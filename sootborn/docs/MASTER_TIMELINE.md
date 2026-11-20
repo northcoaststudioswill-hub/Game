@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version:** `GAME_VER` in `src/ui.js` (0.72; next is 0.73). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
+- **Version:** `GAME_VER` in `src/ui.js` (0.73; next is 0.74). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.71 on; v0.66 to v0.70 in `-changelog-archive-3.md`, v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -323,9 +323,12 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - Not built, on purpose: the flash that the porter stepping aside is meant to set off (12b, the white cloak at the camp) and the service stair (12c) are Step 8. The porter and his line are in place for it.
 - Tests: `ring.mjs` (N, PICK, S0), `plate.mjs`, `coldopen.mjs`.
 
-**Step 8 · v0.73 · Part Two's flashbacks and new places**
+**Step 8 · v0.73 · Part Two's flashbacks and new places** — **DONE 2026-11-20**
 - The camp at night (12b). The service stair, 2.5D (12c). Celestine's own Assay, 2D, stealth then the valve (14b); gloves on her model everywhere. The barge deck as home in Two Years (15b). Seren finds the bleed (15c).
 - Check: each flash's trigger fires and its transition plays; Celestine's gloves in every scene she is in.
+- Done, all in `src/assay.js`: `walkCampNight()` (12b; followers are allies with `crew`, moved in `walk.tick` along a trail of the player's steps), `walkServiceStair()` (12c; `bg2: 'sstair'`, `swall` bays), `MISSIONS.ember` (14b; the `raid` map with `grey: 1`, `where`, Proctors on the pickets' rounds, the wheel at the `valve` hot), `walkBarge()` (15b; `bg2: 'barge'`), `walkSerenLine()` (15c; hero `seren`, steps gated by a counter, `exit: () => step >= 3`). Cards and calls in `P2[1]`, `P2[3]`, `P2[4]` in `src/part2.js`. Gloves: `gloves` on `celestine`, `celf`, `cel20` looks (`src/art.js` hand pixels; `L.gloves` in `src/g3.js`).
+- Not done: gloves in the hand-painted story panels; the barge as a place revisited (it is walked once).
+- Tests: `campn.mjs`, `walk3.mjs` (M=sstair|barge), `seren.mjs`, `ember.mjs`, `gloves.mjs`.
 
 **Step 9 · v0.74 · the Count, the last flash, the ending**
 - The Count as a puzzle (16a); the full Stair replays the cold open's minute from inside (16b); Celestine's "one for forty" line before Little Ember; the ending choice (become her / send her home) and Mara's "little ember" beat (16c); the last flash (16d); the ending as drawn pictures (16e).

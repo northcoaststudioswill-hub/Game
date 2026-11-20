@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.72 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.73 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,13 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.73 (needs your eye)
+- **Five things to play in Part Two:** the cloak (the camp at night, day thirty-one), the service stair, Celestine's own Assay played as her, the barge deck, Seren finding the line played as her.
+- **Things I made up to fill them, to keep or strike:** the other House slept in "the stack's undercroft" that year, which is how shutting one valve left them short of air; thirty-eight came up and two did not; the three people behind the painted line (a valve hand, a woman with plates, a lamp trimmer) and that they know him; Hollis on the barge with a line about Brand; Brand's halberd lashed to the rail; "a way round the meter" built into Bank Seven, which Crew Three walks round and never mentions.
+- **How Kael learns it:** the bible already has Orin telling him she came asking about the line. So after her scene he says "I thought he meant she was curious. She was not curious. She was choosing." Say if you want him not to know, or to be told by somebody.
+- **The barge is walked once**, not as a home visited between scenes. Say if you want a second visit after Tavi comes up.
+- **Celestine's age:** twenty at fifty years before makes her seventy at the furnace, so she now says seventy-six in her room and is seventy-nine at the last fight (the lines said seventy and seventy-three). Say if you would rather move the flash's date and keep the old ages.
 
 ## Built in v0.72 (needs your eye, and three answers)
 - **The fourth ring**, three visits, with NOTICED (the suspicion meter), the bell, the head rule and four Codex finds. Say: is the meter too easy to empty; should a full meter cost more than a slip under the door; is one length of corridor enough.
@@ -89,7 +96,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 6. **The Proctors:** done as detailed flat figures in the valley and the Pairing room (v0.62). Needs your eye. Open: the same treatment for Celestine and her Wardens on the Keep's dais; the crowd in other 3D rooms.
 
 ## Places
-7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rules: (1) from here on, new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot (the fire was already in the story, so it stands). (2) Do not change an existing area to another dimension (2D, 2.5D, 3D) unless you name the area and the dimension.** All five candidates below are approved, to be built after the rest of this list has been gone over. Built in v0.61: Row K the morning after the wedding; the fever ward with the fans up. Built in v0.69: the Assay camp by day. Still to build: the deck of a barge in the two years; the Spire's fourth ring at night. Also still open: the whole square explorable this way in the present, not only as a memory.
+7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rules: (1) from here on, new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot (the fire was already in the story, so it stands). (2) Do not change an existing area to another dimension (2D, 2.5D, 3D) unless you name the area and the dimension.** All five candidates below are approved, to be built after the rest of this list has been gone over. Built in v0.61: Row K the morning after the wedding; the fever ward with the fans up. Built in v0.69: the Assay camp by day. Built in v0.72: the Spire's fourth ring at night. Built in v0.73: the deck of a barge in the two years, and the service stair. Also still open: the whole square explorable this way in the present, not only as a memory.
 8. **The High Docks rebuilt from reference:** laid out like a real dock, dressed as somewhere the Accredited live, with side corridors that go nowhere, height for the boots, and hidden things that feed the Codex.
 9. **Riser Nine:** more character still. It has a hill, a hoist and a road now.
 9a. **The Stair's sky:** the far fleet rides in two turning rings with winking lamps and cannot touch (v0.56). Still to do: crew on the near hulls; the three near wrecks and the smoke do not move.
@@ -106,10 +113,10 @@ Kept current each round. "Keep going" means work down this list from the top unl
 15. **Comic layouts:** the Table was checked; the three levels' opening pages and memory pages still need the same look.
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
 16a. **Built (v0.67 the cold open, v0.68 the intro and the ending; needs your eye).** The Keep as the cold open (master plan 9b): black and the shift song; a 25-second animated intro of moving drawn stills counting to eleven; the Keep at dawn as a duel you cannot lose (strike, dodge, fly); ELEVEN, cut before the blow; then the prologue. The Valley returns to its place. The same fight on the last day, where the blow lands.
-16b. **Part Two flashbacks** (master plan 9c): the Post → the white cloak at the Assay; What She Knows → Celestine's own Assay, played as her; Two Years → Seren tracing the line first; the Count → no cuts, then one flash to the furnace at eleven; the ending as a played sequence of pictures.
+16b. **Built in v0.73 except the last two (the Count's one flash and the played ending are Step 9).** **Part Two flashbacks** (master plan 9c): the Post → the white cloak at the Assay; What She Knows → Celestine's own Assay, played as her; Two Years → Seren tracing the line first; the Count → no cuts, then one flash to the furnace at eleven; the ending as a played sequence of pictures.
 16c. **Both built (the vent stack v0.70, the Deep Array v0.71; need your eye).** Two more comic-book levels in the first half (master plan 9e): the Deep Array with Dace (The Ledger); the vent stack on day 31, where he takes the boots.
 16d. **Built in v0.69 (needs your eye).** Two more 2.5D parts with story in the first half: the Assay camp by day (its people: Dorian, Oswin, Petra); Bay 3 at last bell, counting the knives back.
-16e. **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
+16e. **Built (v0.72, v0.73; needs your eye).** **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
 16f. **The Assay's art in the opening:** the expression, the ring, ELEVEN. Its people and story should be felt, not only fought.
 16g. **Partly built (v0.72: the fourth ring with the meter, the cold open, both flash-forwards; still to come: the service stair, the Count as a puzzle).** **Part Two needs more play (owner, 2026-11-19):** the fourth ring as a home base between chapters, with the suspicion meter; a Part Two cold open (a minute of the Stair at +9); two flash-forwards (the book with his name in red; Tavi at sixteen); the service stair; the Count as a puzzle. Master timeline 10f, 11c, 11d, 12b, 14c, 16a.
 17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)

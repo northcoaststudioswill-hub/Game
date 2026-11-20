@@ -23,7 +23,7 @@ const CAST = {
   watchman: { name: 'Night Watchman', look: () => ({ skin: '#a87a5a', hair: '#2a2a2e', style: 'short', shirt: '#4a4e58', pants: '#2a2c32', extra: 'hat', clean: 1 }) },
   proctor: { name: 'Proctor Sull', look: () => ({ skin: '#c8a080', hair: '#3a3a40', style: 'short', shirt: '#6a6e78', pants: '#3a3c44', extra: 'hat', clean: 1 }) },
   vale: { name: 'Inspector Vale', look: () => ({ skin: '#b89070', hair: '#2a2a2e', style: 'short', shirt: '#5a5e66', pants: '#2a2c32', extra: 'pin', clean: 1 }) },
-  celestine: { name: 'High Auditor Celestine Aurel', look: () => ({ accredited: 1, skin: '#f4e6dc', hair: '#f6eac0', robe: '#f4f2ec', trim: '#e8c25a', crown: 1 }) },
+  celestine: { name: 'High Auditor Celestine Aurel', look: () => ({ accredited: 1, skin: '#f4e6dc', hair: '#f6eac0', robe: '#f4f2ec', trim: '#e8c25a', crown: 1, gloves: '#a8905c' }) },   // gloves, always: she let them take the burns off her palms
   warden: { name: 'Warden', look: () => ({ accredited: 1, warden: 1, skin: '#e8dcd0', hair: '#c8ccd4', robe: '#c8ccd8', trim: '#e8c25a' }) },
   // the Assay, four years on (flash-forwards)
   kael3: { name: 'Kael', look: () => Object.assign({}, CAST.kael2.look(), { cape: '#f4efe2' }) },   // from day thirty-one: the Proctor's white cloak
@@ -39,7 +39,7 @@ const CAST = {
   ilse: { name: 'Ilse Marrin', look: () => ({ accredited: 1, skin: '#e0cdbc', hair: '#b8b4ac', style: 'long', robe: '#5a5660', trim: '#8a8478', sash: '#3a3640' }) },
   brand: { name: 'Brand', look: () => ({ skin: '#b88a6a', hair: '#8a8a8a', style: 'short', beard: 1, shirt: '#4a4e58', pants: '#2a2c34' }) },
   tyr: { name: 'Severin Cade', look: () => ({ accredited: 1, cadet: 1, skin: '#d8b8a0', hair: '#2a2a34', style: 'short', circlet: 1, robe: '#2a2c38', armor: '#2a2c38', trim: '#e8c25a', sash: '#8a1c1c', cape: '#8a1c1c' }) },
-  celf: { name: 'Celestine Aurel', look: () => ({ skirt: 1, accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#f4f2ec', armor: '#f4f2ec', trim: '#e8c25a', sash: '#e8c25a', cape: '#fbf8f0' }) },
+  celf: { name: 'Celestine Aurel', look: () => ({ gloves: '#a8905c', skirt: 1, accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#f4f2ec', armor: '#f4f2ec', trim: '#e8c25a', sash: '#e8c25a', cape: '#fbf8f0' }) },
   sable: { name: 'Sable', look: () => ({ skin: '#8a5a3e', hair: '#1a1418', style: 'long', shirt: '#3a4a3a', pants: '#2a2a22', scarf: '#c8a45a' }) },
   wren: { name: 'Kestrel Dray', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dcc8', hair: '#c88a4a', style: 'short', robe: '#e8e4dc', armor: '#e8e4dc', trim: '#e8c25a', sash: '#4a8ac8' }) },
   teo: { name: 'Dorian Aldane', look: () => ({ accredited: 1, cadet: 1, skin: '#e8c8a8', hair: '#d8b070', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },

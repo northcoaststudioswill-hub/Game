@@ -123,6 +123,7 @@ body.portrait #hint{bottom:auto;top:calc(var(--cy) + var(--ch) + 64px)}
 #card.on{opacity:1}
 #card::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:0}
 #card.tr-wake::before{background:#f6f1e4;animation:trFade 1.6s ease-out both}
+#card.tr-ash::before{background:linear-gradient(to top,#c9c9d0 0%,#77777f 40%,rgba(60,60,66,0) 84%);animation:trRise 2.3s ease-out both}
 #card.tr-furnace::before{background:linear-gradient(to top,#ff8a2a 0%,#c8400c 40%,rgba(120,20,0,0) 84%);animation:trRise 1.9s ease-out both}
 #card.tr-strip::before{background:radial-gradient(ellipse at 50% 72%,rgba(232,194,90,.6),rgba(232,194,90,0) 70%);animation:trFade 1.7s ease-out both}
 #card.tr-strip .acal,#card.tr-years .acal{animation:trSlide 1.1s cubic-bezier(.2,.8,.2,1) both}
@@ -646,9 +647,9 @@ function makeAccredited(o) {
     const sway = f === 1 ? -1 : f === 2 ? 1 : 0, robe = o.robe, trim = o.trim, sk = o.skin;
     // robe: long, widening to the floor
     for (let y = 9; y < AH; y++) { const w = Math.min(12, 6 + Math.floor((y - 9) / 3)), x0 = 8 - Math.floor(w / 2) + (y > AH - 6 ? sway : 0); R(x0, y, w, 1, y === AH - 1 ? trim : robe); R(x0 + w - 1, y, 1, 1, shade(robe, .86)); if (y > 12 && (y % 5) === 2) R(x0 + 2, y, 1, 3, shade(robe, .92)); }
-    if (d === 0) { R(7, 10, 2, AH - 11, trim); R(7, 10, 1, AH - 11, shade(trim, 1.25)); R(4, 9, 8, 1, trim); R(4, 8, 2, 2, trim); R(10, 8, 2, 2, trim); R(3, 12, 1, 6, robe); R(12, 12, 1, 6, robe); R(3, 18, 1, 1, sk); R(12, 18, 1, 1, sk); }
+    if (d === 0) { R(7, 10, 2, AH - 11, trim); R(7, 10, 1, AH - 11, shade(trim, 1.25)); R(4, 9, 8, 1, trim); R(4, 8, 2, 2, trim); R(10, 8, 2, 2, trim); R(3, 12, 1, 6, robe); R(12, 12, 1, 6, robe); R(3, 18, 1, 1, o.gloves || sk); R(12, 18, 1, 1, o.gloves || sk); if (o.gloves) { R(3, 17, 1, 1, o.gloves); R(12, 17, 1, 1, o.gloves); } }
     else if (d === 1) { R(5, 9, 6, 1, trim); }
-    else { R(5, 9, 5, 1, trim); R(4, 8, 2, 2, trim); R(7, 12, 2, 6, shade(robe, .9)); R(7, 18, 2, 1, sk); }
+    else { R(5, 9, 5, 1, trim); R(4, 8, 2, 2, trim); R(7, 12, 2, 6, shade(robe, .9)); R(7, 18, 2, 1, o.gloves || sk); if (o.gloves) R(7, 17, 2, 1, o.gloves); }
     if (o.warden) {
       R(5, 1, 6, 7, '#d8dce4'); R(5, 1, 6, 1, '#f4f6fa'); if (d === 0) { R(6, 3, 4, 1, trim); R(5, 5, 6, 1, '#1e1e28'); R(7, 6, 2, 2, '#b8bcc8'); R(3, 9, 2, 3, '#e8ecf2'); R(11, 9, 2, 3, '#e8ecf2'); R(3, 9, 2, 1, trim); R(11, 9, 2, 1, trim); } else if (d > 1) R(5, 4, 2, 1, trim);
       R(d === 2 ? 2 : 13, 0, 1, AH, '#b8bcc8'); R(d === 2 ? 1 : 12, 0, 3, 2, trim); R(d === 2 ? 2 : 13, -1, 1, 1, '#fff');
@@ -697,7 +698,7 @@ function makeCadet(o) {
       else { R(7, 11, 2, 6, aD); R(4, 13, 8, 1, aD); for (let i = 0; i < 5; i++) R(10 - i, 12 + i, 2, 1, sash); }
       R(5, 17, 6, 1, sash); R(5, 18, 6, 1, trim); R(7, 18, 2, 1, tL); R(4, 19, 3, 2, arm); R(9, 19, 3, 2, arm); R(4, 20, 3, 1, trim); R(9, 20, 3, 1, trim); R(7, 19, 2, 2, aD);
       // arms: pauldron, upper arm, gilt cuff, hand
-      R(2, 12, 2, 4, arm); R(12, 12, 2, 4, arm); R(2, 12, 1, 4, aL); R(13, 12, 1, 4, aD); R(2, 16, 2, 2, trim); R(12, 16, 2, 2, trim); R(2, 17, 2, 1, tD); R(12, 17, 2, 1, tD); R(2, 18, 2, 1, sk); R(12, 18, 2, 1, sk);
+      R(2, 12, 2, 4, arm); R(12, 12, 2, 4, arm); R(2, 12, 1, 4, aL); R(13, 12, 1, 4, aD); R(2, 16, 2, 2, trim); R(12, 16, 2, 2, trim); R(2, 17, 2, 1, tD); R(12, 17, 2, 1, tD); R(2, 18, 2, 1, o.gloves || sk); R(12, 18, 2, 1, o.gloves || sk);
       if (o.band) R(d === 0 ? 12 : 2, 13, 2, 2, '#c8281e'); }
     // neck
     if (d !== 1) R(7, 9, 2, 1, skD);
@@ -1186,7 +1187,7 @@ const CAST = {
   watchman: { name: 'Night Watchman', look: () => ({ skin: '#a87a5a', hair: '#2a2a2e', style: 'short', shirt: '#4a4e58', pants: '#2a2c32', extra: 'hat', clean: 1 }) },
   proctor: { name: 'Proctor Sull', look: () => ({ skin: '#c8a080', hair: '#3a3a40', style: 'short', shirt: '#6a6e78', pants: '#3a3c44', extra: 'hat', clean: 1 }) },
   vale: { name: 'Inspector Vale', look: () => ({ skin: '#b89070', hair: '#2a2a2e', style: 'short', shirt: '#5a5e66', pants: '#2a2c32', extra: 'pin', clean: 1 }) },
-  celestine: { name: 'High Auditor Celestine Aurel', look: () => ({ accredited: 1, skin: '#f4e6dc', hair: '#f6eac0', robe: '#f4f2ec', trim: '#e8c25a', crown: 1 }) },
+  celestine: { name: 'High Auditor Celestine Aurel', look: () => ({ accredited: 1, skin: '#f4e6dc', hair: '#f6eac0', robe: '#f4f2ec', trim: '#e8c25a', crown: 1, gloves: '#a8905c' }) },   // gloves, always: she let them take the burns off her palms
   warden: { name: 'Warden', look: () => ({ accredited: 1, warden: 1, skin: '#e8dcd0', hair: '#c8ccd4', robe: '#c8ccd8', trim: '#e8c25a' }) },
   // the Assay, four years on (flash-forwards)
   kael3: { name: 'Kael', look: () => Object.assign({}, CAST.kael2.look(), { cape: '#f4efe2' }) },   // from day thirty-one: the Proctor's white cloak
@@ -1202,7 +1203,7 @@ const CAST = {
   ilse: { name: 'Ilse Marrin', look: () => ({ accredited: 1, skin: '#e0cdbc', hair: '#b8b4ac', style: 'long', robe: '#5a5660', trim: '#8a8478', sash: '#3a3640' }) },
   brand: { name: 'Brand', look: () => ({ skin: '#b88a6a', hair: '#8a8a8a', style: 'short', beard: 1, shirt: '#4a4e58', pants: '#2a2c34' }) },
   tyr: { name: 'Severin Cade', look: () => ({ accredited: 1, cadet: 1, skin: '#d8b8a0', hair: '#2a2a34', style: 'short', circlet: 1, robe: '#2a2c38', armor: '#2a2c38', trim: '#e8c25a', sash: '#8a1c1c', cape: '#8a1c1c' }) },
-  celf: { name: 'Celestine Aurel', look: () => ({ skirt: 1, accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#f4f2ec', armor: '#f4f2ec', trim: '#e8c25a', sash: '#e8c25a', cape: '#fbf8f0' }) },
+  celf: { name: 'Celestine Aurel', look: () => ({ gloves: '#a8905c', skirt: 1, accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#f4f2ec', armor: '#f4f2ec', trim: '#e8c25a', sash: '#e8c25a', cape: '#fbf8f0' }) },
   sable: { name: 'Sable', look: () => ({ skin: '#8a5a3e', hair: '#1a1418', style: 'long', shirt: '#3a4a3a', pants: '#2a2a22', scarf: '#c8a45a' }) },
   wren: { name: 'Kestrel Dray', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dcc8', hair: '#c88a4a', style: 'short', robe: '#e8e4dc', armor: '#e8e4dc', trim: '#e8c25a', sash: '#4a8ac8' }) },
   teo: { name: 'Dorian Aldane', look: () => ({ accredited: 1, cadet: 1, skin: '#e8c8a8', hair: '#d8b070', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },
@@ -2181,7 +2182,7 @@ const Cutscene = {
   // wake (back to the present below), furnace (back to before the furnace), strip (to the Assay), step (on, inside the Assay), chalk (the same time, somewhere else), page (into a comic-book level)
   card(t, sub, big, tr) {
     const el = $('#card'); el.classList.remove('hidden'); if (!tr && big && /assay/i.test(sub || '')) tr = /^FOUR YEARS AFTER/.test(t) ? 'strip' : 'step';
-    el.className = el.className.replace(/\s*\btr-\w+/g, ''); void el.offsetWidth; if (tr && !Settings.d.reduce) { el.classList.add('tr-' + tr); const sf = { wake: 'dash', furnace: 'heart', strip: 'stage', years: 'stage', chalk: 'clue', page: 'page' }[tr]; if (sf) Sound.play(sf); }
+    el.className = el.className.replace(/\s*\btr-\w+/g, ''); void el.offsetWidth; if (tr && !Settings.d.reduce) { el.classList.add('tr-' + tr); const sf = { wake: 'dash', furnace: 'heart', ash: 'heart', strip: 'stage', years: 'stage', chalk: 'clue', page: 'page' }[tr]; if (sf) Sound.play(sf); }
     el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}${tr === 'years' ? yearCal(t) : assayCal(sub)}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
     el.classList.remove('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   },
@@ -3057,10 +3058,10 @@ const Brawl = {
     for (const n of this.allies.concat(w.spots || [])) { const dx = p.x - n.x, dy = (p.y - n.y) * 1.4, d = Math.hypot(dx, dy), r = n.r || 11; if (d < r && d > .01) { p.x = n.x + dx / d * r; p.y = n.y + dy / d * r / 1.4; } if (n.talk && d < (n.reach || 30) && d < bd) { bd = d; best = n; } }
     k.near = best; for (const n of this.allies) { n.t += dt; if (n.kn) { n.fx = 0; n.fy = 1; } /* the head rule: soot turn to whoever comes up to them; the Accredited keep their eyes front */ else if (best === n && !n.acc) { const d = Math.hypot(p.x - n.x, p.y - n.y) || 1; n.fx = (p.x - n.x) / d; n.fy = (p.y - n.y) / d; } }
     if (w.tick) { const ev = w.tick(k, dt, this); if (ev) { p.st = 'idle'; p.anim = 0; Dialogue.start(ev); return; } }
-    if (best && Input.p('A')) { Input.consume(); p.st = 'idle'; p.anim = 0; const d = Math.hypot(best.x - p.x, best.y - p.y) || 1; p.fx = (best.x - p.x) / d; p.fy = (best.y - p.y) / d; const steps = best.talk(k) || []; if (best.exit) { Dialogue.start(steps, () => this.end(true)); return; } const id = best.key || best.id; if (!k.said[id]) { k.said[id] = 1; k.n++; } Dialogue.start(steps); return; }
+    if (best && Input.p('A')) { Input.consume(); p.st = 'idle'; p.anim = 0; const d = Math.hypot(best.x - p.x, best.y - p.y) || 1; p.fx = (best.x - p.x) / d; p.fy = (best.y - p.y) / d; const steps = best.talk(k) || []; if (typeof best.exit === 'function' ? best.exit(k) : best.exit) { Dialogue.start(steps, () => this.end(true)); return; } const id = best.key || best.id; if (!k.said[id]) { k.said[id] = 1; k.n++; } Dialogue.start(steps); return; }
     this.stepParts(dt); { const c = this.cam, q = Math.min(1, dt * 4); c.x += (p.x * .85 - c.x) * q; c.y += (p.y + 185 - c.y) * q; c.h += (104 - c.h) * q; c.roll = 0; } },
   hudWalk(g) { const w = this.def.walk, k = this.wk, n = k.near, o = typeof w.obj === 'function' ? w.obj(k) : w.obj;
-    if (this.t < 3.2 && this.def.title) { const tw = ptextW(this.def.title, 2); g.globalAlpha = clamp(3.2 - this.t, 0, 1); if (this.def.bg2 === 'ring4') { const sw = this.def.sub ? ptextW(this.def.sub) : 0, bw = Math.max(tw, sw) + 16; g.fillStyle = 'rgba(10,6,8,.7)'; g.fillRect(Math.round((W - bw) / 2), 25, bw, 34); } ptext(g, this.def.title, Math.round((W - tw) / 2), 30, '#ffe08a', 2); if (this.def.sub) { const sw = ptextW(this.def.sub); ptext(g, this.def.sub, Math.round((W - sw) / 2), 46, '#e8dcc0'); } g.globalAlpha = 1; }
+    if (this.t < 3.2 && this.def.title) { const tw = ptextW(this.def.title, 2); g.globalAlpha = clamp(3.2 - this.t, 0, 1); if (this.def.bg2 === 'ring4' || this.def.bg2 === 'sstair' || this.def.bg2 === 'barge') { const sw = this.def.sub ? ptextW(this.def.sub) : 0, bw = Math.max(tw, sw) + 16; g.fillStyle = 'rgba(10,6,8,.7)'; g.fillRect(Math.round((W - bw) / 2), 25, bw, 34); } ptext(g, this.def.title, Math.round((W - tw) / 2), 30, '#ffe08a', 2); if (this.def.sub) { const sw = ptextW(this.def.sub); ptext(g, this.def.sub, Math.round((W - sw) / 2), 46, '#e8dcc0'); } g.globalAlpha = 1; }
     if (o) { const tw = ptextW(o); g.fillStyle = 'rgba(10,6,8,.78)'; g.fillRect(3, 3, tw + 8, 11); ptext(g, o, 7, 5, '#e8dcc0'); }
     if (w.meter) { const m = w.meter(k), lw = ptextW(m.label), n = m.max, x0 = W - (lw + n * 7 + 12), hot = m.v >= n - 1; k.mv = k.mv === undefined ? m.v : k.mv; if (m.v !== k.mv) { k.mf = 1; k.mup = m.v > k.mv; k.mv = m.v; } k.mf = Math.max(0, (k.mf || 0) - 1 / 60); g.fillStyle = 'rgba(10,6,8,.78)'; g.fillRect(x0 - 4, 16, lw + n * 7 + 13, 11); ptext(g, m.label, x0, 18, k.mf > 0 ? (k.mup ? '#ff8a6a' : '#9ad8c0') : '#e8dcc0'); for (let i = 0; i < n; i++) { g.fillStyle = '#2a2026'; g.fillRect(x0 + lw + 5 + i * 7, 18, 5, 7); if (i < m.v) { g.fillStyle = hot ? '#e8452e' : i >= n - 3 ? '#e8a23a' : '#e8dcc0'; g.fillRect(x0 + lw + 6 + i * 7, 19, 3, 5); } } }
     { const pp = this.proj(this.p.x, this.p.y, 46), x = Math.round(pp.x), y = Math.round(pp.y); g.fillStyle = '#120a0e'; g.fillRect(x - 3, y - 1, 7, 4); g.fillStyle = '#ffe08a'; g.fillRect(x - 2, y, 5, 1); g.fillRect(x - 1, y + 1, 3, 1); g.fillRect(x, y + 2, 1, 1); }
@@ -3523,6 +3524,15 @@ const Brawl = {
   },
   backdrop(g, bg, hor, t) {
     const c = this.cam, px = -c.x * .12, R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }, rm = Settings.d.reduce;
+    if (this.def.bg2 === 'barge') {   /* a deck in the weather: cloud, rain, and the hooded lamps of other hulls riding in it */
+      for (let y = 0; y <= hor; y++) R(0, y, W, 1, `rgb(${20 + y * .2 | 0},${24 + y * .24 | 0},${36 + y * .3 | 0})`);
+      for (let i = 0; i < 7; i++) { const x = ((i * 83 + t * (2 + i % 3) + px * (.6 + i % 3 * .3)) % (W + 120) + W + 120) % (W + 120) - 60, y = 6 + (i * 23) % Math.max(8, hor - 30); g.fillStyle = `rgba(${60 + i * 6},${66 + i * 6},${84 + i * 6},.5)`; g.beginPath(); g.ellipse(x, y, 46 + (i % 3) * 16, 7 + (i % 2) * 3, 0, 0, 6.3); g.fill(); }
+      for (let i = 0; i < 9; i++) { const x = ((i * 61 + px * (1 + i % 3 * .5)) % (W + 40) + W + 40) % (W + 40) - 20, y = hor - 6 - (i * 17) % 44 + (rm ? 0 : Math.sin(t * .7 + i * 1.7) * 2), sc = .5 + (i % 3) * .3; R(x - 9 * sc, y, 18 * sc, 3 * sc, '#12141c'); R(x - 6 * sc, y - 5 * sc, 12 * sc, 5 * sc, '#191c26'); R(x + 5 * sc, y - 1, 1, 1, '#ffb040'); if (i % 2 === 0) R(x - 6 * sc, y - 1, 1, 1, '#ffb040'); }
+      R(0, hor - 3, W, 3, '#1c2030'); return; }
+    if (this.def.bg2 === 'sstair') {
+      for (let y = 0; y <= hor; y++) R(0, y, W, 1, `rgb(${14 + y * .12 | 0},${13 + y * .1 | 0},${16 + y * .12 | 0})`);
+      const bx = px * 2; for (let i = -2; i < 9; i++) { const x = bx + i * 46; R(x, 0, 5, hor, '#2a2830'); R(x, 0, 1, hor, '#3e3c46'); R(x + 14, 0, 2, hor, '#4a3a2a'); }
+      return; }
     if (this.def.bg2 === 'ring4') {
       for (let y = 0; y <= hor; y++) R(0, y, W, 1, `rgb(${16 + y * .22 | 0},${18 + y * .26 | 0},${40 + y * .42 | 0})`);
       const bx = px * 2; g.strokeStyle = 'rgba(232,194,90,.5)'; g.lineWidth = 1; for (let i = -2; i < 7; i++) { const x = bx + 20 + i * 70; g.beginPath(); g.moveTo(x, hor); g.quadraticCurveTo(x + 35, hor - 96, x + 70, hor); g.stroke(); R(x - 1, hor - 30, 3, 30, '#b9963c'); }
@@ -3584,7 +3594,7 @@ const Brawl = {
     g.imageSmoothingEnabled = false; g.fillStyle = this.pat[bg]; const b = g.getTransform();
     for (let sy = Math.ceil(c.hor) + 1; sy < H; sy++) { const s = (sy - c.hor) / c.h, dz = c.f / s, wy = c.y - dz; g.setTransform(b.a * s, 0, 0, b.d, b.e + b.a * (W / 2 - (256 + c.x) * s), b.f + b.d * (sy - (wy + 256))); g.fillRect(256 + c.x - (W / 2) / s - 1, wy + 256, W / s + 2, 1.02); }
     g.setTransform(b);
-    const haze = bg === 'ring' ? '20,12,16' : bg === 'furnace' ? '255,110,40' : bg === 'ford' ? '255,170,120' : this.def.bg2 === 'ring4' ? '130,160,220' : bg === 'keep' ? '255,214,190' : '200,230,255'; const gr = g.createLinearGradient(0, c.hor, 0, c.hor + 46); gr.addColorStop(0, `rgba(${haze},.85)`); gr.addColorStop(1, `rgba(${haze},0)`); g.fillStyle = gr; g.fillRect(0, c.hor, W, 47);
+    const haze = bg === 'ring' ? '20,12,16' : bg === 'furnace' ? '255,110,40' : bg === 'ford' ? '255,170,120' : this.def.bg2 === 'ring4' ? '130,160,220' : this.def.bg2 === 'sstair' ? '30,26,30' : this.def.bg2 === 'barge' ? '40,46,64' : bg === 'keep' ? '255,214,190' : '200,230,255'; const gr = g.createLinearGradient(0, c.hor, 0, c.hor + 46); gr.addColorStop(0, `rgba(${haze},.85)`); gr.addColorStop(1, `rgba(${haze},0)`); g.fillStyle = gr; g.fillRect(0, c.hor, W, 47);
   },
   drawMarks(g) { // a fist lands as a star, a blade as a cut, a boot as a crescent; steel on a guard chips; a body on the ground raises dust
     for (const q of this.marks) { const pr = this.proj(q.x, q.y, q.h), u = q.life / q.max, W0 = 16 * this.K * pr.s * (q.big ? 1.45 : 1), c = q.c || '255,255,255', al = 1 - u * u, ca = Math.cos(q.a), sa = Math.sin(q.a);
@@ -3713,6 +3723,24 @@ const Brawl = {
       else if (v === 'lamp') { R(-2, -84, 4, 10, '#b9963c'); R(-5, -96, 10, 12, '#1c6a64'); R(-3, -94, 6, 8, '#7fe0d4'); R(-1, -92, 2, 4, '#eafffb'); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pr.x, pr.y - 90 * s, 0, pr.x, pr.y - 90 * s, 60 * s); gr.addColorStop(0, 'rgba(110,230,215,.42)'); gr.addColorStop(1, 'rgba(60,200,190,0)'); g.fillStyle = gr; g.fillRect(pr.x - 62 * s, pr.y - 152 * s, 124 * s, 124 * s); g.globalCompositeOperation = 'source-over'; }
       else if (v === 'pipe') { R(-4, -Hh, 8, Hh, '#8a8f98'); R(-4, -Hh, 2, Hh, '#b8bec8'); R(2, -Hh, 2, Hh, '#5e636c'); for (const y of [-120, -64, -20]) { R(-6, y, 12, 4, '#6a6f78'); R(-6, y, 12, 1, '#a8aeb8'); } R(-10, -58, 6, 6, '#b9963c'); R(-9, -57, 4, 4, '#2a2630'); }
       else if (v === 'bell') { R(-9, -98, 18, 26, '#b9963c'); R(-7, -96, 14, 22, '#2a2630'); R(-5, -93, 2, 2, '#e8c25a'); R(-5, -88, 2, 2, '#e8c25a'); R(-1, -88, 2, 2, '#e8c25a'); R(-5, -82, 10, 1, '#9a94a0'); R(-3, -112, 6, 9, '#e8c25a'); R(-4, -104, 8, 2, '#b9963c'); R(-1, -102, 2, 3, '#7a6428'); const rg = q.ring ? q.ring() : 0; if (rg > 0 && !Settings.d.reduce) { g.strokeStyle = `rgba(255,224,138,${rg * .8})`; g.lineWidth = 1; for (let i = 0; i < 2; i++) { g.beginPath(); g.arc(pr.x, pr.y - 107 * s, (10 + (1 - rg) * 26 + i * 8) * s, 0, 6.3); g.stroke(); } } } }
+    else if (q.t === 'swall') {   /* behind the painted line: one bay of the service side. v: plain | valve | lamp | arch | door */
+      const v = q.v || 'plain', Hh = 150; R(-21, -Hh, 42, Hh, '#34323a'); for (let r = 0; r < 10; r++) { R(-21, -Hh + r * 15, 42, 1, '#26242b'); R(-21 + ((r * 17 + (q.k || 0) * 7) % 34), -Hh + r * 15, 1, 15, '#26242b'); } R(-21, -6, 42, 6, '#222027'); R(-14, -Hh, 3, Hh, '#5a5e68'); R(-14, -Hh, 1, Hh, '#7a7f8a'); R(12, -Hh, 2, Hh, '#6a4a30');
+      if (v === 'valve') { R(-11, -84, 22, 50, '#2a2c34'); R(-10, -83, 20, 48, '#3a3d48'); for (let i = 0; i < 2; i++) { const cx = pr.x + (i ? 5 : -5) * s, cy = pr.y - 56 * s; g.strokeStyle = '#8a2f24'; g.lineWidth = Math.max(1, 1.6 * s); g.beginPath(); g.arc(cx, cy, 4 * s, 0, 6.3); g.stroke(); const a = q.turn ? q.turn() * 3 + i : i; g.beginPath(); g.moveTo(cx - Math.cos(a) * 4 * s, cy - Math.sin(a) * 4 * s); g.lineTo(cx + Math.cos(a) * 4 * s, cy + Math.sin(a) * 4 * s); g.moveTo(cx + Math.sin(a) * 4 * s, cy - Math.cos(a) * 4 * s); g.lineTo(cx - Math.sin(a) * 4 * s, cy + Math.cos(a) * 4 * s); g.stroke(); R((i ? 5 : -5) - 3, -78, 6, 6, '#d8d2c0'); R((i ? 5 : -5), -76, 1, 3, '#b3261c'); } R(-8, -42, 16, 3, '#b08a44'); R(-7, -41, 6, 1, '#2a2016'); }
+      else if (v === 'lamp') { R(-1, -100, 2, 10, '#2a2228'); R(-4, -92, 8, 10, '#6a4a20'); R(-3, -91, 6, 8, '#ffb040'); R(-1, -89, 2, 4, '#fff0b0'); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pr.x, pr.y - 86 * s, 0, pr.x, pr.y - 86 * s, 70 * s); gr.addColorStop(0, 'rgba(255,170,80,.45)'); gr.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = gr; g.fillRect(pr.x - 72 * s, pr.y - 158 * s, 144 * s, 144 * s); g.globalCompositeOperation = 'source-over'; }
+      else if (v === 'arch') { R(-15, -96, 30, 96, '#131217'); R(-17, -98, 34, 3, '#4a4852'); R(-17, -98, 2, 98, '#4a4852'); R(15, -98, 2, 98, '#4a4852'); for (let i = 0; i < 6; i++) { R(-13 + i * 2, -8 - i * 9, 26 - i * 2, 9, i & 1 ? '#26242b' : '#2e2c34'); R(-13 + i * 2, -8 - i * 9, 26 - i * 2, 1, '#45434d'); R(-2 + i, -7 - i * 9, 3, 1, '#c9963a'); } R(4, -92, 8, 20, '#141a3a'); R(6, -88, 1, 1, '#f4f0e0'); R(9, -80, 1, 1, '#f4f0e0'); }
+      else if (v === 'door') { R(-12, -90, 24, 84, '#1c1a20'); R(-10, -88, 20, 82, '#4a4650'); R(-10, -88, 20, 2, '#5e5a66'); R(6, -48, 2, 5, '#b08a44'); R(-10, -8, 20, 2, '#f6f1e4'); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(246,241,228,.16)'; g.fillRect(Math.round(pr.x - 14 * s), Math.round(pr.y - 6 * s), Math.round(28 * s), Math.round(14 * s)); g.globalCompositeOperation = 'source-over'; } }
+    else if (q.t === 'vbank') {   /* a valve bank below: a rack of risers, three wheels, a gauge over each, and its number on a plate */
+      R(-26, -64, 52, 64, '#2a2226'); R(-24, -62, 48, 60, '#3a3036'); for (let i = 0; i < 6; i++) { R(-22 + i * 8, -62, 4, 60, '#6a6f78'); R(-22 + i * 8, -62, 1, 60, '#a8aeb8'); } R(-26, -66, 52, 3, '#5a4a40'); R(-26, -2, 52, 2, '#1a1418');
+      for (let i = 0; i < 3; i++) { const cx = pr.x + (i - 1) * 16 * s, cy = pr.y - 30 * s; g.strokeStyle = '#a8382a'; g.lineWidth = Math.max(1, 1.8 * s); g.beginPath(); g.arc(cx, cy, 5 * s, 0, 6.3); g.stroke(); g.beginPath(); g.moveTo(cx - 5 * s, cy); g.lineTo(cx + 5 * s, cy); g.moveTo(cx, cy - 5 * s); g.lineTo(cx, cy + 5 * s); g.stroke(); R((i - 1) * 16 - 3, -52, 6, 6, '#d8d2c0'); R((i - 1) * 16, -50, 1, 3, '#b3261c'); }
+      R(-7, -76, 14, 10, '#b08a44'); R(-6, -75, 12, 8, '#2a2016'); ptext(g, String(q.n || 7), Math.round(pr.x - 2), Math.round(pr.y - 75 * s + 1), '#e8dcc0'); }
+    else if (q.t === 'brail') {   /* a barge's rail: posts, two lines, sometimes a hooded lamp or a halberd lashed butt down */
+      R(-20, -22, 3, 22, '#3a2c20'); R(-20, -22, 1, 22, '#5a4634'); R(-21, -20, 42, 2, '#6a5a44'); R(-21, -11, 42, 1, '#5a4a38'); R(-21, -1, 42, 2, '#2a2018');
+      if (q.v === 'lamp') { R(-1, -34, 2, 14, '#2a2228'); R(-4, -40, 8, 7, '#3a3430'); R(-3, -35, 6, 2, '#ffb040'); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pr.x, pr.y - 30 * s, 0, pr.x, pr.y - 30 * s, 34 * s); gr.addColorStop(0, 'rgba(255,170,80,.34)'); gr.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = gr; g.fillRect(pr.x - 36 * s, pr.y - 64 * s, 72 * s, 72 * s); g.globalCompositeOperation = 'source-over'; }
+      else if (q.v === 'halberd') { R(4, -70, 2, 70, '#6a4a30'); R(4, -70, 1, 70, '#8a6a48'); R(2, -78, 6, 9, '#c8ccd4'); R(7, -74, 4, 5, '#9aa0aa'); R(4, -82, 2, 5, '#e8ecf2'); R(1, -26, 8, 2, '#8a7a5a'); R(1, -12, 8, 2, '#8a7a5a'); } }
+    else if (q.t === 'bpipe') {   /* the run of pipe along a barge's deck, and the seal on it that weeps */
+      R(-30, -9, 60, 6, '#6a6f78'); R(-30, -9, 60, 2, '#a8aeb8'); R(-30, -4, 60, 1, '#3a3d44'); for (const x of [-24, 20]) { R(x, -11, 4, 10, '#4a4e58'); R(x, -3, 4, 3, '#2a2c32'); } R(-3, -12, 7, 12, '#8a5a30'); R(-3, -12, 7, 2, '#b07a44'); R(-1, -18, 3, 6, '#5a5e68'); R(-4, -20, 9, 2, '#8a2f24');
+      const wet = q.weep ? q.weep() : 1; if (wet && !Settings.d.reduce) for (let i = 0; i < 5; i++) { const k = (t * .9 + i * .21) % 1; g.fillStyle = `rgba(220,230,240,${(1 - k) * .4 * wet})`; g.beginPath(); g.arc(pr.x + (Math.sin(i * 2.3 + t) * 3 + 1) * s, pr.y - (12 + k * 26) * s, (2 + k * 5) * s, 0, 6.3); g.fill(); } if (wet) { R(-6, 0, 12, 1, 'rgba(180,200,220,.5)'); } }
+    else if (q.t === 'bcrate') { R(-8, -12, 16, 12, '#c9d2da'); R(-8, -12, 16, 2, '#eef2f6'); R(-8, -2, 16, 2, '#8a94a0'); R(-1, -12, 2, 12, '#9aa4ae'); if (q.k % 2) { R(-7, -22, 14, 10, '#5a4634'); R(-7, -22, 14, 2, '#7a624a'); } }
     else if (q.t === 'stall') {   /* Sable's stall: cold crates off Freight Three, greens under a teal lamp. q.shut(): the shutter half down */
       const sh = q.shut ? q.shut() : 0; R(-24, -4, 4, 4, '#3a3028'); R(20, -4, 4, 4, '#3a3028'); R(-26, -22, 52, 18, '#5a4634'); R(-26, -22, 52, 2, '#7a624a'); R(-26, -6, 52, 2, '#3a2c20'); R(-24, -50, 2, 28, '#3a3028'); R(22, -50, 2, 28, '#3a3028'); R(-28, -56, 56, 7, '#1c6a64'); R(-28, -50, 56, 2, '#124a46'); for (let i = 0; i < 7; i++) R(-28 + i * 8, -56, 4, 7, '#2a8a82');
       if (sh) { R(-24, -49, 48, 27, '#2a2630'); for (let i = 0; i < 6; i++) R(-24, -46 + i * 4, 48, 1, '#3a3642'); R(-8, -40, 5, 1, '#e8dcc0'); R(-6, -38, 9, 1, '#e8dcc0'); R(4, -41, 1, 5, '#e8dcc0'); }
@@ -3742,7 +3770,7 @@ const Brawl = {
     if (d3) { g.clearRect(-8, -8, W + 16, H + 16); G3.begin(this, artOn && !rm ? [.04, .025, .09] : null, sx, sy); if (this.def.flat && !(artOn && !rm)) { if (!this.flatC) { this.flatC = document.createElement('canvas'); this.flatC.width = 320; this.flatC.height = 180; } if (this.flatC.width !== W) this.flatC.width = W; const fg = this.flatC.getContext('2d'); this.g3 = false; this.backdrop(fg, bg, c.hor, this.t); this.floor(fg, bg); for (const q of this.props.filter(q => q.y < -8).sort((a, b) => a.y - b.y)) this.prop(fg, q); if (bg === 'storm') { const t = this.t, fl = rm ? 0 : Math.max(0, Math.sin(t * 0.83) * Math.sin(t * 2.9) - 0.93) * 9; fg.fillStyle = 'rgba(6,8,30,.62)'; fg.fillRect(0, 0, W, H); if (fl > 0) { fg.fillStyle = `rgba(210,220,255,${Math.min(.5, fl)})`; fg.fillRect(0, 0, W, H); } if (!rm) { fg.fillStyle = 'rgba(190,205,255,.3)'; for (let i = 0; i < 70; i++) { const rx = ((i * 53.7 + t * 260) % (W + 40)) - 20, ry = ((i * 91.3 + t * 520) % (H + 20)) - 10; fg.fillRect(rx, ry, 1, 6); } } } this.g3 = true; G3.flatSrc = this.flatC; } } else { this.backdrop(g, bg, c.hor, this.t); this.floor(g, bg); }
     if (!rm && !d3 && (bg === 'valley' || bg === 'ford')) { const t = this.t; for (let i = 0; i < 3; i++) { const cx0 = ((i * 190 + t * 9) % 620) - 310, cy0 = -90 + i * 70; this.poly(g, Array.from({ length: 14 }, (_, k) => [cx0 + Math.cos(k / 14 * 6.283) * (70 + i * 14), cy0 + Math.sin(k / 14 * 6.283) * 30]), 'rgba(10,30,40,.13)'); }
       if (bg === 'ford') for (let i = 0; i < 26; i++) { const wx = ((i * 47.3 + t * (14 + i % 4 * 5)) % 420) - 210, wy = -48 + (i * 13) % 40, pr = this.proj(wx, wy); if (Math.sin(t * 5 + i * 2.1) > .2) { g.fillStyle = i % 3 ? 'rgba(255,230,190,.8)' : 'rgba(255,255,255,.9)'; g.fillRect(Math.round(pr.x), Math.round(pr.y), Math.max(2, Math.round(5 * pr.s)), 1); } } }
-    if (!rm && !d3 && bg === 'keep') { const A = this.arena; for (let i = 0; i < 4; i++) { const x0 = -A.w / 2 - 40 + i * 90 + Math.sin(this.t * .2 + i) * 6; this.poly(g, [[x0, -A.h / 2 - 20], [x0 + 26, -A.h / 2 - 20], [x0 + 86, A.h / 2 + 60], [x0 + 40, A.h / 2 + 60]], this.def.bg2 === 'ring4' ? 'rgba(150,180,255,.09)' : 'rgba(255,236,200,.10)'); } }
+    if (!rm && !d3 && bg === 'keep') { const A = this.arena; for (let i = 0; i < 4; i++) { const x0 = -A.w / 2 - 40 + i * 90 + Math.sin(this.t * .2 + i) * 6; this.poly(g, [[x0, -A.h / 2 - 20], [x0 + 26, -A.h / 2 - 20], [x0 + 86, A.h / 2 + 60], [x0 + 40, A.h / 2 + 60]], this.def.bg2 === 'ring4' ? 'rgba(150,180,255,.09)' : this.def.bg2 === 'sstair' ? 'rgba(255,190,110,.05)' : 'rgba(255,236,200,.10)'); } }
     for (const r of this.rings) this.disc(g, r.x, r.y, r.r, r.c === '#fff' ? `rgba(255,255,255,${r.life * .8})` : r.c + (Math.round(clamp(r.life, 0, 1) * 200).toString(16).padStart(2, '0')), 2);
     if (rush && !rm) { const tg = artOn ? this.art.tg : this.sup.tg || this.p, pr = this.proj(tg.x, tg.y, 24), t = this.t; if (!d3) { g.fillStyle = artOn ? (this.art.a.dark || 'rgba(10,6,22,.8)') : 'rgba(26,2,4,.78)'; g.fillRect(-8, -8, W + 16, H + 16); } g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 40; i++) { const a = i / 40 * 6.283 + (i % 5) * .13, r0 = 26 + (i * 37 + t * 520) % 150, r1 = r0 + 30 + (i % 4) * 16; g.strokeStyle = i % 3 ? (artOn ? `rgba(${this.art.a.rgb || '255,200,90'},.5)` : 'rgba(255,90,30,.5)') : 'rgba(255,220,160,.6)'; g.lineWidth = i % 4 === 0 ? 2 : 1; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * r1, pr.y + Math.sin(a) * r1 * .7); g.stroke(); } g.globalCompositeOperation = 'source-over'; }
     const list = (rush || d3 ? [] : this.props.map(q => ({ y: q.y, d: () => this.prop(g, q) }))).concat(extra);
@@ -4366,10 +4394,10 @@ const G3 = {
       if (L.circlet) { D.box(hd, 0, 11, 0, 9.8, 1.2, 9.8, trim); D.box(hd, 0, 12.2, 4.9, 1.6, 2, .5, [1, 1, .9], 1); }
       if (L.crown) for (let i = 0; i < 5; i++) D.box(M4.chain(hd, M4.ry((i - 2) * .55), M4.t(0, 12.4, 4.9)), 0, 1.8 + (i === 2 ? 1 : 0), 0, 1.3, 3.6 + (i === 2 ? 2 : 0), .6, [1, .9, .5], 1); }
     // off arm: shoulder, elbow, an open hand for balance
-    { const am = M4.chain(up, M4.t(SHX, SHY, 0), M4.rz(.14), M4.ry(P.ly), M4.rx(P.lp)), fm = M4.chain(am, M4.t(0, -UA, 0), M4.rx(P.le)); if (N) { this.arm2(D, am, fm, UA, arm, trim, skin); if (L.band) { D.loft(fm, [[-9, 2.1, 2.2], [-6.2, 2.35, 2.45], [-2.6, 2.05, 2.15]], 6, ['#8a6a3a', '#a87a3a']); D.box(fm, 0, -9.2, 0, 4.3, .5, 4.5, [1, .75, .35], 1); D.box(fm, 0, -6, 2.3, 2.6, 1.8, .5, [1, .7, .3], 1); } } else { D.cyl(am, 0, -7.3, 0, 2.1, 2.8, 7.4, 6, arm); D.box(am, 0, -7, -.4, 3.6, 2.2, 3.8, trim); D.cyl(fm, 0, -6.5, 0, 1.8, 2.6, 6.6, 6, shade(arm, .92)); D.box(fm, 0, -3.6, 1.6, 3.4, 4.6, 1.4, arm); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim); D.box(fm, 0, -7.7, 0, 3.4, 2.8, 3.6, skin); D.box(fm, 0, -8.7, .8, 3.2, 1.4, 2.2, shade(skin, .86)); D.box(fm, 1.9, -7.3, .6, 1, 1.8, 1.4, shade(skin, .9)); if (L.band) { D.cyl(fm, 0, -6.7, 0, 2.7, 3.1, 5.2, 6, '#a87a3a'); D.box(fm, 0, -8, 0, 4.6, 3.4, 4.8, '#8a6a3a'); D.box(fm, 0, -1.6, 0, 5.8, 1, 5.8, [1, .8, .4], 1); D.box(fm, 0, -8, 2.5, 3, 2, .5, [1, .7, .3], 1); } if (L.shield) { const sm2 = M4.chain(fm, M4.t(2.6, -4, 0), M4.rz(Math.PI / 2)); D.cyl(sm2, 0, 0, 0, 8.4, 8.4, 1.2, 8, sash, 0, 1); D.cyl(sm2, 0, 1.2, 0, 8.6, 7.6, .5, 8, trim); D.cyl(sm2, 0, 1.2, 0, 2.4, 1.4, 1.6, 6, trim, 1, 1); D.cyl(sm2, 0, -.2, 0, 8.8, 8.8, .3, 8, shade(sash, .7)); } } }
+    { const am = M4.chain(up, M4.t(SHX, SHY, 0), M4.rz(.14), M4.ry(P.ly), M4.rx(P.lp)), fm = M4.chain(am, M4.t(0, -UA, 0), M4.rx(P.le)); if (N) { this.arm2(D, am, fm, UA, arm, trim, L.gloves || skin); if (L.band) { D.loft(fm, [[-9, 2.1, 2.2], [-6.2, 2.35, 2.45], [-2.6, 2.05, 2.15]], 6, ['#8a6a3a', '#a87a3a']); D.box(fm, 0, -9.2, 0, 4.3, .5, 4.5, [1, .75, .35], 1); D.box(fm, 0, -6, 2.3, 2.6, 1.8, .5, [1, .7, .3], 1); } } else { D.cyl(am, 0, -7.3, 0, 2.1, 2.8, 7.4, 6, arm); D.box(am, 0, -7, -.4, 3.6, 2.2, 3.8, trim); D.cyl(fm, 0, -6.5, 0, 1.8, 2.6, 6.6, 6, shade(arm, .92)); D.box(fm, 0, -3.6, 1.6, 3.4, 4.6, 1.4, arm); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim); D.box(fm, 0, -7.7, 0, 3.4, 2.8, 3.6, skin); D.box(fm, 0, -8.7, .8, 3.2, 1.4, 2.2, shade(skin, .86)); D.box(fm, 1.9, -7.3, .6, 1, 1.8, 1.4, shade(skin, .9)); if (L.band) { D.cyl(fm, 0, -6.7, 0, 2.7, 3.1, 5.2, 6, '#a87a3a'); D.box(fm, 0, -8, 0, 4.6, 3.4, 4.8, '#8a6a3a'); D.box(fm, 0, -1.6, 0, 5.8, 1, 5.8, [1, .8, .4], 1); D.box(fm, 0, -8, 2.5, 3, 2, .5, [1, .7, .3], 1); } if (L.shield) { const sm2 = M4.chain(fm, M4.t(2.6, -4, 0), M4.rz(Math.PI / 2)); D.cyl(sm2, 0, 0, 0, 8.4, 8.4, 1.2, 8, sash, 0, 1); D.cyl(sm2, 0, 1.2, 0, 8.6, 7.6, .5, 8, trim); D.cyl(sm2, 0, 1.2, 0, 2.4, 1.4, 1.6, 6, trim, 1, 1); D.cyl(sm2, 0, -.2, 0, 8.8, 8.8, .3, 8, shade(sash, .7)); } } }
     // sword arm: shoulder, elbow, wrist, steel
     const am = M4.chain(up, M4.t(-SHX, SHY, 0), M4.rz(-.14), M4.ry(P.ry), M4.rx(P.rp)), fm = M4.chain(am, M4.t(0, -UA, 0), M4.rx(P.re));
-    if (N) { this.arm2(D, am, fm, UA, arm, trim, skin); if (L.band) D.loft(am, [[-4.6, 1.95, 2.1], [-2.8, 2.05, 2.2]], 6, '#c8281e'); } else {
+    if (N) { this.arm2(D, am, fm, UA, arm, trim, L.gloves || skin); if (L.band) D.loft(am, [[-4.6, 1.95, 2.1], [-2.8, 2.05, 2.2]], 6, '#c8281e'); } else {
     D.cyl(am, 0, -7.3, 0, 2.1, 2.8, 7.4, 6, arm); D.box(am, 0, -7, -.4, 3.6, 2.2, 3.8, trim); if (L.band) D.box(am, 0, -3.4, 0, 4.9, 2.6, 5.3, '#c8281e'); D.cyl(fm, 0, -6.5, 0, 1.8, 2.6, 6.6, 6, shade(arm, .92)); D.box(fm, 0, -3.6, 1.6, 3.4, 4.6, 1.4, arm); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim); D.box(fm, 0, -7.7, 0, 3.4, 2.8, 3.6, skin); D.box(fm, 0, -8.7, .8, 3.2, 1.4, 2.2, shade(skin, .86)); D.box(fm, 1.9, -7.3, .6, 1, 1.8, 1.4, shade(skin, .9)); }
     if (blade) { const hm = M4.chain(fm, M4.t(0, -7.8, 0), M4.rx(P.tilt)), av = Math.abs(R.v.ry || 0) + Math.abs(R.v.rp || 0) + Math.abs(R.v.tw || 0) * .6, fast = av > 9, BL = (blade === 2 ? 58 : 27) * (1 + (rm ? 0 : clamp((av - 9) / 60, 0, .45))), hot = o === Brawl.p && !Brawl.cine ? this.rage : (opt.aura || 0) > 2.5 ? 1 : 0, bc = blade === 2 ? [.86, .88, .92] : [1, .97 - hot * .4, .86 - hot * .6];
       if (blade === 2) { D.box(hm, 0, -BL * .35, 0, 1.6, BL, 1.6, '#6a5a44'); D.cyl(M4.chain(hm, M4.t(0, -BL * .85, 0), M4.rx(Math.PI)), 0, 0, 0, 2.6, 0, 9, 4, bc, 1); D.box(hm, 0, -BL * .82, 0, 5, 1.2, 1.2, trim); }
@@ -5812,7 +5840,10 @@ const P2 = {
     { narr: 'They kneel when a bell rings. One bell for a clerk. Two for a House. I am told that for the High Auditor nobody rings anything. People simply know.' },
     { narr: 'The first time a porter knelt to me I nearly knelt back. Ilse had warned me about that. She said it was how the last one was caught.' },
     { fade: 'out' }, { panel: null },
-    { card: 'THE FOURTH RING', sub: 'The Sun Spire. Four years and a season after the furnace. Night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkRing(1) }, { music: 'spire' },
+    { card: 'THE FOURTH RING', sub: 'The Sun Spire. Four years and a season after the furnace. Night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkRing(1) },
+    /* 12b: the porter stepped aside without being asked, and he knows where he first saw that */
+    { narr: 'The porter had stepped off his line for me, and I had not asked. I knew where I had first seen people do that. It was not on the Spire.' },
+    { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day thirty-one, after dark.', big: 1, tr: 'strip', min: 1.5, max: 4.5 }, { brawl: () => walkCampNight() }, { music: 'spire' },
     { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { pstage: 3 },
     { say: 'wren', t: 'Clerk Sorrel? Engineer Dray. They have put me on the Array board. You will not remember, but we... no. Forgive me. You have a look of someone.' },
@@ -5845,6 +5876,8 @@ const P2 = {
     { narr: 'It is a good pen. It does not drag. I had expected it to drag.' },
     { narr: 'After that I learned where the Spire kitchens keep their surplus, and how to carry a day across from one column to another where nobody looks. I was handed nine hundred lines in five years. I struck four hundred and six. I know every name. It does not help them.' },
     { fx: () => { G.flags.fury = (G.flags.fury || 0) + 2; } },
+    /* 12c: where the surplus goes down. Behind the painted line */
+    { fade: 'out' }, { panel: null }, { card: 'THE SERVICE STAIR', sub: 'The Sun Spire. The painted line.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkServiceStair() }, { music: 'spire' },
     { fade: 'out' }, { panel: 'ante' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'lucan', t: 'Sorrel. You are the one who put me on my knees in front of my mother. I have been wanting to meet you properly.' },
     { say: 'lucan', t: 'Nobody had ever beaten me. I found I did not mind as much as I was supposed to. Would you teach me how you did it?' },
@@ -5951,7 +5984,17 @@ const P2 = {
     { say: 'celestine', t: 'Little ember had a husband. I remember now. A valve technician. I had him brought up here to teach my engineers, and then he fell in a furnace, and I was briefly annoyed.' },
     { sfx: 'heart' }, { narr: 'One. Two. Three.' }, { sfx: 'heart' }, { narr: 'Nine years of counting, and it had never once been this hard to stop at eleven.' },
     { music: 'spire' }, { say: 'celestine', t: 'Sit down, Brennick. If I meant to call the Wardens I should not have sent them out of the room first.' },
-    { say: 'celestine', t: 'I am seventy. The Accredited bear late and live long; it is most of what the gold is for. The Array has perhaps ten years. My son is kind, which is the same as useless. I need somebody to keep the Count after me who knows what a valve is and what a furnace is for.' },
+    { say: 'celestine', t: 'I am seventy-six. The Accredited bear late and live long; it is most of what the gold is for. The Array has perhaps ten years. My son is kind, which is the same as useless. I need somebody to keep the Count after me who knows what a valve is and what a furnace is for.' },
+    /* 14b: her own Assay. She takes off one glove and closes the seat he came to mend */
+    { narr: 'The seat I had come to mend was still weeping. She got up, and took off one glove, and closed it herself.' },
+    { narr: 'Palm flat on the pipe first. Then the wheel, a quarter back, and home. Nobody up here does that. Below, we are shown it before we can read.' },
+    { sfx: 'heart' }, { say: 'celestine', t: 'You are looking at my hand, technician. Very well. Look.' },
+    { fade: 'out' }, { panel: null },
+    { card: 'FIFTY YEARS BEFORE THE FURNACE', sub: 'An Assay. A cadet called Celestine Aurel, twenty.', big: 1, tr: 'ash', min: 1.8, max: 5 }, { mission: 'ember' },
+    { music: 'spire' }, { panel: 'ante' }, { pstage: 5 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'She drew the glove back on, a finger at a time.' },
+    { say: 'celestine', t: 'Whoever will turn the valve runs everything. I have run the Count that way for fifty years.' },
+    { sfx: 'heart' }, { narr: 'A valve hand. The High Auditor of the Array was a valve hand, and she had sat in a white chair and watched my wife walk into a furnace.' },
     { say: 'celestine', t: 'You could make it gentler. Fewer lines struck. You would be very good at it. You already are.' },
     { choice: [
       { t: 'Granted.', fx: () => { G.flags.liedToHer = 1; }, then: [say('celestine', 'You said that too quickly. Never mind. You have until the morning to mean it.'), narr('I did not have until the morning. She told her son that night. I think she wanted to see what he would do.')] },
@@ -6036,8 +6079,13 @@ const P2 = {
     { say: 'ilse', t: 'You are going to tell me she had the right. Do not. I can hear you preparing it.' },
     { say: 'kael', t: 'She had the right.' },
     { say: 'ilse', t: 'She had a brother. Brand had a stair. You had a room that opened for one. Nobody in this had a right, soot. They saw to that before any of you were born.' },
-    { narr: 'I had not lost anything since the furnace. I had forgotten how it is done. I sat on a barge in the weather for most of a month and did not count anything at all.' },
-    { narr: 'It was a valve that got me up. A seal weeping on the third barge, and four hundred hulls, and nobody else aboard who knew what the sound meant. I went and put my hand on the pipe. Then I went and found the others.' },
+    /* 15b: the barge deck, played. 15c: his hand on the seal, and what she had done with hers */
+    { fade: 'out' }, { panel: null }, { card: 'EIGHT YEARS AFTER THE FURNACE', sub: 'A barge, in the weather.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkBarge() },
+    { card: 'THREE WEEKS BEFORE THE FURNACE', sub: 'Bay Three. Seren, alone, after last bell.', big: 1, tr: 'furnace', min: 1.6, max: 4.5 }, { brawl: () => walkSerenLine() },
+    { music: 'mystery' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'Orin told me once that she had come asking about that line, weeks before I ever touched it. I thought he meant she was curious.' },
+    { sfx: 'heart' }, { narr: 'She was not curious. She was choosing.' },
+    { narr: 'I took my hand off the pipe. Then I went and found the others.' },
     { fx: () => { G.flags.fury = (G.flags.fury || 0) + 3; } },
     { fade: 'out' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
     { narr: 'We hid four hundred barges in the weather for two years. The Unlit came up in ones and twos through Riser Nine and learned to fly them. Valve techs. Welders. A noodle seller.' },
@@ -6162,7 +6210,7 @@ const P2 = {
     { say: 'kael', t: 'Then you\'ve got it written down what she was worth to you.' },
     { say: 'celestine', t: 'Forty beds, and you. One has never made a better trade. You may hate the arithmetic. You have lived on it.' },
     { sfx: 'heart' },
-    { narr: 'She took a blade down from the wall. She was seventy-three, and she held it as if it were a pen.' },
+    { narr: 'She took a blade down from the wall. She was seventy-nine, and she held it as if it were a pen.' },
     { say: 'celestine', t: 'Come, then. Show me what one bought.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.ember() },
@@ -6332,7 +6380,8 @@ const CODEX_FINDS = [
   ['f_line', 'The painted line', 'The Sun Spire, the fourth ring', 'Ochre, a hand wide, from the service stair to every lamp and every door and nowhere else. The service walks on it. A porter who steps off it loses a day of air. The clerks are brought up not to see it.', 'It is repainted every rest day, by the porters, in their own time. Nobody orders the paint. I looked for the line in the Count that pays for it. There is not one. They buy it themselves.'],
   ['f_bellplate', 'The bell plate', 'The Sun Spire, the fourth ring', 'ONE: A CLERK. TWO: A HOUSE. THREE: A MARSHAL. Under that the gilt has been left bare. The service kneels at any of them. The clerks bow from the neck at two.', null],
   ['f_greens', 'Greens off Freight Three', "The Sun Spire, Sable's stall", "Cold crates chalked F3 in Sable's hand. The kitchens send down what the third ring leaves on its plates. Half of it she sells to clerks. The other half goes down the stair in the same crates, and is in nobody's book.", null],
-  ['f_handpipe', 'A worn place on a riser', 'The Sun Spire, the fourth ring', 'Beside a door with a new slate, the paint is gone from the riser pipe at the height of a hand. Somebody on this ring puts a palm on it every night to hear how it is running. Nobody up here does that. Below, everybody does. Seren taught me. I do not know who taught this door.', null]
+  ['f_handpipe', 'A worn place on a riser', 'The Sun Spire, the fourth ring', 'Beside a door with a new slate, the paint is gone from the riser pipe at the height of a hand. Somebody on this ring puts a palm on it every night to hear how it is running. Nobody up here does that. Below, everybody does. Seren taught me. I do not know who taught this door.', null],
+  ['f_spirebank', "The Spire's own valves", 'The Sun Spire, behind the painted line', 'Twelve wheels on one landing of the service side, and on every valve body the foundry mark that is on Bank Seven. The Spire is plumbed exactly like Tier Six. It is only kept by people nobody up here has given a ring.', null]
 ];
 const Codex = {
   d: null,
@@ -6635,7 +6684,7 @@ const Mission = {
     this.prev = { map: G.mapId, x: P.x, y: P.y, dir: P.dir, sheet: P.sheet, show: World.showPlayer, dark: World.darkOverride };
     G.flags = G.flags || {}; for (const k of Object.keys(G.flags)) if (k.startsWith('m_')) delete G.flags[k];
     G.heist = 3; G.flags.heistEase = 0; G.flags.mCaught = 0; UI.clear(); P.sheet = World.sheetFor(d.sheet || 'kael2'); World.showPlayer = true; World.darkOverride = null;
-    if (d.reset) d.reset();
+    if (d.reset) d.reset(); $('#game').style.filter = d.grey ? 'grayscale(.82) contrast(1.08) brightness(1.05)' : '';
     World.load(d.map, { x: d.spawn[0] * 16 + 8, y: d.spawn[1] * 16 + 4, dir: d.spawn[2] }, true); G.mode = 'world'; this.reset(); Sound.music(MAPS[d.map].music);
     Fade.a = 1; Fade.dir = -1; Fade.sp = 1; Fade.busy = true; HUD.dirty = true;
     setTimeout(() => { if (G.heist === 3) HUD.toast(d.toast); }, 900);
@@ -6653,7 +6702,7 @@ const Mission = {
   finish() {
     if (G.heist !== 3) return; const pv = this.prev || {}, cb = this.done; this.done = null;
     G.heist = 0; G.flags.heistEase = 0; World.seq = null; World.bolt = null; World.ripple = null; World.dynLights = []; World.npcs = []; World.work = 0; World.alert = 0; for (const k of Object.keys(G.flags)) if (k.startsWith('m_')) delete G.flags[k]; if (this.def.reset) this.def.reset();
-    if (Dialogue.active) Dialogue.end(); UI.clear();
+    if (Dialogue.active) Dialogue.end(); UI.clear(); $('#game').style.filter = '';
     P.sheet = pv.sheet || P.sheet; World.showPlayer = pv.show; World.darkOverride = pv.dark || null;
     if (pv.map && MAPS[pv.map]) World.load(pv.map, { x: pv.x, y: pv.y, dir: pv.dir }, true);
     Sound.play('ok'); Fade.a = 1; Fade.dir = 0; Fade.busy = false; HUD.dirty = true;
@@ -7110,6 +7159,175 @@ function walkRing(n) {
         for (let i = 0; i < wall.length; i++) { const v = wall[i]; if (v !== 'lamp' && v !== 'door') continue; const x = ((256 + (i - W0) * 40) % 512 + 512) % 512; g.fillStyle = '#c9963a'; g.fillRect(x - 2, 256 - 34, 4, 56); g.fillStyle = '#e0b04c'; g.fillRect(x - 2, 256 - 34, 1, 56); }
         g.fillStyle = 'rgba(20,26,58,.20)'; g.fillRect(0, 0, 512, 512); } } };
 }
+// ---- the Assay, day thirty-one, after dark: he comes back down the ridge in the Proctor's cloak, and the camp gets up behind him.
+// A flash out of the fourth ring (a porter stepped aside for him, and he knows where he first saw that)
+function walkCampNight() {
+  const spots0 = [[-128, -18, 0], [-112, 30, 1], [-84, -40, 0], [-58, 26, 1], [-36, -30, 0], [-6, 34, 0], [22, -34, 1], [44, 14, 0], [70, -26, 2], [92, 30, 2], [112, -8, 3], [132, 22, 2], [146, -34, 3], [60, 40, 0]];
+  const trail = []; let joined = 0, lastX = 1e9, lastY = 1e9;
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, crew: 1, talk: () => lines });
+  const npcs = [
+    N('petra', -70, -12, 'PETRA LUNE', [say('petra', 'One had you down as lost. One had ruled the line and everything.'), narr('She rubbed something off her slate with her thumb. Then she put the slate under her arm and fell in a pace behind me, without being asked.')]),
+    N('oswin', 6, 8, 'OSWIN HALE', [say('oswin', 'Is that... one is not permitted to touch them. It is the only rule they have.'), say('you', 'One added a line.'), narr('He looked at the hem, and at the blood on it, and then he got up off his log. He had not stood up for anybody in thirty-one days. I do not think he knew he had done it.')]),
+    N('cadt1', 104, 8, 'A CADET OF HOUSE TEAL', [say('cadt1', 'You are on our side of the fire, Violet.'), narr('Then she saw the white, and the rest of it went out of her mouth unfinished. She had been told since she could walk what to do when that colour came toward her. Nobody had told her what to do about who was inside it.')]),
+    ...spots0.map(([x, y, c], i) => ({ id: ['cadv1', 'cadv2', 'cadt1', 'cadt2'][c], x, y, r: 8, crew: 1, key: 'c' + i }))];
+  return { era: 4, d2: 1, title: 'THE CLOAK', sub: 'THE ASSAY. DAY THIRTY-ONE, AFTER DARK', bg: 'storm', arena: { kind: 'ring', rx: 196, ry: 72 }, music: 'mystery', hero: { id: 'kael3', hp: 9, pow: 2, blade: 0, fury0: 0 },
+    walk: { id: 'campnight', spawn: [-176, 30], clear: 220, npcs,
+      open: () => [narr("I came down the ridge after dark in a Proctor's cloak, with his blood on the hem and his boots on my feet."), narr('Nobody on the dais came down to take it off me. So I walked into the camp to see what it was.')],
+      obj: () => joined ? Math.min(70, Math.round(joined / npcs.length * 70)) + ' BEHIND YOU. THE CACHE IS AT THE FAR END OF THE CAMP.' : 'WALK INTO THE CAMP.',
+      floor(g) { g.fillStyle = 'rgba(70,50,34,.5)'; g.beginPath(); g.ellipse(256, 256, 150, 40, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(40,28,22,.6)'; g.beginPath(); g.ellipse(256 + 20, 256 - 6, 22, 11, 0, 0, 6.3); g.fill(); },
+      props: [{ t: 'fire', x: 20, y: -6, k: 1 },
+        { t: 'tent', x: -196, y: -62, c: '#7a5ac8', k: 1 }, { t: 'tent', x: -120, y: -88, c: '#7a5ac8', k: 2 }, { t: 'tent', x: -30, y: -96, c: '#7a5ac8', k: 3 }, { t: 'tent', x: 96, y: -92, c: '#2aa6a0', k: 4 }, { t: 'tent', x: 150, y: -84, c: '#2aa6a0', k: 5 },
+        ...Array.from({ length: 14 }, (_, i) => ({ t: 'tree', x: -260 + i * 40 + (i * 13) % 17, y: -120 - (i * 7) % 30, k: i, h: 64 + (i * 11) % 24 })),
+        { t: 'banner', x: -50, y: -78, c: '#7a5ac8', k: 1 }, { t: 'banner', x: 124, y: -80, c: '#2aa6a0', k: 2 }, { t: 'rank', x: -150, y: -40, at: 10, k: 1 }],
+      spots: [
+        { id: 'lamps', x: -30, y: -44, r: 6, reach: 24, ph: 70, name: "THE PROCTORS' LAMPS", verb: 'LOOK UP', talk: () => [narr('Six lamps on the dais. Not one of them has moved. They are waiting to be told what a cadet in a Proctor\'s cloak is. There is no line for it.'), narr('Below, when there is no line for a thing, somebody burns. Up here, it seems, they wait.')] },
+        { id: 'cache', x: 176, y: -22, r: 9, reach: 30, ph: 30, name: 'THE CACHE', verb: 'BREAK THE RIBBON', exit: 1, talk: () => [
+          fx(() => { for (const a of Brawl.allies) if (a.crew && !a.fol) { a.fol = ++joined; a.r = 1; } }),
+          narr('The cache. A white ribbon across the lid, and a seal that the collar in my hand opens. It has sat forty paces from seventy hungry people for a month, and not one of them has touched it. That is what the white is for.'),
+          fx(() => Sound.play('clue')), narr('I broke it. Bread. Salve. Lamp oil. I gave it out by hand, Violet and Teal, in the order they were standing.'),
+          narr('When I turned round they were all behind me. I had not called anybody.'),
+          { s: 'narr', t: 'They did not follow me because I won. They followed me because I came back.' }] }],
+      tick(k, dt, B) { const p = B.p; if (Math.hypot(p.x - lastX, p.y - lastY) > 7) { trail.push([p.x, p.y]); lastX = p.x; lastY = p.y; if (trail.length > 400) trail.shift(); }
+        let slot = 0; for (const a of B.allies) { if (!a.crew) continue;
+          if (!a.fol && (Math.hypot(p.x - a.x, (p.y - a.y) * .8) < 66 || (a.talk && k.said[a.key || a.id]))) { a.fol = ++joined; a.r = 1; if (!Settings.d.reduce) a.bark = { t: joined === 1 ? '...' : ['', '', 'HIM?', '', 'THE CLOAK.', '', '', 'VIOLET.', '', '', 'GET UP.'][joined % 11] || '', life: 1.1 }; if (a.bark && !a.bark.t) a.bark = null; HUD.dirty = true; }
+          if (a.bark) { a.bark.life -= dt; if (a.bark.life <= 0) a.bark = null; }
+          if (!a.fol) continue; slot++; const row = Math.ceil(a.fol / 2), side = a.fol % 2 ? -1 : 1, t = trail[Math.max(0, trail.length - 1 - row * 2)] || [p.x, p.y], dxp = p.fx || 1, tx = t[0] - (trail.length < row * 2 + 1 ? dxp * row * 12 : 0), ty = clamp(t[1] + side * (7 + (a.fol % 3) * 2), -64, 64), dx = tx - a.x, dy = ty - a.y, d = Math.hypot(dx, dy);
+          if (d > 3) { const sp = Math.min(78, 20 + d * 3) * dt; a.x += dx / d * Math.min(sp, d); a.y += dy / d * Math.min(sp, d); a.anim = (a.anim || 0) + dt; a.fx = dx / d; a.fy = dy / d; } else { a.anim = 0; const q = Math.hypot(p.x - a.x, p.y - a.y) || 1; a.fx = (p.x - a.x) / q; a.fy = (p.y - a.y) / q; } }
+        return null; } } };
+}
+FF.campnight = walkCampNight;
+// ---- the service stair: behind a painted line no clerk crosses. Tier Six people, working the Spire's own valves
+Object.assign(CAST, {
+  svc1: { name: 'A valve hand', look: () => ({ knife: 1, skin: '#8a5a3e', hair: '#1a1014', style: 'short', shirt: '#5a5248', pants: '#2a2420', scarf: '#c9a23a' }) },
+  svc2: { name: 'A woman with plates', look: () => ({ skin: '#c08a6a', hair: '#6a3a1a', style: 'bun', shirt: '#8a8478', pants: '#4a463e', scarf: '#c9a23a' }) },
+  svc3: { name: 'A lamp trimmer', look: () => ({ skin: '#b07a5a', hair: '#d8d0c0', style: 'bald', shirt: '#6a5a48', pants: '#2a2420', scarf: '#c9a23a' }) }
+});
+function walkServiceStair() {
+  const F = G.flags, once = {}, one = (id, first, again) => () => { if (once[id]) return again; once[id] = 1; return first; };
+  const N = (id, x, y, name, talk) => ({ id, x, y, name, talk }); let turn = 0, heard = 0;
+  const wall = ['plain', 'lamp', 'plain', 'plain', 'door', 'lamp', 'valve', 'valve', 'plain', 'lamp', 'arch', 'plain', 'lamp', 'plain', 'plain'], W0 = 7;
+  return { era: 5, d2: 1, title: 'THE SERVICE STAIR', sub: 'THE SUN SPIRE. THE PAINTED LINE', bg: 'keep', bg2: 'sstair', arena: { kind: 'rect', w: 300, h: 60 }, music: 'mystery', hero: { id: 'kael2', hp: 10, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'sstair', spawn: [-138, 6], keep: () => false,
+      props: wall.map((v, j) => ({ t: 'swall', v, x: (j - W0) * 40, y: -40, k: j, turn: () => turn })),
+      open: () => [narr('Behind the kitchens there is a door no clerk uses, and behind the door a line painted across the floor. I had looked at it every morning for a season.'), narr('That night I stepped over it.')],
+      obj: k => heard ? 'GO BACK OVER THE LINE BEFORE YOU ARE MISSED.' : k.n ? 'THEY ARE WORKING. SO COULD YOU.' : 'THE SERVICE SIDE. NOBODY HERE IS LOOKING AT THE FLOOR.',
+      npcs: [
+        N('svc1', -6, -18, 'A VALVE HAND AT A SEIZED WHEEL', one('svc1', [
+          say('svc1', "Seat's lifting on this one. Has been since first bell. They've sent for an engineer."),
+          narr('He had his palm flat on the pipe beside it. He did not know he was doing it. Nobody from Tier Six does.'),
+          { choice: [
+            { t: '"It\'s not the seat. Back it a quarter, let it settle, then close."', fx: () => { F.svcValve = 1; }, then: [say('you', "It's not the seat. Back it a quarter, let it settle, then close."), fx(() => { turn = 1; Sound.play('clue'); }), narr('He did it. The wheel sighed, and came home.'), say('svc1', '...Who taught you that, Clerk?'), say('you', 'A careful woman.'), say('svc1', 'Aye. She would have been.'), narr('He did not look at my collar again. He looked at my hands, in their gloves. Then he went back to his work, and after a moment he said it. Very quietly.'), fx(() => { heard = 1; Sound.play('heart'); }), say('svc1', 'Brennick.')] },
+            { t: 'Say nothing. A clerk does not know valves.', fx: () => { F.svcValve = 0; }, then: [narr('I said nothing. I stood and watched a man fight a wheel I could have closed with two fingers, and I kept my hands behind my back.'), say('svc1', "Don't trouble yourself, Clerk. It's only a valve."), narr('He waited until I had turned away. Then he said it to the pipe. Very quietly.'), fx(() => { heard = 1; Sound.play('heart'); }), say('svc1', 'Brennick.')] }] }],
+          [say('svc1', "Mind how you go. The line's wet.")])),
+        N('svc2', -74, 16, 'A WOMAN WITH PLATES', () => [say('svc2', "Don't stand in the light, love. They can see this door from the ring."), narr('Love. Nobody has called me anything but Clerk and Sorrel for a season. I stood out of the light.')]),
+        N('svc3', 84, -16, 'A LAMP TRIMMER', () => [say('svc3', "Crew Three, wasn't it. I trimmed the lamps over Bank Seven nine years before they brought me up."), narr('He said it to the wick he was cutting. Then he turned his head and looked at me, the way you look at somebody who has spoken. I had not spoken.'), say('svc3', "We hummed for her. Up here. They can't hear it through the stone.")])],
+      spots: [
+        { id: 'bank', x: -20, y: -32, r: 7, reach: 22, ph: 90, name: "THE SPIRE'S OWN VALVES", verb: 'LOOK', talk: () => [narr('The Spire breathes through valves like anybody. Twelve wheels on this landing, a gauge over each, and on every body the same foundry mark as Bank Seven.'), find('f_spirebank'), narr('The Accredited do not know that they have them. Somebody else has always turned them.')] },
+        { id: 'stairs', x: 120, y: -32, r: 7, reach: 24, ph: 90, name: 'THE SERVICE STAIR', verb: 'LOOK DOWN', talk: () => [narr('Nine hundred steps down the outside of the Spire, with the line down the middle of every one. The wind comes up it. It smells of the kitchens, and under that, a long way under, of hot iron.')] },
+        { id: 'back', x: -120, y: -32, r: 8, reach: 26, ph: 100, name: 'THE DOOR TO THE RING', verb: 'GO BACK', exit: 1, talk: () => { F.sstair = 1; return [narr('There is a line painted on the floor. On one side they call me Clerk.'), { s: 'narr', t: heard ? 'On the other they call me Brennick, very quietly.' : 'On the other they know exactly what I am, and have told nobody. I have never been so safe as I was on the wrong side of that paint.' }]; } }],
+      tick() { return null; },
+      floor(g) { for (let y = 0; y < 512; y += 24) for (let x = (y / 24 % 2) * 20 - 20; x < 512; x += 40) { const q = ((x * 7 + y * 13) % 4 + 4) % 4; g.fillStyle = '#1e1c22'; g.fillRect(x, y, 40, 24); g.fillStyle = ['#3a3840', '#34323a', '#403e46', '#373540'][q]; g.fillRect(x, y, 39, 23); }
+        g.fillStyle = '#c9963a'; g.fillRect(0, 256 + 10, 512, 5); g.fillStyle = '#e0b04c'; g.fillRect(0, 256 + 10, 512, 1);
+        const lx = 256 - 104; g.fillStyle = '#e8dcc0'; g.fillRect(lx, 0, 6, 512); g.fillStyle = '#c9963a'; g.fillRect(lx + 6, 0, 3, 512);   /* the line across: the clerk's side is west of it */
+        g.fillStyle = 'rgba(8,6,10,.28)'; g.fillRect(0, 0, 512, 512); } } };
+}
+FF.sstair = walkServiceStair;
+// ---- fifty years before the furnace: Celestine Aurel's own Assay, played as her. The island at night, and one wheel.
+// It is the island mission's map (night twenty-five), cooled to grey; the Proctors walk the pickets' rounds
+Object.assign(CAST, {
+  cel20: { name: 'Celestine Aurel, a cadet', look: () => ({ accredited: 1, cadet: 1, gloves: '#a8905c', skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, robe: '#f4f2ec', armor: '#f4f2ec', trim: '#e8c25a', sash: '#e8c25a' }) },
+  proc50: { name: 'A Proctor', look: () => CAST.voss.look() }
+});
+Object.assign(MOUTH, { cel20: 'flat', proc50: 'flat' });
+MISSIONS.ember = {
+  map: 'raid', sheet: 'cel20', grey: 1, where: 'An Assay · fifty years before the furnace', spawn: [2, 7, 3], toast: 'The pump house is north. Nobody is to see her.', hint: 'B: throw a pebble · hold A to work · watch the lamps turn',
+  npcs: () => MF('shut') ? [] : [
+    mG('proc50', 12, 8, 3, [[19, 8, 3, 1.4], [19, 13, 0, 1.6], [13, 13, 2, 1.4], [13, 8, 1, 1.6]]),
+    mG('proc50', 22, 4, 0, [[22, 4, 2, 2], [22, 4, 0, 1.6], [22, 11, 0, 1.5], [22, 11, 2, 2], [22, 4, 1, 1.4]]),
+    mG('proc50', 26, 9, 2, [[26, 9, 2, 2.2], [26, 9, 1, 1.7], [26, 9, 3, 1.3], [26, 9, 0, 1.7]])],
+  obj: () => MF('shut') ? 'It is done. Walk.' : 'The pump house (north), unseen. Then the wheel: hold A.',
+  mark: () => ({ x: 14 * 16, y: 4 * 16, lab: 'VALVE' }),
+  holds: t => t.id === 'valve' && !MF('shut'),
+  respawn: () => [2, 7, 3],
+  caught: k => [say('proc50', ['CADET. THE ISLAND IS NOT YOURS TONIGHT.', 'BACK ACROSS THE FORD, CADET.', 'ONE SEES YOU. ONE IS WRITING IT DOWN.'][k % 3]), narr(k >= 2 ? 'She goes back to the reeds and waits. She has waited in worse places than reeds.' : 'Back to the reeds. A Proctor does not punish a cadet for trying. He only writes it down.')],
+  use(t) {
+    if (t.id === 'tcairn') return Dialogue.start([narr('Cairns. Every House builds them. She has not yet added to anybody\'s.')]);
+    if (t.id === 'drop') return Dialogue.start([narr('A patron\'s crate on a gilt cord. Nothing has ever been lowered for her. The family that took her up placed its sum once, and is waiting to see.')]);
+    if (t.id === 'tboard') return Dialogue.start([narr('The Proctors\' board. Her House is in the lower half of it. It will not be in the morning.')]);
+    if (t.id === 'ttA' || t.id === 'ttB' || t.id === 'ttC') return Dialogue.start([narr('Canvas, for the look of the thing. That year the other House slept below, in the stack\'s undercroft, out of the storms. Forty of them on one draught. She has counted them in.')]);
+    if (t.id === 'std') return Dialogue.start([narr('Their standard. Everybody comes for the standard. That is why there are four lamps on it, and none on the pump house.')]);
+    if (t.id === 'valve') { if (MF('shut')) return Dialogue.start([narr('Shut. Holding.')]);
+      return Dialogue.start([
+        narr('The pump house. One wheel, and a line off the stack that feeds the undercroft: their lamps, and their air.'),
+        narr('She takes one glove off. They took the burns off that palm when they took her up, and it still knows a wheel. Flat on the pipe first. Then the quarter turn.'),
+        fx(() => Sound.play('heart')),
+        say('cel20', 'It is only a valve. On Tier Six every child can turn one. Up here, nobody else would.'),
+        fx(() => { MSET('shut'); G.flags.heistEase = 1; const m = MAPS.raid; m.lights = m.lights.filter(l => l.c !== '#ffe090'); for (const p of m.props) if (p.t === 'teallamp') p.a = 1; World.layer = renderMapLayer(World.map); Mission.resetNPCs(); World.grace = 99; Sound.play('rotate'); }),
+        narr('The needle falls, and holds. Across the island their lamps go amber, and then out, one after another, like a tier at last bell.'),
+        narr('She puts the glove back on and walks to her own fire. She does not run. Nobody is going to look for a cadet at a valve.'),
+        narr('First light. They come up out of the undercroft with their hands open. Thirty-eight of them.'), fx(() => Sound.play('heart')), narr('Two do not wake.'),
+        say('proc50', 'Genius.'), narr('He writes it in the book in the one word. She says nothing.'),
+        fx(() => { G.flags.emberSeen = 1; })], () => Mission.finish()); }
+  },
+  reset() { const m = MAPS.raid; if (!m.lights0) m.lights0 = m.lights.slice(); if (!MF('shut')) { m.lights = m.lights0.slice(); for (const p of m.props) if (p.t === 'teallamp') p.a = 0; } }
+};
+// ---- a barge in the weather, eight years after the furnace: where he sat for a month and counted nothing, and what got him up
+function walkBarge() {
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines }); let weep = 1;
+  return { era: 5, d2: 1, title: 'A BARGE, IN THE WEATHER', sub: 'EIGHT YEARS AFTER THE FURNACE', bg: 'storm', bg2: 'barge', arena: { kind: 'rect', w: 300, h: 56 }, music: 'mystery', hero: { id: 'kael2', hp: 10, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'barge', spawn: [-120, 14], keep: () => false,
+      props: [...Array.from({ length: 13 }, (_, i) => ({ t: 'brail', x: (i - 6) * 40, y: -36, k: i, v: i === 7 ? 'halberd' : i % 4 === 1 ? 'lamp' : '' })), { t: 'bpipe', x: 112, y: -22, k: 1, weep: () => weep }, { t: 'bcrate', x: -40, y: -26, k: 1 }, { t: 'bcrate', x: -22, y: -28, k: 2 }, { t: 'bcrate', x: 44, y: 24, k: 3 }],
+      open: () => [narr('I had not lost anything since the furnace. I had forgotten how it is done.'), narr('I sat on a barge in the weather for most of a month and did not count anything at all.')],
+      obj: k => k.n >= 2 ? 'SOMETHING ON THIS DECK IS MAKING A NOISE.' : 'A MONTH ON THIS DECK. GET UP.',
+      npcs: [
+        N('ilse', -64, -4, 'ILSE MARRIN', [say('ilse', 'You have sat there a month, soot. I have said nothing. I am saying it now. This hull is making a noise, and I do not know what it means.'), narr('She has a table\'s worth of knives and has never once laid a hand on a pipe. She was asking me. Ilse does not ask.')]),
+        N('hollis', 8, -4, 'HOLLIS THE WELDER', [say('hollis', "He put a halberd butt in my arm once. For humming. I'd have liked to tell him it mended."), narr('He was looking at the halberd on the rail. Somebody had brought it off the dock stair. Nobody has said who.')]),
+        N('bao', 70, 16, 'BAO, AT THE WHEEL', [say('bao', "It's a cart with no road under it. I keep telling myself that. Sit, Kael. Eat."), narr('A noodle seller is flying a barge. Four hundred hulls in this weather, and every one of them has somebody like him on the wheel, telling themselves something.')]),
+        N('sable', -8, 20, 'SABLE', [say('sable', "Eat something. I didn't skim it for the gulls."), narr('Greens. She has kept a cold crate going through a month of cloud for a man who would not look at it.')])],
+      spots: [
+        { id: 'halberd', x: 44, y: -30, r: 5, reach: 28, ph: 70, name: "BRAND'S HALBERD", verb: 'LOOK', talk: () => [narr('Lashed to the rail, butt down, the way he grounded it. Eleven minutes. Somebody timed it. I asked them to.'), narr('I have not touched it. I am not the one it should go to.')] },
+        { id: 'rail', x: -110, y: -30, r: 5, reach: 28, ph: 24, name: 'THE RAIL', verb: 'LOOK OUT', talk: () => [narr('Cloud, and in the cloud the hooded lamps of the others, rising and falling. Four hundred barges, hidden in the weather. From below we must look like nothing at all.'), narr('There is no ceiling. I have stopped minding. I had not noticed that I had stopped.')] },
+        { id: 'seal', x: 112, y: -14, r: 8, reach: 26, ph: 18, name: 'A WEEPING SEAL', verb: 'PUT A HAND ON IT', exit: 1, talk: () => [
+          narr('It was a valve that got me up. A seal weeping on the third barge, and four hundred hulls, and nobody else aboard who knew what the sound meant.'),
+          fx(() => { Sound.play('heart'); }), { s: 'narr', t: 'I went and put my hand flat on the pipe, the way she taught me.' }] }],
+      floor(g) { g.fillStyle = '#141826'; g.fillRect(0, 0, 512, 512); for (let y = 256 - 40; y < 256 + 40; y += 8) { for (let x = ((y / 8) % 2) * 32 - 32; x < 512; x += 64) { const q = ((x * 5 + y * 3) % 4 + 4) % 4; g.fillStyle = '#2a2018'; g.fillRect(x, y, 64, 8); g.fillStyle = ['#5a4634', '#54402e', '#604c38', '#574331'][q]; g.fillRect(x, y, 63, 7); g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(x, y, 63, 1); g.fillStyle = '#2a2018'; g.fillRect(x + 2, y + 3, 1, 1); g.fillRect(x + 60, y + 3, 1, 1); } }
+        g.fillStyle = '#2a2018'; g.fillRect(0, 256 - 42, 512, 3); g.fillRect(0, 256 + 39, 512, 4); g.fillStyle = 'rgba(120,150,190,.10)'; g.fillRect(0, 256 - 40, 512, 80); } } };
+}
+// ---- three weeks before the furnace: Seren, alone in Bay Three after last bell, tracing the line under Bank Seven. Played as her; told from outside
+function walkSerenLine() {
+  let step = 0; const need = (n, lines, other) => () => { if (step < n) return other; if (step === n) step = n + 1; return lines; };
+  return { era: 0, title: 'BAY THREE', sub: 'THREE WEEKS BEFORE THE FURNACE. AFTER LAST BELL', bg: 'furnace', arena: { kind: 'rect', w: 230, h: 84 }, music: 'hum', hero: { id: 'seren', hp: 6, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'serenline', spawn: [-86, 22], keep: () => false,
+      props: [{ t: 'kboard', x: 58, y: -44, own: () => 1, k: 1 }, { t: 'vbank', x: -30, y: -46, n: 7, k: 1 }, { t: 'vbank', x: -96, y: -46, n: 6, k: 2 }, ...[-150, 0, 120].map((x, i) => ({ t: 'lamp', x, y: -52, k: i }))],
+      floor(g) { const X = x => 256 + x, Y = y => 256 + y; g.fillStyle = 'rgba(20,12,10,.55)'; g.fillRect(X(-78), Y(-14), 22, 14); g.strokeStyle = 'rgba(160,150,140,.7)'; g.lineWidth = 1; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(X(-78) + i * 4 + .5, Y(-14)); g.lineTo(X(-78) + i * 4 + .5, Y(0)); g.stroke(); } g.strokeRect(X(-78) + .5, Y(-14) + .5, 22, 14);
+        g.fillStyle = 'rgba(40,24,18,.5)'; g.fillRect(X(-34), Y(-40), 5, 30); g.fillRect(X(-66), Y(-12), 36, 5); g.fillRect(X(-100), Y(-2), 5, 24); g.fillRect(X(-100), Y(-2), 26, 5);
+        g.fillStyle = 'rgba(20,12,10,.7)'; g.beginPath(); g.arc(X(-98), Y(24), 6, 0, 6.3); g.fill(); g.strokeStyle = 'rgba(170,60,40,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(X(-98), Y(24), 4, 0, 6.3); g.stroke(); },
+      open: () => [narr('Last bell is an hour gone and the bay is hers. She has told Kael she is checking a gauge. It is nearly true.')],
+      obj: () => ['BANK SEVEN IS TELLING HER SOMETHING. PUT A HAND ON IT.', 'FOLLOW THE LINE UNDER THE GRATING.', 'OLD ORIN IS STILL HERE. ASK HIM.', 'BACK TO THE TEE.'][Math.min(3, step)],
+      npcs: [{ id: 'orin', x: 30, y: 14, name: 'OLD ORIN', talk: need(2, [
+        say('seren', 'Orin. The capped tee under Seven. Where does it go?'),
+        say('orin', "Forty years I've hung my knife on that board. Don't ask me that one, girl."),
+        say('seren', "I'm asking."),
+        say('orin', "The ward. It fed the fever ward, before the Count shut the fans. Open it and forty beds breathe. And the audit shows a bled line with Crew Three's number on it."),
+        say('orin', "They don't strike a line for that. They strike a crew."),
+        narr('He does not look at her while he says it. He looks at the board, and the hooks.')],
+        [say('orin', 'The pipes are talking tonight. Hm.'), narr('He talks to pipes. She has always thought he was the only one on the tier who listened to the answers.')]) }],
+      spots: [
+        { id: 'bank', x: -30, y: -34, r: 8, reach: 26, ph: 50, name: 'BANK SEVEN', verb: 'PUT A HAND ON IT', talk: need(0, [
+          narr('Her palm flat on the pipe, first. Then her ear. It is telling her something it has never told the gauge.'),
+          narr('There is more going into this bank than comes out of it at the rack. Not much. A breath in every forty.')],
+          [narr('Bank Seven. Four beats, and four beats. It keeps time better than the bell.')]) },
+        { id: 'grate', x: -68, y: -8, r: 6, reach: 22, ph: 6, name: 'THE GRATING', verb: 'TRACE THE LINE', talk: need(1, [
+          narr('She follows it with her hand, under the grating, to where the main splits. A blind tee, capped, with a wheel nobody has painted a number on.'),
+          narr('Somebody built a way round the meter into Bank Seven when the bank was built. Nobody on Crew Three has ever said so. Everybody on Crew Three walks round this grating.')],
+          [narr('A grating like the others. Everybody walks round it. She had never asked herself why.')]) },
+        { id: 'board', x: 58, y: -36, r: 9, reach: 26, ph: 62, name: 'THE SEAT BOARD', verb: 'LOOK', talk: () => [narr('Her knife is on its hook. Three hundred and six. His is on the next one along.'), narr('She touches his with one finger, so that it swings, and stops it again.')] },
+        { id: 'tee', x: -100, y: 22, r: 5, reach: 20, ph: 6, name: 'THE CAPPED TEE', verb: 'LEAVE IT SHUT', exit: () => step >= 3, talk: () => step < 3 ? [narr('Not yet. She does not know yet what it is.')] : [
+          narr('She does not open it. There is nobody in the ward tonight.'),
+          narr('But she knows where it is now, and what it costs. And that on the day somebody opens it, there will have to be a name.'),
+          fx(() => Sound.play('heart')), say('seren', 'Somebody will have to answer for it. Let it be somebody who knew.'), fx(() => { G.flags.serenLine = 1; })] }] } };
+}
+FF.barge = walkBarge; FF.serenline = walkSerenLine;
 FF.ring = walkRing; FF.ring1 = () => walkRing(1); FF.ring2 = () => walkRing(2); FF.ring3 = () => walkRing(3);
 FF.campday = walkCampDay; FF.lastbell = walkLastBell;
 
@@ -7942,6 +8160,7 @@ const Menus = {
         ['★ NEW · Night 28 · The Lamp (find the traitor; a 2D duel)', () => { fresh(); Mission.start('lamp'); }],
         ['★ NEW · Night 30 · The Dais (stealth; the grading book)', () => { fresh(); Mission.start('dais'); }],
         ['★ NEW · Night 49 · The Last Night (the camp; Lucan under truce)', () => { fresh(); Mission.start('eve'); }],
+        ['★ NEW · Fifty years before · Celestine\'s own Assay (stealth, then the wheel; played as her)', () => { fresh(); Mission.start('ember'); }],
         ['★ NEW · Part Two · The Count hall (stealth; lose the order)', () => { fresh(); Mission.start('count'); }],
         ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
@@ -7975,6 +8194,7 @@ const Menus = {
     const film = (k) => () => { UI.clear(); const d = FF[k](); Sound.tname = null; Fade.a = 0; Fade.dir = 0; Fade.busy = false; Brawl.start(Object.assign({}, d, { film: 1, intro: (d.intro || []).concat(d.outro || []), foes: [], waves: null, arts: null, voice: null, allies: [] }), () => Game.toTitle()); G.mode = 'opening'; };
     const cs = (steps, st) => () => { if (st) st(); else UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(steps().filter(s => s && !s.brawl && !s.mission), () => Game.toTitle()); };
     S['Story beats'].push(['The Ledger (43 days after) · whole chapter', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => Game.toTitle()); }, 60); }]);
+    S['Story beats'].push(['★ NEW · The cloak: the camp at night, day thirty-one (2.5D; they fall in behind you)', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day thirty-one, after dark.', 'campnight')], ['★ NEW · The service stair (2.5D; behind the painted line)', ff('THE SERVICE STAIR', 'The Sun Spire. The painted line.', 'sstair')], ['★ NEW · A barge, in the weather (2.5D, eight years after)', ff('EIGHT YEARS AFTER THE FURNACE', 'A barge, in the weather.', 'barge')], ['★ NEW · Seren finds the line (2.5D; played as her, three weeks before)', ff('THREE WEEKS BEFORE THE FURNACE', 'Bay Three. Seren, alone, after last bell.', 'serenline')]);
     S['Story beats'].push(['★ NEW · The fourth ring, first visit (2.5D; what they notice)', ff('THE FOURTH RING', 'The Sun Spire. Four years and a season after the furnace. Night.', 'ring1')], ['★ NEW · The fourth ring, second visit (Kestrel at the pipe; two bells)', ff('THE FOURTH RING', 'Five years after the furnace.', 'ring2')], ['★ NEW · The fourth ring, third visit (colder)', ff('THE FOURTH RING', 'Six years after the furnace.', 'ring3')],
       ['★ NEW · Flash forward: the book (a drawn still)', () => { UI.clear(); G.mode = 'cut'; Cutscene.play([{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Count. A book as wide as a table.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'book', secs: 10 }], () => Game.toTitle()); }],
       ['★ NEW · Flash forward: Tavi at sixteen (a drawn still)', () => { UI.clear(); G.mode = 'cut'; Cutscene.play([{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 }], () => Game.toTitle()); }]);
@@ -8078,11 +8298,11 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.72';
-const DEV_NEW = 'the fourth ring of the Spire, three visits, with what they notice; Part Two\'s cold open on the Stair; two drawn flash-forwards (Story beats; Levels in 3D).';
+const GAME_VER = '0.73';
+const DEV_NEW = 'five played flashes and places in Part Two: the camp at night in the white cloak, the service stair, Celestine\'s own Assay (played as her), a barge in the weather, Seren finding the line (Story beats; Levels in 2D).';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
-  [/fourth ring|cold open|Flash forward|Part Two|The Post|The Balancing|What She Knows|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
+  [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|What She Knows|Two Years|Little Ember|The Count \(/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
   [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],

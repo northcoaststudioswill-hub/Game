@@ -136,9 +136,9 @@ function makeAccredited(o) {
     const sway = f === 1 ? -1 : f === 2 ? 1 : 0, robe = o.robe, trim = o.trim, sk = o.skin;
     // robe: long, widening to the floor
     for (let y = 9; y < AH; y++) { const w = Math.min(12, 6 + Math.floor((y - 9) / 3)), x0 = 8 - Math.floor(w / 2) + (y > AH - 6 ? sway : 0); R(x0, y, w, 1, y === AH - 1 ? trim : robe); R(x0 + w - 1, y, 1, 1, shade(robe, .86)); if (y > 12 && (y % 5) === 2) R(x0 + 2, y, 1, 3, shade(robe, .92)); }
-    if (d === 0) { R(7, 10, 2, AH - 11, trim); R(7, 10, 1, AH - 11, shade(trim, 1.25)); R(4, 9, 8, 1, trim); R(4, 8, 2, 2, trim); R(10, 8, 2, 2, trim); R(3, 12, 1, 6, robe); R(12, 12, 1, 6, robe); R(3, 18, 1, 1, sk); R(12, 18, 1, 1, sk); }
+    if (d === 0) { R(7, 10, 2, AH - 11, trim); R(7, 10, 1, AH - 11, shade(trim, 1.25)); R(4, 9, 8, 1, trim); R(4, 8, 2, 2, trim); R(10, 8, 2, 2, trim); R(3, 12, 1, 6, robe); R(12, 12, 1, 6, robe); R(3, 18, 1, 1, o.gloves || sk); R(12, 18, 1, 1, o.gloves || sk); if (o.gloves) { R(3, 17, 1, 1, o.gloves); R(12, 17, 1, 1, o.gloves); } }
     else if (d === 1) { R(5, 9, 6, 1, trim); }
-    else { R(5, 9, 5, 1, trim); R(4, 8, 2, 2, trim); R(7, 12, 2, 6, shade(robe, .9)); R(7, 18, 2, 1, sk); }
+    else { R(5, 9, 5, 1, trim); R(4, 8, 2, 2, trim); R(7, 12, 2, 6, shade(robe, .9)); R(7, 18, 2, 1, o.gloves || sk); if (o.gloves) R(7, 17, 2, 1, o.gloves); }
     if (o.warden) {
       R(5, 1, 6, 7, '#d8dce4'); R(5, 1, 6, 1, '#f4f6fa'); if (d === 0) { R(6, 3, 4, 1, trim); R(5, 5, 6, 1, '#1e1e28'); R(7, 6, 2, 2, '#b8bcc8'); R(3, 9, 2, 3, '#e8ecf2'); R(11, 9, 2, 3, '#e8ecf2'); R(3, 9, 2, 1, trim); R(11, 9, 2, 1, trim); } else if (d > 1) R(5, 4, 2, 1, trim);
       R(d === 2 ? 2 : 13, 0, 1, AH, '#b8bcc8'); R(d === 2 ? 1 : 12, 0, 3, 2, trim); R(d === 2 ? 2 : 13, -1, 1, 1, '#fff');
@@ -187,7 +187,7 @@ function makeCadet(o) {
       else { R(7, 11, 2, 6, aD); R(4, 13, 8, 1, aD); for (let i = 0; i < 5; i++) R(10 - i, 12 + i, 2, 1, sash); }
       R(5, 17, 6, 1, sash); R(5, 18, 6, 1, trim); R(7, 18, 2, 1, tL); R(4, 19, 3, 2, arm); R(9, 19, 3, 2, arm); R(4, 20, 3, 1, trim); R(9, 20, 3, 1, trim); R(7, 19, 2, 2, aD);
       // arms: pauldron, upper arm, gilt cuff, hand
-      R(2, 12, 2, 4, arm); R(12, 12, 2, 4, arm); R(2, 12, 1, 4, aL); R(13, 12, 1, 4, aD); R(2, 16, 2, 2, trim); R(12, 16, 2, 2, trim); R(2, 17, 2, 1, tD); R(12, 17, 2, 1, tD); R(2, 18, 2, 1, sk); R(12, 18, 2, 1, sk);
+      R(2, 12, 2, 4, arm); R(12, 12, 2, 4, arm); R(2, 12, 1, 4, aL); R(13, 12, 1, 4, aD); R(2, 16, 2, 2, trim); R(12, 16, 2, 2, trim); R(2, 17, 2, 1, tD); R(12, 17, 2, 1, tD); R(2, 18, 2, 1, o.gloves || sk); R(12, 18, 2, 1, o.gloves || sk);
       if (o.band) R(d === 0 ? 12 : 2, 13, 2, 2, '#c8281e'); }
     // neck
     if (d !== 1) R(7, 9, 2, 1, skD);

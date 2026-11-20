@@ -209,7 +209,7 @@ const Mission = {
     this.prev = { map: G.mapId, x: P.x, y: P.y, dir: P.dir, sheet: P.sheet, show: World.showPlayer, dark: World.darkOverride };
     G.flags = G.flags || {}; for (const k of Object.keys(G.flags)) if (k.startsWith('m_')) delete G.flags[k];
     G.heist = 3; G.flags.heistEase = 0; G.flags.mCaught = 0; UI.clear(); P.sheet = World.sheetFor(d.sheet || 'kael2'); World.showPlayer = true; World.darkOverride = null;
-    if (d.reset) d.reset();
+    if (d.reset) d.reset(); $('#game').style.filter = d.grey ? 'grayscale(.82) contrast(1.08) brightness(1.05)' : '';
     World.load(d.map, { x: d.spawn[0] * 16 + 8, y: d.spawn[1] * 16 + 4, dir: d.spawn[2] }, true); G.mode = 'world'; this.reset(); Sound.music(MAPS[d.map].music);
     Fade.a = 1; Fade.dir = -1; Fade.sp = 1; Fade.busy = true; HUD.dirty = true;
     setTimeout(() => { if (G.heist === 3) HUD.toast(d.toast); }, 900);
@@ -227,7 +227,7 @@ const Mission = {
   finish() {
     if (G.heist !== 3) return; const pv = this.prev || {}, cb = this.done; this.done = null;
     G.heist = 0; G.flags.heistEase = 0; World.seq = null; World.bolt = null; World.ripple = null; World.dynLights = []; World.npcs = []; World.work = 0; World.alert = 0; for (const k of Object.keys(G.flags)) if (k.startsWith('m_')) delete G.flags[k]; if (this.def.reset) this.def.reset();
-    if (Dialogue.active) Dialogue.end(); UI.clear();
+    if (Dialogue.active) Dialogue.end(); UI.clear(); $('#game').style.filter = '';
     P.sheet = pv.sheet || P.sheet; World.showPlayer = pv.show; World.darkOverride = pv.dark || null;
     if (pv.map && MAPS[pv.map]) World.load(pv.map, { x: pv.x, y: pv.y, dir: pv.dir }, true);
     Sound.play('ok'); Fade.a = 1; Fade.dir = 0; Fade.busy = false; HUD.dirty = true;
@@ -684,5 +684,174 @@ function walkRing(n) {
         for (let i = 0; i < wall.length; i++) { const v = wall[i]; if (v !== 'lamp' && v !== 'door') continue; const x = ((256 + (i - W0) * 40) % 512 + 512) % 512; g.fillStyle = '#c9963a'; g.fillRect(x - 2, 256 - 34, 4, 56); g.fillStyle = '#e0b04c'; g.fillRect(x - 2, 256 - 34, 1, 56); }
         g.fillStyle = 'rgba(20,26,58,.20)'; g.fillRect(0, 0, 512, 512); } } };
 }
+// ---- the Assay, day thirty-one, after dark: he comes back down the ridge in the Proctor's cloak, and the camp gets up behind him.
+// A flash out of the fourth ring (a porter stepped aside for him, and he knows where he first saw that)
+function walkCampNight() {
+  const spots0 = [[-128, -18, 0], [-112, 30, 1], [-84, -40, 0], [-58, 26, 1], [-36, -30, 0], [-6, 34, 0], [22, -34, 1], [44, 14, 0], [70, -26, 2], [92, 30, 2], [112, -8, 3], [132, 22, 2], [146, -34, 3], [60, 40, 0]];
+  const trail = []; let joined = 0, lastX = 1e9, lastY = 1e9;
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, crew: 1, talk: () => lines });
+  const npcs = [
+    N('petra', -70, -12, 'PETRA LUNE', [say('petra', 'One had you down as lost. One had ruled the line and everything.'), narr('She rubbed something off her slate with her thumb. Then she put the slate under her arm and fell in a pace behind me, without being asked.')]),
+    N('oswin', 6, 8, 'OSWIN HALE', [say('oswin', 'Is that... one is not permitted to touch them. It is the only rule they have.'), say('you', 'One added a line.'), narr('He looked at the hem, and at the blood on it, and then he got up off his log. He had not stood up for anybody in thirty-one days. I do not think he knew he had done it.')]),
+    N('cadt1', 104, 8, 'A CADET OF HOUSE TEAL', [say('cadt1', 'You are on our side of the fire, Violet.'), narr('Then she saw the white, and the rest of it went out of her mouth unfinished. She had been told since she could walk what to do when that colour came toward her. Nobody had told her what to do about who was inside it.')]),
+    ...spots0.map(([x, y, c], i) => ({ id: ['cadv1', 'cadv2', 'cadt1', 'cadt2'][c], x, y, r: 8, crew: 1, key: 'c' + i }))];
+  return { era: 4, d2: 1, title: 'THE CLOAK', sub: 'THE ASSAY. DAY THIRTY-ONE, AFTER DARK', bg: 'storm', arena: { kind: 'ring', rx: 196, ry: 72 }, music: 'mystery', hero: { id: 'kael3', hp: 9, pow: 2, blade: 0, fury0: 0 },
+    walk: { id: 'campnight', spawn: [-176, 30], clear: 220, npcs,
+      open: () => [narr("I came down the ridge after dark in a Proctor's cloak, with his blood on the hem and his boots on my feet."), narr('Nobody on the dais came down to take it off me. So I walked into the camp to see what it was.')],
+      obj: () => joined ? Math.min(70, Math.round(joined / npcs.length * 70)) + ' BEHIND YOU. THE CACHE IS AT THE FAR END OF THE CAMP.' : 'WALK INTO THE CAMP.',
+      floor(g) { g.fillStyle = 'rgba(70,50,34,.5)'; g.beginPath(); g.ellipse(256, 256, 150, 40, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(40,28,22,.6)'; g.beginPath(); g.ellipse(256 + 20, 256 - 6, 22, 11, 0, 0, 6.3); g.fill(); },
+      props: [{ t: 'fire', x: 20, y: -6, k: 1 },
+        { t: 'tent', x: -196, y: -62, c: '#7a5ac8', k: 1 }, { t: 'tent', x: -120, y: -88, c: '#7a5ac8', k: 2 }, { t: 'tent', x: -30, y: -96, c: '#7a5ac8', k: 3 }, { t: 'tent', x: 96, y: -92, c: '#2aa6a0', k: 4 }, { t: 'tent', x: 150, y: -84, c: '#2aa6a0', k: 5 },
+        ...Array.from({ length: 14 }, (_, i) => ({ t: 'tree', x: -260 + i * 40 + (i * 13) % 17, y: -120 - (i * 7) % 30, k: i, h: 64 + (i * 11) % 24 })),
+        { t: 'banner', x: -50, y: -78, c: '#7a5ac8', k: 1 }, { t: 'banner', x: 124, y: -80, c: '#2aa6a0', k: 2 }, { t: 'rank', x: -150, y: -40, at: 10, k: 1 }],
+      spots: [
+        { id: 'lamps', x: -30, y: -44, r: 6, reach: 24, ph: 70, name: "THE PROCTORS' LAMPS", verb: 'LOOK UP', talk: () => [narr('Six lamps on the dais. Not one of them has moved. They are waiting to be told what a cadet in a Proctor\'s cloak is. There is no line for it.'), narr('Below, when there is no line for a thing, somebody burns. Up here, it seems, they wait.')] },
+        { id: 'cache', x: 176, y: -22, r: 9, reach: 30, ph: 30, name: 'THE CACHE', verb: 'BREAK THE RIBBON', exit: 1, talk: () => [
+          fx(() => { for (const a of Brawl.allies) if (a.crew && !a.fol) { a.fol = ++joined; a.r = 1; } }),
+          narr('The cache. A white ribbon across the lid, and a seal that the collar in my hand opens. It has sat forty paces from seventy hungry people for a month, and not one of them has touched it. That is what the white is for.'),
+          fx(() => Sound.play('clue')), narr('I broke it. Bread. Salve. Lamp oil. I gave it out by hand, Violet and Teal, in the order they were standing.'),
+          narr('When I turned round they were all behind me. I had not called anybody.'),
+          { s: 'narr', t: 'They did not follow me because I won. They followed me because I came back.' }] }],
+      tick(k, dt, B) { const p = B.p; if (Math.hypot(p.x - lastX, p.y - lastY) > 7) { trail.push([p.x, p.y]); lastX = p.x; lastY = p.y; if (trail.length > 400) trail.shift(); }
+        let slot = 0; for (const a of B.allies) { if (!a.crew) continue;
+          if (!a.fol && (Math.hypot(p.x - a.x, (p.y - a.y) * .8) < 66 || (a.talk && k.said[a.key || a.id]))) { a.fol = ++joined; a.r = 1; if (!Settings.d.reduce) a.bark = { t: joined === 1 ? '...' : ['', '', 'HIM?', '', 'THE CLOAK.', '', '', 'VIOLET.', '', '', 'GET UP.'][joined % 11] || '', life: 1.1 }; if (a.bark && !a.bark.t) a.bark = null; HUD.dirty = true; }
+          if (a.bark) { a.bark.life -= dt; if (a.bark.life <= 0) a.bark = null; }
+          if (!a.fol) continue; slot++; const row = Math.ceil(a.fol / 2), side = a.fol % 2 ? -1 : 1, t = trail[Math.max(0, trail.length - 1 - row * 2)] || [p.x, p.y], dxp = p.fx || 1, tx = t[0] - (trail.length < row * 2 + 1 ? dxp * row * 12 : 0), ty = clamp(t[1] + side * (7 + (a.fol % 3) * 2), -64, 64), dx = tx - a.x, dy = ty - a.y, d = Math.hypot(dx, dy);
+          if (d > 3) { const sp = Math.min(78, 20 + d * 3) * dt; a.x += dx / d * Math.min(sp, d); a.y += dy / d * Math.min(sp, d); a.anim = (a.anim || 0) + dt; a.fx = dx / d; a.fy = dy / d; } else { a.anim = 0; const q = Math.hypot(p.x - a.x, p.y - a.y) || 1; a.fx = (p.x - a.x) / q; a.fy = (p.y - a.y) / q; } }
+        return null; } } };
+}
+FF.campnight = walkCampNight;
+// ---- the service stair: behind a painted line no clerk crosses. Tier Six people, working the Spire's own valves
+Object.assign(CAST, {
+  svc1: { name: 'A valve hand', look: () => ({ knife: 1, skin: '#8a5a3e', hair: '#1a1014', style: 'short', shirt: '#5a5248', pants: '#2a2420', scarf: '#c9a23a' }) },
+  svc2: { name: 'A woman with plates', look: () => ({ skin: '#c08a6a', hair: '#6a3a1a', style: 'bun', shirt: '#8a8478', pants: '#4a463e', scarf: '#c9a23a' }) },
+  svc3: { name: 'A lamp trimmer', look: () => ({ skin: '#b07a5a', hair: '#d8d0c0', style: 'bald', shirt: '#6a5a48', pants: '#2a2420', scarf: '#c9a23a' }) }
+});
+function walkServiceStair() {
+  const F = G.flags, once = {}, one = (id, first, again) => () => { if (once[id]) return again; once[id] = 1; return first; };
+  const N = (id, x, y, name, talk) => ({ id, x, y, name, talk }); let turn = 0, heard = 0;
+  const wall = ['plain', 'lamp', 'plain', 'plain', 'door', 'lamp', 'valve', 'valve', 'plain', 'lamp', 'arch', 'plain', 'lamp', 'plain', 'plain'], W0 = 7;
+  return { era: 5, d2: 1, title: 'THE SERVICE STAIR', sub: 'THE SUN SPIRE. THE PAINTED LINE', bg: 'keep', bg2: 'sstair', arena: { kind: 'rect', w: 300, h: 60 }, music: 'mystery', hero: { id: 'kael2', hp: 10, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'sstair', spawn: [-138, 6], keep: () => false,
+      props: wall.map((v, j) => ({ t: 'swall', v, x: (j - W0) * 40, y: -40, k: j, turn: () => turn })),
+      open: () => [narr('Behind the kitchens there is a door no clerk uses, and behind the door a line painted across the floor. I had looked at it every morning for a season.'), narr('That night I stepped over it.')],
+      obj: k => heard ? 'GO BACK OVER THE LINE BEFORE YOU ARE MISSED.' : k.n ? 'THEY ARE WORKING. SO COULD YOU.' : 'THE SERVICE SIDE. NOBODY HERE IS LOOKING AT THE FLOOR.',
+      npcs: [
+        N('svc1', -6, -18, 'A VALVE HAND AT A SEIZED WHEEL', one('svc1', [
+          say('svc1', "Seat's lifting on this one. Has been since first bell. They've sent for an engineer."),
+          narr('He had his palm flat on the pipe beside it. He did not know he was doing it. Nobody from Tier Six does.'),
+          { choice: [
+            { t: '"It\'s not the seat. Back it a quarter, let it settle, then close."', fx: () => { F.svcValve = 1; }, then: [say('you', "It's not the seat. Back it a quarter, let it settle, then close."), fx(() => { turn = 1; Sound.play('clue'); }), narr('He did it. The wheel sighed, and came home.'), say('svc1', '...Who taught you that, Clerk?'), say('you', 'A careful woman.'), say('svc1', 'Aye. She would have been.'), narr('He did not look at my collar again. He looked at my hands, in their gloves. Then he went back to his work, and after a moment he said it. Very quietly.'), fx(() => { heard = 1; Sound.play('heart'); }), say('svc1', 'Brennick.')] },
+            { t: 'Say nothing. A clerk does not know valves.', fx: () => { F.svcValve = 0; }, then: [narr('I said nothing. I stood and watched a man fight a wheel I could have closed with two fingers, and I kept my hands behind my back.'), say('svc1', "Don't trouble yourself, Clerk. It's only a valve."), narr('He waited until I had turned away. Then he said it to the pipe. Very quietly.'), fx(() => { heard = 1; Sound.play('heart'); }), say('svc1', 'Brennick.')] }] }],
+          [say('svc1', "Mind how you go. The line's wet.")])),
+        N('svc2', -74, 16, 'A WOMAN WITH PLATES', () => [say('svc2', "Don't stand in the light, love. They can see this door from the ring."), narr('Love. Nobody has called me anything but Clerk and Sorrel for a season. I stood out of the light.')]),
+        N('svc3', 84, -16, 'A LAMP TRIMMER', () => [say('svc3', "Crew Three, wasn't it. I trimmed the lamps over Bank Seven nine years before they brought me up."), narr('He said it to the wick he was cutting. Then he turned his head and looked at me, the way you look at somebody who has spoken. I had not spoken.'), say('svc3', "We hummed for her. Up here. They can't hear it through the stone.")])],
+      spots: [
+        { id: 'bank', x: -20, y: -32, r: 7, reach: 22, ph: 90, name: "THE SPIRE'S OWN VALVES", verb: 'LOOK', talk: () => [narr('The Spire breathes through valves like anybody. Twelve wheels on this landing, a gauge over each, and on every body the same foundry mark as Bank Seven.'), find('f_spirebank'), narr('The Accredited do not know that they have them. Somebody else has always turned them.')] },
+        { id: 'stairs', x: 120, y: -32, r: 7, reach: 24, ph: 90, name: 'THE SERVICE STAIR', verb: 'LOOK DOWN', talk: () => [narr('Nine hundred steps down the outside of the Spire, with the line down the middle of every one. The wind comes up it. It smells of the kitchens, and under that, a long way under, of hot iron.')] },
+        { id: 'back', x: -120, y: -32, r: 8, reach: 26, ph: 100, name: 'THE DOOR TO THE RING', verb: 'GO BACK', exit: 1, talk: () => { F.sstair = 1; return [narr('There is a line painted on the floor. On one side they call me Clerk.'), { s: 'narr', t: heard ? 'On the other they call me Brennick, very quietly.' : 'On the other they know exactly what I am, and have told nobody. I have never been so safe as I was on the wrong side of that paint.' }]; } }],
+      tick() { return null; },
+      floor(g) { for (let y = 0; y < 512; y += 24) for (let x = (y / 24 % 2) * 20 - 20; x < 512; x += 40) { const q = ((x * 7 + y * 13) % 4 + 4) % 4; g.fillStyle = '#1e1c22'; g.fillRect(x, y, 40, 24); g.fillStyle = ['#3a3840', '#34323a', '#403e46', '#373540'][q]; g.fillRect(x, y, 39, 23); }
+        g.fillStyle = '#c9963a'; g.fillRect(0, 256 + 10, 512, 5); g.fillStyle = '#e0b04c'; g.fillRect(0, 256 + 10, 512, 1);
+        const lx = 256 - 104; g.fillStyle = '#e8dcc0'; g.fillRect(lx, 0, 6, 512); g.fillStyle = '#c9963a'; g.fillRect(lx + 6, 0, 3, 512);   /* the line across: the clerk's side is west of it */
+        g.fillStyle = 'rgba(8,6,10,.28)'; g.fillRect(0, 0, 512, 512); } } };
+}
+FF.sstair = walkServiceStair;
+// ---- fifty years before the furnace: Celestine Aurel's own Assay, played as her. The island at night, and one wheel.
+// It is the island mission's map (night twenty-five), cooled to grey; the Proctors walk the pickets' rounds
+Object.assign(CAST, {
+  cel20: { name: 'Celestine Aurel, a cadet', look: () => ({ accredited: 1, cadet: 1, gloves: '#a8905c', skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, robe: '#f4f2ec', armor: '#f4f2ec', trim: '#e8c25a', sash: '#e8c25a' }) },
+  proc50: { name: 'A Proctor', look: () => CAST.voss.look() }
+});
+Object.assign(MOUTH, { cel20: 'flat', proc50: 'flat' });
+MISSIONS.ember = {
+  map: 'raid', sheet: 'cel20', grey: 1, where: 'An Assay · fifty years before the furnace', spawn: [2, 7, 3], toast: 'The pump house is north. Nobody is to see her.', hint: 'B: throw a pebble · hold A to work · watch the lamps turn',
+  npcs: () => MF('shut') ? [] : [
+    mG('proc50', 12, 8, 3, [[19, 8, 3, 1.4], [19, 13, 0, 1.6], [13, 13, 2, 1.4], [13, 8, 1, 1.6]]),
+    mG('proc50', 22, 4, 0, [[22, 4, 2, 2], [22, 4, 0, 1.6], [22, 11, 0, 1.5], [22, 11, 2, 2], [22, 4, 1, 1.4]]),
+    mG('proc50', 26, 9, 2, [[26, 9, 2, 2.2], [26, 9, 1, 1.7], [26, 9, 3, 1.3], [26, 9, 0, 1.7]])],
+  obj: () => MF('shut') ? 'It is done. Walk.' : 'The pump house (north), unseen. Then the wheel: hold A.',
+  mark: () => ({ x: 14 * 16, y: 4 * 16, lab: 'VALVE' }),
+  holds: t => t.id === 'valve' && !MF('shut'),
+  respawn: () => [2, 7, 3],
+  caught: k => [say('proc50', ['CADET. THE ISLAND IS NOT YOURS TONIGHT.', 'BACK ACROSS THE FORD, CADET.', 'ONE SEES YOU. ONE IS WRITING IT DOWN.'][k % 3]), narr(k >= 2 ? 'She goes back to the reeds and waits. She has waited in worse places than reeds.' : 'Back to the reeds. A Proctor does not punish a cadet for trying. He only writes it down.')],
+  use(t) {
+    if (t.id === 'tcairn') return Dialogue.start([narr('Cairns. Every House builds them. She has not yet added to anybody\'s.')]);
+    if (t.id === 'drop') return Dialogue.start([narr('A patron\'s crate on a gilt cord. Nothing has ever been lowered for her. The family that took her up placed its sum once, and is waiting to see.')]);
+    if (t.id === 'tboard') return Dialogue.start([narr('The Proctors\' board. Her House is in the lower half of it. It will not be in the morning.')]);
+    if (t.id === 'ttA' || t.id === 'ttB' || t.id === 'ttC') return Dialogue.start([narr('Canvas, for the look of the thing. That year the other House slept below, in the stack\'s undercroft, out of the storms. Forty of them on one draught. She has counted them in.')]);
+    if (t.id === 'std') return Dialogue.start([narr('Their standard. Everybody comes for the standard. That is why there are four lamps on it, and none on the pump house.')]);
+    if (t.id === 'valve') { if (MF('shut')) return Dialogue.start([narr('Shut. Holding.')]);
+      return Dialogue.start([
+        narr('The pump house. One wheel, and a line off the stack that feeds the undercroft: their lamps, and their air.'),
+        narr('She takes one glove off. They took the burns off that palm when they took her up, and it still knows a wheel. Flat on the pipe first. Then the quarter turn.'),
+        fx(() => Sound.play('heart')),
+        say('cel20', 'It is only a valve. On Tier Six every child can turn one. Up here, nobody else would.'),
+        fx(() => { MSET('shut'); G.flags.heistEase = 1; const m = MAPS.raid; m.lights = m.lights.filter(l => l.c !== '#ffe090'); for (const p of m.props) if (p.t === 'teallamp') p.a = 1; World.layer = renderMapLayer(World.map); Mission.resetNPCs(); World.grace = 99; Sound.play('rotate'); }),
+        narr('The needle falls, and holds. Across the island their lamps go amber, and then out, one after another, like a tier at last bell.'),
+        narr('She puts the glove back on and walks to her own fire. She does not run. Nobody is going to look for a cadet at a valve.'),
+        narr('First light. They come up out of the undercroft with their hands open. Thirty-eight of them.'), fx(() => Sound.play('heart')), narr('Two do not wake.'),
+        say('proc50', 'Genius.'), narr('He writes it in the book in the one word. She says nothing.'),
+        fx(() => { G.flags.emberSeen = 1; })], () => Mission.finish()); }
+  },
+  reset() { const m = MAPS.raid; if (!m.lights0) m.lights0 = m.lights.slice(); if (!MF('shut')) { m.lights = m.lights0.slice(); for (const p of m.props) if (p.t === 'teallamp') p.a = 0; } }
+};
+// ---- a barge in the weather, eight years after the furnace: where he sat for a month and counted nothing, and what got him up
+function walkBarge() {
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines }); let weep = 1;
+  return { era: 5, d2: 1, title: 'A BARGE, IN THE WEATHER', sub: 'EIGHT YEARS AFTER THE FURNACE', bg: 'storm', bg2: 'barge', arena: { kind: 'rect', w: 300, h: 56 }, music: 'mystery', hero: { id: 'kael2', hp: 10, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'barge', spawn: [-120, 14], keep: () => false,
+      props: [...Array.from({ length: 13 }, (_, i) => ({ t: 'brail', x: (i - 6) * 40, y: -36, k: i, v: i === 7 ? 'halberd' : i % 4 === 1 ? 'lamp' : '' })), { t: 'bpipe', x: 112, y: -22, k: 1, weep: () => weep }, { t: 'bcrate', x: -40, y: -26, k: 1 }, { t: 'bcrate', x: -22, y: -28, k: 2 }, { t: 'bcrate', x: 44, y: 24, k: 3 }],
+      open: () => [narr('I had not lost anything since the furnace. I had forgotten how it is done.'), narr('I sat on a barge in the weather for most of a month and did not count anything at all.')],
+      obj: k => k.n >= 2 ? 'SOMETHING ON THIS DECK IS MAKING A NOISE.' : 'A MONTH ON THIS DECK. GET UP.',
+      npcs: [
+        N('ilse', -64, -4, 'ILSE MARRIN', [say('ilse', 'You have sat there a month, soot. I have said nothing. I am saying it now. This hull is making a noise, and I do not know what it means.'), narr('She has a table\'s worth of knives and has never once laid a hand on a pipe. She was asking me. Ilse does not ask.')]),
+        N('hollis', 8, -4, 'HOLLIS THE WELDER', [say('hollis', "He put a halberd butt in my arm once. For humming. I'd have liked to tell him it mended."), narr('He was looking at the halberd on the rail. Somebody had brought it off the dock stair. Nobody has said who.')]),
+        N('bao', 70, 16, 'BAO, AT THE WHEEL', [say('bao', "It's a cart with no road under it. I keep telling myself that. Sit, Kael. Eat."), narr('A noodle seller is flying a barge. Four hundred hulls in this weather, and every one of them has somebody like him on the wheel, telling themselves something.')]),
+        N('sable', -8, 20, 'SABLE', [say('sable', "Eat something. I didn't skim it for the gulls."), narr('Greens. She has kept a cold crate going through a month of cloud for a man who would not look at it.')])],
+      spots: [
+        { id: 'halberd', x: 44, y: -30, r: 5, reach: 28, ph: 70, name: "BRAND'S HALBERD", verb: 'LOOK', talk: () => [narr('Lashed to the rail, butt down, the way he grounded it. Eleven minutes. Somebody timed it. I asked them to.'), narr('I have not touched it. I am not the one it should go to.')] },
+        { id: 'rail', x: -110, y: -30, r: 5, reach: 28, ph: 24, name: 'THE RAIL', verb: 'LOOK OUT', talk: () => [narr('Cloud, and in the cloud the hooded lamps of the others, rising and falling. Four hundred barges, hidden in the weather. From below we must look like nothing at all.'), narr('There is no ceiling. I have stopped minding. I had not noticed that I had stopped.')] },
+        { id: 'seal', x: 112, y: -14, r: 8, reach: 26, ph: 18, name: 'A WEEPING SEAL', verb: 'PUT A HAND ON IT', exit: 1, talk: () => [
+          narr('It was a valve that got me up. A seal weeping on the third barge, and four hundred hulls, and nobody else aboard who knew what the sound meant.'),
+          fx(() => { Sound.play('heart'); }), { s: 'narr', t: 'I went and put my hand flat on the pipe, the way she taught me.' }] }],
+      floor(g) { g.fillStyle = '#141826'; g.fillRect(0, 0, 512, 512); for (let y = 256 - 40; y < 256 + 40; y += 8) { for (let x = ((y / 8) % 2) * 32 - 32; x < 512; x += 64) { const q = ((x * 5 + y * 3) % 4 + 4) % 4; g.fillStyle = '#2a2018'; g.fillRect(x, y, 64, 8); g.fillStyle = ['#5a4634', '#54402e', '#604c38', '#574331'][q]; g.fillRect(x, y, 63, 7); g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(x, y, 63, 1); g.fillStyle = '#2a2018'; g.fillRect(x + 2, y + 3, 1, 1); g.fillRect(x + 60, y + 3, 1, 1); } }
+        g.fillStyle = '#2a2018'; g.fillRect(0, 256 - 42, 512, 3); g.fillRect(0, 256 + 39, 512, 4); g.fillStyle = 'rgba(120,150,190,.10)'; g.fillRect(0, 256 - 40, 512, 80); } } };
+}
+// ---- three weeks before the furnace: Seren, alone in Bay Three after last bell, tracing the line under Bank Seven. Played as her; told from outside
+function walkSerenLine() {
+  let step = 0; const need = (n, lines, other) => () => { if (step < n) return other; if (step === n) step = n + 1; return lines; };
+  return { era: 0, title: 'BAY THREE', sub: 'THREE WEEKS BEFORE THE FURNACE. AFTER LAST BELL', bg: 'furnace', arena: { kind: 'rect', w: 230, h: 84 }, music: 'hum', hero: { id: 'seren', hp: 6, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'serenline', spawn: [-86, 22], keep: () => false,
+      props: [{ t: 'kboard', x: 58, y: -44, own: () => 1, k: 1 }, { t: 'vbank', x: -30, y: -46, n: 7, k: 1 }, { t: 'vbank', x: -96, y: -46, n: 6, k: 2 }, ...[-150, 0, 120].map((x, i) => ({ t: 'lamp', x, y: -52, k: i }))],
+      floor(g) { const X = x => 256 + x, Y = y => 256 + y; g.fillStyle = 'rgba(20,12,10,.55)'; g.fillRect(X(-78), Y(-14), 22, 14); g.strokeStyle = 'rgba(160,150,140,.7)'; g.lineWidth = 1; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(X(-78) + i * 4 + .5, Y(-14)); g.lineTo(X(-78) + i * 4 + .5, Y(0)); g.stroke(); } g.strokeRect(X(-78) + .5, Y(-14) + .5, 22, 14);
+        g.fillStyle = 'rgba(40,24,18,.5)'; g.fillRect(X(-34), Y(-40), 5, 30); g.fillRect(X(-66), Y(-12), 36, 5); g.fillRect(X(-100), Y(-2), 5, 24); g.fillRect(X(-100), Y(-2), 26, 5);
+        g.fillStyle = 'rgba(20,12,10,.7)'; g.beginPath(); g.arc(X(-98), Y(24), 6, 0, 6.3); g.fill(); g.strokeStyle = 'rgba(170,60,40,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(X(-98), Y(24), 4, 0, 6.3); g.stroke(); },
+      open: () => [narr('Last bell is an hour gone and the bay is hers. She has told Kael she is checking a gauge. It is nearly true.')],
+      obj: () => ['BANK SEVEN IS TELLING HER SOMETHING. PUT A HAND ON IT.', 'FOLLOW THE LINE UNDER THE GRATING.', 'OLD ORIN IS STILL HERE. ASK HIM.', 'BACK TO THE TEE.'][Math.min(3, step)],
+      npcs: [{ id: 'orin', x: 30, y: 14, name: 'OLD ORIN', talk: need(2, [
+        say('seren', 'Orin. The capped tee under Seven. Where does it go?'),
+        say('orin', "Forty years I've hung my knife on that board. Don't ask me that one, girl."),
+        say('seren', "I'm asking."),
+        say('orin', "The ward. It fed the fever ward, before the Count shut the fans. Open it and forty beds breathe. And the audit shows a bled line with Crew Three's number on it."),
+        say('orin', "They don't strike a line for that. They strike a crew."),
+        narr('He does not look at her while he says it. He looks at the board, and the hooks.')],
+        [say('orin', 'The pipes are talking tonight. Hm.'), narr('He talks to pipes. She has always thought he was the only one on the tier who listened to the answers.')]) }],
+      spots: [
+        { id: 'bank', x: -30, y: -34, r: 8, reach: 26, ph: 50, name: 'BANK SEVEN', verb: 'PUT A HAND ON IT', talk: need(0, [
+          narr('Her palm flat on the pipe, first. Then her ear. It is telling her something it has never told the gauge.'),
+          narr('There is more going into this bank than comes out of it at the rack. Not much. A breath in every forty.')],
+          [narr('Bank Seven. Four beats, and four beats. It keeps time better than the bell.')]) },
+        { id: 'grate', x: -68, y: -8, r: 6, reach: 22, ph: 6, name: 'THE GRATING', verb: 'TRACE THE LINE', talk: need(1, [
+          narr('She follows it with her hand, under the grating, to where the main splits. A blind tee, capped, with a wheel nobody has painted a number on.'),
+          narr('Somebody built a way round the meter into Bank Seven when the bank was built. Nobody on Crew Three has ever said so. Everybody on Crew Three walks round this grating.')],
+          [narr('A grating like the others. Everybody walks round it. She had never asked herself why.')]) },
+        { id: 'board', x: 58, y: -36, r: 9, reach: 26, ph: 62, name: 'THE SEAT BOARD', verb: 'LOOK', talk: () => [narr('Her knife is on its hook. Three hundred and six. His is on the next one along.'), narr('She touches his with one finger, so that it swings, and stops it again.')] },
+        { id: 'tee', x: -100, y: 22, r: 5, reach: 20, ph: 6, name: 'THE CAPPED TEE', verb: 'LEAVE IT SHUT', exit: () => step >= 3, talk: () => step < 3 ? [narr('Not yet. She does not know yet what it is.')] : [
+          narr('She does not open it. There is nobody in the ward tonight.'),
+          narr('But she knows where it is now, and what it costs. And that on the day somebody opens it, there will have to be a name.'),
+          fx(() => Sound.play('heart')), say('seren', 'Somebody will have to answer for it. Let it be somebody who knew.'), fx(() => { G.flags.serenLine = 1; })] }] } };
+}
+FF.barge = walkBarge; FF.serenline = walkSerenLine;
 FF.ring = walkRing; FF.ring1 = () => walkRing(1); FF.ring2 = () => walkRing(2); FF.ring3 = () => walkRing(3);
 FF.campday = walkCampDay; FF.lastbell = walkLastBell;

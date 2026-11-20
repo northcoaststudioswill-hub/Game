@@ -234,6 +234,7 @@ const Menus = {
         ['★ NEW · Night 28 · The Lamp (find the traitor; a 2D duel)', () => { fresh(); Mission.start('lamp'); }],
         ['★ NEW · Night 30 · The Dais (stealth; the grading book)', () => { fresh(); Mission.start('dais'); }],
         ['★ NEW · Night 49 · The Last Night (the camp; Lucan under truce)', () => { fresh(); Mission.start('eve'); }],
+        ['★ NEW · Fifty years before · Celestine\'s own Assay (stealth, then the wheel; played as her)', () => { fresh(); Mission.start('ember'); }],
         ['★ NEW · Part Two · The Count hall (stealth; lose the order)', () => { fresh(); Mission.start('count'); }],
         ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
@@ -267,6 +268,7 @@ const Menus = {
     const film = (k) => () => { UI.clear(); const d = FF[k](); Sound.tname = null; Fade.a = 0; Fade.dir = 0; Fade.busy = false; Brawl.start(Object.assign({}, d, { film: 1, intro: (d.intro || []).concat(d.outro || []), foes: [], waves: null, arts: null, voice: null, allies: [] }), () => Game.toTitle()); G.mode = 'opening'; };
     const cs = (steps, st) => () => { if (st) st(); else UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(steps().filter(s => s && !s.brawl && !s.mission), () => Game.toTitle()); };
     S['Story beats'].push(['The Ledger (43 days after) · whole chapter', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => Game.toTitle()); }, 60); }]);
+    S['Story beats'].push(['★ NEW · The cloak: the camp at night, day thirty-one (2.5D; they fall in behind you)', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day thirty-one, after dark.', 'campnight')], ['★ NEW · The service stair (2.5D; behind the painted line)', ff('THE SERVICE STAIR', 'The Sun Spire. The painted line.', 'sstair')], ['★ NEW · A barge, in the weather (2.5D, eight years after)', ff('EIGHT YEARS AFTER THE FURNACE', 'A barge, in the weather.', 'barge')], ['★ NEW · Seren finds the line (2.5D; played as her, three weeks before)', ff('THREE WEEKS BEFORE THE FURNACE', 'Bay Three. Seren, alone, after last bell.', 'serenline')]);
     S['Story beats'].push(['★ NEW · The fourth ring, first visit (2.5D; what they notice)', ff('THE FOURTH RING', 'The Sun Spire. Four years and a season after the furnace. Night.', 'ring1')], ['★ NEW · The fourth ring, second visit (Kestrel at the pipe; two bells)', ff('THE FOURTH RING', 'Five years after the furnace.', 'ring2')], ['★ NEW · The fourth ring, third visit (colder)', ff('THE FOURTH RING', 'Six years after the furnace.', 'ring3')],
       ['★ NEW · Flash forward: the book (a drawn still)', () => { UI.clear(); G.mode = 'cut'; Cutscene.play([{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Count. A book as wide as a table.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'book', secs: 10 }], () => Game.toTitle()); }],
       ['★ NEW · Flash forward: Tavi at sixteen (a drawn still)', () => { UI.clear(); G.mode = 'cut'; Cutscene.play([{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 }], () => Game.toTitle()); }]);
@@ -370,11 +372,11 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.72';
-const DEV_NEW = 'the fourth ring of the Spire, three visits, with what they notice; Part Two\'s cold open on the Stair; two drawn flash-forwards (Story beats; Levels in 3D).';
+const GAME_VER = '0.73';
+const DEV_NEW = 'five played flashes and places in Part Two: the camp at night in the white cloak, the service stair, Celestine\'s own Assay (played as her), a barge in the weather, Seren finding the line (Story beats; Levels in 2D).';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
-  [/fourth ring|cold open|Flash forward|Part Two|The Post|The Balancing|What She Knows|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
+  [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|What She Knows|Two Years|Little Ember|The Count \(/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
   [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],

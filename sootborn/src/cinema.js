@@ -26,7 +26,7 @@ const Cutscene = {
   // wake (back to the present below), furnace (back to before the furnace), strip (to the Assay), step (on, inside the Assay), chalk (the same time, somewhere else), page (into a comic-book level)
   card(t, sub, big, tr) {
     const el = $('#card'); el.classList.remove('hidden'); if (!tr && big && /assay/i.test(sub || '')) tr = /^FOUR YEARS AFTER/.test(t) ? 'strip' : 'step';
-    el.className = el.className.replace(/\s*\btr-\w+/g, ''); void el.offsetWidth; if (tr && !Settings.d.reduce) { el.classList.add('tr-' + tr); const sf = { wake: 'dash', furnace: 'heart', strip: 'stage', years: 'stage', chalk: 'clue', page: 'page' }[tr]; if (sf) Sound.play(sf); }
+    el.className = el.className.replace(/\s*\btr-\w+/g, ''); void el.offsetWidth; if (tr && !Settings.d.reduce) { el.classList.add('tr-' + tr); const sf = { wake: 'dash', furnace: 'heart', ash: 'heart', strip: 'stage', years: 'stage', chalk: 'clue', page: 'page' }[tr]; if (sf) Sound.play(sf); }
     el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}${tr === 'years' ? yearCal(t) : assayCal(sub)}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
     el.classList.remove('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   },
