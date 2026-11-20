@@ -1,0 +1,94 @@
+<title>Guttercrown Box Front</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Grenze+Gotisch:wght@700;900&display=swap">
+<style>
+/* Layout: one box face at a big-box 3:4 ratio, centred on a table of dark stone, with the art-direction note below it.
+   Everything on the face scales with the box (container units), so it reads the same on a phone and a monitor. */
+:root {
+  color-scheme: dark;
+  --table: #0d0a0d;        /* what the box sits on */
+  --pit: #120e12;
+  --parch: #e7dbbd;
+  --parch-dim: #b9a986;
+  --gold: #e0b04a;
+  --bronze: #8a6a34;
+  --blood: #b3261e;
+  --title: 'Grenze Gotisch', 'Cinzel', Georgia, serif;
+  --caps: 'Cinzel', Georgia, serif;
+  --body: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+}
+* { box-sizing: border-box; }
+body { background: radial-gradient(ellipse at 50% 30%, #231a22 0%, var(--table) 70%); color: var(--parch); font-family: var(--body); font-size: 18px; line-height: 1.5; min-height: 100%; }
+.stage { padding-block: 32px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+.box { width: min(620px, 100%); aspect-ratio: 3 / 4; container-type: inline-size; position: relative; overflow: hidden; background: var(--pit);
+  box-shadow: 0 0 0 1px #000, 0 30px 60px rgba(0,0,0,.65), 0 8px 18px rgba(0,0,0,.5); border-radius: 3px; }
+.art { position: absolute; left: 0; top: 21%; width: 100%; height: auto; }
+.shade { position: absolute; inset: 0; background:
+  linear-gradient(180deg, rgba(10,7,10,1) 0%, rgba(10,7,10,1) 21%, rgba(10,7,10,.6) 30%, rgba(10,7,10,0) 44%, rgba(10,7,10,0) 66%, rgba(10,7,10,.92) 90%),
+  radial-gradient(ellipse at 50% 55%, transparent 45%, rgba(0,0,0,.55) 100%); }
+/* a thin bronze frame inset from the edge, like a foil border */
+.frame { position: absolute; inset: 2.6cqw; border: .35cqw solid var(--bronze); box-shadow: inset 0 0 0 .25cqw rgba(0,0,0,.6); pointer-events: none; }
+
+.top { position: absolute; top: 5.5cqw; left: 0; right: 0; text-align: center; }
+.platforms { font-family: var(--caps); font-weight: 700; font-size: 2.3cqw; letter-spacing: .5em; color: var(--parch-dim); text-transform: uppercase; }
+.presents { margin-top: 5cqw; font-family: var(--caps); font-size: 2.4cqw; letter-spacing: .42em; text-transform: uppercase; color: var(--parch); }
+.crown { display: block; width: 13cqw; margin: 1.4cqw auto -1.5cqw; }
+.logo { font-family: var(--title); font-weight: 900; font-size: 18.5cqw; line-height: .9; margin: 0;
+  background: linear-gradient(180deg, #fff3c8 0%, var(--gold) 46%, #7d5016 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 .6cqw 0 rgba(0,0,0,.85)) drop-shadow(0 0 3cqw rgba(0,0,0,.7)); }
+.logo span { background: linear-gradient(180deg, #ffa184 0%, var(--blood) 56%, #520d0a 100%); -webkit-background-clip: text; background-clip: text; }
+.ribbon { display: inline-block; margin-top: 1.4cqw; background: var(--blood); color: #f9e9c6; font-family: var(--caps); font-weight: 700; font-size: 2.7cqw; letter-spacing: .3em; text-transform: uppercase; padding: 1.1cqw 4.5cqw; clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%); box-shadow: 0 .4cqw 0 rgba(0,0,0,.6); }
+
+/* a wax seal, the game's own: blood and a crown, not any real ratings mark */
+.seal { position: absolute; right: 6.5cqw; top: 60%; width: 19cqw; height: 19cqw; border-radius: 50%; display: grid; place-items: center; text-align: center;
+  background: radial-gradient(circle at 38% 32%, #d63a2e 0%, var(--blood) 45%, #5f100c 100%); color: #f9e3c0; transform: rotate(-11deg);
+  box-shadow: 0 .8cqw 1.6cqw rgba(0,0,0,.6), inset 0 0 0 .8cqw rgba(0,0,0,.18); font-family: var(--caps); }
+.seal b { display: block; font-family: var(--title); font-size: 7.4cqw; line-height: .85; }
+.seal span { display: block; font-size: 1.75cqw; letter-spacing: .12em; text-transform: uppercase; line-height: 1.2; padding: 0 2cqw; }
+
+.bottom { position: absolute; left: 0; right: 0; bottom: 6cqw; text-align: center; padding: 0 8cqw; }
+.tag { font-family: var(--body); font-style: italic; font-size: 4.3cqw; line-height: 1.2; color: #fff3dc; text-shadow: 0 .3cqw .8cqw #000; }
+.studio { margin-top: 3cqw; display: flex; justify-content: space-between; align-items: center; font-family: var(--caps); font-size: 1.9cqw; letter-spacing: .24em; text-transform: uppercase; color: var(--parch-dim); }
+.mature { border: .3cqw solid var(--parch-dim); padding: .7cqw 1.4cqw; letter-spacing: .14em; }
+
+.note { width: min(620px, 100%); }
+.note h2 { font-family: var(--caps); font-size: 14px; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); margin: 0 0 10px; }
+.note p { margin: 0 0 10px; color: var(--parch); }
+.note ul { margin: 0; padding-left: 20px; color: var(--parch-dim); }
+.note li { margin-bottom: 6px; }
+</style>
+
+<div class="stage">
+  <article class="box" aria-label="Guttercrown box, front">
+    <img class="art" src="img/cover-sorceress.jpg" alt="A tiefling sorceress in a red gown, horns like a crown, both hands blazing with frost light inside her ward, in the Blood Pit.">
+    <div class="shade"></div>
+    <div class="frame"></div>
+
+    <div class="top">
+      <div class="platforms">PC · Phone · Controller</div>
+      <div class="presents">The Deep Guild presents</div>
+      <svg class="crown" viewBox="0 0 120 60" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1c2"/><stop offset=".5" stop-color="#e0b04a"/><stop offset="1" stop-color="#7d5016"/></linearGradient></defs><path d="M6 52 L14 14 L36 34 L60 4 L84 34 L106 14 L114 52 Z" fill="url(#g)" stroke="#2a1a08" stroke-width="2.5" stroke-linejoin="round"/><rect x="6" y="48" width="108" height="9" rx="1.5" fill="#b3261e" stroke="#2a1a08" stroke-width="2"/><circle cx="60" cy="30" r="5" fill="#b3261e"/></svg>
+      <h1 class="logo">Gutter<span>crown</span></h1>
+      <div class="ribbon">Pit-fighters of the Undercity</div>
+    </div>
+
+    <div class="seal" aria-label="116 ways to end a fight"><div><b>116</b><span>ways to end a fight</span></div></div>
+
+    <div class="bottom">
+      <p class="tag">Bleed for coin. Climb the Ledger. Take the crown.</p>
+      <div class="studio"><span>North Coast Studios</span><span class="mature">Adults · Blood &amp; gore</span><span>E Concepts</span></div>
+    </div>
+  </article>
+
+  <section class="note">
+    <h2>Front cover idea</h2>
+    <p>The cover sells one fighter, not the whole pit: a sorceress lit by her own frost in the dark, with the crowd and the iron gate dim behind her. The title sits in the black above her head, in the game’s own gothic face, gold for “Gutter” and blood for “crown”.</p>
+    <ul>
+      <li>Art is a real frame from the game, rendered with the menus hidden. For print, re-render at 4× from the same camera.</li>
+      <li>The wax seal carries the one number that sells it. It is the game’s own seal, not a ratings mark; the real rating box goes where the “Mature” tag is once the game is rated.</li>
+      <li>Alternate covers to test: the half-orc fighter with his axe raised, or a cleric mid-radiance. Keep the same title block so the shelf reads as a series.</li>
+    </ul>
+  </section>
+</div>
