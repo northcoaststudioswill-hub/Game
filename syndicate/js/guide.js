@@ -192,4 +192,28 @@
     bar.classList.add('named'); let lg = document.getElementById('ablegend'); if (!lg) { lg = document.createElement('div'); lg.id = 'ablegend'; bar.parentNode.insertBefore(lg, bar); } legend(); return r; };
   const legend = () => { const lg = document.getElementById('ablegend'); if (!lg) return; const pad = G.input.usingPad; lg.innerHTML = pad ? '<kbd>X</kbd>/<kbd>RT</kbd> strike · hold for a heavy blow &nbsp; <kbd>▼</kbd> taunt &nbsp; <kbd>R-stick</kbd> aim' : '<kbd>Click</kbd> strike · hold for a heavy blow &nbsp; <kbd>G</kbd> taunt &nbsp; <kbd>Mouse</kbd> aim'; lg.className = G.input.touch ? 'hidden' : ''; };
   const rk0 = ui.refreshKeys; ui.refreshKeys = function () { const r = rk0.apply(this, arguments); legend(); return r; };
+  // ------------------------------------------------------------ first steps: a lit path from the first stall to the pit gate
+  const FP = [
+    { re: /^The Fence/, name: 'the Fence', say: 'Steel, potions, armour: that is me. Now the Guildmaster, next door. He keeps your page.' },
+    { re: /^Guildmaster/, name: 'the Guildmaster', say: 'Your page is written. Only one place to go from here: the pit gate. Follow the light.' },
+    { re: /^The Blood Pit/, name: 'the pit gate', say: null }];
+  const fpOn = st => st && st.hero && st.firstPath !== 9 && !bouts(st) && !(st.deaths > 0) && (st.toured || st.tourAsked);
+  let beam = null;
+  const mkBeam = sc => { const T3 = THREE, c = document.createElement('canvas'); c.width = 4; c.height = 128; const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 128); g.addColorStop(0, 'rgba(255,214,140,0)'); g.addColorStop(0.55, 'rgba(255,214,140,0.28)'); g.addColorStop(1, 'rgba(255,230,170,0.75)'); x.fillStyle = g; x.fillRect(0, 0, 4, 128);
+    const tex = new T3.CanvasTexture(c), grp = new T3.Group(), col = new T3.Mesh(new T3.CylinderGeometry(0.75, 0.95, 8, 18, 1, true), new T3.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: T3.AdditiveBlending, side: T3.DoubleSide }));
+    col.position.y = 4; grp.add(col); const ring = new T3.Mesh(new T3.RingGeometry(0.85, 1.15, 32), new T3.MeshBasicMaterial({ color: 0xffd890, transparent: true, opacity: 0.7, depthWrite: false, blending: T3.AdditiveBlending })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.06; grp.add(ring);
+    const L = new T3.PointLight(0xffd08a, 0, 10, 1.3); L.position.y = 3; grp.add(L); grp.visible = false; sc.add(grp); return { grp, col, ring, L }; };
+  const bh1 = W.buildHub;
+  W.buildHub = function () { const h = bh1.apply(this, arguments); beam = mkBeam(h.scene);
+    const up1 = h.update; h.update = function (t) { up1.apply(this, arguments); const st = G.state, on = fpOn(st) && G.scene === 'hub' && !coming && !leading;
+      if (!on) { beam.grp.visible = false; beam.L.intensity = 0; return; }
+      const k = st.firstPath || 0, sp = h.spots.find(q => FP[k].re.test(q.label)); if (!sp) return;
+      if (ui.isOpen() && st.fpSeen !== k) { const w = W.walker; if (Math.hypot(w.x - sp.x, w.z - sp.z) < (sp.r || 1.3) + 1.6) st.fpSeen = k; }
+      beam.grp.visible = !G.talk; beam.grp.position.set(sp.x, 0, sp.z); const pu = 0.5 + 0.5 * Math.sin(t * 2.4); beam.L.intensity = G.talk ? 0 : 22 + pu * 10; beam.col.material.opacity = 0.75 + pu * 0.25; beam.ring.scale.setScalar(1 + pu * 0.15);
+      if (st.fpSeen === k && !ui.isOpen() && !G.talk) { st.fpSeen = null; if (FP[k].say) { G.gfx.floatText(sp.x, (sp.y || 2.6) + 0.6, sp.z - 0.4, '“' + FP[k].say + '”', '#ffe9a0', false); ui.toast(FP[k].say); G.sfx('page'); } st.firstPath = Math.min(FP.length - 1, k + 1); G.save(); } };
+    return h; };
+  const ob1 = G.objective;
+  G.objective = function () { const s0 = ob1.apply(this, arguments), st = G.state; if (G.scene !== 'hub' || !fpOn(st) || coming || leading) return s0; const k = st.firstPath || 0; return 'First steps · follow the light to ' + FP[k].name + (k < FP.length - 1 ? ', then the pit' : ': your first bout'); };
+  const fs0 = G.fight.start;
+  G.fight.start = function (o) { const st = G.state; if (st && st.firstPath !== 9 && !(o && o.spar) && !G.fight.ex) { st.firstPath = 9; } return fs0.apply(this, arguments); };
 })();

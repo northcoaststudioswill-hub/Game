@@ -172,7 +172,10 @@
         npcs.forEach((c, i) => c.pose({ t: t + i * 2, act: 'idle' }));
         mark.pose({ t, act: Math.sin(t * 0.7) > 0.6 ? 'cast' : 'idle', prog: 0.3 });
         const dt2 = 0.016;
+        const tk = G.talk && G.talk.o && G.talk.o.place === 'hub' ? G.talk.o : null, keep = (x, z, r) => tk && (Math.hypot(x - walker.x, z - walker.z) < r || (tk.npc && Math.hypot(x - tk.npc[0], z - tk.npc[1]) < r));
         walkers.forEach(w => {
+          { const rp = w.c.root.position, close = keep(rp.x, rp.z, 3.0); if (close && !w.hid) { w.hid = 1; w.c.root.visible = false; } else if (!tk && w.hid) { w.hid = 0; w.c.root.visible = true; } }
+          if (tk) { const nu = Math.max(0, Math.min(1, w.u + w.dir * w.sp * dt2 * 4)), nx = w.a[0] + (w.b[0] - w.a[0]) * nu, nz = w.a[1] + (w.b[1] - w.a[1]) * nu; if (keep(nx, nz, 4.2)) { w.c.pose({ t, act: 'idle' }); return; } }
           if (w.wait > 0) { w.wait -= dt2; w.c.pose({ t, act: 'idle' }); return; }
           w.u += w.dir * w.sp * dt2 * 4; if (w.u > 1 || w.u < 0) { w.u = Math.max(0, Math.min(1, w.u)); w.dir *= -1; w.wait = 2 + Math.random() * 4; }
           const x = w.a[0] + (w.b[0] - w.a[0]) * w.u, z = w.a[1] + (w.b[1] - w.a[1]) * w.u;
@@ -462,8 +465,9 @@
     const c = walker.char; c.root.position.set(walker.x, walker.lift || 0, walker.z);
     let d = walker.face - c.root.rotation.y; while (d > Math.PI) d -= 6.283; while (d < -Math.PI) d += 6.283; c.root.rotation.y += d * Math.min(1, dt * 14);
     const em = walker.emote;
+    let rf = 1; if (c.ring && pl.blocked) { walker.rfT = (walker.rfT || 0) - dt; if (walker.rfT <= 0) { walker.rfT = 0.12; let free = 1.25; for (let k = 0; k < 12 && free > 0.3; k++) { const an = k * 0.5236; for (let rr = 0.4; rr <= free; rr += 0.15) if (pl.blocked(walker.x + Math.cos(an) * rr, walker.z + Math.sin(an) * rr)) { free = rr - 0.1; break; } } walker.rf = free / 1.25; } rf = walker.rf == null ? 1 : walker.rf; }
     if (em === 'train') { const beat = Math.floor(t * 1.5), pr = (t * 1.5) % 1; c.pose({ t, act: 'swing', prog: pr, step: beat % 3 }); if (pr > 0.42 && walker.trainS !== beat && walker.trainAt) { walker.trainS = beat; gfx.burst(walker.trainAt.x, 1.2, walker.trainAt.z, 0xffe9a0, 4, 2.5, 2); G.sfx('hit'); } }
-    else c.pose({ t, act: em || 'idle', prog: 1, moving: walker.moving, walk: walker.walk });
+    else c.pose({ t, act: em || 'idle', prog: 1, moving: walker.moving, walk: walker.walk, rf });
     const cam = gfx.cam, kk = Math.min(1, dt * 5);
     cam.x += (walker.x - cam.x) * kk; cam.z += (walker.z - cam.z) * kk; cam.fx = 0.5; cam.fy = gfx.portrait ? 0.45 : 0.5;
     cam.vh += ((gfx.portrait ? pl.zoom[1] : pl.zoom[0]) - cam.vh) * kk;
