@@ -791,3 +791,22 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 #dicebar .dholds { justify-content: center; } #dicebar .hold { min-width: 3rem; font-size: 1rem; } #dicebar .hold.sel { box-shadow: 0 0 0 2px #f0d890, 0 0 0.8rem rgba(240, 216, 144, 0.6); }
 #dicebar button:focus-visible, #dicebar button:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
 @media (max-width: 560px) { #dicebar .dgames { grid-template-columns: 1fr; } #dicebar .dgames small { display: none; } }
+
+/* the Guildmaster's page: three tabs under a fixed header */
+.shtabs { position: sticky; top: calc(var(--cpy, 1.2rem) * -1); z-index: 3; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; margin: 0.6rem calc(var(--cpx, 1.4rem) * -1) 0.8rem; padding: 0.45rem var(--cpx, 1.4rem); background: linear-gradient(rgba(22, 17, 26, 0.98), rgba(22, 17, 26, 0.94)); border-bottom: 1px solid rgba(201, 160, 64, 0.35); }
+.shtabs button { padding: 0.6rem 0.4rem; font-family: var(--display); font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.shtabs button.sel { background: linear-gradient(#f6dc8a, #c8963c); color: #20140a; box-shadow: 0 0 0 1px #0b090d, 0 0 0.8rem rgba(240, 201, 90, 0.4); }
+.shpane[hidden] { display: none !important; }
+.shpane .slots.keyrow { gap: 0.35rem; } .shpane .slots.keyrow .slot { min-width: 2.7rem; min-height: 2.5rem; font-size: 1rem; }
+.shlearn { display: flex; justify-content: center; margin: 0.8rem 0 0.2rem; } .shlearn button { min-width: 60%; padding: 0.75rem 1rem; }
+@media (max-width: 560px) { .shpane .ab-row { flex-wrap: wrap; } .shpane .slots.keyrow { width: 100%; justify-content: flex-end; } .shpane .slots.keyrow .slot { flex: 1; max-width: 4.5rem; } }
+/* the Fence: three back rooms as tiles */
+.fence-rooms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.4rem 0 0.8rem; }
+.fence-room { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; padding: 0.8rem 0.4rem 0.7rem; text-align: center; min-height: 6.2rem; }
+.fence-room .fr-ic { font-size: 1.6rem; line-height: 1; color: var(--gold); } .fence-room b { font-size: 1rem; } .fence-room small { font-size: 0.68rem; color: #c8bea8; text-transform: none; letter-spacing: 0; line-height: 1.2; } .fence-room i { font-style: normal; font-size: 0.7rem; color: #9a8f7a; }
+@media (max-width: 420px) { .fence-room small { display: none; } .fence-room { min-height: 5rem; } }
+/* the Tailor: big category tabs, the rack in two columns */
+.tl-tabs { position: sticky; top: calc(var(--cpy, 1.2rem) * -1 + 3rem); z-index: 3; display: grid !important; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: 0.35rem; margin: 0.5rem 0 0.7rem; padding: 0.35rem 0; background: rgba(22, 17, 26, 0.96); }
+.tl-tabs .chip { padding: 0.55rem 0.4rem; font-size: 0.82rem; }
+.tl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; } .tl-grid .ab-row { margin: 0; } .tl-grid .ab-row p { font-size: 0.78rem; }
+@media (max-width: 560px) { .tl-grid { grid-template-columns: 1fr; } }

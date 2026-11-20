@@ -1,0 +1,14 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [], shots = [];
+  for (const [nm, vp] of [['pc', { width: 1280, height: 720 }], ['ph', { width: 390, height: 844 }]]) {
+    const p = await b.newPage({ viewport: vp }); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+    await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(400);
+    await p.click('#bNew'); await p.click('.c-skip'); await p.click('[data-cls=sorcerer]'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+    await p.evaluate(() => { G.muted = true; const st = G.state; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; st.firstPath = 9; st.hero.level = 6; st.respect = 900; st.coin = 600; st.wins = { a: 5 }; st.shownPlaces = { x: 1 }; st.seen = { armory: 1, outfit: 1, tailor: 1, trainer: 1 }; G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); document.querySelectorAll('#veil').forEach(v => v.remove()); });
+    for (const [lbl, js] of [['moves', "G.ui.sheet()"], ['character', "document.querySelector('[data-shtab=char]').click()"], ['build', "document.querySelector('[data-shtab=build]').click()"], ['fence', "G.ui.close(); G.ui.shop()"], ['tailor', "document.querySelector('.fence-room:nth-child(3)').click()"]]) {
+      const info = await p.evaluate(js => { eval(js); const c = document.querySelector('#panel .card'); return c ? c.scrollHeight + '/' + c.clientHeight : 'none'; }, js); await p.waitForTimeout(80); console.log(nm, lbl.padEnd(9), info); shots.push((await p.screenshot({ type: 'jpeg', quality: 80 })).toString('base64')); }
+    // the loadout still works: assign a move to E
+    console.log(nm, 'loadout', await p.evaluate(() => { G.ui.close(); G.ui.sheet(); const opened = (document.querySelector('.shtabs .sel') || {}).textContent; const h = G.state.hero, before = h.slots.join(','); const btn = [...document.querySelectorAll('.shpane[data-pane=moves] .slots .slot')].find(b => !b.classList.contains('sel')); if (!btn) return 'no unselected key'; btn.click(); return 'opens on ' + opened + ' | ' + before + ' -> ' + G.state.hero.slots.join(',') + ' | stays on ' + (document.querySelector('.shtabs .sel') || {}).textContent; }));
+    await p.close(); }
+  const pg = await b.newPage({ viewport: { width: 1600, height: 100 } }); await pg.setContent('<body style="margin:0;background:#111;display:grid;grid-template-columns:repeat(5,320px)">' + shots.map(f => `<img src="data:image/jpeg;base64,${f}" width=320>`).join('') + '</body>'); await pg.screenshot({ path: 'gm_tabs.png', fullPage: true });
+  console.log('ERRORS', errs.length, errs.slice(0, 3).join(' || ')); await b.close(); })();
