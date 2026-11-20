@@ -1,7 +1,7 @@
 const { chromium, devices } = require('playwright');
 (async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
   const ctx = await b.newContext(Object.assign({}, devices['iPhone 13'], { deviceScaleFactor: 1 })); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
-  await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(1500); await p.touchscreen.tap(200, 400); await p.waitForTimeout(200); await p.evaluate(() => { G.bootSkip && G.bootSkip(); G.bootSkip && G.bootSkip(); G.muted = true; }); await p.waitForTimeout(600);
+  await p.goto('http://localhost:8765/index.html'); for (let i = 0; i < 25; i++) { await p.waitForTimeout(400); const ok = await p.evaluate(() => { if (window.G) { G.bootSkip && G.bootSkip(); G.bootSkip && G.bootSkip(); G.muted = true; } return !!document.getElementById('bNew'); }); if (ok) break; } await p.waitForTimeout(400);
   await p.evaluate(() => document.getElementById('bNew').click()); await p.waitForTimeout(400); await p.evaluate(() => { G.cine.skip(); }); await p.waitForTimeout(400);
   await p.evaluate(() => { document.querySelector('[data-cls=druid]').click(); }); await p.waitForTimeout(200); await p.evaluate(() => { document.querySelector('#go').click(); }); await p.waitForTimeout(800);
   await p.evaluate(() => { const v = document.getElementById('veil'); v && v.remove(); }); await p.screenshot({ path: 'ux_notice.png' });
