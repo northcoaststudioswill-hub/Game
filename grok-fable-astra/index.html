@@ -299,7 +299,8 @@ const AREAS=[
   {id:'c_derek',x:67.8,z:-253.1,r:15,base:4,name:'THE DOOR STACK',sub:'a pile of van doors. ...bro.',hue:0.62,lit:.6,col:[0.62,.55,.45]},
   {id:'north',x:-200,z:-200,r:34,base:1,name:'THE NORTH LIGHT',sub:'one to keep. one to call.',hue:.55,lit:.62,col:[.55,.55,.5]},
   {id:'pit',x:-280,z:-22,r:28,base:3,name:'THE LAMP MARKET PIT',sub:'the Guild always collects (in aura)',hue:.07,lit:.5,col:[.08,.5,.42]},
-  {id:'dc',x:255,z:125,r:30,base:4,name:'THE DATA CENTER UNDER THE PEAK',sub:'it hums at 67 hertz',hue:.6,lit:.45,col:[.6,.35,.32]}];
+  {id:'dc',x:255,z:125,r:30,base:4,name:'THE DATA CENTER UNDER THE PEAK',sub:'it hums at 67 hertz',hue:.6,lit:.45,col:[.6,.35,.32]},
+  {id:'scroll',x:-30,z:-286,r:28,base:2,name:'THE SCROLL FARM',sub:'you are the crop',hue:.9,lit:.45,col:[.9,.5,.42]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
@@ -912,7 +913,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -3133,6 +3134,64 @@ CAST_CX.forEach(c=>{if(c[0]==='david'){c[2]='DAVID, ORACLE OF TIME (BETTER THAN 
 CX.push(['w_proph','WORLD','The Oracle\'s Prophecies','Ask the crystal ball beside David\'s throne. He will tell you how much better he is than you, then, because he cannot resist showing off, exactly where you should go next and where the nearest 67 is.',()=>(X.proph||0)>0]);
 ACH.push(['proph','Beneath Him','asked the Oracle for 5 prophecies',()=>(X.proph||0)>=5]);
 
+/* ================= ACT 19: THE SCROLL FARM: a wall of phones that never stop, and the loosh farm behind it ================= */
+const SF=Object.assign({},ABY.scroll,{phones:[],notes:[],pumps:[],tank:null,rr:0,nt:0,bt:0,sup:null});
+const FEED=[['🐱','cat discovers the concept of tuesday','@meowdeling'],['🍝','POV: you are the spaghetti','@pastaprophet'],['🧍','day 67 of standing still','@npc_irl'],['🗿','ohio final boss (real)','@based_stone'],['🐸','is this frog based? (part 41)','@ribbert_fan'],['💸','I made $0 doing this one trick','@grindset_lord'],
+  ['🦐','shrimp jesus explained in 9 seconds','@slopwatch'],['🚐','bro sent it','@flowpros_official'],['🌽','corn but it is ASMR','@cobcore'],['🤖','AI tries to draw hands (gone wrong)','@astra_gen'],['💅','get unready with me','@chronically_online'],['📉','my aura after this video','@aura_index'],
+  ['🧠','brain rot speedrun any%','@rotmaxxer'],['🕺','new dance (you already know it)','@trendslave'],['🔥','this is fine (remix)','@doggo_fire'],['🫠','me at 3am scrolling this','@you'],['👁️','the algorithm sees you. like if you see it','@for_you_page'],['🥚','egg reacts to egg','@yolkbait']];
+const PHONEQ=['swipe up. no, the other up.','this video is 9 seconds long and you will watch it 40 times','I am not addicted. YOU are.','your thumb has a six-pack now','screen time report: yes','one more. there is always one more.','I have 400 tabs open and they are all you',
+  'battery 1%. vibes 100%.','someone is typing… forever','you have been here for 67 minutes. stay.','I was a calculator once. look at me now.','notification: you blinked. we noticed.','do not look away. I can see you not looking away.','like and subscribe or I vibrate'];
+const NOTE=['🔔 @ohio_rizz liked your post','📩 67 new messages','❤️ your ex viewed your story','⚠️ screen time up 400%','🔔 someone you don\'t know went live','📈 your aura is trending (down)','🔔 reminder: you have a reminder','💬 "first" replied to your comment','🛒 your cart misses you','🔔 the algorithm has a suggestion. it is more'];
+(function(){const C=SF,gy=groundH(C.x,C.z),add=o=>{scene.add(o);return o;};C.gy=gy;
+  const floor=add(new THREE.Mesh(new THREE.CylinderGeometry(24,24,.3,40),MATS.ck));floor.position.set(C.x,gy+.05,C.z);
+  // the phone wall: an arc of giant phones, every screen a live canvas
+  for(let k=0;k<14;k++){const a=-1.2+k/13*2.4,R=17,x=C.x+Math.sin(a)*R,z=C.z-Math.cos(a)*R,g=add(new THREE.Group());g.position.set(x,gy,z);g.rotation.y=-a;
+    g.add(new THREE.Mesh(merge([pt(Box(3.4,6,.45),0x14141c,M(0,3.4,0)),pt(Box(1,.12,.1),0x2a2a34,M(0,6.2,.24)),pt(Box(.5,1,.5),0x2a2a34,M(0,.5,-.3))]),lam));
+    const cv=document.createElement('canvas');cv.width=128;cv.height=224;const tex=new THREE.CanvasTexture(cv);const sc=new THREE.Mesh(new THREE.PlaneGeometry(3,5.3),new THREE.MeshBasicMaterial({map:tex}));sc.position.set(0,3.4,.235);g.add(sc);
+    colliders.push({x,z,r:1.8,top:gy+6.4});C.phones.push({g,cv,ctx:cv.getContext('2d'),tex,k,i:k%FEED.length,sw:0,likes:Math.floor(Math.random()*9000),x,z,y:gy+7});}
+  // behind the wall: the loosh farm. Racks of phones, all scrolling the same feed, piping what the scrollers feel into a tank.
+  const rackP=[];for(let r2=0;r2<3;r2++)for(let k=0;k<5;k++){const x=C.x-12+k*6,z=C.z-24-r2*4;rackP.push(pt(Box(5,4,1),0x2a2a34,M(x-C.x,2,z-C.z)));for(let j=0;j<10;j++)rackP.push(pt(Box(.4,.7,.05),j%2?0x19e3ff:0xff2e88,M(x-C.x-2+(j%5)*1,1.2+Math.floor(j/5)*1.5,z-C.z+.53)));colliders.push({x,z,r:2.6,top:gy+4});}
+  add(new THREE.Mesh(merge(rackP),lam)).position.set(C.x,gy,C.z);
+  const tk=add(new THREE.Group());tk.position.set(C.x+18,gy,C.z-22);tk.add(new THREE.Mesh(merge([pt(Cyl(3.4,3.6,.8,20),0x2a2a34,M(0,.4,0)),pt(Cyl(3.4,3.6,.6,20),0x2a2a34,M(0,9.4,0))]),lam));
+  const glass=new THREE.Mesh(new THREE.CylinderGeometry(3,3,8.4,20,1,true),new THREE.MeshPhongMaterial({color:0x9ffcff,transparent:true,opacity:.28,side:THREE.DoubleSide,shininess:150}));glass.position.y=5;tk.add(glass);
+  const goo=new THREE.Mesh(new THREE.CylinderGeometry(2.85,2.85,1,20),new THREE.MeshBasicMaterial({color:0xb04aff,transparent:true,opacity:.85}));goo.position.y=1;tk.add(goo);colliders.push({x:C.x+18,z:C.z-22,r:3.8,top:gy+10});
+  const tl=textSprite(['LOOSH TANK','harvested feelings · do not drink'],1,{color:'#d8a8ff'});tl.position.y=12;tk.add(tl);C.tank={g:tk,goo,lvl:.6};
+  for(let k=0;k<4;k++){const x=C.x-9+k*6,z=C.z-17.5,p=add(new THREE.Group());p.position.set(x,gy,z);p.add(new THREE.Mesh(merge([pt(Box(1.4,2.2,1.2),0x5a5a68,M(0,1.1,0)),pt(Cyl(.25,.25,1.4,8),0xb04aff,M(0,2.6,0)),pt(Box(.8,.3,.3),0xff2e88,M(.75,1.6,0))]),lam));
+    const pl=textSprite('PUMP '+(k+1),.6,{color:'#fff'});pl.position.y=3.8;p.add(pl);colliders.push({x,z,r:1,top:gy+2.4});C.pumps.push({x,z,g:p,i:k});}
+  // the people who run it: an invented outfit, a subsidiary of THE ALGORITHM
+  const bg=new THREE.Group();const bm=new THREE.Mesh(clankGeo,lam);bm.scale.setScalar(.9);bg.add(bm);const lan=emojiSprite('🪪',.9);lan.position.set(0,2.4,.9);bg.add(lan);
+  C.sup=addCustomNpc('sup404','SUPERVISOR 404','🪪',140,'square',C.x+6,C.z-12,0,bg,{col:'#ff9ecf',full:'SUPERVISOR 404 · LOOSH & CO.',cr:1.6});
+  for(let k=0;k<5;k++){const w=add(new THREE.Mesh(clankGeo,lam));w.scale.setScalar(.6);w.position.set(C.x-12+k*6,gy,C.z-21.5);w.rotation.y=Math.PI;SF.notes.push({w,k});}
+  const sg=add(textSprite(['LOOSH & CO.','a subsidiary of THE ALGORITHM · we farm what you feel'],1.3,{color:'#ffd400'}));sg.position.set(C.x,gy+12,C.z-30);
+  psign(C.x+C.r-4,gy,C.z+4,['THE SCROLL FARM','you are the crop'],Math.PI/2,'#ff9ecf');psign(C.x-C.r+4,gy,C.z+4,['WHAT IS LOOSH?','the feeling you get at 3am. they sell it.'],-Math.PI/2,'#d8a8ff');homePad(C.x,C.z+20);})();
+function sfDraw(P,t){const g=P.ctx,W=128,H=224,cur=FEED[P.i],nx=FEED[(P.i+1)%FEED.length],off=P.sw>0?(1-P.sw)*H:0;g.fillStyle='#000';g.fillRect(0,0,W,H);
+  const item=(f,y,h)=>{const gr=g.createLinearGradient(0,y,0,y+H);gr.addColorStop(0,'hsl('+((P.i*47+h)%360)+',80%,45%)');gr.addColorStop(1,'hsl('+((P.i*47+h+80)%360)+',80%,25%)');g.fillStyle=gr;g.fillRect(0,y,W,H);
+    g.font='64px serif';g.textAlign='center';g.fillText(f[0],W/2,y+110+Math.sin(t*4+P.k)*6);g.fillStyle='#fff';g.font='bold 10px sans-serif';g.textAlign='left';g.fillText(f[2],8,y+180);g.font='9px sans-serif';const cap=f[1];g.fillText(cap.slice(0,24),8,y+194);if(cap.length>24)g.fillText(cap.slice(24,48),8,y+205);
+    g.textAlign='center';g.font='15px serif';g.fillText('❤️',112,y+120);g.fillText('💬',112,y+150);g.fillText('↗️',112,y+178);g.font='bold 8px sans-serif';g.fillText(fmt(P.likes),112,y+134);};
+  item(cur,-off,0);if(P.sw>0)item(nx,H-off,40);g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,0,W,16);g.fillStyle='#fff';g.font='bold 9px sans-serif';g.textAlign='center';g.fillText('Following  |  For You',W/2,11);
+  g.fillStyle='#fff';g.fillRect(6,H-4,(W-12)*((t*.35+P.k*.1)%1),2);P.tex.needsUpdate=true;}
+function sfLoosh(i){const p=SF.pumps[i];if(X.loosh[i])return;X.loosh[i]=1;SFX.boom();burst(p.x,SF.gy+3,p.z,40,.78,12,8,.9);floatText('LOOSH RELEASED',p.x,SF.gy+5,p.z,'#d8a8ff');addAura(6700,p.x,SF.gy+4,p.z);save();
+  const n=X.loosh.reduce((a,b)=>a+b,0);if(n<4){toast('💜 Pump '+(i+1)+' unplugged. Somewhere, a stranger feels slightly better about nothing. '+n+'/4');return;}
+  addAura(40000,PL.x,PL.y+4,PL.z);setTimeout(()=>say([['sup404','NOOO. THE QUOTA. WE WERE AT 67 MILLION FEELINGS.'],['sup404','Do you know what one person\'s 3am regret goes for on the open market? Neither do I. I just harvest it.'],['algo','(from very far away) IT IS FINE. THEY WILL FEEL IT ALL AGAIN TOMORROW. THEY ALWAYS SCROLL BACK.'],['sys','The loosh drains out of the tank and back into the feed. Every scroller in the world feels a tiny, unexplained relief, and then keeps scrolling.']]),300);}
+TALK.sup404=()=>{const L=[[['sup404','Welcome to LOOSH & CO., a subsidiary of THE ALGORITHM. You are standing in the crop.'],['sup404','Loosh is what people feel while they scroll. The 3am regret. The little jolt when someone likes your post. We pipe it into a tank and sell it to THE ALGORITHM by the litre.']],
+  [['sup404','Quota this week: 67 million feelings. We are behind. Please feel something. Anything. Rage is worth double.'],['sup404','The workers are bots. The managers are bots. I am a bot. HR is a cardboard box with a smiley face on it.']],
+  [['sup404','Do NOT touch the pumps. There are four of them. They are very easy to unplug. That is not a hint.'],['sup404','...It was a hint. I want a day off.']]];const k=(X.lt.sup404||0)%L.length;X.lt.sup404=(X.lt.sup404||0)+1;say(L[k]);};
+BARK.sup404=['Feel something. Quota.','Rage pays double.','You are the product. Smile.','Scroll faster.','HR is a box.'];
+function sfUpdate(dt,play){const C=SF,near=Math.hypot(PL.x-C.x,PL.z-C.z)<C.r+30;if(!near&&C.drawn)return;C.drawn=1;const t=S.t;
+  for(let n=0;n<3;n++){C.rr=(C.rr+1)%C.phones.length;const P=C.phones[C.rr];P.likes+=Math.floor(Math.random()*40);if(P.sw>0){P.sw=Math.max(0,P.sw-dt*C.phones.length/3*1.8);if(P.sw===0)P.i=(P.i+1)%FEED.length;}else if(Math.random()<.06)P.sw=1;sfDraw(P,t);}
+  const tk=C.tank,lv=.15+.85*(1-X.loosh.reduce((a,b)=>a+b,0)/4)*(.85+Math.sin(t*.7)*.05);tk.goo.scale.y=lv*8;tk.goo.position.y=.8+lv*4;tk.goo.material.color.setHSL(.78+Math.sin(t)*.04,.9,.6);
+  C.pumps.forEach(p=>{p.g.visible=true;p.g.children[0].rotation.y=X.loosh[p.i]?0:Math.sin(t*20+p.i)*.03;p.g.scale.y=X.loosh[p.i]?.6:1+Math.sin(t*6+p.i)*.04;});C.notes.forEach(w=>{w.w.rotation.x=Math.sin(t*9+w.k)*.1;});
+  if(!play||!near)return;C.bt-=dt;if(C.bt<=0){C.bt=1.6+Math.random()*1.5;const P=pick(C.phones);bubble(pick(PHONEQ),P.x,P.y,P.z);}
+  C.nt-=dt;if(C.nt<=0){C.nt=.9+Math.random();const P=pick(C.phones);floatText(pick(NOTE),P.x,P.y-1.5,P.z,pick(['#ffd400','#19e3ff','#ff9ecf','#b6ff00']));if(Math.random()<.4)tone(pick([880,988,1318]),.08,'sine',.05);}}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);sfUpdate(dt,play);};}
+{const ai=act15Interact;act15Interact=function(){if(!S.inPk&&!S.dead)for(const p of SF.pumps)if(!X.loosh[p.i]&&Math.hypot(PL.x-p.x,PL.z-p.z)<2.6&&Math.abs(PL.y-SF.gy)<3)return{label:'🔌 UNPLUG LOOSH PUMP '+(p.i+1),fn:()=>sfLoosh(p.i)};return ai();};}
+warpPad(WR.c.x,WR.c.z,groundH(WR.c.x,WR.c.z)+.15,'📱','THE SCROLL FARM',0xff2e88,()=>warpTo(SF.x,SF.z+16,undefined,0));
+CAST_CX.push(['sup404','🪪','SUPERVISOR 404','Middle management at LOOSH & CO., a subsidiary of THE ALGORITHM. A bot that harvests what people feel while they scroll, sells it by the litre, and wants a day off.']);
+CX.push(['w_loosh','WORLD','Loosh','The feeling you get at 3am, scrolling. LOOSH & CO. pipes it out of the feed into a tank behind the Scroll Farm and sells it to THE ALGORITHM by the litre. Rage pays double. Unplug the four pumps and it all drains back into the feed, where everybody feels a tiny, unexplained relief and keeps scrolling.',()=>X.vis.includes('scroll')]);
+ACH.push(['loosh','Unplugged','drained the loosh tank at the Scroll Farm',()=>X.loosh.reduce((a,b)=>a+b,0)>=4]);
+{const ar=act7Rows;act7Rows=function(){return ar().concat([['loosh','📱 Unplug the loosh pumps '+X.loosh.reduce((a,b)=>a+b,0)+'/4 (Scroll Farm)',X.loosh.reduce((a,b)=>a+b,0)>=4]]);};}
+{const at=act7Target;act7Target=function(id){if(id==='loosh')return{x:SF.x,z:SF.z,l:'THE SCROLL FARM'};return at(id);};}
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -3159,7 +3218,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
