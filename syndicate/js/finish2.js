@@ -10,3 +10,10 @@
   add('druid', { id: 'thorns', lead: 'thorns', imp: 1.8, tail: 2.8, name: 'Grown Through', word: 'GROWN THROUGH', desc: 'Six thorns come up through the sand, and through the feet, the hands and the neck, and keep growing.' });
   add('warlock', { id: 'marionette', lead: 'marionette', imp: 2.2, tail: 2.4, name: 'Danced to Death', word: 'STRINGS CUT', desc: 'Your patron lends you the strings. They dance for the stands until the strings are taken back.' });
 })();
+// once you have signed with David, the line at the top of the market always says where you stand with him
+(function () {
+  'use strict';
+  const G = window.G, ob0 = G.objective; if (!ob0) return;
+  G.objective = function () { const base = ob0.apply(this, arguments), st = G.state; if (!st || !st.hero || G.scene !== 'hub' || !(st.signed || st.bound) || typeof base !== 'string' || /owe David|Signed to David/.test(base)) return base;
+    const d = G.oracle && G.oracle.debt ? G.oracle.debt(st) : (st.soulDebt || 0); return base + (d > 0 ? '  ·  You owe David ' + d + (d === 1 ? ' soul' : ' souls') : '  ·  Signed to David: nothing owed, for now'); };
+})();

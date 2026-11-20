@@ -22,6 +22,13 @@
     if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false);
     if (W.walker.char) W.walker.char.root.visible = false;
   }
+  // last night, still on the spikes: two bodies hung on the west wall's points, and the rest of it on the sand
+  let spikeDead = null;
+  function lastNight(on) { if (!arena) return; if (!on) { if (spikeDead) spikeDead.forEach(o => o.parent && o.parent.remove(o)); return; }
+    if (!spikeDead) { const mk = (cls, race, x, z, ry, lean, pose) => { const c = G.makeChar({ cls, race, tint: { cloth: '#3a2a26', armor: '#4a4044', armor2: '#2a2428', legs: '#2a2428', hair: '#1a1410' } }); for (let i = 0; i < 30; i++) c.pose(Object.assign({ t: 1 + i * 0.016 }, pose)); c.mats.forEach(m => { if (m.color) m.color.multiplyScalar(0.62); }); c.root.position.set(x, pose.act === 'ko' ? 0 : 0.35, z); c.root.rotation.set(lean, ry, 0); return c.root; };
+      spikeDead = [mk('fighter', 'halforc', -W.AR + 0.55, 2.6, Math.PI / 2, 0.18, { act: 'hoist', prog: 0.5 }), mk('rogue', 'human', -W.AR + 0.5, -2.6, Math.PI / 2, 0.24, { act: 'hoist', prog: 0.5 }), mk('cleric', 'dwarf', -W.AR + 1.6, 0.6, 2.4, 0, { act: 'ko', prog: 1 })]; }
+    spikeDead.forEach(o => arena.scene.add(o)); if (arena.remains) arena.remains(7);
+    if (gfx.splat) [[-W.AR + 0.9, 2.6], [-W.AR + 0.9, -2.6], [-W.AR + 1.8, 0.6], [-W.AR + 1.2, 2.0], [-W.AR + 1.0, -2.0]].forEach(q => { for (let i = 0; i < 3; i++) gfx.splat(q[0] + (Math.random() - 0.5) * 0.8, q[1] + (Math.random() - 0.5) * 0.8, 0.5 + Math.random() * 0.6); }); }
   function toArena(hype) { arena = W.get('arena'); gfx.setScene(arena.scene); hideRegulars(); arena.setHype(hype); if (arena.cineWall) arena.cineWall(true); }
   function bout(a, b, pa, pb) { ex = F.exStart(a, b, pa, pb); return ex; }
   function giveCrown(e) {
@@ -115,13 +122,13 @@
       // the pit itself: low along the west wall, past the spikes and what last night left
       {
         dur: 5.2, cut: true, text: 'Nine gates. Iron spikes set in the walls. And whatever is left of last night, still lying on the sand.',
-        setup: () => { arena.setHype(0.35); },
+        setup: () => { arena.setHype(0.35); lastNight(true); },
         update: (p) => { const k = ease(p); shoot(V([-3.4, 0.55, 6.2], [-4.6, 1.25, -1.6], k), V([-8.0, 1.3, 3.4], [-8.0, 1.2, -2.6], k), lerp(56, 46, p), 0.05 - p * 0.09); }
       },
       // ---- montage: STEEL — a leaping slam straight at the lens
       {
         dur: 4.8, cut: true, card: 'Steel',
-        setup: () => { bout(FIGHTER, ROGUE, [-4.6, -4.6], [1.3, 1.3]); flash(0.5); },
+        setup: () => { lastNight(false); bout(FIGHTER, ROGUE, [-4.6, -4.6], [1.3, 1.3]); flash(0.5); },
         update: () => {
           const A = ex.A, B = ex.B;
           at('leap', 0.3, () => { F.exCast(A, 'leap_slam'); F.speed = 0.42; });

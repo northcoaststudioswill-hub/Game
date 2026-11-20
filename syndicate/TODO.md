@@ -49,8 +49,8 @@ Done: caster weapon finishers (fire bolt, eldritch blast, frost, spark, acid, ca
 
 ## Story and menus
 
-- After signing David's contract the top line should show souls owed.
-- The intro's spike-wall shot should show remains.
+Done: once signed, the top line says how many souls you owe David; the intro's spike shot shows bodies hung on the spikes.
+
 
 ## Devices
 
