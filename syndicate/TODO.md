@@ -13,7 +13,7 @@ Done so far:
 - Current starters, on the sand when called: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will.
 - Knockout cinematics as ultimates: Hasbara (Will), Louie Airlines (Erin), The Final Bet (Marcus), Nuke the Data Center (Lil Bottie), War Criminal (King Bibi, the data-centre half only), Judgement's side-eye (Louie).
 - An effect of its own on every guest move.
-- A staged finisher for every guest (Derek Pulls Up, Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality, Compost-ality, Escape Velocity, Eleven Pieces, Your Hour Is Up).
+- A staged finisher for every guest (Derek Pulls Up, Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality, Compost-ality, Your Hour Is Up, and Kael's own set).
 - King Bibi comes back once per bout: below 30% health he returns to 75%.
 - A career of titles for every guest (a new one each level) and their own level-up card instead of the Guild's lessons.
 - The market reacts to whoever you brought: lines from Marc, Pip, the Guildmaster, Big Hobb and David about each guest.
@@ -30,7 +30,7 @@ Not done:
 - **Guest bodies** — share the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **Cinematic art** — the screens are flat shapes and type, far simpler than the Knockout pixel scenes.
 - **Guest endings** — a one-line card after the normal ending; not seen in a real run.
-- **Attack animations** — each guest now has their own idle, walk and cast poses laid over the frame (Bottie's stiff march and both arms out to fire, Mama carrying the baby, Bibi's wagging finger, Kael's skating lean), but melee swings are still the frame's: Marcus swings the wrench like a hammer, Eleven's blade like an axe.
+- **Attack animations** — each guest now has their own idle, walk and cast poses laid over the frame (Bottie's stiff march and both arms out to fire, Bibi's wagging finger, Kael's low stance with the blade out), but melee swings are still the frame's: Marcus swings the wrench like a hammer.
 - **Guest careers are titles only** — no new moves unlocked by level, no story scenes, no guest-specific ending; the normal ending plays.
 - **Guest dialogue is one-liners** — passing remarks in the market only. Talking to Marc, Pip, the Guildmaster or David as a guest still plays the normal conversation, and guests have no lines about each other.
 - **Guests only appear as opponents when you choose to spar them** — never on the ladder, and sparring guests do not use their cinematic ultimates.
