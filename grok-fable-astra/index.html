@@ -3063,6 +3063,47 @@ ABY.pk_patch.name='THE SPROUT PATCH (FORMERLY)';ABY.pk_patch.sub='post-nuke · g
 {const ai=act15Interact;act15Interact=function(){if(S.inPk==='patch'&&!S.dead&&Math.hypot(PL.x-PS.holo.x,PL.z-PS.holo.z)<3.4)return{label:'📼 PLAY lil Bottie\'S RECORDING',fn:playRecording};return ai();};}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(DAV.aura){DAV.d+=dt;DAV.aura.position.y=3.4+Math.sin(DAV.d*2)*.25;DAV.aura.material.rotation=DAV.d;}};}
 
+/* ================= ACT 17: David's gold, his throne and his aura loans ================= */
+const DTH={ry:-.5,gold:[],coins:[],desk:null,t:0};
+(function(){const n=npcs.david;if(!n)return;const cx=n.x,cz=n.z,b=n.y,ry=DTH.ry,c=Math.cos(ry),s=Math.sin(ry),W=(lx,lz)=>({x:cx+lx*c+lz*s,z:cz-lx*s+lz*c});DTH.W=W;DTH.b=b;
+  const G=0xf0c95a,G2=0xb8902e,V=0x6a1a3a,R=0xff2e88,add=o=>{scene.add(o);return o;};
+  const parts=[pt(Box(6.4,1.2,5.6),G2,M(0,.6,-.4)),pt(Box(5,3.2,4),G,M(0,2.8,-.6)),pt(Box(4,.3,3.4),V,M(0,4.55,-.6)),pt(Box(5.2,10,.9),G,M(0,9.4,-2.9)),pt(Box(4,8,.2),V,M(0,9.2,-2.4)),pt(Sph(1,12,9),R,M(0,13.2,-2.3)),
+    pt(Box(.9,1.8,4),G,M(2.9,5.3,-.6)),pt(Box(.9,1.8,4),G,M(-2.9,5.3,-.6)),pt(Sph(.6,10,8),G,M(2.9,6.4,1.4)),pt(Sph(.6,10,8),G,M(-2.9,6.4,1.4)),
+    ...[-2,-1,0,1,2].map(k=>pt(Cone(.45,1.6+(2-Math.abs(k))*.5,6),G,M(k*1.05,15.1+(2-Math.abs(k))*.25,-2.9))),...[[-3,1.9],[3,1.9],[-3,-2.8],[3,-2.8]].map(q=>pt(Box(1.2,1.2,1.2),G2,M(q[0],.6,q[1]))),
+    pt(Box(3,.5,1.6),G,M(0,1.45,3.2)),pt(Box(3,.5,1.4),G,M(0,2.85,2.1))];
+  const th=add(new THREE.Mesh(merge(parts),new THREE.MeshPhongMaterial({vertexColors:true,shininess:110,specular:0x886622})));th.position.set(cx,b,cz);th.rotation.y=ry;
+  const back=W(0,-2.2);colliders.push({x:back.x,z:back.z,r:2.6,top:b+14});[[2.9,-.6],[-2.9,-.6]].forEach(q=>{const p=W(q[0],q[1]);colliders.push({x:p.x,z:p.z,r:.9,top:b+6});});
+  const s1=W(0,3.2),s2=W(0,2.1);platforms.push({x:s1.x,z:s1.z,r:1.4,top:b+1.7},{x:s2.x,z:s2.z,r:1.3,top:b+3.1});
+  const lab=add(textSprite(['DAVID\'S CHAIR','the biggest one in the game · do not sit'],1,{color:'#ffd400'}));const lp=W(0,-3.6);lab.position.set(lp.x,b+17.6,lp.z);
+  // David stands on the seat. Sitting is for people with less to count.
+  n.y=b+4.7;n.g.position.y=n.y;
+  // the gold: other people's minutes, melted down
+  const gp=[],r=mulberry(7777);for(let k=0;k<38;k++){const a=r()*TAU,d=3.6+r()*7.5,lx=Math.cos(a)*d,lz=Math.sin(a)*d;if(lz>2&&Math.abs(lx)<2.2)continue;const p=W(lx,lz);const h=.3+r()*1.3;
+    if(k%3)gp.push(pt(Cyl(.5,.5,h,12),G,M(p.x-cx,h/2,p.z-cz)));else gp.push(pt(Box(1.1,.45,.55),G,M(p.x-cx,.23,p.z-cz,0,r()*3,0)),pt(Box(1.1,.45,.55),G2,M(p.x-cx+.2,.68,p.z-cz,0,r()*3,0)));}
+  const pile=add(new THREE.Mesh(merge(gp),new THREE.MeshPhongMaterial({vertexColors:true,shininess:120,specular:0xaa8833})));pile.position.set(cx,b-.7,cz);
+  for(let k=0;k<22;k++){const a=r()*TAU,d=4+r()*9,p=W(Math.cos(a)*d,Math.sin(a)*d),e=add(emojiSprite(pick(['🪙','💰','🪙','💎','👑','🏆']),1+r()*1.2));e.position.set(p.x,groundH(p.x,p.z)+.9+r()*.6,p.z);DTH.gold.push({s:e,y:e.position.y,k});}
+  for(let k=0;k<6;k++){const e=emojiSprite('🪙',.8);n.g.add(e);DTH.coins.push({s:e,a:k/6*TAU});}
+  // the loan desk at the foot of the throne
+  const dp=W(6.4,4.6),dy=groundH(dp.x,dp.z),desk=add(new THREE.Mesh(merge([pt(Box(1.6,1.5,1),0x3a2a1e,M(0,.75,0)),pt(Box(1.9,.12,1.3),G,M(0,1.56,0)),pt(Box(.9,.08,.6),0xfff8e7,M(0,1.66,0,0,.2,0)),pt(Box(.06,.1,.5),0x6a1a3a,M(0,1.7,0,0,.2,0))]),lam));desk.position.set(dp.x,dy,dp.z);desk.rotation.y=ry;colliders.push({x:dp.x,z:dp.z,r:.9,top:dy+1.6});
+  const ds=add(textSprite(['💰 AURA LOANS','67% interest · per minute'],.8,{color:'#ffd400'}));ds.position.set(dp.x,dy+3.2,dp.z);DTH.desk={x:dp.x,z:dp.z,y:dy};})();
+const LOANQ={take:[['david','Need aura, pet? I lend. Sixty-seven percent.'],['david','Per minute. Do not make that face. It is a very fair minute.'],['david','I do not break legs. I break save files. Pay me back before it compounds into something with teeth.']],
+  paid:[['david','Paid in full. How disappointing. I was looking forward to collecting.'],['david','Come back when you are poor again. You will be.']]};
+function loanAmt(){return Math.min(100000,Math.max(10000,Math.round(S.total*.05/1000)*1000));}
+function takeLoan(){const p=loanAmt();X.lp=p;X.loan=Math.round(p*1.67);X.lw=1;S.aura+=p;S.total+=p;floatText('+'+fmt(p)+' AURA (borrowed)',PL.x,PL.y+4,PL.z,'#ffd400');SFX.relic();save();say(LOANQ.take);}
+function repayLoan(){const pay=Math.min(S.aura,X.loan);if(pay<=0){toast('💰 DAVID: You have nothing. I can see that from up here.');return;}S.aura-=pay;X.loan-=pay;floatText('-'+fmt(pay)+' AURA',PL.x,PL.y+4,PL.z,'#ff2e88');SFX.page();
+  if(X.loan<=0){X.loan=0;X.paid=1;save();say(LOANQ.paid);}else{save();toast('💰 DAVID: Partial payment. Adorable. Still owed: '+fmt(X.loan)+'.');}}
+DAVQ.push('Do you like my chair? It is the biggest chair in the game. I measured the others. Then I had them shortened.','Gold is just time that stopped moving. I collect both.','I stand on the throne. Sitting is for people with less to count.','Every coin in this garden used to be somebody\'s afternoon.','The interest is compounding, pet. So am I.');
+LORE.david.push([['david','Every coin in that pile was a minute somebody borrowed and did not pay back on time.'],['david','I melt the minutes down. Gold is just time that stopped moving.']],[['david','The Algorithm has a For-You Page. I have a chair.'],['david','One of us is going to be sitting on the other one\'s by the end of this. I have already measured.']]);
+{const rs=respawn;respawn=function(){rs();if(S.inBoss||!(X.loan>0))return;const take=Math.min(S.aura,X.loan);if(take>0){S.aura-=take;X.loan-=take;if(X.loan<=0){X.loan=0;X.paid=1;}save();}
+  setTimeout(()=>toast('💰 DAVID: '+(take>0?'I collected '+fmt(take)+' aura off your corpse. '+(X.loan>0?'Still owed: '+fmt(X.loan)+'.':'We are square. For now.'):'You died broke. The interest does not stop because you died, pet. Owed: '+fmt(X.loan)+'.')),1200);};}
+CAST_CX.forEach(c=>{if(c[0]==='david'){c[3]='The Oracle of Time and the Hour Garden\'s loan shark. Stands on the biggest throne in the game, on a pile of gold made of other people\'s minutes. Lends aura at 67% a minute, drags you back when you die, and collects off your corpse.';}});
+CX.push(['w_loans','WORLD','Aura Loans','David lends aura from a desk at the foot of his throne. The interest is 67% and it compounds every minute, up to five times what you borrowed. If you die owing, he takes what you have. He calls this generous.',()=>!!X.lw]);
+ACH.push(['paid','Paid In Full','repaid one of David\'s loans',()=>!!X.paid],['lev','Leveraged','owed David more than 40,000 aura',()=>!!X.lev]);
+{const ai=act15Interact;act15Interact=function(){const D=DTH.desk;if(D&&!S.inPk&&!S.dead&&Math.hypot(PL.x-D.x,PL.z-D.z)<3&&Math.abs(PL.y-D.y)<3)return X.loan>0?{label:'💰 REPAY DAVID (owed '+fmt(X.loan)+')',fn:repayLoan}:{label:'💰 BORROW '+fmt(loanAmt())+' AURA FROM DAVID (67%/min)',fn:takeLoan};return ai();};}
+(function(){const st=document.createElement('style');st.textContent='#debtchip{position:absolute;left:var(--gl);bottom:calc(var(--gb) + 264px);background:var(--ink);color:var(--gold);border:2px solid var(--gold);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700;pointer-events:none;z-index:3}#app.cine #debtchip{display:none}';document.head.appendChild(st);const d=document.createElement('div');d.id='debtchip';d.hidden=true;$('hud').appendChild(d);})();
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);DTH.t+=dt;DTH.gold.forEach(g=>{g.s.position.y=g.y+Math.sin(DTH.t*2+g.k)*.15;g.s.material.rotation=Math.sin(DTH.t+g.k)*.2;});DTH.coins.forEach((q,k)=>{const a=q.a+DTH.t*1.3;q.s.position.set(Math.cos(a)*1.3,2.6+Math.sin(DTH.t*2+k)*.3,Math.sin(a)*1.3);});
+  const ch=$('debtchip'),owe=X.loan>0;if(ch.hidden===owe)ch.hidden=!owe;if(owe){const t='💰 OWED TO DAVID: '+fmt(X.loan);if(ch.textContent!==t)ch.textContent=t;if(play){DTH.it=(DTH.it||0)+dt;if(DTH.it>=60){DTH.it=0;X.loan=Math.min(X.lp*5,Math.round(X.loan*1.067));if(X.loan>40000)X.lev=1;save();floatText('+6.7% interest',PL.x,PL.y+5,PL.z,'#ffd400');}}}};}
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -3089,7 +3130,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
