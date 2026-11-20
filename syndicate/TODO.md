@@ -40,10 +40,10 @@ Not done:
 
 ## Fighting
 
-Done: caster weapon finishers (fire bolt, eldritch blast, frost, spark, acid, caster staves) and a second finisher for every melee weapon family (sword, axe, mace and hammer, spear, daggers, rapier), picked half the time. The kill camera now stays side-on for the whole finisher and rises over the killer if they would block the view.
+Done: caster weapon finishers (fire bolt, eldritch blast, frost, spark, acid, caster staves) and a second finisher for every melee weapon family (sword, axe, mace and hammer, spear, daggers, rapier), picked half the time. A late finisher for every class at Underboss rank (Bent the Wrong Way, Every String Cut, Boiled in the Skin, Made to Pray, Grown Through, Danced to Death), bending joints past where they go. The kill camera now stays side-on for the whole finisher and rises over the killer if they would block the view.
 
 
-- Rework the older finishers to use the new elbow, knee, wrist and pelvis joints.
+- Rework the older finishers to use the new joints: finishers can now bend any joint (wrists included), and the six new ones use it; the older ones have not been gone back over.
 - Deeper class mechanics and upgrade trees.
 - Watch every stance in motion through a full bout (checked as still pictures only).
 - Stamping finisher filmed on an opponent that is actually crawling; own-arm finisher on one that has actually lost an arm.

@@ -229,7 +229,7 @@
     // dismemberment: detach a limb (the caller throws it) and leave a wet stump where it was
     if (civ && civ.head) { head.scale.setScalar(civ.head); head.position.y += 0.2 * (civ.head - 1); }
     if (look.egg && G.EGG_MODEL) { try { G.EGG_MODEL(look.egg, { head, torso, body, root, hR, hL, foreL, foreR, armL, armR, legL, legR, w }); } catch (e) { } }
-    C.limbs = { armL, armR, legL, legR, head, foreL: armL.userData.fore, foreR: armR.userData.fore, shinL: legL.userData.shin, shinR: legR.userData.shin }; C.wHand = hR;
+    C.limbs = { armL, armR, legL, legR, head, foreL: armL.userData.fore, foreR: armR.userData.fore, shinL: legL.userData.shin, shinR: legR.userData.shin, handL: hL, handR: hR }; C.wHand = hR;
     C.sever = function (part) { const g = C.limbs[part]; if (!g || !g.parent || g.userData.gone) return null; g.userData.gone = 1; const st = new T.Mesh(new T.SphereGeometry(part === 'head' ? 0.15 : 0.11, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a, flatShading: true })); st.position.copy(g.position); st.scale.y = 0.55; g.parent.add(st); const bn = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.1, 5), new T.MeshLambertMaterial({ color: 0xe6dcc4 })); bn.position.copy(g.position); bn.position.y -= 0.04; g.parent.add(bn); return g; };
     // Joint targets are computed per state, then eased toward, so stances blend instead of snapping.
     let cur = {}, dtp = 1 / 60, lastPT = null, fresh = 0;
@@ -420,6 +420,7 @@
         foreR.rotation.x = -J('er', eR, Math.max(0.35, snap)); foreL.rotation.x = -J('el', eL, Math.max(0.35, snap)); }
       if (act === 'kick') legL.userData.shin.rotation.x = 0.15;
       if (act === 'ko') { legL.userData.shin.rotation.x = 0.25; legR.userData.shin.rotation.x = 0.5; foreR.rotation.x = -0.3; foreL.rotation.x = -0.5; }
+      if (C.brk) for (const k2 in C.brk) { const L = C.limbs[k2], b = C.brk[k2]; if (L && !L.userData.gone && b) { L.rotation.x += b[0] || 0; L.rotation.y += b[2] || 0; L.rotation.z += b[1] || 0; } }       // a finisher can bend any joint past where it should go
       // sorcerer flames + cast glow
       const fl = 0.85 + Math.sin(t * 17) * 0.12;
       if (orbs) orbs.forEach(o => o.scale.setScalar((act === 'cast' ? 1.2 + k * 0.9 : 0.9) * fl));
