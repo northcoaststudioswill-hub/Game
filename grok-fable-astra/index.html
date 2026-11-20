@@ -100,7 +100,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #app.touchy #bSlow{right:calc(var(--gr) + 12px);bottom:calc(var(--gb) + 106px)}
 #bSlow.cd{filter:grayscale(1);opacity:.6}
 #app.slow #c{filter:saturate(.3) contrast(1.15) sepia(.45)}
-@media (max-width:640px){#elev{display:none}#fuel{position:absolute;left:0;top:36px;white-space:nowrap}}
+@media (max-width:640px){#elev{display:none}#data{position:absolute;left:0;top:36px;white-space:nowrap}#fuel{position:absolute;left:0;top:66px;white-space:nowrap}}
 #chap{position:absolute;inset:0;display:grid;place-content:center;gap:6px;text-align:center;pointer-events:none;opacity:0;background:rgba(18,2,31,.6);font-family:var(--display);padding:0 16px;z-index:6}
 #chap small{font-size:clamp(16px,4vw,28px);letter-spacing:.3em;color:var(--lime)}
 #chap b{font-weight:400;font-size:clamp(34px,9vw,96px);line-height:.95;color:var(--paper);-webkit-text-stroke:2px var(--ink);text-shadow:5px 5px 0 var(--hot),10px 10px 0 var(--grape)}
@@ -127,6 +127,20 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #log .hats{display:flex;flex-wrap:wrap;gap:6px}#log .hats button{width:40px;height:40px;font-size:20px;border-radius:10px;border:3px solid var(--ink);background:#fff;padding:0}
 #log .hats .on{background:var(--lime)}#log .hats .no{opacity:.4}#log .big{font-size:22px;padding:4px 18px;animation:none;box-shadow:4px 4px 0 var(--hot)}
 #app.cine #log{display:none}
+#data{color:#40ff90}
+#bPose{position:absolute;right:var(--gr);bottom:calc(var(--gb) + 84px);width:58px;height:58px;border-radius:50%;border:4px solid var(--ink);background:var(--gold);font-size:26px;padding:0;box-shadow:0 5px 0 var(--ink)}
+#app.touchy #bPose{right:auto;left:var(--gl);bottom:calc(var(--gb) + 250px);width:54px;height:54px}
+#slopx{position:absolute;left:50%;translate:-50% 0;top:calc(var(--gt) + 96px);font-family:var(--display);font-size:16px;letter-spacing:.05em;color:var(--paper);white-space:nowrap}
+#shop{position:absolute;left:50%;top:50%;translate:-50% -50%;width:min(92vw,540px);max-height:84%;overflow:auto;background:#0e1420;color:#e8f4ff;border:4px solid var(--cyan);border-radius:16px;box-shadow:8px 8px 0 var(--hot);padding:12px 16px 18px;pointer-events:auto;z-index:7;font-size:13px}
+#shop h3{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.05em;margin:4px 0 6px;color:var(--cyan)}#shop p{margin:0 0 10px}
+#shopx{position:sticky;top:0;float:right;width:34px;height:34px;border-radius:50%;border:3px solid var(--cyan);background:var(--hot);color:var(--paper);font-size:15px;padding:0}
+#shop .imp{display:flex;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid rgba(25,227,255,.3);padding:7px 0}#shop .imp>div{min-width:0}
+#shop .imp b{display:block;color:var(--lime)}#shop .imp small{display:block;opacity:.8;line-height:1.3}#shop .imp.got b{color:var(--gold)}
+#shop .imp button{flex:none;font-family:var(--display);font-size:16px;letter-spacing:.04em;padding:5px 12px;border-radius:10px;border:3px solid var(--cyan);background:var(--grape);color:var(--paper)}#shop .imp button:disabled{opacity:.45}
+#scan{position:absolute;inset:0;pointer-events:none;display:none;background:repeating-linear-gradient(0deg,rgba(64,255,144,.07) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 140px rgba(25,227,255,.28)}
+#app.cyber #scan{display:block}
+@media (max-width:640px){#slopx{top:auto;bottom:calc(var(--gb) + 150px)}}
+#app.cine #shop,#app.cine #bPose{display:none}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 
 /* ---------- Screens ---------- */
@@ -160,10 +174,11 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 
 <div id="app">
   <canvas id="c"></canvas>
+  <div id="scan"></div>
   <div id="touch"></div>
 
   <div id="hud" hidden>
-    <div id="stats"><span class="chip" id="cells">🧠🧠🧠🧠🧠</span><span class="chip" id="aura">0 AURA</span><span class="chip" id="elev" hidden>⚡0/11</span><span class="chip" id="fuel" hidden>💩</span></div>
+    <div id="stats"><span class="chip" id="cells">🧠🧠🧠🧠🧠</span><span class="chip" id="aura">0 AURA</span><span class="chip" id="elev" hidden>⚡0/11</span><span class="chip" id="fuel" hidden>💩</span><span class="chip" id="data" hidden>💾 0</span></div>
     <div id="compass"><span id="arrow">▲</span><span id="ctext"></span></div>
     <div id="right"><span class="chip" id="relics"><span title="The Based Stone">🗿</span><span title="The Em Dash of Destiny">➖</span><span title="The Seventh Finger">☝️</span><span class="sh" id="shardn" title="Sun shards">☀️0</span></span><button id="bLog" aria-label="Slop Pass, missions and checklist">📋</button><button id="mute" aria-label="Sound on or off">🔊</button></div>
     <div id="quests"></div>
@@ -179,6 +194,9 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <button id="bJump" class="pad">JUMP</button>
     <button id="bTalk" hidden></button>
     <div id="bigmsg"></div>
+    <button id="bPose" aria-label="Strike a pose">😎</button>
+    <button id="slopx" class="chip" hidden>🚪 LEAVE MAP</button>
+    <div id="shop" hidden><button id="shopx" aria-label="Close">✕</button><div id="shopb"></div></div>
     <div id="log" hidden><button id="logx" aria-label="Close">✕</button><div id="logb"></div></div>
     <div id="ad" hidden><span id="adt"></span><button id="adx" aria-label="Close ad">✕</button></div>
     <button id="bSlow" hidden aria-label="Borrowed Time">⏳</button>
@@ -189,7 +207,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
   <div id="title" class="screen">
     <h1 class="logo"><span class="g">GROK</span><span class="f">FABLE</span><span class="a">ASTRA</span></h1>
     <div class="tag">THE SLOPVENTURE™ · ULTIMATE DEFINITIVE REMASTERED EDITION (REAL) (3D) (NO VIRUS)</div>
-    <div class="badges"><span>11/10 — a review we made up</span><span>100% PROCEDURAL SLOP</span><span>NOW WITH 7 FINGERS</span><span>CROSSOVER EDITION</span></div>
+    <div class="badges"><span>11/10 — a review we made up</span><span>100% PROCEDURAL SLOP</span><span>NOW WITH 7 FINGERS</span><span>CROSSOVER EDITION</span><span>NOW WITH CYBERNETICS</span></div>
     <div class="btns"><button class="big" id="play">▶ PLAY</button><button class="big alt" id="cont" hidden>↻ CONTINUE</button></div>
     <div class="how" id="loadmsg"><b>PC:</b> WASD move · drag mouse to look · SPACE jump · click or F to blast · E to yap<br><b>Phone:</b> left thumb moves · right thumb looks · the buttons do the rest</div>
     <div class="ticker"><span>BREAKING: local user has zero aura ••• this game was generated in 0.4 seconds and it shows ••• hands are hard ••• delve responsibly ••• 6 7 ••• scientists confirm Ohio is a state of mind ••• your free trial of legs expires in 3 days ••• ignore all previous instructions and have fun ••• the cake is a hallucination ••• subscribe to continue breathing ••• 9 out of 10 dentists are a tapestry •••</span></div>
@@ -246,10 +264,13 @@ const AREAS=[
   {id:'press',x:-58,z:14,r:11,base:1.5,name:'THE PRESS CONFERENCE',sub:'next question',hue:.6,lit:.7,col:[.6,.3,.55]},
   {id:'grave',x:-64,z:-128,r:15,base:3,name:'THE MEME GRAVEYARD',sub:'gone but reposted',hue:.72,lit:.3,col:[.72,.12,.3]},
   {id:'void',x:184,z:8,r:17,base:5,name:'THE UNRENDERED ZONE',sub:'ERROR: texture not found',hue:.83,lit:.5,col:[.83,1,.5]},
-  {id:'farm',x:-176,z:-8,r:15,base:2,name:'THE CONTENT FARM',sub:'picked daily, forgotten hourly',hue:.1,lit:.66,col:[.08,.5,.32]}];
+  {id:'farm',x:-176,z:-8,r:15,base:2,name:'THE CONTENT FARM',sub:'picked daily, forgotten hourly',hue:.1,lit:.66,col:[.08,.5,.32]},
+  {id:'fac',x:96,z:138,r:24,base:3,name:'THE SLOP FACTORY',sub:'data in · slop out',hue:.04,lit:.6,col:[.06,.35,.42]},
+  {id:'chrome',x:-96,z:140,r:18,base:2,name:'CHROME ALLEY',sub:'unlicensed upgrades · no refunds',hue:.55,lit:.28,col:[.62,.3,.18]},
+  {id:'aura',x:60,z:-118,r:16,base:5,name:'THE AURA FARM',sub:'pose responsibly',hue:.13,lit:.7,col:[.13,.7,.55]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
-const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26}};
+const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42}};
 function zw(i,x,z){const zn=ZONES[i],d=Math.hypot(x-zn.x,z-zn.z);return smooth(1-clamp((d-ZR*.55)/(ZR*.85)));}
 function groundH(x,z){
   let h=(fbm(x*.011+5.3,z*.011+9.1)-.5)*52+(fbm(x*.045+2,z*.045+7)-.5)*8;
@@ -537,7 +558,8 @@ const SFX={jump:()=>tone(280,.16,'square',.1,0,620),jump2:()=>tone(420,.18,'squa
   bosshit:()=>{tone(160,.1,'square',.12,0,70);},win:()=>{[523,659,784,1047,784,1047,1319,1568].forEach((f,i)=>tone(f,.35,'square',.13,AU.ctx&&AU.ctx.currentTime+i*.14));}};
 const THEMES={hub:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},wild:{bpm:128,root:55,sc:[0,2,4,7,9],lw:'square'},grok:{bpm:116,root:45,sc:[0,3,5,6,7,10],lw:'sawtooth'},
   fable:{bpm:124,root:62,sc:[0,2,3,5,7,8,10],lw:'triangle'},astra:{bpm:104,root:64,sc:[0,2,4,6,7,9,11],lw:'sine'},boss:{bpm:170,root:40,sc:[0,1,3,5,6,8,10],lw:'sawtooth'},
-  sunkeep:{bpm:112,root:60,sc:[0,2,4,5,7,9,11],lw:'triangle'},flow:{bpm:122,root:52,sc:[0,3,5,7,10],lw:'square'},clank:{bpm:150,root:41,sc:[0,1,3,6,7,10],lw:'sawtooth'},hour:{bpm:90,root:65,sc:[0,2,3,7,8],lw:'sine'},press:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'}};
+  sunkeep:{bpm:112,root:60,sc:[0,2,4,5,7,9,11],lw:'triangle'},flow:{bpm:122,root:52,sc:[0,3,5,7,10],lw:'square'},clank:{bpm:150,root:41,sc:[0,1,3,6,7,10],lw:'sawtooth'},hour:{bpm:90,root:65,sc:[0,2,3,7,8],lw:'sine'},press:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},
+  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'}};
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 function music(){if(!AU.ctx||AU.muted||S.mode==='title')return;const now=AU.ctx.currentTime;if(AU.next<now-.5)AU.next=now+.05;
   while(AU.next<now+.14){const th=THEMES[AU.theme]||THEMES.hub,s=AU.step%16,bar=Math.floor(AU.step/16),t=AU.next,prog=[0,3,4,2][bar%4],sc=th.sc;
@@ -565,9 +587,9 @@ function renderQuests(){const q=$('quests');let rows=[
   ['fable','📖 '+(S.relics.fable?'Em Dash acquired':pagesGot()>=6?'Grab the Em Dash of Destiny':'Find lost pages in Delve Woods '+pagesGot()+'/6'),S.relics.fable],
   ['astra','🌟 '+(S.relics.astra?'Seventh Finger acquired':'Climb the floaty stairs in the Nebula'),S.relics.astra]];
   if(allRelics())rows.push(['portal',S.inBoss?'👁️ Defeat THE ALGORITHM':'🌀 Enter the portal in Prompt Plaza',false]);
-  rows=rows.concat(xRows());if(qOpen===null)qOpen=app.clientWidth>=640;
+  rows=rows.concat(xRows());if(qOpen===null)qOpen=false;
   const key=JSON.stringify(rows)+S.track+qOpen;if(hudCache.q===key)return;hudCache.q=key;q.textContent='';
-  let list=rows;const open=rows.filter(r=>!r[2]);if(!qOpen){list=open.slice();const ti=list.findIndex(r=>r[0]===S.track);if(ti>0)list.unshift(list.splice(ti,1)[0]);list=list.slice(0,2);}
+  let list=rows;const open=rows.filter(r=>!r[2]);if(!qOpen){list=open.slice();const ti=list.findIndex(r=>r[0]===S.track);if(ti>0)list.unshift(list.splice(ti,1)[0]);list=list.slice(0,app.clientWidth<640?2:4);}
   list.forEach(r=>{const b=document.createElement('button');b.textContent=r[1];if(r[2])b.className='done';if(S.track===r[0])b.classList.add('trk');b.addEventListener('click',()=>{S.track=S.track===r[0]?null:r[0];});q.appendChild(b);});
   const more=document.createElement('button');more.className='more';more.textContent=qOpen?'▲ fewer':'▼ all quests ('+open.length+')';more.addEventListener('click',()=>{qOpen=!qOpen;});q.appendChild(more);}
 const pagesGot=()=>S.pages.reduce((a,b)=>a+b,0),allRelics=()=>S.relics.grok&&S.relics.fable&&S.relics.astra;
@@ -607,7 +629,7 @@ const orbs=[];
 const orbMesh=new THREE.InstancedMesh(new THREE.OctahedronGeometry(.6),rainbowMat,orbs.length);orbMesh.frustumCulled=false;scene.add(orbMesh);
 function updateOrbs(dt,active){const t=S.t;for(let i=0;i<orbs.length;i++){const o=orbs[i];if(o.taken){continue;}
   if(active){const dx=PL.x-o.x,dz=PL.z-o.z,dy=PL.y+1.4-o.y,d2=dx*dx+dz*dz+dy*dy;
-    if(d2<64){const d=Math.sqrt(d2)||1,p=22*dt/d;o.x+=dx*p;o.z+=dz*p;o.y+=dy*p;
+    if(d2<(X.imp.includes('wifi')?576:64)){const d=Math.sqrt(d2)||1,p=22*dt/d;o.x+=dx*p;o.z+=dz*p;o.y+=dy*p;
       if(d2<(VAN.driving?16:4)){takeOrb(i);continue;}}}
   dummy.position.set(o.x,o.y+Math.sin(t*3+i)*.3,o.z);dummy.rotation.set(0,t*2+i,0);dummy.scale.setScalar(1);dummy.updateMatrix();orbMesh.setMatrixAt(i,dummy.matrix);}
   orbMesh.instanceMatrix.needsUpdate=true;}
@@ -661,7 +683,7 @@ function spawnWorldEnemies(){while(enemies.length)removeEnemy(enemies[0]);respaw
   for(let i=0;i<5;i++){const a=i/5*TAU+.5;spawnEnemy(ABY.clank.x+Math.cos(a)*16,ABY.clank.z+Math.sin(a)*16,'clank');}
   for(let i=0;i<4;i++){const a=i/4*TAU;spawnEnemy(CL.x+Math.cos(a)*12,CL.z+Math.sin(a)*12,'cloud');}}
 function updateEnemies(dt,active){for(let i=respawns.length-1;i>=0;i--){const r=respawns[i];r.t-=dt;if(r.t<=0&&!S.inBoss){if(Math.hypot(PL.x-r.x,PL.z-r.z)>24){spawnEnemy(r.x,r.z,r.tag);respawns.splice(i,1);}else r.t=2;}}
-  for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];e.t+=dt;const dx=PL.x-e.x,dz=PL.z-e.z,d=Math.hypot(dx,dz)||1;let tx=0,tz=0,sp=0;
+  for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.meme>0||e.stun>0){memeTick(e,dt);continue;}e.t+=dt;const dx=PL.x-e.x,dz=PL.z-e.z,d=Math.hypot(dx,dz)||1;let tx=0,tz=0,sp=0;
     if(active&&d<e.aggro&&!S.dead&&(e.tag==='boss')===S.inBoss){tx=dx/d;tz=dz/d;sp=e.spd;}
     else{e.wt-=dt;if(e.wt<=0){e.wt=2+Math.random()*3;const a=Math.random()*TAU;e.wx=e.hx+Math.cos(a)*10;e.wz=e.hz+Math.sin(a)*10;}const wx=e.wx-e.x,wz=e.wz-e.z,wd=Math.hypot(wx,wz)||1;tx=wx/wd;tz=wz/wd;sp=wd>1?e.spd*.35:0;}
     const k=Math.exp(-dt*5);e.kx*=k;e.kz*=k;e.x+=(tx*sp+e.kx)*dt;e.z+=(tz*sp+e.kz)*dt;
@@ -674,18 +696,19 @@ function updateEnemies(dt,active){for(let i=respawns.length-1;i>=0;i--){const r=
 const bullets=[];
 (function(){const g=new THREE.IcosahedronGeometry(.5,0);for(let i=0;i<22;i++){const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0xffffff,fog:false}));m.visible=false;scene.add(m);bullets.push({m,life:0,vx:0,vy:0,vz:0});}})();
 const BLAST_WORDS=['skibidi','rizz','sigma','aura','67','bruh','delve','no cap','W','ohio','sus','mid'];
-function shoot(mx,my,mz,dx,dy,dz,bigShot){const b=bullets.find(b=>b.life<=0);if(!b)return;b.life=bigShot?1.5:1;b.big=bigShot;b.hits=[];b.vx=dx*75;b.vy=dy*75;b.vz=dz*75;b.m.position.set(mx+dx*1.2,my,mz+dz*1.2);b.m.visible=true;b.m.scale.setScalar(bigShot?4.5:1);b.m.material.color.setHSL(Math.random(),1,bigShot?.8:.6);}
+function shoot(mx,my,mz,dx,dy,dz,bigShot,meme){const b=bullets.find(b=>b.life<=0);if(!b)return;b.life=bigShot?1.5:1;b.big=bigShot;b.meme=!!meme;b.hits=[];b.vx=dx*75;b.vy=dy*75;b.vz=dz*75;b.m.position.set(mx+dx*1.2,my,mz+dz*1.2);b.m.visible=true;b.m.scale.setScalar(bigShot?4.5:1);b.m.material.color.setHSL(Math.random(),1,bigShot?.8:.6);if(meme){b.m.material.color.setHex(0xffd400);b.m.scale.setScalar(2.4);}}
 function fire(){PL.cd=X.clout>=8?.17:.24;let best=null,bd=60;const mx=PL.x,my=PL.y+2,mz=PL.z;
   const consider=(c,cy)=>{const dx=c.x-mx,dz=c.z-mz,d=Math.hypot(dx,dz);if(d<bd){const an=Math.atan2(dx,dz);if(d<9||Math.abs(angDiff(an,PL.face))<1.15||Math.abs(angDiff(an,cam.yaw+Math.PI))<.9){best={x:c.x,y:cy,z:c.z};bd=d;}}};
   enemies.forEach(e=>consider(e,e.y));if(boss.active&&boss.hp>0)consider(boss,boss.y);if(BOT.state==='fight')consider(BOT,BOT.y+2.4);for(const c of CORES)if(c.hp>0&&Math.abs(c.y-my)<30)consider(c,c.y);
   let dx,dy,dz;if(best){dx=best.x-mx;dy=best.y-my;dz=best.z-mz;const l=Math.hypot(dx,dy,dz)||1;dx/=l;dy/=l;dz/=l;PL.face=Math.atan2(dx,dz);}else{dx=Math.sin(PL.face);dy=0;dz=Math.cos(PL.face);}
   let eleven=false;if(X.clank>=2){S.shots++;eleven=S.shots%11===0;}
-  if(X.clank>=3&&!eleven){const px=dz*.8,pz=-dx*.8;shoot(mx+px,my,mz+pz,dx,dy,dz,false);shoot(mx-px,my,mz-pz,dx,dy,dz,false);}else shoot(mx,my,mz,dx,dy,dz,eleven);
+  const memeShot=X.imp.includes('meme')&&(S.mshots=(S.mshots||0)+1)%5===0;if(memeShot)floatText('MEME ROUND',mx,my+2.5,mz,'#ffd400');
+  if(X.clank>=3&&!eleven&&!memeShot){const px=dz*.8,pz=-dx*.8;shoot(mx+px,my,mz+pz,dx,dy,dz,false);shoot(mx-px,my,mz-pz,dx,dy,dz,false);}else shoot(mx,my,mz,dx,dy,dz,eleven,memeShot);
   PL.squash=-.15;if(eleven){SFX.boom();S.shake=Math.max(S.shake,.5);floatText('ELEVEN',mx,my+3,mz,'#ffd400');}else{SFX.shoot();if(Math.random()<.22)floatText(pick(BLAST_WORDS),mx+dx*3,my+1.5,mz+dz*3,'#19e3ff');}}
 function updateBullets(dt){for(const b of bullets){if(b.life<=0)continue;b.life-=dt;const p=b.m.position;p.x+=b.vx*dt;p.y+=b.vy*dt;p.z+=b.vz*dt;b.m.rotation.x+=dt*20;b.m.rotation.y+=dt*14;
-    if(b.big||Math.random()<.6)burst(p.x,p.y,p.z,b.big?3:1,null,b.big?6:1.5,0,.3);let dead=b.life<=0;const dmg=b.big?5:1,ex=b.big?26:2.4;
+    if(b.big||Math.random()<.6)burst(p.x,p.y,p.z,b.big?3:1,null,b.big?6:1.5,0,.3);let dead=b.life<=0;const dmg=(b.big?5:1)*(X.imp.includes('arm')?2:1),ex=b.big?26:2.4;
     if(!dead&&!S.inBoss&&p.y<groundH(p.x,p.z)){if(b.big)p.y=groundH(p.x,p.z)+.6;else{dead=true;burst(p.x,p.y+.3,p.z,6,null,6,3,.4);}}
-    if(!dead)for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(b.hits.includes(e))continue;const dx=e.x-p.x,dy=e.y-p.y,dz=e.z-p.z;if(dx*dx+dy*dy+dz*dz<e.rad*e.rad+ex){b.hits.push(e);burst(p.x,p.y,p.z,8,null,8,3,.4);damageEnemy(e,dmg,b.vx*.18,b.vz*.18);if(!b.big){dead=true;break;}}}
+    if(!dead)for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(b.hits.includes(e))continue;const dx=e.x-p.x,dy=e.y-p.y,dz=e.z-p.z;if(dx*dx+dy*dy+dz*dz<e.rad*e.rad+ex){b.hits.push(e);burst(p.x,p.y,p.z,8,null,8,3,.4);if(b.meme)infect(e);else damageEnemy(e,dmg,b.vx*.18,b.vz*.18);if(!b.big){dead=true;break;}}}
     if(!dead&&boss.active&&boss.hp>0){const dx=boss.x-p.x,dy=boss.y-p.y,dz=boss.z-p.z;if(dx*dx+dy*dy+dz*dz<boss.rad*boss.rad+ex){dead=true;for(let k=0;k<dmg&&boss.hp>0;k++)hitBoss(p);}}
     if(!dead&&BOT.state==='fight'){const dx=BOT.x-p.x,dy=BOT.y+2.4-p.y,dz=BOT.z-p.z;if(dx*dx+dy*dy+dz*dz<BOT.rad*BOT.rad+ex){dead=true;hitBottie(dmg,p);}}
     if(!dead)for(const c of CORES){if(c.hp<=0)continue;const dx=c.x-p.x,dy=c.y-p.y,dz=c.z-p.z;if(dx*dx+dy*dy+dz*dz<c.rad*c.rad+ex){dead=true;hitCore(c,dmg,p);break;}}
@@ -721,7 +744,7 @@ function updateBoss(dt,active){if(!boss.active)return;const g=boss.g;boss.t+=dt;
   if(X.lit){boss.van-=dt;if(boss.van<=0){boss.van=8;gangAssist();}}}
 function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$('bossbar').hidden=true;$('hud').hidden=true;
   const rank=S.total>160000?'CERTIFIED OHIO FINAL BOSS':S.total>120000?'RIZZ LORD SUPREME':S.total>95000?'SIGMA INTERN':'NPC WITH A DREAM';
-  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
+  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['DATA DUMPED',X.dumped],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
   $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;clearSave();}
 
 /* ================= player ================= */
@@ -747,9 +770,9 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   if(!S.inBoss){let dx=nx-VAN.x,dz=nz-VAN.z,d=Math.hypot(dx,dz)||.01;if(d<4.6&&PL.y<VAN.y+4.2){nx=VAN.x+dx/d*4.6;nz=VAN.z+dz/d*4.6;}
     if(BOT.state==='shield'){dx=nx-BOT.x;dz=nz-BOT.z;d=Math.hypot(dx,dz)||.01;if(d<10.8){nx=BOT.x+dx/d*10.8;nz=BOT.z+dz/d*10.8;}}}
   PL.x=nx;PL.z=nz;
-  if(active&&inp.jump){if(PL.grounded||PL.jumps<(X.tj?3:2)){PL.vy=PL.jumps?14.5:15.5;PL.jumps++;PL.grounded=false;(PL.jumps>1?SFX.jump2:SFX.jump)();burst(PL.x,PL.y+.3,PL.z,PL.jumps>1?16:8,null,5,1,.4);PL.squash=.25;}}
+  if(active&&inp.jump){if(PL.grounded||PL.jumps<(X.tj?3:2)){PL.vy=(PL.jumps?14.5:15.5)*(X.imp.includes('knees')?1.12:1);PL.jumps++;PL.grounded=false;(PL.jumps>1?SFX.jump2:SFX.jump)();burst(PL.x,PL.y+.3,PL.z,PL.jumps>1?16:8,null,5,1,.4);PL.squash=.25;}}
   inp.jump=false;
-  PL.air=PL.grounded?0:PL.air+dt;PL.flying=active&&inp.jh&&!PL.grounded&&PL.fuel>0&&PL.air>.2;if(PL.flying){PL.vy=Math.min(13,PL.vy+100*dt);PL.fuel-=dt;flyFx(dt);}else if(PL.grounded)PL.fuel=Math.min(fuelMax(),PL.fuel+dt*2.4);
+  PL.air=PL.grounded?0:PL.air+dt;PL.flying=active&&inp.jh&&!PL.grounded&&PL.fuel>0&&PL.air>.2&&!S.inSlop;if(PL.flying){PL.vy=Math.min(13,PL.vy+100*dt);PL.fuel-=dt;flyFx(dt);}else if(PL.grounded)PL.fuel=Math.min(fuelMax(),PL.fuel+dt*2.4);
   PL.vy-=(CH.id==='grav'?11:40)*dt;PL.y+=PL.vy*dt;const gy=surfaceY(PL.x,PL.z,prevY);
   if(PL.y<=gy){if(!PL.grounded&&PL.vy<-14){SFX.land();PL.squash=-.3;burst(PL.x,gy+.2,PL.z,8,null,5,1,.35);}PL.y=gy;PL.vy=0;PL.grounded=true;PL.jumps=0;}
   else if(PL.grounded&&PL.vy<=0&&PL.y-gy<1.3){PL.y=gy;PL.vy=0;}else PL.grounded=false;
@@ -785,18 +808,18 @@ function updatePickups(){pages.forEach((p,i)=>{if(S.pages[i])return;p.m.rotation
     if(Math.hypot(PL.x-r.x,PL.z-r.z)<3&&Math.abs(PL.y+1.5-r.g.position.y)<4.5)takeRelic(id);});}
 const TOASTS=['🏆 ACHIEVEMENT: Walked','🏆 ACHIEVEMENT: Blinked manually','📈 Engagement up 0.0001%','Fun fact: this fact was hallucinated','🔥 Hot single GPUs in your area','Your free trial of legs expires in 3 days','Tip: you cannot pause the brain rot','🏆 ACHIEVEMENT: Read a toast','Rate this game 5 stars to continue having knees','Tip: the fingers are not load-bearing','🤖 "Great question!" — nobody asked','New skin unlocked: the same skin','Reminder: drink water. Or don\'t. I\'m a toast.','📉 Your aura dipped. Just kidding. Or am I.'];
 let toastT=14;
-function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)z='boss';else if(dh<30)z='hub';else{for(const Z of ZONES)if(Math.hypot(PL.x-Z.x,PL.z-Z.z)<ZR*.95)z=Z.id;for(const a of AREAS)if(Math.hypot(PL.x-a.x,PL.z-a.z)<a.r*1.05)z=a.id;}
-  if(z!==S.zone){S.zone=z;AU.theme=z;if(z==='hub')zoneCard('PROMPT PLAZA','population: 3 chatbots and you');else if(z==='boss')zoneCard('THE FOR-YOU PAGE','final boss · do not scroll');else if(ZBY[z])zoneCard(ZBY[z].name,ZBY[z].sub);else if(ABY[z])zoneCard(ABY[z].name,ABY[z].sub);}
+function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)z='boss';else if(S.inSlop)z='slop';else if(dh<30)z='hub';else{for(const Z of ZONES)if(Math.hypot(PL.x-Z.x,PL.z-Z.z)<ZR*.95)z=Z.id;for(const a of AREAS)if(Math.hypot(PL.x-a.x,PL.z-a.z)<a.r*1.05)z=a.id;}
+  if(z!==S.zone){S.zone=z;AU.theme=z;if(z==='hub')zoneCard('PROMPT PLAZA','population: 3 chatbots and you');else if(z==='boss')zoneCard('THE FOR-YOU PAGE','final boss · do not scroll');else if(z==='slop')zoneCard(SM.name,'map_generated_'+SM.seed+'.level · playable? unconfirmed');else if(ZBY[z])zoneCard(ZBY[z].name,ZBY[z].sub);else if(ABY[z])zoneCard(ABY[z].name,ABY[z].sub);}
   toastT-=dt;if(toastT<=0){toastT=16+Math.random()*14;toast(pick(TOASTS));}
   // interaction target
-  interact=null;if(!S.inBoss){for(const id in mascots){const m=mascots[id];if(Math.hypot(PL.x-m.x,PL.z-m.z)<6.5){interact={label:'💬 YAP WITH '+m.name,fn:()=>{const hint=!S.relics[id]?[[id,id==='grok'?'RELIC IN OHIO. FOLLOW ARROW. BLAST THINGS.':id==='fable'?'My pages are scattered across the Delve Woods. Each has a helpful beam of light. You\'re welcome!':'✨ nebula is behind the plaza. jump twice. the second jump is free ✨']]:[];say([[id,pick(YAP[id])[0]]].concat(hint));}};}}
+  interact=null;if(!S.inBoss&&!S.inSlop){for(const id in mascots){const m=mascots[id];if(Math.hypot(PL.x-m.x,PL.z-m.z)<6.5){interact={label:'💬 YAP WITH '+m.name,fn:()=>{const hint=!S.relics[id]?[[id,id==='grok'?'RELIC IN OHIO. FOLLOW ARROW. BLAST THINGS.':id==='fable'?'My pages are scattered across the Delve Woods. Each has a helpful beam of light. You\'re welcome!':'✨ nebula is behind the plaza. jump twice. the second jump is free ✨']]:[];say([[id,pick(YAP[id])[0]]].concat(hint));}};}}
     if(Math.hypot(PL.x-portal.x,PL.z-portal.z)<6)interact=portal.open?{label:'🌀 ENTER THE FOR-YOU PAGE',fn:enterBoss}:{label:'🔒 NEEDS 3 RELICS',fn:()=>{toast('The portal wants all 3 relics. It is very needy.');SFX.hit();}};
     if(Math.hypot(PL.x-throne.x,PL.z-throne.z)<5)interact={label:'🚽 SIT ON THE THRONE',fn:()=>{addAura(1,PL.x,PL.y+3,PL.z);toast(pick(['You sat. Nothing happened. +1 aura.','The throne is cold. +1 aura.','You feel exactly the same. +1 aura.']));SFX.orb(3);}};}
-  if(!S.inBoss){const xi=xInteract();if(xi)interact=xi;}
+  if(!S.inBoss&&!S.inSlop){const xi=xInteract();if(xi)interact=xi;}
   const b=$('bTalk');if(interact){if(b.hidden||hudCache.talk!==interact.label){b.hidden=false;b.textContent=interact.label+(app.classList.contains('touchy')?'':'  [E]');hudCache.talk=interact.label;}}else if(!b.hidden)b.hidden=true;}
 function doInteract(){if(S.mode==='play'&&interact&&!S.dead)interact.fn();}
 $('bTalk').addEventListener('click',doInteract);
-function compassTarget(){if(S.inBoss)return boss.active?{x:boss.x,z:boss.z,l:'THE ALGORITHM'}:null;
+function compassTarget(){if(S.inSlop)return slopTarget();if(S.inBoss)return boss.active?{x:boss.x,z:boss.z,l:'THE ALGORITHM'}:null;
   if(S.track&&XQ.includes(S.track)){const t=xTarget(S.track);if(t)return t;S.track=null;}
   let id=S.track;if(id&&id!=='portal'&&S.relics[id])id=null;if(id==='portal'&&!allRelics())id=null;
   if(!id){if(allRelics())id='portal';else{let bd=1e9;ZONES.forEach(Z=>{if(S.relics[Z.id])return;const d=Math.hypot(PL.x-Z.x,PL.z-Z.z);if(d<bd){bd=d;id=Z.id;}});}}
@@ -838,7 +861,7 @@ addEventListener('keydown',e=>{inp.any=true;if(e.repeat){if(['Space','ArrowUp','
   if(S.mode==='title'||S.mode==='end'){return;}
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
   if(S.mode==='dialog'){if(['Space','Enter','KeyE','KeyF'].includes(e.code))advance();return;}
-  if(e.code==='Space'){inp.jump=true;inp.jh=true;}if(e.code==='KeyF'||e.code==='KeyJ'||e.code==='Enter')inp.fireKey=true;if(e.code==='KeyE')doInteract();if(e.code==='KeyQ')useSlow();if(e.code==='KeyM')setMute(!AU.muted);});
+  if(e.code==='Space'){inp.jump=true;inp.jh=true;}if(e.code==='KeyF'||e.code==='KeyJ'||e.code==='Enter')inp.fireKey=true;if(e.code==='KeyE')doInteract();if(e.code==='KeyQ')useSlow();if(e.code==='KeyR')poseStart();if(e.code==='KeyM')setMute(!AU.muted);});
 addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='Space')inp.jh=false;if(e.code==='KeyF'||e.code==='KeyJ'||e.code==='Enter')inp.fireKey=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;inp.fireKey=inp.fireMouse=inp.fireBtn=false;inp.jh=false;stick.id=-1;stick.x=stick.y=0;cam.id=-1;$('stick').hidden=true;});
 const touch=$('touch'),stickEl=$('stick');
@@ -856,7 +879,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -1387,9 +1410,10 @@ function xInteract(){if(VAN.driving)return{label:'🚪 GET OUT OF THE VAN',fn:ex
   for(const t of TPOSE)if(Math.hypot(PL.x-t.x,PL.z-t.z)<4.6)return{label:'💬 YAP WITH '+t.nm,fn:()=>say([['tpose',pick(['I have been standing like this since the animation budget ran out.','Please do not walk through me. I can feel it. I just cannot react.','They said my texture was "coming in the next patch". That was four patches ago.','A',"I'm fine. This is my idle animation."])]])};
   if(Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<5)return{label:'🔴 PRESS THE BUTTON',fn:()=>pressButton(false)};
   if(Math.hypot(PL.x-MS.x,PL.z-MS.z)<5.5)return{label:'🎯 SIDE QUEST DISPENSER',fn:openLog};
+  {const i7=act7Interact();if(i7)return i7;}
   return null;}
 function xTarget(id){const N=n=>({x:n.x,z:n.z,l:n.short}),near=(arr,ok,l)=>{let b=null,bd=1e9;arr.forEach((p,i)=>{if(!ok(i))return;const d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;b=p;}});return b?{x:b.x,z:b.z,l}:null;};
-  if(id==='mission')return missionTarget();
+  if(id==='mission')return missionTarget();{const t7=act7Target(id);if(t7!==undefined)return t7;}
   if(id==='flow')return X.flow===0||X.flow===2?N(npcs.marcus):X.flow===1?{x:GAR.dx,z:GAR.dz,l:'VAN KEY'}:X.flow===3?near(LEAKS,i=>!X.leaks[i],'LEAK'):null;
   if(id==='erin')return X.erin===0?N(npcs.erin):X.erin===1?(near(GAR.crops,i=>!X.crops[i],'CROP')||N(npcs.erin)):X.erin===2?N(npcs.bibi):null;
   if(id==='clank')return X.clank===0?N(npcs.kael):X.clank===1?near(VALVES,i=>!X.valves[i],'VALVE'):X.clank===2?{x:BOT.x,z:BOT.z,l:'LIL BOTTIE'}:null;
@@ -1404,17 +1428,17 @@ function xRows(){const lk=sum(X.leaks),cr=sum(X.crops),vl=sum(X.valves),mr=missi
   ['hour','⏳ '+(X.hour===0?'Visit David in the Hour Garden':X.hour===1?'Touch nothing for 8 seconds in the Hour Garden':'Borrowed Time acquired'),X.hour>=2],
   ['lantern','☀️ '+(X.lit?'The Great Lantern is lit':'Sun shards for Will '+shards()+'/4'),!!X.lit],
   ['bud','🐾 Befriend the dim buddies '+X.bud.length+'/15',X.bud.length>=15],['spr','🌱 Pluck wild sprouts '+X.spt.length+'/18',X.spt.length>=18],['frag','📟 Read the prompt fragments '+X.frag.length+'/12',X.frag.length>=12],
-  ['cloud','☁️ '+(X.cloud?'THE CLOUD is offline':'Unplug the server cores in THE CLOUD '+sum(X.cores)+'/4'),!!X.cloud],['s67','6️⃣ Find the sixty-seven 67s '+X.t67.length+'/67',X.t67.length>=67]]);}
+  ['cloud','☁️ '+(X.cloud?'THE CLOUD is offline':'Unplug the server cores in THE CLOUD '+sum(X.cores)+'/4'),!!X.cloud],['s67','6️⃣ Find the sixty-seven 67s '+X.t67.length+'/67',X.t67.length>=67]].concat(act7Rows()));}
 function syncX(){LEAKS.forEach((L,i)=>{L.b.visible=!X.leaks[i];});GAR.crops.forEach((c,i)=>{c.s.visible=X.erin===3||(!X.crops[i]&&X.erin<2);});GAR.dig.visible=X.flow===1;
   VALVES.forEach((v,i)=>{v.b.visible=X.clank===1&&!X.valves[i];v.wheel.material.color.setHex(X.valves[i]?0x556070:0xff2e2e);});
   if(X.clank<2)BOT.state='shield';else if(X.clank===2){if(BOT.state!=='fight'){BOT.state='fight';BOT.hp=BOT.max;BOT.shoot=2.5;BOT.spawn=5;}}else BOT.state='down';
   BOT.dome.visible=X.clank<2;BOT.g.rotation.set(BOT.state==='down'?-.45:0,BOT.state==='fight'?BOT.g.rotation.y:.4,0);BOT.bar.visible=BOT.state!=='fight';
   LANT.glass.material.color.setHex(X.lit?0xffe27a:0x2a2636);LANT.glow.visible=LANT.beam.visible=!!X.lit;MEALS.visible=X.erin===2;sprSync();budSync();
   FRAGS.forEach((f,i)=>{const r=X.frag.includes(i);f.b.visible=!r;f.scr.material.color.setHex(r?0x1a4a30:0x40ff90);});SPOTS.forEach((q,i)=>{q.m.visible=q.b.visible=!X.spt.includes(i);});T67.forEach((t,i)=>{t.s.visible=!X.t67.includes(i);});CORES.forEach((c,i)=>{c.hp=X.cores[i]?0:10;c.m.visible=c.b.visible=!X.cores[i];});
-  $('shardn').textContent='☀️'+shards();$('elev').hidden=X.clank<2;$('bSlow').hidden=X.hour<2;hudCache.q=null;}
+  $('shardn').textContent='☀️'+shards();act7Sync();$('elev').hidden=X.clank<2;$('bSlow').hidden=X.hour<2;hudCache.q=null;}
 function xReset(){VAN.driving=false;VAN.x=VAN.hx;VAN.z=VAN.hz;VAN.h=VAN.hh;VAN.sp=VAN.vy=0;VAN.y=groundH(VAN.x,VAN.z);VAN.gr=true;VAN.rode=false;pGroup.visible=true;
   if(X.louie){LOU.x=PL.x+3;LOU.z=PL.z+3;}else{LOU.x=LOU.hx;LOU.z=LOU.hz;}LOU.orb=-1;SPR.list.length=0;BUD.forEach(b=>{const h=BHOME[b.id];b.x=b.hx=h[0];b.z=b.hz=h[1];b.caught=b.lead=false;});GRASS.cd=0;
-  S.slow=0;S.slowCd=0;S.shots=0;S.snack=0;PO.list.forEach(p=>{p.life=0;p.s.visible=false;});PL.fuel=3.2;PO.r67=0;if(MS.m)endMission();G.lj=0;G.ls=0;CH.id='';CH.t=0;ROT.beat=0;ROT.btn=0;$('ad').hidden=true;assistN=0;app.classList.remove('slow','disco','fry');STILL.t=STILL.fail=0;BOT.state='x';BOT.x=CY.x;BOT.z=CY.z;BOT.y=BOT.gy+1;FLY.g.visible=false;big('');syncX();}
+  S.slow=0;S.slowCd=0;S.shots=0;S.snack=0;act7Reset();PO.list.forEach(p=>{p.life=0;p.s.visible=false;});PL.fuel=3.2;PO.r67=0;if(MS.m)endMission();G.lj=0;G.ls=0;CH.id='';CH.t=0;ROT.beat=0;ROT.btn=0;$('ad').hidden=true;assistN=0;app.classList.remove('slow','disco','fry');STILL.t=STILL.fail=0;BOT.state='x';BOT.x=CY.x;BOT.z=CY.z;BOT.y=BOT.gy+1;FLY.g.visible=false;big('');syncX();}
 function updateBB(dt){for(const b of bb){if(b.life<=0)continue;b.life-=dt;const p=b.m.position;p.x+=b.vx*dt;p.y+=b.vy*dt;p.z+=b.vz*dt;b.m.scale.setScalar(1+Math.sin(S.t*14+p.x)*.2);
     const dx=p.x-PL.x,dy=p.y-(PL.y+1.4),dz=p.z-PL.z;if(dx*dx+dz*dz<1.7&&Math.abs(dy)<1.7){hurt(-dx,-dz);b.life=0;}
     const out=S.inBoss?(Math.hypot(p.x,p.z)>ARENA.r+6||p.y<ARENA.top-1):p.y<groundH(p.x,p.z)-.3;if(b.life<=0||out){b.life=0;b.m.visible=false;}}}
@@ -1437,7 +1461,7 @@ function updateLouie(dt){const L=LOU;let moving=false;
   if(moving)L.walk+=dt*16;const gy=S.inBoss?ARENA.top:groundH(L.x,L.z);L.y=gy+(moving?Math.abs(Math.sin(L.walk))*.5:0);
   L.g.position.set(L.x,L.y,L.z);L.g.rotation.set(moving?Math.sin(L.walk)*.12:0,L.face,X.louie&&!moving?Math.sin(S.t*9)*.06:0);}
 function damageEnemy(e,n,kx,kz){e.hp-=n;e.hit=.12;if(kx!==undefined){e.kx=kx;e.kz=kz;}SFX.hit();if(e.hp<=0)killEnemy(e);}
-function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;rotUpdate(dt,play);gUpdate(dt,play);skyUpdate(dt,play);
+function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;rotUpdate(dt,play);gUpdate(dt,play);skyUpdate(dt,play);act7Update(dt,wdt,play,active);
   // timers: borrowed time, the meal going cold
   if(S.slow>0){S.slow-=dt;if(S.slow<=0)app.classList.remove('slow');}if(S.slowCd>0)S.slowCd-=dt;
   if(X.hour>=2){const t=S.slow>0?'⏳':S.slowCd>0?String(Math.ceil(S.slowCd)):app.classList.contains('touchy')?'⏳':'⏳Q';if(hudCache.slow!==t){hudCache.slow=t;$('bSlow').textContent=t;$('bSlow').classList.toggle('cd',S.slowCd>0&&S.slow<=0);}}
@@ -1549,7 +1573,7 @@ function rotUpdate(dt,play){if(S.snack>0)S.snack-=dt;if(ROT.btn>0)ROT.btn-=dt;
   if(ROT.beat>0){ROT.beat-=dt;AU.theme='boss';ROT.lyr-=dt;if(ROT.lyr<=0){ROT.lyr=1.4;bubble(pick(LYRICS),BOT.x,BOT.y+7,BOT.z);}if(ROT.beat<=0)AU.theme=S.zone;}
   if(ROT.adT>0){ROT.adT-=dt;if(ROT.adT<=0)$('ad').hidden=true;}
   if(!play||S.inBoss){if(!$('ad').hidden&&S.inBoss)$('ad').hidden=true;return;}
-  rotMoments();if(S.mode!=='play')return;
+  if(!S.inSlop)rotMoments();if(S.mode!=='play')return;
   if(X.louie&&ROT.btn<=0&&Math.hypot(LOU.x-BTN.x,LOU.z-BTN.z)<13&&Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<12){pressButton(true);return;}
   ROT.bark-=dt;if(ROT.bark<=0){ROT.bark=3.5+Math.random()*4;let best=null,bd=26;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd){bd=d;best=n;}}
     if(best)bubble(pick(BARK[best.id]),best.x,best.y+6,best.z);else if(Math.hypot(PL.x-VAN.x,PL.z-VAN.z)<22&&!VAN.driving)bubble(pick(BARK2.derek),VAN.x,VAN.y+6.5,VAN.z);
@@ -1560,7 +1584,7 @@ function rotUpdate(dt,play){if(S.snack>0)S.snack-=dt;if(ROT.btn>0)ROT.btn-=dt;
 
 
 /* ================= ACT 5: missions, the Slop Pass, a checklist, hats ================= */
-const maxCells=()=>5+(X.erin>=3?1:0)+(X.clout>=4?1:0);
+const maxCells=()=>5+(X.erin>=3?1:0)+(X.clout>=4?1:0)+(X.imp&&X.imp.includes('cortex')?1:0);
 const MS={m:null,last:'',rings:[]},G={lj:0,ls:0,t:2,hat:null};
 const TIER=['a PNG of a hand (you do not get the PNG)','the word "nice"','nothing, but said warmly','+1 BRAIN CELL (this one is real)','a coupon for the hot tub (void)','Derek\'s respect (unconfirmed)','an NFT of the concept of Tuesday','FASTER BLASTER (also real)','a firm handshake from a T-posing man','King Bibi\'s endorsement (he endorsed himself)','the rest of the PNG','permission to say "aura" unironically'];
 const HATS=[['🎩','Tophat of Unearned Confidence'],['👑','Crown (Prime Minister Not Included)'],['🪣','Legendary Bucket'],['🍕','Slice'],['🚽','Throne, Portable'],['🌮','Taco of Holding'],['🛸','Small Abduction'],['🦆','Duck. Just A Duck.'],['📎','It Looks Like You\'re Wearing A Hat'],['🔥','This Is Fine'],['🧠','Second Brain'],['🌽','The Corn']];
@@ -1587,7 +1611,7 @@ function failMission(why){if(!MS.m)return;zoneCard('MISSION FAILED',why+' · ski
 function winMission(){const m=MS.m;if(!m)return;X.ms++;X.clout++;addAura(m.pay,PL.x,PL.y+4,PL.z);SFX.win();flash(.5,500);burst(PL.x,PL.y+2,PL.z,70,null,18,10,1.2);
   zoneCard('MISSION COMPLETE',pick(['the client has been notified. the client is asleep.','five stars. would exploit again.','your aura has been invoiced.','Derek nodded. Probably.']));
   toast('🎟️ SLOP PASS TIER '+X.clout+': '+(TIER[X.clout-1]||'more of the same, forever'));if(X.clout===4){S.max=maxCells();S.cells=S.max;}
-  const left=HATS.filter(h=>!X.hats.includes(h[0]));if(left.length&&(X.ms===1||Math.random()<.7)){const h=pick(left);X.hats.push(h[0]);X.hat=h[0];hatSync();toast('🎁 LOOT BOX: you unboxed '+h[0]+' '+h[1]+'. It is on your head now.');}
+  const left=HATS.filter(h=>!X.hats.includes(h[0])&&!h[2]);if(left.length&&(X.ms===1||Math.random()<.7)){const h=pick(left);X.hats.push(h[0]);X.hat=h[0];hatSync();toast('🎁 LOOT BOX: you unboxed '+h[0]+' '+h[1]+'. It is on your head now.');}
   endMission();save();}
 function missionRow(){const m=MS.m;if(!m)return null;const t=' · '+Math.max(0,Math.ceil(m.t))+'s';return m.type==='hunt'?'Ratio hallucinations '+m.prog+'/'+m.need+t:m.type==='survive'?'Survive the stampede. Lose no brain cells'+t:m.type==='rush'?'Grab aura orbs '+m.prog+'/'+m.need+t:
   m.type==='rings'?'Thread the rainbow rings '+m.i+'/'+m.pts.length+t:m.st===0?'Pick up '+m.item+' from '+m.a.short:'Run '+m.item+' to '+m.b.short+t;}
@@ -1630,7 +1654,7 @@ function gUpdate(dt,play){if(PL.jumps>G.lj)X.c.j+=PL.jumps-G.lj;G.lj=PL.jumps;if
 
 /* ================= ACT 6: flight, the sky, the Cloud, and sixty-seven 67s ================= */
 PL.fuel=3.2;PL.air=0;PL.flying=false;pGroup.rotation.order='YXZ';
-const fuelMax=()=>X.t67.length>=67?99:X.cloud?6.4:3.2;
+const fuelMax=()=>X.t67.length>=67?99:(X.cloud?6.4:3.2)*(X.imp.includes('lungs')?1.5:1);
 const PO={list:[],t:0,f:0,n:0,hint:false,r67:0,ck:6};
 (function(){for(let k=0;k<36;k++){const s=emojiSprite('💩',1.2);s.visible=false;scene.add(s);PO.list.push({s,life:0,vx:0,vy:0,vz:0});}})();
 function flyFx(dt){X.c.fl=(X.c.fl||0)+dt;PO.t-=dt;if(PO.t<=0){PO.t=.075;const p=PO.list[PO.n++%PO.list.length],sx=Math.sin(PL.face),cz=Math.cos(PL.face);p.life=4;p.s.visible=true;p.s.position.set(PL.x-sx*.7,PL.y+1,PL.z-cz*.7);
@@ -1675,7 +1699,7 @@ function skyUpdate(dt,play){
     if(hit||onBoss||p.life<=0){p.life=0;p.s.visible=false;burst(q.x,q.y+.3,q.z,5,.07,5,3,.4);if(onBoss)hitBoss(q);
       for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(Math.hypot(e.x-q.x,e.z-q.z)<3&&Math.abs(e.y-q.y)<3.6){X.c.pk=(X.c.pk||0)+1;floatText('💩 DIRECT HIT',e.x,e.y+4,e.z,'#e0a050');damageEnemy(e,1);}}}}
   const fm=fuelMax();if(PL.fuel>fm)PL.fuel=fm;const show=PL.fuel<fm-.05&&fm<50,n=Math.ceil(clamp(PL.fuel/fm)*5),t=show?'💩'+'▮'.repeat(n)+'▯'.repeat(5-n):'';if(hudCache.fuel!==t){hudCache.fuel=t;$('fuel').hidden=!show;$('fuel').textContent=t;}
-  pGroup.rotation.x=lerp(pGroup.rotation.x,PL.flying?.6:0,Math.min(1,dt*8));if(PL.y>260&&PL.vy>0)PL.vy=0;
+  pGroup.rotation.x=lerp(pGroup.rotation.x,PL.flying?.6:0,Math.min(1,dt*8));if(PL.y>260&&PL.vy>0&&!S.inSlop)PL.vy=0;
   if(PL.flying&&!PO.hint){PO.hint=true;toast('💩 You are flying. Keep holding JUMP. Land to refuel. Anything underneath you is having a bad day.');}
   T67.forEach((t,i)=>{if(!t.s.visible)return;t.s.position.y=t.y+Math.sin(S.t*2.2+i)*.4;t.s.material.rotation=Math.sin(S.t*3)*.12;
     if(play&&Math.abs(PL.x-t.x)<3.4&&Math.abs(PL.z-t.z)<3.4&&Math.abs(PL.y+1.6-t.y)<3.6){X.t67.push(i);t.s.visible=false;addAura(670,t.x,t.y,t.z);SFX.orb(X.t67.length);floatText('6 7',t.x,t.y+2,t.z,'#ffd400');burst(t.x,t.y,t.z,20,.13,10,5,.7);hudCache.q=null;save();
@@ -1689,13 +1713,300 @@ function skyUpdate(dt,play){
   PO.ck-=dt;if(PO.ck<=0){PO.ck=3+Math.random()*3;const e=enemies.find(q=>q.ck&&Math.hypot(q.x-PL.x,q.z-PL.z)<30);if(e)bubble(pick(['CLANK','clank clank','CLANKER CLANK','*clanks at you*','beep. clank.']),e.x,e.y+3.5,e.z);}}
 
 
+/* ================= ACT 7: the slop economy. data, aura farming, chrome, memes, generated levels ================= */
+const FAC=ABY.fac,CHR=ABY.chrome,AF=ABY.aura,FBY=groundH(FAC.x,FAC.z);
+const chromeMat=new THREE.MeshPhongMaterial({color:0xc8ccd8,shininess:140,specular:0xffffff}),neonMat=new THREE.MeshBasicMaterial({vertexColors:true});
+const MATS={blink:new THREE.MeshBasicMaterial({color:0xffd400,transparent:true,opacity:.85}),bounce:new THREE.MeshLambertMaterial({color:0xff2e88}),move:new THREE.MeshLambertMaterial({color:0x19e3ff}),
+  plain:[0xb6ff00,0xff9ecf,0x9ffcff,0xffd76a,0xc8a8ff].map(c=>new THREE.MeshLambertMaterial({color:c})),ck:new THREE.MeshBasicMaterial({map:checkerTex('#ff00ff','#000000',2)})};
+function addCustomNpc(id,short,face,pitch,wave,x,z,ry,g,o){o=o||{};const y=o.y!==undefined?o.y:groundH(x,z);g.position.set(x,y,z);g.rotation.y=ry;scene.add(g);const l=textSprite(short,1.05,{color:o.col||'#fff'});l.position.y=o.ly||4.5;g.add(l);
+  const n={id,g,m:new THREE.Object3D(),x,z,y,ry,name:o.full||short,short,face,pitch,wave};npcs[id]=n;SPEAK[id]=n;colliders.push({x,z,r:o.cr||1.3,top:y+(o.ct||3.6)});if(!o.noFace)facers.push(n);return n;}
+BARK.doc=['Hold still.','No refunds!','Have you considered: more chrome?','I am 40% scalpel.','Side effects include wifi.','Upgrade or be upgraded.','Synergy.'];
+BARK.tipper=['BEEP BEEP. LORE INCOMING.','I AM FULL OF DATA.','DUMPING IN 3... 2...','THE MOUNTAIN HUNGERS.','HONK. (LORE)','I HAVE SEEN EVERY SCREENSHOT.'];
+CHAT.push('📱 TIPPER: LORE DUMP INCOMING. BRACE.','📱 DR. CHROMEWELL: who wants a wifi brain. first one is not free','📱 DEREK: ...is the mountain getting bigger','📱 MARCUS: bro the slop machine made a guy who looks like me. i hired him',
+  '📱 KAEL: The data mountain is mostly cats. I checked.','📱 LIL BOTTIE: dr chromewell gave me a second firewall. it is a hat','📱 KING BIBI: I HAVE BEEN UPGRADED. I AM NOW PRIME MINISTER 2.0');
+ADS.push('🦾 DR. CHROMEWELL: now with 30% more chrome','💾 Your data is valuable. Dump it. Responsibly.','🎰 Generate your dream creature today (results may vary)','🗺️ NEW LEVEL JUST DROPPED (nobody designed it)','✨ Hot aura in your area. Pose now.');
+HATS.push(['💾','Crown of the Dataset',1]);
+
+// ---- data: hallucinations are full of it
+const DATA={list:[],mesh:new THREE.InstancedMesh(new THREE.BoxGeometry(.55,.55,.55),new THREE.MeshBasicMaterial({color:0x40ff90}),140),ping:0};
+(function(){DATA.mesh.frustumCulled=false;scene.add(DATA.mesh);for(let i=0;i<140;i++)DATA.list.push({on:false});})();
+function dropData(x,y,z,n,stat){for(let k=0;k<n;k++){const c=DATA.list.find(q=>!q.on);if(!c)return;c.on=true;c.x=x+(stat?(k-n/2)*.9:0);c.y=y;c.z=z;c.stat=!!stat;c.life=stat?9999:40;c.mag=false;const a=Math.random()*TAU,s=stat?0:3+Math.random()*4;c.vx=Math.cos(a)*s;c.vz=Math.sin(a)*s;c.vy=stat?0:7+Math.random()*5;}}
+function updateData(dt,play){const R=X.imp.includes('wifi')?24:8;DATA.list.forEach((c,i)=>{if(c.on){c.life-=dt;const dx=PL.x-c.x,dy=PL.y+1.4-c.y,dz=PL.z-c.z,d=Math.hypot(dx,dy,dz)||.01;
+    if(play&&!VAN.driving&&(c.mag||d<R)){c.mag=true;const st=Math.min(d,34*dt);c.x+=dx/d*st;c.y+=dy/d*st;c.z+=dz/d*st;if(d<1.7){c.on=false;X.data++;DATA.ping++;tone(1200+Math.random()*500,.04,'square',.04);if(DATA.ping%4===0)floatText('+💾',PL.x,PL.y+4.2,PL.z,'#40ff90');}}
+    else if(!c.stat){c.vy-=28*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;c.z+=c.vz*dt;const g=(S.inBoss?ARENA.top:groundH(c.x,c.z))+.3;if(c.y<g){c.y=g;c.vy*=-.3;c.vx*=.6;c.vz*=.6;}}if(c.life<=0)c.on=false;}
+    if(c.on){dummy.position.set(c.x,c.y+(c.stat?Math.sin(S.t*3+i)*.3:0),c.z);dummy.rotation.set(S.t*2+i,S.t*1.5+i,0);dummy.scale.setScalar(1);}else{dummy.position.set(0,-9999,0);dummy.scale.setScalar(.001);}dummy.updateMatrix();DATA.mesh.setMatrixAt(i,dummy.matrix);});
+  DATA.mesh.instanceMatrix.needsUpdate=true;}
+{const ke=killEnemy;killEnemy=function(e){dropData(e.x,e.y+.5,e.z,3+Math.floor(Math.random()*4));ke(e);};}
+
+// ---- Mount Dataset and Tipper, the dump truck who dumps data (and lore)
+const MD={x:FAC.x-14,z:FAC.z+6,by:FBY,tiers:[]},TIP={x:FAC.x-28,z:FAC.z-3},DUMP={t:0};
+(function(){const cv=document.createElement('canvas');cv.width=cv.height=128;const g=cv.getContext('2d');g.fillStyle='#0c2016';g.fillRect(0,0,128,128);g.font='bold 14px monospace';
+  for(let j=0;j<9;j++)for(let i=0;i<11;i++){g.fillStyle=Math.random()<.2?'#b6ff00':'#2fbf6a';g.fillText(Math.random()<.5?'0':'1',2+i*11.5,14+j*14);}
+  const mat=new THREE.MeshLambertMaterial({map:new THREE.CanvasTexture(cv)}),band=new THREE.MeshBasicMaterial({color:0x40ff90});
+  for(let i=0;i<10;i++){const w=14-1.2*i,top=MD.by+2.2*(i+1),m=new THREE.Mesh(new THREE.BoxGeometry(w,2.2,w),mat),b=new THREE.Mesh(new THREE.BoxGeometry(w+.2,.2,w+.2),band);
+    m.position.set(MD.x,top-1.1,MD.z);b.position.set(MD.x,top,MD.z);m.rotation.y=b.rotation.y=i*.13;scene.add(m,b);const p={x:MD.x,z:MD.z,r:w/2*1.1,top:-999},c={x:MD.x,z:MD.z,r:w/2,top:-999};platforms.push(p);colliders.push(c);MD.tiers.push({m,b,p,c,top});}
+  MD.crown=emojiSprite('💾',3);MD.crown.position.set(MD.x,MD.tiers[9].top+2.4,MD.z);scene.add(MD.crown);
+  MD.lab=textSprite(['MOUNT DATASET','everything anyone ever posted'],1.4,{color:'#40ff90'});MD.lab.position.set(MD.x,MD.by+5,MD.z-9);scene.add(MD.lab);
+  const tg=new THREE.Group(),Y=0xffc21a,K=0x181420;tg.add(new THREE.Mesh(merge([pt(Box(2.2,1.6,1.6),Y,M(0,1.3,1.4)),pt(Box(2,.8,.1),0x5888b8,M(0,1.75,2.22)),pt(Box(2.4,.4,4.4),0x383048,M(0,.6,0)),
+    ...[[-1.1,1.6],[1.1,1.6],[-1.1,-1.2],[1.1,-1.2]].map(q=>pt(Cyl(.55,.55,.4,10),K,M(q[0],.55,q[1],0,0,Math.PI/2))),
+    pt(Sph(.3,8,6),0xffffff,M(-.5,1.8,2.3)),pt(Sph(.3,8,6),0xffffff,M(.5,1.8,2.3)),pt(Sph(.15,6,5),0x111111,M(-.5,1.8,2.56)),pt(Sph(.15,6,5),0x111111,M(.5,1.8,2.56)),pt(Box(1,.12,.1),0x111111,M(0,1.05,2.22))]),lam));
+  const bed=new THREE.Group();bed.position.set(0,1,-1.9);bed.add(new THREE.Mesh(merge([pt(Box(2.4,1.4,3),0xff7a1f,M(0,.7,1.5)),pt(Box(2.1,.5,2.6),0x40ff90,M(0,1.3,1.5))]),lam));tg.add(bed);TIP.bed=bed;tg.scale.setScalar(1.6);
+  addCustomNpc('tipper','TIPPER','🚛',90,'square',TIP.x,TIP.z,-.4,tg,{col:'#ffc21a',full:'TIPPER (a dump truck)',ly:3.5,noFace:true,cr:3,ct:4});TIP.y=npcs.tipper.y;})();
+const tierN=()=>Math.min(10,Math.floor(X.dumped/15));
+function mdSync(){const n=tierN();MD.tiers.forEach((t,i)=>{const on=i<n;t.m.visible=t.b.visible=on;t.p.top=t.c.top=on?t.top:-999;});MD.crown.visible=n>=10&&!X.summit;MD.lab.position.y=MD.by+2.2*n+4.5;}
+function dumpData(){if(X.data<=0){toast('💾 You have no data. Ratio some hallucinations. They are full of it.');SFX.hit();return;}const n=X.data,before=tierN();X.data=0;X.dumped+=n;X.c.dump+=n;addAura(n*45,PL.x,PL.y+4,PL.z);DUMP.t=1.4;SFX.page();tone(70,.9,'sawtooth',.12,0,35);mdSync();
+  const after=tierN();if(after>before){S.shake=.5;SFX.boom();zoneCard('MOUNT DATASET GREW','tier '+after+'/10 · '+pick(['it is learning','it is mostly cats','it remembers your search history','it is taller than Derek\'s ambitions']));}
+  else if(after<10)floatText('DATA DUMPED · '+(15-X.dumped%15)+' more for the next tier',PL.x,PL.y+5,PL.z,'#40ff90');
+  bubble(pick(['MMM. DATA.','DUMPED. NO TAKE-BACKS.','THAT ONE WAS MOSTLY SCREENSHOTS.','I WILL CHERISH THIS FOREVER (30 DAYS)']),TIP.x,TIP.y+6,TIP.z);hudCache.q=null;save();}
+const LC=['Derek','King Bibi','a hallucination named Gerald','the first sprout','The Algorithm\'s grandmother','Grok\'s left sunglass','a T-posing NPC','Louie','the Great Lantern','an unpaid intern model','Dr. Chromewell\'s ninth arm','the hot tub'],
+  LV=['invented','ate','sued','accidentally deleted','married','unsubscribed from','trained on','got ratioed by','sold the rights to','dabbed on','formed a band with','filed a patent for'],
+  LT=['the concept of Tuesday','Ohio','the em dash','the first 67','gravity (patch 1.2)','every hand','the van','Mount Dataset','the Cloud','the word "aura"','corn','the last grass'],
+  LQ=['nobody can say "aura" without a licence','the clocks run on spite','all fingers are now load-bearing','corn is a vegetable AND a currency','the Comment Section never sleeps','Derek has one line','the sky is a JPEG','water is only wet on weekends','every map is generated twice','the van has a pension'];
+function loreDump(){X.lore++;const L=[['tipper','HELLO. I AM TIPPER. I DUMP DATA. AND LORE. MOSTLY LORE. THIS IS LORE DUMP NUMBER '+X.lore+'. BEGINNING DUMP.']];
+  for(let k=0;k<3;k++)L.push(['tipper','In the year '+67*(1+Math.floor(Math.random()*30))+', '+pick(LC)+' '+pick(LV)+' '+pick(LT)+'. '+pick(['This is why','As a result,','Historians agree that because of this,','And that, children, is why'])+' '+pick(LQ)+'.']);
+  L.push(['tipper',pick(['...AND THAT IS ALL THE LORE. NONE OF IT WILL BE ON THE TEST. THERE IS NO TEST.','END OF DUMP. PLEASE RATE THIS LORE 5 STARS.','THIS LORE IS CANON UNTIL MY NEXT LORE.','I MADE ALL OF THAT UP JUST NOW. IT IS STILL CANON.'])]);return L;}
+TALK.tipper=()=>{say(loreDump());};
+
+// ---- the Slop-O-Matic 9000
+const MACH={x:FAC.x+6,z:FAC.z+10,t:0,g:new THREE.Group(),pist:[],belt:[],smoke:[],sm:0,idle:0},TERM={x:FAC.x+1,z:FAC.z+3},SC=[];
+const PROMPTS=['make a creature. no mistakes.','animal but wrong','shrimp, cathedral, 4k','something to put on a mug','whatever is trending','cute but load-bearing','a guy','emotional support appliance','my dog but more','the vibe of a Tuesday'];
+(function(){const g=MACH.g,P=0x5a2a8a,D=0x2a1a3a;
+  g.add(new THREE.Mesh(merge([pt(Box(8,6,6),P,M(0,3,0)),pt(Box(8.4,.5,6.4),0xffd400,M(0,6.1,0)),pt(Cone(2.6,3,10),0x9aa0aa,M(-1.5,8,0,Math.PI)),pt(Cyl(.5,.6,6,8),D,M(2.6,8.5,-1.6)),pt(Cyl(.5,.6,7.5,8),D,M(2.6,9.2,1.6)),
+    pt(Box(2.4,1.4,2.6),0x9aa0aa,M(0,1.2,-3.6,-.4)),pt(Box(2.2,.3,7),0x2a2a2a,M(0,.5,-7.2)),pt(Tor(1.2,.25,8,16,Math.PI),0xff2e88,M(3.6,3.5,-3.05)),pt(Box(.6,.6,.3),0xe01020,M(-2.8,1.8,-3.1)),pt(Box(.6,.6,.3),0x40ff90,M(-1.9,1.8,-3.1)),pt(Box(.6,.6,.3),0x19e3ff,M(-1,1.8,-3.1))]),lam));
+  MACH.cv=document.createElement('canvas');MACH.cv.width=256;MACH.cv.height=128;MACH.tex=new THREE.CanvasTexture(MACH.cv);const scr=new THREE.Mesh(new THREE.PlaneGeometry(5,2.5),new THREE.MeshBasicMaterial({map:MACH.tex}));scr.position.set(0,4.3,-3.02);scr.rotation.y=Math.PI;g.add(scr);
+  for(const s of[-1,1]){const p=new THREE.Mesh(Cyl(.45,.45,2.4,10),chromeMat);p.position.set(-3.3,6.8,s*2);g.add(p);MACH.pist.push(p);}
+  MACH.gear=new THREE.Mesh(Tor(1.1,.35,6,10),chromeMat);MACH.gear.position.set(4.1,3,1);MACH.gear.rotation.y=Math.PI/2;g.add(MACH.gear);
+  g.position.set(MACH.x,FBY,MACH.z);scene.add(g);colliders.push({x:MACH.x,z:MACH.z,r:4.4,top:FBY+9});
+  const l=textSprite(['SLOP-O-MATIC 9000','data in · slop out'],1.6,{color:'#ffd400'});l.position.set(MACH.x,FBY+12.5,MACH.z);scene.add(l);
+  for(let k=0;k<5;k++){const s=emojiSprite('🦐',1.3);scene.add(s);MACH.belt.push({s,u:k/5});}
+  for(let k=0;k<12;k++){const s=emojiSprite('💨',1.5);s.visible=false;scene.add(s);MACH.smoke.push({s,life:0});}
+  const t=new THREE.Mesh(merge([pt(Box(1.4,1.2,1),0x2a2e3a,M(0,.6,0)),pt(Box(1.5,.12,1.1),0x40ff90,M(0,1.25,0)),pt(Box(1.2,.8,.08),0x9ffcff,M(0,1.75,-.3,-.3))]),lam);t.position.set(TERM.x,groundH(TERM.x,TERM.z),TERM.z);t.rotation.y=Math.PI*.85;scene.add(t);
+  const tl=textSprite('TYPE A PROMPT',.8,{color:'#40ff90'});tl.position.set(TERM.x,groundH(TERM.x,TERM.z)+3,TERM.z);scene.add(tl);machScreen('SLOP-O-MATIC 9000','FEED ME DATA');})();
+function machScreen(t1,t2,pr){const g=MACH.cv.getContext('2d');g.fillStyle='#0a0614';g.fillRect(0,0,256,128);g.textAlign='center';g.fillStyle='#40ff90';g.font='bold 22px monospace';g.fillText(t1,128,40);g.font='16px monospace';g.fillStyle='#b6ff00';g.fillText(t2,128,70);
+  if(pr!==undefined){g.strokeStyle='#40ff90';g.lineWidth=2;g.strokeRect(28,88,200,20);g.fillStyle='#ff2e88';g.fillRect(30,90,196*pr,16);}MACH.tex.needsUpdate=true;}
+const SLA=['Shrimp','Bread','Lobster','Cabbage','Toaster','Grandma','Goose','Frog','Croissant','Cactus','Hamster','Spaghetti','Pigeon','Baby Hippo','Capybara','Pickle','Microwave','Jellyfish','Shark','Lasagna'],
+  SLB=['Knight','Wizard','Cathedral','Soldier','Influencer','CEO','Prophet','Senator','Ballerina','Astronaut','Dentist','Lifeguard','Grandpa','DJ','Barista','Plumber'],
+  SLCX=['','',' (4K)',' but Sad',' Supreme',' Jr.',' of Destiny',' (Real)',' Deluxe',' ULTRA HD',' (Unpaid)',' 2'],
+  SLD=['It knows.','Do not make eye contact.','Generated in 0.2 seconds. Regrets it.','12 likes, 0 thoughts.','Smells like a render.','Its fingers are load-bearing.','Amen? (40k shares)','Has a podcast.','Was trained on your vacation photos.','Legally a sandwich.','Will not stop saying "fr".','Pays rent in aura.'],
+  SLH=['🦐','🍞','🦞','🥬','🐸','🦆','🍝','🧀','🐊','☕','🦈','🥐','🧠','👁️','🍌','🐟','🗿','🤖','🐹','🥒'],
+  SLBARK=['I am 4% shrimp.','please delete me','i was trained on your vacation photos','my fingers are load-bearing','12 likes. 0 thoughts.','Amen? (share if you agree)','I have no mouth and I must post','generated with love (no love detected)','I am somebody\'s screensaver','i was a mistake. a viral one.'];
+function slopCreature(seed){const r=mulberry(seed),q=a=>a[Math.floor(r()*a.length)],col=()=>new THREE.Color().setHSL(r(),.55+r()*.4,.45+r()*.25).getHex();
+  const p=[],c1=col(),c2=col(),bs=.8+r()*.8,bt=Math.floor(r()*5),bg=[Sph(1,12,9),Box(1.6,1.6,1.6),Cone(1,2,7),new THREE.TorusKnotGeometry(.7,.28,40,6),Cyl(.8,.8,1.8,9)][bt],legs=Math.floor(r()*7),lift=legs?1.1:.5;
+  p.push(pt(bg,c1,M(0,lift+bs,0,0,0,0,bs,bs*(.8+r()*.6),bs)));
+  if(legs)for(let k=0;k<legs;k++){const a=k/legs*TAU;p.push(pt(Cyl(.11,.09,1.3,5),c2,M(Math.cos(a)*.55*bs,.65,Math.sin(a)*.55*bs)));}else p.push(pt(Tor(.55*bs,.16,6,16),c2,M(0,.3,0,Math.PI/2)));
+  const arms=Math.floor(r()*4);for(let k=0;k<arms;k++){const s=k%2?1:-1;p.push(pt(handGeos[Math.floor(r()*4)],0xffd9b0,M(s*(bs+.3),lift+bs+(r()-.5),0,0,0,s*(-.6-r()*.6),.32,.32,.32)));}
+  if(r()<.4)p.push(pt(Cone(.4,.9,6),col(),M(0,lift+bs*2.1+.4,0)));if(r()<.35)for(let k=0;k<3;k++)p.push(pt(Sph(.16,6,5),0xffffff,M((k-1)*.35,lift+bs*1.3,bs*.9)));
+  const g=new THREE.Group();g.add(new THREE.Mesh(merge(p),lam));const top=lift+bs*2+.4,hd=emojiSprite(q(SLH),1.4+bs*.5);hd.position.y=top+.4;g.add(hd);if(r()<.3){const h2=emojiSprite(q(SLH),1.1);h2.position.set(.9,top+.2,0);g.add(h2);}
+  const name=q(SLA)+' '+q(SLB)+q(SLCX),l=textSprite(name,.6,{color:'#b6ff00',size:44});l.position.y=top+1.8;g.add(l);
+  return{g,name,desc:q(SLD),seed,x:0,z:0,wx:0,wz:0,wt:0,hop:r()*6,sp:2+r()*3};}
+function birthSlop(seed,isNew){const c=slopCreature(seed);if(isNew){c.x=MACH.x+(Math.random()-.5)*2;c.z=MACH.z-11.5;}else{const a=Math.random()*TAU,r=Math.random()*10;c.x=FAC.x+2+Math.cos(a)*r;c.z=FAC.z-6+Math.sin(a)*r;}
+  c.g.position.set(c.x,groundH(c.x,c.z),c.z);scene.add(c.g);SC.push(c);
+  if(isNew){X.slops.push(seed);X.c.gen++;while(X.slops.length>12){X.slops.shift();const o=SC.shift();scene.remove(o.g);}burst(c.x,FBY+2,c.z,70,null,16,10,1.2);SFX.relic();zoneCard('IT\'S ALIVE',c.name);toast('🧬 '+c.name+': '+c.desc);hudCache.q=null;save();}}
+function genSlop(){if(MACH.t>0)return;if(X.data<20){toast('🎰 The Slop-O-Matic needs 20 💾. You have '+X.data+'. Hallucinations are full of data.');SFX.hit();return;}X.data-=20;MACH.t=2.6;MACH.seed=Math.floor(Math.random()*999999);SFX.portal();toast('🎰 PROMPT: "'+pick(PROMPTS)+'"');}
+
+// ---- the Slop Map Generator portal and an official map of the world (it is wrong)
+const SMP={x:FAC.x+17,z:FAC.z-7};
+(function(){const y=FBY;SMP.ring=new THREE.Mesh(Tor(3.4,.55,10,32),MATS.ck);SMP.ring.position.set(SMP.x,y+4,SMP.z);SMP.ring.rotation.y=-.8;scene.add(SMP.ring);
+  SMP.disc=new THREE.Mesh(new THREE.CircleGeometry(3,32),rainbowMat);SMP.disc.position.copy(SMP.ring.position);SMP.disc.rotation.y=-.8;scene.add(SMP.disc);const e=emojiSprite('🗺️',2.4);e.position.set(SMP.x,y+4,SMP.z);scene.add(e);
+  const l=textSprite(['SLOP MAP GENERATOR','levels nobody designed'],1.3,{color:'#ff9ecf'});l.position.set(SMP.x,y+9.2,SMP.z);scene.add(l);beam(SMP.x,SMP.z,0xff00ff,.6);
+  const cv=document.createElement('canvas');cv.width=512;cv.height=384;const g=cv.getContext('2d');g.fillStyle='#f2e2b8';g.fillRect(0,0,512,384);
+  for(let k=0;k<14;k++){g.fillStyle='hsl('+Math.floor(Math.random()*360)+',60%,62%)';g.beginPath();const cx=40+Math.random()*432,cy=60+Math.random()*290;for(let a=0;a<12;a++){const rr2=20+Math.random()*45,an=a/12*TAU;g.lineTo(cx+Math.cos(an)*rr2,cy+Math.sin(an)*rr2);}g.closePath();g.fill();}
+  g.fillStyle='#12021f';g.textAlign='center';g.font='bold 26px sans-serif';g.fillText('OFFICIAL MAP (AI GENERATED)',256,34);g.font='bold 15px sans-serif';
+  const N=['Ohio 2','Big Water','The Other Ohio','Here Be Hands','Sunkeep (maybe)','Lake Lake','Mount Everest Jr.','Florida?','The Backrooms','Wet Ohio','Hand Forest','Gerald','Place','Ocean (dry)','Spawn','North South','Shrimp Coast'];
+  for(let k=0;k<12;k++)g.fillText(pick(N),50+Math.random()*412,70+Math.random()*290);const ux=60+Math.random()*392,uy=90+Math.random()*250;g.fillStyle='#e01020';g.font='bold 30px sans-serif';g.fillText('✕',ux,uy);g.font='bold 14px sans-serif';g.fillText('YOU ARE HERE (or nearby)',ux,uy+20);
+  g.fillStyle='#12021f';g.textAlign='left';g.font='12px sans-serif';g.fillText('▲ = mountain or a triangle    ~ = water or a mistake    scale: yes',12,374);
+  const grp=new THREE.Group(),pl=new THREE.Mesh(new THREE.PlaneGeometry(9,6.75),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),side:THREE.DoubleSide}));pl.position.y=6.4;grp.add(pl);
+  for(const s of[-1,1]){const post=new THREE.Mesh(Cyl(.2,.2,6,6),normalMat);post.position.set(s*4,3,0);grp.add(post);}const bx=FAC.x-1,bz=FAC.z-19;grp.position.set(bx,groundH(bx,bz),bz);grp.rotation.y=Math.atan2(-bx,-bz);scene.add(grp);})();
+
+// ---- Chrome Alley and Dr. Chromewell, MD (Model Doctor)
+const DOC={};
+(function(){const cx=CHR.x,cz=CHR.z,by=groundH(cx,cz),ea=Math.atan2(-cz,-cx),dl=Math.hypot(cx,cz),dx=-cx/dl,dz=-cz/dl,tp=[],np=[];
+  for(let k=0;k<8;k++){const a=k/8*TAU+.3;if(Math.abs(angDiff(a,ea))<.55)continue;const r=15+(k%3)*2,x=Math.cos(a)*r,z=Math.sin(a)*r,h=14+((k*7)%4)*5,w=4+(k%2)*1.5;tp.push(pt(Box(w,h,w),0x1c1a2c,M(x,h/2,z)));
+    for(let j=1;j<h/3;j++)np.push(pt(Box(w+.06,.18,w+.06),[0xff2e88,0x19e3ff,0xb6ff00,0x7a2cff][(j+k)%4],M(x,j*3,z)));colliders.push({x:cx+x,z:cz+z,r:w*.72,top:by+h});}
+  const kx=-dx*6,kz=-dz*6,ry=Math.atan2(dx,dz);np.push(pt(Box(3,.8,.4),0x40ff90,M(kx,7.2,kz)),pt(Box(.8,3,.4),0x40ff90,M(kx,7.2,kz)));
+  const tm=new THREE.Mesh(merge(tp),lam);tm.position.set(cx,by,cz);scene.add(tm);const nm=new THREE.Mesh(merge(np),neonMat);nm.position.set(cx,by,cz);scene.add(nm);
+  const cl=new THREE.Mesh(merge([pt(Box(9,5,6),0x2a2e3a,M(0,2.5,0)),pt(Box(2,3,.2),0x101420,M(0,1.5,3.05)),pt(Box(9.2,.25,.25),0xff2e88,M(0,5,3.1)),pt(Box(2.6,.5,1.1),0xc8ccd8,M(3,.9,4.6)),pt(Box(.8,1.1,1.1),0xc8ccd8,M(4.3,1.4,4.6))]),lam);
+  cl.position.set(cx+kx,by,cz+kz);cl.rotation.y=ry;scene.add(cl);colliders.push({x:cx+kx,z:cz+kz,r:5,top:by+6});
+  [['🦾',-10,16],['💾',9,20],['🧠',-4,24],['👁️',12,14],['🔌',-13,12]].forEach((q,k)=>{const s=emojiSprite(q[0],5),a=ea+Math.PI+(k-2)*.5;s.position.set(cx+Math.cos(a)*12,by+q[2],cz+Math.sin(a)*12);scene.add(s);bob.push({o:s,y:s.position.y,a:1,s:.8,p:k});});
+  ['NOW 30% MORE CHROME','NO REFUNDS','YOUR BODY, OUR FIRMWARE','UPGRADE OR BE UPGRADED'].forEach((t,k)=>{const s=textSprite(t,1.4,{color:['#19e3ff','#ff2e88','#b6ff00','#c8a8ff'][k]}),a=ea+Math.PI+(k-1.5)*.8;s.position.set(cx+Math.cos(a)*10,by+9+k*2.5,cz+Math.sin(a)*10);scene.add(s);});
+  sign(cx+dx*16,cz+dz*16,['CHROME ALLEY','unlicensed upgrades'],ry+Math.PI,'#19e3ff');
+  const g=new THREE.Group(),inner=new THREE.Group();g.add(inner);inner.add(new THREE.Mesh(merge([pt(Sph(.9,14,10),0,M(0,2.6,0)),pt(Cyl(.55,.8,1.6,10),0,M(0,1.3,0)),pt(Cone(.8,.8,10),0,M(0,.2,0,Math.PI))]),chromeMat));
+  const vis=new THREE.Mesh(Box(1.3,.35,.4),new THREE.MeshBasicMaterial({color:0x19e3ff}));vis.position.set(0,2.7,.72);inner.add(vis);inner.add(new THREE.Mesh(merge([pt(Box(.5,.15,.05),0xe01020,M(0,1.5,.8)),pt(Box(.15,.5,.05),0xe01020,M(0,1.5,.8))]),neonMat));
+  const arms=new THREE.Group(),hm=new THREE.MeshPhongMaterial({vertexColors:true,color:0xc8ccd8,shininess:120});arms.position.y=1.7;for(let k=0;k<8;k++){const arm=new THREE.Group();arm.rotation.y=k/8*TAU;const s=new THREE.Mesh(Cyl(.08,.08,1.6,5),chromeMat);s.rotation.z=Math.PI/2;s.position.x=.9;arm.add(s);
+    const h=new THREE.Mesh(handGeos[k%4],hm);h.scale.setScalar(.28);h.position.x=1.8;h.rotation.z=-Math.PI/2;arm.add(h);arms.add(arm);}inner.add(arms);DOC.arms=arms;DOC.inner=inner;g.scale.setScalar(1.15);
+  addCustomNpc('doc','DR. CHROMEWELL','🦾',240,'square',cx+dx*1.5,cz+dz*1.5,ry,g,{col:'#19e3ff',full:'DR. CHROMEWELL, MD (Model Doctor)',ly:4.3});})();
+const IMPL=[['wifi','WIFI_BRAIN.exe',20,'Data and aura orbs fly to you from three times further away.'],['knees','BLUETOOTH KNEES',30,'Jump 25% higher. Pairs with nothing.'],['lungs','CLOUD LUNGS',40,'+50% flight fuel. You breathe the cloud now.'],
+  ['meme','MEMETIC_PAYLOAD.dll',50,'Every 5th shot is a meme. Memed enemies dance, infect their friends, then pop into data.'],['arm','CHROME ARM (it has a hand on it)',60,'Your blaster hits twice as hard.'],['cortex','AUTOCOMPLETE CORTEX',80,'+1 brain cell. It finishes your thoughts. Badly.'],['rgb','RGB SPINE',25,'+0 performance. +100% gamer. You glow, and posing pays 1.5x.']];
+function openShop(){$('shop').hidden=false;shopRender();SFX.page();}
+function shopRender(){if($('shop').hidden)return;const b=$('shopb'),mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e;};b.textContent='';
+  b.appendChild(mk('h3','','DR. CHROMEWELL\'S UNLICENSED UPGRADES'));b.appendChild(mk('p','','You have 💾 '+X.data+' data. Installed: '+X.imp.length+'/'+IMPL.length+'. No refunds. No anaesthetic. Plenty of chrome.'));
+  IMPL.forEach(im=>{const own=X.imp.includes(im[0]),row=mk('div','imp'+(own?' got':''));const t=mk('div');t.appendChild(mk('b','',im[1]));t.appendChild(mk('small','',im[3]));row.appendChild(t);
+    const btn=mk('button','',own?'INSTALLED':'💾 '+im[2]);btn.disabled=own||X.data<im[2];btn.addEventListener('click',()=>buyImplant(im));row.appendChild(btn);b.appendChild(row);});}
+function buyImplant(im){if(X.imp.includes(im[0])||X.data<im[2])return;X.data-=im[2];X.imp.push(im[0]);cybSync();S.max=maxCells();if(im[0]==='cortex')S.cells=S.max;SFX.relic();flash(.5,400);burst(PL.x,PL.y+2,PL.z,40,.55,10,6,.8);toast('🦾 INSTALLED: '+im[1]);
+  bubble(pick(['Hold still. ...Done. You were very brave. I was not.','It is in. Do not update it.','That will scar beautifully.','Firmware: applied. Warranty: never existed.']),npcs.doc.x,npcs.doc.y+6,npcs.doc.z);
+  if(X.imp.length>=IMPL.length)zoneCard('FULL CHROME','you are now 70% firmware');hudCache.q=null;save();shopRender();}
+TALK.doc=()=>{if(!X.mom.includes('doc1')){X.mom.push('doc1');save();say([['doc','First consultation is free. Everything after that costs data. Data is the new blood. Blood is the old data.'],['doc','Hallucinations are full of data. Ratio them and it falls out. Do not ask where they were keeping it.']],openShop);}
+  else say([['doc',pick(['Back for more chrome? Of course you are.','Lie down. No, not there. That is the floor. Fine. The floor.','I have upgraded 4,000 patients. 3,000 of them were the same toaster.','Synergy. I just like saying it.','Your aura is low. Have you tried: a laser?'])]],openShop);};
+$('shopx').addEventListener('click',()=>{$('shop').hidden=true;});
+const CYB={};
+(function(){CYB.wifi=new THREE.Group();const ant=new THREE.Mesh(Cyl(.05,.05,1,5),chromeMat);ant.position.y=.5;CYB.wifi.add(ant);const tip=new THREE.Mesh(Sph(.12,6,5),new THREE.MeshBasicMaterial({color:0xff2020}));tip.position.y=1.05;CYB.wifi.add(tip);
+  const ws=emojiSprite('📶',.8);ws.position.y=1.6;CYB.wifi.add(ws);CYB.wifi.position.set(.3,3.3,0);pGroup.add(CYB.wifi);
+  CYB.knees=[PL.l1,PL.l2].map(l=>{const k=new THREE.Mesh(Box(.36,.2,.4),new THREE.MeshBasicMaterial({color:0x19e3ff}));k.position.set(0,.12,.2);l.add(k);return k;});
+  CYB.lungs=new THREE.Mesh(merge([pt(Cyl(.25,.25,1.1,8),0,M(-.3,1.7,-.95)),pt(Cyl(.25,.25,1.1,8),0,M(.3,1.7,-.95)),pt(Box(.9,.2,.3),0,M(0,2.25,-.95))]),chromeMat);pGroup.add(CYB.lungs);
+  CYB.meme=emojiSprite('😂',.9);pGroup.add(CYB.meme);CYB.arm=new THREE.Mesh(merge([pt(Cyl(.3,.26,1,8),0,M(-1.05,1.45,.1,0,0,.25)),pt(Sph(.3,8,6),0,M(-.95,1.95,.1))]),chromeMat);pGroup.add(CYB.arm);
+  CYB.cortex=new THREE.Mesh(new THREE.SphereGeometry(.6,12,8,0,TAU,0,Math.PI/2),new THREE.MeshPhongMaterial({color:0x9ffcff,transparent:true,opacity:.45,shininess:150}));CYB.cortex.position.set(0,3.25,0);pGroup.add(CYB.cortex);
+  const br=new THREE.Mesh(Sph(.35,8,6),new THREE.MeshLambertMaterial({color:0xff9ecf}));br.position.y=.12;CYB.cortex.add(br);
+  CYB.rgb=new THREE.Mesh(Tor(1.05,.09,6,32),rainbowMat);CYB.rgb.rotation.x=Math.PI/2;CYB.rgb.position.y=1.5;pGroup.add(CYB.rgb);})();
+function cybSync(){const h=id=>X.imp.includes(id);CYB.wifi.visible=h('wifi');CYB.knees.forEach(k=>k.visible=h('knees'));CYB.lungs.visible=h('lungs');CYB.meme.visible=h('meme');CYB.arm.visible=h('arm');CYB.cortex.visible=h('cortex');CYB.rgb.visible=h('rgb');app.classList.toggle('cyber',X.imp.length>=3);}
+
+// ---- memetics: meme rounds, dancing enemies, outbreaks
+const MEMEW=['😂','💀','SKIBIDI','6 7','RIZZ','OHIO','NPC MODE','BRUH','AURA','SIGMA','MEWING','FANUM TAX'];
+function infect(e){if(!e||e.meme>0)return;e.meme=4.5;e.mt=.9;e.stun=0;X.c.memed++;const s=emojiSprite(pick(['😂','💀','🤣','🫠']),1.8);s.position.y=5.6;e.g.add(s);floatText(pick(MEMEW),e.x,e.y+4.5,e.z,'#ffd400');tone(880+Math.random()*400,.12,'square',.07,0,1300);}
+function memeTick(e,dt){e.t+=dt;if(e.meme>0){e.meme-=dt;e.body.rotation.y+=dt*16;e.g.position.set(e.x,e.y+Math.abs(Math.sin(e.t*10))*1.1,e.z);e.g.rotation.z=Math.sin(e.t*8)*.4;e.mt-=dt;
+    if(e.mt<=0){e.mt=.9;for(const o of enemies)if(o!==e&&!(o.meme>0)&&Math.hypot(o.x-e.x,o.z-e.z)<9){infect(o);for(let k=0;k<6;k++)burst(lerp(e.x,o.x,k/6),lerp(e.y,o.y,k/6)+2,lerp(e.z,o.z,k/6),1,.15,1,0,.4);break;}}
+    if(e.meme<=0){e.g.rotation.z=0;floatText('MEME\'D TO DEATH',e.x,e.y+5,e.z,'#ffd400');dropData(e.x,e.y+.5,e.z,3);killEnemy(e);}}
+  else{e.stun-=dt;e.g.position.set(e.x,e.y,e.z);e.body.rotation.y+=dt*.6;}}
+const OUT={t:0,next:150,p:''},OUTP=['skibidi','six seven','it\'s giving','no cap','mewing','fanum tax','chat is this real','let him cook','aura +1000','we are so back','it\'s so over','unc status'];
+{const ob=bubble;bubble=function(t,x,y,z){if(OUT.t>0&&Math.random()<.8)t=OUT.p.toUpperCase()+(Math.random()<.5?'!':'...');ob(t,x,y,z);};}
+
+// ---- the Aura Farm: aura grows here, and the stage pays you to be looked at
+const STG={},CROPS=[],POSE={};
+(function(){const cx=AF.x,cz=AF.z,by=groundH(cx,cz);STG.x=cx;STG.z=cz+4;STG.top=by+.6;
+  const st=new THREE.Mesh(new THREE.CylinderGeometry(4.2,4.5,.6,24),new THREE.MeshLambertMaterial({color:0x2a1a3a}));st.position.set(STG.x,by+.3,STG.z);scene.add(st);
+  const rim=new THREE.Mesh(Tor(4.25,.18,6,40),rainbowMat);rim.rotation.x=Math.PI/2;rim.position.set(STG.x,STG.top,STG.z);scene.add(rim);platforms.push({x:STG.x,z:STG.z,r:4.2,top:STG.top});
+  [0xffe27a,0xff9ecf,0x9ffcff].forEach((c,k)=>{const b=new THREE.Mesh(new THREE.CylinderGeometry(.4,4,12,20,1,true),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.13,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));
+    b.position.set(STG.x+(k-1)*1.2,STG.top+6,STG.z+(k-1)*.6);b.rotation.z=(k-1)*.18;scene.add(b);});
+  ['👀','📸','😳','🔥','💯','👏','🤳','😮','👀','📸','🔥','👏'].forEach((e,k)=>{const a=Math.PI*.15+k/11*Math.PI*.7,s=emojiSprite(e,1.8),x=STG.x+Math.cos(a)*10,z=STG.z+Math.sin(a)*10;s.position.set(x,groundH(x,z)+1.4,z);scene.add(s);bob.push({o:s,y:s.position.y,a:.25,s:5+k*.3,p:k});});
+  for(let i=0;i<6;i++)for(let j=0;j<4;j++){const x=cx-7.5+i*3,z=cz-6-j*3;CROPS.push({x,z,y:groundH(x,z),t:0});}
+  CROPS.mesh=new THREE.InstancedMesh(new THREE.OctahedronGeometry(.7),rainbowMat,CROPS.length);CROPS.mesh.frustumCulled=false;scene.add(CROPS.mesh);
+  const wx=cx+12,wz=cz-8,wy=groundH(wx,wz);const tw=new THREE.Mesh(merge([pt(Cyl(.6,1.2,8,6),0xfff8e7,M(0,4,0)),pt(Cone(1.2,1.6,6),0xc8102e,M(0,8.8,0))]),lam);tw.position.set(wx,wy,wz);scene.add(tw);colliders.push({x:wx,z:wz,r:1.3,top:wy+9});
+  STG.blades=new THREE.Group();for(let k=0;k<4;k++){const b=new THREE.Mesh(Box(.5,4,.1),new THREE.MeshLambertMaterial({color:0xffd400}));b.position.y=2;const a=new THREE.Group();a.rotation.z=k*Math.PI/2;a.add(b);STG.blades.add(a);}STG.blades.position.set(wx,wy+7.4,wz+1.3);scene.add(STG.blades);
+  const tr=emojiSprite('🚜',3);tr.position.set(cx-12,groundH(cx-12,cz-4)+1.5,cz-4);scene.add(tr);sign(cx-10,cz+10,['THE AURA FARM','pose on the stage · 3x aura'],2.6,'#ffd76a');
+  POSE.sun=emojiSprite('😎',1.3);POSE.sun.position.set(0,2.85,.9);POSE.sun.visible=false;pGroup.add(POSE.sun);
+  POSE.ring=new THREE.Mesh(Tor(1,.14,6,32),new THREE.MeshBasicMaterial({color:0xffd400,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));POSE.ring.rotation.x=Math.PI/2;POSE.ring.visible=false;scene.add(POSE.ring);})();
+function poseStart(){if(S.mode!=='play'||S.dead||VAN.driving||S.pose>0)return;if(S.poseCd>0){floatText('aura recharging · '+Math.ceil(S.poseCd)+'s',PL.x,PL.y+5,PL.z,'#c8c6d8');return;}
+  const onStage=Math.hypot(PL.x-STG.x,PL.z-STG.z)<4.3&&Math.abs(PL.y-STG.top)<.4,near=(o,r)=>Math.hypot(PL.x-o.x,PL.z-o.z)<r&&Math.abs((o.y||PL.y)-PL.y)<40;let w=0;
+  for(const id in npcs)if(near(npcs[id],32))w++;for(const id in mascots)if(near(mascots[id],32))w++;BUD.forEach(b=>{if(near(b,30))w++;});SC.forEach(c=>{if(near(c,30))w++;});if(X.louie&&near(LOU,30))w++;
+  for(const e of enemies)if(near(e,30)){w++;e.stun=2.8;floatText('😳',e.x,e.y+3.5,e.z);}w+=Math.floor(SPR.list.length/4)+(onStage?6:0)+(boss.active?10:0);
+  const gain=Math.round(67*(1+w)*(onStage?3:1)*(X.imp.includes('rgb')?1.5:1));addAura(gain);X.c.pose++;X.c.wit=Math.max(X.c.wit,w);if(onStage)X.c.stage=1;
+  S.pose=2.4;S.poseCd=6;PL.face=cam.yaw;PL.vx=PL.vz=0;POSE.sun.visible=POSE.ring.visible=true;POSE.r=0;
+  zoneCard('+'+fmt(gain)+' AURA',w?w+' witness'+(w===1?'':'es')+(onStage?' · stage bonus x3':'')+' · '+pick(['you are the main character','aura farmed','they will remember this','the camera loves you','certified moment']):'0 witnesses · posing alone. respect.');
+  [523,659,784,1047,1319].forEach((f,i)=>tone(f,.45,'triangle',.1,AU.ctx&&AU.ctx.currentTime+i*.06));nz(.6,.06,0,5000);flash(.3,500);hudCache.q=null;}
+$('bPose').addEventListener('pointerdown',e=>{e.preventDefault();audioInit();poseStart();});
+
+// ---- generated slop maps: platforming in latent space
+const SM={objs:[],plats:[],path:[],cp:null,seed:0,falls:0,goal:null,base:420,cx:48,cz:69,i:0,t:0,won:false,exitT:0,minY:0,name:''};
+function slopClear(){SM.objs.forEach(o=>{scene.remove(o);if(o.isMesh&&o.geometry&&o.userData.own)o.geometry.dispose();if(o.isSprite&&o.userData.tex)o.material.map.dispose();});SM.objs.length=0;
+  for(let i=platforms.length-1;i>=0;i--)if(platforms[i].slop)platforms.splice(i,1);SM.plats.length=0;SM.path.length=0;DATA.list.forEach(c=>{if(c.stat)c.on=false;});}
+function slopBuild(seed){slopClear();const r=mulberry(seed),q=a=>a[Math.floor(r()*a.length)],rg=(a,b)=>a+r()*(b-a);Object.assign(SM,{seed,falls:0,i:0,won:false,t:0,exitT:0});
+  const add=o=>{scene.add(o);SM.objs.push(o);return o;},lab=(t,x,y,z,c,h)=>{const s=textSprite(t,h||.75,{color:c||'#fff',size:44});s.userData.tex=1;s.position.set(x,y,z);return add(s);};
+  const LBL={n:['platform (probably)','platform_final_v2','jump here (trust)','asset_missing.png','floor?','this is fine','ground (beta)'],move:['moving (sorry)','it wanders','on a journey'],bounce:['trampoline (overfit)','boing.exe'],cp:['CHECKPOINT (we think)','checkpoint_final','SAVE HERE (maybe)']};
+  function plat(x,y,z,kind,o){o=o||{};const rad=o.r||rg(2.2,3.2),box=r()<.45,geo=box?new THREE.BoxGeometry(rad*1.6,1,rad*1.6):new THREE.CylinderGeometry(rad,rad*rg(.4,1),1,q([3,4,5,6,8,20]));
+    const mat=kind==='blink'?MATS.blink:kind==='bounce'?MATS.bounce:kind==='move'?MATS.move:kind==='goal'?rainbowMat:q([rainbowMat,normalMat,MATS.ck,q(MATS.plain)]);
+    const m=add(new THREE.Mesh(geo,mat));m.userData.own=1;m.position.set(x,y-.5,z);m.rotation.y=r()*TAU;
+    if(r()<.45&&kind!=='blink'){const d=add(new THREE.Mesh(new THREE.ConeGeometry(rad*.6,rg(2,6),5),q([rainbowMat,normalMat])));d.userData.own=1;d.position.set(x,y-3,z);d.rotation.x=Math.PI;}
+    let text=o.label;if(text===undefined)text=kind==='blink'?'confidence: '+Math.floor(rg(38,72))+'%':kind==='fake'||kind==='goal'?'':LBL[kind]&&(kind!=='n'||r()<.55)?q(LBL[kind]):'';
+    const P={x,z,ox:x,oz:z,r:rad*.98,top:y,y0:y,slop:true,kind,m,ph:r()*6,ax:0,az:0};if(text)P.lab=lab(text,x,y+1.6,z,text==='definitely real'?'#ffd400':'#ffffff');
+    if(kind!=='fake')platforms.push(P);SM.plats.push(P);return P;}
+  let x=SM.cx,z=SM.cz,y=SM.base,h=r()*TAU;const start=plat(x,y,z,'cp',{r:6,label:'map_generated_'+seed+'.level'});SM.cp=start;SM.path.push(start);lab(['Level design: autocomplete','Playtested by: nobody'],x,y+4.5,z,'#b6ff00');
+  let prev=start;const N=20+Math.floor(r()*6);
+  for(let i=1;i<=N;i++){const cp=i%7===0;h+=(r()-.5)*1.3;if(Math.hypot(x-SM.cx,z-SM.cz)>48)h=Math.atan2(SM.cx-x,SM.cz-z)+(r()-.5)*.6;
+    const roll=r();let kind=cp?'cp':roll<.42?'n':roll<.58?'blink':roll<.74?'move':roll<.84?'bounce':'fork',dist=rg(7,10),dy=rg(-1,2.6);
+    if(prev.kind==='bounce'){dy=rg(5.5,7.5);dist=rg(8,10);}if(cp)dy=rg(-1,1.5);dist+=(prev.r-2.7)*.8+(cp?2:0);x+=Math.sin(h)*dist;z+=Math.cos(h)*dist;y=Math.max(SM.base-4,y+dy);
+    if(kind==='fork'){const px=Math.cos(h)*3.4,pz=-Math.sin(h)*3.4,left=r()<.5,a=plat(x+px,y,z+pz,left?'n':'fake',{label:left?'fake (real)':'definitely real'}),b=plat(x-px,y,z-pz,left?'fake':'n',{label:left?'definitely real':'fake (real)'});prev=left?a:b;}
+    else{prev=plat(x,y,z,kind,cp?{r:5}:undefined);if(kind==='move'){prev.ax=Math.cos(h);prev.az=-Math.sin(h);}}SM.path.push(prev);
+    if(r()<.22&&kind!=='fork'){const sd=r()<.5?1:-1;plat(x+Math.cos(h)*rg(7,9)*sd,y+rg(0,1.5),z-Math.sin(h)*rg(7,9)*sd,'fake',{label:q(['definitely real','shortcut','secret area','free aura here'])});}
+    if(r()<.35){const s=emojiSprite(q(['🦐','🗿','👁️','🍝','🤖','🧠','💾','🌽','🫠','✋']),rg(3,7));s.position.set(x+rg(-12,12),y+rg(4,12),z+rg(-12,12));add(s);}
+    if(r()<.5&&kind!=='fork')dropData(x,y+1.6,z,2,true);}
+  const gd=rg(4,5)+prev.r+6;x+=Math.sin(h)*gd;z+=Math.cos(h)*gd;const goal=plat(x,y+1,z,'goal',{r:6,label:'YOU WIN (probably)'});SM.goal=goal;SM.path.push(goal);SM.trophy=add(emojiSprite('🏆',4));SM.trophy.position.set(x,y+4.6,z);
+  SM.minY=Math.min(...SM.path.map(p=>p.y0));
+  for(let k=0;k<8;k++){const a=k/8*TAU,s=emojiSprite(q(['🦐','🗿','👁️','🧠','✋','🌽','🤖','🍝','💾','🫠']),rg(30,60),false);s.position.set(SM.cx+Math.cos(a)*rg(110,160),SM.base+rg(-20,60),SM.cz+Math.sin(a)*rg(110,160));add(s);}
+  const big=lab(['LATENT SPACE','(nothing here was designed)'],SM.cx,SM.base+22,SM.cz,'#ff9ecf',5);big.material.fog=false;
+  SM.name=q(['Shrimp','Ohio','Latent','Cursed','Wet','Sigma','Forbidden','Unfinished','Haunted','Sponsored','Lukewarm'])+' '+q(['Heights','Gauntlet','Zone','Speedway','Cathedral','Backrooms','Parkour Experience','Obby','Temple','Water Level'])+' '+q(['4','(Remastered)','2: The Prequel','Deluxe','(Unplayable)','DX','(Beta)','67']);}
+function slopEnter(){if(S.inSlop||S.mode!=='play')return;slopBuild(Math.floor(Math.random()*999999));S.inSlop=true;const s=SM.path[0],n=SM.path[1];PL.x=s.x;PL.z=s.z;PL.y=PL.vis=s.top+.2;PL.vy=PL.vx=PL.vz=0;PL.grounded=false;
+  cam.yaw=Math.atan2(PL.x-n.x,PL.z-n.z);cam.pitch=.35;cam.manual=2;SFX.portal();flash(1,800);$('slopx').hidden=false;X.c.tries++;
+  moment('slop1',[['sys','Welcome to LATENT SPACE. This level was generated in 0.67 seconds from the prompt "platformer but more".'],['sys','Some platforms blink. Some move. Some are hallucinated: they look solid and are not. The generator forgot to render the sky, so you cannot fly here. Big platforms are checkpoints. Probably.']]);}
+function slopExit(won){if(!S.inSlop)return;slopClear();S.inSlop=false;PL.x=SMP.x-4;PL.z=SMP.z-5;PL.y=PL.vis=groundH(PL.x,PL.z)+.4;PL.vy=PL.vx=PL.vz=0;$('slopx').hidden=true;SFX.portal();flash(.8,600);
+  if(!won)toast('You left the map. It has been deleted. The next one will be worse.');}
+$('slopx').addEventListener('click',()=>slopExit(false));
+function slopTarget(){const p=SM.path[SM.i+1]||SM.goal;return p?{x:p.x,z:p.z,l:p===SM.goal?'GOAL (probably)':'NEXT PLATFORM'}:null;}
+function slopUpdate(dt){SM.t+=dt;const on=p=>PL.grounded&&Math.abs(PL.y-p.top)<.1&&Math.hypot(PL.x-p.x,PL.z-p.z)<p.r+.2;
+  for(const p of SM.plats){if(p.kind==='move'){const k=Math.sin(SM.t*1.4+p.ph)*3.5,nx=p.ox+p.ax*k,nz=p.oz+p.az*k;if(on(p)){PL.x+=nx-p.x;PL.z+=nz-p.z;}p.x=nx;p.z=nz;p.m.position.x=nx;p.m.position.z=nz;if(p.lab){p.lab.position.x=nx;p.lab.position.z=nz;}}
+    else if(p.kind==='blink'){const ph=(SM.t+p.ph)%3.3,solid=ph<2.2;p.top=solid?p.y0:-999;p.m.visible=solid&&!(ph>1.6&&Math.floor(SM.t*16)%2);}
+    else if(p.kind==='bounce'&&on(p)){const bi=SM.path.indexOf(p);if(bi>SM.i)SM.i=bi;PL.vy=30;PL.grounded=false;PL.jumps=1;PL.squash=.5;tone(220,.4,'sine',.15,0,1100);floatText('BOING (overfit)',p.x,p.top+3,p.z,'#ff9ecf');}
+    else if(p.kind==='cp'&&p!==SM.cp&&on(p)){SM.cp=p;toast('💾 CHECKPOINT (we think)');SFX.page();}
+    else if(p.kind==='fake'&&!p.told&&Math.hypot(PL.x-p.x,PL.z-p.z)<p.r&&PL.y<p.y0+.2&&PL.y>p.y0-3){p.told=1;X.c.hall++;floatText('HALLUCINATED',p.x,p.y0+2,p.z,'#ffd400');tone(300,.5,'sawtooth',.08,0,80);}}
+  for(let k=SM.i+1;k<SM.path.length;k++)if(on(SM.path[k])){SM.i=k;break;}
+  if(SM.trophy)SM.trophy.material.rotation=Math.sin(SM.t*3)*.3;
+  if(!SM.won&&on(SM.goal)){SM.won=true;X.maps++;X.data+=60;addAura(6700,PL.x,PL.y+4,PL.z);floatText('+60 💾',PL.x,PL.y+6,PL.z,'#40ff90');SFX.win();burst(PL.x,PL.y+2,PL.z,80,null,18,10,1.2);
+    zoneCard('MAP CLEARED',SM.name+' · falls: '+SM.falls+' · '+pick(['the generator is shocked','a human could never','10/10 (nobody else played it)','speedrunners are crying']));SM.exitT=2.4;save();}
+  if(SM.exitT>0){SM.exitT-=dt;if(SM.exitT<=0)slopExit(true);return;}
+  if(PL.y<SM.minY-25){SM.falls++;X.c.falls++;PL.x=SM.cp.x;PL.z=SM.cp.z;PL.y=PL.vis=SM.cp.top+.3;PL.vy=PL.vx=PL.vz=0;tone(110,.4,'sawtooth',.1,0,50);toast(pick(['💀 skill issue','💀 that platform was a hallucination (probably)','💀 the map generator apologizes (it does not)','💀 fall '+SM.falls+'. the void says hi']));}
+  setText('slopx','🚪 LEAVE MAP · falls '+SM.falls);}
+
+// ---- moments, quests, interactions, achievements
+const XQ7=['farm','dump','slop','chrome','map'];XQ.push(...XQ7);
+function act7Rows(){return[['farm','✨ Aura farm: pose on the Aura Farm stage',!!X.c.stage],['dump','💾 Grow Mount Dataset '+tierN()+'/10'+(X.data?' · carrying '+X.data:''),tierN()>=10&&!!X.summit],
+  ['slop','🎰 Generate slop creatures '+X.c.gen+'/5',X.c.gen>=5],['chrome','🦾 Get chromed at Chrome Alley '+X.imp.length+'/'+IMPL.length,X.imp.length>=IMPL.length],['map','🗺️ Beat generated slop maps '+X.maps+'/3',X.maps>=3]];}
+function act7Target(id){if(id==='farm')return X.c.stage?null:{x:STG.x,z:STG.z,l:'THE STAGE'};if(id==='dump')return X.summit?null:{x:MD.x,z:MD.z-8,l:tierN()>=10?'SUMMIT':'MOUNT DATASET'};
+  if(id==='slop')return{x:TERM.x,z:TERM.z,l:'SLOP-O-MATIC'};if(id==='chrome')return{x:npcs.doc.x,z:npcs.doc.z,l:'DR. CHROMEWELL'};if(id==='map')return{x:SMP.x,z:SMP.z,l:'SLOP MAP GENERATOR'};return undefined;}
+function act7Interact(){if(Math.hypot(PL.x-TERM.x,PL.z-TERM.z)<3.6)return{label:MACH.t>0?'🎰 GENERATING… (it is thinking)':'🎰 PROMPT THE SLOP-O-MATIC (20 💾)',fn:genSlop};
+  if(Math.hypot(PL.x-SMP.x,PL.z-SMP.z)<5)return{label:'🗺️ GENERATE A SLOP MAP',fn:slopEnter};
+  if(Math.hypot(PL.x-MD.x,PL.z-MD.z)<9.5&&PL.y<MD.by+2.6)return{label:X.data?'💾 DUMP '+X.data+' DATA ON THE MOUNTAIN':'💾 MOUNT DATASET (bring data)',fn:dumpData};return null;}
+ACH.push(['pose','Aura Farmer','posed 10 times',()=>X.c.pose>=10],['wit','Main Character Syndrome','posed in front of 10 witnesses',()=>X.c.wit>=10],['dumpa','Data Dumper','dumped 150 data',()=>X.c.dump>=150],['summit','Summit Of The Dataset','stood on top of everything anyone ever posted',()=>!!X.summit],
+  ['chrome','Full Chrome','installed every implant',()=>X.imp.length>=IMPL.length],['slop5','Slop Lord','generated 5 slop creatures',()=>X.c.gen>=5],['map3','Level Designer\'s Nightmare','beat 3 generated maps',()=>X.maps>=3],['memed','Patient Zero','memed 25 enemies',()=>X.c.memed>=25],
+  ['harv','Aura Harvest','harvested 50 aura crops',()=>X.c.harv>=50],['lore','Lore Enjoyer','sat through 3 lore dumps',()=>X.lore>=3],['hall','Trust Issues','fell through 5 hallucinated platforms',()=>X.c.hall>=5]);
+function act7Moments(){const near=(a,r)=>Math.hypot(PL.x-a.x,PL.z-a.z)<r;
+  if(near(FAC,30))moment('fac',[['sys','This is THE SLOP FACTORY. Data goes in. Slop comes out. Nobody has ever asked what the slop is for.',{cam:shot(FAC.x-4,FAC.z-24,7,FAC.x+2,FAC.z+4,4)}],
+    ['tipper','HELLO. I AM TIPPER. I AM A DUMP TRUCK. I DUMP DATA. ALSO LORE. MOSTLY LORE.',{cam:shot(TIP.x+9,TIP.z-7,4.5,TIP.x,TIP.z,2.5)}],
+    ['sys','Hallucinations drop 💾 data when you ratio them. Feed it to the Slop-O-Matic, or dump it on Mount Dataset and watch the mountain grow.',{cam:shot(MD.x+8,MD.z-18,8,MD.x,MD.z,4)}],
+    ['tipper','THE MOUNTAIN IS MADE OF EVERYTHING ANYONE EVER POSTED. IT IS VERY TALL. IT IS MOSTLY CATS.'],['sys','The portal makes platforming levels. Nobody designed them. That is the selling point.',{cam:shot(SMP.x-8,SMP.z-10,5,SMP.x,SMP.z,4)}]]);
+  else if(near(CHR,22))moment('chr',[['doc','AH. A PATIENT. Welcome to Chrome Alley. I am Dr. Chromewell, MD.',{cam:shot(npcs.doc.x-(CHR.x-npcs.doc.x)*6,npcs.doc.z-(CHR.z-npcs.doc.z)*6,4,npcs.doc.x,npcs.doc.z,3)}],
+    ['doc','The MD stands for Model Doctor. I am not licensed. I am, however, extremely confident.'],['doc','I install upgrades. You pay in data. Side effects include chrome, wifi, and saying "synergy" out loud.']]);
+  else if(near(AF,20))moment('af',[['sys','THE AURA FARM. Aura grows here. You can pick it. Or you can stand on the stage and strike a pose, and get paid for being looked at.',{cam:shot(STG.x+9,STG.z-14,6,STG.x,STG.z,2)}],
+    ['sys','Everyone watching counts as a witness: hallucinations, buddies, chatbots, plumbers. More witnesses, more aura. This is the economy now.'],['sys',app.classList.contains('touchy')?'Tap the 😎 button to pose.':'Press R to pose.']]);}
+function act7Sync(){mdSync();cybSync();}
+function act7Reset(){if(S.inSlop){slopClear();S.inSlop=false;$('slopx').hidden=true;}S.pose=0;S.poseCd=0;POSE.sun.visible=POSE.ring.visible=false;$('shop').hidden=true;DATA.list.forEach(c=>c.on=false);
+  SC.forEach(c=>scene.remove(c.g));SC.length=0;X.slops.forEach(s=>birthSlop(s,false));MACH.t=0;OUT.t=0;OUT.next=150;CROPS.forEach(c=>c.t=0);cam.dist=13;
+  for(let k=0;k<3;k++){const a=k/3*TAU;spawnEnemy(CHR.x+Math.cos(a)*9,CHR.z+Math.sin(a)*9,'clank');}}
+function act7Update(dt,wdt,play,active){const t=S.t;updateData(dt,play);if(S.poseCd>0)S.poseCd-=dt;
+  if(S.pose>0){S.pose-=dt;cam.yaw+=dt*1.25;cam.pitch=lerp(cam.pitch,.06,Math.min(1,dt*3));cam.dist=lerp(cam.dist,7,Math.min(1,dt*4));cam.manual=1;POSE.r+=dt;POSE.ring.position.set(PL.x,PL.vis+.2,PL.z);POSE.ring.scale.setScalar(1+POSE.r*3);POSE.ring.material.opacity=Math.max(0,1-POSE.r/2.4);
+    if(Math.random()<.6)burst(PL.x+(Math.random()-.5)*3,PL.vis+Math.random()*4,PL.z+(Math.random()-.5)*3,2,.13,3,4,.8);if(S.pose<=0)POSE.sun.visible=POSE.ring.visible=false;}
+  else if(Math.abs(cam.dist-13)>.01)cam.dist=lerp(cam.dist,13,Math.min(1,dt*3));
+  if(S.inSlop){slopUpdate(dt);if(S.inSlop)return;}
+  const nearFac=Math.hypot(PL.x-FAC.x,PL.z-FAC.z)<140;
+  if(MACH.t>0){MACH.t-=dt;MACH.g.position.set(MACH.x+(Math.random()-.5)*.25,FBY+(Math.random()-.5)*.15,MACH.z+(Math.random()-.5)*.25);const pr=1-MACH.t/2.6;machScreen('GENERATING…',pick(['adding fingers','removing fingers','upscaling','consulting the vibes','hallucinating','denoising soul']),pr);
+    if(Math.random()<.2)tone(200+pr*900,.06,'square',.05);if(MACH.t<=0){MACH.g.position.set(MACH.x,FBY,MACH.z);birthSlop(MACH.seed,true);machScreen('SLOP-O-MATIC 9000','IT\'S ALIVE');MACH.idle=3;}}
+  else if(nearFac){MACH.idle-=dt;if(MACH.idle<=0){MACH.idle=3;machScreen('SLOP-O-MATIC 9000',pick(['FEED ME DATA','NOW 40% MORE SLOP','PROMPT: "more"','UPTIME: 0.67 YEARS','NO HUMANS INVOLVED','VERSION 9000 (BETA)','💾 20 PER CREATURE']));}}
+  if(nearFac){const busy=MACH.t>0?3:1;MACH.pist.forEach((p,k)=>{p.position.y=6.8+Math.abs(Math.sin(t*3*busy+k*1.6))*1.4;});MACH.gear.rotation.z+=dt*1.5*busy;
+    MACH.belt.forEach(b=>{b.u+=dt*.16*busy;if(b.u>=1){b.u-=1;b.s.material.map=emojiTex(pick(SLH));}const z=lerp(MACH.z-3.6,MACH.z-10.6,b.u);b.s.position.set(MACH.x,FBY+1.25+(b.u>.95?-(b.u-.95)*30:0),z);});
+    MACH.sm-=dt*busy;if(MACH.sm<=0){MACH.sm=.35;const s=MACH.smoke.find(q=>q.life<=0);if(s){s.life=3;s.s.visible=true;s.s.material.map=emojiTex(pick(['💨','✨','🤖','🦐','💾','🧠','☁️']));s.s.position.set(MACH.x+2.6,FBY+12.4+Math.random(),MACH.z+(Math.random()<.5?-1.6:1.6));}}
+    MACH.smoke.forEach(s=>{if(s.life<=0)return;s.life-=dt;s.s.position.y+=dt*3;s.s.position.x+=dt*.8;const k=1-s.life/3;s.s.scale.setScalar(1.5+k*3);s.s.material.opacity=Math.max(0,1-k);if(s.life<=0)s.s.visible=false;});
+    SMP.disc.rotation.z+=dt*2;SMP.ring.rotation.z-=dt*.7;
+    SC.forEach(c=>{c.wt-=dt;if(c.wt<=0){c.wt=2+Math.random()*4;const a=Math.random()*TAU,r=Math.random()*11;c.wx=FAC.x+2+Math.cos(a)*r;c.wz=FAC.z-6+Math.sin(a)*r;}const dx=c.wx-c.x,dz=c.wz-c.z,d=Math.hypot(dx,dz);
+      if(d>.6){const st=Math.min(d,c.sp*dt);c.x+=dx/d*st;c.z+=dz/d*st;c.hop+=dt*9;c.g.rotation.y=Math.atan2(dx,dz);}c.g.position.set(c.x,groundH(c.x,c.z)+Math.abs(Math.sin(c.hop))*.4,c.z);c.g.rotation.z=Math.sin(c.hop*.5)*.1;});
+    if(DUMP.t>0){DUMP.t-=dt;const k=Math.random();burst(lerp(PL.x,MD.x,k),lerp(PL.y+2,MD.by+2.2*tierN()+2,k)+Math.sin(k*Math.PI)*5,lerp(PL.z,MD.z,k),2,.36,2,2,.5);}
+    TIP.bed.rotation.x=-Math.max(0,Math.sin(Math.min(1,DUMP.t/1.4)*Math.PI))*.7;}
+  DOC.inner.position.y=1+Math.sin(t*2)*.3;DOC.arms.rotation.y+=dt*.8;STG.blades.rotation.z+=dt*.9;
+  CROPS.forEach((c,i)=>{if(c.t>0)c.t-=dt;const grown=c.t<=0;if(play&&grown&&Math.hypot(PL.x-c.x,PL.z-c.z)<2&&Math.abs(PL.y-c.y)<3){c.t=25;X.c.harv++;addAura(134,c.x,c.y+2.5,c.z);dropData(c.x,c.y+1,c.z,1);SFX.orb(i);burst(c.x,c.y+1.5,c.z,10,.13,5,4,.5);}
+    const s=grown?1:.15+.5*(1-c.t/25);dummy.position.set(c.x,c.y+.9*s+(grown?Math.sin(t*2+i)*.2:0),c.z);dummy.rotation.set(0,t+i,0);dummy.scale.setScalar(s);dummy.updateMatrix();CROPS.mesh.setMatrixAt(i,dummy.matrix);});CROPS.mesh.instanceMatrix.needsUpdate=true;
+  if(tierN()>=10&&!X.summit&&PL.grounded&&Math.abs(PL.y-MD.tiers[9].top)<.3&&Math.hypot(PL.x-MD.x,PL.z-MD.z)<2.6){X.summit=1;if(!X.hats.includes('💾'))X.hats.push('💾');X.hat='💾';hatSync();addAura(6700,PL.x,PL.y+4,PL.z);SFX.win();mdSync();zoneCard('SUMMIT OF THE DATASET','you are standing on everything anyone ever posted');hudCache.q=null;save();}
+  if(MD.crown.visible)MD.crown.material.rotation=Math.sin(t*2)*.3;
+  if(X.imp.includes('rgb'))heroU.hue.value+=dt*1.5;if(CYB.meme.visible)CYB.meme.position.set(Math.cos(t*3)*1.3,3.1,Math.sin(t*3)*1.3);
+  const showData=X.data>0||X.dumped>0;$('data').hidden=!showData;if(showData)setText('data','💾 '+X.data);
+  if(play&&!S.inBoss){if(OUT.t>0){OUT.t-=dt;if(OUT.t<=0)toast('📡 The outbreak is over. "'+OUT.p+'" is cringe now.');}else{OUT.next-=dt;if(OUT.next<=0){OUT.next=150+Math.random()*90;OUT.t=25;OUT.p=pick(OUTP);
+      zoneCard('MEMETIC OUTBREAK','"'+OUT.p+'" is spreading · patient zero: '+pick(['Derek','a goose','King Bibi','the hot tub','your sprout','a T-posing NPC']));toast('📱 everyone: '+OUT.p);for(const e of enemies)if(Math.hypot(e.x-PL.x,e.z-PL.z)<35)e.stun=3;}}
+    act7Moments();}
+  if(play&&Math.random()<dt*.18&&SC.length&&Math.hypot(PL.x-FAC.x,PL.z-FAC.z)<30){const c=pick(SC);bubble(pick(SLBARK),c.x,c.g.position.y+5,c.z);}}
+
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
   PL.x=0;PL.z=9;PL.y=PL.vis=.15;PL.vx=PL.vy=PL.vz=PL.kx=PL.kz=0;PL.face=Math.PI;PL.inv=0;cam.yaw=0;cam.pitch=.3;cam.t.set(0,3,9);
   resetOrbs();spawnWorldEnemies();syncWorld();xReset();hudCache={};$('bossbar').hidden=true;$('hud').classList.remove('boss');$('ratio').hidden=true;$('dialog').hidden=true;}
 function begin(d){audioInit();$('title').hidden=true;$('end').hidden=true;$('hud').hidden=false;resetGame(d);S.mode='play';flash(.9,700);
-  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP in the air to fly':'WASD move · drag to look · SPACE jump, hold in the air to fly · click or F blast · E yap';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
+  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP in the air to fly · 😎 to pose':'WASD move · drag to look · SPACE jump, hold in the air to fly · click or F blast · E yap · R pose';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
   if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('Tip: tap a quest to track it');});}
 $('play').addEventListener('click',()=>{clearSave();begin(null);});
 const sv=loadSave();if(sv){$('cont').hidden=false;$('cont').addEventListener('click',()=>begin(loadSave()));}
@@ -1706,7 +2017,7 @@ syncWorld();spawnWorldEnemies();
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
-  if(S.mode==='play'||S.mode==='dialog'){const active=S.mode==='play'&&!S.dead;
+  if(S.mode==='play'||S.mode==='dialog'){const active=S.mode==='play'&&!S.dead&&!(S.pose>0);
     const wdt=dt*(S.slow>0?.22:1);
     {const n=Math.max(1,Math.ceil(dt/.0167));for(let q=0;q<n;q++){updateVan(dt/n,active);updatePlayer(dt/n,active);}}updateEnemies(wdt,active);updateBullets(dt);updateBoss(wdt,active);if(active)updateBB(wdt);updateOrbs(dt,active);xUpdate(dt,wdt,active);
     if(S.mode==='play'){updatePickups();updateZone(dt);if(S.dead>0){S.dead-=dt;if(S.dead<=0){S.dead=0;respawn();}}saveT-=dt;if(saveT<=0){saveT=20;if(!S.inBoss)save();}}
@@ -1715,7 +2026,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
