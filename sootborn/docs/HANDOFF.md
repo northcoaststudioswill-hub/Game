@@ -24,9 +24,9 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version string:** `src/ui.js`, "Version 0.67." Next is 0.68.
+- **Version string:** `src/ui.js`, "Version 0.68." Next is 0.69.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
-- **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (recent versions; older ones in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
+- **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.66 on; v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
 
 ### A4. How the code is put together (what you need for this plan)
@@ -42,6 +42,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 
 ### A5. Tests (in `tests/`)
 Playwright (run `npm i playwright` inside `tests/` once; it drives the Chrome already on the machine, no browser download) with Chrome and the software renderer (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`). Paths inside older tests may point at another machine's folders: point them at the repo's `index.html` and `issue/`.
+- New in v0.68: `prel.mjs` (stills of the animated intro; VW, VH, TIMES, TAG), `prel2.mjs` (the intro from New Game in real time; SKIP=1), `keepend.mjs` (the Keep's ending, stepped), `ilse.mjs` (the Table callback). Boot note: the opening film is gone, so a test should press Enter until `G.mode === 'title'` and not wait a fixed time.
 - New in v0.67: `cold.mjs` (New Game by real key presses through the cold open), `trans.mjs` (each transition in two pictures).
 - New in v0.66: `circ.mjs` (the Lamp's fire end to end, PICK=0|1|2, LOSE=1), `air.mjs` (how long a man can be kept in the air; BOOTS=1), `death.mjs` (stills of a death; M=fight, BIG=1), `hook.mjs` (the hook used on purpose in four arena fights). `Brawl.stageOf()` + `stage` on a fight def keep a fight in a walk scene; `afterWin` keeps the talk there too.
 - `godrun.mjs`: **the whole-story bot.** Plays New Game to THE END without being able to lose and logs every card, fight and level (`SECS=570`). **Run it every release.** Its log is how you check the order of cards against Part B.

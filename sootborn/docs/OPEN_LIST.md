@@ -13,7 +13,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 - **The present and the flashes** (master plan 9a): day one is Ashgate; everything else is a flash with a trigger and a signpost. Pick: the Assay stays as flashes (shorter), or the Assay becomes its own act after The Way Out (longer).
-- **Approved to plan, not yet to build (2026-11-19):** the Keep as the new cold open with an animated intro (9b), and Part Two's deepening flashbacks and played ending (9c). Say build.
+- **Being built down the handoff's steps (you said continue):** the Keep as the cold open with an animated intro is in (v0.67, v0.68); Part Two's deepening flashbacks and played ending come at steps 7 to 9.
 
 ## Built in v0.66 from your notes of 2026-11-19 (needs your eye, in the hand)
 - **The fire pit:** the naming, the fight with Corin and the aftermath now all stay in the 2.5D Circle. The wrong name is still fought on the ridge, because the lines say so; say if you want that at the fire as well.
@@ -52,7 +52,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 
 ## Matching the writing (from the master plan, v0.65)
 - The seat knife: on Crew Three's belts; the board in Bay 3; counting the knives back at the end of each day.
-- The Proctor's white cloak on Kael from day 31 (Valley, Last Night, Keep).
+- ~~The Proctor's white cloak on Kael from day 31~~ built in v0.68 (Valley, Last Night, Keep, Pinning).
 - A clerk's coat for Kael on the Spire and at the High Docks; gloves.
 - Oswin's stiff leg as the Auditor's Blade; Lucan's stick.
 - Deliberate animations: hand flat on the pipe (Seren, Kael, Kestrel); soot turn their heads and the Accredited do not; the kneel at the bell; hand to the washer before ELEVEN everywhere; humming sway; Brand and Hollis grounding the halberd; Tavi on the left.
@@ -84,7 +84,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 14. **Transitions between story parts:** go through every hand-off (card, fade, music) from the opening to THE END.
 15. **Comic layouts:** the Table was checked; the three levels' opening pages and memory pages still need the same look.
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
-16a. **The Keep as the cold open** (master plan 9b): black and the shift song; a 25-second animated intro of moving drawn stills counting to eleven; the Keep at dawn as a duel you cannot lose (strike, dodge, fly); ELEVEN, cut before the blow; then the prologue. The Valley returns to its place. The same fight on the last day, where the blow lands.
+16a. **Built (v0.67 the cold open, v0.68 the intro and the ending; needs your eye).** The Keep as the cold open (master plan 9b): black and the shift song; a 25-second animated intro of moving drawn stills counting to eleven; the Keep at dawn as a duel you cannot lose (strike, dodge, fly); ELEVEN, cut before the blow; then the prologue. The Valley returns to its place. The same fight on the last day, where the blow lands.
 16b. **Part Two flashbacks** (master plan 9c): the Post → the white cloak at the Assay; What She Knows → Celestine's own Assay, played as her; Two Years → Seren tracing the line first; the Count → no cuts, then one flash to the furnace at eleven; the ending as a played sequence of pictures.
 16c. **Two more comic-book levels in the first half** (master plan 9e): the Deep Array with Dace (The Ledger); the vent stack on day 31, where he takes the boots.
 16d. **Two more 2.5D parts with story in the first half:** the Assay camp by day (its people: Dorian, Oswin, Petra); Bay 3 at last bell, counting the knives back.
