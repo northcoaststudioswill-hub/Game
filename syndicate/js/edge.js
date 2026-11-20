@@ -4,22 +4,22 @@
   const G = window.G, ui = G.ui, MAX = 5;
   const melee = ab => ab.type === 'melee' && !ab.spell, spell = ab => ab.spell || ab.type === 'proj' || ab.type === 'aoe' || ab.type === 'line';
   const E = G.EDGE = {
-    fighter: { name: 'Momentum', col: '#e0b040', desc: 'Every blow that lands adds one. Taking a blow loses one. Each pip is +6% damage; at five the next ability or heavy blow is a Crushing Blow that knocks them flat.' },
+    fighter: { name: 'Momentum', col: '#e0b040', desc: 'Every blow that lands adds one. Taking a blow loses one. Each pip is +4% damage; at five the next ability or heavy blow is a Crushing Blow that knocks them flat.' },
     rogue: { name: 'Openings', col: '#9fe8ff', desc: 'A perfect dodge or a parry adds two; a blow lands for one, or two from the side or behind. At five your next blow is a guaranteed critical.' },
-    sorcerer: { name: 'Overcharge', col: '#ff8a2a', desc: 'Every spell adds one. At five the next spell is Overcharged for +60% damage.' },
+    sorcerer: { name: 'Overcharge', col: '#ff8a2a', desc: 'Every spell adds one. At five the next spell is Overcharged for +45% damage.' },
     cleric: { name: 'Devotion', col: '#ffe08a', desc: 'Every blow that lands adds one. At five the Light answers: you heal a tenth of your health and take a ward.' },
     druid: { name: 'Wild Bond', col: '#8fd66a', desc: 'Every blow that lands adds one. At five your next blow roots them to the spot for a second and a half.' },
-    warlock: { name: 'Debt', col: '#b070ff', desc: 'Every spell adds one, and each pip is +5% damage. At five your next blow collects: you heal half of what it deals.' }
+    warlock: { name: 'Debt', col: '#b070ff', desc: 'Every spell adds one, and each pip is +3% damage. At five your next blow collects: you heal half of what it deals.' }
   };
   const api = () => G.fight.edgeApi, clsOf = e => (e && E[e.cls]) ? e.cls : null, lvOf = e => e && e.isPlayer && G.state && G.state.hero ? (G.state.hero.edgeLv || 0) : e && e.level >= 7 ? 1 : 0, big = e => lvOf(e) >= 2 ? 1.5 : 1;
   const add = (e, n) => { const c = clsOf(e); if (!c || G.fight.ex) return; const was = e.edge || 0; e.edge = Math.max(0, Math.min(MAX, was + n)); if (e.edge === MAX && was < MAX) { const X = api(); X.text(e, E[c].name.toUpperCase() + ' READY', E[c].col, true); G.sfx('buff'); } };
   G.edge = {
     gain(e, why) { const c = clsOf(e); if (!c) return; if (why === 'cast' && (c === 'sorcerer' || c === 'warlock')) add(e, 1); if ((why === 'dodge' || why === 'parry') && c === 'rogue') add(e, 2); },
     pre(att, tgt, ab) { const c = clsOf(att); if (!c) return null; const n = att.edge || 0, full = n >= MAX, r = { mul: 1 };
-      const B = big(att); if (c === 'fighter') { r.mul = 1 + n * 0.06; if (full && (ab.heavy || !ab.basic)) { r.mul *= 1 + 0.4 * B; r.pay = 'crush'; } }
+      const B = big(att); if (c === 'fighter') { r.mul = 1 + n * 0.04; if (full && (ab.heavy || !ab.basic)) { r.mul *= 1 + 0.4 * B; r.pay = 'crush'; } }
       if (c === 'rogue' && full) { r.crit = true; r.pay = 'open'; if (B > 1) r.mul = 1.25; }
-      if (c === 'sorcerer' && full && spell(ab)) { r.mul = 1 + 0.6 * B; r.pay = 'over'; }
-      if (c === 'warlock') { r.mul = 1 + n * 0.05; if (full) r.pay = 'collect'; }
+      if (c === 'sorcerer' && full && spell(ab)) { r.mul = 1 + 0.45 * B; r.pay = 'over'; }
+      if (c === 'warlock') { r.mul = 1 + n * 0.03; if (full) r.pay = 'collect'; }
       if (c === 'druid' && full) r.pay = 'root';
       return r; },
     post(att, tgt, ab, dmg, r) { const X = api(), ca = clsOf(att), ct = clsOf(tgt); if (!X) return;

@@ -42,7 +42,7 @@ Not done:
 Done: caster weapon finishers (fire bolt, eldritch blast, frost, spark, acid, caster staves) and a second finisher for every melee weapon family (sword, axe, mace and hammer, spear, daggers, rapier), picked half the time. A late finisher for every class at Underboss rank (Bent the Wrong Way, Every String Cut, Boiled in the Skin, Made to Pray, Grown Through, Danced to Death), bending joints past where they go. Random finisher events: A Gift From the Stands (the crowd throws you a blade) and The Gibbet Comes Down. New third blows for the longsword (spinning backhand), mace (leaping smash) and halberd (low hooking sweep); left idle, every fighter shows off their weapon. Critical hits can now take the off hand, crack the skull (blunt) or open the belly (blades). Heavy hits now snap the head round and throw the hands for a moment. The stamping finisher and the own-arm finisher were filmed on a crawling and a one-armed opponent and play correctly. The kill camera now stays side-on for the whole finisher and rises over the killer if they would block the view.
 
 
-- Rework the older finishers to use the new joints: finishers can now bend any joint (wrists included), and the six new ones use it; the older ones have not been gone back over.
+- Rework the older finishers to use the new joints: every body that goes down now falls into its own sprawl (arms, elbows, wrists, knees, neck), which applies to every old finisher and every knockout. The older finishers' own choreography has not been rewritten joint by joint.
 - Deeper class mechanics and upgrade trees: each class now has an edge meter (Momentum, Openings, Overcharge, Devotion, Wild Bond, Debt) with five pips on the bout HUD and a note on the Character page. Each class also has a move that spends the whole edge at once (Overrun, Exploit, Release, Sanctify, Call of the Wild, Foreclose) and one more trick from the trainer (Pommel Strike, Caltrops, Shatter, Bane, Moonbeam, Hex). Two upgrades for it on the Character page: Ready (level 3, 150 coin: start every bout with two pips) and Deep (level 6, 400 coin: every payout half again as big). Opponents of level 7 and up start with two pips.
 - Stances in motion: six stances ran through real bouts with no errors (tests/stances-in-bout.js), but the bout camera is too far out to judge how each one looks moving; still worth a look in play.
 
@@ -51,7 +51,7 @@ Done: caster weapon finishers (fire bolt, eldritch blast, frost, spark, acid, ca
 Done: once signed, the top line says how many souls you owe David; the intro's spike shot shows bodies hung on the spikes.
 
 
-- Balance: the simulated careers for fighter, rogue, sorcerer and warlock now finish 34 bouts with no deaths (one death each before the edge). Worth a real play to see if it has got too easy.
+- Balance: after the edge was added the simulated careers ran with no deaths; the edge bonuses were trimmed (Momentum 4% a pip, Debt 3%, Overcharge +45%) and a cracked skull no longer cuts their damage. Now: fighter and rogue 0 deaths in 34 bouts, sorcerer 1 in 38, warlock 2 in 42. Worth a real play.
 
 ## Devices
 
