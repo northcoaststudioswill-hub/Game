@@ -1,5 +1,5 @@
-# SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.64 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+# SOOTBORN — Story bible
+Tagline: "Every breath is hers." Current build: v0.65 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -503,3 +503,6 @@ Rule from the author: a 2.5D place is used for story that adds flavour and under
 - **The four days below are named:** Ashgate (41 days after), First Fire (42), The Ledger (43), The Way Out (160). "Day N" is only ever the Assay.
 - Characters may speak relative to their own present ("nine years ago I knelt"). Cards may not.
 - The order everything plays in, and a proposed reordering, are in the project document "SOOTBORN — the script in order, a proposed timeline, and where to spend".
+
+## Order of play (v0.65). This replaces every older "Placement" note.
+Cold open: the Valley (Assay day 40). Prologue to the furnace. The Pairing before the title. Then: **Ashgate** → night: the Table, the lesson, the Drill, No Gloves, the Camp (day 3). **First Fire** → before the ceremony: the Ford (19) → night: what the Assay is, the Island (25), the Standard (26). **The Ledger** → night: the Lamp (28), the Dais (30), the Proctor and On the Ground (31). **The Way Out** → last dream: the Last Night (49), the Keep → END OF PART ONE → the Pinning → Part Two as before. Rule: after the cold open, no thread ever goes backwards. The full table, the people, and the gaps between the writing and the screen are in the master plan document.

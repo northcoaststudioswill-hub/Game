@@ -4616,12 +4616,7 @@ const DREAM1 = () => [
   { narr: 'Then Brand, in a sealed pump room, every day for three years.' },
   { fade: 'out' }, { panel: null },
   { card: 'TWO YEARS AFTER THE FURNACE', sub: 'A sealed pump room. Brand.', big: 1, min: 1.4, max: 4 }, { brawl: () => FF.drill() },
-  { card: 'Three years of that.', sub: 'Then they sent him up Lift Zero under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
-  { card: 'THE ASSAY', sub: 'Four years after the furnace. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }
-];
-const DREAM2 = () => [
-  { fx: () => { World.gilded = 1; } },
-  { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
+  // the second year, with the gloves off (it used to be dreamed a night later, after things that happen after it)
   { panel: 'gild' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'The second year. I could walk. I could say "granted" without tasting it. I still wore the gloves.' },
   { say: 'brand', t: 'Take them off.' },
@@ -4635,13 +4630,30 @@ const DREAM2 = () => [
   { say: 'brand', t: 'I hit a welder in the back once, for humming. He did not turn round. He finished the bar he was on. I have thought about that bar every day since.' },
   { say: 'brand', t: 'When you get up there, boy, do not let them teach you it was ever a fair fight. It was never a fight. That is what the halberds are for.' },
   { fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; } },
-  { fade: 'out' },
+  { fade: 'out' }, { panel: null },
+  { card: 'Three years of that.', sub: 'Then they sent him up Lift Zero under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
+  // then the lift opens on grass: the first days of the Assay
+  { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'Four years after the furnace the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },
+  { pstage: 3 }, { wait: 1.2 },
+  { narr: 'A Proctor reads out a dead boy\'s name. I answer to it. Nobody looks twice. Ilse was right about that: they do not look at each other, only at what the other is worth.' },
+  { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
+  { narr: 'On the third day House Violet still had not eaten. Forty heirs, a river, a wood full of deer. I had expected to hate them. I had not expected to have to feed them.' },
+  { fade: 'out' }, { panel: null }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day three.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },
+  { panel: 'assay' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+  { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
+  { fade: 'out' }, { panel: null }
+];
+const DREAM2 = () => [
+  { fx: () => { World.gilded = 1; } },
+  { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
+  // what the Assay is, and then its middle: the Island and the Standard
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'The Assay. Every year the Accredited put their heirs, the year they come of age, into a walled valley with real steel and no rule that matters, and wait to see who walks out leading the rest.' },
   { pstage: 1 }, { wait: 2.2 },
   { narr: 'Twelve Houses. Twelve standards. Take another House\'s standard and its cadets are yours. Take the keep on the ridge and it is over.' },
   { pstage: 2 }, { wait: 1.4 },
-  { narr: 'They put me in Violet. Teal holds the river. For forty days we have been taking each other apart.' },
+  { narr: 'They put me in Violet. Teal holds the river. For twenty-five days we have been taking each other apart.' },
   { pstage: 3 }, { wait: 1.4 },
   { narr: 'The Proctors watch from the dais and write it all down. The winner is not given a prize. He is given a post: the Spire, the Array, the count of who breathes.' },
   { narr: 'That is why I am up here. I did not come to win their game. I came to be handed the keys.' },
@@ -4651,7 +4663,14 @@ const DREAM2 = () => [
   { narr: 'And for one breath the dream slips further. A book as wide as a table. Columns of names. A pen in my hand, and gold on my cuff.' },
   { pstage: 1 }, { wait: 1.4 },
   { narr: 'I do not know yet what the red lines mean. I know my hand is very steady, and that I hate it.' },
-  { fade: 'out' }, { panel: null }
+  { fade: 'out' }, { panel: null },
+  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 },
+  { panel: 'island' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'House Teal held the island in the river, and the island held the only pump house in the valley. Their lamps ran off its vent stack. So did the Proctors\' boots. So did everything.' },
+  { narr: 'An apprentice kept the stack at night. Grey coat, no House. She stood with one hand flat on the pipe, the way you stand when you are listening to it.' },
+  { narr: 'I had not known anyone above the rock did that.' },
+  { fade: 'out' }, { panel: null }, { mission: 'raid' },
+  { card: 'MORNING', sub: 'The Assay. Day twenty-six. They have come for it.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() }
 ];
 const DREAM3 = () => [
   { fx: () => { World.gilded = 1; } },
@@ -5200,28 +5219,13 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
-    ...(NOFF ? [] : DREAM2()), ...(NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }]), { card: NOFF ? 'FOUR YEARS AFTER THE FURNACE' : 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
+    ...(NOFF ? [] : DREAM2()), 
     { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
 
 // the Proctor duel plays before the ceremony: the night Kael learns what the Authority takes, cut against the night he takes something back
-{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Night twenty-eight.', big: 1, min: 1.5, max: 4.5 }, { mission: 'lamp' }, { card: 'NIGHT THIRTY', sub: 'The Assay. The night before day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { mission: 'dais' }, { card: 'MORNING', sub: 'The Assay. Day thirty-one. He has noticed the page.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() },
-    { brawl: () => FF.voss2d() },
-    { music: 'mystery' }, { panel: 'voss' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
-    { narr: 'Nobody touches a Proctor. It is the first rule of the Assay, and the only one they have ever enforced.' },
-    { say: 'voss', t: 'You cannot. There is no line for this. There is no column. Nobody has ever needed one.' },
-    { say: 'kael', t: 'Then one will have to be added.' },
-    { sfx: 'heart' }, { wait: 0.8 }, { sfx: 'pillar' }, { flash: '#ffffff' }, { pstage: 1 }, { wait: 1.6 },
-    { narr: 'Forty cadets of Violet and thirty of Teal watched a Proctor go down in the mud, and learned in one breath what my tier has never been allowed to learn. They fall over like anybody.' },
-    { pstage: 2 }, { wait: 1.2 },
-    { narr: 'What I took from him. First the boots. Thirty days I had watched them hang over us, humming. They are lighter than they look. It took me nineteen days to stop falling out of the sky.' },
-    { narr: 'Then the seal on his collar. It opens the cache. That night I broke a white ribbon and fed seventy people the bread and salve that had sat forty paces from them for a month.' },
-    { narr: 'There was a strip of paper in the boot. A sum, a patron\'s mark, and "Violet to finish below." So I knew whose debt Corin Ashby had been paying.' },
-    { pstage: 3 }, { wait: 1.6 },
-    { narr: 'Last, the cloak. White, and gold at the hem. I wore it back down the ridge with his blood on it, and nobody on the dais came down to take it off me.' },
-    { narr: 'From that night they did not follow the House. They followed the cloak. I have thought since that it is all a Proctor ever was. A man, and something white to stand in.' },
-    { fx: () => { G.flags.fury = (G.flags.fury || 0) + 2; } }, { fade: 'out' }, { panel: null }]).concat(f0()); }; }
+{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'THE ASSAY', sub: 'Four years after the furnace. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }]).concat(f0()); }; }
 
 // ---- src/day3.js
 // SOOTBORN — Day 3: The Ledger. Told as an illustrated chapter: panels, choices, one fight under the floor, and a dream.
@@ -5236,28 +5240,28 @@ FF.under = () => ({
 });
 const DREAM4 = () => [
   { fx: () => { World.gilded = 1; } },
-  { card: 'THAT NIGHT', sub: 'It shows him the day he arrives.', min: 1.4, max: 4 },
-  { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
-  { narr: 'Four years after the furnace the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },
-  { pstage: 3 }, { wait: 1.2 },
-  { narr: 'A Proctor reads out a dead boy\'s name. I answer to it. Nobody looks twice. Ilse was right about that: they do not look at each other, only at what the other is worth.' },
-  { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
-  { narr: 'On the third day House Violet still had not eaten. Forty heirs, a river, a wood full of deer. I had expected to hate them. I had not expected to have to feed them.' },
-  { fade: 'out' }, { panel: null }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day three.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },
-  { panel: 'assay' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
-  { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
+  { card: 'THAT NIGHT', sub: 'Further in than it has gone before.', min: 1.4, max: 4 },
+  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Night twenty-eight.', big: 1, min: 1.5, max: 4.5 }, { mission: 'lamp' }, { card: 'NIGHT THIRTY', sub: 'The Assay. The night before day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { mission: 'dais' }, { card: 'MORNING', sub: 'The Assay. Day thirty-one. He has noticed the page.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() },
+    { brawl: () => FF.voss2d() },
+    { music: 'mystery' }, { panel: 'voss' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
+    { narr: 'Nobody touches a Proctor. It is the first rule of the Assay, and the only one they have ever enforced.' },
+    { say: 'voss', t: 'You cannot. There is no line for this. There is no column. Nobody has ever needed one.' },
+    { say: 'kael', t: 'Then one will have to be added.' },
+    { sfx: 'heart' }, { wait: 0.8 }, { sfx: 'pillar' }, { flash: '#ffffff' }, { pstage: 1 }, { wait: 1.6 },
+    { narr: 'Forty cadets of Violet and thirty of Teal watched a Proctor go down in the mud, and learned in one breath what my tier has never been allowed to learn. They fall over like anybody.' },
+    { pstage: 2 }, { wait: 1.2 },
+    { narr: 'What I took from him. First the boots. Thirty days I had watched them hang over us, humming. They are lighter than they look. It took me nineteen days to stop falling out of the sky.' },
+    { narr: 'Then the seal on his collar. It opens the cache. That night I broke a white ribbon and fed seventy people the bread and salve that had sat forty paces from them for a month.' },
+    { narr: 'There was a strip of paper in the boot. A sum, a patron\'s mark, and "Violet to finish below." So I knew whose debt Corin Ashby had been paying.' },
+    { pstage: 3 }, { wait: 1.6 },
+    { narr: 'Last, the cloak. White, and gold at the hem. I wore it back down the ridge with his blood on it, and nobody on the dais came down to take it off me.' },
+    { narr: 'From that night they did not follow the House. They followed the cloak. I have thought since that it is all a Proctor ever was. A man, and something white to stand in.' },
+    { fx: () => { G.flags.fury = (G.flags.fury || 0) + 2; } }, { fade: 'out' }, { panel: null },
   { fade: 'out' }, { panel: 'ante' }, { pstage: 5 }, { fade: 'in', spd: 1.2 }, { wait: 0.6 }, { music: 'hum' },
   { narr: 'Further still. The white room again, years on. A wheel under my hands. I am humming, and I do not know it, and across the room a cup stops halfway to her mouth.' },
   { music: null }, { sfx: 'heart' }, { wait: 1 },
   { narr: 'I wake before I see what she does.' }, { music: 'mystery' },
   { fade: 'out' }, { panel: null },
-  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 },
-  { panel: 'island' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
-  { narr: 'House Teal held the island in the river, and the island held the only pump house in the valley. Their lamps ran off its vent stack. So did the Proctors\' boots. So did everything.' },
-  { narr: 'An apprentice kept the stack at night. Grey coat, no House. She stood with one hand flat on the pipe, the way you stand when you are listening to it.' },
-  { narr: 'I had not known anyone above the rock did that.' },
-  { fade: 'out' }, { panel: null }, { mission: 'raid' },
-  { card: 'MORNING', sub: 'The Assay. Day twenty-six. They have come for it.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() },
   { card: 'FORTY-THREE DAYS AFTER THE FURNACE', sub: 'Cinderwell. Under the floor.', big: 1, min: 1.4, max: 4 }
 ];
 function DAY3() {
@@ -5505,6 +5509,7 @@ function DAY4() {
     { say: 'kael', t: 'I\'m told that can be fixed. ...Ta. For coming.' },
     { say: 'ilse', t: 'That is the last time you will say that word for nine years. Enjoy it. It can be fixed, and you will wish it could not. Come along, soot. One does not keep the table waiting.' },
     { fade: 'out' }, { panel: null },
+    ...(NOFF ? [] : [{ fx: () => { World.gilded = 1; } }, { card: 'THAT NIGHT', sub: 'The last dream below. It runs to the end.', min: 1.4, max: 4 }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }, { card: 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => FF.keep() }]),
     { card: 'END OF PART ONE', sub: 'B E L O W', big: 1, sfx: 'splash', min: 2.6, max: 7 },
     ...(NOFF ? [] : [
       { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() }
@@ -7093,9 +7098,9 @@ const Menus = {
         ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
         ['Prologue · Lift Zero, the furnace, the Pairing', () => { fresh(); Game.onHeistDone(); }],
         ['Ashgate (41 days after) · wake up', () => { fresh(); Game.startPresent(); }],
-        ['After Ashgate · the dream (gilding, the lesson, the Drill, the Ford)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), load('day2')); }],
+        ['After Ashgate · the dream (the Table, the lesson, the Drill, No Gloves, the Camp)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), load('day2')); }],
         ['End of Part One · the last dream, then the Fall', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM3().concat([{ brawl: () => FF.fall() }]), () => Game.toTitle()); }],
-        ['After First Fire · the dream of the Assay, then the Keep', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2().concat([{ brawl: () => FF.keep() }]), () => Game.toTitle()); }],
+        ['After First Fire · the dream (what the Assay is, the Island, the Standard)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2().concat([{ brawl: () => FF.keep() }]), () => Game.toTitle()); }],
         ['First Fire (42 days after) · morning', load('day2')],
         ['First Fire · lantern built, festival next', load('fest')],
         ['First Fire · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
@@ -7170,7 +7175,7 @@ const Menus = {
   chapters() { const go = f => () => { UI.clear(); f(); }; UI.push(modal({ title: 'Chapter select', build(b) { b.innerHTML = '<p>Replay any chapter. Your save slots are not touched until the game autosaves.</p>'; }, items: [{ label: 'Part One · from the beginning', act: () => Menus.newGame() }, ...[1, 2, 3, 4, 5].map(n => ({ label: `Part Two · ${n} · ${P2_TITLES[n]}`, act: go(() => playPart2(n)) })), { label: 'Back', act: () => UI.pop() }] })); },
   memories() { let L = []; try { L = JSON.parse(Store.get('sootborn_mem') || '[]'); } catch (e) { } UI.push(modal({ title: 'Memories', build(b) { b.innerHTML = '<p style="opacity:.7">Mara keeps them on the shelf, beside the tins. ' + L.length + ' kept so far.</p>' + (L.map(m => `<div class="card"><b>${esc(m[0])}</b><p>${esc(m[1])}</p><p style="opacity:.55">${esc(m[2] || '')}</p></div>`).join('') || '<p>None yet. They come back to him in fights.</p>'); }, items: [{ label: 'Back', act: () => UI.pop() }] })); },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.64. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.65. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p><b>The three third-person levels</b> (Riser Nine, the High Docks, the Stair): tap A for light cuts; keep A held for three heavy blows; at full fury a held A is ELEVEN. KICK kicks, twice for the Wide Cut. HOOK throws the hook line. JUMP jumps, held it hovers, and A in the air dives. LUNGE is the boots along the ground. B dodges. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>

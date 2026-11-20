@@ -1,8 +1,9 @@
-# SOOTBORN — open list 
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.64 (2026-11-19).
+# SOOTBORN — open list
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.65 (2026-11-19).
 
 ## Waiting on you
-- **The proposed timeline** (see "the script in order, a proposed timeline, and where to spend"): the Assay would run day 3 → 19 → 25 → 26 → 28 → 30 → 31 → 49 → last day across the four nights, with training all on the first night. Nothing moves until you say yes.
+- **The reorder is in (v0.65).** Play it and say if any night now feels too long. The old game is kept as its own artifact and as a tag.
+- **The boots:** he takes them on day 31 and cannot fly until the last day. Either he flies from the Valley on, or a line says they have no charge. Your call.
 - **Your notes from playing to the Stair** (v0.63): send them when ready.
 - **The budget split** in the same document: say if you want it weighted differently.
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -25,6 +26,14 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - Controller in the comic levels: both sticks and lock-on now reach the level (v0.55); legend and pause menu on the stick (v0.49). Never tried with a real pad.
 - The second wind's furnace scene in arena fights (v0.54). Levels from the Dev menu starting at their opening (v0.55).
 - v0.56: guards' three blows and their guard (TURNED.); the run's arms; the ring of ships over the Stair; the Scuffle on Row K; the second wind's memory by era; the controller legend in arena fights.
+
+## Matching the writing (from the master plan, v0.65)
+- The seat knife: on Crew Three's belts; the board in Bay 3; counting the knives back at the end of each day.
+- The Proctor's white cloak on Kael from day 31 (Valley, Last Night, Keep).
+- A clerk's coat for Kael on the Spire and at the High Docks; gloves.
+- Oswin's stiff leg as the Auditor's Blade; Lucan's stick.
+- Deliberate animations: hand flat on the pipe (Seren, Kael, Kestrel); soot turn their heads and the Accredited do not; the kneel at the bell; hand to the washer before ELEVEN everywhere; humming sway; Brand and Hollis grounding the halberd; Tavi on the left.
+- Unexplored and worth a scene: Seren tracing the line before Kael did; Hollis and Brand; a memory of Celestine's own Assay; a valve job done with Kestrel.
 
 ## Characters and animation
 0. **The run in the comic levels.** Lean, cape and arms done from stills (v0.53, v0.56). **Next step needs a file from you:** Quaternius's Universal Animation Library (CC0, free) has a real sprint, jog, deaths and sword combos; attach the Standard zip and I will put them on Kael and the guards.

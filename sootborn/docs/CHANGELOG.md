@@ -1,4 +1,29 @@
-# SOOTBORN — changelog (latest v0.64 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.65 · 2026-11-19)
+
+## v0.65 · 2026-11-19 — the reorder: the Assay and the training years now run forward
+You approved the proposed timeline. Nothing was cut and nothing was rewritten except one line; pieces moved.
+
+**What moved**
+- **Ashgate, that night:** the Table, the lesson, the Drill, then **No Gloves** (it used to be dreamed a night later), "three years of that", and then **the Camp** (Assay day 3). The Ford is no longer here.
+- **First Fire, before the ceremony:** **the Ford** (day 19) only. The Lamp, the Dais and the Proctor no longer interrupt the festival.
+- **First Fire, that night:** what the Assay is, then **the Island** (night 25) and **the Standard** (day 26).
+- **The Ledger, that night:** **the Lamp** (28), **the Dais** (30), **the Proctor** and **On the Ground** (31), and the dream still ends on the white room and "I wake before I see what she does".
+- **The Way Out:** after Ilse, one last dream: **the Last Night** (49) and **the Keep**. Then END OF PART ONE, and the Pinning follows the Keep directly.
+- So after the cold open in the Valley, the order is: made (½, 2, 2½ years) → Assay day 3 → 19 → 25 → 26 → 28 → 30 → 31 → 49 → the last day → the Pinning → the Spire.
+- One line changed to fit: the dream that explains the Assay said "for forty days"; it is now told on day twenty-five and says so.
+
+**Going back**
+- The game as it was is kept as a separate playable copy in your artifacts, **"SOOTBORN — v0.64, before the reorder"**, as the tag `v0.64-before-reorder` in the repo, and the old order is written down in the plan.
+
+**The plan document, rewritten** ("the master plan: order, people, gaps, cutscenes, grades, budget")
+- The order as it now plays, and as it was.
+- **People:** every named character with a short bio, what is told, what is not, and what they are for in play (a fight, a level, or somebody standing in the world).
+- **Where the game does not match its own writing:** nobody below carries the seat knife the story is built on; Kael never wears the Proctor's white cloak; he has the boots nine days before he can fly; as a clerk he is still in Assay plate; Oswin's leg; Lucan's stick.
+- **Eight deliberate animations** that would tell the story cheaply (hand flat on the pipe; counting the knives back; who turns their head).
+- **Cutscenes graded** one by one for writing and art, with what I would want to see. Overall: writing A−, art B−.
+- The game graded part by part with cost, and a revised split of where to spend.
+
+**Checked:** the whole-story bot from New Game to THE END in the new order, no errors; the page loads clean. **Not checked:** by hand; whether any line elsewhere still talks about a dream as though it came in the old order (I changed the one I found and did not read every line for it); the Dev menu's dream entries were relabelled but not each played.
 
 ## v0.64 · 2026-11-19 — one clock: every card counts from the furnace; the days below have names
 From your notes: the time cards do not make sense ("four years later", "two years before") because the point they count from keeps moving; the little menus still say Day 1, Day 2 from when there were going to be four days; run a bot through the whole story to see how it flows, then lay it out, propose a better timeline, and grade the game.

@@ -247,12 +247,7 @@ const DREAM1 = () => [
   { narr: 'Then Brand, in a sealed pump room, every day for three years.' },
   { fade: 'out' }, { panel: null },
   { card: 'TWO YEARS AFTER THE FURNACE', sub: 'A sealed pump room. Brand.', big: 1, min: 1.4, max: 4 }, { brawl: () => FF.drill() },
-  { card: 'Three years of that.', sub: 'Then they sent him up Lift Zero under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
-  { card: 'THE ASSAY', sub: 'Four years after the furnace. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }
-];
-const DREAM2 = () => [
-  { fx: () => { World.gilded = 1; } },
-  { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
+  // the second year, with the gloves off (it used to be dreamed a night later, after things that happen after it)
   { panel: 'gild' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'The second year. I could walk. I could say "granted" without tasting it. I still wore the gloves.' },
   { say: 'brand', t: 'Take them off.' },
@@ -266,13 +261,30 @@ const DREAM2 = () => [
   { say: 'brand', t: 'I hit a welder in the back once, for humming. He did not turn round. He finished the bar he was on. I have thought about that bar every day since.' },
   { say: 'brand', t: 'When you get up there, boy, do not let them teach you it was ever a fair fight. It was never a fight. That is what the halberds are for.' },
   { fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; } },
-  { fade: 'out' },
+  { fade: 'out' }, { panel: null },
+  { card: 'Three years of that.', sub: 'Then they sent him up Lift Zero under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
+  // then the lift opens on grass: the first days of the Assay
+  { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'Four years after the furnace the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },
+  { pstage: 3 }, { wait: 1.2 },
+  { narr: 'A Proctor reads out a dead boy\'s name. I answer to it. Nobody looks twice. Ilse was right about that: they do not look at each other, only at what the other is worth.' },
+  { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
+  { narr: 'On the third day House Violet still had not eaten. Forty heirs, a river, a wood full of deer. I had expected to hate them. I had not expected to have to feed them.' },
+  { fade: 'out' }, { panel: null }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day three.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },
+  { panel: 'assay' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+  { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
+  { fade: 'out' }, { panel: null }
+];
+const DREAM2 = () => [
+  { fx: () => { World.gilded = 1; } },
+  { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
+  // what the Assay is, and then its middle: the Island and the Standard
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'The Assay. Every year the Accredited put their heirs, the year they come of age, into a walled valley with real steel and no rule that matters, and wait to see who walks out leading the rest.' },
   { pstage: 1 }, { wait: 2.2 },
   { narr: 'Twelve Houses. Twelve standards. Take another House\'s standard and its cadets are yours. Take the keep on the ridge and it is over.' },
   { pstage: 2 }, { wait: 1.4 },
-  { narr: 'They put me in Violet. Teal holds the river. For forty days we have been taking each other apart.' },
+  { narr: 'They put me in Violet. Teal holds the river. For twenty-five days we have been taking each other apart.' },
   { pstage: 3 }, { wait: 1.4 },
   { narr: 'The Proctors watch from the dais and write it all down. The winner is not given a prize. He is given a post: the Spire, the Array, the count of who breathes.' },
   { narr: 'That is why I am up here. I did not come to win their game. I came to be handed the keys.' },
@@ -282,7 +294,14 @@ const DREAM2 = () => [
   { narr: 'And for one breath the dream slips further. A book as wide as a table. Columns of names. A pen in my hand, and gold on my cuff.' },
   { pstage: 1 }, { wait: 1.4 },
   { narr: 'I do not know yet what the red lines mean. I know my hand is very steady, and that I hate it.' },
-  { fade: 'out' }, { panel: null }
+  { fade: 'out' }, { panel: null },
+  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 },
+  { panel: 'island' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'House Teal held the island in the river, and the island held the only pump house in the valley. Their lamps ran off its vent stack. So did the Proctors\' boots. So did everything.' },
+  { narr: 'An apprentice kept the stack at night. Grey coat, no House. She stood with one hand flat on the pipe, the way you stand when you are listening to it.' },
+  { narr: 'I had not known anyone above the rock did that.' },
+  { fade: 'out' }, { panel: null }, { mission: 'raid' },
+  { card: 'MORNING', sub: 'The Assay. Day twenty-six. They have come for it.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() }
 ];
 const DREAM3 = () => [
   { fx: () => { World.gilded = 1; } },

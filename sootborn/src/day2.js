@@ -533,25 +533,10 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
-    ...(NOFF ? [] : DREAM2()), ...(NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }]), { card: NOFF ? 'FOUR YEARS AFTER THE FURNACE' : 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
+    ...(NOFF ? [] : DREAM2()), 
     { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
 
 // the Proctor duel plays before the ceremony: the night Kael learns what the Authority takes, cut against the night he takes something back
-{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Night twenty-eight.', big: 1, min: 1.5, max: 4.5 }, { mission: 'lamp' }, { card: 'NIGHT THIRTY', sub: 'The Assay. The night before day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { mission: 'dais' }, { card: 'MORNING', sub: 'The Assay. Day thirty-one. He has noticed the page.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() },
-    { brawl: () => FF.voss2d() },
-    { music: 'mystery' }, { panel: 'voss' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
-    { narr: 'Nobody touches a Proctor. It is the first rule of the Assay, and the only one they have ever enforced.' },
-    { say: 'voss', t: 'You cannot. There is no line for this. There is no column. Nobody has ever needed one.' },
-    { say: 'kael', t: 'Then one will have to be added.' },
-    { sfx: 'heart' }, { wait: 0.8 }, { sfx: 'pillar' }, { flash: '#ffffff' }, { pstage: 1 }, { wait: 1.6 },
-    { narr: 'Forty cadets of Violet and thirty of Teal watched a Proctor go down in the mud, and learned in one breath what my tier has never been allowed to learn. They fall over like anybody.' },
-    { pstage: 2 }, { wait: 1.2 },
-    { narr: 'What I took from him. First the boots. Thirty days I had watched them hang over us, humming. They are lighter than they look. It took me nineteen days to stop falling out of the sky.' },
-    { narr: 'Then the seal on his collar. It opens the cache. That night I broke a white ribbon and fed seventy people the bread and salve that had sat forty paces from them for a month.' },
-    { narr: 'There was a strip of paper in the boot. A sum, a patron\'s mark, and "Violet to finish below." So I knew whose debt Corin Ashby had been paying.' },
-    { pstage: 3 }, { wait: 1.6 },
-    { narr: 'Last, the cloak. White, and gold at the hem. I wore it back down the ridge with his blood on it, and nobody on the dais came down to take it off me.' },
-    { narr: 'From that night they did not follow the House. They followed the cloak. I have thought since that it is all a Proctor ever was. A man, and something white to stand in.' },
-    { fx: () => { G.flags.fury = (G.flags.fury || 0) + 2; } }, { fade: 'out' }, { panel: null }]).concat(f0()); }; }
+{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'THE ASSAY', sub: 'Four years after the furnace. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }]).concat(f0()); }; }
