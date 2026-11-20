@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guttercrown State of the Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: the same inspection sheet as the SOOTBORN review, so the two read side by side. Brass marks the crown. */
+:root{
+  color-scheme: dark;
+  --page:#121110; --surface:#1a1a19; --raise:#232220; --line:#34322e;
+  --ink:#f0efec; --ink2:#c3c2b7; --muted:#8f8c84;
+  --gold:#e0b04a;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#9085e9; --c7:#c3c2b7; --c8:#e66767;
+  --good:#0ca30c; --warn:#fab219; --crit:#e66767;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+main{max-width:860px;margin:0 auto;padding:28px 18px 80px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1;letter-spacing:.01em}
+h1{font-size:46px;font-weight:700;text-transform:uppercase;color:var(--gold)}
+h2{font-size:30px;font-weight:600;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h3{font-size:21px;font-weight:600}
+p{margin:0;max-width:68ch}
+a{color:var(--gold)}
+section{display:flex;flex-direction:column;gap:16px}
+.lede{font-size:18px;color:var(--ink2)}
+.meta{color:var(--muted);font-size:13px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.tile b{display:block;font-family:var(--display);font-size:34px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.tile span{font-size:13px;color:var(--ink2)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
+li{max-width:68ch}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.scroll svg{display:block}
+.hint{font-size:12px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.c-good{color:#4cc24c}.c-warn{color:var(--warn)}.c-crit{color:var(--crit)}.c-own{color:var(--gold)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink2)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.score{display:grid;grid-template-columns:minmax(120px,190px) 1fr 34px;gap:4px 10px;align-items:center;font-size:14px}
+.score .bar{height:10px;background:var(--raise);border-radius:5px;overflow:hidden}
+.score .bar i{display:block;height:100%;border-radius:5px}
+.score .n{font-variant-numeric:tabular-nums;color:var(--ink2);text-align:right}
+.score .why{grid-column:1/-1;font-size:13px;color:var(--muted);margin:-2px 0 8px}
+.lanes td,.lanes th{text-align:center;padding:6px 4px;font-size:12px}
+.lanes td:first-child,.lanes th:first-child{text-align:left;white-space:nowrap;font-size:13px;padding-right:12px}
+.lanes td{border:2px solid var(--surface)}
+.lanes .on{background:rgba(224,176,74,.75)}
+.lanes .if{background:repeating-linear-gradient(135deg,rgba(224,176,74,.55) 0 5px,rgba(224,176,74,.15) 5px 10px)}
+.lanes .bg{background:rgba(224,176,74,.22)}
+.vers{display:flex;flex-wrap:wrap;gap:4px}
+.vers span{font-size:11px;font-weight:600;padding:3px 6px;border-radius:3px;color:#0b0b0b;font-variant-numeric:tabular-nums}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+figure img{display:block;width:100%;height:auto;max-width:100%}
+figcaption{padding:9px 12px;font-size:13px;color:var(--ink2)}
+figcaption b{color:var(--ink)}
+.phase{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.phase .n{font-family:var(--display);font-size:34px;font-weight:700;color:var(--gold);line-height:1}
+.phase p{color:var(--ink2);font-size:14.5px}
+.sev{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.flag{border-left:3px solid var(--crit);background:var(--surface);border-radius:0 6px 6px 0;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.flow{display:flex;flex-direction:column;gap:6px}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.step .k{font-family:var(--display);font-size:22px;font-weight:700;color:var(--gold);line-height:1.1}
+.step p{font-size:14.5px;color:var(--ink2)}
+.step b{color:var(--ink)}
+.branch{margin-left:40px;border-left:2px dashed var(--muted);padding-left:12px;font-size:14px;color:var(--ink2)}
+@media (max-width:560px){h1{font-size:36px}h2{font-size:25px}.branch{margin-left:16px}}
+.stage{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)}
+.stage .when{font-family:var(--display);font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold)}
+.stage .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.stage .row img{display:block;width:100%;height:auto;border-radius:4px;border:1px solid var(--line)}
+svg text{font-family:var(--body)}
+</style>
+</head>
+<body>
+<main>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="meta">North Coast Studios × E Concepts · updated 19 November 2026 for the build published at 11:30 am (first review: 18 November, 11:11 pm build)</div>
+  <h1>Guttercrown<br>State of the Game</h1>
+  <p class="lede">Guttercrown is a finished, deep, D&amp;D-flavoured pit-fighting career game with a world worth reading about. Today it gained a reshot opening film, a filmed ending, weapon finishers, real sound, two tavern games and a controller pass. A bug from the sound pass that froze the intro film for new fighters was found and fixed by 11:30. David still needs one serious rethink before anyone outside the studio sees him.</p>
+  <div class="tiles">
+    <div class="tile"><b>110</b><span>commits in 39 hours, 30 of them today</span></div>
+    <div class="tile"><b>6×6</b><span>classes and peoples, 12 subclasses</span></div>
+    <div class="tile"><b>185</b><span>abilities defined</span></div>
+    <div class="tile"><b>12</b><span>named bosses, 9 below and 3 above</span></div>
+    <div class="tile"><b>103</b><span>Codex entries</span></div>
+    <div class="tile"><b>4</b><span>endings, now filmed</span></div>
+  </div>
+  <p class="meta">Sources: the live build (published 11:30 am today) and the Game repo, where Guttercrown lives in <code>syndicate/</code> on the <code>claude/wonderful-euler-4hchee</code> branch with its README, <code>docs/NEXT.md</code>, <code>docs/BALANCE.md</code>, <code>docs/LORE.md</code> and full commit history. The repo bundles three.js, so this time I rendered the real 3D: the intro film, the market, a live bout and the ending film. I stepped the game by script; I didn't play it by hand or listen to it. Scores are my judgment.</p>
+</header>
+
+<section>
+  <h2>Since last night</h2>
+  <div class="grid2">
+    <div class="card"><h3>Added or improved (30 commits, 5:36 to 11:30 am)</h3>
+      <ul>
+        <li><b>Finishers everywhere:</b> nine weapon finishers (the thrown spear, legs-then-skull, the lodged mace…), two racial finishers per people, casting finishers (melt, unravel, pillar of salt), and animal-form and environmental kills (spikes, fire vent).</li>
+        <li><b>Fighting look:</b> per-weapon swings and guards, combo flourishes, directional dodge and flinch, robes that move, sand on knockback, a unique trait for every weapon.</li>
+        <li><b>The opening film, reshot:</b> 22 shots, about two minutes, with Tallow Row, the spiked pit, Marc's table, the war with Eireania and David in the Hour Garden. Tap advances a shot, hold skips the film.</li>
+        <li><b>A filmed ending:</b> seven shots after the Queen falls, with one shot particular to your ending.</li>
+        <li><b>Sound:</b> room reverb by place, weapon-specific hits, a crowd that follows the hype, a hush before a kill. No audio files.</li>
+        <li><b>Sound fix (11:20):</b> a first bout on a phone broke up the audio and stalled input. Now there's a hard cap on live voices (10 on touch devices, 22 elsewhere), rate limits on every sound, an output limiter, a single reverb (none on phones), and a light mode it drops into by itself if the page falls behind. A new <code>tests/sound-stress.js</code> covers it.</li>
+        <li><b>Sound, back to basics (11:28):</b> the crowd murmur and reactions were filtered noise, and the limiter turned them into static on a phone. The noise crowd, the echo and the limiter are gone; the crowd is back to how it was before this morning. Weapon hits, finisher sounds, heartbeat, garden and throne sounds stay, capped and rate-limited.</li>
+        <li><b>Intro fix (11:30):</b> the weapon lookup is guarded, hit sounds can no longer throw, and the main loop always schedules its next frame, so one error can't freeze the game again. A new test, <code>tests/cine-plays-through.js</code>, plays the film with no fighter.</li>
+        <li><b>New games:</b> the Knuckle Table and the Knife Board on Tallow Row.</li>
+        <li><b>Hour Garden:</b> souls fight each other first, attacks on you are staggered, and giving up warns you twice.</li>
+        <li><b>Phone and controller:</b> a simulated-gamepad test of the whole opening, and pinned closing rows on long cards.</li>
+        <li><b>Speed:</b> each figure welded per joint (about 57 draw calls down to 33), and the market from about 500 to 310.</li>
+        <li><b>Balance:</b> named fighters +7% health and +5% damage to offset the new traits, pasts and natures.</li>
+      </ul></div>
+    <div class="card"><h3>From last night's list</h3>
+      <ul>
+        <li><span class="chip c-good">Fixed</span> Random names no longer include Kael (Sorrel remains).</li>
+        <li><span class="chip c-good">Better</span> The war and David's history now appear in the opening film, not only in a monologue.</li>
+        <li><span class="chip c-good">Better</span> The repo bundles three.js, so the repo copy runs offline. The published page still loads it from a CDN.</li>
+        <li><span class="chip c-good">Better</span> The repo now has tests: a controller run, filmed bouts, filmed cinematics and filmed endings.</li>
+        <li><span class="chip c-crit">Not yet</span> David is unchanged, and the opening film now gives him a shot on a gold throne.</li>
+        <li><span class="chip c-crit">Not yet</span> The five Player's Handbook subclass names are unchanged.</li>
+        <li><span class="chip c-warn">Not yet</span> Vexa still hits softer than the two gates before her.</li>
+        <li><span class="chip c-good">Fixed</span> The intro-film freeze from the 11:03 sound pass, fixed at 11:30. I re-ran the film on the 11:30 build and it plays through to the builder.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Where it stands</h2>
+  <div class="grid2">
+    <div class="card"><h3>What exists</h3>
+      <ul>
+        <li><b>A fighter builder</b> in six steps: class, blood (people), past, nature, arts (cantrip and technique), steel. Every weapon now has its own trait.</li>
+        <li><b>A walkable undercity market</b> with about 20 places and people: the Pit, the Fence, Marc, the Wisp Table, the Low Lamp, the Long Stair, stalls, the Oracle's cellar, and Tallow Row down to your hideout, with the Knuckle Table and the Knife Board.</li>
+        <li><b>Real-time one-on-one bouts</b> in a 3D isometric pit: stamina, guard, posture, counters, perfect dodges, heavy blows, mortal blows, a crowd meter.</li>
+        <li><b>A career</b>: undercard bouts, nine gates, the crown, defences, then three bouts up the Long Stair and a filmed ending.</li>
+        <li><b>A management layer</b>: hideout building with comfort and perks, a crew (the Tally) on jobs and raids, gear grades, weapon mastery, contracts, loans, gambling.</li>
+        <li><b>A villain thread</b>: David Roseinbeirg, who revives you, binds you after three deaths, and wants the throne.</li>
+      </ul></div>
+    <div class="card"><h3>What that means</h3>
+      <ul>
+        <li>This is the more complete of your two games. Every system has an end state, and there is a credits-worthy ending.</li>
+        <li>Three balance passes are logged, one "after play on a controller", and per the README, simulated careers for all six classes reach the crown with no script errors.</li>
+        <li>The weak points are unchanged: clarity (too many layers before each bout), a thin middle of the climb, code that is getting harder to change safely, and one content problem that has to be fixed before release. Plus one new regression from this morning.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Frames from today's build</h2>
+  <p class="meta">Rendered from the 11:03 am build with its own three.js at 1000×600, stepped by script. The fight frames use the repo's own tracking camera from <code>tests/bout.js</code>.</p>
+  <div class="shots">
+    <figure><img src="img2/title3d.jpg" alt="Guttercrown title over the 3D pit" loading="lazy"><figcaption><b>Title.</b> The logo over the real pit, two fighters circling. A strong first frame.</figcaption></figure>
+    <figure><img src="img2/intro-market.jpg" alt="Intro film shot of the Lamp Market" loading="lazy"><figcaption><b>Intro: the Lamp Market.</b> The First Lamp, the stalls, the crowd.</figcaption></figure>
+    <figure><img src="img2/intro-tallow.jpg" alt="Intro film shot of Tallow Row" loading="lazy"><figcaption><b>Intro: Tallow Row.</b> "Down Tallow Row the ones who owe live door to door." New today.</figcaption></figure>
+    <figure><img src="img2/intro-pit.jpg" alt="Intro film shot in the pit with a fire spell" loading="lazy"><figcaption><b>Intro: the pit montage.</b> Real abilities in a scripted bout. Shot 11 is where today's crash hits.</figcaption></figure>
+    <figure><img src="img2/intro-marc.jpg" alt="Intro film shot of the champion with two blades" loading="lazy"><figcaption><b>Intro: the champion.</b> Crowned, two blades, under the Guild banners.</figcaption></figure>
+    <figure><img src="img2/intro-david.jpg" alt="Intro film shot of David on a gold throne" loading="lazy"><figcaption><b>Intro: David.</b> On a gold throne in a black hat, "while he watches from his gold". See the flag below.</figcaption></figure>
+    <figure><img src="img2/builder.jpg" alt="Six-step fighter builder over the 3D street" loading="lazy"><figcaption><b>The builder.</b> Six steps over the lit street. The fighter's Fire Bolt is now intended: every class gets one cantrip.</figcaption></figure>
+    <figure><img src="img2/market.jpg" alt="The Lamp Market from the isometric camera" loading="lazy"><figcaption><b>The market.</b> Isometric 3D, warm lamps, three wanderers instead of six since this morning.</figcaption></figure>
+    <figure><img src="img2/bout1.jpg" alt="Close tracking shot of a fighter against an axe fighter" loading="lazy"><figcaption><b>A bout, close.</b> Per-weapon stances, shields, blood on the sand.</figcaption></figure>
+    <figure><img src="img2/bout2.jpg" alt="Close tracking shot of a longsword strike with a blade wake" loading="lazy"><figcaption><b>A strike.</b> Blade wake and flinch. A story line ("a clock has started ticking") sits across the top of the fight.</figcaption></figure>
+    <figure><img src="img2/end-hall.jpg" alt="The ending film in the throne hall" loading="lazy"><figcaption><b>The ending film.</b> The throne hall and the crown. "Nine hundred steps of white stone."</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>How it looked: from the first build to today</h2>
+  <p>Each row is an old version checked out of the repo and run as it was then, with the same script: the title, the fighter builder or market, and the start of a bout. Times are Eastern. Read top to bottom to see the game find its look in about 39 hours.</p>
+  <div>
+<div class="stage"><div class="when">Nov 17 · 8:59 pm · commit c3400d5</div><h3>"Underground Syndicate": painted 2D</h3><p>The first slice is 2D. Painted art from the art-direction handoff is the backdrop for the title, the market (places marked on the picture) and the pit, with a small figure on top. Four classes, five fighters.</p><div class="row"><img src="img4/c3400d5-1title.jpg" alt="Painted title screen reading Underground Syndicate" loading="lazy"><img src="img4/c3400d5-4hub.jpg" alt="Painted market with labelled places and a small knight" loading="lazy"><img src="img4/c3400d5-5fight.jpg" alt="Painted pit arena with health bars" loading="lazy"></div></div>
+<div class="stage"><div class="when">Nov 17 · 9:54 pm · 64183c9</div><h3>Rebuilt in real 3D</h3><p>An hour later it is rebuilt as true isometric 3D on three.js: a lit stone pit, a blocky street, a model you can turn in the builder. Playable in phone portrait and on a desktop.</p><div class="row"><img src="img4/64183c9-1title.jpg" alt="First 3D title over a tiled pit" loading="lazy"><img src="img4/64183c9-4hub.jpg" alt="First 3D street with stalls" loading="lazy"><img src="img4/64183c9-5fight.jpg" alt="First 3D bout card against Grubb" loading="lazy"></div></div>
+<div class="stage"><div class="when">Nov 17 · 10:07 pm · 8771286</div><h3>It becomes Guttercrown</h3><p>The new name, the red-and-gold logo and the carved stone menu arrive. The studio boot and an opening film follow within the hour.</p><div class="row"><img src="img4/8771286-1title.jpg" alt="First Guttercrown title screen" loading="lazy"><img src="img4/8771286-4hub.jpg" alt="The street at the time of the rename" loading="lazy"></div></div>
+<div class="stage"><div class="when">Nov 18 · 12:10 am · 7acc9af</div><h3>The Lamp Market</h3><p>The street becomes a plaza around the First Lamp, with stalls, the Fence, the Guildmaster and Marc's table. The builder sits over the live market.</p><div class="row"><img src="img4/7acc9af-4hub.jpg" alt="The Lamp Market plaza around the First Lamp" loading="lazy"><img src="img4/7acc9af-3builder.jpg" alt="The builder over the market" loading="lazy"></div></div>
+<div class="stage"><div class="when">Nov 18 · 12:49 pm · 7613658</div><h3>Druid, Warlock, finishers, the crowd</h3><p>By midday the builder has six classes, the market has a story line and named regulars, and bouts open with generated challengers like Hesper the Hopeful.</p><div class="row"><img src="img4/7613658-3builder.jpg" alt="Builder with six classes including Druid and Warlock" loading="lazy"><img src="img4/7613658-4hub.jpg" alt="The market at midday with more people" loading="lazy"><img src="img4/7613658-5fight.jpg" alt="Bout card for Hesper the Hopeful" loading="lazy"></div></div>
+<div class="stage"><div class="when">Nov 18 · 11:24 pm · 4f12a2b</div><h3>Last night's reviewed build</h3><p>The pit gets sand, dressed stone and spike walls; the builder becomes six steps; the title gains Watch the Intro. This is the build the first version of this report looked at.</p><div class="row"><img src="img4/4f12a2b-1title.jpg" alt="Title with sand pit and three buttons" loading="lazy"><img src="img4/4f12a2b-3builder.jpg" alt="The stepped builder" loading="lazy"><img src="img4/4f12a2b-5fight.jpg" alt="The sand pit at the start of a bout" loading="lazy"></div></div>
+<div class="stage" style="border-bottom:0"><div class="when">Nov 19 · 11:30 am · today</div><h3>Today</h3><p>Real lighting and shadows, per-weapon fighting, a reshot opening film and a filmed ending. See the frames above.</p><div class="row"><img src="img2/title3d.jpg" alt="Today's title" loading="lazy"><img src="img2/market.jpg" alt="Today's market" loading="lazy"><img src="img2/bout2.jpg" alt="Today's bout" loading="lazy"></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>A content problem to fix first</h2>
+  <div class="flag">
+    <p><b>David Roseinbeirg will very likely be read as an antisemitic caricature.</b> I do not think that is the intent, and it may be a friend's name used as a joke. But a stranger on a Steam page sees all of this together:</p>
+    <ul>
+      <li>a Jewish-sounding surname;</li>
+      <li>a money-lender who owns people through debt ("David lends at a rate that should be a crime");</li>
+      <li>a hidden room full of gold under the city, with rings on his hands;</li>
+      <li>a backstory where two crowns expelled his "house" "in a week, like dogs", after his people profited from both sides of a war;</li>
+      <li>a plan to rule the realm from behind the throne, and long monologues of contempt for every other people.</li>
+    </ul>
+    <p>Each piece is a familiar fantasy villain beat. Together, attached to that name, they match a very old and very recognisable smear, and reviewers will say so. It is also the kind of thing that gets a store page reported.</p>
+    <p><b>The fix keeps the character.</b> Give him a name with no real-world ethnic reading, and move him off money: he trades in time and owed hours (the hourglass houses, the clocks, the Hour Garden already point that way). Owed time instead of owed gold, a room of stopped clocks instead of a room of gold, expelled for breaking time rather than for profiting from a war. If he is named after someone you know, a private in-joke can live in a Codex entry or the credits instead.</p>
+  </div>
+  <p><b>Today it got stronger, not weaker.</b> The reshot opening film puts him on a gold throne in a black hat with the caption "while he watches from his gold", and <code>docs/NEXT.md</code> spells out his plan as making his people "a homeland" so "the Roseinbeirg family can move into the realm's lands". Those lines push the reading further. The design notes say "the discomfort is the point", and a hateful villain is fine; the problem is which real-world people he maps onto.</p>
+  <p class="meta">The royal house name "Koheneim" also echoes a Hebrew word, but on its own, on a ruling queen, it does not carry the same weight.</p>
+</section>
+
+<section>
+  <h2>How the story is layered</h2>
+  <p>Guttercrown tells its story through a career, not chapters. Three threads run under it: the Ledger climb in the pit, David's pact, and the throne above. This is the order a player meets them.</p>
+  <div class="flow">
+    <div class="step"><div class="k">1</div><p><b>Arrive in debt.</b> Build a fighter. Your past sets why you owe the Guild.</p></div>
+    <div class="step"><div class="k">2</div><p><b>The undercard.</b> Two to four bouts against generated names earn each named gate. A fresh set of names is drawn for every new fighter.</p></div>
+    <div class="step"><div class="k">3</div><p><b>Nine gates.</b> Grubb, Dolly Two-Teeth, Sister Maul, Ansel Vane, Kessa Cinderhand, Old Sallow, Brakk Ironjaw, Iron Beatrix, then Vexa for the crown. Ranks run Fresh Meat to Pit Legend.</p></div>
+    <div class="branch">At Enforcer, or at your first death (whichever comes first), David sends for you. Die three times and you are bound ("dying is a signature"). Sign, and you can be bound by choice. Refuse to sign, and he puts you in the Hour Garden: a ten-way brawl against the people you killed.</div>
+    <div class="step"><div class="k">4</div><p><b>The crown.</b> The Ledger never closes: challengers keep coming. If you are David's, your Tally rides out on raids: rob a caravan, harry the tribes, burn a village.</p></div>
+    <div class="step"><div class="k">5</div><p><b>The Long Stair opens</b> after two defences if you are bound, five if you are not. Captain Hale Morrow, then King Vilhelm, then Queen Eerin.</p></div>
+    <div class="step"><div class="k">6</div><p><b>The ending</b> is set by the pact: <b>From the Bottom</b> (never bound), <b>The Vessel</b> (bound and still in debt), <b>The Ash Throne</b> (debt paid, villages burned), <b>Paid in Full</b> (debt paid, nothing burned).</p></div>
+  </div>
+
+  <h3>Which thread is active when</h3>
+  <div class="scroll"><table class="lanes" id="lanes"></table></div>
+  <div class="legend"><span><i style="background:rgba(224,176,74,.75)"></i>on stage</span><span><i style="background:repeating-linear-gradient(135deg,rgba(224,176,74,.55) 0 5px,rgba(224,176,74,.15) 5px 10px)"></i>only on some paths</span><span><i style="background:rgba(224,176,74,.22)"></i>in the background</span></div>
+
+  <div class="grid2">
+    <div class="card"><h3>What the layering gets right</h3>
+      <ul>
+        <li>The throne is present from the first bout through proclamations, the tithe and "a plain cloak". By the time you climb the Stair, you know who is up there.</li>
+        <li>The ending is decided by how you played, and now it is filmed: one shot changes with your ending, and the closing lines name what you did.</li>
+        <li>Losing feeds the story. A death is a step toward David, not a reload.</li>
+        <li>The world reacts to who you are: your people, your trade, your name in other mouths.</li>
+      </ul></div>
+    <div class="card"><h3>Where it loses the thread</h3>
+      <ul>
+        <li><b>The middle is the longest and has the least plot.</b> Gates one to nine are bios and taunts. The named fighters are memorable but they do not change, return or interact.</li>
+        <li><b>The King and Queen appear in person only at the very end.</b> Vilhelm's cloaked visits are hints; one confrontation mid-climb would give the last act weight.</li>
+        <li><b>Vexa's bio promises a hand-over</b> ("still waiting for someone worth handing it to"). The new ending film pays off the throne, but the crown bout itself still has no scene.</li>
+        <li><b>A skilled player can miss most of David.</b> The summons at Enforcer helps, but the Garden, raids and three of four endings need you to be bound.</li>
+      </ul></div>
+  </div>
+
+  <h3>World history, as the Codex tells it</h3>
+  <div class="scroll"><svg id="hist" role="img" aria-label="World history before the game starts"></svg></div>
+  <p>The world has three dated anchors (forty years since the sealing, seven since Vexa, now) and several undated ones. The war now appears in the opening film, but it still has no year, so nobody can say whether David's grudge comes before or after the mines ran dry. One sentence in the Codex would fix that.</p>
+</section>
+
+<section>
+  <h2>Against its sources</h2>
+  <p>Guttercrown's rules come from D&amp;D 5th edition, its loop from pit-fighter career games, and its death mechanic from the roguelite habit of making death part of the story. Here is how faithfully it adapts each, and where it is its own.</p>
+  <div class="scroll"><table>
+    <tr><th>Source idea</th><th>Guttercrown</th><th>Fit</th></tr>
+    <tr><td>Six ability scores</td><td>Kept, with new jobs: Intelligence speeds cooldowns, Charisma earns coin and respect</td><td><span class="chip c-own">Its own</span></td></tr>
+    <tr><td>Dice damage (1d8 + modifier)</td><td>Every blow and spell rolls dice in real time</td><td><span class="chip c-good">Faithful</span></td></tr>
+    <tr><td>Classes and subclasses</td><td>6 of the 12 classes, 2 subclasses each; druid and warlock subclasses are new</td><td><span class="chip c-good">Faithful</span></td></tr>
+    <tr><td>Spell slots</td><td>Replaced by cooldowns and a per-class resource (Stamina, Focus, Mana, Faith)</td><td><span class="chip c-own">Its own</span></td></tr>
+    <tr><td>Levels 1 to 20</td><td>Levels 1 to 10, with feats at set levels</td><td><span class="chip c-warn">Compressed</span></td></tr>
+    <tr><td>Skill checks against a DC</td><td>Street events and Tally jobs roll a score against DC 10 to 14</td><td><span class="chip c-good">Faithful</span></td></tr>
+    <tr><td>Death saves</td><td>No death saves; David brings you back and keeps count</td><td><span class="chip c-own">Better</span></td></tr>
+    <tr><td>Arena career: train, fight, climb</td><td>Undercard, gates, crown, defences, plus home and crew between bouts</td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>Death as story progress (the roguelite "go back to the house")</td><td>Each death is a scene with David; three binds you</td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>A rival who climbs alongside you</td><td>"Moments" include a rival, but the nine gates are one-off</td><td><span class="chip c-warn">Thin</span></td></tr>
+  </table></div>
+
+  <h3>The D&amp;D licence question</h3>
+  <p>The free 5e System Reference Document can be used commercially under a Creative Commons licence with a credit line, and it covers the core rules and many spell names. But it includes only one subclass per class. Under SRD 5.1 the fighter gets the Champion, the rogue the Thief, the sorcerer the Draconic Bloodline, and the cleric the Life Domain. Guttercrown also uses <b>Battle Master, Assassin, Wild Magic, War Domain and Light Domain</b>, which come from the Player's Handbook. Renaming those five (and checking any spell names outside the SRD, like Hex) is cheap insurance before a store page. I am not a lawyer; a short review before release would settle it.</p>
+
+  <h3>Against SOOTBORN</h3>
+  <div class="grid2">
+    <div class="card"><h3>The overlap</h3>
+      <ul>
+        <li>Both are an undercity under a sealed, pristine ruling city, with a ledger of debts, a tithe sent up a stair or lift, and a hero climbing to the top.</li>
+        <li>Names cross over: Kael has gone from the random fighter list today, but <b>Sorrel</b> remains, and Guttercrown still has <b>Hale Morrow</b> and <b>Old Marrow Tibb</b> beside SOOTBORN's Dace Morrow, Marrow and Edric Sorrel.</li>
+      </ul></div>
+    <div class="card"><h3>Why it matters</h3>
+      <ul>
+        <li>If both ship, players will notice the same premise twice. Leaning into one shared universe is an option; otherwise pull the premises apart.</li>
+        <li>At minimum, give Guttercrown's random name lists their own names so a SOOTBORN lead does not turn up as an undercard debtor.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Mechanics</h2>
+  <h3>The climb: who you fight, and how hard they hit</h3>
+  <div class="scroll"><svg id="ladder" role="img" aria-label="Level and damage of the twelve named opponents"></svg></div>
+  <p>Today's balance pass raised every named fighter (+7% health, +5% damage), but the shape is the same: <b>Vexa, the pit champion, hits softer (0.85) than the two gates before her</b> (Brakk 1.03, Beatrix 1.01). She dodges and reacts faster and has an ultimate, so it may still be the hardest fight. Check by play that the crown bout does not feel like a step down.</p>
+
+  <h3>Everything that feeds a single bout</h3>
+  <div class="grid2">
+    <div class="card"><h3>In the pit</h3>
+      <ul>
+        <li><b>Resource and tempo:</b> each swing costs stamina, refunded on a hit. Three clean hits make a finisher.</li>
+        <li><b>Defence:</b> guard, parry window, perfect dodge, posture break, counters on wind-up, punishes on recovery.</li>
+        <li><b>Big moments:</b> heavy blows, wall slams, spike walls, five class finishers each plus weapon, racial, casting, animal-form and environmental finishers, ultimates, the crowd meter and its frenzy.</li>
+        <li><b>Build:</b> 6 classes × 6 peoples × 2 subclasses, 7 pasts, 6 natures, 4 bents, 4 cantrips, 31 weapons with mastery, 13 kits and 12 sets.</li>
+      </ul></div>
+    <div class="card"><h3>Before the pit</h3>
+      <ul>
+        <li><b>Nine preparation slots:</b> tonic, meal, song, scouting, rest, set bonus, charm, contract, a second.</li>
+        <li><b>Home:</b> 34 furniture pieces plus floors, walls and garden; comfort; sleep, train, brew, cook.</li>
+        <li><b>Money:</b> purses, a win streak, ten contracts, Marc's loans, David's loans, six games of chance, bets on other bouts, five grades of gear from the Fence.</li>
+        <li><b>Crew:</b> the Tally runs jobs over several bouts; raids once you are bound.</li>
+      </ul></div>
+  </div>
+  <p>The depth is real, and the combat itself sounds like the most carefully tuned part. The risk is that a new player meets nine preparation slots, twenty market stops and four currencies (coin, chits, wizard gold, respect) before they have learned to parry. The guide, the "what is new" line and the tidy-up pass show you have already felt this.</p>
+</section>
+
+<section>
+  <h2>Scorecard</h2>
+  <p class="meta">My read, out of 5, from the code, the repo and today's 3D frames. Not a measurement. Grey ticks show last night's score.</p>
+  <div class="card"><div class="score" id="score"></div></div>
+</section>
+
+<section>
+  <h2>Succeeding</h2>
+  <ul>
+    <li><b>The writing.</b> Dry, specific, funny. "The chalk crown is to be left where it is." The Codex, proclamations and taunts give the world a voice no system could.</li>
+    <li><b>Systems depth with an end.</b> Every layer leads somewhere: the hideout pays, the Tally feeds raids, the raids decide an ending.</li>
+    <li><b>Death as story.</b> Losing moves the plot instead of costing a reload, and the Hour Garden is a memorable idea.</li>
+    <li><b>Reactivity.</b> Your people and trade change what the market, the Keeper, David and the King say to you.</li>
+    <li><b>Replay.</b> A fresh ladder of names per fighter, an open card, and four endings.</li>
+    <li><b>It has been played, and now it is tested.</b> Three balance passes, one after controller play, simulated careers for every class, and repo scripts that film bouts, cinematics and endings.</li>
+    <li><b>Spectacle.</b> The finisher list is now enormous, and each one ends on a weapon left in the body or a camera beat. The new opening film and ending film give the game a real start and end.</li>
+    <li><b>Platform care.</b> Phone portrait and desktop layouts, safe-area padding, touch, keyboard and pad prompts, a Performance setting.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Lacking</h2>
+  <ul>
+    <li><b>The David content problem</b> above. This is the only item on the list that could sink a release on its own.</li>
+    <li><b>Clarity.</b> Too many layers arrive before the player needs them. Gate systems behind ranks more aggressively.</li>
+    <li><b>Mid-game story.</b> Nine gates of standalone opponents. No returning rival, no ally who changes, the royals offstage.</li>
+    <li><b>Class coverage on the ladder.</b> No named druid and no named drow fighter; three rogues among nine gates.</li>
+    <li><b>The Outlands.</b> The map card says "None of it is any business of yours. Yet." Three raids live there, and that is all.</li>
+    <li><b>Code health.</b> Later modules wrap earlier functions and inject HTML into cards after they render. That works, but every new layer makes the order matter more and changes riskier.</li>
+    <li><b>Offline and resilience.</b> The repo now bundles three.js, but the published page still loads it from a CDN; with no network there, the game shows nothing.</li>
+    <li><b>Checks before publishing.</b> This morning's sound pass went live for half an hour with a crash in the opening film. It now has its own test; running the filming scripts before each publish would catch the next one.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Known bugs and risks</h2>
+  <div class="scroll"><table>
+    <tr><th>Level</th><th>Issue</th><th>Source</th></tr>
+    <tr><td><span class="sev c-good">Fixed 11:30</span></td><td>The opening film stopped at shot 11 of 22 for every new fighter (from the 11:03 sound pass). Fixed with a guard, a safer main loop and a new test. Checked on the 11:30 build: the film plays through.</td><td>Reproduced on 11:03 and 11:20; fixed on 11:30</td></tr>
+    <tr><td><span class="sev c-crit">Fix first</span></td><td>David Roseinbeirg reads as an antisemitic caricature, now also in the opening film (see above)</td><td>Build text and film</td></tr>
+    <tr><td><span class="sev c-crit">Fix first</span></td><td>Five subclass names come from the Player's Handbook rather than the free SRD</td><td>Build data</td></tr>
+    <tr><td><span class="sev c-crit">Check</span></td><td>The published page loads three.js from cdn.jsdelivr.net; the repo's bundled copy isn't used there</td><td>Build head</td></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td>Vexa (0.85) deals less damage than Brakk (1.03) and Beatrix (1.01)</td><td>Build data</td></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td>The market's frame cost is dominated by its animated figures; never measured on a phone (README)</td><td>Repo README</td></tr>
+    <tr><td><span class="sev c-warn">Visible</span></td><td>A story line ("a clock has started ticking…") is drawn across the top of the fight, over the arena</td><td>Seen in capture</td></tr>
+    <tr><td><span class="sev c-warn">Visible</span></td><td>Sorrel, Morrow and Marrow still overlap with SOOTBORN's cast</td><td>Build text</td></tr>
+    <tr><td><span class="sev">Code</span></td><td>Nine places in the build still say "Underground Syndicate"; the repo folder keeps the old name on purpose</td><td>Build code</td></tr>
+    <tr><td><span class="sev">Code</span></td><td>Patch chains: later modules wrap earlier functions and edit their HTML after it renders (now 60 modules)</td><td>Build code</td></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td>The 11:20 and 11:28 sound fixes were tested by script, not on the phone where the static and stalls happened</td><td>Commit notes</td></tr>
+    <tr><td><span class="sev">Untested</span></td><td>A real phone, a physical controller, sound by ear, balance against people rather than the AI player (README)</td><td>Repo README</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Ideas: unfinished, missing, unexplored</h2>
+  <div class="grid2">
+    <div class="card"><h3>Unfinished</h3>
+      <ul>
+        <li>The Outlands: Fenrow and Low Barrow are named in an ending and nowhere else.</li>
+        <li>The eleven-year war between the United Realms and Eireania, and the expulsion. Told once in a monologue.</li>
+        <li>The Queen as a faerie with wings, fought as a sorcerer reskin. Give her one move nobody else has.</li>
+        <li>Vexa's hand-over of the crown.</li>
+      </ul></div>
+    <div class="card"><h3>Missing</h3>
+      <ul>
+        <li>A rival who climbs the ladder alongside you and turns up at the Stair.</li>
+        <li>A mid-climb scene with Vilhelm out of his cloak.</li>
+        <li>A named druid and a named drow among the gates.</li>
+        <li>Who you were before the debt paying off at the end (your past shapes the start; let it shape the last line).</li>
+      </ul></div>
+    <div class="card"><h3>Unexplored</h3>
+      <ul>
+        <li><b>Tag bouts</b> with a Tallyman as your second, using the crew you already have.</li>
+        <li><b>The Ledger-Keeper</b> as an optional secret fight.</li>
+        <li><b>The first of the month</b>: a tithe day calendar that changes prices, events and proclamations.</li>
+        <li><b>The crowd choosing the next bout</b>, using the crowd meter you already track.</li>
+        <li><b>A shared universe with SOOTBORN</b>, if you want the overlap to be deliberate.</li>
+      </ul></div>
+    <div class="card"><h3>Small, high value</h3>
+      <ul>
+        <li>Unlock the Wisp Table, Tally and loans at later ranks.</li>
+        <li>Collapse the nine prep slots into one "Ready" summary with a single button to auto-buy the usual.</li>
+        <li>Publish with the bundled three.js, as the repo already does.</li>
+        <li>Run <code>cinef.js</code>, <code>bout.js</code> and <code>finale.js</code> before every publish.</li>
+        <li>A one-page canon sheet with years for every Codex event.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Development timeline</h2>
+  <p>Now dated from the repo. Guttercrown started as "Underground Syndicate" at 8:59 pm on 17 November, became Guttercrown an hour later, and has had 110 commits in 39 hours.</p>
+  <div class="scroll"><svg id="commits" role="img" aria-label="Guttercrown commits per hour, 17 to 19 November"></svg></div>
+  <div class="card" id="devlog" style="display:flex;flex-direction:column;gap:12px"></div>
+  <div class="legend" id="catlegend"></div>
+
+  <h3>Proposed order from here</h3>
+  <div>
+    <div class="phase"><div class="n">1</div><div><h3>Check the sound on the phone</h3><p>Play a first bout on the phone to confirm the static and stalls are gone. Keep running <code>cine-plays-through.js</code> and the filming scripts before each publish.</p></div></div>
+    <div class="phase"><div class="n">2</div><div><h3>Release blockers</h3><p>Rework David's name, look and motive. Rename the five PHB subclasses. Publish with the bundled three.js.</p></div></div>
+    <div class="phase"><div class="n">3</div><div><h3>First hour</h3><p>Gate systems by rank, one prep summary, a guided first three bouts. Watch someone new play it on a phone and a pad.</p></div></div>
+    <div class="phase"><div class="n">4</div><div><h3>Middle of the climb</h3><p>A recurring rival, a Vilhelm scene, a scene for winning the crown from Vexa, a druid and a drow at the gates, the champion's numbers.</p></div></div>
+    <div class="phase" style="border-bottom:0"><div class="n">5</div><div><h3>Code health, then ship prep</h3><p>Fold the patch chains into the functions they wrap; phone performance budget; trademark and licence check; canon sheet; Steam wrapper.</p></div></div>
+  </div>
+</section>
+
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const el=(p,t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;p.appendChild(e);return e;};
+const INK=css('--ink'),INK2=css('--ink2'),MUT=css('--muted'),LINE=css('--line'),SURF=css('--surface'),GOLD=css('--gold'),ACC=css('--c1');
+
+/* lanes */
+(function(){
+  const C=['Build','Undercard','Gates 1–3','Gates 4–6','Gates 7–9','Crown held','Long Stair','Ending'];
+  const L=[['The Ledger climb','11111b00'],['Market, Marc, home, Tally','01111111'],['The throne (proclamations, tithe)','bbbbbb11'],['David: summons, deaths, pact','00iiiii1'],['Hour Garden (if you refuse)','000iiii0'],['Raids in the Outlands (if bound)','00000ii0']];
+  const t=document.getElementById('lanes');
+  t.innerHTML='<tr><th>Thread</th>'+C.map(c=>`<th>${c}</th>`).join('')+'</tr>'+L.map(([n,r])=>'<tr><td>'+n+'</td>'+[...r].map(v=>`<td class="${v==='1'?'on':v==='i'?'if':v==='b'?'bg':''}" aria-label="${v==='1'?'on stage':v==='i'?'some paths':v==='b'?'background':'not active'}"></td>`).join('')+'</tr>').join('');
+})();
+
+/* history */
+(function(){
+  const s=document.getElementById('hist'),W=760,H=190,L=24,R=736;
+  s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);
+  const X=v=>300+(1-v/50)*(R-300);
+  el(s,'line',{x1:L,x2:R,y1:96,y2:96,stroke:MUT,'stroke-width':1.5});
+  el(s,'rect',{x:L,y:88,width:250,height:16,rx:4,fill:LINE});
+  el(s,'text',{x:L+125,y:100,'text-anchor':'middle','font-size':11,fill:INK2},'undated');
+  const ev=[[null,'Eerin crowned','“before most families had names”',0],[null,'The eleven-year war','hourglass houses expelled',1],[40,'Mines run dry; levels sealed','the Iron Peace begins',0],[7,'Vexa takes the crown','“in under a minute”',1],[0,'You arrive','',0]];
+  ev.forEach(([y,a,b,up],i)=>{const x=y==null?[40,190][i]:X(y);const yy=up?52:140;
+    el(s,'line',{x1:x,x2:x,y1:96,y2:up?62:130,stroke:LINE});
+    el(s,y===0?'circle':'circle',{cx:x,cy:96,r:6,fill:y===0?ACC:y==null?MUT:GOLD,stroke:SURF,'stroke-width':2});
+    const anc=x>R-100?'end':x<L+80?'start':'middle';
+    el(s,'text',{x:x,y:up?yy-6:yy+6,'text-anchor':anc,'font-size':13,'font-weight':600,fill:INK},a);
+    if(b)el(s,'text',{x:x,y:up?yy+10:yy+22,'text-anchor':anc,'font-size':11.5,fill:INK2},b);
+    if(y!=null)el(s,'text',{x:x,y:up?yy+(b?26:10):yy-12,'text-anchor':anc,'font-size':11.5,fill:MUT},y===0?'now':y+' years ago');
+  });
+})();
+
+/* ladder */
+(function(){
+  const O=[['Grubb',1,.78],['Dolly',2,.84],['S. Maul',3,.91],['Ansel',4,.95],['Kessa',5,.97],['Sallow',6,1.0],['Brakk',6,1.03],['Beatrix',7,1.01],['Vexa',8,.85],['Hale Morrow',9,.92],['Vilhelm',10,1.0],['Eerin',10,1.0]];
+  const s=document.getElementById('ladder'),W=760,H=360,L=50,B=330,cw=(W-L-10)/O.length;
+  s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);
+  el(s,'text',{x:L,y:20,'font-size':13,'font-weight':600,fill:INK},'Level');
+  el(s,'text',{x:L,y:186,'font-size':13,'font-weight':600,fill:INK},'Damage multiplier');
+  // level bars 28..150
+  const ly=v=>150-v/10*110;
+  O.forEach((o,i)=>{const x=L+i*cw+cw*0.2,w=cw*0.6;const g=el(s,'g',{});el(g,'title',{},`${o[0]}: level ${o[1]}`);
+    el(g,'rect',{x,y:ly(o[1]),width:w,height:150-ly(o[1]),rx:3,fill:i>=9?GOLD:MUT,'fill-opacity':i>=9?.8:.7});
+    el(s,'text',{x:x+w/2,y:ly(o[1])-5,'text-anchor':'middle','font-size':11.5,fill:INK2},o[1]);});
+  el(s,'line',{x1:L,x2:W-10,y1:150,y2:150,stroke:LINE});
+  // dmg line 0.7..1.0 mapped 300..200
+  const dy=v=>300-(v-.7)/.4*90;
+  [.7,.8,.9,1,1.1].forEach(v=>{el(s,'line',{x1:L,x2:W-10,y1:dy(v),y2:dy(v),stroke:LINE});el(s,'text',{x:L-8,y:dy(v)+4,'text-anchor':'end','font-size':11,fill:MUT},v.toFixed(1));});
+  const cx=i=>L+i*cw+cw/2;
+  el(s,'polyline',{points:O.map((o,i)=>`${cx(i)},${dy(o[2])}`).join(' '),fill:'none',stroke:MUT,'stroke-width':2});
+  O.forEach((o,i)=>{const g=el(s,'g',{});el(g,'title',{},`${o[0]}: damage ×${o[2]}`);el(g,'circle',{cx:cx(i),cy:dy(o[2]),r:i===8?7:5,fill:i===8?ACC:MUT,stroke:SURF,'stroke-width':2});});
+  el(s,'text',{x:cx(8),y:dy(.85)+22,'text-anchor':'middle','font-size':12,'font-weight':600,fill:INK},'Vexa ×0.85');
+  O.forEach((o,i)=>el(s,'text',{x:cx(i),y:B+18,'text-anchor':'middle','font-size':11,fill:i===8?INK:INK2,'font-weight':i===8?600:400},o[0]));
+  el(s,'line',{x1:L+9*cw,x2:L+9*cw,y1:30,y2:B,stroke:MUT,'stroke-dasharray':'4 4'});
+  el(s,'text',{x:L+9*cw+6,y:172,'font-size':11.5,fill:INK2},'the Long Stair');
+})();
+
+/* score */
+(function(){
+  const S=[['World and writing',4.5,4.5,'103 Codex entries; the war and Tallow Row are now in the opening film.'],
+  ['Systems depth',4.5,4.5,'Every layer has a payoff. Two more tavern games today.'],
+  ['Build variety',4.5,4.5,'6 × 6 × 2, pasts, natures, 31 weapons each with a trait, kits and sets.'],
+  ['Combat design and feel',4.5,4,'Per-weapon swings, flourishes, directional dodges, and dozens of finishers.'],
+  ['Endings and reactivity',4.5,4,'Four endings, now filmed, with lines that change with what you did.'],
+  ['3D look',4,null,'Seen for the first time today: warm, readable, consistent. Low-poly figures.'],
+  ['Menus and UI craft',3.5,3.5,'Handsome and phone-aware. Still dense; a story line covers the fight.'],
+  ['Story through the middle',2.5,2.5,'Nine gates of standalone fighters; the royals offstage until the end.'],
+  ['Onboarding and clarity',2.5,2.5,'Nine prep slots and four currencies still arrive early.'],
+  ['Code health',3,2.5,'Bundled three.js and filming tests in the repo; 60 patched layers remain.'],
+  ['Stability today',3.5,null,'A morning regression found and fixed within half an hour, now with a test and a loop that survives errors.'],
+  ['Release readiness of content',1.5,1.5,'David and the subclass names are unchanged.']];
+  const b=document.getElementById('score');
+  S.forEach(([n,v,o,w])=>{b.insertAdjacentHTML('beforeend',`<span>${n}</span><div class="bar" style="position:relative" title="${n}: ${v} of 5${o!=null?' (last night '+o+')':' (new)'}"><i style="width:${v*20}%;background:${v>=4?GOLD:v<=2?css('--crit'):MUT}"></i>${o!=null&&o!==v?`<b style="position:absolute;left:calc(${o*20}% - 1px);top:-3px;width:2px;height:16px;background:${INK2}"></b>`:''}</div><span class="n">${v.toFixed(1)}</span><div class="why">${w}${o!=null&&o!==v?' (was '+o.toFixed(1)+')':o==null?' (new)':''}</div>`);});
+})();
+
+/* commits */
+(function(){
+  const H={'11-17 20':1,'11-17 21':2,'11-17 22':4,'11-17 23':2,'11-18 00':4,'11-18 01':9,'11-18 02':3,'11-18 06':2,'11-18 09':9,'11-18 10':4,'11-18 11':4,'11-18 12':6,'11-18 13':4,'11-18 15':2,'11-18 16':3,'11-18 17':3,'11-18 20':3,'11-18 21':6,'11-18 22':6,'11-18 23':3,'11-19 05':6,'11-19 06':7,'11-19 07':5,'11-19 08':2,'11-19 09':2,'11-19 10':4,'11-19 11':4};
+  const hours=[];for(const d of ['11-17','11-18','11-19'])for(let h=0;h<24;h++){const k=d+' '+String(h).padStart(2,'0');if(d==='11-17'&&h<20)continue;if(d==='11-19'&&h>11)continue;hours.push([k,H[k]||0]);}
+  const s=document.getElementById('commits'),W=760,Ht=200,L=36,B=160,cw=(W-L-10)/hours.length,max=10;
+  s.setAttribute('viewBox',`0 0 ${W} ${Ht}`);s.setAttribute('width',W);s.setAttribute('height',Ht);
+  const y=v=>B-v/max*130;
+  [0,5,10].forEach(v=>{el(s,'line',{x1:L,x2:W-10,y1:y(v),y2:y(v),stroke:LINE});el(s,'text',{x:L-6,y:y(v)+4,'text-anchor':'end','font-size':11,fill:MUT},v);});
+  hours.forEach(([k,v],i)=>{if(!v)return;const g=el(s,'g',{});el(g,'title',{},`${k}:00 — ${v} commit${v>1?'s':''}`);el(g,'rect',{x:L+i*cw+1,y:y(v),width:Math.max(2,cw-2),height:B-y(v),rx:1.5,fill:k.startsWith('11-19')?ACC:MUT});});
+  hours.forEach(([k],i)=>{const h=+k.slice(6);if(h===0){el(s,'line',{x1:L+i*cw,x2:L+i*cw,y1:20,y2:B,stroke:MUT,'stroke-dasharray':'3 4'});el(s,'text',{x:L+i*cw+4,y:28,'font-size':12,'font-weight':600,fill:INK},{'11-18':'Nov 18','11-19':'Nov 19 (today)'}[k.slice(0,5)]);}if(h%6===0)el(s,'text',{x:L+i*cw,y:B+16,'text-anchor':'middle','font-size':10.5,fill:MUT},h===0?'12a':h===12?'12p':(h>12?h-12+'p':h+'a'));});
+  el(s,'text',{x:L+4,y:28,'font-size':12,'font-weight':600,fill:INK},'Nov 17');
+  el(s,'text',{x:W-10,y:Ht-6,'text-anchor':'end','font-size':11,fill:INK2},'commits per hour, Eastern time · today in blue');
+})();
+/* dated log */
+(function(){
+  const K={E:['Engine and 3D',css('--c1')],C:['Combat',css('--c2')],P:['Progression and gear',css('--c3')],S:['Story and world',css('--c4')],$:['Money and games',css('--c5')],H:['Home',css('--c6')],U:['Menus, tests, polish',css('--c7')],A:['Sound',css('--c8')]};
+  document.getElementById('catlegend').innerHTML=Object.values(K).map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('');
+  const D=[['Nov 17 evening · from Underground Syndicate to Guttercrown',[['E','8:59 pm vertical slice'],['E','9:54 true 3D isometric'],['U','10:07 renamed, logo, menu skin'],['S','10:14 opening cinematic'],['C','11:45 skill-based combat, home, codex'],['C','11:59 parries, mortal blows, the Tally']]],
+   ['Nov 18 overnight · the market',[['$','12:10 am Lamp Market, Marc'],['H','12:18 room builder'],['$','12:46 schemes, Wisp Table'],['C','1:20 dismemberment, knockdowns'],['C','1:34 heavy blows, posture, weapons'],['S','1:46 the Koheneim throne'],['S','1:55 the Long Stair, Seal-Wardens'],['P','2:39 kits, mastery, cantrips']]],
+   ['Nov 18 morning and afternoon · David and the long climb',[['S','9:27 David designed'],['S','9:45 death and the Oracle'],['P','10:15 the long climb, ten levels'],['S','10:37 expeditions and heat'],['P','12:00 pm gear ladder'],['P','12:37 Druid, Warlock, Drow'],['C','12:49 crowd frenzy, thirty finishers'],['S','1:09 Long Stair, four endings'],['U','3:41 guidance, market tour'],['$','4:14 Marc dé Fleuprau'],['C','5:30 animation pass']]],
+   ['Nov 18 evening · the Hour Garden',[['P','8:21 nine-name ladder, permanent deaths'],['C','8:43 spike walls, the Fallen'],['S','9:23 the Hour Garden'],['$','9:46 loans'],['P','10:32 stepped builder, pasts, natures'],['S','10:55 Tallow Row, David\'s gold throne'],['S','11:24 garden speech bubbles']]],
+   ['Nov 19 today · finishers, film and sound',[['$','5:36 am Knuckle Table'],['$','5:43 Knife Board'],['C','5:51 environmental finishers'],['P','6:02 a trait for every weapon'],['C','6:28 racial finishers'],['C','6:50 casting finishers'],['C','7:47 per-weapon animation'],['C','8:03 weapon finishers'],['S','9:22 opening film reshot'],['C','9:40 fight look'],['S','10:01 Hour Garden tuning'],['U','10:20 phone and controller pass'],['E','10:32 draw calls cut'],['U','10:47 tidy pass'],['A','11:03 filmed ending, sound pass'],['A','11:20 audio fix: voice cap, limiter, phone light mode'],['A','11:28 noise crowd and limiter removed'],['U','11:30 intro freeze fixed, new test']]]];
+  const b=document.getElementById('devlog');
+  D.forEach(([d,vs])=>b.insertAdjacentHTML('beforeend',`<div><div style="font-family:var(--display);font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px">${d}</div><div class="vers">${vs.map(([k,t])=>`<span style="background:${K[k][1]}">${t}</span>`).join('')}</div></div>`));
+})();
+</script>
+</body>
+</html>
