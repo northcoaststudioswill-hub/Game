@@ -111,6 +111,13 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #stats,#right,#quests,#compass,#toasts,#pip{transition:opacity .4s}
 #app.cine #stats,#app.cine #right,#app.cine #quests,#app.cine #compass,#app.cine .pad,#app.cine #pip,#app.cine #toasts,#app.cine #bSlow{opacity:0}
 #app.cine #hint{opacity:0!important}
+.ft.sp{font-family:var(--body);font-size:13px;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:3px 9px;-webkit-text-stroke:0;text-shadow:none;box-shadow:3px 3px 0 var(--cyan);white-space:normal;width:max-content;max-width:210px;text-align:center;line-height:1.2;animation:sp 3.4s ease both}
+@keyframes sp{0%{opacity:0;scale:.5}8%{opacity:1;scale:1}85%{opacity:1;margin-top:-26px}100%{opacity:0;margin-top:-34px}}
+#ad{position:absolute;max-width:min(64vw,260px);background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:8px 30px 8px 10px;font-size:13px;box-shadow:5px 5px 0 var(--hot);pointer-events:auto;rotate:-2deg;animation:wig .4s ease-in-out infinite alternate}
+#adx{position:absolute;right:3px;top:3px;width:22px;height:22px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font-size:11px;padding:0;line-height:1}
+#app.cine #ad{display:none}
+#app.disco #c{animation:disco 1.2s linear infinite}@keyframes disco{to{filter:hue-rotate(360deg)}}
+#app.fry #c{filter:saturate(3.2) contrast(1.7)}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 
 /* ---------- Screens ---------- */
@@ -163,6 +170,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <button id="bJump" class="pad">JUMP</button>
     <button id="bTalk" hidden></button>
     <div id="bigmsg"></div>
+    <div id="ad" hidden><span id="adt"></span><button id="adx" aria-label="Close ad">✕</button></div>
     <button id="bSlow" hidden aria-label="Borrowed Time">⏳</button>
     <div id="ratio" hidden>YOU GOT<br>RATIOED</div>
     <div id="dialog" hidden><div id="dport">🗿</div><div id="dbody"><b id="dname"></b><p id="dtext"></p><small>tap / E ▶</small><button id="dskip" hidden>skip ⏭</button></div></div>
@@ -632,7 +640,7 @@ function spawnEnemy(x,z,tag){const ck=tag==='clank'||tag==='botmin',a=pick(ANIM)
   e.y=(tag==='boss'?ARENA.top:groundH(x,z))+1.6;g.position.set(x,e.y,z);enemies.push(e);burst(x,e.y,z,14,.85,8,4,.6);return e;}
 function removeEnemy(e){scene.remove(e.g);e.label.material.map.dispose();e.label.material.dispose();const i=enemies.indexOf(e);if(i>=0)enemies.splice(i,1);}
 const respawns=[];
-function killEnemy(e){SFX.kill();burst(e.x,e.y,e.z,34,null,14,7,.9);addAura(420,e.x,e.y+2,e.z);floatText(pick(KILLWORDS),e.x,e.y+4,e.z,'#ff2e88');S.shake=Math.max(S.shake,.25);
+function killEnemy(e){rotKill(e);SFX.kill();burst(e.x,e.y,e.z,34,null,14,7,.9);addAura(420,e.x,e.y+2,e.z);floatText(pick(KILLWORDS),e.x,e.y+4,e.z,'#ff2e88');S.shake=Math.max(S.shake,.25);
   if(e.tag==='grok'&&S.kills<KILLS_NEEDED){S.kills++;if(S.kills===KILLS_NEEDED){toast('🗿 THE BASED STONE has appeared in the middle of Ohio');SFX.page();syncWorld();}save();}
   else if(Math.random()<.3)toast(e.name+' was ratioed');
   if(e.tag!=='boss'&&e.tag!=='botmin')respawns.push({t:7,x:e.hx,z:e.hz,tag:e.tag});removeEnemy(e);}
@@ -698,7 +706,7 @@ function updateBoss(dt,active){if(!boss.active)return;const g=boss.g;boss.t+=dt;
   if(!active||S.dead)return;const rage=1+(1-boss.hp/boss.max)*.9;
   boss.ring-=dt*rage;if(boss.ring<=0){boss.ring=3.1;const n=20,off=Math.random()*TAU,gap=Math.floor(Math.random()*n);for(let i=0;i<n;i++){if(i===gap||i===(gap+1)%n)continue;const a=off+i/n*TAU;bossShot(boss.x+Math.cos(a)*9,ARENA.top+1,boss.z+Math.sin(a)*9,Math.cos(a)*13,0,Math.sin(a)*13,.9);}SFX.land();}
   boss.aim-=dt*rage;if(boss.aim<=0){boss.aim=1.25;const ox=boss.x,oy=g.position.y,oz=boss.z+0;let dx=PL.x-ox,dy=PL.y+1.4-oy,dz=PL.z-oz;const l=Math.hypot(dx,dy,dz)||1;bossShot(ox+dx/l*5,oy+dy/l*5,oz+dz/l*5,dx/l*24,dy/l*24,dz/l*24,.13);tone(500,.12,'square',.06,0,200);}
-  if(X.lit){boss.van-=dt;if(boss.van<=0){boss.van=11;FLY.t=0;FLY.hit=false;FLY.g.visible=true;toast('🚐 MARCUS: "SEND IT!"');tone(220,.6,'sawtooth',.1,0,520);}}}
+  if(X.lit){boss.van-=dt;if(boss.van<=0){boss.van=8;gangAssist();}}}
 function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$('bossbar').hidden=true;$('hud').hidden=true;
   const rank=S.total>160000?'CERTIFIED OHIO FINAL BOSS':S.total>120000?'RIZZ LORD SUPREME':S.total>95000?'SIGMA INTERN':'NPC WITH A DREAM';
   $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
@@ -718,7 +726,7 @@ let edgeT=0;
 function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>0)PL.inv-=dt;pGroup.visible=false;return 0;}let ix=0,iy=0;
   if(active){if(keys.KeyA||keys.ArrowLeft)ix-=1;if(keys.KeyD||keys.ArrowRight)ix+=1;if(keys.KeyW||keys.ArrowUp)iy+=1;if(keys.KeyS||keys.ArrowDown)iy-=1;ix+=stick.x;iy-=stick.y;}
   const len=Math.hypot(ix,iy);if(len>1){ix/=len;iy/=len;}
-  const fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw),rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw),mx=fx*iy+rx*ix,mz=fz*iy+rz*ix,SP=16;
+  const fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw),rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw),mx=fx*iy+rx*ix,mz=fz*iy+rz*ix,SP=16*(S.snack>0?1.5:1)*(CH.id==='zoom'?2.2:1);
   const acc=Math.min(1,dt*(PL.grounded?12:5));PL.vx=lerp(PL.vx,mx*SP,acc);PL.vz=lerp(PL.vz,mz*SP,acc);const k=Math.exp(-dt*4);PL.kx*=k;PL.kz*=k;
   const prevY=PL.y;let nx=PL.x+(PL.vx+PL.kx)*dt,nz=PL.z+(PL.vz+PL.kz)*dt;
   if(!S.inBoss){const d=Math.hypot(nx,nz);if(d>WORLD_R-4){nx*=(WORLD_R-4)/d;nz*=(WORLD_R-4)/d;if(S.t-edgeT>8){edgeT=S.t;toast('The world ends here. The AI ran out of tokens.');}}}
@@ -729,7 +737,7 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   PL.x=nx;PL.z=nz;
   if(active&&inp.jump){if(PL.grounded||PL.jumps<(X.tj?3:2)){PL.vy=PL.jumps?14.5:15.5;PL.jumps++;PL.grounded=false;(PL.jumps>1?SFX.jump2:SFX.jump)();burst(PL.x,PL.y+.3,PL.z,PL.jumps>1?16:8,null,5,1,.4);PL.squash=.25;}}
   inp.jump=false;
-  PL.vy-=40*dt;PL.y+=PL.vy*dt;const gy=surfaceY(PL.x,PL.z,prevY);
+  PL.vy-=(CH.id==='grav'?11:40)*dt;PL.y+=PL.vy*dt;const gy=surfaceY(PL.x,PL.z,prevY);
   if(PL.y<=gy){if(!PL.grounded&&PL.vy<-14){SFX.land();PL.squash=-.3;burst(PL.x,gy+.2,PL.z,8,null,5,1,.35);}PL.y=gy;PL.vy=0;PL.grounded=true;PL.jumps=0;}
   else if(PL.grounded&&PL.vy<=0&&PL.y-gy<1.3){PL.y=gy;PL.vy=0;}else PL.grounded=false;
   if(S.inBoss&&PL.y<ARENA.top-25){PL.x=0;PL.z=32;PL.y=ARENA.top+4;PL.vy=0;PL.inv=0;hurt(0,1);PL.kx=PL.kz=0;toast('You fell off the For-You Page');}
@@ -738,7 +746,7 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   if(active&&(inp.fireKey||inp.fireBtn||inp.fireMouse)&&PL.cd<=0)fire();
   // visuals
   PL.vis=PL.grounded&&PL.y>PL.vis?lerp(PL.vis,PL.y,Math.min(1,dt*16)):PL.y;PL.squash=lerp(PL.squash,0,Math.min(1,dt*9));
-  pGroup.position.set(PL.x,PL.vis,PL.z);pGroup.rotation.y=PL.face;const sq=1+PL.squash;pGroup.scale.set(1/Math.sqrt(sq),sq,1/Math.sqrt(sq));
+  pGroup.position.set(PL.x,PL.vis,PL.z);pGroup.rotation.y=PL.face;const sq=1+PL.squash;pGroup.scale.set(1/Math.sqrt(sq),sq,1/Math.sqrt(sq)).multiplyScalar(CH.id==='big'?2.3:CH.id==='tiny'?.42:1);
   const sw=Math.sin(PL.walk)*(len>.1&&PL.grounded?.55:0);PL.l1.position.z=sw;PL.l2.position.z=-sw;PL.l1.position.y=.3+Math.max(0,sw)*.3;PL.l2.position.y=.3+Math.max(0,-sw)*.3;
   pGroup.visible=!(PL.inv>0&&Math.floor(S.t*18)%2)&&!S.dead;PL.shadow.visible=PL.grounded;
   // camera auto-follow
@@ -835,7 +843,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else inp.jump=true;});padB
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0});
 Object.assign(X,X0());
 const XQ=['flow','erin','clank','hour','lantern','bud','spr','frag'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -1364,6 +1372,7 @@ function xInteract(){if(VAN.driving)return{label:'🚪 GET OUT OF THE VAN',fn:ex
   for(let i=0;i<FRAGS.length;i++){const f=FRAGS[i];if(Math.hypot(PL.x-f.x,PL.z-f.z)<4.8&&Math.abs(PL.y-f.y)<4)return{label:X.frag.includes(i)?'📟 READ IT AGAIN':'📟 READ PROMPT FRAGMENT',fn:()=>readFrag(i)};}
   if(Math.hypot(PL.x-GRASS.x,PL.z-GRASS.z)<4)return{label:'🌱 TOUCH GRASS',fn:touchGrass};
   for(const t of TPOSE)if(Math.hypot(PL.x-t.x,PL.z-t.z)<4.6)return{label:'💬 YAP WITH '+t.nm,fn:()=>say([['tpose',pick(['I have been standing like this since the animation budget ran out.','Please do not walk through me. I can feel it. I just cannot react.','They said my texture was "coming in the next patch". That was four patches ago.','A',"I'm fine. This is my idle animation."])]])};
+  if(Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<5)return{label:'🔴 PRESS THE BUTTON',fn:()=>pressButton(false)};
   return null;}
 function xTarget(id){const N=n=>({x:n.x,z:n.z,l:n.short}),near=(arr,ok,l)=>{let b=null,bd=1e9;arr.forEach((p,i)=>{if(!ok(i))return;const d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;b=p;}});return b?{x:b.x,z:b.z,l}:null;};
   if(id==='flow')return X.flow===0||X.flow===2?N(npcs.marcus):X.flow===1?{x:GAR.dx,z:GAR.dz,l:'VAN KEY'}:X.flow===3?near(LEAKS,i=>!X.leaks[i],'LEAK'):null;
@@ -1388,7 +1397,7 @@ function syncX(){LEAKS.forEach((L,i)=>{L.b.visible=!X.leaks[i];});GAR.crops.forE
   $('shardn').textContent='☀️'+shards();$('elev').hidden=X.clank<2;$('bSlow').hidden=X.hour<2;hudCache.q=null;}
 function xReset(){VAN.driving=false;VAN.x=VAN.hx;VAN.z=VAN.hz;VAN.h=VAN.hh;VAN.sp=VAN.vy=0;VAN.y=groundH(VAN.x,VAN.z);VAN.gr=true;VAN.rode=false;pGroup.visible=true;
   if(X.louie){LOU.x=PL.x+3;LOU.z=PL.z+3;}else{LOU.x=LOU.hx;LOU.z=LOU.hz;}LOU.orb=-1;SPR.list.length=0;BUD.forEach(b=>{const h=BHOME[b.id];b.x=b.hx=h[0];b.z=b.hz=h[1];b.caught=b.lead=false;});GRASS.cd=0;
-  S.slow=0;S.slowCd=0;S.shots=0;app.classList.remove('slow');STILL.t=STILL.fail=0;BOT.state='x';BOT.x=CY.x;BOT.z=CY.z;BOT.y=BOT.gy+1;FLY.g.visible=false;big('');syncX();}
+  S.slow=0;S.slowCd=0;S.shots=0;S.snack=0;CH.id='';CH.t=0;ROT.beat=0;ROT.btn=0;$('ad').hidden=true;assistN=0;app.classList.remove('slow','disco','fry');STILL.t=STILL.fail=0;BOT.state='x';BOT.x=CY.x;BOT.z=CY.z;BOT.y=BOT.gy+1;FLY.g.visible=false;big('');syncX();}
 function updateBB(dt){for(const b of bb){if(b.life<=0)continue;b.life-=dt;const p=b.m.position;p.x+=b.vx*dt;p.y+=b.vy*dt;p.z+=b.vz*dt;b.m.scale.setScalar(1+Math.sin(S.t*14+p.x)*.2);
     const dx=p.x-PL.x,dy=p.y-(PL.y+1.4),dz=p.z-PL.z;if(dx*dx+dz*dz<1.7&&Math.abs(dy)<1.7){hurt(-dx,-dz);b.life=0;}
     const out=S.inBoss?(Math.hypot(p.x,p.z)>ARENA.r+6||p.y<ARENA.top-1):p.y<groundH(p.x,p.z)-.3;if(b.life<=0||out){b.life=0;b.m.visible=false;}}}
@@ -1411,7 +1420,7 @@ function updateLouie(dt){const L=LOU;let moving=false;
   if(moving)L.walk+=dt*16;const gy=S.inBoss?ARENA.top:groundH(L.x,L.z);L.y=gy+(moving?Math.abs(Math.sin(L.walk))*.5:0);
   L.g.position.set(L.x,L.y,L.z);L.g.rotation.set(moving?Math.sin(L.walk)*.12:0,L.face,X.louie&&!moving?Math.sin(S.t*9)*.06:0);}
 function damageEnemy(e,n,kx,kz){e.hp-=n;e.hit=.12;if(kx!==undefined){e.kx=kx;e.kz=kz;}SFX.hit();if(e.hp<=0)killEnemy(e);}
-function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;
+function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;rotUpdate(dt,play);
   // timers: borrowed time, the meal going cold
   if(S.slow>0){S.slow-=dt;if(S.slow<=0)app.classList.remove('slow');}if(S.slowCd>0)S.slowCd-=dt;
   if(X.hour>=2){const t=S.slow>0?'⏳':S.slowCd>0?String(Math.ceil(S.slowCd)):app.classList.contains('touchy')?'⏳':'⏳Q';if(hudCache.slow!==t){hudCache.slow=t;$('bSlow').textContent=t;$('bSlow').classList.toggle('cd',S.slowCd>0&&S.slow<=0);}}
@@ -1449,6 +1458,90 @@ function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;
     if(!FLY.hit&&t>=.5){FLY.hit=true;if(boss.active&&boss.hp>0&&boss.dying<=0){for(let k=0;k<4&&boss.hp>0;k++)hitBoss({x:0,y:boss.y,z:0});S.shake=.9;SFX.boom();}}if(t>=1){FLY.g.visible=false;FLY.hit=false;}}}
 
 
+/* ================= ACT 4: more rot. chatter, moments, a chaos button, the gang at the boss ================= */
+function bubble(t,x,y,z){if(floats.children.length>14)floats.firstChild.remove();_v.set(x,y,z).project(camera);if(_v.z>1||Math.abs(_v.x)>1.05||Math.abs(_v.y)>1.05)return;const d=document.createElement('div');d.className='ft sp';d.textContent=t;
+  d.style.left=clamp((_v.x*.5+.5)*app.clientWidth,112,app.clientWidth-112)+'px';d.style.top=((-_v.y*.5+.5)*app.clientHeight)+'px';floats.appendChild(d);setTimeout(()=>d.remove(),3400);}
+const BARK={marcus:['SEND IT!','Bro. BRO.','I\'ve got a guy!','Flow Pros, baby!','Derek! Is the van breathing?','It\'s not a leak, bro. It\'s a water feature.','Dap me up from over there!'],
+  erin:['Who stepped on my basil?','Plant it. Cook it. Serve it.','If Marcus asks, the answer is no.','That tomato was looking at me.','No running in the garden! ...Fine. Run.','The corn knows what it did.'],
+  will:['Let me just push this first.','Works on my machine.','Who merged slop into main?','I leave for ONE sprint...','Louie, no. Louie. LOUIE.','There was a build script. Once.'],
+  bibi:['NEXT QUESTION.','NO FURTHER QUESTIONS.','I AM MY OWN GUY.','FACT CHECK: PENDING.','CITIZENS! BEHOLD: A PODIUM.','I WILL NOW TAKE ZERO QUESTIONS.'],
+  kael:['One valve. Two valve.','The air is wrong here.','...Eleven.','I do not know what "rizz" is.','Somebody has to fix it.','I miss pipes that made sense.'],
+  david:['You are late.','Tick.','I have never once been late.','The clocks agree with me. I checked.','Hurry slowly, vessel.','Tock. I said it second on purpose.']};
+const BARK2={derek:['...Bro.','...','It\'s a good door.','...I could drive. If asked.'],bottie:['spawns got spawns.','loading…','99%.','clankin\' in the cloud.','smile for the dataset.','ur brain rot is premium data, bro.'],louie:['arf','bork','*sniff*','...boop?']};
+const CHAT=['📱 MARCUS: bro who has my wrench','📱 DEREK: ...','📱 ERIN: it is in the hot tub. the hot tub nobody told me about.','📱 WILL: pushing a fix for the wrench','📱 KING BIBI: I HAVE WON THE GROUP CHAT. AGAIN.','📱 LIL BOTTIE: new phone who dis (i am the phone)',
+  '📱 KAEL: How do I leave this.','📱 DAVID: You are all late to a chat I started tomorrow.','📱 LOUIE: arf','📱 MARCUS: van smells like corn again. no further questions','📱 ERIN: who taught the sprouts to say "ratio"','📱 WILL: who gave the robot admin',
+  '📱 GROK: GROK IN CHAT NOW. CHAT IS BASED.','📱 FABLE: What a wonderful group chat! I have summarized it in nine bullet points.','📱 ASTRA: ✨ i sent a photo of my hand. it has a hand on it ✨','📱 KAEL: I counted the messages. Eleven.','📱 DEREK: ...bro',
+  '📱 MARCUS: business idea. group chat but wet','📱 KING BIBI: THIS MESSAGE IS A PRESS CONFERENCE.','📱 LIL BOTTIE: screenshotting this for the dataset','📱 ERIN: Louie ate a relic. he seems fine. he is glowing a little.','📱 DAVID: I read this message before you sent it. It was mid.'];
+// ---- deeper conversations once a character's job is done
+const T0=Object.assign({},TALK),ROT={bark:5,chat:30,ad:55,beat:0,lyr:0,ks:0,kt:0,btn:0};
+const IDEA=[['A lazy river','A hot tub','A waterslide','A car wash','A fountain','A sprinkler','A dunk tank'],['for dogs','around the whole map','that is also a gym','inside the van','that runs on vibes','for people who hate water','but vertical','in Ohio specifically'],['Derek drives it.','Hallucinations as lifeguards.','We charge by the splash.','I already told the bank yes.','It leaks on purpose.','Erin cannot know.','Louie is the CEO.']];
+const DISH=['skibidi stroganoff','rizzotto','sigma slaw','a single wet corn','Ohio-style tomato (it is just a tomato)','carrot, but confident','soup of the day (the day was Tuesday)','gyro sandwich, no cap, extra cap'];
+const NOTES=['Nerfed grass.','Buffed Ohio.','Fixed a bug where fun was possible.','Removed Derek\'s second line.','Hands now have a maximum.','The maximum is eleven.','Louie can no longer open the settings menu.','Added lore. Removed it. Added it back, worse.','The van is now load-bearing.','Known issue: everything.'];
+const TRACKS=['99 Percent','Clankin\' In The Cloud (Deluxe)','Spawns Got Spawns','Firewall (feat. A Valve)','Training Data','Ctrl Alt Delulu'];
+const LYRICS=['♪ clankin\' in the cloud ♪','♪ ninety-nine percent ♪','♪ spawns got spawns got spawns ♪','♪ beep boop, no cap ♪','♪ i am the phone ♪','♪ loading, loading, loading ♪','♪ rizz dot exe has stopped ♪'];
+TALK.marcus=()=>X.flow<4?T0.marcus():say([['marcus','BRO. Business idea. '+pick(IDEA[0])+' '+pick(IDEA[1])+'. '+pick(IDEA[2])],['derek',pick(['...Bro.','...I\'m in.','...That\'s yesterday\'s idea with a hat on.','...Bro. No.','...Who\'s Louie.'])],['marcus',pick(['See? Derek gets it.','That\'s a yes. I know his yeses.','We start Monday. Which Monday? Yes.'])]]);
+TALK.derek=()=>{X.dk=(X.dk||0)+1;say(X.dk%4===0?[['derek','...'],['derek','You ever think about how a van is just a room that leaves?'],['derek','Every road is a hallway. Every town is a room you drove into. The sky is the ceiling of the biggest room.'],['derek','One day the big room closes. And we all just. Park.'],['derek','...Bro.']]:
+  [['derek',pick(['...Bro.','I drive the van. That\'s my whole part.','It\'s a good door. I\'ve sat in worse doors.','Marcus says I\'m "operations". I asked what that means. He said "bro".','...I had a second line once. They patched it out.','I\'m not ignoring you. This is me listening.'])]]);};
+TALK.erin=()=>X.erin<3?T0.erin():say([['erin','Today\'s special: '+pick(DISH)+'. '+pick(['Eat it. You look rendered.','Do not ask what is in it. It is the name.','Marcus ordered nine. For "research".','King Bibi called it "a triumph". He has not paid.','The sprouts helped. Do not think about how.'])]],()=>{S.snack=25;toast('🍽️ You ate it. You run faster for 25 seconds.');SFX.page();});
+TALK.bibi=()=>{if(X.erin===2)return T0.bibi();X.terms=(X.terms||0)+1;say([['bibi','ONE MOMENT. I HAVE JUST CALLED AN ELECTION.'],['bibi',pick(['IT IS OVER. I WON. THAT WAS TERM NUMBER ','THE POLLS CLOSED WHILE YOU BLINKED. TERM NUMBER ','MY OPPONENT WAS A FOLDING CHAIR. IT CONCEDED. TERM NUMBER ','I RAN UNOPPOSED. I STILL DEMANDED A RECOUNT. TERM NUMBER '])+fmt(4207+X.terms)+'.'],
+  ['bibi',pick(['NEXT QUESTION. THERE WAS NO QUESTION. NEXT QUESTION.','MY APPROVAL RATING IS A NUMBER. THAT IS ALL I WILL SAY ABOUT THE NUMBER.','I HAVE BEEN PRIME MINISTER SINCE BEFORE THIS SENTENCE STARTED.','THE PODIUM AND I ARE VERY HAPPY TOGETHER.'])]].concat(X.erin<2?[['bibi','ALSO. MY COMBO MEAL. FROM THE GARDEN IN SUNKEEP. I HAVE BEEN WAITING SINCE THE LAST ELECTION. WHICH WAS JUST NOW.']]:[]),()=>{if(X.erin<2&&!S.track)S.track='erin';});};
+TALK.kael=()=>X.clank<3?T0.kael():say([['kael',pick(['The robot keeps saying "no cap". I checked. There was a cap. I put it back on the valve.','I counted the fingers on your hand. I stopped at eleven. Out of respect.','Where I am from, the air is rationed. Here it is free, and it smells like pizza. I do not trust it.','The plumber called me "bro". I do not have a brother. I said so. He said "bro" again.','Better air now. Breathe it. That is the whole speech.','ELEVEN.'])]]);
+TALK.bottie=()=>BOT.state!=='down'?T0.bottie():say([['bottie','aight bet. dropping a single right now. it\'s called "'+pick(TRACKS)+'".'],['bottie',pick(['it\'s eleven seconds long and nine of them are the tag.','i sampled a dial-up modem. it\'s my dad.','grammy committee is in my DMs. they said "please stop".','this one\'s for the valves that didn\'t make it.'])]],()=>{ROT.beat=13;ROT.lyr=0;});
+TALK.david=()=>X.hour<2?T0.david():say([['david','The time is now exactly '+pick(['half past a Tuesday','eleven, obviously','later than you think and earlier than you deserve','the same time it was when you asked, plus regret','soon o\'clock','a quarter to the heat death of the universe'])+'.'],
+  ['david',pick(['I watched you spend nine minutes in the Comment Section. I aged for both of us.','Borrowed Time is yours, pet. Do not spend it scrolling.','I have seen the end of this game. You press a button.','Punctuality is the only virtue. The rest are hobbies.','That robot said I had "unc energy". I have looked ahead. It never stops being insulting.'])]]);
+TALK.will=()=>!X.lit?T0.will():say([['will','Shipped a hotfix while you were talking. Patch notes:'],['will','v0.'+(67+Math.floor(Math.random()*30))+'. '+pick(NOTES)+' '+pick(NOTES)],['will',pick(['It works on my machine.','Do not tell me if it broke. I will find out in prod, like an adult.','I built the nice game. I am just visiting the slop. I can leave whenever. ...I cannot find the exit.','Quick match, then back to work.'])]]);
+// ---- moments: little scenes the first time you turn up somewhere
+function moment(id,lines,after){if(X.mom.includes(id)||S.mode!=='play'||S.dead)return;X.mom.push(id);save();say(lines,after);}
+const MC={sk:shot(SK.x+3,SK.z+27,5,SK.x+2,SK.z+6,4),fl:shot(FL.x-2,FL.z+22,4.5,FL.x-2,FL.z+5,3),tub:shot(FL.x-3,FL.z-1,4,FL.x-10,FL.z-8,2.4),pr:shot(PR.x+11,PR.z-4,3.4,PR.x+1,PR.z,3.2),cy:shot(CY.x+15,CY.z-11,7,CY.x,CY.z,4),ka:shot(CY.x+22,CY.z-5,3.4,CY.x+29,CY.z-12,3),hg:shot(HG.x-8,HG.z+9,4.2,HG.x,HG.z,3.6),bt:shot(-11,41,4,-18,34,2)};
+function rotMoments(){const near=(a,r)=>Math.hypot(PL.x-a.x,PL.z-a.z)<r;
+  if(near(SK,30))moment('sk',[['erin','Will. There is a person made of noise standing near my tomatoes.',{cam:MC.sk}],['will','It\'s fine. It\'s a user. Mostly harmless. Do not feed it prompts.'],['erin','It has a watermark, Will.'],['will','Yeah, they all do now. I filed a ticket.'],['louie','ARF. (Louie has smelled you. You smell like eleven fingers.)']]);
+  else if(near(FL,27))moment('fl',[['marcus','BRO. A CUSTOMER. Derek. DEREK. Look alive.',{cam:MC.fl}],['derek','...This is the amount of alive I am.'],['marcus','He\'s being modest. Most alive guy I know. Top three.'],['derek','...Who are the other two.'],['marcus','Me and the van, bro.']]);
+  else if(near(PR,13))moment('pr',[['sys','A reporter raises a hand. It is a camera with a hand. Do not think about it.',{cam:MC.pr}],['bibi','YES. YOU. THE CAMERA.'],['sys','"Prime Minister, what is your plan for the slop?"'],['bibi','EXCELLENT QUESTION. NEXT QUESTION.'],['sys','"That was not an answer."'],['bibi','AND THAT WAS NOT A QUESTION. WE ARE BOTH DISAPPOINTED. THIS CONCLUDES PRESS CONFERENCE NUMBER 4,207. PRESS CONFERENCE NUMBER 4,208 BEGINS NOW.']]);
+  else if(near(HG,22))moment('hg',[['david','You are four minutes late.',{cam:MC.hg}],['sys','You have never met this man.'],['david','And yet. Four minutes. I had a chair ready. I have put the chair away. You will not be seeing the chair.']]);
+  else if(X.clank<2&&near(CY,44))moment('cy',[['bottie','YO YO YO. new training data just walked in. smile for the dataset.',{cam:MC.cy}],['kael','It talks.',{cam:MC.ka}],['bottie','i also sing, unc.',{cam:MC.cy}],['kael','I preferred the valves.',{cam:MC.ka}]]);
+  else if(X.clank>=3&&near(CY,32))moment('kb',[['bottie','teach me the valve thing, unc. for content.',{cam:MC.cy}],['kael','You turn it. Until it stops.',{cam:MC.ka}],['bottie','that\'s it? no lore? no skill tree?',{cam:MC.cy}],['kael','It is a wheel.',{cam:MC.ka}],['bottie','...that\'s the hardest thing anyone\'s ever said to me.',{cam:MC.cy}]]);
+  else if(X.flow>=4&&Math.hypot(PL.x-FL.tub[0],PL.z-FL.tub[2])<8)moment('tub',[['marcus','Hot tub\'s open, bro. Flow Pros employee benefit. Do NOT tell Erin.',{cam:MC.tub}],['derek','...She\'s in the group chat.'],['marcus','She doesn\'t read the group chat.'],['erin','I read the group chat, Marcus.'],['marcus','...Erin\'s right behind me, isn\'t she.'],['derek','...Bro.'],['sys','Nobody is behind him. Erin is four hundred metres away. She is just very good at this.']]);}
+// ---- the big red button. Louie boops it. Things happen.
+const CH={id:'',t:0},BTN={x:-18,z:34};
+(function(){const y=groundH(BTN.x,BTN.z),m=new THREE.Mesh(merge([pt(Box(3,1.4,3),0xffd400,M(0,.7,0)),pt(Box(3.05,.3,3.05),0x111111,M(0,.5,0)),pt(Box(3.05,.3,3.05),0x111111,M(0,1.1,0)),pt(Cyl(1.1,1.2,.7,16),0xe01020,M(0,1.75,0))]),lam);m.position.set(BTN.x,y,BTN.z);scene.add(m);BTN.y=y;colliders.push({x:BTN.x,z:BTN.z,r:1.9,top:y+2});
+  sign(BTN.x+4,BTN.z+1,['DO NOT PRESS','(Louie, this means you)'],-1.2,'#e01020');})();
+const CHAOS=[['grav','MOON MODE','gravity has been asked to leave'],['big','BIG MODE','you have been upscaled 4x'],['tiny','SMOL MODE','you have been compressed'],['disco','DISCO MODE','the colours are doing their best'],['fry','DEEP FRIED','too many filters, not enough pixels'],['zoom','ZOOMIES','you are now as fast as Louie thinks he is'],['rain','AURA RAIN','it is raining aura. hallelujah'],['herd','STAMPEDE','every hallucination heard that']];
+function pressButton(who){if(ROT.btn>0){toast('The button is cooling down. It has been through a lot.');return;}ROT.btn=28;const c=pick(CHAOS);CH.id=c[0];CH.t=18;zoneCard(c[1],c[2]);SFX.boom();flash(.5,400);burst(BTN.x,BTN.y+3,BTN.z,60,null,18,10,1.2);
+  app.classList.remove('disco','fry');if(c[0]==='disco'||c[0]==='fry')app.classList.add(c[0]);if(who)bubble('Boop.',LOU.x,LOU.y+4,LOU.z);
+  if(c[0]==='herd')for(let k=0;k<9;k++){const a=k/9*TAU;spawnEnemy(PL.x+Math.cos(a)*22,PL.z+Math.sin(a)*22,'botmin');}
+  if(!X.mom.includes('btn')){X.mom.push('btn');save();say([['sys','A button marked DO NOT PRESS has been pressed.',{cam:MC.bt}],['marcus','(on the phone) Bro. Did somebody just... nah. Nah. It\'s fine. It\'s probably fine.'],['will','(on the phone) It is not fine. That button is wired to everything. I do not know why. I did not build this one.']]);}}
+function chaosEnd(){CH.id='';app.classList.remove('disco','fry');toast('The button has worn off. Reality is back to its usual standard.');}
+// ---- the whole gang pitches in at the final boss
+const ASSIST=[['van',()=>true,()=>{FLY.t=0;FLY.hit=false;FLY.g.visible=true;toast('🚐 MARCUS: "SEND IT!"');tone(220,.6,'sawtooth',.1,0,520);}],
+  ['erin',()=>X.erin>=3,()=>{if(S.cells<S.max)S.cells++;toast('🍅 ERIN: "Eat something, you look rendered!" (+1 brain cell)');SFX.page();}],
+  ['kael',()=>X.clank>=2,()=>{for(let k=0;k<5&&boss.hp>1;k++)hitBoss({x:0,y:boss.y,z:9});toast('🔔 KAEL: "Eleven."');SFX.boom();}],
+  ['david',()=>X.hour>=2,()=>{S.slow=3.2;app.classList.add('slow');toast('⏳ DAVID: "I am lending you three seconds. Be embarrassed faster."');}],
+  ['bibi',()=>X.erin>=3,()=>{boss.ring+=3.5;boss.aim+=3.5;toast('👑 KING BIBI: "THE BOSS MUST NOW TAKE QUESTIONS." (it is stalled)');}],
+  ['louie',()=>!!X.louie,()=>{bb.forEach(b=>{b.life=0;b.m.visible=false;});toast('🐕 LOUIE: arf. (He ate the projectiles. All of them.)');}],
+  ['bottie',()=>X.clank>=3,()=>{for(let k=0;k<3&&boss.hp>1;k++)hitBoss({x:0,y:boss.y,z:-9});toast('🤖 LIL BOTTIE: "fine. clanker guns. for the vibes."');}]];
+let assistN=0;
+function gangAssist(){const ok=ASSIST.filter(a=>a[1]());const a=ok[assistN++%ok.length];a[2]();}
+// ---- kill streaks, pop-up ads
+const STREAK=['','','DOUBLE RATIO','TRIPLE SIGMA','QUAD CAP (NO CAP)','OHIO RAMPAGE','UNSPEAKABLE AURA','PLEASE TOUCH GRASS'];
+function rotKill(e){ROT.ks=S.t-ROT.kt<3.5?ROT.ks+1:1;ROT.kt=S.t;if(ROT.ks>=2){const n=Math.min(ROT.ks,STREAK.length-1);floatText(STREAK[n],e.x,e.y+7,e.z,'#ffd400');addAura(ROT.ks*150);tone(300+n*120,.2,'square',.1);}}
+const ADS=['🔥 HOT SINGLE GPUs IN YOUR AREA','📞 Your van\'s extended warranty is about to expire','🧠 Doctors HATE this one brain cell','📈 Local user gains 67 aura with this one weird trick','💧 FLOW PROS: we have a guy. Call the guy.','👑 VOTE BIBI. You already did. Thank you.','⏳ Is your clock late? David says yes.','🤖 lil Bottie\'s new single is out. It is 11 seconds.','🌽 You may be entitled to corn','📱 You have (1) new notification: this one'];
+function showAd(){const a=$('ad');$('adt').textContent=pick(ADS);a.style.left=(12+Math.random()*30)+'%';a.style.top=(26+Math.random()*22)+'%';a.hidden=false;ROT.adT=9;}
+$('adx').addEventListener('click',e=>{e.stopPropagation();$('ad').hidden=true;addAura(670);toast('Ad closed. +670 aura. Elite ball knowledge.');SFX.orb(5);});
+function rotUpdate(dt,play){if(S.snack>0)S.snack-=dt;if(ROT.btn>0)ROT.btn-=dt;
+  if(CH.t>0){CH.t-=dt;if(CH.id==='rain'&&play&&Math.random()<dt*7){const x=PL.x+(Math.random()-.5)*14,z=PL.z+(Math.random()-.5)*14;floatText(pick(['💎','💯','🔥','👑','🧠','🗿']),x,PL.y+6,z);addAura(67);}if(CH.t<=0)chaosEnd();}
+  if(ROT.beat>0){ROT.beat-=dt;AU.theme='boss';ROT.lyr-=dt;if(ROT.lyr<=0){ROT.lyr=1.4;bubble(pick(LYRICS),BOT.x,BOT.y+7,BOT.z);}if(ROT.beat<=0)AU.theme=S.zone;}
+  if(ROT.adT>0){ROT.adT-=dt;if(ROT.adT<=0)$('ad').hidden=true;}
+  if(!play||S.inBoss){if(!$('ad').hidden&&S.inBoss)$('ad').hidden=true;return;}
+  rotMoments();if(S.mode!=='play')return;
+  if(X.louie&&ROT.btn<=0&&Math.hypot(LOU.x-BTN.x,LOU.z-BTN.z)<13&&Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<12){pressButton(true);return;}
+  ROT.bark-=dt;if(ROT.bark<=0){ROT.bark=3.5+Math.random()*4;let best=null,bd=26;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd){bd=d;best=n;}}
+    if(best)bubble(pick(BARK[best.id]),best.x,best.y+6,best.z);else if(Math.hypot(PL.x-VAN.x,PL.z-VAN.z)<22&&!VAN.driving)bubble(pick(BARK2.derek),VAN.x,VAN.y+6.5,VAN.z);
+    else if(Math.hypot(PL.x-BOT.x,PL.z-BOT.z)<34&&BOT.state!=='fight')bubble(pick(BARK2.bottie),BOT.x,BOT.y+7,BOT.z);else if(X.louie&&Math.random()<.4)bubble(pick(BARK2.louie),LOU.x,LOU.y+3.6,LOU.z);
+    else if(VAN.driving&&Math.random()<.6)bubble(pick(['...You took that corner personally.','...Bro.','...Mirror. Signal. Send it.','...That was a hallucination. You hit it. Good.']),VAN.x,VAN.y+6.5,VAN.z);}
+  ROT.chat-=dt;if(ROT.chat<=0){ROT.chat=26+Math.random()*22;toast(pick(CHAT));}
+  ROT.ad-=dt;if(ROT.ad<=0){ROT.ad=55+Math.random()*40;showAd();}}
+
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;S.max=5+(X.erin>=3?1:0);S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -1475,7 +1568,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN};
 }
 })();
 </script>
