@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
   console.log('button before finding:', await p.evaluate(() => !!document.getElementById('bGuests')));
   for (let i = 0; i < 5; i++) await p.click('#panel .logo'); await p.waitForTimeout(300);
   console.log('page:', await p.evaluate(() => (document.querySelector('#panel h2') || {}).textContent + ' x' + document.querySelectorAll('[data-egg]').length)); await p.screenshot({ path: 'guests.png' });
-  const ids = await p.evaluate(() => Object.keys(G.EGGS)), shots = [];
+  const ids = await p.evaluate(() => Object.keys(G.EGGS).filter(k => !G.EGGS[k].hidden)), shots = [];
   for (const id of ids) { await p.evaluate(id => { if (G.talk) G.talkApi.skip(); G.ui.close(); G.ui.title(); G.ui.guests(); document.querySelector('[data-egg=' + id + ']').click(); }, id); await p.waitForTimeout(80); if (id === 'will') await p.screenshot({ path: 'guest_card.png' });
     await p.evaluate(() => document.querySelector('#y, [data-rep="1"]').click()); await p.waitForTimeout(600);
     const r = await p.evaluate(() => { G.muted = true; const st = G.state, h = st.hero; Object.assign(st, { toured: 1, tourAsked: 1, firstPath: 9, shownPlaces: { a: 1 } }); G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); const top = (document.querySelector('#topbar, .topbar, #hud') || document.body).textContent.replace(/\s+/g, ' ').slice(0, 60);

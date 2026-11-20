@@ -4,23 +4,25 @@ Kept current as work lands. Newest section first.
 
 ## The Guest List (Easter egg roster)
 
-Done in the first pass: hidden roster page (tap the crown five times, type `louie`, or hold both shoulder buttons on the title), eight guests with their own race, title, look, move set, ultimate and named finisher — David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout.
+Done so far: hidden roster page (tap the crown five times, type `louie`, or hold both shoulder buttons on the title); eight guests with their own race, title, move set, ultimate and named finisher — David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout. Guests wear their own clothes from their own games, not pit gear (Will's glasses and red shorts, Erin's garden hat and apron, Marcus's Flow Pros shirt, cap and pipe wrench, Bottie's box head and arm guns, Bibi's suit, tie and crown). Starters are the current ones: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will. Marcus's finisher is Derek Pulls Up (the Flow Pros van, the spike wall, the beer, "NOT AGAIN").
 
 Not done:
 
 - **Kael** — no lore for Kael anywhere in the repo. Needs a description (who they are, what they do) before they can be built.
-- **Buddies on screen** — Cindercap, Drizzlet, Fernfang (Erin) and Embercap, Tidestag, Fernhowl (Will) are moves with their own colours and effects, but the creature itself does not appear when called. Needs small models and a summon animation.
-- **Unique finisher animations** — each guest has a named finisher, but it plays an existing finisher's animation under the new name. Flush-ality, Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality and Compost-ality still need their own staging.
-- **Louie's finisher name** — as a beast he uses the beast finisher ("Fed to the Beast"), not "Bork-ality".
-- **Unique attack animations** — guests use their frame's swings and casts (fighter, rogue, druid, sorcerer). No bespoke animations yet (Bottie's guns, Marcus's wrench, the Sprout's pluck).
+- **Buddies on screen** — Cuyapup, Bessling, Grasskin, Cuyaflare, Bessie and Mossman are moves with their own colours and effects, but the creature itself does not appear when called. Needs small models and a summon animation.
+- **Unique finisher animations for the other seven** — only Marcus has his own staging. Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality, Compost-ality and David's still play an existing finisher under the new name.
+- **Derek Pulls Up polish** — Marcus is off camera when he says "NOT AGAIN"; no engine or horn sound of its own; Derek does not walk back to the van.
+- **Flow Pros colours** — blue and white are the placeholder from Knockout until the real logo or a photo of the truck is supplied.
+- **Louie** — still the wolf body in Shiba orange: no cream face and belly, no curled tail, no airplane ears. As a beast he gets the beast finisher, not Bork-ality.
+- **More moves from the other games** — not yet recreated: Leash Lasso, Louie Airlines, Shiba Plane, Paw Paw Paw, Snake the Drain, Plunger Pop, The Final Bet, Bean Dip, and the whole sets of Corbin, Mama and Gas Guy.
+- **Unique attack animations** — guests use their frame's swings and casts. No bespoke animations yet (Bottie firing from the arm guns, Marcus swinging the wrench as a wrench, Erin's towel snap, the Sprout's pluck).
 - **Career paths** — guests start with everything and level like their frame class; the level-up screen still offers that class's moves. No guest-specific unlocks, story beats or endings yet.
 - **Interactions** — no special dialogue when a guest meets Marc, Pip, the Guildmaster or David (including David meeting himself), and no lines between guests.
 - **King Bibi's "I always come back"** — a once-per-bout return from defeat is not built.
 - **Marcus's Double or Nothing** — currently one very swingy damage roll, not a true coin flip with a called result.
 - **Guests as opponents** — they are playable only. They never appear across the sand from you.
 - **More of the old cast** — Corbin, Mama, Gas Guy are not on the list.
-- **Models** — guests are recoloured frames with a few added pieces (crown, cap, glasses, visor, leaf, garden hat). No fully bespoke bodies; Lil Bottie is not visibly a robot beyond colour, visor and antenna.
-- **Will's portrait** — the rogue hood leaves his face in shadow on the roster page; he needs his own head (no hood, glasses visible).
+- **Shop and Tailor on a guest** — kits and cosmetics bought in the market do not show on a guest's body (by design for now); the shops do not say so.
 - **Stance pictures for Louie** — the stance picker assumes a two-legged fighter.
 - **Balance** — deliberately broken. Not tuned at all.
 
