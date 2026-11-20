@@ -7,7 +7,7 @@ Kept current as work lands. Newest section first.
 Done so far:
 
 - Hidden roster page: tap the crown five times, type `louie`, or hold both shoulder buttons on the title.
-- Ten guests, exactly the ones Will named, each with their own race, title, moves, ultimate and finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael Brennick. (Mama, Corbin and Gas Guy were added by mistake and removed. Do not add anyone Will has not asked for.)
+- Nine guests, exactly the ones Will named, each with their own race, title, moves, ultimate and finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael Brennick. (Mama, Corbin and Gas Guy were added by mistake and removed. Do not add anyone Will has not asked for.)
 - Starting a career as a guest: one big button on their card; if all three pages are in use it asks which page they take. The crown opens the list by mouse or touch.
 - Their own body style (round, smooth, big heads, cartoon eyes; Lil Bottie square and chrome; Louie a Shiba; only David keeps the pit's body) and their own clothes and props.
 - Current starters, on the sand when called: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will.
