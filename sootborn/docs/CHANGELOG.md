@@ -1,4 +1,18 @@
-# SOOTBORN — changelog (latest v0.75 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.76 · 2026-11-20)
+
+## v0.76 · 2026-11-20 — the Keep's dais and the Spire Guards (Step 11, first part)
+What could be done on characters without the animation library.
+
+- **Celestine and her two Wardens on the Keep's dais are drawn in detail now**, flat, the way the Proctors are. They were three grey blocks. She stands crowned in white with her gloved hands folded; the Wardens wear grey plate, a red tabard and crest, a barred helm, and hold their halberds on the outside. They are in the cold open, the Keep, and the Pinning.
+- **The Spire Guards' helm is a helmet:** a gilt brow, a nasal bar, cheek plates and a neck guard, in place of a box with a slit. Seen at the Stair and Riser Nine (the arena versions).
+- **Looked at and left alone:** the guards in the comic-book levels already have their helms, crests and visors from v0.60.
+
+**Checked:** stills of the dais and of the guards up close; the whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. The dais figures were seen from the fight's usual distance only. Not started from Step 11: the bosses' own faces, weapons and idle; Kael's ready stance; capes in motion; the crowd in other 3D rooms; and real animation, which waits for the library.
+
 
 ## v0.75 · 2026-11-20 — matching the writing: the coat, the gloves, the leg, the small things people do
 Step 10 of the plan. Things the story says that the pictures did not show.
