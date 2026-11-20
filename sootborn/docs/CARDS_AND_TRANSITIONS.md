@@ -1,4 +1,6 @@
-# SOOTBORN — cards, transitions and triggers (timeline v2)
+# SOOTBORN — cards, transitions and triggers (timeline v2) — SUPERSEDED
+**Superseded on 2026-11-19 by the master timeline** (`claude/sootborn-master-timeline.md`, `docs/MASTER_TIMELINE.md`), which has every card with its context, the Pairing moved into the first dream, Part Two's additions and the card fixes. Kept for the record; build from the master timeline.
+
 Written 2026-11-19, after v0.65, for the timeline in the master plan (section 9e). Not built yet. This is the script for every title card, every time card, every cut between times, and what in the present sets off each flash. Approve it (or mark it up) before I build.
 
 ## 1. Story check
