@@ -6,6 +6,8 @@ Kept current as work lands. Newest section first.
 
 Done so far: hidden roster page (tap the crown five times, type `louie`, or hold both shoulder buttons on the title); eight guests with their own race, title, move set, ultimate and named finisher — David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout. Guests have their own body style (round, smooth, big heads and cartoon eyes; Lil Bottie square and chrome; only David keeps the pit's body) and wear their own clothes from their own games, not pit gear (Will's glasses and red shorts, Erin's garden hat and apron, Marcus's Flow Pros shirt, cap and pipe wrench, Bottie's box head and arm guns, Bibi's suit, tie and crown). Starters are the current ones: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will. Marcus's finisher is Derek Pulls Up (the Flow Pros van, the spike wall, the beer, "NOT AGAIN").
 
+Move effects built so far: Will's Mazel Tov Blast (wide multi-hit beam with confetti) and Hasbara (cut-in, command desk, SENT!, mind flipped, five self-hits); Lil Bottie's three-round Clanker Guns and the Nuke; Marcus's real coin flip on Double or Nothing and the Hydro Jet spray; Louie's side-eye on Judgement; King Bibi's Red Line drawn on the sand.
+
 Not done:
 
 - **Kael** — no lore for Kael anywhere in the repo. Needs a description (who they are, what they do) before they can be built.
@@ -16,11 +18,12 @@ Not done:
 - **Louie** — now a Shiba (cream face and belly, pointed ears, curled tail) but still on the wolf's skeleton and animations; no airplane ears. As a beast he gets the beast finisher, not Bork-ality.
 - **Guest bodies** — the round, big-headed style shares the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **More moves from the other games** — not yet recreated: Leash Lasso, Louie Airlines, Shiba Plane, Paw Paw Paw, Snake the Drain, Plunger Pop, The Final Bet, Bean Dip, and the whole sets of Corbin, Mama and Gas Guy.
+- **Moves with no effect of their own yet** — Selfie Flash, Bike Lane, the six buddies, Towel Whip, Hide and Seek, Sprout Stampede, Air Support, Chain Stun, Pipe Wrench, Dab Cloud, Chomp, Need More Loaf, Iron Dome, Filibuster, Coalition, all of the Sprout's and David's.
+- **Hasbara is not cast by the computer** — an automatically played Will never chooses it. It works from a real key press (checked: cinematic plays, opponent hits themselves).
 - **Unique attack animations** — guests use their frame's swings and casts. No bespoke animations yet (Bottie firing from the arm guns, Marcus swinging the wrench as a wrench, Erin's towel snap, the Sprout's pluck).
 - **Career paths** — guests start with everything and level like their frame class; the level-up screen still offers that class's moves. No guest-specific unlocks, story beats or endings yet.
 - **Interactions** — no special dialogue when a guest meets Marc, Pip, the Guildmaster or David (including David meeting himself), and no lines between guests.
 - **King Bibi's "I always come back"** — a once-per-bout return from defeat is not built.
-- **Marcus's Double or Nothing** — currently one very swingy damage roll, not a true coin flip with a called result.
 - **Guests as opponents** — they are playable only. They never appear across the sand from you.
 - **More of the old cast** — Corbin, Mama, Gas Guy are not on the list.
 - **Shop and Tailor on a guest** — kits and cosmetics bought in the market do not show on a guest's body (by design for now); the shops do not say so.

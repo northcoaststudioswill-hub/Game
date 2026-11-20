@@ -866,6 +866,7 @@
   }
   function fire(e) {
     const act = e.act, ab = act.ab, foe = e.foe, a = act.aim;
+    if (ab.eggFx && G.eggFx) { try { G.eggFx(ab.eggFx, e, foe, a, ab); } catch (err) { } }
     if (ab.type === 'melee') {
       const fin = act.fin, rng = ab.range * (fin ? 1.2 : 1), d = Math.hypot(foe.x - e.x, foe.y - e.y), ta = Math.atan2(foe.y - e.y, foe.x - e.x), arc = ab.arc * Math.PI / 180 * (fin ? 1.5 : 1);
       if (ab.cone) {
@@ -1328,6 +1329,7 @@
   F.exDodge = function (e, ang) { e.dodgeT = 0; if (e.state !== 'idle') interrupt(e); e.intent.mx = Math.cos(ang); e.intent.my = Math.sin(ang); e.buf = { id: 'dodge', t: 0.3 }; };
 
   F.hitTest = (a2, t2, ab2, o2) => hit(a2, t2, ab2, o2 || {});
+  F.eggApi = { hit, text, spark, blood, mark, S, fx: o => fx.push(o), shake: v => { shake = Math.max(shake, v); }, stop: v => { hitstop = Math.max(hitstop, v); }, alive: e => e && e.hp > 0 && phase === 'fight' };
   F.koEntity = e => ko(e); F.inFight = () => phase === 'fight';
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
