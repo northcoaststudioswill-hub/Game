@@ -401,7 +401,7 @@ function festA() {
   const n = rays();
   return [
     { music: 'mystery' },
-    { card: 'LAST BELL', sub: 'The Festival of the First Fire · forty-two days after the furnace', min: 1.2, max: 4 },
+    { card: 'THE FIRST FIRE', sub: 'Ashgate Square. After last bell.', min: 1.2, max: 4 },
     { scene: 'fest', cam: [8, 10], dark: F('spareOn') ? 'rgba(6,4,14,.5)' : 'rgba(6,4,14,.62)', zoom: 2 },
     { add: [['kael', 8, 9, 3], ['tavi', 7, 10, 3], ['ivo', 9, 11, 1], ['mara', 4, 8, 3], ['hollis', 6, 11, 3], ['marrow', 6, 7, 3], ['pell', 5, 9, 3], ['juno', 9, 12, 1], ['bao', 5, 11, 3], ['orin', 7, 13, 1], ['fen', 3, 10, 3],
       ['kit', 20, 11, 2], ['nell', 18, 10, 2], ['c2', 19, 9, 2, 'c2'], ['c3', 20, 7, 2, 'c3'], ['c4', 18, 12, 2, 'c4'], ['c1', 21, 9, 2, 'c1'], ['proctor', 12, 10, 2], ['watchman', 15, 10, 3], ['vale', 11, 5, 0]] },
@@ -533,10 +533,10 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
-    ...(NOFF ? [] : DREAM2()), 
-    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
+    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
+    ...(NOFF ? [] : DREAM2())
   ].filter(Boolean);
 }
 
 // the Proctor duel plays before the ceremony: the night Kael learns what the Authority takes, cut against the night he takes something back
-{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'THE ASSAY', sub: 'Four years after the furnace. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }]).concat(f0()); }; }
+{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }]).concat(f0()); }; }

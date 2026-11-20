@@ -127,6 +127,7 @@ Object.assign(MOUTH, { rook: 'flat' });
 const P2 = {
   1: () => [
     { music: 'spire' }, { card: 'PART TWO', sub: 'A B O V E', big: 1, sfx: 'splash', min: 2.2, max: 6 },
+    ...(NOFF ? [] : [{ card: 'THE PINNING', sub: 'Four years after the furnace. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() }, { music: 'spire' }]),
     { card: 'THE SEAT KNIFE', sub: 'Four years after the furnace. The night before the lift.', big: 1, min: 1.5, max: 4.5 },
     { music: 'mystery' }, { panel: 'under' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'The night before I went up as Edric Sorrel, Brand took the blade the High Auditor had pinned on me with the sun, and put the last hand of it in a forge.' },
@@ -208,7 +209,7 @@ const P2 = {
     { narr: 'A letter came up through Sable the same week, in Dace\'s chalk-fingered hand.' },
     { say: 'dace', t: 'Tavi is on the wheel now. Twelve. She hums while she turns it and nobody has the heart to stop her. Mara says to tell you the shelf is holding.' },
     { say: 'dace', t: 'She puts the sun back on the Pillar every rest day. Sull scrubs it. She puts it back. I have stopped telling her not to.' },
-    { fade: 'out' }, { panel: null }, { card: 'BELOW', sub: 'Cinderwell. Five years after the furnace. Tavi.', big: 1, min: 1.5, max: 4.5 }, { mission: 'sun' },
+    { fade: 'out' }, { panel: null }, { card: 'MEANWHILE', sub: 'Cinderwell. Five years after the furnace. Tavi.', tr: 'chalk', big: 1, min: 1.5, max: 4.5 }, { mission: 'sun' },
     { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'There is a riser under Tier Four that comes up in your valley. Nine floors, Kael. If somebody held the top of it for an hour.' },
     { fade: 'out' }, { panel: null },
@@ -249,7 +250,7 @@ const P2 = {
     ] },
     { fade: 'out' }, { panel: null },
     // the Dockmaster's table: Vant again, Rook for the first time, and where the nine minutes came from
-    { music: 'spire' }, { card: 'THE DOCKMASTER\'S TABLE', sub: 'Five years after the furnace. The last night of the quarter, on the High Docks.', big: 1, min: 1.5, max: 4.5 },
+    { music: 'spire' }, { card: 'THE DOCKMASTER\'S TABLE', sub: 'Five years after the furnace. The High Docks.', big: 1, min: 1.5, max: 4.5 },
     { panel: 'table' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'On the last night of every quarter the Dockmaster gives a dinner, and the Clerk of the Count is asked, because somebody must sign for what the docks have landed. That is how I came to sit at table with a man I had beaten in a river.' },
     { say: 'vant', t: 'Sorrel. One has not had the pleasure since the Ford. You have grown into the collar. One would not have said, that day, that you were a man for sums.' },
@@ -328,8 +329,7 @@ const P2 = {
     { narr: 'At the gate I looked at the docks the way I had looked at them for three years from a window in the Count. Statues with lamps. Trees in tubs. A fountain, running. Six tiers under it Nell counts water by the cup.' },
     { sfx: 'bell' }, { narr: 'Then the second bell rang, and the top of the stair was full of light.' },
     { fade: 'out' }, { panel: null },
-    { card: 'THE HIGH DOCKS', sub: 'Seven years after the furnace. The second bell.', big: 1, min: 1.5, max: 4.5 },
-    { issue: 'docks', or: [{ brawl: () => FF.docks() }] },
+    { issue: 'docks', or: [{ card: 'THE HIGH DOCKS', sub: 'Seven years after the furnace. The second bell.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.docks() }] },   // the level shows its own title card; this one is only for the 2D fallback
     // ---- the way out: the fleet is away, the sun goes over the rail, and the stair is still to pay for
     { music: 'mystery' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
     { narr: 'From Mooring One I watched four hundred hulls go into the weather with their lamps out. It was the largest theft in the history of the Count, and I was the clerk who would have had to enter it.' },
@@ -347,7 +347,7 @@ const P2 = {
     { narr: 'Brand held the dock stair behind us while we cut the last moorings. He had been a Warden. He knew exactly how many of them it would take, and that it was more than he had minutes.' },
     { pstage: 1 }, { wait: 2.4 },
     { narr: 'He said: go. I said no. He said: Brennick, I put a halberd butt into a welder for humming, once. I have been waiting seven years for a stair. Go.' },
-    { fade: 'out' }, { panel: null }, { card: 'THE DOCK STAIR', sub: 'Seven years after the furnace. Brand.', big: 1, min: 1.5, max: 4.5 },
+    { fade: 'out' }, { panel: null }, { card: 'ELEVEN MINUTES', sub: 'Seven years after the furnace. Brand holds the dock stair.', big: 1, min: 1.5, max: 4.5 },
     { brawl: () => FF.brandstair() },
     { music: 'mystery' }, { panel: 'dockstair' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { sfx: 'heart' }, { wait: 2 },
     { narr: 'Eleven minutes. Somebody timed it. I asked them to.' },
@@ -373,7 +373,7 @@ const P2 = {
     { fade: 'out' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
     { narr: 'We hid four hundred barges in the weather for two years. The Unlit came up in ones and twos through Riser Nine and learned to fly them. Valve techs. Welders. A noodle seller.' },
     { say: 'dace', t: 'Tier Six stopped kneeling in the spring. Mara did it. I was not there. I am told it went like this.' },
-    { fade: 'out' }, { panel: null }, { card: 'MEANWHILE', sub: 'Six tiers down. Bay Three. A commitment.', big: 1, min: 1.5, max: 4.5 },
+    { fade: 'out' }, { panel: null }, { card: 'EIGHT YEARS AFTER THE FURNACE', sub: 'Six tiers down. Bay Three. A commitment.', tr: 'chalk', big: 1, min: 1.5, max: 4.5 },
     { brawl: () => FF.stand() },
     { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'She stood up, and the whole row stood up behind her, and the Wardens found they did not have enough halberds. The boy is on the wheel with Tavi now.' },

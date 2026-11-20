@@ -1,4 +1,43 @@
-# SOOTBORN — changelog (latest v0.66 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.67 · 2026-11-19)
+
+## v0.67 · 2026-11-19 — the rearranging: the Keep opens the game, the Pairing is dreamed, every card in its place, five transitions
+From your question (shouldn't the rearranging come first?): yes. This version does everything in the plan that is pure moving and re-carding, and the transitions that sit on the cards. Nothing new was written except three card lines and two film captions.
+
+**What moved**
+- **The Keep is the cold open.** New Game goes: the opening film, "FOUR YEARS AFTER THE FURNACE · The Assay. The last day.", and the duel on the keep. Nobody is named (his bar reads "Her son"), there are no memory cut-ins, and one line: THE LAST DAY. HER SON HOLDS THE KEEP. **It cannot be lost. When his health is half gone your fury fills; hold strike for ELEVEN and the picture cuts to black as the blade comes down.** (If you never press it, it goes by itself after nine seconds at full fury.) Then Cinderwell.
+- **The Pairing is in the first dream**, after "Three years of that", so the present (Ashgate) now comes straight after the furnace and the title. That night's dream runs in date order: half a year, two years, two and a half, the Assay's first night, night three.
+- **The Lamp (night 28) moved to First Fire's night**, after the Standard: fire answers fire. The Ledger's night is now the Dais, the Proctor and On the Ground.
+- **The Valley (day 40) moved to the last dream**, before the Last Night and the Keep, with a two-line film in place of the six captions that used to explain the whole game. It can be skipped now that it is not the first fight.
+- **The Pinning opens Part Two**, after the PART TWO card.
+- **"One candle-hour. It burned for three."** now closes the festival before the night's dream, not after it.
+
+**Cards**
+- ASHGATE is a chapter card ("Forty-one days after the furnace. Kael still fixes valves."). FIRST FIRE has one too, on waking.
+- The Table: HALF A YEAR AFTER THE FURNACE. The Camp: NIGHT THREE. The Island: night twenty-five. The Lamp: NIGHT TWENTY-EIGHT. The Last Night: NIGHT FORTY-NINE. The Ford's card is a date like the rest.
+- The festival's second LAST BELL card is THE FIRST FIRE. The second THE LEDGER card ("the day ends") is gone: he wakes under the floor. The second THE HIGH DOCKS card is gone. Brand's fight is ELEVEN MINUTES. Tier Six is dated (eight years after), not MEANWHILE; Tavi's Sun is MEANWHILE.
+- The Assay calendar strip has nine beats now (night 25 added, the Pinning taken off).
+
+**Transitions** (how a card arrives; one look per kind of jump)
+- **Wake** (white fading out): Ashgate, First Fire, The Ledger, under the floor, The Way Out.
+- **Furnace** (an orange bloom from below): eleven months before the furnace.
+- **Strip** (a gold wash, the calendar sliding in): every jump to the Assay. Inside the Assay the lit day pulses.
+- **Chalk** (a chalk sun): Tavi's Sun, Tier Six.
+- **Page** (a page sweeping across): into the Table and the three levels.
+- Not built yet: the count to eleven as a transition (it comes with the animated intro), the grey furnace and the strip that runs on into years (they come with the scenes that use them).
+
+**Your bug: an ELEVEN before you know what it is**
+- At the furnace, if he runs for her, the fight with the Warden could reach full fury and do ELEVEN before the count had been shown. That fight can no longer do it.
+- The cold open still ends on ELEVEN on purpose (the plan you approved), after the opening film has counted the eleven seconds. Say if that is the one you meant and you want it changed.
+
+**Checked**
+- New Game by real key presses: the Keep starts, six heavy blows leave him on one health and still fighting, ELEVEN cuts it, and BEFORE THE FURNACE follows.
+- The whole-story bot played New Game to THE END with no errors. Its log of every card, fight and level matches the plan's order line for line for everything that exists so far.
+- Each transition caught in two pictures; every title fits; the strip lights the right day.
+
+**Not checked**
+- By hand, any of it. How the cold open feels as the first minute of the game; whether nine seconds is the right wait.
+- Whether any spoken line still assumes the old order (I changed the one in the first dream; I did not read every line).
+- The transitions were seen as stills, not moving, and not heard.
 
 ## v0.66 · 2026-11-19 — the four bugs from your play: the fire pit, weight, deaths, the hook
 Step 1 of the approved plan (the handoff, Part F). No story or card changes.

@@ -5,7 +5,7 @@
 // {shake} {fade:'out'|'in'} {pillarRed} {fx}
 // ============================================================
 // where a flash-forward lands inside the Assay: the beats in story order, the current one lit
-const ASSAY_BEATS = [[/first night/i, 'NIGHT 1'], [/day three\b/i, 'DAY 3'], [/day nineteen/i, 'DAY 19'], [/day twenty-six/i, 'DAY 26'], [/night twenty-eight/i, 'NIGHT 28'], [/day thirty-one/i, 'DAY 31'], [/day forty/i, 'DAY 40'], [/last day\.?$/i, 'LAST DAY'], [/after the keep/i, 'THE PINNING']];
+const ASSAY_BEATS = [[/first night/i, 'NIGHT 1'], [/day three\b/i, 'DAY 3'], [/day nineteen/i, 'DAY 19'], [/night twenty-five/i, 'NIGHT 25'], [/day twenty-six/i, 'DAY 26'], [/night twenty-eight/i, 'NIGHT 28'], [/day thirty-one/i, 'DAY 31'], [/day forty/i, 'DAY 40'], [/last day\.?$/i, 'LAST DAY']];
 function assayCal(sub) { if (!sub || !/assay/i.test(sub)) return ''; const k = ASSAY_BEATS.findIndex(b => b[0].test(sub)); if (k < 0) return ''; return '<div class="acal">' + ASSAY_BEATS.map((b, i) => `<span class="${i === k ? 'on' : ''}"><i></i>${b[1]}</span>`).join('') + '</div>'; }
 const Cutscene = {
   active: false, steps: [], i: 0, actors: [], cam: { x: 0, y: 0 }, block: null, letter: 0, beam: 0, beamT: 0, flash: 0, flashC: '#fff', shake: 0, dark: null, onEnd: null, pillarRed: false, motes: [],
@@ -19,8 +19,11 @@ const Cutscene = {
     while (this.active && this.i < this.steps.length) { const s = this.steps[this.i++]; if (s && this.run(s)) return; }
     if (this.active && !this.block) this.end();
   },
-  card(t, sub, big) {
-    const el = $('#card'); el.classList.remove('hidden');
+  // tr: how the card arrives. One look for each kind of jump in time, so it only has to be learned once:
+  // wake (back to the present below), furnace (back to before the furnace), strip (to the Assay), step (on, inside the Assay), chalk (the same time, somewhere else), page (into a comic-book level)
+  card(t, sub, big, tr) {
+    const el = $('#card'); el.classList.remove('hidden'); if (!tr && big && /assay/i.test(sub || '')) tr = /^FOUR YEARS AFTER/.test(t) ? 'strip' : 'step';
+    el.className = el.className.replace(/\s*\btr-\w+/g, ''); void el.offsetWidth; if (tr && !Settings.d.reduce) { el.classList.add('tr-' + tr); const sf = { wake: 'dash', furnace: 'heart', strip: 'stage', chalk: 'clue', page: 'page' }[tr]; if (sf) Sound.play(sf); }
     el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}${assayCal(sub)}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
     el.classList.remove('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   },
@@ -30,7 +33,7 @@ const Cutscene = {
     if (s.when && !s.when()) return false;
     if (s.issue) { const rest = this.steps.slice(this.i), cb = this.onEnd, or = s.or || []; this.onEnd = null; this.steps = []; this.end(); Issue.start(s.issue, ok => { G.flags['issue_' + s.issue] = ok ? 1 : 0; Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play((ok ? [] : or).concat(rest), cb); }); return true; }
     if (s.mission) { const rest = this.steps.slice(this.i), cb = this.onEnd; this.onEnd = null; this.steps = []; this.end(); Mission.start(s.mission, () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(rest, cb); }); return true; }
-    if (s.card !== undefined) { this.card(s.card, s.sub, s.big); if (s.sfx) Sound.play(s.sfx); this.block = { type: 'card', t: 0, min: s.min || 1.4, max: s.max || 7 }; return true; }
+    if (s.card !== undefined) { this.card(s.card, s.sub, s.big, s.tr); if (s.sfx) Sound.play(s.sfx); this.block = { type: 'card', t: 0, min: s.min || 1.4, max: s.max || 7 }; return true; }
     if (s.scene) { this.hideCard(); this.panel = null; World.load(s.scene, null, true); this.actors = []; this.dark = s.dark || null; this.cam = { x: s.cam[0] * 16 + 8, y: s.cam[1] * 16 }; this.pillarRed = false; this.beam = 0; this.furnace = 0; this.motes = []; this.zoomT = s.zoom || 1; this.zoom = this.zoomT; return false; }
     if (s.add) { for (const [id, x, y, dir, who] of s.add) { const p = T(x, y); this.actors.push({ id, who: who || id, x: p.x, y: p.y, dir: dir || 0, sheet: id === 'kael' ? P.sheet : World.sheetFor(who || id), anim: 0, moving: false }); } return false; }
     if (s.remove) { this.actors = this.actors.filter(a => a.id !== s.remove); return false; }
@@ -154,7 +157,7 @@ const PROLOGUE_A = [
   { narr: 'Nobody from Cinderwell has ever gone with them.' },
   { narr: 'My name is Kael Brennick. I fix valves on Tier 6. And one year ago tonight, I thought the worst thing that could happen to me was a girl saying no.' },
   { fade: 'out' }, { panel: null }, { music: 'home' },
-  { card: 'ELEVEN MONTHS BEFORE THE FURNACE', sub: 'The Festival of the First Fire · Ashgate Square', min: 1.2, max: 4 },
+  { card: 'ELEVEN MONTHS BEFORE THE FURNACE', sub: 'The Festival of the First Fire. Ashgate Square.', tr: 'furnace', min: 1.6, max: 4 },
   { scene: 'square', cam: [11, 9], dark: 'rgba(8,5,16,.32)', zoom: 2.2 },
   { add: [['seren', 12, 9, 1], ['kael', 7, 9, 3], ['c1', 6, 5, 0, 'c1'], ['c2', 18, 6, 2, 'c2'], ['ivo', 16, 11, 2], ['juno', 9, 12, 1]] },
   { fade: 'in' }, { wait: 0.6 },
@@ -185,7 +188,7 @@ const PROLOGUE_A = [
   { narr: 'Seren draws the last ray of her sun on your wrist with her finger. "There," she says. "Now you\'ve seen it."' },
   { fade: 'out' },
   { music: 'mystery' },
-  { card: 'FOUR DAYS BEFORE THE FURNACE', sub: 'The fever comes to Tier 6', min: 1.2, max: 4 },
+  { card: 'FOUR DAYS BEFORE THE FURNACE', sub: 'The fever comes to Tier Six.', min: 1.2, max: 4 },
   { scene: 'apt', cam: [4, 4], dark: 'rgba(4,3,12,.55)', zoom: 1.8 },
   { add: [['tavi', 1.5, 2.4, 0], ['kael', 3, 3, 2], ['nell', 4.4, 3, 2], ['seren', 5.6, 3.6, 2]] },
   { fade: 'in' }, { wait: 0.8 }, { sfx: 'cough' }, { wait: 0.9 }, { sfx: 'cough' },
@@ -248,7 +251,7 @@ const PROLOGUE_B = [
   { narr: 'She pulls you close by the collar. For a moment, Cinderwell is warm for the right reasons.' },
   { fade: 'out' }, { music: null },
   { card: 'For three nights, you bled the line and balanced the bank by dawn.', sub: 'On the third night, the fever broke. Tavi asked for bread.', min: 1.6, max: 6 },
-  { card: 'On the fourth morning, the audit came early.', sub: 'It did not come by gauge. It came down Lift 0.', min: 1.6, max: 6 },
+  { card: 'On the fourth morning, the audit came early.', sub: 'It did not come by gauge. It came down Lift Zero.', min: 1.6, max: 6 },
   { scene: 'square', cam: [13, 4], dark: 'rgba(10,6,14,.5)', zoom: 1.5 },
   { add: [['kael', 11, 7, 1], ['mara', 10, 7, 1], ['ivo', 12, 8, 1], ['tavi', 11, 9, 1], ['seren', 15, 7, 1], ['c1', 8, 7, 1, 'c1'], ['c2', 9, 8, 1, 'c2'], ['c3', 14, 9, 1, 'c3'], ['c4', 16, 8, 1, 'c4'],
     ['pell', 7, 8, 1], ['bao', 17, 7, 1], ['juno', 13, 10, 1], ['nell', 18, 8, 1], ['orin', 6, 7, 1], ['vale', 11, 4, 0]] },

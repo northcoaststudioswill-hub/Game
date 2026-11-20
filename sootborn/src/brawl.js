@@ -48,7 +48,7 @@ const Brawl = {
   // ---------------------------------------------------------- setup
   start(def, onEnd) {
     const hero = def.hero || {}, A = def.arena || { kind: 'ring', rx: 118, ry: 64 };
-    Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 24, hitsN: 0, hitsT: 0, clang: 0, slashes: [], marks: [], rN: 0, wbSaid: 0, fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {}, qi: {}, qT: -9, memo: null, memoDone: {}, broke: 0, lbUsed: 0, _aw: 0 });
+    Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 24, hitsN: 0, hitsT: 0, clang: 0, slashes: [], marks: [], rN: 0, wbSaid: 0, fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {}, qi: {}, qT: -9, memo: null, memoDone: {}, broke: 0, lbUsed: 0, _aw: 0, coldCut: 0, coldT: 0 });
     const hw = A.kind === 'ring' ? A.rx : A.w / 2;
     this.p = { boots: def.boots ? 1 : 0, fu: 1, kn: 0, xh: 0, z: 0, vz: 0, gd: 3, gdT: 0, hcd: 0, airN: 0, x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet || makeChar(playerLook()), st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
       fury: DEV.fury ? 100 : hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
@@ -136,7 +136,7 @@ const Brawl = {
   band() { const e = this.era || 0; return e >= 6 ? 3 : e >= 5 ? 2 : e >= 1 ? 1 : 0; },
   quip(ev) { const d = this.def; if (d.doomed || (d.hero && d.hero.name) || this.vq.length || this.vcur || this.t - this.qT < 7) return; const b = this.band(), pool = (QUIPS[ev] || [])[b] || [], k = ev + b, i = this.qi[k] | 0; if (i >= pool.length) return; this.qi[k] = i + 1; this.qT = this.t; this.vq.push(pool[i]); },
   memoShow(ev, m) { const d = this.def; if (d.training || DEV.quick || this.memoDone[ev] || this.art || (ev !== 'brk' && this.t - (this.cutT || -9) < 5) || (d.hero && d.hero.name)) return; m = m || (MEMOS[ev] && MEMOS[ev][this.band()]); if (!m) return; this.memoDone[ev] = 1; this.memo = { m, t: 0 }; Sound.play('cutin'); },
-  finKind(air) { const p = this.p, f = this.nearest(p); if (!f) return null; if (p.fury >= 100) { if (air) return this.era >= 3 ? 'air' : null; return f.broken > 0 ? 'one' : 'rush'; } if (p.fury >= 50 && !air && p.hp <= p.max * .3 && !this.lbUsed && this.def.legend && !this.def.training) return 'three'; return null; },
+  finKind(air) { const p = this.p, f = this.nearest(p); if (!f || this.def.noFin) return null;   /* noFin: no ELEVEN in a fight that comes before the story has shown what the count is */ if (p.fury >= 100) { if (air) return this.era >= 3 ? 'air' : null; return f.broken > 0 ? 'one' : 'rush'; } if (p.fury >= 50 && !air && p.hp <= p.max * .3 && !this.lbUsed && this.def.legend && !this.def.training) return 'three'; return null; },
   updFin(dt, s) { const p = this.p; let f = s.tg; if (!f || f.st === 'down') f = s.tg = this.nearest(p); for (const l of this.lines) l.life -= dt; this.lines = this.lines.filter(l => l.life > 0);
     if (s.done !== undefined) { if (s.t > s.done + .55) { this.sup = null; p.z = 0; p.vz = 0; this.lines = []; } return; } if (!f) { this.sup = null; p.z = 0; p.vz = 0; return; }
     const tau = s.t - SUPT, fn = s.fn; if (s.dx === undefined) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; s.dx = dx / d; s.dy = dy / d; s.st = 0; }
@@ -174,7 +174,7 @@ const Brawl = {
 
   // ---------------------------------------------------------- hits
   hurtPlayer(f, dmg, ax, ay) {
-    const p = this.p;
+    const p = this.p; if (this.def.cold) dmg = Math.min(dmg, Math.max(0, p.hp - 1));   /* the cold open cannot be lost */
     if (p.inv > 0 || this.sup) { if (p.st === 'dodge' && p.open <= 0.9) { p.open = 1.6; this.slow = 0.5; this.say('OPENING!'); Sound.play('stage'); this.gain(22); } return; }
     if (p.z > 14 && f && (f.mode === 'sweep' || f.mode === 'line')) { if (!p.overT || this.t - p.overT > 1) { p.overT = this.t; this.say('OVER IT'); this.gain(8); } return; }
     if (p.st === 'guard' && f && -(ax * p.fx + ay * p.fy) > -.25) {
@@ -223,6 +223,9 @@ const Brawl = {
   update(dt) {
     this.t += dt; if (this.fin) { this.fin.t += dt; if (this.fin.t > 1.1) this.fin = null; } this.msgT = Math.max(0, this.msgT - dt); this.shake = Math.max(0, this.shake - dt); this.punch = Math.max(0, this.punch - dt); this.impact = Math.max(0, this.impact - dt); this.hitsT -= dt; this.tipT -= dt;
     if (this.cine) return this.updCine(dt);
+    if (this.def.cold && this.phase === 'fight') { const p = this.p, f = this.foes[0]; if (this.coldCut && this.t >= this.coldCut) { this.coldCut = 0; Sound.play('pillar'); Fade.a = 1; Fade.dir = 0; Fade.busy = false; return this.end(true); }
+      if (f) { if (f.hp < f.max * .34) f.hp = f.max * .34; if (f.hp <= f.max * .5 && p.fury < 100 && !this.sup) { p.fury = 100; this.say('HOLD STRIKE', true); } }
+      if (p.fury >= 100 && !this.sup && !this.art && !this.memo) { this.coldT = (this.coldT || 0) + dt; if (this.coldT > 9 && p.z <= 0 && p.st !== 'hurt') this.startSuper(); } }
     if (Input.p('START')) { this.pauseMenu(); return; }
     if (this.def.walk) return this.updWalk(dt);
     if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play(this.def.hero && this.def.hero.id ? 'horn' : 'bell'); Input.consume(); } return; }
@@ -388,7 +391,7 @@ const Brawl = {
     if (!this.art) { p.z = 0; if (f.st !== 'down') f.z = 0; this.voice('art'); this.cutT = this.t; }
   },
   // ELEVEN: one blow for every second the doors stood open
-  startSuper(kind) { kind = kind || 'rush'; this.voice('eleven'); const p = this.p; p.hold = 0; p.st = 'idle'; if (kind === 'three') { p.fury -= 50; this.lbUsed = 1; } else p.fury = 0; this.sup = { t: 0, n: 0, next: SUPT, tg: this.nearest(p), kind, fn: kind === 'rush' ? null : FINS[kind][this.band()] }; p.vz = 0; this.slow = 0; Sound.play('cutin'); Sound.play('roar'); this.shake = .4; this.token = []; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1; } },
+  startSuper(kind) { kind = kind || 'rush'; this.voice('eleven'); const p = this.p; if (this.def.cold) this.coldCut = this.t + SUPT + .32;   /* the cold open ends as the blade comes down, before it lands */ p.hold = 0; p.st = 'idle'; if (kind === 'three') { p.fury -= 50; this.lbUsed = 1; } else p.fury = 0; this.sup = { t: 0, n: 0, next: SUPT, tg: this.nearest(p), kind, fn: kind === 'rush' ? null : FINS[kind][this.band()] }; p.vz = 0; this.slow = 0; Sound.play('cutin'); Sound.play('roar'); this.shake = .4; this.token = []; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1; } },
   updSuper(dt) {
     const s = this.sup, p = this.p; s.t += dt; p.inv = .5;
     if (s.t < SUPT) { if (s.t > .6 && (Input.p('A') || Input.p('B'))) { s.t = SUPT; Input.consume(); } return; }

@@ -152,7 +152,7 @@ const FF = {
     foes: [{ id: 'brand', name: 'Brand', kind: 'baton', hp: 56, k2: { triple: 1 } }], taunt: { 0: ['DO NOT STOP IT. TURN IT.', 'WHERE WERE YOUR FEET?', 'AN HEIR WOULD BE DEAD.', 'AGAIN.'] },
     voice: { at: [[1, 'NO GLOVES. THE GRIP SITS ON THE OLD BURNS LIKE IT WAS CUT FOR THEM.'], [11, 'HE SWINGS WHERE A WARDEN SWINGS. I KNOW WHERE THAT IS. I HAVE BEEN UNDER IT.'], [22, 'STEP IN. LET IT PASS. BE BEHIND HIM. IT IS A VALVE. YOU DO NOT STOP PRESSURE. YOU SEND IT SOMEWHERE.']], hurt: 'THAT ONE I TRIED TO STOP. HE IS RIGHT. I CANNOT.', fury: 'BANK IT. HE SAYS IT EVERY DAY. BANK IT.', half: 'HE IS BREATHING HARD. HE IS FIFTY. HE HAS NOT SAID SO.', eleven: 'ELEVEN. HE DOES NOT COUNT ALONG THIS TIME. HE IS BUSY.' },
     arts: [{ at: .6, name: 'NOT THOSE', line: 'SHE TOOK THE BONES AND THE THROAT AND THE EYES. I SAID: NOT THE HANDS. THOSE ARE BANK SEVEN.', panel: 'hands', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { at: .28, name: 'THE BAR', line: 'HOLLIS DID NOT TURN ROUND. HE FINISHED THE BAR HE WAS ON. SO WILL I.', panel: 'pipe', kind: 'rise', rgb: '255,120,60', hex: '#ff783c' }] }),
-  furnace: () => ({ title: 'THREE STEPS', sub: 'THE WARDEN', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'mystery', doomed: 9, hero: { hp: 4, fury0: 80 }, voice: { at: [[.4, 'THREE STEPS.'], [3, 'IT IS LIKE HITTING THE ARRAY ITSELF.'], [6, 'SHE IS STILL LOOKING AT ME.']], eleven: 'I HIT HIM WITH EVERYTHING I WILL EVER BE. HE DOES NOT MOVE.' }, foes: [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 999, sc: 1.1 }] })
+  furnace: () => ({ noFin: 1, title: 'THREE STEPS', sub: 'THE WARDEN', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'mystery', doomed: 9, hero: { hp: 4, fury0: 80 }, voice: { at: [[.4, 'THREE STEPS.'], [3, 'IT IS LIKE HITTING THE ARRAY ITSELF.'], [6, 'SHE IS STILL LOOKING AT ME.']], eleven: 'I HIT HIM WITH EVERYTHING I WILL EVER BE. HE DOES NOT MOVE.' }, foes: [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 999, sc: 1.1 }] })
 };
 // ---- the intro before the title: the Assay, start to finish, in thirty seconds
 const OPENING = [
@@ -179,7 +179,7 @@ const OPENING = [
 const Opening = { run(done) { if (NOFF) return done(); G.mode = 'opening'; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => { Fade.a = 1; Fade.dir = -1; Fade.sp = 1.2; Fade.busy = true; done(); }); } };
 
 // ---- weave them into the story
-if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'Above the rock. The Assay. Day forty.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
+if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The last day.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.keepCold() }, { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
 // the furnace: if he runs for her, he gets his three steps
 { const i = PROLOGUE_B.findIndex(s => s.choice && s.choice.some(c => /BREAK FREE/.test(c.t))), ch = PROLOGUE_B[i].choice.find(c => /BREAK FREE/.test(c.t)), was = ch.then;
   ch.then = [narr("You tear out of Mara's arms. Three steps. A Warden turns, unhurried, and lowers a halberd the length of a pipe.")];
@@ -189,7 +189,12 @@ if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.d
   { narr: 'After that night the Authority put it on the tier speakers. Every bell. Slowed down, played on their own bright instruments.' },
   { narr: 'So that whenever we heard our own song, we would see the doors close. Hardly anybody on Tier Six has dared to hum it since.' });
   const j = PROLOGUE_B.findIndex(s => s.narr && /starts to hum the shift song/.test(s.narr)); if (j >= 0) PROLOGUE_B.splice(j + 1, 0, { narr: 'It is the only goodbye we are allowed. Speaking at a commitment is forbidden. Nobody ever wrote a rule about humming.' }); }
-if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }); const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'FORTY-ONE DAYS AFTER THE FURNACE'; c.sub = 'Cinderwell, Tier Six. Kael still fixes valves.'; c.big = 1; } }
+// the Pairing used to play here, before the title. It is in the first dream now (DREAM1), so the present comes straight after the furnace.
+{ const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'ASHGATE'; c.sub = 'Forty-one days after the furnace. Kael still fixes valves.'; c.big = 1; c.tr = 'wake'; } }
+// the cold open: the last day of the Assay, one duel, nobody named. It cannot be lost, and it cuts as ELEVEN comes down. The whole fight is played at the end of Part One.
+FF.keepCold = () => { const d = FF.keep(); delete d.skip; delete d.newMove; delete d.outro; d.cold = 1; d.arts = []; d.sub = 'THE ASSAY - THE LAST DAY'; d.hero = Object.assign({}, d.hero, { fury0: 55 }); d.taunt = { 0: ['WHAT ARE YOU?', 'WHO WAS SHE?', 'YOU ARE ANGRY AT SOMEONE.'] }; d.voice = { at: [[1, 'THE LAST DAY. HER SON HOLDS THE KEEP.']] }; d.foes = d.foes.map(f => Object.assign({}, f, { name: 'Her son' })); if (d.intro) d.intro = d.intro.filter(x => x.big || /LAST DAY/.test(x.cap || '')); return d; };
+// the Valley, day forty: it used to open the game and explain everything. In the last dream it needs none of that
+FF.valley40 = () => { const d = FF.valley(); d.skip = 1; if (d.intro && d.intro.length > 2) { d.intro = [d.intro[0], d.intro[d.intro.length - 1]]; d.intro[0] = Object.assign({}, d.intro[0], { cap: 'DAY FORTY. TWO HOUSES HAVE COME FOR THE VALLEY.' }); d.intro[1] = Object.assign({}, d.intro[1], { cap: 'FORTY CADETS BEHIND ME. NOT ONE OF THEM KNOWS WHAT I AM.' }); } return d; };
 // ---- the dreams: what happens between the fights, told below, the old way
 const DREAM1 = () => [
   { music: 'mystery' }, { card: 'THAT NIGHT', sub: 'Kael does not dream of the furnace. For once it runs forward.', min: 1.6, max: 5 },
@@ -268,9 +273,11 @@ const DREAM1 = () => [
   { narr: 'Four years after the furnace the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },
   { pstage: 3 }, { wait: 1.2 },
   { narr: 'A Proctor reads out a dead boy\'s name. I answer to it. Nobody looks twice. Ilse was right about that: they do not look at each other, only at what the other is worth.' },
-  { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
+  { narr: 'That night they seal us in by twos.' },
+  { fade: 'out' }, { panel: null }, ...(NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }]),
+  { panel: 'assay' }, { pstage: 3 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
   { narr: 'On the third day House Violet still had not eaten. Forty heirs, a river, a wood full of deer. I had expected to hate them. I had not expected to have to feed them.' },
-  { fade: 'out' }, { panel: null }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day three.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },
+  { fade: 'out' }, { panel: null }, { card: 'NIGHT THREE', sub: 'The Assay. Day three, after dark.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },
   { panel: 'assay' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
   { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
   { fade: 'out' }, { panel: null }
@@ -295,13 +302,14 @@ const DREAM2 = () => [
   { pstage: 1 }, { wait: 1.4 },
   { narr: 'I do not know yet what the red lines mean. I know my hand is very steady, and that I hate it.' },
   { fade: 'out' }, { panel: null },
-  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 },
+  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Night twenty-five.', big: 1, min: 1.5, max: 4.5 },
   { panel: 'island' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'House Teal held the island in the river, and the island held the only pump house in the valley. Their lamps ran off its vent stack. So did the Proctors\' boots. So did everything.' },
   { narr: 'An apprentice kept the stack at night. Grey coat, no House. She stood with one hand flat on the pipe, the way you stand when you are listening to it.' },
   { narr: 'I had not known anyone above the rock did that.' },
   { fade: 'out' }, { panel: null }, { mission: 'raid' },
-  { card: 'MORNING', sub: 'The Assay. Day twenty-six. They have come for it.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() }
+  { card: 'MORNING', sub: 'The Assay. Day twenty-six. They have come for it.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() },
+  { card: 'NIGHT TWENTY-EIGHT', sub: 'The Assay. Night twenty-eight. Forty of them, and nobody sitting.', big: 1, min: 1.5, max: 4.5 }, { mission: 'lamp' }
 ];
 const DREAM3 = () => [
   { fx: () => { World.gilded = 1; } },

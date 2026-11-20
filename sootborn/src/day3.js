@@ -11,7 +11,7 @@ FF.under = () => ({
 const DREAM4 = () => [
   { fx: () => { World.gilded = 1; } },
   { card: 'THAT NIGHT', sub: 'Further in than it has gone before.', min: 1.4, max: 4 },
-  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Night twenty-eight.', big: 1, min: 1.5, max: 4.5 }, { mission: 'lamp' }, { card: 'NIGHT THIRTY', sub: 'The Assay. The night before day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { mission: 'dais' }, { card: 'MORNING', sub: 'The Assay. Day thirty-one. He has noticed the page.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() },
+  { card: 'NIGHT THIRTY', sub: 'The Assay. The night before day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { mission: 'dais' }, { card: 'MORNING', sub: 'The Assay. Day thirty-one. He has noticed the page.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() },
     { brawl: () => FF.voss2d() },
     { music: 'mystery' }, { panel: 'voss' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
     { narr: 'Nobody touches a Proctor. It is the first rule of the Assay, and the only one they have ever enforced.' },
@@ -32,7 +32,7 @@ const DREAM4 = () => [
   { music: null }, { sfx: 'heart' }, { wait: 1 },
   { narr: 'I wake before I see what she does.' }, { music: 'mystery' },
   { fade: 'out' }, { panel: null },
-  { card: 'FORTY-THREE DAYS AFTER THE FURNACE', sub: 'Cinderwell. Under the floor.', big: 1, min: 1.4, max: 4 }
+  { card: 'FORTY-THREE DAYS AFTER THE FURNACE', sub: 'Cinderwell. Under the floor.', big: 1, tr: 'wake', min: 1.4, max: 4 }
 ];
 function DAY3() {
   const up = [
@@ -105,7 +105,7 @@ function DAY3() {
     { fade: 'out' }, { panel: null }
   ];
   return [
-    { music: 'home' }, { card: 'THE LEDGER', sub: 'First bell. Forty-three days after the furnace.', big: 1, min: 1.6, max: 5 },
+    { music: 'home' }, { card: 'THE LEDGER', sub: 'Forty-three days after the furnace.', big: 1, tr: 'wake', min: 1.6, max: 5 },
     { panel: 'kael' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'I did not sleep much. Vale\'s offer sat on my chest all night. Carry the Bank Seven ledger up Lift Zero. Nobody from Cinderwell has ever gone up.' },
     { fade: 'out' }, { panel: 'row' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
@@ -123,7 +123,6 @@ function DAY3() {
     ] },
     ...up, ...under,
     ...(NOFF ? [] : DREAM4()),
-    { card: 'THE LEDGER', sub: 'Forty-three days after the furnace. The day ends.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
     { fx: () => { G.flags.day3Done = 1; } }
   ];
 }
@@ -206,7 +205,7 @@ FF.wayout = () => ({
 });
 function DAY4() {
   return [
-    { music: 'home' }, { card: 'THE WAY OUT', sub: 'One hundred and sixty days after the furnace.', big: 1, min: 1.8, max: 5 },
+    { music: 'home' }, { card: 'THE WAY OUT', sub: 'One hundred and sixty days after the furnace.', big: 1, tr: 'wake', min: 1.8, max: 5 },
     { panel: 'ante' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'Twice a week, for four months, I ride up in the white car and teach forty engineers what a valve is for. They are not stupid. They have simply never had to keep anything alive.' },
     { narr: 'I listen. Noted. Granted. One does not. I learn where the nine floors are, and which doors want a gold pass, and who is afraid of whom. I draw none of it. I count it.' },
@@ -279,11 +278,8 @@ function DAY4() {
     { say: 'kael', t: 'I\'m told that can be fixed. ...Ta. For coming.' },
     { say: 'ilse', t: 'That is the last time you will say that word for nine years. Enjoy it. It can be fixed, and you will wish it could not. Come along, soot. One does not keep the table waiting.' },
     { fade: 'out' }, { panel: null },
-    ...(NOFF ? [] : [{ fx: () => { World.gilded = 1; } }, { card: 'THAT NIGHT', sub: 'The last dream below. It runs to the end.', min: 1.4, max: 4 }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }, { card: 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => FF.keep() }]),
+    ...(NOFF ? [] : [{ fx: () => { World.gilded = 1; } }, { card: 'THAT NIGHT', sub: 'The last dream below. It runs to the end.', min: 1.4, max: 4 }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day forty.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley40() }, { card: 'NIGHT FORTY-NINE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }, { card: 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => FF.keep() }]),
     { card: 'END OF PART ONE', sub: 'B E L O W', big: 1, sfx: 'splash', min: 2.6, max: 7 },
-    ...(NOFF ? [] : [
-      { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() }
-    ]),
     { fx: () => { G.flags.day4Done = 1; } }
   ];
 }

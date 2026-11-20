@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.66 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.67 (2026-11-19).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,12 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.67 (needs your eye)
+- **The Keep as the cold open:** cannot be lost; cuts as ELEVEN comes down. The old opening film still plays in front of it until the animated intro is built.
+- **The new order:** the Pairing in the first dream; the Lamp on First Fire's night; the Valley in the last dream; the Pinning opening Part Two.
+- **Cards and five transitions** (wake, furnace, strip, chalk, page).
+- **Your bug, an ELEVEN before you know what it is:** fixed for the Warden fight at the furnace. The cold open ends on ELEVEN by design; say if that was the one you meant.
 
 ## Untested, built blind (check these first when playing)
 - **v0.66: the four fixes above.** Checked by script and stills only.

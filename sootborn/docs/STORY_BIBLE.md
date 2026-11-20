@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.66 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.67 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -34,7 +34,7 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
 - Inspector Vale: Cinderwell-born, raised to grey and a silver pin; writes everything down.
 - Proctor Sull: scrubs Seren's sun off the Pillar.
 - Night Proctor and Night Watchman: the heist guards.
-- High Auditor Celestine Aurel: luminous contempt.
+- High Auditor Celestine Aurel: luminous contempt. **Her secret (decided 2026-11-19, to be played in Part Two):** born on Tier Six, called Little Ember below; taken up by an Accredited family and gilded; she let them take the burns off her palms and has worn gloves since; she won her own Assay at twenty by shutting the valve on the enemy camp (two cadets did not wake). She sent Seren into the furnace anyway: one for forty is the sum she lives by, and a High Auditor born below can never be seen to spare one of her own. Full text in the master timeline, 14b.
   - "Anger is for equals."
   - "Balanced."
   - "Grief is a luxury item. You will be invoiced."
@@ -512,3 +512,16 @@ Cold open: the Valley (Assay day 40). Prologue to the furnace. The Pairing befor
 - **Deaths are falls.** An ordinary blow: to the knees, then over, forward or back. A heavy blow: off his feet and onto his back, once. Nobody turns in the air. (The comic-book levels have had the kneel-and-fall since v0.50.)
 - **The hook shot.** A line with a head that goes out, bites and stays taut. An ordinary man is pulled off his feet to land in front of Kael, reeling; a man too heavy to move stays put and the line takes Kael to him, inside his guard. The shoulder charge on the same button needs Kael nearly touching. The blade shows its hook from the Assay on.
 - **A fight can inherit a place you were walking in** (`stage` on a fight, taken with `Brawl.stageOf()` from a walk scene): same floor, same props, the bystanders become the ring, the fire is solid. A fight can also carry what is said after it (`afterWin`), spoken over the same scene. First used at the Circle on night 28: the naming, the fight with Corin (right name) and the aftermath all stay in the 2.5D scene. The wrong name is fought on the ridge, as the lines say, cut to directly from the Circle.
+
+## Order of play (v0.67). This replaces the v0.65 order above.
+Day one is Ashgate. The present only moves forward from there; everything else is a flash back or forward.
+- **Opening:** the opening film; **the Keep** as the cold open (the last day of the Assay; it cannot be lost and it cuts as ELEVEN comes down; nobody is named); Cinderwell, the festival and wedding, the fever, the heist; Last Bell, the furnace, the count; the title.
+- **Ashgate** (41 days after). That night: the Table, the lesson, the Drill, No Gloves, "three years of that", **the Pairing** (night 1), the Camp (night 3).
+- **First Fire** (42). The Ford (day 19) before the ceremony; the ceremony; the lantern; "One candle-hour. It burned for three." That night: the Island (night 25), the Standard (day 26), **the Lamp** (night 28).
+- **The Ledger** (43). That night: the Dais (night 30), the Proctor and On the Ground (day 31), the hum slip; he wakes under the floor.
+- **The Way Out** (160). The last dream: **the Valley** (day 40), the Last Night (49), the Keep (the last day). END OF PART ONE.
+- **Part Two** opens with the PART TWO card and then **the Pinning**. The rest of Part Two is in its old order.
+- Still to come from the plan: the animated intro, the Keep's new ending, the white cloak, the new places and levels, Part Two's additions.
+
+## How a card arrives (v0.67)
+One look for each kind of jump, so it is learned once. **Wake:** white fading out, back to the present below. **Furnace:** an orange bloom from the bottom, back to before the furnace. **Strip:** a gold wash and the Assay calendar sliding in to the day (nine beats: night 1, day 3, day 19, night 25, day 26, night 28, day 31, day 40, the last day); inside the Assay the lit day only pulses. **Chalk:** a chalk sun, for the same time somewhere else. **Page:** a page sweeping across, into a comic-book level. The count to eleven as a transition is not built yet; it comes with the animated intro. "Reduce motion" turns them off.

@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version string:** `src/ui.js`, "Version 0.66." Next is 0.67.
+- **Version string:** `src/ui.js`, "Version 0.67." Next is 0.68.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (recent versions; older ones in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -42,6 +42,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 
 ### A5. Tests (in `tests/`)
 Playwright (run `npm i playwright` inside `tests/` once; it drives the Chrome already on the machine, no browser download) with Chrome and the software renderer (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`). Paths inside older tests may point at another machine's folders: point them at the repo's `index.html` and `issue/`.
+- New in v0.67: `cold.mjs` (New Game by real key presses through the cold open), `trans.mjs` (each transition in two pictures).
 - New in v0.66: `circ.mjs` (the Lamp's fire end to end, PICK=0|1|2, LOSE=1), `air.mjs` (how long a man can be kept in the air; BOOTS=1), `death.mjs` (stills of a death; M=fight, BIG=1), `hook.mjs` (the hook used on purpose in four arena fights). `Brawl.stageOf()` + `stage` on a fight def keep a fight in a walk scene; `afterWin` keeps the talk there too.
 - `godrun.mjs`: **the whole-story bot.** Plays New Game to THE END without being able to lose and logs every card, fight and level (`SECS=570`). **Run it every release.** Its log is how you check the order of cards against Part B.
 - `walk.mjs` (M=circle|square|rowmorn|ward): the 2.5D places. `iss.mjs` + `lv.js` (via `tests/runlv.sh riser|stair`; `lv.cjs` writes `issue/lv-<key>.html`, don't commit those): comic levels standalone. `ff.mjs`: fights (M=name, BOT=mash). `mis.mjs`: 2D levels. `cap65.mjs`, `cap65b.mjs`: screenshots.
@@ -287,15 +288,14 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - The fire pit stays 2.5D through its fight (6c). Weight in the fights (no juggling without boots). Deaths fall instead of spinning (2D, arena, comic levels). The hook shot in every arena fight from the Assay on.
 - Check: `walk.mjs` M=circle through the choice and the fight; `ff.mjs` BOT=mash on the Drill, Ford and Keep with time-in-air logged before and after; stills of a death in each engine; the hook used on purpose in the Ford, the Proctor, the Valley and the Keep.
 
-**Step 2 · v0.67 · cards and transitions**
-- Build the seven transitions (B3): CUT exists; WAKE, FURNACE (and its grey version), STRIP's slide (and its years version), CHALK, PAGE, ELEVEN.
-- Every card in Part C: wording, order, removals (the second THE LEDGER, the second THE HIGH DOCKS), renames (THE FIRST FIRE, ELEVEN MINUTES, Tier Six dated, THE VENT STACK sub names day thirty-one), PART TWO before the Pinning, the First Fire closing card before the night.
-- Fix the story bible: Tavi is seven at the furnace; Celestine's secret (14b).
-- Check: the bot's card log matches Part C line for line; the calendar strip lights the right day on every Assay card; no card says later, earlier, from now or ago.
+**Step 2 · v0.67 · the rearranging, its cards, and the transitions** — **DONE 2026-11-19** (the owner asked for the rearranging first)
+- Done: the Keep as the cold open (`FF.keepCold`: cannot be lost, cuts as ELEVEN comes down); the Pairing into the first dream; the Lamp to First Fire's night; the Valley (`FF.valley40`) to the last dream; PART TWO before the Pinning; every card in Part C that belongs to an existing scene; five transitions as ways a card arrives (`tr:` on a card step, or automatic for Assay cards): wake, furnace, strip/step, chalk, page.
+- Left for the scenes that need them: the ELEVEN transition (with the animated intro), the grey furnace (Celestine's flash), the strip running on into years (Part Two's flash-forwards).
+- The story bible already had Tavi right (six a year before the furnace is seven at it). Celestine's secret is in the bible's cast entry.
 
-**Step 3 · v0.68 · the opening and the Pairing**
-- The animated intro (0a) replaces the opening film and "ONE SEASON". The Keep as the cold open, cut before the blow (0b). The Pairing out of the opening into the first dream (4e). The Valley moved to 9b. The Keep's ending: the blow lands, Lucan's blade breaks, he kneels (9d). The white cloak on Kael from day 31 (8d). The Ilse callback at the Way Out (9).
-- Check: New game to Ashgate in two jumps; the first dream in date order; stills of the intro on a phone-sized screen.
+**Step 3 · v0.68 · the new things in the opening**
+- The animated intro (0a) replaces the opening film and "ONE SEASON", and ends on the ELEVEN transition. The Keep's ending at the end of Part One: the blow lands, Lucan's blade breaks, he kneels (9d). The white cloak on Kael from day 31 (8d). The Ilse callback at the Way Out (9).
+- Check: New game to Ashgate in two jumps; stills of the intro on a phone-sized screen and at desktop size (PC is the main platform).
 
 **Step 4 · v0.69 · Part One's two new 2.5D places, with the seat knives**
 - The camp by day (4f) with Dorian, Oswin, Petra, the Sisters Vey, Corin; the choice of who you sit with, remembered later.
