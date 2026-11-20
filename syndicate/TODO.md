@@ -12,23 +12,23 @@ Done so far:
 - Current starters, on the sand when called: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will.
 - Knockout cinematics as ultimates: Hasbara (Will), Louie Airlines (Erin), The Final Bet (Marcus), Nuke the Data Center (Lil Bottie), War Criminal (King Bibi, the data-centre half only), Judgement's side-eye (Louie).
 - An effect of its own on every guest move.
-- Marcus's finisher Derek Pulls Up.
+- A staged finisher for every guest (Derek Pulls Up, Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality, Compost-ality, Escape Velocity, Eleven Pieces, Your Hour Is Up).
+- King Bibi comes back once per bout: below 30% health he returns to 75%.
 
 Not done:
 
 - **Kael and Eleven are invented from three hints** (grav boots; hook, sling blade, "insane moves"). No lore for either is in the repo. Looks, races, titles, move names and lines are placeholders until Will says who they are.
-- **War Criminal, second half** — the Knockout version goes on to a cyborg Bibi levelling a city while two other real politicians celebrate. Left out on purpose; see the hand-off note.
-- **Unique finisher animations** — only Marcus has his own staging. Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality, Compost-ality, Escape Velocity, Eleven Pieces and David's still play an existing finisher under the new name, and a kill near spikes or a vent can replace them.
+- **War Criminal, second half** — the Knockout version goes on to a cyborg Bibi levelling a city while two other real politicians celebrate. Left out on purpose: it shows real people cheering a city being destroyed.
+- **Finisher polish** — every guest now has their own staged finisher, but they are built from text, particles and existing poses. None has bespoke body animation, and the kill camera hides parts of some.
 - **Derek Pulls Up polish** — Marcus is off camera when he says "NOT AGAIN"; no engine or horn sound of its own; Derek does not walk back to the van.
 - **Flow Pros colours** — blue and white are the placeholder from Knockout until the real logo or a photo of the truck is supplied.
-- **Louie** — on the wolf's skeleton and animations; no airplane ears. As a beast he gets the beast finisher, not Bork-ality.
+- **Louie** — on the wolf's skeleton and animations; no airplane ears.
 - **Guest bodies** — share the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **Cinematic art** — the screens are flat shapes and type, far simpler than the Knockout pixel scenes.
 - **More moves from the other games** — not yet recreated: Leash Lasso, Shiba Plane, Paw Paw Paw, Snake the Drain, Plunger Pop, Bean Dip, and the whole sets of Corbin, Mama and Gas Guy.
 - **Unique attack animations** — guests use their frame's swings and casts (Bottie does not fire from the arm guns, Marcus swings the wrench like a hammer, Eleven's blade like an axe).
 - **Career paths** — guests start with everything and level like their frame class; the level-up screen still offers that class's moves. No guest-specific unlocks, story beats or endings.
 - **Interactions** — no special dialogue when a guest meets Marc, Pip, the Guildmaster or David (including David meeting himself), and no lines between guests.
-- **King Bibi's "I always come back"** — a once-per-bout return from defeat is not built.
 - **Guests as opponents** — they are playable only.
 - **More of the old cast** — Corbin, Mama, Gas Guy are not on the list.
 - **Shop and Tailor on a guest** — kits and cosmetics do not show on a guest's body; the shops do not say so.
