@@ -14,7 +14,9 @@ Your aim for today: play it start to finish, in order, with every played moment 
 - **The three newest comic-book levels walked with the stick**, not teleported: a bot pushes the stick toward each point of the route and presses the interact button where a person would. The cold open: terrace to the top of the first flight, 23 seconds, ended by itself. The vent stack: foot to crown (height 0 to 36), the collar, the edge, 109 seconds. The Deep Array: hatch, catwalk (waiting for the lamp), floor, the heart, and the run back up to the hatch, 118 seconds. None got stuck. The bot clears each fight as it starts.
 - **The Count puzzle at a person's speed:** the same bot slowed to one key press every 0.4 seconds solved it in 40 seconds without being noted.
 
-**Not checked:** nothing by hand. The fights are still won by scripts that clear them, not by playing them.
+- **Every fight played with real keys by a simple bot** (walk at the nearest man, strike, kick now and then, dodge now and then, hold strike when the fury is full; three tries each; about four minutes of clock). It is a poor player and the test machine runs the 3D fights slowly. **Won outright:** the Drill (both), the three Scuffles, Thorne, Under the Floor, the Way Out, Tier Six Stands, Voss in 2D, the Ford (2D and 3D), the Pairing, the Valley (both), the Twins, the Fall, the Proctor, the Gallery, Riser Nine, and the cold open. **Reached the win as the clock ran out:** the Keep, the Keep's ending (it held strike and broke the blade), the Son. **Still fighting when the clock ran out, alive, with the enemy hurt:** the Pinning, Little Ember, the High Docks, the Stair (these two are long wave fights), the pump room (training, which does not end). **Lost by design:** the furnace, the Dock Stair. No fight stopped, froze or refused to end.
+
+**Not checked:** nothing by hand. Whether the fights are fun or fair for a person: the bot only shows that none is broken.
 
 
 ## v0.77 · 2026-11-20 — the Gallery's onlookers; how each boss stands (Step 11, second part)
