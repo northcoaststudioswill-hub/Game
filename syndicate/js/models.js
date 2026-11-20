@@ -43,7 +43,7 @@
     const m = { skin: M(hex(look.skin || race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, wsk ? wsk.e : WGLOW[g.weapon || 0]) };
     const box = gfx.box, mesh = gfx.mesh;
     const root = new T.Group(), body = new T.Group(); root.add(body);
-    const robed = cls === 'sorcerer' || cls === 'cleric';
+    const robed = cls === 'sorcerer' || cls === 'cleric', hover = rcls === 'sorcerer'; let hovY = 0;
     const w = { fighter: 0.74, rogue: 0.54, sorcerer: 0.56, cleric: 0.66 }[cls];
     const glows = [];
 
@@ -353,18 +353,16 @@
         q.tz += side * 0.3 * h * big; q.hz = side * 0.28 * h * big; q.ty += -side * 0.32 * h * big; q.bx -= (fb > 0 ? 0.5 : 0.34) * h * big * fb; q.hx = -0.45 * h * fb; q.by -= 0.06 * h * big; q.bpz -= 0.12 * h * big * fb; q.ll += 0.25 * h * fb; q.lr -= 0.35 * h * fb; q.arx += 0.55 * h; q.alx += 0.65 * h; if (side > 0) q.arz -= 0.5 * h * big; else q.alz += 0.5 * h * big; snap = Math.max(snap, 0.7); }
       body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); if (q.spin != null) spinNow = q.spin; else if (spinNow) { spinNow = Math.atan2(Math.sin(spinNow), Math.cos(spinNow)) * 0.55; if (Math.abs(spinNow) < 0.02) spinNow = 0; }
       body.rotation.set(J('bx', q.bx, snap), spinNow, J('bz', q.bz, snap));
-      if (robe && act !== 'kneel' && act !== 'sit' && act !== 'ko' && !p.crawl) { const L = act === 'dodge' ? 0.55 : 0.42; q.ll = Math.max(-L, Math.min(L, q.ll)); q.lr = Math.max(-L, Math.min(L, q.lr)); }       // a robe hides the stride, it does not let the shins through it
+      if (robe && act !== 'kneel' && act !== 'sit' && act !== 'ko' && !p.crawl) { if (hover) { q.ll = 0.06 + q.ll * 0.08; q.lr = -0.06 + q.lr * 0.08; } else { const L = act === 'dodge' ? 0.34 : 0.26; q.ll = Math.max(-L, Math.min(L, q.ll * 0.55)); q.lr = Math.max(-L, Math.min(L, q.lr * 0.55)); } }       // a robe hides the stride, it does not let the shins through it
       legL.rotation.x = J('ll', q.ll, snap); legR.rotation.x = J('lr', q.lr, snap);
       torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), -cur.ty * 0.6, J('hz', q.hz, snap));
       armR.rotation.set(J('arx', q.arx, snap), 0, J('arz', q.arz, snap)); armL.rotation.set(J('alx', q.alx, snap), 0, J('alz', q.alz, snap));
       if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
-      if (robe) { const R = robe.userData, ty = cur.ty || 0, spin = Math.min(1, Math.abs(ty - (R.ty == null ? ty : R.ty)) / Math.max(dtp, 1e-3) / 9); R.ty = ty; R.fl = (R.fl || 0) + (spin - (R.fl || 0)) * Math.min(1, dtp * (spin > (R.fl || 0) ? 18 : 5));
-        const tx = (mv ? -0.16 * (p.mf == null ? 1 : p.mf) : 0) - (cur.bx || 0) * 0.55 + (act === 'dodge' ? -0.25 : 0), tz = (mv ? sw * 0.14 : 0) - (cur.bz || 0) * 0.6 - (p.ms || 0) * (mv ? 0.12 : 0);       // the hem trails the stride, hangs plumb when the body leans, and flares on a fast turn
-        R.x = (R.x || 0) + (tx - (R.x || 0)) * Math.min(1, dtp * 9); R.z = (R.z || 0) + (tz - (R.z || 0)) * Math.min(1, dtp * 9); robe.rotation.x = R.x; robe.rotation.z = R.z; const sp = Math.max(Math.abs(cur.ll || 0), Math.abs(cur.lr || 0)), fl = 1 + R.fl * 0.2 + sp * 0.32; robe.scale.set(fl, 1 - R.fl * 0.05, fl); }
-      root.rotation.z = 0; root.rotation.x = 0; root.position.y = p.y || 0;
+      if (robe) robe.rotation.z = mv && !hover ? sw * 0.08 : 0;
+      root.rotation.z = 0; root.rotation.x = 0; { const flo = hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl; hovY += ((flo ? 0.16 + Math.sin(t * 2.1) * 0.035 : 0) - hovY) * Math.min(1, dtp * 6); root.position.y = (p.y || 0) + hovY; }
       { const crouch = Math.max(0, Math.min(1, -cur.by * 3.2)), sitting = act === 'sit' || act === 'kneel';
         if (!sitting && act !== 'dodge') { legL.rotation.x -= crouch * 0.42; legR.rotation.x -= crouch * 0.42; }
-        const knee = l => Math.max(0, Math.min(1.75, Math.max(0, l) * 0.95 + Math.max(0, -l) * 0.3 + Math.max(0, -l - 0.9) * 2.0 + (sitting ? 0 : crouch * 0.85)));
+        const knee = l => robe && !sitting && act !== 'ko' ? Math.max(0, Math.min(0.35, Math.abs(l) * 0.4 + crouch * 0.4)) : Math.max(0, Math.min(1.75, Math.max(0, l) * 0.95 + Math.max(0, -l) * 0.3 + Math.max(0, -l - 0.9) * 2.0 + (sitting ? 0 : crouch * 0.85)));
         legL.userData.shin.rotation.x = J('kl', knee(legL.rotation.x), 0.6); legR.userData.shin.rotation.x = J('kr', knee(legR.rotation.x), 0.6);
         let eR = 0.28, eL = 0.28;
         if (act === 'swing') { eR = k < 0.5 ? mix(1.0, 0.04, Math.pow(Math.min(1, k / 0.5), 3)) : mix(0.04, 0.45, (k - 0.5) / 0.5); eL = p.sty === 2 || p.sty === 3 || cls === 'rogue' ? eR : 0.7; }
