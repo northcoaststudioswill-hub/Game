@@ -34,7 +34,7 @@ const HUD = {
     s.classList.toggle('hidden', !world || Dialogue.active || Puzzle.active || Brawl.active);
     if (Puzzle.active) { o.querySelector('b').textContent = Puzzle.defs[Puzzle.si].wo || ('WO-114 · VALVE ' + Puzzle.defs[Puzzle.si].name); o.querySelector('span').textContent = Puzzle.defs[Puzzle.si].tip; }
     else { o.querySelector('b').textContent = 'OBJECTIVE'; o.querySelector('span').textContent = this.objective(); }
-    s.textContent = G.heist === 3 ? (Mission.def.where || 'The Assay · four years from now') : `Day ${G.day} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
+    s.textContent = G.heist === 3 ? (Mission.def.where || 'The Assay · four years after the furnace') : `${whenS(G.day).replace(' the furnace', '')} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
     document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
@@ -97,7 +97,7 @@ function modal(opts) {
 const Menus = {
   pause() {
     Sound.play('ok');
-    UI.push(modal({ title: 'Paused', startCloses: true, build(b) { b.innerHTML = `<p>${esc(G.name)} · Day ${G.day} · ${esc(MAPS[G.mapId].name)}${G.tendency ? ' · ' + TEND[G.tendency] : ''}</p>`; }, items: [
+    UI.push(modal({ title: 'Paused', startCloses: true, build(b) { b.innerHTML = `<p>${esc(G.name)} · ${whenN(G.day)}, ${whenS(G.day)} · ${esc(MAPS[G.mapId].name)}${G.tendency ? ' · ' + TEND[G.tendency] : ''}</p>`; }, items: [
       { label: 'Resume', act: () => UI.pop() },
       ...(G.heist === 3 ? [{ label: 'Skip this mission', act: () => { UI.clear(); Mission.finish(); } }] : []),
       { label: () => 'Journal' + (G.newJ ? ` (${G.newJ} new)` : ''), act: () => Menus.journal() },
@@ -215,19 +215,19 @@ const Menus = {
     const fest = k => () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Game[k](); }, 60); };
     const S = {
       'Fights': [
-        ['The Valley · battle (the first fight)', ff('FOUR YEARS FROM NOW', 'The Assay. Day forty.', 'valley')],
+        ['The Valley · battle (the first fight)', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day forty.', 'valley')],
         ['Three Steps · the Warden at the furnace', () => { fresh(); G.flags.ranForHer = 1; ffScene('THREE STEPS', 'You make it three steps.', () => FF.furnace(), () => Game.toTitle()); }],
-        ['The Pairing · duel with Dorian Aldane', ff('FOUR YEARS FROM NOW', 'The Assay. The first night.', 'pairing')],
-        ['The Ford · single combat (3D)', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford')],
-        ['The Ford · on the painted valley', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford2d')],
-        ['The Proctor · duel with Halden Voss', ff('FOUR YEARS FROM NOW', 'The Assay. Day thirty-one.', 'proctor')],
-        ['The Keep · duel with Lucan Aurel (boots)', ff('FOUR YEARS FROM NOW', 'The Assay. The last day.', 'keep')],
-        ['The Fall · nine years on (boots, battle)', ff('NINE YEARS FROM NOW', 'Above the weather.', 'fall')],
-        ['The Drill · Brand (2D, training years)', ff('THE DRILL', 'Two years from now. A sealed pump room.', 'drill')],
+        ['The Pairing · duel with Dorian Aldane', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. The first night.', 'pairing')],
+        ['The Ford · single combat (3D)', ff('THE ASSAY', 'Four years after the furnace. Day nineteen.', 'ford')],
+        ['The Ford · on the painted valley', ff('THE ASSAY', 'Four years after the furnace. Day nineteen.', 'ford2d')],
+        ['The Proctor · duel with Halden Voss', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day thirty-one.', 'proctor')],
+        ['The Keep · duel with Lucan Aurel (boots)', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. The last day.', 'keep')],
+        ['The Fall · nine years after the furnace (boots, battle)', ff('NINE YEARS AFTER THE FURNACE', 'Above the weather.', 'fall')],
+        ['The Drill · Brand (2D, training years)', ff('THE DRILL', 'Two years after the furnace. A sealed pump room.', 'drill')],
         ['The Ember Ring · bouts below', load('ring')]
       ],
       'Assay missions (2D)': [
-        ['★ NEW · Day 3 · The Camp (wood, water, fire)', () => { fresh(); Mission.start('camp'); }],
+        ['The Assay, day three · The Camp (wood, water, fire)', () => { fresh(); Mission.start('camp'); }],
         ['★ NEW · Night 25 · The Island (stealth; Kestrel)', () => { fresh(); Mission.start('raid'); }],
         ['★ NEW · Night 28 · The Lamp (find the traitor; a 2D duel)', () => { fresh(); Mission.start('lamp'); }],
         ['★ NEW · Night 30 · The Dais (stealth; the grading book)', () => { fresh(); Mission.start('dais'); }],
@@ -244,37 +244,37 @@ const Menus = {
       'Story beats': [
         ['Opening film', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
         ['New game from the top (Valley, then prologue)', () => { UI.clear(); Game.newGame(); }],
-        ['Prologue · story only', () => { fresh(); Cutscene.play(PROLOGUE_A.filter(s => !s.brawl && !/^FOUR YEARS FROM/.test(s.card || '')), () => Game.startHeist()); }],
+        ['Prologue · story only', () => { fresh(); Cutscene.play(PROLOGUE_A.filter(s => !s.brawl && !/^FOUR YEARS AFTER/.test(s.card || '')), () => Game.startHeist()); }],
         ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
         ['Prologue · Lift Zero, the furnace, the Pairing', () => { fresh(); Game.onHeistDone(); }],
-        ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
-        ['End of Day 1 · the dream (gilding, the lesson, the Drill, the Ford)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), load('day2')); }],
+        ['Ashgate (41 days after) · wake up', () => { fresh(); Game.startPresent(); }],
+        ['After Ashgate · the dream (gilding, the lesson, the Drill, the Ford)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), load('day2')); }],
         ['End of Part One · the last dream, then the Fall', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM3().concat([{ brawl: () => FF.fall() }]), () => Game.toTitle()); }],
-        ['End of Day 2 · the dream of the Assay, then the Keep', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2().concat([{ brawl: () => FF.keep() }]), () => Game.toTitle()); }],
-        ['Day 2 · morning', load('day2')],
-        ['Day 2 · lantern built, festival next', load('fest')],
-        ['Day 2 · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
-        ['Day 2 · the lantern climb (stealth)', fest('startFestStealth')],
-        ['Day 2 · First Fire (the Keep, then the ending)', fest('onFestDone')]
+        ['After First Fire · the dream of the Assay, then the Keep', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2().concat([{ brawl: () => FF.keep() }]), () => Game.toTitle()); }],
+        ['First Fire (42 days after) · morning', load('day2')],
+        ['First Fire · lantern built, festival next', load('fest')],
+        ['First Fire · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
+        ['First Fire · the lantern climb (stealth)', fest('startFestStealth')],
+        ['First Fire (42 days after) · the Keep, then the ending', fest('onFestDone')]
       ]
     };
     const film = (k) => () => { UI.clear(); const d = FF[k](); Sound.tname = null; Fade.a = 0; Fade.dir = 0; Fade.busy = false; Brawl.start(Object.assign({}, d, { film: 1, intro: (d.intro || []).concat(d.outro || []), foes: [], waves: null, arts: null, voice: null, allies: [] }), () => Game.toTitle()); G.mode = 'opening'; };
     const cs = (steps, st) => () => { if (st) st(); else UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(steps().filter(s => s && !s.brawl && !s.mission), () => Game.toTitle()); };
-    S['Story beats'].push(['Day 3 · The Ledger (whole chapter)', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => Game.toTitle()); }, 60); }]);
-    S['Fights'].splice(S['Fights'].length - 1, 0, ['Under the Floor · the Warden (2D, Day 3)', ff('DAY THREE', 'The old tunnel.', 'under')]);
-    S['Fights'].splice(S['Fights'].length - 1, 0, ['The Way Out · Sull and the night watch (2D, Day 4)', ff('DAY FOUR', 'The old tunnel.', 'wayout')], ['The Standard · the Sisters Vey (two duelists)', ff('FOUR YEARS FROM NOW', 'The Assay. Day twenty-six.', 'twins')], ['The Pinning · the Auditor\'s Blade (boots)', ff('FOUR YEARS FROM NOW', 'After the keep.', 'blade')], ['The High Docks · seven years on (battle)', ff('SEVEN YEARS FROM NOW', 'Above the weather.', 'docks')]);
-    S['Story beats'].push(['Day 4 · The Way Out (whole chapter, to the end of Part One)', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY4(), () => afterDay(4, null)); }, 60); }]);
+    S['Story beats'].push(['The Ledger (43 days after) · whole chapter', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => Game.toTitle()); }, 60); }]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['Under the Floor · the Warden (2D, 43 days after)', ff('THE LEDGER', 'Forty-three days after the furnace. The old tunnel.', 'under')]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['The Way Out · Sull and the night watch (2D, 160 days after)', ff('THE WAY OUT', 'One hundred and sixty days after the furnace. The old tunnel.', 'wayout')], ['The Standard · the Sisters Vey (two duelists)', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day twenty-six.', 'twins')], ['The Pinning · the Auditor\'s Blade (boots)', ff('FOUR YEARS AFTER THE FURNACE', 'After the keep.', 'blade')], ['The High Docks · seven years after the furnace (battle)', ff('SEVEN YEARS AFTER THE FURNACE', 'Above the weather.', 'docks')]);
+    S['Story beats'].push(['The Way Out (160 days after) · whole chapter, to the end of Part One', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY4(), () => afterDay(4, null)); }, 60); }]);
     S['Cutscenes'] = [
       ['Opening film', S['Story beats'][0][1]],
       ['Prologue · the world, the wedding, the fever', cs(() => PROLOGUE_A.filter(s => !/^FOUR YEARS/.test(s.card || '')), fresh)],
       ['Prologue · the audit, the furnace, the tin', () => { fresh(); Game.onHeistDone(); }],
-      ['Day 2 · Last Bell ceremony', fest('startFestival')], ['Day 2 · First Fire ending', fest('onFestDone')],
+      ['First Fire · Last Bell ceremony', fest('startFestival')], ['First Fire · the ending', fest('onFestDone')],
       ['Dream · the Gilding and the lesson', cs(DREAM1)], ['Dream · what the Assay is', cs(DREAM2)], ['Dream · the Sun Spire', cs(DREAM3)], ['Dream · the day he arrives', cs(DREAM4)],
-      ['Day 3 · Lift Zero and Celestine, under the floor (no fight)', cs(DAY3)],
-      ['Day 4 · the months, Mara, the way out, Ilse (no fights)', cs(DAY4)], ['Film · The Standard', film('twins')], ['Film · The Pinning', film('blade')], ['Film · The High Docks', film('docks')],
+      ['The Ledger (43 days after) · Lift Zero and Celestine, under the floor (no fight)', cs(DAY3)],
+      ['The Way Out · the months, Mara, the way out, Ilse (no fights)', cs(DAY4)], ['Film · The Standard', film('twins')], ['Film · The Pinning', film('blade')], ['Film · The High Docks', film('docks')],
       ['Film · The Valley', film('valley')], ['Film · The Pairing', film('pairing')], ['Film · The Ford', film('ford')], ['Film · The Proctor', film('proctor')], ['Film · The Keep', film('keep')], ['Film · The Fall', film('fall')]
     ];
-    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years from now. Brand.', 'brandstair')], ['★ NEW · Assay · On the Ground · Proctor Voss (2D)', ff('MORNING', 'The Assay. Day thirty-one.', 'voss2d')], ['★ NEW · Training · No Gloves · Brand (2D)', ff('TWO AND A HALF YEARS FROM NOW', 'The pit. Brand. No gloves.', 'drill2')], ['Part Two · The Gallery · Severin Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years from now.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years from now.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years from now.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years after the furnace. Brand.', 'brandstair')], ['★ NEW · Assay · On the Ground · Proctor Voss (2D)', ff('MORNING', 'The Assay. Day thirty-one.', 'voss2d')], ['★ NEW · Training · No Gloves · Brand (2D)', ff('TWO AND A HALF YEARS AFTER THE FURNACE', 'The pit. Brand. No gloves.', 'drill2')], ['Part Two · The Gallery · Severin Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years after the furnace.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years after the furnace.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years after the furnace.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
     for (let n = 1; n <= 5; n++) { S['Story beats'].push([`Part Two · ${n} · ${P2_TITLES[n]}`, () => playPart2(n)]); S['Cutscenes'].push([`Part Two · ${n} · ${P2_TITLES[n]} (no fights)`, cs(P2[n])]); }
     S['Cutscenes'].push(['Film · The Gallery', film('gallery')], ['Film · Riser Nine', film('riser')], ['Film · The Son', film('son')], ['Film · The Stair', film('stair')], ['Film · Little Ember', film('ember')]);
     const sub = k => () => UI.push(modal({ title: k, items: S[k].map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
@@ -308,7 +308,7 @@ const Menus = {
       b.innerHTML = `<h1 class="logo">SOOTBORN</h1><div class="sub">Every breath is hers.</div>`;
       b.parentNode.style.background = 'rgba(16,10,13,.82)'; b.parentNode.style.textAlign = 'center';
     }, items: [
-      { label: s ? `Continue — Day ${s.day}, ${MAPS[s.map].name}` : 'Continue', disabled: () => !s, act: () => { UI.clear(); Game.loadSave(Save.latest()); } },
+      { label: s ? `Continue — ${whenN(s.day)}, ${MAPS[s.map].name}` : 'Continue', disabled: () => !s, act: () => { UI.clear(); Game.loadSave(Save.latest()); } },
       ...(+Store.get('sootborn_p2') >= 1 ? [{ label: `Continue Part Two — ${+Store.get('sootborn_p2')} · ${P2_TITLES[+Store.get('sootborn_p2')]}`, act: () => playPart2(+Store.get('sootborn_p2')) }] : []),
       { label: 'New game', act: () => Menus.newGame() },
       { label: 'Training room', act: () => Menus.training() },
@@ -325,7 +325,7 @@ const Menus = {
   chapters() { const go = f => () => { UI.clear(); f(); }; UI.push(modal({ title: 'Chapter select', build(b) { b.innerHTML = '<p>Replay any chapter. Your save slots are not touched until the game autosaves.</p>'; }, items: [{ label: 'Part One · from the beginning', act: () => Menus.newGame() }, ...[1, 2, 3, 4, 5].map(n => ({ label: `Part Two · ${n} · ${P2_TITLES[n]}`, act: go(() => playPart2(n)) })), { label: 'Back', act: () => UI.pop() }] })); },
   memories() { let L = []; try { L = JSON.parse(Store.get('sootborn_mem') || '[]'); } catch (e) { } UI.push(modal({ title: 'Memories', build(b) { b.innerHTML = '<p style="opacity:.7">Mara keeps them on the shelf, beside the tins. ' + L.length + ' kept so far.</p>' + (L.map(m => `<div class="card"><b>${esc(m[0])}</b><p>${esc(m[1])}</p><p style="opacity:.55">${esc(m[2] || '')}</p></div>`).join('') || '<p>None yet. They come back to him in fights.</p>'); }, items: [{ label: 'Back', act: () => UI.pop() }] })); },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.63. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.64. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p><b>The three third-person levels</b> (Riser Nine, the High Docks, the Stair): tap A for light cuts; keep A held for three heavy blows; at full fury a held A is ELEVEN. KICK kicks, twice for the Wide Cut. HOOK throws the hook line. JUMP jumps, held it hovers, and A in the air dives. LUNGE is the boots along the ground. B dodges. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
@@ -424,7 +424,7 @@ const DayEnd = {
     Object.assign(G.flags, { day1Done: 1 }); G.day = 2; G.trust0 = { ...G.trust };
     G.mapId = 'apt'; P.x = 3 * 16 + 8; P.y = 4 * 16 + 12; P.dir = 0;
     const ok = Save.write('auto');
-    UI.push(modal({ title: 'End of Day 1', onBack: null, build(b) { b.innerHTML = lines.map(l => `<p>· ${esc(l)}</p>`).join('') + (choice ? `<p>· ${esc(choice)}</p>` : '') + `<p style="opacity:.7">${ok ? 'Progress saved.' : 'Progress kept for this session — export it from Save data to keep it.'}</p>`; },
+    UI.push(modal({ title: 'Ashgate · 41 days after the furnace', onBack: null, build(b) { b.innerHTML = lines.map(l => `<p>· ${esc(l)}</p>`).join('') + (choice ? `<p>· ${esc(choice)}</p>` : '') + `<p style="opacity:.7">${ok ? 'Progress saved.' : 'Progress kept for this session — export it from Save data to keep it.'}</p>`; },
       items: [{ label: 'Continue', act: () => { UI.pop(); DayEnd.outro(); } }] }));
   },
   run2() {
@@ -446,7 +446,7 @@ const DayEnd = {
     Object.assign(G.flags, { day2Done: 1 }); G.day = 3; G.trust0 = { ...G.trust }; addJ('e_leaf', true); addJ('e_slip', true); G.newJ = 0;
     G.mapId = 'apt'; P.x = 3 * 16 + 8; P.y = 4 * 16 + 12; P.dir = 0;
     const ok = Save.write('auto');
-    UI.push(modal({ title: 'End of Day 2 — First Fire', onBack: null, build(b) { b.innerHTML = L.map(l => `<p>· ${esc(l)}</p>`).join('') + `<p style="opacity:.7">${ok ? 'Progress saved.' : 'Progress kept for this session — export it from Save data to keep it.'}</p>`; },
+    UI.push(modal({ title: 'First Fire · 42 days after the furnace', onBack: null, build(b) { b.innerHTML = L.map(l => `<p>· ${esc(l)}</p>`).join('') + `<p style="opacity:.7">${ok ? 'Progress saved.' : 'Progress kept for this session — export it from Save data to keep it.'}</p>`; },
       items: [{ label: 'Continue', act: () => { UI.pop(); DayEnd.outro2(); } }] }));
   },
   outro2() { World.gilded = 0;
@@ -457,7 +457,7 @@ const DayEnd = {
         <p><i>"Be too much for them."</i></p>
         <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
-      { label: 'Wake up: Day 3 — The Ledger', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => { sv.flags = Object.assign(sv.flags || {}, { day3Done: 1, ledgerUp: G.flags.ledgerUp, toldHer: G.flags.toldHer, toldDace: G.flags.toldDace, fury: G.flags.fury }); afterDay(3, sv); }); } },
+      { label: 'Wake up: The Ledger, 43 days after the furnace', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => { sv.flags = Object.assign(sv.flags || {}, { day3Done: 1, ledgerUp: G.flags.ledgerUp, toldHer: G.flags.toldHer, toldDace: G.flags.toldDace, fury: G.flags.fury }); afterDay(3, sv); }); } },
       { label: 'Keep exploring instead', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
     ] }));
@@ -468,9 +468,9 @@ const DayEnd = {
       b.innerHTML = `<p>Far above Cinderwell — above the rock, above the warnings — a crate of cold greens arrives somewhere that doesn't exist.</p>
         <p>Below, Kael Brennick dreams of ${F('sawRiser') ? 'warm air falling from a pipe with no destination' : 'a lift light, green for eleven seconds'} — and of Seren, laughing at him for being right.</p>
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
-        <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">ASHGATE · 41 DAYS AFTER THE FURNACE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
-      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), () => Game.loadSave(sv)); } },
+      { label: 'Wake up: First Fire, 42 days after the furnace', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
     ] }));
   }

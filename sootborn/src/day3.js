@@ -12,12 +12,12 @@ const DREAM4 = () => [
   { fx: () => { World.gilded = 1; } },
   { card: 'THAT NIGHT', sub: 'It shows him the day he arrives.', min: 1.4, max: 4 },
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
-  { narr: 'Four years from now the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },
+  { narr: 'Four years after the furnace the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },
   { pstage: 3 }, { wait: 1.2 },
   { narr: 'A Proctor reads out a dead boy\'s name. I answer to it. Nobody looks twice. Ilse was right about that: they do not look at each other, only at what the other is worth.' },
   { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
   { narr: 'On the third day House Violet still had not eaten. Forty heirs, a river, a wood full of deer. I had expected to hate them. I had not expected to have to feed them.' },
-  { fade: 'out' }, { panel: null }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. Day three.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },
+  { fade: 'out' }, { panel: null }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day three.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },
   { panel: 'assay' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
   { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
   { fade: 'out' }, { panel: 'ante' }, { pstage: 5 }, { fade: 'in', spd: 1.2 }, { wait: 0.6 }, { music: 'hum' },
@@ -25,14 +25,14 @@ const DREAM4 = () => [
   { music: null }, { sfx: 'heart' }, { wait: 1 },
   { narr: 'I wake before I see what she does.' }, { music: 'mystery' },
   { fade: 'out' }, { panel: null },
-  { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 },
+  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 },
   { panel: 'island' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'House Teal held the island in the river, and the island held the only pump house in the valley. Their lamps ran off its vent stack. So did the Proctors\' boots. So did everything.' },
   { narr: 'An apprentice kept the stack at night. Grey coat, no House. She stood with one hand flat on the pipe, the way you stand when you are listening to it.' },
   { narr: 'I had not known anyone above the rock did that.' },
   { fade: 'out' }, { panel: null }, { mission: 'raid' },
   { card: 'MORNING', sub: 'The Assay. Day twenty-six. They have come for it.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() },
-  { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Under the floor.', big: 1, min: 1.4, max: 4 }
+  { card: 'FORTY-THREE DAYS AFTER THE FURNACE', sub: 'Cinderwell. Under the floor.', big: 1, min: 1.4, max: 4 }
 ];
 function DAY3() {
   const up = [
@@ -105,7 +105,7 @@ function DAY3() {
     { fade: 'out' }, { panel: null }
   ];
   return [
-    { music: 'home' }, { card: 'DAY THREE', sub: 'First bell. Forty-three days after the furnace.', big: 1, min: 1.6, max: 5 },
+    { music: 'home' }, { card: 'THE LEDGER', sub: 'First bell. Forty-three days after the furnace.', big: 1, min: 1.6, max: 5 },
     { panel: 'kael' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'I did not sleep much. Vale\'s offer sat on my chest all night. Carry the Bank Seven ledger up Lift Zero. Nobody from Cinderwell has ever gone up.' },
     { fade: 'out' }, { panel: 'row' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
@@ -123,7 +123,7 @@ function DAY3() {
     ] },
     ...up, ...under,
     ...(NOFF ? [] : DREAM4()),
-    { card: 'END OF DAY THREE', sub: 'The Ledger', big: 1, sfx: 'splash', min: 2.2, max: 6 },
+    { card: 'THE LEDGER', sub: 'Forty-three days after the furnace. The day ends.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
     { fx: () => { G.flags.day3Done = 1; } }
   ];
 }
@@ -185,7 +185,7 @@ FF.docks = () => ({
     hurt: 'THREE YEARS BEHIND A DESK. I AM SLOWER. I AM NOT KINDER.', fury: 'I HAVE BEEN POLITE FOR THREE YEARS. NOTED. GRANTED. ONE DOES NOT. NO MORE.', wave: 'VANT. HE LOST A RIVER TO ME ONCE. THEY GAVE HIM A DOCK TO MAKE UP FOR IT.', half: 'HE KNOWS MY FOOTWORK. HE HAS HAD SEVEN YEARS TO THINK ABOUT IT.', eleven: 'ELEVEN. I STOPPED SAYING THEM OUT LOUD ON THE SPIRE. I NEVER STOPPED COUNTING.' },
   arts: [{ on: 'start', after: 6, name: 'THE COUNT', line: 'THEY GAVE ME THE LEDGER OF WHO BREATHES. I READ ALL OF IT. EVERY NAME THEY EVER STRUCK OUT.', panel: 'world', stage: 3, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { on: 'wave', name: 'UNLIT', line: 'WE ARE WHAT IS LEFT IN THE LANTERN WHEN THEY PUT IT OUT. THERE ARE A GREAT MANY OF US.', panel: 'under', stage: 1, kind: 'rise', rgb: '255,170,80', hex: '#ffaa50' }],
   intro: [
-    { d: 2.8, black: 1, big: 'SEVEN YEARS FROM NOW', cap: 'THREE YEARS AFTER THE PINNING. I HAVE A POST, A SUN ON MY COLLAR, AND A KEY TO THE HIGH DOCKS.' },
+    { d: 2.8, black: 1, big: 'SEVEN YEARS AFTER THE FURNACE', cap: 'THREE YEARS AFTER THE PINNING. I HAVE A POST, A SUN ON MY COLLAR, AND A KEY TO THE HIGH DOCKS.' },
     { d: 3.2, cam: [0, 330, 170, 150, .3], to: [0, 240, 110, 150, .3], acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 1, fy: -1 }].concat(ffRow(V, 5, -60, 30, 44, { fy: -1 })), big: 'THE HIGH DOCKS', cap: 'THE LIFT-BARGES MOOR HERE, ABOVE THE WEATHER. FOUR HUNDRED OF THEM. WE NEED EVERY ONE.' },
     { d: 2.6, cam: [70, 60, 50, 150], to: [-70, 60, 50, 150], lin: 1, sfx: 'roar', acts: ffRow(['sg1', 'sg2'], 7, -90, 30, -80, { fy: 1 }, -10), cap: 'I WALKED IN THROUGH THE FRONT GATE. THE GUARD SALUTED. THEN HE SAW WHO WAS BEHIND ME.' },
     { d: 1.6, ...cu(0, 20, 1.9, 2.9, -14), flash: 1, acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 3 }], big: 'CUT THEM LOOSE.' }
@@ -193,7 +193,7 @@ FF.docks = () => ({
   outro: [
     { d: 3.0, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 2 }], cap: 'I TOOK THE SUN OFF MY COLLAR AND DROPPED IT OVER THE RAIL. IT FELL FOR A LONG TIME.' },
     { d: 3.2, cam: [40, 150, 60, 150], to: [-30, 240, 130, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'FOUR HUNDRED BARGES. EVERY ONE WITH A CREW THAT WAS BORN OWING AIR. IT TOOK US TWO MORE YEARS TO BE READY TO USE THEM.' },
-    { d: 2.6, black: 1, big: 'TWO YEARS LATER', cap: 'AND THEN, ONE MORNING, WE WERE.' }
+    { d: 2.6, black: 1, big: 'NINE YEARS AFTER THE FURNACE', cap: 'AND THEN, ONE MORNING, WE WERE.' }
   ]
 });
 FF.wayout = () => ({
@@ -206,7 +206,7 @@ FF.wayout = () => ({
 });
 function DAY4() {
   return [
-    { music: 'home' }, { card: 'DAY FOUR', sub: 'Four months later. One hundred and sixty days after the furnace.', big: 1, min: 1.8, max: 5 },
+    { music: 'home' }, { card: 'THE WAY OUT', sub: 'One hundred and sixty days after the furnace.', big: 1, min: 1.8, max: 5 },
     { panel: 'ante' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'Twice a week, for four months, I ride up in the white car and teach forty engineers what a valve is for. They are not stupid. They have simply never had to keep anything alive.' },
     { narr: 'I listen. Noted. Granted. One does not. I learn where the nine floors are, and which doors want a gold pass, and who is afraid of whom. I draw none of it. I count it.' },
@@ -281,14 +281,14 @@ function DAY4() {
     { fade: 'out' }, { panel: null },
     { card: 'END OF PART ONE', sub: 'B E L O W', big: 1, sfx: 'splash', min: 2.6, max: 7 },
     ...(NOFF ? [] : [
-      { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() }
+      { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() }
     ]),
     { fx: () => { G.flags.day4Done = 1; } }
   ];
 }
 function afterDay(n, sv) { G.mode = 'dayend'; UI.push(modal({ clear: true, onBack: null, build(b) { b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
-    b.innerHTML = n === 3 ? '<p>A Warden lies under the floor of Bay Three with a headache nobody will write down. A valve tech has seen the sky, and has been told to be boring about it.</p><h2 style="margin-top:16px">END OF DAY THREE</h2>' : '<p>Kael Brennick is dead on paper. Something taller is going to come up Lift Zero wearing another name.</p><p><i>"Every breath I take now is hers."</i></p><h2 style="margin-top:16px">END OF PART ONE</h2>'; },
-  items: (n === 4 ? [{ label: 'Begin Part Two — Above', act: () => playPart2(1) }] : []).concat(n === 3 ? [{ label: 'Wake up: Day 4 — The Way Out', act: () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY4(), () => { if (sv) { sv.flags = Object.assign(sv.flags || {}, { day4Done: 1 }); } afterDay(4, sv); }); } }] : []).concat([
+    b.innerHTML = n === 3 ? '<p>A Warden lies under the floor of Bay Three with a headache nobody will write down. A valve tech has seen the sky, and has been told to be boring about it.</p><h2 style="margin-top:16px">THE LEDGER · 43 DAYS AFTER THE FURNACE</h2>' : '<p>Kael Brennick is dead on paper. Something taller is going to come up Lift Zero wearing another name.</p><p><i>"Every breath I take now is hers."</i></p><h2 style="margin-top:16px">END OF PART ONE</h2>'; },
+  items: (n === 4 ? [{ label: 'Begin Part Two — Above', act: () => playPart2(1) }] : []).concat(n === 3 ? [{ label: 'Wake up: The Way Out, 160 days after the furnace', act: () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY4(), () => { if (sv) { sv.flags = Object.assign(sv.flags || {}, { day4Done: 1 }); } afterDay(4, sv); }); } }] : []).concat([
     { label: 'Keep exploring Cinderwell', act: () => { UI.clear(); if (sv) { Game.loadSave(sv); Game.autosave(); } else Game.toTitle(); } }, { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }]) })); }
 
 // the Ford again, with the new fighters standing in the pixel-art valley instead of the low-poly one

@@ -30,7 +30,7 @@ const Issue = {
     f.setAttribute('title', 'SOOTBORN: ' + this.LEVELS[key]); f.setAttribute('tabindex', '-1');
     f.style.cssText = 'position:fixed;border:0;background:#07070d;image-rendering:auto;opacity:0;transition:opacity .6s';
     // a title holds the screen while the level wakes, and the level fades up under it
-    const TT = { docks: ['THE HIGH DOCKS', 'Seven years from now. The second bell.'], riser: ['RISER NINE', 'Five years from now. The Assay valley, at night.'], stair: ['THE STAIR', 'Nine years from now. Sunset.'], gild: ['THE TABLE', 'Half a year from now. A sealed pump room under Tier Six.'] }[key]; try { Cutscene.card(TT[0], TT[1], 1); } catch (e) { /* no title */ } this.t0 = performance.now();
+    const TT = { docks: ['THE HIGH DOCKS', 'Seven years after the furnace. The second bell.'], riser: ['RISER NINE', 'Five years after the furnace. The Assay valley, at night.'], stair: ['THE STAIR', 'Nine years after the furnace. Sunset.'], gild: ['THE TABLE', 'Half a year after the furnace. A sealed pump room under Tier Six.'] }[key]; try { Cutscene.card(TT[0], TT[1], 1); } catch (e) { /* no title */ } this.t0 = performance.now();
     this.onMsg = e => {
       const d = e.data; if (!d || typeof d.sootborn !== 'string' || !this.el || e.source !== this.el.contentWindow) return;
       if (d.sootborn === 'issue-ready') { this.ready = true; setTimeout(() => { if (this.el) this.el.style.opacity = 1; try { Cutscene.hideCard(); } catch (er) { /* gone */ } }, Math.max(0, 1500 - (performance.now() - this.t0))); try { this.el.contentWindow.postMessage({ sootborn: 'assets', panels: this.assets(), fps: Settings.d.fps ? 1 : 0 }, '*'); } catch (er) { /* it plays without them */ } }

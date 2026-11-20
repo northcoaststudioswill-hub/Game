@@ -54,12 +54,12 @@ const Game = {
     World.load('apt', { x: 3 * 16 + 8, y: 3 * 16 + 12, dir: 2 }); G.mode = 'world';
     Fade.a = 1; Fade.dir = -1; Fade.sp = 0.8; Fade.busy = true; Sound.play('bell'); Sound.music('home');
     addJ('p_seren', true); addJ('p_celestine', true); G.newJ = 0; Game.autosave();
-    setTimeout(() => HUD.toast('Day 1 — Ashgate, Tier 6'), 900);
+    setTimeout(() => HUD.toast('Ashgate, Tier 6 — 41 days after the furnace'), 900);
   },
   loadSave(s) {
     if (!s) return Game.toTitle();
     G.look = s.look | 0; World.resetSheets(); World.showPlayer = true; Save.apply(s); World.resetSheets();
-    G.mode = 'world'; Fade.a = 1; Fade.dir = -1; Fade.sp = 2; Fade.busy = true; HUD.toast(`Day ${G.day} — ${MAPS[G.mapId].name}`);
+    G.mode = 'world'; Fade.a = 1; Fade.dir = -1; Fade.sp = 2; Fade.busy = true; HUD.toast(`${MAPS[G.mapId].name} — ${whenS(G.day)}`);
   },
   autosave() { if (G.mode !== 'world' || G.heist) return; Codex.sync(); Save.write('auto'); },
   onPuzzleDone() {

@@ -35,7 +35,7 @@ const FF = {
       { d: 2.4, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 3 }], cap: 'THE GOLD ON ME SHINES. WHAT IS UNDER IT DOES NOT.' },
       { d: 2.6, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THEY CHANT A NAME I BOUGHT. NOT THE ONE I WAS BORN WITH.' },
       { d: 2.8, cam: [0, 215, 110, 150, .32], to: [0, 240, 120, 150, .9], acts: [], cap: 'BEFORE THE GOLD, I WAS SOOT.', tint: 'rgba(255,240,200,.08)' },
-      { d: 2.2, cam: [0, 240, 120, 150, .9], to: [0, 240, 120, 150, 1.25], acts: [], big: 'FOUR YEARS EARLIER', cap: 'SIX TIERS DOWN.', tint: 'rgba(255,250,230,.35)' }
+      { d: 2.2, cam: [0, 240, 120, 150, .9], to: [0, 240, 120, 150, 1.25], acts: [], big: 'BEFORE THE FURNACE', cap: 'SIX TIERS DOWN.', tint: 'rgba(255,250,230,.35)' }
     ]
   }),
   ford: () => ({
@@ -126,7 +126,7 @@ const FF = {
       hurt: 'I HAVE BEEN CUT BY BETTER. I MARRIED BETTER.', fury: 'IT NEVER WENT OUT. I ONLY LEARNED TO AIM IT.', wave: 'CADE. HE SIGNED THE FURNACE ORDER FOR TIER FOUR.', half: 'HE KEEPS LOOKING AT THE SPIRE. NOBODY IS COMING OUT OF IT FOR HIM.', eleven: 'ELEVEN SECONDS. I HAVE MADE AN ARMY OUT OF THEM.' },
     arts: [{ on: 'start', after: 6, name: 'FIRST FIRE', line: 'THEY LIT THEIR FESTIVAL FROM THE FURNACE THAT TOOK HER. I LIT A WAR FROM IT.', panel: 'furnace', stage: 2, kind: 'storm', rgb: '255,120,40', hex: '#ff7828', dark: 'rgba(26,4,2,.8)' }, { on: 'wave', name: 'EVERY BREATH', line: 'EVERY BREATH I TAKE IS HERS. I HAVE TAKEN A GREAT MANY. I INTEND TO SPEND THEM ALL HERE.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }, { at: .6, name: 'THE LEDGER', line: 'THEY WROTE DOWN WHAT WE OWED FOR TWO HUNDRED YEARS. NOBODY EVER WROTE DOWN WHAT THEY DID.', panel: 'world', stage: 3, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }],
     intro: [
-      { d: 2.8, black: 1, big: 'NINE YEARS FROM NOW', cap: 'THIS IS WHERE IT GOES. I AM SHOWING YOU SO YOU KNOW IT GOES SOMEWHERE.' },
+      { d: 2.8, black: 1, big: 'NINE YEARS AFTER THE FURNACE', cap: 'THIS IS WHERE IT GOES. I AM SHOWING YOU SO YOU KNOW IT GOES SOMEWHERE.' },
       { d: 3.2, cam: [0, 330, 170, 150, .3], to: [0, 240, 110, 150, .3], shake: .3, acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 2, fy: -1 }].concat(ffRow(V, 6, -75, 30, 44, { fy: -1 })), big: 'THE FALL', cap: 'THE ACCREDITED LIVE ON THE SUN SPIRE, ABOVE THE WEATHER. YOU CANNOT CLIMB TO IT. SO WE ARE FALLING ON IT.' },
       { d: 3.0, ...cu(0, 20, 1.9, 2.6, 16), acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 2, fy: -1 }], cap: 'FOUR HUNDRED STOLEN LIFT-BARGES, CUT LOOSE FROM THE HIGH DOCKS. WE HAVE BOOTS. THE BARGES DO NOT NEED TO LAND WELL.' },
       { d: 2.6, cam: [70, 60, 50, 150], to: [-70, 60, 50, 150], lin: 1, sfx: 'roar', acts: ffRow(['sg1', 'sg2'], 8, -105, 30, -80, { fy: 1 }, -10), cap: 'THE SPIRE GUARD CAME UP TO MEET US ON THE WAY DOWN.' },
@@ -179,7 +179,7 @@ const OPENING = [
 const Opening = { run(done) { if (NOFF) return done(); G.mode = 'opening'; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => { Fade.a = 1; Fade.dir = -1; Fade.sp = 1.2; Fade.busy = true; done(); }); } };
 
 // ---- weave them into the story
-if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS FROM NOW', sub: 'Above the rock. The Assay. Day forty.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
+if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'Above the rock. The Assay. Day forty.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
 // the furnace: if he runs for her, he gets his three steps
 { const i = PROLOGUE_B.findIndex(s => s.choice && s.choice.some(c => /BREAK FREE/.test(c.t))), ch = PROLOGUE_B[i].choice.find(c => /BREAK FREE/.test(c.t)), was = ch.then;
   ch.then = [narr("You tear out of Mara's arms. Three steps. A Warden turns, unhurried, and lowers a halberd the length of a pipe.")];
@@ -189,12 +189,12 @@ if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.d
   { narr: 'After that night the Authority put it on the tier speakers. Every bell. Slowed down, played on their own bright instruments.' },
   { narr: 'So that whenever we heard our own song, we would see the doors close. Hardly anybody on Tier Six has dared to hum it since.' });
   const j = PROLOGUE_B.findIndex(s => s.narr && /starts to hum the shift song/.test(s.narr)); if (j >= 0) PROLOGUE_B.splice(j + 1, 0, { narr: 'It is the only goodbye we are allowed. Speaking at a commitment is forbidden. Nobody ever wrote a rule about humming.' }); }
-if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }); const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'FOUR YEARS EARLIER'; c.sub = 'Cinderwell, Tier Six. Forty-one days after the furnace.'; c.big = 1; } }
+if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }); const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'FORTY-ONE DAYS AFTER THE FURNACE'; c.sub = 'Cinderwell, Tier Six. Kael still fixes valves.'; c.big = 1; } }
 // ---- the dreams: what happens between the fights, told below, the old way
 const DREAM1 = () => [
   { music: 'mystery' }, { card: 'THAT NIGHT', sub: 'Kael does not dream of the furnace. For once it runs forward.', min: 1.6, max: 5 },
   { panel: 'gild' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
-  { narr: 'Half a year from now a woman finds me in the old tunnel. She was Accredited once. She still has the height, and the gold in her eyes, and nothing else they gave her.' },
+  { narr: 'Half a year after the furnace a woman finds me in the old tunnel. She was Accredited once. She still has the height, and the gold in her eyes, and nothing else they gave her.' },
   { say: 'ilse', t: 'They do not fear soot. They fear nothing that kneels. They only fear what looks like them.' },
   { say: 'ilse', t: 'So I am going to make you look like them. It will hurt more than anything that has happened to you. Except one thing.' },
   { say: 'kael', t: 'Why would one of them do this for one of us?' },
@@ -246,9 +246,9 @@ const DREAM1 = () => [
   { narr: 'You can hear what she did in the way I tell this. I have not been able to say "don\'t" inside my own head for years. It is the one thing they took that I let them keep.' },
   { narr: 'Then Brand, in a sealed pump room, every day for three years.' },
   { fade: 'out' }, { panel: null },
-  { brawl: () => FF.drill() },
+  { card: 'TWO YEARS AFTER THE FURNACE', sub: 'A sealed pump room. Brand.', big: 1, min: 1.4, max: 4 }, { brawl: () => FF.drill() },
   { card: 'Three years of that.', sub: 'Then they sent him up Lift Zero under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
-  { card: 'THE ASSAY', sub: 'Four years from now. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }
+  { card: 'THE ASSAY', sub: 'Four years after the furnace. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }
 ];
 const DREAM2 = () => [
   { fx: () => { World.gilded = 1; } },
@@ -259,7 +259,7 @@ const DREAM2 = () => [
   { say: 'kael', t: 'Ilse said a year.' },
   { say: 'brand', t: 'Ilse is teaching you to pass. I am teaching you to live. Every heir you meet has been handed a blade since he was six and has never once been hit. You have been hit all your breath. That is the only thing you have that they do not. Take them off and use it.' },
   { say: 'brand', t: 'I am going to swing at your head. Do not stop it. You cannot. Step into it and let it go past, and be standing behind me when it lands. They call it the Turn. I call it not being where the halberd is.' },
-  { fade: 'out' }, { panel: null }, { card: 'TWO AND A HALF YEARS FROM NOW', sub: 'The pit. Brand. No gloves.', big: 1, min: 1.5, max: 4.5 },
+  { fade: 'out' }, { panel: null }, { card: 'TWO AND A HALF YEARS AFTER THE FURNACE', sub: 'The pit. Brand. No gloves.', big: 1, min: 1.5, max: 4.5 },
   { brawl: () => FF.drill2() },
   { panel: 'hands' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'He looked at my palms afterwards, the way a man looks at a tool he sold once. He knew what a valve burn was. He had stood guard over the people who got them.' },
@@ -290,7 +290,7 @@ const DREAM3 = () => [
   { narr: 'And once, only once, the dream runs all the way out to the end.' },
   { narr: 'The Sun Spire. Where they keep the count. Above the weather, where the sky was never poison at all.' },
   { pstage: 1 }, { wait: 1.6 },
-  { narr: 'Nine years from now, we stop asking to be let up. We come down on it.' },
+  { narr: 'Nine years after the furnace, we stop asking to be let up. We come down on it.' },
   { fade: 'out' }, { panel: null }
 ];
 function ffScene(card, sub, def, done) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play([{ music: null }, { card, sub, big: 1, min: 1.5, max: 4.5 }, { brawl: def }], done); }

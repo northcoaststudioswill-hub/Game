@@ -379,8 +379,8 @@ barks = function (id) {
 function D2OBJ() {
   if (G.heist === 2) return "Hang her lantern on the Pillar, unseen";
   if (F('day4Done')) return "Part One is finished — explore freely";
-  if (F('day3Done')) return "Day 4 plays from the end of Day 3 (or the Dev menu) — explore freely";
-  if (F('day2Done')) return "Day 3 plays from the end of Day 2 (or the Dev menu) — explore freely";
+  if (F('day3Done')) return "The Way Out begins when The Ledger ends (or from the Dev menu). Explore freely";
+  if (F('day2Done')) return "The Ledger begins when First Fire ends (or from the Dev menu). Explore freely";
   if (!F('d2Tavi')) return 'Talk to Tavi';
   if (!F('mara2')) return G.mapId === 'bay' ? 'Report to Mara' : 'Report to Mara in Bay 3 (east, through the square)';
   if (!F('fuseDone')) return G.mapId === 'fuse' ? 'Balance the breaker panel' : 'Fuse Room C: the door on the north wall of Bay 3';
@@ -401,7 +401,7 @@ function festA() {
   const n = rays();
   return [
     { music: 'mystery' },
-    { card: 'LAST BELL', sub: 'The Festival of the First Fire · one year to the night', min: 1.2, max: 4 },
+    { card: 'LAST BELL', sub: 'The Festival of the First Fire · forty-two days after the furnace', min: 1.2, max: 4 },
     { scene: 'fest', cam: [8, 10], dark: F('spareOn') ? 'rgba(6,4,14,.5)' : 'rgba(6,4,14,.62)', zoom: 2 },
     { add: [['kael', 8, 9, 3], ['tavi', 7, 10, 3], ['ivo', 9, 11, 1], ['mara', 4, 8, 3], ['hollis', 6, 11, 3], ['marrow', 6, 7, 3], ['pell', 5, 9, 3], ['juno', 9, 12, 1], ['bao', 5, 11, 3], ['orin', 7, 13, 1], ['fen', 3, 10, 3],
       ['kit', 20, 11, 2], ['nell', 18, 10, 2], ['c2', 19, 9, 2, 'c2'], ['c3', 20, 7, 2, 'c3'], ['c4', 18, 12, 2, 'c4'], ['c1', 21, 9, 2, 'c1'], ['proctor', 12, 10, 2], ['watchman', 15, 10, 3], ['vale', 11, 5, 0]] },
@@ -533,13 +533,13 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
-    ...(NOFF ? [] : DREAM2()), ...(NOFF ? [] : [{ card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }]), { card: NOFF ? 'FOUR YEARS FROM NOW' : 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
+    ...(NOFF ? [] : DREAM2()), ...(NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }]), { card: NOFF ? 'FOUR YEARS AFTER THE FURNACE' : 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
     { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
 
 // the Proctor duel plays before the ceremony: the night Kael learns what the Authority takes, cut against the night he takes something back
-{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS FROM NOW', sub: 'The Assay. Night twenty-eight.', big: 1, min: 1.5, max: 4.5 }, { mission: 'lamp' }, { card: 'TWO NIGHTS LATER', sub: 'The Assay. The night before day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { mission: 'dais' }, { card: 'MORNING', sub: 'The Assay. Day thirty-one. He has noticed the page.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() },
+{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Night twenty-eight.', big: 1, min: 1.5, max: 4.5 }, { mission: 'lamp' }, { card: 'NIGHT THIRTY', sub: 'The Assay. The night before day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { mission: 'dais' }, { card: 'MORNING', sub: 'The Assay. Day thirty-one. He has noticed the page.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() },
     { brawl: () => FF.voss2d() },
     { music: 'mystery' }, { panel: 'voss' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
     { narr: 'Nobody touches a Proctor. It is the first rule of the Assay, and the only one they have ever enforced.' },

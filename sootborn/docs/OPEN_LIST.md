@@ -1,7 +1,10 @@
-# SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.63 (2026-11-19).
+# SOOTBORN — open list 
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.64 (2026-11-19).
 
 ## Waiting on you
+- **The proposed timeline** (see "the script in order, a proposed timeline, and where to spend"): the Assay would run day 3 → 19 → 25 → 26 → 28 → 30 → 31 → 49 → last day across the four nights, with training all on the first night. Nothing moves until you say yes.
+- **Your notes from playing to the Stair** (v0.63): send them when ready.
+- **The budget split** in the same document: say if you want it weighted differently.
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
 - **Names:** Kestrel Dray (was Wren Halloran) and Severin Cade (was Tyr Cade) are in. Say if either should change, and whether Tyr was who you meant by the Jackal.
 - **Celestine knew him at the Pinning** (v0.44) still wants your yes or no.

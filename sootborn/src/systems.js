@@ -1,3 +1,5 @@
+/* One clock for the whole game: everything is dated from the furnace. The days below have names, not numbers. */
+const WHEN = { 1: ['Ashgate', '41 days after the furnace'], 2: ['First Fire', '42 days after the furnace'], 3: ['The Ledger', '43 days after the furnace'], 4: ['The Way Out', '160 days after the furnace'] }, whenS = d => (WHEN[d] || WHEN[1])[1], whenN = d => (WHEN[d] || WHEN[1])[0];
 // ============================================================
 // systems/ — state, save, dialogue, journal, puzzle, world
 // ============================================================
@@ -25,7 +27,7 @@ const Save = {
   del(slot) { Store.set('bts_save_' + slot, ''); if (slot === 's1') Store.set('bts_save_manual', ''); },
   SLOTS: [['auto', 'Autosave'], ['s1', 'Slot 1'], ['s2', 'Slot 2'], ['s3', 'Slot 3']],
   latest() { let b = null; for (const [k] of this.SLOTS) { const s = this.read(k); if (s && (!b || s.t > b.t)) b = s; } return b; },
-  describe(s) { if (!s) return 'Empty'; const d = new Date(s.t), m = Math.floor((s.play || 0) / 60); let when = ''; try { when = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); } catch (e) { } return `Day ${s.day} · ${MAPS[s.map].name} · ${m < 60 ? m + ' min' : Math.floor(m / 60) + 'h ' + (m % 60) + 'm'}${when ? ' · ' + when : ''}`; },
+  describe(s) { if (!s) return 'Empty'; const d = new Date(s.t), m = Math.floor((s.play || 0) / 60); let when = ''; try { when = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); } catch (e) { } return `${whenN(s.day)} · ${MAPS[s.map].name} · ${m < 60 ? m + ' min' : Math.floor(m / 60) + 'h ' + (m % 60) + 'm'}${when ? ' · ' + when : ''}`; },
   migrate(s) {
     if (!s || typeof s !== 'object') return null;
     if (!s.v) { s.v = 1; s.trust = s.trust || {}; s.journal = s.journal || []; s.flags = s.flags || {}; }

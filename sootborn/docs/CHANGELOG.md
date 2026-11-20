@@ -1,4 +1,23 @@
-# SOOTBORN — changelog (latest v0.63 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.64 · 2026-11-19)
+
+## v0.64 · 2026-11-19 — one clock: every card counts from the furnace; the days below have names
+From your notes: the time cards do not make sense ("four years later", "two years before") because the point they count from keeps moving; the little menus still say Day 1, Day 2 from when there were going to be four days; run a bot through the whole story to see how it flows, then lay it out, propose a better timeline, and grade the game.
+
+**Time cards**
+- **Everything is dated from the furnace now.** No card says "from now", "later", "earlier" or "ago". About sixty cards, captions, level titles and memory captions changed. Examples: "FOUR YEARS FROM NOW" → "FOUR YEARS AFTER THE FURNACE"; "ONE YEAR AGO" → "ELEVEN MONTHS BEFORE THE FURNACE"; "FORTY-ONE DAYS AGO: the fever" → "FOUR DAYS BEFORE THE FURNACE" (it was never forty-one days before anything); "FOUR YEARS EARLIER" → the real date of the scene it returns to; memories inside the comic levels ("TWO YEARS AGO. THE DOCK STAIR.") → "SEVEN YEARS AFTER THE FURNACE. THE DOCK STAIR."
+- Two that were simply wrong: the Count hall called last year's Assay "the Assay of four years ago"; the Drill had no date at all (it is two years after).
+- People still say "nine years ago" in their own voice. Only cards are held to the rule.
+
+**Day 1, Day 2, Day 3, Day 4 are gone**
+- The four days below are **Ashgate** (41 days after the furnace), **First Fire** (42), **The Ledger** (43) and **The Way Out** (160). The top-of-screen line, the pause menu, save slots, Continue, the wake-up buttons, the end-of-day sheets, chapter cards and the Dev menu all use the name and the date.
+- "Day three" now only ever means a day of the Assay.
+
+**The whole story, played by a bot**
+- A new bot starts a new game and goes to THE END, unable to lose, logging every card, fight, level and menu in order. It ran clean in eight minutes. It jumps the four free-play stretches.
+- What it showed is in a new project document, **"SOOTBORN — the script in order, a proposed timeline, and where to spend"**: the full order as built, what is wrong with it (the Assay plays day 40, 1, 19, 28–31, 49, last, 3, 25, 26), a proposed order that moves pieces without cutting any, grades for each part of the game, and how I would split the budget.
+- **Nothing has been reordered.** That waits for your yes.
+
+**Checked:** the bot's full run; all five Part Two chapters build; no contractions in Accredited lines; the Assay calendar strip still lights the right day; the page loads clean. **Not checked:** by hand; whether any card now runs off a small screen (the new ones are longer; the big ones wrap).
 
 ## v0.63 · 2026-11-19 — the torso and the blade in the arena
 From your note: do the torso and blade in the arena.

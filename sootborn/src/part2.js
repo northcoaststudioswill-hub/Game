@@ -8,7 +8,7 @@ FF.gallery = () => ({
   voice: { at: [[1, 'ON THE SPIRE THEY SETTLE THINGS IN A WHITE ROOM WITH A GALLERY, SO EVERYONE WHO MATTERS CAN WATCH WITHOUT STANDING UP.'], [12, 'HE IS FIGHTING FOR HIS UNCLE\'S NAME. I AM FIGHTING UNDER A DEAD BOY\'S. NEITHER OF US IS USING OUR OWN.'], [26, 'IF I WIN TOO WELL THEY WILL ASK WHERE I LEARNED IT. IF I LOSE I AM NOBODY AGAIN. BRAND CALLED THIS THE NARROW PART.']],
     hurt: 'CAREFUL. EDRIC SORREL WOULD NOT KNOW HOW TO TAKE A HIT LIKE THAT.', fury: 'BANK IT. BANK IT. ...SOME OF IT.', half: 'HE HAS STOPPED PLAYING TO THE GALLERY. GOOD. NOW HE WILL MAKE MISTAKES.', eleven: 'ELEVEN. SLOWLY ENOUGH THAT IT LOOKS LIKE STYLE.' },
   arts: [{ at: .32, name: 'A RING', line: 'SHE BET ME THE SKY WAS BLUE. SHE BET ME A RING. I HAVE BEEN PAYING IT EVER SINCE.', panel: 'hands', kind: 'storm', rgb: '120,180,255', hex: '#78b4ff' }, { at: .6, name: 'THE NARROW PART', line: 'BRAND SAID: WIN LIKE YOU ARE BORED. THEY FORGIVE ANYTHING EXCEPT EFFORT.', panel: 'gild', stage: 2, kind: 'storm', rgb: '255,214,120', hex: '#ffd678' }],
-  intro: DUEL_IN('tyr', '', 'THE GALLERY', 'THE SUN SPIRE. FOUR YEARS AND A SEASON FROM NOW. I HAVE A POST, A DESK, AND AN ENEMY.', 'SEVERIN CADE. HIS UNCLE THE MARSHAL DID NOT ENJOY HEARING THAT A NOBODY FROM A MINOR HOUSE MADE A PROCTOR BLEED.', 'HE CALLED ME OUT AT A DINNER. I SAID: GRANTED. ILSE WOULD HAVE BEEN PROUD OF THE WORD.', 1.1),
+  intro: DUEL_IN('tyr', '', 'THE GALLERY', 'THE SUN SPIRE. FOUR YEARS AND A SEASON AFTER THE FURNACE. I HAVE A POST, A DESK, AND AN ENEMY.', 'SEVERIN CADE. HIS UNCLE THE MARSHAL DID NOT ENJOY HEARING THAT A NOBODY FROM A MINOR HOUSE MADE A PROCTOR BLEED.', 'HE CALLED ME OUT AT A DINNER. I SAID: GRANTED. ILSE WOULD HAVE BEEN PROUD OF THE WORD.', 1.1),
   outro: DUEL_OUT('tyr', 'HE YIELDED WITH HIS WHOLE FAMILY WATCHING. I HELPED HIM UP. THAT WAS THE PART THEY NEVER FORGAVE.', 'LUCAN AUREL WAS IN THE GALLERY. HE WAS THE ONLY ONE WHO CLAPPED.', 'A NAME TRAVELS FAST UP HERE. BY MORNING EDRIC SORREL HAD ONE.', 1.1)
 });
 FF.riser = () => ({
@@ -22,7 +22,7 @@ FF.riser = () => ({
     hurt: 'I FELT THAT ONE. GOOD. I HAVE BEEN BEHIND A DESK TOO LONG.', fury: 'I DID NOT SPEND IT IN THE GALLERY. I KEPT IT FOR THIS.', wave: 'TWO MORE. THE STAIR IS NOT EMPTY YET.', half: 'FORTY PEOPLE. I COUNTED THEM PAST ME. I AM STILL A CLERK.', eleven: 'ELEVEN. ONE OF THEM IS FOR TIER FOUR.' },
   arts: [{ on: 'start', after: 5, name: 'THE ORDER', line: 'IT CAME ACROSS MY DESK FOR A SIGNATURE. A WHOLE TIER, IN ONE LINE, WITH A COLUMN FOR THE AIR IT WOULD SAVE.', panel: 'ledger', stage: 1, kind: 'storm', rgb: '255,90,50', hex: '#ff5a32', dark: 'rgba(26,4,2,.8)' }, { on: 'wave', name: 'FEVER WARD', line: 'I STOLE AIR FOR FORTY BEDS ONCE AND IT COST ME EVERYTHING. TONIGHT IT IS FORTY PEOPLE AND I AM NOT ASKING.', panel: 'ward', stage: 1, kind: 'rise', rgb: '160,220,255', hex: '#a0dcff' }],
   intro: [
-    { d: 2.8, black: 1, big: 'RISER NINE', cap: 'FIVE YEARS FROM NOW. THE NIGHT THEY BALANCED TIER FOUR.' },
+    { d: 2.8, black: 1, big: 'RISER NINE', cap: 'FIVE YEARS AFTER THE FURNACE. THE NIGHT THEY BALANCED TIER FOUR.' },
     { d: 3.0, cam: [-60, 250, 150, 150, .18], to: [0, 150, 62, 150, .32], acts: [{ id: 'warden', a: [34, -8], blade: 2, sc: 1.1, fx: -1, fy: .3 }, { id: 'sg1', a: [54, 14], blade: 1, fx: -1, fy: 0 }, { id: 'kael2', a: [-70, 6], b: [-44, 4], fx: 1, fy: 0, blade: 1 }], cap: 'THE RISER COMES UP IN THE VALLEY WHERE THE ASSAY IS HELD. NOBODY BELOW KNOWS THAT. NOBODY ABOVE THINKS ABOUT IT.' },
     { d: 2.4, ...cu(-44, 4, 1.9, 2.8, -14), flash: 1, bolt: 1, sfx: 'roar', acts: [{ id: 'kael2', a: [-44, 4], blade: 1, aura: 3 }], cap: 'I SIGNED THE ORDER THIS MORNING. THEN I CAME DOWN HERE TO BREAK IT.' }
   ],
@@ -36,7 +36,7 @@ FF.son = () => { const friend = !!P2F('lucanFriend'); return {
   fin: { name: 'ONE DOES NOT', l1: 'ONE DOES NOT KNEEL. ONE IS NOT SORRY.', l2: 'I AM SORRY, LUCAN', rgb: '255,240,200' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, taunt: { 0: friend ? ['SAY IT IS NOT TRUE.', 'YOU SAT AT MY TABLE.', 'WAS ANY OF IT REAL?'] : ['SOOT. ALL THIS TIME.', 'SHE WAS RIGHT ABOUT YOU.', 'I SHOULD HAVE KNOWN AT THE KEEP.'] },
   foes: [{ id: 'lucan', name: 'Lucan Aurel', kind: 'duelist', hp: 170, sc: 1.1, k2: { line: 1 } }],
-  voice: { at: [[1, friend ? 'SIX YEARS FROM NOW. HE WAS THE ONLY ONE ON THE SPIRE WHO EVER ASKED ME A QUESTION AND WAITED FOR THE ANSWER.' : 'SIX YEARS FROM NOW. I KEPT HIM AT ARM\'S LENGTH FOR TWO YEARS. IT HAS NOT MADE THIS EASIER.'], [13, 'HE IS BETTER THAN HE WAS AT THE KEEP. HE PRACTISED. BECAUSE OF ME.'], [26, 'HIS MOTHER BURNED MY WIFE. HE WAS FOURTEEN AND HAD NEVER HEARD OF CINDERWELL. I KEEP HAVING TO SAY THAT TO MYSELF.']],
+  voice: { at: [[1, friend ? 'SIX YEARS AFTER THE FURNACE. HE WAS THE ONLY ONE ON THE SPIRE WHO EVER ASKED ME A QUESTION AND WAITED FOR THE ANSWER.' : 'SIX YEARS AFTER THE FURNACE. I KEPT HIM AT ARM\'S LENGTH FOR TWO YEARS. IT HAS NOT MADE THIS EASIER.'], [13, 'HE IS BETTER THAN HE WAS AT THE KEEP. HE PRACTISED. BECAUSE OF ME.'], [26, 'HIS MOTHER BURNED MY WIFE. HE WAS FOURTEEN AND HAD NEVER HEARD OF CINDERWELL. I KEEP HAVING TO SAY THAT TO MYSELF.']],
     hurt: 'HE MEANS IT THIS TIME.', fury: 'NOT AT HIM. IT WAS NEVER FOR HIM.', half: friend ? 'HE IS CRYING. I DID NOT KNOW THEY COULD.' : 'HE WANTS ME TO BE A MONSTER. IT WOULD BE SIMPLER FOR BOTH OF US.', eleven: 'ELEVEN. I PULL THE LAST ONE.' },
   arts: [{ at: .75, name: 'HER CHIN', line: 'HER CHIN. HER HANDS. HER WAY OF LOOKING PAST YOU. AND NONE OF WHAT SHE DID WITH THEM.', panel: 'ante', stage: 1, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }],
   intro: DUEL_IN('lucan', '', 'THE SON', 'THE KEEP IN THE VALLEY, WHERE WE FIRST DID THIS. HE CHOSE THE PLACE.', friend ? 'HE SAID: MOTHER TOLD ME WHAT YOU ARE. I SAID: DID SHE TELL YOU WHAT SHE IS.' : 'HE SAID: MOTHER TOLD ME WHAT YOU ARE. HE SOUNDED RELIEVED TO HAVE A REASON.', 'I DID NOT COME UP HERE FOR HIM. HE IS STANDING IN THE DOOR ALL THE SAME.', 1.1),
@@ -127,7 +127,7 @@ Object.assign(MOUTH, { rook: 'flat' });
 const P2 = {
   1: () => [
     { music: 'spire' }, { card: 'PART TWO', sub: 'A B O V E', big: 1, sfx: 'splash', min: 2.2, max: 6 },
-    { card: 'THE SEAT KNIFE', sub: 'Four years from now. The night before the lift.', big: 1, min: 1.5, max: 4.5 },
+    { card: 'THE SEAT KNIFE', sub: 'Four years after the furnace. The night before the lift.', big: 1, min: 1.5, max: 4.5 },
     { music: 'mystery' }, { panel: 'under' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'The night before I went up as Edric Sorrel, Brand took the blade the High Auditor had pinned on me with the sun, and put the last hand of it in a forge.' },
     { say: 'brand', t: 'They gave you a ruler. Straight, so that it can be counted. What did you carry below?' },
@@ -140,7 +140,7 @@ const P2 = {
     { say: 'brand', t: 'It is still their steel. It will pass any inspection on that Spire. And every time you draw it, you will know which end is yours.' },
     { narr: 'I called it the bank hook, because nobody up there would know what a bank was. I carried it nine years. It is the blade she broke.' },
     { fade: 'out' }, { panel: null }, { music: 'spire' },
-    { card: 'THE POST', sub: 'The Sun Spire. Four years and a season from now.', big: 1, min: 1.6, max: 5 },
+    { card: 'THE POST', sub: 'The Sun Spire. Four years and a season after the furnace.', big: 1, min: 1.6, max: 5 },
     { panel: 'spire' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'My name up here is Edric Sorrel. The real one died of a fever at eleven, in a minor House with no money to bury him loudly. Ilse bought his papers.' },
     { narr: 'I won their Assay under it. The High Auditor pinned a sun to my collar and made me Clerk of the Count. I live on the fourth ring of the Spire. There is a window in every room.' },
@@ -193,7 +193,7 @@ const P2 = {
     { brawl: () => FF.gallery() }
   ],
   2: () => [
-    { music: 'spire' }, { card: 'THE BALANCING', sub: 'Five years from now.', big: 1, min: 1.6, max: 5 },
+    { music: 'spire' }, { card: 'THE BALANCING', sub: 'Five years after the furnace.', big: 1, min: 1.6, max: 5 },
     { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'In my second year the order for Tier Four came across my desk. Eleven hundred lines, to be struck at once. Marshal Cade called it a balancing.' },
     { pstage: 1 }, { sfx: 'heart' }, { wait: 1 },
@@ -249,7 +249,7 @@ const P2 = {
     ] },
     { fade: 'out' }, { panel: null },
     // the Dockmaster's table: Vant again, Rook for the first time, and where the nine minutes came from
-    { music: 'spire' }, { card: 'THE DOCKMASTER\'S TABLE', sub: 'The last night of the quarter. The High Docks.', big: 1, min: 1.5, max: 4.5 },
+    { music: 'spire' }, { card: 'THE DOCKMASTER\'S TABLE', sub: 'Five years after the furnace. The last night of the quarter, on the High Docks.', big: 1, min: 1.5, max: 4.5 },
     { panel: 'table' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'On the last night of every quarter the Dockmaster gives a dinner, and the Clerk of the Count is asked, because somebody must sign for what the docks have landed. That is how I came to sit at table with a man I had beaten in a river.' },
     { say: 'vant', t: 'Sorrel. One has not had the pleasure since the Ford. You have grown into the collar. One would not have said, that day, that you were a man for sums.' },
@@ -268,7 +268,7 @@ const P2 = {
     { fade: 'out' }, { panel: null }
   ],
   3: () => [
-    { music: 'spire' }, { card: 'WHAT SHE KNOWS', sub: 'Six years from now.', big: 1, min: 1.6, max: 5 },
+    { music: 'spire' }, { card: 'WHAT SHE KNOWS', sub: 'Six years after the furnace.', big: 1, min: 1.6, max: 5 },
     { panel: 'ante' }, { pstage: 5 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'She sent for me to look at a valve in her own room. The Array was failing faster. She did not trust her engineers with anything she could hear.' },
     { narr: 'In her anteroom a man was standing to be measured. A mask-maker was fitting gilt to the left half of his face. The right half was turned to the wall.' },
@@ -317,7 +317,7 @@ const P2 = {
     { narr: 'He said it like a man putting down something he had carried up nine floors. Then he went to see to his halberd, and I let him, because I thought there would be a morning after.' },
     { fade: 'out' }, { panel: null },
     // ---- the way up: what the dock stair is, who has which part of the night, and who keeps the docks
-    { music: 'mystery' }, { card: 'THE DOCK STAIR', sub: 'Seven years from now. Before the second bell.', big: 1, min: 1.5, max: 4.5 },
+    { music: 'mystery' }, { card: 'THE DOCK STAIR', sub: 'Seven years after the furnace. Before the second bell.', big: 1, min: 1.5, max: 4.5 },
     { panel: 'dockstair' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'Nine hundred steps go up the outside of the Spire to the High Docks. Porters climb them with a hundredweight on a strap. No Accredited has ever set a foot on them. There is a lift.' },
     { narr: 'We went up in the dark with our boots wrapped. Ilse had the lower basins and forty of the Unlit. Sable was already aboard the lead hull with a knife on the mooring. Brand and I had the top.' },
@@ -328,7 +328,7 @@ const P2 = {
     { narr: 'At the gate I looked at the docks the way I had looked at them for three years from a window in the Count. Statues with lamps. Trees in tubs. A fountain, running. Six tiers under it Nell counts water by the cup.' },
     { sfx: 'bell' }, { narr: 'Then the second bell rang, and the top of the stair was full of light.' },
     { fade: 'out' }, { panel: null },
-    { card: 'THE HIGH DOCKS', sub: 'Seven years from now. The second bell.', big: 1, min: 1.5, max: 4.5 },
+    { card: 'THE HIGH DOCKS', sub: 'Seven years after the furnace. The second bell.', big: 1, min: 1.5, max: 4.5 },
     { issue: 'docks', or: [{ brawl: () => FF.docks() }] },
     // ---- the way out: the fleet is away, the sun goes over the rail, and the stair is still to pay for
     { music: 'mystery' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
@@ -338,7 +338,7 @@ const P2 = {
     { fade: 'out' }, { panel: null }
   ],
   4: () => [
-    { music: 'mystery' }, { card: 'TWO YEARS', sub: 'Seven to nine years from now.', big: 1, min: 1.6, max: 5 },
+    { music: 'mystery' }, { card: 'TWO YEARS', sub: 'Seven to nine years after the furnace.', big: 1, min: 1.6, max: 5 },
     { panel: 'dockstair' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
     { when: () => !G.flags.issue_docks, narr: 'The High Docks should have been dark at that bell. I had written the watch rota myself. They were on the stair with their lamps already lit.' },
     { when: () => !G.flags.issue_docks, narr: 'Somebody had told them the hour. Brand looked at the lamps, and then at me, and counted them the way a Warden counts.' },
@@ -347,7 +347,7 @@ const P2 = {
     { narr: 'Brand held the dock stair behind us while we cut the last moorings. He had been a Warden. He knew exactly how many of them it would take, and that it was more than he had minutes.' },
     { pstage: 1 }, { wait: 2.4 },
     { narr: 'He said: go. I said no. He said: Brennick, I put a halberd butt into a welder for humming, once. I have been waiting seven years for a stair. Go.' },
-    { fade: 'out' }, { panel: null }, { card: 'THE DOCK STAIR', sub: 'Seven years from now. Brand.', big: 1, min: 1.5, max: 4.5 },
+    { fade: 'out' }, { panel: null }, { card: 'THE DOCK STAIR', sub: 'Seven years after the furnace. Brand.', big: 1, min: 1.5, max: 4.5 },
     { brawl: () => FF.brandstair() },
     { music: 'mystery' }, { panel: 'dockstair' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { sfx: 'heart' }, { wait: 2 },
     { narr: 'Eleven minutes. Somebody timed it. I asked them to.' },
@@ -425,7 +425,7 @@ const P2 = {
       { narr: 'I thought of him going over the parapet. I had counted how long he fell. It was less than eleven seconds, and he had lived, and I had not known which of those I wanted.' }
     ]),
     // the night before: the Unlit as an army, for the first and only time at rest
-    { fade: 'out' }, { panel: null }, { card: 'THE NIGHT BEFORE', sub: 'Nine years from now. Four hundred hulls, in the weather.', big: 1, min: 1.5, max: 4.5 },
+    { fade: 'out' }, { panel: null }, { card: 'THE NIGHT BEFORE', sub: 'Nine years after the furnace. Four hundred hulls, in the weather.', big: 1, min: 1.5, max: 4.5 },
     { music: 'home' }, { panel: 'weather' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'The night before, nobody slept, and nobody said why. Six thousand people on four hundred decks, and every one of them found something that needed doing to a rope.' },
     { say: 'hollis', t: "I've been asked to tell you the welders are ready. I've also been asked not to hum till we're over the rail. I said aye to one of those." },
@@ -445,7 +445,7 @@ const P2 = {
     { brawl: () => FF.fall2() }
   ],
   5: () => [
-    { music: 'mystery' }, { card: 'THE COUNT', sub: 'Nine years from now. The Sun Spire.', big: 1, min: 1.6, max: 5 },
+    { music: 'mystery' }, { card: 'THE COUNT', sub: 'Nine years after the furnace. The Sun Spire.', big: 1, min: 1.6, max: 5 },
     { panel: 'weather' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'They wanted me to say something before the stair. I am not good at it. Seren was the one who talked.' },
     { say: 'kael', t: 'For five years up here I said "one." One does not kneel. One is not sorry. I\'m done with it. It\'s "we." It was always we.' },

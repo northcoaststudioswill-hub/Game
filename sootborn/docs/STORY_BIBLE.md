@@ -1,5 +1,5 @@
-# SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.63 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+# SOOTBORN — Story bible 
+Tagline: "Every breath is hers." Current build: v0.64 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -249,7 +249,8 @@ Year 0 is the furnace. This sheet is the reference when a card, a line or a chap
 
 | When | Event |
 |---|---|
-| −1 yr | The proposal and the wedding |
+| −11 months | The proposal and the wedding, at the Festival of the First Fire (a year to the night before First Fire, which is 42 days after the furnace) |
+| −4 days | The fever comes to Tier 6; the plan; the heist. Three nights of bleeding the line |
 | 0 | The fever, the bleed, the heist, the audit. Seren walks into the furnace. Brand is the Warden who strikes Hollis for humming |
 | +41 to +43 days | Days 1 to 3: Ashgate, First Fire, Lift Zero and the window, Under the Floor |
 | +160 days | Day 4: the Way Out. Kael is dead on paper |
@@ -496,3 +497,9 @@ Rule from the author: a 2.5D place is used for story that adds flavour and under
 - **Row K, the morning after the First Fire** (memory, from the ledge by K-7). Seren: the washer is the only round thing he owned and he gave it away; he owns "the inside half". Nan Orla did their sheets in her own ration water as a wedding gift. Garrow: the bite at fourteen cost Seren the knot; rules are rules. Mara's voice went on the last word of the binding and nobody ever mentioned it. Tavi asks whether Seren is his sister now and goes to stand beside her; it stayed that way.
 - **The fever ward, the first night the fans came up** (memory, from the ward board). Nell has forty breathing and a meter that says twelve, and will not ask why; she sat on the floor, which Kael had never seen. Seren: "I'm not married to a thief. I'm married to a man who tidies." Celestine's "a thief who tidies" three nights later echoes it, and Kael cannot hear one without the other. Tavi can breathe "right down to the bottom". Mosi is already drawing the figure with a sun for a head.
 - **What a Proctor looks like (v0.62).** A tall white hood with a gilt band and a stone; gold eyes; a mantle and a long white robe, gilt at the hem; a stole in his own colour with the Watcher at the chest and tally marks under it; boots burning blue under the hem, because a Proctor does not stand on the ground the cadets bleed on. Three carry the Watcher on a staff, two the grading book. The senior Proctor wears ivory, a violet stole and a small crown on the hood. Five grade the valley from the dais; fifteen watch a Pairing from a low balcony in the dark.
+
+## Time: the rule (v0.64)
+- **One clock, the furnace.** Cards say "N after the furnace" or "N before the furnace", or name a day of the Assay. Never "from now", "later", "earlier", "ago".
+- **The four days below are named:** Ashgate (41 days after), First Fire (42), The Ledger (43), The Way Out (160). "Day N" is only ever the Assay.
+- Characters may speak relative to their own present ("nine years ago I knelt"). Cards may not.
+- The order everything plays in, and a proposed reordering, are in the project document "SOOTBORN — the script in order, a proposed timeline, and where to spend".

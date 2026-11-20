@@ -245,11 +245,11 @@ MAPS.counthall = buildMap({
   lights: [{ x: 72, y: 168, r: 44, c: '#ffe090' }, { x: 264, y: 72, r: 48, c: '#ffe090' }, { x: 192, y: 52, r: 40, c: '#e8c25a' }, { x: 360, y: 60, r: 34, c: '#c8d8ff' }],
   hot: [{ id: 'shelf', tiles: blk(1, 3, 2) }, { id: 'count', tiles: blk(11, 3, 2) }, { id: 'tray', tiles: blk(22, 4) }, { id: 'marendesk', tiles: blk(15, 4, 2) }, { id: 'mydesk', tiles: blk(3, 10, 2) }, { id: 'motto', tiles: blk(6, 1, 2) }, { id: 'win', tiles: blk(17, 1) }, { id: 'deskA', tiles: blk(8, 5, 2) }, { id: 'deskB', tiles: blk(20, 9, 2) }], exits: []
 });
-MAPS.night5 = buildMap(Object.assign({}, SQUARE_DEF, { name: 'Ashgate Square — five years on', music: 'mystery', dark: 'rgba(6,4,14,.5)', hot: [{ id: 'pillarSun', tiles: blk(13, 8) }, { id: 'lift5', tiles: blk(12, 1, 2) }, { id: 'notice5', tiles: blk(7, 1, 2) }], exits: [] }));
+MAPS.night5 = buildMap(Object.assign({}, SQUARE_DEF, { name: 'Ashgate Square · five years after the furnace', music: 'mystery', dark: 'rgba(6,4,14,.5)', hot: [{ id: 'pillarSun', tiles: blk(13, 8) }, { id: 'lift5', tiles: blk(12, 1, 2) }, { id: 'notice5', tiles: blk(7, 1, 2) }], exits: [] }));
 Object.assign(MISSIONS, {
   // +5. "Lose it. Buy a day." Played.
   count: {
-    map: 'counthall', spawn: [5, 11, 1], where: 'The Sun Spire · five years on', toast: 'After the bell. The order is in the Marshal\'s tray.', hint: 'B: drop a pen · hold A to work · stay out of the lamps',
+    map: 'counthall', spawn: [5, 11, 1], where: 'The Sun Spire · five years after the furnace', toast: 'After the bell. The order is in the Marshal\'s tray.', hint: 'B: drop a pen · hold A to work · stay out of the lamps',
     npcs: () => [mG('warden', 6, 7, 3, [[18, 7, 3, 1.6], [18, 11, 0, 1.8], [6, 11, 2, 1.6], [6, 7, 1, 1.8]]), mG('maren', 17, 5, 0, [[17, 5, 0, 3], [17, 5, 2, 1.8], [17, 5, 0, 3.4], [17, 5, 3, 1.6]]), mG('warden', 22, 9, 2, [[22, 9, 2, 2.2], [22, 9, 1, 1.8], [22, 9, 2, 2], [22, 9, 0, 1.4]])],
     obj: () => !MF('order') ? "Take the Tier Four order from the Marshal's tray (north-east), unseen" : 'Misfile it in the dead letters (north-west), unseen',
     mark: () => !MF('order') ? { x: 22.5 * 16, y: 4 * 16, lab: 'TRAY' } : { x: 2 * 16, y: 3 * 16, lab: 'DEAD LETTERS' },
@@ -264,7 +264,7 @@ Object.assign(MISSIONS, {
       if (t.id === 'deskB') return Dialogue.start([narr('A child\'s drawing, pinned inside the kneehole where no auditor would look. A house. A tall person. A small person. A yellow circle.'), narr('So they draw it yellow as well.')]);
       if (t.id === 'mydesk') return Dialogue.start([narr('My desk. Fourth ring, third row. Eleven hundred lines waiting in the morning tray, and a pen I have worn a groove in.')]);
       if (t.id === 'count') return Dialogue.start([narr('The Count. Open, always. They do not lock it. Who up here would want to change it?'), narr('I know the page without looking. "Holloway, S. Tier Six. Air owed: balanced." The ink of the strike is browner than the rest. It was done with a different pen.'), fx(() => Sound.play('heart')), narr('Below it, in my own hand, four hundred and six lines I have struck since. I learned every one. It does not help them. It is the only thing I have that is not a lie.'), fx(() => { if (!MF('count')) rage(2); MSET('count'); })]);
-      if (t.id === 'marendesk') return Dialogue.start([narr('Maren Aldane\'s desk. Her lamp is still lit. She has left a second book open under the day\'s columns, and it is not the Count.'), narr('Sealed pairings. The Assay of four years ago. A ribbon at one page, and two names on it.'), fx(() => Sound.play('heart')), narr('"Aldane, D. Sorrel, E." She has underlined neither. She has drawn a small careful box around both, the way one marks a sum that does not come out.'), fx(() => MSET('saw'))]);
+      if (t.id === 'marendesk') return Dialogue.start([narr('Maren Aldane\'s desk. Her lamp is still lit. She has left a second book open under the day\'s columns, and it is not the Count.'), narr('Sealed pairings. Last year\'s Assay. A ribbon at one page, and two names on it.'), fx(() => Sound.play('heart')), narr('"Aldane, D. Sorrel, E." She has underlined neither. She has drawn a small careful box around both, the way one marks a sum that does not come out.'), fx(() => MSET('saw'))]);
       if (t.id === 'tray') { if (MF('order')) return Dialogue.start([narr('Empty. He will ask in the morning where it went.')]);
         return Dialogue.start([narr('Marshal Cade\'s tray. One order, eleven hundred lines, sanded and sealed and waiting for a clerk.'), narr('It weighs nothing. I had thought it would weigh something.'), fx(() => { MSET('order'); Sound.play('coin'); Mission.resetNPCs(); World.grace = 2.5; HUD.toast('Now lose it. The dead letters, north-west.'); })]); }
       if (t.id === 'shelf') { if (!MF('order')) return Dialogue.start([narr('The dead letters. Everything the Spire has ever written to somebody it had already struck. Nobody has opened a slot in years.')]);
@@ -425,7 +425,7 @@ const HOTN = { fire: 'THE FIRE', wood: 'WOODPILE', pump: 'PUMP HOUSE', vstd: 'VI
 /* ---------- places you walk in depth: flat figures, a camp round you. They add to the story and change none of it. ---------- */
 function walkCircle() {
   const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
-  return { era: 3, d2: 1, title: 'THE CIRCLE', sub: 'NIGHT TWENTY-EIGHT', bg: 'storm', arena: { kind: 'ring', rx: 190, ry: 72 }, music: 'mystery', hero: { id: 'kael2', hp: 9, pow: 2, blade: 0, fury0: 0 },
+  return { era: 3, d2: 1, title: 'THE CIRCLE', sub: 'THE ASSAY. NIGHT TWENTY-EIGHT', bg: 'storm', arena: { kind: 'ring', rx: 190, ry: 72 }, music: 'mystery', hero: { id: 'kael2', hp: 9, pow: 2, blade: 0, fury0: 0 },
     walk: { id: 'circle', spawn: [-150, 34], clear: 200,
       obj: k => k.n ? 'THEY ARE WAITING. THE FIRE, WHEN I AM READY.' : 'FORTY OF THEM, AND NOBODY SITTING. WALK THE CIRCLE, OR GO TO THE FIRE.',
       floor(g) { g.fillStyle = 'rgba(70,50,34,.55)'; g.beginPath(); g.ellipse(256, 256, 112, 54, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(40,28,22,.6)'; g.beginPath(); g.ellipse(256, 256, 30, 15, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(20,14,12,.7)'; g.beginPath(); g.ellipse(256, 256, 14, 7, 0, 0, 6.3); g.fill();
@@ -447,7 +447,7 @@ function walkCircle() {
 }
 function walkSquare() {
   const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
-  return { era: 0, title: 'ASHGATE SQUARE', sub: 'AN ORDINARY NIGHT, A YEAR AND MORE AGO', bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 66 }, music: 'home',
+  return { era: 0, title: 'ASHGATE SQUARE', sub: 'AN ORDINARY NIGHT, A YEAR BEFORE THE FURNACE', bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 66 }, music: 'home',
     walk: { id: 'square', spawn: [-96, 30], keep: q => q.t === 'lamp',
       obj: k => k.n >= 3 ? 'NOTHING HAPPENED THAT NIGHT. THE CHALK SUN, WHEN I CAN LET IT GO.' : 'LAST BELL JUST GONE. EVERYBODY IS WHERE THEY ALWAYS WERE.',
       props: [...[[-128, -18], [118, 34], [-40, 52], [140, -8]].map(([x, y], i) => ({ t: 'crowd', x, y, s: World.sheetFor(['pell', 'juno', 'marrow', 'kit'][i]), k: i + 1 }))],
@@ -462,7 +462,7 @@ function walkSquare() {
 }
 function walkRowMorning() {
   const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
-  return { era: 0, bg2: 'rowk', title: 'ROW K', sub: 'THE MORNING AFTER THE FIRST FIRE', bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 60 }, music: 'home',
+  return { era: 0, bg2: 'rowk', title: 'ROW K', sub: 'ELEVEN MONTHS BEFORE THE FURNACE. THE MORNING AFTER THE FIRST FIRE', bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 60 }, music: 'home',
     walk: { id: 'rowmorn', spawn: [10, 8], keep: () => false,
       obj: k => k.n >= 3 ? 'FIRST BELL IN A MINUTE. THE DOOR, WHEN I CAN.' : 'THE ROW IS UP BEFORE US. IT ALWAYS WAS.',
       npcs: [
@@ -476,7 +476,7 @@ function walkRowMorning() {
 }
 function walkWard() {
   const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
-  return { era: 0, bg2: 'ward', title: 'THE FEVER WARD', sub: 'THE FIRST NIGHT THE FANS CAME UP', bg: 'pit', arena: { kind: 'ring', rx: 140, ry: 56 }, music: 'home',
+  return { era: 0, bg2: 'ward', title: 'THE FEVER WARD', sub: 'FOUR NIGHTS BEFORE THE FURNACE. THE FANS COME UP', bg: 'pit', arena: { kind: 'ring', rx: 140, ry: 56 }, music: 'home',
     walk: { id: 'ward', spawn: [-100, 24], keep: () => false,
       obj: k => k.n >= 3 ? 'FORTY, BREATHING. THE BOARD, WHEN I CAN LEAVE THEM.' : 'LISTEN TO THAT. EVERY FAN ON THE BRANCH.',
       npcs: [
