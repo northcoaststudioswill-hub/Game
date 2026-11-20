@@ -76,6 +76,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 16d. **Two more 2.5D parts with story in the first half:** the Assay camp by day (its people: Dorian, Oswin, Petra); Bay 3 at last bell, counting the knives back.
 16e. **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
 16f. **The Assay's art in the opening:** the expression, the ring, ELEVEN. Its people and story should be felt, not only fought.
+16g. **Part Two needs more play (owner, 2026-11-19):** the fourth ring as a home base between chapters, with the suspicion meter; a Part Two cold open (a minute of the Stair at +9); two flash-forwards (the book with his name in red; Tavi at sixteen); the service stair; the Count as a puzzle. Master timeline 10f, 11c, 11d, 12b, 14c, 16a.
 17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)
 
 ## Fighting and controls

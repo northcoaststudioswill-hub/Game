@@ -178,14 +178,32 @@ Each beat: **Card** (exact text: TITLE / sub) · **In** (transition) · **Trigge
 ### PART TWO: ABOVE (the present moves up; all 3D, with 2D and 2.5D flashbacks)
 Each chapter gets one flashback, each deeper than the last; the last chapter has none until the final blow.
 
+**Why Part Two grows (owner, 2026-11-19):** after this plan Part One has about 30 things to play and Part Two about 16, with no free play at all, and the first half just got bigger. Four additions bring Part Two to about 25 and give it a place to spend time in: **the fourth ring as a home base (11c), a Part Two cold open (10f), two short flash-forwards (11d, 14c), the service stair (12b) and the Count as a puzzle (16a).**
+
+**10f. NEW — Part Two's cold open (flash forward)**
+- Card: **NINE YEARS AFTER THE FURNACE** / *The Sun Spire. The Stair. Sunset.* In: STRIP (the strip runs past the Assay, off its end, and becomes a count of years). Trigger: the white of END OF PART ONE burns into sunset.
+- Context: the same move as the Keep at the start of the game. The player sees where Part Two ends before it begins: Kael on the Stair in a clerk's coat, nine hundred steps, a halberd standing at the top, the fleet in the sky.
+- Plays: about a minute of **the Stair** (comic level), a short climb and one fight; cut when he reaches the top and sees who is waiting. Out: CUT to white, then PART TWO. Build: **NEW** (an opening slice of the `stair` level with its own end trigger).
+
 **11. The Pinning**
 - Cards: **PART TWO** / *A B O V E*, then **THE PINNING** / *Four years after the furnace. The last day, after the keep.* (moved: PART TWO now comes first).
 - Context: the present jumps up to the Spire and stays there. Celestine pins the gold on him herself and knows him (from the Ledger, and the white room).
 - Plays: **the Pinning** (3D). Then **THE SEAT KNIFE** / *Four years after the furnace. The night before the lift.* Build: CHANGE (order).
 
+**11c. NEW — the fourth ring (home base for Part Two)**
+- Card: **THE FOURTH RING** / *The Sun Spire. Four years and a season after the furnace. Night.* In: CUT. Returned to between every chapter of Part Two, the way Ashgate holds Part One; each visit has its own date card.
+- Context: Part Two had no free play. This is where Kael lives as Edric Sorrel, among people who don't know what he is. It grows: new people and new talk each chapter, finds that feed the Codex, Kestrel's door, Sable's stall, porters who kneel at the bell.
+- Plays: walk mode (2.5D), the approved "Spire's fourth ring at night". **The suspicion meter** lives here: say the wrong thing, look at the wrong person (the head rule), show your palms, and it climbs. Build: **NEW** (one of the five approved 2.5D places; the suspicion meter is on the open list).
+
+**11d. NEW — flash forward: the book**
+- Card: **NINE YEARS AFTER THE FURNACE** / *The Count. A book as wide as a table.* In: STRIP (years). Trigger: the gold pin closing on his collar at the Pinning.
+- Context: ten seconds. The book from the hum slip in Part One, open; a line in red; it is his name. No explanation. It pays off in 16a.
+- Plays: a drawn still with a slow push. Out: CUT. Build: **NEW**.
+
 **12. The Post**
 - Card: **THE POST** / *The Sun Spire. Four years and a season after the furnace.*
 - Plays: the desk; **the Gallery** (3D, Severin Cade).
+- 12b: **NEW — the service stair** (comic level or 2D, the owner to choose the dimension). Card: **THE SERVICE STAIR** / *The Sun Spire. Four years and a season after the furnace. The painted line.* Context: the stair the soot use inside the Spire, behind a painted line no clerk crosses. Kael crosses it to reach Bay-level people still working above. Build: **NEW** (on the open list as Part Two play, chapter one).
 - 12a: **NEW flash (2.5D).** Card: **FOUR YEARS AFTER THE FURNACE** / *The Assay. The night of day thirty-one.* In: STRIP. Trigger: a porter steps aside for him without being asked. Context: why the Spire defers to a clerk: the white cloak, and forty cadets falling in behind him in camp. Build: **NEW** (walk mode in the camp at night; reuse the Circle's camp).
 
 **13. The Balancing**
@@ -197,6 +215,7 @@ Each chapter gets one flashback, each deeper than the last; the last chapter has
 **14. What She Knows**
 - Card: **WHAT SHE KNOWS** / *Six years after the furnace.* Plays: the hum; **the Son** (3D, Lucan; his mother has told him).
 - 14a: **NEW flash (2D).** Card: **FIFTY YEARS BEFORE THE FURNACE** / *An Assay. Celestine Aurel, twenty.* In: FURNACE, cooled to grey. Trigger: Celestine's hand on a valve wheel she shouldn't know how to turn. Context: you play her, once, at her own Assay, so you understand her before you fight her. Build: **NEW**.
+- 14c: **NEW — flash forward: Tavi at sixteen.** Card: **NINE YEARS AFTER THE FURNACE** / *The Sun Spire. The service stair. Tavi, sixteen.* In: STRIP (years). Trigger: Lucan says "you have a brother" at the end of the Son. Context: ten seconds: Tavi grown, on the stair Kael crossed in 12b, a chalk sun in his hand. It pays off when Tavi arrives at +9 ("Tavi is coming up. Sixteen."). Out: CUT. Build: **NEW** (a drawn still).
 - 14b: **THE HIGH DOCKS** / *Seven years after the furnace. The second bell.* (PAGE) — **the High Docks** (comic). **One card only** (it shows twice now).
 
 **15. Two Years**
@@ -209,17 +228,20 @@ Each chapter gets one flashback, each deeper than the last; the last chapter has
 
 **16. The Count (no flashes until the last blow)**
 - Card: **THE COUNT** / *Nine years after the furnace. The Sun Spire.*
-- 16a: **THE STAIR** / *Nine years after the furnace. Sunset.* (PAGE) — **the Stair** (comic).
-- 16b: **Little Ember** (3D, Celestine Aurel).
-- 16c: **the last flash.** Card: **LAST BELL** / *Bay Three. The heart-furnace.* In: ELEVEN. Trigger: the last blow. The furnace, the count reaching eleven, held. Out: WAKE. Build: **NEW** (reuses the furnace).
-- 16d: **the ending, played** as a sequence of drawn pictures like the Table, not told. Build: **NEW** (`gild`-style comic sequence).
-- 16e: **SOOTBORN** / *E V E R Y   B R E A T H   I S   H E R S* — **THE END** / *North Coast Studios × E Concepts*.
+- 16a: **NEW — the Count as a puzzle.** Card: **THE COUNT** / *Nine years after the furnace. The book.* The book from 11d, open in front of him. Kael has to change the columns so the tiers breathe without the Spire noticing until it is too late: a balancing puzzle on the real numbers of the game (the forty-four names, Tier Six's air). His own name is the last red line. Build: **NEW** (on the open list).
+- 16b: **THE STAIR** / *Nine years after the furnace. Sunset.* (PAGE) — **the Stair** (comic), now the full level; the cold open's minute (10f) plays again from the inside.
+- 16c: **Little Ember** (3D, Celestine Aurel).
+- 16d: **the last flash.** Card: **LAST BELL** / *Bay Three. The heart-furnace.* In: ELEVEN. Trigger: the last blow. The furnace, the count reaching eleven, held. Out: WAKE. Build: **NEW** (reuses the furnace).
+- 16e: **the ending, played** as a sequence of drawn pictures like the Table, not told. Build: **NEW** (`gild`-style comic sequence).
+- 16f: **SOOTBORN** / *E V E R Y   B R E A T H   I S   H E R S* — **THE END** / *North Coast Studios × E Concepts*.
 
 ### Count after this plan
 - Comic-book levels: 3 → 5 (the Deep Array, the vent stack).
 - 2.5D places: 4 → 8 (the camp by day, Bay Three at last bell, the camp at night, Seren in Bay Three, the barge; the Spire's fourth ring is still on the list).
-- Part Two flashbacks: 2 → 6.
-- New cards: 0b, 5f, 6b, 8b, 9c, 10b, 10c, 12a, 14a, 15c, 15d, 16c.
+- Part Two flashbacks: 2 → 6; Part Two flash-forwards: 0 → 3 (the cold open 10f, the book 11d, Tavi 14c).
+- Part Two free play: none → the fourth ring, every chapter.
+- Things to play: Part One about 30, Part Two about 16 → about 25.
+- New cards: 0b, 5f, 6b, 8b, 9c, 10b, 10c, 10f, 11c, 11d, 12a, 12b, 14a, 14c, 15c, 15d, 16a, 16d.
 
 ---
 
@@ -251,8 +273,10 @@ Release after each phase (Part A2, rule 6). Run the whole-story bot each time an
 4. **v0.69: the two new 2.5D parts in Part One:** the camp by day (5f), Bay Three at last bell with the knife board (6b).
 5. **v0.70: the vent stack** (9c, comic level). **v0.71: the Deep Array** (8b, comic level).
 6. **v0.72: Part Two flashbacks:** the camp at night (12a), Celestine's Assay (14a), Seren in Bay Three (15c), the barge (15d).
-7. **v0.73: the last flash and the played ending** (16c, 16d).
-8. Then the open list as before: matching the writing (Part G), real animation once the owner attaches the free Quaternius "Universal Animation Library [Standard]" zip (CC0, it can't be downloaded from the workspace), the High Docks rebuilt, Part Two play, controls card.
+7. **v0.73: Part Two's spine:** the fourth ring as home base with the suspicion meter (11c), the cold open (10f), the two flash-forwards (11d, 14c).
+8. **v0.74: Part Two play:** the service stair (12b; ask the owner which dimension), the Count as a puzzle (16a).
+9. **v0.75: the last flash and the played ending** (16d, 16e).
+10. Then the open list as before: matching the writing (Part G), real animation once the owner attaches the free Quaternius "Universal Animation Library [Standard]" zip (CC0, it can't be downloaded from the workspace), the High Docks rebuilt, Part Two play, controls card.
 
 ---
 
