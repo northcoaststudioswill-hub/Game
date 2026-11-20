@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.62 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.63 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -8,6 +8,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 ## Untested, built blind (check these first when playing)
+- **v0.63: arena figures.** Torso plate, baldric, scabbard, and a blade that is a sword.
 - **v0.62: the Proctors** behind the Dorian fight (low balcony, in the dark) and on the valley dais.
 - **v0.61: two more memories to walk in.** Row K (the ledge of suns by your door) and the fever ward (the ward board in the clinic).
 - **v0.60: arena boots.** The camera follows you up and closes in on dives; hook in the air hauls a man up, strike cuts him down.
@@ -25,7 +26,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 ## Characters and animation
 0. **The run in the comic levels.** Lean, cape and arms done from stills (v0.53, v0.56). **Next step needs a file from you:** Quaternius's Universal Animation Library (CC0, free) has a real sprint, jog, deaths and sword combos; attach the Standard zip and I will put them on Kael and the guards.
 1. **Guards:** moves (v0.56, v0.57) and kit (v0.60: plate, belts, hands, a dock bill) done. Still to do: faces and helms; the same rigs in cutscenes.
-2. **Kael in the arena fights:** arm and leg plate and fingers added for everybody on that body (v0.60); figures in films breathe (v0.57). Still to do: torso and blade; a ready stance in held shots.
+2. **Kael in the arena fights:** arms and legs (v0.60), torso and blade (v0.63) done for everybody on that body. Needs your eye. Open: a ready stance of his own in held shots.
 3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
 4. **Tavi:** re-kitted (v0.60: bedroll, satchel, scarf, lamp). Needs your eye.
 5. **Rook** and the other two bosses re-kitted (v0.60). Still short of Kael: faces, weapons, their own idle.

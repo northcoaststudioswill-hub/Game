@@ -1,4 +1,14 @@
-# SOOTBORN — changelog (latest v0.62 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.63 · 2026-11-19)
+
+## v0.63 · 2026-11-19 — the torso and the blade in the arena
+From your note: do the torso and blade in the arena.
+
+- **Torso** (Kael and everybody on the same body): gilt rims down both sides of the breastplate and along the collar; a rim on each of the two lames below it; a leather baldric across the chest with a buckle; a back plate with a rim and two shoulder-blade ridges; a pouch on the right hip; and for anybody who carries a sword, a scabbard hanging off the left hip with a gilt locket and chape.
+- **Blade:** it was a flat glowing bar. It is now a sword: a dark ricasso with a gilt band above the guard, three lengths that narrow toward the point, a bright edge down each side, and a gilt fuller that stops two-thirds of the way up. The grip has three dark bindings. The hook at +5 and after, and the plain point before it, sit on the end as they did.
+- With v0.60's arms and legs, that is the whole figure gone over.
+- Seen in two close pictures of the Pairing: the plate, gauntlets, scabbard and tapering blades all read.
+
+**Checked:** two close pictures; the opening film; bots won the Pairing and the last duel; the page loads clean. **Not checked:** in motion or by hand; the extra pieces on a phone (about forty more small shapes per fighter; Low graphics draws them too).
 
 ## v0.62 · 2026-11-19 — the Proctors
 From your note: do the Proctors (the watchers behind the fights, as detailed flat figures).
