@@ -4,7 +4,7 @@ Kept current as work lands. Newest section first.
 
 ## The Guest List (Easter egg roster)
 
-Done so far: hidden roster page (tap the crown five times, type `louie`, or hold both shoulder buttons on the title); eight guests with their own race, title, move set, ultimate and named finisher — David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout. Guests wear their own clothes from their own games, not pit gear (Will's glasses and red shorts, Erin's garden hat and apron, Marcus's Flow Pros shirt, cap and pipe wrench, Bottie's box head and arm guns, Bibi's suit, tie and crown). Starters are the current ones: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will. Marcus's finisher is Derek Pulls Up (the Flow Pros van, the spike wall, the beer, "NOT AGAIN").
+Done so far: hidden roster page (tap the crown five times, type `louie`, or hold both shoulder buttons on the title); eight guests with their own race, title, move set, ultimate and named finisher — David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout. Guests have their own body style (round, smooth, big heads and cartoon eyes; Lil Bottie square and chrome; only David keeps the pit's body) and wear their own clothes from their own games, not pit gear (Will's glasses and red shorts, Erin's garden hat and apron, Marcus's Flow Pros shirt, cap and pipe wrench, Bottie's box head and arm guns, Bibi's suit, tie and crown). Starters are the current ones: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will. Marcus's finisher is Derek Pulls Up (the Flow Pros van, the spike wall, the beer, "NOT AGAIN").
 
 Not done:
 
@@ -13,7 +13,8 @@ Not done:
 - **Unique finisher animations for the other seven** — only Marcus has his own staging. Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality, Compost-ality and David's still play an existing finisher under the new name.
 - **Derek Pulls Up polish** — Marcus is off camera when he says "NOT AGAIN"; no engine or horn sound of its own; Derek does not walk back to the van.
 - **Flow Pros colours** — blue and white are the placeholder from Knockout until the real logo or a photo of the truck is supplied.
-- **Louie** — still the wolf body in Shiba orange: no cream face and belly, no curled tail, no airplane ears. As a beast he gets the beast finisher, not Bork-ality.
+- **Louie** — now a Shiba (cream face and belly, pointed ears, curled tail) but still on the wolf's skeleton and animations; no airplane ears. As a beast he gets the beast finisher, not Bork-ality.
+- **Guest bodies** — the round, big-headed style shares the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **More moves from the other games** — not yet recreated: Leash Lasso, Louie Airlines, Shiba Plane, Paw Paw Paw, Snake the Drain, Plunger Pop, The Final Bet, Bean Dip, and the whole sets of Corbin, Mama and Gas Guy.
 - **Unique attack animations** — guests use their frame's swings and casts. No bespoke animations yet (Bottie firing from the arm guns, Marcus swinging the wrench as a wrench, Erin's towel snap, the Sprout's pluck).
 - **Career paths** — guests start with everything and level like their frame class; the level-up screen still offers that class's moves. No guest-specific unlocks, story beats or endings yet.

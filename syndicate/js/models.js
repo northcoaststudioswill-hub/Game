@@ -48,7 +48,7 @@
     else if (id === 'pale') { circ(118, 4, a); circ(104, 2, b2); circ(64, 3, a); poly(12, 100, b2, 2.5, 0, 5); poly(6, 64, a, 2, 0.5236); ticks(24, 108, 116, b2, 2); dots(12, 82, 3.5, a); }
     const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; return (RINGTEX[id] = t); };
   G.makeChar = function (look) {
-    if (look.beast && G.makeBeast) { const b = G.makeBeast(look.beast.kind, look.beast.col); b.root.scale.setScalar((look.scale || 1) * 0.92); return b; }
+    if (look.beast && G.makeBeast) { const b = G.makeBeast(look.beast.kind, look.beast.col); if (look.beast.dress) { try { look.beast.dress(b); } catch (e) { } } b.root.scale.setScalar((look.scale || 1) * 0.92); return b; }
     if (look.egg && G.EGGS && G.EGGS[look.egg]) look = Object.assign({}, look, { cls: G.EGGS[look.egg].frame });
     const rcls = look.cls, cls = ({ druid: 'cleric', warlock: 'sorcerer' })[rcls] || rcls, race = G.RACES[look.race], g = look.gear || {};      // new callings wear an older one's frame
     const P = Object.assign({}, BASE[rcls]); if (look.race === 'drow') P.hair = 0xe8e8f0;
@@ -57,13 +57,13 @@
     if (cos.dye && G.DYES && G.DYES[cos.dye]) Object.assign(P, G.DYES[cos.dye]);
     if (wsk) P.weapon = wsk.color;
     if (TRIM[g.armor]) P.trim = TRIM[g.armor];
-    const mats = [];
+    const mats = [], soft = !!(look.civ && look.civ.round);      // a guest drawn round and smooth, nothing like the pit's cut-stone people
     const M = (color, shiny, emissive) => {
-      const m = shiny ? new T.MeshPhongMaterial({ color, flatShading: true, shininess: 60, specular: 0x666666 }) : new T.MeshLambertMaterial({ color, flatShading: true });
+      const m = soft ? new T.MeshLambertMaterial({ color }) : shiny ? new T.MeshPhongMaterial({ color, flatShading: true, shininess: 60, specular: 0x666666 }) : new T.MeshLambertMaterial({ color, flatShading: true });
       m.emissive = new T.Color(emissive || 0); m.userData.e = m.emissive.clone(); mats.push(m); return m;
     };
     const m = { skin: M(hex(look.skin || race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, wsk ? wsk.e : WGLOW[g.weapon || 0]) };
-    const box = gfx.box, mesh = gfx.mesh;
+    const ball = new T.SphereGeometry(0.5, 14, 10), box = soft ? (w, h, d, mat, x, y, z, parent) => { const q = new T.Mesh(ball, mat); q.scale.set(w * 1.3, h * 1.3, d * 1.3); q.position.set(x || 0, y || 0, z || 0); q.castShadow = true; if (parent) parent.add(q); return q; } : gfx.box, mesh = gfx.mesh;
     const root = new T.Group(), body = new T.Group(); root.add(body);
     const civ = look.civ || null, gc = civ ? 'civ' : cls, cm = civ ? { arm: M(hex(civ.arm)), fore: M(hex(civ.fore)), shin: M(hex(civ.shin)), shoe: M(hex(civ.shoe)) } : null;
     const robed = (gc === 'sorcerer' && rcls !== 'warlock') || gc === 'cleric', hover = (rcls === 'sorcerer' || rcls === 'warlock') && !!(look.ring && (G.RINGS || {})[look.ring]); let hovY = 0;       // they float on a ring; without one they walk like anybody
@@ -227,6 +227,7 @@
     let lastAlpha = 1;
     const C = { root, body, mats, height: 1.9 * sc };
     // dismemberment: detach a limb (the caller throws it) and leave a wet stump where it was
+    if (civ && civ.head) { head.scale.setScalar(civ.head); head.position.y += 0.2 * (civ.head - 1); }
     if (look.egg && G.EGG_MODEL) { try { G.EGG_MODEL(look.egg, { head, torso, body, root, hR, hL, foreL, foreR, armL, armR, legL, legR, w }); } catch (e) { } }
     C.limbs = { armL, armR, legL, legR, head, foreL: armL.userData.fore, foreR: armR.userData.fore, shinL: legL.userData.shin, shinR: legR.userData.shin }; C.wHand = hR;
     C.sever = function (part) { const g = C.limbs[part]; if (!g || !g.parent || g.userData.gone) return null; g.userData.gone = 1; const st = new T.Mesh(new T.SphereGeometry(part === 'head' ? 0.15 : 0.11, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a, flatShading: true })); st.position.copy(g.position); st.scale.y = 0.55; g.parent.add(st); const bn = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.1, 5), new T.MeshLambertMaterial({ color: 0xe6dcc4 })); bn.position.copy(g.position); bn.position.y -= 0.04; g.parent.add(bn); return g; };

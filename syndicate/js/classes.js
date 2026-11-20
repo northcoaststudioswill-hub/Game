@@ -129,7 +129,7 @@
       tail = new T.Group(); tail.position.set(0, y0 + H * 0.3, -L / 2 - 0.05); body.add(tail); if (bear) mesh(new T.SphereGeometry(0.1, 5, 4), fur, 0, 0, -0.04, tail); else { const t = box(0.1, 0.1, 0.5, fur, 0, -0.06, -0.24, tail); t.rotation.x = 0.5; }
     }
     if (glow) gfx.glow(glow, 3.2, 0, 1.0, 0, body, 0.4);
-    const C = { root, body, mats, height: 1.4, limbs: {}, beast: kind, sever: () => null };
+    const C = { root, body, mats, height: 1.4, limbs: {}, beast: kind, sever: () => null, head, tail };
     C.pose = function (p) {
       const t = p.t || 0, act = p.act || 'idle', mv = p.moving && act !== 'ko', k = Math.max(0, Math.min(1, p.prog || 0)), sw = mv ? Math.sin(p.walk * 1.6) : 0;
       root.position.y = p.y || 0; body.rotation.set(0, 0, 0); if (kind !== 'bat') body.position.y = mv ? Math.abs(Math.cos(p.walk * 1.6)) * 0.06 : Math.sin(t * 2.2) * 0.015; body.position.z = 0;
@@ -158,7 +158,7 @@
       const def = FORMS[id]; if (!def) return; if (e.form) G.forms.end(e, true);
       e.form = { id, basic0: e.basic, keys: Object.keys(ab.buff || {}).filter(k => k !== 'form').concat(e.d && e.d.formBonus ? ['dmg'] : []) }; e.basic = def.basic; e.charging = 0; e.chg = 0;
       if (e.d && e.d.formBonus) { ['form', 'speed', 'dmg', 'shield'].forEach(k => { if (e.buffs[k] && ab.buff && ab.buff[k]) e.buffs[k].t += 4; }); e.buffs.dmg = { t: e.buffs.form.t, amt: (ab.buff && ab.buff.dmg ? ab.buff.dmg[1] : 0) + 0.1 }; }
-      const v = e.vis; if (v && v.c && !v.human) { v.human = v.c; v.g.remove(v.c.root); const b = G.makeBeast(def.kind || (id === 'avatar' ? 'bear' : id), def.col, def.glow); b.root.scale.setScalar(def.scale * (e.look && e.look.scale || 1)); b.root.rotation.y = v.c.root.rotation.y; v.c = b; v.g.add(b.root); }
+      const v = e.vis; if (v && v.c && !v.human) { v.human = v.c; v.g.remove(v.c.root); const b = G.makeBeast(def.kind || (id === 'avatar' ? 'bear' : id), def.col, def.glow); if (def.dress) { try { def.dress(b); } catch (err) { } } b.root.scale.setScalar(def.scale * (e.look && e.look.scale || 1)); b.root.rotation.y = v.c.root.rotation.y; v.c = b; v.g.add(b.root); }
       puff(e, ab.color || '#ffffff'); G.sfx('buff'); if (gfx.cam) gfx.cam.shake = Math.max(gfx.cam.shake || 0, id === 'avatar' ? 0.5 : 0.2);
     },
     end: function (e, quiet) {
