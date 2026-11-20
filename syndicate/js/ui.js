@@ -122,8 +122,8 @@
     ui.close(); $('#hud').className = 'hidden'; G.placing = null; ui.placeBar();
     G.scene = 'hub'; W().enter('hub', G.hubPos); ui.topbar();
     if (first) show('<div class="card small letter"><h2>Notice of Debt</h2><p><i>To the bearer, ' + esc(G.state.hero.name) + ':</i></p><p>You owe the Deep Guild a debt, and the only currency we respect is blood on the pit floor.</p>' +
-      '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your rank in the Guild. Coin buys gear, and turns the damp cave we have lent you into a home.</p><p class="sig">Signed and sealed, the Ledger-Keeper</p><span class="seal"></span>' +
-      '<p class="dim">Walk with WASD or the thumb stick, or tap where you want to go. Walk up to the Pit gate, the Fence, the Guildmaster or your Hideout door.</p><div class="row end"><button class="big" id="ok">Make my mark</button></div></div>');
+      '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your rank in the Guild. Coin buys gear, and turns the damp cave we have lent you into a home.</p><div class="sigrow"><span class="seal"></span><p class="sig">Signed and sealed, the Ledger-Keeper</p></div>' +
+      '<p class="dim">' + (G.input.usingPad ? 'Walk with the left stick. Press A' : G.input.touch ? 'Drag your thumb to walk, or tap where you want to go. Tap' : 'Walk with WASD, or click where you want to go. Press E') + ' at the Pit gate, the Fence, the Guildmaster or your Hideout door.</p><div class="row end"><button class="big" id="ok">Make my mark</button></div></div>');
     on('#ok', () => ui.close());
     if (!first) ui.afterFight();
   };
@@ -158,9 +158,15 @@
 
   // ------------------------------------------------------------ the pit ladder
 
-  const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> strike</span><span><kbd>Hold click</kbd>, release: heavy blow</span><span><kbd>Space</kbd> dodge</span><span><kbd>Shift</kbd> or <kbd>Right click</kbd> parry, hold to block</span><span><kbd>T</kbd> call your Second</span><span><kbd>G</kbd> taunt the crowd</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
-    '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LT</kbd> parry · <kbd>D-pad left</kbd> Second · <kbd>D-pad down</kbd> taunt · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +
-    '<p class="dim">On a phone: left thumb moves, buttons on the right, and your aim locks to your opponent. Red marks on the floor are incoming attacks. Dodge through them to thrill the crowd.</p>';
+  // the controls, as a table for the device you are using; the other two are folded away underneath
+  const CT = {
+    key: ['Keyboard and mouse', [['WASD', 'Move'], ['Mouse', 'Aim'], ['Click', 'Strike · hold for a heavy blow'], ['Space', 'Dodge'], ['Shift / right click', 'Parry · hold to block'], ['Q  E  R', 'Your three moves'], ['F', 'Ultimate'], ['C', 'Potion'], ['G', 'Taunt the crowd'], ['T', 'Call your Second'], ['Esc', 'Pause']]],
+    pad: ['Controller', [['Left stick', 'Move'], ['Right stick', 'Aim'], ['X / RT', 'Strike · hold for a heavy blow'], ['A', 'Dodge'], ['LT', 'Parry · hold to block'], ['LB  RB  Y', 'Your three moves'], ['B', 'Ultimate'], ['D-pad ▲', 'Potion'], ['D-pad ▼', 'Taunt'], ['D-pad ◀', 'Second'], ['Menu', 'Pause']]],
+    touch: ['Touch', [['Left thumb', 'Move'], ['ATK', 'Strike · hold for a heavy blow'], ['DODGE', 'Dodge'], ['PARRY', 'Parry · hold to block'], ['Square buttons', 'Your moves, potion and ultimate'], ['TAUNT', 'Taunt the crowd'], ['PAUSE', 'Pause']]] };
+  const ctab = k => '<div class="ctab">' + CT[k][1].map(r => '<kbd>' + r[0] + '</kbd><span>' + r[1] + '</span>').join('') + '</div>';
+  G.controlsHTML = () => { const me = G.input.usingPad ? 'pad' : G.input.touch ? 'touch' : 'key', rest = ['key', 'pad', 'touch'].filter(k => k !== me);
+    return '<h3 class="ctitle">' + CT[me][0] + '</h3>' + ctab(me) + rest.map(k => '<details class="cmore"><summary>' + CT[k][0] + '</summary>' + ctab(k) + '</details>').join('') + '<p class="dim">Red marks on the floor are incoming attacks: dodge through them and the crowd loves it.</p>'; };
+  const CONTROLS = { toString: () => G.controlsHTML() };
   ui.prefight = function (o) {
     const st = G.state, h = st.hero;
     show('<div class="card vs"><div class="vs-row"><div class="vs-side"><span id="vp"></span><b>' + esc(h.name) + '</b><small>Lv ' + h.level + ' ' + G.CLASSES[h.cls].name + '</small></div><div class="vs-mid">VS</div>' +

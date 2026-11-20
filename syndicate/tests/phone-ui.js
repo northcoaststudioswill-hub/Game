@@ -1,0 +1,13 @@
+const { chromium, devices } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  const ctx = await b.newContext(Object.assign({}, devices['iPhone 13'], { deviceScaleFactor: 1 })); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+  await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(1500); await p.touchscreen.tap(200, 400); await p.waitForTimeout(200); await p.evaluate(() => { G.bootSkip && G.bootSkip(); G.bootSkip && G.bootSkip(); G.muted = true; }); await p.waitForTimeout(600);
+  await p.evaluate(() => document.getElementById('bNew').click()); await p.waitForTimeout(400); await p.evaluate(() => { G.cine.skip(); }); await p.waitForTimeout(400);
+  await p.evaluate(() => { document.querySelector('[data-cls=druid]').click(); }); await p.waitForTimeout(200); await p.evaluate(() => { document.querySelector('#go').click(); }); await p.waitForTimeout(800);
+  await p.evaluate(() => { const v = document.getElementById('veil'); v && v.remove(); }); await p.screenshot({ path: 'ux_notice.png' });
+  await p.evaluate(() => { const ok = document.querySelector('#ok'); ok && ok.click(); const st = G.state; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; st.shownPlaces = { a: 1 }; G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } });
+  await p.waitForTimeout(4500); await p.evaluate(() => { document.querySelectorAll('#veil').forEach(v => v.remove()); });
+  const ov = await p.evaluate(() => { const els = [...document.querySelectorAll('#abar .ab, #touch .tbtn')].filter(e => e.offsetParent && getComputedStyle(e).display !== 'none'), out = []; for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const a = els[i].getBoundingClientRect(), c = els[j].getBoundingClientRect(); const ox = Math.min(a.right, c.right) - Math.max(a.left, c.left), oy = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top); if (ox > 1 && oy > 1) out.push((els[i].id || els[i].dataset.act) + '×' + (els[j].id || els[j].dataset.act)); } return els.length + ' buttons, overlaps: ' + (out.join(', ') || 'none'); });
+  console.log(ov); await p.screenshot({ path: 'ux_fight.png' });
+  await p.evaluate(() => { G.ui.pauseMenu(); document.getElementById('pctl').click(); }); await p.waitForTimeout(300); await p.screenshot({ path: 'ux_controls.png' });
+  console.log('ERRORS', errs.length, errs.slice(0, 3).join(' || ')); await b.close(); })();
