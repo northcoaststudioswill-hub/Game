@@ -116,7 +116,7 @@
   window.addEventListener('mousemove', () => setPad(false)); window.addEventListener('keydown', () => setPad(false)); window.addEventListener('touchstart', () => setPad(false), { passive: true });
   G.rumble = (ms, strong) => { try { const gp = In.gp && navigator.getGamepads()[In.gp]; if (In.usingPad && gp && gp.vibrationActuator) gp.vibrationActuator.playEffect('dual-rumble', { duration: ms, strongMagnitude: strong, weakMagnitude: strong * 0.6 }); } catch (e) { } };
   function menuButtons() {
-    const roots = G.ui.isOpen() ? [$('panel')] : [$('placebar'), $('prompt'), $('decorBtn'), $('topbar')];
+    const roots = G.ui.isOpen() ? [$('panel')] : G.dicing ? [document.getElementById('dicebar')] : [$('placebar'), $('prompt'), $('decorBtn'), $('topbar')];
     const out = [];
     roots.forEach(r => { if (!r || r.classList.contains('hidden')) return; (r.tagName === 'BUTTON' ? [r] : r.querySelectorAll('button')).forEach(el => { if (!el.disabled && el.offsetParent !== null) out.push(el); }); });
     return out;
@@ -167,6 +167,9 @@
     } else if (G.placing && !open) {
       if (nx || ny) { const pl = G.placing; pl.x += nx; pl.z += ny; W.get('hideout').setGhost(pl); G.ui.placeBar(); }
       if (hit(0)) $('plOk').click(); if (hit(2)) $('plRot').click(); if (hit(1)) $('plCancel').click();
+    } else if (G.dicing && !open) {
+      if (nx || ny) navigate(nx, ny); const list = menuButtons(); if (list.length && !list.includes(document.activeElement)) (list.find(b => b.classList.contains('big')) || list[0]).focus({ preventScroll: true });
+      if (hit(0) && list.includes(document.activeElement)) document.activeElement.click(); if (hit(1)) { const bk = document.querySelector('#dicebar #dback, #dicebar #dleave'); if (bk) bk.click(); }
     } else if (open || sc === 'title' || sc === 'create') {
       if (nx || ny) navigate(nx, ny);
       const list = menuButtons(); if (list.length && !list.includes(document.activeElement)) (list.find(b => b.classList.contains('big')) || list[0]).focus();
@@ -216,7 +219,7 @@
     if (sc === 'fight') { if (G.talk) G.talkApi.update(dt, T); else G.fight.update(dt); }      // a scene in the pit (the Oracle fetching you back) runs in place of the bout
     else if (sc === 'cine') { G.cine.update(dt, T); }
     else if (sc === 'hub' || sc === 'hideout') {
-      near = W.updateWalk(dt, T, G.ui.isOpen() || !!G.placing || !!G.talk);
+      near = W.updateWalk(dt, T, G.ui.isOpen() || !!G.placing || !!G.talk || !!G.dicing);
       if (G.talk) G.talkApi.update(dt, T);
       if (G.placing) { const k = Math.min(1, dt * 6); cam.x += (G.placing.x - cam.x) * k; cam.z += (G.placing.z - cam.z) * k; }
     } else if (sc === 'title') {

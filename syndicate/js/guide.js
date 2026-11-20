@@ -57,7 +57,7 @@
   G.tour = () => { ui.close(); coming = null; tour(0); };
   // he sees a new face and comes straight over
   let coming = null, lastT = 0;
-  const stepPip = t => { const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t; if (!coming || !pip) return; if (G.talk || ui.isOpen() || G.scene !== 'hub') return;
+  const stepPip = t => { const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t; if (!coming || !pip) return; if (G.talk || ui.isOpen() || G.scene !== 'hub' || G.dicing) return;
     const w = W.walker, dx = w.x - pip.root.position.x, dz = w.z - pip.root.position.z, d = Math.hypot(dx, dz);
     if (!coming.said) { coming.said = 1; ui.toast(coming.fetch ? '“Oi! ' + G.state.hero.name + '! Something has opened!” Pip is running over.' : '“Oi! Fresh meat! Hold up!” Somebody is running over.'); G.sfx('ui'); }
     if (d > 2.3) { const v = 4.2 * dt; pip.root.position.x += dx / d * v; pip.root.position.z += dz / d * v; pip.root.rotation.y = Math.atan2(dx, dz); coming.walk = (coming.walk || 0) + dt * 9; pip.pose({ t, act: 'idle', moving: 1, walk: coming.walk }); }
@@ -105,7 +105,7 @@
   // ------------------------------------------------------------ the market calls out to you: whoever has something new says so
   const HAWK = [[/Fence/, ['Oi! New steel in. Over here!', 'You! Yes, you. Come and look at this.']], [/Guildmaster/, ['A word. You have something to choose.', 'Your page wants attention. Come here.']], [/Apothecary/, ['Tonics! Fresh today!', 'You look pale. I have something for that.']], [/Hobb/, ['Hot bowl! You look thin!', 'Eat before you fight, fool! Over here!']], [/Marc/, ['Bro. BRO. Over here.', 'Psst! Good odds tonight. For you, special.']], [/Low Lamp/, ['Your people are asking for you!', 'Oi, boss! News from the jobs!']], [/Whisper/, ['Psst. I heard something about your next one.', 'A rumour. Cheap. Come closer.']], [/Charms/, ['Something new on the cloth!', 'Lucky face, you have. Come and prove it.']], [/Notice Board/, ['(a fresh sheet has been nailed up)']], [/Knuckle/, ['Fancy your arm? Sit down!']], [/Blood Pit/, ['The gate is open! Who is next?']]];
   let hawkT = 9, hawkLast = '';
-  setInterval(() => { const st = G.state; if (!st || !st.hero || G.scene !== 'hub' || ui.isOpen() || G.talk || coming || leading || G.placing) return; hawkT -= 1; if (hawkT > 0) return;
+  setInterval(() => { const st = G.state; if (!st || !st.hero || G.scene !== 'hub' || ui.isOpen() || G.talk || coming || leading || G.placing || G.dicing) return; hawkT -= 1; if (hawkT > 0) return;
     const hub = W.get('hub'), w = W.walker, want = hub.spots.filter(sp => !(sp.isLocked && sp.isLocked()) && HAWK.some(h => h[0].test(sp.label)) && sp.label !== hawkLast && Math.hypot(sp.x - w.x, sp.z - w.z) > 3 && Math.hypot(sp.x - w.x, sp.z - w.z) < 22);
     const hot = want.filter(sp => { try { return sp.badge && sp.badge(); } catch (e) { return false; } }), pool = hot.length ? hot : (Math.random() < 0.35 ? want.filter(sp => /Hobb|Apothecary|Marc|Knuckle|Fence/.test(sp.label)) : []);
     if (!pool.length) { hawkT = 6; return; } const sp = pool[Math.floor(Math.random() * pool.length)], ln = HAWK.find(h => h[0].test(sp.label))[1]; hawkLast = sp.label; hawkT = hot.length ? 14 + Math.random() * 8 : 24 + Math.random() * 14;

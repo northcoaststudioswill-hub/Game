@@ -85,7 +85,7 @@
       // low orbit around the Guildmaster
       {
         dur: 5.6, cut: true, text: 'The Deep Guild writes every debt in the Blood Ledger, and beside it every name the pit has finished. The Guild always collects.',
-        update: (p, dt) => { const th = lerp(0.8, 1.5, ease(p)), r = lerp(3.3, 2.4, p); shoot([GM[0] + Math.cos(th) * r, lerp(1.0, 1.55, p), GM[2] + Math.sin(th) * r], [GM[0], lerp(1.5, 1.35, p), GM[2]], lerp(46, 34, p), -0.07); hub().update(now, dt); }
+        update: (p, dt) => { const th = lerp(1.2, 1.75, ease(p)), r = lerp(3.6, 3.05, p); shoot([GM[0] + Math.cos(th) * r, lerp(1.0, 1.55, p), GM[2] + Math.sin(th) * r], [GM[0], lerp(1.5, 1.35, p), GM[2]], lerp(46, 34, p), -0.07); hub().update(now, dt); }
       },
       // the underworld at work: Marc's table, the dice of light, and the Wardens taking the Crown's tenth
       {

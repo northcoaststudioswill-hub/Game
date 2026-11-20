@@ -779,3 +779,15 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 #ui.ingarden .hud-mid > :not(#pauseBtn) { display: none !important; }
 #gsouls { top: 5.9rem; }
 @media (orientation: portrait) { #gsouls { top: 7.6rem; } }
+
+/* Sir Dedrick's ring: a slim bar along the bottom instead of a card; the market's own labels step aside */
+#ui.dicing #tags, #ui.dicing #objective, #ui.dicing #prompt, #ui.dicing #touch, #ui.dicing #decorBtn { display: none !important; }
+#dicebar { position: absolute; left: 50%; bottom: calc(0.8rem + var(--sb)); transform: translateX(-50%); width: min(40rem, calc(100% - 1.2rem)); z-index: 25; background: var(--noise), linear-gradient(rgba(30, 24, 44, 0.94), rgba(16, 12, 24, 0.96)); border: 1px solid rgba(200, 184, 255, 0.4); border-radius: 0.5rem; padding: 0.55rem 0.8rem 0.65rem; box-shadow: 0 0 0 2px #0b090d, 0 0.8rem 2rem rgba(0, 0, 0, 0.7); zoom: var(--uiz, 1); }
+#dicebar .dtop { display: flex; justify-content: space-between; align-items: baseline; } #dicebar .dname { font-family: var(--title); font-size: 1.1rem; color: #d8ccff; } #dicebar .dpurse { font-size: 0.8rem; color: #f0d890; }
+#dicebar #dsay { margin: 0.2rem 0 0.45rem; font-style: italic; color: #e8e0f8; font-size: 0.95rem; min-height: 1.3em; }
+#dicebar .dgames { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; } #dicebar .dgames button { text-align: left; padding: 0.45rem 0.6rem; } #dicebar .dgames small { display: block; font-size: 0.72rem; color: #c8bedc; line-height: 1.25; margin-top: 0.15rem; }
+#dicebar .drow { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; justify-content: flex-end; margin-top: 0.4rem; } #dicebar .dgame { margin: 0; font-size: 0.85rem; color: #d8d0e8; }
+#dicebar .dstake { margin-right: auto; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #a89cc8; } #dicebar .dsum { margin-right: auto; color: #fff3cf; } #dicebar .dsum b { font-size: 1.15rem; color: #f0d890; } #dicebar .dpot { font-size: 0.8rem; color: #c8bedc; }
+#dicebar .dholds { justify-content: center; } #dicebar .hold { min-width: 3rem; font-size: 1rem; } #dicebar .hold.sel { box-shadow: 0 0 0 2px #f0d890, 0 0 0.8rem rgba(240, 216, 144, 0.6); }
+#dicebar button:focus-visible, #dicebar button:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 560px) { #dicebar .dgames { grid-template-columns: 1fr; } #dicebar .dgames small { display: none; } }

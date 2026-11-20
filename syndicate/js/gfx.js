@@ -54,8 +54,11 @@
       pcam.position.set(k.pos[0] + sx, k.pos[1] + sx * 0.5, k.pos[2] + sz);
       pcam.up.set(Math.sin(k.roll || 0), Math.cos(k.roll || 0), 0);
       pcam.lookAt(k.look[0] + sx * 0.6, k.look[1], k.look[2] + sz * 0.6); pcam.updateMatrixWorld();
+      { if (scene._glows == null || scene._glowsN !== scene.children.length) { const g = []; scene.traverse(o => { if (o.isSprite) g.push(o); }); scene._glows = g; scene._glowsN = scene.children.length; }       // a lamp's halo right against the lens fills the frame: leave it out of the shot
+        const wp = gfx._wp || (gfx._wp = new T.Vector3()); scene._glows.forEach(o => { if (o._near == null) o._near = o.visible; o.getWorldPosition(wp); const close = wp.distanceTo(pcam.position) < 1.9; if (close && o.visible) { o.visible = false; o._hidCam = 1; } else if (!close && o._hidCam) { o.visible = true; o._hidCam = 0; } }); }
       active = pcam; shadowTick(); renderer.render(scene, pcam); return;
     }
+    if (scene._glows) scene._glows.forEach(o => { if (o._hidCam) { o.visible = true; o._hidCam = 0; } });
     const vw = cam.vh * gfx.W / gfx.H;
     camera.left = -vw * cam.fx; camera.right = vw * (1 - cam.fx); camera.top = cam.vh * cam.fy; camera.bottom = -cam.vh * (1 - cam.fy);
     camera.updateProjectionMatrix();
