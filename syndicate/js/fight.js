@@ -1191,9 +1191,9 @@
     const asp = gfx.W / gfx.H;
     let want = Math.max((sh + 6.5) / (port ? 0.5 : 0.78), (sw + (port ? 3.2 : 7)) / asp, port ? 13 : 10.5);
     if (port) want = Math.min(want, 21);
-    if (F.wideCam) want = Math.max(want, port ? 24 : 19);       // the garden: pulled back far enough to keep its owner in the picture
+    if (F.wideCam) want = Math.max(want, port ? 24 : 21.5);       // the garden: pulled back far enough to keep its owner in the picture
     const k = Math.min(1, dt * 3.5);
-    camVh += (want - camVh) * k; c.vh = camVh; c.fx = 0.5; c.fy = F.wideCam ? (port ? 0.6 : 0.68) : port ? 0.44 : 0.47;
+    camVh += (want - camVh) * k; c.vh = camVh; c.fx = 0.5; c.fy = F.wideCam ? (port ? 0.6 : 0.6) : port ? 0.44 : 0.47;
     // aim at the midpoint, but never let the player leave the frame
     let tx = (P.x + E.x) / 2 / S, tz = (P.y + E.y) / 2 / S;
     const halfW = camVh * asp / 2 - 1.4, px = P.x / S, pz = P.y / S, off = ((px - tx) - (pz - tz)) * 0.7071;

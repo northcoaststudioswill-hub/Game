@@ -9,9 +9,11 @@
   const TAUNTS = ['I signed nothing either. Look at me.', 'There is only one way out of here and it is through you.', 'He said the last one standing walks. He always says that.', 'I have been here since before your first bout.', 'Do not be sorry. I will not be.', 'You put me here. Did you know that?', 'The flowers are real. That is the worst part.', 'He is watching. He claps when it is close.', 'I do not remember my name. I remember yours.', 'Nine of us die today whatever happens. Make it ten.'];
   G.garden = { SOULS, run: null };
 
+  const WORD = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+  G.garden.count = st => Math.max(3, Math.min(SOULS, (st.fallen || []).length));
   function souls(st) {
-    const f = (st.fallen || []).slice(-40).sort(() => Math.random() - 0.5).slice(0, SOULS), h = st.hero, cl = G.FOE_CLASSES || ['fighter', 'rogue', 'sorcerer', 'cleric'], races = Object.keys(G.RACES);
-    return Array.from({ length: SOULS }, (_, i) => { const q = f[i], cls = (q && q.c && G.CLASSES[q.c]) ? q.c : cl[Math.floor(Math.random() * cl.length)], C = G.CLASSES[cls], lv = Math.max(1, h.level - 1);
+    const N = G.garden.count(st), f = (st.fallen || []).slice(-40).sort(() => Math.random() - 0.5).slice(0, N), h = st.hero, cl = G.FOE_CLASSES || ['fighter', 'rogue', 'sorcerer', 'cleric'], races = Object.keys(G.RACES);
+    return Array.from({ length: N }, (_, i) => { const q = f[i], cls = (q && q.c && G.CLASSES[q.c]) ? q.c : cl[Math.floor(Math.random() * cl.length)], C = G.CLASSES[cls], lv = Math.max(1, h.level - 1);
       return { id: 'soul' + i, name: q ? q.n : SHADES[i], title: q ? 'whom you killed' : 'a soul he kept', cls, race: races[Math.floor(Math.random() * races.length)], level: lv, known: C.start.slice(0, 1 + (i >= 5 ? 1 : 0)).filter(id => G.ABILITIES[id]),
         hpMul: +(0.36 + i * 0.022).toFixed(2), dmgMul: +(0.52 + i * 0.03).toFixed(2), ai: { react: 0.6 - i * 0.02, aggro: 0.62, dodge: 0.06 + i * 0.01, guard: 0.2, parry: 0.03 + i * 0.008 }, xp: 0, coin: 0, respect: 0, garden: 1, taunt: TAUNTS[i],
         tint: { cloth: '#cfe0ee', armor: '#9fb4c8', armor2: '#7f94a8', trim: '#f4f8ff', hair: '#eef4ff', legs: '#aebccb' }, mine: !!q }; });
@@ -67,7 +69,7 @@
       if (G.state.gore !== false) G.gfx.blood(m.x / S, 1.1, m.y / S, 14, 4); word(m.x, m.y, String(dmg), '#ffffff', false); if (m.hp <= 0) dropMob(m, 'you'); });
   }
   function stepMobs(dt) {
-    const F = G.fight, P = F.P, E = F.E; if (!P || !E) return; clock += dt; if (davEl) davEl.style.top = G.gfx.portrait ? '41%' : '45%';       // his words hang in the gap between the foot of the throne and the fight
+    const F = G.fight, P = F.P, E = F.E; if (!P || !E) return; clock += dt; if (davEl) davEl.style.top = G.gfx.portrait ? '41%' : '39%';       // his words hang in the gap between the foot of the throne and the fight
     davT -= dt; if (davT <= 0) { const r = Math.random(), alive = mobs.length ? mobs[Math.floor(Math.random() * mobs.length)] : null; says(r < 0.3 ? HIS : r < 0.5 ? ALL_HATE : r < 0.7 ? hateFor(G.state.hero.race) : hateFor(alive ? alive.race : G.state.hero.race)); } const live = F.inFight && F.inFight();
     for (let i = chunks.length - 1; i >= 0; i--) { const c = chunks[i]; c.t += dt; c.vy -= 20 * dt; c.m.position.x += c.vx * dt; c.m.position.z += c.vz * dt; c.m.position.y += c.vy * dt; c.m.rotation.x += dt * 6; c.m.rotation.z += dt * 5; if (c.m.position.y < 0.08) { c.m.position.y = 0.08; c.vy *= -0.3; c.vx *= 0.5; c.vz *= 0.5; } if (c.t > 2.2) { c.m.material.opacity = Math.max(0, 1 - (c.t - 2.2) / 0.6); if (c.t > 2.8) { c.m.parent && c.m.parent.remove(c.m); chunks.splice(i, 1); } } }
     if (live) hitMobs();
@@ -92,25 +94,34 @@
   }
   const fu0 = G.fight.update;
   G.fight.update = function (dt) { const r = fu0.apply(this, arguments), run = G.garden.run; if (run && run.brawl && G.fight.active && !G.fight.paused) { try { stepMobs(Math.min(0.05, dt) * (G.fight.speed || 1)); } catch (e) { console.error(e); } } return r; };
-  function endBrawl() { const sc = arena().scene; mobs.forEach(m => sc.remove(m.c.root)); mobs = []; chunks.forEach(c => c.m.parent && c.m.parent.remove(c.m)); chunks = []; G.fight.onFoeDown = null; G.fight.wideCam = false; G.fight.noSever = false; if (hudEl) { hudEl.remove(); hudEl = null; } if (davEl) { davEl.remove(); davEl = null; } if (G.garden.run) G.garden.run.brawl = 0; }
+  function endBrawl() { const sc = arena().scene; mobs.forEach(m => sc.remove(m.c.root)); mobs = []; chunks.forEach(c => c.m.parent && c.m.parent.remove(c.m)); chunks = []; G.fight.onFoeDown = null; document.getElementById('ui').classList.remove('ingarden'); G.fight.wideCam = false; G.fight.noSever = false; if (hudEl) { hudEl.remove(); hudEl = null; } if (davEl) { davEl.remove(); davEl = null; } if (G.garden.run) G.garden.run.brawl = 0; }
 
   function bout() {
     const run = G.garden.run, st = G.state, o = run.list[0]; ui.close();
     ui.close(); if (ui.leaveHub) ui.leaveHub(); G.scene = 'fight'; ui.topbar(); const a = arena(); if (a.garden) a.garden(true);
-    o.name = 'The Ten'; o.title = 'everybody he kept'; { const lv0 = st.hero.level; o.hpMul = lv0 <= 3 ? 0.36 : lv0 <= 6 ? 0.43 : 0.5; o.dmgMul = lv0 <= 3 ? 0.36 : lv0 <= 6 ? 0.42 : 0.55; }
-    o.onDone = win => { o.onDone = null; run.left = mobs.length + 1; endBrawl(); if (!win) return soulDeath(o); G.sfx('holy'); survived(); };
+    o.name = 'The ' + WORD[run.list.length]; o.title = 'everybody you put in the sand'; run.total = run.list.length; { const lv0 = st.hero.level; o.hpMul = lv0 <= 3 ? 0.36 : lv0 <= 6 ? 0.43 : 0.5; o.dmgMul = lv0 <= 3 ? 0.36 : lv0 <= 6 ? 0.42 : 0.55; }
+    o.onDone = win => { o.onDone = null; run.left = mobs.length + 1; endBrawl(); if (!win) return lastOffer(o); G.sfx('holy'); survived(); };
     G.fight.start(o); const F = G.fight, lv = st.hero.level; clock = 0; youT = 0; tPrev = 'idle'; mobs = []; chunks = [];
-    run.list.slice(1).forEach((q, i) => { const an = i / 9 * 6.2832 + 0.35, r = 150 + (i % 3) * 34, c = G.makeChar({ cls: q.cls, race: q.race, tint: q.tint }), hp = Math.round((34 + lv * 9 + i * 3) * (lv < 7 ? 0.58 + lv * 0.06 : 1));       // the lower rungs meet thinner souls, not slower ones
+    run.list.slice(1).forEach((q, i) => { const an = i / Math.max(1, run.list.length - 1) * 6.2832 + 0.35, r = 150 + (i % 3) * 34, c = G.makeChar({ cls: q.cls, race: q.race, tint: q.tint }), hp = Math.round((34 + lv * 9 + i * 3) * (lv < 7 ? 0.58 + lv * 0.06 : 1));       // the lower rungs meet thinner souls, not slower ones
       const m = { c, name: q.name, race: q.race, x: Math.cos(an) * r, y: Math.sin(an) * r, hp, maxHp: hp, dmg: (2.5 + lv * 0.7) * (lv < 7 ? 0.8 : 1), spd: 105 + Math.random() * 40, state: 'idle', t: 0, cd: 1 + Math.random() * 2, pickT: Math.random(), walk: Math.random() * 6, face: an + Math.PI, kx: 0, ky: 0, tg: null }; a.scene.add(c.root); mobs.push(m); });
-    run.brawl = 1; G.fight.wideCam = true; davT = 5; F.noSever = true; F.onFoeDown = e => nextSoul(e); hud();
+    run.brawl = 1; document.getElementById('ui').classList.add('ingarden'); G.fight.wideCam = true; davT = 5; F.noSever = true; F.onFoeDown = e => nextSoul(e); hud();
   }
   function survived() {
     const st = G.state, run = G.garden.run, then = run.then; leave(); st.gardens = (st.gardens || 0) + 1; G.save(); G.scene = 'hub';
     show('<div class="card small letter event"><small class="over">The Hour Garden</small><h2>Last One Standing</h2><p>The last of them comes apart like breath on glass, and the grass is red to the hedges. The blossom keeps falling. Somewhere above the trees a man is applauding, slowly, with his rings on.</p><p class="quote">“' + pick(['OH, well DONE. I had money on the dwarf. I had money on all of them, actually. Up you get, meat. You have cost me a fortune and I have not enjoyed anything so much in years.', 'Ten! Ten of the whimpering little bastards, and you went through them like a dose. I am almost aroused. Go on. Back to the dirt. The pen is still warm whenever you tire of this.', 'You LIVE. Disgusting. Magnificent. Do it again some time, I will sell tickets.']) + '”</p><p class="got">You wake on the sand of the Blood Pit. You have survived the garden ' + st.gardens + ' time' + (st.gardens === 1 ? '' : 's') + '.</p><div class="row end"><button class="big" id="x">Wake</button></div></div>');
     on('#x', () => { ui.close(); then(); });
   }
+  // you lost. He would much rather own you than bury you, so the pen comes out once more
+  function lastOffer(by) {
+    const st = G.state, run = G.garden.run, then = run.then, left = run.left || 1; G.scene = 'hub'; G.sfx('laugh');
+    show('<div class="card small letter event"><small class="over">Face down in the grass</small><h2>The Pen, Once More</h2><p>The blossom is settling on you. ' + left + ' of them ' + (left === 1 ? 'is' : 'are') + ' still standing, and waiting to be told. A shadow with rings on it leans over and holds something out, very close to your face. It is a pen.</p><p class="quote">“' + pick(['Look at you. LOOK at you. All that pride, and it bleeds like anybody’s. Sign, meat. I would rather own you than compost you. Barely.', 'Oh, do not die. It is so WASTEFUL. I have a use for you and a pen in my hand. Last time I ask.', 'Shh. Shh. You lost. Everybody loses to me in the end; the clever ones do it on paper. Sign.']) + '”</p>' +
+      '<p class="note"><b>Sign</b> and he turns the day back: you wake in the pit, his, with a soul on your account. <b>Refuse</b> and this fighter is erased for good.</p>' +
+      '<div class="row end"><button class="danger" id="no">Refuse</button><button class="big" id="sg">Sign the contract</button></div></div>');
+    on('#sg', () => { st.signed = true; st.soulDebt = (st.soulDebt || 0) + 1; leave(); G.save(); G.sfx('level'); show('<div class="card small letter event"><h2>The Contract</h2><p>The pen is warm. The ink is gold. Your hand shakes and he steadies it, which is the worst part. “THERE. Mine. Up you get, vessel. You have work.”</p><p class="got">Signed · he will bring you back from now on · one soul on your account</p><div class="row end"><button class="big" id="x">Wake up</button></div></div>'); on('#x', () => { ui.close(); then(); }); });
+    on('#no', () => { show('<div class="card small"><h2>Refuse him?</h2><p>This fighter dies in the garden and the save is erased. There is no way back from this one.</p><div class="row end"><button class="big" id="x">Take the pen</button><button class="danger" id="gy">Refuse</button></div></div>'); on('#x', () => lastOffer(by)); on('#gy', () => soulDeath(by)); });
+  }
   function soulDeath(by) {
-    const st = G.state, h = st.hero, epi = h.name + ', level ' + h.level + ' ' + G.CLASSES[h.cls].name + ' · ' + G.RANKS[G.rankOf(st.respect)].name + ' · ' + (st.fallen || []).length + ' in the sand · fell in the garden with ' + ((G.garden.run || {}).left || 1) + ' of ' + SOULS + ' still standing';
+    const st = G.state, h = st.hero, epi = h.name + ', level ' + h.level + ' ' + G.CLASSES[h.cls].name + ' · ' + G.RANKS[G.rankOf(st.respect)].name + ' · ' + (st.fallen || []).length + ' in the sand · fell in the garden with ' + ((G.garden.run || {}).left || 1) + ' of ' + ((G.garden.run || {}).total || SOULS) + ' still standing';
     leave(); try { const g = JSON.parse(localStorage.getItem('guttercrown_graves') || '[]'); g.push(epi); localStorage.setItem('guttercrown_graves', JSON.stringify(g.slice(-20))); } catch (e) { }
     G.scene = 'hub'; G.gameOver = 1; G.wipe();
     show('<div class="card small letter event gameover"><small class="over">Soul death</small><h2>Game Over</h2><p>' + by.name + ' stands over you in the grass. There is no hatch this time, and no gold, and nobody turns anything back. The blossom covers you by evening.</p><p class="quote">“' + pick(['Pity. No, not pity. What is the other one? Lunch.', 'And THAT is what “not yet” buys you, you stubborn streak of piss. Next!', 'I did offer. I offered twice. Nobody can say I am not a generous man.']) + '”</p><p class="got">' + epi + '</p><p class="note">This fighter is gone. The save has been erased.</p><div class="row end"><button class="big" id="x">Back to the title</button></div></div>');
@@ -140,9 +151,9 @@
   }
   G.garden.intro = intro;
   function gate(then) {
-    const st = G.state;
-    show('<div class="card small letter event"><small class="over">You would not sign</small><h2>The Hour Garden</h2><p>He does not send you back up. He opens a different door. There is sunlight behind it, which is wrong, and grass, and blossom coming down like snow.</p><p class="quote">“' + (st.gardens ? 'Back again, and STILL too proud to hold a pen. Good. I was getting bored.' : 'Unsigned meat does not get carried. Unsigned meat EARNS it. My garden. Ten souls I have been keeping for a rainy day, and you, and one way out.') + ' Last one breathing gets to go on breathing. I watch. It is the only thing down here that still gets my blood up.”</p>' +
-      '<p class="note"><b>Ten souls, all at once.</b> Everybody against everybody: they will cut each other down as gladly as you. Be the last one standing and you wake in the pit. <b>Die in the garden and the game is over: this fighter is erased.</b> Or sign, and he simply brings you back, as he does for everyone he owns.</p>' +
+    const st = G.state, cnt = G.garden.count(st), mine = (st.fallen || []).length;
+    show('<div class="card small letter event"><small class="over">You would not sign</small><h2>The Hour Garden</h2><p>He does not send you back up. He opens a different door. There is sunlight behind it, which is wrong, and grass, and blossom coming down like snow.</p><p class="quote">“' + (st.gardens ? 'Back again, and STILL too proud to hold a pen. Good. I was getting bored.' : 'Unsigned meat does not get carried. Unsigned meat EARNS it. My garden. ' + (mine >= 3 ? WORD[cnt] + ' of the ones YOU put in the sand, kept fresh, and very keen to see you again.' : WORD[cnt] + ' souls I have been keeping for a rainy day, and you, and one way out.')) + ' Last one breathing gets to go on breathing. I watch. It is the only thing down here that still gets my blood up.”</p>' +
+      '<p class="note"><b>' + WORD[cnt] + ' souls, all at once' + (mine ? ': ' + Math.min(mine, cnt) + ' of them fighters you killed' : '') + '.</b> Everybody against everybody: they will cut each other down as gladly as you. Be the last one standing and you wake in the pit. <b>Fall in the garden and he offers the contract one last time. Refuse that, and this fighter is erased.</b></p>' +
       '<div class="row end"><button id="sg">Sign the contract</button><button class="big danger" id="gd">Walk into the garden</button></div></div>');
     on('#sg', () => { st.signed = true; G.save(); G.sfx('level'); show('<div class="card small letter event"><h2>The Contract</h2><p>The pen is warm. The ink is gold. “There. Was that so hard? All that pride, and it folds like a wet hat.” He shuts the garden door with his foot.</p><p class="got">Signed · he will bring you back from now on · every death is a soul on your account</p><div class="row end"><button class="big" id="x">Carry on</button></div></div>'); on('#x', () => { ui.close(); then(); }); });
     on('#gd', () => { G.garden.run = { list: souls(st), then }; G.save(); intro(bout); });

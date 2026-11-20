@@ -728,3 +728,9 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 /* a card that opens over a conversation takes over: the conversation waits underneath until the card is closed */
 #talk.under { display: none; }
 #talk .tk-choices button.sel { outline: 2px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 0.9rem rgba(240, 201, 90, 0.55); }
+
+/* the garden's soul count sits under the enemy bar, clear of the crowd meter and of David's face */
+#gsouls { left: auto; right: 1rem; top: 4.6rem; transform: none; }
+@media (orientation: portrait) { #gsouls { top: 6.6rem; right: 0.6rem; font-size: 0.75rem; } }
+/* there is no crowd in the garden, so its meter stays out of the way of David's face */
+#ui.ingarden .hud-mid .hype-label, #ui.ingarden .hud-mid .bar.hype { display: none; }
