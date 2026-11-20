@@ -1,5 +1,5 @@
-# SOOTBORN — open list 
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.61 (2026-11-19).
+# SOOTBORN — open list
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.62 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -8,6 +8,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 ## Untested, built blind (check these first when playing)
+- **v0.62: the Proctors** behind the Dorian fight (low balcony, in the dark) and on the valley dais.
 - **v0.61: two more memories to walk in.** Row K (the ledge of suns by your door) and the fever ward (the ward board in the clinic).
 - **v0.60: arena boots.** The camera follows you up and closes in on dives; hook in the air hauls a man up, strike cuts him down.
 - **v0.60: new kit** on Dock Guards, Stair Blades, Wardens, Rook, the other two bosses and Tavi.
@@ -28,7 +29,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
 4. **Tavi:** re-kitted (v0.60: bedroll, satchel, scarf, lamp). Needs your eye.
 5. **Rook** and the other two bosses re-kitted (v0.60). Still short of Kael: faces, weapons, their own idle.
-6. **The Proctors on the dais:** detailed figures, or detailed flat sprites standing in the 3D scene. Needs the 3D renderer to be able to stand a picture in the scene first; not started.
+6. **The Proctors:** done as detailed flat figures in the valley and the Pairing room (v0.62). Needs your eye. Open: the same treatment for Celestine and her Wardens on the Keep's dais; the crowd in other 3D rooms.
 
 ## Places
 7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rules: (1) from here on, new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot (the fire was already in the story, so it stands). (2) Do not change an existing area to another dimension (2D, 2.5D, 3D) unless you name the area and the dimension.** All five candidates below are approved, to be built after the rest of this list has been gone over. Built in v0.61: Row K the morning after the wedding; the fever ward with the fans up. Still to build: the Assay camp by day (day 3); the deck of a barge in the two years; the Spire's fourth ring at night. Also still open: the whole square explorable this way in the present, not only as a memory.

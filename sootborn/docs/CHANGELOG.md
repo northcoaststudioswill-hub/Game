@@ -1,4 +1,16 @@
-# SOOTBORN — changelog (latest v0.61 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.62 · 2026-11-19)
+
+## v0.62 · 2026-11-19 — the Proctors
+From your note: do the Proctors (the watchers behind the fights, as detailed flat figures).
+
+- **The 3D fights can now stand a drawn figure in the scene.** That was the missing piece: the renderer could only draw shapes and glows. A flat figure is drawn with depth like everything else, so a fighter who crosses in front of it is in front of it.
+- **The Proctors are drawn, not built.** Five of them, each about twice the detail of anybody else on screen: a tall white hood with a gilt band and a stone in it, gold eyes, a mantle with a gilt edge, a robe with folds and a gilt hem, a stole in their own colour down the front with the Watcher at the chest and tally marks below, and boots burning blue under the hem, because they do not stand on anything. Three carry the Watcher on a staff; two hold the grading book open. The senior one is in ivory with a violet stole and a small crown on the hood.
+- **Where:**
+  - **The Assay valley** (the opening battle, the Ford, and the films that use them): five on the dais, in place of the five white cones. They ride up and down a little on their boots.
+  - **The Pairing room** (Dorian): the gallery was a ledge too high to see, with grey cones on it. It is now a low balcony with a gilt rail between the pillars, and the Proctors stand on it in the dark, eyes lit. These are the ones behind your fight with Dorian.
+- The valley at night and the ford at dusk tint them to the light; lightning shows them white.
+
+**Checked:** the five figures on their own in a picture; in the valley and in the Pairing room in pictures, with fighters in front of them; the opening film still plays; bots won the Pairing and the Valley; the page loads clean. **Not checked:** by hand; on a phone (it is one more small draw per figure, five in the valley and fifteen in the Pairing room); the Keep, where Celestine and two Wardens on the dais are still built from shapes.
 
 ## v0.61 · 2026-11-19 — two early memories to walk in; held cuts strain; the air moves written down
 From your note: early story beats from the list, animation, and the fight moves.
