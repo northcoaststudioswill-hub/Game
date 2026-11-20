@@ -72,10 +72,17 @@
     return { id: 'exh', name: FIRST[Math.floor(r() * FIRST.length)], title: K.who, cls, race, level: lv, known: C.start.slice(0, 2).concat(lv >= 3 && C.l2 ? [C.l2[Math.floor(r() * C.l2.length)]] : []).filter(id => G.ABILITIES[id]),
       hpMul: +(0.95 + 0.04 * K.d).toFixed(2), dmgMul: +(0.74 + 0.05 * K.d).toFixed(2), ai: Object.assign({}, base.ai, { react: (base.ai.react || 0.5) + 0.05 }), xp: 0, coin: 0, respect: 0, spar: 1, taunt: '', tint: { cloth: pal[0], armor: pal[1] } };
   }
-  const purse = (st, K) => { const rk = G.rankOf(st.respect); return { rep: Math.round((9 + 4 * rk) * K.rep), coin: Math.round((18 + 14 * rk) * K.coin), xp: Math.round((30 + 12 * st.hero.level) * (K.xp || 1)) }; };
+  // The Open Sand: a bout to the yield you can always ask for. It pays less than an invitation, less again each time
+  // you lean on it, and the gate-men want two Ledger bouts out of you before they will chalk another.
+  const ledgerBouts = st => Object.keys(st.wins || {}).reduce((n, k) => n + (st.wins[k] || 0), 0) + (st.deaths || 0) + (st.losses || 0);
+  const sandWait = st => st.sandAt == null ? 0 : Math.max(0, 2 - (ledgerBouts(st) - st.sandAt));
+  const sandCut = st => Math.max(0.35, 0.75 - 0.08 * (st.sandRun || 0));
+  const purse = (st, K) => { const rk = G.rankOf(st.respect), m = st.exh && st.exh.open ? sandCut(st) : 1; return { rep: Math.max(1, Math.round((9 + 4 * rk) * K.rep * m)), coin: Math.round((18 + 14 * rk) * K.coin * m * (m < 1 ? 0.6 : 1)), xp: Math.round((30 + 12 * st.hero.level) * (K.xp || 1) * (m < 1 ? 0.7 : 1)) }; };
+  G.openSand = { wait: sandWait, cut: sandCut };
   function fightExh() {
     const st = G.state, K = KINDS[st.exh.kind], o = exhOpp(st), p = purse(st, K);
-    G.spar(o, win => { const s2 = G.state; s2.exh = null; s2.exhDone = (s2.exhDone || 0) + 1; const rep = win ? p.rep : Math.round(p.rep * 0.3), coin = win ? p.coin : 0, xp = win ? p.xp : Math.round(p.xp * 0.5);
+    const wasOpen = !!st.exh.open;
+    G.spar(o, win => { const s2 = G.state; s2.exh = null; s2.exhDone = (s2.exhDone || 0) + 1; if (wasOpen) { s2.sandAt = ledgerBouts(s2); s2.sandRun = (s2.sandRun || 0) + 1; } const rep = win ? p.rep : Math.round(p.rep * 0.3), coin = win ? p.coin : 0, xp = win ? p.xp : Math.round(p.xp * 0.5);
       s2.respect += rep; s2.coin += coin; s2.hero.xp += xp; G.save(); G.scene = 'hub'; ui.hub(); ui.close();
       show('<div class="card small"><small class="over">Exhibition · nobody died</small><h2>' + (win ? o.name + ' yields' : 'You yield') + '</h2><p>' + (win ? pick(['They help each other up. The stands like that more than they will admit.', o.name + ' taps the sand twice and laughs with a split lip. Somebody throws a hat.', 'The gate-men look almost disappointed. Nobody to carry.']) : pick(['You tap the sand. ' + o.name + ' offers a hand and you take it. It costs something. Not much.', 'The stands clap anyway. Turning up counts for something down here.'])) + '</p>' +
         '<p class="note">+' + rep + ' respect' + (coin ? ' · +' + coin + ' coin' : '') + ' · +' + xp + ' XP. Nothing was written in the Ledger.</p><div class="row end"><button class="big" id="x">Good</button></div></div>');
@@ -105,6 +112,9 @@
     if (lad && st.exh) { const K = KINDS[st.exh.kind], o = exhOpp(st), p = purse(st, K), d = document.createElement('div'); d.className = 'opp exh cur';
       d.innerHTML = '<span class="op" id="exp"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small><small>Exhibition: ' + K.t + ' · Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.CLASSES[o.cls].name + '</small><em class="taunt">To the yield. Nobody dies, and nothing goes in the Ledger.</em><small class="rew">' + p.rep + ' respect · ' + p.coin + ' coin · ' + p.xp + ' XP</small></div><button class="big" id="exgo">Exhibition</button>';
       lad.insertBefore(d, lad.firstChild); d.querySelector('#exp').appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 56, 1.2)); on('#exgo', fightExh); }
+    else if (lad && st.hero && !G.spectating) { const w = sandWait(st), rk = G.rankOf(st.respect), m = sandCut(st), d = document.createElement('div'); d.className = 'opp exh' + (w ? ' resting' : '');
+      d.innerHTML = '<div class="opp-tx"><b>The Open Sand</b> <small>a bout to the yield</small><small>Somebody your own level. Nobody dies, nothing goes in the Ledger.</small><em class="taunt">' + (w ? 'The gate-men want ' + w + ' more Ledger bout' + (w === 1 ? '' : 's') + ' out of you before they chalk another friendly.' : 'For respect, and to keep your hand in. It pays less each time you lean on it.') + '</em><small class="rew">about ' + Math.max(1, Math.round((9 + 4 * rk) * m)) + ' respect · a little coin and XP</small></div><button id="sandgo"' + (w ? ' disabled' : '') + '>' + (w ? 'Not yet' : 'To the yield') + '</button>';
+      lad.appendChild(d); on('#sandgo', () => { if (sandWait(st)) return; st.sandRun = Math.max(0, (st.sandRun || 0) - Math.floor((ledgerBouts(st) - (st.sandAt || 0)) / 3)); st.exh = { kind: [0, 3, 4, 6][Math.floor(Math.random() * 4)], seed: (Math.random() * 1e9) | 0, open: 1, told: 1 }; G.save(); G.sfx('bell'); fightExh(); }); }
     return r;
   };
   if (G.objective) { const ob0 = G.objective; G.objective = function () { const s = ob0.apply(this, arguments), st = G.state; return st && st.exh && st.exh.told && s && !/calling you over/.test(s) ? s + ' · an exhibition bout is waiting at the Blood Pit' : s; }; }

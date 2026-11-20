@@ -734,3 +734,4 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 @media (orientation: portrait) { #gsouls { top: 6.6rem; right: 0.6rem; font-size: 0.75rem; } }
 /* there is no crowd in the garden, so its meter stays out of the way of David's face */
 #ui.ingarden .hud-mid .hype-label, #ui.ingarden .hud-mid .bar.hype { display: none; }
+.opp.exh.resting { opacity: 0.6; }

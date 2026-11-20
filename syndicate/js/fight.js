@@ -535,6 +535,23 @@
         if (m.t > 0.7 && m.t < 1.0) { const tx = e.x - dx * 30, ty = e.y - dy * 30; P.x += (tx - P.x) * 0.2; P.y += (ty - P.y) * 0.2; }
         if (m.t >= 1.0 && m.t < IMP) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP && m.t < IMP + 0.6) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.64, 0.5 + (m.t - IMP)) }; else if (m.t >= IMP + 0.6 && P.poseOv && P.poseOv.mv === 'chop') P.poseOv = null; }
     }
+    if (k === 'hounds') { e.aim = m.a + Math.PI;
+      once('wh', 0.15, () => { text(P, 'WHISTLES', col, false); G.sfx('holy'); m.f.dogs = [0, 1, 2].map(i => { const an = m.a + Math.PI / 2 + i * 2.094 + 0.5, b = G.makeBeast ? G.makeBeast('wolf', [0x3a3028, 0x54483a, 0x2a2420][i], null) : null; if (!b) return null; b.x = e.x + Math.cos(an) * 190; b.y = e.y + Math.sin(an) * 190; b.an = an; b.root.position.set(b.x / S, -1.2, b.y / S); sc.add(b.root); fx.push({ k: 'dust', x: b.x, y: b.y, r: 70, t: 0, life: 0.5 }); return b; }).filter(Boolean); });
+      if (m.t < IMP) P.poseOv = { act: m.t < 0.5 ? 'cast' : 'release', cs: 'call', prog: m.t < 0.5 ? m.t / 0.5 : Math.min(1, (m.t - 0.5) / 0.5) };
+      (m.f.dogs || []).forEach((b, i) => { const rise = Math.min(1, Math.max(0, (m.t - 0.2) / 0.4)), go = Math.min(1, Math.max(0, (m.t - 0.7 - i * 0.12) / (IMP - 0.9))), gg = go * go, r = 190 - gg * 158, wob = m.t > IMP ? Math.sin(m.t * 22 + i * 2) * 5 : 0;
+        b.x = e.x + Math.cos(b.an) * (r + wob); b.y = e.y + Math.sin(b.an) * (r + wob); const sink = m.t > IMP + 1.5 ? Math.min(1, (m.t - IMP - 1.5) / 0.5) : 0; b.root.position.set(b.x / S, -1.2 * (1 - rise) - 1.4 * sink, b.y / S); b.root.rotation.y = Math.atan2(e.x - b.x, e.y - b.y);
+        b.pose({ t: m.t * 1.4 + i, act: m.t > IMP - 0.1 && m.t < IMP + 1.5 ? 'swing' : 'idle', prog: m.t > IMP ? ((m.t * 2.6 + i * 0.3) % 1) : 0.3, moving: go > 0 && go < 1, walk: m.t * 16 + i }); });
+      if (m.t > 0.6 && m.t < IMP) e.poseOv = { act: 'stun', prog: 0 };
+      once('dn', IMP, () => { e.poseOv = null; e.state = 'ko'; e.koT = 0; e.st = {}; G.sfx('sever'); shake = Math.max(shake, 12); fx.push({ k: 'dust', x: e.x, y: e.y, r: 90, t: 0, life: 0.5 }); });
+      every('maul', IMP, IMP + 1.4, 0.16, i => { blood(e.x, e.y, 14, rand(0, 6.28)); e.x += rand(-4, 4); e.y += rand(-4, 4); if (i % 2 === 0) { G.sfx('slice'); gfx.splat(e.x / S + rand(-0.7, 0.7), e.y / S + rand(-0.7, 0.7), rand(0.4, 0.8)); } if (i === 2 && gore() && !(e.lost && e.lost.armL)) sever(e, 'armL', null, rand(0, 6.28)); if (i === 5 && gore() && !(e.lost && e.lost.legR)) sever(e, 'legR', null, rand(0, 6.28)); });
+      once('howl', IMP + 0.9, () => { text(P, 'HEEL', col, true); P.poseOv = { act: 'cheer', prog: 0.5 }; });
+      once('gone', IMP + 2.1, () => { (m.f.dogs || []).forEach(b => sc.remove(b.root)); m.f.dogs = null; }); }
+    // a taken head goes up on the weapon and round the sand, when the crowd is in the mood for it
+    if (m.f.parade) { const t0 = IMP + 0.55;
+      once('ph', t0, () => { const w = P.vis.c.wHand; if (!w || !w.children.length) { m.f.parade = 0; return; } w.updateMatrixWorld(true); const g = new T.Group(), hd = new T.Mesh(new T.IcosahedronGeometry(0.27, 1), new T.MeshLambertMaterial({ color: 0xcfa07a, flatShading: true })), nk = new T.Mesh(new T.SphereGeometry(0.12, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a })); nk.position.z = -0.14; g.add(hd, nk); const bb = new T.Box3(); w.children.forEach(c => { c.geometry && c.geometry.computeBoundingBox && (c.geometry.boundingBox || c.geometry.computeBoundingBox(), bb.union(c.geometry.boundingBox.clone().applyMatrix4(c.matrix))); }); g.position.set(0, 0, isFinite(bb.max.z) ? bb.max.z - 0.08 : 1.1); w.add(g); m.f.pHead = g; m.f.p0 = Math.atan2(P.y - e.y, P.x - e.x); text(P, 'ON THE STEEL', '#ff3020', true); G.sfx('impale'); G.sfx('cheer'); addHype(15); });
+      if (m.f.pHead && m.t > t0 && m.t < t0 + 2.3) { const u = (m.t - t0) / 2.3, an = m.f.p0 + u * 4.4, R0 = 96; P.x = e.x + Math.cos(an) * R0; P.y = e.y + Math.sin(an) * R0; clampArena(P); P.aim = an + Math.PI / 2; P.moving = true; P.walk = (P.walk || 0) + dt * 11; P.poseOv = { act: 'hoist', prog: 0.5 }; if (Math.random() < dt * 6) blood(P.x, P.y, 3, rand(0, 6.28)); }
+      once('pc', t0 + 1.2, () => G.sfx('cheer'));
+      once('pe', t0 + 2.3, () => { P.moving = false; P.poseOv = { act: 'cheer', prog: 0.5 }; if (m.f.pHead && m.f.pHead.parent) m.f.pHead.parent.remove(m.f.pHead); m.f.pHead = null; }); }
     if (k === 'tear') { const gx = P.x + Math.cos(m.a) * 30, gy = P.y + Math.sin(m.a) * 30;
       if (m.t > 0.15 && m.t < 0.5) { const u = (m.t - 0.15) / 0.35; e.x += (gx - e.x) * u * 0.3; e.y += (gy - e.y) * u * 0.3; }
       if (m.t >= 0.3) P.poseOv = m.t < IMP + 0.5 ? { act: 'tear', prog: Math.min(1, (m.t - 0.3) / (IMP - 0.3 + 0.2)) } : null;
@@ -576,7 +593,7 @@
       spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 95); shake = 22; hitstop = 0.22;
       if (!ash && !def.swallow && !def.ice && !def.gone) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
       screenFx('crit');
-      e.z = 0; e.vis.g.scale.setScalar(1); const behead = def.behead && gore() && !e.vis.c.beast && !(e.lost && e.lost.head); m.f.stand = behead && !e.crawl ? 1 : 0;
+      e.z = 0; e.vis.g.scale.setScalar(1); const behead = def.behead && gore() && !e.vis.c.beast && !(e.lost && e.lost.head); m.f.stand = behead && !e.crawl ? 1 : 0; if (behead && !P.form && !F.ex && !(G.garden && G.garden.run) && (F.forceParade || (hype > 45 && Math.random() < 0.5))) m.f.parade = 1;
       if (behead) { sever(e, 'head', null, m.a); for (let bi = 0; bi < 26; bi++) gfx.emit(e.x / S + rand(-0.1, 0.1), 1.5, e.y / S + rand(-0.1, 0.1), rand(-1.4, 1.4), rand(4, 8), rand(-1.4, 1.4), rand(0.5, 0.9), '#8a0c0c', 1); }
       else if (def.gone) { e.vis.g.visible = false; }
       else if (def.swallow) { e.vis.g.visible = false; fx.push({ k: 'dust', x: e.x, y: e.y, r: 260, t: 0, life: 1 }); mark(e.x, e.y, 3.6, 'crack'); }
@@ -595,7 +612,7 @@
     if (m.t > IMP + 2.2) P.poseOv = null;
     once('roar', IMP + 0.55, () => { G.sfx('cheer'); G.sfx('win'); G.ui.banner('Victory', 'The pit erupts', 'win mortal'); });
     once('roar2', IMP + 1.3, () => G.sfx('cheer'));
-    if (m.t > IMP + (def.tail || 2.3)) { P.poseOv = null; phase = 'ko'; phaseT = 0.35; }
+    if (m.t > IMP + (m.f.parade ? Math.max(def.tail || 2.3, 3.1) : (def.tail || 2.3))) { P.poseOv = null; P.moving = false; if (m.f.pHead && m.f.pHead.parent) m.f.pHead.parent.remove(m.f.pHead); (m.f.dogs || []).forEach(b => sc.remove(b.root)); phase = 'ko'; phaseT = 0.35; }
   }
 
   // ------------------------------------------------------------------ damage
