@@ -724,3 +724,7 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .fin-tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0.8rem 0 0.2rem; }
 .fin-tally span { display: flex; flex-direction: column; align-items: center; padding: 0.45rem 0.3rem; border: 1px solid rgba(201, 160, 64, 0.3); border-radius: 0.3rem; background: rgba(0, 0, 0, 0.25); }
 .fin-tally b { font-family: var(--title); font-size: 1.3rem; color: #fff3cf; } .fin-tally i { font-style: normal; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: #a89c84; text-align: center; }
+
+/* a card that opens over a conversation takes over: the conversation waits underneath until the card is closed */
+#talk.under { display: none; }
+#talk .tk-choices button.sel { outline: 2px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 0.9rem rgba(240, 201, 90, 0.55); }

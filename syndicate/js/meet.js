@@ -30,7 +30,7 @@
     advance(); talk.update(0, lastNow); if (gfx.veil) gfx.veil(0.4);
   }
   function advance() {
-    if (!D) return; const o = D.o, ln = o.lines[D.i];
+    if (!D || ui.isOpen()) return; const o = D.o, ln = o.lines[D.i];
     if (ln && D.shown < ln.text.length) { D.shown = ln.text.length; render(); return; }          // first tap completes the line
     if (D.i >= o.lines.length - 1) { if (o.choices && !D.choosing) return choose(); if (!o.choices) finish(); return; }
     D.i++; D.t = 0; D.shown = 0; G.sfx('page'); render();
@@ -45,6 +45,7 @@
     D.choosing = true; const box = D.el.querySelector('.tk-choices'); D.el.querySelector('.tk-hint').textContent = '';
     box.innerHTML = D.o.choices.map((c, i) => '<button class="' + (i === 0 ? 'big' : '') + '" data-i="' + i + '">' + c.label + '</button>').join('');
     box.querySelectorAll('button').forEach(b => b.onclick = () => { G.sfx('ui'); const c = D.o.choices[+b.dataset.i]; finish(false, c.go); });
+    D.pick = 0; mark();
   }
   function finish(skipped, then) {
     if (!D) return; const o = D.o;
@@ -52,10 +53,16 @@
     if (o.place === 'arena' && !then && G.scene === 'hub') gfx.setScene(W.get('hub').scene);
     if (then) then(); else if (o.done) o.done(skipped);
   }
-  const talk = { next: advance, skip: () => finish(true) };
+  // a choice can be made with a controller or the keyboard: left and right move, A or Enter takes it
+  function mark() { if (!D || !D.choosing) return; D.el.querySelectorAll('.tk-choices button').forEach((b, i) => b.classList.toggle('sel', i === D.pick)); }
+  const talk = { next: advance, skip: () => { if (!ui.isOpen()) finish(true); }, choosing: () => !!(D && D.choosing),
+    move: d => { if (!D || !D.choosing || !d) return; const n = D.o.choices.length; D.pick = ((D.pick || 0) + (d > 0 ? 1 : -1) + n) % n; G.sfx('ui'); mark(); },
+    confirm: () => { if (!D || !D.choosing || ui.isOpen()) return; const b = D.el.querySelectorAll('.tk-choices button')[D.pick || 0]; if (b) b.click(); } };
   let lastNow = 0;
   talk.update = function (dt, now) {
-    lastNow = now; if (!D) return; const o = D.o, ln = o.lines[D.i]; D.t += dt;
+    lastNow = now; if (!D) return; const o = D.o, ln = o.lines[D.i];
+    { const under = ui.isOpen(); if (under !== !!D.under) { D.under = under; D.el.classList.toggle('under', under); } if (under) return; }
+    D.t += dt;
     if (ln && D.shown < ln.text.length) { D.shown = Math.min(ln.text.length, D.shown + dt * 48); render(); }
     const n = o.npc, y = o.place === 'arena' ? o.you : [W.walker.x, W.walker.z], nh = (o.npcH || 1.42), mx = (n[0] + y[0]) / 2, mz = (n[1] + y[1]) / 2, dx = y[0] - n[0], dz = y[1] - n[1], d = Math.hypot(dx, dz) || 1, ux = dx / d, uz = dz / d, px = -uz, pz = ux;
     const side = (px + pz) >= 0 ? 1 : -1, k = Math.min(1, D.t / 6), port = gfx.portrait, shot = (ln && ln.shot) || 'two';

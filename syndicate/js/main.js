@@ -36,7 +36,8 @@
   window.addEventListener('keydown', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
     if (G.bootSkip) return;
-    if (G.talk) { if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE') { e.preventDefault(); if (!e.repeat) G.talkApi.next(); } else if (e.code === 'Escape') G.talkApi.skip(); return; }
+    if (G.talk && !G.ui.isOpen()) { if (G.talkApi.choosing()) { if (e.code === 'ArrowLeft' || e.code === 'ArrowUp' || e.code === 'KeyA' || e.code === 'KeyW') G.talkApi.move(-1); else if (e.code === 'ArrowRight' || e.code === 'ArrowDown' || e.code === 'KeyD' || e.code === 'KeyS' || e.code === 'Tab') { e.preventDefault(); G.talkApi.move(1); } else if ((e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE') && !e.repeat) { e.preventDefault(); G.talkApi.confirm(); } return; }
+      if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE') { e.preventDefault(); if (!e.repeat) G.talkApi.next(); } else if (e.code === 'Escape') G.talkApi.skip(); return; }
     if (G.scene === 'cine') { if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space') e.preventDefault(); return; }      // the intro is skipped by holding, in cine.js
     G.audioInit();
     if (G.scene === 'fight') {
@@ -129,6 +130,7 @@
     });
     if (best) { best.focus(); best.scrollIntoView({ block: 'nearest' }); G.sfx('ui'); }
   }
+  let padT = 0;
   function pollPad(dt) {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     let gp = null; for (const p of pads) if (p && p.connected && p.mapping === 'standard') { gp = p; break; }
@@ -143,7 +145,8 @@
     In.pad = { lx, ly, rx, ry, atk: now[2] || now[7], blk: now[6] };
     if (G.bootSkip) { if (Object.keys(now).some(i => now[i] && !prevB[i])) G.bootSkip(); prevB = now; return; }
     if (!In.usingPad) { prevB = now; return; }
-    if (G.talk) { if (hit(0)) G.talkApi.next(); if (hit(1) || hit(9)) G.talkApi.skip(); prevB = now; return; }
+    if (G.talk && !G.ui.isOpen()) { const tnx = (hit(15) ? 1 : 0) - (hit(14) ? 1 : 0) + (hit(13) ? 1 : 0) - (hit(12) ? 1 : 0); padT -= dt; let sx = 0; if (Math.abs(lx) > 0.6 || Math.abs(ly) > 0.6) { if (padT <= 0) { sx = Math.abs(lx) > Math.abs(ly) ? Math.sign(lx) : Math.sign(ly); padT = 0.25; } } else padT = 0;
+      if (G.talkApi.choosing()) { if (tnx || sx) G.talkApi.move(tnx || sx); if (hit(0)) G.talkApi.confirm(); } else { if (hit(0)) G.talkApi.next(); if (hit(1) || hit(9)) G.talkApi.skip(); } prevB = now; return; }
     const sc = G.scene, open = G.ui.isOpen(), paused = sc === 'fight' && G.fight.paused;
     // one step per press for D-pad, repeating for a held stick
     let nx = (hit(15) ? 1 : 0) - (hit(14) ? 1 : 0), ny = (hit(13) ? 1 : 0) - (hit(12) ? 1 : 0);
@@ -161,7 +164,7 @@
       if (nx || ny) navigate(nx, ny);
       const list = menuButtons(); if (list.length && !list.includes(document.activeElement)) (list.find(b => b.classList.contains('big')) || list[0]).focus();
       if (hit(0) && list.includes(document.activeElement)) document.activeElement.click();
-      if (hit(1) || (paused && hit(9))) { const back = $('panel').querySelector('#x, #n, #rs'); if (back) back.click(); }
+      if (hit(1) || (paused && hit(9))) { const pn = $('panel'); let back = pn.querySelector('#x, #n, #rs'); if (!back) back = [...pn.querySelectorAll('button')].filter(q => !q.disabled && q.offsetParent).find(q => /^(✕|×|back|done|close|step back|not now|not tonight|leave|cancel|later|no)$/i.test(q.textContent.trim())); if (back) back.click(); }
     } else if (sc === 'hub' || sc === 'hideout') {
       if (hit(0) && G.near) { G.sfx('ui'); G.near.go(); }
       if (hit(3)) { G.sfx('ui'); if (sc === 'hideout') G.ui.catalog(); else G.ui.sheet(); }
