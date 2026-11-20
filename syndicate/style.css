@@ -908,3 +908,9 @@ button.saveslot.egslot { width: 100%; text-align: left; display: flex; align-ite
 .edge-note h3 { margin-top: 0.8rem; }
 
 .edge-tier { display: grid; grid-template-columns: 1fr auto; gap: 0.1rem 0.6rem; align-items: center; padding: 0.45rem 0.6rem; margin: 0.35rem 0; border: 1px solid rgba(240, 201, 90, 0.25); border-radius: 0.3rem; background: rgba(0, 0, 0, 0.22); } .edge-tier b { font-size: 0.86rem; } .edge-tier small { grid-column: 1; font-size: 0.72rem; color: #c8bea8; text-transform: none; letter-spacing: 0; } .edge-tier em, .edge-tier button { grid-column: 2; grid-row: 1 / span 2; font-style: normal; font-size: 0.72rem; color: #9a8f7a; } .edge-tier.got { border-color: var(--gold); } .edge-tier.got em { color: var(--gold); }
+
+/* a weapon's profile in the Armoury */
+.wprof { margin: 0.5rem 0 0.4rem; padding: 0.55rem 0.7rem; border: 1px solid rgba(240, 201, 90, 0.25); border-radius: 0.3rem; background: rgba(0, 0, 0, 0.22); }
+.wp-b { display: grid; grid-template-columns: 3.6rem 1fr; align-items: center; gap: 0.5rem; margin: 0.18rem 0; } .wp-b small { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: #c8bea8; }
+.wp-b i { display: block; height: 0.42rem; border-radius: 0.2rem; background: linear-gradient(90deg, var(--c) var(--v), rgba(255, 255, 255, 0.08) var(--v)); }
+.wp-t { margin: 0.45rem 0 0; font-size: 0.78rem; line-height: 1.3; color: #d8cfba; } .wp-t b { color: var(--gold); }

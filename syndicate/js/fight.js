@@ -843,7 +843,7 @@
     let mul = att.d.dmgMul * (1 + (att.buffs.dmg ? att.buffs.dmg.amt : 0)) * (o.power || 1) * (ab.pow || 1) * (att.mast && (ab.basic || ab.heavy) ? 1 + att.mast * 0.03 : 1) * (tgt.st.broken ? 1.35 : 1) * (tgt.st.winded ? 1.15 : 1);
     if (ab.execute && tgt.hp / tgt.maxHp < 0.4) mul *= 2;
     if (ab.exe && tgt.hp / tgt.maxHp < 0.35) mul *= 1 + ab.exe; if (ab.opener && tgt.hp / tgt.maxHp > 0.85) mul *= 1 + ab.opener; if (ab.vsReel && (tgt.st.slow || tgt.st.stun || tgt.st.broken)) mul *= 1 + ab.vsReel;       // what the weapon in your hand is good at
-    const edg = G.edge && ab.type !== 'aura' && !o.dot ? G.edge.pre(att, tgt, ab) : null; if (edg) { mul *= edg.mul || 1; if (edg.crit) crit = true; }
+    const edg = G.edge && ab.type !== 'aura' && !o.dot ? G.edge.pre(att, tgt, ab) : null; if (edg) { mul *= edg.mul || 1; if (edg.crit) crit = true; } att._lastCrit = crit; if (crit && G.ARM_TRAIT && G.ARM_TRAIT[att.basic] && G.ARM_TRAIT[att.basic].crit && (ab.basic || ab.heavy)) mul *= G.ARM_TRAIT[att.basic].crit;
     if (crit) mul *= att.d.critMul;
     if (tgt.st.mark) mul *= 1.25;
     if (att.d.tactical && (tgt.st.stun || tgt.st.slow)) mul *= 1.3;
