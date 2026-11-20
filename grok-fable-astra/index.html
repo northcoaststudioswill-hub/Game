@@ -1213,6 +1213,7 @@ const BUD=BUDS.map((s,i)=>{const h=BHOME[s.id],m=new THREE.Mesh(budGeo(SWBUD[s.i
 // ---- sprout squad: every sprout you pluck follows you; each kind has its own knack
 const SPR={max:24,list:[],mesh:new THREE.InstancedMesh(sproutGeo,lam,24),lit:false};
 (function(){SPR.mesh.frustumCulled=false;const c=new THREE.Color(0xffffff);for(let i=0;i<24;i++)SPR.mesh.setColorAt(i,c);scene.add(SPR.mesh);})();
+BUD.forEach(b=>{const sh=new THREE.Mesh(new THREE.CircleGeometry(1,14),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.28,depthWrite:false}));sh.rotation.x=-Math.PI/2;b.g.add(sh);b.sh=sh;});
 function sprSync(){while(SPR.list.length>X.spr.length)SPR.list.pop();for(let i=SPR.list.length;i<X.spr.length&&i<SPR.max;i++)SPR.list.push({t:X.spr[i],x:PL.x+Math.cos(i)*2,z:PL.z+Math.sin(i)*2,y:PL.y,tg:null,cd:0,hop:i});
   const c=new THREE.Color();SPR.list.forEach((s,i)=>{s.t=X.spr[i];c.setHex(TYPES[s.t].c);SPR.mesh.setColorAt(i,c);});if(SPR.mesh.instanceColor)SPR.mesh.instanceColor.needsUpdate=true;}
 function updateSprouts(dt,active){const n=SPR.list.length,gyb=S.inBoss?ARENA.top:null;
@@ -1301,22 +1302,27 @@ function storyBeat(){const rel=(S.relics.grok?1:0)+(S.relics.fable?1:0)+(S.relic
   return false;}
 
 /* ---- finding things ---- */
-function catchBud(b){b.caught=true;X.bud.push(b.id);SFX.relic();burst(b.x,b.y+2,b.z,50,null,14,8,1);addAura(1500,b.x,b.y+4,b.z);floatText('BEFRIENDED',b.x,b.y+5.5,b.z,'#ffd400');budSync();save();
+function catchBud(b){b.caught=true;b.joy=1.3;X.bud.push(b.id);SFX.relic();burst(b.x,b.y+2,b.z,50,null,14,8,1);addAura(1500,b.x,b.y+4,b.z);floatText('BEFRIENDED',b.x,b.y+5.5,b.z,'#ffd400');budSync();save();
   toast('🐾 '+b.nm+' ('+TYPES[b.t].n+'): '+b.d);if(X.bud.length>=BUD.length){addAura(50000,PL.x,PL.y+5,PL.z);zoneCard('BUDDYDEX COMPLETE','every buddy has seen the light');}}
 function budSync(){const lead=X.bud[X.bud.length-1];BUD.forEach((b,i)=>{b.caught=X.bud.includes(b.id);b.lead=b.caught&&b.id===lead;b.m.material=b.caught?lam:dimMat;b.q.visible=!b.caught;b.l.visible=b.caught;
     if(b.caught&&!b.lead){const a=i/BUD.length*TAU;b.hx=SK.x+Math.cos(a)*22;b.hz=SK.z+Math.sin(a)*22;b.fy=undefined;if(Math.hypot(b.x-b.hx,b.z-b.hz)>40){b.x=b.hx;b.z=b.hz;}}
     if(!b.caught){const h=BHOME[b.id];b.hx=h[0];b.hz=h[1];b.fy=h[3]||undefined;}});hudCache.q=null;}
 function updateBuds(dt,wdt,active){const rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw);
   for(const b of BUD){const dx=PL.x-b.x,dz=PL.z-b.z,d=Math.hypot(dx,dz)||.01;if(d>150&&!b.lead){b.g.visible=false;continue;}b.g.visible=true;let mx=0,mz=0,sp=0;
-    if(b.lead){const tx=PL.x-Math.cos(PL.face)*3.6,tz=PL.z+Math.sin(PL.face)*3.6,ex=tx-b.x,ez=tz-b.z,ed=Math.hypot(ex,ez)||.01;if(ed>1.2){mx=ex/ed;mz=ez/ed;sp=Math.min(VAN.driving?46:24,ed/dt);}
+    if(b.lead){const tx=PL.x-Math.cos(PL.face)*3.6,tz=PL.z+Math.sin(PL.face)*3.6,ex=tx-b.x,ez=tz-b.z,ed=Math.hypot(ex,ez)||.01;if(ed>1.2){mx=ex/ed;mz=ez/ed;sp=Math.min(VAN.driving?46:24,(ed-1)*5);}
       if(ed>80){b.x=tx;b.z=tz;}b.zap-=dt;if(b.zap<=0&&active){b.zap=.4;let bd=15,tg=null;for(const e of enemies){const q=Math.hypot(e.x-b.x,e.z-b.z);if(q<bd){bd=q;tg=e;}}
         if(tg){b.zap=2.2;for(let k=0;k<6;k++)burst(lerp(b.x,tg.x,k/6),lerp(b.y+1.5,tg.y,k/6),lerp(b.z,tg.z,k/6),1,b.t/6,1,0,.35);damageEnemy(tg,1);tone(900+b.t*120,.06,'triangle',.06);}}}
     else{if(!b.caught&&b.beh===2&&d<19&&active){mx=-dx/d;mz=-dz/d;sp=b.sp;const hd=Math.hypot(b.x-b.hx,b.z-b.hz);if(hd>46){mx=(b.hx-b.x)/hd;mz=(b.hz-b.z)/hd;}}
       else if(b.beh>=1||b.caught){b.wt-=dt;if(b.wt<=0){b.wt=2+Math.random()*4;const a=Math.random()*TAU;b.wx=b.hx+Math.cos(a)*7;b.wz=b.hz+Math.sin(a)*7;}const ex=b.wx-b.x,ez=b.wz-b.z,ed=Math.hypot(ex,ez)||.01;if(ed>1){mx=ex/ed;mz=ez/ed;sp=4;}}
       if(!b.caught&&active&&d<3&&Math.abs(PL.y-b.y)<4.5)catchBud(b);}
-    const st=sp*(b.lead?dt:wdt);b.x+=mx*st;b.z+=mz*st;if(sp>.5){b.hop+=dt*(6+sp*.4);const side=mx*rx+mz*rz;if(Math.abs(side)>.2)b.face=side>0?-1:1;}
-    const gy=b.fy!==undefined?b.fy:(b.lead&&S.inBoss)?ARENA.top:(b.lead&&PL.grounded&&PL.y>groundH(PL.x,PL.z)+3)?PL.y:groundH(b.x,b.z);b.y=gy+(sp>.5?Math.abs(Math.sin(b.hop))*.7:Math.abs(Math.sin(S.t*2+b.hop))*.12);
-    b.g.position.set(b.x,b.y,b.z);b.g.rotation.y=cam.yaw;b.m.scale.set(3.4*b.face,3.4*(b.caught?1:1+(Math.random()<.04?.2:0)),3.4);}}
+    const ts=b.lead?dt:wdt,k=Math.min(1,ts*(sp>0?7:9));b.vx=lerp(b.vx||0,mx*sp,k);b.vz=lerp(b.vz||0,mz*sp,k);b.x+=b.vx*ts;b.z+=b.vz*ts;const v=Math.hypot(b.vx,b.vz),side=b.vx*rx+b.vz*rz;
+    if(v>.6&&Math.abs(side)>v*.25)b.face=side>0?-1:1;b.fx=lerp(b.fx===undefined?1:b.fx,b.face,Math.min(1,dt*11));
+    const gy=b.fy!==undefined?b.fy:(b.lead&&S.inBoss)?ARENA.top:(b.lead&&PL.grounded&&PL.y>groundH(PL.x,PL.z)+3)?PL.y:groundH(b.x,b.z);let hy=0,sy=1+Math.sin(S.t*2.2+b.hop)*.035;
+    if(b.joy>0){b.joy-=dt;hy=Math.abs(Math.sin(b.joy*9))*1.6;sy=1+Math.sin(b.joy*18)*.15;b.fx=Math.cos(b.joy*10);}
+    else if(v>.6){b.hop+=dt*(5+v*.5);const h=Math.abs(Math.sin(b.hop));hy=h*(.35+Math.min(v,14)*.045);sy=.86+h*.26;}
+    b.hy=lerp(b.hy||0,hy,Math.min(1,dt*16));b.sy=lerp(b.sy||1,sy,Math.min(1,dt*16));b.y=gy+b.hy;b.g.position.set(b.x,b.y,b.z);b.g.rotation.y=cam.yaw;
+    b.m.scale.set(3.4*b.fx/Math.sqrt(b.sy),3.4*b.sy,3.4);b.m.rotation.z=lerp(b.m.rotation.z,v>.6?b.face*Math.min(v,12)*.02:b.caught?0:Math.sin(S.t*1.3+b.hop)*.07,Math.min(1,dt*8));
+    b.sh.position.y=gy-b.y+.08;b.sh.scale.setScalar(1.25-Math.min(.6,b.hy*.3));}}
 function readFrag(i){if(!X.frag.includes(i)){X.frag.push(i);addAura(800,PL.x,PL.y+4,PL.z);SFX.page();}const n=X.frag.length;syncX();save();
   say([['sys','PROMPT FRAGMENT '+(i+1)+' OF 12.  '+FRAG_TEXT[i]]].concat(n>=12&&!X.tj?[['sys','That is all twelve. You have read the whole cursed prompt. As a reward the physics engine has stopped checking how many times you jump. Triple jump unlocked.']]:[]),()=>{if(n>=12&&!X.tj){X.tj=1;save();chapter('SECRET','THE WHOLE PROMPT');}});}
 function touchGrass(){if(GRASS.cd>0){toast('The grass needs a minute. It has been touched a lot today.');return;}GRASS.cd=30;S.cells=S.max;SFX.relic();burst(GRASS.x,PL.y+1,GRASS.z,40,.33,10,6,1);addAura(X.grass?67:6700,PL.x,PL.y+4,PL.z);
@@ -1998,6 +2004,27 @@ function act7Update(dt,wdt,play,active){const t=S.t;updateData(dt,play);if(S.pos
       zoneCard('MEMETIC OUTBREAK','"'+OUT.p+'" is spreading · patient zero: '+pick(['Derek','a goose','King Bibi','the hot tub','your sprout','a T-posing NPC']));toast('📱 everyone: '+OUT.p);for(const e of enemies)if(Math.hypot(e.x-PL.x,e.z-PL.z)<35)e.stun=3;}}
     act7Moments();}
   if(play&&Math.random()<dt*.18&&SC.length&&Math.hypot(PL.x-FAC.x,PL.z-FAC.z)<30){const c=pick(SC);bubble(pick(SLBARK),c.x,c.g.position.y+5,c.z);}}
+
+
+/* ================= ACT 8: Ribbert, the based frog of the Dew Pond ================= */
+const FROG={x:FL.x+13,z:FL.z-9,cd:0};
+(function(){const y=groundH(FROG.x,FROG.z)+.5,G=0x3fae4a,g=new THREE.Group(),inner=new THREE.Group();g.add(inner);FROG.inner=inner;
+  const pad=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,.3,18),new THREE.MeshLambertMaterial({color:0x2a8a3a}));pad.position.set(FROG.x,y-.15,FROG.z);scene.add(pad);platforms.push({x:FROG.x,z:FROG.z,r:3.4,top:y});
+  inner.add(new THREE.Mesh(merge([pt(Sph(1,14,10),G,M(0,.8,0,0,0,0,1.25,.8,1.1)),pt(Sph(1,12,8),0xd8f0b0,M(0,.62,.25,0,0,0,1,.55,.95)),pt(Sph(.42,10,8),G,M(-.55,1.5,.45)),pt(Sph(.42,10,8),G,M(.55,1.5,.45)),
+    pt(Sph(.3,8,6),0xffffff,M(-.55,1.56,.68)),pt(Sph(.3,8,6),0xffffff,M(.55,1.56,.68)),pt(Sph(.15,6,5),0x111111,M(-.55,1.56,.93)),pt(Sph(.15,6,5),0x111111,M(.55,1.56,.93)),pt(Box(1.5,.07,.1),0x1d5a26,M(0,.95,1.08)),
+    pt(Sph(.5,8,6),G,M(-1.15,.3,.2,0,0,0,1,.5,1.3)),pt(Sph(.5,8,6),G,M(1.15,.3,.2,0,0,0,1,.5,1.3)),pt(Box(1.5,.2,.1),0x111111,M(0,1.6,.95)),pt(Tor(.5,.06,6,16),0xffd400,M(0,.5,.85,1.2))]),lam));
+  inner.scale.setScalar(1.5);addCustomNpc('frog','RIBBERT','🐸',70,'sine',FROG.x,FROG.z,-2.2,g,{y,col:'#b6ff00',full:'RIBBERT, THE BASED FROG',ly:4.2});
+  const l=textSprite('THE BASED POND',1.1,{color:'#b6ff00'});l.position.set(FROG.x,y+7,FROG.z);scene.add(l);})();
+BARK.frog=['ribbit. based.','67.','...cringe detected.','the pond knows.','six. seven.','i have seen your search history. mid.','*slow blink*','ribbit (derogatory)'];
+CHAT.push('📱 RIBBERT: ribbit','📱 RIBBERT: i rated the group chat. it is mid.','📱 MARCUS: bro the frog called my van cringe','📱 RIBBERT: 67');
+TALK.frog=()=>{const sc=[[X.bud.length>=5,'you befriended the small ones'],[X.c.pose>=3,'you pose with conviction'],[!!X.grass,'you touched grass'],[X.hats.length>0,'the hat is a choice, and you made it'],[X.imp.length>=3,'you are mostly chrome'],[X.t67.length>=20,'you respect the number'],[X.c.pet>=1,'you petted the dog'],[X.c.gen>=1,'you made a creature and did not apologise'],[X.dk>=4,'you listened to Derek']],
+    good=sc.filter(q=>q[0]),n=good.length,verdict=n>=7?'BASED BEYOND MEASURE':n>=4?'BASED':n>=2?'MID':'CRINGE',pay=67*(1+n)*(FROG.cd>0?0:10);
+  const lines=[['frog','...'],['frog','I am Ribbert. I sit in the pond. I judge. This is the BASED CHECK.'],['frog',n?'In your favour: '+good.slice(0,3).map(q=>q[1]).join('; ')+'.':'In your favour: nothing. You are a blank render.'],
+    ['frog','Against you: '+pick(['you jump like a spreadsheet','your aura has a watermark','you walked past me twice without saying ribbit','you have '+(9+Math.floor(Math.random()*6))+' fingers and none of them are doing anything','Derek has more lines than you'])+'.'],
+    ['frog','VERDICT: '+verdict+'. '+(pay?'The pond pays '+fmt(pay)+' aura. It is always a multiple of 67. That is the law of the pond.':'The pond has already paid you. Come back in '+Math.ceil(FROG.cd)+' seconds. Ribbit.')]];
+  say(lines,()=>{if(pay){addAura(pay,PL.x,PL.y+4,PL.z);FROG.cd=67;SFX.relic();zoneCard(verdict,'by order of the pond');}X.c.frog=(X.c.frog||0)+1;});};
+ACH.push(['frog','Pond Approved','passed the BASED CHECK as BASED or better',()=>(X.c.frog||0)>0&&[X.bud.length>=5,X.c.pose>=3,!!X.grass,X.hats.length>0,X.imp.length>=3,X.t67.length>=20,X.c.pet>=1,X.c.gen>=1,X.dk>=4].filter(Boolean).length>=4]);
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(FROG.cd>0)FROG.cd-=dt;const k=(S.t*.5)%3;FROG.inner.position.y=k<.5?Math.sin(k/.5*Math.PI)*1.2:0;FROG.inner.scale.set(1.5,1.5*(k<.5?1+Math.sin(k/.5*Math.PI)*.15:1+Math.sin(S.t*3)*.04),1.5);};}
 
 
 /* ================= game flow ================= */
