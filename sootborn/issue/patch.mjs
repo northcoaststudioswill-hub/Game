@@ -228,7 +228,7 @@ rep("sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.04;", "sun.shadow.bias
 rep("const BASS = [38, 0, 38, 41, 0, 43, 0, 36, 38, 0, 45, 43, 0, 41, 36, 0], LEAD = [62, 65, 69, 0, 67, 65, 0, 62];", "const BASS = [38, 0, 38, 45, 0, 43, 0, 41, 38, 0, 45, 43, 0, 41, 40, 0], LEAD = [62, 65, 69, 67, 65, 64, 62, 0];");
 
 /* ---- three levels in one file: the host names the one it wants ---- */
-rep("const SAVE = 'sootborn-issue-docks-v1'", "const SAVE = 'sootborn-issue-' + SC.issue + '-v1'");
+rep("const SAVE = 'sootborn-issue-docks-v1'", "const SAVE = 'sootborn-issue-' + SC.issue + (SC.cold ? '-cold' : '') + '-v1'");
 rep("})();\n'use strict';\n/* SECOND CHANCE - main: boot and the frame loop. */", ST.ALT + "})();\n'use strict';\n/* SECOND CHANCE - main: boot and the frame loop. */");
 rep("voss: { name: 'CAPTAIN ROOK',", "voss: { name: SC.issue === 'riser' ? 'WARDEN CAPTAIN' : SC.issue === 'stair' ? \"THE AUDITOR'S BLADE\" : 'CAPTAIN ROOK',");
 rep("clerk: { name: 'BRAND',", "clerk: { name: SC.issue === 'stair' ? 'TAVI' : 'BRAND',");
@@ -626,6 +626,9 @@ rep("if (pl.path && pl.meter >= T.powerCost) { if (pl.holdA > 0.2", "if (pl.path
 rep("clerk: { name: SC.issue === 'stair' ? 'TAVI' : 'BRAND',", "clerk: { name: SC.issue === 'stair' ? 'TAVI' : SC.issue === 'array' ? 'DACE' : 'BRAND',");
 rep("    if (SC.issue === 'stack') { G.scene.background.set(0x1c2740);", "    if (SC.issue === 'array') { G.scene.background.set(0x090d0c); G.scene.fog.color.set(0x14201c); G.scene.fog.near = 18; G.scene.fog.far = 84; G.amb.color.setRGB(0.34, 0.38, 0.34); G.sun.color.setRGB(0.5, 0.46, 0.36); }\n    if (SC.issue === 'stack') { G.scene.background.set(0x1c2740);");
 rep("const bands = SC.issue === 'stack' ? ", "const bands = SC.issue === 'array' ? ['#060908', '#0a100e', '#0e1614', '#121c18', '#16221e', '#1a2822'] : SC.issue === 'stack' ? ");
+
+// ---- v0.72: the comic pages never say TAP (the standing rule: no tap prompt). The arrow alone marks a page that is waiting
+rep("go.innerHTML = 'TAP &#9654;';", "go.innerHTML = '&#9654;';");
 
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);

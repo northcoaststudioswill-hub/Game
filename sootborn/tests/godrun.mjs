@@ -2,14 +2,14 @@ import { chromium } from 'playwright'; import fs from 'fs';
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => { if (errors.length < 12) errors.push(e.message.slice(0, 160)); }); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + ''); await wait(600); await page.keyboard.press('Enter'); await wait(1500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html'); await wait(600); await page.keyboard.press('Enter'); await wait(1500);
 await ev(() => {
   window.LOG = []; const L = window.L = (...a) => { const s = a.filter(x => x !== '').join(' | '); if (LOG[LOG.length - 1] !== s) LOG.push(s); };
   const oc = Cutscene.card.bind(Cutscene); Cutscene.card = (c, sub, big) => { L('CARD', c, sub || ''); return oc(c, sub, big); };
   const ob = Brawl.start.bind(Brawl); Brawl.start = (def, cb) => { L(def.walk ? 'WALK ' : def.cineOnly ? 'FILM ' : 'FIGHT', def.title || '', def.sub || '', (def.bg || 'ring') + (def.d2 || !/valley|ford|keep|cell|storm|hall|crown|stair|riser|deck|gallery|spire/.test(def.bg || '') ? ' (2D)' : ' (3D)') + (def.doomed ? ' cannot be won' : '')); return ob(def, cb); };
   const op = Brawl.playCine.bind(Brawl); Brawl.playCine = (shots, cb, ...r) => { for (const s of shots || []) if (s.big) L('  film title', s.big, s.cap || ''); return op(shots, cb, ...r); };
   const om = Mission.start.bind(Mission); Mission.start = (k, d) => { L('2D LEVEL', k); return om(k, d); };
-  const oi = Issue.start.bind(Issue); Issue.start = (k, d) => { L('3D COMIC LEVEL', k); return oi(k, d); };
+  const oi = Issue.start.bind(Issue); Issue.start = (k, d, c) => { L('3D COMIC LEVEL', k + (c ? ' (cold open: a slice)' : '')); return oi(k, d, c); }; { const op = Prelude.plate.bind(Prelude); Prelude.plate = (n, s2, d) => { L('DRAWN STILL', n); return op(n, s2, d); }; }
   const ot = HUD.toast.bind(HUD); HUD.toast = (t, ...r) => { if (/after the furnace|before the furnace/i.test(t)) L('  toast', t); return ot(t, ...r); };
   window.__STEP = () => { const G = BTS.G, lab = i => (typeof i.label === 'function' ? i.label() : i.label) || '';
     if (BTS.UI.stack.length) { const m = BTS.UI.stack[BTS.UI.stack.length - 1], its = (m.items || []).filter(i => i.act && !(i.disabled && i.disabled())); const pick = its.find(i => /Begin Part Two|Continue|Wake up|Sleep|Next|Go on|Carry on/i.test(lab(i))) || its.find(i => !/Back|Save|Export|Import|Settings|title|Stay|Explore|Codex|Memories|Dev|About|New game|Chapter/i.test(lab(i))); if (pick) { L('MENU', (m.opts && m.opts.title) || '(menu)', '-> ' + lab(pick)); pick.act(); return 'menu'; } return 'menu?' + its.map(lab).join('/'); }

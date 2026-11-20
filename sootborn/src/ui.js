@@ -246,6 +246,7 @@ const Menus = {
         ['★ NEW · +6 months · The Table (the Gilding, drawn; no fighting)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'gild', or: [] }], () => Game.toTitle()); }]
       ],
       'Story beats': [
+        ['★ Part Two\'s cold open · a minute of the Stair (third person)', () => { fresh(); G.mode = 'cut'; Cutscene.play([{ issue: 'stair', cold: 1, or: [] }], () => Game.toTitle()); }],
         ['★ The animated intro (new in v0.68)', () => { UI.clear(); Prelude.run(() => Game.toTitle()); }],
         ['Opening film (the old one, no longer shown)', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
         ['New game from the top (intro, the Keep, then prologue)', () => { UI.clear(); Game.newGame(); }],
@@ -266,6 +267,9 @@ const Menus = {
     const film = (k) => () => { UI.clear(); const d = FF[k](); Sound.tname = null; Fade.a = 0; Fade.dir = 0; Fade.busy = false; Brawl.start(Object.assign({}, d, { film: 1, intro: (d.intro || []).concat(d.outro || []), foes: [], waves: null, arts: null, voice: null, allies: [] }), () => Game.toTitle()); G.mode = 'opening'; };
     const cs = (steps, st) => () => { if (st) st(); else UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(steps().filter(s => s && !s.brawl && !s.mission), () => Game.toTitle()); };
     S['Story beats'].push(['The Ledger (43 days after) · whole chapter', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => Game.toTitle()); }, 60); }]);
+    S['Story beats'].push(['★ NEW · The fourth ring, first visit (2.5D; what they notice)', ff('THE FOURTH RING', 'The Sun Spire. Four years and a season after the furnace. Night.', 'ring1')], ['★ NEW · The fourth ring, second visit (Kestrel at the pipe; two bells)', ff('THE FOURTH RING', 'Five years after the furnace.', 'ring2')], ['★ NEW · The fourth ring, third visit (colder)', ff('THE FOURTH RING', 'Six years after the furnace.', 'ring3')],
+      ['★ NEW · Flash forward: the book (a drawn still)', () => { UI.clear(); G.mode = 'cut'; Cutscene.play([{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Count. A book as wide as a table.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'book', secs: 10 }], () => Game.toTitle()); }],
+      ['★ NEW · Flash forward: Tavi at sixteen (a drawn still)', () => { UI.clear(); G.mode = 'cut'; Cutscene.play([{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 }], () => Game.toTitle()); }]);
     S['Story beats'].push(['★ NEW · The camp by day (2.5D, the Assay, day three)', ff('MORNING', 'The Assay. Day three. The camp by daylight.', 'campday')], ['★ NEW · Bay Three at last bell: the seat knives (2.5D, 42 days after)', ff('LAST BELL', 'Bay Three. Forty-two days after the furnace.', 'lastbell')]);
     S['Fights'].splice(S['Fights'].length - 1, 0, ['Under the Floor · the Warden (2D, 43 days after)', ff('THE LEDGER', 'Forty-three days after the furnace. The old tunnel.', 'under')]);
     S['Fights'].splice(S['Fights'].length - 1, 0, ['The Way Out · Sull and the night watch (2D, 160 days after)', ff('THE WAY OUT', 'One hundred and sixty days after the furnace. The old tunnel.', 'wayout')], ['The Standard · the Sisters Vey (two duelists)', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day twenty-six.', 'twins')], ['The Pinning · the Auditor\'s Blade (boots)', ff('FOUR YEARS AFTER THE FURNACE', 'After the keep.', 'blade')], ['The High Docks · seven years after the furnace (battle)', ff('SEVEN YEARS AFTER THE FURNACE', 'Above the weather.', 'docks')]);
@@ -366,11 +370,11 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.71';
-const DEV_NEW = 'the Deep Array (a sixth comic-book level, in The Ledger; Levels in 3D).';
+const GAME_VER = '0.72';
+const DEV_NEW = 'the fourth ring of the Spire, three visits, with what they notice; Part Two\'s cold open on the Stair; two drawn flash-forwards (Story beats; Levels in 3D).';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
-  [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
+  [/fourth ring|cold open|Flash forward|Part Two|The Post|The Balancing|What She Knows|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
   [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],

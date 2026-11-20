@@ -373,6 +373,68 @@ const Prelude = (() => {
     if (k >= 1) { const a = cl((u - .2) * 6, 0, 1); g.globalAlpha = a; g.font = "700 250px 'Pixelify Sans', monospace"; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.lineWidth = 26; g.strokeStyle = INK; g.strokeText('ELEVEN', 800, 462); g.fillStyle = '#ffe08a'; g.fillText('ELEVEN', 800, 462); g.globalAlpha = 1; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; }
   }
 
+  // ---- two plates for Part Two's flash-forwards, in the same hand as the intro
+  // the book: the Count, open on a table, seen from his own chair. One line is red
+  function pBook(g, u, T) {
+    g.fillStyle = '#1a1210'; g.fillRect(-300, -200, 2200, 1300); glow(g, 800, 380, 1000, '255,236,190', .5);
+    poly(g, [-300, 1100, -300, 250, 1900, 250, 1900, 1100]); fs(g, '#3a2418'); tone(g, '#120a08', .5, 9);
+    // the pages, in perspective: wide at the near edge
+    const page = (x0, x1, X0, X1) => { poly(g, [x0, 180, x1, 180, X1, 1010, X0, 1010]); };
+    page(210, 800, -60, 800); fs(g, '#f1e6c8'); page(210, 800, -60, 800); st(g, 8); page(800, 1390, 800, 1660); fs(g, '#f8eed2'); page(800, 1390, 800, 1660); st(g, 8);
+    g.save(); page(800, 1390, 800, 1660); g.clip(); g.beginPath(); g.rect(800, 100, 90, 1000); tone(g, '#b9a880', .5, 7); g.restore();
+    g.beginPath(); g.moveTo(800, 180); g.lineTo(800, 1010); st(g, 6);
+    // ruled lines: a name, a figure for air breathed, a figure for air owed
+    const row = (side, i) => { const k = i / 13, y = 230 + k * k * 300 + k * 440, w = 1 + k * .46, xl = side < 0 ? lerp(240, -20, k) : lerp(840, 850, k), xr = side < 0 ? 770 : lerp(1360, 1620, k); return { y, w, xl, xr, k }; };
+    for (const side of [-1, 1]) for (let i = 0; i < 14; i++) { const r = row(side, i), red = side > 0 && i === 8;
+      g.beginPath(); g.moveTo(r.xl, r.y + 22 * r.w); g.lineTo(r.xr, r.y + 22 * r.w); st(g, 2, '#c9bb98');
+      if (red) continue;
+      const n = 3 + ((i * 7 + (side > 0 ? 3 : 0)) % 4); let x = r.xl + 14 * r.w; for (let j = 0; j < n; j++) { const len = (18 + rnd(i * 9 + j + side * 40) * 46) * r.w; g.beginPath(); g.moveTo(x, r.y + 6 * r.w); g.lineTo(x + len, r.y + 6 * r.w); st(g, 5 * r.w, '#3a2c24'); x += len + 12 * r.w; }
+      for (const c of [.66, .84]) { const cx = lerp(r.xl, r.xr, c); g.beginPath(); g.moveTo(cx, r.y + 6 * r.w); g.lineTo(cx + 44 * r.w, r.y + 6 * r.w); st(g, 5 * r.w, '#5a4a3c'); }
+      if ((i * 5 + (side > 0 ? 2 : 0)) % 6 === 0) { g.beginPath(); g.moveTo(r.xl + 6, r.y + 8 * r.w); g.lineTo(lerp(r.xl, r.xr, .58), r.y + 4 * r.w); st(g, 4 * r.w, '#1a1016'); } }
+    // the red line: his own name. Nobody has struck it. The pen is over it
+    { const r = row(1, 8); g.font = `700 ${Math.round(40 * r.w)}px 'Pixelify Sans', monospace`; g.fillStyle = '#b3261c'; g.textBaseline = 'alphabetic'; g.fillText('Brennick, K.', r.xl + 16 * r.w, r.y + 16 * r.w);
+      glow(g, lerp(r.xl, r.xr, .3), r.y, 260, '255,60,40', .16 + Math.sin(T * 3) * .04);
+      g.beginPath(); g.moveTo(r.xl + 14 * r.w, r.y + 26 * r.w); g.lineTo(r.xl + 300 * r.w, r.y + 26 * r.w); st(g, 3 * r.w, '#b3261c'); }
+    // a cuff with gold on it, and the pen
+    g.save(); g.translate(1370 - ez(u) * 60, 900 + Math.sin(T * 1.3) * 5);
+    poly(g, [120, 400, 60, 60, 300, -20, 560, 400]); fs(g, '#f3ead4'); tone(g, '#a89674', .5, 8); st(g, 9); poly(g, [70, 100, 288, 26, 300, 66, 84, 140]); fs(g, '#e2b84a'); st(g, 6);
+    ell(g, 150, 10, 110, 76, -.3); fs(g, '#e6c79a'); g.save(); g.clip(); g.beginPath(); g.rect(150, -80, 160, 200); tone(g, '#8a6a48', .55, 7); g.restore(); ell(g, 150, 10, 110, 76, -.3); st(g, 8);
+    poly(g, [-150, -210, -130, -222, 150, 0, 120, 26]); fs(g, '#1a1016'); st(g, 5); poly(g, [-176, -232, -150, -210, -130, -222]); fs(g, '#e2b84a'); st(g, 4);
+    capsule(g, 60, -34, 20, -70, 22); fs(g, '#e6c79a'); st(g, 7); capsule(g, 100, -60, 50, -96, 22); fs(g, '#e6c79a'); st(g, 7);
+    g.restore();
+  }
+  // Tavi at sixteen, on the service stair, with a piece of chalk
+  function pTavi(g, u, T) {
+    g.fillStyle = '#2a2c34'; g.fillRect(-300, -200, 2200, 1300);
+    for (let r = 0; r < 12; r++) for (let c = 0; c < 9; c++) { const x = -260 + c * 250 + (r & 1) * 125, y = -180 + r * 104, k = rnd(r * 13 + c); g.fillStyle = k > .6 ? '#3a3c46' : k > .3 ? '#34363f' : '#40424c'; g.fillRect(x + 5, y + 5, 240, 94); }
+    glow(g, 1010, 360, 760, '255,220,150', .34);
+    // steps going up to the right, and the painted line the service keeps to
+    for (let i = 0; i < 9; i++) { const x = 760 + i * 150, y = 900 - i * 92; poly(g, [x, y, 1900, y, 1900, y + 92, x, y + 92]); fs(g, i & 1 ? '#565864' : '#4c4e5a'); st(g, 6); g.beginPath(); g.rect(x + 40, y + 4, 60, 14); fs(g, '#e2b84a'); }
+    poly(g, [-300, 900, 760, 900, 760, 1100, -300, 1100]); fs(g, '#4c4e5a'); st(g, 6); g.beginPath(); g.rect(-300, 930, 1060, 16); fs(g, '#e2b84a');
+    // the sun he is chalking on their wall
+    const cx = 1010, cy = 360, jit = (i, s) => (rnd(i) - .5) * s, prog = cl(u * 1.3, 0, 1) * 10;
+    for (let p = 0; p < 3; p++) { g.beginPath(); for (let i = 0; i <= 36; i++) { const a = i / 36 * TAU, r = 96 + jit(i + p * 40, 8); g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } g.globalAlpha = .8; st(g, 9 - p * 2, '#ffe9a8'); } g.globalAlpha = 1;
+    let hx = cx + 96, hy = cy; for (let i = 0; i < 10; i++) { const k = cl(prog - i, 0, 1); if (k <= 0) break; const a = -Math.PI / 2 + i / 10 * TAU, r1 = 130 + (i & 1 ? 70 : 110) * k; g.beginPath(); g.moveTo(cx + Math.cos(a) * 130, cy + Math.sin(a) * 130); g.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); g.globalAlpha = .85; st(g, 9, '#ffe9a8'); g.globalAlpha = 1; hx = cx + Math.cos(a) * r1; hy = cy + Math.sin(a) * r1; }
+    for (let i = 0; i < 18; i++) { const k = (T * .3 + rnd(i)) % 1; g.globalAlpha = (1 - k) * .5; circ(g, hx + (rnd(i + 5) - .5) * 90, hy + k * 220, 2 + rnd(i + 8) * 3); fs(g, '#ffefc0'); } g.globalAlpha = 1;
+    // the boy: bedroll, satchel, scarf, a lamp at his belt. Sixteen and all elbows
+    g.save(); g.translate(520, 0);
+    g.beginPath(); g.moveTo(-40, 1100); g.lineTo(-10, 700); g.quadraticCurveTo(-30, 520, 30, 440); g.lineTo(150, 440); g.quadraticCurveTo(230, 520, 200, 700); g.lineTo(230, 1100); g.closePath(); fs(g, '#6a5236'); tone(g, '#2a1c12', .55, 8); st(g, 9);
+    capsule(g, -30, 470, 240, 420, 46); fs(g, '#8a7a5a'); tone(g, '#3a3020', .5, 7); st(g, 8); for (const x of [10, 110, 200]) { g.beginPath(); g.moveTo(x, 430 + x * -.18 + 46); g.lineTo(x + 8, 430 + x * -.18 - 40); st(g, 5); }
+    poly(g, [-20, 620, 80, 600, 100, 800, -10, 820]); fs(g, '#4a3524'); st(g, 8); g.beginPath(); g.moveTo(170, 450); g.lineTo(10, 640); st(g, 9, '#2a1c12');
+    circ(g, 190, 820, 34); fs(g, '#ffd98a'); st(g, 7); glow(g, 190, 820, 150, '255,217,138', .5);
+    // arm up to the wall, chalk in the fingers
+    g.lineCap = 'round'; g.beginPath(); g.moveTo(140, 486); g.quadraticCurveTo(270, 470, hx - 520 - 26, hy + 44); st(g, 78, '#120a0e'); st(g, 62, '#6a5236'); g.lineCap = 'butt';
+    ell(g, hx - 520 - 16, hy + 14, 34, 28, .3); fs(g, '#c98a62'); st(g, 6); g.beginPath(); g.rect(hx - 520 - 6, hy - 14, 34, 14); fs(g, '#fff6d6'); st(g, 4);
+    // head: turned three-quarters away, hair cropped, the scarf
+    g.beginPath(); g.moveTo(20, 440); g.quadraticCurveTo(90, 470, 160, 440); g.lineTo(150, 380); g.lineTo(34, 380); g.closePath(); fs(g, '#b8682a'); tone(g, '#5a2c10', .5, 7); st(g, 8);
+    g.beginPath(); g.moveTo(92, 180); g.bezierCurveTo(190, 180, 214, 270, 196, 330); g.bezierCurveTo(184, 384, 150, 404, 96, 404); g.bezierCurveTo(30, 404, 2, 350, 4, 290); g.bezierCurveTo(4, 220, 30, 180, 92, 180); g.closePath(); fs(g, '#c98a62'); g.save(); g.clip(); g.beginPath(); g.rect(-20, 160, 110, 260); tone(g, '#5e3122', .7, 7); g.restore();
+    g.beginPath(); g.moveTo(92, 180); g.bezierCurveTo(190, 180, 214, 270, 196, 330); g.bezierCurveTo(184, 384, 150, 404, 96, 404); g.bezierCurveTo(30, 404, 2, 350, 4, 290); g.bezierCurveTo(4, 220, 30, 180, 92, 180); st(g, 8);
+    g.beginPath(); g.moveTo(-6, 300); g.bezierCurveTo(-20, 190, 60, 140, 130, 156); g.bezierCurveTo(196, 166, 220, 220, 206, 268); g.quadraticCurveTo(150, 230, 110, 250); g.quadraticCurveTo(60, 290, 40, 360); g.quadraticCurveTo(10, 350, -6, 300); g.closePath(); fs(g, '#1e1416'); st(g, 8);
+    g.beginPath(); g.moveTo(196, 300); g.lineTo(214, 322); g.lineTo(196, 334); st(g, 6); ell(g, 176, 292, 12, 6, 0); fs(g, '#1e1416');
+    g.beginPath(); g.moveTo(196, 268); g.quadraticCurveTo(206, 300, 196, 330); st(g, 4, '#ffb46a');
+    g.restore();
+  }
+  const PLATES = { book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
   const SHOTS = [
     [[1, s1]], [[1, s2]], [[1, s3], [1.5, s3fg]], [[1, s4], [1.6, s4fg]], [[1, s5]], [[1, s6]], [[1, s7]], [[1, s8], [1.35, s8fg]],
     [[1, (g, u, T) => eyes(g, u, T, 0)]], [[1, (g, u, T) => eyes(g, u, T, 1)]], [[1, s11]]
@@ -382,7 +444,7 @@ const Prelude = (() => {
     on: false, el: null, g: null, t: 0, done: null, last: '', n: -1, D, LEAD,
     total() { return LEAD + D.reduce((a, b) => a + b, 0); },
     run(done) {
-      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; pats = {};
+      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; this.pl = null; pats = {};
       const c = this.el = document.createElement('canvas'); c.id = 'prelude'; c.style.cssText = 'position:fixed;background:#050305;image-rendering:auto';
       document.body.insertBefore(c, $('#ui')); this.g = c.getContext('2d'); this.place();
       try { document.body.classList.remove('ingame', 'fight'); $('#cskip').classList.remove('hidden'); } catch (e) { /* no button */ }
@@ -396,6 +458,7 @@ const Prelude = (() => {
     tick(dt) {
       if (!this.on) return; this.place(); this.t += dt;
       if (this.t > .5 && (Input.p('A') || Input.p('B') || Input.p('START'))) return this.finish();
+      if (this.pl) { if (this.t >= this.pl.secs) return this.finish(); return this.drawPlate(); }
       const at = this.at(this.t);
       if (at.n !== this.n) { this.n = at.n; if (at.n >= 0) { Sound.play(at.n === 10 ? 'pillar' : 'heart'); if (at.n === 10) Sound.play('slash'); } }
       if (this.t >= this.total()) return this.finish();
@@ -428,13 +491,24 @@ const Prelude = (() => {
         if (at.n === 10 && at.u > .72) { g.fillStyle = `rgba(255,252,240,${cl((at.u - .72) / .22, 0, 1)})`; g.fillRect(0, 0, cw, ch); }
       }
     },
+    drawPlate() {
+      const g = this.g, cw = this.el.width, ch = this.el.height, red = Settings.d.reduce, P = PLATES[this.pl.name], C = P[1], u = cl(this.t / this.pl.secs, 0, 1), e = red ? .5 : ez(u);
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = '#050305'; g.fillRect(0, 0, cw, ch);
+      const cx = lerp(C[0], C[3], e), cy = lerp(C[1], C[4], e), z = lerp(C[2], C[5], e), S = Math.max(cw / VW, ch / VH);
+      g.save(); g.translate(cw / 2, ch / 2); g.scale(S * z, S * z); g.translate(-cx, -cy); P[0](g, u, this.t); g.restore();
+      const vg = g.createRadialGradient(cw / 2, ch / 2, ch * .45, cw / 2, ch / 2, Math.max(cw, ch) * .72); vg.addColorStop(0, 'rgba(5,3,5,0)'); vg.addColorStop(1, 'rgba(5,3,5,.6)'); g.fillStyle = vg; g.fillRect(0, 0, cw, ch);
+      const U = ch / 900, bar = 62 * U; g.fillStyle = '#050305'; g.fillRect(0, 0, cw, bar); g.fillRect(0, ch - bar, cw, bar); g.fillStyle = '#e2b84a'; g.fillRect(0, bar - 3 * U, cw, 3 * U); g.fillRect(0, ch - bar, cw, 3 * U);
+      const a = Math.max(1 - this.t / .7, (this.t - (this.pl.secs - .8)) / .8); if (a > 0) { g.fillStyle = `rgba(5,3,5,${cl(a, 0, 1)})`; g.fillRect(0, 0, cw, ch); }
+    },
     finish() {
-      if (!this.on) return; this.on = false; const el = this.el, cb = this.done; this.el = this.g = this.done = null; pats = {};
+      if (!this.on) return; this.on = false; this.pl = null; const el = this.el, cb = this.done; this.el = this.g = this.done = null; pats = {};
       try { $('#cskip').classList.add('hidden'); } catch (e) { /* gone */ }
       Fade.a = 1; Fade.dir = 0; Fade.busy = false; Input.consume();
       if (cb) cb(); setTimeout(() => { if (el) el.remove(); }, 120);
     },
+    // one drawn picture, held and slowly pushed in on, for a flash that has no words (the book; Tavi at sixteen)
+    plate(name, secs, done) { if (!PLATES[name]) return done && done(); this.run(done); this.pl = { name, secs: secs || 9 }; Sound.music('hum'); Sound.play('heart'); },
     // for the Dev menu and the tests: hold one moment of it
-    still(t) { if (!this.on) this.run(() => {}); this.t = t; this.place(); this.draw(this.at(t)); }
+    still(t, plate) { if (!this.on) this.run(() => {}); if (plate) this.pl = { name: plate, secs: 9 }; this.t = t; this.place(); if (this.pl) this.drawPlate(); else this.draw(this.at(t)); }
   };
 })();

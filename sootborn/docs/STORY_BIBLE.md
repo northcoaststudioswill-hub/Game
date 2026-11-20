@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.71 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.72 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -558,3 +558,19 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 - Kael's line: "I had been keeping it alive for ten years, one valve at a time, and nobody had ever let me see it." He has been a valve hand ten years.
 - **Not said there:** that Seren traced the line and saw this first. That is held for Part Two.
 - This is where "the Array has about ten years" (Celestine, six years after) comes from: he has seen the number himself.
+
+## The fourth ring, walked (v0.72)
+- **What it is:** the clerks' ring of the Sun Spire. A white corridor with gilt doors, a teal lamp between each, tall windows, and an ochre line a hand wide painted on the floor from the service stair to every lamp and every door and nowhere else. The service walks on the line; a porter who steps off it loses a day of air. The porters repaint it themselves on rest days and buy the paint.
+- **The head rule:** the Accredited do not turn their heads to whoever is speaking ("a voice is enough to know a rank by, so a face is a thing one does not spend"). Soot do. Kestrel Dray turns her head; nobody has cured her of it.
+- **The bells:** one for a clerk, two for a House, three for a Marshal; for the High Auditor nobody rings anything. The service kneels at any of them. At two bells the clerks bow from the neck.
+- **Who lives there:** Edric Sorrel (the last door on the length); Kestrel Dray, engineer, east manifold, from the Post on (a thumbprint of grease on her door handle; the riser beside her door is worn at the height of a hand); Maren Aldane, Second Clerk, whose lamp is always lit until the last visit. Sable keeps a stall of greens off Freight Three's cold crates: half sold to clerks, half back down the stair in nobody's book.
+- **Soot words that give him away:** "Ta." "I" for "one". "Get up." Looking a porter in the face. A bare palm.
+- **The three visits:** four years and a season after (new, watched); five years after (Kestrel at the pipe: "Four beats and a catch"; Tier Four's crates have not come up); six years after (colder: a porter kneels to him with no bell, because somebody above has looked at him; his gloves are laid out palms up on his desk; "She sent for me in the morning").
+- **Flags:** `susp` (0 to 6, what the ring has noticed, carried between visits), `ring1` to `ring3`, `wrenPipe` (he put his hand on the riser with her).
+- **Not decided by the owner, written to fill the place:** Maren on the fourth ring; the first porter moved to the kitchens; the gloves; the clerks' bow; who pays for the paint.
+
+## Part Two looks ahead (v0.72)
+- **The cold open:** nine years after, sunset, the Stair, Tavi on his left. It ends on somebody standing in front of the white door and "I knew the way he stood." It does not say who. (In the full level the door is held by the Auditor's Blade and then Oswin Hale.)
+- **The book:** the Count, open, one line in red: "Brennick, K." Nobody has struck it; a gilt cuff holds a pen over it. Pays off in the Count (plan 16a).
+- **Tavi at sixteen:** on the service stair with a bedroll and a satchel, chalking a sun on the Spire's wall. Lucan is the one who tells Kael the Spire knows about him ("She says there is a boy"). Pays off in "Tavi is coming up. Sixteen."
+

@@ -321,6 +321,7 @@
       l2: { arena: [-6.6, -21.6, 6.6, -8.4], floor: 12, waves: [[['bruiser', -2, -19], ['bruiser', 3, -18]], [['knifer', -4, -19], ['knifer', 4, -19], ['hollow', 0, -20]]] },
       boss: { arena: [-9.4, -57, 9.4, -34.6], floor: 18, waves: [[['boss', 0, -50]]] }
     });
+    if (SC.cold && !RIS) ENC.alley.waves = [ENC.alley.waves[0]];   /* Part Two's cold open: a minute of this stair, nine years on. One fight, one flight, and a cut */
     Object.keys(ENC).forEach(k => { ENC[k].id = k; });
     const up = () => (F.pump ? 10 : 0) + (F.e_w2 ? 10 : 0) + (F.e_w3 ? 10 : 0) + (F.pull ? 10 : 0);
     const tavi = (x, y, z, yaw) => { if (RIS) return; const g = clerk.group.position; if (clerk.group.visible && Math.hypot(g.x - pl.pos.x, g.z - pl.pos.z) < 30 && Math.abs(g.y - pl.pos.y) < 9) return; showClerk(x, y, z, yaw === undefined ? Math.PI : yaw); };   // Tavi walks now; he is only set down somewhere if he has been left a long way behind
@@ -367,8 +368,17 @@
         { img: shot(0.4, 1.5, 38.4, -1.6, 1.5, 40.2, 30), area: '1 / 2 / 2 / 3', cap2: '"I\'M ON YOUR LEFT THE WHOLE WAY UP. DON\'T ARGUE. *I\'VE FLOWN A BARGE.*"' },
         { img: shot(0, 1.6, 37, 0, 13, -20, 44), area: '2 / 2 / 3 / 3', cap: 'THE LAST OF NINE HUNDRED STEPS.', cap2: 'WE. IT WAS ALWAYS WE.' }
       ];
-      pl.model.expr = null; U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: pg }, begin);
+      pl.model.expr = null; if (SC.cold && !RIS) return begin(); U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: pg }, begin);
     };
+    // the cut: he comes over the top of the first flight and sees the rest of it, and who is standing at the end
+    const coldEnd = () => { if (S.coldDone) return; S.coldDone = 1; S.enc = null; SC.clearEnemies(); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; U.showHud(false); SC.audio.sfx('clue');
+      pl.place(0, 6, 15.5, Math.PI); pl.model.anim.apply(P.guard ? P.guard(0) : P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true);
+      { const m = new THREE.Group(), w = new THREE.MeshBasicMaterial({ color: 0x1a1420, fog: false }), body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.46, 1.5, 8), w), head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 6), w), blade = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.5, 0.06), new THREE.MeshBasicMaterial({ color: 0xe8c25a, fog: false })); body.position.y = 0.75; head.position.y = 1.72; blade.position.set(0.42, 0.75, 0.1); m.add(body, head, blade); m.position.set(0, 18, -52); G.scene.add(m); m.updateMatrixWorld(true); }
+      const a = shot(2.4, 20.4, -24, 0, 19.2, -52, 34, 768, 720), b = shot(1.1, 7.7, 13.2, 0, 7.6, 15.5, 26);
+      U.page({ cols: '1.25fr 1fr', rows: '1fr', panels: [
+        { img: a, area: '1 / 1 / 2 / 2', cap: 'NINE HUNDRED STEPS. AT THE TOP, A WHITE DOOR.', cap2: 'SOMEBODY WAS STANDING IN FRONT OF IT.', fx: 'UP' },
+        { img: b, area: '1 / 2 / 2 / 3', cap2: '*I KNEW THE WAY HE STOOD.*' }
+      ] }, () => done()); };
     const oswinUp = e => { e.maxHp = Math.round(e.maxHp * 0.85); e.hp = e.maxHp; e.K = Object.assign({}, e.K, { speed: e.K.speed * 1.22, wind: e.K.wind * 0.78, rec: e.K.rec * 0.8, cool: [0.4, 0.9], dmg: e.K.dmg + 5 }); e.phase = 2; };
     bossIntro = function () {
       const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
@@ -497,6 +507,7 @@
         const next = F.pump && !F.e_w2 ? 'w2' : F.pylon && !F.e_w3 ? 'w3' : F.pull ? 'boss' : null; if (!next) return; S.pending = true;
         SC.after(next === 'boss' ? 3.4 : 4.2, () => { if (next === 'boss') bossIntro(); else { U.toast('LAMPS ON THE HILL ROAD. *MORE OF THEM.*', 2.2); startEnc(next); } });
       } else {
+        if (SC.cold) { if (F.e_alley && y > 5.4 && z < 17) coldEnd(); return; }
         if (F.e_alley && !F.e_l1 && y > 5.4 && z < 17) startEnc('l1');
         else if (F.e_l1 && F.bell && !F.e_l2 && y > 11.4 && z < -9) startEnc('l2');
         else if (F.e_l2 && !F.boss && !S.bossDown && y > 17.4 && z < -36.5) bossIntro();

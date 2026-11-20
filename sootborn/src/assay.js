@@ -542,4 +542,147 @@ function walkLastBell() {
         say('warden', 'Tier Six, Crew Three. All seats in. Balanced.'),
         narr('He says it of a board of knives. Forty-two days ago, in this bay, somebody said it of her.')]; } }] } };
 }
+// ---- the fourth ring of the Spire, at night: where Clerk Sorrel lives, among people who do not know what he is.
+// Walked three times (the Post, the Balancing, What She Knows). What they have noticed is kept in G.flags.susp and carried from visit to visit.
+Object.assign(CAST, {
+  porter1: { name: 'A porter', look: () => ({ skin: '#9a6448', hair: '#2a1a14', style: 'short', shirt: '#8a8478', pants: '#4a463e', scarf: '#c9a23a' }) },
+  porter2: { name: 'A porter', look: () => ({ skin: '#c08a6a', hair: '#8a8a8a', style: 'bald', shirt: '#8a8478', pants: '#4a463e', scarf: '#c9a23a' }) },
+  clerk4: { name: 'A clerk of the fourth ring', look: () => ({ accredited: 1, skin: '#e0c0a0', hair: '#5a4a3a', style: 'short', robe: '#e8e0cc', trim: '#e8c25a', sash: '#9aa0aa' }) }
+});
+function walkRing(n) {
+  const F = G.flags, MAX = 6; if (n === 1) F.susp = 2; if (n === 3) F.susp = Math.max(F.susp || 0, 4); F.susp = clamp(F.susp || 0, 0, MAX);
+  const S = d => fx(() => { const v = clamp((F.susp || 0) + d, 0, MAX); if (v !== F.susp) Sound.play(d > 0 ? 'heart' : 'clue'); F.susp = v; if (d > 0) F.suspUp = (F.suspUp || 0) + 1; else F.suspDn = (F.suspDn || 0) + 1; });
+  const front = fx(() => { Brawl.p.fx = 0; Brawl.p.fy = 1; });
+  const once = {}, one = (id, first, again) => () => { if (once[id]) return again; once[id] = 1; return first; };
+  const N = (id, x, y, name, talk, o) => Object.assign({ id, x, y, name, talk }, o || {});
+  const pick = (t, d, then, f) => ({ t, fx: () => { f && f(); }, then: [...(d > 0 ? [] : [front]), S(d), ...then] });
+  let ringT = 0, belled = 0;
+  const kneel = v => fx(() => { for (const a of Brawl.allies) if (/^porter/.test(a.id)) a.kn = v; });
+  const sub = ['', 'THE SUN SPIRE. FOUR YEARS AND A SEASON AFTER THE FURNACE. NIGHT', 'THE SUN SPIRE. FIVE YEARS AFTER THE FURNACE. NIGHT', 'THE SUN SPIRE. SIX YEARS AFTER THE FURNACE. NIGHT'][n];
+  const wall = ['plain', 'win', 'lamp', 'door', 'win', 'win', 'plain', 'lamp', 'win', 'door', 'bell', 'lamp', 'door', 'pipe', 'win', 'lamp', 'door', 'win', 'door', 'lamp', 'win', 'plain', 'door', 'lamp', 'win', 'win', 'plain'], W0 = 13;   /* the length of ring he walks is the middle of it; it goes on round either way */
+  const props = wall.map((v, j) => { const i = j - W0 + 8; return { t: 'rwall', v, x: (j - W0) * 40, y: -40, k: j, nm: i === 4 ? 7 : i === 7 ? 8 : i === 11 ? 9 : i === 13 ? 10 : 6, lit: i === 11 ? n < 3 : i === 7 ? n === 2 : i === 13 ? 0 : i !== 17, mark: i === 7, ring: v === 'bell' ? () => ringT : null }; });
+  props.push({ t: 'stall', x: 40, y: -27, k: 1, shut: () => n === 3 });
+  const door = F.susp;   /* read again at the door */
+  // ---- who is on the ring
+  const porter = n === 1 ? N('porter1', -108, 24, 'A PORTER ON THE LINE', one('porter', [
+      narr('He has stepped off his line to let me by. I had not asked. I had not even slowed.'),
+      narr('He is looking at the floor a pace in front of my boots. That is where the service looks. Below, a man who would not meet your eye was a man about to rob you.'),
+      { choice: [
+        pick('Look him in the face. "Ta."', 1, [say('you', 'Ta.'), say('porter1', '...Clerk.'), narr('His eyes came up before he could stop them. Then they went along the ring, to see who had heard me. I had cost him that. I walked on.')]),
+        pick('Eyes front. Walk through the space he has made.', -1, [narr('I walked through the space he had made as if it had always been there. It is the hardest thing I do in a day. Behind me I heard him step back onto the paint.')])] }],
+      [narr('He is back on the paint, with his eyes where they belong. I have done enough to him for one night.')]))
+    : n === 2 ? N('porter1', -108, 24, 'A PORTER ON THE LINE', one('porter', [
+      narr('He does not step off the line for me. The one who did is gone from this ring. Somebody saw a porter leave the paint for a clerk who had not asked, and wrote it down.'),
+      { choice: [
+        pick('Ask him where the other porter went.', 1, [say('you', 'There was another man on this length.'), say('porter1', "Don't know any other, Clerk."), narr('He knew. He said it to the floor, quickly, and his hand closed. A clerk does not notice which porter. I had just told him that I count them.')]),
+        pick('Walk on. A clerk does not notice which porter.', -1, [narr('I walked on. I looked him up the same night, in the Count. He is breathing. They have moved him to the kitchens, and docked him the day.')])] }],
+      [narr('He keeps to the paint. He has learned it from what happened to the last man. So have I.')]))
+    : N('porter1', -108, 24, 'A PORTER, KNEELING', one('porter', [
+      narr('He went down before I reached him. No bell had rung.'),
+      narr('They kneel when a bell rings. One for a clerk. Two for a House. For the High Auditor nobody rings anything. People simply know.'),
+      narr('He was not kneeling to a clerk. Somebody above me had looked at me, and the service had felt it come down the stair like a draught.'),
+      { choice: [
+        pick('Walk past him.', -1, [narr('I walked past him. I did not look down. I have been on that paint, and I know how long a pair of boots takes to go by.')]),
+        pick('"Who told you to kneel?"', 1, [say('you', 'Who told you to kneel?'), say('porter1', 'Nobody, Clerk.'), narr('It was true. That was the worst of it.')])] }],
+      [narr('He has not got up. I do not think he will until I am behind a door.')]));
+  const clerk = n === 1 ? N('clerk4', -150, -12, 'A CLERK OF THE FOURTH RING', one('clerk', [
+      say('clerk4', 'Sorrel. One hears the Count has a new hand. One hears the hand is quick.'),
+      narr('He says it to the lamp across the ring. He has not turned his head. Nobody up here turns their head. A voice is enough to know a rank by, so a face is a thing one does not spend.'),
+      { choice: [
+        pick('Turn and look at him while he speaks.', 1, [narr('I turned to him. It is what you do. Somebody speaks and you give them your face, so that they know the air was not wasted.'), say('clerk4', '...Is something the matter with one\'s collar, Sorrel?'), narr('He wrote nothing down. He did not need to. Up here everybody keeps a column.')]),
+        pick('Eyes front. Answer the lamp.', -1, [say('you', 'One is told so.'), say('clerk4', 'Noted.'), narr('Two men talking to a lamp. I have known furnace crews say more to each other through a wall.')])] }],
+      [say('clerk4', 'Noted, Sorrel.'), narr('It is what they say for goodnight. It is also what they say for everything else.')]), { acc: 1, fx: 0, fy: 1 })
+    : n === 2 ? N('clerk4', -150, -12, 'A CLERK OF THE FOURTH RING', one('clerk', [
+      say('clerk4', 'Sorrel. One hears Tier Four is to be balanced. One hears it will be your pen.'),
+      { choice: [
+        pick('Look at him. "Eleven hundred people."', 1, [say('you', 'Eleven hundred people.'), narr('I said it to his face. He looked at my mouth as though it had done something in public.'), say('clerk4', 'Eleven hundred lines, Sorrel. One says lines.')]),
+        pick('Eyes front. "One has not seen the order."', -1, [say('you', 'One has not seen the order.'), say('clerk4', 'No. One never has, until it is on the desk.'), narr('He sounded almost kind. He has signed them too.')])] }],
+      [say('clerk4', 'One says lines, Sorrel.'), narr('He says it to the lamp.')]), { acc: 1, fx: 0, fy: 1 })
+    : N('clerk4', -150, 20, 'A CLERK OF THE FOURTH RING', one('clerk', [
+      say('clerk4', 'Sorrel.'),
+      narr('Only the name. For two years he has had something to say to the lamp about me. Tonight he has nothing, and he has crossed to the far side of the ring to say it.'),
+      { choice: [
+        pick('Eyes front. "One bids you good evening."', -1, [say('you', 'One bids you good evening.'), say('clerk4', '...Noted.'), narr('He let his breath go. I had given him nothing to carry.')]),
+        pick('Look at him. Ask what he has heard.', 1, [say('you', 'What has one heard?'), say('clerk4', 'One hears nothing, Sorrel. One is on the fourth ring.'), narr('He was afraid. Not of me. Of standing beside me when it came.')])] }],
+      [narr('He has found something to read on the wall.')]), { acc: 1, fx: 0, fy: -1 });
+  const sable = N('sable', 62, -16, "SABLE'S STALL", n === 1 ? one('sable', [
+      say('sable', "Chard, kale, and a thing the kitchens call sorrel. I thought you'd want that one."),
+      narr('Cold crates off Freight Three, chalked in her hand. The kitchens send down what the third ring leaves. She sells half of it to clerks at a mark-up, and the other half does not appear in anybody\'s book.'), find('f_greens'),
+      narr('She is the only person on this ring who knows what I am. She has never once looked as though she did.'),
+      { choice: [
+        pick('"Ta, Sable."', 1, [say('you', 'Ta, Sable.'), say('sable', 'Clerk will want it wrapped.'), narr('She said it loudly, for the ring, and under it she gave me a look that would have stripped paint. Ta is a Tier Six word. I had said it with a sun on my collar.')]),
+        pick('"One will take the sorrel."', -1, [say('you', 'One will take the sorrel.'), say('sable', 'Noted, Clerk.'), narr('She wrapped it in a page off a dock manifest. Inside, in chalk, a four and a nine. Crates that went down this week, and the tier they went to. I ate the greens and burned the paper.')])] }],
+      [say('sable', "That's the lot, Clerk. Unless you're buying the crate.")])
+    : n === 2 ? one('sable', [
+      say('sable', "Thin tonight. Tier Four's crates didn't come up. Don't ask me why. I only read the chalk."),
+      narr('She was asking me why. I am the Count. If a tier stops sending crates up, it is because somebody on my floor has stopped sending air down.'),
+      { choice: [
+        pick('"I\'ll find out."', 1, [say('you', "I'll find out."), say('sable', 'Clerk will want the kale, then.'), narr('Loudly. I had said I, and not one. A year of practice, and it fell out of my mouth over a crate of kale.')]),
+        pick('"One will take what there is."', -1, [say('you', 'One will take what there is.'), say('sable', 'Noted.'), narr('She put a stalk of something in with it that I had not paid for. It is the nearest she comes to saying anything.')])] }],
+      [say('sable', 'Come back when there are crates, Clerk.')])
+    : one('sable', [
+      say('sable', "Don't buy tonight. Two men have been reading my slate since first bell, and they aren't hungry."),
+      narr('She said it without moving her mouth much. Then, for the ring:'),
+      say('sable', 'Nothing fit for a clerk, Clerk. Come back when the crates are in.'),
+      { choice: [
+        pick('Walk on.', -1, [narr('I walked on. It was the only kindness I could do her, and it looked like the opposite of one.')]),
+        pick('"Go down tonight, Sable. Take the stair."', 1, [say('you', 'Go down tonight, Sable. Take the stair.'), say('sable', 'I know where the stair is.'), narr('I had warned her out loud, on the ring. She pulled the shutter the rest of the way and did not look at me again. I do not blame her for the look.')])] }],
+      [narr('The shutter is down. There is chalk on it. I do not stop to read it.')]));
+  const npcs = [porter, clerk, sable,
+    N('porter2', 150, 24, 'A PORTER WITH LINEN', () => n === 3 ? [narr('He does not say Clerk. He does not say anything. He has put the linen down so that both his hands are empty.')] : [say('porter2', 'Clerk.'), narr('That is the whole of what the service is allowed to say to me. One word, to the floor. I have been called worse by people who liked me.')])];
+  if (n === 2) npcs.push(N('wren', -8, -20, 'KESTREL DRAY', one('wren', [
+      say('wren', 'Sorrel. Come and put a hand on this. Tell me one is not imagining it.'),
+      narr('She was standing in the ring with her palm flat on the riser, in front of every door on it. Engineers do not touch pipes. They read the board and send for somebody.'),
+      narr('And she had turned her head to say it. She looks at people. Somebody must have told her not to. She cannot have seen the use of it.'),
+      { choice: [
+        { t: 'Take the glove off. Put your hand on the pipe.', fx: () => { F.wrenPipe = 1; }, then: [S(1), narr('It was running a breath short. Four beats and a catch. Four beats and a catch. Seren could have told you the valve by the catch. I could tell you the tier.'), say('you', 'East manifold. A seat is lifting.'), say('wren', '...Yes. That is what one thought. You did not look at the board.'), narr('She was not looking at the pipe any more. She was looking at my palm, and I put the glove back on it too slowly.')] },
+        { t: '"One reads the board, Engineer."', fx: () => { F.wrenPipe = 0; }, then: [front, S(-1), say('you', 'One reads the board, Engineer.'), say('wren', 'The board says it is well. The board has said so for a year. Noted, Sorrel.'), narr('She kept her hand where it was. Walking away from that pipe was harder than walking past the bell.')] }] }],
+      [say('wren', 'Four beats and a catch. One is not imagining it.')])));
+  // ---- things on the wall
+  const spots = [
+    { id: 'window', x: -200, y: -32, r: 8, reach: 26, ph: 96, name: 'A WINDOW', verb: 'LOOK', talk: () => n === 1 ? [narr('The sky. It goes up and does not stop. I counted four hundred lights in it before I understood that they were not lamps, and that nobody trims them.'), narr('I did not sleep the first month. I still stand with my back to these when I can.')] : n === 2 ? [narr('I can look at it now for the length of a count. One. Two. At eleven I look away. It is not the sky\'s fault.')] : [narr('I looked at it for the whole of a count. There is no ceiling. There was never going to be one. I have stopped waiting.')] },
+    { id: 'bellp', x: -120, y: -32, r: 8, reach: 26, ph: 104, name: 'THE BELL PLATE', verb: 'READ', talk: () => [narr('A gilt plate under the bell. ONE: A CLERK. TWO: A HOUSE. THREE: A MARSHAL. Below that the metal has been left bare. Nobody rings for the High Auditor.'), find('f_bellplate'), narr('Below we had one bell, and it meant get up. Nobody had to be told what to do with their knees.')] },
+    { id: 'aldane', x: 120, y: -32, r: 8, reach: 24, ph: 104, name: 'A DOOR: ALDANE, M.', verb: 'READ', talk: () => n < 3 ? [narr("ALDANE, M. SECOND CLERK. Her lamp is lit under the door. She is checking somebody's columns. I know whose."), narr('She has not found a wrong one yet. It is the only thing on this ring I am proud of, and it is done under a dead boy\'s name.')] : [narr('ALDANE, M. Her lamp is out. It has never been out.')] },
+    { id: 'line', x: 30, y: 24, r: 5, reach: 22, ph: 6, name: 'THE PAINTED LINE', verb: 'LOOK', talk: () => [narr('A hand wide, ochre, and repainted every rest day by the people who have to walk it. It runs from the service stair to every lamp and every door, and nowhere else.'), find('f_line'), narr('A porter who steps off it loses a day of air. Clerks are taught not to see it. I see nothing else.')] },
+    { id: 'mine', x: 200, y: -32, r: 8, reach: 26, ph: 104, name: 'A DOOR: SORREL, E.', verb: 'GO IN', exit: 1, talk: () => { F['ring' + n] = 1; const v = F.susp || 0;
+      if (n === 3) return [narr('SORREL, E. The door was not quite shut. I had shut it.'), narr('Nothing had been taken. On the desk lay my gloves, which I had left in the drawer. Side by side, with the palms up.'), { s: 'narr', t: 'She sent for me in the morning.' }];
+      return v >= 5 ? [narr('SORREL, E. CLERK OF THE COUNT. Somebody has pushed a slip under the door. One word, in a clerk\'s hand. NOTED.'), fx(() => { F.fury = (F.fury || 0) + 1; }), narr('I had been noticed. Up here that is the first of three things. I did not know yet what the other two were.')]
+        : v <= 1 ? [narr('SORREL, E. CLERK OF THE COUNT. A dead boy\'s name, in gilt.'), narr('Nobody looked at me the whole length of the ring. I have never worked so hard to be given nothing.')]
+        : [narr('SORREL, E. CLERK OF THE COUNT. A dead boy\'s name, in gilt.'), narr('I shut it behind me and stood with my back against it, and took my gloves off, and looked at my hands until they were mine again.')]; } }];
+  if (n !== 2) spots.push({ id: 'dray', x: -40, y: -32, r: 8, reach: 24, ph: 104, name: n === 1 ? 'A DOOR WITH A NEW SLATE' : 'A DOOR: DRAY, K.', verb: 'READ', talk: () => n === 1
+    ? [narr('DRAY, K. ENGINEER. EAST MANIFOLD. The slate is new. I do not know the name. There is a thumbprint of grease on the handle that the porters have polished round and not over.'), find('f_handpipe'), narr('The riser runs up the wall beside the door. The paint is worn off it at the height of a hand.')]
+    : [narr('DRAY, K. No lamp. She is on the Array board until the manifold is mended, and the manifold is not going to be mended.'), narr(F.wrenPipe ? 'The paint is worn off the riser beside her door at the height of a hand. There is a second worn place now, a little higher. That one is mine.' : 'The paint is worn off the riser beside her door at the height of a hand. I have never put mine there. I have wanted to every night for a year.')] });
+  // ---- the bell
+  const bell = n === 1 ? [fx(() => { Sound.play('bell'); ringT = 1; }), kneel(1),
+      narr('One bell. Somewhere along the ring a clerk has come out of his door.'),
+      narr('Both porters go down on the paint where they stand. One knee, head low, as if somebody had cut a string. The clerk walks between them without altering his step.'),
+      { choice: [
+        pick('Keep walking. Eyes front.', -1, [narr('I kept walking. My knees did not want to. They had a lifetime of bells in them and they wanted the floor. I got them past it.')]),
+        pick('Look at them.', 1, [narr('I looked. The older one had put his hand flat on the floor to get down, and I knew the knuckles. Every valve hand on Tier Six has them.'), narr('Somebody across the ring was looking at me looking.')]),
+        pick('Say it. "Get up."', 2, [say('you', 'Get up.'), narr('Neither of them moved. A clerk has no bell that means get up. I had given an order that does not exist, in a voice from six tiers down.'), narr('Ilse had warned me about that. She said it was how the last one was caught.')])] },
+      kneel(0), narr('The bell stopped. They got up and stepped back onto the line, and the ring went on as if nothing had knelt.')]
+    : n === 2 ? [fx(() => { Sound.play('bell'); ringT = 1; setTimeout(() => { if (Brawl.active) { Sound.play('bell'); ringT = 1; } }, 700); }), kneel(1),
+      narr('Two bells. A House is on the ring.'),
+      narr('The porters go down. So do the clerks, this time, from the neck. Every head on the ring drops the width of a hand. I am a clerk. Mine is supposed to drop with them.'),
+      { choice: [
+        pick('Bow from the neck, with the rest.', -1, [narr('I bowed. A boy in House colours went by at a stroll. I had put better than him on the grass in the valley. I looked at the floor until his boots were gone.')]),
+        pick('Stay upright.', 2, [narr('I did not bow. I had won their Assay, and for the length of two bells I thought it had bought me a neck.'), narr('It had not. The boy in House colours noticed. Then every clerk on the ring noticed him noticing.')])] },
+      kneel(0), narr('They got up. Nobody had looked at anybody. Everybody knew exactly who had done what.')]
+    : null;
+  return { era: 5, d2: 1, title: 'THE FOURTH RING', sub, bg: 'keep', bg2: 'ring4', arena: { kind: 'rect', w: 448, h: 60 }, music: 'spire', hero: { id: 'kael2', hp: 10, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'ring' + n, spawn: [-206, 6], keep: () => false, props, npcs, spots,
+      open: () => n === 1 ? [narr('Up here nobody looks at anybody. I had to learn that before I learned anything else.'), narr('The fourth ring, at night. Eleven doors, a lamp between each, and a line painted on the floor that I am not supposed to see.')]
+        : n === 2 ? [narr('The fourth ring. A year of it. I can walk it now without counting the doors.'), narr('That is the danger. The ones they catch are never caught in their first month.')]
+        : [narr('The fourth ring was colder that season. Nobody had said anything. That was how I knew.')],
+      obj: k => n === 3 ? 'GO HOME. GIVE THEM NOTHING ELSE.' : k.n >= 3 ? 'YOUR DOOR IS THE LAST ON THIS LENGTH. SORREL, E.' : 'THE FOURTH RING. WALK HOME LIKE A CLERK.',
+      meter: () => ({ label: 'NOTICED', v: F.susp || 0, max: MAX }),
+      tick(k, dt, B) { if (ringT > 0) ringT = Math.max(0, ringT - dt * .8);
+        if (n === 3) { const a = B.allies.find(q => q.id === 'porter1'); if (a && !a.kn && Math.hypot(B.p.x - a.x, B.p.y - a.y) < 64) a.kn = 1; return null; }
+        if (bell && !belled && k.n >= 3 && !Dialogue.active) { belled = 1; return bell; } return null; },
+      floor(g) { for (let y = 0; y < 512; y += 32) for (let x = (y / 32 % 2) * 16 - 16; x < 512; x += 32) { const q = ((x * 7 + y * 13) % 5), c0 = ['#d9d3c6', '#d2ccbe', '#e0dbd0', '#d6d0c2', '#dcd6ca'][q < 0 ? 0 : q]; g.fillStyle = '#b4ad9e'; g.fillRect(x, y, 32, 32); g.fillStyle = c0; g.fillRect(x, y, 31, 31); g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(x, y, 31, 2); }
+        g.fillStyle = '#c9963a'; g.fillRect(0, 256 + 21, 512, 5); g.fillStyle = '#e0b04c'; g.fillRect(0, 256 + 21, 512, 1); g.fillStyle = '#a87a2a'; g.fillRect(0, 256 + 25, 512, 1);
+        for (let i = 0; i < wall.length; i++) { const v = wall[i]; if (v !== 'lamp' && v !== 'door') continue; const x = ((256 + (i - W0) * 40) % 512 + 512) % 512; g.fillStyle = '#c9963a'; g.fillRect(x - 2, 256 - 34, 4, 56); g.fillStyle = '#e0b04c'; g.fillRect(x - 2, 256 - 34, 1, 56); }
+        g.fillStyle = 'rgba(20,26,58,.20)'; g.fillRect(0, 0, 512, 512); } } };
+}
+FF.ring = walkRing; FF.ring1 = () => walkRing(1); FF.ring2 = () => walkRing(2); FF.ring3 = () => walkRing(3);
 FF.campday = walkCampDay; FF.lastbell = walkLastBell;

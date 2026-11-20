@@ -126,8 +126,12 @@ Object.assign(MOUTH, { rook: 'flat' });
 // ------------------------------------------------------------------ the chapters
 const P2 = {
   1: () => [
-    { music: 'spire' }, { card: 'PART TWO', sub: 'A B O V E', big: 1, sfx: 'splash', min: 2.2, max: 6 },
-    ...(NOFF ? [] : [{ card: 'THE PINNING', sub: 'Four years after the furnace. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() }, { music: 'spire' }]),
+    /* cold open: a minute of the Stair, nine years on, before anybody has said why */
+    ...(NOFF ? [] : [{ issue: 'stair', cold: 1, or: [] }]),
+    { music: 'spire' }, { card: 'PART TWO', sub: 'A B O V E', big: 1, sfx: 'splash', tr: NOFF ? undefined : 'wake', min: 2.2, max: 6 },
+    ...(NOFF ? [] : [{ card: 'THE PINNING', sub: 'Four years after the furnace. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() },
+      /* the pin closes on his collar, and for ten seconds he is somewhere else: the book, and one line in it */
+      { card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Count. A book as wide as a table.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'book', secs: 10 }, { music: 'spire' }]),
     { card: 'THE SEAT KNIFE', sub: 'Four years after the furnace. The night before the lift.', big: 1, min: 1.5, max: 4.5 },
     { music: 'mystery' }, { panel: 'under' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'The night before I went up as Edric Sorrel, Brand took the blade the High Auditor had pinned on me with the sun, and put the last hand of it in a forge.' },
@@ -151,7 +155,9 @@ const P2 = {
     { narr: 'The service does not use the lifts. There is a stair up the outside of the Spire, nine hundred steps, with a line painted down the middle of it. A porter who steps off the line loses a day of air. I looked at that stair every morning for five years from a room with a window.' },
     { narr: 'They kneel when a bell rings. One bell for a clerk. Two for a House. I am told that for the High Auditor nobody rings anything. People simply know.' },
     { narr: 'The first time a porter knelt to me I nearly knelt back. Ilse had warned me about that. She said it was how the last one was caught.' },
-    { fade: 'out' }, { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { fade: 'out' }, { panel: null },
+    { card: 'THE FOURTH RING', sub: 'The Sun Spire. Four years and a season after the furnace. Night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkRing(1) }, { music: 'spire' },
+    { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { pstage: 3 },
     { say: 'wren', t: 'Clerk Sorrel? Engineer Dray. They have put me on the Array board. You will not remember, but we... no. Forgive me. You have a look of someone.' },
     { say: 'kael', t: 'One is told that often.' },
@@ -195,6 +201,7 @@ const P2 = {
   ],
   2: () => [
     { music: 'spire' }, { card: 'THE BALANCING', sub: 'Five years after the furnace.', big: 1, min: 1.6, max: 5 },
+    { card: 'THE FOURTH RING', sub: 'Five years after the furnace.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkRing(2) }, { music: 'spire' },
     { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'In my second year the order for Tier Four came across my desk. Eleven hundred lines, to be struck at once. Marshal Cade called it a balancing.' },
     { pstage: 1 }, { sfx: 'heart' }, { wait: 1 },
@@ -270,6 +277,7 @@ const P2 = {
   ],
   3: () => [
     { music: 'spire' }, { card: 'WHAT SHE KNOWS', sub: 'Six years after the furnace.', big: 1, min: 1.6, max: 5 },
+    { card: 'THE FOURTH RING', sub: 'Six years after the furnace.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkRing(3) }, { music: 'spire' },
     { panel: 'ante' }, { pstage: 5 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'She sent for me to look at a valve in her own room. The Array was failing faster. She did not trust her engineers with anything she could hear.' },
     { narr: 'In her anteroom a man was standing to be measured. A mask-maker was fitting gilt to the left half of his face. The right half was turned to the wall.' },
@@ -302,6 +310,11 @@ const P2 = {
     { say: 'kael', t: 'There was a note pinned to the Proctors\' glass, at the Assay. Her hand. "My son is to reach the last day. No further than he can walk."' },
     { sfx: 'heart' }, { say: 'lucan', t: '...She wrote that.' },
     { say: 'lucan', t: 'Of course she wrote that. I reached the last day. I have been proud of it for two years.' },
+    { say: 'lucan', t: 'She says there is a boy. Below, on your tier. You have a brother.' },
+    { fade: 'out' }, { panel: null },
+    { card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 },
+    { music: 'duel' }, { panel: 'ante' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
+    { say: 'kael', t: 'Leave him out of your mouth.' },
     { narr: 'He drew. His hand was steadier than it had been at the keep. I had done that. I was sorry for it, and I let him come.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.son() },

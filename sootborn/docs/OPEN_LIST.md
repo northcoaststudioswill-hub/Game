@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.71 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.72 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,13 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.72 (needs your eye, and three answers)
+- **The fourth ring**, three visits, with NOTICED (the suspicion meter), the bell, the head rule and four Codex finds. Say: is the meter too easy to empty; should a full meter cost more than a slip under the door; is one length of corridor enough.
+- **Part Two's cold open:** a minute of the Stair before the PART TWO card, ending on a figure at the white door. I wrote "I knew the way he stood" and did not say who. Say if you want it to say less, or more.
+- **The book** and **Tavi at sixteen:** ten seconds each, no words. I added one line for Lucan to set Tavi off ("She says there is a boy. Below, on your tier. You have a brother.") and one for Kael after ("Leave him out of your mouth."). Say if either should go.
+- **Things I made up for the ring, to keep or strike:** Maren Aldane lives on the fourth ring; the porter who stepped aside for you is moved to the kitchens and docked a day; your gloves laid out palms up on the last night; the clerks bow from the neck at two bells; the porters buy the line's paint themselves (Codex).
+- **Comic pages no longer say TAP**, only the arrow. Say if a phone player now misses that a page is waiting.
 
 ## Built in v0.71 (needs your eye)
 - **The Deep Array:** a sixth comic-book level in The Ledger. A wrench, a watch lamp to get past, the heart of the Array (31 of 48 banks lit), a brawl, a sixty-second run for the hatch. Tested by teleport only.
@@ -104,7 +111,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 16d. **Built in v0.69 (needs your eye).** Two more 2.5D parts with story in the first half: the Assay camp by day (its people: Dorian, Oswin, Petra); Bay 3 at last bell, counting the knives back.
 16e. **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
 16f. **The Assay's art in the opening:** the expression, the ring, ELEVEN. Its people and story should be felt, not only fought.
-16g. **Part Two needs more play (owner, 2026-11-19):** the fourth ring as a home base between chapters, with the suspicion meter; a Part Two cold open (a minute of the Stair at +9); two flash-forwards (the book with his name in red; Tavi at sixteen); the service stair; the Count as a puzzle. Master timeline 10f, 11c, 11d, 12b, 14c, 16a.
+16g. **Partly built (v0.72: the fourth ring with the meter, the cold open, both flash-forwards; still to come: the service stair, the Count as a puzzle).** **Part Two needs more play (owner, 2026-11-19):** the fourth ring as a home base between chapters, with the suspicion meter; a Part Two cold open (a minute of the Stair at +9); two flash-forwards (the book with his name in red; Tavi at sixteen); the service stair; the Count as a puzzle. Master timeline 10f, 11c, 11d, 12b, 14c, 16a.
 17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)
 
 ## Fighting and controls

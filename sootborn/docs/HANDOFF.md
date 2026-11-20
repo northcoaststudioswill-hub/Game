@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version:** `GAME_VER` in `src/ui.js` (0.71; next is 0.72). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
+- **Version:** `GAME_VER` in `src/ui.js` (0.72; next is 0.73). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.66 on; v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -108,10 +108,14 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - Kept out on purpose: Seren finding the bleed first (15c).
 - Test: `array.mjs`.
 
-**Step 7 · v0.72 · Part Two's spine**
+**Step 7 · v0.72 · Part Two's spine** — **DONE 2026-11-20**
 - The fourth ring as home base (12a), with the suspicion meter, visited in the Post, the Balancing and What She Knows, with its own date card each time; Kestrel, Sable, porters; finds into the Codex. The head rule here first (soot look at whoever speaks; the Accredited don't). Porters kneel at the bell.
 - Part Two's cold open (10), the book (11a), Tavi at sixteen (14a).
 - Check: the bot passes through the ring each chapter; the meter climbs and falls.
+- Done: `walkRing(n)` in `src/assay.js` (n = 1, 2, 3; `FF.ring1`…`FF.ring3`), a walk place on `bg: 'keep'` with `bg2: 'ring4'` (wall bays are `rwall` props: plain, door, win, lamp, pipe, bell; `stall`). The meter is `G.flags.susp`, 0 to 6, drawn by `walk.meter`; `walk.tick(k, dt, B)` rings the bell after three talks and may return steps to say; people with `acc: 1` do not turn their heads; `a.kn = 1` kneels a figure. Cards and calls are in `P2[1]`, `P2[2]`, `P2[3]` in `src/part2.js`. Finds `f_line`, `f_bellplate`, `f_greens`, `f_handpipe` in `src/rowk.js`.
+- Done: the cold open is `{ issue: 'stair', cold: 1, or: [] }` before the PART TWO card (`Issue.start(key, done, cold)`; in the level `SC.cold`: no opening pages, one wave, `coldEnd()` at the top of the first flight; its save key ends `-cold`; the flag is `issue_staircold`). The stills are `PLATES` in `src/prelude.js`, played by `Prelude.plate(name, secs, done)` or a `{ plate: 'book' | 'tavi', secs }` step. The years strip is `tr: 'years'` on a card titled "<N> YEARS AFTER THE FURNACE".
+- Not built, on purpose: the flash that the porter stepping aside is meant to set off (12b, the white cloak at the camp) and the service stair (12c) are Step 8. The porter and his line are in place for it.
+- Tests: `ring.mjs` (N, PICK, S0), `plate.mjs`, `coldopen.mjs`.
 
 **Step 8 · v0.73 · Part Two's flashbacks and new places**
 - The camp at night (12b). The service stair, 2.5D (12c). Celestine's own Assay, 2D, stealth then the valve (14b); gloves on her model everywhere. The barge deck as home in Two Years (15b). Seren finds the bleed (15c).
