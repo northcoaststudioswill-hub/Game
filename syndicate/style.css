@@ -914,3 +914,8 @@ button.saveslot.egslot { width: 100%; text-align: left; display: flex; align-ite
 .wp-b { display: grid; grid-template-columns: 3.6rem 1fr; align-items: center; gap: 0.5rem; margin: 0.18rem 0; } .wp-b small { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: #c8bea8; }
 .wp-b i { display: block; height: 0.42rem; border-radius: 0.2rem; background: linear-gradient(90deg, var(--c) var(--v), rgba(255, 255, 255, 0.08) var(--v)); }
 .wp-t { margin: 0.45rem 0 0; font-size: 0.78rem; line-height: 1.3; color: #d8cfba; } .wp-t b { color: var(--gold); }
+
+/* Kael's finisher cut-in, as Sootborn puts it on screen */
+#eggcine.kcut { place-items: end center; background: linear-gradient(transparent 55%, rgba(8, 6, 10, 0.75)); animation: kcIn 1.5s ease-out forwards; } @keyframes kcIn { 0% { opacity: 0; } 12%, 80% { opacity: 1; } 100% { opacity: 0; } }
+.kc { margin-bottom: 14vh; text-align: center; font-family: sans-serif; } .kc b { display: block; font: 900 min(10vw, 11vh)/1 sans-serif; letter-spacing: 0.12em; color: var(--kc); text-shadow: 0 0 2rem var(--kc), 0.2rem 0.2rem 0 #141018; animation: kcB 0.3s ease-out; } @keyframes kcB { from { transform: scale(1.4); letter-spacing: 0.4em; } }
+.kc span { display: block; margin-top: 0.4rem; font: 700 min(3.6vw, 4vh)/1.2 sans-serif; letter-spacing: 0.24em; color: #f0ece0; opacity: 0; animation: kcL 0.01s linear forwards 0.35s; } .kc span + span { animation-delay: 0.75s; color: var(--kc); } @keyframes kcL { to { opacity: 1; } }
