@@ -34,6 +34,12 @@
     Object.assign(SPECS.hero, { armor: false, pauldron: false, coat: true, cape: false });
     Object.assign(SPECS.hero.pal, { top: 0xe6dcc4, wrap: 0xe6dcc4, glove: 0x6a5a44 });
   }
+  // how each boss stands when he is not moving. Rook: upright, the gaff grounded like a staff, one hand behind his back.
+  // The Warden-captain at the riser: low and square, the halberd across him. The Blade: both points down, the weight off the bad leg
+  SC.bossIdle = (e, o) => { if (e.kind !== 'boss') return o; const t = e.t || 0, br = Math.sin(t * 1.4) * 0.02;
+    if (SC.issue === 'stair') return Object.assign({}, o, { hips: [0, -0.2, 0.05], spine: [0.1 + br, -0.22, 0], chest: [0.06, -0.1, 0], head: [0.1, 0.3, 0], shR: [0.25, 0, -0.5], elR: [-0.45 - br, 0, 0], shL: [0.25, 0, 0.5], elL: [-0.45 + br, 0, 0], thL: [0.04, 0, 0.3], shnL: [0.02, 0, 0], ftL: [0.1, 0, 0], thR: [-0.32, 0, -0.08], shnR: [0.6, 0, 0], y: -0.06 + br * 0.3 });
+    if (SC.issue === 'riser') return Object.assign({}, o, { hips: [0, -0.15, 0], spine: [0.22 + br * 1.5, 0.1, 0], chest: [0.1, 0.1, br], head: [0.08, 0.05, 0], shR: [-1.0, 0, -0.2], elR: [-1.15 - br, 0, 0], shL: [-1.0, 0, 0.5], elL: [-1.2 + br, 0, 0], thL: [-0.28, 0, 0.24], shnL: [0.4, 0, 0], thR: [0.2, 0, -0.24], shnR: [0.34, 0, 0], y: -0.07 + br * 0.5 });
+    return Object.assign({}, o, { hips: [0, -0.1, 0], spine: [-0.05 + br * 0.5, 0, 0], chest: [-0.06, 0, 0], neck: [0, 0, 0], head: [0.06, Math.sin(t * 0.45) * 0.28, 0], shR: [-0.2, 0, -0.36], elR: [-0.4, 0, 0], shL: [0.4, 0, 0.08], elL: [-1.55, 0, 0], thL: [0, 0, 0.07], shnL: [0.03, 0, 0], thR: [0, 0, -0.07], shnR: [0.03, 0, 0], ftR: [0, 0, 0], y: 0 }); };
   // Oswin Hale's leg was broken on night forty-nine and set badly. Nine years on he is the Auditor's Blade, and it still does not bend
   SC.limp = (e, o) => { if (e.kind !== 'boss' || SC.issue !== 'stair') return o; const a = Math.sin(e.runPh || 0); return Object.assign(o, { thL: [-0.32 * a - 0.04, 0, 0.14], shnL: [0.05, 0, 0], ftL: [0.1, 0, 0], hips: [0, o.hips ? o.hips[1] : 0, 0.08 * a], y: (o.y || 0) + 0.035 * Math.abs(a) }); };
   if (SC.issue === 'stair') {   // the Auditor's Blade, and Tavi at sixteen

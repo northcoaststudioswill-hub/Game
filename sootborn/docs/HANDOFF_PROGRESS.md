@@ -1,5 +1,5 @@
-# SOOTBORN — handoff progress, steps 7 to 11 (v0.72 to v0.76)
-The project's "sootborn handoff" and "sootborn master timeline" docs still hold their v0.71 text (steps 1 to 6 marked done). Steps 7, 8 and 9 are done, Step 10 mostly, Step 11 started; their build notes are below, copied from the current handoff, which is `docs/HANDOFF.md` in the repo. **Next: the rest of Step 11 (bosses, Kael's stance, capes, crowds; the animation library when the owner attaches it), version 0.77.** `GAME_VER` in `src/ui.js` is 0.76.
+# SOOTBORN — handoff progress, steps 7 to 11 (v0.72 to v0.77)
+The project's "sootborn handoff" and "sootborn master timeline" docs still hold their v0.71 text (steps 1 to 6 marked done). Steps 7, 8 and 9 are done, Step 10 mostly, Step 11 as far as it goes without the animation library; build notes below, copied from the current handoff, `docs/HANDOFF.md` in the repo. **Next: Step 12 (places), version 0.78; the library goes in whenever the owner attaches it.** `GAME_VER` in `src/ui.js` is 0.77.
 
 Project docs: the changelog is `claude/sootborn-changelog.md` (v0.71 on), with v0.66 to v0.70 in `-changelog-archive-3.md`. Story additions since v0.71 are in `claude/sootborn-story-bible-additions.md`. Open questions for the owner are at the top of the open list.
 
@@ -34,7 +34,7 @@ Project docs: the changelog is `claude/sootborn-changelog.md` (v0.71 on), with v
 - Unexplored scenes worth one each: Hollis and Brand, one line each; a valve job done with Kestrel; Ivo's errand below; Kestrel and the week he blamed her (a memory picture).
 
 **Step 11 · characters and animation** — **STARTED in v0.76, 2026-11-20**
-- Done: `daisSprite('cel' | 'wl' | 'wr')` in `src/g3.js`, placed as tagged flat figures (`tag: 'dais'`) beside the Proctors' list; the Spire Guard helm parts in the `L.helm` branch. Left: bosses, Kael's stance, capes in motion, crowds, and the library (the owner has the link).
+- Done: `daisSprite('cel' | 'wl' | 'wr')` in `src/g3.js`, placed as tagged flat figures (`tag: 'dais'`) beside the Proctors' list; the Spire Guard helm parts in the `L.helm` branch. v0.77: `SC.bossIdle` in `issue/rig.js` (one rep in `issue/patch.mjs`; unseen, could not be held still by script); the Gallery's onlookers are `daisSprite('o' + i)` when `real === 'hall'`. Left: Kael's stance, capes in motion, and the library (the owner has the link).
 - Real animation once the owner attaches the free Quaternius "Universal Animation Library [Standard]" zip (CC0): run, jog, deaths, sword combos on Kael and the guards. If it never comes, keep hand-making moves.
 - Guards: faces and helms; the same rigs in cutscenes. Rook and the other bosses: faces, weapons, their own idle. Kael's own ready stance in held shots. Capes: the owner's rule, it kicks up with momentum then falls, never floats; check in motion. Celestine and her Wardens on the Keep's dais as flat detailed figures, like the Proctors; the crowd in other 3D rooms.
 

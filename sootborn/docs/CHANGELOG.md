@@ -1,4 +1,16 @@
-# SOOTBORN — changelog (latest v0.76 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.77 · 2026-11-20)
+
+## v0.77 · 2026-11-20 — the Gallery's onlookers; how each boss stands (Step 11, second part)
+- **The Gallery has people watching.** The figures between its columns were the Assay's Proctors, borrowed from the pairing room. They are now clerks and ladies of the fourth ring, in four different coats and heads, standing with their hands folded.
+- **Each of the three bosses in the comic-book levels stands his own way when he is not moving.** Rook: upright, the gaff grounded like a staff, one hand behind his back, looking slowly along the dock. The Warden-captain at Riser Nine: low and square with the halberd across him, breathing. The Auditor's Blade: both points down and the weight off the bad leg.
+- **Looked at and left:** the three bosses already had faces, hats and weapons of their own (Rook's cap and gaff; the captain's barred helm and halberd; the Blade's half mask and two blades).
+
+**Checked:** a still of the Gallery; the whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. **The bosses' new stances were not seen at all.** I could not hold a boss still in front of the camera by script (they are either walking, striking or recovering), so the three poses are written from the engine's numbers and unseen. Look at them first; say if any limb is wrong and I will fix or remove it. Not started: Kael's ready stance in held shots; capes in motion.
+
 
 ## v0.76 · 2026-11-20 — the Keep's dais and the Spire Guards (Step 11, first part)
 What could be done on characters without the animation library.

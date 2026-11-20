@@ -633,6 +633,9 @@ rep("go.innerHTML = 'TAP &#9654;';", "go.innerHTML = '&#9654;';");
 // ---- v0.75: the Auditor's Blade walks on a leg that does not bend (SC.limp, in rig.js)
 rep("pose = e.kind === 'boss' || e.kind === 'knifer' ? P.run(e.runPh, sp / K.speed) : P.jog(", "pose = e.kind === 'boss' || e.kind === 'knifer' ? SC.limp(e, P.run(e.runPh, sp / K.speed)) : P.jog(");
 
+// ---- v0.77: each boss has his own way of standing (SC.bossIdle, in rig.js)
+rep("} else { pose = P.guard(e.t); if (e.sk === undefined)", "} else { pose = P.guard(e.t); if (e.kind === 'boss' && SC.bossIdle) pose = SC.bossIdle(e, pose); if (e.sk === undefined)");
+
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));
