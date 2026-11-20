@@ -918,7 +918,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],freed:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cu:[],char:'',squad:['npc'],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],freed:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cu:[],char:'',squad:['npc'],looks:[],look:'',drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -3603,6 +3603,61 @@ CX.push(['w_elect','WORLD','Election Night','Every night. King Bibi calls an ele
   ['w_mtn','WORLD','Mount Skill Issue','Forty-six ledges up a mountain in the east. Some crumble, some slide, some are a plank. No checkpoints, no boosting, no hook, wind near the top. Fall more than a few metres and you start again from the bottom.',()=>X.vis.includes('mtn')]);
 ACH.push(['coal','Coalition Builder','seated all six of King Bibi\'s chairs',()=>(X.coal||0)>0],['mtn','No Skill Issue','reached the top of Mount Skill Issue',()=>!!X.mtn],['mtn10','Skill Issue (Persistent)','attempted Mount Skill Issue 10 times',()=>(X.mtA||0)>=10]);
 
+/* ================= ACT 25: NPC's unlocks. A wardrobe of looks earned around the world, and words, because he never had any. Clink. ================= */
+const achDone=name=>{const a=ACH.find(q=>q[1]===name);return !!a&&X.ach.includes(a[0]);};
+const NPCLOOK=[
+  {id:'',e:'🧍',n:'guy_but_more.png',d:'The original render. Between nine and fourteen fingers.',req:'always yours',u:()=>true},
+  {id:'chrome',e:'🦾',n:'CLANKER NPC',d:'Chrome all over. Every step goes clink.',req:'Get 3 implants at Chrome Alley',u:()=>X.imp.length>=3},
+  {id:'sprout',e:'🌱',n:'SPROUT NPC',d:'Survived the nuke. Has a leaf now.',req:'Fetch all 4 golden seeds in the Sprout Patch',u:()=>X.gseed.length>=4},
+  {id:'gold67',e:'6️⃣',n:'SIXTY-SEVEN NPC',d:'Solid gold. Sixty-seven of something orbits him.',req:'Collect 33 of the 67s',u:()=>X.t67.length>=33},
+  {id:'glitch',e:'👾',n:'CORRUPTED NPC',d:'Rebuilt from a new seed every second.',req:'Reach the Corrupted Core',u:()=>!!X.c.core},
+  {id:'hd',e:'🖼️',n:'NPC (4K REMASTER)',d:'The prompt is finally complete. He renders properly. Nobody recognises him.',req:'Read all 12 prompt fragments',u:()=>X.frag.length>=12},
+  {id:'meme',e:'🌈',n:'MEME NPC',d:'Rendered at one million x.',req:'Touch the First Post on Meme Mountain',u:()=>!!X.mm},
+  {id:'wired',e:'🥽',n:'WIRED NPC',d:'Kept a headset from the facility. Still loading a video.',req:'Free all 16 runners under the Peak',u:()=>X.freed.reduce((a,b)=>a+b,0)>=16},
+  {id:'loosh',e:'💜',n:'LOOSH NPC',d:'Glows with other people\'s 3am feelings.',req:'Drain the loosh tank at the Scroll Farm',u:()=>X.loosh.reduce((a,b)=>a+b,0)>=4},
+  {id:'based',e:'🐸',n:'BASED NPC',d:'Ribbert approved. Pond-coloured.',req:'Pass Ribbert\'s BASED CHECK',u:()=>achDone('Pond Approved')},
+  {id:'summit',e:'🏔️',n:'SUMMIT NPC',d:'Frostbitten. Did it without checkpoints. Will tell you about it.',req:'Reach the top of Mount Skill Issue',u:()=>!!X.mtn},
+  {id:'debtor',e:'🪙',n:'DEBT-FREE NPC',d:'Paid David back. Wears the receipt as gold chains.',req:'Repay one of David\'s loans',u:()=>!!X.paid}];
+const NPCWORDS=['ok','hmm','clink','67','bro','...wait. I can talk?','aura','skibidi?','no cap','the grass was a meme','I am the main character now','first'];
+const NL2={acc:{},mats:{},t:20,step:0};
+function npcWords(){return NPCWORDS.slice(0,Math.min(NPCWORDS.length,Math.floor(X.ach.length/5)));}
+(function(){const mk=c=>{const m=new THREE.MeshPhongMaterial({color:c,shininess:120,specular:0xffffff,flatShading:true});return m;};
+  NL2.mats.chrome=mk(0xc8ccd4);NL2.mats.gold67=new THREE.MeshPhongMaterial({color:0xffd400,shininess:140,specular:0xfff2a0,emissive:0x3a2a00,flatShading:true});NL2.mats.hd=new THREE.MeshLambertMaterial({vertexColors:true});
+  NL2.mats.meme=rainbowMat;NL2.mats.sprout=new THREE.MeshLambertMaterial({color:0x7acc58});NL2.mats.loosh=new THREE.MeshPhongMaterial({color:0xb04aff,emissive:0x4a0a7a,shininess:80});NL2.mats.based=new THREE.MeshLambertMaterial({color:0x3fae4a});
+  NL2.mats.summit=new THREE.MeshLambertMaterial({color:0xcfe8ff});NL2.mats.debtor=mk(0x2a2a34);NL2.mats.wired=mk(0x6a6a74);
+  const g=(id,list)=>{const grp=new THREE.Group();list.forEach(o=>grp.add(o));grp.visible=false;pGroup.add(grp);NL2.acc[id]=grp;};
+  const S=(e,s,x,y,z)=>{const p=emojiSprite(e,s);p.position.set(x,y,z);return p;};
+  g('chrome',[S('⚙️',.8,.9,2.6,0),S('🔩',.6,-.9,1.6,0)]);g('sprout',[(()=>{const m=new THREE.Mesh(merge([pt(Box(.08,.6,.08),0x2c9a30,M(0,3.9,0)),pt(Box(.7,.05,.35),0x5ac83a,M(.32,4.2,0,0,0,.5)),pt(Box(.7,.05,.35),0x5ac83a,M(-.32,4.2,0,0,0,-.5))]),lam);return m;})()]);
+  g('gold67',[0,1,2,3,4,5].map(k=>S(k%2?'7️⃣':'6️⃣',.7,0,2,0)));g('glitch',[S('👾',.9,0,4.2,0)]);g('hd',[S('✨',.8,.8,3.4,.4)]);g('meme',[S('🗿',.9,1,3.6,0),S('💀',.7,-1,3.2,0)]);
+  g('wired',[(()=>new THREE.Mesh(merge([pt(Box(1.3,.45,.4),0x101014,M(0,2.95,.6)),pt(Box(1,.25,.05),0x19e3ff,M(0,2.95,.82))]),lam))()]);g('loosh',[S('💜',.7,.8,3.2,0),S('💭',.8,-.8,3.6,0)]);g('based',[S('🐸',1,0,4.3,0)]);
+  g('summit',[(()=>new THREE.Mesh(merge([pt(Cyl(.72,.78,.5,14),0xd83030,M(0,3.55,0)),pt(Sph(.22,8,6),0xffffff,M(0,3.95,0))]),lam))(),S('❄️',.6,.9,2.4,0)]);
+  g('debtor',[(()=>new THREE.Mesh(merge([pt(Tor(.62,.07,6,20),0xffd400,M(0,2.25,.1,1.3,0,0)),pt(Tor(.5,.06,6,18),0xffd400,M(0,2.05,.2,1.2,0,0))]),lam))(),S('🧾',.7,.9,1.8,.3)]);})();
+function npcLook(){const id=X.look||'';const L=NPCLOOK.find(q=>q.id===id)||NPCLOOK[0];if(!L.u())return NPCLOOK[0];return L;}
+function wearLook(id){const L=NPCLOOK.find(q=>q.id===id);if(!L||!L.u())return;X.look=id;save();applyLook();zoneCard('NPC IS WEARING: '+L.n,L.d);SFX.relic();burst(PL.x,PL.y+2,PL.z,30,null,8,6,.6);if(MENU.open)menuRender();}
+function applyLook(){const L=npcLook();PL.body.material=L.id&&NL2.mats[L.id]?NL2.mats[L.id]:heroMat;for(const k in NL2.acc)NL2.acc[k].visible=(k===L.id)&&!PCH.m;}
+{const hc=heroCaption;heroCaption=function(){hc();if(PCH.id)return;const L=npcLook();if(!L.id)return;const t=textTex('NPC · '+L.n+' · seed '+HERO.seed,{size:30,color:'#b6ff00',stroke:'#12021f',pad:8});if(HERO.cap.material.map)HERO.cap.material.map.dispose();HERO.cap.material.map=t;HERO.cap.material.needsUpdate=true;HERO.cap.scale.set(.6*t.userData.aspect,.6,1);};}
+function lookUpdate(dt,play){const L=npcLook(),t=S.t;applyLook();
+  if(L.id==='gold67'){NL2.acc.gold67.children.forEach((s,k)=>{const a=t*1.6+k/6*TAU;s.position.set(Math.cos(a)*1.5,2+Math.sin(t*2+k)*.4,Math.sin(a)*1.5);});}
+  if(L.id==='glitch'){heroU.hue.value=(t*7)%6;HERO.muts.forEach(m=>{if(Math.random()<.08)m.visible=!m.visible;});}
+  if(L.id==='hd'){heroU.wob.value=0;}
+  if(L.id==='chrome'&&play&&PL.grounded&&!PCH.m){const mv=Math.hypot(PL.vx||0,PL.vz||0)>2;NL2.step-=dt;if(mv&&NL2.step<=0){NL2.step=.28;tone(2400+Math.random()*600,.04,'square',.03);if(Math.random()<.08)floatText('clink',PL.x,PL.y+3,PL.z,'#c8ccd4');}}
+  // NPC's words: he learns one for every five checklist goals, and now and then he uses one
+  if(!play||PCH.m)return;const W=npcWords();if(W.length!==NL2.wl){if(NL2.wl!==undefined&&W.length>NL2.wl){chapter('NPC LEARNED A WORD','"'+W[W.length-1]+'" · '+W.length+'/'+NPCWORDS.length+' words');}NL2.wl=W.length;}
+  NL2.t-=dt;if(NL2.t<=0){NL2.t=22+Math.random()*20;if(W.length)bubble(pick(W),PL.x,PL.y+4.6,PL.z);}
+  NL2.ck=(NL2.ck||0)-dt;if(NL2.ck<=0){NL2.ck=2.5;for(const q of NPCLOOK)if(q.id&&q.u()&&!X.looks.includes(q.id)){X.looks.push(q.id);save();chapter('NEW NPC LOOK',q.e+' '+q.n+' · pause menu → CAST → NPC\'S WARDROBE');break;}}}
+{const ps=poseStart;poseStart=function(){ps.apply(this,arguments);const W=npcWords();if(W.length&&!PCH.m)setTimeout(()=>bubble(pick(W),PL.x,PL.y+4.6,PL.z),400);};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);lookUpdate(dt,play);};}
+{const sr=squadRender;squadRender=function(){sr();const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])),cur=npcLook().id,W=npcWords();
+  let h='<h4>NPC\'S WARDROBE · '+NPCLOOK.filter(q=>q.u()).length+'/'+NPCLOOK.length+' looks · earned around the world</h4><div class="cast">';
+  NPCLOOK.forEach(q=>{const u=q.u();h+='<div class="ent'+(u?'':' lock')+'"><span>'+(u?q.e:'🔒')+'</span><b>'+esc(u?q.n:'???')+'</b>'+esc(u?q.d:q.req)+(u?'<br><button class="wl" data-l="'+q.id+'">'+(cur===q.id?'✔ WEARING':'WEAR')+'</button>':'')+'</div>';});
+  h+='</div><h4>NPC\'S WORDS · '+W.length+'/'+NPCWORDS.length+' · one for every 5 checklist goals</h4><div class="grid">'+NPCWORDS.map((w,i)=>i<W.length?'<span class="chip">"'+esc(w)+'"</span>':'<span class="chip no">…</span>').join('')+'</div>';
+  const first=B.querySelector('.cast');const holder=document.createElement('div');holder.innerHTML=h;first.after(...holder.childNodes);
+  B.querySelectorAll('button.wl').forEach(btn=>btn.addEventListener('click',()=>wearLook(btn.dataset.l)));};}
+(function(){const st=document.createElement('style');st.textContent='#mbody button.wl{margin-top:6px;font-family:var(--display);font-size:15px;letter-spacing:.04em;padding:4px 12px;border:3px solid var(--ink);border-radius:999px;background:var(--gold);color:var(--ink);cursor:pointer}';document.head.appendChild(st);})();
+{const ar=act7Rows;act7Rows=function(){return ar().concat([['looks','🧍 NPC looks '+NPCLOOK.filter(q=>q.u()).length+'/'+NPCLOOK.length+' · words '+npcWords().length+'/'+NPCWORDS.length,NPCLOOK.every(q=>q.u())]]);};}
+CX.push(['w_looks','WORLD','NPC\'s Wardrobe','NPC is part of the collection too. Finish things around the world and he earns a look for each: chrome from the Alley, a leaf from the nuked patch, gold from the 67s, a headset from the facility, a beanie from the mountain. He also learns one word for every five checklist goals. He started with none.',()=>X.looks.length>0||npcWords().length>0]);
+ACH.push(['looks6','Fashion NPC','unlocked 6 NPC looks',()=>NPCLOOK.filter(q=>q.u()).length>=6],['words','He Speaks','NPC learned all 12 words',()=>npcWords().length>=NPCWORDS.length]);
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -3629,7 +3684,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
