@@ -44,7 +44,7 @@ Done: caster weapon finishers (fire bolt, eldritch blast, frost, spark, acid, ca
 
 
 - Rework the older finishers to use the new joints: finishers can now bend any joint (wrists included), and the six new ones use it; the older ones have not been gone back over.
-- Deeper class mechanics and upgrade trees: each class now has an edge meter (Momentum, Openings, Overcharge, Devotion, Wild Bond, Debt) with five pips on the bout HUD and a note on the Character page. Upgrade trees for the edge (bigger payouts, faster filling) are not built.
+- Deeper class mechanics and upgrade trees: each class now has an edge meter (Momentum, Openings, Overcharge, Devotion, Wild Bond, Debt) with five pips on the bout HUD and a note on the Character page. Two upgrades for it on the Character page: Ready (level 3, 150 coin: start every bout with two pips) and Deep (level 6, 400 coin: every payout half again as big). Opponents of level 7 and up start with two pips.
 - Watch every stance in motion through a full bout (checked as still pictures only).
 
 ## Story and menus

@@ -906,3 +906,5 @@ button.saveslot.egslot { width: 100%; text-align: left; display: flex; align-ite
 #hud .edge i { width: 9px; height: 9px; transform: rotate(45deg); border: 1px solid var(--ec); background: rgba(0, 0, 0, 0.45); } #hud .edge i.on { background: var(--ec); box-shadow: 0 0 5px var(--ec); }
 #hud .edge.full i { animation: edgeP 0.6s ease-in-out infinite alternate; } @keyframes edgeP { to { box-shadow: 0 0 10px var(--ec); } } #hudE .edge { flex-direction: row-reverse; } #hudE .edge b { margin: 0 0 0 4px; }
 .edge-note h3 { margin-top: 0.8rem; }
+
+.edge-tier { display: grid; grid-template-columns: 1fr auto; gap: 0.1rem 0.6rem; align-items: center; padding: 0.45rem 0.6rem; margin: 0.35rem 0; border: 1px solid rgba(240, 201, 90, 0.25); border-radius: 0.3rem; background: rgba(0, 0, 0, 0.22); } .edge-tier b { font-size: 0.86rem; } .edge-tier small { grid-column: 1; font-size: 0.72rem; color: #c8bea8; text-transform: none; letter-spacing: 0; } .edge-tier em, .edge-tier button { grid-column: 2; grid-row: 1 / span 2; font-style: normal; font-size: 0.72rem; color: #9a8f7a; } .edge-tier.got { border-color: var(--gold); } .edge-tier.got em { color: var(--gold); }

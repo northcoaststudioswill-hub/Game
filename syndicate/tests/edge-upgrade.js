@@ -1,0 +1,9 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  for (const [nm, vp] of [['pc', { width: 1280, height: 720 }], ['ph', { width: 390, height: 844 }]]) { const p = await b.newPage({ viewport: vp }); p.on('pageerror', e => errs.push(e.message));
+    await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(500);
+    await p.click('#bNew'); await p.click('.c-skip'); await p.click('[data-cls=fighter]'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+    await p.evaluate(() => { const st = G.state; Object.assign(st, { kitPicked: 1, toured: 1, tourAsked: 1, firstPath: 9, shownPlaces: { a: 1 }, coin: 600 }); st.hero.level = 4; G.ui.hub(); G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); G.ui.sheet(); document.querySelector('[data-go=char]').click(); });
+    await p.evaluate(() => { const n = document.querySelector('.edge-note'); n && n.scrollIntoView(); }); await p.screenshot({ path: 'edge_sheet_' + nm + '.png' });
+    const r = await p.evaluate(() => { const bt = document.querySelector('[data-edge="1"]'); if (!bt) return 'no buy button'; bt.click(); const h = G.state.hero; G.ui.close(); G.muted = true; G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } return 'edgeLv ' + h.edgeLv + ' coin ' + G.state.coin + ' bout starts with ' + G.fight.P.edge + ' pips'; }); console.log(nm, r); await p.close(); }
+  console.log('ERRORS', errs.length, errs.slice(0, 3).join(' | ')); await b.close(); })();
