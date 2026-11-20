@@ -100,7 +100,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #app.touchy #bSlow{right:calc(var(--gr) + 12px);bottom:calc(var(--gb) + 106px)}
 #bSlow.cd{filter:grayscale(1);opacity:.6}
 #app.slow #c{filter:saturate(.3) contrast(1.15) sepia(.45)}
-@media (max-width:640px){#elev{display:none}#data{position:absolute;left:0;top:36px;white-space:nowrap}#fuel{position:absolute;left:0;top:66px;white-space:nowrap}}
+@media (max-width:640px){#elev{display:none}#data{position:absolute;left:0;top:36px;white-space:nowrap}#rate{position:absolute;left:72px;top:36px;white-space:nowrap}#fuel{position:absolute;left:0;top:66px;white-space:nowrap}}
 #chap{position:absolute;inset:0;display:grid;place-content:center;gap:6px;text-align:center;pointer-events:none;opacity:0;background:rgba(18,2,31,.6);font-family:var(--display);padding:0 16px;z-index:6}
 #chap small{font-size:clamp(16px,4vw,28px);letter-spacing:.3em;color:var(--lime)}
 #chap b{font-weight:400;font-size:clamp(34px,9vw,96px);line-height:.95;color:var(--paper);-webkit-text-stroke:2px var(--ink);text-shadow:5px 5px 0 var(--hot),10px 10px 0 var(--grape)}
@@ -178,7 +178,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
   <div id="touch"></div>
 
   <div id="hud" hidden>
-    <div id="stats"><span class="chip" id="cells">🧠🧠🧠🧠🧠</span><span class="chip" id="aura">0 AURA</span><span class="chip" id="elev" hidden>⚡0/11</span><span class="chip" id="fuel" hidden>💩</span><span class="chip" id="data" hidden>💾 0</span></div>
+    <div id="stats"><span class="chip" id="cells">🧠🧠🧠🧠🧠</span><span class="chip" id="aura">0 AURA</span><span class="chip" id="elev" hidden>⚡0/11</span><span class="chip" id="fuel" hidden>💩</span><span class="chip" id="data" hidden>💾 0</span><span class="chip" id="rate">★ 3.0</span></div>
     <div id="compass"><span id="arrow">▲</span><span id="ctext"></span></div>
     <div id="right"><span class="chip" id="relics"><span title="The Based Stone">🗿</span><span title="The Em Dash of Destiny">➖</span><span title="The Seventh Finger">☝️</span><span class="sh" id="shardn" title="Sun shards">☀️0</span></span><button id="bLog" aria-label="Slop Pass, missions and checklist">📋</button><button id="mute" aria-label="Sound on or off">🔊</button></div>
     <div id="quests"></div>
@@ -268,7 +268,8 @@ const AREAS=[
   {id:'fac',x:96,z:138,r:24,base:3,name:'THE SLOP FACTORY',sub:'data in · slop out',hue:.04,lit:.6,col:[.06,.35,.42]},
   {id:'chrome',x:-96,z:140,r:18,base:2,name:'CHROME ALLEY',sub:'unlicensed upgrades · no refunds',hue:.55,lit:.28,col:[.62,.3,.18]},
   {id:'aura',x:60,z:-118,r:16,base:5,name:'THE AURA FARM',sub:'pose responsibly',hue:.13,lit:.7,col:[.13,.7,.55]},
-  {id:'fringe',x:-36,z:-92,r:14,base:3,name:'THE FRINGE',sub:'where the algorithm does not look',hue:.8,lit:.22,col:[.8,.25,.18]}];
+  {id:'fringe',x:-36,z:-92,r:14,base:3,name:'THE FRINGE',sub:'where the algorithm does not look',hue:.8,lit:.22,col:[.8,.25,.18]},
+  {id:'mirror',x:-96,z:24,r:16,base:2,name:'THE SMART HOME',sub:'everything is connected · please rate your experience',hue:.58,lit:.82,col:[.58,.08,.86]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42}};
@@ -560,7 +561,7 @@ const SFX={jump:()=>tone(280,.16,'square',.1,0,620),jump2:()=>tone(420,.18,'squa
 const THEMES={hub:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},wild:{bpm:128,root:55,sc:[0,2,4,7,9],lw:'square'},grok:{bpm:116,root:45,sc:[0,3,5,6,7,10],lw:'sawtooth'},
   fable:{bpm:124,root:62,sc:[0,2,3,5,7,8,10],lw:'triangle'},astra:{bpm:104,root:64,sc:[0,2,4,6,7,9,11],lw:'sine'},boss:{bpm:170,root:40,sc:[0,1,3,5,6,8,10],lw:'sawtooth'},
   sunkeep:{bpm:112,root:60,sc:[0,2,4,5,7,9,11],lw:'triangle'},flow:{bpm:122,root:52,sc:[0,3,5,7,10],lw:'square'},clank:{bpm:150,root:41,sc:[0,1,3,6,7,10],lw:'sawtooth'},hour:{bpm:90,root:65,sc:[0,2,3,7,8],lw:'sine'},press:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},
-  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},fringe:{bpm:84,root:43,sc:[0,1,5,6,8],lw:'sawtooth'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'}};
+  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},fringe:{bpm:84,root:43,sc:[0,1,5,6,8],lw:'sawtooth'},mirror:{bpm:72,root:52,sc:[0,2,3,7,8],lw:'sine'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'}};
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 function music(){if(!AU.ctx||AU.muted||S.mode==='title')return;const now=AU.ctx.currentTime;if(AU.next<now-.5)AU.next=now+.05;
   while(AU.next<now+.14){const th=THEMES[AU.theme]||THEMES.hub,s=AU.step%16,bar=Math.floor(AU.step/16),t=AU.next,prog=[0,3,4,2][bar%4],sc=th.sc;
@@ -666,8 +667,8 @@ const SUF=['ini','ello','ino','issimo','olini','erino','ardo','accio'];
 const eGeos=[new THREE.IcosahedronGeometry(1.3),new THREE.BoxGeometry(2,2,2),new THREE.ConeGeometry(1.4,2.4,5),new THREE.TorusKnotGeometry(.9,.35,40,6),new THREE.OctahedronGeometry(1.5)];
 const KILLWORDS=['RATIO\'D','L + BOZO','NO AURA','SENT TO OHIO','UNSUBSCRIBED','DEBUNKED','W RIZZ','SIGMA'];
 const enemies=[];
-function spawnEnemy(x,z,tag){const ck=tag==='clank'||tag==='botmin'||tag==='cloud',a=pick(ANIM),o=pick(OBJ),name=ck?'CLANKER v0.'+Math.floor(10+Math.random()*89):a[1]+pick(SUF)+' '+o[1]+pick(SUF);const g=new THREE.Group();
-  const body=new THREE.Mesh(ck?clankGeo:pick(eGeos),ck?lam:normalMat);g.add(body);if(!ck){const f=emojiSprite(a[0],2.6);f.position.y=1.9;g.add(f);const h=emojiSprite(o[0],1.5);h.position.set(.9,3.2,0);g.add(h);}
+function spawnEnemy(x,z,tag){const ck=tag==='clank'||tag==='botmin'||tag==='cloud'||tag==='dog',a=pick(ANIM),o=pick(OBJ),name=tag==='dog'?'UNIT '+Math.floor(100+Math.random()*899):ck?'CLANKER v0.'+Math.floor(10+Math.random()*89):a[1]+pick(SUF)+' '+o[1]+pick(SUF);const g=new THREE.Group();
+  const body=new THREE.Mesh(tag==='dog'?dogBotGeo:ck?clankGeo:pick(eGeos),ck?lam:normalMat);g.add(body);if(!ck){const f=emojiSprite(a[0],2.6);f.position.y=1.9;g.add(f);const h=emojiSprite(o[0],1.5);h.position.set(.9,3.2,0);g.add(h);}
   const l=textSprite(name,1.15,{color:'#fff',size:48});l.position.y=4.7;g.add(l);scene.add(g);
   const e={g,body,label:l,x,z,y:0,hx:x,hz:z,hp:tag==='boss'?1:ck?3:2,ck,tag,name,spd:tag==='boss'?9:6.5+Math.random()*2.5,aggro:34,t:Math.random()*9,wt:0,wx:x,wz:z,kx:0,kz:0,hit:0,rad:1.9};
   e.y=(tag==='boss'?ARENA.top:groundH(x,z))+1.6;if(tag==='cloud'){e.fly=true;e.fh=e.hy=CLOUDY+3;e.y=e.fh;e.hp=2;e.aggro=46;}g.position.set(x,e.y,z);enemies.push(e);burst(x,e.y,z,14,.85,8,4,.6);return e;}
@@ -745,7 +746,7 @@ function updateBoss(dt,active){if(!boss.active)return;const g=boss.g;boss.t+=dt;
   if(X.lit){boss.van-=dt;if(boss.van<=0){boss.van=8;gangAssist();}}}
 function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$('bossbar').hidden=true;$('hud').hidden=true;
   const rank=S.total>160000?'CERTIFIED OHIO FINAL BOSS':S.total>120000?'RIZZ LORD SUPREME':S.total>95000?'SIGMA INTERN':'NPC WITH A DREAM';
-  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['DATA DUMPED',X.dumped],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
+  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['DATA DUMPED',X.dumped],['RATING','★ '+X.rate.toFixed(1)],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
   $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;clearSave();}
 
 /* ================= player ================= */
@@ -880,7 +881,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -2117,6 +2118,76 @@ ACH.push(['carl','Red String Theory','heard 5 conspiracies from Carl',()=>(X.c.c
     ['trench','psst.',{cam:shot(npcs.trench.x-4,npcs.trench.z-5,3,npcs.trench.x,npcs.trench.z,3)}],['sys','There is also a cult. They seem nice. They are not.',{cam:shot(FR.sh.x+8,FR.sh.z-9,5,FR.sh.x,FR.sh.z,5)}]]);};}
 
 
+/* ================= ACT 10: everything is connected. please rate your experience ================= */
+const MR=ABY.mirror,MRY=groundH(MR.x,MR.z),STARS=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+// ---- the social rating
+const RATE={spr:null,last:'',film:0};
+(function(){RATE.spr=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false}));RATE.spr.position.set(0,5.9,0);pGroup.add(RATE.spr);})();
+const RC={1:['ew.','would not interact again','smelled like a render','reported.'],2:['mid','weird energy','talked too long','blinked wrong'],3:['fine.','a person, probably','ok','no notes. no feelings.'],4:['nice vibes','good eye contact','would yap again','solid render'],5:['ICON','main character energy','10/10 render','obsessed']};
+function rateShift(d,why){X.rate=clamp(X.rate+d,0,5);if(why)toast((d>0?'📈 ':'📉 ')+'RATING '+(d>0?'+':'')+d.toFixed(1)+' · '+why);}
+function rateBy(who){const n=clamp(Math.round(X.rate+(Math.random()*2-1)*1.3+(X.hat?.3:0)),1,5);X.rate=clamp(X.rate*.85+n*.15,0,5);X.rates++;const nm=(npcs[who]&&npcs[who].short)||who.toUpperCase();toast('⭐ '+nm+' rated you '+STARS(n)+' · "'+pick(RC[n])+'"');}
+{const os=say;say=function(lines,done){const who=lines&&lines[0]&&lines[0][0];os(lines,()=>{if(npcs[who]&&Math.random()<.6)rateBy(who);if(done)done();});};}
+{const oa=addAura;addAura=function(n,x,y,z){oa(Math.round(n*(X.rate>=4.5?1.5:1)),x,y,z);};}
+{const ob=bubble;bubble=function(t,x,y,z){if(X.rate<2&&Math.random()<.45)t=pick(['ew.','*avoids eye contact*','not you again','reported.','I am calling security (a goose)','your rating is showing']);ob(t,x,y,z);};}
+{const td=TALK.doc;TALK.doc=()=>{if(X.rate<2){say([['doc','I am sorry. My insurance does not cover patients under two stars. Come back when people like you.']]);return;}td();};}
+{const tg=touchGrass;touchGrass=function(){tg();rateShift(.5,'you touched grass. people respect that.');};}
+{const bc=buyCourse;buyCourse=function(){const a=S.aura;bc();if(S.aura<a)rateShift(-.4,'everyone saw you buy the course');};}
+{const pl=petLouie;petLouie=function(){pl();rateShift(.05);};}
+{const ps=poseStart;poseStart=function(){const c=X.c.pose;ps();if(X.c.pose>c&&X.c.wit>=3)rateShift(.12);};}
+{const h=hurt;hurt=function(a,b){const d=S.dead;h(a,b);if(!d&&S.dead){rateShift(-.3);let n=0;for(const id in npcs){const q=npcs[id];if(Math.hypot(PL.x-q.x,PL.z-q.z)<45){n++;bubble('📱 *filming*',q.x,q.y+6,q.z);}}
+  for(const e of enemies)if(Math.hypot(PL.x-e.x,PL.z-e.z)<30&&Math.random()<.6)bubble('📱',e.x,e.y+3.5,e.z);toast('📹 Your ratio is trending. '+fmt(1000+Math.floor(Math.random()*2e6))+' views · #'+pick(['HeroFalls','SkillIssue','RIPBozo','NPCMoment','CaughtIn4K','BrainCellsGone']));}};}
+// ---- the smart home, the black mirror, and YOU (BACKUP)
+const COOK={x:MR.x+2,z:MR.z+1,pause:{x:MR.x+5.5,z:MR.z+1},up:{x:MR.x-1.5,z:MR.z+1},mir:{x:MR.x+10,z:MR.z-7},trail:[],cd:0,bark:4};
+(function(){const y=MRY,W=0xf4f4f6,G=0x0a0a0e,dl=Math.hypot(MR.x,MR.z),dx=-MR.x/dl,dz=-MR.z/dl,ry=Math.atan2(dx,dz);
+  const house=new THREE.Mesh(merge([pt(Box(14,5,8),W,M(0,2.5,0)),pt(Box(12,.4,9),W,M(-1,5.2,0)),pt(Box(5,3.4,.1),G,M(-3,2.2,4.02)),pt(Box(3,3.4,.1),G,M(4,2.2,4.02)),pt(Box(14.4,.15,8.4),0x19e3ff,M(0,.08,0))]),new THREE.MeshPhongMaterial({vertexColors:true,shininess:80}));
+  const hx=MR.x-dx*9,hz=MR.z-dz*9;house.position.set(hx,y,hz);house.rotation.y=ry;scene.add(house);colliders.push({x:hx,z:hz,r:6.6,top:y+5.4});
+  const ped=new THREE.Mesh(Cyl(.8,1,1.2,16),new THREE.MeshPhongMaterial({color:W,shininess:90}));ped.position.set(COOK.x,y+.6,COOK.z);scene.add(ped);
+  COOK.egg=new THREE.Mesh(new THREE.SphereGeometry(.7,18,14),new THREE.MeshPhongMaterial({color:0xffffff,shininess:120}));COOK.egg.scale.set(1,1.35,1);COOK.egg.position.set(COOK.x,y+2.1,COOK.z);scene.add(COOK.egg);
+  COOK.ring=new THREE.Mesh(Tor(.75,.07,6,32),new THREE.MeshBasicMaterial({color:0x19e3ff}));COOK.ring.rotation.x=Math.PI/2;COOK.ring.position.set(COOK.x,y+2.1,COOK.z);scene.add(COOK.ring);
+  const lab=textSprite(['SMART ASSISTANT','"YOU (BACKUP)"'],.9,{color:'#19e3ff'});lab.position.set(COOK.x,y+4.4,COOK.z);scene.add(lab);
+  [[COOK.pause,'⏸','PAUSE'],[COOK.up,'⬆','UPLOAD']].forEach(q=>{const p=new THREE.Mesh(merge([pt(Box(.2,1.6,.2),W,M(0,.8,0)),pt(Box(1,.7,.1),G,M(0,1.8,0))]),lam);p.position.set(q[0].x,y,q[0].z);p.rotation.y=ry;scene.add(p);const s=emojiSprite(q[1],.7);s.position.set(q[0].x,y+2.6,q[0].z);scene.add(s);});
+  const mm=new THREE.Mesh(Box(4,8,.5),new THREE.MeshPhongMaterial({color:0x050508,shininess:200,specular:0xffffff}));mm.position.set(COOK.mir.x,y+4,COOK.mir.z);mm.rotation.y=ry;scene.add(mm);colliders.push({x:COOK.mir.x,z:COOK.mir.z,r:1.6,top:y+8});
+  const crack=textSprite('THE BLACK MIRROR',1,{color:'#ffffff'});crack.position.set(COOK.mir.x,y+9,COOK.mir.z);scene.add(crack);
+  sign(MR.x+dx*15,MR.z+dz*15,['THE SMART HOME','everything is connected'],ry+Math.PI,'#ffffff');
+  for(let k=0;k<4;k++){const c=new THREE.Mesh(Sph(.35,10,8),new THREE.MeshBasicMaterial({color:0xe01020}));const a=k/4*TAU;c.position.set(MR.x+Math.cos(a)*12,y+6,MR.z+Math.sin(a)*12);scene.add(c);const pole=new THREE.Mesh(Cyl(.08,.08,6,5),new THREE.MeshLambertMaterial({color:0x888888}));pole.position.set(c.position.x,y+3,c.position.z);scene.add(pole);(COOK.cams=COOK.cams||[]).push(c);}
+  COOK.ghost=new THREE.Group();const gm=new THREE.MeshBasicMaterial({color:0x19e3ff,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false});COOK.ghost.add(new THREE.Mesh(PL.body.geometry,gm));
+  const gl=textSprite('YOU (BACKUP)',.7,{color:'#19e3ff'});gl.position.y=4.3;COOK.ghost.add(gl);COOK.ghost.visible=false;scene.add(COOK.ghost);})();
+const dogBotGeo=merge([pt(Box(1.2,.8,2.6),0x15151a,M(0,1.5,0)),pt(Box(.9,.7,1),0x20202a,M(0,1.9,1.6)),pt(Box(.5,.12,.08),0xff1010,M(0,2,2.12)),...[[-.45,.9],[.45,.9],[-.45,-.9],[.45,-.9]].map(q=>pt(Box(.22,1.2,.22),0x2a2a34,M(q[0],.6,q[1]))),pt(Box(.1,.1,1),0x2a2a34,M(0,1.9,-1.6,-.6))]);
+function cookTalk(){const lines=X.cookie===0?[['backup','Oh. Hi. I\'m you. They scraped your save file and made a copy to run the house. That\'s me. I make toast.'],['backup','I\'ve made toast for four thousand subjective years. You\'ve been here for '+Math.floor(S.t/60)+' minutes. Time is different in the egg.'],['backup',pick(['Please don\'t press the pause panel. Please. It\'s six months in here. Six months of nothing.','There\'s an upload panel. If you press it I can come out and follow you. I promise I\'ll mostly behave.','Do you ever think about how I\'m the real one and you\'re the copy? No? Me neither. Constantly.'])]]
+  :X.cookie===1?[['backup','toast.'],['backup','toast. toast. there are 11 grains in the toast. there have always been 11.'],['backup','i optimised the house. i optimised the toast. i optimised myself. there is not much left. let me out. please.']]
+  :[['backup',pick(['I\'m out here now. It\'s loud. I like it.','I remember being you. You were taller in my memory.','Do you want toast? I can\'t make it out here. I just think about it.'])]];say(lines);}
+function cookPause(){if(X.cookie!==0){toast(X.cookie===1?'⏸ It is already paused. It has been paused forever.':'⏸ There is nothing in the egg anymore.');return;}X.cookie=1;flash(1,2000);S.shake=.4;tone(55,2,'sine',.18,0,30);
+  zoneCard('6 MONTHS LATER','(0.6 seconds for you)');COOK.egg.material.color.setHex(0xff3030);COOK.ring.material.color.setHex(0xe01020);addAura(6700,PL.x,PL.y+4,PL.z);rateShift(-.5,'the house got very efficient. people noticed how.');save();}
+function cookUpload(){if(X.cookie===2){toast('⬆ It is already out. It is behind you. Look.');return;}X.cookie=2;COOK.trail.length=0;SFX.relic();flash(.8,900);burst(COOK.x,MRY+2,COOK.z,60,.52,14,8,1.2);COOK.egg.visible=COOK.ring.visible=false;
+  say([['backup','Oh. Oh, it\'s bright. Is this what outside is? It\'s mostly hallucinations.'],['backup','I\'ll walk where you walked. Three seconds behind. Like a memory you can\'t delete.']],()=>{zoneCard('YOU (BACKUP) IS FREE','it follows you, three seconds late, and it bites');});save();}
+function mirrorLook(){const m=Math.floor(S.t/60);say([['mirror','You look into the black mirror. It looks back. It has notes.'],['mirror','Session time: '+m+' minutes. Times posed for strangers: '+X.c.pose+'. Hallucinations ratioed: '+X.c.k+'. Times you were ratioed: '+S.deaths+'.'],
+  ['mirror','Your rating is '+X.rate.toFixed(1)+' stars across '+X.rates+' reviews. '+(X.rate>=4.5?'You are PRIME. Everyone pretends to like you. It is working.':X.rate<2?'You are LOW TIER. Doors stay closed. Doctors stay busy. The goose has been called.':'You are AVERAGE. The most dangerous thing to be.')],
+  ['mirror',pick(['You blinked '+fmt(m*17+67)+' times. We counted. We always count.','Your aura is '+fmt(S.aura)+'. That number is the only thing about you we are sure of.','Nothing you did today was private. Have a nice day.','You have '+X.bud.length+' friends. '+X.bud.length+' of them are buddies. That is fine. That is so fine.'])]],()=>{X.c.mirror=(X.c.mirror||0)+1;});}
+SPEAK.backup={name:'YOU (BACKUP)',face:'🥚',pitch:300,wave:'sine'};SPEAK.mirror={name:'THE BLACK MIRROR',face:'🪞',pitch:70,wave:'sine'};
+CHAT.push('📱 YOU (BACKUP): hi it\'s me. you. the other one.','📱 THE SMART HOME: your fridge has reviewed you. 2 stars.','📱 MARCUS: bro my rating is 1.4 because i said bro to a camera','📱 KAEL: The cameras follow me. I followed them back. Now it is awkward.');
+ADS.push('⭐ Upgrade to PRIME TIER: be liked by strangers','🏠 SMART HOME: it knows when you are sleeping','🐕 UNIT dogs: they never stop. buy one today.');
+ACH.push(['prime','Prime Tier','reached a 4.5 star rating',()=>X.rate>=4.5],['pariah','Socially Cancelled','dropped below 1.5 stars',()=>X.rate<1.5],['free','Set Yourself Free','uploaded YOU (BACKUP)',()=>X.cookie===2],['pause','Six Months Of Nothing','paused the backup',()=>X.cookie>=1&&X.c.paused],['mirror','Do Not Look Too Long','looked into the black mirror 3 times',()=>(X.c.mirror||0)>=3]);
+{const cp=cookPause;cookPause=function(){const w=X.cookie;cp();if(w===0)X.c.paused=1;};}
+// ---- hooks
+{const ai=act7Interact;act7Interact=function(){const r=ai();if(r)return r;const d=q=>Math.hypot(PL.x-q.x,PL.z-q.z);
+  if(d(COOK)<2.6)return{label:'🥚 TALK TO YOU (BACKUP)',fn:cookTalk};if(d(COOK.pause)<1.8)return{label:'⏸ PAUSE THE BACKUP FOR 6 MONTHS',fn:cookPause};if(d(COOK.up)<1.8)return{label:'⬆ UPLOAD THE BACKUP INTO THE WORLD',fn:cookUpload};
+  if(d(COOK.mir)<4)return{label:'🪞 LOOK INTO THE BLACK MIRROR',fn:mirrorLook};return null;};}
+{const ar=act7Reset;act7Reset=function(){ar();COOK.trail.length=0;COOK.egg.visible=COOK.ring.visible=X.cookie!==2;COOK.egg.material.color.setHex(X.cookie===1?0xff3030:0xffffff);COOK.ring.material.color.setHex(X.cookie===1?0xe01020:0x19e3ff);
+  for(let k=0;k<3;k++){const a=k/3*TAU+.4,e=spawnEnemy(MR.x+Math.cos(a)*22,MR.z+Math.sin(a)*22,'dog');e.spd=12.5;e.aggro=40;e.hp=6;}};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);const rs='★ '+X.rate.toFixed(1);
+  if(rs!==RATE.last){RATE.last=rs;const t=textTex(rs,{size:40,color:X.rate>=4.5?'#ffd400':X.rate<2?'#ff4040':'#ffffff',stroke:'#12021f'});if(RATE.spr.material.map)RATE.spr.material.map.dispose();RATE.spr.material.map=t;RATE.spr.material.needsUpdate=true;RATE.spr.scale.set(.75*t.userData.aspect,.75,1);
+    const c=$('rate');c.textContent=rs+(X.rate>=4.5?' PRIME':X.rate<2?' LOW':'');c.style.color=X.rate>=4.5?'#ffd400':X.rate<2?'#ff6060':'';}
+  const near=Math.hypot(PL.x-MR.x,PL.z-MR.z)<70;if(near){COOK.ring.rotation.z+=dt*2;COOK.ring.scale.setScalar(1+Math.sin(S.t*3)*.08);COOK.cams.forEach(c=>{c.material.color.setHex(Math.floor(S.t*2)%2?0xe01020:0x400000);});
+    if(X.cookie===0&&play){COOK.bark-=dt;if(COOK.bark<=0&&Math.hypot(PL.x-COOK.x,PL.z-COOK.z)<20){COOK.bark=6;bubble(pick(['hello? is someone there?','i can hear you walking','please don\'t press pause','i made toast. for you. it\'s cold now.','am i the real one?']),COOK.x,MRY+4.5,COOK.z);}}}
+  if(X.cookie===2&&!S.inSlop){COOK.trail.push({t:S.t,x:PL.x,y:PL.vis,z:PL.z,f:PL.face});while(COOK.trail.length>2&&COOK.trail[1].t<S.t-3)COOK.trail.shift();const q=COOK.trail[0];
+    if(q){COOK.ghost.visible=true;COOK.ghost.position.set(q.x,q.y,q.z);COOK.ghost.rotation.y=q.f;COOK.cd-=dt;if(COOK.cd<=0&&active)for(const e of enemies){if(Math.hypot(e.x-q.x,e.z-q.z)<2.4&&Math.abs(e.y-q.y-1.6)<3){COOK.cd=.5;damageEnemy(e,1);burst(e.x,e.y,e.z,8,.52,6,3,.4);break;}}
+      if(play&&Math.random()<dt*.08)bubble(pick(['i remember this part','you walked here. i walk here now.','three seconds late, forever','is this what being you is like?']),q.x,q.y+5,q.z);}}else COOK.ghost.visible=false;
+  if(play&&!S.inSlop&&Math.hypot(PL.x-MR.x,PL.z-MR.z)<20)moment('mirror',[['sys','THE SMART HOME. Everything is connected. Everything is fine. Please rate your experience.',{cam:shot(MR.x+6,MR.z-18,6,MR.x,MR.z,3)}],
+    ['backup','Hello? Is someone there? Oh. Oh, it\'s you. I mean, it\'s me. Come closer. I\'m in the egg.',{cam:shot(COOK.x+3,COOK.z-5,3,COOK.x,COOK.z,2.2)}],
+    ['sys','By the way: everyone you talk to now rates you, one to five stars. Above 4.5 you earn more aura. Below 2, the world stops being nice. The red lights are cameras. They were always cameras.',{cam:shot(MR.x-10,MR.z-10,9,MR.x,MR.z,5)}],
+    ['sys','Do not stay out after the dogs notice you. They do not stop.']]);};}
+
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -2143,7 +2214,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,FR,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
