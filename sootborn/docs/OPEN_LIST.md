@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.83 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.84 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -23,7 +23,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 
 ## Built in v0.83 (needs your hands)
 - **The yard gate opens by itself with the key.** Tell me if you get through. If not, say what the box at the top right says when you stand at it.
-- Group fights stand off; rises on the valley maps; hand to the washer in 2D fights. Still open: the washer in the comic-book levels.
+- Group fights stand off; rises on the valley maps; hand to the washer in 2D fights. The washer in the comic-book levels followed in v0.84.
 
 ## Built in v0.82 (needs your eye)
 - A drawn picture in front of the Pairing and in front of the Ford.

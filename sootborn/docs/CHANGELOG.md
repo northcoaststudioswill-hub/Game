@@ -1,4 +1,14 @@
-# SOOTBORN — changelog (latest v0.83 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.84 · 2026-11-20)
+
+## v0.84 · 2026-11-20 — the hand to the washer, in the comic-book levels
+- **Before ELEVEN in the comic-book levels**, in the half second where he sinks and the gold draws in, his off hand now goes to the washer at his collar. It is now in all three kinds of fight.
+
+**Checked:** a still of the wind-up on the Stair (the gloved hand is at his collar). The whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. Seen once, not in motion.
+
 
 ## v0.83 · 2026-11-20 — the yard gate you could not get through; group fights; valley ground; the washer
 - **Fixed: the High Docks yard gate** (your screenshot). I could not make it refuse on my side: a bot pressing the same A button at the gate opened it. So I took the button out of the question. **With the key, the gate now rolls back by itself when you walk up to it**, anywhere along its front, and the reach of the OPEN GATE button is doubled so it also answers from the lit post. Works on a save that is already stuck there.

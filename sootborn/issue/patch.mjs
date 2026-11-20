@@ -428,7 +428,7 @@ between("      const up = 0.4;\n", "    } else if (pw.id === 'shade') {", `     
         SC.slowmo(0.07, 4); SC.emit('letterbox', true); SC.ui.showHud(false); SC.cam.lock = null; const c = pl.pos; SC.cam.move(v3(c.x + Math.sin(pl.yaw) * 2.6 + 1.2, c.y + 0.9, c.z + Math.cos(pl.yaw) * 2.6), v3(c.x, c.y + 1.35, c.z), v3(c.x + Math.sin(pl.yaw) * 2.1 + 1.0, c.y + 1.0, c.z + Math.cos(pl.yaw) * 2.1), v3(c.x, c.y + 1.4, c.z), 0.5, 40); SC.audio.sfx('roar'); SC.emit('speedlines', 1); }
       pw.t += rdt || dt; const st2 = pw.t; pl.inv = Math.max(pl.inv, 0.5); pl.vel.set(0, 0, 0);
       if (st2 < 0.5) { // the breath before: he sinks, the hook comes back, the gold draws in
-        pl.pose = SC.mixPose(P.slamDown, P.attack(0, 0.06), SC.clamp(st2 / 0.5, 0, 1)); pl.poseRate = 600; pl.lift = 0;
+        pl.pose = SC.mixPose(P.slamDown, P.attack(0, 0.06), SC.clamp(st2 / 0.5, 0, 1)); pl.poseRate = 600; pl.lift = 0; pl.pose = Object.assign({}, pl.pose, { shL: [-0.95, 0, -0.42], elL: [-2.2, 0, 0] }); /* the off hand to the washer at his collar */
         if (((st2 * 40) | 0) !== pw.rk) { pw.rk = (st2 * 40) | 0; FX.ring(pl.pos, pw.rk % 2 ? 0xffd23a : 0xffffff, 3.2 - st2 * 5.5, 0.3, 0.02); } }
       else if (pw.n < 10) {
         if (!pw.wide) { pw.wide = 1; const c = pw.c; SC.cam.move(v3(c.x + 6.2, c.y + 5.4, c.z + 7.4), v3(c.x, c.y + 1, c.z), v3(c.x + 4.6, c.y + 4.2, c.z + 8.6), v3(c.x, c.y + 1.1, c.z), 1.6, 50); }
