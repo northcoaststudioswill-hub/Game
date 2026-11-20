@@ -503,6 +503,88 @@
       }
     };
   }
+  /* ================= THE VENT STACK: the Assay, day thirty-one. No boss. A climb, three fights on the way, the collar at the top, and the edge ================= */
+  if (SC.issue === 'stack') {
+    const done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
+    for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
+    Object.assign(CROSS, { alley: { x: -6.5, y: 0, z: 17.5, yaw: Math.PI }, yard: { x: -9.6, y: 12, z: 9.6, yaw: Math.PI / 2 }, roof: { x: -9.6, y: 24, z: 9.6, yaw: Math.PI / 2 } });
+    Object.assign(ENC, {
+      alley: { arena: [-16, 9.2, 16, 23.6], floor: 0, waves: [[['hollow', -2, 11], ['hollow', 4, 12], ['hollow', -8, 12]]] },
+      l1: { arena: [-13.6, 5.4, -5.4, 13.6], floor: 12, waves: [[['hollow', -12, 12], ['knifer', -7, 12.4]]] },
+      l2: { arena: [-13.6, 5.4, -5.4, 13.6], floor: 24, waves: [[['bruiser', -11.5, 11.5]], [['hollow', -12.4, 7], ['knifer', -7, 12.6]]] }
+    });
+    Object.keys(ENC).forEach(k => { ENC[k].id = k; });
+    brandOnStair = function () {};
+    S.noBoots = () => !F.charged;   // Voss's boots are dead until they have stood on the collar
+    objective = function () {
+      let t = '', g = null;
+      if (S.enc) t = S.enc.id === 'alley' ? "HOUSE TEAL'S PICKETS. THE STAIR IS BEHIND THEM." : S.enc.id === 'l2' ? 'A WARDEN OF THE DAIS. HE SAW WHAT I DID TO VOSS.' : 'CLEAR THE PLATFORM';
+      else if (!F.path) { t = 'THE FOOT OF THE STACK'; g = CROSS.alley; }
+      else if (!F.e_alley) t = "HOUSE TEAL'S PICKETS. THE STAIR IS BEHIND THEM.";
+      else if (!F.e_l1) { t = "UP THE KEEPER'S STAIR"; g = { x: -9.6, y: 12, z: 9.6 }; }
+      else if (!F.e_l2) { t = 'THE SECOND TURN'; g = { x: -9.6, y: 24, z: 9.6 }; }
+      else if (!F.charged) { t = 'THE CROWN. STAND THE BOOTS ON THE COLLAR.'; g = { x: 0, y: 36, z: 3.6 }; }
+      else if (!F.boss) { t = 'THE EDGE.'; g = { x: 0, y: 36, z: 8 }; }
+      U.objective(t); S.goal = g;
+    };
+    S.objective = objective;
+    encDone = function (id) { setFlag('e_' + id); S.pending = false; SC.audio.sfx('clue'); U.toast(id === 'alley' ? 'THE STAIR IS OPEN. *THIRTY-SIX METRES OF IT.*' : id === 'l1' ? 'ONE TURN. THE BOOTS ARE STILL COLD.' : 'NOBODY LEFT ABOVE ME. *THE CROWN.*', 3.4); objective(); };
+    const begin = () => { SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.mode = 'follow'; cam.snapBehind(Math.PI); U.showHud(true); setFlag('intro');
+      U.toast(SC.hosted ? 'THE BOOTS ARE DEAD. *NO HOVER, NO LEAP.* CLIMB.' : 'WASD MOVES. J STRIKES. K DODGES. THE BOOTS ARE DEAD.', 5); };
+    intro = function () {
+      SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
+      pl.place(-6.5, 0, 21.5, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true);
+      const pg = [
+        { img: shot(-24, 7, 30, 0, 17, 0, 50, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE VENT STACK. THE ASSAY, DAY THIRTY-ONE.', cap2: 'THE ONLY ONE IN THE VALLEY. THE LAMPS RUN OFF IT, AND THE PUMP, AND THE BOOTS THE PROCTORS STAND ON.', fx: 'COLD' },
+        { img: shot(-5.2, 1.6, 19.2, -6.5, 1.5, 21.5, 30), area: '1 / 2 / 2 / 3', cap2: "I HAD VOSS'S BOOTS AND THEY WERE DEAD IN MY HANDS. *A PROCTOR CHARGES THEM AT THE TOP.*" },
+        { img: shot(-8, 2.4, 26, 0, 3, 11, 46), area: '2 / 2 / 3 / 3', cap: 'HOUSE TEAL HOLDS THE ISLAND.', cap2: 'THE STAIR IS FOR WHOEVER KEEPS THE STACK. BELOW, THAT IS US.' }
+      ];
+      pl.model.expr = null; U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: pg }, begin);
+    };
+    bossIntro = function () {};
+    ending = function () {
+      if (F.boss) return; setFlag('boss'); S.enc = null; SC.clearEnemies(); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; U.showHud(false); SC.audio.sfx('clue');
+      const still = (x, y, z, yaw, pose) => { pl.place(x, y, z, yaw); pl.model.anim.apply(pose || P.idle(0), 999, 0.016); pl.model.group.updateMatrixWorld(true); };
+      still(0, 36, 8.1, 0); const a = shot(4.2, 37.3, 12.6, 0, 37.2, 8.1, 34, 768, 720);
+      still(0, 31, 13, 0, P.leap); const b = shot(0, 44, 9.5, 0, 30, 13.4, 50);
+      still(7, 44, 30, 0.4, P.leap); const c = shot(-30, 6, 44, 2, 30, 14, 52);
+      U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
+        { img: a, area: '1 / 1 / 3 / 2', cap: 'THIRTY-SIX METRES. THE WHOLE VALLEY UNDER MY HEELS.', cap2: 'THEY HAD TOLD US THE BOOTS WERE WHAT MADE A PROCTOR.', fx: 'LIVE' },
+        { img: b, area: '1 / 2 / 2 / 3', cap2: 'THEY ARE A BATTERY, AND A STACK,' },
+        { img: c, area: '2 / 2 / 3 / 3', cap2: "*AND A MAN WHO ISN'T AFRAID OF THE HEIGHT.*" }
+      ] }, () => done());
+    };
+    S.init = function () {
+      clerk = { group: { visible: false, position: v3(0, 0, 0), rotation: {}, updateMatrixWorld() {} }, anim: { apply() {} } };
+      pl.model.setGlow(0xf6f2e6, '#f6f2e6'); atmo('riser');
+      Object.keys(CROSS).forEach(id => { const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.07, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
+        const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35); W.dyn.push(t => { a.rotation.z = t * 0.25; b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; }); });
+      const glow = new THREE.PointLight(0x5fd0ff, 0, 30, 1.4); glow.position.set(0, 38.4, 0); G.scene.add(glow); W.dyn.push(t => { glow.intensity = F.charged ? 70 + Math.sin(t * 9) * 16 : 14 + Math.sin(t * 2) * 4; });
+      W.addInteract({ id: 'collar', x: 0, y: 36, z: 3.6, fx: 0, fz: 0, r: 1.9, label: 'STAND THE BOOTS ON IT', marker: 'act', mh: 1.4, when: () => F.e_l2 && !F.charged && !S.enc, act: () => { setFlag('charged'); pl.control = false; SC.audio.sfx('clue'); U.say([
+        { who: 'cap', text: 'A collar on the crown of the stack, worn bright where a hundred Proctors have stood their heels. I put the dead boots on it, and my own weight on them.' },
+        { who: 'cap', text: 'They took one long breath, the way a ward fan does when the branch comes up. Then they burned blue.' },
+        { who: 'hero', face: 'smirk', text: 'It is our air. They have been flying on our air.' }], () => { pl.control = true; FX.burst(v3(0, 36.3, 3.6), 0x5fd0ff, 1.8); SC.cam.shake(0.4); U.toast('THE BOOTS ARE *LIVE*. THE EDGE.', 3.4); objective(); }); } });
+      W.addInteract({ id: 'tag', x: -13.2, y: 12, z: 9.6, fx: -14, fz: 9.6, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_l1 && !F.clue_tag, act: clue('tag', [
+        { who: 'cap', text: 'A slate tag wired to the rail. CHECKED, a date, two initials. K.D. The same hand has checked this stack every nine days all season.' },
+        { who: 'hero', face: 'smirk', text: 'Somebody up here does the rounds. Somebody up here knows what a seal is.' }]) });
+      W.addInteract({ id: 'plate', x: -6.4, y: 24, z: 6.4, fx: -5, fz: 3.4, r: 1.6, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => F.e_l2 && !F.clue_plate, act: clue('plate', [
+        { who: 'cap', text: 'A gilt plate riveted to the stack. DRAWN FROM RISER NINE. The lamps, the pump, the boots: all of it comes up one pipe from under the floor.' },
+        { who: 'hero', face: 'angry', text: 'Forty feet under this grass somebody is turning a wheel so that a Proctor need not touch the ground.' }]) });
+    };
+    S.update = function (dt, rdt) {
+      for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
+      if (SC.state !== 'play') return;
+      if (pl.control) S.time += rdt;
+      updateEnc(dt);
+      if (S.enc && S.enc.arena && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }
+      if (!pl.control || S.enc || pl.state === 'dead') return;
+      const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
+      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && (F.path ? Math.hypot(x - c.x, z - c.z) < 1.6 : id === 'alley' && (Math.hypot(x - c.x, z - c.z) < 2.2 || z < c.z - 0.8))) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
+      if (F.e_alley && !F.e_l1 && y > 11.4 && x < -5.6 && z > 5.6) startEnc('l1');
+      else if (F.e_l1 && !F.e_l2 && y > 23.4 && x < -5.6 && z > 5.6) startEnc('l2');
+      else if (F.charged && !F.boss && y > 35.4 && z > 7.5 && Math.abs(x) < 4.6) ending();
+    };
+  }
   /* ================= THE TABLE: the Gilding, drawn. Nobody fights. Fourteen pictures of what was done, in the order it was done ================= */
   if (SC.issue === 'gild') {
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];

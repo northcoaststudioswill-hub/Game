@@ -602,7 +602,56 @@
       // the frame the kneeling bell hangs in, on the first landing
       [-0.7, 0.7].forEach(o => D('wood', -5.3, 7.5, 15.6 + o, 0.14, 3, 0.14, 0x4a3524, { outline: 0.03 })); D('wood', -5.3, 9.05, 15.6, 0.16, 0.16, 1.7, 0x4a3524, { outline: 0.03 }); D('flat', -5.3, 8.92, 15.6, 0.05, 0.14, 0.05, IRON, { outline: 0 }); solid(-5.5, 14.7, -5.1, 16.5, 6, 9, { cam: false });
     };
-    if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else if (SC.issue === 'gild') GILD(); else { DOCKS_A(); DOCKS_B(); }
+    // ===== THE VENT STACK: the island in the river on day thirty-one. One white chimney, and the iron stair the people who keep it climb =====
+    const STACK = () => {
+      W.underRoof = () => false; W.inside = () => false;
+      const C = 5, O = 8.4, IR = 0x3a3f4c, WHITE = 0xe9e6dc, BLUE = 0x5fd0ff, rs = SC.seeded(31);
+      // the river, the island, its shingle
+      D('roof', 0, -0.9, 0, 260, 1, 260, 0x1c4a5e, { outline: 0 }); cyl('roof', 0, -0.3, 0, 31, 33, 0.6, 0x8a8674, { seg: 44, outline: 0 }); cyl('roof', 0, -0.26, 0, 28, 29, 0.6, 0x2c5a40, { seg: 44, outline: 0 });
+      [[-26, -26, 26, -25], [-26, 25, 26, 26], [-26, -26, -25, 26], [25, -26, 26, 26]].forEach(w => wall(w[0], w[1], w[2], w[3]));
+      for (let i = 0; i < 30; i++) { const a = i / 30 * 6.283 + rs() * 0.1, r = 21 + rs() * 5; const px = Math.cos(a) * r, pz = Math.sin(a) * r * 0.95; if (pz > 8 && Math.abs(px + 5) < 15) continue; pine(px, pz, 1.2 + rs() * 1.1, r < 24.5); }
+      for (let i = 0; i < 70; i++) { const a = i / 70 * 6.283, r = 60 + rs() * 40; pine(Math.cos(a) * r, Math.sin(a) * r, 1.6 + rs() * 1.6); }
+      // House Teal's camp, south of the stack, and the pump house the lamps run from
+      tentD(-15, 17, 0.5, TEAL); tentD(-19, 11, 1.1, TEAL); tentD(13, 19, -0.4, TEAL); standard(8.6, 21, 0, 5, TEAL); standard(-11.4, 21.6, 0, 5, TEAL);
+      B('brick', 13, 2, 20, 9, 0, 3.6, 0xd8d0bc, { outline: 0.1 }); D('roof', 16.5, 3.9, 5.5, 8, 0.5, 8, 0x4a4234, { outline: 0.06 }); D('flat', 12.96, 1.3, 5.5, 0.1, 2.2, 1.3, 0x2a2630, { outline: 0.03 }); sign('PUMP', 12.94, 2.9, 5.5, -Math.PI / 2, 1.6, 0.5, '#e8c25a', '#07070d');
+      D('flat', 9, 0.5, 5.5, 8, 0.5, 0.5, IR, { outline: 0.04 }); D('flat', 5.4, 2.2, 5.5, 0.5, 4, 0.5, IR, { outline: 0.04 });
+      for (let i = 0; i < 9; i++) { const a = -0.6 + i * 0.5, r = 15 + (i % 3) * 3; cyl('flat', Math.sin(a) * r, 0.04, 14 + Math.cos(a) * 6, 0.09, 0.1, 0.06, IR, { seg: 8, outline: 0.02 }); cyl('glow', Math.sin(a) * r, 0.18, 14 + Math.cos(a) * 6, 0.07, 0.08, 0.22, TLAMP, { seg: 8, outline: 0 }); }
+      crate(-3, 20, 0.9, 0, 'hp'); crate(4.5, 17, 0.9, 0, 'meter'); crateStatic(10.5, 12, 1.2, 0); crateStatic(-12.5, 13.6, 1.1, 0);
+      // the stack: white enamel, gilt bands, thirty-six metres of it, and the soot of whoever keeps it
+      B('concrete', -C, -C, C, C, 0, 36, WHITE, { outline: 0.12 });
+      [0.5, 12, 24, 35.4].forEach(y => D('flat', 0, y, 0, 2 * C + 0.5, 0.7, 2 * C + 0.5, GILT, { outline: 0.05 }));
+      for (let i = 0; i < 14; i++) { const sd = i % 4, u = -4 + rs() * 8, y = 3 + rs() * 30, h = 2 + rs() * 5; D('flat', sd === 0 ? u : sd === 1 ? C + 0.02 : sd === 2 ? u : -C - 0.02, y, sd === 0 ? C + 0.02 : sd === 1 ? u : sd === 2 ? -C - 0.02 : u, sd % 2 ? 0.03 : 0.5, h, sd % 2 ? 0.5 : 0.03, 0x8a8478, { outline: 0 }); }
+      watcher(0, 30, C + 0.06, 0, 1.5); sign('AUTHORITY VENT · SEALED BY THE COUNT', 0, 8.4, C + 0.08, 0, 6, 0.6, '#e8c25a', '#07070d');
+      // the keeper's stair: iron, four flights to a turn, three turns
+      const post = (x, y, z) => D('flat', x, y + 0.55, z, 0.1, 1.1, 0.1, IR, { outline: 0.02 });
+      const edge = (x0, z0, x1, z1, ya, yb) => { if (z0 === z1) solid(x0, z0 - 0.1, x1, z0 + 0.1, Math.min(ya, yb) - 0.5, Math.max(ya, yb) + 1.25, { cam: false }); else solid(x0 - 0.1, z0, x0 + 0.1, z1, Math.min(ya, yb) - 0.5, Math.max(ya, yb) + 1.25, { cam: false });
+        const n = Math.max(1, Math.round(Math.hypot(x1 - x0, z1 - z0) / 1.7)); for (let i = 0; i <= n; i++) post(SC.lerp(x0, x1, i / n), SC.lerp(ya, yb, i / n), SC.lerp(z0, z1, i / n)); };
+      const pad = (x0, z0, x1, z1, y) => B('flat', x0, z0, x1, z1, y - 0.45, y, IR, { outline: 0.05 });
+      for (let t = 0; t < 3; t++) { const H = t * 12;
+        ramp('flat', -C, C, C, O, H - 0.45, H, H + 3, 'x', IR, { steps: true }); edge(-C, O, C, O, H, H + 3);
+        pad(C, C, O, O, H + 3); edge(O, C, O, O, H + 3, H + 3); edge(C, O, O, O, H + 3, H + 3);
+        ramp('flat', C, -C, O, C, H + 2.55, H + 6, H + 3, 'z', IR, { steps: true }); edge(O, -C, O, C, H + 6, H + 3);
+        pad(C, -O, O, -C, H + 6); edge(O, -O, O, -C, H + 6, H + 6); edge(C, -O, O, -O, H + 6, H + 6);
+        ramp('flat', -C, -O, C, -C, H + 5.55, H + 9, H + 6, 'x', IR, { steps: true }); edge(-C, -O, C, -O, H + 9, H + 6);
+        pad(-O, -O, -C, -C, H + 9); edge(-O, -O, -O, -C, H + 9, H + 9); edge(-O, -O, -C, -O, H + 9, H + 9);
+        ramp('flat', -O, -C, -C, C, H + 8.55, H + 9, H + 12, 'z', IR, { steps: true }); edge(-O, -C, -O, C, H + 9, H + 12);
+        if (t < 2) {   // a working platform at the foot of each turn, hung off the south-west corner
+          const y = H + 12; pad(-14, C, -C, 14, y); edge(-14, C, -14, 14, y, y); edge(-14, 14, -C, 14, y, y); edge(-C, O, -C, 14, y, y); edge(-14, C, -O, C, y, y);
+          [[-13.7, 13.7], [-5.3, 13.7], [-13.7, 5.3]].forEach(p => D('flat', p[0], y - 1.4, p[1], 0.2, 1.9, 0.2, IR, { outline: 0.03 })); D('flat', -9.5, y - 0.75, 9.5, 8.6, 0.24, 0.3, IR, { outline: 0.03 }); D('flat', -9.5, y - 0.75, 9.5, 0.3, 0.24, 8.6, IR, { outline: 0.03 });
+          crateStatic(-12.6, 12.6, 1.1, y); crate(-6.6, 12.4, 0.9, y, t ? 'meter' : 'hp'); cyl('flat', -13.2, y + 0.04, 6.2, 0.1, 0.11, 0.06, IR, { seg: 8, outline: 0.02 }); cyl('glow', -13.2, y + 0.2, 6.2, 0.08, 0.09, 0.26, LAMP, { seg: 8, outline: 0 });
+        }
+      }
+      // the top: the crown of the stack, and the collar the Proctors stand their heels on
+      pad(-O, C, -C, O, 36); pad(-C, C, C, O, 36); edge(-O, C, -O, O, 36, 36); edge(-O, O, -C, O, 36, 36); edge(C, C, C, O, 36, 36);
+      edge(C, -C, C, C, 36, 36); edge(-C, -C, C, -C, 36, 36); edge(-C, -C, -C, C - 0.2, 36, 36);
+      cyl('flat', 0, 36.55, 0, 2.5, 2.9, 1.1, IR, { seg: 18, outline: 0.06 }); cyl('glow', 0, 37.14, 0, 2.1, 2.1, 0.1, BLUE, { seg: 18, outline: 0 }); solid(-2.5, -2.5, 2.5, 2.5, 36, 37.1, { cam: false });
+      cyl('flat', 0, 36.06, 3.6, 0.7, 0.7, 0.1, GILT, { seg: 14, outline: 0.03 }); cyl('glow', 0, 36.13, 3.6, 0.5, 0.5, 0.04, BLUE, { seg: 14, outline: 0 });
+      for (let k = 0; k < 6; k++) { const g = new THREE.IcosahedronGeometry(1, 1), sz = 1.4 + k * 0.7; g.scale(sz, sz * 0.8, sz); batch.add('flat', g, G.mx(k * k * 0.5, 39 + k * 3.4, -k * 0.9, k), [0xc9d6e2, 0xb4c4d4, 0x9fb2c6][Math.min(2, k >> 1)], 0); g.dispose(); }
+      // the keeper's marks: slate tags wired to the rail, and the plate that says where the air comes from
+      D('flat', -13.86, 13.1, 9.6, 0.04, 0.5, 0.36, 0x23232e, { outline: 0.02 }); D('flat', -C - 0.06, 25.6, 3.4, 0.05, 0.9, 1.5, GILT, { outline: 0.03 }); D('flat', -C - 0.1, 25.6, 3.4, 0.03, 0.6, 1.2, 0x23232e, { outline: 0 });
+      chalkW(-C - 0.04, 13.2, 6.6, -Math.PI / 2, 0.24); chalkW(C + 0.04, 4.4, 1, Math.PI / 2, 0.22);
+    };
+    if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else if (SC.issue === 'gild') GILD(); else if (SC.issue === 'stack') STACK(); else { DOCKS_A(); DOCKS_B(); }
 
     W.statics = batch.build(G.scene); batch = null;
   };

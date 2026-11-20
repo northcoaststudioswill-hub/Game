@@ -20,7 +20,11 @@ const DREAM4 = () => [
     { sfx: 'heart' }, { wait: 0.8 }, { sfx: 'pillar' }, { flash: '#ffffff' }, { pstage: 1 }, { wait: 1.6 },
     { narr: 'Forty cadets of Violet and thirty of Teal watched a Proctor go down in the mud, and learned in one breath what my tier has never been allowed to learn. They fall over like anybody.' },
     { pstage: 2 }, { wait: 1.2 },
-    { narr: 'What I took from him. First the boots. Thirty days I had watched them hang over us, humming. They are lighter than they look. It took me nineteen days to stop falling out of the sky.' },
+    { narr: 'What I took from him. First the boots. Thirty days I had watched them hang over us, humming. They are lighter than they look, and in my hands they were dead.' },
+    // the vent stack: he climbs it with Voss's dead boots and charges them at the crown. He can fly from here on
+    { fade: 'out' }, { issue: 'stack', or: [{ narr: "The Proctors charge them on the island, at the crown of the vent stack. I climbed it by the keeper's stair, the way we climb everything, and stood them on the collar until they burned blue." }] },
+    { panel: 'voss' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
+    { narr: 'It took me the rest of that day to stop falling out of the sky.' },
     { narr: 'Then the seal on his collar. It opens the cache. That night I broke a white ribbon and fed seventy people the bread and salve that had sat forty paces from them for a month.' },
     { narr: 'There was a strip of paper in the boot. A sum, a patron\'s mark, and "Violet to finish below." So I knew whose debt Corin Ashby had been paying.' },
     { pstage: 3 }, { wait: 1.6 },

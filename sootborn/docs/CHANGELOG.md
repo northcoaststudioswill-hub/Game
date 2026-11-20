@@ -1,4 +1,33 @@
-# SOOTBORN — changelog (latest v0.69 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.70 · 2026-11-20)
+
+## v0.70 · 2026-11-20 — the vent stack (a fifth comic-book level), and the Dev menu's versions and way back
+Step 5 of the plan, and your note about the Dev menu.
+
+**The vent stack** (the Assay, day thirty-one; in the Ledger's dream, after he takes Voss's boots)
+- Card: THE VENT STACK / The Assay. Day thirty-one. The island. A page turns into it and out of it.
+- **The place:** House Teal's island in the river, in the storm. One white chimney thirty-six metres high with gilt bands and the Watcher on it, and the keeper's iron stair wound round it: four flights to a turn, three turns, a working platform at the foot of each turn, the crown at the top. Teal's tents and the pump house at its foot.
+- **The boots are dead.** No leap and no hover in this level until the top. It is a climb.
+- **Three fights on the way:** Teal's pickets at the foot; two more on the first platform; a Warden of the dais on the second, then two pickets.
+- **Two things to find:** a keeper's slate tag signed K.D. (Kestrel Dray did the rounds here), and a gilt plate that says the stack is DRAWN FROM RISER NINE.
+- **The crown:** stand the boots on the collar. They burn blue. Then walk to the edge: three pictures of the jump, with the plan's line across them ("They had told us the boots were what made a Proctor. They are a battery, and a stack, and a man who isn't afraid of the height.").
+- **He flies from here on.** The Valley (day forty) now has the boots. The line that said it took him nineteen days to stop falling is now "the rest of that day".
+- Kael wears the white cloak in this level. If the 3D level cannot start, one line of narration covers it.
+
+**The Dev menu** (your note: show what version each scene was last updated, "and the other stuff", and a way back)
+- **Every entry ends with the version that last changed its scene** (for example "The Valley · day forty · v0.70"). A ★ marks the ones changed in the current version.
+- The top of the menu says the game's version and **what is new in it**.
+- **A scene started from the Dev menu comes back to the Dev menu when it ends**, at the list it was picked from, not to the title.
+- **To leave a scene early:** a small "◂ Dev menu" button at the top of the screen (only when the scene was started from the Dev menu), the F2 key, or "Back to the Dev menu" in the pause menu. It works from fights, 2D levels, comic-book levels, cutscenes and free play.
+- The version tags are kept by hand in one table (`DEV_VER` in `src/ui.js`) and are my best reading of the changelogs; older scenes may be a version or two out.
+
+**Checked**
+- The vent stack by script, end to end: the stair's ground is continuous from the foot to the crown (biggest step 0.05); each fight starts where it should; both finds open; the boots are refused before the collar and allowed after; the edge plays the three pictures and hands back to the story. Stills of the intro page, the foot, the stair, a platform, the top and the jump.
+- The Dev menu by script: tags on entries; leaving early from a fight, a 2D level, a comic-book level, a cutscene and free play each returned to the right list; a film that ended by itself returned too; Back forgets it.
+- The whole-story bot, New Game to THE END (see below).
+
+**Not checked**
+- Nothing by hand. The climb was tested by teleporting, not by walking it: how the camera behaves on the turns, and how the fights feel on a platform nine metres square, are unknown.
+- The Dev menu button on a phone.
 
 ## v0.69 · 2026-11-20 — two new places to walk in Part One (the camp by day; Bay Three at last bell with the seat knives), and Lucan's own look
 Step 4 of the plan. Both are 2.5D places (the plan's new ones, approved). Neither has a fight.

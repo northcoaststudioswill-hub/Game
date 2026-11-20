@@ -7,8 +7,22 @@ const Game = {
     G.mode = 'title'; Dialogue.active = false; $('#dlg').classList.add('hidden'); if (Puzzle.active) Puzzle.close();
     if (!P.sheet) World.resetSheets(); World.showPlayer = false; G.flags = G.flags || {};
     World.load('square', { x: 13 * 16 + 8, y: 8 * 16, dir: 0 }); Sound.music('home');
-    Menus.title();
+    Menus.title(); $('#devback').classList.add('hidden');
+    if (DEV.from) Menus.checkpoints(DEV.from);   /* a scene started from the Dev menu comes back to the Dev menu, at the list it was picked from */
   },
+  // stop whatever is playing, wherever it is, without running what would have come next (the Dev menu's way back)
+  abort() {
+    try { if (Prelude.on) { Prelude.done = null; Prelude.finish(); } } catch (e) { /* not running */ }
+    try { if (Issue.on) { Issue.done = null; Issue.closing = false; Issue.finish(false); } } catch (e) { /* not running */ }
+    Cutscene.onEnd = null; Cutscene.steps = []; Cutscene.noSkip = false; if (Cutscene.active) Cutscene.end();
+    if (Brawl.active) { Brawl.active = false; Brawl.onEnd = null; Brawl.cine = null; Brawl.sup = null; Sound.rage = 0; }
+    Dialogue.stack = []; Dialogue.onEnd = null; if (Dialogue.active) { Dialogue.active = false; $('#dlg').classList.add('hidden'); }
+    try { if (Puzzle.active) Puzzle.close(); } catch (e) { /* none open */ }
+    try { Mission.done = null; G.heist = 0; World.seq = null; World.bolt = null; World.darkOverride = null; World.alert = 0; World.work = 0; World.gilded = 0; } catch (e) { /* no mission */ }
+    Fade.a = 0; Fade.dir = 0; Fade.busy = false; Fade.cb = null; UI.clear(); $('#cskip').classList.add('hidden'); try { Cutscene.hideCard(); } catch (e) { /* none */ }
+    if (DEV._tq !== undefined) { DEV.quick = DEV._tq; DEV._tq = undefined; } World.resetSheets(); Input.consume(); HUD.dirty = true;
+  },
+  devBack() { if (!DEV.from) return; Game.abort(); Game.toTitle(); },
   newGame() {
     freshState('Kael', 0); World.resetSheets(); World.showPlayer = true;
     const go = () => Cutscene.play(PROLOGUE_A, () => Game.startHeist());
@@ -180,6 +194,7 @@ canvas.addEventListener('pointerdown', e => {
 });
 $('#card').addEventListener('pointerdown', () => { Cutscene.tapped = true; });
 window.addEventListener('pointerdown', () => { if (Brawl.active && Brawl.cine) Brawl.tap = true; }); window.addEventListener('keydown', e => { if (Brawl.active && Brawl.cine && Brawl.def.cineOnly && !e.repeat) Brawl.tap = true; });
+$('#devback').addEventListener('click', e => { e.stopPropagation(); Game.devBack(); }); window.addEventListener('keydown', e => { if (e.code === 'F2' && DEV.from && G.mode !== 'title') { e.preventDefault(); Game.devBack(); } });
 $('#cskip').addEventListener('click', e => { e.stopPropagation(); if (Prelude.on) Prelude.finish(); else Cutscene.skip(); });
 
 const ZC = { c: null, g: null };

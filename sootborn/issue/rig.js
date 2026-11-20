@@ -21,6 +21,9 @@
     Object.assign(SPECS.hero.pal, { top: 0x2a2630, trim: 0x4a4650, shirt: 0x2a2630, tie: 0x4a4650, band: 0x2a2630 });
     SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, officer: 1, plate: 0xefe8d4, trim: 0xe8c25a, belt: 0x8a1f24, hands: 0x23232e }, pal: { skin: 0xc9cbd6, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0xefe8d4, glove: 0x23232e, wrap: 0xefe8d4 } };
   }
+  if (SC.issue === 'stack') {   // House Teal's pickets hold the island; their blades wear teal, not violet
+    Object.assign(SPECS.knifer.pal, { top: 0x1f6f6a, wrap: 0x1f6f6a });
+  }
   if (SC.issue === 'stair') {   // the Auditor's Blade, and Tavi at sixteen
     SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, kit: { light: 1, officer: 1, mantle: 0x23232e, plate: 0x2a2a38, trim: 0xe8c25a, belt: 0xe8c25a, hands: 0x15151f }, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
     SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', kit: { light: 1, noSh: 1, soot: 1, plate: 0x6a4a34, trim: 0xd9a05f, belt: 0x2a1c14, hands: 0xc98a62, lamp: 0xffd98a }, pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
@@ -288,7 +291,7 @@
     }
     if (sp.cape) {
       // House Violet's cape, cut short so it does not catch on a valve wheel
-      const cm = model.capeMat = G.toon({ color: 0x5a3aa8 }), hem = G.toon({ color: 0xe8c25a }); model.mats.push(cm, hem);
+      const cm = model.capeMat = G.toon({ color: SC.issue === 'stack' ? 0xf4efe2 : 0x5a3aa8 }), hem = G.toon({ color: 0xe8c25a }); model.mats.push(cm, hem);
       add('chest', tbox(0.5, 0.08, 0.12), cm, 0, 0.29, -0.1, 0.016);
       add('sc1', tbox(0.5, 0.03, 0.31), cm, 0, 0, -0.13, 0.016); add('sc2', tbox(0.56, 0.03, 0.31), cm, 0, 0, -0.13, 0.016); add('sc3', tbox(0.62, 0.03, 0.31), cm, 0, 0, -0.13, 0.016);
       add('sc3', tbox(0.63, 0.034, 0.045), hem, 0, 0, -0.275, 0.008);

@@ -612,6 +612,13 @@ rep("G.sky.position.set(G.camera.position.x, 0, G.camera.position.z);", "G.sky.p
 // v0.58: nothing of the HUD sits in the middle. The marker shrinks when what it marks is on screen.
 rep("el.classList.remove('hide'); el.style.transform = 'translate(' + ((x * 0.5 + 0.5) * w)", "el.classList.remove('hide'); el.classList.toggle('near', _v.z <= 1 && Math.abs(_v.x) < 0.9 && _v.y > -0.62 && _v.y < 0.72); el.style.transform = 'translate(' + ((x * 0.5 + 0.5) * w)");
 
+/* ---- v0.70: the vent stack. A fifth level; boots that are dead until the story says otherwise; a storm sky ---- */
+rep("hov = inp.hold.y && pl.airFuel > 0", "hov = inp.hold.y && !(SC.story.noBoots && SC.story.noBoots()) && pl.airFuel > 0");
+rep("if (wantBoot && (pl.bootCd || 0) <= 0 && pl.onGround)", "if (wantBoot && !(SC.story.noBoots && SC.story.noBoots()) && (pl.bootCd || 0) <= 0 && pl.onGround)");
+rep("b.position.set(Math.cos(a) * r, SC.issue === 'stair' ? -34 + rnd() * 46 : -14 + rnd() * 90,", "b.position.set(Math.cos(a) * r, SC.issue === 'stack' ? -600 : SC.issue === 'stair' ? -34 + rnd() * 46 : -14 + rnd() * 90,");
+rep("const bands = SC.issue === 'stair' ? ", "const bands = SC.issue === 'stack' ? ['#10141f', '#182033', '#24304a', '#33445f', '#4a5d78', '#6c7f96'] : SC.issue === 'stair' ? ");
+rep("    if (SC.issue === 'gild') { G.scene.background.set(0x07060a);", "    if (SC.issue === 'stack') { G.scene.background.set(0x1c2740); G.scene.fog.color.set(0x34465e); G.scene.fog.near = 30; G.scene.fog.far = 125; G.amb.color.setRGB(0.34, 0.4, 0.5); }\n    if (SC.issue === 'gild') { G.scene.background.set(0x07060a);");
+
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));

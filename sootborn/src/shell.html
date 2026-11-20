@@ -141,6 +141,8 @@ body.portrait #hint{bottom:auto;top:calc(var(--cy) + var(--ch) + 64px)}
 #card .acal{display:flex;gap:0;margin-top:26px;width:min(92vw,520px);max-width:92vw}#card .acal span{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;flex:1 1 0;text-align:center;overflow-wrap:anywhere;font-size:min(calc(9px*var(--ts)),2.5vw);letter-spacing:.08em;color:#6a5a50;border-top:2px solid #3a2a24;padding-top:0}#card .acal i{width:8px;height:8px;margin-top:-5px;background:#3a2a24;border-radius:50%}#card .acal .on{color:var(--amber)}#card .acal .on i{background:var(--amber);box-shadow:0 0 10px rgba(255,150,60,.9)}
 #card .bigs{margin-top:10px;font-size:calc(13px*var(--ts));letter-spacing:.25em;text-transform:uppercase;opacity:.75}
 #cskip{position:absolute;right:calc(var(--sar) + 10px);bottom:calc(var(--sab) + 10px);min-height:44px;padding:6px 14px;background:rgba(36,23,26,.85);border:2px solid #3a2620;color:var(--cream);font:inherit;border-radius:4px;pointer-events:auto;z-index:5}
+#devback{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--sat, 0px) + 4px);min-height:30px;padding:3px 12px;background:rgba(36,23,26,.72);border:1px solid #6a4a2a;color:var(--cream);font:inherit;font-size:12px;border-radius:4px;pointer-events:auto;z-index:8;opacity:.75}
+#devback:hover,#devback:focus{opacity:1;border-color:#e8c25a}
 #dbg{position:absolute;left:4px;bottom:4px;font-size:10px;background:rgba(0,0,0,.7);padding:4px;white-space:pre;pointer-events:none;z-index:9}
 @media (prefers-reduced-motion:reduce){.press,#dlg .more{animation:none}}
 
@@ -183,6 +185,7 @@ body.inpanel:not(.portrait) #dlg .tx{min-height:0;line-height:1.4}
   <div id="layer"></div>
   <div id="card" class="hidden"></div>
   <button id="cskip" class="hidden">Skip scene ▸▸</button>
+  <button id="devback" class="hidden" title="Back to the Dev menu (F2)">◂ Dev menu</button>
 </div>
 <div id="controls">
   <div id="dpad" aria-label="Direction pad"><i class="h"></i><i class="v"></i><b></b></div>

@@ -203,7 +203,7 @@ FF.keepEnd = () => { const d = FF.keep(); d.breaks = 1; delete d.endAt; d.winTex
     { d: 3.0, cam: [40, 170, 64, 160], to: [14, 132, 56, 180], acts: [{ id: 'celestine', a: [30, -64], fx: -.3, fy: 1 }, { id: 'lucan', a: [26, -6], pose: 'kneel', fx: -1, fy: .2, sc: 1.08 }, { id: 'kael2', a: [-6, 0], blade: 1, fx: 1, fy: -.2, aura: 2 }], cap: 'HE GOES TO HIS KNEES IN FRONT OF HIS MOTHER. SHE DOES NOT GET UP.' }
   ].concat(d.outro); return d; };
 // the Valley, day forty: it used to open the game and explain everything. In the last dream it needs none of that
-FF.valley40 = () => { const d = FF.valley(); d.skip = 1; d.hero = Object.assign({}, d.hero, { cape: CLOAK }); if (d.intro && d.intro.length > 2) { d.intro = [d.intro[0], d.intro[d.intro.length - 1]]; d.intro[0] = Object.assign({}, d.intro[0], { cap: 'DAY FORTY. TWO HOUSES HAVE COME FOR THE VALLEY.' }); d.intro[1] = Object.assign({}, d.intro[1], { cap: 'FORTY CADETS BEHIND ME. NOT ONE OF THEM KNOWS WHAT I AM.' }); } return d; };
+FF.valley40 = () => { const d = FF.valley(); d.skip = 1; d.boots = 1; d.era = Math.max(d.era || 0, 4); d.hero = Object.assign({}, d.hero, { cape: CLOAK }); if (d.intro && d.intro.length > 2) { d.intro = [d.intro[0], d.intro[d.intro.length - 1]]; d.intro[0] = Object.assign({}, d.intro[0], { cap: 'DAY FORTY. TWO HOUSES HAVE COME FOR THE VALLEY.' }); d.intro[1] = Object.assign({}, d.intro[1], { cap: 'FORTY CADETS BEHIND ME. NOT ONE OF THEM KNOWS WHAT I AM.' }); } return d; };
 // ---- the dreams: what happens between the fights, told below, the old way
 const DREAM1 = () => [
   { music: 'mystery' }, { card: 'THAT NIGHT', sub: 'Kael does not dream of the furnace. For once it runs forward.', min: 1.6, max: 5 },

@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version string:** `src/ui.js`, "Version 0.69." Next is 0.70.
+- **Version:** `GAME_VER` in `src/ui.js` (0.70; next is 0.71). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.66 on; v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -37,7 +37,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Fights:** `src/brawl.js` is both the 2D fights and the 3D arena fights (the arena is drawn by `src/g3.js`, plain WebGL). A fight is a def from `FF` in `src/ff.js` (and `assay.js`, `rowk.js`), started with `Brawl.start(def, cb)` or `Mission.fight(def, after)`. `def.era` gates moves; `hookEra()` gives the hook only if `def.hook` or era ≥ 5.
 - **2.5D places** are Brawl's walk mode: a def with `walk: { id, spawn, npcs, spots, props, floor, obj, keep|clear }` (see `walkCircle`, `walkSquare`, `walkRowMorning`, `walkWard` in `src/assay.js`).
 - **2D levels** (top-down missions): `Mission.start(id, done)`; defs in `src/assay.js` and elsewhere.
-- **Comic-book levels** (third person, three.js, `SC` namespace) are chosen by the key replaced into `issue: 'docks'`; existing keys: `gild` (the Table), `riser`, `docks`, `stair`. Started from the game with `Issue.start(key, ok => …)`. Hosted in an iframe; input arrives by postMessage.
+- **Comic-book levels** (third person, three.js, `SC` namespace) are chosen by the key replaced into `issue: 'docks'`; existing keys: `gild` (the Table), `riser`, `docks`, `stair`, `stack` (the vent stack, v0.70). Started from the game with `Issue.start(key, ok => …)`. Hosted in an iframe; input arrives by postMessage.
 - **The opening:** the animated intro is `src/prelude.js` (v0.68); the old film is still in `src/ff.js` (`OPENING`) for the Dev menu only; the cold open is `FF.keepCold`. The Keep is `FF.keep` (src/ff.js, around line 60).
 
 ### A5. Tests (in `tests/`)
@@ -98,9 +98,10 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - **Departures from Part C, waiting on the owner:** Dorian is not in the camp (the written story has him carried out by the other door and on the wall of names; his bread and a boxed name stand in for him). Oswin's leg is not hurt until night 49, as written. The Sisters Vey are Teal and only visit the board. Kael's hook is 307.
 - Not done: the knife count at the end of the other days below.
 
-**Step 5 · v0.70 · the vent stack (comic-book level, 8c)**
-- Vertical climb on the island's stack with Voss's dead boots; charge at the top; jump. Uses the existing level kit and moves. Flight is live from here on in every later fight.
-- Check: `runlv.sh stack`; the Valley (9b) has the boots.
+**Step 5 · v0.70 · the vent stack (comic-book level, 8c)** — **DONE 2026-11-20**
+- Done: level key `stack` (`STACK` in `issue/world.js`; the `SC.issue === 'stack'` block in `issue/story.js`; three reps at the end of `issue/patch.mjs`; `LEVELS`/`TT` in `src/issue.js`). No boss: encounters `alley`, `l1`, `l2`; the collar (`F.charged`); the edge calls `ending()`, which is three pictures and `done()`. `S.noBoots()` switches the leap and hover off (any level can use it). In the story: `DREAM3` in `src/day3.js`, after the boots narration. `FF.valley40` has `boots: 1`.
+- Also in v0.70, from the owner: the Dev menu shows the version that last changed each scene (`DEV_VER`, `GAME_VER`, `DEV_NEW` in `src/ui.js`; **bring all three up to date every release**), and scenes started from it come back to it (`DEV.from`, `Game.abort()`, `Game.devBack()`, `#devback`, F2).
+- Tests: `stack.mjs` (the level by teleport), `devm.mjs` (the Dev menu).
 
 **Step 6 · v0.71 · the Deep Array (comic-book level, 7b)**
 - Kael untrained: a mode with no boots, no ELEVEN, no Assay moves; climb, hide, scramble; a wrench brawl. Show what the Array is and that it is failing.
@@ -260,7 +261,7 @@ Kael's names: **Kael Brennick** below; **Edric Sorrel** (a dead boy's name) from
 - Card: **THAT NIGHT** / *Further in than it has gone before.* In: CUT. Trigger: he falls asleep under the floor with the Array's hum in his ears.
 - 8a: **NIGHT THIRTY** / *The Assay. The night before day thirty-one.* In: STRIP. Happening: Violet gets onto the Proctors' dais and sees the grading book; Kael notices a page that shouldn't be there. Plays: **the Dais** (2D level).
 - 8b: **MORNING** / *The Assay. Day thirty-one. He has noticed the page.* Happening: Halden Voss, the Proctor paid by two Houses, comes for him. Nobody touches a Proctor. Kael does, in the air and then on the ground, and cuts the boots off him. Plays: **the Proctor** (3D), **On the Ground** (2D).
-- 8c: **NEW — the vent stack (comic-book level).** Card: **THE VENT STACK** / *The Assay. Day thirty-one. The island.* In: PAGE. Trigger: Voss's boots, dead in his hands. Happening: the Proctors' boots charge off the island's vent stack (6a told us). Kael climbs it with them, charges them at the top and jumps. **He can fly from here on.** Say: Kael: *"They had told us the boots were what made a Proctor. They are a battery, and a stack, and a man who isn't afraid of the height."* Out: PAGE. Build: **NEW** (`issue/`, key e.g. `stack`; vertical).
+- 8c: **NEW — the vent stack (comic-book level).** Card: **THE VENT STACK** / *The Assay. Day thirty-one. The island.* In: PAGE. Trigger: Voss's boots, dead in his hands. Happening: the Proctors' boots charge off the island's vent stack (6a told us). Kael climbs it with them, charges them at the top and jumps. **He can fly from here on.** Say: Kael: *"They had told us the boots were what made a Proctor. They are a battery, and a stack, and a man who isn't afraid of the height."* Out: PAGE. Build: **BUILT v0.70** (`issue/`, key `stack`).
 - 8d: no card. CUT. Happening: he comes back into camp in Voss's white cloak; the cadets get up from the fire and follow him. Build: **BUILT v0.68** (white cloak on Kael from here: the Valley, the Last Night, the Keep and its cold open, the Pinning).
 - 8e: the hum slip: a book as wide as a table, a pen in his hand, gold on his cuff, a red line he doesn't understand. Existing lines stand. Then **FORTY-THREE DAYS AFTER THE FURNACE** / *Cinderwell. Under the floor.* In: WAKE. Build: CHANGE (drop the second card "THE LEDGER / … The day ends.").
 
