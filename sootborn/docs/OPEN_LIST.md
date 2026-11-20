@@ -24,7 +24,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 ## Your aim (2026-11-20): play it start to finish today; after that, only polish
 - Every scene in the plan is built and in order (the bot's log matches the plan). v0.78 fixed the one dead end found by walking every 2.5D place on foot (the fever ward).
 - **When you play, tell me where you got stuck, lost, or bored.** That list replaces Steps 12 to 14 as what I do next.
-- Most likely trouble, in my guess: the three new comic-book levels (vent stack, Deep Array, the cold open) because nobody has held a stick in them; the Count puzzle's speed; the Keep's ending if you never hold strike.
+- A bot has now walked the three newest comic-book levels with the stick and solved the Count at a person's speed. Most likely trouble left: the fights themselves (no script plays them properly), the Keep's ending if you never hold strike, and the three bosses' standing poses, which nobody has seen.
 - Polish that waits until you have played: Step 11's last two (Kael's stance, capes), Step 12 (places), Step 13 (controls), Step 14 (films).
 
 ## Built in v0.77 (look at these first: built unseen)

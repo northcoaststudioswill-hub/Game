@@ -10,7 +10,11 @@ Your aim for today: play it start to finish, in order, with every played moment 
 
 **The whole-story bot:** new game to THE END, no errors.
 
-**Not checked:** nothing by hand. The comic-book levels' routes (the vent stack, the Deep Array, the Stair's cold open) were proved earlier by stepping the route against the level's own collision, not by a bot holding a stick. The fights are won by scripts that set the state, not by playing them.
+**Added after release (same build, no new version):**
+- **The three newest comic-book levels walked with the stick**, not teleported: a bot pushes the stick toward each point of the route and presses the interact button where a person would. The cold open: terrace to the top of the first flight, 23 seconds, ended by itself. The vent stack: foot to crown (height 0 to 36), the collar, the edge, 109 seconds. The Deep Array: hatch, catwalk (waiting for the lamp), floor, the heart, and the run back up to the hatch, 118 seconds. None got stuck. The bot clears each fight as it starts.
+- **The Count puzzle at a person's speed:** the same bot slowed to one key press every 0.4 seconds solved it in 40 seconds without being noted.
+
+**Not checked:** nothing by hand. The fights are still won by scripts that clear them, not by playing them.
 
 
 ## v0.77 · 2026-11-20 — the Gallery's onlookers; how each boss stands (Step 11, second part)
