@@ -837,3 +837,8 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .card.vs.pf2 .pf-tip { font-size: 0.82rem; padding: 0.45rem 0.7rem; margin: 0.5rem 0 0.2rem; opacity: 0.9; }
 .card.vs.pf2 > .row.end #go { flex: 1; padding-top: 0.85rem; padding-bottom: 0.85rem; font-size: 1rem; }
 @media (max-width: 560px) { .pf-carry .gm-slots { grid-template-columns: 1fr 1fr 1fr; } .pf-carry .gm-slot { flex-direction: column; text-align: center; gap: 0.15rem; padding: 0.4rem 0.2rem; } .pf-carry .gm-slot b { font-size: 0.7rem; white-space: normal; } }
+
+.pf-ess { margin: 0.5rem 0; } .pf-essrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: 0.45rem; margin-top: 0.3rem; }
+.pf-essrow button { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.5rem 0.3rem; text-align: center; }
+.pf-essrow i { font-style: normal; font-size: 1.2rem; line-height: 1; color: var(--gold); } .pf-essrow i svg { width: 1.3rem; height: 1.3rem; }
+.pf-essrow b { font-size: 0.82rem; } .pf-essrow small { font-size: 0.64rem; color: #c8bea8; line-height: 1.2; text-transform: none; letter-spacing: 0; max-height: 2.4em; overflow: hidden; } .pf-essrow em { font-style: normal; font-size: 0.74rem; color: #f0d890; }

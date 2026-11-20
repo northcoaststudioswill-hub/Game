@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  const p = await b.newPage({ viewport: { width: 390, height: 844 } }); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+  await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(400);
+  await p.click('#bNew'); await p.click('.c-skip'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+  const S = () => p.evaluate(() => ({ coin: G.state.coin, potions: G.state.potions, boons: JSON.stringify(G.state.boons || {}), ess: [...document.querySelectorAll('[data-ess]')].map(b => b.dataset.ess + (b.disabled ? '(x)' : '') + ':' + b.querySelector('em').textContent).join(' '), quote: (document.querySelector('#panel .quote') || {}).textContent.slice(0, 30), h: document.querySelector('#panel .card').scrollHeight + '/' + document.querySelector('#panel .card').clientHeight }));
+  await p.evaluate(() => { G.muted = true; const st = G.state; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; st.firstPath = 9; st.respect = 400; st.wins = { a: 3 }; st.coin = 200; st.potions = 1; st.shownPlaces = { a: 1 }; st.seen = { cook: 1, apoth: 1 }; G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); G.ui.pit(); document.querySelector('[data-under]').click(); });
+  console.log('open  ', JSON.stringify(await S())); await p.screenshot({ path: 'ess.png' });
+  for (const k of ['meal', 'pot', 'tonic']) { await p.click('[data-ess=' + k + ']'); console.log(k.padEnd(6), JSON.stringify(await S())); }
+  await p.evaluate(() => { document.querySelector('#go').click(); for (let i = 0; i < 4 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } for (let i = 0; i < 200; i++) G.fight.update(1 / 60); }); console.log('in bout: toast', await p.evaluate(() => document.getElementById('toast').textContent), '| boons after', await p.evaluate(() => JSON.stringify(G.state.boons)));
+  console.log('ERRORS', errs.length, errs.slice(0, 2).join('|')); await b.close(); })();

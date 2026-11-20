@@ -66,7 +66,14 @@
     const gear = q('.gearcmp'); let gline = null; if (gear && gear.classList.contains('ok')) { gline = document.createElement('p'); gline.className = 'pf-even'; gline.textContent = 'Steel and armour: evenly matched.'; gear.remove(); }
     const tip = q('p.note'); if (tip) tip.classList.add('pf-tip');
     const prep = q('.prep'), off = q('.prep-off'); let prow = null; if (prep || off) { prow = document.createElement('div'); prow.className = 'pf-prep'; if (prep) prow.appendChild(prep); if (off) prow.appendChild(off); }
-    [carry, gline || q('.gearcmp'), prow, tip].forEach(el => { if (el && foot) foot.parentNode.insertBefore(el, foot); });
+    // last stop: the essentials in one tap, from whoever is open to you
+    const st = G.state, B = G.BOONS || {}, bn = st.boons || (st.boons = {}), open = k => !G.unlocked || G.unlocked(k), ess = [];
+    if (st.potions < G.POTION_MAX) ess.push({ id: 'pot', ic: G.icon('potion'), name: 'Potion', sub: st.potions + ' of ' + G.POTION_MAX, cost: G.POTION_COST, buy: () => { st.potions++; } });
+    if (open('cook') && B.stew && !bn.meal) ess.push({ id: 'meal', ic: '♨', name: B.stew.name, sub: B.stew.desc, cost: B.stew.cost, buy: () => { bn.meal = 'stew'; } });
+    if (open('apoth') && B.ironbark && !bn.tonic) ess.push({ id: 'tonic', ic: '⚗', name: B.ironbark.name, sub: B.ironbark.desc, cost: B.ironbark.cost, buy: () => { bn.tonic = 'ironbark'; } });
+    let erow = null; if (ess.length && !(o && o.spar)) { erow = document.createElement('div'); erow.className = 'pf-ess'; erow.innerHTML = '<small class="over">Last stop · you have ' + st.coin + ' coin</small><div class="pf-essrow">' + ess.map(e => '<button data-ess="' + e.id + '"' + (st.coin < e.cost ? ' disabled' : '') + '><i>' + e.ic + '</i><b>' + e.name + '</b><small>' + e.sub + '</small><em>' + e.cost + ' coin</em></button>').join('') + '</div>';
+      erow.querySelectorAll('[data-ess]').forEach(b => b.onclick = () => { const e = ess.find(x => x.id === b.dataset.ess); if (!e || st.coin < e.cost) return; st.coin -= e.cost; e.buy(); G.save(); G.sfx('coin'); ui.topbar(); const keepQ = [q('.quote'), q('.retort'), q('p.note')].map(x => x && x.innerHTML); ui.prefight(o); const c2 = document.querySelector('#panel .card.vs'); if (c2) ['.quote', '.retort', 'p.note'].forEach((sel, i) => { const x = c2.querySelector(sel); if (x && keepQ[i]) x.innerHTML = keepQ[i]; }); }); }
+    [carry, gline || q('.gearcmp'), prow, erow, tip].forEach(el => { if (el && foot) foot.parentNode.insertBefore(el, foot); });
     return r;
   };
 
