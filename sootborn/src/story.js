@@ -26,6 +26,7 @@ const CAST = {
   celestine: { name: 'High Auditor Celestine Aurel', look: () => ({ accredited: 1, skin: '#f4e6dc', hair: '#f6eac0', robe: '#f4f2ec', trim: '#e8c25a', crown: 1 }) },
   warden: { name: 'Warden', look: () => ({ accredited: 1, warden: 1, skin: '#e8dcd0', hair: '#c8ccd4', robe: '#c8ccd8', trim: '#e8c25a' }) },
   // the Assay, four years on (flash-forwards)
+  kael3: { name: 'Kael', look: () => Object.assign({}, CAST.kael2.look(), { cape: '#f4efe2' }) },   // from day thirty-one: the Proctor's white cloak
   kael2: { name: 'Kael', look: () => Object.assign({}, playerLook(), { accredited: 1, cadet: 1, robe: '#efe8d4', armor: '#efe8d4', trim: '#e8c25a', sash: '#7a5ac8', hair: '#e9cf7a', style: 'spiky', spiky: 1, band: 1, smudge: 1, cape: '#5a3aa8' }) },
   cadv1: { name: 'House Violet', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dccc', hair: '#f2e2a8', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },
   cadv2: { name: 'House Violet', look: () => ({ accredited: 1, cadet: 1, skin: '#e8ccb4', hair: '#f6eac0', style: 'long', long: 1, robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },

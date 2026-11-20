@@ -158,7 +158,7 @@ FF.twins = () => ({ flat: 1,
 FF.blade = () => ({
   era: 4, boots: 1, title: 'THE PINNING', sub: 'THE AUDITOR\'S BLADE - HER OWN CHAMPION', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'PIN IT ON HIM',
   newMove: 'THE BOOTS: HOLD JUMP TO FLY. HE HAS THEM TOO.', fin: { name: 'IRON SKY', l1: 'SHE WANTED TO SEE WHAT I WAS', l2: 'I SHOWED HER MOST OF IT', rgb: '140,220,255', mode: 'sky' },
-  hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU WERE NOT RAISED TO THIS.', 'I CAN SMELL THE EFFORT.', 'WHO TAUGHT YOU THAT?'] },
+  hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50, cape: CLOAK }, taunt: { 0: ['YOU WERE NOT RAISED TO THIS.', 'I CAN SMELL THE EFFORT.', 'WHO TAUGHT YOU THAT?'] },
   foes: [{ id: 'voss', name: 'The Auditor\'s Blade', kind: 'duelist', hp: 150, sc: 1.22, k2: { slam: 1 } }],
   voice: { at: [[1, 'I PUT HER SON ON HIS KNEES. SHE SMILED, AND SENT HER OWN CHAMPION DOWN THE STEPS. ONE MORE, SHE SAID. FOR MY CURIOSITY.'], [13, 'HE HAS KILLED FOR HER FOR THIRTY YEARS. HE DOES IT THE WAY I USED TO CHANGE A SEAL.'], [27, 'SHE IS LEANING FORWARD. I HAVE SEEN THAT LOOK. SHE HAD IT AT THE FURNACE.']],
     hurt: 'HE CUTS WHERE THE WIRE WENT IN. HE CAN SEE IT. SHE CANNOT.', fury: 'NOT ALL OF IT. NOT IN FRONT OF HER. ENOUGH.', half: 'HE HAS REALISED I AM NOT WHAT IS WRITTEN ON MY PAPERS. HE CANNOT WORK OUT WHAT I AM INSTEAD.', eleven: 'ELEVEN. SHE COUNTS THEM TOO. SHE DOES NOT KNOW WHY THERE ARE ELEVEN.' },
@@ -277,8 +277,10 @@ function DAY4() {
     { say: 'ilse', t: 'You are shorter than I was told.' },
     { say: 'kael', t: 'I\'m told that can be fixed. ...Ta. For coming.' },
     { say: 'ilse', t: 'That is the last time you will say that word for nine years. Enjoy it. It can be fixed, and you will wish it could not. Come along, soot. One does not keep the table waiting.' },
-    { fade: 'out' }, { panel: null },
-    ...(NOFF ? [] : [{ fx: () => { World.gilded = 1; } }, { card: 'THAT NIGHT', sub: 'The last dream below. It runs to the end.', min: 1.4, max: 4 }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day forty.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley40() }, { card: 'NIGHT FORTY-NINE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }, { card: 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => FF.keep() }]),
+    // the callback: one beat of the Table's first picture, a page in and a page out. It is the only time the Gilding touches the present; the present stops at that door
+    { card: '', big: 1, tr: 'page', min: .95, max: 1.05 }, { panel: 'gild' }, { fx: () => { Fade.a = 0; Fade.dir = 0; Fade.busy = false; } }, { sfx: 'heart' }, { wait: 1.9 },
+    { card: '', big: 1, tr: 'page', min: .95, max: 1.05 }, { panel: null }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } },
+    ...(NOFF ? [] : [{ fx: () => { World.gilded = 1; } }, { card: 'THAT NIGHT', sub: 'The last dream below. It runs to the end.', min: 1.4, max: 4 }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day forty.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley40() }, { card: 'NIGHT FORTY-NINE', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }, { card: 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => FF.keepEnd() }]),
     { card: 'END OF PART ONE', sub: 'B E L O W', big: 1, sfx: 'splash', min: 2.6, max: 7 },
     { fx: () => { G.flags.day4Done = 1; } }
   ];

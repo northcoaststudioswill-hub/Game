@@ -371,7 +371,7 @@ const G3 = {
     if (L.circlet) { D.loft(hd, [[5.55, 3.5, 3.65, 0, -.1], [6.1, 3.45, 3.6, 0, -.1]], 8, trim); D.box(hd, 0, 6.2, 3.6, 1.1, 1.4, .4, [1, 1, .9], 1); }
     if (L.crown) for (let i = 0; i < 5; i++) D.box(M4.chain(hd, M4.ry((i - 2) * .55), M4.t(0, 6.6, 3.6)), 0, 1.2 + (i === 2 ? .7 : 0), 0, .9, 2.4 + (i === 2 ? 1.4 : 0), .5, [1, .9, .5], 1); },
   char(o, opt) {
-    const D = this.dyn, t = this.t, L = (CAST[opt.id] || CAST.cadv1).look(), idx = o.idx || 0, st = o.st || 'idle', sc = (o.sc || 1), fx = o.fx || 0, fy = o.fy === undefined ? 1 : o.fy, rm = Settings.d.reduce;
+    const D = this.dyn, t = this.t, L0 = (CAST[opt.id] || CAST.cadv1).look(), L = opt.cape && L0.cape && opt.cape !== L0.cape ? Object.assign({}, L0, { cape: opt.cape }) : L0, idx = o.idx || 0, st = o.st || 'idle', sc = (o.sc || 1), fx = o.fx || 0, fy = o.fy === undefined ? 1 : o.fy, rm = Settings.d.reduce;
     if (o === Brawl.p && o.inv > 0 && st !== 'dodge' && !Brawl.sup && !Brawl.art && Math.floor(t * 20) % 2) return;
     const arm = L.armor || '#efe8d4', trim = L.trim || '#e8c25a', sash = L.sash || '#7a5ac8', skin = (h => { const n = parseInt(h.slice(1), 16), r = Math.min(255, Math.round((n >> 16) * 1.06)), gg = Math.round((n >> 8 & 255) * .95), b = Math.round((n & 255) * .82); return '#' + ((1 << 24) | (r << 16) | (gg << 8) | b).toString(16).slice(1); })(L.skin || '#d8a07a'), hair = L.hair || '#e9cf7a', dark = shade(arm, .62), blade = opt.blade || 0;
     const z = (o.z || 0) * this.HK * 1.2;

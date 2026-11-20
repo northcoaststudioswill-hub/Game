@@ -311,7 +311,7 @@ MAPS.vcamp3 = buildMap(Object.assign({}, VC2, { name: 'House Violet — night tw
 const EVE_N = () => ['petra', 'oswin', 'teal', 'lucan'].filter(k => MF('e_' + k)).length;
 Object.assign(MISSIONS, {
   eve: {
-    calm: 1, map: 'vcamp2', spawn: [2, 7, 3], toast: 'Tomorrow, the keep. Nobody is sleeping.', hint: 'Walk the camp · talk to whoever is awake',
+    calm: 1, map: 'vcamp2', spawn: [2, 7, 3], sheet: 'kael3', toast: 'Tomorrow, the keep. Nobody is sleeping.', hint: 'Walk the camp · talk to whoever is awake',
     npcs: () => [mS('petra', 10, 6, 0), mS('oswin', 14, 11, 1), mS('cadt1', 18, 8, 2), mS('lucan', 21, 7, 2), mS('cadv1', 6, 9, 3), mS('cadv2', 9, 12, 1)],
     obj: () => EVE_N() < 3 ? 'Walk the camp. Speak to those who are awake (' + EVE_N() + '/4)' : 'Sit down at the fire (hold)',
     mark: () => EVE_N() < 3 ? null : { x: 12.5 * 16, y: 9 * 16, lab: 'FIRE' },

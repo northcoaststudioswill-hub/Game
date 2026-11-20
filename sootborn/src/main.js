@@ -11,7 +11,8 @@ const Game = {
   },
   newGame() {
     freshState('Kael', 0); World.resetSheets(); World.showPlayer = true;
-    Cutscene.play(PROLOGUE_A, () => Game.startHeist());
+    const go = () => Cutscene.play(PROLOGUE_A, () => Game.startHeist());
+    if (NOFF) go(); else Prelude.run(go);
   },
   startHeist() {
     G.heist = 1; World.load('bay', { x: 24, y: 7 * 16 + 4, dir: 3 }, true); World.darkOverride = 'rgba(3,2,9,.8)';
@@ -179,7 +180,7 @@ canvas.addEventListener('pointerdown', e => {
 });
 $('#card').addEventListener('pointerdown', () => { Cutscene.tapped = true; });
 window.addEventListener('pointerdown', () => { if (Brawl.active && Brawl.cine) Brawl.tap = true; }); window.addEventListener('keydown', e => { if (Brawl.active && Brawl.cine && Brawl.def.cineOnly && !e.repeat) Brawl.tap = true; });
-$('#cskip').addEventListener('click', e => { e.stopPropagation(); Cutscene.skip(); });
+$('#cskip').addEventListener('click', e => { e.stopPropagation(); if (Prelude.on) Prelude.finish(); else Cutscene.skip(); });
 
 const ZC = { c: null, g: null };
 const BLEED2 = { name: 'BANK 7 · BLEED AGAIN', timer: 28, tip: "Feed AUX-9 into the clinic branch before Vale walks back. Don't get caught with your hands in it.", cols: 4, rows: 3, cells: [
@@ -198,7 +199,7 @@ function boot() {
   // press-to-start (also unlocks audio as a user gesture)
   const el = document.createElement('div'); el.className = 'splash'; el.style.background = '#07090d';
   el.innerHTML = '<div class="press">▶ Tap or press any key</div>'; $('#layer').appendChild(el);
-  const go = () => { if (booted) return; booted = true; Sound.unlock(); el.remove(); Input.consume(); window.removeEventListener('keydown', go); G.mode = 'splash'; Splash.run(() => { if (!P.sheet) World.resetSheets(); Opening.run(() => Game.toTitle()); }); };
+  const go = () => { if (booted) return; booted = true; Sound.unlock(); el.remove(); Input.consume(); window.removeEventListener('keydown', go); G.mode = 'splash'; Splash.run(() => { if (!P.sheet) World.resetSheets(); Game.toTitle(); }); };
   el.addEventListener('pointerdown', go); window.addEventListener('keydown', go);
   Boot.go = go;
   requestAnimationFrame(frame);
@@ -207,7 +208,9 @@ const Boot = { go: null };
 
 let last = 0, acc = 0;
 function frame(ts) {
-  requestAnimationFrame(frame); if (Issue.on) { last = ts; Input.update(1 / 60); Issue.tick(); return; } Perf.tick(ts);
+  requestAnimationFrame(frame); if (Issue.on) { last = ts; Input.update(1 / 60); Issue.tick(); return; }
+  if (Prelude.on) { const d = Math.min(0.1, last ? (ts - last) / 1000 : STEP); last = ts; Input.update(d); Prelude.tick(d); Sound.tick(); return; }
+  Perf.tick(ts);
   const dt = Math.min(0.1, last ? (ts - last) / 1000 : STEP); last = ts; acc += dt; Debug.frame(dt);
   let n = 0; while (acc >= STEP && n < 6) { step(STEP); acc -= STEP; n++; } if (n === 6) acc = 0;
   render(); Sound.tick();

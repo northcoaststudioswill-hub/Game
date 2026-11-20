@@ -1,4 +1,40 @@
-# SOOTBORN — changelog (latest v0.67 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.68 · 2026-11-20)
+
+## v0.68 · 2026-11-20 — the new things in the opening: the animated intro, the Keep's ending, the white cloak, the Table at the door
+Step 3 of the plan. Four things, all in Part One.
+
+**The animated intro (plan 0a)**
+- New Game now opens on eleven drawn pictures that move, counted ONE to ELEVEN, with no words: a hand flat on a pipe, then the same hand in plate closing on a hilt; a chalk sun and the woman drawing it, then the real sun over a valley; her eye through the washer, then the eye in the Authority's gold sun; three cadets' faces; a Proctor writing tally marks; his eyes below, then the same eyes in gold; the blade.
+- Each picture is shorter than the one before (3.4 seconds down to 1), about 23 seconds in all. One voice hums the shift song; a heartbeat lands on each number; a tally is kept in the corner.
+- It is drawn by code at the screen's real resolution (ink lines, halftone dots), not at the game's 320 pixels, so it is sharp on a PC monitor. It fills a phone held upright by cropping the sides.
+- Any button skips it, and so does the Skip button. "Reduce motion" holds each picture still and drops the flashes.
+- **The old opening film no longer plays.** The game boots from the two logos straight to the title. The film is still in the Dev menu, marked old.
+- The count reaching eleven is the ELEVEN transition at the opening (the first of its three uses).
+
+**The Keep's ending (plan 9d)**
+- At the end of Part One the Keep is now fought the whole way through. Lucan cannot be put down by ordinary blows (he stops at a fifth of his health). When he is at half or less your fury fills and the game says HOLD STRIKE; **an ELEVEN begun then breaks his blade** and he goes to his knees. An ELEVEN used earlier only hurts him.
+- Two new pictures at the head of the film afterwards: the eleventh coming down on his blade, and Lucan on his knees with Celestine standing behind him. Then the three that were there (the circlet, the sun, the candle-hour).
+- Kael's lines in the fight now start with the cold open's line and then: IF I PUT HIM ON HIS KNEES IN FRONT OF HER, SHE WILL HAVE TO PIN THE GOLD ON ME HERSELF.
+- The banner reads ON HIS KNEES. He lives.
+
+**The white cloak (plan 8d)**
+- From day thirty-one Kael wears Voss's white cloak in place of House Violet's: the last two pictures after the Proctor, the Valley (day forty), the Last Night (his walking figure), the Keep (the cold open too, since it is the same morning) and the Pinning.
+
+**The Table at the door (plan 9)**
+- At the end of The Way Out, as Ilse says "One does not keep the table waiting", a page turns onto the Table under its lamp for two seconds and a heartbeat, and a page turns it away. It is the only time the Gilding touches the present.
+
+**Checked**
+- The intro from New Game in real time: eleven pictures in order, 23 seconds, the hum playing, a heartbeat on each count, then the Keep's card and the cold open. Skipping at three seconds does the same.
+- Stills of all eleven pictures at desktop size, and of six at phone size upright and two on its side.
+- The Keep's ending by stepping the fight: an early ELEVEN does not end it; forty heavy blows stop at a fifth; fury fills at 44%; the late ELEVEN breaks the blade; he kneels; the film's five pictures play in order.
+- The Table callback: page, the Table, page, then on to the next card.
+- The whole-story bot (see the last line of this entry).
+
+**Not checked**
+- Nothing by hand. The intro has been seen only as stills: its motion, its pacing against the hum, and how it sounds are unjudged.
+- The intro's speed on a real phone.
+- Whether Kael and Lucan, both in white cloaks now, are easy to tell apart in the Keep in motion.
+- The Keep's ending played by a person from start to finish.
 
 ## v0.67 · 2026-11-19 — the rearranging: the Keep opens the game, the Pairing is dreamed, every card in its place, five transitions
 From your question (shouldn't the rearranging come first?): yes. This version does everything in the plan that is pure moving and re-carding, and the transitions that sit on the cards. Nothing new was written except three card lines and two film captions.

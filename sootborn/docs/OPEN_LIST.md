@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.67 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.68 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -21,8 +21,14 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
 
+## Built in v0.68 (needs your eye)
+- **The animated intro:** eleven pictures counted to ELEVEN, in place of the opening film. Seen only as stills so far. Say if any picture is weak, if it is too long or too short, and whether the faces (the three cadets, the Proctor) are good enough.
+- **The Keep's ending:** his blade breaks on an ELEVEN begun at half health or less, and he kneels. Say if being unable to finish him any other way feels like a cheat.
+- **The white cloak** from day thirty-one. Kael and Lucan are both in white in the Keep now; say if they are hard to tell apart and I will give Kael's a violet lining.
+- **The Table at the door** when Ilse comes for him.
+
 ## Built in v0.67 (needs your eye)
-- **The Keep as the cold open:** cannot be lost; cuts as ELEVEN comes down. The old opening film still plays in front of it until the animated intro is built.
+- **The Keep as the cold open:** cannot be lost; cuts as ELEVEN comes down. (The animated intro went in front of it in v0.68.)
 - **The new order:** the Pairing in the first dream; the Lamp on First Fire's night; the Valley in the last dream; the Pinning opening Part Two.
 - **Cards and five transitions** (wake, furnace, strip, chalk, page).
 - **Your bug, an ELEVEN before you know what it is:** fixed for the Warden fight at the furnace. The cold open ends on ELEVEN by design; say if that was the one you meant.

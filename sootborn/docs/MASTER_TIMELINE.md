@@ -30,7 +30,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
 
 ### A4. How the code is put together (what you need for this plan)
-- Scripts are concatenated in this order: core, art, content, story, systems, cinema, panels, brawl, g3, ff, day2, day3, part2, rowk, assay, issue, checkpoints, ui, main. Top-level `const`s (Mission, DEV, Cutscene, Brawl, Issue, HUD, G3, FF…) are globals; `window.BTS` exposes G, UI, Game, Brawl, Dialogue, Puzzle, FF, World, P, Cutscene. A global called `STEP` exists; don't define `window.STEP`.
+- Scripts are concatenated in this order: core, art, content, story, systems, cinema, panels, brawl, g3, ff, day2, day3, part2, rowk, assay, issue, prelude, checkpoints, ui, main. Top-level `const`s (Mission, DEV, Cutscene, Brawl, Issue, HUD, G3, FF…) are globals; `window.BTS` exposes G, UI, Game, Brawl, Dialogue, Puzzle, FF, World, P, Cutscene. A global called `STEP` exists; don't define `window.STEP`.
 - **Cutscenes** are step lists: `{ card, sub }`, `{ narr }`, `{ say }`, `{ panel }`, `{ fade }`, `{ brawl: () => FF.x() }`, `{ mission: 'id' }`, `{ fx }`. `Cutscene.play(steps, done)`.
 - **The calendar strip** (`assayCal` in `src/cinema.js`) lights the Assay day by reading the card's **sub** text with regexes such as `/day thirty-one/i`. Assay days must stay in subs.
 - **Time helpers** `WHEN`, `whenS(d)`, `whenN(d)` at the top of `src/systems.js`.
@@ -38,7 +38,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **2.5D places** are Brawl's walk mode: a def with `walk: { id, spawn, npcs, spots, props, floor, obj, keep|clear }` (see `walkCircle`, `walkSquare`, `walkRowMorning`, `walkWard` in `src/assay.js`).
 - **2D levels** (top-down missions): `Mission.start(id, done)`; defs in `src/assay.js` and elsewhere.
 - **Comic-book levels** (third person, three.js, `SC` namespace) are chosen by the key replaced into `issue: 'docks'`; existing keys: `gild` (the Table), `riser`, `docks`, `stair`. Started from the game with `Issue.start(key, ok => …)`. Hosted in an iframe; input arrives by postMessage.
-- **The opening:** the opening film and its caption "ONE SEASON" are in `src/ff.js`; the cold open is currently `FF.valley`. The Keep is `FF.keep` (src/ff.js, around line 60).
+- **The opening:** the animated intro is `src/prelude.js` (v0.68); the old film is still in `src/ff.js` (`OPENING`) for the Dev menu only; the cold open is `FF.keepCold`. The Keep is `FF.keep` (src/ff.js, around line 60).
 
 ### A5. Tests (in `tests/`)
 Playwright (run `npm i playwright` inside `tests/` once; it drives the Chrome already on the machine, no browser download) with Chrome and the software renderer (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`). Paths inside older tests may point at another machine's folders: point them at the repo's `index.html` and `issue/`.
@@ -97,7 +97,7 @@ Kael's names: **Kael Brennick** below; **Edric Sorrel** (a dead boy's name) from
 - Happening: the player knows nothing yet. Three promises: a man underground, a woman, gold. It ends on the number the game is built round.
 - Say: no words. One voice humming the shift song; the count, one to eleven, under the pictures.
 - Plays: about 25 seconds of drawn stills that move (pans, pushes, cuts), in the Table's comic style. A hand flat on a pipe → a gauntlet closing on a hilt. A chalk sun on a wall → the real sun over a valley. Faces in the Assay's ring: cadets, a Proctor writing. Cuts getting faster on each number.
-- Out: ELEVEN. Build: **NEW** (replaces the opening film and its "ONE SEASON" caption in `src/ff.js`).
+- Out: ELEVEN. Build: **BUILT v0.68** (`src/prelude.js`; replaced the opening film). Pictures as built: hand on a pipe / gauntlet on a hilt; chalk sun and the woman drawing it / the real sun; her eye through the washer / the eye in the gold sun; three cadets; a Proctor writing tallies; his eyes below / his eyes in gold; the blade.
 
 **0b. The Keep (cold open)**
 - Card: **FOUR YEARS AFTER THE FURNACE** / *The Assay. The last day.* In: STRIP. Trigger: the count reaches eleven.
@@ -167,17 +167,17 @@ Kael's names: **Kael Brennick** below; **Edric Sorrel** (a dead boy's name) from
 - 8a: **NIGHT THIRTY** / *The Assay. The night before day thirty-one.* In: STRIP. Happening: Violet gets onto the Proctors' dais and sees the grading book; Kael notices a page that shouldn't be there. Plays: **the Dais** (2D level).
 - 8b: **MORNING** / *The Assay. Day thirty-one. He has noticed the page.* Happening: Halden Voss, the Proctor paid by two Houses, comes for him. Nobody touches a Proctor. Kael does, in the air and then on the ground, and cuts the boots off him. Plays: **the Proctor** (3D), **On the Ground** (2D).
 - 8c: **NEW — the vent stack (comic-book level).** Card: **THE VENT STACK** / *The Assay. Day thirty-one. The island.* In: PAGE. Trigger: Voss's boots, dead in his hands. Happening: the Proctors' boots charge off the island's vent stack (6a told us). Kael climbs it with them, charges them at the top and jumps. **He can fly from here on.** Say: Kael: *"They had told us the boots were what made a Proctor. They are a battery, and a stack, and a man who isn't afraid of the height."* Out: PAGE. Build: **NEW** (`issue/`, key e.g. `stack`; vertical).
-- 8d: no card. CUT. Happening: he comes back into camp in Voss's white cloak; the cadets get up from the fire and follow him. Build: CHANGE (white cape on Kael from here: the Valley, the Last Night, the Keep).
+- 8d: no card. CUT. Happening: he comes back into camp in Voss's white cloak; the cadets get up from the fire and follow him. Build: **BUILT v0.68** (white cloak on Kael from here: the Valley, the Last Night, the Keep and its cold open, the Pinning).
 - 8e: the hum slip: a book as wide as a table, a pen in his hand, gold on his cuff, a red line he doesn't understand. Existing lines stand. Then **FORTY-THREE DAYS AFTER THE FURNACE** / *Cinderwell. Under the floor.* In: WAKE. Build: CHANGE (drop the second card "THE LEDGER / … The day ends.").
 
 **9. The Way Out**
 - Card: **THE WAY OUT** / *One hundred and sixty days after the furnace.* In: WAKE.
-- Happening: four months on. Kael has decided. Mara knows. Proctor Sull's night watch stands between him and Lift Zero. Ilse Marrin comes for him at the end: *"Come along, soot. One does not keep the table waiting."* **Callback:** as she says it, one beat of the Table's first picture (PAGE in and out). That is the only time the Gilding touches the present; the present stops at that door.
+- Happening: four months on. Kael has decided. Mara knows. Proctor Sull's night watch stands between him and Lift Zero. Ilse Marrin comes for him at the end: *"Come along, soot. One does not keep the table waiting."* **Callback:** as she says it, one beat of the Table's first picture (PAGE in and out). That is the only time the Gilding touches the present; the present stops at that door. (**BUILT v0.68**, with the 2D picture of the Table.)
 - Plays: the months, Mara, **the Way Out** (2D), Ilse. Existing lines stand.
 - 9a: **THAT NIGHT** / *The last dream below. It runs to the end.* In: CUT. Trigger: the lift's light going up the shaft.
 - 9b: **FOUR YEARS AFTER THE FURNACE** / *The Assay. Day forty.* In: STRIP. Happening: Violet holds the valley against two Houses; he flies now. Plays: **the Valley** (3D, with the boots and the white cloak). Build: CHANGE (moved from the cold open).
 - 9c: **NIGHT FORTY-NINE** / *The Assay. The night before the last day.* Happening: the night before the end; no enemies; the cadets who are left. Plays: **the Last Night** (2D level).
-- 9d: **MORNING** / *The Assay. The last day.* Happening: **the cold open again, the whole way through.** This time ELEVEN lands: **Lucan's blade breaks and he goes to his knees in front of his mother.** He lives. Say: Kael's line from the cold open, then the one he says in the dream: *"If I put him on his knees in front of her, she will have to pin the gold on me herself."* Plays: **the Keep**. Out: ELEVEN, then black. Build: CHANGE.
+- 9d: **MORNING** / *The Assay. The last day.* Happening: **the cold open again, the whole way through.** This time ELEVEN lands: **Lucan's blade breaks and he goes to his knees in front of his mother.** He lives. Say: Kael's line from the cold open, then the one he says in the dream: *"If I put him on his knees in front of her, she will have to pin the gold on me herself."* Plays: **the Keep**. Out: ELEVEN, then black. Build: **BUILT v0.68** (`FF.keepEnd`).
 - 9e: **END OF PART ONE** / *B E L O W*.
 
 ### PART TWO: ABOVE
@@ -293,9 +293,10 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - Left for the scenes that need them: the ELEVEN transition (with the animated intro), the grey furnace (Celestine's flash), the strip running on into years (Part Two's flash-forwards).
 - The story bible already had Tavi right (six a year before the furnace is seven at it). Celestine's secret is in the bible's cast entry.
 
-**Step 3 · v0.68 · the new things in the opening**
-- The animated intro (0a) replaces the opening film and "ONE SEASON", and ends on the ELEVEN transition. The Keep's ending at the end of Part One: the blow lands, Lucan's blade breaks, he kneels (9d). The white cloak on Kael from day 31 (8d). The Ilse callback at the Way Out (9).
-- Check: New game to Ashgate in two jumps; stills of the intro on a phone-sized screen and at desktop size (PC is the main platform).
+**Step 3 · v0.68 · the new things in the opening** — **DONE 2026-11-20**
+- Done: the animated intro (`src/prelude.js`, `Prelude.run`; eleven drawn pictures counted to ELEVEN; called from `Game.newGame`; the old film is no longer shown at boot and survives only in the Dev menu). The Keep's ending (`FF.keepEnd`, `breaks: 1` on the fight: Lucan stops at a fifth of his health, and an ELEVEN begun at half or less breaks his blade and puts him on his knees; two new film pictures). The white cloak (`hero.cape` on a fight, `cape` on a film actor, the `kael3` walking sheet; `CLOAK` in `src/ff.js`): the Proctor's last two pictures, the Valley, the Last Night, the Keep and its cold open, the Pinning. The Ilse callback (two blank PAGE cards round the `gild` panel in `DAY4`).
+- Tests added: `prel.mjs` (stills of the intro; VW, VH, TIMES, TAG), `prel2.mjs` (the intro from New Game in real time; SKIP=1), `keepend.mjs` (the Keep's ending, stepped), `ilse.mjs` (the callback).
+- Not done here and still wanted: the intro has only been seen as stills. If the owner finds Kael and Lucan hard to tell apart in white, give Kael's cloak a violet lining.
 
 **Step 4 · v0.69 · Part One's two new 2.5D places, with the seat knives**
 - The camp by day (4f) with Dorian, Oswin, Petra, the Sisters Vey, Corin; the choice of who you sit with, remembered later.

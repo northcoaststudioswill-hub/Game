@@ -1,0 +1,20 @@
+// the Keep at the end of Part One: he cannot be put down before ELEVEN; an ELEVEN at half or less breaks the blade; he kneels; the film follows
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
+const shot = async n => { await wait(900); await page.screenshot({ path: '/home/claude/shots/v68/keep-' + n + '.png' }); };
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); for (let i = 0; i < 40 && !(await ev(() => BTS.G.mode === 'title' && BTS.UI.stack.length)); i++) { await page.keyboard.press('Enter'); await wait(250); } await wait(300);
+await ev(() => { BTS.UI.clear(); DEV.quick = 1; window.__end = 0; const B = BTS.Brawl; const d = BTS.FF.keepEnd(); d.arts = []; B.start(d, () => { window.__end = 1; }); BTS.UI.clear(); window.__u = B.update.bind(B); B.update = () => {}; window.step = (n, f) => { for (let i = 0; i < n; i++) { if (f) f(); if (B.phase === 'fight') { B.p.hp = Math.max(B.p.hp, 6); if (!B.sup && !B.snap) B.p.inv = Math.max(B.p.inv, .2); } window.__u(1 / 60); } }; });
+await ev(() => { step(150); }); const B0 = await ev(() => { const B = BTS.Brawl; return [B.phase, B.def.hero.cape, B.foes[0].hp, B.foes[0].max]; }); console.log('start', B0); await shot('0-cloak');
+// an early ELEVEN: must not end it
+console.log('early ELEVEN at full health:', await ev(() => { const B = BTS.Brawl, f = B.foes[0], p = B.p; p.x = f.x - 20; p.y = f.y; p.fury = 100; B.startSuper(); step(60 * 9, () => { p.inv = 1; }); return ['foe%', Math.round(f.hp / f.max * 100), 'snap', B.snap, 'phase', B.phase, 'supWas', B.supWas]; }));
+// beat him down with plain blows: the floor holds at 20%
+console.log('pounded with 40 heavy blows:', await ev(() => { const B = BTS.Brawl, f = B.foes[0], p = B.p; for (let i = 0; i < 40; i++) { B.hitFoe(f, 9, 1, 0, true); step(4, () => { p.inv = 1; }); } return ['foe%', Math.round(f.hp / f.max * 100), 'state', f.st, 'fury', p.fury, 'phase', B.phase, 'msg', B.msg]; }));
+await ev(() => { const B = BTS.Brawl, f = B.foes[0], p = B.p; let n = 0; while ((B.memo || B.art || B.sup) && n++ < 900) step(1); f.hp = f.max * .44; f.st = 'idle'; f.cd = 9; f.z = 0; p.z = 0; p.st = 'idle'; step(20); window.__fury = [p.fury, B.msg]; p.x = f.x - 20; p.y = f.y; B.startSuper(); step(60); }); console.log('at 44%: fury and prompt', await ev(() => window.__fury)); await shot('1-eleven');
+const r = await ev(() => { const B = BTS.Brawl, f = B.foes[0], p = B.p; let n = 0; while (!B.snap && n < 900) { step(1, () => { p.inv = 1; }); n++; } return ['frames to snap', n, 'snap', B.snap, 'foe%', Math.round(f.hp / f.max * 100), 'msg', B.msg, 'snapped', f.snapped]; }); console.log('late ELEVEN:', r);
+await ev(() => step(8)); await shot('2-break'); await ev(() => step(50)); await shot('3-kneel');
+const r2 = await ev(() => { const B = BTS.Brawl; let n = 0; while (B.phase === 'fight' && n < 600) { step(1); n++; } return ['frames to win', n, B.phase]; }); console.log(r2);
+await ev(() => { const B = BTS.Brawl; let n = 0; while (!B.cine && n < 600) { step(1); n++; } step(60); return n; }); await shot('4-film1');
+for (let i = 2; i <= 5; i++) { await ev(() => { const B = BTS.Brawl, c = B.cine; if (!c) return; const k = c.i; let n = 0; while (B.cine && B.cine.i === k && n < 900) { step(1); n++; } step(70); }); console.log('film shot', i, await ev(() => { const c = BTS.Brawl.cine; return c ? [c.i, (c.list || c.shots || [])[c.i] ? ((c.list || c.shots)[c.i].cap || '').slice(0, 60) : ''] : 'done'; })); if (i <= 3) await shot('4-film' + i); }
+await ev(() => { let n = 0; while (!window.__end && n < 3000) { step(1); n++; } }); console.log('ended', await ev(() => window.__end), 'errors', errors); await browser.close();

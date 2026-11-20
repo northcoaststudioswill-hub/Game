@@ -7,6 +7,7 @@
 //  - FF.furnace: present day, the three steps toward the furnace. It cannot be won.
 // ============================================================
 const NOFF = /noff/.test(location.hash);
+const CLOAK = '#f4efe2';   // Voss's white cloak: on Kael from day thirty-one to the Pinning
 const ffRow = (id, n, x0, dx, y, o, y2) => Array.from({ length: n }, (_, i) => Object.assign({ id: Array.isArray(id) ? id[i % id.length] : id, a: [x0 + i * dx, y + (i % 2) * 7], k: i, blade: 1 }, y2 === undefined ? {} : { b: [x0 + i * dx, y2 + (i % 2) * 7] }, o));
 // close-up on a point: scale s0 -> s1, drifting dx sideways
 const cu = (x, y, s0, s1, dx) => ({ cam: [x + (dx || 0), y + 200 / s0, 54, 200], to: [x, y + 200 / s1, 54, 200] });
@@ -59,7 +60,7 @@ const FF = {
   }),
   keep: () => ({
     era: 4, newMove: 'NEW: THE BOOTS - HOLD JUMP TO FLY', fin: { name: 'IRON SKY', l1: 'THEY BUILT THE BOOTS TO STAY ABOVE US', l2: 'I BROUGHT THE GROUND WITH ME', rgb: '140,220,255', mode: 'sky' }, boots: 1, title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
-    hero: { id: 'kael2', hp: 9, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU ARE ANGRY AT SOMEONE.', 'MOTHER WOULD LIKE YOU.', 'WHAT ARE YOU?', 'WHO WAS SHE?'] },
+    hero: { id: 'kael2', hp: 9, pow: 2, blade: 1, fury0: 50, cape: CLOAK }, taunt: { 0: ['YOU ARE ANGRY AT SOMEONE.', 'MOTHER WOULD LIKE YOU.', 'WHAT ARE YOU?', 'WHO WAS SHE?'] },
     voice: { at: [[1, 'LUCAN AUREL. HER SON. HER CHIN, HER HANDS, HER WAY OF LOOKING PAST YOU.'], [12, 'HE HAS BEEN BETTER THAN EVERYONE HIS WHOLE LIFE. IT HAS MADE HIM SLOW.'], [20, 'SHE IS WATCHING FROM THE DAIS. SHE DOES NOT KNOW MY FACE. SHE MADE IT.'], [34, 'SHE CALLED SEREN LITTLE EMBER. I WONDER WHAT SHE CALLS HIM.']],
       hurt: 'HE DID NOT LIGHT THE FURNACE. I KNOW. I KNOW.', fury: 'BE TOO MUCH FOR THEM, SHE SAID.', eleven: 'ELEVEN. FOR THE DOORS. FOR THE WASHER ON HER FINGER.', half: 'I COULD KILL HIM. THAT IS NOT WHAT I CAME UP HERE FOR.' },
     arts: [{ at: .82, name: 'LIFT ZERO', line: 'THEY CAME DOWN IN LIGHT. I WENT UP IN IT.', panel: 'lift', kind: 'rise', rgb: '255,240,200', hex: '#fff0c8' }, { at: .6, name: 'TIN SUN', line: 'SHE PAINTED A SUN ON A TIN LID. WRONG COLOUR. BETTER.', panel: 'tin', kind: 'storm', rgb: '255,200,60', hex: '#ffc83c' }, { at: .42, name: 'ELEVEN SECONDS', line: 'THE DOORS STOOD OPEN ELEVEN SECONDS. SHE WALKED IN BY HERSELF.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.82)' }],
@@ -111,8 +112,8 @@ const FF = {
     ],
     outro: [
       { d: 3.0, cam: [34, 150, 56, 170], to: [10, 124, 54, 190], acts: [{ id: 'voss', a: [26, -6], pose: 'kneel', sc: 1.28, fx: -1, fy: .2 }, { id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1, aura: 2 }], cap: 'HE BLEEDS. THE WHOLE VALLEY SEES IT. NOBODY KNEW THEY COULD.' },
-      { d: 3.0, ...cu(-10, 2, 1.8, 2.5, 14), acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 2 }], cap: 'I TOOK HIS WHITE CLOAK OFF HIM AND WORE IT BACK TO CAMP.' },
-      { d: 3.2, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THAT WAS THE NIGHT THEY STOPPED FOLLOWING THE HOUSE AND STARTED FOLLOWING ME.' }
+      { d: 3.0, ...cu(-10, 2, 1.8, 2.5, 14), acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 2, cape: CLOAK }], cap: 'I TOOK HIS WHITE CLOAK OFF HIM AND WORE IT BACK TO CAMP.' },
+      { d: 3.2, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1, cape: CLOAK }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THAT WAS THE NIGHT THEY STOPPED FOLLOWING THE HOUSE AND STARTED FOLLOWING ME.' }
     ]
   }),
   // nine years on: the war comes down out of the sky
@@ -193,8 +194,16 @@ if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.d
 { const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'ASHGATE'; c.sub = 'Forty-one days after the furnace. Kael still fixes valves.'; c.big = 1; c.tr = 'wake'; } }
 // the cold open: the last day of the Assay, one duel, nobody named. It cannot be lost, and it cuts as ELEVEN comes down. The whole fight is played at the end of Part One.
 FF.keepCold = () => { const d = FF.keep(); delete d.skip; delete d.newMove; delete d.outro; d.cold = 1; d.arts = []; d.sub = 'THE ASSAY - THE LAST DAY'; d.hero = Object.assign({}, d.hero, { fury0: 55 }); d.taunt = { 0: ['WHAT ARE YOU?', 'WHO WAS SHE?', 'YOU ARE ANGRY AT SOMEONE.'] }; d.voice = { at: [[1, 'THE LAST DAY. HER SON HOLDS THE KEEP.']] }; d.foes = d.foes.map(f => Object.assign({}, f, { name: 'Her son' })); if (d.intro) d.intro = d.intro.filter(x => x.big || /LAST DAY/.test(x.cap || '')); return d; };
+// the Keep at the end of Part One: the cold open again, the whole way through. He cannot be put down until ELEVEN has gone through him;
+// then the blade breaks and he is on his knees in front of his mother. He lives.
+FF.keepEnd = () => { const d = FF.keep(); d.breaks = 1; delete d.endAt; d.winText = 'ON HIS KNEES'; d.newMove = 'ELEVEN ENDS IT - FILL THE BAR, THEN HOLD STRIKE';
+  d.voice = Object.assign({}, d.voice, { at: [[1, 'THE LAST DAY. HER SON HOLDS THE KEEP.'], [8, 'IF I PUT HIM ON HIS KNEES IN FRONT OF HER, SHE WILL HAVE TO PIN THE GOLD ON ME HERSELF.'], [17, 'LUCAN AUREL. HER CHIN, HER HANDS, HER WAY OF LOOKING PAST YOU.'], [27, 'SHE IS WATCHING FROM THE DAIS. SHE DOES NOT KNOW MY FACE. SHE MADE IT.'], [39, 'SHE CALLED SEREN LITTLE EMBER. I WONDER WHAT SHE CALLS HIM.']] });
+  d.outro = [
+    { d: 2.4, ...cu(26, -6, 1.7, 2.4, 14), flash: 1, sfx: 'steel', shake: .6, acts: [{ id: 'lucan', a: [26, -6], fx: -1, fy: .2, guard: 1, blade: 1, sc: 1.08 }, { id: 'kael2', a: [4, -3], blade: 1, fx: 1, fy: -.2, aura: 3, hold: 3 }], cap: 'THE ELEVENTH COMES DOWN ON HIS BLADE. IT BREAKS A HAND ABOVE THE HILT.' },
+    { d: 3.0, cam: [40, 170, 64, 160], to: [14, 132, 56, 180], acts: [{ id: 'celestine', a: [30, -64], fx: -.3, fy: 1 }, { id: 'lucan', a: [26, -6], pose: 'kneel', fx: -1, fy: .2, sc: 1.08 }, { id: 'kael2', a: [-6, 0], blade: 1, fx: 1, fy: -.2, aura: 2 }], cap: 'HE GOES TO HIS KNEES IN FRONT OF HIS MOTHER. SHE DOES NOT GET UP.' }
+  ].concat(d.outro); return d; };
 // the Valley, day forty: it used to open the game and explain everything. In the last dream it needs none of that
-FF.valley40 = () => { const d = FF.valley(); d.skip = 1; if (d.intro && d.intro.length > 2) { d.intro = [d.intro[0], d.intro[d.intro.length - 1]]; d.intro[0] = Object.assign({}, d.intro[0], { cap: 'DAY FORTY. TWO HOUSES HAVE COME FOR THE VALLEY.' }); d.intro[1] = Object.assign({}, d.intro[1], { cap: 'FORTY CADETS BEHIND ME. NOT ONE OF THEM KNOWS WHAT I AM.' }); } return d; };
+FF.valley40 = () => { const d = FF.valley(); d.skip = 1; d.hero = Object.assign({}, d.hero, { cape: CLOAK }); if (d.intro && d.intro.length > 2) { d.intro = [d.intro[0], d.intro[d.intro.length - 1]]; d.intro[0] = Object.assign({}, d.intro[0], { cap: 'DAY FORTY. TWO HOUSES HAVE COME FOR THE VALLEY.' }); d.intro[1] = Object.assign({}, d.intro[1], { cap: 'FORTY CADETS BEHIND ME. NOT ONE OF THEM KNOWS WHAT I AM.' }); } return d; };
 // ---- the dreams: what happens between the fights, told below, the old way
 const DREAM1 = () => [
   { music: 'mystery' }, { card: 'THAT NIGHT', sub: 'Kael does not dream of the furnace. For once it runs forward.', min: 1.6, max: 5 },
