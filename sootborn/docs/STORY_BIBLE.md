@@ -1,5 +1,5 @@
-# SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.65 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+# SOOTBORN — Story bible 
+Tagline: "Every breath is hers." Current build: v0.66 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -506,3 +506,9 @@ Rule from the author: a 2.5D place is used for story that adds flavour and under
 
 ## Order of play (v0.65). This replaces every older "Placement" note.
 Cold open: the Valley (Assay day 40). Prologue to the furnace. The Pairing before the title. Then: **Ashgate** → night: the Table, the lesson, the Drill, No Gloves, the Camp (day 3). **First Fire** → before the ceremony: the Ford (19) → night: what the Assay is, the Island (25), the Standard (26). **The Ledger** → night: the Lamp (28), the Dais (30), the Proctor and On the Ground (31). **The Way Out** → last dream: the Last Night (49), the Keep → END OF PART ONE → the Pinning → Part Two as before. Rule: after the cold open, no thread ever goes backwards. The full table, the people, and the gaps between the writing and the screen are in the master plan document.
+
+## Fighting: weight, deaths, the hook, and the Circle (v0.66)
+- **Weight.** A heavy blow lifts a man once. From the ground nobody can keep him up: a blow on a falling man knocks him down faster; a second heavy blow drives him into the ground. Men fall faster than they rise and bounce once off a hard landing. Air combos belong to the boots, and even there each blow lifts less (about a second and a third at most). Without the boots Kael does not hang in the air while striking, and the hook from the air does not haul a man up.
+- **Deaths are falls.** An ordinary blow: to the knees, then over, forward or back. A heavy blow: off his feet and onto his back, once. Nobody turns in the air. (The comic-book levels have had the kneel-and-fall since v0.50.)
+- **The hook shot.** A line with a head that goes out, bites and stays taut. An ordinary man is pulled off his feet to land in front of Kael, reeling; a man too heavy to move stays put and the line takes Kael to him, inside his guard. The shoulder charge on the same button needs Kael nearly touching. The blade shows its hook from the Assay on.
+- **A fight can inherit a place you were walking in** (`stage` on a fight, taken with `Brawl.stageOf()` from a walk scene): same floor, same props, the bystanders become the ring, the fire is solid. A fight can also carry what is said after it (`afterWin`), spoken over the same scene. First used at the Circle on night 28: the naming, the fight with Corin (right name) and the aftermath all stay in the 2.5D scene. The wrong name is fought on the ridge, as the lines say, cut to directly from the Circle.

@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.65 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.66 (2026-11-19).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -15,13 +15,14 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The present and the flashes** (master plan 9a): day one is Ashgate; everything else is a flash with a trigger and a signpost. Pick: the Assay stays as flashes (shorter), or the Assay becomes its own act after The Way Out (longer).
 - **Approved to plan, not yet to build (2026-11-19):** the Keep as the new cold open with an animated intro (9b), and Part Two's deepening flashbacks and played ending (9c). Say build.
 
-## Bugs and feel (your notes, 2026-11-19)
-- **The fire pit:** the Circle's 2.5D scene ends, then the fight happens somewhere else. It should stay in the 2.5D scene until the fight ends.
-- **Too floaty:** a man can be kept in the air without the boots. More weight in the physics.
-- **Death animations:** people spin when they die. Replace with a real fall in every engine.
-- **The hook shot** in the 3D arena fights where it fits.
+## Built in v0.66 from your notes of 2026-11-19 (needs your eye, in the hand)
+- **The fire pit:** the naming, the fight with Corin and the aftermath now all stay in the 2.5D Circle. The wrong name is still fought on the ridge, because the lines say so; say if you want that at the fire as well.
+- **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
+- **Deaths:** knees and over, or onto the back; nobody spins.
+- **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
 
 ## Untested, built blind (check these first when playing)
+- **v0.66: the four fixes above.** Checked by script and stills only.
 - **v0.63: arena figures.** Torso plate, baldric, scabbard, and a blade that is a sword.
 - **v0.62: the Proctors** behind the Dorian fight (low balcony, in the dark) and on the valley dais.
 - **v0.61: two more memories to walk in.** Row K (the ledge of suns by your door) and the fever ward (the ward board in the clinic).
@@ -87,6 +88,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 21. The on-screen pad has no second stick, so on a phone the camera still turns by dragging the picture.
 
 ## Housekeeping
+- **PC is the main platform** (owner, 2026-11-19). Keyboard and a controller on a computer come first; the iPhone in the Claude app is the second screen. Still to do because of it: check every screen at desktop sizes; the keyboard legend everywhere; mouse where it helps (menus, the camera in the comic levels).
+- **Dropped by you:** the aura turning off when sitting or wrapping up a wall ("ignore the aura command", 2026-11-19).
 - **Rule:** everything asked for goes on this list and stays until it is done or you say drop it.
 - Phone frame rate has never been measured (Settings → Show frame time).
 - A trademark check on the name before selling.

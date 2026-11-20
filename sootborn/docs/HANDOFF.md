@@ -10,7 +10,7 @@ This is the same plan as `claude/sootborn-master-timeline.md` / `docs/MASTER_TIM
 ### A1. What SOOTBORN is
 An original story game, inspired by Red Rising but legally distinct. **No Red Rising names, emblems, weapons or characters may appear.** A valve tech in an underground city (Cinderwell) loses his wife Seren to the heart-furnace, is remade into one of the ruling class (the Gilding), fights through their trial (the Assay), and climbs their tower (the Sun Spire) to end the count of who gets to breathe. Tagline: *Every breath is hers.* Studio line: North Coast Studios × E Concepts.
 
-The owner plays on an **iPhone in the Claude app**, often with a **controller**. Nobody uses touch controls except the on-screen pad, or plays on a computer. Replies to the owner: short, mobile-sized, lead with the outcome, and say plainly what was not checked.
+**PC is the main platform** (owner, 2026-11-19): keyboard and a controller on a computer come first. The owner also plays on an **iPhone in the Claude app**, often with a **controller**. Nobody uses touch controls except the on-screen pad. Replies to the owner: short, mobile-sized, lead with the outcome, and say plainly what was not checked.
 
 ### A2. The owner's standing rules
 1. **Everything the owner asks for goes on the open list** and stays there until done or the owner says drop it. Never let a request get lost.
@@ -24,7 +24,7 @@ The owner plays on an **iPhone in the Claude app**, often with a **controller**.
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version string:** `src/ui.js`, "Version 0.65." Next is 0.66.
+- **Version string:** `src/ui.js`, "Version 0.66." Next is 0.67.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md`, `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -41,7 +41,8 @@ The owner plays on an **iPhone in the Claude app**, often with a **controller**.
 - **The opening:** the opening film and its caption "ONE SEASON" are in `src/ff.js`; the cold open is currently `FF.valley`. The Keep is `FF.keep` (src/ff.js, around line 60).
 
 ### A5. Tests (in `tests/`)
-Playwright with Chrome and the software renderer (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`). Paths inside older tests may point at another machine's folders: point them at the repo's `index.html` and `issue/`.
+Playwright (run `npm i playwright` inside `tests/` once; it drives the Chrome already on the machine, no browser download) with Chrome and the software renderer (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`). Paths inside older tests may point at another machine's folders: point them at the repo's `index.html` and `issue/`.
+- New in v0.66: `circ.mjs` (the Lamp's fire end to end, PICK=0|1|2, LOSE=1), `air.mjs` (how long a man can be kept in the air; BOOTS=1), `death.mjs` (stills of a death; M=fight, BIG=1), `hook.mjs` (the hook used on purpose in four arena fights). `Brawl.stageOf()` + `stage` on a fight def keep a fight in a walk scene; `afterWin` keeps the talk there too.
 - `godrun.mjs`: **the whole-story bot.** Plays New Game to THE END without being able to lose and logs every card, fight and level (`SECS=570`). **Run it every release.** Its log is how you check the order of cards against Part B.
 - `walk.mjs` (M=circle|square|rowmorn|ward): the 2.5D places. `iss.mjs` + `lv.js` (via `tests/runlv.sh riser|stair`; `lv.cjs` writes `issue/lv-<key>.html`, don't commit those): comic levels standalone. `ff.mjs`: fights (M=name, BOT=mash). `mis.mjs`: 2D levels. `cap65.mjs`, `cap65b.mjs`: screenshots.
 
@@ -76,7 +77,7 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 
 **Why this order:** fix how the game feels first (every later scene is played with it); then lay the cards and transitions, which are cheap and are the frame every new scene hangs on; then the opening and Part One, front to back, cheap pieces before expensive ones; then Part Two, spine before content; then the ending. Matching the writing goes in with the scene it belongs to, not as a separate pass. Expensive art (the animation library, the High Docks rebuild) comes after the story is whole.
 
-**Step 1 · v0.66 · the four bugs (Part E)**
+**Step 1 · v0.66 · the four bugs (Part E)** — **DONE 2026-11-19** (see the changelog; needs the owner's hand). The wrong-name fight at the Lamp is still on the ridge, as its lines say.
 - The fire pit stays 2.5D through its fight (6c). Weight in the fights (no juggling without boots). Deaths fall instead of spinning (2D, arena, comic levels). The hook shot in every arena fight from the Assay on.
 - Check: `walk.mjs` M=circle through the choice and the fight; `ff.mjs` BOT=mash on the Drill, Ford and Keep with time-in-air logged before and after; stills of a death in each engine; the hook used on purpose in the Ford, the Proctor, the Valley and the Keep.
 
@@ -210,7 +211,7 @@ Kael's names: **Kael Brennick** below; **Edric Sorrel** (a dead boy's name) from
 - Card: **LAST BELL** / *Bay Three. The heart-furnace.* In: CUT.
 - Happening: the audit finds the bled line. Someone has to answer for it. Seren says it was her, and goes into the heart-furnace. It takes eleven seconds; the count ONE to ELEVEN is her eleven memories.
 - Say: existing lines stand (ONE. … ELEVEN.); the tin.
-- Out: ELEVEN, then black, then the title: **SOOTBORN** / *What they call us. What they will remember.* Build: EXISTS. **CHANGE: the Pairing no longer comes before the title** (it moves to 5e).
+- Out: ELEVEN, then black, then the title: **SOOTBORN** / *What they call us. What they will remember.* Build: EXISTS. **CHANGE: the Pairing no longer comes before the title** (it moves to 4e).
 
 ### PART ONE: BELOW (the present)
 
@@ -285,7 +286,7 @@ The present jumps from Lift Zero (160 days after) to the Pinning (four years aft
 - Card: **THE PINNING** / *Four years after the furnace. The last day, after the keep.* In: CUT.
 - Happening: hours after the Keep. Celestine Aurel pins the gold on Edric Sorrel herself and gives him the post. She knows him, from the white room during the Gilding and from Lift Zero. She does not say so. Her champion, the Auditor's Blade, tests him first.
 - Say: existing lines stand. Plays: **the Pinning** (3D). Build: CHANGE (now after the PART TWO card).
-- 11a: **NEW flash forward: the book.** Card: **NINE YEARS AFTER THE FURNACE** / *The Count. A book as wide as a table.* In: STRIP (years). Trigger: the pin closing on his collar. Happening: ten seconds: the book from the hum slip, open; one line in red; it is his name. No explanation. Pays off in 15a. Say: no words. Build: **NEW** (a drawn still, slow push).
+- 11a: **NEW flash forward: the book.** Card: **NINE YEARS AFTER THE FURNACE** / *The Count. A book as wide as a table.* In: STRIP (years). Trigger: the pin closing on his collar. Happening: ten seconds: the book from the hum slip, open; one line in red; it is his name. No explanation. Pays off in 16a. Say: no words. Build: **NEW** (a drawn still, slow push).
 - 11b: **THE SEAT KNIFE** / *Four years after the furnace. The night before the lift.* Existing lines stand.
 
 **12. The Post**
@@ -366,7 +367,7 @@ The present jumps from Lift Zero (160 days after) to the Pinning (four years aft
 | The writing says | On screen now | Fix | Cost |
 |---|---|---|---|
 | Every valve hand carries a **seat knife**, counted back onto a board at last bell | Nobody carries one; no board | Knife on Crew Three's belts; the board in Bay Three; counting back (5b) | Low |
-| Kael wears **the Proctor's white cloak** from day 31 | Violet cape to the end | White cape from 9d on | Very low |
+| Kael wears **the Proctor's white cloak** from day 31 | Violet cape to the end | White cape from 8d on | Very low |
 | As **Edric Sorrel he is a clerk** with a sun on his collar | Assay plate in every Part Two scene | A clerk's coat on the Spire and at the High Docks; plate only where he fights openly | Medium |
 | He **wore gloves for a year** and hides his palms | Never shown | Gloves on the clerk; Kestrel turns his hand over once | Low |
 | **Oswin's leg** set crooked | Moves like any boss | A stiff leg in his stance and walk | Low |

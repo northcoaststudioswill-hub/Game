@@ -1,3 +1,4 @@
 issue/issue.html
 issue/lv-*.html
-issue/lv-*.html
+node_modules
+tests/shots/

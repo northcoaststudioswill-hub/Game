@@ -321,7 +321,10 @@ const G3 = {
     else if (opt.rage > .9 && (st === 'idle' || st === 'move') && !mv) { const k = Math.sin(t * 5.5) * .5 + .5; S({ cr: 2.8 + k * .8, lean: .3, tw: -.15, rp: .15, ry: -.35, re: -.15, tilt: -.45, lp: .1, ly: .3, le: -1.3, hx: .32, hl: .45, kl: .7, hr: -.4, kr: .55, sp: .22 }); rate = 16; }
     else if (opt.fear && st === 'approach') { S({ rp: -1.25, ry: .85, re: -1.15, tilt: -1.85, lp: -1.2, le: -1.3, ly: -.5, cr: 2.8, lean: -.2, tw: -.25, hx: -.1 }); if (mv) S({ lean: -.28 }); rate = 18; }
     const hero = o === Brawl.p && st !== 'hurt' && st !== 'down';
-    if (((o.z || 0) > 1 && !hero) || st === 'down') { S({ lean: -.7, tw: Math.sin(t * 7 + idx) * .3, rp: -2.7, ry: -1.2, re: -.2, tilt: -1, lp: -2.7, ly: 1.2, le: -.2, hl: .7, kl: 1.0, hr: -.35, kr: .5, cr: 0, hx: -.4, sp: .3 }); rate = 20; }
+    if (st === 'down') { // a death is a fall. An ordinary blow: to the knees, then forward onto his face. A heavy one: off his feet and onto his back. Then he lies still
+      if (o.dk === 'crumple') { if (o.t < .34) S({ cr: 9, lean: .3, hl: 1.4, kl: 1.7, hr: .9, kr: 1.9, rp: -.15, ry: .1, re: -.25, lp: -.15, ly: -.1, le: -.25, tilt: -.2, hx: .5, tw: 0, sp: .25 }); else S({ cr: 3, lean: .1, hl: .25, kl: .5, hr: .1, kr: .3, rp: -1.0, ry: .6, re: -.9, lp: -.5, ly: -.5, le: -.6, tilt: 0, hx: .3, tw: 0, sp: 0 }); rate = 16; }
+      else { S({ lean: -.35, tw: 0, rp: -1.5, ry: -1.0, re: -.3, tilt: -.6, lp: -1.5, ly: 1.0, le: -.3, hl: .3, kl: .5, hr: -.1, kr: .25, cr: 0, hx: -.3, sp: .1 }); rate = 14; } }
+    else if ((o.z || 0) > 1 && !hero) { S({ lean: -.7, tw: Math.sin(t * 7 + idx) * .12, rp: -2.7, ry: -1.2, re: -.2, tilt: -1, lp: -2.7, ly: 1.2, le: -.2, hl: .7, kl: 1.0, hr: -.35, kr: .5, cr: 0, hx: -.4, sp: .3 }); rate = 20; }
     if (hero) { // kicks, jumps, the guard, the hook line
       if (st === 'kick') { if (o.t < .06) S({ hr: 1.5, kr: 1.7, lean: -.1, cr: 1, hl: -.1, kl: .3, rp: -.2, re: -1.2, lp: -.8, le: -1.2, tw: -.3 }); else S({ hr: 1.6, kr: .05, lean: -.4, cr: .5, hl: -.25, kl: .25, rp: .5, re: -.5, lp: -1.0, le: -.8, tw: .35, hx: .2 }); rate = 44; zeta = .7; }
       else if (st === 'dive') { S({ hr: 1.25, kr: .05, hl: .3, kl: 1.7, lean: -.55, rp: .7, re: -.3, lp: -1.2, le: -.6, cr: 0, tw: .2 }); rate = 40; }
@@ -386,7 +389,7 @@ const G3 = {
     else if (fresh || jump) { Object.assign(R.p, T); R.yaw = yawT; }
     R.x = o.x; R.y = o.y; const P = R.p, yaw = R.yaw, spd = Math.hypot(R.vx, R.vy), fwdV = R.vx * Math.sin(yaw) + R.vy * Math.cos(yaw), sideV = R.vx * Math.cos(yaw) - R.vy * Math.sin(yaw);
     let hop = st === 'atk' && o.combo === 3 ? Math.sin(Math.min(1, o.t / .13) * Math.PI) * 10 : 0; if (R.hop > 2 && hop <= .5 && z <= 0) R.land = .14; R.hop = hop + z; R.land = Math.max(0, R.land - dt);
-    const sq = P.sq * (1 - Math.sin(R.land / .14 * Math.PI) * .12), fall = st === 'floor' ? (o.t < .6 ? Math.min(1, o.t * 6) : Math.max(0, 1 - (o.t - .6) / .35)) * 1.5 : st === 'down' ? Math.min(1, o.t * 3.5) * 1.5 + (z > 0 ? o.t * 9 : 0) : z > 1 ? t * 7 % 6.2832 * .0 - .5 : 0, roll = st === 'dodge' ? o.t / .3 * 6.2832 : 0;
+    const sq = P.sq * (1 - Math.sin(R.land / .14 * Math.PI) * .12), fall = st === 'floor' ? (o.t < .6 ? Math.min(1, o.t * 6) : Math.max(0, 1 - (o.t - .6) / .35)) * 1.5 : st === 'down' ? (o.dk === 'crumple' ? (o.dkb ? 1.45 : -1.45) * Math.pow(clamp((o.t - .3) / .34, 0, 1), 2) : Math.min(1, o.t * 3.2) * 1.5) : z > 1 ? t * 7 % 6.2832 * .0 - .5 : 0, roll = st === 'dodge' ? o.t / .3 * 6.2832 : 0;
     D.flash = o.flash > 0 ? .55 : 0;
     let root = M4.chain(M4.t(o.x, z + hop * this.MS, o.y), M4.ry(yaw), M4.s(sc * this.MS));
     if (fall) root = M4.chain(root, M4.t(0, 4, 0), M4.rx(-fall), M4.t(0, -2, 0));

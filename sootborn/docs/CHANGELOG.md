@@ -1,4 +1,45 @@
-# SOOTBORN — changelog (latest v0.65 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.66 · 2026-11-19)
+
+## v0.66 · 2026-11-19 — the four bugs from your play: the fire pit, weight, deaths, the hook
+Step 1 of the approved plan (the handoff, Part F). No story or card changes.
+
+**1. The fire pit stays where it is**
+- The Circle on night 28 no longer closes for the naming and opens somewhere else for the fight. You walk the Circle, say the name at the fire, and it all happens there: the naming, the choice, **the fight with Corin on the same ground, round the same fire, with the same forty people standing in the ring**, and what is said afterwards (keep him, or turn him out). The 2.5D scene ends only when the night does.
+- The fire is solid in the fight: you and he go round it, not through it. If you lose, you start again in the same place.
+- **The wrong name still leaves the fire.** The lines say so ("up on the ridge in the dark, where nobody saw"), so that fight is on the ridge, and the game now cuts straight from the Circle to it without dropping back to the top-down camp first.
+
+**2. Weight**
+- **A man cannot be kept in the air from the ground any more.** A heavy blow still lifts him once. After that, a blow on a falling man knocks him down faster instead of lifting him, and a second heavy blow drives him into the ground.
+- Men fall faster than they rise, a hard landing gives one short bounce and a shake, and then he is on the floor.
+- **Air combos need the boots**, and even in the boots each blow lifts him less, so he comes down after about a second and a third.
+- Without the boots Kael no longer hangs in the air while striking, and comes down harder from a jump. The hook from the air hauls a man up only in the boots.
+- Measured with a bot that launches a man and then lands a light blow every tenth of a second for three seconds (the Drill, the Ford and the Keep, all the same): **before, he never landed in three seconds and reached a height of 316; now he lands in 0.2 seconds from a height of 18.** In the boots: 1.35 seconds, height 40.
+
+**3. Deaths are falls**
+- Nobody spins. An ordinary blow: **to his knees, then over**, forward or back. A heavy blow: **off his feet and onto his back**, once. A man killed in the air comes down. In the arena the figures have a kneeling pose and a lying pose for it; in 2D the turning in the air is gone.
+- Before, every death in the arena threw the body up (height 34, two thirds of a second in the air) turning as it went; now a heavy blow lifts him 5.
+- The comic-book levels already had the kneel-and-fall from v0.50; they are unchanged.
+
+**4. The hook shot in the arena fights**
+- The hook was there but did not read: twelve dots for an eighth of a second, and up close the same button did the shoulder charge instead. Now it is **a line with a head on it that goes out, bites with a flash and a jolt, and stays taut while the pull lasts.**
+- **An ordinary man comes off his feet and lands in front of you, reeling. A man too heavy to move (a captain, a Proctor, Lucan) stays where he is and the line takes you to him, inside his guard**, with an opening for your first blow.
+- The charge now needs you nearer (34, was 46), so the hook is what the button does at any real distance. Kael's blade shows its hook from the Assay on (it used to appear only in Part Two).
+
+**Also**
+- **PC is the main platform** (your note). Written into the handoff and the open list: keyboard and a controller on a computer come first; the phone is the second screen.
+
+**Checked**
+- The fire pit: a script walks to the fire, says each of the three names, fights, loses once on purpose, wins, and reads the aftermath. With the right name the 2.5D scene was on screen for every frame until the night ended.
+- Weight: the air-time bot above, old build against new.
+- Deaths: stills at four moments of a death, light and heavy blow, in the arena (the Ford) and in 2D (the Drill), old build against new.
+- The hook: used on purpose in the Ford, the Proctor, the Valley and the Keep, with stills of line out, bite and arrival.
+- The whole-story bot played New Game to THE END with no errors, and the order of every card, fight and level is the same as v0.65. (The bot skips fights and levels, so it does not test the four changes; the scripts above do.) A mashing bot still wins the Drill.
+
+**Not checked**
+- **How any of it feels in the hand.** The weight numbers come from a bot; whether the fights are now too stiff, or the heavy launch too low, is yours to say.
+- The deaths and the hook were looked at as stills, not in motion.
+- Nothing was tried on a phone or with a controller.
+- The difficulty of fights was not re-measured. Juggling was a way of winning; without it some fights may be harder.
 
 ## v0.65 · 2026-11-19 — the reorder: the Assay and the training years now run forward
 You approved the proposed timeline. Nothing was cut and nothing was rewritten except one line; pieces moved.

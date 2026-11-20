@@ -393,7 +393,8 @@ Object.assign(MISSIONS, {
       if (t.id === 'tentQ') return Dialogue.start([narr('The quartermaster\'s tent. Everything squared. Under the bedroll, a second slate: three strokes, and beside each a number in a neat hand.'), narr('They are our picket counts. Ford, ridge, river. All three nights.'), fx(() => Sound.play('heart')), narr('And a boot, set to dry by the pole. The left heel is worn through on the outside.'), L('tent')]);
       if (t.id === 'stds') return Dialogue.start([narr('Two standards, and a gap where the third will go if we live. Violet. Teal. Whoever is on the ridge at night would like there to be one.')]);
       if (t.id === 'fire2') { if (!LAMP_READY()) return Dialogue.start([narr('Not yet. If I name somebody at this fire and I am wrong, forty people will remember it longer than they remember the raids.')]);
-        const duel = wrong => fx(() => Mission.fight(wrong ? Object.assign(FF.corin(), { sub: 'CORIN ASHBY, AND THE PICKETS HE SOLD US TO', foes: FF.corin().foes.concat([{ id: 'cadt1', name: 'Teal picket', kind: 'cadet', hp: 14 }, { id: 'cadt2', name: 'Teal picket', kind: 'lancer', hp: 14 }]) }) : FF.corin(), () => Dialogue.start([
+        // the right name is fought at the fire, in the same place, in front of all of them, and what follows is said there too; the wrong name is fought on the ridge in the dark, as it is told
+        const aft = wrong => [
           narr(wrong ? 'It took the three of them down to do it, and it was up on the ridge in the dark, where nobody saw. That is what the wrong name cost: nobody saw.' : 'In front of all of them, at their own fire. That is what the right name bought.'),
           narr('He is on his knees in the wet with his blade a yard from his hand. Nobody has moved. Forty of them, and the fire, and the rain starting.'),
           say('corin', 'It is not a betrayal. One wishes you would stop looking at it as one. A debt was called. One paid it with what one had. You were what one had.'),
@@ -403,15 +404,17 @@ Object.assign(MISSIONS, {
             { t: wrong ? 'Turn him out of the valley. Barefoot. (There is nothing else left to do with him.)' : 'Turn him out of the valley. Barefoot.', fx: () => { G.flags.corin = 'out'; }, then: [...(wrong ? [narr('I could not keep him to write lies for me. Forty people had watched me name the wrong man; nobody would have believed a lamp I vouched for.')] : []), narr('I took his boots and sent him up the ridge path he liked so well. A cadet who leaves the valley is struck from the Assay. His father\'s debt will stand. I did not ask what that means for his father.')] },
             ] },
           narr(wrong ? 'I had named the wrong one first. Nobody has said so since. They only looked at each other, that night, a little longer than they used to.' : 'They only looked at each other, that night, a little longer than they used to. I had done that as well, by being right.'),
-          narr('Somebody paid for that lamp. A cadet\'s father does not owe a debt that size to another cadet. He owes it to somebody who can write in the grading book.')], () => Mission.finish())));
-        const nameIt = () => Dialogue.start([
+          narr('Somebody paid for that lamp. A cadet\'s father does not owe a debt that size to another cadet. He owes it to somebody who can write in the grading book.')];
+        const duel = wrong => fx(() => { if (wrong || !(Brawl.active && Brawl.def.walk)) return Mission.fight(Object.assign(FF.corin(), wrong ? { title: 'THE RIDGE', sub: 'CORIN ASHBY, AND THE PICKETS HE SOLD US TO', foes: FF.corin().foes.concat([{ id: 'cadt1', name: 'Teal picket', kind: 'cadet', hp: 14 }, { id: 'cadt2', name: 'Teal picket', kind: 'lancer', hp: 14 }]) } : {}), () => Dialogue.start(aft(wrong), () => Mission.finish()));
+          Mission.fight(Object.assign(FF.corin(), { stage: Brawl.stageOf(['corin']), title: 'THE CIRCLE', sub: 'CORIN ASHBY - IT IS ONLY ARITHMETIC', afterWin: aft(0) }), () => Mission.finish()); });
+        const nameIt = [
           narr('Forty of them round the fire. Thirty Teal at the edge of the light, not sitting. Everybody knows why I have called them.'),
           narr('I get one name. If it is the right one, he is caught here in the light with nowhere to go. If it is the wrong one, the right one will be over the ridge before I can say a second.'),
           { choice: [
             { t: 'Corin Ashby. The oil, the slate, the left heel.', then: [say('corin', '...Nine flasks. You counted. Nobody counts.'), say('corin', 'My father owes a Proctor. One does not say which. The debt is struck if Violet finishes below Teal\'s patron. It is only arithmetic, Sorrel.'), say('kael', 'It is always only arithmetic.'), narr('He stood up, and he drew. I had not thought he would. He had been afraid for twenty-five days, and it had made him quick.'), fx(() => { HUD.toast('The right name. He is caught at the fire: single combat.'); Sound.play('clue'); }), duel(0)] },
             { t: 'Merrow. It is always the ones who came over.', fx: () => { G.flags.lampWrong = 1; rage(1); }, then: [say('merrow', 'There it is. One wondered how long a Violet standard would stay kind.'), say('petra', 'He was on the ford with me, Sorrel. From dusk. One said so.'), narr('I had said Corin\'s own words back to forty people, in my own mouth. Corin was looking at his slate. Then he was not. Then he was running for the ridge, and that was all the answer anybody needed.'), narr('Merrow took nine of the thirty and walked out before dawn. I did not stop them. I had no right left to.'), fx(() => { HUD.toast('The wrong name. Corin reaches his pickets: three to fight, and he cannot be kept.'); Sound.play('deny'); }), duel(1)] },
-            { t: 'Oswin Hale. The prints drag.', fx: () => { G.flags.lampWrong = 1; rage(1); }, then: [say('oswin', 'The right, Sorrel. I told you. The right.'), narr('He said it quietly. He pulled the dressing off in front of all of them, and it was the right, and I have not forgotten his face.'), narr('In the quiet, somebody behind the stores put down a slate and began to walk, and then to run. Corin Ashby. That was all the answer anybody needed.'), narr('Oswin did not carry water for me again. He carried it. Not for me.'), fx(() => { HUD.toast('The wrong name. Corin reaches his pickets: three to fight, and he cannot be kept.'); Sound.play('deny'); }), duel(1)] }] }]);
-        if (MF('circle')) return nameIt(); MSET('circle'); return Mission.fight(walkCircle(), () => nameIt()); }
+            { t: 'Oswin Hale. The prints drag.', fx: () => { G.flags.lampWrong = 1; rage(1); }, then: [say('oswin', 'The right, Sorrel. I told you. The right.'), narr('He said it quietly. He pulled the dressing off in front of all of them, and it was the right, and I have not forgotten his face.'), narr('In the quiet, somebody behind the stores put down a slate and began to walk, and then to run. Corin Ashby. That was all the answer anybody needed.'), narr('Oswin did not carry water for me again. He carried it. Not for me.'), fx(() => { HUD.toast('The wrong name. Corin reaches his pickets: three to fight, and he cannot be kept.'); Sound.play('deny'); }), duel(1)] }] }];
+        MSET('circle'); return Mission.fight(walkCircle(nameIt), () => {}); }
     }
   }
 });
@@ -423,10 +426,10 @@ const HOTN = { fire: 'THE FIRE', wood: 'WOODPILE', pump: 'PUMP HOUSE', vstd: 'VI
   kwash: 'WASH-HOUSE', kdoor5: 'K-5', kdoorM: "K-9 · MARA'S", kdoor11: 'K-11', kdoor13: 'K-13 · SEALED', ksuns: 'THE LEDGE', kwall: "MARA'S WALL", ktap: 'RATION TAP', kbarrel: 'BARRELS', kpost: 'THE POST', khop: 'THE SQUARES', ktub: 'WASH TUB', kbench: 'THE BENCH' };
 
 /* ---------- places you walk in depth: flat figures, a camp round you. They add to the story and change none of it. ---------- */
-function walkCircle() {
+function walkCircle(atFire) {
   const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
   return { era: 3, d2: 1, title: 'THE CIRCLE', sub: 'THE ASSAY. NIGHT TWENTY-EIGHT', bg: 'storm', arena: { kind: 'ring', rx: 190, ry: 72 }, music: 'mystery', hero: { id: 'kael2', hp: 9, pow: 2, blade: 0, fury0: 0 },
-    walk: { id: 'circle', spawn: [-150, 34], clear: 200,
+    walk: { id: 'circle', spawn: [-150, 34], clear: 200, block: [{ x: 0, y: 0, r: 15 }],
       obj: k => k.n ? 'THEY ARE WAITING. THE FIRE, WHEN I AM READY.' : 'FORTY OF THEM, AND NOBODY SITTING. WALK THE CIRCLE, OR GO TO THE FIRE.',
       floor(g) { g.fillStyle = 'rgba(70,50,34,.55)'; g.beginPath(); g.ellipse(256, 256, 112, 54, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(40,28,22,.6)'; g.beginPath(); g.ellipse(256, 256, 30, 15, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(20,14,12,.7)'; g.beginPath(); g.ellipse(256, 256, 14, 7, 0, 0, 6.3); g.fill();
         g.fillStyle = 'rgba(70,50,34,.4)'; for (let i = 0; i < 26; i++) { g.beginPath(); g.ellipse(256 - 112 - i * 6, 256 + 12 + Math.sin(i * .5) * 6, 9, 4, 0, 0, 6.3); g.fill(); } },
@@ -442,7 +445,7 @@ function walkCircle() {
         N('merrow', 128, 12, 'MERROW', [say('merrow', 'Thirty of us at the edge of your light, Sorrel. Notice that nobody has asked us to come nearer.'), narr('Nobody has. That is mine to mend, and it will not be mended tonight.')]),
         N('cadv1', 34, 28, 'A CADET IN A BORROWED CLOAK', [say('cadv1', 'Is it true that below the rock they burn their dead? One heard it from a porter. One did not believe it.'), narr('They burn more than their dead. I told her I had heard the same.')])],
       spots: [
-        { id: 'fire', x: 0, y: 2, r: 15, reach: 34, ph: 30, name: 'THE FIRE', verb: 'SAY THE NAME', exit: 1, talk: () => [] },
+        atFire ? { id: 'fire', x: 0, y: 2, r: 15, reach: 34, ph: 30, name: 'THE FIRE', verb: 'SAY THE NAME', talk: () => atFire } : { id: 'fire', x: 0, y: 2, r: 15, reach: 34, ph: 30, name: 'THE FIRE', verb: 'SAY THE NAME', exit: 1, talk: () => [] },
         { id: 'stds', x: -40, y: -70, r: 8, reach: 28, ph: 60, name: 'THE STANDARDS', verb: 'LOOK', talk: () => [narr('Two standards, and a gap for a third. Below, nobody ever called forty people to a fire. They called us to a furnace. We stood in rows there as well, and nobody sat.'), narr('It is the same silence. I did not expect to find it up here. I had thought it was ours.')] }] } };
 }
 function walkSquare() {
