@@ -37,7 +37,8 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #relics{font-size:20px;display:flex;gap:4px}
 #relics span{filter:grayscale(1) brightness(.5);opacity:.6;transition:all .4s}
 #relics span.got{filter:none;opacity:1;transform:scale(1.2) rotate(-8deg)}
-#mute{width:40px;height:40px;border-radius:50%;background:var(--ink);border:2px solid var(--paper);font-size:18px;padding:0}
+#mute,#bLog{width:40px;height:40px;border-radius:50%;background:var(--ink);border:2px solid var(--paper);font-size:18px;padding:0}
+#bLog{background:var(--gold)}
 #quests{position:absolute;left:var(--gl);top:calc(var(--gt) + 46px);display:flex;flex-direction:column;gap:3px;font-size:13px;max-width:min(64vw,300px)}
 #quests button{all:unset;pointer-events:auto;cursor:pointer;background:rgba(18,2,31,.62);border-left:4px solid var(--cyan);padding:2px 8px;border-radius:0 8px 8px 0;line-height:1.3}
 #quests button.done{opacity:.55;text-decoration:line-through;border-color:var(--lime)}
@@ -85,7 +86,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #app.touchy #bTalk{bottom:calc(var(--gb) + 184px)}
 @media (max-width:640px){
   #stats{font-size:15px;gap:5px}.chip{padding:3px 7px;box-shadow:2px 2px 0 var(--hot)}
-  #relics{font-size:15px}#mute{width:36px;height:36px;font-size:16px}#right{gap:5px}
+  #relics{font-size:13px}#mute,#bLog{width:34px;height:34px;font-size:15px}#right{gap:4px}
   #compass{top:calc(var(--gt) + 40px);max-width:94vw;font-size:13px;white-space:nowrap}#arrow{font-size:26px}
   #quests{top:calc(var(--gt) + 98px);font-size:11px;max-width:54vw}
   #toasts{top:calc(var(--gt) + 98px);max-width:38vw}.toast{font-size:11px;padding:4px 7px;box-shadow:3px 3px 0 var(--hot)}
@@ -118,6 +119,14 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #app.cine #ad{display:none}
 #app.disco #c{animation:disco 1.2s linear infinite}@keyframes disco{to{filter:hue-rotate(360deg)}}
 #app.fry #c{filter:saturate(3.2) contrast(1.7)}
+#log{position:absolute;left:50%;top:50%;translate:-50% -50%;width:min(92vw,540px);max-height:84%;overflow:auto;background:var(--paper);color:var(--ink);border:4px solid var(--ink);border-radius:16px;box-shadow:8px 8px 0 var(--hot);padding:12px 16px 18px;pointer-events:auto;z-index:7;font-size:13px}
+#log h3{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:.05em;margin:12px 0 4px;color:var(--grape)}
+#log p{margin:0 0 8px}#logx{position:sticky;top:0;float:right;width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);background:var(--hot);color:var(--paper);font-size:15px;padding:0}
+#log .tiers,#log .ach{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:3px 12px}
+#log .tiers div,#log .ach div{opacity:.55;line-height:1.25}#log .got{opacity:1!important;font-weight:700}#log .ach small{display:block;font-size:11px;opacity:.75;margin-left:22px}
+#log .hats{display:flex;flex-wrap:wrap;gap:6px}#log .hats button{width:40px;height:40px;font-size:20px;border-radius:10px;border:3px solid var(--ink);background:#fff;padding:0}
+#log .hats .on{background:var(--lime)}#log .hats .no{opacity:.4}#log .big{font-size:22px;padding:4px 18px;animation:none;box-shadow:4px 4px 0 var(--hot)}
+#app.cine #log{display:none}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 
 /* ---------- Screens ---------- */
@@ -156,7 +165,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
   <div id="hud" hidden>
     <div id="stats"><span class="chip" id="cells">🧠🧠🧠🧠🧠</span><span class="chip" id="aura">0 AURA</span><span class="chip" id="elev" hidden>⚡0/11</span></div>
     <div id="compass"><span id="arrow">▲</span><span id="ctext"></span></div>
-    <div id="right"><span class="chip" id="relics"><span title="The Based Stone">🗿</span><span title="The Em Dash of Destiny">➖</span><span title="The Seventh Finger">☝️</span><span class="sh" id="shardn" title="Sun shards">☀️0</span></span><button id="mute" aria-label="Sound on or off">🔊</button></div>
+    <div id="right"><span class="chip" id="relics"><span title="The Based Stone">🗿</span><span title="The Em Dash of Destiny">➖</span><span title="The Seventh Finger">☝️</span><span class="sh" id="shardn" title="Sun shards">☀️0</span></span><button id="bLog" aria-label="Slop Pass, missions and checklist">📋</button><button id="mute" aria-label="Sound on or off">🔊</button></div>
     <div id="quests"></div>
     <div id="zonecard"><b></b><i></i></div>
     <div id="chap"><small></small><b></b></div>
@@ -170,6 +179,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <button id="bJump" class="pad">JUMP</button>
     <button id="bTalk" hidden></button>
     <div id="bigmsg"></div>
+    <div id="log" hidden><button id="logx" aria-label="Close">✕</button><div id="logb"></div></div>
     <div id="ad" hidden><span id="adt"></span><button id="adx" aria-label="Close ad">✕</button></div>
     <button id="bSlow" hidden aria-label="Borrowed Time">⏳</button>
     <div id="ratio" hidden>YOU GOT<br>RATIOED</div>
@@ -664,7 +674,7 @@ const bullets=[];
 (function(){const g=new THREE.IcosahedronGeometry(.5,0);for(let i=0;i<22;i++){const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0xffffff,fog:false}));m.visible=false;scene.add(m);bullets.push({m,life:0,vx:0,vy:0,vz:0});}})();
 const BLAST_WORDS=['skibidi','rizz','sigma','aura','67','bruh','delve','no cap','W','ohio','sus','mid'];
 function shoot(mx,my,mz,dx,dy,dz,bigShot){const b=bullets.find(b=>b.life<=0);if(!b)return;b.life=bigShot?1.5:1;b.big=bigShot;b.hits=[];b.vx=dx*75;b.vy=dy*75;b.vz=dz*75;b.m.position.set(mx+dx*1.2,my,mz+dz*1.2);b.m.visible=true;b.m.scale.setScalar(bigShot?4.5:1);b.m.material.color.setHSL(Math.random(),1,bigShot?.8:.6);}
-function fire(){PL.cd=.24;let best=null,bd=60;const mx=PL.x,my=PL.y+2,mz=PL.z;
+function fire(){PL.cd=X.clout>=8?.17:.24;let best=null,bd=60;const mx=PL.x,my=PL.y+2,mz=PL.z;
   const consider=(c,cy)=>{const dx=c.x-mx,dz=c.z-mz,d=Math.hypot(dx,dz);if(d<bd){const an=Math.atan2(dx,dz);if(d<9||Math.abs(angDiff(an,PL.face))<1.15||Math.abs(angDiff(an,cam.yaw+Math.PI))<.9){best={x:c.x,y:cy,z:c.z};bd=d;}}};
   enemies.forEach(e=>consider(e,e.y));if(boss.active&&boss.hp>0)consider(boss,boss.y);if(BOT.state==='fight')consider(BOT,BOT.y+2.4);
   let dx,dy,dz;if(best){dx=best.x-mx;dy=best.y-my;dz=best.z-mz;const l=Math.hypot(dx,dy,dz)||1;dx/=l;dy/=l;dz/=l;PL.face=Math.atan2(dx,dz);}else{dx=Math.sin(PL.face);dy=0;dz=Math.cos(PL.face);}
@@ -709,7 +719,7 @@ function updateBoss(dt,active){if(!boss.active)return;const g=boss.g;boss.t+=dt;
   if(X.lit){boss.van-=dt;if(boss.van<=0){boss.van=8;gangAssist();}}}
 function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$('bossbar').hidden=true;$('hud').hidden=true;
   const rank=S.total>160000?'CERTIFIED OHIO FINAL BOSS':S.total>120000?'RIZZ LORD SUPREME':S.total>95000?'SIGMA INTERN':'NPC WITH A DREAM';
-  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
+  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
   $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;clearSave();}
 
 /* ================= player ================= */
@@ -794,7 +804,7 @@ function compassTarget(){if(S.inBoss)return boss.active?{x:boss.x,z:boss.z,l:'TH
     if(id==='fable'){let b=null,bd=1e9;pages.forEach((p,i)=>{if(S.pages[i])return;const d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;b=p;}});if(b)return{x:b.x,z:b.z,l:'LOST PAGE'};}
     if(id==='astra'){let b=null;for(let i=1;i<16;i++){const p=platforms[i];if(p.top>PL.y+.5){b=p;break;}}if(b)return{x:b.x,z:b.z,l:'NEXT STAIR ↑'};return{x:TOP.x,z:TOP.z,l:'SEVENTH FINGER'};}}
   return{x:Z.x,z:Z.z,l:Z.name};}
-function updateHUD(){setText('aura',fmt(S.aura)+' AURA');setText('cells',app.clientWidth<640?'🧠×'+Math.max(0,S.cells):'🧠'.repeat(Math.max(0,S.cells))+'💀'.repeat(Math.max(0,S.max-S.cells)));renderQuests();
+function updateHUD(){setText('aura',fmt(S.aura)+(app.clientWidth<640?' ✨':' AURA'));setText('cells',app.clientWidth<640?'🧠×'+Math.max(0,S.cells):'🧠'.repeat(Math.max(0,S.cells))+'💀'.repeat(Math.max(0,S.max-S.cells)));renderQuests();
   const t=compassTarget(),ar=$('arrow');if(t){const dx=t.x-PL.x,dz=t.z-PL.z,d=Math.hypot(dx,dz),fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw),rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw);
     const rel=Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz);ar.style.transform='rotate('+rel.toFixed(2)+'rad)';setText('ctext',t.l+' · '+Math.round(d)+'m');ar.style.visibility='visible';}else{ar.style.visibility='hidden';setText('ctext','');}
   if(boss.active)$('bossfill').style.width=(clamp(boss.hp/boss.max)*100)+'%';}
@@ -843,9 +853,9 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else inp.jump=true;});padB
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0}});
 Object.assign(X,X0());
-const XQ=['flow','erin','clank','hour','lantern','bud','spr','frag'];
+const XQ=['mission','flow','erin','clank','hour','lantern','bud','spr','frag'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
 const sum=a=>a.reduce((p,c)=>p+c,0);
 const plainLam=new THREE.MeshLambertMaterial();
@@ -1306,7 +1316,7 @@ const TALK={
     else if(X.erin===1){X.erin=2;MEAL.t=100;say([['erin','Chop. Fry. Plate. One combo meal, to go. King Bibi\'s podium is out past the plaza, to the west. Run it over before it goes cold.']],()=>{syncX();toast('🍔 100 seconds. The van would help.');});}
     else if(X.erin===2)say([['erin','It is getting COLD. Podium. West of the plaza. Go!']]);
     else say([['erin',pick(['Plant it, cook it, serve it. That\'s the whole stand.','Do not tell me Marcus built a hot tub. ...He built a hot tub, didn\'t he.','The slop out there keeps eating my fence. I keep building the fence.'])]]);},
-  bibi(){if(X.erin===2){X.erin=3;S.max=6;S.cells=S.max;giveShard([['bibi','A combo meal. To go. Finally, a deliverable. CITIZENS! I have personally delivered lunch.'],['bibi','I found this under my podium. My people tell me it is a POLL BUMP. Take it. I have many.']],()=>toast('📈 POLL BUMP: +1 brain cell, permanently'));}
+  bibi(){if(X.erin===2){X.erin=3;S.max=maxCells();S.cells=S.max;giveShard([['bibi','A combo meal. To go. Finally, a deliverable. CITIZENS! I have personally delivered lunch.'],['bibi','I found this under my podium. My people tell me it is a POLL BUMP. Take it. I have many.']],()=>toast('📈 POLL BUMP: +1 brain cell, permanently'));}
     else say([['bibi',pick(['PRIME MINISTER. AGAIN. NEXT QUESTION.','FACT CHECK: PENDING. I DON\'T DO FACT CHECKS.','NICE OUTFIT. WHO\'S YOUR GUY? ...I AM MY OWN GUY.','THIS IS MY 4,207TH PRESS CONFERENCE TODAY. NO FURTHER QUESTIONS.'])]].concat(X.erin<2?[['bibi','ALSO. I ORDERED A COMBO MEAL. TO GO. FROM THE GARDEN IN SUNKEEP. I HAVE BEEN WAITING SINCE THE LAST ELECTION.']]:[]),()=>{if(X.erin<2&&!S.track)S.track='erin';});},
   kael(){S.track='clank';
     if(X.clank===0){X.clank=1;say([['kael','The air here is wrong. I can hear it. Three valves in that yard. Someone opened all of them.'],['kael','Close them. The robot\'s shield runs on that pressure.'],['kael','And count when you fight. Every eleventh strike lands like a bell.']],()=>{syncX();save();});}
@@ -1373,21 +1383,23 @@ function xInteract(){if(VAN.driving)return{label:'🚪 GET OUT OF THE VAN',fn:ex
   if(Math.hypot(PL.x-GRASS.x,PL.z-GRASS.z)<4)return{label:'🌱 TOUCH GRASS',fn:touchGrass};
   for(const t of TPOSE)if(Math.hypot(PL.x-t.x,PL.z-t.z)<4.6)return{label:'💬 YAP WITH '+t.nm,fn:()=>say([['tpose',pick(['I have been standing like this since the animation budget ran out.','Please do not walk through me. I can feel it. I just cannot react.','They said my texture was "coming in the next patch". That was four patches ago.','A',"I'm fine. This is my idle animation."])]])};
   if(Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<5)return{label:'🔴 PRESS THE BUTTON',fn:()=>pressButton(false)};
+  if(Math.hypot(PL.x-MS.x,PL.z-MS.z)<5.5)return{label:'🎯 SIDE QUEST DISPENSER',fn:openLog};
   return null;}
 function xTarget(id){const N=n=>({x:n.x,z:n.z,l:n.short}),near=(arr,ok,l)=>{let b=null,bd=1e9;arr.forEach((p,i)=>{if(!ok(i))return;const d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;b=p;}});return b?{x:b.x,z:b.z,l}:null;};
+  if(id==='mission')return missionTarget();
   if(id==='flow')return X.flow===0||X.flow===2?N(npcs.marcus):X.flow===1?{x:GAR.dx,z:GAR.dz,l:'VAN KEY'}:X.flow===3?near(LEAKS,i=>!X.leaks[i],'LEAK'):null;
   if(id==='erin')return X.erin===0?N(npcs.erin):X.erin===1?(near(GAR.crops,i=>!X.crops[i],'CROP')||N(npcs.erin)):X.erin===2?N(npcs.bibi):null;
   if(id==='clank')return X.clank===0?N(npcs.kael):X.clank===1?near(VALVES,i=>!X.valves[i],'VALVE'):X.clank===2?{x:BOT.x,z:BOT.z,l:'LIL BOTTIE'}:null;
   if(id==='hour')return X.hour<2?N(npcs.david):null;
   if(id==='lantern')return X.lit?null:N(npcs.will);
   if(id==='bud')return near(BUD,i=>!BUD[i].caught,'DIM BUDDY');if(id==='spr')return near(SPOTS,i=>!X.spt.includes(i),'WILD SPROUT');if(id==='frag')return near(FRAGS,i=>!X.frag.includes(i),'PROMPT FRAGMENT');return null;}
-function xRows(){const lk=sum(X.leaks),cr=sum(X.crops),vl=sum(X.valves);return[
+function xRows(){const lk=sum(X.leaks),cr=sum(X.crops),vl=sum(X.valves),mr=missionRow();return(mr?[['mission','🎯 '+mr,false]]:[]).concat([
   ['flow','🚐 '+(X.flow===0?'Flow Pros have a job (find Marcus)':X.flow===1?'Find the van key in Erin\'s garden':X.flow===2?'Bring the key back to Marcus':X.flow===3?'Drive the van at the leaks '+lk+'/4':'Flow Pros job done'),X.flow>=4],
   ['erin','🍔 '+(X.erin===0?'Erin needs hands at Sunkeep':X.erin===1?(cr<3?'Pick Erin\'s crops '+cr+'/3':'Bring the crops to Erin'):X.erin===2?'Run the combo meal to King Bibi · '+Math.ceil(MEAL.t)+'s':'King Bibi has been fed'),X.erin>=3],
   ['clank','🤖 '+(X.clank===0?'Something clanks out west (find Kael)':X.clank===1?'Close the valves in the Clanker Yard '+vl+'/3':X.clank===2?'Beat lil Bottie':'lil Bottie is at 99%'),X.clank>=3],
   ['hour','⏳ '+(X.hour===0?'Visit David in the Hour Garden':X.hour===1?'Touch nothing for 8 seconds in the Hour Garden':'Borrowed Time acquired'),X.hour>=2],
   ['lantern','☀️ '+(X.lit?'The Great Lantern is lit':'Sun shards for Will '+shards()+'/4'),!!X.lit],
-  ['bud','🐾 Befriend the dim buddies '+X.bud.length+'/15',X.bud.length>=15],['spr','🌱 Pluck wild sprouts '+X.spt.length+'/18',X.spt.length>=18],['frag','📟 Read the prompt fragments '+X.frag.length+'/12',X.frag.length>=12]];}
+  ['bud','🐾 Befriend the dim buddies '+X.bud.length+'/15',X.bud.length>=15],['spr','🌱 Pluck wild sprouts '+X.spt.length+'/18',X.spt.length>=18],['frag','📟 Read the prompt fragments '+X.frag.length+'/12',X.frag.length>=12]]);}
 function syncX(){LEAKS.forEach((L,i)=>{L.b.visible=!X.leaks[i];});GAR.crops.forEach((c,i)=>{c.s.visible=X.erin===3||(!X.crops[i]&&X.erin<2);});GAR.dig.visible=X.flow===1;
   VALVES.forEach((v,i)=>{v.b.visible=X.clank===1&&!X.valves[i];v.wheel.material.color.setHex(X.valves[i]?0x556070:0xff2e2e);});
   if(X.clank<2)BOT.state='shield';else if(X.clank===2){if(BOT.state!=='fight'){BOT.state='fight';BOT.hp=BOT.max;BOT.shoot=2.5;BOT.spawn=5;}}else BOT.state='down';
@@ -1397,7 +1409,7 @@ function syncX(){LEAKS.forEach((L,i)=>{L.b.visible=!X.leaks[i];});GAR.crops.forE
   $('shardn').textContent='☀️'+shards();$('elev').hidden=X.clank<2;$('bSlow').hidden=X.hour<2;hudCache.q=null;}
 function xReset(){VAN.driving=false;VAN.x=VAN.hx;VAN.z=VAN.hz;VAN.h=VAN.hh;VAN.sp=VAN.vy=0;VAN.y=groundH(VAN.x,VAN.z);VAN.gr=true;VAN.rode=false;pGroup.visible=true;
   if(X.louie){LOU.x=PL.x+3;LOU.z=PL.z+3;}else{LOU.x=LOU.hx;LOU.z=LOU.hz;}LOU.orb=-1;SPR.list.length=0;BUD.forEach(b=>{const h=BHOME[b.id];b.x=b.hx=h[0];b.z=b.hz=h[1];b.caught=b.lead=false;});GRASS.cd=0;
-  S.slow=0;S.slowCd=0;S.shots=0;S.snack=0;CH.id='';CH.t=0;ROT.beat=0;ROT.btn=0;$('ad').hidden=true;assistN=0;app.classList.remove('slow','disco','fry');STILL.t=STILL.fail=0;BOT.state='x';BOT.x=CY.x;BOT.z=CY.z;BOT.y=BOT.gy+1;FLY.g.visible=false;big('');syncX();}
+  S.slow=0;S.slowCd=0;S.shots=0;S.snack=0;if(MS.m)endMission();G.lj=0;G.ls=0;CH.id='';CH.t=0;ROT.beat=0;ROT.btn=0;$('ad').hidden=true;assistN=0;app.classList.remove('slow','disco','fry');STILL.t=STILL.fail=0;BOT.state='x';BOT.x=CY.x;BOT.z=CY.z;BOT.y=BOT.gy+1;FLY.g.visible=false;big('');syncX();}
 function updateBB(dt){for(const b of bb){if(b.life<=0)continue;b.life-=dt;const p=b.m.position;p.x+=b.vx*dt;p.y+=b.vy*dt;p.z+=b.vz*dt;b.m.scale.setScalar(1+Math.sin(S.t*14+p.x)*.2);
     const dx=p.x-PL.x,dy=p.y-(PL.y+1.4),dz=p.z-PL.z;if(dx*dx+dz*dz<1.7&&Math.abs(dy)<1.7){hurt(-dx,-dz);b.life=0;}
     const out=S.inBoss?(Math.hypot(p.x,p.z)>ARENA.r+6||p.y<ARENA.top-1):p.y<groundH(p.x,p.z)-.3;if(b.life<=0||out){b.life=0;b.m.visible=false;}}}
@@ -1420,7 +1432,7 @@ function updateLouie(dt){const L=LOU;let moving=false;
   if(moving)L.walk+=dt*16;const gy=S.inBoss?ARENA.top:groundH(L.x,L.z);L.y=gy+(moving?Math.abs(Math.sin(L.walk))*.5:0);
   L.g.position.set(L.x,L.y,L.z);L.g.rotation.set(moving?Math.sin(L.walk)*.12:0,L.face,X.louie&&!moving?Math.sin(S.t*9)*.06:0);}
 function damageEnemy(e,n,kx,kz){e.hp-=n;e.hit=.12;if(kx!==undefined){e.kx=kx;e.kz=kz;}SFX.hit();if(e.hp<=0)killEnemy(e);}
-function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;rotUpdate(dt,play);
+function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;rotUpdate(dt,play);gUpdate(dt,play);
   // timers: borrowed time, the meal going cold
   if(S.slow>0){S.slow-=dt;if(S.slow<=0)app.classList.remove('slow');}if(S.slowCd>0)S.slowCd-=dt;
   if(X.hour>=2){const t=S.slow>0?'⏳':S.slowCd>0?String(Math.ceil(S.slowCd)):app.classList.contains('touchy')?'⏳':'⏳Q';if(hudCache.slow!==t){hudCache.slow=t;$('bSlow').textContent=t;$('bSlow').classList.toggle('cd',S.slowCd>0&&S.slow<=0);}}
@@ -1542,8 +1554,77 @@ function rotUpdate(dt,play){if(S.snack>0)S.snack-=dt;if(ROT.btn>0)ROT.btn-=dt;
   ROT.ad-=dt;if(ROT.ad<=0){ROT.ad=55+Math.random()*40;showAd();}}
 
 
+/* ================= ACT 5: missions, the Slop Pass, a checklist, hats ================= */
+const maxCells=()=>5+(X.erin>=3?1:0)+(X.clout>=4?1:0);
+const MS={m:null,last:'',rings:[]},G={lj:0,ls:0,t:2,hat:null};
+const TIER=['a PNG of a hand (you do not get the PNG)','the word "nice"','nothing, but said warmly','+1 BRAIN CELL (this one is real)','a coupon for the hot tub (void)','Derek\'s respect (unconfirmed)','an NFT of the concept of Tuesday','FASTER BLASTER (also real)','a firm handshake from a T-posing man','King Bibi\'s endorsement (he endorsed himself)','the rest of the PNG','permission to say "aura" unironically'];
+const HATS=[['🎩','Tophat of Unearned Confidence'],['👑','Crown (Prime Minister Not Included)'],['🪣','Legendary Bucket'],['🍕','Slice'],['🚽','Throne, Portable'],['🌮','Taco of Holding'],['🛸','Small Abduction'],['🦆','Duck. Just A Duck.'],['📎','It Looks Like You\'re Wearing A Hat'],['🔥','This Is Fine'],['🧠','Second Brain'],['🌽','The Corn']];
+const ITEMS=['a wrench that is slightly wet','one (1) lukewarm combo meal','a mixtape nobody asked for','an overdue library clock','a valve, still warm','a signed photo of a podium','Louie\'s second-best ball','a USB stick labelled DO NOT','a jar of premium Ohio air','eleven loose fingers (for the hero)'];
+const OPA=['WET','SIGMA','LUKEWARM','UNLICENSED','FERAL','DISCOUNT','FORBIDDEN','MODERATELY BASED','DEEP FRIED','UNSUPERVISED'],OPN=['CORN','WRENCH','GOOSE','SPREADSHEET','LASAGNA','VALVE','PODIUM','HAND','TUESDAY','VAN'];
+(function(){for(let k=0;k<8;k++){const r=new THREE.Mesh(Tor(5,.55,8,28),rainbowMat);r.visible=false;scene.add(r);MS.rings.push(r);}
+  const x=14,z=17,y=groundH(x,z)+.15,m=new THREE.Mesh(merge([pt(Box(3,5.4,2.2),0xff2e88,M(0,2.7,0)),pt(Box(2.2,2.6,.2),0x9ffcff,M(-.2,3.4,1.12)),pt(Box(2.6,.7,.2),0x12021f,M(0,.9,1.12)),pt(Box(.4,1.6,.2),0xffd400,M(1.15,3.4,1.12)),pt(Box(3.3,.4,2.5),0xffd400,M(0,5.6,0))]),lam);
+  m.position.set(x,y,z);m.rotation.y=-2.4;scene.add(m);colliders.push({x,z,r:2,top:y+6});MS.x=x;MS.z=z;const l=textSprite(['SIDE QUEST','DISPENSER'],1.5,{color:'#ffd400'});l.position.set(x,y+7.6,z);scene.add(l);beam(x,z,0xff2e88,.5);
+  G.hat=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false}));G.hat.scale.set(1.5,1.5,1);G.hat.position.set(0,4.1,0);G.hat.visible=false;pGroup.add(G.hat);})();
+function hatSync(){G.hat.visible=!!X.hat;if(X.hat){G.hat.material.map=emojiTex(X.hat);G.hat.material.needsUpdate=true;}}
+// ---- missions
+function startMission(force){if(MS.m||S.mode!=='play'||S.inBoss)return;const types=['hunt','courier','rings','rush','survive'].filter(t=>t!==MS.last),ty=typeof force==='string'?force:pick(types),ids=Object.keys(npcs),by=npcs[pick(ids)];MS.last=ty;
+  const m={type:ty,name:'OPERATION '+pick(OPA)+' '+pick(OPN),by:by.short,t:0,clock:true,prog:0,need:0,pay:2500+Math.floor(Math.random()*6)*500};
+  const herd=n=>{for(let k=0;k<n;k++){const a=k/n*TAU+Math.random();spawnEnemy(PL.x+Math.cos(a)*(20+Math.random()*10),PL.z+Math.sin(a)*(20+Math.random()*10),'botmin');}};
+  if(ty==='hunt'){m.need=5+Math.floor(Math.random()*4);m.t=80;herd(m.need+2);}
+  else if(ty==='survive'){m.t=30;m.c0=S.cells;herd(9);}
+  else if(ty==='rush'){m.need=15;m.t=60;resetOrbs();}
+  else if(ty==='courier'){const a=pick(ids);let b=pick(ids);while(b===a)b=pick(ids);m.a=npcs[a];m.b=npcs[b];m.item=pick(ITEMS);m.st=0;m.clock=false;m.t=120;m.pay+=1500;}
+  else{m.i=0;m.pts=[];let x=PL.x,z=PL.z,h=Math.random()*TAU;const n=6;for(let k=0;k<n;k++){h+=(Math.random()-.5)*1.6;let nx=x+Math.sin(h)*38,nz=z+Math.cos(h)*38;const d=Math.hypot(nx,nz);if(d>185){h=Math.atan2(-x,-z);nx=x+Math.sin(h)*38;nz=z+Math.cos(h)*38;}x=nx;z=nz;m.pts.push([x,groundH(x,z)+4.5,z,h]);}
+    m.t=n*10;m.pts.forEach((p,k)=>{const r=MS.rings[k];r.position.set(p[0],p[1],p[2]);r.rotation.y=p[3];r.visible=true;});}
+  MS.m=m;S.track='mission';hudCache.q=null;SFX.relic();zoneCard(m.name,'posted by '+m.by+' · pays '+fmt(m.pay)+' aura');logRender();}
+function endMission(){MS.rings.forEach(r=>r.visible=false);MS.m=null;if(S.track==='mission')S.track=null;hudCache.q=null;logRender();}
+function failMission(why){if(!MS.m)return;zoneCard('MISSION FAILED',why+' · skill issue');SFX.hit();tone(200,.5,'sawtooth',.12,0,60);endMission();}
+function winMission(){const m=MS.m;if(!m)return;X.ms++;X.clout++;addAura(m.pay,PL.x,PL.y+4,PL.z);SFX.win();flash(.5,500);burst(PL.x,PL.y+2,PL.z,70,null,18,10,1.2);
+  zoneCard('MISSION COMPLETE',pick(['the client has been notified. the client is asleep.','five stars. would exploit again.','your aura has been invoiced.','Derek nodded. Probably.']));
+  toast('🎟️ SLOP PASS TIER '+X.clout+': '+(TIER[X.clout-1]||'more of the same, forever'));if(X.clout===4){S.max=maxCells();S.cells=S.max;}
+  const left=HATS.filter(h=>!X.hats.includes(h[0]));if(left.length&&(X.ms===1||Math.random()<.7)){const h=pick(left);X.hats.push(h[0]);X.hat=h[0];hatSync();toast('🎁 LOOT BOX: you unboxed '+h[0]+' '+h[1]+'. It is on your head now.');}
+  endMission();save();}
+function missionRow(){const m=MS.m;if(!m)return null;const t=' · '+Math.max(0,Math.ceil(m.t))+'s';return m.type==='hunt'?'Ratio hallucinations '+m.prog+'/'+m.need+t:m.type==='survive'?'Survive the stampede. Lose no brain cells'+t:m.type==='rush'?'Grab aura orbs '+m.prog+'/'+m.need+t:
+  m.type==='rings'?'Thread the rainbow rings '+m.i+'/'+m.pts.length+t:m.st===0?'Pick up '+m.item+' from '+m.a.short:'Run '+m.item+' to '+m.b.short+t;}
+function missionTarget(){const m=MS.m;if(!m)return null;if(m.type==='courier'){const n=m.st?m.b:m.a;return{x:n.x,z:n.z,l:n.short};}if(m.type==='rings'){const p=m.pts[m.i];return p?{x:p[0],z:p[2],l:'RING '+(m.i+1)}:null;}
+  if(m.type==='rush'){let b=null,bd=1e9;for(const o of orbs){if(o.taken||o.fy!==undefined)continue;const d=Math.hypot(PL.x-o.x,PL.z-o.z);if(d<bd){bd=d;b=o;}}return b?{x:b.x,z:b.z,l:'AURA'}:null;}
+  let b=null,bd=1e9;for(const e of enemies){const d=Math.hypot(PL.x-e.x,PL.z-e.z);if(d<bd){bd=d;b=e;}}return b?{x:b.x,z:b.z,l:'HALLUCINATION'}:null;}
+// ---- the checklist
+const ACH=[['grass','Touched Grass','you did it. it counted.',()=>!!X.grass],['ratio','Certified Ratio Victim','got ratioed 3 times',()=>S.deaths>=3],['jump','Knees: Optional','jumped 100 times',()=>X.c.j>=100],['pet','Good Boy Enjoyer','petted Louie 5 times',()=>X.c.pet>=5],
+  ['boop','Read The Sign, Ignored The Sign','pressed the button 3 times',()=>X.c.boop>=3],['ads','Ad Blocker (Manual)','closed 3 ads by hand',()=>X.c.ad>=3],['drive','Commercial Licence','drove the van a long way',()=>X.c.drv>=1500],['kills','Debunker','ratioed 40 hallucinations',()=>X.c.k>=40],
+  ['el','He Counted','landed 5 ELEVENs',()=>X.c.el>=5],['derek','A Room That Leaves','heard Derek out',()=>X.dk>=4],['terms','Voter Fatigue','sat through 5 elections',()=>X.terms>=5],['bud5','Buddy System','befriended 5 buddies',()=>X.bud.length>=5],['bud15','Buddydex','befriended all 15',()=>X.bud.length>=15],
+  ['squad','Middle Management','12 sprouts report to you',()=>X.spr.length>=12],['frag','Prompt Engineer','read the whole cursed prompt',()=>X.frag.length>=12],['lit','Lamplighter','relit the Great Lantern',()=>!!X.lit],['relic','Relic Hoarder','all three relics',()=>allRelics()],
+  ['top','Stairway','stood on top of Slop Heaven',()=>!!X.c.top],['hats','Hat Guy','own 4 hats',()=>X.hats.length>=4],['gig','Gig Economy','finished 5 missions',()=>X.ms>=5],['gig2','Unpaid Intern Of The Month','finished 12 missions',()=>X.ms>=12],['rich','Aura Quarter-Millionaire','earned 250,000 aura',()=>S.total>=250000]];
+// ---- the Slop Pass panel
+function logRender(){const L=$('log');if(L.hidden)return;const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;},body=$('logb');body.textContent='';
+  body.appendChild(mk('h3','','SLOP PASS · TIER '+X.clout));const tiers=mk('div','tiers');TIER.forEach((t,i)=>{const d=mk('div',i<X.clout?'got':'',(i<X.clout?'✔ ':(i+1)+'. ')+t);tiers.appendChild(d);});body.appendChild(tiers);
+  body.appendChild(mk('h3','','MISSIONS · '+X.ms+' done'));const m=MS.m;body.appendChild(mk('p','',m?m.name+': '+missionRow():'No mission running. The dispenser is full of them. They are all somebody else\'s problem, until now.'));
+  const b=mk('button','big',m?'✖ ABANDON':'🎯 START A MISSION');b.addEventListener('click',()=>{if(MS.m)failMission('abandoned');else{startMission();closeLog();}});body.appendChild(b);
+  body.appendChild(mk('h3','','HATS · '+X.hats.length+'/'+HATS.length));const hr=mk('div','hats');HATS.forEach(h=>{const own=X.hats.includes(h[0]),e=mk('button',own?(X.hat===h[0]?'on':''):'no',own?h[0]:'❔');e.title=own?h[1]:'not unboxed yet';if(own)e.addEventListener('click',()=>{X.hat=X.hat===h[0]?'':h[0];hatSync();save();logRender();});hr.appendChild(e);});body.appendChild(hr);
+  body.appendChild(mk('h3','','BRAIN ROT CHECKLIST · '+X.ach.length+'/'+ACH.length));const al=mk('div','ach');ACH.forEach(a=>{const d=mk('div',X.ach.includes(a[0])?'got':'',(X.ach.includes(a[0])?'🏆 ':'▫️ ')+a[1]);d.appendChild(mk('small','',a[2]));al.appendChild(d);});body.appendChild(al);}
+function openLog(){$('log').hidden=false;logRender();SFX.page();}
+function closeLog(){$('log').hidden=true;}
+$('bLog').addEventListener('click',()=>{audioInit();$('log').hidden?openLog():closeLog();});$('logx').addEventListener('click',closeLog);
+// ---- hooks into what already exists
+(function(){const pet=petLouie,pb=pressButton,rk=rotKill,to=takeOrb,ht=hurt,bg=begin;
+  petLouie=function(){X.c.pet++;pet();};pressButton=function(w){if(ROT.btn<=0)X.c.boop++;pb(w);};rotKill=function(e){X.c.k++;if(MS.m&&MS.m.type==='hunt')MS.m.prog++;rk(e);};
+  takeOrb=function(i){if(MS.m&&MS.m.type==='rush')MS.m.prog++;to(i);};hurt=function(a,b){const c=S.cells;ht(a,b);if(S.cells<c&&MS.m&&MS.m.type==='survive')failMission('you lost a brain cell');};
+  begin=function(d){bg(d);hatSync();closeLog();if(!d){addAura(67);toast('📅 DAY 1 LOGIN BONUS: +67 aura. Come back tomorrow for the same 67.');}};
+  $('adx').addEventListener('click',()=>{X.c.ad++;});})();
+function gUpdate(dt,play){if(PL.jumps>G.lj)X.c.j+=PL.jumps-G.lj;G.lj=PL.jumps;if(VAN.driving)X.c.drv+=Math.abs(VAN.sp)*dt;if(S.shots!==G.ls){G.ls=S.shots;if(S.shots&&S.shots%11===0)X.c.el++;}
+  if(!S.inBoss&&PL.grounded&&Math.abs(PL.y-ISLE.a3.top)<.4&&Math.hypot(PL.x-ISLE.a3.x,PL.z-ISLE.a3.z)<9)X.c.top=1;
+  G.t-=dt;if(G.t<=0&&S.mode==='play'){G.t=2;for(const a of ACH)if(!X.ach.includes(a[0])&&a[3]()){X.ach.push(a[0]);toast('🏆 '+a[1]+': '+a[2]);addAura(1000);SFX.page();save();}}
+  const m=MS.m;if(!m)return;MS.rings.forEach((r,k)=>{if(r.visible){r.rotation.z+=dt*(k===m.i?3:.6);r.scale.setScalar(k===m.i?1+Math.sin(S.t*6)*.08:.8);}});
+  if(S.inBoss){failMission('abandoned at the portal');return;}if(S.dead){failMission('you got ratioed');return;}if(!play)return;
+  if(m.clock){m.t-=dt;if(m.t<=0){if(m.type==='survive')winMission();else failMission('out of time');return;}}
+  if(m.type==='hunt'||m.type==='rush'){if(m.prog>=m.need)winMission();}
+  else if(m.type==='courier'){const n=m.st?m.b:m.a;if(Math.hypot(PL.x-n.x,PL.z-n.z)<7){if(!m.st){m.st=1;m.clock=true;SFX.page();bubble(pick(['Take it. Do not ask.','Careful. It\'s load-bearing.','Tell them it was like that when I found it.','Do not look at it directly.']),n.x,n.y+6,n.z);toast('📦 You are carrying '+m.item+'.');}
+      else{bubble(pick(['...Why is it wet.','I did not order this. I will keep it.','Finally. The prophecy.','Put it with the others.','This is the wrong one. Perfect.']),n.x,n.y+6,n.z);winMission();}}}
+  else if(m.type==='rings'){const p=m.pts[m.i];if(p&&Math.hypot(PL.x-p[0],PL.z-p[2])<6.5&&Math.abs(PL.y+1.5-p[1])<9){MS.rings[m.i].visible=false;m.i++;SFX.orb(m.i*2);addAura(200,p[0],p[1],p[2]);burst(p[0],p[1],p[2],30,null,14,6,.7);if(m.i>=m.pts.length)winMission();}}}
+
+
 /* ================= game flow ================= */
-function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;S.max=5+(X.erin>=3?1:0);S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
+function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
   PL.x=0;PL.z=9;PL.y=PL.vis=.15;PL.vx=PL.vy=PL.vz=PL.kx=PL.kz=0;PL.face=Math.PI;PL.inv=0;cam.yaw=0;cam.pitch=.3;cam.t.set(0,3,9);
   resetOrbs();spawnWorldEnemies();syncWorld();xReset();hudCache={};$('bossbar').hidden=true;$('hud').classList.remove('boss');$('ratio').hidden=true;$('dialog').hidden=true;}
@@ -1561,14 +1642,14 @@ let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
   if(S.mode==='play'||S.mode==='dialog'){const active=S.mode==='play'&&!S.dead;
     const wdt=dt*(S.slow>0?.22:1);
-    updateVan(dt,active);updatePlayer(dt,active);updateEnemies(wdt,active);updateBullets(dt);updateBoss(wdt,active);if(active)updateBB(wdt);updateOrbs(dt,active);xUpdate(dt,wdt,active);
+    {const n=Math.max(1,Math.ceil(dt/.0167));for(let q=0;q<n;q++){updateVan(dt/n,active);updatePlayer(dt/n,active);}}updateEnemies(wdt,active);updateBullets(dt);updateBoss(wdt,active);if(active)updateBB(wdt);updateOrbs(dt,active);xUpdate(dt,wdt,active);
     if(S.mode==='play'){updatePickups();updateZone(dt);if(S.dead>0){S.dead-=dt;if(S.dead<=0){S.dead=0;respawn();}}saveT-=dt;if(saveT<=0){saveT=20;if(!S.inBoss)save();}}
     else updateDialog(dt);
     updateHUD();updatePip(dt);}
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,MS,startMission,winMission,failMission,openLog,ACH,orbs};
 }
 })();
 </script>
