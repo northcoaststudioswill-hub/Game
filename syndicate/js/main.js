@@ -131,6 +131,9 @@
     if (best) { best.focus(); best.scrollIntoView({ block: 'nearest' }); G.sfx('ui'); }
   }
   let padT = 0;
+  // B on a menu: the card's own way out, whatever it is called
+  function padBack() { const pn = $('panel'); let back = pn.querySelector('#x, #n, #rs'); if (!back || back.disabled || !back.offsetParent) back = [...pn.querySelectorAll('button')].filter(q => !q.disabled && q.offsetParent).find(q => /^(✕|×|back|done|close|step back|not now|not tonight|leave|leave (them|him|her) be|cancel|later|no|climb out|go back down|carry on|good|go on|keep fighting|back to [a-z ’']+)$/i.test(q.textContent.trim())); if (back) { back.click(); return true; } return false; }
+  G._pad = { nav: (x, y) => navigate(x, y), back: padBack, list: () => menuButtons() };
   function pollPad(dt) {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     let gp = null; for (const p of pads) if (p && p.connected && p.mapping === 'standard') { gp = p; break; }
@@ -164,7 +167,7 @@
       if (nx || ny) navigate(nx, ny);
       const list = menuButtons(); if (list.length && !list.includes(document.activeElement)) (list.find(b => b.classList.contains('big')) || list[0]).focus();
       if (hit(0) && list.includes(document.activeElement)) document.activeElement.click();
-      if (hit(1) || (paused && hit(9))) { const pn = $('panel'); let back = pn.querySelector('#x, #n, #rs'); if (!back) back = [...pn.querySelectorAll('button')].filter(q => !q.disabled && q.offsetParent).find(q => /^(✕|×|back|done|close|step back|not now|not tonight|leave|cancel|later|no)$/i.test(q.textContent.trim())); if (back) back.click(); }
+      if (hit(1) || (paused && hit(9))) padBack();
     } else if (sc === 'hub' || sc === 'hideout') {
       if (hit(0) && G.near) { G.sfx('ui'); G.near.go(); }
       if (hit(3)) { G.sfx('ui'); if (sc === 'hideout') G.ui.catalog(); else G.ui.sheet(); }

@@ -18,9 +18,10 @@
     if (!bouts(st) && (coming || (!st.toured && !st.tourAsked))) return 'Somebody is calling you over';
     if (/grudge|clock|has news|loadout|Long Stair is open|New in the market/.test(s) && !/New in the market/.test(s)) return s;
     const base = s.replace(/\s*·\s*New in the market:.*$/, ''), short = base.replace(/^Blood Pit: /, '').replace(/^Next on the Ledger: /, 'fight ').replace(/^Go to the Blood Pit gate and face /, 'fight ');
-    const fresh = KEYS.filter(k => open(k) && !(st.seen || {})[k] && WHAT[k]);
+    const fresh = KEYS.filter(k => open(k) && !(st.seen || {})[k] && WHAT[k] && !(st.shownPlaces || {})[WHAT[k][0]]);
     if (fresh.length) { const w = WHAT[fresh[0]]; return 'NEW · ' + w[0] + ' (' + w[2] + '): ' + w[1] + (fresh.length > 1 ? ' · and ' + (fresh.length - 1) + ' more' : '') + ' · then ' + short; }
     const tips = [];
+    { const mo = st.loanM && st.loanM.owed, dov = st.loanD && st.loanD.owed; if (mo) tips.push('You owe Marc ' + Math.round(mo) + ' coin: pay it off at his table before he comes to collect', 'You owe Marc ' + Math.round(mo) + ' coin'); if (dov) tips.push('David’s loan stands at ' + Math.round(dov) + ' coin and grows every bout: pay it in his cellar', 'You owe David ' + Math.round(dov) + ' coin, growing'); }
     if (bouts(st) >= 1 && !(st.items || []).length) tips.push('Your hideout (down Tallow Row, south-west) is empty: a bed there gives bonus XP');
     if (bouts(st) >= 2 && !st.talked) tips.push('People in the market will talk: try the old miner east of the lamp');
     if (open('apoth') && (st.seen || {}).apoth && st.coin >= 60 && !(st.boons || {}).tonic && bouts(st) % 2 === 0) tips.push('You can afford a tonic before your next bout');
@@ -70,7 +71,7 @@
     [/Apothecary/, 'the Apothecary', 'Tonics. Drink one before a bout: harder skin, quicker hands, a hotter temper. They wear off after one fight.', 'Potions for mid-fight are the Fence. Tonics for before are here.'],
     [/Marc/, 'Marc’s table', 'Marc dé Fleuprau. Dice, a bet on tonight’s other bouts, and a loan if you are short. You can watch the bout you bet on.', 'He is fun and he is a crook. Borrow from him and he collects at the pit gate.'],
     [/Wisp/, 'the Wisp Table', 'Wispdice. Dice made of light, Guild-work, cannot be loaded. Marc’s back room.', 'Pure gambling. Set a stake, roll, walk away while you are ahead. Nobody does.'],
-    [/Charms/, 'the charm-seller', 'Charms. One worn at a time. Small edges: a bit of luck, a bit of coin, a second wind.', 'Some are cut to go with a particular kit and weapon. Wear all three and they add up.'],
+    [/Charms/, 'the charm seller', 'Charms. One worn at a time. Small edges: a bit of luck, a bit of coin, a second wind.', 'Some are cut to go with a particular kit and weapon. Wear all three and they add up.'],
     [/Whisper/, 'Whisper', 'She sells what she hears. Pay her and she tells you how your next opponent fights: what they open with, what they fear.', 'Worth it before a named bout. Not worth it for an undercard.'],
     [/Long Stair/, 'the Long Stair', 'The way up. Wardens on it, and the Crown’s tithe.', 'When you hold the crown long enough, that gate is the next thing.']];
   const placeOf = sp => PLACE.find(q => q[0].test(sp.label)), openNow = hub => hub.spots.filter(sp => sp.isLocked && !sp.isLocked() && placeOf(sp) && !/Pip/.test(sp.label));
