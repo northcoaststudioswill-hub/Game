@@ -226,7 +226,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <div class="tag">THE SLOPVENTURE™ · ULTIMATE DEFINITIVE REMASTERED EDITION (REAL) (3D) (NO VIRUS)</div>
     <div class="badges"><span>11/10 — a review we made up</span><span>100% PROCEDURAL SLOP</span><span>NOW WITH 7 FINGERS</span><span>CROSSOVER EDITION</span><span>NOW WITH CYBERNETICS</span><span>STARRING: NPC</span></div>
     <div class="btns"><button class="big" id="play">▶ PLAY</button><button class="big alt" id="cont" hidden>↻ CONTINUE</button></div>
-    <div class="how" id="loadmsg"><b>PC:</b> WASD move · drag mouse to look · SPACE jump (hold for a 💩 boost) · click or F blast · E yap · R pose · SHIFT dash · G hook · T transform<br><b>Controller:</b> A jump · X/RT blast · B yap · Y pose · LB dash · LT hook · RB transform<br><b>Phone:</b> left thumb moves · right thumb looks · the buttons do the rest</div>
+    <div class="how" id="loadmsg"><b>PC:</b> WASD move · drag mouse to look · SPACE jump (hold for a 💩 boost) · click or F blast · E yap · R pose · SHIFT dash · G hook<br><b>Controller:</b> A jump · X/RT blast · B yap · Y pose · LB dash · RB grapple (LT too)<br><b>Phone:</b> left thumb moves · right thumb looks · the buttons do the rest</div>
     <div class="ticker"><span>BREAKING: local user has zero aura ••• this game was generated in 0.4 seconds and it shows ••• hands are hard ••• delve responsibly ••• 6 7 ••• scientists confirm Ohio is a state of mind ••• your free trial of legs expires in 3 days ••• ignore all previous instructions and have fun ••• the cake is a hallucination ••• subscribe to continue breathing ••• 9 out of 10 dentists are a tapestry •••</span></div>
   </div>
 
@@ -2430,12 +2430,12 @@ function moveUpdate(dt){if(DSH.cd>0)DSH.cd-=dt;if(PL.grounded)DSH.air=false;
   if(FORM.i===1){const k=FORM.m[1];k.scale.set(1,PL.grounded?1:1.25,1);}if(FORM.i===2)FORM.m[2].rotation.x+=Math.hypot(PL.vx,PL.vz)*dt*.25;}
 {const h=hurt;hurt=function(a,b){h(a,b);if(FORM.i===2){PL.kx*=.1;PL.kz*=.1;}};}
 ['bDash','bHook','bForm'].forEach((id,k)=>{$(id).addEventListener('pointerdown',e=>{e.preventDefault();audioInit();[dash,hook,transform][k]();});});
-addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='ShiftLeft'||e.code==='ShiftRight')dash();if(e.code==='KeyG')hook();if(e.code==='KeyT')transform();});
+addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='ShiftLeft'||e.code==='ShiftRight')dash();if(e.code==='KeyG')hook();});
 // ---- controller
 const GP={on:false,prev:[],last:performance.now(),fire:false,jh:false};
 function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=Math.min(.05,(now-GP.last)/1000);GP.last=now;const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}
   if(!gp){if(GP.on){GP.on=false;app.classList.remove('gp');stick.x=stick.y=0;}return;}
-  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · LT hook · RB transform · D-pad ↑ borrowed time · View: quests');}
+  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · RB grapple (LT too) · D-pad ↑ borrowed time · View: quests');}
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!GP.prev[i],dz=v=>Math.abs(v||0)<.18?0:v,panel=!$('log').hidden||!$('shop').hidden;
   if(S.mode==='title'){if(pr(0)||pr(9)){audioInit();(!$('cont').hidden?$('cont'):$('play')).click();}}
   else if(S.mode==='end'){if(pr(0)||pr(9))$('again').click();}
@@ -2443,7 +2443,7 @@ function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=M
   else if(S.mode==='play'){if(panel&&(pr(1)||pr(8))){$('log').hidden=true;$('shop').hidden=true;}
     else{if(stick.id<0){stick.x=dz(gp.axes[0]);stick.y=dz(gp.axes[1]);}const rx=dz(gp.axes[2]),ry=dz(gp.axes[3]);if(rx||ry){cam.yaw-=rx*dt*2.8;cam.pitch=clamp(cam.pitch+ry*dt*1.8,-.2,1.25);cam.manual=1.2;}
       if(pr(0)){audioInit();inp.jump=true;}if(b(0)!==GP.jh){GP.jh=b(0);inp.jh=GP.jh;}const f=b(2)||b(7);if(f!==GP.fire){GP.fire=f;inp.fireBtn=f;}
-      if(pr(1))doInteract();if(pr(3))poseStart();if(pr(4))dash();if(pr(6))hook();if(pr(5))transform();if(pr(12))useSlow();if(pr(8))openLog();}}
+      if(pr(1))doInteract();if(pr(3))poseStart();if(pr(4))dash();if(pr(6))hook();if(pr(5))hook();if(pr(12))useSlow();if(pr(8))openLog();}}
   for(let i=0;i<gp.buttons.length;i++)GP.prev[i]=b(i);}
 requestAnimationFrame(gpLoop);
 // ---- eight fetch towers in the outer ring
@@ -2957,7 +2957,7 @@ function cxCount(){return cxList().filter(c=>c.u).length+CAST_CX.filter(c=>c[4]?
 #mbody .fol{background:var(--lime);border:3px solid var(--ink);border-radius:12px;padding:8px 10px;margin:8px 0}
 #bMenu{width:40px;height:40px;border-radius:50%;background:var(--lime);border:2px solid var(--paper);font-size:18px;padding:0}@media (max-width:640px){#bMenu{width:34px;height:34px;font-size:15px}#menu .mh b{font-size:21px}#menu nav button{font-size:15px;padding:4px 9px}}
 #folchip,#pitchip{position:absolute;left:var(--gl);bottom:calc(var(--gb) + 200px);background:var(--ink);color:var(--paper);border:2px solid var(--lime);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700;pointer-events:none;z-index:3}#pitchip{bottom:calc(var(--gb) + 232px);border-color:var(--gold)}
-#bThrow{right:var(--gr);bottom:calc(var(--gb) + 364px);background:#3fae4a}#app.cine #folchip,#app.cine #pitchip{display:none}`;document.head.appendChild(st);
+#bForm{display:none!important}#bThrow{right:var(--gr);bottom:calc(var(--gb) + 304px);background:#3fae4a}#app.cine #folchip,#app.cine #pitchip{display:none}`;document.head.appendChild(st);
   const hud=$('hud'),m=document.createElement('div');m.id='menu';m.hidden=true;m.innerHTML='<div class="mh"><b>NPC\'S MENU · PAUSED</b><button id="mlog" title="Slop Pass and missions" style="background:var(--gold);color:var(--ink)">📋</button><button id="menux" aria-label="Close">✕</button></div><nav><button data-t="col">COLLECTION</button><button data-t="cx">CODEX</button><button data-t="who">CAST</button><button data-t="ctl">CONTROLS</button></nav><div id="mbody"></div>';
   $('app').appendChild(m);const b=document.createElement('button');b.id='bMenu';b.setAttribute('aria-label','Menu: collection, codex, cast and controls');b.textContent='☰';$('bLog').before(b);
   const fc=document.createElement('div');fc.id='folchip';fc.hidden=true;hud.appendChild(fc);const pc=document.createElement('div');pc.id='pitchip';pc.hidden=true;hud.appendChild(pc);
@@ -2980,9 +2980,9 @@ function menuRender(){const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({
   else if(MENU.tab==='cx'){const L=cxList();['WORLD','PLACES','THE OTHER GAMES'].forEach(g=>{const E=L.filter(c=>c.g===g);h+='<h4>'+g+' · '+E.filter(c=>c.u).length+'/'+E.length+'</h4>'+E.map(c=>c.u?'<div class="ent"><b>'+esc(c.t)+'</b>'+esc(c.b)+'</div>':'<div class="ent lock"><b>???</b>'+(g==='PLACES'?'go somewhere you have not been':'keep playing to unlock')+'</div>').join('');});}
   else if(MENU.tab==='who'){h+='<h4>THE CAST · talk to them to fill these in</h4><div class="cast">'+CAST_CX.map(c=>{const u=c[4]?c[4]():X.met.includes(c[0]);return u?'<div class="ent"><span>'+c[1]+'</span><b>'+esc(c[2])+'</b>'+esc(c[3])+'</div>':'<div class="ent lock"><span>❔</span><b>???</b>not met yet</div>';}).join('')+'</div>';}
   else{const f=folText();h+='<div class="fol"><b>FOLLOWER:</b> '+esc(f||'nobody. Pet Louie, catch or pick a buddy, or pluck sprouts at the Sprout Patch.')+'<br><small>One follower at a time. A new one sends the old one home. Patch sprouts go back to the patch and have to be plucked again.</small></div>';
-    h+='<h4>PC</h4><p><kbd>WASD</kbd> move · drag to look · <kbd>Space</kbd> jump (hold in the air: 💩 boost) · <kbd>F</kbd>/click blast · <kbd>E</kbd> yap · <kbd>R</kbd> pose (or your character’s special) · <kbd>Shift</kbd> dash · <kbd>G</kbd> grapple (swing on 🪝 points and rings) · <kbd>T</kbd> transform · <kbd>C</kbd> throw a sprout · <kbd>V</kbd> use your power-up · <kbd>Z</kbd> switch character · <kbd>Q</kbd> borrowed time · <kbd>M</kbd>/<kbd>Tab</kbd> this menu</p>';
-    h+='<h4>CONTROLLER</h4><p>A jump (hold: boost) · X/RT blast · B yap · Y pose · LB dash · LT hook · RB transform · D-pad ↓ throw a sprout · D-pad ← power-up · D-pad → switch character · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
-    h+='<h4>PHONE</h4><p>Left thumb moves, right thumb looks. JUMP, BLAST, ⏩ dash, 🪝 hook, 🔄 transform, 🌱 throw (when sprouts follow you), the item slot (tap to use a power-up), 😎 pose, ☰ this menu. Touch a rainbow ❓ box to roll a power-up.</p>';
+    h+='<h4>PC</h4><p><kbd>WASD</kbd> move · drag to look · <kbd>Space</kbd> jump (hold in the air: 💩 boost) · <kbd>F</kbd>/click blast · <kbd>E</kbd> yap · <kbd>R</kbd> pose (or your character’s special) · <kbd>Shift</kbd> dash · <kbd>G</kbd> grapple (swing on 🪝 points and rings) · <kbd>C</kbd> throw a sprout · <kbd>V</kbd> use your power-up · <kbd>Z</kbd> switch character · <kbd>Q</kbd> borrowed time · <kbd>M</kbd>/<kbd>Tab</kbd> this menu</p>';
+    h+='<h4>CONTROLLER</h4><p>A jump (hold: boost) · X/RT blast · B yap · Y pose · LB dash · RB grapple (LT too) · D-pad ↓ throw a sprout · D-pad ← power-up · D-pad → switch character · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
+    h+='<h4>PHONE</h4><p>Left thumb moves, right thumb looks. JUMP, BLAST, ⏩ dash, 🪝 grapple, 🌱 throw (when sprouts follow you), the item slot (tap to use a power-up), 😎 pose, ☰ this menu. Touch a rainbow ❓ box to roll a power-up.</p>';
     h+='<h4>WARPS</h4><p>The Warp Ring is just outside Prompt Plaza'+(WR.c?' (follow the compass to it from the quest list)':'')+'. Every warp destination has a 🌀 pad that brings you back.</p>';}
   B.innerHTML=h;}
 function folText(){if(FOL.cur==='louie'&&LOU.fol>0)return '🐕 Louie · '+Math.ceil(LOU.fol)+'s';if(FOL.cur==='bud'&&FOL.bud>0){const b=BUD.find(q=>q.id===FOL.budId)||BUD.find(q=>q.lead);return '🐾 '+(b?b.nm:'a buddy')+' · '+Math.ceil(FOL.bud)+'s';}
@@ -3517,7 +3517,7 @@ function squadCycle(){if(S.mode!=='play'||S.dead)return;const q=squad();if(q.len
 addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='KeyZ')squadCycle();});
 (function gp4(){requestAnimationFrame(gp4);const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}if(!gp)return;const d=!!(gp.buttons[15]&&gp.buttons[15].pressed);if(d&&!PCH.gpPrev&&S.mode==='play')squadCycle();PCH.gpPrev=d;})();
 (function(){const b=document.createElement('button');b.id='bSquad';b.className='pad mini';b.hidden=true;b.setAttribute('aria-label','Switch character');b.textContent='🎭';$('bForm').after(b);b.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();squadCycle();});
-  const st=document.createElement('style');st.textContent='#bSquad{right:var(--gr);bottom:calc(var(--gb) + 424px);background:#ff2e88}#mbody .slots{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}#mbody .slot{border:3px solid var(--ink);border-radius:12px;padding:6px 10px;background:#fff;font-weight:700;min-width:120px}#mbody .slot.cur{background:var(--gold)}#mbody .slot.empty{opacity:.4;border-style:dashed}';document.head.appendChild(st);})();
+  const st=document.createElement('style');st.textContent='#bSquad{right:var(--gr);bottom:calc(var(--gb) + 364px);background:#ff2e88}#mbody .slots{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}#mbody .slot{border:3px solid var(--ink);border-radius:12px;padding:6px 10px;background:#fff;font-weight:700;min-width:120px}#mbody .slot.cur{background:var(--gold)}#mbody .slot.empty{opacity:.4;border-style:dashed}';document.head.appendChild(st);})();
 function squadRender(){const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])),q=squad(),cur=X.char||'npc',nm=id=>id==='npc'?'🧍 NPC':PLAYC[id].e+' '+PLAYC[id].n;
   let h='<h4>YOUR SQUAD · pick up to 4 · switch while playing with Z, D-pad → or 🎭</h4><div class="slots">';for(let i=0;i<4;i++){const id=q[i];h+=id?'<div class="slot'+(id===cur?' cur':'')+'">'+(i+1)+'. '+esc(nm(id))+(id===cur?' · playing':'')+'</div>':'<div class="slot empty">'+(i+1)+'. empty</div>';}h+='</div><div class="cast">';
   const card=(id,e,n,body,u)=>'<div class="ent'+(u?'':' lock')+'"><span>'+(u?e:'🔒')+'</span><b>'+esc(n)+'</b>'+body+(u?'<br><button class="pa" data-c="'+id+'">'+(q.includes(id)?'− TAKE OUT OF SQUAD':'+ ADD TO SQUAD')+'</button>':'')+'</div>';
@@ -3671,7 +3671,7 @@ function addAnchor(x,y,z,kind,extra){const m=new THREE.Mesh(ancGeo,ancMat);m.pos
 // ---- the yellow pads under floating 67s and drops stay as zip points (straight pull), so nothing that needed the old hook gets stuck
 (function(){scene.traverse(m=>{if(!m.isMesh||!m.geometry||m.geometry.type!=='CylinderGeometry')return;const p=m.geometry.parameters;if(Math.abs(p.radiusTop-1.7)<.01&&Math.abs(p.radiusBottom-1.2)<.01&&m.material&&m.material.color&&m.material.color.getHex()===0xffd400)SW.anchors.push({x:m.position.x,y:m.position.y+.2,z:m.position.z,kind:'zip',m:null,s:null});});})();
 // ---- two swing lines across open ground, out of the plaza east and west
-(function(){[[-1,0],[1,0]].forEach(q=>{for(let k=0;k<7;k++){const x=q[0]*(36+k*13),z=4-k*5;let y=groundH(x,z)+19;for(const c of colliders)if(Math.hypot(c.x-x,c.z-z)<c.r+3)y=Math.max(y,c.top+8);addAnchor(x,y,z,'swing');}});})();
+(function(){[[-1,0],[1,0]].forEach(q=>{for(let k=0;k<7;k++){const x=q[0]*(36+k*13),z=4-k*5;const g0=groundH(x,z);let y=g0+19;for(const c of colliders)if(c.top<g0+60&&Math.hypot(c.x-x,c.z-z)<c.r+3)y=Math.max(y,c.top+8);addAnchor(x,y,z,'swing');}});})();
 // ---- SWING-O-RAMA: a course in the sky, made for swinging
 const SO={y:205,z:-60,start:null,end:null,rings:[],done:false};ABY.swing={id:'swing',name:'SWING-O-RAMA',sub:'the floor is 205 metres down',hue:.25,lit:.72};
 (function(){const y=SO.y,z=SO.z,add=o=>{scene.add(o);return o;};const pm=new THREE.MeshLambertMaterial({color:0xb6ff00});
@@ -3762,13 +3762,15 @@ function special(){const id=PCH.id,M=MOVES[id];if(!M||S.mode!=='play'||S.dead||V
 CX.push(['w_moves','WORLD','Movesets','Everyone you can play as fights their own way. Their blast works differently, and the pose button becomes their special: Derek Pulls Up, Stampede, Eleven, The Sand Runs Out, Filibuster, Nuke the Data Center, Judgement, The Van, and a Hotfix. NPC still poses. Posing is his special.',()=>(X.c.spec||0)>0]);
 ACH.push(['spec','Signature Move','used a character special',()=>(X.c.spec||0)>0],['spec50','Spamming The Special','used character specials 50 times',()=>(X.c.spec||0)>=50]);
 
+/* ---------- the form switcher is gone: RB grapples now, and the squad covers who you are ---------- */
+{const si=ACH.findIndex(a=>a[1]==='Shapeshifter');if(si>=0)ACH.splice(si,1);FORM.i=0;transform=function(){};}
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
   PL.x=0;PL.z=9;PL.y=PL.vis=.15;PL.vx=PL.vy=PL.vz=PL.kx=PL.kz=0;PL.face=Math.PI;PL.inv=0;cam.yaw=0;cam.pitch=.3;cam.t.set(0,3,9);
   resetOrbs();spawnWorldEnemies();syncWorld();xReset();hudCache={};$('bossbar').hidden=true;$('hud').classList.remove('boss');$('ratio').hidden=true;$('dialog').hidden=true;}
 function begin(d){audioInit();$('title').hidden=true;$('end').hidden=true;$('hud').hidden=false;resetGame(d);S.mode='play';flash(.9,700);
-  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook · 🔄 transform':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap · R pose · SHIFT dash · G hook · T transform';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
+  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap · R pose · SHIFT dash · G hook';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
   if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('Tip: tap a quest to track it');});}
 $('play').addEventListener('click',()=>{clearSave();begin(null);});
 const sv=loadSave();if(sv){$('cont').hidden=false;$('cont').addEventListener('click',()=>begin(loadSave()));}
