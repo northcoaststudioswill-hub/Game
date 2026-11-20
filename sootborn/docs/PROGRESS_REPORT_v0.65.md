@@ -1,4 +1,4 @@
-# SOOTBORN — Progress report at v0.65
+# SOOTBORN — Progress report at v0.65 
 Tagline: "Every breath is hers." Report date: 2026-11-19. Build: v0.65.
 
 **What this is.** A record of where the game stood at v0.65: what exists, the order it plays in, who is in it, where it falls short of its own writing, how good each part is, and what it would cost to raise. It is a snapshot. It is not kept up to date; the changelog, the story bible and the open list are. When the game has moved on, this stays as the measure of how far.
@@ -183,3 +183,9 @@ Questions waiting on you when this report was written:
 - **Your notes** from playing from the beginning to the Stair: not yet given, not yet in this report.
 
 Everything else you have asked for and not yet had is on the open list.
+
+## 12. Known bugs (added after the snapshot, from your play)
+- **The fire pit (the Circle, night 28):** the 2.5D scene ends and the fight happens elsewhere. It should stay in the 2.5D scene until the fight ends.
+- **Combat is too floaty:** a man can be kept in the air without the boots.
+- **Death animations:** people spin when they die.
+- **The hook shot** is missing as a real move in the 3D arena fights.

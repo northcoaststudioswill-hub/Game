@@ -14,6 +14,12 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The present and the flashes** (master plan 9a): day one is Ashgate; everything else is a flash with a trigger and a signpost. Pick: the Assay stays as flashes (shorter), or the Assay becomes its own act after The Way Out (longer).
 - **Approved to plan, not yet to build (2026-11-19):** the Keep as the new cold open with an animated intro (9b), and Part Two's deepening flashbacks and played ending (9c). Say build.
 
+## Bugs and feel (your notes, 2026-11-19)
+- **The fire pit:** the Circle's 2.5D scene ends, then the fight happens somewhere else. It should stay in the 2.5D scene until the fight ends.
+- **Too floaty:** a man can be kept in the air without the boots. More weight in the physics.
+- **Death animations:** people spin when they die. Replace with a real fall in every engine.
+- **The hook shot** in the 3D arena fights where it fits.
+
 ## Untested, built blind (check these first when playing)
 - **v0.63: arena figures.** Torso plate, baldric, scabbard, and a blade that is a sword.
 - **v0.62: the Proctors** behind the Dorian fight (low balcony, in the dark) and on the valley dais.
@@ -66,6 +72,10 @@ Kept current each round. "Keep going" means work down this list from the top unl
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
 16a. **The Keep as the cold open** (master plan 9b): black and the shift song; a 25-second animated intro of moving drawn stills counting to eleven; the Keep at dawn as a duel you cannot lose (strike, dodge, fly); ELEVEN, cut before the blow; then the prologue. The Valley returns to its place. The same fight on the last day, where the blow lands.
 16b. **Part Two flashbacks** (master plan 9c): the Post → the white cloak at the Assay; What She Knows → Celestine's own Assay, played as her; Two Years → Seren tracing the line first; the Count → no cuts, then one flash to the furnace at eleven; the ending as a played sequence of pictures.
+16c. **Two more comic-book levels in the first half** (master plan 9e): the Deep Array with Dace (The Ledger); the vent stack on day 31, where he takes the boots.
+16d. **Two more 2.5D parts with story in the first half:** the Assay camp by day (its people: Dorian, Oswin, Petra); Bay 3 at last bell, counting the knives back.
+16e. **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
+16f. **The Assay's art in the opening:** the expression, the ring, ELEVEN. Its people and story should be felt, not only fought.
 17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)
 
 ## Fighting and controls

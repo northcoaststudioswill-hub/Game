@@ -175,3 +175,43 @@ Replaces the Valley as the first thing you play. The Valley goes back to its pla
 | Two Years | Back before the furnace: Seren tracing the line; she found the leak first | The biggest reveal in the game | Medium (new) |
 | The Count | **No cuts.** The present runs straight through. After the last blow, one flash to the furnace and the count reaching eleven | Closes the loop back to the start | Low |
 | The ending | Played as a Table-style sequence of pictures, not told | A proper ending | Medium |
+
+### 9d. Your notes, 2026-11-19 (to build)
+**Bugs**
+- **The fire pit (the Circle, night 28):** the 2.5D scene ends, then the game goes elsewhere for the fight. It should stay in the 2.5D scene until the fight ends.
+- **Combat is too floaty.** You can keep a man in the air without the boots. Needs weight: heavier fall, fewer re-launches, no juggling off the ground unless the boots are on.
+- **Death animations:** people spin when they die. It looks bad. A real fall (knees, then down) in every engine.
+
+**Wanted**
+- **The hook shot in the 3D arena fights** where it fits (the button exists; it needs to be a real hook shot there).
+- **Two more comic-book (third-person) levels** in the first half.
+- **Two more 2.5D parts with story** in the first half. (This widens your earlier rule: these carry story, not only flavour.)
+- **The second half is all 3D, so it gets 2D and 2.5D flashbacks.**
+- **The Assay's art in the opening:** the expression, the ring, ELEVEN.
+- **The Assay mattered, and its people mattered.** Its story should be felt, not only fought.
+
+### 9e. Proposed timeline (v2)
+Day one is Ashgate; the present moves forward from there; everything else is a flash. This assumes **the Assay stays as flashes in the first half** (your note that the half after the Assay is all 3D fits that). **New** marks additions; nothing existing changes dimension.
+
+| # | Present / flash | What plays | Kind |
+|---|---|---|---|
+| 0 | Flash forward | Black, the shift song; **new** animated intro: the expression, the ring, the count to ELEVEN; **the Keep** as the cold open, cut before the blow | Drawn stills, 3D duel |
+| 1 | Flash back | Prologue; the heist | 2D |
+| 2 | Flash back | Last Bell, the furnace, the count, the tin | 2D, film |
+| 3 | Flash forward | The Pairing | 3D |
+| 4 | **Present: Ashgate** | Free play; three walkable memories | 2D, 2.5D |
+| 5 | That night | The Table; the lesson; the Drill; No Gloves; the Camp | Comic, 2D |
+| 5a | **New** | **The Assay camp by day** (day 3): Dorian's bread, Oswin, Petra, the cadets as people | 2.5D, story |
+| 6 | **Present: First Fire** | Free play; the Ford; **new: Bay 3 at last bell, counting the knives back** (2.5D, story); the ceremony; the lantern climb | 2D, 3D, 2.5D |
+| 7 | That night | **The Lamp: the Circle stays 2.5D through its fight**; the Island; the Standard | 2.5D, 2D, 3D |
+| 8 | **Present: The Ledger** | Lift Zero, Celestine, the window, Under the Floor; **new: the Deep Array** with Dace, the lore never shown | 2D, **comic level** |
+| 9 | That night | The Dais; **new: the vent stack, day 31, where he takes the boots**; the Proctor; On the Ground | 2D, **comic level**, 3D |
+| 10 | **Present: The Way Out** | The months, Mara, the Way Out, Ilse; last dream: the Valley, the Last Night, **the Keep again, and the blow lands**. END OF PART ONE | 2D, 3D |
+| 11 | **Present: the Spire** | The Pinning | 3D |
+| 12 | The Post | The desk, the Gallery; **flash: the Assay camp, the white cloak, the cadets following** | 3D, 2.5D flash |
+| 13 | The Balancing | Riser Nine; **flash, same time below: the Sun (Tavi)** | Comic, 2D flash |
+| 14 | What She Knows | The Son, the High Docks; **new flash: Celestine's own Assay, played as her** | 3D, comic, 2D flash |
+| 15 | Two Years | The Fall; **flashes: the Dock Stair (Brand), Tier Six (Mara), new: Seren tracing the line first, the barge** | 3D, 2D and 2.5D flashes |
+| 16 | The Count | The Stair, Little Ember; **no cuts**; one last flash: the furnace at eleven; **the ending, played as drawn pictures** | Comic, 3D |
+
+**Totals after this:** comic levels 3 → 5 (two new in the first half); 2.5D places 4 → 8; Part Two flashbacks 2 → 6.
