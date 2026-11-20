@@ -2,12 +2,12 @@
 Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.65 (2026-11-19).
 
 ## Waiting on you
-- **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. Still open: the service stair's dimension (comic level or 2D).
+- **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
 - **The reorder is in (v0.65).** Play it and say if any night now feels too long. The old game is kept as its own artifact and as a branch in the repo.
 - **The boots:** he takes them on day 31 and cannot fly until the last day. Either he flies from the Valley on, or a line says they have no charge. Your call.
 - **Your notes from playing to the Stair** (v0.63): send them when ready.
 - **The budget split** in the same document: say if you want it weighted differently.
-- **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
+- **A new name for the Assay.** It should be memorable. The owner is weighing **Universalis** (a spin on university). Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
 - **Names:** Kestrel Dray (was Wren Halloran) and Severin Cade (was Tyr Cade) are in. Say if either should change, and whether Tyr was who you meant by the Jackal.
 - **Celestine knew him at the Pinning** (v0.44) still wants your yes or no.
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.

@@ -204,7 +204,7 @@ Each chapter gets one flashback, each deeper than the last; the last chapter has
 **12. The Post**
 - Card: **THE POST** / *The Sun Spire. Four years and a season after the furnace.*
 - Plays: the desk; **the Gallery** (3D, Severin Cade).
-- 12b: **NEW — the service stair** (comic level or 2D, the owner to choose the dimension). Card: **THE SERVICE STAIR** / *The Sun Spire. Four years and a season after the furnace. The painted line.* Context: the stair the soot use inside the Spire, behind a painted line no clerk crosses. Kael crosses it to reach Bay-level people still working above. Build: **NEW** (on the open list as Part Two play, chapter one).
+- 12b: **NEW — the service stair (2.5D, the owner's choice).** Card: **THE SERVICE STAIR** / *The Sun Spire. Four years and a season after the furnace. The painted line.* Context: the stair the soot use inside the Spire, behind a painted line no clerk crosses. Kael crosses it to reach Bay-level people still working above. Build: **NEW** (walk mode, 2.5D; on the open list as Part Two play, chapter one).
 - 12a: **NEW flash (2.5D).** Card: **FOUR YEARS AFTER THE FURNACE** / *The Assay. The night of day thirty-one.* In: STRIP. Trigger: a porter steps aside for him without being asked. Context: why the Spire defers to a clerk: the white cloak, and forty cadets falling in behind him in camp. Build: **NEW** (walk mode in the camp at night; reuse the Circle's camp).
 
 **13. The Balancing**
@@ -275,7 +275,7 @@ Release after each phase (Part A2, rule 6). Run the whole-story bot each time an
 5. **v0.70: the vent stack** (9c, comic level). **v0.71: the Deep Array** (8b, comic level).
 6. **v0.72: Part Two flashbacks:** the camp at night (12a), Celestine's Assay (14a), Seren in Bay Three (15c), the barge (15d).
 7. **v0.73: Part Two's spine:** the fourth ring as home base with the suspicion meter (11c), the cold open (10f), the two flash-forwards (11d, 14c).
-8. **v0.74: Part Two play:** the service stair (12b; ask the owner which dimension), the Count as a puzzle (16a).
+8. **v0.74: Part Two play:** the service stair (12b, 2.5D), the Count as a puzzle (16a).
 9. **v0.75: the last flash and the played ending** (16d, 16e).
 10. Then the open list as before: matching the writing (Part G), real animation once the owner attaches the free Quaternius "Universal Animation Library [Standard]" zip (CC0, it can't be downloaded from the workspace), the High Docks rebuilt, Part Two play, controls card.
 
@@ -321,8 +321,8 @@ Release after each phase (Part A2, rule 6). Run the whole-story bot each time an
 - "The expression" in the intro = the faces in the ring.
 - The budget split stands (30% animation, 25% matching the writing, 20% High Docks, 15% Part Two play, 10% controls), after this plan.
 - Keep the names Kestrel Dray and Severin Cade, and "the Assay", until the owner picks a new name.
+- **The service stair is 2.5D** (owner, 2026-11-19).
 
 **Still open:**
-- **The service stair (12b): comic-book level or 2D?** Ask the owner before building it (the dimension rule).
-- **A new name for the Assay** (candidates: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives).
+- **A new name for the Assay.** The owner is weighing **Universalis** (a spin on university). Other candidates: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives).
 - **The animation library zip** (Quaternius, CC0) and **the owner's notes from playing to the Stair.**
