@@ -216,7 +216,13 @@ The present jumps from Lift Zero (160 days after) to the Pinning (four years aft
 - Happening: Celestine has known all along. She tells her son. Lucan comes for him. The fourth ring (visit three) is colder: the suspicion meter starts higher.
 - Plays: the hum; **the Son** (3D, Lucan).
 - 14a: **NEW flash forward: Tavi at sixteen.** Card: **NINE YEARS AFTER THE FURNACE** / *The Sun Spire. The service stair. Tavi, sixteen.* In: STRIP (years). Trigger: Lucan: *"You have a brother."* Happening: ten seconds: Tavi grown, on the service stair, a chalk sun in his hand. Pays off in 15 ("Tavi is coming up. Sixteen."). Say: no words. Build: **NEW** (a drawn still).
-- 14b: **NEW flash (2D).** Card: **FIFTY YEARS BEFORE THE FURNACE** / *An Assay. Celestine Aurel, twenty.* In: FURNACE, cooled to grey. Trigger: Celestine's hand on a valve wheel, turning it the way only a valve hand would. Happening: you play Celestine at her own Assay, fifty years ago, so you understand her before you fight her. **What she learned there is why she knew him** (decide the secret before writing it; the bible has her Assay as "not yet told"). Say: Celestine: *"They told us the Assay finds the best of us. It finds the ones who will do what is needed, and calls that the best."* Build: **NEW**.
+- 14b: **NEW flash (2D).** Card: **FIFTY YEARS BEFORE THE FURNACE** / *An Assay. A cadet called Celestine Aurel, twenty.* In: FURNACE, cooled to grey. Trigger: in her rooms Celestine takes off one glove and turns a valve wheel the way only a valve hand would; Kael sees it.
+  - **Happening, her secret (decided 2026-11-19):** Celestine was born on Tier Six. Below, they called her **Little Ember**. An Accredited family took her up as an heir and had her gilded; unlike Kael, **she let them take the burns off her palms**, and she has worn gloves ever since. At her own Assay, at twenty, she won by sneaking to the island's pump house at night and **shutting the valve** on the enemy House's camp. They woke short of air and surrendered; two of them did not wake. The Proctors wrote it down as genius. She learned that whoever will turn the valve runs everything, and she has run the Count that way for fifty years.
+  - **Why it makes sense of everything:** she calls Seren "little ember" at the furnace because Seren was what she had been; "I do not usually remember them" is true, except for that one. She knew Kael at the Ledger for the same reason: a valve hand who could do the arithmetic. She let him up Lift Zero and **sent for a successor** (her existing line). She recognised the Gilding on him because it was done to her. **The mirror:** she turned a valve so people stopped breathing; Kael turned one so a ward could. The final fight is called LITTLE EMBER because it is her name. The ending choice gains weight: sending her down Lift Zero to a bunk on Row K is sending her home.
+  - **Plays:** you play her, in 2D: stealth across the island at night (it mirrors the heist), then the valve: hold to shut it. The Proctors' lamps, the camp going quiet.
+  - **Say:** Celestine, at the wheel: *"It is only a valve. On Tier Six every child can turn one. Up here, nobody else would."* Then, at the Pinning-style ceremony after: a Proctor: *"Genius."* Her: nothing.
+  - **Payoff (16c, Little Ember):** before the fight she says: *"They called me that too, before they gave me this name."* Keep her existing lines.
+  - **Build:** NEW. Update the story bible's Celestine entry, and give her model gloves everywhere.
 - 14c: **THE DOCK STAIR** / *Seven years after the furnace. Before the second bell.* Happening: the raid on the High Docks: cut four hundred barges loose. Ilse plans it; Brand and Kael take the top of the dock stair; somebody has told the Wardens the hour (Maren Aldane). Existing lines stand.
 - 14d: **THE HIGH DOCKS** / *Seven years after the furnace. The second bell.* In: PAGE. Plays: **the High Docks** (comic). **One card only** (it shows twice now).
 
@@ -256,7 +262,7 @@ The present jumps from Lift Zero (160 days after) to the Pinning (four years aft
 7. **The Pairing moved into the first dream (4e)**, so the present (Ashgate) comes straight after the furnace and the title, and the first dream runs in exact date order: half a year, two years, two and a half, the Assay's first night, day three.
 8. **Card fixes from the check:** two LAST BELL cards in a row on First Fire (the ceremony is now THE FIRST FIRE); the First Fire closing card moved before the night; the vent stack's sub names day thirty-one (the calendar strip reads it); the Deep Array card no longer repeats UNDER THE FLOOR; the second "THE LEDGER / The day ends" card dropped (he wakes under the floor); the Brand fight card is ELEVEN MINUTES; Tier Six is dated, not MEANWHILE, because Dace tells it afterwards.
 9. **Two Years happens off the Spire:** after the docks Kael hides with the barges, so that chapter's home is the barge deck, not the fourth ring.
-10. **Celestine's own Assay needs its secret decided before it is written** (what she learned that made her know him).
+10. **Celestine's secret is decided** (14b): born on Tier Six, called Little Ember, gilded, won her Assay by shutting a valve. It fits every line she already has.
 11. Holds already: the furnace at zero; the four days below; the Gilding at half a year; training at two and two and a half; the Assay at four years; Celestine at Lift Zero setting up the Pinning; Brand dead at +7 and his halberd at +9; Seren and Orin and the bleed.
 
 ---
@@ -306,7 +312,7 @@ Release after each phase (Part A2, rule 6). Run the whole-story bot each time an
 - **Tavi:** Kael's younger brother; seven at the furnace. Played in the Sun.
 - **Mara Venn:** foreperson; married them; keeps the list. Played at Tier Six.
 - **Brand:** the Warden who deserted and trained Kael; dies at +7 (eleven minutes). Played at the Dock Stair.
-- **Celestine Aurel:** High Auditor, seventy; the final fight; played once in 14b.
+- **Celestine Aurel:** High Auditor, seventy; born on Tier Six as "Little Ember", gilded, won her Assay by shutting a valve; the final fight; played once in 14b.
 - **Lucan Aurel:** her son; kind; the Keep and the Son. Lives.
 - **Dorian Aldane:** sixteen; shared bread; the Pairing. **Maren Aldane:** his sister; sold the hour of the raid.
 - **Dace Morrow:** Seren's partner at work; under the floor; takes Kael to the Deep Array (7b).
