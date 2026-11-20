@@ -277,19 +277,72 @@ The present jumps from Lift Zero (160 days after) to the Pinning (four years aft
 
 ---
 
-## Part F. Build order
-Release after each phase (Part A2, rule 6). Run the whole-story bot each time and check its card log against Part C.
+## Part F. The work, in order
+Release after every step (Part A2, rule 6). Each step lists what is in it, why it comes here, and how to check it. Run the whole-story bot every release and check its card log against Part C. Keep the open list in step: tick items off, never drop one the owner hasn't dropped.
 
-1. **v0.66: the four bugs (Part E).**
-2. **v0.67: the transitions** (B3: WAKE, FURNACE, STRIP's slide, CHALK, PAGE, ELEVEN) and **every card in Part C** (wording, order, the duplicate cards, PART TWO before the Pinning). No new scenes yet.
-3. **v0.68: the opening:** the animated intro (0a), the Keep as the cold open (0b), the Pairing moved into the first dream (4e), the Valley moved to 9b, the Keep's ending (9d), the white cloak from day 31 (8d).
-4. **v0.69: the two new 2.5D parts in Part One:** the camp by day (4f), Bay Three at last bell with the knife board (5b).
-5. **v0.70: the vent stack** (8c, comic level). **v0.71: the Deep Array** (7b, comic level).
-6. **v0.72: Part Two flashbacks:** the camp at night (12b), Celestine's Assay (14b), Seren in Bay Three (15c), the barge deck (15b).
-7. **v0.73: Part Two's spine:** the fourth ring as home base with the suspicion meter (12a), the cold open (10), the two flash-forwards (11a, 14a).
-8. **v0.74: Part Two play:** the service stair (12c, 2.5D), the Count as a puzzle (16a).
-9. **v0.75: the last flash and the played ending** (16d, 16e).
-10. Then the open list as before: matching the writing (Part G), real animation once the owner attaches the free Quaternius "Universal Animation Library [Standard]" zip (CC0, it can't be downloaded from the workspace), the High Docks rebuilt, Part Two play, controls card.
+**Why this order:** fix how the game feels first (every later scene is played with it); then lay the cards and transitions, which are cheap and are the frame every new scene hangs on; then the opening and Part One, front to back, cheap pieces before expensive ones; then Part Two, spine before content; then the ending. Matching the writing goes in with the scene it belongs to, not as a separate pass. Expensive art (the animation library, the High Docks rebuild) comes after the story is whole.
+
+**Step 1 · v0.66 · the four bugs (Part E)**
+- The fire pit stays 2.5D through its fight (6c). Weight in the fights (no juggling without boots). Deaths fall instead of spinning (2D, arena, comic levels). The hook shot in every arena fight from the Assay on.
+- Check: `walk.mjs` M=circle through the choice and the fight; `ff.mjs` BOT=mash on the Drill, Ford and Keep with time-in-air logged before and after; stills of a death in each engine; the hook used on purpose in the Ford, the Proctor, the Valley and the Keep.
+
+**Step 2 · v0.67 · cards and transitions**
+- Build the seven transitions (B3): CUT exists; WAKE, FURNACE (and its grey version), STRIP's slide (and its years version), CHALK, PAGE, ELEVEN.
+- Every card in Part C: wording, order, removals (the second THE LEDGER, the second THE HIGH DOCKS), renames (THE FIRST FIRE, ELEVEN MINUTES, Tier Six dated, THE VENT STACK sub names day thirty-one), PART TWO before the Pinning, the First Fire closing card before the night.
+- Fix the story bible: Tavi is seven at the furnace; Celestine's secret (14b).
+- Check: the bot's card log matches Part C line for line; the calendar strip lights the right day on every Assay card; no card says later, earlier, from now or ago.
+
+**Step 3 · v0.68 · the opening and the Pairing**
+- The animated intro (0a) replaces the opening film and "ONE SEASON". The Keep as the cold open, cut before the blow (0b). The Pairing out of the opening into the first dream (4e). The Valley moved to 9b. The Keep's ending: the blow lands, Lucan's blade breaks, he kneels (9d). The white cloak on Kael from day 31 (8d). The Ilse callback at the Way Out (9).
+- Check: New game to Ashgate in two jumps; the first dream in date order; stills of the intro on a phone-sized screen.
+
+**Step 4 · v0.69 · Part One's two new 2.5D places, with the seat knives**
+- The camp by day (4f) with Dorian, Oswin, Petra, the Sisters Vey, Corin; the choice of who you sit with, remembered later.
+- Bay Three at last bell (5b): the knife board, hook 306, counting back. Seat knives on Crew Three's belts everywhere below. The board in Bay Three in free play too.
+- Check: `walk.mjs` with the two new ids; the knife board visible in Ashgate free play.
+
+**Step 5 · v0.70 · the vent stack (comic-book level, 8c)**
+- Vertical climb on the island's stack with Voss's dead boots; charge at the top; jump. Uses the existing level kit and moves. Flight is live from here on in every later fight.
+- Check: `runlv.sh stack`; the Valley (9b) has the boots.
+
+**Step 6 · v0.71 · the Deep Array (comic-book level, 7b)**
+- Kael untrained: a mode with no boots, no ELEVEN, no Assay moves; climb, hide, scramble; a wrench brawl. Show what the Array is and that it is failing.
+- Check: `runlv.sh array`; none of the Assay moves can be triggered.
+
+**Step 7 · v0.72 · Part Two's spine**
+- The fourth ring as home base (12a), with the suspicion meter, visited in the Post, the Balancing and What She Knows, with its own date card each time; Kestrel, Sable, porters; finds into the Codex. The head rule here first (soot look at whoever speaks; the Accredited don't). Porters kneel at the bell.
+- Part Two's cold open (10), the book (11a), Tavi at sixteen (14a).
+- Check: the bot passes through the ring each chapter; the meter climbs and falls.
+
+**Step 8 · v0.73 · Part Two's flashbacks and new places**
+- The camp at night (12b). The service stair, 2.5D (12c). Celestine's own Assay, 2D, stealth then the valve (14b); gloves on her model everywhere. The barge deck as home in Two Years (15b). Seren finds the bleed (15c).
+- Check: each flash's trigger fires and its transition plays; Celestine's gloves in every scene she is in.
+
+**Step 9 · v0.74 · the Count, the last flash, the ending**
+- The Count as a puzzle (16a); the full Stair replays the cold open's minute from inside (16b); Celestine's "one for forty" line before Little Ember; the ending choice (become her / send her home) and Mara's "little ember" beat (16c); the last flash (16d); the ending as drawn pictures (16e).
+- Check: both endings reached by the bot (set `G.flags.ending`), both credits texts shown.
+
+**Step 10 · matching the writing (what is left after steps 3 to 9)**
+- A clerk's coat for Kael on the Spire and at the High Docks; plate only where he fights openly; gloves on the clerk. Oswin's stiff leg as the Auditor's Blade. Lucan's stick in his last scene (if not befriended).
+- The rest of the eight deliberate animations: hand flat on the pipe (Seren, Kael, Kestrel); the kneel at the bell; Kael's hand to the washer before ELEVEN in every engine; a humming sway at a commitment; Brand and then Hollis grounding the halberd; Tavi on Seren's left, then on Kael's left.
+- Unexplored scenes worth one each: Hollis and Brand, one line each; a valve job done with Kestrel; Ivo's errand below; Kestrel and the week he blamed her (a memory picture).
+
+**Step 11 · characters and animation**
+- Real animation once the owner attaches the free Quaternius "Universal Animation Library [Standard]" zip (CC0): run, jog, deaths, sword combos on Kael and the guards. If it never comes, keep hand-making moves.
+- Guards: faces and helms; the same rigs in cutscenes. Rook and the other bosses: faces, weapons, their own idle. Kael's own ready stance in held shots. Capes: the owner's rule, it kicks up with momentum then falls, never floats; check in motion. Celestine and her Wardens on the Keep's dais as flat detailed figures, like the Proctors; the crowd in other 3D rooms.
+
+**Step 12 · places**
+- The High Docks rebuilt from reference: a real dock, dressed as where the Accredited live, side corridors that go nowhere, height for the boots, hidden things for the Codex.
+- Riser Nine: more character. The Stair: crew on the near hulls; the three near wrecks and the smoke move. 2D valley maps: readable terrain (rises, banks, cover). The Scuffle's floor (still the square's flagstones). The whole of Ashgate Square walkable in the present, not only as a memory. Every new comic level gets a long first stretch.
+
+**Step 13 · fighting and controls**
+- One controls card across 2D, arena and comic levels. Group fights read as busy: thin them. Difficulty: re-fight the Ember Ring, the Drill and the group fights with the two bots, as was done for the Scuffle in v0.58. A second stick or a look zone for the on-screen pad (the camera still turns by dragging).
+
+**Step 14 · films and hand-offs**
+- A drawn scene for losing below, not only a line. More short 2D memory scenes. More 2D films from stills in the comic style; the Pairing's and the Ford's own intro shots. The comic levels' opening and memory pages to the Table's standard. A last pass over every hand-off (card, fade, music) from the opening to THE END.
+
+**Step 15 · housekeeping**
+- Measure the frame rate on the owner's phone (Settings → Show frame time). A trademark check on SOOTBORN, and on Universalis if the owner picks it.
 
 ---
 
@@ -334,7 +387,10 @@ Release after each phase (Part A2, rule 6). Run the whole-story bot each time an
 - The budget split stands (30% animation, 25% matching the writing, 20% High Docks, 15% Part Two play, 10% controls), after this plan.
 - Keep the names Kestrel Dray and Severin Cade, and "the Assay", until the owner picks a new name.
 - **The service stair is 2.5D** (owner, 2026-11-19).
+- **Celestine's secret** (14b) and **why she still sent Seren into the furnace**: decided by Claude at the owner's request ("just make it make sense").
+- **The ending choice stays:** strike her line, or send her down to Row K. Either way she is finished; only whether she lives is the player's.
 
 **Still open:**
-- **A new name for the Assay.** The owner is weighing **Universalis** (a spin on university). Other candidates: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives).
-- **The animation library zip** (Quaternius, CC0) and **the owner's notes from playing to the Stair.**
+- **A new name for the Assay.** The owner is weighing **Universalis** (a spin on university). Other candidates: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Cautions given: it leans toward Red Rising's school-as-war idea, it is long to say, and the word is used by other products. One way to keep it: the Universalis is the institution, the Assay its final trial.
+- **Offered, not answered:** in the Row K ending, Celestine knows the Array's numbers better than anyone alive and ends up on a valve wheel, so fewer die the first winter.
+- **The animation library zip** (Quaternius, CC0) and **the owner's notes from playing to the Stair.** The zip is optional; without it, keep hand-making animation.
