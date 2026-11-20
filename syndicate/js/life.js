@@ -26,16 +26,13 @@
     box(3.6, 0.04, 3.4, L(0x143a2c), -0.3, 0.02, 0, booth).castShadow = false; box(3.2, 0.045, 3.0, L(0x1f5a3a), -0.3, 0.02, 0, booth).castShadow = false;
     box(0.7, 1.0, 2.6, woodD, 0.2, 0.5, 0, booth); box(0.85, 0.08, 2.75, L(0x1f5a3a), 0.2, 1.04, 0, booth); box(0.9, 0.05, 2.8, L(0xd9a93c), 0.2, 0.98, 0, booth);
     box(1.0, 1.0, 0.5, woodD, -0.3, 0.5, -1.3, booth); box(1.0, 1.0, 0.5, woodD, -0.3, 0.5, 1.3, booth); box(1.1, 0.08, 0.6, L(0x1f5a3a), -0.3, 1.04, -1.3, booth); box(1.1, 0.08, 0.6, L(0x1f5a3a), -0.3, 1.04, 1.3, booth);
-    [[1.3, -1.6], [1.3, 1.6], [-1.9, -1.6], [-1.9, 1.6]].forEach(q => mesh(new T.CylinderGeometry(0.07, 0.07, 3.0, 5), woodD, q[0], 1.5, q[1], booth));
-    box(0.09, 0.09, 3.3, woodD, 1.3, 3.0, 0, booth); box(0.09, 0.09, 3.3, woodD, -1.9, 3.0, 0, booth); box(3.3, 0.09, 0.09, woodD, -0.3, 3.0, -1.6, booth); box(3.3, 0.09, 0.09, woodD, -0.3, 3.0, 1.6, booth); box(0.07, 0.34, 3.3, L(0xd9a93c), -1.95, 2.8, 0, booth);
-    for (let i = 0; i < 14; i++) { const u = i / 13, side = i % 2, m = new T.Mesh(new T.SphereGeometry(0.06, 5, 4), emis(i % 3 ? 0x6af0ff : 0xffd36b)); m.position.set(-1.9 + u * 3.2, 2.9 - Math.sin(u * Math.PI) * 0.25, side ? 1.6 : -1.6); booth.add(m); }
     const dice = [];
-    for (let i = 0; i < 5; i++) { const z = (i - 2) * 0.5; mesh(new T.CylinderGeometry(0.1, 0.13, 0.1, 8), iron, 0.2, 1.12, z, booth); const d = wispDie(0.26, [0x6af0ff, 0x8affc0, 0x6af0ff, 0xc79bff, 0x6af0ff][i]); d.position.set(0.2, 1.55, z); booth.add(d); dice.push(d); }
+    for (let i = 0; i < 5; i++) { const z = (i - 2) * 0.5; const d = wispDie(0.26, [0x6af0ff, 0x8affc0, 0x6af0ff, 0xc79bff, 0x6af0ff][i]); d.position.set(0.2, 1.55, z); booth.add(d); dice.push(d); }
     const bl = new T.PointLight(0x70f0ff, 14, 9, 1.6); bl.position.set(-0.2, 2.2, 0); booth.add(bl);
-    { const big = wispDie(0.5, 0x6af0ff); big.position.set(-2.05, 3.6, 0); booth.add(big); dice.push(big); }                      // the sign: a slow-turning die over the entrance
+    { const big = wispDie(0.42, 0x6af0ff); big.position.set(0.2, 2.75, 0); booth.add(big); dice.push(big); }                      // the sign: a slow-turning die over the open table
     [-1.5, 1.5].forEach(z => { mesh(new T.CylinderGeometry(0.05, 0.07, 0.9, 6), L(0xd9a93c), -2.2, 0.45, z, booth); mesh(new T.SphereGeometry(0.09, 6, 5), L(0xd9a93c), -2.2, 0.95, z, booth); });
     [-0.9, 0.9].forEach(z => mesh(new T.CylinderGeometry(0.2, 0.2, 0.5, 7), wood, -1.0, 0.25, z, booth));
-    const croup = npc(s, { cls: 'rogue', race: 'dwarf', tint: { cloth: '#1f5a3a', armor: '#143a2c', trim: '#d9a93c' } }, BX + 0.95, BZ, -Math.PI / 2);
+    W.wispBooth = { g: booth, idle: dice, x: BX, z: BZ };
     const roller = npc(s, { cls: 'cleric', race: 'human', tint: { cloth: '#5a2a4a', armor: '#3a3040' } }, BX - 0.75, BZ - 0.75, Math.PI / 2);
     obstacles.push([BX - 0.9, BZ - 1.7, BX + 1.5, BZ + 1.7]);
 
@@ -100,9 +97,9 @@
       [[14, 9, 0xffd8a0, 3.4, 0.05], [30.9, 6.2, 0x8af0ff, 2.2, 0.04]].forEach(q => { const m = new T.Mesh(new T.ConeGeometry(q[3], 9, 14, 1, true), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: q[4], blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); m.position.set(q[0], 4.6, q[1]); s.add(m); }); }
     return function (t) {
       const dt = Math.min(0.05, Math.max(0.001, t - last)); last = t;
-      dice.forEach((d, i) => { d.rotation.set(t * (0.5 + i * 0.07), t * (0.8 + i * 0.05), 0); if (i < 5) d.position.y = 1.55 + Math.sin(t * 1.6 + i * 1.2) * 0.07; });
+      dice.forEach((d, i) => { if (!d.visible) return; d.rotation.set(t * (0.5 + i * 0.07), t * (0.8 + i * 0.05), 0); if (i < 5) d.position.y = 1.55 + Math.sin(t * 1.6 + i * 1.2) * 0.07; });
       bl.intensity = 13 + Math.sin(t * 3.1) * 2;
-      croup.pose({ t, act: Math.sin(t * 0.5) > 0.7 ? 'cast' : 'idle', prog: 0.3 }); roller.pose({ t: t + 3, act: 'idle' });
+      roller.pose({ t: t + 3, act: 'idle' });
       guards.forEach((c, i) => c.pose({ t: t + i * 2.5, act: 'idle' })); arg.forEach((c, i) => c.pose({ t: t + i, act: Math.sin(t * 1.3 + i * 3.14) > 0.5 ? 'cast' : 'idle', prog: 0.25 }));
       wardens.forEach((c, i) => c.pose({ t: t + i * 3.1, act: 'idle' })); wardT -= dt; if (wardT <= 0 && G.scene === 'hub' && !G.ui.isOpen() && !G.talk) { wardT = R(14, 24); const w = wardens[Math.random() < 0.5 ? 0 : 1].root.position; gfx.floatText(w.x, 2.7, w.z, WARD[Math.floor(Math.random() * WARD.length)], '#e8e4f8'); }
       if (Math.random() < 0.06) gfx.emit(-1.1, R(0.4, 3), 14.5 + R(-1, 1), R(0.2, 0.6), R(-0.1, 0.2), 0, 1.6, 0xdfe6ff, 0);
