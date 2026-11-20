@@ -1,0 +1,9 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  const p = await b.newPage({ viewport: { width: 760, height: 480 } }); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+  await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(500);
+  await p.click('#bNew'); await p.click('.c-skip'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+  const r = await p.evaluate(() => { G.muted = true; const st = G.state; Object.assign(st, { kitPicked: 1, toured: 1, tourAsked: 1, firstPath: 9, shownPlaces: { a: 1 } }); G.ui.hub(); G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); G.debugAuto = true; G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } document.getElementById('panel').style.visibility = 'hidden';
+    const F = G.fight; F.E.maxHp *= 8; F.E.hp = F.E.maxHp; F.P.maxHp *= 8; F.P.hp = F.P.maxHp; const said = []; const t0 = F.edgeApi.text; F.edgeApi.text = function (e, s) { if (/FLASK|DRINKS|FIRST/.test(s)) said.push(s); return t0.apply(this, arguments); }; for (let t = 0; t < 60 * 90 && F.active; t++) { if (F.addHype) F.addHype(2); F.update(1 / 60); if (said.length === 1 && !window._shot) { window._shot = 1; for (let k = 0; k < 20; k++) F.update(1 / 60); G.gfx.render(); window._img = 1; } } return said.join(' | '); });
+  console.log('events:', r); await p.screenshot({ path: 'flask.png' });
+  console.log('ERRORS', errs.length, [...new Set(errs)].slice(0, 3).join(' || ')); await b.close(); })();

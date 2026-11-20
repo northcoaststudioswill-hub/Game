@@ -1032,10 +1032,11 @@
       if (!landed && !ab.cone && !e.clashed) act.missed = 1; e.clashed = 0;
       if (fin) { shake = Math.max(shake, 5); if (landed && e.isPlayer) { text(foe, 'FINISHER', '#ffe9a0', true); addHype(8); } }
     } else if (ab.type === 'proj') {
-      const n = ab.count || 1;
+      let n = ab.count || 1, pab = ab; const third = ab.basic && !ab.count && (e.castN = (e.castN || 0) + 1) % 3 === 0;       // every third bolt of a caster's basic is the calling's own: a fan, a pair, a heavier one
+      if (third) { const c3 = e.cls; if (c3 === 'sorcerer') { n = 3; pab = Object.assign({}, ab, { spread: 0.32 }); text(e, 'TRIPLE', ab.color || '#ff8a2a', false); } else if (c3 === 'warlock') { pab = Object.assign({}, ab, { pr: (ab.pr || 9) * 1.6, dmg: [ab.dmg[0] + 1, ab.dmg[1]], knock: (ab.knock || 0) + 160 }); text(e, 'HEAVY BLAST', ab.color || '#b070ff', false); } else if (c3 === 'cleric' || c3 === 'druid') { n = 2; pab = Object.assign({}, ab, { spread: 0.22 }); } fx.push({ k: 'ring', x: e.x, y: e.y, r: 40, col: ab.color || '#fff', t: 0, life: 0.25 }); }
       for (let i = 0; i < n; i++) {
-        const aa = a + (n > 1 ? (i / (n - 1) - 0.5) * ab.spread : 0);
-        projs.push({ x: e.x + Math.cos(aa) * 20, y: e.y + Math.sin(aa) * 20, vx: Math.cos(aa) * ab.speed, vy: Math.sin(aa) * ab.speed, a: aa, r: ab.pr, owner: e, ab, t: 0, dis: act.dis });
+        const aa = a + (n > 1 ? (i / (n - 1) - 0.5) * (pab.spread || 0.3) : 0);
+        projs.push({ x: e.x + Math.cos(aa) * 20, y: e.y + Math.sin(aa) * 20, vx: Math.cos(aa) * pab.speed, vy: Math.sin(aa) * pab.speed, a: aa, r: pab.pr, owner: e, ab: pab, t: 0, dis: act.dis });
       }
       if (!ab.basic) G.sfx(ab.fire ? 'fire' : ab.slow ? 'ice' : ab.radiant ? 'holy' : 'swing');
     } else if (ab.type === 'line') {

@@ -33,6 +33,12 @@
     w_frost: { name: 'Grave Cold', text: 'Hits slow them, and slowed targets take 15% more.', pre: (a, t) => t.st && t.st.slow ? 1.15 : 1, post: (a, t) => slow(t, 1.5, 0.25) },
     w_spark: { name: 'Tether', text: 'Each hit on the same target within two seconds adds 10%, up to +40%.', pre: (a, t) => 1 + Math.min(0.4, ((a._wt === t && now() - (a._wn || 0) < 2) ? (a._wc || 0) : 0) * 0.1), post: (a, t) => chain(a, t, 2) },
     w_acid: { name: 'Gnaw', text: 'Every hit poisons them a little longer.', post: (a, t) => { if (t.st && t.st.poison) t.st.poison.t += 1; else bleed(t, a, 2, [1, 3]); } },
+    // a druid in another shape fights with that shape's own temper
+    bite_wolf: { name: 'The Pack', text: 'Every third bite in a row drags them down for a moment.', post: (a, t) => { if (chain(a, t, 2.5) % 3 === 0) { t.st.stun = { t: 0.5 }; X().text(t, 'DRAGGED DOWN', '#c8c0b0', false); } } },
+    maul_bear: { name: 'The Weight', text: 'Every maul shoves them back, and one in three knocks them flat.', post: (a, t) => { if (Math.random() < 0.33) X().knockdown(t, 0.7); } },
+    bite_spider: { name: 'Venom', text: 'Every bite poisons them, and poisoned targets take 15% more.', pre: (a, t) => t.st && t.st.poison ? 1.15 : 1, post: (a, t) => { if (t.st && t.st.poison) t.st.poison.t += 1; else bleed(t, a, 3, [1, 4]); } },
+    rake_bat: { name: 'Blood Drinker', text: 'You heal for a fifth of every rake.', post: (a, t, ab, dmg) => { if (dmg > 0) X().heal(a, dmg * 0.2); } },
+    maul_avatar: { name: 'The Old Thing', text: 'Every blow breaks their guard and shakes the pit.', post: (a, t) => { t.guard = 0; } },
     w_staff: { name: 'Pact Drain', text: 'You heal for a tenth of every blow.', post: (a, t, ab, dmg) => { if (dmg > 0) X().heal(a, dmg * 0.1); } }
   };
   const traitOf = e => e && T[e.basic];
