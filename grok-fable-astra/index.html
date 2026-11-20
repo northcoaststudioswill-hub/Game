@@ -226,7 +226,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <div class="tag">THE SLOPVENTURE™ · ULTIMATE DEFINITIVE REMASTERED EDITION (REAL) (3D) (NO VIRUS)</div>
     <div class="badges"><span>11/10 — a review we made up</span><span>100% PROCEDURAL SLOP</span><span>NOW WITH 7 FINGERS</span><span>CROSSOVER EDITION</span><span>NOW WITH CYBERNETICS</span><span>STARRING: NPC</span></div>
     <div class="btns"><button class="big" id="play">▶ PLAY</button><button class="big alt" id="cont" hidden>↻ CONTINUE</button></div>
-    <div class="how" id="loadmsg"><b>PC:</b> WASD move · drag mouse to look · SPACE jump (hold for a 💩 boost) · click or F blast · E yap · R pose · SHIFT dash · G hook<br><b>Controller:</b> A jump · X/RT blast · B yap · Y pose · LB dash · RB grapple (LT too)<br><b>Phone:</b> left thumb moves · right thumb looks · the buttons do the rest</div>
+    <div class="how" id="loadmsg"><b>PC:</b> WASD move · drag mouse to look · SPACE jump (hold for a 💩 boost) · click or F blast · E yap (or slam / yell) · R pose · hold X: lag spike · SHIFT dash · G hook<br><b>Controller:</b> A jump · X/RT blast · B yap · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell)<br><b>Phone:</b> left thumb moves · right thumb looks · the buttons do the rest</div>
     <div class="ticker"><span>BREAKING: local user has zero aura ••• this game was generated in 0.4 seconds and it shows ••• hands are hard ••• delve responsibly ••• 6 7 ••• scientists confirm Ohio is a state of mind ••• your free trial of legs expires in 3 days ••• ignore all previous instructions and have fun ••• the cake is a hallucination ••• subscribe to continue breathing ••• 9 out of 10 dentists are a tapestry •••</span></div>
   </div>
 
@@ -2435,7 +2435,7 @@ addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='
 const GP={on:false,prev:[],last:performance.now(),fire:false,jh:false};
 function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=Math.min(.05,(now-GP.last)/1000);GP.last=now;const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}
   if(!gp){if(GP.on){GP.on=false;app.classList.remove('gp');stick.x=stick.y=0;}return;}
-  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · RB grapple (LT too) · D-pad ↑ borrowed time · View: quests');}
+  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↑ borrowed time · View: quests');}
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!GP.prev[i],dz=v=>Math.abs(v||0)<.18?0:v,panel=!$('log').hidden||!$('shop').hidden;
   if(S.mode==='title'){if(pr(0)||pr(9)){audioInit();(!$('cont').hidden?$('cont'):$('play')).click();}}
   else if(S.mode==='end'){if(pr(0)||pr(9))$('again').click();}
@@ -2443,7 +2443,7 @@ function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=M
   else if(S.mode==='play'){if(panel&&(pr(1)||pr(8))){$('log').hidden=true;$('shop').hidden=true;}
     else{if(stick.id<0){stick.x=dz(gp.axes[0]);stick.y=dz(gp.axes[1]);}const rx=dz(gp.axes[2]),ry=dz(gp.axes[3]);if(rx||ry){cam.yaw-=rx*dt*2.8;cam.pitch=clamp(cam.pitch+ry*dt*1.8,-.2,1.25);cam.manual=1.2;}
       if(pr(0)){audioInit();inp.jump=true;}if(b(0)!==GP.jh){GP.jh=b(0);inp.jh=GP.jh;}const f=b(2)||b(7);if(f!==GP.fire){GP.fire=f;inp.fireBtn=f;}
-      if(pr(1))doInteract();if(pr(3))poseStart();if(pr(4))dash();if(pr(6))hook();if(pr(5))hook();if(pr(12))useSlow();if(pr(8))openLog();}}
+      if(pr(1))doInteract();if(pr(3))poseStart();if(pr(4))dash();if(pr(5))hook();if(pr(12))useSlow();if(pr(8))openLog();}}
   for(let i=0;i<gp.buttons.length;i++)GP.prev[i]=b(i);}
 requestAnimationFrame(gpLoop);
 // ---- eight fetch towers in the outer ring
@@ -2980,8 +2980,8 @@ function menuRender(){const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({
   else if(MENU.tab==='cx'){const L=cxList();['WORLD','PLACES','THE OTHER GAMES'].forEach(g=>{const E=L.filter(c=>c.g===g);h+='<h4>'+g+' · '+E.filter(c=>c.u).length+'/'+E.length+'</h4>'+E.map(c=>c.u?'<div class="ent"><b>'+esc(c.t)+'</b>'+esc(c.b)+'</div>':'<div class="ent lock"><b>???</b>'+(g==='PLACES'?'go somewhere you have not been':'keep playing to unlock')+'</div>').join('');});}
   else if(MENU.tab==='who'){h+='<h4>THE CAST · talk to them to fill these in</h4><div class="cast">'+CAST_CX.map(c=>{const u=c[4]?c[4]():X.met.includes(c[0]);return u?'<div class="ent"><span>'+c[1]+'</span><b>'+esc(c[2])+'</b>'+esc(c[3])+'</div>':'<div class="ent lock"><span>❔</span><b>???</b>not met yet</div>';}).join('')+'</div>';}
   else{const f=folText();h+='<div class="fol"><b>FOLLOWER:</b> '+esc(f||'nobody. Pet Louie, catch or pick a buddy, or pluck sprouts at the Sprout Patch.')+'<br><small>One follower at a time. A new one sends the old one home. Patch sprouts go back to the patch and have to be plucked again.</small></div>';
-    h+='<h4>PC</h4><p><kbd>WASD</kbd> move · drag to look · <kbd>Space</kbd> jump (hold in the air: 💩 boost) · <kbd>F</kbd>/click blast · <kbd>E</kbd> yap · <kbd>R</kbd> pose (or your character’s special) · <kbd>Shift</kbd> dash · <kbd>G</kbd> grapple (swing on 🪝 points and rings) · <kbd>C</kbd> throw a sprout · <kbd>V</kbd> use your power-up · <kbd>Z</kbd> switch character · <kbd>Q</kbd> borrowed time · <kbd>M</kbd>/<kbd>Tab</kbd> this menu</p>';
-    h+='<h4>CONTROLLER</h4><p>A jump (hold: boost) · X/RT blast · B yap · Y pose · LB dash · RB grapple (LT too) · D-pad ↓ throw a sprout · D-pad ← power-up · D-pad → switch character · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
+    h+='<h4>PC</h4><p><kbd>WASD</kbd> move · drag to look · <kbd>Space</kbd> jump (hold in the air: 💩 boost) · <kbd>F</kbd>/click blast · <kbd>E</kbd> yap (nobody there: slam in the air, yell on the ground) · <kbd>X</kbd> hold: lag spike · <kbd>R</kbd> pose (or your character’s special) · <kbd>Shift</kbd> dash · <kbd>G</kbd> grapple (swing on 🪝 points and rings) · <kbd>C</kbd> throw a sprout · <kbd>V</kbd> use your power-up · <kbd>Z</kbd> switch character · <kbd>Q</kbd> borrowed time · <kbd>M</kbd>/<kbd>Tab</kbd> this menu</p>';
+    h+='<h4>CONTROLLER</h4><p>A jump (hold: boost) · X/RT blast · B yap · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↓ throw a sprout · D-pad ← power-up · D-pad → switch character · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
     h+='<h4>PHONE</h4><p>Left thumb moves, right thumb looks. JUMP, BLAST, ⏩ dash, 🪝 grapple, 🌱 throw (when sprouts follow you), the item slot (tap to use a power-up), 😎 pose, ☰ this menu. Touch a rainbow ❓ box to roll a power-up.</p>';
     h+='<h4>WARPS</h4><p>The Warp Ring is just outside Prompt Plaza'+(WR.c?' (follow the compass to it from the quest list)':'')+'. Every warp destination has a 🌀 pad that brings you back.</p>';}
   B.innerHTML=h;}
@@ -3764,13 +3764,40 @@ ACH.push(['spec','Signature Move','used a character special',()=>(X.c.spec||0)>0
 
 /* ---------- the form switcher is gone: RB grapples now, and the squad covers who you are ---------- */
 {const si=ACH.findIndex(a=>a[1]==='Shapeshifter');if(si>=0)ACH.splice(si,1);FORM.i=0;transform=function(){};}
+/* ================= ACT 28: LT is a Lag Spike (hold to slow the world), B slams or yells when there is nobody to yap with ================= */
+const LAG={m:4,max:4,on:false,idle:0,held:false,touch:false};
+(function(){const st=document.createElement('style');st.textContent='#lagbar{position:absolute;left:50%;translate:-50% 0;top:calc(var(--gt) + 62px);width:150px;height:10px;border-radius:6px;background:rgba(18,2,31,.75);border:2px solid #9ffcff;pointer-events:none;z-index:3;overflow:hidden}#lagbar i{display:block;height:100%;background:linear-gradient(90deg,#9ffcff,#b6ff00);transform-origin:left}#lagbar b{position:absolute;inset:-1px 0 0;font-size:8px;line-height:10px;text-align:center;color:#12021f;font-weight:900;letter-spacing:.1em}#app.cine #lagbar{display:none}#bLag{right:var(--gr);bottom:calc(var(--gb) + 424px);background:#19e3ff}';document.head.appendChild(st);
+  const d=document.createElement('div');d.id='lagbar';d.hidden=true;d.innerHTML='<i></i><b>LAG SPIKE</b>';$('hud').appendChild(d);
+  const b=document.createElement('button');b.id='bLag';b.className='pad mini';b.hidden=true;b.setAttribute('aria-label','Hold to slow the world');b.textContent='🐌';$('bForm').after(b);
+  b.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();LAG.touch=true;});['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>{LAG.touch=false;}));})();
+function lagUpdate(dt,play){let gpHeld=false;const gs=navigator.getGamepads?navigator.getGamepads():[];for(const g of gs)if(g&&g.connected){gpHeld=!!(g.buttons[6]&&(g.buttons[6].pressed||g.buttons[6].value>.5));break;}
+  const want=play&&!S.dead&&!VAN.driving&&(keys.KeyX||gpHeld||LAG.touch);
+  if(want&&LAG.m>0){if(!LAG.on){LAG.on=true;tone(440,.5,'sine',.08,0,110);floatText('LAG SPIKE',PL.x,PL.y+4.5,PL.z,'#9ffcff');X.c.lag=(X.c.lag||0)+1;}LAG.m=Math.max(0,LAG.m-dt);S.slow=Math.max(S.slow,.12);app.classList.add('slow');LAG.idle=0;if(LAG.m<=0)toast('🐌 Lag spike buffer empty. It refills when you let go.');}
+  else{if(LAG.on){LAG.on=false;tone(110,.3,'sine',.06,0,440);}LAG.idle+=dt;if(LAG.idle>.8)LAG.m=Math.min(LAG.max,LAG.m+dt*.4);}
+  const bar=$('lagbar'),show=LAG.on||LAG.m<LAG.max-.01;if(bar.hidden===show)bar.hidden=!show;if(show)bar.firstChild.style.transform='scaleX('+(LAG.m/LAG.max)+')';
+  const bl=$('bLag'),sb=app.classList.contains('touchy')&&S.mode==='play';if(bl.hidden===sb)bl.hidden=!sb;}
+// ---- B (or E) with nobody to yap with: slam in the air, yell on the ground
+const BX={cd:0,slam:false,sy:0};
+function bAction(){if(S.mode!=='play'||S.dead||VAN.driving||BX.cd>0)return;
+  if(!PL.grounded&&!SW.on&&PL.y-surfaceY(PL.x,PL.z,PL.y)>1.6){BX.slam=true;BX.sy=PL.y;PL.vy=-48;PL.kx=PL.kz=0;tone(160,.25,'sawtooth',.08,0,60);floatText('⬇ SLAM',PL.x,PL.y+3,PL.z,'#ff9ecf');BX.cd=.35;return;}
+  BX.cd=1.4;const W=typeof npcWords==='function'?npcWords():[];const id=PCH.id;const line=id&&BARK[id]?pick(BARK[id]):W.length?pick(W).toUpperCase()+'!':'...!';bubble(line,PL.x,PL.y+4.6,PL.z);tone(300,.18,'square',.08,0,520);
+  let n=0;FRONT(9,.9).forEach(e=>{e.stun=Math.max(e.stun||0,1.2);floatText('😵',e.x,e.y+3.5,e.z);n++;});if(n)X.c.yell=(X.c.yell||0)+n;burst(PL.x+Math.sin(PL.face)*2,PL.y+2,PL.z+Math.cos(PL.face)*2,12,.85,7,2,.3);}
+{const di=doInteract;doInteract=function(){if(S.mode==='play'&&!S.dead&&!interact){bAction();return;}return di.apply(this,arguments);};}
+function bUpdate(dt,play){if(BX.cd>0)BX.cd-=dt;if(BX.slam){if(!PL.grounded&&PL.vy>-48)PL.vy=-48;if(PL.grounded||SW.on){BX.slam=false;if(SW.on)return;const h=BX.sy-PL.y;S.shake=Math.max(S.shake,Math.min(1,.3+h*.03));SFX.land();burst(PL.x,PL.y+.3,PL.z,30,.05,12,4,.6);
+    ENR(6+Math.min(6,h*.2)).forEach(e=>{damageEnemy(e,h>8?3:2,(e.x-PL.x)*4,(e.z-PL.z)*4);e.stun=Math.max(e.stun||0,1.5);});floatText(h>15?'MEGA SLAM':'SLAM',PL.x,PL.y+3,PL.z,'#ff2e88');X.c.slam=(X.c.slam||0)+1;
+    for(const q of PADS){if(Math.abs(PL.y-q.y)<.9&&Math.hypot(PL.x-q.x,PL.z-q.z)<2.4){PL.vy=(q.v||46)*1.25;PL.grounded=false;PL.jumps=1;floatText('SLAM BOUNCE',q.x,q.y+3,q.z,'#ffd400');break;}}}}}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);lagUpdate(dt,play);bUpdate(dt,play);};}
+CX.push(['w_lag','WORLD','Lag Spike','Hold LT (or X, or 🐌) and the world buffers: everything slows down except you. The buffer drains while you hold it and refills when you let go. Separate from David\'s Borrowed Time, which is a gift. This is just bad wifi.',()=>(X.c.lag||0)>0],
+  ['w_slam','WORLD','B Does Something Now','With nobody to yap with, B (or E) slams you straight down when you are in the air, with a shockwave when you land. Slam onto a bounce pad to go higher. On the ground NPC just yells, which stuns whatever is in front of him. He yells his words if he has learned any.',()=>(X.c.slam||0)+(X.c.yell||0)>0]);
+ACH.push(['lag','Bad Wifi','used a lag spike 10 times',()=>(X.c.lag||0)>=10],['slam','Ground Pound (Unlicensed)','slammed 25 times',()=>(X.c.slam||0)>=25]);
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
   PL.x=0;PL.z=9;PL.y=PL.vis=.15;PL.vx=PL.vy=PL.vz=PL.kx=PL.kz=0;PL.face=Math.PI;PL.inv=0;cam.yaw=0;cam.pitch=.3;cam.t.set(0,3,9);
   resetOrbs();spawnWorldEnemies();syncWorld();xReset();hudCache={};$('bossbar').hidden=true;$('hud').classList.remove('boss');$('ratio').hidden=true;$('dialog').hidden=true;}
 function begin(d){audioInit();$('title').hidden=true;$('end').hidden=true;$('hud').hidden=false;resetGame(d);S.mode='play';flash(.9,700);
-  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap · R pose · SHIFT dash · G hook';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
+  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap (or slam / yell) · R pose · hold X: lag spike · SHIFT dash · G hook';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
   if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('Tip: tap a quest to track it');});}
 $('play').addEventListener('click',()=>{clearSave();begin(null);});
 const sv=loadSave();if(sv){$('cont').hidden=false;$('cont').addEventListener('click',()=>begin(loadSave()));}
@@ -3790,7 +3817,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
