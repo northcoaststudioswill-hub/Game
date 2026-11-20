@@ -1,5 +1,5 @@
 # SOOTBORN — MASTER TIMELINE AND BUILD PLAN
-Version 2 · written 2026-11-19, on top of game build v0.65 · for the next build session (Fable) to execute
+Version 2 · written 2026-11-19, on top of game build v0.65 · **APPROVED by the owner 2026-11-19 (all suggestions)** · for the next build session (Fable) to execute
 
 **This is the one document to work from.** It holds the whole game in play order: every card, every jump in time with the context for it, every transition and what triggers it, the bugs to fix first, what to build in what order, and how to build, test and release. The other SOOTBORN docs are reference only: `STORY_BIBLE.md` (lore and people), `CHANGELOG.md` (history), `OPEN_LIST.md` (everything ever asked for). Where they disagree with this document, this document wins; then update them.
 
@@ -246,7 +246,7 @@ Each chapter gets one flashback, each deeper than the last; the last chapter has
 ---
 
 ## Part D. Story check (done; keep it true)
-1. **Day one = Ashgate.** The owner wrote that the present should start "after he is officially gold"; this plan reads day one as Ashgate. **Confirm with the owner before building Part C.** If he meant the Gilding, the Assay becomes its own act and Part C changes.
+1. **Day one = Ashgate.** Approved. The present starts at Ashgate; the Assay is a flash in Part One.
 2. **Lucan lives.** The Keep ends with his blade broken and him on his knees, not dead.
 3. **The boots** come from Voss on day 31 and are charged at the vent stack; he flies from then on.
 4. **Tavi is seven at the furnace** (twelve at +5, sixteen at +9). Fix the story bible, which says six.
@@ -312,11 +312,16 @@ Release after each phase (Part A2, rule 6). Run the whole-story bot each time an
 
 ---
 
-## Part I. Waiting on the owner (defaults if no answer)
-- **Day one** = Ashgate or the Gilding (Part D1). **Default: ask before Part C; do Part E meanwhile.**
-- **A new name for the Assay** (candidates: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives). Default: keep "the Assay".
-- **Names:** Kestrel Dray, Severin Cade. Default: keep.
-- **Celestine knew him at the Pinning.** Default: yes (this plan builds on it).
-- **The budget split** (30% animation, 25% matching the writing, 20% High Docks, 15% Part Two play, 10% controls). This plan comes before it.
-- **"The expression"** in the intro art: read as the faces in the ring. Confirm.
-- **The animation library zip** and **the owner's notes from playing to the Stair.**
+## Part I. Decisions
+**Approved by the owner, 2026-11-19 ("I approve all your suggestions"):**
+- Day one = Ashgate; the whole of Part C as written, including Part Two's additions (10f, 11c, 11d, 12b, 14c, 16a).
+- Lucan lives (his blade breaks at the Keep); the boots come from Voss and are charged at the vent stack, and he flies from day 31; Tavi is seven at the furnace (fix the story bible); the Deep Array with no Assay moves; one card each for the High Docks and the Dock Stair; PART TWO before the Pinning.
+- Celestine knew him at the Pinning: yes.
+- "The expression" in the intro = the faces in the ring.
+- The budget split stands (30% animation, 25% matching the writing, 20% High Docks, 15% Part Two play, 10% controls), after this plan.
+- Keep the names Kestrel Dray and Severin Cade, and "the Assay", until the owner picks a new name.
+
+**Still open:**
+- **The service stair (12b): comic-book level or 2D?** Ask the owner before building it (the dimension rule).
+- **A new name for the Assay** (candidates: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives).
+- **The animation library zip** (Quaternius, CC0) and **the owner's notes from playing to the Stair.**

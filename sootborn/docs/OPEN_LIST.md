@@ -2,6 +2,7 @@
 Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.65 (2026-11-19).
 
 ## Waiting on you
+- **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. Still open: the service stair's dimension (comic level or 2D).
 - **The reorder is in (v0.65).** Play it and say if any night now feels too long. The old game is kept as its own artifact and as a branch in the repo.
 - **The boots:** he takes them on day 31 and cannot fly until the last day. Either he flies from the Valley on, or a line says they have no charge. Your call.
 - **Your notes from playing to the Stair** (v0.63): send them when ready.
