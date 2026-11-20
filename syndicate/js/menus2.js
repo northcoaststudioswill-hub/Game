@@ -6,13 +6,13 @@
   let sheetTab = 'moves';
   const TABS = [['moves', 'Moves'], ['char', 'Character'], ['build', 'Build']];
 
-  // ---------------------------------------------------------------- the Guildmaster's page
+  // ---------------------------------------------------------------- the Guildmaster's page: a front page of tiles, like the Fence, each opening one short page
+  const A = G.ABILITIES, PAGES = { moves: 'Loadout', char: 'Character', build: 'Build' };
   const sh0 = ui.sheet;
   ui.sheet = function (msg) {
-    const again = !!document.querySelector('#panel .shtabs'); const r = sh0.apply(this, arguments), card = document.querySelector('#panel .card'); if (!card || !card.querySelector('.sh-top')) return r;
-    if (msg || !again) sheetTab = 'moves';
-    // sort what is on the page into tabs; anything before the first heading describes who you are
-    const kids = [...card.children], pane = { moves: [], char: [], build: [] }; let cur = 'char', top = null, foot = null;
+    const again = !!document.querySelector('#panel .gm-home'); const r = sh0.apply(this, arguments), card = document.querySelector('#panel .card'); if (!card || !card.querySelector('.sh-top')) return r;
+    if (msg) sheetTab = 'moves'; else if (!again) sheetTab = 'home';
+    const st = G.state, h = st.hero, kids = [...card.children], pane = { moves: [], char: [], build: [] }; let cur = 'char', top = null, foot = null;
     kids.forEach(el => {
       if (el.classList.contains('sh-top')) { top = el; return; }
       if (el.classList.contains('foot') || (el.classList.contains('row') && el.classList.contains('end'))) { foot = el; return; }
@@ -20,21 +20,36 @@
       if (el.classList.contains('rankup') && cur === 'char') { pane.moves.unshift(el); return; }
       pane[cur].push(el);
     });
-    // the page's own learning button belongs with the moves
-    const learn = foot && [...foot.querySelectorAll('button')].find(b => /learn techniques/i.test(b.textContent));
-    const bar = document.createElement('div'); bar.className = 'shtabs';
-    bar.innerHTML = TABS.map(t => '<button data-shtab="' + t[0] + '" class="' + (t[0] === sheetTab ? 'sel' : '') + '">' + t[1] + '</button>').join('');
-    top.insertAdjacentElement('afterend', bar);
-    const wraps = {}; let after = bar;
-    TABS.forEach(t => { const w = document.createElement('div'); w.className = 'shpane'; w.dataset.pane = t[0]; pane[t[0]].forEach(el => w.appendChild(el)); after.insertAdjacentElement('afterend', w); after = w; wraps[t[0]] = w; });
-    if (learn) { const box = document.createElement('div'); box.className = 'shlearn'; learn.classList.add('big'); box.appendChild(learn); wraps.moves.appendChild(box); }
-    // loadout: one key row per move, big enough for a thumb
-    wraps.moves.querySelectorAll('.ab-row .slots').forEach(s => s.classList.add('keyrow'));
-    const show = k => { sheetTab = k; bar.querySelectorAll('button').forEach(b => b.classList.toggle('sel', b.dataset.shtab === k)); TABS.forEach(t => { wraps[t[0]].hidden = t[0] !== k; }); card.scrollTop = 0; };
-    bar.querySelectorAll('button').forEach(b => b.onclick = () => { G.sfx('page'); show(b.dataset.shtab); });
+    const wraps = {}; let after = top;
+    // the front page
+    const home = document.createElement('div'); home.className = 'gm-home shpane'; home.dataset.pane = 'home';
+    const fb = re => foot && [...foot.querySelectorAll('button')].find(q => re.test(q.textContent));
+    const keys = G.input.usingPad ? ['LB', 'RB', 'Y'] : G.input.touch ? ['1', '2', '3'] : ['Q', 'E', 'R'];
+    home.innerHTML = '<button class="gm-carry" data-go="moves"><small class="over">You carry into the pit</small><span class="gm-slots">' + [0, 1, 2].map(i => { const ab = A[(h.slots || [])[i]]; return '<span class="gm-slot' + (ab ? '' : ' none') + '"><i class="gm-ic">' + (ab ? G.icon(ab) : '') + '</i><b>' + (ab ? ab.name : 'Empty') + '</b><kbd>' + keys[i] + '</kbd></span>'; }).join('') + '</span></button>' +
+      '<div class="fence-rooms gm-tiles">' +
+      '<button class="fence-room" data-go="moves"><span class="fr-ic">⚔</span><b>Loadout</b><small>Choose your three moves</small></button>' +
+      '<button class="fence-room" data-px="learn"><span class="fr-ic">✦</span><b>Learn</b><small>Techniques for hire</small></button>' +
+      '<button class="fence-room" data-px="fin"><span class="fr-ic">☠</span><b>Finisher</b><small>Your mortal blow</small></button>' +
+      '<button class="fence-room" data-go="char"><span class="fr-ic">◈</span><b>Character</b><small>Scores, blood, past' + (h.cls === 'sorcerer' || h.cls === 'warlock' ? ', ring' : '') + '</small></button>' +
+      '<button class="fence-room" data-go="build"><span class="fr-ic">▲</span><b>Build</b><small>Your path by level</small></button>' +
+      '<button class="fence-room" data-px="builds"><span class="fr-ic">❖</span><b>Builds</b><small>Ideas for your class</small></button>' +
+      '<button class="fence-room" data-px="fallen"><span class="fr-ic">✝</span><b>The Fallen</b><small>' + ((st.fallen || []).length) + ' in the sand</small></button>' +
+      '<button class="fence-room" data-px="codex"><span class="fr-ic">❧</span><b>Codex</b><small>Lore and how things work</small></button>' +
+      '</div>';
+    top.insertAdjacentElement('afterend', home); after = home; wraps.home = home;
+    const back = document.createElement('div'); back.className = 'gm-back'; back.innerHTML = '<button id="gmback">‹ Guildmaster</button><b></b>'; home.insertAdjacentElement('afterend', back); after = back;
+    Object.keys(PAGES).forEach(k => { const w = document.createElement('div'); w.className = 'shpane'; w.dataset.pane = k; pane[k].forEach(el => w.appendChild(el)); after.insertAdjacentElement('afterend', w); after = w; wraps[k] = w; });
+    wraps.moves.querySelectorAll('.ab-row .slots').forEach(q => q.classList.add('keyrow'));
+    // the old footer's doors are tiles now; only Done stays down there
+    const PX = { learn: fb(/learn techniques/i), builds: fb(/^builds$/i), fallen: fb(/fallen/i), codex: fb(/codex/i), fin: [...wraps.moves.querySelectorAll('.ab-row')].map(rw => /mortal blow|finisher/i.test(rw.textContent) ? rw.querySelector('button') : null).find(Boolean) };
+    ['learn', 'builds', 'fallen', 'codex'].forEach(k => { if (PX[k]) PX[k].style.display = 'none'; });
+    home.querySelectorAll('[data-px]').forEach(t => { const b2 = PX[t.dataset.px]; if (!b2) { t.disabled = true; return; } t.onclick = () => b2.click(); });
+    const show = k => { sheetTab = k; Object.keys(wraps).forEach(q => { wraps[q].hidden = q !== k; }); back.hidden = k === 'home'; back.querySelector('b').textContent = PAGES[k] || ''; card.scrollTop = 0; };
+    home.querySelectorAll('[data-go]').forEach(t => t.onclick = () => { G.sfx('page'); show(t.dataset.go); });
+    back.querySelector('#gmback').onclick = () => { G.sfx('page'); show('home'); };
     show(sheetTab);
-    // LB / RB switch tabs on a controller
-    card._tabs = d => { const i = TABS.findIndex(t => t[0] === sheetTab); show(TABS[(i + d + TABS.length) % TABS.length][0]); G.sfx('page'); };
+    if (G.input.usingPad) { const f1 = sheetTab === 'home' ? home.querySelector('.gm-tiles button') : back.querySelector('#gmback'); if (f1) setTimeout(() => f1.focus({ preventScroll: true }), 0); }
+    card._back = () => { if (sheetTab !== 'home') { G.sfx('page'); show('home'); return true; } return false; };       // B on a controller steps back to the front page first
     return r;
   };
 
@@ -64,6 +79,6 @@
   let was = {};
   setInterval(() => { let pads = []; try { pads = navigator.getGamepads ? navigator.getGamepads() : []; } catch (e) { } let gp = null; for (const p of pads) if (p && p.connected) { gp = p; break; } if (!gp) return;
     const now = { 4: !!(gp.buttons[4] && gp.buttons[4].pressed), 5: !!(gp.buttons[5] && gp.buttons[5].pressed) };
-    [4, 5].forEach(i => { if (now[i] && !was[i] && ui.isOpen()) { const card = document.querySelector('#panel .card'), d = i === 5 ? 1 : -1; if (card && card._tabs) card._tabs(d); else { const tabs = [...document.querySelectorAll('#panel .tl-tabs .chip')]; const k = tabs.findIndex(b => b.classList.contains('sel')); if (tabs.length) tabs[(k + d + tabs.length) % tabs.length].click(); } } });
+    [4, 5].forEach(i => { if (now[i] && !was[i] && ui.isOpen()) { const card = document.querySelector('#panel .card'), d = i === 5 ? 1 : -1; { const tabs = [...document.querySelectorAll('#panel .tl-tabs .chip')]; const k = tabs.findIndex(b => b.classList.contains('sel')); if (tabs.length) tabs[(k + d + tabs.length) % tabs.length].click(); } } });
     was = now; }, 60);
 })();

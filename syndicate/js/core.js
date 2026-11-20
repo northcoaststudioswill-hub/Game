@@ -13,19 +13,24 @@
   G.esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // ---------- save ----------
-  const KEY = 'underground_syndicate_v2';
+  // three save slots. The first keeps the original key, so an existing fighter is simply slot 1.
+  const KEY0 = 'underground_syndicate_v2', keyOf = n => n <= 1 ? KEY0 : KEY0 + '_' + n;
+  G.SLOTS = 3; G.slot = 1; try { G.slot = Math.max(1, Math.min(3, +(localStorage.getItem('guttercrown_slot') || 1))); } catch (e) { }
+  G.setSlot = n => { G.slot = Math.max(1, Math.min(G.SLOTS, n | 0)); try { localStorage.setItem('guttercrown_slot', String(G.slot)); } catch (e) { } };
+  G.slotInfo = n => { try { const q = JSON.parse(localStorage.getItem(keyOf(n)) || 'null'); return q && q.v === 2 && q.hero ? q : null; } catch (e) { return null; } };
+  G.wipeSlot = n => { try { localStorage.removeItem(keyOf(n)); } catch (e) { } };
   G.newState = () => ({ v: 2, hero: null, coin: 0, respect: 0, wins: {}, losses: 0, items: [], tally: [], second: null, cos: { owned: {}, dye: null, head: null, back: null, weapon: null, aura: null }, reports: [], gore: true, met: {}, opt: {}, chits: 0, stats: {}, deeds: {}, deaths: 0, soulDebt: 0, wallItems: [], gear: { weapon: 0, armor: 0 }, potions: 1, seenHelp: false });
   G.state = G.newState();
-  G.save = () => { try { localStorage.setItem(KEY, JSON.stringify(G.state)); } catch (e) { } };
+  G.save = () => { if (G.guest) return; try { localStorage.setItem(keyOf(G.slot), JSON.stringify(G.state)); } catch (e) { } };
   G.load = () => {
     try {
-      const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      const s = JSON.parse(localStorage.getItem(keyOf(G.slot)) || 'null');
       if (s && s.v === 2 && s.hero) { G.state = Object.assign(G.newState(), s); return true; }
     } catch (e) { }
     return false;
   };
-  G.hasSave = () => { try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); return !!(s && s.v === 2 && s.hero); } catch (e) { return false; } };
-  G.wipe = () => { try { localStorage.removeItem(KEY); } catch (e) { } G.state = G.newState(); };
+  G.hasSave = () => { for (let n = 1; n <= G.SLOTS; n++) if (G.slotInfo(n)) return true; return false; };
+  G.wipe = () => { if (!G.guest) { try { localStorage.removeItem(keyOf(G.slot)); } catch (e) { } } G.state = G.newState(); };
 
   // ---------- audio (tiny synth, no files) ----------
   let ac = null, master = null, nbuf = null;

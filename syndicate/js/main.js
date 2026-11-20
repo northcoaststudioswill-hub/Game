@@ -136,7 +136,7 @@
   }
   let padT = 0;
   // B on a menu: the card's own way out, whatever it is called
-  function padBack() { const pn = $('panel'); let back = pn.querySelector('#x, #n, #rs'); if (!back || back.disabled || !back.offsetParent) back = [...pn.querySelectorAll('button')].filter(q => !q.disabled && q.offsetParent).find(q => /^(✕|×|back|done|close|step back|not now|not tonight|leave|leave (them|him|her) be|cancel|later|no|climb out|go back down|carry on|good|go on|keep fighting|back to [a-z ’']+)$/i.test(q.textContent.trim())); if (back) { back.click(); return true; } return false; }
+  function padBack() { const pn = $('panel'); { const cd = pn.querySelector('.card'); if (cd && cd._back && cd._back()) return true; } let back = pn.querySelector('#x, #n, #rs'); if (!back || back.disabled || !back.offsetParent) back = [...pn.querySelectorAll('button')].filter(q => !q.disabled && q.offsetParent).find(q => /^(✕|×|back|done|close|step back|not now|not tonight|leave|leave (them|him|her) be|cancel|later|no|climb out|go back down|carry on|good|go on|keep fighting|back to [a-z ’']+)$/i.test(q.textContent.trim())); if (back) { back.click(); return true; } return false; }
   G._pad = { nav: (x, y) => navigate(x, y), back: padBack, list: () => menuButtons() };
   function pollPad(dt) {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];

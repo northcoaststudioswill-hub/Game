@@ -1,0 +1,30 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [], shots = [];
+  for (const [nm, vp] of [['pc', { width: 1280, height: 720 }], ['ph', { width: 390, height: 844 }]]) {
+    const ctx = await b.newContext({ viewport: vp }); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(nm + ' ' + e.message + (e.stack || '').split('\n')[1]));
+    await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); const boot = async () => { await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); G.muted = true; }); await p.waitForTimeout(400); };
+    const snap = async () => { await p.evaluate(() => document.querySelectorAll('#veil').forEach(v => v.remove())); await p.waitForTimeout(60); shots.push((await p.screenshot({ type: 'jpeg', quality: 78 })).toString('base64')); };
+    const menu = () => p.evaluate(() => [...document.querySelectorAll('#panel .menu button')].map(b => b.textContent.trim().slice(0, 34)).join(' | '));
+    await boot(); console.log(nm, 'no saves     :', await menu());
+    // fighter 1
+    await p.click('#bNew'); await p.click('.c-skip'); await p.click('#go'); await p.click('#ok'); await p.evaluate(() => { G.state.coin = 111; G.save(); }); const n1 = await p.evaluate(() => G.state.hero.name + ' slot ' + G.slot);
+    await boot(); console.log(nm, 'one save     :', await menu());
+    // fighter 2 goes to the next free page without asking
+    await p.click('#bNew'); await p.click('.c-skip'); await p.click('[data-cls=druid]'); await p.click('#go'); await p.click('#ok'); await p.evaluate(() => { G.state.coin = 222; G.save(); }); const n2 = await p.evaluate(() => G.state.hero.name + ' slot ' + G.slot);
+    await boot(); console.log(nm, 'two saves    :', await menu(), '|', n1, '|', n2); await snap();
+    await p.click('#bSaves'); await p.waitForTimeout(200); await snap(); console.log(nm, 'pages        :', await p.evaluate(() => [...document.querySelectorAll('.saveslot')].map(e => e.querySelector('.ss-tx b').textContent + '[' + [...e.querySelectorAll('button')].map(b => b.textContent).join(',') + ']').join(' | ')));
+    await p.click('[data-load="1"]'); await p.waitForTimeout(200); console.log(nm, 'load page 1  :', await p.evaluate(() => G.state.hero.name + ' coin ' + G.state.coin + ' cls ' + G.state.hero.cls + ' slot ' + G.slot));
+    await boot(); await p.click('#bCont'); await p.waitForTimeout(200); console.log(nm, 'continue     :', await p.evaluate(() => G.state.hero.name + ' coin ' + G.state.coin));
+    // the Guildmaster
+    await p.evaluate(() => { const st = G.state; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; st.firstPath = 9; st.hero.level = 4; st.respect = 900; st.shownPlaces = { a: 1 }; st.seen = { trainer: 1 }; G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); G.ui.sheet(); }); await p.waitForTimeout(150); await snap();
+    console.log(nm, 'gm home      :', await p.evaluate(() => { const c = document.querySelector('#panel .card'); return c.scrollHeight + '/' + c.clientHeight + ' tiles ' + [...document.querySelectorAll('.gm-tiles button')].map(b => b.querySelector('b').textContent + (b.disabled ? '(off)' : '')).join(','); }));
+    await p.click('.gm-tiles [data-go=moves]'); await p.waitForTimeout(100); await snap(); console.log(nm, 'gm loadout   :', await p.evaluate(() => { const c = document.querySelector('#panel .card'); const before = G.state.hero.slots.join(','); const k = [...document.querySelectorAll('.shpane[data-pane=moves] .slots .slot')].find(b => !b.classList.contains('sel')); k.click(); return c.scrollHeight + '/' + c.clientHeight + ' ' + before + ' -> ' + G.state.hero.slots.join(',') + ' still on: ' + document.querySelector('.gm-back b').textContent; }));
+    console.log(nm, 'tiles work   :', await p.evaluate(() => { const out = []; for (const k of ['learn', 'fin', 'builds', 'fallen', 'codex']) { G.ui.close(); G.ui.sheet(); const t = document.querySelector('[data-px=' + k + ']'); t.click(); for (let i = 0; i < 2; i++) { const q = document.querySelector('#panel #ok'); if (q && /Go on/.test(q.textContent)) q.click(); } out.push(k + '→' + ((document.querySelector('#panel h2, #panel h1') || {}).textContent || '?').replace('✕', '').slice(0, 22)); } G.ui.close(); return out.join(' | '); }));
+    // Marc's table from the title
+    await boot(); await p.click('#bMarc'); await p.waitForTimeout(300); await snap(); console.log(nm, 'guest        :', await p.evaluate(() => (document.querySelector('#panel h2') || {}).textContent + ' coin ' + G.state.coin + ' guest ' + G.guest));
+    await p.click('#gm'); await p.waitForTimeout(200); console.log(nm, 'marc games   :', await p.evaluate(() => (document.querySelector('#panel h2') || {}).textContent.replace('✕', '') + ' :: ' + [...document.querySelectorAll('#panel .choices button b, #panel button b')].map(b => b.textContent).slice(0, 9).join(',')));
+    await p.evaluate(() => { G.state.coin -= 50; G.save(); G.ui.close(); }); await p.waitForTimeout(500); console.log(nm, 'card returns :', await p.evaluate(() => (document.querySelector('#panel h2') || {}).textContent + ' | ' + (document.querySelector('#panel .dim') || {}).textContent));
+    await p.click('#x'); await p.waitForTimeout(200); console.log(nm, 'after guest  :', await menu(), '| saved fighters intact:', await p.evaluate(() => [1, 2, 3].map(n => { const q = G.slotInfo(n); return q ? q.hero.name + ':' + q.coin : '-'; }).join(' ')));
+    await ctx.close(); }
+  const pg = await b.newPage({ viewport: { width: 1600, height: 100 } }); await pg.setContent('<body style="margin:0;background:#111;display:grid;grid-template-columns:repeat(5,320px)">' + shots.map(f => `<img src="data:image/jpeg;base64,${f}" width=320>`).join('') + '</body>'); await pg.screenshot({ path: 'sv.png', fullPage: true });
+  console.log('ERRORS', errs.length, errs.slice(0, 3).join(' || ')); await b.close(); })();
