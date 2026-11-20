@@ -845,13 +845,13 @@
    "name": "Warhammer",
    "type": "melee",
    "dmg": [
-    1,
-    12
+    2,
+    7
    ],
    "stat": "str",
    "cost": 13,
-   "wind": 0.377,
-   "rec": 0.39,
+   "wind": 0.32045,
+   "rec": 0.3315,
    "range": 64,
    "arc": 110,
    "pz": 2.1,
@@ -1042,13 +1042,13 @@
    "type": "proj",
    "dmg": [
     1,
-    6
+    8
    ],
    "stat": "cha",
    "cost": 8,
    "wind": 0.29,
    "rec": 0.286,
-   "speed": 580,
+   "speed": 700,
    "knock": 85,
    "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Brittle: Slows, and hits slowed foes 12% harder.",
    "kind": "Cantrip",
@@ -1162,8 +1162,8 @@
    ],
    "stat": "str",
    "cost": 10,
-   "wind": 0.29,
-   "rec": 0.338,
+   "wind": 0.261,
+   "rec": 0.3042,
    "range": 82,
    "arc": 150,
    "desc": "Tap to strike for 1d10 + STR. Costs 10, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Penance: Every hit leaves them marked for a moment: they take 25% more.",
@@ -1196,13 +1196,13 @@
    "name": "War Pick",
    "type": "melee",
    "dmg": [
-    1,
-    10
+    2,
+    6
    ],
    "stat": "str",
    "cost": 13,
-   "wind": 0.348,
-   "rec": 0.364,
+   "wind": 0.2784,
+   "rec": 0.2912,
    "range": 62,
    "arc": 80,
    "pz": 1.7,
@@ -1395,8 +1395,8 @@
    ],
    "stat": "wis",
    "cost": 8,
-   "wind": 0.22446,
-   "rec": 0.27456,
+   "wind": 0.24241680000000002,
+   "rec": 0.29652480000000003,
    "range": 92,
    "arc": 120,
    "desc": "Tap to strike for 1d6 + WIS. Costs 8, partly returned on a hit. Hold, then release, for a heavy blow. Living Wood: Heals you for 12% of the damage it deals.",
@@ -1498,13 +1498,13 @@
    "name": "Root Maul",
    "type": "melee",
    "dmg": [
-    1,
-    12
+    2,
+    7
    ],
    "stat": "wis",
    "cost": 12,
-   "wind": 0.359136,
-   "rec": 0.41184000000000004,
+   "wind": 0.3052656,
+   "rec": 0.35006400000000004,
    "range": 66,
    "arc": 100,
    "pz": 2,
@@ -1573,7 +1573,7 @@
    "type": "proj",
    "dmg": [
     1,
-    6
+    8
    ],
    "stat": "cha",
    "cost": 8,
@@ -1608,7 +1608,7 @@
    "type": "proj",
    "dmg": [
     1,
-    6
+    8
    ],
    "stat": "cha",
    "cost": 8,
@@ -1682,8 +1682,8 @@
    ],
    "stat": "str",
    "cost": 12,
-   "wind": 0.278,
-   "rec": 0.312,
+   "wind": 0.25020000000000003,
+   "rec": 0.2808,
    "range": 88,
    "arc": 150,
    "pz": 1.6,
@@ -1792,13 +1792,13 @@
    "name": "Bell-Hammer",
    "type": "melee",
    "dmg": [
-    1,
-    12
+    2,
+    8
    ],
    "stat": "str",
    "cost": 13,
-   "wind": 0.365,
-   "rec": 0.406,
+   "wind": 0.292,
+   "rec": 0.32480000000000003,
    "range": 66,
    "arc": 100,
    "pz": 2.2,
@@ -1833,7 +1833,7 @@
    "type": "melee",
    "dmg": [
     1,
-    6
+    8
    ],
    "stat": "wis",
    "cost": 6,
@@ -1870,7 +1870,7 @@
    "type": "proj",
    "dmg": [
     1,
-    6
+    8
    ],
    "stat": "cha",
    "cost": 8,

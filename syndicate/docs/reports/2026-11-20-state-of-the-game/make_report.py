@@ -92,12 +92,15 @@ ENV=[('On the Spikes','Near a spike wall','Each class has its own name: Shield-R
 def t3(rows_,hd): return '<div class="scroll"><table><thead><tr>'+''.join('<th>'+h+'</th>' for h in hd)+'</tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+E(x)+'</td>' for x in r)+'</tr>' for r in rows_)+'</tbody></table></div>'
 def fig(src,cap): return '<figure><img src="img5/'+src+'.jpg" alt="'+E(cap)+'" loading="lazy"><figcaption>'+cap+'</figcaption></figure>'
 gTotal=totalClass+totalWF+len(SIT)+len(RND)+2
+import subprocess
+NC=int(subprocess.check_output(['git','-C','/home/user/Game/syndicate','log','--oneline','--since=2026-11-19 21:21']).decode().count('\n'))
+exec(open('/home/user/Game/syndicate/docs/reports/2026-11-20-state-of-the-game/grades_part.py').read())
 NEWSEC=f'''
 <section>
 <h2>Since the 19 November report</h2>
-<p>53 commits since the report went out at 9:21 pm on 19 November. The work went in four directions: how fights end, how each class and weapon plays, presentation and menus, and a hidden roster of guests from the other North Coast games. The 19 November report is kept in full below, unchanged.</p>
+<p>{NC} commits since the report went out at 9:21 pm on 19 November. The work went in four directions: how fights end, how each class and weapon plays, presentation and menus, and a hidden roster of guests from the other North Coast games. The 19 November report is kept in full below, unchanged.</p>
 <div class="tiles six">
-<div class="tile"><b>53</b><span>commits since the last report</span></div>
+<div class="tile"><b>{NC}</b><span>commits since the last report</span></div>
 <div class="tile"><b>{gTotal}</b><span>distinct finishers, from {totalClass} class finishers to random events</span></div>
 <div class="tile"><b>{nArms}</b><span>weapons, every one with a property and a temper</span></div>
 <div class="tile"><b>{nab}</b><span>class moves on offer, plus race, earned and gift moves</span></div>
@@ -114,6 +117,7 @@ NEWSEC=f'''
 <li>Every weapon has a temper on top of its property; druid beast shapes have their own.</li>
 <li>Every third basic bolt is the calling's own: a fan, a heavy blast or a pair.</li>
 <li>The crowd throws a healing flask when it loves you, and a hurt opponent races you for it.</li>
+<li>A weapon balance pass from a seeded tournament: slow hammers and picks, frost and acid now hold their own (see Balance).</li>
 </ul></div>
 <div class="card"><h3>Bodies, gore and animation</h3><ul>
 <li>A fuller skeleton: hips, elbows, wrists, knees, ankles and neck.</li>
@@ -223,6 +227,7 @@ NEWSEC=f'''
 <li><b>Stances in motion:</b> they run in bouts without errors; the bout camera is too far out to judge how they look. Needs a look in play.</li>
 <li><b>Edge tree:</b> two upgrades so far; a deeper tree is not built.</li>
 <li><b>Balance:</b> weapons are now even within each class by the tournament; the warlock may still be slightly hard. Everything here is measured by the game playing itself.</li>
+<li><b>From the report card:</b> story in the middle of the ladder, staggered onboarding, a public build without the Guest List, signature patterns for gate fighters, a closer bout camera, and a sound pass. See the ordered list at the top.</li>
 <li><b>Devices:</b> iPhone Safari menu size and a physical controller still need real hardware.</li>
 <li><b>Guest List (paused):</b> bespoke swing animations, separate rigs, richer cinematic art, guest story and dialogue.</li>
 </ul>
@@ -232,13 +237,13 @@ s=open(OLD).read()
 s=s.replace('<title>Guttercrown State of the Game</title>','<title>Guttercrown State of the Game</title>',1)
 a=s.index('<header'); b=s.index('</header>')+len('</header>')
 HDR=f'''<header style="display:flex;flex-direction:column;gap:12px">
-  <div class="meta">North Coast Studios × E Concepts · updated 20 November 2026 for Version 147 of the live build · the 19 November report is kept in full below</div>
+  <div class="meta">North Coast Studios × E Concepts · updated 20 November 2026 for Version 148 of the live build, with a report card · the 19 November report is kept in full below</div>
   <h1>Guttercrown<br>State of the Game</h1>
   <p class="lede">Since the last report Guttercrown's fighting has gone much deeper: {gTotal} distinct ways to end a bout, a temper for every one of its {nArms} weapons, a class mechanic for every calling, joints that bend and break, and blood that paints the sand. The pit is close to the difficulty it had on the 19th. The tables below come straight from the build.</p>
   <p class="meta">Sources: the live build and the Game repo (<code>syndicate/</code> on <code>claude/wonderful-euler-4hchee</code>). Tables were read out of the running game by script; screenshots are from scripted runs, not hand play. Difficulty figures are simulated careers.</p>
 </header>'''
 OLDHDR=s[a:b]
-s=s[:a]+HDR+NEWSEC+'\n<div class="divider"><span>The 19 November report, unchanged</span></div>\n'+OLDHDR.replace('<h1>Guttercrown<br>State of the Game</h1>','<h1 style="font-size:34px">19 November</h1>',1)+s[b:]
+s=s[:a]+HDR+GRADES+NEWSEC+'\n<div class="divider"><span>The 19 November report, unchanged</span></div>\n'+OLDHDR.replace('<h1>Guttercrown<br>State of the Game</h1>','<h1 style="font-size:34px">19 November</h1>',1)+s[b:]
 s=s.replace('src="img2/','src="img2/').replace('</style>','''table.wide{min-width:1080px}table.wide th,table.wide td{font-size:13px}
 .tiles.six{grid-template-columns:repeat(3,1fr)}.tiles.five{grid-template-columns:repeat(5,1fr)}@media (max-width:640px){.tiles.six,.tiles.five{grid-template-columns:repeat(2,1fr)}}
 .num{font-variant-numeric:tabular-nums;text-align:right}
@@ -254,5 +259,5 @@ table.kv td{font-size:13.5px}
 .divider{display:flex;align-items:center;gap:12px;color:var(--gold);font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.06em}
 .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--gold);opacity:.5}
 code{font-size:.92em}
-</style>''',1)
+'''+GCSS+'''</style>''',1)
 open(NEW,'w').write(s); print(len(s))
