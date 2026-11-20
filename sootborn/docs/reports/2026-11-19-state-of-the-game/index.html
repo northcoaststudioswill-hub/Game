@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOOTBORN State of the Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Same inspection sheet as the Guttercrown and Sprouts reports. Four story lanes take c2, c6, c3, c1. */
+:root{
+  color-scheme: dark;
+  --page:#121110; --surface:#1a1a19; --raise:#232220; --line:#34322e;
+  --ink:#f0efec; --ink2:#c3c2b7; --muted:#8f8c84;
+  --gold:#e0b04a;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#9085e9; --c7:#c3c2b7; --c8:#e66767;
+  --good:#0ca30c; --warn:#fab219; --crit:#e66767;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+main{max-width:860px;margin:0 auto;padding:28px 18px 80px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1;letter-spacing:.01em}
+h1{font-size:46px;font-weight:700;text-transform:uppercase;color:var(--gold)}
+h2{font-size:30px;font-weight:600;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h3{font-size:21px;font-weight:600}
+p{margin:0;max-width:68ch}
+a{color:var(--gold)}
+section{display:flex;flex-direction:column;gap:16px}
+.lede{font-size:18px;color:var(--ink2)}
+.meta{color:var(--muted);font-size:13px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.tile b{display:block;font-family:var(--display);font-size:34px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.tile span{font-size:13px;color:var(--ink2)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
+li{max-width:68ch}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.scroll svg{display:block}
+.hint{font-size:12px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.c-good{color:#4cc24c}.c-warn{color:var(--warn)}.c-crit{color:var(--crit)}.c-own{color:var(--gold)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink2)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.score{display:grid;grid-template-columns:minmax(120px,190px) 1fr 34px;gap:4px 10px;align-items:center;font-size:14px}
+.score .bar{height:10px;background:var(--raise);border-radius:5px;overflow:hidden}
+.score .bar i{display:block;height:100%;border-radius:5px}
+.score .n{font-variant-numeric:tabular-nums;color:var(--ink2);text-align:right}
+.score .why{grid-column:1/-1;font-size:13px;color:var(--muted);margin:-2px 0 8px}
+.lanes td,.lanes th{text-align:center;padding:6px 4px;font-size:12px}
+.lanes td:first-child,.lanes th:first-child{text-align:left;white-space:nowrap;font-size:13px;padding-right:12px}
+.lanes td{border:2px solid var(--surface)}
+.lanes .on{background:rgba(224,176,74,.75)}
+.lanes .if{background:repeating-linear-gradient(135deg,rgba(224,176,74,.55) 0 5px,rgba(224,176,74,.15) 5px 10px)}
+.lanes .bg{background:rgba(224,176,74,.22)}
+.vers{display:flex;flex-wrap:wrap;gap:4px}
+.vers span{font-size:11px;font-weight:600;padding:3px 6px;border-radius:3px;color:#0b0b0b;font-variant-numeric:tabular-nums}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+figure img{display:block;width:100%;height:auto;max-width:100%}
+figcaption{padding:9px 12px;font-size:13px;color:var(--ink2)}
+figcaption b{color:var(--ink)}
+.phase{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.phase .n{font-family:var(--display);font-size:34px;font-weight:700;color:var(--gold);line-height:1}
+.phase p{color:var(--ink2);font-size:14.5px}
+.sev{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.flag{border-left:3px solid var(--crit);background:var(--surface);border-radius:0 6px 6px 0;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.flow{display:flex;flex-direction:column;gap:6px}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.step .k{font-family:var(--display);font-size:22px;font-weight:700;color:var(--gold);line-height:1.1}
+.step p{font-size:14.5px;color:var(--ink2)}
+.step b{color:var(--ink)}
+.branch{margin-left:40px;border-left:2px dashed var(--muted);padding-left:12px;font-size:14px;color:var(--ink2)}
+@media (max-width:560px){h1{font-size:36px}h2{font-size:25px}.branch{margin-left:16px}}
+.stage{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)}
+.stage .when{font-family:var(--display);font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold)}
+.stage .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.stage .row img{display:block;width:100%;height:auto;border-radius:4px;border:1px solid var(--line)}
+svg text{font-family:var(--body)}
+</style>
+<style>
+:root{--below:var(--c2);--train:var(--c6);--assay:var(--c3);--spire:var(--c1)}
+.play{columns:2 260px;font-size:13.5px;color:var(--ink2);margin:0;padding-left:26px}
+.play li{break-inside:avoid;margin-bottom:3px}
+.mx td,.mx th{text-align:center;padding:6px 4px;font-size:12px}
+.mx td:first-child,.mx th:first-child{text-align:left;white-space:nowrap;font-size:13px;padding-right:12px}
+.mx td{border:2px solid var(--surface)}
+.mx .on{background:rgba(224,176,74,.75)}.mx .half{background:rgba(224,176,74,.28)}
+.stack .row{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;font-size:13.5px;margin:6px 0}
+.stack .segs{display:flex;gap:2px;height:22px}
+.stack .segs i{display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:600;color:#0b0b0b;border-radius:3px}
+</style>
+</head>
+<body>
+<main>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="meta">North Coast Studios × E Concepts · updated 19 November 2026 for v0.48, pushed at 2:28 pm (first review: v0.24, 18 November, 10:03 pm)</div>
+  <h1>SOOTBORN<br>State of the Game</h1>
+  <p class="lede">Since the first review SOOTBORN went from v0.24 to v0.48 in about sixteen hours. It now has three third-person levels built in the Second Chance engine, seven walk-around 2D missions, a drawn 3D Gilding, a settled canon, and a plot you have frozen. Almost every gap the first review named has been answered in the story. What it hasn't had is a full run by hand, and it now asks a player to learn three different ways of fighting.</p>
+  <div class="tiles">
+    <div class="tile"><b>48</b><span>versions; 24 since the first review</span></div>
+    <div class="tile"><b>69</b><span>commits in 27 hours, 35 of them today</span></div>
+    <div class="tile"><b>3 + 1</b><span>third-person levels, plus the Table drawn in 3D</span></div>
+    <div class="tile"><b>7</b><span>2D missions in the Assay and Part Two</span></div>
+    <div class="tile"><b>63</b><span>guards fought by a bot across the three levels, none stuck</span></div>
+    <div class="tile"><b>9 yrs</b><span>of story, now on one canon sheet</span></div>
+  </div>
+  <p class="meta">Sources: the live v0.48 build and the Game repo's <code>sootborn</code> branch: <code>docs/CHANGELOG.md</code>, <code>docs/STORY_BIBLE.md</code> (now current to v0.48) and the full commit history. I ran the build and eight older commits headlessly through the dev menu to capture the frames below. I didn't play anything by hand or listen to it, and a software renderer isn't a phone. Scores and the Red Rising comparison are my judgment; the Red Rising side is from memory of the first trilogy.</p>
+</header>
+
+<section>
+  <h2>Since the first review</h2>
+  <div class="grid2">
+    <div class="card"><h3>Added (v0.25 to v0.48, 37 commits)</h3>
+      <ul>
+        <li><b>Third-person levels:</b> the High Docks (+7), Riser Nine (+5) and the Stair (+9), in the Second Chance engine with cel shading and a faint halftone. They play inside the game's own frame and controls: one strike button (tap light, hold for a three-blow heavy), a kick, the hook line, the boots (LIFT ZERO), memories at chalked suns, and ELEVEN as a four-stage finisher at full fury.</li>
+        <li><b>The Table:</b> the Gilding drawn as a fourteen-picture 3D comic in Pump Room Seven. No fighting.</li>
+        <li><b>2D missions:</b> the Camp, the Island, the Lamp, the Dais and the Last Night inside the Assay; the Count hall and the Sun (you play Tavi) in Part Two. They include fetch tasks, a pipe puzzle, stealth, a traitor to find, and a night with no enemies.</li>
+        <li><b>Story:</b> Maren Aldane (Teo's sister) and the betrayal at the docks; Brand's death played as Brand; the low point; Wren's second arc; Oswin Hale and Petra Lune; seat knives; the Spire's rings; Celestine knew from the Pinning; both endings reach the last scene. The plot was frozen at v0.44.</li>
+        <li><b>Combat and look:</b> graphics presets and a frame-time readout, cel shading, rebuilt bodies for every arena fighter, three fights moved onto the painted valley, a redrawn cadet sprite with a crescent swing, four hit reactions in 2D, and tougher guards in v0.48.</li>
+        <li><b>The Assay, lived in:</b> the Proctors' ranking board, cairns, patrons' drops, wagers, grounded blades at the keep.</li>
+      </ul></div>
+    <div class="card"><h3>From the first review's list</h3>
+      <ul>
+        <li><span class="chip c-good">Fixed</span> Mara's body, the fury smear, the stale About text and "Below the Sun" (v0.26).</li>
+        <li><span class="chip c-good">Fixed</span> The Valley HUD: hit counter and enemy bar sit inside the frame in today's capture.</li>
+        <li><span class="chip c-good">Fixed</span> The bible is current, with a canon sheet that settles all six timeline conflicts.</li>
+        <li><span class="chip c-good">Done</span> Training room on the title screen; a calendar strip on every Assay card; a Memories shelf.</li>
+        <li><span class="chip c-good">Done</span> A fall (Maren and the docks), Teo's family (Maren), choice payoffs in the last chapter, Ilse sent the leaf.</li>
+        <li><span class="chip c-warn">Partly</span> Braiding Part Two: the Sun and Tier Six Stands go back below; the rest still climbs.</li>
+        <li><span class="chip c-warn">Partly</span> A rival: Tyr Cade suspects him and Oswin becomes the Auditor's Blade, but neither is a cunning equal.</li>
+        <li><span class="chip c-warn">Partly</span> Training-year bouts: No Gloves added; still two fights in three and a half years.</li>
+        <li><span class="chip c-crit">Not yet</span> Phone frame rate. The readout exists; nobody has sent numbers back.</li>
+        <li><span class="chip c-crit">Not yet</span> A full play-through by hand. Every changelog entry since v0.25 ends "Not checked: played by hand."</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Where it stands</h2>
+  <div class="grid2">
+    <div class="card"><h3>What exists</h3>
+      <ul>
+        <li><b>Part One, Below.</b> Prologue, heist, furnace, four days in Cinderwell, with the Gilding now drawn as the Table.</li>
+        <li><b>The Assay.</b> Seven arena fights and five 2D missions, each with a calendar strip.</li>
+        <li><b>Part Two, Above.</b> Five chapters, +4 to +9. Two 2D missions, two 2D fights, four arena fights and three third-person levels. The ending is a film.</li>
+        <li><b>Four ways to play:</b> a 2D walk-around world, 2D pixel fights, arena fights (painted or full 3D), and third-person levels.</li>
+        <li><b>Tools:</b> a dev menu with 31 cutscenes, every mission and level; bots that fight the levels; graphics presets and a frame-time readout.</li>
+      </ul></div>
+    <div class="card"><h3>What that means</h3>
+      <ul>
+        <li>The story is done. The changelog says remaining story work is reading and pacing, not new threads.</li>
+        <li>Part Two is no longer a visual novel with fights: chapters 2, 3 and 5 now have something you walk through.</li>
+        <li>The cost is consistency. Kael fights with 21 moves in the arena, one strike button in the levels, and a sprite blade in 2D. These are three control languages in one game.</li>
+        <li>The newest work was tuned against a bot that never uses the hook, the kick, the jump or ELEVEN.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Frames from today's build</h2>
+  <p class="meta">v0.48 at 960×540 through the dev menu, rendered in software. Lighting and frame rate on a phone will differ.</p>
+  <div class="shots">
+    <figure><img src="img/now-docks-rook.jpg" alt="Comic close-up of Captain Rook with gold leaf in his hair"><figcaption><b>The High Docks: Rook.</b> Cel shading and ink lines, with caption boxes. "Somebody had told them the hour."</figcaption></figure>
+    <figure><img src="img/now-docks.jpg" alt="Third-person view of Kael and Rook on a sky dock"><figcaption><b>The High Docks in play.</b> The sky dock on the Spire, crates and moorings, Kael and Rook in frame.</figcaption></figure>
+    <figure><img src="img/now-riser-mask.jpg" alt="Masked Kael in the Assay valley at night"><figcaption><b>Riser Nine: the mask.</b> "A clerk cannot be seen to fight. I wore a mask."</figcaption></figure>
+    <figure><img src="img/now-riser.jpg" alt="Meadow with a white pylon, pines and the hatch"><figcaption><b>Riser Nine: the meadow.</b> The pylon, the hill road and the treelines, as rebuilt in v0.47.</figcaption></figure>
+    <figure><img src="img/now-stair-top.jpg" alt="The last flight of the Spire stair at sunset"><figcaption><b>The Stair.</b> "The last of nine hundred steps." / "We. It was always we."</figcaption></figure>
+    <figure><img src="img/now-stair.jpg" alt="Kael's crescent swing on the Stair terrace with a tutorial box"><figcaption><b>The Stair in play.</b> The crescent swing and the hooked blade. The first tutorial box sits over the middle of the fight.</figcaption></figure>
+    <figure><img src="img/now-table.jpg" alt="3D comic panel of the Gilding table with a bowl"><figcaption><b>The Table.</b> The throat comes out into a bowl. "Why everybody on my tier sounded alike."</figcaption></figure>
+    <figure><img src="img/now-camp.jpg" alt="2D pixel camp at night with tents and cadets"><figcaption><b>The Camp (day 3).</b> Fetch wood, raise water, light the fire. Readable but very dark; the objective text is small.</figcaption></figure>
+    <figure><img src="img/now-island.jpg" alt="2D stealth map with a valve marker and a lamp"><figcaption><b>The Island (night 25).</b> Shut the lamp valve unseen. Stealth is back, and it's in the Assay.</figcaption></figure>
+    <figure><img src="img/now-ridge.jpg" alt="2D camp with campfire and coloured House flags"><figcaption><b>The Lamp (night 28).</b> Find who is signalling from the ridge, then name them at the fire. A deduction mission.</figcaption></figure>
+    <figure><img src="img/now-valley.jpg" alt="Arena fight on the painted valley with a 13-hit counter"><figcaption><b>The Valley.</b> Now on the painted backdrop with rebuilt bodies. The HUD fits; the crowd fight is still busy.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>How it looked: from the first build to today</h2>
+  <p>Each row is an old version checked out of the repo and run with the same script. The script takes the title, a new game, and the dev menu's Valley fight and High Docks, where the build had them. Times are Eastern. The repo starts at v0.6; v0.1 to v0.5 exist only in the changelog.</p>
+  <div>
+<div class="stage"><div class="when">Nov 17 · 11:35 am · v0.6 · 6da12c0</div><h3>A pixel RPG below ground</h3><p>The first commit in the repo. The title is a carved-stone menu over a dark tile map; the new game opens on Seren under a shaft of light, with portraits and a dialogue box.</p><div class="row"><img src="img/6da12c0-1title.jpg" alt="First SOOTBORN title, Book One The First Shift"><img src="img/6da12c0-2newgame.jpg" alt="Pixel room with Kael, Seren and a light shaft"></div></div>
+<div class="stage"><div class="when">Nov 17 · 3:37 pm · v0.8 · 16f0378</div><h3>The art pass</h3><p>Stone walls get texture, the floor gets grating and the light shaft gets a lamp. Same scene, more place. Day 2, the combat foundation and the cutaway map arrived twenty minutes earlier.</p><div class="row"><img src="img/16f0378-1title.jpg" alt="Title after the art pass"><img src="img/16f0378-2newgame.jpg" alt="Seren's room after the art pass"></div></div>
+<div class="stage"><div class="when">Nov 18 · 1:06 am · v0.11 · ee9e2a2</div><h3>The Assay and the world panel</h3><p>A new game now opens on the cutaway of Tiers 4 to 9 around the Deep Array. A film opening, save slots and a Checkpoints (dev) entry arrive. The Assay's first 3D fights land here too; in this build the dev route drops to the pixel tunnel.</p><div class="row"><img src="img/ee9e2a2-1title.jpg" alt="Title with Checkpoints (dev)"><img src="img/ee9e2a2-2newgame.jpg" alt="Cutaway of the tiers and the Deep Array"><img src="img/ee9e2a2-4valley.jpg" alt="Dark pixel tunnel scene"></div></div>
+<div class="stage"><div class="when">Nov 18 · 8:17 pm · v0.20 · 47728f3</div><h3>"Every breath is hers." Real 3D above ground</h3><p>The tagline replaces Book One. The Valley is a full 3D battle on green grass with jointed models, lighting and a crowd. This is the chaotic group fight your v0.12 notes described.</p><div class="row"><img src="img/47728f3-1title.jpg" alt="Title with the tagline Every breath is hers"><img src="img/47728f3-4valley.jpg" alt="Full 3D Valley battle with blocky fighters"></div></div>
+<div class="stage"><div class="when">Nov 18 · 10:03 pm · v0.24 · 005f790</div><h3>The first review's build</h3><p>Forms, four finishers, fury and Memory Arts. Kael blooms gold at high fury. The 2D Drill was the fight style you said you wanted more of.</p><div class="row"><img src="img/005f790-4valley.jpg" alt="The Valley at v0.24 with FURY and 8 hits"><img src="img/005f790-drill.jpg" alt="2D Drill fight from the first review"></div></div>
+<div class="stage"><div class="when">Nov 19 · 7:15 am · v0.29 · 946f4a9</div><h3>The dev menu and the High Docks</h3><p>The title opens on a full dev menu: training room, fights, Assay missions, Levels in 3D, story beats and cutscenes. The High Docks appears as a third-person level with a comic title card.</p><div class="row"><img src="img/946f4a9-1title.jpg" alt="Dev menu at v0.29"><img src="img/946f4a9-5docks.jpg" alt="The High Docks title card"><img src="img/946f4a9-4valley.jpg" alt="The Valley at v0.29"></div></div>
+<div class="stage"><div class="when">Nov 19 · 11:58 am · v0.42 · cf1dceb</div><h3>Rebuilt bodies, the painted valley</h3><p>Arena fighters get new bodies and the Valley moves onto a painted backdrop with a crowd of cadets. The docks level has its inked panels and caption boxes.</p><div class="row"><img src="img/cf1dceb-4valley.jpg" alt="The Valley on the painted backdrop at v0.42"><img src="img/cf1dceb-5docks.jpg" alt="High Docks comic panel at v0.42"></div></div>
+<div class="stage" style="border-bottom:0"><div class="when">Nov 19 · 2:28 pm · v0.48 · today</div><h3>Today</h3><p>Three third-person levels, the Table and seven 2D missions. See the frames above.</p><div class="row"><img src="img/now-docks-rook.jpg" alt="Today's High Docks"><img src="img/now-valley.jpg" alt="Today's Valley"><img src="img/now-stair.jpg" alt="Today's Stair"></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="flag">
+    <h3>Before anything new: play it start to finish</h3>
+    <p>No changelog entry since v0.25 records a full run by hand. Your play notes show you've tried the levels on the phone (the dots, the hook, the jarring start), and each note was fixed within the hour. But the newest versions were checked by a bot that dodges better than people, never uses the hook, the kick, the jump or ELEVEN, and can't measure a phone. One play-through on the phone with the frame-time readout on would tell you more than the next five versions.</p>
+  </div>
+</section>
+
+<section>
+  <h2>How the story is layered</h2>
+  <p>The game still tells two stories at once: <b>Below</b> moves a day at a time, <b>Above</b> arrives in dreams years ahead. Left to right is the order the player sees things; bottom to top is when they happen. New since the first review: the Table, five Assay missions, No Gloves, and play in Part Two.</p>
+  <div class="legend">
+    <span><i style="background:var(--below)"></i>Below (Cinderwell)</span>
+    <span><i style="background:var(--train)"></i>Gilding and training</span>
+    <span><i style="background:var(--assay)"></i>The Assay</span>
+    <span><i style="background:var(--spire)"></i>The Spire and the war</span>
+    <span>● scene &nbsp; ■ fight &nbsp; ◆ level you walk</span>
+  </div>
+  <div class="scroll"><svg id="braid" role="img" aria-label="Play order against story time"></svg></div>
+  <p class="hint">Scroll sideways on a phone. Numbers match the list below. I placed each Assay mission before the fight it hands back to, going by the bible; I didn't play through to confirm the exact order.</p>
+  <ol class="play" id="playlist"></ol>
+
+  <div class="grid2">
+    <div class="card"><h3>What changed</h3>
+      <ul>
+        <li><b>Part Two has ground to stand on.</b> Riser Nine, the High Docks and the Stair sit at +5, +7 and +9, so the climb now has a played step at each rise.</li>
+        <li><b>The braid comes back below twice</b> in Part Two: Tavi chalking the sun at +5, and Mara at Tier Six.</li>
+        <li><b>The Assay is walked, not only fought.</b> Five nights on foot fill the gaps between the dated fights.</li>
+        <li><b>One canon sheet</b> now dates every event, from the wedding at −1 to Lift Zero at +9.</li>
+      </ul></div>
+    <div class="card"><h3>Where it still loses the thread</h3>
+      <ul>
+        <li><b>The Assay is still shown out of order.</b> It opens on day 40, and the arrival, the Island and the Standard all come after the Keep. The calendar strip helps, and you decided to keep the order. Play it once and see whether the Standard after the Keep still lands.</li>
+        <li><b>Chapter 1 (+4) still has one fight and nothing to walk.</b> The clerk years, the heart of the secret identity, are told.</li>
+        <li><b>Chapter 4 (+7 to +9) covers two years</b> in two 2D fights where you aren't Kael. The low point is told.</li>
+      </ul></div>
+  </div>
+
+  <h3>The Assay, in the order shown</h3>
+  <div class="scroll"><svg id="assay" role="img" aria-label="Assay beats: order shown against day of the Assay"></svg></div>
+  <p class="hint">Green circles are fights; diamonds are the new 2D missions.</p>
+
+  <h3>Canon settled since the first review</h3>
+  <div class="scroll"><table>
+    <tr><th>Item</th><th>Now</th></tr>
+    <tr><td>Length of the Assay</td><td>One season, about fifty days. "Year-long" is retired.</td></tr>
+    <tr><td>The High Docks</td><td>+7, ending chapter 3.</td></tr>
+    <tr><td>Brand</td><td>Struck Hollis at year 0, deserted within the year, trained Kael, dies on the dock stair at +7: "waiting seven years for a stair."</td></tr>
+    <tr><td>Inspector Vale</td><td>Born on Tier Four, the top of Cinderwell. Ends on a wheel on Tier Eight.</td></tr>
+    <tr><td>Celestine and Lucan</td><td>The Accredited bear late and live long. She is 70 at +6; Lucan was born when she was 50.</td></tr>
+    <tr><td>The leaf in Lift Zero</td><td>Ilse Marrin sent it.</td></tr>
+    <tr><td>What Celestine knew</td><td>She recognised him at the Pinning and let him rise as her successor (v0.44). This replaces "she finds out at +6."</td></tr>
+    <tr><td>Still open</td><td>The Warden Captain at Riser Nine has no name.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Against Red Rising</h2>
+  <p>Both run from a wife's execution to the fall of the people who ordered it. The first review found SOOTBORN missing a fall, a rival and follow-through on the boy he kills. Two of those three are now in.</p>
+  <div class="scroll"><svg id="rr" role="img" aria-label="Story years in the Red Rising trilogy and in SOOTBORN"></svg></div>
+  <div class="scroll"><table>
+    <tr><th>Red Rising</th><th>SOOTBORN now</th><th>Fit</th></tr>
+    <tr><td>Eo sings and is hanged</td><td>Seren takes the blame and walks into the furnace; the tier hums</td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>Carved into a Gold</td><td>The Table: bones, throat and eyes taken; he refuses the hands</td><td><span class="chip c-own">Better</span></td></tr>
+    <tr><td>The Passage: he kills a boy he liked</td><td>The Pairing, and nine years of Maren Aldane, Teo's sister</td><td><span class="chip c-good">Now pays off</span></td></tr>
+    <tr><td>The Institute</td><td>The Assay, now with ranking boards, patrons, wagers, flying Proctors, grounded blades</td><td><span class="chip c-warn">Very close</span></td></tr>
+    <tr><td>Years in the court</td><td>The Count hall, the rings, the Clerk's desk</td><td><span class="chip c-warn">Still compressed</span></td></tr>
+    <tr><td>The Iron Rain</td><td>Riser Nine, the High Docks, the Fall</td><td><span class="chip c-good">More</span></td></tr>
+    <tr><td>Betrayal at the triumph</td><td>Maren gives the dock office the hour; Brand dies; a month on a barge</td><td><span class="chip c-own">Its own</span></td></tr>
+    <tr><td>The feral lieutenant</td><td>Tavi at his shoulder up the Stair; Petra and Oswin in the Assay</td><td><span class="chip c-warn">Better, still thin</span></td></tr>
+    <tr><td>An equal who becomes a partner</td><td>Wren: the Island, the desk, the manifold, the rail, Row K</td><td><span class="chip c-good">Slow-built</span></td></tr>
+    <tr><td>A cunning rival his age</td><td>Tyr Cade suspects; Oswin becomes the Auditor's Blade</td><td><span class="chip c-warn">Tragic, not cunning</span></td></tr>
+    <tr><td>The giant who holds the line</td><td>Brand on the dock stair, now played as Brand</td><td><span class="chip c-good">Close, and played</span></td></tr>
+    <tr><td>The ruler falls</td><td>Celestine knew all along and chose him; strike her line or send her below</td><td><span class="chip c-own">Its own</span></td></tr>
+  </table></div>
+  <p class="meta">On staying distinct: the Assay additions move it closer to its source. Proctors hovering on boots, Houses with standards, patrons and a keep all track the Institute. The original parts (the boards as a shift rota, cairns marked BALANCED, the vent stack running on Cinderwell's air) are the right direction. I'm not a lawyer; a short review of the Assay before a Steam page is still sensible.</p>
+</section>
+
+<section>
+  <h2>Mechanics</h2>
+  <h3>Which systems are alive in which chapter</h3>
+  <p>At v0.24, everything but fights and panels stopped after Day 2. Now walking, stealth and choices come back in the Assay and in Part Two.</p>
+  <div class="scroll"><table class="mx" id="mx"></table></div>
+  <div class="legend"><span><i style="background:rgba(224,176,74,.75)"></i>in use</span><span><i style="background:rgba(224,176,74,.28)"></i>light use</span></div>
+
+  <h3>Play by part of the story</h3>
+  <div class="card stack" id="fights"></div>
+  <div class="legend" id="fleg"></div>
+
+  <div class="grid2">
+    <div class="card"><h3>Three ways Kael fights</h3>
+      <ul>
+        <li><b>2D pixel fights</b> (Below, training, chapter 4): the sprite brawler with a redrawn cadet, a shaped blade, a crescent swing and four hit reactions.</li>
+        <li><b>Arena fights</b> (the Assay, chapters 1 to 5): 21 moves, forms, finishers, stagger, style rank. Three now sit on the painted valley.</li>
+        <li><b>Third-person levels</b>: a five-beat chain from one button, kick, hook, boots, the Turn and the Riposte, the Count, ELEVEN. Fury shows as gold on Kael.</li>
+        <li>Each was improved today. They don't share a button map, a hook rule or a finisher, so what a player learns in one doesn't carry to the next.</li>
+      </ul></div>
+    <div class="card"><h3>Everything else</h3>
+      <ul>
+        <li><b>Stealth:</b> the heist, the Island, the Dais, the Count hall.</li>
+        <li><b>Puzzles and tasks:</b> the pipe bleed, the breaker, the Camp's pump, Riser Nine's pump and pylon, the Lamp's deduction.</li>
+        <li><b>Choices:</b> drive, the fury count, the rays, the Tier Four order, Lucan, Maren (two flags), Wren (three), the doors, the last choice. Several now land in chapter 5.</li>
+        <li><b>Presentation:</b> pixel panels, films, 3D comic panels with halftone, generated music on the shift song.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Scorecard</h2>
+  <p class="meta">My read, out of 5. A grey tick marks the first review's score.</p>
+  <div class="card"><div class="score" id="score"></div></div>
+</section>
+
+<section>
+  <h2>Succeeding</h2>
+  <ul>
+    <li><b>The story is finished and consistent.</b> One canon sheet, a frozen plot, and the first review's six conflicts settled.</li>
+    <li><b>The Table.</b> The Gilding drawn as a 3D comic with no fighting is the strongest new idea, and one of the game's best scenes.</li>
+    <li><b>The third-person levels have a reason to exist.</b> Hold, raid, ascent, each one a turn in the story, not a set piece bolted on.</li>
+    <li><b>The world above is written as carefully as Cinderwell.</b> Seat knives, the bells, "noted" as a debt, the painted line on the service stair.</li>
+    <li><b>Your notes get acted on fast.</b> The dots, the hook, the jarring start and the ELEVEN request were each answered within an hour or two.</li>
+    <li><b>Process.</b> Bots that fight whole levels, a frame-time readout, and a changelog that says plainly what wasn't checked.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Lacking</h2>
+  <ul>
+    <li><b>Hand play.</b> No full run since v0.24, and the guards were made tougher against a bot.</li>
+    <li><b>One control language.</b> Three fighting systems with different buttons and rules.</li>
+    <li><b>Phone performance.</b> The levels draw tens of thousands of triangles; Riser Nine added about 16,000 more in v0.47. Never measured.</li>
+    <li><b>Dark 2D nights.</b> Every Assay mission I captured is at night, dim green on black, with small objective text.</li>
+    <li><b>Chapter 1 and chapter 4.</b> The clerk years and the two years in the weather are still mostly told.</li>
+    <li><b>Kael's model.</b> Rounder now, but the head, hands and face are still simple; the changelog lists it as open.</li>
+    <li><b>Scope.</b> 24 versions in 16 hours across four play styles. The game is broad; it now needs to get consistent.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Known bugs and risks</h2>
+  <div class="scroll"><table>
+    <tr><th>Level</th><th>Issue</th><th>Source</th></tr>
+    <tr><td><span class="sev c-crit">Check first</span></td><td>Phone frame rate in the three levels has never been measured</td><td>Changelog</td></tr>
+    <tr><td><span class="sev c-crit">Check first</span></td><td>v0.48's tougher guards were tuned against a bot that never hooks, kicks, jumps or uses ELEVEN</td><td>Changelog</td></tr>
+    <tr><td><span class="sev c-crit">Check first</span></td><td>Whether the 3D levels start inside the Claude app; the fallback is the 2D fight</td><td>Changelog</td></tr>
+    <tr><td><span class="sev c-warn">Visible</span></td><td>2D Assay missions are very dark, and the objective text is small</td><td>Seen in capture</td></tr>
+    <tr><td><span class="sev c-warn">Visible</span></td><td>The Stair's first tutorial box covers the middle of the fight</td><td>Seen in capture</td></tr>
+    <tr><td><span class="sev c-warn">Visible</span></td><td>New Part Two scenes reuse old backdrops (the tunnel, the desk, the anteroom)</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Known gap</span></td><td>Lock-on is not on the touch pad</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Known gap</span></td><td>The hand-off between the 2D world and the arena fights hasn't been looked at</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Untested</span></td><td>Held JUMP didn't register on the Stair in the slow test browser</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Untested</span></td><td>Hovering may be too safe: he can't be hit above about waist height</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Untested</span></td><td>The 2D edge bounce may make some fights too easy</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Untested</span></td><td>Whether moving three fights onto the painted valley lost the 3D camera you liked</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Untested</span></td><td>ELEVEN's last close shot may be too crowded on a small screen</td><td>Changelog</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Ideas: unfinished, missing, unexplored</h2>
+  <p>Everything here fits the engines already in the game: the 2D world, the brawler, the arena renderer and the Second Chance levels.</p>
+  <div class="grid2">
+    <div class="card"><h3>Unfinished</h3>
+      <ul>
+        <li>Kael's head, hands and face in the levels.</li>
+        <li>The levels' graphics pass the changelog calls "mostly still to do".</li>
+        <li>ELEVEN in the manner of Zenless Zone Zero, as you asked. The four-stage version exists; it hasn't been judged in motion.</li>
+        <li>The 2D fights above ground, which your notes say need the most work.</li>
+        <li>A name for the Warden Captain.</li>
+      </ul></div>
+    <div class="card"><h3>Missing</h3>
+      <ul>
+        <li>Something to walk in chapter 1.</li>
+        <li>Two years in the weather (chapter 4) as play, not narration.</li>
+        <li>A quiet scene with the Unlit as an army, between the Fall and the Stair.</li>
+        <li>One controls card that holds across all three fighting styles.</li>
+      </ul></div>
+    <div class="card"><h3>Unexplored (reuse what is built)</h3>
+      <ul>
+        <li><b>The service stair, chapter 1.</b> A third-person level with no fighting: a clerk walking the Spire's rings on the painted line, kneeling at the bells. Step off and you lose a day of air. That is the secret identity as play, and it uses the level engine as it is.</li>
+        <li><b>A barge, chapter 4.</b> The boots and the hook on a moving deck in the weather.</li>
+        <li><b>The ending as a Table.</b> You've decided the ending is a film. The 3D comic format would make it the most finished-looking film in the game.</li>
+        <li><b>A suspicion meter in Spire talk</b>, and <b>the Count as a puzzle</b>, from the first review. Both still fit.</li>
+      </ul></div>
+    <div class="card"><h3>Small, high value</h3>
+      <ul>
+        <li>Brighter nights or a lamp radius in the 2D missions; larger objective text.</li>
+        <li>Lock-on on the touch pad.</li>
+        <li>A small mode icon on each chapter card (2D, arena, level) so the player knows what is coming.</li>
+        <li>Delay the Stair's first tutorial box until the first guard is down, or move it to the edge.</li>
+        <li>Chapter select after THE END.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Development timeline</h2>
+  <p>Dated from the repo. SOOTBORN's folder starts at v0.6 at 11:35 am on 17 November and has had 69 commits since. The first review looked at v0.24 at 10:03 pm on the 18th.</p>
+  <div class="scroll"><svg id="commits" role="img" aria-label="SOOTBORN commits per hour, 17 to 19 November"></svg></div>
+  <div class="card" id="devlog" style="display:flex;flex-direction:column;gap:12px"></div>
+  <div class="legend" id="catlegend"></div>
+  <p id="tally"></p>
+
+  <h3>Proposed order from here</h3>
+  <div>
+    <div class="phase"><div class="n">1</div><div><h3>Play it on the phone</h3><p>One full run with Settings → Show frame time on. Send back the numbers from each level. Confirm the levels start inside the Claude app. Fight the tougher guards with the hook and ELEVEN.</p></div></div>
+    <div class="phase"><div class="n">2</div><div><h3>One way to fight</h3><p>No new play styles. Give the 2D brawler, the arena and the levels the same strike, kick, hook and guard buttons, and one controls card.</p></div></div>
+    <div class="phase"><div class="n">3</div><div><h3>Readability</h3><p>Brighter 2D nights, larger objective text, lock-on on touch, the Stair's tutorial box, the hand-off from 2D into the arena.</p></div></div>
+    <div class="phase"><div class="n">4</div><div><h3>The two thin chapters</h3><p>The service stair in chapter 1, a barge or the weather in chapter 4, the Unlit before the Stair.</p></div></div>
+    <div class="phase"><div class="n">5</div><div><h3>Look</h3><p>Kael's head and hands, the levels' graphics pass, new backdrops for the reused Part Two scenes, the ending as a Table.</p></div></div>
+    <div class="phase" style="border-bottom:0"><div class="n">6</div><div><h3>Ship prep</h3><p>Phone performance budget, a distinctness review of the Assay, the trademark check, the Steam wrapper.</p></div></div>
+  </div>
+</section>
+
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const el=(p,t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;p.appendChild(e);return e;};
+const COL={B:css('--c2'),T:css('--c6'),A:css('--c3'),S:css('--c1')};
+const INK=css('--ink'),INK2=css('--ink2'),MUT=css('--muted'),LINE=css('--line'),SURF=css('--surface'),GOLD=css('--gold');
+const mark=(g,x,y,k,c)=>{const a={fill:c,stroke:SURF,'stroke-width':2};
+  if(k===1)el(g,'rect',{x:x-6,y:y-6,width:12,height:12,rx:2,...a});
+  else if(k===2)el(g,'path',{d:`M${x},${y-8} L${x+8},${y} L${x},${y+8} L${x-8},${y} Z`,...a});
+  else el(g,'circle',{cx:x,cy:y,r:6,...a});};
+const SYM=['●','■','◆'];
+
+/* braid */
+const ROWS=['A year before','Year 0: heist, furnace','+41 to +160 days','+6 to +15 months: Gilding','Training (+2 to +2½)','+4: the Assay','+4: the Post','+5','+6','+7','+7 to +9','+9'];
+const P=[
+['Opening film: the furnace',1,'B',0],['Opening film: Assay montage',5,'A',0],['The Valley (day 40)',5,'A',1],
+['Proposal and wedding',0,'B',0],['Fever, the plan, the heist',1,'B',2],['Audit, furnace, the tin',1,'B',2],
+['The Pairing (night 1)',5,'A',1],['Day 1 in Ashgate',2,'B',2],['Dream: the Table (the Gilding)',3,'T',0],
+['The Drill (+2)',4,'T',1],['Mission: the Camp (day 3)',5,'A',2],['The Ford (day 19)',5,'A',1],['Day 2: the Ember Ring',2,'B',1],
+['Mission: the Lamp (night 28)',5,'A',2],['Mission: the Dais (night 30)',5,'A',2],['The Proctor (day 31)',5,'A',1],
+['First Fire, the lantern climb',2,'B',2],['Glimpse: the Count',6,'S',0],['Mission: the Last Night (night 49)',5,'A',2],
+['The Keep (last day)',5,'A',1],['Day 3: Lift Zero, the window, Under the Floor',2,'B',0],['Dream: arriving at the Assay',5,'A',0],
+['Glimpse: the white room',11,'S',0],['Mission: the Island (night 25)',5,'A',2],['The Standard (day 26)',5,'A',1],
+['No Gloves (+2½)',4,'T',1],['Day 4: the Way Out',2,'B',0],['The Pinning',5,'A',1],
+['Ch 1 · the Gallery (Tyr Cade)',6,'S',1],['Ch 2 · the Count hall (if he loses the order)',7,'S',2],['Ch 2 · the Sun (Tavi, below)',7,'B',2],
+['Ch 2 · Riser Nine (third person)',7,'S',2],['Ch 3 · the Son',8,'S',1],['Ch 3 · the High Docks (third person)',9,'S',2],
+['Ch 4 · the Dock Stair (as Brand)',9,'S',1],['Ch 4 · Tier Six Stands (Mara, below)',10,'B',1],['Ch 4 · the Fall',11,'S',1],
+['Ch 5 · the Stair (third person)',11,'S',2],['Ch 5 · Little Ember (Celestine)',11,'S',1],['Ending film: Lift Zero open, Row K',11,'B',0]];
+(function(){
+  const s=document.getElementById('braid'),L=178,T=44,cw=24,rh=28,W=L+P.length*cw+24,H=T+ROWS.length*rh+34;
+  s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);
+  const x=i=>L+i*cw+cw/2,y=r=>T+(ROWS.length-1-r)*rh+rh/2;
+  ROWS.forEach((r,i)=>{el(s,'line',{x1:L,x2:W-12,y1:y(i),y2:y(i),stroke:LINE,'stroke-width':1});el(s,'text',{x:L-10,y:y(i)+4,'text-anchor':'end','font-size':12,fill:INK2},r);});
+  const dx=L+28*cw;el(s,'line',{x1:dx,x2:dx,y1:T-18,y2:H-30,stroke:MUT,'stroke-dasharray':'4 4'});
+  el(s,'text',{x:dx-8,y:T-22,'text-anchor':'end','font-size':12,'font-weight':600,fill:INK},'Part One: the braid');
+  el(s,'text',{x:dx+8,y:T-22,'font-size':12,'font-weight':600,fill:INK},'Part Two: climbs, with two returns below');
+  el(s,'polyline',{points:P.map((p,i)=>`${x(i)},${y(p[1])}`).join(' '),fill:'none',stroke:MUT,'stroke-width':1.5,'stroke-linejoin':'round'});
+  P.forEach((p,i)=>{const g=el(s,'g',{});el(g,'title',{},`${i+1}. ${p[0]}`);mark(g,x(i),y(p[1]),p[3],COL[p[2]]);
+    el(s,'text',{x:x(i),y:H-12,'text-anchor':'middle','font-size':10,fill:MUT},i+1);});
+  const ol=document.getElementById('playlist');
+  P.forEach(p=>{const li=document.createElement('li');li.innerHTML=`<span style="color:${COL[p[2]]}">${SYM[p[3]]}</span> ${p[0]}`;ol.appendChild(li);});
+})();
+
+/* assay order */
+(function(){
+  const D=[['Valley','day 40',40,1],['Pairing','night 1',1,1],['Camp','day 3',3,2],['Ford','day 19',19,1],['Lamp','night 28',28,2],['Dais','night 30',30,2],['Proctor','day 31',31,1],['Last Night','night 49',49,2],['Keep','last day',50,1],['Arrival','day 0',0,0],['Island','night 25',25,2],['Standard','day 26',26,1],['Pinning','after',53,0]];
+  const s=document.getElementById("assay"),L=56,cw=60,W=L+D.length*cw+10,T=16,PH=170,H=T+PH+58;
+  s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);
+  const x=i=>L+i*cw+cw/2,y=d=>T+PH-d/53*PH;
+  [0,10,20,30,40,50].forEach(v=>{el(s,'line',{x1:L,x2:W-6,y1:y(v),y2:y(v),stroke:LINE});el(s,'text',{x:L-8,y:y(v)+4,'text-anchor':'end','font-size':11,fill:MUT},'day '+v);});
+  el(s,'polyline',{points:D.map((d,i)=>`${x(i)},${y(d[2])}`).join(' '),fill:'none',stroke:COL.A,'stroke-width':2,'stroke-linejoin':'round'});
+  D.forEach((d,i)=>{const g=el(s,'g',{});el(g,'title',{},`Shown ${i+1}: ${d[0]}, ${d[1]}`);mark(g,x(i),y(d[2]),d[3],COL.A);
+    el(s,'text',{x:x(i),y:H-34,'text-anchor':'middle','font-size':11.5,'font-weight':600,fill:INK},d[0]);
+    el(s,'text',{x:x(i),y:H-19,'text-anchor':'middle','font-size':11,fill:INK2},d[1]);
+    el(s,'text',{x:x(i),y:H-5,'text-anchor':'middle','font-size':10,fill:MUT},'shown '+(i+1));});
+})();
+
+/* RR tracks */
+(function(){
+  const s=document.getElementById('rr'),L=18,W=760,H=236,X=v=>L+v/9*(W-2*L-8);
+  s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);
+  for(let v=0;v<=9;v++){el(s,'line',{x1:X(v),x2:X(v),y1:34,y2:H-28,stroke:LINE});el(s,'text',{x:X(v),y:H-10,'text-anchor':v===0?'start':'middle','font-size':11.5,fill:MUT},v===0?'the death':'+'+v);}
+  const track=(yy,name,segs)=>{el(s,'text',{x:L,y:yy-10,'font-size':13,'font-weight':600,fill:INK},name);
+    segs.forEach(([a,b,lab,col,op])=>{const g=el(s,'g',{});el(g,'title',{},`${lab}: years ${a} to ${b}`);
+      el(g,'rect',{x:X(a)+1,y:yy,width:X(b)-X(a)-2,height:26,rx:3,fill:col,'fill-opacity':op});
+      el(s,'text',{x:X(a)+7,y:yy+42,'font-size':11.5,fill:INK2},lab);});};
+  track(52,'Red Rising trilogy (approximate)',[[0,0.5,'Mine',COL.B,1],[0.5,2,'Institute',COL.A,1],[2,4,'gap',MUT,.25],[4,5,'Golden Son',COL.S,1],[5,7,'Morning Star',COL.S,.6]]);
+  track(140,'SOOTBORN (canon sheet)',[[0,0.5,'Below',COL.B,1],[0.5,4,'Gilding and training',COL.T,1],[4,4.2,'',COL.A,1],[4.2,7,'Clerk years, raids',COL.S,1],[7,9,'The weather, the war',COL.S,.6]]);
+  el(s,'text',{x:X(4)+2,y:182,'font-size':11.5,fill:INK2},'');
+  el(s,'text',{x:X(4.1),y:130,'text-anchor':'middle','font-size':11,fill:INK2},'Assay: 50 days');
+})();
+
+/* matrix */
+(function(){
+  const C=['Prologue','Day 1','Day 2','Day 3','Day 4','Assay','P2·1','P2·2','P2·3','P2·4','P2·5'];
+  const M=[['2D walk-around','11100101000'],['Third-person levels','00000001101'],['Puzzles and tasks','11100202000'],['Stealth','10100101000'],
+    ['Choices with later effects','11120222101'],['2D fights','11111000010'],['Arena fights','12111111111'],['Panels, films, comics','11111111111'],['Dreams and flash-forwards','11111100000']];
+  const t=document.getElementById('mx');
+  t.innerHTML='<tr><th>System</th>'+C.map(c=>`<th>${c}</th>`).join('')+'</tr>'+M.map(([n,r])=>'<tr><td>'+n+'</td>'+[...r].map(v=>`<td class="${v==='1'?'on':v==='2'?'half':''}" aria-label="${v==='0'?'not used':v==='1'?'in use':'light use'}"></td>`).join('')+'</tr>').join('');
+})();
+
+/* play by part */
+(function(){
+  const K=[['2D fight',COL.B],['Arena fight',COL.A],['2D mission',GOLD],['Third-person level',COL.S]];
+  document.getElementById('fleg').innerHTML=K.map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('');
+  const F=[['Below',[4,0,0,0]],['Training',[2,0,0,0]],['The Assay',[0,7,5,0]],['Part Two',[2,4,2,3]]];
+  const b=document.getElementById('fights');
+  F.forEach(([n,v])=>{const r=document.createElement('div');r.className='row';const tot=v.reduce((a,c)=>a+c,0);
+    r.innerHTML=`<span>${n}</span><div class="segs">${v.map((c,i)=>c?`<i style="flex:${c};background:${K[i][1]};${i===3?'color:#fff':''}" title="${n}: ${c} ${K[i][0]}${c>1?'s':''}">${c}</i>`:'').join('')}<span style="flex:${12-tot}"></span></div>`;b.appendChild(r);});
+})();
+
+/* score */
+(function(){
+  const S=[['Story and writing',5,4.5,'Complete, frozen at v0.44, one canon sheet. Maren, Oswin and the Table deepen it.'],
+  ['Combat depth',4.5,4.5,'Three fighting systems, each deep. Perhaps more than one player will learn.'],
+  ['Combat feel',3.5,4,'Your notes: 2D fights above ground need work, the hook did nothing, Kael needs smoothing. Fixes are untried by hand.'],
+  ['3D art',3.5,2.5,'Cel shading, ink and comic panels give the levels and the Table a look of their own. Figures are still simple.'],
+  ['2D art',3.5,3.5,'Redrawn cadet and hit reactions. The Assay nights are too dark.'],
+  ['Part Two parity',3.5,2.5,'Play in chapters 2, 3 and 5. Chapters 1 and 4 still mostly told.'],
+  ['Choice and consequence',3.5,2.5,'Maren, Wren, Lucan and the doors pay off in chapter 5.'],
+  ['Stealth and puzzles',3,2.5,'Back in the Assay and the Count hall. Still light.'],
+  ['Fight readability',3,2.5,'HUD fits, painted backdrops, gold glow instead of red. Crowd fights are still busy.'],
+  ['Audio',3,3,'Unchanged since the first review; still not judged by ear.'],
+  ['Consistency across modes',2,null,'Different buttons, hook rules and finishers in each style.'],
+  ['Testing and stability',2.5,2,'Bots now fight whole levels. No full run by hand; phone frame rate unknown.']];
+  const b=document.getElementById('score');
+  S.forEach(([n,v,o,w])=>{b.insertAdjacentHTML('beforeend',`<span>${n}</span><div class="bar" style="position:relative" title="${n}: ${v} of 5${o!=null?' (first review '+o+')':' (new)'}"><i style="width:${v*20}%;background:${v>=4?GOLD:v<=2?css('--crit'):MUT}"></i>${o!=null&&o!==v?`<b style="position:absolute;left:calc(${o*20}% - 1px);top:-3px;width:2px;height:16px;background:${INK2}"></b>`:''}</div><span class="n">${v.toFixed(1)}</span><div class="why">${w}${o!=null&&o!==v?' (was '+o.toFixed(1)+')':o==null?' (new)':''}</div>`);});
+})();
+
+/* commits per hour */
+(function(){
+  const H={'11-17 11':1,'11-17 15':4,'11-17 16':1,'11-17 17':1,'11-18 01':5,'11-18 02':1,'11-18 09':1,'11-18 10':2,'11-18 11':1,'11-18 12':1,'11-18 13':2,'11-18 14':1,'11-18 16':1,'11-18 17':3,'11-18 18':2,'11-18 20':2,'11-18 21':2,'11-18 22':2,'11-18 23':1,'11-19 00':3,'11-19 06':1,'11-19 07':4,'11-19 08':5,'11-19 09':4,'11-19 10':8,'11-19 11':4,'11-19 12':2,'11-19 13':2,'11-19 14':2};
+  const hours=[];for(const d of ['11-17','11-18','11-19'])for(let h=0;h<24;h++){const k=d+' '+String(h).padStart(2,'0');if(d==='11-17'&&h<11)continue;if(d==='11-19'&&h>14)continue;hours.push([k,H[k]||0]);}
+  const s=document.getElementById('commits'),W=760,Ht=200,L=36,B=160,cw=(W-L-10)/hours.length,max=8;
+  s.setAttribute('viewBox',`0 0 ${W} ${Ht}`);s.setAttribute('width',W);s.setAttribute('height',Ht);
+  const y=v=>B-v/max*120;
+  [0,4,8].forEach(v=>{el(s,'line',{x1:L,x2:W-10,y1:y(v),y2:y(v),stroke:LINE});el(s,'text',{x:L-6,y:y(v)+4,'text-anchor':'end','font-size':11,fill:MUT},v);});
+  const rev=hours.findIndex(h=>h[0]==='11-18 22');
+  el(s,'line',{x1:L+rev*cw+cw*0.1,x2:L+rev*cw+cw*0.1,y1:34,y2:B,stroke:GOLD,'stroke-dasharray':'2 3'});
+  el(s,'text',{x:L+rev*cw-4,y:46,'text-anchor':'end','font-size':11.5,fill:GOLD},'first review (v0.24)');
+  hours.forEach(([k,v],i)=>{if(!v)return;const g=el(s,'g',{});el(g,'title',{},`${k}:00 — ${v} commit${v>1?'s':''}`);el(g,'rect',{x:L+i*cw+1,y:y(v),width:Math.max(2,cw-2),height:B-y(v),rx:1.5,fill:i>rev||(i===rev&&false)?COL.S:MUT});});
+  hours.forEach(([k],i)=>{const h=+k.slice(6);if(h===0){el(s,'line',{x1:L+i*cw,x2:L+i*cw,y1:20,y2:B,stroke:MUT,'stroke-dasharray':'3 4'});el(s,'text',{x:L+i*cw+4,y:28,'font-size':12,'font-weight':600,fill:INK},{'11-18':'Nov 18','11-19':'Nov 19 (today)'}[k.slice(0,5)]);}if(h%6===0)el(s,'text',{x:L+i*cw,y:B+16,'text-anchor':'middle','font-size':10.5,fill:MUT},h===0?'12a':h===12?'12p':(h>12?h-12+'p':h+'a'));});
+  el(s,'text',{x:L+4,y:28,'font-size':12,'font-weight':600,fill:INK},'Nov 17');
+  el(s,'text',{x:W-10,y:Ht-6,'text-anchor':'end','font-size':11,fill:INK2},'commits per hour, Eastern time · since the first review in blue');
+})();
+
+/* dated log */
+(function(){
+  const K={S:['Story',css('--c4')],C:['Combat',css('--c2')],L:['Levels and missions',css('--c1')],A:['Art and animation',css('--c3')],U:['Audio',css('--c5')],F:['Fixes, tools, readability',css('--c7')]};
+  document.getElementById('catlegend').innerHTML=Object.values(K).map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('');
+  const D=[['Before 17 Nov · changelog only',[['S','0.1 first slice'],['A','0.2 tunnel, speech bubbles'],['S','0.3 renamed SOOTBORN'],['S','0.4 Kael and Seren, heist, furnace'],['S','0.5 furnace rebuilt']]],
+   ['Nov 17 · Part One takes shape',[['A','11:35 am 0.6 first in the repo'],['S','3:16 pm 0.7 Day 2, combat, map'],['A','3:37 0.8 art pass'],['A','3:53 0.8.1 polish'],['S','4:23 0.9 panels, stealth meter'],['F','5:20 0.10 playtest fixes']]],
+   ['Nov 18 · 23 versions in a day',[['C','1:06 am 0.11 the Assay, fury, Memory Arts'],['A','1:42 0.12 real 3D'],['A','1:57 .1 animation'],['A','2:35 .2 postures'],['A','9:48 .3 bloom, rage'],['U','10:09 .4 music'],['U','10:26 .5 music fixed'],['C','11:11 .6 heavy, knockdowns'],['F','12:09 pm .7 readable, calmer'],['F','1:02 .8 dev menu'],['C','1:27 .9 kicks, guard, hook'],['C','2:19 0.13 signatures'],['C','4:32 0.14 difficulty, boots'],['S','5:14 0.15 Day 3'],['S','5:34 0.16 Day 4'],['S','5:55 0.17 Part Two'],['A','6:11 0.18 quality pass'],['C','6:32 0.19 bosses, Mara'],['A','8:17 0.20 models'],['S','8:34 0.21 scenes'],['S','9:03 0.22 two ways of speaking'],['C','9:23 0.23 buffer, stagger'],['C','10:03 0.24 forms, finishers']]],
+   ['Nov 18 late to Nov 19 · since the first review',[['A','10:55 pm 0.25 presets, cel shading'],['F','11:52 0.26 review bug table'],['L','12:56 am 0.27 Camp, Island, Dais; Maren'],['L','6:20 0.28 Count hall, the Sun'],['L','7:15 0.29 the High Docks'],['A','7:28 .1 sky dock'],['F','7:45 .2 in the game frame'],['F','7:49 .3 touch pad'],['C','8:04 .4 blade cuts'],['C','8:10 .5 five-beat chain'],['L','8:36 .6 lead-in, lead-out'],['S','8:46 .7 Part Two map'],['S','8:59 .8 rings, the table'],['L','9:14 0.30 Riser Nine, the Stair'],['A','9:28 .1 brighter, gold glow'],['A','9:45 0.31 Kael, Oswin'],['C','10:06 0.32 light/heavy, ELEVEN'],['A','10:15 0.33 finer dots'],['C','10:25 0.34 one strike button'],['C','10:34 0.35 kick, rage cut-ins'],['S','10:41 0.36 story pass'],['F','10:49 0.37 title cards'],['L','10:53 0.38 Assay lived in'],['L','11:04 0.39 retry, Petra'],['A','11:22 0.40 faint print, ELEVEN'],['L','11:30 0.41 keep board'],['A','11:58 0.42 rebuilt bodies'],['A','12:16 pm 0.43 cadet, crescent'],['S','12:22 0.44 ending settled'],['L','1:08 0.45 the Table'],['A','1:36 0.46 2D hits, dressing'],['L','2:00 0.47 Riser Nine rebuilt'],['F','2:28 0.48 bot-tested guards']]]];
+  const b=document.getElementById('devlog');
+  D.forEach(([d,vs])=>b.insertAdjacentHTML('beforeend',`<div><div style="font-family:var(--display);font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px">${d}</div><div class="vers">${vs.map(([k,t])=>`<span style="background:${K[k][1]}${k==='L'?';color:#fff':''}">${t}</span>`).join('')}</div></div>`));
+  const t={};D[3][1].forEach(([k])=>t[k]=(t[k]||0)+1);
+  document.getElementById('tally').textContent=`Since the first review: ${Object.entries(t).sort((a,b)=>b[1]-a[1]).map(([k,v])=>K[k][0].toLowerCase()+' '+v).join(', ')}. Through v0.24 the work went mostly to story and combat. Since then it has gone mostly to levels and how they look.`;
+})();
+</script>
+</body>
+</html>
