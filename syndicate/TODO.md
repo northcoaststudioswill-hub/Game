@@ -40,8 +40,10 @@ Not done:
 
 ## Fighting
 
+Done: caster weapon finishers (fire bolt, eldritch blast, frost, spark, acid, caster staves) and a second finisher for every melee weapon family (sword, axe, mace and hammer, spear, daggers, rapier), picked half the time.
+
+
 - Rework the older finishers to use the new elbow, knee, wrist and pelvis joints.
-- Weapon finishers for orb, bolt and rod casters.
 - Deeper class mechanics and upgrade trees.
 - Watch every stance in motion through a full bout (checked as still pictures only).
 - Stamping finisher filmed on an opponent that is actually crawling; own-arm finisher on one that has actually lost an arm.
