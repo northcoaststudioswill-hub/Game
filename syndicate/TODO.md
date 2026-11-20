@@ -7,7 +7,7 @@ Kept current as work lands. Newest section first.
 Done so far:
 
 - Hidden roster page: tap the crown five times, type `louie`, or hold both shoulder buttons on the title.
-- Ten guests, exactly the ones Will named, each with their own race, title, moves, ultimate and finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael, Eleven. (Mama, Corbin and Gas Guy were added by mistake and removed. Do not add anyone Will has not asked for.)
+- Ten guests, exactly the ones Will named, each with their own race, title, moves, ultimate and finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael Brennick. (Mama, Corbin and Gas Guy were added by mistake and removed. Do not add anyone Will has not asked for.)
 - Starting a career as a guest: one big button on their card; if all three pages are in use it asks which page they take. The crown opens the list by mouse or touch.
 - Their own body style (round, smooth, big heads, cartoon eyes; Lil Bottie square and chrome; Louie a Shiba; only David keeps the pit's body) and their own clothes and props.
 - Current starters, on the sand when called: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will.
@@ -21,7 +21,7 @@ Done so far:
 
 Not done:
 
-- **Kael and Eleven are invented from three hints** (grav boots; hook, sling blade, "insane moves"). No lore for either is in the repo. Looks, races, titles, move names and lines are placeholders until Will says who they are.
+- **Kael Brennick** is built from Sootborn (the `sootborn` branch: docs/STORY_BIBLE.md): Sootborn race, gilded House Violet look with the washer, the rigging hook line, his blade, the Proctor boots, The Turn, Breach, Shaft Drop, Wide Cut, and ELEVEN as his ultimate; career titles follow his eras (Valve Tech to Edric Sorrel to We). Eleven was his special move, not a separate person, and has been folded into him. Not done: his other Sootborn finishers (Last Bell, Struck Through, Her Name, Nine Floors, On My Breath), Memory Arts, the fury bar.
 - **War Criminal, second half** — the Knockout version goes on to a cyborg Bibi levelling a city while two other real politicians celebrate. Left out on purpose: it shows real people cheering a city being destroyed.
 - **Finisher polish** — every guest now has their own staged finisher, but they are built from text, particles and existing poses. None has bespoke body animation, and the kill camera hides parts of some.
 - **Derek Pulls Up polish** — Marcus is off camera when he says "NOT AGAIN"; no engine or horn sound of its own; Derek does not walk back to the van.
@@ -29,7 +29,6 @@ Not done:
 - **Louie** — on the wolf's skeleton and animations; no airplane ears.
 - **Guest bodies** — share the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **Cinematic art** — the screens are flat shapes and type, far simpler than the Knockout pixel scenes.
-- **Kael should come from Sootborn** — Will says Kael is written in depth there. Sootborn is not in this repository or in the account's other three (kira, itsforfun, renderit, including their side branches); the current Kael is a placeholder until it can be read.
 - **Guest endings** — a one-line card after the normal ending; not seen in a real run.
 - **Attack animations** — each guest now has their own idle, walk and cast poses laid over the frame (Bottie's stiff march and both arms out to fire, Mama carrying the baby, Bibi's wagging finger, Kael's skating lean), but melee swings are still the frame's: Marcus swings the wrench like a hammer, Eleven's blade like an axe.
 - **Guest careers are titles only** — no new moves unlocked by level, no story scenes, no guest-specific ending; the normal ending plays.
