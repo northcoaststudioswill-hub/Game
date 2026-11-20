@@ -232,7 +232,7 @@
     C.limbs = { armL, armR, legL, legR, head, foreL: armL.userData.fore, foreR: armR.userData.fore, shinL: legL.userData.shin, shinR: legR.userData.shin, handL: hL, handR: hR }; C.wHand = hR;
     C.sever = function (part) { const g = C.limbs[part]; if (!g || !g.parent || g.userData.gone) return null; g.userData.gone = 1; const st = new T.Mesh(new T.SphereGeometry(part === 'head' ? 0.15 : 0.11, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a, flatShading: true })); st.position.copy(g.position); st.scale.y = 0.55; g.parent.add(st); const bn = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.1, 5), new T.MeshLambertMaterial({ color: 0xe6dcc4 })); bn.position.copy(g.position); bn.position.y -= 0.04; g.parent.add(bn); return g; };
     // Joint targets are computed per state, then eased toward, so stances blend instead of snapping.
-    let cur = {}, dtp = 1 / 60, lastPT = null, fresh = 0;
+    let cur = {}, dtp = 1 / 60, lastPT = null, fresh = 0, idle0 = 0, twR = 0, twL = 0;
     const CAP = { arx: 30, arz: 30, alx: 30, alz: 30, ll: 22, lr: 22, bx: 12, bz: 10, ty: 16, tz: 12, hx: 14, hz: 14, by: 4.5, bpz: 4.5, kl: 26, kr: 26, er: 30, el: 30, cape: 20, py: 30, wr: 26, wl: 26, nk: 18 };
     const J = (k, v, s) => { if (cur[k] == null) return (cur[k] = v); const a = 1 - Math.pow(1 - Math.min(0.999, s), dtp * 60), m = (CAP[k] || 30) * dtp; let d = (v - cur[k]) * a; if (d > m) d = m; else if (d < -m) d = -m; return (cur[k] += d); };
     const mix = G.lerp, eo = x => 1 - Math.pow(1 - x, 3), ei = x => x * x;
@@ -291,6 +291,9 @@
           else if (FAM === 'heavy') { q.by = k < 0.5 ? Math.sin(w * Math.PI) * 0.3 : -0.14 * (1 - back); q.arx = seq(-0.45, -3.25, 0.5); q.arz = 0; q.alx = seq(-1.45, -3.2, 0.5); q.alz = seq(0.5, 0.25, 0.1); q.ty = 0; q.bx = seq(0.1, -0.32, 0.5); q.hx = seq(0, -0.3, 0.25); q.ll = seq(0.05, 0.2, 0.6); q.lr = seq(-0.05, -0.2, -0.5); }       // both hands, right over the top, and the whole body follows it into the sand
           else if (FAM === 'swing') { const tw = k < 0.5 ? cock * 12.56 : 0; q.spin = k < 0.5 ? tw : null; q.arx = seq(-0.45, -2.2, -1.0); q.arz = seq(0.3, -1.5, 1.4); q.alx = seq(restL, -1.2, -0.3); q.alz = seq(0, 0.9, 0.2); q.bx = seq(0.06, -0.1, 0.2); q.by = seq(0, 0.05, -0.06); }       // twice round the head with the whole body turning under it, then let go at them
           else if (arm === 'staff') { q.arx = seq(-1.15, -2.9, 0.1); q.arz = seq(0.1, -0.3, 0.2); q.alx = seq(-1.0, -2.7, 0.0); q.alz = seq(-0.5, 0.2, 0.3); q.ty = seq(0.55, -0.5, 0.5); q.bx = seq(0.2, -0.2, 0.42); q.by = seq(0, 0.06, -0.1); q.ll = seq(0.05, -0.3, 0.7); q.lr = seq(-0.05, 0.3, -0.6); }       // the butt comes up under the chin, then the head of the staff comes down on the crown
+          else if (arm === 'halberd') { q.by = -0.1 * (k < 0.5 ? cock : 1 - back); q.arx = seq(-0.45, -1.25, -1.05); q.arz = seq(0.3, 1.7, -1.5); q.alx = seq(-1.0, -1.3, -1.1); q.alz = seq(-0.5, 1.3, -1.4); q.ty = seq(0.2, -1.1, 1.1); q.bx = seq(0.1, 0.2, 0.35); q.ll = seq(0.05, 0.3, -0.2); q.lr = seq(-0.05, -0.4, 0.5); }
+          else if (cls === 'fighter' && (arm === 'basic' || !arm)) { q.spin = k < 0.5 ? -cock * 6.283 : null; q.arx = seq(-0.45, -1.6, -1.3); q.arz = seq(0, -1.4, 1.3); q.alx = seq(-1.2, -0.6, -1.0); q.alz = seq(0, 0.6, 0.2); q.bx = seq(0.06, 0.05, 0.35); q.by = -0.05 * (k < 0.5 ? cock : 1 - back); q.ll = seq(0.05, 0.25, 0.45); q.lr = seq(-0.05, -0.25, -0.35); }
+          else if (cls === 'cleric' && (arm === 'basic' || !arm)) { q.by = k < 0.5 ? Math.sin(w * Math.PI) * 0.42 : -0.12 * (1 - back); q.arx = seq(-0.45, -3.1, 0.35); q.arz = seq(0, -0.3, 0.1); q.alx = seq(-0.4, -2.2, 0.2); q.alz = seq(0, 0.5, 0.3); q.bx = seq(0.06, -0.35, 0.6); q.hx = seq(0, -0.3, 0.3); q.ll = q.lr = k < 0.5 ? -Math.sin(w * Math.PI) * 0.5 : 0; }
           else if (arm === 'spear') { q.arx = seq(-0.45, -2.95, -0.85); q.alx = seq(restL, -2.75, -1.05); q.alz = seq(0, -0.3, -0.2); q.bx = seq(0.06, -0.22, 0.62); q.hx = seq(0, -0.3, 0.3); }       // up off the ground and driven down point-first
         }
         if (FAM === 'swing' && step < 2 && !p.mv && p.sty !== 1) { const wh = k < 0.5 ? cock : 1; q.arx = seq(-0.45, -2.55, -0.75); q.arz = seq(0.3, step ? 1.3 : -1.3, step ? -1.2 : 1.2) + Math.sin(k * 14) * 0.25 * (k < 0.3 ? 1 : 0); q.ty = seq(0, step ? -0.9 : 0.9, step ? 0.8 : -0.8); q.bx = seq(0.06, -0.14, 0.28); q.hx = seq(0, -0.2, 0.1); q.alx = seq(restL, -0.6, -0.2); q.alz = seq(0, 0.5, 0.2); }       // a flail or chain is whirled up over the head and brought round, not chopped
@@ -364,7 +367,9 @@
         else if (FAM === 'swing') { q.arx = -0.55 + Math.sin(t * 3.4) * 0.28; q.arz = 0.3 + Math.cos(t * 3.4) * 0.12; q.ty = 0.3; }               // the head never stops moving
         else if (FAM === 'orb') { q.arx = -1.05 + br; q.arz = -0.3; q.alx = -1.05 - br; q.alz = 0.3; q.by += Math.sin(t * 1.6) * 0.012; }
       }
-      q.eR = q.eL = q.fl = q.kn = q.fbx = null;
+      q.eR = q.eL = q.fl = q.kn = q.fbx = null; twR = twL = 0;
+      if (act !== 'idle' || mv || p.guard || !p.ready || p.hurt > 0) idle0 = t; else if (t - idle0 > 2.6 && !look.civ) { const u5 = (t - idle0 - 2.6) % 7.5; if (u5 < 1.2) { const w5 = u5 / 1.2, s5 = Math.sin(w5 * Math.PI);
+        if (FAM === 'heavy') { q.arx = -2.05 - s5 * 0.7; q.bz = s5 * 0.08; q.hz = -s5 * 0.15; } else if (FAM === 'dual' || cls === 'rogue') { twR = w5 * 12.566; twL = -w5 * 12.566; q.arx = -1.25; q.alx = -1.25; } else if (FAM === 'pole') { twR = w5 * 6.283; q.arx = -1.3 - s5 * 0.3; q.ty = 0.55 + s5 * 0.4; } else if (FAM === 'orb' || cls === 'sorcerer') { q.arx = -0.9 - s5 * 1.4; q.alx = -0.9 - Math.sin(w5 * Math.PI + 1.6) * 1.0; q.hx = -s5 * 0.25; } else if (FAM === 'swing') { q.arx = -2.4; } else { twR = w5 * 6.283; q.arx = -1.0 - s5 * 0.5; q.arz = 0.5 * s5; q.hx = 0.2 * s5; } } }
       if (p.ready && act === 'idle' && !p.guard && !(p.hurt > 0) && p.stn && G.STANCE_POSE) { const sf = G.STANCE_POSE[hover ? 'f' : 'g'][p.stn[hover ? 1 : 0]]; if (sf) sf(q, t, mv, robe); }
       if (look.egg && G.EGG_POSE && !(p.hurt > 0)) { try { G.EGG_POSE(look.egg, q, p, act, mv, t); } catch (e) { } }
       if (p.tired && (act === 'idle' || act === 'cheer')) { q.bx += 0.2 + Math.sin(t * 5) * 0.04; q.hx = 0.25; q.by -= 0.04 + Math.abs(Math.sin(t * 2.5)) * 0.02; q.arx += 0.3; }
@@ -398,7 +403,7 @@
         else if (act === 'idle' && mv) wr = sw * 0.22;
         else if (act === 'cast') wr = -0.35 * Math.min(1, k * 2); else if (act === 'release') wr = 0.25 * (1 - k);
         if (act === 'idle' && mv) wl = -sw * 0.2;
-        hR.rotation.x = J('wr', wr, 0.5); hL.rotation.x = J('wl', wl, 0.45); }
+        hR.rotation.x = J('wr', wr, 0.5) + twR; hL.rotation.x = J('wl', wl, 0.45) + twL; }
       if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
       if (robe) robe.rotation.z = mv && !hover ? sw * 0.08 : 0;
       root.rotation.z = 0; root.rotation.x = 0; { const flo = hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl; hovY += ((flo ? 0.16 + Math.sin(t * 2.1) * 0.035 : 0) - hovY) * Math.min(1, dtp * 6); root.position.y = (p.y || 0) + hovY; if (C.ring) { C.ring.position.y = 0.08 - hovY; const want = act === 'ko' || act === 'sit' || act === 'kneel' || p.crawl || (p.y || 0) > 0.05 ? 0 : Math.max(0, Math.min(1, p.rf == null ? 1 : p.rf)); C.ringK = (C.ringK == null ? want : C.ringK) + (want - (C.ringK == null ? want : C.ringK)) * Math.min(1, dtp * 8); C.ring.visible = C.ringK > 0.3; C.ring.scale.setScalar(Math.max(0.3, C.ringK)); C.ring.children.forEach(pl => { pl.rotation.z = t * 0.35 * pl.userData.dir; pl.material.opacity = (pl.userData.dir < 0 ? 0.7 : 1) * Math.min(1, (C.ringK - 0.3) / 0.25); }); } }
