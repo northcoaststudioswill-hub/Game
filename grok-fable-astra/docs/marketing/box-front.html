@@ -1,0 +1,97 @@
+<title>Grok Fable Astra Box Front</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Rubik:ital,wght@0,400;0,600;0,800;1,600&display=swap">
+<style>
+/* Layout: one box face at a big-box 3:4 ratio, centred on a dark desk, with the art-direction note below it.
+   Everything on the face scales with the box (container units), so it reads the same on a phone and a monitor.
+   The face is deliberately too much: word-art title, a starburst, five sticker claims. The note below is calm. */
+:root {
+  color-scheme: dark;
+  --desk: #120a1e;         /* what the box sits on */
+  --void: #1b0b33;
+  --ink: #fff6fb;
+  --ink-dim: #c9b6dd;
+  --pink: #ff2e88;
+  --cyan: #19e3ff;
+  --lime: #b6ff00;
+  --gold: #ffd400;
+  --title: 'Bungee', 'Arial Black', Impact, sans-serif;
+  --shade: 'Bungee Shade', 'Bungee', 'Arial Black', sans-serif;
+  --body: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; }
+body { background: radial-gradient(ellipse at 50% 20%, #2d1450 0%, var(--desk) 70%); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5; min-height: 100%; }
+.stage { padding-block: 32px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+.box { width: min(620px, 100%); max-width: 100%; aspect-ratio: 3 / 4; container-type: inline-size; position: relative; overflow: hidden; background: var(--void);
+  box-shadow: 0 0 0 1px #000, 0 30px 60px rgba(0,0,0,.65), 0 8px 18px rgba(0,0,0,.5); border-radius: 3px; }
+.art { position: absolute; left: 0; top: 25%; width: 100%; height: auto; }
+.shade { position: absolute; inset: 0; background:
+  linear-gradient(180deg, #2a0a52 0%, #5a0f7a 16%, rgba(120,20,140,.85) 25%, rgba(120,20,140,0) 40%, rgba(20,6,40,0) 72%, rgba(20,6,40,.94) 92%); }
+/* a rainbow foil border, because of course */
+.frame { position: absolute; inset: 2.4cqw; border: .7cqw solid transparent; border-image: linear-gradient(135deg, var(--pink), var(--gold), var(--lime), var(--cyan), #b46bff, var(--pink)) 1; pointer-events: none; }
+
+.top { position: absolute; top: 5.2cqw; left: 0; right: 0; text-align: center; }
+.platforms { font-weight: 800; font-size: 2.2cqw; letter-spacing: .42em; color: var(--ink-dim); text-transform: uppercase; }
+.logo { margin: 2.2cqw 0 0; font-family: var(--title); font-weight: 400; line-height: .86; text-transform: uppercase; }
+.logo span { display: block; filter: drop-shadow(.5cqw .5cqw 0 #12002a) drop-shadow(0 0 2.5cqw rgba(0,0,0,.55)); }
+.logo .g { font-size: 15.5cqw; color: #ff8a3d; -webkit-text-stroke: .35cqw #3b0a00; transform: rotate(-3deg); }
+.logo .f { font-size: 12cqw; color: #d9a8ff; -webkit-text-stroke: .35cqw #2a0a52; transform: rotate(2deg) translateX(3cqw); }
+.logo .a { font-size: 15.5cqw; color: var(--cyan); -webkit-text-stroke: .35cqw #05233a; transform: rotate(-2deg); }
+.ribbon { display: inline-block; margin-top: 2.4cqw; background: var(--lime); color: #12002a; font-weight: 800; font-size: 2.35cqw; letter-spacing: .08em; text-transform: uppercase; padding: 1cqw 3.5cqw; transform: rotate(-1.5deg); box-shadow: .5cqw .5cqw 0 #12002a; }
+
+/* the game's own starburst: the number is the joke, not a rating */
+.burst { position: absolute; right: 4.5cqw; top: 53%; width: 23cqw; height: 23cqw; display: grid; place-items: center; text-align: center; transform: rotate(12deg);
+  background: var(--gold); color: #12002a; clip-path: polygon(50% 0, 59% 14%, 75% 7%, 77% 23%, 93% 25%, 86% 41%, 100% 50%, 86% 59%, 93% 75%, 77% 77%, 75% 93%, 59% 86%, 50% 100%, 41% 86%, 25% 93%, 23% 77%, 7% 75%, 14% 59%, 0 50%, 14% 41%, 7% 25%, 23% 23%, 25% 7%, 41% 14%); }
+.burst b { display: block; font-family: var(--title); font-size: 8.6cqw; line-height: .85; }
+.burst span { display: block; font-weight: 800; font-size: 1.55cqw; letter-spacing: .06em; text-transform: uppercase; line-height: 1.15; padding: 0 5cqw; }
+.sticker { position: absolute; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; font-size: 2cqw; padding: .8cqw 1.8cqw; border: .35cqw solid #12002a; box-shadow: .45cqw .45cqw 0 #12002a; }
+.s1 { left: 5cqw; top: 56%; background: var(--pink); color: #fff; transform: rotate(-7deg); }
+.s2 { left: 6cqw; top: 66%; background: var(--cyan); color: #12002a; transform: rotate(4deg); }
+
+.bottom { position: absolute; left: 0; right: 0; bottom: 5.6cqw; text-align: center; padding: 0 7cqw; }
+.tag { margin: 0; font-style: italic; font-weight: 600; font-size: 4.1cqw; line-height: 1.2; color: #fff; text-shadow: 0 .3cqw .8cqw #000, .3cqw .3cqw 0 #12002a; }
+.studio { margin-top: 2.6cqw; display: flex; justify-content: space-between; align-items: center; gap: 2cqw; font-weight: 600; font-size: 1.8cqw; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-dim); }
+.mature { border: .3cqw solid var(--ink-dim); padding: .6cqw 1.3cqw; letter-spacing: .1em; }
+
+.note { width: min(620px, 100%); }
+.note h2 { font-family: var(--title); font-weight: 400; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin: 0 0 10px; text-wrap: balance; }
+.note p { margin: 0 0 10px; color: var(--ink); max-width: 65ch; }
+.note ul { margin: 0; padding-left: 20px; color: var(--ink-dim); }
+.note li { margin-bottom: 6px; max-width: 65ch; }
+</style>
+
+<div class="stage">
+  <article class="box" aria-label="Grok Fable Astra box, front">
+    <img class="art" src="img/cover.jpg" alt="A glitchy, pastel, AI-generated hero with too many hands stands on a pink and cyan checkerboard in Prompt Plaza, facing a stone head, a rainbow portal and a book with eyes.">
+    <div class="shade"></div>
+    <div class="frame"></div>
+
+    <div class="top">
+      <div class="platforms">PC · Phone · Controller</div>
+      <h1 class="logo"><span class="g">Grok</span><span class="f">Fable</span><span class="a">Astra</span></h1>
+      <div class="ribbon">The Slopventure · Ultimate Definitive Edition (Real)</div>
+    </div>
+
+    <div class="sticker s1">100% procedural slop</div>
+    <div class="sticker s2">Now with 7 fingers</div>
+    <div class="burst" aria-label="Rot level one million"><div><b>x1M</b><span>rot at the summit</span></div></div>
+
+    <div class="bottom">
+      <p class="tag">Farm the aura. Beat the Algorithm. Touch the grass. Regret it.</p>
+      <div class="studio"><span>North Coast Studios</span><span class="mature">Teens &amp; up · Crude humour</span><span>No virus</span></div>
+    </div>
+  </article>
+
+  <section class="note">
+    <h2>Front cover idea</h2>
+    <p>The cover is the title screen turned up: the hero nobody finished rendering, seen from behind, walking into Prompt Plaza with the three mascots waiting. The title is stacked word art in three clashing colours, one per mascot. Everything a real box would be embarrassed by is on purpose.</p>
+    <ul>
+      <li>Art is a real frame from the game with the menus hidden. For print, re-render at 4× from the same camera. The hero re-rolls its look, so pick the frame you like and keep its seed.</li>
+      <li>The starburst carries the number that sells the ending: the rot goes to one million on Meme Mountain. It is the game’s own sticker, not a ratings mark; the real rating box goes where “Teens &amp; up” is once the game is rated.</li>
+      <li>“Grok” is also the name of another company’s product. Clear the title, or pick a fallback, before anything is printed. The report covers this.</li>
+      <li>Alternate covers to test: the Algorithm’s pyramid over the checkerboard arena, or the Flow Pros van mid-air. Keep the same title block so the shelf reads as a series.</li>
+    </ul>
+  </section>
+</div>
