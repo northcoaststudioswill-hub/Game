@@ -4388,13 +4388,13 @@ MENU.tabs=()=>['col','cx','who','ctl','sys'].concat(DEV.on?['dev']:[]);
 const NAV={el:null,prev:[],rep:0,dir:null,reset(){NAV.need=true;}};
 function navRoot(){if($('splash'))return $('splash');if($('intro'))return $('intro');if($('ctlcard'))return $('ctlcard');if($('tpanel'))return $('tpanel');if(MENU.open)return $('menu');if(!$('title').hidden)return $('title');if(!$('end').hidden)return $('end');return null;}
 function navItems(r){return [...r.querySelectorAll('button,select,input')].filter(e=>!e.hidden&&e.offsetParent!==null&&!e.disabled);}
-function navSet(e){if(NAV.el)NAV.el.classList.remove('gpf');NAV.el=e;const R=navRoot();if(e&&R){NAV.i=navItems(R).indexOf(e);NAV.r=R.id;}if(e){if(app.classList.contains('gp'))e.classList.add('gpf');try{e.focus({preventScroll:true});}catch(x){}e.scrollIntoView({block:'nearest',inline:'nearest'});}}
+function navSet(e){if(NAV.el)NAV.el.classList.remove('gpf');NAV.el=e;const R=navRoot();if(e&&R){NAV.mem=NAV.mem||{};NAV.mem[R.id]=navItems(R).indexOf(e);}if(e){if(app.classList.contains('gp'))e.classList.add('gpf');try{e.focus({preventScroll:true});}catch(x){}e.scrollIntoView({block:'nearest',inline:'nearest'});}}
 function navMove(r,dx,dy){const it=navItems(r);if(!it.length)return;if(!NAV.el||!it.includes(NAV.el)){navSet(it[0]);return;}const a=NAV.el.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2;let best=null,bs=1e9;
   for(const e of it){if(e===NAV.el)continue;const b=e.getBoundingClientRect(),bx=b.left+b.width/2,by=b.top+b.height/2,vx=bx-ax,vy=by-ay,along=vx*dx+vy*dy;if(along<=4)continue;const perp=Math.abs(vx*dy-vy*dx),sc=along+perp*2.2;if(sc<bs){bs=sc;best=e;}}
   if(!best){const i=it.indexOf(NAV.el),j=(i+(dx+dy>0?1:-1)+it.length)%it.length;best=it[j];}navSet(best);tone(520,.04,'square',.03);}
 (function navLoop(){requestAnimationFrame(navLoop);const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}if(!gp)return;
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!NAV.prev[i];const r=navRoot();
-  if(r){if(NAV.need||!NAV.el||!r.contains(NAV.el)){NAV.need=false;const it=navItems(r);const pref=(NAV.r===r.id&&NAV.i>=0&&it[NAV.i])||r.querySelector('.go')||r.querySelector('#cont:not([hidden])')||r.querySelector('nav button.on')||it[0];navSet(pref||null);}
+  if(r){if(NAV.need||!NAV.el||!r.contains(NAV.el)){NAV.need=false;const it=navItems(r);const mi=NAV.mem&&NAV.mem[r.id];const pref=(mi>=0&&it[mi])||r.querySelector('.go')||r.querySelector('#cont:not([hidden])')||r.querySelector('nav button.on')||it[0];navSet(pref||null);}
     if(r.id==='splash'){if(gp.buttons.some((x,i)=>pr(i)))SPL.end&&SPL.end();}
     else if(r.id==='intro'){if(pr(0)||pr(9))INTR.adv&&INTR.adv();if(pr(1))INTR.skip&&INTR.skip();}
     else{const ax=gp.axes[0]||0,ay=gp.axes[1]||0;let d=b(12)?[0,-1]:b(13)?[0,1]:b(14)?[-1,0]:b(15)?[1,0]:Math.abs(ay)>.55?[0,Math.sign(ay)]:Math.abs(ax)>.55?[Math.sign(ax),0]:null;const k=d?d.join():null;
