@@ -1,0 +1,754 @@
+[
+{
+"id": "A1",
+"group": "call",
+"sev": "high",
+"title": "Tavi is a girl in Part Two and a boy in Part One",
+"game": [
+[
+"part2.js:222",
+"Tavi is on the wheel now. Twelve. She hums while she turns it and nobody has the heart to stop her."
+],
+[
+"part2.js:223",
+"She puts the sun back on the Pillar every rest day. Sull scrubs it. She puts it back."
+],
+[
+"part2.js:519",
+"He looked at her for some time. Nobody had ever said \"come\" to him without a rank on the end of it."
+],
+[
+"part2.js:583",
+"Tavi flies the lift-barges. Yellow hull. She painted the sun on it herself..."
+],
+[
+"assay.js:488",
+"It had not been like that for anybody on Tier Six in his lifetime."
+]
+],
+"conflict": "Five lines in Part Two call Tavi she or her. One line in a Part One memory says his. The codex and the prologue avoid it with \"they\" and \"their\".",
+"fix": "You decided: a boy, Kael's brother. Change the four Part Two lines to he, him and his, and the fallback line at part2.js:60 (\"MARA SAID SHE COULD NOT STOP HER\"). Optional: change \"Your little sibling\" (story.js:85) to \"Your little brother\".",
+"bible": "The plan says brother. The bible lists it as an open question."
+},
+{
+"id": "A2",
+"group": "call",
+"sev": "high",
+"title": "Tavi says \"I'm eleven\" 42 days after the furnace",
+"game": [
+[
+"day2.js:88",
+"I know that. I'm eleven, not stupid."
+],
+[
+"part2.js:222",
+"Tavi is on the wheel now. Twelve. (five years after)"
+],
+[
+"part2.js:418",
+"Tavi is coming up. Sixteen. (nine years after)"
+]
+],
+"conflict": "Twelve at five years and sixteen at nine years both mean seven at the furnace. Eleven on First Fire does not fit either.",
+"fix": "Change the line to \"I'm seven, not stupid.\" If you would rather Tavi be older, the other way is eleven at the furnace, which makes him sixteen at the Sun level and twenty on the Stair, and changes three Part Two lines.",
+"bible": "The plan fixes seven at the furnace. The bible's cast list still says six."
+},
+{
+"id": "A3",
+"group": "call",
+"sev": "high",
+"title": "Celestine is 70 and 79 in the same fight",
+"game": [
+[
+"part2.js:79",
+"SHE IS SEVENTY. SHE HAS WORN THE BOOTS SINCE SHE WAS TWELVE."
+],
+[
+"part2.js:547",
+"She was seventy-nine, and she held it as if it were a pen."
+],
+[
+"part2.js:313",
+"FIFTY YEARS BEFORE THE FURNACE / An Assay. A cadet called Celestine Aurel, twenty."
+],
+[
+"part2.js:39",
+"HE WAS FOURTEEN AND HAD NEVER HEARD OF CINDERWELL. (Lucan, at the furnace)"
+]
+],
+"conflict": "The card makes her 70 at the furnace and 79 at the end, which matches the narration but not the fight's own voice line. Lucan was 14 at the furnace, so on the card's numbers she had him at 56.",
+"fix": "Fewest changes: keep the approved card, change the voice line to \"SHE IS SEVENTY-NINE\", and update the bible. Or follow the bible: change the card to \"FORTY-FOUR YEARS BEFORE THE FURNACE\" and the narration to \"seventy-three\", so Lucan was born when she was fifty.",
+"bible": "Bible decision 5: seventy at six years after (73 at the end); Lucan born when she was fifty."
+},
+{
+"id": "A4",
+"group": "call",
+"sev": "med",
+"title": "The Pairing halves the cadets, but the numbers never halve",
+"game": [
+[
+"ff.js:88",
+"THE ASSAY. THE FIRST NIGHT. THEY SEAL US IN BY TWOS."
+],
+[
+"ff.js:81",
+"TWO GO IN. ONE COMES OUT A CADET."
+],
+[
+"assay.js:182",
+"Four hundred and eighty cadets came into this valley. They packed one cloak."
+],
+[
+"assay.js:512",
+"Forty on the roll. ... one more name with a box drawn round it. Aldane, D."
+],
+[
+"part2.js:275",
+"Four hundred and eighty children went into that valley."
+]
+],
+"conflict": "Twelve Houses of forty is 480 after the Pairing. If 480 went in and were sealed in by twos, each House would have twenty. Either 960 went up the lift, or not everyone is paired.",
+"fix": "My pick: only cadets from minor Houses with no patron are paired, for the last seat in each House. It keeps 480, explains why Sorrel and Dorian fought (both minor Houses), and fits \"Nobody placed a sum on us\". Change ff.js:88 to \"THEY SEAL THE UNSPONSORED IN BY TWOS.\" The other way is to say 960 went up the lift.",
+"bible": "Not covered."
+},
+{
+"id": "A5",
+"group": "call",
+"sev": "med",
+"title": "Nobody explains how a man of about thirty passes as a cadet",
+"game": [
+[
+"assay.js:87",
+"Twelve Houses send their heirs the year they come of age."
+],
+[
+"assay.js:346",
+"He is eighteen and he meant it. (Lucan)"
+],
+[
+"ff.js:225",
+"Twenty years of furnace air comes out of it in black thread."
+],
+[
+"day3.js:108",
+"Ten years you've kept that bank turning."
+]
+],
+"conflict": "Dorian is 16, Petra and Lucan are 18. Kael kissed Seren at fifteen, has worked the bank ten years and has twenty years of furnace air in his throat. He is close to thirty at the Assay.",
+"fix": "Add one line from Ilse at the Table: \"The gold keeps them young. At thirty they look eighteen. Nobody will ask your age. They will ask your House.\" It also supports Celestine at seventy with a son of twenty.",
+"bible": "Decision 5 says the Accredited \"bear late and live long. It is most of what the gold is for.\" Nothing about Kael's age."
+},
+{
+"id": "A6",
+"group": "call",
+"sev": "low",
+"title": "Two different men are the Auditor's Blade, and the first one vanishes",
+"game": [
+[
+"day3.js:171",
+"HE HAS KILLED FOR HER FOR THIRTY YEARS. (the Pinning)"
+],
+[
+"istory.js:400",
+"One is the Auditor's Blade. One had another name. She took it when she gave one the post. (Oswin, the Stair)"
+]
+],
+"conflict": "Kael beats a thirty-year champion at the Pinning. Five years later the Blade is Oswin. The game never says what became of the first one.",
+"fix": "Add one line at the fitting scene (six years after): \"The old Blade had stood behind her chair for thirty years. I put him on the floor at the Pinning. She does not keep what has been beaten.\"",
+"bible": "The bible says the Blade is Oswin and marks his not joining the Unlit as \"to confirm\". The game is already consistent on that part."
+},
+{
+"id": "B1",
+"group": "game",
+"sev": "high",
+"title": "Dace says he has been under the floor six weeks. He was at work two days ago",
+"game": [
+[
+"day3.js:90",
+"I've been under your feet for six weeks, eating what Sable drops through the Freight Three grating."
+],
+[
+"story.js:207",
+"Kael. ...I'm glad you came back. (Dace, at Conveyor Two, day 41)"
+],
+[
+"story.js:183",
+"Dace isn't on tomorrow's roster."
+],
+[
+"day2.js:343",
+"Dace's lamp sits on the stack. ... He was here last night."
+]
+],
+"conflict": "Dace is on shift on day 41, gone from the roster on day 42, and meets Kael on day 43.",
+"fix": "Change to: \"I've been under your feet for two days, eating what Sable drops through the Freight Three grating.\" Optional next line so the Unlit do not read as his own idea: \"They found me the first night.\"",
+"bible": ""
+},
+{
+"id": "B2",
+"group": "game",
+"sev": "high",
+"title": "Mara is on a barge at the Fall, and at her table as if she never left",
+"game": [
+[
+"part2.js:96",
+"MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER."
+],
+[
+"part2.js:475",
+"Mara had sent a list up with Tavi. Forty-four names, in order..."
+],
+[
+"part2.js:587",
+"Mara looked up from the table and did not get up. / Taller. I did say."
+]
+],
+"conflict": "The Fall's voice line puts her in the fleet. The night before, she is below and sends a list up. The last scene only works if he has not seen her in nine years.",
+"fix": "Replace the voice line (also at ff.js:126) with: \"MARA SENT A LIST UP WITH TAVI. FORTY-FOUR NAMES. READ THEM OUT WHEN IT IS DONE, SHE SAID.\"",
+"bible": ""
+},
+{
+"id": "B3",
+"group": "game",
+"sev": "high",
+"title": "Old names are still on screen: Teo, and a note signed W.H.",
+"game": [
+[
+"istory.js:89",
+"TEO ALDANE SHARED HIS BREAD ON THE LIFT."
+],
+[
+"istory.js:90",
+"I NEVER TOLD TEO THERE WAS A SHE."
+],
+[
+"assay.js:338",
+"\"Stack pressure, two. It has held twenty-four days. Whoever you are: why did you care whether it would? W.H.\""
+],
+[
+"istory.js:585",
+"CHECKED, a date, two initials. K.D."
+]
+],
+"conflict": "Teo was renamed Dorian and the engineer is Kestrel Dray. Two memory captions and one note still carry the old names.",
+"fix": "Change TEO to DORIAN in both captions and W.H. to K.D. in the note.",
+"bible": ""
+},
+{
+"id": "B4",
+"group": "game",
+"sev": "high",
+"title": "Years on the Spire are counted three different ways",
+"game": [
+[
+"part2.js:361",
+"...the way I had looked at them for three years from a window in the Count. (correct)"
+],
+[
+"part2.js:368",
+"I took the Count's sun off my collar. Seven years I had worn it."
+],
+[
+"part2.js:155",
+"I looked at that stair every morning for five years from a room with a window."
+],
+[
+"part2.js:193",
+"I was handed nine hundred lines in five years. I struck four hundred and six."
+],
+[
+"part2.js:146",
+"I called it the bank hook... I carried it nine years."
+],
+[
+"part2.js:305",
+"Nine years of counting, and it had never once been this hard to stop at eleven. (six years after)"
+],
+[
+"istory.js:486",
+"One has been paying on it nine years. Come and collect, Sorrel. (Oswin)"
+]
+],
+"conflict": "He is pinned at four years and leaves at seven, so he is a clerk for three years. The hook was forged at four years and broken at nine. Oswin's debt starts at the Assay.",
+"fix": "\"Three years I had worn it.\" / \"every morning for three years\" / \"nine hundred lines in three years\" / \"I carried it five years.\" / \"Six years of counting\" / \"paying on it five years\".",
+"bible": ""
+},
+{
+"id": "B5",
+"group": "game",
+"sev": "med",
+"title": "Tavi's reunion is \"seven years late\" but happens at nine",
+"game": [
+[
+"part2.js:424",
+"My own voice. \"Tav.\" I had not used it in seven years."
+],
+[
+"part2.js:425",
+"Seven years late. Tavi looked for a long time and then said: she was right."
+],
+[
+"part2.js:418",
+"Tavi is coming up. Sixteen."
+]
+],
+"conflict": "Tavi is sixteen only at nine years after. Kael left at 160 days and promised on day 43.",
+"fix": "\"I had not used it in nine years.\" and \"Nine years late.\"",
+"bible": "The bible says \"He shows Tavi seven years later, on a barge.\" Change it to nine."
+},
+{
+"id": "B6",
+"group": "game",
+"sev": "med",
+"title": "Seren's knife is on her hook, and her hook is empty",
+"game": [
+[
+"story.js:292",
+"Three hundred and six has been empty since the furnace."
+],
+[
+"assay.js:539",
+"Three hundred and six. Nobody has hung anything on it. Nobody has taken the hook down either."
+],
+[
+"part2.js:141",
+"Seren's was counted back the night they walked her. I saw it afterwards, on her hook. Number three hundred and six. Somebody had cleaned it."
+]
+],
+"conflict": "Part One builds a scene on the empty hook. Part Two says her knife was hung back on it.",
+"fix": "Change part2.js:141 to: \"Seren's was taken off her the night they walked her. I saw it afterwards, in the Warden's tray. Number three hundred and six. Somebody had cleaned it. Nobody hung it back.\"",
+"bible": ""
+},
+{
+"id": "B7",
+"group": "game",
+"sev": "med",
+"title": "Hollis leaves Cinderwell at five years and is back in Bay Three at eight",
+"game": [
+[
+"part2.js:231",
+"Hollis the welder was the thirty-first. Brand was at the top of the ladder with a hand out..."
+],
+[
+"assay.js:809",
+"He put a halberd butt in my arm once. (Hollis, on the barge, eight years after)"
+],
+[
+"part2.js:121",
+"HOLLIS HAS BOTH ARMS UP. I DID NOT KNOW HE COULD. (Mara, Bay Three, eight years after)"
+]
+],
+"conflict": "He climbs out through Riser Nine and is with the barges, so he cannot be in the row when Tier Six stands.",
+"fix": "Change Mara's line to somebody still below: \"OLD ORIN HAS BOTH ARMS UP. I DID NOT KNOW HE COULD.\" Optional: a half line at Riser Nine on why a Tier Six welder is among Tier Four's forty (\"He had gone up to carry children.\").",
+"bible": ""
+},
+{
+"id": "B8",
+"group": "game",
+"sev": "med",
+"title": "He has struck 406 lines after one year, and 406 after three",
+"game": [
+[
+"assay.js:266",
+"Below it, in my own hand, four hundred and six lines I have struck since. (five years after)"
+],
+[
+"part2.js:193",
+"I was handed nine hundred lines... I struck four hundred and six. (his whole time as clerk)"
+],
+[
+"istory.js:68",
+"FOUR HUNDRED AND SIX LINES I HAVE STRUCK MYSELF. (seven years after)"
+]
+],
+"conflict": "406 is the total when he leaves the Count. The Count hall level uses the same number two years earlier.",
+"fix": "Change the Count hall line to \"a hundred and forty lines I have struck since\", or drop the number there.",
+"bible": "The bible's note on the Count hall level also says 406."
+},
+{
+"id": "B9",
+"group": "game",
+"sev": "med",
+"title": "The Assay lasts \"one year\" in the Codex and one season everywhere else",
+"game": [
+[
+"rowk.js:98",
+"One valley, twelve houses, one year."
+],
+[
+"ff.js:169",
+"ONE VALLEY. TWELVE HOUSES. ONE SEASON. THEY CALL IT THE ASSAY."
+],
+[
+"day3.js:173",
+"I HAVE BEEN STANDING UNDER IT FOR FORTY DAYS. (the last day, about day fifty)"
+]
+],
+"conflict": "The cards run from the first night to night forty-nine and the last day.",
+"fix": "Codex: \"one season\". Voice line: \"FOR FIFTY DAYS\".",
+"bible": "Decision 1: one season, about fifty days. \"Year-long\" is retired everywhere."
+},
+{
+"id": "B10",
+"group": "game",
+"sev": "low",
+"title": "Half a year or four months in the white room",
+"game": [
+[
+"ff.js:308",
+"She sat across a white room from me twice a week for half a year."
+],
+[
+"day3.js:218",
+"Twice a week, for four months, I ride up in the white car..."
+]
+],
+"conflict": "Day 43 to day 160 is just under four months.",
+"fix": "\"twice a week for four months\".",
+"bible": ""
+},
+{
+"id": "B11",
+"group": "game",
+"sev": "low",
+"title": "Kestrel is an engineer at nineteen and an apprentice at twenty-three",
+"game": [
+[
+"day3.js:226",
+"Kestrel Dray. Nineteen, and the only one of the forty who ever got grease on a cuff."
+],
+[
+"assay.js:155",
+"Apprentice to the Array board. I keep the stack while the heirs are playing. (four years after)"
+],
+[
+"part2.js:165",
+"Engineer Dray. They have put me on the Array board."
+]
+],
+"conflict": "She is one of Celestine's forty engineers at 160 days, then calls herself an apprentice at the Assay.",
+"fix": "Island line: \"Junior on the Array board. They give the stack to whoever is newest.\"",
+"bible": ""
+},
+{
+"id": "B12",
+"group": "game",
+"sev": "low",
+"title": "Lift Zero opens once a decade, and also some years for the festival",
+"game": [
+[
+"cinema.js:161",
+"Once in a decade they come down Lift Zero, in white, in light."
+],
+[
+"cinema.js:267",
+"Lift 0 opened for the first time in eleven years."
+],
+[
+"main.js:132",
+"The High Auditor is coming down for First Fire. She lights it herself, some years."
+]
+],
+"conflict": "If she lights the First Fire herself some years, the lift has not been shut for eleven.",
+"fix": "Vale: \"The High Auditor is coming down for First Fire. She has not lit it herself in eleven years.\" It also makes her coming twice in six weeks mean something.",
+"bible": ""
+},
+{
+"id": "B13",
+"group": "game",
+"sev": "low",
+"title": "The note from \"the morning of the wedding\"",
+"game": [
+[
+"cinema.js:189",
+"Mara binds you at the Pillar, in front of the whole crew... (the same night as the proposal)"
+],
+[
+"assay.js:473",
+"Married on a festival night."
+],
+[
+"day2.js:316",
+"the note she left you on the morning of the wedding... DON'T BE LATE. I'LL START WITHOUT YOU."
+]
+],
+"conflict": "He proposes and they are bound the same night. There was no wedding morning for her to leave a note on.",
+"fix": "\"the note she left you the morning after the wedding, on her way to first bell\".",
+"bible": ""
+},
+{
+"id": "B14",
+"group": "game",
+"sev": "low",
+"title": "Hollis was hit in the arm, in the back, and between the shoulders",
+"game": [
+[
+"story.js:276",
+"Took a halberd at her commitment for humming. Still can't lift my left arm above the shoulder."
+],
+[
+"part2.js:232",
+"You're the one that did my arm."
+],
+[
+"ff.js:275",
+"I hit a welder in the back once, for humming. He did not turn round."
+]
+],
+"conflict": "Hollis says arm three times. Brand says back once.",
+"fix": "Brand: \"I hit a welder from behind once, for humming. He did not turn round.\"",
+"bible": ""
+},
+{
+"id": "B15",
+"group": "game",
+"sev": "low",
+"title": "The shift song has seven notes and five notes",
+"game": [
+[
+"assay.js:291",
+"You do them to the shift song or they come out crooked. Seven notes. Everybody knows that."
+],
+[
+"rowk.js:109",
+"It only plays five notes. The shift song only has five."
+]
+],
+"conflict": "The tune in the bible is seven notes on five pitches (D F A G, F E D), so both can be true if the wording is exact.",
+"fix": "Codex: \"It only plays five pitches. The shift song only needs five.\"",
+"bible": ""
+},
+{
+"id": "B16",
+"group": "game",
+"sev": "low",
+"title": "Small date slips",
+"game": [
+[
+"story.js:359",
+"The fuse you pulled forty-one days ago... (the heist was four nights before the furnace: forty-five)"
+],
+[
+"cinema.js:208",
+"The Authority cut the clinic to ration pressure two weeks ago. (said four days before)"
+],
+[
+"assay.js:836",
+"It fed the fever ward, before the Count shut the fans. (said three weeks before)"
+],
+[
+"assay.js:100",
+"It is forty paces from thirty hungry children. (House Violet is forty)"
+]
+],
+"conflict": "Each is off by a few days or a few people.",
+"fix": "\"six weeks ago\"; Nell: \"a month ago\"; \"forty hungry children\".",
+"bible": ""
+},
+{
+"id": "B17",
+"group": "game",
+"sev": "low",
+"title": "Who said \"the only round thing I own\"",
+"game": [
+[
+"day3.js:264",
+"...she turned it over and said: it is a valve washer, Kael. I said: it is the only round thing I own."
+],
+[
+"assay.js:472",
+"Don't look at it like that. It's a washer. It's the only round thing you own and you gave it away..."
+]
+],
+"conflict": "Kael remembers saying it; in the walked memory Seren says it. Harmless, but the memory level is the later and better version.",
+"fix": "Change day3.js:264 so she says it: \"She said: it is the only round thing you own, so I will have to be careful with it.\"",
+"bible": ""
+},
+{
+"id": "C1",
+"group": "docs",
+"sev": "med",
+"title": "Master timeline 7: Celestine does not come down. Kael goes up",
+"game": [
+[
+"day3.js:47",
+"It climbs for nine minutes. I count. Kit was right. Nine floors, not six."
+],
+[
+"day3.js:51",
+"The valve technician. You hung a lantern where I had forbidden one. Sit."
+],
+[
+"cinema.js:362",
+"You. The loud one. (the furnace: the first time she looks at him)"
+]
+],
+"conflict": "The timeline says she comes down to Tier Six on day 43 and \"this is where she first sees him\". In the game he carries the ledger up, and she has already spoken to him at the furnace and at First Fire.",
+"fix": "Fix the timeline entry. The game and the older bible section agree with each other.",
+"bible": "Bible (v0.14): \"Kael carries the ledger up Lift Zero, Celestine tells him she knew and puts him to work, he sees the sky through her window.\""
+},
+{
+"id": "C2",
+"group": "docs",
+"sev": "med",
+"title": "Master timeline 4f: Dorian does not live",
+"game": [
+[
+"assay.js:79",
+"You are the one who walked out of the Pairing with bread in your pack. Aldane's bread."
+],
+[
+"assay.js:516",
+"They took the losers out by the other door. ... It has not opened again."
+],
+[
+"part2.js:174",
+"Dorian Aldane. He was the youngest one there. He did not come out of the Pairing."
+],
+[
+"part2.js:526",
+"He was kind. I killed him anyway. The room only opened for one."
+]
+],
+"conflict": "The timeline has Dorian holding out half a loaf on day three. The game has Kael wake with the bread and nobody there.",
+"fix": "Fix 4f in the timeline. The game is right and Maren's whole arc depends on it.",
+"bible": "The bible agrees with the game."
+},
+{
+"id": "C3",
+"group": "docs",
+"sev": "low",
+"title": "Master timeline 11: where Celestine knows him from",
+"game": [
+[
+"part2.js:534",
+"One knew you on the steps of the keep. One pinned the sun on you with one's own hands."
+]
+],
+"conflict": "The timeline says she knows him \"from the white room during the Gilding and from Lift Zero\". There is no white room in the Gilding.",
+"fix": "Reword: she knows him from the furnace, the square and the four months in her white room, and recognises him at the keep.",
+"bible": "Bible (v0.44) says the same as the game."
+},
+{
+"id": "C4",
+"group": "docs",
+"sev": "low",
+"title": "Bible: which of Oswin's legs",
+"game": [
+[
+"assay.js:382",
+"The Vey girl opened the right one, two days ago. I have been dragging the right ever since."
+],
+[
+"assay.js:416",
+"The right, Sorrel. I told you. The right."
+]
+],
+"conflict": "The bible says the Auditor's Blade's left leg does not bend. The Lamp makes a point of it being the right.",
+"fix": "Change the bible, and check the Blade's model and stance use the right leg.",
+"bible": "\"The Auditor's Blade (Oswin Hale, nine years after): the left leg does not bend.\""
+},
+{
+"id": "C5",
+"group": "docs",
+"sev": "low",
+"title": "Smaller doc slips",
+"game": [
+[
+"ff.js:310",
+"And for one breath the dream slips further. A book as wide as a table. (First Fire night)"
+],
+[
+"day3.js:35",
+"The white room again, years on. ... I am humming, and I do not know it. (the Ledger night)"
+]
+],
+"conflict": "The timeline puts the book on the Ledger night (8e). The bible still calls a flag \"he told her Teo was kind\" and lists Tavi as six.",
+"fix": "Update the three notes.",
+"bible": ""
+},
+{
+"id": "D1",
+"group": "left",
+"sev": "med",
+"title": "Fallback fights still carry the old story",
+"game": [
+[
+"part2.js:61",
+"HER CHAMPION AGAIN. HE YIELDED TO ME ONCE. HE HAS BEEN ASHAMED OF IT FOR FIVE YEARS."
+],
+[
+"part2.js:60",
+"NINE HUNDRED STEPS. I KNOW BECAUSE I CLIMBED THEM EVERY MORNING FOR THREE YEARS..."
+],
+[
+"day3.js:192",
+"HE KNOWS MY FOOTWORK. HE HAS HAD SEVEN YEARS TO THINK ABOUT IT. (Vant, three years after the Ford)"
+],
+[
+"day3.js:191",
+"DACE SENT WORD FROM BELOW: THE TIERS ARE READY."
+],
+[
+"part2.js:21",
+"TONIGHT I AM AT THE BOTTOM OF RISER NINE IN A MASK..."
+]
+],
+"conflict": "The old arena versions of the Stair, the High Docks and Riser Nine only play if a comic-book level fails to load. Their lines contradict the levels that replaced them: the Blade is Oswin, no Accredited climbs that stair, Dace is at the docks, and Kael holds the top of the riser.",
+"fix": "Either bring the five lines into line or remove the fallbacks.",
+"bible": ""
+},
+{
+"id": "D2",
+"group": "left",
+"sev": "low",
+"title": "A Day 1 line still says Day 2 is not built",
+"game": [
+[
+"story.js:112",
+"Morning! Festival in two days. ... (Day 2 isn't built yet. Explore as long as you like.)"
+],
+[
+"story.js:306",
+"FESTIVAL OF THE FIRST FIRE \u2014 tomorrow, last bell."
+]
+],
+"conflict": "Tavi's line after Day 1 says the festival is in two days and shows a builder's note. I did not test whether a player can still reach it.",
+"fix": "Delete the branch, or change it to \"Festival's tonight.\"",
+"bible": ""
+},
+{
+"id": "E1",
+"group": "thread",
+"sev": "low",
+"title": "Kael's father",
+"game": [
+[
+"day3.js:120",
+"It's a leash. They put it on the clever ones first. Your father thought he was being promoted, too."
+]
+],
+"conflict": "Set up once and never returned to.",
+"fix": "Either pay it off in one line (his name in the Count, or on Mara's wall), or cut \"too\" and the sentence about his father.",
+"bible": ""
+},
+{
+"id": "E2",
+"group": "thread",
+"sev": "low",
+"title": "\"How the last one was caught\"",
+"game": [
+[
+"part2.js:157",
+"Ilse had warned me about that. She said it was how the last one was caught."
+],
+[
+"day3.js:97",
+"We've been waiting years for someone the Authority would carry up their own lift."
+]
+],
+"conflict": "Someone was sent up before Kael and caught. It is mentioned twice and never named.",
+"fix": "Good as a hint. If you want it paid off, one name on Mara's list would do it.",
+"bible": ""
+}
+]
