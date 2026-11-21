@@ -71,7 +71,7 @@ There was a noise behind me. It was Ivo, crying into a sleeve, and pretending he
 
 "Pressure-bound," said Mara. "Crew Three, you saw it. Now get off the stones before the Proctor sees you kneeling and writes something down."
 
-The tier cheered, which it did not usually do. Tavi, who was six and had been put on Mara's shoulders for the view, shouted that the sun was on everything, and was right. The Pillar was lit. The square smelled of hot wax and fried dough and the cold blue water they gave out at the pump, and everybody on the tier who could leave their shift had come to see a valve hand get married.
+The tier cheered, which it did not usually do. Tavi, my brother, who was six and had been put on Mara's shoulders for the view, shouted that the sun was on everything, and was right. The Pillar was lit. The square smelled of hot wax and fried dough and the cold blue water they gave out at the pump, and everybody on the tier who could leave their shift had come to see a valve hand get married.
 
 I remember thinking that was the best day I had ever had. I still think it.
 
@@ -80,7 +80,7 @@ I remember thinking that was the best day I had ever had. I still think it.
 **FOUR DAYS BEFORE THE FURNACE**
 *The fever comes to Tier Six.*
 
-Tavi was seven, and when he breathed it sounded like a sock being pulled over a boot.
+Tavi was my brother. He was seven, and when he breathed it sounded like a sock being pulled over a boot.
 
 I heard it from the bunk. Our bunk, the top one in the back room of Row K, with Seren's paintings all over the wall above it. There were seventeen suns in that room. Tavi counted them every night in a whisper until he fell asleep, and every night he got a different number, and every night he said that was because she had been painting more.
 
