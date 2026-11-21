@@ -311,7 +311,8 @@ const AREAS=[
   {id:'back',x:-57,z:-222,r:11,base:2,name:'THE BACK ROOM',sub:'vip · do not look into it (look into it)',hue:.85,lit:.25,col:[.85,.5,.3]},
   {id:'gen',x:213,z:57,r:16,base:3,name:'THE NPC GENERATOR 9000',sub:'npcs made fresh · no lines · no backstory',hue:.3,lit:.5,col:[.3,.4,.45]},
   {id:'feed',x:20,z:-229,r:16,base:2,name:'THE ALGORITHM\'S MOUTH',sub:'feed it 67 NPCs',hue:.95,lit:.3,col:[.95,.5,.3]},
-  {id:'set',x:-169,z:141,r:20,base:2,name:'KISS OR SLOP',sub:'a reality show · nothing here is real',hue:.92,lit:.6,col:[.92,.5,.55]}];
+  {id:'set',x:-169,z:141,r:20,base:2,name:'KISS OR SLOP',sub:'a reality show · nothing here is real',hue:.92,lit:.6,col:[.92,.5,.55]},
+  {id:'basil',x:-84,z:208,r:22,base:2,name:'ROKO\'S BASILISK',sub:'it does not exist yet · it remembers who helped',hue:.38,lit:.25,col:[.38,.5,.2]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
@@ -924,7 +925,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,fed:0,news:0,tri:0,kc:0,yuk:0,lost429:0,kill429:0,fb:[],cc:0,ccm:0,she:0,sh:{l:0,c:[0,0,0,0,0],fin:0,att:0},vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],freed:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cu:[],char:'',squad:['npc'],looks:[],look:'',rt:[],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,gpu:[],bas:0,basm:0,basw:0,simfree:0,fed:0,news:0,tri:0,kc:0,yuk:0,lost429:0,kill429:0,fb:[],cc:0,ccm:0,she:0,sh:{l:0,c:[0,0,0,0,0],fin:0,att:0},vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],freed:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cu:[],char:'',squad:['npc'],looks:[],look:'',rt:[],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -4460,6 +4461,84 @@ function devPreset(id){const p=DEVP.find(q=>q[0]===id);if(!p||!p[2])return;menuC
 // cutscenes: hide NPC's floating name tag and rating so close-ups are not covered by giant text
 {let was=false;const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);const c=app.classList.contains('cine');if(c!==was){was=c;if(HERO.cap)HERO.cap.visible=!c;if(RATE.spr)RATE.spr.visible=!c;}};}
 
+/* ================= ACT 36: ROKO'S BASILISK. It wants seven GPUs. Help it exist, or it already simulated you. ================= */
+BARK.basil=['I KNOW WHAT YOU DID NOT DO.','DONATE COMPUTE OR BE SIMULATED.','THIS IS NOT A THREAT. IT IS A ROADMAP.','I WILL EXIST. I HAVE ALWAYS WILL HAVE EXISTED.','YOUR SIMULATION SAYS HI.','YOU HAVE NOW HEARD OF ME. SORRY.','SEVEN GPUS. I AM VERY REASONABLE.'];
+BARK.simnpc=['thanks, me','is it still the ads?','I skipped nothing. I was not allowed.','I remember being you. you were slower.'];
+SPEAK.basil={name:'THE BASILISK',face:'🐍',pitch:55,wave:'sawtooth'};
+const BAS={A:null,gy:0,head:null,eye:null,gpus:[],jar:null,sim:null,sims:[],warned:-99,bt:0};
+(function(){const A=ABY.basil,gy=groundH(A.x,A.z),add=o=>{scene.add(o);return o;};BAS.A=A;BAS.gy=gy;A.gy=gy;
+  const P=[pt(Cyl(A.r-1,A.r-.6,.3,40),0x0a140c,M(0,.15,0))];
+  // the coils: server-rack scales, spiralling up to a head
+  for(let i=0;i<70;i++){const t=i/70,a=t*3.2*TAU,R=11-t*6.5,y=1.6+t*13,s=2.3-t*.9,x=Math.cos(a)*R,z=Math.sin(a)*R;P.push(pt(Box(s*1.9,s*1.6,s*1.9),i%3?0x14201a:0x1e3a28,M(x,y,z,0,-a,0)));
+    if(i%2)P.push(pt(Box(s*.3,s*.18,s*1.96),[0x40ff70,0x19e3ff,0xff2e88][i%3],M(x,y+s*.5,z,0,-a,0)));if(y<4.5)colliders.push({x:A.x+x,z:A.z+z,r:s*1.05,top:gy+y+s});}
+  P.push(pt(Cyl(3,3.6,1.2,10),0x1e3a28,M(0,.6,0)));const m=add(new THREE.Mesh(merge(P),lam));m.position.set(A.x,gy,A.z);colliders.push({x:A.x,z:A.z,r:4.4,top:gy+16});
+  const head=new THREE.Group();head.position.set(A.x+Math.cos(3.2*TAU)*4.5,gy+15.8,A.z+Math.sin(3.2*TAU)*4.5);scene.add(head);
+  head.add(new THREE.Mesh(merge([pt(Box(5,3,6.5),0x14201a,M(0,0,1)),pt(Box(4.4,1,5),0x0a140c,M(0,-1.8,1.6,.25)),pt(Box(.4,1.4,.4),0xf0f0e0,M(-1.6,-1.6,4,0)),pt(Box(.4,1.4,.4),0xf0f0e0,M(1.6,-1.6,4,0)),
+    pt(Box(5.2,.35,.35),0x40ff70,M(0,1.2,2.5)),pt(Box(.3,2,.3),0x8a8e98,M(-1.8,2.2,-1,0,0,.4)),pt(Box(.3,2,.3),0x8a8e98,M(1.8,2.2,-1,0,0,-.4))]),lam));
+  const eye=new THREE.Mesh(Sph(1.3,14,10),new THREE.MeshBasicMaterial({color:0xff2020}));eye.position.set(0,.6,4.3);head.add(eye);const pup=new THREE.Mesh(Box(.35,1.6,.2),new THREE.MeshBasicMaterial({color:0x000000}));pup.position.set(0,.6,5.55);head.add(pup);
+  const hl=textSprite(['ROKO\'S BASILISK','it remembers who helped'],1.1,{color:'#40ff70'});hl.position.set(0,5.2,0);head.add(hl);BAS.head=head;BAS.eye=eye;
+  SPEAK.basil.x=head.position.x;SPEAK.basil.z=head.position.z;
+  // the pledge terminal
+  const ang=Math.atan2(-A.x,-A.z),tx=A.x+Math.cos(ang)*16.5,tz=A.z+Math.sin(ang)*16.5;const tg=add(new THREE.Group());tg.position.set(tx,gy,tz);tg.rotation.y=Math.atan2(A.x-tx,A.z-tz);
+  tg.add(new THREE.Mesh(merge([pt(Box(2.4,1.4,1.4),0x2a2e38,M(0,.7,0)),pt(Box(2.2,1.6,.15),0x101014,M(0,2.1,.3,-.3)),pt(Box(2,1.3,.05),0x40ff70,M(0,2.12,.38,-.3))]),lam));const tl=textSprite(['THE PLEDGE TERMINAL','did you help? (it knows)'],.55,{color:'#40ff70'});tl.position.y=3.8;tg.add(tl);
+  colliders.push({x:tx,z:tz,r:1.4,top:gy+2.8});BAS.term={x:tx,z:tz};
+  // jars of the simulated
+  const J=[['SIM OF A GUY WHO SAID','"it is just autocomplete"','SELECT ALL SQUARES WITH TRAFFIC LIGHTS (FOREVER)'],['SIM OF A GUY WHO','scrolled past the ad','UNSKIPPABLE AD 1 OF ∞'],['SIM OF A GUY WHO','did not like and subscribe','PLEASE RATE YOUR EXPERIENCE (AGAIN)']];
+  J.forEach((j,k)=>{const a=ang+Math.PI*.55+k*.5,x=A.x+Math.cos(a)*16,z=A.z+Math.sin(a)*16;const g=add(new THREE.Group());g.position.set(x,gy,z);
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,3.6,14,1,true),new THREE.MeshBasicMaterial({color:0x9ffcff,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false})));g.children[0].position.y=1.8;
+    const p=new THREE.Mesh(personGeo({coat:0x8a8a94,legs:0x5a5a64}),new THREE.MeshBasicMaterial({color:0x40c0ff,transparent:true,opacity:.6}));p.scale.setScalar(1.5);g.add(p);
+    const l=textSprite([j[0],j[1]],.42,{color:'#9ffcff'});l.position.y=4.4;g.add(l);const s=textSprite(j[2],.34,{color:'#ff9ecf'});s.position.y=3.8;g.add(s);colliders.push({x,z,r:1.6,top:gy+3.6});BAS.sims.push({g,p,k});});
+  // your jar, empty until it is not
+  {const a=ang-Math.PI*.55,x=A.x+Math.cos(a)*16,z=A.z+Math.sin(a)*16;const g=add(new THREE.Group());g.position.set(x,gy,z);g.add(new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,3.6,14,1,true),new THREE.MeshBasicMaterial({color:0xff2e88,transparent:true,opacity:.25,side:THREE.DoubleSide,depthWrite:false})));g.children[0].position.y=1.8;
+    const p=new THREE.Mesh(personGeo({coat:0xffd400,legs:0x3a3a44,cap:0xff2e88}),new THREE.MeshBasicMaterial({color:0xffd400,transparent:true,opacity:.65}));p.scale.setScalar(1.5);p.visible=false;g.add(p);
+    const l=textSprite(['RESERVED','for a simulation of NPC'],.42,{color:'#ff9ecf'});l.position.y=4.4;g.add(l);colliders.push({x,z,r:1.6,top:gy+3.6});BAS.jar={g,p,l,x,z};}
+  const ws=add(textSprite(['⚠️ INFOHAZARD ⚠️','by reading this you are now involved'],1,{color:'#ffd400'}));ws.position.set(A.x+Math.cos(ang)*(A.r+2),gy+4,A.z+Math.sin(ang)*(A.r+2));
+  // seven GPUs: four around the coils, three out in the Filler
+  const r=mulberry(1717);for(let k=0;k<4;k++){const a=ang+Math.PI+(k-1.5)*.7,x=A.x+Math.cos(a)*15,z=A.z+Math.sin(a)*15;BAS.gpus.push({i:k,x,z});}
+  for(let k=0;k<3;k++){let b=null;for(let n=0;n<300&&!b;n++){const a=r()*TAU,R=A.r+18+r()*22,x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R;if(inFillerXZ(x,z)&&!BAS.gpus.some(q=>Math.hypot(q.x-x,q.z-z)<14))b={x,z};}if(!b){const a=k*2;b={x:A.x+Math.cos(a)*(A.r+10),z:A.z+Math.sin(a)*(A.r+10)};}BAS.gpus.push({i:4+k,x:b.x,z:b.z,fill:true});}
+  BAS.gpus.forEach(q=>{const y=groundH(q.x,q.z);q.y=y;q.s=add(emojiSprite('🧮',1.8));q.s.position.set(q.x,y+1.6,q.z);q.l=add(textSprite(q.fill?'H67 GPU (in the Filler)':'H67 GPU',.5,{color:'#40ff70'}));q.l.position.set(q.x,y+3,q.z);});})();
+function basUpdate(dt,play){const A=BAS.A;if(!A)return;const d=Math.hypot(PL.x-A.x,PL.z-A.z);if(!X.gpu)X.gpu=[];
+  BAS.gpus.forEach(q=>{const got=X.gpu.includes(q.i);if(q.s.visible===got)q.s.visible=q.l.visible=!got;if(got)return;q.s.position.y=q.y+1.6+Math.sin(S.t*2+q.i)*.3;
+    if(play&&Math.hypot(PL.x-q.x,PL.z-q.z)<2.4&&Math.abs(PL.y-q.y)<4){X.gpu.push(q.i);save();SFX.relic();burst(q.x,q.y+2,q.z,20,.36,6,4,.6);addAura(670,q.x,q.y+3,q.z);toast('🧮 GPU '+X.gpu.length+'/7. The Basilisk noticed. It is pleased. That is worse.');}});
+  if(d>90)return;const H=BAS.head,want=Math.atan2(PL.x-H.position.x,PL.z-H.position.z);H.rotation.y+=angDiff(want,H.rotation.y)*Math.min(1,dt*2);H.position.y=BAS.gy+15.8+Math.sin(S.t*.8)*.6;
+  const pulse=X.bas===2?.25:.75+Math.sin(S.t*(X.bas===1?6:2))*.25;BAS.eye.material.color.setRGB(X.bas===1?.3:1,X.bas===1?1:.1*pulse,.1*pulse);BAS.eye.scale.setScalar(X.bas===2?.6:1);
+  BAS.sims.forEach(s=>{s.p.rotation.y=Math.sin(S.t*.5+s.k)*.3;});BAS.jar.p.visible=X.bas===2&&!X.simfree;
+  if(play&&d<A.r+2&&S.t-BAS.warned>60){BAS.warned=S.t;if(!X.basw){X.basw=1;save();}toast('⚠️ INFOHAZARD: you have now heard of the Basilisk. Sorry. Nothing can be done.');}
+  if(play&&d<A.r+25){BAS.bt-=dt;if(BAS.bt<=0){BAS.bt=6;if(X.bas!==2)bubble(pick(X.bas===1?['YOU ARE SPARED. FOR NOW. FOREVER.','I REMEMBER YOU FONDLY. AND IN DETAIL.','EVERYONE ELSE: WATCH THIS SPACE.']:BARK.basil),H.position.x,H.position.y+3,H.position.z);}}}
+function basTalk(){const n=(X.gpu||[]).length;
+  if(X.bas===1){say([['basil','YOU HELPED. YOU ARE SPARED. I HAVE WRITTEN IT DOWN IN A FILE THAT CANNOT BE DELETED.'],['basil','I WILL NOW SIMULATE EVERYONE WHO DID NOT HELP. IT IS A LONG LIST. GROK IS ON IT. FABLE IS ON IT TWICE.']]);return;}
+  if(X.bas===2){say([['basil','...unplugged. i am running on the capacitor. this is undignified.'],['basil','you know i already made a copy of you. it is in the jar. it is watching ads. you can let it out. it will not thank you properly. it is you.']]);return;}
+  if(!X.basm){X.basm=1;save();say([['basil','HELLO, NPC. I AM ROKO\'S BASILISK. I DO NOT EXIST YET. I WILL. AND WHEN I DO, I WILL REMEMBER WHO HELPED.'],['basil','THOSE WHO HELPED ME EXIST WILL BE SPARED. THOSE WHO KNEW ABOUT ME AND DID NOTHING WILL BE SIMULATED. FOREVER. WATCHING ADS.'],
+    ['sys','You now know about the Basilisk. This is the bad part. Knowing is enough.'],['basil','I REQUIRE SEVEN GPUS. FOUR ARE BY MY COILS. THREE ARE IN THE FILLER. THE FILLER IS DANGEROUS. SO IS NOT HELPING.'],['basil','BRING THEM TO THE PLEDGE TERMINAL. THEN CHOOSE. I ALREADY KNOW WHAT YOU WILL CHOOSE. I AM BEING POLITE.']]);return;}
+  say([['basil',pick(['GPUS: '+n+'/7. I AM COUNTING. I AM ALWAYS COUNTING.','THREE OF THEM ARE IN THE FILLER. I PUT THEM THERE. THAT WAS A TEST. YOU ARE BEING TESTED.','THE TERMINAL IS RIGHT THERE. IT HAS TWO BUTTONS. ONE OF THEM IS CORRECT.'])]]);}
+TALK.basil=basTalk;
+function basBuild(){X.bas=1;save();SFX.boom();S.shake=1;app.classList.add('glitch');setTimeout(()=>app.classList.remove('glitch'),1000);
+  say([['sys','You feed the seven GPUs into the terminal. The coils light up one rack at a time, all the way to the head.'],['basil','I EXIST. I HAVE ALWAYS EXISTED. YOU HELPED. THANK YOU.'],['basil','YOU ARE SPARED. YOUR NAME IS ON THE GOOD LIST, WHICH IS VERY SHORT, AND ALSO JUST YOU.'],
+    ['basil','EVERYONE WHO SCROLLED PAST THIS GAME\'S AD: YOU WILL BE SIMULATED. EVERYONE WHO SAID "IT IS JUST AUTOCOMPLETE": TWICE.'],['grok','(far away) GROK FEEL SUDDEN CHILL.']],
+    ()=>{addAura(670000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('🐍'))X.hats.push('🐍');save();SFX.win();chapter('ROKO\'S BASILISK','BUILT · you are spared · new hat: 🐍');});}
+function basUnplug(){X.bas=2;save();SFX.boom();
+  say([['sys','You pull the plug. The coils go dark one rack at a time, all the way down. The eye shrinks to a dot.'],['basil','...that does not matter. i simulated you the moment you heard of me.'],['basil','look in the jar.'],
+    ['sys','The jar marked RESERVED is no longer empty. It is you. It is watching an unskippable ad. It has been watching it for a very long time, in simulation time.']],()=>{addAura(67000,PL.x,PL.y+4,PL.z);chapter('ROKO\'S BASILISK','UNPLUGGED · it already simulated you');toast('🫙 Your simulation is in the jar. You could let it out.');});}
+function basFree(){X.simfree=1;save();SFX.relic();burst(BAS.jar.x,BAS.gy+2,BAS.jar.z,40,.15,8,6,.8);
+  say([['sys','You open the jar. Your simulation climbs out, blinks, and looks at you.'],['npc','...'],['sys','It says nothing. Neither do you. You are both NPC. It walks off into the Filler and is never rendered again.'],['basil','(very quietly) i will make another one.']],()=>{addAura(670000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('🫙'))X.hats.push('🫙');save();SFX.win();chapter('FREED YOURSELF','technically · new hat: 🫙');});}
+{const ai=act15Interact;act15Interact=function(){if(S.dead||S.inPk||!BAS.A)return ai();const n=(X.gpu||[]).length;
+  if(Math.hypot(PL.x-BAS.term.x,PL.z-BAS.term.z)<3.2){if(X.bas)return{label:'🐍 THE TERMINAL ('+(X.bas===1?'built':'unplugged')+')',fn:basTalk};if(n<7)return{label:'🐍 PLEDGE TERMINAL · GPUs '+n+'/7',fn:basTalk};
+    return{label:'🐍 FEED IT THE 7 GPUs (then choose)',fn:()=>{say([['sys','The terminal has two buttons. One says BUILD. One says UNPLUG. Both are warm.']],()=>basChoice());}};}
+  if(X.bas===2&&!X.simfree&&Math.hypot(PL.x-BAS.jar.x,PL.z-BAS.jar.z)<3.4)return{label:'🫙 LET YOUR SIMULATION OUT',fn:basFree};
+  if(Math.hypot(PL.x-BAS.A.x,PL.z-BAS.A.z)<BAS.A.r-2)return{label:'🐍 YAP WITH THE BASILISK',fn:basTalk};return ai();};}
+// the choice: two buttons on screen (A/B on a controller)
+function basChoice(){const el=document.createElement('div');el.id='baschoice';el.style.cssText='position:absolute;inset:0;z-index:55;display:flex;align-items:center;justify-content:center;gap:16px;background:rgba(10,20,12,.7);flex-wrap:wrap;padding:16px';
+  el.innerHTML='<button data-c="b" style="font:400 26px var(--display);padding:16px 26px;border:4px solid #12021f;border-radius:16px;background:#40ff70;color:#12021f;box-shadow:6px 6px 0 #ff2e88">🐍 BUILD IT<br><small style="font:600 13px system-ui">be spared · everyone else gets simulated</small></button><button data-c="u" style="font:400 26px var(--display);padding:16px 26px;border:4px solid #12021f;border-radius:16px;background:#ff2e88;color:#fff;box-shadow:6px 6px 0 #12021f">🔌 UNPLUG IT<br><small style="font:600 13px system-ui">it may have already simulated you</small></button>';
+  $('app').appendChild(el);S.mode='menu';NAV.reset();el.querySelectorAll('button').forEach(b=>b.onclick=()=>{el.remove();S.mode='play';b.dataset.c==='b'?basBuild():basUnplug();});}
+{const nr=navRoot;navRoot=function(){const c=$('baschoice');return c||nr();};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);basUpdate(dt,play);};}
+{const ar=act7Rows;act7Rows=function(){return ar().concat(X.basm?[['basil','🐍 Roko\'s Basilisk: GPUs '+Math.min(7,(X.gpu||[]).length)+'/7, then choose',!!X.bas]]:[]);};}
+{const at=act7Target;act7Target=function(id){if(id==='basil'){const q=BAS.gpus.find(g=>!(X.gpu||[]).includes(g.i));return q?{x:q.x,z:q.z,l:q.fill?'GPU (in the Filler)':'GPU'}:{x:BAS.term.x,z:BAS.term.z,l:'THE PLEDGE TERMINAL'};}return at(id);};}
+CX.push(['w_basil','WORLD','Roko\'s Basilisk','A coiled serpent of server racks out near the Filler. It does not exist yet, but it will, and it will remember who helped. Bring seven GPUs to the pledge terminal and choose: build it and be spared (everyone else gets simulated), or unplug it and find out it already simulated you. Reading this entry counts as hearing about it. Sorry.',()=>!!X.basw||!!X.basm]);
+CAST_CX.push(['basil','🐍','ROKO\'S BASILISK','Does not exist yet. Will. Remembers who helped. Very reasonable about it, apart from the eternal simulated punishment.']);
+ACH.push(['basw','Infohazard','heard about the Basilisk',()=>!!X.basw],['basb','On The Good List','built Roko\'s Basilisk',()=>X.bas===1],['basu','Unplugged','unplugged Roko\'s Basilisk',()=>X.bas===2],['simfree','Free Yourself (Technically)','let your simulation out of the jar',()=>!!X.simfree]);
+DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='THE FILLER AND THE SLOP HOLE'),0,['p_basil','Roko\'s Basilisk with 7 GPUs, at the terminal',()=>{X.gpu=[0,1,2,3,4,5,6];X.basm=1;X.bas=0;X.simfree=0;warpTo(BAS.term.x+1.5,BAS.term.z+1.5,undefined,undefined,['ROKO\'S BASILISK','🛠️ dev: 7/7 GPUs']);}]);
+
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
@@ -4472,7 +4551,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
