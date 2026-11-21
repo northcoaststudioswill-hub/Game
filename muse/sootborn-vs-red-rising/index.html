@@ -1,0 +1,443 @@
+<title>Sootborn and Red Rising</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Literata:opsz,wght@7..72,400;7..72,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column of sections; charts sit full-width in scroll boxes. Two inks: ember for Sootborn, violet for Red Rising. */
+:root {
+  --bg: #f2f1ee;
+  --panel: #fbfaf8;
+  --fg: #1c1a18;
+  --muted: #5e5953;
+  --faint: #8d877f;
+  --line: #d8d4ce;
+  --sb: #eb6834;
+  --rr: #6250d6;
+  --sb-soft: color-mix(in oklab, var(--sb) 16%, var(--panel));
+  --rr-soft: color-mix(in oklab, var(--rr) 14%, var(--panel));
+  --change: #c4322f;
+  --watch: #a86a00;
+  --safe: #2b7a3d;
+  --display: "Big Shoulders Display", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151312; --panel: #1d1b19; --fg: #efebe6; --muted: #aca59c; --faint: #7f786f; --line: #36322e;
+    --sb: #d95926; --rr: #9085e9; --change: #ec6a66; --watch: #e0a53a; --safe: #5cbf6e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #151312; --panel: #1d1b19; --fg: #efebe6; --muted: #aca59c; --faint: #7f786f; --line: #36322e;
+  --sb: #d95926; --rr: #9085e9; --change: #ec6a66; --watch: #e0a53a; --safe: #5cbf6e; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 800; letter-spacing: 0.01em; text-wrap: balance; margin: 0; line-height: 1.02; }
+h2 { font-size: clamp(30px, 5vw, 44px); text-transform: uppercase; }
+h3 { font-size: 22px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+p { margin: 0; max-width: 66ch; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--muted); font-size: 17px; }
+section { display: flex; flex-direction: column; gap: 18px; }
+.sb { color: var(--sb); } .rr { color: var(--rr); }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+
+/* hero */
+.hero { padding-top: 56px; display: grid; gap: 22px; }
+.hero h1 { font-size: clamp(54px, 11vw, 120px); text-transform: uppercase; }
+.hero h1 .x { font-weight: 600; color: var(--faint); font-size: 0.5em; vertical-align: middle; padding: 0 0.15em; }
+.hero h1 .a { color: var(--sb); } .hero h1 .b { color: var(--rr); }
+.verdict { font-size: clamp(19px, 2.4vw, 23px); max-width: 52ch; line-height: 1.45; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: grid; gap: 2px; }
+.tile .n { font-family: var(--display); font-size: 44px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.tile .l { font-size: 14px; color: var(--muted); line-height: 1.4; }
+
+/* charts */
+.chart { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; overflow-x: auto; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart.tl svg { min-width: 760px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+svg text { font-family: var(--mono); fill: var(--fg); }
+svg .muted { fill: var(--muted); } svg .faint { fill: var(--faint); }
+.note { font-size: 14px; color: var(--muted); }
+.callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 28px; }
+.callouts p { font-size: 15px; }
+.callouts b { font-family: var(--display); font-size: 19px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; display: block; }
+
+/* beat table */
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; background: var(--panel); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--mono); color: var(--faint); width: 36px; font-variant-numeric: tabular-nums; }
+td .t { font-weight: 600; display: block; }
+td .s { color: var(--muted); }
+.pips { display: inline-flex; gap: 3px; vertical-align: middle; }
+.pips i { width: 9px; height: 9px; border-radius: 2px; background: var(--line); display: block; }
+.pips i.on { background: var(--fg); }
+
+/* pairs */
+.pairs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+.pair { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; gap: 6px; }
+.pair .names { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-family: var(--display); font-size: 21px; font-weight: 600; text-transform: uppercase; line-height: 1.1; }
+.pair .names .arrow { color: var(--faint); font-family: var(--mono); font-size: 13px; }
+.pair .bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.pair .bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--sb), var(--rr)); border-radius: 3px; }
+.pair p { font-size: 14px; color: var(--muted); }
+.pair .score { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+/* risk board */
+.board { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+.col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.col h3 { display: flex; align-items: center; gap: 8px; }
+.col h3 .dot { width: 12px; height: 12px; border-radius: 50%; }
+.item { border-left: 3px solid var(--line); padding: 2px 0 2px 12px; }
+.item b { display: block; font-size: 15px; }
+.item span { font-size: 14px; color: var(--muted); display: block; }
+.c-change .item { border-color: var(--change); } .c-change .dot { background: var(--change); }
+.c-watch .item { border-color: var(--watch); } .c-watch .dot { background: var(--watch); }
+.c-safe .item { border-color: var(--safe); } .c-safe .dot { background: var(--safe); }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.two ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 15px; }
+.two ul li::marker { color: var(--faint); }
+
+#tip { position: fixed; pointer-events: none; z-index: 20; background: var(--fg); color: var(--bg); font-family: var(--mono); font-size: 12px; line-height: 1.45; padding: 8px 10px; border-radius: 4px; max-width: 280px; opacity: 0; transition: opacity .1s; }
+.hit { cursor: default; }
+.hit:focus { outline: none; }
+.hit:focus-visible rect, .hit:focus-visible circle { stroke: var(--fg); stroke-width: 2; }
+footer { font-size: 13px; color: var(--faint); border-top: 1px solid var(--line); padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { #tip { transition: none; } }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Story comparison · Sootborn v0.84, story complete</div>
+  <h1><span class="a">Sootborn</span><span class="x">vs</span><span class="b">Red Rising</span></h1>
+  <p class="verdict">The same skeleton with different organs. Sootborn keeps Red Rising's spine (a dead wife, a man remade into a master, a rigged trial, a climb to the top) and then spends its time on the things Red Rising moves past quickly: grief, ordinary life below, and the arithmetic of who gets to breathe.</p>
+  <div class="tiles" id="tiles"></div>
+</header>
+
+<section>
+  <div class="eyebrow">01 · Timeline overlap</div>
+  <h2>Both clocks start at a death</h2>
+  <p class="lede">Each story counted in years from the execution that starts it: the heart-furnace for Seren, the gallows for Eo. Dashed lines join the beats that do the same job.</p>
+  <div class="legend"><span><i class="swatch" style="background:var(--sb)"></i>Sootborn (dates from the master timeline)</span><span><i class="swatch" style="background:var(--rr)"></i>Red Rising saga (approximate, from Darrow's age in each book)</span></div>
+  <div class="chart tl"><svg id="timeline" viewBox="0 0 980 400" role="img" aria-label="Two timelines in years after the execution. Sootborn runs from eleven months before to nine years after. Red Rising's first trilogy runs to about six and a half years after, with the later saga near sixteen."></svg></div>
+  <div class="callouts">
+    <p><b class="sb">Sootborn lingers</b>Part One is four days, 41 to 160 days after the furnace. Red Rising has no equivalent stretch: Darrow is cut down and taken to be carved almost at once.</p>
+    <p><b>Training takes longer</b>Kael has three and a half years between the furnace and the Assay. Darrow reaches the Institute in about one.</p>
+    <p><b class="rr">The endings line up late</b>From trial to final confrontation is about five years in both. Sootborn's first winter after the Count plays the role Iron Gold plays for Red Rising: the cost of winning.</p>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">02 · Beat by beat</div>
+  <h2>Seventeen beats, matched</h2>
+  <p class="lede">Each row is a job in the story and how each book fills it. The squares score how close the two are, from one (same job, different shape) to five (nearly the same scene).</p>
+  <div class="tablebox"><table id="beats"><thead><tr><th>#</th><th class="sb">Sootborn</th><th class="rr">Red Rising</th><th>Closeness</th><th>Where Sootborn turns away</th></tr></thead><tbody></tbody></table></div>
+  <div class="chart"><svg id="closehist" viewBox="0 0 980 170" role="img" aria-label="Count of beats at each closeness score"></svg></div>
+</section>
+
+<section>
+  <div class="eyebrow">03 · People</div>
+  <h2>Who stands in for whom</h2>
+  <p class="lede">Most of Sootborn's cast splits one Red Rising role into two people or folds two into one. The bar is the same one-to-five closeness score.</p>
+  <div class="pairs" id="pairs"></div>
+  <div class="two">
+    <div><h3 class="rr">In Red Rising, missing from Sootborn</h3><ul>
+      <li>A Sevro: the feral best friend at the hero's side through everything.</li>
+      <li>A Mustang romance. Kestrel Dray is the Accredited who asks why, with no love story.</li>
+      <li>A pack like the Howlers. Kael's cadets follow him, but no named band grows up around him.</li>
+      <li>Space. No fleets between planets; the sky is one valley and one tower.</li>
+    </ul></div>
+    <div><h3 class="sb">In Sootborn, not in Red Rising</h3><ul>
+      <li>Celestine's secret: the ruler was born on Tier Six and won her own trial by shutting a valve.</li>
+      <li>Seren found the bleed first and chose to answer for it, played as her in Bay Three.</li>
+      <li>The Count as a puzzle: Kael rebalances the book and writes his own name in black.</li>
+      <li>A choice at the end: strike her line, or send her home to Row K.</li>
+      <li>Playable side people: Tavi, Mara, Brand, Seren and Celestine each get a level.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">04 · Weight</div>
+  <h2>Where each story spends its pages</h2>
+  <p class="lede">Claude's reading, scored one to five for how much of each story goes to each theme. This is judgement, not a count.</p>
+  <div class="legend"><span><i class="swatch" style="background:var(--sb)"></i>Sootborn</span><span><i class="swatch" style="background:var(--rr)"></i>Red Rising (first trilogy)</span></div>
+  <div class="chart"><svg id="dumbbell" viewBox="0 0 980 420" role="img" aria-label="Dumbbell chart comparing theme weight scores for both stories"></svg></div>
+</section>
+
+<section>
+  <div class="eyebrow">05 · Legally distinct check</div>
+  <h2>What to rename before Steam</h2>
+  <p class="lede">The master timeline says no Red Rising names, emblems, weapons or characters. Ideas and story shapes are free to share; specific terms and signature scenes are what a reader notices. This sorts the overlaps by how much attention they need.</p>
+  <div class="board" id="board"></div>
+</section>
+
+<footer>Sootborn facts come from the <code>sootborn</code> branch: <code>docs/MASTER_TIMELINE.md</code> and <code>docs/STORY_BIBLE.md</code> (v0.84). Red Rising is Pierce Brown's (2014 onward); its dates here are approximate and worked out from Darrow's age, and its details are from memory, not checked against the books. Scores are Claude's judgement. This is a craft comparison, not legal advice.</footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const beats = [
+  ["The execution that starts it", "Seren walked into the heart-furnace for the bled line. Eleven seconds.", "Eo hanged for singing the forbidden song.", 5, "A furnace, not a gallows, and the count to eleven becomes the fury meter."],
+  ["Forbidden goodbye", "Humming the shift song is the only goodbye allowed; Hollis is struck for it.", "Eo's song is forbidden; singing it is what kills her.", 4, "Wordless, because words cost breath. The Authority turns it into the bell tone."],
+  ["She chose it", "Seren found the bleed first, weeks before Kael. \"Let it be somebody who knew.\"", "Eo sings knowing what it costs, to make Darrow want more.", 4, "Seren's choice is hidden until Part Two and played as her."],
+  ["The lie about the world", "\"THE SURFACE BURNS.\" An upper world they are told does not exist.", "Reds are told Mars is unlivable and they are pioneers.", 5, "Air instead of helium-3; the lie is about the sky, not the planet."],
+  ["A death on paper", "Dace arranges Kael's death: a failed seal, Mara signs, a second tin.", "Darrow is hanged and cut down alive by the Sons of Ares.", 3, "Bureaucratic, not physical. It happens 160 days after, not the same night."],
+  ["The resistance below", "The Unlit, under the floor.", "The Sons of Ares.", 4, "Smaller and local: they skim crates and hide people."],
+  ["The remaking", "The Gilding: gold wire in the long bones, gold in the eye. Nine months.", "Mickey carves Darrow into a Gold.", 5, "Kael refuses to lose the burns on his palms. Shown once, as a comic."],
+  ["Learning to pass", "Ilse teaches speech; Brand, a deserted Warden, teaches the blade. Three years.", "Matteo teaches manners; later Lorn teaches the blade.", 4, "Speech rules are mechanical: the Accredited never use contractions or say \"we\"."],
+  ["Into the trial under a dead name", "Up Lift Zero as Edric Sorrel, into the Assay. Twelve Houses, fifty days.", "Into the Institute as Darrow au Andromedus. Houses, one season.", 5, "Told only as dreams in Part One."],
+  ["Kill to enter", "The Pairing: two cadets in a room, one comes out. Dorian shared his bread.", "The Passage: Darrow kills Julian.", 4, "Dorian lives. The Pairing only decides who is a cadet."],
+  ["The graders are bought", "Proctor Halden Voss is paid by two Houses.", "Proctors favour the Jackal and rig the game.", 5, "One man, not the whole staff. Kael is the one who catches it."],
+  ["The hero takes the high ground", "Kael cuts Voss's boots off, charges them at the vent stack and flies.", "Darrow turns the Proctors' own power on them and storms Olympus.", 4, "The boots run off a battery on the island: a valve tech's answer."],
+  ["The ruler's heir on his knees", "The Keep: Lucan's blade breaks in front of his mother. He lives.", "Darrow defeats the trial and the ArchGovernor's children are at stake.", 3, "Kael wins to be pinned by the mother herself."],
+  ["Taken into the enemy's service", "Celestine pins the gold on him and makes him Clerk of the Count.", "Nero au Augustus makes Darrow his lancer.", 5, "She knows who he is and chose him as her successor."],
+  ["Betrayed by the brother's family", "Maren Aldane, Dorian's sister, sells the hour of the dock raid.", "Cassius, Julian's brother, betrays Darrow at the Triumph.", 3, "The sister of the one who lived, not of the one who died."],
+  ["Bodies from the sky", "The Fall: four hundred stolen barges dropped on the Sun Spire.", "The Iron Rain.", 4, "Stolen cargo barges flown by the Unlit, not a fleet's drop troops."],
+  ["The cost of winning", "The Array does not hold. The dead of the first winter are read aloud by name.", "Iron Gold: ten years of war and hunger after the Rising.", 3, "Told in the ending pictures, not a sequel. The player chose her fate."]
+];
+
+const pairs = [
+  ["Kael Brennick", "Darrow", 5, "Underground tech made into a ruler's son. Kael is a valve hand with burned palms, not a Helldiver."],
+  ["Seren Holloway", "Eo", 5, "The wife whose death makes him. Seren paints suns and is played once, in Bay Three."],
+  ["Ilse Marrin", "Mickey + Matteo", 4, "One person does both jobs: the remaking and the manners."],
+  ["Celestine Aurel", "Nero + Octavia", 4, "The ruler who takes him in, plus the throne at the end. Her Tier Six birth is new."],
+  ["Halden Voss", "Apollo", 4, "The bought Proctor he takes apart. One man instead of a panel of gods."],
+  ["The Unlit", "Sons of Ares", 4, "The resistance below. No masked leader with a secret identity."],
+  ["Dace Morrow", "Dancer", 4, "The worker who brings him into the resistance. The names are close; see section 05."],
+  ["Brand", "Lorn + Ragnar", 3, "Blade teacher and the one who dies holding the line. Brand also struck Hollis at Seren's commitment."],
+  ["Maren Aldane", "Cassius", 3, "Family of his trial victim who sells him out. A sister, and Dorian lived."],
+  ["Dorian Aldane", "Julian", 3, "The gentle boy at the first-night kill. Dorian survives."],
+  ["Severin Cade", "Karnus", 3, "A noble who wants satisfaction for his family's honour."],
+  ["Kestrel Dray", "Mustang", 2, "The ruling-class mind who asks why and defects. No romance."],
+  ["Lucan Aurel", "Cassius", 2, "The ruler's kind son he defeats at the keep and who may become a friend."],
+  ["Tavi", "Kieran", 2, "Younger, not older. Saved by the stolen air; comes up at sixteen."],
+  ["Mara Venn", "Narol", 2, "The elder below who knows. Mara leads Tier Six to stop kneeling."]
+];
+
+const themes = [
+  ["Grief for the dead wife", 5, 4],
+  ["Everyday life below", 5, 2],
+  ["The cost of the revolution", 5, 4],
+  ["Class system critique", 5, 5],
+  ["Political intrigue, betrayal", 3, 5],
+  ["War and battle scale", 3, 5],
+  ["Friendship, found family", 3, 5],
+  ["Romance", 1, 4],
+  ["Science fiction technology", 2, 5]
+];
+
+const board = {
+  change: { title: "Change", items: [
+    ["\"Proctor\"", "Red Rising's word for the trial's graders, and Sootborn uses it for exactly that job, corrupt and paid by a House. Since the Assay is about counting, try Tallymen or Markers."],
+    ["\"Universalis\" for the Assay", "The open list already warns it leans on the school-as-war idea. Keeping \"the Assay\" is safer."]
+  ]},
+  watch: { title: "Watch", items: [
+    ["Dace Morrow", "Dace next to Dancer, in the same role, will be read as a nod. A different first sound fixes it."],
+    ["Gold eyes and longer bones", "The Gilding is close to the carving. The burned palms help; keep leaning on what is different."],
+    ["Taking the Proctor's boots to fly", "A signature beat for readers. The battery and the vent stack make it Sootborn's own; keep that in the scene."],
+    ["The pinning and the patron's post", "Same shape as the lancer. Fine as a shape; avoid the word lancer and any ceremony echoes."],
+    ["Barges dropped on the Spire", "Reads as the Iron Rain. Never call it a rain."],
+    ["Houses named for colours", "Violet and Teal sit next to a story about colour castes. Low risk, but noticeable."]
+  ]},
+  safe: { title: "Already distinct", items: [
+    ["Air instead of helium-3", "The whole economy, the Count and the heart-furnace."],
+    ["Celestine's Tier Six secret", "No ruler in Red Rising is secretly lowborn."],
+    ["The ending choice", "Strike her line or send her down Lift Zero."],
+    ["The shift song, the washer ring, the chalk sun", "Sootborn's own objects carry its motifs."],
+    ["Eleven seconds", "The count as memory, fury meter and transition."],
+    ["Speech rules", "No contractions above; aye and ta below."]
+  ]}
+};
+
+const $ = (s) => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const tip = $("#tip");
+function bindTip(node, html) {
+  node.classList.add("hit");
+  node.setAttribute("tabindex", "0");
+  const show = (x, y) => { tip.innerHTML = html; tip.style.opacity = 1; place(x, y); };
+  const place = (x, y) => {
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = x + 14, top = y + 14;
+    if (left + w > innerWidth - 8) left = x - w - 14;
+    if (top + h > innerHeight - 8) top = y - h - 14;
+    tip.style.left = Math.max(8, left) + "px"; tip.style.top = Math.max(8, top) + "px";
+  };
+  node.addEventListener("pointerenter", (e) => show(e.clientX, e.clientY));
+  node.addEventListener("pointermove", (e) => place(e.clientX, e.clientY));
+  node.addEventListener("pointerleave", () => tip.style.opacity = 0);
+  node.addEventListener("focus", () => { const r = node.getBoundingClientRect(); show(r.left + r.width / 2, r.bottom); });
+  node.addEventListener("blur", () => tip.style.opacity = 0);
+}
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+/* tiles */
+const close4 = beats.filter(b => b[3] >= 4).length;
+const avg = (beats.reduce((a, b) => a + b[3], 0) / beats.length).toFixed(1);
+$("#tiles").innerHTML = [
+  [beats.length, "story beats do the same job in both"],
+  [close4, "of them are close (four or five out of five)"],
+  [avg, "average closeness, out of five"],
+  [board.change.items.length + " + " + board.watch.items.length, "names to change, overlaps to watch"]
+].map(([n, l]) => `<div class="tile"><span class="n">${n}</span><span class="l">${l}</span></div>`).join("");
+
+/* timeline */
+(function () {
+  const svg = $("#timeline");
+  const L = 40, R = 840, BRK = 870, IG = 925;
+  const x = (y) => y > 12 ? IG + (y - 16.5) * 24 : L + (y + 1) / 11 * (R - L);
+  const sbY = 140, rrY = 240, H = 16;
+  // grid
+  for (let y = -1; y <= 10; y++) {
+    el("line", { x1: x(y), x2: x(y), y1: 30, y2: 350, stroke: "var(--line)", "stroke-width": 1 }, svg);
+    el("text", { x: x(y), y: 376, "text-anchor": "middle", "font-size": 12, class: y === 0 ? "" : "muted", "font-weight": y === 0 ? 500 : 400 }, svg, y === 0 ? "0" : (y > 0 ? "+" + y : y));
+  }
+  el("line", { x1: IG, x2: IG, y1: 30, y2: 350, stroke: "var(--line)", "stroke-width": 1 }, svg);
+  el("text", { x: IG, y: 376, "text-anchor": "middle", "font-size": 12, class: "muted" }, svg, "+16");
+  el("text", { x: BRK, y: 376, "text-anchor": "middle", "font-size": 13, class: "faint" }, svg, "//");
+  el("text", { x: L, y: 396, "font-size": 11, class: "faint" }, svg, "years after the execution");
+  el("line", { x1: x(0), x2: x(0), y1: 30, y2: 350, stroke: "var(--fg)", "stroke-width": 1.5, "stroke-dasharray": "2 3" }, svg);
+  // lane rails
+  el("line", { x1: L, x2: R + 50, y1: sbY + H / 2, y2: sbY + H / 2, stroke: "var(--sb)", "stroke-opacity": .25, "stroke-width": 2 }, svg);
+  el("line", { x1: L, x2: IG + 30, y1: rrY + H / 2, y2: rrY + H / 2, stroke: "var(--rr)", "stroke-opacity": .25, "stroke-width": 2 }, svg);
+  el("text", { x: L - 4, y: sbY - 74, "font-size": 12, "font-weight": 500, fill: "var(--sb)", style: "fill:var(--sb)" }, svg, "SOOTBORN");
+  el("text", { x: L - 4, y: rrY + H + 86, "font-size": 12, "font-weight": 500, style: "fill:var(--rr)" }, svg, "RED RISING");
+
+  const sb = [
+    [-0.92, null, "Wedding", 0, "Eleven months before. Pressure-bound at the Pillar, First Fire."],
+    [-0.01, null, "Fever, heist", 1, "Four days before. The bleed off Valve Bank Seven so forty kids can breathe.", "end"],
+    [0, null, "Furnace", 2, "Seren goes into the heart-furnace. Eleven seconds.", "start6"],
+    [0.11, 0.44, "Four days below", 0, "Part One's present: 41 to 160 days after. Ashgate, First Fire, the Ledger, the Way Out."],
+    [0.5, 1.25, "Gilding", 1, "Half a year after. Nine months on Ilse's table."],
+    [1.25, 3.95, "Training with Brand", 2, "Two to two and a half years after: the Drill, No Gloves. Three years in all."],
+    [4.0, 4.14, "The Assay", 0, "Four years after. Fifty days, the Pairing to the Keep."],
+    [4.14, 4.9, "Pinning, the Post", 1, "Celestine pins him; Clerk Sorrel at the Count."],
+    [5, null, "Balancing", 2, "Five years after. Tier Four, Riser Nine."],
+    [6, null, "What she knows", 0, "Six years after. Lucan comes for him."],
+    [7, null, "High Docks", 1, "Seven years after. Four hundred barges cut loose; Brand holds the stair."],
+    [7, 9, "Two years on the barges", 2, "Seven to nine years after."],
+    [9, null, "The Count, Little Ember", 0, "Nine years after. The book, the Stair, Celestine."],
+    [9.05, 9.6, "First winter", 1, "The Array does not hold; the dead are counted aloud."]
+  ];
+  const rr = [
+    [0, null, "Eo hanged", 0, "Darrow is about 16.", "start6"],
+    [0.1, 0.9, "Carved, taught", 1, "Mickey's carving, Matteo's manners. Approximate."],
+    [1.0, 1.4, "The Institute", 2, "Book one. Darrow about 17."],
+    [1.5, null, "Lancer to Nero", 0, "End of book one."],
+    [3.8, 4.6, "Golden Son", 1, "Book two. Darrow about 20. The Iron Rain, the Triumph."],
+    [4.6, 5.4, "The Jackal's table", 2, "Captivity, between books two and three."],
+    [5.4, 6.6, "Morning Star", 0, "Book three. The Rising."],
+    [16, 17, "Iron Gold saga", 1, "Ten years after Morning Star. Darrow about 33.", "end"]
+  ];
+  const links = [[0, 0], [0.5, 0.1], [4.0, 1.0], [4.14, 1.5], [7, 4.2], [9, 6.6], [9.3, 16]];
+  links.forEach(([a, b]) => el("path", { d: `M${x(a)},${sbY + H + 2} C${x(a)},${(sbY + rrY) / 2 + 20} ${x(b)},${(sbY + rrY) / 2 - 10} ${x(b)},${rrY - 2}`, fill: "none", stroke: "var(--muted)", "stroke-width": 1.2, "stroke-dasharray": "4 4", "stroke-opacity": .8 }, svg));
+
+  function lane(items, laneY, color, above) {
+    items.forEach(([a, b, label, row, desc, anchor]) => {
+      const g = el("g", {}, svg);
+      const ly = above ? laneY - 12 - row * 22 : laneY + H + 22 + row * 22;
+      const xa = x(a);
+      if (b == null) {
+        el("circle", { cx: xa, cy: laneY + H / 2, r: label === "Furnace" || label === "Eo hanged" ? 8 : 6, fill: color, stroke: "var(--panel)", "stroke-width": 2 }, g);
+      } else {
+        el("rect", { x: xa, y: laneY, width: Math.max(4, x(b) - xa), height: H, rx: 4, fill: color, stroke: "var(--panel)", "stroke-width": 2 }, g);
+      }
+      el("line", { x1: xa + (anchor === "end" ? 0 : 0), x2: xa, y1: above ? ly + 4 : ly - 13, y2: above ? laneY - 2 : laneY + H + 2, stroke: "var(--line)", "stroke-width": 1 }, g);
+      el("text", { x: anchor === "end" ? xa + 4 : anchor === "start6" ? xa + 6 : xa - 2, y: ly, "font-size": 12, "text-anchor": anchor === "end" ? "end" : "start" }, g, label);
+      // generous hit target
+      el("rect", { x: xa - 10, y: Math.min(ly - 14, laneY - 4), width: Math.max(28, (b == null ? 0 : x(b) - xa) + 20), height: Math.abs(ly - laneY) + H + 18, fill: "transparent" }, g);
+      bindTip(g, `<b>${esc(label)}</b><br>${esc(desc)}`);
+    });
+  }
+  lane(sb, sbY, "var(--sb)", true);
+  lane(rr, rrY, "var(--rr)", false);
+})();
+
+/* beats table */
+$("#beats tbody").innerHTML = beats.map((b, i) => `<tr><td class="n">${String(i + 1).padStart(2, "0")}</td>
+  <td><span class="t">${esc(b[0])}</span><span class="s">${esc(b[1])}</span></td>
+  <td><span class="s">${esc(b[2])}</span></td>
+  <td><span class="pips" aria-label="${b[3]} of 5">${[1,2,3,4,5].map(k => `<i class="${k <= b[3] ? "on" : ""}"></i>`).join("")}</span></td>
+  <td><span class="s">${esc(b[4])}</span></td></tr>`).join("");
+
+/* closeness histogram */
+(function () {
+  const svg = $("#closehist");
+  const counts = [1, 2, 3, 4, 5].map(k => beats.filter(b => b[3] === k));
+  const L = 190, R = 940, max = Math.max(...counts.map(c => c.length));
+  el("text", { x: 0, y: 18, "font-size": 12, class: "muted" }, svg, "BEATS BY CLOSENESS SCORE");
+  counts.forEach((c, i) => {
+    const y = 34 + i * 26;
+    const labels = ["1 · same job only", "2 · loose", "3 · recognisable", "4 · close", "5 · nearly the same"];
+    el("text", { x: 0, y: y + 13, "font-size": 12, class: "muted" }, svg, labels[i]);
+    const w = c.length / max * (R - L);
+    if (c.length) {
+      const g = el("g", {}, svg);
+      el("rect", { x: L, y, width: w, height: 18, rx: 4, fill: "var(--sb)", "fill-opacity": 0.35 + i * 0.16 }, g);
+      el("rect", { x: L, y: y - 2, width: Math.max(w, 30), height: 22, fill: "transparent" }, g);
+      bindTip(g, `<b>${c.length} beat${c.length > 1 ? "s" : ""} at ${i + 1}</b><br>${c.map(b => esc(b[0])).join("<br>")}`);
+    }
+    el("text", { x: L + w + 8, y: y + 13, "font-size": 12 }, svg, c.length);
+  });
+})();
+
+/* pairs */
+$("#pairs").innerHTML = pairs.map(p => `<div class="pair">
+  <div class="names"><span class="sb">${esc(p[0])}</span><span class="arrow">≈</span><span class="rr">${esc(p[1])}</span></div>
+  <div class="bar" role="img" aria-label="closeness ${p[2]} of 5"><span style="width:${p[2] * 20}%"></span></div>
+  <span class="score">closeness ${p[2]} / 5</span>
+  <p>${esc(p[3])}</p></div>`).join("");
+
+/* dumbbell */
+(function () {
+  const svg = $("#dumbbell");
+  const L = 270, R = 940, top = 40, rowH = 40;
+  const x = (v) => L + (v - 1) / 4 * (R - L);
+  for (let v = 1; v <= 5; v++) {
+    el("line", { x1: x(v), x2: x(v), y1: top - 14, y2: top + themes.length * rowH - 16, stroke: "var(--line)" }, svg);
+    el("text", { x: x(v), y: top - 22, "text-anchor": "middle", "font-size": 12, class: "muted" }, svg, v);
+  }
+  el("text", { x: L, y: top + themes.length * rowH + 6, "font-size": 11, class: "faint" }, svg, "1 = barely there · 5 = central");
+  themes.forEach(([name, s, r], i) => {
+    const y = top + i * rowH;
+    const g = el("g", {}, svg);
+    el("text", { x: 0, y: y + 4, "font-size": 13 }, g, name);
+    if (s !== r) el("line", { x1: x(Math.min(s, r)), x2: x(Math.max(s, r)), y1: y, y2: y, stroke: "var(--muted)", "stroke-width": 2, "stroke-opacity": .5 }, g);
+    if (s === r) {
+      el("circle", { cx: x(s) - 7, cy: y, r: 8, fill: "var(--rr)", stroke: "var(--panel)", "stroke-width": 2 }, g);
+      el("circle", { cx: x(s) + 7, cy: y, r: 8, fill: "var(--sb)", stroke: "var(--panel)", "stroke-width": 2 }, g);
+    } else {
+      el("circle", { cx: x(r), cy: y, r: 8, fill: "var(--rr)", stroke: "var(--panel)", "stroke-width": 2 }, g);
+      el("circle", { cx: x(s), cy: y, r: 8, fill: "var(--sb)", stroke: "var(--panel)", "stroke-width": 2 }, g);
+    }
+    el("rect", { x: 0, y: y - 16, width: R + 20, height: 32, fill: "transparent" }, g);
+    bindTip(g, `<b>${esc(name)}</b><br>Sootborn ${s} · Red Rising ${r}`);
+  });
+})();
+
+/* board */
+$("#board").innerHTML = ["change", "watch", "safe"].map(k => `<div class="col c-${k}"><h3><span class="dot"></span>${board[k].title}</h3>
+  ${board[k].items.map(([b, s]) => `<div class="item"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>`).join("");
+</script>
