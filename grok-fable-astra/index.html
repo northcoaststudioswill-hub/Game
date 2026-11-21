@@ -4383,7 +4383,7 @@ MENU.tabs=()=>['col','cx','who','ctl','sys'].concat(DEV.on?['dev']:[]);
     B.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const d=b.dataset.d;if(d==='found'){AREAS.forEach(a=>{if(!X.vis.includes(a.id))X.vis.push(a.id);});['pk_maze','pk_patch','pk_lab','pk_hole','swing'].forEach(v=>{if(!X.vis.includes(v))X.vis.push(v);});}
       else if(d==='chars'){DEV.all=true;}else if(d==='aura')addAura(1000000,PL.x,PL.y+3,PL.z);else if(d==='bits'){X.fb=[0,1,2,3,4,5];X.cc=1;X.ccm=1;}else if(d==='fed')X.fed=Math.max(X.fed||0,60);else if(d==='kc')X.kc=Math.max(X.kc||0,3);else if(d==='lose'){X.terms=Math.max(1,X.terms||0);e4Lose();}else if(d==='heal')S.cells=S.max;
       else if(d==='god'){DEV.god=!DEV.god;devSave();}else if(d==='fps'){DEV.fps=!DEV.fps;devSave();fpsShow();}save();toast('🛠️ '+b.textContent);menuRender();NAV.reset();});}
-  NAV.reset();};}
+  if(MENU._lt!==MENU.tab){MENU._lt=MENU.tab;NAV.mem=NAV.mem||{};NAV.mem.menu=navItems($('menu')).indexOf($('menu').querySelector('nav button.on'));}NAV.reset();};}
 // ---- controller navigation for every menu and screen
 const NAV={el:null,prev:[],rep:0,dir:null,reset(){NAV.need=true;}};
 function navRoot(){if($('splash'))return $('splash');if($('intro'))return $('intro');if($('ctlcard'))return $('ctlcard');if($('tpanel'))return $('tpanel');if(MENU.open)return $('menu');if(!$('title').hidden)return $('title');if(!$('end').hidden)return $('end');return null;}
