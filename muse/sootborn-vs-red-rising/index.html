@@ -111,6 +111,38 @@ td .s { color: var(--muted); }
 .two ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 15px; }
 .two ul li::marker { color: var(--faint); }
 
+
+/* arcs */
+.arcs { display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 14px; }
+@media (max-width: 520px) { .arcs { grid-template-columns: 1fr; } }
+.arc { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.arc .names { font-family: var(--display); font-size: 24px; font-weight: 600; text-transform: uppercase; line-height: 1.05; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.arc .names i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--faint); }
+.arc .svgbox { overflow-x: auto; }
+.arc svg { display: block; width: 100%; min-width: 400px; height: auto; }
+.arc dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 14px; }
+.arc dt { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; padding-top: 3px; white-space: nowrap; }
+.arc dd { margin: 0; color: var(--muted); }
+.arc .flip { border-top: 1px solid var(--line); padding-top: 10px; font-size: 14.5px; }
+.arc .flip b { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-right: 6px; }
+.keyrow { display: flex; flex-wrap: wrap; gap: 6px 20px; font-family: var(--mono); font-size: 12px; color: var(--muted); align-items: center; }
+.keyrow svg { vertical-align: middle; margin-right: 6px; }
+
+/* mirrors */
+.mirrors { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+.mirror { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.mirror .hd { font-family: var(--display); font-size: 22px; font-weight: 600; text-transform: uppercase; line-height: 1.05; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.mirror .hd i { font-style: normal; font-family: var(--mono); color: var(--faint); font-size: 15px; }
+.mirror .same { font-size: 14px; color: var(--muted); }
+.mirror .same b { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; margin-right: 4px; color: var(--fg); }
+.mirror .lr { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.mirror .lr div { background: var(--panel); padding: 8px 10px; font-size: 14px; }
+.mirror .lr div b { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; font-weight: 500; color: var(--muted); margin-bottom: 2px; }
+.mirror q { font-size: 14.5px; font-style: italic; quotes: "\201C" "\201D"; }
+.mirror .tag { font-family: var(--mono); font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; }
+.threads { border: 1px solid var(--watch); border-radius: 6px; padding: 14px 16px; display: grid; gap: 8px; background: var(--panel); }
+.threads h3 { color: var(--watch); }
+.threads ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 15px; }
 #tip { position: fixed; pointer-events: none; z-index: 20; background: var(--fg); color: var(--bg); font-family: var(--mono); font-size: 12px; line-height: 1.45; padding: 8px 10px; border-radius: 4px; max-width: 280px; opacity: 0; transition: opacity .1s; }
 .hit { cursor: default; }
 .hit:focus { outline: none; }
@@ -186,6 +218,42 @@ footer { font-size: 13px; color: var(--faint); border-top: 1px solid var(--line)
   <div class="board" id="board"></div>
 </section>
 
+
+<section>
+  <div class="eyebrow">06 · Character arcs</div>
+  <h2>Who they stand with, start to finish</h2>
+  <p class="lede">Each panel follows one Sootborn character and their Red Rising counterpart through five stages of the story. Up is the rulers, down is the people below, the way the two worlds sit in both books. The scores are Claude's reading; hover or tap a point for what happens there.</p>
+  <div class="keyrow">
+    <span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="var(--sb)" stroke-width="2.5"/></svg>Sootborn</span>
+    <span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="var(--rr)" stroke-width="2" stroke-dasharray="5 4"/></svg>Red Rising</span>
+    <span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="var(--sb)" stroke-width="2" stroke-dasharray="1.5 3.5"/></svg>the player's other ending</span>
+    <span><svg width="14" height="14"><path d="M3 3L11 11M11 3L3 11" stroke="var(--fg)" stroke-width="2"/></svg>dies</span>
+  </div>
+  <div class="arcs" id="arcs"></div>
+</section>
+
+<section>
+  <div class="eyebrow">07 · Inverse characters</div>
+  <h2>Same place, opposite choice</h2>
+  <p class="lede">Sootborn is built in mirrored pairs: two people put in the same position who choose the other way. Red Rising has some of this (Darrow and the Jackal, both climbing Mars), but Sootborn leans on it much harder. These are the inverses inside Sootborn.</p>
+  <div class="mirrors" id="mirrors"></div>
+  <h3 style="margin-top:8px">Flipped across the two books</h3>
+  <p class="lede">Some Sootborn characters are a Red Rising role turned inside out.</p>
+  <div class="tablebox"><table id="flips"><thead><tr><th class="sb">Sootborn</th><th class="rr">Red Rising</th><th>What is flipped</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section>
+  <div class="eyebrow">08 · Loose threads</div>
+  <div class="threads">
+    <h3>The docs disagree here</h3>
+    <ul>
+      <li><b>Does Dorian survive the Pairing?</b> The master timeline (4f) says he lives and shares bread on day three. The story bible says the loser leaves "by the other door", puts "Aldane, D." on the wall, and has Maren sell the dock raid "For Dorian Aldane. Balanced." Maren's whole arc depends on which is true.</li>
+      <li><b>Is Tavi a brother or a sister?</b> The plan says brother, the Part Two script says her, the Codex says sibling. The story bible lists it as open.</li>
+      <li><b>Oswin and the Unlit.</b> Making him the Auditor's Blade means he never appears with the Unlit later. The bible marks this "to confirm".</li>
+    </ul>
+  </div>
+</section>
+
 <footer>Sootborn facts come from the <code>sootborn</code> branch: <code>docs/MASTER_TIMELINE.md</code> and <code>docs/STORY_BIBLE.md</code> (v0.84). Red Rising is Pierce Brown's (2014 onward); its dates here are approximate and worked out from Darrow's age, and its details are from memory, not checked against the books. Scores are Claude's judgement. This is a craft comparison, not legal advice.</footer>
 </div>
 <div id="tip" role="tooltip"></div>
@@ -201,12 +269,12 @@ const beats = [
   ["The remaking", "The Gilding: gold wire in the long bones, gold in the eye. Nine months.", "Mickey carves Darrow into a Gold.", 5, "Kael refuses to lose the burns on his palms. Shown once, as a comic."],
   ["Learning to pass", "Ilse teaches speech; Brand, a deserted Warden, teaches the blade. Three years.", "Matteo teaches manners; later Lorn teaches the blade.", 4, "Speech rules are mechanical: the Accredited never use contractions or say \"we\"."],
   ["Into the trial under a dead name", "Up Lift Zero as Edric Sorrel, into the Assay. Twelve Houses, fifty days.", "Into the Institute as Darrow au Andromedus. Houses, one season.", 5, "Told only as dreams in Part One."],
-  ["Kill to enter", "The Pairing: two cadets in a room, one comes out. Dorian shared his bread.", "The Passage: Darrow kills Julian.", 4, "Dorian lives. The Pairing only decides who is a cadet."],
+  ["Kill to enter", "The Pairing: two cadets in a room, one comes out. Dorian shared his bread.", "The Passage: Darrow kills Julian.", 4, "The master timeline says Dorian lives; older notes say he dies. See section 08."],
   ["The graders are bought", "Proctor Halden Voss is paid by two Houses.", "Proctors favour the Jackal and rig the game.", 5, "One man, not the whole staff. Kael is the one who catches it."],
   ["The hero takes the high ground", "Kael cuts Voss's boots off, charges them at the vent stack and flies.", "Darrow turns the Proctors' own power on them and storms Olympus.", 4, "The boots run off a battery on the island: a valve tech's answer."],
   ["The ruler's heir on his knees", "The Keep: Lucan's blade breaks in front of his mother. He lives.", "Darrow defeats the trial and the ArchGovernor's children are at stake.", 3, "Kael wins to be pinned by the mother herself."],
   ["Taken into the enemy's service", "Celestine pins the gold on him and makes him Clerk of the Count.", "Nero au Augustus makes Darrow his lancer.", 5, "She knows who he is and chose him as her successor."],
-  ["Betrayed by the brother's family", "Maren Aldane, Dorian's sister, sells the hour of the dock raid.", "Cassius, Julian's brother, betrays Darrow at the Triumph.", 3, "The sister of the one who lived, not of the one who died."],
+  ["Betrayed by the brother's family", "Maren Aldane, Dorian's sister, sells the hour of the dock raid.", "Cassius, Julian's brother, betrays Darrow at the Triumph.", 3, "A sister, not a brother, and her weapon is a pen."],
   ["Bodies from the sky", "The Fall: four hundred stolen barges dropped on the Sun Spire.", "The Iron Rain.", 4, "Stolen cargo barges flown by the Unlit, not a fleet's drop troops."],
   ["The cost of winning", "The Array does not hold. The dead of the first winter are read aloud by name.", "Iron Gold: ten years of war and hunger after the Rising.", 3, "Told in the ending pictures, not a sequel. The player chose her fate."]
 ];
@@ -220,8 +288,8 @@ const pairs = [
   ["The Unlit", "Sons of Ares", 4, "The resistance below. No masked leader with a secret identity."],
   ["Dace Morrow", "Dancer", 4, "The worker who brings him into the resistance. The names are close; see section 05."],
   ["Brand", "Lorn + Ragnar", 3, "Blade teacher and the one who dies holding the line. Brand also struck Hollis at Seren's commitment."],
-  ["Maren Aldane", "Cassius", 3, "Family of his trial victim who sells him out. A sister, and Dorian lived."],
-  ["Dorian Aldane", "Julian", 3, "The gentle boy at the first-night kill. Dorian survives."],
+  ["Maren Aldane", "Cassius", 3, "Family of his trial opponent who sells him out. A sister, with a pen instead of a blade."],
+  ["Dorian Aldane", "Julian", 3, "The gentle boy at the first-night kill. The docs disagree on whether he survives; see section 08."],
   ["Severin Cade", "Karnus", 3, "A noble who wants satisfaction for his family's honour."],
   ["Kestrel Dray", "Mustang", 2, "The ruling-class mind who asks why and defects. No romance."],
   ["Lucan Aurel", "Cassius", 2, "The ruler's kind son he defeats at the keep and who may become a friend."],
@@ -440,4 +508,164 @@ $("#pairs").innerHTML = pairs.map(p => `<div class="pair">
 /* board */
 $("#board").innerHTML = ["change", "watch", "safe"].map(k => `<div class="col c-${k}"><h3><span class="dot"></span>${board[k].title}</h3>
   ${board[k].items.map(([b, s]) => `<div class="item"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>`).join("");
+
+/* ---------- arcs ---------- */
+const SBPH = ["Below", "The Assay", "The Spire", "Docks, barges", "The Count"];
+const RRPH = ["Lykos", "Institute", "Golden Son", "Morning Star", "Iron Gold"];
+const arcs = [
+  { a: "Kael Brennick", b: "Darrow",
+    sb: [2, 1, 0, 2, 2], sbN: ["Valve hand on Tier Six. Bleeds the line so the fever ward can breathe.", "Edric Sorrel, a dead boy's name. Fights for House Violet.", "Clerk of the Count. Has struck 406 lines himself and learned every one.", "Cuts the barges loose with the Unlit; sits a month on a barge counting nothing.", "Rebalances the book, writes his own name in black, goes down to Seren's chalk sun."],
+    rr: [0, 1, 0, 2, 2], rrN: ["A Helldiver who believes the Society's promise.", "Carved into a Gold; wins the Institute.", "Lancer to Nero. The Gold life pulls at him.", "Leads the Rising.", "The war goes on under his name, and so does its cost."],
+    arcS: "Fury turned into arithmetic. Starts counting eleven seconds; ends rewriting the book. His speech goes soot, then Accredited, then back to \"we\" before the Stair.",
+    arcR: "From obedient miner to the revolution's sword. The later books ask what the sword cost.",
+    flip: "Darrow's danger is turning into a Gold. Kael's danger is turning into Celestine, and the game makes that a choice the player makes at the end." },
+  { a: "Celestine Aurel", b: "Nero au Augustus",
+    sb: [2, -1, -2, -2, -2], sbN: ["Little Ember, born on Tier Six. Taken up by an Accredited family; lets them take the burns off her palms.", "Her own Assay at twenty: shuts the valve on the enemy camp. Two cadets do not wake. The Proctors write \"genius\".", "Fifty years running the Count. Sends Seren into the furnace: one for forty.", "Knew Kael at the Pinning; has waited two years for him to slip. Wants a successor.", "Beaten at Little Ember. Struck: Kael writes \"Balanced\" after her name."],
+    alt: { v: 1, n: "Sent down Lift Zero to a bunk on Row K. Mara calls her \"little ember\" without knowing why." },
+    rr: [-2, -2, -2, null, null], rrN: ["ArchGovernor of Mars.", "Watches the Institute and picks Darrow out.", "Takes Darrow as his lancer; killed by his own son at the Triumph.", "", ""], rrDie: 2,
+    arcS: "Her arc happened fifty years ago and the game reveals it backwards: the gloves, the valve wheel, then her own Assay played as her.",
+    arcR: "Fixed in place. A born Gold who rewards talent and is undone by his family.",
+    flip: "Nero never knew what Darrow was. Celestine knew him at first look, because she had been him." },
+  { a: "Oswin Hale", b: "Roque au Fabii",
+    sb: [null, 1, -1, -1, -2], sbN: ["", "House Violet cadet; his father finished ninth for thirty years. Carries the water unasked. \"Noted\", and means it.", "The salve comes eleven days late and his leg sets crooked. Celestine offers a post and takes his name.", "Kael sees him masked at the fitting and does not turn round.", "The Auditor's Blade at the top of the Stair. \"Hale, O.\" goes on Mara's list."], sbDie: 4,
+    rr: [null, 1, -2, -2, null], rrN: ["", "A friend in House Mars, the poet.", "Beside Darrow through Golden Son, then betrays him at the Triumph.", "Fights the Rising; dies by his own hand rather than be taken.", ""], rrDie: 3,
+    arcS: "The best slow arc in the game: a decent boy priced out of his family, bought by Celestine, met on the Stair in a mask.",
+    arcR: "A gentle friend who chooses the Society's order over Darrow.",
+    flip: "Roque betrays out of belief. Oswin never betrays anyone; he is bought." },
+  { a: "Maren Aldane", b: "Cassius au Bellona",
+    sb: [-1, -1, -1, -2, -2], sbN: ["Second Clerk of the Count, Dorian's elder sister.", "Her brother goes into the Pairing against Edric Sorrel.", "Likes Sorrel's sums. Opens the sealed pairings and reads who was in Dorian's room.", "Gives the dock office the hour of the raid: \"For Dorian Aldane. Balanced.\" Brand dies holding the stair.", "Alone at the white door with a pen."],
+    alt: { v: 1, n: "Told the truth, she opens the door, then keeps the new Count as a list of names read aloud, Dorian's first." },
+    rr: [null, -1, -2, 1, 1], rrN: ["", "Julian's brother; Darrow kills Julian in the Passage.", "Darrow's friend, then betrays him at the Triumph.", "Turns on the Jackal and fights beside Darrow.", "Keeps his own code, guarding the enemy's heir."],
+    arcS: "Grief kept in a ledger. She uses Celestine's word for her revenge, and her last scene is whether she keeps the new book.",
+    arcR: "Grief as family honour: revenge first, then a harder loyalty.",
+    flip: "Cassius gets a duel. Maren gets a pen, and Brand is the one who pays." },
+  { a: "Kestrel Dray", b: "Mustang",
+    sb: [-1, -1, 0, 2, 2], sbN: ["Accredited engineer, one of Celestine's forty, nineteen.", "Not in the Assay. Working the Array board for Celestine.", "Lives on the fourth ring. The only one of the forty who asks why; starts saying \"we\".", "Defects to the Unlit with eleven engineers and the Array schematics. Kael blames her for a week.", "Brings the Array board's copy of the Count for the last night."],
+    rr: [null, -1, 0, 2, 2], rrN: ["", "House Minerva at the Institute: rival, then ally.", "Ally and love, keeping her own counsel.", "Brings her forces to the Rising.", "Sovereign of the new Republic."],
+    arcS: "The ruling class learning to say \"we\". An engineer who says somebody has to care whether it works.",
+    arcR: "A Gold who chooses the revolution and ends up running it.",
+    flip: "Mustang is the love story. Kestrel is a colleague, and the one person Kael wrongly suspects." },
+  { a: "Lucan Aurel", b: "The Jackal",
+    sb: [-1, -1, 0, 1, 1], sbN: ["Celestine's son. \"Kind, which is the same as useless.\"", "Holds the Keep on the last day; his blade breaks and he kneels in front of his mother.", "Asks Clerk Sorrel to teach him.", "Celestine tells him who Sorrel is; he comes for Kael. As a friend, he yields and gives the dock key.", "At the white door he lays his blade flat and walks down."],
+    alt: { at: 3, v: -1, n: "Not befriended, he goes over the parapet and lives, with a stick ever after." },
+    rr: [null, -2, -2, -2, null], rrN: ["", "Rigs the Institute through the Proctors.", "Kills his father at the Triumph and takes Mars.", "Holds Darrow prisoner; dies before the war ends.", ""], rrDie: 3,
+    arcS: "A kind heir who is beaten, then taught, then lets go.",
+    arcR: "The ruler's son as the cruellest person in the story.",
+    flip: "Sootborn turns the heir around. It has no sadist: its threat is a woman doing sums." }
+];
+
+(function () {
+  const host = $("#arcs");
+  arcs.forEach((d, k) => {
+    const card = document.createElement("div");
+    card.className = "arc";
+    card.innerHTML = `<div class="names"><span class="sb">${esc(d.a)}</span><i>vs</i><span class="rr">${esc(d.b)}</span></div><div class="svgbox"></div>
+      <dl><dt class="sb">Sootborn arc</dt><dd>${esc(d.arcS)}</dd><dt class="rr">Red Rising arc</dt><dd>${esc(d.arcR)}</dd></dl>
+      <div class="flip"><b>The inverse</b>${esc(d.flip)}</div>`;
+    host.appendChild(card);
+    const svg = el("svg", { viewBox: "0 0 470 230", role: "img", "aria-label": `${d.a} and ${d.b}: who they side with across five stages` }, card.querySelector(".svgbox"));
+    const L = 112, R = 428, T = 18, B = 168;
+    const x = (i) => L + i * (R - L) / 4;
+    const y = (v) => T + (v + 2) / 4 * (B - T);
+    [[-2, "rulers"], [0, "between"], [2, "below"]].forEach(([v, t]) => {
+      el("line", { x1: L - 8, x2: R, y1: y(v), y2: y(v), stroke: "var(--line)", "stroke-dasharray": v === 0 ? "2 3" : "" }, svg);
+      el("text", { x: L - 14, y: y(v) + 4, "text-anchor": "end", "font-size": 11, class: "muted" }, svg, t === "rulers" ? "with the rulers" : t === "below" ? "with below" : "between");
+    });
+    for (let i = 0; i < 5; i++) {
+      el("text", { x: x(i), y: B + 22, "text-anchor": "middle", "font-size": 10.5 }, svg, SBPH[i]);
+      el("text", { x: x(i), y: B + 37, "text-anchor": "middle", "font-size": 10.5, class: "muted" }, svg, RRPH[i]);
+    }
+    function path(vals) {
+      let dstr = "", pen = false;
+      vals.forEach((v, i) => { if (v == null) { pen = false; return; } dstr += (pen ? "L" : "M") + x(i) + "," + y(v); pen = true; });
+      return dstr;
+    }
+    // small vertical offset so identical values don't hide each other
+    const rrOff = (v, i) => (d.sb[i] === v ? 4 : 0);
+    const rrVals = d.rr.map((v, i) => v == null ? null : v);
+    const rrPathD = (() => { let s = "", pen = false; rrVals.forEach((v, i) => { if (v == null) { pen = false; return; } s += (pen ? "L" : "M") + x(i) + "," + (y(v) + rrOff(v, i)); pen = true; }); return s; })();
+    el("path", { d: rrPathD, fill: "none", stroke: "var(--rr)", "stroke-width": 2, "stroke-dasharray": "5 4", "stroke-linejoin": "round" }, svg);
+    el("path", { d: path(d.sb), fill: "none", stroke: "var(--sb)", "stroke-width": 2.5, "stroke-linejoin": "round" }, svg);
+    if (d.alt) {
+      const at = d.alt.at ?? 4;
+      el("path", { d: `M${x(at - 1)},${y(d.sb[at - 1])}L${x(at)},${y(d.alt.v)}`, fill: "none", stroke: "var(--sb)", "stroke-width": 2, "stroke-dasharray": "1.5 3.5" }, svg);
+      const g = el("g", {}, svg);
+      el("circle", { cx: x(at), cy: y(d.alt.v), r: 5.5, fill: "var(--panel)", stroke: "var(--sb)", "stroke-width": 2 }, g);
+      el("circle", { cx: x(at), cy: y(d.alt.v), r: 13, fill: "transparent" }, g);
+      bindTip(g, `<b>${esc(d.a)} · other ending</b><br>${esc(d.alt.n)}`);
+    }
+    function dots(vals, notes, color, name, phases, off, die) {
+      vals.forEach((v, i) => {
+        if (v == null) return;
+        const g = el("g", {}, svg);
+        const cy = y(v) + off(v, i);
+        if (die === i) {
+          el("path", { d: `M${x(i) - 6},${cy - 6}L${x(i) + 6},${cy + 6}M${x(i) + 6},${cy - 6}L${x(i) - 6},${cy + 6}`, stroke: color, "stroke-width": 3, "stroke-linecap": "round" }, g);
+        } else {
+          el("circle", { cx: x(i), cy, r: 5.5, fill: color, stroke: "var(--panel)", "stroke-width": 2 }, g);
+        }
+        el("circle", { cx: x(i), cy, r: 13, fill: "transparent" }, g);
+        bindTip(g, `<b>${esc(name)} · ${esc(phases[i])}</b><br>${esc(notes[i])}`);
+      });
+    }
+    dots(d.rr, d.rrN, "var(--rr)", d.b, RRPH, rrOff, d.rrDie);
+    dots(d.sb, d.sbN, "var(--sb)", d.a, SBPH, () => 0, d.sbDie);
+  });
+})();
+
+/* ---------- mirrors ---------- */
+const mirrors = [
+  { a: "Kael", b: "Celestine", same: "Born on Tier Six, gilded, raised into the Count by someone above.",
+    ca: "Kept the burns on his palms. Opened a valve so a ward could breathe.", cb: "Let them take the burns. Shut a valve so a camp could not.",
+    q: "It is only a valve. On Tier Six every child can turn one. Up here, nobody else would.", who: "Celestine, at the wheel" },
+  { a: "Seren", b: "Celestine", same: "Both did the sum one for forty.",
+    ca: "Gave herself so Crew Three would not answer for the line.", cb: "Took one to keep forty quiet, and has done it every day for fifty years.",
+    q: "She did it too, little ember, when she said it was her. She only did it the other way round.", who: "Celestine, before the last fight" },
+  { a: "Kael", b: "Oswin", same: "Both took a post from Celestine and a name that was not theirs.",
+    ca: "Stayed himself under Edric Sorrel. Kept his palms, kept his count.", cb: "Let her take his name. Became the Auditor's Blade, masked.",
+    q: "I've been on the floor all my life. You should see what I do from it.", who: "Kael to the Blade, in soot" },
+  { a: "Mara", b: "Maren", same: "Nearly the same name. Each keeps a list of people for her world.",
+    ca: "Below: two tins, forty-four commitments knelt through, then the day Tier Six stands up.", cb: "Above: the Count. Sells the dock raid in Celestine's word, \"Balanced\".",
+    q: "For Dorian Aldane. Balanced.", who: "Maren's note to the dock office" },
+  { a: "Brand", b: "Hollis", same: "The halberd at Seren's commitment: one swung it, one was hit by it.",
+    ca: "Struck a man for humming, then deserted rather than kill a child for the same.", cb: "Kept humming. Took Brand's hand at Riser Nine.",
+    q: "Hollis carries Brand's halberd up the Stair and grounds it at the top, the way a Warden does.", who: "The last chapter", narr: true },
+  { a: "Brand", b: "Sull", same: "Two enforcers below, each ordered to stamp out the same song.",
+    ca: "Breaks all at once: deserts, trains Kael, dies holding the stair for eleven minutes.", cb: "Bends slowly: scrubs Seren's sun for years, then starts looking the other way.",
+    q: "I'm seeing less every year.", who: "Proctor Sull, the Sun" },
+  { a: "Tavi", b: "Lucan", same: "The younger ones of the two families, at the same white door at the end.",
+    ca: "Soot boy who chalks Seren's sun back every rest day and comes up at sixteen.", cb: "The ruler's kind son, called useless by his mother.",
+    q: "Tavi says \"come\". Lucan lays the blade flat and walks down.", who: "The ending", narr: true },
+  { a: "Ilse", b: "Kestrel", same: "Accredited women who cross over to the people below.",
+    ca: "Keeps Accredited speech to the end. Remakes Kael in her own image.", cb: "Starts saying \"we\". Brings the engineers and the book.",
+    q: "Come along, soot. One does not keep the table waiting.", who: "Ilse, at the door" },
+  { a: "Vale", b: "Celestine", same: "Both born below and counted up into the Authority's service.",
+    ca: "Strikes Kael's entry out of his own notebook. His sister died in a fever ward.", cb: "Strikes Seren's line out of the Count.",
+    q: "Vale speaks their way, with contractions slipping.", who: "The speech rules", narr: true },
+  { a: "Dace", b: "Kael", same: "Both lost Seren: her work partner and her husband.",
+    ca: "Goes under the floor. After seven years he still cannot face the sky.", cb: "Goes up Lift Zero and into the sky on purpose.",
+    q: "I was not there. I am told it went like this.", who: "Dace, telling Tier Six Stands" },
+  { a: "Dorian", b: "Corin", same: "Two House Violet cadets with something to share in a hungry camp.",
+    ca: "Shares his bread with a stranger on the lift.", cb: "Sells the House's lamp oil, and writes Kael's sum down as his own.",
+    q: "Dorian's bread is the best recurring object in the game.", who: "The script and plan", narr: true },
+  { a: "Petra", b: "Maren", same: "Two clerks keeping columns of the Count.",
+    ca: "Keeps a column in the new book and reads the names aloud each quarter. Stops at Hale, O. every time.", cb: "Reads the sealed pairings to find who was in her brother's room, and sells the hour.",
+    q: "Petra will keep a column of the Count by winter.", who: "The Last Night", narr: true }
+];
+$("#mirrors").innerHTML = mirrors.map(m => `<div class="mirror">
+  <div class="hd"><span>${esc(m.a)}</span><i>⇄</i><span>${esc(m.b)}</span></div>
+  <div class="same"><b>Same place</b>${esc(m.same)}</div>
+  <div class="lr"><div><b>${esc(m.a)}</b>${esc(m.ca)}</div><div><b>${esc(m.b)}</b>${esc(m.cb)}</div></div>
+  ${m.narr ? `<p class="same">${esc(m.q)}</p>` : `<q>${esc(m.q)}</q>`}<span class="tag">${esc(m.who)}</span></div>`).join("");
+
+const flips = [
+  ["Lucan Aurel", "The Jackal", "The ruler's son is kind, not cruel, and lives. Nobody in Sootborn tortures anybody for pleasure."],
+  ["Halden Voss", "Fitchner", "Both are Proctors with a secret. Fitchner secretly helps the rebels; Voss secretly sells the cadets."],
+  ["Celestine Aurel", "Nero", "The patron was born at the bottom and recognises the hero at once. Nero was born at the top and never guessed."],
+  ["Tavi", "Kieran", "Younger, not older. The sibling Kael saves instead of the brother Darrow leaves behind."],
+  ["Seren", "Eo", "Eo's death is a message to Darrow. Seren's turns out to be her own decision, made weeks before he knew."],
+  ["Dorian Aldane", "Julian", "Julian dies in the Passage. Dorian, in the current plan, lives and shares his bread."],
+  ["The Unlit", "Sons of Ares", "No masked leader with a secret identity. The resistance is crews and runners skimming crates."]
+];
+$("#flips tbody").innerHTML = flips.map(f => `<tr><td><span class="t">${esc(f[0])}</span></td><td><span class="t">${esc(f[1])}</span></td><td><span class="s">${esc(f[2])}</span></td></tr>`).join("");
 </script>
