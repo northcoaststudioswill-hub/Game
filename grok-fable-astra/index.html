@@ -3965,7 +3965,7 @@ function holeY(i){return HOLE.b-i*HOLE.gap;}
     plat(L,0,b,34,6,{seg:8,c:D.col2});const sg=add(textSprite([D.name,D.sub.split(' · ').slice(1).join(' · ')],1.1,{color:'#b6ff00',fog:false}));sg.position.set(0,b+7,40);
     let pts=[];
     if(D.id==='orchard'){for(let k=1;k<=11;k++){const z=34-k*6.2,x=Math.sin(k*.8)*7,y=b+Math.min(k,6)*.6;pts.push({x,y,z,r:2.6});}}
-    else if(D.id==='gym'){for(let k=1;k<=11;k++)pts.push({x:(k%2?1:-1)*5.2+Math.sin(k)*1.2,y:b+k*.35,z:34-k*6.2,r:2.2});}
+    else if(D.id==='gym'){for(let k=1;k<=12;k++)pts.push({x:(k%2?1:-1)*2.8+Math.sin(k)*1.1,y:b+k*.35,z:34-k*5.6,r:2.4});}
     else if(D.id==='ctx'){for(let k=1;k<=16;k++){const a=Math.PI/2-k*.45,R=22;pts.push({x:Math.cos(a)*R*(k<2?.9:1),y:b+k*1.15,z:Math.sin(a)*R+(k<2?8:0),r:2.4});}}
     else if(D.id==='render'){for(let k=1;k<=12;k++)pts.push({x:Math.sin(k*1.1)*6,y:b+k*.45,z:34-k*5.8,r:2.5});}
     else{for(let k=1;k<=16;k++){const a=Math.PI/2-k*.36,R=24+Math.sin(k*.7)*3;pts.push({x:Math.cos(a)*R,y:b+Math.sin(k*.5)*1.5+k*.25,z:Math.sin(a)*R,r:2.4});}}
