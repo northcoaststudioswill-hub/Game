@@ -13,6 +13,7 @@
   --line: #d8d4ce;
   --sb: #eb6834;
   --rr: #6250d6;
+  --ff: #2a78d6;
   --sb-soft: color-mix(in oklab, var(--sb) 16%, var(--panel));
   --rr-soft: color-mix(in oklab, var(--rr) 14%, var(--panel));
   --change: #c4322f;
@@ -25,12 +26,12 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #151312; --panel: #1d1b19; --fg: #efebe6; --muted: #aca59c; --faint: #7f786f; --line: #36322e;
-    --sb: #d95926; --rr: #9085e9; --change: #ec6a66; --watch: #e0a53a; --safe: #5cbf6e; color-scheme: dark;
+    --sb: #d95926; --rr: #9085e9; --ff: #3987e5; --change: #ec6a66; --watch: #e0a53a; --safe: #5cbf6e; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #151312; --panel: #1d1b19; --fg: #efebe6; --muted: #aca59c; --faint: #7f786f; --line: #36322e;
-  --sb: #d95926; --rr: #9085e9; --change: #ec6a66; --watch: #e0a53a; --safe: #5cbf6e; color-scheme: dark;
+  --sb: #d95926; --rr: #9085e9; --ff: #3987e5; --change: #ec6a66; --watch: #e0a53a; --safe: #5cbf6e; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body {
@@ -143,6 +144,27 @@ td .s { color: var(--muted); }
 .threads { border: 1px solid var(--watch); border-radius: 6px; padding: 14px 16px; display: grid; gap: 8px; background: var(--panel); }
 .threads h3 { color: var(--watch); }
 .threads ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 15px; }
+
+/* dialogue cards */
+.lines { display: grid; gap: 12px; }
+.line { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; display: grid; grid-template-columns: 170px 1fr 1fr; gap: 0; overflow: hidden; }
+.line > div { padding: 14px 16px; min-width: 0; }
+.line .job { font-family: var(--display); font-size: 19px; font-weight: 600; text-transform: uppercase; line-height: 1.1; border-right: 1px solid var(--line); }
+.line .job span { display: block; font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: .08em; margin-bottom: 6px; font-weight: 400; }
+.line .q { border-right: 1px solid var(--line); display: grid; gap: 6px; align-content: start; }
+.line .q blockquote { margin: 0; font-size: 16px; line-height: 1.5; }
+.line .q cite, .line .r cite { font-style: normal; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+.line .r { display: grid; gap: 8px; align-content: start; font-size: 14.5px; }
+.line .r .para { color: var(--fg); }
+.line .r .why { color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+@media (max-width: 760px) { .line { grid-template-columns: 1fr; } .line .job, .line .q { border-right: 0; border-bottom: 1px solid var(--line); } }
+.essays { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px 32px; }
+.essay { display: grid; gap: 8px; align-content: start; }
+.essay h3 { font-size: 21px; }
+.essay p { font-size: 15.5px; }
+.essay blockquote { margin: 0; padding-left: 12px; border-left: 2px solid var(--sb); font-size: 15px; font-style: italic; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.stats b { font-family: var(--display); font-size: 30px; color: var(--fg); font-weight: 800; margin-right: 6px; vertical-align: -3px; }
 #tip { position: fixed; pointer-events: none; z-index: 20; background: var(--fg); color: var(--bg); font-family: var(--mono); font-size: 12px; line-height: 1.45; padding: 8px 10px; border-radius: 4px; max-width: 280px; opacity: 0; transition: opacity .1s; }
 .hit { cursor: default; }
 .hit:focus { outline: none; }
@@ -242,13 +264,92 @@ footer { font-size: 13px; color: var(--faint); border-top: 1px solid var(--line)
   <div class="tablebox"><table id="flips"><thead><tr><th class="sb">Sootborn</th><th class="rr">Red Rising</th><th>What is flipped</th></tr></thead><tbody></tbody></table></div>
 </section>
 
+
 <section>
-  <div class="eyebrow">08 · Loose threads</div>
+  <div class="eyebrow">09 · Voices, measured</div>
+  <h2>The speech rules hold in the script</h2>
+  <p class="lede">The story bible sets the rules: soot use contractions, "aye" and "we"; the Accredited never contract and say "one". I pulled 1,008 spoken lines out of the game's source on the <code>sootborn</code> branch and counted. The rule is kept almost perfectly: every Accredited speaker is at zero contractions.</p>
+  <div class="legend"><span><i class="swatch" style="background:var(--sb)"></i>contractions per 100 words (soot speech)</span><span><i class="swatch" style="background:var(--muted)"></i>"one" as a pronoun, per 100 words (Accredited speech)</span></div>
+  <div class="chart"><svg id="voices" viewBox="0 0 980 640" role="img" aria-label="Butterfly chart of contractions and use of one per 100 words for nineteen characters"></svg></div>
+  <div class="callouts">
+    <p><b>Vale slips, as written</b>The bible says Vale "speaks their way, with contractions slipping". The script has him at 1.2 contractions per 100 words, the only speaker between the two camps.</p>
+    <p><b>Brand speaks like neither</b>No contractions, and never "one". A Warden who left the Authority but never learned to talk like the people below.</p>
+    <p><b>Celestine barely says "one"</b>At 0.6 she uses it far less than the cadets (3 to 4.5). She doesn't need the grammar to prove what she is, which fits a woman born on Tier Six.</p>
+  </div>
+  <h3 style="margin-top:6px">Two speakers whose grammar changes</h3>
+  <div class="chart"><svg id="shift" viewBox="0 0 980 260" role="img" aria-label="Kael's and Kestrel's use of we and one across the story"></svg></div>
+  <p class="note">Kael below counts his lines in Part One and the walkable memories; as Sorrel, the Assay and the Spire up to the speech before the Stair; after, from "It was always we" on. Kestrel early is her lines at the Assay and the Ledger; late is Part Two. Small samples: 16 to 114 lines each.</p>
+  <p>Red Rising marks its castes mostly with vocabulary: invented curses, Latin mottos, each colour's slang. Sootborn marks them with grammar, and then makes the grammar move. That is also the safest kind of difference for a story that cannot borrow Red Rising's words.</p>
+</section>
+
+<section>
+  <div class="eyebrow">10 · Dialogue, side by side</div>
+  <h2>Lines that do the same job</h2>
+  <p class="lede">Sootborn's lines are quoted from the game. Red Rising's are described, not quoted: they belong to Pierce Brown, and the point is the job each line does.</p>
+  <div class="lines" id="lines"></div>
+</section>
+
+<section>
+  <div class="eyebrow">11 · Story beats in play order</div>
+  <h2>Sootborn is told out of order on purpose</h2>
+  <p class="lede">Every card in the master timeline, in the order you play it, against when it happens. Red Rising tells its story in order, so it would be close to one rising line. Sootborn keeps a slow present and cuts away to the Assay, the past and the end.</p>
+  <div class="stats" id="ordstats"></div>
+  <div class="legend"><span><i class="swatch" style="background:var(--fg)"></i>the present</span><span><i class="swatch" style="background:var(--sb)"></i>flash back</span><span><i class="swatch" style="background:var(--ff)"></i>flash forward (in Part One, the Assay is dreamed)</span><span><svg width="30" height="10" style="vertical-align:middle;margin-right:6px"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--rr)" stroke-width="2" stroke-dasharray="5 4"/></svg>a story told in order, for comparison</span></div>
+  <div class="chart tl"><svg id="order" viewBox="0 0 980 380" role="img" aria-label="Scatter of each card's play position against its story year"></svg></div>
+  <div class="callouts">
+    <p><b>Part One alternates every night</b>Days below and Assay dreams take turns: each day ends with "THAT NIGHT", and the dream runs a little further.</p>
+    <p><b>Both parts open on their endings</b>The Keep opens Part One and the Stair opens Part Two. Red Rising opens at the start: in the mine.</p>
+    <p><b>The deepest cut is fifty years</b>Celestine's own Assay drops off the bottom of the chart. Red Rising never shows its rulers young.</p>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">12 · Motifs</div>
+  <h2>What the script keeps coming back to</h2>
+  <p class="lede">Mentions of each motif across the game's text (dialogue, narration, cards and finds), from the source. Red Rising has its own recurring objects; where one does the same job, it is named.</p>
+  <div class="chart"><svg id="motifs" viewBox="0 0 980 470" role="img" aria-label="Bar chart of motif mentions in the Sootborn script"></svg></div>
+  <div class="tablebox"><table><thead><tr><th class="sb">Sootborn motif</th><th class="rr">Red Rising's nearest</th><th>Difference</th></tr></thead><tbody>
+    <tr><td><span class="t">The heart-furnace</span></td><td><span class="s">The gallows</span></td><td><span class="s">The furnace is also the tier's fuel and the First Fire's source. The thing that killed her lights the festival.</span></td></tr>
+    <tr><td><span class="t">Breath</span></td><td><span class="s">Helium-3 and the Laurel</span></td><td><span class="s">Red Rising's resource is what the miners dig for others. Sootborn's is what the soot are allowed to keep: their own air.</span></td></tr>
+    <tr><td><span class="t">Eleven</span></td><td><span class="s">No counted number</span></td><td><span class="s">Eleven seconds becomes memory cards, the fury attack, Brand's eleven minutes and the transition. It is Sootborn's most original device.</span></td></tr>
+    <tr><td><span class="t">The shift song</span></td><td><span class="s">Eo's forbidden song</span></td><td><span class="s">The shift song has no words, because words cost breath. The Authority takes it over as the bell tone.</span></td></tr>
+    <tr><td><span class="t">The chalk sun</span></td><td><span class="s">Eo's flower</span></td><td><span class="s">Both are the dead wife's token. The sun is made, not picked, and Tavi keeps remaking it.</span></td></tr>
+    <tr><td><span class="t">Balanced</span></td><td><span class="s">No single word</span></td><td><span class="s">The enemy's whole philosophy in one ledger word, used by Celestine, Corin, Voss and Maren.</span></td></tr>
+    <tr><td><span class="t">The halberd</span></td><td><span class="s">The razor</span></td><td><span class="s">The halberd is a guard's weapon, not a noble's. It passes from Brand to Hollis to the top of the Stair.</span></td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
+  <div class="eyebrow">13 · Deeper reading</div>
+  <h2>What the comparison shows</h2>
+  <div class="essays">
+    <div class="essay"><h3>The villain is a sum</h3><p>Red Rising's enemies are people with appetites: the Jackal's cruelty, the Sovereign's grip on power. Sootborn's enemy is a piece of arithmetic that several people say aloud. "Balanced" appears 41 times in the script. Corin sells his House and calls it "only arithmetic". Voss, beaten, says "It does not... balance." Maren signs her betrayal with it. Celestine is the final fight because she is the sum's best practitioner, not its author.</p><blockquote>One for forty. I did that sum at twenty, with two cadets who did not wake. I have done it every day since.</blockquote></div>
+    <div class="essay"><h3>Kael is complicit, on the page</h3><p>Darrow spends years living as a Gold, and the books worry about what it does to him. Sootborn puts a number on it: as Clerk of the Count, Kael has struck 406 lines himself. When he saves forty people at Riser Nine, he writes "clerical" beside the difference in his own hand. The hero who hates the book is the book's best clerk, and the game lets you see it.</p><blockquote>The order said eleven hundred. I was back at my desk before the bell, and I wrote "clerical" beside the difference.</blockquote></div>
+    <div class="essay"><h3>Seren chose first</h3><p>Eo's death is a message aimed at Darrow. Seren's turns out to be her own decision about her own work: she traced the bleed and asked Orin about it weeks before Kael touched the bank. The game holds that back until Part Two and has you play it as her. Her last words are a work order: "Balance the bank."</p><blockquote>Somebody will have to answer for it. Let it be somebody who knew.</blockquote></div>
+    <div class="essay"><h3>Rage is turned into counting</h3><p>Red Rising's hero becomes "the Reaper", and his rage is the engine. Kael's rage has a meter (fury, then ELEVEN), and the bible's rule is that he never says he is angry, only what he does with it. By the end he isn't counting seconds any more; he is counting everyone else.</p><blockquote>I have counted eleven seconds every day for nine years. Mara has counted forty-four commitments.</blockquote></div>
+    <div class="essay"><h3>The cost is inside the ending</h3><p>Red Rising wins its revolution in book three, and the cost is the subject of the books that follow. Sootborn puts the cost into its own last pictures: the Array does not hold, and the dead of the first winter are read aloud by name. Then it hands the player the choice of what to do with the woman who ran the sum.</p><blockquote>Eat it while it's hot, little ember. Nobody's counting your bowl.</blockquote></div>
+    <div class="essay"><h3>Everyone is offered the same deal</h3><p>Celestine makes the same offer again and again: a post, a better name, and a column to keep, in exchange for yourself. Kael takes it and stays himself. Oswin takes it and is masked. Ilse refused one line of it and was struck. Maren keeps the book either way. Red Rising has one tempter at a time; Sootborn has one offer and makes everyone answer it.</p><blockquote>One had another name. She took it when she gave one the post.</blockquote></div>
+  </div>
+  <h3 style="margin-top:8px">Craft notes: what Red Rising does that Sootborn could use</h3>
+  <div class="two">
+    <ul>
+      <li><b>A friend at his side above.</b> Darrow always has Sevro. Kael's friend Ivo has 36 lines, all below, and the script plan says "Nothing of his own". Even one scene for Ivo in Part Two would give Kael someone who knew him before.</li>
+      <li><b>Villains with blood in it.</b> The Bellona feud works because it is family against family. The script plan calls Severin and Marshal Cade "the thinnest villains in the game": four lines between them in the dialogue pulled here. One reason for the Marshal's balancing would help.</li>
+    </ul>
+    <ul>
+      <li><b>Already stronger than Red Rising:</b> the mirrored cast, the speech system, eleven as a single device across story, combat and editing, and an antagonist the hero could become.</li>
+      <li><b>Keep the out-of-order telling readable.</b> 58 cards and 25 jumps of a year or more is a lot. The cards and transition rules in the master timeline carry it; the calendar strip should stay on every Assay flash.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">14 · Loose threads</div>
   <div class="threads">
     <h3>The docs disagree here</h3>
     <ul>
-      <li><b>Does Dorian survive the Pairing?</b> The master timeline (4f) says he lives and shares bread on day three. The story bible says the loser leaves "by the other door", puts "Aldane, D." on the wall, and has Maren sell the dock raid "For Dorian Aldane. Balanced." Maren's whole arc depends on which is true.</li>
-      <li><b>Is Tavi a brother or a sister?</b> The plan says brother, the Part Two script says her, the Codex says sibling. The story bible lists it as open.</li>
+      <li><b>Dorian dies. Corrected.</b> An earlier version of this page said he lives, following the master timeline (4f). The game's own script says otherwise: Petra says Sorrel "walked out of the Pairing with bread in your pack. Aldane's bread", and Maren says "He did not come out of the Pairing." The master timeline's note is the outlier; fix 4f to match.</li>
+      <li><b>Is Tavi a brother or a sister, and how old?</b> The plan says brother; in the Part Two script Dace says "She hums while she turns it." The plan fixed Tavi at seven at the furnace, but on First Fire Tavi says "I'm eleven, not stupid."</li>
       <li><b>Oswin and the Unlit.</b> Making him the Auditor's Blade means he never appears with the Unlit later. The bible marks this "to confirm".</li>
     </ul>
   </div>
@@ -269,7 +370,7 @@ const beats = [
   ["The remaking", "The Gilding: gold wire in the long bones, gold in the eye. Nine months.", "Mickey carves Darrow into a Gold.", 5, "Kael refuses to lose the burns on his palms. Shown once, as a comic."],
   ["Learning to pass", "Ilse teaches speech; Brand, a deserted Warden, teaches the blade. Three years.", "Matteo teaches manners; later Lorn teaches the blade.", 4, "Speech rules are mechanical: the Accredited never use contractions or say \"we\"."],
   ["Into the trial under a dead name", "Up Lift Zero as Edric Sorrel, into the Assay. Twelve Houses, fifty days.", "Into the Institute as Darrow au Andromedus. Houses, one season.", 5, "Told only as dreams in Part One."],
-  ["Kill to enter", "The Pairing: two cadets in a room, one comes out. Dorian shared his bread.", "The Passage: Darrow kills Julian.", 4, "The master timeline says Dorian lives; older notes say he dies. See section 08."],
+  ["Kill to enter", "The Pairing: two cadets in a room, one comes out. Dorian shared his bread.", "The Passage: Darrow kills Julian.", 5, "Dorian dies as Julian does. Sootborn keeps him in the story: Kael carries his bread, and his sister comes to collect."],
   ["The graders are bought", "Proctor Halden Voss is paid by two Houses.", "Proctors favour the Jackal and rig the game.", 5, "One man, not the whole staff. Kael is the one who catches it."],
   ["The hero takes the high ground", "Kael cuts Voss's boots off, charges them at the vent stack and flies.", "Darrow turns the Proctors' own power on them and storms Olympus.", 4, "The boots run off a battery on the island: a valve tech's answer."],
   ["The ruler's heir on his knees", "The Keep: Lucan's blade breaks in front of his mother. He lives.", "Darrow defeats the trial and the ArchGovernor's children are at stake.", 3, "Kael wins to be pinned by the mother herself."],
@@ -289,7 +390,7 @@ const pairs = [
   ["Dace Morrow", "Dancer", 4, "The worker who brings him into the resistance. The names are close; see section 05."],
   ["Brand", "Lorn + Ragnar", 3, "Blade teacher and the one who dies holding the line. Brand also struck Hollis at Seren's commitment."],
   ["Maren Aldane", "Cassius", 3, "Family of his trial opponent who sells him out. A sister, with a pen instead of a blade."],
-  ["Dorian Aldane", "Julian", 3, "The gentle boy at the first-night kill. The docs disagree on whether he survives; see section 08."],
+  ["Dorian Aldane", "Julian", 4, "The gentle boy killed at the first-night trial. His bread and his sister carry him into Part Two."],
   ["Severin Cade", "Karnus", 3, "A noble who wants satisfaction for his family's honour."],
   ["Kestrel Dray", "Mustang", 2, "The ruling-class mind who asks why and defects. No romance."],
   ["Lucan Aurel", "Cassius", 2, "The ruler's kind son he defeats at the keep and who may become a friend."],
@@ -634,7 +735,7 @@ const mirrors = [
     ca: "Breaks all at once: deserts, trains Kael, dies holding the stair for eleven minutes.", cb: "Bends slowly: scrubs Seren's sun for years, then starts looking the other way.",
     q: "I'm seeing less every year.", who: "Proctor Sull, the Sun" },
   { a: "Tavi", b: "Lucan", same: "The younger ones of the two families, at the same white door at the end.",
-    ca: "Soot boy who chalks Seren's sun back every rest day and comes up at sixteen.", cb: "The ruler's kind son, called useless by his mother.",
+    ca: "Soot kid who chalks Seren's sun back every rest day and comes up at sixteen.", cb: "The ruler's kind son, called useless by his mother.",
     q: "Tavi says \"come\". Lucan lays the blade flat and walks down.", who: "The ending", narr: true },
   { a: "Ilse", b: "Kestrel", same: "Accredited women who cross over to the people below.",
     ca: "Keeps Accredited speech to the end. Remakes Kael in her own image.", cb: "Starts saying \"we\". Brings the engineers and the book.",
@@ -664,8 +765,190 @@ const flips = [
   ["Celestine Aurel", "Nero", "The patron was born at the bottom and recognises the hero at once. Nero was born at the top and never guessed."],
   ["Tavi", "Kieran", "Younger, not older. The sibling Kael saves instead of the brother Darrow leaves behind."],
   ["Seren", "Eo", "Eo's death is a message to Darrow. Seren's turns out to be her own decision, made weeks before he knew."],
-  ["Dorian Aldane", "Julian", "Julian dies in the Passage. Dorian, in the current plan, lives and shares his bread."],
+  ["Dorian Aldane", "Julian", "Not flipped in the death, but in the debt: Julian's brother wants a duel; Dorian's sister keeps a ledger and sells a stair."],
   ["The Unlit", "Sons of Ares", "No masked leader with a secret identity. The resistance is crews and runners skimming crates."]
 ];
 $("#flips tbody").innerHTML = flips.map(f => `<tr><td><span class="t">${esc(f[0])}</span></td><td><span class="t">${esc(f[1])}</span></td><td><span class="s">${esc(f[2])}</span></td></tr>`).join("");
+
+/* ---------- voices ---------- */
+const voices = [
+  // name, contractions/100w, one/100w, lines, group
+  ["Tavi", 7.9, 0, 59, "soot"], ["Seren", 7.3, 0, 38, "soot"], ["Mara", 6.7, 0, 75, "soot"], ["Nell", 6.5, 0, 25, "soot"],
+  ["Dace", 6.3, 0, 29, "soot"], ["Proctor Sull", 6.0, 0, 25, "soot"], ["Ivo", 5.5, 0, 36, "soot"], ["Hollis", 5.1, 0, 17, "soot"],
+  ["Inspector Vale", 1.2, 0, 46, "between"], ["Brand", 0, 0, 12, "between"],
+  ["Celestine", 0, 0.6, 72, "acc"], ["Ilse", 0, 0.4, 30, "acc"], ["Lucan", 0, 1.9, 21, "acc"], ["Oswin", 0, 1.7, 17, "acc"],
+  ["Kestrel", 0, 2.3, 30, "acc"], ["Petra", 0, 3.5, 20, "acc"], ["Maren", 0, 3.6, 14, "acc"], ["Voss", 0, 4.1, 9, "acc"], ["Corin", 0, 4.5, 8, "acc"]
+];
+(function () {
+  const svg = $("#voices");
+  const C = 600, W = 360, T = 40, rh = 28, max = 8;
+  const xl = (v) => C - 40 - v / max * (W - 60);
+  const xr = (v) => C + 40 + v / max * (W - 60);
+  el("text", { x: C - 40, y: 18, "text-anchor": "end", "font-size": 12, class: "muted" }, svg, "← contractions");
+  el("text", { x: C + 40, y: 18, "font-size": 12, class: "muted" }, svg, "\"one\" →");
+  [0, 2, 4, 6, 8].forEach(v => {
+    el("line", { x1: xl(v), x2: xl(v), y1: T - 8, y2: T + voices.length * rh + 22, stroke: "var(--line)" }, svg);
+    el("text", { x: xl(v), y: T + voices.length * rh + 38, "text-anchor": "middle", "font-size": 11, class: "muted" }, svg, v);
+    el("line", { x1: xr(v), x2: xr(v), y1: T - 8, y2: T + voices.length * rh + 22, stroke: "var(--line)" }, svg);
+    el("text", { x: xr(v), y: T + voices.length * rh + 38, "text-anchor": "middle", "font-size": 11, class: "muted" }, svg, v);
+  });
+  let lastG = null;
+  voices.forEach(([n, c, o, l, g], i) => {
+    const gap = (g !== "soot" ? 10 : 0) + (g === "acc" ? 10 : 0);
+    const y = T + i * rh + gap;
+    if (g !== lastG) {
+      el("text", { x: 0, y: y - 4, "font-size": 10.5, class: "faint", "letter-spacing": "0.08em" }, svg, g === "soot" ? "BELOW" : g === "between" ? "IN BETWEEN" : "ACCREDITED");
+      lastG = g;
+    }
+    const G2 = el("g", {}, svg);
+    el("text", { x: 0, y: y + 14, "font-size": 13 }, G2, n);
+    el("text", { x: 150, y: y + 14, "font-size": 11, class: "faint" }, G2, l + " lines");
+    if (c > 0) el("rect", { x: xl(c), y: y + 3, width: xl(0) - xl(c), height: 15, rx: 3, fill: "var(--sb)" }, G2);
+    if (o > 0) el("rect", { x: xr(0), y: y + 3, width: xr(o) - xr(0), height: 15, rx: 3, fill: "var(--muted)" }, G2);
+    el("text", { x: xl(c) - 6, y: y + 14, "text-anchor": "end", "font-size": 11, class: "muted" }, G2, c ? c.toFixed(1) : "0");
+    el("text", { x: xr(o) + 6, y: y + 14, "font-size": 11, class: "muted" }, G2, o ? o.toFixed(1) : "0");
+    el("rect", { x: 0, y: y, width: 980, height: rh - 2, fill: "transparent" }, G2);
+    bindTip(G2, `<b>${esc(n)}</b> · ${l} lines<br>Contractions: ${c} per 100 words<br>"One": ${o} per 100 words`);
+  });
+  el("line", { x1: C, x2: C, y1: T - 8, y2: T + voices.length * rh + 22, stroke: "var(--fg)", "stroke-width": 1 }, svg);
+})();
+
+(function () {
+  const svg = $("#shift");
+  const panels = [
+    { name: "Kael", x0: 60, eras: ["Below", "As Sorrel", "After \"we\""], we: [1.6, 0, 3.3], one: [0.2, 3.9, 0.8], lines: [114, 49, 16] },
+    { name: "Kestrel", x0: 610, w: 250, eras: ["Early", "Part Two"], we: [0.4, 1.7], one: [3.9, 1.0], lines: [15, 15] }
+  ];
+  panels.forEach(p => {
+    const w = p.w || 360, T = 40, B = 200, max = 4.5;
+    const x = (i) => p.x0 + (p.eras.length === 1 ? 0 : i * w / (p.eras.length - 1));
+    const y = (v) => B - v / max * (B - T);
+    el("text", { x: p.x0 - 40, y: 18, "font-size": 14, "font-weight": 500 }, svg, p.name.toUpperCase());
+    [0, 2, 4].forEach(v => {
+      el("line", { x1: p.x0 - 10, x2: p.x0 + w + 10, y1: y(v), y2: y(v), stroke: "var(--line)" }, svg);
+      el("text", { x: p.x0 - 16, y: y(v) + 4, "text-anchor": "end", "font-size": 11, class: "muted" }, svg, v);
+    });
+    p.eras.forEach((e, i) => el("text", { x: x(i), y: B + 22, "text-anchor": "middle", "font-size": 12 }, svg, e));
+    p.eras.forEach((e, i) => el("text", { x: x(i), y: B + 38, "text-anchor": "middle", "font-size": 10.5, class: "faint" }, svg, p.lines[i] + " lines"));
+    [["we", "var(--sb)", "\"we / us / our\""], ["one", "var(--muted)", "\"one\""]].forEach(([k, col, lab]) => {
+      el("path", { d: p[k].map((v, i) => (i ? "L" : "M") + x(i) + "," + y(v)).join(""), fill: "none", stroke: col, "stroke-width": 2 }, svg);
+      p[k].forEach((v, i) => {
+        const g = el("g", {}, svg);
+        el("circle", { cx: x(i), cy: y(v), r: 5.5, fill: col, stroke: "var(--panel)", "stroke-width": 2 }, g);
+        el("circle", { cx: x(i), cy: y(v), r: 13, fill: "transparent" }, g);
+        bindTip(g, `<b>${p.name} · ${esc(p.eras[i])}</b><br>${esc(lab)}: ${v} per 100 words`);
+      });
+      const li = p[k].length - 1;
+      el("text", { x: x(li) + 12, y: y(p[k][li]) + 4, "font-size": 11.5, class: "muted" }, svg, lab);
+    });
+  });
+})();
+
+/* ---------- dialogue side by side ---------- */
+const lines2 = [
+  ["Last words", "You were always too much for this place. Too loud, too proud, too much. Good. Be too much for THEM. Balance the bank. And don't you DARE stop breathing.", "Seren, at the furnace door",
+   "Eo asks Darrow to live for more than the mine and to break free of it.", "Both ask him to be more. Seren asks him to stay exactly what he is and point it outward, and ends on an order from their own trade."],
+  ["The vow", "So every breath I take now is hers. And every breath THEY take is mine.", "Kael, after the furnace",
+   "Darrow's grief turns into a promise to tear the Society down.", "Kael's vow is a ledger entry: a debt in one column, a claim in the other. The whole game is in that line."],
+  ["The ruler's contempt", "Grief is a luxury item, little soot. You will be invoiced.", "Celestine, after the furnace",
+   "Golds speak of Reds as tools and of their sacrifice as noble.", "Sootborn's cruelty is clerical: the family gets a tin with the ash, the ring and an invoice for the fuel."],
+  ["Why the disguise", "They do not fear soot. They fear nothing that kneels. They only fear what looks like them.", "Ilse, before the Gilding",
+   "The Sons of Ares reason that the Golds can only be broken from inside their own ranks.", "The same logic. Ilse adds a reason of her own: she was struck from her House for asking to see one person before striking her line."],
+  ["Learning the voice", "Soot says \"aye.\" They say \"granted.\" … And never \"we.\" Soot says \"we\" about everything. Up there it is \"one.\"", "Ilse, the Table",
+   "Matteo teaches Darrow manners: how a Gold eats, dances and carries himself.", "Red Rising teaches behaviour. Sootborn teaches grammar, and section 09 shows the grammar moving through the whole script."],
+  ["The trainer's truth", "When you get up there, boy, do not let them teach you it was ever a fair fight. It was never a fight. That is what the halberds are for.", "Brand, No Gloves",
+   "Lorn teaches Darrow the blade and warns him what war does to the people who wage it.", "Brand's lesson comes with a confession: he is the Warden who struck Hollis for humming."],
+  ["The patron knows", "I knew at the furnace. … I am not telling you this to be cruel. I am telling you because I have a use for you, and I prefer my tools to know what they are.", "Celestine, the Ledger",
+   "Nero prizes Darrow's talent without ever knowing what he is.", "The inverse. Celestine has known all along, and says so to his face on day three."],
+  ["The kind heir", "She says I am kind. She says it the way one reports a fault in a casting.", "Lucan, the Last Night",
+   "The Jackal is the ArchGovernor's least-loved child, and the neglect turns into cruelty.", "The same coldness from a parent, the opposite result. Lucan ends by laying his blade flat."],
+  ["The betrayal named", "Brennick. That is the name, is it not. I read it in a sealed book, and then I sold you a stair for it. … Eleven minutes, they tell me. I have counted them since. It did not balance.", "Maren, at the white door",
+   "Cassius learns Darrow killed his brother and turns on him at the Triumph.", "Maren's revenge is a sum that failed. Nothing came back, and she says so."],
+  ["The enemy's creed", "It is only a valve. On Tier Six every child can turn one. Up here, nobody else would.", "Celestine at twenty, her own Assay",
+   "The Sovereign defends the hierarchy as the price of order.", "Red Rising's rulers believe they are better. Celestine believes only that she is willing. Corin says the same thing smaller: \"It is only arithmetic, Sorrel.\""],
+  ["The turn", "For five years up here I said \"one.\" One does not kneel. One is not sorry. I'm done with it. It's \"we.\" It was always we.", "Kael, before the Stair",
+   "Darrow stops hiding that he is Red and leads the Rising as one.", "Sootborn makes the turn a change of pronoun, and the script measures it (section 09)."],
+  ["Home", "Eat it while it's hot, little ember. Nobody's counting your bowl.", "Mara, the Row K ending",
+   "No equivalent. Red Rising does not send its tyrant home.", "The ending most unlike Red Rising: the woman who ran the Count gets a bowl nobody counts."]
+];
+$("#lines").innerHTML = lines2.map((l, i) => `<div class="line">
+  <div class="job"><span>${String(i + 1).padStart(2, "0")}</span>${esc(l[0])}</div>
+  <div class="q"><blockquote class="sb-q">“${esc(l[1])}”</blockquote><cite class="sb">${esc(l[2])}</cite></div>
+  <div class="r"><span class="para"><cite class="rr" style="display:block;margin-bottom:2px">Red Rising</cite>${esc(l[3])}</span><span class="why">${esc(l[4])}</span></div></div>`).join("");
+
+/* ---------- play order vs story time ---------- */
+const ord = [
+  ["The Keep (cold open)", 4.137, "fwd", 1], ["Cinderwell", -0.95, "back", 1], ["The wedding at First Fire", -0.92, "back", 1], ["The fever, the heist", -0.011, "back", 1], ["Last Bell: the furnace", 0, "back", 1],
+  ["Ashgate", 0.112, "present", 1], ["The Table (the Gilding)", 0.5, "fwd", 1], ["The Drill", 2.0, "fwd", 1], ["No Gloves", 2.5, "fwd", 1], ["The Pairing", 4.0, "fwd", 1],
+  ["The camp by day", 4.008, "fwd", 1], ["Night three", 4.008, "fwd", 1], ["First Fire", 0.115, "present", 1], ["The Ford", 4.052, "fwd", 1], ["Bay Three at last bell", 0.115, "present", 1],
+  ["The lantern climb", 0.115, "present", 1], ["The Island", 4.068, "fwd", 1], ["The Standard", 4.071, "fwd", 1], ["The Lamp", 4.077, "fwd", 1], ["The Ledger", 0.118, "present", 1],
+  ["Under the Floor", 0.118, "present", 1], ["The Deep Array", 0.118, "present", 1], ["The Dais", 4.082, "fwd", 1], ["The Proctor", 4.085, "fwd", 1], ["The vent stack", 4.085, "fwd", 1],
+  ["The hum slip: the book", 9, "fwd", 1], ["The Way Out", 0.438, "present", 1], ["The Valley", 4.11, "fwd", 1], ["The Last Night", 4.134, "fwd", 1], ["The Keep", 4.137, "fwd", 1],
+  ["Cold open: the Stair", 9, "fwd", 2], ["The Pinning", 4.137, "present", 2], ["Flash: the book", 9, "fwd", 2], ["The seat knife", 3.99, "back", 2], ["The Post", 4.25, "present", 2],
+  ["The fourth ring", 4.25, "present", 2], ["The white cloak", 4.085, "back", 2], ["The service stair", 4.25, "present", 2], ["The Gallery", 4.3, "present", 2], ["The Balancing", 5, "present", 2],
+  ["The Sun (Tavi)", 5, "present", 2], ["Riser Nine", 5, "present", 2], ["The Dockmaster's table", 5.1, "present", 2], ["What She Knows", 6, "present", 2], ["Flash: Tavi at sixteen", 9, "fwd", 2],
+  ["Celestine's own Assay", -50, "back", 2], ["The dock stair plan", 7, "present", 2], ["The High Docks", 7, "present", 2], ["Eleven Minutes", 7, "present", 2], ["The barge deck", 8, "present", 2],
+  ["Seren finds the bleed", -0.058, "back", 2], ["Tier Six Stands", 8, "present", 2], ["The Fall", 9, "present", 2], ["The Book", 9, "present", 2], ["The Stair", 9, "present", 2],
+  ["Little Ember", 9, "present", 2], ["Last flash: the furnace", 0, "back", 2], ["The ending", 9.2, "present", 2]
+];
+(function () {
+  const svg = $("#order");
+  const L = 50, R = 960, T = 20, B = 300, N = ord.length;
+  const x = (i) => L + i / (N - 1) * (R - L);
+  const y = (v) => B - (Math.max(v, -1.6) + 1) / 11 * (B - T);
+  const p2 = ord.findIndex(o => o[3] === 2);
+  el("rect", { x: x(p2) - 8, y: T - 10, width: R - x(p2) + 16, height: B - T + 40, fill: "var(--sb)", "fill-opacity": 0.05 }, svg);
+  el("text", { x: L, y: T - 4, "font-size": 11, class: "faint" }, svg, "PART ONE · BELOW");
+  el("text", { x: x(p2), y: T - 4, "font-size": 11, class: "faint" }, svg, "PART TWO · ABOVE");
+  [-1, 0, 2, 4, 6, 8, 10].forEach(v => {
+    el("line", { x1: L - 6, x2: R, y1: y(v), y2: y(v), stroke: "var(--line)", "stroke-dasharray": v === 0 ? "" : "2 3" }, svg);
+    el("text", { x: L - 10, y: y(v) + 4, "text-anchor": "end", "font-size": 11, class: v === 0 ? "" : "muted" }, svg, v > 0 ? "+" + v : v);
+  });
+  el("text", { x: L, y: B + 52, "font-size": 11, class: "faint" }, svg, "play order, card by card →   ·   up: years after the furnace");
+  // ordered-telling reference: Red Rising-like rising line over its own span
+  el("path", { d: `M${x(0)},${y(0)}L${x(N - 1)},${y(9.2)}`, stroke: "var(--rr)", "stroke-width": 2, "stroke-dasharray": "5 4", fill: "none", "stroke-opacity": .8 }, svg);
+  el("path", { d: ord.map((o, i) => (i ? "L" : "M") + x(i) + "," + y(o[1])).join(""), stroke: "var(--muted)", "stroke-opacity": .45, "stroke-width": 1, fill: "none" }, svg);
+  const col = { present: "var(--fg)", back: "var(--sb)", fwd: "var(--ff)" };
+  const name = { present: "the present", back: "flash back", fwd: "flash forward" };
+  ord.forEach((o, i) => {
+    const g = el("g", {}, svg);
+    if (o[1] < -1.6) {
+      el("path", { d: `M${x(i)},${y(-1.6) - 10}L${x(i)},${y(-1.6) + 6}M${x(i) - 4},${y(-1.6) + 2}L${x(i)},${y(-1.6) + 7}L${x(i) + 4},${y(-1.6) + 2}`, stroke: col[o[2]], "stroke-width": 2, fill: "none" }, g);
+    } else el("circle", { cx: x(i), cy: y(o[1]), r: 4.5, fill: col[o[2]], stroke: "var(--panel)", "stroke-width": 1.5 }, g);
+    el("rect", { x: x(i) - 8, y: T, width: 16, height: B - T + 14, fill: "transparent" }, g);
+    const yr = o[1] === -50 ? "fifty years before" : o[1] < 0 ? (Math.abs(o[1]) < 0.1 ? Math.round(-o[1] * 365) + " days before" : "about " + Math.round(-o[1] * 12) + " months before") : o[1] === 0 ? "the furnace" : o[1] < 1 ? Math.round(o[1] * 365) + " days after" : o[1] + " years after";
+    bindTip(g, `<b>${i + 1}. ${esc(o[0])}</b><br>${esc(yr)} · ${name[o[2]]}`);
+  });
+  // labels for a few landmarks
+  [[0, "The Keep", -1], [5, "Ashgate", 1], [25, "the book", -1], [30, "the Stair", -1], [45, "Celestine at 20", -1], [56, "the furnace", 1]].forEach(([i, t, d]) => {
+    const yy = ord[i][1] < -1.6 ? y(-1.6) + 18 : y(ord[i][1]) + (d < 0 ? -10 : 16);
+    el("text", { x: x(i), y: yy, "text-anchor": i > 50 ? "end" : "middle", "font-size": 11, class: "muted" }, svg, t);
+  });
+  const jumps = ord.slice(1).filter((o, i) => Math.abs(o[1] - ord[i][1]) >= 1).length;
+  const cnt = (k) => ord.filter(o => o[2] === k).length;
+  $("#ordstats").innerHTML = `<span><b>${N}</b>cards in play order</span><span><b>${cnt("present")}</b>in the present</span><span><b>${cnt("fwd")}</b>flash forward</span><span><b>${cnt("back")}</b>flash back</span><span><b>${jumps}</b>jumps of a year or more</span>`;
+  window.__ord = { N, jumps };
+})();
+
+/* ---------- motifs ---------- */
+const motifs = [["Furnace", 103], ["Breath", 97], ["Eleven", 75], ["Sun", 64], ["Chalk", 45], ["Valve", 43], ["Balanced", 41], ["Lantern", 36], ["Humming, the shift song", 34], ["The Count", 28], ["Halberd", 20], ["Kneel", 20], ["Sky", 17], ["Washer", 16], ["Tin", 15], ["Noted", 14], ["Palms", 13], ["Gloves", 8], ["Bread", 7], ["Seat knife", 7], ["Leaf", 7]];
+(function () {
+  const svg = $("#motifs");
+  const L = 190, R = 920, rh = 21, max = 110;
+  const x = (v) => L + v / max * (R - L);
+  [0, 25, 50, 75, 100].forEach(v => {
+    el("line", { x1: x(v), x2: x(v), y1: 4, y2: motifs.length * rh + 6, stroke: "var(--line)" }, svg);
+    el("text", { x: x(v), y: motifs.length * rh + 22, "text-anchor": "middle", "font-size": 11, class: "muted" }, svg, v);
+  });
+  motifs.forEach(([n, v], i) => {
+    const y = 6 + i * rh;
+    const g = el("g", {}, svg);
+    el("text", { x: 0, y: y + 12, "font-size": 12.5 }, g, n);
+    el("rect", { x: L, y: y + 2, width: x(v) - L, height: 14, rx: 3, fill: "var(--sb)", "fill-opacity": 0.85 }, g);
+    el("text", { x: x(v) + 6, y: y + 12, "font-size": 11, class: "muted" }, g, v);
+    el("rect", { x: 0, y, width: 980, height: rh, fill: "transparent" }, g);
+    bindTip(g, `<b>${esc(n)}</b><br>${v} mentions in the game's text`);
+  });
+  el("text", { x: L, y: motifs.length * rh + 40, "font-size": 11, class: "faint" }, svg, "mentions in on-screen text: dialogue, narration, cards, finds (the comic-book levels not included)");
+})();
 </script>
