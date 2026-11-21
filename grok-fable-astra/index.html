@@ -4036,7 +4036,7 @@ function holeUpdate(dt,play){const inH=S.inPk==='hole';
   if(L.id==='orchard')L.plats.forEach(p=>{if(p.fake)p.m.material.opacity=.72+Math.sin(t*9+p.k)*.18;});
   if(L.id==='gym'){let mir=false;HOLE.wm.forEach(w=>{const x=w.x0+Math.sin(t*TAU/w.per+w.k*2)*12;w.box.position.set(x,w.y,w.z);w.s.position.set(x,w.y+2,w.z);if(Math.abs(PL.x-x)<6&&Math.abs(PL.z-w.z)<4.5&&Math.abs(PL.y-w.y)<7)mir=true;});
     if(mir&&!HOLE.mir){X.c.wm=(X.c.wm||0)+1;tone(880,.2,'square',.06,0,440);}HOLE.mir=mir;if($('wmark').hidden===mir)$('wmark').hidden=!mir;}else{HOLE.mir=false;if(!$('wmark').hidden)$('wmark').hidden=true;}
-  if(L.id==='render'){L.plats.forEach(p=>{if(!p.zf)return;const ph=((t+p.zf.ph)%3.3),on=ph<2.2,warn=ph>1.75&&ph<2.2;p.top=on?p.y0:-999;p.m.visible=on&&!(warn&&Math.floor(t*20)%2);p.zf.m2.visible=on&&(Math.floor(t*30+p.k)%2===0);
+  if(L.id==='render'){L.plats.forEach(p=>{if(!p.zf)return;const ph=((t+p.zf.ph)%3.3),on=ph<2.6,warn=ph>2.15&&ph<2.6;p.top=on?p.y0:-999;p.m.visible=on&&!(warn&&Math.floor(t*20)%2);p.zf.m2.visible=on&&(Math.floor(t*30+p.k)%2===0);
       const near=Math.hypot(PL.x-p.x,PL.z-p.z)<10;p.m.material.wireframe=!near;});}
   // which platform am I on
   let on=null;if(PL.grounded)for(const p of L.plats)if(p.top>-500&&Math.abs(PL.y-p.top)<.3&&Math.hypot(PL.x-p.x,PL.z-p.z)<p.r+.2){on=p;break;}
