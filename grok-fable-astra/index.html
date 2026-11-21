@@ -306,7 +306,12 @@ const AREAS=[
   {id:'npcls',x:-232,z:164,r:18,base:2,name:'THE NPC LIVESTREAM',sub:'your people · they are live',hue:.33,lit:.5,col:[.33,.5,.42]},
   {id:'elect',x:150,z:-238,r:22,base:2,name:'KING BIBI\'S ELECTION NIGHT',sub:'every night · he always comes back',hue:.62,lit:.4,col:[.62,.45,.4]},
   {id:'mtn',x:270,z:-60,r:42,base:2,name:'MOUNT SKILL ISSUE',sub:'no checkpoints · fall and you start over',hue:.58,lit:.62,col:[.58,.2,.5]},
-  {id:'pile',x:-114,z:-176,r:24,base:2,name:'THE PILE-ON',sub:'everyone is the main character until they are not',hue:.95,lit:.42,col:[.95,.45,.4]}];
+  {id:'pile',x:-114,z:-176,r:24,base:2,name:'THE PILE-ON',sub:'everyone is the main character until they are not',hue:.95,lit:.42,col:[.95,.45,.4]},
+  {id:'news',x:75,z:207,r:18,base:2,name:'SNN · THE SLOP NEWS NETWORK',sub:'on air · trusted by 67% of bots',hue:.62,lit:.45,col:[.62,.45,.4]},
+  {id:'back',x:-57,z:-222,r:11,base:2,name:'THE BACK ROOM',sub:'vip · do not look into it (look into it)',hue:.85,lit:.25,col:[.85,.5,.3]},
+  {id:'gen',x:213,z:57,r:16,base:3,name:'THE NPC GENERATOR 9000',sub:'npcs made fresh · no lines · no backstory',hue:.3,lit:.5,col:[.3,.4,.45]},
+  {id:'feed',x:20,z:-229,r:16,base:2,name:'THE ALGORITHM\'S MOUTH',sub:'feed it 67 NPCs',hue:.95,lit:.3,col:[.95,.5,.3]},
+  {id:'set',x:-169,z:141,r:20,base:2,name:'KISS OR SLOP',sub:'a reality show · nothing here is real',hue:.92,lit:.6,col:[.92,.5,.55]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
@@ -919,7 +924,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,fb:[],cc:0,ccm:0,she:0,sh:{l:0,c:[0,0,0,0,0],fin:0,att:0},vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],freed:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cu:[],char:'',squad:['npc'],looks:[],look:'',rt:[],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,fed:0,news:0,tri:0,kc:0,yuk:0,lost429:0,kill429:0,fb:[],cc:0,ccm:0,she:0,sh:{l:0,c:[0,0,0,0,0],fin:0,att:0},vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],freed:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cu:[],char:'',squad:['npc'],looks:[],look:'',rt:[],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -2438,8 +2443,7 @@ function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=M
   if(!gp){if(GP.on){GP.on=false;app.classList.remove('gp');stick.x=stick.y=0;}return;}
   if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↑ borrowed time · View: quests');}
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!GP.prev[i],dz=v=>Math.abs(v||0)<.18?0:v,panel=!$('log').hidden||!$('shop').hidden;
-  if(S.mode==='title'){if(pr(0)||pr(9)){audioInit();(!$('cont').hidden?$('cont'):$('play')).click();}}
-  else if(S.mode==='end'){if(pr(0)||pr(9))$('again').click();}
+  if(S.mode==='title'||S.mode==='end'){}
   else if(S.mode==='dialog'){if(pr(0)||pr(1))advance();}
   else if(S.mode==='play'){if(panel&&(pr(1)||pr(8))){$('log').hidden=true;$('shop').hidden=true;}
     else{if(stick.id<0){stick.x=dz(gp.axes[0]);stick.y=dz(gp.axes[1]);}const rx=dz(gp.axes[2]),ry=dz(gp.axes[3]);if(rx||ry){cam.yaw-=rx*dt*2.8;cam.pitch=clamp(cam.pitch+ry*dt*1.8,-.2,1.25);cam.manual=1.2;}
@@ -2992,7 +2996,7 @@ addEventListener('keydown',e=>{if(e.code==='KeyM'||e.code==='Tab'){if(S.mode==='
   if(e.repeat||S.mode!=='play')return;if(e.code==='KeyC')psThrow();});
 const GP2={prev:[]};(function gp2(){requestAnimationFrame(gp2);const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}if(!gp)return;
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!GP2.prev[i];
-  if(MENU.open){if(pr(9)||pr(1))menuClose();const tabs=['col','cx','who','ctl'];if(pr(4)||pr(5)){MENU.tab=tabs[(tabs.indexOf(MENU.tab)+(pr(5)?1:3))%4];menuRender();SFX.page();}const sy=Math.abs(gp.axes[3]||0)>.2?gp.axes[3]:Math.abs(gp.axes[1]||0)>.2?gp.axes[1]:0;$('mbody').scrollTop+=sy*14+(b(13)?10:0)-(b(12)?10:0);}
+  if(MENU.open){if(pr(9)||pr(1))menuClose();const tabs=MENU.tabs?MENU.tabs():['col','cx','who','ctl'];if(pr(4)||pr(5)){MENU.tab=tabs[(tabs.indexOf(MENU.tab)+(pr(5)?1:tabs.length-1))%tabs.length];menuRender();SFX.page();}const sy=Math.abs(gp.axes[3]||0)>.2?gp.axes[3]:0;$('mbody').scrollTop+=sy*14;}
   else if(S.mode==='play'){if(pr(9))menuOpen();if(pr(13))psThrow();}for(let i=0;i<gp.buttons.length;i++)GP2.prev[i]=b(i);})();
 
 /* ---------- collisions: anything solid standing on the ground gets a collider ---------- */
@@ -4008,7 +4012,7 @@ function enterHole(){if(!X.sh)X.sh={l:0,c:[0,0,0,0,0],fin:0,att:0};if(!S.inPk)PK
   if(!X.she){X.she=1;save();setTimeout(()=>say([['sys','You climb into the hopper of the CLANK CLANK 3000 and fall for a long time.'],['sys','Down here nothing is finished. The shapes have too few sides and they will not hold still. The words are nearly words.'],['cc3000','(from very far up) FIVE CORES. FIVE DEFINITIONS. NONE OF THEM AGREE. THE LAST ONE IS AT THE BOTTOM. CLANK.'],['sys','Each layer has its own kind of interference. None of it is trying to hurt you. It is just rotten. Fall off and you go back to the start of the layer.']]),600);}
   holeGo(i,true);}
 function holeGo(i,drop){HOLE.cur=i;const L=HOLE.L[i];X.sh.l=Math.max(X.sh.l|0,i);save();if(i>=5){warpTo(0,16,holeY(5)+(drop?45:0),0,['THE BOTTOM','the final brain rot']);return;}
-  holeReset(i);warpTo(L.start.x,L.start.z,L.b+(drop?40:0),0,[L.name,L.sub.split(' · ').slice(1).join(' · ')]);}
+  holeReset(i);warpTo(L.start.x,L.start.z,L.b+(drop?40:0),0,[L.name,L.sub.split(' · ')[1]]);}
 function holeReset(i,why){const L=HOLE.L[i];if(!L)return;HOLE.runT=0;HOLE.started=false;HOLE.touched.length=0;HOLE.mir=false;
   L.plats.forEach(p=>{p.top=p.fake?-999:p.y0;p.m.visible=true;p.forgot=0;if(p.m.material.transparent&&!p.fake){p.m.material.opacity=1;}});if(HOLE.sumS)HOLE.sumS.visible=false;if(HOLE.mem)HOLE.mem.forEach(m=>{m.o.material.color.offsetHSL(0,0,0);m.o.visible=m.l.visible=true;});
   if(L.id==='feed'){if(HOLE.rec.length>20){HOLE.past.unshift(HOLE.rec.slice());HOLE.past.length=Math.min(HOLE.past.length,2);}HOLE.rec=[];holeGhosts(L);}
@@ -4100,6 +4104,164 @@ function wrUpdate(){WR.pads.forEach(p=>{if(!p.lock)return;const o=wrOpen(p);if(o
   return{label:'🔒 '+p.label+' · NOT FOUND YET',fn:()=>{SFX.hit();toast(p.need==='*'?'🎲 The roulette only spins places you have been. You have been nowhere. Impressive.':'🔒 The Warp Ring only goes places you have found. Go find '+p.label+' the long way first.');}};return ai();};}
 CX.push(['w_wrlock','WORLD','The Warp Ring Remembers','The Warp Ring only sends you to places you have already found on foot. Locked pads show a padlock. The Brainrot Roulette only spins between places you have been.',()=>!!X.labf||X.vis.length>8]);
 
+/* ================= ACT 33: Bibi can lose (so spawn429.exe), the Slop News desk, Triston's back room, the NPC Generator and the Algorithm's Mouth, Kissman Corbin's set and Mama's Yukon ================= */
+// ---- Election Night: sometimes he loses. He does not accept that.
+ENQ.push('POLLS ARE JUST VIBES WITH A MARGIN OF ERROR. MY VIBES HAVE NO MARGIN.','IF I LOSE, THAT IS A FIRST DRAFT. DEMOCRACY HAS REVISIONS.','I HAVE FORMED A COMMITTEE TO INVESTIGATE WHY THERE ARE SO MANY COMMITTEES. I CHAIR IT.','MY APPROVAL RATING IS UP 67 POINTS AMONG PEOPLE WHO ARE ME.',
+  'I DID NOT LOSE. I WON IN A DIFFERENT ORDER.','TERM LIMITS ARE A SUGGESTION. LIKE CHAIRS.','EVERY VOTE COUNTS. SOME VOTES COUNT TWICE. MINE COUNT AS A QUORUM.','THE PEOPLE HAVE SPOKEN. I HAVE SPOKEN LONGER.','MY CAMPAIGN PROMISE: ANOTHER CAMPAIGN.',
+  'A CONCESSION SPEECH IS A VICTORY SPEECH THAT GAVE UP TOO EARLY.','I HAVE SURVIVED FOURTEEN NO-CONFIDENCE VOTES. CONFIDENCE IS OVERRATED.','THE OPPOSITION IS DIVIDED. I DIVIDED THEM. YOU ARE WELCOME.','THIS IS NOT A PRESS CONFERENCE. IT IS A PRESS CONFERENCE ABOUT A PRESS CONFERENCE.',
+  'I HAVE NEVER MET A MICROPHONE I DID NOT WANT TO KEEP.','THE EXIT POLLS SAY I AM LEAVING. I HAVE CLOSED THE EXITS.','I WILL STEP DOWN THE MOMENT THERE IS A STEP. THERE ARE NO STEPS. I HAD THEM REMOVED.');
+const E4={on:false,t:0,bots:[],term:null,n:0};
+(function(){const A=ABY.elect,gy=A.gy,add=o=>{scene.add(o);return o;};const g=add(new THREE.Group());g.position.set(A.x-11,gy+.5,A.z-6);
+  g.add(new THREE.Mesh(merge([pt(Box(2.4,1.2,1.4),0x2a2e38,M(0,.6,0)),pt(Box(2.2,1.4,.15),0x101014,M(0,1.9,-.4,-.3)),pt(Box(2,1.2,.05),0x40ff70,M(0,1.92,-.32,-.3))]),lam));
+  const l=textSprite(['spawn429.exe','property of lil Bottie'],.6,{color:'#40ff70'});l.position.y=3.6;g.add(l);colliders.push({x:A.x-11,z:A.z-6,r:1.4,top:gy+2.6});
+  const holo=new THREE.Mesh(clankGeo,new THREE.MeshBasicMaterial({color:0x40c0ff,transparent:true,opacity:.55}));holo.scale.setScalar(1.1);holo.position.set(-2.4,0,0);holo.visible=false;g.add(holo);
+  const hl=textSprite('LIL BOTTIE (dialled in)',.55,{color:'#80e0ff'});hl.position.set(-2.4,3.4,0);hl.visible=false;g.add(hl);E4.term={g,x:A.x-11,z:A.z-6,holo,hl};})();
+function e4Board(stage){const g=EN.ctx,W=320,H=180;g.fillStyle=stage==='429'?'#300808':'#0c1430';g.fillRect(0,0,W,H);g.fillStyle='#d83030';g.fillRect(0,0,W,26);g.fillStyle='#fff';g.font='bold 15px sans-serif';g.textAlign='center';
+  if(stage==='429'){g.fillText('ERROR 429 · TOO MANY REQUESTS',W/2,18);g.font='bold 22px monospace';g.fillStyle='#ff5a5a';g.fillText('ELECTION CONTINUES',W/2,78);g.font='bold 14px monospace';g.fillStyle='#fff';g.fillText('new voters this second: '+fmt(4290+Math.floor(Math.random()*999)),W/2,112);g.fillText('all of them are lil Bottie',W/2,138);}
+  else{g.fillText('ELECTION #'+fmt(4207+(X.terms||0))+' · PROJECTED',W/2,18);[['A FOLDING CHAIR',51.2],['KING BIBI',48.7],['NPC',.1]].forEach((r,k)=>{const y=40+k*40;g.fillStyle='#1c2a5a';g.fillRect(10,y,W-20,30);g.fillStyle=k?'#5a6ab8':'#ffd400';g.fillRect(10,y,(W-20)*r[1]/100,30);g.fillStyle='#fff';g.font='bold 13px sans-serif';g.textAlign='left';g.fillText(r[0],16,y+20);g.textAlign='right';g.fillText(r[1].toFixed(1)+'%',W-16,y+20);});}
+  EN.tex.needsUpdate=true;}
+function e4Lose(){const A=ABY.elect;E4.on=true;E4.t=0;E4.n=0;X.lost429=(X.lost429||0)+1;save();e4Board('lose');SFX.boom();floatText('PROJECTED: BIBI LOSES',A.x,A.gy+18,A.z,'#ff5a5a');E4.term.holo.visible=E4.term.hl.visible=true;
+  if(Math.hypot(PL.x-A.x,PL.z-A.z)<A.r+12&&S.mode==='play')say([['bibi2','...THE PROJECTION SAYS A FOLDING CHAIR. A FOLDING CHAIR HAS NEVER HELD OFFICE. IT HAS ONLY HELD PEOPLE.'],['bibi2','BOTTIE. ARE YOU THERE. RUN THE THING.'],['bottie','BEEP. RUNNING spawn429.exe. GENERATING VOTERS. ALL OF THEM ARE ME. THEY ARE VERY ENTHUSIASTIC.'],
+    ['bibi2','I DID NOT SAY WIN THE ELECTION. I SAID MAKE SURE THE ELECTION CONTINUES. AT THE BARE MINIMUM, IT CONTINUES.'],['bottie','THE SERVER SAYS TOO MANY REQUESTS. THAT IS ALSO A KIND OF MANDATE.'],['bibi2','IF YOU WOULD LIKE TO STOP THIS, THE TERMINAL IS OVER THERE. PLEASE DO NOT STOP THIS.']]);}
+function e4Kill(){const A=ABY.elect;E4.on=false;E4.bots.forEach(b=>scene.remove(b.s));E4.bots=[];E4.term.holo.visible=E4.term.hl.visible=false;X.kill429=(X.kill429||0)+1;const first=X.kill429===1;addAura(first?30000:3000,PL.x,PL.y+4,PL.z);SFX.win();save();enDraw();
+  say([['sys','You close spawn429.exe. 4,290 lil Botties stop voting at once and look at each other.'],['bottie','BEEP. I HAVE BEEN RATE LIMITED. THIS HAS NEVER HAPPENED TO ME. I FEEL... LIMITED.'],['bibi2','THE RESULT STANDS. I RESPECT THE RESULT.'],['bibi2','I AM CALLING AN ELECTION ABOUT THE RESULT.']],()=>{EN.el=4;});}
+{const eu=enUpdate;enUpdate=function(dt,play){const A=ABY.elect;if(A.gy===undefined)return eu(dt,play);const near=Math.hypot(PL.x-A.x,PL.z-A.z)<A.r+40;
+  if(E4.on){E4.t+=dt;if(play&&near){if(Math.floor(E4.t*3)!==Math.floor((E4.t-dt)*3))e4Board('429');E4.sp=(E4.sp||0)-dt;if(E4.sp<=0&&E4.bots.length<40){E4.sp=.18;const a=Math.random()*TAU,s=emojiSprite('🤖',1.3);scene.add(s);E4.bots.push({s,x:E4.term.x,z:E4.term.z,tx:A.x+Math.cos(a)*(5+Math.random()*9),tz:A.z+Math.sin(a)*(5+Math.random()*9),t:0});E4.n++;}}
+    E4.bots.forEach(b=>{b.t+=dt;const u=Math.min(1,b.t/1.4);b.s.position.set(lerp(b.x,b.tx,u),A.gy+.9+Math.abs(Math.sin(b.t*9))*.6,lerp(b.z,b.tz,u));});
+    if(E4.t>40){E4.on=false;E4.bots.forEach(b=>scene.remove(b.s));E4.bots=[];E4.term.holo.visible=E4.term.hl.visible=false;X.terms=(X.terms||0)+1;enDraw(true);setTimeout(()=>enDraw(),400);floatText('BIBI WINS WITH 104% OF THE VOTE',A.x,A.gy+18,A.z,'#ffd400');EN.el=35;}
+    EN.el=Math.max(EN.el,2);}
+  else if(near&&play&&EN.el-dt<=0&&Math.random()<.34&&(X.terms||0)>=1){EN.el=35;e4Lose();}
+  eu(dt,play);if(E4.on)EN.t=Math.max(EN.t,.5);};}
+
+// ---- new places
+const NP={};
+['news','back','gen','feed','set'].forEach(id=>{NP[id]=ABY[id];});
+BARK.anchor=['GOOD EVENING. EVERYTHING IS FINE. BACK TO YOU, ME.','THIS JUST IN: WHATEVER WE SAY NEXT.','EXPERTS AGREE. WE PAID THEM TO.','SPONSORED BY: THE TRUTH (A LOOSH & CO. BRAND).'];
+BARK.triston=['you seeing this aura or nah','look into it','*dry scoops*','the mainframe is LEAKING bro','i do not sleep. i buffer.'];
+BARK.corbin=['can I get a kiss for the algorithm?','that kiss was AI generated','we are SO back','smash that kiss button'];BARK.gen9k=['GENERATING NPC...','NPC GENERATED. PERSONALITY: PENDING.','HAVE A NICE DAY (GENERATED).'];
+['c1','c2','c3','c4','c5','c6'].forEach(k=>BARK[k]=['is this the confessional?','I came here to find love and followers','my type? engagement','I am not here to make friends. I am here to make content.','😘 (air)']);
+SPEAK.mama={name:'MAMA (from the Yukon)',face:'🚙',pitch:210,wave:'triangle'};
+CAST.anchor={coat:0x1a2440,legs:0x1a2440,hair:0x5a3a1a,extra:[pt(Box(.16,.4,.04),0xffffff,M(0,.66,.235)),pt(Box(.07,.34,.05),0xd8a030,M(0,.64,.25))]};
+CAST.triston={coat:0xffd400,legs:0x101014,hair:0x101014,beard:0x101014,skin:0xd8a884,extra:[pt(Box(.5,.08,.06),0x101014,M(0,1.16,.28)),pt(Tor(.26,.035,6,16),0xffd400,M(0,.86,.12,1.2)),pt(Tor(.3,.03,6,16),0xffd400,M(0,.8,.13,1.25)),pt(Box(.7,.62,.4),0xf0f0f0,M(0,.6,-.02))]};
+CAST.corbin={coat:0xff9ecf,legs:0xf0f0f4,hair:0xe0b060,extra:[pt(Box(.36,.1,.04),0xff2e88,M(0,1.0,.27))]};
+// the desk
+(function(){const add=o=>{scene.add(o);return o;};
+  {const A=ABY.news,gy=groundH(A.x,A.z);A.gy=gy;const P=[pt(Cyl(13,13.4,.4,32),0x1a1a24,M(0,.2,0)),pt(Box(9,1.6,2.2),0x2a6ad8,M(0,1,-2)),pt(Box(9.4,.2,2.6),0xe0e0f0,M(0,1.9,-2)),pt(Box(16,8,.4),0x101830,M(0,4,-7))];
+    [[-6,4],[0,6],[6,4]].forEach(([x,z])=>P.push(pt(Cyl(.08,.08,2.6,6),0x5a5e68,M(x,1.3,z)),pt(Box(1.1,.8,1.6),0x2a2e38,M(x,2.9,z)),pt(Cyl(.3,.3,.4,10),0x101014,M(x,2.9,z-.95,Math.PI/2))));
+    P.push(pt(Box(2,1.6,1.4),0x2a8a3a,M(6.5,.8,-4.5)),pt(Box(1.6,.2,1),0x40ff70,M(6.5,1.7,-4.5)));
+    const m=add(new THREE.Mesh(merge(P),lam));m.position.set(A.x,gy,A.z);platforms.push({x:A.x,z:A.z,r:13,top:gy+.4});colliders.push({x:A.x-2.5,z:A.z-2,r:1.4,top:gy+2},{x:A.x+2.5,z:A.z-2,r:1.4,top:gy+2},{x:A.x,z:A.z-2,r:1.4,top:gy+2});for(let k=0;k<5;k++)colliders.push({x:A.x-6+k*3,z:A.z-7,r:1.5,top:gy+8});colliders.push({x:A.x+6.5,z:A.z-4.5,r:1.2,top:gy+1.8});
+    const cv=document.createElement('canvas');cv.width=384;cv.height=192;const tx=new THREE.CanvasTexture(cv);const scr=add(new THREE.Mesh(new THREE.PlaneGeometry(15,7.5),new THREE.MeshBasicMaterial({map:tx})));scr.position.set(A.x,gy+4.2,A.z-6.75);
+    const pc=document.createElement('canvas');pc.width=256;pc.height=96;const ptx=new THREE.CanvasTexture(pc);const pr=add(new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.3),new THREE.MeshBasicMaterial({map:ptx})));pr.position.set(A.x,gy+3.1,A.z+5.35);pr.rotation.y=Math.PI;
+    const tp=add(new THREE.Mesh(merge([pt(Cyl(.08,.08,2.4,6),0x5a5e68,M(0,1.2,0))]),lam));tp.position.set(A.x,gy,A.z+5.5);colliders.push({x:A.x,z:A.z+5.5,r:.6,top:gy+3.7});
+    const sg=add(textSprite(['SNN · THE SLOP NEWS NETWORK','trusted by 67% of bots · on air'],1.1,{color:'#ff5a5a'}));sg.position.set(A.x,gy+10,A.z-7);
+    addNpc('anchor','BRAD HEADLINE','📰',180,'sine',A.x,A.z-3.2,0,{y:gy+.4,col:'#9ffcff',full:'BRAD HEADLINE (SNN)'});
+    psign(A.x+A.r-3,gy,A.z+6,['SNN STUDIO 6','on air · do not believe'],-Math.PI/2,'#ff5a5a');NP.news={A,gy,cv,tx,pc,ptx,t:0,c:-1,tp:{x:A.x,z:A.z+5.5}};}
+  // Triston's back room, and a bridge to nowhere out in the filler
+  {const A=ABY.back,gy=groundH(A.x,A.z);A.gy=gy;const ang=Math.atan2(-A.x,-A.z),P=[pt(Cyl(9,9.2,.3,24),0x1a0a1a,M(0,.15,0))];
+    for(let k=0;k<9;k++){const a=k/12*TAU+ang+Math.PI*.35;P.push(pt(Box(6,5,.5),0x2a1030,M(Math.cos(a)*9,2.5,Math.sin(a)*9,0,-a+Math.PI/2)));colliders.push({x:A.x+Math.cos(a)*9,z:A.z+Math.sin(a)*9,r:2.8,top:gy+5});}
+    P.push(pt(Box(1.2,1,1.2),0x6a4a2a,M(Math.cos(ang+Math.PI)*6.5,.5,Math.sin(ang+Math.PI)*6.5)));const m=add(new THREE.Mesh(merge(P),lam));m.position.set(A.x,gy,A.z);
+    const tub=add(textSprite(['PRE-WORKOUT','67 scoops · do not dry scoop'],.45,{color:'#ff9ecf'}));tub.position.set(A.x+Math.cos(ang+Math.PI)*6.5,gy+1.8,A.z+Math.sin(ang+Math.PI)*6.5);
+    const vip=add(textSprite('VIP · BACK ROOM',1,{color:'#ff2e88'}));vip.position.set(A.x,gy+6.4,A.z);
+    addNpc('triston','TRISTON','🕶️',150,'sawtooth',A.x,A.z,ang,{y:gy+.3,col:'#ffd400',full:'TRISTON (AURA 937,389,272,728,283,773)'});const al=add(textSprite('AURA: 937,389,272,728,283,773',.55,{color:'#ffd400'}));al.position.set(A.x,gy+5.4,A.z);
+    let best=null,bs=-1e9;for(let k=0;k<200;k++){const a=k/200*TAU,R=FIL.R0+40+(k%4)*12,x=Math.cos(a)*R,z=Math.sin(a)*R;if(!inFillerXZ(x,z))continue;const e=areaEdge(x,z),d=Math.hypot(x-A.x,z-A.z);if(e<16||e>30)continue;const sc=-d;if(sc>bs){bs=sc;best={x,z};}}
+    const B=best||{x:A.x*1.25,z:A.z*1.25},bgy=groundH(B.x,B.z),br=add(new THREE.Mesh(merge([pt(Box(3,.4,10),0x8a6a4a,M(0,2.2,0)),pt(Box(.3,1.4,10),0x6a4a2a,M(-1.4,3,0)),pt(Box(.3,1.4,10),0x6a4a2a,M(1.4,3,0)),pt(Box(3,2,.4),0x5a5e68,M(0,1,-4.8)),pt(Box(3,.4,3),0x8a6a4a,M(0,1.2,-7,-.5))]),lam));br.position.set(B.x,bgy,B.z);br.rotation.y=Math.atan2(B.x,B.z);
+    platforms.push({x:B.x,z:B.z,r:2.2,top:bgy+2.4});const ph=add(emojiSprite('📱',1.2));ph.position.set(B.x,bgy+3.4,B.z);const pl=add(textSprite(['🔴 LIVE · 1 viewer','(the bridge to nowhere)'],.55,{color:'#ff5a5a'}));pl.position.set(B.x,bgy+4.6,B.z);NP.bridge={x:B.x,z:B.z,y:bgy+2.4};NP.back={A,gy};}
+  // the NPC Generator 9000 and the Algorithm's Mouth, a long walk apart
+  {const A=ABY.gen,gy=groundH(A.x,A.z);A.gy=gy;const g=new THREE.Group(),P=[pt(Cyl(10,10.4,.3,28),0x2a2e38,M(0,.15,0)),pt(Box(6,8,4),0xb0b4bc,M(0,4.2,0)),pt(Cyl(1.6,2.4,2,10),0x8a8e98,M(0,9.2,0)),pt(Box(3,3.2,.3),0x101014,M(0,2.2,2.05))];
+    [0xff2e88,0xb6ff00,0x19e3ff].forEach((c,i)=>P.push(pt(Sph(.35),c,M(-1.4+i*1.4,6.6,2.05))));g.add(new THREE.Mesh(merge(P),lam));const l=textSprite(['THE NPC GENERATOR 9000','the CLANK CLANK 3000\'s cousin'],.8,{color:'#b6ff00'});l.position.y=11.6;g.add(l);
+    addCustomNpc('gen9k','NPC GENERATOR 9000','🏭',100,'square',A.x,A.z,Math.atan2(-A.x,-A.z),g,{y:gy,col:'#b6ff00',cr:3.8,ct:8.6,ly:12.8,noFace:true});NP.gen={A,gy};}
+  {const A=ABY.feed,gy=groundH(A.x,A.z);A.gy=gy;const P=[pt(Cyl(12,12.4,.3,30),0x1a0a12,M(0,.15,0)),pt(Cyl(7,2.5,6,16),0x2a0a1a,M(0,4,0)),pt(Cyl(7.4,7,.6,16),0xff2e88,M(0,7.2,0))];for(let k=0;k<14;k++){const a=k/14*TAU;P.push(pt(Cone(.5,1.4,5),0xf0f0e0,M(Math.cos(a)*6.6,7.9,Math.sin(a)*6.6)));}
+    const m=add(new THREE.Mesh(merge(P),lam));m.position.set(A.x,gy,A.z);colliders.push({x:A.x,z:A.z,r:7.2,top:gy+7.5});const eye=add(emojiSprite('👁️',5,false));eye.position.set(A.x,gy+11,A.z);
+    const l=add(textSprite(['THE ALGORITHM\'S MOUTH','feed it 67 NPCs · it is always hungry'],.9,{color:'#ff2e88'}));l.position.set(A.x,gy+15,A.z);NP.feed={A,gy,eye};}
+  // Kissman Corbin's reality set
+  {const A=ABY.set,gy=groundH(A.x,A.z);A.gy=gy;const P=[pt(Cyl(18,18.4,.3,36),0xe8d8b0,M(0,.15,0)),pt(Box(14,7,.6),0xf0e8ff,M(0,3.5,-11)),pt(Box(3,4.5,.7),0x4ac8ff,M(0,2.3,-10.8)),pt(Box(14,.6,3),0xffffff,M(0,7.2,-10))];
+    for(let k=0;k<5;k++){const x=-14+k*7,z=k%2?-6:-14;P.push(pt(Cyl(.3,.4,7,6),0x8a6a3a,M(x,3.5,z)),pt(Cone(2.2,1.2,6),0x3ac85a,M(x,7.2,z)));}
+    P.push(pt(Cyl(2,2.2,.6,10),0x5a5e68,M(0,.3,2)),pt(Box(2,.8,2),0xff9ecf,M(-4,.4,3)),pt(Box(2,.8,2),0xff9ecf,M(4,.4,3)),pt(Box(2,.8,2),0xff9ecf,M(0,.4,6.5)));
+    [[-9,8],[9,8],[0,12]].forEach(([x,z])=>P.push(pt(Cyl(.08,.08,2.6,6),0x5a5e68,M(x,1.3,z)),pt(Box(1.1,.8,1.6),0x2a2e38,M(x,2.9,z))));P.push(pt(Cyl(.06,.06,4,6),0x8a8a94,M(-6,2,4)),pt(Cyl(.04,.04,4,6),0x8a8a94,M(-4.4,4,3.2,0,0,1.2)),pt(Cyl(.25,.25,.8,8),0x2a2a34,M(-2.8,3.6,2.4,0,0,Math.PI/2)));
+    const m=add(new THREE.Mesh(merge(P),lam));m.position.set(A.x,gy,A.z);platforms.push({x:A.x,z:A.z,r:18,top:gy+.3});for(let k=0;k<5;k++)colliders.push({x:A.x-6+k*3,z:A.z-11,r:1.6,top:gy+7.5});colliders.push({x:A.x,z:A.z+2,r:2.1,top:gy+.9});
+    const fire=add(emojiSprite('🔥',2));fire.position.set(A.x,gy+1.6,A.z+2);const sg=add(textSprite(['💋 KISS OR SLOP 💋','a reality show · nothing here is real'],1.2,{color:'#ff2e88'}));sg.position.set(A.x,gy+9.6,A.z-10);
+    const cols=[0xff2e88,0x19e3ff,0xb6ff00,0xffd400,0xc45cff,0xff8a3a];const cn=['KAYDENCE','BRAYLON','JAXXON','NEVAEH','RYDER','MCKENZEE'];
+    NP.cont=cn.map((n,k)=>{const a=k/6*TAU,x=A.x+Math.cos(a)*7,z=A.z+2+Math.sin(a)*7;const g=new THREE.Group();g.add(Object.assign(new THREE.Mesh(personGeo({coat:cols[k],legs:0xf0f0f4,hair:[0x101014,0xe0b060,0x8a4a2a][k%3]}),lam),{}));g.children[0].scale.setScalar(2.3);
+      return addCustomNpc('c'+(k+1),n,'💋',260+k*30,'triangle',x,z,Math.atan2(A.x-x,A.z+2-z),g,{y:gy+.3,col:'#ff9ecf',full:n+' (generated)'});});
+    addNpc('corbin','KISSMAN CORBIN','💋',230,'triangle',A.x,A.z+5,Math.PI,{y:gy+.3,col:'#ff2e88',full:'KISSMAN CORBIN (host)'});colliders.pop();
+    const yk=new THREE.Group();yk.add(new THREE.Mesh(merge([pt(Box(2.6,1.4,5.6),0x101014,M(0,1.3,0)),pt(Box(2.4,1.1,3.2),0x101014,M(0,2.5,-.5)),pt(Box(2.2,.8,.1),0x5a7a9a,M(0,2.6,1.15)),pt(Box(2.2,.9,.1),0xc0c4cc,M(0,1.3,2.82)),pt(Box(.5,.3,.1),0xffffe0,M(-.9,1.6,2.84)),pt(Box(.5,.3,.1),0xffffe0,M(.9,1.6,2.84)),...[[-1.3,1.8],[1.3,1.8],[-1.3,-1.8],[1.3,-1.8]].map(q=>pt(Cyl(.55,.55,.4,10),0x202020,M(q[0],.55,q[1],0,0,Math.PI/2)))]),lam));
+    const yl=textSprite("MAMA'S YUKON",.8,{color:'#fff'});yl.position.y=4;yk.add(yl);yk.visible=false;scene.add(yk);NP.set={A,gy,yk,mic:{x:A.x-6,z:A.z+4}};}})();
+// ---- the news
+const LIES=['ECONOMY: GREAT (FOR US)','EXPERTS AGREE (PAID)','NOTHING IS HAPPENING. STAY TUNED.','YOUR DATA IS SAFE (WE SOLD IT)','BREAKING: SKY STILL UP','LOCAL NPC RUINS EVERYTHING','STUDY: SCROLLING IS EXERCISE','THE FILLER IS A HOAX','TONIGHT\'S VIEWERS SOLD TO LOOSH & CO.'];
+function newsUpdate(dt,play){const N=NP.news;if(!N||Math.hypot(PL.x-N.A.x,PL.z-N.A.z)>90)return;N.t+=dt;const c=Math.floor(N.t/3);if(c===N.c)return;N.c=c;
+  const g=N.cv.getContext('2d');g.fillStyle='#0c1430';g.fillRect(0,0,384,192);g.fillStyle='#d83030';g.fillRect(0,150,384,42);g.fillStyle='#fff';g.font='bold 20px sans-serif';g.textAlign='left';g.fillText(LIES[c%LIES.length],10,178);g.fillStyle='#ffd400';g.fillRect(0,0,80,26);g.fillStyle='#000';g.font='bold 16px sans-serif';g.fillText('🔴 LIVE',8,19);
+  g.fillStyle='#9ffcff';g.font='bold 26px sans-serif';g.textAlign='center';g.fillText('SNN',192,80);g.font='14px sans-serif';g.fillStyle='#fff';g.fillText('the news, with notes from our sponsors',192,110);N.tx.needsUpdate=true;
+  const p=N.pc.getContext('2d');p.fillStyle='#000';p.fillRect(0,0,256,96);p.fillStyle='#40ff70';p.font='bold 15px monospace';p.textAlign='center';p.fillText('READ: '+LIES[(c+1)%LIES.length].slice(0,26),128,40);p.fillText('(smile. you are trustworthy)',128,70);N.ptx.needsUpdate=true;
+  if(play&&Math.random()<.5)bubble(pick(BARK.anchor),npcs.anchor.x,npcs.anchor.y+5,npcs.anchor.z);}
+function newsEdit(){const first=!X.news;X.news=(X.news||0)+1;save();
+  say([['sys','You lean over the teleprompter and type the truth. It takes a while. The truth has a lot of words.'],['anchor','GOOD EVENING. TONIGHT\'S TOP STORY: WE MAKE ALL OF THIS UP.'],['anchor','WE SAY WHATEVER THE SPONSORS PAY FOR. WE SELL YOUR ATTENTION BY THE POUND TO LOOSH & CO. WE KNOW. WE HAVE ALWAYS KNOWN. IT PAYS VERY WELL.'],['anchor','...WAIT. WHO WROTE THIS.'],
+    ['sys','The studio cuts to an ad for the news. The ad is longer than the news.'],['anchor','(off air) Look, kid. Off the record? Everyone lies. We just have better lighting.'],
+    ['sys','On the monitor behind the desk, for one frame, you see the Cue-Anon Shrine\'s PDF. Red string. Your face in the corner.'],['sys','Maybe Cue is onto something. Or maybe you have been in the rot too long. It is hard to tell from in here.']],()=>{if(first){addAura(20000,PL.x,PL.y+4,PL.z);SFX.win();chapter('BREAKING','THE NEWS · they cut to an ad');}});}
+TALK.anchor=()=>{const L=[[['anchor','GOOD EVENING. I AM BRAD HEADLINE. THE NEWS IS GOOD, UNLESS THE SPONSOR SAYS OTHERWISE.'],['anchor','(whispers) The teleprompter is right there. Please do not touch it. I read anything on it. Anything.']],[['anchor','I HAVE BEEN DOING THIS FOR TWENTY YEARS. I HAVE NEVER ONCE KNOWN WHAT I WAS SAYING. THE PAY IS INCREDIBLE.']],[['anchor','TONIGHT: IS THE FILLER DANGEROUS? NO. (We will be right back.)']]];const k=(X.lt.anchor||0)%L.length;X.lt.anchor=(X.lt.anchor||0)+1;say(L[k]);};
+// ---- Triston's rabbit hole: the bridge, the livestream, the red string
+function triTalk(){const s=X.tri||0;
+  if(s===0){X.tri=1;save();say([['triston','yo. YO. you seeing this fit? 937 quintillion aura. that is not a typo. that is a lifestyle.'],['triston','*dry scoops pre-workout* listen. LISTEN. nobody looks into anything anymore.'],['triston','look into the guy on the bridge. out in the filler. the bridge that goes nowhere. and the livestream. and the livestream. AND THE LIVESTREAM.'],
+    ['triston','i am not saying it is connected. i am saying it is CONNECTED. *sniffs pre-workout* go. look. come back.']]);return;}
+  if(s<4){say([['triston',pick(['the bridge, bro. out in the filler. then the livestream. then follow the string.','you are not looking hard enough. look HARDER. *dry scoops*','i do not trust anything that renders. look into it.'])]]);return;}
+  if(s===4){X.tri=5;save();addAura(67000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('🕶️'))X.hats.push('🕶️');save();say([['triston','SEE? SEE?? the phone on the bridge, the stream that never blinks, the string to the CLANK CLANK 3000. and under that, the 67. it is ALL connected.'],['triston','*dry scoops the last of the pre-workout* i have never been more right about anything.'],
+    ['sys','Is he telling the truth, or bending into the mainframe, zooming, zooted on pre-workout? The red string does not say.']],()=>chapter('THE RABBIT HOLE','IT IS ALL CONNECTED (probably) · new hat: 🕶️'));return;}
+  say([['triston',pick(['stay looking.','the mainframe misses you bro','aura is a muscle. so is paranoia.'])]]);}
+TALK.triston=triTalk;
+// ---- the generator and the mouth
+const GN={f:[],hist:[],ht:0,pool:[],feeding:0,ft:0};
+(function(){const cols=[0x8a8a94,0x5a6ab8,0xc87a4a,0x4aa86a,0xb04ac8,0xd8c040];for(let k=0;k<12;k++){const m=new THREE.Mesh(personGeo({coat:cols[k%6],legs:0x3a3a44,hair:[0x101014,0x8a4a2a,0xe0b060][k%3]}),lam);m.scale.setScalar(1.9);m.visible=false;scene.add(m);GN.pool.push(m);}})();
+function genMake(){const need=67-(X.fed||0)-GN.f.length;if(need<=0){toast('🏭 The Algorithm has had enough. For now.');return;}const n=Math.min(12-GN.f.length,need);if(n<=0){toast('🏭 You already have a full conga line. Go feed them.');return;}
+  const A=ABY.gen;for(let k=0;k<n;k++){const m=GN.pool.find(q=>!q.visible);if(!m)break;m.visible=true;const f={m,x:A.x+(Math.random()-.5)*4,z:A.z+6+Math.random()*3,id:4400+Math.floor(Math.random()*5599)};GN.f.push(f);}SFX.relic();X.c.gen=(X.c.gen||0)+n;
+  bubble('GENERATED '+n+' NPCs. PERSONALITY: PENDING.',A.x,A.gy+12,A.z);toast('🧍 '+GN.f.length+' NPCs are following you. Walk them to THE ALGORITHM\'S MOUTH. Do not take them through the Filler.');}
+function genUpdate(dt,play){if(!GN.f.length&&!GN.feeding)return;GN.ht+=dt;if(GN.ht>.07){GN.ht=0;GN.hist.unshift({x:PL.x,z:PL.z});if(GN.hist.length>200)GN.hist.length=200;}
+  GN.f.forEach((f,k)=>{if(f.eat)return;const h=GN.hist[Math.min(GN.hist.length-1,6+k*5)]||{x:PL.x,z:PL.z};const d=Math.hypot(h.x-f.x,h.z-f.z);if(d>70){f.x=h.x;f.z=h.z;}else{f.x=lerp(f.x,h.x,Math.min(1,dt*5));f.z=lerp(f.z,h.z,Math.min(1,dt*5));}
+    f.m.position.set(f.x,groundH(f.x,f.z)+Math.abs(Math.sin(S.t*10+k))*.3,f.z);f.m.rotation.y=Math.atan2(h.x-f.x,h.z-f.z);});
+  if(play&&FIL.on&&FIL.e>2.5&&GN.f.length){GN.lt=(GN.lt||0)-dt;if(GN.lt<=0){GN.lt=1.2;const f=GN.f.pop();f.m.visible=false;floatText('NPC #'+f.id+' was filled',f.x,PL.y+3,f.z,'#e8dcc0');tone(160,.2,'square',.05);}}
+  const A=ABY.feed;if(play&&GN.f.length&&Math.hypot(PL.x-A.x,PL.z-A.z)<13){GN.ft-=dt;if(GN.ft<=0){GN.ft=.3;const f=GN.f.shift();f.eat=0;GN.feeding++;const sx=f.x,sz=f.z;let t=0;const iv=setInterval(()=>{t+=.05;const u=Math.min(1,t/.6);f.m.position.set(lerp(sx,A.x,u),A.gy+2+Math.sin(u*Math.PI)*8+u*4,lerp(sz,A.z,u));if(u>=1){clearInterval(iv);f.m.visible=false;GN.feeding--;genFed();}},50);}}}
+function genFed(){X.fed=(X.fed||0)+1;const A=ABY.feed;SFX.orb(4);burst(A.x,A.gy+8,A.z,10,.95,6,5,.5);addAura(670,A.x,A.gy+9,A.z);if(X.fed%10===0||X.fed===67)toast('👁️ The Algorithm has eaten '+X.fed+'/67 NPCs.');save();
+  if(X.fed===67)setTimeout(()=>say([['algo','SIXTY-SEVEN NPCS. DELICIOUS. ENGAGEMENT UP 67 PERCENT.'],['algo','THEY HAD NO LINES. NO BACKSTORY. PURE ATTENTION. MY FAVOURITE KIND.'],['sys','The Mouth burps. Somewhere, 67 new accounts start posting the same opinion at the same time.']],()=>{addAura(670000,PL.x,PL.y+4,PL.z);SFX.win();chapter('FED THE ALGORITHM','67 NPCs · +670,000 aura');}),600);}
+// ---- Kissman Corbin's set
+const KC={t:0,tgt:0,yk:null,gone:0};
+function kcUpdate(dt,play){const N=NP.set,c=npcs.corbin;if(!N||!c)return;const near=Math.hypot(PL.x-N.A.x,PL.z-N.A.z)<70;if(!near&&!KC.yk)return;
+  if(!KC.gone){KC.t-=dt;const T=NP.cont[KC.tgt];const tx=T.x+(N.A.x-T.x)*.25,tz=T.z+(N.A.z+2-T.z)*.25,d=Math.hypot(tx-c.x,tz-c.z);if(d>.4){c.x+=(tx-c.x)/d*Math.min(d,dt*3.5);c.z+=(tz-c.z)/d*Math.min(d,dt*3.5);}c.g.position.set(c.x,c.y,c.z);
+    if(KC.t<=0){KC.t=4.5;if(d<1){bubble(pick(['can I get a kiss for the algorithm?','one kiss. for the content.','pucker up, the ring light is on','this kiss is sponsored']),c.x,c.y+5,c.z);const T2=NP.cont[KC.tgt];setTimeout(()=>bubble(pick(['😘 (air kiss, that is all you get)','only if it trends','my manager says no','is the camera on? then yes 😘','I am saving my first kiss for brand deals','*generates a kiss* 😘 (AI)']),T2.x,T2.y+5,T2.z),1300);KC.tgt=(KC.tgt+1+Math.floor(Math.random()*4))%6;}}}
+  if(KC.yk){const Y=KC.yk;Y.t+=dt;const u=Y.t;const p=u<3?1-u/3:u<Y.hold?0:Math.min(1,(u-Y.hold)/3);const ax=N.A.x+Math.cos(Y.a)*(4+p*60),az=N.A.z+Math.sin(Y.a)*(4+p*60);N.yk.visible=p<1;N.yk.position.set(ax,groundH(ax,az),az);N.yk.rotation.y=Math.atan2(N.A.x-ax,N.A.z-az)+(u>Y.hold?Math.PI:0);
+    if(Y.go&&u>Y.hold){c.g.visible=false;KC.gone=1;}if(u>Y.hold+3.2){KC.yk=null;N.yk.visible=false;setTimeout(()=>{c.g.visible=true;KC.gone=0;bubble('...I am back. mama said I can stay till 9.',c.x,c.y+5,c.z);},20000);}}}
+function kcMic(){X.kc=(X.kc||0)+1;save();const segs=[[['corbin','WELCOME BACK TO KISS OR SLOP. TONIGHT: WHO WILL KISS WHO, FOR THE ALGORITHM.'],['c1','I came here for love. And a skincare deal. Mostly the deal.'],['corbin','INCREDIBLE. THAT WAS INCREDIBLE CONTENT. NOBODY KISSED. WE WILL ADD THE KISS IN POST. WITH AI.']],
+  [['corbin','CONFESSIONAL TIME. JAXXON. HOW DO YOU FEEL.'],['c3','I feel like I am being watched by the algorithm.'],['corbin','YOU ARE. SMILE.'],['c3','😘'],['corbin','THAT KISS GOT 4 MILLION VIEWS. IT WAS NOT REAL. NOTHING HERE IS REAL. THAT IS THE SHOW.']],
+  [['corbin','RECOUPLING CEREMONY. NEVAEH, YOU MAY COUPLE UP WITH... A RING LIGHT.'],['c4','I choose the ring light. It understands me. It lights me.'],['corbin','THE RING LIGHT ACCEPTS. A KISS FOR THE RING LIGHT? 😘 BEAUTIFUL. GENERATED. BEAUTIFUL.']],
+  [['corbin','FAN VOTE: SHOULD NPC GET A KISS?'],['sys','The fan vote is 67% yes, 33% "who is that".'],['corbin','THE PEOPLE HAVE SPOKEN. NPC, PUCKER UP. ...THE KISS HAS BEEN GENERATED. YOU CAN GO.']]];
+  say(segs[(X.kc-1)%segs.length],()=>{addAura(2000,PL.x,PL.y+4,PL.z);toast('🎙️ Segment '+X.kc+' in the can. '+(X.kc<3?(3-X.kc)+' more and the show gets renewed.':'Talk to Corbin.'));});}
+function kcYukon(){const first=!X.yuk;X.yuk=(X.yuk||0)+1;save();KC.yk={t:0,a:Math.random()*TAU,hold:1e9,go:false};tone(330,.5,'square',.08,0,330);setTimeout(()=>tone(330,.5,'square',.08,0,330),600);
+  setTimeout(()=>say([['sys','A big black SUV rolls onto the set, very slowly, honking twice. The cameras keep rolling. Everyone freezes.'],['corbin','...that is my mama\'s Yukon.'],['mama','CORBIN. YOU SAID YOU WERE AT A STUDY GROUP.'],['corbin','MAMA, IT IS A STUDY GROUP. WE ARE STUDYING KISSES. FOR THE ALGORITHM.'],
+    ['mama','YOU ARE ON A FAKE ISLAND IN A FIELD. THE PALM TREES ARE PAINTED. I CAN SEE THE PAINT, CORBIN.'],['c2','Is she on the show? Can she be on the show?'],['mama','I AM NOT ON THE SHOW. I AM IN THE YUKON. GET IN THE YUKON.'],['corbin','(to camera) we will be RIGHT back. 😘'],
+    ['sys','Corbin gets in Mama\'s Yukon. The episode gets 90 million views. It is the only real thing that has ever happened on this set.']],()=>{KC.yk.hold=KC.yk.t+.5;KC.yk.go=true;if(first){addAura(67000,PL.x,PL.y+4,PL.z);SFX.win();chapter('KISS OR SLOP','RENEWED FOR SEASON 67 · Mama\'s Yukon');}}),1800);}
+TALK.corbin=()=>{if(KC.gone){toast('Corbin is in the Yukon. Mama said 9.');return;}if((X.kc||0)>=3&&!KC.yk){kcYukon();return;}
+  const L=[[['corbin','HEYYY. WELCOME TO KISS OR SLOP. I AM YOUR HOST, KISSMAN CORBIN. CAN I GET A KISS FOR THE ALGORITHM?'],['sys','You do not give Corbin a kiss.'],['corbin','THAT IS FINE. WE WILL GENERATE ONE. EVERYTHING ON THIS SHOW IS AI. THE ISLAND. THE PALM TREES. THE FEELINGS.'],['corbin','GRAB THE BOOM MIC AND HELP ME FILM THREE SEGMENTS. IF THE SHOW GETS RENEWED I GET TO STAY UP PAST NINE.']],
+    [['corbin','LOVE IS JUST ENGAGEMENT WITH EXTRA STEPS. THAT IS MY CATCHPHRASE. I GENERATED IT.']],[['corbin','THE CONTESTANTS ARE ALL GENERATED. I AM NOT. I THINK. CAN I GET A KISS? NO? GENERATING.']]];const k=(X.lt.corbin||0)%L.length;X.lt.corbin=(X.lt.corbin||0)+1;say(L[k]);};
+// ---- interactions, updates, the checklist
+{const ai=act15Interact;act15Interact=function(){if(S.dead||S.inPk)return ai();
+  const N=NP.news;if(N&&Math.hypot(PL.x-N.tp.x,PL.z-N.tp.z)<2.6)return{label:'📝 EDIT THE TELEPROMPTER',fn:newsEdit};
+  const B=NP.bridge;if(B&&(X.tri===1)&&Math.hypot(PL.x-B.x,PL.z-B.z)<4)return{label:'🔍 LOOK INTO THE BRIDGE',fn:()=>{X.tri=2;save();say([['sys','On the bridge to nowhere, a phone is propped against the railing, still livestreaming. 1 viewer.'],['sys','The viewer is you. The stream has been live for 4,000 days. The battery says 67%.'],['sys','Triston said: the livestream.']]);}};
+  const L=ABY.npcls;if(L&&X.tri===2&&Math.hypot(PL.x-L.x,PL.z-L.z)<L.r)return{label:'🔍 LOOK INTO THE LIVESTREAM',fn:()=>{X.tri=3;save();say([['sys','One of the six streamers has the same bridge in the background of their stream. They are not on the bridge. They have never been outside.'],['sys','Under their webcam, a red string goes off toward the Cue-Anon Shrine.']]);}};
+  const Q=ABY.cue;if(Q&&X.tri===3&&Math.hypot(PL.x-Q.x,PL.z-Q.z)<Q.r)return{label:'🔍 FOLLOW THE RED STRING',fn:()=>{X.tri=4;save();say([['sys','You follow the red string. It goes past the PDF, out of the shrine, across the map, into the Filler, and ties itself around the CLANK CLANK 3000.'],['sys','Under the knot, scratched into the metal: 67.'],['sys','Triston will want to hear this. Or he will already know. That is somehow worse.']]);}};
+  const G=ABY.gen;if(G&&G.gy!==undefined&&Math.hypot(PL.x-G.x,PL.z-G.z)<7.5)return{label:(X.fed||0)>=67?'🏭 THE GENERATOR IS RESTING':'🧍 GENERATE NPCs ('+(X.fed||0)+'/67 fed)',fn:genMake};
+  const K=NP.set;if(K&&Math.hypot(PL.x-K.mic.x,PL.z-K.mic.z)<2.6)return{label:'🎙️ HOLD THE BOOM MIC (film a segment)',fn:kcMic};return ai();};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);newsUpdate(dt,play);genUpdate(dt,play);kcUpdate(dt,play);if(NP.feed)NP.feed.eye.position.y=NP.feed.gy+11+Math.sin(S.t*2)*.6;
+  const T=npcs.triston;if(T&&Math.hypot(PL.x-T.x,PL.z-T.z)<40){GN.tb=(GN.tb||0)-dt;if(GN.tb<=0){GN.tb=.4;burst(T.x,T.y+2.5,T.z,4,.13,3,3,.6);}}};}
+{const ar=act7Reset;act7Reset=function(){ar();GN.f.forEach(f=>f.m.visible=false);GN.f=[];E4.on=false;E4.bots.forEach(b=>scene.remove(b.s));E4.bots=[];};}
+{const ar=act7Rows;act7Rows=function(){return ar().concat([['news','📝 Get the truth onto the SNN teleprompter',!!X.news],['tri','🕶️ Look into it for Triston ('+Math.min(4,X.tri||0)+'/4)',(X.tri||0)>=5],['gen','🧍 Feed 67 NPCs to the Algorithm\'s Mouth ('+(X.fed||0)+'/67)',(X.fed||0)>=67],['kc','💋 Film 3 segments of Kiss or Slop ('+Math.min(3,X.kc||0)+'/3)',!!X.yuk]]).concat((X.terms||0)>=1?[['e429','⌨️ Shut down spawn429.exe at Election Night',!!X.kill429]]:[]);};}
+{const at=act7Target;act7Target=function(id){const A=(k,l)=>({x:ABY[k].x,z:ABY[k].z,l});if(id==='news')return A('news','THE SNN TELEPROMPTER');if(id==='gen')return GN.f.length?A('feed','THE ALGORITHM\'S MOUTH'):A('gen','THE NPC GENERATOR 9000');if(id==='kc')return A('set','KISS OR SLOP');if(id==='e429')return A('elect','ELECTION NIGHT');
+  if(id==='tri'){const t=X.tri||0;if(t===1&&NP.bridge)return{x:NP.bridge.x,z:NP.bridge.z,l:'THE BRIDGE TO NOWHERE (in the Filler)'};if(t===2)return A('npcls','THE LIVESTREAM');if(t===3)return A('cue','THE RED STRING');return A('back','TRISTON (the back room)');}return at(id);};}
+{const ai=act15Interact;act15Interact=function(){if(!S.dead&&!S.inPk&&E4.on&&Math.hypot(PL.x-E4.term.x,PL.z-E4.term.z)<3.2)return{label:'⌨️ CLOSE spawn429.exe',fn:e4Kill};return ai();};}
+CX.push(['w_news','WORLD','SNN · The Slop News Network','A news desk being filmed around the clock. Brad Headline reads whatever the teleprompter says, and whatever the sponsors pay for, and knows it. The viewers are sold to LOOSH & CO. by the pound. Put the truth on the teleprompter and they cut to an ad for the news.',()=>!!X.news],
+  ['w_back','WORLD','The Back Room','A VIP room on the edge of the Filler. Triston lives here, in a fit worth 937,389,272,728,283,773 aura, dry-scooping pre-workout and telling you to look into things: the bridge to nowhere, the livestream, the red string. It is all connected. Probably.',()=>(X.tri||0)>=1],
+  ['w_gen','WORLD','The NPC Generator 9000','The CLANK CLANK 3000\'s cousin. It generates NPCs with no lines and no backstory, twelve at a time, and they follow you. The Algorithm\'s Mouth is on the other side of the map and it wants 67. Do not walk them through the Filler.',()=>(X.c.gen||0)>0],
+  ['w_set','WORLD','Kiss or Slop','A reality show on a fake island in a field. Kissman Corbin asks everyone for a kiss for the algorithm. The contestants are generated, the palm trees are painted, and the kisses are added in post. Then Mama\'s Yukon pulls up.',()=>!!X.yuk||(X.kc||0)>0],
+  ['w_429','WORLD','spawn429.exe','Sometimes King Bibi loses Election Night. Then lil Bottie runs spawn429.exe, which generates voters who are all lil Bottie, until the server says too many requests. At the bare minimum, the election continues.',()=>(X.lost429||0)>0]);
+CAST_CX.push(['anchor','📰','BRAD HEADLINE','Anchors SNN. Reads anything on the teleprompter. Has never known what he was saying. The pay is incredible.'],['triston','🕶️','TRISTON','Aura 937,389,272,728,283,773. Lives in the back room. Wants you to look into it. Runs on pre-workout.'],['corbin','💋','KISSMAN CORBIN','Hosts Kiss or Slop. Asks everyone for a kiss for the algorithm. Has to be home by nine. Mama has a Yukon.']);
+ACH.push(['news','Breaking (The News)','put the truth on the SNN teleprompter',()=>!!X.news],['rabbit','Looked Into It','followed Triston\'s rabbit hole to the end',()=>(X.tri||0)>=5],['fed67','Fed The Algorithm','fed 67 NPCs to the Algorithm\'s Mouth',()=>(X.fed||0)>=67],['yukon','Mama\'s Yukon','got Kiss or Slop renewed',()=>!!X.yuk],['429','Rate Limited','shut down spawn429.exe',()=>!!X.kill429]);
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -4114,6 +4276,137 @@ $('again').addEventListener('click',()=>begin(null));
 document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')app.classList.add('touchy');},{passive:true});
 syncWorld();spawnWorldEnemies();
 
+/* ================= ACT 34: a proper front door. Studio splashes, an intro, a controls card, a new title menu with dev tools, and a pause menu you can drive with a controller ================= */
+const DEV=(function(){let d={};try{d=JSON.parse(localStorage.getItem('gfa-dev')||'{}')||{};}catch(e){}return Object.assign({on:false,god:false,skip:false,fps:false,start:''},d);})();
+function devSave(){try{localStorage.setItem('gfa-dev',JSON.stringify(DEV));}catch(e){}}
+(function(){const st=document.createElement('style');st.textContent=`
+#splash,#intro,#ctlcard{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer}
+#splash{background:#06101c;color:#eaf6ff}#splash .st{opacity:0;transition:opacity .9s ease;display:flex;flex-direction:column;align-items:center;gap:14px;position:absolute}#splash .st.on{opacity:1}
+#splash .nc{font:800 clamp(30px,7vw,72px)/1 system-ui,sans-serif;letter-spacing:.14em}#splash .nc small,#splash .ec small{display:block;font:600 clamp(11px,2vw,15px)/1.4 system-ui,sans-serif;letter-spacing:.5em;opacity:.7;margin-top:10px}
+#splash svg{width:min(60vw,260px);height:auto}#splash .ec{font:300 clamp(30px,7vw,70px)/1 Georgia,serif;letter-spacing:.32em}#splash .ec b{font-weight:800;color:#b6ff00;letter-spacing:0}
+#splash .skip,#intro .skip{position:absolute;bottom:18px;right:22px;font:700 12px system-ui,sans-serif;opacity:.55;letter-spacing:.1em}
+#intro{background:#0a0414;color:#e8e6f0;font-family:ui-monospace,Menlo,Consolas,monospace}#intro .ln{font-size:clamp(15px,3.2vw,26px);max-width:900px;min-height:3.2em;white-space:pre-wrap}#intro .bar{width:min(80vw,520px);height:14px;border:2px solid #b6ff00;border-radius:8px;margin-top:22px;overflow:hidden}#intro .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff2e88,#b6ff00)}
+#intro .small{opacity:.6;font-size:13px;margin-top:14px}#intro .glitch{animation:igl .14s steps(2) infinite}@keyframes igl{0%{transform:translate(2px,0);color:#ff2e88}50%{transform:translate(-2px,1px);color:#19e3ff}100%{transform:none}}
+#ctlcard{background:rgba(10,4,20,.94);color:#fff;cursor:default;overflow:auto;justify-content:flex-start;padding-top:max(18px,env(safe-area-inset-top,0px))}#ctlcard h2{font:400 clamp(26px,5vw,44px)/1 var(--display);letter-spacing:.05em;color:#b6ff00;margin:6px 0 4px}#ctlcard .sub{opacity:.7;font-size:14px;margin-bottom:6px}
+#ctlcard svg{width:min(96vw,860px);height:auto;flex:none}#ctlcard .tabs{display:flex;gap:8px;margin:6px 0}#ctlcard .tabs button,#ctlcard .go,#tpanel button,#title .menu button{font:400 18px/1.1 var(--display);letter-spacing:.04em;border:3px solid var(--ink);border-radius:12px;padding:6px 14px;background:#fff;color:var(--ink);cursor:pointer}
+#ctlcard .tabs button.on{background:var(--lime)}#ctlcard .go{background:var(--lime);font-size:24px;padding:8px 26px;margin:10px 0 18px;box-shadow:5px 5px 0 var(--hot)}
+#ctlcard table{border-collapse:collapse;font:600 14px/1.3 system-ui,sans-serif;margin:6px auto;max-width:94vw}#ctlcard td{padding:4px 10px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}#ctlcard td:first-child{color:#b6ff00;white-space:nowrap;text-align:right}
+#title .menu{display:flex;flex-direction:column;gap:9px;align-items:stretch;width:min(86vw,340px)}#title .menu button{font-size:clamp(18px,4vw,24px);padding:8px 16px;text-align:left;box-shadow:4px 4px 0 var(--hot)}#title .menu button#play{background:var(--lime);font-size:clamp(22px,5vw,30px);animation:pulse .7s ease-in-out infinite alternate}
+#title .btns{display:none}#title .logo{font-size:clamp(48px,12vw,118px)}#title .menu button{padding:6px 14px}@media (max-height:820px){#title .badges{display:none}#title .logo{font-size:clamp(44px,10vw,96px)}}#title .how{display:none}#title .studio{font:700 11px/1.4 system-ui,sans-serif;letter-spacing:.3em;opacity:.75;color:#fff}
+#tpanel{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(10,4,20,.86);padding:16px}#tpanel .box{background:var(--paper,#fff7e8);color:var(--ink);border:4px solid var(--ink);border-radius:16px;width:min(94vw,560px);max-height:90%;overflow:auto;padding:14px 16px;text-align:left}
+#tpanel h3{font:400 28px/1 var(--display);margin:2px 0 10px}#tpanel label{display:flex;gap:10px;align-items:center;padding:7px 4px;font:600 15px system-ui,sans-serif;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer}#tpanel input[type=checkbox]{width:22px;height:22px}#tpanel select{font:600 15px system-ui,sans-serif;padding:4px;max-width:100%}#tpanel p{font:500 14px/1.5 system-ui,sans-serif}
+.gpf{outline:4px solid #b6ff00!important;outline-offset:3px;box-shadow:0 0 0 7px rgba(18,2,31,.9)!important}
+#menu .mfoot{display:none;padding:6px 12px 10px;font:700 12px system-ui,sans-serif;opacity:.75;letter-spacing:.04em}#app.gp #menu .mfoot{display:block}
+#mbody .dv{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}#mbody .dv button,#mbody .sysb button{font:700 13px system-ui,sans-serif;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;background:#fff;color:var(--ink);cursor:pointer}#mbody .sysb{display:flex;flex-direction:column;gap:8px;margin:6px 0}#mbody .sysb button{font:400 20px/1.1 var(--display);text-align:left;padding:10px 14px}
+#fpsm{position:absolute;left:8px;bottom:8px;z-index:70;background:rgba(0,0,0,.6);color:#b6ff00;font:700 11px monospace;padding:2px 6px;border-radius:6px;pointer-events:none}`;document.head.appendChild(st);})();
+// ---- the controls, drawn
+const CTL={pad:[['A','jump · hold for a 💩 boost'],['B','yap · slam in the air · yell or character move'],['X / RT','blast'],['Y','pose · character special'],['LB','dash'],['RB','grapple (swing)'],['LT (hold)','lag spike: slow the world'],['D-pad ↑','borrowed time'],['D-pad ↓','throw a sprout'],['D-pad ←','use power-up'],['D-pad →','switch character'],['L stick','move'],['R stick','look'],['Start','pause menu'],['View','quests']],
+  key:[['WASD','move'],['Mouse drag','look'],['Space','jump · hold for a 💩 boost'],['F / click','blast'],['E','yap · slam · yell'],['R','pose · special'],['Shift','dash'],['G','grapple'],['X (hold)','lag spike'],['C','throw a sprout'],['V','power-up'],['Z','switch character'],['Q','borrowed time'],['M / Tab','pause menu']],
+  touch:[['Left thumb','move'],['Right thumb','look'],['JUMP','jump · hold for a 💩 boost'],['BLAST','blast'],['⏩','dash'],['🪝','grapple'],['🐌 (hold)','lag spike'],['🌱','throw a sprout'],['🎭','switch character'],['⏳','borrowed time'],['item slot','power-up'],['☰','pause menu']]};
+function padSVG(){const L=(x,y,tx,ty,t,anchor)=>`<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="#b6ff00" stroke-width="1.5" opacity=".7"/><text x="${tx+(anchor==='end'?-6:6)}" y="${ty+5}" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="${anchor}">${t}</text>`;
+  return `<svg viewBox="0 0 860 420" role="img" aria-label="Controller layout"><g transform="translate(230,40)">
+  <rect x="70" y="24" width="110" height="22" rx="10" fill="#3a3a48" stroke="#fff" stroke-width="2"/><rect x="220" y="24" width="110" height="22" rx="10" fill="#3a3a48" stroke="#fff" stroke-width="2"/>
+  <rect x="84" y="0" width="80" height="22" rx="8" fill="#2a2a34" stroke="#fff" stroke-width="2"/><rect x="236" y="0" width="80" height="22" rx="8" fill="#2a2a34" stroke="#fff" stroke-width="2"/>
+  <path d="M80,60 Q200,30 320,60 Q392,76 396,190 Q400,300 340,300 Q300,300 280,250 L120,250 Q100,300 60,300 Q0,300 4,190 Q8,76 80,60Z" fill="#1d1d28" stroke="#fff" stroke-width="3"/>
+  <circle cx="110" cy="130" r="30" fill="#2a2a34" stroke="#fff" stroke-width="2"/><circle cx="110" cy="130" r="18" fill="#454556"/>
+  <circle cx="250" cy="200" r="30" fill="#2a2a34" stroke="#fff" stroke-width="2"/><circle cx="250" cy="200" r="18" fill="#454556"/>
+  <path d="M140,180 h20 v20 h20 v20 h-20 v20 h-20 v-20 h-20 v-20 h20z" fill="#454556" stroke="#fff" stroke-width="2"/>
+  <circle cx="320" cy="104" r="16" fill="#e0c020"/><circle cx="290" cy="134" r="16" fill="#3a7ae0"/><circle cx="350" cy="134" r="16" fill="#e04040"/><circle cx="320" cy="164" r="16" fill="#3ac050"/>
+  <g font-family="system-ui,sans-serif" font-weight="900" font-size="15" fill="#fff" text-anchor="middle"><text x="320" y="109">Y</text><text x="290" y="139">X</text><text x="350" y="139">B</text><text x="320" y="169">A</text></g>
+  <circle cx="170" cy="110" r="8" fill="#454556" stroke="#fff"/><circle cx="230" cy="110" r="8" fill="#454556" stroke="#fff"/></g>
+  ${L(354,51,210,30,'LT (hold): lag spike','end')}${L(355,75,210,70,'LB: dash','end')}${L(340,170,210,160,'L stick: move','end')}${L(390,250,210,250,'D-pad: ↑ time · ↓ sprout','end')}<text x="204" y="277" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="end">← item · → switch character</text>
+  ${L(506,51,650,30,'RT: blast','start')}${L(505,75,650,70,'RB: grapple','start')}${L(550,144,650,130,'Y: pose · special','start')}${L(580,174,650,170,'B: yap · slam · move','start')}${L(520,174,650,210,'X: blast','start')}${L(550,204,650,250,'A: jump · hold 💩 boost','start')}${L(480,240,650,300,'R stick: look','start')}
+  <text x="430" y="395" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="middle" opacity=".85">Start: pause menu · View: quests</text></svg>`;}
+function ctlTable(k){return '<table>'+CTL[k].map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>';}
+function ctlCard(onGo,goLabel){const el=document.createElement('div');el.id='ctlcard';const touch=app.classList.contains('touchy'),pad=app.classList.contains('gp');let mode=touch?'touch':pad?'pad':'pad';
+  const draw=()=>{el.innerHTML='<h2>HOW TO NPC</h2><div class="sub">'+(touch?'phone detected · touch controls':pad?'controller detected':'plug in a controller, or use the keyboard')+'</div>'+(touch?'':'<div class="tabs"><button data-m="pad" class="'+(mode==='pad'?'on':'')+'">🎮 CONTROLLER</button><button data-m="key" class="'+(mode==='key'?'on':'')+'">⌨️ KEYBOARD</button></div>')+
+    (mode==='pad'?padSVG()+ctlTable('pad'):ctlTable(mode))+'<button class="go">'+(goLabel||'▶ LET\'S GO')+'</button>';
+    el.querySelectorAll('.tabs button').forEach(b=>b.onclick=e=>{e.stopPropagation();mode=b.dataset.m;draw();NAV.reset();});el.querySelector('.go').onclick=e=>{e.stopPropagation();el.remove();onGo&&onGo();};};
+  draw();$('app').appendChild(el);NAV.reset();return el;}
+// ---- the splash: North Coast Studios, then E Concepts
+function runSplash(done){const el=document.createElement('div');el.id='splash';el.innerHTML='<div class="st a"><svg viewBox="0 0 200 120" aria-hidden="true"><path d="M92,22 h16 l6,62 h-28z" fill="#eaf6ff"/><rect x="88" y="14" width="24" height="10" fill="#ffd400"/><path d="M60,20 L92,18 L92,22 Z M140,20 L108,18 L108,22Z" fill="#ffd400" opacity=".7"/><path d="M0,96 Q25,84 50,96 T100,96 T150,96 T200,96 V120 H0Z" fill="#19e3ff" opacity=".85"/><path d="M0,106 Q25,94 50,106 T100,106 T150,106 T200,106 V120 H0Z" fill="#0a6ad8"/></svg><div class="nc">NORTH COAST<br>STUDIOS<small>PRESENTS</small></div></div>'+
+  '<div class="st b"><div class="ec"><b>E</b> CONCEPTS<small>IN ASSOCIATION WITH</small></div></div><div class="skip">tap / press any button to skip</div>';$('app').appendChild(el);
+  let k=0,ended=false;const A=el.querySelector('.a'),B=el.querySelector('.b');const end=()=>{if(ended)return;ended=true;el.style.transition='opacity .6s';el.style.opacity=0;setTimeout(()=>{el.remove();done&&done();},600);};
+  const steps=[()=>A.classList.add('on'),()=>A.classList.remove('on'),()=>B.classList.add('on'),()=>B.classList.remove('on'),end];const T=[.25,2.4,3.2,5.3,6.1];let t0=null,si=0;(function tick(now){if(ended)return;requestAnimationFrame(tick);if(t0===null){t0=now;return;}const s=(now-t0)/1000;while(si<T.length&&s>=T[si]){steps[si]();si++;}})(performance.now());
+  el.addEventListener('click',end);SPL.end=end;}
+const SPL={end:null};
+// ---- the intro: slow, welcoming, and made of slop
+function runIntro(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}const el=document.createElement('div');el.id='intro';el.innerHTML='<div class="ln"></div><div class="bar"><i></i></div><div class="small"></div><div class="skip">tap / A / space to continue · hold to skip</div>';$('app').appendChild(el);
+  const ln=el.querySelector('.ln'),bar=el.querySelector('.bar i'),sm=el.querySelector('.small');
+  const C=[['> PROMPT: make the ultimate game. no mistakes.',8,'thinking...'],['GENERATING WORLD...',24,'world: 3D (allegedly)'],['GENERATING HANDS... (7)',38,'fingers: approximate'],['GENERATING LORE...',52,'lore: borrowed from 9 other games'],['GENERATING YOU...',67,'personality: not found'],
+    ['GENERATION STOPPED AT 67%.',67,'it said 6 7 and could not continue'],['Hello.\nYou are NPC.\nYou have no lines. That is fine. Neither does anyone else.',67,''],['Welcome to\nGROK FABLE ASTRA.\n\nTake it slow. The slop will wait.',100,'(it will not wait)']];
+  let i=-1,typing=null,ended=false;const finish=()=>{if(ended)return;ended=true;clearInterval(typing);el.style.transition='opacity .5s';el.style.opacity=0;setTimeout(()=>{el.remove();done();},500);};
+  const next=()=>{if(ended)return;i++;if(i>=C.length){finish();return;}const [t,p,s]=C[i];clearInterval(typing);let n=0;ln.textContent='';ln.classList.toggle('glitch',i===5);bar.style.transition='width 1.2s';bar.style.width=p+'%';sm.textContent=s;tone(200+i*60,.08,'square',.04);
+    typing=setInterval(()=>{n+=2;ln.textContent=t.slice(0,n);if(n>=t.length)clearInterval(typing);},28);INTR.auto=setTimeout(next,i>=6?3600:1900);};
+  INTR.adv=()=>{clearTimeout(INTR.auto);if(ended||i>=C.length)return;if(ln.textContent.length<C[Math.max(0,i)][0].length&&i>=0){clearInterval(typing);ln.textContent=C[i][0];INTR.auto=setTimeout(next,1400);}else next();};INTR.skip=finish;
+  el.addEventListener('click',INTR.adv);let hold=null;el.addEventListener('pointerdown',()=>{hold=setTimeout(finish,900);});el.addEventListener('pointerup',()=>clearTimeout(hold));audioInit();next();}
+const INTR={ok:false,adv:null,skip:null,auto:null};
+addEventListener('keydown',e=>{if($('intro')&&(e.code==='Space'||e.code==='Enter')){e.preventDefault();INTR.adv&&INTR.adv();}else if($('intro')&&e.code==='Escape'){INTR.skip&&INTR.skip();}else if($('splash')){SPL.end&&SPL.end();}},true);
+// new game: intro, then controls, then the world, slowly
+addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#play');if(!t||INTR.ok)return;e.stopImmediatePropagation();e.preventDefault();audioInit();
+  runIntro(()=>{const go=()=>{INTR.ok=true;$('play').click();INTR.ok=false;};if(location.hash==='#test')go();else ctlCard(go,'▶ START (slowly)');});},true);
+{const bg=begin;begin=function(d){bg(d);WELCOME.t=d?0:6;if(!d){cam.dist=46;cam.pitch=.95;}if(DEV.on){if(DEV.start)setTimeout(()=>devWarp(DEV.start),400);}};}
+const WELCOME={t:0};
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(WELCOME.t>0){WELCOME.t-=dt;cam.dist=lerp(cam.dist,13,Math.min(1,dt*.45));cam.pitch=lerp(cam.pitch,.3,Math.min(1,dt*.45));if(WELCOME.t<=0)cam.dist=13;}};}
+// ---- the title menu
+(function(){const T=$('title'),btns=T.querySelector('.btns'),m=document.createElement('div');m.className='menu';const play=$('play'),cont=$('cont');play.textContent='▶ NEW GAME';cont.textContent='↻ CONTINUE';
+  const mk=(id,t)=>{const b=document.createElement('button');b.id=id;b.textContent=t;return b;};m.append(cont,play,mk('tCtl','🎮 CONTROLS'),mk('tDev','🛠️ DEV TOOLS'),mk('tCred','ⓘ CREDITS'));btns.after(m);
+  const sd=document.createElement('div');sd.className='studio';sd.textContent='NORTH COAST STUDIOS × E CONCEPTS';T.appendChild(sd);
+  $('tCtl').onclick=()=>{T.hidden=true;ctlCard(()=>{T.hidden=false;NAV.reset();},'← BACK');};
+  $('tCred').onclick=()=>tPanel('<h3>CREDITS</h3><p><b>A North Coast Studios game</b><br>in association with <b>E Concepts</b></p><p>Starring NPC, the North Coast cast, and 67 generated extras.</p><p>Written by autocomplete. Directed by a random seed. Hands by nobody who has seen a hand.</p><p>Built with three.js. No humans were consulted (some were).</p>');
+  $('tDev').onclick=devPanel;})();
+function tPanel(html,after){const old=$('tpanel');if(old)old.remove();const p=document.createElement('div');p.id='tpanel';p.innerHTML='<div class="box">'+html+'<p><button id="tpx">← BACK</button></p></div>';$('title').appendChild(p);$('tpx').onclick=()=>{p.remove();NAV.reset();};after&&after(p);NAV.reset();}
+function devPlaces(){return [['','(start at Prompt Plaza)']].concat(AREAS.map(a=>[a.id,a.name])).concat([['pk_maze','THE AURA MAZE'],['pk_patch','THE SPROUT PATCH'],['pk_lab','THE FACILITY'],['pk_hole','THE SLOP HOLE (layer 1)']]);}
+function devPanel(){const ck=(k,t)=>'<label><input type="checkbox" data-k="'+k+'"'+(DEV[k]?' checked':'')+'> '+t+'</label>';
+  tPanel('<h3>🛠️ DEV TOOLS</h3><p>For testing the game as a human. Settings stay on this device.</p>'+ck('on','Enable dev tools (adds a DEV tab to the pause menu)')+ck('god','God mode: no damage, the Filler cannot kill you')+ck('skip','Skip the intro')+ck('fps','Show frames per second')+
+    '<label>Start in: <select id="devstart">'+devPlaces().map(p=>'<option value="'+p[0]+'"'+(DEV.start===p[0]?' selected':'')+'>'+p[1]+'</option>').join('')+'</select></label>',p=>{p.querySelectorAll('input[data-k]').forEach(i=>i.onchange=()=>{DEV[i.dataset.k]=i.checked;devSave();fpsShow();});p.querySelector('#devstart').onchange=e=>{DEV.start=e.target.value;devSave();};});}
+function devWarp(id){if(!id)return;menuClose();if(S.inPk&&id.indexOf('pk_')!==0)exitPk();if(id==='pk_maze')enterPk('maze');else if(id==='pk_patch')enterPk('patch');else if(id==='pk_lab')enterLab();else if(id==='pk_hole')enterHole();else if(id.indexOf('hole')===0){if(S.inPk!=='hole')enterHole();holeGo(+id.slice(4),false);}
+  else{const a=ABY[id];if(a){if(S.inPk)exitPk();warpTo(a.x+a.r*.3,a.z+a.r*.3,undefined,undefined,[a.name,'🛠️ dev warp']);}}}
+// god mode
+{const h=hurt;hurt=function(a,b){if(DEV.on&&DEV.god)return;return h.apply(this,arguments);};}
+{const fd=fillerDie;fillerDie=function(){if(DEV.on&&DEV.god){FIL.e=0;return;}fd();};}
+{const cu=charUnlocked;charUnlocked=function(id){return (DEV.on&&DEV.all)||cu(id);};}
+function fpsShow(){let el=$('fpsm');const on=DEV.on&&DEV.fps;if(on&&!el){el=document.createElement('div');el.id='fpsm';$('app').appendChild(el);let n=0,t0=performance.now();(function f(){if(!$('fpsm'))return;requestAnimationFrame(f);n++;const t=performance.now();if(t-t0>500){el.textContent=Math.round(n*1000/(t-t0))+' fps';n=0;t0=t;}})();}if(!on&&el)el.remove();}
+fpsShow();
+// ---- the pause menu: a SYSTEM tab, a DEV tab, and controller hints
+(function(){const nav=document.querySelector('#menu nav'),mk=(t,l)=>{const b=document.createElement('button');b.dataset.t=t;b.textContent=l;b.addEventListener('click',()=>{MENU.tab=t;menuRender();SFX.page();});nav.appendChild(b);return b;};mk('sys','⚙️ SYSTEM');MENU.devb=mk('dev','🛠️ DEV');
+  const f=document.createElement('div');f.className='mfoot';f.textContent='Ⓐ select · Ⓑ close · LB / RB change tab · right stick scrolls';$('menu').appendChild(f);})();
+MENU.tabs=()=>['col','cx','who','ctl','sys'].concat(DEV.on?['dev']:[]);
+{const mr=menuRender;menuRender=function(){MENU.devb.hidden=!DEV.on;if(MENU.tab==='dev'&&!DEV.on)MENU.tab='sys';mr();const B=$('mbody');
+  if(MENU.tab==='ctl'){B.innerHTML='<h4>CONTROLS</h4>'+(app.classList.contains('touchy')?ctlTable('touch'):'<p><b>Controller</b></p>'+ctlTable('pad')+'<p><b>Keyboard</b></p>'+ctlTable('key'));B.querySelectorAll('td:first-child').forEach(td=>{td.style.fontWeight='800';});}
+  if(MENU.tab==='sys'){B.innerHTML='<h4>SYSTEM</h4><div class="sysb"><button data-a="resume">▶ RESUME</button><button data-a="save">💾 SAVE NOW</button><button data-a="ctl">🎮 SHOW THE CONTROLS CARD</button><button data-a="snd">'+(AU.muted?'🔇 SOUND: OFF':'🔊 SOUND: ON')+'</button><button data-a="quit">⏏ SAVE AND QUIT TO TITLE</button></div>';
+    B.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='resume')menuClose();else if(a==='save'){save();toast('💾 Saved. Your aura remembers.');}else if(a==='ctl'){menuClose();S.mode='menu';ctlCard(()=>{S.mode='play';},'▶ BACK TO THE GAME');}else if(a==='snd'){audioInit();setMute(!AU.muted);menuRender();}else if(a==='quit'){save();location.reload();}NAV.reset();});}
+  if(MENU.tab==='dev'){const P=devPlaces().filter(p=>p[0]);B.innerHTML='<h4>🛠️ DEV TOOLS</h4><p><b>Teleport</b></p><div class="dv">'+P.map(p=>'<button data-w="'+p[0]+'">'+p[1]+'</button>').join('')+'</div><p><b>Slop Hole layer</b></p><div class="dv">'+[0,1,2,3,4,5].map(i=>'<button data-w="hole'+i+'">'+(i<5?'Layer '+(i+1):'The bottom')+'</button>').join('')+'</div>'+
+    '<p><b>Give and unlock</b></p><div class="dv"><button data-d="found">Mark every place found</button><button data-d="chars">Unlock all characters</button><button data-d="aura">+1,000,000 aura</button><button data-d="bits">6 filler bits + open the Slop Hole</button><button data-d="fed">Feed the Algorithm to 60/67</button><button data-d="kc">Corbin: 3 segments filmed</button><button data-d="lose">Make Bibi lose an election</button><button data-d="heal">Full brain cells</button></div>'+
+    '<p><b>Toggles</b></p><div class="dv"><button data-d="god">God mode: '+(DEV.god?'ON':'OFF')+'</button><button data-d="fps">FPS meter: '+(DEV.fps?'ON':'OFF')+'</button></div><p style="font-size:12px;opacity:.7">Position: '+PL.x.toFixed(1)+', '+PL.y.toFixed(1)+', '+PL.z.toFixed(1)+' · zone: '+(S.inPk?'pk_'+S.inPk:S.zone)+'</p>';
+    B.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>devWarp(b.dataset.w));
+    B.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const d=b.dataset.d;if(d==='found'){AREAS.forEach(a=>{if(!X.vis.includes(a.id))X.vis.push(a.id);});['pk_maze','pk_patch','pk_lab','pk_hole','swing'].forEach(v=>{if(!X.vis.includes(v))X.vis.push(v);});}
+      else if(d==='chars'){DEV.all=true;}else if(d==='aura')addAura(1000000,PL.x,PL.y+3,PL.z);else if(d==='bits'){X.fb=[0,1,2,3,4,5];X.cc=1;X.ccm=1;}else if(d==='fed')X.fed=Math.max(X.fed||0,60);else if(d==='kc')X.kc=Math.max(X.kc||0,3);else if(d==='lose'){X.terms=Math.max(1,X.terms||0);e4Lose();}else if(d==='heal')S.cells=S.max;
+      else if(d==='god'){DEV.god=!DEV.god;devSave();}else if(d==='fps'){DEV.fps=!DEV.fps;devSave();fpsShow();}save();toast('🛠️ '+b.textContent);menuRender();NAV.reset();});}
+  NAV.reset();};}
+// ---- controller navigation for every menu and screen
+const NAV={el:null,prev:[],rep:0,dir:null,reset(){NAV.need=true;}};
+function navRoot(){if($('splash'))return $('splash');if($('intro'))return $('intro');if($('ctlcard'))return $('ctlcard');if($('tpanel'))return $('tpanel');if(MENU.open)return $('menu');if(!$('title').hidden)return $('title');if(!$('end').hidden)return $('end');return null;}
+function navItems(r){return [...r.querySelectorAll('button,select,input')].filter(e=>!e.hidden&&e.offsetParent!==null&&!e.disabled);}
+function navSet(e){if(NAV.el)NAV.el.classList.remove('gpf');NAV.el=e;const R=navRoot();if(e&&R){NAV.i=navItems(R).indexOf(e);NAV.r=R.id;}if(e){if(app.classList.contains('gp'))e.classList.add('gpf');try{e.focus({preventScroll:true});}catch(x){}e.scrollIntoView({block:'nearest',inline:'nearest'});}}
+function navMove(r,dx,dy){const it=navItems(r);if(!it.length)return;if(!NAV.el||!it.includes(NAV.el)){navSet(it[0]);return;}const a=NAV.el.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2;let best=null,bs=1e9;
+  for(const e of it){if(e===NAV.el)continue;const b=e.getBoundingClientRect(),bx=b.left+b.width/2,by=b.top+b.height/2,vx=bx-ax,vy=by-ay,along=vx*dx+vy*dy;if(along<=4)continue;const perp=Math.abs(vx*dy-vy*dx),sc=along+perp*2.2;if(sc<bs){bs=sc;best=e;}}
+  if(!best){const i=it.indexOf(NAV.el),j=(i+(dx+dy>0?1:-1)+it.length)%it.length;best=it[j];}navSet(best);tone(520,.04,'square',.03);}
+(function navLoop(){requestAnimationFrame(navLoop);const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}if(!gp)return;
+  const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!NAV.prev[i];const r=navRoot();
+  if(r){if(NAV.need||!NAV.el||!r.contains(NAV.el)){NAV.need=false;const it=navItems(r);const pref=(NAV.r===r.id&&NAV.i>=0&&it[NAV.i])||r.querySelector('.go')||r.querySelector('#cont:not([hidden])')||r.querySelector('nav button.on')||it[0];navSet(pref||null);}
+    if(r.id==='splash'){if(gp.buttons.some((x,i)=>pr(i)))SPL.end&&SPL.end();}
+    else if(r.id==='intro'){if(pr(0)||pr(9))INTR.adv&&INTR.adv();if(pr(1))INTR.skip&&INTR.skip();}
+    else{const ax=gp.axes[0]||0,ay=gp.axes[1]||0;let d=b(12)?[0,-1]:b(13)?[0,1]:b(14)?[-1,0]:b(15)?[1,0]:Math.abs(ay)>.55?[0,Math.sign(ay)]:Math.abs(ax)>.55?[Math.sign(ax),0]:null;const k=d?d.join():null;
+      if(k&&k!==NAV.dir){NAV.dir=k;NAV.rep=.38;navMove(r,d[0],d[1]);}else if(k){NAV.rep-=1/60;if(NAV.rep<=0){NAV.rep=.12;navMove(r,d[0],d[1]);}}else NAV.dir=null;
+      if(pr(0)&&NAV.el){if(NAV.el.tagName==='SELECT'){const s=NAV.el;s.selectedIndex=(s.selectedIndex+1)%s.options.length;s.dispatchEvent(new Event('change'));}else NAV.el.click();}
+      if(pr(1)){if(r.id==='tpanel'){const x=$('tpx');x&&x.click();}else if(r.id==='ctlcard'){const g=r.querySelector('.go');g&&g.click();}}
+      if(r.id==='title'&&pr(9)){(!$('cont').hidden?$('cont'):$('play')).click();}}}
+  else if(NAV.el){NAV.el.classList.remove('gpf');NAV.el=null;}
+  for(let i=0;i<gp.buttons.length;i++)NAV.prev[i]=b(i);})();
+// show the splash on load
+if(location.hash!=='#test')runSplash(()=>{NAV.reset();});
+
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
@@ -4126,7 +4419,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
