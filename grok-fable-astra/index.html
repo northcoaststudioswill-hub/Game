@@ -4060,7 +4060,7 @@ function holeFinal(){if(S.mode!=='play')return;const first=!X.sh.fin;
     ['cc3000','(falling past, very slowly) CLANK CLANK. I GENERATED THE HOLE. I DID NOT GENERATE A BOTTOM. WHO GENERATED THE BOTTOM?'],['f67','NOBODY. IT IS SLOP ALL THE WAY DOWN.'],['sys','You have reached the bottom of the slop hole. There is nothing below it except another 67.']],
     ()=>{X.sh.fin=1;X.sh.l=5;if(first){addAura(670000,PL.x,PL.y+5,PL.z);if(!X.hats.includes('🕳️'))X.hats.push('🕳️');}save();SFX.win();S.shake=1;app.classList.add('glitch');setTimeout(()=>app.classList.remove('glitch'),1500);chapter('THE FINAL BRAIN ROT','6 7'+(first?' · +670,000 aura · new hat: 🕳️':''));});}
 {const ai=act15Interact;act15Interact=function(){if(S.dead)return ai();
-  if(S.inPk==='hole'){if(HOLE.cur>=5&&Math.hypot(PL.x,PL.z+6)<11&&Math.abs(PL.y-holeY(5))<4)return{label:'🧠 TOUCH THE FINAL BRAIN ROT 67',fn:holeFinal};return ai();}
+  if(S.inPk==='hole'){if(HOLE.cur>=5&&Math.hypot(PL.x,PL.z+6)<13.5&&Math.abs(PL.y-holeY(5))<4)return{label:'🧠 TOUCH THE FINAL BRAIN ROT 67',fn:holeFinal};return ai();}
   const C=FIL.cc;if(!S.inPk&&C&&Math.hypot(PL.x-C.x,PL.z-C.z)<FIL.safe&&Math.abs(PL.y-C.gy)<6){const n=(X.fb||[]).length;return{label:X.cc?'🕳️ JUMP IN THE SLOP HOLE':n>=6?'🧩 GIVE THE CLANK CLANK 3000 ALL 6 BITS':'💬 YAP WITH THE CLANK CLANK 3000 ('+n+'/6)',fn:ccTalk};}return ai();};}
 {const pu=pkUpdate;pkUpdate=function(dt,play){if(S.inPk==='hole')return;pu(dt,play);};}
 {const rs=respawn;respawn=function(){const h=S.inPk==='hole';rs();if(h){S.inPk='hole';holeVis(true);holeGo(Math.min(HOLE.cur<0?0:HOLE.cur,5),false);}};}
