@@ -4331,15 +4331,18 @@ function runSplash(done){const el=document.createElement('div');el.id='splash';e
   el.addEventListener('click',end);SPL.end=end;}
 const SPL={end:null};
 // ---- the intro: slow, welcoming, and made of slop
-function runIntro(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}const el=document.createElement('div');el.id='intro';el.innerHTML='<div class="ln"></div><div class="bar"><i></i></div><div class="small"></div><div class="skip">tap / A / space to continue · hold to skip</div>';$('app').appendChild(el);
+function runIntro(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}const el=document.createElement('div');el.id='intro';el.innerHTML='<div class="ln"></div><div class="bar"><i></i></div><div class="small"></div><div class="skip">tap / A / space: next · hold or B / Esc: skip</div>';$('app').appendChild(el);
   const ln=el.querySelector('.ln'),bar=el.querySelector('.bar i'),sm=el.querySelector('.small');
   const C=[['> PROMPT: make the ultimate game. no mistakes.',8,'thinking...'],['GENERATING WORLD...',24,'world: 3D (allegedly)'],['GENERATING HANDS... (7)',38,'fingers: approximate'],['GENERATING LORE...',52,'lore: borrowed from 9 other games'],['GENERATING YOU...',67,'personality: not found'],
     ['GENERATION STOPPED AT 67%.',67,'it said 6 7 and could not continue'],['Hello.\nYou are NPC.\nYou have no lines. That is fine. Neither does anyone else.',67,''],['Welcome to\nGROK FABLE ASTRA.\n\nTake it slow. The slop will wait.',100,'(it will not wait)']];
-  let i=-1,typing=null,ended=false;const finish=()=>{if(ended)return;ended=true;clearInterval(typing);el.style.transition='opacity .5s';el.style.opacity=0;setTimeout(()=>{el.remove();done();},500);};
-  const next=()=>{if(ended)return;i++;if(i>=C.length){finish();return;}const [t,p,s]=C[i];clearInterval(typing);let n=0;ln.textContent='';ln.classList.toggle('glitch',i===5);bar.style.transition='width 1.2s';bar.style.width=p+'%';sm.textContent=s;tone(200+i*60,.08,'square',.04);
-    typing=setInterval(()=>{n+=2;ln.textContent=t.slice(0,n);if(n>=t.length)clearInterval(typing);},28);INTR.auto=setTimeout(next,i>=6?3600:1900);};
-  INTR.adv=()=>{clearTimeout(INTR.auto);if(ended||i>=C.length)return;if(ln.textContent.length<C[Math.max(0,i)][0].length&&i>=0){clearInterval(typing);ln.textContent=C[i][0];INTR.auto=setTimeout(next,1400);}else next();};INTR.skip=finish;
-  el.addEventListener('click',INTR.adv);let hold=null;el.addEventListener('pointerdown',()=>{hold=setTimeout(finish,900);});el.addEventListener('pointerup',()=>clearTimeout(hold));audioInit();next();}
+  const CPS=32;let i=-1,t0=0,ended=false,lastN=-1;
+  const finish=()=>{if(ended)return;ended=true;el.style.transition='opacity .5s';el.style.opacity=0;setTimeout(()=>{el.remove();done();},500);};
+  const show=k=>{if(k>=C.length){finish();return;}i=k;t0=performance.now();lastN=-1;ln.textContent='';ln.classList.toggle('glitch',k===5);bar.style.transition='width 1.2s';bar.style.width=C[k][1]+'%';sm.textContent=C[k][2];tone(200+k*60,.08,'square',.04);};
+  const typedFor=k=>C[k][0].length/CPS,holdFor=k=>k>=6?3.2:k===5?2:1.4;
+  (function tick(now){if(ended)return;requestAnimationFrame(tick);if(i<0)return;const e=(now-t0)/1000,t=C[i][0],n=Math.min(t.length,Math.floor(e*CPS));
+    if(n!==lastN){lastN=n;ln.textContent=t.slice(0,n);if(n<t.length&&n%3===0)tone(900+Math.random()*300,.02,'square',.015);}if(e>typedFor(i)+holdFor(i))show(i+1);})(performance.now());
+  INTR.adv=()=>{if(ended||i<0)return;const e=(performance.now()-t0)/1000;if(e<typedFor(i))t0=performance.now()-typedFor(i)*1000;else show(i+1);};INTR.skip=finish;
+  el.addEventListener('click',INTR.adv);let hold=null;el.addEventListener('pointerdown',()=>{hold=setTimeout(finish,900);});el.addEventListener('pointerup',()=>clearTimeout(hold));audioInit();requestAnimationFrame(()=>show(0));}
 const INTR={ok:false,adv:null,skip:null,auto:null};
 addEventListener('keydown',e=>{if($('intro')&&(e.code==='Space'||e.code==='Enter')){e.preventDefault();INTR.adv&&INTR.adv();}else if($('intro')&&e.code==='Escape'){INTR.skip&&INTR.skip();}else if($('splash')){SPL.end&&SPL.end();}},true);
 // new game: intro, then controls, then the world, slowly
@@ -4407,6 +4410,55 @@ function navMove(r,dx,dy){const it=navItems(r);if(!it.length)return;if(!NAV.el||
 // show the splash on load
 if(location.hash!=='#test')runSplash(()=>{NAV.reset();});
 
+/* ================= ACT 35: dev progression presets, and no giant name tags in the cutscenes ================= */
+function devRelics(){S.relics={grok:true,fable:true,astra:true};S.kills=Math.max(S.kills,KILLS_NEEDED);S.pages=[1,1,1,1,1,1];X.ch=Math.max(X.ch,3);syncWorld();S.track='portal';}
+function devCast(){X.flow=Math.max(X.flow,4);X.erin=Math.max(X.erin,3);X.clank=Math.max(X.clank,3);X.hour=Math.max(X.hour,2);X.terms=Math.max(X.terms||0,3);X.louie=1;X.dk=Math.max(X.dk||0,4);X.lit=1;for(let i=0;i<6;i++)if(!X.frag.includes(i))X.frag.push(i);
+  ['marcus','erin','kael','david','bibi','bottie','louie','derek'].forEach(k=>X.fx[k]=2);DEV.all=true;for(const k in PLAYC)if(!X.cu.includes(k))X.cu.push(k);}
+function devFound(){AREAS.forEach(a=>{if(!X.vis.includes(a.id))X.vis.push(a.id);});['pk_maze','pk_patch','pk_lab','pk_hole','swing'].forEach(v=>{if(!X.vis.includes(v))X.vis.push(v);});}
+const DEVP=[
+  ['g','START OF THE GAME'],
+  ['p_start','Just after the opening movie',()=>{X.ch=Math.max(X.ch,1);devWarp('');warpTo(0,9,undefined,0,['PROMPT PLAZA','🛠️ dev: fresh start']);}],
+  ['p_relics','All 3 relics · the portal is open',()=>{devRelics();warpTo(0,-8,undefined,0,['THE FOR-YOU PAGE','🛠️ dev: portal open']);}],
+  ['g','THE MAIN STORY'],
+  ['p_boss','Boss fight: THE ALGORITHM',()=>{devRelics();if(S.inPk)exitPk();enterBoss();}],
+  ['p_rot','ROT x1000 (after the boss)',()=>{devRelics();if(S.inPk)exitPk();startRot1000();}],
+  ['p_mm','Meme Mountain (the final mission)',()=>{devRelics();X.rot1000=1;if(S.inPk)exitPk();mmEnter();}],
+  ['g','THE CAST'],
+  ['p_cast','Every character playable, every place found',()=>{devCast();devFound();toast('🛠️ Pause menu → CAST to pick a squad.');}],
+  ['g','LATE-GAME AREAS'],
+  ['p_maze','Aura Maze with 7 of 8 shards',()=>{X.mz=[0,1,2,3,4,5,6];if(!X.vis.includes('pk_maze'))X.vis.push('pk_maze');enterPk('maze');}],
+  ['p_lab','The facility with 15 of 16 runners freed',()=>{X.freed=X.freed.map((v,i)=>i<15?1:0);X.labf=1;enterLab();}],
+  ['p_mtn','Bottom of Mount Skill Issue',()=>{if(S.inPk)exitPk();warpTo(MT.start.x,MT.start.z+3,undefined,0,['MOUNT SKILL ISSUE','🛠️ dev: base camp']);}],
+  ['p_swing','Start of Swing-O-Rama',()=>{if(S.inPk)exitPk();warpTo(SO.start.x,SO.start.z,SO.y,Math.PI/2,['SWING-O-RAMA','🛠️ dev']);}],
+  ['p_429','Election Night, Bibi losing (spawn429.exe)',()=>{X.terms=Math.max(1,X.terms||0);devWarp('elect');setTimeout(()=>e4Lose(),900);}],
+  ['p_gen','Algorithm fed 60 of 67, at the generator',()=>{X.fed=Math.max(X.fed||0,60);devWarp('gen');}],
+  ['p_kc','Kiss or Slop, ready for Mama\'s Yukon',()=>{X.kc=Math.max(X.kc||0,3);devWarp('set');}],
+  ['p_tri','Triston, last clue found',()=>{X.tri=4;devWarp('back');}],
+  ['p_news','SNN news desk',()=>devWarp('news')],
+  ['g','THE FILLER AND THE SLOP HOLE'],
+  ['p_fill','Filler done, CLANK CLANK 3000 ready to glitch',()=>{X.fb=[0,1,2,3,4,5];X.ccm=1;X.cc=0;if(S.inPk)exitPk();const C=FIL.cc;warpTo(C.x-Math.cos(C.a)*5,C.z-Math.sin(C.a)*5,undefined,undefined,['THE CLANK CLANK 3000','🛠️ dev: 6/6 bits']);}],
+  ['p_h0','Slop Hole layer 1 · Hallucinations',()=>{X.fb=[0,1,2,3,4,5];X.cc=1;X.ccm=1;devWarp('hole0');}],
+  ['p_h1','Slop Hole layer 2 · Watermarks',()=>{X.cc=1;devWarp('hole1');}],
+  ['p_h2','Slop Hole layer 3 · Context loss',()=>{X.cc=1;devWarp('hole2');}],
+  ['p_h3','Slop Hole layer 4 · Z-fighting',()=>{X.cc=1;devWarp('hole3');}],
+  ['p_h4','Slop Hole layer 5 · Overfitting',()=>{X.cc=1;devWarp('hole4');}],
+  ['p_h5','The Final Brain Rot 67',()=>{X.cc=1;X.sh.c=[1,1,1,1,1];devWarp('hole5');}],
+  ['g','EVERYTHING'],
+  ['p_all','Endgame sandbox: everything above unlocked',()=>{devRelics();devCast();devFound();X.rot1000=1;X.fb=[0,1,2,3,4,5];X.cc=1;X.ccm=1;X.she=1;addAura(1000000,PL.x,PL.y+3,PL.z);warpTo(0,9,undefined,0,['PROMPT PLAZA','🛠️ dev: endgame sandbox']);}]];
+function devPreset(id){const p=DEVP.find(q=>q[0]===id);if(!p||!p[2])return;menuClose();if(S.mode==='dialog'||S.mode==='title'){setTimeout(()=>devPreset(id),300);return;}if(S.mode!=='play')return;S.cells=S.max;try{p[2]();}catch(e){console.error(e);toast('🛠️ preset failed: '+e.message);}save();toast('🛠️ Jumped to: '+p[1]);}
+// in the pause menu's DEV tab, put the jumps first
+{const mr=menuRender;menuRender=function(){mr();if(MENU.tab!=='dev'||!DEV.on)return;const B=$('mbody'),d=document.createElement('div');let h='<p><b>⏩ JUMP TO A POINT IN THE GAME</b> <small style="opacity:.7">(changes this save)</small></p>';
+  DEVP.forEach(p=>{if(p[0]==='g')h+='<p style="margin:8px 0 2px;font-size:12px;opacity:.7"><b>'+p[1]+'</b></p>';else h+='<button data-p="'+p[0]+'">'+p[1]+'</button>';});d.innerHTML='<div class="dvp">'+h+'</div>';
+  const t=B.querySelector('h4');t?t.after(d):B.prepend(d);d.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>devPreset(b.dataset.p));NAV.reset();};}
+(function(){const st=document.createElement('style');st.textContent='#mbody .dvp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}#mbody .dvp p{flex-basis:100%}#mbody .dvp button{font:700 13px system-ui,sans-serif;border:2px solid var(--ink);border-radius:10px;padding:7px 10px;background:var(--lime);color:var(--ink);cursor:pointer}';document.head.appendChild(st);})();
+// the title screen's dev panel can start a new game at any of these points
+{const dp=devPlaces;devPlaces=function(){return dp().concat(DEVP.filter(p=>p[0]!=='g').map(p=>[p[0],'⏩ '+p[1]]));};}
+{const dw=devWarp;devWarp=function(id){if(id&&id.indexOf('p_')===0){devPreset(id);return;}return dw(id);};}
+// skip intro also skips the opening movie
+{const bg=begin;begin=function(d){bg(d);if(!d&&DEV.on&&DEV.skip&&S.mode==='dialog'&&DLG.q.length){DLG.i=DLG.q.length-1;advance();}};}
+// cutscenes: hide NPC's floating name tag and rating so close-ups are not covered by giant text
+{let was=false;const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);const c=app.classList.contains('cine');if(c!==was){was=c;if(HERO.cap)HERO.cap.visible=!c;if(RATE.spr)RATE.spr.visible=!c;}};}
+
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
@@ -4419,7 +4471,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
