@@ -297,16 +297,16 @@ const CH1_KEEP_SHOTS = [
   // "Her son holds the keep."  the blade comes off his shoulder, turns once in his hand, and settles into a guard
   VS(21.05, 23.0, { cam: [52, 132, 40, 190, .4], to: [50, 116, 38, 198, .42], lin: 1, sfxs: [[.45, 'swing2']], acts: [L({ a: [40, -10], poses: [[0, ACT.shoulder, 6], [.3, ACT.ready, 8]], sts: [[.35, 'atk', { dur: .45, combo: 2 }]] })], caps: [[.25, 'HER SON HOLDS THE KEEP.']] }),
   // "I am in their plate, with a white cloak over it that is not mine."  the last steps; he looks at his own arm, then back at the cloak
-  VS(23.0, 27.4, { cel: 'front', cam: [-70, 132, 50, 186, .34], to: [-62, 112, 48, 198, .35], lin: 1, acts: [K({ a: [-58, 8], aura: 1, poses: [[0, ACT.stand, 5], [.3, ACT.lookArm, 5], [1.7, ACT.lookCloak, 4], [3.7, ACT.stand, 4]] })], caps: [[.3, 'I AM IN THEIR PLATE,'], [1.8, 'WITH A WHITE CLOAK OVER IT THAT IS NOT MINE.']] }),
+  VS(23.0, 27.4, { cel: 'front', cam: [-70, 132, 50, 186, .34], to: [-62, 112, 48, 198, .35], lin: 1, acts: [K({ a: [-58, 8], fx: .75, fy: .65, aura: 1, poses: [[0, ACT.stand, 5], [.3, ACT.lookArm, 5], [1.7, ACT.lookCloak, 4], [3.7, ACT.stand, 4]] })], caps: [[.3, 'I AM IN THEIR PLATE,'], [1.8, 'WITH A WHITE CLOAK OVER IT THAT IS NOT MINE.']] }),
   // "Under it, on a cord, a brass washer."
-  VS(27.4, 31.1, { ...cu(-58, 8, 2.0, 2.9, -12), acts: [K({ a: [-58, 8], aura: 1, poses: [[0, ACT.stand, 5], [.35, ACT.washerUp, 5], [2.3, ACT.washer, 4], [3.3, ACT.washerUp, 6]] })], caps: [[.3, 'UNDER IT, ON A CORD,'], [2.35, 'A BRASS WASHER.']] }),
+  VS(27.4, 31.1, { ...cu(-58, 8, 2.2, 3.3, -8), acts: [K({ a: [-58, 8], fx: .35, fy: .95, aura: 1, poses: [[0, ACT.stand, 5], [.35, ACT.washerUp, 5], [2.3, ACT.washer, 4], [3.3, ACT.washerUp, 6]] })], caps: [[.3, 'UNDER IT, ON A CORD,'], [2.35, 'A BRASS WASHER.']] }),
   // "The first cut comes in out of the sun, and I am not there."
-  VS(31.1, 34.25, { music: 'duel', cam: [-14, 180, 64, 164, .32], to: [-64, 142, 54, 186, .33], sfxs: [[1.65, 'swing']], shakes: [[1.75, .2]], fxs: [[1.75, 'spark', -62, 8, '#e8e4f0', 8, 4], [1.75, 'kick', .04]],
+  VS(31.1, 34.25, { music: 'duel', cam: [-14, 180, 64, 164, .32], to: [-64, 142, 54, 186, .33], sfxs: [[1.65, 'swing']], shakes: [[1.75, .2]], fxs: [[1.75, 'spark', -62, 8, '#e8e4f0', 8, 4], [1.75, 'kick', .04]], cams: [[1.45, [-62, 34, 170, 120, -3], [-66, 34, 150, 124, -3], 2.35]],
     acts: [L({ a: [40, -10], faceTo: 'kael2', path: [[0, 40, -10], [.15, 40, -10], [1.55, -36, 6], [2.0, -56, 7], [3.15, -56, 7]], poses: [[0, ACT.ready, 10], [2.0, ACT.through, 10], [2.5, ACT.lowTurn, 6]], sts: [[1.55, 'atk', { dur: .4, combo: 1 }]] }),
            K({ a: [-58, 8], aura: 1, path: [[0, -58, 8], [1.58, -58, 8], [1.95, -82, 14], [3.15, -84, 14]], faceTo: 'lucan', poses: [[0, ACT.washerUp, 6], [.8, ACT.ready, 7], [1.58, ACT.slip, 30], [2.2, ACT.stand, 6]], sts: [[1.58, 'dodge', { dur: .36 }]] })],
     caps: [[.25, 'THE FIRST CUT COMES IN OUT OF THE SUN,'], [2.0, 'AND I AM NOT THERE.']] }),
   // "The second comes, and I step through it."
-  VS(34.25, 36.65, { cam: [-68, 138, 52, 184, .33], to: [-56, 124, 50, 194, .33], sfxs: [[1.15, 'swing2'], [1.52, 'hit']], shakes: [[1.52, .3]], fxs: [[1.51, 'spark', -62, 8, '#fff', 8, 28], [1.51, 'kick', .06]],
+  VS(34.25, 36.65, { cam: [-68, 138, 52, 184, .33], to: [-56, 124, 50, 194, .33], sfxs: [[1.15, 'swing2'], [1.52, 'hit']], shakes: [[1.52, .3]], fxs: [[1.51, 'spark', -62, 8, '#fff', 8, 28], [1.51, 'kick', .06]], cams: [[1.3, [-64, 62, 120, 140, -.9], [-52, 62, 112, 146, -.9], 2.05]],
     acts: [L({ a: [-56, 7], faceTo: 'kael2', path: [[0, -56, 7], [1.5, -56, 7], [1.9, -34, 2], [2.4, -33, 2]], poses: [[0, ACT.ready, 10], [.2, ACT.brace, 6], [1.9, ACT.backStep, 10]], sts: [[1.12, 'atk', { dur: .38, combo: 1 }], [1.52, 'hurt', { dur: .3, kx: 90, ky: -20 }]] }),
            K({ a: [-84, 14], aura: 2, faceTo: 'lucan', path: [[0, -84, 14], [1.05, -84, 14], [1.52, -68, 10], [2.4, -54, 12]], poses: [[0, ACT.stand, 6], [.25, ACT.ready, 8], [1.05, ACT.through, 22], [1.44, ACT.shove, 26], [1.95, ACT.ready, 9]] })],
     caps: [[.2, 'THE SECOND COMES,'], [1.2, 'AND I STEP THROUGH IT.']] }),
@@ -376,18 +376,24 @@ const CH1_KEEP_SHOTS = [
   // black. the hit; the music goes; two heartbeats; then nothing, before the card
   { d: 3.6, vd: 3.6, black: 1, flash: 1, sfx: 'hit', shake: .6, fxs: [[.05, 'fn', () => Sound.music(null)], [1.1, 'fn', () => Sound.play('heart')], [2.3, 'fn', () => Sound.play('heart')]] }
 ];
-const MEM_AT = 40.7, MEM = 7.5;
+const MEM_AT = 40.7, MEM = 19.61, FORD = { bg: 'ford', tint: 'rgba(30,40,90,.34)' };
 for (const sh of CH1_KEEP_SHOTS) if (sh.va !== undefined && sh.va >= MEM_AT - .01) sh.va += MEM;
-{ const i = CH1_KEEP_SHOTS.findIndex(sh => sh.va !== undefined && sh.va >= MEM_AT + MEM - .01);
+{ const i = CH1_KEEP_SHOTS.findIndex(sh => sh.va !== undefined && sh.va >= MEM_AT + MEM - .01), M = (a, b, o) => VS(MEM_AT + a, MEM_AT + b, Object.assign({}, FORD, o));
+  const lu = (o) => Object.assign({ id: 'lucan', a: [26, -14], fx: -1, fy: .5, blade: 0, poses: [[0, ACT.stand, 5]] }, o), open = Object.assign({}, ACT.stand, { lp: -.35, ly: .5, le: -.5, rp: -.35, ry: -.5, re: -.5, hx: -.05 }), ask = Object.assign({}, ACT.stand, { hx: -.08, hy: .35, lp: -.5, le: -.9, ly: .2 });
   CH1_KEEP_SHOTS.splice(i, 0,
-    // the night before: the ford, the truce he asked for. (His words are from the game's truce scene.)
-    VS(MEM_AT, MEM_AT + 4.0, { bg: 'ford', flash: 1, sfx: 'heart', mem: 1, tint: 'rgba(30,40,90,.34)', cam: [0, 200, 90, 160, .3], to: [6, 150, 60, 176, .33], lin: 1, sfxs: [[2, 'heart']],
-      acts: [{ id: 'lucan', a: [26, -14], fx: -1, fy: .5, blade: 0, poses: [[0, ACT.stand, 5]] }, { id: 'kael2', a: [-30, 22], fx: 1, fy: -.6, blade: 1, walk: 1, path: [[0, -44, 30], [3.2, -26, 20], [4, -26, 20]], poses: [[0, ACT.low, 5]] }],
-      caps: [[.3, 'HE IS STANDING ON THE FAR BANK, ALONE, WITH HIS BLADE LEFT ON THE STONES BEHIND HIM.']] }),
-    VS(MEM_AT + 4.0, MEM_AT + MEM, { bg: 'ford', mem: 1, tint: 'rgba(30,40,90,.34)', ...cu(26, -14, 2.0, 2.6, 10), sfxs: [[1.6, 'heart']],
-      acts: [{ id: 'lucan', a: [26, -14], fx: -1, fy: .5, blade: 0, poses: [[0, ACT.stand, 5], [1.4, Object.assign({}, ACT.stand, { hx: -.08, hy: .35, lp: -.5, le: -.9, ly: .2 }), 3]] }],
-      caps: [[.15, '“YOU FIGHT AS IF YOU HATE THE GROUND YOU ARE STANDING ON. WHERE DOES ONE LEARN IT?”']] }));
-  CH1_KEEP_SHOTS[i + 2].flash = 1; }
+    // the night before: the ford, the truce he asked for. Kael tells it; Lucan's words are from the game's truce scene.
+    M(0, 4.6, { flash: 1, sfx: 'heart', cam: [0, 210, 96, 160, .3], to: [6, 156, 62, 176, .33], lin: 1,
+      acts: [lu({}), K({ a: [-44, 30], fy: -.6, walk: 1, path: [[0, -48, 32], [3.6, -26, 20], [4.6, -26, 20]], poses: [[0, ACT.low, 5]] })],
+      caps: [[.3, 'HE IS STANDING ON THE FAR BANK, ALONE,']] }),
+    // on him: nothing in his hands
+    M(4.6, 8.45, { cam: [40, 118, 46, 196, .35], to: [34, 100, 44, 206, .36], lin: 1, acts: [lu({ poses: [[0, ACT.stand, 5], [.6, open, 3], [2.6, ACT.stand, 3]] })], caps: [[0, 'WITH HIS BLADE LEFT ON THE STONES BEHIND HIM.']] }),
+    // he asks it
+    M(8.45, 12.0, { ...cu(26, -14, 2.0, 2.6, 10), sfxs: [[1.6, 'heart']], acts: [lu({ poses: [[0, ACT.stand, 5], [.9, ask, 3]] })], caps: [[0, 'HE SAID: YOU FIGHT AS IF YOU HATE THE GROUND YOU ARE STANDING ON.']] }),
+    // the two of us and the water between
+    M(12.0, 16.4, { cam: [-6, 176, 70, 168, .32], to: [2, 150, 60, 178, .33], lin: 1, acts: [lu({ poses: [[0, ask, 3]] }), K({ a: [-26, 20], fy: -.6, poses: [[0, ACT.low, 5]] })], caps: [[0, 'HE SAID: YOU FIGHT AS IF YOU HATE THE GROUND YOU ARE STANDING ON.']] }),
+    // on me: I have no answer I can give him; I look at the water
+    M(16.4, MEM, { ...cu(-26, 20, 2.1, 2.8, -8), sfxs: [[1.4, 'heart']], acts: [K({ a: [-26, 20], fx: .7, fy: .7, poses: [[0, ACT.stand, 5], [1.0, Object.assign({}, ACT.stand, { hx: .5, hy: -.3 }), 2.5]] })], caps: [[0, 'HE SAID: WHERE DOES ONE LEARN IT.']] }));
+  CH1_KEEP_SHOTS[i + 5].flash = 1; }
 // ---- the voice. The read is the clock: while it plays, the film's time is the audio's time, so picture and voice cannot drift.
 const VO = { a: null, on: false, off: false,
   start() { if (this.off) return; try { if (!this.a) { this.a = new Audio(CH1_VO_SRC); this.a.preload = 'auto'; } this.a.currentTime = 0; this.a.volume = 1; this.vt = 0; this.last = -1; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
@@ -402,6 +408,7 @@ const VO = { a: null, on: false, off: false,
     const c2 = this.cine; if (c2.i === i0) { const tB = c2.t; if (s.sfxs) for (const e of s.sfxs) if (e[0] > tA && e[0] <= tB || (tA === 0 && e[0] === 0)) Sound.play(e[1]); if (s.shakes) for (const e of s.shakes) if (e[0] > tA && e[0] <= tB) this.shake = e[1]; if (s.fxs) for (const e of s.fxs) if (e[0] > tA && e[0] <= tB) { const a = e.slice(2); if (e[1] === 'spark') this.spark(...a); else if (e[1] === 'ring') this.ring(...a); else if (e[1] === 'kick') c2._kick = a[0]; else if (e[1] === 'fn') a[0](); } }
     else { const s2 = c2.shots[c2.i]; if (s2 && s2.va !== undefined && VO.on && Math.abs(VO.vt - s2.va) > .2) { VO.vt = s2.va; try { VO.a.currentTime = s2.va; } catch (e) { } } }
     if (c2.shots[c2.i] && c2.shots[c2.i].va !== undefined) { const w = VO.vt || 0; this.cam.x += Math.sin(w * .7) * .5; this.cam.h += Math.sin(w * .93 + 1) * .35; }
+    { const s3 = c2.shots[c2.i]; if (s3 && s3.cams) for (const e of s3.cams) if (c2.t >= e[0] && c2.t < e[3]) { const u = (c2.t - e[0]) / (e[3] - e[0]), A = e[1], B = e[2], cm = this.cam; cm.x = A[0] + (B[0] - A[0]) * u; cm.y = A[1] + (B[1] - A[1]) * u; cm.h = A[2] + (B[2] - A[2]) * u; cm.f = A[3] + (B[3] - A[3]) * u; cm.hor = Math.round(H * (A[4] + (B[4] - A[4]) * u)); } }
     if (c2._kick > .002) { this.cam.f *= 1 + c2._kick; c2._kick *= Math.pow(.0008, dt); } };
   const e0 = Brawl.end; Brawl.end = function () { VO.stop(); return e0.apply(this, arguments); }; }
 const CH1_KEEP_FILM = () => ({ bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'dawn', cineOnly: 1, film: 1, hero: { id: 'kael2', cape: CLOAK }, intro: CH1_KEEP_SHOTS, foes: [] });
