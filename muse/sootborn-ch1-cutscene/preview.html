@@ -9009,6 +9009,80 @@ const CH1_KEEP = [
 // a film actor can leave the ground: za -> zb over the shot (the game's films never needed it; the chapter does)
 { const f0 = Brawl.fighter; Brawl.fighter = function (g, o, opt) { const k = opt && opt.key, c = this.cine; if (k && k.za !== undefined && c) { const q = Math.min(1, c.t / c.dur), e = k.zease === 'in' ? q * q : 1 - Math.pow(1 - q, 2), zb = k.zb === undefined ? k.za : k.zb; o.z = k.za + (zb - k.za) * e; o.vz = zb > k.za ? 1 : -1; } return f0.call(this, g, o, opt); }; }
 
+// ============================================================
+// CHAPTER ONE, BELOW — the same story as CH1_NEW, told the way the Assay is told: a film.
+// Hard cuts, a camera that moves, captions that do not wait for a button, on the game's own 2.5D sets
+// (the square, Row K, the fever ward, Bay Three). Dialogue is carried in the captions, in quotes.
+// CH1_FILM_A runs from the world to the plan under the Pillar. CH1_FILM_HEIST is the heist as film.
+// In the game the heist is a level you play, so the game would use CH1_FILM_A, then the level.
+// ============================================================
+const SQ = { bg: 'ring', bg2: null }, ROW = { bg: 'ring', bg2: 'rowk' }, WARD = { bg: 'pit', bg2: 'ward' }, BAY = { bg: 'furnace', bg2: null };
+const NIGHT = 'rgba(6,8,30,.5)', WARM = 'rgba(255,214,140,.12)';
+const two = (x, y) => ({ cam: [x - 6, y + 150, 56, 170], to: [x + 4, y + 132, 52, 186] });
+const cuH = (x, y, s0, s1, dx) => ({ cam: [x + (dx || 0), y + 200 / (s0 * .68), 30, 200, .34], to: [x, y + 200 / (s1 * .68), 27, 200, .34], _cu: 1 });
+const CH1_FILM_A = [
+  { d: 3.0, black: 1, music: 'mystery', cap: 'THEY SAY THE SURFACE BURNED TWO HUNDRED YEARS AGO. THAT THE SKY IS POISON, AND THE SUN IS A FURNACE THAT EATS LUNGS.' },
+  { d: 3.2, ...BAY, cam: [0, 300, 170, 150, .16], to: [0, 170, 70, 150, .3], lin: 1, acts: [{ id: 'mara', a: [-60, -6], fx: 1 }, { id: 'ivo', a: [58, 8], fx: -1 }, { id: 'hollis', a: [-24, 20], fy: -1 }, { id: 'dace', a: [30, -14], fx: -1 }, { id: 'kael', a: [0, 0], fy: -1 }], cap: 'SO WE LIVE BELOW. CINDERWELL. SIX TIERS OF ROCK WRAPPED ROUND A MACHINE CALLED THE DEEP ARRAY, WHICH MAKES THE ONLY AIR THERE IS.' },
+  { d: 2.6, ...BAY, cam: [-30, 170, 60, 160], to: [30, 160, 58, 168], lin: 1, acts: [{ id: 'mara', a: [-60, -6], fx: 1 }, { id: 'ivo', a: [58, 8], fx: -1 }, { id: 'hollis', a: [-24, 20], fy: -1 }, { id: 'dace', a: [30, -14], fx: -1 }, { id: 'kael', a: [0, 0], fy: -1 }], cap: 'WE KEEP THE ARRAY RUNNING. THE ARRAY AUTHORITY KEEPS THE COUNT. THEY HAVE A WORD FOR US. SOOT.' },
+  { d: 2.6, ...BAY, ...cuH(0, 0, 1.8, 2.6, -14), acts: [{ id: 'kael', a: [0, 0], fx: .4, fy: .9 }], cap: 'MY NAME IS KAEL BRENNICK. I FIXED VALVES ON TIER SIX.' },
+  { d: 2.4, black: 1, cap: 'ELEVEN MONTHS BEFORE THE FURNACE, I THOUGHT THE WORST THING THAT COULD HAPPEN TO ME WAS A GIRL SAYING NO.' },
+  // ---- the festival
+  { d: 2.2, black: 1, music: 'home', big: 'ELEVEN MONTHS BEFORE THE FURNACE', sub2: 'THE FESTIVAL OF THE FIRST FIRE. ASHGATE SQUARE.' },
+  { d: 3.2, ...SQ, flash: 1, cam: [0, 330, 200, 150, .14], to: [0, 176, 72, 150, .32], acts: [{ id: 'seren', a: [0, -30], fy: -1 }], cap: 'ONCE A YEAR, CINDERWELL LIGHTS PAPER LANTERNS AND PRETENDS THE LUMEN PILLAR IS THE SUN.' },
+  { d: 2.6, ...SQ, cam: [-50, 150, 56, 170], to: [-8, 130, 52, 186], lin: 1, acts: [{ id: 'seren', a: [0, -30], fy: -1 }, { id: 'kael', a: [-96, 6], b: [-20, -24], fx: 1, fy: -.3 }], cap: 'SEREN: DON\'T LOOK. IT\'S NOT FINISHED.' },
+  { d: 2.8, ...SQ, ...two(-10, -27), acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .2 }, { id: 'kael', a: [-20, -24], fx: 1, fy: -.2 }], cap: 'KAEL: IT\'S A SUN. SEREN: IT\'S THE SUN. THE REAL ONE. YOU CAN\'T LOOK STRAIGHT AT IT, AND IT NEVER NEEDS A VALVE.' },
+  { d: 2.4, ...SQ, ...cuH(-20, -24, 1.9, 2.6, -12), acts: [{ id: 'kael', a: [-20, -24], fx: 1, fy: .3 }], cap: 'KAEL: I CAN\'T LOOK STRAIGHT AT YOU EITHER. SAME PROBLEM.' },
+  { d: 2.6, ...SQ, ...cuH(0, -30, 1.9, 2.7, 12), acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .4 }], cap: 'SEREN: THAT WAS DISGUSTING. SAY IT AGAIN. ... DON\'T PROMISE ME THE SKY. PROMISE ME TOMORROW. TOMORROW I CAN USE.' },
+  { d: 2.8, ...SQ, ...cuH(-20, -24, 2.2, 3.0, -8), sfx: 'clue', acts: [{ id: 'kael', a: [-20, -24], fx: .6, fy: .8 }], cap: 'I HAD CARRIED IT IN MY POCKET FOR THREE WEEKS. A BRASS WASHER OFF BANK SEVEN, FILED SMOOTH ON MY LUNCH BREAKS.' },
+  { d: 2.8, ...SQ, cam: [-10, 126, 52, 186], to: [-10, 112, 48, 200], acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .2 }, { id: 'kael', a: [-20, -24], fx: 1, fy: -.2 }], cap: 'KAEL: SEREN HOLLOWAY. I CAN\'T GIVE YOU THE SKY. BUT I CAN GIVE YOU A PERFECTLY BALANCED PRESSURE SEAL.' },
+  { d: 2.6, ...SQ, ...cuH(0, -30, 2.0, 2.9, 10), sfx: 'coin', flash: 1, tint: WARM, acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .4 }], cap: 'SEREN: THAT IS THE WORST PROPOSAL IN THE HISTORY OF CINDERWELL. ... AYE. OBVIOUSLY AYE.' },
+  { d: 3.0, ...SQ, cam: [-10, 190, 80, 150, .3], to: [-10, 150, 60, 165, .32], flash: 1, tint: WARM, acts: [{ id: 'seren', a: [0, -30], fy: 1 }, { id: 'kael', a: [-20, -24], fy: 1 }, { id: 'mara', a: [-10, 40], b: [-10, -6], fy: -1 }, { id: 'ivo', a: [60, 20], b: [26, -14], fx: -1 }, { id: 'tavi', a: [-70, 26], b: [-40, -14], fx: 1 }], cap: 'MARA VENN BOUND US AT THE PILLAR IN FRONT OF THE WHOLE OF CREW THREE, WITH CHALK ON BOTH OUR HANDS.' },
+  { d: 2.2, ...SQ, ...cuH(26, -14, 2.0, 2.8, 12), acts: [{ id: 'ivo', a: [26, -14], fx: -.6, fy: .8 }], cap: 'IVO: I\'M NOT CRYING. THE SQUARE IS DUSTY. THE SQUARE IS VERY DUSTY.' },
+  { d: 3.0, ...SQ, cam: [-10, 118, 50, 196, .32], to: [-10, 150, 70, 180, .5], tint: WARM, acts: [{ id: 'seren', a: [-4, -28], fx: -1, fy: .2 }, { id: 'kael', a: [-18, -25], fx: 1, fy: -.2 }], cap: 'SHE DREW THE LAST RAY OF HER SUN ON MY WRIST WITH ONE FINGER. SEREN: THERE. NOW YOU\'VE SEEN IT.' },
+  // ---- the morning after
+  { d: 2.0, black: 1, big: 'MORNING', sub2: 'ROW K. THE MORNING AFTER THE FIRST FIRE.' },
+  { d: 2.8, ...ROW, flash: 1, ...two(-6, -10), acts: [{ id: 'seren', a: [4, -12], fx: -1, fy: .2 }, { id: 'kael', a: [-16, -8], fx: 1, fy: -.2 }], cap: 'SEREN: IT\'S THE ONLY ROUND THING YOU OWN AND YOU GAVE IT AWAY. KAEL: I OWN HALF OF ONE. SEREN: AYE. THE INSIDE HALF.' },
+  { d: 2.6, ...ROW, cam: [20, 160, 58, 165], to: [0, 146, 54, 176], lin: 1, acts: [{ id: 'seren', a: [4, -12], fx: 1, fy: .4 }, { id: 'kael', a: [-16, -8], fx: 1, fy: .4 }, { id: 'mara', a: [96, 14], b: [40, 2], fx: -1 }], cap: 'MARA: BAY THREE AT FIRST BELL, THE BOTH OF YOU. I MARRIED YOU. I DIDN\'T GIVE YOU THE DAY.' },
+  { d: 2.8, ...ROW, ...cuH(-44, 6, 2.0, 2.8, -12), acts: [{ id: 'tavi', a: [-44, 6], fx: .7, fy: -.5 }], cap: 'MY BROTHER TAVI WAS SIX. TAVI: IS SHE MY SISTER NOW? DO I HAVE TO DO WHAT SHE SAYS? KAEL: AYE. AND AYE.' },
+  { d: 3.0, ...ROW, cam: [-14, 150, 56, 170], to: [-4, 134, 52, 184], acts: [{ id: 'seren', a: [4, -12], fx: -1, fy: .3 }, { id: 'kael', a: [-16, -8], fx: -1, fy: .5 }, { id: 'tavi', a: [-44, 6], b: [16, -6], fx: 1 }], cap: 'HE THOUGHT ABOUT THAT. THEN HE WENT AND STOOD NEXT TO HER, AND NOT NEXT TO ME. IT STAYED THAT WAY.' },
+  // ---- the fever
+  { d: 2.2, black: 1, music: 'mystery', big: 'FOUR DAYS BEFORE THE FURNACE', sub2: 'THE FEVER COMES TO TIER SIX.' },
+  { d: 3.0, ...WARD, sfx: 'cough', cam: [0, 250, 130, 150, .2], to: [0, 164, 66, 156, .32], tint: 'rgba(6,14,26,.2)', acts: [{ id: 'nell', a: [8, -22], fy: 1 }, { id: 'tavi', a: [44, -6], fx: -1, fy: .4 }, { id: 'kael', a: [-10, 60], b: [-12, 2], fy: -1 }, { id: 'seren', a: [8, 66], b: [8, 10], fy: -1 }], cap: 'TAVI WAS SEVEN, AND WHEN HE BREATHED IT SOUNDED LIKE A SOCK BEING PULLED OVER A BOOT.' },
+  { d: 3.0, ...WARD, sfx: 'cough', ...cuH(8, -22, 1.9, 2.6, 12), tint: 'rgba(6,14,26,.2)', acts: [{ id: 'nell', a: [8, -22], fx: -.4, fy: .9 }], cap: 'NELL: THE FEVER ISN\'T WHAT KILLS THEM. IT\'S THE AIR. THE AUTHORITY CUT THE CLINIC A MONTH AGO. FORTY KIDS, BREATHING EACH OTHER\'S BREATH.' },
+  { d: 2.8, ...WARD, ...cuH(44, -6, 1.8, 2.5, 10), tint: 'rgba(6,14,26,.2)', acts: [{ id: 'tavi', a: [44, -6], fx: -1, fy: .4 }], cap: 'MY BROTHER LAY WITH HIS HAND FLAT ON HIS CHEST, AS IF HE COULD HOLD THE AIR IN.' },
+  { d: 3.2, ...WARD, ...cuH(-12, 2, 1.9, 2.7, -12), tint: 'rgba(6,14,26,.2)', acts: [{ id: 'kael', a: [-12, 2], fx: .6, fy: -.6 }], cap: 'KAEL: BANK SEVEN HAS A LINE NOBODY\'S ALLOWED TO TOUCH. SO WE BLEED IT SLOW, AND BALANCE THE BANK BEFORE THE MORNING AUDIT.' },
+  { d: 3.0, ...WARD, cam: [0, 150, 56, 170], to: [0, 136, 52, 182], tint: 'rgba(90,10,0,.22)', acts: [{ id: 'nell', a: [8, -22], fy: 1 }, { id: 'kael', a: [-12, 2], fy: -1 }, { id: 'seren', a: [8, 10], fx: -1, fy: -.6 }], cap: 'STEALING AIR IS THE ONE CRIME THE AUTHORITY NEVER FORGIVES. THEY COMMIT YOU TO THE ARRAY, AND THE ARRAY RUNS ON FIRE.' },
+  { d: 2.6, ...WARD, cam: [10, 140, 54, 178], to: [30, 140, 54, 178], lin: 1, tint: 'rgba(6,14,26,.2)', acts: [{ id: 'nell', a: [8, -22], b: [60, -30], fx: 1 }, { id: 'kael', a: [-12, 2], fx: 1, fy: -.4 }, { id: 'seren', a: [8, 10], fx: 1, fy: -.4 }], cap: 'NELL: I DIDN\'T HEAR ANY OF THIS. I\'LL HAVE THE WARD VENTS OPEN AT SECOND BELL.' },
+  // ---- the plan, under her sun
+  { d: 2.8, ...SQ, nocrowd: 1, tint: NIGHT, cam: [-40, 160, 58, 168], to: [-6, 140, 54, 182], lin: 1, acts: [{ id: 'seren', a: [-60, -10], b: [0, -30], fx: 1 }, { id: 'kael', a: [-84, -4], b: [-20, -24], fx: 1 }], cap: 'WE WALKED BACK THROUGH THE SQUARE WITHOUT TALKING. AT THE PILLAR SHE STOPPED, UNDER HER OWN PAINTED SUN.' },
+  { d: 2.2, ...SQ, nocrowd: 1, tint: NIGHT, ...cuH(0, -30, 1.9, 2.6, 12), acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .4 }], cap: 'SEREN: WHY YOU? WHY DOES IT ALWAYS HAVE TO BE YOU?' },
+  { d: 2.4, ...SQ, nocrowd: 1, tint: NIGHT, ...cuH(-20, -24, 1.9, 2.7, -12), acts: [{ id: 'kael', a: [-20, -24], fx: 1, fy: .3 }], cap: 'KAEL: BECAUSE I WON\'T WATCH TAV DROWN IN HIS OWN BED.' },
+  { d: 2.6, ...SQ, nocrowd: 1, tint: NIGHT, ...cuH(0, -30, 2.2, 3.0, 8), acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .4 }], cap: 'SEREN: AYE. THAT\'S THE ANSWER I MARRIED, YOU IDIOT. THAT EXACT ONE.' },
+  { d: 3.2, ...SQ, nocrowd: 1, tint: NIGHT, ...two(-10, -27), acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .2 }, { id: 'kael', a: [-20, -24], fx: 1, fy: -.2 }], cap: 'SEREN: RELAY, EAST WALL. THEN BANK SEVEN. I\'LL KEEP WATCH. THE NIGHT TALLYMAN WALKS BAY THREE EVERY HOUR WITH A LANTERN.' },
+  { d: 3.0, ...SQ, nocrowd: 1, tint: NIGHT, cam: [-10, 126, 52, 186], to: [-10, 112, 48, 200], acts: [{ id: 'seren', a: [0, -30], fx: -1, fy: .2 }, { id: 'kael', a: [-20, -24], fx: 1, fy: -.2 }], cap: 'KAEL: AND IF HE SEES BOTH OF US? SEREN: THEN WE\'RE NEWLYWEDS LOOKING FOR SOMEWHERE PRIVATE. TRY TO LOOK EMBARRASSED.' }
+];
+const DARK = 'rgba(4,5,22,.62)';
+const CH1_FILM_HEIST = [
+  { d: 2.0, black: 1, big: 'BAY THREE', sub2: 'SECOND BELL.' },
+  { d: 3.2, ...BAY, tint: DARK, cam: [-60, 190, 80, 150, .3], to: [40, 170, 70, 156, .32], lin: 1, acts: [{ id: 'proctor', a: [90, -8], b: [-70, -8], fx: -1 }, { id: 'watchman', a: [96, 26], fx: -1 }], cap: 'THE NIGHT TALLYMAN WALKED THE MIDDLE OF IT, END TO END, WITH HIS LANTERN HELD HIGH.' },
+  { d: 3.0, ...BAY, tint: DARK, cam: [-70, 150, 54, 176], to: [10, 150, 54, 176], lin: 1, acts: [{ id: 'proctor', a: [-70, -8], b: [60, -8], fx: 1 }, { id: 'kael', a: [-104, 30], b: [-10, 30], fx: 1 }, { id: 'watchman', a: [96, 26], fx: 1 }], cap: 'THE LAMPS SWEPT. I COUNTED THEM. FOUR. SIX. EIGHT. THERE WAS ALWAYS A GAP, IF YOU WERE PATIENT.' },
+  { d: 3.0, ...BAY, tint: DARK, sfx: 'rotate', ...cuH(100, 4, 1.9, 2.8, 12), acts: [{ id: 'kael', a: [100, 4], fx: 1, fy: -.2 }], cap: 'AT THE EAST WALL I HELD MY HAND ON THE GREY BOX WHILE THE CUTTER BIT INTO THE SEAL. TWO SECONDS, NOT BREATHING.' },
+  { d: 2.4, ...BAY, tint: 'rgba(255,200,80,.14)', flash: 1, cam: [60, 150, 56, 170], to: [80, 132, 52, 186], acts: [{ id: 'proctor', a: [40, -8], b: [66, -2], fx: 1, fy: .2 }, { id: 'kael', a: [100, 4], fx: 1, fy: -.2 }], cap: 'THE LAMP CAME ROUND. IT STOPPED ON THE CRATE BESIDE MY FACE.' },
+  { d: 3.2, ...BAY, tint: DARK, sfx: 'rumble', shake: .5, cam: [-110, 150, 56, 170], to: [-96, 134, 52, 184], acts: [{ id: 'seren', a: [-104, 8], fx: 1, fy: .3 }, { id: 'proctor', a: [40, -6], b: [-40, 0], fx: -1 }, { id: 'watchman', a: [96, 26], b: [20, 20], fx: -1 }], cap: 'ACROSS THE BAY SOMETHING HEAVY WENT OVER WITH A CRASH. EVERY LAMP TURNED TOWARD HER.' },
+  { d: 2.6, ...BAY, tint: DARK, sfx: 'clink', ...cuH(-104, 8, 1.9, 2.6, -12), acts: [{ id: 'seren', a: [-104, 8], fx: 1, fy: .5 }], cap: 'SEREN STOOD IN THE DOORWAY WITH A SACK OF BOLTS AT HER FEET, SWEARING AT THE SACK.' },
+  { d: 3.0, ...BAY, tint: 'rgba(8,6,20,.45)', sfx: 'rotate', cam: [0, 150, 56, 170], to: [0, 120, 50, 196], acts: [{ id: 'kael', a: [0, -34], fy: -1 }], cap: 'BANK SEVEN CAME UP UNDER MY HANDS. I FOUND THE AUTHORITY LINE BY TOUCH, AND TURNED THE WHEEL A QUARTER. THEN ANOTHER EIGHTH.' },
+  { d: 3.2, ...WARD, flash: 1, sfx: 'solved', cam: [0, 220, 110, 150, .22], to: [0, 160, 64, 158, .32], acts: [{ id: 'nell', a: [0, -18], fy: 1 }, { id: 'pip', a: [-40, -4], fx: 1 }, { id: 'mosi', a: [36, 0], fx: -1 }, { id: 'ada', a: [-14, 12], fy: -1 }, { id: 'tavi', a: [18, 14], fy: -1 }], cap: 'FAR OFF, THROUGH THE VENTS: THE CLINIC FANS, SPINNING UP. THEN A CHEER, FROM A WARD FULL OF CHILDREN WHO COULD SUDDENLY BREATHE.' },
+  { d: 2.8, ...BAY, tint: 'rgba(8,6,20,.4)', ...two(-6, -32), acts: [{ id: 'seren', a: [-14, -32], fx: 1, fy: .2 }, { id: 'kael', a: [2, -34], fx: -1, fy: .2 }], cap: 'SEREN: YOU\'RE INSUFFERABLE WHEN YOU\'RE RIGHT. KAEL: THEN I PLAN TO BE INSUFFERABLE FOR A VERY LONG TIME.' },
+  { d: 2.8, ...BAY, tint: 'rgba(8,6,20,.4)', cam: [-6, 122, 52, 188], to: [-6, 108, 48, 202], acts: [{ id: 'seren', a: [-14, -32], fx: 1, fy: .2 }, { id: 'kael', a: [2, -34], fx: -1, fy: .2 }], cap: 'SEREN: BALANCE IT BACK BEFORE THE AUDIT. PROMISE ME. KAEL: EVERY NIGHT. BALANCED BY DAWN. ON MY BREATH.' },
+  { d: 3.2, ...BAY, tint: WARM, ...cuH(-6, -33, 2.2, 3.2, 0), acts: [{ id: 'seren', a: [-10, -32], fx: 1, fy: .2 }, { id: 'kael', a: [-2, -34], fx: -1, fy: .2 }], cap: 'SHE PULLED ME DOWN BY THE COLLAR. FOR A MOMENT, CINDERWELL WAS WARM FOR THE RIGHT REASONS.' },
+  { d: 3.4, black: 1, music: null, cap: 'FOR THREE NIGHTS, WE BLED THE LINE AND BALANCED THE BANK BY DAWN. ON THE THIRD NIGHT, THE FEVER BROKE. TAVI ASKED FOR BREAD.' }
+];
+for (const sh of CH1_FILM_A.concat(CH1_FILM_HEIST)) if (!sh.black && !sh._cu && sh.cam) { sh.cam = sh.cam.slice(); sh.cam[2] = Math.round(sh.cam[2] * .7); if (sh.to) { sh.to = sh.to.slice(); sh.to[2] = Math.round(sh.to[2] * .7); } }
+const CH1_FILM_DEF = shots => () => ({ bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 66 }, music: 'mystery', cineOnly: 1, film: 1, intro: shots, foes: [] });
+const CH1_FILM = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: CH1_FILM_DEF(CH1_FILM_A.concat(CH1_FILM_HEIST)) }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }];
+// a film shot may name its own set (bg2) and ask for an empty square (nocrowd); the game's films never changed sets below
+{ const n0 = Brawl.nextShot; Brawl.nextShot = function () { const c = this.cine, s = c && c.shots[c.i + 1]; if (s && s.bg2 !== undefined) this.def = Object.assign({}, this.def, { bg2: s.bg2 || undefined }); n0.call(this); if (s && s.nocrowd && this.props) this.props = this.props.filter(q => q.t !== 'crowd'); }; }
+
 // a lantern for any actor marked with one: the light sits a little ahead of the way he is facing
 { const a0 = Cutscene.anim, e0 = Cutscene.end;
   Cutscene.anim = function (dt) { a0.call(this, dt); const L = this.actors.filter(a => a.lamp); if (L.length) World.dynLights = L.map(a => { const an = DIRA[a.dir]; return { x: a.x + Math.cos(an) * 14, y: a.y - 6 + Math.sin(an) * 14, r: 60, c: '#ffd070' }; }); else if (this._lamps) World.dynLights = []; this._lamps = L.length; };
@@ -9024,12 +9098,12 @@ Menus.title = function () {
     b.innerHTML = '<h1 class="logo">SOOTBORN</h1><div class="sub">Chapter One · Before the Furnace</div><p style="opacity:.75;margin-top:10px">A preview of a new cutscene. This is not the game, and the game has not been changed.</p>';
     b.parentNode.style.background = 'rgba(16,10,13,.82)'; b.parentNode.style.textAlign = 'center';
   }, items: [
-    { label: 'Play the opening: the Keep (new film)', act: () => CH1_PREVIEW.play(CH1_KEEP) },
-    { label: 'Play all of Chapter One (the Keep, then below)', act: () => CH1_PREVIEW.play(CH1_KEEP.concat(CH1_NEW)) },
-    { label: 'Play only the scenes below (new cutscene)', act: () => CH1_PREVIEW.play(CH1_NEW) },
+    { label: 'Play Chapter One (the Keep, then below, all as film)', act: () => CH1_PREVIEW.play(CH1_KEEP.concat(CH1_FILM)) },
+    { label: 'Only the opening: the Keep', act: () => CH1_PREVIEW.play(CH1_KEEP) },
+    { label: 'Only the scenes below, as film', act: () => CH1_PREVIEW.play(CH1_FILM) },
+    { label: 'Earlier version: the scenes below as a 2D cutscene', act: () => CH1_PREVIEW.play(CH1_NEW) },
     { label: "Compare: the game's current scenes below", act: () => CH1_PREVIEW.play(CH1_PREVIEW.old()) },
-    { label: 'Settings', act: () => Menus.settings() },
-    { label: 'Controls', act: () => Menus.controls() }
+    { label: 'Settings', act: () => Menus.settings() }
   ] }));
 };
 
