@@ -283,8 +283,10 @@ const DOWN_SHOT = { cam: [-52, 20, 190, 110, -6], to: [-52, 20, 340, 110, -6], l
 const CH1_KEEP_SHOTS = [
   // "Dawn, and banners."
   VS(0, 2.35, { bg: 'keep', music: 'dawn', cel: 'front', cam: [-24, 250, 124, 170, .64], to: [-6, 236, 112, 170, .56], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[0, 'DAWN, AND BANNERS.']] }),
-  // "A keep of grey stone on the end of a ridge."
-  VS(2.35, 5.3, { cam: [-70, 920, 70, 165, .46], to: [0, 400, 58, 150, .4], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[.3, 'A KEEP OF GREY STONE ON THE END OF A RIDGE.']] }),
+  // "A keep of grey stone on the end of a ridge."  out wide: the keep on its rock, the road up to the gate, the valley under it
+  VS(2.35, 4.2, { fog: [1400, 7000], cam: [150, 1320, 250, 162, .47], to: [90, 1040, 190, 164, .46], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[.3, 'A KEEP OF GREY STONE ON THE END OF A RIDGE.']] }),
+  // then up close: over the wall, onto the field, the boy small under the banners
+  VS(4.2, 5.3, { fog: [700, 3000], cam: [30, 420, 96, 150, .34], to: [20, 300, 74, 150, .32], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[0, 'A KEEP OF GREY STONE ON THE END OF A RIDGE.']] }),
   // "A boy stands under the banners with a blade held low."  he shifts his weight; the point of the blade draws a slow line on the stone
   VS(5.3, 8.95, { cam: [50, 46, 9, 230, .4], to: [44, 78, 52, 205, .34], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6], [1.3, ACT.lowShift, 2.5], [2.7, ACT.low, 2.5]] })], caps: [[.3, 'A BOY STANDS UNDER THE BANNERS WITH A BLADE HELD LOW.']] }),
   // "He is eighteen."
@@ -428,38 +430,61 @@ const CH1_KEEP = [
 // the rock of the ridge under it running back to the mountains, and the valley below with its river.
 // (x right, y up, z toward the camera; the field is y = 0, x -256..256, z -192..256.)
 const KEEPSET = (A, S) => {
-  const I = M4.id(), G1 = '#aaa69d', G2 = '#98948b', G3c = '#bcb8ae', DK = '#2a2438', GOLD = '#e8c25a', WHT = '#f4f0e6', SLATE = '#4c4860', ROCK = '#857c70', ROCK2 = '#746c62';
-  let sd = 9173; const rnd = () => (sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296, R = (a, b) => a + rnd() * (b - a);
-  // ---- the keep: a great hall, a tall tower out of the middle of it, a round tower at each end
-  S.box(I, 0, 70, -196, 280, 140, 110, G1);
-  for (let i = -6; i <= 6; i++) S.box(I, i * 21, 146, -142, 11, 12, 8, G3c);
-  S.box(I, 0, 141, -142, 284, 3, 9, G2);
-  S.box(I, 0, 160, -214, 96, 320, 84, G2);
-  S.box(I, 0, 322, -214, 108, 10, 96, G3c);
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) S.box(I, sx * 46, 334, -214 + sz * 40, 14, 16, 14, G3c);
-  S.cyl(M4.chain(M4.t(0, 327, -214), M4.ry(.785)), 0, 0, 0, 58, 0, 84, 4, SLATE);
-  S.cyl(I, 0, 411, -214, 1, 1, 34, 4, '#8a8478'); S.box(I, 12, 436, -214, 24, 13, .8, GOLD);
-  for (const sx of [-1, 1]) { S.cyl(I, sx * 158, 0, -176, 38, 33, 216, 9, G1, 0, 1); S.cyl(I, sx * 158, 216, -176, 44, 44, 5, 9, G3c, 0, 1); S.cyl(I, sx * 158, 221, -176, 42, 0, 66, 9, sx < 0 ? '#7a5ac8' : '#2aa6a0'); S.cyl(I, sx * 158, 287, -176, .9, .9, 26, 4, '#8a8478'); S.box(I, sx * 158 + 10, 306, -176, 20, 11, .8, sx < 0 ? '#7a5ac8' : '#2aa6a0');
-    for (let k = 0; k < 3; k++) A.box(I, sx * 158, 70 + k * 50, -137.6, 6, 16, 1, DK, 1); }
-  // windows, a string course, the great door behind the dais
-  for (let k = 0; k < 2; k++) for (let i = -4; i <= 4; i++) { if (Math.abs(i) < 1 && k === 0) continue; A.box(I, i * 28, 62 + k * 44, -140.4, 7, 20, 1, DK, 1); A.box(I, i * 28, 73 + k * 44, -140.2, 9, 3, 1, G3c, 1); }
-  S.box(I, 0, 88, -140.5, 282, 3, 2, G3c);
-  for (let k = 0; k < 5; k++) A.box(I, 0, 176 + k * 28, -171.6, 8, 16, 1, DK, 1);
-  // gold and white, down the face of it
-  { const bn = [[-112, GOLD], [-70, WHT], [70, WHT], [112, GOLD]]; for (const [x, c] of bn) { S.box(I, x, 104, -140, 18, 62, .9, c); S.box(I, x - 4.5, 68, -140, 9, 12, .9, c); S.box(I, x + 4.5, 70, -140, 9, 8, .9, c); A.box(I, x, 112, -139.4, 7, 7, .4, c === GOLD ? WHT : GOLD, 1); A.box(I, x, 136, -139.6, 22, 2, 1.2, '#8a8478', 1); }
-    for (const [x, c] of [[-24, WHT], [24, GOLD]]) { S.box(I, x, 244, -171, 16, 120, .9, c); S.box(I, x - 4, 180, -171, 8, 12, .9, c); S.box(I, x + 4, 182, -171, 8, 8, .9, c); A.box(I, x, 262, -170.4, 7, 7, .4, c === GOLD ? WHT : GOLD, 1); } }
-  // ---- the front of the field: a tower on each corner, a low parapet, and the gate we came in by
-  for (const sx of [-1, 1]) { const m = M4.t(sx * 256, 0, 256); S.cyl(m, 0, -40, 0, 26, 22, 150, 8, '#ece6d8', 0, 1); S.cyl(m, 0, 110, 0, 30, 0, 52, 8, sx < 0 ? '#2aa6a0' : '#7a5ac8'); S.cyl(m, 0, 62, 0, 23.4, 23.4, 3, 8, GOLD, 1); S.cyl(m, 0, 162, 0, .9, .9, 24, 4, '#8a8478'); S.box(m, 9, 180, 0, 18, 10, .8, sx < 0 ? '#2aa6a0' : '#7a5ac8');
-    S.box(I, sx * 150, 4, 258, 200, 8, 6, '#d4cec0'); A.box(I, sx * 150, 8.3, 258, 200, .8, 6.4, GOLD, 1); }
-  // ---- the ridge: the rock the keep stands on, and the spine of it running back toward the mountains
-  A.cyl(I, 0, -640, 20, 600, 316, 637, 9, ROCK, 0, 1);
-  for (let i = 0; i < 9; i++) { const a = i / 9 * 6.2832 + .3, d = R(250, 330), m = M4.chain(M4.t(Math.cos(a) * d, 0, 20 + Math.sin(a) * d * .9), M4.ry(R(0, 6))); A.cyl(m, 0, -640, 0, R(150, 230), R(40, 80), R(420, 600), 6, i % 2 ? ROCK2 : ROCK, 0, 1); A.cyl(m, 0, R(-70, -30), 0, R(50, 80), 0, R(20, 34), 6, [.36, .54, .3]); }
-  for (let k = 0; k < 8; k++) { const z = -330 - k * 130, x = Math.sin(k * 1.3) * 70, top = -6 - k * 26, rad = 330 - k * 16; A.cyl(M4.chain(M4.t(x, 0, z), M4.ry(k)), 0, -640, 0, rad + 220, rad * .5, 640 + top, 7, k % 2 ? ROCK : ROCK2, 0, 1); A.cyl(M4.chain(M4.t(x, 0, z), M4.ry(k)), 0, top - 1, 0, rad * .5, rad * .2, 24, 7, [.34, .52, .3], 0, 1); }
-  // ---- the valley: grass, a river, woods, a long way down
-  A.quad(-5000, -5000, 5000, 2600, -640, [.3, .5, .3]);
-  for (let i = 0; i < 60; i++) { const x = -3000 + i * 100, z = 900 + Math.sin(i * .33) * 260 + Math.sin(i * .11) * 300; A.quad(x, z - 46, x + 104, z + 46, -639, [.34, .58, .84], 1); }
-  for (let i = 0; i < 260; i++) { const a = R(0, 6.2832), d = R(760, 2600), x = Math.cos(a) * d, z = Math.sin(a) * d * .8 + 300, sz = R(.8, 1.7); A.cyl(M4.t(x, -640, z), 0, 0, 0, 22 * sz, 0, 62 * sz, 5, [.16 + rnd() * .06, .38 + rnd() * .1, .2]); }
-  for (let i = 0; i < 26; i++) { const a = R(0, 6.2832), d = R(900, 2400); A.cyl(M4.chain(M4.t(Math.cos(a) * d, -640, Math.sin(a) * d * .8 + 300), M4.ry(R(0, 6))), 0, 0, 0, R(60, 140), R(10, 40), R(40, 110), 6, ROCK2, 0, 1); } };
+  const I = M4.id(), G1 = '#b6b2a9', G2 = '#a5a198', G3c = '#c8c4ba', DK = '#2a2438', LIT = '#ffd98a', GOLD = '#e8c25a', WHT = '#f4f0e6', SLATE = '#4c4860', WALLC = '#d2cbbd', ROCK = [.92, .86, .78], ROCK2 = [.82, .76, .69], ROCK3 = [1, .95, .88], GR = [.45, .62, .36];
+  let sd = 9173; const rnd = () => (sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296, R = (a, b) => a + rnd() * (b - a), pick = (L) => L[Math.floor(rnd() * L.length)];
+  const banner = (x, y, z, h, c, alongZ) => { const o = c === GOLD ? WHT : GOLD; if (alongZ) { S.box(I, x, y, z, .9, h, 18, c); S.box(I, x, y - h / 2 - 5, z - 4.5, .9, 12, 9, c); S.box(I, x, y - h / 2 - 3, z + 4.5, .9, 8, 9, c); A.box(I, x + .6, y + h * .15, z, .4, 7, 7, o, 1); A.box(I, x + .2, y + h / 2 + 1, z, 1.2, 2, 22, '#8a8478', 1); } else { S.box(I, x, y, z, 18, h, .9, c); S.box(I, x - 4.5, y - h / 2 - 5, z, 9, 12, .9, c); S.box(I, x + 4.5, y - h / 2 - 3, z, 9, 8, .9, c); A.box(I, x, y + h * .15, z + .6, 7, 7, .4, o, 1); A.box(I, x, y + h / 2 + 1, z + .2, 22, 2, 1.2, '#8a8478', 1); } };
+  // ---- THE KEEP stands along the left side of the field, so the dais and the fight keep the open sky behind them.
+  const KX = -380;
+  // the great hall: long, pitched slate roof, buttressed, two rows of windows facing the field
+  S.box(I, KX, 75, -70, 150, 150, 300, G1);
+  S.box(M4.chain(M4.t(KX, 150, -70), M4.rz(.785)), 0, 0, 0, 104, 104, 296, SLATE);
+  for (const k of [38, 76, 114]) S.box(I, -304.4, k, -70, 1.6, 3, 302, G3c);
+  for (let i = 0; i < 6; i++) { S.box(I, -301, 60, -205 + i * 54, 9, 120, 10, G2); S.box(I, -300, 124, -205 + i * 54, 12, 8, 13, G3c); }
+  for (let i = 0; i < 15; i++) S.box(I, -308, 157, -213 + i * 21, 8, 13, 11, G3c);
+  for (let k = 0; k < 2; k++) for (let i = 0; i < 5; i++) { const z = -178 + i * 54; A.box(I, -304.3, 54 + k * 46, z, 1, 22, 8, (i + k * 2) % 3 === 1 ? LIT : DK, 1); A.box(I, -303.9, 41.5 + k * 46, z, 1.6, 2.5, 11, G3c, 1); A.box(I, -303.9, 66.5 + k * 46, z, 1.6, 2.5, 11, G3c, 1); }
+  for (const [z, c] of [[-151, GOLD], [-97, WHT], [11, WHT], [65, GOLD]]) banner(-303.4, 100, z, 56, c, 1);
+  // its gable end, toward us: a tall window and two banners
+  A.box(I, KX, 74, 80.6, 28, 64, 1, DK, 1); for (const dx of [-7, 0, 7]) A.box(I, KX + dx, 74, 81, 1.2, 64, 1, G3c, 1); A.box(I, KX, 108, 81, 32, 3, 1.4, G3c, 1); A.box(I, KX, 86, 81, 28, 1.4, 1, G3c, 1);
+  banner(KX - 48, 100, 80.8, 64, GOLD); banner(KX + 48, 100, 80.8, 64, WHT);
+  for (const k of [38, 76, 114]) S.box(I, KX, k, 80.4, 152, 3, 1.6, G3c);
+  // the great tower, at the back: string courses, a crown of merlons, four turrets, a slate spire, a balcony over the field
+  const TX = -380, TZ = -250;
+  S.box(I, TX, 175, TZ, 116, 350, 116, G2);
+  for (let k = 60; k <= 310; k += 50) S.box(I, TX, k, TZ, 119, 3, 119, G3c);
+  S.box(I, TX, 354, TZ, 132, 10, 132, G3c);
+  for (let q = -2; q <= 2; q++) { S.box(I, TX + q * 27, 366, TZ + 62, 12, 14, 9, G3c); S.box(I, TX + q * 27, 366, TZ - 62, 12, 14, 9, G3c); S.box(I, TX + 62, 366, TZ + q * 27, 9, 14, 12, G3c); S.box(I, TX - 62, 366, TZ + q * 27, 9, 14, 12, G3c); }
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { S.cyl(I, TX + sx * 60, 296, TZ + sz * 60, 13, 13, 78, 6, G1, 0, 1); S.cyl(I, TX + sx * 60, 374, TZ + sz * 60, 18, 0, 38, 6, SLATE); A.box(I, TX + sx * 60 + (sx > 0 ? 13.4 : -13.4), 340, TZ + sz * 60, 1, 12, 5, DK, 1); }
+  S.cyl(M4.chain(M4.t(TX, 359, TZ), M4.ry(.785)), 0, 0, 0, 72, 0, 104, 4, SLATE); S.cyl(I, TX, 463, TZ, 1.1, 1.1, 40, 4, '#8a8478'); S.box(I, TX + 14, 494, TZ, 28, 15, .9, GOLD); A.box(I, TX + 14, 494, TZ + .6, 8, 8, .4, WHT, 1);
+  for (let k = 0; k < 5; k++) { A.box(I, TX, 88 + k * 52, TZ + 58.6, 9, 22, 1, k === 2 || k === 4 ? LIT : DK, 1); A.box(I, TX + 58.6, 88 + k * 52, TZ, 1, 22, 9, k === 1 ? LIT : DK, 1); A.box(I, TX + 58.6, 88 + k * 52, TZ - 34, 1, 14, 5, DK, 1); A.box(I, TX + 58.6, 88 + k * 52, TZ + 34, 1, 14, 5, DK, 1); }
+  banner(TX - 34, 250, TZ + 59, 128, WHT); banner(TX + 34, 250, TZ + 59, 128, GOLD); banner(TX + 59, 250, TZ - 0, 128, GOLD, 1);
+  S.box(I, TX + 68, 150, TZ, 20, 3, 56, G3c); A.box(I, TX + 77.4, 157, TZ, 1, 1.6, 56, GOLD, 1); for (const dz of [-26, -13, 0, 13, 26]) S.box(I, TX + 77, 154, TZ + dz, 1.6, 8, 1.6, G3c); S.box(I, TX + 64, 142, TZ - 20, 12, 14, 5, G2); S.box(I, TX + 64, 142, TZ + 20, 12, 14, 5, G2);
+  // a round tower on the near end of the hall
+  S.cyl(I, KX, 0, 118, 46, 40, 238, 10, G1, 0, 1); S.cyl(I, KX, 80, 118, 43.5, 43.5, 3, 10, G3c, 0, 1); S.cyl(I, KX, 160, 118, 41.5, 41.5, 3, 10, G3c, 0, 1); S.cyl(I, KX, 238, 118, 52, 52, 6, 10, G3c, 0, 1);
+  for (let q = 0; q < 10; q++) { const a = q / 10 * 6.2832; S.box(M4.chain(M4.t(KX + Math.cos(a) * 48, 250, 118 + Math.sin(a) * 48), M4.ry(-a)), 0, 0, 0, 9, 12, 13, G3c); }
+  S.cyl(I, KX, 244, 118, 42, 0, 78, 10, '#7a5ac8'); S.cyl(I, KX, 322, 118, 1, 1, 30, 4, '#8a8478'); S.box(I, KX + 11, 344, 118, 22, 12, .9, '#7a5ac8');
+  for (let k = 0; k < 3; k++) { A.box(I, KX, 60 + k * 60, 118 + 43.4, 7, 18, 1, k === 1 ? LIT : DK, 1); A.box(I, KX + 42.6, 60 + k * 60, 118, 1, 18, 7, DK, 1); }
+  // a covered bridge from the hall onto the wall of the field
+  S.box(I, -283, 46, -43, 44, 22, 24, G1); S.box(M4.chain(M4.t(-283, 57, -43), M4.rx(.785)), 0, 0, 0, 46, 19, 19, SLATE); S.box(I, -283, 17, -43, 10, 36, 18, G2); for (const dx of [-12, 0, 12]) A.box(I, -283 + dx, 47, -30.8, 6, 10, .6, DK, 1);
+  // ---- the front of the field: a tower on each corner, a low parapet
+  for (const sx of [-1, 1]) { const m = M4.t(sx * 256, 0, 256); S.cyl(m, 0, -80, 0, 26, 22, 190, 8, '#ece6d8', 0, 1); S.cyl(m, 0, 110, 0, 30, 0, 52, 8, sx < 0 ? '#2aa6a0' : '#7a5ac8'); S.cyl(m, 0, 62, 0, 23.4, 23.4, 3, 8, GOLD, 1); S.cyl(m, 0, 162, 0, .9, .9, 24, 4, '#8a8478'); S.box(m, 9, 180, 0, 18, 10, .8, sx < 0 ? '#2aa6a0' : '#7a5ac8'); A.box(m, 0, 40, 23, 5, 14, 1, DK, 1); A.box(m, 0, 84, 23.6, 5, 14, 1, DK, 1);
+    S.box(I, sx * 150, 4, 258, 200, 8, 6, WALLC); A.box(I, sx * 150, 8.3, 258, 200, .8, 6.4, GOLD, 1); S.box(I, sx * 44, 9, 258, 10, 18, 10, '#e6e0d2'); A.box(I, sx * 44, 18.6, 258, 12, 1.4, 12, GOLD, 1); }
+  // ---- under the field: a wall of dressed stone with buttresses and the gate in it, and the road up to that gate
+  S.box(I, 0, -42, 259, 524, 84, 8, WALLC);
+  for (const k of [-14, -36, -58]) A.box(I, 0, k, 263.2, 524, 1.6, .6, '#b3ab9b', 1);
+  for (let q = -4; q <= 4; q++) if (q) { S.box(I, q * 58, -44, 265, 15, 88, 12, '#c6beb0'); S.box(I, q * 58, 2, 265, 19, 6, 15, '#dbd4c6'); }
+  A.box(I, 0, -52, 263.7, 40, 60, 1, DK, 1); A.box(I, 0, -20, 264, 46, 5, 1.4, GOLD, 1); for (const dx of [-12, -4, 4, 12]) A.box(I, dx, -54, 264.1, 1.2, 56, .6, '#6a6470', 1); for (const sx of [-1, 1]) { S.box(I, sx * 26, -46, 266, 9, 76, 12, '#dbd4c6'); A.box(I, sx * 26, -4, 272.4, 7, 7, .6, GOLD, 1); }
+  for (let k = 0; k < 20; k++) { const y = -84 - k * 13, z = 280 + k * 24; S.box(I, 0, y, z, 64, 7, 24, k % 2 ? '#ddd6c8' : '#cfc8ba'); for (const sx of [-1, 1]) { S.box(I, sx * 34, y + 8, z, 5, 14, 24, '#c2baac'); if (k % 3 === 0) { S.box(I, sx * 34, y + 28, z, 3, 26, 3, G2); A.box(I, sx * 34, y + 42, z, 5, 3, 5, GOLD, 1); S.box(I, sx * 34 + sx * 6, y + 34, z, 10, 12, .8, (k / 3 + (sx > 0 ? 1 : 0)) % 2 ? GOLD : WHT); } } }
+  A.cyl(M4.chain(M4.t(0, 0, 520), M4.ry(.4)), 0, -640, 0, 300, 70, 420, 7, ROCK2, 0, 1); A.cyl(M4.chain(M4.t(40, 0, 700), M4.ry(1.4)), 0, -640, 0, 260, 60, 300, 7, ROCK, 0, 1);
+  // ---- the ridge: pale rock under all of it, broken into outcrops, grass on the ledges; the spine of it runs back to the mountains
+  A.box(I, 0, -384, 30, 500, 600, 430, ROCK2); A.box(I, KX, -330, -70, 200, 660, 420, ROCK2);
+  for (let q = 0; q < 34; q++) { const a = q / 34 * 6.2832 + R(-.06, .06), px = Math.cos(a) * R(262, 300) * (Math.cos(a) < -.2 ? 1.5 : 1), pz = 30 + Math.sin(a) * R(232, 268), m = M4.chain(M4.t(px, 0, pz), M4.ry(R(0, 6))), top = R(-128, -88), r0 = R(120, 200); A.cyl(m, 0, -640, 0, r0, R(44, 86), 640 + top, 6, pick([ROCK, ROCK2, ROCK3]), 0, 1); if (q % 2) A.cyl(m, R(-20, 20), top - 2, R(-20, 20), R(30, 50), 0, R(14, 26), 6, GR); if (q % 3 === 0) A.cyl(M4.chain(M4.t(px * 1.25, 0, pz * 1.2), M4.ry(R(0, 6))), 0, -640, 0, R(100, 170), R(20, 50), R(260, 440), 6, pick([ROCK, ROCK2]), 0, 1); }
+  for (let k = 0; k < 8; k++) { const z = -360 - k * 130, x = -120 + Math.sin(k * 1.3) * 80, top = -20 - k * 30, rad = 340 - k * 16, m = M4.chain(M4.t(x, 0, z), M4.ry(k)); A.cyl(m, 0, -640, 0, rad + 220, rad * .5, 640 + top, 7, k % 2 ? ROCK : ROCK2, 0, 1); A.cyl(m, 0, top - 1, 0, rad * .5, rad * .2, 24, 7, GR, 0, 1); }
+  // ---- the valley: grass, the river, woods, and the twelve camps
+  A.quad(-6000, -6000, 6000, 3200, -640, [.42, .62, .38]);
+  for (let q = 0; q < 70; q++) { const x = -3500 + q * 100, z = 1150 + Math.sin(q * .33) * 240 + Math.sin(q * .11) * 280; A.quad(x, z - 50, x + 104, z + 50, -639, [.42, .66, .92], 1); }
+  for (let q = 0; q < 320; q++) { const a = R(0, 6.2832), d = R(820, 3000), x = Math.cos(a) * d, z = Math.sin(a) * d * .8 + 300, sz = R(.8, 1.8); A.cyl(M4.t(x, -640, z), 0, 0, 0, 22 * sz, 0, 62 * sz, 5, [.2 + rnd() * .06, .44 + rnd() * .1, .24]); }
+  for (let q = 0; q < 26; q++) { const a = R(0, 6.2832), d = R(900, 2600); A.cyl(M4.chain(M4.t(Math.cos(a) * d, -640, Math.sin(a) * d * .8 + 300), M4.ry(R(0, 6))), 0, 0, 0, R(60, 140), R(10, 40), R(40, 110), 6, ROCK2, 0, 1); }
+  { const HC = ['#7a5ac8', '#2aa6a0', '#c8452e', '#e8c25a', '#3a6ac8', '#58b848', '#c85a9a', '#e88a3a', '#8a8a92', '#40c8e8', '#a03a3a', '#f4f0e6']; for (let q = 0; q < 12; q++) { const x = -1100 + q * 200 + R(-40, 40), z = 880 + R(-120, 120) + Math.abs(q - 5.5) * 40; for (let t = 0; t < 4; t++) A.cyl(M4.t(x + (t % 2) * 46 - 23, -640, z + (t > 1 ? 40 : 0)), 0, 0, 0, 20, 0, 26, 6, WHT); A.cyl(M4.t(x, -640, z + 20), 0, 0, 0, 1.6, 1.6, 70, 4, '#8a8478'); A.box(I, x + 16, -578, z + 20, 32, 20, 1, HC[q], 1); } } };
 { const env0 = G3.env; G3.env = function (bg) { if (bg !== 'keep' || this.envs[bg] || !this.gl) return env0.call(this, bg);
     const XA = new Batch(30000), XS = new Batch(30000); try { KEEPSET(XA, XS); } catch (e) { return env0.call(this, bg); }
     const gl = this.gl, bd = gl.bufferData; let n = 0;
@@ -515,7 +540,7 @@ const CEL = { cache: {}, draw(kind) { if (this.cache[kind]) return this.cache[ki
     else if (kind === 'up') { g.fillStyle = HR; g.fillRect(15, 1, 14, 10); g.drawImage(base, 14, 3, 16, 9, 14, 1, 16, 9); g.fillStyle = HR; g.fillRect(18, 10, 8, 3); g.drawImage(base, 18, 13, 8, 9, 18, 11, 8, 9); g.fillStyle = SK; g.fillRect(18, 20, 8, 4); g.fillStyle = SK2; g.fillRect(19, 23, 6, 3); g.fillStyle = '#8a5a4a'; g.fillRect(20, 20, 4, 1); }
     return (this.cache[kind] = c); },
   set(kind) { const L = G3.bbs && G3.bbs.keep; if (!L) return; const i = L.findIndex(b => b.tag === 'dais' && b.x === 0); if (i < 0 || L[i]._kind === kind) return; this.ent = this.ent || {}; if (!this.ent[kind]) this.ent[kind] = Object.assign({}, L[i], { cv: this.draw(kind), tex: null, _kind: kind }); if (!L[i]._kind) { L[i]._kind = 'front'; this.ent.front = L[i]; } L[i] = this.ent[kind]; } };
-{ const r0 = Brawl.renderCine; Brawl.renderCine = function (g) { const rr = this._rc0(g), c9 = this.cine, s9 = c9 && c9.shots[c9.i]; if (s9) MEMFX(this, g, c9, s9); return rr; }; Brawl._rc0 = function (g) { const c = this.cine, s = c && c.shots[c.i]; if (s && this.def.bg === 'keep') { let kind = s.cel; if (s.cels) for (const e of s.cels) if (c.t >= e[0]) kind = e[1]; if (kind) CEL.set(kind); } if (s && s.caps) { let cp = ''; for (const e of s.caps) if (c.t >= e[0]) cp = e[1]; s.cap = undefined; SUB.show(cp, s.va + '|' + cp, s.mem); } else if (s && (s.va !== undefined || c.shots === CH1_KEEP_SHOTS)) SUB.show('', ''); if (s && s.va !== undefined && s.big) { s._big = s.big; s._bigC = s.bigC; s.big = undefined; } SUB.num(s && s._big ? s._big : '', s && s._bigC, c ? c.t : 0); return r0.call(this, g); }; }
+{ const r0 = Brawl.renderCine; Brawl.renderCine = function (g) { { const c8 = this.cine, s8 = c8 && c8.shots[c8.i], Lk = G3.LOOK && G3.LOOK.keep; if (Lk) { Lk._f0 = Lk._f0 || Lk.fogR; Lk.fogR = s8 && s8.fog ? s8.fog : Lk._f0; } } const rr = this._rc0(g), c9 = this.cine, s9 = c9 && c9.shots[c9.i]; if (s9) MEMFX(this, g, c9, s9); return rr; }; Brawl._rc0 = function (g) { const c = this.cine, s = c && c.shots[c.i]; if (s && this.def.bg === 'keep') { let kind = s.cel; if (s.cels) for (const e of s.cels) if (c.t >= e[0]) kind = e[1]; if (kind) CEL.set(kind); } if (s && s.caps) { let cp = ''; for (const e of s.caps) if (c.t >= e[0]) cp = e[1]; s.cap = undefined; SUB.show(cp, s.va + '|' + cp, s.mem); } else if (s && (s.va !== undefined || c.shots === CH1_KEEP_SHOTS)) SUB.show('', ''); if (s && s.va !== undefined && s.big) { s._big = s.big; s._bigC = s.bigC; s.big = undefined; } SUB.num(s && s._big ? s._big : '', s && s._bigC, c ? c.t : 0); return r0.call(this, g); }; }
 
 // ============================================================
 // CHAPTER ONE, BELOW — the same story as CH1_NEW, told the way the Assay is told: a film.
