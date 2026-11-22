@@ -214,21 +214,92 @@ const CH1_NEW = [
 // It follows the chapter's first page: dawn and banners, the boy, the woman in the chair, the cuts,
 // the rise, the dive, the count. It cuts before the blade lands. No play; any key moves to the next shot.
 // ============================================================
+// ---- acting. A film actor can carry a performance, keyed over the shot (q = 0..1 of the shot's length):
+//   path: [[q, x, y], ...]   footwork, eased between marks        zs: [[q, z], ...]   height off the ground
+//   poses: [[q, {joints}, rate], ...]   a held pose from q on; the rig's springs do the blend
+//   sts: [[q, 'atk'|'hurt'|'wind'|'guard', { dur, combo, kx, ky }], ...]   a cut, a reaction, a guard, lasting dur seconds
+//   faceTo: id   keep facing another actor        rage: n   the breathing, coiled stance
+const ACT = {
+  low:     { cr: .5, lean: .02, tw: -.18, rp: .08, ry: .22, re: -.12, tilt: -.22, lp: .12, ly: -.15, le: -.25, hl: .12, kl: .1, hr: -.1, kr: .1, sp: .1, hx: 0 },
+  lowTurn: { cr: .5, lean: .02, tw: -.05, rp: .08, ry: .22, re: -.12, tilt: -.22, lp: .12, ly: -.15, le: -.25, hl: .12, kl: .1, hr: -.1, kr: .1, sp: .1, hx: -.05, hy: .55 },
+  ready:   { cr: 2.2, lean: .12, tw: -.35, rp: -1.1, ry: .5, re: -1.0, tilt: -1.5, lp: -.7, ly: -.4, le: -1.1, hl: .5, kl: .6, hr: -.4, kr: .5, sp: .16 },
+  washer:  { cr: 1.4, lean: .1, tw: -.1, lp: -1.05, ly: -.95, le: -2.25, rp: .1, re: -.2, tilt: -.5, hx: .6 },
+  washerUp:{ cr: 1.0, lean: .02, tw: -.1, lp: -1.05, ly: -.95, le: -2.25, rp: .1, re: -.2, tilt: -.5, hx: -.12 },
+  slip:    { cr: 3.4, lean: .2, side: -.55, tw: .75, rp: -.5, ry: .2, re: -1.2, tilt: -1.0, lp: -.9, le: -1.1, hl: .9, kl: 1.0, hr: -.5, kr: .5, hx: .1, hy: -.5 },
+  through: { cr: 6.2, lean: .85, tw: -.45, rp: .6, re: -.4, tilt: -.3, lp: -1.2, le: -1.2, hl: 1.2, kl: 1.5, hr: -.7, kr: .9, hx: -.25 },
+  heave:   { cr: 3.6, lean: .5, tw: -.12, hx: .6, lp: -1.05, ly: -.95, le: -2.25, rp: .25, re: -.25, tilt: -.5, hl: .45, kl: .75, hr: -.4, kr: .6, sp: .2 },
+  headUp:  { cr: 1.4, lean: .05, tw: -.1, hx: -.3, lp: -.2, ly: -.3, le: -.6, rp: -.2, re: -.5, tilt: -.9, hl: .3, kl: .4, hr: -.25, kr: .35, sp: .2 },
+  coil:    { cr: 8.5, lean: .55, hl: 1.25, kl: 1.95, hr: 1.25, kr: 1.95, rp: .55, re: -.6, tilt: -.5, lp: .55, le: -.6, hx: .35, tw: 0, sq: .9 },
+  rise:    { cr: 0, lean: -.18, rp: .75, re: -.2, tilt: -.4, lp: .65, le: -.3, hl: .15, kl: .25, hr: -.1, kr: .55, hx: -.4, sq: 1.14, tw: 0 },
+  hover:   { cr: 0, lean: .06, tw: -.2, rp: -.6, ry: .5, re: -.3, tilt: -.6, lp: -.3, ly: -.6, le: -.4, hl: .2, kl: .5, hr: -.15, kr: .7, hx: .55 },
+  hoverUp: { cr: 0, lean: -.1, tw: 0, rp: -2.9, ry: 0, re: -.25, tilt: -.18, lp: -2.6, ly: 0, le: -.4, hl: .3, kl: .7, hr: .1, kr: .9, hx: .6, sq: 1.06 },
+  lookUp:  { cr: 1.2, lean: -.14, tw: -.1, hx: -.65, rp: -.5, ry: .3, re: -.9, tilt: -1.2, lp: -.3, le: -.6, hl: .2, kl: .25, hr: -.25, kr: .3 },
+  backStep:{ cr: 2.0, lean: -.2, tw: -.2, hx: -.6, rp: -1.2, ry: .7, re: -1.1, tilt: -1.7, lp: -1.0, le: -1.2, hl: -.3, kl: .3, hr: .5, kr: .6 },
+  brace:   { cr: 3.6, lean: -.1, tw: -.15, hx: -.45, rp: -2.2, ry: .9, re: -1.0, tilt: -1.9, lp: -2.0, ly: -.7, le: -1.0, hl: .55, kl: .85, hr: -.4, kr: .7, sp: .22 },
+  beaten1: { cr: 3.2, lean: -.12, tw: -.2, hx: -.2, rp: -1.6, ry: .9, re: -1.2, tilt: -1.9, lp: -1.5, ly: -.6, le: -1.3, hl: .5, kl: .8, hr: -.4, kr: .7, sp: .2 },
+  beaten2: { cr: 5.6, lean: -.22, tw: -.25, hx: -.1, rp: -1.9, ry: .9, re: -1.1, tilt: -1.9, lp: -1.8, ly: -.6, le: -1.2, hl: .8, kl: 1.2, hr: -.3, kr: 1.0, sp: .24 },
+  beaten3: { cr: 8.2, lean: -.05, tw: -.3, hx: .1, rp: -2.1, ry: .9, re: -1.0, tilt: -1.9, lp: -2.0, ly: -.6, le: -1.1, hl: 1.3, kl: 1.6, hr: -.3, kr: 1.5, sp: .2 },
+  kneelUp: { cr: 9, lean: .08, tw: 0, hl: 1.4, kl: 1.6, hr: -.3, kr: 1.5, rp: -1.0, ry: .8, re: -1.3, tilt: -1.7, lp: -1.5, ly: -.3, le: -1.0, hx: -.55, sp: .2 },
+  overhead:{ cr: 1.4, lean: -.32, tw: 0, rp: -3.05, ry: 0, re: -.3, tilt: -.22, lp: -2.75, ly: 0, le: -.3, hl: .5, kl: .6, hr: -.3, kr: .4, hx: .4, sq: 1.08 }
+};
+const kq = (keys, q) => { let a = keys[0], b = keys[keys.length - 1]; if (q <= a[0]) return [a, a, 0]; if (q >= b[0]) return [b, b, 0]; for (let i = 0; i < keys.length - 1; i++) if (q >= keys[i][0] && q < keys[i + 1][0]) { const u = (q - keys[i][0]) / (keys[i + 1][0] - keys[i][0]); return [keys[i], keys[i + 1], u * u * (3 - 2 * u)]; } return [b, b, 0]; };
+// the count's ticks fall where the game's own counter puts them: tick k of n at .92 * (k / n) ^ .8 of the shot
+const tickQ = (k, n) => .92 * Math.pow(k / n, .8);
+const COUNT_N = 10;
+const countKael = Array.from({ length: COUNT_N }, (_, k) => [Math.max(0, tickQ(k, COUNT_N) - .012), 'atk', { dur: .26, combo: 1 + (k % 3) }]);
+const countLucan = Array.from({ length: COUNT_N }, (_, k) => [tickQ(k, COUNT_N) + .008, 'hurt', { dur: .16, kx: 70, ky: -10 }]);
 const CH1_KEEP_SHOTS = [
-  { d: 3.4, bg: 'keep', music: 'dawn', cam: [0, 340, 210, 150, .14], to: [0, 180, 74, 150, .3], acts: [{ id: 'lucan', a: [40, -10], blade: 1, fx: -1, fy: .3 }], cap: 'DAWN, AND BANNERS. A KEEP OF GREY STONE ON THE END OF A RIDGE.' },
-  { d: 2.6, ...cu(40, -10, 1.8, 2.5, 18), acts: [{ id: 'lucan', a: [40, -10], blade: 1, fx: -1, fy: .3 }], cap: 'A BOY STANDS UNDER THE BANNERS WITH A BLADE HELD LOW. HE IS EIGHTEEN. HE HAS NEVER BEEN HIT BY ANYTHING HE COULD NOT SEE COMING.' },
-  { d: 3.0, cam: [14, 110, 84, 200, .5], to: [0, 84, 88, 200, .52], lin: 1, acts: [], cap: 'ON A WHITE PLATFORM A WOMAN SITS IN A CHAIR WITH HER HANDS FOLDED, AND WATCHES HIM.' },
-  { d: 2.2, cam: [0, 84, 88, 200, .52], to: [0, 52, 92, 200, .56], lin: 1, acts: [], cap: 'THE LAST DAY. HER SON HOLDS THE KEEP.' },
-  { d: 3.0, ...cu(-40, 4, 1.9, 2.8, -16), music: 'duel', acts: [{ id: 'kael2', a: [-40, 4], blade: 1, fx: 1, fy: -.2, aura: 1, pose: 'washer' }], cap: 'I AM IN THEIR PLATE, WITH A WHITE CLOAK OVER IT THAT IS NOT MINE. UNDER IT, ON A CORD, A BRASS WASHER.' },
-  { d: 1.8, cam: [-10, 150, 56, 170], to: [6, 132, 52, 186], flash: 1, sfx: 'clash', shake: .3, acts: [{ id: 'lucan', a: [30, -6], b: [12, -2], blade: 1, fx: -1, fy: .2, swing: 1 }, { id: 'kael2', a: [-12, 4], b: [-26, 14], blade: 1, fx: 1, fy: -.2, aura: 1 }], cap: 'THE FIRST CUT COMES IN OUT OF THE SUN, AND I AM NOT THERE.' },
-  { d: 1.8, cam: [6, 132, 52, 186], to: [-4, 124, 50, 196], flash: 1, sfx: 'steel', shake: .3, acts: [{ id: 'lucan', a: [12, -2], blade: 1, fx: -1, fy: .2, swing: 1 }, { id: 'kael2', a: [-26, 14], b: [-4, 2], blade: 1, fx: 1, fy: -.2, aura: 2 }], cap: 'THE SECOND COMES, AND I STEP THROUGH IT.' },
-  { d: 2.0, cam: [-4, 124, 50, 196], to: [4, 118, 48, 204], flash: 1, sfx: 'clash', shake: .5, acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2, guard: 1 }, { id: 'kael2', a: [-6, 2], blade: 1, fx: 1, fy: -.2, aura: 2, swing: 1 }], cap: 'I HIT, AND HE TAKES IT. HE HITS, AND I TAKE IT.' },
-  { d: 2.6, ...cu(-6, 2, 1.9, 3.0, -14), sfx: 'fury', bolt: 1, tint: 'rgba(160,20,0,.14)', acts: [{ id: 'kael2', a: [-6, 2], blade: 1, fx: .5, fy: .9, aura: 3 }], cap: 'UNDER MY RIBS A PRESSURE STARTS, LOW, THE WAY A SEAL STARTS TO LIFT BEFORE ANYBODY HEARS IT.' },
-  { d: 2.0, cam: [0, 170, 60, 170, .34], to: [0, 190, 120, 160, .52], speed: 1, sfx: 'dash', acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2 }, { id: 'kael2', a: [-6, 2], blade: 1, fx: 1, fy: -.2, aura: 3, za: 0, zb: 90 }], cap: 'I GO UP. THE GROUND DROPS OFF ME.' },
-  { d: 3.0, cam: [4, 176, 150, 160, .6], to: [10, 156, 142, 176, .62], lin: 1, acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2 }, { id: 'kael2', a: [-6, 2], blade: 1, fx: 1, fy: -.2, aura: 3, za: 90, zb: 96 }], cap: 'THE WOMAN IN THE CHAIR TURNS HER HEAD, ONLY HER HEAD, TO FOLLOW.' },
-  { d: 1.3, cam: [0, 200, 130, 160, .5], to: [6, 150, 58, 180, .34], speed: 1, sfx: 'roar', shake: .6, flash: 1, acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2, guard: 1 }, { id: 'kael2', a: [-6, 2], b: [4, 0], blade: 1, fx: 1, fy: -.2, aura: 4, za: 96, zb: 4, st: 'plunge', zease: 'in' }], cap: 'THEN I COME DOWN ON HIM.' },
-  { d: 6.4, cam: [4, 150, 56, 176, .33], to: [8, 118, 48, 200, .34], lin: 1, count: 10, tint: 'rgba(120,10,0,.16)', acts: [{ id: 'lucan', a: [14, -2], b: [22, -4], blade: 1, fx: -1, fy: .2, guard: 1 }, { id: 'kael2', a: [2, 0], b: [10, -2], blade: 1, fx: 1, fy: -.2, aura: 4, swing: 1 }], cap: 'I KNOW HOW MANY THERE WILL BE. THERE ARE ALWAYS ELEVEN.' },
-  { d: 1.5, ...cu(10, -2, 2.0, 3.2, -8), bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)', acts: [{ id: 'lucan', a: [22, -4], blade: 1, fx: -1, fy: .2, pose: 'kneel' }, { id: 'kael2', a: [10, -2], blade: 1, fx: 1, fy: -.2, aura: 4, hold: 2 }], cap: 'THE BLADE COMES DOWN.' },
+  // 1. dawn, and banners: he waits, blade low
+  { d: 3.4, bg: 'keep', music: 'dawn', cel: 'front', cam: [0, 340, 210, 150, .14], to: [0, 180, 74, 150, .3], acts: [{ id: 'lucan', a: [40, -10], blade: 1, fx: -1, fy: .3, poses: [[0, ACT.low, 6]] }], cap: 'DAWN, AND BANNERS. A KEEP OF GREY STONE ON THE END OF A RIDGE.' },
+  // 2. the boy: still, then his head comes round to the far side of the field
+  { d: 2.6, ...cu(40, -10, 1.8, 2.5, 18), cel: 'turn', acts: [{ id: 'lucan', a: [40, -10], blade: 1, fx: -1, fy: .3, poses: [[0, ACT.low, 6], [.5, ACT.lowTurn, 4], [.85, ACT.low, 4]] }], cap: 'A BOY STANDS UNDER THE BANNERS WITH A BLADE HELD LOW. HE IS EIGHTEEN. HE HAS NEVER BEEN HIT BY ANYTHING HE COULD NOT SEE COMING.' },
+  // 3-4. her: she looks at her son
+  { d: 3.0, cel: 'turn', cam: [14, 110, 84, 200, .5], to: [0, 84, 88, 200, .52], lin: 1, acts: [], cap: 'ON A WHITE PLATFORM A WOMAN SITS IN A CHAIR WITH HER HANDS FOLDED, AND WATCHES HIM.' },
+  { d: 2.2, cel: 'turn', cam: [0, 84, 88, 200, .52], to: [0, 52, 92, 200, .56], lin: 1, acts: [], cap: 'THE LAST DAY. HER SON HOLDS THE KEEP.' },
+  // 5. him: head down, hand on the washer; then he looks up at the keep
+  { d: 3.0, ...cu(-40, 4, 1.9, 2.8, -16), music: 'duel', cel: 'front', acts: [{ id: 'kael2', a: [-40, 4], blade: 1, fx: 1, fy: -.2, aura: 1, poses: [[0, ACT.washer, 5], [.62, ACT.washerUp, 4]] }], cap: 'I AM IN THEIR PLATE, WITH A WHITE CLOAK OVER IT THAT IS NOT MINE. UNDER IT, ON A CORD, A BRASS WASHER.' },
+  // 6. the first cut: he closes and cuts; I slip it
+  { d: 1.8, cam: [-10, 150, 56, 170], to: [6, 132, 52, 186], sfx: 'swing', shake: .2, cel: 'front',
+    acts: [{ id: 'lucan', blade: 1, a: [34, -6], fx: -1, fy: .2, path: [[0, 34, -6], [.3, 10, -2], [1, 8, -2]], faceTo: 'kael2', poses: [[0, ACT.ready, 14]], sts: [[.26, 'atk', { dur: .34, combo: 1 }]] },
+           { id: 'kael2', blade: 1, a: [-12, 4], fx: 1, fy: -.2, aura: 1, path: [[0, -12, 4], [.24, -12, 4], [.42, -22, 20], [1, -24, 20]], faceTo: 'lucan', poses: [[0, ACT.ready, 12], [.26, ACT.slip, 30], [.6, ACT.ready, 10]] }],
+    cap: 'THE FIRST CUT COMES IN OUT OF THE SUN, AND I AM NOT THERE.' },
+  // 7. the second: I go under it and through
+  { d: 1.8, cam: [6, 132, 52, 186], to: [-4, 124, 50, 196], sfx: 'swing2', shake: .2,
+    acts: [{ id: 'lucan', blade: 1, a: [8, -2], fx: -1, fy: .4, faceTo: 'kael2', poses: [[0, ACT.ready, 14]], sts: [[.2, 'atk', { dur: .34, combo: 2 }]] },
+           { id: 'kael2', blade: 1, a: [-24, 20], fx: 1, fy: -.4, aura: 2, path: [[0, -24, 20], [.16, -22, 18], [.5, -13, 8], [1, -14, 8]], faceTo: 'lucan', poses: [[0, ACT.ready, 12], [.16, ACT.through, 26], [.56, ACT.ready, 12]] }],
+    cap: 'THE SECOND COMES, AND I STEP THROUGH IT.' },
+  // 8. the trade: mine lands and he rocks; his lands and I rock
+  { d: 2.0, cam: [-4, 124, 50, 196], to: [4, 118, 48, 204], shake: .3,
+    acts: [{ id: 'lucan', blade: 1, a: [14, -2], fx: -1, fy: .2, faceTo: 'kael2', path: [[0, 14, -2], [.2, 14, -2], [.3, 19, -3], [.5, 15, -2], [1, 15, -2]], poses: [[0, ACT.ready, 14]], sts: [[.19, 'hurt', { dur: .3, kx: 80, ky: -10 }], [.55, 'atk', { dur: .34, combo: 1 }]] },
+           { id: 'kael2', blade: 1, a: [-4, 2], fx: 1, fy: -.2, aura: 2, faceTo: 'lucan', path: [[0, -4, 2], [.6, -4, 2], [.7, -10, 4], [1, -7, 3]], poses: [[0, ACT.ready, 14]], sts: [[.12, 'atk', { dur: .34, combo: 2 }], [.62, 'hurt', { dur: .3, kx: -80, ky: 10 }]] }],
+    cap: 'I HIT, AND HE TAKES IT. HE HITS, AND I TAKE IT.' },
+  // 9. the pressure: bent over it, breathing; then the head comes up
+  { d: 2.6, ...cu(-6, 2, 1.9, 3.0, -14), sfx: 'fury', bolt: 1, tint: 'rgba(160,20,0,.14)', acts: [{ id: 'kael2', a: [-6, 2], blade: 1, fx: .5, fy: .9, aura: 3, poses: [[0, ACT.heave, 9], [.3, Object.assign({}, ACT.heave, { cr: 4.6 }), 5], [.5, ACT.heave, 5], [.72, ACT.headUp, 7]] }], cap: 'UNDER MY RIBS A PRESSURE STARTS, LOW, THE WAY A SEAL STARTS TO LIFT BEFORE ANYBODY HEARS IT.' },
+  // 10. the rise: coil, then the ground drops off; he watches it happen and gives a step
+  { d: 2.0, cam: [0, 170, 60, 170, .34], to: [0, 190, 120, 160, .52], speed: 1, sfx: 'dash',
+    acts: [{ id: 'lucan', blade: 1, a: [14, -2], fx: -1, fy: .2, faceTo: 'kael2', path: [[0, 14, -2], [.3, 14, -2], [.6, 22, -4], [1, 22, -4]], poses: [[0, ACT.ready, 12], [.3, ACT.backStep, 12], [.7, ACT.lookUp, 8]] },
+           { id: 'kael2', blade: 1, a: [-6, 2], fx: 1, fy: -.2, aura: 3, zs: [[0, 0], [.26, 0], [1, 92]], zease: 'out', poses: [[0, ACT.coil, 22], [.26, ACT.rise, 30], [.8, ACT.hover, 8]] }],
+    cap: 'I GO UP. THE GROUND DROPS OFF ME.' },
+  // 11. the hang: the blade goes up over my head, slowly; below, he has not moved; she turns her face up
+  { d: 3.0, cel: 'up', cam: [0, 190, 120, 160, .52], to: [4, 178, 134, 166, .56], lin: 1,
+    acts: [{ id: 'lucan', blade: 1, a: [22, -4], fx: -1, fy: .2, faceTo: 'kael2', poses: [[0, ACT.lookUp, 8]] },
+           { id: 'kael2', blade: 1, a: [-6, 2], fx: 1, fy: -.2, aura: 3, zs: [[0, 92], [.5, 97], [1, 95]], poses: [[0, ACT.hover, 6], [.4, ACT.hoverUp, 3]] }],
+    cap: 'THE WOMAN IN THE CHAIR TURNS HER HEAD, ONLY HER HEAD, TO FOLLOW.' },
+  // 12. the dive: he gets his guard up; I land on it and he gives ground
+  { d: 1.3, cel: 'front', cam: [0, 200, 130, 160, .5], to: [6, 150, 58, 180, .34], speed: 1, sfx: 'roar', shake: .6, flash: 1,
+    acts: [{ id: 'lucan', blade: 1, a: [22, -4], fx: -1, fy: .2, faceTo: 'kael2', path: [[0, 22, -4], [.72, 22, -4], [.86, 30, -5], [1, 30, -5]], poses: [[0, ACT.lookUp, 12], [.2, ACT.brace, 22]], sts: [[.72, 'hurt', { dur: .3, kx: 90, ky: -10 }]] },
+           { id: 'kael2', blade: 1, a: [-6, 2], fx: 1, fy: -.2, aura: 4, path: [[0, -6, 2], [.7, 10, -2], [1, 12, -3]], zs: [[0, 95], [.7, 3], [.76, 0], [1, 0]], zease: 'in', poses: [[0, ACT.hoverUp, 14]], sts: [[0, 'plunge', { dur: 9, until: .7 }], [.7, 'atk', { dur: .34, combo: 3 }]] }],
+    cap: 'THEN I COME DOWN ON HIM.' },
+  // 13. the count: one blow on each number; his guard comes down a little with every one
+  { d: 6.4, cam: [18, 150, 56, 176, .33], to: [34, 118, 48, 200, .34], lin: 1, count: COUNT_N, tint: 'rgba(120,10,0,.16)',
+    acts: [{ id: 'lucan', blade: 1, a: [30, -5], fx: -1, fy: .2, faceTo: 'kael2', path: [[0, 30, -5], [1, 52, -8]], poses: [[0, ACT.beaten1, 16], [.4, ACT.beaten2, 6], [.78, ACT.beaten3, 6]], sts: countLucan },
+           { id: 'kael2', blade: 1, a: [12, -3], fx: 1, fy: -.2, aura: 4, faceTo: 'lucan', path: [[0, 12, -3], [1, 34, -6]], poses: [[0, ACT.ready, 16]], sts: countKael }],
+    cap: 'I KNOW HOW MANY THERE WILL BE. THERE ARE ALWAYS ELEVEN.' },
+  // 14. the last one: he is on a knee with his face up; the blade goes over my head, and starts down
+  { d: 1.7, cam: [40, 124, 62, 185, .4], to: [44, 104, 58, 200, .42], bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)',
+    acts: [{ id: 'lucan', blade: 1, a: [52, -8], fx: -1, fy: .2, faceTo: 'kael2', poses: [[0, ACT.kneelUp, 12]] },
+           { id: 'kael2', blade: 1, a: [34, -6], fx: 1, fy: -.2, aura: 4, faceTo: 'lucan', poses: [[0, ACT.ready, 16], [.1, ACT.overhead, 9]], sts: [[.86, 'atk', { dur: .5, combo: 3, t0: .05 }]] }],
+    cap: 'THE BLADE COMES DOWN.' },
   { d: 0.5, black: 1, flash: 1, sfx: 'hit', shake: .6 }
 ];
 const CH1_KEEP_FILM = () => ({ bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'dawn', cineOnly: 1, film: 1, hero: { id: 'kael2', cape: CLOAK }, intro: CH1_KEEP_SHOTS, foes: [] });
@@ -239,8 +310,31 @@ const CH1_KEEP = [
   { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { music: null },
   { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, tr: 'furnace', min: 1.6, max: 5 }
 ];
-// a film actor can leave the ground: za -> zb over the shot (the game's films never needed it; the chapter does)
-{ const f0 = Brawl.fighter; Brawl.fighter = function (g, o, opt) { const k = opt && opt.key, c = this.cine; if (k && k.za !== undefined && c) { const q = Math.min(1, c.t / c.dur), e = k.zease === 'in' ? q * q : 1 - Math.pow(1 - q, 2), zb = k.zb === undefined ? k.za : k.zb; o.z = k.za + (zb - k.za) * e; o.vz = zb > k.za ? 1 : -1; } return f0.call(this, g, o, opt); }; }
+// the acting layer: reads an actor's performance each frame and sets what the game's own rig then draws
+{ const f0 = Brawl.fighter; Brawl.fighter = function (g, o, opt) {
+    const k = opt && opt.key, c = this.cine;
+    if (k && c && (k.path || k.zs || k.poses || k.sts || k.faceTo || k.za !== undefined)) {
+      const q = Math.min(1, c.t / c.dur), now = c.t;
+      if (k.path) { const [A, B, u] = kq(k.path, q); const x = A[1] + (B[1] - A[1]) * u, y = A[2] + (B[2] - A[2]) * u; k._sp = k._lt !== undefined && now > k._lt ? Math.hypot(x - k._x, y - k._y) / (now - k._lt) : 0; k._x = x; k._y = y; k._lt = now; k.x = x; k.y = y; o.x = x; o.y = y; if (k._sp > 14) { k._an = (k._an || 0) + Math.min(.05, Math.max(0, now - (k._la || now))); opt.run = true; } else opt.run = false; k._la = now; o.anim = k._an || 0; }
+      if (k.zs) { const [A, B, u0] = kq(k.zs, q), u = k.zease === 'in' ? u0 * u0 : k.zease === 'out' ? 1 - Math.pow(1 - u0, 2) : u0; o.z = A[1] + (B[1] - A[1]) * u; o.vz = B[1] >= A[1] ? 1 : -1; if (o.z > 1) opt.run = false; }
+      else if (k.za !== undefined) { const e = k.zease === 'in' ? q * q : 1 - Math.pow(1 - q, 2), zb = k.zb === undefined ? k.za : k.zb; o.z = k.za + (zb - k.za) * e; o.vz = zb > k.za ? 1 : -1; }
+      if (k.faceTo) { const other = c.acts.find(a => a.id === k.faceTo); if (other) { const dx = other.x - o.x, dy = other.y - o.y, d = Math.hypot(dx, dy) || 1; o.fx = dx / d; o.fy = dy / d; o.ax = o.fx; o.ay = o.fy; } }
+      k._pose = null; if (k.poses) { let cur = k.poses[0]; for (const e of k.poses) if (q >= e[0]) cur = e; k._pose = cur[1]; k._rate = cur[2] || 10; }
+      o.swing = 0; o.guardT = 0;
+      if (k.sts) for (const e of k.sts) { const t0 = e[0] * c.dur, m = e[2] || {}, end = m.until !== undefined ? m.until * c.dur : t0 + (m.dur || .3); if (now >= t0 && now < end) { if (e[1] === 'guard') o.guardT = 1; else { o.st = e[1]; o.t = now - t0 + (m.t0 || 0); if (m.combo) o.combo = m.combo; if (m.kx !== undefined) { o.kx = m.kx; o.ky = m.ky || 0; } } } }
+      if (k.rage) opt.rage = k.rage;
+    }
+    return f0.call(this, g, o, opt); }; }
+// a held pose lies over whatever the rig would have done, except while a cut or a blow is playing
+{ const t0 = G3.target; G3.target = function (o, opt, st, blade, mv, t, idx) { const r = t0.call(this, o, opt, st, blade, mv, t, idx), k = opt && opt.key; if (k && k._pose && st !== 'atk' && st !== 'hurt' && st !== 'plunge' && !mv) { Object.assign(r[0], k._pose); r[1] = k._rate || 10; r[2] = .8; } return r; }; }
+// she is drawn flat on the dais; three drawings of her let her look at her son, and up
+const CEL = { cache: {}, draw(kind) { if (this.cache[kind]) return this.cache[kind]; const base = daisSprite('cel'); if (kind === 'front') return (this.cache[kind] = base); const c = document.createElement('canvas'); c.width = base.width; c.height = base.height; const g = c.getContext('2d'); g.drawImage(base, 0, 0);
+    const HR = '#f6eac0', SK = '#f4e6dc', SK2 = '#d2c6bd';
+    if (kind === 'turn') { g.fillStyle = HR; g.fillRect(18, 13, 8, 12); g.drawImage(base, 18, 13, 8, 11, 20, 13, 8, 11); g.fillStyle = SK2; g.fillRect(20, 24, 6, 2); g.fillStyle = HR; g.fillRect(15, 12, 5, 12); }
+    else if (kind === 'up') { g.fillStyle = HR; g.fillRect(15, 1, 14, 10); g.drawImage(base, 14, 3, 16, 9, 14, 1, 16, 9); g.fillStyle = HR; g.fillRect(18, 10, 8, 3); g.drawImage(base, 18, 13, 8, 9, 18, 11, 8, 9); g.fillStyle = SK; g.fillRect(18, 20, 8, 4); g.fillStyle = SK2; g.fillRect(19, 23, 6, 3); g.fillStyle = '#8a5a4a'; g.fillRect(20, 20, 4, 1); }
+    return (this.cache[kind] = c); },
+  set(kind) { const L = G3.bbs && G3.bbs.keep; if (!L) return; const i = L.findIndex(b => b.tag === 'dais' && b.x === 0); if (i < 0 || L[i]._kind === kind) return; this.ent = this.ent || {}; if (!this.ent[kind]) this.ent[kind] = Object.assign({}, L[i], { cv: this.draw(kind), tex: null, _kind: kind }); if (!L[i]._kind) { L[i]._kind = 'front'; this.ent.front = L[i]; } L[i] = this.ent[kind]; } };
+{ const r0 = Brawl.renderCine; Brawl.renderCine = function (g) { const c = this.cine, s = c && c.shots[c.i]; if (s && s.cel && this.def.bg === 'keep') CEL.set(s.cel); return r0.call(this, g); }; }
 
 // ============================================================
 // CHAPTER ONE, BELOW — the same story as CH1_NEW, told the way the Assay is told: a film.
