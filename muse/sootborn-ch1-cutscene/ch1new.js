@@ -272,7 +272,7 @@ const quiet4 = (va, ve, T) => VS(va, ve, { cam: [(lx(4) + kx(4)) / 2 - 10, 170, 
   sfxs: T.flatMap(t => [[t, 'heart'], [t + .16, 'hit']]), shakes: T.map(t => [t + .16, .22]), fxs: T.flatMap((t, i) => [[t + .15, 'spark', (lx(4 + i) + kx(4 + i)) / 2 + 5, -4, '#ffe9a0', 12, 30], [t + .15, 'kick', .05]]),
   acts: [L({ a: [lx(3), -5], faceTo: 'kael2', path: [[0, lx(3), -5]].concat(T.flatMap((t, i) => [[t + .16, lx(3 + i), -5], [t + .45, lx(4 + i), -5]])).concat([[ve - va, lx(7), -5]]), poses: [[0, ACT.beaten1, 16], [T[0] + .2, ACT.beaten2, 6]], sts: T.map(t => [t + .16, 'hurt', { dur: .2, kx: 70, ky: -8 }]) }),
          K({ a: [kx(3), -3], aura: 4, faceTo: 'lucan', path: [[0, kx(3), -3]].concat(T.flatMap((t, i) => [[t, kx(3 + i), -3], [t + .3, kx(4 + i), -3]])).concat([[ve - va, kx(7), -3]]), poses: [[0, ACT.ready, 16]], sts: T.map((t, i) => [t, 'atk', { dur: .36, combo: 1 + (i % 2) }]) })],
-  caps: [[.3, 'I KNOW HOW MANY THERE WILL BE.'], [2.3, 'THERE ARE ALWAYS ELEVEN.']] });
+  caps: [[.3, 'I KNOW HOW MANY THERE WILL BE.'], [2.3, 'THERE ARE ALWAYS ELEVEN.']], mems: [[2.45, 3.05, 'furnace', 1, '255,90,30']] });
 // looking straight down: he comes up at the camera and the field shrinks under him
 const DOWN_SHOT = { cam: [-52, 20, 190, 110, -6], to: [-52, 20, 340, 110, -6], lin: 1, speed: 1,
   acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 7]] }), K({ a: [-52, 12], aura: 3, zs: [[0, 60], [1.85, 94]], zease: 'out', poses: [[0, ACT.rise, 20], [1.0, ACT.hover, 5]] })],
@@ -299,7 +299,7 @@ const CH1_KEEP_SHOTS = [
   // "I am in their plate, with a white cloak over it that is not mine."  the last steps; he looks at his own arm, then back at the cloak
   VS(23.0, 27.4, { cel: 'front', cam: [-70, 132, 50, 186, .34], to: [-62, 112, 48, 198, .35], lin: 1, acts: [K({ a: [-58, 8], fx: .75, fy: .65, aura: 1, poses: [[0, ACT.stand, 5], [.3, ACT.lookArm, 5], [1.7, ACT.lookCloak, 4], [3.7, ACT.stand, 4]] })], caps: [[.3, 'I AM IN THEIR PLATE,'], [1.8, 'WITH A WHITE CLOAK OVER IT THAT IS NOT MINE.']] }),
   // "Under it, on a cord, a brass washer."
-  VS(27.4, 31.1, { ...cu(-58, 8, 2.2, 3.3, -8), acts: [K({ a: [-58, 8], fx: .35, fy: .95, aura: 1, poses: [[0, ACT.stand, 5], [.35, ACT.washerUp, 5], [2.3, ACT.washer, 4], [3.3, ACT.washerUp, 6]] })], caps: [[.3, 'UNDER IT, ON A CORD,'], [2.35, 'A BRASS WASHER.']] }),
+  VS(27.4, 31.1, { ...cu(-58, 8, 2.2, 3.3, -8), mems: [[2.3, 3.3, 'hands', 0, '255,210,110']], sfxs: [[2.3, 'cutin']], acts: [K({ a: [-58, 8], fx: .35, fy: .95, aura: 1, poses: [[0, ACT.stand, 5], [.35, ACT.washerUp, 5], [2.3, ACT.washer, 4], [3.3, ACT.washerUp, 6]] })], caps: [[.3, 'UNDER IT, ON A CORD,'], [2.35, 'A BRASS WASHER.']] }),
   // "The first cut comes in out of the sun, and I am not there."
   VS(31.1, 34.25, { music: 'duel', cam: [-14, 180, 64, 164, .32], to: [-64, 142, 54, 186, .33], sfxs: [[1.65, 'swing']], shakes: [[1.75, .2]], fxs: [[1.75, 'spark', -62, 8, '#e8e4f0', 8, 4], [1.75, 'kick', .04]], cams: [[1.45, [-62, 34, 170, 120, -3], [-66, 34, 150, 124, -3], 2.35]],
     acts: [L({ a: [40, -10], faceTo: 'kael2', path: [[0, 40, -10], [.15, 40, -10], [1.55, -36, 6], [2.0, -56, 7], [3.15, -56, 7]], poses: [[0, ACT.ready, 10], [2.0, ACT.through, 10], [2.5, ACT.lowTurn, 6]], sts: [[1.55, 'atk', { dur: .4, combo: 1 }]] }),
@@ -327,7 +327,7 @@ const CH1_KEEP_SHOTS = [
   // "Under my ribs a pressure starts, low,"
   VS(40.7, 43.75, { ...cu(-52, 12, 1.9, 2.5, -12), acts: [K({ a: [-52, 12], fx: .5, fy: .9, aura: 2, poses: [[0, ACT.spent, 6], [.3, ACT.ribs, 6], [2.35, ACT.ribsLow, 6]] })], caps: [[.2, 'UNDER MY RIBS A PRESSURE STARTS,'], [2.38, 'LOW,']] }),
   // "the way a seal starts to lift before anybody hears it."
-  VS(43.75, 47.05, { cam: [-44, 150, 50, 176, .34], to: [-42, 128, 48, 190, .35], lin: 1, sfx: 'fury', bolt: 1, tint: 'rgba(160,20,0,.14)', shakes: [[1.1, .15], [2.2, .2]], fxs: [[1.1, 'ring', -52, 12, '#ff7a30', 30], [2.2, 'ring', -52, 12, '#ffb040', 50], [2.2, 'spark', -52, 12, '#ffb040', 8, 2]],
+  VS(43.75, 47.05, { cam: [-44, 150, 50, 176, .34], to: [-42, 128, 48, 190, .35], lin: 1, sfx: 'fury', bolt: 1, tint: 'rgba(160,20,0,.14)', mems: [[.95, 1.3, 'furnace', 1, '255,90,30'], [2.0, 2.35, 'tin', 0, '255,210,110']], sfxs: [[.95, 'cutin'], [2.0, 'cutin']], shakes: [[1.1, .15], [2.2, .2]], fxs: [[1.1, 'ring', -52, 12, '#ff7a30', 30], [2.2, 'ring', -52, 12, '#ffb040', 50], [2.2, 'spark', -52, 12, '#ffb040', 8, 2]],
     acts: [L({ a: [-28, 1], faceTo: 'kael2', path: [[0, -28, 1], [1.3, -28, 1], [2.0, -18, -1], [3.3, -18, -1]], poses: [[0, ACT.ready, 10], [1.3, ACT.backStep, 9], [2.2, ACT.ready, 7]] }),
            K({ a: [-52, 12], fx: .8, fy: -.2, aura: 3, poses: [[0, ACT.ribsLow, 6], [.6, ACT.ribs, 3], [1.7, ACT.heave, 4], [2.5, ACT.headUp, 6]] })],
     caps: [[.15, 'THE WAY A SEAL STARTS TO LIFT BEFORE ANYBODY HEARS IT.']] }),
@@ -376,7 +376,7 @@ const CH1_KEEP_SHOTS = [
   // black. the hit; the music goes; two heartbeats; then nothing, before the card
   { d: 3.6, vd: 3.6, black: 1, flash: 1, sfx: 'hit', shake: .6, fxs: [[.05, 'fn', () => Sound.music(null)], [1.1, 'fn', () => Sound.play('heart')], [2.3, 'fn', () => Sound.play('heart')]] }
 ];
-const MEM_AT = 40.7, MEM = 19.61, FORD = { bg: 'ford', tint: 'rgba(30,40,90,.34)' };
+const MEM_AT = 40.7, MEM = 19.61, FORD = { bg: 'ford', tint: 'rgba(30,40,90,.3)', memo: '150,190,255' };
 for (const sh of CH1_KEEP_SHOTS) if (sh.va !== undefined && sh.va >= MEM_AT - .01) sh.va += MEM;
 { const i = CH1_KEEP_SHOTS.findIndex(sh => sh.va !== undefined && sh.va >= MEM_AT + MEM - .01), M = (a, b, o) => VS(MEM_AT + a, MEM_AT + b, Object.assign({}, FORD, o));
   const lu = (o) => Object.assign({ id: 'lucan', a: [26, -14], fx: -1, fy: .5, blade: 0, poses: [[0, ACT.stand, 5]] }, o), open = Object.assign({}, ACT.stand, { lp: -.35, ly: .5, le: -.5, rp: -.35, ry: -.5, re: -.5, hx: -.05 }), ask = Object.assign({}, ACT.stand, { hx: -.08, hy: .35, lp: -.5, le: -.9, ly: .2 });
@@ -396,13 +396,13 @@ for (const sh of CH1_KEEP_SHOTS) if (sh.va !== undefined && sh.va >= MEM_AT - .0
   CH1_KEEP_SHOTS[i + 5].flash = 1; }
 // ---- the voice. The read is the clock: while it plays, the film's time is the audio's time, so picture and voice cannot drift.
 const VO = { a: null, on: false, off: false,
-  start() { if (this.off) return; try { if (!this.a) { this.a = new Audio(CH1_VO_SRC); this.a.preload = 'auto'; } this.a.currentTime = 0; this.a.volume = 1; this.vt = 0; this.last = -1; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
+  start() { if (this.off) return; try { if (!this.a) { this.a = new Audio(CH1_VO_SRC); this.a.preload = 'auto'; } this.a.currentTime = 0; this.a.volume = 1; this.vt = 0; this.last = -1; this.still = 0; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
   stop() { SUB.hide(); if (!this.on) return; this.on = false; try { this.a.pause(); } catch (e) { } Sound.setVol(); },
   live() { return this.on && this.a && !this.a.paused && !this.a.ended && this.a.currentTime > 0; } };
 { const n1 = Brawl.nextShot; Brawl.nextShot = function () { n1.call(this); const c = this.cine, s = c && c.shots[c.i]; if (s && s.vd) c.dur = s.vd; if (c) c._fx = 0; };
   const u0 = Brawl.updCine; Brawl.updCine = function (dt) { const c = this.cine, s = c.shots[c.i], i0 = c.i;
     if (s.va === 0 && !VO.on && c.t === 0) VO.start();
-    if (s.va !== undefined && VO.on) { VO.vt += dt; const a = VO.a; if (a && !a.paused && !a.ended) { const ct = a.currentTime; if (ct !== VO.last) { VO.last = ct; if (Math.abs(ct - VO.vt) < .35) VO.vt = ct; else { try { a.currentTime = VO.vt; } catch (e) { } } } } c.t = Math.max(0, VO.vt - s.va - dt); }
+    if (s.va !== undefined && VO.on) { VO.vt += dt; const a = VO.a; if (a && !a.paused && !a.ended) { const ct = a.currentTime; if (ct !== VO.last) { VO.last = ct; if (VO.still > .6 && VO.vt - ct > .35) { try { a.currentTime = VO.vt; } catch (e) { } } else VO.vt = ct; VO.still = 0; } else VO.still = (VO.still || 0) + dt; } c.t = Math.max(0, VO.vt - s.va - dt); }
     const tA = c.t; u0.call(this, dt);
     if (!this.cine) return VO.stop();
     const c2 = this.cine; if (c2.i === i0) { const tB = c2.t; if (s.sfxs) for (const e of s.sfxs) if (e[0] > tA && e[0] <= tB || (tA === 0 && e[0] === 0)) Sound.play(e[1]); if (s.shakes) for (const e of s.shakes) if (e[0] > tA && e[0] <= tB) this.shake = e[1]; if (s.fxs) for (const e of s.fxs) if (e[0] > tA && e[0] <= tB) { const a = e.slice(2); if (e[1] === 'spark') this.spark(...a); else if (e[1] === 'ring') this.ring(...a); else if (e[1] === 'kick') c2._kick = a[0]; else if (e[1] === 'fn') a[0](); } }
@@ -420,6 +420,13 @@ const CH1_KEEP = [
   { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, tr: 'furnace', min: 1.6, max: 5 }
 ];
 const STAB = {};
+// memories, the way the fights do them: a painted panel slides in under a MEMORY tag with scan lines (mems: [[from, to, panel, stage, rgb]]);
+// and the same dress for a whole 3D shot that is a memory (memo: 'r,g,b')
+const MEMFX = (B, g, c, s) => {
+  if (s.mems) for (const m of s.mems) if (c.t >= m[0] && c.t < m[1]) { const keep = B.art; B.art = { a: { panel: m[2], stage: m[3] || 0, line: '', rgb: m[4], name: '' }, t: c.t - m[0], C: 99 }; try { B.renderArt(g); } catch (e) { } B.art = keep; const out = m[1] - c.t; if (out < .1) { g.fillStyle = `rgba(255,255,255,${(1 - out * 10) * .8})`; g.fillRect(0, 0, W, H); } }
+  if (s.memo) { const rgb = s.memo, t = c.t; g.fillStyle = `rgba(${rgb},.10)`; g.fillRect(0, 14, W, H - 28); for (let y = 14 + ((VO.vt * 30) % 4 | 0); y < H - 14; y += 4) { g.fillStyle = 'rgba(0,0,0,.13)'; g.fillRect(0, y, W, 1); }
+    const vg = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, W * .7); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.72)'); g.fillStyle = vg; g.fillRect(0, 14, W, H - 28);
+    const tag = 'M E M O R Y'; g.fillStyle = `rgb(${rgb})`; g.fillRect(8, 2, ptextW(tag) + 8, 10); ptext(g, tag, 12, 5, '#07050a'); } };
 // subtitles for the voiced film: a serif italic set over the picture, no box; the counted numbers in the same face
 const SUB = { el: null, big: null, key: null, t0: 0,
   sent(t) { t = t.toLowerCase().replace(/(^[\u201c]?|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase()).replace(/\bi\b/g, 'I'); return t; },
@@ -454,7 +461,7 @@ const CEL = { cache: {}, draw(kind) { if (this.cache[kind]) return this.cache[ki
     else if (kind === 'up') { g.fillStyle = HR; g.fillRect(15, 1, 14, 10); g.drawImage(base, 14, 3, 16, 9, 14, 1, 16, 9); g.fillStyle = HR; g.fillRect(18, 10, 8, 3); g.drawImage(base, 18, 13, 8, 9, 18, 11, 8, 9); g.fillStyle = SK; g.fillRect(18, 20, 8, 4); g.fillStyle = SK2; g.fillRect(19, 23, 6, 3); g.fillStyle = '#8a5a4a'; g.fillRect(20, 20, 4, 1); }
     return (this.cache[kind] = c); },
   set(kind) { const L = G3.bbs && G3.bbs.keep; if (!L) return; const i = L.findIndex(b => b.tag === 'dais' && b.x === 0); if (i < 0 || L[i]._kind === kind) return; this.ent = this.ent || {}; if (!this.ent[kind]) this.ent[kind] = Object.assign({}, L[i], { cv: this.draw(kind), tex: null, _kind: kind }); if (!L[i]._kind) { L[i]._kind = 'front'; this.ent.front = L[i]; } L[i] = this.ent[kind]; } };
-{ const r0 = Brawl.renderCine; Brawl.renderCine = function (g) { const c = this.cine, s = c && c.shots[c.i]; if (s && this.def.bg === 'keep') { let kind = s.cel; if (s.cels) for (const e of s.cels) if (c.t >= e[0]) kind = e[1]; if (kind) CEL.set(kind); } if (s && s.caps) { let cp = ''; for (const e of s.caps) if (c.t >= e[0]) cp = e[1]; s.cap = undefined; SUB.show(cp, s.va + '|' + cp, s.mem); } else if (s && (s.va !== undefined || c.shots === CH1_KEEP_SHOTS)) SUB.show('', ''); if (s && s.va !== undefined && s.big) { s._big = s.big; s._bigC = s.bigC; s.big = undefined; } SUB.num(s && s._big ? s._big : '', s && s._bigC, c ? c.t : 0); return r0.call(this, g); }; }
+{ const r0 = Brawl.renderCine; Brawl.renderCine = function (g) { const rr = this._rc0(g), c9 = this.cine, s9 = c9 && c9.shots[c9.i]; if (s9) MEMFX(this, g, c9, s9); return rr; }; Brawl._rc0 = function (g) { const c = this.cine, s = c && c.shots[c.i]; if (s && this.def.bg === 'keep') { let kind = s.cel; if (s.cels) for (const e of s.cels) if (c.t >= e[0]) kind = e[1]; if (kind) CEL.set(kind); } if (s && s.caps) { let cp = ''; for (const e of s.caps) if (c.t >= e[0]) cp = e[1]; s.cap = undefined; SUB.show(cp, s.va + '|' + cp, s.mem); } else if (s && (s.va !== undefined || c.shots === CH1_KEEP_SHOTS)) SUB.show('', ''); if (s && s.va !== undefined && s.big) { s._big = s.big; s._bigC = s.bigC; s.big = undefined; } SUB.num(s && s._big ? s._big : '', s && s._bigC, c ? c.t : 0); return r0.call(this, g); }; }
 
 // ============================================================
 // CHAPTER ONE, BELOW — the same story as CH1_NEW, told the way the Assay is told: a film.
