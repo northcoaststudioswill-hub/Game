@@ -9032,9 +9032,9 @@ Object.assign(ACT, {
 const VS = (va, ve, o) => Object.assign({ va, vd: ve - va, d: ve - va, sec: 1 }, o);
 const L = (o) => Object.assign({ id: 'lucan', blade: 1, fx: -1, fy: .2 }, o), K = (o) => Object.assign({ id: 'kael2', blade: 1, fx: 1, fy: -.2 }, o);
 // the count: blow n lands with Lucan at lx(n), Kael at kx(n); his guard is lower every time
-const lx = (n) => 30 + 2.2 * n, kx = (n) => 12 + 2.2 * n, guardOf = (n) => n < 4 ? ACT.beaten1 : n < 8 ? ACT.beaten2 : ACT.beaten3;
-const blow = (va, ve, n, word, camo) => VS(va, ve, Object.assign({ big: word, bigC: '#ff8a3c', tint: 'rgba(120,10,0,.16)', sfxs: [[.1, 'heart'], [.24, 'hit']], shakes: [[.24, .28]],
-  acts: [L({ a: [lx(n - 1), -5], faceTo: 'kael2', path: [[0, lx(n - 1), -5], [.24, lx(n - 1), -5], [.5, lx(n), -5]], poses: [[0, guardOf(n), 16]], sts: [[.24, 'hurt', { dur: .2, kx: 70, ky: -8 }]] }),
+const lx = (n) => 30 + 2.2 * n, kx = (n) => 5 + 2.2 * n, guardOf = (n) => n < 4 ? ACT.beaten1 : n < 8 ? ACT.beaten2 : ACT.beaten3;
+const blow = (va, ve, n, word, camo) => VS(va, ve, Object.assign({ big: word, bigC: '#ff8a3c', tint: 'rgba(120,10,0,.16)', sfxs: [[.1, 'heart'], [.24, 'hit']], shakes: [[.24, .28]], fxs: [[.23, 'spark', (lx(n) + kx(n)) / 2 + 5, -4, '#ffe9a0', 12, 30], [.23, 'spark', (lx(n) + kx(n)) / 2 + 5, -4, '#ff8a3c', 6, 28], [.23, 'kick', .07]].concat(n === 10 ? [[.23, 'ring', lx(n), -5, '#ffe08a', 60]] : []),
+  acts: [L({ a: [lx(n - 1), -5], faceTo: 'kael2', path: [[0, lx(n - 1), -5], [.24, lx(n - 1), -5], [.5, lx(n), -5]], poses: [[0, guardOf(n), 16]].concat(n === 10 ? [[.45, ACT.kneelUp, 10]] : []), sts: [[.24, 'hurt', { dur: .2, kx: 70, ky: -8 }]] }),
          K({ a: [kx(n - 1), -3], aura: 4, faceTo: 'lucan', path: [[0, kx(n - 1), -3], [.3, kx(n), -3]], poses: [[0, ACT.ready, 16]], sts: [[.08, 'atk', { dur: .36, combo: 1 + (n % 3) }]] })] }, camo));
 const side = (n, h) => ({ cam: [(lx(n) + kx(n)) / 2 - 6, 138, h || 54, 182, .33], to: [(lx(n) + kx(n)) / 2 - 2, 128, (h || 54) - 2, 190, .33], lin: 1 });
 const CH1_KEEP_SHOTS = [
@@ -9061,29 +9061,29 @@ const CH1_KEEP_SHOTS = [
   // "Under it, on a cord, a brass washer."  the hand goes to his chest; the head goes down; then it comes up
   VS(29.2, 32.95, { ...cu(-56, 8, 2.0, 2.9, -12), acts: [K({ a: [-56, 8], aura: 1, poses: [[0, ACT.stand, 5], [.4, ACT.washerUp, 5], [2.2, ACT.washer, 4], [3.3, ACT.washerUp, 6]] })], caps: [[.4, 'UNDER IT, ON A CORD,'], [2.25, 'A BRASS WASHER.']] }),
   // "The first cut comes in out of the sun, and I am not there."  he runs the length of the field; I do not move until it lands
-  VS(32.95, 37.05, { music: 'duel', cam: [-14, 180, 64, 164, .32], to: [-50, 142, 54, 186, .33], sfxs: [[2.1, 'swing']], shakes: [[2.2, .2]],
-    acts: [L({ a: [40, -10], faceTo: 'kael2', path: [[0, 40, -10], [.3, 40, -10], [2.0, -34, 4], [2.5, -40, 6], [4.1, -40, 6]], poses: [[0, ACT.ready, 10], [2.5, ACT.through, 10], [3.1, ACT.lowTurn, 6]], sts: [[2.0, 'atk', { dur: .4, combo: 1 }]] }),
-           K({ a: [-56, 8], aura: 1, path: [[0, -56, 8], [2.02, -56, 8], [2.4, -64, 26], [4.1, -66, 27]], faceTo: 'lucan', poses: [[0, ACT.washerUp, 6], [1.2, ACT.ready, 7], [2.02, ACT.slip, 30], [2.75, ACT.stand, 6]] })],
+  VS(32.95, 37.05, { music: 'duel', cam: [-14, 180, 64, 164, .32], to: [-64, 142, 54, 186, .33], sfxs: [[2.1, 'swing']], shakes: [[2.2, .2]], fxs: [[2.2, 'spark', -62, 8, '#e8e4f0', 8, 4], [2.2, 'kick', .04]],
+    acts: [L({ a: [40, -10], faceTo: 'kael2', path: [[0, 40, -10], [.3, 40, -10], [2.0, -36, 6], [2.5, -56, 7], [4.1, -56, 7]], poses: [[0, ACT.ready, 10], [2.5, ACT.through, 10], [3.1, ACT.lowTurn, 6]], sts: [[2.0, 'atk', { dur: .4, combo: 1 }]] }),
+           K({ a: [-56, 8], aura: 1, path: [[0, -56, 8], [2.02, -56, 8], [2.4, -82, 14], [4.1, -84, 14]], faceTo: 'lucan', poses: [[0, ACT.washerUp, 6], [1.2, ACT.ready, 7], [2.02, ACT.slip, 30], [2.75, ACT.stand, 6]], sts: [[2.02, 'dodge', { dur: .36 }]] })],
     caps: [[.45, 'THE FIRST CUT COMES IN OUT OF THE SUN,'], [2.7, 'AND I AM NOT THERE.']] }),
   // "The second comes, and I step through it."  he winds it up; I walk inside the arc and put a shoulder in him
-  VS(37.05, 40.1, { cam: [-48, 138, 52, 184, .33], to: [-50, 124, 50, 194, .33], sfxs: [[1.75, 'swing2'], [2.15, 'hit']], shakes: [[2.15, .3]],
-    acts: [L({ a: [-40, 6], faceTo: 'kael2', path: [[0, -40, 6], [2.12, -40, 6], [2.5, -30, 2], [3.05, -29, 2]], poses: [[0, ACT.ready, 10], [.45, ACT.brace, 5], [2.5, ACT.backStep, 10]], sts: [[1.7, 'atk', { dur: .4, combo: 1 }], [2.14, 'hurt', { dur: .3, kx: 90, ky: -20 }]] }),
-           K({ a: [-66, 27], aura: 2, faceTo: 'lucan', path: [[0, -66, 27], [1.6, -66, 27], [2.15, -50, 13], [3.05, -50, 13]], poses: [[0, ACT.stand, 6], [.5, ACT.ready, 8], [1.6, ACT.through, 22], [2.05, ACT.shove, 26], [2.6, ACT.ready, 9]] })],
+  VS(37.05, 40.1, { cam: [-68, 138, 52, 184, .33], to: [-56, 124, 50, 194, .33], sfxs: [[1.75, 'swing2'], [2.15, 'hit']], shakes: [[2.15, .3]], fxs: [[2.14, 'spark', -62, 8, '#fff', 8, 28], [2.14, 'kick', .06]],
+    acts: [L({ a: [-56, 7], faceTo: 'kael2', path: [[0, -56, 7], [2.12, -56, 7], [2.55, -34, 2], [3.05, -33, 2]], poses: [[0, ACT.ready, 10], [.45, ACT.brace, 5], [2.5, ACT.backStep, 10]], sts: [[1.7, 'atk', { dur: .4, combo: 1 }], [2.14, 'hurt', { dur: .3, kx: 90, ky: -20 }]] }),
+           K({ a: [-84, 14], aura: 2, faceTo: 'lucan', path: [[0, -84, 14], [1.6, -84, 14], [2.15, -68, 10], [3.05, -54, 12]], poses: [[0, ACT.stand, 6], [.5, ACT.ready, 8], [1.6, ACT.through, 22], [2.05, ACT.shove, 26], [2.6, ACT.ready, 9]] })],
     caps: [[.45, 'THE SECOND COMES,'], [1.65, 'AND I STEP THROUGH IT.']] }),
   // "I hit, and he takes it. He hits, and I take it."
-  VS(40.1, 45.1, { cam: [-42, 132, 50, 188, .33], to: [-38, 120, 48, 198, .33], lin: 1, sfxs: [[.6, 'hit'], [3.0, 'hit']], shakes: [[.6, .35], [3.0, .35]],
+  VS(40.1, 45.1, { cam: [-42, 132, 50, 188, .33], to: [-38, 120, 48, 198, .33], lin: 1, sfxs: [[.6, 'hit'], [3.0, 'hit']], shakes: [[.6, .35], [3.0, .35]], fxs: [[.58, 'spark', -32, 3, '#fff', 10, 30], [.58, 'kick', .07], [2.98, 'spark', -42, 8, '#fff', 10, 30], [2.98, 'kick', .07]],
     acts: [L({ a: [-30, 2], faceTo: 'kael2', path: [[0, -30, 2], [.58, -30, 2], [.85, -24, 0], [2.6, -24, 0], [2.95, -28, 1], [5, -28, 1]], poses: [[0, ACT.ready, 12], [.95, ACT.taken, 10], [1.9, ACT.ready, 6]], sts: [[.58, 'hurt', { dur: .36, kx: 90, ky: -10 }], [2.8, 'atk', { dur: .4, combo: 1 }]] }),
            K({ a: [-50, 13], aura: 2, faceTo: 'lucan', path: [[0, -50, 13], [.2, -50, 13], [.55, -44, 9], [2.98, -44, 9], [3.3, -52, 12], [5, -52, 12]], poses: [[0, ACT.ready, 12], [3.35, ACT.taken, 10], [4.2, ACT.spent, 4]], sts: [[.42, 'atk', { dur: .4, combo: 2 }], [2.98, 'hurt', { dur: .36, kx: -90, ky: 10 }]] })],
     caps: [[.4, 'I HIT,'], [1.25, 'AND HE TAKES IT.'], [2.8, 'HE HITS, AND I TAKE IT.']] }),
   // "Under my ribs a pressure starts, low,"  bent over it; the hand goes to the ribs; he sinks
   VS(45.1, 48.6, { ...cu(-52, 12, 1.9, 2.5, -12), acts: [K({ a: [-52, 12], fx: .5, fy: .9, aura: 2, poses: [[0, ACT.spent, 6], [.5, ACT.ribs, 6], [2.7, ACT.ribsLow, 5]] })], caps: [[.45, 'UNDER MY RIBS A PRESSURE STARTS,'], [2.7, 'LOW,']] }),
   // "the way a seal starts to lift before anybody hears it."  it comes up through him; across from him the boy gives a step
-  VS(48.6, 52.1, { cam: [-44, 150, 50, 176, .34], to: [-42, 128, 48, 190, .35], lin: 1, sfx: 'fury', bolt: 1, tint: 'rgba(160,20,0,.14)', shakes: [[1.2, .15], [2.4, .2]],
+  VS(48.6, 52.1, { cam: [-44, 150, 50, 176, .34], to: [-42, 128, 48, 190, .35], lin: 1, sfx: 'fury', bolt: 1, tint: 'rgba(160,20,0,.14)', shakes: [[1.2, .15], [2.4, .2]], fxs: [[1.2, 'ring', -52, 12, '#ff7a30', 30], [2.4, 'ring', -52, 12, '#ffb040', 50], [2.4, 'spark', -52, 12, '#ffb040', 8, 2]],
     acts: [L({ a: [-28, 1], faceTo: 'kael2', path: [[0, -28, 1], [1.4, -28, 1], [2.2, -18, -1], [3.5, -18, -1]], poses: [[0, ACT.ready, 10], [1.4, ACT.backStep, 9], [2.4, ACT.ready, 7]] }),
            K({ a: [-52, 12], fx: .8, fy: -.2, aura: 3, poses: [[0, ACT.ribsLow, 6], [.6, ACT.ribs, 3], [1.8, ACT.heave, 4], [2.7, ACT.headUp, 6]] })],
     caps: [[.1, 'THE WAY A SEAL STARTS TO LIFT BEFORE ANYBODY HEARS IT.']] }),
   // "I go up. The ground drops off me."  down into the knees on the breath before it; then gone
-  VS(52.1, 55.8, { cam: [-40, 176, 56, 170, .34], to: [-40, 196, 124, 160, .54], speed: 1, sfxs: [[.6, 'dash']], shakes: [[.6, .3]],
+  VS(52.1, 55.8, { cam: [-40, 176, 56, 170, .34], to: [-40, 196, 124, 160, .54], speed: 1, sfxs: [[.6, 'dash'], [.6, 'roar']], shakes: [[.6, .4]], fxs: [[.6, 'ring', -52, 12, '#fff2c0', 90], [.62, 'ring', -52, 12, '#ff7a30', 56], [.6, 'spark', -52, 12, '#d8d4e4', 16, 0], [.6, 'kick', .08]],
     acts: [L({ a: [-18, -1], faceTo: 'kael2', path: [[0, -18, -1], [.7, -18, -1], [1.3, -10, -3], [3.7, -10, -3]], poses: [[0, ACT.ready, 10], [.7, ACT.backStep, 12], [1.5, ACT.lookUp, 7]] }),
            K({ a: [-52, 12], aura: 3, zs: [[0, 0], [.6, 0], [3.7, 94]], zease: 'out', poses: [[0, ACT.headUp, 8], [.15, ACT.coil, 20], [.6, ACT.rise, 30], [2.4, ACT.hover, 5]] })],
     caps: [[.5, 'I GO UP.'], [1.85, 'THE GROUND DROPS OFF ME.']] }),
@@ -9094,21 +9094,21 @@ const CH1_KEEP_SHOTS = [
     acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 8]] }), K({ a: [-52, 12], aura: 3, zs: [[0, 94], [1.2, 98], [2.35, 96]], poses: [[0, ACT.hover, 6], [.4, ACT.hoverUp, 3]] })],
     caps: [[.15, 'ONLY HER HEAD, TO FOLLOW.']] }),
   // "Then I come down on him."
-  VS(60.65, 62.4, { cel: 'front', cam: [-30, 204, 132, 160, .5], to: [-22, 152, 60, 180, .34], speed: 1, sfxs: [[.45, 'roar']],
+  VS(60.65, 62.4, { cel: 'front', cam: [-30, 182, 136, 166, .57], to: [-22, 152, 60, 180, .34], speed: 1, sfxs: [[.45, 'roar']],
     acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 12], [.55, ACT.brace, 20]] }),
            K({ a: [-52, 12], aura: 4, path: [[0, -52, 12], [.45, -52, 12], [1.75, -27, 0]], zs: [[0, 96], [.45, 96], [1.75, 2]], zease: 'in', poses: [[0, ACT.hoverUp, 14]], sts: [[.45, 'plunge', { until: 1.75 }]] })],
     caps: [[.4, 'THEN I COME DOWN ON HIM.']] }),
   // the landing: it goes straight through his guard and he is driven the width of the field
-  VS(62.4, 63.5, { cam: [-6, 150, 56, 178, .33], to: [8, 136, 52, 186, .33], flash: 1, shake: .7, sfx: 'hit', speed: 1,
+  VS(62.4, 63.5, { cam: [-6, 150, 56, 178, .33], to: [8, 136, 52, 186, .33], flash: 1, shake: .8, sfx: 'hit', speed: 1, fxs: [[.02, 'ring', -12, -2, '#fff2c0', 110], [.04, 'ring', -12, -2, '#ff7a30', 70], [.02, 'spark', -14, -2, '#ffe9a0', 20, 26], [.02, 'spark', -20, 0, '#d8d4e4', 14, 0], [.02, 'kick', .12], [.3, 'spark', 4, -4, '#d8d4e4', 6, 0], [.55, 'spark', 20, -5, '#d8d4e4', 6, 0]],
     acts: [L({ a: [-10, -3], faceTo: 'kael2', path: [[0, -10, -3], [.06, -10, -3], [.8, 30, -5], [1.1, 30, -5]], poses: [[0, ACT.brace, 20], [.5, ACT.beaten1, 12]], sts: [[.04, 'hurt', { dur: .45, kx: 120, ky: -10 }]] }),
-           K({ a: [-27, 0], aura: 4, faceTo: 'lucan', path: [[0, -27, 0], [.3, -27, 0], [1.0, 12, -3], [1.1, 12, -3]], poses: [[0, ACT.ready, 16]], sts: [[0, 'atk', { dur: .34, combo: 3, t0: .1 }]] })] }),
+           K({ a: [-27, 0], aura: 4, faceTo: 'lucan', path: [[0, -27, 0], [.3, -27, 0], [1.0, 5, -3], [1.1, 5, -3]], poses: [[0, ACT.ready, 16]], sts: [[0, 'atk', { dur: .34, combo: 3, t0: .1 }]] })] }),
   // "One. Two. Three."
   blow(63.5, 64.75, 1, 'ONE', side(1)),
   blow(64.75, 65.88, 2, 'TWO', cu(lx(2), -5, 1.5, 1.8, 8)),
   blow(65.88, 67.0, 3, 'THREE', cu(kx(3), -3, 1.5, 1.8, -8)),
   // "I know how many there will be. There are always eleven."  four, five, six, seven: nobody says them
   VS(67.0, 71.75, { cam: [(lx(4) + kx(4)) / 2 - 10, 170, 66, 170, .33], to: [(lx(7) + kx(7)) / 2, 140, 56, 184, .33], lin: 1, tint: 'rgba(120,10,0,.16)',
-    sfxs: [[.5, 'heart'], [.66, 'hit'], [1.6, 'heart'], [1.76, 'hit'], [2.7, 'heart'], [2.86, 'hit'], [3.8, 'heart'], [3.96, 'hit']], shakes: [[.66, .22], [1.76, .22], [2.86, .22], [3.96, .22]],
+    sfxs: [[.5, 'heart'], [.66, 'hit'], [1.6, 'heart'], [1.76, 'hit'], [2.7, 'heart'], [2.86, 'hit'], [3.8, 'heart'], [3.96, 'hit']], shakes: [[.66, .22], [1.76, .22], [2.86, .22], [3.96, .22]], fxs: [.66, 1.76, 2.86, 3.96].flatMap((t, i) => [[t - .01, 'spark', (lx(4 + i) + kx(4 + i)) / 2 + 5, -4, '#ffe9a0', 12, 30], [t - .01, 'kick', .05]]),
     acts: [L({ a: [lx(3), -5], faceTo: 'kael2', path: [[0, lx(3), -5], [.66, lx(3), -5], [.95, lx(4), -5], [1.76, lx(4), -5], [2.05, lx(5), -5], [2.86, lx(5), -5], [3.15, lx(6), -5], [3.96, lx(6), -5], [4.25, lx(7), -5], [4.75, lx(7), -5]], poses: [[0, ACT.beaten1, 16], [.7, ACT.beaten2, 6]], sts: [.66, 1.76, 2.86, 3.96].map(t => [t, 'hurt', { dur: .2, kx: 70, ky: -8 }]) }),
            K({ a: [kx(3), -3], aura: 4, faceTo: 'lucan', path: [[0, kx(3), -3], [.5, kx(3), -3], [.8, kx(4), -3], [1.6, kx(4), -3], [1.9, kx(5), -3], [2.7, kx(5), -3], [3.0, kx(6), -3], [3.8, kx(6), -3], [4.1, kx(7), -3], [4.75, kx(7), -3]], poses: [[0, ACT.ready, 16]], sts: [.5, 1.6, 2.7, 3.8].map((t, i) => [t, 'atk', { dur: .36, combo: 1 + (i % 3) }]) })],
     caps: [[.5, 'I KNOW HOW MANY THERE WILL BE.'], [2.6, 'THERE ARE ALWAYS ELEVEN.']] }),
@@ -9119,23 +9119,24 @@ const CH1_KEEP_SHOTS = [
   // "The blade comes down."  he is on a knee with his face up; it goes up over my head, hangs, and starts down
   VS(74.6, 77.0, { cam: [40, 126, 62, 185, .4], to: [44, 104, 58, 200, .42], bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)',
     acts: [L({ a: [52, -5], faceTo: 'kael2', poses: [[0, ACT.kneelUp, 9]] }),
-           K({ a: [34, -3], aura: 4, faceTo: 'lucan', poses: [[0, ACT.ready, 16], [.3, ACT.overhead, 6]], sts: [[2.15, 'atk', { dur: .5, combo: 3, t0: .05 }]] })],
+           K({ a: [30, -3], aura: 4, faceTo: 'lucan', poses: [[0, ACT.ready, 16], [.3, ACT.overhead, 6]], sts: [[2.15, 'atk', { dur: .5, combo: 3, t0: .05 }]] })],
     caps: [[.35, 'THE BLADE COMES DOWN.']] }),
   { d: 0.6, vd: .9, black: 1, flash: 1, sfx: 'hit', shake: .6 }
 ];
 // ---- the voice. The read is the clock: while it plays, the film's time is the audio's time, so picture and voice cannot drift.
 const VO = { a: null, on: false, off: false,
-  start() { if (this.off) return; try { if (!this.a) { this.a = new Audio(CH1_VO_SRC); this.a.preload = 'auto'; } this.a.currentTime = 0; this.a.volume = 1; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
+  start() { if (this.off) return; try { if (!this.a) { this.a = new Audio(CH1_VO_SRC); this.a.preload = 'auto'; } this.a.currentTime = 0; this.a.volume = 1; this.vt = 0; this.last = -1; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
   stop() { if (!this.on) return; this.on = false; try { this.a.pause(); } catch (e) { } Sound.setVol(); },
   live() { return this.on && this.a && !this.a.paused && !this.a.ended && this.a.currentTime > 0; } };
 { const n1 = Brawl.nextShot; Brawl.nextShot = function () { n1.call(this); const c = this.cine, s = c && c.shots[c.i]; if (s && s.vd) c.dur = s.vd; if (c) c._fx = 0; };
   const u0 = Brawl.updCine; Brawl.updCine = function (dt) { const c = this.cine, s = c.shots[c.i], i0 = c.i;
     if (s.va === 0 && !VO.on && c.t === 0) VO.start();
-    if (s.va !== undefined && VO.live()) c.t = Math.max(0, VO.a.currentTime - s.va - dt);
+    if (s.va !== undefined && VO.on) { VO.vt += dt; const a = VO.a; if (a && !a.paused && !a.ended) { const ct = a.currentTime; if (ct !== VO.last) { VO.last = ct; if (Math.abs(ct - VO.vt) < .35) VO.vt = ct; else { try { a.currentTime = VO.vt; } catch (e) { } } } } c.t = Math.max(0, VO.vt - s.va - dt); }
     const tA = c.t; u0.call(this, dt);
     if (!this.cine) return VO.stop();
-    const c2 = this.cine; if (c2.i === i0) { const tB = c2.t; if (s.sfxs) for (const e of s.sfxs) if (e[0] > tA && e[0] <= tB || (tA === 0 && e[0] === 0)) Sound.play(e[1]); if (s.shakes) for (const e of s.shakes) if (e[0] > tA && e[0] <= tB) this.shake = e[1]; }
-    else { const s2 = c2.shots[c2.i]; if (s2 && s2.va !== undefined && VO.live() && Math.abs(VO.a.currentTime - s2.va) > .2) VO.a.currentTime = s2.va; if (s2 && s2.va === undefined) { /* the read is over */ } } };
+    const c2 = this.cine; if (c2.i === i0) { const tB = c2.t; if (s.sfxs) for (const e of s.sfxs) if (e[0] > tA && e[0] <= tB || (tA === 0 && e[0] === 0)) Sound.play(e[1]); if (s.shakes) for (const e of s.shakes) if (e[0] > tA && e[0] <= tB) this.shake = e[1]; if (s.fxs) for (const e of s.fxs) if (e[0] > tA && e[0] <= tB) { const a = e.slice(2); if (e[1] === 'spark') this.spark(...a); else if (e[1] === 'ring') this.ring(...a); else if (e[1] === 'kick') c2._kick = a[0]; } }
+    else { const s2 = c2.shots[c2.i]; if (s2 && s2.va !== undefined && VO.on && Math.abs(VO.vt - s2.va) > .2) { VO.vt = s2.va; try { VO.a.currentTime = s2.va; } catch (e) { } } }
+    if (c2._kick > .002) { this.cam.f *= 1 + c2._kick; c2._kick *= Math.pow(.0008, dt); } };
   const e0 = Brawl.end; Brawl.end = function () { VO.stop(); return e0.apply(this, arguments); }; }
 const CH1_KEEP_FILM = () => ({ bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'dawn', cineOnly: 1, film: 1, hero: { id: 'kael2', cape: CLOAK }, intro: CH1_KEEP_SHOTS, foes: [] });
 const CH1_KEEP = [
@@ -9161,7 +9162,7 @@ const CH1_KEEP = [
     }
     return f0.call(this, g, o, opt); }; }
 // a held pose lies over whatever the rig would have done, except while a cut or a blow is playing
-{ const t0 = G3.target; G3.target = function (o, opt, st, blade, mv, t, idx) { const r = t0.call(this, o, opt, st, blade, mv, t, idx), k = opt && opt.key; if (k && k._pose && st !== 'atk' && st !== 'hurt' && st !== 'plunge' && st !== 'wind' && !mv) { Object.assign(r[0], k._pose); r[1] = k._rate || 10; r[2] = .8; } return r; }; }
+{ const t0 = G3.target; G3.target = function (o, opt, st, blade, mv, t, idx) { const r = t0.call(this, o, opt, st, blade, mv, t, idx), k = opt && opt.key; if (k && k._pose && st !== 'atk' && st !== 'hurt' && st !== 'plunge' && st !== 'wind' && st !== 'dodge' && !mv) { Object.assign(r[0], k._pose); r[1] = k._rate || 10; r[2] = .8; const br = Math.sin(t * 1.7 + (idx || 0) * 2.1); r[0].cr = (r[0].cr || 0) + br * .2 + .2; r[0].lean = (r[0].lean || 0) + br * .012; r[0].hx = (r[0].hx || 0) + Math.sin(t * .83 + (idx || 0)) * .035; r[0].lp = (r[0].lp || 0) + br * .02; } return r; }; }
 // she is drawn flat on the dais; three drawings of her let her look at her son, and up
 const CEL = { cache: {}, draw(kind) { if (this.cache[kind]) return this.cache[kind]; const base = daisSprite('cel'); if (kind === 'front') return (this.cache[kind] = base); const c = document.createElement('canvas'); c.width = base.width; c.height = base.height; const g = c.getContext('2d'); g.drawImage(base, 0, 0);
     const HR = '#f6eac0', SK = '#f4e6dc', SK2 = '#d2c6bd';
