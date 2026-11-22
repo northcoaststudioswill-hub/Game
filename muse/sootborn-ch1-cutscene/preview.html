@@ -9298,7 +9298,7 @@ const SUB = { el: null, big: null, key: null, t0: 0,
       o.swing = 0; o.guardT = 0;
       if (k.sts) for (const e of k.sts) { const t0 = e[0] * U, m = e[2] || {}, end = m.until !== undefined ? m.until * U : t0 + (m.dur || .3); if (now >= t0 && now < end) { if (e[1] === 'guard') o.guardT = 1; else { o.st = e[1]; o.t = now - t0 + (m.t0 || 0); if (m.combo) o.combo = m.combo; if (m.kx !== undefined) { o.kx = m.kx; o.ky = m.ky || 0; } } } }
       if (k.rage) opt.rage = k.rage;
-      if (S.va !== undefined && k.id) { const sk = STAB[k.id] || (STAB[k.id] = {}); sk.act = k; opt.key = sk; if (!k._init) { k._init = 1; const R = G3.rigs && G3.rigs.get(sk); if (R) { R.x = o.x; R.y = o.y; R.vx = 0; R.vy = 0; R.trail = []; R.yaw = Math.atan2(o.fx, o.fy); } } }
+      if ((S.va !== undefined || S.sec) && k.id) { const sk = STAB[k.id] || (STAB[k.id] = {}); sk.act = k; opt.key = sk; if (!k._init) { k._init = 1; const R = G3.rigs && G3.rigs.get(sk); if (R) { R.x = o.x; R.y = o.y; R.vx = 0; R.vy = 0; R.trail = []; R.yaw = Math.atan2(o.fx, o.fy); } } }
     }
     if (k && k.notrail && G3.rigs) { const R = G3.rigs.get(opt.key); if (R) R.trail = []; }
     const gk = k && c && k.glint ? k.glint : null; if (gk) G3._cap = [];
@@ -9390,12 +9390,119 @@ for (const sh of CH1_FILM_A.concat(CH1_FILM_HEIST)) if (!sh.black && !sh._cu && 
 const CH1_FILM_DEF = shots => () => ({ bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 66 }, music: 'mystery', cineOnly: 1, film: 1, intro: shots, foes: [] });
 const CH1_FILM = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: CH1_FILM_DEF(CH1_FILM_A.concat(CH1_FILM_HEIST)) }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }];
 // a film shot may name its own set (bg2) and ask for an empty square (nocrowd); the game's films never changed sets below
-{ const n0 = Brawl.nextShot; Brawl.nextShot = function () { const c = this.cine, s = c && c.shots[c.i + 1]; if (s && s.bg2 !== undefined) this.def = Object.assign({}, this.def, { bg2: s.bg2 || undefined }); n0.call(this); if (s && s.nocrowd && this.props) this.props = this.props.filter(q => q.t !== 'crowd'); }; }
+{ const n0 = Brawl.nextShot; Brawl.nextShot = function () { const c = this.cine, s = c && c.shots[c.i + 1]; if (s && s.bg2 !== undefined) this.def = Object.assign({}, this.def, { bg2: s.bg2 || undefined }); n0.call(this); if (s && s.nocrowd && this.props) this.props = this.props.filter(q => q.t !== 'crowd'); if (s && s.noprops) this.props = []; }; }
 
 // a lantern for any actor marked with one: the light sits a little ahead of the way he is facing
 { const a0 = Cutscene.anim, e0 = Cutscene.end;
   Cutscene.anim = function (dt) { a0.call(this, dt); const L = this.actors.filter(a => a.lamp); if (L.length) World.dynLights = L.map(a => { const an = DIRA[a.dir]; return { x: a.x + Math.cos(an) * 14, y: a.y - 6 + Math.sin(an) * 14, r: 60, c: '#ffd070' }; }); else if (this._lamps) World.dynLights = []; this._lamps = L.length; };
   Cutscene.end = function () { if (this._lamps) { World.dynLights = []; this._lamps = 0; } return e0.call(this); }; }
+
+// ============================================================
+// SCENE 30, REBUILT: TAVI AT SIXTEEN. The game holds one drawing for ten seconds. Here it is a 3D film on a set built for it:
+// the service side of the Sun Spire, where the soot work behind a painted line. No words are spoken; the place card is the only text.
+// the 3D figure is built for plate; a work coat in place of it: brown leather, dark seams, the scarf where a House sash would be
+CAST.tavi16 = { name: 'Tavi', look: () => ({ skin: KAEL_LOOK.skin, hair: KAEL_LOOK.hair, style: 'short', armor: '#6a5236', trim: '#3a2a20', sash: '#b8682a', shirt: '#6a5236', pants: '#3a2e28' }) };
+G3.LOOK.svc = Object.assign({}, G3.LOOK.hall, { amb: [.4, .37, .4], sunC: [1.1, .95, .8], fog: [.08, .07, .08], fogR: [320, 900] });
+// (x across, y up, z toward the camera.) A landing, a stair coming up to it from below, a stair going on up along the back wall,
+// a wall of dressed grey block with pipes, valves and lamps, a door with kitchen light, a slit of sky, and the painted line.
+const SVCSET = (A, S) => {
+  const I = M4.id(), GOLD = '#e2b84a', DK = '#1a1418', LIT = '#ffd98a';
+  let sd = 4711; const rnd = () => (sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296;
+  for (let ix = -7; ix < 7; ix++) for (let iz = -2; iz < 2; iz++) { const k = (ix + iz) & 1, j = rnd() * .03; A.quad(ix * 32, iz * 31, ix * 32 + 32, iz * 31 + 31, 0, k ? [.44 + j, .43 + j, .46 + j] : [.39 + j, .38 + j, .41 + j]); }
+  S.box(I, 0, -40, 0, 460, 80, 124, '#3a3840');
+  // the painted line, across the head of the stair: the clerks' side stops here
+  A.box(I, 60, .15, 57, 74, .3, 3, GOLD, 1);
+  // the stair up from below, toward the camera
+  for (let k = 1; k <= 10; k++) { S.box(I, 60, -7 * k - 40, 60 + 16 * k - 8, 70, 80, 16, k & 1 ? '#4e4c56' : '#46444e'); A.box(I, 60, -7 * k + .2, 60 + 16 * k - 15.4, 70, .5, 1.2, GOLD, 1); }
+  for (const bx of [22, 98]) { S.box(I, bx, -30, 135, 4, 50, 160, '#4a4852'); A.box(I, bx, -4.6, 135, 5, 1, 160, '#6a6672', 1); }
+  // the back wall: dressed block, string course, block faces set a hair proud
+  S.box(I, 0, 100, -66, 470, 220, 6, '#5a5862');
+  for (let r = 0; r < 16; r++) for (let c = 0; c < 15; c++) { const w = 30, x = -232 + c * 31 + (r & 1) * 15, y = 6 + r * 13, t = rnd(); if (x > 132 && x < 170 && y < 70) continue; S.box(I, x, y, -62.3, w, 12, 1.2, t > .66 ? '#686670' : t > .33 ? '#62606a' : '#6e6c76'); }
+  S.box(I, 0, 92, -61, 470, 3, 2, '#7a7882');
+  // a door on the service side, kitchen light behind it
+  A.box(I, 150, 34, -61, 32, 66, 1, [1, .78, .48], 1); S.box(I, 132, 36, -60, 4, 72, 4, '#3a3038'); S.box(I, 168, 36, -60, 4, 72, 4, '#3a3038'); S.box(I, 150, 72, -60, 40, 4, 4, '#3a3038');
+  // a slit of sky
+  A.box(I, -150, 128, -61, 12, 52, 1, [.78, .88, 1], 1); S.box(I, -150, 101, -60, 18, 3, 4, '#7a7882'); S.box(I, -150, 155, -60, 18, 3, 4, '#7a7882');
+  // the pipes: one along the wall, two down it, a valve wheel on each
+  S.cyl(M4.chain(M4.t(-230, 150, -55), M4.rz(-Math.PI / 2)), 0, 0, 0, 3.6, 3.6, 460, 7, '#7a6450');
+  for (const px of [96, -96]) { S.cyl(M4.t(px, 0, -55), 0, 0, 0, 3.2, 3.2, 150, 7, '#7a6450'); const wm = M4.chain(M4.t(px, 84, -50), M4.rx(Math.PI / 2)); S.cyl(wm, 0, 0, 0, 9, 9, 1.6, 12, '#a8452a'); S.cyl(wm, 0, -.2, 0, 2.4, 2.4, 2.4, 6, '#3a2a24'); for (let q = 0; q < 3; q++) S.box(M4.chain(M4.t(px, 84, -49.6), M4.rz(q * 1.047)), 0, 0, 0, 17, 1.4, 1.2, '#a8452a'); }
+  // lamps
+  for (const lx of [-120, 30, 190]) { S.box(I, lx, 104, -58, 3, 3, 7, '#3a3038'); A.box(I, lx, 98, -55, 6, 9, 6, LIT, 1); S.box(I, lx, 104.5, -55, 8, 1.5, 8, '#3a3038'); }
+  // the stair on up, along the back wall, to the left
+  for (let k = 1; k <= 12; k++) { const xk = -50 - 14 * k, h = 7 * k; S.box(I, xk, h / 2 - .5, -42, 14, h + 1, 40, k & 1 ? '#4e4c56' : '#46444e'); A.box(I, xk + 6.4, h + .2, -42, 1.2, .5, 40, GOLD, 1); }
+  S.box(I, -130, 62, -21, 170, 4, 2, '#6a6672');
+  // the ceiling, so it is inside
+  S.box(I, 0, 214, 0, 470, 6, 280, '#2a2830');
+};
+{ const env1 = G3.env; G3.env = function (bg) { if (bg !== 'svc' || !this.gl) return env1.call(this, bg); if (this.envs.svc) return this.envs.svc;
+    const A = new Batch(20000), S = new Batch(20000); SVCSET(A, S); const gl = this.gl;
+    const mk = B => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, B.a.subarray(0, B.n * 9), gl.STATIC_DRAW); return { b, n: B.n }; };
+    return this.envs.svc = { a: mk(A), s: mk(S), hw: 110, hh: 76 }; }; }   // hh puts the game's two field flags behind the back wall
+
+// the chalk sun, drawn stroke by stroke on the wall (centre -20, 52): a rough ring three times round, then ten rays
+const SUN_AT = [-20, 44, -60.1];
+const drawSun = (ring, rays) => { const D = G3.dyn, [cx, cy, cz] = SUN_AT, col = [1, .96, .82], seg = (x1, y1, x2, y2, w) => { const L = Math.hypot(x2 - x1, y2 - y1); D.box(M4.chain(M4.t((x1 + x2) / 2, (y1 + y2) / 2, cz), M4.rz(Math.atan2(y2 - y1, x2 - x1))), 0, 0, 0, L + .4, w, .3, col, 1); };
+  let jit = 11; const J = () => ((jit = (jit * 9301 + 49297) % 233280) / 233280 - .5);
+  const N = 30, tot = ring * 3 * N; for (let p = 0; p < 3; p++) for (let i = 0; i < N; i++) { if (p * N + i >= tot) break; const a0 = i / N * 6.2832 + p * .2, a1 = (i + 1) / N * 6.2832 + p * .2, r0 = 10 + J() * 1.2 + p * .25, r1 = 10 + J() * 1.2 + p * .25; seg(cx + Math.cos(a0) * r0, cy + Math.sin(a0) * r0, cx + Math.cos(a1) * r1, cy + Math.sin(a1) * r1, .9 - p * .15); }
+  for (let i = 0; i < 10; i++) { const k = Math.min(1, Math.max(0, rays * 10 - i)); if (k <= 0) break; const a = Math.PI / 2 - i / 10 * 6.2832, r1 = 13.5, r2 = 13.5 + (i & 1 ? 6 : 10) * k; seg(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1, cx + Math.cos(a) * r2, cy + Math.sin(a) * r2, 1); } };
+{ const f1 = Brawl.fighter; Brawl.fighter = function (g, o, opt) { const r = f1.call(this, g, o, opt), k = opt && (opt.key && (opt.key.act || opt.key)), c = this.cine, s = c && c.shots[c.i];
+    if (k && k.id === 'tavi16' && s && s.tavi) { const T = s.tavi, t = c.t, p = (a) => !a ? 1 : Math.min(1, Math.max(0, (t - a[0]) / (a[1] - a[0])));
+      if (T.sun) drawSun(T.sun === 'done' ? 1 : p(T.sun[0]), T.sun === 'done' ? 1 : p(T.sun[1]));
+      if (k.lamp) { const tt = this.t, sw = Math.sin(tt * 3.2) * 1.6; G3.glow(o.x + (o.fx || 0) * 3 + 5 * (o.fy || 0), (o.z || 0) + 17 + sw * .3, o.y - 2 * (o.fx || 0), 16, [1, .78, .42], .55); }
+      for (const lx of [-120, 30, 190]) G3.glow(lx, 98, -54, 22, [1, .8, .5], .35 + Math.sin(this.t * 7 + lx) * .03); G3.glow(150, 34, -58, 40, [1, .7, .4], .25); }
+    return r; }; }
+// non-voiced films keep the same moving hand on the camera, on the game's own clock
+{ const u2 = Brawl.updCine; Brawl.updCine = function (dt) { u2.call(this, dt); const c = this.cine, s = c && c.shots[c.i]; if (s && s.drift && s.va === undefined) { const w = this.t; this.cam.x += Math.sin(w * .7) * .7 + Math.sin(w * 1.9) * .2; this.cam.h += Math.sin(w * .93 + 1) * .5; this.cam.y += Math.sin(w * .41 + 2) * .9; } }; }
+
+const TS30 = (d, o) => Object.assign({ d, vd: d, sec: 1, drift: 1, noprops: 1, caps: [[0, '']], tavi: { sun: 0 } }, o);
+const TV = (o) => Object.assign({ id: 'tavi16', blade: 0, fx: 0, fy: -1, sc: .96 }, o);
+// heights on the two stairs
+const upA = (zz) => -Math.max(0, zz - 60) * 7 / 16, upB = (x) => Math.max(0, -50 - x) / 2;
+Object.assign(ACT, {
+  climb: { cr: .7, lean: .1, tw: 0, hx: .25, rp: .4, re: -.6, lp: -.3, ly: -.2, le: -1.2, hl: .5, kl: .7, hr: -.2, kr: .5, sp: .12 },
+  lookWall: { cr: .4, lean: -.06, tw: 0, hx: -.42, hy: 0, rp: .1, re: -.3, lp: -.25, ly: -.25, le: -1.1, hl: .1, kl: .1, hr: -.1, kr: .1, sp: .1 },
+  chalkIn: { cr: .6, lean: .02, tw: .15, hx: .2, hy: .2, rp: .35, ry: -.35, re: -1.9, lp: -.25, ly: -.25, le: -1.1, hl: .1, kl: .1, hr: -.1, kr: .1, sp: .1 },
+  chalkUp: { cr: .2, lean: .1, tw: -.1, hx: -.25, rp: -1.95, ry: .15, re: -.5, lp: -.25, ly: -.25, le: -1.1, hl: .05, kl: .05, hr: -.1, kr: .1, sp: .1 },
+  chalkL: { cr: .2, lean: .1, tw: -.18, hx: -.36, hy: .1, rp: -1.8, ry: .55, re: -.7, lp: -.25, ly: -.25, le: -1.1, hl: .05, kl: .05, hr: -.1, kr: .1, sp: .1 },
+  chalkR: { cr: .2, lean: .1, tw: 0, hx: -.4, hy: -.1, rp: -2.1, ry: .3, re: -.35, lp: -.25, ly: -.25, le: -1.1, hl: .05, kl: .05, hr: -.1, kr: .1, sp: .1 },
+  stepBack: { cr: .5, lean: -.08, tw: 0, hx: -.34, rp: .05, re: -.25, lp: -.25, ly: -.25, le: -1.1, hl: .1, kl: .1, hr: -.1, kr: .1, sp: .12 }
+});
+const drawing = (t0, t1, n) => Array.from({ length: n }, (_, i) => [t0 + (t1 - t0) * i / n, [ACT.chalkUp, ACT.chalkL, ACT.chalkR][i % 3], 9]);
+const chalkDust = (t0, t1, n, rays) => Array.from({ length: n }, (_, i) => { const t = t0 + (t1 - t0) * i / n, a = rays ? Math.PI / 2 - i / n * 6.28 : i / n * 6.28 * 3, r = rays ? 18 : 10; return [t, 'spark', SUN_AT[0] + Math.cos(a) * r, SUN_AT[2] + 1.5, '#fff6d8', 2, SUN_AT[1] + Math.sin(a) * r - 1]; });
+const TAVI16_SHOTS = [
+  // the service stair, from above the landing: a lamp coming up out of the dark
+  TS30(5.2, { bg: 'svc', music: 'hum', cam: [110, 300, 100, 168, .46], to: [76, 236, 62, 176, .42], sfxs: [[.2, 'heart'], [3.0, 'heart']],
+    caps: [[.5, 'NINE YEARS AFTER THE FURNACE.'], [2.7, 'THE SUN SPIRE. THE SERVICE STAIR.']],
+    acts: [TV({ a: [60, 200], fy: -1, lamp: 1, walk: 1, path: [[0, 60, 200], [5.2, 62, 118]], zs: [[0, upA(200)], [5.2, upA(118)]], poses: [[0, ACT.climb, 6]] })] }),
+  // low on the steps: his boots on the gold edges, the lamp swinging
+  TS30(3.2, { cam: [40, 150, -20, 205, .5], to: [46, 116, 0, 212, .46], caps: [[.3, 'TAVI, SIXTEEN.']],
+    acts: [TV({ a: [62, 118], lamp: 1, walk: 1, path: [[0, 62, 118], [3.2, 60, 72]], zs: [[0, upA(118)], [3.2, upA(72)]], poses: [[0, ACT.climb, 6]] })] }),
+  // the head of the stair: over the painted line, onto their side; he stops
+  TS30(3.6, { cam: [-40, 160, 60, 176, .34], to: [-20, 130, 54, 186, .34],
+    acts: [TV({ a: [60, 72], lamp: 1, walk: 1, path: [[0, 60, 72], [.8, 60, 56], [2.4, -14, -30], [3.6, -18, -36]], zs: [[0, upA(72)], [.8, 0]], poses: [[0, ACT.climb, 6], [.9, ACT.stand, 5], [2.6, ACT.lookWall, 3]] })] }),
+  // his face, at the blank wall. Row K, when he was small
+  TS30(3.4, { ...cu(-18, -36, 2.3, 3.0, 8), zooms: [[.3, 3.2, .35]], mems: [[1.1, 2.6, 'row', 0, '255,210,110']], sfxs: [[1.1, 'cutin']],
+    acts: [TV({ a: [-18, -36], lamp: 1, fx: -.25, fy: -1, poses: [[0, ACT.lookWall, 3], [2.7, Object.assign({}, ACT.lookWall, { hx: -.3 }), 2]] })] }),
+  // the chalk, out of the satchel
+  TS30(2.8, { cam: [14, 70, 58, 196, .36], to: [8, 54, 56, 206, .37],
+    acts: [TV({ a: [-18, -36], lamp: 1, fx: -.1, fy: -1, path: [[0, -18, -36], [1.8, 2, -44]], poses: [[0, ACT.lookWall, 4], [.5, ACT.chalkIn, 6], [1.8, ACT.chalkUp, 5]] })] }),
+  // the ring, three times round. Ashgate Square: the Pillar, where she painted the first one
+  TS30(5.2, { tavi: { sun: [[.4, 3.6], [99, 100]] }, cam: [-40, -60 + 200 / 1.7, 46, 200, .55], to: [-34, -60 + 200 / 2.2, 46, 200, .55], mems: [[1.8, 3.3, 'dawn', 0, '255,210,140']], sfxs: [[.5, 'page'], [1.2, 'page'], [3.4, 'page'], [1.8, 'cutin']], fxs: chalkDust(.4, 3.6, 22),
+    acts: [TV({ a: [2, -44], lamp: 1, fx: -.35, fy: -1, poses: drawing(.3, 3.7, 10).concat([[3.8, ACT.chalkUp, 4]]) })] }),
+  // the rays, one by one; we come off the wall
+  TS30(4.4, { tavi: { sun: ['done', [.3, 3.6]] }, cam: [-34, -60 + 200 / 2.6, 46, 200, .55], to: [-26, -60 + 200 / 1.6, 48, 200, .52], sfxs: [[.4, 'page'], [1.5, 'page'], [2.6, 'page']], fxs: chalkDust(.3, 3.6, 10, 1),
+    acts: [TV({ a: [2, -44], lamp: 1, fx: -.35, fy: -1, poses: drawing(.2, 3.6, 10).concat([[3.7, ACT.stepBack, 4]]) })] }),
+  // he steps back from it, and looks
+  TS30(3.4, { tavi: { sun: 'done' }, cam: [-30, -30 + 200 / 1.9, 46, 200, .55], to: [-22, -30 + 200 / 2.6, 47, 200, .55], zooms: [[1.2, 3.3, .4]], sfxs: [[1.6, 'heart']],
+    acts: [TV({ a: [2, -44], lamp: 1, fx: -.25, fy: -1, path: [[0, 2, -44], [1.0, 4, -30]], poses: [[0, ACT.stepBack, 5], [1.2, ACT.lookWall, 3]] })] }),
+  // and goes on up. The sun stays
+  TS30(5.6, { tavi: { sun: 'done' }, cam: [-10, 150, 70, 172, .36], to: [-24, 118, 76, 186, .44], sfxs: [[4.2, 'heart']],
+    acts: [TV({ a: [-4, -30], lamp: 1, walk: 1, faceTo: null, path: [[0, -4, -30], [1.0, -46, -42], [5.6, -190, -42]], zs: [[0, 0], [1.0, 0], [5.6, upB(-190)]], faces: [[0, -1, -.1]], poses: [[0, ACT.climb, 5]] })] }),
+  { d: 1.4, vd: 1.4, black: 1, caps: [[0, '']] }
+];
+const TAVI16_FILM = () => ({ bg: 'svc', arena: { kind: 'rect', w: 220, h: 100 }, music: 'hum', cineOnly: 1, film: 1, hero: { id: 'tavi16' }, intro: TAVI16_SHOTS, foes: [] });
+const TAVI16 = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: () => TAVI16_FILM() }];
+const TAVI16_OLD = [{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 }];
 
 // the preview's own front page: this build exists only to show the cutscene
 const CH1_PREVIEW = {
@@ -9412,6 +9519,8 @@ Menus.title = function () {
     { label: 'Only the scenes below, as film', act: () => CH1_PREVIEW.play(CH1_FILM) },
     { label: 'Earlier version: the scenes below as a 2D cutscene', act: () => CH1_PREVIEW.play(CH1_NEW) },
     { label: "Compare: the game's current scenes below", act: () => CH1_PREVIEW.play(CH1_PREVIEW.old()) },
+    { label: 'Scene 30, rebuilt: Tavi at sixteen (3D film)', act: () => CH1_PREVIEW.play(TAVI16) },
+    { label: "Compare: the game's Tavi at sixteen (a drawn still)", act: () => CH1_PREVIEW.play(TAVI16_OLD) },
     { label: 'Settings', act: () => Menus.settings() }
   ] }));
 };
