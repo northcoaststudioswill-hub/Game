@@ -209,6 +209,39 @@ const CH1_NEW = [
   { card: 'For three nights, we bled the line and balanced the bank by dawn.', sub: 'On the third night, the fever broke. Tavi asked for bread.', min: 1.8, max: 6 }
 ];
 
+// ============================================================
+// THE KEEP — the opening of Chapter One, as a film in the Assay's own engine (shot list, 3D valley).
+// It follows the chapter's first page: dawn and banners, the boy, the woman in the chair, the cuts,
+// the rise, the dive, the count. It cuts before the blade lands. No play; any key moves to the next shot.
+// ============================================================
+const CH1_KEEP_SHOTS = [
+  { d: 3.4, bg: 'keep', music: 'dawn', cam: [0, 340, 210, 150, .14], to: [0, 180, 74, 150, .3], acts: [{ id: 'lucan', a: [40, -10], blade: 1, fx: -1, fy: .3 }], cap: 'DAWN, AND BANNERS. A KEEP OF GREY STONE ON THE END OF A RIDGE.' },
+  { d: 2.6, ...cu(40, -10, 1.8, 2.5, 18), acts: [{ id: 'lucan', a: [40, -10], blade: 1, fx: -1, fy: .3 }], cap: 'A BOY STANDS UNDER THE BANNERS WITH A BLADE HELD LOW. HE IS EIGHTEEN. HE HAS NEVER BEEN HIT BY ANYTHING HE COULD NOT SEE COMING.' },
+  { d: 3.0, cam: [14, 110, 84, 200, .5], to: [0, 84, 88, 200, .52], lin: 1, acts: [], cap: 'ON A WHITE PLATFORM A WOMAN SITS IN A CHAIR WITH HER HANDS FOLDED, AND WATCHES HIM.' },
+  { d: 2.2, cam: [0, 84, 88, 200, .52], to: [0, 52, 92, 200, .56], lin: 1, acts: [], cap: 'THE LAST DAY. HER SON HOLDS THE KEEP.' },
+  { d: 3.0, ...cu(-40, 4, 1.9, 2.8, -16), music: 'duel', acts: [{ id: 'kael2', a: [-40, 4], blade: 1, fx: 1, fy: -.2, aura: 1, pose: 'washer' }], cap: 'I AM IN THEIR PLATE, WITH A WHITE CLOAK OVER IT THAT IS NOT MINE. UNDER IT, ON A CORD, A BRASS WASHER.' },
+  { d: 1.8, cam: [-10, 150, 56, 170], to: [6, 132, 52, 186], flash: 1, sfx: 'clash', shake: .3, acts: [{ id: 'lucan', a: [30, -6], b: [12, -2], blade: 1, fx: -1, fy: .2, swing: 1 }, { id: 'kael2', a: [-12, 4], b: [-26, 14], blade: 1, fx: 1, fy: -.2, aura: 1 }], cap: 'THE FIRST CUT COMES IN OUT OF THE SUN, AND I AM NOT THERE.' },
+  { d: 1.8, cam: [6, 132, 52, 186], to: [-4, 124, 50, 196], flash: 1, sfx: 'steel', shake: .3, acts: [{ id: 'lucan', a: [12, -2], blade: 1, fx: -1, fy: .2, swing: 1 }, { id: 'kael2', a: [-26, 14], b: [-4, 2], blade: 1, fx: 1, fy: -.2, aura: 2 }], cap: 'THE SECOND COMES, AND I STEP THROUGH IT.' },
+  { d: 2.0, cam: [-4, 124, 50, 196], to: [4, 118, 48, 204], flash: 1, sfx: 'clash', shake: .5, acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2, guard: 1 }, { id: 'kael2', a: [-6, 2], blade: 1, fx: 1, fy: -.2, aura: 2, swing: 1 }], cap: 'I HIT, AND HE TAKES IT. HE HITS, AND I TAKE IT.' },
+  { d: 2.6, ...cu(-6, 2, 1.9, 3.0, -14), sfx: 'fury', bolt: 1, tint: 'rgba(160,20,0,.14)', acts: [{ id: 'kael2', a: [-6, 2], blade: 1, fx: .5, fy: .9, aura: 3 }], cap: 'UNDER MY RIBS A PRESSURE STARTS, LOW, THE WAY A SEAL STARTS TO LIFT BEFORE ANYBODY HEARS IT.' },
+  { d: 2.0, cam: [0, 170, 60, 170, .34], to: [0, 190, 120, 160, .52], speed: 1, sfx: 'dash', acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2 }, { id: 'kael2', a: [-6, 2], blade: 1, fx: 1, fy: -.2, aura: 3, za: 0, zb: 90 }], cap: 'I GO UP. THE GROUND DROPS OFF ME.' },
+  { d: 3.0, cam: [4, 176, 150, 160, .6], to: [10, 156, 142, 176, .62], lin: 1, acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2 }, { id: 'kael2', a: [-6, 2], blade: 1, fx: 1, fy: -.2, aura: 3, za: 90, zb: 96 }], cap: 'THE WOMAN IN THE CHAIR TURNS HER HEAD, ONLY HER HEAD, TO FOLLOW.' },
+  { d: 1.3, cam: [0, 200, 130, 160, .5], to: [6, 150, 58, 180, .34], speed: 1, sfx: 'roar', shake: .6, flash: 1, acts: [{ id: 'lucan', a: [14, -2], blade: 1, fx: -1, fy: .2, guard: 1 }, { id: 'kael2', a: [-6, 2], b: [4, 0], blade: 1, fx: 1, fy: -.2, aura: 4, za: 96, zb: 4, st: 'plunge', zease: 'in' }], cap: 'THEN I COME DOWN ON HIM.' },
+  { d: 6.4, cam: [4, 150, 56, 176, .33], to: [8, 118, 48, 200, .34], lin: 1, count: 10, tint: 'rgba(120,10,0,.16)', acts: [{ id: 'lucan', a: [14, -2], b: [22, -4], blade: 1, fx: -1, fy: .2, guard: 1 }, { id: 'kael2', a: [2, 0], b: [10, -2], blade: 1, fx: 1, fy: -.2, aura: 4, swing: 1 }], cap: 'I KNOW HOW MANY THERE WILL BE. THERE ARE ALWAYS ELEVEN.' },
+  { d: 1.5, ...cu(10, -2, 2.0, 3.2, -8), bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)', acts: [{ id: 'lucan', a: [22, -4], blade: 1, fx: -1, fy: .2, pose: 'kneel' }, { id: 'kael2', a: [10, -2], blade: 1, fx: 1, fy: -.2, aura: 4, hold: 2 }], cap: 'THE BLADE COMES DOWN.' },
+  { d: 0.5, black: 1, flash: 1, sfx: 'hit', shake: .6 }
+];
+const CH1_KEEP_FILM = () => ({ bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'dawn', cineOnly: 1, film: 1, hero: { id: 'kael2', cape: CLOAK }, intro: CH1_KEEP_SHOTS, foes: [] });
+const CH1_KEEP = [
+  { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } },
+  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The last day.', big: 1, min: 1.5, max: 4.5 },
+  { brawl: () => CH1_KEEP_FILM() },
+  { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { music: null },
+  { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, tr: 'furnace', min: 1.6, max: 5 }
+];
+// a film actor can leave the ground: za -> zb over the shot (the game's films never needed it; the chapter does)
+{ const f0 = Brawl.fighter; Brawl.fighter = function (g, o, opt) { const k = opt && opt.key, c = this.cine; if (k && k.za !== undefined && c) { const q = Math.min(1, c.t / c.dur), e = k.zease === 'in' ? q * q : 1 - Math.pow(1 - q, 2), zb = k.zb === undefined ? k.za : k.zb; o.z = k.za + (zb - k.za) * e; o.vz = zb > k.za ? 1 : -1; } return f0.call(this, g, o, opt); }; }
+
 // a lantern for any actor marked with one: the light sits a little ahead of the way he is facing
 { const a0 = Cutscene.anim, e0 = Cutscene.end;
   Cutscene.anim = function (dt) { a0.call(this, dt); const L = this.actors.filter(a => a.lamp); if (L.length) World.dynLights = L.map(a => { const an = DIRA[a.dir]; return { x: a.x + Math.cos(an) * 14, y: a.y - 6 + Math.sin(an) * 14, r: 60, c: '#ffd070' }; }); else if (this._lamps) World.dynLights = []; this._lamps = L.length; };
@@ -224,8 +257,10 @@ Menus.title = function () {
     b.innerHTML = '<h1 class="logo">SOOTBORN</h1><div class="sub">Chapter One · Before the Furnace</div><p style="opacity:.75;margin-top:10px">A preview of a new cutscene. This is not the game, and the game has not been changed.</p>';
     b.parentNode.style.background = 'rgba(16,10,13,.82)'; b.parentNode.style.textAlign = 'center';
   }, items: [
-    { label: 'Play the new Chapter One cutscene', act: () => CH1_PREVIEW.play(CH1_NEW) },
-    { label: "Play the game's current version, to compare", act: () => CH1_PREVIEW.play(CH1_PREVIEW.old()) },
+    { label: 'Play the opening: the Keep (new film)', act: () => CH1_PREVIEW.play(CH1_KEEP) },
+    { label: 'Play all of Chapter One (the Keep, then below)', act: () => CH1_PREVIEW.play(CH1_KEEP.concat(CH1_NEW)) },
+    { label: 'Play only the scenes below (new cutscene)', act: () => CH1_PREVIEW.play(CH1_NEW) },
+    { label: "Compare: the game's current scenes below", act: () => CH1_PREVIEW.play(CH1_PREVIEW.old()) },
     { label: 'Settings', act: () => Menus.settings() },
     { label: 'Controls', act: () => Menus.controls() }
   ] }));
