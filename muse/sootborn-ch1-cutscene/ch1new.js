@@ -273,6 +273,10 @@ const quiet4 = (va, ve, T) => VS(va, ve, { cam: [(lx(4) + kx(4)) / 2 - 10, 170, 
   acts: [L({ a: [lx(3), -5], faceTo: 'kael2', path: [[0, lx(3), -5]].concat(T.flatMap((t, i) => [[t + .16, lx(3 + i), -5], [t + .45, lx(4 + i), -5]])).concat([[ve - va, lx(7), -5]]), poses: [[0, ACT.beaten1, 16], [T[0] + .2, ACT.beaten2, 6]], sts: T.map(t => [t + .16, 'hurt', { dur: .2, kx: 70, ky: -8 }]) }),
          K({ a: [kx(3), -3], aura: 4, faceTo: 'lucan', path: [[0, kx(3), -3]].concat(T.flatMap((t, i) => [[t, kx(3 + i), -3], [t + .3, kx(4 + i), -3]])).concat([[ve - va, kx(7), -3]]), poses: [[0, ACT.ready, 16]], sts: T.map((t, i) => [t, 'atk', { dur: .36, combo: 1 + (i % 2) }]) })],
   caps: [[.3, 'I KNOW HOW MANY THERE WILL BE.'], [2.3, 'THERE ARE ALWAYS ELEVEN.']] });
+// looking straight down: he comes up at the camera and the field shrinks under him
+const DOWN_SHOT = { cam: [-52, 20, 190, 110, -6], to: [-52, 20, 340, 110, -6], lin: 1, speed: 1,
+  acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 7]] }), K({ a: [-52, 12], aura: 3, zs: [[0, 60], [1.85, 94]], zease: 'out', poses: [[0, ACT.rise, 20], [1.0, ACT.hover, 5]] })],
+  caps: [[.1, 'THE GROUND DROPS OFF ME.']] };
 const CH1_KEEP_SHOTS = [
   // "Dawn, and banners."
   VS(0, 2.35, { bg: 'keep', music: 'dawn', cel: 'front', cam: [-24, 250, 124, 170, .64], to: [-6, 236, 112, 170, .56], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[0, 'DAWN, AND BANNERS.']] }),
@@ -306,11 +310,20 @@ const CH1_KEEP_SHOTS = [
     acts: [L({ a: [-56, 7], faceTo: 'kael2', path: [[0, -56, 7], [1.5, -56, 7], [1.9, -34, 2], [2.4, -33, 2]], poses: [[0, ACT.ready, 10], [.2, ACT.brace, 6], [1.9, ACT.backStep, 10]], sts: [[1.12, 'atk', { dur: .38, combo: 1 }], [1.52, 'hurt', { dur: .3, kx: 90, ky: -20 }]] }),
            K({ a: [-84, 14], aura: 2, faceTo: 'lucan', path: [[0, -84, 14], [1.05, -84, 14], [1.52, -68, 10], [2.4, -54, 12]], poses: [[0, ACT.stand, 6], [.25, ACT.ready, 8], [1.05, ACT.through, 22], [1.44, ACT.shove, 26], [1.95, ACT.ready, 9]] })],
     caps: [[.2, 'THE SECOND COMES,'], [1.2, 'AND I STEP THROUGH IT.']] }),
-  // "I hit, and he takes it. He hits, and I take it."
-  VS(36.65, 40.7, { cam: [-42, 132, 50, 188, .33], to: [-38, 120, 48, 198, .33], lin: 1, sfxs: [[.3, 'hit'], [2.33, 'hit']], shakes: [[.3, .35], [2.33, .35]], fxs: [[.28, 'spark', -32, 3, '#fff', 10, 30], [.28, 'kick', .07], [2.31, 'spark', -42, 8, '#fff', 10, 30], [2.31, 'kick', .07]],
-    acts: [L({ a: [-30, 2], faceTo: 'kael2', path: [[0, -30, 2], [.28, -30, 2], [.55, -24, 0], [1.95, -24, 0], [2.28, -28, 1], [4.05, -28, 1]], poses: [[0, ACT.ready, 12], [.65, ACT.taken, 10], [1.5, ACT.ready, 6]], sts: [[.28, 'hurt', { dur: .36, kx: 90, ky: -10 }], [2.12, 'atk', { dur: .4, combo: 1 }]] }),
-           K({ a: [-50, 13], aura: 2, faceTo: 'lucan', path: [[0, -50, 13], [.25, -44, 9], [2.3, -44, 9], [2.62, -52, 12], [4.05, -52, 12]], poses: [[0, ACT.ready, 12], [2.68, ACT.taken, 10], [3.4, ACT.spent, 4]], sts: [[.12, 'atk', { dur: .4, combo: 2 }], [2.31, 'hurt', { dur: .36, kx: -90, ky: 10 }]] })],
-    caps: [[.15, 'I HIT,'], [.95, 'AND HE TAKES IT.'], [2.15, 'HE HITS,'], [2.92, 'AND I TAKE IT.']] }),
+  // "I hit,"
+  VS(36.65, 37.5, { cam: [-42, 132, 50, 188, .33], to: [-40, 126, 49, 194, .33], lin: 1, sfxs: [[.3, 'hit']], shakes: [[.3, .35]], fxs: [[.28, 'spark', -32, 3, '#fff', 10, 30], [.28, 'kick', .07]],
+    acts: [L({ a: [-30, 2], faceTo: 'kael2', path: [[0, -30, 2], [.28, -30, 2], [.55, -24, 0], [.85, -24, 0]], poses: [[0, ACT.ready, 12], [.65, ACT.taken, 10]], sts: [[.28, 'hurt', { dur: .36, kx: 90, ky: -10 }]] }),
+           K({ a: [-50, 13], aura: 2, faceTo: 'lucan', path: [[0, -50, 13], [.25, -44, 9], [.85, -44, 9]], poses: [[0, ACT.ready, 12]], sts: [[.12, 'atk', { dur: .4, combo: 2 }]] })],
+    caps: [[.15, 'I HIT,']] }),
+  // "and he takes it."  on him: his head comes back up, and he sets his feet
+  VS(37.5, 38.67, { ...cu(-24, 0, 1.9, 2.3, 8), acts: [L({ a: [-24, 0], faceTo: 'kael2', poses: [[0, ACT.taken, 10], [.55, ACT.ready, 6]] }), K({ a: [-44, 9], aura: 2, faceTo: 'lucan', poses: [[0, ACT.ready, 12]] })], caps: [[.1, 'AND HE TAKES IT.']] }),
+  // "He hits,"
+  VS(38.67, 39.5, { cam: [-30, 124, 44, 196, .35], to: [-34, 118, 43, 200, .35], lin: 1, sfxs: [[.3, 'hit']], shakes: [[.3, .35]], fxs: [[.29, 'spark', -42, 8, '#fff', 10, 30], [.29, 'kick', .07]],
+    acts: [L({ a: [-24, 0], faceTo: 'kael2', path: [[0, -24, 0], [.26, -28, 1], [.83, -28, 1]], poses: [[0, ACT.ready, 12]], sts: [[.1, 'atk', { dur: .4, combo: 1 }]] }),
+           K({ a: [-44, 9], aura: 2, faceTo: 'lucan', path: [[0, -44, 9], [.28, -44, 9], [.6, -52, 12], [.83, -52, 12]], poses: [[0, ACT.ready, 12], [.66, ACT.taken, 10]], sts: [[.29, 'hurt', { dur: .36, kx: -90, ky: 10 }]] })],
+    caps: [[.15, 'HE HITS,']] }),
+  // "and I take it."  on me: bent over it, straightening slowly
+  VS(39.5, 40.7, { ...cu(-52, 12, 1.9, 2.3, -8), acts: [K({ a: [-52, 12], aura: 2, faceTo: 'lucan', poses: [[0, ACT.taken, 10], [.5, ACT.spent, 4]] }), L({ a: [-28, 1], faceTo: 'kael2', poses: [[0, ACT.ready, 10]] })], caps: [[.1, 'AND I TAKE IT.']] }),
   // "Under my ribs a pressure starts, low,"
   VS(40.7, 43.75, { ...cu(-52, 12, 1.9, 2.5, -12), acts: [K({ a: [-52, 12], fx: .5, fy: .9, aura: 2, poses: [[0, ACT.spent, 6], [.3, ACT.ribs, 6], [2.35, ACT.ribsLow, 6]] })], caps: [[.2, 'UNDER MY RIBS A PRESSURE STARTS,'], [2.38, 'LOW,']] }),
   // "the way a seal starts to lift before anybody hears it."
@@ -318,22 +331,27 @@ const CH1_KEEP_SHOTS = [
     acts: [L({ a: [-28, 1], faceTo: 'kael2', path: [[0, -28, 1], [1.3, -28, 1], [2.0, -18, -1], [3.3, -18, -1]], poses: [[0, ACT.ready, 10], [1.3, ACT.backStep, 9], [2.2, ACT.ready, 7]] }),
            K({ a: [-52, 12], fx: .8, fy: -.2, aura: 3, poses: [[0, ACT.ribsLow, 6], [.6, ACT.ribs, 3], [1.7, ACT.heave, 4], [2.5, ACT.headUp, 6]] })],
     caps: [[.15, 'THE WAY A SEAL STARTS TO LIFT BEFORE ANYBODY HEARS IT.']] }),
-  // "I go up. The ground drops off me."
-  VS(47.05, 50.1, { cam: [-40, 176, 56, 170, .34], to: [-40, 196, 124, 160, .54], speed: 1, sfxs: [[.42, 'dash'], [.42, 'roar']], shakes: [[.42, .4]], fxs: [[.42, 'ring', -52, 12, '#fff2c0', 90], [.44, 'ring', -52, 12, '#ff7a30', 56], [.42, 'spark', -52, 12, '#d8d4e4', 16, 0], [.42, 'kick', .08]],
-    acts: [L({ a: [-18, -1], faceTo: 'kael2', path: [[0, -18, -1], [.5, -18, -1], [1.1, -10, -3], [3.05, -10, -3]], poses: [[0, ACT.ready, 10], [.5, ACT.backStep, 12], [1.3, ACT.lookUp, 7]] }),
-           K({ a: [-52, 12], aura: 3, zs: [[0, 0], [.42, 0], [1.3, 66], [3.05, 94]], zease: 'out', poses: [[0, ACT.coil, 20], [.42, ACT.rise, 30], [2.0, ACT.hover, 5]] })],
-    caps: [[.3, 'I GO UP.'], [1.3, 'THE GROUND DROPS OFF ME.']] }),
+  // "I go up."
+  VS(47.05, 48.25, { cam: [-40, 176, 56, 170, .34], to: [-40, 186, 84, 166, .42], speed: 1, sfxs: [[.42, 'dash'], [.42, 'roar']], shakes: [[.42, .4]], fxs: [[.42, 'ring', -52, 12, '#fff2c0', 90], [.44, 'ring', -52, 12, '#ff7a30', 56], [.42, 'spark', -52, 12, '#d8d4e4', 16, 0], [.42, 'kick', .08]],
+    acts: [L({ a: [-18, -1], faceTo: 'kael2', path: [[0, -18, -1], [.5, -18, -1], [1.1, -10, -3], [1.2, -10, -3]], poses: [[0, ACT.ready, 10], [.5, ACT.backStep, 12]] }),
+           K({ a: [-52, 12], aura: 3, zs: [[0, 0], [.42, 0], [1.2, 60]], zease: 'out', poses: [[0, ACT.coil, 20], [.42, ACT.rise, 30]] })],
+    caps: [[.3, 'I GO UP.']] }),
+  // "The ground drops off me."  from above: the keep turns into a square of roof
+  VS(48.25, 50.1, DOWN_SHOT),
   // "The woman in the chair turns her head,"
   VS(50.1, 52.45, { cels: [[0, 'turn'], [.9, 'up']], cam: [0, 50, 94, 240, .58], to: [0, 42, 96, 262, .6], lin: 1, acts: [], caps: [[.25, 'THE WOMAN IN THE CHAIR TURNS HER HEAD,']] }),
   // "only her head, to follow."
   VS(52.45, 54.85, { cel: 'up', cam: [-34, 196, 124, 160, .54], to: [-30, 182, 136, 166, .57], lin: 1,
     acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 8]] }), K({ a: [-52, 12], aura: 3, zs: [[0, 94], [1.2, 98], [2.4, 96]], poses: [[0, ACT.hover, 6], [.4, ACT.hoverUp, 3]] })],
     caps: [[.2, 'ONLY HER HEAD,'], [1.45, 'TO FOLLOW.']] }),
-  // "Then I come down on him."
-  VS(54.85, 56.62, { cel: 'front', cam: [-30, 182, 136, 166, .57], to: [-22, 152, 60, 180, .34], lin: 1, speed: 1, sfxs: [[.4, 'roar']], fxs: [.6, .8, 1.0, 1.2, 1.4, 1.6].map(t => [t, 'spark', -52 + 25 * Math.pow((t - .4) / 1.37, 1), 12 - 12 * (t - .4) / 1.37, '#ffb040', 5, 96 - 94 * Math.pow((t - .4) / 1.37, 2)]),
-    acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 12], [.5, ACT.brace, 20]] }),
-           K({ a: [-52, 12], aura: 4, path: [[0, -52, 12], [.3, -52, 12], [1.77, -27, 0]], zs: [[0, 96], [.3, 96], [1.77, 2]], poses: [[0, ACT.hoverUp, 14]], sts: [[.3, 'plunge', { until: 1.77 }]] })],
+  // "Then I come down on him."  from over my shoulder, looking down: he is very small, and he has seen it
+  VS(54.85, 55.5, { cel: 'front', cam: [-52, 40, 200, 120, -2], to: [-50, 40, 190, 124, -2], lin: 1, sfxs: [[.3, 'roar']],
+    acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 12], [.25, ACT.brace, 14]] }), K({ a: [-52, 12], aura: 4, zs: [[0, 96]], poses: [[0, ACT.hoverUp, 14]] })],
     caps: [[.2, 'THEN I COME DOWN ON HIM.']] }),
+  VS(55.5, 56.62, { cam: [-30, 182, 136, 166, .57], to: [-22, 152, 60, 180, .34], lin: 1, speed: 1, fxs: [.15, .35, .55, .75, .95].map(t => [t, 'spark', -52 + 25 * t / 1.12, 12 - 12 * t / 1.12, '#ffb040', 5, 96 - 94 * t / 1.12]),
+    acts: [L({ a: [-10, -3], faceTo: 'kael2', poses: [[0, ACT.brace, 20]] }),
+           K({ a: [-52, 12], aura: 4, path: [[0, -52, 12], [1.12, -27, 0]], zs: [[0, 96], [1.12, 2]], poses: [[0, ACT.hoverUp, 14]], sts: [[0, 'plunge', { until: 1.12 }]] })],
+    caps: [[0, 'THEN I COME DOWN ON HIM.']] }),
   // the landing
   VS(56.62, 57.0, { cam: [-10, 150, 56, 178, .33], to: [6, 138, 52, 186, .33], flash: 1, shake: .8, sfx: 'hit', speed: 1, fxs: [[.02, 'ring', -12, -2, '#fff2c0', 110], [.04, 'ring', -12, -2, '#ff7a30', 70], [.02, 'spark', -14, -2, '#ffe9a0', 20, 26], [.02, 'spark', -20, 0, '#d8d4e4', 14, 0], [.02, 'kick', .12], [.2, 'spark', 10, -4, '#d8d4e4', 6, 0]],
     acts: [L({ a: [-10, -3], faceTo: 'kael2', path: [[0, -10, -3], [.04, -10, -3], [.36, 30, -5]], poses: [[0, ACT.brace, 20]], sts: [[.03, 'hurt', { dur: .4, kx: 120, ky: -10 }]] }),
@@ -349,12 +367,27 @@ const CH1_KEEP_SHOTS = [
   blow(64.2, 65.0, 9, 'NINE', cu(kx(9), -3, 1.5, 1.8, -8)),
   blow(65.0, 66.0, 10, 'TEN', Object.assign(side(10, 50), { bigC: '#fff6dc' })),
   // "The blade comes down."
-  VS(66.0, 68.4, { cam: [40, 126, 62, 185, .4], to: [44, 104, 58, 200, .42], bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)',
+  VS(66.0, 67.75, { cam: [40, 126, 62, 185, .4], to: [43, 108, 59, 198, .42], bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)',
     acts: [L({ a: [52, -5], faceTo: 'kael2', poses: [[0, ACT.kneelUp, 9]] }),
-           K({ a: [30, -3], aura: 4, faceTo: 'lucan', poses: [[0, ACT.ready, 16], [.3, ACT.overhead, 6]], sts: [[2.1, 'atk', { dur: .5, combo: 3, t0: .05 }]] })],
+           K({ a: [30, -3], aura: 4, faceTo: 'lucan', poses: [[0, ACT.ready, 16], [.3, ACT.overhead, 6]] })],
     caps: [[.3, 'THE BLADE COMES DOWN.']] }),
-  { d: 0.6, vd: .9, black: 1, flash: 1, sfx: 'hit', shake: .6 }
+  // her, as it falls: she has not moved
+  VS(67.75, 68.5, { cel: 'turn', cam: [0, 44, 94, 256, .58], to: [0, 40, 94, 268, .58], lin: 1, acts: [], sfxs: [[.5, 'swing']], caps: [[0, 'THE BLADE COMES DOWN.']] }),
+  // black. the hit; the music goes; two heartbeats; then nothing, before the card
+  { d: 3.6, vd: 3.6, black: 1, flash: 1, sfx: 'hit', shake: .6, fxs: [[.05, 'fn', () => Sound.music(null)], [1.1, 'fn', () => Sound.play('heart')], [2.3, 'fn', () => Sound.play('heart')]] }
 ];
+const MEM_AT = 40.7, MEM = 7.5;
+for (const sh of CH1_KEEP_SHOTS) if (sh.va !== undefined && sh.va >= MEM_AT - .01) sh.va += MEM;
+{ const i = CH1_KEEP_SHOTS.findIndex(sh => sh.va !== undefined && sh.va >= MEM_AT + MEM - .01);
+  CH1_KEEP_SHOTS.splice(i, 0,
+    // the night before: the ford, the truce he asked for. (His words are from the game's truce scene.)
+    VS(MEM_AT, MEM_AT + 4.0, { bg: 'ford', flash: 1, sfx: 'heart', mem: 1, tint: 'rgba(30,40,90,.34)', cam: [0, 200, 90, 160, .3], to: [6, 150, 60, 176, .33], lin: 1, sfxs: [[2, 'heart']],
+      acts: [{ id: 'lucan', a: [26, -14], fx: -1, fy: .5, blade: 0, poses: [[0, ACT.stand, 5]] }, { id: 'kael2', a: [-30, 22], fx: 1, fy: -.6, blade: 1, walk: 1, path: [[0, -44, 30], [3.2, -26, 20], [4, -26, 20]], poses: [[0, ACT.low, 5]] }],
+      caps: [[.3, 'HE IS STANDING ON THE FAR BANK, ALONE, WITH HIS BLADE LEFT ON THE STONES BEHIND HIM.']] }),
+    VS(MEM_AT + 4.0, MEM_AT + MEM, { bg: 'ford', mem: 1, tint: 'rgba(30,40,90,.34)', ...cu(26, -14, 2.0, 2.6, 10), sfxs: [[1.6, 'heart']],
+      acts: [{ id: 'lucan', a: [26, -14], fx: -1, fy: .5, blade: 0, poses: [[0, ACT.stand, 5], [1.4, Object.assign({}, ACT.stand, { hx: -.08, hy: .35, lp: -.5, le: -.9, ly: .2 }), 3]] }],
+      caps: [[.15, '“YOU FIGHT AS IF YOU HATE THE GROUND YOU ARE STANDING ON. WHERE DOES ONE LEARN IT?”']] }));
+  CH1_KEEP_SHOTS[i + 2].flash = 1; }
 // ---- the voice. The read is the clock: while it plays, the film's time is the audio's time, so picture and voice cannot drift.
 const VO = { a: null, on: false, off: false,
   start() { if (this.off) return; try { if (!this.a) { this.a = new Audio(CH1_VO_SRC); this.a.preload = 'auto'; } this.a.currentTime = 0; this.a.volume = 1; this.vt = 0; this.last = -1; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
@@ -366,7 +399,7 @@ const VO = { a: null, on: false, off: false,
     if (s.va !== undefined && VO.on) { VO.vt += dt; const a = VO.a; if (a && !a.paused && !a.ended) { const ct = a.currentTime; if (ct !== VO.last) { VO.last = ct; if (Math.abs(ct - VO.vt) < .35) VO.vt = ct; else { try { a.currentTime = VO.vt; } catch (e) { } } } } c.t = Math.max(0, VO.vt - s.va - dt); }
     const tA = c.t; u0.call(this, dt);
     if (!this.cine) return VO.stop();
-    const c2 = this.cine; if (c2.i === i0) { const tB = c2.t; if (s.sfxs) for (const e of s.sfxs) if (e[0] > tA && e[0] <= tB || (tA === 0 && e[0] === 0)) Sound.play(e[1]); if (s.shakes) for (const e of s.shakes) if (e[0] > tA && e[0] <= tB) this.shake = e[1]; if (s.fxs) for (const e of s.fxs) if (e[0] > tA && e[0] <= tB) { const a = e.slice(2); if (e[1] === 'spark') this.spark(...a); else if (e[1] === 'ring') this.ring(...a); else if (e[1] === 'kick') c2._kick = a[0]; } }
+    const c2 = this.cine; if (c2.i === i0) { const tB = c2.t; if (s.sfxs) for (const e of s.sfxs) if (e[0] > tA && e[0] <= tB || (tA === 0 && e[0] === 0)) Sound.play(e[1]); if (s.shakes) for (const e of s.shakes) if (e[0] > tA && e[0] <= tB) this.shake = e[1]; if (s.fxs) for (const e of s.fxs) if (e[0] > tA && e[0] <= tB) { const a = e.slice(2); if (e[1] === 'spark') this.spark(...a); else if (e[1] === 'ring') this.ring(...a); else if (e[1] === 'kick') c2._kick = a[0]; else if (e[1] === 'fn') a[0](); } }
     else { const s2 = c2.shots[c2.i]; if (s2 && s2.va !== undefined && VO.on && Math.abs(VO.vt - s2.va) > .2) { VO.vt = s2.va; try { VO.a.currentTime = s2.va; } catch (e) { } } }
     if (c2.shots[c2.i] && c2.shots[c2.i].va !== undefined) { const w = VO.vt || 0; this.cam.x += Math.sin(w * .7) * .5; this.cam.h += Math.sin(w * .93 + 1) * .35; }
     if (c2._kick > .002) { this.cam.f *= 1 + c2._kick; c2._kick *= Math.pow(.0008, dt); } };
@@ -382,11 +415,11 @@ const CH1_KEEP = [
 const STAB = {};
 // subtitles for the voiced film: a serif italic set over the picture, no box; the counted numbers in the same face
 const SUB = { el: null, big: null, key: null, t0: 0,
-  sent(t) { t = t.toLowerCase().replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase()).replace(/\bi\b/g, 'I'); return t; },
-  make() { if (this.el) return; const st = document.createElement('style'); st.textContent = '.ch1sub{position:fixed;z-index:50;pointer-events:none;text-align:center;font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-style:italic;font-weight:600;color:#fff6e2;letter-spacing:.012em;line-height:1.22;-webkit-text-stroke:.16em rgba(8,4,10,.62);paint-order:stroke fill;text-shadow:0 .06em .1em #000,0 0 .5em rgba(0,0,0,.9),0 0 1.4em rgba(0,0,0,.75);opacity:0;transition:opacity .22s ease}.ch1num{position:fixed;z-index:50;pointer-events:none;text-align:center;font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:700;letter-spacing:.3em;text-indent:.3em;color:#ff8a3c;-webkit-text-stroke:.1em rgba(20,6,2,.7);paint-order:stroke fill;text-shadow:0 .05em .08em #000,0 0 .3em rgba(0,0,0,.9),0 0 1em rgba(255,90,20,.6);opacity:0}'; document.head.appendChild(st);
+  sent(t) { t = t.toLowerCase().replace(/(^[\u201c]?|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase()).replace(/\bi\b/g, 'I'); return t; },
+  make() { if (this.el) return; const st = document.createElement('style'); st.textContent = '.ch1sub{position:fixed;z-index:50;pointer-events:none;text-align:center;font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-style:italic;font-weight:600;color:#fff6e2;letter-spacing:.012em;line-height:1.32;-webkit-text-stroke:.14em rgba(8,4,10,.7);paint-order:stroke fill;filter:drop-shadow(0 .05em .05em rgba(0,0,0,.95)) drop-shadow(0 0 .3em rgba(0,0,0,.8));opacity:0;transition:opacity .22s ease}.ch1sub.mem{font-style:normal;font-weight:500;color:#dfe6ff;letter-spacing:.03em}.ch1num{position:fixed;z-index:50;pointer-events:none;text-align:center;font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:700;letter-spacing:.3em;text-indent:.3em;color:#ff8a3c;-webkit-text-stroke:.1em rgba(20,6,2,.7);paint-order:stroke fill;text-shadow:0 .05em .08em #000,0 0 .3em rgba(0,0,0,.9),0 0 1em rgba(255,90,20,.6);opacity:0}'; document.head.appendChild(st);
     this.el = document.createElement('div'); this.el.className = 'ch1sub'; this.big = document.createElement('div'); this.big.className = 'ch1num'; document.body.appendChild(this.el); document.body.appendChild(this.big); setInterval(() => { if (!Brawl.cine) this.hide(); }, 250); },
   place() { const r = document.getElementById('game').getBoundingClientRect(); const e = this.el.style, b = this.big.style; e.left = (r.left + r.width * .08) + 'px'; e.width = (r.width * .84) + 'px'; e.bottom = (window.innerHeight - r.bottom + r.height * .125) + 'px'; e.fontSize = Math.max(15, r.width * .043) + 'px'; b.left = r.left + 'px'; b.width = r.width + 'px'; b.top = (r.top + r.height * .13) + 'px'; b.fontSize = Math.max(26, r.width * .09) + 'px'; },
-  show(text, key) { this.make(); if (key === this.key) return; this.key = key; this.place(); if (!text) { this.el.style.opacity = 0; return; } this.el.style.transition = 'none'; this.el.style.opacity = 0; this.el.textContent = this.sent(text); void this.el.offsetWidth; this.el.style.transition = ''; this.el.style.opacity = 1; },
+  show(text, key, mem) { this.make(); this.el.className = mem ? 'ch1sub mem' : 'ch1sub'; if (key === this.key) return; this.key = key; this.place(); if (!text) { this.el.style.opacity = 0; return; } this.el.style.transition = 'none'; this.el.style.opacity = 0; this.el.textContent = this.sent(text); void this.el.offsetWidth; this.el.style.transition = ''; this.el.style.opacity = 1; },
   num(word, col, t) { this.make(); if (!word) { if (this._n) { this._n = ''; this.big.style.opacity = 0; } return; } if (this._n !== word) { this._n = word; this.place(); this.big.textContent = word; this.big.style.color = col || '#ff8a3c'; } const k = Math.min(1, Math.max(0, (t - .08) / .1)); this.big.style.opacity = k; this.big.style.transform = 'scale(' + (1.35 - .35 * k) + ')'; },
   hide() { if (!this.el) return; this.key = null; this._n = ''; this.el.style.opacity = 0; this.big.style.opacity = 0; } };
 // the acting layer: reads an actor's performance each frame and sets what the game's own rig then draws
@@ -414,7 +447,7 @@ const CEL = { cache: {}, draw(kind) { if (this.cache[kind]) return this.cache[ki
     else if (kind === 'up') { g.fillStyle = HR; g.fillRect(15, 1, 14, 10); g.drawImage(base, 14, 3, 16, 9, 14, 1, 16, 9); g.fillStyle = HR; g.fillRect(18, 10, 8, 3); g.drawImage(base, 18, 13, 8, 9, 18, 11, 8, 9); g.fillStyle = SK; g.fillRect(18, 20, 8, 4); g.fillStyle = SK2; g.fillRect(19, 23, 6, 3); g.fillStyle = '#8a5a4a'; g.fillRect(20, 20, 4, 1); }
     return (this.cache[kind] = c); },
   set(kind) { const L = G3.bbs && G3.bbs.keep; if (!L) return; const i = L.findIndex(b => b.tag === 'dais' && b.x === 0); if (i < 0 || L[i]._kind === kind) return; this.ent = this.ent || {}; if (!this.ent[kind]) this.ent[kind] = Object.assign({}, L[i], { cv: this.draw(kind), tex: null, _kind: kind }); if (!L[i]._kind) { L[i]._kind = 'front'; this.ent.front = L[i]; } L[i] = this.ent[kind]; } };
-{ const r0 = Brawl.renderCine; Brawl.renderCine = function (g) { const c = this.cine, s = c && c.shots[c.i]; if (s && this.def.bg === 'keep') { let kind = s.cel; if (s.cels) for (const e of s.cels) if (c.t >= e[0]) kind = e[1]; if (kind) CEL.set(kind); } if (s && s.caps) { let cp = ''; for (const e of s.caps) if (c.t >= e[0]) cp = e[1]; s.cap = undefined; SUB.show(cp, s.va + '|' + cp); } else if (s && s.va !== undefined) SUB.show('', ''); if (s && s.va !== undefined && s.big) { s._big = s.big; s._bigC = s.bigC; s.big = undefined; } SUB.num(s && s._big ? s._big : '', s && s._bigC, c ? c.t : 0); return r0.call(this, g); }; }
+{ const r0 = Brawl.renderCine; Brawl.renderCine = function (g) { const c = this.cine, s = c && c.shots[c.i]; if (s && this.def.bg === 'keep') { let kind = s.cel; if (s.cels) for (const e of s.cels) if (c.t >= e[0]) kind = e[1]; if (kind) CEL.set(kind); } if (s && s.caps) { let cp = ''; for (const e of s.caps) if (c.t >= e[0]) cp = e[1]; s.cap = undefined; SUB.show(cp, s.va + '|' + cp, s.mem); } else if (s && (s.va !== undefined || c.shots === CH1_KEEP_SHOTS)) SUB.show('', ''); if (s && s.va !== undefined && s.big) { s._big = s.big; s._bigC = s.bigC; s.big = undefined; } SUB.num(s && s._big ? s._big : '', s && s._bigC, c ? c.t : 0); return r0.call(this, g); }; }
 
 // ============================================================
 // CHAPTER ONE, BELOW — the same story as CH1_NEW, told the way the Assay is told: a film.
