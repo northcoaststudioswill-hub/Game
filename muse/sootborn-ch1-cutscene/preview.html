@@ -9504,6 +9504,96 @@ const TAVI16_FILM = () => ({ bg: 'svc', arena: { kind: 'rect', w: 220, h: 100 },
 const TAVI16 = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: () => TAVI16_FILM() }];
 const TAVI16_OLD = [{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 }];
 
+// ============================================================
+// SCENE 25, REBUILT: THE BOOK. At the Pinning the pin closes on his collar and for ten seconds he is somewhere else, nine years on:
+// the Count, a book as wide as a table, and one line in it. The game holds one drawing. Here it is a 3D film on a set built for it.
+G3.LOOK.count = Object.assign({}, G3.LOOK.hall, { amb: [.44, .4, .4], sunC: [1.25, 1.05, .85], fog: [.1, .08, .07], fogR: [320, 900] });
+// (x across, y up, z toward the camera.) A long table under lamps with the book open on it, ledgers to the ceiling behind,
+// two tall windows with the sky in them (every room on the fourth ring has a window), a white floor with a gold border.
+const BOOK = { y: 26.35, row: (i) => -24 + i * 2.7, x0: 6, x1: 62, red: 8 };
+const COUNTSET = (A, S) => {
+  const I = M4.id(), GOLD = '#e8c25a', WOOD = '#4a3024', WOOD2 = '#3a241a';
+  let sd = 2718; const rnd = () => (sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296, pick = (L) => L[Math.floor(rnd() * L.length)];
+  for (let ix = -8; ix < 8; ix++) for (let iz = -4; iz < 5; iz++) { const k = (ix + iz) & 1; A.quad(ix * 30, iz * 30, ix * 30 + 30, iz * 30 + 30, 0, k ? [.9, .88, .84] : [.84, .82, .78]); }
+  A.box(I, 0, .1, -60, 400, .2, 2, GOLD, 1); A.box(I, 0, .1, 90, 400, .2, 2, GOLD, 1);
+  // the table, and the book on it
+  S.box(I, 0, 24, -8, 150, 3, 50, WOOD); for (const sx of [-1, 1]) for (const sz of [-1, 1]) S.box(I, sx * 68, 11.5, -8 + sz * 20, 4, 23, 4, WOOD2); A.box(I, 0, 25.6, 17.2, 150, .8, .6, GOLD, 1);
+  S.box(I, 0, 26, -8, 134, .8, 43, '#5a1e18'); A.box(I, 0, 28.2, -8, .8, .3, 40, [.5, .42, .3], 1); // the binding, and the gutter
+  for (const side of [-1, 1]) S.box(I, side * 33, 27.4, -8, 62, 1.4, 38, side > 0 ? '#f4ead0' : '#efe4c8');
+  // the ruled lines, a name and two figures on each; struck lines in black; the red line left blank for the hand to find
+  for (const side of [-1, 1]) for (let i = 0; i < 14; i++) { const z = BOOK.row(i), y = BOOK.y + (side > 0 ? 1.9 : 1.9) + .02; const xa = side > 0 ? BOOK.x0 : -62, xb = side > 0 ? BOOK.x1 : -6;
+    A.box(I, (xa + xb) / 2, y - .05, z + 1, xb - xa, .05, .12, [.8, .74, .6], 1);
+    if (side > 0 && i === BOOK.red) continue;
+    const n = 2 + ((i * 7 + side * 3 + 9) % 3); let x = xa + 1.5; for (let j = 0; j < n; j++) { const len = 3 + rnd() * 6; A.box(I, x + len / 2, y, z, len, .06, .5, [.24, .2, .22], 1); x += len + 1.4; }
+    for (const c of [.66, .84]) A.box(I, xa + (xb - xa) * c + 2, y, z, 4, .06, .5, [.24, .2, .22], 1);
+    if ((i * 5 + (side > 0 ? 2 : 0)) % 6 === 0) A.box(I, (xa + xb) / 2 - 6, y + .03, z - .1, (xb - xa) * .6, .05, .22, [.06, .04, .05], 1); }
+  // the red line: his own name. Nobody has struck it
+  { const z = BOOK.row(BOOK.red), y = BOOK.y + 1.95; A.box(I, BOOK.x0 + 10, y, z, 17, .07, .7, [.75, .12, .1], 1); A.box(I, BOOK.x0 + 10, y, z + 1.1, 20, .06, .18, [.75, .12, .1], 1); }
+  // an inkwell, a blotter, a lamp on the table
+  S.cyl(I, 56, 26, 8, 2.6, 2.2, 4, 8, '#1e1a22'); S.box(I, -50, 26, 10, 20, .6, 12, '#2a3a2e'); S.cyl(I, -64, 26, -24, 4, 3, 2, 8, '#6a5a40'); S.cyl(I, -64, 28, -24, 1, 1, 16, 6, '#6a5a40'); A.box(I, -64, 46, -24, 7, 7, 7, [1, .86, .55], 1);
+  // the back wall: ledgers from floor to ceiling, a ladder, two windows
+  S.box(I, 0, 100, -102, 420, 220, 4, '#e8e2d4');
+  for (let sh = 0; sh < 11; sh++) { const y = 6 + sh * 18; S.box(I, 0, y - 1, -96, 400, 1.6, 10, WOOD); for (let x = -196; x < 196;) { const w = 2.4 + rnd() * 2.2, h = 11 + rnd() * 4; if (Math.abs(x + 80) < 26 && y > 40 || Math.abs(x - 80) < 26 && y > 40) { x += w; continue; } S.box(I, x + w / 2, y + h / 2, -96, w, h, 8, pick(['#5a1e18', '#3a2a22', '#4a3a24', '#22303a', '#5a4a2a', '#6a2a1e'])); if (rnd() < .3) A.box(I, x + w / 2, y + h * .7, -91.9, w * .8, .6, .2, GOLD, 1); x += w + .2; } }
+  for (const wx of [-80, 80]) { A.box(I, wx, 120, -99.5, 46, 150, 1, [.72, .84, 1], 1); for (const dx of [-11.5, 11.5]) S.box(I, wx + dx, 120, -98, 1.4, 150, 2, '#e8e2d4'); S.box(I, wx, 120, -98, 46, 1.4, 2, '#e8e2d4'); S.box(I, wx, 45, -98, 52, 4, 6, GOLD); S.box(I, wx, 196, -98, 52, 4, 6, GOLD);
+    A.box(I, wx - 4, 160, -99.2, 18, 4, .4, [1, 1, 1], 1); A.box(I, wx + 8, 150, -99.2, 12, 3, .4, [1, 1, 1], 1); }
+  { const lm = M4.chain(M4.t(150, 0, -88), M4.rz(-.18)); for (const dx of [-6, 6]) S.box(lm, dx, 90, 0, 1.6, 180, 1.6, WOOD); for (let k = 0; k < 14; k++) S.box(lm, 0, 8 + k * 12, 0, 12, 1.2, 1.2, WOOD); }
+  // side walls and the ceiling, with two hanging lamps over the book
+  for (const sx of [-1, 1]) S.box(I, sx * 210, 100, 0, 4, 220, 210, '#e2dccc');
+  S.box(I, 0, 214, 0, 430, 6, 220, '#d8d2c2');
+  for (const lx of [-30, 30]) { S.cyl(I, lx, 150, -8, .4, .4, 64, 4, '#3a3a40'); S.cyl(I, lx, 140, -8, 9, 3, 10, 8, '#2a2a30'); A.box(I, lx, 138, -8, 8, 2, 8, [1, .9, .66], 1); }
+};
+{ const env2 = G3.env; G3.env = function (bg) { if (bg !== 'count' || !this.gl) return env2.call(this, bg); if (this.envs.count) return this.envs.count;
+    const A = new Batch(30000), S = new Batch(30000); COUNTSET(A, S); const gl = this.gl;
+    const mk = B => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, B.a.subarray(0, B.n * 9), gl.STATIC_DRAW); return { b, n: B.n }; };
+    return this.envs.count = { a: mk(A), s: mk(S), hw: 110, hh: 200 }; }; }   // hh puts the game's two field flags behind the shelves
+
+// the hand on the page: a white cuff with gold at the wrist, a brown glove, the pen. It travels down the right-hand column
+const drawHand = (x, z, lift, tilt) => { const D = G3.dyn, y = BOOK.y + 2 + lift, m = M4.chain(M4.t(x, y, z), M4.ry(.5), M4.rx(-.5 + (tilt || 0)), M4.s(.72));
+  D.box(m, 0, 0, -11, 4.2, 4.2, 9, '#f3ead4'); D.box(m, 0, 0, -6.4, 4.5, 4.5, 1.2, '#e2b84a', 1); D.box(m, 0, .2, -3.2, 3.6, 3, 5, '#6a5a44'); D.box(m, .9, -.6, -.2, 1.2, 1.2, 3, '#6a5a44');
+  D.box(M4.chain(m, M4.rx(.9)), .6, 3.2, 1.6, .6, 9, .6, '#1a1016'); D.box(M4.chain(m, M4.rx(.9)), .6, -1.2, 1.6, .5, 1.2, .5, '#e2b84a', 1); };
+{ const f2 = Brawl.fighter; Brawl.fighter = function (g, o, opt) { const r = f2.call(this, g, o, opt), k = opt && (opt.key && (opt.key.act || opt.key)), c = this.cine, s = c && c.shots[c.i];
+    if (k && k.id === 'kaelc' && s && s.pen) { const P = s.pen, t = c.t; let [A, B, u] = kq(P, t); const row = A[1] + (B[1] - A[1]) * u, x = A[2] + (B[2] - A[2]) * u, lift = A[3] + (B[3] - A[3]) * u; drawHand(x, BOOK.row(row) + 1.2, lift, Math.sin(t * 9) * .05 * (lift < 1 ? 1 : 0));
+      if (s.redGlow) G3.glow(BOOK.x0 + 10, BOOK.y + 2.4, BOOK.row(BOOK.red), 10 + s.redGlow * Math.sin(t * 3) * 2, [1, .3, .2], .3 * s.redGlow); }
+    if (k && k.id === 'kaelc' && s && s.bg0 === 'count') { for (const lx of [-30, 30]) G3.glow(lx, 136, -8, 30, [1, .86, .6], .35); G3.glow(-64, 46, -24, 16, [1, .8, .5], .5); }
+    return r; }; }
+const KC = (o) => Object.assign({ id: 'kaelc', blade: 0, fx: 0, fy: 1 }, o);
+const TB = (d, o) => Object.assign({ d, vd: d, sec: 1, drift: 1, noprops: 1, bg0: 'count', caps: [[0, '']] }, o);
+Object.assign(ACT, {
+  read: { cr: 1.6, lean: .38, tw: 0, hx: .62, hy: 0, rp: -.55, ry: .25, re: -1.05, lp: -.4, ly: -.2, le: -1.0, hl: .2, kl: .2, hr: -.1, kr: .15, sp: .1 },
+  readStill: { cr: 1.8, lean: .42, tw: .04, hx: .72, hy: .06, rp: -.55, ry: .25, re: -1.05, lp: -.35, ly: -.25, le: -1.1, hl: .2, kl: .22, hr: -.1, kr: .15, sp: .1 },
+  upright: { cr: .6, lean: .02, tw: 0, hx: -.05, rp: -.2, ry: .2, re: -1.3, lp: -.2, ly: -.2, le: -.9, hl: .1, kl: .1, hr: -.1, kr: .1, sp: .1 }
+});
+// the pen: [t, row, x, lift]
+const PEN = [[0, 1.2, 22, 3], [1.0, 1.4, 20, .6], [2.2, 3, 18, .6], [3.4, 4.6, 16, .7], [4.6, 6.2, 16, .6], [5.6, 7.6, 14, .8], [6.4, 8, 13, .9]];
+const BOOK25_SHOTS = [
+  // the Count hall: the book, the lamps, the shelves to the ceiling; a man bent over the page
+  TB(5.4, { bg: 'count', music: 'hum', cam: [-20, 210, 96, 160, .4], to: [6, 110, 62, 176, .42], sfxs: [[.2, 'heart'], [3.2, 'heart']],
+    caps: [[.5, 'NINE YEARS AFTER THE FURNACE.'], [2.8, 'THE COUNT. A BOOK AS WIDE AS A TABLE.']],
+    acts: [KC({ a: [16, -44], poses: [[0, ACT.read, 4], [3, ACT.readStill, 2]] })] }),
+  // across the page, low: the ruled lines, the names, the figures, the lines that have been struck
+  TB(4.6, { cam: [-44, 2, 96, 120, -4], to: [4, -2, 84, 126, -4], pen: [[0, 1.2, 22, 3], [4.6, 2.4, 20, .6]],
+    acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3]] })] }),
+  // from above, the hand going down the column. The Count, as it was: balanced, balanced, balanced
+  TB(6.6, { cam: [30, 2, 120, 120, -4], to: [24, -2, 96, 126, -4], pen: PEN, mems: [[2.2, 3.9, 'ledger', 1, '255,120,90']], sfxs: [[1.0, 'page'], [2.2, 'cutin'], [4.6, 'page']],
+    acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3]] })] }),
+  // the red line. His own name. Nobody has struck it
+  TB(4.0, { cam: [22, 4, 76, 130, -4], to: [20, 2, 64, 140, -4], redGlow: 1, pen: [[0, 8, 13, .9], [1.6, 8, 12, .5], [4, 8, 12, 1.4]], sfxs: [[.4, 'heart'], [2.4, 'heart']],
+    caps: [[.6, 'BRENNICK, K.']], acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3]] })] }),
+  // his face over it. The furnace door, for a breath
+  TB(3.6, { ...cu(16, -44, 2.4, 3.2, -6), zooms: [[.4, 3.4, .35]], mems: [[1.4, 2.4, 'furnace', 1, '255,90,30']], sfxs: [[1.4, 'cutin']], redGlow: 1,
+    acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3], [2.5, Object.assign({}, ACT.readStill, { hx: .5 }), 2]] })] }),
+  // the pen over the line, not moving
+  TB(3.4, { cam: [34, 34, 50, 210, .7], to: [28, 28, 48, 216, .72], pen: [[0, 8, 12, 1.4], [3.4, 8, 12, 1.6]], redGlow: 1, sfxs: [[1.6, 'heart']],
+    acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3]] })] }),
+  // and back, high: the hall, the book, the man who has not moved
+  TB(5.2, { cam: [6, 110, 62, 176, .42], to: [0, 230, 110, 162, .4], pen: [[0, 8, 12, 1.6]], redGlow: .6, sfxs: [[3.6, 'heart']],
+    acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3], [2.6, ACT.upright, 1.5]] })] }),
+  { d: 1.2, vd: 1.2, black: 1, caps: [[0, '']] }
+];
+const BOOK25_FILM = () => ({ bg: 'count', arena: { kind: 'rect', w: 220, h: 100 }, music: 'hum', cineOnly: 1, film: 1, hero: { id: 'kaelc' }, intro: BOOK25_SHOTS, foes: [] });
+const BOOK25 = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: () => BOOK25_FILM() }];
+const BOOK25_OLD = [{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Count. A book as wide as a table.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'book', secs: 10 }];
+
 // the preview's own front page: this build exists only to show the cutscene
 const CH1_PREVIEW = {
   play(steps) { UI.clear(); freshState('Kael', 0); World.resetSheets(); World.showPlayer = true; Cutscene.play(steps, () => Game.toTitle()); },
@@ -9521,6 +9611,8 @@ Menus.title = function () {
     { label: "Compare: the game's current scenes below", act: () => CH1_PREVIEW.play(CH1_PREVIEW.old()) },
     { label: 'Scene 30, rebuilt: Tavi at sixteen (3D film)', act: () => CH1_PREVIEW.play(TAVI16) },
     { label: "Compare: the game's Tavi at sixteen (a drawn still)", act: () => CH1_PREVIEW.play(TAVI16_OLD) },
+    { label: 'Scene 25, rebuilt: the book (3D film)', act: () => CH1_PREVIEW.play(BOOK25) },
+    { label: "Compare: the game's book (a drawn still)", act: () => CH1_PREVIEW.play(BOOK25_OLD) },
     { label: 'Settings', act: () => Menus.settings() }
   ] }));
 };
