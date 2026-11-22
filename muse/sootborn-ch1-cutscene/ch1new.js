@@ -260,6 +260,8 @@ Object.assign(ACT, {
   shove: { cr: 3.4, lean: .55, tw: .5, rp: -.4, ry: .3, re: -1.3, tilt: -1.2, lp: -1.3, ly: .2, le: -1.6, hl: .9, kl: 1.0, hr: -.6, kr: .7, hx: -.1 },
   spent: { cr: 4.6, lean: .5, tw: .1, hx: .55, rp: .5, re: -.3, tilt: -.2, lp: .2, le: -.5, hl: .7, kl: 1.0, hr: -.4, kr: .8, sp: .2 }
 });
+// a close-up cut into a shot for a while: on (x, y), from scale s0 to s1, at head height h
+const CC = (t0, t1, x, y, s0, s1, dx, h) => [t0, [x + (dx || 0), y + 200 / s0, h || 54, 200, .32], [x, y + 200 / s1, h || 54, 200, .32], t1];
 const VS = (va, ve, o) => Object.assign({ va, vd: ve - va, d: ve - va, sec: 1 }, o);
 const L = (o) => Object.assign({ id: 'lucan', blade: 1, fx: -1, fy: .2 }, o), K = (o) => Object.assign({ id: 'kael2', blade: 1, fx: 1, fy: -.2 }, o);
 // the count: blow n lands with Lucan at lx(n), Kael at kx(n); his guard is lower every time
@@ -282,15 +284,15 @@ const CH1_KEEP_SHOTS = [
   // "Dawn, and banners."
   VS(0, 2.35, { bg: 'keep', music: 'dawn', cel: 'front', cam: [-24, 250, 124, 170, .64], to: [-6, 236, 112, 170, .56], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[0, 'DAWN, AND BANNERS.']] }),
   // "A keep of grey stone on the end of a ridge."
-  VS(2.35, 5.3, { cam: [0, 330, 200, 150, .16], to: [0, 200, 80, 150, .3], acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[.3, 'A KEEP OF GREY STONE ON THE END OF A RIDGE.']] }),
+  VS(2.35, 5.3, { cam: [-30, 700, 34, 150, .47], to: [0, 380, 56, 150, .4], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6]] })], caps: [[.3, 'A KEEP OF GREY STONE ON THE END OF A RIDGE.']] }),
   // "A boy stands under the banners with a blade held low."  he shifts his weight; the point of the blade draws a slow line on the stone
   VS(5.3, 8.95, { cam: [50, 46, 9, 230, .4], to: [44, 78, 52, 205, .34], lin: 1, acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6], [1.3, ACT.lowShift, 2.5], [2.7, ACT.low, 2.5]] })], caps: [[.3, 'A BOY STANDS UNDER THE BANNERS WITH A BLADE HELD LOW.']] }),
   // "He is eighteen."
   VS(8.95, 10.5, { ...cu(40, -10, 2.2, 2.6, 10), zooms: [[.2, 1.4, .45]], cel: 'turn', acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6], [.3, ACT.lowTurn, 5]] })], caps: [[.3, 'HE IS EIGHTEEN.']] }),
   // "He has never been hit by anything he could not see coming."  one lazy practice cut, and the blade goes up on his shoulder
-  VS(10.5, 14.0, { cam: [30, 140, 50, 184, .34], to: [36, 124, 48, 194, .35], lin: 1, sfxs: [[.7, 'swing']], acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6], [1.3, ACT.lowShift, 3], [2.6, ACT.low, 3]], sts: [[.55, 'atk', { dur: .5, combo: 1 }]] })], caps: [[.3, 'HE HAS NEVER BEEN HIT BY ANYTHING HE COULD NOT SEE COMING.']] }),
+  VS(10.5, 14.0, { cam: [30, 140, 50, 184, .34], to: [36, 124, 48, 194, .35], lin: 1, cams: [CC(2.45, 3.51, 40, -10, 2.3, 2.9, 8)], sfxs: [[.7, 'swing']], acts: [L({ a: [40, -10], fy: .3, poses: [[0, ACT.low, 6], [1.3, ACT.lowShift, 3], [2.6, ACT.low, 3]], sts: [[.55, 'atk', { dur: .5, combo: 1 }]] })], caps: [[.3, 'HE HAS NEVER BEEN HIT BY ANYTHING HE COULD NOT SEE COMING.']] }),
   // "On a white platform a woman sits in a chair with her hands folded,"
-  VS(14.0, 18.1, { cel: 'front', cam: [16, 116, 84, 200, .5], to: [2, 84, 88, 206, .52], lin: 1, acts: [], caps: [[.3, 'ON A WHITE PLATFORM A WOMAN SITS IN A CHAIR WITH HER HANDS FOLDED,']] }),
+  VS(14.0, 18.1, { zooms: [[2.3, 4.0, .55]], cel: 'front', cam: [16, 116, 84, 200, .5], to: [2, 84, 88, 206, .52], lin: 1, acts: [], caps: [[.3, 'ON A WHITE PLATFORM A WOMAN SITS IN A CHAIR WITH HER HANDS FOLDED,']] }),
   // "and watches him."  close: her head comes round to her son
   VS(18.1, 19.5, { zooms: [[.3, 1.3, .3]], cels: [[0, 'front'], [.3, 'turn']], cam: [0, 46, 94, 250, .58], to: [0, 42, 94, 262, .58], lin: 1, acts: [], caps: [[.2, 'AND WATCHES HIM.']] }),
   // "The last day."  the whole field: him under the banners; I walk out onto the far end of it
@@ -302,12 +304,12 @@ const CH1_KEEP_SHOTS = [
   // "Under it, on a cord, a brass washer."
   VS(27.4, 31.1, { ...cu(-58, 8, 2.2, 3.3, -8), mems: [[1.35, 3.4, 'hands', 0, '255,210,110']], sfxs: [[1.35, 'cutin']], acts: [K({ a: [-58, 8], fx: .35, fy: .95, aura: 1, poses: [[0, ACT.stand, 5], [.35, ACT.washerUp, 5], [2.3, ACT.washer, 4], [3.3, ACT.washerUp, 6]] })], caps: [[.3, 'UNDER IT, ON A CORD,'], [2.35, 'A BRASS WASHER.']] }),
   // "The first cut comes in out of the sun, and I am not there."
-  VS(31.1, 34.25, { music: 'duel', cam: [-4, 184, 66, 162, .32], to: [-72, 144, 54, 184, .33], sfxs: [[1.65, 'swing']], shakes: [[1.75, .2]], fxs: [[1.75, 'spark', -52, 8, '#e8e4f0', 8, 4], [1.75, 'kick', .04]], cams: [[1.45, [-66, 36, 180, 116, -3], [-70, 36, 160, 120, -3], 2.35]],
+  VS(31.1, 34.25, { music: 'duel', cam: [-4, 184, 66, 162, .32], to: [-72, 144, 54, 184, .33], sfxs: [[1.65, 'swing']], shakes: [[1.75, .2]], fxs: [[1.75, 'spark', -52, 8, '#e8e4f0', 8, 4], [1.75, 'kick', .04]], cams: [[1.45, [-66, 36, 180, 116, -3], [-70, 36, 160, 120, -3], 2.35], CC(2.45, 3.16, -90, 8, 2.0, 2.6, -8)],
     acts: [L({ a: [40, -10], faceTo: 'kael2', path: [[0, 40, -10], [.15, 40, -10], [1.55, -30, 6], [2.0, -44, 6], [3.15, -44, 6]], poses: [[0, ACT.ready, 10], [2.0, ACT.through, 10], [2.5, ACT.lowTurn, 6]], sts: [[1.55, 'atk', { dur: .4, combo: 1 }]] }),
            K({ a: [-58, 8], aura: 1, path: [[0, -58, 8], [1.58, -58, 8], [1.95, -88, 8], [3.15, -90, 8]], faceTo: 'lucan', poses: [[0, ACT.washerUp, 6], [.8, ACT.ready, 7], [1.58, ACT.slip, 30], [2.2, ACT.stand, 6]], sts: [[1.58, 'dodge', { dur: .36 }]] })],
     caps: [[.25, 'THE FIRST CUT COMES IN OUT OF THE SUN,'], [2.0, 'AND I AM NOT THERE.']] }),
   // "The second comes, and I step through it."  the one place they touch: a shoulder, under a flash and a cut to above
-  VS(34.25, 36.65, { cam: [-80, 140, 52, 182, .33], to: [-40, 124, 50, 194, .33], sfxs: [[1.15, 'swing2'], [1.52, 'hit']], shakes: [[1.52, .4]], fxs: [[1.5, 'spark', -54, 7, '#fff', 14, 28], [1.5, 'ring', -54, 7, '#fff2c0', 40], [1.5, 'kick', .08], [1.5, 'fn', () => { Brawl.impact = .2; }]], cams: [[1.3, [-60, 64, 124, 136, -.9], [-40, 64, 116, 144, -.9], 2.05]],
+  VS(34.25, 36.65, { cam: [-80, 140, 52, 182, .33], to: [-40, 124, 50, 194, .33], sfxs: [[1.15, 'swing2'], [1.52, 'hit']], shakes: [[1.52, .4]], fxs: [[1.5, 'spark', -54, 7, '#fff', 14, 28], [1.5, 'ring', -54, 7, '#fff2c0', 40], [1.5, 'kick', .08], [1.5, 'fn', () => { Brawl.impact = .2; }]], cams: [CC(0, .95, -44, 6, 1.9, 2.4, 8), [1.3, [-60, 64, 124, 136, -.9], [-40, 64, 116, 144, -.9], 2.05]],
     acts: [L({ a: [-44, 6], faceTo: 'kael2', path: [[0, -44, 6], [1.5, -44, 6], [1.95, -14, 3], [2.4, -14, 3]], poses: [[0, ACT.ready, 10], [.2, ACT.brace, 6], [1.9, ACT.backStep, 10]], sts: [[1.12, 'atk', { dur: .38, combo: 1 }], [1.52, 'hurt', { dur: .3, kx: 90, ky: -20 }]] }),
            K({ a: [-90, 8], aura: 2, faceTo: 'lucan', path: [[0, -90, 8], [1.05, -90, 8], [1.52, -63, 7], [1.75, -60, 7], [2.4, -50, 6]], poses: [[0, ACT.stand, 6], [.25, ACT.ready, 8], [1.05, ACT.through, 22], [1.44, ACT.shove, 26], [1.95, ACT.ready, 9]] })],
     caps: [[.2, 'THE SECOND COMES,'], [1.2, 'AND I STEP THROUGH IT.']] }),
@@ -333,7 +335,7 @@ const CH1_KEEP_SHOTS = [
            K({ a: [-52, 12], fx: .8, fy: -.2, aura: 3, poses: [[0, ACT.ribsLow, 6], [.6, ACT.ribs, 3], [1.7, ACT.heave, 4], [2.5, ACT.headUp, 6]] })],
     caps: [[.15, 'THE WAY A SEAL STARTS TO LIFT BEFORE ANYBODY HEARS IT.']] }),
   // "I go up."
-  VS(47.05, 48.25, { cam: [-40, 176, 56, 170, .34], to: [-40, 186, 84, 166, .42], speed: 1, cams: [[.78, [14, -3 + 200 / 2.2, 56, 200, .36], [8, -3 + 200 / 2.8, 58, 200, .38], 1.21]], sfxs: [[.42, 'dash'], [.42, 'roar']], shakes: [[.42, .4]], fxs: [[.42, 'ring', -52, 12, '#fff2c0', 90], [.44, 'ring', -52, 12, '#ff7a30', 56], [.42, 'spark', -52, 12, '#d8d4e4', 16, 0], [.42, 'kick', .08]],
+  VS(47.05, 48.25, { cam: [-40, 176, 56, 170, .34], to: [-40, 186, 84, 166, .42], speed: 1, cams: [CC(0, .42, -52, 12, 2.0, 2.6, -6, 40), [.78, [14, -3 + 200 / 2.2, 56, 200, .36], [8, -3 + 200 / 2.8, 58, 200, .38], 1.21]], sfxs: [[.42, 'dash'], [.42, 'roar']], shakes: [[.42, .4]], fxs: [[.42, 'ring', -52, 12, '#fff2c0', 90], [.44, 'ring', -52, 12, '#ff7a30', 56], [.42, 'spark', -52, 12, '#d8d4e4', 16, 0], [.42, 'kick', .08]],
     acts: [L({ a: [0, -1], faceTo: 'kael2', path: [[0, 0, -1], [.5, 0, -1], [1.1, 8, -3], [1.2, 8, -3]], poses: [[0, ACT.ready, 10], [.5, ACT.backStep, 12]] }),
            K({ a: [-52, 12], aura: 3, notrail: 1, zs: [[0, 0], [.42, 0], [1.2, 60]], zease: 'out', poses: [[0, ACT.coil, 20], [.42, ACT.rise, 30]] })],
     caps: [[.3, 'I GO UP.']] }),
@@ -342,7 +344,7 @@ const CH1_KEEP_SHOTS = [
   // "The woman in the chair turns her head,"
   VS(50.1, 52.45, { cels: [[0, 'turn'], [.9, 'up']], cam: [0, 50, 94, 240, .58], to: [0, 42, 96, 262, .6], lin: 1, acts: [], caps: [[.25, 'THE WOMAN IN THE CHAIR TURNS HER HEAD,']] }),
   // "only her head, to follow."
-  VS(52.45, 54.85, { cel: 'up', cam: [-34, 198, 128, 158, .62], to: [-32, 186, 140, 162, .68], lin: 1,
+  VS(52.45, 54.85, { cams: [[0, [-44, 12 + 96, 172, 200, .36], [-52, 12 + 74, 174, 200, .36], 1.15]], cel: 'up', cam: [-34, 198, 128, 158, .62], to: [-32, 186, 140, 162, .68], lin: 1,
     acts: [L({ a: [8, -3], faceTo: 'kael2', poses: [[0, ACT.lookUp, 8]] }), K({ a: [-52, 12], aura: 3, notrail: 1, glint: [1.45, .7], zs: [[0, 94], [1.2, 98], [2.4, 96]], poses: [[0, ACT.hover, 6], [.3, ACT.hoverUp, 6]] })],
     sfxs: [[1.5, 'steel']], fxs: [[1.5, 'fn', () => { Brawl.impact = .1; }]], caps: [[.2, 'ONLY HER HEAD,'], [1.45, 'TO FOLLOW.']] }),
   // "Then I come down on him."  from over my shoulder, looking down: he is very small, and he has seen it
@@ -366,9 +368,9 @@ const CH1_KEEP_SHOTS = [
   // "Eight. Nine. Ten."
   blow(63.5, 64.2, 8, 'EIGHT', cu(lx(8), -5, 1.5, 1.8, 8)),
   blow(64.2, 65.0, 9, 'NINE', cu(kx(9), -3, 1.5, 1.8, -8)),
-  blow(65.0, 66.0, 10, 'TEN', Object.assign(side(10, 50), { bigC: '#fff6dc', zooms: [[.24, .6, .3]] })),
+  blow(65.0, 66.0, 10, 'TEN', Object.assign(side(10, 50), { bigC: '#fff6dc', zooms: [[.24, .6, .3]], cams: [CC(.55, 1.01, lx(10), -5, 1.8, 2.3, 6, 40)] })),
   // "The blade comes down."
-  VS(66.0, 67.75, { zooms: [[.9, 1.7, .3]], cam: [28, 136, 64, 178, .4], to: [40, 106, 58, 198, .42], cams: [[0, [58, -5 + 200 / 2.3, 44, 200, .36], [52, -5 + 200 / 2.9, 42, 200, .38], .82]], bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)',
+  VS(66.0, 67.75, { zooms: [[.9, 1.7, .3]], cam: [28, 136, 64, 178, .4], to: [40, 106, 58, 198, .42], cams: [[0, [58, -5 + 200 / 2.3, 44, 200, .36], [52, -5 + 200 / 2.9, 42, 200, .38], .82], CC(1.25, 1.76, 22, -3, 2.1, 2.7, -6, 80)], bolt: 2, sfx: 'cutin', tint: 'rgba(160,20,0,.2)',
     acts: [L({ a: [52, -5], faceTo: 'kael2', poses: [[0, ACT.kneelUp, 9]] }),
            K({ a: [22, -3], aura: 4, glint: [.95, .6], faceTo: 'lucan', poses: [[0, ACT.ready, 16], [.3, ACT.overhead, 6]] })],
     caps: [[.3, 'THE BLADE COMES DOWN.']] }),
