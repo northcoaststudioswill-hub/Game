@@ -1,0 +1,117 @@
+<title>Grok Fable Astra Box Back</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:ital,wght@0,400;0,600;0,800;1,600&display=swap">
+<style>
+/* Layout: the back face at the same 3:4 ratio as the front. It reads in the order a shopper turns the box:
+   headline, blurb, five real frames, six features, one line of the game's own dialogue, small print. */
+:root {
+  color-scheme: dark;
+  --desk: #120a1e;
+  --void: #1b0b33;
+  --panel: #2a1150;
+  --ink: #fff6fb;
+  --ink-dim: #c9b6dd;
+  --pink: #ff2e88;
+  --cyan: #19e3ff;
+  --lime: #b6ff00;
+  --gold: #ffd400;
+  --title: 'Bungee', 'Arial Black', Impact, sans-serif;
+  --body: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; }
+body { background: radial-gradient(ellipse at 50% 20%, #2d1450 0%, var(--desk) 70%); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5; min-height: 100%; }
+.stage { padding-block: 32px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+.box { width: min(620px, 100%); max-width: 100%; aspect-ratio: 3 / 4; container-type: inline-size; position: relative; overflow: hidden;
+  background: linear-gradient(180deg, #3a0f6e 0%, var(--void) 38%, #12061f 100%);
+  box-shadow: 0 0 0 1px #000, 0 30px 60px rgba(0,0,0,.65), 0 8px 18px rgba(0,0,0,.5); border-radius: 3px;
+}
+/* the padding lives on an inner face: container units on the box itself would measure the window, not the box */
+.face { position: absolute; inset: 0; padding: 6.2cqw 6.4cqw 5.4cqw; display: flex; flex-direction: column; gap: 2.1cqw; }
+.box::after { content: ""; position: absolute; inset: 2.4cqw; border: .7cqw solid transparent; border-image: linear-gradient(135deg, var(--pink), var(--gold), var(--lime), var(--cyan), #b46bff, var(--pink)) 1; pointer-events: none; }
+
+.head h2 { margin: 0; font-family: var(--title); font-weight: 400; font-size: 5.5cqw; line-height: 1; text-transform: uppercase; color: var(--gold); text-wrap: balance; filter: drop-shadow(.4cqw .4cqw 0 #12002a); }
+.head h2 span { color: var(--cyan); }
+.blurb { margin: 0; font-size: 2.5cqw; line-height: 1.38; color: var(--ink); }
+.blurb b { color: var(--lime); font-weight: 800; }
+
+.strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.1cqw; }
+.strip figure { margin: 0; }
+.strip img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: .3cqw solid #12002a; outline: .2cqw solid var(--pink); }
+.strip figcaption { margin-top: .8cqw; font-weight: 800; font-size: 1.62cqw; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-dim); text-align: center; line-height: 1.15; }
+
+.feat { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2cqw 3cqw; }
+.feat li { font-size: 2.18cqw; line-height: 1.32; color: var(--ink-dim); padding-left: 2.6cqw; position: relative; }
+.feat li::before { content: ""; position: absolute; left: 0; top: .75cqw; width: 1.3cqw; height: 1.3cqw; background: var(--pink); transform: rotate(45deg); }
+.feat b { color: var(--ink); font-weight: 800; }
+
+.line { margin: 0; text-align: center; font-style: italic; font-weight: 600; font-size: 2.9cqw; line-height: 1.25; color: #fff; }
+.line cite { display: block; margin-top: .6cqw; font-style: normal; font-weight: 600; font-size: 1.55cqw; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim); }
+
+.small { margin-top: auto; display: grid; grid-template-columns: auto 1fr auto; gap: 2.4cqw; align-items: end; }
+.rate { border: .35cqw solid var(--ink); padding: 1cqw 1.4cqw; text-align: center; }
+.rate b { display: block; font-family: var(--title); font-weight: 400; font-size: 3cqw; line-height: 1; }
+.rate span { display: block; margin-top: .5cqw; font-size: 1.45cqw; line-height: 1.2; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-dim); }
+.spec { font-size: 1.6cqw; line-height: 1.38; color: var(--ink-dim); }
+.spec b { color: var(--ink); }
+.code { text-align: center; background: #fff; padding: 1cqw 1.2cqw .6cqw; }
+.bars { display: flex; align-items: stretch; height: 6.4cqw; }
+.bars i { display: block; background: #000; }
+.code small { display: block; margin-top: .4cqw; font-size: 1.2cqw; letter-spacing: .2em; color: #000; }
+
+.note { width: min(620px, 100%); }
+.note h2 { font-family: var(--title); font-weight: 400; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin: 0 0 10px; }
+.note p { margin: 0 0 10px; color: var(--ink); max-width: 65ch; }
+.note ul { margin: 0; padding-left: 20px; color: var(--ink-dim); }
+.note li { margin-bottom: 6px; max-width: 65ch; }
+</style>
+
+<div class="stage">
+  <article class="box" aria-label="Grok Fable Astra box, back"><div class="face">
+    <div class="head"><h2>The filter is gone. <span>So is your attention span.</span></h2></div>
+    <p class="blurb">You are a hero nobody finished rendering, dropped into Prompt Plaza with zero aura and too many hands. Three mascots want their relics back, <b>THE ALGORITHM</b> wants your watch time, and a plumbing van full of guest stars has crashed the crossover. Collect <b>sixty-seven 67s</b>, feed the Slop-O-Matic, follow the red string to an island of secrets, and climb <b>Meme Mountain at x1,000,000 rot</b> to read the first post ever made. It says “first”.</p>
+
+    <div class="strip">
+      <figure><img src="img/boss.jpg" alt="A rainbow pyramid with one eye hovers over a checkerboard arena."><figcaption>Beat the Algorithm</figcaption></figure>
+      <figure><img src="img/cloud.jpg" alt="The hero stands on a white cloud among server racks and floating 67s."><figcaption>Sixty-seven 67s</figcaption></figure>
+      <figure><img src="img/factory.jpg" alt="A purple machine and a map board at the Slop Factory."><figcaption>Make more slop</figcaption></figure>
+      <figure><img src="img/flow.jpg" alt="A plumbing van parked on a job site."><figcaption>Drive the van</figcaption></figure>
+      <figure><img src="img/rot1000.jpg" alt="The plaza in clashing green and blue with a huge rot counter on screen."><figcaption>Rot x1000. Then more.</figcaption></figure>
+    </div>
+
+    <ul class="feat">
+      <li><span><b>A 3D world of pure slop.</b> Twenty-six places, from the Ohio Badlands to The Cloud, which is just someone else’s computer.</span></li>
+      <li><span><b>Platforming with four moves.</b> A poop boost, a dash, a prompt hook, and three forms to change into.</span></li>
+      <li><span><b>A crossover nobody asked for.</b> Marcus, Derek, Erin, Will, Louie, lil Bottie, Kael, King Bibi and an Oracle of Time.</span></li>
+      <li><span><b>A slop economy.</b> Farm aura, dump data, buy chrome knees, infect your enemies with memes.</span></li>
+      <li><span><b>A conspiracy with red string.</b> Seventeen drops, a shrine, a secret island and the way out of the simulation.</span></li>
+      <li><span><b>Sixty-three things to tick off.</b> Fifteen buddies, eight fetch towers, hats, and a frog who decides if you are based.</span></li>
+    </ul>
+
+    <p class="line">“The cake is a hallucination. Subscribe to continue breathing.”<cite>The title screen ticker</cite></p>
+
+    <div class="small">
+      <div class="rate" aria-label="Intended for teens and up"><b>Teens+</b><span>Crude humour<br>Flashing colours</span></div>
+      <div class="spec"><b>Plays on</b> any modern desktop or phone browser, with touch, keyboard and mouse, or a controller. One player. Saves on your device. Fast colour changes and flashes throughout.<br>© 2026 North Coast Studios. Title and character names are working names, not yet cleared.</div>
+      <div class="code" aria-hidden="true"><div class="bars" id="bars"></div><small>NCS · GFA · 067</small></div>
+    </div>
+  </div></article>
+
+  <section class="note">
+    <h2>Back cover idea</h2>
+    <p>Same order as the Guttercrown box: a headline in the game’s voice, a blurb built from what the game really contains, five real frames, six features, then one line from the title screen before the small print.</p>
+    <ul>
+      <li>The “Teens+” box marks where the real rating goes once the game is rated. It is deliberately not drawn like any ratings board’s mark.</li>
+      <li>The game flashes and strobes on purpose, most of all in the last two sections. A real box needs a photosensitivity warning, and the game needs a setting to turn it down first.</li>
+      <li>The bar code is decoration until a real product code exists.</li>
+      <li>The copyright line says the names are not cleared. That is true today; see the report.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+// decorative bar code: fixed widths, so it renders the same every time
+(function () { var w = [3,1,1,2,1,3,2,1,1,1,3,1,2,2,1,1,3,1,1,2,1,1,2,3,1,1,1,2,1,3,1,2,1,1,2,1,3,1,1,2,1,1,3,2,1], el = document.getElementById('bars'); if (!el) return;
+  w.forEach(function (n, i) { var b = document.createElement('i'); b.style.width = (n * 0.32) + 'cqw'; if (i % 2) b.style.background = 'transparent'; el.appendChild(b); }); })();
+</script>
