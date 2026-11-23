@@ -262,6 +262,10 @@ function poseOf(anim, t, o) {
     }
     case 'cheer': { const s = Math.sin(t * 8 + (o.ph || 0)); setP(p, 'shR', -2.7, 0, -0.3 + s * 0.2); setP(p, 'shL', -2.7, 0, 0.3 - s * 0.2); setP(p, 'elR', -0.5); setP(p, 'elL', -0.5); p.y = 0.04 * Math.max(0, s); break; }
     case 'beg': { const s = Math.sin(t * 3 + (o.ph || 0)); setP(p, 'shR', -1.1, 0, 0.1); setP(p, 'elR', -0.9 + s * 0.15); setP(p, 'shL', 0.1, 0, 0.15); setP(p, 'spine', 0.3); setP(p, 'head', 0.15 + s * 0.05); p.y = -0.05; setP(p, 'knR', 0.3); setP(p, 'knL', 0.3); setP(p, 'hpR', -0.25); setP(p, 'hpL', -0.25); break; }
+    case 'dance': { const b = t * 5.7 + (o.ph || 0), s = Math.sin(b), c = Math.cos(b), s2 = Math.sin(b * 2); p.y = -0.07 + 0.05 * Math.abs(s2); setP(p, 'hips', 0, s * 0.35, s * 0.14); setP(p, 'spine', 0.08, -s * 0.3, -s * 0.1); setP(p, 'head', 0.1 * s2, s * 0.2, 0);
+      setP(p, 'shR', -1.2 - c * 0.9, 0, -0.5 + s * 0.3); setP(p, 'elR', -1.3 + s * 0.5); setP(p, 'shL', -1.2 + c * 0.9, 0, 0.5 + s * 0.3); setP(p, 'elL', -1.3 - s * 0.5);
+      setP(p, 'hpR', -0.25 - Math.max(0, s) * 0.5, 0, -0.15); setP(p, 'knR', 0.4 + Math.max(0, s) * 0.8); setP(p, 'hpL', -0.25 - Math.max(0, -s) * 0.5, 0, 0.15); setP(p, 'knL', 0.4 + Math.max(0, -s) * 0.8); p.rate = 20; break; }
+    case 'warm': { const s = Math.sin(t * 2 + (o.ph || 0)); setP(p, 'shR', -1.25, 0, 0.15); setP(p, 'shL', -1.25, 0, -0.15); setP(p, 'elR', -0.5 + s * 0.08); setP(p, 'elL', -0.5 - s * 0.08); setP(p, 'spine', 0.18); p.y = -0.03; setP(p, 'knR', 0.2); setP(p, 'knL', 0.2); setP(p, 'hpR', -0.15); setP(p, 'hpL', -0.15); break; }
     case 'sit': p.y = -0.42 * (o.leg || 1); setP(p, 'hpR', -1.5, 0, -0.1); setP(p, 'hpL', -1.5, 0, 0.1); setP(p, 'knR', 1.5); setP(p, 'knL', 1.5); setP(p, 'shR', -0.4); setP(p, 'shL', -0.4); setP(p, 'elR', -0.9); setP(p, 'elL', -0.9); setP(p, 'spine', 0.08); break;
   }
   return p;
@@ -284,18 +288,18 @@ POSE.zero = [0, 0, 0];
 function randomWorn(tier, ragged) {
   const pool = s => DRIP.filter(d => d.slot === s && d.r <= tier && d.kind !== 'eagle');
   const w = {}; for (const [s] of SLOTS) { const p = pool(s); w[s] = p.length ? pick(p).id : null; }
-  if (ragged) { w.top = 't_tank'; w.bottom = 'b_camo'; w.shoes = 'k_beat'; w.head = Math.random() < 0.3 ? 'hd_crown' : 'hd_none'; w.back = 'bk_none'; w.arm = 'a_none'; }
+  if (ragged) { w.top = 't_tank'; w.bottom = 'b_camo'; w.shoes = 'k_beat'; w.head = RNG() < 0.3 ? 'hd_crown' : 'hd_none'; w.back = 'bk_none'; w.arm = 'a_none'; }
   return w;
 }
 function aiBuild(ovr, role) {
   const styles = ['sniper', 'slasher', 'general', 'lockdown', 'glass', 'showman'];
   const style = role || pick(styles);
   const hBase = { sniper: 77, slasher: 78, general: 74, lockdown: 78, glass: 83, showman: 76 }[style];
-  const build = { style, origin: 'rustbelt', body: { h: clamp(Math.round(hBase + rnd(-2, 2)), H_MIN, H_MAX), w: style === 'glass' ? rnd(0.2, 0.9) : rnd(-0.6, 0.3), s: rnd(-0.3, 0.8) }, skin: Math.floor(Math.random() * SKINS.length) };
+  const build = { style, origin: 'rustbelt', body: { h: clamp(Math.round(hBase + rnd(-2, 2)), H_MIN, H_MAX), w: style === 'glass' ? rnd(0.2, 0.9) : rnd(-0.6, 0.3), s: rnd(-0.3, 0.8) }, skin: Math.floor(RNG() * SKINS.length) };
   const caps = capsFor(build), attrs = {};
   for (const a of ATTRS) attrs[a.id] = clamp(Math.round(caps[a.id] * (0.52 + (ovr - 55) / 45 * 0.48) + rnd(-3, 3)), 30, 99);
   const badges = {}; const bt = ovr > 88 ? 3 : ovr > 78 ? 2 : ovr > 66 ? 1 : 0;
-  if (bt) for (const b of BADGES) if (attrs[b.req[0]] >= b.req[bt] - 6 && Math.random() < 0.6) badges[b.id] = bt;
+  if (bt) for (const b of BADGES) if (attrs[b.req[0]] >= b.req[bt] - 6 && RNG() < 0.6) badges[b.id] = bt;
   const mv = { side: pick(MOVES.filter(m => m.slot === 'side' && m.need <= attrs.handle)).id, back: 'stepback', diag: 'spin', jumper: pick(JUMPERS).id, dunk: pick(DUNKS.filter(d => d.need <= attrs.dunk)).id, celeb: pick(CELEBS).id };
   return { name: pick(NPC_NAMES), build, attrs, badges, worn: randomWorn(ovr > 85 ? 3 : ovr > 72 ? 2 : ovr > 62 ? 1 : 0), moves: mv };
 }

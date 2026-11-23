@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.2';
+const VERSION = '0.3';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -407,4 +407,11 @@ const OLDHEAD = [
   'Your crib is your court. Fix it up. A man with a milk crate hoop is still a man. Barely.',
   'Get the ball back past the arc after a stop. That\'s the law. Only law left, really.',
 ];
-function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+// one random source, so a roster can be rebuilt identically from a seed on two machines
+let RNG = Math.random;
+function pick(a) { return a[Math.floor(RNG() * a.length)]; }
+function withSeed(seed, fn) {
+  let t = (seed >>> 0) || 1; const old = RNG;
+  RNG = () => { t = (t + 0x6D2B79F5) >>> 0; let r = Math.imul(t ^ (t >>> 15), 1 | t); r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r; return ((r ^ (r >>> 14)) >>> 0) / 4294967296; };
+  try { return fn(); } finally { RNG = old; }
+}

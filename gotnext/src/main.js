@@ -81,9 +81,8 @@ function launchGame(m, tier, st) {
   uiClose(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
 }
 function finishGame(res, m, tier, st, cfg) {
-  twoPlayer = false; const doorX = -10.5 + MODES.indexOf(m) * 7;
-  enterWorld('pit', doorX, -6.6, 0);
-  if (res.quit) { toast('FORFEIT', 'No VC. No Respect. The park saw that.'); return; }
+  twoPlayer = false; enterWorld('pit', pitDoorX(MODES.indexOf(m)), -1.6, Math.PI);
+  if (res.quit) { if (res.lost) toast('CONNECTION LOST', 'The other player dropped. No harm, no pay.'); else toast('FORFEIT', 'No VC. No Respect. The park saw that.'); return; }
   const s = res.stats, L = S.life, notes = [];
   let vc = (res.win ? 70 : 30) * tier.mult + s.pts * 4 + s.ast * 6 + s.reb * 4 + s.stl * 8 + s.blk * 8 + s.ankles * 10 + s.dunks * 5 + s.greens * 4;
   if (m.arcade) vc *= 0.75;       // JAM games are faster and score more
@@ -102,10 +101,10 @@ function finishGame(res, m, tier, st, cfg) {
   L.games = (L.games || 0) + 1; if (res.win) L.wins = (L.wins || 0) + 1; if (res.shutout && res.win) L.shutouts = (L.shutouts || 0) + 1;
   gainRep(rep); checkAch(); save();
   if (pts.length) setTimeout(() => { toast('BADGE POINTS', pts.join(' · '), 'ach'); sfx('unlock'); }, 1600);
-  uiResults(res, { vc, rep, bxp: bx, pts, notes }, () => launchGame(m, tier, st));
+  uiResults(res, { vc, rep, bxp: bx, pts, notes }, st ? () => launchGame(m, tier, st) : null);
 }
 function afterPractice(res, back) {
-  if (back === 'hub') enterWorld('hub', 13, 15, -2.4); else enterWorld('crib', 0, 9, Math.PI);
+  if (back === 'hub') enterWorld('hub', 6.4, 7.4, 0.7); else enterWorld('crib', 0, 9, Math.PI);
   if (res.practice === 'rack' && !res.quit) {
     const pay = res.rack * 5; S.vc += pay; S.life.bestRack = Math.max(S.life.bestRack || 0, res.rack); save(); checkAch();
     uiDialog('SHARPIE THE HUSTLER', res.rack >= 20 ? `${res.rack}?! Who ARE you. Take your ${pay} VC and stop embarrassing me.` : res.rack >= 8 ? `${res.rack} points. ${pay} VC. Respectable. Barely.` : `${res.rack} points. Here's ${pay} VC. Buy a jumpshot with it.`, [['Take the bag', null]]); sfx('buy');
@@ -116,18 +115,18 @@ function afterPractice(res, back) {
 let last = 0;
 function frame(now) {
   requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
-  pollInput();
+  pollInput(); netPollRemote();
   if (uiBusy()) uiStep(dt);
   if (MT) { if (!UI.cur && (IN[0].start || IN[1].start)) uiPause(); else matchStep(dt); }
-  else if (W) worldStep(dt);
+  else if (W) { worldStep(dt); netWorldStep(dt); }
   else if (ST) studioStep(dt);
   if (scene) renderer.render(scene, camera);
 }
 function boot() {
-  loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle();
+  loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; } };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET };
   window.__step = dt => { if (MT) matchStep(dt); };
   requestAnimationFrame(frame);
 }

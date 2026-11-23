@@ -21,10 +21,13 @@ function effAttrs(b, mine) {
   return A;
 }
 
+// in an online game the host's sounds, calls and floats are echoed to the guest
+function sfxM(n) { sfx(n); if (MT && MT.net === 'host' && n !== 'bounce' && n !== 'step' && n !== 'whoosh' && n !== 'whistle') netEv({ k: 's', s2: n }); }
+function fb(p, txt, col) { if (p.remote) netEv({ k: 'fb', t: txt, c: col }); else if (p.user) hudFb(txt, col); }
 function startMatch(cfg) {
   disposeScene(scene); scene = new THREE.Scene();
   const arcade = cfg.mode.arcade;
-  MT = { cfg, arcade, P: [], score: [0, 0], phase: 'check', pt: 0, off: cfg.firstOff || 0, needClear: false, clock: 14, time: 0, slow: 0, shake: 0, parts: [], boosts: cfg.boosts || [], practice: cfg.practice || null, rackT: 40, rackScore: 0, over: false, paused: false, callQ: [], looseT: 0, lastScorer: null, hotTeam: -1 };
+  MT = { cfg, arcade, P: [], score: [0, 0], phase: 'check', pt: 0, off: cfg.firstOff || 0, needClear: false, clock: 14, time: 0, slow: 0, shake: 0, parts: [], boosts: cfg.boosts || [], practice: cfg.practice || null, rackT: 40, rackScore: 0, over: false, paused: false, callQ: [], looseT: 0, lastScorer: null, hotTeam: -1, net: cfg.net || null };
   // --- set ---
   const style = cfg.court || (arcade ? 'arcade' : 'street');
   scene.background = new THREE.Color(arcade ? 0x120824 : style === 'street' ? 0x1a2238 : 0x27304a);
@@ -43,7 +46,7 @@ function startMatch(cfg) {
   // --- players ---
   cfg.teams.forEach((team, ti) => team.forEach((sp, k) => {
     const mine = sp.mine === true;
-    const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
+    const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, remote: sp.ctrl === 2, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
       stats: { pts: 0, ast: 0, reb: 0, stl: 0, blk: 0, ankles: 0, greens: 0, dunks: 0, threes: 0, fga: 0, fgm: 0, bravs: 0, fires: 0 }, ai: { tick: rnd(0, 0.3), spot: null, spotT: 0, tx: 0, tz: 0, mx: 0, mz: 0, hold: 0, mode: '', react: 0 } };
     p.A = effAttrs(sp.b, mine); p.aiLvl = sp.ai === undefined ? cfg.tier.ai : sp.ai;
     p.rig = makeRig(sp.b); p.H = p.rig.H; scene.add(p.rig.root);
@@ -54,7 +57,7 @@ function startMatch(cfg) {
   }));
   // man-to-man by slot
   for (const p of MT.P) { const opp = MT.P.filter(o => o.team !== p.team); p.man = opp.length ? opp[p.k % opp.length] : null; }
-  MT.humans = MT.P.filter(p => p.user); MT.me = MT.P.find(p => p.mine) || MT.humans[0];
+  MT.humans = MT.P.filter(p => p.user); MT.me = MT.P.find(p => p.mine) || MT.humans[0]; MT.locals = MT.humans.filter(p => !p.remote);
   // --- ball ---
   const B = MT.B = { mesh: makeBall(cfg.ball || 'bl_std'), pos: V3(0, 1, 9), vel: V3(), state: 'held', holder: null, t: 0, shooter: null, lastTeam: 0, spin: 0 };
   scene.add(B.mesh); B.shadow = M(geo('bshadow', () => new THREE.CircleGeometry(0.14, 10)), flat(0x000000, { transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.016, 0, scene); B.shadow.rotation.x = -Math.PI / 2;
@@ -81,27 +84,27 @@ function setCheck(team, first) {
 }
 function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.dribPh = 0; }
 function changePoss(team) { if (MT.off !== team) { MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; } } }
-function call(big, small, col, dur) { hudCall(big, small, col, dur); }
+function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
   if (!p.user || p.bravT > 0 || MT.practice) return;
   let m = 1; if (p.mine) { if (ORIGIN[S.build.origin].k === 'brav') m += 0.2; if (MT.boosts.includes('hype')) m += 0.5; }
   p.brav += v * m;
-  if (p.brav >= 1) { p.brav = 1; p.bravT = 20; p.stats.bravs++; call(pick(CALLS.brav), p.b.name + ' gets +8 to everything', '#ffc531', 1.6); sfx('rank'); burst(p.x, 1.2, p.z, 0xffc531, 18); }
+  if (p.brav >= 1) { p.brav = 1; p.bravT = 20; p.stats.bravs++; call(pick(CALLS.brav), p.b.name + ' gets +8 to everything', '#ffc531', 1.6); sfxM('rank'); burst(p.x, 1.2, p.z, 0xffc531, 18); }
 }
 function scorePts(p, pts, how) {
   const M_ = MT; M_.score[p.team] += pts; p.stats.pts += pts; p.stats.fgm++; p.hot++; M_.lastScorer = p;
   for (const o of M_.P) if (o.team !== p.team) { o.hot = 0; if (o.fire) { o.fire = false; } }
   if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
-  if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfx('fire'); }
+  if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfxM('fire'); }
   if (p.mine && cribFx('bucket')) M_.bonusRep = (M_.bonusRep || 0) + 1;
   for (const f of M_.fans) f.hype = 1.6;
   if (M_.hoop.userData.net) M_.netT = 0.35;
   addBrav(p, how === 'dunk' ? 0.16 : 0.10);
   if (M_.practice) return;
   M_.phase = 'scored'; M_.pt = 1.45; p.st = 'celeb'; p.t = 0;
-  if (M_.score[p.team] >= M_.cfg.mode.to) { M_.phase = 'over'; M_.pt = 2.6; sfx('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
+  if (M_.score[p.team] >= M_.cfg.mode.to) { M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
 }
-function floatTxt(p, txt, col) { hudFloat(p, txt, col); }
+function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
 function burst(x, y, z, col, n) {
   let k = 0; for (const q of MT.parts) { if (q.life > 0) continue; q.life = rnd(0.35, 0.7); q.max = q.life; q.m.position.set(x, y, z); q.v.set(rnd(-2.5, 2.5), rnd(0.5, 4), rnd(-2.5, 2.5)); q.m.material.color.setHex(col); if (++k >= n) break; }
 }
@@ -118,7 +121,7 @@ function contestOn(p, rad) {
   return Math.min(0.9, c);
 }
 function startShot(p, src) {
-  if (MT.needClear && MT.off === p.team) { if (p.user) hudFb('TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
+  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
   const d = dHoop(p);
   if (d < 2.0 || (d < finishRange(p) && Math.hypot(p.vx, p.vz) > 2.2 && (p.vx * -p.x + p.vz * -p.z) > 0 && src !== 'ai')) return startFinish(p);
   const j = JUMPER[p.b.moves.jumper] || JUMPERS[0];
@@ -128,7 +131,7 @@ function startShot(p, src) {
 }
 function releaseShot(p) {
   const s = p.shot; if (s.released) return; s.released = true; const B = MT.B;
-  const err = (p.t - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
+  const err = ((s.hold != null ? s.hold : p.t) - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
   let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; c *= (1 - 0.12 * bt(p, 'filibuster'));
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
   let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
@@ -154,10 +157,10 @@ function releaseShot(p) {
   launch(p, make, pts, green && make, s.j.arc, kind);
   if (p.user) {
     const lbl = green && make ? 'GREEN' : e < w * 2.2 ? (err < 0 ? 'Slightly early' : 'Slightly late') : err < 0 ? (e > 0.45 ? 'Very early' : 'Early') : (e > 0.45 ? 'Very late' : 'Late');
-    hudFb(lbl + (c > 0.06 ? ` · ${Math.round(c * 100)}% contested` : ' · wide open'), green && make ? '#33ff88' : '#fff');
-    if (green && make) { p.stats.greens++; sfx('green'); addBrav(p, 0.05); }
+    fb(p, lbl + (c > 0.06 ? ` · ${Math.round(c * 100)}% contested` : ' · wide open'), green && make ? '#33ff88' : '#fff');
+    if (green && make) { p.stats.greens++; sfxM('green'); addBrav(p, 0.05); }
   }
-  sfx('whoosh');
+  sfxM('whoosh');
 }
 function launch(p, make, pts, green, arc, kind) {
   const B = MT.B; B.state = 'shot'; B.holder = null; B.shooter = p; B.lastTeam = p.team; B.make = make; B.pts = pts; B.green = green; B.kind = kind; B.t = 0;
@@ -169,18 +172,18 @@ function launch(p, make, pts, green, arc, kind) {
 function blocked(p, o) {
   const B = MT.B; p.stats.fga++; o.stats.blk++; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
-  call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfx('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; }
+  call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; }
   for (const f of MT.fans) f.hype = 1.2; B.rebound = false;
 }
 function finishRange(p) { return MT.arcade ? 5.6 : 2.5 + nAtt(p, 'vert') * 0.6 + 0.25 * bt(p, 'gravity'); }
 function startFinish(p) {
-  if (MT.needClear && MT.off === p.team) { if (p.user) hudFb('TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
+  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
   const d = dHoop(p), canDunk = (MT.arcade || att(p, 'dunk') >= 55) && d <= finishRange(p) && (MT.arcade || att(p, 'dunk') + att(p, 'vert') * 0.4 > 78 + (2.0 - p.H) * 40 || att(p, 'dunk') >= 75);
   let ax = p.x, az = Math.max(p.z, 0.15); const l = Math.hypot(ax, az) || 1; ax /= l; az /= l;
   const type = canDunk ? 'dunk' : 'layup';
   p.st = 'finish'; p.t = 0;
   p.finish = { type, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0), done: false, peak: type === 'dunk' ? Math.max(0.5, 3.22 - p.H * 1.36) + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0), style: p.b.moves.dunk, spin: (type === 'dunk' && (p.b.moves.dunk === 'three60' || (MT.arcade && d > 3.5))) ? 1 : 0 };
-  p.face = Math.atan2(-p.x, -p.z); sfx('whoosh'); return true;
+  p.face = Math.atan2(-p.x, -p.z); sfxM('whoosh'); return true;
 }
 function resolveFinish(p) {
   const f = p.finish, B = MT.B; f.done = true; if (B.holder !== p) return;
@@ -200,11 +203,11 @@ function resolveFinish(p) {
     const prob = 0.74 + nAtt(p, 'dunk') * 0.24 + ds.bonus + 0.04 * bt(p, 'gravity') + put - c * 0.5 + (MT.arcade ? 0.15 : 0) + (p.fire ? 0.3 : 0);
     if (Math.random() < prob) {
       B.state = 'through'; B.holder = null; B.pos.set(0, HOOP_Y - 0.05, 0); B.vel.set(0, -5, 0); B.t = 0; B.scored = true;
-      p.stats.dunks++; sfx('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
+      p.stats.dunks++; sfxM('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
       call(pick(CALLS.dunk), p.b.name + (ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
       scorePts(p, pts, 'dunk'); return;
     }
-    B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; sfx('rim'); if (p.user) hudFb('Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
+    B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; sfxM('rim'); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
   const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put - c * 0.6 + (p.fire ? 0.3 : 0);
   handPos(p.rig, 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
@@ -215,7 +218,7 @@ function startMove(p, slot, dx, dz) {
   const mv = MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot); const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
   p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot }; p.moveCool = mv.dur + 0.12; p.stam -= mv.st; p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand;
-  p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfx('whoosh');
+  p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh');
   // ankle check on the nearest defender
   let o = null, od = 2.1; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
   if (!o) return;
@@ -223,14 +226,14 @@ function startMove(p, slot, dx, dz) {
   if (o.vx * dx + o.vz * dz < -1.2) ch += 0.13;
   if (Math.random() < clamp(ch, 0.02, 0.6)) {
     const fall = Math.random() < 0.4 + p.combo * 0.1; o.st = 'stagger'; o.t = 0; o.stg = { dur: fall ? rnd(1.2, 1.6) : rnd(0.6, 0.9), fall };
-    p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfx('ankle'); addBrav(p, 0.2); MT.slow = 0.3; for (const f of MT.fans) f.hype = 1.5;
+    p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; for (const f of MT.fans) f.hype = 1.5;
   } else o.slowT = 0.22 + mv.ank;
 }
 function doPass(p, to) {
   if (!to || MT.B.holder !== p) return; const B = MT.B;
   p.st = 'pass'; p.t = 0; p.face = Math.atan2(to.x - p.x, to.z - p.z);
   B.state = 'pass'; B.holder = null; B.target = to; B.from = p; B.t = 0; B.tried = {}; B.lastTeam = p.team;
-  B.pos.set(p.x + Math.sin(p.face) * 0.4, 1.25 + p.y, p.z + Math.cos(p.face) * 0.4); B.speed = 11 + nAtt(p, 'pass') * 7; sfx('whoosh');
+  B.pos.set(p.x + Math.sin(p.face) * 0.4, 1.25 + p.y, p.z + Math.cos(p.face) * 0.4); B.speed = 11 + nAtt(p, 'pass') * 7; sfxM('whoosh');
 }
 function passTarget(p, mx, mz) {
   const mates = MT.P.filter(o => o.team === p.team && o !== p && o.st !== 'stagger'); if (!mates.length) return null;
@@ -244,7 +247,7 @@ function startSteal(p) {
     let o = null, od = 1.35; for (const q of MT.P) { if (q.team === p.team || q.st === 'stagger') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
     p.st = 'shove'; p.t = 0; p.cool = 1.3;
     if (o && Math.random() < 0.62 + nAtt(p, 'str') * 0.2 - nAtt(o, 'str') * 0.3) {
-      o.st = 'stagger'; o.t = 0; o.stg = { dur: 0.95, fall: true }; sfx('block'); MT.shake = 0.2;
+      o.st = 'stagger'; o.t = 0; o.stg = { dur: 0.95, fall: true }; sfxM('block'); MT.shake = 0.2;
       if (B.holder === o) { B.state = 'loose'; B.holder = null; B.pos.set(o.x, 1, o.z); B.vel.set(rnd(-3, 3), 3, rnd(-3, 3)); B.t = 0; B.rebound = false; B.lastTeam = p.team; p.stats.stl++; call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); addBrav(p, 0.12); }
     }
     return;
@@ -256,7 +259,7 @@ function resolveSteal(p) {
   let ch = 0.11 + (att(p, 'steal') - att(h, 'handle')) * 0.0045 + 0.03 * bt(p, 'repo') - 0.04 * bt(h, 'nda') + (h.st === 'move' ? -0.04 : 0) + (h.sprinting ? 0.05 : 0) + (h.st === 'shoot' && h.t < h.shot.rel * 0.4 ? 0.06 : 0);
   if (h.st === 'finish') ch *= 0.3;
   if (Math.random() < clamp(ch, 0.01, 0.45)) {
-    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish') { h.st = 'free'; h.y = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfx('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
+    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish') { h.st = 'free'; h.y = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
   } else { p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; }
 }
 function startJump(p) { if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); }
@@ -266,6 +269,11 @@ function humanThink(p, dt) {
   const I = IN[p.ctrl], B = MT.B; p.in.dx = I.mx; p.in.dz = I.my; p.in.sprint = I.sprint; p.handsUp = false;
   if (MT.phase !== 'live') return;
   const hasBall = B.holder === p;
+  if (p.remote) {          // the guest times their own release; the host just takes their word for the hold
+    if (I.relEdge) p.pendRel = I.rh;
+    if (p.st === 'shoot' && !p.shot.released) { if ((p.pendRel != null && p.t >= Math.min(p.pendRel, p.shot.rel * 1.55)) || p.t > p.shot.rel * 1.55 + 0.6) { p.shot.hold = p.pendRel; p.pendRel = null; releaseShot(p); } return; }
+    if (p.st !== 'shoot' && p.pendRel != null && !I.bP && I.flick !== 'D') p.pendRel = null;
+  }
   if (p.st === 'shoot' && !p.shot.released) {
     if ((p.shot.src === 'btn' && !I.b) || (p.shot.src === 'stick' && I.rdir !== 'D' && I.rdir !== 'DL' && I.rdir !== 'DR') || p.t > p.shot.rel * 1.55) releaseShot(p);
     return;
@@ -390,18 +398,19 @@ function aiThink(p, dt) {
 
 // ---------- step ----------
 function matchStep(dtReal) {
-  const M_ = MT; if (!M_ || M_.paused) return;
+  const M_ = MT; if (!M_ || (M_.paused && !M_.net)) return;
+  if (M_.net === 'guest') return netGuestStep(dtReal);
   let dt = dtReal; if (M_.slow > 0) { M_.slow -= dtReal; dt *= 0.35; }
   M_.time += dt; const B = M_.B;
   // phases
-  if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfx('whistle'); } }
+  if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
   else if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
   else if (M_.phase === 'over') { M_.pt -= dt; if (M_.pt <= 0 && !M_.over) { M_.over = true; endMatch(); return; } }
   else if (M_.phase === 'live' && !M_.practice) {
-    if (B.state === 'held') { M_.clock -= dt; if (M_.clock <= 0) { sfx('buzz'); call('SHOT CLOCK', 'Attention span expired', '#ff4040', 1.2); M_.viol = (M_.viol || 0) + 1; const t = 1 - M_.off; M_.lastScorer = { team: M_.off }; M_.phase = 'scored'; M_.pt = 1.2; void t; } }
+    if (B.state === 'held') { M_.clock -= dt; if (M_.clock <= 0) { sfxM('buzz'); call('SHOT CLOCK', 'Attention span expired', '#ff4040', 1.2); M_.viol = (M_.viol || 0) + 1; const t = 1 - M_.off; M_.lastScorer = { team: M_.off }; M_.phase = 'scored'; M_.pt = 1.2; void t; } }
     if (M_.needClear && B.holder && beyondArc(B.holder.x, B.holder.z)) { M_.needClear = false; }
   }
-  if (M_.practice === 'rack' && !M_.over) { M_.rackT -= dt; if (M_.rackT <= 0) { M_.over = true; sfx('buzz'); endMatch(); return; } }
+  if (M_.practice === 'rack' && !M_.over) { M_.rackT -= dt; if (M_.rackT <= 0) { M_.over = true; sfxM('buzz'); endMatch(); return; } }
 
   for (const p of M_.P) {
     p.in = p.in || { dx: 0, dz: 0, sprint: false }; p.t += dt; p.cool -= dt; p.moveCool -= dt; p.slowT -= dt; p.callT -= dt; p.putT -= dt;
@@ -416,11 +425,13 @@ function matchStep(dtReal) {
   }
   stepBall(dt);
   for (const p of M_.P) animPlayer(p, dt);
-  // particles
+  matchFx(dt); matchCam(dtReal); hudMatch(); if (M_.net === 'host') netHostStep(dtReal);
+}
+function matchFx(dt) {
+  const M_ = MT;
   for (const q of M_.parts) { if (q.life <= 0) continue; q.life -= dt; q.v.y -= 6 * dt; q.m.position.addScaledVector(q.v, dt); q.m.material.opacity = Math.max(0, q.life / q.max); q.m.scale.setScalar(0.5 + q.life / q.max); if (q.life <= 0) q.m.position.y = -5; }
   for (const f of M_.fans) { f.hype -= dt; applyPose(f.r, poseOf(f.hype > 0 ? 'cheer' : 'idle', M_.time, { ph: f.ph }), dt); }
   if (M_.netT > 0) { M_.netT -= dt; const n = M_.hoop.userData.net; if (n) n.scale.set(1 - M_.netT, 1 + M_.netT * 1.5, 1 - M_.netT); }
-  matchCam(dtReal); hudMatch();
 }
 function stepPlayer(p, dt) {
   const M_ = MT, B = M_.B, hasBall = B.holder === p; let lock = 1;
@@ -479,36 +490,26 @@ function lerpAng(a, b, t) { let d = b - a; while (d > Math.PI) d -= 6.2832; whil
 function stepBall(dt) {
   const M_ = MT, B = M_.B; B.t += dt;
   if (B.state === 'held') {
-    const p = B.holder;
-    if (p.st === 'shoot' || p.st === 'finish') { handPos(p.rig, 'R', B.pos); B.pos.y += 0.1; if (p.st === 'shoot' && p.t < p.shot.rel * 0.5) { handPos(p.rig, 'L', _v); B.pos.lerp(_v, 0.5); } }
-    else {
-      const rate = p.st === 'move' ? 15 : 7 + p.speed * 0.9; const prev = Math.sin(p.dribPh); p.dribPh += dt * rate; const cur = Math.sin(p.dribPh);
-      if ((prev > 0) !== (cur > 0) && M_.phase === 'live') { if (!M_.bounceMute) sfx('bounce'); }
-      const hgt = Math.abs(cur), side = p.hand === 'R' ? -1 : 1, low = p.st === 'move' ? 0.5 : 0.8;
-      const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = fz, rz = -fx;   // right of facing = -x when facing +z → (cos, -sin)·side
-      B.pos.set(p.x + fx * 0.3 - rx * side * -0.27, 0.125 + hgt * p.H * 0.47 * low + p.y, p.z + fz * 0.3 - rz * side * -0.27);
-      p.dribH = hgt;
-    }
-    B.spin += dt * 6;
+    ballHeld(B.holder, dt);
   } else if (B.state === 'shot') {
     B.vel.y -= GRAV * dt; B.pos.addScaledVector(B.vel, dt); B.spin -= dt * 9;
     if (B.shooter && B.shooter.fire && Math.random() < 0.6) burst(B.pos.x, B.pos.y, B.pos.z, 0xff7a1f, 1);
     if (B.t >= B.T) {
       const p = B.shooter;
       if (B.make) {
-        B.state = 'through'; B.t = 0; B.pos.set(0, HOOP_Y, 0); B.vel.set(0, -4.5, 0); sfx(B.green ? 'green' : 'swish');
+        B.state = 'through'; B.t = 0; B.pos.set(0, HOOP_Y, 0); B.vel.set(0, -4.5, 0); sfxM(B.green ? 'green' : 'swish');
         if (B.kind === 'three') p.stats.threes++;
         if (M_.practice === 'rack') { if (B.kind === 'three') { const v = B.green ? 3 : 2; M_.rackScore += v; floatTxt(p, '+' + v, B.green ? '#33ff88' : '#ffc531'); } else floatTxt(p, 'Deep balls only!', '#ff8a1f'); }
         else if (!M_.practice) call(B.green ? pick(CALLS.green) : B.kind === 'three' ? pick(CALLS.three) : pick(CALLS.make), p.b.name + ` +${B.pts}`, B.green ? '#33ff88' : '#fff', 1.1);
         else floatTxt(p, B.green ? 'GREEN' : 'Bucket', B.green ? '#33ff88' : '#fff');
         scorePts(p, B.pts, 'shot');
       } else {
-        B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfx('rim'); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14);
+        B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfxM('rim'); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14);
         if (M_.practice) floatTxt(p, pick(CALLS.miss), '#ff8a1f');
       }
     }
   } else if (B.state === 'through') {
-    B.vel.y -= GRAV * dt; B.pos.addScaledVector(B.vel, dt); if (B.pos.y < 0.125) { B.pos.y = 0.125; B.vel.y *= -0.5; B.vel.x = rnd(-0.5, 0.5); B.vel.z = rnd(0.3, 1); if (Math.abs(B.vel.y) > 1) sfx('bounce'); }
+    B.vel.y -= GRAV * dt; B.pos.addScaledVector(B.vel, dt); if (B.pos.y < 0.125) { B.pos.y = 0.125; B.vel.y *= -0.5; B.vel.x = rnd(-0.5, 0.5); B.vel.z = rnd(0.3, 1); if (Math.abs(B.vel.y) > 1) sfxM('bounce'); }
     if (M_.practice && B.t > 0.45) give(M_.me);
   } else if (B.state === 'pass') {
     const to = B.target; _v.set(to.x, 1.2 + to.y, to.z).sub(B.pos); const l = _v.length(), stepL = B.speed * dt;
@@ -518,12 +519,12 @@ function stepBall(dt) {
       if (B.t * B.speed > 1.3) for (const o of M_.P) {
         if (o.team === B.from.team || B.tried[o.i] || (o.st !== 'free' && o.st !== 'steal') || Math.hypot(o.x - B.pos.x, o.z - B.pos.z) > 0.8) continue; B.tried[o.i] = 1;
         const ch = 0.08 + nAtt(o, 'steal') * 0.42 - nAtt(B.from, 'pass') * 0.36 + 0.03 * bt(o, 'repo') + (o.user ? 0.12 : 0);
-        if (Math.random() < clamp(ch, 0.02, 0.6)) { o.stats.stl++; give(o); changePoss(o.team); call(pick(CALLS.steal), o.b.name + ' jumped the lane', '#33e0ff', 1); sfx('steal'); addBrav(o, 0.15); break; }
+        if (Math.random() < clamp(ch, 0.02, 0.6)) { o.stats.stl++; give(o); changePoss(o.team); call(pick(CALLS.steal), o.b.name + ' jumped the lane', '#33e0ff', 1); sfxM('steal'); addBrav(o, 0.15); break; }
       }
     }
   } else if (B.state === 'loose') {
     M_.looseT += dt; B.vel.y -= GRAV * dt; B.pos.addScaledVector(B.vel, dt); B.spin += dt * 5;
-    if (B.pos.y < 0.125) { B.pos.y = 0.125; if (Math.abs(B.vel.y) > 1.2) sfx('bounce'); B.vel.y *= -0.62; B.vel.x *= 0.8; B.vel.z *= 0.8; }
+    if (B.pos.y < 0.125) { B.pos.y = 0.125; if (Math.abs(B.vel.y) > 1.2) sfxM('bounce'); B.vel.y *= -0.62; B.vel.x *= 0.8; B.vel.z *= 0.8; }
     if (B.pos.x < -8.3 || B.pos.x > 8.3) { B.vel.x *= -0.6; B.pos.x = clamp(B.pos.x, -8.3, 8.3); } if (B.pos.z < -2.3 || B.pos.z > 13.3) { B.vel.z *= -0.6; B.pos.z = clamp(B.pos.z, -2.3, 13.3); }
     if (B.t > 0.18) {
       let best = null, bs = -9;
@@ -546,6 +547,19 @@ function stepBall(dt) {
   B.mesh.position.copy(B.pos); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3));
 }
 
+function ballHeld(p, dt) {
+  const M_ = MT, B = M_.B;
+  if (p.st === 'shoot' || p.st === 'finish') { handPos(p.rig, 'R', B.pos); B.pos.y += 0.1; if (p.st === 'shoot' && p.t < p.shot.rel * 0.5) { handPos(p.rig, 'L', _v); B.pos.lerp(_v, 0.5); } }
+  else {
+    const rate = p.st === 'move' ? 15 : 7 + p.speed * 0.9; const prev = Math.sin(p.dribPh); p.dribPh += dt * rate; const cur = Math.sin(p.dribPh);
+    if ((prev > 0) !== (cur > 0) && M_.phase === 'live') { if (!M_.bounceMute) sfxM('bounce'); }
+    const hgt = Math.abs(cur), side = p.hand === 'R' ? -1 : 1, low = p.st === 'move' ? 0.5 : 0.8;
+    const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = fz, rz = -fx;   // right of facing = -x when facing +z → (cos, -sin)·side
+    B.pos.set(p.x + fx * 0.3 - rx * side * -0.27, 0.125 + hgt * p.H * 0.47 * low + p.y, p.z + fz * 0.3 - rz * side * -0.27);
+    p.dribH = hgt;
+  }
+  B.spin += dt * 6;
+}
 function animPlayer(p, dt) {
   const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen };
   p.runPh += dt * (4 + p.speed * 2.1);
@@ -572,11 +586,11 @@ function animPlayer(p, dt) {
   // ring colours: your matchup glows when you are on defence
   if (!p.user) { const marked = M_.me && M_.me.def && M_.me.man === p && M_.phase === 'live'; p.ring.material.color.setHex(marked ? 0xff4fd8 : p.team === M_.me.team ? 0x33a0ff : 0xff4040); p.ring.scale.setScalar(marked ? 1.25 : 1); }
   if (p.bravT > 0 || p.fire) { if (Math.random() < 0.35) burst(p.x + rnd(-0.3, 0.3), rnd(0.2, 1.8) + p.y, p.z + rnd(-0.3, 0.3), p.fire ? 0xff7a1f : 0xffc531, 1); }
-  if (p.sprinting && p.speed > 4 && Math.sin(p.runPh) * Math.sin(p.runPh - dt * 12) < 0 && p.user) sfx('step');
+  if (p.sprinting && p.speed > 4 && Math.sin(p.runPh) * Math.sin(p.runPh - dt * 12) < 0 && p.user) sfxM('step');
 }
 
 function matchCam(dt) {
-  const M_ = MT, hs = M_.humans.length ? M_.humans : [M_.P[0]]; let fx = 0, fz = 0; for (const h of hs) { fx += h.x; fz += h.z; } fx /= hs.length; fz /= hs.length;
+  const M_ = MT, hs = M_.locals.length ? M_.locals : [M_.me || M_.P[0]]; let fx = 0, fz = 0; for (const h of hs) { fx += h.x; fz += h.z; } fx /= hs.length; fz /= hs.length;
   const portrait = innerWidth < innerHeight, B = M_.B;
   // lean the frame toward the ball so passes and boards stay on screen
   fx = lerp(fx, B.pos.x, 0.25); fz = lerp(fz, B.pos.z, 0.2);
@@ -591,6 +605,6 @@ function endMatch() {
   const M_ = MT, me = M_.me, cfg = M_.cfg;
   hudShow(false);
   const res = { practice: M_.practice, rack: M_.rackScore, win: M_.score[0] > M_.score[1], score: M_.score.slice(), stats: me.stats, mode: cfg.mode, tier: cfg.tier, bonusRep: M_.bonusRep || 0, shutout: M_.score[1] === 0 && M_.score[0] > 0, box: M_.P.map(p => ({ n: p.b.name, team: p.team, user: p.user, s: p.stats })) };
-  MT = null; cfg.onEnd(res);
+  netHostEnd(res); MT = null; cfg.onEnd(res);
 }
-function quitMatch() { if (!MT) return; const cfg = MT.cfg, pr = MT.practice; hudShow(false); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }
+function quitMatch() { if (!MT) return; const cfg = MT.cfg, pr = MT.practice; hudShow(false); if (MT.net) netLeave(NET.game); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }

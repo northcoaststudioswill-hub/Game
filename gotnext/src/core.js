@@ -3,7 +3,7 @@
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const lerp = (a, b, t) => a + (b - a) * t;
-const rnd = (a, b) => a + Math.random() * (b - a);
+const rnd = (a, b) => a + RNG() * (b - a);
 const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 
 // ---------------- save ----------------
@@ -26,7 +26,8 @@ function loadSave() {
   try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); return; } } catch (e) { }
   S = newSave();
 }
-function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
+function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
+function save() { S.ts = Date.now(); saveLocal(); cloudSave(); }
 function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v; }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }
@@ -36,8 +37,13 @@ function myBuild() {   // a portable snapshot of the player (also what export co
 function encodeBuild(b) { return BRAND.code + '1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
 function decodeBuild(code) {
   try {
-    const j = JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^(PIT|GN)1-/, '')))));
-    if (!j || !j.build || !STYLE[j.build.style] || !j.attrs) return null;
+    return sanitizeBuild(JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^(PIT|GN)1-/, ''))))));
+  } catch (e) { return null; }
+}
+// anything that arrives from outside (a pasted code, another player online) goes through here
+function sanitizeBuild(j) {
+  try {
+    if (!j || !j.build || !STYLE[j.build.style] || !j.attrs || !j.build.body) return null;
     j.name = String(j.name || 'HOMIE').slice(0, 14).replace(/[<>&]/g, '');
     for (const a of ATTRS) j.attrs[a.id] = clamp(+j.attrs[a.id] || 40, 25, 99);
     j.build.body = { h: clamp(+j.build.body.h || 77, H_MIN, H_MAX), w: clamp(+j.build.body.w || 0, -1, 1), s: clamp(+j.build.body.s || 0, -1, 1) };
@@ -56,7 +62,7 @@ function decodeBuild(code) {
 
 // ---------------- input ----------------
 function blankIn() { return { mx: 0, my: 0, rx: 0, ry: 0, sprint: false, a: false, b: false, aP: false, bP: false, bR: false, start: false, back: false, flick: null, rdir: null, rRel: false, _a: false, _b: false, _rd: null, _st: false, _bk: false }; }
-const IN = [blankIn(), blankIn()];
+const IN = [blankIn(), blankIn(), blankIn()];      // 0 and 1 are local players; 2 is a player online
 const keys = {};
 let twoPlayer = false;       // set by the Pit when a second pad joins
 const touch = { L: null, R: null, a: false, b: false, start: false };

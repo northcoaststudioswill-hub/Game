@@ -54,9 +54,9 @@ let fbT = null;
 function hudFb(txt, col) { const f = $('fb'); f.textContent = txt; f.style.color = col || '#fff'; f.style.opacity = 1; clearTimeout(fbT); fbT = setTimeout(() => f.style.opacity = 0, 1300); }
 function hudFloat(p, txt, col) { const [x, y] = project(p.x, p.H + 0.5 + p.y, p.z); const d = document.createElement('div'); d.className = 'flt'; d.textContent = txt; d.style.cssText = `left:${x}px;top:${y}px;color:${col || '#fff'}`; $('flts').appendChild(d); setTimeout(() => d.remove(), 1100); }
 function hudMatch() {
-  const M_ = MT, me = M_.me; $('s0').textContent = M_.score[0]; $('s1').textContent = M_.score[1]; $('clock').textContent = Math.max(0, Math.ceil(M_.clock));
+  const M_ = MT, me = M_.me; $('s0').textContent = M_.score[me.team]; $('s1').textContent = M_.score[1 - me.team]; $('clock').textContent = Math.max(0, Math.ceil(M_.clock));
   $('stam').firstElementChild.style.width = me.stam + '%'; const bv = $('brav'); bv.firstElementChild.style.width = (me.brav * 100) + '%'; bv.classList.toggle('on', me.bravT > 0);
-  const sh = M_.humans.find(h => h.st === 'shoot'), mt = $('meter');
+  const sh = M_.locals.find(h => h.st === 'shoot'), mt = $('meter');
   if (sh && S.set.meter) {
     const [x, y] = project(sh.x, sh.H * 0.6 + sh.y, sh.z); const u = sh.t / (sh.shot.rel * 1.55), z = 1 / 1.55;
     mt.style.display = 'block'; mt.style.left = (x + 34) + 'px'; mt.style.top = (y - 60) + 'px';
@@ -75,6 +75,7 @@ function uiHud() {
   if (!S) return; $('wvc').textContent = S.vc.toLocaleString(); const r = rankOf(S.rep); $('wrank').textContent = RANKS[r].n;
   const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
   $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
+  const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = on ? `<b>${on}</b> online with you` : 'online · nobody else here';
   $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
 }
 function vcLine() { return `<span class="chip" style="margin:0">VC <b>${S.vc.toLocaleString()}</b></span>`; }
@@ -84,7 +85,7 @@ function uiTitle() {
   document.body.dataset.state = 'title'; $('title').style.display = 'flex'; document.body.classList.add('busy'); UI.handlers = []; UI.focus = 0;
   $('seasonTag').textContent = `RUN ${String(BRAND.season.no).padStart(2, '0')} · ${BRAND.season.name}`; $('titleLine').textContent = BRAND.line;
   $('tickerTxt').innerHTML = (BRAND.ticker.join(' <b>//</b> ') + ' <b>//</b> ').repeat(4) + 'v' + VERSION;
-  $('titleBtns').innerHTML = (S.created ? Btn('Continue · ' + esc(S.name), () => { hideTitle(); enterWorld('hub', 0, 20, Math.PI); }) : '') + Btn(S.created ? 'New player' : 'Build your player', () => {
+  $('titleBtns').innerHTML = (S.created ? Btn('Continue · ' + esc(S.name), () => { hideTitle(); enterWorld('hub', 0, 9, Math.PI); }) : '') + Btn(S.created ? 'New player' : 'Build your player', () => {
     const go = () => { if (S.created) S = newSave(); hideTitle(); uiBuilder(); };
     if (S.created) uiDialog('START OVER', 'Start over? This erases your player, drip, crib and Respect. It is only kept once you finish the new build.', [['Erase and start over', go, 'red'], ['Keep my player', () => { uiClose(); uiTitle(); }, 'alt']]); else go();
   }, S.created ? 'alt' : '');
@@ -123,7 +124,7 @@ function uiBuilder() {
     h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
       const nm = ($('bname').value || '').trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
-      uiClose(); sfx('unlock'); enterWorld('hub', 0, 20, Math.PI); toast('WELCOME TO THE BLOCK', 'Walk to THE PIT and call next. Fiends will ask for VC.', 'rank');
+      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); toast('WELCOME TO THE BLOCK', 'Walk to THE PIT and call next. Fiends will ask for VC.', 'rank');
     })}</div>`;
     return h;
   }, 'side', () => { });
@@ -254,10 +255,18 @@ function uiMode(m) {
     h += `<div style="margin-bottom:8px">${Btn(`RIVAL: ${st.rival < 0 ? 'RANDOMS' : esc(S.homies[st.rival].name) + ' (homie) + crew'} ▸`, () => { st.rival = cyc(st.rival, S.homies.length); sfx('ui'); rerender(); }, 'alt sm')}</div>`;
     if (!S.homies.length) h += `<p class="mu">Import a friend's build at THE LINK to run with them — or against them.</p>`;
     if (!IS_TOUCH) h += `<div class="cat">PLAYER 2 <span class="mu" style="text-transform:none;letter-spacing:.02em">— needs a controller</span></div>${Btn('P2: ' + ({ off: 'OFF', coop: 'CO-OP (your teammate)', vs: 'VERSUS (other team)' }[st.p2]) + ' ▸', () => { st.p2 = st.p2 === 'off' ? 'coop' : st.p2 === 'coop' ? 'vs' : 'off'; sfx('ui'); rerender(); }, 'alt sm')}<p class="mu">${anyPadStart() ? anyPadStart() + ' controller(s) connected.' : 'No controller detected yet — press a button on it.'} Player 1 uses the keyboard${anyPadStart() > 1 ? ' or controller 1' : ''}.</p>`;
+    if (NET.room && NET.connected) {
+      const others = netOthers();
+      h += `<div class="cat">ONLINE <span class="mu" style="text-transform:none;letter-spacing:.02em">— anyone with the game open right now</span></div>`;
+      if (NET.out) h += `<div class="card sel"><h3>CALLING…</h3><p>Waiting for them to pick up.</p><div style="margin-top:6px">${Btn('CANCEL', () => { NET.out = null; NET.room.presence({ inv: null }).catch(() => { }); rerender(); }, 'sm alt')}</div></div>`;
+      else if (!others.length) h += `<p class="mu">Nobody else is here. Share the game with a friend and they show up on The Block.</p>`;
+      else for (const p of others) { const busy = p.presence.w === 'game'; h += `<div class="card"><div class="row"><div class="g"><h3>${esc(peerName(p))} <span class="mu">${p.presence.o | 0} OVR</span></h3><p>${busy ? 'In a game right now.' : 'On ' + (p.presence.w === 'pit' ? 'The Pit floor' : 'The Block') + '.'}</p></div>${Btn('SAME TEAM', () => { netInvite(p.peer, m, st.tier, 'coop'); rerender(); }, 'sm', busy)}${Btn('VERSUS', () => { netInvite(p.peer, m, st.tier, 'vs'); rerender(); }, 'sm alt', busy)}</div></div>`; }
+    }
     if (S.boosts.length) h += `<div class="cat">LOADED BOOSTS</div><p class="buff">${S.boosts.map(b => BOOSTS.find(x => x.id === b).n).join(' · ')}</p>`;
     h += `</div><div class="pf">${Btn('RUN IT', () => { S.lastTier = st.tier; launchGame(m, t, st); })}<span class="mu" style="align-self:center">Win ≈ ${Math.round(70 * t.mult + 60)} VC · ${Math.round(45 * t.mult + 15)} Respect</span></div>`;
     return h;
   });
+  UI.cur.live = true;
 }
 function uiKiosk() {
   openPanel(() => {
@@ -312,12 +321,12 @@ function uiResults(res, rw, again) {
     h += `<div class="card sel"><div class="row" style="flex-wrap:wrap;gap:18px"><div><div class="mu f">VC</div><div class="big ye" id="rvc">0</div></div><div><div class="mu f">RESPECT</div><div class="big cy" id="rrep">0</div></div><div class="g"><div class="mu f">BADGE XP</div>${['F', 'S', 'P', 'D'].map(c => `<span class="tag" style="color:${CATS[c][1]}">${CATS[c][0]} +${rw.bxp[c]}</span>`).join(' ')}${rw.pts.length ? `<p class="buff">${rw.pts.join(' · ')}</p>` : ''}</div></div>${rw.notes.length ? `<p class="buff">${rw.notes.join(' · ')}</p>` : ''}</div>`;
     h += `<div class="card"><table><tr><th>PLAYER</th><th>PTS</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>ANK</th><th>FG</th></tr>` + res.box.map(b => `<tr style="color:${b.user ? 'var(--gold)' : b.team === 0 ? 'var(--ice)' : '#ff9ab8'}"><td>${esc(b.n)}</td><td>${b.s.pts}</td><td>${b.s.ast}</td><td>${b.s.reb}</td><td>${b.s.stl}</td><td>${b.s.blk}</td><td>${b.s.ankles}</td><td>${b.s.fgm}/${b.s.fga}</td></tr>`).join('') + `</table></div>`;
     h += `<p class="mu">${s.greens} greens · ${s.dunks} dunks · ${s.threes} deep balls · ${s.bravs} Bravado</p>`;
-    return h + `</div><div class="pf">${Btn('RUN IT BACK', again)}${Btn('BACK TO THE PIT', uiClose, 'alt')}</div>`;
+    return h + `</div><div class="pf">${again ? Btn('RUN IT BACK', again) : ''}${Btn('BACK TO THE PIT', uiClose, again ? 'alt' : '')}</div>`;
   });
   // the count-up
   let t = 0; const iv = setInterval(() => { t += 0.05; const k = Math.min(1, t); const a = $('rvc'), b = $('rrep'); if (!a) { clearInterval(iv); return; } a.textContent = '+' + Math.round(rw.vc * k); b.textContent = '+' + Math.round(rw.rep * k); if (k < 1) sfx('coin'); else { clearInterval(iv); sfx('buy'); } }, 45);
 }
 function uiPause() {
-  if (!MT || MT.over) return; MT.paused = true;
-  openPanel(() => `<div class="ph"><h2>PAUSED</h2></div><div class="pb"><div class="card"><h3>WITH THE BALL</h3><p>Skill stick ↓ hold & release = shoot (release in the green band) · ↑ = drive, layup or dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin. PASS throws to the teammate you are pushing toward.</p></div><div class="card"><h3>WITHOUT IT</h3><p>On defense: skill stick ↑ = hands up, ↓ = steal${MT.arcade ? ' / shove' : ''}, JUMP to block or rebound. On offense: CALL asks for the rock. After a stop, take it back past the arc.</p></div><div class="card"><h3>BRAVADO</h3><p>Big plays fill the bar. Full bar = +8 to every attribute for 20 seconds.</p></div></div><div class="pf">${Btn('RESUME', uiClose)}${Btn(MT.practice ? 'LEAVE' : 'FORFEIT', () => { uiClose(); quitMatch(); }, 'red')}</div>`, '', uiClose);
+  if (!MT || MT.over) return; MT.paused = true; const online = !!MT.net;
+  openPanel(() => `<div class="ph"><h2>${online ? 'MENU · the game is still live' : 'PAUSED'}</h2></div><div class="pb"><div class="card"><h3>WITH THE BALL</h3><p>Skill stick ↓ hold & release = shoot (release in the green band) · ↑ = drive, layup or dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin. PASS throws to the teammate you are pushing toward.</p></div><div class="card"><h3>WITHOUT IT</h3><p>On defense: skill stick ↑ = hands up, ↓ = steal${MT.arcade ? ' / shove' : ''}, JUMP to block or rebound. On offense: CALL asks for the rock. After a stop, take it back past the arc.</p></div><div class="card"><h3>BRAVADO</h3><p>Big plays fill the bar. Full bar = +8 to every attribute for 20 seconds.</p></div></div><div class="pf">${Btn('RESUME', uiClose)}${Btn(MT.practice ? 'LEAVE' : 'FORFEIT', () => { uiClose(); quitMatch(); }, 'red')}</div>`, '', uiClose);
 }

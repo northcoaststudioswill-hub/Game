@@ -13,11 +13,11 @@ await page.goto('file://' + path.join(dir, '..', 'index.html')); await page.wait
 await page.click('#titleBtns .btn'); await page.waitForTimeout(800); await page.fill('#bname', 'WILL'); await shot('02-builder');
 await page.evaluate(() => { const b = document.querySelector('#panel .pb'); b.scrollTop = b.scrollHeight; }); await page.waitForTimeout(200); await shot('03-builder-caps');
 await page.click('#panel .pf .btn'); await page.waitForTimeout(1500); await shot('04-hub');
-await page.evaluate(() => __pit.enterWorld('hub', 0, -24, 0)); await page.waitForTimeout(600); await shot('05-hub-statue');
-await page.evaluate(() => __pit.enterWorld('hub', 26, -2, Math.PI / 2)); await page.waitForTimeout(500);
+await page.evaluate(() => __pit.enterWorld('hub', 0, 9, Math.PI)); await page.waitForTimeout(600); await shot('05-hub-statue');
+await page.evaluate(() => __pit.enterWorld('hub', 12, -5.6, Math.PI / 2)); await page.waitForTimeout(500);
 await page.evaluate(() => __pit.W.near && __pit.W.near.fn()); await page.waitForTimeout(900); await shot('06-shop');
 await page.evaluate(() => { __pit.uiClose(); __pit.enterWorld('crib', 0, 13, Math.PI); }); await page.waitForTimeout(700); await shot('07-crib');
-await page.evaluate(() => __pit.enterWorld('pit', 0, 6, Math.PI)); await page.waitForTimeout(700); await shot('08-pit');
+await page.evaluate(() => __pit.enterWorld('pit', 0, 3.4, Math.PI)); await page.waitForTimeout(700); await shot('08-pit');
 await page.evaluate(m => { const P = __pit; P.launchGame(P.MODES.find(x => x.id === m), P.TIERS_COURT[0], { mates: [], rival: -1, p2: 'off' }); }, MODE);
 await page.waitForTimeout(3200); await shot('09-check');
 // bot: drive at the rim / shoot when open; on defence stay near the man

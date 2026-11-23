@@ -73,9 +73,9 @@ The point of this table is to save the space now, so new things arrive with a na
 
 | Layer | In the game now | Held for later |
 |---|---|---|
-| The game | GOT NEXT | — |
+| The game | GOT NEXT. Never "cage" or "born" in the game's name. | — |
 | Seasons | RUN 00 · PRESEASON (shown on the title; `BRAND.season`) | RUN 01, RUN 02 … each with a one-word name and its own foil |
-| Places | The Block, The Pit, The Plug, The Lab, Tape Deck, The Link, My Crib, Last Call, Money Rack | The Roof, The Yard, The Rec, Uptown, The Bridge (new courts and districts); The Chair (barber: hair and face), The Vault (grails) |
+| Places | The Block, The Pit (it is a cage: chain link, floodlights, gates), The Plug, The Lab, Tape Deck, The Link, My Crib, Last Call, Money Rack | The Roof, The Yard, The Rec, The Bridge (new courts and districts); Uptown is already promised by the chained subway gate on The Block (UPTOWN LINE); The Chair (barber: hair and face), The Vault (grails) |
 | Modes | Street 2v2, Street 3v3, JAM 2v2, JAM 3v3 | Ones (1v1), 21, King of the Court, Crew runs |
 | Court tiers | Side Court, Main Court, The Cage, Kings Court | Open Run, The Invitational |
 | Ranks | Nobody, Local, Regular, Problem, Certified, Big Name, City Legend, Immortal | Prestige loops: Immortal II, III |
@@ -96,5 +96,12 @@ The point of this table is to save the space now, so new things arrive with a na
 ## 8. Not yet rebranded
 
 Badge names, attribute blurbs, origins, trophies and the announcer's calls are still in the first version's joke
-voice. The 3D world has brick, concrete and posters now, but has not had a full art pass, and the players themselves
-(bodies, faces, how flashy the drip reads) have not been touched yet.
+voice. The players themselves (bodies, faces, how flashy the drip reads) have not been touched yet.
+
+## 9. The Block, as built in v0.3
+
+One street corner you can cross in a few seconds. What makes it the brand's place, so new districts can match it:
+chain link and floodlights, brick with wheat-pasted GOT NEXT posters, spray-paint pieces (BALL IS LIFE, RUN IT BACK,
+WHO GOT NEXT, NO REFS, KINGS STAY), court paint spilling out of the cage gate onto the asphalt, string lights
+overhead, kicks hanging on a wire, a boombox with a live level meter and people dancing at it, a barrel fire, milk
+crates, grails under glass in The Plug's window, and an elevated train going by behind the cage.

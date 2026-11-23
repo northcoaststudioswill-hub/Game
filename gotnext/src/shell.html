@@ -44,7 +44,7 @@ body.touch:not(.busy)[data-state=match] .hintL,body.touch:not(.busy)[data-state=
 #whud{position:fixed;left:calc(12px + var(--sal));top:calc(10px + var(--sat));z-index:6;display:none;pointer-events:none}
 body[data-state=world] #whud{display:block}
 .chip{display:inline-flex;align-items:baseline;gap:6px;background:rgba(8,8,10,.72);border:1px solid var(--line);padding:5px 10px;margin:0 6px 6px 0;font:500 10px var(--m);letter-spacing:.1em;color:var(--ash);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.chip b{font:900 15px var(--d);font-stretch:125%;letter-spacing:0;color:var(--gold)}.chip.rep b{color:var(--ice);font-size:12px}
+.chip b{font:900 15px var(--d);font-stretch:125%;letter-spacing:0;color:var(--gold)}.chip.rep b{color:var(--ice);font-size:12px}#wonline{color:var(--go)}#wonline b{color:var(--go);font-size:12px}
 #wtag{font:500 10px var(--m);letter-spacing:.16em;color:rgba(236,233,226,.5);margin-top:6px}
 #repbar{width:150px;height:2px;background:var(--line)}#repbar i{display:block;height:100%;background:var(--ice)}
 #prompt{position:fixed;left:50%;bottom:calc(24% + var(--sab));transform:translateX(-50%);z-index:7;display:none;background:var(--bone);color:var(--ink);font:900 14px var(--d);font-stretch:125%;text-transform:uppercase;padding:12px 26px 12px 18px;cursor:pointer;white-space:nowrap;clip-path:polygon(0 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%);border-left:4px solid var(--heat)}
@@ -138,7 +138,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div class="hintL">MOVE</div><div class="hintR" id="hintR">SKILL STICK</div>
   <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tMenu">≡</div>
 </div>
-<div id="whud"><div><span class="chip">VC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
+<div id="whud"><div><span class="chip">VC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
 <div id="prompt"></div>
 <div id="keys"></div>
 <div id="hud">
@@ -170,6 +170,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 /*@include ball.js*/
 /*@include hub.js*/
 /*@include ui.js*/
+/*@include net.js*/
 /*@include main.js*/
 })();
 </script>
