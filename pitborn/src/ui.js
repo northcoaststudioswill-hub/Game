@@ -83,11 +83,12 @@ function vcLine() { return `<span class="chip"><b>${S.vc.toLocaleString()}</b> V
 function uiTitle() {
   document.body.dataset.state = 'title'; $('title').style.display = 'flex'; document.body.classList.add('busy'); UI.handlers = []; UI.focus = 0;
   $('titleBtns').innerHTML = (S.created ? Btn('CONTINUE AS ' + esc(S.name), () => { hideTitle(); enterWorld('hub', 0, 20, Math.PI); }) : '') + Btn(S.created ? 'NEW PLAYER' : 'CREATE YOUR PLAYER', () => {
-    if (S.created && !confirm('Start over? This erases your player, drip, crib and Respect.')) return; if (S.created) { S = newSave(); } hideTitle(); uiBuilder();
+    const go = () => { if (S.created) S = newSave(); hideTitle(); uiBuilder(); };
+    if (S.created) uiDialog('DEPARTMENT OF PLAYER REGISTRATION', 'Start over? This erases your player, drip, crib and Respect. It is only kept once you finish the new build.', [['Erase and start over', go, 'red'], ['Keep my player', () => { uiClose(); uiTitle(); }, 'alt']]); else go();
   }, S.created ? 'alt' : '');
   paintFocus();
 }
-function hideTitle() { $('title').style.display = 'none'; document.body.classList.remove('busy'); sfx('uiok'); }
+function hideTitle() { $('title').style.display = 'none'; if (!UI.cur) document.body.classList.remove('busy'); sfx('uiok'); }
 
 // ---------- builder ----------
 function capBars(build, attrs) {
@@ -191,7 +192,7 @@ function uiPlayer(tab) {
     } else {
       h += `<div class="card"><h3>SOUND</h3><div style="margin-top:6px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Pit with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (JAM: shove) · jump to block and board.</p></div>`;
-      h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => { if (confirm('Erase your player, drip, crib and Respect for good?')) { localStorage.removeItem(SAVE_KEY); location.reload(); } }, 'sm red')}</div></div>`;
+      h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => uiDialog('ARE YOU SURE', 'Erase your player, drip, crib and Respect for good?', [['Erase it all', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } S = newSave(); uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'red'], ['Never mind', null, 'alt']]), 'sm red')}</div></div>`;
     }
     return h + `</div>`;
   });

@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>PITBORN 2145</title>
 <style>
-:root{--bg:#0c0c16;--pan:#151522;--pan2:#1e1e30;--ln:#2e2e48;--or:#ff5a3c;--ye:#ffc531;--cy:#33e0ff;--pk:#ff4fd8;--gr:#33ff88;--tx:#f2f2f7;--mu:#9a9ab4;
+:root{color-scheme:dark;--bg:#0c0c16;--pan:#151522;--pan2:#1e1e30;--ln:#2e2e48;--or:#ff5a3c;--ye:#ffc531;--cy:#33e0ff;--pk:#ff4fd8;--gr:#33ff88;--tx:#f2f2f7;--mu:#9a9ab4;
 --f:Impact,'Haettenschweiler','Arial Narrow Bold','Arial Black',sans-serif;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:15px/1.35 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;overflow:hidden;overscroll-behavior:none;user-select:none;-webkit-user-select:none;touch-action:none}
@@ -63,7 +63,7 @@ body:not([data-state=world]) #prompt{display:none!important}
 #rackHud{position:absolute;right:calc(12px + var(--sar));top:calc(60px + var(--sat));font-family:var(--f);font-size:30px;text-align:right;text-shadow:3px 3px 0 #000;display:none}
 #clear{position:absolute;left:0;right:0;top:calc(72px + var(--sat));text-align:center;font-family:var(--f);font-size:15px;color:var(--or);letter-spacing:.1em;text-shadow:2px 2px 0 #000;display:none}
 /* ---- panels ---- */
-#panel{position:fixed;inset:0;z-index:20;display:none;background:rgba(8,8,16,.86);overflow:hidden}
+#panel{position:fixed;inset:0;z-index:35;display:none;background:rgba(8,8,16,.86);overflow:hidden}
 #panel.side{background:linear-gradient(90deg,rgba(8,8,16,0) 0,rgba(8,8,16,.0) 36%,rgba(8,8,16,.93) 46%)}
 #panel.clear{background:rgba(8,8,16,.45)}
 .pin{position:absolute;inset:0;display:flex;flex-direction:column;padding:calc(10px + var(--sat)) calc(12px + var(--sar)) calc(10px + var(--sab)) calc(12px + var(--sal));max-width:980px;margin:0 auto}
