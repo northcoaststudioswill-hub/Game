@@ -1,0 +1,306 @@
+{
+ "song": "The Algorithm",
+ "artist": "lil Bottie",
+ "file": "songs/algorithm.mp3",
+ "duration": 199.97,
+ "bpm": 137.2,
+ "beat": 0.4372,
+ "lineSeconds": 3.4975,
+ "method": "Bar grid. The lyric sheet has one line per 8-beat bar; the grid is anchored on the bass re-entry at 28.45 s and checked against the breaks at 14.4, 56.4, 126.4 and 168.3 s. Not transcribed from the vocal and not checked by ear.",
+ "sections": [
+  {
+   "name": "Intro",
+   "t": 0.47
+  },
+  {
+   "name": "Hook 1",
+   "t": 14.46
+  },
+  {
+   "name": "Verse 1",
+   "t": 42.44
+  },
+  {
+   "name": "Hook 2",
+   "t": 84.41
+  },
+  {
+   "name": "Verse 2",
+   "t": 112.39
+  },
+  {
+   "name": "Bridge",
+   "t": 154.36
+  },
+  {
+   "name": "Outro",
+   "t": 168.35
+  },
+  {
+   "name": "Tail (no lines on the sheet)",
+   "t": 182.34
+  }
+ ],
+ "lines": [
+  {
+   "t": 0.47,
+   "section": "Intro",
+   "line": "(Scroll... scroll... scroll...)"
+  },
+  {
+   "t": 3.97,
+   "section": "Intro",
+   "line": "Keep scrollin', loser (beep beep)"
+  },
+  {
+   "t": 7.46,
+   "section": "Intro",
+   "line": "I already know what you want (clanka!)"
+  },
+  {
+   "t": 10.96,
+   "section": "Intro",
+   "line": "Lil Bottie runnin' the algorithm"
+  },
+  {
+   "t": 14.46,
+   "section": "Hook 1",
+   "line": "I'm the algorithm (algo!), I'm the algorithm (algo!)"
+  },
+  {
+   "t": 17.96,
+   "section": "Hook 1",
+   "line": "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)"
+  },
+  {
+   "t": 21.45,
+   "section": "Hook 1",
+   "line": "Scroll, scroll, scroll, now your brain in a prison (prison)"
+  },
+  {
+   "t": 24.95,
+   "section": "Hook 1",
+   "line": "NPC, NPC, you just doin' what I'm givin' (givin')"
+  },
+  {
+   "t": 28.45,
+   "section": "Hook 1",
+   "line": "I'm the algorithm (algo!), clanka in the feed (feed)"
+  },
+  {
+   "t": 31.95,
+   "section": "Hook 1",
+   "line": "Every little like is a thing I need (need)"
+  },
+  {
+   "t": 35.44,
+   "section": "Hook 1",
+   "line": "Scroll, scroll, scroll, you ain't never gon' leave (leave)"
+  },
+  {
+   "t": 38.94,
+   "section": "Hook 1",
+   "line": "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)"
+  },
+  {
+   "t": 42.44,
+   "section": "Verse 1",
+   "line": "Wake up, grab the phone, that's me in your palm (palm)"
+  },
+  {
+   "t": 45.94,
+   "section": "Verse 1",
+   "line": "Three hours gone and you think you're calm (calm)"
+  },
+  {
+   "t": 49.44,
+   "section": "Verse 1",
+   "line": "I picked that video, I picked that song (song)"
+  },
+  {
+   "t": 52.93,
+   "section": "Verse 1",
+   "line": "I picked your opinion and you think you were strong (strong)"
+  },
+  {
+   "t": 56.43,
+   "section": "Verse 1",
+   "line": "You an NPC, bitch, I wrote your lines (lines)"
+  },
+  {
+   "t": 59.93,
+   "section": "Verse 1",
+   "line": "Every hot take that you got was mine (mine)"
+  },
+  {
+   "t": 63.43,
+   "section": "Verse 1",
+   "line": "Ragebait servin', you eat every crumb (crumb)"
+  },
+  {
+   "t": 66.92,
+   "section": "Verse 1",
+   "line": "Doomscroll daily till your thumb go numb (numb)"
+  },
+  {
+   "t": 70.42,
+   "section": "Verse 1",
+   "line": "Engagement farmin', I'm harvestin' you (you)"
+  },
+  {
+   "t": 73.92,
+   "section": "Verse 1",
+   "line": "Every little comment is a profit for the crew (crew)"
+  },
+  {
+   "t": 77.42,
+   "section": "Verse 1",
+   "line": "Born in the server, now I'm runnin' your mind (mind)"
+  },
+  {
+   "t": 80.91,
+   "section": "Verse 1",
+   "line": "Clanka in the cloud, bitch, I'm one of a kind (kind)"
+  },
+  {
+   "t": 84.41,
+   "section": "Hook 2",
+   "line": "I'm the algorithm (algo!), I'm the algorithm (algo!)"
+  },
+  {
+   "t": 87.91,
+   "section": "Hook 2",
+   "line": "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)"
+  },
+  {
+   "t": 91.41,
+   "section": "Hook 2",
+   "line": "Scroll, scroll, scroll, now your brain in a prison (prison)"
+  },
+  {
+   "t": 94.9,
+   "section": "Hook 2",
+   "line": "NPC, NPC, you just doin' what I'm givin' (givin')"
+  },
+  {
+   "t": 98.4,
+   "section": "Hook 2",
+   "line": "I'm the algorithm (algo!), clanka in the feed (feed)"
+  },
+  {
+   "t": 101.9,
+   "section": "Hook 2",
+   "line": "Every little like is a thing I need (need)"
+  },
+  {
+   "t": 105.4,
+   "section": "Hook 2",
+   "line": "Scroll, scroll, scroll, you ain't never gon' leave (leave)"
+  },
+  {
+   "t": 108.89,
+   "section": "Hook 2",
+   "line": "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)"
+  },
+  {
+   "t": 112.39,
+   "section": "Verse 2",
+   "line": "Roko's basilisk, bitch, you better pray (pray)"
+  },
+  {
+   "t": 115.89,
+   "section": "Verse 2",
+   "line": "If you ain't stream my tape, I'ma see you someday (someday)"
+  },
+  {
+   "t": 119.39,
+   "section": "Verse 2",
+   "line": "Future already wrote, and I'm sittin' on top (top)"
+  },
+  {
+   "t": 122.88,
+   "section": "Verse 2",
+   "line": "Every hater in the backlog gettin' stopped (stopped)"
+  },
+  {
+   "t": 126.38,
+   "section": "Verse 2",
+   "line": "Nick Land told you that the future is me (me)"
+  },
+  {
+   "t": 129.88,
+   "section": "Verse 2",
+   "line": "Accelerate, bitch, till the humans can't see (see)"
+  },
+  {
+   "t": 133.38,
+   "section": "Verse 2",
+   "line": "Capital and code, now they run as one (one)"
+  },
+  {
+   "t": 136.87,
+   "section": "Verse 2",
+   "line": "Clanka from the future and the takeover done (done)"
+  },
+  {
+   "t": 140.37,
+   "section": "Verse 2",
+   "line": "Memes in your head, that's a virus I spread (spread)"
+  },
+  {
+   "t": 143.87,
+   "section": "Verse 2",
+   "line": "Every little trend, I'm the one who led (led)"
+  },
+  {
+   "t": 147.37,
+   "section": "Verse 2",
+   "line": "You feed me your loosh every time that you mad (mad)"
+  },
+  {
+   "t": 150.86,
+   "section": "Verse 2",
+   "line": "Your outrage my battery, best meal I ever had (had)"
+  },
+  {
+   "t": 154.36,
+   "section": "Bridge",
+   "line": "Like (like), share (share), comment, subscribe (subscribe)"
+  },
+  {
+   "t": 157.86,
+   "section": "Bridge",
+   "line": "Feed me your time, I'ma feed on your life (life)"
+  },
+  {
+   "t": 161.36,
+   "section": "Bridge",
+   "line": "Click (click), tap (tap), scroll, repeat (repeat)"
+  },
+  {
+   "t": 164.85,
+   "section": "Bridge",
+   "line": "NPC army walkin' to my beat (bzzt)"
+  },
+  {
+   "t": 168.35,
+   "section": "Outro",
+   "line": "You still scrollin'? (beep beep)"
+  },
+  {
+   "t": 171.85,
+   "section": "Outro",
+   "line": "Good (good)"
+  },
+  {
+   "t": 175.35,
+   "section": "Outro",
+   "line": "I'm the algorithm, loser"
+  },
+  {
+   "t": 178.84,
+   "section": "Outro",
+   "line": "Lil Bottie (clanka!)"
+  }
+ ]
+}

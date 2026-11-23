@@ -1,0 +1,59 @@
+# lil Bottie
+
+Everything for lil Bottie in one place: how he looks, his 3D model, his songs, his lyrics and the music video work.
+
+lil Bottie is a fictional rapper, born in the server and raised by code. The look is locked: chrome helmet with a
+blue LED smiley screen for a face, long black braids, silver puffer jacket over a black hoodie, iced clover chain,
+chrome hands, iced watch.
+
+## What is in here
+
+| Folder | What it holds |
+| --- | --- |
+| `index.html` | Open this. The model on a stage: turn him, try the poses and faces, and press **The Algorithm** to watch him rap it with the timed lyrics on screen. |
+| `asset/` | `lil-bottie.js`, the 3D model (needs only three.js r128), and a sheet of ten views. |
+| `refs/` | The thirteen reference photos the model was built from. |
+| `songs/` | `algorithm.mp3` (3:20), copied unchanged from the studio's music. |
+| `lyrics/` | *The Algorithm*, word for word from the archive, and its timing file. |
+| `lore/` | `artist-archive.pdf`: tracklist, persona rules, visual lock, lore and every saved lyric. |
+| `music-video/` | The plan for the music video in the Grok Fable Astra world. Not built yet. |
+
+There is an older lil Bottie game, *Clankin' in the Cloud*, in the `bottie/` folder on the branch
+`claude/modest-ride-rgjg4r`. Nothing here changes it.
+
+## The model
+
+`asset/lil-bottie.js` builds him in the Grok Fable Astra style: blocky, low-poly, flat shaded. He is **not in the
+game yet**. To use him:
+
+```js
+const b = LilBottie.build(THREE);       // b.group is about 1.5 units tall, feet at y = 0
+scene.add(b.group);
+b.group.scale.setScalar(2.2);           // the size the game uses for people
+b.setPose('dance');                     // idle, walk, dance, point, thumbs, arms, sit
+b.setFace('hype');                      // smile, talk1, talk2, wink, hype, dead, btv
+b.setMouth(0.7);                        // lip sync, 0 to 1
+b.update(timeInSeconds);                // every frame
+```
+
+![ten views of the model](asset/lil-bottie-sheet.png)
+
+## The Algorithm: lyrics and timing
+
+- `lyrics/the-algorithm.md` is copied word for word from the archive. **Do not reword his lyrics and do not write
+  new ones in his voice** (the rule from the archive and from the `bottie/` README).
+- `lyrics/the-algorithm.timing.json` gives a start time for each of the 52 lines.
+
+How the timing was made: the song runs at about 137 beats a minute and the lyric sheet has one line per 8-beat
+bar (3.50 seconds). The grid is anchored where the bass comes back in at 28.45 s, and the sheet's section
+boundaries then land on the track's own breaks at 14.4, 56.4, 126.4 and 168.3 seconds.
+
+**Not checked by ear.** Nobody has listened to it against the track, and it was not transcribed from the vocal, so
+a line could sit early or late inside its bar, and the last 17 seconds (after 3:02) have no lines on the sheet.
+`index.html` has "lyrics −¼s / +¼s" buttons for checking it.
+
+## Rules
+
+- His lyrics are his: copy them, never rewrite them.
+- The General and the council in his story are fictional. No real flags, no real officials.
+- The visual lock is in `lore/artist-archive.pdf`, section 6.
