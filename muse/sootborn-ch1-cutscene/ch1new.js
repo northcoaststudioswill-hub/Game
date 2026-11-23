@@ -400,12 +400,12 @@ for (const sh of CH1_KEEP_SHOTS) if (sh.va !== undefined && sh.va >= MEM_AT - .0
   CH1_KEEP_SHOTS[i + 5].flash = 1; }
 // ---- the voice. The read is the clock: while it plays, the film's time is the audio's time, so picture and voice cannot drift.
 const VO = { a: null, on: false, off: false,
-  start() { if (this.off) return; try { if (!this.a) { this.a = new Audio(CH1_VO_SRC); this.a.preload = 'auto'; } this.a.currentTime = 0; this.a.volume = 1; this.vt = 0; this.last = -1; this.still = 0; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
+  start(src) { if (this.off) return; src = src || CH1_VO_SRC; try { if (!this.a || this.src !== src) { this.a = new Audio(src); this.a.preload = 'auto'; this.src = src; } this.a.currentTime = 0; this.a.volume = 1; this.vt = 0; this.last = -1; this.still = 0; const p = this.a.play(); if (p && p.catch) p.catch(() => { }); this.on = true; if (Sound.mus) Sound.mus.gain.value = (Settings.d.music / 10) * .5; } catch (e) { } },
   stop() { SUB.hide(); if (!this.on) return; this.on = false; try { this.a.pause(); } catch (e) { } Sound.setVol(); },
   live() { return this.on && this.a && !this.a.paused && !this.a.ended && this.a.currentTime > 0; } };
 { const n1 = Brawl.nextShot; Brawl.nextShot = function () { n1.call(this); const c = this.cine, s = c && c.shots[c.i]; if (s && s.vd) c.dur = s.vd; if (c) c._fx = 0; };
   const u0 = Brawl.updCine; Brawl.updCine = function (dt) { const c = this.cine, s = c.shots[c.i], i0 = c.i;
-    if (s.va === 0 && !VO.on && c.t === 0) VO.start();
+    if (s.va === 0 && !VO.on && c.t === 0) VO.start(this.def && this.def.voSrc);
     if (s.va !== undefined && VO.on) { VO.vt += dt; const a = VO.a; if (a && !a.paused && !a.ended) { const ct = a.currentTime; if (ct !== VO.last) { VO.last = ct; if (VO.still > .6 && VO.vt - ct > .35) { try { a.currentTime = VO.vt; } catch (e) { } } else VO.vt = ct; VO.still = 0; } else VO.still = (VO.still || 0) + dt; } c.t = Math.max(0, VO.vt - s.va - dt); }
     const tA = c.t; u0.call(this, dt);
     if (!this.cine) return VO.stop();
@@ -889,42 +889,51 @@ const hammerPoses = (S) => S.flatMap(s => [[s - .45, ACT.hamUp, 22], [s - .08, A
 const strikeFx = (S) => S.flatMap(s => [[s, 'spark', ANV.x + 8, ANV.z, '#ffd27a', 12, ANV.y + 1], [s, 'kick', .03]]);
 const AB = (h, heat) => [ANV.x - 6, ANV.y + 1, ANV.z, 0, 0, heat, h];   // the blade lying on the anvil, its end over the horn
 const S9 = [.9, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3], S10 = [.4, 1.2, 2.0, 2.8];
+// cut to Kael's read: every shot starts where its words start in the audio (va, seconds). The take stops at 100.4 s, after
+// "It is still their steel."; the shots after that keep the same clock and show their words as captions until it is re-recorded.
+const TV2 = (va, ve, o) => VS(va, ve, Object.assign({ noprops: 1, caps: [[0, '']] }, o));
+const FB = [HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0];   // the blade lying in the coals
+const S9v = [1.0, 2.1, 3.2, 4.3, 5.4, 6.5, 7.6, 8.7, 9.8], S10v = [.5, 1.4, 2.3, 3.2];
 const KNIFE23_SHOTS = [
-  TK(4.8, { bg: 'forge', music: 'mystery', forge: { blade: [[0, ...AB(0, 0)]] }, cam: [-10, 170, 78, 170, .36], to: [0, 120, 56, 178, .36], sfxs: [[.2, 'heart']],
-    caps: [[.4, 'Four years after the furnace.'], [2.4, 'The night before the lift.']], acts: [KG({ poses: [[0, ACT.stand, 5]] }), BR({ poses: [[0, ACT.arms, 5]] })] }),
-  TK(6.2, { forge: { blade: [[0, ...AB(0, 0)]] }, cam: [-6, 66, 32, 200, .46], to: [2, 54, 30, 206, .46],
-    caps: [[.3, 'The night before I went up as Edric Sorrel, Brand took the blade the High Auditor had pinned on me with the sun,']], acts: [KG({ poses: [[0, ACT.stand, 5]] }), BR({ poses: [[0, ACT.arms, 5]] })] }),
-  TK(3.8, { forge: { blade: [[0, ...AB(0, 0)], [1.2, -30, 30, -20, 0, .2, 0, 0], [2.4, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, .3, 0], [3.8, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, .9, 0]] }, cam: [-40, 40, 46, 200, .4], to: [-54, 20, 44, 206, .42], sfxs: [[2.4, 'clink']],
-    caps: [[.2, 'and put the last hand of it in a forge.']], acts: [KG({ path: [[0, -20, -4], [2.2, 6, -10]], faceTo: null, faces: [[0, 1, -.3], [2.2, -.6, -.4]], walk: 1, poses: [[0, ACT.stand, 5]] }), BR({ path: [[0, 20, -6], [2.2, -26, -24]], faceTo: null, faces: [[0, -1, -.4]], walk: 1, poses: [[0, ACT.stand, 5], [2.3, ACT.tongs, 6]] })] }),
-  TK(5.8, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, .9, 0]] }, ...cu(-26, -24, 2.4, 2.9, 10), zooms: [[2, 5.6, .3]],
-    caps: [[.2, 'Brand said: “They gave you a ruler. Straight, so that it can be counted.”'], [3.4, '“What did you carry below?”']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.tongs, 5], [3.2, Object.assign({}, ACT.stand, { hx: -.05, hy: -.3 }), 3]] })] }),
-  TK(6.4, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, ...cu(6, -10, 2.4, 3.0, 10), zooms: [[2.4, 6, .3]],
-    caps: [[.2, 'I said: “A seat knife. Every valve hand is issued one.”'], [2.8, '“A hooked blade the length of your palm, for cutting a seized seat out of a valve body.”']], acts: [KG({ a: [6, -10], fx: -.3, fy: .9, poses: [[0, ACT.stand, 5], [2.8, Object.assign({}, ACT.stand, { rp: -1.0, re: -1.4, ry: -.3 }), 4]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
-  TK(4.2, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, mems: [[.3, 3.4, 'pipe', 0, '255,170,70']], sfxs: [[.3, 'cutin']], cam: [-20, 90, 48, 200, .4], to: [-16, 80, 46, 204, .4],
-    caps: [[.2, 'It is the only edge soot are allowed. They are numbered.']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
-  TK(5.6, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, cam: [-58, 30, 40, 200, .42], to: [-56, 10, 40, 210, .44],
-    caps: [[.2, 'At last bell the knives are counted back onto a board, and a hook left empty on that board is a line struck by morning.']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
-  TK(7.4, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, ...cu(6, -10, 2.2, 3.1, 8), zooms: [[3.6, 7.2, .4]], mems: [[1.3, 2.9, 'furnace', 1, '255,90,30']], sfxs: [[1.3, 'cutin'], [4.2, 'heart']],
-    caps: [[.2, 'Seren’s was taken off her the night they walked her. I saw it afterwards, in the Warden’s tray.'], [3.8, 'Number three hundred and six. Somebody had cleaned it. Nobody hung it back.']],
-    acts: [KG({ a: [6, -10], fx: -.3, fy: .9, poses: [[0, ACT.stand, 5], [3.6, ACT.washerUp, 4], [5.4, ACT.washer, 3]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
-  TK(6.4, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0], [3.8, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0], [5.4, -20, 30, -14, 0, .2, 1, 0], [6.4, ...AB(0, 1)]], tongs: 0 }, cam: [-24, 130, 60, 176, .36], to: [-10, 110, 54, 184, .36], sfxs: [[5.2, 'clink']],
-    caps: [[.2, 'Brand said: “I counted that board for eleven years. I never once asked what the knives were for.”'], [4.2, '“Hold the tongs.”']],
-    acts: [KG({ a: [6, -10], path: [[0, 6, -10], [2.0, 6, -10], [3.4, -14, -2]], faceTo: null, faces: [[0, -.6, -.4], [2.0, -1, .2], [3.4, 1, .1]], walk: 1, poses: [[0, ACT.stand, 5], [5.6, ACT.tongs, 6]] }),
-           BR({ a: [-26, -24], path: [[0, -26, -24], [3.8, -26, -24], [5.0, 0, -30], [6.2, 16, -6]], faceTo: null, faces: [[0, .7, .7], [3.8, 1, -.2], [5.6, -1, .15]], walk: 1, poses: [[0, ACT.stand, 5], [3.9, ACT.tongs, 6], [6, ACT.arms, 5]] })] }),
-  TK(7.4, { forge: { blade: [[0, ...AB(0, 1)], [7.4, ...AB(.65, .9)]], tongs: 1, strikes: S9, hammer: 1 }, cam: [4, 40, 30, 200, .5], to: [8, 34, 28, 206, .5], sfxs: S9.map(s => [s, 'steel']), fxs: strikeFx(S9),
-    caps: [[.3, 'He drew the point out and turned it over the horn until their blade ended in our hook.']], acts: [KG({ a: [-14, -2], poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: hammerPoses(S9) })] }),
-  TK(4.0, { forge: { blade: [[0, ...AB(.65, .9)], [4, ...AB(1, .8)]], tongs: 1, strikes: S10 }, cam: [10, 120, 56, 180, .38], to: [4, 104, 52, 186, .38], sfxs: S10.map(s => [s, 'steel']), fxs: strikeFx(S10),
-    caps: [[.3, 'It took most of the night.']], acts: [KG({ a: [-14, -2], poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: hammerPoses(S10).concat([[3.4, ACT.arms, 4]]) })] }),
-  TK(4.2, { forge: { blade: [[0, ...AB(1, .8)], [1.2, 20, 30, -12, 0, 0, .8, 1], [2.0, TROUGH.x - 6, TROUGH.y + 1, TROUGH.z, 0, -.4, .8, 1], [2.4, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1], [4.2, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1]], tongs: 1 },
+  TV2(0, 4.4, { bg: 'forge', music: 'mystery', forge: { blade: [[0, ...AB(0, 0)]] }, cam: [-10, 170, 78, 170, .36], to: [0, 120, 56, 178, .36], sfxs: [[.2, 'heart']],
+    caps: [[0, 'Four years after the furnace.'], [2.5, 'The night before the lift.']], acts: [KG({ poses: [[0, ACT.stand, 5]] }), BR({ poses: [[0, ACT.arms, 5]] })] }),
+  TV2(4.4, 10.4, { forge: { blade: [[0, ...AB(0, 0)]] }, cam: [-6, 66, 32, 200, .46], to: [2, 54, 30, 206, .46],
+    caps: [[.1, 'The night before I went up as Edric Sorrel, Brand took the blade the High Auditor had pinned on me with the sun,']], acts: [KG({ poses: [[0, ACT.stand, 5]] }), BR({ poses: [[0, ACT.arms, 5]] })] }),
+  TV2(10.4, 12.9, { forge: { blade: [[0, ...AB(0, 0)], [.8, -30, 30, -20, 0, .2, 0, 0], [1.6, ...FB, .3, 0], [2.5, ...FB, .9, 0]] }, cam: [-40, 40, 46, 200, .4], to: [-54, 20, 44, 206, .42], sfxs: [[1.6, 'clink']],
+    caps: [[.1, 'and put the last hand of it in a forge.']], acts: [KG({ path: [[0, -20, -4], [1.6, 6, -10]], faceTo: null, faces: [[0, 1, -.3], [1.6, -.6, -.4]], walk: 1, poses: [[0, ACT.stand, 5]] }), BR({ path: [[0, 20, -6], [1.5, -26, -24]], faceTo: null, faces: [[0, -1, -.4]], walk: 1, poses: [[0, ACT.stand, 5], [1.6, ACT.tongs, 6]] })] }),
+  TV2(12.9, 20.9, { forge: { blade: [[0, ...FB, .9, 0]] }, ...cu(-26, -24, 2.4, 3.0, 10), zooms: [[5.6, 7.8, .3]],
+    caps: [[.1, 'Brand said: “They gave you a ruler. Straight, so that it can be counted.”'], [6.1, '“What did you carry below?”']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.tongs, 5], [5.8, Object.assign({}, ACT.stand, { hx: -.05, hy: -.3 }), 3]] })] }),
+  TV2(20.9, 31.6, { forge: { blade: [[0, ...FB, 1, 0]] }, ...cu(6, -10, 2.3, 3.0, 10), zooms: [[5.5, 10.4, .3]],
+    caps: [[.5, 'I said: “A seat knife. Every valve hand is issued one.”'], [5.7, '“A hooked blade the length of your palm, for cutting a seized seat out of a valve body.”']], acts: [KG({ a: [6, -10], fx: -.3, fy: .9, poses: [[0, ACT.stand, 5], [5.7, Object.assign({}, ACT.stand, { rp: -1.0, re: -1.4, ry: -.3 }), 4], [9.2, ACT.stand, 3]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TV2(31.6, 35.9, { forge: { blade: [[0, ...FB, 1, 0]] }, mems: [[.4, 3.9, 'pipe', 0, '255,170,70']], sfxs: [[.4, 'cutin']], cam: [-20, 90, 48, 200, .4], to: [-16, 80, 46, 204, .4],
+    caps: [[.3, 'It is the only edge soot are allowed. They are numbered.']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TV2(35.9, 44.8, { forge: { blade: [[0, ...FB, 1, 0]] }, cam: [-58, 30, 40, 200, .42], to: [-50, 4, 40, 214, .44],
+    caps: [[.3, 'At last bell the knives are counted back onto a board, and a hook left empty on that board is a line struck by morning.']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TV2(44.8, 53.6, { forge: { blade: [[0, ...FB, 1, 0]] }, ...cu(6, -10, 2.0, 2.6, 8), mems: [[3.0, 5.2, 'furnace', 1, '255,90,30']], sfxs: [[3.0, 'cutin']],
+    caps: [[1.3, 'Seren’s was taken off her the night they walked her.'], [5.4, 'I saw it afterwards, in the Warden’s tray.']], acts: [KG({ a: [6, -10], fx: -.3, fy: .9, poses: [[0, ACT.stand, 5], [5.6, Object.assign({}, ACT.stand, { hx: .3 }), 3]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TV2(53.6, 62.5, { forge: { blade: [[0, ...FB, 1, 0]] }, ...cu(6, -10, 2.6, 3.3, 8), zooms: [[3.6, 8.6, .4]], sfxs: [[.6, 'heart'], [6.8, 'heart']],
+    caps: [[.8, 'Number three hundred and six.'], [3.8, 'Somebody had cleaned it.'], [6.9, 'Nobody hung it back.']], acts: [KG({ a: [6, -10], fx: -.3, fy: .9, poses: [[0, ACT.stand, 5], [3.6, ACT.washerUp, 4], [6.6, ACT.washer, 3]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TV2(62.5, 73.0, { forge: { blade: [[0, ...FB, 1, 0]] }, ...cu(-26, -24, 2.3, 2.9, 10), zooms: [[6.8, 10.4, .3]],
+    caps: [[1.4, 'Brand said: “I counted that board for eleven years.”'], [7.7, '“I never once asked what the knives were for.”']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5], [7.5, Object.assign({}, ACT.stand, { hx: .35 }), 3]] })] }),
+  TV2(73.0, 76.8, { forge: { blade: [[0, ...FB, 1, 0], [2.0, ...FB, 1, 0], [2.9, -20, 30, -14, 0, .2, 1, 0], [3.8, ...AB(0, 1)]] }, cam: [-24, 130, 60, 176, .36], to: [-10, 110, 54, 184, .36], sfxs: [[3.6, 'clink']],
+    caps: [[1.8, '“Hold the tongs.”']], acts: [KG({ a: [6, -10], path: [[0, 6, -10], [1.4, -14, -2]], faceTo: null, faces: [[0, -1, .2], [1.4, 1, .1]], walk: 1, poses: [[0, ACT.stand, 5], [3.2, ACT.tongs, 6]] }),
+           BR({ a: [-26, -24], path: [[0, -26, -24], [1.6, -26, -24], [2.6, 0, -30], [3.8, 16, -6]], faceTo: null, faces: [[0, 1, -.2], [3.0, -1, .15]], walk: 1, poses: [[0, ACT.tongs, 6], [3.6, ACT.arms, 5]] })] }),
+  TV2(76.8, 87.3, { forge: { blade: [[0, ...AB(0, 1)], [10.5, ...AB(.7, .9)]], tongs: 1, strikes: S9v, hammer: 1 }, cam: [4, 40, 30, 200, .5], to: [8, 34, 28, 206, .5], sfxs: S9v.map(s => [s, 'steel']), fxs: strikeFx(S9v),
+    caps: [[.5, 'He drew the point out and turned it over the horn until their blade ended in our hook.']], acts: [KG({ a: [-14, -2], poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: hammerPoses(S9v) })] }),
+  TV2(87.3, 90.9, { forge: { blade: [[0, ...AB(.7, .9)], [3.6, ...AB(1, .8)]], tongs: 1, strikes: S10v }, cam: [10, 120, 56, 180, .38], to: [4, 104, 52, 186, .38], sfxs: S10v.map(s => [s, 'steel']), fxs: strikeFx(S10v),
+    caps: [[.3, 'It took most of the night.']], acts: [KG({ a: [-14, -2], poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: hammerPoses(S10v).concat([[3.3, ACT.arms, 4]]) })] }),
+  TV2(90.9, 94.9, { forge: { blade: [[0, ...AB(1, .8)], [1.2, 20, 30, -12, 0, 0, .8, 1], [2.0, TROUGH.x - 6, TROUGH.y + 1, TROUGH.z, 0, -.4, .8, 1], [2.4, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1], [4, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1]], tongs: 1 },
     cam: [40, 60, 36, 200, .44], to: [46, 50, 34, 206, .44], sfxs: [[2.1, 'splash']], fxs: Array.from({ length: 10 }, (_, i) => [2.1 + i * .12, 'spark', TROUGH.x - 4 + (i % 3) * 3, TROUGH.z, '#e8eef4', 4, TROUGH.y + 2]),
-    caps: [[.2, 'He did not speak again until it was in the water.']], acts: [KG({ path: [[0, -14, -2], [1.6, 34, -4]], faceTo: null, faces: [[0, 1, .1]], walk: 1, poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: [[0, ACT.arms, 5]] })] }),
-  TK(7.2, { forge: { blade: [[0, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1]] }, ...cu(12, -8, 2.4, 3.0, -10), zooms: [[3.8, 7, .3]],
-    caps: [[.2, 'Brand said: “It is still their steel. It will pass any inspection on that Spire.”'], [3.8, '“And every time you draw it, you will know which end is yours.”']], acts: [KG({ a: [40, -2], fx: -.7, fy: .3, poses: [[0, ACT.tongs, 5]] }), BR({ a: [12, -8], fx: .2, fy: 1, poses: [[0, ACT.arms, 5], [3.6, Object.assign({}, ACT.arms, { hx: -.15 }), 3]] })] }),
-  TK(7.0, { forge: { blade: [[0, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1], [1.2, 24, 33, 3, -.15, .4, 0, 1], [7, 24, 34, 3, -.15, .5, 0, 1]], glintAt: 2.6 }, ...cu(38, -2, 1.7, 2.2, -12), sfxs: [[2.6, 'clink']],
-    caps: [[.3, 'I called it the bank hook, because nobody up there would know what a bank was.'], [4.0, 'I carried it five years. It is the blade she broke.']], acts: [KG({ a: [40, -2], fx: -.4, fy: .9, poses: [[0, ACT.tongs, 5], [1.0, ACT.holdUp, 4]] }), BR({ a: [-6, -16], fx: 1, fy: .3, poses: [[0, ACT.arms, 5]] })] }),
+    caps: [[.3, 'He did not speak again until it was in the water.']], acts: [KG({ path: [[0, -14, -2], [1.6, 34, -4]], faceTo: null, faces: [[0, 1, .1]], walk: 1, poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: [[0, ACT.arms, 5]] })] }),
+  TV2(94.9, 103.4, { forge: { blade: [[0, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1]] }, ...cu(12, -8, 2.4, 3.0, -10), zooms: [[5.4, 8.4, .3]],
+    caps: [[.3, 'Brand said: “It is still their steel.”'], [5.6, '“It will pass any inspection on that Spire.”']], acts: [KG({ a: [40, -2], fx: -.7, fy: .3, poses: [[0, ACT.tongs, 5]] }), BR({ a: [12, -8], fx: .2, fy: 1, poses: [[0, ACT.arms, 5], [5.4, Object.assign({}, ACT.arms, { hx: -.15 }), 3]] })] }),
+  TV2(103.4, 107.4, { forge: { blade: [[0, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1]] }, ...cu(12, -8, 2.8, 3.3, -10),
+    caps: [[.2, '“And every time you draw it, you will know which end is yours.”']], acts: [KG({ a: [40, -2], fx: -.7, fy: .3, poses: [[0, ACT.tongs, 5]] }), BR({ a: [12, -8], fx: .2, fy: 1, poses: [[0, Object.assign({}, ACT.arms, { hx: -.15 }), 3]] })] }),
+  TV2(107.4, 115.4, { forge: { blade: [[0, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1], [1.4, 24, 33, 3, -.15, .4, 0, 1], [8, 24, 34, 3, -.15, .5, 0, 1]], glintAt: 3.0 }, ...cu(38, -2, 1.7, 2.2, -12), sfxs: [[3.0, 'clink']],
+    caps: [[.6, 'I called it the bank hook, because nobody up there would know what a bank was.'], [4.6, 'I carried it five years. It is the blade she broke.']], acts: [KG({ a: [40, -2], fx: -.4, fy: .9, poses: [[0, ACT.tongs, 5], [1.2, ACT.holdUp, 4]] }), BR({ a: [-6, -16], fx: 1, fy: .3, poses: [[0, ACT.arms, 5]] })] }),
   { d: 1.6, vd: 1.6, black: 1, caps: [[0, '']] }
 ];
-const KNIFE23_FILM = () => ({ bg: 'forge', arena: { kind: 'rect', w: 220, h: 100 }, music: 'mystery', cineOnly: 1, film: 1, hero: { id: 'kaelg' }, intro: KNIFE23_SHOTS, foes: [] });
+const KNIFE23_FILM = () => ({ voSrc: CH23_VO_SRC, bg: 'forge', arena: { kind: 'rect', w: 220, h: 100 }, music: 'mystery', cineOnly: 1, film: 1, hero: { id: 'kaelg' }, intro: KNIFE23_SHOTS, foes: [] });
 const KNIFE23 = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: () => KNIFE23_FILM() }];
 const KNIFE23_OLD = P2[1]().slice(P2[1]().findIndex(s => s.card === 'THE SEAT KNIFE'), P2[1]().findIndex(s => s.card === 'THE SEAT KNIFE') + 13);
 
