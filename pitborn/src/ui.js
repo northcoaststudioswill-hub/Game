@@ -1,0 +1,320 @@
+// PITBORN 2145 — menus and HUD (DOM over the 3D view)
+'use strict';
+const UI = { cur: null, handlers: [], focus: 0, navT: 0, stack: [] };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
+function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
+function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
+function openPanel(render, cls, onBack) { UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy'); }
+function rerender(reset) {
+  if (!UI.cur) return; const el = $('panel'), pb = el.querySelector('.pb'), sc = pb && !reset ? pb.scrollTop : 0, tb = el.querySelector('.tabs'), ts = tb && !reset ? tb.scrollLeft : 0;
+  UI.handlers = []; el.className = UI.cur.cls; el.innerHTML = `<div class="pin">${UI.cur.render()}</div>`; el.style.display = 'block';
+  const pb2 = el.querySelector('.pb'); if (pb2) pb2.scrollTop = sc; const tb2 = el.querySelector('.tabs'); if (tb2) tb2.scrollLeft = ts; paintFocus();
+}
+function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
+function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
+function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range]')); }
+function paintFocus() { if (IS_TOUCH) return; const f = focusables(); f.forEach((b, i) => b.classList.toggle('focus', i === UI.focus)); }
+function uiInit() {
+  const click = e => {
+    const b = e.target.closest('[data-k]'); if (!b || b.disabled || b.tagName === 'INPUT') return; audioInit();
+    const f = focusables().indexOf(b); if (f >= 0) UI.focus = f; const h = UI.handlers[+b.dataset.k]; if (h) h(b);
+  };
+  $('panel').addEventListener('click', click); $('title').addEventListener('click', click);
+  $('panel').addEventListener('input', e => { const b = e.target.closest('[data-k]'); if (b) { const h = UI.handlers[+b.dataset.k]; if (h) h(b); } });
+  $('prompt').addEventListener('click', () => { if (W && W.near && !uiBusy()) { audioInit(); sfx('uiok'); W.near.fn(); } });
+}
+function uiStep(dt) {
+  const I = IN[0], f = focusables(); UI.navT -= dt; const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName) && document.activeElement.type !== 'range';
+  if (typing) { if (keys.Escape) document.activeElement.blur(); return; }
+  const m = Math.abs(I.mx) > Math.abs(I.my) ? (I.mx > 0.6 ? 'R' : I.mx < -0.6 ? 'L' : '') : (I.my > 0.6 ? 'D' : I.my < -0.6 ? 'U' : '');
+  if (!m) UI.navT = 0;
+  if (m && UI.navT <= 0 && f.length) {
+    UI.navT = 0.17; const cur = f[UI.focus];
+    if (cur && cur.type === 'range' && (m === 'L' || m === 'R')) { cur.value = +cur.value + (m === 'R' ? 1 : -1) * (+cur.step || 1); cur.dispatchEvent(new Event('input', { bubbles: true })); }
+    else { UI.focus = (UI.focus + (m === 'D' || m === 'R' ? 1 : -1) + f.length) % f.length; paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
+  }
+  if (I.aP && f[UI.focus] && !IS_TOUCH) f[UI.focus].click();
+  if (I.back && UI.cur) uiBack();
+}
+
+// ---------- toasts ----------
+function toast(big, small, cls) { const t = document.createElement('div'); t.className = 'toast ' + (cls || ''); t.innerHTML = esc(big) + (small ? `<small>${esc(small)}</small>` : ''); $('toasts').appendChild(t); setTimeout(() => t.remove(), 3500); while ($('toasts').children.length > 4) $('toasts').firstChild.remove(); }
+
+// ---------- HUD ----------
+function project(x, y, z) { _v.set(x, y, z).project(camera); return [(_v.x * 0.5 + 0.5) * innerWidth, (-_v.y * 0.5 + 0.5) * innerHeight]; }
+function hudShow(on) {
+  $('hud').style.display = on ? 'block' : 'none'; if (!on || !MT) return;
+  $('modeTag').textContent = MT.cfg.mode.n + (MT.practice ? '' : ' · ' + MT.cfg.tier.n + ' · FIRST TO ' + MT.cfg.mode.to);
+  $('sb').style.display = MT.practice ? 'none' : 'flex'; $('rackHud').style.display = MT.practice === 'rack' ? 'block' : 'none'; $('brav').style.display = MT.practice ? 'none' : 'block';
+  $('n0').textContent = (S.name || 'YOU').slice(0, 10); $('flts').innerHTML = ''; $('call').className = '';
+}
+function hudCall(big, small, col, dur) { const c = $('call'); c.firstElementChild.textContent = big; c.lastElementChild.textContent = small || ''; c.firstElementChild.style.color = col || '#fff'; c.className = ''; void c.offsetWidth; c.style.animationDuration = (dur || 1.2) + 's'; c.className = 'go'; }
+let fbT = null;
+function hudFb(txt, col) { const f = $('fb'); f.textContent = txt; f.style.color = col || '#fff'; f.style.opacity = 1; clearTimeout(fbT); fbT = setTimeout(() => f.style.opacity = 0, 1300); }
+function hudFloat(p, txt, col) { const [x, y] = project(p.x, p.H + 0.5 + p.y, p.z); const d = document.createElement('div'); d.className = 'flt'; d.textContent = txt; d.style.cssText = `left:${x}px;top:${y}px;color:${col || '#fff'}`; $('flts').appendChild(d); setTimeout(() => d.remove(), 1100); }
+function hudMatch() {
+  const M_ = MT, me = M_.me; $('s0').textContent = M_.score[0]; $('s1').textContent = M_.score[1]; $('clock').textContent = Math.max(0, Math.ceil(M_.clock));
+  $('stam').firstElementChild.style.width = me.stam + '%'; const bv = $('brav'); bv.firstElementChild.style.width = (me.brav * 100) + '%'; bv.classList.toggle('on', me.bravT > 0);
+  const sh = M_.humans.find(h => h.st === 'shoot'), mt = $('meter');
+  if (sh && S.set.meter) {
+    const [x, y] = project(sh.x, sh.H * 0.6 + sh.y, sh.z); const u = sh.t / (sh.shot.rel * 1.55), z = 1 / 1.55;
+    mt.style.display = 'block'; mt.style.left = (x + 34) + 'px'; mt.style.top = (y - 60) + 'px';
+    const rel = sh.shot.released; if (!rel) { $('meterFill').style.height = Math.min(100, u * 100) + '%'; $('meterFill').style.background = '#fff'; } else $('meterFill').style.background = MT.B.green ? '#33ff88' : '#ff8a1f';
+    $('meterZone').style.bottom = (z * 100 - 5) + '%'; $('meterZone').style.height = '10%';
+  } else mt.style.display = 'none';
+  $('clear').style.display = M_.needClear && M_.off === me.team && M_.phase === 'live' ? 'block' : 'none';
+  if (M_.practice === 'rack') $('rackHud').innerHTML = `<span class="ye">${M_.rackScore}</span> PTS<br><span style="font-size:20px">${Math.max(0, Math.ceil(M_.rackT))}s</span>`;
+  if (IS_TOUCH) {
+    const has = M_.B.holder === me, offb = M_.off === me.team;
+    const a = has ? 'PASS' : offb ? 'CALL' : M_.arcade ? 'SHOVE' : 'STEAL', b = has ? 'SHOOT' : 'JUMP', h = has ? '↓ HOLD SHOOT · ↑ DRIVE · ←→ MOVES' : offb ? 'SKILL STICK' : '↑ HANDS UP · ↓ ' + (M_.arcade ? 'SHOVE' : 'STEAL');
+    if ($('tA').textContent !== a) $('tA').textContent = a; if ($('tB').textContent !== b) $('tB').textContent = b; if ($('hintR').textContent !== h) $('hintR').textContent = h;
+  }
+}
+function uiHud() {
+  if (!S) return; $('wvc').textContent = S.vc.toLocaleString(); const r = rankOf(S.rep); $('wrank').textContent = RANKS[r].n;
+  const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
+  $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
+  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
+}
+function vcLine() { return `<span class="chip"><b>${S.vc.toLocaleString()}</b> VC</span>`; }
+
+// ---------- title ----------
+function uiTitle() {
+  document.body.dataset.state = 'title'; $('title').style.display = 'flex'; document.body.classList.add('busy'); UI.handlers = []; UI.focus = 0;
+  $('titleBtns').innerHTML = (S.created ? Btn('CONTINUE AS ' + esc(S.name), () => { hideTitle(); enterWorld('hub', 0, 20, Math.PI); }) : '') + Btn(S.created ? 'NEW PLAYER' : 'CREATE YOUR PLAYER', () => {
+    if (S.created && !confirm('Start over? This erases your player, drip, crib and Respect.')) return; if (S.created) { S = newSave(); } hideTitle(); uiBuilder();
+  }, S.created ? 'alt' : '');
+  paintFocus();
+}
+function hideTitle() { $('title').style.display = 'none'; document.body.classList.remove('busy'); sfx('uiok'); }
+
+// ---------- builder ----------
+function capBars(build, attrs) {
+  const caps = capsFor(build); let h = '';
+  for (const c in CATS) {
+    h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]}</div>`;
+    for (const a of ATTRS) if (a.cat === c) { const v = attrs ? attrs[a.id] : null; h += `<div class="row" style="margin-bottom:3px"><div class="an">${a.n}</div><div class="ab"><i style="width:${caps[a.id]}%;background:${CATS[c][1]};opacity:${attrs ? 0.3 : 1}"></i>${attrs ? `<i style="width:${v}%;background:${CATS[c][1]}"></i>` : ''}</div><div class="av">${attrs ? v + '<small>/' + caps[a.id] + '</small>' : caps[a.id]}</div></div>`; }
+  }
+  return h;
+}
+function uiBuilder() {
+  const T = { name: S.name === 'ROOKIE' ? '' : S.name, build: JSON.parse(JSON.stringify(S.build)), hair: S.worn.hair };
+  document.body.dataset.state = 'create'; studioScene();
+  const rig = () => studioRig({ build: T.build, worn: Object.assign({}, S.worn, { hair: T.hair }) });
+  const lbs = () => Math.round(150 + (T.build.body.h - 67) * 5.6 + T.build.body.w * 32);
+  const body = () => `<label class="sl">HEIGHT <b>${fmtH(T.build.body.h)}</b></label><label class="sl">WEIGHT <b>${lbs()} lbs</b></label><label class="sl">WINGSPAN <b>${fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5))}</b></label>`;
+  rig();
+  openPanel(() => {
+    const st = STYLE[T.build.style];
+    let h = `<div class="ph"><h2>BUILD YOUR PLAYER</h2></div><div class="pb">`;
+    h += `<div class="cat ye">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}">`;
+    h += `<div class="cat ye">PLAYSTYLE <span class="mu">— sets what you can become</span></div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === T.build.style ? 'sel' : ''}" data-k="${on(() => { T.build.style = s.id; sfx('ui'); rig(); rerender(); })}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
+    h += `<div class="cat ye">ORIGIN <span class="mu">— where 2145 America grew you</span></div><div class="grid">` + ORIGINS.map(o => `<div class="card ${o.id === T.build.origin ? 'sel' : ''}" data-k="${on(() => { T.build.origin = o.id; sfx('ui'); rerender(); })}"><h3>${o.n}</h3><p>${o.d}</p><p class="buff">${o.perk}</p></div>`).join('') + `</div>`;
+    h += `<div class="cat ye">BODY <span class="mu">— every inch moves your caps</span></div><div class="card"><div id="bodyLbl" style="display:none"></div>`;
+    h += `<label class="sl">HEIGHT <b id="lh">${fmtH(T.build.body.h)}</b></label><input type="range" min="${H_MIN}" max="${H_MAX}" step="1" value="${T.build.body.h}" data-k="${on(el => { T.build.body.h = +el.value; $('lh').textContent = fmtH(T.build.body.h); upd(); })}">`;
+    h += `<label class="sl">WEIGHT <b id="lw">${lbs()} lbs</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.w * 10)}" data-k="${on(el => { T.build.body.w = el.value / 10; upd(); })}">`;
+    h += `<label class="sl">WINGSPAN <b id="ls">${fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5))}</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.s * 10)}" data-k="${on(el => { T.build.body.s = el.value / 10; upd(); })}"></div>`;
+    h += `<div class="cat ye">LOOK</div><div class="card">` + SKINS.map((c, i) => `<span class="sw ${i === T.build.skin ? 'sel' : ''}" style="background:${c}" data-k="${on(() => { T.build.skin = i; rig(); rerender(); })}"></span>`).join('') + `<div style="margin-top:8px">` + DRIP.filter(d => d.slot === 'hair' && d.src === 'start').map(d => Btn(d.n, () => { T.hair = d.id; rig(); rerender(); }, 'sm ' + (T.hair === d.id ? '' : 'alt'))).join(' ') + `</div></div>`;
+    h += `<div class="cat ye">ATTRIBUTE CAPS <span class="mu">— ${st.n}, max potential</span></div><div class="card" id="capbox">${capBars(T.build)}</div>`;
+    h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
+      const nm = ($('bname').value || '').trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
+      S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
+      uiClose(); sfx('unlock'); enterWorld('hub', 0, 20, Math.PI); toast('WELCOME TO THE BLOCK', 'Walk to THE PIT to play. Fiends will ask for VC. Stay strong.', 'rank');
+    })}</div>`;
+    return h;
+  }, 'side', () => { });
+  function upd() { $('lw').textContent = lbs() + ' lbs'; $('ls').textContent = fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5)); $('capbox').innerHTML = capBars(T.build); rig(); }
+  $('panel').addEventListener('change', e => { if (e.target.id === 'bname') T.name = e.target.value; });
+  void body;
+}
+
+// ---------- MyPLAYER ----------
+function buffTotals() { const t = {}; for (const s in S.worn) { const d = DRIPS[S.worn[s]]; if (d && d.buff) for (const k in d.buff) t[k] = (t[k] || 0) + d.buff[k]; } return t; }
+function header() {
+  const r = rankOf(S.rep), nx = RANKS[r + 1];
+  return `<div class="hdr"><div class="ovr">${ovrOf(S.attrs)}</div><div><div class="f" style="font-size:22px">${esc(S.name)} <span class="mu" style="font-size:14px">${STYLE[S.build.style].n} · ${fmtH(S.build.body.h)}</span></div><div class="f cy" style="font-size:14px">${RANKS[r].n} · ${S.rep.toLocaleString()} RESPECT${nx ? ' <span class="mu">/ ' + nx.rep.toLocaleString() + '</span>' : ''}</div></div><div style="flex:1"></div>${vcLine()}</div>`;
+}
+function uiPlayer(tab) {
+  const st = { tab: tab || 'attrs' };
+  const tabs = [['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
+  openPanel(() => {
+    let h = `<div class="ph"><h2>MY PLAYER</h2>${Btn('✕', uiClose, 'alt sm')}</div>` + header() + `<div class="tabs">` + tabs.map(t => Btn(t[1], () => { st.tab = t[0]; sfx('ui'); rerender(true); }, st.tab === t[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb">`;
+    if (st.tab === 'attrs') {
+      const caps = capsFor(S.build), bf = buffTotals();
+      const buy = (id, n) => { let c = 0, k = 0; for (let i = 0; i < n && S.attrs[id] < caps[id]; i++) { const p = attrCost(S.attrs[id]); if (S.vc < p) break; S.vc -= p; S.attrs[id]++; c += p; k++; } if (k) { sfx('coin'); save(); checkAch(); } else sfx('no'); rerender(); };
+      for (const c in CATS) {
+        h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]}</div>`;
+        for (const a of ATTRS) if (a.cat === c) {
+          const v = S.attrs[a.id], cap = caps[a.id], cost = attrCost(v), mx = v >= cap;
+          h += `<div class="card" style="padding:6px 9px"><div class="row"><div class="an"><b>${a.n}</b></div><div class="ab"><i style="width:${cap}%;background:${CATS[c][1]};opacity:.28"></i><i style="width:${v}%;background:${CATS[c][1]}"></i></div><div class="av">${v}${bf[a.id] ? `<span class="buff">+${bf[a.id]}</span>` : ''}<small>/${cap}</small></div>${mx ? '<span class="tag" style="background:#ffc531;color:#111">MAX</span>' : Btn('+1 · ' + cost, () => buy(a.id, 1), 'sm', S.vc < cost) + Btn('+5', () => buy(a.id, 5), 'sm alt', S.vc < cost)}</div><p>${a.d}</p></div>`;
+        }
+      }
+    } else if (st.tab === 'badges') {
+      h += `<p class="mu">Earn badge XP by doing the thing in real games. 100 XP = 1 point in that category. Higher tiers need the attribute to back it up.</p>`;
+      for (const c of ['F', 'S', 'P', 'D']) {
+        h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]} · <span class="ye">${S.bp[c]} PTS</span> <span class="mu">· ${Math.floor(S.bxp[c])}/100 XP</span></div><div class="grid">`;
+        for (const b of BADGES) if (b.cat === c) {
+          const t = S.badges[b.id] || 0, nxt = t + 1, need = nxt <= 4 ? b.req[nxt] : 0, ok = nxt <= 4 && S.attrs[b.req[0]] >= need && S.bp[c] >= TIER_COST[nxt];
+          h += `<div class="card"><h3 style="color:${TIER_COL[t] === '#555' ? '#fff' : TIER_COL[t]}">${b.n}</h3><div class="pips">${[1, 2, 3, 4].map(i => `<i style="background:${i <= t ? TIER_COL[i] : '#000'}"></i>`).join('')}<span class="tag mu">${TIERS[t]}</span></div><p>${b.d}</p>`;
+          h += nxt > 4 ? `<p class="ye">MAXED. The founders weep.</p>` : `<div class="row" style="margin-top:5px"><p class="g" style="color:${S.attrs[b.req[0]] >= need ? '#33ff88' : '#ff8a1f'}">${TIERS[nxt]}: needs ${ATTR[b.req[0]].n} ${need}</p>${Btn(TIER_COST[nxt] + ' PT', () => { S.bp[c] -= TIER_COST[nxt]; S.badges[b.id] = nxt; sfx('unlock'); toast(b.n + ' → ' + TIERS[nxt], b.d, 'ach'); save(); rerender(); }, 'sm', !ok)}</div>`;
+          h += `</div>`;
+        }
+        h += `</div>`;
+      }
+    } else if (st.tab === 'moves') {
+      const r = rankOf(S.rep);
+      const sec = (title, list, slot, needAttr) => {
+        h += `<div class="cat ye">${title}</div><div class="grid">`;
+        for (const m of list) {
+          const own = S.moves.owned.includes(m.id), eq = S.moves[slot] === m.id, price = shopPrice(m.cost), lockR = m.rank > r, lockA = needAttr && m.need > S.attrs[needAttr];
+          h += `<div class="card ${eq ? 'sel' : ''} ${!own && (lockR || lockA) ? 'lock' : ''}"><h3>${m.n}</h3><p>${m.d || ''}</p><div style="margin-top:5px">` +
+            (eq ? `<span class="tag" style="background:#ffc531;color:#111">EQUIPPED</span>` : own ? Btn('EQUIP', () => { S.moves[slot] = m.id; sfx('uiok'); save(); rerender(); if (W) worldPlayerRig(); }, 'sm') :
+              lockR ? `<span class="tag or">RANK: ${RANKS[m.rank].n}</span>` : lockA ? `<span class="tag or">NEEDS ${ATTR[needAttr].n} ${m.need}</span>` :
+                Btn('BUY · ' + price + ' VC', () => { S.vc -= price; S.moves.owned.push(m.id); S.moves[slot] = m.id; sfx('buy'); toast('NEW ANIMATION', m.n); save(); rerender(); }, 'sm', S.vc < price)) + `</div></div>`;
+        }
+        h += `</div>`;
+      };
+      h += `<p class="mu">The right stick is your skill stick. With the ball: flick ← → for your side move, ↙ ↘ for your stepback, ↖ ↗ for your spin, pull ↓ and hold to shoot, push ↑ to attack the rim.</p>`;
+      sec('SIDE MOVE  ← →', MOVES.filter(m => m.slot === 'side'), 'side', 'handle'); sec('STEPBACK  ↙ ↘', MOVES.filter(m => m.slot === 'back'), 'back', 'handle'); sec('SPIN  ↖ ↗', MOVES.filter(m => m.slot === 'diag'), 'diag', 'handle');
+      sec('JUMPSHOT', JUMPERS, 'jumper'); sec('DUNK PACKAGE', DUNKS, 'dunk', 'dunk'); sec('CELEBRATION', CELEBS, 'celeb');
+    } else if (st.tab === 'ach') {
+      const done = ACH.filter(a => S.ach[a.id]).length; h += `<p class="mu">${done} / ${ACH.length} trophies.</p><div class="grid">`;
+      for (const a of ACH) { const v = Math.min(a.t, achVal(a.k)), d = S.ach[a.id]; h += `<div class="card ${d ? 'sel' : ''}"><h3 style="color:${d ? '#ffc531' : '#fff'}">${d ? '🏆 ' : ''}${a.n}</h3><p>${a.d}</p><div class="row" style="margin-top:4px"><div class="ab"><i style="width:${v / a.t * 100}%;background:#ff4fd8"></i></div><div class="av" style="width:auto;font-size:13px">${v}/${a.t}</div></div><p class="buff">+${a.vc} VC${a.drip ? ' · ' + DRIPS[a.drip].n : ''}</p></div>`; }
+      h += `</div>`;
+    } else if (st.tab === 'road') {
+      const r = rankOf(S.rep);
+      RANKS.forEach((k, i) => {
+        const un = [].concat(TIERS_COURT.filter(t => t.rank === i && i > 0).map(t => 'Court: ' + t.n), DRIP.filter(d => d.rank === i && d.src === 'shop' && i > 0).map(d => d.n), MOVES.concat(JUMPERS, DUNKS, CELEBS).filter(m => m.rank === i && i > 0).map(m => m.n), CRIB.flatMap(c => c.tiers.filter(t => t.rank === i && t.cost > 0 && i > 0).map(t => 'Crib: ' + t.n)));
+        h += `<div class="card ${i === r ? 'sel' : ''} ${i > r ? 'lock' : ''}"><div class="row"><h3 class="g" style="color:${i <= r ? '#33e0ff' : '#fff'}">${i <= r ? '✓ ' : ''}${k.n}</h3><span class="f mu">${k.rep.toLocaleString()} RESPECT</span></div><p>${un.length ? 'Unlocks in shops: ' + un.join(' · ') : 'Where everyone starts. Even the Founding Fathers. Allegedly.'}</p></div>`;
+      });
+    } else {
+      h += `<div class="card"><h3>SOUND</h3><div style="margin-top:6px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
+      h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Pit with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (JAM: shove) · jump to block and board.</p></div>`;
+      h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => { if (confirm('Erase your player, drip, crib and Respect for good?')) { localStorage.removeItem(SAVE_KEY); location.reload(); } }, 'sm red')}</div></div>`;
+    }
+    return h + `</div>`;
+  });
+}
+
+// ---------- drip depot / closet ----------
+function uiShop(closet) {
+  const st = { slot: 'top' }; if (W) { W.look = true; W.me.face = W.yaw + Math.PI; W.me.vx = W.me.vz = 0; }
+  const r = () => rankOf(S.rep);
+  openPanel(() => {
+    let h = `<div class="ph"><h2>${closet ? 'CLOSET' : 'DRIP DEPOT'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="tabs">` + SLOTS.map(s => Btn(s[1], () => { st.slot = s[0]; sfx('ui'); rerender(true); }, st.slot === s[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb"><div class="grid">`;
+    let items = DRIP.filter(d => d.slot === st.slot); if (closet) items = items.filter(d => S.owned.includes(d.id)); else items = items.slice().sort((a, b) => a.r - b.r || a.cost - b.cost);
+    for (const d of items) {
+      const own = S.owned.includes(d.id), eq = S.worn[d.slot] === d.id, price = shopPrice(d.cost), lockR = d.rank > r();
+      const bf = d.buff ? Object.keys(d.buff).map(k => `+${d.buff[k]} ${ATTR[k].n}`).join(' · ') : '';
+      let act;
+      if (eq) act = `<span class="tag" style="background:#ffc531;color:#111">WEARING</span>`;
+      else if (own) act = Btn('WEAR', () => { S.worn[d.slot] = d.id; sfx('uiok'); save(); worldPlayerRig(); rerender(); }, 'sm');
+      else if (d.src === 'ach') act = `<span class="tag" style="color:#ff4fd8">TROPHY REWARD</span>`;
+      else if (d.src === 'bum') act = `<span class="tag" style="color:#ff4fd8">A FIEND MIGHT HAVE ONE</span>`;
+      else if (lockR) act = `<span class="tag or">RANK: ${RANKS[d.rank].n}</span>`;
+      else act = Btn('BUY · ' + price + ' VC', () => { S.vc -= price; S.owned.push(d.id); S.worn[d.slot] = d.id; sfx('buy'); toast('NEW DRIP: ' + d.n, RAR[d.r][0] + (bf ? ' · ' + bf : '')); save(); worldPlayerRig(); checkAch(); rerender(); }, 'sm', S.vc < price);
+      h += `<div class="card ${eq ? 'sel' : ''} ${!own && lockR ? 'lock' : ''}" style="border-left:5px solid ${RAR[d.r][1]}"><div class="row"><span class="sw" style="background:${d.c};width:22px;height:22px;margin:0;border-width:2px"></span><h3 class="g">${d.n}</h3></div><span class="tag" style="color:${RAR[d.r][1]}">${RAR[d.r][0]}</span> <span class="buff">${bf}</span><div style="margin-top:6px">${act}</div></div>`;
+    }
+    if (!items.length) h += `<p class="mu">Nothing here yet.</p>`;
+    return h + `</div></div>`;
+  }, 'side');
+}
+
+// ---------- crib ----------
+function uiCrib() {
+  openPanel(() => {
+    const r = rankOf(S.rep);
+    let h = `<div class="ph"><h2>CRIB UPGRADES</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">Your home court. Everything you bolt on here follows you into The Pit.</p>`;
+    for (const c of CRIB) {
+      const t = cribTier(c.id), cur = c.tiers[t], nx = c.tiers[t + 1];
+      h += `<div class="card"><div class="row"><div class="g"><h3>${c.n}: <span class="cy">${cur.n}</span></h3><p>${cur.d || '&nbsp;'}</p>`;
+      if (nx) { const price = shopPrice(nx.cost), lock = nx.rank > r; h += `<p class="ye">NEXT → ${nx.n}: <span class="buff">${nx.d}</span></p></div>` + (lock ? `<span class="tag or">RANK: ${RANKS[nx.rank].n}</span>` : Btn(price + ' VC', () => { S.vc -= price; S.crib[c.id] = t + 1; sfx('buy'); toast('CRIB UPGRADE', nx.n + ' — ' + nx.d, 'ach'); save(); checkAch(); const m = W.me; uiClose(); enterWorld('crib', m.x, m.z, m.face); uiCrib(); }, '', S.vc < price)); }
+      else h += `<p class="ye">Fully upgraded.</p></div>`;
+      h += `</div><div class="pips" style="margin-top:5px">${c.tiers.slice(1).map((x, i) => `<i style="background:${i < t ? '#33e0ff' : '#000'}"></i>`).join('')}</div></div>`;
+    }
+    return h + `</div>`;
+  });
+}
+
+// ---------- the Pit: mode setup, kiosk, homies ----------
+function uiMode(m) {
+  const r = rankOf(S.rep); let top = 0; TIERS_COURT.forEach((t, i) => { if (t.rank <= r) top = i; });
+  const st = { tier: Math.min(top, S.lastTier === undefined ? top : S.lastTier), mates: [], rival: -1, p2: 'off' };
+  const cyc = (v, n) => (v + 2) % (n + 1) - 1;   // -1 (random), 0..n-1
+  openPanel(() => {
+    const t = TIERS_COURT[st.tier];
+    let h = `<div class="ph"><h2>${m.n}</h2>${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p>${m.d}</p>`;
+    h += `<div class="cat ye">COURT</div><div class="grid">` + TIERS_COURT.map((c, i) => `<div class="card ${i === st.tier ? 'sel' : ''} ${c.rank > r ? 'lock' : ''}" ${c.rank > r ? '' : `data-k="${on(() => { st.tier = i; sfx('ui'); rerender(); })}"`}><h3>${c.n}</h3><p>${c.rank > r ? 'Unlocks at ' + RANKS[c.rank].n : `Opponents ~${c.ovr} OVR · pays ×${c.mult}`}</p></div>`).join('') + `</div>`;
+    h += `<div class="cat ye">YOUR SQUAD</div>`;
+    for (let i = 0; i < m.size - 1; i++) { const v = st.mates[i] === undefined ? -1 : st.mates[i]; h += `<div style="margin-bottom:8px">${Btn(`TEAMMATE ${i + 1}: ${v < 0 ? 'RANDOM FROM THE PARK' : esc(S.homies[v].name) + ' (homie)'} ▸`, () => { st.mates[i] = cyc(v, S.homies.length); sfx('ui'); rerender(); }, 'alt sm')}</div>`; }
+    h += `<div style="margin-bottom:8px">${Btn(`RIVAL: ${st.rival < 0 ? 'RANDOMS' : esc(S.homies[st.rival].name) + ' (homie) + crew'} ▸`, () => { st.rival = cyc(st.rival, S.homies.length); sfx('ui'); rerender(); }, 'alt sm')}</div>`;
+    if (!S.homies.length) h += `<p class="mu">Import a friend's build at the HOMIE TERMINAL to run with them — or against them.</p>`;
+    if (!IS_TOUCH) h += `<div class="cat ye">PLAYER 2 <span class="mu">— needs a controller</span></div>${Btn('P2: ' + ({ off: 'OFF', coop: 'CO-OP (your teammate)', vs: 'VERSUS (other team)' }[st.p2]) + ' ▸', () => { st.p2 = st.p2 === 'off' ? 'coop' : st.p2 === 'coop' ? 'vs' : 'off'; sfx('ui'); rerender(); }, 'alt sm')}<p class="mu">${anyPadStart() ? anyPadStart() + ' controller(s) connected.' : 'No controller detected yet — press a button on it.'} Player 1 uses the keyboard${anyPadStart() > 1 ? ' or controller 1' : ''}.</p>`;
+    if (S.boosts.length) h += `<div class="cat ye">LOADED BOOSTS</div><p class="buff">${S.boosts.map(b => BOOSTS.find(x => x.id === b).n).join(' · ')}</p>`;
+    h += `</div><div class="pf">${Btn('RUN IT', () => { S.lastTier = st.tier; launchGame(m, t, st); })}<span class="mu" style="align-self:center">Win ≈ ${Math.round(70 * t.mult + 60)} VC · ${Math.round(45 * t.mult + 15)} Respect</span></div>`;
+    return h;
+  });
+}
+function uiKiosk() {
+  openPanel(() => {
+    let h = `<div class="ph"><h2>LAST CALL</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"One game only. No refunds. Side effects include winning." Everything here is used up in your next Pit game.</p><div class="grid">`;
+    for (const b of BOOSTS) { const has = S.boosts.includes(b.id), price = shopPrice(b.cost); h += `<div class="card ${has ? 'sel' : ''}"><h3>${b.n}</h3><p class="buff">${b.d}</p><div style="margin-top:6px">${has ? '<span class="tag" style="background:#33ff88;color:#111">LOADED</span>' : Btn(price + ' VC', () => { S.vc -= price; S.boosts.push(b.id); sfx('buy'); save(); rerender(); }, 'sm', S.vc < price)}</div></div>`; }
+    return h + `</div></div>`;
+  });
+}
+function uiHomie() {
+  const code = encodeBuild(myBuild());
+  openPanel(() => {
+    let h = `<div class="ph"><h2>HOMIE TERMINAL</h2>${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
+    h += `<div class="card"><h3>EXPORT YOUR BUILD</h3><p>Send this code to a friend. They paste it here and your player shows up in their park — as a teammate or as the rival.</p><textarea id="expc" rows="3" readonly>${code}</textarea><div style="margin-top:6px">${Btn('COPY CODE', () => { const t = $('expc'); t.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) { } if (navigator.clipboard) navigator.clipboard.writeText(code).catch(() => { }); toast(ok || navigator.clipboard ? 'COPIED' : 'SELECT AND COPY IT', 'Send it to a homie.'); sfx('uiok'); }, 'sm cy')}</div></div>`;
+    h += `<div class="card"><h3>IMPORT A HOMIE</h3><textarea id="impc" rows="3" placeholder="Paste a PIT1-… code"></textarea><div style="margin-top:6px">${Btn('ADD HOMIE', () => {
+      const b = decodeBuild($('impc').value); if (!b) { toast('BAD CODE', 'That is not a PITBORN build.'); sfx('no'); return; }
+      if (S.homies.length >= 12) S.homies.shift(); S.homies.push(b); S.life.homies = (S.life.homies || 0) + 1; save(); checkAch(); sfx('unlock'); toast('HOMIE ADDED: ' + b.name, STYLE[b.build.style].n + ' · ' + ovrOf(b.attrs) + ' OVR', 'ach'); rerender();
+    }, 'sm')}</div></div>`;
+    h += `<div class="cat ye">YOUR HOMIES</div>` + (S.homies.length ? S.homies.map((b, i) => `<div class="card"><div class="row"><div class="g"><h3>${esc(b.name)} <span class="mu">${ovrOf(b.attrs)} OVR</span></h3><p>${STYLE[b.build.style].n} · ${fmtH(b.build.body.h)}</p></div>${Btn('CUT', () => { S.homies.splice(i, 1); save(); rerender(); }, 'sm alt')}</div></div>`).join('') : `<p class="mu">Nobody yet. It's lonely at the bottom.</p>`);
+    h += `<div class="card"><h3>PLAY TOGETHER</h3><p>This game is one file. Send the file to a friend and they have the whole game. On a computer, plug in a controller and pick CO-OP or VERSUS at any game door.</p></div>`;
+    return h + `</div>`;
+  });
+}
+
+// ---------- talk ----------
+function uiDialog(name, text, opts) {
+  openPanel(() => `<div style="flex:1"></div><div class="card" style="border-color:#ffc531"><h3 class="ye">${esc(name)}</h3><p style="color:#f2f2f7;font-size:16px;margin:6px 0 10px">${esc(text)}</p><div class="pf">${opts.map(o => Btn(o[0], () => { if (o[1]) o[1](); else uiClose(); }, o[2] || '', o[3])).join('')}</div></div><div style="height:12%"></div>`, 'clear');
+}
+function uiBum(n) {
+  W.talk = n;
+  if (n.blessed) return uiDialog(n.name, pick(BUM_THANKS), [['Stay up.', null]]);
+  const amt = Math.max(3, Math.round((6 + rankOf(S.rep) * 6 + rnd(0, 6)) * (1 - cribFx('bum'))));
+  uiDialog(n.name, pick(BUM_ASK).replace('{n}', amt), [
+    [`Give ${amt} VC`, () => {
+      S.vc -= amt; S.life.gave = (S.life.gave || 0) + 1; n.blessed = true; n.anim = 'cheer'; n.wander = false; sfx('coin'); gainRep(3);
+      let extra = '';
+      if (!S.owned.includes('hd_crown') && Math.random() < 0.22) { S.owned.push('hd_crown'); extra = ' He hands you a CARDBOARD CROWN.'; toast('NEW DRIP: Cardboard Crown', 'EPIC · +1 Passing', 'ach'); sfx('unlock'); }
+      save(); checkAch(); uiDialog(n.name, pick(BUM_THANKS) + extra, [['+3 Respect. Worth it.', null]]);
+    }, '', S.vc < amt],
+    ['Nah', () => uiDialog(n.name, pick(BUM_NO), [['...', null]]), 'alt'],
+  ]);
+}
+function uiRack() {
+  uiDialog('SHARPIE THE HUSTLER', `Money Rack. 40 seconds, deep balls only. Makes pay 2, greens pay 3, and I pay 5 VC a point. Entry is 25 VC. Your best: ${S.life.bestRack || 0}.`, [
+    ['Play (25 VC)', () => { S.vc -= 25; save(); startPractice('rack'); }, '', S.vc < 25], ['Nah', null, 'alt']]);
+}
+
+// ---------- results ----------
+function uiResults(res, rw, again) {
+  const s = res.stats;
+  openPanel(() => {
+    let h = `<div class="ph"><h2 style="color:${res.win ? '#33ff88' : '#ff5a3c'};font-size:38px">${res.win ? 'DUB' : 'L'} · ${res.score[0]} — ${res.score[1]}</h2></div><div class="pb">`;
+    h += `<div class="card sel"><div class="row" style="flex-wrap:wrap;gap:18px"><div><div class="mu f">VC</div><div class="big ye" id="rvc">0</div></div><div><div class="mu f">RESPECT</div><div class="big cy" id="rrep">0</div></div><div class="g"><div class="mu f">BADGE XP</div>${['F', 'S', 'P', 'D'].map(c => `<span class="tag" style="color:${CATS[c][1]}">${CATS[c][0]} +${rw.bxp[c]}</span>`).join(' ')}${rw.pts.length ? `<p class="buff">${rw.pts.join(' · ')}</p>` : ''}</div></div>${rw.notes.length ? `<p class="buff">${rw.notes.join(' · ')}</p>` : ''}</div>`;
+    h += `<div class="card"><table><tr><th>PLAYER</th><th>PTS</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>ANK</th><th>FG</th></tr>` + res.box.map(b => `<tr style="color:${b.user ? '#ffc531' : b.team === 0 ? '#9fd0ff' : '#ffb0b0'}"><td>${esc(b.n)}</td><td>${b.s.pts}</td><td>${b.s.ast}</td><td>${b.s.reb}</td><td>${b.s.stl}</td><td>${b.s.blk}</td><td>${b.s.ankles}</td><td>${b.s.fgm}/${b.s.fga}</td></tr>`).join('') + `</table></div>`;
+    h += `<p class="mu">${s.greens} greens · ${s.dunks} dunks · ${s.threes} deep balls · ${s.bravs} Bravado</p>`;
+    return h + `</div><div class="pf">${Btn('RUN IT BACK', again)}${Btn('BACK TO THE PIT', uiClose, 'alt')}</div>`;
+  });
+  // the count-up
+  let t = 0; const iv = setInterval(() => { t += 0.05; const k = Math.min(1, t); const a = $('rvc'), b = $('rrep'); if (!a) { clearInterval(iv); return; } a.textContent = '+' + Math.round(rw.vc * k); b.textContent = '+' + Math.round(rw.rep * k); if (k < 1) sfx('coin'); else { clearInterval(iv); sfx('buy'); } }, 45);
+}
+function uiPause() {
+  if (!MT || MT.over) return; MT.paused = true;
+  openPanel(() => `<div class="ph"><h2>PAUSED</h2></div><div class="pb"><div class="card"><h3>WITH THE BALL</h3><p>Skill stick ↓ hold & release = shoot (release in the green band) · ↑ = drive, layup or dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin. PASS throws to the teammate you are pushing toward.</p></div><div class="card"><h3>WITHOUT IT</h3><p>On defense: skill stick ↑ = hands up, ↓ = steal${MT.arcade ? ' / shove' : ''}, JUMP to block or rebound. On offense: CALL asks for the rock. After a stop, take it back past the arc.</p></div><div class="card"><h3>BRAVADO</h3><p>Big plays fill the bar. Full bar = +8 to every attribute for 20 seconds.</p></div></div><div class="pf">${Btn('RESUME', uiClose)}${Btn(MT.practice ? 'LEAVE' : 'FORFEIT', () => { uiClose(); quitMatch(); }, 'red')}</div>`, '', uiClose);
+}
