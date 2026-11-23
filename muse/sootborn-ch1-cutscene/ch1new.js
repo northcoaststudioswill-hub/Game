@@ -506,7 +506,7 @@ const MEMFX = (B, g, c, s) => {
     const tag = 'M E M O R Y'; g.fillStyle = `rgb(${rgb})`; g.fillRect(8, 2, ptextW(tag) + 8, 10); ptext(g, tag, 12, 5, '#07050a'); } };
 // subtitles for the voiced film: a serif italic set over the picture, no box; the counted numbers in the same face
 const SUB = { el: null, big: null, key: null, t0: 0,
-  sent(t) { t = t.toLowerCase().replace(/(^[\u201c]?|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase()).replace(/\bi\b/g, 'I'); return t; },
+  sent(t) { if (/[a-z]/.test(t)) return t; t = t.toLowerCase().replace(/(^[\u201c]?|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase()).replace(/\bi\b/g, 'I'); return t; },
   make() { if (this.el) return; const st = document.createElement('style'); st.textContent = '.ch1sub{position:fixed;z-index:50;pointer-events:none;text-align:center;font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-style:italic;font-weight:600;color:#fff6e2;letter-spacing:.012em;line-height:1.32;-webkit-text-stroke:.14em rgba(8,4,10,.7);paint-order:stroke fill;filter:drop-shadow(0 .05em .05em rgba(0,0,0,.95)) drop-shadow(0 0 .3em rgba(0,0,0,.8));opacity:0;transition:opacity .22s ease}.ch1sub.mem{font-style:normal;font-weight:500;color:#dfe6ff;letter-spacing:.03em}.ch1num{position:fixed;z-index:50;pointer-events:none;text-align:center;font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:700;letter-spacing:.3em;text-indent:.3em;color:#ff8a3c;-webkit-text-stroke:.1em rgba(20,6,2,.7);paint-order:stroke fill;text-shadow:0 .05em .08em #000,0 0 .3em rgba(0,0,0,.9),0 0 1em rgba(255,90,20,.6);opacity:0}'; document.head.appendChild(st);
     this.el = document.createElement('div'); this.el.className = 'ch1sub'; this.big = document.createElement('div'); this.big.className = 'ch1num'; document.body.appendChild(this.el); document.body.appendChild(this.big); setInterval(() => { if (!Brawl.cine) this.hide(); }, 250); },
   place() { const r = document.getElementById('game').getBoundingClientRect(); const e = this.el.style, b = this.big.style; e.left = (r.left + r.width * .08) + 'px'; e.width = (r.width * .84) + 'px'; e.bottom = (window.innerHeight - r.bottom + r.height * .125) + 'px'; e.fontSize = Math.max(15, r.width * .043) + 'px'; b.left = r.left + 'px'; b.width = r.width + 'px'; b.top = (r.top + r.height * .13) + 'px'; b.fontSize = Math.max(26, r.width * .09) + 'px'; },
@@ -701,10 +701,10 @@ const chalkDust = (t0, t1, n, rays) => Array.from({ length: n }, (_, i) => { con
 const TAVI16_SHOTS = [
   // the service stair, from above the landing: a lamp coming up out of the dark
   TS30(5.2, { bg: 'svc', music: 'hum', cam: [110, 300, 100, 168, .46], to: [76, 236, 62, 176, .42], sfxs: [[.2, 'heart'], [3.0, 'heart']],
-    caps: [[.5, 'NINE YEARS AFTER THE FURNACE.'], [2.7, 'THE SUN SPIRE. THE SERVICE STAIR.']],
+    caps: [[.5, 'NINE YEARS AFTER THE FURNACE.'], [2.7, 'The Sun Spire. The service stair.']],
     acts: [TV({ a: [60, 200], fy: -1, lamp: 1, walk: 1, path: [[0, 60, 200], [5.2, 62, 118]], zs: [[0, upA(200)], [5.2, upA(118)]], poses: [[0, ACT.climb, 6]] })] }),
   // low on the steps: his boots on the gold edges, the lamp swinging
-  TS30(3.2, { cam: [40, 150, -20, 205, .5], to: [46, 116, 0, 212, .46], caps: [[.3, 'TAVI, SIXTEEN.']],
+  TS30(3.2, { cam: [40, 150, -20, 205, .5], to: [46, 116, 0, 212, .46], caps: [[.3, 'Tavi, sixteen.']],
     acts: [TV({ a: [62, 118], lamp: 1, walk: 1, path: [[0, 62, 118], [3.2, 60, 72]], zs: [[0, upA(118)], [3.2, upA(72)]], poses: [[0, ACT.climb, 6]] })] }),
   // the head of the stair: over the painted line, onto their side; he stops
   TS30(3.6, { cam: [-40, 160, 60, 176, .34], to: [-20, 130, 54, 186, .34],
@@ -797,7 +797,7 @@ const PEN = [[0, 1.2, 22, 3], [1.0, 1.4, 20, .6], [2.2, 3, 18, .6], [3.4, 4.6, 1
 const BOOK25_SHOTS = [
   // the Count hall: the book, the lamps, the shelves to the ceiling; a man bent over the page
   TB(5.4, { bg: 'count', music: 'hum', cam: [-20, 210, 96, 160, .4], to: [6, 110, 62, 176, .42], sfxs: [[.2, 'heart'], [3.2, 'heart']],
-    caps: [[.5, 'NINE YEARS AFTER THE FURNACE.'], [2.8, 'THE COUNT. A BOOK AS WIDE AS A TABLE.']],
+    caps: [[.5, 'NINE YEARS AFTER THE FURNACE.'], [2.8, 'The Count. A book as wide as a table.']],
     acts: [KC({ a: [16, -44], poses: [[0, ACT.read, 4], [3, ACT.readStill, 2]] })] }),
   // across the page, low: the ruled lines, the names, the figures, the lines that have been struck
   TB(4.6, { cam: [-44, 2, 96, 120, -4], to: [4, -2, 84, 126, -4], pen: [[0, 1.2, 22, 3], [4.6, 2.4, 20, .6]],
@@ -807,7 +807,7 @@ const BOOK25_SHOTS = [
     acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3]] })] }),
   // the red line. His own name. Nobody has struck it
   TB(4.0, { cam: [22, 4, 76, 130, -4], to: [20, 2, 64, 140, -4], redGlow: 1, pen: [[0, 8, 13, .9], [1.6, 8, 12, .5], [4, 8, 12, 1.4]], sfxs: [[.4, 'heart'], [2.4, 'heart']],
-    caps: [[.6, 'BRENNICK, K.']], acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3]] })] }),
+    caps: [[.6, 'Brennick, K.']], acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3]] })] }),
   // his face over it. The furnace door, for a breath
   TB(3.6, { ...cu(16, -44, 2.4, 3.2, -6), zooms: [[.4, 3.4, .35]], mems: [[1.4, 2.4, 'furnace', 1, '255,90,30']], sfxs: [[1.4, 'cutin']], redGlow: 1,
     acts: [KC({ a: [16, -44], poses: [[0, ACT.readStill, 3], [2.5, Object.assign({}, ACT.readStill, { hx: .5 }), 2]] })] }),
@@ -822,6 +822,111 @@ const BOOK25_SHOTS = [
 const BOOK25_FILM = () => ({ bg: 'count', arena: { kind: 'rect', w: 220, h: 100 }, music: 'hum', cineOnly: 1, film: 1, hero: { id: 'kaelc' }, intro: BOOK25_SHOTS, foes: [] });
 const BOOK25 = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: () => BOOK25_FILM() }];
 const BOOK25_OLD = [{ card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Count. A book as wide as a table.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'book', secs: 10 }];
+
+// ============================================================
+// SCENE 23, REBUILT: THE SEAT KNIFE. Four years after the furnace, the night before the lift. Brand puts the end of the
+// Auditor's blade in a forge and turns it into a valve hand's hook. A 3D film on a set built for it: Brand's sealed pump room.
+CAST.kaelg = { name: 'Kael', look: () => ({ skin: KAEL_LOOK.skin, hair: '#e9cf7a', style: 'spiky', armor: '#3d5a6a', trim: '#24323c', sash: '#b8682a', shirt: '#3d5a6a', pants: '#2a3440' }) };
+CAST.brand3 = { name: 'Brand', look: () => ({ skin: '#b88a6a', hair: '#8a8a8a', style: 'short', armor: '#6a4a32', trim: '#3a2a1e', sash: '#2a2c34', shirt: '#4a4e58', pants: '#2a2c34' }) };
+G3.LOOK.forge = Object.assign({}, G3.LOOK.hall, { amb: [.3, .26, .28], sunC: [1.0, .7, .5], fog: [.05, .03, .03], fogR: [260, 700] });
+const ANV = { x: 0, y: 19, z: 0 }, HEARTH = { x: -62, y: 21, z: -46 }, TROUGH = { x: 48, y: 11.5, z: -20 };
+const FORGESET = (A, S) => {
+  const I = M4.id(); let sd = 1306; const rnd = () => (sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296;
+  for (let ix = -6; ix < 6; ix++) for (let iz = -4; iz < 3; iz++) { const j = rnd() * .04; A.quad(ix * 28, iz * 28, ix * 28 + 28, iz * 28 + 28, 0, [.26 + j, .23 + j, .22 + j]); }
+  // the room: old stone, a sealed pump the size of a lift car, pipes, a valve wheel
+  S.box(I, 0, 90, -104, 360, 180, 4, '#2e2a2a'); for (let r = 0; r < 13; r++) for (let c = 0; c < 12; c++) { const x = -170 + c * 30 + (r & 1) * 15, y = 6 + r * 13, t = rnd(); S.box(I, x, y, -101.6, 29, 12, 1, t > .6 ? '#3e3836' : t > .3 ? '#38322f' : '#433c39'); }
+  for (const sx of [-1, 1]) S.box(I, sx * 170, 90, -10, 4, 180, 190, '#2a2626');
+  S.box(I, 0, 178, -10, 360, 4, 190, '#1e1a1a');
+  S.cyl(I, 104, 0, -70, 24, 24, 96, 12, '#5a4a3c', 0, 1); S.cyl(I, 104, 96, -70, 27, 20, 8, 12, '#4a3c30', 0, 1); for (const h of [20, 50, 80]) S.cyl(I, 104, h, -70, 25, 25, 2.4, 12, '#8a6a40', 0, 1);
+  S.cyl(M4.chain(M4.t(80, 130, -86), M4.rz(Math.PI / 2)), 0, 0, 0, 4, 4, 240, 7, '#6a5240'); S.cyl(I, 128, 96, -70, 4, 4, 40, 7, '#6a5240');
+  { const wm = M4.chain(M4.t(104, 60, -45), M4.rx(Math.PI / 2)); S.cyl(wm, 0, 0, 0, 11, 11, 1.8, 12, '#a8452a'); for (let q = 0; q < 3; q++) S.box(M4.chain(M4.t(104, 60, -44.6), M4.rz(q * 1.047)), 0, 0, 0, 21, 1.6, 1.4, '#a8452a'); }
+  A.box(I, 104, 44, -45.6, 30, 5, .4, [.9, .8, .5], 1);   // the old stencil on the pump: SEALED
+  // the forge: a brick hearth, a coal bed, a hood and its flue
+  S.box(I, HEARTH.x, 9, HEARTH.z, 44, 18, 30, '#5a3026'); for (let k = 0; k < 4; k++) S.box(I, HEARTH.x, 3 + k * 4.4, HEARTH.z + 15.2, 44, .5, .4, '#3a1e18');
+  A.box(I, HEARTH.x, 18.6, HEARTH.z, 30, 1.2, 20, [1, .46, .14], 1); for (let k = 0; k < 14; k++) A.box(I, HEARTH.x - 13 + rnd() * 26, 19.6, HEARTH.z - 8 + rnd() * 16, 3, 1.2, 3, [1, .7 + rnd() * .2, .3], 1);
+  S.box(I, HEARTH.x, 52, HEARTH.z - 4, 40, 4, 26, '#3a3232'); S.box(I, HEARTH.x, 44, HEARTH.z + 8, 40, 14, 2, '#3a3232'); S.cyl(I, HEARTH.x, 54, HEARTH.z - 6, 6, 6, 130, 8, '#3a3232');
+  // the anvil, its horn pointing at the trough; the trough of water; tongs on a nail; a hammer on the block
+  S.box(I, ANV.x, 5, ANV.z, 16, 10, 14, '#4a3a2e'); S.box(I, ANV.x, 12.5, ANV.z, 8, 5, 8, '#3a3a40'); S.box(I, ANV.x, 17, ANV.z, 22, 4, 8, '#4a4a52'); A.box(I, ANV.x - 1, 19.05, ANV.z, 20, .1, 7.6, [.62, .62, .66], 1);
+  S.cyl(M4.chain(M4.t(ANV.x + 11, 17.5, ANV.z), M4.rz(-Math.PI / 2)), 0, 0, 0, 3.4, .3, 12, 8, '#4a4a52');
+  S.box(I, TROUGH.x, 6, TROUGH.z, 32, 12, 16, '#3a2e24'); A.box(I, TROUGH.x, TROUGH.y, TROUGH.z, 29, .3, 13, [.1, .2, .3], 1);
+  S.box(I, -100, 50, -98, 2, 26, 2, '#2a2a30'); S.box(I, -104, 38, -98, 2, 26, 2, '#2a2a30');
+  // a lamp on a chain over the anvil
+  S.cyl(I, 0, 100, 0, .4, .4, 78, 4, '#3a3a40'); S.cyl(I, 0, 92, 0, 6, 2, 8, 8, '#2a2a30'); A.box(I, 0, 91, 0, 5, 2, 5, [1, .86, .58], 1);
+};
+{ const env3 = G3.env; G3.env = function (bg) { if (bg !== 'forge' || !this.gl) return env3.call(this, bg); if (this.envs.forge) return this.envs.forge;
+    const A = new Batch(20000), S = new Batch(20000); FORGESET(A, S); const gl = this.gl;
+    const mk = B => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, B.a.subarray(0, B.n * 9), gl.STATIC_DRAW); return { b, n: B.n }; };
+    return this.envs.forge = { a: mk(A), s: mk(S), hw: 110, hh: 200 }; }; }
+
+// the blade: their straight steel with a grip; the end turns over into our hook as `hook` goes 0 to 1; `heat` 0 to 1 colours the end
+const mixc = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+const drawBlade = (x, y, z, ry, rz, heat, hook) => { const D = G3.dyn, m = M4.chain(M4.t(x, y, z), M4.ry(ry), M4.rz(rz || 0)), steel = [.9, .88, .82], hot = [1, .5, .16];
+  D.box(m, -4.5, 0, 0, 8, 1.5, 1.4, '#2a1e18'); D.box(m, -.3, 0, 0, 1.2, 3.6, 1.6, '#e2b84a', 1);
+  const L = 26 - 6 * hook; D.box(m, L / 2, 0, 0, L, 2, .45, mixc(steel, hot, heat * .6), heat > .4 ? 1 : 0);
+  let px = L, py = 0, a = 0; for (let i = 0; i < 5; i++) { const seg = 1.9, na = a + hook * .62; const cx = px + Math.cos(na) * seg / 2, cy = py + Math.sin(na) * seg / 2; D.box(M4.chain(m, M4.t(cx, cy, 0), M4.rz(na)), 0, 0, 0, seg + .3, 2 - i * .2, .45, mixc(steel, hot, heat), heat > .2 ? 1 : 0); px += Math.cos(na) * seg; py += Math.sin(na) * seg; a = na; }
+  if (heat > .05) { const w = M4.chain(m, M4.t(px - 3, py / 2, 0)); G3.glow(w[12], w[13], w[14], 5 + 8 * heat, [1, .5, .15], .7 * heat); }
+  return [px, py]; };
+const drawTongs = (x, y, z) => { const D = G3.dyn; for (const s of [-1, 1]) D.box(M4.chain(M4.t(x - 10, y + s * .6, z + s * .3), M4.rz(s * .04)), 0, 0, 0, 18, .7, .7, '#2a2a30'); };
+const drawHammer = (x, y, z) => { const D = G3.dyn; D.box(M4.t(x, y + 2, z), 0, 0, 0, 6, 4, 4, '#3a3a42'); D.box(M4.chain(M4.t(x + 2, y + 9, z), M4.rz(-.35)), 0, 0, 0, 1.1, 14, 1.1, '#6a4a30'); };
+const hamLift = (t, S) => { let best = 9; for (const s of S) { const d = t - s; if (Math.abs(d) < Math.abs(best)) best = d; } const d = best; return d < 0 && d > -.45 ? 15 * Math.sin(Math.PI * (-d) / .45 * .5 + .0) * (1 - Math.max(0, (-d - .3) / .15)) : d >= 0 && d < .18 ? 1.5 * (1 - d / .18) : 5; };
+{ const f3 = Brawl.fighter; Brawl.fighter = function (g, o, opt) { const r = f3.call(this, g, o, opt), k = opt && (opt.key && (opt.key.act || opt.key)), c = this.cine, s = c && c.shots[c.i];
+    if (k && k.id === 'kaelg' && s && s.forge) { const F = s.forge, t = c.t, tt = this.t;
+      if (F.blade) { const [A, B, u] = kq(F.blade, t), V = (i) => A[i] + (B[i] - A[i]) * u, tip = drawBlade(V(1), V(2), V(3), V(4), V(5), V(6), V(7)); if (F.tongs) drawTongs(V(1), V(2), V(3));
+        if (F.glintAt !== undefined && t > F.glintAt && t < F.glintAt + .8) { const a = Math.sin(Math.PI * (t - F.glintAt) / .8), m = M4.chain(M4.t(V(1), V(2), V(3)), M4.ry(V(4)), M4.rz(V(5))), w = M4.chain(m, M4.t(tip[0], tip[1], 0)); G3.glow(w[12], w[13], w[14], 4 + 16 * a, [1, .95, .8], .9 * a); G3.glow(w[12], w[13], w[14], 2 + 6 * a, [1, 1, 1], a); } }
+      if (F.strikes && F.hammer) drawHammer(ANV.x + 4, ANV.y + .8 + hamLift(t, F.strikes), ANV.z);
+      G3.glow(HEARTH.x, HEARTH.y + 2, HEARTH.z, 34 + Math.sin(tt * 6) * 3, [1, .45, .12], .55); G3.glow(HEARTH.x, HEARTH.y + 14, HEARTH.z, 50, [1, .5, .2], .18); G3.glow(0, 90, 0, 26, [1, .84, .56], .3); }
+    return r; }; }
+const KG = (o) => Object.assign({ id: 'kaelg', blade: 0, a: [-20, -4], fx: 1, fy: .15 }, o), BR = (o) => Object.assign({ id: 'brand3', blade: 0, a: [20, -6], fx: -1, fy: .15 }, o);
+const TK = (d, o) => Object.assign({ d, vd: d, sec: 1, drift: 1, noprops: 1, caps: [[0, '']] }, o);
+Object.assign(ACT, {
+  tongs: { cr: 1.6, lean: .3, tw: 0, hx: .45, rp: -1.0, ry: .1, re: -.7, lp: -1.0, ly: -.1, le: -.7, hl: .3, kl: .4, hr: -.2, kr: .3, sp: .14 },
+  hamUp: { cr: 1.4, lean: .1, tw: -.25, hx: .35, rp: -2.7, ry: .2, re: -1.6, lp: -.5, ly: -.3, le: -1.0, hl: .3, kl: .4, hr: -.3, kr: .4, sp: .16 },
+  hamDown: { cr: 2.0, lean: .4, tw: .15, hx: .5, rp: -.5, ry: .1, re: -.3, lp: -.5, ly: -.3, le: -1.0, hl: .4, kl: .5, hr: -.3, kr: .5, sp: .16 },
+  arms: { cr: .5, lean: 0, tw: 0, hx: .05, lp: -.9, ly: .7, le: -1.6, rp: -.9, ry: -.7, re: -1.6, hl: .1, kl: .1, hr: -.1, kr: .1, sp: .12 },
+  holdUp: { cr: .4, lean: -.05, tw: 0, hx: -.1, rp: -1.5, ry: .25, re: -1.3, lp: -.4, ly: -.2, le: -.9, hl: .1, kl: .1, hr: -.1, kr: .1, sp: .1 }
+});
+const hammerPoses = (S) => S.flatMap(s => [[s - .45, ACT.hamUp, 22], [s - .08, ACT.hamDown, 40]]);
+const strikeFx = (S) => S.flatMap(s => [[s, 'spark', ANV.x + 8, ANV.z, '#ffd27a', 12, ANV.y + 1], [s, 'kick', .03]]);
+const AB = (h, heat) => [ANV.x - 6, ANV.y + 1, ANV.z, 0, 0, heat, h];   // the blade lying on the anvil, its end over the horn
+const S9 = [.9, 1.8, 2.7, 3.6, 4.5, 5.4, 6.3], S10 = [.4, 1.2, 2.0, 2.8];
+const KNIFE23_SHOTS = [
+  TK(4.8, { bg: 'forge', music: 'mystery', forge: { blade: [[0, ...AB(0, 0)]] }, cam: [-10, 170, 78, 170, .36], to: [0, 120, 56, 178, .36], sfxs: [[.2, 'heart']],
+    caps: [[.4, 'Four years after the furnace.'], [2.4, 'The night before the lift.']], acts: [KG({ poses: [[0, ACT.stand, 5]] }), BR({ poses: [[0, ACT.arms, 5]] })] }),
+  TK(6.2, { forge: { blade: [[0, ...AB(0, 0)]] }, cam: [-6, 66, 32, 200, .46], to: [2, 54, 30, 206, .46],
+    caps: [[.3, 'The night before I went up as Edric Sorrel, Brand took the blade the High Auditor had pinned on me with the sun,']], acts: [KG({ poses: [[0, ACT.stand, 5]] }), BR({ poses: [[0, ACT.arms, 5]] })] }),
+  TK(3.8, { forge: { blade: [[0, ...AB(0, 0)], [1.2, -30, 30, -20, 0, .2, 0, 0], [2.4, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, .3, 0], [3.8, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, .9, 0]] }, cam: [-40, 40, 46, 200, .4], to: [-54, 20, 44, 206, .42], sfxs: [[2.4, 'clink']],
+    caps: [[.2, 'and put the last hand of it in a forge.']], acts: [KG({ path: [[0, -20, -4], [2.2, 6, -10]], faceTo: null, faces: [[0, 1, -.3], [2.2, -.6, -.4]], walk: 1, poses: [[0, ACT.stand, 5]] }), BR({ path: [[0, 20, -6], [2.2, -26, -24]], faceTo: null, faces: [[0, -1, -.4]], walk: 1, poses: [[0, ACT.stand, 5], [2.3, ACT.tongs, 6]] })] }),
+  TK(5.8, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, .9, 0]] }, ...cu(-26, -24, 2.4, 2.9, 10), zooms: [[2, 5.6, .3]],
+    caps: [[.2, 'Brand said: “They gave you a ruler. Straight, so that it can be counted.”'], [3.4, '“What did you carry below?”']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.tongs, 5], [3.2, Object.assign({}, ACT.stand, { hx: -.05, hy: -.3 }), 3]] })] }),
+  TK(6.4, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, ...cu(6, -10, 2.4, 3.0, 10), zooms: [[2.4, 6, .3]],
+    caps: [[.2, 'I said: “A seat knife. Every valve hand is issued one.”'], [2.8, '“A hooked blade the length of your palm, for cutting a seized seat out of a valve body.”']], acts: [KG({ a: [6, -10], fx: -.3, fy: .9, poses: [[0, ACT.stand, 5], [2.8, Object.assign({}, ACT.stand, { rp: -1.0, re: -1.4, ry: -.3 }), 4]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TK(4.2, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, mems: [[.3, 3.4, 'pipe', 0, '255,170,70']], sfxs: [[.3, 'cutin']], cam: [-20, 90, 48, 200, .4], to: [-16, 80, 46, 204, .4],
+    caps: [[.2, 'It is the only edge soot are allowed. They are numbered.']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TK(5.6, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, cam: [-58, 30, 40, 200, .42], to: [-56, 10, 40, 210, .44],
+    caps: [[.2, 'At last bell the knives are counted back onto a board, and a hook left empty on that board is a line struck by morning.']], acts: [KG({ a: [6, -10], fx: -.6, fy: -.4, poses: [[0, ACT.stand, 5]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TK(7.4, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0]] }, ...cu(6, -10, 2.2, 3.1, 8), zooms: [[3.6, 7.2, .4]], mems: [[1.3, 2.9, 'furnace', 1, '255,90,30']], sfxs: [[1.3, 'cutin'], [4.2, 'heart']],
+    caps: [[.2, 'Seren’s was taken off her the night they walked her. I saw it afterwards, in the Warden’s tray.'], [3.8, 'Number three hundred and six. Somebody had cleaned it. Nobody hung it back.']],
+    acts: [KG({ a: [6, -10], fx: -.3, fy: .9, poses: [[0, ACT.stand, 5], [3.6, ACT.washerUp, 4], [5.4, ACT.washer, 3]] }), BR({ a: [-26, -24], fx: .7, fy: .7, poses: [[0, ACT.stand, 5]] })] }),
+  TK(6.4, { forge: { blade: [[0, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0], [3.8, HEARTH.x + 8, HEARTH.y + 1.2, HEARTH.z, 0, 0, 1, 0], [5.4, -20, 30, -14, 0, .2, 1, 0], [6.4, ...AB(0, 1)]], tongs: 0 }, cam: [-24, 130, 60, 176, .36], to: [-10, 110, 54, 184, .36], sfxs: [[5.2, 'clink']],
+    caps: [[.2, 'Brand said: “I counted that board for eleven years. I never once asked what the knives were for.”'], [4.2, '“Hold the tongs.”']],
+    acts: [KG({ a: [6, -10], path: [[0, 6, -10], [2.0, 6, -10], [3.4, -14, -2]], faceTo: null, faces: [[0, -.6, -.4], [2.0, -1, .2], [3.4, 1, .1]], walk: 1, poses: [[0, ACT.stand, 5], [5.6, ACT.tongs, 6]] }),
+           BR({ a: [-26, -24], path: [[0, -26, -24], [3.8, -26, -24], [5.0, 0, -30], [6.2, 16, -6]], faceTo: null, faces: [[0, .7, .7], [3.8, 1, -.2], [5.6, -1, .15]], walk: 1, poses: [[0, ACT.stand, 5], [3.9, ACT.tongs, 6], [6, ACT.arms, 5]] })] }),
+  TK(7.4, { forge: { blade: [[0, ...AB(0, 1)], [7.4, ...AB(.65, .9)]], tongs: 1, strikes: S9, hammer: 1 }, cam: [4, 40, 30, 200, .5], to: [8, 34, 28, 206, .5], sfxs: S9.map(s => [s, 'steel']), fxs: strikeFx(S9),
+    caps: [[.3, 'He drew the point out and turned it over the horn until their blade ended in our hook.']], acts: [KG({ a: [-14, -2], poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: hammerPoses(S9) })] }),
+  TK(4.0, { forge: { blade: [[0, ...AB(.65, .9)], [4, ...AB(1, .8)]], tongs: 1, strikes: S10 }, cam: [10, 120, 56, 180, .38], to: [4, 104, 52, 186, .38], sfxs: S10.map(s => [s, 'steel']), fxs: strikeFx(S10),
+    caps: [[.3, 'It took most of the night.']], acts: [KG({ a: [-14, -2], poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: hammerPoses(S10).concat([[3.4, ACT.arms, 4]]) })] }),
+  TK(4.2, { forge: { blade: [[0, ...AB(1, .8)], [1.2, 20, 30, -12, 0, 0, .8, 1], [2.0, TROUGH.x - 6, TROUGH.y + 1, TROUGH.z, 0, -.4, .8, 1], [2.4, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1], [4.2, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1]], tongs: 1 },
+    cam: [40, 60, 36, 200, .44], to: [46, 50, 34, 206, .44], sfxs: [[2.1, 'splash']], fxs: Array.from({ length: 10 }, (_, i) => [2.1 + i * .12, 'spark', TROUGH.x - 4 + (i % 3) * 3, TROUGH.z, '#e8eef4', 4, TROUGH.y + 2]),
+    caps: [[.2, 'He did not speak again until it was in the water.']], acts: [KG({ path: [[0, -14, -2], [1.6, 34, -4]], faceTo: null, faces: [[0, 1, .1]], walk: 1, poses: [[0, ACT.tongs, 6]] }), BR({ a: [16, -6], poses: [[0, ACT.arms, 5]] })] }),
+  TK(7.2, { forge: { blade: [[0, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1]] }, ...cu(12, -8, 2.4, 3.0, -10), zooms: [[3.8, 7, .3]],
+    caps: [[.2, 'Brand said: “It is still their steel. It will pass any inspection on that Spire.”'], [3.8, '“And every time you draw it, you will know which end is yours.”']], acts: [KG({ a: [40, -2], fx: -.7, fy: .3, poses: [[0, ACT.tongs, 5]] }), BR({ a: [12, -8], fx: .2, fy: 1, poses: [[0, ACT.arms, 5], [3.6, Object.assign({}, ACT.arms, { hx: -.15 }), 3]] })] }),
+  TK(7.0, { forge: { blade: [[0, TROUGH.x - 6, TROUGH.y - 3, TROUGH.z, 0, -.4, 0, 1], [1.2, 24, 33, 3, -.15, .4, 0, 1], [7, 24, 34, 3, -.15, .5, 0, 1]], glintAt: 2.6 }, ...cu(38, -2, 1.7, 2.2, -12), sfxs: [[2.6, 'clink']],
+    caps: [[.3, 'I called it the bank hook, because nobody up there would know what a bank was.'], [4.0, 'I carried it five years. It is the blade she broke.']], acts: [KG({ a: [40, -2], fx: -.4, fy: .9, poses: [[0, ACT.tongs, 5], [1.0, ACT.holdUp, 4]] }), BR({ a: [-6, -16], fx: 1, fy: .3, poses: [[0, ACT.arms, 5]] })] }),
+  { d: 1.6, vd: 1.6, black: 1, caps: [[0, '']] }
+];
+const KNIFE23_FILM = () => ({ bg: 'forge', arena: { kind: 'rect', w: 220, h: 100 }, music: 'mystery', cineOnly: 1, film: 1, hero: { id: 'kaelg' }, intro: KNIFE23_SHOTS, foes: [] });
+const KNIFE23 = [{ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { brawl: () => KNIFE23_FILM() }];
+const KNIFE23_OLD = P2[1]().slice(P2[1]().findIndex(s => s.card === 'THE SEAT KNIFE'), P2[1]().findIndex(s => s.card === 'THE SEAT KNIFE') + 13);
 
 // the preview's own front page: this build exists only to show the cutscene
 const CH1_PREVIEW = {
@@ -842,6 +947,8 @@ Menus.title = function () {
     { label: "Compare: the game's Tavi at sixteen (a drawn still)", act: () => CH1_PREVIEW.play(TAVI16_OLD) },
     { label: 'Scene 25, rebuilt: the book (3D film)', act: () => CH1_PREVIEW.play(BOOK25) },
     { label: "Compare: the game's book (a drawn still)", act: () => CH1_PREVIEW.play(BOOK25_OLD) },
+    { label: 'Scene 23, rebuilt: the seat knife (3D film)', act: () => CH1_PREVIEW.play(KNIFE23) },
+    { label: "Compare: the game's seat knife (panels)", act: () => CH1_PREVIEW.play(KNIFE23_OLD) },
     { label: 'Settings', act: () => Menus.settings() }
   ] }));
 };
