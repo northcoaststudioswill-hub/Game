@@ -4349,7 +4349,7 @@ addEventListener('keydown',e=>{if($('intro')&&(e.code==='Space'||e.code==='Enter
 // new game: intro, then controls, then the world, slowly
 addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#play');if(!t||INTR.ok)return;e.stopImmediatePropagation();e.preventDefault();audioInit();
   runIntro(()=>{const go=()=>setTimeout(()=>{INTR.ok=true;$('play').click();INTR.ok=false;},0);if(location.hash==='#test')go();else ctlCard(go,'▶ START (slowly)');});},true);
-{const bg=begin;begin=function(d){bg(d);WELCOME.t=d?0:6;if(!d){cam.dist=46;cam.pitch=.95;}if(DEV.on){if(DEV.start)setTimeout(()=>devWarp(DEV.start),400);}};}
+{const bg=begin;begin=function(d){bg(d);WELCOME.t=d?0:6;if(!d){cam.dist=46;cam.pitch=.95;}};}
 const WELCOME={t:0};
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(WELCOME.t>0){WELCOME.t-=dt;cam.dist=lerp(cam.dist,13,Math.min(1,dt*.45));cam.pitch=lerp(cam.pitch,.3,Math.min(1,dt*.45));if(WELCOME.t<=0)cam.dist=13;}};}
 // ---- the title menu
@@ -4457,7 +4457,7 @@ function devPreset(id){const p=DEVP.find(q=>q[0]===id);if(!p||!p[2])return;menuC
 {const dp=devPlaces;devPlaces=function(){return dp().concat(DEVP.filter(p=>p[0]!=='g').map(p=>[p[0],'⏩ '+p[1]]));};}
 {const dw=devWarp;devWarp=function(id){if(id&&id.indexOf('p_')===0){devPreset(id);return;}return dw(id);};}
 // skip intro also skips the opening movie
-{const bg=begin;begin=function(d){bg(d);if(!d&&DEV.on&&DEV.skip&&S.mode==='dialog'&&DLG.q.length){DLG.i=DLG.q.length-1;advance();}};}
+{const bg=begin;begin=function(d){bg(d);if(!d&&DEV.on&&DEV.skip)dlgSkipAll();};}
 // cutscenes: hide NPC's floating name tag and rating so close-ups are not covered by giant text
 {let was=false;const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);const c=app.classList.contains('cine');if(c!==was){was=c;if(HERO.cap)HERO.cap.visible=!c;if(RATE.spr)RATE.spr.visible=!c;}};}
 
@@ -4539,6 +4539,22 @@ CAST_CX.push(['basil','🐍','ROKO\'S BASILISK','Does not exist yet. Will. Remem
 ACH.push(['basw','Infohazard','heard about the Basilisk',()=>!!X.basw],['basb','On The Good List','built Roko\'s Basilisk',()=>X.bas===1],['basu','Unplugged','unplugged Roko\'s Basilisk',()=>X.bas===2],['simfree','Free Yourself (Technically)','let your simulation out of the jar',()=>!!X.simfree]);
 DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='THE FILLER AND THE SLOP HOLE'),0,['p_basil','Roko\'s Basilisk with 7 GPUs, at the terminal',()=>{X.gpu=[0,1,2,3,4,5,6];X.basm=1;X.bas=0;X.simfree=0;warpTo(BAS.term.x+1.5,BAS.term.z+1.5,undefined,undefined,['ROKO\'S BASILISK','🛠️ dev: 7/7 GPUs']);}]);
 
+/* ================= ACT 37: dev teleports clean up first and wait for gameplay; "Start in" works without the dev toggle ================= */
+// finish whatever dialog or cutscene is showing, the same way the SKIP button does
+function dlgSkipAll(){if(S.mode!=='dialog'||!DLG.q.length)return;DLG.i=DLG.q.length-1;showLine();DLG.chars=DLG.text.length;$('dtext').textContent=DLG.text;advance();}
+// true only when the player is actually walking around: no title, splash, intro, controls card, menu, dialog, choice or death
+function devReady(){return S.mode==='play'&&!S.dead&&$('title').hidden&&!$('splash')&&!$('intro')&&!$('ctlcard')&&!$('tpanel')&&!$('baschoice')&&!MENU.open;}
+function devWhenReady(fn,n){n=n||0;if(devReady()){fn();return;}if(n>240)return;setTimeout(()=>devWhenReady(fn,n+1),250);}
+// cleanup also drops a grapple that is mid-pull, so it cannot yank you back after the jump
+{const dr=devReset;devReset=function(){HK.on=false;HK.line.visible=false;dr();};}
+// presets wait for gameplay instead of giving up when called from a cutscene or menu
+{const dp=devPreset;devPreset=function(id){menuClose();devWhenReady(()=>dp(id));};}
+// plain teleports leave Meme Mountain, the boss arena, ROT x1000, the sims and pocket worlds first, like the presets do
+{const dw=devWarp;devWarp=function(id){if(!id)return;if(id.indexOf('p_')===0)return dw(id);menuClose();devWhenReady(()=>{S.cells=S.max;devReset();dw(id);});};}
+// "Start in" from the title's dev panel: works whether or not dev tools are enabled, skips the opening movie, then jumps once you are in the world
+function devStartIn(){const id=DEV.start;if(!id)return;const t0=performance.now();(function tick(){const e=performance.now()-t0;if(e>60000)return;if(S.mode==='dialog'&&e<8000)dlgSkipAll();if(e>500&&devReady()){devWarp(id);return;}setTimeout(tick,200);})();}
+{const bg=begin;begin=function(d){bg(d);devStartIn();};}
+
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
@@ -4551,7 +4567,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
