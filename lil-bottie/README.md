@@ -38,15 +38,19 @@ b.update(time, dt, songSeconds);        // every frame; songSeconds (optional) l
 
 ![twelve views of the model](asset/lil-bottie-sheet.png)
 
-How he moves (v0.3):
+How he moves (v0.4):
 
 - Shoulders, elbows, wrists, hips, knees and ankles are all joints. Each hand has four fingers with two joints
   each and a thumb, and nine hand shapes: open, relax, fist, point, thumb, peace, grip, spread, horns.
 - Every joint is a spring chasing its target, so a move overshoots a little and settles, and the pinky lags the
   index when a hand opens or closes. The braids and the clover swing behind his turns and bounces.
-- Each of his 25 dreads is its own chain of four segments. They hang plumb when he tilts his head, get thrown
-  against a turn, fan out when he spins, lift when he drops, and each segment follows the one above a little
-  late, so they whip. `shake` is the move that throws them: head side to side on the beat, then a headbang.
+- Each of his 25 dreads is a simulated chain: five points with weight and momentum, joined by four segments.
+  The points are pushed out of his head, jacket, hood, shoulders, arms and thighs, so the dreads drape over him
+  and cannot pass through him. `shake` is the move that throws them: head side to side on the beat, then a headbang.
+- Arms are kept out of the jacket: after every pose is set, any forearm or hand point found inside the torso
+  swings the arm out or forward by that much. The `chain` pose was solved so the palm sits on the clover.
+- Clipping is measured, not eyeballed: over 7 seconds of every pose, the deepest an arm goes into the jacket is
+  0.5 cm (it was up to 24 cm) and no dread point sits inside it (there were up to 15 a frame).
 - His knees never lock straight: there is a kneecap, creases and stacked cuffs, and they bend in every pose.
 - `dance`, `rap`, `shake` and `walk` are locked to the beat (137.2 bpm; `setTempo` changes it). `rap` chops one hand on
   every beat, changes the hand shape each bar, grabs the chain on the third bar and swaps hands every four bars.

@@ -136,20 +136,22 @@
     var screen = new THREE.Mesh(new THREE.PlaneGeometry(.39, .273), new THREE.MeshBasicMaterial({ map: faceTx, fog: false }));
     screen.position.set(0, .17, .2985); head.add(screen);
 
-    // ---- dreads: each one is its own chain of four segments, so they swing, whip and shake one by one
+    // ---- dreads: each one is a chain of five points joined by four segments. The points are simulated (they have
+    //      weight and momentum) and are pushed out of the head, jacket, hood, shoulders and arms, so they drape
+    //      over him and cannot pass through him.
     var dreadGeo = bake([P(Cyl(.021, .019, .09, 5), 0x101014, M(0, -.045, 0)), P(Cyl(.019, .02, .08, 5), 0x1a1a22, M(0, -.13, 0)), P(Cyl(.023, .023, .014, 5), 0x2a2a36, M(0, -.088, 0))]);   // one segment, .17 long
     var tipGeo = bake([P(Sph(.022, 5, 4), 0x30303c, M(0, -.012, 0))]);
-    var dreads = [], dseed = 7;
+    var dreadLayer = new THREE.Group(); group.add(dreadLayer);
+    var dreads = [], dseed = 7, DOWN = new THREE.Vector3(0, -1, 0);
     function drand() { dseed = (dseed * 16807) % 2147483647; return dseed / 2147483647; }
-    function dread(a, len, tilt, fwd) {
-      var root = new THREE.Group(); root.position.set(Math.sin(a) * .25, .07, Math.cos(a) * .25); head.add(root);
-      var segL = len / 4, th = .9 + drand() * .4, segs = [], par = root;
-      for (var i = 0; i < 4; i++) { var gseg = i ? new THREE.Group() : root; if (i) { gseg.position.y = -segL; par.add(gseg); } var m = new THREE.Mesh(dreadGeo, clothM); m.scale.set(th * (1 - i * .06), segL / .17, th * (1 - i * .06)); gseg.add(m); segs.push(gseg); par = gseg; }
-      var tip = new THREE.Mesh(tipGeo, clothM); tip.position.y = -segL; tip.scale.setScalar(th); par.add(tip);
-      dreads.push({ a: a, segs: segs, rx: -(Math.cos(a) * tilt + fwd), rz: Math.sin(a) * tilt, k: 34 + drand() * 22, d: 3.4 + drand() * 1.6, w: .8 + drand() * .5, n: dreads.length });
+    function dread(a, len) {
+      var D = { a: a, root: new THREE.Vector3(Math.sin(a) * .25, .07, Math.cos(a) * .25), segL: len / 4, th: .9 + drand() * .4, pts: [], prev: [], mesh: [], drag: .25 + drand() * .2, n: dreads.length, rp: new THREE.Vector3(), rn: new THREE.Vector3() };
+      for (var i = 0; i < 5; i++) { D.pts.push(new THREE.Vector3()); D.prev.push(new THREE.Vector3()); }
+      for (var j = 0; j < 4; j++) { var m = new THREE.Mesh(dreadGeo, clothM); dreadLayer.add(m); D.mesh.push(m); }
+      D.tip = new THREE.Mesh(tipGeo, clothM); D.tip.scale.setScalar(D.th); dreadLayer.add(D.tip); dreads.push(D);
     }
-    for (var b = 0; b < 19; b++) { var ba = Math.PI * .4 + b / 18 * Math.PI * 1.2; dread(ba, .64 + ((b * 7) % 5) * .05, .27 + ((b * 3) % 4) * .03, 0); }
-    [-1, 1].forEach(function (s) { dread(s * 1.0, .7, .24, .13); dread(s * 1.22, .78, .25, .06); dread(s * .8, .5, .2, .16); });
+    for (var b = 0; b < 19; b++) dread(Math.PI * .4 + b / 18 * Math.PI * 1.2, .64 + ((b * 7) % 5) * .05);
+    [-1, 1].forEach(function (s) { dread(s * 1.0, .7); dread(s * 1.22, .78); dread(s * .8, .5); });
 
     // ---- the chain and the iced clover
     var C = []; for (var c = 0; c < 15; c++) { var u = c / 14, ca = (u - .5) * 2.2, cx = Math.sin(ca) * .17, cy = .55 - Math.cos(ca) * .13 - Math.pow(1 - Math.abs(u - .5) * 2, 1.4) * .14, cz = .2 + Math.cos(ca) * .1; C.push(P(Sph(.015, 6, 4), c % 2 ? ICE : 0xc8ced8, M(cx, cy, cz, 0, 0, 0, 1.2, .7, 1))); }
@@ -220,7 +222,7 @@
       rap: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)), bar = Math.floor(bt / 8), v = bar % 4, mir = Math.floor(bt / 32) % 2, sway = Math.sin(bt * Math.PI / 4);
         crouch(g, .07 + .11 * b); g.tx = .09 + b * .05; g.brz = sway * .04; g.hx = b * .2; g.hz = sway * .06; g.ll.o = .09; g.rl.o = .09;
         var act = A({ sx: -1.25 + b * .5, out: .12 + (v === 1 ? .35 : 0), ex: -1.3 + b * .6, wy: v === 1 ? .2 : 1.5, wx: -b * .35, hand: ['point', 'open', 'peace', 'horns'][v] });
-        var off = v === 2 ? A({ sx: -.35, out: -.35, tw: -.8, ex: -1.4, wy: 1.2, wz: Math.sin(t * 5) * .1, hand: 'grip' }) : A({ sx: .12, out: .2, ex: -.55 - b * .2, hand: 'fist' });
+        var off = v === 2 ? A({ sx: -.48, out: .48, tw: -1.3, ex: -1.18, wy: .61, wx: .35, wz: Math.sin(t * 5) * .08, hand: 'grip' }) : A({ sx: .12, out: .2, ex: -.55 - b * .2, hand: 'fist' });
         g.pz = v === 2 ? 1 : 0; var tw = .28 + sway * .1;
         if (mir) { g.L = act; g.R = off; g.bry = tw; g.ty = -.12; g.hy = -.2; } else { g.R = act; g.L = off; g.bry = -tw; g.ty = .12; g.hy = .2; } },
       point: function (g, t) { var j = Math.sin(t * 3) * .03; crouch(g, .05); g.tx = .12; g.bry = .22; g.ty = .12; g.hy = -.2; g.hx = .04; g.ll.h -= .22; g.ll.f += .12; g.rl.h += .12;
@@ -234,13 +236,45 @@
       arms: function (g, t) { var w = Math.sin(t * 1.4); g.tx = -.2; g.hx = -.32; g.by += w * .012; g.ll.o = .16; g.rl.o = .16; g.brz = w * .015;
         g.L = A({ sx: -.12, out: 1.5 + w * .05, ex: -.14, wy: 0, wx: -.25, hand: 'spread' }); g.R = A({ sx: -.12, out: 1.5 - w * .05, ex: -.14, wy: 0, wx: -.25, hand: 'spread' }); },
       chain: function (g, t) { crouch(g, .06); g.tx = .2; g.hx = -.12; g.hy = Math.sin(t * .8) * .08; g.bry = -.12; g.pz = 1;
-        g.L = A({ sx: -.35, out: -.35, tw: -.8, ex: -1.4, wy: 1.2, wz: Math.sin(t * 5) * .14, hand: 'grip' }); g.R = A({ sx: .15, out: .45, ex: -1.1, wy: 1.57, wx: .3, hand: 'fist' }); },
+        g.L = A({ sx: -.48, out: .48, tw: -1.3, ex: -1.18, wy: .61, wx: .35, wz: Math.sin(t * 5) * .1, hand: 'grip' });   /* solved so the palm sits on the clover and the forearm clears the jacket */ g.R = A({ sx: .15, out: .45, ex: -1.1, wy: 1.57, wx: .3, hand: 'fist' }); },
       wave: function (g, t) { var w = Math.sin(t * 7); g.brz = -.03; g.tz = .05; g.hz = -.1; g.hy = .1; g.hx = -.06;
         g.R = A({ sx: -.15, out: 2.8 + w * .2, ex: -.25 - w * .12, wy: 0, wz: w * .4, hand: 'spread' }); g.L = A({ sx: .05, ex: -.25 }); },
       sit: function (g, t) { g.by = -.2; g.ll = { h: -1.5, o: .14, k: 1.5, f: 0 }; g.rl = { h: -1.42, o: .16, k: 1.3, f: .12 }; g.tx = -.14; g.hx = .1; g.hy = Math.sin(t * .5) * .14; g.hz = .05;
         g.L = A({ sx: -.6, out: .22, ex: -1.25 + Math.sin(t * .9) * .05, wy: 1.57, hand: 'grip' }); g.R = A({ sx: -.5, out: .12, ex: -.85, wy: .4, wx: .3, hand: 'relax' }); }
     };
-    var prevTurn = 0, prevBy = 0, prevTX = 0, prevTZ = 0;
+    var prevTurn = 0, prevBy = 0, V1 = new THREE.Vector3(), INV = new THREE.Matrix4(), TINV = new THREE.Matrix4(), simDreads = true, dInit = false;
+    // keep forearms and hands out of the jacket: measure how far a point is inside the torso and swing the arm out, or forward, by that much
+    var ARMPTS = [['el', 0, .105], ['el', -.15, .095], ['hand', 0, .07], ['hand', -.09, .062], ['hand', -.2, .04]];
+    function armFix(a) { var bx = a.sh.rotation.x, bz = a.sh.rotation.z, cOut = 0, cSx = 0;
+      TINV.copy(torso.matrixWorld).invert();
+      for (var it = 0; it < 6; it++) { var worst = 0, wx = 0, wz = 0;
+        for (var i = 0; i < ARMPTS.length; i++) { var q = ARMPTS[i]; V1.set(0, q[1], 0).applyMatrix4(a[q[0]].matrixWorld).applyMatrix4(TINV); if (V1.y < -.06 || V1.y > .6) continue;
+          var e = Math.sqrt(Math.pow(V1.x / (.345 + q[2]), 2) + Math.pow(V1.z / (.3 + q[2]), 2)); if (e < 1) { var pen = (1 - e) * (.32 + q[2]); if (pen > worst) { worst = pen; var l = Math.hypot(V1.x, V1.z) || 1; wx = V1.x / l; wz = V1.z / l; if (l < .02) { wx = 0; wz = 1; } } } }
+        if (worst < .004) break;
+        if (wz > .55) cSx -= worst * 1.7; else if (wz < -.55) cSx += worst * 1.7; else cOut += worst * 1.9;
+        a.sh.rotation.x = bx + cSx; a.sh.rotation.z = bz + a.s * cOut; a.sh.updateMatrixWorld(true); } }
+    // the things the dreads cannot pass through: [joint, x, y, z, radius], measured in that joint's own space
+    var CAPS = [[head, 0, .2, 0, .25], [head, 0, .17, .16, .22], [torso, 0, .1, 0, .335], [torso, 0, .24, 0, .355], [torso, 0, .38, 0, .355], [torso, 0, .5, 0, .31], [torso, 0, .6, -.14, .2], [torso, 0, .62, 0, .15]];
+    arms.forEach(function (a) { CAPS.push([a.sh, 0, 0, 0, .15], [a.sh, 0, -.15, 0, .13], [a.el, 0, 0, 0, .125], [a.el, 0, -.14, 0, .115], [a.hand, 0, -.08, 0, .085]); });
+    legs.forEach(function (l) { CAPS.push([l.hip, 0, -.05, 0, .14], [l.knee, 0, 0, 0, .125]); });
+    var CW = CAPS.map(function () { return new THREE.Vector3(); });
+    function dSolve(D, iters) { var rad = .024 * D.th;
+      for (var it = 0; it < iters; it++) {
+        for (var i = 1; i < 5; i++) { var p = D.pts[i], q = D.pts[i - 1]; V1.subVectors(p, q); var l = V1.length() || 1e-4; p.copy(q).addScaledVector(V1, D.segL / l); }
+        for (var k = 1; k < 5; k++) { var pp = D.pts[k]; for (var c = 0; c < CAPS.length; c++) { var R = CAPS[c][4] + rad, dx = pp.x - CW[c].x, dy = pp.y - CW[c].y, dz = pp.z - CW[c].z, d2 = dx * dx + dy * dy + dz * dz; if (d2 < R * R) { var d = Math.sqrt(d2) || 1e-4, f = R / d; pp.set(CW[c].x + dx * f, CW[c].y + dy * f, CW[c].z + dz * f); } } } } }
+    function dreadSim(t, dt) {
+      INV.copy(group.matrixWorld).invert();
+      for (var c = 0; c < CAPS.length; c++) CW[c].set(CAPS[c][1], CAPS[c][2], CAPS[c][3]).applyMatrix4(CAPS[c][0].matrixWorld).applyMatrix4(INV);
+      var reset = !dInit || dt > .2 || dt <= 0; dInit = true; var n = reset ? 1 : Math.min(5, Math.ceil(dt / .011)), h = dt / n;
+      for (var di = 0; di < dreads.length; di++) { var D = dreads[di]; D.rn.copy(D.root).applyMatrix4(head.matrixWorld).applyMatrix4(INV);
+        if (reset) { for (var i = 0; i < 5; i++) { D.pts[i].set(D.rn.x + Math.sin(D.a) * .05 * i, D.rn.y - D.segL * i, D.rn.z + Math.cos(D.a) * .05 * i); } D.pts[0].copy(D.rn); dSolve(D, 30); for (var j = 0; j < 5; j++) D.prev[j].copy(D.pts[j]); D.rp.copy(D.rn); }
+        else if (simDreads) { var keep = Math.pow(D.drag, h);
+          for (var sI = 1; sI <= n; sI++) { D.pts[0].lerpVectors(D.rp, D.rn, sI / n);
+            for (var k = 1; k < 5; k++) { var p = D.pts[k], pv = D.prev[k], vx = (p.x - pv.x) * keep, vy2 = (p.y - pv.y) * keep, vz = (p.z - pv.z) * keep; pv.copy(p); p.x += vx + Math.sin(t * 1.3 + D.n * 1.7) * .02 * h * h; p.y += vy2 - 8.4 * h * h; p.z += vz; }
+            dSolve(D, 3); }
+          D.rp.copy(D.rn); }
+        for (var m = 0; m < 4; m++) { var a = D.pts[m], bb = D.pts[m + 1]; V1.subVectors(bb, a); var len = V1.length() || 1e-4; D.mesh[m].position.copy(a); D.mesh[m].quaternion.setFromUnitVectors(DOWN, V1.multiplyScalar(1 / len)); var w = D.th * (1 - m * .06); D.mesh[m].scale.set(w, len / .17, w); }
+        D.tip.position.copy(D.pts[4]); } }
     function update(t, dt, beatSeconds) {
       dt = dt === undefined ? 1 / 60 : dt; var bt = (beatSeconds === undefined ? t : beatSeconds) * bpm / 60;
       var g = { L: A(), R: A(), ll: L0(), rl: L0(), by: 0, bry: 0, brz: 0, tx: 0, ty: 0, tz: 0, hx: 0, hy: 0, hz: 0, pz: 0 };
@@ -259,22 +293,14 @@
         l.hip.rotation.set(ch(n + 'h', o.h, dt, 190, 21), 0, l.s * ch(n + 'o', o.o, dt)); l.knee.rotation.x = ch(n + 'k', o.k, dt, 190, 21); l.foot.rotation.x = ch(n + 'f', o.f, dt, 190, 21); });
       // follow-through: the braids and the clover lag behind his turns and bounces, then swing back
       var turn = bry + ty + hy, om = dt > 0 && dt < .2 ? (turn - prevTurn) / dt : 0, vy = dt > 0 && dt < .2 ? (by - prevBy) / dt : 0; prevTurn = turn; prevBy = by;
-      var tiltX = tx + hx, tiltZ = brz + tz + hz, live = dt > 0 && dt < .2, wx = live ? (tiltX - prevTX) / dt : 0, wz = live ? (tiltZ - prevTZ) / dt : 0; prevTX = tiltX; prevTZ = tiltZ;
-      var flare = Math.max(0, -vy) * .22 + Math.min(.5, Math.abs(om) * .035);   // they lift when he drops, and fan out when he spins
-      for (var di = 0; di < dreads.length; di++) { var D = dreads[di], sa = Math.sin(D.a), ca = Math.cos(D.a);
-        var px = (-ca * om * .055 + sa * flare) * D.w - wz * .05, pzv = (sa * om * .055 + ca * flare) * D.w + wx * .05;   // where the tip is thrown: against the turn, and outwards
-        var idle = Math.sin(t * 1.3 + D.n * 1.7) * .012;
-        var r0z = ch('dz' + di, D.rz + px - tiltZ * .85 + idle, dt, D.k, D.d), r0x = ch('dx' + di, D.rx - pzv - tiltX * .85, dt, D.k, D.d);   // hang plumb whatever the head does
-        D.segs[0].rotation.set(r0x, 0, r0z);
-        var cz = r0z - D.rz + tiltZ * .85, cx = r0x - D.rx + tiltX * .85;
-        for (var si = 1; si < 4; si++) { cz = ch('dz' + di + '_' + si, cz * .75, dt, D.k * (1 - si * .16), D.d * .8); cx = ch('dx' + di + '_' + si, cx * .75, dt, D.k * (1 - si * .16), D.d * .8); D.segs[si].rotation.set(cx, 0, cz); }   // each segment follows the one above, late: the whip
-      }
+      torso.position.y = .4 + Math.min(1, Math.max(0, -(legs[0].hip.rotation.x + legs[1].hip.rotation.x) / 2 - .5)) * .06;   // the jacket rides up when he folds at the hips
+      group.updateMatrixWorld(true); armFix(arms[0]); armFix(arms[1]); group.updateMatrixWorld(true); dreadSim(t, dt);
       var pz = ch('pz', g.pz, dt, 120, 14); pendant.position.set(0, .29 + pz * .05, .315 + pz * .09);
-      pendant.rotation.set(-pz * .5 + ch('pendx', -tx * .8 + vy * .5, dt, 45, 4), Math.sin(t * 1.1) * .3 * (1 - pz), ch('pendz', -(tz + brz) * 1.2 - om * .1, dt, 45, 4));
+      pendant.rotation.set(Math.min(0, -pz * .5 + ch('pendx', -tx * .8 + vy * .5, dt, 45, 4)), Math.sin(t * 1.1) * .3 * (1 - pz), ch('pendz', -(tz + brz) * 1.2 - om * .1, dt, 45, 4));
     }
     update(0, 1);
     return { group: group, parts: { body: body, torso: torso, head: head, screen: screen, arms: arms, legs: legs, pendant: pendant, dreads: dreads },
-      faces: Object.keys(FACES), poses: Object.keys(POSES), hands: Object.keys(HANDS), setFace: setFace, setMouth: setMouth, setPose: setPose, setTempo: setTempo, update: update, height: 1.5 };
+      faces: Object.keys(FACES), poses: Object.keys(POSES), hands: Object.keys(HANDS), setFace: setFace, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.5 };
   }
-  root.LilBottie = { build: build, version: '0.3' };
+  root.LilBottie = { build: build, version: '0.4' };
 })(typeof window !== 'undefined' ? window : this);
