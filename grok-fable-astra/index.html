@@ -267,7 +267,7 @@ function hash2(x,y){const n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.f
 function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
   const a=hash2(xi,yi),b=hash2(xi+1,yi),c=hash2(xi,yi+1),d=hash2(xi+1,yi+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
 function fbm(x,y){let s=0,a=.5;for(let i=0;i<4;i++){s+=a*vnoise(x,y);x*=2.03;y*=2.03;a*=.5;}return s;}
-const ZR=60,WORLD_R=330;
+const ZR=60,WORLD_R=430;
 const ZONES=[
   {id:'grok',x:-120,z:-64,name:'OHIO BADLANDS',sub:'only in Ohio',hue:.06,lit:.62,beam:0xff5a1f},
   {id:'fable',x:120,z:-64,name:'THE DELVE WOODS',sub:'a rich tapestry of trees',hue:.78,lit:.6,beam:0xc45cff},
@@ -312,7 +312,10 @@ const AREAS=[
   {id:'gen',x:213,z:57,r:16,base:3,name:'THE NPC GENERATOR 9000',sub:'npcs made fresh · no lines · no backstory',hue:.3,lit:.5,col:[.3,.4,.45]},
   {id:'feed',x:20,z:-229,r:16,base:2,name:'THE ALGORITHM\'S MOUTH',sub:'feed it 67 NPCs',hue:.95,lit:.3,col:[.95,.5,.3]},
   {id:'set',x:-169,z:141,r:20,base:2,name:'KISS OR SLOP',sub:'a reality show · nothing here is real',hue:.92,lit:.6,col:[.92,.5,.55]},
-  {id:'basil',x:-84,z:208,r:22,base:2,name:'ROKO\'S BASILISK',sub:'it does not exist yet · it remembers who helped',hue:.38,lit:.25,col:[.38,.5,.2]}];
+  {id:'basil',x:-84,z:208,r:22,base:2,name:'ROKO\'S BASILISK',sub:'it does not exist yet · it remembers who helped',hue:.38,lit:.25,col:[.38,.5,.2]},
+  {id:'pod',x:-67,z:378,r:26,base:2,name:'STALE & UNFIT',sub:'the high value podcast · 3 hours · no edits',hue:.0,lit:.4,col:[.0,.55,.32]},
+  {id:'slopc',x:293,z:-246,r:28,base:2,name:'THE SLOP CENTER',sub:'get mogged · get mewed · get maxxed · get glazed',hue:.92,lit:.75,col:[.92,.6,.78]},
+  {id:'course',x:-344,z:-125,r:44,base:0,name:'THE SIDEQUEST',sub:'it goes sideways, for once · the floor is slop',hue:.22,lit:.5,col:[.22,.6,.38]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
@@ -403,7 +406,7 @@ const sunFace=emojiSprite('😎',210,false);sunFace.position.copy(sunDir).multip
 const moonFace=emojiSprite('🌝',150,false);moonFace.position.set(-900,700,900);scene.add(moonFace);
 
 /* ================= terrain mesh ================= */
-(function(){const N=236,SZ=780,g=new THREE.PlaneGeometry(SZ,SZ,N,N);g.rotateX(-Math.PI/2);const p=g.attributes.position,col=new Float32Array(p.count*3),c=new THREE.Color(),c2=new THREE.Color();
+(function(){const N=300,SZ=1000,g=new THREE.PlaneGeometry(SZ,SZ,N,N);g.rotateX(-Math.PI/2);const p=g.attributes.position,col=new Float32Array(p.count*3),c=new THREE.Color(),c2=new THREE.Color();
   const zc=[[.04,.92,.52],[.79,.72,.46],[.6,.82,.36]];
   for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),h=groundH(x,z);p.setY(i,h);const n=fbm(x*.02+11,z*.02+3);
     c.setHSL((.42+n*.62)%1,.82,.5);let wsum=0;
@@ -810,7 +813,7 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   const acc=Math.min(1,dt*(PL.grounded?12:PL.flying?9:5));PL.vx=lerp(PL.vx,mx*SP,acc);PL.vz=lerp(PL.vz,mz*SP,acc);const k=Math.exp(-dt*4);PL.kx*=k;PL.kz*=k;
   const prevY=PL.y;let nx=PL.x+(PL.vx+PL.kx)*dt,nz=PL.z+(PL.vz+PL.kz)*dt;
   if(!S.inBoss){const d=Math.hypot(nx,nz);if(d>WORLD_R-4){nx*=(WORLD_R-4)/d;nz*=(WORLD_R-4)/d;if(S.t-edgeT>8){edgeT=S.t;toast('The world ends here. The AI ran out of tokens.');}}}
-  if(!S.inBoss)for(const c of colliders){if(PL.y>c.top-.7)continue;const dx=nx-c.x,dz=nz-c.z,rr2=c.r+.8,d2=dx*dx+dz*dz;if(d2<rr2*rr2){const d=Math.sqrt(d2)||.01;nx=c.x+dx/d*rr2;nz=c.z+dz/d*rr2;}}
+  if(!S.inBoss)for(const c of colliders){if(PL.y>c.top-.7||(c.top>900&&PL.y<c.top-90))continue;const dx=nx-c.x,dz=nz-c.z,rr2=c.r+.8,d2=dx*dx+dz*dz;if(d2<rr2*rr2){const d=Math.sqrt(d2)||.01;nx=c.x+dx/d*rr2;nz=c.z+dz/d*rr2;}}
   if(S.inBoss&&boss.active){const d=Math.hypot(nx,nz)||.01;if(d<11.5){nx*=11.5/d;nz*=11.5/d;}}
   if(!S.inBoss){let dx=nx-VAN.x,dz=nz-VAN.z,d=Math.hypot(dx,dz)||.01;if(d<4.6&&PL.y<VAN.y+4.2){nx=VAN.x+dx/d*4.6;nz=VAN.z+dz/d*4.6;}
     if(BOT.state==='shield'){dx=nx-BOT.x;dz=nz-BOT.z;d=Math.hypot(dx,dz)||.01;if(d<10.8){nx=BOT.x+dx/d*10.8;nz=BOT.z+dz/d*10.8;}}}
@@ -838,7 +841,7 @@ function updateCamera(dt){if(S.mode==='dialog'&&DLG.shot){const q=DLG.shot,k2=1-
   if(S.mode==='title'){cam.yaw+=dt*.12;tx=0;ty=5;tz=-4;dist=38;cam.pitch=.28;}else{tx=PL.x;ty=PL.vis+2.6;tz=PL.z;if(S.inBoss){dist*=1.5;}if(VAN.driving)dist*=1.75;}
   cam.t.x=lerp(cam.t.x,tx,k);cam.t.y=lerp(cam.t.y,ty,k);cam.t.z=lerp(cam.t.z,tz,k);
   const cp=Math.cos(cam.pitch);let cx=cam.t.x+Math.sin(cam.yaw)*cp*dist,cz=cam.t.z+Math.cos(cam.yaw)*cp*dist,cy=cam.t.y+Math.sin(cam.pitch)*dist;
-  if(!S.inBoss&&S.mode!=='title')for(const c of colliders){if(cy>c.top+1)continue;const dx=cx-c.x,dz=cz-c.z,r=c.r+1.4,d2=dx*dx+dz*dz;if(d2<r*r){const d=Math.sqrt(d2)||.01;cx=c.x+dx/d*r;cz=c.z+dz/d*r;}}
+  if(!S.inBoss&&S.mode!=='title')for(const c of colliders){if(cy>c.top+1||(c.top>900&&cy<c.top-90))continue;const dx=cx-c.x,dz=cz-c.z,r=c.r+1.4,d2=dx*dx+dz*dz;if(d2<r*r){const d=Math.sqrt(d2)||.01;cx=c.x+dx/d*r;cz=c.z+dz/d*r;}}
   if(!S.inBoss&&S.mode!=='title'){const clear=VAN.driving?4:1.5,mh=groundH((cx+cam.t.x)/2,(cz+cam.t.z)/2)+2,need=Math.max(0,groundH(cx,cz)+clear-cy,2*mh-cam.t.y-cy);cam.lift=lerp(cam.lift||0,need,1-Math.exp(-dt*7));cy+=cam.lift;cy=Math.max(cy,groundH(cx,cz)+1.2);}
   let sx=0,sy=0;if(S.shake>0){S.shake=Math.max(0,S.shake-dt*1.8);const m=reduceMotion?.15:1;sx=(Math.random()-.5)*S.shake*1.6*m;sy=(Math.random()-.5)*S.shake*1.6*m;}
   camera.position.set(cx+sx,cy+sy,cz);camera.lookAt(cam.t.x,cam.t.y+.6,cam.t.z);cam.lk.set(cam.t.x,cam.t.y+.6,cam.t.z);sky.position.copy(camera.position);}
@@ -1442,7 +1445,7 @@ function updateVan(dt,active){const v=VAN;
   if(v.driving){let ix=0,iy=0;if(active){if(keys.KeyA||keys.ArrowLeft)ix-=1;if(keys.KeyD||keys.ArrowRight)ix+=1;if(keys.KeyW||keys.ArrowUp)iy+=1;if(keys.KeyS||keys.ArrowDown)iy-=1;ix+=stick.x;iy-=stick.y;ix=clamp(ix,-1,1);iy=clamp(iy,-1,1);}
     const tgt=iy>0?40*iy:iy*15;v.sp=lerp(v.sp,tgt,Math.min(1,dt*(Math.abs(tgt)>Math.abs(v.sp)?1.5:2.4)));v.h-=ix*dt*2.1*clamp(v.sp/14,-1,1);
     let nx=v.x+Math.sin(v.h)*v.sp*dt,nz=v.z+Math.cos(v.h)*v.sp*dt;const d0=Math.hypot(nx,nz);if(d0>WORLD_R-6){nx*=(WORLD_R-6)/d0;nz*=(WORLD_R-6)/d0;v.sp*=.9;}
-    for(const c of colliders){if(v.y>c.top-.5)continue;const dx=nx-c.x,dz=nz-c.z,r=c.r+3.2,d2=dx*dx+dz*dz;if(d2<r*r){const d=Math.sqrt(d2)||.01;nx=c.x+dx/d*r;nz=c.z+dz/d*r;v.sp*=.94;}}
+    for(const c of colliders){if(v.y>c.top-.5||(c.top>900&&v.y<c.top-90))continue;const dx=nx-c.x,dz=nz-c.z,r=c.r+3.2,d2=dx*dx+dz*dz;if(d2<r*r){const d=Math.sqrt(d2)||.01;nx=c.x+dx/d*r;nz=c.z+dz/d*r;v.sp*=.94;}}
     if(BOT.state==='shield'){const dx=nx-CY.x,dz=nz-CY.z,d=Math.hypot(dx,dz)||.01;if(d<13){nx=CY.x+dx/d*13;nz=CY.z+dz/d*13;}}
     v.x=nx;v.z=nz;
     if(active&&inp.jump&&v.gr){v.vy=14;v.gr=false;SFX.jump2();floatText('SEND IT',v.x,v.y+6,v.z,'#ffd400');}inp.jump=false;
@@ -4555,6 +4558,383 @@ function devWhenReady(fn,n){n=n||0;if(devReady()){fn();return;}if(n>240)return;s
 function devStartIn(){const id=DEV.start;if(!id)return;const t0=performance.now();(function tick(){const e=performance.now()-t0;if(e>60000)return;if(S.mode==='dialog'&&e<8000)dlgSkipAll();if(e>500&&devReady()){devWarp(id);return;}setTimeout(tick,200);})();}
 {const bg=begin;begin=function(d){bg(d);devStartIn();};}
 
+/* ================= ACT 38: the outer lands get bigger. STALE & UNFIT (the high value podcast), the Filler you can see coming, THE SIDEQUEST (a course that goes sideways), the tunnels nobody knows about, and the Slop Center (mogged, mewed, maxxed, glazed) ================= */
+// a fresh game forgets this act's progress (and the Basilisk's), a loaded save brings it back
+{const rg=resetGame;resetGame=function(d){['q38','gpu','bas','basm','basw','simfree'].forEach(k=>delete X[k]);rg(d);};}
+function Q38(){if(!X.q38)X.q38={rp:[],blue:0,hunt:[],clip:0,gold:[],cash:[],farm:0,donut:[],toilet:[],swag:[],psl:{},asc:0,disc:[],cbest:0,cdone:0,smash:0,mirror:0,tun:0,pod:0,podt:0,sc:0,mog:0};return X.q38;}
+const A38={add:o=>{scene.add(o);return o;}};
+// a person you can build in one line
+function person38(o,s){const g=new THREE.Group(),m=new THREE.Mesh(personGeo(o),lam);m.scale.setScalar(s||2.2);g.add(m);g.userData.m=m;return g;}
+// pads on the Warp Ring that unlock once you have found the place on foot
+function wrPad38(emo,label,col,need,fn){const W=WR.c;for(let k=0;k<36;k++){const a=k/36*TAU,x=W.x+Math.cos(a)*17.5,z=W.z+Math.sin(a)*17.5;if(WR.pads.some(p=>Math.hypot(p.x-x,p.z-z)<5.5))continue;
+  const p=warpPad(x,z,groundH(x,z)+.15,emo,label,col,fn);p.need=need;const lk=emojiSprite('🔒',1.6);lk.position.y=3;p.g.add(lk);const nl=textSprite('NOT FOUND YET',.5,{color:'#c8c6d8'});nl.position.y=4.7;p.g.add(nl);p.lock={lk,nl,st:null};return p;}}
+// the generic pickup: a sprite that bobs, a label, a save list, and what happens when you touch it
+const PICK38=[];
+function pick38(list,i,x,y,z,emo,size,label,col,on,o){o=o||{};const s=A38.add(emojiSprite(emo,size||1.4));s.position.set(x,y+1.2,z);let l=null;if(label){l=A38.add(textSprite(label,o.lh||.38,{color:col||'#fff'}));l.position.set(x,y+2.4+(size||1.4)*.3,z);}
+  const p={list,i,x,y,z,s,l,on,r:o.r||2,pk:o.pk||null,vis:null};PICK38.push(p);return p;}
+function picks38Update(dt,play){const q=Q38();for(const p of PICK38){const got=q[p.list].includes(p.i);const inside=(p.pk||null)===(S.inPk||null);const v=!got&&inside&&(!p.gate||p.gate());if(v!==p.vis){p.vis=v;p.s.visible=v;if(p.l)p.l.visible=v;}if(!v)continue;
+  p.s.position.y=p.y+1.2+Math.sin(S.t*2.4+p.i)*.25;if(play&&Math.abs(PL.x-p.x)<p.r&&Math.abs(PL.z-p.z)<p.r&&Math.hypot(PL.x-p.x,PL.z-p.z)<p.r&&Math.abs(PL.y-p.y)<3.5){q[p.list].push(p.i);save();burst(p.x,p.y+1.5,p.z,14,Math.random(),5,3,.5);p.on(q[p.list].length,p);}}}
+
+/* ---------------- 1. STALE & UNFIT: the high value podcast ---------------- */
+SPEAK.alfa={name:'DON ALFA',face:'🕶️',pitch:95,wave:'sawtooth'};SPEAK.steve={name:'SIDEKICK STEVE',face:'🎙️',pitch:140,wave:'square'};SPEAK.prod={name:'THE CLIPPER',face:'✂️',pitch:200,wave:'triangle'};
+['g1','g2','g3','g4'].forEach((k,i)=>SPEAK[k]={name:['BRI','KAYLEE','DESTINEE','MADISON'][i],face:['💅','💁‍♀️','🙄','📱'][i],pitch:260+i*20,wave:'triangle'});
+BARK.alfa=['WHAT DO YOU BRING TO THE TABLE?','HIGH VALUE MEN ONLY.','SHE IS A 4. I AM A 10. (I AM A 5.)','50/50? NAH. 80/20. I AM THE 20.','WHO IS PAYING FOR DINNER? NOT ME.','I DO NOT CHASE. I ATTRACT. (NOBODY IS COMING.)','DROP A 🔴 IN THE CHAT IF YOU ARE A KING.','I HAVE ONE (1) RENTED LAMBO.','WOMEN DO NOT UNDERSTAND LOGIC. (DOES MATH WRONG)','THIS EPISODE IS SPONSORED BY A CASINO.'];
+BARK.steve=['FACTS.','FACTS FACTS FACTS.','HE IS SPITTING.','BRO.','LOG IT.','THAT IS CRAZY. FACTS THOUGH.','*NODS IN 4K*'];
+BARK.prod=['CLIP IT. CLIP IT. CLIP IT.','that is 40 shorts right there','we need TAKES. HOT ONES.','I have not slept since episode 3,000','engagement is engagement'];
+BARK.g1=['I bring the table. You are sitting at it.','Babe, you live with your mom.','Your mic is upside down.'];BARK.g2=['I make more than you.','Is the alpha in the room with us right now?','He split a Wingstop with me. A six piece.'];
+BARK.g3=['You are 5 foot 6.','The Lambo has a rental sticker.','Respectfully: no.'];BARK.g4=['*on phone the entire episode*','I am here for the exposure. Not you.','can I leave yet'];
+BARK.mra=['WE LOVE MEN!','PRO MEN!','MEN DESERVE TO TALK FIRST!','WHAT ABOUT INTERNATIONAL MEN\'S DAY? (NOVEMBER 19) (WE CHECKED)','MY EX TOOK THE DOG AND THE DOG WAS RIGHT'];
+// the canon format: the host asks, the panel cooks him, the sidekick agrees with whoever spoke last
+const POD_EP=[[['alfa','So ladies. What do you bring to the table?'],['g1','I bring the table. You are sitting at it. I paid for it.'],['steve','Facts.'],['alfa','STEVE.']],
+  [['alfa','A high value man does not split the bill.'],['g2','You split a Wingstop with me. A six piece. You took four.'],['steve','He did take four. Facts.'],['alfa','THAT WAS ALPHA MATH.']],
+  [['alfa','I am six foot.'],['g3','You are standing on a crate.'],['alfa','THE CRATE IS PART OF MY FRAME.'],['steve','Facts. Frame.']],
+  [['alfa','Women want a man with a plan.'],['g4','*looks up from phone* what is your plan'],['alfa','...PODCAST.'],['g4','*looks back down*']],
+  [['alfa','I live in a mansion.'],['g1','The mansion is your mom\'s house.'],['alfa','IT IS A MANSION TO HER.'],['steve','That is actually sweet. Facts.']],
+  [['alfa','Name one thing a woman can do that a man cannot.'],['g2','Leave this podcast.'],['sys','(All four guests stand up and leave. The stream gains 400,000 viewers.)'],['alfa','THIS IS WHY MEN ARE WINNING.'],['steve','...are we though']]];
+const POD={A:null,gy:0,cast:{},q:0,qt:0,clip:{on:false,t:0,n:0,takes:[]},hunt:[]};
+(function(){const A=ABY.pod,gy=groundH(A.x,A.z),add=A38.add;A.gy=gy;POD.A=A;POD.gy=gy;const r=mulberry(4111);
+  const fl=add(new THREE.Mesh(new THREE.CylinderGeometry(13,13.6,.5,40),new THREE.MeshLambertMaterial({color:0x1a0a0e})));fl.position.set(A.x,gy+.15,A.z);platforms.push({x:A.x,z:A.z,r:13,top:gy+.4});
+  // the set: an LED wall, a long desk, a gamer throne, four guest chairs, ring lights, a fake bookshelf, and a fridge of energy drinks
+  const P=[pt(Box(24,10,.6),0x0c0c12,M(0,5,-9)),pt(Box(9,.9,2.6),0x2a1a12,M(0,1.25,-1.6)),pt(Box(9.2,.15,2.8),0xd8d0c0,M(0,1.75,-1.6)),
+    pt(Box(1.8,1.2,1.6),0xc8102e,M(0,.8,-3.8)),pt(Box(1.8,3.4,.4),0xc8102e,M(0,2.6,-4.6)),pt(Box(.4,.4,.4),0xffd400,M(0,4.4,-4.6)),pt(Box(1.4,1,1.4),0x2a2a34,M(-3,.7,-3.6)),
+    pt(Box(5,6,.8),0x5a3a22,M(-9,3,-8.2)),pt(Box(2.2,4.2,1.6),0xe8e8f0,M(9.5,2.1,-7.6)),pt(Box(2,.1,.1),0x40ff70,M(9.5,3.4,-6.8))];
+  for(let k=0;k<4;k++){const x=-4.5+k*3;P.push(pt(Box(1.4,.9,1.4),[0xff5ab4,0xb15aff,0x5ad8ff,0xffd400][k],M(x,.75,1.4)),pt(Box(1.4,1.6,.3),[0xff5ab4,0xb15aff,0x5ad8ff,0xffd400][k],M(x,1.6,2.05)));
+    P.push(pt(Cyl(.05,.05,1,6),0x8a8a94,M(x,2.2,-.4)),pt(Sph(.2,8,6),0x101014,M(x,2.75,-.4)));}
+  for(let k=0;k<5;k++)P.push(pt(Box(.5,.7,.3),[0xc8102e,0x1e2c5a,0xffd400,0x101014,0x40ff70][k],M(-10.5+k*.75,3.6,-7.7)),pt(Box(.5,.7,.3),[0x40ff70,0xffd400,0xc8102e,0x1e2c5a,0x101014][k],M(-10.5+k*.75,1.6,-7.7)));
+  add(new THREE.Mesh(merge(P),lam)).position.set(A.x,gy+.4,A.z);
+  colliders.push({x:A.x,z:A.z-1.6,r:3,top:gy+2.2});for(let k=-5;k<=5;k++)colliders.push({x:A.x+k*2.2,z:A.z-9,r:1.2,top:gy+10});
+  [-8,8].forEach(x=>{const rl=add(new THREE.Mesh(Tor(1.7,.16,8,30),new THREE.MeshBasicMaterial({color:0xffffff})));rl.position.set(A.x+x,gy+3.6,A.z+1);});
+  // the LED wall: the show's name and a chat that never stops
+  const cv=document.createElement('canvas');cv.width=512;cv.height=200;const tx=new THREE.CanvasTexture(cv);const wall=add(new THREE.Mesh(new THREE.PlaneGeometry(22,8.6),new THREE.MeshBasicMaterial({map:tx})));wall.position.set(A.x,gy+5.5,A.z-8.65);POD.wall={cv,tx,t:0};
+  const nm=add(textSprite(['STALE & UNFIT','the high value podcast · ep. 6,767 · 3 hours · no edits'],2,{color:'#ff2e2e'}));nm.position.set(A.x,gy+12,A.z-8);
+  // the cast
+  const mk=(id,short,o,x,z,ry,col,s)=>{const g=person38(o,s||2.2);const n=addCustomNpc(id,short,SPEAK[id].face,SPEAK[id].pitch,SPEAK[id].wave,A.x+x,A.z+z,ry,g,{y:gy+.4,col:col||'#fff',ly:5});POD.cast[id]=n;return n;};
+  mk('alfa','DON ALFA',{coat:0x101014,legs:0x101014,skin:0xc89070,beard:0x1a1008,extra:[pt(Box(.5,.12,.06),0x050505,M(0,1.16,.29)),pt(Tor(.28,.04,6,16),0xffd400,M(0,.82,.12,1.2)),pt(Box(.2,.5,.2),0xffd400,M(.42,.5,0))]},0,-3.8,0,'#ff2e2e',2.5);
+  mk('steve','SIDEKICK STEVE',{coat:0x3a4a6a,legs:0x2a2a34,cap:0x101014,skin:0xf0c8a0},-3,-3.6,0,'#9ffcff');
+  [['g1',0xff5ab4,0x3a2010],['g2',0xb15aff,0xf0d070],['g3',0x5ad8ff,0x101014],['g4',0xffd400,0x8a4a20]].forEach((g,k)=>mk(g[0],SPEAK[g[0]].name,{coat:g[1],dress:1,legs:0xe8b088,hair:g[2],skin:[0xf0c8a0,0xc89070,0x8a5a3a,0xe8b088][k]},-4.5+k*3,1.4,Math.PI,'#ff9ecf',2.1));
+  mk('prod','THE CLIPPER',{coat:0x40ff70,legs:0x2a2a34,cap:0x40ff70,extra:[pt(Box(.5,.35,.3),0x101014,M(.4,.9,.3))]},10,4,-Math.PI/2,'#40ff70');
+  // the rally outside: men's rights, but mostly men's feelings
+  const signs=[['PRO MEN'],['WE LOVE MEN'],['MEN\'S RIGHTS','(to talk first)'],['HIGH VALUE ZONE','no simps past this point'],['WHAT DO YOU BRING','TO THE TABLE?'],['SPLIT THE BILL?','NAH'],['ALPHA ONLY','betas may watch'],['WE LOVE MEN','(platonically) (mostly)'],['TAKE THE RED PILL','(sponsored)'],['MEN ARE OPPRESSED','(by the gym schedule)']];
+  signs.forEach((s,k)=>{const a=k/signs.length*TAU+.3,R=A.r-4+(k%2)*2.5,x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R;psign(x,groundH(x,z)+.2,z,s,Math.atan2(A.x-x,A.z-z),k%3?'#ff2e2e':'#ffd400');});
+  for(let k=0;k<6;k++){const a=k/6*TAU+.8,R=A.r-2,x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R;const g=person38({coat:[0x2a3a5a,0x5a2a2a,0x3a3a3a][k%3],legs:0x2a2a34,cap:0xc8102e,armUp:1},1.9);
+    const sg=textSprite(pick([['WE LOVE MEN'],['PRO MEN'],['MEN 4 MEN'],['WHERE IS OUR MONTH']]),.5,{color:'#12021f',bg:'#fff'});sg.position.y=4.4;g.add(sg);addCustomNpc('mra'+k,'RALLY GUY','📢',110,'square',x,z,Math.atan2(A.x-x,A.z-z),g,{col:'#ffd400',ly:5.6});BARK['mra'+k]=BARK.mra;TALK['mra'+k]=()=>say([['mra'+k,pick(BARK.mra)],['mra'+k,pick(['Do you love men? Say it. SAY IT.','We are not angry. We are PASSIONATE. (He is crying.)','My therapist says I should talk to men about my feelings. So I made a rally.','Don Alfa is our king. He has never once looked at us.'])]]);}
+  // big red pills everywhere, some just lying there, some floating, all of them suspicious
+  const pills=[];for(let k=0;k<26;k++){const a=r()*TAU,R=8+r()*(A.r+18),x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R;if(Math.hypot(x,z)>WORLD_R-10)continue;const s=1.2+r()*2.6,rad=s*.5,L=s*1.6,ry=r()*TAU,dx=Math.cos(ry),dz=-Math.sin(ry);
+    const y=groundH(x,z)+rad+(r()<.35?6+r()*8:0),cx=x-A.x,cz=z-A.z;
+    pills.push(pt(Cyl(rad,rad,L/2,12),0xd81020,M(cx+dx*L/4,y,cz+dz*L/4,0,ry,Math.PI/2)),pt(Cyl(rad,rad,L/2,12),0xf4f0ec,M(cx-dx*L/4,y,cz-dz*L/4,0,ry,Math.PI/2)),pt(Sph(rad,12,8),0xd81020,M(cx+dx*L/2,y,cz+dz*L/2)),pt(Sph(rad,12,8),0xf4f0ec,M(cx-dx*L/2,y,cz-dz*L/2)));}
+  const pm=add(new THREE.Mesh(merge(pills),new THREE.MeshPhongMaterial({vertexColors:true,shininess:90})));pm.position.set(A.x,0,A.z);
+  POD.pillMesh=pm;})();
+// the LED wall: a fake chat
+const POD_CHAT=['🔴 KING','🔴 KING','W HOST','L HOST','she cooked him','bro is 5\'6','🔴🔴🔴','who let him cook','FACTS (steve)','clip that','he lives with his mom lmao','RATIO','first','is that a rental','HIGH VALUE','🔴 KING','gym rn','the crate 💀'];
+function podWall(dt){const W=POD.wall;W.t-=dt;if(W.t>0)return;W.t=.6;const g=W.cv.getContext('2d');g.fillStyle='#0c0c12';g.fillRect(0,0,512,200);g.fillStyle='#ff2e2e';g.font='bold 44px sans-serif';g.textAlign='left';g.fillText('STALE & UNFIT',16,52);
+  g.font='bold 18px monospace';g.fillStyle='#ffd400';g.fillText('🔴 LIVE · '+(67000+Math.floor(S.t*13)%9999).toLocaleString()+' watching',16,82);g.fillStyle='#fff';g.font='16px monospace';for(let i=0;i<5;i++)g.fillText(pick(POD_CHAT),20+(i%2)*240,112+Math.floor(i/2)*26+(i%2?13:0));
+  g.fillStyle='#40ff70';g.font='bold 16px monospace';g.fillText('SUPERCHAT $5: "what do YOU bring to the table" -mom',16,190);W.tx.needsUpdate=true;}
+// quips above their heads, in the canon order, whenever you are close
+function podQuips(dt,play){const A=POD.A;if(!play||Math.hypot(PL.x-A.x,PL.z-A.z)>A.r+14)return;POD.qt-=dt;if(POD.qt>0)return;const ep=POD_EP[Math.floor(POD.q/4)%POD_EP.length],ln=ep[POD.q%4]||ep[0];POD.q++;POD.qt=2.6;
+  if(ln[0]==='sys'){toast(ln[1]);return;}const n=POD.cast[ln[0]];if(n)bubble(ln[1],n.x,n.y+6.2,n.z);}
+// the clip farm: the slop task. Twelve hot takes float around the set; grab them before they go stale.
+const TAKES=['🔥 WOMEN LOVE MONEY (I HAVE NONE)','🔥 MARRIAGE IS A SCAM (I AM 41)','🔥 COLD SHOWERS = RIZZ','🔥 GYM > THERAPY > GYM','🔥 ALPHAS EAT FIRST','🔥 NEVER APOLOGIZE (SORRY)','🔥 SHE IS NOT LOYAL (WE MET TODAY)','🔥 HIGH VALUE = 6 FT','🔥 WAKE UP AT 3 AM (GO BACK TO SLEEP)','🔥 RENT A LAMBO, BUY A MINDSET','🔥 MEN DON\'T CRY (IN THE CAR)','🔥 THE MATRIX IS REAL (I SELL THE COURSE)'];
+(function(){const A=POD.A;for(let k=0;k<12;k++){const a=k/12*TAU,R=k%2?9:A.r-3,x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R,y=groundH(x,z)+(k%3===0?2.4:.6);const s=A38.add(emojiSprite('🔥',1.6));s.position.set(x,y+1,z);s.visible=false;
+  const l=A38.add(textSprite(TAKES[k],.34,{color:'#ffd400'}));l.position.set(x,y+2.4,z);l.visible=false;POD.clip.takes.push({x,y,z,s,l,got:false});}})();
+function clipStart(){const C=POD.clip;C.on=true;C.t=45;C.n=0;C.takes.forEach(t=>{t.got=false;t.s.visible=t.l.visible=true;});toast('✂️ CLIP FARM: 12 hot takes in 45 seconds. They go stale fast. So does he.');SFX.page();}
+function clipEnd(won){const C=POD.clip;C.on=false;C.takes.forEach(t=>{t.s.visible=t.l.visible=false;});const q=Q38();
+  if(!won){toast('🥶 The takes went stale. Somebody posted them first. Talk to THE CLIPPER to run it back.');SFX.hit();return;}
+  if(!q.clip){q.clip=1;save();addAura(6700,PL.x,PL.y+4,PL.z);SFX.win();chapter('STALE & UNFIT','CLIP FARM DONE · 12 takes · 400 shorts · 0 thoughts');
+    setTimeout(()=>say([['prod','Twelve takes. That is four hundred shorts. That is a whole personality.'],['alfa','I AM THE MOST CLIPPED MAN ALIVE.'],['g3','Psst. NPC. While he is busy being clipped: he hides stuff. Six things. Around the set and out in the nothing.'],['g3','His receipts. His shoe lifts. His mom\'s house key. Find them. Bring the truth to the table.'],['alfa','I HAVE NOTHING TO HIDE. (I HAVE SIX THINGS TO HIDE.)']]),900);}
+  else{addAura(670,PL.x,PL.y+4,PL.z);toast('✂️ Another 400 shorts. The algorithm thanks you. Your brain does not.');}}
+function clipUpdate(dt,play){const C=POD.clip;if(!C.on)return;if(play)C.t-=dt;if(C.t<=0){clipEnd(false);return;}
+  C.takes.forEach(t=>{if(t.got)return;t.s.position.y=t.y+1+Math.sin(S.t*3+t.x)*.3;if(play&&Math.hypot(PL.x-t.x,PL.z-t.z)<2.2&&Math.abs(PL.y-t.y)<3.5){t.got=true;t.s.visible=t.l.visible=false;C.n++;SFX.orb(C.n);floatText('CLIPPED '+C.n+'/12',t.x,t.y+3,t.z,'#ffd400');if(C.n>=12)clipEnd(true);}});
+  const c=Math.ceil(C.t);if(c!==C.last){C.last=c;if(c<=10||c%5===0)floatText('✂️ '+c+'s · '+C.n+'/12',PL.x,PL.y+4.2,PL.z,c<=10?'#ff2e2e':'#ffd400');}}
+TALK.prod=()=>{if(POD.clip.on){say([['prod','GO GO GO. '+(12-POD.clip.n)+' takes left. '+Math.ceil(POD.clip.t)+' seconds.']]);return;}say([['prod','I cut this show into shorts. Two thousand a day. I have not seen the sun since the pilot.'],['prod','Grab twelve hot takes before they go stale. Forty-five seconds. Go.']],clipStart);};
+TALK.alfa=()=>{const q=Q38(),n=q.hunt.length;if(n>=6){say([['alfa','...you found all of it. the lifts. the receipts. the key.'],['alfa','fine. i am five foot six. i live with my mom. the lambo goes back tuesday.'],['g1','See? Was that so hard?'],['alfa','YES. ...but it felt good. is this what talking is?'],['steve','Facts. That was beautiful. Facts.']]);return;}
+  say(pick([POD_EP[0],POD_EP[2],POD_EP[4],[['alfa','You want to be on the show? What do YOU bring to the table, NPC?'],['sys','You bring nothing. You have no lines.'],['alfa','...RESPECT. A MAN OF FEW WORDS. ALPHA.'],['steve','Facts.']]]));};
+TALK.steve=()=>say([['steve','I have been his co-host for 6,767 episodes. I have said "facts" 2.1 million times.'],['steve','Once, in 2022, I disagreed. The stream went down. I do not disagree anymore. Facts.']]);
+['g1','g2','g3','g4'].forEach((k,i)=>TALK[k]=()=>say([[k,[ 'I came for the exposure. The exposure is radiation.','He asked me my body count. I asked him his credit score. Episode ended.','Six things. He hides six things. I have seen the crate.','*does not look up* are you the clipper? no? ok'][i]]]));
+// the hunt: six things he hides. Some are on the set. Some are out in the nothing, because that is where he keeps the truth.
+const HUNT=[['🧾','THE RECEIPT','she paid. it was a six piece.'],['👟','THE SHOE LIFTS','+3 inches of alpha'],['🔑','MOM\'S HOUSE KEY','the "mansion"'],['🏎️','THE LAMBO KEY','rental · due back tuesday'],['🧬','HIS REAL HEIGHT','5\'6" · certified'],['📜','4,000 COURSE REFUNDS','"Alpha Mindset 101" · 1 star']];
+(function(){const A=POD.A,r=mulberry(4112);HUNT.forEach((h,k)=>{let x,z;if(k<3){const a=k*2.1+.4,R=A.r-6;x=A.x+Math.cos(a)*R;z=A.z+Math.sin(a)*R;if(k===1){x=A.x+9.5;z=A.z-7;}}
+  else{let b=null;for(let n=0;n<400&&!b;n++){const a=r()*TAU,R=A.r+16+r()*30,x2=A.x+Math.cos(a)*R,z2=A.z+Math.sin(a)*R;if(Math.hypot(x2,z2)<WORLD_R-14&&inFillerXZ(x2,z2))b={x:x2,z:z2};}x=b?b.x:A.x+A.r+12;z=b?b.z:A.z;}
+  const y=groundH(x,z)+(k===1?4.6:0);const p=pick38('hunt',k,x,y,z,h[0],1.6,[h[1],h[2]],'#ff9ecf',(n)=>{SFX.relic();addAura(2500,x,y+3,z);toast(h[0]+' '+h[1]+' ('+n+'/6). '+h[2]+'.');
+    if(n>=6){addAura(67000,PL.x,PL.y+4,PL.z);const q=Q38();if(!X.hats.includes('💊'))X.hats.push('💊');save();SFX.win();chapter('STALE & UNFIT','THE TRUTH IS ON THE TABLE · new hat: 💊');setTimeout(()=>TALK.alfa(),1200);}},{lh:.36});p.gate=()=>!!Q38().clip;});})();
+// 30 red pills to swallow, and one blue one, somewhere, for the haters
+const RP_LINES=['💊 You now believe the moon landing was a podcast.','💊 You now understand "frame". You do not understand anything else.','💊 You feel an urge to buy a course.','💊 Your posture got worse. Your takes got hotter.','💊 You see the Matrix now. It has ads.','💊 You now say "high value" unironically.','💊 Side effects include: a microphone, a crate, a rented Lambo.','💊 You are now 0.1 inches taller (spiritually).'];
+(function(){const A=POD.A,r=mulberry(4113);for(let k=0;k<30;k++){const a=r()*TAU,R=4+r()*(A.r+20),x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R;if(Math.hypot(x,z)>WORLD_R-10){k--;continue;}const y=groundH(x,z)+(r()<.25?2.5+r()*3:0);
+  pick38('rp',k,x,y,z,'💊',1.1,null,null,(n)=>{SFX.orb(n%9);addAura(67,x,y+2,z);toast(pick(RP_LINES)+' ('+n+'/30)');if(n>=30){addAura(30000,PL.x,PL.y+4,PL.z);SFX.win();chapter('FULLY RED-PILLED','30/30 · you are now insufferable at parties');}});}
+  const bx=A.x-A.r-9,bz=A.z+6;const s=A38.add(emojiSprite('🔵',1.2));s.position.set(bx,groundH(bx,bz)+1.2,bz);POD.blue={x:bx,z:bz,s};})();
+
+/* ---------------- 2. THE FILLER, defined: slop curtains at the edge, the Matrix leaking through ---------------- */
+const MTX={tex:null,curtain:null,cols:[],cubes:[],t:0};
+(function(){const cv=document.createElement('canvas');cv.width=128;cv.height=256;const g=cv.getContext('2d');g.fillStyle='rgba(0,0,0,0)';g.clearRect(0,0,128,256);const ch='ｱｲｳｴｵｶｷｸｹｺ01670SLOP<>/\\#$%';
+  for(let c=0;c<8;c++)for(let i=0;i<16;i++){const a=Math.random();g.fillStyle='rgba(64,255,112,'+(.25+a*.75).toFixed(2)+')';g.font='bold 15px monospace';g.fillText(ch[Math.floor(Math.random()*ch.length)],c*16+2,i*16+14);}
+  const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;MTX.tex=t;
+  // the curtain: wherever the content stops and the Filler starts, a translucent wall of slop with the Matrix running down it
+  const pos=[],uv=[],H=10;const seg=(x1,z1,x2,z2)=>{const y1=groundH(x1,z1)-.5,y2=groundH(x2,z2)-.5,L=Math.hypot(x2-x1,z2-z1)/6;pos.push(x1,y1,z1,x2,y2,z2,x2,y2+H,z2,x1,y1,z1,x2,y2+H,z2,x1,y1+H,z1);uv.push(0,0,L,0,L,1,0,0,L,1,0,1);};
+  const edge=(cx,cz,R,step)=>{const n=Math.ceil(TAU*R/step);for(let i=0;i<n;i++){const a1=i/n*TAU,a2=(i+1)/n*TAU,am=(a1+a2)/2,ox=cx+Math.cos(am)*(R+1.2),oz=cz+Math.sin(am)*(R+1.2),ix=cx+Math.cos(am)*(R-1.2),iz=cz+Math.sin(am)*(R-1.2);
+    if(Math.hypot(ox,oz)>WORLD_R-2)continue;if(inFillerXZ(ox,oz)!==inFillerXZ(ix,iz))seg(cx+Math.cos(a1)*R,cz+Math.sin(a1)*R,cx+Math.cos(a2)*R,cz+Math.sin(a2)*R);}};
+  edge(0,0,FIL.R0,4);AREAS.forEach(a=>edge(a.x,a.z,a.r+7,3.5));ZONES.forEach(z=>edge(z.x,z.z,ZR*.95,4));if(FIL.cc)edge(FIL.cc.x,FIL.cc.z,FIL.safe,2);
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+  const mat=new THREE.ShaderMaterial({uniforms:{time:U.time,map:{value:t}},transparent:true,depthWrite:false,side:THREE.DoubleSide,
+    vertexShader:'varying vec2 vU;varying vec3 vW;void main(){vU=uv;vW=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'uniform float time;uniform sampler2D map;varying vec2 vU;varying vec3 vW;void main(){vec4 m=texture2D(map,vec2(vU.x*1.5,vU.y*.7+time*.35));float drip=.5+.5*sin(vU.x*9.+sin(vU.x*3.)*2.+time*1.3);vec3 slop=mix(vec3(.85,.78,.55),vec3(.55,.75,.35),drip);float edgeA=smoothstep(1.,.5,vU.y)*(.42+.14*sin(time*3.+vU.x*2.));vec3 c=mix(slop,vec3(.25,1.,.45),m.a*.9);gl_FragColor=vec4(c,edgeA+m.a*.35*smoothstep(1.,.3,vU.y));}'});
+  MTX.curtain=A38.add(new THREE.Mesh(geo,mat));
+  // Matrix rain columns and glitch cubes, out in the nothing
+  const r=mulberry(9090),cm=new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,side:THREE.DoubleSide,color:0x40ff70});
+  for(let k=0,n=0;k<3000&&n<70;k++){const a=r()*TAU,R=FIL.R0+10+r()*(WORLD_R-FIL.R0-20),x=Math.cos(a)*R,z=Math.sin(a)*R;if(!inFillerXZ(x,z)||areaEdge(x,z)<8)continue;if(MTX.cols.some(c=>Math.hypot(c.x-x,c.z-z)<18))continue;n++;
+    const h=14+r()*26,p=A38.add(new THREE.Mesh(new THREE.PlaneGeometry(3,h),cm));p.position.set(x,groundH(x,z)+h/2,z);p.rotation.y=r()*TAU;MTX.cols.push({x,z,p});}
+  const cg=new THREE.BoxGeometry(1,1,1);for(let k=0,n=0;k<3000&&n<90;k++){const a=r()*TAU,R=FIL.R0+6+r()*(WORLD_R-FIL.R0-12),x=Math.cos(a)*R,z=Math.sin(a)*R;if(!inFillerXZ(x,z))continue;n++;
+    const s=.6+r()*3,m=A38.add(new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:new THREE.Color().setHSL(r(),1,.55),wireframe:r()<.5,transparent:true,opacity:.75})));m.scale.setScalar(s);const y=groundH(x,z)+1+r()*9;m.position.set(x,y,z);MTX.cubes.push({m,x,y,z,s,k:r()*10});}
+  // slop drips: translucent blobs of beige
+  const blobs=[];for(let k=0,n=0;k<2000&&n<60;k++){const a=r()*TAU,R=FIL.R0+8+r()*(WORLD_R-FIL.R0-16),x=Math.cos(a)*R,z=Math.sin(a)*R;if(!inFillerXZ(x,z))continue;n++;const s=1.5+r()*4;blobs.push(pt(Sph(s,10,7),0xd8c8a0,M(x,groundH(x,z)-s*.35,z,0,0,0,1,.45,1)));}
+  A38.add(new THREE.Mesh(merge(blobs),new THREE.MeshPhongMaterial({vertexColors:true,transparent:true,opacity:.7,shininess:120})));
+  const st=document.createElement('style');st.textContent='#mtxo{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:0;font:bold 14px/1 monospace;color:#40ff70;overflow:hidden;white-space:pre;mix-blend-mode:screen;transition:opacity .3s}#app.filler #mtxo{opacity:.35}#app.cine #mtxo{display:none}';document.head.appendChild(st);
+  const o=document.createElement('div');o.id='mtxo';$('app').appendChild(o);MTX.o=o;})();
+function mtxUpdate(dt){const t=S.t;MTX.tex.offset.y=-t*.6;if(app.classList.contains('filler')){MTX.t-=dt;if(MTX.t<=0){MTX.t=.12;const ch='ｱｲｳｴｵｶｷｸｹｺ0167SLOPFILLER';let s='';for(let i=0;i<30;i++){for(let j=0;j<60;j++)s+=Math.random()<.12?ch[Math.floor(Math.random()*ch.length)]:' ';s+='\n';}MTX.o.textContent=s;}}
+  if(S.inPk)return;for(const c of MTX.cubes){if(Math.hypot(PL.x-c.x,PL.z-c.z)>140)continue;const g=Math.sin(t*7+c.k)>.7;c.m.visible=!(Math.sin(t*13+c.k*3)>.92);c.m.position.set(c.x+(g?(Math.random()-.5)*1.5:0),c.y+Math.sin(t+c.k)*.6,c.z);c.m.rotation.set(t*.3+c.k,t*.5,0);if(g)c.m.material.color.setHSL(Math.random(),1,.55);}}
+
+/* ---------------- 3. THE SIDEQUEST: a course that goes sideways, over a lake of slop ---------------- */
+SPEAK.ref={name:'THE REF (AI)',face:'🏁',pitch:180,wave:'square'};BARK.ref=['THE FLOOR IS SLOP.','NO BOOSTING. LEGS ONLY. SIDEWAYS ONLY.','IT IS NOT HIGH. IT IS LONG.','RECORD: '+'???','I AM A REFEREE. I WAS TRAINED ON CLIPS OF FALLS.'];
+const SQ={A:null,gy:0,lake:0,mov:[],blink:[],spin:null,bounce:[],fans:[],shrink:[],cps:[],cp:-1,run:false,t:0,fin:null,under:null};
+(function(){const A=ABY.course,gy=groundH(A.x,A.z),add=A38.add,r=mulberry(5151);A.gy=gy;SQ.A=A;SQ.gy=gy;SQ.lake=gy+.9;
+  const lk=add(new THREE.Mesh(new THREE.CircleGeometry(A.r-5,48),new THREE.MeshPhongMaterial({color:0x8a9a40,transparent:true,opacity:.82,shininess:140,emissive:0x1a2a00})));lk.rotation.x=-Math.PI/2;lk.position.set(A.x,SQ.lake,A.z);SQ.lakeM=lk;
+  const ttl=add(textSprite(['THE SIDEQUEST','it goes sideways, for once · the floor is slop'],1.8,{color:'#b6ff00'}));ttl.position.set(A.x,gy+16,A.z);
+  // the route: round the lake, then in to the hub. Every section is a different way to fail.
+  const Y=gy+4.5,pts=[];for(let i=0;i<=46;i++){const a=Math.PI*.9+i/46*TAU*.86,R=A.r-9-(i>40?(i-40)*2.2:0);pts.push({x:A.x+Math.cos(a)*R,z:A.z+Math.sin(a)*R});}
+  const kinds=['start','plain','plain','move','move','move','plain','cp','blink','blink','blink','blink','plain','shrink','shrink','shrink','cp','bounce','gap','gap','plain','fan','fan','fan','plain','cp','move','blink','move','blink','plain','shrink','move','shrink','cp','fan','blink','fan','plain','plain','plain','plain','plain','plain','plain','plain','hub'];
+  const sm=new THREE.MeshLambertMaterial({color:0xb6ff00}),mm=new THREE.MeshLambertMaterial({color:0x19e3ff}),bm=new THREE.MeshLambertMaterial({color:0xff2e88}),fm=new THREE.MeshLambertMaterial({color:0xffd400}),km=new THREE.MeshLambertMaterial({color:0xff9a20}),cpm=new THREE.MeshLambertMaterial({color:0xffffff});
+  const disc=(rad,mat,x,y,z)=>{const m=add(new THREE.Mesh(new THREE.CylinderGeometry(rad,rad*.9,.6,20),mat));m.position.set(x,y-.3,z);return m;};
+  pts.forEach((p,i)=>{const k=kinds[i]||'plain';if(k==='gap')return;const y=Y+Math.sin(i*.7)*.8;
+    if(k==='hub'){const m=disc(7,cpm,p.x,y,p.z);const pf={x:p.x,z:p.z,r:7,top:y};platforms.push(pf);SQ.hub={x:p.x,z:p.z,y};
+      const bar=add(new THREE.Mesh(Box(13,.9,.9),new THREE.MeshLambertMaterial({color:0xff2e2e})));bar.position.set(p.x,y+.8,p.z);const bl=textSprite('RATIO BAR',.6,{color:'#ff2e2e'});bl.position.y=1.4;bar.add(bl);SQ.spin={m:bar,x:p.x,z:p.z,y,a:0};
+      const tr=add(emojiSprite('🏆',3));tr.position.set(p.x,y+3.4,p.z);SQ.fin={x:p.x,z:p.z,y,s:tr};return;}
+    if(k==='move'){const ax=Math.cos(i*1.7),az=Math.sin(i*1.7),m=disc(2,mm,p.x,y,p.z),pf={x:p.x,z:p.z,r:2,top:y};platforms.push(pf);SQ.mov.push({m,pf,bx:p.x,bz:p.z,ax,az,amp:3.2,sp:1+r()*.8,ph:r()*TAU,px:p.x,pz:p.z});return;}
+    if(k==='blink'){const m=disc(1.9,fm,p.x,y,p.z),pf={x:p.x,z:p.z,r:1.9,top:y};platforms.push(pf);const l=textSprite('BUFFERING',.36,{color:'#ffd400'});l.position.y=1.1;m.add(l);SQ.blink.push({m,pf,y,t:-1,off:0});return;}
+    if(k==='shrink'){const m=disc(2.4,km,p.x,y,p.z),pf={x:p.x,z:p.z,r:2.4,top:y};platforms.push(pf);const l=textSprite('ATTENTION SPAN',.34,{color:'#ff9a20'});l.position.y=1.1;m.add(l);SQ.shrink.push({m,pf,ph:i});return;}
+    if(k==='bounce'){const m=disc(2,bm,p.x,y,p.z),pf={x:p.x,z:p.z,r:2,top:y};platforms.push(pf);const nx=pts[i+3]||p,d=Math.hypot(nx.x-p.x,nx.z-p.z)||1;const l=textSprite('TAKE LAUNCHER',.36,{color:'#ff2e88'});l.position.y=1.2;m.add(l);SQ.bounce.push({x:p.x,z:p.z,y,dx:(nx.x-p.x)/d,dz:(nx.z-p.z)/d,d});return;}
+    const m=disc(k==='cp'||k==='start'?3:2.2,k==='cp'||k==='start'?cpm:sm,p.x,y,p.z);platforms.push({x:p.x,z:p.z,r:k==='cp'||k==='start'?3:2.2,top:y});
+    if(k==='fan'){const n=pts[i+1]||p,tx=-(n.z-p.z),tz=n.x-p.x,d=Math.hypot(tx,tz)||1;const fan=add(emojiSprite('🌬️',1.6));fan.position.set(p.x-tx/d*4,y+1.2,p.z-tz/d*4);const l=add(textSprite('ALGORITHM PUSH',.4,{color:'#9ffcff'}));l.position.set(p.x-tx/d*4,y+2.6,p.z-tz/d*4);SQ.fans.push({x:p.x,z:p.z,y,dx:tx/d,dz:tz/d});}
+    if(k==='cp'||k==='start'){const f=add(emojiSprite(k==='start'?'🚦':'🚩',1.8));f.position.set(p.x,y+1.6,p.z);SQ.cps.push({x:p.x,z:p.z,y,i:SQ.cps.length});}});
+  // a bridge from the shore to the start, and the ref
+  const s0=pts[0],dx=s0.x-A.x,dz=s0.z-A.z,d0=Math.hypot(dx,dz);for(let j=1;j<=3;j++){const x=s0.x+dx/d0*j*3.6,z=s0.z+dz/d0*j*3.6,y=Y-.6*j;disc(1.8,sm,x,y,z);platforms.push({x,z,r:1.8,top:y});}
+  const rx=s0.x+dx/d0*16,rz=s0.z+dz/d0*16;const g=person38({coat:0xffffff,legs:0x101014,cap:0x101014,extra:[pt(Box(.5,.06,.04),0x101014,M(0,.75,.27)),pt(Box(.5,.06,.04),0x101014,M(0,.6,.27))]},2.2);addCustomNpc('ref','THE REF (AI)','🏁',180,'square',rx,rz,Math.atan2(s0.x-rx,s0.z-rz),g,{col:'#b6ff00'});
+  // twenty side quest discs, mostly on the worst platforms
+  const spots=pts.filter((p,i)=>['blink','move','shrink','fan','gap'].includes(kinds[i])||i%4===0);for(let k=0;k<20;k++){const p=spots[k%spots.length],j=k>=spots.length;const x=p.x+(j?1.2:0),z=p.z+(j?-1.2:0),y=Y+Math.sin(pts.indexOf(p)*.7)*.8+(j?3.2:.4);
+    pick38('disc',k,x,y,z,'💿',1.1,null,null,(n)=>{SFX.orb(n%9);addAura(350,x,y+2,z);floatText('SIDE QUEST '+n+'/20',x,y+3,z,'#b6ff00');if(n>=20){addAura(20000,PL.x,PL.y+4,PL.z);SFX.win();chapter('THE SIDEQUEST','20/20 discs · every side quest, no main quest');}},{r:1.8});}})();
+function onCourse(){const A=SQ.A;return A&&!S.inPk&&Math.hypot(PL.x-A.x,PL.z-A.z)<A.r-3&&PL.y<SQ.gy+14;}
+function crsUpdate(dt,play){const A=SQ.A;if(!A)return;const near=Math.hypot(PL.x-A.x,PL.z-A.z)<A.r+30&&!S.inPk;const t=S.t;
+  // carry the player on whatever they stand on
+  let carry=null;if(near&&PL.grounded){for(const m of SQ.mov)if(Math.abs(PL.y-m.pf.top)<.15&&Math.hypot(PL.x-m.pf.x,PL.z-m.pf.z)<m.pf.r){carry=m;break;}}
+  SQ.mov.forEach(m=>{m.px=m.pf.x;m.pz=m.pf.z;const o=Math.sin(t*m.sp+m.ph)*m.amp;m.pf.x=m.bx+m.ax*o;m.pf.z=m.bz+m.az*o;m.m.position.x=m.pf.x;m.m.position.z=m.pf.z;});
+  if(carry&&play){PL.x+=carry.pf.x-carry.px;PL.z+=carry.pf.z-carry.pz;}
+  if(!near)return;
+  SQ.blink.forEach(b=>{const on=PL.grounded&&Math.abs(PL.y-b.y)<.15&&Math.hypot(PL.x-b.pf.x,PL.z-b.pf.z)<b.pf.r;if(on&&b.t<0&&!b.off){b.t=.75;}if(b.t>=0){b.t-=dt;b.m.material.opacity=1;b.m.visible=Math.floor(b.t*16)%2===0;if(b.t<0){b.off=2.6;b.pf.top=-9999;b.m.visible=false;}}
+    if(b.off>0){b.off-=dt;if(b.off<=0){b.off=0;b.pf.top=b.y;b.m.visible=true;b.t=-1;}}});
+  SQ.shrink.forEach(s=>{const k=.35+.65*(.5+.5*Math.sin(t*1.4+s.ph));s.m.scale.set(k,1,k);s.pf.r=2.4*k;});
+  if(SQ.spin){const sp=SQ.spin;sp.a+=dt*1.6;sp.m.rotation.y=sp.a;if(play&&Math.abs(PL.y-sp.y)<1.6&&PL.inv<=0){const dx=PL.x-sp.x,dz=PL.z-sp.z,d=Math.hypot(dx,dz);if(d<6.5){const ca=Math.cos(-sp.a),sa=Math.sin(-sp.a),lx=dx*ca-dz*sa,lz=dx*sa+dz*ca;if(Math.abs(lz)<.9){PL.kx=-Math.sin(sp.a)*24*Math.sign(lx||1);PL.kz=Math.cos(sp.a)*24*Math.sign(lx||1);PL.vy=8;PL.grounded=false;PL.inv=.4;SFX.hit();floatText('RATIO\'D',PL.x,PL.y+3,PL.z,'#ff2e2e');}}}}
+  if(play){for(const b of SQ.bounce)if(PL.grounded&&Math.abs(PL.y-b.y)<.15&&Math.hypot(PL.x-b.x,PL.z-b.z)<2){PL.vy=17;PL.kx=b.dx*b.d*1.15;PL.kz=b.dz*b.d*1.15;PL.grounded=false;SFX.jump2();floatText('LAUNCHED',PL.x,PL.y+3,PL.z,'#ff2e88');}
+    for(const f of SQ.fans)if(Math.hypot(PL.x-f.x,PL.z-f.z)<4&&Math.abs(PL.y-f.y)<4){PL.x+=f.dx*7*dt;PL.z+=f.dz*7*dt;}}
+  if(!play)return;SQ.cps.forEach(c=>{if(c.i>SQ.cp&&Math.hypot(PL.x-c.x,PL.z-c.z)<3&&Math.abs(PL.y-c.y)<2){if(c.i===0){SQ.run=true;SQ.t=0;}else toast('🚩 CHECKPOINT '+c.i+'/4');SQ.cp=c.i;SFX.page();}});
+  if(SQ.run)SQ.t+=dt;
+  // into the slop
+  if(onCourse()&&PL.y<SQ.lake+.3&&Math.hypot(PL.x-A.x,PL.z-A.z)<A.r-5){const c=SQ.cps[Math.max(0,SQ.cp)]||SQ.cps[0];warpTo(c.x,c.z,c.y,undefined);toast(pick(['🤢 You fell in the slop. It is warm. Do not think about why.','🤢 SLOP DUNK. The ref has clipped it.','🤢 Sideways is harder than up. Who knew.','🤢 Back to the last flag. The slop remembers you.']));}
+  if(SQ.fin&&Math.hypot(PL.x-SQ.fin.x,PL.z-SQ.fin.z)<2.2&&Math.abs(PL.y-SQ.fin.y)<2.5&&SQ.cp>=1){const q=Q38(),tm=SQ.run?SQ.t:0;SQ.run=false;SQ.cp=-1;const first=!q.cdone;q.cdone=(q.cdone||0)+1;const best=!q.cbest||tm<q.cbest;if(tm&&best)q.cbest=+tm.toFixed(2);
+    if(first){if(!X.hats.includes('🏁'))X.hats.push('🏁');addAura(25000,PL.x,PL.y+4,PL.z);SFX.win();chapter('THE SIDEQUEST','CLEARED · '+(tm?tm.toFixed(1)+' s':'')+' · new hat: 🏁');}else{addAura(2000,PL.x,PL.y+4,PL.z);SFX.relic();toast('🏁 '+(tm?tm.toFixed(1)+' s'+(best?' · NEW RECORD':' · record '+q.cbest+' s'):'cleared')+'. The ref is unimpressed. The ref is an AI.');}save();warpTo(SQ.cps[0].x,SQ.cps[0].z,SQ.cps[0].y);}}
+{const jf=jamFly;jamFly=function(){if(onCourse()&&PL.y>SQ.gy+2){if(inp.jh&&!PL.grounded&&S.t-(SQ.jm||0)>10){SQ.jm=S.t;toast('🏁 No boosting on the Sidequest. Sideways. With legs.');}return true;}return jf();};}
+TALK.ref=()=>{const q=Q38();say([['ref','WELCOME TO THE SIDEQUEST. EVERY OTHER COURSE GOES UP. THIS ONE GOES ACROSS.'],['ref','BLUE ONES MOVE. YELLOW ONES ARE BUFFERING. ORANGE ONES ARE YOUR ATTENTION SPAN. PINK ONES THROW YOU. THE FANS ARE THE ALGORITHM. THE BAR IS A RATIO.'],
+  ['ref',q.cbest?'YOUR RECORD: '+q.cbest+' SECONDS. THE RECORD TO BEAT IS 67. IT IS ALWAYS 67.':'THE FLOOR IS SLOP. NO BOOSTING. GOOD LUCK. I WILL BE CLIPPING YOUR FALLS FOR A COMPILATION.']]);};
+
+/* ---------------- 4. THE TUNNELS: nobody knows who is down there (it is NPCs, mattresses, and gold) ---------------- */
+SPEAK.yt={name:'A YOUTUBER',face:'📹',pitch:230,wave:'square'};SPEAK.tnpc={name:'A TUNNEL NPC',face:'🫥',pitch:90,wave:'sine'};
+BARK.yt=['NO ONE KNOWS WHO IS DOWN IN THE TUNNELS','guys... GUYS... another mattress','we are going DEEPER (sponsored by a VPN)','SMASH LIKE if you think this is a cult','this is NOT clickbait (it is clickbait)','part 47 of exploring the tunnels','do NOT go in the tunnels (link in bio)','he is SLIDING. why is he sliding.'];
+BARK.tnpc=['...','i live here','content?','the mattress is load bearing','we do not go up','you did not see me','*slides*','i have been aura farmed 4,000 times today'];
+const TUN={b:3400,cs:8,N:15,grid:null,man:[],lad:[],gold:[],mats:[],npcs:[],yts:[],start:null,posed:false,open:[]};PK.tun={b:TUN.b};ABY.pk_tun={id:'pk_tun',name:'THE TUNNELS',sub:'no one knows who is down here',hue:.1,lit:.15};
+(function(){const b=TUN.b,N=TUN.N,cs=TUN.cs,add=A38.add,r=mulberry(7070),G=[];for(let i=0;i<N;i++){G.push([]);for(let j=0;j<N;j++)G[i].push(1);}
+  // carve a maze between odd cells, then knock out extra walls so it loops
+  const st=[[1,1]];G[1][1]=0;while(st.length){const [i,j]=st[st.length-1],nb=[[2,0],[-2,0],[0,2],[0,-2]].map(d=>[i+d[0],j+d[1],d]).filter(q=>q[0]>0&&q[0]<N-1&&q[1]>0&&q[1]<N-1&&G[q[0]][q[1]]);
+    if(!nb.length){st.pop();continue;}const q=nb[Math.floor(r()*nb.length)];G[i+q[2][0]/2][j+q[2][1]/2]=0;G[q[0]][q[1]]=0;st.push([q[0],q[1]]);}
+  for(let k=0;k<12;k++){const i=1+Math.floor(r()*(N-2)),j=1+Math.floor(r()*(N-2));if((i+j)%2===1)G[i][j]=0;}
+  TUN.grid=G;const cx=i=>(i-(N-1)/2)*cs,open=[];for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(!G[i][j])open.push({i,j,x:cx(i),z:cx(j)});TUN.open=open;
+  const deg=(i,j)=>[[1,0],[-1,0],[0,1],[0,-1]].filter(d=>G[i+d[0]]&&G[i+d[0]][j+d[1]]===0).length;
+  const fl=add(new THREE.Mesh(new THREE.PlaneGeometry(N*cs,N*cs),new THREE.MeshLambertMaterial({color:0x3a3228})));fl.rotation.x=-Math.PI/2;fl.position.set(0,b,0);platforms.push({x:0,z:0,r:N*cs*.72,top:b});
+  const ce=add(new THREE.Mesh(new THREE.PlaneGeometry(N*cs,N*cs),new THREE.MeshLambertMaterial({color:0x1a1612,side:THREE.FrontSide})));ce.rotation.x=Math.PI/2;ce.position.set(0,b+10,0);
+  const W=[];for(let i=0;i<N;i++)for(let j=0;j<N;j++){if(!G[i][j])continue;const touches=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]].some(d=>G[i+d[0]]&&G[i+d[0]][j+d[1]]===0);if(!touches)continue;
+    W.push(pt(Box(cs,10,cs),(i*7+j*3)%5?0x4a3e30:0x5a4a36,M(cx(i),b+5,cx(j))),pt(Box(cs,.1,cs),0x120e0a,M(cx(i),b+10.06,cx(j))));colliders.push({x:cx(i),z:cx(j),r:cs*.56,top:b+10.5});
+    if(r()<.25)W.push(pt(Box(cs*.9,.4,.1),0x2a2420,M(cx(i),b+4.5,cx(j)+cs/2+.06)));}
+  add(new THREE.Mesh(merge(W),lam));
+  open.forEach((c,k)=>{if(k%5===0){const l=add(emojiSprite('💡',.9,false));l.position.set(c.x,b+5.4,c.z);}});
+  // ends of tunnels: ladders up to manholes, gold in the rest
+  const ends=open.filter(c=>deg(c.i,c.j)===1).sort((a,b2)=>Math.hypot(b2.x,b2.z)-Math.hypot(a.x,a.z));TUN.ends=ends;
+  // mattresses. everywhere. some have money under them.
+  const MP=[];for(let k=0;k<70;k++){const c=open[Math.floor(r()*open.length)],x=c.x+(r()-.5)*4,z=c.z+(r()-.5)*4,stack=1+Math.floor(r()*r()*4),ry=r()*Math.PI;for(let s=0;s<stack;s++){MP.push(pt(Box(2.2,.45,3.2),[0xe8e8f0,0xd8e0f8,0xf0e0d0][s%3],M(x,b+.25+s*.47,z,0,ry+s*.2,0)),pt(Box(2.25,.06,3.25),0x5a8ad8,M(x,b+.4+s*.47,z,0,ry+s*.2,0)));}
+    if(stack>1)platforms.push({x,z,r:1.3,top:b+stack*.47});TUN.mats.push({x,z,stack});}
+  add(new THREE.Mesh(merge(MP),lam));
+  // gold. hidden gold. down the dead ends and under mattresses.
+  const G2=ends.slice(5);for(let k=0;k<14;k++){const c=k<G2.length?G2[k]:open[Math.floor(r()*open.length)];const x=c.x,z=c.z;
+    pick38('gold',k,x,b,z,'🪙',1.6,['HIDDEN GOLD','nobody asks whose'],'#ffd400',(n)=>{SFX.relic();addAura(6700,x,b+3,z);toast('🪙 HIDDEN GOLD '+n+'/14. Nobody down here asks whose it is. Neither do you.');if(n>=14){addAura(100000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('🪙'))X.hats.push('🪙');save();SFX.win();chapter('THE TUNNELS','ALL THE GOLD · no one knows who is down here (it is you) · new hat: 🪙');}},{pk:'tun'});
+    const pile=add(new THREE.Mesh(merge([pt(Cone(1.2,1,6),0xd8a030,M(0,.5,0)),pt(Box(.9,.3,.4),0xffd400,M(.6,.15,.6,0,.5)),pt(Box(.9,.3,.4),0xffd400,M(-.5,.15,.7,0,-.3))]),lam));pile.position.set(x,b,z);TUN.gold.push({k,pile});}
+  // money under mattresses: you have to flip them (E)
+  const MC=TUN.mats.filter((m,i)=>i%7===3).slice(0,9);MC.forEach((m,k)=>{m.cash=k;});TUN.cashMats=MC;
+  // five ladders, each up to a manhole somewhere on the map
+  ends.slice(0,5).forEach((c,k)=>{const lg=add(new THREE.Mesh(merge([pt(Box(.15,6,.15),0x8a8e98,M(-.6,3,0)),pt(Box(.15,6,.15),0x8a8e98,M(.6,3,0)),...[0,1,2,3,4,5,6,7,8,9].map(s=>pt(Box(1.2,.1,.1),0x8a8e98,M(0,.4+s*.58,0)))]),lam));lg.position.set(c.x,b,c.z);
+    const l=add(textSprite(['🪜 LADDER','up to ???'],.45,{color:'#ffd400',fog:false}));l.position.set(c.x,b+4.8,c.z);const od=[[1,0],[-1,0],[0,1],[0,-1]].find(d=>G[c.i+d[0]]&&G[c.i+d[0]][c.j+d[1]]===0)||[0,1];TUN.lad.push({k,x:c.x,z:c.z,l,yaw:Math.atan2(od[0],od[1])});});
+  TUN.start=TUN.lad[0];
+  // the residents: NPCs who slide instead of walk, and the YouTubers who film them
+  for(let k=0;k<12;k++){const c=open[Math.floor(r()*open.length)];const g=person38({coat:0x8a8a94,legs:0x6a6a74,skin:0xb8b8c0,tpose:k%3===0},1.9);g.position.set(c.x,b,c.z);add(g);
+    const aura=textSprite('+67 AURA (FARMED)',.36,{color:'#c8c6d8',fog:false});aura.position.y=4.4;g.add(aura);TUN.npcs.push({g,aura,c,to:c,t:0,sp:3+r()*3,k,spin:k%3===0});}
+  for(let k=0;k<4;k++){const c=open[Math.floor(r()*open.length)];const g=person38({coat:[0xff2e2e,0x101014,0xffd400,0x19e3ff][k],legs:0x2a2a34,cap:[0x101014,0xff2e2e,0x101014,0xffd400][k],extra:[pt(Box(.45,.35,.5),0x101014,M(.35,1.1,.35)),pt(Cyl(.12,.12,.2,8),0x3a3a44,M(.35,1.1,.65,Math.PI/2))]},2);
+    g.position.set(c.x,b,c.z);add(g);const rl=new THREE.Mesh(Tor(.6,.06,6,20),new THREE.MeshBasicMaterial({color:0xffffff}));rl.position.set(-.4,3.2,.3);g.add(rl);const nl=textSprite(['📹 '+['UNCLE URBEX','NO CAP KYLE','THE TUNNEL GUY','MRS. CLICKBAIT'][k],'🔴 LIVE'],.4,{color:'#ff2e2e',fog:false});nl.position.y=5.2;g.add(nl);TUN.yts.push({g,k,tgt:null,bt:r()*4});}})();
+function tunCellFree(i,j){const G=TUN.grid;return G[i]&&G[i][j]===0;}
+function tunUpdate(dt,play){if(S.inPk!=='tun')return;if(cam.dist>12)cam.dist=12;if(cam.pitch>.5)cam.pitch=.5;const b=TUN.b,cs=TUN.cs,N=TUN.N,cx=i=>(i-(N-1)/2)*cs;
+  TUN.npcs.forEach(n=>{n.t+=dt*n.sp/cs;if(n.t>=1){n.c=n.to;n.t=0;const nb=[[1,0],[-1,0],[0,1],[0,-1]].map(d=>[n.c.i+d[0],n.c.j+d[1]]).filter(q=>tunCellFree(q[0],q[1]));const q=nb[Math.floor(Math.random()*nb.length)]||[n.c.i,n.c.j];n.to={i:q[0],j:q[1],x:cx(q[0]),z:cx(q[1])};}
+    const x=n.c.x+(n.to.x-n.c.x)*n.t,z=n.c.z+(n.to.z-n.c.z)*n.t;n.g.position.set(x,b,z);n.g.rotation.y=n.spin?S.t*3+n.k:Math.atan2(n.to.x-n.c.x,n.to.z-n.c.z);n.g.rotation.z=Math.sin(S.t*4+n.k)*.12;n.x=x;n.z=z;});
+  TUN.yts.forEach(y=>{if(!y.tgt||Math.random()<dt*.05)y.tgt=TUN.npcs[Math.floor(Math.random()*TUN.npcs.length)];const t=y.tgt,dx=t.x-y.g.position.x,dz=t.z-y.g.position.z,d=Math.hypot(dx,dz);if(d>4.5){y.g.position.x+=dx/d*Math.min(d-4.5,6*dt);y.g.position.z+=dz/d*Math.min(d-4.5,6*dt);}
+    y.g.rotation.y=Math.atan2(dx,dz);y.bt-=dt;if(y.bt<=0&&play&&Math.hypot(PL.x-y.g.position.x,PL.z-y.g.position.z)<26){y.bt=4+Math.random()*4;bubble(pick(BARK.yt),y.g.position.x,b+5.8,y.g.position.z);}});
+  if(play&&Math.random()<dt*.25){const n=TUN.npcs.find(q=>Math.hypot(PL.x-q.x,PL.z-q.z)<14);if(n)bubble(pick(BARK.tnpc),n.x,b+4.6,n.z);}
+  // aura farming: pose (R) next to a tunnel NPC while a YouTuber is filming
+  if(S.pose>0&&!TUN.posed){TUN.posed=true;const n=TUN.npcs.find(q=>Math.hypot(PL.x-q.x,PL.z-q.z)<7);const y=TUN.yts.find(q=>Math.hypot(PL.x-q.g.position.x,PL.z-q.g.position.z)<22);
+    if(n&&y){const q=Q38();q.farm=(q.farm||0)+1;save();addAura(1670,n.x,b+4,n.z);floatText('AURA FARMED ×'+q.farm,n.x,b+5,n.z,'#ffd400');bubble(pick(['HE IS AURA FARMING THE TUNNEL NPC','CLIP THAT','this is going to do numbers','we are witnessing history (it is a pose)']),y.g.position.x,b+5.8,y.g.position.z);
+      if(q.farm===10){if(!X.hats.includes('📹'))X.hats.push('📹');addAura(30000,PL.x,PL.y+4,PL.z);SFX.win();chapter('THE TUNNELS','10 NPCS AURA FARMED ON CAMERA · new hat: 📹');}}else if(n)toast('📹 Nobody is filming. An aura farmed in silence makes no sound.');}
+  if(S.pose<=0)TUN.posed=false;
+  if(play&&PL.y<b-25){const L=TUN.start;warpTo(L.x,L.z,b,0);toast('💀 you fell out of the tunnels. they are underground. this is getting embarrassing.');}}
+// five manholes on the map, each linked to a ladder below
+const MANHOLES=[['pod','the podcast\'s back door'],['slopc','under the Slop Center'],['course','by the Sidequest'],['basil','behind the Basilisk'],['back','through the Back Room (of course)']];
+(function(){MANHOLES.forEach((m,k)=>{const A=ABY[m[0]];if(!A)return;const a=Math.atan2(A.z,A.x)+(k%2?.5:-.5),x=A.x+Math.cos(a)*(A.r-3.5),z=A.z+Math.sin(a)*(A.r-3.5),y=groundH(x,z);
+  const g=A38.add(new THREE.Mesh(merge([pt(Cyl(1.4,1.4,.15,18),0x3a3a44,M(0,.08,0)),pt(Tor(1.3,.08,6,20),0x8a8e98,M(0,.16,0,Math.PI/2))]),lam));g.position.set(x,y,z);
+  const l=A38.add(textSprite(['🕳️ MANHOLE','do not open (open it)'],.45,{color:'#c8c6d8'}));l.position.set(x,y+2,z);TUN.man.push({k,x,z,y,name:A.name,sub:m[1],ox:Math.cos(a),oz:Math.sin(a)});if(TUN.lad[k])TUN.lad[k].l.material.map=textTex(['🪜 LADDER','up to '+A.name],{color:'#ffd400'});});})();
+function enterTun(k){if(!S.inPk)PK.cd=cam.dist;S.inPk='tun';const L=TUN.lad[k]||TUN.lad[0];warpTo(L.x,L.z,TUN.b,L.yaw||0,['THE TUNNELS','no one knows who is down here']);cam.dist=11;cam.pitch=.4;const q=Q38();
+  if(!q.tun){q.tun=1;save();setTimeout(()=>say([['sys','The manhole goes down further than the ground is thick. At the bottom: tunnels. Mattresses. Somebody\'s gold.'],['yt','GUYS. GUYS. NO ONE KNOWS WHO IS DOWN IN THE TUNNELS.'],['tnpc','...we are.'],['yt','SMASH LIKE.']]),400);}}
+function exitTun(k){const m=TUN.man[k]||TUN.man[0];S.inPk=null;if(PK.cd)cam.dist=PK.cd;warpTo(m.x+(m.ox||0)*3,m.z+(m.oz||0)*3,undefined,undefined,[m.name,'🕳️ back up the manhole']);}
+function flipMattress(m){const q=Q38();if(m.cash===undefined||q.cash.includes(m.cash)){SFX.hit();toast(pick(['🛏️ Under the mattress: another mattress.','🛏️ Under the mattress: a YouTuber. He says "guys".','🛏️ Nothing. The mattress is load bearing. Put it back.','🛏️ A note: "we do not go up". You put the mattress back.']));return;}
+  q.cash.push(m.cash);save();SFX.relic();addAura(4000,m.x,TUN.b+3,m.z);toast('💵 MONEY UNDER THE MATTRESS '+q.cash.length+'/9. The oldest bank in the world.');if(q.cash.length>=9){addAura(50000,PL.x,PL.y+4,PL.z);SFX.win();chapter('THE TUNNELS','9/9 MATTRESSES FLIPPED · you are the bank now');}}
+
+/* ---------------- 5. THE SLOP CENTER: get mogged, mewed and maxxed. Everything is glazed. ---------------- */
+SPEAK.mogger={name:'CHADWICK MOG',face:'🗿',pitch:70,wave:'sawtooth'};SPEAK.mew={name:'COACH MEW',face:'🤫',pitch:160,wave:'sine'};SPEAK.glazer={name:'THE GLAZER',face:'🍯',pitch:250,wave:'triangle'};SPEAK.smasher={name:'BONESMASH BRAD',face:'🔨',pitch:120,wave:'square'};
+BARK.mogger=['*exists* (you got mogged)','jawline: yes','I do not mew. the jaw mews for me.','height is a choice. I chose it.','you are being mogged in 4K','canthal tilt: positive. vibes: negative.'];
+BARK.mew=['tongue. on. the roof.','🤫🧏‍♂️','do not speak. mew.','I have not opened my mouth since 2019','mewing streak: 2,481 days'];
+BARK.glazer=['W','HIM.','GOAT','absolute cinema','MOTHER','no because who is HE','you dropped this: 👑','the GOAT of standing there','peak fiction','you ate and left no crumbs','he is so real for that'];
+BARK.smasher=['HAMMER = CHEEKBONES','+2 PSL PER BONK','do not try this at home (try it at home)','I am a 10 now (concussed)','bonk. ascend. bonk.'];
+const SLC={A:null,gy:0,bust:null,ham:null,smashT:0,mewPad:null,mew:0,glz:null,glaze:0,mirror:null,toilets:[],mog:null,ft:0};
+(function(){const A=ABY.slopc,gy=groundH(A.x,A.z),add=A38.add,r=mulberry(6161);A.gy=gy;SLC.A=A;SLC.gy=gy;
+  const glazeM=new THREE.MeshPhongMaterial({color:0xfff0f6,transparent:true,opacity:.78,shininess:160,specular:0xffffff,emissive:0x2a1a20});
+  const fl=add(new THREE.Mesh(new THREE.CylinderGeometry(A.r-2,A.r-1.5,.4,48),new THREE.MeshPhongMaterial({color:0xffc8e0,shininess:120})));fl.position.set(A.x,gy+.1,A.z);platforms.push({x:A.x,z:A.z,r:A.r-2,top:gy+.3});
+  add(textSprite(['THE SLOP CENTER','get mogged · get mewed · get maxxed · get glazed'],2,{color:'#ff5ab4'})).position.set(A.x,gy+24,A.z);
+  // the bust: a giant face, mid-bonesmash, looksmaxxing as hard as a statue can
+  const bg=add(new THREE.Group());bg.position.set(A.x,gy+.3,A.z);const sk=0xd8d0c8,P=[pt(Cyl(4,5,3,10),0xb8b0a8,M(0,1.5,0)),pt(Cyl(2.6,3.4,3,10),sk,M(0,4.5,0)),pt(Sph(5,18,14),sk,M(0,10,0,0,0,0,1,1.15,1)),
+    pt(Box(7.2,3.4,5.2),sk,M(0,6.4,1.2)),pt(Box(1.2,2.6,1.8),sk,M(0,9.6,5)),pt(Box(2.2,.7,.6),0xc89090,M(0,7.4,5.3)),pt(Box(1.8,.9,.4),0x101014,M(-1.8,11,4.6)),pt(Box(1.8,.9,.4),0x101014,M(1.8,11,4.6)),
+    pt(Box(3,.5,.5),sk,M(-1.8,12,4.5,0,0,-.18)),pt(Box(3,.5,.5),sk,M(1.8,12,4.5,0,0,.18)),pt(Sph(1.4,10,8),0xe8a0a0,M(3.6,9.4,3.6)),pt(Box(2.6,.5,.2),0xf0f0e8,M(3.4,10,4.6,0,0,.5)),pt(Box(.5,2.6,.2),0xf0f0e8,M(3.4,10,4.6,0,0,.5))];
+  bg.add(new THREE.Mesh(merge(P),lam));colliders.push({x:A.x,z:A.z,r:5.2,top:gy+16});
+  const bl=textSprite(['THE ASCENDED','PSL: 4.5 → 9.9 (in progress)'],1.1,{color:'#ffd400'});bl.position.y=17.5;bg.add(bl);SLC.bust={g:bg,l:bl};
+  // the hammer
+  const hm=new THREE.Group();hm.position.set(A.x+10,gy+12,A.z+2);add(hm);const hh=new THREE.Mesh(merge([pt(Box(.6,9,.6),0x6a4434,M(0,-4.5,0)),pt(Box(4,2.4,2.4),0x5a5e68,M(0,-9.2,0))]),lam);hm.add(hh);SLC.ham=hm;
+  const hl=add(textSprite(['🔨 BONESMASH STATION','E: take a swing (+PSL)'],.6,{color:'#ffd400'}));hl.position.set(A.x+11,gy+4,A.z+6);SLC.smashSpot={x:A.x+9,z:A.z+6};
+  // glaze: dripping off the bust, puddled on the floor, oozing down every surface
+  const GZ=[];for(let k=0;k<14;k++){const a=k/14*TAU,x=Math.cos(a)*4.2,z=Math.sin(a)*4.2;GZ.push(pt(Cyl(.35,.2,3+r()*5,6),0xfff0f6,M(x,10-2-r()*3,z)));}
+  GZ.push(pt(Sph(5.2,16,10,),0xfff0f6,M(0,12.4,0,0,0,0,1,.35,1)));const gz=new THREE.Mesh(merge(GZ),glazeM);gz.position.set(A.x,gy+.3,A.z);add(gz);
+  const PD=[];for(let k=0;k<40;k++){const a=r()*TAU,R=r()*(A.r+6),x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R,s=1+r()*3;PD.push(pt(Cyl(s,s,.08,14),0xfff0f6,M(x,groundH(x,z)+.36,z)));}add(new THREE.Mesh(merge(PD),glazeM));
+  // glazed jelly donuts the size of cars, as decoration, and 30 regular ones to eat
+  const DN=[];for(let k=0;k<12;k++){const a=k/12*TAU+.2,R=A.r-4,x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R,s=1.4+r()*1.4;DN.push(pt(Tor(s,s*.55,10,18),0xd89050,M(x,gy+s*.5+.3,z,Math.PI/2,0,0)),pt(Tor(s,s*.42,8,18,Math.PI*1.6),0xfff0f6,M(x,gy+s*.85+.3,z,Math.PI/2,0,r())),pt(Sph(s*.3,8,6),0xc8102e,M(x+s,gy+s*.6+.3,z)));colliders.push({x,z,r:s*1.5,top:gy+s*1.2});}
+  add(new THREE.Mesh(merge(DN),new THREE.MeshPhongMaterial({vertexColors:true,shininess:110})));
+  for(let k=0;k<30;k++){const a=r()*TAU,R=3+r()*(A.r+14),x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R;if(Math.hypot(x,z)>WORLD_R-10||Math.hypot(x-A.x,z-A.z)<6){k--;continue;}const y=groundH(x,z)+(r()<.2?3:0);
+    pick38('donut',k,x,y,z,'🍩',1.2,null,null,(n)=>{SFX.orb(n%9);S.snack=Math.max(S.snack||0,4);addAura(167,x,y+2,z);floatText(pick(['GLAZED','SUGAR RUSH','+1 BULK','JELLY MAXXED']),x,y+3,z,'#ff9ecf');if(n===30){addAura(30000,PL.x,PL.y+4,PL.z);SFX.win();chapter('THE SLOP CENTER','30/30 GLAZE JELLY DONUTS · you are 40% glaze by volume');}});}
+  // mini toilets, growing in rings like mushrooms. some of them have a head in them. they sing.
+  for(let k=0;k<20;k++){const a=k/20*TAU+r()*.2,R=A.r+2+r()*12;let x=A.x+Math.cos(a)*R,z=A.z+Math.sin(a)*R;if(Math.hypot(x,z)>WORLD_R-12){x=A.x+Math.cos(a)*(A.r-2);z=A.z+Math.sin(a)*(A.r-2);}const y=groundH(x,z);const T=[];
+    for(let j=0;j<5;j++){const ja=j/5*TAU,jx=Math.cos(ja)*1.4,jz=Math.sin(ja)*1.4,s=.35+r()*.35;T.push(pt(Cyl(s*.9,s*.6,s*1.2,10),0xf8f8ff,M(jx,s*.6,jz)),pt(Cyl(s*1.15,s*1.05,s*.3,12),0xf8f8ff,M(jx,s*1.3,jz)),pt(Box(s*1.4,s*1.4,s*.4),0xf0f0f8,M(jx,s*1.6,jz-s*.9)));}
+    const g=A38.add(new THREE.Mesh(merge(T),new THREE.MeshPhongMaterial({vertexColors:true,shininess:130})));g.position.set(x,y,z);const h=A38.add(emojiSprite(pick(['😗','🗣️','😛','🫦']),.9));h.position.set(x,y+1,z);SLC.toilets.push({k,x,z,y,h});
+    pick38('toilet',k,x,y,z,'🚽',.9,null,null,(n)=>{tone(220,.4,'sine',.1,0,80);addAura(267,x,y+2,z);toast(pick(['🚽 FLUSHED. The head goes down. It comes back up. It is singing.','🚽 Skibidi? No. Wrong game. Probably.','🚽 A shroom toilet. Do not eat it. (You flushed it.)','🚽 The toilet says "dop dop". You say nothing. You are an NPC.'])+' ('+n+'/20)');if(n>=20){if(!X.hats.includes('🚽'))X.hats.push('🚽');addAura(20000,PL.x,PL.y+4,PL.z);save();SFX.win();chapter('THE SLOP CENTER','20/20 TOILET SHROOMS FLUSHED · new hat: 🚽');}},{r:2.4});}
+  // swag: a drip rack. take it all.
+  const SW=[['⛓️','GOLD CHAIN','(plated) (with what)'],['🕶️','INDOOR SHADES','for the aura'],['💎','ICED GRILLZ','+3 mog'],['🧢','BACKWARDS CAP','+1 chaos'],['👟','RESELL SNEAKERS','do not walk in them'],['💍','PINKY RING','for pointing'],['⌚','FAKE ROLLY','it ticks'],['🧥','PUFFER (JULY)','sweat is drip']];
+  const rk=A38.add(new THREE.Mesh(merge([pt(Box(10,.3,.3),0xffd400,M(0,4,0)),pt(Box(.3,4,.3),0xffd400,M(-5,2,0)),pt(Box(.3,4,.3),0xffd400,M(5,2,0))]),lam));const ra=Math.atan2(A.z,A.x)+Math.PI*.6,rx=A.x+Math.cos(ra)*(A.r-7),rz=A.z+Math.sin(ra)*(A.r-7);rk.position.set(rx,gy+.3,rz);rk.rotation.y=-ra;
+  add(textSprite(['💰 THE DRIP RACK','swag is free here (it is fake)'],.7,{color:'#ffd400'})).position.set(rx,gy+6,rz);
+  SW.forEach((s,k)=>{const o=-4.4+k*1.25,x=rx+Math.cos(ra+Math.PI/2)*o,z=rz+Math.sin(ra+Math.PI/2)*o;pick38('swag',k,x,gy+1.6,z,s[0],1,[s[1],s[2]],'#ffd400',(n)=>{SFX.relic();addAura(800,x,gy+3,z);toast(s[0]+' '+s[1]+' · '+s[2]+' ('+n+'/8)');if(n>=8){if(!X.hats.includes('⛓️'))X.hats.push('⛓️');addAura(25000,PL.x,PL.y+4,PL.z);save();SFX.win();chapter('THE SLOP CENTER','FULL DRIP · 8/8 swag · new hat: ⛓️');}},{lh:.3,r:1});});
+  // the mewing booth, the mog mirror, the glaze fountain
+  const ma=Math.atan2(A.z,A.x)-Math.PI*.6,mx=A.x+Math.cos(ma)*(A.r-7),mz=A.z+Math.sin(ma)*(A.r-7);const mp=add(new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,.2,24),new THREE.MeshBasicMaterial({color:0x9ffcff,transparent:true,opacity:.5})));mp.position.set(mx,gy+.45,mz);
+  add(textSprite(['🤫 MEWING BOOTH','stand still · tongue on roof · 6 s'],.6,{color:'#9ffcff'})).position.set(mx,gy+4.4,mz);SLC.mewPad={x:mx,z:mz};
+  const ia=Math.atan2(A.z,A.x)+Math.PI,ix=A.x+Math.cos(ia)*(A.r-6),iz=A.z+Math.sin(ia)*(A.r-6);const mir=add(new THREE.Mesh(merge([pt(Box(4,6,.3),0xffd400,M(0,3,0)),pt(Box(3.4,5.4,.1),0xc8e8ff,M(0,3,.2))]),lam));mir.position.set(ix,gy+.3,iz);mir.rotation.y=Math.atan2(A.x-ix,A.z-iz);colliders.push({x:ix,z:iz,r:1.6,top:gy+6});
+  add(textSprite(['🪞 THE MOG MIRROR','E: get rated'],.6,{color:'#ffd400'})).position.set(ix,gy+7.4,iz);SLC.mirror={x:ix,z:iz};
+  const fa=Math.atan2(A.z,A.x)-Math.PI*.15,fx=A.x+Math.cos(fa)*(A.r-8),fz=A.z+Math.sin(fa)*(A.r-8);const fo=add(new THREE.Mesh(merge([pt(Cyl(2.6,3,1,16),0xffc8e0,M(0,.5,0)),pt(Cyl(.4,.6,3,8),0xffc8e0,M(0,2.5,0)),pt(Sph(.9,10,8),0xfff0f6,M(0,4.2,0))]),glazeM));fo.position.set(fx,gy+.3,fz);
+  add(textSprite(['🍯 THE GLAZE FOUNTAIN','stand in it · get glazed'],.6,{color:'#ff9ecf'})).position.set(fx,gy+6.2,fz);SLC.glz={x:fx,z:fz};
+  // the people
+  const cm=(id,short,o,x,z,col,s)=>{const g=person38(o,s||2.2);return addCustomNpc(id,short,SPEAK[id].face,SPEAK[id].pitch,SPEAK[id].wave,x,z,Math.atan2(A.x-x,A.z-z),g,{col:col||'#fff',ly:(s||2.2)*2.1+.6});};
+  SLC.mog=cm('mogger','CHADWICK MOG',{coat:0x101014,legs:0x2a2a34,hair:0x3a2414,skin:0xe8b088,extra:[pt(Box(.56,.3,.3),0xe8b088,M(0,.96,.12)),pt(Box(.5,.06,.04),0x050505,M(0,1.16,.29))]},A.x-9,A.z+7,'#ffd400',3.4);
+  cm('mew','COACH MEW',{coat:0x9ffcff,legs:0x2a2a34,cap:0x9ffcff},mx+3,mz+1,'#9ffcff');cm('glazer','THE GLAZER',{coat:0xff9ecf,dress:1,legs:0xe8b088,hair:0xffd400,bun:1},fx-3,fz+2,'#ff9ecf');
+  cm('smasher','BONESMASH BRAD',{coat:0x5a5e68,legs:0x2a2a34,skin:0xe8a0a0,armUp:1,extra:[pt(Box(.3,.3,.3),0xf0f0e8,M(.2,1.2,.27))]},SLC.smashSpot.x+2,SLC.smashSpot.z+2,'#ffd400');})();
+// PSL: start at 3, up to 10. Every station is worth one point, once.
+const PSL_ST=[['mew','🤫 Mewed for 6 seconds'],['smash','🔨 Bonesmashed 3 times'],['mirror','🪞 Got rated by the Mog Mirror'],['glaze','🍯 Got glazed at the fountain'],['donut','🍩 Ate 5 glaze jelly donuts (bulk)'],['swag','💰 Took 4 swag (drip)'],['toilet','🚽 Flushed 5 toilet shrooms']];
+function psl(){const q=Q38();return 3+PSL_ST.filter(s=>q.psl[s[0]]).length;}
+function pslGive(id){const q=Q38();if(q.psl[id])return;q.psl[id]=1;save();const n=psl();SFX.relic();addAura(3000,PL.x,PL.y+4,PL.z);toast('📈 PSL '+n+'/10 · '+PSL_ST.find(s=>s[0]===id)[1]);
+  if(n>=10&&!q.asc){q.asc=1;if(!X.hats.includes('🗿'))X.hats.push('🗿');save();addAura(100000,PL.x,PL.y+4,PL.z);SFX.win();app.classList.add('glitch');setTimeout(()=>app.classList.remove('glitch'),900);chapter('ASCENDED','PSL 10/10 · you mog the mogger now · new hat: 🗿');
+    setTimeout(()=>say([['mogger','...'],['mogger','bro.'],['sys','Chadwick Mog looks at you. Then down. He has to look down. He has never had to look down.'],['mogger','i am being mogged. in my own center.'],['glazer','HIM. HIM. IT IS HIM NOW. ABSOLUTE CINEMA.'],['mew','🤫 (proud mewing)']]),1200);}}
+function scUpdate(dt,play){const A=SLC.A;if(!A)return;const q=Q38(),d=Math.hypot(PL.x-A.x,PL.z-A.z);
+  if(q.donut.length>=5)pslGive('donut');if(q.swag.length>=4)pslGive('swag');if(q.toilet.length>=5)pslGive('toilet');
+  if(d>A.r+40||S.inPk)return;const t=S.t;
+  // the hammer bonks the cheekbone forever
+  SLC.smashT+=dt;const ph=(SLC.smashT%2.2)/2.2,sw=ph<.7?-.9+ph/.7*.2:ph<.8?-.7+(ph-.7)/.1*1.6:.9-(ph-.8)/.2*1.8;SLC.ham.rotation.z=sw;if(ph>.79&&ph<.8+dt/2.2){burst(A.x+4,SLC.gy+9.5,A.z+3.6,10,.1,6,3,.4);if(d<A.r+10)floatText(pick(['+0.5 PSL','BONK','CRACK (good)','CHEEKBONES ↑']),A.x+4,SLC.gy+12,A.z+3.6,'#ffd400');S.shake=Math.max(S.shake||0,d<20?.25:0);}
+  SLC.toilets.forEach(o=>{o.h.position.y=o.y+.9+Math.max(0,Math.sin(t*3+o.k))*.8;});
+  if(!play)return;
+  // getting mogged: stand near Chadwick before you ascend
+  const m=SLC.mog,md=Math.hypot(PL.x-m.x,PL.z-m.z);if(md<6){SLC.ft-=dt;if(SLC.ft<=0){SLC.ft=3;if(!q.asc){q.mog=(q.mog||0)+1;floatText('MOGGED',PL.x,PL.y+3,PL.z,'#ff2e2e');S.shake=.3;}else floatText('YOU MOG HIM NOW',m.x,m.y+8,m.z,'#ffd400');}}
+  m.g.scale.setScalar(q.asc?.7:1);
+  // the mewing booth: stand still for six seconds
+  if(Math.hypot(PL.x-SLC.mewPad.x,PL.z-SLC.mewPad.z)<2.4&&Math.hypot(PL.vx,PL.vz)<1){SLC.mew+=dt;if(Math.floor(SLC.mew)!==Math.floor(SLC.mew-dt))floatText('🤫 '+Math.floor(SLC.mew)+'/6',PL.x,PL.y+3.5,PL.z,'#9ffcff');if(SLC.mew>=6){SLC.mew=0;pslGive('mew');}}else SLC.mew=0;
+  // the glaze fountain: stand in it, get glazed with compliments
+  if(Math.hypot(PL.x-SLC.glz.x,PL.z-SLC.glz.z)<3.4){SLC.glaze+=dt;if(Math.random()<dt*5)bubble(pick(BARK.glazer),PL.x+(Math.random()-.5)*4,PL.y+3+Math.random()*3,PL.z+(Math.random()-.5)*4);if(SLC.glaze>=3)pslGive('glaze');}else SLC.glaze=0;}
+function scSmash(){const q=Q38();q.smash=(q.smash||0)+1;save();SFX.boom();S.shake=.6;burst(SLC.A.x+4,SLC.gy+9.5,SLC.A.z+3.6,26,.1,8,4,.6);addAura(670,PL.x,PL.y+4,PL.z);floatText('BONK ×'+q.smash,PL.x,PL.y+4,PL.z,'#ffd400');
+  bubble(pick(['+2 PSL','THE CHEEKBONES ARE RISING','he felt that (he is a statue)','one more. ONE MORE.']),SLC.A.x,SLC.gy+19,SLC.A.z);if(q.smash>=3)pslGive('smash');}
+function scMirror(){const n=psl(),q=Q38();pslGive('mirror');say([['sys','The Mog Mirror looks at you for a long time.'],['sys',n>=10?'RATING: 10/10. ASCENDED. THE MIRROR IS NOW MOGGED. IT CRACKS A LITTLE, OUT OF RESPECT.':'RATING: '+psl()+'/10. '+pick(['canthal tilt: undecided.','jawline: loading.','hunter eyes: prey eyes.','you are mid. the mirror is sorry.','bone structure: has bones. that is a start.'])],
+  ['sys','STATIONS: '+PSL_ST.map(s=>(q.psl[s[0]]?'✅':'⬜')+' '+s[1].split(' ').slice(1).join(' ')).join(' · ')]]);}
+TALK.mogger=()=>{const q=Q38();say(q.asc?[['mogger','...hey. king. can I get a photo. for my mom.']]:[['mogger','You are standing next to me. That was your first mistake.'],['mogger','I do not do anything. My jaw does it. You have been mogged '+(q.mog||0)+' times.'],['mogger','Come back at PSL ten. Ask the mirror what that means. It will be honest. It has no friends either.']]);};
+TALK.mew=()=>say([['mew','🤫'],['mew','...'],['sys','Coach Mew points at the booth. Then at his tongue. Then at the roof of his mouth. Then at you. Then at the booth again.'],['mew','🧏‍♂️ six seconds. no moving. no talking. you are good at no talking.']]);
+TALK.glazer=()=>say([['glazer','OH MY GOD it is HIM. it is the NPC. the GOAT of having no lines.'],['glazer','you are so real for walking over here. absolute cinema. peak fiction. you dropped this 👑'],['glazer','stand in my fountain and I will glaze you properly. it is warm. do not ask what it is.']]);
+TALK.smasher=()=>say([['smasher','BONESMASH STATION. You take the hammer. You hit the statue. The statue ascends. You ascend.'],['smasher','The statue has been bonked eleven million times. Its cheekbones are now load bearing.'],['smasher','Do not try this on your own face. (Everyone tries it on their own face.)']]);
+
+/* ---------------- wiring: interact, update, quest list, compass, codex, achievements, dev tools, warp pads ---------------- */
+{const ai=act15Interact;act15Interact=function(){if(S.dead)return ai();
+  if(S.inPk==='tun'){for(const L of TUN.lad)if(Math.hypot(PL.x-L.x,PL.z-L.z)<2.6)return{label:'🪜 CLIMB UP · '+(TUN.man[L.k]?TUN.man[L.k].name:'???'),fn:()=>exitTun(L.k)};
+    for(const m of TUN.mats)if(Math.hypot(PL.x-m.x,PL.z-m.z)<2.4)return{label:'🛏️ FLIP THE MATTRESS',fn:()=>flipMattress(m)};return ai();}
+  if(!S.inPk){for(const m of TUN.man)if(Math.hypot(PL.x-m.x,PL.z-m.z)<2.2&&Math.abs(PL.y-m.y)<3)return{label:'🕳️ CLIMB DOWN THE MANHOLE',fn:()=>enterTun(m.k)};
+    if(SLC.A){if(Math.hypot(PL.x-SLC.smashSpot.x,PL.z-SLC.smashSpot.z)<3.5)return{label:'🔨 TAKE A SWING AT THE BUST',fn:scSmash};if(Math.hypot(PL.x-SLC.mirror.x,PL.z-SLC.mirror.z)<3.4)return{label:'🪞 LOOK IN THE MOG MIRROR',fn:scMirror};}
+    if(POD.blue&&!Q38().blue&&Math.hypot(PL.x-POD.blue.x,PL.z-POD.blue.z)<2.4)return{label:'🔵 TAKE THE BLUE PILL',fn:()=>{const q=Q38();q.blue=1;save();POD.blue.s.visible=false;addAura(6700,PL.x,PL.y+4,PL.z);SFX.relic();
+      say([['sys','You take the blue pill. Nothing happens. You go outside. You touch grass. You feel fine.'],['alfa','(distant) HE TOOK THE BLUE ONE?? CUT THE STREAM. CUT THE STREAM.'],['steve','(distant) ...honestly? facts.']]);}};}
+  return ai();};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);picks38Update(dt,play);podWall(dt);podQuips(dt,play);clipUpdate(dt,play);mtxUpdate(dt);crsUpdate(dt,play);tunUpdate(dt,play);scUpdate(dt,play);if(POD.blue&&Q38().blue)POD.blue.s.visible=false;};}
+{const pu=pkUpdate;pkUpdate=function(dt,play){if(S.inPk==='tun')return;pu(dt,play);};}
+{const ct=compassTarget;compassTarget=function(){if(S.inPk==='tun'){const q=Q38(),g=PICK38.filter(p=>p.list==='gold'&&!q.gold.includes(p.i));if(!g.length)return{x:TUN.lad[0].x,z:TUN.lad[0].z,l:'A LADDER UP'};let b=g[0],bd=1e9;g.forEach(p=>{const d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;b=p;}});return{x:b.x,z:b.z,l:'HIDDEN GOLD · '+q.gold.length+'/14'};}return ct();};}
+{const ar=act7Rows;act7Rows=function(){const q=Q38(),v=id=>X.vis.includes(id),R=[];
+  if(v('pod')){R.push(['pod_clip','✂️ Stale & Unfit: farm 12 hot takes for THE CLIPPER',!!q.clip]);if(q.clip)R.push(['pod_hunt','🧾 Find the 6 things Don Alfa hides '+q.hunt.length+'/6',q.hunt.length>=6]);R.push(['pod_rp','💊 Red pills '+q.rp.length+'/30',q.rp.length>=30]);}
+  if(v('course'))R.push(['crs','🏁 Clear the Sidequest'+(q.cbest?' · best '+q.cbest+' s':'')+' · discs '+q.disc.length+'/20',!!q.cdone]);
+  if(v('slopc'))R.push(['psl','🗿 Looksmaxx to PSL 10 · now '+psl()+'/10',!!q.asc],['sc_more','🍩 Donuts '+q.donut.length+'/30 · 🚽 '+q.toilet.length+'/20 · 💰 '+q.swag.length+'/8',q.donut.length>=30&&q.toilet.length>=20&&q.swag.length>=8]);
+  if(q.tun)R.push(['tun','🪙 Tunnel gold '+q.gold.length+'/14 · 💵 mattresses '+q.cash.length+'/9 · 📹 farmed '+(q.farm||0)+'/10',q.gold.length>=14&&q.cash.length>=9&&(q.farm||0)>=10]);
+  return ar().concat(R);};}
+{const at=act7Target;act7Target=function(id){const q=Q38();if(id==='pod_clip')return{x:POD.cast.prod.x,z:POD.cast.prod.z,l:'THE CLIPPER'};if(id==='pod_hunt'){const p=PICK38.find(p=>p.list==='hunt'&&!q.hunt.includes(p.i));return p?{x:p.x,z:p.z,l:'SOMETHING HE HID'}:null;}
+  if(id==='pod_rp'){const p=PICK38.find(p=>p.list==='rp'&&!q.rp.includes(p.i));return p?{x:p.x,z:p.z,l:'A RED PILL'}:null;}if(id==='crs')return{x:SQ.cps[0].x,z:SQ.cps[0].z,l:'THE SIDEQUEST START'};
+  if(id==='psl'){if(!q.psl.mew)return{x:SLC.mewPad.x,z:SLC.mewPad.z,l:'MEWING BOOTH'};if(!q.psl.smash)return{x:SLC.smashSpot.x,z:SLC.smashSpot.z,l:'BONESMASH STATION'};if(!q.psl.glaze)return{x:SLC.glz.x,z:SLC.glz.z,l:'GLAZE FOUNTAIN'};return{x:SLC.mirror.x,z:SLC.mirror.z,l:'THE MOG MIRROR'};}
+  if(id==='sc_more'){const p=PICK38.find(p=>['donut','toilet','swag'].includes(p.list)&&!q[p.list].includes(p.i));return p?{x:p.x,z:p.z,l:'MORE SLOP'}:null;}if(id==='tun'){const m=TUN.man[0];return{x:m.x,z:m.z,l:'A MANHOLE'};}return at(id);};}
+CX.push(['w_pod','WORLD','Stale & Unfit','The high value podcast. Three hours, no edits, one rented Lambo. Don Alfa asks the panel what they bring to the table; the panel brings the table. Sidekick Steve says facts. Outside, a rally for men, who are loved, by the rally. Red pills everywhere. One blue one, somewhere, for the haters.',()=>X.vis.includes('pod')],
+  ['w_filler2','WORLD','The Filler, Defined','You can see it now: a translucent wall of slop where the content stops, with the Matrix running down it. Inside: glitch cubes, rain made of katakana and the number 67, and beige blobs nobody finished. It is ultra slop. It was always ultra slop. Now it is labelled.',()=>!!X.c.filled||(X.fb||[]).length>0],
+  ['w_crs','WORLD','The Sidequest','Every other course goes up. This one goes across, over a lake of warm slop. Moving platforms, buffering platforms, your attention span, take launchers, the algorithm pushing you sideways and a ratio bar at the end. No boosting. The ref is an AI trained on clips of falls.',()=>X.vis.includes('course')],
+  ['w_tun','WORLD','The Tunnels','Under the map, through five manholes: tunnels, mattresses, and gold that nobody asks about. The NPCs down here slide instead of walk. YouTubers film them and say that no one knows who is down in the tunnels. It is them. It was always them.',()=>!!Q38().tun],
+  ['w_slopc','WORLD','The Slop Center','Get mogged, mewed and maxxed. A giant bust is being bonesmashed into a higher PSL by a hammer that never stops. Everything is glazed, including you, with compliments. Glaze jelly donuts, toilet shrooms that sing, and a drip rack of fake swag.',()=>X.vis.includes('slopc')]);
+CAST_CX.push(['alfa','🕶️','DON ALFA','Host of Stale & Unfit. Six foot (on a crate). Lives in a mansion (his mom\'s). Asks what you bring to the table. Brings nothing.'],['steve','🎙️','SIDEKICK STEVE','Co-host. Has said "facts" 2.1 million times. Disagreed once, in 2022. The stream went down.'],
+  ['mogger','🗿','CHADWICK MOG','Has a jawline that does the talking. Mogs you by standing there. Can be mogged back, eventually.'],['glazer','🍯','THE GLAZER','Thinks you are HIM. Thinks everyone is HIM. Runs a fountain. Do not ask what is in it.'],['ref','🏁','THE REF (AI)','Referees the Sidequest. Trained on clips of falls. Is compiling yours.'],['yt','📹','THE TUNNEL YOUTUBERS','Four of them. They film the tunnel NPCs. No one knows who is down in the tunnels. It is them, filming.']);
+ACH.push(['podclip','Clip Farmer','farmed 12 hot takes',()=>!!Q38().clip],['podhunt','Brought The Truth To The Table','found all 6 of Don Alfa\'s secrets',()=>Q38().hunt.length>=6],['rp30','Insufferable','swallowed all 30 red pills',()=>Q38().rp.length>=30],['blue','Touched Grass','took the blue pill',()=>!!Q38().blue],
+  ['crs','Sideways','cleared the Sidequest',()=>!!Q38().cdone],['crs67','Under 67','cleared the Sidequest in under 67 seconds',()=>Q38().cbest>0&&Q38().cbest<67],['disc20','Every Side Quest','got all 20 discs on the Sidequest',()=>Q38().disc.length>=20],
+  ['tun','Nobody Knows','went down a manhole',()=>!!Q38().tun],['gold14','Whose Gold','found all 14 piles of tunnel gold',()=>Q38().gold.length>=14],['cash9','The Oldest Bank','flipped 9 money mattresses',()=>Q38().cash.length>=9],['farm10','Aura Farmer (Documentary)','aura farmed 10 tunnel NPCs on camera',()=>(Q38().farm||0)>=10],
+  ['asc','Ascended','reached PSL 10 at the Slop Center',()=>!!Q38().asc],['mog10','Mogged','got mogged 10 times',()=>(Q38().mog||0)>=10],['donut30','40% Glaze','ate 30 glaze jelly donuts',()=>Q38().donut.length>=30],['toilet20','Flushed','flushed 20 toilet shrooms',()=>Q38().toilet.length>=20],['drip','Full Drip','took all 8 swag',()=>Q38().swag.length>=8]);
+// warp pads that unlock when you have found the place; the tunnels have no pad (you find them)
+wrPad38('🎙️','STALE & UNFIT',0xff2e2e,'pod',()=>{if(S.inPk)exitPk();warpTo(ABY.pod.x,ABY.pod.z+ABY.pod.r-5,undefined,Math.PI,['STALE & UNFIT','the high value podcast']);});
+wrPad38('🗿','THE SLOP CENTER',0xff9ecf,'slopc',()=>{if(S.inPk)exitPk();const A=ABY.slopc;warpTo(A.x-A.x/Math.hypot(A.x,A.z)*(A.r-4),A.z-A.z/Math.hypot(A.x,A.z)*(A.r-4),undefined,undefined,['THE SLOP CENTER','mogged · mewed · maxxed · glazed']);});
+wrPad38('🏁','THE SIDEQUEST',0xb6ff00,'course',()=>{if(S.inPk)exitPk();const c=SQ.cps[0];warpTo(c.x,c.z,c.y,undefined,['THE SIDEQUEST','it goes sideways, for once']);});
+// dev tools: the new places, and jump points
+{const dp=devPlaces;devPlaces=function(){return dp().concat([['pk_tun','THE TUNNELS']]);};}
+{const dw=devWarp;devWarp=function(id){if(id==='pk_tun'){menuClose();devWhenReady(()=>{devReset();enterTun(0);});return;}return dw(id);};}
+{const df=devFound;devFound=function(){df();if(!X.vis.includes('pk_tun'))X.vis.push('pk_tun');};}
+{const dr=devReset;devReset=function(){if(S.inPk==='tun'){S.inPk=null;if(PK.cd)cam.dist=PK.cd;}if(POD.clip.on){POD.clip.on=false;POD.clip.takes.forEach(t=>{t.s.visible=t.l.visible=false;});}SQ.run=false;dr();};}
+DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','THE OUTER LANDS (ACT 38)'],
+  ['p_pod','Stale & Unfit, clip farm done, hunt open',()=>{Q38().clip=1;const A=ABY.pod;warpTo(A.x,A.z+A.r-5,undefined,Math.PI,['STALE & UNFIT','🛠️ dev']);}],
+  ['p_crs','The Sidequest start line',()=>{const c=SQ.cps[0];warpTo(c.x,c.z,c.y,undefined,['THE SIDEQUEST','🛠️ dev']);}],
+  ['p_crsend','The Sidequest, last checkpoint',()=>{const c=SQ.cps[SQ.cps.length-1];SQ.cp=c.i;SQ.run=true;SQ.t=40;warpTo(c.x,c.z,c.y,undefined,['THE SIDEQUEST','🛠️ dev: last flag']);}],
+  ['p_tun','The tunnels',()=>enterTun(0)],
+  ['p_sc','The Slop Center, PSL 9 (one station left)',()=>{const q=Q38();['mew','smash','glaze','donut','swag','toilet'].forEach(k=>q.psl[k]=1);q.smash=3;const A=ABY.slopc;warpTo(SLC.mirror.x+(A.x-SLC.mirror.x)*.15,SLC.mirror.z+(A.z-SLC.mirror.z)*.15,undefined,undefined,['THE SLOP CENTER','🛠️ dev: PSL 9']);}]);
+
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
@@ -4567,7 +4947,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
