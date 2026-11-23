@@ -1,4 +1,4 @@
-// PITBORN 2145 — graphics: renderer, cel-shading, the lanky baller rig, drip, animation, set dressing
+// GOT NEXT — graphics: renderer, cel-shading, the lanky baller rig, drip, animation, set dressing
 'use strict';
 let renderer, camera, scene;
 const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -55,10 +55,10 @@ function sign(text, w, h, fg, bg, opts) {
   const tex = canvasTex(512, Math.round(512 * h / w), (x, W, H) => {
     x.fillStyle = bg || '#0c0c16'; x.fillRect(0, 0, W, H);
     if (opts.border !== false) { x.strokeStyle = fg; x.lineWidth = 10; x.strokeRect(9, 9, W - 18, H - 18); }
-    const lines = text.split('\n'); let fs = Math.min(H / (lines.length * 1.15), 130);
-    x.font = `900 ${fs}px Impact, 'Arial Black', sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+    const lines = text.split('\n'); let fs = Math.min(H / (lines.length * 1.25), 120);
+    x.font = `900 expanded ${fs}px Archivo, Impact, 'Arial Black', sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
     let mw = 0; for (const l of lines) mw = Math.max(mw, x.measureText(l).width);
-    if (mw > W - 50) { fs *= (W - 50) / mw; x.font = `900 ${fs}px Impact, 'Arial Black', sans-serif`; }
+    if (mw > W - 50) { fs *= (W - 50) / mw; x.font = `900 expanded ${fs}px Archivo, Impact, 'Arial Black', sans-serif`; }
     x.shadowColor = fg; x.shadowBlur = 18; x.fillStyle = fg;
     lines.forEach((l, i) => x.fillText(l, W / 2, H / 2 + (i - (lines.length - 1) / 2) * fs * 1.1));
   });
@@ -356,8 +356,8 @@ function courtTex(style) {
       x.beginPath(); x.arc(X(0), Z(13), 1.8 * s, Math.PI, 0); x.stroke();
       x.beginPath(); x.arc(X(0), Z(0), 1.25 * s, 0, Math.PI); x.stroke();
     } else { x.strokeStyle = P[2]; x.lineWidth = 5; x.setLineDash([18, 14]); x.beginPath(); x.arc(X(0), Z(0), 6.75 * s, 0.2, Math.PI - 0.2); x.stroke(); x.setLineDash([]); }
-    x.shadowBlur = 0; x.fillStyle = style === 'arcade' ? 'rgba(255,79,216,.5)' : 'rgba(255,255,255,.16)'; x.font = '900 110px Impact, sans-serif'; x.textAlign = 'center';
-    x.save(); x.translate(X(0), Z(10.2)); x.fillText(style === 'arcade' ? 'JAM' : style === 'street' ? 'THE PIT' : 'HOME', 0, 0); x.restore();
+    x.shadowBlur = 0; x.fillStyle = style === 'arcade' ? 'rgba(255,79,216,.5)' : 'rgba(255,255,255,.16)'; x.font = '900 expanded 84px Archivo, Impact, sans-serif'; x.textAlign = 'center';
+    x.save(); x.translate(X(0), Z(10.2)); x.fillText(style === 'arcade' ? 'JAM' : style === 'street' ? BRAND.name : 'HOME', 0, 0); x.restore();
   });
 }
 function addCourt(sc, style, hoopTier) {
@@ -389,7 +389,28 @@ function billboard(sc, text, x, y, z, ry, w, h, fg) {
   const back = M(box(w + 0.3, h + 0.3, 0.2), toon('#20242c'), x, y, z, sc); back.rotation.y = ry; back.translateZ(-0.12);
   const post = M(cyl(0.12, 0.12, y, 6), toon('#20242c'), x, y / 2 - h / 2, z, sc); post.translateZ(-0.2); return s;
 }
+// brick and concrete for the block: one tinted, tiling texture each
+let _brick = null;
+function brickMat(col, w, h) {
+  if (!_brick) _brick = canvasTex(256, 256, (x, S_) => {
+    x.fillStyle = '#b9b9b9'; x.fillRect(0, 0, S_, S_);
+    for (let r = 0; r < 16; r++) for (let c = -1; c < 8; c++) { const v = 150 + Math.floor(Math.random() * 90); x.fillStyle = `rgb(${v},${v},${v})`; x.fillRect(c * 32 + (r % 2 ? 16 : 0) + 1, r * 16 + 1, 30, 14); }
+  });
+  const t = _brick.clone(); t.needsUpdate = true; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(w / 4, h / 4);
+  return new THREE.MeshToonMaterial({ map: t, color: col, gradientMap: ramp() });
+}
+// wheat-pasted brand posters
+function poster(sc, x, y, z, ry, inv) {
+  const tex = geoTex('poster' + (inv ? 1 : 0), () => canvasTex(256, 360, (c, W, H) => {
+    c.fillStyle = inv ? '#08080a' : '#ece9e2'; c.fillRect(0, 0, W, H); c.fillStyle = inv ? '#ece9e2' : '#08080a';
+    c.save(); c.transform(1, 0, -0.12, 1, 20, 0); c.font = '900 expanded 62px Archivo, Impact, sans-serif'; c.fillText(BRAND.a, 14, 210); c.fillStyle = '#ff2d78'; c.fillText(BRAND.b, 14, 268); c.restore();
+    c.fillStyle = inv ? '#ece9e2' : '#08080a'; c.font = '500 13px "JetBrains Mono", monospace'; c.fillText('HALF COURT // WINNERS STAY', 16, 320); c.fillText('RUN ' + String(BRAND.season.no).padStart(2, '0'), 16, 34); c.fillRect(16, 44, 224, 3);
+  }));
+  const m = new THREE.Mesh(geo('posterG', () => new THREE.PlaneGeometry(1.5, 2.1)), flat(0xffffff, { map: tex })); m.position.set(x, y, z); m.rotation.y = ry; m.rotation.z = rnd(-0.03, 0.03); sc.add(m);
+}
+const _texCache = {};
+function geoTex(k, f) { return _texCache[k] || (_texCache[k] = f()); }
 function disposeScene(sc) {
   if (!sc) return;
-  sc.traverse(o => { if (o.isMesh) { const g = o.geometry; if (g && !Object.values(_geo).includes(g)) g.dispose(); const m = o.material; if (m && m.map && !Object.values(_mats).includes(m)) { m.map.dispose(); m.dispose(); } } });
+  sc.traverse(o => { if (o.isMesh) { const g = o.geometry; if (g && !Object.values(_geo).includes(g)) g.dispose(); const m = o.material; if (m && m.map && !Object.values(_mats).includes(m) && !Object.values(_texCache).includes(m.map)) { if (m.map.source !== (_brick && _brick.source)) m.map.dispose(); m.dispose(); } } });
 }

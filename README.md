@@ -57,7 +57,7 @@ A pocket game console in one HTML file, by North Coast Studios. Seven game cartr
 `main` holds this seven-cartridge build as of Nov 18 2026. Work in progress happens on working branches and shows here
 after it is merged. Clankawatch is still being built on `claude/tender-darwin-0r4toe`; the copy in the console is
 refreshed by hand. Other North Coast games (lil Bottie, Starhaven, Sootborn, Underground Syndicate, and the new
-[PITBORN 2145](pitborn/README.md) in `pitborn/`) live on their own
+[GOT NEXT](gotnext/README.md) in `gotnext/`) live on their own
 branches and are listed at the end of [`OPEN-ITEMS.md`](OPEN-ITEMS.md).
 
 ## For developers

@@ -1,4 +1,4 @@
-# PITBORN 2145 — design notes (v0.1)
+# GOT NEXT — design notes
 
 How the builder, the buffs and the rewards are put together, why, and where they can go next.
 Every number below lives in `src/data.js` (tables) or `src/ball.js` (formulas) and is a first guess, not a tested balance.
@@ -52,7 +52,7 @@ Overall rating is the average of your best twelve attributes, so a specialist is
 
 ## 3. Badges
 
-Sixteen badges, four per skill group, four tiers each (Bronze, Silver, Gold, Founding Father).
+Sixteen badges, four per skill group, four tiers each (Bronze, Silver, Gold, Iced Out).
 
 - You earn **badge XP per group by doing that group's thing in real games** (dunks feed Finishing, greens and deep
   balls feed Shooting, assists and ankle breakers feed Playmaking, steals, blocks and boards feed Defense).

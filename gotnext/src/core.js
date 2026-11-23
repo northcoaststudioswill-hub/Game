@@ -1,4 +1,4 @@
-// PITBORN 2145 — core: save, input (touch twin-stick / keyboard / gamepads), audio
+// GOT NEXT — core: save, input (touch twin-stick / keyboard / gamepads), audio
 'use strict';
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
@@ -7,7 +7,7 @@ const rnd = (a, b) => a + Math.random() * (b - a);
 const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
 
 // ---------------- save ----------------
-const SAVE_KEY = 'pitborn2145_v1';
+const SAVE_KEY = 'gotnext_v1', OLD_SAVE_KEY = 'pitborn2145_v1';
 let S = null;
 function newSave() {
   return {
@@ -23,7 +23,7 @@ function newSave() {
   };
 }
 function loadSave() {
-  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); return; } } catch (e) { }
+  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); return; } } catch (e) { }
   S = newSave();
 }
 function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
@@ -33,10 +33,10 @@ function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'sho
 function myBuild() {   // a portable snapshot of the player (also what export codes carry)
   return { name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
 }
-function encodeBuild(b) { return 'PIT1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
+function encodeBuild(b) { return BRAND.code + '1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
 function decodeBuild(code) {
   try {
-    const j = JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^PIT1-/, '')))));
+    const j = JSON.parse(decodeURIComponent(escape(atob(code.trim().replace(/^(PIT|GN)1-/, '')))));
     if (!j || !j.build || !STYLE[j.build.style] || !j.attrs) return null;
     j.name = String(j.name || 'HOMIE').slice(0, 14).replace(/[<>&]/g, '');
     for (const a of ATTRS) j.attrs[a.id] = clamp(+j.attrs[a.id] || 40, 25, 99);

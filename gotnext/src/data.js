@@ -1,6 +1,13 @@
-// PITBORN 2145 — data: everything a designer would want to edit lives here.
+// GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.1';
+const VERSION = '0.2';
+// The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
+const BRAND = {
+  name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
+  line: 'Build a player. Hold the court. Come home dripping.',
+  season: { no: 0, name: 'PRESEASON' },          // slot for seasons ("RUN 01", "RUN 02" …)
+  ticker: ['WINNERS STAY', 'CALL YOUR OWN', 'CHECK UP', 'ONES AND TWOS', 'TAKE IT BACK', 'WHO GOT NEXT', 'NO REFS', 'RUN IT BACK', 'BALL DON\'T LIE'],
+};
 
 // ---------- attributes ----------
 // cat: F finishing, S shooting, P playmaking, D defense, A athletics
@@ -26,7 +33,7 @@ const ATTRS = [
   { id: 'stam', n: 'Stamina', cat: 'A', d: 'Sprint and chain moves longer before your shot falls apart.' },
 ];
 const ATTR = {}; ATTRS.forEach(a => ATTR[a.id] = a);
-const CATS = { F: ['FINISHING', '#ff5a3c'], S: ['SHOOTING', '#3cd070'], P: ['PLAYMAKING', '#ffc531'], D: ['DEFENSE', '#3ca0ff'], A: ['ATHLETICS', '#c66bff'] };
+const CATS = { F: ['FINISHING', '#ff6a3d'], S: ['SHOOTING', '#3dffa0'], P: ['PLAYMAKING', '#f2c14e'], D: ['DEFENSE', '#7de3ff'], A: ['ATHLETICS', '#a78bff'] };
 
 // ---------- playstyles (the "class") : base caps before body mods ----------
 const STYLES = [
@@ -86,8 +93,8 @@ function ovrOf(attrs) {
 }
 
 // ---------- badges ----------
-const TIERS = ['—', 'BRONZE', 'SILVER', 'GOLD', 'FOUNDING FATHER'];
-const TIER_COL = ['#555', '#c9814a', '#c8d0d8', '#ffc531', '#ff3c6a'];
+const TIERS = ['—', 'BRONZE', 'SILVER', 'GOLD', 'ICED OUT'];
+const TIER_COL = ['#555', '#c9814a', '#c8d0d8', '#f2c14e', '#7de3ff'];
 const TIER_COST = [0, 1, 2, 3, 4];
 const BADGES = [
   { id: 'lobby', cat: 'F', n: 'Rim Lobbyist', d: 'Contests on your drives matter less. You have friends at the rim.', req: ['layup', 55, 68, 80, 92] },
@@ -147,20 +154,20 @@ const CELEBS = [
 
 // ---------- ranks (Respect) ----------
 const RANKS = [
-  { n: 'Unpaid Intern', rep: 0 },
-  { n: 'Benchwarmer', rep: 150 },
-  { n: 'Local Menace', rep: 450 },
-  { n: 'Certified Bucket', rep: 1000 },
-  { n: 'Park Senator', rep: 2000 },
-  { n: 'Blacktop Governor', rep: 3600 },
-  { n: 'President of Buckets', rep: 6000 },
-  { n: 'Founding Father', rep: 10000 },
+  { n: 'Nobody', rep: 0 },
+  { n: 'Local', rep: 150 },
+  { n: 'Regular', rep: 450 },
+  { n: 'Problem', rep: 1000 },
+  { n: 'Certified', rep: 2000 },
+  { n: 'Big Name', rep: 3600 },
+  { n: 'City Legend', rep: 6000 },
+  { n: 'Immortal', rep: 10000 },
 ];
 function rankOf(rep) { let r = 0; for (let i = 0; i < RANKS.length; i++) if (rep >= RANKS[i].rep) r = i; return r; }
 
 // ---------- drip ----------
-// rarity: 0 common 1 rare 2 epic 3 legendary 4 patriotic
-const RAR = [['COMMON', '#9aa4ad'], ['RARE', '#3ca0ff'], ['EPIC', '#c66bff'], ['LEGENDARY', '#ffc531'], ['PATRIOTIC', '#ff3c6a']];
+// rarity, in sneaker terms: 0 general release, 1 limited, 2 exclusive, 3 grail, 4 one of one
+const RAR = [['GR', '#8d8d99'], ['LIMITED', '#5aa9ff'], ['EXCLUSIVE', '#a78bff'], ['GRAIL', '#f2c14e'], ['1 OF 1', '#ff2d78']];
 const SLOTS = [['hair', 'Hair'], ['head', 'Headwear'], ['face', 'Face'], ['top', 'Top'], ['arm', 'Arms'], ['bottom', 'Shorts'], ['socks', 'Socks'], ['shoes', 'Kicks'], ['back', 'Back'], ['ball', 'Ball']];
 // each item: id, slot, n(ame), kind (shape), c (main colour), c2 (accent), r(arity), cost, rank, buff {attr:+n}, src: 'shop'|'ach'|'bum'|'start'
 const DRIP = [];
@@ -310,10 +317,10 @@ const MODES = [
   { id: 'j3', n: 'JAM 3v3', size: 3, arcade: true, to: 21, d: 'Arcade chaos with six people and no adults.' },
 ];
 const TIERS_COURT = [
-  { n: 'ROOKIE RUN', rank: 0, ai: 0.30, ovr: 58, mult: 1 },
-  { n: 'PROVING GROUND', rank: 2, ai: 0.55, ovr: 70, mult: 1.6 },
-  { n: 'GOT NEXT', rank: 4, ai: 0.78, ovr: 82, mult: 2.4 },
-  { n: 'COURT OF APPEALS', rank: 6, ai: 1.0, ovr: 92, mult: 3.5 },
+  { n: 'SIDE COURT', rank: 0, ai: 0.30, ovr: 58, mult: 1 },
+  { n: 'MAIN COURT', rank: 2, ai: 0.55, ovr: 70, mult: 1.6 },
+  { n: 'THE CAGE', rank: 4, ai: 0.78, ovr: 82, mult: 2.4 },
+  { n: 'KINGS COURT', rank: 6, ai: 1.0, ovr: 92, mult: 3.5 },
 ];
 
 // ---------- achievements ----------

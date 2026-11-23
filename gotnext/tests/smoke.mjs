@@ -46,7 +46,7 @@ await page.evaluate(() => { for (const k in __pit.keys) __pit.keys[k] = false; f
 await page.waitForTimeout(2500); await shot('14-results');
 await page.evaluate(() => { const b = [...document.querySelectorAll('#panel .btn')].find(x => /PIT/.test(x.textContent)); if (b) b.click(); __pit.S.vc += 5000; __pit.gainRep(1200); __pit.W.spots.find(s => /LAST CALL/.test(s.label)).fn(); });
 await page.waitForTimeout(500); await shot('15-kiosk');
-await page.evaluate(() => { __pit.uiClose(); __pit.W.spots.find(s => /HOMIE/.test(s.label)).fn(); }); await page.waitForTimeout(300);
+await page.evaluate(() => { __pit.uiClose(); __pit.W.spots.find(s => /LINK/.test(s.label)).fn(); }); await page.waitForTimeout(300);
 await page.evaluate(() => { document.querySelector('#impc').value = document.querySelector('#expc').value; [...document.querySelectorAll('#panel .btn')].find(x => /ADD HOMIE/.test(x.textContent)).click(); }); await page.waitForTimeout(300); await shot('16-homie');
 await page.evaluate(() => { __pit.uiClose(); __pit.enterWorld('crib', 6, 10, 1); __pit.W.spots.find(s => /UPGRADES/.test(s.label)).fn(); }); await page.waitForTimeout(300);
 for (let i = 0; i < 6; i++) { await page.evaluate(() => { const b = [...document.querySelectorAll('#panel .card .btn:not([disabled])')][0]; if (b) b.click(); }); await page.waitForTimeout(250); }

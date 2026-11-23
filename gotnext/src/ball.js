@@ -1,4 +1,4 @@
-// PITBORN 2145 — the basketball: half-court park games, Street rules and JAM (arcade) rules
+// GOT NEXT — the basketball: half-court park games, Street rules and JAM (arcade) rules
 'use strict';
 let MT = null;
 const ARC = 6.75, GRAV = 9.8, HOOP_Y = 3.05;

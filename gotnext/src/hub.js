@@ -1,4 +1,4 @@
-// PITBORN 2145 — walking around: The Block (hub), The Pit (mode doors), My Crib (home court)
+// GOT NEXT — walking around: The Block (hub), The Pit (mode doors), My Crib (home court)
 'use strict';
 let W = null;
 function worldPlayerRig() {
@@ -12,8 +12,8 @@ function addNpc(build, x, z, face, anim, extra) {
 function spot(x, z, r, label, fn) { W.spots.push({ x, z, r, label, fn }); }
 function solid(x0, x1, z0, z1) { W.solids.push([x0, x1, z0, z1]); }
 function building(x, z, w, d, h, col, label, labelCol, face) {
-  ink(M(box(w, h, d), toon(col), x, h / 2, z, scene), 1.015); solid(x - w / 2 - 0.4, x + w / 2 + 0.4, z - d / 2 - 0.4, z + d / 2 + 0.4);
-  M(box(w + 0.5, 0.5, d + 0.5), toon('#16181c'), x, h + 0.25, z, scene);
+  ink(M(box(w, h, d), brickMat(col, Math.max(w, d), h), x, h / 2, z, scene), 1.015); solid(x - w / 2 - 0.4, x + w / 2 + 0.4, z - d / 2 - 0.4, z + d / 2 + 0.4);
+  M(box(w + 0.5, 0.5, d + 0.5), toon('#16181c'), x, h + 0.25, z, scene); M(box(w + 0.1, 1.1, d + 0.1), toon('#26262c'), x, 0.55, z, scene);
   if (label) {
     const s = sign(label, Math.min(w, d) * 0.9, 2.4, labelCol, '#0a0a14'); const off = { n: [0, -d / 2 - 0.06, Math.PI], s: [0, d / 2 + 0.06, 0], e: [w / 2 + 0.06, 0, Math.PI / 2], w: [-w / 2 - 0.06, 0, -Math.PI / 2] }[face];
     s.position.set(x + (face === 'e' || face === 'w' ? off[0] : 0), h - 1.8, z + (face === 'n' || face === 's' ? off[1] : 0)); s.rotation.y = off[2]; scene.add(s);
@@ -33,34 +33,37 @@ function enterWorld(kind, sx, sz, face) {
 }
 
 function buildHub() {
-  scene.background = new THREE.Color(0x2a2140); scene.fog = new THREE.Fog(0x2a2140, 45, 170);
-  baseLights(scene, 0xffd9c0, 0x3a3050, 0xffc890, 1.5);
+  scene.background = new THREE.Color(0x191a22); scene.fog = new THREE.Fog(0x191a22, 45, 170);
+  baseLights(scene, 0xffe2c8, 0x34343c, 0xffc890, 1.5);
   const gt = canvasTex(1024, 1024, (x, S_) => {
-    x.fillStyle = '#343846'; x.fillRect(0, 0, S_, S_);
+    x.fillStyle = '#35363b'; x.fillRect(0, 0, S_, S_);
     for (let i = 0; i < 900; i++) { x.fillStyle = `rgba(${Math.random() < 0.5 ? '0,0,0' : '255,255,255'},${rnd(0.02, 0.07)})`; x.fillRect(rnd(0, S_), rnd(0, S_), rnd(2, 30), rnd(2, 6)); }
     x.strokeStyle = '#f2c230'; x.lineWidth = 8; x.setLineDash([40, 30]); x.beginPath(); x.moveTo(S_ / 2, 0); x.lineTo(S_ / 2, S_); x.moveTo(0, S_ / 2); x.lineTo(S_, S_ / 2); x.stroke(); x.setLineDash([]);
     x.strokeStyle = 'rgba(255,255,255,.5)'; x.lineWidth = 10; x.beginPath(); x.arc(S_ / 2, S_ / 2, 120, 0, 6.3); x.stroke();
-    x.fillStyle = 'rgba(255,79,216,.25)'; x.font = '900 70px Impact'; x.textAlign = 'center'; x.fillText('THE BLOCK', S_ / 2, S_ / 2 + 230);
+    x.fillStyle = 'rgba(236,233,226,.22)'; x.font = '900 expanded 54px Archivo, Impact'; x.textAlign = 'center'; x.fillText('THE BLOCK', S_ / 2, S_ / 2 + 230);
   });
   const g = new THREE.Mesh(new THREE.PlaneGeometry(64, 64), new THREE.MeshToonMaterial({ map: gt, gradientMap: ramp() })); g.rotation.x = -Math.PI / 2; scene.add(g);
   const g2 = M(new THREE.PlaneGeometry(400, 400), toon('#1c1a28'), 0, -0.05, 0, scene); g2.rotation.x = -Math.PI / 2;
-  skyline(scene, 46, 75, ['#ffc531', '#ff4fd8', '#33e0ff', '#ffe9a8']);
+  skyline(scene, 46, 75, ['#f2c14e', '#ffe9a8', '#ffe9a8', '#7de3ff']);
   // The Pit — north
-  building(0, -36, 30, 12, 13, '#3a2a55', 'THE PIT', '#ff5a3c', 's');
-  M(box(30.6, 1.2, 12.6), toon('#ff5a3c', '#ff5a3c'), 0, 9.2, -36, scene);
+  building(0, -36, 30, 12, 13, '#6b3a30', 'THE PIT', '#ece9e2', 's');
+  M(box(30.6, 0.5, 12.6), flat(0xff2d78), 0, 9.4, -36, scene);
+  for (let i = 0; i < 5; i++) { poster(scene, -13 + i * 1.6, 2.2, -29.93, 0, i % 2); poster(scene, 6.6 + i * 1.6, 2.2, -29.93, 0, (i + 1) % 2); }
   spot(0, -28.6, 2.6, 'ENTER THE PIT', () => enterWorld('pit', 0, 6.5, Math.PI));
   // Drip Depot — east
-  building(36, -2, 12, 18, 8, '#19c7b0', 'DRIP DEPOT', '#ffc531', 'w');
-  spot(28.4, -2, 2.6, 'DRIP DEPOT', () => uiShop(false));
+  building(36, -2, 12, 18, 8, '#8a8378', 'THE PLUG', '#f2c14e', 'w');
+  for (let i = 0; i < 3; i++) poster(scene, 29.93, 2.2, 3.4 + i * 1.6, -Math.PI / 2, i % 2);
+  spot(28.4, -2, 2.6, 'THE PLUG (drip)', () => uiShop(false));
   // Gainz Lab — west
-  building(-36, -2, 12, 18, 8, '#c8482c', 'GAINZ LAB', '#33ff88', 'e');
-  spot(-28.4, -2, 2.6, 'GAINZ LAB', () => uiPlayer('attrs'));
+  building(-36, -2, 12, 18, 8, '#7a4034', 'THE LAB', '#3dffa0', 'e');
+  for (let i = 0; i < 3; i++) poster(scene, -29.93, 2.2, -8.6 + i * 1.6, Math.PI / 2, i % 2);
+  spot(-28.4, -2, 2.6, 'THE LAB (attributes)', () => uiPlayer('attrs'));
   // Crib — south-west
-  building(-20, 35, 12, 10, 5.5, '#59606c', 'MY CRIB', '#33e0ff', 'n');
+  building(-20, 35, 12, 10, 5.5, '#5e5e66', 'MY CRIB', '#7de3ff', 'n');
   spot(-20, 28.6, 2.4, 'GO HOME', () => enterWorld('crib', 0, 13.5, Math.PI));
   // Move Dealer stall — south-east
-  building(20, 35, 10, 10, 5, '#2440a8', 'ANIMATION\nPLUG', '#ff4fd8', 'n');
-  spot(20, 28.6, 2.4, 'ANIMATION PLUG', () => uiPlayer('moves'));
+  building(20, 35, 10, 10, 5, '#4a4f5c', 'TAPE DECK', '#ff2d78', 'n');
+  spot(20, 28.6, 2.4, 'TAPE DECK (moves)', () => uiPlayer('moves'));
   addNpc(aiBuild(80, 'showman'), 23.5, 28.2, Math.PI, 'idle');
   // statue: the Freedom Eagle, mid-dunk, in solid gold
   ink(M(cyl(2.2, 2.6, 1.2, 8), toon('#59606c'), 0, 0.6, 0, scene), 1.03); solid(-2.5, 2.5, -2.5, 2.5);
@@ -83,7 +86,7 @@ function buildHub() {
   // ballers hanging around
   for (let i = 0; i < 5; i++) addNpc(aiBuild(rnd(60, 90)), rnd(-18, 18), rnd(-20, -12), rnd(0, 6), 'idle', { wander: true });
   // dressing
-  for (const [x, z] of [[-12, -26], [12, -26], [-26, -14], [26, -14], [-26, 14], [26, 14], [-8, 26], [8, 26]]) lamp(x, z, pick([0xffe9a8, 0xff9fe8, 0x9fefff]));
+  for (const [x, z] of [[-12, -26], [12, -26], [-26, -14], [26, -14], [-26, 14], [26, 14], [-8, 26], [8, 26]]) lamp(x, z, 0xffd28a);
   billboard(scene, ADS[0], -22, 9, -33, 0.25, 11, 6); billboard(scene, ADS[1], 22, 9, -33, -0.25, 11, 6);
   billboard(scene, ADS[2], 34, 8, 20, -Math.PI / 2, 10, 5.5); billboard(scene, ADS[3], -34, 8, 20, Math.PI / 2, 10, 5.5);
   billboard(scene, ADS[4], 34, 8, -24, -Math.PI / 2, 10, 5.5); billboard(scene, ADS[5], -34, 8, -24, Math.PI / 2, 10, 5.5);
@@ -98,20 +101,21 @@ function buildHub() {
 }
 
 function buildPit() {
-  scene.background = new THREE.Color(0x0e0a18); scene.fog = new THREE.Fog(0x0e0a18, 25, 70);
-  baseLights(scene, 0xffd0e8, 0x2a1a40, 0xffe0c0, 1.6);
-  const ft = canvasTex(512, 512, (x, S_) => { x.fillStyle = '#231a36'; x.fillRect(0, 0, S_, S_); x.strokeStyle = 'rgba(255,255,255,.07)'; x.lineWidth = 3; for (let i = 0; i <= 8; i++) { x.beginPath(); x.moveTo(i * 64, 0); x.lineTo(i * 64, S_); x.moveTo(0, i * 64); x.lineTo(S_, i * 64); x.stroke(); } });
+  scene.background = new THREE.Color(0x0b0b0e); scene.fog = new THREE.Fog(0x0b0b0e, 25, 70);
+  baseLights(scene, 0xfff0e0, 0x26262c, 0xffe0c0, 1.6);
+  const ft = canvasTex(512, 512, (x, S_) => { x.fillStyle = '#1d1d22'; x.fillRect(0, 0, S_, S_); x.strokeStyle = 'rgba(255,255,255,.07)'; x.lineWidth = 3; for (let i = 0; i <= 8; i++) { x.beginPath(); x.moveTo(i * 64, 0); x.lineTo(i * 64, S_); x.moveTo(0, i * 64); x.lineTo(S_, i * 64); x.stroke(); } });
   ft.wrapS = ft.wrapT = THREE.RepeatWrapping; ft.repeat.set(3, 2);
   const g = new THREE.Mesh(new THREE.PlaneGeometry(30, 20), new THREE.MeshToonMaterial({ map: ft, gradientMap: ramp() })); g.rotation.x = -Math.PI / 2; scene.add(g);
-  const wall = toon('#3a2a55');
+  const wall = brickMat('#4a4a52', 30, 7);
   M(box(30, 7, 0.5), wall, 0, 3.5, -10, scene); M(box(0.5, 7, 20), wall, -15, 3.5, 0, scene); M(box(0.5, 7, 20), wall, 15, 3.5, 0, scene);
-  M(box(30, 0.3, 0.3), flat(0xff4fd8), 0, 6.8, -9.7, scene);
-  const cols = ['#ffc531', '#ff5a3c', '#33e0ff', '#ff4fd8'];
+  M(box(30, 0.16, 0.3), flat(0xff2d78), 0, 6.8, -9.7, scene);
+  for (let i = 0; i < 4; i++) { poster(scene, -14.72, 2.3, -7.5 + i * 1.6, Math.PI / 2, i % 2); poster(scene, 14.72, 2.3, -7.5 + i * 1.6, -Math.PI / 2, (i + 1) % 2); }
+  const cols = ['#ece9e2', '#f2c14e', '#7de3ff', '#ff2d78'];
   MODES.forEach((m, i) => {
     const x = -10.5 + i * 7;
-    M(box(3.2, 4.2, 0.2), flat(cols[i], { transparent: true, opacity: 0.85 }), x, 2.1, -9.7, scene); M(box(2.7, 3.8, 0.24), toon('#0e0a18'), x, 1.9, -9.68, scene);
+    M(box(3.2, 4.2, 0.2), flat(cols[i], { transparent: true, opacity: 0.85 }), x, 2.1, -9.7, scene); M(box(2.7, 3.8, 0.24), toon('#0b0b0e'), x, 1.9, -9.68, scene);
     const s = sign(m.n.replace(' ', '\n'), 3.2, 1.6, cols[i], '#0a0a14'); s.position.set(x, 5.2, -9.7); scene.add(s);
-    const ic = sign(m.arcade ? '🔥' : '⛓', 1.6, 1.6, cols[i], '#0e0a18', { border: false }); ic.position.set(x, 2.1, -9.54); scene.add(ic);
+    const ic = sign(m.arcade ? 'TO 21' : 'TO 11', 1.8, 0.7, cols[i], '#0b0b0e', { border: false }); ic.position.set(x, 2.1, -9.54); scene.add(ic);
     spot(x, -8, 2.2, m.n, () => uiMode(m));
   });
   // Last Call kiosk (east) — the last-minute things
@@ -122,9 +126,9 @@ function buildPit() {
   spot(11.2, 2, 2.2, 'LAST CALL (boosts)', () => uiKiosk());
   // Homie Terminal (west) — export / import builds
   ink(M(box(1.0, 2.2, 1.6), toon('#20242c'), -13.8, 1.1, 2, scene), 1.03); solid(-15, -13, 1, 3);
-  const scn = sign('HOMIE\nTERMINAL', 1.3, 0.9, '#33e0ff', '#061018'); scn.position.set(-13.28, 1.6, 2); scn.rotation.y = Math.PI / 2; scene.add(scn);
+  const scn = sign('THE\nLINK', 1.3, 0.9, '#33e0ff', '#061018'); scn.position.set(-13.28, 1.6, 2); scn.rotation.y = Math.PI / 2; scene.add(scn);
   const hs = sign('EXPORT YOUR BUILD · IMPORT YOUR FRIENDS', 5, 0.9, '#33e0ff', '#0a0a14'); hs.position.set(-14.7, 4, 2); hs.rotation.y = Math.PI / 2; scene.add(hs);
-  spot(-12, 2, 2.2, 'HOMIE TERMINAL', () => uiHomie());
+  spot(-12, 2, 2.2, 'THE LINK (friends)', () => uiHomie());
   // exit
   M(box(4, 4.4, 0.2), flat(0xffe9a8, { transparent: true, opacity: 0.5 }), 0, 2.2, 10, scene);
   const ex = sign('THE BLOCK ↓', 4, 0.9, '#ffe9a8', '#0a0a14'); ex.position.set(0, 5, 9.9); ex.rotation.y = Math.PI; scene.add(ex);
@@ -203,9 +207,11 @@ function worldStep(dt) {
   // camera
   const portrait = innerWidth < innerHeight, back = portrait ? 7.5 : 6.2, up = portrait ? 3.8 : 3.1;
   let cx = me.x - fx * back, cz = me.z - fz * back;
+  // don't let the camera sit inside a building: pull it in until it is clear
+  for (let b = back; b > 1.2; b -= 0.6) { cx = me.x - fx * b; cz = me.z - fz * b; if (!W.solids.some(s => cx > s[0] + 0.2 && cx < s[1] - 0.2 && cz > s[2] + 0.2 && cz < s[3] - 0.2)) break; }
   if (W.kind !== 'hub') { cx = clamp(cx, W.bounds[0] - (W.kind === 'crib' ? 6 : 0.3), W.bounds[1] + (W.kind === 'crib' ? 6 : 0.3)); cz = clamp(cz, W.bounds[2] - (W.kind === 'crib' ? 1 : 0.3), W.bounds[3] + (W.kind === 'crib' ? 6 : 0.4)); }
   if (W.look) {   // shop / closet: swing round to look at your drip
-    const mfx = Math.sin(me.face), mfz = Math.cos(me.face), sx = -mfz, sz = mfx;
+    const mfx = Math.sin(me.face), mfz = Math.cos(me.face), sx = mfz, sz = -mfx;
     if (portrait) { _v.set(me.x + mfx * 5.6, 0.6, me.z + mfz * 5.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(me.x, -0.6, me.z); }
     else { _v.set(me.x + mfx * 4.2 + sx * 1.6, 1.3, me.z + mfz * 4.2 + sz * 1.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(me.x + sx * 1.6, 1.0, me.z + sz * 1.6); }
     return;

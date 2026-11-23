@@ -1,28 +1,30 @@
-# PITBORN 2145
+# GOT NEXT
 
-*United States of America™. Ball is the only law left.*
+*Half court. Winners stay.*
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Pit, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.1, first playable.** It is a standalone game, not a Pocket Lantern cartridge.
+crib. A North Coast Studios game. **Version 0.2: first playable, rebranded (it was PITBORN 2145 for one version).** It is a standalone game, not a Pocket Lantern cartridge.
 
 **Play:** open [`index.html`](index.html) in a browser. That one file is the whole game; send it to a friend and they
 have it too.
 
-![Street 2v2](docs/img/street.jpg)
+![Title](docs/img/title.jpg)
 
-| The Block (hub) | The Pit (mode doors) | On a phone |
-|---|---|---|
-| ![hub](docs/img/hub.jpg) | ![pit](docs/img/pit.jpg) | ![phone](docs/img/phone.jpg) |
+The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](docs/BRAND.md).
 
-## What is in v0.1
+| The Block (hub) | The Pit (mode doors) | The Plug (drip) | On a phone |
+|---|---|---|---|
+| ![hub](docs/img/hub.jpg) | ![pit](docs/img/pit.jpg) | ![shop](docs/img/shop.jpg) | ![phone](docs/img/phone.jpg) |
+
+## What is in it
 
 - **The builder.** Six playstyles, six origins, height / weight / wingspan sliders that move the caps of 19 attributes
   live. See [`docs/DESIGN.md`](docs/DESIGN.md) for how the numbers work.
-- **The Block.** Third-person hub: The Pit, Drip Depot, Gainz Lab, the Animation Plug, your crib, the Money Rack
+- **The Block.** Third-person hub: The Pit, The Plug (drip), The Lab (attributes and badges), the Tape Deck (moves), your crib, the Money Rack
   shootout, the old head, and six build fiends who need VC for their Basketball 2146 builds on PS88.
 - **The Pit.** Four doors: Street 2v2, Street 3v3, JAM 2v2, JAM 3v3. A side kiosk (Last Call) for one-game boosts and
-  the Homie Terminal for build codes. Four court tiers, opened by Respect.
+  The Link for build codes. Four court tiers, opened by Respect.
 - **The basketball.** Half court, camera on your player. Street: 1s and 2s to 11, take it back past the arc, 14-second
   clock. JAM: 2s and 3s to 21, shoving is legal, dunks from the logo, three makes in a row sets you on fire.
 - **Two-stick control,** on a phone too: left stick moves, right stick is the skill stick (shoot, drive, side move,
@@ -66,6 +68,7 @@ python3 build.py        # writes index.html
 | `src/main.js` | Boot, the loop, rewards, ranks, trophies |
 | `src/shell.html` | Page and CSS |
 | `vendor/three.min.js` | three.js r160 (MIT), inlined by the build so the game stays one file |
+| `vendor/archivo.woff2`, `vendor/jbmono.woff2` | The two brand typefaces, Archivo and JetBrains Mono (both SIL Open Font License), embedded by the build |
 
 ## Tests
 
@@ -92,3 +95,4 @@ tests/sim.sh                      # an all-AI game in each mode, printed as box 
 - Two players share one camera, so they can drift apart on screen.
 - Play with a friend over the internet is not built. Friends share builds by code and the game by file.
 - Court tiers change opponents and pay, not the look of the court.
+- The rebrand in v0.2 covers the name, the mark, type, colour, every menu, the HUD, signs, shop names, ranks and rarity names. Still in the old joke voice: badge names, attribute blurbs, origins, trophies, the announcer calls. The 3D world got brick, concrete and posters but not a full art pass.

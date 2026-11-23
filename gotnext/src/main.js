@@ -1,4 +1,4 @@
-// PITBORN 2145 — boot, the loop, rewards
+// GOT NEXT — boot, the loop, rewards
 'use strict';
 let ST = null;   // studio / title scene state
 
@@ -17,10 +17,10 @@ function titleScene() {
 }
 function studioScene() {
   disposeScene(scene); scene = new THREE.Scene(); W = null; MT = null;
-  scene.background = new THREE.Color(0x1c1a30); baseLights(scene, 0xffe8d8, 0x3a3050, 0xffffff, 1.6);
-  ink(M(cyl(1.6, 1.8, 0.3, 20), toon('#ff5a3c'), 0, -0.15, 0, scene), 1.03);
-  const g = M(new THREE.PlaneGeometry(80, 80), toon('#14121f'), 0, -0.3, 0, scene); g.rotation.x = -Math.PI / 2;
-  const s = sign('PITBORN\nDEPARTMENT OF\nPLAYER REGISTRATION', 9, 4.5, '#2e2e48', '#1c1a30', { border: false }); s.position.set(0, 3.2, -5); scene.add(s);
+  scene.background = new THREE.Color(0x141418); baseLights(scene, 0xffe8d8, 0x30303a, 0xffffff, 1.6);
+  ink(M(cyl(1.6, 1.8, 0.3, 20), toon('#ece9e2'), 0, -0.15, 0, scene), 1.03);
+  const g = M(new THREE.PlaneGeometry(80, 80), toon('#0e0e11'), 0, -0.3, 0, scene); g.rotation.x = -Math.PI / 2;
+  const s = sign('WHO\nGOT\nNEXT', 7, 5.4, '#26262e', '#141418', { border: false }); s.position.set(0, 3.2, -5); scene.add(s);
   ST = { kind: 'studio', t: 0, rig: null };
 }
 function studioRig(spec) { if (ST.rig) scene.remove(ST.rig.root); ST.rig = makeRig(spec); scene.add(ST.rig.root); ST.H = ST.rig.H; }
@@ -46,7 +46,7 @@ function checkAch() {
   for (const a of ACH) {
     if (S.ach[a.id] || achVal(a.k) < a.t) continue; S.ach[a.id] = 1; S.vc += a.vc;
     if (a.drip && !S.owned.includes(a.drip)) S.owned.push(a.drip);
-    toast('🏆 ' + a.n, `+${a.vc} VC` + (a.drip ? ' · NEW DRIP: ' + DRIPS[a.drip].n : ''), 'ach'); sfx('unlock');
+    toast(a.n, `+${a.vc} VC` + (a.drip ? ' · NEW DRIP: ' + DRIPS[a.drip].n : ''), 'ach'); sfx('unlock');
   }
   save(); uiHud();
 }
@@ -131,4 +131,5 @@ function boot() {
   window.__step = dt => { if (MT) matchStep(dt); };
   requestAnimationFrame(frame);
 }
-boot();
+// signs are drawn with the brand face, so wait for it (briefly) before building the first scene
+(document.fonts && document.fonts.load ? Promise.race([Promise.all([document.fonts.load('900 expanded 40px Archivo'), document.fonts.load('500 12px "JetBrains Mono"')]), new Promise(r => setTimeout(r, 1500))]) : Promise.resolve()).then(boot, boot);
