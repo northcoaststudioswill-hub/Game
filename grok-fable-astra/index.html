@@ -5432,8 +5432,31 @@ const MOV={on:false,i:-1,t0:0,u:0,shot:null,el:null,done:null,raf:0,ended:false}
   +'#intro.mov .grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.09;background-image:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#000 0 1px,transparent 1px 4px);animation:movgr .12s steps(2) infinite}@keyframes movgr{to{transform:translate(2px,-2px)}}#intro.mov .flare{position:absolute;z-index:2;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 8% at 50% 46%,rgba(120,200,255,.35),transparent 70%)}'
   +'#intro.mov .crawl{position:absolute;z-index:2;left:0;right:0;top:100%;text-align:center;text-transform:uppercase;letter-spacing:.2em;font-size:clamp(11px,1.8vw,17px);line-height:1.5;text-shadow:0 1px 8px #000;animation:movcrawl 11s linear both}#intro.mov .crawl b{display:block;color:#ffd400;font-weight:400;font-size:.72em;letter-spacing:.4em;margin-top:1.1em}@keyframes movcrawl{to{transform:translateY(-135vh)}}'
   +'#intro.mov .mvt{font-family:var(--display);letter-spacing:.06em;font-size:clamp(44px,13vw,170px);line-height:.9;color:#ffd400;-webkit-text-stroke:3px #12021f;text-shadow:8px 8px 0 #ff2e88;animation:movslam .5s cubic-bezier(.2,1.6,.4,1) both;text-transform:uppercase}@keyframes movslam{from{transform:scale(3.4);opacity:0}to{transform:scale(1);opacity:1}}#intro.mov .fine{position:relative;z-index:4;margin-top:16px;font:600 clamp(9px,1.3vw,12px)/1.5 system-ui,sans-serif;letter-spacing:.2em;opacity:.7;text-transform:uppercase;max-width:86vw}#intro.mov .skip{z-index:5;bottom:calc(12.5% - 22px)}';document.head.appendChild(st);})();
-function movBraam(){[55,58.3,82.4,110].forEach(f=>tone(f,2.4,'sawtooth',.13,0,f*.9));nz(.7,.12,0,180);}
+function movBraam(){[55,58.3,82.4,110].forEach(f=>tone(f,2.2,'sawtooth',.07,0,f*.9));nz(.6,.07,0,180);}
 function movRise(d){tone(180,d||3,'sine',.05,0,1500);tone(90,d||3,'sawtooth',.03,0,700);}
+// ---- the score: "SLOP: THE MOTION PICTURE (ORIGINAL SOUNDTRACK)". An epic trailer cue, generated, in D minor, with a key change it did not earn.
+const MSC={next:0,step:0,sec:-1};
+function movSec(){const i=MOV.i;return i<2?0:i<4?1:i<11?2:i===11?3:i===12?4:i===13?5:i===14?6:7;}
+function movHorn(t,v){[466,471,588].forEach(f=>tone(f,.55,'sawtooth',v||.05,t,f*.94));}
+function movMusic(){if(!AU.ctx||AU.muted||!MOV.on)return;const now=AU.ctx.currentTime,sec=movSec();if(MSC.next<now-.4)MSC.next=now+.05;
+  if(sec!==MSC.sec){const prev=MSC.sec;MSC.sec=sec;MSC.step=0;MSC.next=now+.06;
+    if(sec===7){const t=now+.05;[38,50,57,62,66,69,74].forEach((m,k)=>tone(mtof(m),5.5,k<2?'sawtooth':'triangle',k<2?.14:.06,t));tone(60,1.6,'sine',.5,t,28);nz(1.4,.16,t,300);movHorn(t,.07);movHorn(t+.5,.07);movHorn(t+1,.08);tone(1319,.12,'square',.05,t+5);tone(1568,.2,'square',.05,t+5.16);return;}
+    if(sec===3){tone(55,1.2,'sine',.3,now+.05,40);}else if(prev>=0){tone(65,.9,'sine',.45,now+.05,30);nz(.5,.1,now+.05,500);}}
+  if(sec===7||sec===5)return;const spb=60/(sec===6?126:104)/4,tr=(sec===4||sec===6)?2:0,PROG=[0,8,3,10],MAJ=[0,1,1,1];
+  const MEL=[[0,69,7],[8,74,7],[16,77,7],[24,76,3],[28,74,3],[32,72,7],[40,69,7],[48,70,3],[52,72,3],[56,74,8]];
+  while(MSC.next<now+.5){const st=MSC.step,s=st%16,bar=Math.floor(st/16),t=MSC.next,ch=PROG[bar%4]+tr,maj=MAJ[bar%4];
+    if(sec===0){if(s===0){tone(mtof(26),spb*16,'sawtooth',.07,t);tone(mtof(38),spb*16,'sine',.1,t);}if(s===0||s===3){tone(58,.3,'sine',.3,t,36);}}
+    else if(sec===3){if(s===0||s===3)tone(58,.3,'sine',.25,t,36);}
+    else{// pad, bass, ostinato
+      if(s===0){[0,maj?4:3,7].forEach(n=>tone(mtof(62+ch+n),spb*16,'triangle',.03,t));tone(mtof(26+ch),spb*15,'sawtooth',.09,t);}
+      if(s===8||s===11)tone(mtof(26+ch),.3,'sawtooth',.1,t);
+      const arp=[0,7,12,7,0,7,maj?16:15,7][(s>>1)%8];if(s%2===0||sec>=4)tone(mtof(50+ch+arp),.1,'sawtooth',s%4===0?.05:.035,t);
+      if(sec>=2){// drums
+        if(s===0||s===6||s===8||(sec===6&&s===14)){tone(72,.34,'sine',.42,t,34);nz(.08,.08,t,250);}if(s===4||s===12){nz(.13,.11,t,900);tone(190,.1,'triangle',.08,t,120);}if(sec===6||s%4===2)nz(.025,.03,t,8000);
+        // the theme: brass, doubled by a kazoo that is nearly in tune
+        const m=MEL.find(q=>q[0]===st%64);if(m){const d=spb*m[2]*1.05;tone(mtof(m[1]+tr),d,'sawtooth',.07,t);tone(mtof(m[1]+tr+12),d,'sawtooth',.025,t);tone(mtof(m[1]+tr+.45),d,'square',.035,t+.03);}
+        if(s===0&&bar%4===3)movHorn(t+spb*12,.045);if(s===0&&bar%8===7)tone(200,spb*16,'sine',.04,t,1600);}}
+    MSC.next+=spb;MSC.step++;}}
 function movShots(){const G=(id)=>{const A=ABY[id];return{x:A.x,z:A.z,y:groundH(A.x,A.z),r:A.r};},orb=(c,R,h,a0,a1,lh)=>u=>{const a=a0+(a1-a0)*u;return[c.x+Math.cos(a)*R,c.y+h,c.z+Math.sin(a)*R,c.x,c.y+lh,c.z];},pan=(f,t,l)=>u=>[lerp(f[0],t[0],u),lerp(f[1],t[1],u),lerp(f[2],t[2],u),l[0],l[1],l[2]];
   const by=G('debate'),pod=G('pod'),pile=G('pile'),bas=G('basil'),sc=G('slopc'),tr=G('trench'),el=G('elect');
   return[{d:3.4,blk:1,fx:movBraam,card:'North Coast Studios<small>in association with E Concepts</small>',cc:'[a low note. it is very low. it means business]'},
@@ -5451,7 +5474,7 @@ function movShots(){const G=(id)=>{const A=ABY[id];return{x:A.x,z:A.z,y:groundH(
     {d:5,cam:pan([7,3.4,19],[3.5,2.8,14],[0,2.6,9]),fx:movBraam,card:'…has <em>no lines</em>',cred:'<b>NPC</b>as NPC · seed 67 · hands: approximate',cc:'[he says nothing] [it is his best work]'},
     {d:4,wht:1,fx:()=>{if(typeof savChord==='function')savChord(true);},card:'with Sav<small>as a normal guy · he was not supposed to be in this</small>',cc:'[a choir] [the choir is one guy] [it is Sav]'},
     {d:11,cam:orb({x:0,y:0,z:0},170,80,0,.9,0),fx:()=>movRise(9),crawl:[['Directed by','Autocomplete'],['Written by','Four thousand prompts'],['Produced by','A guy named Will, at 3 a.m.'],['Executive producer','The Algorithm'],['Director of photography','A camera that clips through walls'],['Hands','Nobody who has seen a hand'],['Casting','The NPC Generator 9000'],['Key grip','A rat'],['Best boy','A different rat'],['Stunts','Louie (a dog)'],['Catering','Slopburger · and a Denny\'s in Arkansas'],['Music','Slop FM 67.7'],['Visual effects','The AI Brain Rot Clip Engine 9,000,000 (67)'],['Legal','Nobody · please do not sue'],['The empty chair','Unfilled'],['Based on','An idea, loosely']]},
-    {d:6.5,blk:1,fx:()=>{SFX.boom();movBraam();},title:1,cc:''}];}
+    {d:8,blk:1,title:1,cc:'[the orchestra gives everything] [there is no orchestra]'}];}
 function movShow(k){const S2=MOV.shots;if(k>=S2.length){movEnd();return;}MOV.i=k;MOV.t0=performance.now();MOV.u=0;const s=S2[k],el=MOV.el;MOV.shot=s;el.classList.toggle('blk',!!s.blk);el.classList.toggle('wht',!!s.wht);
   let h='<div class="grain"></div>'+(s.cam?'<div class="flare"></div><div class="wm">'+Array.from({length:18},(q,i)=>'<span>'+(i%2?'SLOPSTOCK':'PREVIEW')+'</span>').join('')+'</div><div class="ai">AI GENERATED</div><div class="meta">seed 67 · step '+(12+k*2)+'/50 · cfg 7<br>hands: 7 · takes: 1 · budget: $0</div>':'');
   if(s.title)h+='<div class="card mvt">GROK<br>FABLE<br>ASTRA</div><div class="fine"><b style="color:#ffd400;letter-spacing:.3em">The sloppiest game of all time</b><br>This summer · every summer · it is always summer in here<br>Rated S for slop · may contain hands · no humans were consulted (some were) · generated in 4 seconds</div>';
@@ -5460,8 +5483,10 @@ function movShow(k){const S2=MOV.shots;if(k>=S2.length){movEnd();return;}MOV.i=k
 function movEnd(){if(MOV.ended)return;MOV.ended=true;MOV.on=false;cancelAnimationFrame(MOV.raf);const el=MOV.el,done=MOV.done;INTR.adv=INTR.skip=null;el.style.transition='opacity .6s';el.style.opacity=0;setTimeout(()=>{el.remove();done&&done();},600);}
 function movieRun(done){MOV.seen=true;audioInit();const el=document.createElement('div');el.id='intro';el.className='mov blk';$('app').appendChild(el);MOV.el=el;MOV.done=done;MOV.ended=false;MOV.on=true;MOV.shots=movShots();MOV.keep=!$('title').hidden;$('title').hidden=true;
   const fin=MOV.done;MOV.done=()=>{if(MOV.keep&&S.mode==='title')$('title').hidden=false;fin&&fin();};
-  INTR.adv=()=>{if(MOV.on&&performance.now()-MOV.t0>450)movShow(MOV.i+1);};INTR.skip=movEnd;el.addEventListener('click',()=>INTR.adv&&INTR.adv());movShow(0);
-  (function tick(now){if(!MOV.on)return;MOV.raf=requestAnimationFrame(tick);const s=MOV.shot;if(!s)return;MOV.u=Math.min(1,(now-MOV.t0)/1000/s.d);if(MOV.u>=1)movShow(MOV.i+1);})(performance.now());}
+  MSC.sec=-1;MSC.step=0;MOV.i=-1;MOV.shot=null;MOV.gate=true;const start=()=>{if(!MOV.gate||!MOV.on)return;MOV.gate=false;INTR.adv=()=>{if(MOV.on&&performance.now()-MOV.t0>450)movShow(MOV.i+1);};movShow(0);};
+  INTR.skip=movEnd;INTR.adv=()=>{audioInit();start();};el.addEventListener('click',()=>{audioInit();INTR.adv&&INTR.adv();});
+  setTimeout(()=>{if(!MOV.on||!MOV.gate)return;if(AU.ctx&&AU.ctx.state==='running'){start();return;}el.innerHTML='<div class="grain"></div><div class="card">🔊 Tap for sound<small>this film has a score · it was generated · it is loud</small></div><div class="skip">tap / A / space: start the film · B / Esc: skip it</div>';},350);
+  (function tick(now){if(!MOV.on)return;MOV.raf=requestAnimationFrame(tick);const s=MOV.shot;if(!s)return;try{movMusic();}catch(e){}MOV.u=Math.min(1,(now-MOV.t0)/1000/s.d);if(MOV.u>=1)movShow(MOV.i+1);})(performance.now());}
 {const uc=updateCamera;updateCamera=function(dt){if(MOV.on&&MOV.shot&&MOV.shot.cam){const u=MOV.u,e=u*u*(3-2*u),q=MOV.shot.cam(e);camera.position.set(q[0],q[1],q[2]);camera.lookAt(q[3],q[4],q[5]);sky.position.copy(camera.position);return;}uc(dt);};}
 // the boot-up text stays as the cold open; the trailer follows it
 {const ri=runIntro;runIntro=function(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}ri(()=>MOV.seen?done():movieRun(done));};}
