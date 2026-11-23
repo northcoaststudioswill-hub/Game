@@ -5458,13 +5458,15 @@ function movShow(k){const S2=MOV.shots;if(k>=S2.length){movEnd();return;}MOV.i=k
   else if(s.crawl)h+='<div class="crawl">'+s.crawl.map(c=>'<b>'+c[0]+'</b>'+c[1]).join('')+'</div>';else if(s.card)h+='<div class="card">'+s.card+'</div>';
   if(s.cred)h+='<div class="cred">'+s.cred+'</div>';if(s.cc)h+='<div class="cc">'+s.cc+'</div>';h+='<div class="skip">tap / A / space: next · B / Esc: skip the film (the director is crying)</div>';el.innerHTML=h;if(s.fx)try{s.fx();}catch(e){}}
 function movEnd(){if(MOV.ended)return;MOV.ended=true;MOV.on=false;cancelAnimationFrame(MOV.raf);const el=MOV.el,done=MOV.done;INTR.adv=INTR.skip=null;el.style.transition='opacity .6s';el.style.opacity=0;setTimeout(()=>{el.remove();done&&done();},600);}
-function movieRun(done){audioInit();const el=document.createElement('div');el.id='intro';el.className='mov blk';$('app').appendChild(el);MOV.el=el;MOV.done=done;MOV.ended=false;MOV.on=true;MOV.shots=movShots();MOV.keep=!$('title').hidden;$('title').hidden=true;
+function movieRun(done){MOV.seen=true;audioInit();const el=document.createElement('div');el.id='intro';el.className='mov blk';$('app').appendChild(el);MOV.el=el;MOV.done=done;MOV.ended=false;MOV.on=true;MOV.shots=movShots();MOV.keep=!$('title').hidden;$('title').hidden=true;
   const fin=MOV.done;MOV.done=()=>{if(MOV.keep&&S.mode==='title')$('title').hidden=false;fin&&fin();};
   INTR.adv=()=>{if(MOV.on&&performance.now()-MOV.t0>450)movShow(MOV.i+1);};INTR.skip=movEnd;el.addEventListener('click',()=>INTR.adv&&INTR.adv());movShow(0);
   (function tick(now){if(!MOV.on)return;MOV.raf=requestAnimationFrame(tick);const s=MOV.shot;if(!s)return;MOV.u=Math.min(1,(now-MOV.t0)/1000/s.d);if(MOV.u>=1)movShow(MOV.i+1);})(performance.now());}
 {const uc=updateCamera;updateCamera=function(dt){if(MOV.on&&MOV.shot&&MOV.shot.cam){const u=MOV.u,e=u*u*(3-2*u),q=MOV.shot.cam(e);camera.position.set(q[0],q[1],q[2]);camera.lookAt(q[3],q[4],q[5]);sky.position.copy(camera.position);return;}uc(dt);};}
 // the boot-up text stays as the cold open; the trailer follows it
-{const ri=runIntro;runIntro=function(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}ri(()=>movieRun(done));};}
+{const ri=runIntro;runIntro=function(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}ri(()=>MOV.seen?done():movieRun(done));};}
+// the trailer plays on boot-up, straight after the studio splash and before the title screen
+if(location.hash!=='#test'&&!(DEV.on&&DEV.skip)){const iv=setInterval(()=>{if($('splash'))return;clearInterval(iv);if(S.mode==='title'&&!$('intro')&&!$('ctlcard')&&!MOV.seen)movieRun(()=>{NAV.reset();});},150);}
 (function(){const m=document.querySelector('#title .menu');if(!m)return;const b=document.createElement('button');b.id='tMov';b.textContent='🎬 WATCH THE TRAILER';m.insertBefore(b,$('tCred'));b.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();});};})();
 
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
