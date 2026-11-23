@@ -30,13 +30,22 @@ game yet**. To use him:
 const b = LilBottie.build(THREE);       // b.group is about 1.5 units tall, feet at y = 0
 scene.add(b.group);
 b.group.scale.setScalar(2.2);           // the size the game uses for people
-b.setPose('dance');                     // idle, walk, dance, point, thumbs, arms, sit
+b.setPose('rap');                       // idle, walk, dance, rap, point, thumbs, arms, chain, wave, sit
 b.setFace('hype');                      // smile, talk1, talk2, wink, hype, dead, btv
 b.setMouth(0.7);                        // lip sync, 0 to 1
-b.update(timeInSeconds);                // every frame
+b.update(time, dt, songSeconds);        // every frame; songSeconds (optional) locks the moves to the beat
 ```
 
-![ten views of the model](asset/lil-bottie-sheet.png)
+![twelve views of the model](asset/lil-bottie-sheet.png)
+
+How he moves (v0.2):
+
+- Shoulders, elbows, wrists, hips, knees and ankles are all joints. Each hand has four fingers with two joints
+  each and a thumb, and nine hand shapes: open, relax, fist, point, thumb, peace, grip, spread, horns.
+- Every joint is a spring chasing its target, so a move overshoots a little and settles, and the pinky lags the
+  index when a hand opens or closes. The braids and the clover swing behind his turns and bounces.
+- `dance`, `rap` and `walk` are locked to the beat (137.2 bpm; `setTempo` changes it). `rap` chops one hand on
+  every beat, changes the hand shape each bar, grabs the chain on the third bar and swaps hands every four bars.
 
 ## The Algorithm: lyrics and timing
 
