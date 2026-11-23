@@ -30,7 +30,7 @@ game yet**. To use him:
 const b = LilBottie.build(THREE);       // b.group is about 1.5 units tall, feet at y = 0
 scene.add(b.group);
 b.group.scale.setScalar(2.2);           // the size the game uses for people
-b.setPose('rap');                       // idle, walk, dance, rap, point, thumbs, arms, chain, wave, sit
+b.setPose('rap');                       // idle, walk, dance, rap, shake, point, thumbs, arms, chain, wave, sit
 b.setFace('hype');                      // smile, talk1, talk2, wink, hype, dead, btv
 b.setMouth(0.7);                        // lip sync, 0 to 1
 b.update(time, dt, songSeconds);        // every frame; songSeconds (optional) locks the moves to the beat
@@ -38,13 +38,17 @@ b.update(time, dt, songSeconds);        // every frame; songSeconds (optional) l
 
 ![twelve views of the model](asset/lil-bottie-sheet.png)
 
-How he moves (v0.2):
+How he moves (v0.3):
 
 - Shoulders, elbows, wrists, hips, knees and ankles are all joints. Each hand has four fingers with two joints
   each and a thumb, and nine hand shapes: open, relax, fist, point, thumb, peace, grip, spread, horns.
 - Every joint is a spring chasing its target, so a move overshoots a little and settles, and the pinky lags the
   index when a hand opens or closes. The braids and the clover swing behind his turns and bounces.
-- `dance`, `rap` and `walk` are locked to the beat (137.2 bpm; `setTempo` changes it). `rap` chops one hand on
+- Each of his 25 dreads is its own chain of four segments. They hang plumb when he tilts his head, get thrown
+  against a turn, fan out when he spins, lift when he drops, and each segment follows the one above a little
+  late, so they whip. `shake` is the move that throws them: head side to side on the beat, then a headbang.
+- His knees never lock straight: there is a kneecap, creases and stacked cuffs, and they bend in every pose.
+- `dance`, `rap`, `shake` and `walk` are locked to the beat (137.2 bpm; `setTempo` changes it). `rap` chops one hand on
   every beat, changes the hand shape each bar, grabs the chain on the third bar and swaps hands every four bars.
 
 ## The Algorithm: lyrics and timing

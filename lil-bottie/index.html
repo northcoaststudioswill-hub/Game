@@ -30,7 +30,7 @@ button:focus-visible{outline:3px solid var(--led)}
 @media (max-height:520px),(max-width:520px){#faces{display:none}}
 </style>
 <canvas id="c"></canvas>
-<div id="top"><b>LIL BOTTIE</b><span>asset v0.2 · Grok Fable Astra style · drag to turn him</span></div>
+<div id="top"><b>LIL BOTTIE</b><span>asset v0.3 · Grok Fable Astra style · drag to turn him</span></div>
 <div id="lyric"><i id="sec"></i><b id="line"></b></div>
 <div id="ui">
   <div class="row"><button class="go" id="play">▶ The Algorithm</button><span id="clock">0:00 / 3:20</span><button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span></div>
@@ -82,7 +82,7 @@ button:focus-visible{outline:3px solid var(--led)}
       if(k!==lastK||past){lastK=past?-3:k;$('sec').textContent=k<0||past?(k<0?'':'TAIL · NO LINES ON THE SHEET'):LINES[k][1].toUpperCase();$('line').textContent=k<0||past?'':LINES[k][2];}
       if(!song.paused){var lvl=.5+.5*Math.sin(t*14)*Math.sin(t*3.1);if(an){an.getByteFrequencyData(buf);var s=0;for(var i=6;i<60;i++)s+=buf[i];lvl=Math.min(1,s/54/150);}
         var sec=k>=0&&!past?LINES[k][1]:'';if(!manualFace)B.setMouth(sec?lvl:0);
-        if(!manualPose)B.setPose(sec.indexOf('Hook')===0?'dance':sec==='Bridge'?'arms':sec==='Outro'?(k===LINES.length-1?'wave':'thumbs'):sec.indexOf('Verse')===0?(k%6===5?'point':k%6===2?'chain':'rap'):sec==='Intro'?(k===0?'idle':'point'):'dance');
+        if(!manualPose)B.setPose(sec.indexOf('Hook')===0?(k%8>=6?'shake':'dance'):sec==='Bridge'?'arms':sec==='Outro'?(k===LINES.length-1?'wave':'thumbs'):sec.indexOf('Verse')===0?(k%6===5?'point':k%6===2?'chain':'rap'):sec==='Intro'?(k===0?'idle':'point'):'dance');
         ring.material.color.setHSL((t*.2)%1,1,.55);floorM.color.setScalar(.42+lvl*.3);}}
     B.update(t,dt,started&&!song.paused?song.currentTime-28.45+offset:undefined);
     cam.position.set(Math.sin(yaw)*Math.cos(pitch)*dist,1.9+Math.sin(pitch)*dist,Math.cos(yaw)*Math.cos(pitch)*dist);cam.lookAt(0,1.75,0);R.render(scene,cam);})(t0);
