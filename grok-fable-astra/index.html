@@ -284,7 +284,7 @@ const AREAS=[
   {id:'farm',x:-176,z:-8,r:15,base:2,name:'THE CONTENT FARM',sub:'picked daily, forgotten hourly',hue:.1,lit:.66,col:[.08,.5,.32]},
   {id:'fac',x:96,z:138,r:24,base:3,name:'THE SLOP FACTORY',sub:'data in · slop out',hue:.04,lit:.6,col:[.06,.35,.42]},
   {id:'chrome',x:-96,z:140,r:18,base:2,name:'CHROME ALLEY',sub:'unlicensed upgrades · no refunds',hue:.55,lit:.28,col:[.62,.3,.18]},
-  {id:'aura',x:60,z:-118,r:16,base:5,name:'THE AURA FARM',sub:'pose responsibly',hue:.13,lit:.7,col:[.13,.7,.55]},
+  {id:'aura',x:60,z:-118,r:15,base:5,name:'THE AURA FARM',sub:'pose responsibly',hue:.13,lit:.7,col:[.13,.7,.55]},
   {id:'fringe',x:-36,z:-92,r:14,base:3,name:'THE FRINGE',sub:'where the algorithm does not look',hue:.8,lit:.22,col:[.8,.25,.18]},
   {id:'mirror',x:-96,z:24,r:16,base:2,name:'THE SMART HOME',sub:'everything is connected · please rate your experience',hue:.58,lit:.82,col:[.58,.08,.86]},
   {id:'cue',x:150,z:120,r:13,base:4,name:'THE CUE-ANON SHRINE',sub:'trust the plan · the plan is a PDF',hue:.12,lit:.35,col:[.1,.4,.3]},
@@ -867,7 +867,7 @@ function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)
   if(!S.inBoss&&!S.inSlop&&!S.inSim&&!S.inMM&&!S.inPk){const xi=xInteract();if(xi)interact=xi;}
   if(!S.inBoss&&!S.inSlop&&!S.inSim&&!S.inMM){const ni=act15Interact();if(ni)interact=ni;}
   const b=$('bTalk');if(interact){if(b.hidden||hudCache.talk!==interact.label){b.hidden=false;b.textContent=interact.label+(app.classList.contains('touchy')?'':app.classList.contains('gp')?'  [B]':'  [E]');hudCache.talk=interact.label;}}else if(!b.hidden)b.hidden=true;}
-function doInteract(){if(S.mode==='play'&&interact&&!S.dead)interact.fn();}
+function doInteract(){if(S.mode!=='play'||!interact||S.dead)return;if(typeof interact.fn==='function'){interact.fn();return;}let b=null,bd=9;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd){bd=d;b=n;}}if(b)say([[b.id,pick((typeof BARK!=='undefined'&&BARK[b.id])||['...'])]]);}
 $('bTalk').addEventListener('click',doInteract);
 function compassTarget(){if(S.inSlop)return slopTarget();if(S.inBoss)return boss.active?{x:boss.x,z:boss.z,l:'THE ALGORITHM'}:null;
   if(S.track&&XQ.includes(S.track)){const t=xTarget(S.track);if(t)return t;S.track=null;}
@@ -4285,7 +4285,7 @@ syncWorld();spawnWorldEnemies();
 const DEV=(function(){let d={};try{d=JSON.parse(localStorage.getItem('gfa-dev')||'{}')||{};}catch(e){}return Object.assign({on:false,god:false,skip:false,fps:false,start:''},d);})();
 function devSave(){try{localStorage.setItem('gfa-dev',JSON.stringify(DEV));}catch(e){}}
 (function(){const st=document.createElement('style');st.textContent=`
-#splash,#intro,#ctlcard{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer}
+#ctlcard{overflow-y:auto;justify-content:safe center}#splash,#intro,#ctlcard{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer}
 #splash{background:#06101c;color:#eaf6ff}#splash .st{opacity:0;transition:opacity .9s ease;display:flex;flex-direction:column;align-items:center;gap:14px;position:absolute}#splash .st.on{opacity:1}
 #splash .nc{font:800 clamp(30px,7vw,72px)/1 system-ui,sans-serif;letter-spacing:.14em}#splash .nc small,#splash .ec small{display:block;font:600 clamp(11px,2vw,15px)/1.4 system-ui,sans-serif;letter-spacing:.5em;opacity:.7;margin-top:10px}
 #splash svg{width:min(60vw,260px);height:auto}#splash .ec{font:300 clamp(30px,7vw,70px)/1 Georgia,serif;letter-spacing:.32em}#splash .ec b{font-weight:800;color:#b6ff00;letter-spacing:0}
@@ -4323,7 +4323,7 @@ function padSVG(){const L=(x,y,tx,ty,t,anchor)=>`<line x1="${x}" y1="${y}" x2="$
   ${L(506,51,650,30,'RT: blast','start')}${L(505,75,650,70,'RB: grapple','start')}${L(550,144,650,130,'Y: pose · special','start')}${L(580,174,650,170,'B: yap · slam · move','start')}${L(520,174,650,210,'X: blast','start')}${L(550,204,650,250,'A: jump · hold 💩 boost','start')}${L(480,240,650,300,'R stick: look','start')}
   <text x="430" y="395" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="middle" opacity=".85">Start: pause menu · View: quests</text></svg>`;}
 function ctlTable(k){return '<table>'+CTL[k].map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>';}
-function ctlCard(onGo,goLabel){const el=document.createElement('div');el.id='ctlcard';const touch=app.classList.contains('touchy'),pad=app.classList.contains('gp');let mode=touch?'touch':pad?'pad':'pad';
+function ctlCard(onGo,goLabel){const el=document.createElement('div');el.id='ctlcard';const touch=app.classList.contains('touchy'),pad=app.classList.contains('gp');let mode=touch?'touch':pad?'pad':'key';
   const draw=()=>{el.innerHTML='<h2>HOW TO NPC</h2><div class="sub">'+(touch?'phone detected · touch controls':pad?'controller detected':'plug in a controller, or use the keyboard')+'</div>'+(touch?'':'<div class="tabs"><button data-m="pad" class="'+(mode==='pad'?'on':'')+'">🎮 CONTROLLER</button><button data-m="key" class="'+(mode==='key'?'on':'')+'">⌨️ KEYBOARD</button></div>')+
     (mode==='pad'?padSVG()+ctlTable('pad'):ctlTable(mode))+'<button class="go">'+(goLabel||'▶ LET\'S GO')+'</button>';
     el.querySelectorAll('.tabs button').forEach(b=>b.onclick=e=>{e.stopPropagation();mode=b.dataset.m;draw();NAV.reset();});el.querySelector('.go').onclick=e=>{e.stopPropagation();el.remove();onGo&&onGo();};};
@@ -4351,7 +4351,7 @@ function runIntro(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();r
 const INTR={ok:false,adv:null,skip:null,auto:null};
 addEventListener('keydown',e=>{if($('intro')&&(e.code==='Space'||e.code==='Enter')){e.preventDefault();INTR.adv&&INTR.adv();}else if($('intro')&&e.code==='Escape'){INTR.skip&&INTR.skip();}else if($('splash')){SPL.end&&SPL.end();}},true);
 // new game: intro, then controls, then the world, slowly
-addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#play');if(!t||INTR.ok)return;e.stopImmediatePropagation();e.preventDefault();audioInit();
+addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#play');if(!t||INTR.ok)return;if($('intro')||$('ctlcard')||$('splash')){e.stopImmediatePropagation();e.preventDefault();return;}t.blur();e.stopImmediatePropagation();e.preventDefault();audioInit();
   runIntro(()=>{const go=()=>setTimeout(()=>{INTR.ok=true;$('play').click();INTR.ok=false;},0);if(location.hash==='#test')go();else ctlCard(go,'▶ START (slowly)');});},true);
 {const bg=begin;begin=function(d){bg(d);WELCOME.t=d?0:6;if(!d){cam.dist=46;cam.pitch=.95;}};}
 const WELCOME={t:0};
@@ -4603,7 +4603,7 @@ const POD={A:null,gy:0,cast:{},q:0,qt:0,clip:{on:false,t:0,n:0,takes:[]},hunt:[]
     P.push(pt(Cyl(.05,.05,1,6),0x8a8a94,M(x,2.2,-.4)),pt(Sph(.2,8,6),0x101014,M(x,2.75,-.4)));}
   for(let k=0;k<5;k++)P.push(pt(Box(.5,.7,.3),[0xc8102e,0x1e2c5a,0xffd400,0x101014,0x40ff70][k],M(-10.5+k*.75,3.6,-7.7)),pt(Box(.5,.7,.3),[0x40ff70,0xffd400,0xc8102e,0x1e2c5a,0x101014][k],M(-10.5+k*.75,1.6,-7.7)));
   add(new THREE.Mesh(merge(P),lam)).position.set(A.x,gy+.4,A.z);
-  colliders.push({x:A.x,z:A.z-1.6,r:3,top:gy+2.2});for(let k=-5;k<=5;k++)colliders.push({x:A.x+k*2.2,z:A.z-9,r:1.2,top:gy+10});
+  [-3.4,-1.2,1.2,3.4].forEach(o=>colliders.push({x:A.x+o,z:A.z-1.6,r:1.3,top:gy+2.2}));for(let k=-5;k<=5;k++)colliders.push({x:A.x+k*2.2,z:A.z-9,r:1.2,top:gy+10});
   [-8,8].forEach(x=>{const rl=add(new THREE.Mesh(Tor(1.7,.16,8,30),new THREE.MeshBasicMaterial({color:0xffffff})));rl.position.set(A.x+x,gy+3.6,A.z+1);});
   // the LED wall: the show's name and a chat that never stops
   const cv=document.createElement('canvas');cv.width=512;cv.height=200;const tx=new THREE.CanvasTexture(cv);const wall=add(new THREE.Mesh(new THREE.PlaneGeometry(22,8.6),new THREE.MeshBasicMaterial({map:tx})));wall.position.set(A.x,gy+5.5,A.z-8.65);POD.wall={cv,tx,t:0};
@@ -4689,7 +4689,7 @@ const MTX={tex:null,curtain:null,cols:[],cubes:[],t:0};
   A38.add(new THREE.Mesh(merge(blobs),new THREE.MeshPhongMaterial({vertexColors:true,transparent:true,opacity:.7,shininess:120})));
   const st=document.createElement('style');st.textContent='#mtxo{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:0;font:bold 14px/1 monospace;color:#40ff70;overflow:hidden;white-space:pre;mix-blend-mode:screen;transition:opacity .3s}#app.filler #mtxo{opacity:.35}#app.cine #mtxo{display:none}';document.head.appendChild(st);
   const o=document.createElement('div');o.id='mtxo';$('app').appendChild(o);MTX.o=o;})();
-function mtxUpdate(dt){const t=S.t;MTX.tex.offset.y=-t*.6;if(app.classList.contains('filler')){MTX.t-=dt;if(MTX.t<=0){MTX.t=.12;const ch='ｱｲｳｴｵｶｷｸｹｺ0167SLOPFILLER';let s='';for(let i=0;i<30;i++){for(let j=0;j<60;j++)s+=Math.random()<.12?ch[Math.floor(Math.random()*ch.length)]:' ';s+='\n';}MTX.o.textContent=s;}}
+function mtxUpdate(dt){const t=S.t;MTX.tex.offset.y=-t*.6;if(!app.classList.contains('filler')&&MTX.o.textContent)MTX.o.textContent='';if(app.classList.contains('filler')){MTX.t-=dt;if(MTX.t<=0){MTX.t=.12;const ch='ｱｲｳｴｵｶｷｸｹｺ0167SLOPFILLER';let s='';for(let i=0;i<30;i++){for(let j=0;j<60;j++)s+=Math.random()<.12?ch[Math.floor(Math.random()*ch.length)]:' ';s+='\n';}MTX.o.textContent=s;}}
   if(S.inPk)return;for(const c of MTX.cubes){if(Math.hypot(PL.x-c.x,PL.z-c.z)>140)continue;const g=Math.sin(t*7+c.k)>.7;c.m.visible=!(Math.sin(t*13+c.k*3)>.92);c.m.position.set(c.x+(g?(Math.random()-.5)*1.5:0),c.y+Math.sin(t+c.k)*.6,c.z);c.m.rotation.set(t*.3+c.k,t*.5,0);if(g)c.m.material.color.setHSL(Math.random(),1,.55);}}
 
 /* ---------------- 3. THE SIDEQUEST: a course that goes sideways, over a lake of slop ---------------- */
@@ -5274,34 +5274,34 @@ function cheatUpdate(dt,play){if(!X.q38||!X.q38.ch)return;const on=chOn;
 const GACHA={m:[],cd:0};
 const GACHA_RUG=['🎰 RUGGED. The capsule was empty. So is some of your wallet.','🎰 The machine ate {n} aura and displayed "thank you for your liquidity".','🎰 You pulled: a tiny certificate that says you own {n} less aura.','🎰 RUG. The claw came out, took {n} aura, and went back in.','🎰 The capsule contained a mirror. You lost {n} aura looking at it.','🎰 "BETTER LUCK NEXT PULL" · minus {n} aura · there is no better luck.','🎰 The machine sneezed. {n} aura is gone. It did not say excuse me.'];
 const GACHA_NIL=['🎰 You pulled: a smaller capsule. It is empty.','🎰 You pulled: a sticker of a rat. It is not a cheat. It is a rat.','🎰 You pulled: one (1) packing peanut.','🎰 You pulled: a coupon for another pull at full price.'];
-const GACHA_COST=6742069;
+const GACHA_COST=67420;
 const G_LOSE=['LMAOOO','skill issue','that was your rent','the capsule was empty. like your wallet. like you.','imagine losing to a vending machine','your aura tasted mid','L + ratio + rugged + no cheat','even the rats win sometimes','I am literally a box and I am richer than you','thank you for your liquidity','that one hurt to watch. I watched anyway.','you pulled like somebody who loses','did you think that would work? be honest'],
   G_MORE=['AGAIN. DO IT AGAIN.','one more. you are due. (you are not due)','keep spending. the next one is the one. (it is not the one)','you cannot stop now. think of what you already lost.','winners pull again. so do you, apparently.','go on. I believe in you. (I believe in your aura.)','quitting is for people with money left. oh.','the cheat is in the NEXT capsule. I can see it from here.'],
   G_STREAK=['that is {n} in a row. statistically you are owed. statistics is not real.','{n} straight Ls. a new personal best.','{n} pulls, zero cheats. I am not even trying.','sunk cost so far: {s} aura. quitting now would WASTE it.'],
-  G_IDLE=['psst. NPC. NOW ONLY 6,742,069.','you look like you have aura and no plan.','feeling lucky? you should not be.','the last guy won. (there was no last guy)','come on. one pull. what is the worst that could happen. (everything)','I can smell aura on you.','do not walk past me. nobody walks past me. (everybody walks past me)'],
+  G_IDLE=['psst. NPC. NOW ONLY 67,420.','you look like you have aura and no plan.','feeling lucky? you should not be.','the last guy won. (there was no last guy)','come on. one pull. what is the worst that could happen. (everything)','I can smell aura on you.','do not walk past me. nobody walks past me. (everybody walks past me)'],
   G_LEAVE=['COWARD.','come back. you were due.','that is fine. I will keep your aura warm.','walk away. like your father.','you will be back. they always come back. like Bibi.','leaving? with THAT streak?'],
-  G_BROKE=['you cannot afford me. Slopburger is hiring.','come back when you are somebody.','6,742,069. you have {a}. embarrassing for both of us.','no aura? sell a kidney. NPCs have four.'],
+  G_BROKE=['you cannot afford me. Slopburger is hiring.','come back when you are somebody.','67,420. you have {a}. embarrassing for both of us.','no aura? sell a kidney. NPCs have four.'],
   G_WIN=['NO. that was not supposed to happen. give it back.','...enjoy it. it will not happen again.','a CHEAT? I am calling my manager. (I am the manager.)','fine. FINE. pull again, I dare you.'],
   G_TIER=[[1,'FRESH MEAT'],[5,'REGULAR'],[15,'VALUED CUSTOMER'],[30,'WHALE'],[67,'EXIT LIQUIDITY']];
 function gachaTier(n){let t='WINDOW SHOPPER';G_TIER.forEach(q=>{if(n>=q[0])t=q[1];});return t;}
 function gachaSay(m,t){bubble(t,m.x,m.y+7.4,m.z);m.talk=2.4;}
 function gachaWah(){if(!AU.ctx)return;const t=AU.ctx.currentTime;[330,311,294,220].forEach((f,i)=>tone(f,i===3?.7:.28,'sawtooth',.09,t+i*.3,i===3?150:f*.97));}
-function gachaPull(m){const q=chQ();if(GACHA.cd>0)return;if(S.aura<GACHA_COST){SFX.hit();gachaSay(m,pick(G_BROKE).replace('{a}',fmt(S.aura)));toast('🎰 A pull is NOW ONLY 6,742,069 aura. You have '+fmt(S.aura)+'.');return;}GACHA.cd=1.1;S.aura-=GACHA_COST;q.ga.n++;q.ga.pity++;q.ga.lost+=GACHA_COST;m.shake=.8;m.last=S.t;tone(300,.5,'square',.08,0,900);
+function gachaPull(m){const q=chQ();if(GACHA.cd>0)return;if(S.aura<GACHA_COST){SFX.hit();gachaSay(m,pick(G_BROKE).replace('{a}',fmt(S.aura)));toast('🎰 A pull is NOW ONLY 67,420 aura. You have '+fmt(S.aura)+'.');return;}GACHA.cd=1.1;S.aura-=GACHA_COST;q.ga.n++;q.ga.pity++;q.ga.lost+=GACHA_COST;m.shake=.8;m.last=S.t;tone(300,.5,'square',.08,0,900);
   const tier=G_TIER.find(t=>t[0]===q.ga.n);if(tier)setTimeout(()=>chapter('🎰 LOYALTY TIER',tier[1]+' · '+q.ga.n+' pull'+(q.ga.n>1?'s':'')+' · the machines know your name'),1600);
   const left=CHEATS.filter(c=>!q.ch.own.includes(c[0])),r=Math.random();
   if(left.length&&(q.ga.pity>=9||r<.08)){q.ga.pity=0;q.ga.streak=0;const c=pick(left);q.ch.own.push(c[0]);q.ch.on[c[0]]=false;save();SFX.win();flash(.8,600);burst(m.x,m.y+3,m.z,50,.14,10,8,1);gachaSay(m,pick(G_WIN));chapter('🎰 CHEAT UNLOCKED',c[1]+' '+c[2]+' · turn it on in the pause menu → CHEATS');return;}
-  if(r<.2){const n=Math.round(GACHA_COST*pick([.25,.5,.5,1,1.5,3]));q.ga.won+=n;q.ga.streak=0;addAura(n,m.x,m.y+4,m.z);SFX.relic();gachaSay(m,n>GACHA_COST?pick(G_WIN):'you got SOME of it back. that is called a discount. pull again.');toast('🎰 You won '+fmt(n)+' aura'+(n<GACHA_COST?' (you paid 6,742,069 for it).':'. The machine is furious.'));save();return;}
+  if(r<.2){const n=Math.round(GACHA_COST*pick([.25,.5,.5,1,1.5,3]));q.ga.won+=n;q.ga.streak=0;addAura(n,m.x,m.y+4,m.z);SFX.relic();gachaSay(m,n>GACHA_COST?pick(G_WIN):'you got SOME of it back. that is called a discount. pull again.');toast('🎰 You won '+fmt(n)+' aura'+(n<GACHA_COST?' (you paid 67,420 for it).':'. The machine is furious.'));save();return;}
   q.ga.streak=(q.ga.streak||0)+1;const st=q.ga.streak;
-  if(r<.4){gachaWah();gachaSay(m,pick(G_LOSE));setTimeout(()=>gachaSay(m,st>=3?pick(G_STREAK).replace('{n}',st).replace('{s}',fmt(q.ga.lost)):pick(G_MORE)),2300);toast(pick(GACHA_NIL)+' That cost 6,742,069 aura.');save();return;}
-  const n=Math.min(Math.floor(S.aura),Math.max(67,Math.floor(S.aura*(.08+Math.random()*.16))));S.aura-=n;q.ga.lost+=n;save();SFX.boom();gachaWah();S.shake=.5;$('ratio').hidden=false;setTimeout(()=>{$('ratio').hidden=true;},500);floatText('-'+fmt(n+GACHA_COST)+' AURA',PL.x,PL.y+4.5,PL.z,'#ff2e2e');
-  gachaSay(m,pick(G_LOSE));setTimeout(()=>gachaSay(m,st>=3?pick(G_STREAK).replace('{n}',st).replace('{s}',fmt(q.ga.lost)):pick(G_MORE)),2300);toast(pick(GACHA_RUG).replace('{n}',fmt(n))+' (On top of the 6,742,069.)');}
+  if(r<.56){gachaWah();gachaSay(m,pick(G_LOSE));setTimeout(()=>gachaSay(m,st>=3?pick(G_STREAK).replace('{n}',st).replace('{s}',fmt(q.ga.lost)):pick(G_MORE)),2300);toast(pick(GACHA_NIL)+' That cost 67,420 aura.');save();return;}
+  const n=Math.min(Math.floor(S.aura),Math.max(67,Math.floor(S.aura*(.03+Math.random()*.08))));S.aura-=n;q.ga.lost+=n;save();SFX.boom();gachaWah();S.shake=.5;$('ratio').hidden=false;setTimeout(()=>{$('ratio').hidden=true;},500);floatText('-'+fmt(n+GACHA_COST)+' AURA',PL.x,PL.y+4.5,PL.z,'#ff2e2e');
+  gachaSay(m,pick(G_LOSE));setTimeout(()=>gachaSay(m,st>=3?pick(G_STREAK).replace('{n}',st).replace('{s}',fmt(q.ga.lost)):pick(G_MORE)),2300);toast(pick(GACHA_RUG).replace('{n}',fmt(n))+' (On top of the 67,420.)');}
 function gachaTaunt(dt,play){if(!play||S.inPk)return;const q=X.q38&&X.q38.ga;for(const m of GACHA.m){const d=Math.hypot(PL.x-m.x,PL.z-m.z);if(m.talk>0)m.talk-=dt;if(d>60){m.near=false;continue;}
     if(d<13){m.near=true;m.idle=(m.idle===undefined?2:m.idle)-dt;if(m.idle<=0&&!(m.talk>0)){m.idle=7+Math.random()*6;gachaSay(m,q&&q.streak>=3&&Math.random()<.5?pick(G_STREAK).replace('{n}',q.streak).replace('{s}',fmt(q.lost)):pick(G_IDLE));}}
     else if(m.near&&d>17){m.near=false;if(m.last&&S.t-m.last<40&&q&&q.streak>0){gachaSay(m,pick(G_LEAVE));tone(200,.3,'sawtooth',.06,0,120);}}}}
 function gachaBuild(x,z){const y=groundH(x,z),g=new THREE.Group();g.position.set(x,y,z);g.rotation.y=Math.atan2(-x,-z);scene.add(g);const P=[pt(Box(2.4,2.2,2.4),0xff2e88,M(0,1.1,0)),pt(Box(2.6,.3,2.6),0xffd400,M(0,2.3,0)),pt(Box(.9,.5,.2),0x101014,M(0,.7,1.22)),pt(Cyl(.3,.3,.25,10),0xffd400,M(.7,1.4,1.25,Math.PI/2)),pt(Cyl(.9,1.2,.4,12),0xffd400,M(0,4.9,0))];
   const cols=[0xff2e88,0x19e3ff,0xb6ff00,0xffd400,0x7a2cff,0xff5a1f];for(let k=0;k<16;k++){const a=k*2.4,R=.2+(k%4)*.22;P.push(pt(Sph(.3,8,6),cols[k%6],M(Math.cos(a)*R,2.8+(k%5)*.36,Math.sin(a)*R)));}g.add(new THREE.Mesh(merge(P),lam));
   const dome=new THREE.Mesh(new THREE.SphereGeometry(1.35,16,12),new THREE.MeshPhongMaterial({color:0xd8f4ff,transparent:true,opacity:.3,shininess:200,specular:0xffffff}));dome.position.y=3.5;g.add(dome);
-  const l=textSprite(['🎰 GACHA','NOW ONLY 6,742,069 AURA · odds: lol'],.5,{color:'#ffd400'});l.position.y=6.2;g.add(l);const l2=textSprite('KEEP SPENDING',.42,{color:'#ff2e88'});l2.position.y=7.3;g.add(l2);colliders.push({x,z,r:1.9,top:y+5});const m={x,z,y,g,shake:0};GACHA.m.push(m);return m;}
+  const l=textSprite(['🎰 GACHA','NOW ONLY 67,420 AURA · odds: lol'],.5,{color:'#ffd400'});l.position.y=6.2;g.add(l);const l2=textSprite('KEEP SPENDING',.42,{color:'#ff2e88'});l2.position.y=7.3;g.add(l2);colliders.push({x,z,r:1.9,top:y+5});const m={x,z,y,g,shake:0};GACHA.m.push(m);return m;}
 (function(){for(let k=0;k<12;k++){const s=boreSpot(k%2===0,50);if(s)gachaBuild(s.x,s.z);}[['pod',.9],['slopc',2.2],['course',-2.2]].forEach(a=>{const A=ABY[a[0]],an=Math.atan2(A.z,A.x)+a[1];gachaBuild(A.x+Math.cos(an)*(A.r-4),A.z+Math.sin(an)*(A.r-4));});})();
 // ---- THE TRENCHES
 SPEAK.mgr={name:'THE SHIFT MANAGER',face:'🍔',pitch:170,wave:'square'};BARK.mgr=['NOW HIRING. ALWAYS HIRING.','FORMER TRADERS WELCOME.','THE FRYER DOES NOT RUG.','SHIFT STARTS AT 6.','WOULD YOU LIKE SLOP WITH THAT?'];
@@ -5404,12 +5404,12 @@ addEventListener('keydown',e=>{if(!$('trade'))return;if(TRD.ph==='live'&&(e.code
 {const dr=devReady;devReady=function(){return !$('trade')&&dr();};}
 {const dr=devReset;devReset=function(){if($('trade')){if(TRD.ph==='live')trdEnd(false);TRD.ph='';trdClose();}dr();};}
 // ---- wiring
-{const ai=act15Interact;act15Interact=function(){if(S.dead||S.inPk)return ai();for(const m of GACHA.m)if(Math.hypot(PL.x-m.x,PL.z-m.z)<4&&Math.abs(PL.y-m.y)<4)return{label:'🎰 PULL THE GACHA (only 6,742,069 aura)',fn:()=>gachaPull(m)};
+{const ai=act15Interact;act15Interact=function(){if(S.dead||S.inPk)return ai();for(const m of GACHA.m)if(Math.hypot(PL.x-m.x,PL.z-m.z)<4&&Math.abs(PL.y-m.y)<4)return{label:'🎰 PULL THE GACHA (only 67,420 aura)',fn:()=>gachaPull(m)};
   if(TR.A&&Math.hypot(PL.x-TR.A.x,PL.z-TR.A.z)<TR.A.r){if(Math.hypot(PL.x-TR.term.x,PL.z-TR.term.z)<3.6&&Math.abs(PL.y-TR.term.y)<4)return{label:'💻 TRADE MEME COINS',fn:trdOpen};if(Math.hypot(PL.x-TR.sb.x,PL.z-TR.sb.z)<3&&Math.abs(PL.y-TR.sb.y)<4)return{label:'🍔 CLOCK IN AT SLOPBURGER',fn:sbShift};}return ai();};}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);gachaTaunt(dt,play);if(GACHA.cd>0)GACHA.cd-=dt;GACHA.m.forEach(m=>{if(m.shake>0){m.shake-=dt;m.g.rotation.z=Math.sin(S.t*60)*.08*m.shake;}});trUpdate(dt,play);cheatUpdate(dt,play);};}
 {const ar=act7Rows;act7Rows=function(){const q=chQ(),R=[];if(q.ga.n)R.push(['gacha','🎰 Gacha cheats '+q.ch.own.length+'/'+CHEATS.length+' · rugged '+fmt(q.ga.lost)+' aura',q.ch.own.length>=CHEATS.length]);if(X.vis.includes('trench'))R.push(['trench','📉 The Trenches: lifetime '+(q.trd.pnl<0?'':'+')+fmt(Math.round(q.trd.pnl))+' · 🪦 '+(q.deadc||[]).length+'/15 · climb the chart'+(q.ath?' ✓':''),!!q.ath&&(q.deadc||[]).length>=15&&q.trd.n>=10]);return ar().concat(R);};}
 {const at=act7Target;act7Target=function(id){if(id==='gacha'){let b=null,bd=1e9;GACHA.m.forEach(m=>{const d=Math.hypot(PL.x-m.x,PL.z-m.z);if(d<bd){bd=d;b=m;}});return b?{x:b.x,z:b.z,l:'A GACHA MACHINE'}:null;}if(id==='trench')return{x:TR.term.x,z:TR.term.z,l:'THE TERMINAL'};return at(id);};}
-CX.push(['w_gacha','WORLD','The Gacha Machines','Sixteen of them, scattered where nobody asked for one. A pull is NOW ONLY 6,742,069 aura. Most pulls then rug you for more on top, and the machine laughs at you and tells you to pull again. Roughly one in twelve coughs up a cheat, which you turn on in the pause menu. The odds are printed on the machine. The odds say "lol".',()=>chQ().ga.n>0],
+CX.push(['w_gacha','WORLD','The Gacha Machines','Sixteen of them, scattered where nobody asked for one. A pull is NOW ONLY 67,420 aura. Most pulls then rug you for more on top, and the machine laughs at you and tells you to pull again. Roughly one in twelve coughs up a cheat, which you turn on in the pause menu. The odds are printed on the machine. The odds say "lol".',()=>chQ().ga.n>0],
   ['w_trench','WORLD','The Trenches','A crater out past everything, full of tents, cans, and degens who say gm. A board sorts everyone into MAXXING PROFIT and REPORTING TO SLOPBURGER. A terminal sells meme coins in 20 second rounds, with charts drawn by the AI Brain Rot Clip Engine 9,000,000 (67). Most rounds end when the dev sells. You can climb the candles to the all time high. It smells.',()=>X.vis.includes('trench')],
   ['w_sb','WORLD','Slopburger','The only employer in the Trenches. Nobody can rug the fryer. Clock in, work a shift, get paid in aura that is actually yours. Former traders welcome. All traders are former traders.',()=>chQ().trd.shift>0]);
 CAST_CX.push(['chad','🧟','THE DEGENS','Eight of them live in the Trenches. They say gm at noon and gn at noon. They are all down 99% and still bullish. Do not touch them. Do not ask about the bottles.'],['mgr','🍔','THE SHIFT MANAGER','Runs Slopburger. Has an apron with your name on it. Has had it for a while.']);
@@ -5418,7 +5418,7 @@ ACH.push(['gacha1','Thank You For Your Liquidity','got rugged by a gacha machine
 SAV_PLACE.push(['trench','The Trenches? Bro, those dudes offered me a coin with my name on it. I didn\'t make that. I checked it though. It\'s up two percent. That\'s a normal amount.']);
 wrPad38('📉','THE TRENCHES',0x30d060,'trench',()=>{if(S.inPk)exitPk();const A=ABY.trench;warpTo(A.x+A.x/Math.hypot(A.x,A.z)*-(A.r-8),A.z+A.z/Math.hypot(A.x,A.z)*-(A.r-8),undefined,undefined,['THE TRENCHES','gm · it smells in here']);});
 DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','GACHA AND THE TRENCHES (ACT 43)'],['p_trench','The Trenches, at the terminal, with 100,000 aura',()=>{S.aura=Math.max(S.aura,100000);warpTo(TR.term.x,TR.term.z+1,undefined,Math.PI,['THE TRENCHES','🛠️ dev']);}],
-  ['p_cheats','Unlock every cheat (all off)',()=>{const q=chQ();CHEATS.forEach(c=>{if(!q.ch.own.includes(c[0]))q.ch.own.push(c[0]);});toast('🛠️ Pause menu → CHEATS.');}],['p_gacha','Next to a gacha machine with 100,000,000 aura',()=>{S.aura=Math.max(S.aura,100000000);const m=GACHA.m[0];warpTo(m.x-m.x/Math.hypot(m.x,m.z)*3,m.z-m.z/Math.hypot(m.x,m.z)*3,undefined,undefined,['A GACHA MACHINE','🛠️ dev']);}]);
+  ['p_cheats','Unlock every cheat (all off)',()=>{const q=chQ();CHEATS.forEach(c=>{if(!q.ch.own.includes(c[0]))q.ch.own.push(c[0]);});toast('🛠️ Pause menu → CHEATS.');}],['p_gacha','Next to a gacha machine with 2,000,000 aura',()=>{S.aura=Math.max(S.aura,2000000);const m=GACHA.m[0];warpTo(m.x-m.x/Math.hypot(m.x,m.z)*3,m.z-m.z/Math.hypot(m.x,m.z)*3,undefined,undefined,['A GACHA MACHINE','🛠️ dev']);}]);
 
 /* ================= ACT 44: THE TRAILER. An opening movie that takes this far too seriously: real shots of the world, title cards, a cast, a crew, and a title slam. Plays after the boot-up text on a new game, and from the title menu. ================= */
 const MOV={on:false,i:-1,t0:0,u:0,shot:null,el:null,done:null,raf:0,ended:false};
@@ -5467,6 +5467,8 @@ function movieRun(done){audioInit();const el=document.createElement('div');el.id
 {const ri=runIntro;runIntro=function(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}ri(()=>movieRun(done));};}
 (function(){const m=document.querySelector('#title .menu');if(!m)return;const b=document.createElement('button');b.id='tMov';b.textContent='🎬 WATCH THE TRAILER';m.insertBefore(b,$('tCred'));b.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();});};})();
 
+// the Kiss or Slop contestants had a talk prompt and nothing behind it
+['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
