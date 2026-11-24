@@ -42,5 +42,5 @@ const lane = press => p.evaluate(press => { const P = __pit, M = P.MT, me = M.me
   return got; }, press);
 const l0 = await lane(false), l1 = await lane(true);
 ok(l1 > l0 + 4, `passes thrown past you (40 each): intercepted ${l1} jumping the lane, ${l0} standing still`);
-const tags = await p.evaluate(() => __pit.MT.P.map(q => q.rig.root.children.filter(c => c.isSprite).length)); ok(tags.every(n => n >= 1), 'every player has a name tag: ' + tags.join(','));
+const tags = await p.evaluate(() => __pit.MT.P.map(q => q.tag && q.tag.isSprite ? 1 : 0)); ok(tags.every(n => n >= 1), 'every player has a name tag (under them): ' + tags.join(','));
 console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close();

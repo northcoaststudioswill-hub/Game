@@ -1,0 +1,37 @@
+// The cast on the Block: Nexx (ride, content, goji wrap, merch, server), Mark & D, Erin's stand, Bottie, Louie; the
+// pickup run in the cage. node tests/cast.mjs → tests/shots/cast-nexx.png
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 960, height: 540 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
+await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
+let r = await p.evaluate(() => { const W = __pit.W, C = W.cast; return { cast: C && C.list.map(n => n.cast), louie: !!(C && C.louie), park: !!W.park, spots: W.spots.map(s => s.label).filter(l => /NEXX|MARK|ERIN|BOTTIE|LOUIE/.test(l)) }; });
+ok(r.cast && r.cast.includes('nexx') && r.louie && r.park && r.spots.length === 5, `on the Block: ${r.cast.join(', ')}, Louie, the run in the cage; spots ${r.spots.join(' · ')}`);
+// Nexx's menu
+r = await p.evaluate(() => { const P = __pit; P.uiNexx(); window.__tick(2); return Array.from(document.querySelectorAll('#panel .btn')).map(b => b.textContent); });
+ok(r.includes('RIDE') && r.some(t => t.startsWith('CONTENT')) && r.some(t => t.startsWith('GOJI')) && r.includes('MERCH') && r.includes('THE SERVER'), `Nexx: ${r.join(' · ')}`);
+r = await p.evaluate(() => { const P = __pit, S = P.S, n0 = S.boosts.length; Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent.startsWith('GOJI')).click(); window.__tick(2); const got = S.boosts.includes('goji');
+  P.uiNexx(); window.__tick(2); const again = Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent.includes('WRAP')); return { got, disabled: again && again.disabled }; });
+ok(r.got && r.disabled, `goji wrap: in your boosts (${r.got}), once a day (button off after: ${r.disabled})`);
+r = await p.evaluate(() => { const P = __pit, S = P.S, g = S.nexx.goal, keys = ['dunks', 'greens', 'ankles', 'threes', 'ast', 'blk'], st = {}; for (const k of keys) st[k] = 0; const miss = P.nexxCheck({ stats: st }); st[keys[g]] = 9; const hit = P.nexxCheck({ stats: st }); const again = P.nexxCheck({ stats: st }); return { miss, hit: hit && hit.vc, again }; });
+ok(r.miss === null && r.hit === 200 && r.again === null, `content: nothing for a game without it, 200 VC when you do it (${r.hit}), once a day`);
+r = await p.evaluate(() => { const P = __pit, S = P.S; S.vc = 5000; P.uiClose(); P.uiNexx(); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent === 'MERCH').click(); window.__tick(2);
+  const names = Array.from(document.querySelectorAll('#panel h3')).map(h => h.textContent); document.querySelector('#panel .card .btn').click(); window.__tick(2); return { names, owned: S.owned.includes('t_nexx'), vc: S.vc }; });
+ok(r.names.length === 3 && r.owned, `NEXX SUPPLY: ${r.names.join(', ')}; bought the hoodie (${r.vc} VC left)`);
+r = await p.evaluate(() => { const P = __pit; P.uiClose(); P.uiNexx(); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent === 'RIDE').click(); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent === 'THE CAGES').click(); window.__tick(30); return P.W && P.W.kind; });
+ok(r === 'pit', `Nexx drives you to The Cages (${r})`);
+await p.evaluate(() => { __pit.enterWorld('hub', -9.5, -6.5, Math.PI); window.__tick(40); });
+r = await p.evaluate(() => { const P = __pit, S = P.S, rp = S.rep; P.uiLouie(); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent === 'SCRATCHES').click(); window.__tick(2); return S.rep - rp; });
+ok(r === 3, `Louie: scratches, +${r} Respect`);
+r = await p.evaluate(() => { const P = __pit, S = P.S; S.vc = 100; P.uiErin(); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent.startsWith('FARM')).click(); window.__tick(2); return { b: S.boosts.includes('smoothie'), vc: S.vc }; });
+ok(r.b && r.vc === 60, `Erin's stand: a farm smoothie in your boosts, 40 VC`);
+r = await p.evaluate(() => { const W = __pit.W, nx = W.cast.nexx; W.me.x = nx.x + 1.5; W.me.z = nx.z + 2.5; window.__tick(30); return nx.amb; });
+ok(r === 'film', `walk up to Nexx and he films you (${r})`);
+r = await p.evaluate(() => { const W = __pit.W, L = W.cast.louie, x0 = L.x, z0 = L.z; L.zoom = 3; window.__tick(60); return +Math.hypot(L.x - x0, L.z - z0).toFixed(1); });
+ok(r > 2, `Louie gets the zoomies (${r} m in a second)`);
+await p.evaluate(() => { const W = __pit.W, nx = W.cast.nexx; __pit.uiClose(); W.me.x = nx.x + 2.4; W.me.z = nx.z + 3.2; W.me.face = Math.atan2(nx.x - W.me.x, nx.z - W.me.z); window.__tick(40); });
+await p.screenshot({ path: path.join(dir, 'shots', 'cast-nexx.png'), timeout: 300000 });
+console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close();

@@ -1,4 +1,4 @@
-// Courts: tier-painted park courts, the JAM arcade and its power-ups. node tests/courts.mjs
+// Courts: tier-painted park courts, the RUCKUS arcade and its power-ups. node tests/courts.mjs
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
 import path from 'path'; import { fileURLToPath } from 'url';
 const dir = path.dirname(fileURLToPath(import.meta.url));
@@ -9,7 +9,7 @@ await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluat
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
 const launch = (mi, ti) => p.evaluate(([mi, ti]) => { const P = __pit; if (P.MT) P.MT.cfg.onEnd = () => {}; P.uiClose(); P.launchGame(P.MODES[mi], P.TIERS_COURT[ti], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(220); const M = P.MT; return { kind: M.courtFx && M.courtFx.kind, pu: !!M.pu }; }, [mi, ti]);
 let r = await launch(0, 3); ok(r.kind === 'park' && !r.pu, `street game: dressed park court (${r.kind}), no power-ups`);
-r = await launch(2, 1); ok(r.kind === 'arcade' && r.pu, `JAM game: arcade court (${r.kind}) with power-ups`);
+r = await launch(2, 1); ok(r.kind === 'arcade' && r.pu, `RUCKUS game: arcade court (${r.kind}) with power-ups`);
 // spawn, take, effects
 const set = `var P = __pit, M = P.MT, me = M.me; M.phase = 'live'; M.needClear = false; M.clock = 20; for (const q of M.P) { q.st = 'free'; q.pu = null; q.puA = null; if (q.ai) q.ai.tick = 999; } for (const it of M.pu.list.slice()) { }`;
 r = await p.evaluate(s => { eval(s); for (const q of M.P) { q.x = 7.5; q.z = 12.5; } M.pu.t = 0; P.puStep(1 / 60); const it = M.pu.list[M.pu.list.length - 1]; if (!it) return { spawned: false };

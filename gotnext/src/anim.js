@@ -186,3 +186,47 @@ const TRANS = {
   'shoot>idle': 12, 'shoot>run': 14, 'shoot>slide': 16, 'jump>slide': 16, 'jump>idle': 12, 'hold>shoot': 30, 'hold>pass': 32, 'dribble>shoot': 30, 'dribble>pass': 32, 'dribble>hold': 22, 'sulk>idle': 6, 'celeb>idle': 8,
 };
 function transRate(from, to) { return TRANS[from + '>' + to] || TRANS['*>' + to] || 14; }
+
+// ---------------- 8. crowds ----------------
+// People watching a game. Every pose here is joint angles on top of the person's own idle blend (so any body size,
+// any profile). Ambient habits: watch, phone, film, talk, clap, bob, arms crossed. Reactions: up (arms up), jump,
+// ohh (hands on head), point (pointing and laughing), cover (hand over mouth), boo, count (three fingers), wave.
+const CROWD_AMBIENT = ['watch', 'watch', 'watch', 'phone', 'film', 'talk', 'clap', 'bob', 'cross'];
+function crowdPose(kind, t, o, prof) {
+  o = o || {}; const ph = o.ph || 0, P = idlePose(prof, t, { ph, alert: o.alert || 0 }), S_ = (k, x, y, z) => { P[k] = [x || 0, y || 0, z || 0]; };
+  const add = (k, x, y, z) => { const v = P[k] || (P[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+  const u = o.u === undefined ? 1 : o.u, s = Math.sin(t * 7 + ph), s2 = Math.sin(t * 3.1 + ph), jumpY = (a) => Math.max(0, Math.sin(t * 9 + ph)) * a;
+  const legsBend = (k) => { add('hpR', -0.25 * k); add('hpL', -0.25 * k); add('knR', 0.45 * k); add('knL', 0.45 * k); P.y = (P.y || 0) - 0.06 * k; };
+  switch (kind) {
+    case 'phone': S_('shR', -0.75, 0, 0.25); S_('elR', -2.1); S_('wrR', 0.5); add('neck', 0.35); add('chest', 0.06); break;
+    case 'film': S_('shR', -1.45, 0, 0.32); S_('elR', -0.9); S_('wrR', 0.3); S_('shL', -1.45, 0, -0.32); S_('elL', -0.9); S_('wrL', 0.3); add('neck', -0.05); break;
+    case 'talk': S_('shR', -0.55 - 0.25 * Math.max(0, s2), 0, -0.1); S_('elR', -1.3 + 0.3 * s2); S_('wrR', 0.3 * s2); add('neck', 0, 0.55, 0); add('chest', 0, 0.2, 0); break;
+    case 'clap': { const c = Math.max(0, Math.sin(t * 9 + ph)); S_('shR', -1.0, 0, 0.42 - 0.22 * c); S_('elR', -1.4); S_('wrR', 0.2); S_('shL', -1.0, 0, -0.42 + 0.22 * c); S_('elL', -1.4); S_('wrL', 0.2); break; }
+    case 'bob': { const b = Math.sin(t * 5.2 + ph); add('neck', 0.12 * Math.max(0, b)); add('spine', 0.04 * b); add('knR', 0.12 * Math.max(0, -b)); add('knL', 0.12 * Math.max(0, -b)); P.y = (P.y || 0) - 0.015 * Math.max(0, -b); S_('shR', 0.05, 0, -0.12); S_('elR', -0.4 - 0.2 * Math.max(0, b)); break; }
+    case 'cross': S_('shR', -0.55, 0, 0.55); S_('elR', -1.9); S_('shL', -0.55, 0, -0.55); S_('elL', -1.9); S_('wrR', 0); S_('wrL', 0); add('chest', -0.04); break;
+    case 'up': S_('shR', -2.75, 0, -0.35 + s * 0.15); S_('shL', -2.75, 0, 0.35 - s * 0.15); S_('elR', -0.3); S_('elL', -0.3); S_('wrR', s * 0.4); S_('wrL', -s * 0.4); add('chest', -0.12); add('neck', -0.2); P.y = (P.y || 0) + jumpY(0.05) * u; break;
+    case 'jump': legsBend(0.3 * (1 - Math.max(0, Math.sin(t * 9 + ph)))); P.y = (P.y || 0) + jumpY(0.16) * u; S_('shR', -2.2, 0, -0.5); S_('shL', -2.2, 0, 0.5); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.6); S_('wrL', 0.6); add('neck', -0.25); break;
+    case 'ohh': S_('shR', -2.6, 0, -0.9); S_('elR', -2.2); S_('shL', -2.6, 0, 0.9); S_('elL', -2.2); S_('wrR', 0.4); S_('wrL', 0.4); add('spine', -0.14 * u); add('chest', -0.12 * u); add('neck', -0.25 * u); legsBend(0.15); break;
+    case 'point': { const l = Math.max(0, Math.sin(t * 11 + ph)); S_('shR', -1.55, 0, 0.1); S_('elR', -0.05); S_('wrR', 0); S_('shL', -0.4, 0, -0.3); S_('elL', -1.5); add('spine', 0.25 + 0.12 * l); add('chest', 0.1 * l); add('neck', 0.1 * l); legsBend(0.25); break; }
+    case 'cover': S_('shR', -1.25, 0, 0.45); S_('elR', -2.3); S_('wrR', 0.3); S_('shL', -0.6, 0, -0.2); S_('elL', -1.2); add('spine', -0.1 * u); add('neck', -0.1); P.y = (P.y || 0) - 0.02; break;
+    case 'boo': S_('shR', -1.3, 0, 0.5); S_('elR', -1.9); S_('wrR', 0.6); S_('shL', -1.3, 0, -0.5); S_('elL', -1.9); S_('wrL', 0.6); add('spine', 0.12); add('neck', -0.15 + 0.08 * s); break;      /* hands cupped round the mouth */
+    case 'count': S_('shR', -2.9, 0, -0.15); S_('elR', -0.15); S_('wrR', 0.2 + 0.25 * s); S_('shL', -0.3, 0, 0.3); S_('elL', -1.2); add('neck', -0.2); P.y = (P.y || 0) + jumpY(0.04) * u; break;
+    case 'wave': { const a = t * 9 + ph; S_('shR', -2.4 + 0.35 * Math.sin(a), 0, -0.4 + 0.35 * Math.cos(a)); S_('elR', -0.6); S_('wrR', 0.5); S_('shL', -0.9, 0, 0.3); S_('elL', -1.6); P.y = (P.y || 0) + jumpY(0.06) * u; break; }      /* swinging a towel round */
+  }
+  P.rate = kind === 'watch' || kind === 'bob' ? 14 : 18; return P;
+}
+// how a person reacts to a play: kind of play, and whether it was their side that did it
+function crowdReaction(play, mine) {
+  const r = Math.random(), pick = (...a) => a[Math.floor(Math.random() * a.length)];
+  if (mine === false) return play === 'ko' || play === 'hit' ? pick('cover', 'ohh') : r < 0.5 ? 'boo' : r < 0.8 ? 'ohh' : 'cross';
+  switch (play) {
+    case 'dunk': return r < 0.4 ? 'jump' : r < 0.75 ? 'up' : r < 0.9 ? 'ohh' : 'point';
+    case 'three': return r < 0.45 ? 'count' : r < 0.85 ? 'up' : 'jump';
+    case 'block': return r < 0.5 ? 'ohh' : r < 0.8 ? 'up' : 'point';
+    case 'ankles': return r < 0.45 ? 'point' : r < 0.85 ? 'ohh' : 'jump';
+    case 'ko': case 'hit': return r < 0.4 ? 'cover' : r < 0.8 ? 'ohh' : 'jump';
+    case 'steal': return r < 0.5 ? 'clap' : 'up';
+    case 'win': return r < 0.35 ? 'jump' : r < 0.7 ? 'up' : 'wave';
+    default: return r < 0.6 ? 'clap' : 'up';
+  }
+}

@@ -644,7 +644,7 @@ function courtTex(style) {
       x.beginPath(); x.arc(X(0), Z(0), 1.25 * s, 0, Math.PI); x.stroke();
     } else { x.strokeStyle = P[2]; x.lineWidth = 5; x.setLineDash([18, 14]); x.beginPath(); x.arc(X(0), Z(0), 6.75 * s, 0.2, Math.PI - 0.2); x.stroke(); x.setLineDash([]); }
     x.shadowBlur = 0; x.fillStyle = style === 'arcade' ? 'rgba(255,79,216,.5)' : 'rgba(255,255,255,.16)'; x.font = '900 expanded 84px Archivo, Impact, sans-serif'; x.textAlign = 'center';
-    x.save(); x.translate(X(0), Z(10.2)); x.fillText(style === 'arcade' ? 'JAM' : style === 'street' ? BRAND.name : 'HOME', 0, 0); x.restore();
+    x.save(); x.translate(X(0), Z(10.2)); x.fillText(style === 'arcade' ? 'RUCKUS' : style === 'street' ? BRAND.name : 'HOME', 0, 0); x.restore();
   });
 }
 function addCourt(sc, style, hoopTier) {

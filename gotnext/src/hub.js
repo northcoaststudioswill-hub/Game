@@ -140,6 +140,9 @@ function buildHub() {
     x.fillStyle = 'rgba(236,233,226,.75)'; for (let i = 0; i < 12; i++) x.fillRect(X(-9 + i * 1.6), Z(11.2), 0.8 * u, 2.2 * u);
     x.font = '500 22px "JetBrains Mono", monospace'; x.fillStyle = 'rgba(242,193,78,.8)'; x.save(); x.translate(X(-9), Z(-1)); x.rotate(-0.3); x.fillText('WINNERS STAY →', 0, 0); x.restore(); x.save(); x.translate(X(6), Z(-2.5)); x.rotate(0.2); x.fillText('NO REFS. NO MERCY.', 0, 0); x.restore();
     for (const [mx, mz] of [[-6, 3], [8, -8], [3, 10]]) { x.fillStyle = '#1c1d21'; x.beginPath(); x.arc(X(mx), Z(mz), 0.55 * u, 0, 6.3); x.fill(); x.strokeStyle = '#3a3b42'; x.lineWidth = 3; x.stroke(); }
+    // grit: per-pixel noise so the asphalt reads as asphalt up close, and a few dark gum spots
+    for (let i = 0; i < 260; i++) { x.fillStyle = `rgba(0,0,0,${rnd(0.15, 0.35)})`; x.beginPath(); x.arc(rnd(0, S_), rnd(0, S_), rnd(1.5, 4), 0, 6.3); x.fill(); }
+    const img = x.getImageData(0, 0, S_, S_), d = img.data; for (let i = 0; i < d.length; i += 4) { const n = (Math.random() - 0.5) * 22; d[i] += n; d[i + 1] += n; d[i + 2] += n; } x.putImageData(img, 0, 0);
   });
   const g = new THREE.Mesh(new THREE.PlaneGeometry(34, 34), new THREE.MeshToonMaterial({ map: gt, gradientMap: ramp() })); g.rotation.x = -Math.PI / 2; scene.add(g);
   const g2 = M(new THREE.PlaneGeometry(400, 400), toon('#17181d'), 0, -0.05, 0, scene); g2.rotation.x = -Math.PI / 2;
@@ -158,12 +161,12 @@ function buildHub() {
   M(box(9.6, 0.14, 0.52), flat(0xff2d78), 0, 7.2, -12, scene);
   const ps2 = sign('CALL NEXT  //  WINNERS STAY', 4.4, 0.42, '#ff2d78', '#0a0a0e', { border: false }); ps2.position.set(0, 6.85, -11.72); scene.add(ps2);
   // the show court inside the cage
-  const ct = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), new THREE.MeshToonMaterial({ map: courtTex('street'), gradientMap: ramp() })); ct.rotation.x = -Math.PI / 2; ct.position.set(0, 0.012, -22); scene.add(ct);
+  const ct = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), new THREE.MeshToonMaterial({ map: parkCourtTex(1), gradientMap: ramp() })); ct.rotation.x = -Math.PI / 2; ct.position.set(0, 0.012, -22); scene.add(ct);
   const hp = hoopMesh(2, 'street'); hp.position.set(0, 0, -28); scene.add(hp);
   floodlight(-15, -13, 10, -4, -22); floodlight(15, -13, 10, 4, -22); floodlight(-15, -31, 10, -3, -23); floodlight(15, -31, 10, 3, -23);
-  for (let i = 0; i < 4; i++) { const b = aiBuild(rnd(70, 95)); b.worn = randomWorn(3); addNpc(b, rnd(-5, 5), rnd(-25.5, -17), rnd(0, 6), i === 0 ? 'cheer' : 'ball', { cage: true }); }
   for (let r = 0; r < 3; r++) ink(M(box(12, 0.4, 0.9), toon('#3a3c44'), 0, 0.3 + r * 0.45, -31 - r * 0.9, scene), 1.02);
-  for (let i = 0; i < 7; i++) { const b = aiBuild(60); const n = addNpc(b, -5 + i * 1.7, -31 - (i % 3) * 0.9, 0, 'cheer', { low: true }); n.rig.root.position.y = 0.5 + (i % 3) * 0.45; n.yFix = n.rig.root.position.y; }
+  parkInit(scene);      /* park.js: a real 2v2 run on the show court, and the bleachers watching it */
+  castInit();      /* cast.js: Nexx, Mark and D, Erin's stand, Bottie, Louie */
   spot(0, -10.3, 2.4, 'ENTER THE CAGES', () => enterWorld('pit', 0, 3.4, Math.PI));
   // elevated train behind it all
   M(box(120, 0.6, 3), toon('#23242a'), 0, 9.2, -37, scene); for (let x = -50; x <= 50; x += 10) M(box(0.8, 9, 0.8), toon('#23242a'), x, 4.5, -37, scene);
@@ -354,6 +357,7 @@ function worldStep(dt) {
   else locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
   for (const n of W.npcs) {
+    if (n.cast) continue;      /* cast.js animates its own people */
     let an = n.anim === 'ball' ? 'dribble' : n.anim, o = { ph: n.ph, leg: n.rig.legLen, sp: 0, dr: Math.abs(Math.sin(W.t * 7 + n.ph)) };
     if (n.wander && !(n.bum && W.talk === n)) {
       n.wt -= dt; if (n.wt <= 0) { n.wt = rnd(3, 9); const rg = n.range || 2.5; n.tx = n.hx + rnd(-rg, rg); n.tz = n.hz + rnd(-rg, rg); }
@@ -362,9 +366,12 @@ function worldStep(dt) {
       else if (Math.hypot(me.x - n.x, me.z - n.z) < 5 && n.bum) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08);
     }
     if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt, undefined, undefined, n.swag === undefined ? (n.swag = 0.4 + RNG() * 0.6) : n.swag); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
-    else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, an === 'idle' ? Object.assign({ prof: n.rig.prof, ph: n.ph }, o) : o), dt); }
+    else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face;
+      if (an === 'idle' && !n.bum && !n.still) { n.ambT = (n.ambT || rnd(1, 6)) - dt; if (n.ambT <= 0 || !n.amb) { n.amb = pick(CROWD_AMBIENT.filter(k => k !== 'film')); n.ambT = rnd(4, 11); } applyPose(n.rig, crowdPose(n.amb, W.t, { ph: n.ph }, n.rig.prof), dt); }      /* people standing around have habits: phone, talking, bobbing, arms crossed */
+      else applyPose(n.rig, poseOf(an, W.t, an === 'idle' ? Object.assign({ prof: n.rig.prof, ph: n.ph }, o) : o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }
+  if (W.park) parkStep(dt); if (W.cast) castStep(dt);
   for (const c of W.cars) { c.a += c.s * dt; c.c.position.set(Math.cos(c.a) * c.r, c.y, Math.sin(c.a) * c.r); c.c.rotation.y = -c.a + (c.s > 0 ? -Math.PI / 2 : Math.PI / 2); }
   if (W.train) { W.train.position.x += dt * 16; if (W.train.position.x > 95) W.train.position.x = -140 - rnd(0, 120); }
   if (W.eq) { W.eq.forEach((e, i) => { const v = 0.2 + Math.abs(Math.sin(W.t * (6 + i * 1.3) + i)) * (0.5 + 0.5 * Math.abs(Math.sin(W.t * 1.9))); e.scale.y = v * 2; e.position.y = 1.02 + v * 0.3; }); const pu = 1 + Math.max(0, Math.sin(W.t * 11.4)) * 0.08; for (const sp of W.speakers) sp.scale.set(pu, 1, pu); }

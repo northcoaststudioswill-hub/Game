@@ -1,6 +1,6 @@
 // GOT NEXT — the courts, dressed. Park courts get real asphalt (grit, resurfacing patches, worn paint, rubber scuffs,
 // lane hashes, a centre logo) painted in their tier's colours, plus courtside life and a flip scoreboard on the fence.
-// JAM courts become an arcade: a neon floor, LED strips that chase and flash on scores, a jumbotron, and power-ups.
+// RUCKUS courts become an arcade: a neon floor, LED strips that chase and flash on scores, a jumbotron, and power-ups.
 // Gameplay is host-side (puStep, from matchStep); everything you see runs on host and guest alike (courtFx, from matchFx).
 'use strict';
 
@@ -73,7 +73,7 @@ function drawBoard(S, M_) {
   b.tex.needsUpdate = true;
 }
 
-// ---------------- JAM: the arcade ----------------
+// ---------------- RUCKUS: the arcade ----------------
 function arcadeCourtTex() {
   return canvasTex(1024, 1024, (x, W) => {
     const s = W / 18, X = v => (v + 9) * s, Z = v => (v + 3) * s;
@@ -91,7 +91,7 @@ function arcadeCourtTex() {
     x.shadowBlur = 26; x.shadowColor = '#33e0ff'; x.strokeStyle = 'rgba(51,224,255,.5)'; x.lineWidth = 14; lines(); x.shadowBlur = 8; x.strokeStyle = '#bff6ff'; x.lineWidth = 5; lines(); x.shadowBlur = 0;
     // the big logo at centre court
     x.save(); x.translate(X(0), Z(10.1)); const lg = x.createLinearGradient(-200, 0, 200, 0); lg.addColorStop(0, '#ff4fd8'); lg.addColorStop(0.5, '#ffc531'); lg.addColorStop(1, '#33e0ff');
-    x.font = '900 150px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.shadowColor = '#ff4fd8'; x.shadowBlur = 30; x.fillStyle = lg; x.fillText('JAM', 0, 50); x.shadowBlur = 0; x.lineWidth = 4; x.strokeStyle = '#fff'; x.strokeText('JAM', 0, 50);
+    x.font = '900 112px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.shadowColor = '#ff4fd8'; x.shadowBlur = 30; x.fillStyle = lg; x.fillText('RUCKUS', 0, 50); x.shadowBlur = 0; x.lineWidth = 4; x.strokeStyle = '#fff'; x.strokeText('RUCKUS', 0, 50);
     x.font = '700 26px Archivo, sans-serif'; x.fillStyle = '#ffc531'; x.fillText('NO RULES · NO REFUNDS', 0, 92); x.restore();
     // arrows painted toward the rim in the lane
     x.fillStyle = 'rgba(255,197,49,.35)'; for (const zz of [7.2, 8.2]) { x.beginPath(); x.moveTo(X(0), Z(zz - 0.6)); x.lineTo(X(0.5), Z(zz)); x.lineTo(X(-0.5), Z(zz)); x.closePath(); x.fill(); }
@@ -117,12 +117,12 @@ function drawJumbo(S, M_) {
   const g = x.createLinearGradient(0, 0, 512, 0); g.addColorStop(0, '#2a0f4a'); g.addColorStop(1, '#0d1a3a'); x.fillStyle = g; x.fillRect(0, 0, 512, 192);
   x.strokeStyle = '#ff4fd8'; x.lineWidth = 6; x.strokeRect(4, 4, 504, 184); x.textAlign = 'center';
   x.font = '900 104px Archivo, Impact, sans-serif'; x.fillStyle = '#33e0ff'; x.fillText(String(sc[t0]), 120, 128); x.fillStyle = '#ff4fd8'; x.fillText(String(sc[1 - t0]), 392, 128);
-  x.font = '900 34px Archivo, Impact, sans-serif'; x.fillStyle = '#ffc531'; x.fillText(M_.hotTeam >= 0 ? 'ON FIRE' : 'JAM', 256, 92); x.font = '700 18px Archivo, sans-serif'; x.fillStyle = '#fff'; x.fillText('FIRST TO ' + M_.cfg.mode.to, 256, 128);
+  x.font = '900 34px Archivo, Impact, sans-serif'; x.fillStyle = '#ffc531'; x.fillText(M_.hotTeam >= 0 ? 'ON FIRE' : 'RUCKUS', 256, 92); x.font = '700 18px Archivo, sans-serif'; x.fillStyle = '#fff'; x.fillText('FIRST TO ' + M_.cfg.mode.to, 256, 128);
   x.font = '700 20px Archivo, sans-serif'; x.fillStyle = '#bff6ff'; x.fillText('US', 120, 168); x.fillText('THEM', 392, 168);
   j.tex.needsUpdate = true;
 }
 
-// ---------------- power-ups (JAM) ----------------
+// ---------------- power-ups (RUCKUS) ----------------
 // a power-up drops somewhere on the floor every so often; run over it to take it. All cosmetic beyond what is listed:
 // attribute bonuses while it lasts, and DOUBLE UP doubles your next bucket.
 const POWERUPS = [
@@ -214,7 +214,7 @@ function courtFx(dt) {
       const on = !!p.pu; p.puIcon.visible = on;
       if (on) { const P = POWERUPS[p.pu.k]; p.puIcon.material.map = puIconTex(p.pu.k); p.puIcon.position.y = p.H + 0.55 + Math.sin(S.t * 4) * 0.04; p.ring.material.color.set(P.c); p.ring.scale.setScalar(1.15 + 0.15 * Math.sin(S.t * 8)); p._puRing = true;
         if (Math.random() < 0.25) burst(p.x + rnd(-0.25, 0.25), rnd(0.2, 1.6) + p.y, p.z + rnd(-0.25, 0.25), new THREE.Color(P.c).getHex(), 1); }
-      else if (p._puRing) { p._puRing = false; p.ring.scale.setScalar(1); if (p.user) p.ring.material.color.set(p.ctrl === 0 ? 0xffe14a : 0x4dff9a); }
+      else if (p._puRing) { p._puRing = false; p.ring.scale.setScalar(1); p.ring.material.color.setHex(p.teamCol || 0x33a0ff); }
     }
   }
 }
@@ -226,4 +226,33 @@ function dressCourt(sc, cfg, style) {
   if (style === 'street' && !cfg.practice) { const ti = tierIndex(cfg); const fl = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), new THREE.MeshToonMaterial({ map: parkCourtTex(ti), gradientMap: ramp() })); fl.rotation.x = -Math.PI / 2; fl.position.set(0, 0, 6); sc.add(fl);
     const h = hoopMesh(hoopTier, 'street'); sc.add(h); parkDressing(sc, ti); return h; }
   return addCourt(sc, style, hoopTier);
+}
+
+// ---------------- the crowd ----------------
+// People along the baseline fence and both sidelines. Each has their own body, movement profile and habits, follows
+// the ball with their head, and reacts to big plays by their kind and by whose side they are on.
+function crowdInit() {
+  const M_ = MT, spots = []; for (let i = 0; i < 9; i++) spots.push([-8 + i * 2 + rnd(-0.35, 0.35), -3.3 - rnd(0, 0.9)]);
+  for (const sd of [-1, 1]) for (const z of [1.2, 4.8, 8.6]) spots.push([sd * (9.9 + rnd(0, 0.5)), z + rnd(-0.6, 0.6)]);
+  const myT = Math.max(0, M_.cfg.teams.findIndex(t => t.some(x => x.mine === true)));
+  for (const [x, z] of spots) {
+    const b = aiBuild(Math.round(rnd(50, 75))); b.name = 'FAN' + Math.floor(Math.random() * 1e6); const r = makeRig(b, true); r.root.position.set(x, 0, z); const face = Math.atan2(0 - x, 5 - z); r.root.rotation.y = face; r.shadow.visible = false; scene.add(r.root);
+    M_.fans.push({ r, x, z, face, ph: rnd(0, 6), prof: r.prof, amb: pick(CROWD_AMBIENT), ambT: rnd(2, 8), react: null, team: Math.random() < 0.6 ? myT : 1 - myT, hype: 0 });
+  }
+}
+function crowdReact(play, team, fromNet) {
+  const M_ = MT; if (!M_ || !M_.fans) return; if (!fromNet && M_.net === 'host') netEv({ k: 'cr', p: play, t: team });
+  const ch = play === 'score' ? 0.35 : play === 'steal' ? 0.6 : 0.9;
+  for (const f of M_.fans) { if (Math.random() > ch) continue; f.react = { kind: crowdReaction(play, team === undefined ? undefined : f.team === team), t: -rnd(0, 0.35), dur: rnd(1.5, 2.7) }; f.hype = f.react.dur; }
+}
+function crowdStep(dt) {
+  const M_ = MT, B = M_.B, bx = B.pos.x, bz = B.pos.z;
+  for (const f of M_.fans) {
+    let kind = f.amb, u = 1;
+    if (f.react) { f.react.t += dt; if (f.react.t >= f.react.dur) f.react = null; else if (f.react.t >= 0) { kind = f.react.kind; u = Math.min(1, f.react.t / 0.25); } }
+    else { f.ambT -= dt; if (f.ambT <= 0) { f.amb = pick(CROWD_AMBIENT); f.ambT = rnd(3, 9); } }
+    const P = crowdPose(kind, M_.time, { ph: f.ph, u, alert: M_.phase === 'live' ? 0.3 : 0 }, f.prof);
+    if (kind !== 'phone' && kind !== 'talk') { let a = Math.atan2(bx - f.x, bz - f.z) - f.face; a = Math.atan2(Math.sin(a), Math.cos(a)); a = clamp(a, -1.1, 1.1); const n = P.neck || (P.neck = [0, 0, 0]); n[1] += a * 0.6; const c = P.chest || (P.chest = [0, 0, 0]); c[1] += a * 0.25; }      /* eyes on the ball */
+    applyPose(f.r, P, dt);
+  }
 }

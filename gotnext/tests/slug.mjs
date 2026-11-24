@@ -1,4 +1,4 @@
-// Post moves by stick direction, the dribble hand, and the JAM slugfest. node tests/slug.mjs
+// Post moves by stick direction, the dribble hand, and the RUCKUS slugfest. node tests/slug.mjs
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
 import path from 'path'; import { fileURLToPath } from 'url';
 const dir = path.dirname(fileURLToPath(import.meta.url));
@@ -31,16 +31,16 @@ ok(defL === 'R' && defR === 'L', `defender up close on the left: right hand (${d
 // 3. street: LT + A off the ball is still a call for the ball, not a punch
 let r = await p.evaluate(s => { eval(s); me.x = 2; me.z = 6; d.x = 2; d.z = 5.3; M.B.state = 'held'; M.B.holder = M.P.find(q => q.team === me.team && q !== me); M.off = me.team; __pad.buttons[6].pressed = true; window.__tick(2); __pad.buttons[0].pressed = true; window.__tick(2); const st = me.st; for (const bt of __pad.buttons) bt.pressed = false; window.__tick(10); return st; }, set);
 ok(r !== 'punch' && r !== 'clothes', `street game, LT + A off the ball: no punches (${r})`);
-// 4. JAM: haymaker, clothesline, and a knockout that gets called
+// 4. RUCKUS: haymaker, clothesline, and a knockout that gets called
 await launch(2);
 r = await p.evaluate(s => { eval(s); const h = d; h.x = 0; h.z = 6; me.x = 0; me.z = 5.1; me.face = 0; M.B.state = 'held'; M.B.holder = h; M.off = h.team; h.live = 'drib'; window.__tick(2);
   const R = Math.random; Math.random = () => 0.5; __pad.buttons[6].pressed = true; window.__tick(2); __pad.buttons[2].pressed = true; window.__tick(2); const st = me.st; __pad.buttons[2].pressed = false; window.__tick(20); Math.random = R; for (const bt of __pad.buttons) bt.pressed = false;
   const out = { st, hit: h.st, fall: h.stg && h.stg.fall, ball: M.B.state }; window.__tick(120); return out; }, set);
-ok(r.st === 'punch' && r.hit === 'stagger' && r.fall, `JAM, LT + X at the ball handler: haymaker (${r.st}), he goes down (${r.hit}), ball ${r.ball}`);
+ok(r.st === 'punch' && r.hit === 'stagger' && r.fall, `RUCKUS, LT + X at the ball handler: haymaker (${r.st}), he goes down (${r.hit}), ball ${r.ball}`);
 r = await p.evaluate(s => { eval(s); const a = opp[0], c = opp[1]; a.x = -0.3; a.z = 4; c.x = 0.3; c.z = 3.2; me.x = 0; me.z = 7.5; M.B.state = 'held'; M.B.holder = M.P.find(q => q.team === me.team && q !== me); M.B.holder.x = 6; M.off = me.team; window.__tick(2);
   __pad.axes = [0, -1, 0, 0]; __pad.buttons[7].pressed = true; window.__tick(24); __pad.buttons[0].pressed = true; window.__tick(3); __pad.buttons[0].pressed = false; let st = me.st, downs = 0; for (let i = 0; i < 30; i++) { window.__tick(1); downs = Math.max(downs, [a, c].filter(q => q.st === 'stagger' && q.stg.fall).length); }
   __pad.axes = [0, 0, 0, 0]; for (const bt of __pad.buttons) bt.pressed = false; window.__tick(150); return { st, downs }; }, set);
-ok(r.st === 'clothes' && r.downs >= 1, `JAM, sprinting + A through two of them: clothesline (${r.st}), ${r.downs} down`);
+ok(r.st === 'clothes' && r.downs >= 1, `RUCKUS, sprinting + A through two of them: clothesline (${r.st}), ${r.downs} down`);
 r = await p.evaluate(s => { eval(s); const h = d; h.x = 0; h.z = 6; me.x = 0; me.z = 5.1; me.face = 0; M.B.state = 'held'; M.B.holder = h; M.off = h.team; h.live = 'drib'; window.__tick(2);
   const R = Math.random; Math.random = () => 0.01; __pad.buttons[6].pressed = true; window.__tick(2); __pad.buttons[2].pressed = true; window.__tick(25); Math.random = R; for (const bt of __pad.buttons) bt.pressed = false;
   const ko = h.ko > 0, calls = []; const hc = document.querySelector('#call'); for (let i = 0; i < 140; i++) { window.__tick(1); const t = hc && hc.firstElementChild.textContent; if (t && !calls.includes(t)) calls.push(t); }

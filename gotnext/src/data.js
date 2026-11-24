@@ -262,6 +262,10 @@ drip('socks', 's_flag', 'Bald Eagle Socks', 'high', '#2440a8', '#ff3c3c', 2, 900
 drip('socks', 's_neon', 'Glow Socks', 'high', '#33ff88', 0, 2, 1000, 3, { speed: 1 });
 // shoes
 drip('shoes', 'k_beat', 'Beaters', 'low', '#b9b9b9', '#666', 0, 0, 0, null, 'start');
+// NEXX SUPPLY: only Nexx sells these (cast.js)
+drip('top', 't_nexx', 'NEXX Studio Hoodie', 'hoodie', '#111216', '#7de3ff', 2, 1200, 0, { handle: 1, swb: 1 }, 'nexx');
+drip('head', 'hd_nexx', 'NEXX Snapback', 'cap', '#7de3ff', '#111216', 1, 450, 0, null, 'nexx');
+drip('shoes', 'k_nexx', 'NEXX Runners', 'high', '#111216', '#7de3ff', 2, 1400, 0, { speed: 1, accel: 1 }, 'nexx');
 drip('shoes', 'k_white', 'Crisp Whites', 'low', '#ffffff', '#c8d0d8', 0, 300, 0, { speed: 1 });
 drip('shoes', 'k_red', 'Red Octobers 2145', 'high', '#e02828', '#111', 1, 800, 1, { accel: 1, vert: 1 });
 drip('shoes', 'k_volt', 'Volt Runners', 'low', '#c8ff2a', '#111', 1, 850, 1, { speed: 2 });
@@ -328,6 +332,8 @@ const CRIB = [
 // ---------- last-call boosts (one game) ----------
 const BOOSTS = [
   { id: 'dog', n: 'Soy Dog', d: '+4 Stamina this game.', cost: 15, buff: { stam: 4 }, hidden: true },
+  { id: 'goji', n: 'Goji Berry Wrap', d: '+3 Speed, +3 Acceleration, +5 Stamina this game.', cost: 0, buff: { speed: 3, accel: 3, stam: 5 }, hidden: true },
+  { id: 'smoothie', n: "Erin's Farm Smoothie", d: '+6 Stamina, +2 Strength this game.', cost: 40, buff: { stam: 6, str: 2 }, hidden: true },
   { id: 'paste', n: 'GatorGrade Energy Paste', d: '+5 Speed, +10 Stamina this game.', cost: 60, buff: { speed: 5, stam: 10 } },
   { id: 'rosin', n: 'Rosin Vape (grape)', d: '+4 to every Shooting attribute this game.', cost: 80, buff: { mid: 4, three: 4, iq: 4 } },
   { id: 'knees', n: 'Knee Subscription (1 day)', d: '+6 Vertical, +4 Dunk this game.', cost: 80, buff: { vert: 6, dunk: 4 } },
@@ -340,8 +346,8 @@ const BOOSTS = [
 const MODES = [
   { id: 's2', n: 'STREET 2v2', size: 2, arcade: false, to: 11, d: 'Half court. 1s and 2s. First to 11. Call your own nothing.' },
   { id: 's3', n: 'STREET 3v3', size: 3, arcade: false, to: 11, d: 'Half court threes. Spacing is a rumor.' },
-  { id: 'j2', n: 'JAM 2v2', size: 2, arcade: true, to: 21, d: 'Arcade rules. Shoving is legal. Dunk from the logo. Catch fire.' },
-  { id: 'j3', n: 'JAM 3v3', size: 3, arcade: true, to: 21, d: 'Arcade chaos with six people and no adults.' },
+  { id: 'j2', n: 'RUCKUS 2v2', size: 2, arcade: true, to: 21, d: 'Arcade rules, no fouls, no manners: shove, haymaker, clothesline. Power-ups on the floor. Dunk from the logo. Catch fire.' },
+  { id: 'j3', n: 'RUCKUS 3v3', size: 3, arcade: true, to: 21, d: 'Arcade chaos with six people and no adults.' },
 ];
 const TIERS_COURT = [
   { n: 'SIDE COURT', rank: 0, ai: 0.30, ovr: 58, mult: 1 },
@@ -370,7 +376,7 @@ const ACH = [
   { id: 's20', n: 'Repossessed', d: '20 steals.', k: 'stl', t: 20, vc: 300 },
   { id: 'b20', n: 'Return To Sender', d: '20 blocks.', k: 'blk', t: 20, vc: 300 },
   { id: 'r50', n: 'Board Member', d: '50 rebounds.', k: 'reb', t: 50, vc: 350 },
-  { id: 'fire', n: 'Fire Hazard', d: 'Catch fire in a JAM game.', k: 'fires', t: 1, vc: 200 },
+  { id: 'fire', n: 'Fire Hazard', d: 'Catch fire in a RUCKUS game.', k: 'fires', t: 1, vc: 200 },
   { id: 'brav', n: 'Main Character', d: 'Trigger Bravado 10 times.', k: 'bravs', t: 10, vc: 400, drip: 'bk_wings' },
   { id: 'bum1', n: 'Philanthropist', d: 'Give VC to a build fiend.', k: 'gave', t: 1, vc: 20 },
   { id: 'bum20', n: 'Enabler', d: 'Give VC to build fiends 20 times.', k: 'gave', t: 20, vc: 500 },

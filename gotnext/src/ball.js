@@ -1,4 +1,4 @@
-// GOT NEXT — the basketball: half-court park games, Street rules and JAM (arcade) rules
+// GOT NEXT — the basketball: half-court park games, Street rules and RUCKUS (arcade) rules
 'use strict';
 let MT = null;
 const ARC = 6.75, GRAV = 9.8, HOOP_Y = 3.05;
@@ -35,12 +35,12 @@ function startMatch(cfg) {
   scene.fog = new THREE.Fog(scene.background.getHex(), 40, 150);
   baseLights(scene, arcade ? 0xc8a8ff : 0xdde8ff, arcade ? 0x301850 : 0x404858, arcade ? 0xffd0ff : 0xfff0d8, arcade ? 1.7 : 1.5);
   const g = M(new THREE.PlaneGeometry(300, 300), toon(arcade ? '#0c0618' : '#20242c'), 0, -0.02, 0, scene); g.rotation.x = -Math.PI / 2;
-  MT.hoop = dressCourt(scene, cfg, style);      /* courts.js: tier-painted park courts, the JAM arcade, power-ups */
+  MT.hoop = dressCourt(scene, cfg, style);      /* courts.js: tier-painted park courts, the RUCKUS arcade, power-ups */
   addFence(scene, -8.6, 8.6, -2.6, 13.6, 4.2, arcade ? 0xff8ff0 : 0xffffff);
   skyline(scene, 34, 60, arcade ? ['#ff4fd8', '#33e0ff', '#ffc531'] : ['#ffc531', '#ffe9a8', '#33e0ff'], 30);
   billboard(scene, ADS[(MT.cfg.seed || 0) % ADS.length], -13, 7, -6, 0.5, 9, 5);
   billboard(scene, ADS[((MT.cfg.seed || 0) + 3) % ADS.length], 13, 7.5, -7, -0.5, 9, 5);
-  billboard(scene, arcade ? 'JAM\nNO RULES\nNO REFUNDS' : (cfg.practice ? (cfg.practice === 'drill' ? (cfg.court === 'street' ? 'THE BLOCK\nPRACTICE' : 'HOME COURT\nPRACTICE') : cfg.practice === 'rack' ? 'MONEY RACK' : 'HOME COURT') : (cfg.mode.id === '1v1' ? 'THE LADDER\nONES' : 'THE CAGES\n' + cfg.tier.n)), 0, 9.5, -9, 0, 12, 4.5, arcade ? '#ff4fd8' : '#ffc531');
+  billboard(scene, arcade ? 'RUCKUS\nNO RULES\nNO REFUNDS' : (cfg.practice ? (cfg.practice === 'drill' ? (cfg.court === 'street' ? 'THE BLOCK\nPRACTICE' : 'HOME COURT\nPRACTICE') : cfg.practice === 'rack' ? 'MONEY RACK' : 'HOME COURT') : (cfg.mode.id === '1v1' ? 'THE LADDER\nONES' : 'THE CAGES\n' + cfg.tier.n)), 0, 9.5, -9, 0, 12, 4.5, arcade ? '#ff4fd8' : '#ffc531');
   // spectators behind the baseline fence
   MT.fans = [];
   // atmosphere: four light poles over the court, light pooled on the ground, the day's weather, paper in the wind
@@ -49,8 +49,8 @@ function startMatch(cfg) {
     M(cyl(0.1, 0.13, 8.5, 6), toon('#2a2c33'), lx, 4.25, lz, scene); const hx = lx * 0.93, hz = lz < 0 ? lz + 0.3 : lz - 0.3; M(box(1.2, 0.4, 0.5), toon('#2a2c33'), hx, 8.6, hz, scene);
     glow(hx, 8.45, hz, arcade ? 0xffb8f0 : 0xfff2dc, 4, null, 0.85); beam(hx, 8.4, hz, lx * 0.45, 0, lz < 0 ? 2 : 8, arcade ? 0xffb8f0 : 0xfff2c8, 3.2, 0.05, 8); pool(lx * 0.5, lz < 0 ? 1.5 : 9, arcade ? 0xff8ff0 : 0xffe9c0, 7, 7, 0.16);
   }
-  if (style === 'street' || style === 'arcade') { weather(); litter(6, -8, 8, -1, 12); skyLife(60, arcade ? 'JAM · NO RULES · NO REFUNDS' : 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); }
-  if (!cfg.practice) for (let i = 0; i < 7; i++) { const b = aiBuild(60); const r = makeRig(b, true); r.root.position.set(-7.5 + i * 2.5 + rnd(-0.4, 0.4), 0, -3.4 - rnd(0, 0.8)); r.shadow.visible = false; scene.add(r.root); MT.fans.push({ r, ph: rnd(0, 6), hype: 0 }); }
+  if (style === 'street' || style === 'arcade') { weather(); litter(6, -8, 8, -1, 12); skyLife(60, arcade ? 'RUCKUS · NO RULES · NO REFUNDS' : 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); }
+  if (!cfg.practice) crowdInit();      /* courts.js: people along the baseline and both sidelines */
   // --- players ---
   cfg.teams.forEach((team, ti) => team.forEach((sp, k) => {
     const mine = sp.mine === true;
@@ -58,15 +58,16 @@ function startMatch(cfg) {
       stats: { fouls: 0, pts: 0, ast: 0, reb: 0, stl: 0, blk: 0, ankles: 0, greens: 0, dunks: 0, threes: 0, fga: 0, fgm: 0, bravs: 0, fires: 0 }, ai: { tick: rnd(0, 0.3), spot: null, spotT: 0, tx: 0, tz: 0, mx: 0, mz: 0, hold: 0, mode: '', react: 0 } };
     p.A = effAttrs(sp.b, mine); p.aiLvl = sp.ai === undefined ? cfg.tier.ai : sp.ai;
     p.rig = makeRig(sp.b); p.H = p.rig.H; scene.add(p.rig.root);
-    const ringC = ti === 0 ? 0x33a0ff : 0xff4040;
-    p.ring = M(geo('ring', () => new THREE.RingGeometry(0.36, 0.46, 20)), new THREE.MeshBasicMaterial({ color: p.user ? (p.ctrl === 0 ? 0xffe14a : 0x4dff9a) : ringC, transparent: true, opacity: 0.85, depthWrite: false }), 0, 0.02, 0, p.rig.root); p.ring.rotation.x = -Math.PI / 2;
+    // one colour per team for the ring and the name: your team blue, theirs red. You are the thicker ring with the arrow.
+    const myT = Math.max(0, cfg.teams.findIndex(t => t.some(x => x.mine === true))); p.teamCol = ti === myT ? 0x33a0ff : 0xff4a4a;
+    p.ring = M(p.user ? geo('ringMe', () => new THREE.RingGeometry(0.32, 0.5, 24)) : geo('ring', () => new THREE.RingGeometry(0.36, 0.46, 20)), new THREE.MeshBasicMaterial({ color: p.teamCol, transparent: true, opacity: 0.85, depthWrite: false }), 0, 0.02, 0, p.rig.root); p.ring.rotation.x = -Math.PI / 2;
     if (p.user) {      // a little arrow on your ring that points at the man you are guarding
       p.ptr = new THREE.Group(); p.ptr.position.y = 0.03; p.rig.root.add(p.ptr); p.ptr.visible = false;
-      const tri = M(geo('ptr', () => { const sh = new THREE.Shape(); sh.moveTo(0, 0.44); sh.lineTo(-0.26, 0); sh.lineTo(0, 0.12); sh.lineTo(0.26, 0); sh.lineTo(0, 0.44); return new THREE.ShapeGeometry(sh); }), new THREE.MeshBasicMaterial({ color: 0xff4fd8, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide }), 0, 0, 0.5, p.ptr); tri.rotation.x = Math.PI / 2;
+      const tri = M(geo('ptr', () => { const sh = new THREE.Shape(); sh.moveTo(0, 0.44); sh.lineTo(-0.26, 0); sh.lineTo(0, 0.12); sh.lineTo(0.26, 0); sh.lineTo(0, 0.44); return new THREE.ShapeGeometry(sh); }), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide }), 0, 0, 0.5, p.ptr); tri.rotation.x = Math.PI / 2;
     }
-    { const myT = Math.max(0, cfg.teams.findIndex(t => t.some(x => x.mine === true))), col = mine ? '#ffe14a' : sp.ctrl === 1 ? '#4dff9a' : ti === myT ? '#33a0ff' : '#ff5a4a';      /* names carry the team colour: you gold, your squad blue, them red */
-      const tg = nameTag(sp.b.name, mine ? 'you' : sp.peer ? 'online' : sp.ctrl === 1 ? 'player 2' : ti === myT ? 'squad' : 'them', p.H, col); tg.scale.multiplyScalar(mine ? 0.7 : 0.9); tg.material.opacity = mine ? 0.85 : 1; p.rig.root.add(tg); if (mine) tg.position.y += 0.34; }
-    if (p.user) { p.arrow = M(geo('arrow', () => new THREE.ConeGeometry(0.11, 0.24, 4)), flat(p.ctrl === 0 ? 0xffe14a : 0x4dff9a), 0, p.H + 0.42, 0, p.rig.root); p.arrow.rotation.x = Math.PI; }
+    { const col = '#' + p.teamCol.toString(16).padStart(6, '0');      /* the name sits under the player, in the team's colour */
+      const tg = nameTag(sp.b.name, mine ? 'you' : sp.peer ? 'online' : sp.ctrl === 1 ? 'player 2' : ti === myT ? 'squad' : 'them', 0, col); tg.scale.multiplyScalar(0.72); tg.center.set(0.5, 1); tg.material.opacity = mine ? 1 : 0.9; scene.add(tg); p.tag = tg; }
+    if (p.user) { p.arrow = M(geo('arrow', () => new THREE.ConeGeometry(0.09, 0.2, 4)), flat(0xffffff), 0, p.H + 0.36, 0, p.rig.root); p.arrow.rotation.x = Math.PI; }
     MT.P.push(p);
   }));
   // man-to-man by slot
@@ -109,7 +110,7 @@ function addBrav(p, v) {
 }
 // a dead ball: play stops, and after a beat 'team' checks it up top (fouls, out of bounds)
 function deadBall(team, pause) { const M_ = MT; M_.lastScorer = { team: 1 - team, dead: true }; M_.phase = 'scored'; M_.pt = pause || 1.2; M_.B.foulBy = null; }
-// fouls (street rules, not JAM): the offense keeps the ball; a foul on a made shot is an and-one (+1)
+// fouls (street rules, not RUCKUS): the offense keeps the ball; a foul on a made shot is an and-one (+1)
 function foul(d, o, kind, keep) {
   const M_ = MT; if (!d || !o || M_.arcade || M_.practice) return false; d.stats.fouls = (d.stats.fouls || 0) + 1; sfxM('whistle'); if (M_.net === 'host') netEv({ k: 's', s2: 'whistle' });
   call('FOUL', kind + ' · ' + d.b.name + ' (' + d.stats.fouls + ')', '#ff8a1f', 1.3); floatTxt(d, 'FOUL', '#ff8a1f');
@@ -118,7 +119,7 @@ function foul(d, o, kind, keep) {
 const COURT = { x0: -8, x1: 8, z0: -1.6, z1: 13 };      /* the painted lines */
 function andOne(p, d) {
   const M_ = MT; if (M_.phase === 'over') return; M_.score[p.team] += 1; p.stats.pts += 1; call('AND ONE', p.b.name + ' +1 · ' + d.b.name + ' fouled', '#ffc531', 1.4);
-  if (M_.score[p.team] >= M_.cfg.mode.to) { M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
 }
 function scorePts(p, pts, how) {
   const M_ = MT; if (p.pu && p.pu.id === 'double' && !M_.practice) { pts *= 2; p.pu = null; p.puA = null; if (M_.net === 'host') netEv({ k: 'pu', a: 'x', i: p.i }); call('DOUBLE UP', p.b.name + ' · that one counts ' + pts, '#ff4fd8', 1.2); }
@@ -127,13 +128,13 @@ function scorePts(p, pts, how) {
   if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
   if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfxM('fire'); }
   if (p.mine && cribFx('bucket')) M_.bonusRep = (M_.bonusRep || 0) + 1;
-  for (const f of M_.fans) f.hype = 1.6;
+  crowdReact(how === 'dunk' ? 'dunk' : pts >= 2 ? 'three' : 'score', p.team);
   if (M_.hoop.userData.net) M_.netT = 0.35;
   addBrav(p, how === 'dunk' ? 0.16 : 0.10);
   if (M_.drill) drillEvent('make', p, { how, kind: how === 'dunk' ? 'dunk' : M_.B.kind, green: how !== 'dunk' && M_.B.green });
   if (M_.practice) return;
   M_.phase = 'scored'; M_.pt = 1.45; p.st = 'celeb'; p.t = 0;
-  if (M_.score[p.team] >= M_.cfg.mode.to) { M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
 function burst(x, y, z, col, n) {
@@ -258,7 +259,7 @@ function blocked(p, o) {
   const B = MT.B; p.stats.fga++; o.stats.blk++; o.swatT = 0.45; MT.hoopT = 0.2; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
   call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; p.finish.blocked = true; p.bumpT = 0.3; p.bumpX = -0.3; p.bumpZ = rnd(-0.15, 0.15); }
-  for (const f of MT.fans) f.hype = 1.2; B.rebound = false;
+  crowdReact('block', o.team); B.rebound = false;
 }
 function finishRange(p) { return MT.arcade ? 5.6 : 2.5 + nAtt(p, 'vert') * 0.6 + 0.25 * bt(p, 'gravity'); }
 // who is in the way of this finish: the opponent most in the lane between you and the rim (or waiting under it).
@@ -372,7 +373,7 @@ function startMove(p, slot, dx, dz) {
     // he bit on the fake: his weight goes the opposite way to where the ball handler really went
     const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
     o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5 };
-    p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; for (const f of MT.fans) f.hype = 1.5;
+    p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
   } else o.slowT = 0.22 + mv.ank;
 }
 function doPass(p, to) {
@@ -392,7 +393,7 @@ function passTarget(p, mx, mz) {
   if (m > 0.4) { let best = null, bs = -9; for (const o of mates) { const dx = o.x - p.x, dz = o.z - p.z, l = Math.hypot(dx, dz) || 1; const s = (dx * mx + dz * mz) / (l * m); if (s > bs) { bs = s; best = o; } } return best; }
   let best = null, bs = -9; for (const o of mates) { let od = 9; for (const q of MT.P) if (q.team !== p.team) od = Math.min(od, dist(q, o)); const s = od - dist(o, p) * 0.1; if (s > bs) { bs = s; best = o; } } return best;
 }
-// ---------------- JAM slugfest ----------------
+// ---------------- RUCKUS slugfest ----------------
 function startHit(p, kind) {
   p.st = kind; p.t = 0; p.cool = kind === 'punch' ? 1.5 : 2.2; p.hitList = []; sfxM('whoosh');
   if (kind === 'punch') { const fx = Math.sin(p.face), fz = Math.cos(p.face); p.vx += fx * 2; p.vz += fz * 2; }
@@ -408,14 +409,14 @@ function applyHit(p, o, kind) {
   const ko = Math.random() < (kind === 'clothes' ? 0.36 : 0.18) + Math.min(0.3, (M_.brawlHeat || 0) * 0.08);
   o.st = 'stagger'; o.t = 0; o.stg = { dur: ko ? 4.2 : kind === 'clothes' ? 2.0 : 1.5, fall: true, side: 0, dir, push: kind === 'clothes' ? 3.4 : 2.2 };
   if (ko) { o.ko = 4.2; if (M_.net === 'host') netEv({ k: 'ko', i: o.i, d: 4.2 }); }
-  sfxM('block'); M_.shake = ko ? 0.55 : 0.3; for (const f of M_.fans) f.hype = 1.4; burst(o.x, 1.3, o.z, ko ? 0xff4040 : 0xffc531, ko ? 18 : 10);
+  sfxM('block'); M_.shake = ko ? 0.55 : 0.3; crowdReact(ko ? 'ko' : 'hit', p.team); burst(o.x, 1.3, o.z, ko ? 0xff4040 : 0xffc531, ko ? 18 : 10);
   floatTxt(o, ko ? 'KO' : kind === 'clothes' ? 'CLOTHESLINED' : 'POW', ko ? '#ff4040' : '#ffc531');
   call(kind === 'clothes' ? 'CLOTHESLINE!' : 'HAYMAKER!', p.b.name + ' on ' + o.b.name, '#ff4040', 1);
   if (B.holder === o) { B.state = 'loose'; B.holder = null; B.pos.set(o.x, 1, o.z); B.vel.set(rnd(-3, 3), 3, rnd(-3, 3)); B.t = 0; B.rebound = false; B.lastTeam = p.team; }
   M_.brawlHeat = (M_.brawlHeat || 0) + 1;
   if (ko && M_.phase === 'live') { M_.brawl = M_.brawl || { t: 1.4, by: p, victims: [] }; if (!M_.brawl.victims.includes(o)) M_.brawl.victims.push(o); }
 }
-// a knockout stops the game: even in JAM, that one gets called. The team that got hit keeps the ball.
+// a knockout stops the game: even in RUCKUS, that one gets called. The team that got hit keeps the ball.
 function calledFoul() {
   const M_ = MT, b = M_.brawl; M_.brawl = null; if (!b || M_.phase !== 'live') return; const v = b.victims[0], by = b.by;
   sfxM('whistle'); call('WE HAVE TO CALL THAT', `${by.b.name} is crazy · ${b.victims.length > 1 ? 'two down' : v.b.name + ' is down'}`, '#ff4040', 2.4);
@@ -429,7 +430,7 @@ function startSteal(p) {
     if (h && h.team !== p.team && dist(h, p) < 1.4 && p.reach.length >= 3 && Math.random() < 0.09 * (p.reach.length - 2)) foul(p, h, 'hand check');
     return;
   }
-  if (MT.arcade) {   // JAM: shove; hold LT for a haymaker; at a sprint it is a clothesline (AI throws the odd punch too)
+  if (MT.arcade) {   // RUCKUS: shove; hold LT for a haymaker; at a sprint it is a clothesline (AI throws the odd punch too)
     const kind = p.sprinting && Math.hypot(p.vx, p.vz) > 3.6 ? 'clothes' : (p.ltHeld || (!p.user && Math.random() < 0.22)) ? 'punch' : 'shove';
     if (kind !== 'shove') { startHit(p, kind); return; }
     let o = null, od = 1.35; for (const q of MT.P) { if (q.team === p.team || q.st === 'stagger') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
@@ -464,7 +465,7 @@ function resolveSteal(p) {
   const sc = stealChance(p, h), ch = sc.ch;
   if (p.user && sc.reach > 0.9) floatTxt(p, 'REACHED', '#8d8d99');
   if (Math.random() < ch) {
-    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
+    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); crowdReact('steal', p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); 
   } else {
     p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0;
     const hf = [Math.sin(h.face), Math.cos(h.face)], dh = dist(h, p) || 1, behind = ((p.x - h.x) * hf[0] + (p.z - h.z) * hf[1]) / dh < -0.3, spam = Math.max(0, (p.reach || []).length - 1);
@@ -557,7 +558,7 @@ function humanThink(p, dt) {
     if (I.flick === 'UL' || I.flick === 'UR') { startMove(p, 'diag', I.flick === 'UL' ? -0.8 : 0.8, -0.8); return; }
     if (I.aP) { doPass(p, passTarget(p, I.mx, I.my)); return; }
   } else if (MT.off === p.team && B.state !== 'loose' && B.state !== 'shot') {
-    if (I.aP) { if (MT.arcade && (I.lt || p.sprinting)) startSteal(p); else { p.callT = 1.2; floatTxt(p, 'BALL!', '#fff'); } }      /* JAM: off the ball you can still throw hands */
+    if (I.aP) { if (MT.arcade && (I.lt || p.sprinting)) startSteal(p); else { p.callT = 1.2; floatTxt(p, 'BALL!', '#fff'); } }      /* RUCKUS: off the ball you can still throw hands */
     if (I.bP || I.flick === 'U') startJump(p);
   } else {
     if (I.rdir === 'U' || I.rdir === 'UL' || I.rdir === 'UR') p.handsUp = true;
@@ -714,7 +715,7 @@ function matchFx(dt) {
   const M_ = MT;
   if (M_.hoopT > 0) { M_.hoopT -= dt; const k = Math.max(0, M_.hoopT); M_.hoop.rotation.x = Math.sin(M_.time * 46) * 0.035 * k; M_.hoop.rotation.z = Math.sin(M_.time * 39) * 0.02 * k; } else if (M_.hoop.rotation.x) { M_.hoop.rotation.x = 0; M_.hoop.rotation.z = 0; }
   for (const q of M_.parts) { if (q.life <= 0) continue; q.life -= dt; q.v.y -= 6 * dt; q.m.position.addScaledVector(q.v, dt); q.m.material.opacity = Math.max(0, q.life / q.max); q.m.scale.setScalar(0.5 + q.life / q.max); if (q.life <= 0) q.m.position.y = -5; }
-  for (const f of M_.fans) { f.hype -= dt; applyPose(f.r, poseOf(f.hype > 0 ? 'cheer' : 'idle', M_.time, { ph: f.ph }), dt); }
+  crowdStep(dt);
   if (M_.netT > 0) { M_.netT -= dt; const n = M_.hoop.userData.net; if (n) n.scale.set(1 - M_.netT, 1 + M_.netT * 1.5, 1 - M_.netT); }
 }
 function stepPlayer(p, dt) {
@@ -1108,9 +1109,10 @@ function animPlayer(p, dt) {
     const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.man || p.guard || (guest ? near() : null));      /* your matchup from the opening check, not whoever you happen to be near */ p.ptr.visible = !!tg && dist(tg, p) > 0.5;
     if (p.ptr.visible) { p.ptr.position.y = 0.03 - p.y; p.ptr.rotation.y = Math.atan2(tg.x - p.x, tg.z - p.z) - R.root.rotation.y; p.ptr.children[0].material.opacity = 0.6 + 0.3 * Math.sin(M_.time * 6); } }
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
-  if (p.arrow) { p.arrow.position.y = p.H + 0.42 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }
+  if (p.arrow) { p.arrow.position.y = p.H + 0.36 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }
+  if (p.tag) p.tag.position.set(p.x, 0.04, p.z + 0.62);      /* just in front of the feet, toward the camera */
   // ring colours: your matchup glows when you are on defence
-  if (!p.user) { const marked = M_.me && M_.me.def && (M_.me.man || M_.me.guard) === p && M_.phase === 'live'; p.ring.material.color.setHex(marked ? 0xff4fd8 : p.team === M_.me.team ? 0x33a0ff : 0xff4040); p.ring.scale.setScalar(marked ? 1.25 : 1); }
+  if (!p._puRing) { const marked = !p.user && M_.me && M_.me.def && (M_.me.man || M_.me.guard) === p && M_.phase === 'live'; p.ring.material.color.setHex(p.teamCol); p.ring.scale.setScalar(marked ? 1.2 + 0.08 * Math.sin(M_.time * 6) : 1); }      /* your matchup's ring pulses */
   if (p.bravT > 0 || p.fire) { if (Math.random() < 0.35) burst(p.x + rnd(-0.3, 0.3), rnd(0.2, 1.8) + p.y, p.z + rnd(-0.3, 0.3), p.fire ? 0xff7a1f : 0xffc531, 1); }
   if (p.sprinting && p.speed > 4 && Math.sin(p.runPh) * Math.sin(p.runPh - dt * 12) < 0 && p.user) sfxM('step');
 }
