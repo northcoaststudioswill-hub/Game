@@ -4951,7 +4951,8 @@ function navMove(r,dx,dy){const it=navItems(r);if(!it.length)return;if(!NAV.el||
   else if(NAV.el){NAV.el.classList.remove('gpf');NAV.el=null;}
   for(let i=0;i<gp.buttons.length;i++)NAV.prev[i]=b(i);})();
 // show the splash on load
-const SKIPBOOT=(function(){try{const v=sessionStorage.getItem('gfa-skipboot');sessionStorage.removeItem('gfa-skipboot');return !!v;}catch(e){return false;}})();
+const MVONLY=!!window.GFA_MV_ONLY||location.hash==='#mv';
+const SKIPBOOT=MVONLY||(function(){try{const v=sessionStorage.getItem('gfa-skipboot');sessionStorage.removeItem('gfa-skipboot');return !!v;}catch(e){return false;}})();
 if(location.hash!=='#test'&&!SKIPBOOT)runSplash(()=>{NAV.reset();});
 
 /* ================= ACT 35: dev progression presets, and no giant name tags in the cutscenes ================= */
@@ -7059,7 +7060,7 @@ const MVD={on:false,a:null,t0:0,i:-2,cut:-1,b:null,spot:null,cam:[0,0,0,0,0,0],f
   +'#intro.mvd .rail{position:absolute;z-index:5;right:3%;bottom:30%;display:flex;flex-direction:column;gap:12px;align-items:center;font:800 12px system-ui,sans-serif;color:#fff;text-shadow:0 1px 3px #000}#intro.mvd .rail i{font-style:normal;font-size:30px;display:block}#intro.mvd .bar{position:absolute;z-index:5;left:0;bottom:9%;height:5px;background:#ff2e88;width:0}'
   +'#intro.mvd .pop{position:absolute;z-index:4;font-size:clamp(40px,9vw,110px);animation:mvpop .7s ease-out both;pointer-events:none}@keyframes mvpop{0%{transform:scale(.2) rotate(-20deg);opacity:0}25%{transform:scale(1.25) rotate(8deg);opacity:1}100%{transform:scale(1) translateY(-40px);opacity:0}}'
   +'#intro.mvd .ttl{position:absolute;inset:0;z-index:6;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}#intro.mvd .ttl b{font-weight:400;font-size:clamp(44px,12vw,140px);line-height:.9;color:#ffd400;-webkit-text-stroke:3px #12021f;text-shadow:7px 7px 0 #ff2e88}#intro.mvd .ttl span{font:800 clamp(11px,1.8vw,16px) system-ui,sans-serif;letter-spacing:.4em;color:#fff}'
-  +'#intro.mvd .skip{z-index:7;bottom:calc(9% - 22px)}#app.mvflash #c{filter:brightness(1.3) saturate(1.8) hue-rotate(30deg)}#app.mvhook #c{filter:saturate(1.6) contrast(1.12)}#app.mvglitch #c{filter:hue-rotate(150deg) saturate(2) contrast(1.2)}@media (prefers-reduced-motion:reduce){#app.mvflash #c,#app.mvglitch #c{filter:none}}';document.head.appendChild(st);})();
+  +'#intro.mvd .skip{z-index:7;bottom:calc(9% - 22px)}#intro.mvd .tune{position:absolute;z-index:8;left:3%;top:calc(9% + 8px);display:flex;gap:6px;align-items:center;font:700 11px ui-monospace,Menlo,monospace;color:#b6ff00;text-shadow:0 1px 3px #000}#intro.mvd .tune button{font:700 11px system-ui,sans-serif;padding:4px 8px;border-radius:6px;border:1px solid #b6ff00;background:rgba(0,0,0,.6);color:#b6ff00;cursor:pointer}#app.mvflash #c{filter:brightness(1.3) saturate(1.8) hue-rotate(30deg)}#app.mvhook #c{filter:saturate(1.6) contrast(1.12)}#app.mvglitch #c{filter:hue-rotate(150deg) saturate(2) contrast(1.2)}@media (prefers-reduced-motion:reduce){#app.mvflash #c,#app.mvglitch #c{filter:none}}';document.head.appendChild(st);})();
 // a spot to stand on each set, and which way the set is
 function mvFloor(x,z){let y=groundH(x,z);for(const P of platforms)if(P.top>y&&P.top<y+7&&Math.hypot(x-P.x,z-P.z)<P.r)y=P.top;return y;}
 function mvSpot(id){const R=RL.list.find(r=>r.id===id);
@@ -7077,7 +7078,8 @@ function mvSpot(id){const R=RL.list.find(r=>r.id===id);
 function mvCam(sp,style,u,k){const a0=sp.f+(k%2?.55:-.45)+(style==='orbit'?(u-.5)*.9:0),r=sp.r*(style==='push'?1.25-u*.55:style==='close'?.42:style==='low'?.62:1)*(k%2?.8:1),h=style==='low'?1.1:style==='crane'?1.5+u*6.5:style==='close'?4.4:3.6+(k%2)*1.2;
   if(sp.fix&&k%2===0)return[sp.fix[0],sp.fix[1],sp.fix[2],sp.x,sp.y+3.4,sp.z];
   let x=sp.x+Math.sin(a0)*r,z=sp.z+Math.cos(a0)*r,y=sp.y+h;if(style==='hand'){x+=Math.sin(u*40)*.25;y+=Math.cos(u*33)*.2;}return[x,y,z,sp.x,sp.y+(style==='low'?4.2:3.5),sp.z];}
-function mvLineAt(t){let k=-1;for(let i=0;i<MVL.length;i++){if(MVL[i][0]<=t)k=i;else break;}return k;}
+MVD.off=(function(){try{return +localStorage.getItem('gfa-mv-off')||0;}catch(e){return 0;}})();
+function mvLineAt(t){let k=-1;for(let i=0;i<MVL.length;i++){if(MVL[i][0]+MVD.off<=t)k=i;else break;}return k;}
 function mvCaption(i){const el=MVD.el,old=el.querySelector('.cap');if(old)old.remove();if(i<0)return;const c=document.createElement('div');c.className='cap';const words=MVL[i][2].split(' ');let ad=false;
   words.forEach(w=>{const s=document.createElement('span');if(w[0]==='(')ad=true;s.textContent=w;s.className='wait'+(ad?' ad':'');if(w[w.length-1]===')')ad=false;c.appendChild(s);c.appendChild(document.createTextNode(' '));});el.appendChild(c);MVD.words=[...c.querySelectorAll('span')];}
 function mvPop(e){if(!e)return;const d=document.createElement('div');d.className='pop';d.textContent=e;d.style.left=(8+Math.random()*70)+'%';d.style.top=(18+Math.random()*40)+'%';MVD.el.appendChild(d);setTimeout(()=>d.remove(),720);}
@@ -7085,7 +7087,7 @@ const MVICON={scroll:'📱',btv:'📺',npc:'🧍',heart:'❤️',cash:'💸',wha
 function mvPlace(sp){const b=MVD.b;b.group.position.set(sp.x,sp.y,sp.z);MVD.spot=sp;try{bossPeek(!!sp.boss)();}catch(e){}}
 function mvRun(done){if(MVD.on||!window.LilBottie)return;audioInit();SEEN.add('mv');MVD.on=true;MVD.done=done;MVD.i=-2;MVD.cut=-1;MVD.punch=0;MVD.prev=S.mode;MVD.keep=!$('title').hidden;$('title').hidden=true;MVD.hud=$('hud').hidden;$('hud').hidden=true;if(S.mode==='play')S.mode='mv';
   if(!MVD.b){MVD.b=LilBottie.build(THREE);MVD.b.group.scale.setScalar(2.9);scene.add(MVD.b.group);}MVD.b.group.visible=true;MVD.b.setJacket('silver');MVD.pg=pGroup.visible;pGroup.visible=false;MVD.botv=BOT.g.visible;BOT.g.visible=false;MVD.fov0=camera.fov;
-  const el=document.createElement('div');el.id='intro';el.className='mvd';el.innerHTML='<div class="ttl"><span>North Coast Studios presents</span><b>THE<br>ALGORITHM</b><span>lil Bottie · official video</span></div><div class="tag"><b>lil Bottie</b>THE ALGORITHM<br>🔴 REC</div><div class="rail"><div><i>❤️</i><span id="mvlk">670K</span></div><div><i>💬</i>67K</div><div><i>↗️</i>6.7K</div></div><div class="bar"></div><div class="skip">hold or Esc: skip the video</div>';$('app').appendChild(el);MVD.el=el;
+  const el=document.createElement('div');el.id='intro';el.className='mvd';el.innerHTML='<div class="ttl"><span>North Coast Studios presents</span><b>THE<br>ALGORITHM</b><span>lil Bottie · official video</span></div><div class="tag"><b>lil Bottie</b>THE ALGORITHM<br>🔴 REC</div><div class="rail"><div><i>❤️</i><span id="mvlk">670K</span></div><div><i>💬</i>67K</div><div><i>↗️</i>6.7K</div></div><div class="bar"></div><div class="skip">hold or Esc: skip the video</div>'+(MVONLY||(DEV.on&&DEV.unlocked)?'<div class="tune"><button data-o="-0.1">lyrics earlier</button><button data-o="0.1">lyrics later</button><span class="rd"></span></div>':'');$('app').appendChild(el);MVD.el=el;el.querySelectorAll('.tune button').forEach(b=>{b.addEventListener('pointerdown',e=>e.stopPropagation(),true);b.onclick=e=>{e.stopPropagation();MVD.off=Math.round((MVD.off+ +b.dataset.o)*10)/10;try{localStorage.setItem('gfa-mv-off',MVD.off);}catch(x){}MVD.i=-2;};});
   INTR.skip=mvEnd;INTR.adv=null;
   if(RAD&&RAD.a&&!RAD.a.paused){MVD.rad=true;RAD.a.pause();}
   const a=new Audio('music/algorithm.mp3');a.volume=Math.min(1,.9*VOL.music+.1);MVD.a=a;MVD.silent=false;MVD.t0=performance.now();a.addEventListener('ended',mvEnd);a.play().catch(()=>{MVD.silent=true;MVD.t0=performance.now();});a.addEventListener('error',()=>{MVD.silent=true;MVD.t0=performance.now();});
@@ -7096,7 +7098,7 @@ function mvFrame(){const t=mvTime(),el=MVD.el,b=MVD.b,dt=1/60;if(t>199.5){mvEnd(
   if(i!==MVD.i){MVD.i=i;MVD.cut=-1;if(i>=0){const L=MVL[i];mvCaption(i);b.setPose(L[3]);b.setExpression(L[4],L[5]);if(L[6])b.setIcon(L[6]);mvPop(MVICON[L[6]]||null);
       const prevSec=i>0?MVL[i-1][1]:'';if(L[1]!==prevSec){const o=el.querySelector('.sec');if(o)o.remove();const s=document.createElement('div');s.className='sec';s.textContent=L[1];el.appendChild(s);setTimeout(()=>s.remove(),2200);}
       app.classList.toggle('mvhook',/Hook|Bridge/.test(L[1]));}}
-  const L=i>=0?MVL[i]:null,next=i+1<MVL.length?MVL[i+1][0]:t+4,st=L?L[0]:0,dur=Math.max(.6,Math.min(next-st,4.6)),u=L?clamp((t-st)/dur):clamp(t/5.1);
+  const L=i>=0?MVL[i]:null,next=i+1<MVL.length?MVL[i+1][0]+MVD.off:t+4,st=L?L[0]+MVD.off:0,dur=Math.max(.6,Math.min(next-st,4.6)),u=L?clamp((t-st)/dur):clamp(t/5.1);
   // which set, and the cut inside the line
   const S2=MVSET[Math.max(0,i)]||MVSET[0],multi=S2[0].indexOf('cuts:')===0,sets=multi?S2[0].slice(5).split(','):[S2[0]],nc=multi?sets.length:2,ck=Math.min(nc-1,Math.floor(u*nc));
   if(ck!==MVD.cut){MVD.cut=ck;mvPlace(mvSpot(multi?sets[ck]:sets[0]));app.classList.add(ck%2&&!multi?'mvglitch':'mvflash');MVD.flashT=performance.now()+90;MVD.punch=1;}
@@ -7110,7 +7112,7 @@ function mvFrame(){const t=mvTime(),el=MVD.el,b=MVD.b,dt=1/60;if(t>199.5){mvEnd(
   MVD.punch*=.86;camera.fov=MVD.fov0-MVD.punch*9;camera.updateProjectionMatrix();
   // captions: light the words up across the line
   if(L&&MVD.words){const n=MVD.words.length,k=Math.min(n-1,Math.floor(clamp((t-st)/(dur*.86))*n));MVD.words.forEach((w,j)=>{const c=(j<k?'':j===k?'on':'wait')+(w.classList.contains('ad')?' ad':'');if(w.className!==c.trim())w.className=c.trim();});}
-  const bar=el.querySelector('.bar');if(bar)bar.style.width=(t/199.97*100)+'%';
+  const bar=el.querySelector('.bar');if(bar)bar.style.width=(t/199.97*100)+'%';const rd=el.querySelector('.rd');if(rd){const tx='line '+(i+1)+'/52 · '+t.toFixed(1)+'s'+(L?' · starts '+L[0].toFixed(2)+'s':'')+' · offset '+(MVD.off>0?'+':'')+MVD.off.toFixed(1)+'s';if(rd.textContent!==tx)rd.textContent=tx;}
   // the reel screens near the set keep playing
   MVD.sub-=dt;if(MVD.sub<=0){MVD.sub=.1;if(sp.reel){drawReel(sp.reel.g,sp.reel,t);sp.reel.tex.needsUpdate=true;}}}
 function mvEnd(){if(!MVD.on)return;MVD.on=false;try{MVD.a.pause();}catch(e){}INTR.skip=null;app.classList.remove('mvflash','mvglitch','mvhook');camera.fov=MVD.fov0;camera.updateProjectionMatrix();MVD.b.group.visible=false;pGroup.visible=MVD.pg;BOT.g.visible=MVD.botv;try{bossPeek(false)();}catch(e){}
@@ -7123,6 +7125,10 @@ music=(function(m){return function(){if(MVD.on)return;return m.apply(this,argume
 {const ai=act15Interact;act15Interact=function(){if(!S.dead&&!S.inPk&&BOT.state==='down'&&Math.hypot(PL.x-BOT.x,PL.z-BOT.z)<7)return{label:'🎤 WATCH HIS MUSIC VIDEO',fn:()=>mvRun(()=>{})};return ai();};}
 // an event no longer grabs the compass: it tells you how to follow it (the first few times)
 {const es=evStart;evStart=function(){es();const q=Q38();q.evH=(q.evH||0)+1;if(q.evH<=3)setTimeout(()=>{if(S.mode==='play')toast('📍 An event started. Tap it in your quests if you want the compass to point at it.');},1800);};}
+// ---- the video on its own: with GFA_MV_ONLY (or #mv) the page is just a play button and the music video
+if(MVONLY)(function(){$('title').hidden=true;const st=document.createElement('style');st.textContent='#mvonly{position:absolute;inset:0;z-index:30;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;font-family:var(--display);color:#fff;padding:0 16px}#mvonly b{font-weight:400;font-size:clamp(44px,12vw,130px);line-height:.9;color:#ffd400;-webkit-text-stroke:3px #12021f;text-shadow:7px 7px 0 #ff2e88}#mvonly span{font:800 clamp(11px,1.8vw,16px) system-ui,sans-serif;letter-spacing:.3em}#mvonly button{font-family:var(--display);font-size:clamp(24px,5vw,40px);letter-spacing:.05em;padding:10px 36px;border:5px solid #12021f;border-radius:18px;background:#b6ff00;color:#12021f;box-shadow:7px 7px 0 #ff2e88;cursor:pointer}#mvonly small{font:600 12px system-ui,sans-serif;opacity:.7;max-width:34em}';document.head.appendChild(st);
+  const card=txt=>{const d=document.createElement('div');d.id='mvonly';d.innerHTML='<span>lil Bottie · official video</span><b>THE<br>ALGORITHM</b><button>'+txt+'</button><small>Shot inside Grok Fable Astra. Hold anywhere to skip. If the lyrics are early or late, use the two buttons at the top left while it plays; the readout beside them shows the line number and time.</small>';$('app').appendChild(d);d.querySelector('button').onclick=()=>{d.remove();mvRun(()=>{$('title').hidden=true;card('↻ WATCH AGAIN');});};};
+  card('▶ PLAY');})();
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
 ['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
 /* ================= main loop ================= */

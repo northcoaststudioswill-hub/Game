@@ -85,7 +85,7 @@ body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(48px +
   // ---- songs. A song with a recording plays it; one without runs on a silent clock at one line a bar.
   var JACK={'the-algorithm':'silver','boot-up':'white','overclocked':'red','born-in-the-server':'ice','terms-and-conditions':'black','root-access':'slime','no-wi-fi-still-online':'blue','aura-farming':'purple','rate-limit':'orange','blue-screen':'blue','run-the-bank':'gold','nuke-the-data-center':'camo','clanka-szn':'rose'};
   var SONGS=[{id:'the-algorithm',title:'The Algorithm',src:'songs/algorithm.mp3',lines:ALGO}].concat(OTHERS.map(function(o){return{id:o.id,title:o.title,src:o.src||null,lines:o.lines.map(function(q,i){var sg=LilBottie.suggest(q[1],i);return[2+i*3.4975,q[0],q[1],sg.pose,sg.eyes,sg.mouth,sg.icon];})};}));
-  SONGS.forEach(function(s){s.grid=s.lines.map(function(L){return L[0];});s.mine=false;try{var sv=JSON.parse(localStorage.getItem('lb-timing-'+s.id)||(s.id==='the-algorithm'?localStorage.getItem('lb-algorithm-timing'):null)||'null');if(sv&&sv.length===s.lines.length){sv.forEach(function(t,i){s.lines[i][0]=t;});s.mine=true;}}catch(e){}});
+  SONGS.forEach(function(s){s.grid=s.lines.map(function(L){return L[0];});s.mine=false;try{var sv=JSON.parse(localStorage.getItem('lb-timing3-'+s.id)||'null');if(sv&&sv.length===s.lines.length){sv.forEach(function(t,i){s.lines[i][0]=t;});s.mine=true;}}catch(e){}});
   var AUDIO=$('song'),VC={currentTime:0,paused:true,playbackRate:1,duration:1,play:function(){this.paused=false;return Promise.resolve();},pause:function(){this.paused=true;}};
   var CUR=SONGS[0],LINES=CUR.lines,song=AUDIO,offset=0,AC=null,an=null,buf=null,started=false,lastK=-9,lineT0=0,follow=true,manualJacket=null,tab=null;
   AUDIO.src=CUR.src;
@@ -96,8 +96,8 @@ body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(48px +
   AUDIO.addEventListener('ended',ended);
   function selectSong(i){AUDIO.pause();VC.pause();CUR=SONGS[i];LINES=CUR.lines;song=CUR.src?AUDIO:VC;if(CUR.src&&AUDIO.getAttribute('data-id')!==CUR.id){AUDIO.src=CUR.src;AUDIO.setAttribute('data-id',CUR.id);}VC.currentTime=0;VC.duration=LINES[LINES.length-1][0]+6;offset=0;started=false;lastK=-9;setFollow(true);
     B.setJacket(manualJacket||JACK[CUR.id]||'silver');B.setPose('idle');B.setFace('smile');$('sec').textContent=CUR.src?'':'NO RECORDING IN THE REPO · SILENT RUN-THROUGH · ADD ONE IN SONGS';$('line').textContent='';$('now').textContent=CUR.title+(CUR.src?'':' (silent)');render();size();}
-  function store(){try{localStorage.setItem('lb-timing-'+CUR.id,JSON.stringify(LINES.map(function(L){return L[0];})));}catch(e){}CUR.mine=true;}
-  function resetTiming(){LINES.forEach(function(L,i){L[0]=CUR.grid[i];});try{localStorage.removeItem('lb-timing-'+CUR.id);if(CUR.id==='the-algorithm')localStorage.removeItem('lb-algorithm-timing');}catch(e){}CUR.mine=false;lastK=-9;render();}
+  function store(){try{localStorage.setItem('lb-timing3-'+CUR.id,JSON.stringify(LINES.map(function(L){return L[0];})));}catch(e){}CUR.mine=true;}
+  function resetTiming(){LINES.forEach(function(L,i){L[0]=CUR.grid[i];});try{localStorage.removeItem('lb-timing3-'+CUR.id);if(CUR.id==='the-algorithm')localStorage.removeItem('lb-algorithm-timing');}catch(e){}CUR.mine=false;lastK=-9;render();}
   function setFollow(v){follow=v;if(v)lastK=-9;}
   function seek(t){started=true;song.currentTime=Math.max(0,t);lastK=-9;}
   function lineAt(t){var k=-1;for(var i=0;i<LINES.length;i++){if(LINES[i][0]+offset<=t)k=i;else break;}return k;}
