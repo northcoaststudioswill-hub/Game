@@ -25,7 +25,7 @@ await page.evaluate(() => {
     },
     me() { const M = __pit.MT, p = M.me, B = M.B, R = p.rig, G = R.gait, w = n => R.joints['an' + n].getWorldPosition(new THREE.Vector3()), hR = R.handR.getWorldPosition(new THREE.Vector3()), hL = R.handL.getWorldPosition(new THREE.Vector3());
       const fr = w('R'), fl = w('L');
-      return { x: p.x, z: p.z, y: p.y, vx: p.vx, vz: p.vz, st: p.st, hold: B.holder === p, bs: B.state, b: [B.pos.x, B.pos.y, B.pos.z], fR: [fr.x, fr.z], fL: [fl.x, fl.z], swR: G ? G.ft.R.sw : false, swL: G ? G.ft.L.sw : false, steps: G ? G.steps : 0, dph: p.drib ? p.drib.ph : '', hd: Math.min(Math.hypot(B.pos.x - hR.x, B.pos.y - hR.y, B.pos.z - hR.z), Math.hypot(B.pos.x - hL.x, B.pos.y - hL.y, B.pos.z - hL.z)), handsUp: p.handsUp, an: p.an, mN: p.moveN || 0 }; },
+      return { x: p.x, z: p.z, y: p.y, vx: p.vx, vz: p.vz, st: p.st, hold: B.holder === p, bs: B.state, b: [B.pos.x, B.pos.y, B.pos.z], fR: [fr.x, fr.z], fL: [fl.x, fl.z], swR: (p.strideW || 0) > 0.9 ? !(p.psi > 0.04 && p.psi < 0.22) : (p.strideW || 0) > 0.05 ? true : (G ? G.ft.R.sw : false), swL: (p.strideW || 0) > 0.9 ? !(((p.psi + 0.5) % 1) > 0.04 && ((p.psi + 0.5) % 1) < 0.22) : (p.strideW || 0) > 0.05 ? true : (G ? G.ft.L.sw : false), steps: G ? G.steps : 0, dph: p.drib ? p.drib.ph : '', hd: Math.min(Math.hypot(B.pos.x - hR.x, B.pos.y - hR.y, B.pos.z - hR.z), Math.hypot(B.pos.x - hL.x, B.pos.y - hL.y, B.pos.z - hL.z)), handsUp: p.handsUp, an: p.an, mN: p.moveN || 0 }; },
   };
 });
 const res = []; const check = (n, name, ok, detail) => { res.push({ n, name, ok, detail }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}. ${name}  ${detail}`); };

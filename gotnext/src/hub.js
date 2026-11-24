@@ -72,37 +72,44 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const v = Math.hypot(vx, vz), fwdA = ax * Math.sin(face) + az * Math.cos(face);
   L.lean = lerp(L.lean, clamp(fwdA * 0.014, -0.18, 0.2), 1 - Math.exp(-8 * dt));
   let hipYaw = 0; if (v > 0.6) { let a = Math.atan2(vx, vz) - face; a = Math.atan2(Math.sin(a), Math.cos(a)); if (Math.abs(a) < 2.3) hipYaw = clamp(a, -0.5, 0.5) * Math.min(1, v / 2.5) * 0.6; }
-  // walking: the stride cycle advances with distance covered (steps lengthen with speed), so the feet do not skate.
-  // Up to a brisk walk the legs follow real gait curves; above it the run (planted-feet IK) takes over.
-  const sg = swag === undefined ? 0.6 : swag, step = R.legLen * 0.74 * clamp(Math.sqrt(Math.max(v, 0.01) / 1.35), 0.45, 1.3), amp = clamp(v / 0.5, 0, 1) * clamp(Math.sqrt(v / 1.35), 0.45, 1.3);
+  // one stride clock for walking and running: it advances with distance covered, so feet do not skate. Up to a brisk
+  // walk the legs follow walking gait curves; above it, running curves (knee drive, heel recovery, a flight phase).
+  const sg = swag === undefined ? 0.6 : swag, wWalk = 1 - clamp((v - 2.2) / 0.9, 0, 1), k = clamp((v - 2.6) / 3.6, 0, 1);
+  const stepW = R.legLen * 0.74 * clamp(Math.sqrt(Math.max(v, 0.01) / 1.35), 0.45, 1.3), amp = clamp(v / 0.5, 0, 1) * clamp(Math.sqrt(v / 1.35), 0.45, 1.3);
+  const cad = 2.65 + 0.85 * k, stepR = Math.max(v, 0.5) / cad, duty = 0.42 - 0.13 * k, step = lerp(stepR, stepW, wWalk);     /* running: 2.65 steps/s at a jog to 3.5 at a sprint */
   L.psi = ((L.psi || 0) + v * dt / (2 * step)) % 1;
-  // the hip swing that carries the body exactly one step over the standing foot in stance (60% of the cycle), less the
-  // heel-to-toe roll of the foot: then the planted foot stays put
-  const need = 1.2 * step - 0.12; let lo = 0.2, hi = 2.2; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * (Math.sin((11 + 19 * m) * D2R) + Math.sin((20 * m - 11) * D2R)); if (sweep < need) lo = m; else hi = m; }
-  const hipA = Math.min(lo, 1.6) * clamp(v / 0.5, 0, 1);
-  const wWalk = 1 - clamp((v - 2.3) / 0.9, 0, 1);
-  let P = poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen });
-  if (v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
-  // running: exactly the run from the court (same pose, same arms on the feet that are really stepping, same lean)
-  if (wWalk < 1) P = blendPose(poseOf('run', W.t, { sp: clamp(v / 6.5, 0, 1), ph: R.gait ? R.gait.ph : 0, leg: R.legLen, leanF: L.lean, hipYaw }), P, wWalk);
-  else { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
+  // the hip swing that carries the body one step over the standing foot (walk), or the stance distance (run)
+  const solve = need => { let lo = 0.2, hi = 2.4; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * (Math.sin((11 + 19 * m) * D2R) + Math.sin((20 * m - 11) * D2R)); if (sweep < need) lo = m; else hi = m; } return lo; };
+  const hipA = Math.min(solve(1.2 * stepW - 0.12), 1.6) * clamp(v / 0.5, 0, 1);
+  const solveR = need => { let lo = 0.3, hi = 2.2; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * 0.92 * (Math.sin((8 + 20 * m) * D2R) + Math.sin((20 * m - 8) * D2R)); if (sweep < need) lo = m; else hi = m; } return lo; };
+  const stanceDist = v * duty * 2 / cad, hipR = Math.min(solveR(stanceDist - 0.1), 2.0), flight = (0.5 - duty) * 2 / cad;
+  let P = wWalk > 0 ? poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen }) : null;
+  if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
+  if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
+  { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
   applyPose(R, P, dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;
-  if (v > 0.25 && wWalk > 0.3) gaitLock(R, L.psi, face, wWalk); else R.lock = null;
-  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: 0.05, want: 1 - wWalk, dt, swag: 0 }); legIK(R, dt);
+  if (v > 0.25) gaitLock(R, L.psi, face, 1, lerp(duty, 0.6, wWalk)); else R.lock = null;
+  R.gait = null;
 }
 // foot lock for the walk: while a foot is in stance, nudge that hip so the ankle stays where the foot landed (the curve
 // shape stays; only the hip angle is corrected, and the ankle keeps the foot flat). Released through push-off.
-const _gl = new THREE.Vector3();
-function gaitLock(R, psi, face, w) {
+const _gl = new THREE.Vector3(), _gh = new THREE.Vector3();
+function gaitLock(R, psi, face, w, stEnd) {
   const J = R.joints, fx = Math.sin(face), fz = Math.cos(face), Lg = R.thigh + R.shin; R.lock = R.lock || {}; R.root.updateMatrixWorld(true);
   for (const [s, off] of [['R', 0], ['L', 0.5]]) {
     const u = ((psi + off) % 1 + 1) % 1, an = J['an' + s]; an.getWorldPosition(_gl);
-    if (u > 0.6) { R.lock[s] = null; continue; }
+    if (u > stEnd) { R.lock[s] = null; continue; }
     if (!R.lock[s]) { R.lock[s] = { x: _gl.x, z: _gl.z }; continue; }
-    const k = w * (u < 0.48 ? 1 : 1 - (u - 0.48) / 0.12), dx = R.lock[s].x - _gl.x, dz = R.lock[s].z - _gl.z, e = dx * fx + dz * fz, el = dx * fz - dz * fx;
-    const d = clamp(-e / Lg, -0.35, 0.35) * k, dl = clamp(el / Lg, -0.12, 0.12) * k;
-    J['hp' + s].rotation.x += d; J['hp' + s].rotation.z += dl; an.rotation.x -= d; J['hp' + s].updateMatrixWorld(true);
+    const k = w * (u < stEnd * 0.8 ? 1 : 1 - (u - stEnd * 0.8) / (stEnd * 0.2));
+    // two passes: with the knee bent the leg is shorter than its full length, so one pass under-corrects
+    for (let it = 0; it < 2; it++) {
+      if (it) an.getWorldPosition(_gl);
+      const dx = R.lock[s].x - _gl.x, dz = R.lock[s].z - _gl.z, e = dx * fx + dz * fz, el = dx * fz - dz * fx;
+      J['hp' + s].getWorldPosition(_gh); const lever = Math.max(0.35, _gh.y - _gl.y);
+      const d = clamp(-e / lever, -0.4, 0.4) * k, dl = clamp(el / lever, -0.12, 0.12) * k;
+      J['hp' + s].rotation.x += d; J['hp' + s].rotation.z += dl; an.rotation.x -= d; J['hp' + s].updateMatrixWorld(true);
+    }
   }
 }
 function enterWorld(kind, sx, sz, face, opts) {

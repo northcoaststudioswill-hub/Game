@@ -240,6 +240,41 @@ function walkPose(p, o) {
   }
   p.rate = 32;
 }
+// ---- a real run: joint angles through one running stride (degrees), from running-biomechanics data ----
+// 0 = foot strike, toe-off at 0.38 in these reference curves (re-timed below: the faster the run, the shorter the
+// stance and the longer the flight). The knee folds to ~95-125 degrees in the swing; the hip drives to ~45-60.
+const RUN_HIP = [[0, 28], [0.1, 22], [0.25, 6], [0.38, -12], [0.46, -8], [0.6, 20], [0.75, 44], [0.86, 48], [0.95, 36], [1, 28]];
+const RUN_KNEE = [[0, 18], [0.12, 40], [0.2, 42], [0.38, 20], [0.5, 62], [0.62, 96], [0.7, 100], [0.82, 62], [0.93, 24], [1, 18]];
+const RUN_ANKLE = [[0, 6], [0.12, 20], [0.2, 22], [0.38, -24], [0.5, -14], [0.7, 0], [1, 6]];
+// o.psi stride phase, o.duty stance share of the stride (0.42 jog .. 0.28 sprint), o.k 0 jog .. 1 sprint,
+// o.flight seconds in the air between steps, o.hipA stance hip-swing scale
+function runPose(p, o) {
+  const S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
+  const ps = ((o.psi || 0) % 1 + 1) % 1, d = o.duty || 0.38, k = o.k || 0, ah = o.hipA === undefined ? 1 : o.hipA, th = o.thigh || 0.48, sh = o.shin || 0.48, full = th + sh;
+  const warp = u => u < d ? u / d * 0.38 : 0.38 + (u - d) / (1 - d) * 0.62;       // stance and swing re-timed for this speed
+  const leg = u => { const w = warp(((u % 1) + 1) % 1), st = w < 0.38; const hip = (st ? 8 + (gcurve(RUN_HIP, w) - 8) * ah : gcurve(RUN_HIP, w) * (1 + 0.28 * k)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.25 * k) * D2R, an = gcurve(RUN_ANKLE, w) * D2R; return { hip, kn, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
+  let low = 0, stance = false;
+  for (const [side, off] of [['R', 0], ['L', 0.5]]) {
+    const u = ((ps + off) % 1 + 1) % 1, L = leg(u);
+    S_('hp' + side, -L.hip, 0, side === 'R' ? -0.02 : 0.02); S_('kn' + side, L.kn); S_('an' + side, -(-L.hip + L.kn) - L.an);
+    if (u < d) { stance = true; low = Math.max(low, L.reach); }
+  }
+  if (stance) p.y = low - full;
+  else {      // both feet off: a short ballistic hop from the toe-off height to the next foot-strike height
+    const u = ps < 0.5 ? ps : ps - 0.5, a = clamp((u - d) / (0.5 - d), 0, 1), y0 = leg(d - 0.001).reach, y1 = leg(0).reach, tf = o.flight || 0.1;
+    p.y = lerp(y0, y1, a) - full + 4 * (9.8 * tf * tf / 8) * a * (1 - a);
+  }
+  // trunk leans into the run; pelvis and shoulders counter-rotate; the head stays level
+  const c = Math.cos(2 * Math.PI * ps), lean = 0.1 + 0.1 * k, py = 0.1 * c, pz = -0.05 * Math.sin(2 * Math.PI * ps);
+  S_('hips', lean * 0.35, py, pz); for (const s of ['R', 'L']) { const h = p['hp' + s]; h[0] += lean * 0.35; h[1] -= py; h[2] -= pz; }
+  S_('spine', lean * 0.4, -0.05 * c, 0); S_('chest', lean * 0.25, -0.13 * c, 0); S_('neck', -lean * 0.8, 0.12 * c, 0); S_('head', -0.03);
+  // arms: elbows near a right angle, driven from the shoulder, opposite the legs; the hand comes up toward the chin
+  for (const [side, off] of [['R', 0.5], ['L', 0]]) {
+    const f = Math.cos(2 * Math.PI * (ps - off) + 0.5), fl = (4 + (26 + 12 * k) * f) * D2R;
+    S_('sh' + side, -fl, 0, side === 'R' ? -0.12 : 0.12); S_('el' + side, -(1.35 + 0.3 * Math.max(0, f) - 0.2 * Math.max(0, -f))); S_('wr' + side, -0.1);
+  }
+  p.rate = 40;
+}
 function blendPose(A, B, t) { const o = { y: lerp(A.y || 0, B.y || 0, t), rate: Math.max(A.rate || 16, B.rate || 16) }; const z = POSE.zero; for (const k of new Set([...Object.keys(A), ...Object.keys(B)])) { if (k === 'y' || k === 'rate') continue; const a = A[k] || z, b = B[k] || z; o[k] = [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; } return o; }
 function poseOf(anim, t, o) {
   const p = { y: 0, rate: 16 }; o = o || {};
@@ -445,6 +480,7 @@ function poseOf(anim, t, o) {
       p.rate = 14; break;
     }
     case 'gait': walkPose(p, o); break;
+    case 'sprint': runPose(p, o); break;
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
   // layered on top of every pose: eyes on the ball, lean into the turn

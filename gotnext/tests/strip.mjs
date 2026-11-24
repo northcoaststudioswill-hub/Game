@@ -15,15 +15,17 @@ await page.goto('file://' + file); await page.evaluate(() => window.__tick(60, 1
 await page.click('#titleBtns .btn'); await page.evaluate(() => window.__tick(5, 16.67)); await page.click('#panel .pf .btn'); await page.evaluate(() => window.__tick(10, 16.67));
 const SC = {
   run: { setup: 'free', frames: [[24, ['KeyD', 'ShiftLeft']], [30, ['KeyA', 'ShiftLeft']]], every: 3 },
+  sprint: { setup: 'free', frames: [[76, ['KeyD', 'ShiftLeft']]], every: 2 },
   drib: { setup: 'free', frames: [[18, ['KeyD']], [2, ['KeyD', 'KeyJ']], [22, ['KeyD']], [2, ['KeyD', 'KeyL']], [16, ['KeyD']]], every: 3 },
   shot: { setup: 'free', frames: [[16, ['KeyD', 'ShiftLeft']], [34, ['Space']], [24, []]], every: 3 },
   def: { setup: 'game', frames: [[20, ['KeyD']], [20, ['KeyA']], [14, ['KeyA', 'KeyI']]], every: 3 },
 };
 const sc = SC[name]; const shots = [];
+await page.evaluate(n => { if (n === 'sprint') window.__sx = -7.5; const st = document.createElement('style'); st.textContent = '#toasts,#call,#fb{display:none!important}'; document.head.appendChild(st); }, name);
 await page.evaluate(setup => {
   const P = __pit; for (const k in P.keys) P.keys[k] = false;
   if (setup === 'free') P.startPractice('free'); else P.launchGame(P.MODES[0], P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' });
-  window.__tick(170, 16.67); const M = P.MT, me = M.me; me.x = -3; me.z = 7; me.face = Math.PI / 2; me.vx = me.vz = 0; M.phase = 'live';
+  window.__tick(170, 16.67); const M = P.MT, me = M.me; me.x = (window.__sx === undefined ? -3 : window.__sx); me.z = 7; me.face = Math.PI / 2; me.vx = me.vz = 0; M.phase = 'live';
   if (setup === 'game') { const o = M.P.find(p => p.team !== me.team); M.B.holder = o; M.B.state = 'held'; M.off = o.team; o.x = -1; o.z = 4.4; o.face = Math.PI; o.ai.tick = 99; o.aiLvl = 0; M.P.forEach(p => { if (p !== me && p !== o) { p.x = 7; p.z = 12; } }); }
   window.__tick(20, 16.67);
   // a side-on camera that follows the player, instead of the game camera

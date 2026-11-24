@@ -347,7 +347,57 @@ Sources for the angle values:
 - [OUHSC kinematic analyses of gait](https://ouhsc.edu/bserdac/dthompso/web/gait/KNMATICS/gait.htm)
 - the standard normative curves (Winter)
 
-## 11. Not checked
+## 11. Running from running-biomechanics data (v0.8.4)
+
+![Running on The Block, before and after](img/run-gait.png)
+
+The run looked like a fast lunge. Both feet stayed near the ground, there was no knee drive, the back heel never came
+up, and the arms hardly moved. It was the planted-feet stepping stretched to speed, with no flight phase.
+
+It is rebuilt the way the walk was, from the joint angles running labs measure (video still could not be watched from
+here).
+
+**Joint angles through one running stride:**
+- **Hip:** about 28° flexed at foot strike, to about 12° behind at toe-off, driving to about 48° forward in the swing
+  (more at a sprint).
+- **Knee:** about 18° at strike, giving to about 42° under the body, about 20° at toe-off, folding to about 100° in the
+  swing (up to about 125° at a sprint: the heel comes up toward the hip).
+- **Ankle:** about 6° up at strike, about 22° up at mid-stance, about 24° pointed at toe-off.
+
+**How it runs:**
+- **Stance shortens with speed:** 42% of the stride at a jog, 29% at a sprint. Between stances both feet are off the
+  ground and the body follows a short ballistic hop.
+- **Cadence:** 2.65 steps a second at a jog to 3.5 at a sprint. The stride lengthens with speed.
+- **One stride clock** for walk and run, so the change between them stays in step.
+- **Upper body:** the trunk leans in, the pelvis and shoulders counter-rotate, and the elbows sit near a right angle and
+  drive from the shoulder, opposite the legs.
+- **Foot lock:** it now corrects in two passes using the real hip-to-ankle height (a bent knee shortens the leg). This
+  also took the walk's standing-foot slide from 0.04 to 0.00 m/s.
+
+**On game courts:**
+- The same run is used when a player runs forward at speed, with or without the ball. With the ball, the arms stay with
+  the dribble.
+- Sideways, backward, slow and defensive movement keep the planted-feet stepping.
+- It fades in over about a third of a second.
+
+**Measured** (`node tests/runcheck.mjs`), sprinting on The Block at 6.2 m/s:
+
+| | value | a real sprinter at that speed |
+|---|---|---|
+| Steps per second | 3.8 | about 3.5–4 |
+| Both feet off the ground | 40% of the time | about 35–45% |
+| Peak knee bend | 123° | about 110–130° |
+| Body bounce | 7.7 cm | about 6–10 cm |
+| Planted foot slide (median / p90) | 0.01 / 0.01 m/s | 0 |
+
+All eight court acceptance tests pass. Test 1 now reads "planted" from the stride clock while running: p50 0.00, p90
+0.42 m/s at 4.9 m/s. The p90 includes the moments the run blends in and out.
+
+Sources for the running values:
+- [Physiopedia, Running Biomechanics](https://www.physio-pedia.com/Running_Biomechanics) (summarising Novacheck 1998)
+- [Novacheck, The biomechanics of running](https://core.ac.uk/download/357229176.pdf)
+
+## 12. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

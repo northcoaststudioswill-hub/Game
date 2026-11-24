@@ -838,10 +838,30 @@ function animPlayer(p, dt) {
   if (R.gait && (an === 'run' || an === 'dribble' || an === 'slide')) o.ph = R.gait.ph;       // arms swing with the feet that are actually stepping
   p.an = an;
   const t = an === 'idle' || an === 'celeb' || an === 'call' || an === 'sulk' ? M_.time : an === 'fake' ? 0.3 + p.t : p.t;
-  applyPose(R, poseOf(an, t, o), dt);
+  // running forward at speed (with or without the ball): the legs follow real running curves on a stride clock that
+  // advances with distance (knee drive, heel recovery, a flight phase); arms stay with the ball when dribbling.
+  // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
+  let P = poseOf(an, t, o), duty = 0.38;
+  { const yawR = p.face + (R.extraYaw || 0); let da = Math.atan2(p.avx, p.avz) - yawR; da = Math.atan2(Math.sin(da), Math.cos(da));
+    const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 3.0 && Math.abs(da) < 0.7 && !p.protect;
+    p.strideW = lerp(p.strideW || 0, fwd ? 1 : 0, 1 - Math.exp(-(fwd ? 9 : 14) * dt)); const w = p.strideW;
+    if (w > 0.02) {
+      const k = clamp((asp - 2.6) / 3.6, 0, 1), cad = 2.65 + 0.85 * k; duty = 0.42 - 0.13 * k; p.psi = ((p.psi || 0) + asp * dt * cad / (2 * Math.max(asp, 0.5))) % 1;
+      let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((8 + 20 * m) * D2R) + Math.sin((20 * m - 8) * D2R)) < need) lo = m; else hi = m; }
+      const Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 2.0), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin });
+      const mix = (key, ww) => { const a = P[key] || POSE.zero, b = Pr[key] || POSE.zero; P[key] = [lerp(a[0], b[0], ww), lerp(a[1], b[1], ww), lerp(a[2], b[2], ww)]; };
+      for (const key of ['hpR', 'knR', 'anR', 'hpL', 'knL', 'anL']) mix(key, w); P.y = lerp(P.y || 0, Pr.y, w);
+      const ub = an === 'run' ? w : w * 0.45; for (const key of ['hips', 'spine', 'chest', 'neck']) mix(key, ub);
+      if (an === 'run') for (const key of ['shR', 'elR', 'wrR', 'shL', 'elL', 'wrL']) mix(key, w); else { const off = (o.hand === 'L') ? 'R' : 'L'; for (const key of ['sh' + off, 'el' + off, 'wr' + off]) mix(key, w * 0.8); }
+      if (o.leanF) P.spine[0] += o.leanF * w * 0.5; P.rate = Math.max(P.rate || 16, 16 + 24 * w);
+      const uR = p.psi, uL = (p.psi + 0.5) % 1; p.stR = uR < duty; p.stL = uL < duty;
+    }
+  }
+  applyPose(R, P, dt);
   R.root.position.set(p.x, p.y, p.z); R.root.rotation.y = p.face + (R.extraYaw || 0);
+  if ((p.strideW || 0) > 0.3) gaitLock(R, p.psi, R.root.rotation.y, p.strideW, duty); else R.lock = null;
   const air = p.y > 0.01 || p.st === 'finish' || (p.st === 'hop' && p.t < (p.hop ? p.hop.dur : HOP_T) * 0.7) || (p.st === 'jump' && p.t > 0.04);
-  gaitStep(R, { x: p.x, z: p.z, yaw: R.root.rotation.y, vx: p.avx, vz: p.avz, grounded: !air, wide: an === 'slide' ? 1 : p.protect ? 0.6 : an === 'idle' || an === 'catch' ? 0.25 : 0.05, want: p.st === 'stagger' ? (p.stg && p.stg.fall ? 0 : 0.4) : 1, dt });
+  gaitStep(R, { x: p.x, z: p.z, yaw: R.root.rotation.y, vx: p.avx, vz: p.avz, grounded: !air, wide: an === 'slide' ? 1 : p.protect ? 0.6 : an === 'idle' || an === 'catch' ? 0.25 : 0.05, want: (p.st === 'stagger' ? (p.stg && p.stg.fall ? 0 : 0.4) : 1) * (1 - (p.strideW || 0)), dt });
   legIK(R, dt);
   R.shadow.position.y = 0.015 - p.y; R.shadow.scale.setScalar(clamp(1 - p.y * 0.25, 0.4, 1)); p.ring.position.y = 0.02 - p.y;
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
