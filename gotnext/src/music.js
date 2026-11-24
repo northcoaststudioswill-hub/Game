@@ -4,7 +4,7 @@
 'use strict';
 const TRACKS = [['afraid', 'Afraid'], ['down', 'Down'], ['hard-to-pretend', 'Hard to Pretend'], ['city-deep', 'City Deep'], ['i-am-somebody', 'I Am Somebody'], ['parody-3', 'Parody 3'], ['no-love', 'No Love'], ['insanity', 'Insanity'], ['going-out-sad', 'Going Out Sad'], ['believe', 'Believe'], ['bbb', 'BBB']];
 // per place: reverb mix (wet), dry level, how bright the top end stays, overall level
-const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.5 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.48 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.48 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.45 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.32 } };   /* released tracks are mastered loud: they sit under the game's sounds */
+const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.66 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.64 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.64 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.6 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.44 } };   /* released tracks are mastered loud: they sit under the game's sounds */
 const OST = { el: null, ok: false, order: [], i: -1, fails: 0, room: 'menu', graph: null };
 function ostInit() {
   if (OST.el || !AC) return;
@@ -16,8 +16,8 @@ function ostInit() {
     const src = AC.createMediaElementSource(el), hi = AC.createBiquadFilter(), dry = AC.createGain(), wet = AC.createGain(), conv = AC.createConvolver(), damp = AC.createBiquadFilter(), bus = AC.createGain();
     hi.type = 'highshelf'; hi.frequency.value = 9000; hi.gain.value = -3;            /* the harsh top of a compressed file, softened */
     conv.buffer = ostImpulse(2.6, 2.2); damp.type = 'lowpass'; damp.frequency.value = 5200; /* the tail is darker than the sound: distance */
-    src.connect(hi); hi.connect(dry); hi.connect(conv); conv.connect(damp); damp.connect(wet); dry.connect(bus); wet.connect(bus); bus.connect(master);
-    OST.graph = { hi, dry, wet, bus, lp: (() => { const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 14000; bus.disconnect(); bus.connect(f); f.connect(master); return f; })() };
+    src.connect(hi); hi.connect(dry); hi.connect(conv); conv.connect(damp); damp.connect(wet); dry.connect(bus); wet.connect(bus); bus.connect(musBus);
+    OST.graph = { hi, dry, wet, bus, lp: (() => { const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 14000; bus.disconnect(); bus.connect(f); f.connect(musBus); return f; })() };
   } catch (e) { OST.graph = null; }
   OST.order = TRACKS.map((t, i) => i).sort(() => Math.random() - 0.5); ostRoom(OST.room); ostNext();
 }
@@ -34,7 +34,7 @@ function ostNext() {
 }
 // glide the room settings when you change places
 function ostRoom(k) {
-  OST.room = ROOMS[k] ? k : 'menu'; const r = ROOMS[OST.room], G = OST.graph; if (!G || !AC) { if (OST.el) OST.el.volume = r.lvl; return; }
+  OST.room = ROOMS[k] ? k : 'menu'; const r = ROOMS[OST.room], G = OST.graph; if (!G || !AC) { if (OST.el) OST.el.volume = clamp(r.lvl * volOf('musVol'), 0, 1); return; }
   const t = AC.currentTime; G.wet.gain.setTargetAtTime(r.wet, t, 0.6); G.dry.gain.setTargetAtTime(r.dry, t, 0.6); G.lp.frequency.setTargetAtTime(r.hi, t, 0.6); G.bus.gain.setTargetAtTime(r.lvl * 0.9, t, 0.6);
 }
 function ostSync() {

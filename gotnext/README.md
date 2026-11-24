@@ -83,7 +83,8 @@ Eleven tracks in `gotnext/music/` (see `music/README.md`). They belong to this g
 The reverb tail is darker than the sound itself (distance), and a gentle top-end roll-off smooths the compressed files.
 The music sits under the game's sounds.
 
-**Controls:** **N** skips a track, as does OPTIONS → SKIP TRACK. Music on/off is in Options.
+**Controls:** **N** skips a track, as does OPTIONS → SKIP TRACK. Options and the in-game pause menu have separate
+**music** and **effects** volume sliders (0–100, default 80); the on/off switches are in Options.
 
 **Opened straight from disk (file://):** the browser won't route the tracks through the reverb, so they play dry. The
 published game has the reverb. If no track loads, the old synth loop plays instead.

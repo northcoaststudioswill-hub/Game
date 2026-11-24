@@ -19,7 +19,7 @@ function newSave() {
     worn: { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tank', arm: 'a_none', bottom: 'b_basic', socks: 's_low', shoes: 'k_beat', back: 'bk_none', ball: 'bl_std' },
     moves: { owned: ['cross', 'stepback', 'spin', 'textbook', 'twohand', 'flex'], side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'twohand', celeb: 'flex' },
     crib: {}, home: { lot: 0, items: [], store: {}, look: { house: 0, trim: 0, fence: 0, ground: 1 }, used: {}, tour: '' }, boosts: [], life: {}, drills: {}, ladder: 0, ach: {}, homies: [], seenRank: 0, bumDay: 0,
-    set: { sfx: 1, music: 1, meter: 1 },
+    set: { sfx: 1, music: 1, meter: 1, sfxVol: 80, musVol: 80 },
   };
 }
 function loadSave() {
@@ -156,25 +156,29 @@ function setupTouch() {
 }
 
 // ---------------- audio (all synthesised) ----------------
-let AC = null, master = null, musicGain = null, noiseBuf = null, musicTimer = null, musicStep = 0, musicNext = 0, musicMode = 'hub';
+let AC = null, master = null, sfxBus = null, musBus = null, musicGain = null, noiseBuf = null, musicTimer = null, musicStep = 0, musicNext = 0, musicMode = 'hub';
 function audioInit() {
   if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
   try {
     AC = new (window.AudioContext || window.webkitAudioContext)();
     master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
-    musicGain = AC.createGain(); musicGain.gain.value = 0.16; musicGain.connect(master);
+    sfxBus = AC.createGain(); sfxBus.connect(master); musBus = AC.createGain(); musBus.connect(master);      /* the two volume sliders */
+    musicGain = AC.createGain(); musicGain.gain.value = 0.16; musicGain.connect(musBus); applyVolumes();
     noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     musicNext = AC.currentTime + 0.1; musicTimer = setInterval(musicTick, 60); if (typeof ostInit === 'function') ostInit();
   } catch (e) { AC = null; }
 }
+// volume sliders: 0-100, 80 is the default level
+function volOf(k) { const v = S && S.set ? S.set[k] : undefined; return (v === undefined ? 80 : clamp(+v || 0, 0, 100)) / 80; }
+function applyVolumes() { if (!AC) return; const t = AC.currentTime; sfxBus.gain.setTargetAtTime(volOf('sfxVol'), t, 0.05); musBus.gain.setTargetAtTime(volOf('musVol'), t, 0.05); if (typeof ostRoom === 'function' && typeof OST !== 'undefined') ostRoom(OST.room); }
 function tone(f, t, dur, type, vol, f2, dest) {
   if (!AC) return; const o = AC.createOscillator(), g = AC.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
   if (f2) o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t + dur);
-  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); o.connect(g); g.connect(dest || master); o.start(t); o.stop(t + dur + 0.02);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); o.connect(g); g.connect(dest || sfxBus); o.start(t); o.stop(t + dur + 0.02);
 }
 function noise(t, dur, vol, hp, lp, dest) {
   if (!AC) return; const s = AC.createBufferSource(); s.buffer = noiseBuf; const g = AC.createGain(), f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = (hp + lp) / 2; f.Q.value = 0.7;
-  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); s.connect(f); f.connect(g); g.connect(dest || master); s.start(t, Math.random() * 0.5, dur + 0.05);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); s.connect(f); f.connect(g); g.connect(dest || sfxBus); s.start(t, Math.random() * 0.5, dur + 0.05);
 }
 function sfx(n) {
   if (!AC || !S || !S.set.sfx) return; const t = AC.currentTime;

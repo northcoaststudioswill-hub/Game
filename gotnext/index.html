@@ -196,7 +196,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.8.2';
+const VERSION = '0.8.3';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -679,7 +679,7 @@ function newSave() {
     worn: { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tank', arm: 'a_none', bottom: 'b_basic', socks: 's_low', shoes: 'k_beat', back: 'bk_none', ball: 'bl_std' },
     moves: { owned: ['cross', 'stepback', 'spin', 'textbook', 'twohand', 'flex'], side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'twohand', celeb: 'flex' },
     crib: {}, home: { lot: 0, items: [], store: {}, look: { house: 0, trim: 0, fence: 0, ground: 1 }, used: {}, tour: '' }, boosts: [], life: {}, drills: {}, ladder: 0, ach: {}, homies: [], seenRank: 0, bumDay: 0,
-    set: { sfx: 1, music: 1, meter: 1 },
+    set: { sfx: 1, music: 1, meter: 1, sfxVol: 80, musVol: 80 },
   };
 }
 function loadSave() {
@@ -816,25 +816,29 @@ function setupTouch() {
 }
 
 // ---------------- audio (all synthesised) ----------------
-let AC = null, master = null, musicGain = null, noiseBuf = null, musicTimer = null, musicStep = 0, musicNext = 0, musicMode = 'hub';
+let AC = null, master = null, sfxBus = null, musBus = null, musicGain = null, noiseBuf = null, musicTimer = null, musicStep = 0, musicNext = 0, musicMode = 'hub';
 function audioInit() {
   if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
   try {
     AC = new (window.AudioContext || window.webkitAudioContext)();
     master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
-    musicGain = AC.createGain(); musicGain.gain.value = 0.16; musicGain.connect(master);
+    sfxBus = AC.createGain(); sfxBus.connect(master); musBus = AC.createGain(); musBus.connect(master);      /* the two volume sliders */
+    musicGain = AC.createGain(); musicGain.gain.value = 0.16; musicGain.connect(musBus); applyVolumes();
     noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     musicNext = AC.currentTime + 0.1; musicTimer = setInterval(musicTick, 60); if (typeof ostInit === 'function') ostInit();
   } catch (e) { AC = null; }
 }
+// volume sliders: 0-100, 80 is the default level
+function volOf(k) { const v = S && S.set ? S.set[k] : undefined; return (v === undefined ? 80 : clamp(+v || 0, 0, 100)) / 80; }
+function applyVolumes() { if (!AC) return; const t = AC.currentTime; sfxBus.gain.setTargetAtTime(volOf('sfxVol'), t, 0.05); musBus.gain.setTargetAtTime(volOf('musVol'), t, 0.05); if (typeof ostRoom === 'function' && typeof OST !== 'undefined') ostRoom(OST.room); }
 function tone(f, t, dur, type, vol, f2, dest) {
   if (!AC) return; const o = AC.createOscillator(), g = AC.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
   if (f2) o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t + dur);
-  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); o.connect(g); g.connect(dest || master); o.start(t); o.stop(t + dur + 0.02);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); o.connect(g); g.connect(dest || sfxBus); o.start(t); o.stop(t + dur + 0.02);
 }
 function noise(t, dur, vol, hp, lp, dest) {
   if (!AC) return; const s = AC.createBufferSource(); s.buffer = noiseBuf; const g = AC.createGain(), f = AC.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = (hp + lp) / 2; f.Q.value = 0.7;
-  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); s.connect(f); f.connect(g); g.connect(dest || master); s.start(t, Math.random() * 0.5, dur + 0.05);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t + dur); s.connect(f); f.connect(g); g.connect(dest || sfxBus); s.start(t, Math.random() * 0.5, dur + 0.05);
 }
 function sfx(n) {
   if (!AC || !S || !S.set.sfx) return; const t = AC.currentTime;
@@ -2454,7 +2458,7 @@ function quitMatch() { if (!MT) return; const cfg = MT.cfg, pr = MT.practice; hu
 'use strict';
 const TRACKS = [['afraid', 'Afraid'], ['down', 'Down'], ['hard-to-pretend', 'Hard to Pretend'], ['city-deep', 'City Deep'], ['i-am-somebody', 'I Am Somebody'], ['parody-3', 'Parody 3'], ['no-love', 'No Love'], ['insanity', 'Insanity'], ['going-out-sad', 'Going Out Sad'], ['believe', 'Believe'], ['bbb', 'BBB']];
 // per place: reverb mix (wet), dry level, how bright the top end stays, overall level
-const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.5 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.48 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.48 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.45 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.32 } };   /* released tracks are mastered loud: they sit under the game's sounds */
+const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.66 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.64 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.64 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.6 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.44 } };   /* released tracks are mastered loud: they sit under the game's sounds */
 const OST = { el: null, ok: false, order: [], i: -1, fails: 0, room: 'menu', graph: null };
 function ostInit() {
   if (OST.el || !AC) return;
@@ -2466,8 +2470,8 @@ function ostInit() {
     const src = AC.createMediaElementSource(el), hi = AC.createBiquadFilter(), dry = AC.createGain(), wet = AC.createGain(), conv = AC.createConvolver(), damp = AC.createBiquadFilter(), bus = AC.createGain();
     hi.type = 'highshelf'; hi.frequency.value = 9000; hi.gain.value = -3;            /* the harsh top of a compressed file, softened */
     conv.buffer = ostImpulse(2.6, 2.2); damp.type = 'lowpass'; damp.frequency.value = 5200; /* the tail is darker than the sound: distance */
-    src.connect(hi); hi.connect(dry); hi.connect(conv); conv.connect(damp); damp.connect(wet); dry.connect(bus); wet.connect(bus); bus.connect(master);
-    OST.graph = { hi, dry, wet, bus, lp: (() => { const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 14000; bus.disconnect(); bus.connect(f); f.connect(master); return f; })() };
+    src.connect(hi); hi.connect(dry); hi.connect(conv); conv.connect(damp); damp.connect(wet); dry.connect(bus); wet.connect(bus); bus.connect(musBus);
+    OST.graph = { hi, dry, wet, bus, lp: (() => { const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 14000; bus.disconnect(); bus.connect(f); f.connect(musBus); return f; })() };
   } catch (e) { OST.graph = null; }
   OST.order = TRACKS.map((t, i) => i).sort(() => Math.random() - 0.5); ostRoom(OST.room); ostNext();
 }
@@ -2484,7 +2488,7 @@ function ostNext() {
 }
 // glide the room settings when you change places
 function ostRoom(k) {
-  OST.room = ROOMS[k] ? k : 'menu'; const r = ROOMS[OST.room], G = OST.graph; if (!G || !AC) { if (OST.el) OST.el.volume = r.lvl; return; }
+  OST.room = ROOMS[k] ? k : 'menu'; const r = ROOMS[OST.room], G = OST.graph; if (!G || !AC) { if (OST.el) OST.el.volume = clamp(r.lvl * volOf('musVol'), 0, 1); return; }
   const t = AC.currentTime; G.wet.gain.setTargetAtTime(r.wet, t, 0.6); G.dry.gain.setTargetAtTime(r.dry, t, 0.6); G.lp.frequency.setTargetAtTime(r.hi, t, 0.6); G.bus.gain.setTargetAtTime(r.lvl * 0.9, t, 0.6);
 }
 function ostSync() {
@@ -3704,7 +3708,7 @@ function uiPlayer(tab) {
         h += `<div class="card ${i === r ? 'sel' : ''} ${i > r ? 'lock' : ''}"><div class="row"><h3 class="g" style="color:${i <= r ? 'var(--ice)' : 'var(--bone)'}">${i <= r ? '✓ ' : ''}${k.n}</h3><span class="f mu">${k.rep.toLocaleString()} RESPECT</span></div><p>${un.length ? 'Unlocks in shops: ' + un.join(' · ') : 'Where everyone starts. Even the Founding Fathers. Allegedly.'}</p></div>`;
       });
     } else {
-      h += `<div class="card"><h3>SOUND</h3><div style="margin-top:6px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${OST.el ? Btn('SKIP TRACK (N)' + (OST.cur ? ' · now: ' + esc(OST.cur) : ''), () => { ostNext(); setTimeout(rerender, 300); }, 'sm alt') : ''} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
+      h += `<div class="card"><h3>SOUND</h3>${volSliders()}<div style="margin-top:8px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${OST.el ? Btn('SKIP TRACK (N)' + (OST.cur ? ' · now: ' + esc(OST.cur) : ''), () => { ostNext(); setTimeout(rerender, 300); }, 'sm alt') : ''} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Cages with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (JAM: shove) · jump to block and board.</p></div>`;
       h += `<div class="card"><h3>DEV ROOM</h3><p>A maxed-out player, every build, every move, and a reel that plays them all. F2 on The Block opens it too.</p><div style="margin-top:6px">${Btn('OPEN DEV ROOM', () => { uiClose(); uiDev('hub'); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => uiDialog('ARE YOU SURE', 'Erase your player, drip, crib and Respect for good?', [['Erase it all', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } S = newSave(); uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'red'], ['Never mind', null, 'alt']]), 'sm red')}</div></div>`;
@@ -3860,9 +3864,10 @@ function uiResults(res, rw, again) {
   // the count-up
   let t = 0; const iv = setInterval(() => { t += 0.05; const k = Math.min(1, t); const a = $('rvc'), b = $('rrep'); if (!a) { clearInterval(iv); return; } a.textContent = '+' + Math.round(rw.vc * k); b.textContent = '+' + Math.round(rw.rep * k); if (k < 1) sfx('coin'); else { clearInterval(iv); sfx('buy'); } }, 45);
 }
+function volSliders() { return `<label class="sl">MUSIC VOLUME <b id="lmv">${S.set.musVol === undefined ? 80 : S.set.musVol}</b></label><input type="range" id="vmus" min="0" max="100" step="5" value="${S.set.musVol === undefined ? 80 : S.set.musVol}" data-k="${on(el => { S.set.musVol = +el.value; $('lmv').textContent = el.value; applyVolumes(); saveLocal(); })}"><label class="sl">EFFECTS VOLUME <b id="lsv">${S.set.sfxVol === undefined ? 80 : S.set.sfxVol}</b></label><input type="range" id="vsfx" min="0" max="100" step="5" value="${S.set.sfxVol === undefined ? 80 : S.set.sfxVol}" data-k="${on(el => { S.set.sfxVol = +el.value; $('lsv').textContent = el.value; applyVolumes(); saveLocal(); if (!UI.vt || performance.now() - UI.vt > 180) { UI.vt = performance.now(); sfx('bounce'); } })}">`; }
 function uiPause() {
   if (!MT || MT.over) return; MT.paused = true; const online = !!MT.net;
-  openPanel(() => `<div class="ph"><h2>${online ? 'MENU · the game is still live' : 'PAUSED'}</h2></div><div class="pb"><div class="card"><h3>WITH THE BALL</h3><p>Skill stick ↓ hold & release = shoot (release in the green band) · ↑ = drive, layup or dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin. PASS throws to the teammate you are pushing toward.</p></div><div class="card"><h3>WITHOUT IT</h3><p>On defense: skill stick ↑ = hands up, ↓ = steal${MT.arcade ? ' / shove' : ''}, JUMP to block or rebound. On offense: CALL asks for the rock. After a stop, take it back past the arc.</p></div><div class="card"><h3>BRAVADO</h3><p>Big plays fill the bar. Full bar = +8 to every attribute for 20 seconds.</p></div></div><div class="pf">${Btn('RESUME', uiClose)}${Btn(MT.practice ? 'LEAVE' : 'FORFEIT', () => { uiClose(); quitMatch(); }, 'red')}</div>`, '', uiClose);
+  openPanel(() => `<div class="ph"><h2>${online ? 'MENU · the game is still live' : 'PAUSED'}</h2></div><div class="pb"><div class="card"><h3>SOUND</h3>${volSliders()}</div><div class="card"><h3>WITH THE BALL</h3><p>Skill stick ↓ hold & release = shoot (release in the green band) · ↑ = drive, layup or dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin. PASS throws to the teammate you are pushing toward.</p></div><div class="card"><h3>WITHOUT IT</h3><p>On defense: skill stick ↑ = hands up, ↓ = steal${MT.arcade ? ' / shove' : ''}, JUMP to block or rebound. On offense: CALL asks for the rock. After a stop, take it back past the arc.</p></div><div class="card"><h3>BRAVADO</h3><p>Big plays fill the bar. Full bar = +8 to every attribute for 20 seconds.</p></div></div><div class="pf">${Btn('RESUME', uiClose)}${Btn(MT.practice ? 'LEAVE' : 'FORFEIT', () => { uiClose(); quitMatch(); }, 'red')}</div>`, '', uiClose);
 }
 // GOT NEXT — online: who else has the game open right now, invites, a shared game, and your player saved to your account.
 // Runs on the claude.ai artifact "room" (live presence), "user" and "db" capabilities. Outside an artifact, or for a
@@ -4888,7 +4893,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera); window.__info = () => { let m = 0, s = 0, t = 0; scene.traverse(o => { if (o.isSprite) s++; else if (o.isMesh) m++; }); return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, meshes: m, sprites: s }; };
   // test hook: draw the player in one pose and hand back the frame
