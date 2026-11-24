@@ -44,6 +44,21 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
 - **Friends.** Export your build as a code; a friend imports it and your player is in their park as a teammate or the
   rival. On a computer a second player joins with a controller or on a split keyboard, co-op or versus.
 
+## Model lab
+
+[`lab.html`](lab.html) is the game's own player model on a model sheet, for designing bodies and drip. It has:
+- views: a turnaround (front, ¾, side, back), a six-pose sheet, lineups (playstyles at their usual heights,
+  5'9" to 7'3", weight and wingspan) and an orbit view
+- every pose in the game, playing or paused
+- every drip slot, a skeleton overlay and height lines in feet
+- **proportion sliders** for leg length, thigh/shin split, torso, arms, shoulders, hips, head, neck, limb thickness,
+  hands and feet
+
+**Copy proportions** gives numbers that go into `PROP` in `src/gfx.js`. **Copy build code** brings a look into the
+game through The Link. Built by `python3 build.py` alongside the game; source in `src/lab.html` and `src/lab.js`.
+
+![Model lab](docs/img/lab.jpg)
+
 ## Controls
 
 | | Phone | Keyboard | Controller |

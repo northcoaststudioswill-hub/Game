@@ -66,17 +66,21 @@ function sign(text, w, h, fg, bg, opts) {
   return m;
 }
 
+// Body proportions, all 1 (or the default share) in the game. The model lab edits these live; numbers that look right
+// there get copied back here. leg/torso/arm scale lengths; thighShare/upperArm split a limb between its two bones.
+const PROP_DEFAULT = { leg: 1, thighShare: 0.5, torso: 1, arm: 1, upperArm: 0.5, shoulder: 1, hips: 1, head: 1, neck: 1, limb: 1, hand: 1, foot: 1 };
+const PROP = Object.assign({}, PROP_DEFAULT);
 // =====================================================================
 //  THE RIG — thin, long-limbed, built out of joints so drip snaps on
 // =====================================================================
 function makeRig(spec, lowDetail) {
   const b = spec.build.body, worn = spec.worn || {};
-  const H = b.h * 0.0254, wS = 1 + b.w * 0.2, aS = 1 + b.s * 0.07;
+  const P = PROP, H = b.h * 0.0254, wS = 1 + b.w * 0.2, aS = 1 + b.s * 0.07, lW = wS * P.limb;
   const skin = toon(SKINS[spec.build.skin || 0]);
   const D = s => DRIPS[worn[s]] || null;
   const R = { H, joints: {}, cur: {}, spec, extraYaw: 0 };
-  const legLen = H * 0.5, thigh = legLen * 0.5, shin = legLen * 0.5, torso = H * 0.29, armLen = H * 0.39 * aS, up = armLen * 0.5, fore = armLen * 0.5;
-  const shW = 0.21 * (0.92 + 0.08 * wS) * (H / 1.95), hipW = 0.095 * wS;
+  const legLen = H * 0.5 * P.leg, thigh = legLen * P.thighShare, shin = legLen * (1 - P.thighShare), torso = H * 0.29 * P.torso, armLen = H * 0.39 * aS * P.arm, up = armLen * P.upperArm, fore = armLen * (1 - P.upperArm);
+  const shW = 0.21 * (0.92 + 0.08 * wS) * (H / 1.95) * P.shoulder, hipW = 0.095 * wS * P.hips;
   const root = new THREE.Group(); R.root = root;
   const out = lowDetail ? (m => m) : ink;
   const hips = grp(root, 0, legLen, 0); R.legLen = legLen;
@@ -92,9 +96,9 @@ function makeRig(spec, lowDetail) {
   if (top.kind === 'jersey') { const st = M(box(shW * 1.5, 0.05, 0.02), toon(top.c2), 0, upH * 0.3, 0.105 * wS, chestJ); st.rotation.x = -0.12; }
   const chest = grp(chestJ, 0, upH, 0);
   // neck + head
-  const neck = grp(chest, 0, 0, 0); M(cyl(0.045, 0.05, 0.1, 8), skin, 0, 0.04, 0, neck);
-  const head = grp(neck, 0, 0.09, 0);
-  const hr = 0.108;
+  const neck = grp(chest, 0, 0, 0); M(cyl(0.045 * P.limb, 0.05 * P.limb, 0.1 * P.neck, 8), skin, 0, 0.04 * P.neck, 0, neck);
+  const head = grp(neck, 0, 0.09 * P.neck, 0);
+  const hr = 0.108 * P.head;
   const hm = out(M(sph(hr, 12, 10), skin, 0, hr * 1.05, 0.01, head), 1.07); hm.scale.set(0.92, 1.12, 0.98);
   if (!lowDetail) { for (const sx of [-1, 1]) { M(box(0.026, 0.034, 0.01), flat(0x101014), sx * 0.04, hr * 1.12, hr * 0.96, head); M(box(0.042, 0.012, 0.01), flat(0x101014), sx * 0.04, hr * 1.42, hr * 0.93, head).rotation.z = sx * -0.15; } }
   // hair
@@ -140,16 +144,16 @@ function makeRig(spec, lowDetail) {
   for (const side of ['R', 'L']) {
     const sx = side === 'R' ? -1 : 1;
     const sh = grp(chest, sx * (shW + 0.015), -0.035, 0);
-    out(M(capsule(0.043 * wS, up), skin, 0, -up / 2 + 0.03, 0, sh), 1.12);
-    M(sph(0.055 * wS), top.kind === 'tank' ? skin : toon(top.c), 0, 0, 0, sh);
-    if (top.kind === 'tee' || top.kind === 'jersey') M(capsule(0.052 * wS, up * (top.kind === 'tee' ? 0.55 : 0.3)), toon(top.c), 0, -up * 0.16, 0, sh);
+    out(M(capsule(0.043 * lW, up), skin, 0, -up / 2 + 0.03, 0, sh), 1.12);
+    M(sph(0.055 * lW), top.kind === 'tank' ? skin : toon(top.c), 0, 0, 0, sh);
+    if (top.kind === 'tee' || top.kind === 'jersey') M(capsule(0.052 * lW, up * (top.kind === 'tee' ? 0.55 : 0.3)), toon(top.c), 0, -up * 0.16, 0, sh);
     const el = grp(sh, 0, -up + 0.03, 0);
-    out(M(capsule(0.036 * wS, fore), skin, 0, -fore / 2 + 0.02, 0, el), 1.13);
-    const wr = grp(el, 0, -fore + 0.045, 0); const hand = out(M(sph(0.046), skin, 0, -0.045, 0, wr), 1.1); hand.scale.set(0.85, 1.35, 0.5); R.joints['wr' + side] = wr;
+    out(M(capsule(0.036 * lW, fore), skin, 0, -fore / 2 + 0.02, 0, el), 1.13);
+    const wr = grp(el, 0, -fore + 0.045, 0); const hand = out(M(sph(0.046), skin, 0, -0.045, 0, wr), 1.1); hand.scale.set(0.85 * P.hand, 1.35 * P.hand, 0.5 * P.hand); R.joints['wr' + side] = wr;
     if (arm && arm.kind !== 'none') {
       const ac = toon(arm.c);
-      if (arm.kind === 'wrist') M(cyl(0.041 * wS, 0.041 * wS, 0.045, 8), ac, 0, -fore + 0.09, 0, el);
-      if ((arm.kind === 'sleeve' && side === 'R') || arm.kind === 'sleeves') { M(capsule(0.041 * wS, fore * 0.85), ac, 0, -fore / 2 + 0.04, 0, el); M(capsule(0.048 * wS, up * 0.5), ac, 0, -up * 0.7, 0, sh); if (arm.c2) M(cyl(0.043 * wS, 0.043 * wS, 0.02, 8), flat(arm.c2), 0, -fore * 0.5, 0, el); }
+      if (arm.kind === 'wrist') M(cyl(0.041 * lW, 0.041 * lW, 0.045, 8), ac, 0, -fore + 0.09, 0, el);
+      if ((arm.kind === 'sleeve' && side === 'R') || arm.kind === 'sleeves') { M(capsule(0.041 * lW, fore * 0.85), ac, 0, -fore / 2 + 0.04, 0, el); M(capsule(0.048 * lW, up * 0.5), ac, 0, -up * 0.7, 0, sh); if (arm.c2) M(cyl(0.043 * lW, 0.043 * lW, 0.02, 8), flat(arm.c2), 0, -fore * 0.5, 0, el); }
     }
     R.joints['sh' + side] = sh; R.joints['el' + side] = el; R['hand' + side] = hand;
   }
@@ -163,15 +167,15 @@ function makeRig(spec, lowDetail) {
   for (const side of ['R', 'L']) {
     const sx = side === 'R' ? -1 : 1;
     const hp = grp(hips, sx * hipW, -0.04, 0);
-    out(M(capsule(0.062 * wS, thigh), skin, 0, -thigh / 2 + 0.03, 0, hp), 1.1);
+    out(M(capsule(0.062 * lW, thigh), skin, 0, -thigh / 2 + 0.03, 0, hp), 1.1);
     const sl = thigh * (baggy ? 0.98 : 0.62);
-    out(M(geo('short' + wS.toFixed(2) + sl.toFixed(3), () => new THREE.CylinderGeometry(0.074 * wS, 0.086 * wS, sl, 8)), sc, 0, -sl / 2 + 0.03, 0, hp), 1.07);
+    out(M(geo('short' + wS.toFixed(2) + sl.toFixed(3), () => new THREE.CylinderGeometry(0.074 * lW, 0.086 * lW, sl, 8)), sc, 0, -sl / 2 + 0.03, 0, hp), 1.07);
     const kn = grp(hp, 0, -thigh + 0.03, 0);
-    out(M(capsule(0.045 * wS, shin), skin, 0, -shin / 2 + 0.02, 0, kn), 1.12);
+    out(M(capsule(0.045 * lW, shin), skin, 0, -shin / 2 + 0.02, 0, kn), 1.12);
     const sockH = socks.kind === 'high' ? shin * 0.62 : shin * 0.2;
-    M(cyl(0.047 * wS, 0.043 * wS, sockH, 8), toon(socks.c), 0, -shin + 0.06 + sockH / 2, 0, kn);
-    if (socks.c2 && socks.kind === 'high') M(cyl(0.049 * wS, 0.049 * wS, 0.025, 8), toon(socks.c2), 0, -shin + 0.04 + sockH, 0, kn);
-    const foot = grp(kn, 0, -shin + 0.05, 0); R.joints['an' + side] = foot;
+    M(cyl(0.047 * lW, 0.043 * lW, sockH, 8), toon(socks.c), 0, -shin + 0.06 + sockH / 2, 0, kn);
+    if (socks.c2 && socks.kind === 'high') M(cyl(0.049 * lW, 0.049 * lW, 0.025, 8), toon(socks.c2), 0, -shin + 0.04 + sockH, 0, kn);
+    const foot = grp(kn, 0, -shin + 0.05, 0); R.joints['an' + side] = foot; foot.scale.setScalar(P.foot);
     out(M(box(0.095, 0.075, 0.25), toon(shoes.c), 0, -0.01, 0.055, foot), 1.1);
     M(box(0.1, 0.022, 0.26), toon(shoes.c2 || '#fff'), 0, -0.045, 0.055, foot);
     if (shoes.kind === 'high') M(cyl(0.052, 0.05, 0.08, 8), toon(shoes.c), 0, 0.045, 0, foot);

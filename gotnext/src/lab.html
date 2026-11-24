@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hooper Model Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* GOT NEXT model lab — the game's own rig, posed and lined up on a sheet so bodies and drip can be designed.
+   Layout: the sheet fills the left; a narrow control rail on the right (below it on a phone). */
+@font-face{font-family:'Archivo';src:url(data:font/woff2;base64,/*@font archivo.woff2*/) format('woff2');font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:'JetBrains Mono';src:url(data:font/woff2;base64,/*@font jbmono.woff2*/) format('woff2');font-weight:100 800;font-display:block}
+:root{color-scheme:dark;--ink:#08080a;--tar:#111114;--grit:#1a1a1f;--line:#2c2c35;--bone:#ece9e2;--ash:#8d8d99;--heat:#ff2d78;--gold:#f2c14e;--ice:#7de3ff;--go:#3dffa0;
+--d:'Archivo','Arial Black',Arial,sans-serif;--m:'JetBrains Mono',ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--bone);font:400 13px/1.4 var(--d);overflow:hidden}
+.app{display:grid;grid-template-columns:1fr 300px;height:100%}
+.sheet{position:relative;min-width:0;min-height:0}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.labels{position:absolute;inset:0;pointer-events:none}
+.labels .lb{position:absolute;font:500 10px var(--m);letter-spacing:.12em;text-transform:uppercase;color:#4a4740;transform:translateX(-50%);white-space:nowrap}
+.labels .ft{position:absolute;left:8px;font:500 9px var(--m);color:#8a8478}
+.hdr{position:absolute;left:max(14px,env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px));pointer-events:none}
+.hdr h1{margin:0;font:900 22px/1 var(--d);font-stretch:125%;letter-spacing:-.01em;text-transform:uppercase;color:#1a1814}
+.hdr div{font:500 10px var(--m);letter-spacing:.14em;text-transform:uppercase;color:#6d675d;margin-top:4px}
+.rail{background:var(--tar);border-left:1px solid var(--line);overflow-y:auto;padding:12px max(14px,env(safe-area-inset-right,0px)) 24px 14px;scrollbar-width:thin}
+.sec{margin-bottom:16px}
+.sec>h2{margin:0 0 8px;font:500 10px var(--m);letter-spacing:.16em;text-transform:uppercase;color:var(--ash);display:flex;gap:8px;align-items:center}
+.sec>h2::before{content:"";width:12px;height:2px;background:var(--heat)}
+.seg{display:flex;flex-wrap:wrap;gap:3px}
+.seg button,.btn{font:800 10px var(--d);font-stretch:125%;text-transform:uppercase;letter-spacing:.02em;background:var(--grit);color:var(--bone);border:0;box-shadow:inset 0 0 0 1px var(--line);padding:7px 9px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--bone);color:var(--ink);box-shadow:none}
+.btn.hot{background:var(--heat);color:#fff;box-shadow:none}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ice);outline-offset:1px}
+label.r{display:grid;grid-template-columns:86px 1fr 42px;align-items:center;gap:6px;font:500 10px var(--m);letter-spacing:.06em;text-transform:uppercase;color:var(--ash);margin:3px 0}
+label.r b{font:800 11px var(--d);font-stretch:125%;color:var(--bone);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--heat);margin:0}
+select{width:100%;background:var(--ink);color:var(--bone);border:1px solid var(--line);font:500 11px var(--m);padding:5px;border-radius:0}
+.slot{display:grid;grid-template-columns:62px 1fr;gap:6px;align-items:center;margin:3px 0;font:500 10px var(--m);text-transform:uppercase;color:var(--ash)}
+.sw{display:inline-block;width:22px;height:22px;margin:0 4px 4px 0;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}.sw[aria-pressed=true]{outline:2px solid var(--bone);outline-offset:1px}
+.chk{display:flex;align-items:center;gap:6px;font:500 10px var(--m);text-transform:uppercase;letter-spacing:.06em;color:var(--ash);margin:4px 0}
+.note{font:500 10px/1.5 var(--m);color:var(--ash)}
+.row{display:flex;gap:4px;flex-wrap:wrap}
+#toast{position:fixed;right:16px;bottom:16px;background:var(--grit);border-left:3px solid var(--go);padding:8px 12px;font:500 11px var(--m);opacity:0;transition:opacity .2s;pointer-events:none}
+@media (max-width:760px){.app{grid-template-columns:1fr;grid-template-rows:58vh 1fr}.rail{border-left:0;border-top:1px solid var(--line)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sheet"><canvas id="gl"></canvas><div class="labels" id="labels"></div>
+    <div class="hdr"><h1>GOT NEXT · MODEL LAB</h1><div id="sub">turnaround</div></div></div>
+  <div class="rail" id="rail"></div>
+</div>
+<div id="toast"></div>
+<script>/*@three*/</script>
+<script>
+(function(){
+/*@include data.js*/
+/*@include core.js*/
+/*@include gfx.js*/
+/*@include lab.js*/
+})();
+</script>
+</body>
+</html>
