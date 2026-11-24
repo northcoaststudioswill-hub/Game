@@ -64,7 +64,7 @@ function sanitizeBuild(j) {
 function blankIn() { return { mx: 0, my: 0, rx: 0, ry: 0, sprint: false, a: false, b: false, aP: false, bP: false, bR: false, start: false, back: false, flick: null, rdir: null, rRel: false, _a: false, _b: false, _rd: null, _st: false, _bk: false }; }
 const IN = [blankIn(), blankIn(), blankIn()];      // 0 and 1 are local players; 2 is a player online
 const keys = {};
-let twoPlayer = false;       // set by the Pit when a second pad joins
+let twoPlayer = false;       // set by the Cages when a second pad joins
 const touch = { L: null, R: null, a: false, b: false, start: false };
 function dir8(x, y) {        // screen space: y negative = up
   const m = Math.hypot(x, y); if (m < 0.55) return null;
@@ -78,10 +78,17 @@ function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
     const I = IN[i]; let mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
+    // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
+    const split = twoPlayer && pads.length === 0;
+    if (i === 1 && split) {
+      if (keys.ArrowLeft) mx -= 1; if (keys.ArrowRight) mx += 1; if (keys.ArrowUp) my -= 1; if (keys.ArrowDown) my += 1;
+      if (keys.Numpad4) rx -= 1; if (keys.Numpad6) rx += 1; if (keys.Numpad8) ry -= 1; if (keys.Numpad5 || keys.Numpad2) ry += 1;
+      sprint = !!keys.ShiftRight; a = !!(keys.Period || keys.Numpad1); b = !!(keys.Slash || keys.Numpad0); st = !!keys.Backspace;
+    }
     if (i === 0) {
-      if (keys.KeyA || keys.ArrowLeft) mx -= 1; if (keys.KeyD || keys.ArrowRight) mx += 1; if (keys.KeyW || keys.ArrowUp) my -= 1; if (keys.KeyS || keys.ArrowDown) my += 1;
+      if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
-      sprint = !!(keys.ShiftLeft || keys.ShiftRight); a = !!(keys.KeyE || keys.Enter); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape;
+      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape;
       if (touch.L) { mx += touch.L.x; my += touch.L.y; if (Math.hypot(touch.L.x, touch.L.y) > 0.93) sprint = true; }
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       a = a || touch.a; b = b || touch.b; st = st || touch.start;
@@ -104,7 +111,7 @@ function pollInput() {
   }
 }
 function anyPadStart() { const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected); return pads.length; }
-addEventListener('keydown', e => { keys[e.code] = true; if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code) && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) e.preventDefault(); audioInit(); });
+addEventListener('keydown', e => { keys[e.code] = true; if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Slash', 'Backspace'].includes(e.code) && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) e.preventDefault(); audioInit(); });
 addEventListener('keyup', e => { keys[e.code] = false; });
 addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
 

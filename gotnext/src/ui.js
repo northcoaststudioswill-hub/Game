@@ -56,7 +56,7 @@ function hudFloat(p, txt, col) { const [x, y] = project(p.x, p.H + 0.5 + p.y, p.
 function hudMatch() {
   const M_ = MT, me = M_.me; $('s0').textContent = M_.score[me.team]; $('s1').textContent = M_.score[1 - me.team]; $('clock').textContent = Math.max(0, Math.ceil(M_.clock));
   $('stam').firstElementChild.style.width = me.stam + '%'; const bv = $('brav'); bv.firstElementChild.style.width = (me.brav * 100) + '%'; bv.classList.toggle('on', me.bravT > 0);
-  const sh = M_.locals.find(h => h.st === 'shoot'), mt = $('meter');
+  const sh = M_.locals.find(h => h.st === 'shoot' && !h.shot.floater), mt = $('meter');
   if (sh && S.set.meter) {
     const [x, y] = project(sh.x, sh.H * 0.6 + sh.y, sh.z); const u = sh.t / (sh.shot.rel * 1.55), z = 1 / 1.55;
     mt.style.display = 'block'; mt.style.left = (x + 34) + 'px'; mt.style.top = (y - 60) + 'px';
@@ -75,7 +75,7 @@ function uiHud() {
   if (!S) return; $('wvc').textContent = S.vc.toLocaleString(); const r = rankOf(S.rep); $('wrank').textContent = RANKS[r].n;
   const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
   $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
-  const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = on ? `<b>${on}</b> online with you` : 'online · nobody else here';
+  const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = (on ? `<b>${on}</b> online with you` : 'online · nobody else here') + (NET.crew ? ` · crew of <b>${NET.crew.m.length + 1}</b>` : NET.inCrew ? ' · in a crew' : '');
   $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
 }
 function vcLine() { return `<span class="chip" style="margin:0">VC <b>${S.vc.toLocaleString()}</b></span>`; }
@@ -124,7 +124,7 @@ function uiBuilder() {
     h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
       const nm = ($('bname').value || '').trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
-      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); toast('WELCOME TO THE BLOCK', 'Walk to THE PIT and call next. Fiends will ask for VC.', 'rank');
+      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for VC.', 'rank');
     })}</div>`;
     return h;
   }, 'side', () => { });
@@ -141,8 +141,9 @@ function header() {
 }
 function uiPlayer(tab) {
   const st = { tab: tab || 'attrs' };
-  const tabs = [['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
+  const tabs = [['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
   openPanel(() => {
+    UI.cur.live = st.tab === 'crew';
     let h = `<div class="ph"><h2>MY PLAYER</h2>${Btn('✕', uiClose, 'alt sm')}</div>` + header() + `<div class="tabs">` + tabs.map(t => Btn(t[1], () => { st.tab = t[0]; sfx('ui'); rerender(true); }, st.tab === t[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb">`;
     if (st.tab === 'attrs') {
       const caps = capsFor(S.build), bf = buffTotals();
@@ -182,6 +183,9 @@ function uiPlayer(tab) {
       h += `<p class="mu">The right stick is your skill stick. With the ball: flick ← → for your side move, ↙ ↘ for your stepback, ↖ ↗ for your spin, pull ↓ and hold to shoot, push ↑ to attack the rim.</p>`;
       sec('SIDE MOVE  ← →', MOVES.filter(m => m.slot === 'side'), 'side', 'handle'); sec('STEPBACK  ↙ ↘', MOVES.filter(m => m.slot === 'back'), 'back', 'handle'); sec('SPIN  ↖ ↗', MOVES.filter(m => m.slot === 'diag'), 'diag', 'handle');
       sec('JUMPSHOT', JUMPERS, 'jumper'); sec('DUNK PACKAGE', DUNKS, 'dunk', 'dunk'); sec('CELEBRATION', CELEBS, 'celeb');
+    } else if (st.tab === 'crew') {
+      h += NET.room && NET.connected ? onlineBlock(null, null) : `<div class="card"><h3>OFFLINE</h3><p>Online play works from the game's shared Claude link, for people signed in that it is shared with. Opened as a file, the game is single player (plus local player 2 with a controller on a computer).</p></div>`;
+      h += `<div class="cat">HOMIES · ${S.homies.length}</div>` + (S.homies.length ? S.homies.map(b => `<div class="card"><h3>${esc(b.name)} <span class="mu">${ovrOf(b.attrs)} OVR</span></h3><p>${STYLE[b.build.style].n} · ${fmtH(b.build.body.h)}${b.net ? ' · met online' : ''}</p></div>`).join('') : `<p class="mu">Nobody yet.</p>`);
     } else if (st.tab === 'ach') {
       const done = ACH.filter(a => S.ach[a.id]).length; h += `<p class="mu">${done} / ${ACH.length} trophies.</p><div class="grid">`;
       for (const a of ACH) { const v = Math.min(a.t, achVal(a.k)), d = S.ach[a.id]; h += `<div class="card ${d ? 'sel' : ''}"><h3 style="color:${d ? 'var(--gold)' : 'var(--bone)'}">${d ? '✓ ' : ''}${a.n}</h3><p>${a.d}</p><div class="row" style="margin-top:4px"><div class="ab"><i style="width:${v / a.t * 100}%;background:var(--heat)"></i></div><div class="av" style="width:auto;font-size:11px">${v}/${a.t}</div></div><p class="buff">+${a.vc} VC${a.drip ? ' · ' + DRIPS[a.drip].n : ''}</p></div>`; }
@@ -194,7 +198,7 @@ function uiPlayer(tab) {
       });
     } else {
       h += `<div class="card"><h3>SOUND</h3><div style="margin-top:6px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
-      h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Pit with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (JAM: shove) · jump to block and board.</p></div>`;
+      h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Cages with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (JAM: shove) · jump to block and board.</p></div>`;
       h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => uiDialog('ARE YOU SURE', 'Erase your player, drip, crib and Respect for good?', [['Erase it all', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } S = newSave(); uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'red'], ['Never mind', null, 'alt']]), 'sm red')}</div></div>`;
     }
     return h + `</div>`;
@@ -229,7 +233,7 @@ function uiShop(closet) {
 function uiCrib() {
   openPanel(() => {
     const r = rankOf(S.rep);
-    let h = `<div class="ph"><h2>CRIB UPGRADES</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">Your home court. Everything you bolt on here follows you into The Pit.</p>`;
+    let h = `<div class="ph"><h2>CRIB UPGRADES</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">Your home court. Everything you bolt on here follows you into The Cages.</p>`;
     for (const c of CRIB) {
       const t = cribTier(c.id), cur = c.tiers[t], nx = c.tiers[t + 1];
       h += `<div class="card"><div class="row"><div class="g"><h3>${c.n}: <span class="cy">${cur.n}</span></h3><p>${cur.d || '&nbsp;'}</p>`;
@@ -241,32 +245,53 @@ function uiCrib() {
   });
 }
 
-// ---------- the Pit: mode setup, kiosk, homies ----------
+// ---------- the Cages: mode setup, kiosk, homies ----------
 function uiMode(m) {
   const r = rankOf(S.rep); let top = 0; TIERS_COURT.forEach((t, i) => { if (t.rank <= r) top = i; });
-  const st = { tier: Math.min(top, S.lastTier === undefined ? top : S.lastTier), mates: [], rival: -1, p2: 'off' };
+  const st = { tier: Math.min(top, S.lastTier === undefined ? top : S.lastTier), mates: Array.from({ length: m.size - 1 }, (_, i) => S.homies[i] ? i : -1), rival: -1, p2: 'off', ct: {} };
   const cyc = (v, n) => (v + 2) % (n + 1) - 1;   // -1 (random), 0..n-1
   openPanel(() => {
     const t = TIERS_COURT[st.tier];
     let h = `<div class="ph"><h2>${m.n}</h2>${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p>${m.d}</p>`;
+    const online = NET.room && NET.connected, crewFirst = online && (crewMembers().length || crewLead());
+    if (crewFirst) h += onlineBlock(m, st);
     h += `<div class="cat">COURT</div><div class="grid">` + TIERS_COURT.map((c, i) => `<div class="card ${i === st.tier ? 'sel' : ''} ${c.rank > r ? 'lock' : ''}" ${c.rank > r ? '' : `data-k="${on(() => { st.tier = i; sfx('ui'); rerender(); })}"`}><h3>${c.n}</h3><p>${c.rank > r ? 'Unlocks at ' + RANKS[c.rank].n : `Opponents ~${c.ovr} OVR · pays ×${c.mult}`}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">YOUR SQUAD</div>`;
     for (let i = 0; i < m.size - 1; i++) { const v = st.mates[i] === undefined ? -1 : st.mates[i]; h += `<div style="margin-bottom:8px">${Btn(`TEAMMATE ${i + 1}: ${v < 0 ? 'RANDOM FROM THE PARK' : esc(S.homies[v].name) + ' (homie)'} ▸`, () => { st.mates[i] = cyc(v, S.homies.length); sfx('ui'); rerender(); }, 'alt sm')}</div>`; }
     h += `<div style="margin-bottom:8px">${Btn(`RIVAL: ${st.rival < 0 ? 'RANDOMS' : esc(S.homies[st.rival].name) + ' (homie) + crew'} ▸`, () => { st.rival = cyc(st.rival, S.homies.length); sfx('ui'); rerender(); }, 'alt sm')}</div>`;
-    if (!S.homies.length) h += `<p class="mu">Import a friend's build at THE LINK to run with them — or against them.</p>`;
-    if (!IS_TOUCH) h += `<div class="cat">PLAYER 2 <span class="mu" style="text-transform:none;letter-spacing:.02em">— needs a controller</span></div>${Btn('P2: ' + ({ off: 'OFF', coop: 'CO-OP (your teammate)', vs: 'VERSUS (other team)' }[st.p2]) + ' ▸', () => { st.p2 = st.p2 === 'off' ? 'coop' : st.p2 === 'coop' ? 'vs' : 'off'; sfx('ui'); rerender(); }, 'alt sm')}<p class="mu">${anyPadStart() ? anyPadStart() + ' controller(s) connected.' : 'No controller detected yet — press a button on it.'} Player 1 uses the keyboard${anyPadStart() > 1 ? ' or controller 1' : ''}.</p>`;
-    if (NET.room && NET.connected) {
-      const others = netOthers();
-      h += `<div class="cat">ONLINE <span class="mu" style="text-transform:none;letter-spacing:.02em">— anyone with the game open right now</span></div>`;
-      if (NET.out) h += `<div class="card sel"><h3>CALLING…</h3><p>Waiting for them to pick up.</p><div style="margin-top:6px">${Btn('CANCEL', () => { NET.out = null; NET.room.presence({ inv: null }).catch(() => { }); rerender(); }, 'sm alt')}</div></div>`;
-      else if (!others.length) h += `<p class="mu">Nobody else is here. Share the game with a friend and they show up on The Block.</p>`;
-      else for (const p of others) { const busy = p.presence.w === 'game'; h += `<div class="card"><div class="row"><div class="g"><h3>${esc(peerName(p))} <span class="mu">${p.presence.o | 0} OVR</span></h3><p>${busy ? 'In a game right now.' : 'On ' + (p.presence.w === 'pit' ? 'The Pit floor' : 'The Block') + '.'}</p></div>${Btn('SAME TEAM', () => { netInvite(p.peer, m, st.tier, 'coop'); rerender(); }, 'sm', busy)}${Btn('VERSUS', () => { netInvite(p.peer, m, st.tier, 'vs'); rerender(); }, 'sm alt', busy)}</div></div>`; }
-    }
+    h += S.homies.length ? `<p class="mu">Your homies fill the squad first. Anyone you meet online becomes a homie, so their player runs with you even when they are not here.</p>` : `<p class="mu">Meet friends online, or import their build at THE LINK, and their players can run with you here.</p>`;
+    if (!IS_TOUCH) h += `<div class="cat">PLAYER 2 <span class="mu" style="text-transform:none;letter-spacing:.02em">— same screen, controller or split keyboard</span></div>${Btn('P2: ' + ({ off: 'OFF', coop: 'CO-OP (your teammate)', vs: 'VERSUS (other team)' }[st.p2]) + ' ▸', () => { st.p2 = st.p2 === 'off' ? 'coop' : st.p2 === 'coop' ? 'vs' : 'off'; sfx('ui'); rerender(); }, 'alt sm')}<p class="mu">${anyPadStart() ? anyPadStart() + ' controller(s) connected: player 2 is on ' + (anyPadStart() > 1 ? 'controller 2, player 1 on controller 1 or the keyboard.' : 'the controller, player 1 on the keyboard.') : 'No controller: the keyboard splits. Player 1: WASD move, Shift sprint, Space shoot, E pass, IJKL skill stick. Player 2: arrows move, right Shift sprint, / shoot, . pass, numpad 8 4 5 6 skill stick.'}</p>`;
+    if (online && !crewFirst) h += onlineBlock(m, st);
     if (S.boosts.length) h += `<div class="cat">LOADED BOOSTS</div><p class="buff">${S.boosts.map(b => BOOSTS.find(x => x.id === b).n).join(' · ')}</p>`;
     h += `</div><div class="pf">${Btn('RUN IT', () => { S.lastTier = st.tier; launchGame(m, t, st); })}<span class="mu" style="align-self:center">Win ≈ ${Math.round(70 * t.mult + 60)} VC · ${Math.round(45 * t.mult + 15)} Respect</span></div>`;
     return h;
   });
   UI.cur.live = true;
+}
+// who is online, your crew, and the calls you can make from a cage gate (m) or from My Player (no m)
+function onlineBlock(m, st) {
+  const others = netOthers(), crew = crewMembers(), lead = crewLead(); let h = `<div class="cat">ONLINE <span class="mu" style="text-transform:none;letter-spacing:.02em">— anyone with the game open right now</span></div>`;
+  if (lead) h += `<div class="card sel"><h3>IN ${esc(peerName(lead))}'S CREW</h3><p>You follow them, and they pull you into their runs. You can still run solo.</p><div style="margin-top:6px">${Btn('LEAVE CREW', () => { crewLeave(); rerender(); }, 'sm alt')}</div></div>`;
+  if (crew.length) {
+    h += `<div class="card sel"><h3>YOUR CREW · ${crew.length + 1}</h3>`;
+    for (const p of crew) {
+      const busy = p.presence.w === 'game', t = st && st.ct[p.peer] ? 1 : 0;
+      h += `<div class="row" style="margin-top:6px"><div class="g"><b>${esc(peerName(p))}</b> <span class="mu">${p.presence.o | 0} OVR${busy ? ' · in a game' : ''}</span></div>${m ? Btn(t ? 'THEIR TEAM' : 'MY TEAM', () => { st.ct[p.peer] = t ? 0 : 1; sfx('ui'); rerender(); }, 'sm ' + (t ? 'red' : '')) : ''}${Btn('CUT', () => { crewKick(p.peer); rerender(); }, 'sm alt')}</div>`;
+    }
+    if (m) {
+      const go = crew.filter(p => p.presence.w !== 'game'), n0 = 1 + go.filter(p => !st.ct[p.peer]).length, n1 = go.filter(p => st.ct[p.peer]).length, ok = go.length && n0 <= m.size && n1 <= m.size;
+      h += `<p class="mu" style="margin-top:8px">${ok ? `${n0} of you vs ${n1 ? n1 + ' of you' : 'nobody you know'}, AI fills the rest.` : `Too many on one side for ${m.n}: ${m.size} a team.`}</p><div style="margin-top:6px">${Btn('RUN IT WITH THE CREW', () => { S.lastTier = st.tier; netGo(m, st.tier, go.map(p => [p.peer, st.ct[p.peer] ? 1 : 0])); }, '', !ok)}</div>`;
+    } else h += `<p class="mu" style="margin-top:8px">Walk to a cage gate to start a run with them.</p>`;
+    h += `</div>`;
+  }
+  if (NET.out) h += `<div class="card sel"><h3>CALLING…</h3><p>Waiting for them to pick up.</p><div style="margin-top:6px">${Btn('CANCEL', () => { NET.out = null; pres({ inv: null }); rerender(); }, 'sm alt')}</div></div>`;
+  const rest = others.filter(p => !(NET.crew && NET.crew.m.includes(p.peer)) && p.peer !== NET.inCrew);
+  if (!others.length) h += `<p class="mu">Nobody else is here. Share the game's link with a friend and they show up on The Block.</p>`;
+  else for (const p of rest) {
+    const busy = p.presence.w === 'game' || !!NET.out, full = crew.length >= 5;
+    h += `<div class="card"><div class="row" style="flex-wrap:wrap"><div class="g"><h3>${esc(peerName(p))} <span class="mu">${p.presence.o | 0} OVR</span></h3><p>${p.presence.w === 'game' ? 'In a game right now.' : 'On ' + (p.presence.w === 'pit' ? 'The Cages' : p.presence.w === 'crib' ? 'their crib' : 'The Block') + '.'}${p.presence.in ? ' Running with a crew.' : ''}</p></div>${NET.inCrew ? '' : Btn('+ CREW', () => { netInvite(p.peer, null, 0, 'crew'); rerender(); }, 'sm cy', busy || full)}${m ? Btn('SAME TEAM', () => { netInvite(p.peer, m, st.tier, 'coop'); rerender(); }, 'sm', busy) + Btn('VERSUS', () => { netInvite(p.peer, m, st.tier, 'vs'); rerender(); }, 'sm alt', busy) : ''}</div></div>`;
+  }
+  return h;
 }
 function uiKiosk() {
   openPanel(() => {
@@ -321,7 +346,7 @@ function uiResults(res, rw, again) {
     h += `<div class="card sel"><div class="row" style="flex-wrap:wrap;gap:18px"><div><div class="mu f">VC</div><div class="big ye" id="rvc">0</div></div><div><div class="mu f">RESPECT</div><div class="big cy" id="rrep">0</div></div><div class="g"><div class="mu f">BADGE XP</div>${['F', 'S', 'P', 'D'].map(c => `<span class="tag" style="color:${CATS[c][1]}">${CATS[c][0]} +${rw.bxp[c]}</span>`).join(' ')}${rw.pts.length ? `<p class="buff">${rw.pts.join(' · ')}</p>` : ''}</div></div>${rw.notes.length ? `<p class="buff">${rw.notes.join(' · ')}</p>` : ''}</div>`;
     h += `<div class="card"><table><tr><th>PLAYER</th><th>PTS</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>ANK</th><th>FG</th></tr>` + res.box.map(b => `<tr style="color:${b.user ? 'var(--gold)' : b.team === 0 ? 'var(--ice)' : '#ff9ab8'}"><td>${esc(b.n)}</td><td>${b.s.pts}</td><td>${b.s.ast}</td><td>${b.s.reb}</td><td>${b.s.stl}</td><td>${b.s.blk}</td><td>${b.s.ankles}</td><td>${b.s.fgm}/${b.s.fga}</td></tr>`).join('') + `</table></div>`;
     h += `<p class="mu">${s.greens} greens · ${s.dunks} dunks · ${s.threes} deep balls · ${s.bravs} Bravado</p>`;
-    return h + `</div><div class="pf">${again ? Btn('RUN IT BACK', again) : ''}${Btn('BACK TO THE PIT', uiClose, again ? 'alt' : '')}</div>`;
+    return h + `</div><div class="pf">${again ? Btn('RUN IT BACK', again) : ''}${Btn('BACK TO THE CAGES', uiClose, again ? 'alt' : '')}</div>`;
   });
   // the count-up
   let t = 0; const iv = setInterval(() => { t += 0.05; const k = Math.min(1, t); const a = $('rvc'), b = $('rrep'); if (!a) { clearInterval(iv); return; } a.textContent = '+' + Math.round(rw.vc * k); b.textContent = '+' + Math.round(rw.rep * k); if (k < 1) sfx('coin'); else { clearInterval(iv); sfx('buy'); } }, 45);

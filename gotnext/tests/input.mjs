@@ -36,4 +36,11 @@ await page.waitForTimeout(2000);
 const b = await page.evaluate(() => { const p2 = __pit.MT.P.find(p => p.ctrl === 1); return { x: p2.x, humans: __pit.MT.humans.length, phase: __pit.MT.phase }; });
 console.log('player 2 on pad: team', a.team, 'x', a.x.toFixed(1), '→', b.x.toFixed(1), 'humans', b.humans, b.phase, b.x > a.x + 0.5 ? 'OK' : 'FAIL');
 await page.screenshot({ path: path.join(dir, 'shots', 'two-player.png') });
+// two players, no controller: split keyboard
+await page.evaluate(() => { __pit.MT.cfg.onEnd({ quit: true }); navigator.getGamepads = () => []; const P = __pit; P.launchGame(P.MODES[0], P.TIERS_COURT[0], { mates: [], rival: -1, p2: 'coop' }); });
+await page.waitForTimeout(6500);
+const k0 = await page.evaluate(() => { const M = __pit.MT, p1 = M.P.find(p => p.ctrl === 0), p2 = M.P.find(p => p.ctrl === 1); __pit.keys.ArrowLeft = true; return [p1.x, p2.x]; });
+await page.waitForTimeout(1500);
+const k1 = await page.evaluate(() => { const M = __pit.MT, p1 = M.P.find(p => p.ctrl === 0), p2 = M.P.find(p => p.ctrl === 1); __pit.keys.ArrowLeft = false; return [p1.x, p2.x]; });
+console.log('split keyboard: arrows move P2 only', JSON.stringify([k0, k1].map(a => a.map(v => +v.toFixed(1)))), k1[1] < k0[1] - 0.8 && Math.abs(k1[0] - k0[0]) < 1.2 ? 'OK' : 'FAIL');
 console.log(errs ? 'ERRORS ' + errs : 'NO ERRORS'); await browser.close();

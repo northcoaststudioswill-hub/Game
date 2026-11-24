@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.3';
+const VERSION = '0.4';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -189,7 +189,7 @@ drip('head', 'hd_cap', 'Backwards Cap', 'cap', '#20242c', '#ffc531', 1, 400, 1);
 drip('head', 'hd_capflag', 'Stars & Stripes Snapback', 'cap', '#2440a8', '#ff3c3c', 2, 1100, 2, { iq: 1 });
 drip('head', 'hd_halo', 'Halo (Subscription)', 'halo', '#ffe680', 0, 3, 3800, 4, { three: 2 });
 drip('head', 'hd_crown', 'Cardboard Crown', 'crown', '#b98a4a', 0, 2, 0, 0, { pass: 1 }, 'bum');
-drip('head', 'hd_crowngold', 'King of the Pit', 'crown', '#ffc531', '#ff3c6a', 4, 0, 0, { iq: 2, pass: 2 }, 'ach');
+drip('head', 'hd_crowngold', 'King of the Cages', 'crown', '#ffc531', '#ff3c6a', 4, 0, 0, { iq: 2, pass: 2 }, 'ach');
 drip('head', 'hd_antenna', '5G Antenna', 'antenna', '#c8d0d8', '#33e0ff', 1, 500, 1);
 drip('head', 'hd_eagle', 'Freedom Eagle Head', 'eagle', '#f4f4f4', '#ffc531', 4, 0, 0, { vert: 2, dunk: 2 }, 'ach');
 // face
@@ -309,7 +309,7 @@ const BOOSTS = [
   { id: 'hype', n: 'Rent-A-Hype-Man', d: 'Bravado fills 50% faster this game.', cost: 90, k: 'hype' },
 ];
 
-// ---------- game modes (doors in the Pit) ----------
+// ---------- game modes (doors in the Cages) ----------
 const MODES = [
   { id: 's2', n: 'STREET 2v2', size: 2, arcade: false, to: 11, d: 'Half court. 1s and 2s. First to 11. Call your own nothing.' },
   { id: 's3', n: 'STREET 3v3', size: 3, arcade: false, to: 11, d: 'Half court threes. Spacing is a rumor.' },

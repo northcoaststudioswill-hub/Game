@@ -3,8 +3,10 @@
 *Half court. Winners stay.*
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
-You build a player, walk The Block, take games in The Pit, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.3: two players online, a tighter Block, The Pit as a cage.** It is a standalone game, not a Pocket Lantern cartridge.
+You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
+crib. A North Coast Studios game. **Version 0.4: crews online (up to six, 3v3), more joints and moves, local two-player on one keyboard, The Cages.**
+
+**Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
 **Play:** open [`index.html`](index.html) in a browser. That one file is the whole game; send it to a friend and they
 have it too.
@@ -13,20 +15,23 @@ have it too.
 
 The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](docs/BRAND.md).
 
-| The Block (hub) | The Pit (a cage) | A friend online | On a phone |
+| The Block (hub) | The Cages | A crew online | On a phone |
 |---|---|---|---|
-| ![hub](docs/img/hub.jpg) | ![pit](docs/img/pit.jpg) | ![online](docs/img/online.jpg) | ![phone](docs/img/phone.jpg) |
+| ![hub](docs/img/hub.jpg) | ![pit](docs/img/pit.jpg) | ![crew](docs/img/crew.jpg) | ![phone](docs/img/phone.jpg) |
 
 ## What is in it
 
 - **The builder.** Six playstyles, six origins, height / weight / wingspan sliders that move the caps of 19 attributes
   live. See [`docs/DESIGN.md`](docs/DESIGN.md) for how the numbers work.
-- **Online, two players (v0.3).** Open the shared link at the same time and you see each other walking The Block and
-  The Pit, each with the player they built. Either of you can keep doing your own thing, or call the other from any
-  game door to run on the same team or against each other. Details and limits are under *Online* below.
-- **The Block.** One tight street corner; The Pit is a floodlit chain-link cage across the north side. Third-person hub: The Pit, The Plug (drip), The Lab (attributes and badges), the Tape Deck (moves), your crib, the Money Rack
+- **Online, crews of up to six (v0.4).** Open the shared link at the same time and you see each other walking The
+  Block and The Cages, each with the player they built. Call people into your crew: they pull up next to you and
+  follow you around, and at any cage gate you put each of them on your team or the other and run it, 2v2 or 3v3.
+  Details and limits are under *Online* below.
+- **Your friends' players, solo.** Everyone you meet online is kept as a homie, and homies fill your squad by default,
+  so a 3v3 with your friends' builds works with nobody else online.
+- **The Block.** One tight street corner; The Cages is a floodlit chain-link cage across the north side. Third-person hub: The Cages, The Plug (drip), The Lab (attributes and badges), the Tape Deck (moves), your crib, the Money Rack
   shootout, the old head, and six build fiends who need VC for their Basketball 2146 builds on PS88.
-- **The Pit.** Four doors: Street 2v2, Street 3v3, JAM 2v2, JAM 3v3. A side kiosk (Last Call) for one-game boosts and
+- **The Cages.** Four doors: Street 2v2, Street 3v3, JAM 2v2, JAM 3v3. A side kiosk (Last Call) for one-game boosts and
   The Link for build codes. Four court tiers, opened by Respect.
 - **The basketball.** Half court, camera on your player. Street: 1s and 2s to 11, take it back past the arc, 14-second
   clock. JAM: 2s and 3s to 21, shoving is legal, dunks from the logo, three makes in a row sets you on fire.
@@ -37,7 +42,7 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
 - **Unlocks:** 74 pieces of drip in ten slots (some carry small buffs), 22 animations (dribble moves, jumpshots, dunk
   packages, celebrations), 8 crib upgrade lines with passive buffs, 29 trophies, 8 Respect ranks.
 - **Friends.** Export your build as a code; a friend imports it and your player is in their park as a teammate or the
-  rival. On a computer a second player joins with a controller, co-op or versus.
+  rival. On a computer a second player joins with a controller or on a split keyboard, co-op or versus.
 
 ## Controls
 
@@ -66,7 +71,7 @@ python3 build.py        # writes index.html
 | `src/core.js` | Save, build codes, input (touch sticks, keyboard, gamepads), synthesised sound and music |
 | `src/gfx.js` | Renderer, cel shading and ink lines, the player rig and its drip, poses, courts, signs |
 | `src/ball.js` | The basketball: rules, shooting, finishing, dribble moves, steals, blocks, rebounds, AI, camera |
-| `src/hub.js` | The Block, The Pit, My Crib, walking and talking |
+| `src/hub.js` | The Block, The Cages, My Crib, walking and talking |
 | `src/ui.js` | HUD and every menu |
 | `src/net.js` | Online: who is here, invites, the shared game, your player saved to your account |
 | `src/main.js` | Boot, the loop, rewards, ranks, trophies |
@@ -83,6 +88,8 @@ node tests/smoke.mjs              # title → builder → hub → a game → res
 node tests/input.mjs              # real touch events on both sticks; a fake second controller
 tests/sim.sh                      # an all-AI game in each mode, printed as box scores
 node tests/online.mjs             # two pages in one simulated live room: meet, invite, play a shared game, both get paid
+node tests/crew.mjs               # three pages: form a crew, follow the leader, run a 3v3 with a member on each side
+node tests/poses.mjs              # renders every pose to tests/shots/pose-NN.png
 ```
 
 ## Online
@@ -90,21 +97,25 @@ node tests/online.mjs             # two pages in one simulated live room: meet, 
 It runs on the claude.ai artifact's live room, so it only works from the published link, not from the file on disk.
 
 - **Who can connect:** people signed in to Claude that the link has been shared with. A public link does not connect.
-- **Being there:** everyone with the game open shows up on The Block and in The Pit with a name tag. The top-left chip
+- **Being there:** everyone with the game open shows up on The Block and in The Cages with a name tag. The top-left chip
   says how many are online with you.
-- **Playing together:** walk to a game door in The Pit. Under ONLINE, pick SAME TEAM or VERSUS next to their name. They
-  get a call wherever they are and choose Run it or Nah. Each of you earns your own VC, Respect and badge XP.
+- **Crews:** My Player → CREW, or any cage gate: press + CREW next to someone. They choose Pull up or Nah. A crew is
+  up to six; members follow the leader between The Block and The Cages.
+- **Playing together:** at a gate the leader sets each crew member to MY TEAM or THEIR TEAM and presses RUN IT WITH THE
+  CREW; AI fills the empty spots. Without a crew, SAME TEAM or VERSUS next to a name calls a one-off game. Each of you
+  earns your own VC, Respect and badge XP.
 - **Your player travels:** each person plays with the player they built, on every screen. When the game is opened from
   the link, the save is also kept on your account, so the same player is there on your phone and your computer.
 - **How it works:** the caller's device runs the game and the other one sends its sticks and draws what it is told.
   Rosters are rebuilt from a shared seed, so only the two human builds cross the wire. The caller must keep the game on
   screen; if either side drops, the other is told and the AI takes over or the game ends.
-- **Limits today:** two people per game. The joining player's crib bonuses and Last Call boosts do not apply in a shared
+- **Limits today:** up to the mode's size per team (3v3 = six people). The joining player's crib bonuses and Last Call boosts do not apply in a shared
   game. Their moves feel a little late (their own shot timing does not: the meter is judged on their device).
 
 ## What was and was not tested
 
-- **Online, checked by script only, in a simulated room:** two pages see each other, invite, play one shared Street 2v2
+- **Online, checked by script only, in a simulated room:** three pages form a crew and play a 3v3 with a member on each
+  side; two pages see each other, invite, play one shared Street 2v2
   to a finish, the joining player's movement and shot reach the host, and both get paid. **It has not been run on the
   real platform by two real people.** The account save has not been exercised at all outside the code.
 - **Checked by script:** the whole loop above with no page errors, landscape and portrait; all four modes play to a

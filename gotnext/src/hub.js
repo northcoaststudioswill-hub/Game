@@ -1,4 +1,4 @@
-// GOT NEXT — walking around: The Block (hub), The Pit (mode doors), My Crib (home court)
+// GOT NEXT — walking around: The Block (hub), The Cages (mode doors), My Crib (home court)
 'use strict';
 let W = null;
 function worldPlayerRig() {
@@ -63,7 +63,7 @@ function enterWorld(kind, sx, sz, face) {
   W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] };
   musicMode = 'hub'; $('prompt').style.display = 'none';
   if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else buildCrib();
-  worldPlayerRig(); W.camInit = false; $('wtag').textContent = kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE PIT' : 'MY CRIB';
+  worldPlayerRig(); W.camInit = false; $('wtag').textContent = kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : 'MY CRIB';
   document.body.dataset.state = 'world'; uiHud();
 }
 
@@ -90,7 +90,7 @@ function buildHub() {
   const g2 = M(new THREE.PlaneGeometry(400, 400), toon('#17181d'), 0, -0.05, 0, scene); g2.rotation.x = -Math.PI / 2;
   skyline(scene, 54, 58, ['#f2c14e', '#ffe9a8', '#ffe9a8', '#7de3ff', '#ff2d78']);
 
-  // ---- THE PIT: a floodlit cage across the whole north side ----
+  // ---- THE CAGES: a floodlit cage across the whole north side ----
   const ft = () => { const t = fenceTex(); return t; };
   const fenceSeg = (x0, x1, z, h) => { const w = x1 - x0, t = ft(); t.repeat.set(w / 1.1, h / 1.1); const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, transparent: true, side: THREE.DoubleSide, depthWrite: false })); m.position.set((x0 + x1) / 2, h / 2, z); scene.add(m); M(box(w, 0.1, 0.1), toon('#6a707c'), (x0 + x1) / 2, h, z, scene); M(box(w, 0.1, 0.1), toon('#6a707c'), (x0 + x1) / 2, 0.05, z, scene); };
   fenceSeg(-16, -2.2, -12, 6.5); fenceSeg(2.2, 16, -12, 6.5); solid(-16.5, -2.2, -12.6, -11.6); solid(2.2, 16.5, -12.6, -11.6);
@@ -99,7 +99,7 @@ function buildHub() {
   // gate: steel truss with the name on it
   for (const sx of [-1, 1]) ink(M(box(0.35, 8.4, 0.35), toon('#1c1d22'), sx * 2.4, 4.2, -12, scene), 1.06);
   ink(M(box(9.6, 1.9, 0.5), toon('#1c1d22'), 0, 8.2, -12, scene), 1.03);
-  const ps = sign('THE PIT', 9, 1.6, '#ece9e2', '#0a0a0e'); ps.position.set(0, 8.2, -11.72); scene.add(ps);
+  const ps = sign('THE CAGES', 9, 1.6, '#ece9e2', '#0a0a0e'); ps.position.set(0, 8.2, -11.72); scene.add(ps);
   M(box(9.6, 0.14, 0.52), flat(0xff2d78), 0, 7.2, -12, scene);
   const ps2 = sign('CALL NEXT  //  WINNERS STAY', 4.4, 0.42, '#ff2d78', '#0a0a0e', { border: false }); ps2.position.set(0, 6.85, -11.72); scene.add(ps2);
   // the show court inside the cage
@@ -109,7 +109,7 @@ function buildHub() {
   for (let i = 0; i < 4; i++) { const b = aiBuild(rnd(70, 95)); b.worn = randomWorn(3); addNpc(b, rnd(-5, 5), rnd(-25.5, -17), rnd(0, 6), i === 0 ? 'cheer' : 'ball', { cage: true }); }
   for (let r = 0; r < 3; r++) ink(M(box(12, 0.4, 0.9), toon('#3a3c44'), 0, 0.3 + r * 0.45, -31 - r * 0.9, scene), 1.02);
   for (let i = 0; i < 7; i++) { const b = aiBuild(60); const n = addNpc(b, -5 + i * 1.7, -31 - (i % 3) * 0.9, 0, 'cheer', { low: true }); n.rig.root.position.y = 0.5 + (i % 3) * 0.45; n.yFix = n.rig.root.position.y; }
-  spot(0, -10.3, 2.4, 'ENTER THE PIT', () => enterWorld('pit', 0, 3.4, Math.PI));
+  spot(0, -10.3, 2.4, 'ENTER THE CAGES', () => enterWorld('pit', 0, 3.4, Math.PI));
   // elevated train behind it all
   M(box(120, 0.6, 3), toon('#23242a'), 0, 9.2, -37, scene); for (let x = -50; x <= 50; x += 10) M(box(0.8, 9, 0.8), toon('#23242a'), x, 4.5, -37, scene);
   W.train = new THREE.Group(); for (let i = 0; i < 4; i++) { ink(M(box(8.6, 2.6, 2.4), toon('#b9bec7'), i * 9, 0, 0, W.train), 1.02); M(box(8.2, 0.9, 2.44), flat(0xffe9a8), i * 9, 0.35, 0, W.train); M(box(8.6, 0.3, 2.44), flat(0xff2d78), i * 9, -0.8, 0, W.train); } W.train.position.set(-90, 11, -37); scene.add(W.train);

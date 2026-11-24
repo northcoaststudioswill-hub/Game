@@ -62,7 +62,7 @@ Two families, both embedded in the file so every phone shows the same thing.
 | Do | Don't |
 |---|---|
 | "Call next." "Run it back." "Winners stay." | Puns in buttons or headings |
-| Name places the way a block would: The Pit, The Plug, The Lab, Tape Deck, The Link | Corporate parody names for the player's own tools |
+| Name places the way a block would: The Cages, The Plug, The Lab, Tape Deck, The Link | Corporate parody names for the player's own tools |
 | Sneaker words for rarity: GR, Limited, Exclusive, Grail, 1 of 1 | "Common / Rare / Epic / Legendary" |
 | Let the 2145 satire live in the world: ads, fiends, the statue | Satire in the menus |
 | | The word swag. Anywhere. |
@@ -75,7 +75,7 @@ The point of this table is to save the space now, so new things arrive with a na
 |---|---|---|
 | The game | GOT NEXT. Never "cage" or "born" in the game's name. | — |
 | Seasons | RUN 00 · PRESEASON (shown on the title; `BRAND.season`) | RUN 01, RUN 02 … each with a one-word name and its own foil |
-| Places | The Block, The Pit (it is a cage: chain link, floodlights, gates), The Plug, The Lab, Tape Deck, The Link, My Crib, Last Call, Money Rack | The Roof, The Yard, The Rec, The Bridge (new courts and districts); Uptown is already promised by the chained subway gate on The Block (UPTOWN LINE); The Chair (barber: hair and face), The Vault (grails) |
+| Places | The Block, The Cages (renamed from The Pit in v0.4: chain link, floodlights, a gate per mode), The Plug, The Lab, Tape Deck, The Link, My Crib, Last Call, Money Rack | The Roof, The Yard, The Rec, The Bridge (new courts and districts); Uptown is already promised by the chained subway gate on The Block (UPTOWN LINE); The Chair (barber: hair and face), The Vault (grails) |
 | Modes | Street 2v2, Street 3v3, JAM 2v2, JAM 3v3 | Ones (1v1), 21, King of the Court, Crew runs |
 | Court tiers | Side Court, Main Court, The Cage, Kings Court | Open Run, The Invitational |
 | Ranks | Nobody, Local, Regular, Problem, Certified, Big Name, City Legend, Immortal | Prestige loops: Immortal II, III |

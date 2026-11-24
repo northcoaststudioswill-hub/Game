@@ -83,14 +83,17 @@ function makeRig(spec, lowDetail) {
   const spine = grp(hips, 0, 0, 0);
   const top = D('top') || DRIPS.t_tank, bot = D('bottom') || DRIPS.b_basic;
   // torso: shoulders wider than waist, flattened front to back
-  const tg = geo('torso' + shW.toFixed(3) + wS.toFixed(2) + torso.toFixed(3), () => { const g = new THREE.CylinderGeometry(shW * 0.98, 0.115 * wS, torso, 10); g.scale(1, 1, 0.58); return g; });
-  out(M(tg, toon(top.c), 0, torso / 2, 0, spine), 1.06);
+  const loH = torso * 0.46, upH = torso * 0.54, midR = lerp(0.115 * wS, shW * 0.98, 0.42);
+  const tgLo = geo('torsoLo' + shW.toFixed(3) + wS.toFixed(2) + torso.toFixed(3), () => { const g = new THREE.CylinderGeometry(midR, 0.115 * wS, loH + 0.03, 10); g.scale(1, 1, 0.6); return g; });
+  const tgUp = geo('torsoUp' + shW.toFixed(3) + wS.toFixed(2) + torso.toFixed(3), () => { const g = new THREE.CylinderGeometry(shW * 0.98, midR, upH + 0.02, 10); g.scale(1, 1, 0.58); return g; });
+  out(M(tgLo, toon(top.c), 0, loH / 2, 0, spine), 1.06);
+  const chestJ = grp(spine, 0, loH, 0); out(M(tgUp, toon(top.c), 0, upH / 2, 0, chestJ), 1.06);
   M(cyl(0.118 * wS, 0.118 * wS, 0.03, 10), toon(top.c2 || top.c), 0, 0.03, 0, spine).scale.z = 0.62;       // hem
-  if (top.kind === 'jersey') { const st = M(box(shW * 1.5, 0.05, 0.02), toon(top.c2), 0, torso * 0.62, 0.105 * wS, spine); st.rotation.x = -0.12; }
-  const chest = grp(spine, 0, torso, 0);
+  if (top.kind === 'jersey') { const st = M(box(shW * 1.5, 0.05, 0.02), toon(top.c2), 0, upH * 0.3, 0.105 * wS, chestJ); st.rotation.x = -0.12; }
+  const chest = grp(chestJ, 0, upH, 0);
   // neck + head
-  M(cyl(0.045, 0.05, 0.1, 8), skin, 0, 0.04, 0, chest);
-  const head = grp(chest, 0, 0.09, 0);
+  const neck = grp(chest, 0, 0, 0); M(cyl(0.045, 0.05, 0.1, 8), skin, 0, 0.04, 0, neck);
+  const head = grp(neck, 0, 0.09, 0);
   const hr = 0.108;
   const hm = out(M(sph(hr, 12, 10), skin, 0, hr * 1.05, 0.01, head), 1.07); hm.scale.set(0.92, 1.12, 0.98);
   if (!lowDetail) { for (const sx of [-1, 1]) { M(box(0.026, 0.034, 0.01), flat(0x101014), sx * 0.04, hr * 1.12, hr * 0.96, head); M(box(0.042, 0.012, 0.01), flat(0x101014), sx * 0.04, hr * 1.42, hr * 0.93, head).rotation.z = sx * -0.15; } }
@@ -142,7 +145,7 @@ function makeRig(spec, lowDetail) {
     if (top.kind === 'tee' || top.kind === 'jersey') M(capsule(0.052 * wS, up * (top.kind === 'tee' ? 0.55 : 0.3)), toon(top.c), 0, -up * 0.16, 0, sh);
     const el = grp(sh, 0, -up + 0.03, 0);
     out(M(capsule(0.036 * wS, fore), skin, 0, -fore / 2 + 0.02, 0, el), 1.13);
-    const hand = out(M(sph(0.045), skin, 0, -fore + 0.01, 0, el), 1.1); hand.scale.set(0.8, 1.2, 1);
+    const wr = grp(el, 0, -fore + 0.045, 0); const hand = out(M(sph(0.046), skin, 0, -0.045, 0, wr), 1.1); hand.scale.set(0.85, 1.35, 0.5); R.joints['wr' + side] = wr;
     if (arm && arm.kind !== 'none') {
       const ac = toon(arm.c);
       if (arm.kind === 'wrist') M(cyl(0.041 * wS, 0.041 * wS, 0.045, 8), ac, 0, -fore + 0.09, 0, el);
@@ -168,7 +171,7 @@ function makeRig(spec, lowDetail) {
     const sockH = socks.kind === 'high' ? shin * 0.62 : shin * 0.2;
     M(cyl(0.047 * wS, 0.043 * wS, sockH, 8), toon(socks.c), 0, -shin + 0.06 + sockH / 2, 0, kn);
     if (socks.c2 && socks.kind === 'high') M(cyl(0.049 * wS, 0.049 * wS, 0.025, 8), toon(socks.c2), 0, -shin + 0.04 + sockH, 0, kn);
-    const foot = grp(kn, 0, -shin + 0.05, 0);
+    const foot = grp(kn, 0, -shin + 0.05, 0); R.joints['an' + side] = foot;
     out(M(box(0.095, 0.075, 0.25), toon(shoes.c), 0, -0.01, 0.055, foot), 1.1);
     M(box(0.1, 0.022, 0.26), toon(shoes.c2 || '#fff'), 0, -0.045, 0.055, foot);
     if (shoes.kind === 'high') M(cyl(0.052, 0.05, 0.08, 8), toon(shoes.c), 0, 0.045, 0, foot);
@@ -185,7 +188,7 @@ function makeRig(spec, lowDetail) {
       case 'wings': for (const sx of [-1, 1]) { const g = grp(chest, sx * 0.06, -0.08, -0.1); const w = M(geo('wing', () => { const s = new THREE.Shape(); s.moveTo(0, 0); s.lineTo(0.55, 0.3); s.lineTo(0.5, 0.05); s.lineTo(0.42, -0.1); s.lineTo(0.28, -0.22); s.lineTo(0.1, -0.3); s.lineTo(0, -0.12); return new THREE.ShapeGeometry(s); }), toon(bk.c), 0, 0, 0, g); w.material.side = THREE.DoubleSide; g.scale.x = sx; g.rotation.y = sx * 0.5; (R.wings = R.wings || []).push(g); } break;
     }
   }
-  Object.assign(R.joints, { hips, spine, head });
+  Object.assign(R.joints, { hips, spine, chest: chestJ, neck, head });
   for (const k in R.joints) R.cur[k] = [0, 0, 0];
   R.yOff = 0;
   // blob shadow
@@ -199,75 +202,94 @@ const POSE = {};
 function setP(p, k, x, y, z) { p[k] = [x || 0, y || 0, z || 0]; }
 function poseOf(anim, t, o) {
   const p = { y: 0, rate: 16 }; o = o || {};
-  const armsDown = () => { setP(p, 'shR', 0.05, 0, -0.1); setP(p, 'shL', 0.05, 0, 0.1); setP(p, 'elR', -0.25); setP(p, 'elL', -0.25); };
+  const S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
+  const armsDown = () => { S_('shR', 0.05, 0, -0.1); S_('shL', 0.05, 0, 0.1); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', -0.1); S_('wrL', -0.1); };
+  const legs = (hr, kr, hl, kl, spread) => { S_('hpR', hr, 0, -(spread || 0)); S_('knR', kr); S_('hpL', hl, 0, spread || 0); S_('knL', kl); S_('anR', -(hr + kr) * 0.55); S_('anL', -(hl + kl) * 0.55); };
   switch (anim) {
-    case 'idle': armsDown(); p.y = Math.sin(t * 2) * 0.006; setP(p, 'spine', 0.03 + Math.sin(t * 2) * 0.01); break;
+    case 'idle': { const b = Math.sin(t * 2); armsDown(); p.y = b * 0.006; S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); break; }
     case 'walk': case 'run': case 'dribble': case 'slide': {
       const a = clamp(o.sp || 0, 0, 1), ph = o.ph || 0, s = Math.sin(ph), c = Math.cos(ph), amp = anim === 'slide' ? 0.35 : 0.25 + a * 0.75;
-      setP(p, 'hpR', -s * amp); setP(p, 'hpL', s * amp);
-      setP(p, 'knR', 0.15 + amp * 1.1 * Math.max(0, -c)); setP(p, 'knL', 0.15 + amp * 1.1 * Math.max(0, c));
-      setP(p, 'spine', 0.06 + a * 0.2); p.y = -0.02 + 0.035 * Math.abs(s) * amp;
-      setP(p, 'shR', s * amp * 0.8, 0, -0.12); setP(p, 'shL', -s * amp * 0.8, 0, 0.12); setP(p, 'elR', -0.5 - a * 0.9); setP(p, 'elL', -0.5 - a * 0.9);
+      // legs: thigh swings, knee folds on the recovery, ankle pushes off behind and dorsiflexes in front
+      S_('hpR', -s * amp); S_('hpL', s * amp); S_('knR', 0.15 + amp * 1.25 * Math.max(0, -c)); S_('knL', 0.15 + amp * 1.25 * Math.max(0, c));
+      S_('anR', s * amp * 0.55 + 0.1); S_('anL', -s * amp * 0.55 + 0.1);
+      // trunk: lean, counter-rotate chest against hips, keep the head level
+      S_('hips', 0, -s * 0.1 * amp, 0); S_('spine', 0.05 + a * 0.14); S_('chest', 0.03 + a * 0.08, s * 0.24 * amp, 0); S_('neck', -0.06 - a * 0.14, -s * 0.12 * amp, 0);
+      p.y = -0.02 + 0.04 * Math.abs(s) * amp;
+      S_('shR', s * amp * 0.85, 0, -0.12); S_('shL', -s * amp * 0.85, 0, 0.12); S_('elR', -0.5 - a * 1.0 - Math.max(0, -s) * 0.3); S_('elL', -0.5 - a * 1.0 - Math.max(0, s) * 0.3); S_('wrR', -0.15); S_('wrL', -0.15);
       if (anim === 'dribble') {
-        const d = o.dr || 0;   // 0..1 ball height in its bounce
-        p.y -= 0.07; setP(p, 'spine', 0.22 + a * 0.12); p.knR[0] += 0.25; p.knL[0] += 0.25; p.hpR[0] -= 0.2; p.hpL[0] -= 0.2;
-        const hand = o.hand === 'L' ? 'L' : 'R', sg = hand === 'R' ? -1 : 1;
-        setP(p, 'sh' + hand, -0.55 + d * -0.25, 0, sg * 0.25); setP(p, 'el' + hand, -0.6 - d * 0.7); p.rate = 22;
-        const off = hand === 'R' ? 'L' : 'R'; setP(p, 'sh' + off, -0.3, 0, -sg * 0.5); setP(p, 'el' + off, -1.2);
+        const d = o.dr || 0, hand = o.hand === 'L' ? 'L' : 'R', sg = hand === 'R' ? -1 : 1, off = hand === 'R' ? 'L' : 'R';
+        p.y -= 0.08; S_('spine', 0.2 + a * 0.1); S_('chest', 0.1, s * 0.12 * amp + sg * -0.12, 0); S_('neck', -0.28, 0, 0); p.knR[0] += 0.28; p.knL[0] += 0.28; p.hpR[0] -= 0.24; p.hpL[0] -= 0.24;
+        S_('sh' + hand, -0.5 - d * 0.22, 0, sg * 0.28); S_('el' + hand, -0.55 - d * 0.75); S_('wr' + hand, 0.5 - d * 1.0);     // the wrist snaps the ball down
+        S_('sh' + off, -0.35, 0, -sg * 0.55); S_('el' + off, -1.25); S_('wr' + off, -0.3); p.rate = 22;                     // off arm up, shielding
       }
-      if (anim === 'slide') { p.y = -0.15; setP(p, 'hpR', -0.55 - s * 0.15, 0, -0.32); setP(p, 'hpL', -0.55 + s * 0.15, 0, 0.32); setP(p, 'knR', 0.95); setP(p, 'knL', 0.95); setP(p, 'spine', 0.2); const up = o.up ? 1 : 0; setP(p, 'shR', up ? -2.9 : -0.3, 0, up ? -0.15 : -1.0); setP(p, 'shL', -0.3, 0, 1.0); setP(p, 'elR', -0.3); setP(p, 'elL', -0.5); }
+      if (anim === 'slide') { const up = o.up ? 1 : 0; p.y = -0.16; S_('hips', 0.05, 0, 0); legs(-0.6 - s * 0.16, 1.0, -0.6 + s * 0.16, 1.0, 0.36); S_('spine', 0.14); S_('chest', 0.1); S_('neck', -0.22);
+        S_('shR', up ? -2.9 : -0.35, 0, up ? -0.15 : -1.05); S_('shL', -0.35, 0, 1.05); S_('elR', up ? -0.2 : -0.45); S_('elL', -0.55); S_('wrR', up ? 0.3 : -0.4); S_('wrL', -0.4); }
       break;
     }
-    case 'shoot': {
+    case 'shoot': case 'fake': {
       const u = clamp(t / (o.rel || 0.6), 0, 1.6), k = o.kick ? 1 : 0;
-      if (u < 0.45) { p.y = -0.12 * (u / 0.45); setP(p, 'knR', 0.6); setP(p, 'knL', 0.6); setP(p, 'hpR', -0.4); setP(p, 'hpL', -0.4); setP(p, 'shR', -0.9, 0, 0.1); setP(p, 'shL', -0.9, 0, -0.25); setP(p, 'elR', -2.1); setP(p, 'elL', -1.9); setP(p, 'spine', 0.12); }
-      else if (u < 1) { setP(p, 'shR', -2.5, 0, 0.05); setP(p, 'shL', -2.3, 0, -0.3); setP(p, 'elR', -1.5); setP(p, 'elL', -1.2); setP(p, 'spine', -0.04); setP(p, 'knR', 0.1); setP(p, 'knL', 0.1 + k * 0.5); setP(p, 'hpL', -k * 0.9); }
-      else { setP(p, 'shR', -2.85, 0, 0); setP(p, 'elR', -0.12); setP(p, 'shL', -2.1, 0, -0.35); setP(p, 'elL', -0.9); setP(p, 'knL', k * 0.3); setP(p, 'hpL', -k * 1.1); setP(p, 'spine', -0.06); }
-      p.rate = 20; break;
+      if (u < 0.45) { p.y = -0.13 * (u / 0.45); legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); }       // dip: ball to the pocket
+      else if (u < 1) { legs(-0.05, 0.12, -k * 0.9, 0.12 + k * 0.5, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); }   // set point: wrist cocked
+      else { legs(0.05, 0.05, -k * 1.1, k * 0.3, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); }                                          // follow-through: gooseneck
+      p.rate = anim === 'fake' ? 30 : 20; break;
     }
-    case 'layup': setP(p, 'shR', -2.95, 0, 0.1); setP(p, 'elR', -0.15); setP(p, 'shL', -0.4, 0, 0.4); setP(p, 'elL', -1.0); setP(p, 'hpL', -1.3); setP(p, 'knL', 1.5); setP(p, 'hpR', 0.3); setP(p, 'knR', 0.3); setP(p, 'spine', 0.1); p.rate = 18; break;
+    case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
+    case 'layup': { const eu = o.euro || 0; legs(0.3, 0.3, -1.3, 1.5); S_('anR', 0.9); S_('hips', 0, 0, -eu * 0.25); S_('spine', 0.08, 0, -eu * 0.15); S_('chest', -0.05, -eu * 0.3, 0); S_('neck', -0.2); S_('shR', -2.95, 0, 0.1 + eu * 0.2); S_('elR', -0.18); S_('wrR', (o.u || 0) > 0.7 ? -0.9 : 0.6); S_('shL', -0.5, 0, 0.45); S_('elL', -1.1); p.rate = 18; break; }
     case 'dunk': {
-      const u = o.u || 0, st = o.style || 'twohand', slam = u > 0.72;
-      setP(p, 'hpR', -0.9); setP(p, 'hpL', -0.5); setP(p, 'knR', 1.5); setP(p, 'knL', 1.2); setP(p, 'spine', slam ? 0.3 : -0.25);
-      if (st === 'twohand') { const a = slam ? -1.9 : -3.3; setP(p, 'shR', a, 0, 0.12); setP(p, 'shL', a, 0, -0.12); setP(p, 'elR', slam ? -0.2 : -0.9); setP(p, 'elL', slam ? -0.2 : -0.9); }
-      else if (st === 'windmill') { const a = slam ? -1.9 : (0.4 - u / 0.72 * 4.4); setP(p, 'shR', a, 0, -0.1); setP(p, 'elR', -0.1); setP(p, 'shL', -0.6, 0, 0.7); setP(p, 'elL', -0.8); p.rate = 30; }
-      else { setP(p, 'shR', slam ? -1.9 : -3.7, 0, -0.1); setP(p, 'elR', slam ? -0.15 : -1.2); setP(p, 'shL', -0.5, 0, 0.8); setP(p, 'elL', -0.9); }
+      const u = o.u || 0, st = o.style || 'twohand', slam = u > 0.72, hang = u > 0.8;
+      legs(hang ? -0.5 : -0.95, hang ? 0.9 : 1.55, hang ? -0.3 : -0.5, hang ? 0.7 : 1.25, 0.1); S_('spine', slam ? 0.22 : -0.2); S_('chest', slam ? 0.3 : -0.35); S_('neck', slam ? 0.2 : -0.3);
+      if (st === 'twohand') { const a = slam ? -1.95 : -3.3; S_('shR', a, 0, 0.12); S_('shL', a, 0, -0.12); S_('elR', slam ? -0.2 : -0.95); S_('elL', slam ? -0.2 : -0.95); S_('wrR', slam ? -0.9 : 0.5); S_('wrL', slam ? -0.9 : 0.5); }
+      else if (st === 'windmill') { const a = slam ? -1.95 : (0.4 - u / 0.72 * 4.4); S_('shR', a, 0, -0.1); S_('elR', -0.1); S_('wrR', slam ? -0.9 : 0); S_('shL', -0.6, 0, 0.75); S_('elL', -0.8); p.rate = 30; }
+      else { S_('shR', slam ? -1.95 : -3.75, 0, -0.1); S_('elR', slam ? -0.15 : -1.25); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -0.5, 0, 0.85); S_('elL', -0.9); }
       p.rate = Math.max(p.rate, 22); break;
     }
-    case 'jump': setP(p, 'shR', -3.0, 0, 0.12); setP(p, 'shL', -2.9, 0, -0.12); setP(p, 'elR', -0.1); setP(p, 'elL', -0.15); setP(p, 'knR', 0.25); setP(p, 'knL', 0.15); setP(p, 'spine', -0.05); p.rate = 22; break;
-    case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.16; setP(p, 'spine', 0.5); setP(p, 'hpR', -0.9); setP(p, 'knR', 1.0); setP(p, 'hpL', 0.2); setP(p, 'knL', 0.5); setP(p, 'shR', -1.3, 0, -0.9 + u * 1.6); setP(p, 'elR', -0.2); setP(p, 'shL', 0.4, 0, 0.5); p.rate = 28; break; }
-    case 'shove': p.y = -0.08; setP(p, 'spine', 0.4); setP(p, 'shR', -1.5, 0, 0.1); setP(p, 'shL', -1.5, 0, -0.1); setP(p, 'elR', -0.1); setP(p, 'elL', -0.1); setP(p, 'hpR', -0.7); setP(p, 'knR', 0.7); setP(p, 'hpL', 0.4); p.rate = 30; break;
-    case 'pass': setP(p, 'shR', -1.5, 0, 0.2); setP(p, 'shL', -1.5, 0, -0.2); setP(p, 'elR', -0.15); setP(p, 'elL', -0.15); setP(p, 'spine', 0.2); setP(p, 'hpR', -0.5); setP(p, 'knR', 0.5); p.rate = 30; break;
-    case 'catch': setP(p, 'shR', -1.2, 0, 0.2); setP(p, 'shL', -1.2, 0, -0.2); setP(p, 'elR', -1.2); setP(p, 'elL', -1.2); break;
-    case 'move': {   // dribble move: low, leaning into it
-      const s = o.side || 0; p.y = -0.17; setP(p, 'hips', 0.1, 0, -s * 0.35); setP(p, 'spine', 0.35, 0, -s * 0.15);
-      setP(p, 'hpR', -0.8, 0, -0.35); setP(p, 'hpL', -0.8, 0, 0.35); setP(p, 'knR', 1.2); setP(p, 'knL', 1.2);
-      setP(p, 'shR', -0.7, 0, s > 0 ? 0.5 : -0.5); setP(p, 'elR', -0.9); setP(p, 'shL', -0.7, 0, s > 0 ? 0.5 : -0.5); setP(p, 'elL', -0.9); p.rate = 26; break;
+    case 'jump': legs(0.05, 0.25, 0.02, 0.15, 0.05); S_('anR', 0.8); S_('anL', 0.8); S_('spine', -0.04); S_('chest', -0.1); S_('neck', -0.25); S_('shR', -3.0, 0, 0.12); S_('shL', -2.9, 0, -0.12); S_('elR', -0.1); S_('elL', -0.15); S_('wrR', 0.4); S_('wrL', 0.4); p.rate = 22; break;
+    case 'swat': legs(0.1, 0.3, -0.3, 0.5, 0.08); S_('anR', 0.8); S_('spine', 0.1); S_('chest', 0.15, 0.5, 0); S_('neck', -0.1); S_('shR', -1.7, 0, 0.5); S_('elR', -0.05); S_('wrR', -0.9); S_('shL', -0.4, 0, 0.6); S_('elL', -0.8); p.rate = 34; break;
+    case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28; break; }
+    case 'shove': p.y = -0.08; legs(-0.75, 0.75, 0.4, 0.2); S_('spine', 0.3); S_('chest', 0.15); S_('neck', -0.3); S_('shR', -1.5, 0, 0.1); S_('shL', -1.5, 0, -0.1); S_('elR', -0.1); S_('elL', -0.1); S_('wrR', 0.9); S_('wrL', 0.9); p.rate = 30; break;
+    case 'pass': { const f = o.flashy; legs(-0.55, 0.55, 0.1, 0.2); S_('spine', 0.14); S_('chest', 0.1, f ? 0.6 : 0, 0); S_('neck', -0.1, f ? -0.7 : 0, 0);
+      if (f) { S_('shR', 0.7, 0, -0.3); S_('elR', -1.3); S_('wrR', -0.8); S_('shL', -0.4, 0, 0.5); S_('elL', -0.9); } else { S_('shR', -1.5, 0, 0.2); S_('shL', -1.5, 0, -0.2); S_('elR', -0.12); S_('elL', -0.12); S_('wrR', -0.7); S_('wrL', -0.7); } p.rate = 30; break; }
+    case 'catch': S_('shR', -1.2, 0, 0.2); S_('shL', -1.2, 0, -0.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.5); S_('wrL', 0.5); S_('neck', -0.1); break;
+    case 'call': armsDown(); S_('shR', -2.85, 0, -0.2); S_('elR', -0.3); S_('wrR', 0.4 + Math.sin(t * 14) * 0.4); S_('neck', -0.1); break;
+    case 'move': {   // each dribble move has its own shape
+      const s = o.side || 0, k = o.kind || 'cross', u = clamp(o.u || 0, 0, 1), e = Math.sin(u * Math.PI);
+      p.y = -0.17; S_('hips', 0.08, 0, -s * 0.3); S_('spine', 0.3, 0, -s * 0.12); S_('chest', 0.12, -s * 0.25, 0); S_('neck', -0.35, s * 0.2, 0); legs(-0.8, 1.2, -0.8, 1.2, 0.36);
+      S_('shR', -0.7, 0, s > 0 ? 0.5 : -0.5); S_('elR', -0.9); S_('shL', -0.7, 0, s > 0 ? 0.5 : -0.5); S_('elL', -0.9); S_('wrR', -0.4); S_('wrL', -0.4);
+      if (k === 'tween') { legs(s > 0 ? -1.15 : -0.3, 1.0, s > 0 ? -0.3 : -1.15, 1.0, 0.3); p.y = -0.2; S_('spine', 0.4); }
+      else if (k === 'behind' || k === 'shammgod') { S_('spine', 0.12); S_('chest', -0.05, -s * 0.5, 0); S_('shR', 0.75 * (s > 0 ? 1 : 0.2), 0, -0.35); S_('elR', -1.2); S_('shL', 0.75 * (s < 0 ? 1 : 0.2), 0, 0.35); S_('elL', -1.2); if (k === 'shammgod') { p.y = -0.24; S_('sh' + (s > 0 ? 'L' : 'R'), -1.5, 0, s * 0.9); S_('el' + (s > 0 ? 'L' : 'R'), -0.1); } }
+      else if (k === 'stepback' || k === 'moonwalk') { p.y = -0.1 + e * 0.12; legs(-0.3 - e * 0.5, 0.5 + e * 0.7, 0.35, 0.4, 0.18); S_('spine', -0.08); S_('chest', -0.1); S_('neck', -0.05); S_('hips', -0.12, 0, 0); }
+      else if (k === 'hesi') { p.y = -0.04 + e * 0.05; legs(-0.2, 0.3, 0.1, 0.25, 0.14); S_('spine', 0.0); S_('chest', -0.05); S_('neck', 0.05); S_('shR', -1.3, 0, 0.1); S_('elR', -1.7); S_('shL', -1.1, 0, -0.2); S_('elL', -1.6); }
+      else if (k === 'spin' || k === 'halfspin') { p.y = -0.15; legs(-0.6, 1.0, -0.2, 0.6, 0.15); S_('shR', -0.5, 0, 0.3); S_('elR', -1.8); S_('shL', -0.5, 0, -0.3); S_('elL', -1.8); S_('spine', 0.25); }
+      p.rate = 26; break;
     }
     case 'stagger': {
       const u = clamp(t / 0.35, 0, 1), fall = o.fall ? 1 : 0;
-      if (fall) { p.y = -R_fallY(o) * u; setP(p, 'hips', -1.35 * u); setP(p, 'hpR', -1.2 * u, 0, -0.3); setP(p, 'hpL', -0.7 * u, 0, 0.3); setP(p, 'knR', 0.9); setP(p, 'knL', 0.4); setP(p, 'shR', -0.6, 0, -1.4); setP(p, 'shL', 0.6, 0, 1.4); setP(p, 'spine', 0.3); }
-      else { p.y = -0.2; setP(p, 'hips', -0.25, 0, Math.sin(t * 22) * 0.2); setP(p, 'spine', -0.3); setP(p, 'hpR', -0.9, 0, -0.5); setP(p, 'hpL', 0.3, 0, 0.5); setP(p, 'knR', 1.2); setP(p, 'knL', 0.7); setP(p, 'shR', -1.4, 0, -1.3); setP(p, 'shL', -0.3, 0, 1.6); }
+      if (fall) { p.y = -R_fallY(o) * u; S_('hips', -1.35 * u); legs(-1.2 * u, 0.9, -0.7 * u, 0.4, 0.3); S_('spine', 0.2); S_('chest', 0.25); S_('neck', 0.35); S_('shR', -0.6, 0, -1.4); S_('shL', 0.6, 0, 1.4); S_('elR', -0.4); S_('elL', -0.6); S_('wrR', 0.6); S_('wrL', 0.6); }
+      else { const w = Math.sin(t * 22); p.y = -0.2; S_('hips', -0.25, 0, w * 0.2); S_('spine', -0.2); S_('chest', -0.15, w * 0.3, 0); S_('neck', 0.2); legs(-0.9, 1.2, 0.3, 0.7, 0.5); S_('anR', w * 0.5); S_('shR', -1.4, 0, -1.3); S_('shL', -0.3, 0, 1.6); S_('elR', -0.5); S_('elL', -0.3); }
       p.rate = 14; break;
     }
     case 'celeb': {
       const s = Math.sin(t * 9);
       switch (o.style) {
-        case 'salute': setP(p, 'shR', -0.7, 0, -1.25); setP(p, 'elR', -2.3); setP(p, 'shL', 0.05, 0, 0.08); setP(p, 'spine', -0.08); break;
-        case 'count': setP(p, 'shR', -1.0, 0, 0.3); setP(p, 'elR', -1.4 + s * 0.3); setP(p, 'shL', -1.0, 0, -0.3); setP(p, 'elL', -1.4 - s * 0.3); setP(p, 'spine', -0.1); break;
-        case 'eagle': setP(p, 'shR', 0, 0, -1.4 + s * 0.5); setP(p, 'shL', 0, 0, 1.4 - s * 0.5); setP(p, 'hpL', -1.2); setP(p, 'knL', 1.6); p.y = 0.03 * s; break;
-        default: setP(p, 'shR', -0.2, 0, -1.55); setP(p, 'elR', -2.2 + s * 0.15); setP(p, 'shL', -0.2, 0, 1.55); setP(p, 'elL', -2.2 - s * 0.15); setP(p, 'spine', -0.15); setP(p, 'head', -0.25);
+        case 'salute': S_('shR', -0.7, 0, -1.25); S_('elR', -2.3); S_('wrR', 0.2); S_('shL', 0.05, 0, 0.08); S_('spine', -0.05); S_('chest', -0.08); S_('neck', -0.05); break;
+        case 'count': S_('shR', -1.0, 0, 0.3); S_('elR', -1.4 + s * 0.3); S_('wrR', s * 0.8); S_('shL', -1.0, 0, -0.3); S_('elL', -1.4 - s * 0.3); S_('wrL', -s * 0.8); S_('chest', -0.1); S_('neck', 0.25); break;
+        case 'eagle': S_('shR', 0, 0, -1.4 + s * 0.5); S_('shL', 0, 0, 1.4 - s * 0.5); S_('wrR', s * 0.5); S_('wrL', s * 0.5); S_('hpL', -1.2); S_('knL', 1.6); S_('chest', -0.2); S_('neck', -0.3); p.y = 0.03 * s; break;
+        default: S_('shR', -0.2, 0, -1.55); S_('elR', -2.2 + s * 0.15); S_('wrR', -0.6); S_('shL', -0.2, 0, 1.55); S_('elL', -2.2 - s * 0.15); S_('wrL', -0.6); S_('spine', -0.08); S_('chest', -0.15); S_('neck', -0.3);
       }
       break;
     }
-    case 'cheer': { const s = Math.sin(t * 8 + (o.ph || 0)); setP(p, 'shR', -2.7, 0, -0.3 + s * 0.2); setP(p, 'shL', -2.7, 0, 0.3 - s * 0.2); setP(p, 'elR', -0.5); setP(p, 'elL', -0.5); p.y = 0.04 * Math.max(0, s); break; }
-    case 'beg': { const s = Math.sin(t * 3 + (o.ph || 0)); setP(p, 'shR', -1.1, 0, 0.1); setP(p, 'elR', -0.9 + s * 0.15); setP(p, 'shL', 0.1, 0, 0.15); setP(p, 'spine', 0.3); setP(p, 'head', 0.15 + s * 0.05); p.y = -0.05; setP(p, 'knR', 0.3); setP(p, 'knL', 0.3); setP(p, 'hpR', -0.25); setP(p, 'hpL', -0.25); break; }
-    case 'dance': { const b = t * 5.7 + (o.ph || 0), s = Math.sin(b), c = Math.cos(b), s2 = Math.sin(b * 2); p.y = -0.07 + 0.05 * Math.abs(s2); setP(p, 'hips', 0, s * 0.35, s * 0.14); setP(p, 'spine', 0.08, -s * 0.3, -s * 0.1); setP(p, 'head', 0.1 * s2, s * 0.2, 0);
-      setP(p, 'shR', -1.2 - c * 0.9, 0, -0.5 + s * 0.3); setP(p, 'elR', -1.3 + s * 0.5); setP(p, 'shL', -1.2 + c * 0.9, 0, 0.5 + s * 0.3); setP(p, 'elL', -1.3 - s * 0.5);
-      setP(p, 'hpR', -0.25 - Math.max(0, s) * 0.5, 0, -0.15); setP(p, 'knR', 0.4 + Math.max(0, s) * 0.8); setP(p, 'hpL', -0.25 - Math.max(0, -s) * 0.5, 0, 0.15); setP(p, 'knL', 0.4 + Math.max(0, -s) * 0.8); p.rate = 20; break; }
-    case 'warm': { const s = Math.sin(t * 2 + (o.ph || 0)); setP(p, 'shR', -1.25, 0, 0.15); setP(p, 'shL', -1.25, 0, -0.15); setP(p, 'elR', -0.5 + s * 0.08); setP(p, 'elL', -0.5 - s * 0.08); setP(p, 'spine', 0.18); p.y = -0.03; setP(p, 'knR', 0.2); setP(p, 'knL', 0.2); setP(p, 'hpR', -0.15); setP(p, 'hpL', -0.15); break; }
-    case 'sit': p.y = -0.42 * (o.leg || 1); setP(p, 'hpR', -1.5, 0, -0.1); setP(p, 'hpL', -1.5, 0, 0.1); setP(p, 'knR', 1.5); setP(p, 'knL', 1.5); setP(p, 'shR', -0.4); setP(p, 'shL', -0.4); setP(p, 'elR', -0.9); setP(p, 'elL', -0.9); setP(p, 'spine', 0.08); break;
+    case 'sulk': armsDown(); S_('spine', 0.12); S_('chest', 0.18); S_('neck', 0.55); S_('shR', 0.1, 0, -0.05); S_('shL', 0.1, 0, 0.05); S_('hpR', 0, 0, -0.05); break;
+    case 'cheer': { const s = Math.sin(t * 8 + (o.ph || 0)); S_('shR', -2.7, 0, -0.3 + s * 0.2); S_('shL', -2.7, 0, 0.3 - s * 0.2); S_('elR', -0.5); S_('elL', -0.5); S_('wrR', s * 0.6); S_('wrL', -s * 0.6); S_('chest', -0.1); S_('neck', -0.2); p.y = 0.04 * Math.max(0, s); S_('anR', Math.max(0, s) * 0.6); S_('anL', Math.max(0, s) * 0.6); break; }
+    case 'beg': { const s = Math.sin(t * 3 + (o.ph || 0)); S_('shR', -1.1, 0, 0.1); S_('elR', -0.9 + s * 0.15); S_('wrR', 1.0); S_('shL', 0.1, 0, 0.15); S_('spine', 0.2); S_('chest', 0.15); S_('neck', -0.05 + s * 0.05); p.y = -0.05; legs(-0.25, 0.3, -0.25, 0.3); break; }
+    case 'dance': { const b = t * 5.7 + (o.ph || 0), s = Math.sin(b), c = Math.cos(b), s2 = Math.sin(b * 2); p.y = -0.07 + 0.05 * Math.abs(s2); S_('hips', 0, s * 0.35, s * 0.14); S_('spine', 0.05, -s * 0.15, -s * 0.06); S_('chest', 0.06, -s * 0.3, -s * 0.1); S_('neck', 0.1 * s2, s * 0.25, 0);
+      S_('shR', -1.2 - c * 0.9, 0, -0.5 + s * 0.3); S_('elR', -1.3 + s * 0.5); S_('wrR', s2 * 0.6); S_('shL', -1.2 + c * 0.9, 0, 0.5 + s * 0.3); S_('elL', -1.3 - s * 0.5); S_('wrL', -s2 * 0.6);
+      S_('hpR', -0.25 - Math.max(0, s) * 0.5, 0, -0.15); S_('knR', 0.4 + Math.max(0, s) * 0.8); S_('anR', Math.max(0, s) * 0.5); S_('hpL', -0.25 - Math.max(0, -s) * 0.5, 0, 0.15); S_('knL', 0.4 + Math.max(0, -s) * 0.8); S_('anL', Math.max(0, -s) * 0.5); p.rate = 20; break; }
+    case 'warm': { const s = Math.sin(t * 2 + (o.ph || 0)); S_('shR', -1.25, 0, 0.15); S_('shL', -1.25, 0, -0.15); S_('elR', -0.5 + s * 0.08); S_('elL', -0.5 - s * 0.08); S_('wrR', 0.9); S_('wrL', 0.9); S_('spine', 0.1); S_('chest', 0.1); p.y = -0.03; legs(-0.15, 0.2, -0.15, 0.2); break; }
+    case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
+  // layered on top of every pose: eyes on the ball, lean into the turn
+  if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
+  if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }
   return p;
 }
 function R_fallY(o) { return (o.leg || 0.95) * 0.82; }

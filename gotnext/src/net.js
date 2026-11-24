@@ -2,7 +2,7 @@
 // Runs on the claude.ai artifact "room" (live presence), "user" and "db" capabilities. Outside an artifact, or for a
 // viewer the platform does not connect, every one of these is absent and the game is simply single player.
 'use strict';
-const NET = { room: null, db: null, uid: null, me: null, peers: [], out: null, seenInv: {}, game: null, pub: {}, pubT: 0, cloudT: null, cloudBusy: false, cloudDirty: false, connected: false };
+const NET = { room: null, db: null, uid: null, me: null, peers: [], out: null, seenInv: {}, seenGo: {}, known: {}, crew: null, inCrew: null, inSince: 0, waitGo: null, game: null, pub: {}, pubT: 0, cloudT: null, cloudBusy: false, cloudDirty: false, connected: false };
 const ST_CODES = ['free', 'shoot', 'finish', 'move', 'stagger', 'jump', 'steal', 'shove', 'pass', 'celeb'];
 const BSTATES = ['held', 'shot', 'through', 'pass', 'loose'];
 const r2 = v => Math.round(v * 100) / 100;
@@ -51,31 +51,77 @@ function cloudSave() {
 }
 
 // ---------- the lobby: everyone with the game open ----------
+// Crews: a leader invites people; members pull up to wherever the leader is and get pulled into the leader's games.
 function netOthers() { return NET.peers.filter(p => !p.sameTab && p.kind === 'viewer' && p.presence && p.presence.b); }
 function peerName(p) { return String((p.presence && p.presence.b && p.presence.b.n) || 'SOMEONE').slice(0, 12); }
+function peerById(id) { return netOthers().find(p => p.peer === id) || null; }
+function pres(patch) { if (NET.room) NET.room.presence(patch).catch(() => { }); }
+function rid() { return Math.random().toString(36).slice(2, 10); }
+function crewMembers() { return NET.crew ? NET.crew.m.map(peerById).filter(Boolean) : []; }
+function crewLead() { return NET.inCrew ? peerById(NET.inCrew) : null; }
+function canAnswer() { return !MT && !NET.game && S.created && $('title').style.display !== 'flex' && document.body.dataset.state === 'world'; }
+// everyone you meet online is kept as a homie, so you can still run with their player when they are gone
+function remember(p) {
+  if (!S.created) return; const bj = JSON.stringify(p.presence.b); if (NET.known[p.peer] === bj) return; NET.known[p.peer] = bj;
+  const b = unpackBuild(p.presence.b); if (!b) return; b.net = 1;
+  const i = S.homies.findIndex(h => h.name === b.name);
+  if (i >= 0) { if (JSON.stringify(S.homies[i]) === JSON.stringify(b)) return; S.homies[i] = b; }
+  else { if (S.homies.length >= 12) { const k = S.homies.findIndex(h => h.net); S.homies.splice(k >= 0 ? k : 0, 1); } S.homies.push(b); toast('NEW HOMIE: ' + b.name, 'Their player can run with you now, even when they are not online.'); }
+  S.life.homies = Math.max(S.life.homies || 0, S.homies.length); save();
+}
+function pullUp(L) {
+  const w = L.presence.w === 'pit' ? 'pit' : 'hub';
+  if (L.presence.w === w) enterWorld(w, clamp(+L.presence.x || 0, -14, 14) + 1.1, clamp(+L.presence.z || 0, -10, 11) + 0.9, +L.presence.f || 0);
+  else enterWorld('hub', 0, 9, Math.PI);
+}
 function netPeers(peers) {
   NET.peers = peers; const me = peers.find(p => p.sameTab); if (me) NET.me = me.peer;
   for (const p of netOthers()) {
-    const pr = p.presence;
-    // an invite addressed to this tab
+    const pr = p.presence; remember(p);
+    // a call addressed to this tab
     const inv = pr.inv;
-    if (inv && inv.to === NET.me && !NET.seenInv[inv.id] && !MT && !NET.game && S.created && $('title').style.display !== 'flex' && document.body.dataset.state === 'world') {
-      NET.seenInv[inv.id] = 1; const m = MODES.find(x => x.id === inv.m), t = TIERS_COURT[inv.t | 0]; if (!m || !t) continue;
-      const nm = peerName(p); sfx('unlock');
-      uiDialog(nm + ' CALLED YOU', `${nm} wants to run ${m.n} on ${t.n} — ${inv.k === 'vs' ? 'against you' : 'on your team'}.`, [
-        ['Run it', () => { const hb = unpackBuild(pr.b); if (!hb) { uiClose(); return; } NET.room.presence({ acc: { id: inv.id, from: p.peer } }).catch(() => { }); uiClose(); netStartGuest(inv, p.peer, hb, m, t); }],
-        ['Nah', () => { NET.room.presence({ acc: { id: inv.id, from: p.peer, no: 1 } }).catch(() => { }); uiClose(); }, 'alt']]);
+    if (inv && inv.to === NET.me && !NET.seenInv[inv.id] && canAnswer()) {
+      NET.seenInv[inv.id] = 1; const nm = peerName(p); sfx('unlock');
+      if (inv.k === 'crew') {
+        uiDialog(nm + ' WANTS YOU IN THEIR CREW', `Pull up and you go wherever ${nm} goes, and you get pulled into their games: same team or against them, they call it.`, [
+          ['Pull up', () => { if (NET.crew) { NET.crew = null; } NET.inCrew = p.peer; NET.inSince = performance.now(); pres({ acc: { id: inv.id, from: p.peer }, in: p.peer, cr: null }); uiClose(); pullUp(p); toast('RUNNING WITH ' + nm, 'You follow them now. Leave the crew from My Player.'); }],
+          ['Nah', () => { pres({ acc: { id: inv.id, from: p.peer, no: 1 } }); uiClose(); }, 'alt']]);
+      } else {
+        const m = MODES.find(x => x.id === inv.m), t = TIERS_COURT[inv.t | 0]; if (!m || !t) continue;
+        uiDialog(nm + ' CALLED YOU', `${nm} wants to run ${m.n} on ${t.n}, ${inv.k === 'vs' ? 'against you' : 'on your team'}.`, [
+          ['Run it', () => { NET.waitGo = p.peer; pres({ acc: { id: inv.id, from: p.peer } }); uiClose(); toast('CHECKING UP', 'Waiting on ' + nm + '…'); }],
+          ['Nah', () => { pres({ acc: { id: inv.id, from: p.peer, no: 1 } }); uiClose(); }, 'alt']]);
+      }
     }
-    // an answer to the invite this tab sent
+    // the answer to the call this tab made
     const acc = pr.acc, out = NET.out;
     if (out && acc && acc.id === out.id && acc.from === NET.me && p.peer === out.to) {
-      NET.out = null; NET.room.presence({ inv: null }).catch(() => { });
-      if (acc.no) { toast(peerName(p) + ' PASSED', 'Maybe next run.'); if (UI.cur) rerender(); }
-      else { const gb = unpackBuild(pr.b); if (gb) netStartHost(out, p.peer, gb); }
+      NET.out = null; pres({ inv: null });
+      if (acc.no) toast(peerName(p) + ' PASSED', 'Maybe next run.');
+      else if (out.k === 'crew') { NET.crew = NET.crew || { id: rid(), m: [] }; if (!NET.crew.m.includes(p.peer)) NET.crew.m.push(p.peer); pres({ cr: NET.crew }); sfx('uiok'); toast(peerName(p) + ' PULLED UP', 'Your crew follows you. Start a run from any cage gate.'); }
+      else netGo(MODES.find(x => x.id === out.m), out.t, [[p.peer, out.k === 'vs' ? 1 : 0]], out.seed);
+      if (UI.cur) rerender();
+    }
+    // a run this tab was called into
+    const go = pr.go;
+    if (go && !NET.seenGo[go.id] && Array.isArray(go.g) && go.g.some(x => Array.isArray(x) && x[0] === NET.me) && (NET.waitGo === p.peer || NET.inCrew === p.peer) && !MT && !NET.game) {
+      NET.seenGo[go.id] = 1; NET.waitGo = null; if (UI.cur) uiClose(); netStartGuest(go, p);
     }
   }
-  if (NET.out && !netOthers().some(p => p.peer === NET.out.to)) { NET.out = null; NET.room.presence({ inv: null }).catch(() => { }); if (UI.cur) rerender(); }
-  if (UI.cur && UI.cur.live) rerender();
+  if (NET.out && !peerById(NET.out.to)) { NET.out = null; pres({ inv: null }); }
+  // crew bookkeeping: members who left, or left the crew, drop off; members follow their leader around
+  if (NET.crew) {
+    const alive = NET.crew.m.filter(id => { const q = peerById(id); return q && q.presence.in === NET.me; });
+    if (alive.length !== NET.crew.m.length) { NET.crew.m = alive; if (!alive.length) NET.crew = null; pres({ cr: NET.crew }); }
+  }
+  if (NET.inCrew) {
+    const L = crewLead(), listed = L && L.presence.cr && Array.isArray(L.presence.cr.m) && L.presence.cr.m.includes(NET.me);
+    if (!L || (!listed && performance.now() - NET.inSince > 6000)) { NET.inCrew = null; pres({ in: null }); toast('CREW SPLIT', L ? 'You were taken off the crew.' : 'Your crew leader went offline.'); }
+    else if (canAnswer() && !UI.cur && W && (L.presence.w === 'hub' || L.presence.w === 'pit') && W.kind !== L.presence.w) { pullUp(L); toast('FOLLOWING ' + peerName(L)); }
+  }
+  // redraw an open online menu only when something it shows changed (walking around must not eat taps)
+  const sig = JSON.stringify([netOthers().map(p => [p.peer, p.presence.w === 'game', p.presence.w, p.presence.o, p.presence.in, p.presence.b && p.presence.b.n]), NET.crew, NET.inCrew, !!NET.out]);
+  if (sig !== NET.sig) { NET.sig = sig; if (UI.cur && UI.cur.live) rerender(); }
   uiHud();
 }
 // called from the world loop; sends only what changed, a few times a second
@@ -89,10 +135,12 @@ function netPublish(force) {
   if (Object.keys(patch).length) { NET.pubT = now; NET.room.presence(patch).catch(() => { }); }
 }
 function netInvite(peer, m, tierIdx, kind) {
-  if (!NET.room) return; NET.out = { id: Math.random().toString(36).slice(2, 10), to: peer, m: m.id, t: tierIdx, k: kind, seed: Math.floor(Math.random() * 1e9) };
-  NET.room.presence({ inv: NET.out, acc: null }).catch(() => { }); sfx('uiok');
-  const id = NET.out.id; setTimeout(() => { if (NET.out && NET.out.id === id) { NET.out = null; NET.room.presence({ inv: null }).catch(() => { }); toast('NO ANSWER', 'They did not pick up.'); if (UI.cur) rerender(); } }, 30000);
+  if (!NET.room) return; NET.out = { id: rid(), to: peer, m: m ? m.id : '', t: tierIdx | 0, k: kind, seed: Math.floor(Math.random() * 1e9) };
+  pres({ inv: NET.out, acc: null }); sfx('uiok');
+  const id = NET.out.id; setTimeout(() => { if (NET.out && NET.out.id === id) { NET.out = null; pres({ inv: null }); toast('NO ANSWER', 'They did not pick up.'); if (UI.cur) rerender(); } }, 30000);
 }
+function crewKick(peer) { if (!NET.crew) return; NET.crew.m = NET.crew.m.filter(x => x !== peer); if (!NET.crew.m.length) NET.crew = null; pres({ cr: NET.crew }); }
+function crewLeave() { NET.inCrew = null; pres({ in: null }); }
 // other players walking the same place
 function netWorldStep(dt) {
   if (!W) return; netPublish();
@@ -118,46 +166,64 @@ function nameTag(name, sub, H) {
 }
 
 // ---------- a shared game ----------
-// Both sides build the same rosters from the same seed, so only the two humans' builds ever cross the wire.
-function netTeams(m, tier, kind, seed, hostB, guestB) {
+// Every screen rebuilds the same rosters from the same seed, so only the human builds ever cross the wire.
+// Up to the mode's size per team: 2v2 or 3v3, any mix of people and AI.
+function netTeams(m, tier, seed, hostB, guests) {
   return withSeed(seed, () => {
-    const used = new Set([hostB.name, guestB.name]);
-    const ai = o => { const b = aiBuild(clamp(o + rnd(-3, 3), 50, 99)); let k = 0; while (used.has(b.name)) b.name = pick(NPC_NAMES) + (++k > 20 ? k : ''); used.add(b.name); return { b, role: 'ai' }; };
-    const t0 = [{ b: hostB, role: 'host' }], t1 = [];
-    if (kind === 'coop') t0.push({ b: guestB, role: 'guest' }); else t1.push({ b: guestB, role: 'guest' });
+    const used = new Set([hostB.name, ...guests.map(g => g.b.name)]);
+    const ai = o => { const b = aiBuild(clamp(o + rnd(-3, 3), 50, 99)); let k = 0; while (used.has(b.name)) b.name = pick(NPC_NAMES) + (++k > 20 ? k : ''); used.add(b.name); return { b, key: '' }; };
+    const t0 = [{ b: hostB, key: 'host' }], t1 = [];
+    for (const g of guests) { const t = g.team ? t1 : t0; if (t.length < m.size) t.push({ b: g.b, key: g.peer }); }
     while (t0.length < m.size) t0.push(ai(tier.ovr - 2)); while (t1.length < m.size) t1.push(ai(tier.ovr));
     return [t0, t1];
   });
 }
 async function netJoin(id) { try { return await NET.room.join('g-' + id); } catch (e) { return null; } }
-async function netStartHost(inv, guestPeer, guestB) {
-  const m = MODES.find(x => x.id === inv.m), tier = TIERS_COURT[inv.t]; const R = await netJoin(inv.id); if (!R) { toast('COULD NOT CONNECT', 'Try the invite again.'); return; }
-  const teams = netTeams(m, tier, inv.k, inv.seed, myBuild(), guestB);
-  for (const t of teams) for (const sp of t) { if (sp.role === 'host') { sp.ctrl = 0; sp.mine = true; } else if (sp.role === 'guest') { sp.ctrl = 2; sp.ai = Math.max(0.5, tier.ai); } else { sp.ctrl = -1; sp.ai = tier.ai; } }
-  const G = NET.game = { role: 'host', R, guestPeer, inv, q: 0, ev: [], evN: 0, sendT: 0, last: {}, unsub: null };
+// host: announce the run in the lobby, then start it. g = [[peer, team], ...]
+function netGo(m, tierIdx, g, seed) {
+  if (!m || !NET.room) return; const go = { id: rid(), m: m.id, t: tierIdx | 0, s: (seed || Math.floor(Math.random() * 1e9)) >>> 0, g };
+  pres({ go }); netStartHost(go);
+}
+async function netStartHost(go) {
+  const m = MODES.find(x => x.id === go.m), tier = TIERS_COURT[go.t];
+  const guests = go.g.map(([peer, team]) => { const q = peerById(peer), b = q && unpackBuild(q.presence.b); return b ? { peer, team: team ? 1 : 0, b, rin: null, last: {} } : null; }).filter(Boolean);
+  if (!m || !tier || !guests.length) { pres({ go: null }); toast('NOBODY TO RUN WITH', 'They left before the check.'); return; }
+  const R = await netJoin(go.id); if (!R) { pres({ go: null }); toast('COULD NOT CONNECT', 'Try again.'); return; }
+  const teams = netTeams(m, tier, go.s, myBuild(), guests); let slot = 2;
+  for (const t of teams) for (const sp of t) {
+    if (sp.key === 'host') { sp.ctrl = 0; sp.mine = true; }
+    else if (sp.key) { const gg = guests.find(x => x.peer === sp.key); gg.slot = slot; while (IN.length <= slot) IN.push(blankIn()); sp.ctrl = slot++; sp.peer = sp.key; sp.ai = Math.max(0.5, tier.ai); }
+    else { sp.ctrl = -1; sp.ai = tier.ai; }
+  }
+  const G = NET.game = { role: 'host', R, go, guests, q: 0, ev: [], evN: 0, sendT: 0, unsub: null, t0: performance.now() };
   G.unsub = R.onPeers(ch => {
-    const g = ch.peers.find(p => p.peer === guestPeer); if (g && g.presence && g.presence.i) G.rin = g.presence.i;
-    if (ch.left.some(p => p.peer === guestPeer) && MT) { const rp = MT.P.find(p => p.remote); if (rp) { rp.remote = false; rp.user = false; rp.ctrl = -1; MT.humans = MT.P.filter(p => p.user); toast(rp.b.name + ' LEFT', 'The AI took over their player.'); } }
+    for (const gg of guests) { const q = ch.peers.find(p => p.peer === gg.peer); if (q) gg.seen = true; if (q && q.presence && q.presence.i) gg.rin = q.presence.i; }
+    for (const l of ch.left) { const gg = guests.find(x => x.peer === l.peer); if (gg && !gg.gone && MT) { gg.gone = true; const rp = MT.P.find(p => p.peer === gg.peer); if (rp) { rp.remote = false; rp.user = false; rp.ctrl = -1; MT.humans = MT.P.filter(p => p.user); toast(rp.b.name + ' LEFT', 'The AI took over their player.'); } } }
   }, () => { });
+  // anyone who never shows up in the game's room within 8 seconds is played by the AI
+  setTimeout(() => { if (NET.game !== G || !MT) return; for (const gg of guests) if (!gg.seen && !gg.gone) { gg.gone = true; const rp = MT.P.find(p => p.peer === gg.peer); if (rp) { rp.remote = false; rp.user = false; rp.ctrl = -1; MT.humans = MT.P.filter(p => p.user); toast(rp.b.name + " DIDN'T SHOW", 'The AI is playing their player.'); } } }, 8000);
   const boosts = S.boosts.slice(); S.boosts = []; save();
-  const cfg = { mode: m, tier, teams, boosts, ball: S.worn.ball, seed: inv.seed % 8, firstOff: inv.seed % 2, net: 'host' };
+  const cfg = { mode: m, tier, teams, boosts, ball: S.worn.ball, seed: go.s % 8, firstOff: go.s % 2, net: 'host' };
   cfg.onEnd = res => { finishGame(res, m, tier, null, cfg); setTimeout(() => netLeave(G), 6000); };
   uiClose(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud(); netPublish(true);
 }
-async function netStartGuest(inv, hostPeer, hostB, m, tier) {
-  const R = await netJoin(inv.id); if (!R) { toast('COULD NOT CONNECT', 'Ask them to invite you again.'); return; }
-  const teams = netTeams(m, tier, inv.k, inv.seed, hostB, myBuild());
-  for (const t of teams) for (const sp of t) { sp.ctrl = sp.role === 'guest' ? 0 : -1; sp.mine = sp.role === 'guest'; }
-  const G = NET.game = { role: 'guest', R, hostPeer, inv, snap: null, q: -1, evSeen: 0, lastSnapT: performance.now(), out: { a: 0, bc: 0, fc: 0, rc: 0 }, outJ: '', sendT: 0, gs: null, unsub: null, ended: false };
+async function netStartGuest(go, hostP) {
+  const m = MODES.find(x => x.id === go.m), tier = TIERS_COURT[go.t | 0], hb = unpackBuild(hostP.presence.b);
+  const guests = go.g.map(x => { if (!Array.isArray(x)) return null; const [peer, team] = x; const b = peer === NET.me ? unpackBuild(packBuild(myBuild())) : (peerById(peer) && unpackBuild(peerById(peer).presence.b)); return b ? { peer, team: team ? 1 : 0, b } : null; });
+  if (!m || !tier || !hb || guests.some(x => !x)) { toast('COULD NOT LOAD THE RUN', 'Someone in it dropped. Get called again.'); return; }
+  const R = await netJoin(go.id); if (!R) { toast('COULD NOT CONNECT', 'Get called again.'); return; }
+  const teams = netTeams(m, tier, go.s, hb, guests);
+  for (const t of teams) for (const sp of t) { sp.ctrl = sp.key === NET.me ? 0 : -1; sp.mine = sp.key === NET.me; if (sp.key) sp.peer = sp.key === 'host' ? hostP.peer : sp.key; }
+  const G = NET.game = { role: 'guest', R, hostPeer: hostP.peer, go, snap: null, q: -1, evSeen: 0, lastSnapT: performance.now(), out: { a: 0, bc: 0, fc: 0, rc: 0 }, outJ: '', sendT: 0, gs: null, unsub: null, ended: false };
   G.unsub = R.onPeers(ch => {
-    const h = ch.peers.find(p => p.peer === hostPeer); if (h && h.presence && h.presence.s && h.presence.s.q !== G.q) { G.snap = h.presence.s; G.lastSnapT = performance.now(); }
-    if (ch.left.some(p => p.peer === hostPeer)) G.hostLeft = true;
+    const h = ch.peers.find(p => p.peer === hostP.peer); if (h && h.presence && h.presence.s && h.presence.s.q !== G.q) { G.snap = h.presence.s; G.lastSnapT = performance.now(); }
+    if (ch.left.some(p => p.peer === hostP.peer)) G.hostLeft = true;
   }, () => { G.hostLeft = true; });
-  const cfg = { mode: m, tier, teams, boosts: [], ball: hostB.worn.ball, seed: inv.seed % 8, firstOff: inv.seed % 2, net: 'guest' };
+  const cfg = { mode: m, tier, teams, boosts: [], ball: hb.worn.ball, seed: go.s % 8, firstOff: go.s % 2, net: 'guest' };
   cfg.onEnd = res => { finishGame(res, m, tier, null, cfg); netLeave(G); };
   document.body.dataset.state = 'match'; startMatch(cfg); uiHud(); netPublish(true);
 }
-function netLeave(G) { if (!G) return; try { if (G.unsub) G.unsub(); G.R.leave().catch(() => { }); } catch (e) { } if (NET.game === G) NET.game = null; if (NET.room) NET.room.presence({ acc: null, inv: null }).catch(() => { }); netPublish(true); }
+function netLeave(G) { if (!G) return; try { if (G.unsub) G.unsub(); G.R.leave().catch(() => { }); } catch (e) { } if (NET.game === G) NET.game = null; pres({ acc: null, inv: null, go: null }); netPublish(true); }
 
 // host → guest: things that happened (calls, floats, sounds, shot feedback)
 function netEv(e) { const G = NET.game; if (!G || G.role !== 'host') return; e.n = ++G.evN; G.ev.push(e); if (G.ev.length > 6) G.ev.shift(); }
@@ -177,14 +243,20 @@ function netHostStep(dt) {
   if (G.sendT <= 0) { G.sendT = 0.05; G.R.presence({ s: netSnapshot() }).catch(() => { }); }
 }
 function netHostEnd(res) { const G = NET.game; if (!G || G.role !== 'host' || !MT) return; G.R.presence({ s: netSnapshot({ sc: res.score, box: res.box.map(b => ({ n: b.n, team: b.team, s: b.s })) }) }).catch(() => { }); }
-// host: the guest's sticks and buttons become input slot 2
+// host: each guest's sticks and buttons become an input slot (2, 3, …)
 function netPollRemote() {
-  const I = IN[2], G = NET.game, r = G && G.role === 'host' ? G.rin : null, L = G ? G.last : null;
-  I.aP = I.bP = I.relEdge = false; I.flick = null; if (!r) { I.mx = I.my = 0; I.sprint = false; I.rdir = null; I.b = false; return; }
-  I.mx = clamp(+r.mx || 0, -1, 1); I.my = clamp(+r.my || 0, -1, 1); I.sprint = !!r.sp; I.rdir = typeof r.rd === 'string' ? r.rd : null; I.b = !!r.b;
-  if (L.a !== undefined && r.a !== L.a) I.aP = true; if (L.bc !== undefined && r.bc !== L.bc) I.bP = true;
-  if (L.fc !== undefined && r.fc !== L.fc) I.flick = String(r.fd || ''); if (L.rc !== undefined && r.rc !== L.rc) { I.relEdge = true; I.rh = clamp(+r.rh || 0, 0, 3); }
-  L.a = r.a; L.bc = r.bc; L.fc = r.fc; L.rc = r.rc;
+  const G = NET.game; if (!G || G.role !== 'host') return;
+  for (const gg of G.guests) {
+    const I = IN[gg.slot], r = gg.rin, L = gg.last; if (!I) continue; I.aP = I.bP = I.relEdge = false; I.flick = null;
+    // a player who has not touched anything for 6 s is played by the AI until they do (a phone in a pocket must not stall the game)
+    const rj = r ? JSON.stringify(r) : ''; if (rj !== gg.rj) { gg.rj = rj; gg.lastIn = performance.now(); } const idle = performance.now() - (gg.lastIn || G.t0 || 0) > 6000 && !(r && (r.mx || r.my || r.rd || r.b));
+    if (MT) { const pl = gg.pl || (gg.pl = MT.P.find(p => p.peer === gg.peer)); if (pl && pl.afk !== idle) { pl.afk = idle; if (pl.remote) floatTxt(pl, idle ? 'AUTO' : 'BACK', idle ? '#8d8d99' : '#3dffa0'); } }
+    if (!r) { I.mx = I.my = 0; I.sprint = false; I.rdir = null; I.b = false; continue; }
+    I.mx = clamp(+r.mx || 0, -1, 1); I.my = clamp(+r.my || 0, -1, 1); I.sprint = !!r.sp; I.rdir = typeof r.rd === 'string' ? r.rd : null; I.b = !!r.b;
+    if (L.a !== undefined && r.a !== L.a) I.aP = true; if (L.bc !== undefined && r.bc !== L.bc) I.bP = true;
+    if (L.fc !== undefined && r.fc !== L.fc) I.flick = String(r.fd || ''); if (L.rc !== undefined && r.rc !== L.rc) { I.relEdge = true; I.rh = clamp(+r.rh || 0, 0, 3); }
+    L.a = r.a; L.bc = r.bc; L.fc = r.fc; L.rc = r.rc;
+  }
 }
 
 // guest: no simulation here. Send the sticks, draw what the host says.
@@ -222,7 +294,7 @@ function netGuestStep(dt) {
       if (!e || e.n <= G.evSeen) continue; G.evSeen = e.n;
       if (e.k === 'c') hudCall(String(e.b || ''), String(e.s || ''), cssCol(e.c), +e.d || 1.2);
       else if (e.k === 'f') { const p = M_.P[e.i]; if (p) hudFloat(p, String(e.t || ''), cssCol(e.c)); }
-      else if (e.k === 'fb') hudFb(String(e.t || ''), cssCol(e.c));
+      else if (e.k === 'fb') { if (!e.to || e.to === NET.me) hudFb(String(e.t || ''), cssCol(e.c)); }
       else if (e.k === 's') { sfx(String(e.s2 || '')); if (e.s2 === 'dunk') { M_.shake = 0.45; burst(0, 3, 0, 0xffc531, 14); for (const f of M_.fans) f.hype = 1.6; M_.netT = 0.35; } if (e.s2 === 'swish' || e.s2 === 'green') { M_.netT = 0.35; for (const f of M_.fans) f.hype = 1.4; } }
     }
     if (s.end && !G.ended) { G.ended = true; G.end = s.end; G.endT = 2.4; }

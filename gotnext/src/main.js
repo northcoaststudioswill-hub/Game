@@ -119,15 +119,22 @@ function frame(now) {
   if (uiBusy()) uiStep(dt);
   if (MT) { if (!UI.cur && (IN[0].start || IN[1].start)) uiPause(); else matchStep(dt); }
   else if (W) { worldStep(dt); netWorldStep(dt); }
-  else if (ST) studioStep(dt);
+  else if (ST && !ST.frozen) studioStep(dt);
   if (scene) renderer.render(scene, camera);
 }
 function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo };
   window.__step = dt => { if (MT) matchStep(dt); };
+  // test hook: draw the player in one pose and hand back the frame
+  window.__poseShot = (an, t, o) => {
+    if (!ST || !ST.frozen) { uiClose(); $('title').style.display = 'none'; studioScene(); studioRig(myBuild()); ST.frozen = true; }
+    const R = ST.rig; for (let k = 0; k < 40; k++) applyPose(R, poseOf(an, t, Object.assign({ leg: R.legLen }, o)), 0.05);
+    R.root.rotation.y = o.ry === undefined ? -1.15 : o.ry; R.root.position.y = (o.y || 0);
+    camera.position.set(0, 1.15, 3.1); camera.lookAt(0, 1.0, 0); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png');
+  };
   requestAnimationFrame(frame);
 }
 // signs are drawn with the brand face, so wait for it (briefly) before building the first scene

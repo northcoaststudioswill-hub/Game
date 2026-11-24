@@ -6,7 +6,7 @@ Every number below lives in `src/data.js` (tables) or `src/ball.js` (formulas) a
 ## 1. The loop
 
 ```
-build a player → walk The Block → take a game in The Pit → VC + Respect + badge XP
+build a player → walk The Block → take a game in The Cages → VC + Respect + badge XP
       ↑                                                              ↓
   crib buffs ← crib upgrades ← shops (drip, animations, attributes, badges, boosts)
 ```
@@ -130,7 +130,7 @@ Ideas that fit the same tables without new systems:
 - **Crib as a place:** invite a rival for a home game with a home-court bonus; a trophy case you can walk past;
   furniture from fiends.
 - **Fiends with arcs:** each one's Basketball 2146 build gets better the more you give, and one day one of them shows
-  up in The Pit as an opponent with the player you paid for.
+  up in The Cages as an opponent with the player you paid for.
 - **Drip sets:** wear three pieces of a set for a named bonus.
 - **Real animation:** keyframed dribble moves and dunks on the same joints (the rig is already a joint tree with drip
   attached to the bones, which is what makes new clothes cheap to add).
