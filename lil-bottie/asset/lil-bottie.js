@@ -3,8 +3,10 @@
 
    const b = LilBottie.build(THREE);      // b.group is a THREE.Group, about 1.5 units tall (feet at y=0)
    scene.add(b.group); b.group.scale.setScalar(2.2);   // 2.2 is the size the game uses for people
-   b.setFace('smile');                    // smile, talk1, talk2, wink, hype, dead, btv
-   b.setMouth(0..1);                      // lip sync: 0 closed smile, 1 wide open
+   b.setFace('smug');                     // a preset (smile, angry, sad, shock, love, money, smug …) or an icon (npc, heart, bars, crown …)
+   b.setExpression('angry', 'grin');      // eyes and mouth separately
+   b.setIcon('npc');                      // fill the screen with an icon; setExpression clears it
+   b.setMouth(0..1);                      // lip sync on top of the expression: 0 resting mouth, 1 wide open
    b.setPose('idle');                     // idle, walk, dance, rap, shake, point, thumbs, arms, chain, wave, sit
    b.update(time, dt, songSeconds);       // call every frame; songSeconds (optional) locks the moves to the beat
 
@@ -114,7 +116,12 @@
       }
       var th = new THREE.Group(); th.position.set(s * .058, -.05, .012); th.scale.setScalar(1.25); hg.add(th); th.add(new THREE.Mesh(tA, chromeM));
       var th2 = new THREE.Group(); th2.position.y = -.05; th.add(th2); th2.add(new THREE.Mesh(tB, chromeM));
-      arms.push({ sh: sh, el: el, hand: hg, fingers: fingers, thumb: th, thumb2: th2, s: s });
+      var phone = null;
+      if (s > 0) { phone = new THREE.Group(); phone.position.set(0, -.1, .05); phone.visible = false; hg.add(phone);   // his phone, in his left hand
+        phone.add(new THREE.Mesh(bake([P(Box(.1, .19, .016), 0x0c0c10, M(0, 0, 0)), P(Box(.03, .03, .004), CHROME2, M(-.025, .065, -.01))]), chromeM));
+        var ps = new THREE.Mesh(new THREE.PlaneGeometry(.088, .172), new THREE.MeshBasicMaterial({ color: 0x4fb4ff, fog: false })); ps.position.z = .0086; phone.add(ps); }
+      el.rotation.order = 'YXZ';
+      arms.push({ sh: sh, el: el, hand: hg, fingers: fingers, thumb: th, thumb2: th2, phone: phone, s: s });
     });
 
     // ---- neck: ribbed chrome
@@ -163,30 +170,56 @@
     LOB.forEach(function (o, n) { for (var d = 0; d < 6; d++) { var da = d / 6 * TAU + n; K.push(P(Sph(.011, 4, 3), d % 2 ? 0xffffff : 0xb8c0d0, M(o[0] + Math.sin(da) * .03, o[1] + Math.cos(da) * .03, .026))); } });
     pendant.add(new THREE.Mesh(bake(K), iceM));
 
-    // ---- the LED face: a 20 x 14 dot matrix, drawn to a canvas
-    var FACES = {
-      smile: ['....................', '....................', '....................', '....##.......##.....', '...#..#.....#..#....', '..#....#...#....#...', '....................', '....................', '.....#........#.....', '......#......#......', '.......######.......', '....................', '....................', '....................'],
-      talk1: ['....................', '....................', '....................', '....##.......##.....', '...#..#.....#..#....', '..#....#...#....#...', '....................', '....................', '......########......', '......#......#......', '.......######.......', '....................', '....................', '....................'],
-      talk2: ['....................', '....................', '....................', '....##.......##.....', '...#..#.....#..#....', '..#....#...#....#...', '....................', '.......######.......', '......#......#......', '......#......#......', '......#......#......', '.......######.......', '....................', '....................'],
-      wink: ['....................', '....................', '....................', '....##..............', '...#..#.............', '..#....#...######...', '....................', '....................', '.....#........#.....', '......#......#......', '.......######.......', '....................', '....................', '....................'],
-      hype: ['....................', '....................', '..#....#...#....#...', '...#..#.....#..#....', '....##.......##.....', '....................', '....................', '.....##########.....', '.....#........#.....', '......#......#......', '.......######.......', '....................', '....................', '....................'],
-      dead: ['....................', '....................', '..#...#.....#...#...', '...#.#.......#.#....', '....#.........#.....', '...#.#.......#.#....', '..#...#.....#...#...', '....................', '....................', '......########......', '....................', '....................', '....................', '....................'],
-      btv: ['....................', '....................', '....................', '.###..#####.#...#...', '.#..#...#...#...#...', '.#..#...#...#...#...', '.###....#...#...#...', '.#..#...#....#.#....', '.#..#...#....#.#....', '.###....#.....#.....', '....................', '....................', '....................', '....................']
+    // ---- the LED face: a 20 x 14 dot matrix. Eyes and mouth are separate, so he can hold an expression and
+    //      lip-sync at the same time. An icon takes the whole screen until it is cleared.
+    var EYES = {   // each is the left eye, 6 dots wide; the right eye is its mirror unless r is given
+      happy: { l: ['..##..', '.#..#.', '#....#'] }, open: { l: ['.####.', '#.##.#', '#.##.#', '.####.'] }, wide: { l: ['.####.', '#....#', '#.##.#', '#....#', '.####.'] },
+      angry: { l: ['##....', '..##..', '....##', '..##..', '..##..'] }, sad: { l: ['....##', '..##..', '##....', '..##..', '..##..'] },
+      side: { l: ['.####.', '#...##', '#...##', '.####.'], r: ['.####.', '#...##', '#...##', '.####.'] }, sleepy: { l: ['......', '######', '.####.'] }, closed: { l: ['######'] },
+      heart: { l: ['.#.#..', '#####.', '#####.', '.###..', '..#...'], r: ['.#.#..', '#####.', '#####.', '.###..', '..#...'] }, dollar: { l: ['.####.', '#.#...', '.###..', '..#.#.', '####..', '..#...'], r: ['.####.', '#.#...', '.###..', '..#.#.', '####..', '..#...'] },
+      spiral: { l: ['#####.', '....#.', '.##.#.', '.#..#.', '.####.'] }, x: { l: ['#...#.', '.#.#..', '..#...', '.#.#..', '#...#.'], r: ['#...#.', '.#.#..', '..#...', '.#.#..', '#...#.'] },
+      dot: { l: ['..##..', '..##..'] }, hype: { l: ['#....#', '.#..#.', '..##..'] }, wink: { l: ['..##..', '.#..#.', '#....#'], r: ['######'] }
     };
-    var faceName = '';
-    function setFace(name) {
-      if (!FACES[name] || name === faceName) return; faceName = name;
-      var g = faceCv.getContext('2d'), rows = FACES[name], cw = 160 / 20, ch = 112 / 14;
-      g.fillStyle = '#04050a'; g.fillRect(0, 0, 160, 112);
-      for (var yy = 0; yy < 14; yy++) for (var xx = 0; xx < 20; xx++) {
-        var on = rows[yy][xx] === '#', px = xx * cw + cw / 2, py = yy * ch + ch / 2;
+    var MOUTHS = {   // [row, 20 dots]
+      smile: [[8, '.....#........#.....'], [9, '......#......#......'], [10, '.......######.......']], frown: [[9, '.......######.......'], [10, '......#......#......'], [11, '.....#........#.....']],
+      flat: [[10, '......########......']], grin: [[8, '....############....'], [9, '....#..#..#..#.#....'], [10, '.....##########.....']], smirk: [[8, '..............#.....'], [9, '.............#......'], [10, '......#######.......']],
+      o: [[8, '........####........'], [9, '.......#....#.......'], [10, '.......#....#.......'], [11, '........####........']],
+      open1: [[8, '......########......'], [9, '......#......#......'], [10, '.......######.......']], open2: [[7, '.......######.......'], [8, '......#......#......'], [9, '......#......#......'], [10, '......#......#......'], [11, '.......######.......']]
+    };
+    var FONT = { N: ['#...#', '##..#', '#.#.#', '#.#.#', '#..##', '#...#', '#...#'], P: ['####.', '#...#', '#...#', '####.', '#....', '#....', '#....'], C: ['.####', '#....', '#....', '#....', '#....', '#....', '.####'], B: ['####.', '#...#', '#...#', '####.', '#...#', '#...#', '####.'],
+      T: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '..#..'], V: ['#...#', '#...#', '#...#', '#...#', '#...#', '.#.#.', '..#..'], '?': ['.###.', '#...#', '....#', '...#.', '..#..', '.....', '..#..'], '$': ['..#..', '.####', '#.#..', '.###.', '..#.#', '####.', '..#..'],
+      '6': ['.###.', '#....', '#....', '####.', '#...#', '#...#', '.###.'], '7': ['#####', '....#', '...#.', '..#..', '..#..', '..#..', '..#..'], '1': ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'], '!': ['..#..', '..#..', '..#..', '..#..', '..#..', '.....', '..#..'] };
+    var ICONS = { btv: { text: 'BTV' }, npc: { text: 'NPC' }, what: { text: '?' }, cash: { text: '$$$' }, six7: { text: '67' }, one: { text: '1' }, bang: { text: '!!!' },
+      heart: { rows: [[2, '....###......###....'], [3, '...#####....#####...'], [4, '..################..'], [5, '..################..'], [6, '...##############...'], [7, '....############....'], [8, '.....##########.....'], [9, '......########......'], [10, '.......######.......'], [11, '........####........'], [12, '.........##.........']] },
+      bars: { rows: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (r) { return [r, '.##..##..##..##..##.']; }) },
+      lock: { rows: [[1, '.......######.......'], [2, '......#......#......'], [3, '......#......#......'], [4, '......#......#......'], [5, '....############....'], [6, '....############....'], [7, '....#####..#####....'], [8, '....#####..#####....'], [9, '....############....'], [10, '....############....'], [11, '....############....']] },
+      bell: { rows: [[1, '.........##.........'], [2, '........####........'], [3, '.......######.......'], [4, '......########......'], [5, '......########......'], [6, '......########......'], [7, '.....##########.....'], [8, '....############....'], [9, '...##############...'], [11, '.........##.........']] },
+      crown: { rows: [[3, '...#.....##.....#...'], [4, '...##...####...##...'], [5, '...###.######.###...'], [6, '...##############...'], [7, '...##############...'], [8, '...##############...'], [10, '...##############...']] },
+      skull: { rows: [[1, '......########......'], [2, '.....##########.....'], [3, '....############....'], [4, '....##..####..##....'], [5, '....##..####..##....'], [6, '....############....'], [7, '.....####..####.....'], [8, '......########......'], [9, '......#.#..#.#......'], [10, '......#.#..#.#......']] },
+      scroll: { rows: [[1, '....#..........#....'], [2, '.....#........#.....'], [3, '......#......#......'], [4, '.......#....#.......'], [5, '........#..#........'], [6, '.........##.........'], [7, '....#..........#....'], [8, '.....#........#.....'], [9, '......#......#......'], [10, '.......#....#.......'], [11, '........#..#........'], [12, '.........##.........']] },
+      battery: { rows: [[4, '..###############...'], [5, '..#.............##..'], [6, '..#.#####.......##..'], [7, '..#.#####.......##..'], [8, '..#.#####.......##..'], [9, '..#.............##..'], [10, '..###############...']] },
+      off: { rows: [] } };
+    var PRESET = { smile: ['happy', 'smile'], talk1: ['happy', 'open1'], talk2: ['happy', 'open2'], wink: ['wink', 'smile'], hype: ['hype', 'grin'], dead: ['x', 'flat'], angry: ['angry', 'frown'], mad: ['angry', 'grin'], sad: ['sad', 'frown'], shock: ['wide', 'o'], love: ['heart', 'grin'],
+      money: ['dollar', 'grin'], sleepy: ['sleepy', 'flat'], hypno: ['spiral', 'flat'], smug: ['side', 'smirk'], blank: ['dot', 'flat'], laugh: ['hype', 'open2'], stare: ['open', 'flat'] };
+    var fx = { eyes: 'happy', mouth: 'smile', icon: null, lip: 0, key: '' };
+    function drawFace() {
+      var lipM = fx.lip > .62 ? 'open2' : fx.lip > .25 ? 'open1' : fx.mouth, key = fx.icon ? 'i' + fx.icon : fx.eyes + '|' + lipM; if (key === fx.key) return; fx.key = key;
+      var G = []; for (var r0 = 0; r0 < 14; r0++) G.push('....................'.split(''));
+      function put(rows, x, y) { for (var r = 0; r < rows.length; r++) for (var c = 0; c < rows[r].length; c++) if (rows[r][c] === '#' && G[y + r] && x + c >= 0 && x + c < 20) G[y + r][x + c] = '#'; }
+      if (fx.icon) { var I = ICONS[fx.icon]; if (I.text) { var w = I.text.length * 6 - 1, x0 = Math.round((20 - w) / 2); for (var ci = 0; ci < I.text.length; ci++) put(FONT[I.text[ci]] || [], x0 + ci * 6, 3); } else I.rows.forEach(function (q) { put([q[1]], 0, q[0]); }); }
+      else { var E = EYES[fx.eyes] || EYES.happy, lft = E.l, rgt = E.r || E.l.map(function (row) { return row.split('').reverse().join(''); }), top = 5 - Math.ceil(lft.length / 2);
+        put(lft, 2, Math.max(1, top)); put(rgt, 12, Math.max(1, 5 - Math.ceil(rgt.length / 2))); (MOUTHS[lipM] || MOUTHS.smile).forEach(function (q) { put([q[1]], 0, q[0]); }); }
+      var g = faceCv.getContext('2d'), cw = 160 / 20, chh = 112 / 14; g.fillStyle = '#04050a'; g.fillRect(0, 0, 160, 112);
+      for (var yy = 0; yy < 14; yy++) for (var xx = 0; xx < 20; xx++) { var on = G[yy][xx] === '#', px = xx * cw + cw / 2, py = yy * chh + chh / 2;
         g.fillStyle = on ? '#4fb4ff' : '#0a0e1a'; g.beginPath(); g.arc(px, py, on ? 3.7 : 1.2, 0, TAU); g.fill();
-        if (on) { g.fillStyle = 'rgba(80,170,255,.34)'; g.beginPath(); g.arc(px, py, 7, 0, TAU); g.fill(); g.fillStyle = '#e6f6ff'; g.beginPath(); g.arc(px, py, 1.7, 0, TAU); g.fill(); }
-      }
+        if (on) { g.fillStyle = 'rgba(80,170,255,.34)'; g.beginPath(); g.arc(px, py, 7, 0, TAU); g.fill(); g.fillStyle = '#e6f6ff'; g.beginPath(); g.arc(px, py, 1.7, 0, TAU); g.fill(); } }
       faceTx.needsUpdate = true;
     }
-    function setMouth(v) { setFace(v > .62 ? 'talk2' : v > .25 ? 'talk1' : 'smile'); }
-    setFace('smile');
+    function setExpression(eyes, mouth) { if (EYES[eyes]) fx.eyes = eyes; if (MOUTHS[mouth]) fx.mouth = mouth; fx.icon = null; drawFace(); }
+    function setIcon(name) { fx.icon = ICONS[name] ? name : null; drawFace(); }
+    function setFace(name) { if (PRESET[name]) { fx.lip = 0; setExpression(PRESET[name][0], PRESET[name][1]); } else if (ICONS[name]) setIcon(name); }
+    function setMouth(v) { fx.lip = v; drawFace(); }
+    drawFace();
 
     // ---- poses and motion. Every joint is a spring chasing a target, so moves overshoot a little and settle.
     var pose = 'idle', bpm = 137.2, st = {};
@@ -200,8 +233,8 @@
       return q.x;
     }
     // hand shapes: curl of index, middle, ring, pinky, thumb (0 straight, 1 closed; thumb below 0 sticks out), then finger spread
-    var HANDS = { open: [0, 0, 0, 0, 0, .2], relax: [.22, .28, .34, .4, .25, .05], fist: [1, 1, 1, 1, .9, 0], point: [0, 1, 1, 1, .9, 0], thumb: [1, 1, 1, 1, -.55, 0], peace: [0, 0, 1, 1, .9, .45], grip: [.6, .6, .62, .66, .3, 0], spread: [0, 0, 0, 0, -.25, .6], horns: [0, 1, 1, 0, .9, .25] };
-    function A(o) { var r = { sx: .05, out: .13, tw: 0, ex: -.2, wx: 0, wy: 1.2, wz: 0, hand: 'relax' }; for (var k in o) r[k] = o[k]; return r; }
+    var HANDS = { open: [0, 0, 0, 0, 0, .2], relax: [.22, .28, .34, .4, .25, .05], fist: [1, 1, 1, 1, .9, 0], point: [0, 1, 1, 1, .9, 0], thumb: [1, 1, 1, 1, -.55, 0], peace: [0, 0, 1, 1, .9, .45], grip: [.6, .6, .62, .66, .3, 0], spread: [0, 0, 0, 0, -.25, .6], horns: [0, 1, 1, 0, .9, .25], L: [0, 1, 1, 1, -.55, 0], three: [0, 0, 0, 1, .9, .3] };
+    function A(o) { var r = { sx: .05, out: .13, tw: 0, ex: -.2, roll: 0, wx: 0, wy: 1.2, wz: 0, hand: 'relax' }; for (var k in o) r[k] = o[k]; return r; }
     function L0() { return { h: -.05, o: .03, k: .1, f: -.05 }; }   // knees never lock straight
     function frac(x) { return ((x % 1) + 1) % 1; }
     function crouch(g, c) { g.ll.h -= c; g.rl.h -= c; g.ll.k += 2 * c; g.rl.k += 2 * c; g.ll.f -= c; g.rl.f -= c; g.by -= .455 * (1 - Math.cos(c)); }
@@ -226,11 +259,57 @@
         g.pz = v === 2 ? 1 : 0; var tw = .28 + sway * .1;
         if (mir) { g.L = act; g.R = off; g.bry = tw; g.ty = -.12; g.hy = -.2; } else { g.R = act; g.L = off; g.bry = -tw; g.ty = .12; g.hy = .2; } },
       point: function (g, t) { var j = Math.sin(t * 3) * .03; crouch(g, .05); g.tx = .12; g.bry = .22; g.ty = .12; g.hy = -.2; g.hx = .04; g.ll.h -= .22; g.ll.f += .12; g.rl.h += .12;
-        g.L = A({ sx: -1.5 + j, out: .12, ex: -.08, wy: 1.57, hand: 'point' }); g.R = A({ sx: .25, out: .5, ex: -1.25, wy: 1.57, wx: .3, hand: 'fist' }); },
+        g.L = A({ sx: -1.5 + j, out: .12, ex: -.08, wy: 1.57, hand: 'point' }); g.R = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
       shake: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)), sd = Math.sin(bt * Math.PI), bar = Math.floor(bt / 8) % 2;   // head side to side on the beat (or a headbang, every other bar): this is the one that throws the dreads
         crouch(g, .14 + .14 * b); g.ll.o = .12; g.rl.o = .12; g.tx = .1 + b * .06;
         if (!bar) { g.hy = sd * .8; g.hz = sd * .18; g.hx = .1; g.ty = sd * .18; g.brz = sd * .04; } else { g.hx = -.25 + b * .75; g.tx = .05 + b * .2; g.hy = sd * .12; }
         g.L = A({ sx: -.5, out: .3, ex: -1.35 + b * .35, wy: 1.4, hand: 'fist' }); g.R = A({ sx: -.5, out: .3, ex: -1.35 + b * .35, wy: 1.4, hand: bar ? 'horns' : 'fist' }); },
+      // ---- poses written for lines of The Algorithm
+      scroll: function (g, t) { var f = frac(t * 2.2); g.phone = true; g.tx = .16; g.hx = .38; g.hz = Math.sin(t * .7) * .04; crouch(g, .04);
+        g.L = A({ sx: -.75, out: .12, tw: -.5, ex: -1.5, wy: .3, hand: 'grip', thumb: .1 }); g.R = A({ sx: -.8, out: .05, tw: -.95, ex: -1.5 + f * .22, wy: 1.2, wx: .4 - f * .5, hand: 'point' }); },
+      phone: function (g, t) { g.phone = true; g.tx = .08; g.bry = -.15; g.hy = .12; g.hz = .08; crouch(g, .05);
+        g.L = A({ sx: -1.15 + Math.sin(t * 3) * .04, out: .2, ex: -1.6, wy: 3.14, hand: 'grip', thumb: .1 }); g.R = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      loser: function (g, t) { var w = Math.sin(t * 6) * .06; g.hz = -.14; g.hy = .1; g.tz = .04; g.brz = -.03;
+        g.R = A({ sx: -1.9, out: .1, tw: -.9, ex: -1.3 + w, wy: 3.14, hand: 'L' }); g.L = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      think: function (g, t) { var tap = Math.max(0, Math.sin(t * 9)) * .12; g.hz = .12; g.hy = -.1; g.hx = -.05;
+        g.L = A({ sx: -1.75, out: .4, tw: -.35, ex: -1.65 + tap, wy: 1.57, hand: 'point' }); g.R = A({ sx: .05, ex: -.3 }); },
+      me: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)); crouch(g, .05 + b * .05); g.tx = -.08; g.hx = -.1 + b * .1; g.ll.o = .1; g.rl.o = .1;
+        g.L = A({ sx: -.55, out: .5, tw: -1.25, ex: -1.5 + b * .2, wy: -.3, hand: 'thumb' }); g.R = A({ sx: -.55, out: .5, tw: -1.25, ex: -1.5 + b * .2, wy: -.3, hand: 'thumb' }); },
+      prison: function (g, t) { var r = Math.sin(t * 11) * .05; g.tx = .12; g.hx = .05; g.hy = Math.sin(t * 3) * .12; crouch(g, .08); g.ll.o = .1; g.rl.o = .1;
+        g.L = A({ sx: -1.5 + r, out: .22, ex: -1.25, wy: 3.14, hand: 'fist' }); g.R = A({ sx: -1.5 - r, out: .22, ex: -1.25, wy: 3.14, hand: 'fist' }); },
+      npc: function (g, t, bt) { var ph = bt * Math.PI, sn = Math.sin(ph), cs = Math.cos(ph); g.ll.h = sn * .32; g.ll.k = Math.max(0, -cs) * .5 + .05; g.rl.h = -sn * .32; g.rl.k = Math.max(0, cs) * .5 + .05; g.brz = sn * .07; g.hz = .28; g.hx = .12; g.tx = .06;
+        g.L = A({ sx: -1.35 + sn * .06, out: .08, ex: -.12, wy: 1.57, wx: .5, hand: 'relax' }); g.R = A({ sx: -1.35 - sn * .06, out: .08, ex: -.12, wy: 1.57, wx: .5, hand: 'relax' }); },
+      nope: function (g, t) { var w = Math.sin(t * 8); g.hy = w * .3; g.hz = .05; g.tx = -.04;
+        g.R = A({ sx: -1.2, out: .2, ex: -1.6, wy: 3.14, wz: w * .5, hand: 'point' }); g.L = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      watch: function (g, t) { g.hx = .32; g.hy = .3; g.tx = .08; g.hz = .05;
+        g.R = A({ sx: -.7, out: .35, tw: -1.3, ex: -1.45, wy: 1.57, hand: 'fist' }); g.L = A({ sx: -.6, out: .2, tw: -1.2, ex: -1.5 + Math.max(0, Math.sin(t * 7)) * .12, wy: 1.2, hand: 'point' }); },
+      flex: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)); g.tx = -.12; g.hx = -.15; g.ll.o = .15; g.rl.o = .15; crouch(g, .06);
+        g.L = A({ sx: 0, out: 1.5, ex: -1.9 - b * .25, roll: 1.57, wy: 1.57, hand: 'fist' }); g.R = A({ sx: 0, out: 1.5, ex: -1.9 - b * .25, roll: 1.57, wy: 1.57, hand: 'fist' }); },
+      write: function (g, t) { var w = Math.sin(t * 13); g.tx = .14; g.hx = .3; g.hy = -.1;
+        g.L = A({ sx: -.55, out: .35, tw: -1.0, ex: -1.3, wy: -.4, hand: 'open' }); g.R = A({ sx: -.65, out: .3, tw: -1.1, ex: -1.35 + w * .05, wy: 1.2, wz: w * .3, hand: 'point' }); },
+      eat: function (g, t) { var u = .5 + .5 * Math.sin(t * 6); g.hx = .1 - u * .12; g.tx = .08; g.hz = .06;
+        g.R = A({ sx: -1.0 - u * .5, out: .25, tw: -.9, ex: -1.7 - u * .4, wy: 1.2, hand: 'grip' }); g.L = A({ sx: -.5, out: .3, tw: -1.0, ex: -1.3, wy: -.4, hand: 'open' }); },
+      harvest: function (g, t, bt) { var u = Math.sin(bt * Math.PI); g.tx = .2 - Math.abs(u) * .1; g.ty = u * .2; crouch(g, .14); g.ll.o = .14; g.rl.o = .14; g.hx = .1;
+        g.L = A({ sx: -1.0 - u * .4, out: .15, ex: -.9 + u * .6, wy: 1.57, hand: 'fist' }); g.R = A({ sx: -1.0 + u * .4, out: .15, ex: -.9 - u * .6, wy: 1.57, hand: 'fist' }); },
+      money: function (g, t) { var f = frac(t * 3.5); g.tx = -.05; g.hz = -.08; g.bry = .12;
+        g.L = A({ sx: -.75, out: .2, tw: -.6, ex: -1.4, wy: -.3, hand: 'open' }); g.R = A({ sx: -.85, out: .25, tw: -.8, ex: -1.3 - f * .25, wy: 1.57, wz: -f * .9, hand: f < .5 ? 'grip' : 'spread' }); },
+      one: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)); g.hx = -.2; g.tx = -.08; g.brz = .03; crouch(g, .04 + b * .05);
+        g.R = A({ sx: -.15, out: 2.75 + b * .1, ex: -.15, wy: 0, hand: 'point' }); g.L = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      pray: function (g, t) { g.hx = .3; g.tx = .12; g.by += Math.sin(t * 2) * .006;
+        g.L = A({ sx: -.6, out: .5, tw: -1.3, ex: -1.5, wy: 1.57, hand: 'open' }); g.R = A({ sx: -.6, out: .5, tw: -1.3, ex: -1.5, wy: 1.57, hand: 'open' }); },
+      boss: function (g, t) { g.tx = -.1; g.hx = -.16; g.hy = Math.sin(t * .8) * .15; g.ll.o = .17; g.rl.o = .17; g.by += Math.sin(t * 2) * .006;
+        g.L = A({ sx: .15, out: .8, ex: -1.95, roll: -1.57, wy: 1.57, hand: 'fist' }); g.R = A({ sx: .15, out: .8, ex: -1.95, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      stop: function (g, t) { g.tx = -.08; g.bry = .12; g.hx = -.05; g.ll.h -= .15; g.rl.h += .1;
+        g.R = A({ sx: -1.2, out: .15, ex: -1.7, wy: 3.14, hand: 'spread' }); g.L = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      run: function (g, t, bt) { var ph = bt * Math.PI * 2, sn = Math.sin(ph), cs = Math.cos(ph); g.tx = .3; g.hx = -.15;
+        g.ll.h = sn * .9 - .2; g.ll.k = Math.max(0, -cs) * 1.3 + .2; g.rl.h = -sn * .9 - .2; g.rl.k = Math.max(0, cs) * 1.3 + .2; g.by = Math.abs(cs) * .05 - .04; g.ty = -sn * .2;
+        g.L = A({ sx: -sn * .9, out: .2, ex: -1.5, hand: 'fist' }); g.R = A({ sx: sn * .9, out: .2, ex: -1.5, hand: 'fist' }); },
+      lead: function (g, t, bt) { var ph = bt * Math.PI, sn = Math.sin(ph), cs = Math.cos(ph), b = Math.exp(-5 * frac(bt)); g.ll.h = sn * .35; g.ll.k = Math.max(0, -cs) * .6 + .05; g.rl.h = -sn * .35; g.rl.k = Math.max(0, cs) * .6 + .05; g.hx = -.12; g.brz = sn * .04;
+        g.R = A({ sx: -1.5 + b * .5, out: .55, ex: -.9 + b * .5, wy: 1.57, hand: 'point' }); g.L = A({ sx: -sn * .4, out: .2, ex: -.6, hand: 'fist' }); },
+      mad: function (g, t, bt) { var b = Math.exp(-6 * frac(bt * 2)), w = Math.sin(t * 16); crouch(g, .1 + b * .16); g.tx = .16; g.hx = .12; g.hy = w * .12; g.ll.o = .14; g.rl.o = .14;
+        g.L = A({ sx: .1, out: .5, ex: -1.1 - b * .5, wy: 1.57, hand: 'fist' }); g.R = A({ sx: .1, out: .5, ex: -1.1 - b * .5, wy: 1.57, hand: 'fist' }); },
+      shrug: function (g, t) { var u = .5 + .5 * Math.sin(t * 2.5); g.hz = .16; g.hx = -.05; g.by += u * .012;
+        g.L = A({ sx: -.3, out: .6 + u * .1, ex: -1.6, roll: .9, wy: -.6, hand: 'open' }); g.R = A({ sx: -.3, out: .6 + u * .1, ex: -1.6, roll: .9, wy: -.6, hand: 'open' }); },
       thumbs: function (g, t) { var j = Math.sin(t * 4) * .05; g.hz = .12; g.hy = -.1; g.tz = -.03; g.brz = .02; g.ll.o = .06; g.rl.o = .06;
         g.L = A({ sx: -.95, out: .22, ex: -.95 + j, wy: 1.57, wz: -.1, hand: 'thumb' }); g.R = A({ sx: .05, ex: -.25 }); },
       arms: function (g, t) { var w = Math.sin(t * 1.4); g.tx = -.2; g.hx = -.32; g.by += w * .012; g.ll.o = .16; g.rl.o = .16; g.brz = w * .015;
@@ -277,18 +356,18 @@
         D.tip.position.copy(D.pts[4]); } }
     function update(t, dt, beatSeconds) {
       dt = dt === undefined ? 1 / 60 : dt; var bt = (beatSeconds === undefined ? t : beatSeconds) * bpm / 60;
-      var g = { L: A(), R: A(), ll: L0(), rl: L0(), by: 0, bry: 0, brz: 0, tx: 0, ty: 0, tz: 0, hx: 0, hy: 0, hz: 0, pz: 0 };
+      var g = { L: A(), R: A(), ll: L0(), rl: L0(), phone: false, by: 0, bry: 0, brz: 0, tx: 0, ty: 0, tz: 0, hx: 0, hy: 0, hz: 0, pz: 0 };
       (POSES[pose] || POSES.idle)(g, t, bt);
       var by = ch('by', g.by, dt, 220, 24), bry = ch('bry', g.bry, dt), brz = ch('brz', g.brz, dt), tx = ch('tx', g.tx, dt), ty = ch('ty', g.ty, dt), tz = ch('tz', g.tz, dt);
       var hx = ch('hx', g.hx, dt, 130, 15), hy = ch('hy', g.hy, dt, 110, 15), hz = ch('hz', g.hz, dt, 110, 15);
       body.position.y = by; body.rotation.set(0, bry, brz); torso.rotation.set(tx, ty, tz); head.rotation.set(hx, hy, hz);
       [['R', arms[0], g.R], ['L', arms[1], g.L]].forEach(function (q) { var n = q[0], a = q[1], o = q[2], s = a.s, H = HANDS[o.hand] || HANDS.relax;
-        a.sh.rotation.set(ch(n + 'sx', o.sx, dt), s * ch(n + 'tw', o.tw, dt), s * ch(n + 'out', o.out, dt)); a.el.rotation.x = ch(n + 'ex', o.ex, dt, 170, 18);
+        a.sh.rotation.set(ch(n + 'sx', o.sx, dt), s * ch(n + 'tw', o.tw, dt), s * ch(n + 'out', o.out, dt)); a.el.rotation.x = ch(n + 'ex', o.ex, dt, 170, 18); a.el.rotation.y = s * ch(n + 'roll', o.roll, dt); if (a.phone) a.phone.visible = !!g.phone;
         a.hand.rotation.set(ch(n + 'wx', o.wx, dt, 190, 17), -s * ch(n + 'wy', o.wy, dt), s * ch(n + 'wz', o.wz, dt, 190, 17));
         var sp = ch(n + 'sp', H[5], dt, 200, 22);
         a.fingers.forEach(function (fg) { var c = ch(n + 'f' + fg.f, H[fg.f] + Math.sin(t * 1.7 + fg.f * 1.3 + s) * .03, dt, 240 - fg.f * 22, 23);   // the pinky lags the index
           fg.a.rotation.set(-c * 1.4, 0, s * (1.5 - fg.f) * sp * .22); fg.b.rotation.x = -c * 1.5; });
-        var tc = ch(n + 'f4', H[4], dt, 220, 23); a.thumb.rotation.set(-Math.max(0, tc) * .9, 0, s * (.8 - tc * 1.0)); a.thumb2.rotation.z = -s * Math.max(0, tc) * .7; });
+        var tc = ch(n + 'f4', o.thumb === undefined ? H[4] : o.thumb, dt, 260, 22); a.thumb.rotation.set(-Math.max(0, tc) * .9, 0, s * (.8 - tc * 1.0)); a.thumb2.rotation.z = -s * Math.max(0, tc) * .7; });
       [['r', legs[0], g.rl], ['l', legs[1], g.ll]].forEach(function (q) { var n = q[0], l = q[1], o = q[2];
         l.hip.rotation.set(ch(n + 'h', o.h, dt, 190, 21), 0, l.s * ch(n + 'o', o.o, dt)); l.knee.rotation.x = ch(n + 'k', o.k, dt, 190, 21); l.foot.rotation.x = ch(n + 'f', o.f, dt, 190, 21); });
       // follow-through: the braids and the clover lag behind his turns and bounces, then swing back
@@ -300,7 +379,7 @@
     }
     update(0, 1);
     return { group: group, parts: { body: body, torso: torso, head: head, screen: screen, arms: arms, legs: legs, pendant: pendant, dreads: dreads },
-      faces: Object.keys(FACES), poses: Object.keys(POSES), hands: Object.keys(HANDS), setFace: setFace, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.5 };
+      poses: Object.keys(POSES), hands: Object.keys(HANDS), faces: Object.keys(PRESET), icons: Object.keys(ICONS), eyes: Object.keys(EYES), mouths: Object.keys(MOUTHS), setFace: setFace, setExpression: setExpression, setIcon: setIcon, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.5 };
   }
-  root.LilBottie = { build: build, version: '0.4' };
+  root.LilBottie = { build: build, version: '0.5' };
 })(typeof window !== 'undefined' ? window : this);

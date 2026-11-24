@@ -55,6 +55,24 @@ How he moves (v0.4):
 - `dance`, `rap`, `shake` and `walk` are locked to the beat (137.2 bpm; `setTempo` changes it). `rap` chops one hand on
   every beat, changes the hand shape each bar, grabs the chain on the third bar and swaps hands every four bars.
 
+## Faces, icons and lyric poses (v0.5)
+
+- **Faces** are built from eyes and a mouth, so he can hold an expression and lip-sync at once. 15 eyes
+  (happy, open, wide, angry, sad, side, sleepy, closed, heart, dollar, spiral, x, dot, hype, wink) and 8 mouths.
+  18 presets combine them: smile, angry, mad, sad, shock, love, money, sleepy, hypno, smug, blank, laugh, stare …
+- **Icons** fill the whole screen: npc, heart, bars, lock, bell, crown, skull, scroll, battery, cash, btv and more.
+- **22 poses written for lines of The Algorithm:** scroll (with his phone), phone, loser, think, me, prison, npc,
+  nope, watch, flex, write, eat, harvest, money, one, pray, boss, stop, run, lead, mad, shrug.
+
+![the lyric poses, each with one of the new faces](asset/lil-bottie-lyric-poses.png)
+
+## The Algorithm, line by line
+
+`lyrics/the-algorithm.choreo.json` gives every one of the 52 lines a pose, eyes, a resting mouth and (for some)
+an icon that flashes on his screen for the first 0.9 seconds. `index.html` plays it: each line shows its
+**number, start time, pose and face**, with previous / next line buttons, a list of all 52 lines to jump from,
+half speed, and "lyrics −¼s / +¼s". To correct it, say the line number and what is off (timing, pose or face).
+
 ## The Algorithm: lyrics and timing
 
 - `lyrics/the-algorithm.md` is copied word for word from the archive. **Do not reword his lyrics and do not write

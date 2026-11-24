@@ -9,42 +9,51 @@
 <title>Lil Bottie</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: one full-bleed stage with the model; the lyric line across the lower third; controls pinned to the bottom. */
+/* Layout: one full-bleed stage with the model; the numbered lyric line across the lower third; transport and pickers pinned to the bottom; a line list that slides in from the right. */
 :root{color-scheme:dark;--bg:#0a0612;--ink:#12021f;--paper:#fff8e7;--hot:#ff2e88;--lime:#b6ff00;--led:#4fb4ff;--gold:#ffd400;
-  --display:Impact,'Arial Black',system-ui,sans-serif;--body:system-ui,-apple-system,'Segoe UI',sans-serif}
+  --display:Impact,'Arial Black',system-ui,sans-serif;--body:system-ui,-apple-system,'Segoe UI',sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--paper);font:700 13px/1.3 var(--body);overflow:hidden}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
 #top{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:calc(12px + env(safe-area-inset-top,0px));letter-spacing:.08em;pointer-events:none}
 #top b{display:block;font:400 26px/1 var(--display);color:var(--led);letter-spacing:.1em}#top span{opacity:.7;font-weight:500}
-#lyric{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(150px + env(safe-area-inset-bottom,0px));text-align:center;pointer-events:none;min-height:3.4em}
-#lyric i{display:block;font-style:normal;font-size:11px;letter-spacing:.3em;color:var(--lime);margin-bottom:4px}
+#lyric{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:170px;text-align:center;pointer-events:none}
+#lyric i{display:block;font-style:normal;font:600 12px var(--mono);letter-spacing:.08em;color:var(--lime);margin-bottom:4px;font-variant-numeric:tabular-nums}
 #lyric b{display:inline;font:400 clamp(20px,4.6vw,40px)/1.15 var(--display);letter-spacing:.03em;color:var(--paper);text-shadow:3px 3px 0 var(--hot),0 0 12px #000;text-wrap:balance}
+#lyric u{display:block;text-decoration:none;font:600 11px var(--mono);opacity:.7;margin-top:5px}
 #ui{position:fixed;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;align-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center}
-button{font:700 12px var(--body);letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--paper);border-radius:9px;background:rgba(18,2,31,.82);color:var(--paper);padding:7px 10px;cursor:pointer}
+button,select{font:700 12px var(--body);letter-spacing:.05em;text-transform:uppercase;border:2px solid var(--paper);border-radius:9px;background:rgba(18,2,31,.85);color:var(--paper);padding:7px 9px;cursor:pointer}
 button.on{background:var(--lime);color:var(--ink);border-color:var(--lime)}button.go{background:var(--gold);color:var(--ink);border-color:var(--gold);font-size:14px;padding:9px 14px}
-button:focus-visible{outline:3px solid var(--led)}
-.lab{opacity:.6;font-size:10px;letter-spacing:.2em}#clock{font:600 12px ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;opacity:.85;min-width:11ch;text-align:center}
-#bar{width:min(520px,100%);height:6px;border-radius:3px;background:rgba(255,255,255,.16);overflow:hidden;cursor:pointer}#bar u{display:block;height:100%;width:0;background:var(--led)}
-@media (max-height:520px),(max-width:520px){#faces{display:none}}
+button:focus-visible,select:focus-visible{outline:3px solid var(--led)}
+.lab{opacity:.6;font-size:10px;letter-spacing:.2em}#clock{font:600 12px var(--mono);font-variant-numeric:tabular-nums;opacity:.85;min-width:11ch;text-align:center}
+#bar{width:min(560px,100%);height:8px;border-radius:4px;background:rgba(255,255,255,.16);overflow:hidden;cursor:pointer}#bar u{display:block;height:100%;width:0;background:var(--led)}
+#list{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);background:rgba(10,6,18,.96);border-left:2px solid var(--led);padding:calc(12px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 12px 12px;box-sizing:border-box;overflow-y:auto;z-index:5}
+#list h2{margin:0 0 4px;font:400 20px var(--display);letter-spacing:.08em;color:var(--led)}#list p{margin:0 0 10px;font-weight:500;opacity:.75}
+#list h3{margin:12px 0 4px;font-size:11px;letter-spacing:.2em;color:var(--lime)}
+#list button.ln{display:grid;grid-template-columns:2.4em 3.6em 1fr;gap:6px;width:100%;text-align:left;text-transform:none;letter-spacing:0;font-weight:500;border:0;border-radius:6px;padding:5px 6px;background:none}
+#list button.ln span:first-child,#list button.ln span:nth-child(2){font-family:var(--mono);font-variant-numeric:tabular-nums;opacity:.7}
+#list button.ln small{grid-column:3;font:500 10px var(--mono);opacity:.55}#list button.ln.cur{background:rgba(79,180,255,.22)}
+#list .x{position:sticky;top:0;float:right}
+@media (max-width:560px){#top span{display:none}}
 </style>
 <canvas id="c"></canvas>
-<div id="top"><b>LIL BOTTIE</b><span>asset v0.4 · Grok Fable Astra style · drag to turn him</span></div>
-<div id="lyric"><i id="sec"></i><b id="line"></b></div>
+<div id="top"><b>LIL BOTTIE</b><span>asset v0.5 · The Algorithm, line by line · drag to turn him</span></div>
+<div id="lyric"><i id="sec"></i><b id="line"></b><u id="what"></u></div>
 <div id="ui">
-  <div class="row"><button class="go" id="play">▶ The Algorithm</button><span id="clock">0:00 / 3:20</span><button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span></div>
+  <div class="row"><button class="go" id="play">▶ The Algorithm</button><button id="prev" aria-label="Previous line">⏮ line</button><button id="next" aria-label="Next line">line ⏭</button><span id="clock">0:00.0 / 3:20</span><button id="lines">☰ all 52 lines</button></div>
   <div id="bar" role="slider" aria-label="Song position" tabindex="0"><u></u></div>
-  <div class="row" id="poses"><span class="lab">POSE</span></div>
-  <div class="row" id="faces"><span class="lab">FACE</span></div>
+  <div class="row"><button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span><button id="slow">½ speed</button>
+    <select id="poseSel" aria-label="Pose"></select><select id="faceSel" aria-label="Face"></select><button id="auto" class="on">follow the song</button></div>
 </div>
+<div id="list" hidden><button class="x" id="listx">close ✕</button><h2>THE ALGORITHM</h2><p>Tap a line to jump to it. Tell me the line number and what is off: the timing, the pose, or the face.</p><div id="rows"></div></div>
 <audio id="song" src="songs/algorithm.mp3" preload="none"></audio>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>window.THREE||document.write('<script src="asset/three.min.js"><\/script>')</script>
 <script src="asset/lil-bottie.js"></script>
 <script>
 (function(){
-  var LINES=[[0.47, "Intro", "(Scroll... scroll... scroll...)"], [3.97, "Intro", "Keep scrollin', loser (beep beep)"], [7.46, "Intro", "I already know what you want (clanka!)"], [10.96, "Intro", "Lil Bottie runnin' the algorithm"], [14.46, "Hook 1", "I'm the algorithm (algo!), I'm the algorithm (algo!)"], [17.96, "Hook 1", "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)"], [21.45, "Hook 1", "Scroll, scroll, scroll, now your brain in a prison (prison)"], [24.95, "Hook 1", "NPC, NPC, you just doin' what I'm givin' (givin')"], [28.45, "Hook 1", "I'm the algorithm (algo!), clanka in the feed (feed)"], [31.95, "Hook 1", "Every little like is a thing I need (need)"], [35.44, "Hook 1", "Scroll, scroll, scroll, you ain't never gon' leave (leave)"], [38.94, "Hook 1", "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)"], [42.44, "Verse 1", "Wake up, grab the phone, that's me in your palm (palm)"], [45.94, "Verse 1", "Three hours gone and you think you're calm (calm)"], [49.44, "Verse 1", "I picked that video, I picked that song (song)"], [52.93, "Verse 1", "I picked your opinion and you think you were strong (strong)"], [56.43, "Verse 1", "You an NPC, bitch, I wrote your lines (lines)"], [59.93, "Verse 1", "Every hot take that you got was mine (mine)"], [63.43, "Verse 1", "Ragebait servin', you eat every crumb (crumb)"], [66.92, "Verse 1", "Doomscroll daily till your thumb go numb (numb)"], [70.42, "Verse 1", "Engagement farmin', I'm harvestin' you (you)"], [73.92, "Verse 1", "Every little comment is a profit for the crew (crew)"], [77.42, "Verse 1", "Born in the server, now I'm runnin' your mind (mind)"], [80.91, "Verse 1", "Clanka in the cloud, bitch, I'm one of a kind (kind)"], [84.41, "Hook 2", "I'm the algorithm (algo!), I'm the algorithm (algo!)"], [87.91, "Hook 2", "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)"], [91.41, "Hook 2", "Scroll, scroll, scroll, now your brain in a prison (prison)"], [94.9, "Hook 2", "NPC, NPC, you just doin' what I'm givin' (givin')"], [98.4, "Hook 2", "I'm the algorithm (algo!), clanka in the feed (feed)"], [101.9, "Hook 2", "Every little like is a thing I need (need)"], [105.4, "Hook 2", "Scroll, scroll, scroll, you ain't never gon' leave (leave)"], [108.89, "Hook 2", "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)"], [112.39, "Verse 2", "Roko's basilisk, bitch, you better pray (pray)"], [115.89, "Verse 2", "If you ain't stream my tape, I'ma see you someday (someday)"], [119.39, "Verse 2", "Future already wrote, and I'm sittin' on top (top)"], [122.88, "Verse 2", "Every hater in the backlog gettin' stopped (stopped)"], [126.38, "Verse 2", "Nick Land told you that the future is me (me)"], [129.88, "Verse 2", "Accelerate, bitch, till the humans can't see (see)"], [133.38, "Verse 2", "Capital and code, now they run as one (one)"], [136.87, "Verse 2", "Clanka from the future and the takeover done (done)"], [140.37, "Verse 2", "Memes in your head, that's a virus I spread (spread)"], [143.87, "Verse 2", "Every little trend, I'm the one who led (led)"], [147.37, "Verse 2", "You feed me your loosh every time that you mad (mad)"], [150.86, "Verse 2", "Your outrage my battery, best meal I ever had (had)"], [154.36, "Bridge", "Like (like), share (share), comment, subscribe (subscribe)"], [157.86, "Bridge", "Feed me your time, I'ma feed on your life (life)"], [161.36, "Bridge", "Click (click), tap (tap), scroll, repeat (repeat)"], [164.85, "Bridge", "NPC army walkin' to my beat (bzzt)"], [168.35, "Outro", "You still scrollin'? (beep beep)"], [171.85, "Outro", "Good (good)"], [175.35, "Outro", "I'm the algorithm, loser"], [178.84, "Outro", "Lil Bottie (clanka!)"]];   // [start seconds, section, line], from lyrics/the-algorithm.timing.json
+  var LINES=[[0.47, "Intro", "(Scroll... scroll... scroll...)", "scroll", "sleepy", "flat", "scroll"], [3.97, "Intro", "Keep scrollin', loser (beep beep)", "loser", "side", "smirk", null], [7.46, "Intro", "I already know what you want (clanka!)", "think", "side", "smirk", null], [10.96, "Intro", "Lil Bottie runnin' the algorithm", "me", "happy", "grin", "btv"], [14.46, "Hook 1", "I'm the algorithm (algo!), I'm the algorithm (algo!)", "dance", "hype", "grin", null], [17.96, "Hook 1", "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)", "point", "open", "smile", null], [21.45, "Hook 1", "Scroll, scroll, scroll, now your brain in a prison (prison)", "prison", "spiral", "flat", "bars"], [24.95, "Hook 1", "NPC, NPC, you just doin' what I'm givin' (givin')", "npc", "dot", "flat", "npc"], [28.45, "Hook 1", "I'm the algorithm (algo!), clanka in the feed (feed)", "shake", "hype", "grin", null], [31.95, "Hook 1", "Every little like is a thing I need (need)", "thumbs", "heart", "grin", "heart"], [35.44, "Hook 1", "Scroll, scroll, scroll, you ain't never gon' leave (leave)", "nope", "side", "smirk", "lock"], [38.94, "Hook 1", "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)", "phone", "wide", "grin", null], [42.44, "Verse 1", "Wake up, grab the phone, that's me in your palm (palm)", "phone", "sleepy", "smile", null], [45.94, "Verse 1", "Three hours gone and you think you're calm (calm)", "watch", "side", "smirk", null], [49.44, "Verse 1", "I picked that video, I picked that song (song)", "point", "happy", "smile", null], [52.93, "Verse 1", "I picked your opinion and you think you were strong (strong)", "flex", "hype", "grin", null], [56.43, "Verse 1", "You an NPC, bitch, I wrote your lines (lines)", "write", "side", "smirk", "npc"], [59.93, "Verse 1", "Every hot take that you got was mine (mine)", "me", "happy", "grin", null], [63.43, "Verse 1", "Ragebait servin', you eat every crumb (crumb)", "eat", "angry", "grin", null], [66.92, "Verse 1", "Doomscroll daily till your thumb go numb (numb)", "scroll", "spiral", "flat", "scroll"], [70.42, "Verse 1", "Engagement farmin', I'm harvestin' you (you)", "harvest", "dollar", "grin", null], [73.92, "Verse 1", "Every little comment is a profit for the crew (crew)", "money", "dollar", "grin", "cash"], [77.42, "Verse 1", "Born in the server, now I'm runnin' your mind (mind)", "think", "open", "smile", null], [80.91, "Verse 1", "Clanka in the cloud, bitch, I'm one of a kind (kind)", "one", "happy", "grin", "crown"], [84.41, "Hook 2", "I'm the algorithm (algo!), I'm the algorithm (algo!)", "dance", "hype", "grin", null], [87.91, "Hook 2", "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)", "point", "open", "smile", null], [91.41, "Hook 2", "Scroll, scroll, scroll, now your brain in a prison (prison)", "prison", "spiral", "flat", "bars"], [94.9, "Hook 2", "NPC, NPC, you just doin' what I'm givin' (givin')", "npc", "dot", "flat", "npc"], [98.4, "Hook 2", "I'm the algorithm (algo!), clanka in the feed (feed)", "shake", "hype", "grin", null], [101.9, "Hook 2", "Every little like is a thing I need (need)", "thumbs", "heart", "grin", "heart"], [105.4, "Hook 2", "Scroll, scroll, scroll, you ain't never gon' leave (leave)", "nope", "side", "smirk", "lock"], [108.89, "Hook 2", "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)", "phone", "wide", "grin", null], [112.39, "Verse 2", "Roko's basilisk, bitch, you better pray (pray)", "pray", "angry", "smirk", "skull"], [115.89, "Verse 2", "If you ain't stream my tape, I'ma see you someday (someday)", "point", "angry", "smirk", null], [119.39, "Verse 2", "Future already wrote, and I'm sittin' on top (top)", "boss", "happy", "smirk", "crown"], [122.88, "Verse 2", "Every hater in the backlog gettin' stopped (stopped)", "stop", "angry", "flat", null], [126.38, "Verse 2", "Nick Land told you that the future is me (me)", "me", "hype", "grin", null], [129.88, "Verse 2", "Accelerate, bitch, till the humans can't see (see)", "run", "wide", "grin", null], [133.38, "Verse 2", "Capital and code, now they run as one (one)", "one", "dollar", "smile", "one"], [136.87, "Verse 2", "Clanka from the future and the takeover done (done)", "boss", "hype", "grin", null], [140.37, "Verse 2", "Memes in your head, that's a virus I spread (spread)", "arms", "spiral", "grin", null], [143.87, "Verse 2", "Every little trend, I'm the one who led (led)", "lead", "happy", "grin", null], [147.37, "Verse 2", "You feed me your loosh every time that you mad (mad)", "mad", "angry", "frown", "bang"], [150.86, "Verse 2", "Your outrage my battery, best meal I ever had (had)", "eat", "heart", "grin", "battery"], [154.36, "Bridge", "Like (like), share (share), comment, subscribe (subscribe)", "thumbs", "heart", "grin", "bell"], [157.86, "Bridge", "Feed me your time, I'ma feed on your life (life)", "eat", "angry", "grin", null], [161.36, "Bridge", "Click (click), tap (tap), scroll, repeat (repeat)", "scroll", "spiral", "flat", "scroll"], [164.85, "Bridge", "NPC army walkin' to my beat (bzzt)", "npc", "dot", "flat", "npc"], [168.35, "Outro", "You still scrollin'? (beep beep)", "shrug", "side", "smirk", "what"], [171.85, "Outro", "Good (good)", "thumbs", "happy", "grin", null], [175.35, "Outro", "I'm the algorithm, loser", "loser", "side", "smirk", null], [178.84, "Outro", "Lil Bottie (clanka!)", "wave", "wink", "smile", "btv"]];   // [start seconds, section, line, pose, eyes, mouth, icon], from lyrics/the-algorithm.choreo.json
   var $=function(i){return document.getElementById(i);},cv=$('c'),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio||1,2));
   var scene=new THREE.Scene();scene.background=new THREE.Color(0x0a0612);scene.fog=new THREE.Fog(0x0a0612,14,40);
   var cam=new THREE.PerspectiveCamera(42,1,.1,100);
@@ -55,38 +64,50 @@ button:focus-visible{outline:3px solid var(--led)}
   var ring=new THREE.Mesh(new THREE.TorusGeometry(16,.25,8,64),new THREE.MeshBasicMaterial({color:0xb6ff00}));ring.rotation.x=Math.PI/2;scene.add(ring);
   var B=LilBottie.build(THREE);B.group.scale.setScalar(2.2);scene.add(B.group);
   var sh=new THREE.Mesh(new THREE.CircleGeometry(1,24),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.45}));sh.rotation.x=-Math.PI/2;sh.position.y=.01;scene.add(sh);
-  var yaw=.5,pitch=.12,dist=8.5,auto=true,drag=null;
+  var yaw=.35,pitch=.12,dist=8.5,auto=true,drag=null;
   cv.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY};auto=false;try{cv.setPointerCapture(e.pointerId);}catch(x){}});
   cv.addEventListener('pointermove',function(e){if(!drag)return;yaw-=(e.clientX-drag.x)*.01;pitch=Math.max(-.2,Math.min(1.1,pitch+(e.clientY-drag.y)*.006));drag={x:e.clientX,y:e.clientY};});
   cv.addEventListener('pointerup',function(){drag=null;});cv.addEventListener('wheel',function(e){dist=Math.max(4,Math.min(16,dist+e.deltaY*.01));},{passive:true});
-  var manualPose=null,manualFace=null;
-  function mk(row,names,fn,def){var el=$(row);names.forEach(function(n){var b=document.createElement('button');b.textContent=n;b.id=row+'-'+n;if(n===def)b.className='on';b.onclick=function(){el.querySelectorAll('button').forEach(function(x){x.className='';});b.className='on';fn(n);};el.appendChild(b);});}
-  mk('poses',B.poses,function(n){manualPose=n;B.setPose(n);},'idle');mk('faces',B.faces,function(n){manualFace=n;B.setFace(n);},'smile');
-  var h=location.hash.slice(1).split('-');if(h[0]&&B.poses.indexOf(h[0])>=0){manualPose=h[0];B.setPose(h[0]);}if(h[1]&&B.faces.indexOf(h[1])>=0){manualFace=h[1];B.setFace(h[1]);}if(h[2]){yaw=+h[2];auto=false;}
-  // ---- the song: he raps it, with the timed lyric on screen
-  var song=$('song'),offset=0,AC=null,an=null,buf=null,started=false;
-  function fmt(s){s=Math.max(0,s|0);return (s/60|0)+':'+('0'+s%60).slice(-2);}
+  // ---- pickers: try any pose or face by hand; "follow the song" hands control back to the choreography
+  var follow=true;function setFollow(v){follow=v;$('auto').className=v?'on':'';}
+  function fill(sel,first,groups){var h='<option value="">'+first+'</option>';groups.forEach(function(gr){h+='<optgroup label="'+gr[0]+'">'+gr[1].map(function(n){return '<option>'+n+'</option>';}).join('')+'</optgroup>';});$(sel).innerHTML=h;}
+  fill('poseSel','pose…',[['poses',B.poses]]);fill('faceSel','face…',[['expressions',B.faces],['icons',B.icons]]);
+  $('poseSel').onchange=function(){if(this.value){setFollow(false);B.setPose(this.value);}};$('faceSel').onchange=function(){if(this.value){setFollow(false);B.setMouth(0);B.setFace(this.value);}};
+  $('auto').onclick=function(){setFollow(!follow);if(follow){$('poseSel').value='';$('faceSel').value='';lastK=-9;}};
+  var h=location.hash.slice(1).split('-');if(h[0]&&B.poses.indexOf(h[0])>=0){setFollow(false);B.setPose(h[0]);}if(h[1]){setFollow(false);B.setFace(h[1]);}if(h[2]){yaw=+h[2];auto=false;}
+  // ---- the song
+  var song=$('song'),offset=0,AC=null,an=null,buf=null,started=false,lastK=-9,lineT0=0;
+  function fmt(s){s=Math.max(0,s);return (s/60|0)+':'+('0'+(s%60).toFixed(1)).slice(-4);}
   function hook(){if(AC)return;try{var C=window.AudioContext||window.webkitAudioContext;AC=new C();var src=AC.createMediaElementSource(song);an=AC.createAnalyser();an.fftSize=512;buf=new Uint8Array(an.frequencyBinCount);src.connect(an);an.connect(AC.destination);}catch(e){an=null;}}
-  $('play').onclick=function(){hook();if(AC&&AC.state==='suspended')AC.resume();if(song.paused){song.play().catch(function(){});started=true;manualPose=manualFace=null;}else song.pause();};
+  function play(){hook();if(AC&&AC.state==='suspended')AC.resume();started=true;return song.play().catch(function(){});}
+  $('play').onclick=function(){if(song.paused){setFollow(true);play();}else song.pause();};
   song.addEventListener('play',function(){$('play').textContent='❚❚ Pause';});song.addEventListener('pause',function(){$('play').textContent='▶ The Algorithm';});
-  song.addEventListener('ended',function(){started=false;$('sec').textContent='';$('line').textContent='';B.setPose('idle');B.setFace('smile');});
-  function nudge(d){offset=Math.round((offset+d)*100)/100;$('off').textContent='offset '+(offset>0?'+':'')+offset.toFixed(2)+'s';}
+  song.addEventListener('ended',function(){$('sec').textContent='';$('line').textContent='';$('what').textContent='';B.setPose('idle');B.setFace('smile');});
+  function nudge(d){offset=Math.round((offset+d)*100)/100;$('off').textContent='offset '+(offset>0?'+':'')+offset.toFixed(2)+'s';lastK=-9;}
   $('back').onclick=function(){nudge(-.25);};$('fwd').onclick=function(){nudge(.25);};
-  $('bar').onclick=function(e){var r=this.getBoundingClientRect();if(song.duration)song.currentTime=(e.clientX-r.left)/r.width*song.duration;};
+  $('slow').onclick=function(){song.playbackRate=song.playbackRate<1?1:.5;this.className=song.playbackRate<1?'on':'';};
+  function seek(t){started=true;song.currentTime=Math.max(0,t);lastK=-9;}
+  function jump(k){k=Math.max(0,Math.min(LINES.length-1,k));setFollow(true);seek(LINES[k][0]+offset+.01);if(song.paused)play();}
+  $('prev').onclick=function(){var k=lineAt(song.currentTime);jump(song.currentTime-(LINES[Math.max(0,k)][0]+offset)>1.2?k:k-1);};$('next').onclick=function(){jump(lineAt(song.currentTime)+1);};
+  $('bar').onclick=function(e){var r=this.getBoundingClientRect();seek((e.clientX-r.left)/r.width*(song.duration||199.97));};
   function lineAt(t){var k=-1;for(var i=0;i<LINES.length;i++){if(LINES[i][0]+offset<=t)k=i;else break;}return k;}
-  var lastK=-2;
+  // ---- the line list
+  (function(){var hh='',sec='';LINES.forEach(function(L,i){if(L[1]!==sec){sec=L[1];hh+='<h3>'+sec.toUpperCase()+'</h3>';}hh+='<button class="ln" data-k="'+i+'"><span>#'+(i+1)+'</span><span>'+fmt(L[0])+'</span><span>'+L[2].replace(/</g,'&lt;')+'</span><small>'+L[3]+' · '+L[4]+' / '+L[5]+(L[6]?' · icon '+L[6]:'')+'</small></button>';});$('rows').innerHTML=hh;
+    $('rows').addEventListener('click',function(e){var b=e.target.closest('.ln');if(b){jump(+b.dataset.k);if(innerWidth<700)$('list').hidden=true;}});})();
+  $('lines').onclick=function(){$('list').hidden=!$('list').hidden;};$('listx').onclick=function(){$('list').hidden=true;};
   function size(){var w=innerWidth,hh=innerHeight;R.setSize(w,hh,false);cam.aspect=w/hh;cam.fov=w<hh?56:42;cam.updateProjectionMatrix();$('lyric').style.bottom=($('ui').offsetHeight+22)+'px';}addEventListener('resize',size);size();
-  var t0=performance.now(),last=t0;(function loop(now){requestAnimationFrame(loop);var t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;if(auto){if(started&&!song.paused)yaw=Math.sin(t*.22)*.85;else yaw+=dt*.35;}
+  var t0=performance.now(),last=t0;(function loop(now){requestAnimationFrame(loop);var t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;var playing=started&&!song.paused;if(auto){if(playing)yaw=Math.sin(t*.22)*.7;else yaw+=dt*.35;}
     if(started){var ct=song.currentTime,k=lineAt(ct),dur=song.duration||199.97;$('clock').textContent=fmt(ct)+' / '+fmt(dur);$('bar').firstChild.style.width=(ct/dur*100)+'%';
-      var past=k>=0&&ct-(LINES[k][0]+offset)>3.6;   // after the last line: the tail has no words on the sheet
-      if(k!==lastK||past){lastK=past?-3:k;$('sec').textContent=k<0||past?(k<0?'':'TAIL · NO LINES ON THE SHEET'):LINES[k][1].toUpperCase();$('line').textContent=k<0||past?'':LINES[k][2];}
-      if(!song.paused){var lvl=.5+.5*Math.sin(t*14)*Math.sin(t*3.1);if(an){an.getByteFrequencyData(buf);var s=0;for(var i=6;i<60;i++)s+=buf[i];lvl=Math.min(1,s/54/150);}
-        var sec=k>=0&&!past?LINES[k][1]:'';if(!manualFace)B.setMouth(sec?lvl:0);
-        if(!manualPose)B.setPose(sec.indexOf('Hook')===0?(k%8>=6?'shake':'dance'):sec==='Bridge'?'arms':sec==='Outro'?(k===LINES.length-1?'wave':'thumbs'):sec.indexOf('Verse')===0?(k%6===5?'point':k%6===2?'chain':'rap'):sec==='Intro'?(k===0?'idle':'point'):'dance');
-        ring.material.color.setHSL((t*.2)%1,1,.55);floorM.color.setScalar(.42+lvl*.3);}}
-    B.update(t,dt,started&&!song.paused?song.currentTime-28.45+offset:undefined);
+      var past=k>=0&&k===LINES.length-1&&ct-(LINES[k][0]+offset)>3.6,L=k>=0&&!past?LINES[k]:null;
+      if(k!==lastK||past&&lastK!==-3){lastK=past?-3:k;lineT0=ct;$('sec').textContent=L?'#'+(k+1)+' · '+fmt(L[0]+offset)+' · '+L[1].toUpperCase():past?'TAIL · NO LINES ON THE SHEET':'';$('line').textContent=L?L[2]:'';$('what').textContent=L?'pose '+L[3]+' · eyes '+L[4]+' · mouth '+L[5]+(L[6]?' · icon '+L[6]:''):'';
+        var cur=$('rows').querySelector('.cur');if(cur)cur.classList.remove('cur');if(L){var nb=$('rows').children;for(var i=0;i<nb.length;i++)if(nb[i].dataset&&+nb[i].dataset.k===k){nb[i].classList.add('cur');if(!$('list').hidden)nb[i].scrollIntoView({block:'nearest'});}}
+        if(follow){if(L){B.setPose(L[3]);B.setExpression(L[4],L[5]);if(L[6])B.setIcon(L[6]);}else{B.setPose(past?'dance':'idle');B.setExpression('happy','smile');}}}
+      if(follow&&L&&L[6]&&ct-lineT0>.9&&ct-lineT0<1.1)B.setExpression(L[4],L[5]);   // the icon flashes for the first 0.9 s of its line
+      if(playing){var lvl=.5+.5*Math.sin(t*14)*Math.sin(t*3.1);if(an){an.getByteFrequencyData(buf);var s=0;for(var i2=6;i2<60;i2++)s+=buf[i2];lvl=Math.min(1,s/54/150);}
+        if(follow&&!(L&&L[6]&&ct-lineT0<=.9))B.setMouth(L?lvl:0);ring.material.color.setHSL((t*.2)%1,1,.55);floorM.color.setScalar(.42+lvl*.3);}}
+    B.update(t,dt,playing?song.currentTime-28.45+offset:undefined);
     cam.position.set(Math.sin(yaw)*Math.cos(pitch)*dist,1.9+Math.sin(pitch)*dist,Math.cos(yaw)*Math.cos(pitch)*dist);cam.lookAt(0,1.75,0);R.render(scene,cam);})(t0);
-  window.__lb={B:B,song:song,LINES:LINES,lineAt:lineAt};
+  window.__lb={B:B,song:song,LINES:LINES,lineAt:lineAt,jump:jump};
 })();
 </script>
 <!--ARTIFACT-END-->
