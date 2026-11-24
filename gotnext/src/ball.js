@@ -55,11 +55,15 @@ function startMatch(cfg) {
   cfg.teams.forEach((team, ti) => team.forEach((sp, k) => {
     const mine = sp.mine === true;
     const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, remote: sp.ctrl >= 2, peer: sp.peer || null, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
-      stats: { pts: 0, ast: 0, reb: 0, stl: 0, blk: 0, ankles: 0, greens: 0, dunks: 0, threes: 0, fga: 0, fgm: 0, bravs: 0, fires: 0 }, ai: { tick: rnd(0, 0.3), spot: null, spotT: 0, tx: 0, tz: 0, mx: 0, mz: 0, hold: 0, mode: '', react: 0 } };
+      stats: { fouls: 0, pts: 0, ast: 0, reb: 0, stl: 0, blk: 0, ankles: 0, greens: 0, dunks: 0, threes: 0, fga: 0, fgm: 0, bravs: 0, fires: 0 }, ai: { tick: rnd(0, 0.3), spot: null, spotT: 0, tx: 0, tz: 0, mx: 0, mz: 0, hold: 0, mode: '', react: 0 } };
     p.A = effAttrs(sp.b, mine); p.aiLvl = sp.ai === undefined ? cfg.tier.ai : sp.ai;
     p.rig = makeRig(sp.b); p.H = p.rig.H; scene.add(p.rig.root);
     const ringC = ti === 0 ? 0x33a0ff : 0xff4040;
     p.ring = M(geo('ring', () => new THREE.RingGeometry(0.36, 0.46, 20)), new THREE.MeshBasicMaterial({ color: p.user ? (p.ctrl === 0 ? 0xffe14a : 0x4dff9a) : ringC, transparent: true, opacity: 0.85, depthWrite: false }), 0, 0.02, 0, p.rig.root); p.ring.rotation.x = -Math.PI / 2;
+    if (p.user) {      // a little arrow on your ring that points at the man you are guarding
+      p.ptr = new THREE.Group(); p.ptr.position.y = 0.03; p.rig.root.add(p.ptr); p.ptr.visible = false;
+      const tri = M(geo('ptr', () => { const sh = new THREE.Shape(); sh.moveTo(0, 0.44); sh.lineTo(-0.26, 0); sh.lineTo(0, 0.12); sh.lineTo(0.26, 0); sh.lineTo(0, 0.44); return new THREE.ShapeGeometry(sh); }), new THREE.MeshBasicMaterial({ color: 0xff4fd8, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide }), 0, 0, 0.5, p.ptr); tri.rotation.x = Math.PI / 2;
+    }
     { const myT = Math.max(0, cfg.teams.findIndex(t => t.some(x => x.mine === true))), col = mine ? '#ffe14a' : sp.ctrl === 1 ? '#4dff9a' : ti === myT ? '#33a0ff' : '#ff5a4a';      /* names carry the team colour: you gold, your squad blue, them red */
       const tg = nameTag(sp.b.name, mine ? 'you' : sp.peer ? 'online' : sp.ctrl === 1 ? 'player 2' : ti === myT ? 'squad' : 'them', p.H, col); tg.scale.multiplyScalar(mine ? 0.7 : 0.9); tg.material.opacity = mine ? 0.85 : 1; p.rig.root.add(tg); if (mine) tg.position.y += 0.34; }
     if (p.user) { p.arrow = M(geo('arrow', () => new THREE.ConeGeometry(0.11, 0.24, 4)), flat(p.ctrl === 0 ? 0xffe14a : 0x4dff9a), 0, p.H + 0.42, 0, p.rig.root); p.arrow.rotation.x = Math.PI; }
@@ -102,6 +106,19 @@ function addBrav(p, v) {
   let m = 1; if (p.mine) { if (ORIGIN[S.build.origin].k === 'brav') m += 0.2; if (MT.boosts.includes('hype')) m += 0.5; }
   p.brav += v * m;
   if (p.brav >= 1) { p.brav = 1; p.bravT = 20; p.stats.bravs++; call(pick(CALLS.brav), p.b.name + ' gets +8 to everything', '#ffc531', 1.6); sfxM('rank'); burst(p.x, 1.2, p.z, 0xffc531, 18); }
+}
+// a dead ball: play stops, and after a beat 'team' checks it up top (fouls, out of bounds)
+function deadBall(team, pause) { const M_ = MT; M_.lastScorer = { team: 1 - team, dead: true }; M_.phase = 'scored'; M_.pt = pause || 1.2; M_.B.foulBy = null; }
+// fouls (street rules, not JAM): the offense keeps the ball; a foul on a made shot is an and-one (+1)
+function foul(d, o, kind, keep) {
+  const M_ = MT; if (!d || !o || M_.arcade || M_.practice) return false; d.stats.fouls = (d.stats.fouls || 0) + 1; sfxM('whistle'); if (M_.net === 'host') netEv({ k: 's', s2: 'whistle' });
+  call('FOUL', kind + ' · ' + d.b.name + ' (' + d.stats.fouls + ')', '#ff8a1f', 1.3); floatTxt(d, 'FOUL', '#ff8a1f');
+  if (keep !== false) deadBall(o.team); return true;
+}
+const COURT = { x0: -8, x1: 8, z0: -1.6, z1: 13 };      /* the painted lines */
+function andOne(p, d) {
+  const M_ = MT; if (M_.phase === 'over') return; M_.score[p.team] += 1; p.stats.pts += 1; call('AND ONE', p.b.name + ' +1 · ' + d.b.name + ' fouled', '#ffc531', 1.4);
+  if (M_.score[p.team] >= M_.cfg.mode.to) { M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
 }
 function scorePts(p, pts, how) {
   const M_ = MT; M_.score[p.team] += pts; p.stats.pts += pts; p.stats.fgm++; p.hot++; M_.lastScorer = p;
@@ -189,6 +206,12 @@ function releaseShot(p) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
     const pb = (0.06 + nAtt(o, 'block') * 0.28 + 0.04 * bt(o, 'nofly')) * (s.j.id === 'quick' ? 0.7 : 1) * (kind === 'three' ? 0.8 : 1) * (s.fade ? 0.55 : 1);
     if (Math.random() < pb) return blocked(p, o);
+  }
+  B.foulBy = null;
+  if (!MT.arcade && !MT.practice) for (const o of MT.P) {
+    if (o.team === p.team || o.st !== 'jump') continue; const dd = dist(o, p); if (dd > 0.78) continue;
+    const fch = clamp(0.3 + (o.lunge ? 0.22 : 0) + (0.78 - dd) * 0.6 - nAtt(o, 'perd') * 0.25 - 0.05 * bt(o, 'ground'), 0.05, 0.75);
+    if (Math.random() < fch) { B.foulBy = o; break; }
   }
   const make = Math.random() < prob; p.stats.fga++;
   const pts = MT.arcade ? (kind === 'three' ? 3 : 2) : (kind === 'three' ? 2 : 1);
@@ -316,13 +339,13 @@ function resolveFinish(p) {
       if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2 }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
       f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : 0); MT.hoopT = 0.6;
       call(f.oop ? 'ALLEY-OOP!' : f.put ? 'PUTBACK!' : vic ? 'POSTER!' : pick(CALLS.dunk), p.b.name + (vic ? ' on ' + vic.b.name : ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
-      scorePts(p, pts, 'dunk'); return;
+      scorePts(p, pts, 'dunk'); if (f.foulBy) { foul(f.foulBy, p, 'blocking', false); andOne(p, f.foulBy); } return;
     }
     B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
   const kAdj = { finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
   const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
-  handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
+  handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
 }
 function startMove(p, slot, dx, dz) {
@@ -363,7 +386,11 @@ function passTarget(p, mx, mz) {
   let best = null, bs = -9; for (const o of mates) { let od = 9; for (const q of MT.P) if (q.team !== p.team) od = Math.min(od, dist(q, o)); const s = od - dist(o, p) * 0.1; if (s > bs) { bs = s; best = o; } } return best;
 }
 function startSteal(p) {
-  if (p.cool > 0) return; const B = MT.B, h = B.holder;
+  const B = MT.B, h = B.holder, now = MT.time; p.reach = (p.reach || []).filter(t => now - t < 1.6); p.reach.push(now);
+  if (p.cool > 0) {      // still recovering from the last reach: swiping again is a hand check
+    if (h && h.team !== p.team && dist(h, p) < 1.4 && p.reach.length >= 3 && Math.random() < 0.09 * (p.reach.length - 2)) foul(p, h, 'hand check');
+    return;
+  }
   if (MT.arcade) {   // shove: anyone close in front
     let o = null, od = 1.35; for (const q of MT.P) { if (q.team === p.team || q.st === 'stagger') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
     p.st = 'shove'; p.t = 0; p.cool = 1.3;
@@ -398,7 +425,12 @@ function resolveSteal(p) {
   if (p.user && sc.reach > 0.9) floatTxt(p, 'REACHED', '#8d8d99');
   if (Math.random() < ch) {
     p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
-  } else { p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0; }
+  } else {
+    p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0;
+    const hf = [Math.sin(h.face), Math.cos(h.face)], dh = dist(h, p) || 1, behind = ((p.x - h.x) * hf[0] + (p.z - h.z) * hf[1]) / dh < -0.3, spam = Math.max(0, (p.reach || []).length - 1);
+    const fch = (0.05 + 0.08 * spam + (sc.reach > 0.9 ? 0.12 : 0) + (behind ? 0.15 : 0)) * (1 - nAtt(p, 'steal') * 0.4) * (1 - 0.15 * bt(p, 'repo'));
+    if (Math.random() < fch) foul(p, h, behind ? 'reach from behind' : 'reach-in');
+  }
 }
 function startJump(p) {
   if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); p.lunge = null;
@@ -638,7 +670,7 @@ function stepPlayer(p, dt) {
         const push = 0.62 - dd, ps = f.style === 'contact' && f.type === 'dunk' ? 0.35 : 1; f.ox += dx / dd * push * ps; f.oz += dz / dd * push * ps; p.x += dx / dd * push * ps; p.z += dz / dd * push * ps;
         if (ps < 1) { o.x -= dx / dd * push * 0.65; o.z -= dz / dd * push * 0.65; }
         if (!f.hit) {
-          f.hit = o; const s = (att(p, 'str') - att(o, 'str')) / 40 + (f.style === 'contact' && f.type === 'dunk' ? 0.8 : 0) + (f.kind === 'power' ? 0.3 : 0);
+          f.hit = o; if (!MT.arcade && !MT.practice && o.st !== 'jump' && Math.hypot(o.vx, o.vz) > 1.6 && Math.random() < 0.55) f.foulBy = o;      /* he moved into the finisher: blocking foul */ const s = (att(p, 'str') - att(o, 'str')) / 40 + (f.style === 'contact' && f.type === 'dunk' ? 0.8 : 0) + (f.kind === 'power' ? 0.3 : 0);
           f.contact = clamp(0.45 - s * 0.45, 0, 0.8) * (f.kind === 'hang' || f.kind === 'switch' ? 0.5 : 1);
           const fx = Math.sin(p.face), fz = Math.cos(p.face), lx = -dx / dd, lz = -dz / dd;
           p.bumpT = 0.3; p.bumpX = clamp(-(lx * fx + lz * fz) * (0.32 - s * 0.12), -0.4, 0.05); p.bumpZ = clamp((lx * fz - lz * fx) * 0.3, -0.3, 0.3);
@@ -710,7 +742,14 @@ function stepPlayer(p, dt) {
     const acc = (11 + nAtt(p, 'accel') * 15) * (opp ? 2.4 : 1) * dt;      // braking and reversing bite harder than speeding up
     const ddx = tvx - p.vx, ddz = tvz - p.vz, dl = Math.hypot(ddx, ddz); if (dl <= acc || dl === 0) { p.vx = tvx; p.vz = tvz; } else { p.vx += ddx / dl * acc; p.vz += ddz / dl * acc; }
   }
-  p.x = clamp(p.x + p.vx * dt, -7.8, 7.8); p.z = clamp(p.z + p.vz * dt, -1.35, 12.8);
+  if (hasBall && p.st === 'free' && M_.phase === 'live' && !M_.practice) {      // line awareness: hard to drift out by accident
+    const push = (n, dist) => { const out = p.vx * n[0] + p.vz * n[1], want = p.in.dx * n[0] + p.in.dz * n[1]; if (out <= 0 || dist > 0.7) return; if (want > 0.85 && p.sprinting) return; const k = clamp(dist / 0.7, 0.05, 1); p.vx -= n[0] * out * (1 - k); p.vz -= n[1] * out * (1 - k); };
+    push([1, 0], COURT.x1 - p.x); push([-1, 0], p.x - COURT.x0); push([0, -1], p.z - COURT.z0); push([0, 1], COURT.z1 - p.z);
+  }
+  p.x = clamp(p.x + p.vx * dt, COURT.x0 - 0.9, COURT.x1 + 0.9); p.z = clamp(p.z + p.vz * dt, COURT.z0 - 0.6, COURT.z1 + 0.9);
+  if (hasBall && M_.phase === 'live' && !M_.practice && p.y < 0.05 && (p.st === 'free' || p.st === 'move') && (p.x < COURT.x0 - 0.06 || p.x > COURT.x1 + 0.06 || p.z < COURT.z0 - 0.06 || p.z > COURT.z1 + 0.06)) {
+    sfxM('whistle'); call('OUT OF BOUNDS', p.b.name + ' stepped out', '#ff8a1f', 1.2); floatTxt(p, 'OUT', '#ff8a1f'); deadBall(1 - p.team);
+  }
   // don't run through the pole / backboard zone
   if (p.z < -0.5 && Math.abs(p.x) < 0.5 && p.st !== 'finish') p.z = -0.5;
   // facing
@@ -754,6 +793,9 @@ function stepBall(dt) {
         else if (!M_.practice) call(B.green ? pick(CALLS.green) : B.kind === 'three' ? pick(CALLS.three) : pick(CALLS.make), p.b.name + ` +${B.pts}`, B.green ? '#33ff88' : '#fff', 1.1);
         else floatTxt(p, B.green ? 'GREEN' : 'Bucket', B.green ? '#33ff88' : '#fff');
         scorePts(p, B.pts, 'shot');
+        if (B.foulBy) { const d = B.foulBy; B.foulBy = null; foul(d, p, 'shooting', false); andOne(p, d); }
+      } else if (B.foulBy) {
+        const d = B.foulBy; B.foulBy = null; B.state = 'loose'; B.t = 0; B.vel.set(rnd(-1, 1), 3, rnd(0.5, 1.5)); sfxM('rim'); foul(d, p, 'shooting');      /* missed and fouled: their ball again */
       } else {
         B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfxM('rim'); if (M_.drill) drillEvent('miss', p, { kind: B.kind }); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14);
         if (M_.practice) floatTxt(p, pick(CALLS.miss), '#ff8a1f');
@@ -907,7 +949,7 @@ function animPlayer(p, dt) {
       else if (B.state === 'pass' && B.target === p) an = 'catch';
       if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
       if (B.state === 'pass' && B.target === p && Math.hypot(B.pos.x - p.x, B.pos.z - p.z) < 4) o.catchArms = true;
-      else if (M_.phase === 'scored' && M_.lastScorer && M_.lastScorer.team !== p.team) an = 'sulk';
+      else if (M_.phase === 'scored' && M_.lastScorer && !M_.lastScorer.dead && M_.lastScorer.team !== p.team) an = 'sulk';
   }
   if (p.forceAn && p.st === 'free' && !hasBall) { an = p.forceAn; o.ph = p.runPh; }
   if (p.st !== 'finish' && p.st !== 'move') R.extraYaw = 0;       /* whatever ended a spin or a reverse, the body faces where it faces */
@@ -953,6 +995,9 @@ function animPlayer(p, dt) {
   gaitStep(R, { x: p.x, z: p.z, yaw: R.root.rotation.y, vx: p.avx, vz: p.avz, grounded: !air, quick: p.st === 'move' ? 1 : 0, wide: an === 'slide' ? 1 : p.protect ? 0.6 : an === 'idle' || an === 'catch' ? 0.25 : 0.05, want: (p.st === 'stagger' ? (p.stg && p.stg.fall ? 0 : 0.4) : 1) * (1 - (p.strideW || 0)), dt });
   legIK(R, dt);
   R.shadow.position.y = 0.015 - p.y; R.shadow.scale.setScalar(clamp(1 - p.y * 0.25, 0.4, 1)); p.ring.position.y = 0.02 - p.y;
+  if (p.ptr) { const guest = M_.net === 'guest', near = () => { let best = null, bd = 1e9; for (const q of M_.P) if (q.team !== p.team) { const d = dist(q, p); if (d < bd) { bd = d; best = q; } } return best; };      /* a guest doesn't run the defense brain: point at the closest man */
+    const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.guard || p.man || (guest ? near() : null)); p.ptr.visible = !!tg && dist(tg, p) > 0.5;
+    if (p.ptr.visible) { p.ptr.position.y = 0.03 - p.y; p.ptr.rotation.y = Math.atan2(tg.x - p.x, tg.z - p.z) - R.root.rotation.y; p.ptr.children[0].material.opacity = 0.6 + 0.3 * Math.sin(M_.time * 6); } }
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
   if (p.arrow) { p.arrow.position.y = p.H + 0.42 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }
   // ring colours: your matchup glows when you are on defence

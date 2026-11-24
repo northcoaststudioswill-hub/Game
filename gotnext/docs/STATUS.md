@@ -182,6 +182,10 @@ COPY CODE buttons had invisible labels.
 | 3v3 with friends' built players when playing solo | Done: homies fill your squad |
 | Local 2 player | Done: controller or split keyboard |
 | A detailed breakdown | This file |
+| Fouls to stop steal spam | Done (0.9.4): reach-ins, hand checks on repeat swipes, shooting and blocking fouls, and-ones; offense keeps the ball. Not in JAM. Balance is a first pass |
+| Out of bounds, not too easy to run out | Done (0.9.4): ball handler over a line is a turnover; outward drift near a line is damped unless you sprint at it on purpose. Loose balls are not called out yet |
+| Ring pointer to your man | Done (0.9.4): magenta arrow on your ring on defense |
+| Game crashed spamming steal | Not reproduced: about 6 minutes of random steal spam (2v2, JAM, 3v3) gave no page errors or freezes. Need details: phone or PC, online or solo, froze or error |
 
 ---
 

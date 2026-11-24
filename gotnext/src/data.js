@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.9.3';
+const VERSION = '0.9.4';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',

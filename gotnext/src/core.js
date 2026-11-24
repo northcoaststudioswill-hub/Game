@@ -193,6 +193,7 @@ function sfx(n) {
     case 'bump': noise(t, .09, .45, 60, 500); tone(90, t, .1, 'sine', .35, 55); break;
     case 'block': noise(t, .12, .6, 200, 1400); tone(160, t, .15, 'square', .3, 80); break;
     case 'steal': tone(500, t, .07, 'square', .2, 900); tone(900, t + .06, .1, 'square', .2, 1400); break;
+    case 'whistle': tone(2700, t, .12, 'square', .1); tone(2850, t + .13, .3, 'square', .1); break;
     case 'buzz': tone(140, t, .7, 'sawtooth', .3); tone(147, t, .7, 'sawtooth', .3); break;
     case 'ui': tone(660, t, .05, 'square', .1); break;
     case 'uiok': tone(520, t, .06, 'square', .12); tone(780, t + .05, .09, 'square', .12); break;
@@ -204,7 +205,6 @@ function sfx(n) {
     case 'crowd': noise(t, 1.2, .25, 300, 2500); break;
     case 'fire': noise(t, .8, .4, 150, 1200); tone(200, t, .8, 'sawtooth', .15, 800); break;
     case 'step': noise(t, .03, .05, 1500, 4000); break;
-    case 'whistle': tone(2100, t, .25, 'square', .1, 2000); break;
   }
 }
 // tiny boom-bap sequencer; three moods

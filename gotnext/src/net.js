@@ -332,5 +332,5 @@ function netGuestStep(dt) {
     cfg.onEnd({ win: e.sc[t] > e.sc[1 - t], score: [e.sc[t] | 0, e.sc[1 - t] | 0], stats: box[mi] ? box[mi].s : cleanStats({}), mode: cfg.mode, tier: cfg.tier, bonusRep: 0, shutout: e.sc[1 - t] === 0 && e.sc[t] > 0, box }); } }
   else if (G.hostLeft || now - G.lastSnapT > 9000) { const cfg = M_.cfg; hudShow(false); MT = null; netLeave(G); cfg.onEnd({ quit: true, lost: true }); }
 }
-function cleanStats(s) { const o = {}; for (const k of ['pts', 'ast', 'reb', 'stl', 'blk', 'ankles', 'greens', 'dunks', 'threes', 'fga', 'fgm', 'bravs', 'fires']) o[k] = clamp((s && s[k]) | 0, 0, 999); return o; }
+function cleanStats(s) { const o = {}; for (const k of ['pts', 'ast', 'reb', 'stl', 'blk', 'ankles', 'greens', 'dunks', 'threes', 'fga', 'fgm', 'bravs', 'fires', 'fouls']) o[k] = clamp((s && s[k]) | 0, 0, 999); return o; }
 function cssCol(c) { return typeof c === 'string' && /^#[0-9a-f]{3,8}$/i.test(c) ? c : '#fff'; }
