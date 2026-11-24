@@ -422,17 +422,27 @@ function poseOf(anim, t, o) {
     case 'call': armsDown(); S_('shR', -2.85, 0, -0.2); S_('elR', -0.3); S_('wrR', 0.4 + Math.sin(t * 14) * 0.4); S_('neck', -0.1); break;
     case 'move': {   // each dribble move has its own shape
       const s = o.side || 0, k = o.kind || 'cross', u = clamp(o.u || 0, 0, 1), e = Math.sin(u * Math.PI);
-      p.y = -0.17; S_('hips', 0.08, 0, -s * 0.3); S_('spine', 0.3, 0, -s * 0.12); S_('chest', 0.12, -s * 0.25, 0); S_('neck', -0.35, s * 0.2, 0); legs(-0.8, 1.2, -0.8, 1.2, 0.36);
-      S_('shR', -0.7, 0, s > 0 ? 0.5 : -0.5); S_('elR', -0.9); S_('shL', -0.7, 0, s > 0 ? 0.5 : -0.5); S_('elL', -0.9); S_('wrR', -0.4); S_('wrL', -0.4);
+      // a crossover in two beats. SET (first 30%): stay over the feet, dip a shoulder toward the ball side to sell it while
+      // the ball hand pushes the ball low across the front. GO: the shoulders turn and the body leans into the new
+      // direction, the receiving hand waits low by the lead knee, the other arm comes up to shield.
+      const dS = s < 0 ? -1 : 1, set = u < 0.3, a = clamp(u / 0.3, 0, 1), b0 = clamp((u - 0.3) / 0.4, 0, 1), bb = b0 * b0 * (3 - 2 * b0);
+      const hz = dS * (set ? 0.08 * a : lerp(0.08, -0.16, bb)), cy = dS * (set ? 0.22 * a : lerp(0.22, -0.32, bb)), out = h => h === 'L' ? 1 : -1, recv = dS > 0 ? 'L' : 'R', old = dS > 0 ? 'R' : 'L';
+      p.y = -0.06 - 0.07 * Math.sin(Math.PI * Math.min(1, u * 1.3)); S_('hips', 0.06, 0, hz); S_('spine', 0.26, 0, hz * 0.5); S_('chest', 0.1, cy, 0); S_('neck', -0.3, -cy * 0.6, 0); legs(-0.6, 0.95, -0.6, 0.95, 0.28);
+      S_('sh' + recv, -0.55, 0, out(recv) * 0.3); S_('el' + recv, -0.8); S_('wr' + recv, -0.35);
+      S_('sh' + old, set ? -0.55 : -0.85, 0, -out(old) * (set ? 0.35 * a : 0.1)); S_('el' + old, set ? -0.6 : -1.3); S_('wr' + old, -0.3);
       if (k === 'tween') { legs(s > 0 ? -1.15 : -0.3, 1.0, s > 0 ? -0.3 : -1.15, 1.0, 0.3); p.y = -0.2; S_('spine', 0.4); }
-      else if (k === 'behind' || k === 'shammgod') { S_('spine', 0.12); S_('chest', -0.05, -s * 0.5, 0); S_('shR', 0.75 * (s > 0 ? 1 : 0.2), 0, -0.35); S_('elR', -1.2); S_('shL', 0.75 * (s < 0 ? 1 : 0.2), 0, 0.35); S_('elL', -1.2); if (k === 'shammgod') { p.y = -0.24; S_('sh' + (s > 0 ? 'L' : 'R'), -1.5, 0, s * 0.9); S_('el' + (s > 0 ? 'L' : 'R'), -0.1); } }
+      else if (k === 'behind') { S_('spine', 0.12); S_('chest', -0.05, -s * 0.5, 0); S_('shR', 0.75 * (s > 0 ? 1 : 0.2), 0, -0.35); S_('elR', -1.2); S_('shL', 0.75 * (s < 0 ? 1 : 0.2), 0, 0.35); S_('elL', -1.2); }
+      else if (k === 'shammgod') {     // push the ball out with one hand (a long reach, selling that side), then the other hand rakes it back across
+        p.y -= 0.04; if (set) { S_('sh' + old, -1.15, 0, out(old) * 0.45 * a); S_('el' + old, -0.25); S_('hips', 0.06, 0, dS * 0.14 * a); S_('spine', 0.3, 0, dS * 0.08 * a); }
+        else S_('sh' + recv, -0.9 + 0.35 * bb, 0, out(recv) * lerp(-0.35, 0.3, bb));
+      }
       else if (k === 'stepback' || k === 'moonwalk') { p.y = -0.1 + e * 0.12; legs(-0.3 - e * 0.5, 0.5 + e * 0.7, 0.35, 0.4, 0.18); S_('spine', -0.08); S_('chest', -0.1); S_('neck', -0.05); S_('hips', -0.12, 0, 0); }
       else if (k === 'hesi') { p.y = -0.04 + e * 0.05; legs(-0.2, 0.3, 0.1, 0.25, 0.14); S_('spine', 0.0); S_('chest', -0.05); S_('neck', 0.05); S_('shR', -1.3, 0, 0.1); S_('elR', -1.7); S_('shL', -1.1, 0, -0.2); S_('elL', -1.6); }
       else if (k === 'inout') {        // shoulders and the ball hand sell the cross, then come straight back
         const d = s > 0 ? 1 : -1; p.y = -0.15; legs(-0.7, 1.1, -0.7, 1.1, 0.3 + e * 0.1); S_('hips', 0.06, 0, -d * 0.2 * e); S_('chest', 0.12, -d * 0.55 * e, 0); S_('neck', -0.3, -d * 0.3 * e, 0); const h = o.hand === 'L' ? 'L' : 'R'; S_('sh' + h, -0.75, 0, -d * 0.7 * e); S_('el' + h, -0.9);
       }
-      else if (k === 'killer') {       // the killer: very low and wide, the whole upper body dips the wrong way first
-        const d = s > 0 ? 1 : -1, sw = u < 0.4 ? -1 : 1; p.y = -0.26; legs(-0.95, 1.45, -0.95, 1.45, 0.48); S_('hips', 0.12, 0, -d * 0.24 * sw); S_('spine', 0.4, 0, -d * 0.14 * sw); S_('chest', 0.15, -d * 0.4 * sw, 0); S_('neck', -0.45, d * 0.25, 0);
+      else if (k === 'killer') {       // the killer: low and wide, the whole upper body dips the wrong way first, then swings through
+        const sw = set ? -a : lerp(-1, 1, bb); p.y = -0.15; legs(-0.8, 1.2, -0.8, 1.2, 0.4); S_('hips', 0.1, 0, -dS * 0.2 * sw); S_('spine', 0.34, 0, -dS * 0.1 * sw); S_('chest', 0.14, -dS * 0.35 * sw, 0); S_('neck', -0.4, dS * 0.2, 0);
       }
       else if (k === 'snatch') {       // snatch-back: a hop away while one arm yanks the ball home to the hip
         p.y = -0.08 + e * 0.15; legs(-0.25 - e * 0.35, 0.5 + e * 0.5, 0.25 + e * 0.15, 0.5 + e * 0.4, 0.16); S_('spine', -0.1); S_('chest', -0.12); S_('hips', -0.1); const h = o.hand === 'L' ? 'L' : 'R'; S_('sh' + h, 0.55 * e - 0.4 * (1 - e), 0, 0); S_('el' + h, -1.6);
@@ -665,9 +675,9 @@ function gaitStep(R, c) {
     // a wide, low stance (defense) takes short quick steps instead of long strides
     // stride grows with speed; a foot lands a reachable distance ahead (never further than the leg can reach), and
     // the swing takes as long as a real one (~0.3 s), so a sprint gets a short flight phase instead of frantic steps
-    const reach = 0.42 * (R.thigh + R.shin);
+    const q = c.quick || 0, reach = (0.42 + 0.2 * q) * (R.thigh + R.shin); G.maxDrop = q ? 0.09 : 0.22;       /* an explosive move: quicker, longer steps, and no sitting down to reach */
     const sw = (c.swag || 0) * (1 - clamp((v - 2.6) / 1.6, 0, 1));    // the street walk: fewer, longer, lower, softer steps
-    const thr = Math.min(0.85 * (R.thigh + R.shin), 0.08 + 0.12 * v * (1 - 0.55 * wide) + 0.08 * sw * Math.min(1, v)), T = clamp(0.36 - 0.013 * v, 0.24, 0.36) * (1 - 0.35 * wide) * (1 + 0.3 * sw), lead = Math.min(T * 0.55, reach / Math.max(v, 0.01));
+    const thr = Math.min(0.85 * (R.thigh + R.shin), 0.08 + 0.12 * v * (1 - 0.55 * wide) + 0.08 * sw * Math.min(1, v)), T = clamp(0.36 - 0.013 * v, 0.24, 0.36) * (1 - 0.35 * wide) * (1 + 0.3 * sw) * (1 - 0.42 * q), lead = Math.min(T * 0.55, reach / Math.max(v, 0.01));
     G.sw = sw;
     for (const s of ['R', 'L']) {
       const f = G.ft[s], o = G.ft[s === 'R' ? 'L' : 'R']; home(s, _g1);
@@ -702,7 +712,7 @@ function legIK(R, dt) {
   // so the legs never have to stretch past what they can reach and the planted foot stays put
   R.root.updateMatrixWorld(true); let need = 0;
   for (const s of ['R', 'L']) { const f = G.ft[s]; _g1.set(f.p.x, 0.04 + f.lift, f.p.z); hips.worldToLocal(_g1); _g1.sub(J['hp' + s].position); need = Math.max(need, _g1.length() - maxL); }
-  const tgt = clamp(need + 0.008, 0, 0.22); G.drop += (tgt - G.drop) * (1 - Math.exp(-(tgt > G.drop ? (G.sw ? 18 : 60) : 10) * dt));
+  const tgt = clamp(need + 0.008, 0, G.maxDrop || 0.22); G.drop += (tgt - G.drop) * (1 - Math.exp(-(tgt > G.drop ? (G.sw ? 18 : 60) : 10) * dt));
   const landDip = G.land > 0 ? Math.sin(Math.PI * (1 - G.land / 0.17)) * 0.075 : 0;        // soak up the landing
   hips.position.y -= (G.drop + landDip) * w; hips.updateMatrixWorld(true);
   // pass 2: two-bone IK for each leg, blended with the pose by the gait weight

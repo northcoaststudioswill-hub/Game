@@ -427,7 +427,32 @@ Feedback on v0.8.4: it still read as a power stomp, the arms were strange, and t
 Measured: sprint at 5.6 m/s, 3.8 steps/s, 45% flight, 117° peak knee bend, 6.5 cm bounce, planted foot slide 0.00 /
 0.01 m/s. All eight court tests pass: test 1 planted feet p90 0.27 m/s, ball in hand 33%, max ball speed 12.0 m/s.
 
-## 13. Not checked
+## 13. Crossovers (v0.8.7)
+
+![Crossover before and after](img/crossover.png)
+
+Filmed in gameplay with a maxed player (`node tests/movelook.mjs <move>`), the side moves looked terrible:
+- The move threw the body sideways at full burst from the first frame (8.5 m/s with maxed Burst).
+- The feet could not keep up, so the legs trailed and the hips sank from 0.88 m to 0.52 m, a near-sitting squat.
+- The torso leaned over hard.
+- The Shell Company ended with the arm locked straight out holding the ball.
+
+**Now, for every side move:**
+- **Two beats:** a set (the first 30%: barely moving, a shoulder dips toward the ball side while the ball is pushed low
+  across), then the burst. Peak speed is a little higher and total distance about the same.
+- **Feet:** during a move the stepping is quicker and reaches further. The hips may drop at most 9 cm to reach, so
+  nobody sits down.
+- **Pose by beat:** after the set, the shoulders turn and lean into the new direction. The receiving hand waits low by
+  the lead knee, and the other arm comes up to shield.
+- **The Shell Company:** one hand pushes the ball out with a long reach, the other rakes it back. No locked arm.
+- **Hostile Takeover:** dips the wrong way in the set, then swings through.
+- **The ball** aims for where the body will really be. It used to assume full burst speed. The Shell Company's ball
+  went 1.42 m from the body and Insider Trading's 1.2 m; every side move now stays within 0.73 m.
+
+Lowest hip height during the move, maxed player: 0.72–0.78 m (was 0.52–0.63). All eight court tests pass, including the
+crossover and four-move chain.
+
+## 14. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.
