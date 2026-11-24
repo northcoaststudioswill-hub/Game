@@ -6822,20 +6822,31 @@ function hcDraw(t){const q=Q38(),terms=Math.max(1,X.terms||0),wc=(q.wcUses||0)+t
   HC.tex.forEach(x=>x.needsUpdate=true);}
 // ---- going down, coming up
 function enterHc(){if(S.inPk)return;S.inPk='hc';PK.cd=cam.dist;TCAM.d=0;TCAM.p=null;warpTo(HC.lad.x-2,HC.lad.z-2,HC.b,Math.PI*1.25,['THE HASBARA CHAMBER','whatever he does, they clap']);const q=Q38();
-  if(!q.hcm){q.hcm=1;save();setTimeout(()=>say([['sys','Under King Bibi\'s podium there is a room. Nobody upstairs knows it is here. Not even the man running it.'],['willhc','Oh hey. You found the ad server room. I\'m running a bonus round on the auction. CPMs are insane down here.'],['willhc','Weird thing: every keyword I bid on comes back as "VOTE BIBI". Must be a sponsor. Good sponsor. Pays on time.'],['hcbibi','WHATEVER I DO, THEY CLAP. THE APPLAUSE SIGN IS WIRED DOWN HERE. I CHECKED.'],['sys','(Six talking points are lying around. Then there is THE BIG SWITCH.)']],()=>{chapter('HIDDEN','THE HASBARA CHAMBER');hudCache.q=null;}),900);}}
+  if(!q.hcm){q.hcm=1;save();setTimeout(()=>say([['sys','Under King Bibi\'s podium there is a room. Nobody upstairs knows it is here. Not even the man running it.'],['willhc','Oh hey. You found the ad server room. I\'m running a bonus round on the auction. CPMs are insane down here.'],['willhc','Weird thing: every keyword I bid on comes back as "VOTE BIBI". Must be a sponsor. Good sponsor. Pays on time.'],['sys','This is Will. He made this game. He also, without knowing it, runs this room. He would find that very funny if he knew. He does know. He made this too.'],['hcbibi','WHATEVER I DO, THEY CLAP. THE APPLAUSE SIGN IS WIRED DOWN HERE. I CHECKED.'],['sys','(Six talking points are lying around. Then there is THE BIG SWITCH.)']],()=>{chapter('HIDDEN','THE HASBARA CHAMBER');hudCache.q=null;}),900);}}
 function exitHc(){S.inPk=null;if(PK.cd)cam.dist=PK.cd;TCAM.p=null;const h=HC.hatch;warpTo(h.x+1.6,h.z+1.6,h.y+.2,0,['ELECTION NIGHT','you were never down there']);}
 // the bid
 function hcBid(){const cost=6700;if(S.aura<cost){toast('💸 A bid costs '+fmt(cost)+' aura. Will says the minimum is "vibes", but the system says '+fmt(cost)+'.');return;}S.aura-=cost;const kw=pick(HC_BIDS),q=Q38();q.hcb=(q.hcb||0)+1;save();
-  say([['willhc','Bidding on '+kw+'... and... we won the slot.'],['sys','The ad that runs: "VOTE BIBI." Again.'],['willhc','Huh. That\'s '+q.hcb+' in a row. The algorithm really likes this sponsor.'],['sys','+67 NPCs swayed. Approval: 67%. It was already 67%.']],()=>{addAura(670,PL.x,PL.y+3,PL.z);floatText('+67 SWAYED',PL.x,PL.y+4,PL.z,'#ffd400');});}
+  say([['willhc','Bidding on '+kw+'... and... we won the slot.'],['sys','The ad that runs: "VOTE BIBI." Again.'],['willhc','Huh. That\'s '+q.hcb+' in a row. The algorithm really likes this sponsor.'],['willhc',pick(['Anyway, back to making a game about how bad this is.','I should put this in the game. Oh. I did.','Content. Is. Content.'])],['sys','+67 NPCs swayed. Approval: 67%. It was already 67%.']],()=>{addAura(670,PL.x,PL.y+3,PL.z);floatText('+67 SWAYED',PL.x,PL.y+4,PL.z,'#ffd400');});}
 // the switch: pull it and watch the backup come on
 function hcSwitch(){const q=Q38();if((q.tp||[]).length<6){say([['sys','THE BIG SWITCH is locked behind six talking points. Find them first.']]);return;}
   if(q.hcw){HC.switchOff=4;say([['sys','You pull it again. NO SIGNAL. Then: BACKUP CHAMBER ONLINE. Then everything is exactly the same.']]);return;}
   HC.switchOff=6;SFX.boom();S.shake=.6;flash(.8,600);
-  say([['sys','You pull THE BIG SWITCH. Every screen goes black. The tubes stop. The NPCs blink.'],['willhc','Uh. Did the ad server just... I had a campaign running.'],['sys','Upstairs, for one second, nobody claps.'],['sys','BACKUP CHAMBER ONLINE.'],['hcbibi','NEXT QUESTION.'],['sys','Approval: 67%. It never moved. It was never going to move. That was the joke the whole time.']],
+  say([['sys','You pull THE BIG SWITCH. Every screen goes black. The tubes stop. The NPCs blink.'],['willhc','Uh. Did the ad server just... I had a campaign running.'],['willhc','Wait. Was I... was this whole room... am I the bad guy in my own game?'],['willhc','...nah. It is satire. I will push a fix.'],['sys','Upstairs, for one second, nobody claps.'],['sys','BACKUP CHAMBER ONLINE.'],['hcbibi','NEXT QUESTION.'],['sys','Approval: 67%. It never moved. It was never going to move. That was the joke the whole time.']],
     ()=>{q.hcw=1;addAura(67000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('🎚️'))X.hats.push('🎚️');save();SFX.win();chapter('THE HASBARA CHAMBER','switched off · switched back on · new hat: 🎚️');hudCache.q=null;});}
 HATS.push(['🎚️','The Big Switch (it does nothing)',1]);
-TALK.willhc=()=>say([['willhc',pick(['I just run the ad auction. What the ads say is not my department.','Bonus bidding round! Everything I bid on turns into "VOTE BIBI". Must be a glitch. A profitable glitch.','Do you think the sponsor is a real company? They never answer emails. They just clap.','I built a nice game once. It had a lantern. Now I have three monitors and a headset I cannot take off.'])]]);
-BARK.willhc=['bidding...','CPMs are wild down here','who is this sponsor','another VOTE BIBI, nice','I should go back to my lantern'];
+TALK.willhc=()=>{const q=Q38();const L=[
+  ['I just run the ad auction. What the ads say is not my department. I am a game developer. Allegedly.'],
+  ['Bonus bidding round! Everything I bid on turns into "VOTE BIBI". Probably a bug. I will push a fix. I will not push a fix.'],
+  ['Do you think the sponsor is a real company? They never answer emails. They just clap.'],
+  ['I built a nice game once. It had a lantern. Then I typed "make the ultimate game, no mistakes" and now I live under a podium.'],
+  ['I am not a propagandist. I am a creator. I create engagement. The engagement votes Bibi. Those are separate things. Probably.'],
+  ['Hold on, I am prompting an AI to make my game sloppier. It is going great. Do not look at the screens behind you.'],
+  ['People keep asking me if I know what this room does. I made a whole dark-comedy game about it, so, no.'],
+  ['I satirise propaganda in my free time. In my paid time I am apparently doing it. The hours are good.'],
+  ['Every bid funds the game. The game funds the bids. The bids fund Bibi. I am a closed loop. I am the content.'],
+  ['My mom thinks I make video games. I do. They are just very effective at elections.']];
+  const i=(q.willi=(q.willi||0)+1)%L.length;say([['willhc',L[i][0]]]);};
+BARK.willhc=['bidding...','CPMs are wild down here','who is this sponsor','another VOTE BIBI, nice','I should go back to my lantern','pushing a fix (I am not)','it works on my machine','this is satire. right? right?','the AI said no mistakes','my game is doing numbers (votes)'];
 {const ai=act15Interact;act15Interact=function(){if(!S.dead){const h=HC.hatch;
   if(!S.inPk&&h&&Math.hypot(PL.x-h.x,PL.z-h.z)<1.8&&Math.abs(PL.y-h.y)<2.5)return{label:'🕳️ SOMETHING UNDER THE PODIUM',fn:enterHc};
   if(S.inPk==='hc'){if(Math.hypot(PL.x-HC.lad.x,PL.z-HC.lad.z)<2.6)return{label:'🪜 BACK UP TO THE STAGE',fn:exitHc};if(Math.hypot(PL.x-HC.desk.x,PL.z-HC.desk.z)<2.6)return{label:'💸 PLACE A BONUS BID (6,700 aura)',fn:hcBid};if(Math.hypot(PL.x-HC.sw.x,PL.z-HC.sw.z)<2.8)return{label:'🎚️ PULL THE BIG SWITCH',fn:hcSwitch};}}return ai();};}
