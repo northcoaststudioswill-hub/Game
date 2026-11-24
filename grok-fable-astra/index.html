@@ -6865,6 +6865,64 @@ BARK.willhc=['bidding...','CPMs are wild down here','who is this sponsor','anoth
 {const ar=act7Rows;act7Rows=function(){const q=Q38();return ar().concat(q.hcm?[['hc',q.hcw?'🎚️ The Hasbara Chamber: switched off (and back on)':'🎚️ The Hasbara Chamber: talking points '+(q.tp||[]).length+'/6'+((q.tp||[]).length>=6?' · pull the big switch':''),!!q.hcw]]:[]);};}
 CX.push(['w_hc','WORLD','The Hasbara Chamber','A hidden control room under King Bibi\'s Election Night podium. Will runs the ad auction down here and thinks every "VOTE BIBI" is a sponsor. The screens show the podcasts, the brain rot, the data dumping into minds, and the NPCs swayed per election. Approval holds at 67% no matter how many times Bibi uses War Criminal.',()=>!!Q38().hcm]);
 DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','THE HASBARA CHAMBER (ACT 59)'],['p_hc','In the Hasbara Chamber, all 6 talking points',()=>{const q=Q38();q.tp=[0,1,2,3,4,5];q.hcm=1;if(S.inPk&&S.inPk!=='hc')exitPk();enterHc();}],['p_hcd','At the hatch behind the podium',()=>{const h=HC.hatch;if(S.inPk)exitPk();warpTo(h.x+1.2,h.z+1.6,h.y+.2,Math.PI,['THE HATCH','🛠️ dev']);}]);
+/* ================= ACT 60: CAMPAIGN MATERIAL. The Hasbara Chamber gets wallpapered: Bibi posters with satirical slogans, a banner, yard signs, flyer stacks, a bowl of buttons, balloons and a cardboard cutout. On the back wall a big screen loops WILL'S HASBARA FINISHER, a fighting-game finishing move where the move is a narrative. ================= */
+const BIBI_SLOGANS=[['BIBI','HE NEVER LEFT'],['4,207 TERMS','AND COUNTING'],['NEXT QUESTION.','VOTE BIBI'],['STRONG. STABLE.','UNDER INVESTIGATION.'],['THE POLLS AGREE','(WE ARE THE POLLS)'],['HE CAME BACK.','HE ALWAYS COMES BACK.'],['APPROVAL 67%','ALWAYS'],['NO COMMENT','IS A COMMENT'],['VOTE BIBI','OR DON\'T. IT WON\'T MATTER.'],['CLEARED BY','HIS OWN INVESTIGATION'],['PEACE THROUGH','PRESS CONFERENCES'],['TRUST','THE APPLAUSE'],['ONE MORE TERM','(THE LAST ONE) (IT IS NOT)'],['DON\'T LOOK','AT THE SCREENS']];
+function bibiPoster(top,bot,k){const cv=document.createElement('canvas');cv.width=256;cv.height=384;const g=cv.getContext('2d');const bg=[['#14204a','#ffd400'],['#a80c1e','#ffffff'],['#ffd400','#14204a']][k%3];
+  g.fillStyle=bg[0];g.fillRect(0,0,256,384);g.fillStyle=bg[1];g.globalAlpha=.12;for(let y=0;y<384;y+=28)g.fillRect(0,y,256,12);g.globalAlpha=1;
+  // a portrait: face, swept silver hair, the crown
+  const cx=128,cy=150;g.fillStyle='#e6b48e';g.fillRect(cx-48,cy-52,96,100);g.fillStyle='#e8e8ee';g.fillRect(cx-52,cy-74,104,30);g.fillRect(cx-56,cy-60,14,36);g.fillRect(cx+42,cy-60,14,36);
+  g.fillStyle='#111';g.fillRect(cx-28,cy-14,14,16);g.fillRect(cx+14,cy-14,14,16);g.fillStyle='#8a8a90';g.fillRect(cx-32,cy-26,22,5);g.fillRect(cx+10,cy-26,22,5);g.fillStyle='#8a4a3a';g.fillRect(cx-18,cy+24,36,5);
+  g.fillStyle='#ffd400';g.fillRect(cx-30,cy-92,60,16);for(let i=0;i<5;i++){g.beginPath();g.moveTo(cx-30+i*15,cy-92);g.lineTo(cx-22+i*15,cy-112);g.lineTo(cx-15+i*15,cy-92);g.fill();}
+  g.fillStyle='#14204a';g.fillRect(cx-62,cy+50,124,40);g.fillStyle='#ffffff';g.fillRect(cx-10,cy+50,20,36);g.fillStyle='#c8102e';g.fillRect(cx-4,cy+52,8,34);
+  g.textAlign='center';g.fillStyle=bg[1];g.font='900 34px Impact,Arial Black,sans-serif';g.fillText(top,128,290);g.font='800 19px Impact,Arial Black,sans-serif';g.fillText(bot,128,322);
+  g.fillStyle=bg[1];g.font='700 11px system-ui,sans-serif';g.fillText('PAID FOR BY THE COMMITTEE TO RE-ELECT BIBI (AGAIN)',128,366);g.strokeStyle=bg[1];g.lineWidth=6;g.strokeRect(4,4,248,376);
+  const t=new THREE.CanvasTexture(cv);return new THREE.MeshLambertMaterial({map:t});}
+(function(){if(!HC||!HC.lad)return;const b=HC.b,x0=HC.x,z0=HC.z,W=HC.W,D=HC.D,H=HC.H,add=o=>{scene.add(o);return o;};let k=0;
+  const poster=(x,y,z,ry,s,tilt)=>{const S2=BIBI_SLOGANS[k%BIBI_SLOGANS.length],m=add(new THREE.Mesh(new THREE.PlaneGeometry(2.4*s,3.6*s),bibiPoster(S2[0],S2[1],k)));m.position.set(x,y,z);m.rotation.set(0,ry,tilt||0);k++;return m;};
+  // side walls: two rows of posters, a little crooked, like somebody did this at 3 a.m.
+  for(let i=0;i<5;i++){poster(x0-W+.08,b+4.2+(i%2)*.4,z0-12+i*5.4,Math.PI/2,1,(i%3-1)*.06);poster(x0+W-.08,b+4.2+((i+1)%2)*.4,z0-12+i*5.4,-Math.PI/2,1,(i%3-1)*-.05);}
+  for(let i=0;i<4;i++)poster(x0-W+.09,b+8.6,z0-9+i*7,Math.PI/2,.8,.04*(i%2?1:-1));
+  // the back wall: posters either side of the finisher screen
+  for(const s of[-1,1])for(let i=0;i<2;i++)poster(x0+s*(13+i*3.2),b+4.4+(i%2)*.5,z0+D-.08,Math.PI,1,s*.05);
+  // a banner across the ceiling
+  const bc=document.createElement('canvas');bc.width=1024;bc.height=128;const bg=bc.getContext('2d');bg.fillStyle='#a80c1e';bg.fillRect(0,0,1024,128);bg.fillStyle='#ffd400';bg.font='900 72px Impact,Arial Black,sans-serif';bg.textAlign='center';bg.fillText('RE-ELECT BIBI (AGAIN) (AGAIN)',512,92);
+  const bm=new THREE.MeshLambertMaterial({map:new THREE.CanvasTexture(bc)});for(const r of[0,Math.PI]){const ban=add(new THREE.Mesh(new THREE.PlaneGeometry(26,3.2),bm));ban.position.set(x0,b+H-2.4,z0+2+(r?-.02:.02));ban.rotation.y=r;}
+  // yard signs in a bundle, flyer stacks, a bowl of buttons
+  const yp=[];for(let i=0;i<7;i++){const a=i*.4-1.2;yp.push({x:x0+W-5+Math.cos(a)*1.6,z:z0+10+Math.sin(a)*1.2,ry:a});}
+  yp.forEach((q,i)=>{const S2=BIBI_SLOGANS[(i*3)%BIBI_SLOGANS.length];const g=new THREE.Group();g.position.set(q.x,b,q.z);g.rotation.set(0,q.ry,(i%3-1)*.12);add(g);g.add(new THREE.Mesh(merge([pt(Box(.06,1.6,.06),0x8a8e98,M(-.5,.8,0)),pt(Box(.06,1.6,.06),0x8a8e98,M(.5,.8,0))]),lam));
+    const sg=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1),bibiPoster(S2[0],S2[1],i));sg.position.y=1.8;sg.material.side=THREE.DoubleSide;g.add(sg);});colliders.push({x:x0+W-5,z:z0+10,r:2,top:b+2.4});
+  const tb=add(new THREE.Mesh(merge([pt(Box(5,.15,2),0x5a3a22,M(0,1.4,0)),pt(Box(.15,1.4,1.8),0x5a3a22,M(-2.3,.7,0)),pt(Box(.15,1.4,1.8),0x5a3a22,M(2.3,.7,0)),
+    ...[0,1,2,3,4,5].map(i=>pt(Box(.9,.18+(i%3)*.16,.66),[0xffffff,0xffd400,0x14204a][i%3],M(-1.9+i*.76,1.55+((i%3)*.08),-.3))),pt(Cyl(.5,.35,.35,14),0xc8c8d0,M(1.4,1.65,.45))]),lam));tb.position.set(x0-W+5,b,z0+13.6);colliders.push({x:x0-W+5,z:z0+13.6,r:2.6,top:b+1.6});
+  const tl=add(textSprite(['FREE FLYERS','take 6,700'],.45,{color:'#ffd400',fog:false}));tl.position.set(x0-W+5,b+3,z0+13.6);
+  const btn=[];for(let i=0;i<14;i++){const a=i*2.4,r=.18+(i%3)*.08;btn.push(pt(Cyl(.12,.12,.04,10),[0xffd400,0xc8102e,0x14204a,0xffffff][i%4],M(Math.cos(a)*r+1.4,1.85,Math.sin(a)*r+.45,(i%2)*.4,0,(i%3)*.3)));}add(new THREE.Mesh(merge(btn),lam)).position.set(x0-W+5,b,z0+13.6);
+  // balloons, up at the ceiling where you cannot reach them
+  for(let i=0;i<16;i++){const bx=x0-W+3+((i*7.3)%(W*2-6)),bz=z0-D+3+((i*5.1)%(D*2-6)),by=b+H-1.6-(i%3)*.5;const bl=add(new THREE.Mesh(new THREE.SphereGeometry(.7,12,10),new THREE.MeshLambertMaterial({color:[0xffd400,0x14204a,0xc8102e,0xffffff][i%4]})));bl.scale.y=1.2;bl.position.set(bx,by,bz);bob.push({o:bl,y:by,a:.2,s:1+i*.1,p:i});
+    const st=add(new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,1.6,4),new THREE.MeshBasicMaterial({color:0xdddddd})));st.position.set(bx,by-1.6,bz);}
+  // a life-size cardboard cutout of Bibi, thumbs up, slightly bent
+  const cut=add(new THREE.Mesh(new THREE.BoxGeometry(1.6,3.6,.06),[lam,lam,lam,lam,bibiPoster('BIBI','LIFE-SIZE (ROUGHLY)',1),bibiPoster('THE BACK','OF A CARDBOARD MAN',2)]));cut.position.set(x0+8.5,b+1.8,z0+13);cut.rotation.set(0,-.4,.05);colliders.push({x:x0+8.5,z:z0+13,r:.9,top:b+3.6});
+  // WILL'S HASBARA FINISHER: the back wall screen
+  const fc=document.createElement('canvas');fc.width=480;fc.height=270;const ft=new THREE.CanvasTexture(fc);HC.fin={g:fc.getContext('2d'),t:ft};
+  add(new THREE.Mesh(new THREE.BoxGeometry(15,8.6,.3),new THREE.MeshLambertMaterial({color:0x050508}))).position.set(x0,b+5.6,z0+D-.25);
+  const fs=add(new THREE.Mesh(new THREE.PlaneGeometry(14.2,8),new THREE.MeshBasicMaterial({map:ft})));fs.position.set(x0,b+5.6,z0+D-.42);fs.rotation.y=Math.PI;
+  const fl=add(textSprite(['WILL\'S HASBARA FINISHER','on loop · he does not know'],.6,{color:'#ff2e88',fog:false}));fl.position.set(x0,b+10.6,z0+D-1);})();
+// the finisher, drawn: a fighting-game finishing move, except the move is a narrative
+function finDraw(t){const F=HC.fin;if(!F)return;const g=F.g,W=480,H=270,T=t%14;g.fillStyle='#0a0614';g.fillRect(0,0,W,H);
+  const txt=(s,x,y,sz,c,al)=>{g.font='900 '+sz+'px Impact,Arial Black,sans-serif';g.textAlign=al||'center';g.lineWidth=sz/6;g.strokeStyle='#000';g.strokeText(s,x,y);g.fillStyle=c;g.fillText(s,x,y);};
+  // the floor, the crowd of grey NPCs on the right, Will on the left
+  g.fillStyle='#2a0a18';g.fillRect(0,210,W,60);const sway=Math.min(1,Math.max(0,(T-6.5)/2.5));
+  for(let i=0;i<7;i++){const x=300+i*24+(i%2)*6,y=168+(i%2)*14;const c=sway>i/7?'#ffd400':'#8a8a94';g.fillStyle=c;g.fillRect(x,y,16,40);g.fillRect(x+2,y-16,12,14);g.fillStyle='#111';g.fillRect(x+4,y-11,3,4);g.fillRect(x+9,y-11,3,4);
+    if(sway>i/7){g.font='700 9px system-ui';g.fillStyle='#ffd400';g.textAlign='center';g.fillText('VOTE BIBI',x+8,y-22);}}
+  const wx=90,wy=150,pump=T>2&&T<6?Math.sin(T*18)*3:0;g.fillStyle='#3f8a52';g.fillRect(wx,wy+pump,28,52);g.fillStyle='#f0c8a0';g.fillRect(wx+3,wy-24+pump,22,22);g.fillStyle='#d8a030';g.fillRect(wx+1,wy-30+pump,26,8);
+  g.fillStyle='#222';g.fillRect(wx-1,wy-18+pump,4,10);g.fillRect(wx+25,wy-18+pump,4,10);g.fillRect(wx+2,wy-26+pump,24,3);g.fillStyle='#111';g.fillRect(wx+8,wy-16+pump,3,4);g.fillRect(wx+17,wy-16+pump,3,4);
+  g.fillStyle='#3c4a66';g.fillRect(wx+2,wy+52,10,8);g.fillRect(wx+16,wy+52,10,8);
+  if(T<2){txt('WILL',W/2,90,40,'#ffd400');txt('VS',W/2,128,26,'#fff');txt('PUBLIC OPINION',W/2,166,34,'#9fe8ff');}
+  else if(T<6){const n=Math.floor((T-2)*16.75);if(T>2.3)txt('CHARGING: TALKING POINTS',W/2,40,22,'#9fe8ff');txt(n+' HIT COMBO',W/2,78,30,'#ff2e88');
+    for(let i=0;i<6;i++){const k=((T-2)*1.6+i*.17)%1,x=wx+34+k*(260),y=170-Math.sin(k*Math.PI)*40;g.font='700 11px system-ui';g.fillStyle=['#ffd400','#ff2e88','#9fe8ff'][i%3];g.textAlign='left';g.fillText(['NEXT QUESTION','67%','SELF-INVESTIGATED','TRUST THE APPLAUSE','IT IS COMPLICATED','BOTS'][i],x,y);}}
+  else if(T<9){txt('PODCAST UPPERCUT',W/2,46,30,'#ffd400');g.fillStyle='rgba(255,212,0,'+(.3+.3*Math.sin(T*20))+')';g.beginPath();g.moveTo(wx+30,wy);g.lineTo(460,140);g.lineTo(460,210);g.closePath();g.fill();txt('🎙️',wx+44,wy-6,28,'#fff','left');}
+  else if(T<11.5){g.fillStyle='rgba(168,12,30,'+(.25+.25*Math.sin(T*8))+')';g.fillRect(0,0,W,H);txt('FINISH THE NARRATIVE',W/2,90,36,'#fff');txt('SPIN-ALITY',W/2,150,52,'#ff2e88');}
+  else{txt('FLAWLESS SPIN',W/2,80,40,'#ffd400');txt('APPROVAL 67%',W/2,130,30,'#fff');g.font='700 14px system-ui';g.fillStyle='#9fe8ff';g.textAlign='center';g.fillText('Will wins. Will does not know he played.',W/2,170);g.fillText('(he will put this in his game)',W/2,192);}
+  g.font='700 11px monospace';g.fillStyle='#666';g.textAlign='right';g.fillText('REPLAY · '+(T).toFixed(1)+'s',W-8,262);F.t.needsUpdate=true;}
+{const au=act7Update;let ft=0;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(S.inPk!=='hc')return;ft-=dt;if(ft<=0){ft=1/12;finDraw(HC.switchOff>0?0:S.t);}};}
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
 ['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
 /* ================= main loop ================= */
