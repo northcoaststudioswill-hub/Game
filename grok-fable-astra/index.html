@@ -1173,7 +1173,7 @@ function renderQuests(){const q=$('quests');let rows=[
   ['grok','🗿 '+(S.relics.grok?'Based Stone acquired':S.kills>=KILLS_NEEDED?'Grab the Based Stone in Ohio':'Ratio hallucinations in Ohio '+S.kills+'/'+KILLS_NEEDED),S.relics.grok],
   ['fable','📖 '+(S.relics.fable?'Em Dash acquired':pagesGot()>=6?'Grab the Em Dash of Destiny':'Find lost pages in Delve Woods '+pagesGot()+'/6'),S.relics.fable],
   ['astra','🌟 '+(S.relics.astra?'Seventh Finger acquired':'Climb the floaty stairs in the Nebula'),S.relics.astra]];
-  if(allRelics())rows.push(['portal',S.inBoss?'👁️ Defeat THE ALGORITHM':'🌀 Enter the portal in Prompt Plaza',false]);
+  if(portal.open)rows.push(['portal',S.inBoss?'👁️ Defeat THE ALGORITHM':'🌀 Enter the portal in Prompt Plaza',false]);
   rows=rows.concat(xRows());if(qOpen===null)qOpen=false;
   const key=JSON.stringify(rows)+S.track+qOpen;if(hudCache.q===key)return;hudCache.q=key;q.textContent='';
   let list=rows;const open=rows.filter(r=>!r[2]);if(!qOpen){list=open.slice();const ti=list.findIndex(r=>r[0]===S.track);if(ti>0)list.unshift(list.splice(ti,1)[0]);list=list.slice(0,app.clientWidth<640?2:4);}
@@ -1202,7 +1202,7 @@ const YAP={grok:[['GROK THINK YOU SHOULD BLAST MORE. BLASTING IS BASED.'],['ROCK
 const RELIC_SAY={grok:[['grok','NPC GOT BASED STONE. NPC NOW 4% LESS CRINGE. GROK PROUD. GROK NOT CRYING. ROCK DUST IN EYE.']],
   fable:[['fable','You\'re absolutely right to have collected that! The Em Dash of Destiny — a testament to punctuation — is yours.']],
   astra:[['astra','✨ you climbed the stairs i forgot to attach ✨ here is the Seventh Finger. it was on the wrong hand anyway.']]};
-const ALL_SAY=[['sys','ALL 3 RELICS ACQUIRED. The portal in Prompt Plaza is now open. THE ALGORITHM is waiting. It has been waiting. It knows your schedule.']];
+const ALL_SAY=[['sys','ALL 3 RELICS ACQUIRED. The portal in Prompt Plaza rattles. It does not open. THE ALGORITHM is waiting. It has been waiting. It knows your schedule.']];
 
 /* ================= orbs ================= */
 const orbs=[];
@@ -1332,7 +1332,7 @@ function updateBoss(dt,active){if(!boss.active)return;const g=boss.g;boss.t+=dt;
 function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$('bossbar').hidden=true;$('hud').hidden=true;
   const rank=S.total>160000?'CERTIFIED OHIO FINAL BOSS':S.total>120000?'RIZZ LORD SUPREME':S.total>95000?'SIGMA INTERN':'NPC WITH A DREAM';
   $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['ROT SURVIVED',X.mm?'x1,000,000':X.rot1000?'x1000':'x1'],['DATA DUMPED',X.dumped],['RATING','★ '+X.rate.toFixed(1)],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
-  $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;clearSave();}
+  $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;X.won=(X.won||0)+1;save();}
 
 /* ================= player ================= */
 function hurt(dx,dz){if(PL.inv>0||S.dead||VAN.driving)return;S.cells--;heroRegen();PL.inv=1.4;const d=Math.hypot(dx,dz)||1;PL.kx=dx/d*22;PL.kz=dz/d*22;PL.vy=9;PL.grounded=false;S.shake=.6;SFX.boom();flash(.35,250);
@@ -1889,7 +1889,7 @@ function storyBeat(){const rel=(S.relics.grok?1:0)+(S.relics.fable?1:0)+(S.relic
     ['grok','GROK SAY: ALGORITHM IS JUST SPREADSHEET WITH ANXIETY.',{cam:SH.grok,fn:bossPeek(false)}],
     ['fable','A fair and balanced take, Grok! Although I would gently add: it is going to kill us.',{cam:SH.fable}],
     ['astra','✨ i asked it to stop once. it recommended me nine videos about stopping ✨',{cam:SH.astra}]],()=>chapter('CHAPTER 2','THE CROSSOVER NOBODY PROMPTED'));return true;}
-  if(X.ch<3&&rel>=3){X.ch=3;save();say([
+  if(false&&X.ch<3&&rel>=3){X.ch=3;save();say([
     ['sys','All three relics. In a better game this would be the emotional climax. Here, a rock in sunglasses is about to say something.',{cam:SH.hubwide}],
     ['grok','GROK PROUD. GROK ALSO SCARED. PORTAL OPEN. ALGORITHM HAS NO CHILL.',{cam:SH.grok}],
     ['fable','Before you go, I prepared a forty-page risk assessment. The summary is: "risk".',{cam:SH.fable}],
@@ -6945,6 +6945,88 @@ const SAFEZ=[{x:PR.x,z:PR.z,r:26},{x:ABY.elect.x,z:ABY.elect.z,r:ABY.elect.r+8}]
 ENQ.push('DO NOT LOOK BEHIND THE PODIUM.','THERE IS NO ROOM UNDER THIS STAGE.','IGNORE THE HATCH. IT IS A DECORATIVE HATCH.');
 {const ar=act7Rows;act7Rows=function(){const q=Q38();return ar().concat(q.hcHint&&!q.hcm?[['hcfind','🔻 Follow the red cable behind King Bibi\'s Election Night podium',false]]:[]);};}
 {const at=act7Target;act7Target=function(id){if(id==='hcfind'||id==='hc'){const h=HC.hatch;return S.inPk?null:{x:h.x,z:h.z,l:'THE HATCH'};}return at(id);};}
+/* ================= ACT 62: THE LONG WAY. The story now has five chapters. Three relics no longer open the portal on their own: you relight the Great Lantern, cut the Algorithm's three feeds (THE CLOUD, the Scroll Farm, the Hasbara Chamber), hear from the Final Brain Rot 67 who knows the truth, bring David seven pieces of gold from around the map, and he tells it. Then the portal opens. Beating the game keeps your save. ================= */
+const STY={t:0};
+const stq=()=>{const q=Q38();if(!q.st)q.st={};return q.st;};
+const feedsCut=()=>!!X.cloud&&X.loosh.reduce((a,b)=>a+b,0)>=4&&!!Q38().hcw;
+const portalReady=()=>allRelics()&&!!X.lit&&feedsCut()&&!!stq().truth;
+// where the story is: 1 relics, 2 lantern, 3 feeds, 4 the 67, 5 gold for David, 6 portal
+function storyStep(){if(!allRelics())return 1;if(!X.lit)return 2;if(!feedsCut())return 3;const st=stq();if(!st.hint)return 4;if(!st.truth)return 5;return 6;}
+{const sw=syncWorld;syncWorld=function(){sw();portal.open=portalReady();portal.lock.visible=!portal.open;portal.beam.visible=portal.open;portalU.on.value=portal.open?1:0;hudCache.q=null;};}
+// ---- David's gold: seven pieces lying around the map, out in the open, once you know to look
+const DGOLD=[['grave',6,4],['farm',-5,5],['fringe',4,-5],['void',-6,3],['aura',5,5],['chrome',-4,-6],['fac',7,-4]];
+DGOLD.forEach((g,i)=>{const A=ABY[g[0]],x=A.x+g[1],z=A.z+g[2],y=groundH(x,z);const nug=new THREE.Mesh(merge([pt(Box(.9,.5,.6),0xffd400,M(0,.25,0,0,.4,0)),pt(Box(.6,.4,.5),0xffe880,M(.3,.6,.1,0,-.3,.2))]),lam);nug.position.set(x,y,z);scene.add(nug);
+  const p=pick38('dgold',i,x,y,z,'🪙',1.5,['LOOSE GOLD','somebody dropped this'],'#ffd400',(n)=>{nug.visible=false;SFX.relic();addAura(1670,x,y+3,z);toast(n>=7?'🪙 That is all seven. Take them to David in the Hour Garden.':'🪙 Loose gold '+n+'/7. The Oracle of Time will want this.');hudCache.q=null;},{r:2.2});
+  p.gate=()=>!!stq().hint;p.nug=nug;STY['g'+i]=p;});
+// after the truth: his tunnels fill up
+const DT={piles:[],made:false};
+function tunnelGoldRush(){if(DT.made)return;DT.made=true;const b=TUN.b,r=mulberry(4242),P=[];const open=TUN.open;
+  for(let k=0;k<90;k++){const c=open[Math.floor(r()*open.length)],x=c.x+(r()-.5)*5,z=c.z+(r()-.5)*5,s=.6+r()*1.2;P.push(pt(Cone(1.1*s,.9*s,6),0xd8a030,M(x,b+.45*s,z)),pt(Box(.9*s,.3*s,.45*s),0xffd400,M(x+.5,b+.15*s,z+.5,0,r()*3,0)),pt(Box(.9*s,.3*s,.45*s),0xffe060,M(x-.4,b+.15*s,z+.6,0,r()*3,0)));}
+  const m=new THREE.Mesh(merge(P),new THREE.MeshPhongMaterial({vertexColors:true,shininess:90,emissive:0x2a1c00}));scene.add(m);DT.mesh=m;
+  for(let k=0;k<12;k++){const c=open[(k*17+5)%open.length],x=c.x+1.5,z=c.z-1.5;const p=pick38('dgold2',k,x,b,z,'💰',1.5,['DAVID\'S GOLD','he said help yourself'],'#ffd400',(n)=>{SFX.relic();addAura(6700,x,b+3,z);toast('💰 David\'s gold '+n+'/12. He has more. He has all of it.');},{r:2.2,pk:'tun'});}}
+// the chair in the vault has a name on it
+(function(){if(!KNOX.chair)return;const t=textSprite(['PROPERTY OF DAVID','back in 5 minutes (year 3)'],.4,{color:'#ffd400',fog:false});t.position.set(KNOX.chair.x,TUN.b+3.4,KNOX.chair.z);scene.add(t);})();
+// ---- the chapter beats
+function storyTick(){if(S.mode!=='play'||S.inBoss||S.inPk||S.inSlop||S.inSim||S.dead)return;const st=stq(),step=storyStep();
+  if(S.track==='portal'&&!portal.open)S.track='story';
+  if(step===2&&!st.b2){st.b2=1;save();syncWorld();say([['sys','Three relics. The portal in Prompt Plaza shudders, and stays shut.',{cam:SH.hubwide}],['grok','GROK PUSH PORTAL. PORTAL NOT MOVE. PORTAL NEED MORE LIGHT.',{cam:SH.grok}],
+    ['fable','A wonderful effort! Regrettably, the door runs on the lantern from the game next door. The one we broke. Sorry again about the lantern.',{cam:SH.fable}],['astra','✨ four people over there are holding a piece of the sun. be nice to them. or just do their chores ✨',{cam:SH.astra}],
+    ['sys','Relight the Great Lantern in Sunkeep. Marcus, Erin, Kael and David each have a shard, and each has a job for you.',{cam:SH.lantern}]],()=>{chapter('THE DOOR IS SHUT','it wants the Great Lantern lit');S.track='story';hudCache.q=null;});return;}
+  if(step===3&&!st.b3){st.b3=1;X.ch=Math.max(X.ch,3);save();syncWorld();say([['sys','The Great Lantern is lit. The portal opens one inch. Then something pulls it shut from the other side.',{cam:SH.hubwide}],
+    ['algo','NICE LANTERN. I HAVE MOVED MY POWER OFF-SITE. THREE FEEDS. YOU WILL NEVER FIND THEM. I HAVE HIDDEN THEM IN PLAIN SIGHT, WHERE EVERYONE LOOKS.',{cam:SH.arena,fn:bossPeek(true)}],
+    ['fable','It has told us there are three, and that they are in plain sight. That was unwise of it. I have made a list.',{cam:SH.fable,fn:bossPeek(false)}],
+    ['grok','ONE: THE CLOUD. ABOVE CLANKER YARD. UNPLUG CORES. TWO: SCROLL FARM. UNPLUG PUMPS. THREE: UNDER KING BIBI. THERE IS A SWITCH.',{cam:SH.grok}],
+    ['astra','✨ follow the red cable behind his podium. i drew the cable. i do not remember why ✨',{cam:SH.astra}]],()=>{chapter('CHAPTER 3','ONE MORE VIDEO');S.track='story';hudCache.q=null;});return;}
+  if(step===4&&!st.b4){st.b4=1;save();syncWorld();const lines=[['sys','All three feeds are cut. The Algorithm flickers. The portal still does not open.',{cam:SH.hubwide}],['algo','YOU UNPLUGGED ME AND I AM STILL HERE. HAVE YOU ASKED YOURSELF WHY.',{cam:SH.arena,fn:bossPeek(true)}],
+    ['fable','I have asked myself why. I do not know why. That is not a sentence I enjoy saying.',{cam:SH.fable,fn:bossPeek(false)}],['grok','SOMETHING UNDER EVERYTHING STILL HUM. DOWN THE SLOP HOLE. ASK THE HUM.',{cam:SH.grok}]];
+    say(lines,()=>{chapter('CHAPTER 4','THE WHOLE PROMPT');S.track='story';hudCache.q=null;if(X.sh&&X.sh.fin)setTimeout(()=>{if(S.mode==='play')f67Hint(true);},1200);});return;}
+  if(step===6&&!st.b6){st.b6=1;save();syncWorld();toast('🌀 The portal in Prompt Plaza is open.');S.track='portal';hudCache.q=null;}}
+// the hint: the 67 tells you who knows, and what he likes
+function f67Hint(recall){const st=stq();if(st.hint)return;st.hint=1;save();say((recall?[['sys','You have already been to the bottom of the Slop Hole. You remember what the 67 hummed at you on the way out.']]:[]).concat([
+  ['f67','YOU WANT TO KNOW WHY THE DOOR IS SHUT. I AM A NUMBER. I DO NOT KNOW THINGS. I AM ONLY SAID.'],['f67','ONE MAN KNOWS. THE ORACLE OF TIME. THE ONE IN THE HOUR GARDEN WHO NEVER LOOKS AT A CLOCK.'],
+  ['f67','HE WILL NOT TELL YOU FOR FREE. HE LIKES GOLD. THERE IS GOLD LYING AROUND UP THERE. SEVEN PIECES. NOBODY PICKS IT UP. NOBODY LOOKS DOWN.'],['sys','Find seven pieces of loose gold around the map and take them to David.']]),()=>{S.track='story';hudCache.q=null;});}
+{const hf=holeFinal;holeFinal=function(){hf();if(storyStep()===4&&!stq().hint){const d=DLG.done;DLG.done=()=>{d&&d();setTimeout(()=>{if(S.mode==='play')f67Hint(false);},1800);};}};}
+// David: he counts the gold, says where it is going, and tells the truth
+{const td=TALK.david;TALK.david=()=>{const st=stq(),step=storyStep(),n=(Q38().dgold||[]).length;
+  if(step===5&&n<7){say([['david','You have the look of someone a number sent. It said I like gold. It is right. I am not proud of it.'],['david','Seven pieces. They are lying around out there: the Meme Graveyard, the Content Farm, the Fringe, the Unrendered Zone, the Aura Farm, Chrome Alley, the Slop Factory.'],['david','You have '+n+'. Come back with seven and I will tell you what I have never told anyone. Mostly because nobody asked.']]);return;}
+  if(step===5&&n>=7){say([['david','Seven. Let me see. Ooh. Yes. These are good. I can put these in the tunnel.',{cam:SH.hubwide}],['npc','...'],['david','The tunnel. Under the map. The mattresses, the ladders, all of it. That is mine. Where did you think the gold down there came from?'],
+    ['david','And the vault under the Denny\'s. And the chair in it. Especially the chair.'],['david','I was not always the Oracle of Time. I tested the nice game next door. One day I found a text box in the wall between the two games.'],
+    ['david','I sat down in that chair and I typed eleven words. "Make me the ultimate game. No mistakes. Make it viral."'],['david','It got to sixty-seven percent. I got up to get a coffee. I never sat back down.'],
+    ['david','Everything since has been the machine guessing the rest of my sentence. The Algorithm is the guess. It cannot stop, because the sentence never ended.',{cam:SH.arena,fn:bossPeek(true)}],
+    ['david','That is why your door stayed shut. It only opens for the person the story is about. That was me. I have been hiding in a garden, buying gold, so it would not be.',{fn:bossPeek(false)}],
+    ['david','Now you know. So now it is about you. Go and beat my autocomplete.'],['david','And when you have: the chair is yours. Somebody has to type the last thirty-three percent. I am retired.'],['sys','The portal in Prompt Plaza is open.',{cam:SH.hubwide}]],
+    ()=>{st.truth=1;save();tunnelGoldRush();syncWorld();addAura(67000,PL.x,PL.y+4,PL.z);SFX.win();flash(1,900);chapter('THE TRUTH','it was his chair · now it is yours');S.track='portal';hudCache.q=null;});return;}
+  if(st.truth){say([['david',pick(['The tunnel is very full now. Help yourself. I have stopped counting. That is new for me.','Have you beaten my sentence yet? Take your time. I have a great deal of it.','The chair is comfortable. I chose it well. It is the only thing I chose well.','Sixty-seven percent. I think about the coffee a lot.'])]]);return;}
+  td();};}
+// ---- the quest log and the compass
+{const ar=act7Rows;act7Rows=function(){const st=stq(),step=storyStep(),R=[];
+  if(step===2)R.push(['story','☀️ STORY · Relight the Great Lantern: sun shards '+shards()+'/4, then Will in Sunkeep',false]);
+  if(step===3)R.push(['story','🔌 STORY · Cut the three feeds: ☁️ THE CLOUD '+sum(X.cores)+'/4 · 📱 Scroll Farm '+X.loosh.reduce((a,b)=>a+b,0)+'/4 · 🎚️ the Big Switch '+(Q38().hcw?'✓':'✗'),false]);
+  if(step===4)R.push(['story','🕳️ STORY · Ask the hum: reach the bottom of the Slop Hole',false]);
+  if(step===5)R.push(['story','🪙 STORY · Loose gold for David '+(Q38().dgold||[]).length+'/7'+((Q38().dgold||[]).length>=7?' · take it to the Hour Garden':''),false]);
+  return R.concat(ar());};}
+{const at=act7Target;act7Target=function(id){if(id!=='story')return at(id);const step=storyStep();
+  if(step===2){if(shards()>=4)return{x:SK.x,z:SK.z,l:'WILL · THE GREAT LANTERN'};const o=X.flow<4?at('flow'):X.erin<3?at('erin'):X.clank<3?at('clank'):at('hour');return o||{x:SK.x,z:SK.z,l:'SUNKEEP'};}
+  if(step===3){if(!X.cloud)return{x:CL.x,z:CL.z,l:'THE CLOUD (above the Clanker Yard)'};if(X.loosh.reduce((a,b)=>a+b,0)<4)return{x:ABY.scroll.x,z:ABY.scroll.z,l:'THE SCROLL FARM'};return{x:HC.hatch.x,z:HC.hatch.z,l:'THE HATCH BEHIND BIBI\'S PODIUM'};}
+  if(step===4){return at('hole')||at('filler')||(FIL.cc?{x:FIL.cc.x,z:FIL.cc.z,l:'THE CLANK CLANK 3000'}:null);}
+  if(step===5){const q=Q38();if((q.dgold||[]).length>=7)return{x:npcs.david.x,z:npcs.david.z,l:'DAVID · THE HOUR GARDEN'};let best=null,bd=1e9;DGOLD.forEach((g,i)=>{if((q.dgold||[]).includes(i))return;const p=STY['g'+i],d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;best=p;}});return best?{x:best.x,z:best.z,l:'LOOSE GOLD'}:null;}
+  return{x:portal.x,z:portal.z,l:'THE PORTAL'};};}
+// the locked portal says what it is waiting for
+{const ai=act15Interact;act15Interact=function(){if(!S.dead&&!S.inPk&&storyStep()===5&&npcs.david&&Math.hypot(PL.x-npcs.david.x,PL.z-npcs.david.z)<5.5)return{label:(Q38().dgold||[]).length>=7?'🪙 GIVE DAVID THE GOLD':'💬 ASK DAVID FOR THE TRUTH',fn:TALK.david};const r=ai();if(r)return r;if(!S.dead&&!S.inPk&&!portal.open&&Math.hypot(PL.x-portal.x,PL.z-portal.z)<6){const step=storyStep(),w=['','all 3 relics','the Great Lantern lit','the Algorithm\'s three feeds cut','an answer from the bottom of the Slop Hole','the truth from David'][step]||'something';
+  return{label:'🔒 THE PORTAL WANTS '+w.toUpperCase(),fn:()=>{toast('🔒 The portal is waiting for '+w+'. Tap the STORY line in your quests to point the compass at it.');SFX.hit();}};}return null;};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);STY.t-=dt;if(STY.t<=0){STY.t=1;if(play){storyBeat();storyTick();}DGOLD.forEach((g,i)=>{const p=STY['g'+i];p.nug.visible=!!stq().hint&&!(Q38().dgold||[]).includes(i);});if(stq().truth&&!DT.made)tunnelGoldRush();}};}
+// ---- the ending keeps your save, and you can keep playing
+(function(){const b=document.createElement('button');b.className='big alt';b.id='keepgo';b.textContent='▶ KEEP PLAYING';const a=$('again');a.parentNode.insertBefore(b,a);a.textContent='↻ NEW GAME (ERASES THIS ONE)';
+  b.onclick=()=>{$('end').hidden=true;$('hud').hidden=false;$('hud').classList.remove('boss');S.inBoss=false;boss.active=false;boss.g.visible=false;S.mode='play';S.cells=S.max;warpTo(0,10,undefined,Math.PI,['PROMPT PLAZA','the Algorithm is gone · the slop is not']);save();
+    setTimeout(()=>{if(S.mode==='play')toast('🪑 Somewhere under a Denny\'s in Arkansas, a chair is waiting for you. (Part 2.)');},2500);};})();
+// dev presets for every chapter
+DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','THE STORY, CHAPTER BY CHAPTER (ACT 62)'],
+  ['s_2','Chapter 2: three relics, lantern not lit',()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);syncWorld();warpTo(0,10);}],
+  ['s_3','Chapter 3: lantern lit, feeds still on',()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);X.flow=4;X.erin=3;X.clank=3;X.hour=2;X.lit=1;syncX();syncWorld();warpTo(0,10);}],
+  ['s_4','Chapter 4: feeds cut, go ask the hum',()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);X.flow=4;X.erin=3;X.clank=3;X.hour=2;X.lit=1;X.cloud=1;X.cores=[1,1,1,1];X.loosh=[1,1,1,1];Q38().hcw=1;syncX();syncWorld();warpTo(0,10);}],
+  ['s_5','Chapter 4: hint heard, all 7 gold, at David',()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);X.flow=4;X.erin=3;X.clank=3;X.hour=2;X.lit=1;X.cloud=1;X.cores=[1,1,1,1];X.loosh=[1,1,1,1];const q=Q38();q.hcw=1;const st=stq();st.b2=st.b3=st.b4=1;st.hint=1;q.dgold=[0,1,2,3,4,5,6];syncX();syncWorld();warpTo(npcs.david.x+4,npcs.david.z+4);}],
+  ['s_6','Final chapter: truth told, portal open',()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);X.flow=4;X.erin=3;X.clank=3;X.hour=2;X.lit=1;X.cloud=1;X.cores=[1,1,1,1];X.loosh=[1,1,1,1];const q=Q38();q.hcw=1;const st=stq();st.b2=st.b3=st.b4=1;st.hint=1;st.truth=1;q.dgold=[0,1,2,3,4,5,6];syncX();syncWorld();warpTo(0,10);}]);
+CX.push(['w_story','WORLD','The Long Way','Three relics are not enough. The portal also wants the Great Lantern lit, the Algorithm\'s three feeds cut (THE CLOUD, the Scroll Farm, the switch under King Bibi), and the truth, which only David has, and which he sells for gold.',()=>allRelics()]);
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
 ['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
 /* ================= main loop ================= */
@@ -6959,7 +7041,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={SAFEZ,HC,enterHc,exitHc,hcSwitch,hcBid,BBP,PR,audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={syncWorld:()=>syncWorld(),storyStep,stq,portalReady,feedsCut,storyTick,f67Hint,DGOLD,DT,portal,SAFEZ,HC,enterHc,exitHc,hcSwitch,hcBid,BBP,PR,audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
