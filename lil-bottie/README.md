@@ -69,9 +69,10 @@ How he moves (v0.4):
 ## v0.6: taller, better hair, and moves for every song
 
 - **Taller:** longer thighs and shins (about 1.63 units, was 1.5) and a slightly smaller head.
-- **Helmet and hair:** the dome now ends in a rolled rim with a dark head of hair under it, and 43 dreads in
-  three groups: an outer row round the back from ear to ear, a shorter inner row so the back is thick, and three
-  each side that frame the screen and fall down his chest.
+- **Helmet and hair (v0.7, from a closer look at the photos):** the helmet is hammered chrome with small dark
+  **dimples** pressed into it, not raised studs. It is a front shell: behind a hairline over the crown the back
+  of his head is hair. 38 dreads are rooted there in four rows that run over the top from ear to ear. Each has
+  a combed path down over the head; the part lying on the head follows the head and the rest hangs and swings.
 - **15 more poses** from his other songs: boot, shiver, hot, crash, glitch, key, wait, boom, mic, wrist, hear, see,
   sleep, swipe, gang. **More faces:** cold, overheat, glitch, cry, grit, cheeky, starry, zeroed, lookup.
   **More icons:** power, fire, snow, key, wifi, nuke, ghost, load, check, 100, ZZZ, ERR, GM, OK, :(.

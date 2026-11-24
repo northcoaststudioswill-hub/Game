@@ -131,11 +131,14 @@
     // ---- head: riveted chrome dome, ear cups, a black screen with the LED face
     var head = new THREE.Group(); head.position.y = .725; head.scale.setScalar(.9); torso.add(head);
     var Hh = [P(new THREE.SphereGeometry(.3, 12, 8, 0, TAU, 0, Math.PI * .62), CHROME, M(0, .2, 0)), P(Cyl(.31, .302, .04, 14), CHROME2, M(0, .11, 0)), P(Cyl(.16, .13, .1, 10), 0x4a4e58, M(0, -.02, 0))];   // the dome ends in a rolled rim; the hair comes out from under it
-    for (var rr = 0; rr < 3; rr++) for (var q = 0; q < 14; q++) { var ra = q / 14 * TAU + rr * .22, el2 = .5 + rr * .42, rx = Math.sin(ra) * Math.sin(el2) * .3, ry = .2 + Math.cos(el2) * .3, rz = Math.cos(ra) * Math.sin(el2) * .3; if (rz > .16 && ry < .34) continue; Hh.push(P(Sph(.016, 5, 4), 0xeef2f8, M(rx, ry, rz))); }
+    var hseed = 11; function hrand() { hseed = (hseed * 16807) % 2147483647; return hseed / 2147483647; }
+    for (var q = 0; q < 90; q++) {   // hammered chrome: small dark dimples pressed into the shell, uneven like the real one
+      var el2 = .12 + hrand() * 1.55, ra = (hrand() - .5) * 3.3, dx = Math.sin(ra) * Math.sin(el2), dy = Math.cos(el2), dz = Math.cos(ra) * Math.sin(el2); if (dz < -.05 || (dz > .52 && dy < .5)) continue;
+      var dsz = .012 + hrand() * .014; Hh.push(P(Sph(dsz, 6, 4), hrand() < .5 ? 0x2a2e36 : 0x3c414c, M(dx * .297, .2 + dy * .297, dz * .297, Math.atan2(Math.hypot(dx, dz), dy) * (dz >= 0 ? 1 : -1) * Math.abs(Math.cos(ra)), ra, 0, 1, .22, 1))); }
     [-1, 1].forEach(function (s) { Hh.push(P(Cyl(.085, .085, .06, 12), CHROME2, M(s * .29, .16, 0, 0, 0, Math.PI / 2)), P(Cyl(.05, .05, .07, 10), 0x4a4e58, M(s * .3, .16, 0, 0, 0, Math.PI / 2))); });
     Hh.push(P(Box(.46, .34, .06), CHROME2, M(0, .17, .255)), P(Box(.41, .29, .07), 0x050508, M(0, .17, .262)));   // bezel and glass
     Hh.push(P(Box(.48, .035, .09), CHROME, M(0, .355, .25, .25)), P(Box(.3, .07, .1), CHROME2, M(0, -.035, .2)), P(Box(.22, .03, .11), 0x4a4e58, M(0, -.035, .205)), P(Box(.02, .3, .02), 0x7a808c, M(0, .36, 0, 0, 0, 0, 1, 1, 14)));   // brow ridge, jaw, vent, centre seam
-    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { Hh.push(P(Sph(.014, 5, 4), 0xeef2f8, M(c[0] * .215, .17 + c[1] * .155, .29))); });   // bezel bolts
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { Hh.push(P(Cyl(.013, .013, .006, 6), 0x2a2e36, M(c[0] * .215, .17 + c[1] * .155, .287, Math.PI / 2))); });   // bezel screws, sunk flush
     [-1, 1].forEach(function (s) { Hh.push(P(Cyl(.03, .03, .08, 8), CHROME, M(s * .31, .16, 0, 0, 0, Math.PI / 2)), P(Box(.02, .1, .02), CHROME2, M(s * .27, .3, .02, 0, 0, s * -.5))); });   // ear cup hub and band
     head.add(new THREE.Mesh(bake(Hh), chromeM));
     var faceCv = document.createElement('canvas'); faceCv.width = 160; faceCv.height = 112;
@@ -147,23 +150,31 @@
     //      weight and momentum) and are pushed out of the head, jacket, hood, shoulders and arms, so they drape
     //      over him and cannot pass through him.
     var hairM = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
-    // a head of hair under the helmet: a dark cap inside the rim and a band at the back and sides, so there is never chrome or a gap where a dread starts
-    head.add(new THREE.Mesh(bake([P(new THREE.CylinderGeometry(.285, .25, .16, 16, 1, true, .78, TAU - 1.56), 0x0c0c10, M(0, .03, 0)), P(new THREE.CylinderGeometry(.265, .215, .12, 16, 1, true, .95, TAU - 1.9), 0x14141a, M(0, -.06, -.01)),
-      P(new THREE.CircleGeometry(.295, 16), 0x0a0a0e, M(0, .1, 0, Math.PI / 2)), P(Sph(.2, 10, 7), 0x0c0c10, M(0, .0, -.1, 0, 0, 0, 1.15, .7, .9))]), hairM));
+    // the helmet is a front shell. Behind a hairline over the crown, the back of his head is hair: a dark cap, with the dreads rooted all over it
+    head.add(new THREE.Mesh(bake([P(new THREE.SphereGeometry(.316, 16, 12, Math.PI, Math.PI), 0x0c0c10, M(0, .2, .012, -.2)), P(Sph(.2, 10, 7), 0x0c0c10, M(0, .0, -.12, 0, 0, 0, 1.2, .8, .9)),
+      P(new THREE.CircleGeometry(.29, 16), 0x0a0a0e, M(0, .09, 0, Math.PI / 2))]), hairM));
     var dreadGeo = bake([P(Cyl(.024, .022, .09, 5), 0x101014, M(0, -.045, 0)), P(Cyl(.022, .023, .08, 5), 0x1a1a22, M(0, -.13, 0)), P(Cyl(.026, .026, .014, 5), 0x2a2a36, M(0, -.088, 0))]);   // one segment, .17 long
     var tipGeo = bake([P(Sph(.024, 5, 4), 0x30303c, M(0, -.012, 0))]);
     var dreadLayer = new THREE.Group(); group.add(dreadLayer);
     var dreads = [], dseed = 7, DOWN = new THREE.Vector3(0, -1, 0);
     function drand() { dseed = (dseed * 16807) % 2147483647; return dseed / 2147483647; }
-    function dread(a, len, rad, y) {
-      var D = { a: a, root: new THREE.Vector3(Math.sin(a) * rad, y, Math.cos(a) * rad), segL: len / 4, th: .9 + drand() * .4, pts: [], prev: [], mesh: [], drag: .25 + drand() * .2, n: dreads.length, rp: new THREE.Vector3(), rn: new THREE.Vector3() };
-      for (var i = 0; i < 5; i++) { D.pts.push(new THREE.Vector3()); D.prev.push(new THREE.Vector3()); }
-      for (var j = 0; j < 4; j++) { var m = new THREE.Mesh(dreadGeo, clothM); dreadLayer.add(m); D.mesh.push(m); }
+    function dread(root, len, nseg, bx, bz) {
+      var D = { root: root, segL: len / nseg, np: nseg + 1, th: .95 + drand() * .4, pts: [], prev: [], mesh: [], drag: .25 + drand() * .2, n: dreads.length, rp: new THREE.Vector3(), rn: new THREE.Vector3(), bx: bx, bz: bz };
+      // its combed path: down over the head along the surface, then straight down. The part lying on the head is held to this path; the rest hangs free.
+      var cx = 0, cy = .2, cz = .012, R = .322, ux = root.x - cx, uy = root.y - cy, uz = root.z - cz, hx = ux + bx * .16, hz = uz + bz * .16, hl = Math.hypot(hx, hz) || 1; hx /= hl; hz /= hl;
+      var th0 = Math.acos(Math.max(-1, Math.min(1, uy / .318))), off = 0; D.rest = []; D.pin = 0;
+      for (var i = 0; i <= nseg; i++) { D.pts.push(new THREE.Vector3()); D.prev.push(new THREE.Vector3()); var thI = th0 + i * D.segL / R;
+        if (thI < 1.7) { D.rest.push(new THREE.Vector3(cx + Math.sin(thI) * hx * R, cy + Math.cos(thI) * R, cz + Math.sin(thI) * hz * R)); D.pin = i; }
+        else { var lp = D.rest[i - 1] || root; D.rest.push(new THREE.Vector3(lp.x + hx * .02, lp.y - D.segL, lp.z + hz * .02)); } }
+      D.rest[0].copy(root); D.pin = Math.min(D.pin, nseg - 2);
+      for (var j = 0; j < nseg; j++) { var m = new THREE.Mesh(dreadGeo, clothM); dreadLayer.add(m); D.mesh.push(m); }
       D.tip = new THREE.Mesh(tipGeo, clothM); D.tip.scale.setScalar(D.th); dreadLayer.add(D.tip); dreads.push(D);
     }
-    for (var b = 0; b < 23; b++) dread(Math.PI * .36 + b / 22 * Math.PI * 1.28, .68 + ((b * 7) % 5) * .05, .262, .05);   // the outer row, round the back from ear to ear
-    for (var b2 = 0; b2 < 14; b2++) dread(Math.PI * .5 + b2 / 13 * Math.PI, .56 + ((b2 * 5) % 4) * .06, .2, -.02);   // an inner, shorter row, so the back is thick
-    [-1, 1].forEach(function (s) { dread(s * .98, .78, .268, .08); dread(s * 1.1, .86, .27, .07); dread(s * .86, .6, .262, .09); });   // the ones that frame his screen and fall down his chest
+    // rows run over the top of the head from ear to ear, like lines of longitude: the first is the hairline just behind the front of the helmet, the last is low at the back
+    [[.22, 11, 1.12, .3], [.6, 11, 1.06, -.1], [.98, 9, .95, -.5], [1.32, 7, .8, -.8]].forEach(function (row, ri) {
+      for (var k = 0; k < row[1]; k++) { var th = (k / (row[1] - 1) - .5) * 2 * 1.32 + (drand() - .5) * .08, ph = row[0] + (drand() - .5) * .08, x = Math.sin(th), y = Math.cos(th) * Math.cos(ph), z = -Math.cos(th) * Math.sin(ph);
+        var len = row[2] - Math.abs(th) * .2 + ((k * 7) % 5) * .03, side = Math.abs(th) < .12 ? (k % 2 ? .5 : -.5) : Math.sign(th);
+        dread(new THREE.Vector3(x * .318, .2 + y * .318, .012 + z * .318), len, len > .88 ? 6 : 5, side * (ri === 0 ? .9 : .6), row[3]); } });
 
     // ---- the chain and the iced clover
     var C = []; for (var c = 0; c < 15; c++) { var u = c / 14, ca = (u - .5) * 2.2, cx = Math.sin(ca) * .17, cy = .55 - Math.cos(ca) * .13 - Math.pow(1 - Math.abs(u - .5) * 2, 1.4) * .14, cz = .2 + Math.cos(ca) * .1; C.push(P(Sph(.015, 6, 4), c % 2 ? ICE : 0xc8ced8, M(cx, cy, cz, 0, 0, 0, 1.2, .7, 1))); }
@@ -372,7 +383,7 @@
       sit: function (g, t) { g.by = -.27; g.ll = { h: -1.5, o: .14, k: 1.5, f: 0 }; g.rl = { h: -1.42, o: .16, k: 1.3, f: .12 }; g.tx = -.14; g.hx = .1; g.hy = Math.sin(t * .5) * .14; g.hz = .05;
         g.L = A({ sx: -.6, out: .22, ex: -1.25 + Math.sin(t * .9) * .05, wy: 1.57, hand: 'grip' }); g.R = A({ sx: -.5, out: .12, ex: -.85, wy: .4, wx: .3, hand: 'relax' }); }
     };
-    var prevTurn = 0, prevBy = 0, V1 = new THREE.Vector3(), INV = new THREE.Matrix4(), TINV = new THREE.Matrix4(), simDreads = true, dInit = false;
+    var prevTurn = 0, prevBy = 0, V1 = new THREE.Vector3(), V2 = new THREE.Vector3(), INV = new THREE.Matrix4(), TINV = new THREE.Matrix4(), simDreads = true, dInit = false;
     // keep forearms and hands out of the jacket: measure how far a point is inside the torso and swing the arm out, or forward, by that much
     var ARMPTS = [['el', 0, .105], ['el', -.15, .095], ['hand', 0, .07], ['hand', -.09, .062], ['hand', -.2, .04]];
     function armFix(a) { var bx = a.sh.rotation.x, bz = a.sh.rotation.z, cOut = 0, cSx = 0;
@@ -384,27 +395,28 @@
         if (wz > .55) cSx -= worst * 1.7; else if (wz < -.55) cSx += worst * 1.7; else cOut += worst * 1.9;
         a.sh.rotation.x = bx + cSx; a.sh.rotation.z = bz + a.s * cOut; a.sh.updateMatrixWorld(true); } }
     // the things the dreads cannot pass through: [joint, x, y, z, radius], measured in that joint's own space
-    var CAPS = [[head, 0, .2, 0, .25], [head, 0, .17, .16, .22], [torso, 0, .1, 0, .335], [torso, 0, .24, 0, .355], [torso, 0, .38, 0, .355], [torso, 0, .5, 0, .31], [torso, 0, .6, -.14, .2], [torso, 0, .62, 0, .15]];
+    var CAPS = [[head, 0, .2, 0, .312], [head, 0, .15, .13, .26], [head, .3, .16, 0, .1], [head, -.3, .16, 0, .1], [torso, 0, .1, 0, .335], [torso, 0, .24, 0, .355], [torso, 0, .38, 0, .355], [torso, 0, .5, 0, .31], [torso, 0, .6, -.14, .2], [torso, 0, .62, 0, .15]];
     arms.forEach(function (a) { CAPS.push([a.sh, 0, 0, 0, .15], [a.sh, 0, -.15, 0, .13], [a.el, 0, 0, 0, .125], [a.el, 0, -.14, 0, .115], [a.hand, 0, -.08, 0, .085]); });
     legs.forEach(function (l) { CAPS.push([l.hip, 0, -.05, 0, .14], [l.knee, 0, 0, 0, .125]); });
     var CW = CAPS.map(function () { return new THREE.Vector3(); });
-    function dSolve(D, iters) { var rad = .024 * D.th;
+    function dSolve(D, iters) { var rad = .026 * D.th, np = D.np;
       for (var it = 0; it < iters; it++) {
-        for (var i = 1; i < 5; i++) { var p = D.pts[i], q = D.pts[i - 1]; V1.subVectors(p, q); var l = V1.length() || 1e-4; p.copy(q).addScaledVector(V1, D.segL / l); }
-        for (var k = 1; k < 5; k++) { var pp = D.pts[k]; for (var c = 0; c < CAPS.length; c++) { var R = CAPS[c][4] + rad, dx = pp.x - CW[c].x, dy = pp.y - CW[c].y, dz = pp.z - CW[c].z, d2 = dx * dx + dy * dy + dz * dz; if (d2 < R * R) { var d = Math.sqrt(d2) || 1e-4, f = R / d; pp.set(CW[c].x + dx * f, CW[c].y + dy * f, CW[c].z + dz * f); } } } } }
+        for (var i = 1; i < np; i++) { var p = D.pts[i], q = D.pts[i - 1]; V1.subVectors(p, q); var l = V1.length() || 1e-4; p.copy(q).addScaledVector(V1, D.segL / l); }
+        for (var k = 1; k < np; k++) { var pp = D.pts[k]; for (var c = 0; c < CAPS.length; c++) { var R = CAPS[c][4] + rad, dx = pp.x - CW[c].x, dy = pp.y - CW[c].y, dz = pp.z - CW[c].z, d2 = dx * dx + dy * dy + dz * dz; if (d2 < R * R) { var d = Math.sqrt(d2) || 1e-4, f = R / d; pp.set(CW[c].x + dx * f, CW[c].y + dy * f, CW[c].z + dz * f); } } } } }
     function dreadSim(t, dt) {
       INV.copy(group.matrixWorld).invert();
       for (var c = 0; c < CAPS.length; c++) CW[c].set(CAPS[c][1], CAPS[c][2], CAPS[c][3]).applyMatrix4(CAPS[c][0].matrixWorld).applyMatrix4(INV);
       var reset = !dInit || dt > .2 || dt <= 0; dInit = true; var n = reset ? 1 : Math.min(5, Math.ceil(dt / .011)), h = dt / n;
-      for (var di = 0; di < dreads.length; di++) { var D = dreads[di]; D.rn.copy(D.root).applyMatrix4(head.matrixWorld).applyMatrix4(INV);
-        if (reset) { for (var i = 0; i < 5; i++) { D.pts[i].set(D.rn.x + Math.sin(D.a) * .05 * i, D.rn.y - D.segL * i, D.rn.z + Math.cos(D.a) * .05 * i); } D.pts[0].copy(D.rn); dSolve(D, 30); for (var j = 0; j < 5; j++) D.prev[j].copy(D.pts[j]); D.rp.copy(D.rn); }
+      for (var di = 0; di < dreads.length; di++) { var D = dreads[di], np = D.np; D.rn.copy(D.root).applyMatrix4(head.matrixWorld).applyMatrix4(INV);
+        if (reset) { for (var i = 0; i < np; i++) D.pts[i].copy(D.rest[i]).applyMatrix4(head.matrixWorld).applyMatrix4(INV); D.pts[0].copy(D.rn); dSolve(D, 12); for (var j = 0; j < np; j++) D.prev[j].copy(D.pts[j]); D.rp.copy(D.rn); }
         else if (simDreads) { var keep = Math.pow(D.drag, h);
           for (var sI = 1; sI <= n; sI++) { D.pts[0].lerpVectors(D.rp, D.rn, sI / n);
-            for (var k = 1; k < 5; k++) { var p = D.pts[k], pv = D.prev[k], vx = (p.x - pv.x) * keep, vy2 = (p.y - pv.y) * keep, vz = (p.z - pv.z) * keep; pv.copy(p); p.x += vx + Math.sin(t * 1.3 + D.n * 1.7) * .02 * h * h; p.y += vy2 - 8.4 * h * h; p.z += vz; }
+            for (var k = 1; k < np; k++) { var p = D.pts[k], pv = D.prev[k], vx = (p.x - pv.x) * keep, vy2 = (p.y - pv.y) * keep, vz = (p.z - pv.z) * keep; pv.copy(p); p.x += vx + Math.sin(t * 1.3 + D.n * 1.7) * .02 * h * h; p.y += vy2 - 8.4 * h * h; p.z += vz; }
+            for (var pi = 1; pi <= D.pin; pi++) { V2.copy(D.rest[pi]).applyMatrix4(head.matrixWorld).applyMatrix4(INV); D.pts[pi].lerp(V2, pi === D.pin ? .35 : .7); }   // combed: the part on his head follows his head
             dSolve(D, 3); }
           D.rp.copy(D.rn); }
-        for (var m = 0; m < 4; m++) { var a = D.pts[m], bb = D.pts[m + 1]; V1.subVectors(bb, a); var len = V1.length() || 1e-4; D.mesh[m].position.copy(a); D.mesh[m].quaternion.setFromUnitVectors(DOWN, V1.multiplyScalar(1 / len)); var w = D.th * (1 - m * .06); D.mesh[m].scale.set(w, len / .17, w); }
-        D.tip.position.copy(D.pts[4]); } }
+        for (var m = 0; m < np - 1; m++) { var a = D.pts[m], bb = D.pts[m + 1]; V1.subVectors(bb, a); var len = V1.length() || 1e-4; D.mesh[m].position.copy(a); D.mesh[m].quaternion.setFromUnitVectors(DOWN, V1.multiplyScalar(1 / len)); var w = D.th * (1 - m * .045); D.mesh[m].scale.set(w, len / .17, w); }
+        D.tip.position.copy(D.pts[np - 1]); } }
     function update(t, dt, beatSeconds) {
       dt = dt === undefined ? 1 / 60 : dt; var bt = (beatSeconds === undefined ? t : beatSeconds) * bpm / 60;
       var g = { L: A(), R: A(), ll: L0(), rl: L0(), phone: false, by: 0, bry: 0, brz: 0, tx: 0, ty: 0, tz: 0, hx: 0, hy: 0, hz: 0, pz: 0 };
@@ -448,5 +460,5 @@
     [/\blove|\bheart|\blikes?\b/i, 'thumbs', 'heart', 'grin', 'heart'], [/strong|flex|muscle/i, 'flex', 'hype', 'grin', null], [/know|think|mind|brain|smart/i, 'think', 'side', 'smirk', null], [/\bme\b|\bmine\b|\bmyself/i, 'me', 'happy', 'grin', null], [/\byou\b|\byour\b|y'all/i, 'point', 'happy', 'smile', null], [/\?/, 'shrug', 'side', 'smirk', 'what']];
   var FALLBACK = ['rap', 'dance', 'mic', 'shake', 'rap', 'gang', 'lead', 'me'];
   function suggest(line, n) { var txt = String(line || ''); for (var i = 0; i < RULES.length; i++) if (RULES[i][0].test(txt)) return { pose: RULES[i][1], eyes: RULES[i][2], mouth: RULES[i][3], icon: RULES[i][4] }; return { pose: FALLBACK[(n || 0) % FALLBACK.length], eyes: 'happy', mouth: 'grin', icon: null }; }
-  root.LilBottie = { build: build, suggest: suggest, version: '0.6' };
+  root.LilBottie = { build: build, suggest: suggest, version: '0.7' };
 })(typeof window !== 'undefined' ? window : this);
