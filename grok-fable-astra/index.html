@@ -1177,7 +1177,7 @@ function renderQuests(){const q=$('quests');let rows=[
   rows=rows.concat(xRows());if(qOpen===null)qOpen=false;
   const key=JSON.stringify(rows)+S.track+qOpen;if(hudCache.q===key)return;hudCache.q=key;q.textContent='';
   let list=rows;const open=rows.filter(r=>!r[2]);if(!qOpen){list=open.slice();const ti=list.findIndex(r=>r[0]===S.track);if(ti>0)list.unshift(list.splice(ti,1)[0]);list=list.slice(0,app.clientWidth<640?2:4);}
-  list.forEach(r=>{const b=document.createElement('button');b.textContent=r[1];if(r[2])b.className='done';if(S.track===r[0])b.classList.add('trk');b.addEventListener('click',()=>{S.track=S.track===r[0]?null:r[0];});q.appendChild(b);});
+  list.forEach(r=>{const b=document.createElement('button');b.textContent=r[1];if(r[2])b.className='done';if(S.track===r[0])b.classList.add('trk');b.addEventListener('click',()=>{S.track=S.track===r[0]?null:r[0];S.pin=!!S.track;});q.appendChild(b);});
   const more=document.createElement('button');more.className='more';more.textContent=qOpen?'▲ fewer':'▼ all quests ('+open.length+')';more.addEventListener('click',()=>{qOpen=!qOpen;});q.appendChild(more);}
 const pagesGot=()=>S.pages.reduce((a,b)=>a+b,0),allRelics=()=>S.relics.grok&&S.relics.fable&&S.relics.astra;
 
@@ -1410,7 +1410,7 @@ $('bTalk').addEventListener('click',doInteract);
 function compassTarget(){if(S.inSlop)return slopTarget();if(S.inBoss)return boss.active?{x:boss.x,z:boss.z,l:'THE ALGORITHM'}:null;
   if(S.track&&XQ.includes(S.track)){const t=xTarget(S.track);if(t)return t;S.track=null;}
   let id=S.track;if(id&&id!=='portal'&&S.relics[id])id=null;if(id==='portal'&&!allRelics())id=null;
-  if(!id){if(allRelics())id='portal';else{let bd=1e9;ZONES.forEach(Z=>{if(S.relics[Z.id])return;const d=Math.hypot(PL.x-Z.x,PL.z-Z.z);if(d<bd){bd=d;id=Z.id;}});}}
+  if(!id){if(allRelics())id='portal';else if(S.defZ&&!S.relics[S.defZ])id=S.defZ;else{let bd=1e9;ZONES.forEach(Z=>{if(S.relics[Z.id])return;const d=Math.hypot(PL.x-Z.x,PL.z-Z.z);if(d<bd){bd=d;id=Z.id;}});S.defZ=id;}}
   if(id==='portal')return{x:portal.x,z:portal.z,l:'THE PORTAL'};const Z=ZBY[id];if(!Z)return null;
   if(relicAvailable(id)&&id!=='astra')return{x:relics[id].x,z:relics[id].z,l:relics[id].name};
   if(Math.hypot(PL.x-Z.x,PL.z-Z.z)<ZR*1.1){
@@ -2025,7 +2025,7 @@ function xTarget(id){const N=n=>({x:n.x,z:n.z,l:n.short}),near=(arr,ok,l)=>{let 
   if(id==='cloud')return X.cloud?null:cloudTarget();if(id==='s67')return near(T67,i=>!X.t67.includes(i),'67');
   if(id==='bud')return near(BUD,i=>!BUD[i].caught,'DIM BUDDY');if(id==='spr')return near(SPOTS,i=>!X.spt.includes(i),'WILD SPROUT');if(id==='frag')return near(FRAGS,i=>!X.frag.includes(i),'PROMPT FRAGMENT');return null;}
 function xRows(){const lk=sum(X.leaks),cr=sum(X.crops),vl=sum(X.valves),mr=missionRow();return(mr?[['mission','🎯 '+mr,false]]:[]).concat([
-  ['flow','🚐 '+(X.flow===0?'Flow Pros have a job (find Marcus)':X.flow===1?'Find the van key in Erin\'s garden':X.flow===2?'Bring the key back to Marcus':X.flow===3?'Drive the van at the leaks '+lk+'/4':'Flow Pros job done'),X.flow>=4],
+  ['flow','🚐 '+(X.flow===0?(X.mom.includes('fl')||X.vis.includes('flow')?'Talk to Marcus at the Flow Pros job site':'Flow Pros have a job (find Marcus)'):X.flow===1?'Find the van key in Erin\'s garden':X.flow===2?'Bring the key back to Marcus':X.flow===3?'Drive the van at the leaks '+lk+'/4':'Flow Pros job done'),X.flow>=4],
   ['erin','🍔 '+(X.erin===0?'Erin needs hands at Sunkeep':X.erin===1?(cr<3?'Pick Erin\'s crops '+cr+'/3':'Bring the crops to Erin'):X.erin===2?'Run the combo meal to King Bibi · '+Math.ceil(MEAL.t)+'s':'King Bibi has been fed'),X.erin>=3],
   ['clank','🤖 '+(X.clank===0?'Something clanks out west (find Kael)':X.clank===1?'Close the valves in the Clanker Yard '+vl+'/3':X.clank===2?'Beat lil Bottie':'lil Bottie is at 99%'),X.clank>=3],
   ['hour','⏳ '+(X.hour===0?'Visit David in the Hour Garden':X.hour===1?'Touch nothing for 8 seconds in the Hour Garden':'Borrowed Time acquired'),X.hour>=2],
@@ -2210,14 +2210,14 @@ function hatSync(){G.hat.visible=!!X.hat;if(X.hat){G.hat.material.map=emojiTex(X
 function startMission(force){if(MS.m||S.mode!=='play'||S.inBoss)return;const types=['hunt','courier','rings','rush','survive'].filter(t=>t!==MS.last),ty=typeof force==='string'?force:pick(types),ids=Object.keys(npcs),by=npcs[pick(ids)];MS.last=ty;
   const m={type:ty,name:'OPERATION '+pick(OPA)+' '+pick(OPN),by:by.short,t:0,clock:true,prog:0,need:0,pay:2500+Math.floor(Math.random()*6)*500};
   const herd=n=>{for(let k=0;k<n;k++){const a=k/n*TAU+Math.random();spawnEnemy(PL.x+Math.cos(a)*(20+Math.random()*10),PL.z+Math.sin(a)*(20+Math.random()*10),'botmin');}};
-  if(ty==='hunt'){m.need=5+Math.floor(Math.random()*4);m.t=80;herd(m.need+2);}
-  else if(ty==='survive'){m.t=30;m.c0=S.cells;herd(9);}
-  else if(ty==='rush'){m.need=15;m.t=60;resetOrbs();}
+  const easy=(X.ms||0)<2;if(ty==='hunt'){m.need=easy?3:5+Math.floor(Math.random()*4);m.t=easy?120:90;herd(m.need+2);}
+  else if(ty==='survive'){m.t=easy?20:30;m.c0=S.cells;herd(easy?5:9);}
+  else if(ty==='rush'){m.need=easy?6:10;m.t=easy?120:90;resetOrbs();}
   else if(ty==='courier'){const a=pick(ids);let b=pick(ids);while(b===a)b=pick(ids);m.a=npcs[a];m.b=npcs[b];m.item=pick(ITEMS);m.st=0;m.clock=false;m.t=120;m.pay+=1500;}
   else{m.i=0;m.pts=[];let x=PL.x,z=PL.z,h=Math.random()*TAU;const n=6;for(let k=0;k<n;k++){h+=(Math.random()-.5)*1.6;let nx=x+Math.sin(h)*38,nz=z+Math.cos(h)*38;const d=Math.hypot(nx,nz);if(d>185){h=Math.atan2(-x,-z);nx=x+Math.sin(h)*38;nz=z+Math.cos(h)*38;}x=nx;z=nz;m.pts.push([x,groundH(x,z)+4.5,z,h]);}
-    m.t=n*10;m.pts.forEach((p,k)=>{const r=MS.rings[k];r.position.set(p[0],p[1],p[2]);r.rotation.y=p[3];r.visible=true;});}
-  MS.m=m;S.track='mission';hudCache.q=null;SFX.relic();zoneCard(m.name,'posted by '+m.by+' · pays '+fmt(m.pay)+' aura');logRender();}
-function endMission(){MS.rings.forEach(r=>r.visible=false);MS.m=null;if(S.track==='mission')S.track=null;hudCache.q=null;logRender();}
+    m.t=n*((X.ms||0)<2?18:13);m.pts.forEach((p,k)=>{const r=MS.rings[k];r.position.set(p[0],p[1],p[2]);r.rotation.y=p[3];r.visible=true;});}
+  MS.m=m;if(S.pin&&S.track){toast('🎯 Mission started. Your compass is still on your own target. Tap the mission in your quests to follow it.');}else{S.trkBack=S.track;S.track='mission';S.pin=false;}hudCache.q=null;SFX.relic();zoneCard(m.name,'posted by '+m.by+' · pays '+fmt(m.pay)+' aura');logRender();}
+function endMission(){MS.rings.forEach(r=>r.visible=false);MS.m=null;if(S.track==='mission'){S.track=S.trkBack||null;S.trkBack=null;}hudCache.q=null;logRender();}
 function failMission(why){if(!MS.m)return;zoneCard('MISSION FAILED',why+' · skill issue');SFX.hit();tone(200,.5,'sawtooth',.12,0,60);endMission();}
 function winMission(){const m=MS.m;if(!m)return;X.ms++;X.clout++;addAura(m.pay,PL.x,PL.y+4,PL.z);SFX.win();flash(.5,500);burst(PL.x,PL.y+2,PL.z,70,null,18,10,1.2);
   zoneCard('MISSION COMPLETE',pick(['the client has been notified. the client is asleep.','five stars. would exploit again.','your aura has been invoiced.','Derek nodded. Probably.']));
@@ -3081,7 +3081,7 @@ XQ.push('event','fetch','glitch');
 {const ar=act7Rows;act7Rows=function(){const n=Object.values(X.fx).filter(v=>v===2).length,E=EVT.on;return(E?[['event','📍 '+E.title.slice(2)+' · '+Math.ceil(E.t)+'s',false]]:[]).concat(ar(),[['fetch','📦 Fetch quests for the cast '+n+'/8'+(Object.values(X.fx).some(v=>v===1)?' · carrying something':''),n>=8],['glitch','👾 Reach the Corrupted Core',!!X.c.core]]);};}
 {const at=act7Target;act7Target=function(id){if(id==='event')return evTarget();if(id==='glitch')return GLS.coreP?{x:GLS.coreP.x,z:GLS.coreP.z,l:'CORRUPTED CORE'}:null;
   if(id==='fetch'){let b=null,bd=1e9;for(const C of CRS.list){const s=X.fx[C.id]||0;if(s===2)continue;const o=s===1?OWN[C.id]():C.top;if(!o)continue;const d=Math.hypot(PL.x-o.x,PL.z-o.z);if(d<bd){bd=d;b={x:o.x,z:o.z,l:s===1?'GIVE IT BACK':C.name};}}return b;}return at(id);};}
-{const ct=compassTarget;compassTarget=function(){if(EVT.on&&!S.track&&!S.inSim&&!S.inSlop&&!R1K.on)return evTarget();return ct();};}
+{const ct=compassTarget;compassTarget=function(){if(EVT.on&&S.track==='event'&&!S.inSim&&!S.inSlop&&!R1K.on)return evTarget();if(S.track==='event'&&!EVT.on)S.track=null;return ct();};}
 ACH.push(['fetch8','Fetch Lord','finished all 8 fetch quests',()=>Object.values(X.fx).filter(v=>v===2).length>=8],['ev5','Main Event','cleared 5 random events',()=>(X.c.events||0)>=5],['core','Kernel Panic','reached the Corrupted Core',()=>!!X.c.core],
   ['forms','Shapeshifter','tried every form',()=>X.c.forms&&Object.keys(X.c.forms).length>=3],['hook50','Hooked','used the Prompt Hook 50 times',()=>(X.c.hook||0)>=50],['dash100','Skip Intro','dashed 100 times',()=>(X.c.dash||0)>=100]);
 {const ar=act7Reset;act7Reset=function(){ar();if(EVT.on){EVT.objs.forEach(o=>scene.remove(o));EVT.objs.length=0;EVT.on=null;}EVT.next=80;HK.on=false;HK.line.visible=false;if(FORM.i!==0){FORM.i=FORMS.length-1;transform();}X.fx=X.fx||{};X.fq=X.fq||{};crsSync();if(!GLS.seed)glitchBuild(Math.floor(Math.random()*999999));};}
@@ -7121,6 +7121,8 @@ music=(function(m){return function(){if(MVD.on)return;return m.apply(this,argume
 {const up=unlocksPanel;unlocksPanel=function(){up();const p=$('tpanel');if(!p)return;const g=p.querySelector('.unl');if(!g||g.querySelector('[data-mv]'))return;const b=document.createElement('button');b.dataset.mv=1;b.innerHTML='<b>🎤</b><span>THE ALGORITHM<small>lil Bottie · official video</small></span>';b.onclick=()=>{p.remove();mvRun(()=>{unlocksPanel();});};g.insertBefore(b,g.children[2]||null);};}
 {const dr=dvcRender;dvcRender=function(){dr();const el=DVC.el;if(!el||DVC.tab!=='mov')return;const l=el.querySelector('.pane .list');if(!l||l.querySelector('[data-mv]'))return;const b=document.createElement('button');b.className='r';b.dataset.mv=1;b.innerHTML='<span><b>The Algorithm (official video)</b><small>lil Bottie · 3:20 · shot on the game\'s sets</small></span><i>▶</i>';b.onclick=()=>{dvcToggle(false);mvRun(()=>{});};l.insertBefore(b,l.children[2]||null);};}
 {const ai=act15Interact;act15Interact=function(){if(!S.dead&&!S.inPk&&BOT.state==='down'&&Math.hypot(PL.x-BOT.x,PL.z-BOT.z)<7)return{label:'🎤 WATCH HIS MUSIC VIDEO',fn:()=>mvRun(()=>{})};return ai();};}
+// an event no longer grabs the compass: it tells you how to follow it (the first few times)
+{const es=evStart;evStart=function(){es();const q=Q38();q.evH=(q.evH||0)+1;if(q.evH<=3)setTimeout(()=>{if(S.mode==='play')toast('📍 An event started. Tap it in your quests if you want the compass to point at it.');},1800);};}
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
 ['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
 /* ================= main loop ================= */
