@@ -742,7 +742,9 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
   else if (kind === 'shammgod') { side = -0.55; fwd = 0.55; }
   else if (kind === 'retreat') { side = 0.32; fwd = 0.1; }
   else if (p.protect) { side = 0.42; fwd = 0.05; }                     // ball kept away from the defender, low and to the side
-  return _bq.set(p.x + vx * tAhead + rx * side * sgn, 0.125, p.z + vz * tAhead + rz * side * sgn).clone();
+  // forward of the body along the way he faces (the offset was worked out above but never applied: the ball always
+  // bounced level with the hips, and a runner then outran it)
+  return _bq.set(p.x + vx * tAhead + rx * side * sgn + fx * fwd, 0.125, p.z + vz * tAhead + rz * side * sgn + fz * fwd).clone();
 }
 // a dribble move takes the ball out of whatever it was doing and sends it where the move needs it
 function dribMove(p, mv) {
@@ -782,7 +784,7 @@ function ballHeld(p, dt) {
     palm(p, D.hand, _bp); ballFollow(B, _bp, dt, true);
     if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = ''; D.F = dribFloor(p, D, '', D.T); D.upT = Tc * 0.38; }
   } else if (D.ph === 'down') {
-    if (D.t <= dt * 1.01) D.T = Math.max(D.T, D.P0.distanceTo(D.F) / 10);     // no faster than a hard real push
+    if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) / 10);     /* no faster than a hard real push */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
     const u = Math.min(1, D.t / D.T), e = Math.pow(u, 1.5); p.dribH = 0.25 + 0.6 * u;
     B.pos.set(lerp(D.P0.x, D.F.x, u), lerp(D.P0.y, 0.125, e), lerp(D.P0.z, D.F.z, u));
     if (u >= 1) { D.ph = 'up'; D.t = 0; D.C0 = null; D.T = D.upT || Tc * 0.5; D.F.copy(B.pos); if (M_.phase === 'live' && !M_.bounceMute) sfx('bounce'); }
@@ -846,13 +848,14 @@ function animPlayer(p, dt) {
     const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 3.0 && Math.abs(da) < 0.7 && !p.protect;
     p.strideW = lerp(p.strideW || 0, fwd ? 1 : 0, 1 - Math.exp(-(fwd ? 9 : 14) * dt)); const w = p.strideW;
     if (w > 0.02) {
-      const k = clamp((asp - 2.6) / 3.6, 0, 1), cad = 2.65 + 0.85 * k; duty = 0.42 - 0.13 * k; p.psi = ((p.psi || 0) + asp * dt * cad / (2 * Math.max(asp, 0.5))) % 1;
-      let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((8 + 20 * m) * D2R) + Math.sin((20 * m - 8) * D2R)) < need) lo = m; else hi = m; }
-      const Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 2.0), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin });
+      const k = clamp((asp - 2.6) / 3.6, 0, 1), cad = 2.7 + 1.1 * k; duty = 0.4 - 0.14 * k; p.psi = ((p.psi || 0) + asp * dt * cad / (2 * Math.max(asp, 0.5))) % 1;
+      let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)) < need) lo = m; else hi = m; }
+      const Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin });
       const mix = (key, ww) => { const a = P[key] || POSE.zero, b = Pr[key] || POSE.zero; P[key] = [lerp(a[0], b[0], ww), lerp(a[1], b[1], ww), lerp(a[2], b[2], ww)]; };
       for (const key of ['hpR', 'knR', 'anR', 'hpL', 'knL', 'anL']) mix(key, w); P.y = lerp(P.y || 0, Pr.y, w);
       const ub = an === 'run' ? w : w * 0.45; for (const key of ['hips', 'spine', 'chest', 'neck']) mix(key, ub);
-      if (an === 'run') for (const key of ['shR', 'elR', 'wrR', 'shL', 'elL', 'wrL']) mix(key, w); else { const off = (o.hand === 'L') ? 'R' : 'L'; for (const key of ['sh' + off, 'el' + off, 'wr' + off]) mix(key, w * 0.8); }
+      if (an === 'dribble') { P.spine[0] += 0.2 * w; P.chest[0] += 0.12 * w; P.neck[0] -= 0.26 * w; }
+      if (an === 'run') for (const key of ['shR', 'elR', 'wrR', 'shL', 'elL', 'wrL']) mix(key, w); else { const off = (o.hand === 'L') ? 'R' : 'L'; for (const key of ['sh' + off, 'el' + off, 'wr' + off]) mix(key, w * 0.95); }
       if (o.leanF) P.spine[0] += o.leanF * w * 0.5; P.rate = Math.max(P.rate || 16, 16 + 24 * w);
       const uR = p.psi, uL = (p.psi + 0.5) % 1; p.stR = uR < duty; p.stL = uL < duty;
     }

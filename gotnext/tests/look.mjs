@@ -1,0 +1,16 @@
+// Close look at a sprint from a chosen angle: node tests/look.mjs <court|block> <front|side|q> [ball]
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url)), where = process.argv[2] || 'court', ang = process.argv[3] || 'q', ball = process.argv[4] !== 'noball';
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 300, height: 340 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0;
+  window.__tick = n => { if (!window.__patched && window.THREE && THREE.Object3D) { window.__patched = 1; const orig = THREE.Object3D.prototype.lookAt; THREE.Object3D.prototype.lookAt = function (x, y, z) { if (this.isPerspectiveCamera && window.__camFn) { const t = window.__camFn(this); return orig.call(this, t[0], t[1], t[2]); } return orig.call(this, x, y, z); }; }
+    for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message)); await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
+await p.evaluate(([where, ang, ball]) => { const P = __pit; P.uiClose(); const st = document.createElement('style'); st.textContent = '#toasts,#call,#fb,#whud,#emobar,#keys,#hud,#prompt{display:none!important}'; document.head.appendChild(st);
+  if (where === 'court') { P.startPractice('free'); window.__tick(170); const M = P.MT; M.phase = 'live'; M.me.x = -7.4; M.me.z = 7; if (!ball) { M.B.holder = null; M.B.state = 'loose'; M.B.pos.set(7.5, 0.2, 12.5); M.B.vel.set(0, 0, 0); M.looseT = -99; } } else { P.enterWorld('hub', -13, 0, Math.PI / 2); window.__tick(10); }
+  const me = () => where === 'court' ? P.MT.me : P.W.me; const off = { front: [5, 1.3, 0], side: [0, 1.2, 5], q: [3.6, 1.5, 3.4] }[ang];
+  window.__camFn = cam => { const m = me(); cam.position.set(m.x + off[0], off[1], m.z + off[2]); if (cam.fov !== 38) { cam.fov = 38; cam.updateProjectionMatrix(); } return [m.x, 1.0, m.z]; }; }, [where, ang, ball]);
+const shots = []; for (let i = 0; i < 84; i++) { await p.evaluate(where => { const K = __pit.keys; for (const k in K) K[k] = false; K[where === 'court' ? 'KeyD' : 'KeyW'] = true; K.ShiftLeft = true; if (where !== 'court') __pit.W.yaw = Math.PI / 2; if (where === 'court' && __pit.MT.B.state === 'loose') __pit.MT.looseT = -99; window.__tick(1); }, where); if (i >= 60 && i % 2 === 0) shots.push(await p.screenshot({ timeout: 120000 })); }
+fs.mkdirSync(path.join(dir, 'shots'), { recursive: true }); shots.forEach((s, i) => fs.writeFileSync(path.join(dir, 'shots', `look-${where}-${ang}-${String(i).padStart(2, '0')}.png`), s)); console.log(shots.length); await b.close();

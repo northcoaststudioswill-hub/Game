@@ -76,13 +76,13 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   // walk the legs follow walking gait curves; above it, running curves (knee drive, heel recovery, a flight phase).
   const sg = swag === undefined ? 0.6 : swag, wWalk = 1 - clamp((v - 2.2) / 0.9, 0, 1), k = clamp((v - 2.6) / 3.6, 0, 1);
   const stepW = R.legLen * 0.74 * clamp(Math.sqrt(Math.max(v, 0.01) / 1.35), 0.45, 1.3), amp = clamp(v / 0.5, 0, 1) * clamp(Math.sqrt(v / 1.35), 0.45, 1.3);
-  const cad = 2.65 + 0.85 * k, stepR = Math.max(v, 0.5) / cad, duty = 0.42 - 0.13 * k, step = lerp(stepR, stepW, wWalk);     /* running: 2.65 steps/s at a jog to 3.5 at a sprint */
+  const cad = 2.7 + 1.1 * k, stepR = Math.max(v, 0.5) / cad, duty = 0.4 - 0.14 * k, step = lerp(stepR, stepW, wWalk);     /* running: 2.65 steps/s at a jog to 3.5 at a sprint */
   L.psi = ((L.psi || 0) + v * dt / (2 * step)) % 1;
   // the hip swing that carries the body one step over the standing foot (walk), or the stance distance (run)
   const solve = need => { let lo = 0.2, hi = 2.4; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * (Math.sin((11 + 19 * m) * D2R) + Math.sin((20 * m - 11) * D2R)); if (sweep < need) lo = m; else hi = m; } return lo; };
   const hipA = Math.min(solve(1.2 * stepW - 0.12), 1.6) * clamp(v / 0.5, 0, 1);
-  const solveR = need => { let lo = 0.3, hi = 2.2; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * 0.92 * (Math.sin((8 + 20 * m) * D2R) + Math.sin((20 * m - 8) * D2R)); if (sweep < need) lo = m; else hi = m; } return lo; };
-  const stanceDist = v * duty * 2 / cad, hipR = Math.min(solveR(stanceDist - 0.1), 2.0), flight = (0.5 - duty) * 2 / cad;
+  const solveR = need => { let lo = 0.3, hi = 2.2; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)); if (sweep < need) lo = m; else hi = m; } return lo; };
+  const stanceDist = v * duty * 2 / cad, hipR = Math.min(solveR(stanceDist - 0.1), 1.5), flight = (0.5 - duty) * 2 / cad;
   let P = wWalk > 0 ? poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen }) : null;
   if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
   if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
@@ -337,8 +337,8 @@ function worldStep(dt) {
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
   // speed off the court: keys walk (Shift runs). A stick or thumb sets it by how far you push: a walk up to about 80%,
   // then a smooth ramp into the run at full push (no on/off flip at a threshold, which made the body jerk between gaits)
-  const sm = Math.min(1, Math.hypot(mx, my)), ramp = (u => u * u * (3 - 2 * u))(clamp((sm - 0.8) / 0.18, 0, 1));
-  const sp = I.analog ? (I.sprintBtn ? 6.2 : (1.5 + 4.7 * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? 6.2 : 1.5);
+  const RUNV = 5.6, sm = Math.min(1, Math.hypot(mx, my)), ramp = (u => u * u * (3 - 2 * u))(clamp((sm - 0.8) / 0.18, 0, 1));
+  const sp = I.analog ? (I.sprintBtn ? RUNV : (1.5 + (RUNV - 1.5) * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? RUNV : 1.5);
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }

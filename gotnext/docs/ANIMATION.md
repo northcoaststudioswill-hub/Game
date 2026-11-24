@@ -397,7 +397,37 @@ Sources for the running values:
 - [Physiopedia, Running Biomechanics](https://www.physio-pedia.com/Running_Biomechanics) (summarising Novacheck 1998)
 - [Novacheck, The biomechanics of running](https://core.ac.uk/download/357229176.pdf)
 
-## 12. Not checked
+## 12. Run follow-up: stomp, arms, and the ball (v0.8.5)
+
+![The run after the follow-up](img/run-v085.png)
+
+Feedback on v0.8.4: it still read as a power stomp, the arms were strange, and the ball had problems.
+
+- **Stomp:**
+  - The front foot landed far ahead with a hard heel plant. The stance hip swing is now centred further back, so the
+    foot lands closer under the body and pushes further behind (capped at 1.5× the reference swing).
+  - The end of the swing now eases into the angle the stance starts at. Before, it snapped at foot strike.
+  - Lower knee drive, a flatter foot at strike, less give at mid-stance, and less forward lean.
+  - Cadence is a little higher and stance shorter at speed (2.7 → 3.8 steps a second).
+  - The body's rise and fall is damped by 28%: bounce 6.5 cm, down from 9.
+  - Top running speed off the court is 5.6 m/s (was 6.2).
+- **Arms:**
+  - Both forearms used to sit out in front. Now the upper arm swings about 40° behind the body and about 20° in front.
+  - The elbow closes as the hand comes up and opens as it passes the hip.
+  - With the ball, the free arm runs the same way. Before, it stuck out straight.
+- **Ball:** an old bug that the new run exposed.
+  - `dribFloor` worked out how far ahead of the body the ball should bounce (more at speed, and per move), then never
+    added it. The ball always bounced level with the hips.
+  - With the upright run the hand was higher and the drop longer, so a sprinting player outran the ball: it landed
+    15 cm behind him.
+  - The offset is now applied. A drop that takes longer than planned re-aims further ahead.
+  - The speed dribble leans the trunk forward, which brings the hand down to about 0.7–1.0 m.
+  - Through a sprint the ball now stays 0.24–0.70 m ahead of the body.
+
+Measured: sprint at 5.6 m/s, 3.8 steps/s, 45% flight, 117° peak knee bend, 6.5 cm bounce, planted foot slide 0.00 /
+0.01 m/s. All eight court tests pass: test 1 planted feet p90 0.27 m/s, ball in hand 33%, max ball speed 12.0 m/s.
+
+## 13. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

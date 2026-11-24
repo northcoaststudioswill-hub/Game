@@ -9,7 +9,7 @@ await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); awai
 const r = await p.evaluate(() => { const P = __pit; P.uiClose(); P.enterWorld('hub', -12, 0, Math.PI / 2); window.__tick(20); const V = new THREE.Vector3(), rows = [];
   for (let i = 0; i < 220; i++) { const K = P.keys; for (const k in K) K[k] = false; K.KeyW = true; K.ShiftLeft = true; P.W.yaw = Math.PI / 2; window.__tick(1); if (Math.abs(P.W.me.x) > 13.2) { P.W.me.x = -Math.sign(P.W.me.x) * 12; P.W.me.rig.lock = null; } if (i < 60) continue; const me = P.W.me, J = me.rig.joints, f = {}; for (const s of ['R', 'L']) { J['an' + s].getWorldPosition(V); f[s] = [V.x, V.y, V.z]; } J.hips.getWorldPosition(V); rows.push({ f, y: V.y, x: me.x, z: me.z, kn: Math.max(J.knR.rotation.x, 0), psi: me.rig.loco.psi }); }
   return rows; });
-const dt = 1 / 60, G = 0.085, D = 0.29; let air = 0, strikes = 0, slide = [];
+const dt = 1 / 60, G = 0.085, D = 0.28; let air = 0, strikes = 0, slide = [];
 // stance by the stride clock: each foot is on the ground for the first 29% of its cycle at a sprint (flat part: 10-80% of that)
 for (let i = 1; i < r.length; i++) { const a = r[i], q = r[i - 1]; if (a.psi < q.psi) strikes += 2; let st = 0; for (const [s, off] of [['R', 0], ['L', 0.5]]) { const u = (a.psi + off) % 1; if (u < D) st++; if (u > D * 0.1 && u < D * 0.8 && Math.abs(a.x - q.x) < 1) slide.push(Math.hypot(a.f[s][0] - q.f[s][0], a.f[s][2] - q.f[s][2]) / dt); } if (!st) air++; }
 slide.sort((x, y) => x - y); const secs = r.length / 60, ys = r.map(x => x.y), kn = Math.max(...r.map(x => x.kn)) * 180 / Math.PI, v = r.filter((x, i) => i && Math.abs(x.x - r[i - 1].x) < 1).reduce((s, x, i, arr) => s, 0);
