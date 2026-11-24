@@ -624,7 +624,7 @@ function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.re
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
-    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
+    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false, lt = false;
     // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
     const split = twoPlayer && pads.length === 0;
     if (i === 1 && split) {
@@ -635,7 +635,7 @@ function pollInput() {
     if (i === 0) {
       if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
-      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape;
+      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ;
       if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       a = a || touch.a || touch.aTap; b = b || touch.b || touch.bTap; st = st || touch.start || touch.startTap; touch.aTap = touch.bTap = touch.startTap = false;
@@ -650,11 +650,12 @@ function pollInput() {
       // on defense (2K layout): X steals, Y jumps to block; A still steals. With the ball and off it: X or Y shoots / jumps
       const def = typeof padDefense === 'function' && padDefense(i);
       sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
+      lt = lt || B(6) || (p.buttons[6] && p.buttons[6].value > 0.35);      /* LT: body up on defense, post up on offense */
       const lb = B(4), rb = B(5); I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
-    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
+    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.lt = lt; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
     I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
@@ -1300,6 +1301,15 @@ function poseOf(anim, t, o) {
     case 'sprint': runPose(p, o); break;
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
+  // LT on defense: body up. Lower, wider, the lead hand on his hip, the other arm out for the ball
+  if (o.bodyUp) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('knR', 0.22); ad('knL', 0.22); ad('hpR', -0.16, 0, -0.05); ad('hpL', -0.16, 0, 0.05); ad('spine', 0.14); p.y = (p.y || 0) - 0.05;
+    p.shR = [-1.2, 0, 0.12]; p.elR = [-0.35, 0, 0]; p.wrR = [0.45, 0, 0]; p.shL = [-0.85, 0, 0.8]; p.elL = [-0.55, 0, 0]; p.wrL = [0.2, 0, 0]; p.rate = Math.max(p.rate || 16, 22); }
+  // LT on offense: posting up. Low and wide, the back into the defender, the off arm barred behind to hold him
+  if (o.post) { const off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1; p.y = (p.y || 0) - 0.1;
+    p.hpR = [-0.55, 0, -0.24]; p.knR = [0.95, 0, 0]; p.anR = [-0.3, 0, 0.1]; p.hpL = [-0.55, 0, 0.24]; p.knL = [0.95, 0, 0]; p.anL = [-0.3, 0, -0.1];
+    p.spine = [0.36, 0, 0]; p.chest = [0.1, 0.22 * sg, 0]; p.neck = [-0.3, -0.5 * sg, 0];
+    p['sh' + off] = [0.5, 0, 0.65 * sg]; p['el' + off] = [-1.4, 0, 0]; p['wr' + off] = [0.1, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
   // layered on top of every pose: eyes on the ball, lean into the turn
   if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
   if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }

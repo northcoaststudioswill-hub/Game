@@ -187,6 +187,8 @@ COPY CODE buttons had invisible labels.
 | Ring pointer to your man | Done (0.9.4): magenta arrow on your ring on defense |
 | Don't earn VC too fast (no 99 in one session) | Done (0.10): upgrades past 55 get steep. Maxing a build is ~72-110k VC (about 20 hours); 80 OVR is ~32-39k. Early upgrades cost what they did |
 | 5 savable builds | Done (0.10): MY PLAYER → BUILDS. Own body, attributes, badges, moves, fit and movement profile per build; VC, Respect, owned drip and moves, crib shared. Online uses the active build |
+| Stomping when jogging on the court | Fixed (0.10): the running stride only kicked in above 3 m/s, so a half-pushed stick fell back to old stepping. Now the Block's walk-to-run gait runs on the court from 1.2 m/s, and a jogging ball handler turns toward where he's going |
+| Post game (LT on offense) and body up (LT on defense) | Done (0.10): first pass. Back-down by strength, turnaround fade, hook, drop step, face up. AI offense doesn't post up yet; there is no touch button for LT yet |
 | Animation blending and player individuality | Done (0.10): see docs/ANIMATION.md §15. Three blended shot styles and three idles, persistent profiles, transition table, layers, ANIM LAB in the Dev Room |
 | Game crashed spamming steal | Not reproduced: about 6 minutes of random steal spam (2v2, JAM, 3v3) gave no page errors or freezes. Need details: phone or PC, online or solo, froze or error |
 

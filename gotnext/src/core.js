@@ -95,7 +95,7 @@ function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.re
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
-    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
+    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false, lt = false;
     // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
     const split = twoPlayer && pads.length === 0;
     if (i === 1 && split) {
@@ -106,7 +106,7 @@ function pollInput() {
     if (i === 0) {
       if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
-      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape;
+      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ;
       if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       a = a || touch.a || touch.aTap; b = b || touch.b || touch.bTap; st = st || touch.start || touch.startTap; touch.aTap = touch.bTap = touch.startTap = false;
@@ -121,11 +121,12 @@ function pollInput() {
       // on defense (2K layout): X steals, Y jumps to block; A still steals. With the ball and off it: X or Y shoots / jumps
       const def = typeof padDefense === 'function' && padDefense(i);
       sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
+      lt = lt || B(6) || (p.buttons[6] && p.buttons[6].value > 0.35);      /* LT: body up on defense, post up on offense */
       const lb = B(4), rb = B(5); I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
-    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
+    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.lt = lt; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
     I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;

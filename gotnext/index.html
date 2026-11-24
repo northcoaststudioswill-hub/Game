@@ -755,7 +755,7 @@ function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.re
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
-    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
+    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false, lt = false;
     // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
     const split = twoPlayer && pads.length === 0;
     if (i === 1 && split) {
@@ -766,7 +766,7 @@ function pollInput() {
     if (i === 0) {
       if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
-      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape;
+      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ;
       if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       a = a || touch.a || touch.aTap; b = b || touch.b || touch.bTap; st = st || touch.start || touch.startTap; touch.aTap = touch.bTap = touch.startTap = false;
@@ -781,11 +781,12 @@ function pollInput() {
       // on defense (2K layout): X steals, Y jumps to block; A still steals. With the ball and off it: X or Y shoots / jumps
       const def = typeof padDefense === 'function' && padDefense(i);
       sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
+      lt = lt || B(6) || (p.buttons[6] && p.buttons[6].value > 0.35);      /* LT: body up on defense, post up on offense */
       const lb = B(4), rb = B(5); I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
-    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
+    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.lt = lt; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
     I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
@@ -1431,6 +1432,15 @@ function poseOf(anim, t, o) {
     case 'sprint': runPose(p, o); break;
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
+  // LT on defense: body up. Lower, wider, the lead hand on his hip, the other arm out for the ball
+  if (o.bodyUp) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('knR', 0.22); ad('knL', 0.22); ad('hpR', -0.16, 0, -0.05); ad('hpL', -0.16, 0, 0.05); ad('spine', 0.14); p.y = (p.y || 0) - 0.05;
+    p.shR = [-1.2, 0, 0.12]; p.elR = [-0.35, 0, 0]; p.wrR = [0.45, 0, 0]; p.shL = [-0.85, 0, 0.8]; p.elL = [-0.55, 0, 0]; p.wrL = [0.2, 0, 0]; p.rate = Math.max(p.rate || 16, 22); }
+  // LT on offense: posting up. Low and wide, the back into the defender, the off arm barred behind to hold him
+  if (o.post) { const off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1; p.y = (p.y || 0) - 0.1;
+    p.hpR = [-0.55, 0, -0.24]; p.knR = [0.95, 0, 0]; p.anR = [-0.3, 0, 0.1]; p.hpL = [-0.55, 0, 0.24]; p.knL = [0.95, 0, 0]; p.anL = [-0.3, 0, -0.1];
+    p.spine = [0.36, 0, 0]; p.chest = [0.1, 0.22 * sg, 0]; p.neck = [-0.3, -0.5 * sg, 0];
+    p['sh' + off] = [0.5, 0, 0.65 * sg]; p['el' + off] = [-1.4, 0, 0]; p['wr' + off] = [0.1, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
   // layered on top of every pose: eyes on the ball, lean into the turn
   if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
   if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }
@@ -2326,8 +2336,12 @@ function humanThink(p, dt) {
   if (MT.reel && p.ctrl === 0) { reelThink(p, dt); return; }
   let I = IN[p.ctrl];
   const B = MT.B; p.in.dx = I.mx; p.in.dz = I.my; p.in.sprint = I.sprint; p.handsUp = false;
-  if (MT.phase !== 'live') return;
+  if (MT.phase !== 'live') { p.post = p.bodyUp = false; return; }
   const hasBall = B.holder === p;
+  // LT: with the ball and a live dribble, back to the basket (post up); on defense against the ball, body up
+  const postNow = !!I.lt && hasBall && p.live === 'drib' && (p.st === 'free' || p.st === 'move') && !MT.arcade;
+  if (postNow && !p.post) floatTxt(p, 'POST UP', '#f2c14e'); p.post = postNow;
+  p.bodyUp = !!I.lt && !hasBall && MT.off !== p.team && !!B.holder && B.holder.team !== p.team && p.st === 'free';
   if (p.st === 'shoot' && !p.shot.released && p.shot.auto) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
   if (p.remote) {          // the guest times their own release; the host just takes their word for the hold
     if (I.relEdge) p.pendRel = I.rh;
@@ -2351,6 +2365,14 @@ function humanThink(p, dt) {
     if (p.live === 'dead' && dribRules(p)) {
       if (I.flick === 'U' && dHoop(p) < 2.6) { startFinish(p, 0, false, 0, { layup: 1, kind: 'power' }); return; }      /* a power move off two feet is still allowed */
       if (I.flick && I.flick !== 'D') { floatTxt(p, "DRIBBLE'S DEAD", '#ff8a1f'); return; }
+    }
+    if (p.post && p.st === 'free') {      // post moves: shoot = turnaround fadeaway, stick toward the rim = hook, stick to a side = drop step
+      const d = dHoop(p), hf = Math.atan2(-p.x, -p.z);
+      if (I.bP || I.flick === 'D') { p.post = false; startShot(p, I.bP ? 'btn' : 'stick', false, { fade: true }); floatTxt(p, 'TURNAROUND', '#f2c14e'); return; }
+      if (I.flick === 'U' && d < 5.2) { p.post = false; p.face = hf; startShot(p, 'stick', true); floatTxt(p, 'HOOK', '#f2c14e'); return; }
+      if (I.flick && I.flick !== 'U') { const side = I.flick.includes('L') ? -1 : I.flick.includes('R') ? 1 : 0; p.post = false; p.face = hf;
+        if (d < 3.8 && side) { floatTxt(p, 'DROP STEP', '#f2c14e'); startFinish(p, side, false, 0, { layup: 1, kind: 'power' }); return; }
+        floatTxt(p, 'FACE UP', '#f2c14e'); p.vx += side * 2.4; p.vz += 0; return; }
     }
     if (I.bP) { startShot(p, 'btn'); return; }
     if (I.flick === 'D') { startShot(p, 'stick'); return; }
@@ -2503,7 +2525,7 @@ function matchStep(dtReal) {
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
     const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), R = 0.56;
     if (d < R && d > 0.001) { const push = (R - d) / 2; if (push > 0.05) for (const q of [a, b]) { const sg = q === a ? -1 : 1, lx = dx / d * sg, lz = dz / d * sg, fx = Math.sin(q.face), fz = Math.cos(q.face); q.bumpT = 0.3; q.bumpX = clamp((lx * fx + lz * fz) * -push * 3, -0.25, 0.25); q.bumpZ = clamp((lx * fz - lz * fx) * push * 3, -0.25, 0.25); }
-      const wa = a.st === 'stagger' ? 0.2 : 1, wb = b.st === 'stagger' ? 0.2 : 1, sa = 0.5 + nAtt(b, 'str') * 0.5, sb = 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
+      const wa = a.st === 'stagger' ? 0.2 : 1, wb = b.st === 'stagger' ? 0.2 : 1, pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
   }
   stepBall(dt);
   for (const p of M_.P) animPlayer(p, dt);
@@ -2577,10 +2599,20 @@ function stepPlayer(p, dt) {
     const [o, od] = nearestOpp(p), fx = Math.sin(p.face), fz = Math.cos(p.face);
     if (o && od < 1.25 && ((o.x - p.x) * fx + (o.z - p.z) * fz) > od * 0.5 && Math.hypot(p.vx, p.vz) < 1.6 && (o.st === 'free' || o.st === 'steal')) {
       p.pressT = (p.pressT || 0) + dt;
-      if (p.pressT >= 0.6) { p.pressT = 0; const ch = clamp(0.1 + (att(o, 'perd') - att(p, 'handle')) * 0.006 + 0.05 * bt(o, 'ground') - 0.05 * bt(p, 'nda') + (o.handsUp ? 0.04 : 0), 0.02, 0.3);
+      if (p.pressT >= 0.6) { p.pressT = 0; const ch = clamp(0.1 + (att(o, 'perd') - att(p, 'handle')) * 0.006 + 0.05 * bt(o, 'ground') - 0.05 * bt(p, 'nda') + (o.handsUp ? 0.04 : 0) + (o.bodyUp ? 0.06 : 0), 0.02, 0.34);
         if (Math.random() < ch) { p.live = 'dead'; floatTxt(p, 'FORCED PICKUP', '#ff8a1f'); floatTxt(o, 'LOCKED UP', '#7de3ff'); addBrav(o, 0.08); } }
     } else p.pressT = 0;
   }
+  // backing down in the post: moving toward the rim with a defender on your back moves him, by strength (less if he is bodying up)
+  if (hasBall && p.post && p.st === 'free' && M_.phase === 'live') {
+    const dh = dHoop(p) || 1, hx = -p.x / dh, hz = -p.z / dh, va = p.vx * hx + p.vz * hz;
+    for (const o of M_.P) { if (o.team === p.team || o.st === 'jump') continue; const rx = o.x - p.x, rz = o.z - p.z, rl = Math.hypot(rx, rz); if (rl > 1.05 || (rx * hx + rz * hz) < rl * 0.4) continue;
+      if (va > 0.2) { const push = clamp(0.3 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.6 - (o.bodyUp ? 0.2 : 0), 0.05, 0.8); o.x += hx * va * push * dt; o.z += hz * va * push * dt; p.stam = Math.max(0, p.stam - dt * 2.5); o.stam = Math.max(0, o.stam - dt * 2);
+        p.bumpTk = (p.bumpTk || 0) - dt; if (p.bumpTk <= 0) { p.bumpTk = 0.45; sfxM('bump'); } } }
+  }
+  // leaning on the ball handler all day gets called eventually (a hand check)
+  if (p.bodyUp && B.holder && B.holder.team !== p.team && dist(p, B.holder) < 1.1) { p.bodyT = (p.bodyT || 0) + dt; if (p.bodyT > 3 && Math.random() < dt * 0.05) { if (foul(p, B.holder, 'hand check')) p.bodyT = 0; } }
+  else p.bodyT = Math.max(0, (p.bodyT || 0) - dt * 2);
   if (hasBall) {
     if (p.live === 'dead' && p.st === 'free') { lock = 0; const k = Math.pow(0.002, dt); p.vx *= k; p.vz *= k; }      /* feet stay put: pivot only */
   }
@@ -2590,18 +2622,21 @@ function stepPlayer(p, dt) {
   // ball when he does not have it. With the stick released it guards for you; pushing the stick still steers.
   if (p.user && !p.remote && p.guard && M_.phase === 'live' && M_.off !== p.team && B.holder && B.holder !== p && !p.in.sprint && p.st === 'free' && (!S || !S.set || S.set.dassist !== 0)) {
     const g = p.guard, dg = dist(p, g); if (dg < 4.2) {
-      const gh = dHoop(g) || 1, ux = -g.x / gh, uz = -g.z / gh, onBall = g === B.holder, off = onBall ? 1.05 : 1.6;
+      const gh = dHoop(g) || 1, ux = -g.x / gh, uz = -g.z / gh, onBall = g === B.holder, off = onBall ? (p.bodyUp ? 0.74 : 1.05) : 1.6;
       let sx = g.x + ux * off, sz = g.z + uz * off; if (!onBall) { sx = lerp(sx, B.holder.x, 0.22); sz = lerp(sz, B.holder.z, 0.22); }
       const ka = 3.2, dvx = (sx - p.x) * ka + (g.vx || 0), dvz = (sz - p.z) * ka + (g.vz || 0), topD = (3.3 + nAtt(p, 'speed') * 2.5) * 0.92, m = Math.hypot(dvx, dvz) / topD, ax = m > 1 ? dvx / topD / m : dvx / topD, az = m > 1 ? dvz / topD / m : dvz / topD;
       const pushed = Math.hypot(p.in.dx, p.in.dz) > 0.2, w = (pushed ? 0.3 : 0.85) * (0.75 + 0.25 * nAtt(p, 'perd')) * clamp((4.2 - dg) / 1.5, 0, 1);
-      p.in.dx = lerp(p.in.dx, ax, w); p.in.dz = lerp(p.in.dz, az, w); p.assist = w;
+      const w2 = p.bodyUp && onBall ? Math.max(w, 0.9) : w; p.in.dx = lerp(p.in.dx, ax, w2); p.in.dz = lerp(p.in.dz, az, w2); p.assist = w2;
       if (onBall && dg < 1.9 && (g.st === 'shoot' || g.st === 'fake')) p.handsUp = true;       /* hands go up on a shooter in front of you */
     }
   } else p.assist = 0;
   // locomotion
   let top = (3.3 + nAtt(p, 'speed') * 2.5) * (M_.arcade ? 1.15 : 1);
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
-  const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5;
+  if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
+  if (p.bodyUp) top *= 0.86;
+  if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= 0.8 + 0.12 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5); }      /* a hand on your body slows the drive */
+  const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
   if (p.sprinting) { top *= 1.28; if (!p.fire) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * dt);
   if (p.stam < 20) top *= 0.86; if (p.slowT > 0) top *= 0.45;
@@ -2611,6 +2646,8 @@ function stepPlayer(p, dt) {
     const acc = (11 + nAtt(p, 'accel') * 15) * (opp ? 2.4 : 1) * dt;      // braking and reversing bite harder than speeding up
     const ddx = tvx - p.vx, ddz = tvz - p.vz, dl = Math.hypot(ddx, ddz); if (dl <= acc || dl === 0) { p.vx = tvx; p.vz = tvz; } else { p.vx += ddx / dl * acc; p.vz += ddz / dl * acc; }
   }
+  // guarding a post-up: hold your ground (you do not walk into him); the contact itself decides who gives, by strength
+  if (!p.post && M_.phase === 'live') for (const q of M_.P) { if (q.team === p.team || !q.post) continue; const dx = q.x - p.x, dz = q.z - p.z, dd = Math.hypot(dx, dz); if (dd > 0.9 || dd < 1e-3) continue; const vt = (p.vx * dx + p.vz * dz) / dd; if (vt > 0 || !p.user) { p.vx -= dx / dd * vt; p.vz -= dz / dd * vt; } }      /* the AI plants; a person may give ground */
   if (hasBall && p.st === 'free' && M_.phase === 'live' && !M_.practice) {      // line awareness: hard to drift out by accident
     const push = (n, dist) => { const out = p.vx * n[0] + p.vz * n[1], want = p.in.dx * n[0] + p.in.dz * n[1]; if (out <= 0 || dist > 0.7) return; if (want > 0.85 && p.sprinting) return; const k = clamp(dist / 0.7, 0.05, 1); p.vx -= n[0] * out * (1 - k); p.vz -= n[1] * out * (1 - k); };
     push([1, 0], COURT.x1 - p.x); push([-1, 0], p.x - COURT.x0); push([0, -1], p.z - COURT.z0); push([0, 1], COURT.z1 - p.z);
@@ -2636,8 +2673,9 @@ function stepPlayer(p, dt) {
     // on the ball: square to him. Off the ball: face your man when tight, open up between man and ball as you sag off
     if (g === h) tf = am; else tf = lerpAng(am, Math.atan2(h.x - p.x, h.z - p.z), clamp((dist(p, g) - 1.4) / 3.2, 0, 0.5));
   }
+  else if (hasBall && p.post && p.st === 'free') tf = Math.atan2(p.x, p.z);      /* posting: back to the basket */
   else if (hasBall && p.live === 'dead' && p.st === 'free' && Math.hypot(p.in.dx, p.in.dz) > 0.3) tf = Math.atan2(p.in.dx, p.in.dz);     /* pivot */
-  else if (hasBall && !p.sprinting && p.st === 'free') { const hf = Math.atan2(-p.x, -p.z); tf = sp > 1.5 ? lerpAng(Math.atan2(p.vx, p.vz), hf, 0.45) : hf; }
+  else if (hasBall && !p.sprinting && p.st === 'free') { const hf = Math.atan2(-p.x, -p.z); tf = sp > 1.5 ? lerpAng(Math.atan2(p.vx, p.vz), hf, 0.45 * clamp((3.6 - sp) / 2.1, 0.15, 1)) : hf; }      /* jogging with it, the body turns to where it is going (feet and run curves line up); creeping, it squares to the rim */
   else if (sp > 0.6) tf = Math.atan2(p.vx, p.vz);
   else if (B.holder && B.holder !== p) tf = Math.atan2(B.holder.x - p.x, B.holder.z - p.z);
   if (p.faceLock !== undefined) tf = p.faceLock;
@@ -2811,9 +2849,9 @@ function animPlayer(p, dt) {
     case 'celeb': an = 'celeb'; o.style = p.b.moves.celeb; break;
     default:
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
-      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; }
+      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); } }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
-      else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; if (p.sprinting) { an = 'run'; o.sp = spN; } }
+      else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; o.bodyUp = p.bodyUp ? 1 : 0; if (p.sprinting) { an = 'run'; o.sp = spN; } }
       else if (p.speed > 0.4) { an = 'run'; o.sp = spN; o.ph = p.runPh; }
       else if (B.state === 'pass' && B.target === p) an = 'catch';
       if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
@@ -2843,12 +2881,19 @@ function animPlayer(p, dt) {
   // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
   let P = poseOf(an, t, o), duty = 0.38;
   { const yawR = p.face + (R.extraYaw || 0); let da = Math.atan2(p.avx, p.avz) - yawR; da = Math.atan2(Math.sin(da), Math.cos(da));
-    const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 3.0 && Math.abs(da) < 0.7 && !p.protect;
+    const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 1.2 && Math.abs(da) < 0.7 && !p.protect;      /* jogging counts too (was 3 m/s: a half-pushed stick fell back to the old stepping, the "stomp") */
     p.strideW = lerp(p.strideW || 0, fwd ? 1 : 0, 1 - Math.exp(-(fwd ? 9 : 14) * dt)); const w = p.strideW;
     if (w > 0.02) {
-      const k = clamp((asp - 2.6) / 3.6, 0, 1), cad = 2.7 + 1.1 * k; duty = 0.4 - 0.14 * k; p.psi = ((p.psi || 0) + asp * dt * cad / (2 * Math.max(asp, 0.5))) % 1;
-      let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)) < need) lo = m; else hi = m; }
-      const Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin });
+      // the same stride clock as walking around the Block: walking gait curves up to a brisk walk, running curves above
+      const k = clamp((asp - 2.6) / 3.6, 0, 1), cad = 2.7 + 1.1 * k, wWalk = 1 - clamp((asp - 2.2) / 0.9, 0, 1); duty = 0.4 - 0.14 * k;
+      const stepW = R.legLen * 0.74 * clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), step = lerp(Math.max(asp, 0.5) / cad, stepW, wWalk); p.psi = ((p.psi || 0) + asp * dt / (2 * step)) % 1;
+      let Pr = null;
+      if (wWalk < 1) { let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)) < need) lo = m; else hi = m; }
+        Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin }); }
+      if (wWalk > 0) { let lo = 0.2, hi = 2.4; const need = 1.2 * stepW - 0.12; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (R.legLen * (Math.sin((11 + 19 * m) * D2R) + Math.sin((20 * m - 11) * D2R)) < need) lo = m; else hi = m; }
+        const amp = clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), Pw = poseOf('gait', 0, { psi: p.psi, amp, hipA: Math.min(lo, 1.6), swag: R.prof ? 0.2 + R.prof.swag * 0.4 : 0.3, thigh: R.thigh, shin: R.shin, leg: R.legLen });
+        Pr = Pr ? blendPose(Pr, Pw, wWalk) : Pw; }
+      duty = lerp(duty, 0.6, wWalk);
       const mix = (key, ww) => { const a = P[key] || POSE.zero, b = Pr[key] || POSE.zero; P[key] = [lerp(a[0], b[0], ww), lerp(a[1], b[1], ww), lerp(a[2], b[2], ww)]; };
       for (const key of ['hpR', 'knR', 'anR', 'hpL', 'knL', 'anL']) mix(key, w); P.y = lerp(P.y || 0, Pr.y, w);
       const ub = an === 'run' ? w : w * 0.45; for (const key of ['hips', 'spine', 'chest', 'neck']) mix(key, ub);
@@ -2871,12 +2916,12 @@ function animPlayer(p, dt) {
   legIK(R, dt);
   R.shadow.position.y = 0.015 - p.y; R.shadow.scale.setScalar(clamp(1 - p.y * 0.25, 0.4, 1)); p.ring.position.y = 0.02 - p.y;
   if (p.ptr) { const guest = M_.net === 'guest', near = () => { let best = null, bd = 1e9; for (const q of M_.P) if (q.team !== p.team) { const d = dist(q, p); if (d < bd) { bd = d; best = q; } } return best; };      /* a guest doesn't run the defense brain: point at the closest man */
-    const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.guard || p.man || (guest ? near() : null)); p.ptr.visible = !!tg && dist(tg, p) > 0.5;
+    const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.man || p.guard || (guest ? near() : null));      /* your matchup from the opening check, not whoever you happen to be near */ p.ptr.visible = !!tg && dist(tg, p) > 0.5;
     if (p.ptr.visible) { p.ptr.position.y = 0.03 - p.y; p.ptr.rotation.y = Math.atan2(tg.x - p.x, tg.z - p.z) - R.root.rotation.y; p.ptr.children[0].material.opacity = 0.6 + 0.3 * Math.sin(M_.time * 6); } }
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
   if (p.arrow) { p.arrow.position.y = p.H + 0.42 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }
   // ring colours: your matchup glows when you are on defence
-  if (!p.user) { const marked = M_.me && M_.me.def && (M_.me.guard || M_.me.man) === p && M_.phase === 'live'; p.ring.material.color.setHex(marked ? 0xff4fd8 : p.team === M_.me.team ? 0x33a0ff : 0xff4040); p.ring.scale.setScalar(marked ? 1.25 : 1); }
+  if (!p.user) { const marked = M_.me && M_.me.def && (M_.me.man || M_.me.guard) === p && M_.phase === 'live'; p.ring.material.color.setHex(marked ? 0xff4fd8 : p.team === M_.me.team ? 0x33a0ff : 0xff4040); p.ring.scale.setScalar(marked ? 1.25 : 1); }
   if (p.bravT > 0 || p.fire) { if (Math.random() < 0.35) burst(p.x + rnd(-0.3, 0.3), rnd(0.2, 1.8) + p.y, p.z + rnd(-0.3, 0.3), p.fire ? 0xff7a1f : 0xffc531, 1); }
   if (p.sprinting && p.speed > 4 && Math.sin(p.runPh) * Math.sin(p.runPh - dt * 12) < 0 && p.user) sfxM('step');
 }
@@ -4136,7 +4181,7 @@ function uiHud() {
   const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
   $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
   const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = (on ? `<b>${on}</b> online with you` : 'online · nobody else here') + (NET.crew ? ` · crew of <b>${NET.crew.m.length + 1}</b>` : NET.inCrew ? ' · in a crew' : '');
-  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
+  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · Q (LT) post up / body up · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
 }
 function vcLine() { return `<span class="chip" style="margin:0">VC <b>${S.vc.toLocaleString()}</b></span>`; }
 
@@ -4698,8 +4743,8 @@ function netPollRemote() {
     // a player who has not touched anything for 6 s is played by the AI until they do (a phone in a pocket must not stall the game)
     const rj = r ? JSON.stringify(r) : ''; if (rj !== gg.rj) { gg.rj = rj; gg.lastIn = performance.now(); } const idle = performance.now() - (gg.lastIn || G.t0 || 0) > 6000 && !(r && (r.mx || r.my || r.rd || r.b));
     if (MT) { const pl = gg.pl || (gg.pl = MT.P.find(p => p.peer === gg.peer)); if (pl && pl.afk !== idle) { pl.afk = idle; if (pl.remote) floatTxt(pl, idle ? 'AUTO' : 'BACK', idle ? '#8d8d99' : '#3dffa0'); } }
-    if (!r) { I.mx = I.my = 0; I.sprint = false; I.rdir = null; I.b = false; continue; }
-    I.mx = clamp(+r.mx || 0, -1, 1); I.my = clamp(+r.my || 0, -1, 1); I.sprint = !!r.sp; I.rdir = typeof r.rd === 'string' ? r.rd : null; I.b = !!r.b;
+    if (!r) { I.mx = I.my = 0; I.sprint = false; I.rdir = null; I.b = false; I.lt = false; continue; }
+    I.mx = clamp(+r.mx || 0, -1, 1); I.my = clamp(+r.my || 0, -1, 1); I.sprint = !!r.sp; I.lt = !!r.lt; I.rdir = typeof r.rd === 'string' ? r.rd : null; I.b = !!r.b;
     if (L.a !== undefined && r.a !== L.a) I.aP = true; if (L.bc !== undefined && r.bc !== L.bc) I.bP = true;
     if (L.fc !== undefined && r.fc !== L.fc) I.flick = String(r.fd || ''); if (L.rc !== undefined && r.rc !== L.rc) { I.relEdge = true; I.rh = clamp(+r.rh || 0, 0, 3); }
     L.a = r.a; L.bc = r.bc; L.fc = r.fc; L.rc = r.rc;
@@ -4720,7 +4765,7 @@ function netGuestStep(dt) {
     if ((G.gs.done && el > myRel * 1.55 + 0.6) || (!G.gs.seen && el > 0.7) || (G.gs.seen && me.st !== 'shoot')) G.gs = null;
   }
   G.sendT -= dt;
-  const pay = { mx: r2(I.mx), my: r2(I.my), sp: I.sprint ? 1 : 0, rd: I.rdir, b: I.b ? 1 : 0, a: o.a, bc: o.bc, fc: o.fc, fd: o.fd || '', rc: o.rc, rh: o.rh || 0 }, pj = JSON.stringify(pay);
+  const pay = { mx: r2(I.mx), my: r2(I.my), sp: I.sprint ? 1 : 0, lt: I.lt ? 1 : 0, rd: I.rdir, b: I.b ? 1 : 0, a: o.a, bc: o.bc, fc: o.fc, fd: o.fd || '', rc: o.rc, rh: o.rh || 0 }, pj = JSON.stringify(pay);
   if (pj !== G.outJ && G.sendT <= 0) { G.outJ = pj; G.sendT = 0.033; G.R.presence({ i: pay }).catch(() => { }); }
   // ---- state in ----
   const s = G.snap;

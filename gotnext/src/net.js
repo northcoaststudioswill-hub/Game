@@ -268,8 +268,8 @@ function netPollRemote() {
     // a player who has not touched anything for 6 s is played by the AI until they do (a phone in a pocket must not stall the game)
     const rj = r ? JSON.stringify(r) : ''; if (rj !== gg.rj) { gg.rj = rj; gg.lastIn = performance.now(); } const idle = performance.now() - (gg.lastIn || G.t0 || 0) > 6000 && !(r && (r.mx || r.my || r.rd || r.b));
     if (MT) { const pl = gg.pl || (gg.pl = MT.P.find(p => p.peer === gg.peer)); if (pl && pl.afk !== idle) { pl.afk = idle; if (pl.remote) floatTxt(pl, idle ? 'AUTO' : 'BACK', idle ? '#8d8d99' : '#3dffa0'); } }
-    if (!r) { I.mx = I.my = 0; I.sprint = false; I.rdir = null; I.b = false; continue; }
-    I.mx = clamp(+r.mx || 0, -1, 1); I.my = clamp(+r.my || 0, -1, 1); I.sprint = !!r.sp; I.rdir = typeof r.rd === 'string' ? r.rd : null; I.b = !!r.b;
+    if (!r) { I.mx = I.my = 0; I.sprint = false; I.rdir = null; I.b = false; I.lt = false; continue; }
+    I.mx = clamp(+r.mx || 0, -1, 1); I.my = clamp(+r.my || 0, -1, 1); I.sprint = !!r.sp; I.lt = !!r.lt; I.rdir = typeof r.rd === 'string' ? r.rd : null; I.b = !!r.b;
     if (L.a !== undefined && r.a !== L.a) I.aP = true; if (L.bc !== undefined && r.bc !== L.bc) I.bP = true;
     if (L.fc !== undefined && r.fc !== L.fc) I.flick = String(r.fd || ''); if (L.rc !== undefined && r.rc !== L.rc) { I.relEdge = true; I.rh = clamp(+r.rh || 0, 0, 3); }
     L.a = r.a; L.bc = r.bc; L.fc = r.fc; L.rc = r.rc;
@@ -290,7 +290,7 @@ function netGuestStep(dt) {
     if ((G.gs.done && el > myRel * 1.55 + 0.6) || (!G.gs.seen && el > 0.7) || (G.gs.seen && me.st !== 'shoot')) G.gs = null;
   }
   G.sendT -= dt;
-  const pay = { mx: r2(I.mx), my: r2(I.my), sp: I.sprint ? 1 : 0, rd: I.rdir, b: I.b ? 1 : 0, a: o.a, bc: o.bc, fc: o.fc, fd: o.fd || '', rc: o.rc, rh: o.rh || 0 }, pj = JSON.stringify(pay);
+  const pay = { mx: r2(I.mx), my: r2(I.my), sp: I.sprint ? 1 : 0, lt: I.lt ? 1 : 0, rd: I.rdir, b: I.b ? 1 : 0, a: o.a, bc: o.bc, fc: o.fc, fd: o.fd || '', rc: o.rc, rh: o.rh || 0 }, pj = JSON.stringify(pay);
   if (pj !== G.outJ && G.sendT <= 0) { G.outJ = pj; G.sendT = 0.033; G.R.presence({ i: pay }).catch(() => { }); }
   // ---- state in ----
   const s = G.snap;

@@ -526,6 +526,15 @@ function poseOf(anim, t, o) {
     case 'sprint': runPose(p, o); break;
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
+  // LT on defense: body up. Lower, wider, the lead hand on his hip, the other arm out for the ball
+  if (o.bodyUp) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('knR', 0.22); ad('knL', 0.22); ad('hpR', -0.16, 0, -0.05); ad('hpL', -0.16, 0, 0.05); ad('spine', 0.14); p.y = (p.y || 0) - 0.05;
+    p.shR = [-1.2, 0, 0.12]; p.elR = [-0.35, 0, 0]; p.wrR = [0.45, 0, 0]; p.shL = [-0.85, 0, 0.8]; p.elL = [-0.55, 0, 0]; p.wrL = [0.2, 0, 0]; p.rate = Math.max(p.rate || 16, 22); }
+  // LT on offense: posting up. Low and wide, the back into the defender, the off arm barred behind to hold him
+  if (o.post) { const off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1; p.y = (p.y || 0) - 0.1;
+    p.hpR = [-0.55, 0, -0.24]; p.knR = [0.95, 0, 0]; p.anR = [-0.3, 0, 0.1]; p.hpL = [-0.55, 0, 0.24]; p.knL = [0.95, 0, 0]; p.anL = [-0.3, 0, -0.1];
+    p.spine = [0.36, 0, 0]; p.chest = [0.1, 0.22 * sg, 0]; p.neck = [-0.3, -0.5 * sg, 0];
+    p['sh' + off] = [0.5, 0, 0.65 * sg]; p['el' + off] = [-1.4, 0, 0]; p['wr' + off] = [0.1, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
   // layered on top of every pose: eyes on the ball, lean into the turn
   if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
   if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }
