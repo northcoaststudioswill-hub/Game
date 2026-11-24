@@ -859,13 +859,17 @@ const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
 function zw(i,x,z){const zn=ZONES[i],d=Math.hypot(x-zn.x,z-zn.z);return smooth(1-clamp((d-ZR*.55)/(ZR*.85)));}
+const AW_X=44,AW_W=[],AW_A=[];
 function groundH(x,z){
   let h=(fbm(x*.011+5.3,z*.011+9.1)-.5)*52+(fbm(x*.045+2,z*.045+7)-.5)*8;
   const wg=zw(0,x,z),wf=zw(1,x,z),wa=zw(2,x,z);
   if(wg>0){const t=h/6,fl=Math.floor(t),fr=t-fl;h=lerp(h,(fl+smooth(clamp((fr-.7)/.3)))*6,wg*.85);}
   if(wf>0)h=lerp(h,h*.45+3,wf);
   if(wa>0){const zn=ZONES[2],d=Math.hypot(x-zn.x,z-zn.z);h=lerp(h,h*.5,wa);h=lerp(h,1,smooth(1-clamp((d-24)/20)));}
-  for(const a of AREAS){const w=aw(a,x,z);if(w>0){h=lerp(h,a.base,w);if(a.id==='glitch')h+=w*Math.floor(vnoise(x*.11+3,z*.11+7)*5)*2.4;}}
+  // each flattened area eases into the land around it: the bigger the height difference, the wider the ramp (so rims are slopes, not walls).
+  // the strongest area is applied last, so every area's own floor stays exactly flat.
+  {const h0=h;let n=0;for(const a of AREAS){const d=Math.hypot(x-a.x,z-a.z);if(d>=a.r*1.3+AW_X)continue;const ext=a.id==='glitch'?0:Math.min(AW_X,Math.abs(h0-a.base)*2.3),w=smooth(1-clamp((d-a.r*.7)/(a.r*.6+ext)));if(w<=0)continue;let k=n++;while(k>0&&AW_W[k-1]>w){AW_W[k]=AW_W[k-1];AW_A[k]=AW_A[k-1];k--;}AW_W[k]=w;AW_A[k]=a;}
+    for(let k=0;k<n;k++){const a=AW_A[k],w=AW_W[k];h=lerp(h,a.base,w);if(a.id==='glitch')h+=w*Math.floor(vnoise(x*.11+3,z*.11+7)*5)*2.4;}}
   const dh=Math.hypot(x,z);
   h=lerp(h,0,smooth(1-clamp((dh-24)/34)));
   const e=clamp((dh-WORLD_R)/36);h+=e*e*110;
@@ -1375,13 +1379,19 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   // camera auto-follow
   cam.manual-=dt;if(len>.3&&cam.manual<=0&&cam.id<0){const want=PL.face+Math.PI,toward=mx*Math.sin(cam.yaw)+mz*Math.cos(cam.yaw);if(toward<.5)cam.yaw+=angDiff(want,cam.yaw)*dt*1.1;}
   return len;}
+const CAM_S=[.25,.5,.75,.9];
 function updateCamera(dt){if(S.mode==='dialog'&&DLG.shot){const q=DLG.shot,k2=1-Math.exp(-dt*2.4),cp=camera.position;cp.set(lerp(cp.x,q[0],k2),lerp(cp.y,q[1],k2),lerp(cp.z,q[2],k2));cam.lk.set(lerp(cam.lk.x,q[3],k2),lerp(cam.lk.y,q[4],k2),lerp(cam.lk.z,q[5],k2));camera.lookAt(cam.lk);sky.position.copy(cp);return;}
   const k=1-Math.exp(-dt*12);let tx,ty,tz,dist=cam.dist*(camera.aspect<1?1.2:1);
   if(S.mode==='title'){cam.yaw+=dt*.12;tx=0;ty=5;tz=-4;dist=38;cam.pitch=.28;}else{tx=PL.x;ty=PL.vis+2.6;tz=PL.z;if(S.inBoss){dist*=1.5;}if(VAN.driving)dist*=1.75;}
   cam.t.x=lerp(cam.t.x,tx,k);cam.t.y=lerp(cam.t.y,ty,k);cam.t.z=lerp(cam.t.z,tz,k);
   const cp=Math.cos(cam.pitch);let cx=cam.t.x+Math.sin(cam.yaw)*cp*dist,cz=cam.t.z+Math.cos(cam.yaw)*cp*dist,cy=cam.t.y+Math.sin(cam.pitch)*dist;
   if(!S.inBoss&&S.mode!=='title')for(const c of colliders){if(cy>c.top+1||(c.top>900&&cy<c.top-90))continue;const dx=cx-c.x,dz=cz-c.z,r=c.r+1.4,d2=dx*dx+dz*dz;if(d2<r*r){const d=Math.sqrt(d2)||.01;cx=c.x+dx/d*r;cz=c.z+dz/d*r;}}
-  if(!S.inBoss&&S.mode!=='title'){const clear=VAN.driving?4:1.5,mh=groundH((cx+cam.t.x)/2,(cz+cam.t.z)/2)+2,need=Math.max(0,groundH(cx,cz)+clear-cy,2*mh-cam.t.y-cy);cam.lift=lerp(cam.lift||0,need,1-Math.exp(-dt*7));cy+=cam.lift;cy=Math.max(cy,groundH(cx,cz)+1.2);}
+  if(!S.inBoss&&S.mode!=='title'){const clear=VAN.driving?4:1.5;let need=Math.max(0,groundH(cx,cz)+clear-cy);
+    // the ground between you and the lens: the sight line has to clear it at four points, not just the middle
+    for(const q of CAM_S){const g=groundH(cam.t.x+(cx-cam.t.x)*q,cam.t.z+(cz-cam.t.z)*q)+1.4;need=Math.max(need,cam.t.y+(g-cam.t.y)/q-cy);}
+    // if clearing it would mean looking straight down, come in closer instead
+    const cap=dist*.8,pk=need>cap?clamp(cap/need,.4,1):1;cam.pull=lerp(cam.pull===undefined?1:cam.pull,pk,1-Math.exp(-dt*(pk<(cam.pull||1)?8:2.5)));if(need>cap)need=cap;
+    cam.lift=lerp(cam.lift||0,need,1-Math.exp(-dt*7));cy+=cam.lift;if(cam.pull<.995){cx=cam.t.x+(cx-cam.t.x)*cam.pull;cz=cam.t.z+(cz-cam.t.z)*cam.pull;cy=cam.t.y+(cy-cam.t.y)*Math.max(cam.pull,.7);}cy=Math.max(cy,groundH(cx,cz)+1.2);}
   let sx=0,sy=0;if(S.shake>0){S.shake=Math.max(0,S.shake-dt*1.8);const m=reduceMotion?.15:1;sx=(Math.random()-.5)*S.shake*1.6*m;sy=(Math.random()-.5)*S.shake*1.6*m;}
   camera.position.set(cx+sx,cy+sy,cz);camera.lookAt(cam.t.x,cam.t.y+.6,cam.t.z);cam.lk.set(cam.t.x,cam.t.y+.6,cam.t.z);sky.position.copy(camera.position);}
 
@@ -6360,7 +6370,7 @@ const SOLID_SIG=[[270,63,-60,61,127,60],[-67,12,368,105,23,73],[-282,5,-22,42,3,
 function solidBuild(){const T=THREE,ray=new T.Raycaster(),dn=new T.Vector3(0,-1,0),up=new T.Vector3(0,1,0),cs=SOLID.cs;const found=[];
   scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry)return;const B=new T.Box3().setFromObject(o),c=B.getCenter(new T.Vector3()),s=B.getSize(new T.Vector3());
     const GA=ABY.glitch;if(GA&&Math.hypot(c.x-GA.x,c.z-GA.z)<GA.r&&s.y>2&&s.x<34&&s.z<34&&!o.material.transparent&&!(o.parent&&o.parent!==scene)){found.push({o,B});return;}
-    for(const q of SOLID_SIG)if(Math.abs(c.x-q[0])<2&&Math.abs(c.y-q[1])<2&&Math.abs(c.z-q[2])<2&&Math.abs(s.x-q[3])<2&&Math.abs(s.y-q[4])<2&&Math.abs(s.z-q[5])<2){found.push({o,B});break;}});
+    for(const q of SOLID_SIG)if(Math.abs(c.x-q[0])<2&&Math.abs(c.y-q[1])<9&&Math.abs(c.z-q[2])<2&&Math.abs(s.x-q[3])<2&&Math.abs(s.y-q[4])<2&&Math.abs(s.z-q[5])<2){found.push({o,B});break;}});
   for(const F of found){const o=F.o,B=F.B,side=o.material.side;o.material.side=T.DoubleSide;
     for(let x=Math.floor(B.min.x/cs)*cs+cs/2;x<B.max.x;x+=cs)for(let z=Math.floor(B.min.z/cs)*cs+cs/2;z<B.max.z;z+=cs){const gy=groundH(x,z);
       ray.set(new T.Vector3(x,B.max.y+1,z),dn);ray.far=B.max.y-gy+3;const h=ray.intersectObject(o,false)[0];if(!h)continue;const top=h.point.y;if(top<gy+.9)continue;
@@ -7091,7 +7101,7 @@ const MVE=MVL.map(()=>null);(function(){try{const v=JSON.parse(localStorage.getI
 function mvEndOf(i){const s=MVL[i][0],nx=i+1<MVL.length?MVL[i+1][0]:199.5,e=MVE[i];return e!=null&&e>s+.2?Math.min(e,nx):Math.min(nx,s+3.9);}
 // wide shots and B-roll: slow arcs, cranes, flyovers and pull-backs over the sets and the rest of the map, each with its name on screen
 // marks: where he stands on each set so that nothing passes through him, and where you stand beside him (found by probing the real geometry)
-const MVFIX={"@anchor":[79.8,2.4,208.9],"trench":[-335.7,-18,128.4],"debate":[112.4,2,248.6],"grave":[-59.4,2.98,-119.6],"@marc":[-258.4,2.19,-18.8],"cloud":[-126,48.98,68],"needle":[-281.9,63.4,251.7],"@erin":[19.4,4,-153.1],"glitch":[202.7,6,-145.4],"set":[-164.3,2.3,139.2],"basil":[-78.8,2.3,194.3],"course":[-319.9,0.9,-118.6],"podium":[154,2.5,-243],"north":[-186.8,1.12,-184.2],"cue":[140.3,1.71,115.4],"@kael":[-106.6,4.44,52.1],"plaza":[0,0.15,7.3],"feed":[20.5,2.3,-219.8],"npcls":[-223.2,2.4,159.3],"pile":[-107.2,2,-165.4],"farm":[-166.5,1.91,-7.6],"void":[173.4,5,7.5],"fringe":[-32.1,3,-85.6]},MVPC={"scroll":[-24.8,2.2,-271.1],"feed":[24.1,2.3,-219.5],"mirror":[-88.3,1.98,18.4],"clank":[-134.7,3,64.6],"arena":[3.6,170,14],"@anchor":[83.4,2.4,208.9],"gen":[203.6,3.3,58.2],"npcls":[-221.1,2.4,162.2],"aura":[59.5,5.06,-109],"trench":[-334.4,-18,131.8],"chrome":[-93.4,2,129.8],"sunkeep":[3.6,4,-131.1],"hour":[82,6,-135.8],"pod":[-60.8,2,363.5],"debate":[116.3,2,248.5],"npcesc":[329.4,2,-143.2],"@carl":[-34.6,3,-89.5],"pile":[-110.2,2,-163.4],"grave":[-55.5,2.93,-119.9],"farm":[-164.8,0.79,-11.1],"@marc":[-258.4,1.86,-15.2],"dc":[238.6,4,121],"cloud":[-122.4,48.75,68],"needle":[-280.7,63.4,247.2],"slopc":[277.8,2.3,-238],"void":[173.2,4.96,11.1],"fac":[85.5,3,129.2],"@erin":[22.8,4,-154.2],"rizz":[177,2,-312],"glitch":[200.6,6,-148.3],"set":[-164.3,2.8,143.9],"basil":[-82.1,2.3,193],"@det":[384.4,2,49],"mtn":[248.2,2,-51.5],"land":[-293.5,-3.96,-290.6],"course":[-318.7,0.9,-122],"@eth":[-113.8,3.4,-179],"podium":[157.6,2.5,-243],"mew":[232.6,2,273.6],"sigma":[-182.7,2,309.1],"press":[-53,0.95,9.1],"chat":[302.4,2,193],"corn":[52.2,2,354.9],"north":[-189.3,1.12,-181.7],"fringe":[-28.7,2.98,-86.9],"wreck":[350.5,2,51.5],"@marcus":[125.9,3,81.7],"tax":[-358.3,2,15.3],"cue":[140.2,2.71,116.7],"back":[-59,2.3,-215.2],"pit":[-264.4,3,-24.4],"@kael":[-106.9,3.82,56],"plaza":[3.6,0.15,7.3]};
+const MVFIX={"@anchor":[79.8,2.4,208.9],"trench":[-335.7,-18,128.4],"debate":[112.4,2,248.6],"grave":[-59.4,2.98,-119.6],"@marc":[-258.1,2.82,-17.5],"cloud":[-126,48.98,68],"needle":[-281.9,63.4,251.7],"@erin":[19.4,4,-153.1],"glitch":[202.7,6,-145.4],"set":[-164.3,2.3,139.2],"basil":[-78.8,2.3,194.3],"course":[-319.9,0.9,-118.6],"podium":[154,2.5,-243],"north":[-186.8,1.12,-184.2],"cue":[140.3,1.71,115.4],"@kael":[-106.6,2.88,52.1],"plaza":[0,0.15,7.3],"feed":[20.7,2.3,-218.5],"npcls":[-223.2,2.4,159.3],"pile":[-107.2,2,-165.4],"farm":[-166.5,1.91,-7.6],"void":[173.4,5,7.5],"fringe":[-32.1,3,-85.6]},MVPC={"scroll":[-24.5,2.2,-268.1],"feed":[24.3,2.3,-218.2],"mirror":[-88.3,1.99,18.4],"clank":[-134.7,3,64.6],"arena":[3.6,170,14],"@anchor":[83.4,2.4,208.9],"gen":[203.6,3.3,58.2],"npcls":[-221.1,2.4,162.2],"aura":[59.5,5.01,-109],"trench":[-334.4,-18,131.8],"chrome":[-93.4,2,129.8],"sunkeep":[3.6,4,-131.1],"hour":[82,6,-135.8],"pod":[-60.8,2,363.5],"debate":[116.3,2,248.5],"npcesc":[329.4,2,-143.2],"@carl":[-34.6,3,-89.5],"pile":[-110.2,2,-163.4],"grave":[-55.5,2.96,-119.9],"farm":[-164.8,1.87,-11.1],"@marc":[-259.6,2.89,-13.9],"dc":[238.6,4,121],"cloud":[-122.4,48.75,68],"needle":[-280.7,63.4,247.2],"slopc":[277.8,2.3,-238],"void":[173.2,4.99,11.1],"fac":[85.5,3,129.2],"@erin":[22.8,4,-154.2],"rizz":[177,2,-312],"glitch":[200.6,6,-148.3],"set":[-164.3,2.8,143.9],"basil":[-82.1,2.3,193],"@det":[384.4,2,49],"mtn":[248.2,2,-51.5],"land":[-293.5,-3.96,-290.6],"course":[-318.7,0.9,-122],"@eth":[-113.8,3.4,-179],"podium":[157.6,2.5,-243],"mew":[232.6,2,273.6],"sigma":[-182.7,2,309.1],"press":[-53,1.39,9.1],"chat":[302.4,2,193],"corn":[52.2,2,354.9],"north":[-189.3,1.12,-181.7],"fringe":[-28.7,2.99,-86.9],"wreck":[350.5,2,51.5],"@marcus":[125.9,3,81.7],"tax":[-358.3,2,15.3],"cue":[140.2,2.71,116.7],"back":[-51.6,2.3,-215.6],"pit":[-264.4,3,-24.4],"@kael":[-105,3.12,48.9],"plaza":[3.6,0.15,7.3]};
 {const ms=mvSpot;mvSpot=function(id){const sp=ms(id),k=id[0]==='@'&&!sp.npc?'plaza':id,f=MVFIX[k];if(f){sp.x=f[0];sp.y=f[1];sp.z=f[2];}sp.id=k;return sp;};}
 function mvPlan(i){if(i<0)return['perf','perf'];const id=MVSET[i][0];if(id==='hc'||id.indexOf('cuts:')===0)return['perf','perf'];if(i===0||MVL[i][1]!==MVL[i-1][1])return['wide','perf'];if(i%3===1)return['perf','wide'];if(i%4===2)return['perf','cast'];if(i%7===5)return['broll','perf'];return['perf','perf'];}
 function mvNear(x,z){let best=null,bd=1e9;for(const A of AREAS){const d=Math.hypot(x-A.x,z-A.z)-A.r;if(d<bd){bd=d;best=A;}}if(best&&bd<30)return[best.name,best.sub];for(const Z of ZONES){const d=Math.hypot(x-Z.x,z-Z.z);if(d<70)return[Z.name,Z.sub];}return null;}
