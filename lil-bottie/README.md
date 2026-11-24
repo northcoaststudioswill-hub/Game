@@ -84,6 +84,24 @@ How he moves (v0.4):
 ![hair and helmet from six angles](asset/lil-bottie-hair.png)
 ![the newer poses and faces](asset/lil-bottie-more-poses.png)
 
+## v0.8: action moves, grounded feet, a phone with a feed
+
+- **12 action moves, all on the beat:** jump, bodyroll, spin, kick, punch, dab, robot, armwave, drop, slide,
+  backflip, stomp. His body can now pitch (about the hips) and travel, which the flip and the slide use.
+- **Scroll:** he holds his phone out at you, screen first, and flicks the feed with his other hand. The screen is
+  live: a feed that never stops scrolling, deep fried, with grain, crushed colour and tearing.
+- **Feet on the floor.** An audit found his soles 4 to 14 cm through the floor in every pose. The lowest point
+  of either sole is now put on the floor every frame, unless the move says he is in the air.
+- **Arms:** the fix pass now also keeps arms out of the helmet, the face, the hips and the other hand, and may
+  bend the elbow as well as move the shoulder. It tries small moves and keeps whichever clears the most.
+- **Hair:** combing no longer pumps energy into the dreads, and they have a top speed, so they move with weight.
+- **Audit** (`arms / head / hips / hands / legs / floor / dreads / phone`, 8 simulated seconds of each of 60
+  poses): nothing is more than 2 cm into anything. Worst cases: an arm 0.4 cm into the jacket, a dread 1 cm.
+- **The page:** one slim row of controls; the rest is behind ⋯, and **hide** clears the screen to just him and
+  the lyric. The view shifts up so he stands clear of the controls.
+
+![the action moves](asset/lil-bottie-action-moves.png)
+
 ## The Algorithm, line by line
 
 `lyrics/the-algorithm.choreo.json` gives every one of the 52 lines a pose, eyes, a resting mouth and (for some)

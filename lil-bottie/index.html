@@ -20,7 +20,7 @@ body{margin:0;background:var(--bg);color:var(--paper);font:700 13px/1.3 var(--bo
 #top b{display:block;font:400 26px/1 var(--display);color:var(--led);letter-spacing:.1em}#top span{opacity:.7;font-weight:500}
 #lyric{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:170px;text-align:center;pointer-events:none}
 #lyric i{display:block;font-style:normal;font:600 12px var(--mono);letter-spacing:.08em;color:var(--lime);margin-bottom:4px;font-variant-numeric:tabular-nums}
-#lyric b{display:inline;font:400 clamp(20px,4.6vw,40px)/1.15 var(--display);letter-spacing:.03em;color:var(--paper);text-shadow:3px 3px 0 var(--hot),0 0 12px #000;text-wrap:balance}
+#lyric b{display:inline;font:400 clamp(16px,3vw,28px)/1.15 var(--display);letter-spacing:.03em;color:var(--paper);text-shadow:3px 3px 0 var(--hot),0 0 12px #000;text-wrap:balance}
 #lyric u{display:block;text-decoration:none;font:600 11px var(--mono);opacity:.7;margin-top:5px}
 #ui{position:fixed;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;align-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center}
@@ -43,17 +43,22 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--led)}
 #tapbtn{font:400 clamp(28px,7vw,54px) var(--display);letter-spacing:.06em;padding:26px 40px;border-radius:20px;background:var(--lime);color:var(--ink);border-color:var(--lime);width:min(520px,100%)}#tapbtn:active{background:var(--gold)}
 #tapper textarea{width:min(520px,100%);height:120px;font:12px var(--mono);background:#12021f;color:var(--paper);border:2px solid var(--led);border-radius:8px;padding:8px;box-sizing:border-box}
 #mine{font:600 11px var(--mono);color:var(--gold)}
+#ui{gap:5px}#ui button,#ui select{padding:5px 8px;font-size:11px}#ui button.go{font-size:12px;padding:6px 12px}#songSel{max-width:44vw}
+#lyric u{display:none}body.more #lyric u{display:block}
+#show{position:fixed;right:max(10px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));opacity:.7;padding:5px 9px;font-size:11px;z-index:3}
+body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(14px + env(safe-area-inset-bottom,0px))!important}body.clean #lyric i{opacity:.6}
 @media (max-width:560px){#top span{display:none}}
 </style>
 <canvas id="c"></canvas>
-<div id="top"><b>LIL BOTTIE</b><span>asset v0.6 · his songs, line by line · drag to turn him</span></div>
+<div id="top"><b>LIL BOTTIE</b><span>asset v0.8 · his songs, line by line · drag to turn him</span></div>
 <div id="lyric"><i id="sec"></i><b id="line"></b><u id="what"></u></div>
 <div id="ui">
-  <div class="row"><select id="songSel" aria-label="Song"></select><button class="go" id="play">▶ play</button><button id="prev" aria-label="Previous line">⏮ line</button><button id="next" aria-label="Next line">line ⏭</button><span id="clock">0:00.0 / 3:20</span><button id="lines">☰ all 52 lines</button><button id="tap">⏱ time it yourself</button></div>
+  <div class="row"><select id="songSel" aria-label="Song"></select><button class="go" id="play">▶ play</button><button id="prev" aria-label="Previous line">⏮</button><button id="next" aria-label="Next line">⏭</button><span id="clock">0:00.0 / 3:20</span><button id="lines" aria-label="All lines">☰</button><button id="moreb" aria-label="More controls">⋯</button><button id="hide" aria-label="Hide the controls">hide</button></div>
   <div id="bar" role="slider" aria-label="Song position" tabindex="0"><u></u></div>
-  <div class="row"><button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span><span id="mine"></span><button id="slow">½ speed</button>
-    <select id="poseSel" aria-label="Pose"></select><select id="faceSel" aria-label="Face"></select><button id="auto" class="on">follow the song</button></div>
+  <div class="row" id="more" hidden><select id="poseSel" aria-label="Pose"></select><select id="faceSel" aria-label="Face"></select><button id="auto" class="on">follow the song</button><button id="slow">½ speed</button><button id="tap">⏱ time it yourself</button>
+    <button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span><span id="mine"></span></div>
 </div>
+<button id="show" hidden>show controls</button>
 <div id="tapper" hidden><h2>TIME THE LYRICS</h2><p id="taphelp">The song plays from the start. Tap the big button (or press Space) the moment he <b>starts</b> each line. Wrong tap? Use undo.</p>
   <div class="af" id="tapprog"></div><div class="nx" id="tapnext"></div><div class="af" id="tapafter"></div>
   <button id="tapbtn">TAP</button><div class="row"><button id="tapundo">↶ undo last</button><button id="taprestart">⟲ start over</button><button id="tapquit">✕ close</button></div>
@@ -128,8 +133,10 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--led)}
   $('tapquit').onclick=function(){TAP.on=false;$('tapper').hidden=true;lastK=-9;};
   $('tapcopy').onclick=function(){var ta=$('tapout');function fb(){ta.focus();ta.select();$('tapmsg').textContent='selected: copy it';}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(ta.value).then(function(){$('tapmsg').textContent='copied';},fb);else fb();};
   addEventListener('keydown',function(e){if(TAP.on&&e.code==='Space'){e.preventDefault();if(!e.repeat)tapHit();}});
-  $('lines').onclick=function(){$('list').hidden=!$('list').hidden;};$('listx').onclick=function(){$('list').hidden=true;};
-  function size(){var w=innerWidth,hh=innerHeight;R.setSize(w,hh,false);cam.aspect=w/hh;cam.fov=w<hh?56:42;cam.updateProjectionMatrix();$('lyric').style.bottom=($('ui').offsetHeight+22)+'px';}addEventListener('resize',size);size();
+  $('lines').onclick=function(){$('list').hidden=!$('list').hidden;};
+  $('moreb').onclick=function(){var o=$('more').hidden;$('more').hidden=!o;this.className=o?'on':'';document.body.classList.toggle('more',o);size();};
+  $('hide').onclick=function(){document.body.classList.add('clean');$('show').hidden=false;size();};$('show').onclick=function(){document.body.classList.remove('clean');this.hidden=true;size();};$('listx').onclick=function(){$('list').hidden=true;};
+  function size(){var w=innerWidth,hh=innerHeight;R.setSize(w,hh,false);cam.aspect=w/hh;cam.fov=w<hh?56:42;var uh=document.body.classList.contains('clean')?40:$('ui').offsetHeight+($('lyric').offsetHeight||40)+26;cam.setViewOffset(w,hh,0,Math.round(uh*.5),w,hh);cam.updateProjectionMatrix();$('lyric').style.bottom=($('ui').offsetHeight+18)+'px';}addEventListener('resize',size);size();
   var t0=performance.now(),last=t0;(function loop(now){requestAnimationFrame(loop);var t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;if(song===VC&&!VC.paused){VC.currentTime+=dt*VC.playbackRate;if(VC.currentTime>=VC.duration){VC.pause();VC.currentTime=0;started=false;ended();}}var playing=started&&!song.paused,pt=playing?'❚❚ pause':'▶ play';if($('play').textContent!==pt)$('play').textContent=pt;if(auto){if(playing)yaw=Math.sin(t*.22)*.7;else yaw+=dt*.35;}
     if(started){var ct=song.currentTime,k=lineAt(ct),dur=song.duration||199.97;$('clock').textContent=fmt(ct)+' / '+fmt(dur);$('bar').firstChild.style.width=(ct/dur*100)+'%';
       var past=k>=0&&k===LINES.length-1&&ct-(LINES[k][0]+offset)>3.6,L=k>=0&&!past?LINES[k]:null;

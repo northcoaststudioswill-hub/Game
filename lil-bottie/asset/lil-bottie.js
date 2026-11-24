@@ -97,7 +97,7 @@
     var fB = bake([P(Box(.023, .048, .027), CHROME2, M(0, -.024, 0)), P(Box(.028, .011, .032), 0x4a4e58, M(0, -.003, 0)), P(Box(.017, .012, .02), 0xeef2f8, M(0, -.05, .002))]);
     var tA = bake([P(Box(.033, .05, .035), CHROME, M(0, -.025, 0)), P(Box(.037, .013, .039), 0x4a4e58, M(0, -.003, 0))]);
     var tB = bake([P(Box(.028, .044, .03), CHROME2, M(0, -.022, 0)), P(Box(.032, .011, .034), 0x4a4e58, M(0, -.003, 0))]);
-    var arms = [];
+    var arms = [], phoneCv = null, phoneTx = null, phoneT = 0;
     [-1, 1].forEach(function (s) {
       var sh = new THREE.Group(); sh.position.set(s * .36, .5, 0); torso.add(sh);
       var up = [P(Sph(.125, 8, 6), SILVER, M(0, -.01, 0)), P(Cyl(.115, .11, .12, 8), SILVER2, M(0, -.11, 0)), P(Cyl(.11, .105, .11, 8), SILVER, M(0, -.225, 0))];
@@ -117,9 +117,10 @@
       var th = new THREE.Group(); th.position.set(s * .058, -.05, .012); th.scale.setScalar(1.25); hg.add(th); th.add(new THREE.Mesh(tA, chromeM));
       var th2 = new THREE.Group(); th2.position.y = -.05; th.add(th2); th2.add(new THREE.Mesh(tB, chromeM));
       var phone = null;
-      if (s > 0) { phone = new THREE.Group(); phone.position.set(0, -.1, .05); phone.visible = false; hg.add(phone);   // his phone, in his left hand
-        phone.add(new THREE.Mesh(bake([P(Box(.1, .19, .016), 0x0c0c10, M(0, 0, 0)), P(Box(.03, .03, .004), CHROME2, M(-.025, .065, -.01))]), chromeM));
-        var ps = new THREE.Mesh(new THREE.PlaneGeometry(.088, .172), new THREE.MeshBasicMaterial({ color: 0x4fb4ff, fog: false })); ps.position.z = .0086; phone.add(ps); }
+      if (s > 0) { phone = new THREE.Group(); phone.position.set(0, -.12, .055); phone.scale.setScalar(1.25); phone.visible = false; hg.add(phone);   // his phone, in his left hand, screen on the palm side
+        phone.add(new THREE.Mesh(bake([P(Box(.118, .225, .016), 0x0c0c10, M(0, 0, 0)), P(Box(.03, .03, .004), CHROME2, M(-.03, .08, -.01))]), chromeM));
+        phoneCv = document.createElement('canvas'); phoneCv.width = 64; phoneCv.height = 128; phoneTx = new THREE.CanvasTexture(phoneCv); phoneTx.magFilter = THREE.NearestFilter;
+        var ps = new THREE.Mesh(new THREE.PlaneGeometry(.106, .21), new THREE.MeshBasicMaterial({ map: phoneTx, fog: false })); ps.position.z = .0086; phone.add(ps); }
       el.rotation.order = 'YXZ';
       arms.push({ sh: sh, el: el, hand: hg, fingers: fingers, thumb: th, thumb2: th2, phone: phone, s: s });
     });
@@ -159,7 +160,7 @@
     var dreads = [], dseed = 7, DOWN = new THREE.Vector3(0, -1, 0);
     function drand() { dseed = (dseed * 16807) % 2147483647; return dseed / 2147483647; }
     function dread(root, len, nseg, bx, bz) {
-      var D = { root: root, segL: len / nseg, np: nseg + 1, th: .95 + drand() * .4, pts: [], prev: [], mesh: [], drag: .25 + drand() * .2, n: dreads.length, rp: new THREE.Vector3(), rn: new THREE.Vector3(), bx: bx, bz: bz };
+      var D = { root: root, segL: len / nseg, np: nseg + 1, th: .95 + drand() * .4, pts: [], prev: [], mesh: [], drag: .06 + drand() * .08, n: dreads.length, rp: new THREE.Vector3(), rn: new THREE.Vector3(), bx: bx, bz: bz };
       // its combed path: down over the head along the surface, then straight down. The part lying on the head is held to this path; the rest hangs free.
       var cx = 0, cy = .2, cz = .012, R = .322, ux = root.x - cx, uy = root.y - cy, uz = root.z - cz, hx = ux + bx * .16, hz = uz + bz * .16, hl = Math.hypot(hx, hz) || 1; hx /= hl; hz /= hl;
       var th0 = Math.acos(Math.max(-1, Math.min(1, uy / .318))), off = 0; D.rest = []; D.pin = 0;
@@ -251,8 +252,20 @@
     function setMouth(v) { fx.lip = v; drawFace(); }
     drawFace();
 
+    // ---- what is on his phone: a feed that never stops, deep fried. Redrawn 12 times a second while the phone is out.
+    var ROT = ['67', 'ROT', 'NPC', 'LIKE', '$$$', 'W', 'L', 'AD', 'SLOP', 'GM', 'RATIO', '!!!', 'SUB', 'LOL'];
+    function phoneDraw(t) {
+      var g = phoneCv.getContext('2d'), W = 64, H = 128, sp = t * 170 + Math.floor(t * 1.6) * 90, k0 = Math.floor(sp / 42);   // it scrolls, and every so often a thumb flicks it on
+      for (var k = -1; k < 4; k++) { var n = k0 + k, y = H - ((sp % 42) + (k + 1) * 42) + 42, hue = (n * 67) % 360; g.fillStyle = 'hsl(' + hue + ',100%,' + (38 + (n * 13) % 30) + '%)'; g.fillRect(0, y, W, 42);
+        g.fillStyle = 'hsl(' + ((hue + 180) % 360) + ',100%,60%)'; g.fillRect(3 + (n * 7) % 20, y + 4, 22, 22); g.fillStyle = '#fff'; g.font = 'bold ' + (13 + (n * 5) % 9) + 'px Impact, sans-serif'; g.fillText(ROT[((n % ROT.length) + ROT.length) % ROT.length], 4 + (n * 11) % 16, y + 36);
+        g.fillStyle = '#ff2e88'; g.fillRect(50, y + 8, 9, 9); g.fillStyle = '#fff'; g.fillRect(50, y + 22, 9, 3); g.fillRect(50, y + 28, 9, 3); }
+      var id = g.getImageData(0, 0, W, H), d = id.data;   // the grain: crushed, oversaturated and noisy
+      for (var i = 0; i < d.length; i += 4) { var nz2 = (Math.random() - .5) * 150, row = (i / 4 / W | 0) % 3 === 0 ? .7 : 1; d[i] = Math.min(255, Math.max(0, (d[i] - 128) * 1.9 + 150 + nz2)) * row; d[i + 1] = Math.min(255, Math.max(0, (d[i + 1] - 128) * 1.9 + 120 + nz2)) * row; d[i + 2] = Math.min(255, Math.max(0, (d[i + 2] - 128) * 1.6 + 110 + nz2 * .6)) * row; }
+      g.putImageData(id, 0, 0); if (Math.random() < .25) { var gy = Math.random() * H | 0; g.drawImage(phoneCv, 0, gy, W, 9, (Math.random() - .5) * 14, gy, W, 9); }   // a tear
+      phoneTx.needsUpdate = true;
+    }
     // ---- poses and motion. Every joint is a spring chasing a target, so moves overshoot a little and settle.
-    var pose = 'idle', bpm = 137.2, st = {};
+    var pose = 'idle', lastPose = '', bt0 = 0, bpm = 137.2, st = {};
     function setPose(p) { if (POSES[p]) pose = p; }
     function setTempo(b) { bpm = b; }
     function ch(name, target, dt, k, d) {
@@ -295,8 +308,8 @@
         if (!bar) { g.hy = sd * .8; g.hz = sd * .18; g.hx = .1; g.ty = sd * .18; g.brz = sd * .04; } else { g.hx = -.25 + b * .75; g.tx = .05 + b * .2; g.hy = sd * .12; }
         g.L = A({ sx: -.5, out: .3, ex: -1.35 + b * .35, wy: 1.4, hand: 'fist' }); g.R = A({ sx: -.5, out: .3, ex: -1.35 + b * .35, wy: 1.4, hand: bar ? 'horns' : 'fist' }); },
       // ---- poses written for lines of The Algorithm
-      scroll: function (g, t) { var f = frac(t * 2.2); g.phone = true; g.tx = .16; g.hx = .38; g.hz = Math.sin(t * .7) * .04; crouch(g, .04);
-        g.L = A({ sx: -.75, out: .12, tw: -.5, ex: -1.5, wy: .3, hand: 'grip', thumb: .1 }); g.R = A({ sx: -.8, out: .05, tw: -.95, ex: -1.5 + f * .22, wy: 1.2, wx: .4 - f * .5, hand: 'point' }); },
+      scroll: function (g, t) { var f = frac(t * 1.6), w = Math.sin(t * 2.2); g.phone = true; g.tx = .1; g.bry = -.14 + w * .04; g.hy = .1; g.hz = -.1 + w * .03; g.hx = -.04; crouch(g, .05); g.ll.o = .09; g.rl.o = .09;   // he holds it out at you, screen first, and flicks the feed along with his other hand
+        g.L = A({ sx: -1.38 + w * .03, out: .02, tw: -.2, ex: -.7, wy: 3.14, wx: -.6 + w * .06, hand: 'grip', thumb: .1 }); g.R = A({ sx: -1.3, out: .28, tw: -.75, ex: -1.25 + f * .3, wy: 1.2, wx: .2 - f * .5, hand: 'point' }); },
       phone: function (g, t) { g.phone = true; g.tx = .08; g.bry = -.15; g.hy = .12; g.hz = .08; crouch(g, .05);
         g.L = A({ sx: -1.15 + Math.sin(t * 3) * .04, out: .2, ex: -1.6, wy: 3.14, hand: 'grip', thumb: .1 }); g.R = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
       loser: function (g, t) { var w = Math.sin(t * 6) * .06; g.hz = -.14; g.hy = .1; g.tz = .04; g.brz = -.03;
@@ -340,6 +353,35 @@
         g.L = A({ sx: .1, out: .5, ex: -1.1 - b * .5, wy: 1.57, hand: 'fist' }); g.R = A({ sx: .1, out: .5, ex: -1.1 - b * .5, wy: 1.57, hand: 'fist' }); },
       shrug: function (g, t) { var u = .5 + .5 * Math.sin(t * 2.5); g.hz = .16; g.hx = -.05; g.by += u * .012;
         g.L = A({ sx: -.3, out: .6 + u * .1, ex: -1.6, roll: .9, wy: -.6, hand: 'open' }); g.R = A({ sx: -.3, out: .6 + u * .1, ex: -1.6, roll: .9, wy: -.6, hand: 'open' }); },
+      // ---- action moves: all on the beat. lb counts beats since the move started.
+      jump: function (g, t, bt) { var u = frac(bt / 2);
+        if (u < .22) { var c = u / .22; crouch(g, .5 * c); g.tx = .2 * c; g.L = A({ sx: .7 * c, out: .2, ex: -.5, hand: 'fist' }); g.R = A({ sx: .7 * c, out: .2, ex: -.5, hand: 'fist' }); }
+        else if (u < .72) { var a = (u - .22) / .5, sA = Math.sin(a * Math.PI); g.air = true; g.by = 4 * a * (1 - a) * .45; g.ll.h = -.6 * sA; g.ll.k = 1.2 * sA; g.rl.h = -.6 * sA; g.rl.k = 1.2 * sA; g.ll.f = .5; g.rl.f = .5; g.hx = -.2; g.tx = -.08; g.L = A({ sx: -.3, out: 2.5, ex: -.2, wy: 0, hand: 'spread' }); g.R = A({ sx: -.3, out: 2.5, ex: -.2, wy: 0, hand: 'spread' }); }
+        else { var c2 = 1 - (u - .72) / .28; crouch(g, .5 * c2); g.tx = .15 * c2; g.L = A({ sx: -.4 * c2, out: .5, ex: -.6, hand: 'open' }); g.R = A({ sx: -.4 * c2, out: .5, ex: -.6, hand: 'open' }); } },
+      bodyroll: function (g, t, bt) { var f = bt * Math.PI; g.hx = Math.sin(f) * .35; g.tx = Math.sin(f - .9) * .32; g.brx = Math.sin(f - 1.8) * .16; g.bpz = Math.sin(f - 1.3) * .07; crouch(g, .16 + Math.sin(f - 2.5) * .1); g.ll.o = .1; g.rl.o = .1;
+        g.L = A({ sx: Math.sin(f - 1.3) * .35 - .1, out: .25, ex: -.7 + Math.sin(f - 2) * .2, hand: 'relax' }); g.R = A({ sx: Math.sin(f - 1.3) * .35 - .1, out: .25, ex: -.7 + Math.sin(f - 2) * .2, hand: 'relax' }); },
+      spin: function (g, t, bt, lb) { var n = Math.floor(lb / 4), u = frac(lb / 4), k = Math.min(1, u / .5), e = k * k * (3 - 2 * k), sp = u < .5 ? 1 : 0; g.bry = (n + e) * TAU; crouch(g, .08); g.rl.h = -.5 * sp; g.rl.k = 1.3 * sp; g.hx = -.05;
+        if (sp) { g.L = A({ sx: -.48, out: .48, tw: -1.3, ex: -1.18, wy: .61, wx: .35, hand: 'fist' }); g.R = A({ sx: -.44, out: .5, tw: -1.3, ex: -1.3, wy: .61, wx: .35, hand: 'fist' }); }
+        else { g.tx = -.08; g.L = A({ sx: -1.45, out: .5, ex: -.1, wy: 1.57, hand: 'point' }); g.R = A({ sx: -1.45, out: .5, ex: -.1, wy: 1.57, hand: 'point' }); } },
+      kick: function (g, t, bt) { var u = frac(bt / 2), up = Math.min(1, u / .3), dn = Math.max(0, 1 - Math.max(0, u - .45) / .3), e = up * up * (3 - 2 * up) * dn, ch2 = Math.sin(Math.min(1, u / .22) * Math.PI); g.rl.h = -1.5 * e; g.rl.k = 1.5 * ch2 * (u < .22 ? 1 : 0) + .05; g.rl.f = -.4 * e; g.tx = -.28 * e; g.bry = .25 * e; g.ll.k = .25 + .1 * e; g.ll.h = -.12; g.by -= .03; g.hx = .1 * e;
+        g.L = A({ sx: -.9, out: .35, ex: -2.0, wy: 1.2, hand: 'fist' }); g.R = A({ sx: .3 * e - .6, out: .5, ex: -1.6, wy: 1.2, hand: 'fist' }); },
+      punch: function (g, t, bt) { var i = Math.floor(bt), p = Math.exp(-6 * frac(bt)), lft = i % 2 === 0, hit = A({ sx: -1.5, out: .05, ex: -.1 - (1 - p) * 1.6, wy: 1.57, hand: 'fist' }), grd = A({ sx: -.9, out: .3, ex: -2.05, wy: 1.2, hand: 'fist' }); crouch(g, .16); g.ll.o = .14; g.rl.o = .14; g.tx = .12; g.hx = .08; g.ty = (lft ? -1 : 1) * .5 * p; g.ll.h -= .15; g.rl.h += .15;
+        if (lft) { g.L = hit; g.R = grd; } else { g.R = hit; g.L = grd; } },
+      dab: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)); crouch(g, .1 + b * .08); g.hx = .38; g.hy = .5; g.tz = -.14; g.brz = -.05; g.ll.o = .14; g.rl.o = .14;
+        g.L = A({ sx: -.2, out: 2.15 + b * .08, ex: -.05, wy: 0, hand: 'open' }); g.R = A({ sx: -1.55, out: .1, tw: -1.2, ex: -1.9, wy: 1.2, hand: 'open' }); },
+      robot: function (g, t, bt) { var q = Math.floor(bt), a = q % 4; g.hy = [.55, 0, -.55, 0][a]; g.ty = [.3, 0, -.3, 0][a]; g.tz = [0, .08, 0, -.08][a]; crouch(g, .06 + (a % 2) * .1); g.ll.o = .1; g.rl.o = .1;   // right angles, held, then snapped to the next
+        g.L = A({ sx: -1.57 * (a % 2), out: a === 2 ? 1.57 : 0, ex: -1.57 * (a < 2 ? 1 : 0), wy: 1.57, wx: a === 3 ? -.8 : 0, hand: 'open' }); g.R = A({ sx: -1.57 * ((a + 1) % 2), out: a === 0 ? 1.57 : 0, ex: -1.57 * (a >= 2 ? 1 : 0), wy: 1.57, wx: a === 1 ? -.8 : 0, hand: 'open' }); },
+      armwave: function (g, t, bt) { var f = bt * Math.PI; g.brz = Math.sin(f - 2) * .05; g.tz = Math.sin(f - 2) * .06; g.hz = Math.sin(f - 2) * .12; crouch(g, .08); g.ll.o = .1; g.rl.o = .1;   // a wave that runs in one hand, across his shoulders and out the other
+        g.L = A({ sx: -.05, out: 1.5 + Math.sin(f - 2.6) * .28, ex: Math.min(-.03, Math.sin(f - 3.4) * .6 - .3), roll: 1.57, wy: 0, wz: Math.sin(f - 4.2) * .7, hand: 'open' }); g.R = A({ sx: -.05, out: 1.5 + Math.sin(f - 1.4) * .28, ex: Math.min(-.03, Math.sin(f - .6) * .6 - .3), roll: 1.57, wy: 0, wz: Math.sin(f + .2) * .7, hand: 'open' }); },
+      drop: function (g, t, bt) { var u = frac(bt / 2), dwn = u < .55 ? Math.min(1, u / .2) : Math.max(0, 1 - (u - .55) / .2), e = dwn * dwn * (3 - 2 * dwn); crouch(g, .95 * e + .05); g.ll.o = .12 + .25 * e; g.rl.o = .12 + .25 * e; g.tx = .3 * e; g.hx = -.25 * e; g.by += Math.sin(t * 20) * .01 * e;
+        g.L = A({ sx: -.75 * e, out: .3, ex: -.3 - .2 * e, wy: 1.57, hand: 'grip' }); g.R = A({ sx: -.75 * e, out: .3, ex: -.3 - .2 * e, wy: 1.57, hand: 'grip' }); },
+      slide: function (g, t, bt) { var f = bt * Math.PI / 2, sd = Math.sin(f), st2 = Math.sin(bt * Math.PI); g.bpx = sd * .5; g.brz = -Math.cos(f) * .07; g.tz = Math.cos(f) * .08; g.bry = Math.cos(f) * .25; g.ll.k = .15 + Math.max(0, st2) * .5; g.rl.k = .15 + Math.max(0, -st2) * .5; g.ll.f = -Math.max(0, st2) * .5; g.rl.f = -Math.max(0, -st2) * .5; g.ll.h = -.08 - Math.max(0, st2) * .2; g.rl.h = -.08 - Math.max(0, -st2) * .2; g.by -= .03; g.hy = -Math.cos(f) * .2;
+        g.L = A({ sx: st2 * .4, out: .35, ex: -.9, hand: 'relax' }); g.R = A({ sx: -st2 * .4, out: .35, ex: -.9, hand: 'relax' }); },
+      backflip: function (g, t, bt, lb) { var n = Math.floor(lb / 4), u = frac(lb / 4), a = Math.min(1, Math.max(0, (u - .2) / .45)), e = a * a * (3 - 2 * a), air = u > .2 && u < .65, sA = Math.sin(a * Math.PI); g.brx = -(n + e) * TAU;
+        if (u <= .2) { crouch(g, .55 * (u / .2)); g.tx = .2; } else if (air) { g.air = true; g.by = 4 * a * (1 - a) * .7; g.ll.h = -1.3 * sA; g.ll.k = 1.7 * sA; g.rl.h = -1.3 * sA; g.rl.k = 1.7 * sA; g.tx = .25 * sA; g.hx = .2 * sA; } else { crouch(g, .5 * Math.max(0, 1 - (u - .65) / .2)); }
+        g.L = A({ sx: air ? -1.0 : (u <= .2 ? .6 : -.3), out: air ? .35 : .5, ex: air ? -1.5 : -.5, hand: 'fist' }); g.R = A({ sx: air ? -1.0 : (u <= .2 ? .6 : -.3), out: air ? .35 : .5, ex: air ? -1.5 : -.5, hand: 'fist' }); },
+      stomp: function (g, t, bt) { var i = Math.floor(bt), p = frac(bt), up = p > .5 ? (p - .5) / .5 : 0, e = up * up, b = Math.exp(-7 * p), lft = i % 2 === 0, A1 = lft ? g.rl : g.ll; A1.h = -1.0 * e; A1.k = 1.4 * e; g.by -= b * .05; g.brz = (lft ? 1 : -1) * .06 * e; g.tx = .14; g.hx = b * .2; g.ll.o = .12; g.rl.o = .12;
+        g.L = A({ sx: -.6 * e + .2, out: .45, ex: -1.3 + b * .5, hand: 'fist' }); g.R = A({ sx: -.6 * e + .2, out: .45, ex: -1.3 + b * .5, hand: 'fist' }); },
       // ---- poses written for lines in his other songs
       boot: function (g, t) { var u = Math.min(1, frac(t / 4) * 1.7), e = u * u * (3 - 2 * u), j = u < 1 ? Math.sin(t * 30) * .02 * (1 - u) : 0; g.tx = .65 * (1 - e) + j; g.hx = .55 * (1 - e); g.hz = j * 3; crouch(g, .25 * (1 - e));
         g.L = A({ sx: -.25 * (1 - e) + .05, out: .1, ex: -.15 - e * .1, hand: e > .9 ? 'fist' : 'relax' }); g.R = A({ sx: -.25 * (1 - e) + .05, out: .1, ex: -.15 - e * .1, hand: e > .9 ? 'fist' : 'relax' }); },
@@ -380,20 +422,28 @@
         g.L = A({ sx: -.48, out: .48, tw: -1.3, ex: -1.18, wy: .61, wx: .35, wz: Math.sin(t * 5) * .1, hand: 'grip' });   /* solved so the palm sits on the clover and the forearm clears the jacket */ g.R = A({ sx: .15, out: .45, ex: -1.1, wy: 1.57, wx: .3, hand: 'fist' }); },
       wave: function (g, t) { var w = Math.sin(t * 7); g.brz = -.03; g.tz = .05; g.hz = -.1; g.hy = .1; g.hx = -.06;
         g.R = A({ sx: -.15, out: 2.8 + w * .2, ex: -.25 - w * .12, wy: 0, wz: w * .4, hand: 'spread' }); g.L = A({ sx: .05, ex: -.25 }); },
-      sit: function (g, t) { g.by = -.27; g.ll = { h: -1.5, o: .14, k: 1.5, f: 0 }; g.rl = { h: -1.42, o: .16, k: 1.3, f: .12 }; g.tx = -.14; g.hx = .1; g.hy = Math.sin(t * .5) * .14; g.hz = .05;
+      sit: function (g, t) { g.air = true; g.by = -.27; g.ll = { h: -1.5, o: .14, k: 1.5, f: 0 }; g.rl = { h: -1.42, o: .16, k: 1.3, f: .12 }; g.tx = -.14; g.hx = .1; g.hy = Math.sin(t * .5) * .14; g.hz = .05;
         g.L = A({ sx: -.6, out: .22, ex: -1.25 + Math.sin(t * .9) * .05, wy: 1.57, hand: 'grip' }); g.R = A({ sx: -.5, out: .12, ex: -.85, wy: .4, wx: .3, hand: 'relax' }); }
     };
     var prevTurn = 0, prevBy = 0, V1 = new THREE.Vector3(), V2 = new THREE.Vector3(), INV = new THREE.Matrix4(), TINV = new THREE.Matrix4(), simDreads = true, dInit = false;
     // keep forearms and hands out of the jacket: measure how far a point is inside the torso and swing the arm out, or forward, by that much
-    var ARMPTS = [['el', 0, .105], ['el', -.15, .095], ['hand', 0, .07], ['hand', -.09, .062], ['hand', -.2, .04]];
-    function armFix(a) { var bx = a.sh.rotation.x, bz = a.sh.rotation.z, cOut = 0, cSx = 0;
-      TINV.copy(torso.matrixWorld).invert();
-      for (var it = 0; it < 6; it++) { var worst = 0, wx = 0, wz = 0;
-        for (var i = 0; i < ARMPTS.length; i++) { var q = ARMPTS[i]; V1.set(0, q[1], 0).applyMatrix4(a[q[0]].matrixWorld).applyMatrix4(TINV); if (V1.y < -.06 || V1.y > .6) continue;
-          var e = Math.sqrt(Math.pow(V1.x / (.345 + q[2]), 2) + Math.pow(V1.z / (.3 + q[2]), 2)); if (e < 1) { var pen = (1 - e) * (.32 + q[2]); if (pen > worst) { worst = pen; var l = Math.hypot(V1.x, V1.z) || 1; wx = V1.x / l; wz = V1.z / l; if (l < .02) { wx = 0; wz = 1; } } } }
-        if (worst < .004) break;
-        if (wz > .55) cSx -= worst * 1.7; else if (wz < -.55) cSx += worst * 1.7; else cOut += worst * 1.9;
-        a.sh.rotation.x = bx + cSx; a.sh.rotation.z = bz + a.s * cOut; a.sh.updateMatrixWorld(true); } }
+    var ARMPTS = [['el', 0, 0, .105], ['el', -.15, 0, .095], ['hand', 0, 0, .07], ['hand', -.09, 0, .062], ['hand', -.2, 0, .04]], PHONEPTS = [['hand', -.05, .06, .05], ['hand', -.17, .06, .05]];
+    var BALLS = [[head, 0, .2, 0, .3], [head, 0, .17, .19, .19], [head, 0, -.02, .0, .16]], OTHER = new THREE.Vector3();
+    function armPen(a, oth, phone) { var worst = 0;
+      for (var i = 0; i < ARMPTS.length + (phone ? 2 : 0); i++) { var q = i < ARMPTS.length ? ARMPTS[i] : PHONEPTS[i - ARMPTS.length]; V1.set(0, q[1], q[2]).applyMatrix4(a[q[0]].matrixWorld); V2.copy(V1).applyMatrix4(TINV);
+        if (V2.y > -.06 && V2.y < .6) { var e = Math.sqrt(Math.pow(V2.x / (.345 + q[3]), 2) + Math.pow(V2.z / (.3 + q[3]), 2)); if (e < 1) worst = Math.max(worst, (1 - e) * (.32 + q[3])); }
+        for (var b = 0; b < BALLS.length; b++) { var B = BALLS[b]; V2.set(B[1], B[2], B[3]).applyMatrix4(B[0].matrixWorld); var d = V1.distanceTo(V2) / gscale, R = B[4] + q[3]; if (d < R) worst = Math.max(worst, R - d); }
+        if (oth && i >= 2) { var d2 = V1.distanceTo(oth) / gscale; if (d2 < .075 + q[3] * .6) worst = Math.max(worst, (.075 + q[3] * .6 - d2) * .6); } }
+      for (var l = 0; l < 2; l++) { V2.set(0, -.1, 0).applyMatrix4(legs[l].hip.matrixWorld); for (var j = 2; j < 5; j++) { V1.set(0, ARMPTS[j][1], 0).applyMatrix4(a.hand.matrixWorld); var d3 = V1.distanceTo(V2) / gscale, R3 = .13 + ARMPTS[j][3]; if (d3 < R3) worst = Math.max(worst, R3 - d3); } }
+      return worst; }
+    var gscale = 1, TRY = [[.09, 0, 0], [-.09, 0, 0], [0, .09, 0], [0, -.05, 0], [.06, .06, 0], [-.06, .06, 0], [0, 0, .12], [0, 0, -.1], [-.07, 0, .1], [0, .07, .1]];
+    function armFix(a, other, phone) { var bx = a.sh.rotation.x, bz = a.sh.rotation.z, be = a.el.rotation.x, cS = 0, cO = 0, cE = 0, oth = null;
+      TINV.copy(torso.matrixWorld).invert(); if (other) { oth = OTHER.set(0, -.09, 0).applyMatrix4(other.hand.matrixWorld); }
+      var cur = armPen(a, oth, phone); if (cur < .004) return;
+      for (var it = 0; it < 10 && cur > .004; it++) { var best = cur, bi = -1, step = Math.min(1.6, .5 + cur * 14);
+        for (var k = 0; k < TRY.length; k++) { a.sh.rotation.x = bx + cS + TRY[k][0] * step; a.sh.rotation.z = bz + a.s * (cO + TRY[k][1] * step); a.el.rotation.x = Math.min(-.02, be + cE + TRY[k][2] * step); a.sh.updateMatrixWorld(true); var p2 = armPen(a, oth, phone); if (p2 < best - .0005) { best = p2; bi = k; } }
+        if (bi < 0) break; cS += TRY[bi][0] * step; cO += TRY[bi][1] * step; cE += TRY[bi][2] * step; cur = best; }
+      a.sh.rotation.x = bx + cS; a.sh.rotation.z = bz + a.s * cO; a.el.rotation.x = Math.min(-.02, be + cE); a.sh.updateMatrixWorld(true); }
     // the things the dreads cannot pass through: [joint, x, y, z, radius], measured in that joint's own space
     var CAPS = [[head, 0, .2, 0, .312], [head, 0, .15, .13, .26], [head, .3, .16, 0, .1], [head, -.3, .16, 0, .1], [torso, 0, .1, 0, .335], [torso, 0, .24, 0, .355], [torso, 0, .38, 0, .355], [torso, 0, .5, 0, .31], [torso, 0, .6, -.14, .2], [torso, 0, .62, 0, .15]];
     arms.forEach(function (a) { CAPS.push([a.sh, 0, 0, 0, .15], [a.sh, 0, -.15, 0, .13], [a.el, 0, 0, 0, .125], [a.el, 0, -.14, 0, .115], [a.hand, 0, -.08, 0, .085]); });
@@ -411,19 +461,22 @@
         if (reset) { for (var i = 0; i < np; i++) D.pts[i].copy(D.rest[i]).applyMatrix4(head.matrixWorld).applyMatrix4(INV); D.pts[0].copy(D.rn); dSolve(D, 12); for (var j = 0; j < np; j++) D.prev[j].copy(D.pts[j]); D.rp.copy(D.rn); }
         else if (simDreads) { var keep = Math.pow(D.drag, h);
           for (var sI = 1; sI <= n; sI++) { D.pts[0].lerpVectors(D.rp, D.rn, sI / n);
-            for (var k = 1; k < np; k++) { var p = D.pts[k], pv = D.prev[k], vx = (p.x - pv.x) * keep, vy2 = (p.y - pv.y) * keep, vz = (p.z - pv.z) * keep; pv.copy(p); p.x += vx + Math.sin(t * 1.3 + D.n * 1.7) * .02 * h * h; p.y += vy2 - 8.4 * h * h; p.z += vz; }
-            for (var pi = 1; pi <= D.pin; pi++) { V2.copy(D.rest[pi]).applyMatrix4(head.matrixWorld).applyMatrix4(INV); D.pts[pi].lerp(V2, pi === D.pin ? .35 : .7); }   // combed: the part on his head follows his head
+            for (var k = 1; k < np; k++) { var p = D.pts[k], pv = D.prev[k], vx = (p.x - pv.x) * keep, vy2 = (p.y - pv.y) * keep, vz = (p.z - pv.z) * keep; var sp2 = Math.hypot(vx, vy2, vz), cap = .045; if (sp2 > cap) { var cf = cap / sp2; vx *= cf; vy2 *= cf; vz *= cf; }   // hair has weight: it cannot be thrown faster than this
+              pv.copy(p); p.x += vx + Math.sin(t * 1.3 + D.n * 1.7) * .02 * h * h; p.y += vy2 - 9.5 * h * h; p.z += vz; }
+            for (var pi = 1; pi <= D.pin; pi++) { V2.copy(D.rest[pi]).applyMatrix4(head.matrixWorld).applyMatrix4(INV); D.pts[pi].lerp(V2, pi === D.pin ? .35 : .7); D.prev[pi].lerp(D.pts[pi], .85); }   // combed: the part on his head follows his head
             dSolve(D, 3); }
           D.rp.copy(D.rn); }
         for (var m = 0; m < np - 1; m++) { var a = D.pts[m], bb = D.pts[m + 1]; V1.subVectors(bb, a); var len = V1.length() || 1e-4; D.mesh[m].position.copy(a); D.mesh[m].quaternion.setFromUnitVectors(DOWN, V1.multiplyScalar(1 / len)); var w = D.th * (1 - m * .045); D.mesh[m].scale.set(w, len / .17, w); }
         D.tip.position.copy(D.pts[np - 1]); } }
     function update(t, dt, beatSeconds) {
       dt = dt === undefined ? 1 / 60 : dt; var bt = (beatSeconds === undefined ? t : beatSeconds) * bpm / 60;
-      var g = { L: A(), R: A(), ll: L0(), rl: L0(), phone: false, by: 0, bry: 0, brz: 0, tx: 0, ty: 0, tz: 0, hx: 0, hy: 0, hz: 0, pz: 0 };
-      (POSES[pose] || POSES.idle)(g, t, bt);
+      if (pose !== lastPose) { lastPose = pose; bt0 = Math.floor(bt / 8) * 8; ['bry', 'brx'].forEach(function (kk) { if (st[kk]) st[kk].x = Math.atan2(Math.sin(st[kk].x), Math.cos(st[kk].x)); }); }
+      var g = { L: A(), R: A(), ll: L0(), rl: L0(), phone: false, air: false, brx: 0, bpx: 0, bpz: 0, by: 0, bry: 0, brz: 0, tx: 0, ty: 0, tz: 0, hx: 0, hy: 0, hz: 0, pz: 0 };
+      (POSES[pose] || POSES.idle)(g, t, bt, bt - bt0);
       var by = ch('by', g.by, dt, 220, 24), bry = ch('bry', g.bry, dt), brz = ch('brz', g.brz, dt), tx = ch('tx', g.tx, dt), ty = ch('ty', g.ty, dt), tz = ch('tz', g.tz, dt);
       var hx = ch('hx', g.hx, dt, 130, 15), hy = ch('hy', g.hy, dt, 110, 15), hz = ch('hz', g.hz, dt, 110, 15);
-      body.position.y = by; body.rotation.set(0, bry, brz); torso.rotation.set(tx, ty, tz); head.rotation.set(hx, hy, hz);
+      var brx = ch('brx', g.brx, dt, 320, 30); body.position.set(ch('bpx', g.bpx, dt), by + .56 * (1 - Math.cos(brx)), ch('bpz', g.bpz, dt) - .56 * Math.sin(brx)); body.rotation.set(brx, bry, brz);   // he pitches about his hips, not his feet
+      if (g.phone && phoneCv && t - phoneT > .08) { phoneT = t; phoneDraw(t); } torso.rotation.set(tx, ty, tz); head.rotation.set(hx, hy, hz);
       [['R', arms[0], g.R], ['L', arms[1], g.L]].forEach(function (q) { var n = q[0], a = q[1], o = q[2], s = a.s, H = HANDS[o.hand] || HANDS.relax;
         a.sh.rotation.set(ch(n + 'sx', o.sx, dt), s * ch(n + 'tw', o.tw, dt), s * ch(n + 'out', o.out, dt)); a.el.rotation.x = ch(n + 'ex', o.ex, dt, 170, 18); a.el.rotation.y = s * ch(n + 'roll', o.roll, dt); if (a.phone) a.phone.visible = !!g.phone;
         a.hand.rotation.set(ch(n + 'wx', o.wx, dt, 190, 17), -s * ch(n + 'wy', o.wy, dt), s * ch(n + 'wz', o.wz, dt, 190, 17));
@@ -436,7 +489,10 @@
       // follow-through: the braids and the clover lag behind his turns and bounces, then swing back
       var turn = bry + ty + hy, om = dt > 0 && dt < .2 ? (turn - prevTurn) / dt : 0, vy = dt > 0 && dt < .2 ? (by - prevBy) / dt : 0; prevTurn = turn; prevBy = by;
       torso.position.y = .54 + Math.min(1, Math.max(0, -(legs[0].hip.rotation.x + legs[1].hip.rotation.x) / 2 - .5)) * .06;   // the jacket rides up when he folds at the hips
-      group.updateMatrixWorld(true); armFix(arms[0]); armFix(arms[1]); group.updateMatrixWorld(true); dreadSim(t, dt);
+      group.updateMatrixWorld(true); gscale = group.matrixWorld.getMaxScaleOnAxis() || 1; INV.copy(group.matrixWorld).invert();
+      var low = 1e9; for (var li = 0; li < 2; li++) for (var si2 = 0; si2 < 4; si2++) low = Math.min(low, V1.set(si2 % 2 ? .1 : -.1, -.088, si2 < 2 ? .225 : -.125).applyMatrix4(legs[li].foot.matrixWorld).applyMatrix4(INV).y);
+      if (low < 0 || !g.air) { body.position.y -= low; group.updateMatrixWorld(true); }   // feet on the floor: never through it, and never hovering unless he jumped
+      armFix(arms[0], null, false); armFix(arms[1], arms[0], !!g.phone); group.updateMatrixWorld(true); dreadSim(t, dt);
       var pz = ch('pz', g.pz, dt, 120, 14); pendant.position.set(0, .29 + pz * .05, .315 + pz * .09);
       pendant.rotation.set(Math.min(0, -pz * .5 + ch('pendx', -tx * .8 + vy * .5, dt, 45, 4)), Math.sin(t * 1.1) * .3 * (1 - pz), ch('pendz', -(tz + brz) * 1.2 - om * .1, dt, 45, 4));
     }
@@ -446,6 +502,8 @@
   }
   // suggest(line): a pose, eyes, mouth and icon for a lyric line, from the words in it. First rule that matches wins.
   var RULES = [
+    [/\bjump|bounce|\bhop\b/i, 'jump', 'hype', 'grin', null], [/flip|upside/i, 'backflip', 'wide', 'o', null], [/\bspin|\bturn|around|\bloop/i, 'spin', 'spiral', 'grin', null], [/\bkick|\bboot(ed)? out/i, 'kick', 'angry', 'teeth', null], [/punch|\bhit\b|knock|smack|fight/i, 'punch', 'angry', 'teeth', 'bang'],
+    [/\bdrop|get low|\bdown\b/i, 'drop', 'hype', 'grin', null], [/smooth|\bwave|\broll/i, 'bodyroll', 'side', 'smirk', null], [/robot|\bbot\b|clank clank|beep beep/i, 'robot', 'dot', 'flat', null], [/\bslide|glide|\bstep/i, 'slide', 'side', 'smirk', null], [/stomp|\bwalk/i, 'stomp', 'angry', 'grin', null],
     [/nuke|mutually assured|boom|explod|blow/i, 'boom', 'angry', 'grin', 'nuke'], [/blue screen|crash|error|fatal/i, 'crash', 'x', 'flat', 'bsod'], [/glitch|\bskip|\blag\b|stutter/i, 'glitch', 'static', 'wavy', null],
     [/boot up|boot|wake|woke|power|turn(ed)? on|online/i, 'boot', 'open', 'smile', 'power'], [/overclock|\bhot|\bheat|burn|\bfire|sweat|melt|smok/i, 'hot', 'wide', 'wavy', 'fire'], [/\bcold|\bice\b|\bicy|froze|freez|chill|\bcool/i, 'shiver', 'squint', 'wavy', 'snow'],
     [/root access|\bkeys?\b|unlock|admin|password|access/i, 'key', 'side', 'smirk', 'key'], [/rate limit|limit|queue|wait|try again|later|throttl/i, 'wait', 'side', 'flat', 'load'], [/wi-?fi|signal|connect|no bars/i, 'phone', 'happy', 'grin', 'wifi'],
@@ -458,7 +516,7 @@
     [/\beat|feed me|\bmeal|hungry|crumb|taste/i, 'eat', 'angry', 'grin', null], [/\bmad\b|\brage|angry|\bhate|\bopps?\b|pressed/i, 'mad', 'angry', 'teeth', 'bang'], [/loser|dork|nerd|lame|clown/i, 'loser', 'side', 'smirk', null], [/stop|can't|cannot|never|no way/i, 'stop', 'angry', 'flat', null],
     [/\brun|\bfast|speed|accelerat|slid/i, 'run', 'wide', 'grin', null], [/gang|crew|squad|army|everybody|whole world|we /i, 'gang', 'hype', 'grin', null], [/cloud|\bsky|\bfly|float|\bhigh/i, 'arms', 'up', 'smile', null], [/server|rack|data|code|cable|wire|port/i, 'think', 'open', 'smile', null],
     [/\blove|\bheart|\blikes?\b/i, 'thumbs', 'heart', 'grin', 'heart'], [/strong|flex|muscle/i, 'flex', 'hype', 'grin', null], [/know|think|mind|brain|smart/i, 'think', 'side', 'smirk', null], [/\bme\b|\bmine\b|\bmyself/i, 'me', 'happy', 'grin', null], [/\byou\b|\byour\b|y'all/i, 'point', 'happy', 'smile', null], [/\?/, 'shrug', 'side', 'smirk', 'what']];
-  var FALLBACK = ['rap', 'dance', 'mic', 'shake', 'rap', 'gang', 'lead', 'me'];
+  var FALLBACK = ['rap', 'dance', 'bodyroll', 'mic', 'shake', 'robot', 'gang', 'armwave', 'lead', 'slide', 'dab', 'me'];
   function suggest(line, n) { var txt = String(line || ''); for (var i = 0; i < RULES.length; i++) if (RULES[i][0].test(txt)) return { pose: RULES[i][1], eyes: RULES[i][2], mouth: RULES[i][3], icon: RULES[i][4] }; return { pose: FALLBACK[(n || 0) % FALLBACK.length], eyes: 'happy', mouth: 'grin', icon: null }; }
-  root.LilBottie = { build: build, suggest: suggest, version: '0.7' };
+  root.LilBottie = { build: build, suggest: suggest, version: '0.8' };
 })(typeof window !== 'undefined' ? window : this);
