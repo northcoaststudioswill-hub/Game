@@ -451,10 +451,39 @@ function poseOf(anim, t, o) {
       p.rate = 26; break;
     }
     case 'stagger': {
-      const u = clamp(t / 0.35, 0, 1), fall = o.fall ? 1 : 0;
-      if (fall) { p.y = -R_fallY(o) * u; S_('hips', -1.35 * u); legs(-1.2 * u, 0.9, -0.7 * u, 0.4, 0.3); S_('spine', 0.2); S_('chest', 0.25); S_('neck', 0.35); S_('shR', -0.6, 0, -1.4); S_('shL', 0.6, 0, 1.4); S_('elR', -0.4); S_('elL', -0.6); S_('wrR', 0.6); S_('wrL', 0.6); }
-      else { const w = Math.sin(t * 22); p.y = -0.2; S_('hips', -0.25, 0, w * 0.2); S_('spine', -0.2); S_('chest', -0.15, w * 0.3, 0); S_('neck', 0.2); legs(-0.9, 1.2, 0.3, 0.7, 0.5); S_('anR', w * 0.5); S_('shR', -1.4, 0, -1.3); S_('shL', -0.3, 0, 1.6); S_('elR', -0.5); S_('elL', -0.3); }
-      p.rate = 14; break;
+      // sd: which way he bit (+1 his right, -1 his left), from the move that beat him; 0 = straight back (posterized, shoved)
+      const D = o.dur || 1, sd = o.side === undefined ? 1 : o.side, sm = x => x * x * (3 - 2 * x), L = o.leg || 0.95;
+      if (!o.fall) {
+        // ANKLES, kept his feet: the weight goes to the outside leg, the inside knee buckles, the arms go out for balance,
+        // then he turns back and scrambles to recover
+        const e = sm(clamp(t / 0.18, 0, 1)) * (1 - sm(clamp((t - 0.3) / Math.max(0.2, D - 0.35), 0, 1))), r = sm(clamp((t - 0.2) / 0.35, 0, 1)) * (1 - sm(clamp((t - D + 0.25) / 0.25, 0, 1)));
+        const out = sd > 0 ? 'R' : 'L', inn = sd > 0 ? 'L' : 'R', so = sd > 0 ? -1 : 1;
+        p.y = -0.05 - 0.27 * e;
+        S_('hips', 0.15 * e, -sd * 0.35 * r, -sd * 0.3 * e);
+        S_('hp' + out, -0.3 * e, 0, so * 0.55 * e); S_('kn' + out, 0.35 * e + 0.2); S_('an' + out, 0.25 * e);
+        S_('hp' + inn, -0.95 * e, 0, -so * 0.3 * e); S_('kn' + inn, 1.75 * e + 0.2); S_('an' + inn, 0.6 * e);    /* the inside knee caves in toward the other leg */
+        S_('spine', 0.3 * e, 0, sd * 0.32 * e); S_('chest', 0.05, -sd * 0.45 * r, sd * 0.1 * e); S_('neck', -0.2, -sd * 0.55 * r, 0);
+        S_('sh' + out, -0.5 * e, 0, so * 1.25 * e); S_('el' + out, -0.3); S_('wr' + out, 0.3 * e);
+        S_('sh' + inn, -1.6 * e, 0, -so * 0.5 * e); S_('el' + inn, -0.6 * e - 0.2); S_('wr' + inn, 0.4 * e);
+        p.rate = 24; break;
+      }
+      // DOWN: legs go, he sits down hard on the side he bit to, posts a hand behind, watches the play, then gets up
+      const fT = 0.3, gT = Math.min(0.55, D * 0.42), f = sm(clamp(t / fT, 0, 1)), g = sm(clamp((t - (D - gT)) / gT, 0, 1)), floor = -(L - 0.13);
+      const post = sd === 0 ? 'both' : sd > 0 ? 'R' : 'L', other = sd > 0 ? 'L' : 'R';
+      const sit = {}; const Z = (k, x, y, z) => { sit[k] = [x || 0, y || 0, z || 0]; };
+      sit.y = floor; Z('hips', -0.05, 0, sd * 0.16); Z('hpR', -1.35, 0, -0.18); Z('hpL', -1.25, 0, 0.18); Z('knR', sd > 0 ? 0.35 : 0.9); Z('knL', sd > 0 ? 0.9 : 0.35); Z('anR', 0.35); Z('anL', 0.35);
+      Z('spine', -0.3); Z('chest', -0.12, -sd * 0.3, 0); Z('neck', 0.15, sd * 0.6, 0);
+      if (post === 'both') { Z('shR', 0.95, 0, -0.35); Z('shL', 0.95, 0, 0.35); Z('elR', -0.15); Z('elL', -0.15); Z('wrR', 1.0); Z('wrL', 1.0); }
+      else { const so = post === 'R' ? -1 : 1; Z('sh' + post, 1.0, 0, so * 0.4); Z('el' + post, -0.12); Z('wr' + post, 1.0); Z('sh' + other, -0.65, 0, -so * 0.25); Z('el' + other, -1.0); Z('wr' + other, 0.2); }
+      sit.rate = 22;
+      // falling: the knees give first, the body goes down and back, the arms reach for the floor
+      const drop = {}; for (const k in sit) drop[k] = Array.isArray(sit[k]) ? sit[k].map(v => v * f) : sit[k];
+      drop.y = floor * f * f + (-0.12 * Math.sin(Math.PI * clamp(t / fT, 0, 1))); drop.knR = [1.3 * Math.sin(Math.PI * clamp(t / fT, 0, 1)) + sit.knR[0] * f]; drop.knL = [1.3 * Math.sin(Math.PI * clamp(t / fT, 0, 1)) + sit.knL[0] * f];
+      // getting up: roll forward onto the feet into a crouch, then stand
+      const crouch = { y: -0.38, rate: 22, hips: [0.2, 0, 0], hpR: [-1.3, 0, -0.1], hpL: [-1.3, 0, 0.1], knR: [1.9], knL: [1.9], anR: [-0.6], anL: [-0.6], spine: [0.45], chest: [0.15], neck: [-0.4], shR: [-0.6, 0, -0.2], shL: [-0.6, 0, 0.2], elR: [-0.8], elL: [-0.8] };
+      for (const Q of [drop, crouch]) for (const k in Q) if (Array.isArray(Q[k])) Q[k] = [Q[k][0] || 0, Q[k][1] || 0, Q[k][2] || 0];
+      const P0 = t < fT ? drop : sit, P1 = g < 0.5 ? blendPose(P0, crouch, g * 2) : blendPose(crouch, poseOf('idle', t, {}), (g - 0.5) * 2);
+      for (const k in P1) p[k] = P1[k]; p.rate = 22; break;
     }
     case 'celeb': {
       const s = Math.sin(t * 9);

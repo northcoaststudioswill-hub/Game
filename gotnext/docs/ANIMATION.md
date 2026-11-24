@@ -452,7 +452,46 @@ Filmed in gameplay with a maxed player (`node tests/movelook.mjs <move>`), the s
 Lowest hip height during the move, maxed player: 0.72–0.78 m (was 0.52–0.63). All eight court tests pass, including the
 crossover and four-move chain.
 
-## 14. Not checked
+## 14. Defense controls and reactions (v0.8.8)
+
+**Defense controls:**
+- **Defense assist** (people only; an OPTIONS toggle, on by default; sprinting turns it off):
+  - Within 4 m of the man you are guarding, it steers you to a spot between him and the rim: about 1 m off the ball
+    handler, about 1.6 m off a man without the ball, shading toward the ball.
+  - It mirrors his steps.
+  - With the stick released it guards for you. Pushing the stick still steers, with the assist reduced to about a third.
+  - Measured with the handler driving at the rim: goal-side 100% of the time, 0.72 m away on average. With the assist
+    off, 41% goal-side.
+- **Timed contests:**
+  - A jump that is rising or at its peak when the shot leaves counts 1.15× a normal contest. Too early or too late
+    counts 0.7×.
+  - Jumping at a shooter up to 3.2 m away closes out at him, stopping a step short.
+  - Your hands go up by themselves on a shooter in front of you.
+  - Measured at 1.2 m: timed 0.42, early 0.25, no jump 0.16.
+- **Steals go for the ball:**
+  - The chance depends on how close the ball is to your reaching hand, ×1.8 at its best.
+  - It is halved when the ball is on the handler's far side, and better on a low bounce in front of you.
+  - A whiffed reach says REACHED. Pressing steal also lunges you a step at the handler.
+  - Measured: ball low in front 17%, tucked away 4%.
+- **Jumping the lane:** steal while a pass is in the air lunges you to the ball's path, with a longer reach and a better
+  chance. Measured over 40 passes thrown past you: 13 intercepted jumping the lane, 0 standing still.
+
+**Reactions:**
+
+![Ankle break, ankle break with a fall, posterized](img/reactions.png)
+
+- **Every reaction has a direction:** the defender's first steps go the way he bit, which is opposite to where the
+  ball handler went (or away from the dunker or shover).
+- **Ankle break, on his feet:** the weight goes onto the outside leg and the inside knee caves. He stumbles the wrong
+  way with arms out for balance, turns his shoulders back, and recovers. Before: a fast wobble in place.
+- **Ankle break, down:**
+  - The knees go first and he sits down hard on the side he bit to, posting a hand behind him.
+  - He watches the play, rolls forward into a crouch, and stands up.
+  - Before: he tipped backwards and snapped back upright when the timer ran out.
+- **Posterized or shoved:** straight back onto the floor, both hands behind, then the same get-up.
+- **Online:** guests receive the direction and the length of each reaction.
+
+## 15. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

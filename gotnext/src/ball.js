@@ -126,7 +126,8 @@ function contestOn(p, rad) {
   let c = 0; rad = rad || 2.4;
   for (const o of MT.P) {
     if (o.team === p.team || o.st === 'stagger') continue; const d = dist(o, p); if (d > rad) continue;
-    let f = (1 - d / rad) * (o.st === 'jump' ? 1 : o.handsUp ? 0.8 : 0.45) * (0.6 + 0.4 * nAtt(o, d > 1.2 ? 'perd' : 'intd')) * (1 + 0.06 * bt(o, 'ground'));
+    const ju = o.st === 'jump' ? o.t / 0.62 : -1, jf = ju < 0 ? 0 : ju > 0.2 && ju < 0.75 ? 1.15 : 0.7;        /* a contest timed with the release counts more; jumping too early or late counts less */
+    let f = (1 - d / rad) * (o.st === 'jump' ? jf : o.handsUp ? 0.8 : 0.45) * (0.6 + 0.4 * nAtt(o, d > 1.2 ? 'perd' : 'intd')) * (1 + 0.06 * bt(o, 'ground'));
     c = Math.max(c, f);
   }
   return Math.min(0.9, c);
@@ -300,7 +301,7 @@ function resolveFinish(p) {
       B.state = 'through'; B.holder = null; B.pos.set(0, HOOP_Y - 0.05, 0); B.vel.set(0, -5, 0); B.t = 0; B.scored = true;
       p.stats.dunks++; sfxM('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
       let vic = f.hit && f.hit.st !== 'stagger' && dist(f.hit, p) < 1.6 ? f.hit : null; if (!vic) for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
-      if (vic) { vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.1, fall: true }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
+      if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2 }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
       f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : 0); MT.hoopT = 0.6;
       call(f.oop ? 'ALLEY-OOP!' : f.put ? 'PUTBACK!' : vic ? 'POSTER!' : pick(CALLS.dunk), p.b.name + (vic ? ' on ' + vic.b.name : ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
       scorePts(p, pts, 'dunk'); return;
@@ -325,7 +326,10 @@ function startMove(p, slot, dx, dz) {
   let ch = 0.05 + (att(p, 'handle') - att(o, 'perd')) * 0.006 + mv.ank + 0.035 * bt(p, 'ankletax') - 0.035 * bt(o, 'ground') + p.combo * 0.035 + (MT.arcade ? 0.08 : 0);
   if (o.vx * dx + o.vz * dz < -1.2) ch += 0.13;
   if (Math.random() < clamp(ch, 0.02, 0.6)) {
-    const fall = Math.random() < 0.4 + p.combo * 0.1; o.st = 'stagger'; o.t = 0; o.stg = { dur: fall ? rnd(1.2, 1.6) : rnd(0.6, 0.9), fall };
+    const fall = Math.random() < 0.4 + p.combo * 0.1; o.st = 'stagger'; o.t = 0;
+    // he bit on the fake: his weight goes the opposite way to where the ball handler really went
+    const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
+    o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5 };
     p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; for (const f of MT.fans) f.hype = 1.5;
   } else o.slowT = 0.22 + mv.ank;
 }
@@ -352,22 +356,44 @@ function startSteal(p) {
     let o = null, od = 1.35; for (const q of MT.P) { if (q.team === p.team || q.st === 'stagger') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
     p.st = 'shove'; p.t = 0; p.cool = 1.3;
     if (o && Math.random() < 0.62 + nAtt(p, 'str') * 0.2 - nAtt(o, 'str') * 0.3) {
-      o.st = 'stagger'; o.t = 0; o.stg = { dur: 0.95, fall: true }; sfxM('block'); MT.shake = 0.2;
+      { const dd = dist(o, p) || 1; o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: 0, dir: [(o.x - p.x) / dd, (o.z - p.z) / dd], push: 2.4 }; } sfxM('block'); MT.shake = 0.2;
       if (B.holder === o) { B.state = 'loose'; B.holder = null; B.pos.set(o.x, 1, o.z); B.vel.set(rnd(-3, 3), 3, rnd(-3, 3)); B.t = 0; B.rebound = false; B.lastTeam = p.team; p.stats.stl++; call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); addBrav(p, 0.12); }
     }
     return;
   }
-  p.st = 'steal'; p.t = 0; p.cool = 0.9; p.stealDone = false;
+  p.st = 'steal'; p.t = 0; p.cool = 0.9; p.stealDone = false; p.lunge = null;
+  if (B.state === 'pass' && B.from && B.from.team !== p.team && B.target) {      // jump the passing lane: lunge to where the ball is going
+    const ax = B.pos.x, az = B.pos.z, bx = B.target.x, bz = B.target.z, ex = bx - ax, ez = bz - az, L2 = ex * ex + ez * ez || 1, t = clamp(((p.x - ax) * ex + (p.z - az) * ez) / L2, 0, 1), cx = ax + ex * t, cz = az + ez * t, d = Math.hypot(cx - p.x, cz - p.z);
+    if (d < 2.3 && d > 0.05) { p.lunge = [(cx - p.x) / d * Math.min(6.5, d / 0.28), (cz - p.z) / d * Math.min(6.5, d / 0.28), 0.28]; p.laneJump = true; floatTxt(p, 'JUMP THE LANE', '#7de3ff'); }
+  } else if (h && h.team !== p.team) { const d = dist(h, p); if (d > 0.7 && d < 1.9) p.lunge = [(h.x - p.x) / d * 2.4, (h.z - p.z) / d * 2.4, 0.16]; }
+}
+// a steal goes for the ball: the closer the ball is to your reaching hand, and the more it is out in front of the
+// handler (not tucked away on his far side), the better. Low on the bounce in front of you is the best poke.
+function stealChance(p, h) {
+  const B = MT.B, fx = Math.sin(p.face), fz = Math.cos(p.face), rx = p.x + fx * 0.75, rz = p.z + fz * 0.75;
+  const reach = Math.hypot(B.pos.x - rx, B.pos.z - rz) + Math.max(0, B.pos.y - 1.2) * 0.6, dB = Math.hypot(B.pos.x - p.x, B.pos.z - p.z), dH = dist(h, p);
+  let ch = 0.11 + (att(p, 'steal') - att(h, 'handle')) * 0.0045 + 0.03 * bt(p, 'repo') - 0.04 * bt(h, 'nda') + (h.st === 'move' ? -0.04 : 0) + (h.sprinting ? 0.05 : 0) + (h.st === 'shoot' && h.t < h.shot.rel * 0.4 ? 0.06 : 0);
+  ch *= reach < 0.35 ? 1.8 : reach < 0.6 ? 1.25 : reach < 0.9 ? 0.8 : 0.35;
+  if (dB > dH + 0.1) ch *= 0.5;                                                   /* the ball is on his far side: protected */
+  if (h.drib && (h.drib.ph === 'down' || h.drib.ph === 'up') && B.pos.y < 0.7 && reach < 0.7) ch *= 1.2;
+  if (h.protect) ch *= 0.75;
+  if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
+  return { ch: clamp(ch, 0.01, 0.6), reach };
 }
 function resolveSteal(p) {
-  p.stealDone = true; const B = MT.B, h = B.holder; if (!h || h.team === p.team || dist(h, p) > 1.5) { p.slowT = 0.25; return; }
-  let ch = 0.11 + (att(p, 'steal') - att(h, 'handle')) * 0.0045 + 0.03 * bt(p, 'repo') - 0.04 * bt(h, 'nda') + (h.st === 'move' ? -0.04 : 0) + (h.sprinting ? 0.05 : 0) + (h.st === 'shoot' && h.t < h.shot.rel * 0.4 ? 0.06 : 0);
-  if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
-  if (Math.random() < clamp(ch, 0.01, 0.45)) {
+  p.stealDone = true; const B = MT.B, h = B.holder; if (!h || h.team === p.team || dist(h, p) > 1.6) { p.slowT = 0.25; return; }
+  const sc = stealChance(p, h), ch = sc.ch;
+  if (p.user && sc.reach > 0.9) floatTxt(p, 'REACHED', '#8d8d99');
+  if (Math.random() < ch) {
     p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
   } else { p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0; }
 }
-function startJump(p) { if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); }
+function startJump(p) {
+  if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); p.lunge = null;
+  // contesting a shooter: close out at him as you go up (not all the way: you stop a step short)
+  let s = null, sd = 3.2; for (const q of MT.P) if (q.team !== p.team && (q.st === 'shoot' || q.st === 'fake') && dist(q, p) < sd) { sd = dist(q, p); s = q; }
+  if (s && sd > 0.75) { const k = Math.min(3.2, (sd - 0.7) / 0.3); p.lunge = [(s.x - p.x) / sd * k, (s.z - p.z) / sd * k, 0.3]; p.face = Math.atan2(s.x - p.x, s.z - p.z); }
+}
 
 // ---------- human control ----------
 // what can be cut short, and when: moves chain from halfway, fakes and passes recover fast, a landed jumper is done
@@ -613,16 +639,28 @@ function stepPlayer(p, dt) {
       break;
     }
     case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; const k = m.v * (m.slot === 'side' ? (u < 0.3 ? 0.12 + 0.3 * (u / 0.3) * (u / 0.3) : 1.2 * (1 - (u - 0.3) / 0.7 * 0.55)) : 1 - u * 0.6), st = 2.4 * Math.min(1, u * 1.6);      /* side moves: set the defender up first, then explode */ p.vx = m.dx * k + p.in.dx * st; p.vz = m.dz * k + p.in.dz * st; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; } break; }
-    case 'stagger': lock = 0; p.vx *= 0.9; p.vz *= 0.9; if (p.t >= p.stg.dur) p.st = 'free'; break;
+    case 'stagger': { lock = 0; const g = p.stg; if (g.dir && p.t < 0.28) { const k = (g.push || 1.5) * (1 - p.t / 0.28); p.vx = g.dir[0] * k; p.vz = g.dir[1] * k; } else { p.vx *= 0.85; p.vz *= 0.85; } if (p.t >= g.dur) p.st = 'free'; break; }      /* the first steps go where he bit, then he is stuck there */
     case 'fake': lock = 0.25; if (p.t > 0.27) p.st = 'free'; break;
-    case 'jump': { lock = 0.35; const u = p.t / 0.62; p.y = p.jumpH * Math.sin(Math.PI * Math.min(1, u)); if (u >= 1) { p.st = 'free'; p.y = 0; } break; }
-    case 'steal': lock = 0.55; if (p.t > 0.13 && !p.stealDone) resolveSteal(p); if (p.t > 0.4) p.st = 'free'; break;
+    case 'jump': { lock = 0.35; if (p.lunge && p.t < p.lunge[2]) { lock = 0; p.vx = p.lunge[0]; p.vz = p.lunge[1]; } const u = p.t / 0.62; p.y = p.jumpH * Math.sin(Math.PI * Math.min(1, u)); if (u >= 1) { p.st = 'free'; p.y = 0; } break; }
+    case 'steal': lock = 0.55; if (p.lunge && p.t < p.lunge[2]) { lock = 0; p.vx = p.lunge[0]; p.vz = p.lunge[1]; } if (p.t > 0.13 && !p.stealDone && MT.B.state !== 'pass') resolveSteal(p); if (p.t > 0.4) { p.st = 'free'; p.laneJump = false; } break;
     case 'shove': lock = 0.3; if (p.t > 0.35) p.st = 'free'; break;
     case 'pass': lock = 0.8; if (p.t > 0.22) p.st = 'free'; break;
     case 'celeb': lock = 0; p.vx *= 0.85; p.vz *= 0.85; if (M_.phase === 'live') p.st = 'free'; break;
   }
   if (M_.phase !== 'live' && M_.phase !== 'check') lock = Math.min(lock, p.st === 'celeb' ? 0 : 0.5);
   if (M_.phase === 'check') lock = 0;
+  // defensive assist (people only, not sprinting): stay between your man and the rim, mirror his steps, sag off the
+  // ball when he does not have it. With the stick released it guards for you; pushing the stick still steers.
+  if (p.user && !p.remote && p.guard && M_.phase === 'live' && M_.off !== p.team && B.holder && B.holder !== p && !p.in.sprint && p.st === 'free' && (!S || !S.set || S.set.dassist !== 0)) {
+    const g = p.guard, dg = dist(p, g); if (dg < 4.2) {
+      const gh = dHoop(g) || 1, ux = -g.x / gh, uz = -g.z / gh, onBall = g === B.holder, off = onBall ? 1.05 : 1.6;
+      let sx = g.x + ux * off, sz = g.z + uz * off; if (!onBall) { sx = lerp(sx, B.holder.x, 0.22); sz = lerp(sz, B.holder.z, 0.22); }
+      const ka = 3.2, dvx = (sx - p.x) * ka + (g.vx || 0), dvz = (sz - p.z) * ka + (g.vz || 0), topD = (3.3 + nAtt(p, 'speed') * 2.5) * 0.92, m = Math.hypot(dvx, dvz) / topD, ax = m > 1 ? dvx / topD / m : dvx / topD, az = m > 1 ? dvz / topD / m : dvz / topD;
+      const pushed = Math.hypot(p.in.dx, p.in.dz) > 0.2, w = (pushed ? 0.3 : 0.85) * (0.75 + 0.25 * nAtt(p, 'perd')) * clamp((4.2 - dg) / 1.5, 0, 1);
+      p.in.dx = lerp(p.in.dx, ax, w); p.in.dz = lerp(p.in.dz, az, w); p.assist = w;
+      if (onBall && dg < 1.9 && (g.st === 'shoot' || g.st === 'fake')) p.handsUp = true;       /* hands go up on a shooter in front of you */
+    }
+  } else p.assist = 0;
   // locomotion
   let top = (3.3 + nAtt(p, 'speed') * 2.5) * (M_.arcade ? 1.15 : 1);
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
@@ -697,8 +735,8 @@ function stepBall(dt) {
       B.pos.y = B.pk === 'bounce' ? (s < 0.6 ? lerp(y0, 0.13, s / 0.6) : lerp(0.13, yT, (s - 0.6) / 0.4)) : lerp(y0, yT, s) + Math.sin(Math.PI * s) * (B.pk === 'lob' ? 1.3 : B.pk === 'overhead' ? 0.55 : 0.12);
       if (B.pk === 'bounce' && !B.bounced && s >= 0.6) { B.bounced = true; sfx('bounce'); }
       if (B.t * B.speed > 1.3) for (const o of M_.P) {
-        if (o.team === B.from.team || B.tried[o.i] || (o.st !== 'free' && o.st !== 'steal') || Math.hypot(o.x - B.pos.x, o.z - B.pos.z) > 0.8) continue; B.tried[o.i] = 1;
-        const ch = 0.08 + nAtt(o, 'steal') * 0.42 - nAtt(B.from, 'pass') * 0.36 + 0.03 * bt(o, 'repo') + (o.user ? 0.12 : 0);
+        if (o.team === B.from.team || B.tried[o.i] || (o.st !== 'free' && o.st !== 'steal') || Math.hypot(o.x - B.pos.x, o.z - B.pos.z) > (o.laneJump ? 1.15 : 0.8)) continue; B.tried[o.i] = 1;
+        const ch = 0.08 + nAtt(o, 'steal') * 0.42 - nAtt(B.from, 'pass') * 0.36 + 0.03 * bt(o, 'repo') + (o.user ? 0.12 : 0) + (o.laneJump ? 0.22 : 0);
         if (Math.random() < clamp(ch, 0.02, 0.6)) { o.stats.stl++; give(o); changePoss(o.team); call(pick(CALLS.steal), o.b.name + ' jumped the lane', '#33e0ff', 1); sfxM('steal'); addBrav(o, 0.15); break; }
       }
     }
@@ -820,7 +858,7 @@ function animPlayer(p, dt) {
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
-    case 'stagger': an = 'stagger'; o.fall = p.stg.fall; break;
+    case 'stagger': an = 'stagger'; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
     case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
     case 'celeb': an = 'celeb'; o.style = p.b.moves.celeb; break;
     default:
