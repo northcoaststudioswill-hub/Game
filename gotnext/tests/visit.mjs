@@ -31,5 +31,9 @@ await B.evaluate(() => __pit.likeCrib()); await wait(B, 500); await wait(A, 1000
 ok('a second like the same day does not count', (await A.evaluate(() => __pit.S.home.likes | 0)) === 1);
 const r0 = await A.evaluate(() => { __pit.W.hangT = 59.9; return __pit.S.rep; }); await wait(A, 2500);
 const hang = await A.evaluate(r0 => ({ d: __pit.S.rep - r0, day: __pit.S.home.hang }), r0); ok('a minute together at a crib: +15 Respect once a day', hang.d === 15, JSON.stringify(hang));
+const inside = await B.evaluate(() => { const s = __pit.W.spots.find(x => /GO INSIDE/.test(x.label)); s.fn(); window.__tick && 0; return { kind: __pit.W.kind, items: __pit.W.hd.items.length, wall: __pit.W.visit.home.room.look.wall }; });
+const hostRoom = await A.evaluate(() => ({ items: __pit.S.home.room.items.length, wall: __pit.S.home.room.look.wall }));
+ok('GUESTY walks inside HOSTY\'s house: the same room', inside.kind === 'room' && inside.items === hostRoom.items && inside.wall === hostRoom.wall, `${inside.items} of ${hostRoom.items} pieces, walls ${inside.wall}`);
+await B.evaluate(() => { const s = __pit.W.spots.find(x => x.label === 'BACK OUTSIDE'); s.fn(); });
 await B.evaluate(() => { __pit.W.yaw = Math.PI; }); await wait(B, 800); await B.screenshot({ path: path.join(dir, 'shots', 'visit-guest.png') });
 console.log(errs ? errs + ' PAGE ERRORS' : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await browser.close(); srv.close();

@@ -22,7 +22,11 @@ function devSampleCrib() {
     ['weights', 14, 9, 0], ['bpress', 17, 9.2, 0], ['bag', 20, 9, 0], ['tires', 22.5, 9, 0], ['rack', 14, 14.5, 2], ['minihoop', 18, 14.5, 2], ['shotclock', 20.5, 14.5, 0], ['cones', 22.5, 13, 0], ['turf', 17, 12, 0],
     ['kicks', -12, 21.5, 2], ['case', -8.5, 21.8, 2], ['spot', -10, 19, 2], ['mirror', -5, 21.8, 2], ['chain', -16, 21.8, 2], ['car', 13, 20, 0], ['holo', 7, 20, 0], ['neonball', 19.5, 22, 2], ['planter', 4, 22, 2],
     ['hedge', 22, 18, 1], ['gnome', 3.2, 19, 0], ['flamingo', 5.2, 18.6, 0], ['flagpole', -22.5, 22.5, 0], ['mural', -20, 22, 2], ['arch', -12, 17.2, 0], ['dogcart', 18, 18.2, 0], ['barber', -3.5, 18, 2], ['boombox', -5.5, 17.2, 0], ['bench', -3.5, 21.6, 2]
-  ].map(([i, x, z, r]) => ({ i, x, z, r, m: Math.floor(Math.random() * 5) })).filter(it => HOME_ITEM[it.i]); save();
+  ].map(([i, x, z, r]) => ({ i, x, z, r, m: Math.floor(Math.random() * 5) })).filter(it => HOME_ITEM[it.i]);
+  homeRoom().look = { wall: 1, floor: 1 };
+  homeRoom().items = [['rug', 0, -1.5, 0], ['sofa', 0, -3.6, 0], ['ctable', 0, -1.6, 0], ['tv', 0, 1.2, 2], ['beanbag', -2.4, -1.8, 1], ['arcade', 6.6, -5.3, 3], ['bed', -5.6, 3.8, 1], ['records', 4.5, -5.6, 0], ['flamp', -2.2, -4.8, 0],
+    ['kicks', 6.9, 1.5, 3], ['poster', -4.2, -5.7, 0], ['throne', 3.2, -1.6, 3], ['houseplant', 6.8, 5.2, 0], ['lava', 2.5, -4.8, 0], ['speaker', -6.6, -0.5, 1], ['bowl', 0, -1.6, 0], ['console', 0.35, -1.6, 0]
+  ].map(([i, x, z, r]) => ({ i, x, z, r, m: 0, y: ['bowl', 'console'].includes(i) ? 0.44 : 0 })).filter(it => HOME_ITEM[it.i]); save();
 }
 function devMax() {
   devKeep();

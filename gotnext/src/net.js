@@ -146,7 +146,7 @@ function crewKick(peer) { if (!NET.crew) return; NET.crew.m = NET.crew.m.filter(
 function crewLeave() { NET.inCrew = null; pres({ in: null }); }
 // other players walking the same place
 // which place you are in, as others see it: a crib is someone's crib
-function worldKey() { return !W ? 'menu' : W.kind === 'crib' ? 'crib@' + (W.visit ? W.visit.peer : (NET.me || 'me')) : W.kind; }
+function worldKey() { return !W ? 'menu' : W.kind === 'crib' || W.kind === 'room' ? W.kind + '@' + (W.visit ? W.visit.peer : (NET.me || 'me')) : W.kind; }
 function netWorldStep(dt) {
   if (!W) return; netPublish();
   const rigs = W.netRigs || (W.netRigs = {}), seen = {}, key = worldKey(), today = dayKey();
@@ -171,7 +171,7 @@ function netWorldStep(dt) {
   }
   for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); delete rigs[k]; }
   // hanging out at a crib with someone online for a minute: +15 Respect once a day, for each of you
-  if (W.kind === 'crib' && Object.keys(seen).length) { W.hangT = (W.hangT || 0) + dt; const H = home(); if (W.hangT >= 60 && H.hang !== today) { H.hang = today; gainRep(15); save(); toast('HUNG OUT', '+15 Respect. Good company counts.', 'ach'); } }
+  if ((W.kind === 'crib' || W.kind === 'room') && Object.keys(seen).length) { W.hangT = (W.hangT || 0) + dt; const H = home(); if (W.hangT >= 60 && H.hang !== today) { H.hang = today; gainRep(15); save(); toast('HUNG OUT', '+15 Respect. Good company counts.', 'ach'); } }
 }
 function nameTag(name, sub, H, col) {
   col = col || '#ff2d78';

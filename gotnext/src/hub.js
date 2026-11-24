@@ -116,8 +116,8 @@ function enterWorld(kind, sx, sz, face, opts) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
   W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] }; if (opts) Object.assign(W, opts);
   musicMode = 'hub'; ostRoom(kind); $('prompt').style.display = 'none'; ambInit();
-  if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else buildCrib();
-  worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : W.visit ? W.visit.name + "'S CRIB" : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
+  if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else if (kind === 'room') buildRoom(); else buildCrib();
+  worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : kind === 'room' ? (W.visit ? W.visit.name + "'S ROOM" : 'MY ROOM') : W.visit ? W.visit.name + "'S CRIB" : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
   if (S.created && S.seenEventDay !== dayKey()) { S.seenEventDay = dayKey(); daily(); setTimeout(() => toast('TODAY · ' + todayEvent().n, todayEvent().d + ' The old head has new contracts.', 'rank'), 800); }
   document.body.dataset.state = 'world'; uiHud();
 }

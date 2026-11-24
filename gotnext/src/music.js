@@ -4,7 +4,7 @@
 'use strict';
 const TRACKS = [['afraid', 'Afraid'], ['down', 'Down'], ['hard-to-pretend', 'Hard to Pretend'], ['city-deep', 'City Deep'], ['i-am-somebody', 'I Am Somebody'], ['parody-3', 'Parody 3'], ['no-love', 'No Love'], ['insanity', 'Insanity'], ['going-out-sad', 'Going Out Sad'], ['believe', 'Believe'], ['bbb', 'BBB']];
 // per place: reverb mix (wet), dry level, how bright the top end stays, overall level
-const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.66 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.64 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.64 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.6 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.44 } };   /* released tracks are mastered loud: they sit under the game's sounds */
+const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.66 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.64 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.64 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.6 }, room: { wet: 0.2, dry: 0.93, hi: 8500, lvl: 0.62 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.44 } };   /* released tracks are mastered loud: they sit under the game's sounds */
 const OST = { el: null, ok: false, order: [], i: -1, fails: 0, room: 'menu', graph: null };
 function ostInit() {
   if (OST.el || !AC) return;

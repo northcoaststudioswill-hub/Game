@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.8.8: defense controls (defense assist, timed contests with closeouts, steals that go for the ball, jumping the passing lane) and real ankle-break and fall reactions.** v0.8.7: crossovers reworked. v0.8.6: team-coloured name tags in games (you gold, your squad blue, them red), and defenders guard their man: face him when tight, open up between man and ball when sagging, square up on the ball.** v0.8.4: a real run (running-lab joint angles: knee drive, heel recovery, a flight phase), on The Block and on game courts.** v0.8.3: volume sliders. v0.8.2: the soundtrack (11 tracks, streamed from `gotnext/music/`, in-world reverb), and running off the court uses the court's run with a smooth walk-to-run ramp on sticks.** v0.8.1: a real walk (from gait-lab joint angles, planted feet that stay put), plus a little Habbo in the crib: things stack on tables, a rare of the day, emotes, chat bubbles, and visiting friends' cribs online with likes.** v0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.9: walk inside your house. A room you decorate (Habbo-style) with its own walls and floor, built with the same builder, counted in your crib's Vibe, and visitable by friends online.** v0.8.8: defense controls (defense assist, timed contests with closeouts, steals that go for the ball, jumping the passing lane) and real ankle-break and fall reactions.** v0.8.7: crossovers reworked. v0.8.6: team-coloured name tags in games (you gold, your squad blue, them red), and defenders guard their man: face him when tight, open up between man and ball when sagging, square up on the ball.** v0.8.4: a real run (running-lab joint angles: knee drive, heel recovery, a flight phase), on The Block and on game courts.** v0.8.3: volume sliders. v0.8.2: the soundtrack (11 tracks, streamed from `gotnext/music/`, in-world reverb), and running off the court uses the court's run with a smooth walk-to-run ramp on sticks.** v0.8.1: a real walk (from gait-lab joint angles, planted feet that stay put), plus a little Habbo in the crib: things stack on tables, a rare of the day, emotes, chat bubbles, and visiting friends' cribs online with likes.** v0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -98,6 +98,29 @@ published game has the reverb. If no track loads, the old synth loop plays inste
 - **The fix:** before, a phone thumb held at full push flickered sprint on and off at 93%. The speed swung between 1.3
   and 2.5 m/s, right across the walk/run blend, and the body jerked. Now it holds a steady run.
 - **On the court**, the phone's sprint turns on at 93% and only off below 85%.
+
+## Inside the house (v0.9)
+
+![Inside the house](docs/img/room.png)
+
+- **Getting in:** the front door of your house (GO INSIDE) leads to a room, about 15 by 12 metres, with three windows
+  onto the city at night, a pendant light, and your wardrobe (the closet now lives here). BACK OUTSIDE leaves.
+- **Building:** build mode (**B**, or the BUILD MODE spot by the wardrobe) works inside the same way as in the yard,
+  with the same catalogue.
+- **What can't go inside:** big outdoor pieces (project car, kiddie pool, gate arch, fence panel, satellite dish, turf,
+  hedge).
+- **Size:** the room holds 60 pieces, on top of the yard's 90.
+- **New pieces:** King Bed, Record Shelf (things stack on it), Arc Floor Lamp, Framed Poster.
+- **Room look** (in build mode):
+  - walls: 8 styles, 350 VC each (plaster, brick, midnight, hot pink, pinstripe, neon grid, gold, mint)
+  - floor: 6 styles, 450 VC each (boards, checker tile, shag carpet, concrete, hardwood court, marble)
+- **Vibe and sets:** everything in the room counts toward crib level and sets.
+- **Homies** come inside and sit on your furniture.
+- **The camera:** the same third-person camera as outside. The wall between you and the camera fades out. From above
+  in build mode, the near wall fades.
+- **Online:** your room travels with your crib. A friend visiting can walk in the front door and sees your room exactly
+  as you built it.
+- **Music:** a smaller, darker reverb indoors.
 
 ## A little Habbo in the crib (v0.8.1)
 
@@ -338,7 +361,8 @@ node tests/gestures.mjs           # each finish and jumper variation from real k
 node tests/devroom.mjs            # clicks through every Dev Room tab, a reel and a 1v1 against a maxed player
 node tests/contest.mjs [N]        # N drives per finisher quality at a rim protector: made %, blocked %, finishes picked
 node tests/home.mjs               # the home builder end to end (place, move, stack, store, sell, rares, land, sets, visitors)
-node tests/visit.mjs              # two players online: visit a crib, chat, emote, like, hang out
+node tests/visit.mjs              # two players online: visit a crib and walk into the house, chat, emote, like, hang out
+node tests/room.mjs               # inside the house: walk in, build, refusals, walls fading, room look, Vibe, walk out
 node tests/walkfeel.mjs [file]    # the walk measured: cadence, step length, foot slide, bob, lean
 node tests/runfeel.mjs [file]     # sprint smoothness on The Block vs a court
 node tests/defend.mjs             # defender facing, defense assist, timed contests, closeouts, steal odds, lane jumps, name tags

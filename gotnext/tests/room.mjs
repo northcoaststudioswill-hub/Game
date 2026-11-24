@@ -1,0 +1,30 @@
+// Inside the house: walk in, build, room looks, walls fade from above, vibe counts, walk out. node tests/room.mjs
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1000, height: 600 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0;
+  window.__tick = n => { if (!window.__patched && window.THREE && THREE.Object3D) { window.__patched = 1; const orig = THREE.Object3D.prototype.lookAt; THREE.Object3D.prototype.lookAt = function (x, y, z) { if (this.isPerspectiveCamera && window.__camFn) { const t = window.__camFn(this); return orig.call(this, t[0], t[1], t[2]); } return orig.call(this, x, y, z); }; }
+    for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
+const T = n => p.evaluate(n => window.__tick(n), n), shot = n => p.screenshot({ path: path.join(dir, 'shots', `room-${n}.png`), timeout: 120000 });
+await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await T(60); await p.click('#titleBtns .btn'); await T(5); await p.click('#panel .pf .btn'); await T(30);
+await p.evaluate(() => { const st = document.createElement('style'); st.textContent = '#toasts{display:none!important}'; document.head.appendChild(st); __pit.S.vc = 20000; __pit.S.rep = 3000; __pit.uiClose(); __pit.enterWorld('crib', 10.1, -0.4, -Math.PI / 2); });
+await T(30);
+let r = await p.evaluate(() => { const s = __pit.W.spots.find(x => /GO INSIDE/.test(x.label)); s.fn(); window.__tick(30); return { kind: __pit.W.kind, tag: document.getElementById('wtag').textContent, walls: __pit.W.walls.length }; });
+ok(r.kind === 'room' && /MY ROOM/.test(r.tag) && r.walls === 4, `walk in the front door: inside the house (${r.tag.split('·')[0].trim()})`);
+await shot('empty');
+r = await p.evaluate(() => { const P = __pit, S = P.S; P.buildEnter(); const B = P.W.build; P.BLD.act.pick('sofa'); B.fx = 0; B.fz = -3.5; window.__tick(3); P.buildPlace(); const car = P.buildFits('car', 0, 2, 0), wall = P.buildFits('sofa', 7.4, 0, 0); P.buildCancel(); return { n: S.home.room.items.length, yard: S.home.items.length, car, wall }; });
+ok(r.n === 1 && r.yard === 0 && /outside/.test(r.car) && /wall/i.test(r.wall), `build inside: a sectional goes in the room (room ${r.n}, yard ${r.yard}); a car is refused ("${r.car}"), so is the wall ("${r.wall}")`);
+r = await p.evaluate(() => { window.__tick(40); return __pit.W.walls.map(w => +w.mats[0].opacity.toFixed(2)); });
+ok(r.some(o => o < 0.5), `build mode from above: the wall in the way fades (${r.join(', ')})`);
+await shot('build');
+r = await p.evaluate(() => { const P = __pit; const v0 = P.homeLevel().tot; P.buildExit(); P.uiHomeLot(); window.__tick(3); const b = [...document.querySelectorAll('#panel .btn')].find(x => x.textContent === 'Exposed Brick'); b.click(); window.__tick(30); return { v0, wall: P.S.home.room.look.wall, kind: P.W.kind }; });
+ok(r.v0 > 0 && r.wall === 1 && r.kind === 'room', `the room counts toward crib Vibe (${r.v0}); walls changed to brick, still inside`);
+await p.evaluate(() => { const P = __pit; P.devSampleCrib(); P.S.homies = [P.maxBuild('showman', 'Lil Kickstand')]; P.enterWorld('room', 0, 4.6, Math.PI); P.W.yaw = Math.PI; }); await T(90); await shot('furnished');
+r = await p.evaluate(() => ({ items: __pit.S.home.room.items.length, homie: __pit.W.npcs.filter(n => n.homie).map(n => n.anim) }));
+ok(r.items > 10, `sample room: ${r.items} pieces; homies inside: ${JSON.stringify(r.homie)}`);
+await p.evaluate(() => { window.__camFn = cam => { cam.position.set(0, 13, 12); return [0, 0, -0.5]; }; }); await T(30); await shot('furnished-top'); await p.evaluate(() => { window.__camFn = null; });
+r = await p.evaluate(() => { const s = __pit.W.spots.find(x => x.label === 'BACK OUTSIDE'); s.fn(); window.__tick(10); return __pit.W.kind; });
+ok(r === 'crib', 'walk out: back in the yard');
+console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close();
