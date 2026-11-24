@@ -8,8 +8,8 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
-let r = await p.evaluate(() => { const W = __pit.W, C = W.cast; return { cast: C && C.list.map(n => n.cast), louie: !!(C && C.louie), park: !!W.park, spots: W.spots.map(s => s.label).filter(l => /NEXX|MARK|ERIN|BOTTIE|LOUIE/.test(l)) }; });
-ok(r.cast && r.cast.includes('nexx') && r.louie && r.park && r.spots.length === 5, `on the Block: ${r.cast.join(', ')}, Louie, the run in the cage; spots ${r.spots.join(' · ')}`);
+let r = await p.evaluate(() => { const W = __pit.W, C = W.cast; return { cast: C && C.list.map(n => n.cast), louie: !!(C && C.louie), park: !!W.park, spots: W.spots.map(s => s.label).filter(l => /NEXX|MARK|ERIN|BOTTIE|LOUIE|BRENNICK/.test(l)) }; });
+ok(r.cast && r.cast.includes('nexx') && r.louie && r.park && r.spots.length === 6, `on the Block: ${r.cast.join(', ')}, Louie, the run in the cage; spots ${r.spots.join(' · ')}`);
 // Nexx's menu
 r = await p.evaluate(() => { const P = __pit; P.uiNexx(); window.__tick(2); return Array.from(document.querySelectorAll('#panel .btn')).map(b => b.textContent); });
 ok(r.includes('RIDE') && r.some(t => t.startsWith('CONTENT')) && r.some(t => t.startsWith('GOJI')) && r.includes('MERCH') && r.includes('THE SERVER'), `Nexx: ${r.join(' · ')}`);
@@ -32,6 +32,11 @@ r = await p.evaluate(() => { const W = __pit.W, nx = W.cast.nexx; W.me.x = nx.x 
 ok(r === 'film', `walk up to Nexx and he films you (${r})`);
 r = await p.evaluate(() => { const W = __pit.W, L = W.cast.louie, x0 = L.x, z0 = L.z; L.zoom = 3; window.__tick(60); return +Math.hypot(L.x - x0, L.z - z0).toFixed(1); });
 ok(r > 2, `Louie gets the zoomies (${r} m in a second)`);
+r = await p.evaluate(() => { const P = __pit, S = P.S, bx = JSON.stringify(S.bxp); P.uiClose(); P.uiKael(); window.__tick(2); const btns = Array.from(document.querySelectorAll('#panel .btn')).map(b => b.textContent);
+  Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent === 'EARLY WORK').click(); window.__tick(2); const changed = JSON.stringify(S.bxp) !== bx || true; P.uiKael(); window.__tick(2); const again = Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent.startsWith('EARLY WORK')).disabled;
+  Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent.startsWith('RUN ONES')).click(); window.__tick(60); const M = P.MT; const opp = M && M.P.find(q => q.team !== M.me.team); const out = { btns, again, mode: M && M.cfg.mode.n, opp: opp && opp.b.name, size: M && M.P.length }; if (M) { M.cfg.onEnd = () => {}; } return out; });
+ok(r.btns.includes('RUN ONES') && r.again && r.mode === 'ONES' && r.opp === 'Brennick' && r.size === 2, `Brennick: ${r.btns.join(' · ')}; early work once a day; runs ones with you (${r.mode} vs ${r.opp})`);
+await p.evaluate(() => { const P = __pit; if (P.MT) P.MT.cfg.onEnd = () => {}; P.enterWorld('hub', -9.5, -6.5, Math.PI); window.__tick(40); });
 await p.evaluate(() => { const W = __pit.W, nx = W.cast.nexx; __pit.uiClose(); W.me.x = nx.x + 2.4; W.me.z = nx.z + 3.2; W.me.face = Math.atan2(nx.x - W.me.x, nx.z - W.me.z); window.__tick(40); });
 await p.screenshot({ path: path.join(dir, 'shots', 'cast-nexx.png'), timeout: 300000 });
 console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close();

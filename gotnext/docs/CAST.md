@@ -1,6 +1,6 @@
 # GOT NEXT — who's who on the Block
 
-Everyone already on the Block stays as they were: Coach Overtime, Sharpie, the Old Head, Soy Dog Sal, the fiends, the dice crew, the six ladder challengers, your homies. The people standing around without much going on now have habits: checking their phone, talking to each other, bobbing to the music, arms crossed, filming. On top of that there is one new character, NEXX, and five regulars borrowed from the crew in your other games.
+Everyone already on the Block stays as they were: Coach Overtime, Sharpie, the Old Head, Soy Dog Sal, the fiends, the dice crew, the six ladder challengers, your homies. The people standing around without much going on now have habits: checking their phone, talking to each other, bobbing to the music, arms crossed, filming. On top of that there is one new character, NEXX, and six regulars borrowed from the crew in your other games.
 
 The borrowed regulars only say lines that already exist in those games (Pocket Lantern / Sprouts / Sproutwild / North Coast Knockout / Patch & Plate), quoted as written. Their names are hinted, not spelled out. NEXX's lines are new, written from your description, so read them and tell me what to change.
 
@@ -25,11 +25,13 @@ The borrowed regulars only say lines that already exist in those games (Pocket L
 | **D** | Derek (drives the van) | Next to Mark, cap and shades | Stands there. That's his whole part | "I drive the van. That's my whole part." · "YO. THE TRUCK NEEDS A PART. THE PART NEEDS A TRUCK TO GO GET IT." · "YO! THE FLOW PROS TRUCK DIED. AGAIN. GOT FRIES?" |
 | **ERIN'S STAND** | Erin (grows the food, runs the stand) | A farm stand by the cage, east side | Sells a Farm Smoothie: 40 VC, +6 Stamina, +2 Strength next game | "A SLOW DAY IS STILL A GOOD DAY." · "GO WATER YOURSELF." · "Back soon. Don't let Marcus touch my seeds." · "BECAUSE I NEVER CHANGE MY MIND." |
 | **BOTTIE** | Lil Bottie (robot rapper, posts everything) | Cage fence, visor, braids, hoodie | Films the run for the feed, all day | "BZZT. THIS IS GOING ON THE FEED." · "CONTEXT WINDOW: FULL OF YOUR MISTAKES." · "BZZT. I PRESSED ONE BUTTON. ONE. EVERYBODY IS SO DRAMATIC." · "PLEASE RATE THIS RESPONSE." |
+| **BRENNICK** | Kael Brennick (Sootborn: the valve hand) | By the cage entrance, first one out, last to leave | Counts his reps out loud ("...nine. Ten. Eleven."). **RUN ONES**: one on one to 7 against him, 88 OVR, a patient, low, explosive finisher with a high release. Beat him the first time: 600 VC, 120 Respect, and he runs with you as a homie. **EARLY WORK**: once a day, +40 badge XP | "Aye. And aye." · "Top three." · "Then I plan to be insufferable for a very long time." · "Listen." · "Somebody has to fix the valves." · "Boring as a bread line." · "I'm early. You're high." · "Then one will have to be added." · after you beat him: "You don't know how to make one." |
 | **LOUIE** | Louie (the Shiba) | Everywhere: he has a route | Wanders, comes over when you're close, gets the zoomies. Scratches once a day: +3 Respect | "WOOF." · "IS IT PATE TIME?" · "SQUIRREL?!" · "MORE SCRATCHES." · "MUCH VICTORY. VERY GOOD BOY." |
 
 ## Not used (yet), and why
 
-- **Kale:** there is no Kale anywhere in the repo (searched the docs, notes, every game file and the git history). If it's someone I should know, tell me who; it might be a dictation slip for one of the names here.
+- **Kael's story itself:** Sootborn is grim (Seren, the furnace, the Gilding). Brennick gets only his lighter lines and his habits: the counting, the patience, the dry "Top three." Nothing about the grief.
+
 - **Will:** that's you. Better as a cameo you choose than a character I write.
 - **Mama and Ruby:** good fit (sideline mom, Yukon, "DON'T MAKE ME TURN THIS YUKON AROUND."), next in line if you want more.
 - **King Bibi:** a parody of a real politician; left out on purpose.

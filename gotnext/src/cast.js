@@ -20,6 +20,8 @@ const CAST_LINES = {
   d: ["I drive the van. That's my whole part.", "YO. THE TRUCK NEEDS A PART. THE PART NEEDS A TRUCK TO GO GET IT.", "YO! THE FLOW PROS TRUCK DIED. AGAIN. GOT FRIES?"],
   erin: ["A SLOW DAY IS STILL A GOOD DAY.", "GO WATER YOURSELF.", "Back soon. Don't let Marcus touch my seeds.", "BECAUSE I NEVER CHANGE MY MIND."],
   bottie: ["BZZT. THIS IS GOING ON THE FEED.", "CONTEXT WINDOW: FULL OF YOUR MISTAKES.", "BZZT. I PRESSED ONE BUTTON. ONE. EVERYBODY IS SO DRAMATIC.", "PLEASE RATE THIS RESPONSE."],
+  kael: ['Aye. And aye.', 'Top three.', 'Then I plan to be insufferable for a very long time.', 'Listen.', 'Somebody has to fix the valves.', 'Boring as a bread line.', "I'm early. You're high.", 'Then one will have to be added.'],
+  kaelLose: ['You don\'t know how to make one.', 'Top three.'],
   louie: ['WOOF.', 'IS IT PATE TIME?', 'SQUIRREL?!', 'MORE SCRATCHES.', 'MUCH VICTORY. VERY GOOD BOY.'],
 };
 // ---- the people ----
@@ -48,6 +50,9 @@ function castInit() {
   // BOTTIE: chrome, dreads, puffer; films the run for the feed
   const bt = castNpc('BOTTIE', 'showman', { hair: 'h_braids', face: 'f_visor', top: 't_hoodie' }, 3.6, -10.9, Math.PI, { cast: 'bottie' }); bt.amb = 'film'; C.list.push(bt);
   spot(3.6, -9.8, 1.5, 'BOTTIE', () => uiDialog('BOTTIE', pick(CAST_LINES.bottie), [['Later']]));
+  // BRENNICK (Kael, from Sootborn): the valve hand. First one out here, last to leave, counts every rep.
+  { const kb = kaelBuild(); const n = addNpc(kb, -2.6, -6.6, Math.PI, 'idle', { still: true }); n.cast = 'kael'; n.amb = 'cross'; C.list.push(n); C.kael = n;
+    spot(-2.6, -5.6, 1.7, 'BRENNICK', () => uiKael()); }
   // LOUIE: the dog. Has a route. Zoomies.
   C.louie = louieInit(2.5, 3);
   spot(2.5, 3, 1.4, 'LOUIE', () => uiLouie()); C.louieSpot = W.spots[W.spots.length - 1];
@@ -67,6 +72,7 @@ function castStep(dt) {
     const d = Math.hypot(me.x - n.x, me.z - n.z);
     if (n.cast === 'nexx') { if (d < 4.5) { n.amb = 'film'; n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08); } else { n.ambT = (n.ambT || 4) - dt; if (n.ambT <= 0 || n.amb === 'film') { n.amb = pick(['phone', 'phone', 'talk', 'bob', 'cross']); n.ambT = rnd(4, 9); } n.face = lerpAng(n.face, 0.6, 0.03); } }
     else if (n.cast === 'bottie') n.amb = 'film';
+    else if (n.cast === 'kael') { n.ambT = (n.ambT || 5) - dt; if (n.ambT <= 0) { n.amb = pick(['cross', 'watch', 'bob', 'watch']); n.ambT = rnd(5, 10); n.count = ((n.count || 0) % 11) + 1; if (d < 7 && Math.random() < 0.4) bubble(n.rig.root, n.count === 11 ? 'Eleven.' : '...' + ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][n.count - 1] + '.', 2.2, n.rig.H + 0.35); } if (d < 4) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.05); }
     else { n.ambT = (n.ambT || 5) - dt; if (n.ambT <= 0) { n.amb = pick(n.cast === 'mark' ? ['cross', 'watch', 'talk', 'point'] : n.cast === 'erin' ? ['watch', 'clap', 'cross'] : ['watch', 'phone', 'cross']); n.ambT = rnd(4, 9); } }
     n.rig.root.position.set(n.x, 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, crowdPose(n.amb, W.t, { ph: n.ph }, n.rig.prof), dt);
     // a line now and then when you walk past
@@ -123,4 +129,29 @@ function uiErin() {
 function uiLouie() {
   const today = dayKey(), done = S.louie === today;
   uiDialog('LOUIE', pick(CAST_LINES.louie), [[done ? 'ALREADY SCRATCHED TODAY' : 'SCRATCHES', () => { S.louie = today; gainRep(3); save(); uiClose(); sfx('unlock'); toast('LOUIE', '"MUCH VICTORY. VERY GOOD BOY." +3 Respect'); if (W.cast && W.cast.louie) W.cast.louie.zoom = 3; }, '', done], ['Later']]);
+}
+
+// ---- BRENNICK ----
+function kaelBuild() {
+  const b = withSeed(2207, () => aiBuild(88, 'slasher')); b.name = 'Brennick'; b.build.body.h = 79; b.build.skin = 2;
+  b.worn = Object.assign(randomWorn(2), { top: 't_tee', head: 'hd_none', face: 'f_none', shoes: 'k_beat' });
+  b.anim = { shot: { trad: 0.25, high: 0.6, quick: 0.15 }, idle: { relaxed: 0.2, athletic: 0.7, wide: 0.1 }, hand: 'R', knee: 1.2, elbow: -0.2, lean: 0.2, stance: 1.1, follow: 1.3, shoulder: 0, cadence: 0.8, intensity: 1.25, recovery: 1.3, restless: 0.1, dribLow: 0.4, defLow: 0.6, arms: 0.2, swag: 0.1 };      /* patient, low, explosive */
+  return b;
+}
+function uiKael() {
+  const today = dayKey(), worked = S.kaelWork === today, beat = !!S.kaelBeat;
+  uiDialog('BRENNICK · 88 OVR', pick(CAST_LINES.kael), [
+    [beat ? 'RUN ONES (rematch)' : 'RUN ONES', () => runKael()],
+    [worked ? 'EARLY WORK: DONE TODAY' : 'EARLY WORK', () => { const cats = ['F', 'S', 'P', 'D'], c = pick(cats); S.kaelWork = today; S.bxp[c] += 40; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; toast('BADGE POINT', '+1 ' + CATS[c][0]); } save(); uiClose(); sfx('unlock'); toast('BRENNICK', '"Listen." +40 ' + CATS[c][0] + ' badge XP'); }, '', worked],
+    ['Later'],
+  ]);
+}
+function runKael() {
+  uiClose(); const tier = TIERS_COURT[2], b = kaelBuild(), first = !S.kaelBeat;
+  const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: 77, firstOff: 0 };
+  cfg.bonus = res => { if (!res.win) { setTimeout(() => toast('BRENNICK', '"' + pick(CAST_LINES.kaelLose) + '"'), 1600); return null; }
+    if (first) { S.kaelBeat = true; const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
+    return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 VC' : 'Beat Brennick again +150 VC' }; };
+  cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
+  save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
 }
