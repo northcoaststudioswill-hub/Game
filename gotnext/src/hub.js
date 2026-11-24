@@ -72,16 +72,44 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const v = Math.hypot(vx, vz), fwdA = ax * Math.sin(face) + az * Math.cos(face);
   L.lean = lerp(L.lean, clamp(fwdA * 0.014, -0.18, 0.2), 1 - Math.exp(-8 * dt));
   let hipYaw = 0; if (v > 0.6) { let a = Math.atan2(vx, vz) - face; a = Math.atan2(Math.sin(a), Math.cos(a)); if (Math.abs(a) < 2.3) hipYaw = clamp(a, -0.5, 0.5) * Math.min(1, v / 2.5) * 0.6; }
-  applyPose(R, poseOf(v > 0.15 || (R.gait && (R.gait.ft.R.sw || R.gait.ft.L.sw)) ? 'loco' : 'idle', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw, swag: swag === undefined ? 1 : swag }), dt);
+  // walking: the stride cycle advances with distance covered (steps lengthen with speed), so the feet do not skate.
+  // Up to a brisk walk the legs follow real gait curves; above it the run (planted-feet IK) takes over.
+  const sg = swag === undefined ? 0.6 : swag, step = R.legLen * 0.74 * clamp(Math.sqrt(Math.max(v, 0.01) / 1.35), 0.45, 1.3), amp = clamp(v / 0.5, 0, 1) * clamp(Math.sqrt(v / 1.35), 0.45, 1.3);
+  L.psi = ((L.psi || 0) + v * dt / (2 * step)) % 1;
+  // the hip swing that carries the body exactly one step over the standing foot in stance (60% of the cycle), less the
+  // heel-to-toe roll of the foot: then the planted foot stays put
+  const need = 1.2 * step - 0.12; let lo = 0.2, hi = 2.2; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * (Math.sin((11 + 19 * m) * D2R) + Math.sin((20 * m - 11) * D2R)); if (sweep < need) lo = m; else hi = m; }
+  const hipA = Math.min(lo, 1.6) * clamp(v / 0.5, 0, 1);
+  const wWalk = 1 - clamp((v - 2.3) / 0.9, 0, 1);
+  let P = poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen });
+  if (v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
+  if (wWalk < 1) P = blendPose(poseOf('loco', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw, swag: 0 }), P, wWalk);
+  else { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
+  applyPose(R, P, dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;
-  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: v < 0.3 ? 0.22 : 0, want: 1, dt, swag: swag === undefined ? 1 : swag }); legIK(R, dt);
+  if (v > 0.25 && wWalk > 0.3) gaitLock(R, L.psi, face, wWalk); else R.lock = null;
+  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: 0, want: 1 - wWalk, dt, swag: 0 }); legIK(R, dt);
 }
-function enterWorld(kind, sx, sz, face) {
+// foot lock for the walk: while a foot is in stance, nudge that hip so the ankle stays where the foot landed (the curve
+// shape stays; only the hip angle is corrected, and the ankle keeps the foot flat). Released through push-off.
+const _gl = new THREE.Vector3();
+function gaitLock(R, psi, face, w) {
+  const J = R.joints, fx = Math.sin(face), fz = Math.cos(face), Lg = R.thigh + R.shin; R.lock = R.lock || {}; R.root.updateMatrixWorld(true);
+  for (const [s, off] of [['R', 0], ['L', 0.5]]) {
+    const u = ((psi + off) % 1 + 1) % 1, an = J['an' + s]; an.getWorldPosition(_gl);
+    if (u > 0.6) { R.lock[s] = null; continue; }
+    if (!R.lock[s]) { R.lock[s] = { x: _gl.x, z: _gl.z }; continue; }
+    const k = w * (u < 0.48 ? 1 : 1 - (u - 0.48) / 0.12), dx = R.lock[s].x - _gl.x, dz = R.lock[s].z - _gl.z, e = dx * fx + dz * fz, el = dx * fz - dz * fx;
+    const d = clamp(-e / Lg, -0.35, 0.35) * k, dl = clamp(el / Lg, -0.12, 0.12) * k;
+    J['hp' + s].rotation.x += d; J['hp' + s].rotation.z += dl; an.rotation.x -= d; J['hp' + s].updateMatrixWorld(true);
+  }
+}
+function enterWorld(kind, sx, sz, face, opts) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
-  W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] };
+  W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] }; if (opts) Object.assign(W, opts);
   musicMode = 'hub'; $('prompt').style.display = 'none'; ambInit();
   if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else buildCrib();
-  worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
+  worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : W.visit ? W.visit.name + "'S CRIB" : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
   if (S.created && S.seenEventDay !== dayKey()) { S.seenEventDay = dayKey(); daily(); setTimeout(() => toast('TODAY · ' + todayEvent().n, todayEvent().d + ' The old head has new contracts.', 'rank'), 800); }
   document.body.dataset.state = 'world'; uiHud();
 }
@@ -273,17 +301,33 @@ function buildPit() {
   W.bounds = [-9.2, 9.2, -4.6, 9.6]; W.camBox = [-9.7, 9.7, -5.4, 10.2];
 }
 
+// emotes: show the block how you feel (keys 1-5, or the buttons). Online friends nearby see them too.
+const EMOTES = { wave: { an: 'call', n: 'WAVE', k: '1' }, dance: { an: 'dance', n: 'DANCE', k: '2' }, sit: { an: 'sit', n: 'SIT', k: '3', y: -0.4 }, cheer: { an: 'cheer', n: 'HYPE', k: '4' }, celeb: { an: 'celeb', n: 'CELEBRATE', k: '5' } };
+function emote(k) { if (!W || W.build || !EMOTES[k]) return; W.me.emote = W.me.emote === k ? null : k; W.me.sit = null; NET.em = W.me.emote; sfx('ui'); }
+// chat: T (or the chat button), type, Enter. A bubble over your head; online friends in the same place see it.
+function chatOpen() {
+  if (!W || W.build || UI.cur) return; let el = $('chatbox'); if (!el) { el = document.createElement('input'); el.id = 'chatbox'; el.maxLength = 60; el.placeholder = 'Say something (Enter)'; el.autocomplete = 'off'; document.body.appendChild(el);
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') { chatSend(el.value); el.value = ''; el.blur(); el.style.display = 'none'; } else if (e.key === 'Escape') { el.blur(); el.style.display = 'none'; } e.stopPropagation(); }); el.addEventListener('blur', () => { el.style.display = 'none'; }); }
+  for (const k in keys) keys[k] = false; el.style.display = 'block'; setTimeout(() => el.focus(), 0);
+}
+function chatSend(t) { t = String(t || '').replace(/[<>]/g, '').trim().slice(0, 60); if (!t || !W) return; bubble(W.me.rig.root, t, 5); NET.say = { i: (NET.say ? NET.say.i : 0) + 1, t }; sfx('ui'); }
+addEventListener('keydown', e => {
+  if (!W || UI.cur || W.build || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.code === 'KeyT') { e.preventDefault(); chatOpen(); } else { const k = Object.keys(EMOTES).find(x => 'Digit' + EMOTES[x].k === e.code); if (k) emote(k); }
+});
+
 // buildCrib lives in home.js (the lot, the house and the home builder)
 
 function worldStep(dt) {
   if (!W) return; W.t += dt; const me = W.me, I = IN[0], building = !!W.build, busy = uiBusy() || building;
   let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my;
+  if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
   if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
-  const sp = I.sprint ? 6.2 : 1.85;          // walk the block with some swagger; run when you need to be somewhere
+  const sp = I.sprint ? 6.2 : 1.5;          // walk the block with some swagger; run when you need to be somewhere
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
@@ -295,6 +339,7 @@ function worldStep(dt) {
   me.ph += dt * (4 + v * 1.6);
   const R = me.rig;
   if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
+  else if (me.emote && v < 0.3) { const e = EMOTES[me.emote]; R.root.position.set(me.x, e.y || 0, me.z); R.root.rotation.y = me.face; applyPose(R, poseOf(e.an, W.t, Object.assign({ leg: R.legLen, style: S.moves.celeb, ph: 0 }, e.o || {})), dt); R.gait = null; }
   else locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
   for (const n of W.npcs) {

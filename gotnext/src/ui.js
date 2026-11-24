@@ -15,6 +15,7 @@ function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel'
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
 function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range]')); }
 function paintFocus() { if (IS_TOUCH) return; const f = focusables(); f.forEach((b, i) => b.classList.toggle('focus', i === UI.focus)); }
+addEventListener('click', e => { const b = e.target.closest('[data-em]'); if (!b) return; e.stopPropagation(); audioInit(); if (b.dataset.em === 'chat') chatOpen(); else emote(b.dataset.em); });
 function uiInit() {
   const click = e => {
     const b = e.target.closest('[data-k]'); if (!b || b.disabled || b.tagName === 'INPUT') return; audioInit();
@@ -292,7 +293,7 @@ function onlineBlock(m, st) {
   if (!others.length) h += `<p class="mu">Nobody else is here. Share the game's link with a friend and they show up on The Block.</p>`;
   else for (const p of rest) {
     const busy = p.presence.w === 'game' || !!NET.out, full = crew.length >= 5;
-    h += `<div class="card"><div class="row" style="flex-wrap:wrap"><div class="g"><h3>${esc(peerName(p))} <span class="mu">${p.presence.o | 0} OVR</span></h3><p>${p.presence.w === 'game' ? 'In a game right now.' : 'On ' + (p.presence.w === 'pit' ? 'The Cages' : p.presence.w === 'crib' ? 'their crib' : 'The Block') + '.'}${p.presence.in ? ' Running with a crew.' : ''}</p></div>${NET.inCrew ? '' : Btn('+ CREW', () => { netInvite(p.peer, null, 0, 'crew'); rerender(); }, 'sm cy', busy || full)}${m ? Btn('SAME TEAM', () => { netInvite(p.peer, m, st.tier, 'coop'); rerender(); }, 'sm', busy) + Btn('VERSUS', () => { netInvite(p.peer, m, st.tier, 'vs'); rerender(); }, 'sm alt', busy) : ''}</div></div>`;
+    h += `<div class="card"><div class="row" style="flex-wrap:wrap"><div class="g"><h3>${esc(peerName(p))} <span class="mu">${p.presence.o | 0} OVR</span></h3><p>${p.presence.w === 'game' ? 'In a game right now.' : 'On ' + (p.presence.w === 'pit' ? 'The Cages' : String(p.presence.w || '').startsWith('crib') ? (p.presence.w === 'crib@' + NET.me ? 'YOUR crib' : 'a crib') : 'The Block') + '.'}${p.presence.in ? ' Running with a crew.' : ''}</p></div>${NET.inCrew ? '' : Btn('+ CREW', () => { netInvite(p.peer, null, 0, 'crew'); rerender(); }, 'sm cy', busy || full)}${!m && p.presence.hm && W ? Btn('VISIT CRIB', () => netVisit(p.peer), 'sm alt') : ''}${m ? Btn('SAME TEAM', () => { netInvite(p.peer, m, st.tier, 'coop'); rerender(); }, 'sm', busy) + Btn('VERSUS', () => { netInvite(p.peer, m, st.tier, 'vs'); rerender(); }, 'sm alt', busy) : ''}</div></div>`;
   }
   return h;
 }

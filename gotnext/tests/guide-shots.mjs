@@ -1,0 +1,35 @@
+// Screenshots for the game guide: node tests/guide-shots.mjs → tests/shots/guide/*.jpg
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url)), out = path.join(dir, 'shots', 'guide'); fs.mkdirSync(out, { recursive: true });
+const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await browser.newContext({ viewport: { width: 1100, height: 640 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0;
+  window.__tick = n => { if (!window.__patched && window.THREE && THREE.Object3D) { window.__patched = 1; const orig = THREE.Object3D.prototype.lookAt; THREE.Object3D.prototype.lookAt = function (x, y, z) { if (this.isPerspectiveCamera && window.__camFn) { const t = window.__camFn(this); return orig.call(this, t[0], t[1], t[2]); } return orig.call(this, x, y, z); }; }
+    for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+const T = n => page.evaluate(n => window.__tick(n), n), shot = async n => { await page.screenshot({ path: path.join(out, n + '.jpg'), type: 'jpeg', quality: 82 }); };
+await page.goto('file://' + path.resolve(dir, '..', 'index.html')); await T(120); await shot('01-title');
+await page.click('#titleBtns .btn'); await T(30); await page.fill('#bname', 'JAYLO'); await T(5); await shot('02-builder');
+await page.click('#panel .pf .btn'); await T(60);
+await page.evaluate(() => { const st = document.createElement('style'); st.textContent = '#toasts{display:none!important}'; document.head.appendChild(st); const S = __pit.S; S.vc = 4200; S.rep = 2300; __pit.uiClose(); __pit.enterWorld('hub', 0, 9, Math.PI); __pit.W.yaw = Math.PI; }); await T(120); await shot('03-block');
+await page.evaluate(() => { __pit.enterWorld('hub', -3.4, 4.6, Math.PI * 0.85); __pit.W.yaw = Math.PI * 0.8; }); await T(90); await shot('04-coach');
+await page.evaluate(() => { __pit.enterWorld('hub', 9.5, -1.0, -Math.PI / 2); __pit.W.yaw = -Math.PI * 0.6; }); await T(90); await shot('05-cart');
+await page.evaluate(() => { __pit.enterWorld('pit', 0, 3.4, Math.PI); __pit.W.yaw = Math.PI; }); await T(90); await shot('06-cages');
+await page.evaluate(() => { __pit.W.spots.find(s => s.label === 'STREET 3v3').fn(); }); await T(20); await shot('07-mode');
+await page.evaluate(() => { __pit.uiClose(); __pit.launchGame(__pit.MODES[1], __pit.TIERS_COURT[1], { mates: [-1, -1], rival: -1, p2: 'off' }); }); await T(400); await shot('08-game');
+await page.evaluate(() => { const M = __pit.MT; M.phase = 'live'; const me = M.me; me.x = 1; me.z = 4; M.B.holder = me; M.B.state = 'held'; M.off = me.team; M.needClear = false; }); await T(4);
+await page.evaluate(() => { __pit.MT.me.vx = -1; __pit.MT.me.vz = -5; }); for (let i = 0; i < 26; i++) { await page.evaluate(i => { const K = __pit.keys; for (const k in K) K[k] = false; K.KeyW = true; K.ShiftLeft = true; if (i === 10) K.KeyI = true; window.__tick(1); }, i); } await shot('09-dunk');
+await page.evaluate(() => { const K = __pit.keys; for (const k in K) K[k] = false; __pit.MT.cfg.onEnd({ quit: true }); __pit.uiClose(); }); await T(30);
+await page.evaluate(() => { __pit.startDrill('three', 'hub'); }); await T(300); await shot('10-drill');
+await page.evaluate(() => { __pit.MT.cfg.onEnd({ quit: true, practice: 'drill' }); __pit.uiClose(); }); await T(30);
+await page.evaluate(() => { __pit.uiPlayer('attrs'); }); await T(10); await shot('11-attributes');
+await page.evaluate(() => { __pit.uiPlayer('badges'); }); await T(10); await shot('12-badges');
+await page.evaluate(() => { __pit.uiPlayer('moves'); }); await T(10); await shot('13-moves');
+await page.evaluate(() => { __pit.uiClose(); __pit.enterWorld('hub', 13.6, -5.6, -Math.PI / 2); window.__tick(10); __pit.W.spots.find(s => /PLUG/.test(s.label)).fn(); }); await T(40); await shot('14-shop');
+await page.evaluate(() => { __pit.uiClose(); __pit.devSampleCrib(); __pit.S.homies = [__pit.maxBuild('showman', 'Lil Kickstand'), __pit.maxBuild('glass', 'Two-Ply')]; __pit.enterWorld('crib', -17, 14, Math.PI); __pit.W.yaw = Math.PI; }); await T(120); await shot('15-crib');
+await page.evaluate(() => { window.__camFn = cam => { cam.position.set(0, 26, 40); return [0, 0, 8]; }; }); await T(30); await shot('16-crib-wide'); await page.evaluate(() => { window.__camFn = null; });
+await page.evaluate(() => { __pit.buildEnter(); __pit.BLD.act.cat('rare'); __pit.BLD.act.pick(__pit.rareToday().id); __pit.W.build.fx = -21; __pit.W.build.fz = 9; }); await T(60); await shot('17-buildmode');
+await page.evaluate(() => { __pit.buildExit(); __pit.uiCrib && 0; }); await T(5);
+await page.evaluate(() => { __pit.enterWorld('crib', -16, 13, Math.PI); __pit.W.yaw = Math.PI; window.__tick(30); __pit.emote('dance'); __pit.chatSend('my crib go crazy'); }); await T(40); await shot('18-chat');
+await page.evaluate(() => { __pit.uiClose(); __pit.uiDev('title'); }); await T(30); await shot('19-devroom');
+console.log(fs.readdirSync(out).length, 'shots ·', errs.length ? errs.length + ' ERRORS ' + errs[0] : 'NO ERRORS'); await browser.close();

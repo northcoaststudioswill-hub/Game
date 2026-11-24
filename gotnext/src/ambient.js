@@ -7,7 +7,7 @@ let weatherOverride = null;
 function todayWeather() { return weatherOverride || WEATHERS[dayHash(dayKey(), 13) % WEATHERS.length][0]; }
 function ambInit() {
   Object.assign(AMB, { t: 0, parts: [], emit: [], birds: [], papers: [], flick: [], spin: [], blimp: null, rain: null, splash: [], talk: null, talkT: 2, lines: null, npcs: null, motes: [] });
-  for (const b of document.querySelectorAll('.bub')) b.remove();
+  for (const b of document.querySelectorAll('.bub')) b.remove(); AMB.bubs = [];
 }
 // a soft round light: additive, so overlapping glows add up like real light
 function glowTex() { return geoTex('glow', () => canvasTex(128, 128, (c, w, h) => { const g = c.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(255,255,255,.45)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(0, 0, w, h); })); }
@@ -75,6 +75,11 @@ function weather(fogCol) {
   }
   return w;
 }
+// a chat bubble over someone's head (you, or a friend online)
+function bubble(obj, text, dur, h, cls) {
+  if (!AMB.bubs) AMB.bubs = []; for (const b of AMB.bubs.filter(b => b.obj === obj)) b.t = 0;
+  const el = document.createElement('div'); el.className = 'bub ' + (cls || 'me'); el.textContent = text; document.body.appendChild(el); AMB.bubs.push({ el, obj, t: dur || 4.5, h: h || 2.35 });
+}
 // people talk: every few seconds somebody near you says something (a list of lines per kind of person)
 function chatter(npcs, linesFor) { AMB.npcs = npcs; AMB.lines = linesFor; }
 function ambientStep(dt, cam, me) {
@@ -111,6 +116,7 @@ function ambientStep(dt, cam, me) {
     pa.needsUpdate = true;
     for (const s of AMB.splash) { s.t -= dt; if (s.t <= 0) { s.t = rnd(0.3, 0.7); s.m.position.set(cx + rnd(-9, 9), 0.02, cz + rnd(-12, 2)); } const k = 1 - s.t / 0.5; s.m.scale.setScalar(0.5 + k * 2); s.m.material.opacity = Math.max(0, 0.5 * (1 - k)); }
   }
+  if (AMB.bubs) AMB.bubs = AMB.bubs.filter(b => { b.t -= dt; const p = b.obj.position; _v.set(p.x, p.y + b.h, p.z).project(camera); if (b.t <= 0 || !b.obj.parent) { b.el.remove(); return false; } b.el.style.display = _v.z > 1 ? 'none' : ''; const [sx, sy] = project(p.x, p.y + b.h, p.z); b.el.style.left = sx + 'px'; b.el.style.top = sy + 'px'; b.el.style.opacity = b.t > 0.3 ? 1 : b.t / 0.3; return true; });
   // speech bubbles
   if (AMB.npcs && AMB.lines && me) {
     AMB.talkT -= dt;

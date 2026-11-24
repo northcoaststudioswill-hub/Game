@@ -85,6 +85,10 @@ body:not([data-state=world]) #prompt{display:none!important}
 #build .card.sel{border-color:var(--ice,#7de3ff);background:#1a2a34}#build .card.lock{opacity:.4}
 body.building #whud,body.building #tL,body.building #tR,body.building #prompt,body.building .tbtn,body.building #tB{display:none!important}
 #vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(5,4,12,.42) 100%);display:none;z-index:1}body[data-state=world] #vig,body[data-state=match] #vig{display:block}
+#emobar{position:fixed;right:10px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:6px;z-index:4}#emobar button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(14,14,18,.85);font-size:17px;cursor:pointer}
+body[data-state=world]:not(.busy):not(.building) #emobar{display:flex}
+#chatbox{position:fixed;left:50%;bottom:22%;transform:translateX(-50%);width:min(420px,86vw);display:none;z-index:8;background:#ece9e2;color:#111;border:0;border-radius:12px;padding:11px 14px;font:700 14px var(--m);box-shadow:0 4px 0 #0a0a0e}
+.bub.me{background:#fff3b0}.bub.net{background:#bfe8ff}
 .bub{position:absolute;transform:translate(-50%,-100%);background:#ece9e2;color:#111114;font:700 11px/1.25 var(--m);padding:6px 9px;border-radius:10px;max-width:220px;text-align:center;pointer-events:none;z-index:3;box-shadow:0 3px 0 #0a0a0e;transition:opacity .2s}.bub:after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-top-color:#ece9e2;border-bottom:0}
 .flt{position:absolute;font:900 16px var(--d);font-stretch:125%;text-transform:uppercase;text-shadow:0 2px 0 var(--ink);animation:flt 1.1s forwards;white-space:nowrap;transform:translateX(-50%)}
 @keyframes flt{to{margin-top:-50px;opacity:0}}
@@ -155,6 +159,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tMenu">≡</div>
 </div>
 <div id="whud"><div><span class="chip">VC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
+<div id="emobar"><button data-em="wave" title="1">👋</button><button data-em="dance" title="2">💃</button><button data-em="sit" title="3">🪑</button><button data-em="cheer" title="4">🙌</button><button data-em="celeb" title="5">🏆</button><button data-em="chat" title="T">💬</button></div>
 <div id="prompt"></div>
 <div id="keys"></div>
 <div id="hud">

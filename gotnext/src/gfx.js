@@ -204,6 +204,43 @@ function handPos(R, side, out) { return R['hand' + (side || 'R')].getWorldPositi
 // ---- poses. Angles in radians; x<0 swings a limb forward. Unlisted joints relax to zero. ----
 const POSE = {};
 function setP(p, k, x, y, z) { p[k] = [x || 0, y || 0, z || 0]; }
+// ---- a real walk: joint angles through one stride, from normative gait-lab data (sagittal plane, degrees) ----
+// 0 = heel strike, 0.6 = toe off (stance 60%, swing 40%). Hip: + flexion (leg in front). Knee: + flexion. Ankle: + dorsiflexion.
+const GAIT_HIP = [[0, 30], [0.1, 27], [0.3, 11], [0.5, -9], [0.6, -3], [0.7, 14], [0.85, 32], [1, 30]];
+const GAIT_KNEE = [[0, 4], [0.12, 17], [0.3, 8], [0.42, 5], [0.55, 22], [0.62, 40], [0.72, 60], [0.82, 46], [0.92, 14], [1, 4]];
+const GAIT_ANKLE = [[0, 0], [0.08, -6], [0.3, 6], [0.45, 10], [0.55, 0], [0.62, -17], [0.72, -6], [0.85, 2], [1, 0]];
+function gcurve(K, u) {           // smooth (Catmull-Rom) through the keyframes, wrapping round the cycle
+  u = ((u % 1) + 1) % 1; let i = 0; while (i < K.length - 2 && K[i + 1][0] <= u) i++;
+  const a = K[i], b = K[i + 1], p0 = K[i - 1] || [K[K.length - 2][0] - 1, K[K.length - 2][1]], p3 = K[i + 2] || [1 + K[1][0], K[1][1]];
+  const t = (u - a[0]) / (b[0] - a[0]), t2 = t * t, t3 = t2 * t, m1 = (b[1] - p0[1]) / (b[0] - p0[0]) * (b[0] - a[0]) * 0.5, m2 = (p3[1] - a[1]) / (p3[0] - a[0]) * (b[0] - a[0]) * 0.5;
+  return (2 * t3 - 3 * t2 + 1) * a[1] + (t3 - 2 * t2 + t) * m1 + (-2 * t3 + 3 * t2) * b[1] + (t3 - t2) * m2;
+}
+const D2R = Math.PI / 180;
+function walkPose(p, o) {
+  const S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
+  const a = o.amp === undefined ? 1 : o.amp, ah = o.hipA === undefined ? a : o.hipA, ps = o.psi || 0, sw = o.swag || 0, th = o.thigh || 0.48, sh = o.shin || 0.48;
+  let lowest = 0;
+  for (const [side, off] of [['R', 0], ['L', 0.5]]) {
+    const u = ps + off, hip = (11 + (gcurve(GAIT_HIP, u) - 11) * ah) * D2R, kn = (4 + (gcurve(GAIT_KNEE, u) - 4) * (0.45 + 0.55 * a)) * D2R, an = gcurve(GAIT_ANKLE, u) * a * D2R;
+    S_('hp' + side, -hip, 0, side === 'R' ? -0.03 : 0.03); S_('kn' + side, kn); S_('an' + side, -(-hip + kn) - an);
+    lowest = Math.max(lowest, th * Math.cos(hip) + sh * Math.cos(-hip + kn));           // the standing leg reaches the ground
+  }
+  p.y = (lowest - (th + sh)) * 0.78;                 /* a real walker's knees and ankles smooth the bob a little more */
+  // pelvis: turns with the forward leg, the swing side drops a little; trunk counter-turns; head steady
+  const c = Math.cos(2 * Math.PI * ps), s2 = Math.sin(4 * Math.PI * ps), pz = -0.04 * Math.sin(2 * Math.PI * ps) * a, py = 0.07 * c * a;
+  S_('hips', 0.02, py, pz);
+  for (const s of ['R', 'L']) { const h = p['hp' + s]; h[1] -= py; h[2] -= pz; }       /* the hips turn and tilt; the legs (and feet) do not go with them */
+  S_('spine', 0.04, -0.03 * c * a, 0.015 * sw);
+  S_('chest', 0.01 + 0.01 * s2 * a, -0.06 * c * a - 0.02 * sw, -0.03 * Math.sin(2 * Math.PI * ps) * sw * a);
+  S_('neck', -0.05, 0.08 * c * a, 0); S_('head', -0.02 + 0.015 * sw * Math.abs(s2));
+  // arms swing opposite the legs: the right arm is furthest forward when the left heel strikes
+  for (const [side, off, k] of [['R', 0.5, 1 + 0.12 * sw], ['L', 0, 1 - 0.18 * sw]]) {
+    const f = Math.cos(2 * Math.PI * (ps - off)), flex = (6 + 16 * f * k) * a * D2R, lag = Math.cos(2 * Math.PI * (ps - off) - 0.6);
+    S_('sh' + side, -flex, 0, side === 'R' ? -0.09 : 0.09); S_('el' + side, -(0.28 + 0.22 * Math.max(0, lag) * a)); S_('wr' + side, -0.12 - 0.05 * sw);
+  }
+  p.rate = 32;
+}
+function blendPose(A, B, t) { const o = { y: lerp(A.y || 0, B.y || 0, t), rate: Math.max(A.rate || 16, B.rate || 16) }; const z = POSE.zero; for (const k of new Set([...Object.keys(A), ...Object.keys(B)])) { if (k === 'y' || k === 'rate') continue; const a = A[k] || z, b = B[k] || z; o[k] = [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; } return o; }
 function poseOf(anim, t, o) {
   const p = { y: 0, rate: 16 }; o = o || {};
   const S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
@@ -407,6 +444,7 @@ function poseOf(anim, t, o) {
       S_('hpR', -s * 0.5 * still); S_('hpL', s * 0.5 * still); S_('knR', 0.2 + 0.6 * Math.max(0, -c) * still); S_('knL', 0.2 + 0.6 * Math.max(0, c) * still);
       p.rate = 14; break;
     }
+    case 'gait': walkPose(p, o); break;
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
   // layered on top of every pose: eyes on the ball, lean into the turn

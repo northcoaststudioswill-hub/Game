@@ -2,7 +2,7 @@
 // Place anything anywhere in the yards you own, turn it, move it, store it, sell it. Everything has Vibe; Vibe levels the
 // crib up (perks that follow you into games), and themed sets give their own bonus. Some pieces do something.
 'use strict';
-const HOME_CATS = [['seat', 'SEATING'], ['food', 'FOOD & DRINK'], ['tech', 'TECH & GAMES'], ['gym', 'HOOPS & GYM'], ['show', 'DISPLAY'], ['light', 'LIGHTS'], ['yard', 'YARD'], ['wall', 'WALLS & ART']];
+const HOME_CATS = [['rare', '★ RARES'], ['seat', 'SEATING'], ['food', 'FOOD & DRINK'], ['tech', 'TECH & GAMES'], ['gym', 'HOOPS & GYM'], ['show', 'DISPLAY'], ['light', 'LIGHTS'], ['yard', 'YARD'], ['wall', 'WALLS & ART']];
 const VIBES = [['comfort', 'COMFORT', '#7de3ff'], ['drip', 'DRIP', '#f2c14e'], ['hoops', 'HOOPS', '#ff6a3d'], ['tech', 'TECH', '#a78bff'], ['party', 'PARTY', '#ff2d78']];
 // the yards: [x0, x1, z0, z1]. The court and the house are never buildable.
 const LOTS = [
@@ -47,7 +47,7 @@ function hitem(id, cat, n, cost, rank, w, d, v, build, extra) { HOME_ITEMS.push(
 const _B = (g, w, h, d, c, x, y, z, k) => ink(M(box(w, h, d), toon(c), x || 0, y === undefined ? h / 2 : y, z || 0, g), k || 1.04);
 const _C = (g, rt, rb, h, c, x, y, z, n) => ink(M(cyl(rt, rb, h, n || 10), toon(c), x || 0, y === undefined ? h / 2 : y, z || 0, g), 1.05);
 // seating
-hitem('crate', 'seat', 'Milk Crate', 20, 0, 0.5, 0.5, { comfort: 1 }, g => { _B(g, 0.45, 0.4, 0.45, '#e04848'); }, { sit: 0.4 });
+hitem('crate', 'seat', 'Milk Crate', 20, 0, 0.5, 0.5, { comfort: 1 }, g => { _B(g, 0.45, 0.4, 0.45, '#e04848'); }, { sit: 0.4, top: 0.42 });
 hitem('lawn', 'seat', 'Lawn Chair', 60, 0, 0.7, 0.7, { comfort: 2 }, g => { _B(g, 0.6, 0.06, 0.55, '#3dffa0', 0, 0.38); _B(g, 0.6, 0.6, 0.06, '#3dffa0', 0, 0.7, -0.27).rotation.x = -0.25; for (const sx of [-0.28, 0.28]) _B(g, 0.04, 0.38, 0.5, '#c8d0d8', sx, 0.19); }, { sit: 0.4 });
 hitem('bench', 'seat', 'Park Bench', 120, 0, 1.8, 0.6, { comfort: 3 }, g => { for (let i = 0; i < 3; i++) _B(g, 1.7, 0.05, 0.14, '#7a5a3a', 0, 0.45, -0.18 + i * 0.17); _B(g, 1.7, 0.4, 0.05, '#7a5a3a', 0, 0.75, -0.27); for (const sx of [-0.75, 0.75]) _B(g, 0.08, 0.45, 0.5, '#20242c', sx); }, { sit: 0.45 });
 hitem('beanbag', 'seat', 'Bean Bag', 150, 0, 0.9, 0.9, { comfort: 3, tech: 1 }, g => { ink(M(sph(0.45, 12, 8), toon('#a78bff'), 0, 0.28, 0, g), 1.04).scale.set(1, 0.65, 1); }, { sit: 0.3 });
@@ -56,8 +56,8 @@ hitem('throne', 'seat', 'Gamer Throne', 900, 2, 0.8, 0.8, { comfort: 4, tech: 3 
 hitem('barber', 'seat', 'Barber Chair', 1200, 2, 0.8, 0.8, { drip: 4, comfort: 2 }, g => { _C(g, 0.3, 0.35, 0.08, '#c8d0d8', 0, 0.04); _C(g, 0.08, 0.08, 0.4, '#c8d0d8', 0, 0.28); _B(g, 0.6, 0.15, 0.6, '#c8482c', 0, 0.55); _B(g, 0.6, 0.8, 0.12, '#c8482c', 0, 0.95, -0.26); for (const sx of [-0.32, 0.32]) _B(g, 0.08, 0.08, 0.55, '#c8d0d8', sx, 0.78); }, { sit: 0.55 });
 hitem('hammock', 'seat', 'Hammock', 1400, 3, 2.6, 1.0, { comfort: 7 }, g => { for (const sx of [-1.2, 1.2]) _C(g, 0.06, 0.07, 1.6, '#7a5a3a', sx, 0.8, 0, 6); const h = M(box(2.0, 0.04, 0.8), toon('#f2c14e'), 0, 0.75, 0, g); h.rotation.z = 0; const s = M(box(2.0, 0.3, 0.02), toon('#e04848'), 0, 0.68, 0.38, g); void s; }, { sit: 0.7 });
 // food & drink
-hitem('cooler', 'food', 'Cooler', 80, 0, 0.7, 0.5, { party: 2 }, g => { _B(g, 0.65, 0.45, 0.45, '#2f6ad8'); _B(g, 0.67, 0.08, 0.47, '#ece9e2', 0, 0.48); });
-hitem('picnic', 'food', 'Picnic Table', 300, 0, 2.0, 1.6, { party: 3, comfort: 2 }, g => { _B(g, 1.9, 0.07, 0.8, '#8a6a44', 0, 0.75); for (const sz of [-0.65, 0.65]) _B(g, 1.9, 0.06, 0.3, '#8a6a44', 0, 0.45, sz); for (const sx of [-0.8, 0.8]) { _B(g, 0.08, 0.75, 1.5, '#6a5034', sx, 0.38); } for (let i = 0; i < 3; i++) _C(g, 0.04, 0.035, 0.12, ['#e04848', '#f2c14e', '#3dffa0'][i], -0.4 + i * 0.35, 0.85, 0.1, 8); }, { sit: 0.45, sitZ: 0.65 });
+hitem('cooler', 'food', 'Cooler', 80, 0, 0.7, 0.5, { party: 2 }, g => { _B(g, 0.65, 0.45, 0.45, '#2f6ad8'); _B(g, 0.67, 0.08, 0.47, '#ece9e2', 0, 0.48); }, { top: 0.52 });
+hitem('picnic', 'food', 'Picnic Table', 300, 0, 2.0, 1.6, { party: 3, comfort: 2 }, g => { _B(g, 1.9, 0.07, 0.8, '#8a6a44', 0, 0.75); for (const sz of [-0.65, 0.65]) _B(g, 1.9, 0.06, 0.3, '#8a6a44', 0, 0.45, sz); for (const sx of [-0.8, 0.8]) { _B(g, 0.08, 0.75, 1.5, '#6a5034', sx, 0.38); } for (let i = 0; i < 3; i++) _C(g, 0.04, 0.035, 0.12, ['#e04848', '#f2c14e', '#3dffa0'][i], -0.4 + i * 0.35, 0.85, 0.1, 8); }, { sit: 0.45, sitZ: 0.65, top: 0.79 });
 hitem('grill', 'food', 'Grill', 450, 1, 0.9, 0.7, { party: 5 }, g => { ink(M(sph(0.38, 12, 8, 0), toon('#16181c'), 0, 0.85, 0, g), 1.03).scale.set(1, 0.6, 0.8); for (const a of [0, 2.1, 4.2]) _B(g, 0.04, 0.8, 0.04, '#3a3c44', Math.cos(a) * 0.22, 0.4, Math.sin(a) * 0.18).rotation.z = Math.cos(a) * 0.2; glow(0, 0.95, 0, 0xff8a3c, 0.9, g, 0.6); }, { emit: ['smoke', 0, 1.05, 0, 3] });
 hitem('vending', 'food', 'Vending Machine', 900, 2, 1.0, 0.8, { tech: 2, party: 2 }, g => { _B(g, 0.95, 1.9, 0.75, '#c8482c'); M(box(0.6, 1.3, 0.04), flat(0xfff2c8), -0.1, 1.15, 0.38, g); for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) M(cyl(0.05, 0.05, 0.14, 6), toon(pick(['#3dffa0', '#f2c14e', '#7de3ff', '#ff2d78'])), -0.3 + c * 0.2, 0.7 + r * 0.3, 0.32, g); }, { glow: [0xfff2c8, 0, 1.2, 0.5, 2.2] });
 hitem('fridge', 'food', 'Yard Fridge', 700, 1, 0.8, 0.7, { comfort: 2, party: 1 }, g => { _B(g, 0.75, 1.5, 0.65, '#ece9e2'); M(box(0.04, 0.4, 0.04), toon('#6a707c'), 0.3, 1.0, 0.34, g); M(box(0.7, 0.02, 0.02), toon('#6a707c'), 0, 1.1, 0.33, g); }, { use: 'fridge' });
@@ -109,7 +109,26 @@ hitem('brick', 'wall', 'Brick Wall', 180, 0, 2.0, 0.4, { drip: 1 }, g => { ink(M
 hitem('mural', 'wall', 'Mural Wall', 1400, 2, 3.0, 0.4, { drip: 6, party: 2 }, g => { ink(M(box(3.0, 2.4, 0.3), toon('#26262c'), 0, 1.2, 0, g), 1.02); }, { mural: 1 });
 hitem('flagpole', 'wall', 'Banner Pole', 400, 0, 0.5, 0.5, { party: 2, drip: 1 }, g => { _C(g, 0.04, 0.05, 3.2, '#c8d0d8', 0, 1.6, 0, 6); const t = canvasTex(256, 128, (x, w, h) => { x.fillStyle = '#ff2d78'; x.fillRect(0, 0, w, h); x.fillStyle = '#0a0a0e'; x.font = '900 60px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.fillText('MY CRIB', w / 2, h * 0.65); }); const f = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.6, 8, 1), new THREE.MeshBasicMaterial({ map: t, side: THREE.DoubleSide })); f.position.set(0.62, 2.8, 0); g.add(f); f.userData.wave = 1; }, { anim: 'wave' });
 hitem('arch', 'wall', 'Gate Arch', 2500, 3, 3.0, 0.6, { drip: 5, party: 2 }, g => { for (const sx of [-1.35, 1.35]) _B(g, 0.25, 2.8, 0.4, '#16181c', sx, 1.4); _B(g, 3.0, 0.5, 0.4, '#16181c', 0, 3.0); const s = sign(S.name, 2.6, 0.4, '#f2c14e', '#0a0a0e', { border: false }); s.position.set(0, 3.0, 0.21); g.add(s); M(box(2.9, 0.05, 0.05), flat(0xf2c14e), 0, 2.72, 0.2, g); }, { glow: [0xf2c14e, 0, 3.0, 0.4, 3.2], walk: 1 });
+// tables: things stack on them (Habbo-style). Small things go on any top, or on the ground.
+hitem('ctable', 'food', 'Coffee Table', 160, 0, 1.2, 0.7, { comfort: 2 }, g => { _B(g, 1.15, 0.07, 0.65, '#3a2a1c', 0, 0.4); for (const sx of [-0.5, 0.5]) for (const sz of [-0.27, 0.27]) _B(g, 0.06, 0.37, 0.06, '#20242c', sx, 0.18, sz); }, { top: 0.44 });
+hitem('stable', 'food', 'Cable Spool Table', 90, 0, 0.9, 0.9, { comfort: 1, party: 1 }, g => { _C(g, 0.45, 0.45, 0.06, '#8a6a44', 0, 0.72, 0, 12); _C(g, 0.18, 0.18, 0.66, '#7a5a3a', 0, 0.36, 0, 10); _C(g, 0.45, 0.45, 0.06, '#8a6a44', 0, 0.03, 0, 12); }, { top: 0.75 });
+hitem('bar', 'food', 'Yard Bar', 1300, 2, 2.0, 0.7, { party: 5, drip: 2 }, g => { _B(g, 1.95, 1.0, 0.6, '#16181c', 0, 0.5); _B(g, 2.0, 0.07, 0.7, '#c8a840', 0, 1.04); M(box(1.9, 0.06, 0.02), flat(0xff2d78), 0, 0.15, 0.31, g); }, { top: 1.08, glow: [0xff2d78, 0, 0.2, 0.5, 2] });
+hitem('trophy', 'show', 'Trophy', 180, 0, 0.3, 0.3, { drip: 2, hoops: 1 }, g => { _B(g, 0.16, 0.06, 0.16, '#20242c', 0, 0.03); M(cyl(0.1, 0.05, 0.22, 8), toon('#f2c14e'), 0, 0.17, 0, g); M(cyl(0.02, 0.02, 0.06, 5), toon('#f2c14e'), 0, 0.3, 0, g); }, { small: 1 });
+hitem('houseplant', 'yard', 'House Plant', 70, 0, 0.4, 0.4, { comfort: 2 }, g => { _C(g, 0.12, 0.1, 0.18, '#c8482c'); for (let i = 0; i < 5; i++) { const l = M(box(0.05, 0.3, 0.12), toon('#3a8a44'), Math.cos(i * 1.3) * 0.05, 0.3, Math.sin(i * 1.3) * 0.05, g); l.rotation.set(Math.sin(i) * 0.5, i * 1.3, Math.cos(i) * 0.5); } }, { small: 1 });
+hitem('console', 'tech', 'Game Console', 250, 0, 0.4, 0.3, { tech: 2 }, g => { _B(g, 0.36, 0.08, 0.26, '#ece9e2', 0, 0.04); M(box(0.08, 0.02, 0.02), flat(0x33e0ff), 0.1, 0.06, 0.13, g); _B(g, 0.12, 0.04, 0.07, '#16181c', -0.08, 0.1, 0.03); }, { small: 1 });
+hitem('bowl', 'food', 'Snack Bowl', 30, 0, 0.3, 0.3, { party: 1 }, g => { _C(g, 0.13, 0.08, 0.08, '#2f6ad8'); for (let i = 0; i < 6; i++) M(sph(0.035, 5, 4), toon('#f2c14e'), rnd(-0.06, 0.06), 0.09, rnd(-0.06, 0.06), g); }, { small: 1 });
+hitem('radio', 'tech', 'Pocket Radio', 60, 0, 0.3, 0.2, { party: 1 }, g => { _B(g, 0.26, 0.16, 0.1, '#c8482c', 0, 0.08); M(cyl(0.05, 0.05, 0.02, 10), toon('#b9bec7'), 0.05, 0.08, 0.05, g).rotation.x = Math.PI / 2; _C(g, 0.005, 0.005, 0.2, '#6a707c', -0.1, 0.25, 0, 4); }, { small: 1, anim: 'pulse' });
+hitem('candles', 'light', 'Candle Trio', 50, 0, 0.3, 0.3, { comfort: 1 }, g => { for (let i = 0; i < 3; i++) { M(cyl(0.03, 0.03, 0.1 + i * 0.04, 6), toon('#ece9e2'), -0.07 + i * 0.07, 0.05 + i * 0.02, 0, g); glow(-0.07 + i * 0.07, 0.13 + i * 0.04, 0, 0xffb060, 0.35, g, 0.7); } }, { small: 1 });
+// ★ rares: one is on sale each day, and only that day. Collect them.
+hitem('r_icecream', 'rare', 'Ice Cream Machine', 3500, 1, 1.0, 0.8, { party: 8, tech: 3 }, g => { _B(g, 0.9, 1.4, 0.7, '#ff9ac8'); M(box(0.6, 0.4, 0.04), flat(0xfff2c8), 0, 1.0, 0.36, g); for (let i = 0; i < 3; i++) M(sph(0.1, 8, 6), toon(['#ff2d78', '#ece9e2', '#7a4a2a'][i]), -0.25 + i * 0.25, 1.55, 0, g); _C(g, 0.05, 0.04, 0.2, '#c8d0d8', 0, 0.55, 0.38, 6); }, { rare: 1, glow: [0xff9ac8, 0, 1.0, 0.5, 2] });
+hitem('r_dragon', 'rare', 'Neon Dragon Lamp', 6000, 2, 0.8, 0.8, { drip: 10, party: 4 }, g => { _C(g, 0.3, 0.35, 0.2, '#16181c'); const h = grp(g, 0, 0.9, 0); for (let i = 0; i < 9; i++) M(sph(0.08 - i * 0.004, 8, 6), flat(0x3dffa0), Math.sin(i * 0.8) * 0.25, i * 0.12 - 0.5, Math.cos(i * 0.8) * 0.25, h); M(geo('dhead', () => new THREE.ConeGeometry(0.1, 0.25, 6)), flat(0x3dffa0), Math.sin(7.2) * 0.25, 0.62, Math.cos(7.2) * 0.25, h).rotation.z = 1.3; h.userData.spin = 1; }, { rare: 1, anim: 'spin', glow: [0x3dffa0, 0, 1.0, 0, 2.6] });
+hitem('r_goldhoop', 'rare', 'Golden Hoop Lamp', 5000, 2, 0.6, 0.6, { drip: 9, hoops: 4 }, g => { _C(g, 0.2, 0.25, 0.1, '#f2c14e'); _C(g, 0.03, 0.03, 1.4, '#f2c14e', 0, 0.75, 0, 6); ink(M(geo('ghr', () => new THREE.TorusGeometry(0.22, 0.03, 8, 20)), toon('#f2c14e'), 0, 1.5, 0.05, g), 1.08).rotation.x = Math.PI / 2; glow(0, 1.5, 0.05, 0xffd060, 1.4, g, 0.8); }, { rare: 1 });
+hitem('r_throne', 'rare', 'Holo Throne', 9000, 4, 1.0, 1.0, { drip: 12, tech: 6 }, g => { _B(g, 0.8, 0.15, 0.7, '#20242c', 0, 0.45); _B(g, 0.8, 1.6, 0.15, '#20242c', 0, 1.25, -0.3); for (const sx of [-0.45, 0.45]) _B(g, 0.12, 0.5, 0.7, '#20242c', sx, 0.55); M(box(0.6, 1.3, 0.02), new THREE.MeshBasicMaterial({ color: 0x33e0ff, transparent: true, opacity: 0.5 }), 0, 1.3, -0.21, g); M(box(0.84, 0.04, 0.72), flat(0x33e0ff), 0, 0.53, 0, g); }, { rare: 1, sit: 0.53, glow: [0x33e0ff, 0, 1.2, -0.1, 2.4] });
+hitem('r_fountain', 'rare', 'Soda Fountain', 7000, 3, 1.0, 1.0, { party: 12 }, g => { _C(g, 0.48, 0.5, 0.3, '#c8d0d8', 0, 0.15, 0, 14); M(cyl(0.44, 0.44, 0.02, 14), flat(0xff6a3d), 0, 0.29, 0, g); _C(g, 0.06, 0.08, 0.8, '#c8d0d8', 0, 0.7, 0, 8); _C(g, 0.25, 0.1, 0.12, '#c8d0d8', 0, 1.1, 0, 10); M(cyl(0.22, 0.22, 0.02, 12), flat(0xff6a3d), 0, 1.16, 0, g); }, { rare: 1, emit: ['spark', 0, 1.2, 0, 3], glow: [0xff6a3d, 0, 0.6, 0, 2] });
+hitem('r_aquarium', 'rare', 'Aquarium', 8000, 3, 1.6, 0.6, { comfort: 10, tech: 3 }, g => { _B(g, 1.6, 0.6, 0.6, '#16181c', 0, 0.3); M(box(1.5, 0.8, 0.5), new THREE.MeshBasicMaterial({ color: 0x2a8ad8, transparent: true, opacity: 0.55, depthWrite: false }), 0, 1.0, 0, g); const f = grp(g, 0, 1.0, 0); for (let i = 0; i < 4; i++) M(sph(0.05, 6, 4), flat([0xff8a1f, 0xf2c14e, 0xff2d78, 0x3dffa0][i]), -0.5 + i * 0.3, (i % 2) * 0.2 - 0.1, (i % 2 ? 0.1 : -0.1), f).scale.set(1.6, 1, 0.6); f.userData.fish = 1; _B(g, 1.6, 0.06, 0.6, '#16181c', 0, 1.43); }, { rare: 1, anim: 'fish', glow: [0x2a8ad8, 0, 1.0, 0.3, 2.2] });
 const HOME_ITEM = {}; HOME_ITEMS.forEach(i => HOME_ITEM[i.id] = i);
+const RARES = HOME_ITEMS.filter(i => i.rare);
+function rareToday() { return RARES[dayHash(dayKey(), 31) % RARES.length]; }
 
 // ---------- save, levels, perks ----------
 function home() { if (!S.home) S.home = { lot: 0, items: [], store: {}, look: { house: 0, trim: 0, fence: 0, ground: 1 }, used: {}, tour: '' }; const h = S.home; h.items = (h.items || []).filter(i => HOME_ITEM[i.i]); h.store = h.store || {}; h.look = Object.assign({ house: 0, trim: 0, fence: 0, ground: 1 }, h.look || {}); h.used = h.used || {}; return h; }
@@ -117,6 +136,26 @@ function homeVibe() { const v = { comfort: 0, drip: 0, hoops: 0, tech: 0, party:
 function homeLevel() { const v = homeVibe(), tot = Object.values(v).reduce((a, b) => a + b, 0); let l = 1; for (let i = 0; i < HOME_LEVELS.length; i++) if (tot >= HOME_LEVELS[i]) l = i + 1; return { lvl: l, tot, next: HOME_LEVELS[l] }; }
 function homeSets() { const have = new Set(home().items.map(i => i.i)); return HOME_SETS.map(s => ({ s, got: s.items.filter(x => have.has(x)).length, done: s.items.every(x => have.has(x)) })); }
 function homeFx(k) { if (!S || !S.home) return 0; let v = 0; const L = homeLevel().lvl; for (const p of HOME_PERKS) if (p.lvl <= L && p.k === k) v += p.v; for (const s of homeSets()) if (s.done && s.s.k === k) v += s.s.v; return v; }
+// ---------- your crib, online: friends can walk around it (packed small enough to ride in presence) ----------
+const _e2 = v => clamp(Math.round(v * 2), 0, 1295).toString(36).padStart(2, '0');
+function packHome() {
+  const H = home(); const c = {}; for (const x of CRIB) c[x.id] = cribTier(x.id);
+  return { n: S.name, l: H.lot | 0, k: [H.look.house, H.look.trim, H.look.fence, H.look.ground], c, lk: H.likes | 0,
+    i: H.items.slice(0, 90).map(it => HOME_ITEMS.indexOf(HOME_ITEM[it.i]).toString(36).padStart(2, '0') + _e2(it.x + 25) + _e2(it.z + 5) + (it.r & 3) + (it.y ? 1 : 0) + ((it.m || 0) % 5)).join('') };
+}
+// anything from another player is checked: known pieces only, inside the lot, sane numbers
+function unpackHome(p) {
+  try {
+    if (!p || typeof p.i !== 'string' || p.i.length > 900) return null; const items = [];
+    for (let k = 0; k + 9 <= p.i.length && items.length < 90; k += 9) {
+      const s = p.i.slice(k, k + 9), d = HOME_ITEMS[parseInt(s.slice(0, 2), 36)]; if (!d) continue;
+      const it = { i: d.id, x: clamp(parseInt(s.slice(2, 4), 36) / 2 - 25, -23.5, 23.5), z: clamp(parseInt(s.slice(4, 6), 36) / 2 - 5, -2.8, 23), r: (+s[6]) & 3, on: s[7] === '1', m: (+s[8]) || 0, y: 0 }; if (isNaN(it.x) || isNaN(it.z)) continue; items.push(it);
+    }
+    for (const it of items) if (it.on) { const t = topUnder(itemRect(it), -1, items.filter(o => !o.on)); it.y = t ? t.h : 0; }
+    const k = Array.isArray(p.k) ? p.k : [], crib = {}; for (const x of CRIB) crib[x.id] = clamp((p.c && p.c[x.id]) | 0, 0, x.tiers.length - 1);
+    return { name: String(p.n || 'SOMEONE').replace(/[<>&"]/g, '').slice(0, 14), crib, home: { lot: clamp(p.l | 0, 0, LOTS.length - 1), items, store: {}, used: {}, likes: clamp(p.lk | 0, 0, 99999), look: { house: clamp(k[0] | 0, 0, LOOKS.house.length - 1), trim: clamp(k[1] | 0, 0, LOOKS.trim.length - 1), fence: clamp(k[2] | 0, 0, LOOKS.fence.length - 1), ground: clamp(k[3] | 0, 0, LOOKS.ground.length - 1) } } };
+  } catch (e) { return null; }
+}
 function lotZones() { const z = []; for (let i = 0; i <= (home().lot || 0); i++) z.push(...LOTS[i].zones); return z; }
 
 // ---------- the crib ----------
@@ -152,12 +191,12 @@ function groundTex(kind) {
     if (kind === 'grass' || kind === 'dirt') for (let i = 0; i < 160; i++) { x.strokeStyle = kind === 'grass' ? 'rgba(120,200,110,.35)' : 'rgba(90,110,60,.35)'; x.beginPath(); const px = rnd(0, w), py = rnd(0, h); x.moveTo(px, py); x.lineTo(px + rnd(-2, 2), py - rnd(3, 7)); x.stroke(); }
   }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; });
 }
-function yard(z, kind, locked) {
+function yard(z, kind, locked, mine) {
   const [x0, x1, z0, z1] = z, w = x1 - x0, d = z1 - z0, t = groundTex(locked ? 'dirt' : kind).clone(); t.needsUpdate = true; t.repeat.set(w / 3, d / 3);
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshToonMaterial({ map: t, gradientMap: ramp() })); m.rotation.x = -Math.PI / 2; m.position.set((x0 + x1) / 2, 0.006, (z0 + z1) / 2); scene.add(m);
-  if (locked) { const s = sign('FOR SALE\n' + 'ASK AT THE BLUEPRINT TABLE', 2.4, 1.0, '#f2c14e', '#16181c'); s.position.set((x0 + x1) / 2, 1.3, (z0 + z1) / 2); scene.add(s); M(cyl(0.05, 0.05, 1.0, 5), toon('#7a5a3a'), (x0 + x1) / 2, 0.5, (z0 + z1) / 2 - 0.05, scene); for (let i = 0; i < 10; i++) ink(M(sph(0.2, 6, 5), toon('#3a5a2a'), rnd(x0 + 0.5, x1 - 0.5), 0.12, rnd(z0 + 0.5, z1 - 0.5), scene), 1.04).scale.set(1, 0.6, 1); }
+  if (locked) { const s = sign(mine ? 'FOR SALE\nASK AT THE BLUEPRINT TABLE' : 'FOR SALE', 2.4, 1.0, '#f2c14e', '#16181c'); s.position.set((x0 + x1) / 2, 1.3, (z0 + z1) / 2); scene.add(s); M(cyl(0.05, 0.05, 1.0, 5), toon('#7a5a3a'), (x0 + x1) / 2, 0.5, (z0 + z1) / 2 - 0.05, scene); for (let i = 0; i < 10; i++) ink(M(sph(0.2, 6, 5), toon('#3a5a2a'), rnd(x0 + 0.5, x1 - 0.5), 0.12, rnd(z0 + 0.5, z1 - 0.5), scene), 1.04).scale.set(1, 0.6, 1); }
 }
-function lotFence(style) {
+function lotFence(style, owner, likes) {
   const h = style === 'wood' ? 1.8 : 2.6, segs = [[-24, -3.6, 24, -3.6], [-24, -3.6, -24, 23.6], [24, -3.6, 24, 23.6], [-24, 23.6, -1.8, 23.6], [1.8, 23.6, 24, 23.6]];
   for (const [ax, az, bx, bz] of segs) {
     const len = Math.hypot(bx - ax, bz - az), cx = (ax + bx) / 2, cz = (az + bz) / 2, ry = Math.atan2(bx - ax, bz - az) - Math.PI / 2;
@@ -169,10 +208,12 @@ function lotFence(style) {
   // the gate posts, and a name over the gate
   for (const sx of [-1, 1]) ink(M(box(0.3, 3.4, 0.3), toon('#16181c'), sx * 1.9, 1.7, 23.6, scene), 1.06);
   ink(M(box(4.1, 0.75, 0.2), toon('#16181c'), 0, 3.6, 23.6, scene), 1.03);
-  for (const sd of [1, -1]) { const s = sign(S.name + "'S", 3.4, 0.6, '#7de3ff', '#0a0a0e'); s.position.set(0, 3.6, 23.6 + sd * 0.11); s.rotation.y = sd > 0 ? 0 : Math.PI; scene.add(s); glow(0, 3.6, 23.6 + sd * 0.45, 0x7de3ff, 3, null, 0.45); }
+  if (likes) { const lk = sign('♥ ' + likes, 1.1, 0.4, '#ff2d78', '#0a0a0e', { border: false }); lk.position.set(0, 2.9, 23.48); lk.rotation.y = Math.PI; scene.add(lk); }
+  for (const sd of [1, -1]) { const s = sign(owner + "'S", 3.4, 0.6, '#7de3ff', '#0a0a0e'); s.position.set(0, 3.6, 23.6 + sd * 0.11); s.rotation.y = sd > 0 ? 0 : Math.PI; scene.add(s); glow(0, 3.6, 23.6 + sd * 0.45, 0x7de3ff, 3, null, 0.45); }
 }
 function buildCrib() {
-  const fl = cribTier('floor'), hp = cribTier('hoop'), H = home(), look = H.look;
+  const V = W.visit, ct = id => V ? (V.crib[id] || 0) : cribTier(id), H = V ? V.home : home(), look = H.look, owner = V ? V.name : S.name; W.hd = H;
+  const fl = ct('floor'), hp = ct('hoop');
   scene.background = new THREE.Color(0x2c2840); scene.fog = new THREE.Fog(0x2c2840, 40, 140);
   baseLights(scene, 0xffe0c8, 0x3a3050, 0xffd0a0, 1.45);
   for (const [x, z, c] of [[-16, 6, 0xffc880], [16, 11, 0xffc880], [0, 20, 0x7de3ff]]) { const l = new THREE.PointLight(c, 10, 16, 1.4); l.position.set(x, 3.6, z); scene.add(l); }
@@ -180,11 +221,12 @@ function buildCrib() {
   addCourt(scene, ['drive', 'black', 'show', 'wood'][fl], hp);
   skyline(scene, 30, 70, ['#ffc531', '#ffe9a8', '#33e0ff'], 10);
   // the yards (owned ones paved your way, the rest for sale), the court-side strips, the house
-  LOTS.forEach((L, i) => L.zones.forEach(z => yard(z, LOOKS.ground[look.ground][1], i > (H.lot || 0))));
+  LOTS.forEach((L, i) => L.zones.forEach(z => yard(z, LOOKS.ground[look.ground][1], i > (H.lot || 0), !V)));
   for (const z of [[-11.5, -9, -2.8, 15], [9, 11.6, -2.8, 15], [-9, 9, 15, 16.4], [-23.5, 23.5, 15, 16.4], [11.6, 23.5, 7, 8]]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(z[1] - z[0], z[3] - z[2]), toon('#3a3c42')); m.rotation.x = -Math.PI / 2; m.position.set((z[0] + z[1]) / 2, 0.004, (z[2] + z[3]) / 2); scene.add(m); }
   const hs = cribHouse(12, 22, -3, 7, LOOKS.house[look.house][1], LOOKS.trim[look.trim][1]);
-  lotFence(LOOKS.fence[look.fence][1]); W.baseSolids = null;
+  lotFence(LOOKS.fence[look.fence][1], owner, H.likes | 0); W.baseSolids = null;
   solid(-24.5, -23.6, -4, 24); solid(23.6, 24.5, -4, 24); solid(-24.5, 24.5, -4.4, -3.4); solid(-24.5, -1.8, 23.4, 24.2); solid(1.8, 24.5, 23.4, 24.2);
+  if (!V) {
   spot(hs.doorX, hs.doorZ, 1.9, 'CLOSET (drip)', () => uiShop(true));
   // blueprint table: the home builder
   { const g = grp(scene, 9.9, 0, 9.6); g.rotation.y = -Math.PI / 2; ink(M(box(1.8, 0.08, 1.0), toon('#2440a8'), 0, 0.9, 0, g), 1.04); M(box(1.6, 0.01, 0.8), flat(0x7de3ff), 0, 0.95, 0, g); for (const sx of [-0.8, 0.8]) for (const sz of [-0.4, 0.4]) M(box(0.06, 0.9, 0.06), toon('#20242c'), sx, 0.45, sz, g); const s = sign('BLUEPRINTS', 1.6, 0.36, '#7de3ff', '#0a0a14', { border: false }); s.position.set(0, 1.4, 0); g.add(s); glow(0, 1.0, 0, 0x7de3ff, 1.8, g, 0.5); solid(9.3, 10.5, 8.6, 10.6); }
@@ -194,9 +236,10 @@ function buildCrib() {
   spot(9.4, 14.6, 1.6, 'CRIB UPGRADES', () => uiCrib());
   spot(-4.5, 9.5, 1.8, 'DRILLS', () => uiDrills('crib'));
   spot(0, 6.5, 2.2, 'SHOOT AROUND', () => startPractice('free'));
+  } else spot(0, 21.2, 1.8, '♥ LIKE THIS CRIB (L)', () => likeCrib());
   spot(0, 22.6, 1.8, 'BACK TO THE BLOCK', () => enterWorld('hub', -12.4, 5.8, Math.PI / 2));
   // upgrade props, courtside
-  const t = id => cribTier(id);
+  const t = ct;
   if (t('couch') === 0) ink(M(box(0.5, 0.45, 0.5), toon('#e04848'), -9.8, 0.23, 6, scene), 1.05);
   else { const c = toon(t('couch') === 2 ? '#7a2a8a' : '#2a6a4a'); ink(M(box(1.0, 0.5, 2.6), c, -9.9, 0.35, 6, scene), 1.03); ink(M(box(0.3, 1.0, 2.6), c, -10.4, 0.6, 6, scene), 1.03); if (t('couch') === 2) M(box(0.1, 1.4, 2.6), flat(0xff4fd8), -10.6, 0.8, 6, scene); }
   solid(-10.9, -9.2, 4.6, 7.4);
@@ -214,22 +257,22 @@ function buildCrib() {
     const cols = ['#6a5040', '#7a4034', '#4a4f5c', '#5a4640', '#8a8378', '#3a4a5a'];
     for (let i = 0; i < 6; i++) rowhouse(-30 + i * 12, 37, 11, 8, 8 + (i % 3) * 2, cols[i], Math.PI);
     for (const sx of [-1, 1]) for (let i = 0; i < 2; i++) rowhouse(sx * 31, 2 + i * 13, 12, 8, 9 + i * 2, cols[(i + (sx > 0 ? 2 : 0)) % 6], sx * -Math.PI / 2);
-    M(box(60, 9, 1), brickMat('#3a3034', 60, 9), 0, 4.5, -8, scene); mural(S.name.split(' ')[0] + '\nHOME COURT', 9, 5, ['#141418', '#7de3ff', '#ff2d78', '#ece9e2', '#08080a'], -14, 4.4, -7.45, 0);
+    M(box(60, 9, 1), brickMat('#3a3034', 60, 9), 0, 4.5, -8, scene); mural(owner.split(' ')[0] + '\nHOME COURT', 9, 5, ['#141418', '#7de3ff', '#ff2d78', '#ece9e2', '#08080a'], -14, 4.4, -7.45, 0);
   }
   // people on the street
   const nb = []; for (let i = 0; i < 2; i++) { const b = aiBuild(55); b.worn = randomWorn(1); nb.push(addNpc(b, -18 + i * 30, 31.2, Math.PI, i ? 'sit' : 'idle', { talk: 'neighbor' })); }
-  buildHomeItems(); homeVisitors();
+  W.baseSolids = W.solids.slice(); W.baseSpots = W.spots.slice();     /* fixed things only; placed pieces are added on top */
+  buildHomeItems(); if (!V) homeVisitors();
   pigeons(-6, 27, 5); pigeons(15, 19, 4); litter(10, -24, 24, 24.6, 30.4); skyLife(70, 'MORTGAGES FOR MINORS · ASK US'); W.weather = weather();
   chatter(W.npcs, n => n.homie ? CHAT.homie : n.talk ? CHAT[n.talk] : CHAT.neighbor);
   // first visit of the day at a Tour Stop crib: tourists paid to look
-  if (homeFx('tour') && S.home.tour !== dayKey()) { S.home.tour = dayKey(); S.vc += homeFx('tour'); save(); setTimeout(() => toast('CRIB TOURS', `Tourists paid ${homeFx('tour')} VC to look at your crib today.`, 'ach'), 1200); }
+  if (!V && homeFx('tour') && S.home.tour !== dayKey()) { S.home.tour = dayKey(); S.vc += homeFx('tour'); save(); setTimeout(() => toast('CRIB TOURS', `Tourists paid ${homeFx('tour')} VC to look at your crib today.`, 'ach'), 1200); }
   W.bounds = [-23.4, 23.4, -2.9, 23.2]; W.camBox = [-24, 24, -3.4, 30];
-  W.baseSolids = W.solids.slice(); W.baseSpots = W.spots.slice();
 }
 // every placed item: its mesh, its footprint (you bump into it), its spot (if it does something), its animation
 function itemRect(it) { const d = HOME_ITEM[it.i], r = it.r & 1, w = r ? d.d : d.w, dd = r ? d.w : d.d; return [it.x - w / 2, it.x + w / 2, it.z - dd / 2, it.z + dd / 2]; }
 function makeItem(d, it) {
-  const g = new THREE.Group(); d.build(g); g.position.set(it.x, 0, it.z); g.rotation.y = it.r * Math.PI / 2;
+  const g = new THREE.Group(); d.build(g); g.position.set(it.x, it.y || 0, it.z); g.rotation.y = it.r * Math.PI / 2;
   if (d.mural) { const texts = ['HOME\nCOURT', S.name.split(' ')[0] + '\nWAS HERE', 'WINNERS\nSTAY', 'BALL\nIS LIFE', 'NO\nREFS']; const m = (it.m || 0) % texts.length; const tex = muralTex(texts[m]); const p = M(new THREE.PlaneGeometry(2.9, 2.3), new THREE.MeshBasicMaterial({ map: tex }), 0, 1.2, 0.16, g); void p; }
   if (d.glow) { const [c, x, y, z, s] = d.glow; glow(x, y, z, c, s, g, 0.55); }
   return g;
@@ -237,7 +280,7 @@ function makeItem(d, it) {
 function muralTex(text) { return geoTex('mur-' + text, () => canvasTex(512, 400, (c, w, h) => { c.fillStyle = '#1a1030'; c.fillRect(0, 0, w, h); for (let i = 0; i < 8; i++) { const gg = c.createRadialGradient(rnd(0, w), rnd(0, h), 4, rnd(0, w), rnd(0, h), rnd(60, 180)); gg.addColorStop(0, pick(['#ff2d78cc', '#7de3ffcc', '#f2c14ecc'])); gg.addColorStop(1, '#00000000'); c.fillStyle = gg; c.fillRect(0, 0, w, h); } const L = text.split('\n'); c.font = '900 110px Archivo, Impact, sans-serif'; c.textAlign = 'center'; c.lineWidth = 14; c.strokeStyle = '#0a0a0e'; L.forEach((l, i) => { c.save(); c.translate(w / 2, h / 2 + (i - (L.length - 1) / 2) * 120 + 40); c.transform(1, 0, -0.15, 1, 0, 0); c.strokeText(l, 0, 0); c.fillStyle = i ? '#7de3ff' : '#ff2d78'; c.fillText(l, 0, 0); c.restore(); }); })); }
 function buildHomeItems() {
   if (W.homeG) scene.remove(W.homeG); W.homeG = grp(scene); W.homeAnim = []; AMB.emit = AMB.emit.filter(e => !e.home);
-  const sol = [], sp = [], H = home();
+  const sol = [], sp = [], H = W.hd || home();
   for (const it of H.items) {
     const d = HOME_ITEM[it.i], g = makeItem(d, it); W.homeG.add(g); const r = itemRect(it);
     if (!d.floor && !d.walk && !d.floorish) sol.push([r[0] - 0.12, r[1] + 0.12, r[2] - 0.12, r[3] + 0.12]);
@@ -251,6 +294,7 @@ function buildHomeItems() {
   W.solids = (W.baseSolids || W.solids).concat(sol); W.spots = (W.baseSpots || W.spots).concat(sp);
 }
 function homeUse(k, it) {
+  if (W.visit && k !== 'dj' && k !== 'tv' && k !== 'arcade') return toast('NOT YOUR CRIB', 'Ask ' + W.visit.name + ' first.');
   const H = home(), today = dayKey(), done = H.used[k] === today;
   if (k === 'fridge') { if (done) return toast('FRIDGE', 'Empty until tomorrow. Somebody ate the last soy dog.'); H.used[k] = today; S.boosts.push('dog'); save(); toast('YARD FRIDGE', 'Soy dog loaded: +4 Stamina next game.'); sfx('coin'); }
   else if (k === 'weights' || k === 'bpress') { if (done) return toast('ALREADY LIFTED', 'Your arms filed a complaint. Come back tomorrow.'); H.used[k] = today; const c = k === 'weights' ? 'F' : 'D'; S.bxp[c] += 30; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; } save(); toast(k === 'weights' ? 'LEG DAY' : 'CHEST DAY', `+30 ${CATS[c][0]} badge XP.`); sfx('uiok'); }
@@ -286,13 +330,14 @@ function homeAnimStep(dt) {
     if (u.flame !== undefined) { o.scale.set(1, 0.7 + Math.abs(Math.sin(t * (9 + u.flame * 2) + u.flame)) * 0.8, 1); }
     if (u.wave) { const pa = o.geometry.attributes.position; for (let i = 0; i < pa.count; i++) pa.setZ(i, Math.sin(pa.getX(i) * 3 + t * 4) * 0.08 * (pa.getX(i) + 0.6)); pa.needsUpdate = true; }
     if (u.clock && (u.ct = (u.ct || 0) + dt) > 1) { u.ct = 0; }
+    if (u.fish) o.children.forEach((f, i) => { f.position.x = Math.sin(t * (0.5 + i * 0.13) + i * 2) * 0.6; f.rotation.y = Math.cos(t * (0.5 + i * 0.13) + i * 2) > 0 ? 0 : Math.PI; });
   });
 }
 
 // ---------- build mode ----------
 const BLD = { cat: 'seat', on: false };
 function buildEnter() {
-  if (!W || W.kind !== 'crib') return; uiClose(); home();
+  if (!W || W.kind !== 'crib' || W.visit) return; uiClose(); home();
   W.build = { x: Math.round(W.me.x * 2) / 2, z: Math.round(W.me.z * 2) / 2, yaw: 0, sel: null, rot: 0, ghost: null, pick: null, hover: -1 };
   BLD.on = true; document.body.classList.add('building'); buildPanel(); buildZonesShow(true); sfx('uiok');
 }
@@ -319,29 +364,36 @@ function buildGhost(id) {
 }
 // can it go here: inside the yards you own, clear of the house, the court-side furniture and other things (rugs and turf
 // only clash with rugs and turf; anything can stand on them)
+// what a small thing would stand on here: the highest table top that holds its whole footprint
+function topUnder(R, ignore, list) { let best = null; (list || home().items).forEach((o, k) => { const dd = HOME_ITEM[o.i]; if (k === ignore || !dd.top || o.y) return; const q = itemRect(o); if (R[0] >= q[0] - 0.02 && R[1] <= q[1] + 0.02 && R[2] >= q[2] - 0.02 && R[3] <= q[3] + 0.02 && (!best || dd.top > best.h)) best = { k, h: dd.top }; }); return best; }
+const layerOf = (it, d) => d.floor ? 0 : it.y ? 2 : 1;
 function buildFits(id, x, z, r, ignore) {
   const d = HOME_ITEM[id], it = { i: id, x, z, r }, R = itemRect(it), e = 0.001;
+  if (d.small) { const t = topUnder(R, ignore); if (t) { it.y = t.h; for (let k = 0; k < home().items.length; k++) { const o = home().items[k]; if (k === ignore || !o.y) continue; const q = itemRect(o); if (R[0] < q[1] - e && R[1] > q[0] + e && R[2] < q[3] - e && R[3] > q[2] + e) return 'Overlaps ' + HOME_ITEM[o.i].n; } return ''; } }
   if (!lotZones().some(Z => R[0] >= Z[0] - e && R[1] <= Z[1] + e && R[2] >= Z[2] - e && R[3] <= Z[3] + e)) return 'Outside the yards you own';
   if (!d.floor) for (const s of W.baseSolids || []) if (R[0] < s[1] - 0.05 && R[1] > s[0] + 0.05 && R[2] < s[3] - 0.05 && R[3] > s[2] + 0.05) return 'Something is in the way';
-  const flat = x => !!(HOME_ITEM[x.i].floor);
-  for (let k = 0; k < home().items.length; k++) { if (k === ignore) continue; const o = home().items[k]; if (flat(o) !== !!d.floor) continue; const q = itemRect(o); if (R[0] < q[1] - e && R[1] > q[0] + e && R[2] < q[3] - e && R[3] > q[2] + e) return 'Overlaps ' + HOME_ITEM[o.i].n; }
+  for (let k = 0; k < home().items.length; k++) { if (k === ignore) continue; const o = home().items[k]; if (layerOf(o, HOME_ITEM[o.i]) !== layerOf(it, d)) continue; const q = itemRect(o); if (R[0] < q[1] - e && R[1] > q[0] + e && R[2] < q[3] - e && R[3] > q[2] + e) return 'Overlaps ' + HOME_ITEM[o.i].n; }
   if (home().items.length >= 90 && ignore === undefined) return 'The crib is full (90 pieces)';
   return '';
 }
-function buildItemAt(x, z) { const H = home(); let best = -1; for (let k = H.items.length - 1; k >= 0; k--) { const q = itemRect(H.items[k]); if (x >= q[0] && x <= q[1] && z >= q[2] && z <= q[3]) { if (best < 0 || (HOME_ITEM[H.items[best].i].floor && !HOME_ITEM[H.items[k].i].floor)) best = k; } } return best; }
+function buildItemAt(x, z) { const H = home(); let best = -1, bl = -1; for (let k = H.items.length - 1; k >= 0; k--) { const it = H.items[k], q = itemRect(it), l = layerOf(it, HOME_ITEM[it.i]); if (x >= q[0] - 0.1 && x <= q[1] + 0.1 && z >= q[2] - 0.1 && z <= q[3] + 0.1 && l > bl) { best = k; bl = l; } } return best; }
 function buildPlace() {
   const B = W.build, H = home(); if (!B.sel) { const k = buildItemAt(B.x, B.z); if (k >= 0) buildPickUp(k); return; }
   const why = buildFits(B.sel, B.x, B.z, B.rot, B.pick === null ? undefined : -1); if (why) { toast("CAN'T PUT THAT THERE", why); sfx('no'); return; }
   const d = HOME_ITEM[B.sel];
   if (B.pick === null) { if ((H.store[B.sel] || 0) > 0) H.store[B.sel]--; else { if (S.vc < d.cost) { toast('NOT ENOUGH VC', `${d.n} costs ${d.cost} VC.`); sfx('no'); return; } S.vc -= d.cost; } }
   const lv0 = homeLevel().lvl, sets0 = homeSets().filter(s => s.done).length;
-  H.items.push({ i: B.sel, x: B.x, z: B.z, r: B.rot, m: Math.floor(Math.random() * 5) }); B.pick = null; sfx('buy'); buildHomeItems(); save(); uiHud();
+  if (HOME_ITEM[B.sel].rare && B.pick === null && !(H.store[B.sel] > 0) && rareToday().id !== B.sel) { toast('NOT TODAY', 'That rare is only sold on its day.'); return; }
+  const t = HOME_ITEM[B.sel].small ? topUnder(itemRect({ i: B.sel, x: B.x, z: B.z, r: B.rot })) : null;
+  H.items.push({ i: B.sel, x: B.x, z: B.z, r: B.rot, m: Math.floor(Math.random() * 5), y: t ? t.h : 0 }); if (t) sfx('uiok'); B.pick = null; sfx('buy'); buildHomeItems(); save(); uiHud();
   const lv = homeLevel().lvl, sets = homeSets(); if (lv > lv0) { const p = HOME_PERKS.find(x => x.lvl === lv); toast('CRIB LEVEL ' + lv, p ? p.n + ': ' + p.d : 'The vibe is rising.', 'rank'); sfx('unlock'); }
   if (sets.filter(s => s.done).length > sets0) { const s = sets.find(x => x.done && x.s.items.includes(H.items[H.items.length - 1].i)); if (s) { toast('SET COMPLETE · ' + s.s.n, s.s.d, 'ach'); sfx('unlock'); } }
   if (!((H.store[B.sel] || 0) > 0) && S.vc < d.cost) buildGhost(null);
   buildPanel();
 }
-function buildPickUp(k) { const B = W.build, it = home().items.splice(k, 1)[0]; buildHomeItems(); buildGhost(it.i); B.rot = it.r; B.pick = it; B.x = it.x; B.z = it.z; sfx('ui'); buildPanel(); }
+function buildPickUp(k) { const B = W.build, H = home(), it0 = H.items[k];
+  if (HOME_ITEM[it0.i].top && !it0.y) { const q = itemRect(it0), on = H.items.filter(o => o.y && (() => { const r = itemRect(o); return r[0] >= q[0] - 0.05 && r[1] <= q[1] + 0.05 && r[2] >= q[2] - 0.05 && r[3] <= q[3] + 0.05; })()); if (on.length) { for (const o of on) H.store[o.i] = (H.store[o.i] || 0) + 1; H.items = H.items.filter(o => !on.includes(o)); k = H.items.indexOf(it0); toast('CLEARED THE TABLE', on.length + ' thing' + (on.length > 1 ? 's' : '') + ' went to storage.'); } }
+  const it = H.items.splice(k, 1)[0]; buildHomeItems(); buildGhost(it.i); B.rot = it.r; B.pick = it; B.x = it.x; B.z = it.z; sfx('ui'); buildPanel(); }
 function buildCancel() { const B = W.build; if (B.pick) { home().items.push(B.pick); B.pick = null; buildHomeItems(); } buildGhost(null); buildPanel(); }
 function buildStore() { const B = W.build, H = home(); if (B.pick) { H.store[B.pick.i] = (H.store[B.pick.i] || 0) + 1; toast('STORED', HOME_ITEM[B.pick.i].n + ' is in storage.'); B.pick = null; buildGhost(null); save(); buildPanel(); return; } const k = buildItemAt(B.x, B.z); if (k >= 0) { const it = H.items.splice(k, 1)[0]; H.store[it.i] = (H.store[it.i] || 0) + 1; buildHomeItems(); save(); toast('STORED', HOME_ITEM[it.i].n + ' is in storage.'); buildPanel(); } }
 function buildSell() { const B = W.build, H = home(); let id = null; if (B.pick) { id = B.pick.i; B.pick = null; buildGhost(null); } else { const k = buildItemAt(B.x, B.z); if (k >= 0) { id = H.items.splice(k, 1)[0].i; buildHomeItems(); } } if (!id) return; const v = Math.round(HOME_ITEM[id].cost * 0.5); S.vc += v; save(); uiHud(); toast('SOLD', `${HOME_ITEM[id].n} for ${v} VC.`); sfx('coin'); buildPanel(); }
@@ -349,13 +401,13 @@ function buildRotate() { const B = W.build; B.rot = (B.rot + 1) % 4; sfx('ui'); 
 function buildPanel() {
   let el = $('build'); if (!el) { el = document.createElement('div'); el.id = 'build'; document.body.appendChild(el); el.addEventListener('click', e => { const b = e.target.closest('[data-b]'); if (!b) return; e.stopPropagation(); audioInit(); BLD.act[b.dataset.b](b.dataset.v); }); }
   const H = home(), lv = homeLevel(), v = homeVibe(), B = W.build, sets = homeSets();
-  const items = HOME_ITEMS.filter(i => i.cat === BLD.cat), r = rankOf(S.rep);
+  const items = HOME_ITEMS.filter(i => i.cat === BLD.cat), r = rankOf(S.rep), rt = rareToday();
   el.style.display = 'block';
   el.innerHTML = `<div class="bt"><div><b>CRIB LEVEL ${lv.lvl}</b> <span class="mu">VIBE ${lv.tot}${lv.next ? ' / ' + lv.next : ' · MAX'}</span></div><div class="vb">${VIBES.map(([k, n, c]) => `<span style="color:${c}">${n} ${v[k]}</span>`).join('')}</div><div class="vc">VC ${S.vc.toLocaleString()}</div>
     <div class="bb"><button data-b="sets">SETS ${sets.filter(s => s.done).length}/${HOME_SETS.length}</button><button data-b="lot">LOT & LOOK</button><button data-b="cam">⟳ VIEW</button><button data-b="exit" class="x">DONE</button></div></div>
     <div class="bact">${B && B.sel ? `<button data-b="rot">↻ ROTATE (R)</button><button data-b="place" class="go">PLACE (E)</button>${B.pick ? '<button data-b="store">STORE (F)</button>' : ''}${B.pick ? '<button data-b="sell">SELL (X)</button>' : ''}<button data-b="cancel">CANCEL</button>` : `<button data-b="place">PICK UP (E)</button><button data-b="store">STORE (F)</button><button data-b="sell">SELL ½ (X)</button>`}<span class="hint">${B && B.sel ? HOME_ITEM[B.sel].n + (B.pick ? ' · moving' : (H.store[B.sel] ? ' · from storage' : ' · ' + HOME_ITEM[B.sel].cost + ' VC')) : 'Point at something you placed to pick it up, store it or sell it. Or pick something below.'}</span></div>
     <div class="bcat">${HOME_CATS.map(([k, n]) => `<button data-b="cat" data-v="${k}" class="${k === BLD.cat ? 'on' : ''}">${n}</button>`).join('')}<button data-b="cat" data-v="store" class="${BLD.cat === 'store' ? 'on' : ''}">STORAGE ${Object.values(H.store).reduce((a, b) => a + b, 0)}</button></div>
-    <div class="bitems">${(BLD.cat === 'store' ? HOME_ITEMS.filter(i => H.store[i.id] > 0) : items).map(i => { const lock = i.rank > r && !(H.store[i.id] > 0), st = H.store[i.id] || 0; return `<button data-b="pick" data-v="${i.id}" class="card ${B && B.sel === i.id ? 'sel' : ''} ${lock ? 'lock' : ''}" ${lock ? 'disabled' : ''}><b>${i.n}</b><small>${lock ? 'RANK: ' + RANKS[i.rank].n : st ? 'IN STORAGE ×' + st : i.cost + ' VC'}</small><i>${Object.entries(i.v).map(([k, x]) => `<em style="color:${VIBES.find(q => q[0] === k)[2]}">+${x} ${k}</em>`).join(' ') || '&nbsp;'}</i>${HOME_SETS.filter(s => s.items.includes(i.id)).map(s => `<u>${s.n}</u>`).join('')}</button>`; }).join('') || '<p class="mu">Nothing in storage.</p>'}</div>`;
+    <div class="bitems">${(BLD.cat === 'store' ? HOME_ITEMS.filter(i => H.store[i.id] > 0) : items).map(i => { const st = H.store[i.id] || 0, off = i.rare && i.id !== rt.id && !st, lock = (i.rank > r && !st) || off; return `<button data-b="pick" data-v="${i.id}" class="card ${B && B.sel === i.id ? 'sel' : ''} ${lock ? 'lock' : ''}" ${lock ? 'disabled' : ''}><b>${i.rare ? '★ ' : ''}${i.n}</b><small>${st ? 'IN STORAGE ×' + st : off ? 'BACK ON ITS DAY' : i.rank > r ? 'RANK: ' + RANKS[i.rank].n : (i.rare ? 'TODAY ONLY · ' : '') + i.cost + ' VC'}</small><i>${Object.entries(i.v).map(([k, x]) => `<em style="color:${VIBES.find(q => q[0] === k)[2]}">+${x} ${k}</em>`).join(' ') || '&nbsp;'}</i>${HOME_SETS.filter(s => s.items.includes(i.id)).map(s => `<u>${s.n}</u>`).join('')}</button>`; }).join('') || '<p class="mu">Nothing in storage.</p>'}</div>`;
 }
 BLD.act = {
   exit: () => buildExit(), rot: () => buildRotate(), place: () => buildPlace(), store: () => buildStore(), sell: () => buildSell(), cancel: () => buildCancel(),
@@ -369,11 +421,11 @@ function buildStep(dt) {
   const a = B.yaw * Math.PI / 2, fx = -Math.sin(a), fz = -Math.cos(a), rx = -fz, rz = fx;
   if (!busy) { const sp = I.sprint ? 12 : 6; B.fx = (B.fx === undefined ? B.x : B.fx) + (fx * -I.my + rx * I.mx) * sp * dt; B.fz = (B.fz === undefined ? B.z : B.fz) + (fz * -I.my + rz * I.mx) * sp * dt; }
   if (B.mouse) { B.fx = B.mouse[0]; B.fz = B.mouse[1]; B.mouse = null; }
-  B.fx = clamp(B.fx, -23.5, 23.5); B.fz = clamp(B.fz, -2.8, 23); B.x = Math.round(B.fx * 2) / 2; B.z = Math.round(B.fz * 2) / 2;
+  B.fx = clamp(B.fx, -23.5, 23.5); B.fz = clamp(B.fz, -2.8, 23); const gs = B.sel && HOME_ITEM[B.sel].small ? 4 : 2; B.x = Math.round(B.fx * gs) / gs; B.z = Math.round(B.fz * gs) / gs;      /* small things snap to a quarter metre */
   if (B.sel) { const d = HOME_ITEM[B.sel]; if ((B.rot & 1 ? d.d : d.w) % 1 !== 0 && (B.rot & 1 ? d.d : d.w) * 2 % 2 === 1) { /* half-metre footprints sit on the half grid */ } }
   if (!busy) { if (I.aP) buildPlace(); if (I.bP) buildRotate(); if (I.back) buildExit(); }
   if (!W.build) return;
-  if (B.ghost) { B.ghost.position.set(B.x, 0, B.z); B.ghost.rotation.y = B.rot * Math.PI / 2; const ok = !buildFits(B.sel, B.x, B.z, B.rot, B.pick ? -1 : undefined); if (ok !== B.ok) { B.ok = ok; B.ghost.traverse(o => { if (o.isMesh) o.material = ok ? _ghostOK : _ghostBad; }); } B.ghost.children[0].position.y = 0.04 + Math.sin(W.t * 6) * 0.03; }
+  if (B.ghost) { const tu = HOME_ITEM[B.sel].small ? topUnder(itemRect({ i: B.sel, x: B.x, z: B.z, r: B.rot }), B.pick ? -1 : undefined) : null; B.ghost.position.set(B.x, tu ? tu.h : 0, B.z); B.ghost.rotation.y = B.rot * Math.PI / 2; const ok = !buildFits(B.sel, B.x, B.z, B.rot, B.pick ? -1 : undefined); if (ok !== B.ok) { B.ok = ok; B.ghost.traverse(o => { if (o.isMesh) o.material = ok ? _ghostOK : _ghostBad; }); } B.ghost.children[0].position.y = 0.04 + Math.sin(W.t * 6) * 0.03; }
   // hover outline on placed things
   const k = B.sel ? -1 : buildItemAt(B.x, B.z); if (k !== B.hover) { B.hover = k; if (W.hoverBox) { scene.remove(W.hoverBox); W.hoverBox = null; } if (k >= 0) { const q = itemRect(home().items[k]); const bx = new THREE.Box3(new THREE.Vector3(q[0], 0, q[2]), new THREE.Vector3(q[1], 1.6, q[3])); W.hoverBox = new THREE.Box3Helper(bx, 0x7de3ff); scene.add(W.hoverBox); } }
   if (!W.cursor) { W.cursor = M(geo('cur', () => new THREE.RingGeometry(0.18, 0.26, 20)), flat(0xffffff, { transparent: true, opacity: 0.85, depthWrite: false }), 0, 0.05, 0, scene); W.cursor.rotation.x = -Math.PI / 2; }
@@ -388,11 +440,17 @@ addEventListener('keydown', e => {
   else if (k === 'Escape' || k === 'KeyB') { if (W.build.sel) buildCancel(); else buildExit(); e.preventDefault(); }
   else if (k === 'Tab') { e.preventDefault(); const i = HOME_CATS.findIndex(c => c[0] === BLD.cat); BLD.cat = HOME_CATS[(i + 1) % HOME_CATS.length][0]; buildPanel(); }
 });
-addEventListener('keydown', e => { if (e.code === 'KeyB' && W && W.kind === 'crib' && !W.build && !UI.cur && !BLD.on) buildEnter(); });
+addEventListener('keydown', e => { if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return; if (e.code === 'KeyB' && W && W.kind === 'crib' && !W.build && !UI.cur && !BLD.on) buildEnter(); if (e.code === 'KeyL' && W && W.visit && !UI.cur) likeCrib(); });
+// visiting: leave a like (one a day per crib), and hang out
+function likeCrib() { if (!W || !W.visit) return; if (NET.liked === W.visit.peer + '|' + dayKey()) return toast('ALREADY LIKED', 'One like a day per crib.'); NET.liked = W.visit.peer + '|' + dayKey(); pres({ lk: NET.liked }); bubble(W.me.rig.root, '♥', 2.5); toast('♥ LIKED', W.visit.name + ' will see it.'); sfx('coin'); }
+function netVisit(peer) {
+  const p = peerById(peer), d = p && unpackHome(p.presence.hm); if (!d) { toast('CAN\'T VISIT', 'Their crib did not come through. Try again in a moment.'); return; }
+  uiClose(); d.peer = peer; enterWorld('crib', 0, 19.2, Math.PI, { visit: d }); toast(d.name + "'S CRIB", 'Look around, sit down, say something (T). Press L to leave a like.', 'rank');
+}
 const _ray = new THREE.Raycaster(), _pl = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), _mp = new THREE.Vector2(), _hit = new THREE.Vector3();
 function buildPointer(e, click) {
   if (!BLD.on || !W || !W.build || UI.cur || e.target.id !== 'gl') return; _mp.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); _ray.setFromCamera(_mp, camera);
-  if (_ray.ray.intersectPlane(_pl, _hit)) { W.build.mouse = [_hit.x, _hit.z]; if (click) { W.build.fx = _hit.x; W.build.fz = _hit.z; W.build.x = Math.round(_hit.x * 2) / 2; W.build.z = Math.round(_hit.z * 2) / 2; if (e.pointerType === 'mouse') buildPlace(); } }
+  if (_ray.ray.intersectPlane(_pl, _hit)) { W.build.mouse = [_hit.x, _hit.z]; if (click) { W.build.fx = _hit.x; W.build.fz = _hit.z; const gs = W.build.sel && HOME_ITEM[W.build.sel].small ? 4 : 2; W.build.x = Math.round(_hit.x * gs) / gs; W.build.z = Math.round(_hit.z * gs) / gs; if (e.pointerType === 'mouse') buildPlace(); } }
 }
 addEventListener('pointermove', e => { if (e.pointerType === 'mouse') buildPointer(e, false); });
 addEventListener('pointerdown', e => buildPointer(e, true));

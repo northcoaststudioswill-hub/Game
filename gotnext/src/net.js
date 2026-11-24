@@ -128,7 +128,10 @@ function netPeers(peers) {
 function netPublish(force) {
   if (!NET.room || !S || !S.created) return;
   const now = performance.now(); if (!force && now - NET.pubT < 110) return;
-  const w = MT ? 'game' : W ? W.kind : 'menu', me = W ? W.me : null, patch = {}, P = NET.pub;
+  const w = MT ? 'game' : worldKey(), me = W ? W.me : null, patch = {}, P = NET.pub;
+  const hm = JSON.stringify(packHome()); if (hm !== P.hm) { P.hm = hm; patch.hm = JSON.parse(hm); }
+  if ((NET.em || '') !== (P.em || '')) { P.em = NET.em || ''; patch.em = P.em; }
+  if (NET.say && (!P.say || P.say.i !== NET.say.i)) { P.say = NET.say; patch.say = NET.say; }
   const bj = JSON.stringify(packBuild(myBuild())); if (bj !== P.bj) { P.bj = bj; patch.b = JSON.parse(bj); patch.o = ovrOf(S.attrs); patch.r = rankOf(S.rep); }
   if (w !== P.w) { P.w = w; patch.w = w; }
   if (me && (Math.abs(me.x - (P.x || 0)) > 0.04 || Math.abs(me.z - (P.z || 0)) > 0.04 || Math.abs(me.face - (P.f || 0)) > 0.05)) { P.x = me.x; P.z = me.z; P.f = me.face; patch.x = r2(me.x); patch.z = r2(me.z); patch.f = r2(me.face); }
@@ -142,23 +145,33 @@ function netInvite(peer, m, tierIdx, kind) {
 function crewKick(peer) { if (!NET.crew) return; NET.crew.m = NET.crew.m.filter(x => x !== peer); if (!NET.crew.m.length) NET.crew = null; pres({ cr: NET.crew }); }
 function crewLeave() { NET.inCrew = null; pres({ in: null }); }
 // other players walking the same place
+// which place you are in, as others see it: a crib is someone's crib
+function worldKey() { return !W ? 'menu' : W.kind === 'crib' ? 'crib@' + (W.visit ? W.visit.peer : (NET.me || 'me')) : W.kind; }
 function netWorldStep(dt) {
   if (!W) return; netPublish();
-  const rigs = W.netRigs || (W.netRigs = {}), seen = {};
-  if (NET.room && (W.kind === 'hub' || W.kind === 'pit')) for (const p of netOthers()) {
-    const pr = p.presence; if (pr.w !== W.kind || typeof pr.x !== 'number' || typeof pr.z !== 'number') continue; seen[p.peer] = 1;
+  const rigs = W.netRigs || (W.netRigs = {}), seen = {}, key = worldKey(), today = dayKey();
+  if (NET.room) for (const p of netOthers()) {
+    const pr = p.presence;
+    // likes for your crib, one per person per day
+    if (pr.lk === (NET.me + '|' + today)) { const H = home(), nm = peerName(p); H.likers = H.likers || {}; if (H.likers[nm] !== today) { H.likers[nm] = today; H.likes = (H.likes | 0) + 1; save(); toast('♥ ' + nm + ' LIKED YOUR CRIB', H.likes + ' likes all time.', 'ach'); sfx('unlock'); } }
+    if (pr.w !== key || typeof pr.x !== 'number' || typeof pr.z !== 'number') continue; seen[p.peer] = 1;
     let g = rigs[p.peer]; const bj = JSON.stringify(pr.b);
     if (!g || g.bj !== bj) {
       const b = unpackBuild(pr.b); if (!b) continue; if (g) scene.remove(g.rig.root);
       const rig = makeRig(b); scene.add(rig.root); rig.root.add(nameTag(b.name, RANKS[clamp(pr.r | 0, 0, RANKS.length - 1)].n, rig.H));
-      g = rigs[p.peer] = { rig, bj, x: clamp(pr.x, -60, 60), z: clamp(pr.z, -60, 60), f: +pr.f || 0, ph: 0 };
+      g = rigs[p.peer] = { rig, bj, x: clamp(pr.x, -60, 60), z: clamp(pr.z, -60, 60), f: +pr.f || 0, ph: 0, sayI: g ? g.sayI : (pr.say ? pr.say.i : 0) };
     }
     const tx = clamp(pr.x, -60, 60), tz = clamp(pr.z, -60, 60), k = 1 - Math.exp(-9 * dt), ox = g.x, oz = g.z;
     g.x += (tx - g.x) * k; g.z += (tz - g.z) * k; g.f = lerpAng(g.f, +pr.f || 0, k);
     const v = Math.hypot(g.x - ox, g.z - oz) / Math.max(dt, 0.001); g.ph += dt * (4 + v * 1.6);
-    locoAnim(g.rig, g.x, g.z, g.f, dt);
+    const em = typeof pr.em === 'string' && EMOTES[pr.em] ? EMOTES[pr.em] : null;
+    if (em && v < 0.3) { g.rig.root.position.set(g.x, em.y || 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, poseOf(em.an, W.t, Object.assign({ leg: g.rig.legLen, style: 'flex', ph: 0 }, em.o || {})), dt); g.rig.gait = null; }
+    else locoAnim(g.rig, g.x, g.z, g.f, dt);
+    if (pr.say && typeof pr.say.t === 'string' && pr.say.i !== g.sayI) { bubble(g.rig.root, pr.say.t.replace(/[<>]/g, '').slice(0, 60), 5, g.rig.H + 0.45, 'net'); g.sayI = pr.say.i; }
   }
   for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); delete rigs[k]; }
+  // hanging out at a crib with someone online for a minute: +15 Respect once a day, for each of you
+  if (W.kind === 'crib' && Object.keys(seen).length) { W.hangT = (W.hangT || 0) + dt; const H = home(); if (W.hangT >= 60 && H.hang !== today) { H.hang = today; gainRep(15); save(); toast('HUNG OUT', '+15 Respect. Good company counts.', 'ach'); } }
 }
 function nameTag(name, sub, H) {
   const tex = canvasTex(256, 80, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = 'rgba(8,8,10,.8)'; x.fillRect(0, 8, w, 60); x.fillStyle = '#ff2d78'; x.fillRect(0, 8, 6, 60); x.fillStyle = '#ece9e2'; x.font = '900 expanded 26px Archivo, sans-serif'; x.textBaseline = 'middle'; x.fillText(String(name).slice(0, 12), 16, 32, 232); x.fillStyle = '#7de3ff'; x.font = '500 14px "JetBrains Mono", monospace'; x.fillText(String(sub).toUpperCase(), 16, 54, 232); });

@@ -6,8 +6,8 @@ const LS = 'gotnext-lab-v1';
 const POSES = [
   // [id, label, group, fn(t) -> [anim, time, opts, extra]]  extra: { y: height off the floor, ball: 'hand'|'drib'|'chest'|null, yaw }
   ['idle', 'Idle', 'Stance', t => ['idle', t, {}, { ball: 'hip' }]],
-  ['swag', 'Street walk', 'Stance', t => ['loco', 0, { v: 2.1, ph: t * 6.2, swag: 1 }, {}]],
-  ['walk', 'Plain walk', 'Stance', t => ['loco', 0, { v: 1.5, ph: t * 6 }, {}]],
+  ['swag', 'Walk (gait-lab curves)', 'Stance', t => ['gait', 0, { psi: (t * 1.0) % 1, amp: 1.05, hipA: 1.2, swag: 0.6, thigh: 0.48, shin: 0.48 }, {}]],
+  ['walk', 'Slow walk', 'Stance', t => ['gait', 0, { psi: (t * 0.8) % 1, amp: 0.7, hipA: 0.8, swag: 0, thigh: 0.48, shin: 0.48 }, {}]],
   ['jog', 'Jog (park)', 'Stance', t => ['loco', 0, { v: 3.3, ph: t * 8 }, {}]],
   ['run', 'Sprint (park)', 'Stance', t => ['loco', 0, { v: 6.6, ph: t * 9.5 }, { y: 0.03 * Math.abs(Math.sin(t * 9.5)) }]],
   ['courtrun', 'Run (court)', 'Stance', t => ['run', 0, { sp: 1, ph: t * 9 }, { y: 0.03 * Math.abs(Math.sin(t * 9)) }]],

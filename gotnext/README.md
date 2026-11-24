@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.8.1: a real walk (from gait-lab joint angles, planted feet that stay put), plus a little Habbo in the crib: things stack on tables, a rare of the day, emotes, chat bubbles, and visiting friends' cribs online with likes.** v0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -68,6 +68,29 @@ Every place got an atmosphere pass. It uses no new libraries, and all of it is l
   - a dice crew by the hydrant
   - more lamps
 - **Game courts** get light poles with beams, light on the ground, the weather and the sky.
+
+## A little Habbo in the crib (v0.8.1)
+
+- **Stacking:** small things go on table tops. Trophy, game console, house plant, snack bowl, pocket radio and candles
+  stand on the coffee table, spool table, yard bar, picnic table, crate or cooler. Small things snap to a quarter-metre
+  grid. Picking up a table puts what was on it into storage.
+- **★ Rares:** six collectibles, one on sale each day and only that day:
+  - Ice Cream Machine
+  - Neon Dragon Lamp
+  - Golden Hoop Lamp
+  - Holo Throne
+  - Soda Fountain
+  - Aquarium
+- **Emotes:** keys 1–5, or the buttons on the right: wave, dance, sit, hype, your celebration. Moving cancels them.
+- **Chat:** T (or 💬) opens a chat line. Your words appear in a bubble over your head. Online friends in the same place
+  see your bubbles and emotes.
+- **Visiting friends' cribs:**
+  - My Player → CREW → VISIT CRIB on anyone online. Your crib travels with your presence (about 550 bytes) and is
+    checked on arrival: known pieces only, inside the lot.
+  - You see their house, their pieces, their looks, and anyone else there.
+  - You can sit, chat, emote and spin their DJ booth. You can't build there or take their daily freebies.
+  - L leaves a like (one a day per crib). Likes show on their gate.
+  - Spending a minute at a crib with someone online gives each of you +15 Respect, once a day.
 
 ## My Crib and the home builder (v0.8)
 
@@ -284,7 +307,9 @@ node tests/reel.mjs dunks|layups|jumpers|handles      # films every move in a De
 node tests/gestures.mjs           # each finish and jumper variation from real key presses; Dev Room max and restore
 node tests/devroom.mjs            # clicks through every Dev Room tab, a reel and a 1v1 against a maxed player
 node tests/contest.mjs [N]        # N drives per finisher quality at a rim protector: made %, blocked %, finishes picked
-node tests/home.mjs               # the home builder end to end (place, move, store, sell, land, sets, visitors)
+node tests/home.mjs               # the home builder end to end (place, move, stack, store, sell, rares, land, sets, visitors)
+node tests/visit.mjs              # two players online: visit a crib, chat, emote, like, hang out
+node tests/walkfeel.mjs [file]    # the walk measured: cadence, step length, foot slide, bob, lean
 node tests/areas.mjs [tag]        # screenshots of every place from the player's camera and wide
 ```
 

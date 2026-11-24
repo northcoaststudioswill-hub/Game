@@ -302,7 +302,52 @@ through the real game. The middle column is what the game picked.
 **Dev Room reel:** CONTESTED AT THE RIM shows the same drive with finishers of different quality, plus forced hang,
 euro, switch and a stuffed dunk. The reel's defender stands in the lane and jumps at the shot.
 
-## 10. Not checked
+## 10. Walking from gait-lab data (v0.8.1)
+
+![Walking on The Block, before and after](img/walk-gait.png)
+
+The walk around The Block still looked wrong. He leaned back with bent knees and his feet out in front, as if walking
+while sitting in a chair. Two causes:
+- The planted-feet IK bent the legs to reach targets.
+- The "street walk" lean-back pushed the body behind them.
+
+Video could not be watched from here, and image hosts are blocked by this environment's network. So the walk was
+rebuilt from the numbers gait labs measure from filmed walkers:
+
+**Joint angles through one stride** (0% = heel strike, toe-off at 60%):
+- **Hip:** about 30° flexed at heel strike, extending to about 10° behind at late stance.
+- **Knee:** nearly straight at heel strike, a 15–20° give as the weight lands, about 40° at toe-off, about 60° mid-swing.
+- **Ankle:** neutral at heel strike, a little down onto the foot, about 10° up in late stance, about 17–20° pointed at
+  toe-off.
+
+**How it runs:**
+- **Stepping:** the cycle advances with distance walked, and steps lengthen with speed.
+- **The hip swing is solved for** so the body travels exactly one step over the standing foot.
+- **A light foot lock:** during stance, the hip angle is nudged each frame (forward-back and sideways) so the planted
+  ankle stays where it landed. It releases through push-off.
+- **Hip height:** comes from the standing leg, so the body rises and falls like a real walker.
+- **Pelvis:** turns and tilts, and the legs counter-rotate so the feet do not swing with it.
+- **Trunk and arms:** the trunk counter-turns and stays upright (about 4° forward). The arms swing opposite the legs.
+- **Swagger:** a little stays, in the upper body only.
+- **Running:** above a brisk walk the run (planted-feet IK) blends in. The court is unchanged.
+
+**Measured** (`node tests/walkfeel.mjs`), walking at 1.5 m/s on The Block:
+
+| | before | after | a real walker |
+|---|---|---|---|
+| Steps per second | — | 2.0 | about 1.8–2.0 |
+| Step length | — | 0.77 m | about 0.7–0.75 m |
+| Standing-foot slide (median) | 0.50 m/s | **0.04 m/s** | 0 (the ankle only moves at heel rock and push-off) |
+| Trunk lean | backward | **4° forward** | slightly forward |
+| Body bob | — | 7 cm | about 4–5 cm (a little high) |
+
+Sources for the angle values:
+- [University of Missouri, Normal Gait](https://medicine.missouri.edu/sites/default/files/pm-r/Normal_Gait.pdf)
+- [PMC normative ranges table](https://pmc.ncbi.nlm.nih.gov/articles/PMC555760/table/T3)
+- [OUHSC kinematic analyses of gait](https://ouhsc.edu/bserdac/dthompso/web/gait/KNMATICS/gait.htm)
+- the standard normative curves (Winter)
+
+## 11. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

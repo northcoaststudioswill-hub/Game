@@ -1,0 +1,35 @@
+// Two players online: one visits the other's crib, sees the same furniture, chats, emotes, leaves a like, hangs out.
+// node tests/visit.mjs · uses the same fake live room as online.mjs
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || 'playwright');
+import path from 'path'; import fs from 'fs'; import http from 'http'; import { fileURLToPath } from 'url';
+import { MOCK } from './room-mock.mjs';
+const dir = path.dirname(fileURLToPath(import.meta.url)); fs.mkdirSync(path.join(dir, 'shots'), { recursive: true });
+const html = fs.readFileSync(path.join(dir, '..', 'index.html'));
+const srv = http.createServer((q, r) => { r.writeHead(200, { 'content-type': 'text/html' }); r.end(html); }).listen(0); const url = 'http://127.0.0.1:' + srv.address().port + '/';
+const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const ctx = await browser.newContext({ viewport: { width: 900, height: 540 } }); await ctx.addInitScript(MOCK);
+let errs = 0, fails = 0; const ok = (l, c, x) => { console.log((c ? 'PASS ' : 'FAIL ') + l + (x === undefined ? '' : ': ' + x)); if (!c) fails++; };
+const open = async name => { const p = await ctx.newPage(); p.on('pageerror', e => { errs++; console.log(name, 'PAGEERROR', e.message); }); await p.goto(url); await p.waitForTimeout(900); await p.click('#titleBtns .btn'); await p.waitForTimeout(300); await p.fill('#bname', name); await p.click('#panel .pf .btn'); await p.waitForTimeout(700); return p; };
+const A = await open('HOSTY'); await A.evaluate(() => { localStorage.removeItem('gotnext_v1'); }); const B = await open('GUESTY');
+const wait = async (p, ms) => { await p.bringToFront(); await p.waitForTimeout(ms); };
+await A.evaluate(() => { __pit.devSampleCrib(); __pit.S.homies = []; __pit.enterWorld('crib', -4, 12, Math.PI); }); await wait(A, 1500);
+await B.evaluate(() => __pit.enterWorld('hub', 0, 6, Math.PI)); await wait(B, 1200);
+const peerA = await B.evaluate(() => { const p = __pit.NET.peers.find(q => !q.sameTab && q.presence.b && q.presence.b.n === 'HOSTY'); return p ? { id: p.peer, w: p.presence.w, hm: !!p.presence.hm, len: JSON.stringify(p.presence.hm || '').length } : null; });
+ok('B sees HOSTY online, in their crib, with the crib packed', peerA && /^crib@/.test(peerA.w) && peerA.hm, peerA && `${peerA.w}, crib data ${peerA.len} bytes`);
+const vis = await B.evaluate(id => { __pit.netVisit(id); window.__tick && 0; return { kind: __pit.W.kind, name: __pit.W.visit && __pit.W.visit.name, items: __pit.W.hd.items.length, build: (__pit.buildEnter(), !!__pit.W.build) }; }, peerA.id);
+const hostItems = await A.evaluate(() => __pit.S.home.items.length);
+ok('B walks into HOSTY\'s crib: same furniture, no building there', vis.kind === 'crib' && vis.name === 'HOSTY' && vis.items === hostItems && !vis.build, `${vis.items} of ${hostItems} pieces`);
+await wait(B, 1000); await wait(A, 1200);
+const seen = await A.evaluate(() => Object.keys(__pit.W.netRigs || {}).length); ok('HOSTY sees GUESTY standing in the crib', seen === 1);
+await B.evaluate(() => { __pit.chatSend('nice crib fr'); __pit.emote('dance'); }); await wait(B, 600); await wait(A, 1200);
+const chat = await A.evaluate(() => ({ bub: [...document.querySelectorAll('.bub.net')].map(b => b.textContent), em: __pit.NET.peers.find(q => !q.sameTab).presence.em }));
+ok('HOSTY sees GUESTY\'s chat bubble and dance', chat.bub.includes('nice crib fr') && chat.em === 'dance', JSON.stringify(chat));
+await A.screenshot({ path: path.join(dir, 'shots', 'visit-host.png') });
+await B.evaluate(() => __pit.likeCrib()); await wait(B, 500); await wait(A, 1200);
+const likes = await A.evaluate(() => __pit.S.home.likes | 0); ok('GUESTY leaves a like; HOSTY gets one', likes === 1, likes);
+await B.evaluate(() => __pit.likeCrib()); await wait(B, 500); await wait(A, 1000);
+ok('a second like the same day does not count', (await A.evaluate(() => __pit.S.home.likes | 0)) === 1);
+const r0 = await A.evaluate(() => { __pit.W.hangT = 59.9; return __pit.S.rep; }); await wait(A, 2500);
+const hang = await A.evaluate(r0 => ({ d: __pit.S.rep - r0, day: __pit.S.home.hang }), r0); ok('a minute together at a crib: +15 Respect once a day', hang.d === 15, JSON.stringify(hang));
+await B.evaluate(() => { __pit.W.yaw = Math.PI; }); await wait(B, 800); await B.screenshot({ path: path.join(dir, 'shots', 'visit-guest.png') });
+console.log(errs ? errs + ' PAGE ERRORS' : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await browser.close(); srv.close();
