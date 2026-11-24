@@ -280,7 +280,7 @@ function capsFor(build) {
   return out;
 }
 function startAttrs(build) { const c = capsFor(build), o = {}; for (const a of ATTRS) o[a.id] = Math.max(30, Math.round(c[a.id] * 0.60)); return o; }
-function attrCost(v) { return Math.round(6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16); }   // VC for +1 from v
+function attrCost(v) { const b = 6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16; return Math.round(b * (1 + Math.pow(Math.max(0, v - 55) / 13, 1.6))); }   // VC for +1 from v: cheap early, steep near the top (maxing a build is weeks of play, not one night)
 const OVR_W = { layup: 1, dunk: .7, close: .7, mid: 1, three: 1.2, iq: .8, handle: 1.1, pass: .8, swb: .8, perd: 1, intd: .7, steal: .8, block: .7, reb: .8, speed: 1, accel: 1, str: .6, vert: .7, stam: .6 };
 function ovrOf(attrs) {
   // best 12 weighted, so specialists are not punished for dump stats
@@ -683,11 +683,23 @@ function newSave() {
   };
 }
 function loadSave() {
-  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); return; } } catch (e) { }
-  S = newSave();
+  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); return; } } catch (e) { }
+  S = newSave(); slotsInit();
 }
 function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
-function save() { S.ts = Date.now(); saveLocal(); cloudSave(); }
+function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
+// ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
+// fit; VC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
+const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb'];
+const cloneJ = o => JSON.parse(JSON.stringify(o));
+function slotSnap() { const mv = {}; for (const k of MOVE_SLOTS) mv[k] = S.moves[k]; return cloneJ({ name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, bp: S.bp, bxp: S.bxp, moves: mv, worn: S.worn, anim: S.anim || null, made: S.created }); }
+function slotLoad(t) { const d = newSave(); S.name = t.name || d.name; S.build = cloneJ(t.build || d.build); S.attrs = cloneJ(t.attrs || {}); S.badges = cloneJ(t.badges || {}); S.bp = cloneJ(t.bp || d.bp); S.bxp = cloneJ(t.bxp || d.bxp);
+  for (const k of MOVE_SLOTS) S.moves[k] = t.moves && S.moves.owned.includes(t.moves[k]) ? t.moves[k] : d.moves[k]; S.worn = Object.assign({}, d.worn, t.worn || {}); for (const s in S.worn) if (s !== 'hair' && S.worn[s] && !S.owned.includes(S.worn[s]) && S.worn[s] !== d.worn[s]) S.worn[s] = d.worn[s];
+  S.anim = t.anim || null; if (!Object.keys(S.attrs).length) S.attrs = startAttrs(S.build); }
+function slotsInit() { if (!Array.isArray(S.slots) || !S.slots.length) { S.slots = [slotSnap()]; S.slot = 0; } S.slot = Math.max(0, Math.min(S.slots.length - 1, S.slot | 0)); S.slots = S.slots.slice(0, MAX_SLOTS); }
+function slotSwitch(i) { if (i === S.slot || !S.slots[i] || S.devBak) return false; S.slots[S.slot] = slotSnap(); S.slot = i; slotLoad(S.slots[i]); save(); return true; }
+function slotNew() { if (S.slots.length >= MAX_SLOTS || S.devBak) return -1; S.slots[S.slot] = slotSnap(); const d = newSave(); S.slots.push({ name: 'ROOKIE', build: d.build, attrs: {}, badges: {}, bp: d.bp, bxp: d.bxp, moves: {}, worn: d.worn, made: false }); return S.slots.length - 1; }
+function slotDelete(i) { if (i === S.slot || !S.slots[i] || S.slots.length < 2) return false; S.slots.splice(i, 1); if (i < S.slot) S.slot--; save(); return true; }
 function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v + (typeof homeFx === 'function' ? homeFx(k) : 0); }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }
@@ -3929,8 +3941,8 @@ function capBars(build, attrs) {
   }
   return h;
 }
-function uiBuilder() {
-  const T = { name: S.name === 'ROOKIE' ? '' : S.name, build: JSON.parse(JSON.stringify(S.build)), hair: S.worn.hair };
+function uiBuilder(opts) {
+  opts = opts || {}; const T = { name: S.name === 'ROOKIE' ? '' : S.name, build: JSON.parse(JSON.stringify(S.build)), hair: S.worn.hair };
   document.body.dataset.state = 'create'; studioScene();
   const rig = () => studioRig({ build: T.build, worn: Object.assign({}, S.worn, { hair: T.hair }) });
   const lbs = () => Math.round(150 + (T.build.body.h - 67) * 5.6 + T.build.body.w * 32);
@@ -3951,8 +3963,8 @@ function uiBuilder() {
     h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
       const nm = ($('bname').value || '').trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
-      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for VC.', 'rank');
-    })}</div>`;
+      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); if (opts.prev !== undefined) toast('NEW BUILD', `${S.name} is on the Block. Switch builds in MY PLAYER → BUILDS.`, 'rank'); else toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for VC.', 'rank');
+    })}${opts.prev !== undefined ? Btn('CANCEL', () => { S.slots.splice(S.slot, 1); S.slot = opts.prev; slotLoad(S.slots[opts.prev]); save(); uiClose(); enterWorld('hub', 0, 9, Math.PI); }, 'alt') : ''}</div>`;
     return h;
   }, 'side', () => { });
   function upd() { $('lw').textContent = lbs() + ' lbs'; $('ls').textContent = fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5)); $('capbox').innerHTML = capBars(T.build); rig(); }
@@ -3968,11 +3980,20 @@ function header() {
 }
 function uiPlayer(tab) {
   const st = { tab: tab || 'attrs' };
-  const tabs = [['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
+  const tabs = [['builds', 'BUILDS'], ['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
   openPanel(() => {
     UI.cur.live = st.tab === 'crew';
     let h = `<div class="ph"><h2>MY PLAYER</h2>${Btn('✕', uiClose, 'alt sm')}</div>` + header() + `<div class="tabs">` + tabs.map(t => Btn(t[1], () => { st.tab = t[0]; sfx('ui'); rerender(true); }, st.tab === t[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb">`;
-    if (st.tab === 'attrs') {
+    if (st.tab === 'builds') {
+      h += `<p class="mu" style="margin:2px 0 8px">Up to ${MAX_SLOTS} builds. Each has its own body, attributes, badges, moves and fit. VC, Respect, the drip and moves you own, and your crib are shared. Online games use the active build.</p>`;
+      S.slots[S.slot] = slotSnap();
+      if (S.devBak) h += `<p class="warn">Dev Room maxed player is on. Restore your real player in the Dev Room before switching builds.</p>`;
+      S.slots.forEach((t, i) => { const on = i === S.slot, st2 = STYLE[t.build.style] || {};
+        h += `<div class="card"${on ? ' style="border-color:var(--go)"' : ''}><div class="row"><div><b>${t.name}</b> <span class="mu">· ${st2.n || ''} · ${fmtH(t.build.body.h)} · OVR ${ovrOf(Object.keys(t.attrs).length ? t.attrs : startAttrs(t.build))}</span>${on ? ' <span class="tag on">ACTIVE</span>' : ''}</div><div>`
+          + (on ? '' : Btn('PLAY AS', () => { if (slotSwitch(i)) { sfx('unlock'); toast('BUILD SWITCHED', 'You are ' + S.name + ' now.'); if (W && W.me) { worldPlayerRig(); if (typeof netBuildChanged === 'function') netBuildChanged(); } } rerender(); }, 'sm') + ' ' + Btn('DELETE', () => { if (confirm('Delete ' + t.name + '? This cannot be undone.')) { slotDelete(i); sfx('no'); rerender(); } }, 'alt sm'))
+          + `</div></div></div>`; });
+      if (S.slots.length < MAX_SLOTS) h += Btn('+ NEW BUILD', () => { if (MT) return; const prev = S.slot, i = slotNew(); if (i < 0) return; S.slot = i; slotLoad(S.slots[i]); uiClose(); uiBuilder({ prev }); });
+    } else if (st.tab === 'attrs') {
       const caps = capsFor(S.build), bf = buffTotals();
       const buy = (id, n) => { let c = 0, k = 0; for (let i = 0; i < n && S.attrs[id] < caps[id]; i++) { const p = attrCost(S.attrs[id]); if (S.vc < p) break; S.vc -= p; S.attrs[id]++; c += p; k++; } if (k) { sfx('coin'); save(); checkAch(); } else sfx('no'); rerender(); };
       for (const c in CATS) {
@@ -4224,7 +4245,7 @@ function netInit() {
       const d = snap.exists ? snap.data() : null;
       if (d && typeof d.save === 'string' && (+d.ts || 0) > (S.ts || 0)) {
         const j = JSON.parse(d.save);
-        if (j && j.v === 1 && j.created && !MT) { S = Object.assign(newSave(), j); saveLocal(); toast('PLAYER LOADED', S.name + ' · from your account'); if ($('title').style.display === 'flex') uiTitle(); else if (W) { worldPlayerRig(); uiHud(); } }
+        if (j && j.v === 1 && j.created && !MT) { S = Object.assign(newSave(), j); slotsInit(); saveLocal(); toast('PLAYER LOADED', S.name + ' · from your account'); if ($('title').style.display === 'flex') uiTitle(); else if (W) { worldPlayerRig(); uiHud(); } }
       } else if (S.created) cloudSave();
     } catch (e) { }
   }).catch(() => { });
@@ -5215,7 +5236,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s) => startShot(p, s), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s) => startShot(p, s), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera); window.__info = () => { let m = 0, s = 0, t = 0; scene.traverse(o => { if (o.isSprite) s++; else if (o.isMesh) m++; }); return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, meshes: m, sprites: s }; };
   // test hook: draw the player in one pose and hand back the frame

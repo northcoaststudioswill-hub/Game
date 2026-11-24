@@ -104,8 +104,8 @@ function capBars(build, attrs) {
   }
   return h;
 }
-function uiBuilder() {
-  const T = { name: S.name === 'ROOKIE' ? '' : S.name, build: JSON.parse(JSON.stringify(S.build)), hair: S.worn.hair };
+function uiBuilder(opts) {
+  opts = opts || {}; const T = { name: S.name === 'ROOKIE' ? '' : S.name, build: JSON.parse(JSON.stringify(S.build)), hair: S.worn.hair };
   document.body.dataset.state = 'create'; studioScene();
   const rig = () => studioRig({ build: T.build, worn: Object.assign({}, S.worn, { hair: T.hair }) });
   const lbs = () => Math.round(150 + (T.build.body.h - 67) * 5.6 + T.build.body.w * 32);
@@ -126,8 +126,8 @@ function uiBuilder() {
     h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
       const nm = ($('bname').value || '').trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
-      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for VC.', 'rank');
-    })}</div>`;
+      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); if (opts.prev !== undefined) toast('NEW BUILD', `${S.name} is on the Block. Switch builds in MY PLAYER → BUILDS.`, 'rank'); else toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for VC.', 'rank');
+    })}${opts.prev !== undefined ? Btn('CANCEL', () => { S.slots.splice(S.slot, 1); S.slot = opts.prev; slotLoad(S.slots[opts.prev]); save(); uiClose(); enterWorld('hub', 0, 9, Math.PI); }, 'alt') : ''}</div>`;
     return h;
   }, 'side', () => { });
   function upd() { $('lw').textContent = lbs() + ' lbs'; $('ls').textContent = fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5)); $('capbox').innerHTML = capBars(T.build); rig(); }
@@ -143,11 +143,20 @@ function header() {
 }
 function uiPlayer(tab) {
   const st = { tab: tab || 'attrs' };
-  const tabs = [['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
+  const tabs = [['builds', 'BUILDS'], ['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
   openPanel(() => {
     UI.cur.live = st.tab === 'crew';
     let h = `<div class="ph"><h2>MY PLAYER</h2>${Btn('✕', uiClose, 'alt sm')}</div>` + header() + `<div class="tabs">` + tabs.map(t => Btn(t[1], () => { st.tab = t[0]; sfx('ui'); rerender(true); }, st.tab === t[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb">`;
-    if (st.tab === 'attrs') {
+    if (st.tab === 'builds') {
+      h += `<p class="mu" style="margin:2px 0 8px">Up to ${MAX_SLOTS} builds. Each has its own body, attributes, badges, moves and fit. VC, Respect, the drip and moves you own, and your crib are shared. Online games use the active build.</p>`;
+      S.slots[S.slot] = slotSnap();
+      if (S.devBak) h += `<p class="warn">Dev Room maxed player is on. Restore your real player in the Dev Room before switching builds.</p>`;
+      S.slots.forEach((t, i) => { const on = i === S.slot, st2 = STYLE[t.build.style] || {};
+        h += `<div class="card"${on ? ' style="border-color:var(--go)"' : ''}><div class="row"><div><b>${t.name}</b> <span class="mu">· ${st2.n || ''} · ${fmtH(t.build.body.h)} · OVR ${ovrOf(Object.keys(t.attrs).length ? t.attrs : startAttrs(t.build))}</span>${on ? ' <span class="tag on">ACTIVE</span>' : ''}</div><div>`
+          + (on ? '' : Btn('PLAY AS', () => { if (slotSwitch(i)) { sfx('unlock'); toast('BUILD SWITCHED', 'You are ' + S.name + ' now.'); if (W && W.me) { worldPlayerRig(); if (typeof netBuildChanged === 'function') netBuildChanged(); } } rerender(); }, 'sm') + ' ' + Btn('DELETE', () => { if (confirm('Delete ' + t.name + '? This cannot be undone.')) { slotDelete(i); sfx('no'); rerender(); } }, 'alt sm'))
+          + `</div></div></div>`; });
+      if (S.slots.length < MAX_SLOTS) h += Btn('+ NEW BUILD', () => { if (MT) return; const prev = S.slot, i = slotNew(); if (i < 0) return; S.slot = i; slotLoad(S.slots[i]); uiClose(); uiBuilder({ prev }); });
+    } else if (st.tab === 'attrs') {
       const caps = capsFor(S.build), bf = buffTotals();
       const buy = (id, n) => { let c = 0, k = 0; for (let i = 0; i < n && S.attrs[id] < caps[id]; i++) { const p = attrCost(S.attrs[id]); if (S.vc < p) break; S.vc -= p; S.attrs[id]++; c += p; k++; } if (k) { sfx('coin'); save(); checkAch(); } else sfx('no'); rerender(); };
       for (const c in CATS) {

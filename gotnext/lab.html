@@ -149,7 +149,7 @@ function capsFor(build) {
   return out;
 }
 function startAttrs(build) { const c = capsFor(build), o = {}; for (const a of ATTRS) o[a.id] = Math.max(30, Math.round(c[a.id] * 0.60)); return o; }
-function attrCost(v) { return Math.round(6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16); }   // VC for +1 from v
+function attrCost(v) { const b = 6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16; return Math.round(b * (1 + Math.pow(Math.max(0, v - 55) / 13, 1.6))); }   // VC for +1 from v: cheap early, steep near the top (maxing a build is weeks of play, not one night)
 const OVR_W = { layup: 1, dunk: .7, close: .7, mid: 1, three: 1.2, iq: .8, handle: 1.1, pass: .8, swb: .8, perd: 1, intd: .7, steal: .8, block: .7, reb: .8, speed: 1, accel: 1, str: .6, vert: .7, stam: .6 };
 function ovrOf(attrs) {
   // best 12 weighted, so specialists are not punished for dump stats
@@ -552,11 +552,23 @@ function newSave() {
   };
 }
 function loadSave() {
-  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); return; } } catch (e) { }
-  S = newSave();
+  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); return; } } catch (e) { }
+  S = newSave(); slotsInit();
 }
 function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
-function save() { S.ts = Date.now(); saveLocal(); cloudSave(); }
+function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
+// ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
+// fit; VC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
+const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb'];
+const cloneJ = o => JSON.parse(JSON.stringify(o));
+function slotSnap() { const mv = {}; for (const k of MOVE_SLOTS) mv[k] = S.moves[k]; return cloneJ({ name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, bp: S.bp, bxp: S.bxp, moves: mv, worn: S.worn, anim: S.anim || null, made: S.created }); }
+function slotLoad(t) { const d = newSave(); S.name = t.name || d.name; S.build = cloneJ(t.build || d.build); S.attrs = cloneJ(t.attrs || {}); S.badges = cloneJ(t.badges || {}); S.bp = cloneJ(t.bp || d.bp); S.bxp = cloneJ(t.bxp || d.bxp);
+  for (const k of MOVE_SLOTS) S.moves[k] = t.moves && S.moves.owned.includes(t.moves[k]) ? t.moves[k] : d.moves[k]; S.worn = Object.assign({}, d.worn, t.worn || {}); for (const s in S.worn) if (s !== 'hair' && S.worn[s] && !S.owned.includes(S.worn[s]) && S.worn[s] !== d.worn[s]) S.worn[s] = d.worn[s];
+  S.anim = t.anim || null; if (!Object.keys(S.attrs).length) S.attrs = startAttrs(S.build); }
+function slotsInit() { if (!Array.isArray(S.slots) || !S.slots.length) { S.slots = [slotSnap()]; S.slot = 0; } S.slot = Math.max(0, Math.min(S.slots.length - 1, S.slot | 0)); S.slots = S.slots.slice(0, MAX_SLOTS); }
+function slotSwitch(i) { if (i === S.slot || !S.slots[i] || S.devBak) return false; S.slots[S.slot] = slotSnap(); S.slot = i; slotLoad(S.slots[i]); save(); return true; }
+function slotNew() { if (S.slots.length >= MAX_SLOTS || S.devBak) return -1; S.slots[S.slot] = slotSnap(); const d = newSave(); S.slots.push({ name: 'ROOKIE', build: d.build, attrs: {}, badges: {}, bp: d.bp, bxp: d.bxp, moves: {}, worn: d.worn, made: false }); return S.slots.length - 1; }
+function slotDelete(i) { if (i === S.slot || !S.slots[i] || S.slots.length < 2) return false; S.slots.splice(i, 1); if (i < S.slot) S.slot--; save(); return true; }
 function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v + (typeof homeFx === 'function' ? homeFx(k) : 0); }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }

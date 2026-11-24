@@ -36,7 +36,7 @@ function netInit() {
       const d = snap.exists ? snap.data() : null;
       if (d && typeof d.save === 'string' && (+d.ts || 0) > (S.ts || 0)) {
         const j = JSON.parse(d.save);
-        if (j && j.v === 1 && j.created && !MT) { S = Object.assign(newSave(), j); saveLocal(); toast('PLAYER LOADED', S.name + ' · from your account'); if ($('title').style.display === 'flex') uiTitle(); else if (W) { worldPlayerRig(); uiHud(); } }
+        if (j && j.v === 1 && j.created && !MT) { S = Object.assign(newSave(), j); slotsInit(); saveLocal(); toast('PLAYER LOADED', S.name + ' · from your account'); if ($('title').style.display === 'flex') uiTitle(); else if (W) { worldPlayerRig(); uiHud(); } }
       } else if (S.created) cloudSave();
     } catch (e) { }
   }).catch(() => { });
