@@ -1482,11 +1482,11 @@ function personGeo(o){const sk=o.skin||0xf0c8a0,p=[],legc=o.legs||o.coat;
   p.push(pt(Cyl(.21,o.robe?.42:o.dress?.36:.27,o.robe?.86:.54,8),o.coat,M(0,o.robe?.43:.57,0)));
   for(const s of[-1,1]){if(o.tpose){p.push(pt(Box(.46,.14,.14),o.coat,M(s*.5,.78,0)),pt(Box(.12,.12,.12),sk,M(s*.79,.78,0)));continue;}const up=o.armUp&&s>0;p.push(pt(Box(.14,.42,.14),o.coat,M(s*(up?.4:.33),up?1:.6,0,0,0,up?-s*2.5:s*.2)));p.push(pt(Box(.13,.11,.13),sk,M(s*(up?.52:.38),up?1.22:.35,0)));}
   p.push(pt(Sph(.29,10,8),sk,M(0,1.12,0)),pt(Box(.08,.11,.04),0x111111,M(-.13,1.14,.27)),pt(Box(.08,.11,.04),0x111111,M(.13,1.14,.27)));
-  const dome=(r,c,y)=>pt(new THREE.SphereGeometry(r,10,6,0,TAU,0,Math.PI/2),c,M(0,y,0));
-  if(o.cap)p.push(dome(.325,o.cap,1.15),pt(Box(.48,.05,.3),o.cap,M(0,1.17,.34)));
-  if(o.hair)p.push(dome(.32,o.hair,1.13),pt(Box(.6,.2,.1),o.hair,M(0,1.12,-.24)));
+  const dome=(r,c,y)=>pt(new THREE.SphereGeometry(r,10,6,0,TAU,0,Math.PI/2),c,M(0,y,0,0,0,0,1,.85,1));
+  if(o.cap)p.push(dome(.3,o.cap,1.2),pt(Box(.46,.05,.28),o.cap,M(0,1.22,.33)));
+  if(o.hair)p.push(dome(.3,o.hair,1.2),pt(Box(.56,.24,.1),o.hair,M(0,1.15,-.24)));
   if(o.beard)p.push(pt(Box(.4,.16,.14),o.beard,M(0,.94,.22)),pt(Box(.08,.22,.3),o.beard,M(-.24,1,.08)),pt(Box(.08,.22,.3),o.beard,M(.24,1,.08)));
-  if(o.bun)p.push(pt(Sph(.2,8,6),o.hair,M(0,1.3,-.26)),pt(Box(.09,.34,.26),o.hair,M(-.29,1.04,0)),pt(Box(.09,.34,.26),o.hair,M(.29,1.04,0)));
+  if(o.bun)p.push(pt(Sph(.2,8,6),o.hair,M(0,1.3,-.26)),pt(Box(.09,.34,.22),o.hair,M(-.29,1.04,-.04)),pt(Box(.09,.34,.22),o.hair,M(.29,1.04,-.04)));
   (o.extra||[]).forEach(e=>p.push(e));return merge(p);}
 const CAST={
   will:{coat:0x3f8a52,legs:0x3c4a66,cap:0xd8a030,extra:[pt(Box(.6,.14,.1),0x5e3c22,M(0,1.08,-.25)),pt(Box(.46,.03,.3),0x9aa0aa,M(0,.6,.36)),pt(Box(.46,.28,.03),0x9ffcff,M(0,.74,.5,-.3))]},
@@ -6700,6 +6700,67 @@ dvcRender=function(){const el=DVC.el;if(!el)return;const inGame=S.mode!=='title'
 // skip hints mention holding
 movShow=(function(ms){return function(k){ms(k);const s=MOV.el&&MOV.el.querySelector('.skip');if(s)s.textContent='tap: next · hold or Esc: skip';};})(movShow);
 opnShow=(function(os){return function(k){os(k);const s=MOV.el&&MOV.el.querySelector('.skip');if(s)s.textContent='tap: next · hold or Esc: skip the intro';};})(opnShow);
+/* ================= ACT 58: KING BIBI, REMASTERED. A new model (swept silver hair that stays out of his eyes, brows, a nose, a proper suit, a royal cape, the crown up on top) and two new podiums at his height, with mics, teleprompters, a crown seal, a backdrop and an applause sign. Everyone's hair now sits above their eyes. ================= */
+const BIBI={look:{coat:0x14204a,legs:0x14204a,skin:0xe6b48e,extra:[
+  // shirt, lapels, tie
+  pt(Box(.2,.34,.03),0xffffff,M(0,.7,.262)),pt(Box(.06,.3,.04),0xc8102e,M(0,.68,.272)),pt(Box(.08,.06,.045),0xa00c24,M(0,.83,.274)),pt(Box(.08,.3,.03),0x0c1636,M(-.1,.7,.26,0,0,-.25)),pt(Box(.08,.3,.03),0x0c1636,M(.1,.7,.26,0,0,.25)),
+  pt(Box(.04,.04,.03),0xffd400,M(-.15,.78,.265)),
+  // the cape: royal red with gold trim, hanging off the shoulders
+  pt(Box(.62,.78,.05),0xa80c1e,M(0,.5,-.28,.12,0,0)),pt(Box(.64,.06,.07),0xffd400,M(0,.88,-.25)),pt(Box(.06,.78,.06),0xffd400,M(-.31,.5,-.28,.12,0,0)),pt(Box(.06,.78,.06),0xffd400,M(.31,.5,-.28,.12,0,0)),
+  // face: brows, nose, a confident mouth
+  pt(Box(.13,.035,.04),0x8a8a90,M(-.13,1.215,.272,0,0,.12)),pt(Box(.13,.035,.04),0x8a8a90,M(.13,1.215,.272,0,0,-.12)),pt(Box(.07,.1,.08),0xd8a07e,M(0,1.08,.3)),pt(Box(.16,.03,.03),0x8a4a3a,M(0,.99,.28)),
+  // hair: swept back, parted on his left, sitting on the top and back of the head, clear of the eyes
+  pt(Box(.5,.12,.44),0xe8e8ee,M(.02,1.36,-.02,-.12,0,-.05)),pt(Box(.3,.1,.3),0xf4f4f8,M(.12,1.42,.02,-.1,0,-.18)),pt(Box(.56,.26,.12),0xe0e0e6,M(0,1.2,-.24)),pt(Box(.06,.16,.2),0xd8d8de,M(-.29,1.2,-.04)),pt(Box(.06,.16,.2),0xd8d8de,M(.29,1.2,-.04)),
+  // the crown, up on top of the hair, a little tilted
+  pt(Cyl(.17,.19,.12,10),0xffd400,M(-.03,1.53,-.02,0,0,.08)),...[0,1,2,3,4].map(k=>pt(Cone(.045,.15,4),0xffd400,M(-.03+Math.cos(k/5*TAU)*.14,1.66,-.02+Math.sin(k/5*TAU)*.14))),pt(Sph(.035,6,5),0xc8102e,M(-.03,1.56,.17))]}};
+Object.assign(CAST.bibi,{hair:0,cap:0},BIBI.look);if(CAST.bibi2)Object.assign(CAST.bibi2,{hair:0,cap:0},BIBI.look);
+// the shared hair and caps sit above the eyes now
+// (personGeo is patched in place below, so new models build right)
+
+// rebuild every NPC already standing in the world with the fixed hair
+Object.keys(npcs).forEach(id=>{const n=npcs[id];if(!CAST[id]||!n.m||!n.m.geometry)return;try{const g=personGeo(CAST[id]);n.m.geometry.dispose();n.m.geometry=g;}catch(e){}});
+// ---- a podium builder: his height, angled front, crown seal, three mics, two teleprompter panes
+function bibiPodium(){const p=[],W=0xffffff,G=0xffd400,N=0x14204a,D=0x5a3a22;
+  p.push(pt(Box(1.9,1.7,1.1),0x7a4a28,M(0,.85,0)),pt(Box(2.2,.14,1.4),D,M(0,1.76,0)),pt(Box(2.1,.12,.16),G,M(0,1.62,.58)),pt(Box(2.1,.12,.16),G,M(0,.12,.58)));
+  // the seal: a gold ring, a navy disc, a little crown
+  p.push(pt(Cyl(.5,.5,.06,20),G,M(0,.95,.57,Math.PI/2)),pt(Cyl(.42,.42,.07,20),N,M(0,.95,.58,Math.PI/2)),pt(Box(.42,.12,.04),G,M(0,.86,.62)),...[-1,0,1].map(k=>pt(Cone(.07,.2,4),G,M(k*.15,1.0,.62))));
+  // mics
+  for(const s of[-.35,0,.35])p.push(pt(Cyl(.025,.025,.55,5),0x222222,M(s,2.02,.2,.5)),pt(Sph(.08,8,6),0x111111,M(s,2.27,.36)));
+  // teleprompters: thin poles, tilted glass
+  for(const s of[-1,1])p.push(pt(Cyl(.04,.04,2.2,6),0x333340,M(s*2,1.1,.8)),pt(Box(.7,.5,.03),0x9fe8ff,M(s*2,2.3,.8,-.5,s*-.5,0)));
+  return merge(p);}
+function bibiBackdrop(lines){const cv=document.createElement('canvas');cv.width=512;cv.height=256;const g=cv.getContext('2d');const gr=g.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#1e2c6a');gr.addColorStop(1,'#0c1636');g.fillStyle=gr;g.fillRect(0,0,512,256);
+  g.font='900 26px Impact,Arial Black,sans-serif';g.textAlign='center';g.fillStyle='rgba(255,212,0,.18)';for(let y=20;y<256;y+=40)for(let x=(y/40%2)*64;x<520;x+=128)g.fillText('👑',x,y);
+  g.fillStyle='#ffd400';g.font='900 52px Impact,Arial Black,sans-serif';g.fillText(lines[0],256,118);g.fillStyle='#ffffff';g.font='700 24px system-ui,sans-serif';g.fillText(lines[1],256,160);g.strokeStyle='#ffd400';g.lineWidth=6;g.strokeRect(8,8,496,240);
+  return new THREE.MeshLambertMaterial({map:new THREE.CanvasTexture(cv)});}
+function applause(){const cv=document.createElement('canvas');cv.width=256;cv.height=64;const g=cv.getContext('2d');const t=new THREE.CanvasTexture(cv);const m=new THREE.Mesh(new THREE.PlaneGeometry(3,.75),new THREE.MeshBasicMaterial({map:t,transparent:true}));
+  m.userData.draw=on=>{g.fillStyle=on?'#ff2020':'#401010';g.fillRect(0,0,256,64);g.fillStyle=on?'#fff':'#a06060';g.font='900 40px Impact,Arial Black,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('APPLAUSE',128,34);t.needsUpdate=true;};m.userData.draw(false);return m;}
+const BBP={signs:[],spots:[]};
+(function(){const old=[];scene.traverse(o=>{if(!o.isMesh||!o.geometry)return;const P=o.position;if(Math.abs(P.x-(PR.x+2.2))<.01&&Math.abs(P.z-(PR.z-.5))<.01)old.push(o);});old.forEach(o=>o.visible=false);
+  for(let k=colliders.length-1;k>=0;k--){const c=colliders[k];if(Math.abs(c.x-(PR.x+2.2))<.01&&Math.abs(c.z-(PR.z-.5))<.01)colliders.splice(k,1);}
+  const ry=1.33,fx=Math.sin(ry),fz=Math.cos(ry),gy=groundH(PR.x,PR.z),px=PR.x+fx*1.5,pz=PR.z+fz*1.5;
+  const pod=new THREE.Mesh(bibiPodium(),lam);pod.position.set(px,gy,pz);pod.rotation.y=ry;scene.add(pod);colliders.push({x:px,z:pz,r:1.1,top:gy+1.8});
+  const bx=PR.x-fx*2.6,bz=PR.z-fz*2.6,bd=new THREE.Mesh(new THREE.PlaneGeometry(11,5.5),bibiBackdrop(['NEXT QUESTION','KING BIBI · PRESS CONFERENCE #4,207']));bd.position.set(bx,gy+3.4,bz);bd.rotation.y=ry;scene.add(bd);
+  const fr=new THREE.Mesh(merge([pt(Box(11.6,.4,.3),0xffd400,M(0,6.35,0)),pt(Box(.3,6.4,.3),0xffd400,M(-5.65,3.2,0)),pt(Box(.3,6.4,.3),0xffd400,M(5.65,3.2,0))]),lam);fr.position.set(bx-fx*.1,gy,bz-fz*.1);fr.rotation.y=ry;scene.add(fr);
+  const carpet=new THREE.Mesh(new THREE.PlaneGeometry(3,9),new THREE.MeshLambertMaterial({color:0xa80c1e}));carpet.rotation.set(-Math.PI/2,0,ry);carpet.position.set(PR.x+fx*4.5,gy+.04,PR.z+fz*4.5);scene.add(carpet);
+  const ap=applause();ap.position.set(bx,gy+6.9,bz);ap.rotation.y=ry;scene.add(ap);BBP.signs.push(ap);
+  const n=npcs.bibi;if(n){n.g.position.set(PR.x,gy,PR.z);n.x=PR.x;n.z=PR.z;n.ry=ry;n.g.rotation.y=ry;const i=facers.indexOf(n);if(i>=0)facers.splice(i,1);BBP.a=n;}})();
+(function(){const A=ABY.elect;if(!A)return;const gy=A.gy||groundH(A.x,A.z);
+  // the old merged stage had the podium baked in: rebuild the stage without it
+  let st=null;scene.traverse(o=>{if(o.isMesh&&Math.abs(o.position.x-A.x)<.01&&Math.abs(o.position.z-A.z)<.01&&Math.abs(o.position.y-gy)<.01&&o.geometry&&o.geometry.attributes.position.count>200&&!st)st=o;});
+  if(st){st.visible=false;const s2=new THREE.Mesh(merge([pt(Cyl(16,16.4,.5,36),0x1e2c5a,M(0,.25,0)),pt(Box(12,1.2,5),0x24304c,M(0,.6,-8)),pt(Box(4,1,1.6),0x6a4434,M(6,.9,4)),...[0,1,2,3,4,5].map(k=>pt(Box(14,.4,.4),k%2?0xffffff:0x2a6ad8,M(0,9.5+k*.4,-12)))]),lam);s2.position.copy(st.position);scene.add(s2);}
+  for(let k=colliders.length-1;k>=0;k--){const c=colliders[k];if(Math.abs(c.x-A.x)<.01&&Math.abs(c.z-(A.z-7))<.01)colliders.splice(k,1);}
+  const top=gy+1.2,pod=new THREE.Mesh(bibiPodium(),lam);pod.position.set(A.x,top,A.z-5.4);scene.add(pod);colliders.push({x:A.x,z:A.z-5.4,r:1.1,top:top+1.8});
+  const n=npcs.bibi2;if(n){n.g.position.set(A.x,top,A.z-6.9);n.x=A.x;n.z=A.z-6.9;n.y=top;n.ry=0;n.g.rotation.y=0;const i=facers.indexOf(n);if(i>=0)facers.splice(i,1);BBP.b=n;for(const c of colliders)if(Math.abs(c.x-A.x)<.01&&Math.abs(c.z-(A.z-5.6))<.01){c.z=A.z-6.9;c.top=top+3.6;}}
+  platforms.push({x:A.x,z:A.z-7,r:3.2,top});
+  const ap=applause();ap.position.set(A.x,gy+8.6,A.z-9.9);scene.add(ap);BBP.signs.push(ap);
+  // two spotlights on him
+  for(const s of[-1,1]){const c=new THREE.Mesh(new THREE.ConeGeometry(2.2,9,16,1,true),new THREE.MeshBasicMaterial({color:0xfff2b0,transparent:true,opacity:.12,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));c.position.set(A.x+s*3,top+4.5,A.z-5);c.rotation.z=s*.35;c.rotation.x=-.25;scene.add(c);BBP.spots.push(c);}})();
+// he sways a little behind the podium, the applause sign blinks, and he says his line
+{const au=act7Update;let t=0;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);const T=S.t;
+  [BBP.a,BBP.b].forEach((n,k)=>{if(!n)return;n.g.rotation.y=n.ry+Math.sin(T*.7+k)*.18;n.m.rotation.z=Math.sin(T*1.3+k)*.04;});
+  t-=dt;if(t<=0){t=.5;const on=Math.floor(T*1.6)%2===0;BBP.signs.forEach(s=>s.userData.draw(on));
+    if(play&&Math.random()<.08)[BBP.a,BBP.b].forEach(n=>{if(n&&Math.hypot(PL.x-n.x,PL.z-n.z)<24)bubble(pick(['NEXT QUESTION.','I HAVE WON. AGAIN.','RECOUNT. OF MY MARGIN.','NO FURTHER QUESTIONS. THERE WERE NONE.','THE POLLS LOVE ME. I AM THE POLLS.']),n.x,n.y+4.6,n.z);});}};}
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
 ['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
 /* ================= main loop ================= */
@@ -6714,7 +6775,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={BBP,PR,audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
