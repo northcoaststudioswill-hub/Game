@@ -5546,7 +5546,7 @@ function opnMusic(){if(!AU.ctx||AU.muted||!MOV.on)return;const now=AU.ctx.curren
 // the opening plays on boot-up and (if it has not been seen) after the boot-up text on a new game
 {const ri=runIntro;runIntro=function(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}ri(()=>MOV.seen?done():movieRun(done));};}
 // the trailer plays on boot-up, straight after the studio splash and before the title screen
-if(location.hash!=='#test'&&!(DEV.on&&DEV.skip)){const iv=setInterval(()=>{if($('splash'))return;clearInterval(iv);if(S.mode==='title'&&!$('intro')&&!$('ctlcard')&&!MOV.seen)movieRun(()=>{NAV.reset();});},150);}
+if(location.hash!=='#test'&&!(DEV.on&&DEV.skip)){MOV.bootHide=true;$('title').hidden=true;const iv=setInterval(()=>{const sp=$('splash');if(sp&&sp.style.opacity!=='0')return;clearInterval(iv);MOV.bootHide=false;if(S.mode==='title'&&!$('intro')&&!$('ctlcard')&&!MOV.seen){$('title').hidden=false;movieRun(()=>{NAV.reset();});}else if(S.mode==='title')$('title').hidden=false;},50);}
 (function(){const m=document.querySelector('#title .menu');if(!m)return;const b=document.createElement('button');b.id='tMov';b.textContent='🎬 WATCH THE TRAILER';m.insertBefore(b,$('tCred'));b.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();},'trailer');};const o=document.createElement('button');o.id='tOpn';o.textContent='📼 WATCH THE INTRO';m.insertBefore(o,b);o.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();});};})();
 
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
