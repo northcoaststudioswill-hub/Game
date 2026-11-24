@@ -83,6 +83,12 @@ How the timing was made: the song runs at about 137 beats a minute and the lyric
 bar (3.50 seconds). The grid is anchored where the bass comes back in at 28.45 s, and the sheet's section
 boundaries then land on the track's own breaks at 14.4, 56.4, 126.4 and 168.3 seconds.
 
+**The grid is wrong against the vocal** (Will, 24 Nov). To fix it, open `index.html` and press **⏱ time it
+yourself**: the song plays and you tap once at the start of each line. Your times are used straight away, kept in
+that browser, and can be copied out to be saved into the two timing files here. Each line in the list also has
+−0.1s / +0.1s buttons. Timing from the vocal by speech recognition was tried and could not be run in the build
+session.
+
 **Not checked by ear.** Nobody has listened to it against the track, and it was not transcribed from the vocal, so
 a line could sit early or late inside its bar, and the last 17 seconds (after 3:02) have no lines on the sheet.
 `index.html` has "lyrics −¼s / +¼s" buttons for checking it.

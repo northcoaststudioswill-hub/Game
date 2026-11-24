@@ -13,6 +13,7 @@
 :root{color-scheme:dark;--bg:#0a0612;--ink:#12021f;--paper:#fff8e7;--hot:#ff2e88;--lime:#b6ff00;--led:#4fb4ff;--gold:#ffd400;
   --display:Impact,'Arial Black',system-ui,sans-serif;--body:system-ui,-apple-system,'Segoe UI',sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}
 html,body{height:100%}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--paper);font:700 13px/1.3 var(--body);overflow:hidden}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
 #top{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:calc(12px + env(safe-area-inset-top,0px));letter-spacing:.08em;pointer-events:none}
@@ -35,17 +36,28 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--led)}
 #list button.ln span:first-child,#list button.ln span:nth-child(2){font-family:var(--mono);font-variant-numeric:tabular-nums;opacity:.7}
 #list button.ln small{grid-column:3;font:500 10px var(--mono);opacity:.55}#list button.ln.cur{background:rgba(79,180,255,.22)}
 #list .x{position:sticky;top:0;float:right}
+#list .nu{display:flex;gap:4px;justify-content:flex-end;margin:-2px 0 4px}#list .nu button{padding:2px 8px;font-size:11px;border-width:1px}
+#tapper{position:fixed;inset:0;z-index:8;background:rgba(10,6,18,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px));box-sizing:border-box}
+#tapper h2{margin:0;font:400 22px var(--display);letter-spacing:.08em;color:var(--led)}#tapper p{margin:0;max-width:34em;font-weight:500;opacity:.8}
+#tapper .nx{font:400 clamp(22px,5vw,44px)/1.15 var(--display);color:var(--paper);text-shadow:3px 3px 0 var(--hot);min-height:2.4em;text-wrap:balance}#tapper .af{font:500 13px var(--body);opacity:.6;min-height:1.4em}
+#tapbtn{font:400 clamp(28px,7vw,54px) var(--display);letter-spacing:.06em;padding:26px 40px;border-radius:20px;background:var(--lime);color:var(--ink);border-color:var(--lime);width:min(520px,100%)}#tapbtn:active{background:var(--gold)}
+#tapper textarea{width:min(520px,100%);height:120px;font:12px var(--mono);background:#12021f;color:var(--paper);border:2px solid var(--led);border-radius:8px;padding:8px;box-sizing:border-box}
+#mine{font:600 11px var(--mono);color:var(--gold)}
 @media (max-width:560px){#top span{display:none}}
 </style>
 <canvas id="c"></canvas>
 <div id="top"><b>LIL BOTTIE</b><span>asset v0.5 · The Algorithm, line by line · drag to turn him</span></div>
 <div id="lyric"><i id="sec"></i><b id="line"></b><u id="what"></u></div>
 <div id="ui">
-  <div class="row"><button class="go" id="play">▶ The Algorithm</button><button id="prev" aria-label="Previous line">⏮ line</button><button id="next" aria-label="Next line">line ⏭</button><span id="clock">0:00.0 / 3:20</span><button id="lines">☰ all 52 lines</button></div>
+  <div class="row"><button class="go" id="play">▶ The Algorithm</button><button id="prev" aria-label="Previous line">⏮ line</button><button id="next" aria-label="Next line">line ⏭</button><span id="clock">0:00.0 / 3:20</span><button id="lines">☰ all 52 lines</button><button id="tap">⏱ time it yourself</button></div>
   <div id="bar" role="slider" aria-label="Song position" tabindex="0"><u></u></div>
-  <div class="row"><button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span><button id="slow">½ speed</button>
+  <div class="row"><button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span><span id="mine"></span><button id="slow">½ speed</button>
     <select id="poseSel" aria-label="Pose"></select><select id="faceSel" aria-label="Face"></select><button id="auto" class="on">follow the song</button></div>
 </div>
+<div id="tapper" hidden><h2>TIME THE LYRICS</h2><p id="taphelp">The song plays from the start. Tap the big button (or press Space) the moment he <b>starts</b> each line. Wrong tap? Use undo.</p>
+  <div class="af" id="tapprog"></div><div class="nx" id="tapnext"></div><div class="af" id="tapafter"></div>
+  <button id="tapbtn">TAP</button><div class="row"><button id="tapundo">↶ undo last</button><button id="taprestart">⟲ start over</button><button id="tapquit">✕ close</button></div>
+  <textarea id="tapout" hidden readonly aria-label="Your timings"></textarea><div class="row" id="tapdone" hidden><button class="go" id="tapcopy">copy my timings</button><span class="lab" id="tapmsg"></span></div></div>
 <div id="list" hidden><button class="x" id="listx">close ✕</button><h2>THE ALGORITHM</h2><p>Tap a line to jump to it. Tell me the line number and what is off: the timing, the pose, or the face.</p><div id="rows"></div></div>
 <audio id="song" src="songs/algorithm.mp3" preload="none"></audio>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -92,8 +104,25 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--led)}
   $('bar').onclick=function(e){var r=this.getBoundingClientRect();seek((e.clientX-r.left)/r.width*(song.duration||199.97));};
   function lineAt(t){var k=-1;for(var i=0;i<LINES.length;i++){if(LINES[i][0]+offset<=t)k=i;else break;}return k;}
   // ---- the line list
-  (function(){var hh='',sec='';LINES.forEach(function(L,i){if(L[1]!==sec){sec=L[1];hh+='<h3>'+sec.toUpperCase()+'</h3>';}hh+='<button class="ln" data-k="'+i+'"><span>#'+(i+1)+'</span><span>'+fmt(L[0])+'</span><span>'+L[2].replace(/</g,'&lt;')+'</span><small>'+L[3]+' · '+L[4]+' / '+L[5]+(L[6]?' · icon '+L[6]:'')+'</small></button>';});$('rows').innerHTML=hh;
-    $('rows').addEventListener('click',function(e){var b=e.target.closest('.ln');if(b){jump(+b.dataset.k);if(innerWidth<700)$('list').hidden=true;}});})();
+  function buildList(){var hh='',sec='';LINES.forEach(function(L,i){if(L[1]!==sec){sec=L[1];hh+='<h3>'+sec.toUpperCase()+'</h3>';}hh+='<button class="ln" data-k="'+i+'"><span>#'+(i+1)+'</span><span>'+fmt(L[0])+'</span><span>'+L[2].replace(/</g,'&lt;')+'</span><small>'+L[3]+' · '+L[4]+' / '+L[5]+(L[6]?' · icon '+L[6]:'')+'</small></button><div class="nu"><button data-n="'+i+'" data-d="-0.1">−0.1s</button><button data-n="'+i+'" data-d="0.1">+0.1s</button></div>';});$('rows').innerHTML=hh;lastK=-9;}
+  $('rows').addEventListener('click',function(e){var nb=e.target.closest('[data-n]');if(nb){var k=+nb.dataset.n;LINES[k][0]=Math.max(0,Math.round((LINES[k][0]+ +nb.dataset.d)*100)/100);store();buildList();jump(k);return;}var b=e.target.closest('.ln');if(b){jump(+b.dataset.k);if(innerWidth<700)$('list').hidden=true;}});
+  // ---- your own timing: kept in this browser, and copyable so it can be sent back
+  var GRID=LINES.map(function(L){return L[0];});
+  function times(){return LINES.map(function(L){return L[0];});}
+  function store(){try{localStorage.setItem('lb-algorithm-timing',JSON.stringify(times()));}catch(e){}mineLabel(true);}
+  function mineLabel(on){$('mine').innerHTML=on?'using your timing · <a href="#" id="resetT" style="color:inherit">reset</a>':'';var r=$('resetT');if(r)r.onclick=function(e){e.preventDefault();LINES.forEach(function(L,i){L[0]=GRID[i];});try{localStorage.removeItem('lb-algorithm-timing');}catch(x){}mineLabel(false);buildList();};}
+  try{var sv=JSON.parse(localStorage.getItem('lb-algorithm-timing')||'null');if(sv&&sv.length===LINES.length){sv.forEach(function(t,i){LINES[i][0]=t;});mineLabel(true);}}catch(e){}
+  buildList();
+  var TAP={on:false,n:0,t:[]};
+  function tapShow(){var n=TAP.n,done=n>=LINES.length;$('tapprog').textContent=done?'all 52 lines timed':'line '+(n+1)+' of '+LINES.length+' · '+LINES[Math.min(n,LINES.length-1)][1];$('tapnext').textContent=done?'Done.':LINES[n][2];$('tapafter').textContent=done?'':(LINES[n+1]?'then: '+LINES[n+1][2]:'(last line)');
+    $('tapbtn').hidden=done;$('tapout').hidden=!done;$('tapdone').hidden=!done;if(done){TAP.t.forEach(function(t,i){LINES[i][0]=t;});offset=0;$('off').textContent='offset 0.00s';store();buildList();$('tapout').value='The Algorithm line start times (seconds):\n'+JSON.stringify(TAP.t);$('taphelp').textContent='Saved in this browser: close this and press play to watch it with your timing. Copy the numbers and send them to me to make them permanent.';}}
+  function tapStart(){TAP.on=true;TAP.n=0;TAP.t=[];$('tapper').hidden=false;$('list').hidden=true;$('taphelp').innerHTML='The song plays from the start. Tap the big button (or press Space) the moment he <b>starts</b> each line. Wrong tap? Use undo.';setFollow(true);song.playbackRate=1;$('slow').className='';started=true;song.currentTime=0;play();tapShow();}
+  function tapHit(){if(!TAP.on||TAP.n>=LINES.length)return;TAP.t.push(Math.max(0,Math.round((song.currentTime-.08)*100)/100));TAP.n++;tapShow();}   // 0.08 s taken off for the reach of a thumb
+  $('tap').onclick=tapStart;$('tapbtn').addEventListener('pointerdown',function(e){e.preventDefault();tapHit();});
+  $('tapundo').onclick=function(){if(!TAP.n)return;TAP.n--;var t=TAP.t.pop();song.currentTime=Math.max(0,t-3);if(song.paused)play();tapShow();};$('taprestart').onclick=tapStart;
+  $('tapquit').onclick=function(){TAP.on=false;$('tapper').hidden=true;lastK=-9;};
+  $('tapcopy').onclick=function(){var ta=$('tapout');function fb(){ta.focus();ta.select();$('tapmsg').textContent='selected: copy it';}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(ta.value).then(function(){$('tapmsg').textContent='copied';},fb);else fb();};
+  addEventListener('keydown',function(e){if(TAP.on&&e.code==='Space'){e.preventDefault();if(!e.repeat)tapHit();}});
   $('lines').onclick=function(){$('list').hidden=!$('list').hidden;};$('listx').onclick=function(){$('list').hidden=true;};
   function size(){var w=innerWidth,hh=innerHeight;R.setSize(w,hh,false);cam.aspect=w/hh;cam.fov=w<hh?56:42;cam.updateProjectionMatrix();$('lyric').style.bottom=($('ui').offsetHeight+22)+'px';}addEventListener('resize',size);size();
   var t0=performance.now(),last=t0;(function loop(now){requestAnimationFrame(loop);var t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;var playing=started&&!song.paused;if(auto){if(playing)yaw=Math.sin(t*.22)*.7;else yaw+=dt*.35;}
@@ -107,7 +136,7 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--led)}
         if(follow&&!(L&&L[6]&&ct-lineT0<=.9))B.setMouth(L?lvl:0);ring.material.color.setHSL((t*.2)%1,1,.55);floorM.color.setScalar(.42+lvl*.3);}}
     B.update(t,dt,playing?song.currentTime-28.45+offset:undefined);
     cam.position.set(Math.sin(yaw)*Math.cos(pitch)*dist,1.9+Math.sin(pitch)*dist,Math.cos(yaw)*Math.cos(pitch)*dist);cam.lookAt(0,1.75,0);R.render(scene,cam);})(t0);
-  window.__lb={B:B,song:song,LINES:LINES,lineAt:lineAt,jump:jump};
+  window.__lb={B:B,song:song,LINES:LINES,lineAt:lineAt,jump:jump,TAP:TAP};
 })();
 </script>
 <!--ARTIFACT-END-->
