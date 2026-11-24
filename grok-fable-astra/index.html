@@ -843,7 +843,18 @@ const AREAS=[
   {id:'pod',x:-67,z:378,r:26,base:2,name:'STALE & UNFIT',sub:'the high value podcast · 3 hours · no edits',hue:.0,lit:.4,col:[.0,.55,.32]},
   {id:'slopc',x:293,z:-246,r:28,base:2,name:'THE SLOP CENTER',sub:'get mogged · get mewed · get maxxed · get glazed',hue:.92,lit:.75,col:[.92,.6,.78]},
   {id:'course',x:-344,z:-125,r:44,base:0,name:'THE SIDEQUEST',sub:'it goes sideways, for once · the floor is slop',hue:.22,lit:.5,col:[.22,.6,.38]},
-  {id:'trench',x:-353,z:135,r:34,base:-18,name:'THE TRENCHES',sub:'gm · it smells in here · not financial advice',hue:.3,lit:.3,col:[.25,.4,.2]}];
+  {id:'trench',x:-353,z:135,r:34,base:-18,name:'THE TRENCHES',sub:'gm · it smells in here · not financial advice',hue:.3,lit:.3,col:[.25,.4,.2]},
+  {id:'wreck',x:375,z:59,r:40,base:2,name:'VAN DOWN · THE CRASH SITE',sub:'a slopflix original docuseries · do not cross',hue:0.0,lit:0.3,col:[0.0, 0.6, 0.28]},
+  {id:'sigma',x:-190,z:329,r:38,base:2,name:'THE SIGMA STAIRCASE',sub:'the grind never stops (the stairs do)',hue:0.7,lit:0.4,col:[0.72, 0.15, 0.4]},
+  {id:'t67',x:73,z:-373,r:38,base:2,name:'THE 67 SPIRE',sub:'six. seven. six seven. up.',hue:0.12,lit:0.55,col:[0.12, 0.8, 0.5]},
+  {id:'mew',x:249,z:287,r:38,base:2,name:'MEWING MOUNTAIN',sub:'tongue on the roof. forever.',hue:0.55,lit:0.55,col:[0.55, 0.35, 0.55]},
+  {id:'throne',x:-173,z:-339,r:38,base:2,name:'THE THRONE TOWER',sub:'porcelain all the way up',hue:0.58,lit:0.8,col:[0.58, 0.2, 0.8]},
+  {id:'corn',x:59,z:375,r:38,base:2,name:'THE OHIO CORN STACK',sub:'only in ohio. only upward.',hue:0.14,lit:0.6,col:[0.14, 0.8, 0.5]},
+  {id:'needle',x:-287,z:249,r:38,base:2,name:'THE AURA NEEDLE',sub:'+1000 aura per floor (not really)',hue:0.8,lit:0.5,col:[0.8, 0.6, 0.5]},
+  {id:'tax',x:-379,z:20,r:38,base:2,name:'THE FANUM TAX OFFICE',sub:'they take a bite at every floor',hue:0.08,lit:0.55,col:[0.07, 0.7, 0.5]},
+  {id:'rizz',x:184,z:-332,r:38,base:2,name:'RIZZ RAMP',sub:'w rizz only past this point',hue:0.93,lit:0.62,col:[0.93, 0.7, 0.62]},
+  {id:'npcesc',x:347,z:-155,r:38,base:2,name:'THE NPC ESCALATOR',sub:'stand right. walk left. think never.',hue:0.0,lit:0.55,col:[0.0, 0.0, 0.55]},
+  {id:'chat',x:322,z:201,r:38,base:2,name:'CHAT IS THIS REAL TOWER',sub:'chat? chat?? chat???',hue:0.6,lit:0.5,col:[0.62, 0.75, 0.55]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
@@ -6033,6 +6044,131 @@ function lbSet(b,pose,eyes,mouth,icon){if(b._p!==pose){b._p=pose;b.setPose(pose)
 {const cm=charModel;charModel=function(id){if(id==='bottie'&&window.LilBottie){const b=LilBottie.build(THREE),g=new THREE.Group();b.group.scale.setScalar(1.9);b.group.rotation.y=Math.PI;g.add(b.group);g.userData.lb=b;b.setPose('idle');b.setFace('smile');return g;}return cm(id);};}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);const m=PCH.m;if(!m||!m.userData.lb)return;const b=m.userData.lb,mv=Math.hypot(PL.vx||0,PL.vz||0)>1;
   lbSet(b,!PL.grounded?'jump':mv?'walk':(S.pose>0?'dab':'idle'),mv?'happy':'happy',mv?'grin':'smile',null);b.update(S.t,dt);m.position.y=0;m.rotation.z=0;};}
+/* ================= ACT 47: THE SLOP STACKS. Ten brainrot towers stood up in the emptiest stretches of the Filler. Spiral up the outside, grab the brainrot bits, summit the top. The Filler shrinks from about 63% of the map to about 50%. ================= */
+const STK={list:[],bits:0};
+(function(){const A47=new THREE.Group();scene.add(A47);
+  // theme: [area id, step colour, pillar colour, bit emoji, top label, top builder]
+  const W=0xffffff,K=0x16102a;
+  const TH=[
+    ['sigma',0x8a7aa8,0x5a4a78,'🗿','SIGMA AT THE TOP',(p,h)=>{p.push(pt(Box(5,6,4.4),0x9a92a8,M(0,h+3.6,0)),pt(Box(5.4,1,1.1),K,M(0,h+4.6,2.3)),pt(Box(2.2,.8,.9),0x9a92a8,M(0,h+2.6,2.6)),pt(Box(5.8,.6,5),0x6a627a,M(0,h+.9,0)));}],
+    ['t67',0xffd400,0xff2e88,'6️⃣','SIX SEVEN',(p,h)=>{p.push(pt(Box(1.4,8,1.4),0xff2e88,M(-2.4,h+4.6,0)),pt(Box(3,1.4,1.4),0xff2e88,M(-1.6,h+8,0)),pt(Box(3,1.4,1.4),0xff2e88,M(-1.6,h+1.2,0)),pt(Box(3,1.4,1.4),0xff2e88,M(-1.6,h+4.4,0)),pt(Box(1.4,3.4,1.4),0xff2e88,M(-.8,h+2.8,0)),pt(Box(3.4,1.4,1.4),0x19e3ff,M(2.6,h+8,0)),pt(Box(1.4,8,1.4),0x19e3ff,M(3.6,h+4.6,0,0,0,-.35)));}],
+    ['mew',0xd8b8a0,0xb89880,'🤫','THE JAWLINE',(p,h)=>{p.push(pt(Box(8,2.2,5),0xe8c8b0,M(0,h+1.6,0)),pt(Box(2.2,4.4,5),0xe8c8b0,M(-3.6,h+4,0,0,0,.18)),pt(Box(2.2,4.4,5),0xe8c8b0,M(3.6,h+4,0,0,0,-.18)),pt(Box(4,1,1),0xff6a8a,M(0,h+3,1.6)));}],
+    ['throne',0xffffff,0xd8e4f0,'🚽','THE THRONE',(p,h)=>{p.push(pt(Cyl(2.2,1.6,2.4,14),W,M(0,h+1.6,0)),pt(Cyl(2.8,2.6,.6,16),W,M(0,h+3,0)),pt(Box(4.6,5,1.4),W,M(0,h+5.6,-2.4)),pt(Box(3.6,1.6,1.8),0xd8e4f0,M(0,h+8.6,-2.4)),pt(Box(.6,.6,.8),0xc8a050,M(1.6,h+7.4,-1.4)));}],
+    ['corn',0xffe14d,0x7ac040,'🌽','THE COB',(p,h)=>{p.push(pt(Cyl(2.2,1.6,9,12),0xffd23a,M(0,h+5.4,0)),pt(Cone(2.2,2.4,12),0xffd23a,M(0,h+11,0)),pt(Box(1.4,7,.6),0x5aa030,M(-2.2,h+4,0,0,0,.3)),pt(Box(1.4,7,.6),0x5aa030,M(2.2,h+4,0,0,0,-.3)));}],
+    ['needle',0xb98cff,0x7a2cff,'✨','THE HALO',(p,h)=>{p.push(pt(Cone(1,12,8),0xffffff,M(0,h+6,0)),pt(Tor(4.4,.5,8,28),0xffd400,M(0,h+10,0,Math.PI/2)),pt(Tor(3,.35,8,24),0x19e3ff,M(0,h+6,0,Math.PI/2)));}],
+    ['tax',0xc87a3a,0x8a4a1a,'🍟','THE TAX DESK',(p,h)=>{p.push(pt(Box(6,1,3.4),0x8a5a2a,M(0,h+2.4,0)),pt(Box(.5,2,.5),0x6a3a1a,M(-2.6,h+1,-1.3)),pt(Box(.5,2,.5),0x6a3a1a,M(2.6,h+1,-1.3)),pt(Box(.5,2,.5),0x6a3a1a,M(-2.6,h+1,1.3)),pt(Box(.5,2,.5),0x6a3a1a,M(2.6,h+1,1.3)),pt(Box(3,4,1.6),0xe8342a,M(0,h+5,-.6)));for(let i=0;i<7;i++)p.push(pt(Box(.4,4.4,.4),0xffd23a,M(-1.2+i*.4,h+7.2,-.6,0,0,(i-3)*.09)));}],
+    ['rizz',0xff8fb8,0xff2e88,'😏','THE W',(p,h)=>{p.push(pt(Sph(2.6,12,9),0xff2e88,M(-1.7,h+5,0)),pt(Sph(2.6,12,9),0xff2e88,M(1.7,h+5,0)),pt(Cone(3.6,4.6,4),0xff2e88,M(0,h+1.8,0,Math.PI,Math.PI/4)));}],
+    ['npcesc',0xc8c6d0,0x8a8894,'🧍','THE NPC',(p,h)=>{p.push(pt(Box(3.4,3.4,3.4),0xb8b6c0,M(0,h+8.4,0)),pt(Box(3,4.6,2),0x8a8894,M(0,h+4.4,0)),pt(Box(1.1,3,1.1),0x5a5864,M(-.8,h+1.5,0)),pt(Box(1.1,3,1.1),0x5a5864,M(.8,h+1.5,0)),pt(Box(1,.25,.1),K,M(-.7,h+8.8,1.72)),pt(Box(1,.25,.1),K,M(.7,h+8.8,1.72)),pt(Box(1.6,.2,.1),K,M(0,h+7.6,1.72)));}],
+    ['chat',0x9fe8ff,0x3f7dff,'💬','CHAT',(p,h)=>{p.push(pt(Sph(3.4,14,10),0xffffff,M(0,h+5.6,0,0,0,0,1,.75,.75)),pt(Cone(1.2,2.4,6),0xffffff,M(-1.6,h+2.6,0,0,0,.6)),pt(Sph(.45,8,6),K,M(-1.4,h+5.6,2.5)),pt(Sph(.45,8,6),K,M(0,h+5.6,2.6)),pt(Sph(.45,8,6),K,M(1.4,h+5.6,2.5)));}]];
+  let bitK=0;
+  TH.forEach((th,si)=>{const a=ABY[th[0]],gy=groundH(a.x,a.z),n=15+(si%3)*2,step=3.1,RR=11.5,steps=[];
+    const p=[];const ph=n*step+2;p.push(pt(Cyl(5.6,6.4,ph,14),th[2],M(0,ph/2,0)));for(let k=0;k<ph;k+=6)p.push(pt(Cyl(5.75,5.75,.5,14),(k/6)%2?0xffffff:th[1],M(0,k+3,0)));
+    colliders.push({x:a.x,z:a.z,r:6,top:gy+ph});platforms.push({x:a.x,z:a.z,r:6.6,top:gy+ph+.5});p.push(pt(Cyl(7,6.2,1,18),th[1],M(0,ph,0)));
+    const a0=si*1.3;for(let k=0;k<n;k++){const an=a0+k*.56,x=Math.cos(an)*RR,z=Math.sin(an)*RR,y=1.6+k*step;p.push(pt(Cyl(3,2.4,1,10),k%2?th[1]:0xffffff,M(x,y-.5,z)),pt(Cone(2.2,3.4,8),th[2],M(x,y-2.8,z,Math.PI)));platforms.push({x:a.x+x,z:a.z+z,r:3,top:gy+y});steps.push({x:a.x+x,y:gy+y,z:a.z+z});}
+    th[5](p,ph+.5);const m=new THREE.Mesh(merge(p),lam);m.position.set(a.x,gy,a.z);A47.add(m);
+    const lab=textSprite(a.name,2.4,{color:'#ffd400'});lab.position.set(a.x,gy+ph+15,a.z);A47.add(lab);beam(a.x,a.z,[0xff2e88,0xffd400,0x19e3ff,0xb6ff00][si%4],1.1);
+    // a pad at the bottom gets you started; the climb is yours
+    pad(a.x+Math.cos(a0-.8)*RR,a.z+Math.sin(a0-.8)*RR);
+    // floating brainrot around it, for scale
+    for(let k=0;k<6;k++){const e=emojiSprite([th[3],'💀','🔥','💯','🧠','📈'][k],3.2);const an=k/6*TAU+si;e.position.set(a.x+Math.cos(an)*24,gy+6+k*ph/6,a.z+Math.sin(an)*24);A47.add(e);bob.push({o:e,y:e.position.y,a:1.2,s:1+k*.2,p:k+si});}
+    steps.forEach((st,k)=>{if(k%2)return;pick38('rot',bitK++,st.x,st.y,st.z,th[3],1.3,null,null,(c)=>{addAura(670,st.x,st.y+3,st.z);floatText('+670 BRAINROT',st.x,st.y+4,st.z,'#b6ff00');SFX.orb(c);});});
+    pick38('stk',si,a.x,gy+ph+.5,a.z,'🏆',2.2,['SUMMIT',a.name],'#ffd400',(c)=>{addAura(6700,PL.x,PL.y+4,PL.z);SFX.relic();flash(.6,500);zoneCard('SUMMIT · '+a.name,c+' of 10 slop stacks · the view is mid');
+      if(c>=10){addAura(67000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('🗼')){X.hats.push('🗼');save();}chapter('ALL TEN STACKS','new hat: 🗼 · you are very high up');}},{r:3});
+    STK.list.push({id:a.id,x:a.x,z:a.z,top:gy+ph,first:steps[0]});});
+  STK.bits=bitK;})();
+HATS.push(['🗼','The Slop Stack (worn, somehow)',1]);
+// slop it up: spinning rainbow rings round every tower, and brainrot slang stuck all the way up
+(function(){const SL=['W','L','RATIO','NO CAP','FR FR','ONLY IN OHIO','GYATT','MEWING','SIGMA','FANUM TAX','+1000 AURA','6 7','CHAT IS THIS REAL','BRO THOUGHT','IT\'S GIVING','DELULU','LOCK IN','COOKED','HIM','NPC BEHAVIOUR','RIZZ','BUSSIN','SKILL ISSUE','TOUCH GRASS','MID','UNC','LOW KEY','HIGH KEY','AURA FARMING','STAY TOASTY'];
+  const cols=['#ffd400','#ff2e88','#19e3ff','#b6ff00','#ffffff'];let k=0;
+  STK.list.forEach((t,si)=>{const gy=t.top-(t.top-groundH(t.x,t.z));const base=groundH(t.x,t.z),h=t.top-base;
+    for(let r=0;r<3;r++){const ring=new THREE.Mesh(Tor(9+r*1.2,.35,6,40),rainbowMat);ring.position.set(t.x,base+h*(.3+r*.25),t.z);ring.rotation.x=Math.PI/2+(r-1)*.25;scene.add(ring);spin.push({o:ring,y:(r%2?-1:1)*(.3+r*.15)});}
+    for(let j=0;j<6;j++){const an=j/6*TAU+si*.7,w=SL[(k++)%SL.length],sp=textSprite(w,3+(j%3)*.8,{color:cols[(si+j)%cols.length]});sp.position.set(t.x+Math.cos(an)*7.2,base+6+j*h/6,t.z+Math.sin(an)*7.2);scene.add(sp);bob.push({o:sp,y:sp.position.y,a:.5,s:1.6+j*.2,p:j*1.3+si});}});})();
+
+{const ar=act7Rows;act7Rows=function(){const q=Q38(),R=[];const seen=STK.list.some(t=>X.vis.includes(t.id));if(seen)R.push(['stk','🗼 Summit the slop stacks '+(q.stk||[]).length+'/10 · brainrot bits '+(q.rot||[]).length+'/'+STK.bits,(q.stk||[]).length>=10]);return ar().concat(R);};}
+{const at=act7Target;act7Target=function(id){if(id==='stk'){const q=Q38();let best=null,bd=1e9;for(const t of STK.list){if((q.stk||[]).includes(STK.list.indexOf(t)))continue;const d=Math.hypot(PL.x-t.x,PL.z-t.z);if(d<bd){bd=d;best=t;}}return best?{x:best.x,z:best.z,l:ABY[best.id].name}:null;}return at(id);};}
+CX.push(['w_stacks','WORLD','The Slop Stacks','Ten towers that grew in the emptiest parts of the Filler: the Sigma Staircase, the 67 Spire, Mewing Mountain, the Throne Tower, the Ohio Corn Stack, the Aura Needle, the Fanum Tax Office, Rizz Ramp, the NPC Escalator and the Chat Is This Real Tower. Spiral up the outside. The trophy is at the top. The view is mid.',()=>STK.list.some(t=>X.vis.includes(t.id))]);
+DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','THE SLOP STACKS AND VAN DOWN (ACT 47)'],['p_stack','The Sigma Staircase, at the bottom pad',()=>{const t=STK.list[0];warpTo(t.first.x,t.first.z+4,undefined,undefined,['THE SIGMA STAIRCASE','🛠️ dev']);}]);
+/* ================= ACT 48: VAN DOWN. A Slopflix original true-crime docuseries. Somebody wrecked Derek's first van and left it on top of a pole. Six pieces of evidence, six suspects, one evidence board, ominous cello. ================= */
+const VDN={a:ABY.wreck,ev:[],board:null,pole:null,open:false};
+SPEAK.narr={name:'THE NARRATOR (DOCUMENTARY VOICE)',face:'🎞️',pitch:70,wave:'sine'};
+SPEAK.det={name:'DETECTIVE SLOPEZ (RETIRED)',face:'🕵️',pitch:120,wave:'triangle'};
+(function(){const st=document.createElement('style');st.textContent='#sfx{position:absolute;inset:0;z-index:9;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;pointer-events:none;opacity:0;transition:opacity .5s}#sfx.on{opacity:1}'
+  +'#sfx .lg{font:900 clamp(54px,14vw,150px)/.9 Impact,"Arial Black",sans-serif;letter-spacing:-.02em;color:#e50914;transform:scaleY(1.25);animation:sfxin 1.1s cubic-bezier(.2,1.4,.4,1) both}#sfx .k{font:700 clamp(11px,1.8vw,15px) system-ui,sans-serif;letter-spacing:.5em;color:#bbb;text-transform:uppercase}#sfx .t{font:900 clamp(30px,7vw,72px)/1 Georgia,serif;color:#fff;letter-spacing:.06em}#sfx .q{font:italic 400 clamp(14px,2.2vw,20px) Georgia,serif;color:#ccc}@keyframes sfxin{from{transform:scaleY(1.25) scale(2.6);opacity:0;filter:blur(8px)}to{opacity:1}}'
+  +'#vdbox{position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:8;width:min(92vw,620px);background:#141414;border:3px solid #e50914;border-radius:6px;padding:16px;color:#fff;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 0 0 6px #000}#vdbox h3{margin:0 0 4px;font:900 22px Impact,"Arial Black",sans-serif;letter-spacing:.04em;color:#e50914}#vdbox p{margin:0 0 10px;color:#ccc}#vdbox .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}#vdbox button{font:800 13px system-ui,sans-serif;padding:12px 6px;border:2px solid #444;border-radius:4px;background:#222;color:#fff;cursor:pointer}#vdbox button:hover,#vdbox button:focus-visible{border-color:#e50914;outline:none;background:#331}#vdbox button b{display:block;font-size:26px;margin-bottom:4px}#vdbox .x{margin-top:10px;width:100%;background:none;border-color:#333;color:#999}@media (max-width:520px){#vdbox .g{grid-template-columns:repeat(2,1fr)}}';
+  document.head.appendChild(st);const d=document.createElement('div');d.id='sfx';d.innerHTML='<div class="lg">SLOPFLIX</div>';$('app').appendChild(d);
+  const b=document.createElement('div');b.id='vdbox';b.hidden=true;$('app').appendChild(b);})();
+// ---- the crash site: a van on top of a pole, police tape, a chalk outline of a van, an interview set, an evidence board
+(function(){const a=VDN.a,gy=groundH(a.x,a.z),p=[],K=0x16102a,Y=0xffd400;const poleH=34;
+  p.push(pt(Cyl(1.6,2.2,poleH,10),0x6a6a78,M(0,poleH/2,0)));for(let k=0;k<poleH;k+=4)p.push(pt(Box(4.2,.3,.3),Y,M(0,k+2,0,0,k*.4,0)));
+  colliders.push({x:a.x,z:a.z,r:2,top:gy+poleH});platforms.push({x:a.x,z:a.z,r:4.6,top:gy+poleH+.6});p.push(pt(Cyl(4.6,4,1.2,14),0x3a3a48,M(0,poleH,0)));
+  // the tape: a ring of yellow posts
+  for(let k=0;k<24;k++){const an=k/24*TAU,an2=(k+1)/24*TAU,R=30;p.push(pt(Cyl(.15,.15,2,6),K,M(Math.cos(an)*R,1,Math.sin(an)*R)));const mx=(Math.cos(an)+Math.cos(an2))/2*R,mz=(Math.sin(an)+Math.sin(an2))/2*R;p.push(pt(Box(2*R*Math.sin(Math.PI/24),.35,.04),Y,M(mx,1.7,mz,0,-(an+an2)/2+Math.PI/2,0)));}
+  // chalk outline of a van on the ground
+  [[0,-3.6,9,.25],[0,3.6,9,.25],[-4.5,0,.25,7.4],[4.5,0,.25,7.4],[-6,2,3,.25],[-6,-2,3,.25],[-7.5,0,.25,4]].forEach(q=>p.push(pt(Box(q[2],.06,q[3]),0xffffff,M(10+q[0],.05,8+q[1]))));
+  // the docuseries set: a chair, a ring light, a camera
+  const sx=-12,sz=10;p.push(pt(Box(1.8,.4,1.8),0x8a2a2a,M(sx,1,sz)),pt(Box(1.8,2,.4),0x8a2a2a,M(sx,2,sz-.8)),pt(Cyl(.1,.1,1,6),K,M(sx,.5,sz)),pt(Tor(1.3,.18,8,24),0xffffff,M(sx+2.8,3.4,sz+2,0,.6,0)),pt(Cyl(.08,.08,3.4,6),K,M(sx+2.8,1.7,sz+2)),pt(Box(1.2,.9,1.6),K,M(sx+.6,2.6,sz+5)),pt(Cyl(.35,.35,.8,8),0x333333,M(sx+.6,2.6,sz+4,Math.PI/2)),pt(Cyl(.06,.06,2.4,5),K,M(sx+.6,1.2,sz+5)));
+  // the evidence board: cork, string, photos
+  const bx=-4,bz=-14;p.push(pt(Box(9,5.4,.4),0xb8874a,M(bx,3.6,bz)),pt(Box(9.6,.4,.6),0x6a4a2a,M(bx,.9,bz)),pt(Box(.4,1.2,.4),0x6a4a2a,M(bx-4,.6,bz)),pt(Box(.4,1.2,.4),0x6a4a2a,M(bx+4,.6,bz)));
+  for(let k=0;k<6;k++)p.push(pt(Box(1.6,1.2,.06),0xf4f0e8,M(bx-3+(k%3)*3,2.6+Math.floor(k/3)*2,bz+.25)));
+  const m=new THREE.Mesh(merge(p),lam);m.position.set(a.x,gy,a.z);scene.add(m);colliders.push({x:a.x+bx,z:a.z+bz,r:2.2,top:gy+6.3});
+  // the van itself, upside down on the pole (nobody knows how)
+  const v=new THREE.Mesh(VAN.geo,lam);v.position.set(a.x,gy+poleH+3.4,a.z);v.rotation.set(Math.PI,0.4,.25);scene.add(v);VDN.van=v;
+  const smoke=emojiSprite('💨',4);smoke.position.set(a.x+1,gy+poleH+8,a.z);scene.add(smoke);bob.push({o:smoke,y:smoke.position.y,a:1,s:1.4,p:0});
+  // climb: a spiral of crates and traffic cones around the pole
+  const n=11;for(let k=0;k<n;k++){const an=k*.62,x=Math.cos(an)*8,z=Math.sin(an)*8,y=1.4+k*3,c=new THREE.Mesh(merge([pt(Box(3.6,1,3.6),k%2?0xff7a1a:0x8a6a4a,M(0,-.5,0)),pt(Cone(.5,1.4,8),0xff7a1a,M(1.2,.7,1.2))]),lam);c.position.set(a.x+x,gy+y,a.z+z);scene.add(c);platforms.push({x:a.x+x,z:a.z+z,r:2.2,top:gy+y});}
+  const t1=textSprite(['VAN DOWN','a slopflix original docuseries'],2.2,{color:'#e50914'});t1.position.set(a.x,gy+poleH+14,a.z);scene.add(t1);
+  const t2=textSprite('EVIDENCE BOARD',.8,{color:'#ffd400'});t2.position.set(a.x+bx,gy+7.4,a.z+bz);scene.add(t2);
+  const t3=textSprite('INTERVIEW SET',.7,{color:'#ffffff'});t3.position.set(a.x+sx,gy+5.4,a.z+sz);scene.add(t3);
+  beam(a.x,a.z,0xe50914,1.4);
+  VDN.board={x:a.x+bx,z:a.z+bz+1.8,y:gy};VDN.set={x:a.x+sx,z:a.z+sz,y:gy};VDN.top={x:a.x,z:a.z,y:gy+poleH+.6};
+  CAST.det={coat:0xc8a070,legs:0x3a3a46,hair:0x5a4a3a,beard:0x5a4a3a,extra:[pt(Cyl(.3,.33,.3,10),0x3a2e24,M(0,1.72,0)),pt(Cyl(.52,.52,.05,14),0x3a2e24,M(0,1.58,0)),pt(Box(.06,.5,.06),0xe8e0d0,M(.3,.9,.3))]};const det=addNpc('det','DETECTIVE SLOPEZ','🕵️',120,'triangle',a.x+bx+6,a.z+bz+4,0,{col:'#d8c8a8',full:'DETECTIVE SLOPEZ (RETIRED)'});})();
+// ---- the evidence: one at the crash site, five out in the world
+const VDEV=[
+ {id:'dash',x:()=>VDN.top.x+1.6,z:()=>VDN.top.z+1.6,y:()=>VDN.top.y,e:'📼',n:'THE DASHCAM',sus:'louie',
+  lines:[['narr','Exhibit A. The dashcam. Four hours of footage.'],['narr','Three hours and fifty-eight minutes of Derek saying nothing.'],['narr','The last two minutes are just a dog in the driver\'s seat.'],['narr','[ominous cello]']]},
+ {id:'cap',x:()=>ABY.flow.x+9,z:()=>ABY.flow.z+7,e:'🛞',n:'A HUBCAP',sus:'marcus',
+  lines:[['narr','A hubcap, found at the Flow Pros job site. Forty miles from the crash.'],['marcus','I needed that van for a job. Why would I wreck my own ride?'],['marcus','...I mean it\'s Derek\'s. Whatever. I\'ve got a guy. The guy is me.'],['narr','Marcus has an alibi. The alibi is also Marcus.']]},
+ {id:'fw',x:()=>ABY.clank.x,z:()=>ABY.clank.z+27,e:'💾',n:'A FIRMWARE CHIP',sus:'bottie',
+  lines:[['narr','A firmware chip from the van\'s self-driving update. Signed: lil Bottie.'],['bottie','THE UPDATE WAS AT 99%. THE LAST 1% WAS "BRAKES".'],['bottie','I DO NOT SEE THE PROBLEM. 99 IS A LOT.'],['narr','[a single piano note]']]},
+ {id:'foot',x:()=>ABY.debate.x-12,z:()=>ABY.debate.z+2,e:'🦶',n:'A FORTY-FOOT FOOTPRINT',sus:'byron',
+  lines:[['narr','A footprint. Forty feet long. There is only one suspect that big.'],['byron','I STEP ON A LOT OF THINGS. IDIOTS, MOSTLY.'],['byron','A VAN? THE VAN WAS ALSO AN IDIOT. NEXT QUESTION.'],['narr','He did not answer the question.']]},
+ {id:'rcpt',x:()=>ABY.c_derek.x+6,z:()=>ABY.c_derek.z+4,e:'🧾',n:'A RECEIPT',sus:'derek',
+  lines:[['narr','A receipt, found at the Door Stack.'],['narr','"One (1) van, new. Extra doors: fourteen. Insurance: platinum. Signed: D."'],['derek','...'],['narr','Interesting.']]},
+ {id:'hair',x:()=>ABY.c_louie.x+5,z:()=>ABY.c_louie.z+5,e:'🐾',n:'DOG HAIR',sus:'louie',
+  lines:[['narr','Dog hair. On the driver\'s seat. And the steering wheel. And the gas pedal.'],['louie','ARF.'],['narr','Translation: "I was in the driver\'s seat. I can\'t reach the pedals. Nobody can prove anything."'],['algo','ALSO I RECOMMENDED THE CLIFF. ENGAGEMENT WAS UP 400%.']]}];
+VDEV.forEach((E,i)=>{const x=E.x(),z=E.z(),y=E.y?E.y():groundH(x,z);const p=pick38('ev',i,x,y,z,E.e,1.8,['EVIDENCE',E.n],'#e50914',(c)=>{addAura(4200,x,y+4,z);SFX.relic();say([['narr','EPISODE '+(c+1)+'.']].concat(E.lines).concat([['narr',c>=6?'That is all six. Go to the evidence board at the crash site. Name the killer. Of the van.':'Evidence '+c+' of 6.']]),()=>{hudCache.q=null;});},{r:2.6});p.gate=()=>!!Q38().vd;VDN.ev.push(p);});
+// ---- the cold open, the first time you walk into the crash site
+function vdIntro(){const q=Q38();q.vd=1;save();const s=$('sfx');s.innerHTML='<div class="lg">SLOPFLIX</div>';s.classList.add('on');
+  if(AU.ctx&&!AU.muted){tone(73,1.4,'sawtooth',.12,0,60);tone(55,1.8,'sine',.3,AU.ctx.currentTime+.55,45);nz(.4,.08,AU.ctx.currentTime+.5,300);}
+  setTimeout(()=>{s.innerHTML='<div class="k">A Slopflix original docuseries</div><div class="t">VAN DOWN</div><div class="q">Who wrecked Derek\'s van?</div>';},1900);
+  setTimeout(()=>{s.classList.remove('on');say([['narr','It was a Tuesday. It is always a Tuesday in these.'],['narr','Derek\'s first van was found here. Upside down. On top of a pole. Thirty-four feet up.'],['det','Twenty-two years on the force. I have never seen a van on a pole. I have also never been on the force.'],['det','Six pieces of evidence. Six suspects. One of them did it. Maybe two. It is a docuseries, we have eight episodes to fill.'],['narr','Find the evidence. Then come back to the board and make the accusation.'],['sys','(The first piece is up on the van. Climb the cones.)']],()=>{zoneCard('VAN DOWN','episode 1 of 8 · the crash');hudCache.q=null;});},4600);}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(play&&S.zone==='wreck'&&!Q38().vd&&S.mode==='play')vdIntro();if(VDN.van)VDN.van.rotation.y+=dt*.05;};}
+// ---- the accusation
+const SUSPECTS=[['marcus','🔧','MARCUS'],['bottie','🤖','LIL BOTTIE'],['byron','🗣️','BYRON PAINS'],['louie','🐶','LOUIE'],['algo','👁️','THE ALGORITHM'],['derek','🚐','DEREK']];
+function vdBoard(){const q=Q38(),n=(q.ev||[]).length;if(q.vdw){say([['det','Case closed. I am retired again. Leave me alone.']]);return;}
+  if(n<6){say([['det','You have '+n+' of 6 pieces of evidence. A good docuseries needs all six. And a drone shot.'],['narr','[drone shot]']]);return;}
+  const b=$('vdbox');b.innerHTML='<h3>THE ACCUSATION</h3><p>Who wrecked Derek\'s van? Pick one. (Keys 1 to 6.)</p><div class="g">'+SUSPECTS.map((s2,i)=>'<button data-i="'+i+'"><b>'+s2[1]+'</b>'+(i+1)+'. '+s2[2]+'</button>').join('')+'</div><button class="x">not yet</button>';b.hidden=false;
+  const close=()=>{b.hidden=true;removeEventListener('keydown',key);};const key=e=>{const k=+e.key;if(k>=1&&k<=6){close();vdAccuse(k-1);}if(e.key==='Escape')close();};addEventListener('keydown',key);
+  b.querySelectorAll('[data-i]').forEach(x=>x.onclick=()=>{close();vdAccuse(+x.dataset.i);});b.querySelector('.x').onclick=close;b.querySelector('[data-i]').focus();}
+const VD_WRONG={marcus:[['narr','The jury took four minutes. Three of them were a bathroom break.'],['marcus','It wasn\'t me, bro. I was at my other job. I\'ve got a guy.'],['narr','He had a guy. The guy testified. The guy was also Marcus.']],
+  bottie:[['bottie','OBJECTION. I WAS AT 99%. YOU CANNOT CONVICT SOMETHING THAT IS STILL LOADING.'],['narr','Legally, he is right. Morally, he is a robot.']],
+  byron:[['byron','I DID NOT STEP ON THE VAN. THE VAN STEPPED UNDER ME. IDIOT.'],['narr','The footprint was a size 340. Byron is a size 338. Reasonable doubt.']],
+  louie:[['louie','...'],['narr','You cannot convict a dog. You have tried. The comments are not kind.'],['narr','Louie was in the driver\'s seat. Somebody put him there.']],
+  algo:[['algo','I ONLY RECOMMENDED THE CLIFF. I DID NOT DRIVE OFF IT. THAT IS ON YOU, THE VIEWER.'],['narr','It is technically correct. That is the worst kind of correct.']]};
+function vdAccuse(i){const q=Q38(),s2=SUSPECTS[i];q.vdg=(q.vdg||0)+1;save();
+  if(s2[0]!=='derek'){say(VD_WRONG[s2[0]].concat([['narr','The episode ends on a cliffhanger. Season '+(q.vdg+1)+' has been greenlit.'],['det','Look at the evidence again. Who bought fourteen extra doors?']]));return;}
+  q.vdw=1;save();say([['narr','Episode eight. The reveal.'],['det','The receipt. A brand new van, bought the day before the crash. Fourteen extra doors. Platinum insurance.'],['det','The dog in the driver\'s seat, so it would look like an accident. The firmware at 99%, so it would look like Bottie.'],['det','There is only one person in this game who never says anything. Because he has something to hide.'],['derek','...'],['derek','...yeah. it was me.'],['derek','i wanted the new van. the old one\'s doors only opened fourteen ways.'],['narr','Those were Derek\'s first words in the entire game.'],['narr','He was sentenced to driving Marcus around forever, which is what he was already doing.'],['narr','VAN DOWN is now the number one show on Slopflix. Season 2 is about a missing hot tub.']],
+    ()=>{addAura(67000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('🕵️')){X.hats.push('🕵️');}save();SFX.win();flash(1,900);chapter('CASE CLOSED','VAN DOWN · new hat: 🕵️');hudCache.q=null;});}
+HATS.push(['🕵️','Detective Slopez\'s Hat (retired)',1]);
+{const ai=act15Interact;act15Interact=function(){if(!S.dead&&VDN.board&&Math.hypot(PL.x-VDN.board.x,PL.z-VDN.board.z)<4.5&&Math.abs(PL.y-VDN.board.y)<4)return{label:Q38().vdw?'🗂️ THE CASE IS CLOSED':'🗂️ THE EVIDENCE BOARD',fn:vdBoard};
+  if(!S.dead&&VDN.set&&Math.hypot(PL.x-VDN.set.x,PL.z-VDN.set.z)<3&&Q38().vd)return{label:'🎬 SIT FOR AN INTERVIEW',fn:()=>say([['narr','You sit in the interview chair. The ring light is very bright.'],['narr','"Where were you on the night of the crash?"'],['npc','...'],['narr','Not a suspect. Not even a person, legally. Thank you for your time.']])};return ai();};}
+TALK.det=()=>{const q=Q38(),n=(q.ev||[]).length;say(q.vdw?[['det','I solved it. Well. You solved it. I narrated.']]:q.vd?[['det',n<6?'Evidence: '+n+' of 6. Hubcap at the Flow Pros site, a chip at the Clanker Yard, a footprint at the Idiot Debate, a receipt at the Door Stack, dog hair at Doghouse Heights. And the dashcam, up on the van.':'You have all six. The board. Go.']]:[['det','Walk into the tape. The cameras are already rolling.']]);};
+BARK.det=['Twenty-two years on the force. Zero on the force.','Every van has a story. This one has a pole.','Somebody get me a drone shot.','The killer is always the quiet one. Hm.','[ominous cello]'];
+{const ar=act7Rows;act7Rows=function(){const q=Q38(),R=[];if(q.vd)R.push(['vd',q.vdw?'📼 VAN DOWN: case closed':'📼 VAN DOWN: who wrecked Derek\'s van? evidence '+(q.ev||[]).length+'/6'+((q.ev||[]).length>=6?' · go to the board':''),!!q.vdw]);return ar().concat(R);};}
+{const at=act7Target;act7Target=function(id){if(id==='vd'){const q=Q38();if(q.vdw)return null;if((q.ev||[]).length>=6)return{x:VDN.board.x,z:VDN.board.z,l:'THE EVIDENCE BOARD'};const p=VDN.ev.find(p=>!(q.ev||[]).includes(p.i));return p?{x:p.x,z:p.z,l:'EVIDENCE: '+VDEV[p.i].n}:null;}return at(id);};}
+CX.push(['w_vandown','WORLD','VAN DOWN','A Slopflix original docuseries. Derek\'s first van was found upside down on top of a pole at the edge of the map. Six pieces of evidence are spread across the world. Bring them together at the evidence board and name who did it. Season 2 is about a missing hot tub.',()=>!!Q38().vd]);
+CAST_CX.push(['det','🕵️','DETECTIVE SLOPEZ','Twenty-two years on the force. Zero years on the force. Narrates his own docuseries.']);
+DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['p_vd','VAN DOWN, all six evidence, at the board',()=>{const q=Q38();q.vd=1;q.ev=[0,1,2,3,4,5];q.vdw=0;warpTo(VDN.board.x,VDN.board.z+3,undefined,Math.PI,['VAN DOWN','🛠️ dev: 6/6 evidence']);}]);
 /* ================= ACT 45: THE OPENING. The game's own intro movie: the story of how this place got made, told over real shots of the world while a generation bar climbs to 67% and stops. Plays on boot-up and on a new game. The trailer (ACT 44) stays on the title menu. ================= */
 (function(){const st=document.createElement('style');st.textContent='#intro.mov.opn{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}'
   +'#intro.opn .gen{position:absolute;z-index:4;top:0;left:0;right:0;height:12.5%;display:flex;align-items:center;gap:12px;padding:0 max(16px,env(safe-area-inset-left,0px));box-sizing:border-box;font:700 clamp(9px,1.4vw,13px)/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;color:#b6ff00;text-align:left}#intro.opn .gen u{flex:1;height:6px;border:1px solid #b6ff00;border-radius:4px;overflow:hidden;text-decoration:none}#intro.opn .gen u i{display:block;height:100%;background:#b6ff00;transition:width 3s ease-out}#intro.opn .gen b{min-width:3.2em;text-align:right;font-variant-numeric:tabular-nums}#intro.opn .gen.stop{color:#ff2e88}#intro.opn .gen.stop u{border-color:#ff2e88}#intro.opn .gen.stop u i{background:#ff2e88;animation:blink .5s 6}'
