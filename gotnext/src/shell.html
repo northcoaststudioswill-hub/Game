@@ -128,6 +128,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 .toast small{display:block;font:500 10px/1.4 var(--m);letter-spacing:.04em;text-transform:none;color:var(--ash);margin-top:3px}.toast.ach{border-left-color:var(--heat)}.toast.rank{border-left-color:var(--ice);font-size:15px}
 @keyframes tin{0%{opacity:0;transform:translateX(40px)}6%{opacity:1;transform:none}90%{opacity:1}100%{opacity:0}}
 @media (orientation:portrait){#tA{bottom:27%}#tB{bottom:calc(27% + 44px)}#bars{top:calc(70px + var(--sat))}#fb{bottom:40%}}
+#dbg{position:fixed;left:8px;bottom:30px;z-index:60;display:none;margin:0;padding:8px 10px;background:rgba(8,8,10,.82);border:1px solid var(--line);font:500 10.5px/1.45 var(--m);color:var(--bone);pointer-events:none;white-space:pre}
 @media (prefers-reduced-motion:reduce){.foil,#ticker span,#brav.on{animation:none}}
 </style>
 </head>
@@ -161,6 +162,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div id="ticker"><span id="tickerTxt"></span></div>
 </div>
 <div id="toasts"></div>
+<pre id="dbg"></pre>
 <script>/*@three*/</script>
 <script>
 (function(){

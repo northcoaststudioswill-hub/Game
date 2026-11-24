@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.4: crews online (up to six, 3v3), more joints and moves, local two-player on one keyboard, The Cages.**
+crib. A North Coast Studios game. **Version 0.5: animation and control overhaul: planted feet with leg IK, a dribble that lives in the hand, responsive fixed-step controls.** Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -73,6 +73,7 @@ python3 build.py        # writes index.html
 | `src/ball.js` | The basketball: rules, shooting, finishing, dribble moves, steals, blocks, rebounds, AI, camera |
 | `src/hub.js` | The Block, The Cages, My Crib, walking and talking |
 | `src/ui.js` | HUD and every menu |
+| `src/gfx.js` (end) | Locomotion layer: planted feet, stepping, two-bone leg IK |
 | `src/net.js` | Online: who is here, invites, the shared game, your player saved to your account |
 | `src/main.js` | Boot, the loop, rewards, ranks, trophies |
 | `src/shell.html` | Page and CSS |
@@ -90,6 +91,9 @@ tests/sim.sh                      # an all-AI game in each mode, printed as box 
 node tests/online.mjs             # two pages in one simulated live room: meet, invite, play a shared game, both get paid
 node tests/crew.mjs               # three pages: form a crew, follow the leader, run a 3v3 with a member on each side
 node tests/poses.mjs              # renders every pose to tests/shots/pose-NN.png
+node tests/accept.mjs             # the eight animation/control acceptance scenarios, with numbers
+node tests/feel.mjs [file.html]   # movement metrics for any build (reversal time, foot slip, ball in hand, FPS drift)
+node tests/strip.mjs run|drib|shot|def [file.html]   # side-on filmstrips of real gameplay
 ```
 
 ## Online

@@ -74,6 +74,11 @@ function dir8(x, y) {        // screen space: y negative = up
   if (a > -112.5 && a <= -67.5) return 'D'; return 'DR';
 }
 function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
+// round deadzone: small pushes give small, controlled movement; direction is never snapped to an axis
+function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
+// button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
+// between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = false; I.flick = null; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
@@ -97,7 +102,7 @@ function pollInput() {
     let p = null;
     if (twoPlayer) p = pads.length >= 2 ? pads[i] : (i === 1 ? pads[0] : null); else if (i === 0) p = pads[0];
     if (p) {
-      mx += dead(p.axes[0] || 0); my += dead(p.axes[1] || 0); rx += dead(p.axes[2] || 0); ry += dead(p.axes[3] || 0);
+      const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
       if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1;
       sprint = sprint || B(7) || B(5); a = a || B(0); b = b || B(2) || B(3); st = st || B(9); bk = bk || B(1);
@@ -105,9 +110,10 @@ function pollInput() {
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
     I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprint = sprint;
-    I.aP = a && !I._a; I.bP = b && !I._b; I.bR = !b && I._b; I.a = a; I.b = b; I._a = a; I._b = b;
+    const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
+    I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
     I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
-    const d = dir8(rx, ry); I.flick = (d && !I._rd) ? d : null; I.rRel = (!d && !!I._rd); I.rdir = d; I._rd = d;
+    const d = dir8(rx, ry); if (d && !I._rd) { I.flick = d; I.tPress = now; } I.rRel = I.rRel || (!d && !!I._rd); I.rdir = d; I._rd = d;
   }
 }
 function anyPadStart() { const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected); return pads.length; }

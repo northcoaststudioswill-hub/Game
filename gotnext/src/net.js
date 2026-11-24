@@ -156,7 +156,8 @@ function netWorldStep(dt) {
     const tx = clamp(pr.x, -60, 60), tz = clamp(pr.z, -60, 60), k = 1 - Math.exp(-9 * dt), ox = g.x, oz = g.z;
     g.x += (tx - g.x) * k; g.z += (tz - g.z) * k; g.f = lerpAng(g.f, +pr.f || 0, k);
     const v = Math.hypot(g.x - ox, g.z - oz) / Math.max(dt, 0.001); g.ph += dt * (4 + v * 1.6);
-    applyPose(g.rig, poseOf(v > 0.5 ? 'run' : 'idle', v > 0.5 ? 0 : W.t, { sp: v / 8, ph: g.ph }), dt); g.rig.root.position.set(g.x, 0, g.z); g.rig.root.rotation.y = g.f;
+    applyPose(g.rig, poseOf(v > 0.5 ? 'run' : 'idle', v > 0.5 ? 0 : W.t, { sp: v / 8, ph: g.rig.gait ? g.rig.gait.ph : g.ph }), dt); g.rig.root.position.set(g.x, 0, g.z); g.rig.root.rotation.y = g.f;
+    gaitStep(g.rig, { x: g.x, z: g.z, yaw: g.f, vx: (g.x - ox) / Math.max(dt, 0.001), vz: (g.z - oz) / Math.max(dt, 0.001), grounded: true, wide: 0, want: 1, dt }); legIK(g.rig, dt);
   }
   for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); delete rigs[k]; }
 }
@@ -305,10 +306,11 @@ function netGuestStep(dt) {
     p.speed = lerp(p.speed || 0, Math.hypot(p.x - ox, p.z - oz) / Math.max(dt, 0.001), 0.3); p.def = M_.off !== p.team && B.holder !== p && B.state !== 'loose';
   }
   if (G.gs && me.st === 'shoot' && !me.shot.released) me.t = (now - G.gs.t0) / 1000;      // your own meter follows your thumb, not the lag
-  if (B.state === 'held' && B.holder) ballHeld(B.holder, dt); else if (B.tp) B.pos.lerp(B.tp, 1 - Math.exp(-28 * dt));
-  B.spin += dt * 6; if (B.shooter && B.state === 'shot' && Math.random() < 0.6) burst(B.pos.x, B.pos.y, B.pos.z, 0xff7a1f, 1);
-  B.mesh.position.copy(B.pos); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z);
   for (const p of M_.P) animPlayer(p, dt);
+  if (B.state === 'held' && B.holder) { if (!B.holder.drib || B.lastHolder !== B.holder) B.holder.drib = newDrib(B.holder, B.pos); ballHeld(B.holder, dt); } else if (B.tp) B.pos.lerp(B.tp, 1 - Math.exp(-28 * dt));
+  B.lastHolder = B.state === 'held' ? B.holder : null;
+  B.spin += dt * 6; if (B.shooter && B.state === 'shot' && Math.random() < 0.6) burst(B.pos.x, B.pos.y, B.pos.z, 0xff7a1f, 1);
+  ballMesh();
   matchFx(dt); matchCam(dt); hudMatch();
   // ---- endings ----
   if (G.ended) { G.endT -= dt; if (G.endT <= 0 && MT) { const e = G.end, mi = me.i, t = me.team; hudShow(false); const cfg = M_.cfg; MT = null;

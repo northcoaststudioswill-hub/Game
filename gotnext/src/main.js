@@ -112,15 +112,44 @@ function afterPractice(res, back) {
 }
 
 // ---------- loop ----------
-let last = 0;
+let last = 0; const SIM_DT = 1 / 60;
+// ---------- debug overlay: ` (backquote) or ?debug ----------
+const DBG = { on: /[?&]debug/.test(location.search), t: 0, fps: 60, steps: 0 };
+addEventListener('keydown', e => { if (e.code === 'Backquote') { DBG.on = !DBG.on; $('dbg').style.display = DBG.on ? 'block' : 'none'; } });
+function dbgDraw(dt) {
+  DBG.fps = lerp(DBG.fps, 1 / Math.max(dt, 0.001), 0.05); if ((DBG.t += dt) < 0.1) return; DBG.t = 0;
+  const el = $('dbg'); el.style.display = DBG.on ? 'block' : 'none'; if (!DBG.on) return;
+  const f2 = v => (v >= 0 ? ' ' : '') + v.toFixed(2), I = IN[0];
+  if (!MT) { el.textContent = `fps ${DBG.fps.toFixed(0)}  (no game)`; return; }
+  const p = MT.me, B = MT.B, R = p.rig, G = R.gait, D = p.drib;
+  const ft = s => { const f = G && G.ft[s]; return !f ? '-' : f.sw ? `swing ${(f.t / f.T * 100 | 0)}%` : 'planted'; };
+  el.textContent = [
+    `fps ${DBG.fps.toFixed(0)}   sim 60 Hz   steps/frame ${DBG.steps}`,
+    `state  ${p.st.padEnd(7)} t ${p.t.toFixed(2)}   anim ${p.an || ''}   buffered ${p.buf && p.buf.ttl > 0 ? (p.buf.bP ? 'shoot' : p.buf.aP ? 'pass' : p.buf.flick) : '-'}`,
+    `move   v ${Math.hypot(p.vx, p.vz).toFixed(2)} m/s   stick ${f2(I.mx)} ${f2(I.my)}${I.sprint ? ' sprint' : ''}   skill ${I.rdir || '-'}`,
+    `feet   R ${ft('R').padEnd(11)} L ${ft('L').padEnd(11)} ik ${G ? G.w.toFixed(2) : '-'}  hips -${G ? G.drop.toFixed(2) : '0'}  steps ${G ? G.steps : 0}`,
+    `ball   ${B.state.padEnd(6)} ${B.holder === p && D ? `${D.ph} ${D.hand} ${(D.t / (D.T || 1) * 100 | 0)}%` : B.holder ? 'held by ' + B.holder.b.name : ''}   y ${B.pos.y.toFixed(2)}`,
+    `input  last press → action ${p.lat !== undefined ? p.lat.toFixed(0) + ' ms' : '-'}`,
+  ].join('\n');
+}
 function frame(now) {
   requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
   pollInput(); netPollRemote();
   if (uiBusy()) uiStep(dt);
-  if (MT) { if (!UI.cur && (IN[0].start || IN[1].start)) uiPause(); else matchStep(dt); }
-  else if (W) { worldStep(dt); netWorldStep(dt); }
-  else if (ST && !ST.frozen) studioStep(dt);
+  if (MT) {
+    if (!UI.cur && (IN[0].start || IN[1].start)) { uiPause(); clearEdges(); }
+    else {
+      // games run on a fixed 60 Hz step: the same input does the same thing at 30, 60 or 144 FPS
+      MT.acc = (MT.acc || 0) + dt; let n = 0;
+      while (MT && MT.acc >= SIM_DT - 1e-6 && n < 5) { MT.acc -= SIM_DT; matchStep(SIM_DT); clearEdges(); n++; }
+      DBG.steps = n;
+      if (MT && n === 5) MT.acc = 0;
+    }
+  }
+  else if (W) { worldStep(dt); netWorldStep(dt); clearEdges(); }
+  else { if (ST && !ST.frozen) studioStep(dt); clearEdges(); }
   if (scene) renderer.render(scene, camera);
+  dbgDraw(dt);
 }
 function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
@@ -128,6 +157,7 @@ function boot() {
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
   window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo };
   window.__step = dt => { if (MT) matchStep(dt); };
+  window.__camera = camera; window.__render = () => renderer.render(scene, camera);
   // test hook: draw the player in one pose and hand back the frame
   window.__poseShot = (an, t, o) => {
     if (!ST || !ST.frozen) { uiClose(); $('title').style.display = 'none'; studioScene(); studioRig(myBuild()); ST.frozen = true; }

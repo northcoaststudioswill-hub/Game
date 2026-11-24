@@ -175,7 +175,7 @@ function makeRig(spec, lowDetail) {
     out(M(box(0.095, 0.075, 0.25), toon(shoes.c), 0, -0.01, 0.055, foot), 1.1);
     M(box(0.1, 0.022, 0.26), toon(shoes.c2 || '#fff'), 0, -0.045, 0.055, foot);
     if (shoes.kind === 'high') M(cyl(0.052, 0.05, 0.08, 8), toon(shoes.c), 0, 0.045, 0, foot);
-    R.joints['hp' + side] = hp; R.joints['kn' + side] = kn;
+    R.joints['hp' + side] = hp; R.joints['kn' + side] = kn; R.thigh = thigh; R.shin = shin; R.hipW = hipW;
   }
   // back
   const bk = D('back');
@@ -248,7 +248,14 @@ function poseOf(anim, t, o) {
     case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28; break; }
     case 'shove': p.y = -0.08; legs(-0.75, 0.75, 0.4, 0.2); S_('spine', 0.3); S_('chest', 0.15); S_('neck', -0.3); S_('shR', -1.5, 0, 0.1); S_('shL', -1.5, 0, -0.1); S_('elR', -0.1); S_('elL', -0.1); S_('wrR', 0.9); S_('wrL', 0.9); p.rate = 30; break;
     case 'pass': { const f = o.flashy; legs(-0.55, 0.55, 0.1, 0.2); S_('spine', 0.14); S_('chest', 0.1, f ? 0.6 : 0, 0); S_('neck', -0.1, f ? -0.7 : 0, 0);
-      if (f) { S_('shR', 0.7, 0, -0.3); S_('elR', -1.3); S_('wrR', -0.8); S_('shL', -0.4, 0, 0.5); S_('elL', -0.9); } else { S_('shR', -1.5, 0, 0.2); S_('shL', -1.5, 0, -0.2); S_('elR', -0.12); S_('elL', -0.12); S_('wrR', -0.7); S_('wrL', -0.7); } p.rate = 30; break; }
+      const k = o.pk || 'chest', u = clamp(t / 0.2, 0, 1), snap = u < 0.35 ? 0 : 1;     // load, then snap the wrists through
+      if (f) { S_('shR', 0.7, 0, -0.3); S_('elR', -1.3); S_('wrR', -0.8); S_('shL', -0.4, 0, 0.5); S_('elL', -0.9); }
+      else if (k === 'overhead' || k === 'lob') { S_('shR', snap ? -2.3 : -2.9, 0, 0.2); S_('shL', snap ? -2.3 : -2.9, 0, -0.2); S_('elR', snap ? -0.2 : -1.3); S_('elL', snap ? -0.2 : -1.3); S_('wrR', snap ? -0.9 : 0.6); S_('wrL', snap ? -0.9 : 0.6); S_('chest', snap ? 0.15 : -0.2); }
+      else if (k === 'bounce') { S_('shR', snap ? -0.9 : -0.5, 0, 0.2); S_('shL', snap ? -0.9 : -0.5, 0, -0.2); S_('elR', snap ? -0.1 : -1.4); S_('elL', snap ? -0.1 : -1.4); S_('wrR', snap ? -1.0 : 0.5); S_('wrL', snap ? -1.0 : 0.5); S_('spine', 0.3); }
+      else if (k === 'one') { S_('shR', snap ? -1.4 : -0.6, 0, 0.1); S_('elR', snap ? -0.1 : -1.6); S_('wrR', snap ? -0.9 : 0.6); S_('shL', -0.5, 0, 0.4); S_('elL', -1.0); }
+      else if (!snap) { S_('shR', -0.9, 0, 0.3); S_('shL', -0.9, 0, -0.3); S_('elR', -1.8); S_('elL', -1.8); S_('wrR', 0.5); S_('wrL', 0.5); }
+      else { S_('shR', -1.5, 0, 0.2); S_('shL', -1.5, 0, -0.2); S_('elR', -0.12); S_('elL', -0.12); S_('wrR', -0.7); S_('wrL', -0.7); } p.rate = 30; break; }
+    case 'boxout': legs(-0.55, 0.75, -0.55, 0.75, 0.45); p.y = -0.14; S_('hips', 0.25); S_('spine', 0.22); S_('chest', 0.05); S_('neck', -0.35); S_('shR', -0.4, 0, -1.2); S_('shL', -0.4, 0, 1.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.3); S_('wrL', 0.3); p.rate = 18; break;
     case 'catch': S_('shR', -1.2, 0, 0.2); S_('shL', -1.2, 0, -0.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.5); S_('wrL', 0.5); S_('neck', -0.1); break;
     case 'call': armsDown(); S_('shR', -2.85, 0, -0.2); S_('elR', -0.3); S_('wrR', 0.4 + Math.sin(t * 14) * 0.4); S_('neck', -0.1); break;
     case 'move': {   // each dribble move has its own shape
@@ -290,6 +297,14 @@ function poseOf(anim, t, o) {
   // layered on top of every pose: eyes on the ball, lean into the turn
   if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
   if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }
+  // lean into acceleration and braking; hips turn toward where the body is going while the shoulders stay square
+  if (o.leanF) { const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] += o.leanF; }
+  if (o.hipYaw) { const h = p.hips || (p.hips = [0, 0, 0]); h[1] += o.hipYaw; const c = p.chest || (p.chest = [0, 0, 0]); c[1] -= o.hipYaw * 0.8; }
+  if (o.bump) { const c = p.chest || (p.chest = [0, 0, 0]); c[0] += o.bump[0]; c[2] += o.bump[1]; }
+  // a contested or moving shot fades back / drifts; a pass on its way in gets the hands up whatever the feet are doing
+  if (o.fade) { const c = p.chest || (p.chest = [0, 0, 0]); c[0] -= o.fade * 0.35; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] -= o.fade * 0.15; }
+  if (o.drift) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.drift, -0.3, 0.3); }
+  if (o.catchArms) { p.shR = [-1.25, 0, 0.2]; p.shL = [-1.25, 0, -0.2]; p.elR = [-1.15, 0, 0]; p.elL = [-1.15, 0, 0]; p.wrR = [0.5, 0, 0]; p.wrL = [0.5, 0, 0]; p.rate = Math.max(p.rate, 20); }
   return p;
 }
 function R_fallY(o) { return (o.leg || 0.95) * 0.82; }
@@ -436,6 +451,72 @@ function poster(sc, x, y, z, ry, inv) {
 }
 const _texCache = {};
 function geoTex(k, f) { return _texCache[k] || (_texCache[k] = f()); }
+// =====================================================================
+//  LOCOMOTION LAYER — feet are planted on the court in world space and step when the body has moved on;
+//  each leg is then solved with two-bone IK to reach its foot. The pose layer still drives everything above
+//  the hips (and the legs whenever the player is in the air).
+// =====================================================================
+const _g1 = new THREE.Vector3(), _g2 = new THREE.Vector3();
+function gaitFoot() { return { p: new THREE.Vector3(), a: new THREE.Vector3(), sw: false, t: 0, T: 0.2, lift: 0 }; }
+// c: { x, z, yaw, vx, vz, grounded, wide 0..1, want 0..1, dt }
+function gaitStep(R, c) {
+  const G = R.gait || (R.gait = { w: 0, ph: 0, drop: 0, land: 0, air: true, ft: { R: gaitFoot(), L: gaitFoot() }, steps: 0 });
+  const dt = c.dt, v = Math.hypot(c.vx, c.vz), vn = clamp(v / 7, 0, 1);
+  G.w += ((c.grounded ? c.want : 0) - G.w) * (1 - Math.exp(-16 * dt));
+  const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), wide = c.wide || 0;
+  const home = (s, out) => { const lx = (s === 'R' ? -1 : 1) * (R.hipW + 0.045 + 0.15 * wide); return out.set(c.x + lx * cy, 0, c.z - lx * sy); };
+  if (!c.grounded) {                       // airborne: the pose owns the legs; remember where the feet are for the landing
+    G.air = true; for (const s of ['R', 'L']) { const f = G.ft[s]; R.joints['an' + s].getWorldPosition(f.p); f.p.y = 0; f.sw = false; f.lift = 0; }
+  } else {
+    if (G.air) { G.air = false; G.land = 0.17; }
+    // a wide, low stance (defense) takes short quick steps instead of long strides
+    const thr = 0.08 + 0.1 * v * (1 - 0.55 * wide), T = clamp(0.3 - 0.024 * v, 0.13, 0.3) * (1 - 0.3 * wide), lead = T * 0.55;
+    for (const s of ['R', 'L']) {
+      const f = G.ft[s], o = G.ft[s === 'R' ? 'L' : 'R']; home(s, _g1);
+      if (f.sw) {
+        f.t += dt; const u = Math.min(1, f.t / f.T), rem = f.T * (1 - u) + lead;
+        _g2.set(_g1.x + c.vx * rem, 0, _g1.z + c.vz * rem);
+        const e = u * u * (3 - 2 * u); f.p.set(lerp(f.a.x, _g2.x, e), 0, lerp(f.a.z, _g2.z, e)); f.lift = Math.sin(Math.PI * u) * (0.045 + 0.1 * vn);
+        if (u >= 1) { f.sw = false; f.lift = 0; G.steps++; }
+      } else {
+        const ex = _g1.x + c.vx * lead - f.p.x, ez = _g1.z + c.vz * lead - f.p.z, err = Math.hypot(ex, ez);
+        if (err > 1.8) f.p.copy(_g1);
+        else if ((err > thr || f.over > 0.015) && (!o.sw || o.t > o.T * 0.6 || err > thr * 1.8 || f.over > 0.06)) { f.sw = true; f.t = 0; f.T = T; f.a.copy(f.p); f.over = 0; }     // also step when the leg can no longer reach it
+      }
+    }
+  }
+  const fr = G.ft.R, fl = G.ft.L;            // a phase for the arms: right foot swinging 0..π, left π..2π
+  if (fr.sw) G.ph = Math.PI * fr.t / fr.T; else if (fl.sw) G.ph = Math.PI + Math.PI * fl.t / fl.T;
+  if (G.land > 0) G.land -= dt;
+  return G;
+}
+// solve both legs to their feet; blend with the pose by the gait weight; drop the hips when a foot is out of reach
+function legIK(R, dt) {
+  const G = R.gait; if (!G || G.w < 0.01) return;
+  const J = R.joints, hips = J.hips, L1 = R.thigh - 0.03, L2 = R.shin - 0.05, maxL = (L1 + L2) * 0.995, w = G.w;
+  // pass 1: how far is the farther foot out of reach? Lower the hips first (at once going down, eased coming up),
+  // so the legs never have to stretch past what they can reach and the planted foot stays put
+  R.root.updateMatrixWorld(true); let need = 0;
+  for (const s of ['R', 'L']) { const f = G.ft[s]; _g1.set(f.p.x, 0.04 + f.lift, f.p.z); hips.worldToLocal(_g1); _g1.sub(J['hp' + s].position); need = Math.max(need, _g1.length() - maxL); }
+  const tgt = clamp(need + 0.008, 0, 0.22); G.drop = tgt > G.drop ? tgt : G.drop + (tgt - G.drop) * (1 - Math.exp(-10 * dt));
+  const landDip = G.land > 0 ? Math.sin(Math.PI * (1 - G.land / 0.17)) * 0.075 : 0;        // soak up the landing
+  hips.position.y -= (G.drop + landDip) * w; hips.updateMatrixWorld(true);
+  // pass 2: two-bone IK for each leg, blended with the pose by the gait weight
+  for (const s of ['R', 'L']) {
+    const f = G.ft[s], hp = J['hp' + s];
+    _g1.set(f.p.x, 0.04 + f.lift, f.p.z); hips.worldToLocal(_g1); _g1.sub(hp.position);
+    const D0 = Math.max(0.05, _g1.length()); f.over = D0 - maxL;
+    const D = Math.min(D0, maxL);
+    const k = Math.PI - Math.acos(clamp((L1 * L1 + L2 * L2 - D * D) / (2 * L1 * L2), -1, 1));
+    // exact for the rig's Euler order (X·Y·Z): the bent leg lies in the hip's YZ plane, is rolled by Z, then pitched by X
+    const A = L1 + L2 * Math.cos(k), hz = Math.asin(clamp(_g1.x / A, -1, 1)), y0 = -A * Math.cos(hz), z0 = -L2 * Math.sin(k);
+    const hx = Math.atan2(_g1.z, _g1.y) - Math.atan2(z0, y0);
+    const h = hp.rotation, kn = J['kn' + s].rotation, an = J['an' + s].rotation;
+    h.x = lerp(h.x, hx, w); h.y = lerp(h.y, 0, w); h.z = lerp(h.z, hz, w); kn.x = lerp(kn.x, k, w); kn.y = lerp(kn.y, 0, w); kn.z = lerp(kn.z, 0, w);
+    const toe = f.sw ? 0.35 * Math.sin(Math.PI * Math.min(1, f.t / f.T)) : 0;              // toe-off during the swing, flat foot when planted
+    an.x = lerp(an.x, -(hips.rotation.x + hx + k) + toe, w);
+  }
+}
 function disposeScene(sc) {
   if (!sc) return;
   sc.traverse(o => { if (o.isMesh) { const g = o.geometry; if (g && !Object.values(_geo).includes(g)) g.dispose(); const m = o.material; if (m && m.map && !Object.values(_mats).includes(m) && !Object.values(_texCache).includes(m.map)) { if (m.map.source !== (_brick && _brick.source)) m.map.dispose(); m.dispose(); } } });

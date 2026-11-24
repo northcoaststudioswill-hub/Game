@@ -83,7 +83,7 @@ function setCheck(team, first) {
   give(offs[0]); M_.B.assist = null;
   if (!M_.practice) call(first ? 'CHECK UP' : 'CHECK', first ? `${M_.cfg.mode.n} · first to ${M_.cfg.mode.to}` : '', '#fff', 1.2);
 }
-function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.dribPh = 0; }
+function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); }
 function changePoss(team) { if (MT.off !== team) { MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; } } }
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
@@ -232,7 +232,7 @@ function startMove(p, slot, dx, dz) {
   if (p.moveCool > 0 || p.stam < 6) return;
   const mv = MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot); const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
-  p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur + 0.12; p.stam -= mv.st; p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand;
+  p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; if (mv.slot === 'side') p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
   p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh');
   // ankle check on the nearest defender
   let o = null, od = 2.1; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
@@ -249,8 +249,10 @@ function doPass(p, to) {
   const oop = MT.phase === 'live' && !MT.needClear && to.st === 'free' && dHoop(to) < 3.7 && dHoop(to) > 0.9 && dist(p, to) > 3 && (MT.arcade || att(to, 'dunk') >= 62) && nearestOpp(to)[1] > 0.95 && (to.callT > 0 || to.vx * -to.x + to.vz * -to.z > 1.2);
   p.flashy = !oop && (p.b.build.style === 'showman' || bt(p, 'trickle') >= 2) && Math.random() < 0.45;
   p.st = 'pass'; p.t = 0; p.face = Math.atan2(to.x - p.x, to.z - p.z);
-  B.state = 'pass'; B.holder = null; B.target = to; B.from = p; B.t = 0; B.tried = {}; B.lastTeam = p.team;
-  B.pos.set(p.x + Math.sin(p.face) * 0.4, 1.25 + p.y, p.z + Math.cos(p.face) * 0.4); B.speed = 11 + nAtt(p, 'pass') * 7; sfxM('whoosh');
+  B.state = 'pass'; B.holder = null; B.target = to; B.from = p; B.t = 0; B.tried = {}; B.lastTeam = p.team; B.bounced = false;
+  if (B.pos.y < 0.7) B.pos.y = 0.7;     /* a pass leaves from the hands, wherever the dribble had the ball */ B.speed = 11 + nAtt(p, 'pass') * 7; sfxM('whoosh');
+  const dd = dist(p, to); B.pk = oop ? 'lob' : (!passLane(p, to) && dd < 7) ? 'bounce' : dd > 7.5 ? 'overhead' : Math.hypot(p.vx, p.vz) > 3.2 ? 'one' : 'chest'; p.pk = B.pk;
+  B.y0 = B.pos.y; B.h0 = Math.max(0.5, Math.hypot(to.x - B.pos.x, to.z - B.pos.z));
   if (oop && startFinish(to, 0, true)) { to.finish.oop = true; to.finish.dur = Math.max(to.finish.dur, 0.66); B.speed = Math.max(7, dist(p, to) / (to.finish.dur * 0.6)); B.oop = true; floatTxt(p, 'LOB', '#f2c14e'); } else B.oop = false;
 }
 function passTarget(p, mx, mz) {
@@ -278,13 +280,27 @@ function resolveSteal(p) {
   if (h.st === 'finish') ch *= 0.3;
   if (Math.random() < clamp(ch, 0.01, 0.45)) {
     p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish') { h.st = 'free'; h.y = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
-  } else { p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; }
+  } else { p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0; }
 }
 function startJump(p) { if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); }
 
 // ---------- human control ----------
+// what can be cut short, and when: moves chain from halfway, fakes and passes recover fast, a landed jumper is done
+function canCancel(p) {
+  switch (p.st) {
+    case 'move': return p.t > p.mv.mv.dur * 0.5;
+    case 'fake': return p.t > 0.12;
+    case 'pass': return p.t > 0.12;
+    case 'steal': return p.t > 0.26;
+    case 'shove': return p.t > 0.22;
+    case 'shoot': return p.shot.released && p.y <= 0.001 && p.t > p.shot.rel + 0.08;
+    case 'celeb': return false;
+  }
+  return false;
+}
 function humanThink(p, dt) {
-  const I = IN[p.ctrl], B = MT.B; p.in.dx = I.mx; p.in.dz = I.my; p.in.sprint = I.sprint; p.handsUp = false;
+  let I = IN[p.ctrl];
+  const B = MT.B; p.in.dx = I.mx; p.in.dz = I.my; p.in.sprint = I.sprint; p.handsUp = false;
   if (MT.phase !== 'live') return;
   const hasBall = B.holder === p;
   if (p.st === 'shoot' && !p.shot.released && p.shot.auto) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
@@ -297,7 +313,15 @@ function humanThink(p, dt) {
     if ((p.shot.src === 'btn' && !I.b) || (p.shot.src === 'stick' && I.rdir !== 'D' && I.rdir !== 'DL' && I.rdir !== 'DR') || p.t > p.shot.rel * 1.55) releaseShot(p);
     return;
   }
-  if (p.st !== 'free') return;
+  // an action pressed while busy is held for 0.3 s and fires as soon as the current one can be cut short
+  const pressed = I.bP || I.aP || !!I.flick;
+  if (p.st !== 'free') {
+    if (pressed && canCancel(p)) { p.st = 'free'; p.rig.extraYaw = 0; p.y = 0; }
+    else { if (pressed) p.buf = { bP: I.bP, aP: I.aP, flick: I.flick, ttl: 0.3 }; return; }
+  }
+  if (!pressed && p.buf && p.buf.ttl > 0) { I = Object.assign({}, I, p.buf); p.buf = null; if (p.st !== 'free') return; }
+  else if (pressed) p.buf = null;
+  p.tAct = MT.time; if (pressed && I.tPress) p.lat = performance.now() - I.tPress;
   if (hasBall) {
     if (I.bP) { startShot(p, 'btn'); return; }
     if (I.flick === 'D') { startShot(p, 'stick'); return; }
@@ -434,7 +458,7 @@ function matchStep(dtReal) {
   if (M_.practice === 'rack' && !M_.over) { M_.rackT -= dt; if (M_.rackT <= 0) { M_.over = true; sfxM('buzz'); endMatch(); return; } }
 
   for (const p of M_.P) {
-    p.in = p.in || { dx: 0, dz: 0, sprint: false }; p.t += dt; p.swatT = (p.swatT || 0) - dt; p.cool -= dt; p.moveCool -= dt; p.slowT -= dt; p.callT -= dt; p.putT -= dt;
+    p.in = p.in || { dx: 0, dz: 0, sprint: false }; if (p.buf) p.buf.ttl -= dt; p.t += dt; p.swatT = (p.swatT || 0) - dt; p.cool -= dt; p.moveCool -= dt; p.slowT -= dt; p.callT -= dt; p.putT -= dt;
     if (p.bravT > 0) { p.bravT -= dt; p.brav = Math.max(0, p.bravT / 20); if (p.bravT <= 0) p.brav = 0; }
     if (p.user && !(p.remote && p.afk)) humanThink(p, dt); else aiThink(p, dt);
     stepPlayer(p, dt);
@@ -442,10 +466,12 @@ function matchStep(dtReal) {
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
     const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), R = 0.56;
-    if (d < R && d > 0.001) { const push = (R - d) / 2, wa = a.st === 'stagger' ? 0.2 : 1, wb = b.st === 'stagger' ? 0.2 : 1, sa = 0.5 + nAtt(b, 'str') * 0.5, sb = 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
+    if (d < R && d > 0.001) { const push = (R - d) / 2; if (push > 0.05) for (const q of [a, b]) { const sg = q === a ? -1 : 1, lx = dx / d * sg, lz = dz / d * sg, fx = Math.sin(q.face), fz = Math.cos(q.face); q.bumpT = 0.3; q.bumpX = clamp((lx * fx + lz * fz) * -push * 3, -0.25, 0.25); q.bumpZ = clamp((lx * fz - lz * fx) * push * 3, -0.25, 0.25); }
+      const wa = a.st === 'stagger' ? 0.2 : 1, wb = b.st === 'stagger' ? 0.2 : 1, sa = 0.5 + nAtt(b, 'str') * 0.5, sb = 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
   }
   stepBall(dt);
   for (const p of M_.P) animPlayer(p, dt);
+  if (B.state === 'held' && B.holder) ballHeld(B.holder, dt); ballMesh();
   matchFx(dt); matchCam(dtReal); hudMatch(); if (M_.net === 'host') netHostStep(dtReal);
 }
 function matchFx(dt) {
@@ -459,7 +485,8 @@ function stepPlayer(p, dt) {
   const M_ = MT, B = M_.B, hasBall = B.holder === p; let lock = 1;
   switch (p.st) {
     case 'shoot': {
-      lock = 0.12; const s = p.shot, j0 = s.rel * 0.42, air = 0.56; const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (0.32 + nAtt(p, 'vert') * 0.2) * Math.sin(Math.PI * u) * (M_.arcade ? 1.4 : 1) : 0;
+      const s = p.shot, j0 = s.rel * 0.42, air = 0.56;
+      if (p.y > 0.01) { lock = 0; const dmp = Math.pow(0.35, dt); p.vx *= dmp; p.vz *= dmp; } else lock = s.released ? 0.5 : 0.05;   /* plant on the gather (pull-up), drift in the air, walk off the landing */ const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (0.32 + nAtt(p, 'vert') * 0.2) * Math.sin(Math.PI * u) * (M_.arcade ? 1.4 : 1) : 0;
       if (s.released && u >= 1 && p.t > s.rel + 0.2) { p.st = 'free'; p.y = 0; }
       break;
     }
@@ -472,13 +499,13 @@ function stepPlayer(p, dt) {
       if (u >= 1.15) { p.st = 'free'; p.y = 0; p.rig.extraYaw = 0; }
       break;
     }
-    case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; const k = m.v * (1 - u * 0.6); p.vx = m.dx * k; p.vz = m.dz * k; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; } break; }
+    case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; const k = m.v * (1 - u * 0.6), st = 2.4 * Math.min(1, u * 1.6); p.vx = m.dx * k + p.in.dx * st; p.vz = m.dz * k + p.in.dz * st; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; } break; }
     case 'stagger': lock = 0; p.vx *= 0.9; p.vz *= 0.9; if (p.t >= p.stg.dur) p.st = 'free'; break;
     case 'fake': lock = 0.25; if (p.t > 0.27) p.st = 'free'; break;
     case 'jump': { lock = 0.35; const u = p.t / 0.62; p.y = p.jumpH * Math.sin(Math.PI * Math.min(1, u)); if (u >= 1) { p.st = 'free'; p.y = 0; } break; }
-    case 'steal': lock = 0.4; if (p.t > 0.13 && !p.stealDone) resolveSteal(p); if (p.t > 0.4) p.st = 'free'; break;
+    case 'steal': lock = 0.55; if (p.t > 0.13 && !p.stealDone) resolveSteal(p); if (p.t > 0.4) p.st = 'free'; break;
     case 'shove': lock = 0.3; if (p.t > 0.35) p.st = 'free'; break;
-    case 'pass': lock = 0.5; if (p.t > 0.22) p.st = 'free'; break;
+    case 'pass': lock = 0.8; if (p.t > 0.22) p.st = 'free'; break;
     case 'celeb': lock = 0; p.vx *= 0.85; p.vz *= 0.85; if (M_.phase === 'live') p.st = 'free'; break;
   }
   if (M_.phase !== 'live' && M_.phase !== 'check') lock = Math.min(lock, p.st === 'celeb' ? 0 : 0.5);
@@ -492,7 +519,8 @@ function stepPlayer(p, dt) {
   if (p.stam < 20) top *= 0.86; if (p.slowT > 0) top *= 0.45;
   const def = M_.off !== p.team && !hasBall && B.state !== 'loose'; if (def && !p.sprinting) top *= 0.92;
   if (lock > 0) {
-    const acc = (11 + nAtt(p, 'accel') * 15) * dt, tvx = p.in.dx * top * lock, tvz = p.in.dz * top * lock;
+    const tvx = p.in.dx * top * lock, tvz = p.in.dz * top * lock, opp = p.vx * tvx + p.vz * tvz < 0 || (Math.abs(tvx) + Math.abs(tvz) < 0.05);
+    const acc = (11 + nAtt(p, 'accel') * 15) * (opp ? 2.4 : 1) * dt;      // braking and reversing bite harder than speeding up
     const ddx = tvx - p.vx, ddz = tvz - p.vz, dl = Math.hypot(ddx, ddz); if (dl <= acc || dl === 0) { p.vx = tvx; p.vz = tvz; } else { p.vx += ddx / dl * acc; p.vz += ddz / dl * acc; }
   }
   p.x = clamp(p.x + p.vx * dt, -7.8, 7.8); p.z = clamp(p.z + p.vz * dt, -1.35, 12.8);
@@ -502,6 +530,7 @@ function stepPlayer(p, dt) {
   const sp = Math.hypot(p.vx, p.vz); let tf = p.face;
   if (p.st === 'shoot' || p.st === 'finish') tf = Math.atan2(-p.x, -p.z);
   else if (p.st === 'celeb') tf = 0;
+  else if (B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && sp < 2.5) tf = Math.atan2(-p.x, -p.z);
   else if (def && B.holder) { const m = p.user ? B.holder : (p.man || B.holder); const tgt = dist(p, B.holder) < 4 ? B.holder : m; tf = Math.atan2(tgt.x - p.x, tgt.z - p.z); }
   else if (hasBall && !p.sprinting && p.st === 'free') { const hf = Math.atan2(-p.x, -p.z); tf = sp > 1.5 ? lerpAng(Math.atan2(p.vx, p.vz), hf, 0.45) : hf; }
   else if (sp > 0.6) tf = Math.atan2(p.vx, p.vz);
@@ -514,7 +543,7 @@ function lerpAng(a, b, t) { let d = b - a; while (d > Math.PI) d -= 6.2832; whil
 function stepBall(dt) {
   const M_ = MT, B = M_.B; B.t += dt;
   if (B.state === 'held') {
-    ballHeld(B.holder, dt);
+    // where the held ball is drawn is decided after the bodies are posed (ballHeld), so it can sit in a real hand
   } else if (B.state === 'shot') {
     B.vel.y -= GRAV * dt; B.pos.addScaledVector(B.vel, dt); B.spin -= dt * 9;
     if (B.shooter && B.shooter.fire && Math.random() < 0.6) burst(B.pos.x, B.pos.y, B.pos.z, 0xff7a1f, 1);
@@ -540,6 +569,10 @@ function stepBall(dt) {
     if (l <= Math.max(0.45, stepL)) { give(to); to.catchT = M_.time; to.catchFrom = B.from; B.assist = B.from; if (to.st === 'free') to.ai.tick = 0.25; }
     else {
       B.pos.addScaledVector(_v, stepL / l);
+      // the flight's height follows the kind of pass: chest (flat), bounce (off the floor at 60%), overhead and lob (arcs)
+      const s = clamp(1 - Math.hypot(to.x - B.pos.x, to.z - B.pos.z) / (B.h0 || 1), 0, 1), yT = 1.2 + to.y, y0 = B.y0 || 1.2;
+      B.pos.y = B.pk === 'bounce' ? (s < 0.6 ? lerp(y0, 0.13, s / 0.6) : lerp(0.13, yT, (s - 0.6) / 0.4)) : lerp(y0, yT, s) + Math.sin(Math.PI * s) * (B.pk === 'lob' ? 1.3 : B.pk === 'overhead' ? 0.55 : 0.12);
+      if (B.pk === 'bounce' && !B.bounced && s >= 0.6) { B.bounced = true; sfx('bounce'); }
       if (B.t * B.speed > 1.3) for (const o of M_.P) {
         if (o.team === B.from.team || B.tried[o.i] || (o.st !== 'free' && o.st !== 'steal') || Math.hypot(o.x - B.pos.x, o.z - B.pos.z) > 0.8) continue; B.tried[o.i] = 1;
         const ch = 0.08 + nAtt(o, 'steal') * 0.42 - nAtt(B.from, 'pass') * 0.36 + 0.03 * bt(o, 'repo') + (o.user ? 0.12 : 0);
@@ -570,53 +603,130 @@ function stepBall(dt) {
     if (M_.practice && M_.looseT > 1.1) { give(M_.me); }
   }
   if (M_.practice === 'rack' && (B.state === 'shot' || B.state === 'through') && B.t > 0.3 && M_.me.st === 'free' && !M_.rackBall) { /* a second ball appears in hand so the rack keeps moving */ }
-  B.mesh.position.copy(B.pos); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3));
 }
 
-function ballHeld(p, dt) {
-  const M_ = MT, B = M_.B;
-  if (p.st === 'shoot' || p.st === 'finish') { handPos(p.rig, 'R', B.pos); B.pos.y += 0.1; if (p.st === 'shoot' && p.t < p.shot.rel * 0.5) { handPos(p.rig, 'L', _v); B.pos.lerp(_v, 0.5); } }
-  else {
-    const rate = p.st === 'move' ? 15 : 7 + p.speed * 0.9; const prev = Math.sin(p.dribPh); p.dribPh += dt * rate; const cur = Math.sin(p.dribPh);
-    if ((prev > 0) !== (cur > 0) && M_.phase === 'live') { if (!M_.bounceMute) sfxM('bounce'); }
-      let hgt = Math.abs(cur), side = p.hand === 'R' ? -1 : 1, low = p.st === 'move' ? 0.5 : 0.8, fwd = 0.3;
-      const mk = p.st === 'move' && p.mv.mv ? p.mv.mv.id : '';
-      if (mk === 'cross' || mk === 'tween' || mk === 'behind' || mk === 'shammgod' || mk === 'halfspin') {      // the ball changes hands: across the front, through the legs or round the back
-        const u = clamp(p.t / p.mv.mv.dur, 0, 1), e = u * u * (3 - 2 * u), s0 = (p.mv.h0 || 'R') === 'R' ? -1 : 1; side = lerp(s0, side, e) * (mk === 'shammgod' ? 1.6 : 1.15);
-        fwd = mk === 'behind' ? lerp(0.3, -0.3, Math.sin(u * Math.PI)) : mk === 'tween' ? lerp(0.3, 0.02, Math.sin(u * Math.PI)) : 0.36; hgt = Math.abs(Math.cos(u * Math.PI)) * 0.8; low = 0.62;
-      }
-      const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = fz, rz = -fx;
-      B.pos.set(p.x + fx * fwd + rx * side * 0.27, 0.125 + hgt * p.H * 0.47 * low + p.y, p.z + fz * fwd + rz * side * 0.27);
-    p.dribH = hgt;
-  }
-  B.spin += dt * 6;
+// =====================================================================
+//  BALL HANDLING LAYER — the dribble is a little state machine with real ball flight:
+//    hand  : ball in the palm, the hand pushes it down
+//    down  : released, travels to a floor point picked for this dribble (beside, in front, between the legs, behind)
+//    up    : comes back off the floor and meets the receiving hand wherever that hand now is
+//    carry : held in one palm (spin moves)       gather: both hands (shots, passes, fakes, finishes)
+//  The hand pose is driven from the same clock, so the hand is low when the ball leaves and high when it arrives.
+// =====================================================================
+const _bp = new THREE.Vector3(), _bq = new THREE.Vector3();
+function palm(p, hand, out) { handPos(p.rig, hand, out); out.y -= 0.115; return out; }
+// a reset (check, teleport): the ball starts in the hand instead of flying in from wherever it was
+function resetDrib(p) { const D = newDrib(p, MT.B.pos); palm(p, D.hand, MT.B.pos); D.ph = 'hand'; D.t = 0; D.F = null; p.drib = D; return D; }
+function newDrib(p, from) { return { ph: 'up', t: 0, T: 0.16, hand: p.hand || 'R', F: from.clone(), P0: from.clone(), kind: '', push: 1 }; }
+// where this bounce lands, in the player's frame: side (+ = dribble hand side), forward
+function dribFloor(p, D, kind, tAhead, vx, vz) {
+  if (vx === undefined) { vx = p.avx || 0; vz = p.avz || 0; }
+  const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = fz, rz = -fx, sgn = D.hand === 'R' ? -1 : 1, v = Math.hypot(vx, vz);
+  let side = 0.3, fwd = 0.3 + Math.min(0.45, v * 0.06);                 // ordinary dribble: outside the foot, ahead more at speed
+  if (kind === 'cross') { side = 0.02; fwd = 0.45; }
+  else if (kind === 'tween') { side = 0.0; fwd = 0.04; }
+  else if (kind === 'behind') { side = 0.0; fwd = -0.32; }
+  else if (kind === 'shammgod') { side = -0.55; fwd = 0.55; }
+  else if (kind === 'retreat') { side = 0.32; fwd = 0.1; }
+  else if (p.protect) { side = 0.42; fwd = 0.05; }                     // ball kept away from the defender, low and to the side
+  return _bq.set(p.x + vx * tAhead + rx * side * sgn, 0.125, p.z + vz * tAhead + rz * side * sgn).clone();
 }
+// a dribble move takes the ball out of whatever it was doing and sends it where the move needs it
+function dribMove(p, mv) {
+  const D = p.drib; if (!D || MT.B.holder !== p) return;
+  const k = mv.id, change = { cross: 1, tween: 1, behind: 1, shammgod: 1 }[k];
+  if (k === 'spin' || k === 'halfspin') { D.ph = 'carry'; D.t = 0; D.T = mv.dur * 0.8; return; }
+  if (change) D.hand = p.hand;                                         // startMove already chose the new hand
+  D.ph = 'down'; D.t = 0; D.T = Math.max(0.09, mv.dur * 0.32); D.P0 = MT.B.pos.clone(); D.kind = change ? k : (k === 'stepback' || k === 'moonwalk' ? 'retreat' : k === 'hesi' ? 'hesi' : '');
+  const mvx = p.mv.dx * p.mv.v * 0.8, mvz = p.mv.dz * p.mv.v * 0.8; D.F = dribFloor(p, D, D.kind, D.T, mvx, mvz); D.upT = Math.max(0.12, mv.dur * 0.42);
+}
+function ballFollow(B, target, dt, exact) {
+  // never teleport: if the ball is far from where it should be (a state change), it closes the gap fast instead of jumping
+  const d = B.pos.distanceTo(target);
+  if (exact && d < 0.2) B.pos.copy(target); else if (d > 0) { const m = Math.min(d, Math.max(d * (1 - Math.exp(-22 * dt)), 0), 11 * dt); B.pos.addScaledVector(_bq.copy(target).sub(B.pos), m / d); }
+}
+function ballHeld(p, dt) {
+  const M_ = MT, B = M_.B; let D = p.drib || (p.drib = newDrib(p, B.pos)); if (p.reset) { p.reset = false; D = resetDrib(p); } D.t += dt;
+  if (B.pos.distanceTo(_bp.set(p.x, B.pos.y, p.z)) > 2.5 || (D.F && Math.hypot(D.F.x - p.x, D.F.z - p.z) > 2.5)) D = resetDrib(p);
+  const st = p.st;
+  if (st === 'shoot' || st === 'finish' || st === 'fake' || (st === 'pass')) {
+    // gather: ball between the hands, then up into the shooting hand
+    handPos(p.rig, 'R', _bp); handPos(p.rig, 'L', _bq);
+    const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
+    _bp.lerp(_bq, 0.5 * (1 - lift)); _bp.y += 0.06 + 0.05 * lift;
+    ballFollow(B, _bp, dt, true); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
+  }
+  if (D.ph === 'gather') { D.ph = 'up'; D.t = 0; D.T = 0.14; D.F = B.pos.clone(); D.hand = p.hand; }
+  const v = Math.hypot(p.avx || 0, p.avz || 0), hesi = p.st === 'move' && p.mv.mv.id === 'hesi';
+  const Tc = clamp(0.56 - v * 0.032, 0.36, 0.56) * (p.protect ? 0.8 : 1) * (hesi ? 1.35 : 1);
+  if (D.ph === 'carry') {
+    palm(p, D.hand, _bp); ballFollow(B, _bp, dt, true); p.dribH = 0.75;
+    if (D.t >= D.T || p.st !== 'move') { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = ''; D.F = dribFloor(p, D, '', D.T); D.upT = Tc * 0.38; }
+  } else if (D.ph === 'hand') {
+    // the hand rides the ball down, then lets go
+    // receive (the hand gives with the ball as it rises), then push it back down
+    const Th = Tc * 0.36, u = Math.min(1, D.t / Th); p.dribH = u < 0.35 ? 0.88 + 0.12 * (u / 0.35) : 1 - 0.8 * ((u - 0.35) / 0.65);
+    palm(p, D.hand, _bp); ballFollow(B, _bp, dt, true);
+    if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = ''; D.F = dribFloor(p, D, '', D.T); D.upT = Tc * 0.38; }
+  } else if (D.ph === 'down') {
+    if (D.t <= dt * 1.01) D.T = Math.max(D.T, D.P0.distanceTo(D.F) / 10);     // no faster than a hard real push
+    const u = Math.min(1, D.t / D.T), e = Math.pow(u, 1.5); p.dribH = 0.25 + 0.6 * u;
+    B.pos.set(lerp(D.P0.x, D.F.x, u), lerp(D.P0.y, 0.125, e), lerp(D.P0.z, D.F.z, u));
+    if (u >= 1) { D.ph = 'up'; D.t = 0; D.C0 = null; D.T = D.upT || Tc * 0.5; D.F.copy(B.pos); if (M_.phase === 'live' && !M_.bounceMute) sfx('bounce'); }
+  } else {   // up: off the floor to wherever the receiving hand is now
+    const u = Math.min(1, D.t / D.T), e = 1 - (1 - u) * (1 - u); p.dribH = 0.85 + 0.15 * u;
+    palm(p, D.hand, _bp); _bq.set(lerp(D.F.x, _bp.x, u), lerp(D.F.y, _bp.y, e), lerp(D.F.z, _bp.z, u));
+    // a real ball has a top speed: chase the path, but never faster than ~11 m/s; the catch happens when ball and hand meet
+    const gap = B.pos.distanceTo(_bq), cap = 11 * dt; if (gap > cap) B.pos.lerp(_bq, cap / gap); else B.pos.copy(_bq);
+    if (u >= 0.85 && B.pos.distanceTo(_bp) < 0.12) { D.ph = 'hand'; D.t = 0; }      // fingertips take it a touch before the palm
+  }
+  B.spin += dt * (D.ph === 'down' ? 9 : 4);
+}
+function ballMesh() { const B = MT.B; B.mesh.position.copy(B.pos); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3)); }
 function animPlayer(p, dt) {
   const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen };
+  p.protect = hasBall && p.st === 'free' && nearestOpp(p)[1] < 1.7 && Math.hypot(p.avx || 0, p.avz || 0) < 3;
   p.runPh += dt * (4 + p.speed * 2.1);
   const spN = clamp(p.speed / 6.5, 0, 1);
   switch (p.st) {
-    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.kick = p.shot.j.id === 'lawsuit'; break;
+    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
     case 'fake': an = 'fake'; o.rel = 0.6; break;
     case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.euro = f.euro || 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; break; }
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
     case 'stagger': an = 'stagger'; o.fall = p.stg.fall; break;
-    case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'pass': an = 'pass'; o.flashy = p.flashy; break;
+    case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
     case 'celeb': an = 'celeb'; o.style = p.b.moves.celeb; break;
     default:
-      if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH || 0; o.hand = p.hand; }
+      if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
       else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; if (p.sprinting) { an = 'run'; o.sp = spN; } }
       else if (p.speed > 0.4) { an = 'run'; o.sp = spN; o.ph = p.runPh; }
       else if (B.state === 'pass' && B.target === p) an = 'catch';
+      if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
+      if (B.state === 'pass' && B.target === p && Math.hypot(B.pos.x - p.x, B.pos.z - p.z) < 4) o.catchArms = true;
       else if (M_.phase === 'scored' && M_.lastScorer && M_.lastScorer.team !== p.team) an = 'sulk';
   }
   if (!hasBall && an !== 'stagger' && an !== 'sulk' && an !== 'celeb' && p.st !== 'finish' && p.st !== 'move') { let a = Math.atan2(B.pos.x - p.x, B.pos.z - p.z) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.look = a; }
   if (p.speed > 2 && (an === 'run' || an === 'dribble')) { let a = Math.atan2(p.vx || 0, p.vz || 0) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.bank = -a * 0.35 * spN; }
+  // presentation velocity from actual movement (works the same on a guest, who only gets positions)
+  let avx = (p.x - (p.lx === undefined ? p.x : p.lx)) / dt, avz = (p.z - (p.lz === undefined ? p.z : p.lz)) / dt; p.lx = p.x; p.lz = p.z;
+  if (Math.hypot(avx, avz) * dt > 1) { avx = avz = 0; p.avx = p.avz = p.pavx = p.pavz = 0; if (B.holder === p) p.reset = true; }   // placed, not moved (a check, a reset)
+  avx = clamp(avx, -12, 12); avz = clamp(avz, -12, 12);
+  p.avx = lerp(p.avx || 0, avx, 0.5); p.avz = lerp(p.avz || 0, avz, 0.5);
+  const fwdA = ((p.avx - (p.pavx || 0)) * Math.sin(p.face) + (p.avz - (p.pavz || 0)) * Math.cos(p.face)) / dt; p.pavx = p.avx; p.pavz = p.avz;
+  p.leanF = lerp(p.leanF || 0, clamp(fwdA * 0.016, -0.24, 0.26), 1 - Math.exp(-9 * dt)); o.leanF = p.leanF;
+  const asp = Math.hypot(p.avx, p.avz);
+  if (asp > 0.6 && (p.st === 'free' || p.st === 'move')) { let a = Math.atan2(p.avx, p.avz) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; if (Math.abs(a) < 2.3) o.hipYaw = clamp(a, -0.6, 0.6) * Math.min(1, asp / 3) * 0.75; }
+  if (p.bumpT > 0) { p.bumpT -= dt; const k = p.bumpT / 0.3; o.bump = [p.bumpX * k, p.bumpZ * k]; }
+  if (R.gait && (an === 'run' || an === 'dribble' || an === 'slide')) o.ph = R.gait.ph;       // arms swing with the feet that are actually stepping
+  p.an = an;
   const t = an === 'idle' || an === 'celeb' || an === 'call' || an === 'sulk' ? M_.time : an === 'fake' ? 0.3 + p.t : p.t;
   applyPose(R, poseOf(an, t, o), dt);
   R.root.position.set(p.x, p.y, p.z); R.root.rotation.y = p.face + (R.extraYaw || 0);
+  const air = p.y > 0.01 || p.st === 'finish' || (p.st === 'jump' && p.t > 0.04);
+  gaitStep(R, { x: p.x, z: p.z, yaw: R.root.rotation.y, vx: p.avx, vz: p.avz, grounded: !air, wide: an === 'slide' ? 1 : p.protect ? 0.6 : an === 'idle' || an === 'catch' ? 0.25 : 0.05, want: p.st === 'stagger' ? (p.stg && p.stg.fall ? 0 : 0.4) : 1, dt });
+  legIK(R, dt);
   R.shadow.position.y = 0.015 - p.y; R.shadow.scale.setScalar(clamp(1 - p.y * 0.25, 0.4, 1)); p.ring.position.y = 0.02 - p.y;
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
   if (p.arrow) { p.arrow.position.y = p.H + 0.42 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }

@@ -267,7 +267,8 @@ function worldStep(dt) {
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
-  const R = me.rig; applyPose(R, poseOf(v > 0.5 ? 'run' : 'idle', v > 0.5 ? 0 : W.t, { sp: v / 8, ph: me.ph }), dt); R.root.position.set(me.x, 0, me.z); R.root.rotation.y = me.face; R.capeSwing = v / 8;
+  const R = me.rig; applyPose(R, poseOf(v > 0.5 ? 'run' : 'idle', v > 0.5 ? 0 : W.t, { sp: v / 8, ph: R.gait ? R.gait.ph : me.ph }), dt); R.root.position.set(me.x, 0, me.z); R.root.rotation.y = me.face; R.capeSwing = v / 8;
+  gaitStep(R, { x: me.x, z: me.z, yaw: me.face, vx: me.vx, vz: me.vz, grounded: true, wide: v < 0.3 ? 0.25 : 0, want: 1, dt }); legIK(R, dt);
   // npcs
   for (const n of W.npcs) {
     let an = n.anim === 'ball' ? 'dribble' : n.anim, o = { ph: n.ph, leg: n.rig.legLen, sp: 0, dr: Math.abs(Math.sin(W.t * 7 + n.ph)) };

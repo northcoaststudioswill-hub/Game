@@ -1,4 +1,4 @@
-# GOT NEXT — where it stands (v0.4)
+# GOT NEXT — where it stands (v0.4, with the v0.5 animation pass noted)
 
 Written at the end of the v0.4 pass: animation and gameplay, crews online (up to six people, 3v3), local two-player
 on one keyboard, The Pit renamed The Cages. It covers what is in the game, what is missing, the bugs and risks I know
@@ -9,6 +9,11 @@ software rendering). Online play has only run in a simulated room on one machine
 with real people on real phones.
 
 ---
+
+**v0.5 (animation and controls):** feet plant and step with leg IK, the dribble is a ball-in-hand state machine, a fixed 60 Hz
+simulation with latched and buffered input, cancel windows, braking, steering in moves, pass types, catch arms, box-outs.
+All eight acceptance scenarios pass. See [`ANIMATION.md`](ANIMATION.md). The items below "Feet slide" and "the ball can clip"
+in section 3 are fixed by it.
 
 ## 1. What is in the game
 
