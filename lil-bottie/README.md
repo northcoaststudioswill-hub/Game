@@ -10,10 +10,10 @@ chrome hands, iced watch.
 
 | Folder | What it holds |
 | --- | --- |
-| `index.html` | Open this. The model on a stage: turn him, try the poses and faces, and press **The Algorithm** to watch him rap it with the timed lyrics on screen. |
+| `index.html` | Open this. The model on a stage with a row of menus along the bottom: **Songs** (pick any of the 13; three have recordings, or load one from your device), **Puffer** (12 jacket colours, or each song's own), **Poses**, **Faces**, **Tap** (tap in the lyric timing for the chosen song) and **Lines** (jump to a line, nudge it by a tenth of a second). |
 | `asset/` | `lil-bottie.js`, the 3D model (needs only three.js r128), and a sheet of ten views. |
 | `refs/` | The thirteen reference photos the model was built from. |
-| `songs/` | `algorithm.mp3` (3:20), copied unchanged from the studio's music. |
+| `songs/` | `algorithm.mp3` (3:20), `overclocked.mp3` (3:17) and `nuke.mp3` (3:50), copied unchanged from the studio's music. |
 | `lyrics/` | *The Algorithm*, word for word from the archive, and its timing file. |
 | `lore/` | `artist-archive.pdf`: tracklist, persona rules, visual lock, lore and every saved lyric. |
 | `music-video/` | The plan for the music video in the Grok Fable Astra world. Not built yet. |
@@ -132,15 +132,14 @@ How the timing was made: the song runs at about 137 beats a minute and the lyric
 bar (3.50 seconds). The grid is anchored where the bass comes back in at 28.45 s, and the sheet's section
 boundaries then land on the track's own breaks at 14.4, 56.4, 126.4 and 168.3 seconds.
 
-**The grid is wrong against the vocal** (Will, 24 Nov). To fix it, open `index.html` and press **⏱ time it
-yourself**: the song plays and you tap once at the start of each line. Your times are used straight away, kept in
+**The grid is wrong against the vocal** (Will, 24 Nov). To fix it, open `index.html` and open the **Tap** menu and press **start tapping from the top**: the song plays and you tap once at the start of each line. Your times are used straight away, kept in
 that browser, and can be copied out to be saved into the two timing files here. Each line in the list also has
 −0.1s / +0.1s buttons. Timing from the vocal by speech recognition was tried and could not be run in the build
 session.
 
 **Not checked by ear.** Nobody has listened to it against the track, and it was not transcribed from the vocal, so
 a line could sit early or late inside its bar, and the last 17 seconds (after 3:02) have no lines on the sheet.
-`index.html` has "lyrics −¼s / +¼s" buttons for checking it.
+The **Tap** menu in `index.html` has −¼s / +¼s buttons for checking it. Timings are kept per song.
 
 ## Rules
 

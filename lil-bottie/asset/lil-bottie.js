@@ -500,7 +500,7 @@
     }
     update(0, 1);
     return { group: group, parts: { body: body, torso: torso, head: head, screen: screen, arms: arms, legs: legs, pendant: pendant, dreads: dreads },
-      poses: Object.keys(POSES), hands: Object.keys(HANDS), faces: Object.keys(PRESET), icons: Object.keys(ICONS), eyes: Object.keys(EYES), mouths: Object.keys(MOUTHS), jackets: Object.keys(JACKETS), setJacket: setJacket, setFace: setFace, setExpression: setExpression, setIcon: setIcon, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.63 };
+      poses: Object.keys(POSES), hands: Object.keys(HANDS), faces: Object.keys(PRESET), icons: Object.keys(ICONS), eyes: Object.keys(EYES), mouths: Object.keys(MOUTHS), jackets: Object.keys(JACKETS), setJacket: setJacket, jacket: function () { return jacketName; }, setFace: setFace, setExpression: setExpression, setIcon: setIcon, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.63 };
   }
   // suggest(line): a pose, eyes, mouth and icon for a lyric line, from the words in it. First rule that matches wins.
   var RULES = [
@@ -520,5 +520,5 @@
     [/\blove|\bheart|\blikes?\b/i, 'thumbs', 'heart', 'grin', 'heart'], [/strong|flex|muscle/i, 'flex', 'hype', 'grin', null], [/know|think|mind|brain|smart/i, 'think', 'side', 'smirk', null], [/\bme\b|\bmine\b|\bmyself/i, 'me', 'happy', 'grin', null], [/\byou\b|\byour\b|y'all/i, 'point', 'happy', 'smile', null], [/\?/, 'shrug', 'side', 'smirk', 'what']];
   var FALLBACK = ['rap', 'dance', 'bodyroll', 'mic', 'shake', 'robot', 'gang', 'armwave', 'lead', 'slide', 'dab', 'me'];
   function suggest(line, n) { var txt = String(line || ''); for (var i = 0; i < RULES.length; i++) if (RULES[i][0].test(txt)) return { pose: RULES[i][1], eyes: RULES[i][2], mouth: RULES[i][3], icon: RULES[i][4] }; return { pose: FALLBACK[(n || 0) % FALLBACK.length], eyes: 'happy', mouth: 'grin', icon: null }; }
-  root.LilBottie = { build: build, suggest: suggest, version: '0.9' };
+  root.LilBottie = { build: build, suggest: suggest, version: '1.0' };
 })(typeof window !== 'undefined' ? window : this);
