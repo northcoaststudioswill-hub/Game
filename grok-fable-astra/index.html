@@ -6629,9 +6629,9 @@ function volApply(){if(AU.mus)AU.mus.gain.value=VOL.music*.85;if(AU.sfx)AU.sfx.g
 function onMusicBus(f){return function(){const pb=AU.bus;if(AU.mus)AU.bus=AU.mus;try{return f.apply(this,arguments);}finally{AU.bus=pb;}};}
 music=onMusicBus(music);movMusic=onMusicBus(movMusic);opnMusic=onMusicBus(opnMusic);
 {const rs=setInterval(()=>{if(RAD&&RAD.a){RAD.a.addEventListener('play',()=>{RAD.a.volume=Math.min(1,.55*VOL.music);});clearInterval(rs);}},500);}
-// ---- the dev lock: the code is SLOP67. Anyone who already had dev tools on keeps them.
+// ---- the dev lock: a 4-digit PIN. Anyone who already had dev tools on keeps them.
 if(DEV.unlocked===undefined){DEV.unlocked=!!DEV.on;devSave();}
-const DEVCODE='SLOP67';
+const DEVCODE='1111';
 {const dt=dvcToggle;dvcToggle=function(force){if(!DEV.unlocked&&force!==false)return;return dt(force);};}
 function devBtnSync(){const b=$('dvbtn');if(b)b.hidden=!(DEV.unlocked&&DEV.on);}
 devBtnSync();
@@ -6639,9 +6639,9 @@ devBtnSync();
 function optPanel(){const sl=(id,l,v)=>'<label class="opt"><span>'+l+'</span><input type="range" id="'+id+'" min="0" max="1" step="0.05" value="'+v+'"><b id="'+id+'v">'+Math.round(v*100)+'%</b></label>';
   tPanel('<h3>⚙️ OPTIONS</h3>'+sl('volm','🎵 Music',VOL.music)+sl('vols','💥 Sound effects',VOL.sfx)+'<p class="optn">The radio follows the music volume.</p>'+
     '<h4>Developer</h4>'+(DEV.unlocked?'<p class="optn">Dev tools are unlocked on this device.</p><div class="optb"><button id="optdc">🛠️ OPEN THE DEV CONSOLE</button><button id="optds">⚙️ DEV START SETTINGS</button><button id="optlk">🔒 LOCK DEV TOOLS</button></div>'
-      :'<p class="optn">For the people making the game.</p><div class="optb"><input id="optcode" type="password" autocomplete="off" placeholder="developer code" aria-label="Developer code"><button id="optun">UNLOCK</button></div><p class="optn" id="optmsg"></p>'),
+      :'<p class="optn">For the people making the game.</p><div class="optb"><input id="optcode" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="PIN" aria-label="Developer PIN"><button id="optun">UNLOCK</button></div><p class="optn" id="optmsg"></p>'),
     p=>{const bind=(id,k)=>{const i=p.querySelector('#'+id);i.oninput=()=>{VOL[k]=+i.value;p.querySelector('#'+id+'v').textContent=Math.round(VOL[k]*100)+'%';volSave();volApply();if(k==='sfx'){audioInit();SFX.orb&&SFX.orb(3);}};};bind('volm','music');bind('vols','sfx');
-      const un=p.querySelector('#optun');if(un){const go=()=>{const v=(p.querySelector('#optcode').value||'').trim().toUpperCase();if(v===DEVCODE){DEV.unlocked=true;DEV.on=true;devSave();devBtnSync();SFX.relic&&SFX.relic();p.remove();optPanel();}else{p.querySelector('#optmsg').textContent='Not the code.';}};un.onclick=go;p.querySelector('#optcode').onkeydown=e=>{if(e.key==='Enter')go();};}
+      const un=p.querySelector('#optun');if(un){const go=()=>{const v=(p.querySelector('#optcode').value||'').trim().toUpperCase();if(v===DEVCODE){DEV.unlocked=true;DEV.on=true;devSave();devBtnSync();SFX.relic&&SFX.relic();p.remove();optPanel();}else{p.querySelector('#optmsg').textContent='Wrong PIN.';}};un.onclick=go;p.querySelector('#optcode').onkeydown=e=>{if(e.key==='Enter')go();};}
       const dc=p.querySelector('#optdc');if(dc)dc.onclick=()=>{p.remove();dvcToggle(true);};const ds=p.querySelector('#optds');if(ds)ds.onclick=()=>devPanel();
       const lk=p.querySelector('#optlk');if(lk)lk.onclick=()=>{DEV.unlocked=false;DEV.on=false;devSave();devBtnSync();dvcToggle(false);p.remove();optPanel();};});}
 (function(){const st=document.createElement('style');st.textContent='#tpanel label.opt{display:grid;grid-template-columns:9em 1fr 3.5em;gap:10px;align-items:center;margin:8px 0;font-weight:700}#tpanel label.opt input{width:100%;accent-color:#ff2e88}#tpanel label.opt b{text-align:right;font-variant-numeric:tabular-nums}#tpanel .optn{font-size:12px;opacity:.75;margin:4px 0}#tpanel h4{margin:16px 0 4px;font-family:var(--display);letter-spacing:.06em;font-weight:400;font-size:20px}#tpanel .optb{display:flex;flex-wrap:wrap;gap:8px}#tpanel .optb input{flex:1;min-width:140px;font:700 14px var(--body);padding:8px 10px;border:3px solid var(--ink);border-radius:10px}@media (max-width:480px){#tpanel label.opt{grid-template-columns:1fr 3.5em}#tpanel label.opt span{grid-column:1/-1}}';document.head.appendChild(st);
