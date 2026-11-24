@@ -92,7 +92,9 @@ function setCheck(team, first) {
   give(offs[0]); M_.B.assist = null;
   if (!M_.practice) call(first ? 'CHECK UP' : 'CHECK', first ? `${M_.cfg.mode.n} · first to ${M_.cfg.mode.to}` : '', '#fff', 1.2);
 }
-function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); }
+// p.live: 'hold' (ball held, dribble still available), 'drib' (dribbling), 'dead' (picked up: pass, shoot, fake or pivot)
+function dribRules(p) { return p.user && !p.afk && !MT.reel; }
+function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); p.live = dribRules(p) && Math.hypot(p.vx, p.vz) < 1.5 ? 'hold' : 'drib'; p.stopT = 0; }
 function changePoss(team) { if (MT.off !== team) { MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; } } }
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
@@ -200,6 +202,7 @@ function releaseShot(p) {
   sfxM('whoosh');
 }
 function startFake(p) {
+  if (p.live === 'drib' && dribRules(p)) p.live = 'dead';      /* a pump fake after dribbling is a pickup */
   p.st = 'fake'; p.t = 0; p.y = 0; sfxM('whoosh');
   let o = null, od = 2.4; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
   if (o && !o.user && Math.random() < clamp(0.3 + (1 - o.aiLvl) * 0.3 - nAtt(o, 'perd') * 0.22 + nAtt(p, 'iq') * 0.15, 0.08, 0.7)) { startJump(o); o.ai.react = 0.9; floatTxt(o, 'BIT ON IT', '#f2c14e'); addBrav(p, 0.06); }
@@ -435,6 +438,10 @@ function humanThink(p, dt) {
   else if (pressed) p.buf = null;
   p.tAct = MT.time; if (pressed && I.tPress) p.lat = performance.now() - I.tPress;
   if (hasBall) {
+    if (p.live === 'dead' && dribRules(p)) {
+      if (I.flick === 'U' && dHoop(p) < 2.6) { startFinish(p, 0, false, 0, { layup: 1, kind: 'power' }); return; }      /* a power move off two feet is still allowed */
+      if (I.flick && I.flick !== 'D') { floatTxt(p, "DRIBBLE'S DEAD", '#ff8a1f'); return; }
+    }
     if (I.bP) { startShot(p, 'btn'); return; }
     if (I.flick === 'D') { startShot(p, 'stick'); return; }
     if (I.flick === 'U') { const d = dHoop(p); if (d <= finishRange(p) + 0.6) startFinish(p, euroOf(p)); else if (d <= 5.4) startShot(p, 'stick', true); else if (d <= 7.6) startHop(p, 'shot', 'stick'); else startMove(p, 'diag', 0, -1); return; }
@@ -647,6 +654,13 @@ function stepPlayer(p, dt) {
     case 'pass': lock = 0.8; if (p.t > 0.22) p.st = 'free'; break;
     case 'celeb': lock = 0; p.vx *= 0.85; p.vz *= 0.85; if (M_.phase === 'live') p.st = 'free'; break;
   }
+  // no double dribble: once you have dribbled, coming to a stop picks the ball up, and a picked-up ball cannot be dribbled again
+  if (hasBall && dribRules(p)) {
+    const push = Math.hypot(p.in.dx, p.in.dz);
+    if (p.live === 'hold' && (push > 0.25 || p.st === 'move')) p.live = 'drib';
+    if (p.live === 'drib' && p.st === 'free' && M_.phase === 'live') { if (push < 0.15 && Math.hypot(p.vx, p.vz) < 0.45) { p.stopT = (p.stopT || 0) + dt; if (p.stopT > 0.4) { p.live = 'dead'; if (p.mine || p.user) floatTxt(p, 'PICKED UP', '#f2c14e'); } } else p.stopT = 0; }
+    if (p.live === 'dead' && p.st === 'free') { lock = 0; const k = Math.pow(0.002, dt); p.vx *= k; p.vz *= k; }      /* feet stay put: pivot only */
+  } else if (hasBall && p.live !== 'drib') p.live = 'drib';
   if (M_.phase !== 'live' && M_.phase !== 'check') lock = Math.min(lock, p.st === 'celeb' ? 0 : 0.5);
   if (M_.phase === 'check') lock = 0;
   // defensive assist (people only, not sprinting): stay between your man and the rim, mirror his steps, sag off the
@@ -692,6 +706,7 @@ function stepPlayer(p, dt) {
     // on the ball: square to him. Off the ball: face your man when tight, open up between man and ball as you sag off
     if (g === h) tf = am; else tf = lerpAng(am, Math.atan2(h.x - p.x, h.z - p.z), clamp((dist(p, g) - 1.4) / 3.2, 0, 0.5));
   }
+  else if (hasBall && p.live === 'dead' && p.st === 'free' && Math.hypot(p.in.dx, p.in.dz) > 0.3) tf = Math.atan2(p.in.dx, p.in.dz);     /* pivot */
   else if (hasBall && !p.sprinting && p.st === 'free') { const hf = Math.atan2(-p.x, -p.z); tf = sp > 1.5 ? lerpAng(Math.atan2(p.vx, p.vz), hf, 0.45) : hf; }
   else if (sp > 0.6) tf = Math.atan2(p.vx, p.vz);
   else if (B.holder && B.holder !== p) tf = Math.atan2(B.holder.x - p.x, B.holder.z - p.z);
@@ -812,7 +827,7 @@ function ballHeld(p, dt) {
   const M_ = MT, B = M_.B; let D = p.drib || (p.drib = newDrib(p, B.pos)); if (p.reset) { p.reset = false; D = resetDrib(p); } D.t += dt;
   if (B.pos.distanceTo(_bp.set(p.x, B.pos.y, p.z)) > 2.5 || (D.F && Math.hypot(D.F.x - p.x, D.F.z - p.z) > 2.5)) D = resetDrib(p);
   const st = p.st;
-  if (st === 'shoot' || st === 'finish' || st === 'fake' || st === 'pass' || st === 'hop') {
+  if (st === 'shoot' || st === 'finish' || st === 'fake' || st === 'pass' || st === 'hop' || ((p.live === 'hold' || p.live === 'dead') && st === 'free')) {
     // gather: ball between the hands, then up into the shooting hand
     const bh = st === 'finish' && p.finish.bh === 'L' ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
     const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
@@ -862,7 +877,8 @@ function animPlayer(p, dt) {
     case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
     case 'celeb': an = 'celeb'; o.style = p.b.moves.celeb; break;
     default:
-      if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; }
+      if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
+      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
       else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; if (p.sprinting) { an = 'run'; o.sp = spN; } }
       else if (p.speed > 0.4) { an = 'run'; o.sp = spN; o.ph = p.runPh; }

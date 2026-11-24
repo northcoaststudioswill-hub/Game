@@ -65,7 +65,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.9';
+const VERSION = '0.9.1';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -1281,6 +1281,7 @@ function poseOf(anim, t, o) {
       p.rate = 14; break;
     }
     case 'gait': walkPose(p, o); break;
+    case 'hold': p.y = -0.1; legs(-0.45, 0.7, -0.35, 0.6, 0.14); S_('spine', 0.2); S_('chest', 0.08); S_('neck', -0.15); S_('shR', -0.55, 0, 0.12); S_('elR', -1.7); S_('wrR', 0.3); S_('shL', -0.65, 0, -0.28); S_('elL', -1.5); S_('wrL', 0.3); p.rate = 18; break;   /* triple threat: ball at the hip, both hands on it */
     case 'sprint': runPose(p, o); break;
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }

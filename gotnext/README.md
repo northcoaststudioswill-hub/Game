@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.9: walk inside your house. A room you decorate (Habbo-style) with its own walls and floor, built with the same builder, counted in your crib's Vibe, and visitable by friends online.** v0.8.8: defense controls (defense assist, timed contests with closeouts, steals that go for the ball, jumping the passing lane) and real ankle-break and fall reactions.** v0.8.7: crossovers reworked. v0.8.6: team-coloured name tags in games (you gold, your squad blue, them red), and defenders guard their man: face him when tight, open up between man and ball when sagging, square up on the ball.** v0.8.4: a real run (running-lab joint angles: knee drive, heel recovery, a flight phase), on The Block and on game courts.** v0.8.3: volume sliders. v0.8.2: the soundtrack (11 tracks, streamed from `gotnext/music/`, in-world reverb), and running off the court uses the court's run with a smooth walk-to-run ramp on sticks.** v0.8.1: a real walk (from gait-lab joint angles, planted feet that stay put), plus a little Habbo in the crib: things stack on tables, a rare of the day, emotes, chat bubbles, and visiting friends' cribs online with likes.** v0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.9.1: no more double dribble. Stop after dribbling and you pick the ball up; then pass, shoot, pump fake or pivot.** v0.9: walk inside your house. A room you decorate (Habbo-style) with its own walls and floor, built with the same builder, counted in your crib's Vibe, and visitable by friends online.** v0.8.8: defense controls (defense assist, timed contests with closeouts, steals that go for the ball, jumping the passing lane) and real ankle-break and fall reactions.** v0.8.7: crossovers reworked. v0.8.6: team-coloured name tags in games (you gold, your squad blue, them red), and defenders guard their man: face him when tight, open up between man and ball when sagging, square up on the ball.** v0.8.4: a real run (running-lab joint angles: knee drive, heel recovery, a flight phase), on The Block and on game courts.** v0.8.3: volume sliders. v0.8.2: the soundtrack (11 tracks, streamed from `gotnext/music/`, in-world reverb), and running off the court uses the court's run with a smooth walk-to-run ramp on sticks.** v0.8.1: a real walk (from gait-lab joint angles, planted feet that stay put), plus a little Habbo in the crib: things stack on tables, a rare of the day, emotes, chat bubbles, and visiting friends' cribs online with likes.** v0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -289,6 +289,16 @@ game through The Link. Built by `python3 build.py` alongside the game; source in
 Skill stick with the ball: **↓ hold** shoot, **↑** drive (layup or dunk), **← →** side move, **↙ ↘** stepback,
 **↖ ↗** spin. Without it: **↑** hands up, **↓** steal (JAM: shove).
 
+**Dribble rules** (your player; the AI and online guests follow the host's game):
+- **Ball in hand, not dribbled yet** (after a catch, a check, a rebound): you hold it in triple threat. Moving or any
+  dribble move starts the dribble.
+- **Stopping:** once you have dribbled, standing still for 0.4 s picks the ball up. A quick stop-and-go or a hesi keeps
+  the dribble.
+- **A pump fake** after dribbling also picks it up.
+- **A picked-up ball** can be passed, shot or pump-faked. The stick pivots you (the feet stay put).
+- **Refused once picked up:** dribble moves and drives (DRIBBLE'S DEAD). Exception: a power layup within about 2.5 m
+  of the rim.
+
 The **move stick** (left) picks the finish or the jumper as you go up:
 
 | Move stick as you go up | Near the rim (↑ or shoot) | Jumper (shoot) |
@@ -362,6 +372,8 @@ node tests/devroom.mjs            # clicks through every Dev Room tab, a reel an
 node tests/contest.mjs [N]        # N drives per finisher quality at a rim protector: made %, blocked %, finishes picked
 node tests/home.mjs               # the home builder end to end (place, move, stack, store, sell, rares, land, sets, visitors)
 node tests/visit.mjs              # two players online: visit a crib and walk into the house, chat, emote, like, hang out
+node tests/dribble.mjs            # no double dribble: hold, dribble, stop to pick up, pivot only, hesi and stop-and-go keep it
+node tests/quit.mjs               # leave a shoot-around from the pause menu on desktop and on a phone
 node tests/room.mjs               # inside the house: walk in, build, refusals, walls fading, room look, Vibe, walk out
 node tests/walkfeel.mjs [file]    # the walk measured: cadence, step length, foot slide, bob, lean
 node tests/runfeel.mjs [file]     # sprint smoothness on The Block vs a court
