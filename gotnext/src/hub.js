@@ -7,7 +7,7 @@ function worldPlayerRig() {
 }
 function addNpc(build, x, z, face, anim, extra) {
   const r = makeRig(build, !!(extra && extra.low)); r.root.position.set(x, 0, z); r.root.rotation.y = face; scene.add(r.root);
-  const n = Object.assign({ rig: r, x, z, face, anim: anim || 'idle', ph: rnd(0, 6), hx: x, hz: z, tx: x, tz: z, wt: rnd(1, 5) }, extra || {}); if (n.anim === 'ball') { n.ball = makeBall(pick(['bl_std', 'bl_rwb', 'bl_neon'])); scene.add(n.ball); } W.npcs.push(n); return n;
+  const n = Object.assign({ rig: r, name: build.name, x, z, face, anim: anim || 'idle', ph: rnd(0, 6), hx: x, hz: z, tx: x, tz: z, wt: rnd(1, 5) }, extra || {}); if (n.anim === 'ball') { n.ball = makeBall(pick(['bl_std', 'bl_rwb', 'bl_neon'])); scene.add(n.ball); } W.npcs.push(n); return n;
 }
 function spot(x, z, r, label, fn) { W.spots.push({ x, z, r, label, fn }); }
 function solid(x0, x1, z0, z1) { W.solids.push([x0, x1, z0, z1]); }
@@ -17,13 +17,16 @@ function building(x, z, w, d, h, col, label, labelCol, face) {
   const ew = face === 'e' || face === 'w', sgn = face === 'e' || face === 's' ? 1 : -1;
   const fx = ew ? x + sgn * (w / 2 + 0.07) : x, fz = ew ? z : z + sgn * (d / 2 + 0.07), ry = { n: Math.PI, s: 0, e: Math.PI / 2, w: -Math.PI / 2 }[face];
   const s = sign(label, Math.min(ew ? d : w, 7) * 0.92, 1.7, labelCol, '#0a0a0e'); s.position.set(fx, Math.min(h - 1.4, 5.2), fz); s.rotation.y = ry; scene.add(s);
+  const lc = new THREE.Color(labelCol).getHex(), gl = glow(fx + (ew ? sgn * 0.5 : 0), Math.min(h - 1.4, 5.2), fz + (ew ? 0 : sgn * 0.5), lc, 1, null, 0.75); gl.scale.set(Math.min(ew ? d : w, 7) * 1.5, 4.2, 1);
+  glow(fx + (ew ? sgn * 0.6 : 0), 1.6, fz + (ew ? 0 : sgn * 0.6), lc, 5, null, 0.45);
+  pool(fx + (ew ? sgn * 2.4 : 0), fz + (ew ? 0 : sgn * 2.4), lc, ew ? 4.5 : 7, ew ? 7 : 4.5, 0.4);
   // roll-up door, lit from inside, and windows above
   M(box(ew ? 0.1 : 2.6, 3.2, ew ? 2.6 : 0.1), flat(labelCol, { transparent: true, opacity: 0.9 }), fx, 1.6, fz, scene);
   M(box(ew ? 0.14 : 2.2, 2.8, ew ? 2.2 : 0.14), flat(0x0b0b0e), fx, 1.4, fz, scene);
   for (let i = 0; i < 3; i++) for (let j = 0; h > 7 && j < 1; j++) { const o = (i - 1) * 2.6; M(box(ew ? 0.1 : 1.3, 1.3, ew ? 1.3 : 0.1), flat(RNG() < 0.6 ? 0xffd28a : 0x20222a), ew ? fx : fx + o, h - 1.3 + j, ew ? fz + o : fz, scene); }
-  return { fx, fz, ry };
+  return { fx, fz, ry, gl };
 }
-function lamp(x, z, col) { M(cyl(0.07, 0.09, 5, 6), toon('#20242c'), x, 2.5, z, scene); M(sph(0.28, 8, 6), flat(col || 0xffe9a8), x, 5.1, z, scene); const g = M(geo('glow', () => new THREE.CircleGeometry(2.6, 16)), flat(col || 0xffe9a8, { transparent: true, opacity: 0.1, depthWrite: false }), x, 0.03, z, scene); g.rotation.x = -Math.PI / 2; }
+function lamp(x, z, col) { M(cyl(0.07, 0.09, 5, 6), toon('#20242c'), x, 2.5, z, scene); M(sph(0.28, 8, 6), flat(col || 0xffe9a8), x, 5.1, z, scene); const g = M(geo('glow', () => new THREE.CircleGeometry(2.6, 16)), flat(col || 0xffe9a8, { transparent: true, opacity: 0.1, depthWrite: false }), x, 0.03, z, scene); g.rotation.x = -Math.PI / 2; glow(x, 5.1, z, col || 0xffe9a8, 2.6); pool(x, z, col || 0xffe9a8, 5, 5, 0.3); beam(x, 5.0, z, x, 0, z, col || 0xffe9a8, 2.2, 0.05, 5); }
 // spray-paint piece: big leaning letters, outline, shine, drips
 function mural(text, w, h, cols, x, y, z, ry) {
   const tex = canvasTex(1024, Math.round(1024 * h / w), (c, W_, H_) => {
@@ -49,10 +52,12 @@ function floodlight(x, z, h, tx, tz) {
   const lit = M(box(1.4, 0.5, 0.06), flat(0xfff6dc), x, h + 0.2, z, scene); lit.lookAt(tx, 0, tz); lit.translateZ(0.17);
   const cone = M(geo('cone', () => { const g = new THREE.ConeGeometry(4.2, 11, 14, 1, true); g.translate(0, -5.5, 0); return g; }), flat(0xfff2c8, { transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }), x, h + 0.2, z, scene);
   cone.lookAt(tx, h + 0.2 - 9, tz); cone.rotateX(Math.PI / 2);
+  const gp = lit.position.clone(); glow(gp.x, gp.y, gp.z, 0xfff6dc, 5, null, 0.9);
+  for (let i = 0; i < 10; i++) { const u = rnd(0.2, 0.9), s = glow(lerp(x, tx, u) + rnd(-1.4, 1.4), lerp(h, 0.5, u) + rnd(-0.5, 0.5), lerp(z, tz, u) + rnd(-1.4, 1.4), 0xfff2c8, 0.07, null, 0.7); AMB.motes.push({ s, x: s.position.x, y: s.position.y, z: s.position.z, ph: rnd(0, 6) }); }
 }
 function stringLights(x0, z0, x1, z1, y, n) {
   const pts = [], cols = [0xff2d78, 0xf2c14e, 0x7de3ff, 0xece9e2];
-  for (let i = 0; i <= n; i++) { const u = i / n, sag = Math.sin(u * Math.PI) * 1.1, px = lerp(x0, x1, u), pz = lerp(z0, z1, u), py = y - sag; pts.push(V3(px, py, pz)); if (i > 0 && i < n) { const b = M(sph(0.11, 6, 5), flat(cols[i % 4]), px, py - 0.14, pz, scene); (W.bulbs = W.bulbs || []).push(b); } }
+  for (let i = 0; i <= n; i++) { const u = i / n, sag = Math.sin(u * Math.PI) * 1.1, px = lerp(x0, x1, u), pz = lerp(z0, z1, u), py = y - sag; pts.push(V3(px, py, pz)); if (i > 0 && i < n) { const b = M(sph(0.11, 6, 5), flat(cols[i % 4]), px, py - 0.14, pz, scene); (W.bulbs = W.bulbs || []).push(b); glow(0, 0, 0, cols[i % 4], 0.9, b, 0.55); } }
   scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x08080a })));
 }
 function shoeProp(col, sole, x, y, z, ry, parent) { const g = grp(parent || scene, x, y, z); g.rotation.y = ry || 0; ink(M(box(0.13, 0.11, 0.34), toon(col), 0, 0.07, 0, g), 1.12); M(box(0.14, 0.035, 0.36), toon(sole), 0, 0.015, 0, g); M(box(0.125, 0.1, 0.12), toon(col), 0, 0.15, -0.1, g); return g; }
@@ -74,7 +79,7 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
 function enterWorld(kind, sx, sz, face) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
   W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] };
-  musicMode = 'hub'; $('prompt').style.display = 'none';
+  musicMode = 'hub'; $('prompt').style.display = 'none'; ambInit();
   if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else buildCrib();
   worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
   if (S.created && S.seenEventDay !== dayKey()) { S.seenEventDay = dayKey(); daily(); setTimeout(() => toast('TODAY · ' + todayEvent().n, todayEvent().d + ' The old head has new contracts.', 'rank'), 800); }
@@ -130,7 +135,7 @@ function buildHub() {
 
   // ---- the block: four fronts, close enough to hear each other ----
   building(-21.5, -5.6, 12, 8.6, 9, '#7a4034', 'THE LAB', '#3dffa0', 'e'); spot(-13.6, -5.6, 2.2, 'THE LAB (attributes)', () => uiPlayer('attrs'));
-  building(-21.5, 5.8, 12, 9.6, 11, '#5a4640', 'MY CRIB', '#7de3ff', 'e'); spot(-13.4, 5.8, 2.2, 'GO HOME', () => enterWorld('crib', 0, 13.5, Math.PI));
+  building(-21.5, 5.8, 12, 9.6, 11, '#5a4640', 'MY CRIB', '#7de3ff', 'e'); spot(-13.4, 5.8, 2.2, 'GO HOME', () => enterWorld('crib', 0, 19.2, Math.PI));
   for (let i = 0; i < 3; i++) ink(M(box(1.5 - i * 0.45, 0.25, 3.2), toon('#8a8378'), -15.3 + (1.5 - i * 0.45) / 2, 0.125 + i * 0.25, 5.8, scene), 1.03);
   building(21.5, -5.6, 12, 8.6, 8, '#8a8378', 'THE PLUG', '#f2c14e', 'w'); spot(13.6, -5.6, 2.2, 'THE PLUG (drip)', () => uiShop(false));
   building(21.5, 5.8, 12, 9.6, 7, '#4a4f5c', 'TAPE DECK', '#ff2d78', 'w'); spot(13.6, 5.8, 2.2, 'TAPE DECK (moves)', () => uiPlayer('moves'));
@@ -189,9 +194,28 @@ function buildHub() {
   // rooftop boards, the flag, air traffic
   billboard(scene, ADS[0], -21.5, 13, -5.6, Math.PI / 2, 8, 4); billboard(scene, ADS[2], 21.5, 12, -5.6, -Math.PI / 2, 8, 4); billboard(scene, ADS[3], 21.5, 11, 5.8, -Math.PI / 2, 8, 4); billboard(scene, ADS[5], -9, 10.5, 20.5, Math.PI, 9, 4.4); billboard(scene, ADS[1], 8, 11, 20.5, Math.PI, 9, 4.4);
   M(cyl(0.1, 0.14, 15, 8), toon('#c8d0d8'), -15.2, 7.5, -11.2, scene);
+  if (S.home && homeLevel().lvl >= 10) billboard(scene, S.name + "'S CRIB\nA LANDMARK", -21.5, 19, 5.8, Math.PI / 2, 8, 4, '#7de3ff');
   const fl = canvasTex(256, 160, (x, w, hh) => { for (let i = 0; i < 13; i++) { x.fillStyle = i % 2 ? '#f4f4f4' : '#d02030'; x.fillRect(0, i * hh / 13, w, hh / 13 + 1); } x.fillStyle = '#2440a8'; x.fillRect(0, 0, w * 0.42, hh * 0.54); x.fillStyle = '#ffc531'; x.font = '900 60px Archivo, Impact'; x.textAlign = 'center'; x.fillText('$', w * 0.21, hh * 0.42); });
   W.flag = new THREE.Mesh(new THREE.PlaneGeometry(5, 3, 10, 1), new THREE.MeshBasicMaterial({ map: fl, side: THREE.DoubleSide })); W.flag.position.set(-12.6, 13.3, -11.2); scene.add(W.flag);
   for (let i = 0; i < 5; i++) { const c = new THREE.Group(); ink(M(box(2.6, 0.6, 1.2), toon(pick(['#ff2d78', '#7de3ff', '#f2c14e', '#ece9e2', '#a78bff'])), 0, 0, 0, c), 1.05); M(box(1.3, 0.45, 1.0), toon('#16181c'), -0.1, 0.45, 0, c); M(box(2.2, 0.08, 1.0), flat(0x7de3ff), 0, -0.34, 0, c); scene.add(c); W.cars.push({ c, a: rnd(0, 6.28), r: rnd(30, 48), y: rnd(16, 30), s: rnd(0.08, 0.2) * (i % 2 ? 1 : -1) }); }
+  // ---- life: steam from the manholes, smoke off the barrel, pigeons, paper in the wind, the sky, the weather ----
+  for (const [mx, mz] of [[-6, 3], [8, -8], [3, 10]]) emitter('steam', mx, 0.05, mz, 3);
+  emitter('smoke', -11, 1.2, 9.6, 3); emitter('spark', -11, 1.0, 9.6, 3); glow(-11, 1.3, 9.6, 0xff8a3c, 3.2, null, 0.6);
+  pigeons(3.2, 4.4, 6); pigeons(-7.4, -5.2, 5); pigeons(9.5, -4.2, 4); litter(14, -14, 14, -10, 11);
+  skyLife(64, 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); W.weather = weather();
+  for (const [x, z] of [[-14.6, -9.6], [14.6, -9.6], [-14.6, 10.6], [14.6, 10.6], [-14.6, 0.4], [14.6, 0.4]]) lamp(x, z, 0xffd9a0);
+  // the soy dog cart: steam, an umbrella, a man who has seen things
+  { const c = grp(scene, 11.4, 0, -2.6); c.rotation.y = -Math.PI / 2; ink(M(box(1.8, 0.9, 0.9), toon('#c8d0d8'), 0, 0.75, 0, c), 1.03); M(box(1.82, 0.12, 0.92), toon('#e04848'), 0, 1.25, 0, c);
+    for (const sx of [-0.7, 0.7]) M(cyl(0.18, 0.18, 0.08, 10), toon('#20242c'), sx, 0.2, 0.47, c).rotation.x = Math.PI / 2; M(cyl(0.03, 0.03, 1.8, 5), toon('#6a707c'), 0, 2.0, 0, c);
+    const um = M(geo('umb', () => new THREE.ConeGeometry(1.3, 0.5, 10, 1, true)), new THREE.MeshToonMaterial({ color: '#f2c14e', gradientMap: ramp(), side: THREE.DoubleSide }), 0, 2.9, 0, c); ink(um, 1.02);
+    const s = sign('SOY DOGS · 15', 1.6, 0.36, '#f2c14e', '#0a0a0e', { border: false }); s.position.set(0, 1.0, 0.47); c.add(s); solid(10.8, 12, -3.6, -1.6);
+    const vb = aiBuild(55, 'glass'); vb.worn = Object.assign(randomWorn(1), { head: 'hd_cap', top: 't_tee' }); vb.name = 'Soy Dog Sal'; addNpc(vb, 12.4, -2.6, -Math.PI / 2, 'idle', { talk: 'vendor' }); emitter('steam', 11.4, 1.35, -2.4, 2.5);
+    spot(10.2, -2.6, 1.8, 'SOY DOG SAL (15 VC)', () => uiDialog('SOY DOG SAL', 'Soy dog, extra relish, 15 VC. Legally I have to say it is "dog-adjacent". +4 Stamina next game.', [['One dog (15)', () => { S.vc -= 15; S.boosts.push('dog'); save(); uiHud(); toast('SOY DOG', '+4 Stamina next game. Do not ask.'); sfx('coin'); }, '', S.vc < 15], ['Nah', null, 'alt']])); }
+  // the dice crew by the hydrant
+  for (let i = 0; i < 3; i++) { const a = i / 3 * 6.283, b = aiBuild(60); b.worn = randomWorn(1); addNpc(b, 11.4 + Math.cos(a) * 0.9, -8.6 + Math.sin(a) * 0.9, Math.atan2(-Math.cos(a), -Math.sin(a)), 'beg', { talk: 'dice' }); }
+  for (let i = 0; i < 2; i++) { const d = M(box(0.07, 0.07, 0.07), toon('#ece9e2'), 11.3 + i * 0.12, 0.04, -8.6 + i * 0.05, scene); d.rotation.y = i; }
+  solid(10.3, 12.5, -9.7, -7.5);
+  chatter(W.npcs, n => n.bum ? CHAT.fiend : n.talk ? CHAT[n.talk] : n.anim === 'dance' ? CHAT.dance : n.anim === 'warm' ? CHAT.fire : n.anim === 'sit' ? CHAT.oldhead : n.cage ? CHAT.cage : CHAT.block);
   W.bounds = [-14.3, 14.3, -10.9, 11.5]; W.camBox = [-15.1, 15.1, -11.7, 18.6];
 }
 
@@ -243,44 +267,19 @@ function buildPit() {
   stringLights(-10, -1, 10, -1.4, 6.4, 14); stringLights(-10, 5.5, 10, 5.2, 6.2, 14);
   for (let i = 0; i < 4; i++) { poster(scene, -9.96, 2.2, -4.6 + i * 1.55, Math.PI / 2, i % 2); poster(scene, 9.96, 2.2, 4.4 + (i > 1 ? 1.55 * (i - 2) : -9 + i * 1.55), -Math.PI / 2, (i + 1) % 2); }
   for (let i = 0; i < 4; i++) { const b = aiBuild(rnd(62, 92)); b.worn = randomWorn(2); addNpc(b, rnd(-5.5, 5.5), rnd(-1.5, 4.5), rnd(0, 6), ['ball', 'idle', 'cheer', 'dance'][i], { wander: i === 1, range: 1.5 }); }
+  MODES.forEach((m, i) => { glow(pitDoorX(i), 1.8, PIT_DOOR_Z - 0.6, new THREE.Color(cols[i]).getHex(), 4.2, null, 0.35); glow(pitDoorX(i), 4.4, PIT_DOOR_Z - 0.1, new THREE.Color(cols[i]).getHex(), 3.4, null, 0.4); });
+  glow(8.6, 2.4, 2, 0x3dffa0, 3, null, 0.5); glow(-8.3, 1.8, 2, 0x7de3ff, 2.4, null, 0.5); litter(8, -9, 9, -4, 9); skyLife(56, 'THE CAGES · WINNERS STAY'); W.weather = weather();
+  chatter(W.npcs, n => n.name && LADDER.some(L => L.name === n.name) ? CHAT.ladder : CHAT.cage);
   W.bounds = [-9.2, 9.2, -4.6, 9.6]; W.camBox = [-9.7, 9.7, -5.4, 10.2];
 }
 
-function buildCrib() {
-  const fl = cribTier('floor'), hp = cribTier('hoop');
-  scene.background = new THREE.Color(0x3a3558); scene.fog = new THREE.Fog(0x3a3558, 40, 150);
-  baseLights(scene, 0xffe0c8, 0x3a3050, 0xffd0a0, 1.5);
-  const g2 = M(new THREE.PlaneGeometry(300, 300), toon('#2a2d34'), 0, -0.03, 0, scene); g2.rotation.x = -Math.PI / 2;
-  addCourt(scene, ['drive', 'black', 'show', 'wood'][fl], hp);
-  addFence(scene, -11, 11, -3.4, 16, 3, 0xffffff);
-  skyline(scene, 30, 62, ['#ffc531', '#ffe9a8', '#33e0ff'], 34);
-  // the shack you call home
-  ink(M(box(5, 3.6, 6), toon('#59606c'), 11.2, 1.8, 5, scene), 1.02); M(box(5.6, 0.3, 6.6), toon('#c8482c'), 11.2, 3.75, 5, scene); M(box(0.1, 2.2, 1.2), toon('#3a2a1c'), 8.66, 1.1, 5, scene); solid(8.6, 14, 1.8, 8.2);
-  spot(7.7, 5, 2.0, 'CLOSET (drip)', () => uiShop(true));
-  // workbench: upgrades
-  ink(M(box(1.6, 0.9, 0.8), toon('#7a5a3a'), 8.6, 0.45, 10.5, scene), 1.04); const ws = sign('CRIB UPGRADES', 2, 0.5, '#ffc531', '#20242c'); ws.position.set(8.6, 1.5, 10.5); ws.rotation.y = -0.6; scene.add(ws); solid(7.7, 9.5, 10, 11);
-  spot(7.5, 10.9, 2.0, 'CRIB UPGRADES', () => uiCrib());
-  spot(-4.5, 9.5, 1.8, 'DRILLS', () => uiDrills('crib'));
-  spot(0, 6.5, 2.2, 'SHOOT AROUND', () => startPractice('free'));
-  spot(0, 14.6, 1.8, 'BACK TO THE BLOCK', () => enterWorld('hub', -12.4, 5.8, Math.PI / 2));
-  const ex = sign('THE BLOCK ↓', 3, 0.7, '#ffe9a8', '#0a0a14'); ex.position.set(0, 3.4, 16); ex.rotation.y = Math.PI; scene.add(ex);
-  // upgrade props
-  const t = id => cribTier(id);
-  if (t('couch') === 0) ink(M(box(0.5, 0.45, 0.5), toon('#e04848'), -9.3, 0.23, 6, scene), 1.05);
-  else { const c = toon(t('couch') === 2 ? '#7a2a8a' : '#2a6a4a'); ink(M(box(1.0, 0.5, 2.6), c, -9.6, 0.35, 6, scene), 1.03); ink(M(box(0.3, 1.0, 2.6), c, -10.1, 0.6, 6, scene), 1.03); if (t('couch') === 2) M(box(0.1, 1.4, 2.6), flat(0xff4fd8), -10.3, 0.8, 6, scene); }
-  solid(-10.6, -8.9, 4.6, 7.4);
-  if (t('trophy')) { ink(M(box(0.4, 2.4, 3.2), toon('#3a2a1c'), -10.4, 1.2, 10.5, scene), 1.02); const n = [0, 3, 7, 12][t('trophy')]; for (let i = 0; i < n; i++) { const tx = -10.1, ty = 0.75 + Math.floor(i / 4) * 0.7, tz = 9.3 + (i % 4) * 0.8; M(cyl(0.1, 0.05, 0.22, 8), toon('#ffc531'), tx, ty + 0.11, tz, scene); M(box(0.14, 0.06, 0.14), toon('#20242c'), tx, ty - 0.02, tz, scene); } solid(-10.8, -9.8, 8.8, 12.2); }
-  if (t('printer')) { ink(M(box(0.9, 1.5, 0.9), toon(t('printer') === 2 ? '#c8482c' : '#c8d0d8'), 6, 0.75, 14.6, scene), 1.03); M(box(0.6, 0.4, 0.05), flat(0x33ff88), 6, 1.1, 14.14, scene); const s = sign(t('printer') === 2 ? 'STEAK\nFABRICATOR' : 'PROTEIN\nPRINTER', 1.2, 0.6, '#33ff88', '#0a0a14'); s.position.set(6, 2, 14.6); s.rotation.y = Math.PI; scene.add(s); solid(5.4, 6.6, 14, 15.2); }
-  if (t('shotdoc')) { ink(M(box(1.2, 1.8, 1.0), toon('#2440a8'), -6, 0.9, 14.6, scene), 1.03); M(cyl(0.3, 0.3, 0.6, 10), toon('#ff7a1f'), -6, 2.1, 14.4, scene).rotation.x = 1.1; const s = sign(t('shotdoc') === 2 ? 'SHOT SURGEON 9000' : 'SHOT DOCTOR 3000', 2, 0.4, '#33e0ff', '#0a0a14'); s.position.set(-6, 2.9, 14.6); s.rotation.y = Math.PI; scene.add(s); solid(-6.8, -5.2, 14, 15.2); }
-  if (t('sign') === 1) { const s = sign('LIVE LAUGH LAYUP', 4, 0.9, '#ff4fd8', '#0a0a14'); s.position.set(8.64, 3.0, 5); s.rotation.y = -Math.PI / 2; scene.add(s); }
-  if (t('sign') === 2) { const s = sign('★ ' + S.name + ' ★\nGREATEST EVER (SELF-REPORTED)', 8, 4, '#ffc531', '#0a0a14'); s.position.set(0, 7, -5); scene.add(s); M(cyl(0.15, 0.15, 5, 6), toon('#20242c'), -3, 2.5, -5.2, scene); M(cyl(0.15, 0.15, 5, 6), toon('#20242c'), 3, 2.5, -5.2, scene); }
-  if (t('flag')) { const big = t('flag') === 2, hgt = big ? 22 : 7; M(cyl(0.1, 0.14, hgt, 8), toon('#c8d0d8'), -10, hgt / 2, -2.6, scene); const ft = canvasTex(256, 160, (x, w, hh) => { for (let i = 0; i < 13; i++) { x.fillStyle = i % 2 ? '#f4f4f4' : '#d02030'; x.fillRect(0, i * hh / 13, w, hh / 13 + 1); } x.fillStyle = '#2440a8'; x.fillRect(0, 0, w * 0.42, hh * 0.54); }); W.flag = new THREE.Mesh(new THREE.PlaneGeometry(big ? 26 : 3, big ? 15 : 1.8, 10, 1), new THREE.MeshBasicMaterial({ map: ft, side: THREE.DoubleSide })); W.flag.position.set(-10 + (big ? 13.1 : 1.6), hgt - (big ? 7.6 : 1), -2.6); scene.add(W.flag); }
-  W.bounds = [-10.4, 8.2, -1.2, 15.2];
-}
+// buildCrib lives in home.js (the lot, the house and the home builder)
 
 function worldStep(dt) {
-  if (!W) return; W.t += dt; const me = W.me, I = IN[0], busy = uiBusy();
+  if (!W) return; W.t += dt; const me = W.me, I = IN[0], building = !!W.build, busy = uiBusy() || building;
   let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my;
+  if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
+  if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
   if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
@@ -288,12 +287,15 @@ function worldStep(dt) {
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
-  let nx = me.x + me.vx * dt, nz = me.z + me.vz * dt;
-  for (const s of W.solids) { if (nx > s[0] && nx < s[1] && nz > s[2] && nz < s[3]) { const px = Math.min(nx - s[0], s[1] - nx), pz = Math.min(nz - s[2], s[3] - nz); if (px < pz) nx = nx - s[0] < s[1] - nx ? s[0] : s[1]; else nz = nz - s[2] < s[3] - nz ? s[2] : s[3]; } }
+  if (me.sit) { me.vx = me.vz = 0; }
+  let nx = me.sit ? me.x : me.x + me.vx * dt, nz = me.sit ? me.z : me.z + me.vz * dt;
+  if (!me.sit) for (const s of W.solids) { if (nx > s[0] && nx < s[1] && nz > s[2] && nz < s[3]) { const px = Math.min(nx - s[0], s[1] - nx), pz = Math.min(nz - s[2], s[3] - nz); if (px < pz) nx = nx - s[0] < s[1] - nx ? s[0] : s[1]; else nz = nz - s[2] < s[3] - nz ? s[2] : s[3]; } }
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
-  const R = me.rig; locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
+  const R = me.rig;
+  if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
+  else locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
   for (const n of W.npcs) {
     let an = n.anim === 'ball' ? 'dribble' : n.anim, o = { ph: n.ph, leg: n.rig.legLen, sp: 0, dr: Math.abs(Math.sin(W.t * 7 + n.ph)) };
@@ -313,11 +315,13 @@ function worldStep(dt) {
   if (W.flames) { W.flames.forEach((f, i) => { f.scale.set(1, 0.7 + Math.abs(Math.sin(W.t * (9 + i * 2) + i)) * 0.8, 1); f.position.y = 1.1 + f.scale.y * 0.2; }); if (W.fireLight) W.fireLight.intensity = 16 + Math.sin(W.t * 13) * 5 + Math.sin(W.t * 7.3) * 3; }
   if (W.hang) W.hang.forEach((g, i) => { g.rotation.z = Math.sin(W.t * 1.3 + i * 2) * 0.12; });
   if (W.bulbs && (W.bt = (W.bt || 0) + dt) > 0.4) { W.bt = 0; const k = Math.floor(W.t * 2.5); W.bulbs.forEach((b, i) => b.scale.setScalar((i + k) % 3 === 0 ? 1.35 : 0.9)); }
+  ambientStep(dt, camera, me); homeAnimStep(dt);
   if (W.flag) { const pa = W.flag.geometry.attributes.position; for (let i = 0; i < pa.count; i++) pa.setZ(i, Math.sin(pa.getX(i) * 1.2 + W.t * 3) * 0.25 * (pa.getX(i) / 3 + 1)); pa.needsUpdate = true; }
   // nearest interactable
   let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d < s.r && d < nd) { nd = d; near = s; } }
   if (near !== W.near) { W.near = near; const p = $('prompt'); if (near) { p.textContent = near.label; p.style.display = 'block'; } else p.style.display = 'none'; }
   if (busy) $('prompt').style.display = 'none'; else if (W.near) $('prompt').style.display = 'block';
+  if (building) { buildStep(dt); return; }
   if (!busy && W.near && I.aP) { sfx('uiok'); W.near.fn(); }
   else if (!busy && I.start) uiPlayer('attrs');
   // camera

@@ -89,7 +89,7 @@ function finishGame(res, m, tier, st, cfg) {
   const s = res.stats, L = S.life, notes = [];
   let vc = (res.win ? 70 : 30) * tier.mult + s.pts * 4 + s.ast * 6 + s.reb * 4 + s.stl * 8 + s.blk * 8 + s.ankles * 10 + s.dunks * 5 + s.greens * 4;
   if (m.arcade) vc *= 0.75;       // JAM games are faster and score more
-  const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Trophy wall +${Math.round(cv * 100)}% VC`); }
+  const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Crib +${Math.round(cv * 100)}% VC`); }
   if (cfg.boosts.includes('lotto')) { if (Math.random() < 0.5) { vc *= 2; notes.push('SCRATCH-OFF HIT: VC doubled'); } else notes.push('Scratch-off: "PLAY AGAIN"'); }
   let rep = (res.win ? 45 : 12) * tier.mult + s.pts + s.ast * 2 + s.stl * 2 + s.blk * 2 + s.ankles * 3 + res.bonusRep;
   const rm = (ORIGIN[S.build.origin].k === 'rep' ? 0.15 : 0) + cribFx('rep'); if (rm) { rep *= 1 + rm; notes.push(`+${Math.round(rm * 100)}% Respect`); }
@@ -160,7 +160,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, devSampleCrib, homeLevel, homeSets, homeFx };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera);
   // test hook: draw the player in one pose and hand back the frame

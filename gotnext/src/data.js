@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.7.1';
+const VERSION = '0.8';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -327,6 +327,7 @@ const CRIB = [
 
 // ---------- last-call boosts (one game) ----------
 const BOOSTS = [
+  { id: 'dog', n: 'Soy Dog', d: '+4 Stamina this game.', cost: 15, buff: { stam: 4 }, hidden: true },
   { id: 'paste', n: 'GatorGrade Energy Paste', d: '+5 Speed, +10 Stamina this game.', cost: 60, buff: { speed: 5, stam: 10 } },
   { id: 'rosin', n: 'Rosin Vape (grape)', d: '+4 to every Shooting attribute this game.', cost: 80, buff: { mid: 4, three: 4, iq: 4 } },
   { id: 'knees', n: 'Knee Subscription (1 day)', d: '+6 Vertical, +4 Dunk this game.', cost: 80, buff: { vert: 6, dunk: 4 } },
@@ -418,6 +419,20 @@ const ADS = [
   'VOTE BUCKETS\n2148',
   'GATORGRADE\nIT\'S GOT WHAT\nBALLERS CRAVE',
 ];
+// what people on the block say when you walk by
+const CHAT = {
+  fiend: ['Spare 5 VC? PS88 ain\'t gonna pre-order itself.', 'I had 99 OVR once. Then they patched me.', 'You got next? I got NEXT next.', 'Basketball 2146 got real sweat physics, I heard.', 'They nerfed my knees in a hotfix.'],
+  dance: ['THIS my song!', 'Tape Deck stay knocking.', 'Run it back, DJ!', 'You can\'t stand still to this. Federal law.'],
+  fire: ['Coldest summer since the weather got privatized.', 'Barrel fire is the only free thing left.', 'Warm your hands, not your jumper.'],
+  oldhead: ['In \'29 we played with real gravity.', 'Back in my day the rim was ten feet. Every day.', 'Kids today got shoes that dribble for them.', 'Contracts on the bench. Check \'em.'],
+  cage: ['Who got next?', 'He traveled. Ain\'t no refs though.', 'Kings court been undefeated since Tuesday.', 'That boy cooking!', 'Run it back!'],
+  ladder: ['You want this smoke?', 'Climb the ladder, see what happens.', 'One on one. No help. No excuses.'],
+  block: ['You see that windmill in the Cages?', 'My knees on a payment plan.', 'Coach Overtime made me run Mikans for an hour.', 'Sharpie hustled me again.', 'They raised the price of air at The Plug.', 'Freedom Eagle dunked so we could scroll.'],
+  vendor: ['Soy dogs! Hot and dog-adjacent!', 'Extra relish is extra VC, chief.', 'Fifteen VC. Cheapest protein on the block.'],
+  dice: ['Seven! Pay up!', 'Snake eyes, man...', 'Roll it, don\'t pray on it.', 'Who brought these dice? They weighted.'],
+  homie: ['Your crib hard, not gonna lie.', 'Can I get a run on your court later?', 'Who picked this couch? Elite.', 'I\'m just here for the cookout.', 'Neighbors gonna call the HOA.'],
+  neighbor: ['Nice place you got.', 'Your speakers are LOUD. Respect.', 'I heard you can dunk from the free throw line.'],
+};
 const CALLS = {
   make: ['BUCKET!', 'CASH!', 'WET!', 'THAT\'S AMERICA\'S SHOT!', 'DIRECT DEPOSIT!'],
   green: ['GREEN!', 'PURE!', 'TAX-FREE!', 'ALL NET, NO GROSS!'],

@@ -13,7 +13,17 @@ function maxBuild(style, name, h) {
     worn: Object.assign({}, newSave().worn, { shoes: 'k_gold', bottom: 'b_gold', back: 'bk_cape' }), moves: { side: 'shammgod', back: 'moonwalk', diag: 'halfspin', jumper: 'lawsuit', dunk: 'legs', celeb: 'eagle' } };
 }
 // the first time the Dev Room changes your player, the real one is put aside (inside the save, so it follows a cloud save)
-function devKeep() { if (!S.devBak) { const { name, build, attrs, badges, moves, owned, worn, vc, rep, created, seenRank } = S; S.devBak = JSON.parse(JSON.stringify({ name, build, attrs, badges, moves, owned, worn, vc, rep, created, seenRank })); } }
+function devKeep() { if (!S.devBak) { const { name, build, attrs, badges, moves, owned, worn, vc, rep, created, seenRank, home } = S; S.devBak = JSON.parse(JSON.stringify({ name, build, attrs, badges, moves, owned, worn, vc, rep, created, seenRank, home })); } }
+// a furnished crib to look at: every yard, a few complete sets
+function devSampleCrib() {
+  const H = home(); H.lot = 2; H.look = { house: 0, trim: 2, fence: 2, ground: 3 };
+  H.items = [['rug', -17, 6, 0], ['sofa', -17, 4.5, 0], ['tv', -17, 8.5, 2], ['beanbag', -19, 6, 1], ['arcade', -21.5, 3, 1], ['lava', -14.5, 4, 0], ['fire', -17, 11.5, 0], ['lawn', -15.5, 12.5, 3], ['lawn', -18.5, 12.5, 1],
+    ['grill', -21.5, 13, 1], ['cooler', -21.5, 11, 1], ['picnic', -14, 0, 0], ['speaker', -20, -1.5, 0], ['dj', -17, -1.8, 0], ['strings', -17, 1.8, 0], ['palm', -22.5, -2, 0], ['palm', -12.5, 14.2, 0], ['lamp', -12.2, 9, 0],
+    ['weights', 14, 9, 0], ['bpress', 17, 9.2, 0], ['bag', 20, 9, 0], ['tires', 22.5, 9, 0], ['rack', 14, 14.5, 2], ['minihoop', 18, 14.5, 2], ['shotclock', 20.5, 14.5, 0], ['cones', 22.5, 13, 0], ['turf', 17, 12, 0],
+    ['kicks', -12, 21.5, 2], ['case', -8.5, 21.8, 2], ['spot', -10, 19, 2], ['mirror', -5, 21.8, 2], ['chain', -16, 21.8, 2], ['car', 13, 20, 0], ['holo', 7, 20, 0], ['neonball', 19.5, 22, 2], ['planter', 4, 22, 2],
+    ['hedge', 22, 18, 1], ['gnome', 3.2, 19, 0], ['flamingo', 5.2, 18.6, 0], ['flagpole', -22.5, 22.5, 0], ['mural', -20, 22, 2], ['arch', -12, 17.2, 0], ['dogcart', 18, 18.2, 0], ['barber', -3.5, 18, 2], ['boombox', -5.5, 17.2, 0], ['bench', -3.5, 21.6, 2]
+  ].map(([i, x, z, r]) => ({ i, x, z, r, m: Math.floor(Math.random() * 5) })).filter(it => HOME_ITEM[it.i]); save();
+}
 function devMax() {
   devKeep();
   for (const a of ATTRS) S.attrs[a.id] = 99; for (const b of BADGES) S.badges[b.id] = 4;
@@ -48,6 +58,8 @@ function devRender() {
   if (t === 'profile') {
     h += `<div class="card"><h3>MAXED OUT</h3><p>Every attribute 99, every badge iced out, every move, jumper, dunk, celebration and piece of drip owned, top rank, 250,000 VC. The flashiest package is equipped.</p><div style="margin-top:6px">${Btn('MAX ME OUT', () => { devMax(); devRig(); sfx('unlock'); toast('MAXED OUT', '99 everything. Go look in the mirror.', 'rank'); rerender(); })}</div></div>`;
     h += `<div class="card"><h3>YOUR REAL PLAYER</h3><p>${S.devBak ? `Saved: <b>${esc(S.devBak.name)}</b>, ${ovrOf(S.devBak.attrs)} OVR, ${S.devBak.vc.toLocaleString()} VC. Restoring puts everything back exactly as it was, and throws away the dev changes.` : 'Nothing changed yet. The first change made here puts your real player aside so you can get them back.'}</p>${S.devBak ? `<div style="margin-top:6px">${Btn('RESTORE MY PLAYER', () => { devRestore(); devRig(); sfx('uiok'); toast('RESTORED', 'Back to the real you.'); rerender(); }, 'alt')}</div>` : ''}</div>`;
+    h += `<div class="card"><h3>WORLD</h3><p>Weather today: <b>${todayWeather()}</b>${weatherOverride ? ' (forced)' : ''}. It changes by the day; force it here to look around.</p><div style="margin-top:6px">${['clear', 'drizzle', 'fog'].map(w => Btn(w, () => { weatherOverride = w; toast('WEATHER', w + ' (next place you enter)'); rerender(); }, 'sm ' + (weatherOverride === w ? '' : 'alt'))).join(' ')} ${Btn('by the day', () => { weatherOverride = null; rerender(); }, 'sm alt')}</div>
+      <p style="margin-top:8px">Crib: level ${homeLevel().lvl}, ${home().items.length} pieces, lot ${home().lot + 1}/3.</p><div style="margin-top:6px">${Btn('DECORATE MY CRIB (sample)', () => { devKeep(); devSampleCrib(); toast('CRIB DECORATED', 'All three yards, a few sets. Go home and look.'); rerender(); }, 'sm alt')} ${Btn('EMPTY MY CRIB', () => { devKeep(); home().items = []; home().store = {}; save(); rerender(); }, 'sm alt')}</div></div>`;
     h += `<div class="card"><h3>BUILD CODE</h3><p>Paste a code to become that player, or copy yours.</p><input type="text" id="devCode" placeholder="GN1-..." style="width:100%"><div style="margin-top:6px">${Btn('LOAD CODE', () => { const b = decodeBuild(($('devCode').value || '')); if (!b) { toast('BAD CODE', 'That code did not read.'); return; } devEdit(() => { S.name = b.name; S.build = b.build; S.attrs = b.attrs; S.badges = b.badges; S.worn = b.worn; Object.assign(S.moves, b.moves); }); toast('LOADED', b.name); }, 'sm')} ${Btn('COPY MINE', () => { const c = encodeBuild(myBuild()); try { navigator.clipboard.writeText(c); } catch (e) { } $('devCode').value = c; toast('COPIED', 'Build code is on the clipboard.'); }, 'sm alt')}</div></div>`;
   } else if (t === 'build') {
     const caps = capsFor(S.build);

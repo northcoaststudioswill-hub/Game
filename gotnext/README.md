@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -43,6 +43,102 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
   packages, celebrations), 8 crib upgrade lines with passive buffs, 29 trophies, 8 Respect ranks.
 - **Friends.** Export your build as a code; a friend imports it and your player is in their park as a teammate or the
   rival. On a computer a second player joins with a controller or on a split keyboard, co-op or versus.
+
+## Living places (v0.8)
+
+![The Block and The Cages, before and after](docs/img/areas-block.png)
+
+Every place got an atmosphere pass. It uses no new libraries, and all of it is light enough for a phone:
+- **Light:**
+  - Neon signs glow and spill onto the wet street.
+  - Lamps throw beams with dust hanging in them.
+  - String-light bulbs glow, and floodlights have halos.
+  - A soft vignette frames the screen.
+- **Things moving:**
+  - Steam from the manholes, and smoke and sparks off the barrel fire.
+  - Pigeons that burst up and away when you walk into them, then come back.
+  - Paper blowing in gusts.
+  - Searchlights sweeping behind the skyline, and a blimp selling something.
+- **Weather by the day:** clear, drizzle (rain streaks and splashes) or smog. It is the same for everyone, and the Dev
+  Room can force it.
+- **People talk:** walk near someone and they say something that suits who they are. Fiends ask about the PS88, the old
+  head talks about 2129, the dice crew argues, homies at your crib compliment the couch.
+- **New on The Block:**
+  - Soy Dog Sal's cart (15 VC, +4 Stamina next game)
+  - a dice crew by the hydrant
+  - more lamps
+- **Game courts** get light poles with beams, light on the ground, the weather and the sky.
+
+## My Crib and the home builder (v0.8)
+
+![My Crib, before and after](docs/img/areas-crib.png)
+
+**The lot:**
+- The crib is a real lot now:
+  - a two-storey house with a stoop, a porch light and lit windows (the closet is at the front door)
+  - the court
+  - three yards
+  - a fence with your name over the gate
+  - a street out front with parked cars and lamps
+  - neighbours' rowhouses all around
+- **The Side Yard** is yours from the start. **The East Yard** (2,500 VC) and **The Front Yard** (7,500 VC) are for sale
+  until you buy them.
+- **Lot & look:**
+  - house paint (6)
+  - trim (5)
+  - fence (chain link, wood slat, neon rail)
+  - yard ground (dirt, concrete, grass, pavers, court turf)
+
+**Build mode:** the BLUEPRINTS table by the house, the Crib Upgrades bench, or **B** at the crib.
+
+![Building](docs/img/home-builder.png)
+
+- **The pieces:** 50, in 8 categories: seating, food & drink, tech & games, hoops & gym, display, lights, yard, walls &
+  art. Each one is built from shapes in code, like everything else, and costs VC. Some unlock with rank.
+- **Placing:**
+  - Snap to a half-metre grid and turn in quarter steps.
+  - A green ghost means it fits; red says why not (outside your yards, something in the way, overlaps something).
+  - Rugs and turf are a floor layer, and things stand on them.
+- **Changing your mind:** point at anything you placed to pick it up and move it, store it (free, place it again later
+  at no cost) or sell it for half.
+- **Controls:**
+  - Keyboard: WASD or the mouse moves the cursor, a click or E places, R turns, X sells, F stores, C turns the view,
+    Tab changes category, Esc or B leaves.
+  - Phone: tap the ground, then the buttons.
+  - Controller: stick, A to place, X to turn.
+- **Vibe:** every piece adds Vibe in five kinds: comfort, drip, hoops, tech, party. A third copy of the same piece
+  counts half, a fifth a fifth.
+- **Crib levels:** total Vibe sets the crib level (1–10). Each level adds a perk that follows you into games:
+  - +VC and +Respect from games
+  - Stamina
+  - starting Bravado
+  - +1 to every attribute
+  - Tour Stop: tourists pay 60 VC a day
+  - Kingdom: your crib goes on The Block's billboard
+- **Sets:** 8 themed sets, each with its own bonus when every piece is placed:
+  - Cookout
+  - Arcade Night
+  - Sneaker Museum (the wall shows the kicks you own)
+  - Iron Paradise
+  - Barbershop Saturday
+  - Garden of Eden
+  - Block Party
+  - Hoop Heaven
+- **Pieces that do something:**
+  - Sit on any seat.
+  - The yard fridge gives a free soy dog boost once a day.
+  - The weight rack and bench press give badge XP once a day.
+  - The big screen shows your career highlights.
+  - The DJ booth starts a party: everyone on the lot dances.
+  - The mirror opens the closet, and the trophy case opens your trophies.
+  - The Gold Statue of You is your own player, in gold, mid-dunk.
+- **Company:**
+  - From crib level 3 your homies come over and sit on your furniture.
+  - From level 4, neighbours drop in.
+  - From level 6, they dance if there is music.
+
+`node tests/home.mjs` builds, moves, stores and sells pieces, buys land, checks every piece of a furnished sample crib
+is in a legal spot, and checks the visitors, sitting and the fridge.
 
 ## The grind (v0.6)
 
@@ -188,6 +284,8 @@ node tests/reel.mjs dunks|layups|jumpers|handles      # films every move in a De
 node tests/gestures.mjs           # each finish and jumper variation from real key presses; Dev Room max and restore
 node tests/devroom.mjs            # clicks through every Dev Room tab, a reel and a 1v1 against a maxed player
 node tests/contest.mjs [N]        # N drives per finisher quality at a rim protector: made %, blocked %, finishes picked
+node tests/home.mjs               # the home builder end to end (place, move, store, sell, land, sets, visitors)
+node tests/areas.mjs [tag]        # screenshots of every place from the player's camera and wide
 ```
 
 ## Online

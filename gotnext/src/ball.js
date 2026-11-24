@@ -16,6 +16,7 @@ function effAttrs(b, mine) {
   if (mine) {
     const all = cribFx('all'); for (const k in A) A[k] += all;
     A.stam += cribFx('stam') + cribFx('stam2'); if (cribFx('stam2')) A.str += 3;
+    for (const k in A) A[k] += cribFx('a_' + k);           /* crib sets and levels */
     for (const id of MT ? MT.boosts : []) { const bo = BOOSTS.find(x => x.id === id); if (bo && bo.buff) for (const k in bo.buff) A[k] += bo.buff[k]; }
   }
   return A;
@@ -42,6 +43,13 @@ function startMatch(cfg) {
   billboard(scene, arcade ? 'JAM\nNO RULES\nNO REFUNDS' : (cfg.practice ? (cfg.practice === 'drill' ? (cfg.court === 'street' ? 'THE BLOCK\nPRACTICE' : 'HOME COURT\nPRACTICE') : cfg.practice === 'rack' ? 'MONEY RACK' : 'HOME COURT') : (cfg.mode.id === '1v1' ? 'THE LADDER\nONES' : 'THE CAGES\n' + cfg.tier.n)), 0, 9.5, -9, 0, 12, 4.5, arcade ? '#ff4fd8' : '#ffc531');
   // spectators behind the baseline fence
   MT.fans = [];
+  // atmosphere: four light poles over the court, light pooled on the ground, the day's weather, paper in the wind
+  ambInit();
+  for (const [lx, lz] of [[-9.4, -2.2], [9.4, -2.2], [-9.4, 13], [9.4, 13]]) {
+    M(cyl(0.1, 0.13, 8.5, 6), toon('#2a2c33'), lx, 4.25, lz, scene); const hx = lx * 0.93, hz = lz < 0 ? lz + 0.3 : lz - 0.3; M(box(1.2, 0.4, 0.5), toon('#2a2c33'), hx, 8.6, hz, scene);
+    glow(hx, 8.45, hz, arcade ? 0xffb8f0 : 0xfff2dc, 4, null, 0.85); beam(hx, 8.4, hz, lx * 0.45, 0, lz < 0 ? 2 : 8, arcade ? 0xffb8f0 : 0xfff2c8, 3.2, 0.05, 8); pool(lx * 0.5, lz < 0 ? 1.5 : 9, arcade ? 0xff8ff0 : 0xffe9c0, 7, 7, 0.16);
+  }
+  if (style === 'street' || style === 'arcade') { weather(); litter(6, -8, 8, -1, 12); skyLife(60, arcade ? 'JAM · NO RULES · NO REFUNDS' : 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); }
   if (!cfg.practice) for (let i = 0; i < 7; i++) { const b = aiBuild(60); const r = makeRig(b, true); r.root.position.set(-7.5 + i * 2.5 + rnd(-0.4, 0.4), 0, -3.4 - rnd(0, 0.8)); r.shadow.visible = false; scene.add(r.root); MT.fans.push({ r, ph: rnd(0, 6), hype: 0 }); }
   // --- players ---
   cfg.teams.forEach((team, ti) => team.forEach((sp, k) => {
@@ -554,6 +562,7 @@ function matchStep(dtReal) {
   matchFx(dt); matchCam(dtReal); hudMatch(); if (M_.net === 'host') netHostStep(dtReal);
 }
 function matchFx(dt) {
+  ambientStep(dt, camera, null);
   const M_ = MT;
   if (M_.hoopT > 0) { M_.hoopT -= dt; const k = Math.max(0, M_.hoopT); M_.hoop.rotation.x = Math.sin(M_.time * 46) * 0.035 * k; M_.hoop.rotation.z = Math.sin(M_.time * 39) * 0.02 * k; } else if (M_.hoop.rotation.x) { M_.hoop.rotation.x = 0; M_.hoop.rotation.z = 0; }
   for (const q of M_.parts) { if (q.life <= 0) continue; q.life -= dt; q.v.y -= 6 * dt; q.m.position.addScaledVector(q.v, dt); q.m.material.opacity = Math.max(0, q.life / q.max); q.m.scale.setScalar(0.5 + q.life / q.max); if (q.life <= 0) q.m.position.y = -5; }

@@ -236,7 +236,7 @@ function uiShop(closet) {
 function uiCrib() {
   openPanel(() => {
     const r = rankOf(S.rep);
-    let h = `<div class="ph"><h2>CRIB UPGRADES</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">Your home court. Everything you bolt on here follows you into The Cages.</p>`;
+    let h = `<div class="ph"><h2>CRIB UPGRADES</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">Your home court. Everything you bolt on here follows you into The Cages.</p>` + (W && W.kind === 'crib' ? `<div class="card sel"><h3>HOME BUILDER</h3><p>Furniture, lights, gym gear, art, the yard: place anything in the yards you own. Vibe levels your crib up; sets give bonuses. Crib level ${homeLevel().lvl}.</p>${Btn('OPEN BUILD MODE (B)', () => buildEnter(), 'sm')}</div>` : '');
     for (const c of CRIB) {
       const t = cribTier(c.id), cur = c.tiers[t], nx = c.tiers[t + 1];
       h += `<div class="card"><div class="row"><div class="g"><h3>${c.n}: <span class="cy">${cur.n}</span></h3><p>${cur.d || '&nbsp;'}</p>`;
@@ -299,7 +299,7 @@ function onlineBlock(m, st) {
 function uiKiosk() {
   openPanel(() => {
     let h = `<div class="ph"><h2>LAST CALL</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"One game only. No refunds. Side effects include winning." Everything here is used up in your next Pit game.</p><div class="grid">`;
-    for (const b of BOOSTS) { const has = S.boosts.includes(b.id), price = shopPrice(b.cost); h += `<div class="card ${has ? 'sel' : ''}"><h3>${b.n}</h3><p class="buff">${b.d}</p><div style="margin-top:6px">${has ? '<span class="tag hot">LOADED</span>' : Btn(price + ' VC', () => { S.vc -= price; S.boosts.push(b.id); sfx('buy'); save(); rerender(); }, 'sm', S.vc < price)}</div></div>`; }
+    for (const b of BOOSTS.filter(x => !x.hidden)) { const has = S.boosts.includes(b.id), price = shopPrice(b.cost); h += `<div class="card ${has ? 'sel' : ''}"><h3>${b.n}</h3><p class="buff">${b.d}</p><div style="margin-top:6px">${has ? '<span class="tag hot">LOADED</span>' : Btn(price + ' VC', () => { S.vc -= price; S.boosts.push(b.id); sfx('buy'); save(); rerender(); }, 'sm', S.vc < price)}</div></div>`; }
     return h + `</div></div>`;
   });
 }
