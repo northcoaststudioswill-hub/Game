@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.8.1: a real walk (from gait-lab joint angles, planted feet that stay put), plus a little Habbo in the crib: things stack on tables, a rare of the day, emotes, chat bubbles, and visiting friends' cribs online with likes.** v0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.8.2: the soundtrack (11 tracks, streamed from `gotnext/music/`, in-world reverb), and running off the court uses the court's run with a smooth walk-to-run ramp on sticks.** v0.8.1: a real walk (from gait-lab joint angles, planted feet that stay put), plus a little Habbo in the crib: things stack on tables, a rare of the day, emotes, chat bubbles, and visiting friends' cribs online with likes.** v0.8: the places come alive (light, steam, pigeons, weather, people talking) and My Crib becomes a home you build: a house, a street, three yards, 50 pieces to place, crib levels and sets.** v0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -68,6 +68,35 @@ Every place got an atmosphere pass. It uses no new libraries, and all of it is l
   - a dice crew by the hydrant
   - more lamps
 - **Game courts** get light poles with beams, light on the ground, the weather and the sky.
+
+## Soundtrack (v0.8.2)
+
+Eleven tracks in `gotnext/music/` (see `music/README.md`). They belong to this game only. They stream next to
+`index.html`, shuffled, and keep playing across places.
+
+**The reverb:** a soft room around the music, sized by where you are:
+- the widest on The Block
+- the chain-link of The Cages
+- a little in your yard
+- a light touch in games, with the music lower
+
+The reverb tail is darker than the sound itself (distance), and a gentle top-end roll-off smooths the compressed files.
+The music sits under the game's sounds.
+
+**Controls:** **N** skips a track, as does OPTIONS → SKIP TRACK. Music on/off is in Options.
+
+**Opened straight from disk (file://):** the browser won't route the tracks through the reverb, so they play dry. The
+published game has the reverb. If no track loads, the old synth loop plays instead.
+
+## Running off the court (v0.8.2)
+
+- **Keys:** walking is the gait-lab walk (Shift runs).
+- **The run itself:** the same pose and planted-feet layer as running in a game.
+- **Sticks and phone thumbs** set speed by how far you push: a walk up to about 80%, then a smooth ramp into the run at
+  full push.
+- **The fix:** before, a phone thumb held at full push flickered sprint on and off at 93%. The speed swung between 1.3
+  and 2.5 m/s, right across the walk/run blend, and the body jerked. Now it holds a steady run.
+- **On the court**, the phone's sprint turns on at 93% and only off below 85%.
 
 ## A little Habbo in the crib (v0.8.1)
 
@@ -310,6 +339,9 @@ node tests/contest.mjs [N]        # N drives per finisher quality at a rim prote
 node tests/home.mjs               # the home builder end to end (place, move, stack, store, sell, rares, land, sets, visitors)
 node tests/visit.mjs              # two players online: visit a crib, chat, emote, like, hang out
 node tests/walkfeel.mjs [file]    # the walk measured: cadence, step length, foot slide, bob, lean
+node tests/runfeel.mjs [file]     # sprint smoothness on The Block vs a court
+node tests/stickrun.mjs [file]    # a phone thumb wobbling at full push: speed swing and leg jitter
+node tests/music.mjs              # the soundtrack over HTTP: plays, reverb per place, N skips
 node tests/areas.mjs [tag]        # screenshots of every place from the player's camera and wide
 ```
 

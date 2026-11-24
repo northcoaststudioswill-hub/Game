@@ -195,7 +195,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.8.1';
+const VERSION = '0.8.2';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -741,7 +741,7 @@ function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.re
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
-    const I = IN[i]; let mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
+    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
     // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
     const split = twoPlayer && pads.length === 0;
     if (i === 1 && split) {
@@ -753,7 +753,7 @@ function pollInput() {
       if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
       sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape;
-      if (touch.L) { mx += touch.L.x; my += touch.L.y; if (Math.hypot(touch.L.x, touch.L.y) > 0.93) sprint = true; }
+      if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       a = a || touch.a; b = b || touch.b; st = st || touch.start;
     }
@@ -761,14 +761,14 @@ function pollInput() {
     let p = null;
     if (twoPlayer) p = pads.length >= 2 ? pads[i] : (i === 1 ? pads[0] : null); else if (i === 0) p = pads[0];
     if (p) {
-      const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; rx += rs[0]; ry += rs[1];
+      const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; if (ls[0] || ls[1]) analog = true; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
       if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1;
       sprint = sprint || B(7) || B(5); a = a || B(0); b = b || B(2) || B(3); st = st || B(9); bk = bk || B(1);
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
-    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprint = sprint;
+    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
     I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
@@ -823,7 +823,7 @@ function audioInit() {
     master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
     musicGain = AC.createGain(); musicGain.gain.value = 0.16; musicGain.connect(master);
     noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    musicNext = AC.currentTime + 0.1; musicTimer = setInterval(musicTick, 60);
+    musicNext = AC.currentTime + 0.1; musicTimer = setInterval(musicTick, 60); if (typeof ostInit === 'function') ostInit();
   } catch (e) { AC = null; }
 }
 function tone(f, t, dur, type, vol, f2, dest) {
@@ -869,7 +869,8 @@ const MUS = {
   jam: { bpm: 124, kick: 'x...x...x...x...', snare: '....x.......x...', hat: '..x...x...x...x.', bass: [55, 55, 0, 55, 65, 0, 55, 0, 49, 49, 0, 49, 73, 0, 65, 0] },
 };
 function musicTick() {
-  if (!AC || !S || !S.set.music || musicMode === 'off') { if (AC) musicNext = AC.currentTime + 0.1; return; }
+  if (typeof ostSync === 'function') ostSync();
+  if (!AC || !S || !S.set.music || musicMode === 'off' || (typeof ostPlaying === 'function' && ostPlaying())) { if (AC) musicNext = AC.currentTime + 0.1; return; }
   const M = MUS[musicMode]; const sp = 60 / M.bpm / 4;
   while (musicNext < AC.currentTime + 0.15) {
     const i = musicStep % 16, t = musicNext;
@@ -1646,7 +1647,7 @@ function startMatch(cfg) {
   scene.add(B.mesh); B.shadow = M(geo('bshadow', () => new THREE.CircleGeometry(0.14, 10)), flat(0x000000, { transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.016, 0, scene); B.shadow.rotation.x = -Math.PI / 2;
   for (let i = 0; i < 36; i++) { const m = M(sph(0.07, 6, 5), new THREE.MeshBasicMaterial({ color: 0xff8a1f, transparent: true }), 0, -5, 0, scene); MT.parts.push({ m, life: 0, v: V3() }); }
   camera.position.set(0, 7, 20);
-  musicMode = arcade ? 'jam' : 'game';
+  musicMode = arcade ? 'jam' : 'game'; ostRoom('game');
   hudShow(true); setCheck(MT.off, true);
   if (cfg.practice === 'rack') call('MONEY RACK', 'Deep balls only. 40 seconds. GO!', '#ffc531');
   window.__mt = MT;
@@ -2446,6 +2447,52 @@ function endMatch() {
   netHostEnd(res); MT = null; cfg.onEnd(res);
 }
 function quitMatch() { if (!MT) return; const cfg = MT.cfg, pr = MT.practice; hudShow(false); if (MT.net) netLeave(NET.game); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }
+// GOT NEXT — the soundtrack: real tracks streamed from music/ (next to the game), shuffled, played "in the world":
+// a soft reverb whose size changes with the place (wide street, chain-link cage, your yard, a game court), a gentle
+// top-end roll-off that smooths compressed audio, and the synth loop only as a fallback if no track can load.
+'use strict';
+const TRACKS = [['afraid', 'Afraid'], ['down', 'Down'], ['hard-to-pretend', 'Hard to Pretend'], ['city-deep', 'City Deep'], ['i-am-somebody', 'I Am Somebody'], ['parody-3', 'Parody 3'], ['no-love', 'No Love'], ['insanity', 'Insanity'], ['going-out-sad', 'Going Out Sad'], ['believe', 'Believe'], ['bbb', 'BBB']];
+// per place: reverb mix (wet), dry level, how bright the top end stays, overall level
+const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.5 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.48 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.48 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.45 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.32 } };   /* released tracks are mastered loud: they sit under the game's sounds */
+const OST = { el: null, ok: false, order: [], i: -1, fails: 0, room: 'menu', graph: null };
+function ostInit() {
+  if (OST.el || !AC) return;
+  const el = OST.el = new Audio(); el.preload = 'auto'; el.volume = 1;
+  el.addEventListener('ended', () => ostNext()); el.addEventListener('error', () => { if (++OST.fails < TRACKS.length) ostNext(); else OST.ok = false; });
+  el.addEventListener('playing', () => { OST.ok = true; OST.fails = 0; });
+  // the reverb only works through WebAudio, which a page opened straight from disk (file://) is not allowed to route; it still plays dry
+  if (location.protocol !== 'file:') try {
+    const src = AC.createMediaElementSource(el), hi = AC.createBiquadFilter(), dry = AC.createGain(), wet = AC.createGain(), conv = AC.createConvolver(), damp = AC.createBiquadFilter(), bus = AC.createGain();
+    hi.type = 'highshelf'; hi.frequency.value = 9000; hi.gain.value = -3;            /* the harsh top of a compressed file, softened */
+    conv.buffer = ostImpulse(2.6, 2.2); damp.type = 'lowpass'; damp.frequency.value = 5200; /* the tail is darker than the sound: distance */
+    src.connect(hi); hi.connect(dry); hi.connect(conv); conv.connect(damp); damp.connect(wet); dry.connect(bus); wet.connect(bus); bus.connect(master);
+    OST.graph = { hi, dry, wet, bus, lp: (() => { const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 14000; bus.disconnect(); bus.connect(f); f.connect(master); return f; })() };
+  } catch (e) { OST.graph = null; }
+  OST.order = TRACKS.map((t, i) => i).sort(() => Math.random() - 0.5); ostRoom(OST.room); ostNext();
+}
+// a soft room: two channels of decaying noise, slightly different, with a short pre-delay
+function ostImpulse(secs, decay) {
+  const n = Math.floor(AC.sampleRate * secs), b = AC.createBuffer(2, n, AC.sampleRate), pre = Math.floor(AC.sampleRate * 0.025);
+  for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = pre; i < n; i++) { const t = (i - pre) / (n - pre); d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, decay) * (i - pre < 400 ? (i - pre) / 400 : 1); } }
+  return b;
+}
+function ostNext() {
+  if (!OST.el) return; OST.i = (OST.i + 1) % TRACKS.length; const t = TRACKS[OST.order[OST.i]];
+  OST.el.src = 'music/' + t[0] + '.mp3'; OST.cur = t[1];
+  if (S && S.set.music) OST.el.play().then(() => { if (typeof toast === 'function' && document.body.dataset.state !== 'match') toast('♪ ' + t[1], 'GOT NEXT soundtrack · N skips'); }).catch(() => { });
+}
+// glide the room settings when you change places
+function ostRoom(k) {
+  OST.room = ROOMS[k] ? k : 'menu'; const r = ROOMS[OST.room], G = OST.graph; if (!G || !AC) { if (OST.el) OST.el.volume = r.lvl; return; }
+  const t = AC.currentTime; G.wet.gain.setTargetAtTime(r.wet, t, 0.6); G.dry.gain.setTargetAtTime(r.dry, t, 0.6); G.lp.frequency.setTargetAtTime(r.hi, t, 0.6); G.bus.gain.setTargetAtTime(r.lvl * 0.9, t, 0.6);
+}
+function ostSync() {
+  if (!OST.el) return; const on = S && S.set.music;
+  if (on && OST.el.paused && OST.el.src) OST.el.play().catch(() => { }); else if (!on && !OST.el.paused) OST.el.pause();
+}
+// the synth loop steps aside while a real track is playing
+function ostPlaying() { return !!(OST.el && OST.ok && !OST.el.paused); }
+addEventListener('keydown', e => { if (e.code === 'KeyN' && OST.el && !/INPUT|TEXTAREA/.test(document.activeElement.tagName) && document.body.dataset.state !== 'match') ostNext(); });
 // GOT NEXT — ambient life for every place: light glow and beams, steam and smoke, pigeons, litter in the wind,
 // searchlights and a blimp, the day's weather, and people talking. One AMB per scene; ambInit() when a scene is built.
 'use strict';
@@ -2660,12 +2707,13 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const wWalk = 1 - clamp((v - 2.3) / 0.9, 0, 1);
   let P = poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen });
   if (v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
-  if (wWalk < 1) P = blendPose(poseOf('loco', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw, swag: 0 }), P, wWalk);
+  // running: exactly the run from the court (same pose, same arms on the feet that are really stepping, same lean)
+  if (wWalk < 1) P = blendPose(poseOf('run', W.t, { sp: clamp(v / 6.5, 0, 1), ph: R.gait ? R.gait.ph : 0, leg: R.legLen, leanF: L.lean, hipYaw }), P, wWalk);
   else { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
   applyPose(R, P, dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;
   if (v > 0.25 && wWalk > 0.3) gaitLock(R, L.psi, face, wWalk); else R.lock = null;
-  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: 0, want: 1 - wWalk, dt, swag: 0 }); legIK(R, dt);
+  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: 0.05, want: 1 - wWalk, dt, swag: 0 }); legIK(R, dt);
 }
 // foot lock for the walk: while a foot is in stance, nudge that hip so the ankle stays where the foot landed (the curve
 // shape stays; only the hip angle is corrected, and the ankle keeps the foot flat). Released through push-off.
@@ -2684,7 +2732,7 @@ function gaitLock(R, psi, face, w) {
 function enterWorld(kind, sx, sz, face, opts) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
   W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] }; if (opts) Object.assign(W, opts);
-  musicMode = 'hub'; $('prompt').style.display = 'none'; ambInit();
+  musicMode = 'hub'; ostRoom(kind); $('prompt').style.display = 'none'; ambInit();
   if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else buildCrib();
   worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : W.visit ? W.visit.name + "'S CRIB" : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
   if (S.created && S.seenEventDay !== dayKey()) { S.seenEventDay = dayKey(); daily(); setTimeout(() => toast('TODAY · ' + todayEvent().n, todayEvent().d + ' The old head has new contracts.', 'rank'), 800); }
@@ -2904,7 +2952,10 @@ function worldStep(dt) {
   if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
-  const sp = I.sprint ? 6.2 : 1.5;          // walk the block with some swagger; run when you need to be somewhere
+  // speed off the court: keys walk (Shift runs). A stick or thumb sets it by how far you push: a walk up to about 80%,
+  // then a smooth ramp into the run at full push (no on/off flip at a threshold, which made the body jerk between gaits)
+  const sm = Math.min(1, Math.hypot(mx, my)), ramp = (u => u * u * (3 - 2 * u))(clamp((sm - 0.8) / 0.18, 0, 1));
+  const sp = I.analog ? (I.sprintBtn ? 6.2 : (1.5 + 4.7 * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? 6.2 : 1.5);
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
@@ -3652,7 +3703,7 @@ function uiPlayer(tab) {
         h += `<div class="card ${i === r ? 'sel' : ''} ${i > r ? 'lock' : ''}"><div class="row"><h3 class="g" style="color:${i <= r ? 'var(--ice)' : 'var(--bone)'}">${i <= r ? '✓ ' : ''}${k.n}</h3><span class="f mu">${k.rep.toLocaleString()} RESPECT</span></div><p>${un.length ? 'Unlocks in shops: ' + un.join(' · ') : 'Where everyone starts. Even the Founding Fathers. Allegedly.'}</p></div>`;
       });
     } else {
-      h += `<div class="card"><h3>SOUND</h3><div style="margin-top:6px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
+      h += `<div class="card"><h3>SOUND</h3><div style="margin-top:6px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${OST.el ? Btn('SKIP TRACK (N)' + (OST.cur ? ' · now: ' + esc(OST.cur) : ''), () => { ostNext(); setTimeout(rerender, 300); }, 'sm alt') : ''} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Cages with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (JAM: shove) · jump to block and board.</p></div>`;
       h += `<div class="card"><h3>DEV ROOM</h3><p>A maxed-out player, every build, every move, and a reel that plays them all. F2 on The Block opens it too.</p><div style="margin-top:6px">${Btn('OPEN DEV ROOM', () => { uiClose(); uiDev('hub'); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => uiDialog('ARE YOU SURE', 'Erase your player, drip, crib and Respect for good?', [['Erase it all', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } S = newSave(); uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'red'], ['Never mind', null, 'alt']]), 'sm red')}</div></div>`;
@@ -4678,6 +4729,7 @@ addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.cr
 let ST = null;   // studio / title scene state
 
 function titleScene() {
+  if (typeof ostRoom === 'function') ostRoom('menu');
   disposeScene(scene); scene = new THREE.Scene(); W = null; MT = null;
   scene.background = new THREE.Color(0x1a1430); scene.fog = new THREE.Fog(0x1a1430, 30, 140);
   baseLights(scene, 0xffd9c0, 0x3a3050, 0xffc890, 1.5);
@@ -4835,7 +4887,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera); window.__info = () => { let m = 0, s = 0, t = 0; scene.traverse(o => { if (o.isSprite) s++; else if (o.isMesh) m++; }); return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, meshes: m, sprites: s }; };
   // test hook: draw the player in one pose and hand back the frame

@@ -65,7 +65,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.8.1';
+const VERSION = '0.8.2';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -611,7 +611,7 @@ function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.re
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
-    const I = IN[i]; let mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
+    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false;
     // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
     const split = twoPlayer && pads.length === 0;
     if (i === 1 && split) {
@@ -623,7 +623,7 @@ function pollInput() {
       if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
       sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape;
-      if (touch.L) { mx += touch.L.x; my += touch.L.y; if (Math.hypot(touch.L.x, touch.L.y) > 0.93) sprint = true; }
+      if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       a = a || touch.a; b = b || touch.b; st = st || touch.start;
     }
@@ -631,14 +631,14 @@ function pollInput() {
     let p = null;
     if (twoPlayer) p = pads.length >= 2 ? pads[i] : (i === 1 ? pads[0] : null); else if (i === 0) p = pads[0];
     if (p) {
-      const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; rx += rs[0]; ry += rs[1];
+      const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; if (ls[0] || ls[1]) analog = true; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
       if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1;
       sprint = sprint || B(7) || B(5); a = a || B(0); b = b || B(2) || B(3); st = st || B(9); bk = bk || B(1);
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
-    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprint = sprint;
+    I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
     I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
@@ -693,7 +693,7 @@ function audioInit() {
     master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
     musicGain = AC.createGain(); musicGain.gain.value = 0.16; musicGain.connect(master);
     noiseBuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    musicNext = AC.currentTime + 0.1; musicTimer = setInterval(musicTick, 60);
+    musicNext = AC.currentTime + 0.1; musicTimer = setInterval(musicTick, 60); if (typeof ostInit === 'function') ostInit();
   } catch (e) { AC = null; }
 }
 function tone(f, t, dur, type, vol, f2, dest) {
@@ -739,7 +739,8 @@ const MUS = {
   jam: { bpm: 124, kick: 'x...x...x...x...', snare: '....x.......x...', hat: '..x...x...x...x.', bass: [55, 55, 0, 55, 65, 0, 55, 0, 49, 49, 0, 49, 73, 0, 65, 0] },
 };
 function musicTick() {
-  if (!AC || !S || !S.set.music || musicMode === 'off') { if (AC) musicNext = AC.currentTime + 0.1; return; }
+  if (typeof ostSync === 'function') ostSync();
+  if (!AC || !S || !S.set.music || musicMode === 'off' || (typeof ostPlaying === 'function' && ostPlaying())) { if (AC) musicNext = AC.currentTime + 0.1; return; }
   const M = MUS[musicMode]; const sp = 60 / M.bpm / 4;
   while (musicNext < AC.currentTime + 0.15) {
     const i = musicStep % 16, t = musicNext;

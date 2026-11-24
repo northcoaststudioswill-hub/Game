@@ -72,7 +72,7 @@ function startMatch(cfg) {
   scene.add(B.mesh); B.shadow = M(geo('bshadow', () => new THREE.CircleGeometry(0.14, 10)), flat(0x000000, { transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.016, 0, scene); B.shadow.rotation.x = -Math.PI / 2;
   for (let i = 0; i < 36; i++) { const m = M(sph(0.07, 6, 5), new THREE.MeshBasicMaterial({ color: 0xff8a1f, transparent: true }), 0, -5, 0, scene); MT.parts.push({ m, life: 0, v: V3() }); }
   camera.position.set(0, 7, 20);
-  musicMode = arcade ? 'jam' : 'game';
+  musicMode = arcade ? 'jam' : 'game'; ostRoom('game');
   hudShow(true); setCheck(MT.off, true);
   if (cfg.practice === 'rack') call('MONEY RACK', 'Deep balls only. 40 seconds. GO!', '#ffc531');
   window.__mt = MT;

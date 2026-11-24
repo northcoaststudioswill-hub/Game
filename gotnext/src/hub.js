@@ -83,12 +83,13 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const wWalk = 1 - clamp((v - 2.3) / 0.9, 0, 1);
   let P = poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen });
   if (v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
-  if (wWalk < 1) P = blendPose(poseOf('loco', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw, swag: 0 }), P, wWalk);
+  // running: exactly the run from the court (same pose, same arms on the feet that are really stepping, same lean)
+  if (wWalk < 1) P = blendPose(poseOf('run', W.t, { sp: clamp(v / 6.5, 0, 1), ph: R.gait ? R.gait.ph : 0, leg: R.legLen, leanF: L.lean, hipYaw }), P, wWalk);
   else { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
   applyPose(R, P, dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;
   if (v > 0.25 && wWalk > 0.3) gaitLock(R, L.psi, face, wWalk); else R.lock = null;
-  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: 0, want: 1 - wWalk, dt, swag: 0 }); legIK(R, dt);
+  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: 0.05, want: 1 - wWalk, dt, swag: 0 }); legIK(R, dt);
 }
 // foot lock for the walk: while a foot is in stance, nudge that hip so the ankle stays where the foot landed (the curve
 // shape stays; only the hip angle is corrected, and the ankle keeps the foot flat). Released through push-off.
@@ -107,7 +108,7 @@ function gaitLock(R, psi, face, w) {
 function enterWorld(kind, sx, sz, face, opts) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
   W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] }; if (opts) Object.assign(W, opts);
-  musicMode = 'hub'; $('prompt').style.display = 'none'; ambInit();
+  musicMode = 'hub'; ostRoom(kind); $('prompt').style.display = 'none'; ambInit();
   if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else buildCrib();
   worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : W.visit ? W.visit.name + "'S CRIB" : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
   if (S.created && S.seenEventDay !== dayKey()) { S.seenEventDay = dayKey(); daily(); setTimeout(() => toast('TODAY · ' + todayEvent().n, todayEvent().d + ' The old head has new contracts.', 'rank'), 800); }
@@ -327,7 +328,10 @@ function worldStep(dt) {
   if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
-  const sp = I.sprint ? 6.2 : 1.5;          // walk the block with some swagger; run when you need to be somewhere
+  // speed off the court: keys walk (Shift runs). A stick or thumb sets it by how far you push: a walk up to about 80%,
+  // then a smooth ramp into the run at full push (no on/off flip at a threshold, which made the body jerk between gaits)
+  const sm = Math.min(1, Math.hypot(mx, my)), ramp = (u => u * u * (3 - 2 * u))(clamp((sm - 0.8) / 0.18, 0, 1));
+  const sp = I.analog ? (I.sprintBtn ? 6.2 : (1.5 + 4.7 * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? 6.2 : 1.5);
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
