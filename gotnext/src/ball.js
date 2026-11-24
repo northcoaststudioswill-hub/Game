@@ -166,10 +166,10 @@ function startHop(p, next, src, opt) {
 function startShot(p, src, floater, opt) {
   if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
   opt = opt || {}; const d = dHoop(p), sp0 = Math.hypot(p.vx, p.vz);
-  if (!floater && !opt.hopped && !opt.fade && !opt.side && (d < 2.0 || (d < finishRange(p) && sp0 > 2.2 && (p.vx * -p.x + p.vz * -p.z) > 0 && src !== 'ai'))) return startFinish(p, p.user ? euroOf(p) : 0);
+  if (!floater && !opt.hopped && !opt.fade && !opt.side && !opt.jumper && (d < 2.0 || (d < finishRange(p) && sp0 > 2.2 && (p.vx * -p.x + p.vz * -p.z) > 0 && src !== 'ai'))) return startFinish(p, p.user ? euroOf(p) : 0);
   // the move stick picks the jumper: away from the rim fades, sideways from a stand side-steps, let go on a drive hops
   let fade = opt.fade ? 1 : 0, side = opt.side || 0;
-  if (!floater && !opt.hopped && !fade && !side) {
+  if (!floater && !opt.hopped && !fade && !side && !opt.jumper) {
     if (p.user && !p.afk && src !== 'reel') { const g = gest(p); if (g.tw < -0.5) fade = 1; else if (Math.abs(g.lat) > 0.6 && sp0 < 2.6) side = Math.sign(g.lat); }
     else if (!p.user && contestOn(p) > 0.3 && Math.random() < 0.3 + nAtt(p, 'mid') * 0.25) fade = 1;
   }
@@ -360,7 +360,7 @@ function startMove(p, slot, dx, dz) {
   const mv = MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot);
   if (mv.keep) { dx *= 0.45; dz = -0.9; }            /* in-and-out: the fake goes sideways, the burst goes forward */ const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
-  p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
+  p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
   p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh');
   // ankle check on the nearest defender
   let o = null, od = 2.1; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
@@ -392,13 +392,46 @@ function passTarget(p, mx, mz) {
   if (m > 0.4) { let best = null, bs = -9; for (const o of mates) { const dx = o.x - p.x, dz = o.z - p.z, l = Math.hypot(dx, dz) || 1; const s = (dx * mx + dz * mz) / (l * m); if (s > bs) { bs = s; best = o; } } return best; }
   let best = null, bs = -9; for (const o of mates) { let od = 9; for (const q of MT.P) if (q.team !== p.team) od = Math.min(od, dist(q, o)); const s = od - dist(o, p) * 0.1; if (s > bs) { bs = s; best = o; } } return best;
 }
+// ---------------- JAM slugfest ----------------
+function startHit(p, kind) {
+  p.st = kind; p.t = 0; p.cool = kind === 'punch' ? 1.5 : 2.2; p.hitList = []; sfxM('whoosh');
+  if (kind === 'punch') { const fx = Math.sin(p.face), fz = Math.cos(p.face); p.vx += fx * 2; p.vz += fz * 2; }
+}
+function hitScan(p, kind, reach, frontMin) {
+  const fx = Math.sin(p.face), fz = Math.cos(p.face);
+  for (const o of MT.P) { if (o.team === p.team || p.hitList.includes(o) || (o.st === 'stagger' && o.stg && o.stg.fall)) continue; const d = dist(o, p); if (d > reach || d < 1e-3) continue;
+    if (((o.x - p.x) * fx + (o.z - p.z) * fz) / d < frontMin) continue; applyHit(p, o, kind); if (kind === 'punch') return; }
+}
+function applyHit(p, o, kind) {
+  const M_ = MT, B = M_.B; p.hitList.push(o); const dd = dist(o, p) || 1, dir = [(o.x - p.x) / dd, (o.z - p.z) / dd];
+  if (kind === 'punch' && Math.random() > 0.72 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.35) { floatTxt(o, 'SHRUGGED IT OFF', '#8d8d99'); sfxM('bump'); return; }
+  const ko = Math.random() < (kind === 'clothes' ? 0.36 : 0.18) + Math.min(0.3, (M_.brawlHeat || 0) * 0.08);
+  o.st = 'stagger'; o.t = 0; o.stg = { dur: ko ? 4.2 : kind === 'clothes' ? 2.0 : 1.5, fall: true, side: 0, dir, push: kind === 'clothes' ? 3.4 : 2.2 };
+  if (ko) { o.ko = 4.2; if (M_.net === 'host') netEv({ k: 'ko', i: o.i, d: 4.2 }); }
+  sfxM('block'); M_.shake = ko ? 0.55 : 0.3; for (const f of M_.fans) f.hype = 1.4; burst(o.x, 1.3, o.z, ko ? 0xff4040 : 0xffc531, ko ? 18 : 10);
+  floatTxt(o, ko ? 'KO' : kind === 'clothes' ? 'CLOTHESLINED' : 'POW', ko ? '#ff4040' : '#ffc531');
+  call(kind === 'clothes' ? 'CLOTHESLINE!' : 'HAYMAKER!', p.b.name + ' on ' + o.b.name, '#ff4040', 1);
+  if (B.holder === o) { B.state = 'loose'; B.holder = null; B.pos.set(o.x, 1, o.z); B.vel.set(rnd(-3, 3), 3, rnd(-3, 3)); B.t = 0; B.rebound = false; B.lastTeam = p.team; }
+  M_.brawlHeat = (M_.brawlHeat || 0) + 1;
+  if (ko && M_.phase === 'live') { M_.brawl = M_.brawl || { t: 1.4, by: p, victims: [] }; if (!M_.brawl.victims.includes(o)) M_.brawl.victims.push(o); }
+}
+// a knockout stops the game: even in JAM, that one gets called. The team that got hit keeps the ball.
+function calledFoul() {
+  const M_ = MT, b = M_.brawl; M_.brawl = null; if (!b || M_.phase !== 'live') return; const v = b.victims[0], by = b.by;
+  sfxM('whistle'); call('WE HAVE TO CALL THAT', `${by.b.name} is crazy · ${b.victims.length > 1 ? 'two down' : v.b.name + ' is down'}`, '#ff4040', 2.4);
+  const vMates = M_.P.filter(q => q.team === v.team && !b.victims.includes(q)), aMates = M_.P.filter(q => q.team === by.team && q !== by);
+  floatTxt(vMates[0] || v, 'ALL RIGHT, MAN.', '#ffffff'); setTimeout(() => { if (MT === M_) { floatTxt(vMates[1] || v, 'WE HAVE TO CALL THAT.', '#ffffff'); floatTxt(aMates[0] || by, aMates[0] ? "YOU'RE CRAZY." : 'MY BAD.', '#ffc531'); } }, 700);
+  deadBall(v.team, 2.8); M_.brawlHeat = 0;
+}
 function startSteal(p) {
   const B = MT.B, h = B.holder, now = MT.time; p.reach = (p.reach || []).filter(t => now - t < 1.6); p.reach.push(now);
   if (p.cool > 0) {      // still recovering from the last reach: swiping again is a hand check
     if (h && h.team !== p.team && dist(h, p) < 1.4 && p.reach.length >= 3 && Math.random() < 0.09 * (p.reach.length - 2)) foul(p, h, 'hand check');
     return;
   }
-  if (MT.arcade) {   // shove: anyone close in front
+  if (MT.arcade) {   // JAM: shove; hold LT for a haymaker; at a sprint it is a clothesline (AI throws the odd punch too)
+    const kind = p.sprinting && Math.hypot(p.vx, p.vz) > 3.6 ? 'clothes' : (p.ltHeld || (!p.user && Math.random() < 0.22)) ? 'punch' : 'shove';
+    if (kind !== 'shove') { startHit(p, kind); return; }
     let o = null, od = 1.35; for (const q of MT.P) { if (q.team === p.team || q.st === 'stagger') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
     p.st = 'shove'; p.t = 0; p.cool = 1.3;
     if (o && Math.random() < 0.62 + nAtt(p, 'str') * 0.2 - nAtt(o, 'str') * 0.3) {
@@ -455,6 +488,8 @@ function canCancel(p) {
     case 'pass': return p.t > 0.12;
     case 'steal': return p.t > 0.26;
     case 'shove': return p.t > 0.22;
+    case 'punch': return p.t > 0.38;
+    case 'clothes': return p.t > 0.45;
     case 'shoot': return p.shot.released && p.y <= 0.001 && p.t > p.shot.rel + 0.08;
     case 'celeb': return false;
   }
@@ -469,6 +504,7 @@ function humanThink(p, dt) {
   // LT: with the ball and a live dribble, back to the basket (post up); on defense against the ball, body up
   const postNow = !!I.lt && hasBall && p.live === 'drib' && (p.st === 'free' || p.st === 'move') && !MT.arcade;
   if (postNow && !p.post) floatTxt(p, 'POST UP', '#f2c14e'); p.post = postNow;
+  p.ltHeld = !!I.lt;
   p.bodyUp = !!I.lt && !hasBall && MT.off !== p.team && !!B.holder && B.holder.team !== p.team && p.st === 'free';
   if (p.st === 'shoot' && !p.shot.released && p.shot.auto) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
   if (p.remote) {          // the guest times their own release; the host just takes their word for the hold
@@ -496,7 +532,18 @@ function humanThink(p, dt) {
     }
     if (p.post && p.st === 'free') {      // post moves: shoot = turnaround fadeaway, stick toward the rim = hook, stick to a side = drop step
       const d = dHoop(p), hf = Math.atan2(-p.x, -p.z);
-      if (I.bP || I.flick === 'D') { p.post = false; startShot(p, I.bP ? 'btn' : 'stick', false, { fade: true }); floatTxt(p, 'TURNAROUND', '#f2c14e'); return; }
+      if (I.bP) {      // shoot from the post: where the stick points picks the move
+        const hx = -p.x / (d || 1), hz = -p.z / (d || 1), sx = p.in.dx || 0, sz = p.in.dz || 0, sm = Math.hypot(sx, sz), along = sm > 0.3 ? (sx * hx + sz * hz) / sm : 0, lat = sm > 0.3 ? (sx * -hz + sz * hx) / sm : 0;
+        p.post = false;
+        if (along > 0.55) {      // into the defender, toward the rim: drop step to the side he is not on, or a hook from further out
+          if (d < 3.6) { const [o] = nearestOpp(p); const ol = o ? (o.x - p.x) * -hz + (o.z - p.z) * hx : 0; const side = Math.abs(lat) > 0.3 ? Math.sign(lat) : (ol > 0 ? -1 : 1); floatTxt(p, 'DROP STEP', '#f2c14e'); startFinish(p, side, false, 0, { layup: 1, kind: 'power' }); return; }
+          p.face = hf; startShot(p, 'stick', true); floatTxt(p, 'HOOK', '#f2c14e'); return;
+        }
+        if (along < -0.55) { startShot(p, 'btn', false, { fade: true }); floatTxt(p, 'POST FADE', '#f2c14e'); return; }      /* away from the rim: fadeaway */
+        if (Math.abs(lat) > 0.55) { p.face = hf; p.vx += -hz * Math.sign(lat) * 1.6; p.vz += hx * Math.sign(lat) * 1.6; startShot(p, 'stick', true); floatTxt(p, 'JUMP HOOK', '#f2c14e'); return; }      /* across: a step and a jump hook */
+        startShot(p, 'btn', false, { jumper: true }); floatTxt(p, 'TURNAROUND', '#f2c14e'); return;      /* stick still: turnaround jumper */
+      }
+      if (I.flick === 'D') { p.post = false; startShot(p, 'stick', false, { fade: true }); floatTxt(p, 'TURNAROUND', '#f2c14e'); return; }
       if (I.flick === 'U' && d < 5.2) { p.post = false; p.face = hf; startShot(p, 'stick', true); floatTxt(p, 'HOOK', '#f2c14e'); return; }
       if (I.flick && I.flick !== 'U') { const side = I.flick.includes('L') ? -1 : I.flick.includes('R') ? 1 : 0; p.post = false; p.face = hf;
         if (d < 3.8 && side) { floatTxt(p, 'DROP STEP', '#f2c14e'); startFinish(p, side, false, 0, { layup: 1, kind: 'power' }); return; }
@@ -510,7 +557,7 @@ function humanThink(p, dt) {
     if (I.flick === 'UL' || I.flick === 'UR') { startMove(p, 'diag', I.flick === 'UL' ? -0.8 : 0.8, -0.8); return; }
     if (I.aP) { doPass(p, passTarget(p, I.mx, I.my)); return; }
   } else if (MT.off === p.team && B.state !== 'loose' && B.state !== 'shot') {
-    if (I.aP) { p.callT = 1.2; floatTxt(p, 'BALL!', '#fff'); }
+    if (I.aP) { if (MT.arcade && (I.lt || p.sprinting)) startSteal(p); else { p.callT = 1.2; floatTxt(p, 'BALL!', '#fff'); } }      /* JAM: off the ball you can still throw hands */
     if (I.bP || I.flick === 'U') startJump(p);
   } else {
     if (I.rdir === 'U' || I.rdir === 'UL' || I.rdir === 'UR') p.handsUp = true;
@@ -635,6 +682,8 @@ function matchStep(dtReal) {
   // phases
   if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
   else if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
+  if (M_.brawl) { M_.brawl.t -= dt; if (M_.brawl.t <= 0) calledFoul(); }
+  if (M_.brawlHeat) M_.brawlHeat = Math.max(0, M_.brawlHeat - dt * 0.05);
   else if (M_.phase === 'over') { M_.pt -= dt; if (M_.pt <= 0 && !M_.over) { M_.over = true; endMatch(); return; } }
   else if (M_.phase === 'live' && !M_.practice) {
     if (B.state === 'held') { M_.clock -= dt; if (M_.clock <= 0) { sfxM('buzz'); call('SHOT CLOCK', 'Attention span expired', '#ff4040', 1.2); M_.viol = (M_.viol || 0) + 1; const t = 1 - M_.off; M_.lastScorer = { team: M_.off }; M_.phase = 'scored'; M_.pt = 1.2; void t; } }
@@ -716,6 +765,8 @@ function stepPlayer(p, dt) {
     case 'jump': { lock = 0.35; if (p.lunge && p.t < p.lunge[2]) { lock = 0; p.vx = p.lunge[0]; p.vz = p.lunge[1]; } const u = p.t / 0.62; p.y = p.jumpH * Math.sin(Math.PI * Math.min(1, u)); if (u >= 1) { p.st = 'free'; p.y = 0; } break; }
     case 'steal': lock = 0.55; if (p.lunge && p.t < p.lunge[2]) { lock = 0; p.vx = p.lunge[0]; p.vz = p.lunge[1]; } if (p.t > 0.13 && !p.stealDone && MT.B.state !== 'pass') resolveSteal(p); if (p.t > 0.4) { p.st = 'free'; p.laneJump = false; } break;
     case 'shove': lock = 0.3; if (p.t > 0.35) p.st = 'free'; break;
+    case 'punch': lock = 0.25; if (p.t > 0.13 && p.t < 0.3) hitScan(p, 'punch', 1.2, 0.3); if (p.t > 0.45) p.st = 'free'; break;
+    case 'clothes': lock = 1; if (p.t > 0.05 && p.t < 0.42) hitScan(p, 'clothes', 1.05, -0.35); if (p.t > 0.5) p.st = 'free'; break;
     case 'pass': lock = 0.8; if (p.t > 0.22) p.st = 'free'; break;
     case 'celeb': lock = 0; p.vx *= 0.85; p.vz *= 0.85; if (M_.phase === 'live') p.st = 'free'; break;
   }
@@ -763,7 +814,7 @@ function stepPlayer(p, dt) {
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
   if (p.bodyUp) top *= 0.86;
-  if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= 0.8 + 0.12 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5); }      /* a hand on your body slows the drive */
+  if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5), 0.6, 0.95); }      /* a hand on your body slows the drive */
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
   if (p.sprinting) { top *= 1.28; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * dt);
@@ -908,6 +959,13 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
   // bounced level with the hips, and a runner then outran it)
   return _bq.set(p.x + vx * tAhead + rx * side * sgn + fx * fwd, 0.125, p.z + vz * tAhead + rz * side * sgn + fz * fwd).clone();
 }
+// which hand the ball wants to be in: away from a defender who is close, otherwise the hand on the side you are going
+function autoHand(p) {
+  const fx = Math.sin(p.face), fz = Math.cos(p.face), [o, od] = nearestOpp(p);
+  if (o && od < 1.7) { const lat = (o.x - p.x) * -fz + (o.z - p.z) * fx, fwd = (o.x - p.x) * fx + (o.z - p.z) * fz; if (fwd > -0.3 && Math.abs(lat) > 0.12) return lat > 0 ? 'L' : 'R'; if (od < 1.2) return null; }
+  const dh = dHoop(p) || 1, hx = -p.x / dh, hz = -p.z / dh, lv = (p.avx || 0) * -hz + (p.avz || 0) * hx;      /* sideways, as seen looking at the rim */
+  return lv > 1.1 ? 'R' : lv < -1.1 ? 'L' : null;
+}
 // a dribble move takes the ball out of whatever it was doing and sends it where the move needs it
 function dribMove(p, mv) {
   const D = p.drib; if (!D || MT.B.holder !== p) return;
@@ -944,7 +1002,10 @@ function ballHeld(p, dt) {
     // receive (the hand gives with the ball as it rises), then push it back down
     const Th = Tc * 0.36, u = Math.min(1, D.t / Th); p.dribH = u < 0.35 ? 0.88 + 0.12 * (u / 0.35) : 1 - 0.8 * ((u - 0.35) / 0.65);
     palm(p, D.hand, _bp); ballFollow(B, _bp, dt, true);
-    if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = ''; D.F = dribFloor(p, D, '', D.T); D.upT = Tc * 0.38; }
+    if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = '';
+      const want = p.st === 'free' && !p.post ? autoHand(p) : null;      /* switch hands with a quick crossover dribble in front of the body */
+      if (want && want !== D.hand && M_.time - (p.handSwT || -9) > 0.75) { p.hand = want; D.hand = want; D.kind = 'cross'; p.handSwT = M_.time; }
+      D.F = dribFloor(p, D, D.kind, D.T); D.upT = Tc * 0.38; }
   } else if (D.ph === 'down') {
     if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) / 10);     /* no faster than a hard real push */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
     const u = Math.min(1, D.t / D.T), e = Math.pow(u, 1.5); p.dribH = 0.25 + 0.6 * u;
@@ -973,7 +1034,7 @@ function animPlayer(p, dt) {
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
     case 'stagger': an = 'stagger'; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
-    case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
+    case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'punch': an = 'punch'; break; case 'clothes': an = 'clothes'; o.sp = 1; o.ph = p.runPh; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
     case 'celeb': an = 'celeb'; o.style = p.b.moves.celeb; break;
     default:
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }

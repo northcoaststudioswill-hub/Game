@@ -407,6 +407,11 @@ function poseOf(anim, t, o) {
     case 'jump': legs(0.05, 0.25, 0.02, 0.15, 0.05); S_('anR', 0.8); S_('anL', 0.8); S_('spine', -0.04); S_('chest', -0.1); S_('neck', -0.25); S_('shR', -3.0, 0, 0.12); S_('shL', -2.9, 0, -0.12); S_('elR', -0.1); S_('elL', -0.15); S_('wrR', 0.4); S_('wrL', 0.4); p.rate = 22; break;
     case 'swat': legs(0.1, 0.3, -0.3, 0.5, 0.08); S_('anR', 0.8); S_('spine', 0.1); S_('chest', 0.15, 0.5, 0); S_('neck', -0.1); S_('shR', -1.7, 0, 0.5); S_('elR', -0.05); S_('wrR', -0.9); S_('shL', -0.4, 0, 0.6); S_('elL', -0.8); p.rate = 34; break;
     case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28; break; }
+    case 'punch': { const u = clamp(t / 0.45, 0, 1); p.y = -0.06; legs(-0.5, 0.6, 0.25, 0.25, 0.12); S_('spine', 0.12);      // haymaker: load the right hand back, then throw it through
+      if (u < 0.3) { S_('chest', 0, 0.5, 0); S_('shR', 0.55, 0, -0.35); S_('elR', -2.0); S_('shL', -1.0, 0, 0.2); S_('elL', -1.8); }
+      else { S_('chest', 0.05, -0.5, 0); S_('neck', 0, 0.3, 0); S_('shR', -1.55, 0, 0.05); S_('elR', -0.08); S_('wrR', 0.1); S_('shL', -0.5, 0, 0.35); S_('elL', -1.9); }
+      p.rate = 34; break; }
+    case 'clothes': { Object.assign(p, poseOf('run', t, o)); S_('shR', -0.15, 0, -1.5); S_('elR', -0.08); S_('wrR', 0); S_('chest', 0.02, 0.35, 0); p.rate = 30; break; }      /* clothesline: running, the right arm straight out */
     case 'shove': p.y = -0.08; legs(-0.75, 0.75, 0.4, 0.2); S_('spine', 0.3); S_('chest', 0.15); S_('neck', -0.3); S_('shR', -1.5, 0, 0.1); S_('shL', -1.5, 0, -0.1); S_('elR', -0.1); S_('elL', -0.1); S_('wrR', 0.9); S_('wrL', 0.9); p.rate = 30; break;
     case 'pass': { const f = o.flashy; legs(-0.55, 0.55, 0.1, 0.2); S_('spine', 0.14); S_('chest', 0.1, f ? 0.6 : 0, 0); S_('neck', -0.1, f ? -0.7 : 0, 0);
       const k = o.pk || 'chest', u = clamp(t / 0.2, 0, 1), snap = u < 0.35 ? 0 : 1;     // load, then snap the wrists through

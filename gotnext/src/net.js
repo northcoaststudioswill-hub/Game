@@ -3,7 +3,7 @@
 // viewer the platform does not connect, every one of these is absent and the game is simply single player.
 'use strict';
 const NET = { room: null, db: null, uid: null, me: null, peers: [], out: null, seenInv: {}, seenGo: {}, known: {}, crew: null, inCrew: null, inSince: 0, waitGo: null, game: null, pub: {}, pubT: 0, cloudT: null, cloudBusy: false, cloudDirty: false, connected: false };
-const ST_CODES = ['free', 'shoot', 'finish', 'move', 'stagger', 'jump', 'steal', 'shove', 'pass', 'celeb', 'hop'];
+const ST_CODES = ['free', 'shoot', 'finish', 'move', 'stagger', 'jump', 'steal', 'shove', 'pass', 'celeb', 'hop', 'punch', 'clothes'];
 const BSTATES = ['held', 'shot', 'through', 'pass', 'loose'];
 const r2 = v => Math.round(v * 100) / 100;
 
@@ -304,7 +304,7 @@ function netGuestStep(dt) {
       else if (st === 'finish') { const k = String(a[12] || ''); p.finish = { type: a[9] ? 'dunk' : 'layup', dur: +a[10] || 0.6, style: a[9] && (DUNK[k]) ? k : p.b.moves.dunk, kind: a[9] ? '' : (FINISHES.find(x => x.id === k) ? k : 'lay'), spin: a[11] | 0, turn: +a[13] || 0, euro: +a[14] || 0, cont: a[15] & 1, blocked: !!(a[15] & 2), hit: a[15] & 4 ? 1 : null }; }
       else if (st === 'move') p.mv = { dx: +a[9] || 0, slot: ['side', 'back', 'diag'][a[10]] || 'side', mv: { dur: +a[11] || 0.35, id: MOVE[a[12]] ? String(a[12]) : 'cross' } };
       else if (st === 'hop') p.hop = { dur: +a[9] || HOP_T };
-      else if (st === 'stagger') p.stg = { fall: !!a[9], side: clamp(+a[10] || 0, -1, 1), dur: clamp(+a[11] || 1, 0.3, 3) };
+      else if (st === 'stagger') p.stg = { fall: !!a[9], side: clamp(+a[10] || 0, -1, 1), dur: clamp(+a[11] || 1, 0.3, 5) };
       if (st !== 'finish' && st !== 'move') p.rig.extraYaw = 0;
     });
     B.state = BSTATES[s.B[0]] || 'loose'; B.tp = B.tp || V3(); B.tp.set(+s.B[1] || 0, +s.B[2] || 0, +s.B[3] || 0); B.holder = M_.P[s.B[4]] || null; B.green = !!s.B[5]; B.shooter = s.B[6] ? { fire: true } : null;
@@ -313,6 +313,7 @@ function netGuestStep(dt) {
       if (e.k === 'c') hudCall(String(e.b || ''), String(e.s || ''), cssCol(e.c), +e.d || 1.2);
       else if (e.k === 'f') { const p = M_.P[e.i]; if (p) hudFloat(p, String(e.t || ''), cssCol(e.c)); }
       else if (e.k === 'pu') puNet(e);
+      else if (e.k === 'ko') { const p = M_.P[e.i | 0]; if (p) p.ko = clamp(+e.d || 3, 0, 6); }
       else if (e.k === 'fb') { if (!e.to || e.to === NET.me) hudFb(String(e.t || ''), cssCol(e.c)); }
       else if (e.k === 's') { sfx(String(e.s2 || '')); if (e.s2 === 'dunk') { M_.shake = 0.45; burst(0, 3, 0, 0xffc531, 14); for (const f of M_.fans) f.hype = 1.6; M_.netT = 0.35; } if (e.s2 === 'swish' || e.s2 === 'green') { M_.netT = 0.35; for (const f of M_.fans) f.hype = 1.4; } }
     }

@@ -28,7 +28,7 @@ const move = (what) => p.evaluate(([s, what]) => { eval(s); me.x = 0.4; me.z = 3
   if (what === 'shoot') { __pad.buttons[2].pressed = true; window.__tick(3); } else { __pad.axes[2] = what === 'up' ? 0 : 1; __pad.axes[3] = what === 'up' ? -1 : 0; window.__tick(3); }
   const r = { st: me.st, fade: me.shot && me.shot.fade, floater: me.shot && me.shot.floater, finish: me.finish && me.finish.kind }; __pad.axes = [0, 0, 0, 0]; for (const bt of __pad.buttons) bt.pressed = false; window.__tick(150); return r; }, [set, what]);
 const m1 = await move('shoot'), m2 = await move('up'), m3 = await move('side');
-ok(m1.st === 'shoot' && m1.fade, `post + shoot: turnaround fadeaway (${m1.st}, fade ${m1.fade})`);
+ok(m1.st === 'shoot' && !m1.fade, `post + shoot, stick still: turnaround jumper (${m1.st}, fade ${m1.fade}); the fade is stick-away + shoot (tests/slug.mjs)`);
 ok(m2.st === 'shoot' && m2.floater, `post + stick toward the rim: hook (${m2.st})`);
 ok(m3.st === 'finish', `post + stick to the side: drop step into a power finish (${m3.st})`);
 // 3. body up: LT on defense plays tighter on the ball and slows his drive

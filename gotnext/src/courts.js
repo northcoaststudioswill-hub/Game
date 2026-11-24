@@ -185,7 +185,7 @@ function puNet(e) {
 }
 
 // ---------------- every frame, host and guest: the things that move and light up ----------------
-const _ledC = new THREE.Color(), _ledA = new THREE.Color(), _ledB = new THREE.Color();
+const _koV = new THREE.Vector3(), _ledC = new THREE.Color(), _ledA = new THREE.Color(), _ledB = new THREE.Color();
 function courtFx(dt) {
   const M_ = MT, S = M_.courtFx; if (!S) return; S.t = (S.t || 0) + dt;
   const key = M_.score.join('-') + (M_.hotTeam >= 0 ? 'f' : '');
@@ -202,6 +202,8 @@ function courtFx(dt) {
     S.led.instanceColor.needsUpdate = true;
     S.rimRing.material.opacity = 0.22 + 0.15 * Math.sin(S.t * 2.4) + S.flash * 0.4; S.rimRing.material.color.set(fire ? 0xff7a1f : 0xff4fd8); const rs = 1 + 0.06 * Math.sin(S.t * 2.4); S.rimRing.scale.set(rs, rs, rs);
   }
+  // knocked out: stars circling the head
+  for (const p of M_.P) if (p.ko > 0) { p.ko -= dt; if (Math.random() < 0.6) { const h = p.rig.joints.head.getWorldPosition(_koV), a = S.t * 6 + Math.random() * 6.3; burst(h.x + Math.cos(a) * 0.22, h.y + 0.22, h.z + Math.sin(a) * 0.22, 0xffe14a, 1); } }
   // power-ups on the floor bob and spin; a player carrying one glows its colour and wears its icon
   if (M_.pu) {
     for (const it of M_.pu.list) { if (!it.g) continue; it.age += dt; it.sp.position.y = 0.95 + Math.sin(it.age * 3) * 0.1; it.sp.material.rotation = Math.sin(it.age * 2) * 0.25; it.ring.scale.setScalar(1 + 0.12 * Math.sin(it.age * 5)); it.col.material.opacity = 0.1 + 0.05 * Math.sin(it.age * 4);
