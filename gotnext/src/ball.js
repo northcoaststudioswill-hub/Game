@@ -156,7 +156,7 @@ function startShot(p, src, floater, opt) {
     else if (!p.user && contestOn(p) > 0.3 && Math.random() < 0.3 + nAtt(p, 'mid') * 0.25) fade = 1;
   }
   const j = JUMPER[p.b.moves.jumper] || JUMPERS[0];
-  p.st = 'shoot'; p.t = 0; p.shot = { rel: j.rel * (p.fire ? 0.85 : 1), j, src, released: false, kind: shotKind(p), sp: sp0, aiRel: 0, fade, side, fx: p.x / (d || 1), fz: p.z / (d || 1) };
+  p.st = 'shoot'; p.t = 0; p.shot = { rel: j.rel * (p.fire ? 0.85 : 1), j, src, released: false, kind: shotKind(p), sp: sp0, vx: p.vx, vz: p.vz, aiRel: 0, fade, side, fx: p.x / (d || 1), fz: p.z / (d || 1) };
   if (side) { const sh = p.shot, l = d || 1; sh.sx = -p.z / l * side; sh.sz = p.x / l * side; /* across the rim line, the way the stick went */ if (sh.sx * (p.in.dx || 0) + sh.sz * (p.in.dz || 0) < 0) { sh.sx = -sh.sx; sh.sz = -sh.sz; } }
   if (p.user && fade) floatTxt(p, 'FADE', '#f2c14e'); else if (p.user && side) floatTxt(p, 'SIDE STEP', '#f2c14e');
   if (opt.hopped) { const sh = p.shot; sh.auto = true; sh.aiRel = sh.rel * (1 + clamp((Math.random() + Math.random() - 1) * (0.2 - nAtt(p, 'iq') * 0.14), -0.3, 0.3)); }
@@ -202,7 +202,16 @@ function releaseShot(p) {
   sfxM('whoosh');
 }
 function startFake(p) {
-  if (p.live === 'drib' && dribRules(p)) p.live = 'dead';      /* a pump fake after dribbling is a pickup */
+  if (p.live === 'drib' && dribRules(p)) {
+    // driving: the pump becomes a hesitation (the dribble stays alive). Standing: a real pump fake, and the ball is picked up
+    const sp = Math.max(p.shot ? p.shot.sp : 0, Math.hypot(p.vx, p.vz));
+    if (sp > 1.8) {
+      const vx = p.shot && p.shot.vx !== undefined ? p.shot.vx : p.vx, vz = p.shot && p.shot.vz !== undefined ? p.shot.vz : p.vz, l = Math.hypot(vx, vz) || 1, keep = p.b.moves.back;
+      p.st = 'free'; p.y = 0; p.moveCool = 0; p.b.moves.back = 'hesi'; startMove(p, 'back', vx / l, vz / l); p.b.moves.back = keep;
+      if (p.st === 'move') { floatTxt(p, 'HESI', '#f2c14e'); return; }
+    }
+    p.live = 'dead'; floatTxt(p, 'PICKED UP', '#f2c14e');
+  }
   p.st = 'fake'; p.t = 0; p.y = 0; sfxM('whoosh');
   let o = null, od = 2.4; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
   if (o && !o.user && Math.random() < clamp(0.3 + (1 - o.aiLvl) * 0.3 - nAtt(o, 'perd') * 0.22 + nAtt(p, 'iq') * 0.15, 0.08, 0.7)) { startJump(o); o.ai.react = 0.9; floatTxt(o, 'BIT ON IT', '#f2c14e'); addBrav(p, 0.06); }
@@ -654,11 +663,10 @@ function stepPlayer(p, dt) {
     case 'pass': lock = 0.8; if (p.t > 0.22) p.st = 'free'; break;
     case 'celeb': lock = 0; p.vx *= 0.85; p.vz *= 0.85; if (M_.phase === 'live') p.st = 'free'; break;
   }
-  // no double dribble: once you have dribbled, coming to a stop picks the ball up, and a picked-up ball cannot be dribbled again
+  // no double dribble: you can stop and keep dribbling, but a pump fake after dribbling picks the ball up for good
   if (hasBall && dribRules(p)) {
     const push = Math.hypot(p.in.dx, p.in.dz);
     if (p.live === 'hold' && (push > 0.25 || p.st === 'move')) p.live = 'drib';
-    if (p.live === 'drib' && p.st === 'free' && M_.phase === 'live') { if (push < 0.15 && Math.hypot(p.vx, p.vz) < 0.45) { p.stopT = (p.stopT || 0) + dt; if (p.stopT > 0.4) { p.live = 'dead'; if (p.mine || p.user) floatTxt(p, 'PICKED UP', '#f2c14e'); } } else p.stopT = 0; }
     if (p.live === 'dead' && p.st === 'free') { lock = 0; const k = Math.pow(0.002, dt); p.vx *= k; p.vz *= k; }      /* feet stay put: pivot only */
   } else if (hasBall && p.live !== 'drib') p.live = 'drib';
   if (M_.phase !== 'live' && M_.phase !== 'check') lock = Math.min(lock, p.st === 'celeb' ? 0 : 0.5);

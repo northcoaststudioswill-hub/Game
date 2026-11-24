@@ -14,17 +14,19 @@ let r; await p.evaluate(() => { const M = __pit.MT, me = M.me; me.vx = me.vz = 0
 // 1. ball in hand standing still: held, dribble alive; pushing the stick starts the dribble
 let L = await keys([], 10); const r1 = L[L.length - 1]; L = await keys(['KeyD'], 20); const r2 = L[L.length - 1];
 ok(r2.live === 'drib' && r2.x > L[0].x + 0.3, `held at first (${r1.live}, ${r1.an}); push the stick and he dribbles off (${r2.live})`);
-// 2. stop: the ball is picked up; the stick only pivots; moves are refused
-L = await keys([], 35); const r3 = L[L.length - 1]; const x0 = r3.x;
-L = await keys(['KeyA'], 30); const r4 = L[L.length - 1];
-L = await keys(['KeyA', 'KeyL'], 2); L = L.concat(await keys(['KeyA'], 10)); const moved = L.some(s => s.st === 'move');
-ok(r3.live === 'dead' && r3.an === 'hold' && Math.abs(r4.x - x0) < 0.12 && !moved, `stopped: picked up (${r3.live}, ${r3.an}); pushing the stick does not move him (${Math.abs(r4.x - x0).toFixed(2)} m); a dribble move is refused`);
-// 3. dead ball: he can still shoot
+// 2. stopping keeps the dribble alive
+L = await keys([], 60); const r3 = L[L.length - 1];
+ok(r3.live === 'drib' && r3.an === 'dribble', `stop for a second: still dribbling (${r3.live}, ${r3.an})`);
+// 3. pump fake standing after dribbling: picked up; the stick only pivots; moves are refused; he can still shoot
+L = await keys(['Space'], 4); L = L.concat(await keys([], 30)); const r4 = L[L.length - 1]; const x0 = r4.x;
+L = await keys(['KeyA'], 30); const r5 = L[L.length - 1]; L = await keys(['KeyA', 'KeyL'], 2); L = L.concat(await keys(['KeyA'], 10)); const moved = L.some(s => s.st === 'move');
+ok(r4.live === 'dead' && r4.an === 'hold' && Math.abs(r5.x - x0) < 0.12 && !moved, `pump fake standing: picked up (${r4.live}, ${r4.an}); the stick does not move him (${Math.abs(r5.x - x0).toFixed(2)} m); a dribble move is refused`);
 L = await keys(['Space'], 20); ok(L.some(s => s.st === 'shoot'), 'picked up: he can still shoot');
 await keys([], 90);
-// 4. a hesi on the move keeps the dribble alive
-await fresh(); await keys(['KeyD'], 20); L = await keys(['KeyD', 'KeyK', 'KeyL'], 2); L = L.concat(await keys(['KeyD'], 40));
-ok(L.some(s => s.st === 'move') && L[L.length - 1].live === 'drib', `a hesi / move on the move keeps the dribble alive (${L[L.length - 1].live})`);
-// 5. a quick tap stop (under 0.4 s) does not pick it up
-L = await keys([], 15); L = L.concat(await keys(['KeyD'], 20)); ok(L[L.length - 1].live === 'drib', `a quick stop-and-go (0.25 s) keeps the dribble (${L[L.length - 1].live})`);
+// 4. pump while driving: a hesi, and the dribble stays alive
+await fresh(); await keys(['KeyD', 'ShiftLeft'], 40); L = await keys(['KeyD', 'ShiftLeft', 'Space'], 4); L = L.concat(await keys(['KeyD', 'ShiftLeft'], 40));
+const mv = await p.evaluate(() => __pit.MT.me.mv && __pit.MT.me.mv.mv.id);
+ok(L.some(s => s.st === 'move') && mv === 'hesi' && L[L.length - 1].live === 'drib' && !L.some(s => s.st === 'fake'), `pump on the drive: a hesi (${mv}), still dribbling (${L[L.length - 1].live})`);
+// 5. a dribble move on the move keeps the dribble alive
+L = await keys(['KeyD', 'KeyL'], 2); L = L.concat(await keys(['KeyD'], 40)); ok(L.some(s => s.st === 'move') && L[L.length - 1].live === 'drib', `a crossover on the move keeps the dribble (${L[L.length - 1].live})`);
 console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close();
