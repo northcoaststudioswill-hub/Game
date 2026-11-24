@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.7.1: contested finishes: real contact in the air, and the better the finisher, the smarter the finish (measured: 38% → 74% made against the same rim protector); three more dunks and the Posterizer.** v0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -187,6 +187,7 @@ node tests/strip.mjs run|drib|shot|def [file.html]   # side-on filmstrips of rea
 node tests/reel.mjs dunks|layups|jumpers|handles      # films every move in a Dev Room reel and lists what each one did
 node tests/gestures.mjs           # each finish and jumper variation from real key presses; Dev Room max and restore
 node tests/devroom.mjs            # clicks through every Dev Room tab, a reel and a 1v1 against a maxed player
+node tests/contest.mjs [N]        # N drives per finisher quality at a rim protector: made %, blocked %, finishes picked
 ```
 
 ## Online

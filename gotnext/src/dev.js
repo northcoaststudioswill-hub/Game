@@ -89,12 +89,14 @@ function devRender() {
 }
 
 // ---------- playing ----------
+// the reel's defender: a good, not maxed, rim protector (6'10", 85 Block, Silver No Fly Zone)
+function rimGuard() { const b = maxBuild('lockdown', 'RIM GUARD', 82); for (const a of ATTRS) b.attrs[a.id] = 75; Object.assign(b.attrs, { block: 85, intd: 85, str: 80, vert: 80, reb: 82 }); b.badges = { nofly: 2, ground: 2 }; return b; }
 function devOpp(ovr) { return DEV.opp === 'max' ? maxBuild(DEV.oppStyle, pick(NPC_NAMES)) : Object.assign(aiBuild(ovr || DEV.oppOvr), {}); }
 function devPlay(kind) {
   uiClose(); document.body.dataset.state = 'match'; ST = null;
   const back = res => { hudShow(false); uiDev(); if (res && !res.quit && res.score) toast(res.win ? 'DUB' : 'L', `${res.score[0]} — ${res.score[1]} · dev game, no pay`); };
   if (kind === 'solo' || kind === 'reel') {
-    startMatch({ mode: { id: 'dev', n: 'DEV ROOM', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: 'dev', court: 'street', hoopTier: 2, ball: S.worn.ball, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], []], onEnd: back });
+    startMatch({ mode: { id: 'dev', n: 'DEV ROOM', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: 'dev', court: 'street', hoopTier: 2, ball: S.worn.ball, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], kind === 'reel' ? [{ b: rimGuard(), ctrl: -1, ai: 1 }] : []], onEnd: back });
     return;
   }
   const m = kind === '1v1' ? { id: '1v1', n: 'DEV 1V1', size: 1, arcade: false, to: 11 } : MODES.find(x => x.id === kind);
@@ -130,10 +132,30 @@ const REELS = {
     { n: 'Killer Into A Fade', d: 'Combo: Hostile Takeover, then fade', at: [-1.2, 6.2], dir: toRim(-1.2, 6.2), spr: 0, run: 0.5, go: p => { p.b.moves.side = 'killer'; startMove(p, 'side', 1, -0.15); }, then: [[0.45, p => startShot(p, 'reel', false, { fade: 1 })]] }] },
   handles: { n: 'HANDLES', list: () => MOVES.map(m => ({ n: m.n, d: { side: '← →', back: '↙ ↘', diag: '↖ ↗' }[m.slot] + ' · ' + m.d, at: [0.4, 8.2], dir: [0, -0.45], spr: 0, run: 0.7, go: p => { p.b.moves[m.slot] = m.id; if (m.slot === 'side') startMove(p, 'side', 1, -0.15); else if (m.slot === 'back') startMove(p, 'back', 0.55, 1); else startMove(p, 'diag', 0.8, -0.8); } })) },
 };
-REELS.all = { n: 'EVERYTHING', list: () => REELS.dunks.list().concat(REELS.layups.list(), REELS.jumpers.list(), REELS.handles.list()) };
+// the same lane, a rim protector waiting, and finishers of different quality: the game picks the finish
+const CONT = (n, d, att, x, z) => ({ n, d, att, at: [x, z], dir: toRim(x, z), spr: 1, def: [x * 0.17, z * 0.17], when: p => dHoop(p) < 2.9, go: p => startFinish(p, 0, false, 0, { auto: 1 }) });
+REELS.contested = { n: 'CONTESTED AT THE RIM', list: () => [
+  CONT('Average finisher', '65 Layup, 40 Dunk, into a rim protector', { layup: 65, close: 65, dunk: 40, str: 55, vert: 60 }, 0.8, 6.6),
+  CONT('Strong finisher', '85 Layup, 92 Strength', { layup: 85, close: 80, dunk: 40, str: 92, vert: 70 }, -1.2, 6.4),
+  CONT('Elite finisher', '99 Layup', { layup: 99, close: 99, dunk: 40, str: 75, vert: 85 }, 1.6, 6.2),
+  CONT('Average dunker', '72 Dunk but 99 Layup: pulls out of the dunk and finishes', { dunk: 72, vert: 70, str: 60 }, -0.6, 6.8),
+  CONT('Elite dunker', '99 Dunk, 99 Strength', {}, 0.4, 6.8),
+  Object.assign(CONT('Hang And Adjust', 'Elite finisher: pull it down, let him fly by', { layup: 99, dunk: 40 }, 1.0, 6.4), { go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'hang' }) }),
+  Object.assign(CONT('Euro Around Him', 'Elite finisher: one step, then the open side', { layup: 99, dunk: 40 }, 0.6, 6.6), { go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'euro', euro: 1 }) }),
+  Object.assign(CONT('Switch Hands', 'Elite finisher: to the hand away from the block', { layup: 99, dunk: 40 }, -1.0, 6.4), { go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'switch' }) }),
+  CONT('Weak dunker, no layup game', '66 Dunk, 55 Layup: goes up anyway, gets stuffed', { dunk: 66, layup: 55, vert: 72, str: 50 }, 0.2, 6.8)] };
+REELS.all = { n: 'EVERYTHING', list: () => REELS.dunks.list().concat(REELS.layups.list(), REELS.jumpers.list(), REELS.handles.list(), REELS.contested.list()) };
+// the reel's defender: stands in the lane, hands up, and jumps at the shot. Only used by entries that set def.
+function reelDefThink(o) {
+  const R = MT.reel, e = R.list[R.i], me = MT.me; o.in.dx = o.in.dz = 0; o.handsUp = !!e.def;
+  if (!e.def || o.st !== 'free' || R.ph === 'setup') return;
+  o.faceLock = Math.atan2(me.x - o.x, me.z - o.z);
+  const d = dist(o, me), lead = e.jump === undefined ? 0.15 : e.jump;
+  if (!R.jumped && ((me.st === 'finish' && me.t > me.finish.dur * lead && d < 2.6) || (me.st === 'shoot' && me.t > me.shot.rel * 0.35 && d < 2.6) || (me.st === 'hop' && d < 1.6))) { R.jumped = 1; startJump(o); }
+}
 function devReel(k) {
   devPlay('reel'); const keep = Object.assign({}, MT.me.b.moves);
-  MT.reel = { k, list: REELS[k].list(), i: 0, ph: 'setup', t: 0, keep };
+  MT.reel = { k, list: REELS[k].list(), i: 0, ph: 'setup', t: 0, keep, A0: Object.assign({}, MT.me.A), def: MT.P.find(q => q.team === 1) };
 }
 function reelThink(p, dt) {
   const R = MT.reel, B = MT.B, e = R.list[R.i]; p.handsUp = false;
@@ -142,7 +164,8 @@ function reelThink(p, dt) {
   if (R.ph === 'setup') {
     p.in.dx = p.in.dz = 0; p.in.sprint = false;
     if (B.holder !== p) { if ((B.state === 'shot' || B.state === 'through') && R.t < 2.5) return; give(p); }
-    Object.assign(p.b.moves, R.keep);
+    Object.assign(p.b.moves, R.keep); p.A = Object.assign({}, R.A0, e.att || {}); MT.off = p.team; R.jumped = 0;
+    const o = R.def; if (o) { o.st = 'free'; o.y = 0; o.vx = o.vz = 0; o.rig.gait = null; if (e.def) { o.x = e.def[0]; o.z = e.def[1]; } else { o.x = 7.4; o.z = 12.4; } o.lx = o.x; o.lz = o.z; o.face = Math.atan2(p.x - o.x, p.z - o.z); o.faceLock = undefined; }
     p.st = 'free'; p.y = 0; p.x = e.at[0]; p.z = e.at[1]; p.vx = p.vz = 0; p.lx = p.x; p.lz = p.z; p.reset = true; p.rig.gait = null; p.face = Math.atan2(-p.x, -p.z); p.rig.extraYaw = 0;
     call(e.n, `${R.i + 1}/${R.list.length} · ${e.d || ''}`, '#ffc531', 1.6); R.ph = 'run'; R.t = 0; return;
   }

@@ -251,9 +251,23 @@ function poseOf(anim, t, o) {
         legs(0.2, 0.45, -1.15, 1.45); S_('spine', -0.12); S_('chest', -0.28, 0.25, 0); S_('neck', -0.6, 0.35, 0); S_('shR', -3.45, 0, -0.15); S_('elR', -0.25); S_('wrR', rel ? -1.0 : 0.3); S_('shL', -0.7, 0, 0.7); S_('elL', -0.9);
       } else if (k === 'scoop') {    // underhand from low, under the shot-blocker's arm
         const sw = clamp((u - 0.25) / 0.5, 0, 1); legs(0.3, 0.35, -1.2, 1.55); S_('spine', 0.28); S_('chest', 0.12); S_('neck', -0.35); S_('shR', -0.25 - sw * 1.95, 0, 0.15); S_('elR', -0.12); S_('wrR', 1.25); S_('shL', -0.9, 0, 0.75); S_('elL', -1.35); p.rate = 22;
+      } else if (k === 'hang') {     // hang and adjust: up, tuck, pull the ball down while the blocker goes by, then reach and release late
+        if (u < 0.28) { legs(0.2, 0.4, -1.2, 1.5); S_('shR', -1.9, 0, 0.15); S_('shL', -1.7, 0, -0.15); S_('elR', -1.0); S_('elL', -1.0); }
+        else if (u < 0.68) { legs(-1.3, 1.85, -1.15, 1.75, 0.1); S_('spine', 0.28); S_('chest', 0.12); S_('neck', -0.45); S_('shR', -0.45, 0, 0.2); S_('shL', -0.5, 0, -0.2); S_('elR', -1.6); S_('elL', -1.6); S_('wrR', 0.5); S_('wrL', 0.5); }
+        else { legs(-0.2, 0.35, -0.5, 0.6); S_('spine', -0.05); S_('chest', -0.15); S_('neck', -0.35); S_('shR', -2.85, 0, 0.1); S_('elR', -0.12); S_('wrR', u > 0.86 ? -0.9 : 0.5); S_('shL', -1.2, 0, 0.7); S_('elL', -1.5); }
+        p.rate = 22;
+      } else if (k === 'switch') {   // switch hands in the air: right hand high, both meet in front, the left finishes away from the defender
+        legs(0.25, 0.35, -1.25, 1.5);
+        if (u < 0.42) { S_('shR', -2.3, 0, -0.35); S_('elR', -0.4); S_('wrR', 0.4); S_('shL', -0.8, 0, 0.5); S_('elL', -1.2); S_('chest', -0.05, 0.25, 0); }
+        else if (u < 0.6) { S_('shR', -1.4, 0, 0.2); S_('shL', -1.4, 0, -0.2); S_('elR', -1.3); S_('elL', -1.3); S_('chest', 0, 0, 0); }
+        else { S_('shL', -2.95, 0, 0.1); S_('elL', -0.15); S_('wrL', u > 0.8 ? -0.9 : 0.5); S_('shR', -1.35, 0, -0.85); S_('elR', -1.6); S_('chest', -0.08, -0.35, 0); S_('hips', 0, -0.15, 0); }
+        S_('neck', -0.3); p.rate = 24;
       } else if (k === 'power') {    // two feet, two hands, square to the glass
         legs(-0.35, 0.75, -0.35, 0.75, 0.1); S_('anR', 0.7); S_('anL', 0.7); S_('spine', 0.04); S_('chest', -0.12); S_('neck', -0.3); S_('shR', -2.85, 0, 0.18); S_('shL', -2.85, 0, -0.18); S_('elR', -0.35); S_('elL', -0.35); S_('wrR', rel ? -0.7 : 0.5); S_('wrL', rel ? -0.7 : 0.5); p.rate = 20;
       }
+      // contested: the off arm comes up and out to keep the defender off the ball (one-handed finishes only)
+      if (o.cont && (k === 'lay' || k === 'finger' || k === 'euro' || k === 'reverse') && u > 0.15) { S_('shL', -1.3, 0, 0.75); S_('elL', -1.7); S_('wrL', 0.2); }
+      if (o.blocked) { S_('shR', -1.5, 0, -0.55); S_('elR', -0.5); S_('wrR', 0.6); S_('spine', -0.2); S_('chest', -0.25); S_('neck', 0.15); p.rate = 30; }
       break;
     }
     case 'hop': {                    // the hop step: gather to the chest, both feet off, land together low
@@ -263,16 +277,35 @@ function poseOf(anim, t, o) {
       S_('spine', 0.32); S_('chest', 0.14); S_('neck', -0.4); S_('shR', -0.85, 0, 0.25); S_('shL', -0.85, 0, -0.25); S_('elR', -1.65); S_('elL', -1.65); S_('wrR', 0.45); S_('wrL', 0.45); p.rate = 26; break;
     }
     case 'dunk': {
-      const u = o.u || 0, st = o.style || 'twohand', slam = u > 0.72, hang = u > 0.8;
+      const u = o.u || 0, st = o.style || 'twohand', slam = u > 0.72, hang = u > 0.8 || !!o.onRim;
       // one-hand dunks leave off one foot: the drive knee comes up, the take-off leg trails straight with the toe pointed.
       // two-hand dunks jump off both, knees tucked. Hanging after the slam, the legs dangle.
-      const oneFoot = st !== 'twohand' && st !== 'clutch' && st !== 'reverse';
-      if (hang) legs(-0.3, 0.45, -0.12, 0.3, 0.06);
+      const oneFoot = st !== 'twohand' && st !== 'clutch' && st !== 'reverse' && st !== 'squat';
+      if (hang && st === 'squat') legs(-1.45, 1.7, -1.35, 1.65, 0.15);
+      else if (hang) legs(-0.3, 0.45, -0.12, 0.3, 0.06);
+      else if (st === 'contact') { legs(0.15, 0.35, -1.75, 2.0, 0.06); S_('anR', 0.65); }        // the knee goes up into the defender
+      else if (st === 'scratch') { legs(0.35, 1.5, 0.2, 1.35, 0.1); S_('anR', 0.6); S_('anL', 0.6); }   // feet kicked up behind
       else if (oneFoot) { legs(0.18, 0.4, -1.35, 1.75, 0.06); S_('anR', 0.65); }
       else legs(-0.75, 1.1, -0.6, 1.0, 0.12);
       S_('spine', slam ? 0.22 : -0.2); S_('chest', slam ? 0.3 : -0.35); S_('neck', slam ? 0.2 : -0.3);
       if (st === 'twohand') { const a = slam ? -1.95 : -3.3; S_('shR', a, 0, 0.12); S_('shL', a, 0, -0.12); S_('elR', slam ? -0.2 : -0.95); S_('elL', slam ? -0.2 : -0.95); S_('wrR', slam ? -0.9 : 0.5); S_('wrL', slam ? -0.9 : 0.5); }
       else if (st === 'windmill') { const a = slam ? -1.95 : (0.4 - u / 0.72 * 4.4); S_('shR', a, 0, -0.1); S_('elR', -0.1); S_('wrR', slam ? -0.9 : 0); S_('shL', -0.6, 0, 0.75); S_('elL', -0.8); p.rate = 30; }
+      else if (st === 'contact') {   // posterizer: ball cocked way back, forearm into the defender's chest, then through
+        S_('shR', slam ? -1.8 : -3.7, 0, -0.08); S_('elR', slam ? -0.1 : -1.45); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -1.35, 0, 0.45); S_('elL', -1.85); S_('wrL', 0.2);
+        S_('spine', slam ? 0.38 : 0.1); S_('chest', slam ? 0.4 : 0.08); S_('neck', slam ? 0.1 : -0.45); p.rate = 26;
+      }
+      else if (st === 'scratch') {   // back scratcher: the ball goes behind the head until it touches the back, body arched
+        S_('shR', slam ? -1.95 : -3.95, 0, -0.05); S_('elR', slam ? -0.15 : -2.45); S_('wrR', slam ? -1.0 : 0.9); S_('shL', -0.7, 0, 0.9); S_('elL', -0.8);
+        if (!slam) { S_('spine', -0.3); S_('chest', -0.4); S_('neck', -0.25); }
+      }
+      else if (st === 'gavel') {     // the gavel: arm straight out to the side, swung up and over like a hammer
+        const w = clamp(u / 0.72, 0, 1); S_('shR', slam ? -1.95 : lerp(-1.25, -3.35, w), 0, slam ? -0.1 : lerp(-1.35, -0.2, w)); S_('elR', slam ? -0.15 : -0.05); S_('wrR', slam ? -1.0 : 0.2);
+        S_('shL', -0.5, 0, 0.9); S_('elL', -0.7); S_('chest', slam ? 0.3 : -0.2, 0, slam ? 0 : 0.18); S_('spine', slam ? 0.22 : -0.15, 0, slam ? 0 : 0.12); p.rate = 24;
+      }
+      else if (st === 'squat') {     // rim squatter: two hands, then hang on with the knees up
+        const a = slam ? (hang ? -2.95 : -2.0) : -3.3; S_('shR', a, 0, 0.14); S_('shL', a, 0, -0.14); S_('elR', slam ? -0.25 : -0.95); S_('elL', slam ? -0.25 : -0.95); S_('wrR', slam ? -0.6 : 0.5); S_('wrL', slam ? -0.6 : 0.5);
+        if (hang) { S_('spine', 0.15); S_('chest', 0.1); S_('neck', -0.4); }
+      }
       else if (st === 'reverse') {   // back to the rim, both hands go up and back over the head, then down behind
         const a = slam ? -3.75 : -2.9; S_('shR', a, 0, 0.15); S_('shL', a, 0, -0.15); S_('elR', slam ? -0.1 : -0.7); S_('elL', slam ? -0.1 : -0.7); S_('wrR', slam ? -0.8 : 0.4); S_('wrL', slam ? -0.8 : 0.4); S_('spine', slam ? -0.3 : -0.12); S_('chest', slam ? -0.35 : -0.15); S_('neck', -0.55);
       }
@@ -293,6 +326,7 @@ function poseOf(anim, t, o) {
         p.rate = 32;
       }
       else { S_('shR', slam ? -1.95 : -3.75, 0, -0.1); S_('elR', slam ? -0.15 : -1.25); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -0.5, 0, 0.85); S_('elL', -0.9); }
+      if (o.blocked) { S_('shR', -1.4, 0, -0.6); S_('elR', -0.6); S_('wrR', 0.6); S_('spine', -0.25); S_('chest', -0.3); S_('neck', 0.15); legs(-0.4, 0.7, -0.2, 0.5, 0.1); }   // stuffed
       p.rate = Math.max(p.rate, 22); break;
     }
     case 'jump': legs(0.05, 0.25, 0.02, 0.15, 0.05); S_('anR', 0.8); S_('anL', 0.8); S_('spine', -0.04); S_('chest', -0.1); S_('neck', -0.25); S_('shR', -3.0, 0, 0.12); S_('shL', -2.9, 0, -0.12); S_('elR', -0.1); S_('elL', -0.15); S_('wrR', 0.4); S_('wrL', 0.4); p.rate = 22; break;

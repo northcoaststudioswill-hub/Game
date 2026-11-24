@@ -205,10 +205,22 @@ function launch(p, make, pts, green, arc, kind) {
 function blocked(p, o) {
   const B = MT.B; p.stats.fga++; o.stats.blk++; o.swatT = 0.45; MT.hoopT = 0.2; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
-  call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; }
+  call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; p.finish.blocked = true; p.bumpT = 0.3; p.bumpX = -0.3; p.bumpZ = rnd(-0.15, 0.15); }
   for (const f of MT.fans) f.hype = 1.2; B.rebound = false;
 }
 function finishRange(p) { return MT.arcade ? 5.6 : 2.5 + nAtt(p, 'vert') * 0.6 + 0.25 * bt(p, 'gravity'); }
+// who is in the way of this finish: the opponent most in the lane between you and the rim (or waiting under it).
+// along: how far ahead of you, lat: which side of your line (+ = the euro side), rim: how close they are to the rim
+function rimThreat(p) {
+  const l = dHoop(p) || 1, ux = -p.x / l, uz = -p.z / l; let best = null, bs = 0;
+  for (const o of MT.P) {
+    if (o.team === p.team || o.st === 'stagger') continue; const rx = o.x - p.x, rz = o.z - p.z, along = rx * ux + rz * uz, lat = rx * -uz + rz * ux;
+    if (along < -0.3 || along > l + 0.8 || Math.abs(lat) > 1.4) continue;
+    const s = (1 - Math.abs(lat) / 1.4) * (along < 0.2 ? 0.7 : 1) * (0.6 + 0.4 * nAtt(o, 'block'));
+    if (s > bs) { bs = s; best = { o, along, lat, rim: dHoop(o), s }; }
+  }
+  return best;
+}
 // opt: hopped (after a hop step), rev (reverse), layup (no dunk), kind (a layup from FINISHES), style (a dunk), euro
 function startFinish(p, euro, forceDunk, y0, opt) {
   if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
@@ -221,12 +233,31 @@ function startFinish(p, euro, forceDunk, y0, opt) {
     else if (!p.user && !laneOpen(p)) { const r = Math.random(); if (r < 0.16 && d > 1.6) return startHop(p, 'finish'); if (!euro && r < 0.48) euro = Math.random() < 0.5 ? -1 : 1; else if (r < 0.62 && Math.abs(p.x) > 1.4 && p.z < 2.4) rev = true; }
   }
   let ax = p.x, az = Math.max(p.z, 0.15); const l = Math.hypot(ax, az) || 1; ax /= l; az /= l;
-  const type = opt.layup ? 'layup' : canDunk || forceDunk || opt.style ? 'dunk' : 'layup';
-  const near = nearestOpp(p), cont = near[0] && near[1] < 1.6;
-  const kind = type === 'dunk' ? '' : opt.kind || (opt.hopped ? 'power' : euro ? 'euro' : rev ? 'reverse' : cont ? (nAtt(p, 'str') > 0.62 ? 'power' : 'scoop') : sp > 4 && d > 1.7 ? 'finger' : 'lay');
-  const style = type !== 'dunk' ? p.b.moves.dunk : opt.style || (rev ? 'reverse' : p.b.moves.dunk);
+  let type = opt.layup ? 'layup' : canDunk || forceDunk || opt.style ? 'dunk' : 'layup';
+  const near = nearestOpp(p), thr = rimThreat(p), cont = (near[0] && near[1] < 1.6) || !!(thr && thr.s > 0.35);
+  // a finisher reads the defense on the way up; how well depends on how good they are (Layup / Dunk / Strength)
+  const fq = att(p, 'layup'), dq = att(p, 'dunk'), str = att(p, 'str'), free = !opt.kind && !opt.style && !opt.layup && !euro && !rev && !opt.hopped && !forceDunk;
+  let read = '', style0 = '';
+  if (thr && thr.s > 0.35 && free) {
+    if (type === 'dunk') {
+      if (dq >= 90 && (str >= 78 || dq >= 97)) style0 = 'contact';                                   // posterizer: through you
+      else if (dq < 90 && thr.along < 2.4 && fq >= 70) { type = 'layup'; read = 'bail'; }             // smart: no dunk into a shot-blocker
+    }
+    if (type === 'layup') {
+      if (fq >= 88) {        // elite: pick the finish the defense gives you
+        // whatever the defense allows, mixed up so a shot-blocker cannot sit on one answer
+        const opts = [['hang', 3], ['switch', 2]]; if (thr.along > 1.2) opts.push(['euro', 4]); if (thr.rim < 1.4 && Math.abs(p.x) > 0.9) opts.push(['reverse', 2]);
+        let r = Math.random() * opts.reduce((a, o) => a + o[1], 0); for (const o of opts) { r -= o[1]; if (r <= 0) { read = o[0]; break; } } read = read || 'hang';
+        if (read === 'euro') euro = thr.lat > 0 ? -1 : 1; else if (read === 'reverse') rev = true;
+      } else if (fq >= 75) { read = str >= 80 ? 'power' : thr.along > 1.4 ? (euro = thr.lat > 0 ? -1 : 1, 'euro') : 'scoop'; }
+    }
+  }
+  const kind = type === 'dunk' ? '' : opt.kind || (opt.hopped ? 'power' : euro ? 'euro' : rev ? 'reverse' : read === 'hang' || read === 'switch' || read === 'power' || read === 'scoop' ? read : cont ? (fq < 75 ? 'lay' : nAtt(p, 'str') > 0.62 ? 'power' : 'scoop') : sp > 4 && d > 1.7 ? 'finger' : 'lay');
+  const style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
   p.st = 'finish'; p.t = 0;
-  const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R' };
+  const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse' && style !== 'contact'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R', cont: cont ? 1 : 0, ox: 0, oz: 0, hit: null, contact: 0, blocked: false };
+  if (kind === 'hang') f.dur += 0.16; if (kind === 'switch') f.dur += 0.06; if (style === 'squat') f.dur += 0.04;
+  if (p.user && read && read !== 'euro' && read !== 'reverse') floatTxt(p, { hang: 'HANG', switch: 'SWITCH HANDS', power: 'POWER', scoop: 'SCOOP', bail: 'PULLED OUT' }[read] || '', '#7de3ff');
   if (rev) {
     // under the rim and out the other side, back to the rim: keep the line you drove on and finish past the hoop
     let vx = sp > 1 ? p.vx / sp : az, vz = sp > 1 ? p.vz / sp : -ax; const tAl = -(p.x * vx + p.z * vz);
@@ -240,13 +271,15 @@ function startFinish(p, euro, forceDunk, y0, opt) {
 }
 function resolveFinish(p) {
   const f = p.finish, B = MT.B; f.done = true; if (B.holder !== p) return;
-  let c = 0; const soft = (f.euro ? 0.72 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1);
+  let c = 0; const soft = (f.euro ? 0.72 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'hang' ? 0.6 : f.kind === 'switch' ? 0.7 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1) * (f.style === 'contact' && f.type === 'dunk' ? 0.45 : 1);
+  if (f.contact) c = Math.max(c, f.contact * 0.55);           /* got hit in the air and lost the line */
   for (const o of MT.P) { if (o.team === p.team || o.st === 'stagger') continue; const d = dist(o, p); if (d > 1.9) continue; c = Math.max(c, (1 - d / 1.9) * (0.5 + 0.5 * nAtt(o, 'intd')) * (o.st === 'jump' ? 1 : 0.55)); }
-  c *= (1 - 0.13 * bt(p, 'lobby')) * soft;
+  const fs = clamp((att(p, f.type === 'dunk' ? 'dunk' : 'layup') - 70) / 29, 0, 1);       /* finishing skill above 70 */
+  c *= (1 - 0.13 * bt(p, 'lobby')) * soft * (1 - 0.3 * fs);
   for (const o of MT.P) {
     if (o.team === p.team || o.st === 'stagger' || dist(o, p) > 1.7) continue;
     let pb = (0.10 + nAtt(o, 'block') * 0.38 + 0.05 * bt(o, 'nofly')) * (f.type === 'dunk' ? 0.6 : 1) * (1 - nAtt(p, 'str') * 0.25); if (o.st !== 'jump') pb *= 0.1; pb *= soft;
-    if (MT.arcade) pb *= 0.6;
+    if (MT.arcade) pb *= 0.6; pb *= 1 - 0.35 * fs;
     if (Math.random() < pb) return blocked(p, o);
   }
   const put = p.putT > 0 ? 0.05 * bt(p, 'putback') : 0; p.stats.fga++;
@@ -257,15 +290,15 @@ function resolveFinish(p) {
     if (Math.random() < prob) {
       B.state = 'through'; B.holder = null; B.pos.set(0, HOOP_Y - 0.05, 0); B.vel.set(0, -5, 0); B.t = 0; B.scored = true;
       p.stats.dunks++; sfxM('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
-      let vic = null; for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
+      let vic = f.hit && f.hit.st !== 'stagger' && dist(f.hit, p) < 1.6 ? f.hit : null; if (!vic) for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
       if (vic) { vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.1, fall: true }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
-      f.hangT = MT.arcade ? 0.34 : 0.22; MT.hoopT = 0.6;
+      f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : 0); MT.hoopT = 0.6;
       call(f.oop ? 'ALLEY-OOP!' : f.put ? 'PUTBACK!' : vic ? 'POSTER!' : pick(CALLS.dunk), p.b.name + (vic ? ' on ' + vic.b.name : ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
       scorePts(p, pts, 'dunk'); return;
     }
     B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
-  const kAdj = { finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02 }[f.kind] || 0;
+  const kAdj = { finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
   const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
   handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
@@ -400,6 +433,7 @@ function passLane(p, to) {
 function aiGo(p, x, z, sprint) { p.ai.tx = x; p.ai.tz = z; p.ai.spr = !!sprint; }
 function aiThink(p, dt) {
   const B = MT.B, a = p.ai, L = p.aiLvl; p.handsUp = false; a.spr = false;
+  if (MT.reel) { reelDefThink(p); return; }
   if (MT.phase !== 'live') { p.in.dx = p.in.dz = 0; return; }
   if (p.st === 'shoot' && !p.shot.released) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
   if (p.st !== 'free') return;
@@ -538,7 +572,24 @@ function stepPlayer(p, dt) {
     case 'finish': {
       const f = p.finish, u = p.t / f.dur; lock = 0;
       if (f.hangT > 0 && u >= 0.75 && f.done) { f.hangT -= dt; p.t -= dt; }        // hang on the rim a beat
-      const e = Math.min(1, u / 0.8), sw = f.euro ? Math.sin(e * Math.PI) * 1.05 * f.euro : 0; p.x = lerp(f.sx, f.tx, e) + f.px * sw; p.z = lerp(f.sz, f.tz, e) + f.pz * sw; p.vx = p.vz = 0;
+      const e = Math.min(1, u / 0.8), sw = f.euro ? (e < 0.5 ? Math.sin(e * Math.PI) : 1 - (1 - Math.sin(e * Math.PI)) * 0.35) * 0.95 * f.euro : 0; p.x = lerp(f.sx, f.tx, e) + f.px * sw + f.ox; p.z = lerp(f.sz, f.tz, e) + f.pz * sw + f.oz; p.vx = p.vz = 0;
+      // bodies meet in the air: nobody passes through anybody. The finisher slides off the defender, and the first touch
+      // is contact: the weaker body gives (Strength), a posterizer goes through, a weak finisher loses the line
+      for (const o of MT.P) {
+        if (o.team === p.team || o.st === 'stagger' || u > 1) continue; const dx = p.x - o.x, dz = p.z - o.z, dd = Math.hypot(dx, dz) || 0.01;
+        if (dd > 0.62 || Math.abs(p.y - o.y) > 1.0) continue;
+        const push = 0.62 - dd, ps = f.style === 'contact' && f.type === 'dunk' ? 0.35 : 1; f.ox += dx / dd * push * ps; f.oz += dz / dd * push * ps; p.x += dx / dd * push * ps; p.z += dz / dd * push * ps;
+        if (ps < 1) { o.x -= dx / dd * push * 0.65; o.z -= dz / dd * push * 0.65; }
+        if (!f.hit) {
+          f.hit = o; const s = (att(p, 'str') - att(o, 'str')) / 40 + (f.style === 'contact' && f.type === 'dunk' ? 0.8 : 0) + (f.kind === 'power' ? 0.3 : 0);
+          f.contact = clamp(0.45 - s * 0.45, 0, 0.8) * (f.kind === 'hang' || f.kind === 'switch' ? 0.5 : 1);
+          const fx = Math.sin(p.face), fz = Math.cos(p.face), lx = -dx / dd, lz = -dz / dd;
+          p.bumpT = 0.3; p.bumpX = clamp(-(lx * fx + lz * fz) * (0.32 - s * 0.12), -0.4, 0.05); p.bumpZ = clamp((lx * fz - lz * fx) * 0.3, -0.3, 0.3);
+          o.bumpT = 0.3; o.bumpX = clamp(-0.15 - s * 0.15, -0.45, 0.1); o.bumpZ = rnd(-0.12, 0.12);
+          sfxM('bump'); if (p.user && f.contact > 0.3) floatTxt(p, 'BODIED', '#ff8a1f');
+        }
+      }
+      if (f.kind === 'switch' && f.type === 'layup') f.bh = u > 0.5 ? 'L' : 'R';
       p.y = Math.max(f.y0 * (1 - u * 2.2), u < 0.75 ? f.peak * Math.sin(u / 0.75 * Math.PI / 2) : Math.max(0, f.peak * (1 - Math.pow((u - 0.75) / 0.4, 2))));
       if (u >= 0.75 && !f.done) resolveFinish(p);
       if (f.style === 'legs' && f.type === 'dunk') f.bh = u > 0.46 ? 'L' : 'R';
@@ -744,7 +795,7 @@ function animPlayer(p, dt) {
   switch (p.st) {
     case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.fadeA = p.shot.fade ? 1 : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
     case 'fake': an = 'fake'; o.rel = 0.6; break;
-    case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.kind = f.kind; o.euro = f.euro || 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; else if (f.turn) { const k = clamp(o.u / 0.7, 0, 1); R.extraYaw = f.turn * k * k * (3 - 2 * k); } break; }
+    case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.kind = f.kind; o.euro = f.euro || 0; o.cont = f.cont; o.blocked = f.blocked; o.hit = !!f.hit; o.onRim = f.done && f.hangT > 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; else if (f.turn) { const k = clamp(o.u / 0.7, 0, 1); R.extraYaw = f.turn * k * k * (3 - 2 * k); } break; }
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }

@@ -247,7 +247,62 @@ players, and the reel.
 - `node tests/devroom.mjs`: clicks through every tab, a reel and a 1v1 against a maxed player, with no page errors.
 - The eight court acceptance tests, smoke, input, online and crew all pass.
 
-## 9. Not checked
+## 9. Contested finishes and finisher quality (v0.7.1)
+
+![Contested: average finisher, elite euro, elite hang, posterizer](img/contested.png)
+![New dunks and the posterizer](img/dunks-v071.png)
+
+**What filming against a rim protector showed (before):**
+- The finisher and the defender passed straight through each other in the air. Nothing reacted to contact.
+- The finish ignored a shot-blocker waiting under the rim. A defender only counted if within 1.6 m at take-off.
+  So everyone threw a finger roll straight into him.
+- An average and an elite finisher did exactly the same thing.
+
+**Now:**
+- **Reading the defense:** the finish looks for the opponent most in the lane between you and the rim (or under it).
+- **Contact in the air:**
+  - Bodies never overlap. The finisher slides off the defender.
+  - The first touch is contact. Both bodies react, and Strength decides who gives.
+  - A finisher who loses the line misses more (BODIED).
+- **Contested layups:** the off arm comes up and out to shield the ball.
+- **Blocked finishes:** a blocked finisher is knocked back with the shooting arm thrown back (stuffed).
+- **How the finish is picked depends on how good the finisher is.** With the move stick toward the rim (no euro,
+  reverse or hop asked for):
+  - Layup under 75: a plain lay-in. No adjustment.
+  - Layup 75–87: a power layup if strong (Strength 80+), else a euro around a defender who is well ahead, else a scoop.
+  - Layup 88+: whatever the defense allows, mixed up so a shot-blocker cannot sit on one answer:
+    - euro step to the open side
+    - hang and adjust (new: tuck, pull the ball down while the blocker flies by, release late)
+    - switch hands (new: the ball moves to the hand away from the defender, and that hand finishes)
+    - reverse off the rim
+  - Dunk under 90 into a shot-blocker, with a 70+ layup: pulls out of the dunk and finishes with a layup.
+  - Dunk 90+ with Strength 78+ (or Dunk 97+): the Posterizer (new, not for sale). Knee up, ball cocked way back,
+    forearm into the defender, through him. The defender goes down.
+- **Finishing skill above 70** makes the same contest count for less (up to 30%) and lowers the block chance (up to
+  35%).
+
+**Measured** (`node tests/contest.mjs 80`): 80 drives each at the same rim protector (85 Block, Silver No Fly Zone),
+through the real game. The middle column is what the game picked.
+
+| Finisher | Picked | Made | Blocked |
+|---|---|---|---|
+| 65 Layup | lay-in | 38% | 51% |
+| 85 Layup, 92 Strength | power layup | 54% | 40% |
+| 99 Layup | euro 34 · hang 27 · switch 19 | 74% | 19% |
+| 72 Dunk, 99 Layup | pulled out: euro, hang, switch | 70% | 28% |
+| 99 Dunk, 99 Strength | Posterizer | 94% | 6% |
+
+**New dunks:**
+- Back Scratcher (the ball behind the head until it touches the back, feet kicked up behind)
+- The Gavel (arm straight out to the side, swung up and over)
+- Rim Squatter (two hands, then hangs on the rim with the knees up; the hang pose now shows while hanging, it
+  never did before)
+- the Posterizer (contextual, above)
+
+**Dev Room reel:** CONTESTED AT THE RIM shows the same drive with finishers of different quality, plus forced hang,
+euro, switch and a stuffed dunk. The reel's defender stands in the lane and jumps at the shot.
+
+## 10. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

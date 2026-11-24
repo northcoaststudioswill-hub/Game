@@ -186,6 +186,7 @@ function sfx(n) {
     case 'dunk': tone(90, t, .4, 'sawtooth', .5, 40); noise(t, .3, .6, 100, 900); tone(310, t + .02, .5, 'square', .12, 290); break;
     case 'whoosh': noise(t, .16, .22, 500, 2500); break;
     case 'ankle': tone(700, t, .3, 'sawtooth', .22, 90); noise(t + .12, .2, .3, 200, 800); break;
+    case 'bump': noise(t, .09, .45, 60, 500); tone(90, t, .1, 'sine', .35, 55); break;
     case 'block': noise(t, .12, .6, 200, 1400); tone(160, t, .15, 'square', .3, 80); break;
     case 'steal': tone(500, t, .07, 'square', .2, 900); tone(900, t + .06, .1, 'square', .2, 1400); break;
     case 'buzz': tone(140, t, .7, 'sawtooth', .3); tone(147, t, .7, 'sawtooth', .3); break;

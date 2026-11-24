@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.7';
+const VERSION = '0.7.1';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -148,9 +148,13 @@ const DUNKS = [
   { id: 'cradle', n: 'Rock The Cradle', d: 'Ball cradled on the forearm, rocked back, thrown home. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 3600, rank: 3, need: 84 },
   { id: 'clutch', n: 'Double Dip', d: 'Double clutch: up, down to the waist, back up, through. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 4200, rank: 4, need: 86 },
   { id: 'three60', n: '360 No-Scope', d: 'Full rotation. +7 Respect per dunk.', bonus: -.08, rep: 7, cost: 6000, rank: 5, need: 90 },
+  { id: 'scratch', n: 'Back Scratcher', d: 'Ball taken so far behind the head it touches your back, then thrown down. +6 Respect per dunk.', bonus: -.06, rep: 6, cost: 5000, rank: 4, need: 88 },
+  { id: 'gavel', n: 'The Gavel', d: 'Arm straight out to the side, swung over like a judge\'s hammer. Court adjourned. +4 Respect per dunk.', bonus: -.03, rep: 4, cost: 3200, rank: 3, need: 82 },
+  { id: 'squat', n: 'Rim Squatter', d: 'Two hands, then hang on the rim with the knees up. Squatter\'s rights. +5 Respect per dunk.', bonus: -.02, rep: 5, cost: 3800, rank: 3, need: 84 },
   { id: 'legs', n: 'The Loophole', d: 'Between the legs in mid-air. Legal, technically. +9 Respect per dunk.', bonus: -.12, rep: 9, cost: 9000, rank: 6, need: 95 },
 ];
 const DUNK = {}; DUNKS.forEach(m => DUNK[m.id] = m);
+DUNK.contact = { id: 'contact', n: 'Posterizer', d: 'Not for sale. Dunk 90+ with Strength 78+ (or Dunk 97+): when someone is waiting at the rim, you go through them.', bonus: 0, rep: 8 };
 DUNK.reverse = { id: 'reverse', n: 'Reverse Mortgage', d: 'Back to the rim, two hands over the head. Anyone who can dunk: pull the stick away from the rim.', bonus: -.02, rep: 3 };
 // finishes and jumper variations everyone has. The left stick picks one as you go up (see the MOVES tab).
 const FINISHES = [
@@ -161,6 +165,8 @@ const FINISHES = [
   { id: 'euro', n: 'Euro Step', d: 'Stick sideways as you go up: one step, then the other way.' },
   { id: 'reverse', n: 'Reverse', d: 'Stick away from the rim: under it and up the other side. Dunkers reverse-dunk.' },
   { id: 'hop', n: 'Hop Step', d: 'Let go of the move stick at speed as you go to the rim: a two-foot hop, then up strong. Gets around defenders.' },
+  { id: 'hang', n: 'Hang And Adjust', d: 'Elite finishers (Layup 88+), automatic: up, pull the ball down while the shot-blocker flies by, release on the way down.' },
+  { id: 'switch', n: 'Switch Hands', d: 'Elite finishers, automatic: the ball moves to the hand away from the defender in mid-air.' },
   { id: 'fade', n: 'Fadeaway', d: 'Stick away from the rim as you shoot. Harder to block, a little harder to make.' },
   { id: 'side', n: 'Side-Step', d: 'Stick sideways from a stand as you shoot: a quick step out of the contest.' },
   { id: 'hopj', n: 'Hop-Step Jumper', d: 'Push ↑ (drive) from mid-range, outside floater range: hop, plant, rise. The timing is automatic.' },
