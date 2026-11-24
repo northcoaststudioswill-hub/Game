@@ -491,7 +491,110 @@ crossover and four-move chain.
 - **Posterized or shoved:** straight back onto the floor, both hands behind, then the same get-up.
 - **Online:** guests receive the direction and the length of each reaction.
 
-## 15. Not checked
+## 15. Animation blending and player identities (v0.10)
+
+An extension of the system above, not a rebuild. Saved recoverable point: commit `7a54b23` (the build before any of
+this; the local tag `pre-anim-blend` points at it).
+
+### Audit (phase 0)
+
+| System | Where | State | What happened |
+|---|---|---|---|
+| Rig and skeleton | `gfx.js` `makeRig` | 17 joints, Euler rotations, body proportions from the build | Untouched. Each rig now carries a profile (`R.prof`). |
+| Pose library | `gfx.js` `poseOf` | ~45 procedural poses; joint targets per action | Kept. The jump shot and the idle now come from blended styles; everything else as it was. |
+| Transitions | `gfx.js` `applyPose` | Every joint eases exponentially from its current angle toward the target at the pose's `rate` | Already blends from the current evaluated pose. Kept; now the rate is chosen per pair of actions (`TRANS`). |
+| Locomotion | `walkPose`, `runPose`, `gaitStep`, `legIK` | Gait-lab curves, planted feet, leg IK | Untouched; profile adds posture on top. |
+| Shooting | `ball.js` shot state, `poseOf('shoot')` | Release at `t = rel` (from the jumper and attributes); pose was three stepped targets | Gameplay untouched. Pose is now three phase-synced styles blended per player. |
+| Ball contact | `ball.js` `ballHeld` | Ball rides between the hands, then up into the right hand | Unchanged, except a left-handed profile shoots out of the left hand. |
+| Player data | `S`, `myBuild`, `packBuild` | Build, attributes, badges, moves, drip | Added `anim` (the profile), kept separate from every gameplay field. |
+| Rendering | three.js r1xx, one file | ~2 ms a frame for a 2v2 in the test browser | Unchanged. |
+
+### Architecture (`src/anim.js`)
+
+1. **Skeleton map**: joint list, upper/lower halves, `mirrorPose` (left-handers).
+2. **Evaluation**: keyframe tracks over a normalised phase (`evalTrack`), smoothstep between keys.
+3. **Blending**: `blendPoses([[pose, w], ...])` turns each joint into a quaternion, sign-aligns, takes the weighted
+   average and normalises; `slerpPose` is the two-pose case. No Euler wobble between very different poses.
+4. **Styles**: three jump shots and three idles.
+5. **Profiles**: `animProfile(spec)` per player, persistent.
+6. **Transitions**: `TRANS` table of blend rates per pair of actions.
+7. **Layers**: additive idle life, profile posture, a corrective landing.
+
+The dev sandbox is its own file (`src/animlab.js`), loaded only into the game page, reachable only from the Dev Room.
+
+### Shot styles (phases 1-2)
+
+Every style hits the same beats, as a fraction of the release time: gather 0, dip 0.4, extend 0.62, jump 0.75,
+set 0.9, **release 1.0**, follow 1.12, land 1.42, recover 1.6. A blend of any weights therefore still lets go at
+u = 1, which is the moment the game releases the ball. The test measures it: a pure high-release and a pure
+quick-release shot in a game release at the same 0.933 s.
+
+- **Traditional**: the game's original jumper. Its three poses (dip, set point, gooseneck) are the dip, set and
+  follow keys; the test checks the set-point shoulder is still exactly the original -2.55 rad.
+- **High release**: shallower dip, the ball goes up over the head (shoulder -2.95), long arm, big ankle extension.
+- **Quick release**: compact, the ball stays in front of the forehead (shoulder -2.2), shallow dip, quicker recovery.
+
+On top of the blend: knee bend scales the dip, elbow flare, torso lean, shoulder turn, stance width, and the
+follow-through hold (the clock slows after the release so the arm stays up longer, landing on the same beat). Each shot
+gets a small seeded variation (weights ±0.04, knee ±0.04, elbow ±0.08) so no two jumpers are identical, but a
+player's shot is always recognisably theirs.
+
+### Idle styles
+
+Relaxed (the original idle), athletic (knees bent, hands ready), wide (grounded). Additive on top: breathing,
+a slow weight shift (more for a restless player), the hand coming up to the waistband and back, fatigue (gassed
+players hunch: from stamina in games) and readiness (the closer the ball, the more athletic the stance).
+
+### Profiles (phase 3)
+
+Parameters: shot weights, idle weights, dominant hand, knee bend, elbow flare, torso lean, stance width,
+follow-through hold, shoulder turn, idle tempo, movement intensity, recovery speed, idle restlessness, dribble
+crouch, defensive crouch, run arm carry, walk swagger.
+
+- **Built-in players** get theirs from a hash of name, style and height, leaned by the build (shooters balanced or
+  high, slashers quick, bigs high release and wide stances, lockdown defenders crouch lower, showmen swagger). Same
+  player, same profile, every time.
+- **Your builds and homies** keep theirs in the save (per build slot), edited in the ANIM LAB. It goes with the build
+  code and online (`packAnim`, about 200 bytes, clamped on arrival).
+- **Cosmetic only.** Nothing in `ball.js` gameplay reads the profile; release timing, speed, contests and ratings are
+  unchanged. The one visible link: a left-handed profile shoots with the left hand (the shot is mirrored and the ball
+  goes to that hand), with no effect on makes.
+
+### ANIM LAB (phase 4)
+
+Dev Room → ANIM LAB. Two players side by side (your builds, homies, or a built-in player of each style) doing the
+same thing: jump shot, pump fake, idle, dribble, triple threat, defense, run, walk, pass, contest, and transitions
+(idle → shot → land → run, dribble → shot, dribble → pass, run → stop, defense → run → offense, walk → run → stop).
+Speed 0.05x to 2x, pause, frame back and forward, ball on or off, turn the camera. The left player's whole profile is
+on sliders; SAVE writes it to that build or homie, RESET goes back to the defaults its build gives it. The readout
+shows the time and the shot phase (gather, dip, set, release...).
+
+### Transitions and layers (phases 5-6)
+
+- The rig never resets: every action eases from the current joint angles. What changed is how fast: `TRANS` has a
+  rate for each pair (anything into a shot, pass, steal, contest or stumble: 30-36, about 0.1 s; idle into a run 12;
+  a run into a stop 10; a shot into a run 14 times the player's recovery). Gameplay never waits for a transition;
+  input acts on the same frame it always did.
+- Layers, in order: base (the locomotion or action pose, with the existing run-stride mix), upper body (dribble, shot
+  and pass arms as before), additive (idle life above; profile posture on dribble, defense and run), corrective (leg
+  IK and planted feet as before, plus a landing that bends the knees and hips by how far the player fell, quicker
+  with better recovery). Additive personality is only applied where it fits (idle, dribble, defense, run), not on a
+  shot, a dunk, a move or a stumble.
+
+### Expanded actions (phase 7)
+
+Profile posture now reaches the dribble (crouch), defense (crouch and width), the run (arm carry, intensity) and the
+walk on the Block (swagger). Hub people and your player on the Block use profiled idles.
+
+### Measured
+
+`tests/anim.mjs`: blend ordering (a 50/50 blend sits between the two styles at every joint checked), persistence,
+phase sync (every style reaches full arm extension at u 1.12-1.14, just after release), release time identical
+across styles in a real game, a lefty's ball in the left hand at the set point, 2v2 frame cost (~2 ms in the test
+browser), the lab opening with two players. Screenshots: `tests/shots/anim-dip.png`, `anim-set.png`,
+`anim-follow.png`, `anim-land.png`.
+
+## 16. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

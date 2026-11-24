@@ -893,7 +893,7 @@ function ballHeld(p, dt) {
   const st = p.st;
   if (st === 'shoot' || st === 'finish' || st === 'fake' || st === 'pass' || st === 'hop' || ((p.live === 'hold' || p.live === 'dead') && st === 'free')) {
     // gather: ball between the hands, then up into the shooting hand
-    const bh = st === 'finish' && p.finish.bh === 'L' ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
+    const bh = (st === 'finish' && p.finish.bh === 'L') || ((st === 'shoot' || st === 'fake') && p.rig.prof && p.rig.prof.hand === 'L') ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
     const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
     _bp.lerp(_bq, 0.5 * (1 - lift)); _bp.y += 0.06 + 0.05 * lift;
     ballFollow(B, _bp, dt, true); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
@@ -926,12 +926,12 @@ function ballHeld(p, dt) {
 }
 function ballMesh() { const B = MT.B; B.mesh.position.copy(B.pos); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3)); }
 function animPlayer(p, dt) {
-  const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen };
+  const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen, prof: R.prof };
   p.protect = hasBall && p.st === 'free' && nearestOpp(p)[1] < 1.7 && Math.hypot(p.avx || 0, p.avz || 0) < 3;
   p.runPh += dt * (4 + p.speed * 2.1);
   const spN = clamp(p.speed / 6.5, 0, 1);
   switch (p.st) {
-    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.fadeA = p.shot.fade ? 1 : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
+    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.n = p.stats.fga + 1; o.fadeA = p.shot.fade ? 1 : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
     case 'fake': an = 'fake'; o.rel = 0.6; break;
     case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.kind = f.kind; o.euro = f.euro || 0; o.cont = f.cont; o.blocked = f.blocked; o.hit = !!f.hit; o.onRim = f.done && f.hangT > 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; else if (f.turn) { const k = clamp(o.u / 0.7, 0, 1); R.extraYaw = f.turn * k * k * (3 - 2 * k); } break; }
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
@@ -952,6 +952,7 @@ function animPlayer(p, dt) {
       else if (M_.phase === 'scored' && M_.lastScorer && !M_.lastScorer.dead && M_.lastScorer.team !== p.team) an = 'sulk';
   }
   if (p.forceAn && p.st === 'free' && !hasBall) { an = p.forceAn; o.ph = p.runPh; }
+  if (an === 'idle') { o.ph = p.i * 1.7; o.tired = clamp((35 - (p.stam === undefined ? 100 : p.stam)) / 35, 0, 1); o.alert = M_.phase === 'live' ? clamp(1.6 - Math.hypot(B.pos.x - p.x, B.pos.z - p.z) / 4, 0, 1) : 0; }      /* readier the closer the ball, heavier when gassed */
   if (p.st !== 'finish' && p.st !== 'move') R.extraYaw = 0;       /* whatever ended a spin or a reverse, the body faces where it faces */
   if (!hasBall && an !== 'stagger' && an !== 'sulk' && an !== 'celeb' && p.st !== 'finish' && p.st !== 'move') { let a = Math.atan2(B.pos.x - p.x, B.pos.z - p.z) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.look = p.def && p.guard && p.guard !== B.holder && B.state === 'held' ? a * 0.5 : a; }      /* guarding off the ball: the body is on your man, the head only half-turns to the ball (see both) */
   if (p.speed > 2 && (an === 'run' || an === 'dribble')) { let a = Math.atan2(p.vx || 0, p.vz || 0) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.bank = -a * 0.35 * spN; }
@@ -988,6 +989,11 @@ function animPlayer(p, dt) {
       const uR = p.psi, uL = (p.psi + 0.5) % 1; p.stR = uR < duty; p.stL = uL < duty;
     }
   }
+  // layers (anim.js): profile posture on the moving poses, a landing that soaks up the drop; then the transition rate
+  // out of whatever the body was doing (it always blends from its current pose; gameplay never waits for it)
+  profilePosture(P, an, R.prof); landLayer(P, R, p, dt, R.prof);
+  if (an !== R.anPrev) { const r = transRate(R.anPrev || an, an), rec = R.prof ? R.prof.recovery : 1; R.trRate = /^(shoot|jump|swat|stagger|dunk|layup|floater|hop)$/.test(R.anPrev || '') ? r * rec : r; R.trPair = !!TRANS[(R.anPrev || '') + '>' + an]; R.trT = 0; R.anPrev = an; }
+  R.trT = (R.trT || 0) + dt; if (R.trT < 2.5 / R.trRate) P.rate = R.trPair ? lerp(R.trRate, P.rate || 16, R.trT * R.trRate / 2.5) : Math.max(P.rate || 16, R.trRate);
   applyPose(R, P, dt);
   R.root.position.set(p.x, p.y, p.z); R.root.rotation.y = p.face + (R.extraYaw || 0);
   if ((p.strideW || 0) > 0.3) gaitLock(R, p.psi, R.root.rotation.y, p.strideW, duty); else R.lock = null;

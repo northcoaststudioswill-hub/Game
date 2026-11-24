@@ -74,7 +74,7 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   let hipYaw = 0; if (v > 0.6) { let a = Math.atan2(vx, vz) - face; a = Math.atan2(Math.sin(a), Math.cos(a)); if (Math.abs(a) < 2.3) hipYaw = clamp(a, -0.5, 0.5) * Math.min(1, v / 2.5) * 0.6; }
   // one stride clock for walking and running: it advances with distance covered, so feet do not skate. Up to a brisk
   // walk the legs follow walking gait curves; above it, running curves (knee drive, heel recovery, a flight phase).
-  const sg = swag === undefined ? 0.6 : swag, wWalk = 1 - clamp((v - 2.2) / 0.9, 0, 1), k = clamp((v - 2.6) / 3.6, 0, 1);
+  const sg = swag === undefined ? (R.prof ? 0.35 + R.prof.swag * 0.8 : 0.6) : swag, wWalk = 1 - clamp((v - 2.2) / 0.9, 0, 1), k = clamp((v - 2.6) / 3.6, 0, 1);
   const stepW = R.legLen * 0.74 * clamp(Math.sqrt(Math.max(v, 0.01) / 1.35), 0.45, 1.3), amp = clamp(v / 0.5, 0, 1) * clamp(Math.sqrt(v / 1.35), 0.45, 1.3);
   const cad = 2.7 + 1.1 * k, stepR = Math.max(v, 0.5) / cad, duty = 0.4 - 0.14 * k, step = lerp(stepR, stepW, wWalk);     /* running: 2.65 steps/s at a jog to 3.5 at a sprint */
   L.psi = ((L.psi || 0) + v * dt / (2 * step)) % 1;
@@ -84,7 +84,7 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const solveR = need => { let lo = 0.3, hi = 2.2; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)); if (sweep < need) lo = m; else hi = m; } return lo; };
   const stanceDist = v * duty * 2 / cad, hipR = Math.min(solveR(stanceDist - 0.1), 1.5), flight = (0.5 - duty) * 2 / cad;
   let P = wWalk > 0 ? poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen }) : null;
-  if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
+  if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, { prof: R.prof }), clamp(1 - v / 0.12, 0, 1));
   if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
   { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
   applyPose(R, P, dt);
@@ -362,7 +362,7 @@ function worldStep(dt) {
       else if (Math.hypot(me.x - n.x, me.z - n.z) < 5 && n.bum) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08);
     }
     if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt, undefined, undefined, n.swag === undefined ? (n.swag = 0.4 + RNG() * 0.6) : n.swag); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
-    else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); }
+    else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, an === 'idle' ? Object.assign({ prof: n.rig.prof, ph: n.ph }, o) : o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }
   for (const c of W.cars) { c.a += c.s * dt; c.c.position.set(Math.cos(c.a) * c.r, c.y, Math.sin(c.a) * c.r); c.c.rotation.y = -c.a + (c.s > 0 ? -Math.PI / 2 : Math.PI / 2); }

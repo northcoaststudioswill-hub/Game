@@ -65,7 +65,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.9.4';
+const VERSION = '0.10.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -573,7 +573,7 @@ function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v + (typeof homeFx === 'function' ? homeFx(k) : 0); }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }
 function myBuild() {   // a portable snapshot of the player (also what export codes carry)
-  return { name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
+  return { name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
 }
 function encodeBuild(b) { return BRAND.code + '1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
 function decodeBuild(code) {
@@ -597,6 +597,7 @@ function sanitizeBuild(j) {
     if (!MOVE[j.moves.back] || MOVE[j.moves.back].slot !== 'back') j.moves.back = m.back;
     if (!MOVE[j.moves.diag] || MOVE[j.moves.diag].slot !== 'diag') j.moves.diag = m.diag;
     if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk;
+    j.anim = typeof cleanProfile === 'function' ? cleanProfile(j.anim) || undefined : undefined;
     return j;
   } catch (e) { return null; }
 }
@@ -848,7 +849,7 @@ function makeRig(spec, lowDetail) {
   const P = PROP, H = b.h * 0.0254, wS = 1 + b.w * 0.2, aS = 1 + b.s * 0.07, lW = wS * P.limb;
   const skin = toon(SKINS[spec.build.skin || 0]);
   const D = s => DRIPS[worn[s]] || null;
-  const R = { H, joints: {}, cur: {}, spec, extraYaw: 0 };
+  const R = { H, joints: {}, cur: {}, spec, extraYaw: 0, prof: typeof animProfile === 'function' ? animProfile(spec) : null };
   const legLen = H * 0.5 * P.leg, thigh = legLen * P.thighShare, shin = legLen * (1 - P.thighShare), torso = H * 0.29 * P.torso, armLen = H * 0.39 * aS * P.arm, up = armLen * P.upperArm, fore = armLen * (1 - P.upperArm);
   const shW = 0.21 * (0.92 + 0.08 * wS) * (H / 1.95) * P.shoulder, hipW = 0.095 * wS * P.hips;
   const root = new THREE.Group(); R.root = root;
@@ -1056,7 +1057,7 @@ function poseOf(anim, t, o) {
   const armsDown = () => { S_('shR', 0.05, 0, -0.1); S_('shL', 0.05, 0, 0.1); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', -0.1); S_('wrL', -0.1); };
   const legs = (hr, kr, hl, kl, spread) => { S_('hpR', hr, 0, -(spread || 0)); S_('knR', kr); S_('hpL', hl, 0, spread || 0); S_('knL', kl); S_('anR', -(hr + kr) * 0.55); S_('anL', -(hl + kl) * 0.55); };
   switch (anim) {
-    case 'idle': { const b = Math.sin(t * 2); armsDown(); p.y = b * 0.006; S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); break; }
+    case 'idle': if (o.prof) { Object.assign(p, idlePose(o.prof, t, o)); break; } { const b = Math.sin(t * 2); armsDown(); p.y = b * 0.006; S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); break; }
     case 'walk': case 'run': case 'dribble': case 'slide': {
       const a = clamp(o.sp || 0, 0, 1), ph = o.ph || 0, s = Math.sin(ph), c = Math.cos(ph), amp = anim === 'slide' ? 0.35 : 0.25 + a * 0.75;
       // legs: thigh swings, knee folds on the recovery, ankle pushes off behind and dorsiflexes in front
@@ -1077,15 +1078,14 @@ function poseOf(anim, t, o) {
       break;
     }
     case 'shoot': case 'fake': {
-      const u = clamp(t / (o.rel || 0.6), 0, 1.6), k = o.kick ? 1 : 0;
-      if (u < 0.45) { p.y = -0.13 * (u / 0.45); legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); }       // dip: ball to the pocket
-      else if (u < 1) { legs(-0.05, 0.12, -k * 0.9, 0.12 + k * 0.5, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); }   // set point: wrist cocked
-      else { legs(0.05, 0.05, -k * 1.1, k * 0.3, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); }                                          // follow-through: gooseneck
+      const u = clamp(t / (o.rel || 0.6), 0, 1.6), k = o.kick ? 1 : 0, lefty = o.prof && o.prof.hand === 'L';
+      Object.assign(p, shotPose(o.prof, u, o.n, true));       /* traditional / high / quick, blended by the player's profile (anim.js) */
+      if (k && u >= 0.45) { if (u < 1) { S_('hpL', -0.9, 0, 0.04); S_('knL', 0.62); } else { S_('hpL', -1.1, 0, 0.03); S_('knL', 0.3); } }      /* The Lawsuit: the leg kick */
       if (o.fadeA && u >= 0.45) {        // fadeaway: hips back, shoulders back, the off leg kicks out front for balance
         const a = o.fadeA; S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
       }
       if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
-      p.rate = anim === 'fake' ? 30 : 20; break;
+      p.rate = anim === 'fake' ? 30 : 24; if (lefty) Object.assign(p, mirrorPose(p)); break;
     }
     case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
     case 'layup': {
@@ -1539,6 +1539,194 @@ function disposeScene(sc) {
   if (!sc) return;
   sc.traverse(o => { if (o.isMesh) { const g = o.geometry; if (g && !Object.values(_geo).includes(g)) g.dispose(); const m = o.material; if (m && m.map && !Object.values(_mats).includes(m) && !Object.values(_texCache).includes(m.map)) { if (m.map.source !== (_brick && _brick.source)) m.map.dispose(); m.dispose(); } } });
 }
+// GOT NEXT — the animation library. Builds on the existing rig and poses (gfx.js), it does not replace them.
+//   1. skeleton map        which joints exist, which half of the body they belong to, left/right mirroring
+//   2. evaluation          keyframe tracks over a normalised phase, joint rotations as quaternions
+//   3. blending            N poses at weights, per joint, quaternion-averaged (no Euler wobble)
+//   4. styles              three jump shots and three idles, all phase-synced (the release is always at u = 1)
+//   5. profiles            a persistent movement identity per player: style weights, posture, timing, hand
+//   6. transitions         how fast to blend out of the pose you are in, per pair of actions
+//   7. layers              additive (breathing, weight shift, fatigue, personality) and corrective (landing)
+// Gameplay never reads anything in here: release timing, speeds and hit boxes stay where they were.
+'use strict';
+
+// ---------------- 1. skeleton map ----------------
+const SKEL = {
+  joints: ['hips', 'spine', 'chest', 'neck', 'head', 'shR', 'elR', 'wrR', 'shL', 'elL', 'wrL', 'hpR', 'knR', 'anR', 'hpL', 'knL', 'anL'],
+  lower: ['hips', 'hpR', 'knR', 'anR', 'hpL', 'knL', 'anL'],
+  upper: ['spine', 'chest', 'neck', 'head', 'shR', 'elR', 'wrR', 'shL', 'elL', 'wrL'],
+};
+// a left-hander: swap the sides and mirror the rotations about the body's midline (y and z flip sign)
+function mirrorPose(P) {
+  const o = { y: P.y, rate: P.rate };
+  for (const k in P) { if (k === 'y' || k === 'rate') continue; const v = P[k]; if (!Array.isArray(v)) { o[k] = v; continue; }
+    const m = k.endsWith('R') ? k.slice(0, -1) + 'L' : k.endsWith('L') ? k.slice(0, -1) + 'R' : k; o[m] = [v[0], -v[1], -v[2]]; }
+  return o;
+}
+
+// ---------------- 2/3. evaluation and blending ----------------
+const _aq = new THREE.Quaternion(), _aq2 = new THREE.Quaternion(), _ae = new THREE.Euler(), _acc = {};
+// list: [[pose, weight], ...]. Each joint's rotations are turned into quaternions, sign-aligned and averaged.
+function blendPoses(list) {
+  let wsum = 0; for (const [, w] of list) wsum += Math.max(0, w); if (wsum <= 0) return list[0][0];
+  if (list.length === 1 || list.filter(l => l[1] > 0).length === 1) return list.find(l => l[1] > 0)[0];
+  const out = { y: 0, rate: 0 }, keys = new Set();
+  for (const [P, w] of list) { if (w <= 0) continue; for (const k in P) keys.add(k); out.y += (P.y || 0) * w / wsum; out.rate = Math.max(out.rate, P.rate || 16); }
+  for (const k of keys) {
+    if (k === 'y' || k === 'rate') continue; let x = 0, y = 0, z = 0, ww = 0, first = null;
+    for (const [P, w] of list) { if (w <= 0) continue; const v = P[k] || POSE.zero; _aq.setFromEuler(_ae.set(v[0], v[1], v[2]));
+      if (!first) first = _aq2.copy(_aq); else if (first.dot(_aq) < 0) { _aq.x = -_aq.x; _aq.y = -_aq.y; _aq.z = -_aq.z; _aq.w = -_aq.w; }
+      x += _aq.x * w; y += _aq.y * w; z += _aq.z * w; ww += _aq.w * w; }
+    _aq.set(x, y, z, ww).normalize(); _ae.setFromQuaternion(_aq); out[k] = [_ae.x, _ae.y, _ae.z];
+  }
+  return out;
+}
+// two poses, quaternion slerp per joint (the two-way case of blendPoses, kept for transitions and tracks)
+function slerpPose(A, B, t) { return t <= 0 ? A : t >= 1 ? B : blendPoses([[A, 1 - t], [B, t]]); }
+// a keyframe track: [[u, pose], ...] sorted by u. Smoothstep between neighbouring keys.
+function evalTrack(K, u) {
+  if (u <= K[0][0]) return K[0][1]; const L = K[K.length - 1]; if (u >= L[0]) return L[1];
+  let i = 0; while (K[i + 1][0] < u) i++; const a = K[i], b = K[i + 1], t = (u - a[0]) / (b[0] - a[0]);
+  return slerpPose(a[1], b[1], t * t * (3 - 2 * t));
+}
+// pose builder: the same vocabulary as poseOf (legs, arms), so the styles read like the poses they extend
+function mkPose(f) {
+  const p = { y: 0, rate: 20 }, S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
+  const legs = (hr, kr, hl, kl, spread) => { S_('hpR', hr, 0, -(spread || 0)); S_('knR', kr); S_('hpL', hl, 0, spread || 0); S_('knL', kl); S_('anR', -(hr + kr) * 0.55); S_('anL', -(hl + kl) * 0.55); };
+  f(S_, legs, p); return p;
+}
+
+// ---------------- 4. styles ----------------
+// Shot phases (u = t / release time). Every style hits the same beats, so any blend of them still releases at u = 1.
+const SHOT_PH = { gather: 0, dip: 0.4, extend: 0.62, jump: 0.75, set: 0.9, release: 1.0, follow: 1.12, land: 1.42, recover: 1.6 };
+const _shotKeys = {};
+function shotTrack(style) {
+  if (_shotKeys[style]) return _shotKeys[style];
+  const H = SHOT_PH; let K;
+  if (style === 'trad') {          // the game's original jumper, kept as the foundation (its three poses are the dip, set and follow keys)
+    const dip = mkPose((S_, legs, p) => { p.y = -0.13; legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); });
+    const set = mkPose((S_, legs) => { legs(-0.05, 0.12, 0, 0.12, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); });
+    const follow = mkPose((S_, legs) => { legs(0.05, 0.05, 0, 0, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); });
+    K = [[H.gather, slerpPose(dip, set, 0.0)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.55)], [H.set, set], [H.release, slerpPose(set, follow, 0.45)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.2)], [H.recover, slerpPose(follow, dip, 0.65)]];
+  } else if (style === 'high') {     // high release: the ball goes up over the head, long arm, big ankle extension
+    const dip = mkPose((S_, legs, p) => { p.y = -0.11; legs(-0.4, 0.62, -0.4, 0.62, 0.05); S_('spine', 0.08); S_('chest', 0.04); S_('neck', -0.1); S_('shR', -1.35, 0, 0.08); S_('shL', -1.25, 0, -0.28); S_('elR', -2.1); S_('elL', -1.9); S_('wrR', 0.75); S_('wrL', 0.25); });
+    const set = mkPose((S_, legs) => { legs(0, 0.06, 0.02, 0.08, 0.04); S_('anR', 0.95); S_('anL', 0.95); S_('spine', -0.08); S_('chest', -0.1); S_('neck', 0.02); S_('shR', -2.95, 0, 0.02); S_('shL', -2.75, 0, -0.28); S_('elR', -1.05); S_('elL', -0.9); S_('wrR', 1.1); S_('wrL', 0.35); });
+    const follow = mkPose((S_, legs) => { legs(0.04, 0.04, 0.02, 0.02, 0.03); S_('anR', 1.0); S_('anL', 1.0); S_('spine', -0.08); S_('chest', -0.06); S_('neck', -0.02); S_('shR', -3.1, 0, 0); S_('elR', 0); S_('wrR', -1.35); S_('shL', -2.5, 0, -0.35); S_('elL', -0.6); S_('wrL', -0.15); });
+    K = [[H.gather, slerpPose(dip, set, 0.05)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.6)], [H.set, set], [H.release, slerpPose(set, follow, 0.4)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.15)], [H.recover, slerpPose(follow, dip, 0.6)]];
+  } else {                           // quick release: compact, the ball never goes behind the forehead, shallow dip
+    const dip = mkPose((S_, legs, p) => { p.y = -0.08; legs(-0.32, 0.5, -0.32, 0.5, 0.07); S_('spine', 0.14); S_('chest', 0.1); S_('neck', -0.14); S_('shR', -1.25, 0, 0.12); S_('shL', -1.2, 0, -0.28); S_('elR', -2.1); S_('elL', -1.9); S_('wrR', 0.8); S_('wrL', 0.25); });
+    const set = mkPose((S_, legs) => { legs(-0.06, 0.16, -0.04, 0.16, 0.05); S_('anR', 0.6); S_('anL', 0.6); S_('spine', 0.02); S_('chest', -0.02); S_('neck', -0.1); S_('shR', -2.2, 0, 0.1); S_('shL', -2.05, 0, -0.34); S_('elR', -1.75); S_('elL', -1.45); S_('wrR', 0.9); S_('wrL', 0.3); });
+    const follow = mkPose((S_, legs) => { legs(0.04, 0.08, 0, 0.06, 0.04); S_('anR', 0.75); S_('anL', 0.75); S_('spine', 0); S_('chest', -0.02); S_('neck', -0.1); S_('shR', -2.7, 0, 0.04); S_('elR', -0.25); S_('wrR', -1.15); S_('shL', -1.8, 0, -0.4); S_('elL', -1.1); S_('wrL', -0.1); });
+    K = [[H.gather, slerpPose(dip, set, 0.15)], [H.dip - 0.08, dip], [H.extend - 0.05, slerpPose(dip, set, 0.65)], [H.set - 0.05, set], [H.release, slerpPose(set, follow, 0.5)], [H.follow - 0.02, follow], [H.land - 0.1, slerpPose(follow, dip, 0.3)], [H.recover - 0.1, slerpPose(follow, dip, 0.7)]];
+  }
+  return (_shotKeys[style] = K);
+}
+const SHOT_STYLES = [['trad', 'Traditional'], ['high', 'High release'], ['quick', 'Quick release']];
+const IDLE_STYLES = [['relaxed', 'Relaxed'], ['athletic', 'Athletic'], ['wide', 'Wide']];
+// idles: the original idle is "relaxed"; the others are built in the same terms
+function idleBase(style, t) {
+  const b = Math.sin(t * 2);
+  if (style === 'relaxed') return mkPose((S_, legs, p) => { p.rate = 16; p.y = b * 0.006; S_('shR', 0.05, 0, -0.1); S_('shL', 0.05, 0, 0.1); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', -0.1); S_('wrL', -0.1); S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); });
+  if (style === 'athletic') return mkPose((S_, legs, p) => { p.rate = 16; p.y = -0.07; legs(-0.32, 0.5, -0.3, 0.48, 0.1); S_('spine', 0.16); S_('chest', 0.06); S_('neck', -0.16); S_('shR', -0.3, 0, -0.18); S_('shL', -0.3, 0, 0.18); S_('elR', -0.75); S_('elL', -0.75); S_('wrR', 0.05); S_('wrL', 0.05); });
+  return mkPose((S_, legs, p) => { p.rate = 16; p.y = -0.04; legs(-0.12, 0.25, -0.12, 0.25, 0.2); S_('anR', 0.05, 0, 0.12); S_('anL', 0.05, 0, -0.12); S_('hips', -0.02); S_('spine', 0.02); S_('chest', -0.04); S_('neck', -0.02); S_('shR', 0.02, 0, -0.22); S_('shL', 0.02, 0, 0.22); S_('elR', -0.35); S_('elL', -0.35); S_('wrR', -0.12); S_('wrL', -0.12); });
+}
+
+// ---------------- 5. profiles ----------------
+// A profile is how a player physically expresses an action. It is cosmetic: it never changes a gameplay number.
+// Built-in players get one from their name and build (so the same AI player always moves the same way); your own
+// builds keep theirs in the save (S.anim, per build), editable in the Dev Room's ANIM LAB.
+const PROF_KEYS = [
+  ['knee', 'Knee bend', 0.6, 1.4], ['elbow', 'Elbow flare', -1, 1], ['lean', 'Torso lean', -1, 1], ['stance', 'Stance width', 0.6, 1.5],
+  ['follow', 'Follow-through hold', 0.5, 1.6], ['shoulder', 'Shoulder turn', -1, 1], ['cadence', 'Idle tempo', 0.6, 1.5], ['intensity', 'Movement intensity', 0.6, 1.4],
+  ['recovery', 'Recovery speed', 0.6, 1.5], ['restless', 'Idle restlessness', 0, 1], ['dribLow', 'Dribble crouch', -1, 1], ['defLow', 'Defensive crouch', -1, 1], ['arms', 'Run arm carry', -1, 1], ['swag', 'Walk swagger', 0, 1],
+];
+const PROF_DEF = { shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function seededRnd(seed) { let a = seed || 1; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function normW(o) { let s = 0; for (const k in o) s += Math.max(0, o[k]); if (s <= 0) return o; const r = {}; for (const k in o) r[k] = Math.max(0, o[k]) / s; return r; }
+function profileFromBuild(spec) {
+  const b = (spec && spec.build) || {}, r = seededRnd(hashStr(((spec && spec.name) || 'X') + '|' + (b.style || '') + '|' + ((b.body && b.body.h) || 0))), j = (a, s) => a + (r() * 2 - 1) * s;
+  const P = JSON.parse(JSON.stringify(PROF_DEF)), st = b.style;
+  // the build's style leans the defaults: shooters are balanced or high, slashers quick, bigs high and wide
+  const shot = { sniper: [0.6, 0.3, 0.1], slasher: [0.3, 0.1, 0.6], general: [0.5, 0.15, 0.35], lockdown: [0.55, 0.15, 0.3], glass: [0.35, 0.55, 0.1], showman: [0.3, 0.3, 0.4] }[st] || [0.6, 0.2, 0.2];
+  const idle = { sniper: [0.6, 0.3, 0.1], slasher: [0.3, 0.55, 0.15], general: [0.5, 0.4, 0.1], lockdown: [0.15, 0.6, 0.25], glass: [0.3, 0.2, 0.5], showman: [0.6, 0.15, 0.25] }[st] || [0.6, 0.3, 0.1];
+  P.shot = normW({ trad: j(shot[0], 0.25), high: j(shot[1], 0.2), quick: j(shot[2], 0.2) }); P.idle = normW({ relaxed: j(idle[0], 0.25), athletic: j(idle[1], 0.2), wide: j(idle[2], 0.15) });
+  P.hand = r() < 0.12 ? 'L' : 'R';
+  for (const [k, , lo, hi] of PROF_KEYS) { const d = PROF_DEF[k], span = (hi - lo) * 0.18; P[k] = clamp(j(d, span), lo, hi); }
+  if (st === 'glass') { P.stance = clamp(P.stance + 0.15, 0.6, 1.5); P.knee = clamp(P.knee - 0.1, 0.6, 1.4); }
+  if (st === 'lockdown') P.defLow = clamp(P.defLow + 0.4, -1, 1); if (st === 'showman') { P.swag = clamp(P.swag + 0.35, 0, 1); P.restless = clamp(P.restless + 0.2, 0, 1); }
+  return P;
+}
+// anything that arrives from outside (save, another player online) is clamped here
+function cleanProfile(a) {
+  if (!a || typeof a !== 'object') return null; const P = JSON.parse(JSON.stringify(PROF_DEF));
+  for (const g of ['shot', 'idle']) if (a[g] && typeof a[g] === 'object') for (const k in P[g]) { const v = +a[g][k]; if (isFinite(v)) P[g][k] = clamp(v, 0, 1); }
+  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R';
+  for (const [k, , lo, hi] of PROF_KEYS) { const v = +a[k]; if (isFinite(v)) P[k] = clamp(v, lo, hi); }
+  return P;
+}
+function animProfile(spec) { return (spec && spec.anim && cleanProfile(spec.anim)) || profileFromBuild(spec); }
+
+// the jump shot of a profile at phase u (u = 1 is the release); n = shot number, a tiny controlled variation per shot
+function shotPose(prof, u, n) {
+  prof = prof || PROF_DEF; const w = prof.shot, jit = n ? seededRnd(n * 7919 + 13) : null, vj = s => jit ? (jit() * 2 - 1) * s : 0;
+  // follow-through hold: past the release the clock slows (or speeds) so the arm stays up longer, landing on the same beat
+  let uu = u; if (u > SHOT_PH.release) { const f = prof.follow || 1; uu = SHOT_PH.release + (u - SHOT_PH.release) / f; }
+  const list = []; for (const [k] of SHOT_STYLES) if (w[k] > 0.001) list.push([evalTrack(shotTrack(k), uu), Math.max(0, w[k] + vj(0.04))]);
+  const P = blendPoses(list), out = {}; for (const k in P) out[k] = Array.isArray(P[k]) ? P[k].slice() : P[k];
+  // posture on top of the blend: deeper or shallower knees (the dip), elbow in or out, torso lean, stance width
+  const dipK = clamp(1 - Math.abs(uu - SHOT_PH.dip) / 0.35, 0, 1), kn = (prof.knee || 1) - 1 + vj(0.04);
+  for (const s of ['R', 'L']) { if (out['kn' + s]) out['kn' + s][0] *= 1 + kn * dipK; if (out['hp' + s]) { out['hp' + s][0] *= 1 + kn * dipK; out['hp' + s][2] *= prof.stance || 1; } if (out['an' + s]) out['an' + s][0] *= 1 + kn * dipK * 0.6; }
+  if (out.y) out.y *= 1 + kn * dipK;
+  const el = (prof.elbow || 0) + vj(0.08); if (out.shR) out.shR[2] += -el * 0.22 * clamp(uu / SHOT_PH.set, 0, 1); if (out.elR) out.elR[1] = (out.elR[1] || 0) + el * 0.25;
+  if (out.spine) out.spine[0] += (prof.lean || 0) * 0.08; if (out.chest) out.chest[1] = (out.chest[1] || 0) + (prof.shoulder || 0) * 0.18;
+  return prof.hand === 'L' ? mirrorPose(out) : out;
+}
+
+// ---------------- 7. layers ----------------
+// idle = the three base stances blended, then additive life: breathing, weight shift, shoulders settling, the hands
+// finding somewhere to be, fatigue (o.tired 0..1) and readiness (o.alert 0..1 pulls toward the athletic stance)
+function idlePose(prof, t, o) {
+  prof = prof || PROF_DEF; o = o || {}; const w = Object.assign({}, prof.idle), al = clamp(o.alert || 0, 0, 1);
+  if (al > 0) { w.athletic = (w.athletic || 0) + al * 0.8; } const tc = t * (prof.cadence || 1), ph = (o.ph || 0);
+  const list = []; for (const [k] of IDLE_STYLES) if (w[k] > 0.001) list.push([idleBase(k, tc + ph), w[k]]);
+  const P = blendPoses(list), out = {}; for (const k in P) out[k] = Array.isArray(P[k]) ? P[k].slice() : P[k];
+  const add = (k, x, y, z) => { const v = out[k] || (out[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+  const br = Math.sin(tc * 1.7 + ph), rs = prof.restless || 0, sh = Math.sin(tc * 0.45 + ph * 1.3), sh2 = Math.sin(tc * 0.23 + ph);
+  add('chest', -0.018 * br, 0, 0); add('shR', 0, 0, -0.015 * br); add('shL', 0, 0, 0.015 * br); out.y = (out.y || 0) + 0.004 * br;        // breathing
+  add('hips', 0, 0.03 * sh2 * rs, 0.05 * sh * (0.4 + rs)); add('hpR', 0, 0, -0.04 * sh * (0.4 + rs)); add('hpL', 0, 0, -0.04 * sh * (0.4 + rs)); add('spine', 0, 0, -0.025 * sh * (0.4 + rs));   // weight shift
+  const hand = Math.max(0, Math.sin(tc * 0.31 + ph * 2.1)) * rs; add('elR', -0.35 * hand); add('wrR', 0.15 * hand); add('shR', -0.12 * hand);       // the hand comes up to the waistband, goes back down
+  const tr = clamp(o.tired || 0, 0, 1); if (tr) { add('spine', 0.18 * tr); add('chest', 0.06 * tr); add('neck', -0.1 * tr); add('shR', 0, 0, 0.05 * tr); add('shL', 0, 0, -0.05 * tr); out.y -= 0.03 * tr; }
+  add('spine', (prof.lean || 0) * 0.05); out.rate = 16;
+  return prof.hand === 'L' ? mirrorPose(out) : out;
+}
+// profile posture on the moving poses (dribble crouch, defensive crouch, how high the arms carry in a run)
+function profilePosture(P, an, prof) {
+  if (!prof) return P; const add = (k, x, y, z) => { const v = P[k] || (P[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+  if (an === 'dribble' && prof.dribLow) { const d = prof.dribLow; add('spine', 0.08 * d); add('knR', 0.12 * d); add('knL', 0.12 * d); add('hpR', -0.07 * d); add('hpL', -0.07 * d); P.y = (P.y || 0) - 0.03 * d; }
+  if (an === 'slide' && prof.defLow) { const d = prof.defLow; add('knR', 0.14 * d); add('knL', 0.14 * d); add('hpR', -0.1 * d, 0, -0.04 * d); add('hpL', -0.1 * d, 0, 0.04 * d); add('spine', 0.06 * d); P.y = (P.y || 0) - 0.035 * d; }
+  if (an === 'run' && prof.arms) { const d = prof.arms; add('elR', -0.2 * d); add('elL', -0.2 * d); add('shR', 0, 0, -0.04 * d); add('shL', 0, 0, 0.04 * d); }
+  if ((an === 'run' || an === 'dribble' || an === 'slide') && prof.intensity !== 1) { const k = (prof.intensity || 1) - 1; add('spine', 0.06 * k); add('neck', -0.04 * k); }
+  return P;
+}
+// corrective: a landing soaks up the drop through the knees and hips (deeper the harder the fall, quicker with good recovery)
+function landLayer(P, R, p, dt, prof) {
+  const air = p.y > 0.04; if (R.wasAir && !air) R.landK = clamp((R.peakY || 0) * 1.6, 0.25, 1); if (air) R.peakY = Math.max(R.peakY || 0, p.y); else R.peakY = 0; R.wasAir = air;
+  if (!R.landK) return P; const k = R.landK; R.landK = Math.max(0, k - dt * 4.2 * ((prof && prof.recovery) || 1));
+  const add = (j, x) => { const v = P[j] || (P[j] = [0, 0, 0]); v[0] += x; }; const e = Math.sin(Math.min(1, (1 - k) * 1.6) * Math.PI) * k + k * 0.35;
+  add('knR', 0.45 * e); add('knL', 0.45 * e); add('hpR', -0.3 * e); add('hpL', -0.3 * e); add('anR', -0.12 * e); add('anL', -0.12 * e); add('spine', 0.1 * e); P.y = (P.y || 0) - 0.07 * e;
+  P.rate = Math.max(P.rate || 16, 26); return P;
+}
+
+// ---------------- 6. transitions ----------------
+// How quickly to blend out of the pose you are in (the rig always blends from its current evaluated pose, never a
+// reset). Rates are per second of an exponential ease: 30 ≈ 0.1 s, 18 ≈ 0.17 s, 10 ≈ 0.3 s. Fast reactions are fast.
+const TRANS = {
+  '*>shoot': 30, '*>fake': 30, '*>pass': 32, '*>steal': 34, '*>jump': 30, '*>swat': 32, '*>stagger': 36, '*>move': 32, '*>catch': 26,
+  'idle>run': 12, 'idle>dribble': 14, 'idle>slide': 18, 'run>idle': 10, 'dribble>idle': 12, 'slide>run': 16, 'run>slide': 18, 'run>dribble': 22, 'dribble>run': 18,
+  'shoot>idle': 12, 'shoot>run': 14, 'shoot>slide': 16, 'jump>slide': 16, 'jump>idle': 12, 'hold>shoot': 30, 'hold>pass': 32, 'dribble>shoot': 30, 'dribble>pass': 32, 'dribble>hold': 22, 'sulk>idle': 6, 'celeb>idle': 8,
+};
+function transRate(from, to) { return TRANS[from + '>' + to] || TRANS['*>' + to] || 14; }
 // GOT NEXT — model lab: the game's own rig on a model sheet (turnaround, pose row, lineups, orbit), with the build,
 // every drip slot, every pose and the body proportions live-editable. Proportions copy out as JSON for src/gfx.js PROP;
 // a look copies out as a build code the game's Link can import.

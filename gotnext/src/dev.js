@@ -55,11 +55,13 @@ function devLeave() {
 }
 function devPreview(an, o) { DEV.prev = { an, o: o || {}, t0: ST ? ST.t : 0 }; if (ST) ST.devPose = DEV.prev; }
 function devRender() {
-  const tabs = [['profile', 'PROFILE'], ['build', 'BUILD'], ['moves', 'MOVES'], ['play', 'PLAY'], ['reel', 'REEL']];
+  const tabs = [['profile', 'PROFILE'], ['build', 'BUILD'], ['moves', 'MOVES'], ['anim', 'ANIM LAB'], ['play', 'PLAY'], ['reel', 'REEL']];
   let h = `<div class="ph"><h2>DEV ROOM</h2></div><div class="tabs">` + tabs.map(([k, n]) => Btn(n, () => { DEV.tab = k; rerender(true); }, 'sm ' + (DEV.tab === k ? '' : 'alt'))).join('') + `</div><div class="pb">`;
   h += `<div class="card"><div class="row" style="gap:12px"><div class="ovr">${ovrOf(S.attrs)}</div><div><div class="f" style="font-size:18px">${esc(S.name)}</div><div class="mu">${STYLE[S.build.style].n} · ${fmtH(S.build.body.h)} · ${RANKS[rankOf(S.rep)].n}${S.devBak ? ' · <span class="ye">dev player (your real one is saved)</span>' : ''}</div></div></div></div>`;
   const t = DEV.tab;
-  if (t === 'profile') {
+  if (t === 'anim') {
+    h += `<div class="card"><h3>ANIM LAB</h3><p>Every player has a movement profile: how their jump shot blends the three foundations (traditional, high release, quick release), how they stand around (relaxed, athletic, wide), and their posture and timing. It is cosmetic: it never changes release timing or any rating.</p><p style="margin-top:6px">Two players side by side, any action or transition, slow motion, pause and frame step, sliders for the left one, save to your builds or homies.</p><div style="margin-top:6px">${Btn('OPEN ANIM LAB', () => { uiClose(); alabOpen(); })}</div></div>`;
+  } else if (t === 'profile') {
     h += `<div class="card"><h3>MAXED OUT</h3><p>Every attribute 99, every badge iced out, every move, jumper, dunk, celebration and piece of drip owned, top rank, 250,000 VC. The flashiest package is equipped.</p><div style="margin-top:6px">${Btn('MAX ME OUT', () => { devMax(); devRig(); sfx('unlock'); toast('MAXED OUT', '99 everything. Go look in the mirror.', 'rank'); rerender(); })}</div></div>`;
     h += `<div class="card"><h3>YOUR REAL PLAYER</h3><p>${S.devBak ? `Saved: <b>${esc(S.devBak.name)}</b>, ${ovrOf(S.devBak.attrs)} OVR, ${S.devBak.vc.toLocaleString()} VC. Restoring puts everything back exactly as it was, and throws away the dev changes.` : 'Nothing changed yet. The first change made here puts your real player aside so you can get them back.'}</p>${S.devBak ? `<div style="margin-top:6px">${Btn('RESTORE MY PLAYER', () => { devRestore(); devRig(); sfx('uiok'); toast('RESTORED', 'Back to the real you.'); rerender(); }, 'alt')}</div>` : ''}</div>`;
     h += `<div class="card"><h3>WORLD</h3><p>Weather today: <b>${todayWeather()}</b>${weatherOverride ? ' (forced)' : ''}. It changes by the day; force it here to look around.</p><div style="margin-top:6px">${['clear', 'drizzle', 'fog'].map(w => Btn(w, () => { weatherOverride = w; toast('WEATHER', w + ' (next place you enter)'); rerender(); }, 'sm ' + (weatherOverride === w ? '' : 'alt'))).join(' ')} ${Btn('by the day', () => { weatherOverride = null; rerender(); }, 'sm alt')}</div>

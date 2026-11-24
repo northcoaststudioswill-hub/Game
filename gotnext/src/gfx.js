@@ -78,7 +78,7 @@ function makeRig(spec, lowDetail) {
   const P = PROP, H = b.h * 0.0254, wS = 1 + b.w * 0.2, aS = 1 + b.s * 0.07, lW = wS * P.limb;
   const skin = toon(SKINS[spec.build.skin || 0]);
   const D = s => DRIPS[worn[s]] || null;
-  const R = { H, joints: {}, cur: {}, spec, extraYaw: 0 };
+  const R = { H, joints: {}, cur: {}, spec, extraYaw: 0, prof: typeof animProfile === 'function' ? animProfile(spec) : null };
   const legLen = H * 0.5 * P.leg, thigh = legLen * P.thighShare, shin = legLen * (1 - P.thighShare), torso = H * 0.29 * P.torso, armLen = H * 0.39 * aS * P.arm, up = armLen * P.upperArm, fore = armLen * (1 - P.upperArm);
   const shW = 0.21 * (0.92 + 0.08 * wS) * (H / 1.95) * P.shoulder, hipW = 0.095 * wS * P.hips;
   const root = new THREE.Group(); R.root = root;
@@ -286,7 +286,7 @@ function poseOf(anim, t, o) {
   const armsDown = () => { S_('shR', 0.05, 0, -0.1); S_('shL', 0.05, 0, 0.1); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', -0.1); S_('wrL', -0.1); };
   const legs = (hr, kr, hl, kl, spread) => { S_('hpR', hr, 0, -(spread || 0)); S_('knR', kr); S_('hpL', hl, 0, spread || 0); S_('knL', kl); S_('anR', -(hr + kr) * 0.55); S_('anL', -(hl + kl) * 0.55); };
   switch (anim) {
-    case 'idle': { const b = Math.sin(t * 2); armsDown(); p.y = b * 0.006; S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); break; }
+    case 'idle': if (o.prof) { Object.assign(p, idlePose(o.prof, t, o)); break; } { const b = Math.sin(t * 2); armsDown(); p.y = b * 0.006; S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); break; }
     case 'walk': case 'run': case 'dribble': case 'slide': {
       const a = clamp(o.sp || 0, 0, 1), ph = o.ph || 0, s = Math.sin(ph), c = Math.cos(ph), amp = anim === 'slide' ? 0.35 : 0.25 + a * 0.75;
       // legs: thigh swings, knee folds on the recovery, ankle pushes off behind and dorsiflexes in front
@@ -307,15 +307,14 @@ function poseOf(anim, t, o) {
       break;
     }
     case 'shoot': case 'fake': {
-      const u = clamp(t / (o.rel || 0.6), 0, 1.6), k = o.kick ? 1 : 0;
-      if (u < 0.45) { p.y = -0.13 * (u / 0.45); legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); }       // dip: ball to the pocket
-      else if (u < 1) { legs(-0.05, 0.12, -k * 0.9, 0.12 + k * 0.5, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); }   // set point: wrist cocked
-      else { legs(0.05, 0.05, -k * 1.1, k * 0.3, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); }                                          // follow-through: gooseneck
+      const u = clamp(t / (o.rel || 0.6), 0, 1.6), k = o.kick ? 1 : 0, lefty = o.prof && o.prof.hand === 'L';
+      Object.assign(p, shotPose(o.prof, u, o.n, true));       /* traditional / high / quick, blended by the player's profile (anim.js) */
+      if (k && u >= 0.45) { if (u < 1) { S_('hpL', -0.9, 0, 0.04); S_('knL', 0.62); } else { S_('hpL', -1.1, 0, 0.03); S_('knL', 0.3); } }      /* The Lawsuit: the leg kick */
       if (o.fadeA && u >= 0.45) {        // fadeaway: hips back, shoulders back, the off leg kicks out front for balance
         const a = o.fadeA; S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
       }
       if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
-      p.rate = anim === 'fake' ? 30 : 20; break;
+      p.rate = anim === 'fake' ? 30 : 24; if (lefty) Object.assign(p, mirrorPose(p)); break;
     }
     case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
     case 'layup': {

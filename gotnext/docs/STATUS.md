@@ -185,6 +185,9 @@ COPY CODE buttons had invisible labels.
 | Fouls to stop steal spam | Done (0.9.4): reach-ins, hand checks on repeat swipes, shooting and blocking fouls, and-ones; offense keeps the ball. Not in JAM. Balance is a first pass |
 | Out of bounds, not too easy to run out | Done (0.9.4): ball handler over a line is a turnover; outward drift near a line is damped unless you sprint at it on purpose. Loose balls are not called out yet |
 | Ring pointer to your man | Done (0.9.4): magenta arrow on your ring on defense |
+| Don't earn VC too fast (no 99 in one session) | Done (0.10): upgrades past 55 get steep. Maxing a build is ~72-110k VC (about 20 hours); 80 OVR is ~32-39k. Early upgrades cost what they did |
+| 5 savable builds | Done (0.10): MY PLAYER → BUILDS. Own body, attributes, badges, moves, fit and movement profile per build; VC, Respect, owned drip and moves, crib shared. Online uses the active build |
+| Animation blending and player individuality | Done (0.10): see docs/ANIMATION.md §15. Three blended shot styles and three idles, persistent profiles, transition table, layers, ANIM LAB in the Dev Room |
 | Game crashed spamming steal | Not reproduced: about 6 minutes of random steal spam (2v2, JAM, 3v3) gave no page errors or freezes. Need details: phone or PC, online or solo, froze or error |
 
 ---

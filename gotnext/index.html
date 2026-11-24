@@ -196,7 +196,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.9.4';
+const VERSION = '0.10.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -704,7 +704,7 @@ function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v + (typeof homeFx === 'function' ? homeFx(k) : 0); }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }
 function myBuild() {   // a portable snapshot of the player (also what export codes carry)
-  return { name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
+  return { name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
 }
 function encodeBuild(b) { return BRAND.code + '1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
 function decodeBuild(code) {
@@ -728,6 +728,7 @@ function sanitizeBuild(j) {
     if (!MOVE[j.moves.back] || MOVE[j.moves.back].slot !== 'back') j.moves.back = m.back;
     if (!MOVE[j.moves.diag] || MOVE[j.moves.diag].slot !== 'diag') j.moves.diag = m.diag;
     if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk;
+    j.anim = typeof cleanProfile === 'function' ? cleanProfile(j.anim) || undefined : undefined;
     return j;
   } catch (e) { return null; }
 }
@@ -979,7 +980,7 @@ function makeRig(spec, lowDetail) {
   const P = PROP, H = b.h * 0.0254, wS = 1 + b.w * 0.2, aS = 1 + b.s * 0.07, lW = wS * P.limb;
   const skin = toon(SKINS[spec.build.skin || 0]);
   const D = s => DRIPS[worn[s]] || null;
-  const R = { H, joints: {}, cur: {}, spec, extraYaw: 0 };
+  const R = { H, joints: {}, cur: {}, spec, extraYaw: 0, prof: typeof animProfile === 'function' ? animProfile(spec) : null };
   const legLen = H * 0.5 * P.leg, thigh = legLen * P.thighShare, shin = legLen * (1 - P.thighShare), torso = H * 0.29 * P.torso, armLen = H * 0.39 * aS * P.arm, up = armLen * P.upperArm, fore = armLen * (1 - P.upperArm);
   const shW = 0.21 * (0.92 + 0.08 * wS) * (H / 1.95) * P.shoulder, hipW = 0.095 * wS * P.hips;
   const root = new THREE.Group(); R.root = root;
@@ -1187,7 +1188,7 @@ function poseOf(anim, t, o) {
   const armsDown = () => { S_('shR', 0.05, 0, -0.1); S_('shL', 0.05, 0, 0.1); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', -0.1); S_('wrL', -0.1); };
   const legs = (hr, kr, hl, kl, spread) => { S_('hpR', hr, 0, -(spread || 0)); S_('knR', kr); S_('hpL', hl, 0, spread || 0); S_('knL', kl); S_('anR', -(hr + kr) * 0.55); S_('anL', -(hl + kl) * 0.55); };
   switch (anim) {
-    case 'idle': { const b = Math.sin(t * 2); armsDown(); p.y = b * 0.006; S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); break; }
+    case 'idle': if (o.prof) { Object.assign(p, idlePose(o.prof, t, o)); break; } { const b = Math.sin(t * 2); armsDown(); p.y = b * 0.006; S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); break; }
     case 'walk': case 'run': case 'dribble': case 'slide': {
       const a = clamp(o.sp || 0, 0, 1), ph = o.ph || 0, s = Math.sin(ph), c = Math.cos(ph), amp = anim === 'slide' ? 0.35 : 0.25 + a * 0.75;
       // legs: thigh swings, knee folds on the recovery, ankle pushes off behind and dorsiflexes in front
@@ -1208,15 +1209,14 @@ function poseOf(anim, t, o) {
       break;
     }
     case 'shoot': case 'fake': {
-      const u = clamp(t / (o.rel || 0.6), 0, 1.6), k = o.kick ? 1 : 0;
-      if (u < 0.45) { p.y = -0.13 * (u / 0.45); legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); }       // dip: ball to the pocket
-      else if (u < 1) { legs(-0.05, 0.12, -k * 0.9, 0.12 + k * 0.5, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); }   // set point: wrist cocked
-      else { legs(0.05, 0.05, -k * 1.1, k * 0.3, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); }                                          // follow-through: gooseneck
+      const u = clamp(t / (o.rel || 0.6), 0, 1.6), k = o.kick ? 1 : 0, lefty = o.prof && o.prof.hand === 'L';
+      Object.assign(p, shotPose(o.prof, u, o.n, true));       /* traditional / high / quick, blended by the player's profile (anim.js) */
+      if (k && u >= 0.45) { if (u < 1) { S_('hpL', -0.9, 0, 0.04); S_('knL', 0.62); } else { S_('hpL', -1.1, 0, 0.03); S_('knL', 0.3); } }      /* The Lawsuit: the leg kick */
       if (o.fadeA && u >= 0.45) {        // fadeaway: hips back, shoulders back, the off leg kicks out front for balance
         const a = o.fadeA; S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
       }
       if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
-      p.rate = anim === 'fake' ? 30 : 20; break;
+      p.rate = anim === 'fake' ? 30 : 24; if (lefty) Object.assign(p, mirrorPose(p)); break;
     }
     case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
     case 'layup': {
@@ -1670,6 +1670,194 @@ function disposeScene(sc) {
   if (!sc) return;
   sc.traverse(o => { if (o.isMesh) { const g = o.geometry; if (g && !Object.values(_geo).includes(g)) g.dispose(); const m = o.material; if (m && m.map && !Object.values(_mats).includes(m) && !Object.values(_texCache).includes(m.map)) { if (m.map.source !== (_brick && _brick.source)) m.map.dispose(); m.dispose(); } } });
 }
+// GOT NEXT — the animation library. Builds on the existing rig and poses (gfx.js), it does not replace them.
+//   1. skeleton map        which joints exist, which half of the body they belong to, left/right mirroring
+//   2. evaluation          keyframe tracks over a normalised phase, joint rotations as quaternions
+//   3. blending            N poses at weights, per joint, quaternion-averaged (no Euler wobble)
+//   4. styles              three jump shots and three idles, all phase-synced (the release is always at u = 1)
+//   5. profiles            a persistent movement identity per player: style weights, posture, timing, hand
+//   6. transitions         how fast to blend out of the pose you are in, per pair of actions
+//   7. layers              additive (breathing, weight shift, fatigue, personality) and corrective (landing)
+// Gameplay never reads anything in here: release timing, speeds and hit boxes stay where they were.
+'use strict';
+
+// ---------------- 1. skeleton map ----------------
+const SKEL = {
+  joints: ['hips', 'spine', 'chest', 'neck', 'head', 'shR', 'elR', 'wrR', 'shL', 'elL', 'wrL', 'hpR', 'knR', 'anR', 'hpL', 'knL', 'anL'],
+  lower: ['hips', 'hpR', 'knR', 'anR', 'hpL', 'knL', 'anL'],
+  upper: ['spine', 'chest', 'neck', 'head', 'shR', 'elR', 'wrR', 'shL', 'elL', 'wrL'],
+};
+// a left-hander: swap the sides and mirror the rotations about the body's midline (y and z flip sign)
+function mirrorPose(P) {
+  const o = { y: P.y, rate: P.rate };
+  for (const k in P) { if (k === 'y' || k === 'rate') continue; const v = P[k]; if (!Array.isArray(v)) { o[k] = v; continue; }
+    const m = k.endsWith('R') ? k.slice(0, -1) + 'L' : k.endsWith('L') ? k.slice(0, -1) + 'R' : k; o[m] = [v[0], -v[1], -v[2]]; }
+  return o;
+}
+
+// ---------------- 2/3. evaluation and blending ----------------
+const _aq = new THREE.Quaternion(), _aq2 = new THREE.Quaternion(), _ae = new THREE.Euler(), _acc = {};
+// list: [[pose, weight], ...]. Each joint's rotations are turned into quaternions, sign-aligned and averaged.
+function blendPoses(list) {
+  let wsum = 0; for (const [, w] of list) wsum += Math.max(0, w); if (wsum <= 0) return list[0][0];
+  if (list.length === 1 || list.filter(l => l[1] > 0).length === 1) return list.find(l => l[1] > 0)[0];
+  const out = { y: 0, rate: 0 }, keys = new Set();
+  for (const [P, w] of list) { if (w <= 0) continue; for (const k in P) keys.add(k); out.y += (P.y || 0) * w / wsum; out.rate = Math.max(out.rate, P.rate || 16); }
+  for (const k of keys) {
+    if (k === 'y' || k === 'rate') continue; let x = 0, y = 0, z = 0, ww = 0, first = null;
+    for (const [P, w] of list) { if (w <= 0) continue; const v = P[k] || POSE.zero; _aq.setFromEuler(_ae.set(v[0], v[1], v[2]));
+      if (!first) first = _aq2.copy(_aq); else if (first.dot(_aq) < 0) { _aq.x = -_aq.x; _aq.y = -_aq.y; _aq.z = -_aq.z; _aq.w = -_aq.w; }
+      x += _aq.x * w; y += _aq.y * w; z += _aq.z * w; ww += _aq.w * w; }
+    _aq.set(x, y, z, ww).normalize(); _ae.setFromQuaternion(_aq); out[k] = [_ae.x, _ae.y, _ae.z];
+  }
+  return out;
+}
+// two poses, quaternion slerp per joint (the two-way case of blendPoses, kept for transitions and tracks)
+function slerpPose(A, B, t) { return t <= 0 ? A : t >= 1 ? B : blendPoses([[A, 1 - t], [B, t]]); }
+// a keyframe track: [[u, pose], ...] sorted by u. Smoothstep between neighbouring keys.
+function evalTrack(K, u) {
+  if (u <= K[0][0]) return K[0][1]; const L = K[K.length - 1]; if (u >= L[0]) return L[1];
+  let i = 0; while (K[i + 1][0] < u) i++; const a = K[i], b = K[i + 1], t = (u - a[0]) / (b[0] - a[0]);
+  return slerpPose(a[1], b[1], t * t * (3 - 2 * t));
+}
+// pose builder: the same vocabulary as poseOf (legs, arms), so the styles read like the poses they extend
+function mkPose(f) {
+  const p = { y: 0, rate: 20 }, S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
+  const legs = (hr, kr, hl, kl, spread) => { S_('hpR', hr, 0, -(spread || 0)); S_('knR', kr); S_('hpL', hl, 0, spread || 0); S_('knL', kl); S_('anR', -(hr + kr) * 0.55); S_('anL', -(hl + kl) * 0.55); };
+  f(S_, legs, p); return p;
+}
+
+// ---------------- 4. styles ----------------
+// Shot phases (u = t / release time). Every style hits the same beats, so any blend of them still releases at u = 1.
+const SHOT_PH = { gather: 0, dip: 0.4, extend: 0.62, jump: 0.75, set: 0.9, release: 1.0, follow: 1.12, land: 1.42, recover: 1.6 };
+const _shotKeys = {};
+function shotTrack(style) {
+  if (_shotKeys[style]) return _shotKeys[style];
+  const H = SHOT_PH; let K;
+  if (style === 'trad') {          // the game's original jumper, kept as the foundation (its three poses are the dip, set and follow keys)
+    const dip = mkPose((S_, legs, p) => { p.y = -0.13; legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); });
+    const set = mkPose((S_, legs) => { legs(-0.05, 0.12, 0, 0.12, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); });
+    const follow = mkPose((S_, legs) => { legs(0.05, 0.05, 0, 0, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); });
+    K = [[H.gather, slerpPose(dip, set, 0.0)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.55)], [H.set, set], [H.release, slerpPose(set, follow, 0.45)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.2)], [H.recover, slerpPose(follow, dip, 0.65)]];
+  } else if (style === 'high') {     // high release: the ball goes up over the head, long arm, big ankle extension
+    const dip = mkPose((S_, legs, p) => { p.y = -0.11; legs(-0.4, 0.62, -0.4, 0.62, 0.05); S_('spine', 0.08); S_('chest', 0.04); S_('neck', -0.1); S_('shR', -1.35, 0, 0.08); S_('shL', -1.25, 0, -0.28); S_('elR', -2.1); S_('elL', -1.9); S_('wrR', 0.75); S_('wrL', 0.25); });
+    const set = mkPose((S_, legs) => { legs(0, 0.06, 0.02, 0.08, 0.04); S_('anR', 0.95); S_('anL', 0.95); S_('spine', -0.08); S_('chest', -0.1); S_('neck', 0.02); S_('shR', -2.95, 0, 0.02); S_('shL', -2.75, 0, -0.28); S_('elR', -1.05); S_('elL', -0.9); S_('wrR', 1.1); S_('wrL', 0.35); });
+    const follow = mkPose((S_, legs) => { legs(0.04, 0.04, 0.02, 0.02, 0.03); S_('anR', 1.0); S_('anL', 1.0); S_('spine', -0.08); S_('chest', -0.06); S_('neck', -0.02); S_('shR', -3.1, 0, 0); S_('elR', 0); S_('wrR', -1.35); S_('shL', -2.5, 0, -0.35); S_('elL', -0.6); S_('wrL', -0.15); });
+    K = [[H.gather, slerpPose(dip, set, 0.05)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.6)], [H.set, set], [H.release, slerpPose(set, follow, 0.4)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.15)], [H.recover, slerpPose(follow, dip, 0.6)]];
+  } else {                           // quick release: compact, the ball never goes behind the forehead, shallow dip
+    const dip = mkPose((S_, legs, p) => { p.y = -0.08; legs(-0.32, 0.5, -0.32, 0.5, 0.07); S_('spine', 0.14); S_('chest', 0.1); S_('neck', -0.14); S_('shR', -1.25, 0, 0.12); S_('shL', -1.2, 0, -0.28); S_('elR', -2.1); S_('elL', -1.9); S_('wrR', 0.8); S_('wrL', 0.25); });
+    const set = mkPose((S_, legs) => { legs(-0.06, 0.16, -0.04, 0.16, 0.05); S_('anR', 0.6); S_('anL', 0.6); S_('spine', 0.02); S_('chest', -0.02); S_('neck', -0.1); S_('shR', -2.2, 0, 0.1); S_('shL', -2.05, 0, -0.34); S_('elR', -1.75); S_('elL', -1.45); S_('wrR', 0.9); S_('wrL', 0.3); });
+    const follow = mkPose((S_, legs) => { legs(0.04, 0.08, 0, 0.06, 0.04); S_('anR', 0.75); S_('anL', 0.75); S_('spine', 0); S_('chest', -0.02); S_('neck', -0.1); S_('shR', -2.7, 0, 0.04); S_('elR', -0.25); S_('wrR', -1.15); S_('shL', -1.8, 0, -0.4); S_('elL', -1.1); S_('wrL', -0.1); });
+    K = [[H.gather, slerpPose(dip, set, 0.15)], [H.dip - 0.08, dip], [H.extend - 0.05, slerpPose(dip, set, 0.65)], [H.set - 0.05, set], [H.release, slerpPose(set, follow, 0.5)], [H.follow - 0.02, follow], [H.land - 0.1, slerpPose(follow, dip, 0.3)], [H.recover - 0.1, slerpPose(follow, dip, 0.7)]];
+  }
+  return (_shotKeys[style] = K);
+}
+const SHOT_STYLES = [['trad', 'Traditional'], ['high', 'High release'], ['quick', 'Quick release']];
+const IDLE_STYLES = [['relaxed', 'Relaxed'], ['athletic', 'Athletic'], ['wide', 'Wide']];
+// idles: the original idle is "relaxed"; the others are built in the same terms
+function idleBase(style, t) {
+  const b = Math.sin(t * 2);
+  if (style === 'relaxed') return mkPose((S_, legs, p) => { p.rate = 16; p.y = b * 0.006; S_('shR', 0.05, 0, -0.1); S_('shL', 0.05, 0, 0.1); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', -0.1); S_('wrL', -0.1); S_('spine', 0.03); S_('chest', 0.02 + b * 0.02); S_('neck', -0.03); S_('hips', 0, 0, 0.03); S_('hpR', 0, 0, -0.06); S_('hpL', 0, 0, 0.1); });
+  if (style === 'athletic') return mkPose((S_, legs, p) => { p.rate = 16; p.y = -0.07; legs(-0.32, 0.5, -0.3, 0.48, 0.1); S_('spine', 0.16); S_('chest', 0.06); S_('neck', -0.16); S_('shR', -0.3, 0, -0.18); S_('shL', -0.3, 0, 0.18); S_('elR', -0.75); S_('elL', -0.75); S_('wrR', 0.05); S_('wrL', 0.05); });
+  return mkPose((S_, legs, p) => { p.rate = 16; p.y = -0.04; legs(-0.12, 0.25, -0.12, 0.25, 0.2); S_('anR', 0.05, 0, 0.12); S_('anL', 0.05, 0, -0.12); S_('hips', -0.02); S_('spine', 0.02); S_('chest', -0.04); S_('neck', -0.02); S_('shR', 0.02, 0, -0.22); S_('shL', 0.02, 0, 0.22); S_('elR', -0.35); S_('elL', -0.35); S_('wrR', -0.12); S_('wrL', -0.12); });
+}
+
+// ---------------- 5. profiles ----------------
+// A profile is how a player physically expresses an action. It is cosmetic: it never changes a gameplay number.
+// Built-in players get one from their name and build (so the same AI player always moves the same way); your own
+// builds keep theirs in the save (S.anim, per build), editable in the Dev Room's ANIM LAB.
+const PROF_KEYS = [
+  ['knee', 'Knee bend', 0.6, 1.4], ['elbow', 'Elbow flare', -1, 1], ['lean', 'Torso lean', -1, 1], ['stance', 'Stance width', 0.6, 1.5],
+  ['follow', 'Follow-through hold', 0.5, 1.6], ['shoulder', 'Shoulder turn', -1, 1], ['cadence', 'Idle tempo', 0.6, 1.5], ['intensity', 'Movement intensity', 0.6, 1.4],
+  ['recovery', 'Recovery speed', 0.6, 1.5], ['restless', 'Idle restlessness', 0, 1], ['dribLow', 'Dribble crouch', -1, 1], ['defLow', 'Defensive crouch', -1, 1], ['arms', 'Run arm carry', -1, 1], ['swag', 'Walk swagger', 0, 1],
+];
+const PROF_DEF = { shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function seededRnd(seed) { let a = seed || 1; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function normW(o) { let s = 0; for (const k in o) s += Math.max(0, o[k]); if (s <= 0) return o; const r = {}; for (const k in o) r[k] = Math.max(0, o[k]) / s; return r; }
+function profileFromBuild(spec) {
+  const b = (spec && spec.build) || {}, r = seededRnd(hashStr(((spec && spec.name) || 'X') + '|' + (b.style || '') + '|' + ((b.body && b.body.h) || 0))), j = (a, s) => a + (r() * 2 - 1) * s;
+  const P = JSON.parse(JSON.stringify(PROF_DEF)), st = b.style;
+  // the build's style leans the defaults: shooters are balanced or high, slashers quick, bigs high and wide
+  const shot = { sniper: [0.6, 0.3, 0.1], slasher: [0.3, 0.1, 0.6], general: [0.5, 0.15, 0.35], lockdown: [0.55, 0.15, 0.3], glass: [0.35, 0.55, 0.1], showman: [0.3, 0.3, 0.4] }[st] || [0.6, 0.2, 0.2];
+  const idle = { sniper: [0.6, 0.3, 0.1], slasher: [0.3, 0.55, 0.15], general: [0.5, 0.4, 0.1], lockdown: [0.15, 0.6, 0.25], glass: [0.3, 0.2, 0.5], showman: [0.6, 0.15, 0.25] }[st] || [0.6, 0.3, 0.1];
+  P.shot = normW({ trad: j(shot[0], 0.25), high: j(shot[1], 0.2), quick: j(shot[2], 0.2) }); P.idle = normW({ relaxed: j(idle[0], 0.25), athletic: j(idle[1], 0.2), wide: j(idle[2], 0.15) });
+  P.hand = r() < 0.12 ? 'L' : 'R';
+  for (const [k, , lo, hi] of PROF_KEYS) { const d = PROF_DEF[k], span = (hi - lo) * 0.18; P[k] = clamp(j(d, span), lo, hi); }
+  if (st === 'glass') { P.stance = clamp(P.stance + 0.15, 0.6, 1.5); P.knee = clamp(P.knee - 0.1, 0.6, 1.4); }
+  if (st === 'lockdown') P.defLow = clamp(P.defLow + 0.4, -1, 1); if (st === 'showman') { P.swag = clamp(P.swag + 0.35, 0, 1); P.restless = clamp(P.restless + 0.2, 0, 1); }
+  return P;
+}
+// anything that arrives from outside (save, another player online) is clamped here
+function cleanProfile(a) {
+  if (!a || typeof a !== 'object') return null; const P = JSON.parse(JSON.stringify(PROF_DEF));
+  for (const g of ['shot', 'idle']) if (a[g] && typeof a[g] === 'object') for (const k in P[g]) { const v = +a[g][k]; if (isFinite(v)) P[g][k] = clamp(v, 0, 1); }
+  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R';
+  for (const [k, , lo, hi] of PROF_KEYS) { const v = +a[k]; if (isFinite(v)) P[k] = clamp(v, lo, hi); }
+  return P;
+}
+function animProfile(spec) { return (spec && spec.anim && cleanProfile(spec.anim)) || profileFromBuild(spec); }
+
+// the jump shot of a profile at phase u (u = 1 is the release); n = shot number, a tiny controlled variation per shot
+function shotPose(prof, u, n) {
+  prof = prof || PROF_DEF; const w = prof.shot, jit = n ? seededRnd(n * 7919 + 13) : null, vj = s => jit ? (jit() * 2 - 1) * s : 0;
+  // follow-through hold: past the release the clock slows (or speeds) so the arm stays up longer, landing on the same beat
+  let uu = u; if (u > SHOT_PH.release) { const f = prof.follow || 1; uu = SHOT_PH.release + (u - SHOT_PH.release) / f; }
+  const list = []; for (const [k] of SHOT_STYLES) if (w[k] > 0.001) list.push([evalTrack(shotTrack(k), uu), Math.max(0, w[k] + vj(0.04))]);
+  const P = blendPoses(list), out = {}; for (const k in P) out[k] = Array.isArray(P[k]) ? P[k].slice() : P[k];
+  // posture on top of the blend: deeper or shallower knees (the dip), elbow in or out, torso lean, stance width
+  const dipK = clamp(1 - Math.abs(uu - SHOT_PH.dip) / 0.35, 0, 1), kn = (prof.knee || 1) - 1 + vj(0.04);
+  for (const s of ['R', 'L']) { if (out['kn' + s]) out['kn' + s][0] *= 1 + kn * dipK; if (out['hp' + s]) { out['hp' + s][0] *= 1 + kn * dipK; out['hp' + s][2] *= prof.stance || 1; } if (out['an' + s]) out['an' + s][0] *= 1 + kn * dipK * 0.6; }
+  if (out.y) out.y *= 1 + kn * dipK;
+  const el = (prof.elbow || 0) + vj(0.08); if (out.shR) out.shR[2] += -el * 0.22 * clamp(uu / SHOT_PH.set, 0, 1); if (out.elR) out.elR[1] = (out.elR[1] || 0) + el * 0.25;
+  if (out.spine) out.spine[0] += (prof.lean || 0) * 0.08; if (out.chest) out.chest[1] = (out.chest[1] || 0) + (prof.shoulder || 0) * 0.18;
+  return prof.hand === 'L' ? mirrorPose(out) : out;
+}
+
+// ---------------- 7. layers ----------------
+// idle = the three base stances blended, then additive life: breathing, weight shift, shoulders settling, the hands
+// finding somewhere to be, fatigue (o.tired 0..1) and readiness (o.alert 0..1 pulls toward the athletic stance)
+function idlePose(prof, t, o) {
+  prof = prof || PROF_DEF; o = o || {}; const w = Object.assign({}, prof.idle), al = clamp(o.alert || 0, 0, 1);
+  if (al > 0) { w.athletic = (w.athletic || 0) + al * 0.8; } const tc = t * (prof.cadence || 1), ph = (o.ph || 0);
+  const list = []; for (const [k] of IDLE_STYLES) if (w[k] > 0.001) list.push([idleBase(k, tc + ph), w[k]]);
+  const P = blendPoses(list), out = {}; for (const k in P) out[k] = Array.isArray(P[k]) ? P[k].slice() : P[k];
+  const add = (k, x, y, z) => { const v = out[k] || (out[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+  const br = Math.sin(tc * 1.7 + ph), rs = prof.restless || 0, sh = Math.sin(tc * 0.45 + ph * 1.3), sh2 = Math.sin(tc * 0.23 + ph);
+  add('chest', -0.018 * br, 0, 0); add('shR', 0, 0, -0.015 * br); add('shL', 0, 0, 0.015 * br); out.y = (out.y || 0) + 0.004 * br;        // breathing
+  add('hips', 0, 0.03 * sh2 * rs, 0.05 * sh * (0.4 + rs)); add('hpR', 0, 0, -0.04 * sh * (0.4 + rs)); add('hpL', 0, 0, -0.04 * sh * (0.4 + rs)); add('spine', 0, 0, -0.025 * sh * (0.4 + rs));   // weight shift
+  const hand = Math.max(0, Math.sin(tc * 0.31 + ph * 2.1)) * rs; add('elR', -0.35 * hand); add('wrR', 0.15 * hand); add('shR', -0.12 * hand);       // the hand comes up to the waistband, goes back down
+  const tr = clamp(o.tired || 0, 0, 1); if (tr) { add('spine', 0.18 * tr); add('chest', 0.06 * tr); add('neck', -0.1 * tr); add('shR', 0, 0, 0.05 * tr); add('shL', 0, 0, -0.05 * tr); out.y -= 0.03 * tr; }
+  add('spine', (prof.lean || 0) * 0.05); out.rate = 16;
+  return prof.hand === 'L' ? mirrorPose(out) : out;
+}
+// profile posture on the moving poses (dribble crouch, defensive crouch, how high the arms carry in a run)
+function profilePosture(P, an, prof) {
+  if (!prof) return P; const add = (k, x, y, z) => { const v = P[k] || (P[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+  if (an === 'dribble' && prof.dribLow) { const d = prof.dribLow; add('spine', 0.08 * d); add('knR', 0.12 * d); add('knL', 0.12 * d); add('hpR', -0.07 * d); add('hpL', -0.07 * d); P.y = (P.y || 0) - 0.03 * d; }
+  if (an === 'slide' && prof.defLow) { const d = prof.defLow; add('knR', 0.14 * d); add('knL', 0.14 * d); add('hpR', -0.1 * d, 0, -0.04 * d); add('hpL', -0.1 * d, 0, 0.04 * d); add('spine', 0.06 * d); P.y = (P.y || 0) - 0.035 * d; }
+  if (an === 'run' && prof.arms) { const d = prof.arms; add('elR', -0.2 * d); add('elL', -0.2 * d); add('shR', 0, 0, -0.04 * d); add('shL', 0, 0, 0.04 * d); }
+  if ((an === 'run' || an === 'dribble' || an === 'slide') && prof.intensity !== 1) { const k = (prof.intensity || 1) - 1; add('spine', 0.06 * k); add('neck', -0.04 * k); }
+  return P;
+}
+// corrective: a landing soaks up the drop through the knees and hips (deeper the harder the fall, quicker with good recovery)
+function landLayer(P, R, p, dt, prof) {
+  const air = p.y > 0.04; if (R.wasAir && !air) R.landK = clamp((R.peakY || 0) * 1.6, 0.25, 1); if (air) R.peakY = Math.max(R.peakY || 0, p.y); else R.peakY = 0; R.wasAir = air;
+  if (!R.landK) return P; const k = R.landK; R.landK = Math.max(0, k - dt * 4.2 * ((prof && prof.recovery) || 1));
+  const add = (j, x) => { const v = P[j] || (P[j] = [0, 0, 0]); v[0] += x; }; const e = Math.sin(Math.min(1, (1 - k) * 1.6) * Math.PI) * k + k * 0.35;
+  add('knR', 0.45 * e); add('knL', 0.45 * e); add('hpR', -0.3 * e); add('hpL', -0.3 * e); add('anR', -0.12 * e); add('anL', -0.12 * e); add('spine', 0.1 * e); P.y = (P.y || 0) - 0.07 * e;
+  P.rate = Math.max(P.rate || 16, 26); return P;
+}
+
+// ---------------- 6. transitions ----------------
+// How quickly to blend out of the pose you are in (the rig always blends from its current evaluated pose, never a
+// reset). Rates are per second of an exponential ease: 30 ≈ 0.1 s, 18 ≈ 0.17 s, 10 ≈ 0.3 s. Fast reactions are fast.
+const TRANS = {
+  '*>shoot': 30, '*>fake': 30, '*>pass': 32, '*>steal': 34, '*>jump': 30, '*>swat': 32, '*>stagger': 36, '*>move': 32, '*>catch': 26,
+  'idle>run': 12, 'idle>dribble': 14, 'idle>slide': 18, 'run>idle': 10, 'dribble>idle': 12, 'slide>run': 16, 'run>slide': 18, 'run>dribble': 22, 'dribble>run': 18,
+  'shoot>idle': 12, 'shoot>run': 14, 'shoot>slide': 16, 'jump>slide': 16, 'jump>idle': 12, 'hold>shoot': 30, 'hold>pass': 32, 'dribble>shoot': 30, 'dribble>pass': 32, 'dribble>hold': 22, 'sulk>idle': 6, 'celeb>idle': 8,
+};
+function transRate(from, to) { return TRANS[from + '>' + to] || TRANS['*>' + to] || 14; }
 // GOT NEXT — the basketball: half-court park games, Street rules and JAM (arcade) rules
 'use strict';
 let MT = null;
@@ -2565,7 +2753,7 @@ function ballHeld(p, dt) {
   const st = p.st;
   if (st === 'shoot' || st === 'finish' || st === 'fake' || st === 'pass' || st === 'hop' || ((p.live === 'hold' || p.live === 'dead') && st === 'free')) {
     // gather: ball between the hands, then up into the shooting hand
-    const bh = st === 'finish' && p.finish.bh === 'L' ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
+    const bh = (st === 'finish' && p.finish.bh === 'L') || ((st === 'shoot' || st === 'fake') && p.rig.prof && p.rig.prof.hand === 'L') ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
     const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
     _bp.lerp(_bq, 0.5 * (1 - lift)); _bp.y += 0.06 + 0.05 * lift;
     ballFollow(B, _bp, dt, true); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
@@ -2598,12 +2786,12 @@ function ballHeld(p, dt) {
 }
 function ballMesh() { const B = MT.B; B.mesh.position.copy(B.pos); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3)); }
 function animPlayer(p, dt) {
-  const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen };
+  const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen, prof: R.prof };
   p.protect = hasBall && p.st === 'free' && nearestOpp(p)[1] < 1.7 && Math.hypot(p.avx || 0, p.avz || 0) < 3;
   p.runPh += dt * (4 + p.speed * 2.1);
   const spN = clamp(p.speed / 6.5, 0, 1);
   switch (p.st) {
-    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.fadeA = p.shot.fade ? 1 : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
+    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.n = p.stats.fga + 1; o.fadeA = p.shot.fade ? 1 : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
     case 'fake': an = 'fake'; o.rel = 0.6; break;
     case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.kind = f.kind; o.euro = f.euro || 0; o.cont = f.cont; o.blocked = f.blocked; o.hit = !!f.hit; o.onRim = f.done && f.hangT > 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; else if (f.turn) { const k = clamp(o.u / 0.7, 0, 1); R.extraYaw = f.turn * k * k * (3 - 2 * k); } break; }
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
@@ -2624,6 +2812,7 @@ function animPlayer(p, dt) {
       else if (M_.phase === 'scored' && M_.lastScorer && !M_.lastScorer.dead && M_.lastScorer.team !== p.team) an = 'sulk';
   }
   if (p.forceAn && p.st === 'free' && !hasBall) { an = p.forceAn; o.ph = p.runPh; }
+  if (an === 'idle') { o.ph = p.i * 1.7; o.tired = clamp((35 - (p.stam === undefined ? 100 : p.stam)) / 35, 0, 1); o.alert = M_.phase === 'live' ? clamp(1.6 - Math.hypot(B.pos.x - p.x, B.pos.z - p.z) / 4, 0, 1) : 0; }      /* readier the closer the ball, heavier when gassed */
   if (p.st !== 'finish' && p.st !== 'move') R.extraYaw = 0;       /* whatever ended a spin or a reverse, the body faces where it faces */
   if (!hasBall && an !== 'stagger' && an !== 'sulk' && an !== 'celeb' && p.st !== 'finish' && p.st !== 'move') { let a = Math.atan2(B.pos.x - p.x, B.pos.z - p.z) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.look = p.def && p.guard && p.guard !== B.holder && B.state === 'held' ? a * 0.5 : a; }      /* guarding off the ball: the body is on your man, the head only half-turns to the ball (see both) */
   if (p.speed > 2 && (an === 'run' || an === 'dribble')) { let a = Math.atan2(p.vx || 0, p.vz || 0) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.bank = -a * 0.35 * spN; }
@@ -2660,6 +2849,11 @@ function animPlayer(p, dt) {
       const uR = p.psi, uL = (p.psi + 0.5) % 1; p.stR = uR < duty; p.stL = uL < duty;
     }
   }
+  // layers (anim.js): profile posture on the moving poses, a landing that soaks up the drop; then the transition rate
+  // out of whatever the body was doing (it always blends from its current pose; gameplay never waits for it)
+  profilePosture(P, an, R.prof); landLayer(P, R, p, dt, R.prof);
+  if (an !== R.anPrev) { const r = transRate(R.anPrev || an, an), rec = R.prof ? R.prof.recovery : 1; R.trRate = /^(shoot|jump|swat|stagger|dunk|layup|floater|hop)$/.test(R.anPrev || '') ? r * rec : r; R.trPair = !!TRANS[(R.anPrev || '') + '>' + an]; R.trT = 0; R.anPrev = an; }
+  R.trT = (R.trT || 0) + dt; if (R.trT < 2.5 / R.trRate) P.rate = R.trPair ? lerp(R.trRate, P.rate || 16, R.trT * R.trRate / 2.5) : Math.max(P.rate || 16, R.trRate);
   applyPose(R, P, dt);
   R.root.position.set(p.x, p.y, p.z); R.root.rotation.y = p.face + (R.extraYaw || 0);
   if ((p.strideW || 0) > 0.3) gaitLock(R, p.psi, R.root.rotation.y, p.strideW, duty); else R.lock = null;
@@ -2949,7 +3143,7 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   let hipYaw = 0; if (v > 0.6) { let a = Math.atan2(vx, vz) - face; a = Math.atan2(Math.sin(a), Math.cos(a)); if (Math.abs(a) < 2.3) hipYaw = clamp(a, -0.5, 0.5) * Math.min(1, v / 2.5) * 0.6; }
   // one stride clock for walking and running: it advances with distance covered, so feet do not skate. Up to a brisk
   // walk the legs follow walking gait curves; above it, running curves (knee drive, heel recovery, a flight phase).
-  const sg = swag === undefined ? 0.6 : swag, wWalk = 1 - clamp((v - 2.2) / 0.9, 0, 1), k = clamp((v - 2.6) / 3.6, 0, 1);
+  const sg = swag === undefined ? (R.prof ? 0.35 + R.prof.swag * 0.8 : 0.6) : swag, wWalk = 1 - clamp((v - 2.2) / 0.9, 0, 1), k = clamp((v - 2.6) / 3.6, 0, 1);
   const stepW = R.legLen * 0.74 * clamp(Math.sqrt(Math.max(v, 0.01) / 1.35), 0.45, 1.3), amp = clamp(v / 0.5, 0, 1) * clamp(Math.sqrt(v / 1.35), 0.45, 1.3);
   const cad = 2.7 + 1.1 * k, stepR = Math.max(v, 0.5) / cad, duty = 0.4 - 0.14 * k, step = lerp(stepR, stepW, wWalk);     /* running: 2.65 steps/s at a jog to 3.5 at a sprint */
   L.psi = ((L.psi || 0) + v * dt / (2 * step)) % 1;
@@ -2959,7 +3153,7 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const solveR = need => { let lo = 0.3, hi = 2.2; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2, sweep = R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)); if (sweep < need) lo = m; else hi = m; } return lo; };
   const stanceDist = v * duty * 2 / cad, hipR = Math.min(solveR(stanceDist - 0.1), 1.5), flight = (0.5 - duty) * 2 / cad;
   let P = wWalk > 0 ? poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen }) : null;
-  if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, {}), clamp(1 - v / 0.12, 0, 1));
+  if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, { prof: R.prof }), clamp(1 - v / 0.12, 0, 1));
   if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
   { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
   applyPose(R, P, dt);
@@ -3237,7 +3431,7 @@ function worldStep(dt) {
       else if (Math.hypot(me.x - n.x, me.z - n.z) < 5 && n.bum) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08);
     }
     if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt, undefined, undefined, n.swag === undefined ? (n.swag = 0.4 + RNG() * 0.6) : n.swag); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
-    else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); }
+    else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, an === 'idle' ? Object.assign({ prof: n.rig.prof, ph: n.ph }, o) : o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }
   for (const c of W.cars) { c.a += c.s * dt; c.c.position.set(Math.cos(c.a) * c.r, c.y, Math.sin(c.a) * c.r); c.c.rotation.y = -c.a + (c.s > 0 ? -Math.PI / 2 : Math.PI / 2); }
@@ -4195,7 +4389,7 @@ function uiResults(res, rw, again) {
   openPanel(() => {
     let h = `<div class="ph"><h2 style="color:${res.win ? 'var(--go)' : 'var(--heat)'}">${res.win ? 'DUB' : 'L'} · ${res.score[0]} — ${res.score[1]}</h2></div><div class="pb">`;
     h += `<div class="card sel"><div class="row" style="flex-wrap:wrap;gap:18px"><div><div class="mu f">VC</div><div class="big ye" id="rvc">0</div></div><div><div class="mu f">RESPECT</div><div class="big cy" id="rrep">0</div></div><div class="g"><div class="mu f">BADGE XP</div>${['F', 'S', 'P', 'D'].map(c => `<span class="tag" style="color:${CATS[c][1]}">${CATS[c][0]} +${rw.bxp[c]}</span>`).join(' ')}${rw.pts.length ? `<p class="buff">${rw.pts.join(' · ')}</p>` : ''}</div></div>${rw.notes.length ? `<p class="buff">${rw.notes.join(' · ')}</p>` : ''}</div>`;
-    h += `<div class="card"><table><tr><th>PLAYER</th><th>PTS</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>ANK</th><th>FG</th></tr>` + res.box.map(b => `<tr style="color:${b.user ? 'var(--gold)' : b.team === 0 ? 'var(--ice)' : '#ff9ab8'}"><td>${esc(b.n)}</td><td>${b.s.pts}</td><td>${b.s.ast}</td><td>${b.s.reb}</td><td>${b.s.stl}</td><td>${b.s.blk}</td><td>${b.s.ankles}</td><td>${b.s.fgm}/${b.s.fga}</td></tr>`).join('') + `</table></div>`;
+    h += `<div class="card"><table><tr><th>PLAYER</th><th>PTS</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>ANK</th><th>PF</th><th>FG</th></tr>` + res.box.map(b => `<tr style="color:${b.user ? 'var(--gold)' : b.team === 0 ? 'var(--ice)' : '#ff9ab8'}"><td>${esc(b.n)}</td><td>${b.s.pts}</td><td>${b.s.ast}</td><td>${b.s.reb}</td><td>${b.s.stl}</td><td>${b.s.blk}</td><td>${b.s.ankles}</td><td>${b.s.fouls || 0}</td><td>${b.s.fgm}/${b.s.fga}</td></tr>`).join('') + `</table></div>`;
     h += `<p class="mu">${s.greens} greens · ${s.dunks} dunks · ${s.threes} deep balls · ${s.bravs} Bravado</p>`;
     return h + `</div><div class="pf">${again ? Btn('RUN IT BACK', again) : ''}${Btn('BACK TO THE CAGES', uiClose, again ? 'alt' : '')}</div>`;
   });
@@ -4217,14 +4411,17 @@ const BSTATES = ['held', 'shot', 'through', 'pass', 'loose'];
 const r2 = v => Math.round(v * 100) / 100;
 
 // ---------- builds on the wire ----------
+// an animation profile on the wire: rounded numbers, a few dozen bytes
+function packAnim(a) { const r = v => Math.round(v * 100) / 100, o = { s: [r(a.shot.trad), r(a.shot.high), r(a.shot.quick)], i: [r(a.idle.relaxed), r(a.idle.athletic), r(a.idle.wide)], h: a.hand }; for (const [k] of PROF_KEYS) o[k] = r(a[k]); return o; }
+function unpackAnim(o) { if (!o || !Array.isArray(o.s) || !Array.isArray(o.i)) return undefined; const a = { shot: { trad: o.s[0], high: o.s[1], quick: o.s[2] }, idle: { relaxed: o.i[0], athletic: o.i[1], wide: o.i[2] }, hand: o.h }; for (const [k] of PROF_KEYS) a[k] = o[k]; return a; }
 function packBuild(b) {
-  return { n: b.name, st: b.build.style, og: b.build.origin, h: b.build.body.h, w: r2(b.build.body.w), s: r2(b.build.body.s), sk: b.build.skin, a: ATTRS.map(a => b.attrs[a.id]), bd: b.badges, wn: SLOTS.map(s => b.worn[s[0]]), mv: [b.moves.side, b.moves.back, b.moves.diag, b.moves.jumper, b.moves.dunk, b.moves.celeb] };
+  return { n: b.name, st: b.build.style, og: b.build.origin, h: b.build.body.h, w: r2(b.build.body.w), s: r2(b.build.body.s), sk: b.build.skin, a: ATTRS.map(a => b.attrs[a.id]), bd: b.badges, wn: SLOTS.map(s => b.worn[s[0]]), mv: [b.moves.side, b.moves.back, b.moves.diag, b.moves.jumper, b.moves.dunk, b.moves.celeb], an: b.anim ? packAnim(b.anim) : undefined };
 }
 function unpackBuild(c) {
   try {
     if (!c || typeof c !== 'object' || !Array.isArray(c.a) || !Array.isArray(c.wn) || !Array.isArray(c.mv)) return null;
     const attrs = {}; ATTRS.forEach((a, i) => attrs[a.id] = c.a[i]); const worn = {}; SLOTS.forEach((s, i) => worn[s[0]] = c.wn[i]);
-    return sanitizeBuild({ name: c.n, build: { style: c.st, origin: c.og, body: { h: c.h, w: c.w, s: c.s }, skin: c.sk }, attrs, badges: c.bd || {}, worn, moves: { side: c.mv[0], back: c.mv[1], diag: c.mv[2], jumper: c.mv[3], dunk: c.mv[4], celeb: c.mv[5] } });
+    return sanitizeBuild({ name: c.n, build: { style: c.st, origin: c.og, body: { h: c.h, w: c.w, s: c.s }, skin: c.sk }, attrs, badges: c.bd || {}, worn, moves: { side: c.mv[0], back: c.mv[1], diag: c.mv[2], jumper: c.mv[3], dunk: c.mv[4], celeb: c.mv[5] }, anim: unpackAnim(c.an) });
   } catch (e) { return null; }
 }
 
@@ -4931,11 +5128,13 @@ function devLeave() {
 }
 function devPreview(an, o) { DEV.prev = { an, o: o || {}, t0: ST ? ST.t : 0 }; if (ST) ST.devPose = DEV.prev; }
 function devRender() {
-  const tabs = [['profile', 'PROFILE'], ['build', 'BUILD'], ['moves', 'MOVES'], ['play', 'PLAY'], ['reel', 'REEL']];
+  const tabs = [['profile', 'PROFILE'], ['build', 'BUILD'], ['moves', 'MOVES'], ['anim', 'ANIM LAB'], ['play', 'PLAY'], ['reel', 'REEL']];
   let h = `<div class="ph"><h2>DEV ROOM</h2></div><div class="tabs">` + tabs.map(([k, n]) => Btn(n, () => { DEV.tab = k; rerender(true); }, 'sm ' + (DEV.tab === k ? '' : 'alt'))).join('') + `</div><div class="pb">`;
   h += `<div class="card"><div class="row" style="gap:12px"><div class="ovr">${ovrOf(S.attrs)}</div><div><div class="f" style="font-size:18px">${esc(S.name)}</div><div class="mu">${STYLE[S.build.style].n} · ${fmtH(S.build.body.h)} · ${RANKS[rankOf(S.rep)].n}${S.devBak ? ' · <span class="ye">dev player (your real one is saved)</span>' : ''}</div></div></div></div>`;
   const t = DEV.tab;
-  if (t === 'profile') {
+  if (t === 'anim') {
+    h += `<div class="card"><h3>ANIM LAB</h3><p>Every player has a movement profile: how their jump shot blends the three foundations (traditional, high release, quick release), how they stand around (relaxed, athletic, wide), and their posture and timing. It is cosmetic: it never changes release timing or any rating.</p><p style="margin-top:6px">Two players side by side, any action or transition, slow motion, pause and frame step, sliders for the left one, save to your builds or homies.</p><div style="margin-top:6px">${Btn('OPEN ANIM LAB', () => { uiClose(); alabOpen(); })}</div></div>`;
+  } else if (t === 'profile') {
     h += `<div class="card"><h3>MAXED OUT</h3><p>Every attribute 99, every badge iced out, every move, jumper, dunk, celebration and piece of drip owned, top rank, 250,000 VC. The flashiest package is equipped.</p><div style="margin-top:6px">${Btn('MAX ME OUT', () => { devMax(); devRig(); sfx('unlock'); toast('MAXED OUT', '99 everything. Go look in the mirror.', 'rank'); rerender(); })}</div></div>`;
     h += `<div class="card"><h3>YOUR REAL PLAYER</h3><p>${S.devBak ? `Saved: <b>${esc(S.devBak.name)}</b>, ${ovrOf(S.devBak.attrs)} OVR, ${S.devBak.vc.toLocaleString()} VC. Restoring puts everything back exactly as it was, and throws away the dev changes.` : 'Nothing changed yet. The first change made here puts your real player aside so you can get them back.'}</p>${S.devBak ? `<div style="margin-top:6px">${Btn('RESTORE MY PLAYER', () => { devRestore(); devRig(); sfx('uiok'); toast('RESTORED', 'Back to the real you.'); rerender(); }, 'alt')}</div>` : ''}</div>`;
     h += `<div class="card"><h3>WORLD</h3><p>Weather today: <b>${todayWeather()}</b>${weatherOverride ? ' (forced)' : ''}. It changes by the day; force it here to look around.</p><div style="margin-top:6px">${['clear', 'drizzle', 'fog'].map(w => Btn(w, () => { weatherOverride = w; toast('WEATHER', w + ' (next place you enter)'); rerender(); }, 'sm ' + (weatherOverride === w ? '' : 'alt'))).join(' ')} ${Btn('by the day', () => { weatherOverride = null; rerender(); }, 'sm alt')}</div>
@@ -5073,6 +5272,92 @@ function reelThink(p, dt) {
   if ((p.st === 'free' && R.t > 1.3 && (!e.then || Object.keys(R.done).length === e.then.length)) || R.t > 4) { R.i = (R.i + 1) % R.list.length; R.ph = 'setup'; R.t = 0; }
 }
 addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.created) { ev.preventDefault(); uiDev('hub'); } });
+// GOT NEXT — ANIM LAB (developer only, inside the Dev Room): two players side by side doing the same action, the
+// profile of the left one on sliders. Preview the foundational styles, blends, transitions; slow it down, pause, step
+// a frame; save the profile to one of your builds or a homie, or reset it to the defaults its build gives it.
+'use strict';
+const ALAB = { a: null, b: null, act: 'shoot', speed: 1, paused: false, ball: true, t: 0, step: 0, prof: null, solo: null, ui: 'blend' };
+const ALAB_ACTS = [
+  ['shoot', 'Jump shot'], ['fake', 'Pump fake'], ['idle', 'Idle'], ['dribble', 'Dribble'], ['hold', 'Triple threat'], ['slide', 'Defense'], ['run', 'Run'], ['walk', 'Walk'], ['pass', 'Pass'], ['jump', 'Contest'],
+  ['seq:idle,shoot,run', 'Idle → shot → land → run'], ['seq:dribble,shoot,idle', 'Dribble → shot'], ['seq:dribble,pass,idle', 'Dribble → pass'], ['seq:run,idle', 'Run → stop'], ['seq:slide,run,dribble', 'Defense → run → offense'], ['seq:walk,run,idle', 'Walk → run → stop'],
+];
+const ALAB_DUR = { shoot: 1.05, fake: 0.7, pass: 0.6, jump: 0.8, idle: 1.0, dribble: 1.1, hold: 1.0, slide: 1.1, run: 1.2, walk: 1.2 };
+// who you can pick: your builds, your homies, and built-in players of every style
+function alabCast() {
+  const L = [];
+  (S.slots || []).forEach((t, i) => L.push({ k: 'slot', i, n: t.name + (i === S.slot ? ' (active)' : ''), spec: Object.assign({}, i === S.slot ? myBuild() : { name: t.name, build: t.build, attrs: t.attrs, badges: t.badges, worn: t.worn, moves: t.moves, anim: t.anim }) }));
+  (S.homies || []).forEach((h, i) => L.push({ k: 'homie', i, n: h.name + ' (homie)', spec: h }));
+  for (const s of STYLES) L.push({ k: 'ai', n: s.n + ' (built-in)', spec: Object.assign(aiBuild(80, s.id), { name: s.n.toUpperCase() }) });
+  return L;
+}
+function alabOpen() {
+  disposeScene(scene); scene = new THREE.Scene(); W = null; MT = null; scene.background = new THREE.Color(0x141418); baseLights(scene, 0xffe8d8, 0x30303a, 0xffffff, 1.6);
+  const g = M(new THREE.PlaneGeometry(40, 40), toon('#2a2a31'), 0, 0, 0, scene); g.rotation.x = -Math.PI / 2;
+  for (const x of [-1, 1]) ink(M(cyl(0.45, 0.5, 0.04, 20), toon('#3a3a44'), x * 0.6, 0.02, 0, scene), 1.02);
+  ST = { kind: 'alab', t: 0 }; const cast = alabCast(); ALAB.cast = cast; if (ALAB.ai === undefined) { ALAB.ai = 0; ALAB.bi = Math.min(cast.length - 1, (S.slots || []).length + (S.homies || []).length + 1); }
+  alabRigs(); document.body.dataset.state = 'create'; openPanel(alabRender, 'side', () => { uiClose(); uiDev(); });
+}
+function alabRigs() {
+  for (const k of ['a', 'b']) if (ALAB[k]) { scene.remove(ALAB[k].R.root); if (ALAB[k].ball) scene.remove(ALAB[k].ball); }
+  const mk = (c, x) => { const R = makeRig(c.spec); R.root.position.set(x, 0, 0); scene.add(R.root); const ball = makeBall('bl_std'); scene.add(ball); return { R, c, x, ball, y: 0, an: null }; };
+  ALAB.a = mk(ALAB.cast[ALAB.ai], -0.6); ALAB.b = mk(ALAB.cast[ALAB.bi], 0.6); ALAB.prof = JSON.parse(JSON.stringify(ALAB.a.R.prof)); ALAB.a.R.prof = ALAB.prof; ALAB.t = 0;
+}
+// what a player is doing at lab time t: a single action loops; a sequence plays its parts back to back
+function alabAt(t) {
+  const act = ALAB.act; if (!act.startsWith('seq:')) { const d = ALAB_DUR[act] || 1; return { an: act, t: t % (d + 0.5), d }; }
+  const parts = act.slice(4).split(','), tot = parts.reduce((s, a) => s + (ALAB_DUR[a] || 1), 0); let u = t % tot;
+  for (const a of parts) { const d = ALAB_DUR[a] || 1; if (u < d) return { an: a, t: u, d }; u -= d; } return { an: parts[0], t: 0, d: 1 };
+}
+function alabPose(F, s, dt) {
+  const R = F.R, prof = R.prof; let an = s.an, P, y = 0, o = { leg: R.legLen, prof };
+  if (an === 'shoot' || an === 'fake') { const rel = an === 'fake' ? 0.6 : 0.6, u = s.t / rel; o.rel = rel; o.n = 1; P = poseOf(an, s.t, o); if (an === 'shoot') y = u > 0.62 && u < 1.42 ? 0.42 * Math.sin(Math.PI * (u - 0.62) / 0.8) : 0; }
+  else if (an === 'run') { const psi = (s.t * 1.45) % 1; P = poseOf('sprint', 0, { psi, duty: 0.33, k: 0.6, hipA: 1.1, flight: 0.08, thigh: R.thigh, shin: R.shin }); profilePosture(P, 'run', prof); }
+  else if (an === 'walk') { P = poseOf('gait', 0, { psi: (s.t * 0.95) % 1, amp: 1, hipA: 1, swag: 0.35 + prof.swag * 0.8, thigh: R.thigh, shin: R.shin, leg: R.legLen }); }
+  else if (an === 'dribble') { o.sp = 0; o.ph = s.t * 7; o.dr = 0.8; o.hand = prof.hand; P = poseOf('dribble', s.t, o); profilePosture(P, 'dribble', prof); }
+  else if (an === 'slide') { o.ph = s.t * 6; o.up = true; P = poseOf('slide', s.t, o); profilePosture(P, 'slide', prof); }
+  else if (an === 'jump') { P = poseOf('jump', s.t, o); y = s.t < 0.6 ? 0.5 * Math.sin(Math.PI * s.t / 0.6) : 0; }
+  else P = poseOf(an, an === 'idle' ? ALAB.t : s.t, o);
+  F.y = y; landLayer(P, R, F, dt, prof);
+  if (an !== F.an) { F.rate = transRate(F.an || an, an); F.trT = 0; F.an = an; } F.trT = (F.trT || 0) + dt; if (F.trT < 2.5 / F.rate) P.rate = Math.max(P.rate || 16, F.rate);
+  applyPose(R, P, dt); R.root.position.y = y; R.root.updateMatrixWorld(true);
+  // the ball: in the hands, up into the shooting hand, gone at the release; bouncing under the dribble hand
+  const B = F.ball; B.visible = ALAB.ball && an !== 'run' && an !== 'walk' && an !== 'slide' && an !== 'jump' && an !== 'idle';
+  if (B.visible) { const sh = prof.hand === 'L' ? 'L' : 'R', off = sh === 'R' ? 'L' : 'R', a = new THREE.Vector3(), b = new THREE.Vector3(); handPos(R, sh, a); handPos(R, off, b);
+    if (an === 'shoot' || an === 'fake') { const u = s.t / 0.6, lift = clamp((u - 0.35) / 0.4, 0, 1); if (an === 'shoot' && u > 1) { const f = u - 1; B.position.set(F.x, a.y + f * 4.5 - f * f * 3, a.z - f * 2.2); } else { a.lerp(b, 0.5 * (1 - lift)); a.y += 0.06 + 0.05 * lift; B.position.copy(a); } }
+    else if (an === 'dribble') { handPos(R, prof.hand === 'L' ? 'L' : 'R', a); const c = Math.abs(Math.sin(s.t * 7 / 2)); B.position.set(a.x, 0.12 + (a.y - 0.18) * c, a.z + 0.05); }
+    else if (an === 'pass') { const f = s.t / 0.6; a.lerp(b, 0.5); B.position.set(a.x, a.y, a.z + (f > 0.45 ? (f - 0.45) * 6 : 0)); }
+    else { a.lerp(b, 0.5); B.position.copy(a); } }
+}
+function alabStep(dt) {
+  const step = ALAB.step; ALAB.step = 0; const d = ALAB.paused ? step : dt * ALAB.speed; ALAB.t += d;
+  const s = alabAt(ALAB.t); for (const F of [ALAB.a, ALAB.b]) if (F) { F.R.root.rotation.y = ALAB.view || 0.5; alabPose(F, s, Math.max(d, 1e-4)); }
+  const lab = $('alabT'); if (lab) lab.textContent = `${s.an} · ${s.t.toFixed(2)} s` + (s.an === 'shoot' ? ` · u ${(s.t / 0.6).toFixed(2)} (${shotPhaseName(s.t / 0.6)})` : '');
+  const portrait = innerWidth < innerHeight; if (portrait) { camera.position.set(0, 1.6, 5.2); camera.lookAt(0, 0.6, 0); } else {      // the panel covers the right of the screen: aim so both players stand in the part you can see
+    const pn = $('panel'), pf = pn && pn.style.display !== 'none' ? clamp(pn.getBoundingClientRect().left / innerWidth, 0.3, 1) : 1, d = 5.4, hw = d * Math.tan(camera.fov * Math.PI / 360) * camera.aspect, cx = (1 - pf) * hw;
+    camera.position.set(cx, 1.45, d); camera.lookAt(cx, 1.0, 0); }
+}
+function shotPhaseName(u) { let n = 'gather'; for (const k in SHOT_PH) if (u >= SHOT_PH[k]) n = k; return n; }
+function alabPick(k, v) { ALAB[k] = +v; alabRigs(); rerender(); }
+window.alabPick = alabPick;      /* the cast pickers are <select>s: an inline onchange needs a global */
+function alabRender() {
+  const P = ALAB.prof, cast = ALAB.cast, A = cast[ALAB.ai], sl = (lbl, v, lo, hi, st, fn, id) => `<label class="sl">${lbl} <b id="${id}">${(+v).toFixed(2)}</b></label><input type="range" min="${lo}" max="${hi}" step="${st}" value="${v}" data-k="${on(el => { fn(+el.value); $(id).textContent = (+el.value).toFixed(2); })}">`;
+  let h = `<div class="ph"><h2>ANIM LAB</h2>${Btn('✕', () => { uiClose(); uiDev(); }, 'alt sm')}</div><div class="pb">`;
+  h += `<div class="card"><div class="row"><b>LEFT</b><select onchange="alabPick('ai', this.value)">${cast.map((c, i) => `<option value="${i}" ${i === ALAB.ai ? 'selected' : ''}>${esc(c.n)}</option>`).join('')}</select></div>`
+    + `<div class="row" style="margin-top:4px"><b>RIGHT</b><select onchange="alabPick('bi', this.value)">${cast.map((c, i) => `<option value="${i}" ${i === ALAB.bi ? 'selected' : ''}>${esc(c.n)}</option>`).join('')}</select></div><p class="mu" id="alabT" style="margin-top:6px">—</p></div>`;
+  h += `<div class="cat">ACTION</div><div class="card">` + ALAB_ACTS.map(([k, n]) => Btn(n, () => { ALAB.act = k; ALAB.t = 0; rerender(); }, 'sm ' + (ALAB.act === k ? '' : 'alt'))).join(' ') + `</div>`;
+  h += `<div class="cat">PLAYBACK</div><div class="card">${sl('SPEED', ALAB.speed, 0.05, 2, 0.05, v => { ALAB.speed = v; }, 'alS')}<div style="margin-top:6px">${Btn(ALAB.paused ? '▶ PLAY' : '❚❚ PAUSE', () => { ALAB.paused = !ALAB.paused; rerender(); }, 'sm')} ${Btn('◀ FRAME', () => { ALAB.paused = true; ALAB.t = Math.max(0, ALAB.t - 2 / 60); ALAB.step = 1 / 60; rerender(); }, 'sm alt')} ${Btn('FRAME ▶', () => { ALAB.paused = true; ALAB.step = 1 / 60; rerender(); }, 'sm alt')} ${Btn('RESTART', () => { ALAB.t = 0; }, 'sm alt')} ${Btn(ALAB.ball ? 'BALL: ON' : 'BALL: OFF', () => { ALAB.ball = !ALAB.ball; rerender(); }, 'sm alt')}</div>`
+    + sl('TURN', ALAB.view === undefined ? 0.5 : ALAB.view, -3.14, 3.14, 0.05, v => { ALAB.view = v; }, 'alV') + `</div>`;
+  h += `<div class="cat">LEFT PLAYER'S PROFILE <span class="mu" style="text-transform:none;letter-spacing:.02em">— cosmetic only, never changes a gameplay number</span></div><div class="card"><h3>JUMP SHOT BLEND</h3>`;
+  const wset = (g, k) => v => { P[g][k] = v; const n = normW(P[g]); Object.assign(P[g], n); for (const kk in n) { const e = $('al_' + g + kk); if (e) e.textContent = n[kk].toFixed(2); } };
+  for (const [k, n] of SHOT_STYLES) h += sl(n.toUpperCase(), P.shot[k], 0, 1, 0.01, wset('shot', k), 'al_shot' + k);
+  h += `<h3 style="margin-top:8px">IDLE BLEND</h3>`; for (const [k, n] of IDLE_STYLES) h += sl(n.toUpperCase(), P.idle[k], 0, 1, 0.01, wset('idle', k), 'al_idle' + k);
+  h += `<h3 style="margin-top:8px">POSTURE AND TIMING</h3><div style="margin:4px 0">${Btn('SHOOTS ' + (P.hand === 'L' ? 'LEFT' : 'RIGHT'), () => { P.hand = P.hand === 'L' ? 'R' : 'L'; rerender(); }, 'sm alt')}</div>`;
+  for (const [k, n, lo, hi] of PROF_KEYS) h += sl(n.toUpperCase(), P[k], lo, hi, 0.01, v => { P[k] = v; }, 'al_' + k);
+  const canSave = A.k === 'slot' || A.k === 'homie';
+  h += `<div style="margin-top:8px">${Btn('SAVE PROFILE', () => { const c = JSON.parse(JSON.stringify(P)); if (A.k === 'slot') { if (A.i === S.slot) S.anim = c; else S.slots[A.i].anim = c; } else if (A.k === 'homie') S.homies[A.i].anim = c; save(); sfx('unlock'); toast('PROFILE SAVED', A.n + ' moves like this now, everywhere.'); }, 'sm', !canSave)} ${Btn('RESET TO DEFAULTS', () => { const sp = Object.assign({}, A.spec, { anim: undefined }); ALAB.prof = profileFromBuild(sp); ALAB.a.R.prof = ALAB.prof; if (canSave) { if (A.k === 'slot') { if (A.i === S.slot) S.anim = null; else S.slots[A.i].anim = null; } else S.homies[A.i].anim = null; save(); } rerender(); }, 'sm alt')}</div>`
+    + `<p class="mu" style="margin-top:6px">${canSave ? 'Saving writes this profile to ' + esc(A.n) + ': it shows in games, on the Block, and to friends online.' : 'Built-in players get their profile from their name and build, so it is the same every time you meet them. Save is for your builds and homies.'}</p></div>`;
+  return h + `</div>`;
+}
 // GOT NEXT — boot, the loop, rewards
 'use strict';
 let ST = null;   // studio / title scene state
@@ -5102,6 +5387,7 @@ function studioScene() {
 function studioRig(spec) { if (ST.rig) scene.remove(ST.rig.root); ST.rig = makeRig(spec); scene.add(ST.rig.root); ST.H = ST.rig.H; }
 function studioStep(dt) {
   ST.t += dt; const portrait = innerWidth < innerHeight;
+  if (ST.kind === 'alab') { alabStep(dt); return; }
   if (ST.kind === 'title') {
     for (const [r, an, o] of ST.rigs) applyPose(r, poseOf(an, ST.t, o), dt);
     handPos(ST.dunker, 'R', ST.ball.position); ST.ball.position.y += 0.1;
@@ -5236,7 +5522,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s) => startShot(p, s), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), packBuild: b => packBuild(b), unpackBuild: c => unpackBuild(c), myBuild: () => myBuild(), shotPose: (a, u, n) => shotPose(a, u, n), idlePose: (a, t, o) => idlePose(a, t, o), profileFromBuild: s => profileFromBuild(s), animProfile: s => animProfile(s), alabOpen: () => alabOpen(), get ALAB() { return ALAB; }, uiDev: b => uiDev(b), aiBuild: (o, r) => aiBuild(o, r), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s) => startShot(p, s), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera); window.__info = () => { let m = 0, s = 0, t = 0; scene.traverse(o => { if (o.isSprite) s++; else if (o.isMesh) m++; }); return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, meshes: m, sprites: s }; };
   // test hook: draw the player in one pose and hand back the frame
