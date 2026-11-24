@@ -66,6 +66,23 @@ How he moves (v0.4):
 
 ![the lyric poses, each with one of the new faces](asset/lil-bottie-lyric-poses.png)
 
+## v0.6: taller, better hair, and moves for every song
+
+- **Taller:** longer thighs and shins (about 1.63 units, was 1.5) and a slightly smaller head.
+- **Helmet and hair:** the dome now ends in a rolled rim with a dark head of hair under it, and 43 dreads in
+  three groups: an outer row round the back from ear to ear, a shorter inner row so the back is thick, and three
+  each side that frame the screen and fall down his chest.
+- **15 more poses** from his other songs: boot, shiver, hot, crash, glitch, key, wait, boom, mic, wrist, hear, see,
+  sleep, swipe, gang. **More faces:** cold, overheat, glitch, cry, grit, cheeky, starry, zeroed, lookup.
+  **More icons:** power, fire, snow, key, wifi, nuke, ghost, load, check, 100, ZZZ, ERR, GM, OK, :(.
+- **`LilBottie.suggest(line)`** picks a pose, eyes, mouth and icon for any lyric line from the words in it.
+- **`lyrics/all-songs.json`** holds every saved lyric from the archive (13 songs, word for word). `index.html` has
+  a song picker: The Algorithm plays with its recording; the other 12 are silent run-throughs at one line a bar,
+  because their recordings are not in this repo, with moves chosen by `suggest`.
+
+![hair and helmet from six angles](asset/lil-bottie-hair.png)
+![the newer poses and faces](asset/lil-bottie-more-poses.png)
+
 ## The Algorithm, line by line
 
 `lyrics/the-algorithm.choreo.json` gives every one of the 52 lines a pose, eyes, a resting mouth and (for some)

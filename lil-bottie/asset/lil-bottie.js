@@ -61,19 +61,19 @@
     var PANT = 0x101016, PANT2 = 0x24242e, KNEE = 0x30303c;
     var legs = [];
     [-1, 1].forEach(function (s) {
-      var hip = new THREE.Group(); hip.position.set(s * .13, .42, 0); body.add(hip);
-      hip.add(new THREE.Mesh(bake([P(Cyl(.125, .112, .2, 8), PANT, M(0, -.1, 0, 0, 0, 0, 1, 1, 1.1)), P(Box(.012, .2, .03), PANT2, M(s * .118, -.1, 0)), P(Box(.09, .07, .02), PANT2, M(s * .03, -.07, .128))]), clothM));   // thigh, side seam, pocket
-      var knee = new THREE.Group(); knee.position.y = -.2; hip.add(knee);
-      knee.add(new THREE.Mesh(bake([P(Sph(.112, 8, 6), PANT, M(0, 0, 0, 0, 0, 0, 1, .8, 1.1)), P(Sph(.075, 8, 6), KNEE, M(0, -.005, .075, 0, 0, 0, 1.1, .9, .55)), P(Box(.15, .012, .02), PANT2, M(0, .045, .1)), P(Box(.15, .012, .02), PANT2, M(0, -.055, .1)),
-        P(Cyl(.108, .1, .13, 8), PANT, M(0, -.075, 0, 0, 0, 0, 1, 1, 1.08)), P(Cyl(.112, .116, .035, 8), PANT2, M(0, -.125, 0, 0, 0, 0, 1, 1, 1.1)), P(Cyl(.116, .11, .035, 8), PANT, M(0, -.155, 0, 0, 0, 0, 1, 1, 1.1)), P(Box(.012, .15, .03), PANT2, M(s * .104, -.08, 0))]), clothM));   // kneecap, creases, shin, stacked cuffs
-      var foot = new THREE.Group(); foot.position.y = -.17; knee.add(foot);
+      var hip = new THREE.Group(); hip.position.set(s * .13, .56, 0); body.add(hip);
+      hip.add(new THREE.Mesh(bake([P(Cyl(.125, .11, .27, 8), PANT, M(0, -.135, 0, 0, 0, 0, 1, 1, 1.1)), P(Box(.012, .27, .03), PANT2, M(s * .117, -.135, 0)), P(Box(.09, .07, .02), PANT2, M(s * .03, -.08, .128))]), clothM));   // thigh, side seam, pocket
+      var knee = new THREE.Group(); knee.position.y = -.27; hip.add(knee);
+      knee.add(new THREE.Mesh(bake([P(Sph(.11, 8, 6), PANT, M(0, 0, 0, 0, 0, 0, 1, .8, 1.1)), P(Sph(.075, 8, 6), KNEE, M(0, -.005, .075, 0, 0, 0, 1.1, .9, .55)), P(Box(.15, .012, .02), PANT2, M(0, .045, .1)), P(Box(.15, .012, .02), PANT2, M(0, -.055, .1)),
+        P(Cyl(.106, .098, .2, 8), PANT, M(0, -.11, 0, 0, 0, 0, 1, 1, 1.08)), P(Cyl(.11, .116, .035, 8), PANT2, M(0, -.195, 0, 0, 0, 0, 1, 1, 1.1)), P(Cyl(.116, .11, .035, 8), PANT, M(0, -.225, 0, 0, 0, 0, 1, 1, 1.1)), P(Box(.012, .2, .03), PANT2, M(s * .102, -.11, 0))]), clothM));   // kneecap, creases, shin, stacked cuffs
+      var foot = new THREE.Group(); foot.position.y = -.24; knee.add(foot);
       foot.add(new THREE.Mesh(bake([P(Box(.2, .085, .26), 0x16161c, M(0, -.02, .02)), P(Box(.2, .07, .1), 0x2a2a34, M(0, -.03, .18)), P(Box(.15, .05, .09), 0x16161c, M(0, .03, .07, -.5)), P(Box(.19, .04, .05), 0x2a2a34, M(0, .0, -.12))]), clothM));
       foot.add(new THREE.Mesh(bake([P(Box(.215, .032, .36), 0xdfe4ee, M(0, -.072, .05)), P(Box(.05, .05, .012), CHROME, M(0, .0, -.148)), P(Box(.1, .012, .012), 0xdfe4ee, M(0, .035, .1)), P(Box(.1, .012, .012), 0xdfe4ee, M(0, .05, .075)), P(Box(.012, .03, .12), CHROME2, M(s * .102, -.02, .03))]), chromeM));   // sole, heel tab, laces, side stripe
       legs.push({ hip: hip, knee: knee, foot: foot, s: s });
     });
 
     // ---- torso: black hoodie core, silver puffer over it, open down the front
-    var torso = new THREE.Group(); torso.position.y = .4; body.add(torso);
+    var torso = new THREE.Group(); torso.position.y = .54; body.add(torso);
     var T = [P(Cyl(.2, .25, .5, 10), BLACK, M(0, .25, 0)), P(Box(.3, .1, .1), BLACK2, M(0, .14, .22))];   // hoodie + pouch pocket
     T.push(P(Cyl(.02, .02, .2, 5), BLACK2, M(-.06, .38, .23)), P(Cyl(.02, .02, .16, 5), BLACK2, M(.06, .4, .23)));   // hood strings
     T.push(P(Sph(.2, 10, 7), BLACK, M(0, .6, -.13, 0, 0, 0, 1.15, .55, .8)), P(Sph(.13, 8, 6), BLACK2, M(0, .57, -.24, 0, 0, 0, 1.2, .7, .7)), P(Cyl(.15, .2, .08, 10), BLACK2, M(0, .56, .0)));   // the hood, bunched behind the neck
@@ -129,8 +129,8 @@
     torso.add(new THREE.Mesh(bake(N), chromeM));
 
     // ---- head: riveted chrome dome, ear cups, a black screen with the LED face
-    var head = new THREE.Group(); head.position.y = .725; head.scale.setScalar(.93); torso.add(head);
-    var Hh = [P(new THREE.SphereGeometry(.3, 12, 8, 0, TAU, 0, Math.PI * .62), CHROME, M(0, .2, 0)), P(Cyl(.285, .26, .12, 12), CHROME2, M(0, .07, 0)), P(Cyl(.2, .16, .06, 10), CHROME2, M(0, 0, 0))];
+    var head = new THREE.Group(); head.position.y = .725; head.scale.setScalar(.9); torso.add(head);
+    var Hh = [P(new THREE.SphereGeometry(.3, 12, 8, 0, TAU, 0, Math.PI * .62), CHROME, M(0, .2, 0)), P(Cyl(.31, .302, .04, 14), CHROME2, M(0, .11, 0)), P(Cyl(.16, .13, .1, 10), 0x4a4e58, M(0, -.02, 0))];   // the dome ends in a rolled rim; the hair comes out from under it
     for (var rr = 0; rr < 3; rr++) for (var q = 0; q < 14; q++) { var ra = q / 14 * TAU + rr * .22, el2 = .5 + rr * .42, rx = Math.sin(ra) * Math.sin(el2) * .3, ry = .2 + Math.cos(el2) * .3, rz = Math.cos(ra) * Math.sin(el2) * .3; if (rz > .16 && ry < .34) continue; Hh.push(P(Sph(.016, 5, 4), 0xeef2f8, M(rx, ry, rz))); }
     [-1, 1].forEach(function (s) { Hh.push(P(Cyl(.085, .085, .06, 12), CHROME2, M(s * .29, .16, 0, 0, 0, Math.PI / 2)), P(Cyl(.05, .05, .07, 10), 0x4a4e58, M(s * .3, .16, 0, 0, 0, Math.PI / 2))); });
     Hh.push(P(Box(.46, .34, .06), CHROME2, M(0, .17, .255)), P(Box(.41, .29, .07), 0x050508, M(0, .17, .262)));   // bezel and glass
@@ -146,19 +146,24 @@
     // ---- dreads: each one is a chain of five points joined by four segments. The points are simulated (they have
     //      weight and momentum) and are pushed out of the head, jacket, hood, shoulders and arms, so they drape
     //      over him and cannot pass through him.
-    var dreadGeo = bake([P(Cyl(.021, .019, .09, 5), 0x101014, M(0, -.045, 0)), P(Cyl(.019, .02, .08, 5), 0x1a1a22, M(0, -.13, 0)), P(Cyl(.023, .023, .014, 5), 0x2a2a36, M(0, -.088, 0))]);   // one segment, .17 long
-    var tipGeo = bake([P(Sph(.022, 5, 4), 0x30303c, M(0, -.012, 0))]);
+    var hairM = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
+    // a head of hair under the helmet: a dark cap inside the rim and a band at the back and sides, so there is never chrome or a gap where a dread starts
+    head.add(new THREE.Mesh(bake([P(new THREE.CylinderGeometry(.285, .25, .16, 16, 1, true, .78, TAU - 1.56), 0x0c0c10, M(0, .03, 0)), P(new THREE.CylinderGeometry(.265, .215, .12, 16, 1, true, .95, TAU - 1.9), 0x14141a, M(0, -.06, -.01)),
+      P(new THREE.CircleGeometry(.295, 16), 0x0a0a0e, M(0, .1, 0, Math.PI / 2)), P(Sph(.2, 10, 7), 0x0c0c10, M(0, .0, -.1, 0, 0, 0, 1.15, .7, .9))]), hairM));
+    var dreadGeo = bake([P(Cyl(.024, .022, .09, 5), 0x101014, M(0, -.045, 0)), P(Cyl(.022, .023, .08, 5), 0x1a1a22, M(0, -.13, 0)), P(Cyl(.026, .026, .014, 5), 0x2a2a36, M(0, -.088, 0))]);   // one segment, .17 long
+    var tipGeo = bake([P(Sph(.024, 5, 4), 0x30303c, M(0, -.012, 0))]);
     var dreadLayer = new THREE.Group(); group.add(dreadLayer);
     var dreads = [], dseed = 7, DOWN = new THREE.Vector3(0, -1, 0);
     function drand() { dseed = (dseed * 16807) % 2147483647; return dseed / 2147483647; }
-    function dread(a, len) {
-      var D = { a: a, root: new THREE.Vector3(Math.sin(a) * .25, .07, Math.cos(a) * .25), segL: len / 4, th: .9 + drand() * .4, pts: [], prev: [], mesh: [], drag: .25 + drand() * .2, n: dreads.length, rp: new THREE.Vector3(), rn: new THREE.Vector3() };
+    function dread(a, len, rad, y) {
+      var D = { a: a, root: new THREE.Vector3(Math.sin(a) * rad, y, Math.cos(a) * rad), segL: len / 4, th: .9 + drand() * .4, pts: [], prev: [], mesh: [], drag: .25 + drand() * .2, n: dreads.length, rp: new THREE.Vector3(), rn: new THREE.Vector3() };
       for (var i = 0; i < 5; i++) { D.pts.push(new THREE.Vector3()); D.prev.push(new THREE.Vector3()); }
       for (var j = 0; j < 4; j++) { var m = new THREE.Mesh(dreadGeo, clothM); dreadLayer.add(m); D.mesh.push(m); }
       D.tip = new THREE.Mesh(tipGeo, clothM); D.tip.scale.setScalar(D.th); dreadLayer.add(D.tip); dreads.push(D);
     }
-    for (var b = 0; b < 19; b++) dread(Math.PI * .4 + b / 18 * Math.PI * 1.2, .64 + ((b * 7) % 5) * .05);
-    [-1, 1].forEach(function (s) { dread(s * 1.0, .7); dread(s * 1.22, .78); dread(s * .8, .5); });
+    for (var b = 0; b < 23; b++) dread(Math.PI * .36 + b / 22 * Math.PI * 1.28, .68 + ((b * 7) % 5) * .05, .262, .05);   // the outer row, round the back from ear to ear
+    for (var b2 = 0; b2 < 14; b2++) dread(Math.PI * .5 + b2 / 13 * Math.PI, .56 + ((b2 * 5) % 4) * .06, .2, -.02);   // an inner, shorter row, so the back is thick
+    [-1, 1].forEach(function (s) { dread(s * .98, .78, .268, .08); dread(s * 1.1, .86, .27, .07); dread(s * .86, .6, .262, .09); });   // the ones that frame his screen and fall down his chest
 
     // ---- the chain and the iced clover
     var C = []; for (var c = 0; c < 15; c++) { var u = c / 14, ca = (u - .5) * 2.2, cx = Math.sin(ca) * .17, cy = .55 - Math.cos(ca) * .13 - Math.pow(1 - Math.abs(u - .5) * 2, 1.4) * .14, cz = .2 + Math.cos(ca) * .1; C.push(P(Sph(.015, 6, 4), c % 2 ? ICE : 0xc8ced8, M(cx, cy, cz, 0, 0, 0, 1.2, .7, 1))); }
@@ -178,17 +183,21 @@
       side: { l: ['.####.', '#...##', '#...##', '.####.'], r: ['.####.', '#...##', '#...##', '.####.'] }, sleepy: { l: ['......', '######', '.####.'] }, closed: { l: ['######'] },
       heart: { l: ['.#.#..', '#####.', '#####.', '.###..', '..#...'], r: ['.#.#..', '#####.', '#####.', '.###..', '..#...'] }, dollar: { l: ['.####.', '#.#...', '.###..', '..#.#.', '####..', '..#...'], r: ['.####.', '#.#...', '.###..', '..#.#.', '####..', '..#...'] },
       spiral: { l: ['#####.', '....#.', '.##.#.', '.#..#.', '.####.'] }, x: { l: ['#...#.', '.#.#..', '..#...', '.#.#..', '#...#.'], r: ['#...#.', '.#.#..', '..#...', '.#.#..', '#...#.'] },
-      dot: { l: ['..##..', '..##..'] }, hype: { l: ['#....#', '.#..#.', '..##..'] }, wink: { l: ['..##..', '.#..#.', '#....#'], r: ['######'] }
+      dot: { l: ['..##..', '..##..'] }, squint: { l: ['......', '#....#', '.####.'] }, zero: { l: ['.####.', '#....#', '#....#', '.####.'] }, static: { l: ['#.#.#.', '.#.#.#', '#.#.#.', '.#.#.#'] }, star: { l: ['..#...', '.###..', '#####.', '.###..', '#.#.#.'] },
+      tear: { l: ['....##', '..##..', '##....', '..##..', '..##..', '.#....', '.#....'] }, up: { l: ['.####.', '#.##.#', '#....#', '.####.'] }, hype: { l: ['#....#', '.#..#.', '..##..'] }, wink: { l: ['..##..', '.#..#.', '#....#'], r: ['######'] }
     };
     var MOUTHS = {   // [row, 20 dots]
       smile: [[8, '.....#........#.....'], [9, '......#......#......'], [10, '.......######.......']], frown: [[9, '.......######.......'], [10, '......#......#......'], [11, '.....#........#.....']],
       flat: [[10, '......########......']], grin: [[8, '....############....'], [9, '....#..#..#..#.#....'], [10, '.....##########.....']], smirk: [[8, '..............#.....'], [9, '.............#......'], [10, '......#######.......']],
+      teeth: [[9, '.....##########.....'], [10, '.....#.#.#.#.#.#....'], [11, '.....##########.....']], wavy: [[9, '......##..##..##....'], [10, '....##..##..##..##..']], tongue: [[8, '.....#........#.....'], [9, '......########......'], [10, '........####........'], [11, '.........##.........']],
       o: [[8, '........####........'], [9, '.......#....#.......'], [10, '.......#....#.......'], [11, '........####........']],
       open1: [[8, '......########......'], [9, '......#......#......'], [10, '.......######.......']], open2: [[7, '.......######.......'], [8, '......#......#......'], [9, '......#......#......'], [10, '......#......#......'], [11, '.......######.......']]
     };
     var FONT = { N: ['#...#', '##..#', '#.#.#', '#.#.#', '#..##', '#...#', '#...#'], P: ['####.', '#...#', '#...#', '####.', '#....', '#....', '#....'], C: ['.####', '#....', '#....', '#....', '#....', '#....', '.####'], B: ['####.', '#...#', '#...#', '####.', '#...#', '#...#', '####.'],
       T: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '..#..'], V: ['#...#', '#...#', '#...#', '#...#', '#...#', '.#.#.', '..#..'], '?': ['.###.', '#...#', '....#', '...#.', '..#..', '.....', '..#..'], '$': ['..#..', '.####', '#.#..', '.###.', '..#.#', '####.', '..#..'],
-      '6': ['.###.', '#....', '#....', '####.', '#...#', '#...#', '.###.'], '7': ['#####', '....#', '...#.', '..#..', '..#..', '..#..', '..#..'], '1': ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'], '!': ['..#..', '..#..', '..#..', '..#..', '..#..', '.....', '..#..'] };
+      '6': ['.###.', '#....', '#....', '####.', '#...#', '#...#', '.###.'], '7': ['#####', '....#', '...#.', '..#..', '..#..', '..#..', '..#..'], '1': ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'], '!': ['..#..', '..#..', '..#..', '..#..', '..#..', '.....', '..#..'], '0': ['.###.', '#...#', '#..##', '#.#.#', '##..#', '#...#', '.###.'], Z: ['#####', '....#', '...#.', '..#..', '.#...', '#....', '#####'], E: ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
+      R: ['####.', '#...#', '#...#', '####.', '#.#..', '#..#.', '#...#'], G: ['.####', '#....', '#....', '#.###', '#...#', '#...#', '.###.'], M: ['#...#', '##.##', '#.#.#', '#.#.#', '#...#', '#...#', '#...#'], O: ['.###.', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'], K: ['#...#', '#..#.', '#.#..', '##...', '#.#..', '#..#.', '#...#'],
+      ':': ['.....', '..#..', '..#..', '.....', '..#..', '..#..', '.....'], '(': ['...#.', '..#..', '.#...', '.#...', '.#...', '..#..', '...#.'] };
     var ICONS = { btv: { text: 'BTV' }, npc: { text: 'NPC' }, what: { text: '?' }, cash: { text: '$$$' }, six7: { text: '67' }, one: { text: '1' }, bang: { text: '!!!' },
       heart: { rows: [[2, '....###......###....'], [3, '...#####....#####...'], [4, '..################..'], [5, '..################..'], [6, '...##############...'], [7, '....############....'], [8, '.....##########.....'], [9, '......########......'], [10, '.......######.......'], [11, '........####........'], [12, '.........##.........']] },
       bars: { rows: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (r) { return [r, '.##..##..##..##..##.']; }) },
@@ -198,9 +207,19 @@
       skull: { rows: [[1, '......########......'], [2, '.....##########.....'], [3, '....############....'], [4, '....##..####..##....'], [5, '....##..####..##....'], [6, '....############....'], [7, '.....####..####.....'], [8, '......########......'], [9, '......#.#..#.#......'], [10, '......#.#..#.#......']] },
       scroll: { rows: [[1, '....#..........#....'], [2, '.....#........#.....'], [3, '......#......#......'], [4, '.......#....#.......'], [5, '........#..#........'], [6, '.........##.........'], [7, '....#..........#....'], [8, '.....#........#.....'], [9, '......#......#......'], [10, '.......#....#.......'], [11, '........#..#........'], [12, '.........##.........']] },
       battery: { rows: [[4, '..###############...'], [5, '..#.............##..'], [6, '..#.#####.......##..'], [7, '..#.#####.......##..'], [8, '..#.#####.......##..'], [9, '..#.............##..'], [10, '..###############...']] },
+      hundred: { text: '100' }, zzz: { text: 'ZZZ' }, err: { text: 'ERR' }, gm: { text: 'GM' }, ok: { text: 'OK' }, bsod: { text: ':(' }, zero: { text: '0' },
+      wifi: { rows: [[2, '....############....'], [3, '..##............##..'], [5, '......########......'], [6, '....##........##....'], [8, '........####........'], [9, '......##....##......'], [11, '.........##.........']] },
+      key: { rows: [[4, '..####..............'], [5, '.##..##.............'], [6, '.#....############..'], [7, '.##..##......##.##..'], [8, '..####.......##.##..']] },
+      nuke: { rows: [[1, '......########......'], [2, '....############....'], [3, '...##############...'], [4, '...##############...'], [5, '.....##########.....'], [6, '........####........'], [7, '........####........'], [8, '........####........'], [9, '.......######.......'], [10, '.....##########.....'], [11, '...##############...']] },
+      fire: { rows: [[1, '.........#..........'], [2, '........##..........'], [3, '.......###..#.......'], [4, '......####.##.......'], [5, '.....#########......'], [6, '....###########.....'], [7, '....####..#####.....'], [8, '....###....####.....'], [9, '....###....####.....'], [10, '.....###..####......'], [11, '......#######.......']] },
+      snow: { rows: [[2, '.........##.........'], [3, '....#....##....#....'], [4, '.....##..##..##.....'], [5, '.......######.......'], [6, '...##############...'], [7, '.......######.......'], [8, '.....##..##..##.....'], [9, '....#....##....#....'], [10, '.........##.........']] },
+      ghost: { rows: [[1, '......########......'], [2, '.....##########.....'], [3, '....############....'], [4, '....##..####..##....'], [5, '....##..####..##....'], [6, '....############....'], [7, '....############....'], [8, '....############....'], [9, '....############....'], [10, '....###.####.###....'], [11, '....#...#..#...#....']] },
+      load: { rows: [[5, '..################..'], [6, '..#..............#..'], [7, '..#.########.....#..'], [8, '..#..............#..'], [9, '..################..']] },
+      power: { rows: [[1, '.........##.........'], [2, '.....#...##...#.....'], [3, '....##...##...##....'], [4, '...##....##....##...'], [5, '...##....##....##...'], [6, '...##..........##...'], [7, '...##..........##...'], [8, '....##........##....'], [9, '.....##########.....'], [10, '.......######.......']] },
+      check: { rows: [[3, '................##..'], [4, '...............##...'], [5, '..............##....'], [6, '..##.........##.....'], [7, '...##.......##......'], [8, '....##.....##.......'], [9, '.....##...##........'], [10, '......##.##.........'], [11, '.......###..........']] },
       off: { rows: [] } };
     var PRESET = { smile: ['happy', 'smile'], talk1: ['happy', 'open1'], talk2: ['happy', 'open2'], wink: ['wink', 'smile'], hype: ['hype', 'grin'], dead: ['x', 'flat'], angry: ['angry', 'frown'], mad: ['angry', 'grin'], sad: ['sad', 'frown'], shock: ['wide', 'o'], love: ['heart', 'grin'],
-      money: ['dollar', 'grin'], sleepy: ['sleepy', 'flat'], hypno: ['spiral', 'flat'], smug: ['side', 'smirk'], blank: ['dot', 'flat'], laugh: ['hype', 'open2'], stare: ['open', 'flat'] };
+      money: ['dollar', 'grin'], sleepy: ['sleepy', 'flat'], hypno: ['spiral', 'flat'], smug: ['side', 'smirk'], blank: ['dot', 'flat'], laugh: ['hype', 'open2'], stare: ['open', 'flat'], cold: ['squint', 'wavy'], overheat: ['wide', 'wavy'], glitch: ['static', 'wavy'], cry: ['tear', 'frown'], grit: ['angry', 'teeth'], cheeky: ['wink', 'tongue'], starry: ['star', 'grin'], zeroed: ['zero', 'flat'], lookup: ['up', 'smile'] };
     var fx = { eyes: 'happy', mouth: 'smile', icon: null, lip: 0, key: '' };
     function drawFace() {
       var lipM = fx.lip > .62 ? 'open2' : fx.lip > .25 ? 'open1' : fx.mouth, key = fx.icon ? 'i' + fx.icon : fx.eyes + '|' + lipM; if (key === fx.key) return; fx.key = key;
@@ -237,7 +256,7 @@
     function A(o) { var r = { sx: .05, out: .13, tw: 0, ex: -.2, roll: 0, wx: 0, wy: 1.2, wz: 0, hand: 'relax' }; for (var k in o) r[k] = o[k]; return r; }
     function L0() { return { h: -.05, o: .03, k: .1, f: -.05 }; }   // knees never lock straight
     function frac(x) { return ((x % 1) + 1) % 1; }
-    function crouch(g, c) { g.ll.h -= c; g.rl.h -= c; g.ll.k += 2 * c; g.rl.k += 2 * c; g.ll.f -= c; g.rl.f -= c; g.by -= .455 * (1 - Math.cos(c)); }
+    function crouch(g, c) { g.ll.h -= c; g.rl.h -= c; g.ll.k += 2 * c; g.rl.k += 2 * c; g.ll.f -= c; g.rl.f -= c; g.by -= .595 * (1 - Math.cos(c)); }
     // L is his left arm and leg, R his right. sx swings an arm forward (negative) or back, out lifts it sideways,
     // ex bends the elbow (negative), wy turns the palm in towards the body, wx / wz bend the wrist.
     var POSES = {
@@ -310,6 +329,38 @@
         g.L = A({ sx: .1, out: .5, ex: -1.1 - b * .5, wy: 1.57, hand: 'fist' }); g.R = A({ sx: .1, out: .5, ex: -1.1 - b * .5, wy: 1.57, hand: 'fist' }); },
       shrug: function (g, t) { var u = .5 + .5 * Math.sin(t * 2.5); g.hz = .16; g.hx = -.05; g.by += u * .012;
         g.L = A({ sx: -.3, out: .6 + u * .1, ex: -1.6, roll: .9, wy: -.6, hand: 'open' }); g.R = A({ sx: -.3, out: .6 + u * .1, ex: -1.6, roll: .9, wy: -.6, hand: 'open' }); },
+      // ---- poses written for lines in his other songs
+      boot: function (g, t) { var u = Math.min(1, frac(t / 4) * 1.7), e = u * u * (3 - 2 * u), j = u < 1 ? Math.sin(t * 30) * .02 * (1 - u) : 0; g.tx = .65 * (1 - e) + j; g.hx = .55 * (1 - e); g.hz = j * 3; crouch(g, .25 * (1 - e));
+        g.L = A({ sx: -.25 * (1 - e) + .05, out: .1, ex: -.15 - e * .1, hand: e > .9 ? 'fist' : 'relax' }); g.R = A({ sx: -.25 * (1 - e) + .05, out: .1, ex: -.15 - e * .1, hand: e > .9 ? 'fist' : 'relax' }); },
+      shiver: function (g, t) { var j = Math.sin(t * 42) * .018; crouch(g, .1); g.brz = j; g.tx = .12; g.hx = .12; g.hy = j * 4; g.ll.o = .0; g.rl.o = .0;
+        g.L = A({ sx: -.48 + j, out: .48, tw: -1.3, ex: -1.18, wy: .61, wx: .35, hand: 'fist' }); g.R = A({ sx: -.44 - j, out: .5, tw: -1.3, ex: -1.3, wy: .61, wx: .35, hand: 'fist' }); },
+      hot: function (g, t) { var w = Math.sin(t * 17); g.hx = -.22; g.tx = -.08; g.hz = .08; g.by += Math.sin(t * 5) * .008;
+        g.R = A({ sx: -1.55, out: .35, tw: -.5, ex: -1.45, wy: 3.14, wz: w * .55, hand: 'open' }); g.L = A({ sx: -.48, out: .48, tw: -1.3, ex: -1.3 + Math.sin(t * 6) * .08, wy: .61, wx: .35, hand: 'grip' }); },
+      crash: function (g, t) { var tw = frac(t * .9) < .08 ? Math.sin(t * 60) * .12 : 0; g.tx = .38; g.tz = .14 + tw; g.hx = .7; g.hz = .2; crouch(g, .12); g.brz = .05;
+        g.L = A({ sx: -.2 + tw, out: .1, ex: -.1, hand: 'relax' }); g.R = A({ sx: -.3, out: .1, ex: -.1 - tw, hand: 'relax' }); },
+      glitch: function (g, t) { var q = Math.floor(t * 7), r = function (k) { var x = Math.sin((q + k) * 12.9898) * 43758.5453; return (x - Math.floor(x)) * 2 - 1; };
+        g.hy = r(1) * .6; g.hz = r(2) * .3; g.hx = r(3) * .2; g.tz = r(4) * .12; g.brz = r(5) * .05; crouch(g, .05 + Math.abs(r(6)) * .1);
+        g.L = A({ sx: -.8 + r(7) * .8, out: .5 + r(8) * .5, ex: -1.0 + r(9) * .8, hand: r(10) > 0 ? 'spread' : 'fist' }); g.R = A({ sx: -.8 + r(11) * .8, out: .5 + r(12) * .5, ex: -1.0 + r(13) * .8, hand: r(14) > 0 ? 'point' : 'open' }); },
+      key: function (g, t) { g.tx = .16; g.bry = .2; g.hy = -.15; g.hx = .08; crouch(g, .06);
+        g.R = A({ sx: -1.3, out: .12, ex: -.45, wy: 1.57 + Math.sin(t * 3.5) * 1.2, hand: 'grip' }); g.L = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      wait: function (g, t) { g.hz = .14; g.hy = Math.sin(t * .6) * .2; g.hx = .05; g.rl.f = Math.max(0, Math.sin(t * 8)) * .4; g.rl.h = -.12; g.rl.o = .1; g.brz = -.03;
+        g.L = A({ sx: -.48, out: .48, tw: -1.3, ex: -1.18, wy: .61, wx: .35, hand: 'fist' }); g.R = A({ sx: -.42, out: .5, tw: -1.3, ex: -1.32, wy: .61, wx: .35, hand: 'relax' }); },
+      boom: function (g, t, bt) { var b = Math.exp(-4 * frac(bt / 2)); crouch(g, .3 * (1 - b)); g.by += b * .1; g.hx = -.35 * b; g.tx = -.15 * b + .1; g.ll.o = .12 + b * .12; g.rl.o = .12 + b * .12;
+        g.L = A({ sx: -.2, out: .3 + b * 2.2, ex: -1.4 + b * 1.2, wy: 0, hand: b > .3 ? 'spread' : 'fist' }); g.R = A({ sx: -.2, out: .3 + b * 2.2, ex: -1.4 + b * 1.2, wy: 0, hand: b > .3 ? 'spread' : 'fist' }); },
+      mic: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)), sw = Math.sin(bt * Math.PI / 4); crouch(g, .07 + b * .1); g.tx = .1; g.bry = -.2 + sw * .15; g.hx = b * .15; g.hy = .15;
+        g.R = A({ sx: -1.15, out: .25, tw: -.9, ex: -1.95, wy: 1.2, hand: 'fist' }); g.L = A({ sx: -1.15 + b * .45, out: .45, ex: -.95 + b * .45, wy: .4, hand: Math.floor(bt / 4) % 2 ? 'open' : 'point' }); },
+      wrist: function (g, t) { var w = Math.sin(t * 11); g.hy = .3; g.hx = .12; g.bry = -.15; g.hz = -.06;
+        g.R = A({ sx: -1.3, out: .4, tw: -.6, ex: -1.7, wy: 0, wz: w * .22, hand: 'fist' }); g.L = A({ sx: -1.0, out: .15, tw: -.9, ex: -1.5, wy: 1.2, hand: 'point' }); },
+      hear: function (g, t) { g.tz = .14; g.hz = .18; g.hy = -.3; g.brz = .04; g.tx = .06;
+        g.L = A({ sx: -.4, out: 1.3, ex: -2.15, roll: 1.57, wy: 1.57, hand: 'open' }); g.R = A({ sx: .05, ex: -.3 }); },
+      see: function (g, t) { g.tx = .22; g.hx = -.05; g.hy = Math.sin(t * 1.4) * .45; g.bry = Math.sin(t * 1.4) * .2; crouch(g, .08);
+        g.L = A({ sx: -1.78, out: .15, tw: -.55, ex: -1.45, wy: 1.57, hand: 'grip' }); g.R = A({ sx: -1.78, out: .15, tw: -.55, ex: -1.45, wy: 1.57, hand: 'grip' }); },
+      sleep: function (g, t) { var br = Math.sin(t * 1.2); g.tx = .28 + br * .02; g.hx = .62 + br * .04; g.hz = .12; crouch(g, .08); g.by += br * .006;
+        g.L = A({ sx: -.1, out: .08, ex: -.08, hand: 'relax' }); g.R = A({ sx: -.1, out: .08, ex: -.08, hand: 'relax' }); },
+      swipe: function (g, t) { var w = Math.sin(t * 4.5); g.hy = -w * .3; g.ty = -w * .15; g.hx = .04;
+        g.R = A({ sx: -1.3, out: .35 + w * .6, ex: -.5, wy: 1.57, wz: w * .3, hand: 'open' }); g.L = A({ sx: .15, out: .75, ex: -1.9, roll: -1.57, wy: 1.57, hand: 'fist' }); },
+      gang: function (g, t, bt) { var u = .5 + .5 * Math.sin(bt * Math.PI), b = Math.exp(-5 * frac(bt)); crouch(g, .08 + b * .08); g.hx = -.1; g.tx = -.04; g.ll.o = .12; g.rl.o = .12;
+        g.L = A({ sx: -1.1, out: .6, ex: -.8 - u * .9, wy: -1.2, hand: u > .5 ? 'grip' : 'open' }); g.R = A({ sx: -1.1, out: .6, ex: -.8 - u * .9, wy: -1.2, hand: u > .5 ? 'grip' : 'open' }); },
       thumbs: function (g, t) { var j = Math.sin(t * 4) * .05; g.hz = .12; g.hy = -.1; g.tz = -.03; g.brz = .02; g.ll.o = .06; g.rl.o = .06;
         g.L = A({ sx: -.95, out: .22, ex: -.95 + j, wy: 1.57, wz: -.1, hand: 'thumb' }); g.R = A({ sx: .05, ex: -.25 }); },
       arms: function (g, t) { var w = Math.sin(t * 1.4); g.tx = -.2; g.hx = -.32; g.by += w * .012; g.ll.o = .16; g.rl.o = .16; g.brz = w * .015;
@@ -318,7 +369,7 @@
         g.L = A({ sx: -.48, out: .48, tw: -1.3, ex: -1.18, wy: .61, wx: .35, wz: Math.sin(t * 5) * .1, hand: 'grip' });   /* solved so the palm sits on the clover and the forearm clears the jacket */ g.R = A({ sx: .15, out: .45, ex: -1.1, wy: 1.57, wx: .3, hand: 'fist' }); },
       wave: function (g, t) { var w = Math.sin(t * 7); g.brz = -.03; g.tz = .05; g.hz = -.1; g.hy = .1; g.hx = -.06;
         g.R = A({ sx: -.15, out: 2.8 + w * .2, ex: -.25 - w * .12, wy: 0, wz: w * .4, hand: 'spread' }); g.L = A({ sx: .05, ex: -.25 }); },
-      sit: function (g, t) { g.by = -.2; g.ll = { h: -1.5, o: .14, k: 1.5, f: 0 }; g.rl = { h: -1.42, o: .16, k: 1.3, f: .12 }; g.tx = -.14; g.hx = .1; g.hy = Math.sin(t * .5) * .14; g.hz = .05;
+      sit: function (g, t) { g.by = -.27; g.ll = { h: -1.5, o: .14, k: 1.5, f: 0 }; g.rl = { h: -1.42, o: .16, k: 1.3, f: .12 }; g.tx = -.14; g.hx = .1; g.hy = Math.sin(t * .5) * .14; g.hz = .05;
         g.L = A({ sx: -.6, out: .22, ex: -1.25 + Math.sin(t * .9) * .05, wy: 1.57, hand: 'grip' }); g.R = A({ sx: -.5, out: .12, ex: -.85, wy: .4, wx: .3, hand: 'relax' }); }
     };
     var prevTurn = 0, prevBy = 0, V1 = new THREE.Vector3(), INV = new THREE.Matrix4(), TINV = new THREE.Matrix4(), simDreads = true, dInit = false;
@@ -372,14 +423,30 @@
         l.hip.rotation.set(ch(n + 'h', o.h, dt, 190, 21), 0, l.s * ch(n + 'o', o.o, dt)); l.knee.rotation.x = ch(n + 'k', o.k, dt, 190, 21); l.foot.rotation.x = ch(n + 'f', o.f, dt, 190, 21); });
       // follow-through: the braids and the clover lag behind his turns and bounces, then swing back
       var turn = bry + ty + hy, om = dt > 0 && dt < .2 ? (turn - prevTurn) / dt : 0, vy = dt > 0 && dt < .2 ? (by - prevBy) / dt : 0; prevTurn = turn; prevBy = by;
-      torso.position.y = .4 + Math.min(1, Math.max(0, -(legs[0].hip.rotation.x + legs[1].hip.rotation.x) / 2 - .5)) * .06;   // the jacket rides up when he folds at the hips
+      torso.position.y = .54 + Math.min(1, Math.max(0, -(legs[0].hip.rotation.x + legs[1].hip.rotation.x) / 2 - .5)) * .06;   // the jacket rides up when he folds at the hips
       group.updateMatrixWorld(true); armFix(arms[0]); armFix(arms[1]); group.updateMatrixWorld(true); dreadSim(t, dt);
       var pz = ch('pz', g.pz, dt, 120, 14); pendant.position.set(0, .29 + pz * .05, .315 + pz * .09);
       pendant.rotation.set(Math.min(0, -pz * .5 + ch('pendx', -tx * .8 + vy * .5, dt, 45, 4)), Math.sin(t * 1.1) * .3 * (1 - pz), ch('pendz', -(tz + brz) * 1.2 - om * .1, dt, 45, 4));
     }
     update(0, 1);
     return { group: group, parts: { body: body, torso: torso, head: head, screen: screen, arms: arms, legs: legs, pendant: pendant, dreads: dreads },
-      poses: Object.keys(POSES), hands: Object.keys(HANDS), faces: Object.keys(PRESET), icons: Object.keys(ICONS), eyes: Object.keys(EYES), mouths: Object.keys(MOUTHS), setFace: setFace, setExpression: setExpression, setIcon: setIcon, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.5 };
+      poses: Object.keys(POSES), hands: Object.keys(HANDS), faces: Object.keys(PRESET), icons: Object.keys(ICONS), eyes: Object.keys(EYES), mouths: Object.keys(MOUTHS), setFace: setFace, setExpression: setExpression, setIcon: setIcon, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.63 };
   }
-  root.LilBottie = { build: build, version: '0.5' };
+  // suggest(line): a pose, eyes, mouth and icon for a lyric line, from the words in it. First rule that matches wins.
+  var RULES = [
+    [/nuke|mutually assured|boom|explod|blow/i, 'boom', 'angry', 'grin', 'nuke'], [/blue screen|crash|error|fatal/i, 'crash', 'x', 'flat', 'bsod'], [/glitch|\bskip|\blag\b|stutter/i, 'glitch', 'static', 'wavy', null],
+    [/boot up|boot|wake|woke|power|turn(ed)? on|online/i, 'boot', 'open', 'smile', 'power'], [/overclock|\bhot|\bheat|burn|\bfire|sweat|melt|smok/i, 'hot', 'wide', 'wavy', 'fire'], [/\bcold|\bice\b|\bicy|froze|freez|chill|\bcool/i, 'shiver', 'squint', 'wavy', 'snow'],
+    [/root access|\bkeys?\b|unlock|admin|password|access/i, 'key', 'side', 'smirk', 'key'], [/rate limit|limit|queue|wait|try again|later|throttl/i, 'wait', 'side', 'flat', 'load'], [/wi-?fi|signal|connect|no bars/i, 'phone', 'happy', 'grin', 'wifi'],
+    [/terms|conditions|agree|read|sign|contract|fine print/i, 'write', 'side', 'smirk', 'check'], [/captcha|click|\btap\b|button|\bpress/i, 'nope', 'open', 'smile', 'check'], [/delete|block|ban|unplug|shut (me )?down|kill/i, 'swipe', 'angry', 'teeth', null],
+    [/npc/i, 'npc', 'dot', 'flat', 'npc'], [/scroll|feed|timeline/i, 'scroll', 'spiral', 'flat', 'scroll'], [/phone|palm|screen/i, 'phone', 'wide', 'grin', null],
+    [/aura/i, 'arms', 'star', 'grin', null], [/bank|money|rich|profit|bag|tokens?|paid|cash|million|racks?\b/i, 'money', 'dollar', 'grin', 'cash'], [/chain|clover|drip|diamond|ice on|iced/i, 'chain', 'star', 'grin', null], [/watch|wrist|time|clock|hour/i, 'wrist', 'side', 'smirk', null],
+    [/crown|\bking|\btop\b|boss|throne|hardest|\bgoat/i, 'boss', 'hype', 'grin', 'crown'], [/one of|number one|zero, one|only one/i, 'one', 'happy', 'grin', 'one'], [/hundred|100/i, 'one', 'hype', 'grin', 'hundred'], [/zero/i, 'shrug', 'zero', 'flat', 'zero'],
+    [/pray|\bgod\b|\bsoul|heaven|bless|\blord/i, 'pray', 'closed', 'smile', null], [/ghost|haunt|\bdead|\bdie\b|grave/i, 'crash', 'x', 'wavy', 'ghost'], [/sleep|dream|tired|night night/i, 'sleep', 'closed', 'flat', 'zzz'],
+    [/spit|bars|verse|flow|mic|booth|rapper|sing/i, 'mic', 'hype', 'open1', null], [/\bhear|listen|sound|\bloud|speakers?|\bhum\b|buzz/i, 'hear', 'open', 'smile', null], [/\bsee\b|\blook|\beyes?\b|\bspot/i, 'see', 'wide', 'smile', null],
+    [/\beat|feed me|\bmeal|hungry|crumb|taste/i, 'eat', 'angry', 'grin', null], [/\bmad\b|\brage|angry|\bhate|\bopps?\b|pressed/i, 'mad', 'angry', 'teeth', 'bang'], [/loser|dork|nerd|lame|clown/i, 'loser', 'side', 'smirk', null], [/stop|can't|cannot|never|no way/i, 'stop', 'angry', 'flat', null],
+    [/\brun|\bfast|speed|accelerat|slid/i, 'run', 'wide', 'grin', null], [/gang|crew|squad|army|everybody|whole world|we /i, 'gang', 'hype', 'grin', null], [/cloud|\bsky|\bfly|float|\bhigh/i, 'arms', 'up', 'smile', null], [/server|rack|data|code|cable|wire|port/i, 'think', 'open', 'smile', null],
+    [/\blove|\bheart|\blikes?\b/i, 'thumbs', 'heart', 'grin', 'heart'], [/strong|flex|muscle/i, 'flex', 'hype', 'grin', null], [/know|think|mind|brain|smart/i, 'think', 'side', 'smirk', null], [/\bme\b|\bmine\b|\bmyself/i, 'me', 'happy', 'grin', null], [/\byou\b|\byour\b|y'all/i, 'point', 'happy', 'smile', null], [/\?/, 'shrug', 'side', 'smirk', 'what']];
+  var FALLBACK = ['rap', 'dance', 'mic', 'shake', 'rap', 'gang', 'lead', 'me'];
+  function suggest(line, n) { var txt = String(line || ''); for (var i = 0; i < RULES.length; i++) if (RULES[i][0].test(txt)) return { pose: RULES[i][1], eyes: RULES[i][2], mouth: RULES[i][3], icon: RULES[i][4] }; return { pose: FALLBACK[(n || 0) % FALLBACK.length], eyes: 'happy', mouth: 'grin', icon: null }; }
+  root.LilBottie = { build: build, suggest: suggest, version: '0.6' };
 })(typeof window !== 'undefined' ? window : this);
