@@ -6317,6 +6317,113 @@ function opnMusic(){if(!AU.ctx||AU.muted||!MOV.on)return;const now=AU.ctx.curren
 // the trailer plays on boot-up, straight after the studio splash and before the title screen
 if(location.hash!=='#test'&&!(DEV.on&&DEV.skip)){MOV.bootHide=true;$('title').hidden=true;const iv=setInterval(()=>{const sp=$('splash');if(sp&&sp.style.opacity!=='0')return;clearInterval(iv);MOV.bootHide=false;if(S.mode==='title'&&!$('intro')&&!$('ctlcard')&&!MOV.seen){$('title').hidden=false;movieRun(()=>{NAV.reset();});}else if(S.mode==='title')$('title').hidden=false;},50);}
 (function(){const m=document.querySelector('#title .menu');if(!m)return;const b=document.createElement('button');b.id='tMov';b.textContent='🎬 WATCH THE TRAILER';m.insertBefore(b,$('tCred'));b.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();},'trailer');};const o=document.createElement('button');o.id='tOpn';o.textContent='📼 WATCH THE INTRO';m.insertBefore(o,b);o.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();});};})();
+/* ================= ACT 51: UNLOCKS and the DEV CONSOLE. A title-menu Unlocks room where every cinematic you have seen can be replayed (seen ones are remembered across saves, even after the ending wipes your save), and a dev console that opens anywhere with ` or F2 or the 🛠️ button. ================= */
+const SEEN={k:'gfa-seen',get(){try{return JSON.parse(localStorage.getItem(this.k)||'[]')||[];}catch(e){return [];}},add(id){const s=this.get();if(!s.includes(id)){s.push(id);try{localStorage.setItem(this.k,JSON.stringify(s));}catch(e){}}}};
+// every way a cinematic can be seen counts
+{const rw=reelWatch;reelWatch=function(R){SEEN.add('reel:'+R.id);return rw(R);};}
+// ---- a reel cinematic played as a movie, so it works from the title screen too
+function reelShots(R){const A=R.A,gy=groundH(A.x,A.z),c=[A.x,gy,A.z],a0=R.face+Math.PI/2,sh=(a,d,h,lh)=>[c[0]+Math.cos(a)*d,c[1]+h,c[2]+Math.sin(a)*d,c[0],c[1]+lh,c[2]];
+  const P=[[R.x+Math.sin(R.face)*10,R.gy+10.5,R.z+Math.cos(R.face)*10,R.x,R.gy+10.5,R.z],sh(a0,A.r*1.1,A.r*.7,2),sh(a0+1.4,A.r*.75,A.r*.4+6,3),sh(a0+2.6,A.r*.6,A.r*.3+5,3),sh(a0+3.6,A.r*1.4,A.r*1.1,0)];
+  const mv=(f,t)=>u=>f.map((v,i)=>lerp(v,t[i],u));const out=[{d:2.6,blk:1,card:R.title+'<small>a reel · from the Unlocks room</small>'}];
+  R.lines.forEach((l,i)=>{const sp=SPEAK[l[0]]||SPEAK.sys;out.push({d:Math.max(3,1.4+l[1].length*.055),cam:mv(P[i%P.length],P[(i+1)%P.length]),cred:'<b>'+sp.name+'</b>',cc:l[1]});});return out;}
+{const mr2=movieRun;movieRun=function(done,kind){if(!(kind&&kind.reel))return mr2(done,kind);const R=kind.reel,Ph=RL.phone;
+  mr2(()=>{Ph.el.hidden=true;Ph.R=null;done&&done();},'trailer');MOV.kind='reel';MOV.shots=reelShots(R);Ph.R=R;Ph.el.hidden=false;const ob=Ph.el.querySelector('b');if(ob)ob.remove();const bt=document.createElement('b');bt.textContent=R.title;Ph.el.appendChild(bt);
+  (function tick(){if(!MOV.on){Ph.el.hidden=true;return;}requestAnimationFrame(tick);if(MOV.kind==='reel')drawReel(Ph.g,R,performance.now()/1000);})();};}
+{const mr=movieRun;movieRun=function(done,kind){SEEN.add(kind==='trailer'?'trailer':kind&&kind.reel?'reel:'+kind.reel.id:'intro');return mr(done,kind);};}
+{const mm=movMusic;movMusic=function(){if(MOV.kind==='reel')return;return mm();};}
+// ---- the Unlocks room on the title menu
+function unlocksPanel(){const seen=SEEN.get(),all=DEV.on&&DEV.allc,has=id=>all||seen.includes(id)||id==='intro';
+  const items=[['intro','📼','THE INTRO','How the game got made'],['trailer','🎬','THE TRAILER','Slop: The Motion Picture']].concat(RL.list.map(R=>['reel:'+R.id,R.e,R.title,ABY[R.id]?ABY[R.id].name:'']));
+  const n=items.filter(it=>has(it[0])).length;
+  tPanel('<h3>🏆 UNLOCKS</h3><p>Every cinematic you have seen, any time. Watch a show at its screen in the game to unlock it here. '+n+' of '+items.length+' unlocked.</p><div class="unl">'+items.map((it,i)=>has(it[0])?'<button data-u="'+i+'"><b>'+it[1]+'</b><span>'+it[2]+'<small>'+it[3]+'</small></span></button>':'<button disabled><b>🔒</b><span>???<small>'+it[3]+'</small></span></button>').join('')+'</div>',
+    p=>{p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const it=items[+b.dataset.u];p.remove();audioInit();const back=()=>{NAV.reset();unlocksPanel();};
+      if(it[0]==='intro')movieRun(back);else if(it[0]==='trailer')movieRun(back,'trailer');else{const R=RL.list.find(r=>'reel:'+r.id===it[0]);movieRun(back,{reel:R});}});});}
+(function(){const st=document.createElement('style');st.textContent='#tpanel .unl{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:56vh;overflow:auto;margin:8px 0}#tpanel .unl button{display:flex;gap:10px;align-items:center;text-align:left;padding:8px 10px;border-radius:10px;border:3px solid var(--ink);background:var(--paper);color:var(--ink);font:700 13px/1.2 var(--body)}#tpanel .unl button:disabled{opacity:.45}#tpanel .unl b{font-size:24px}#tpanel .unl small{display:block;font-weight:400;font-size:11px;opacity:.75}';document.head.appendChild(st);
+  const m=document.querySelector('#title .menu');if(!m)return;const b=document.createElement('button');b.id='tUnl';b.textContent='🏆 UNLOCKS';m.insertBefore(b,$('tMov')||$('tCred'));b.onclick=()=>{SFX.page&&SFX.page();unlocksPanel();};})();
+// ---- the DEV CONSOLE
+const DVC={open:false,prev:null,el:null,tab:'go',arm:0};
+(function(){const st=document.createElement('style');st.textContent='#dvc{position:absolute;z-index:20;right:max(10px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(420px,calc(100vw - 20px));background:rgba(10,12,20,.96);border:2px solid #b6ff00;border-radius:12px;color:#e8f0ff;font:600 12px/1.35 ui-monospace,Menlo,Consolas,monospace;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.6)}'
+  +'#dvc header{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #2a3a20}#dvc header b{color:#b6ff00;font-size:14px;flex:1}#dvc header button{background:#222;color:#fff;border:1px solid #555;border-radius:6px;padding:4px 9px;font:inherit;cursor:pointer}'
+  +'#dvc nav{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;border-bottom:1px solid #2a3a20}#dvc nav button{background:none;border:1px solid #3a4a30;color:#cde;border-radius:6px;padding:4px 8px;font:inherit;cursor:pointer}#dvc nav button.on{background:#b6ff00;color:#111;border-color:#b6ff00}'
+  +'#dvc .st{padding:6px 10px;color:#9fe8ff;border-bottom:1px solid #2a3a20;white-space:pre-wrap}#dvc .bd{flex:1;overflow:auto;padding:8px 10px 14px}#dvc h5{margin:10px 0 4px;color:#ffd400;font-size:11px;letter-spacing:.12em}#dvc .g{display:flex;flex-wrap:wrap;gap:4px}#dvc .g button{background:#1a2230;color:#e8f0ff;border:1px solid #334;border-radius:6px;padding:5px 8px;font:inherit;cursor:pointer;text-align:left}#dvc .g button:hover,#dvc .g button:focus-visible{border-color:#b6ff00;outline:none}#dvc .g button.on{background:#264a10;border-color:#b6ff00}#dvc .g button.warn{border-color:#ff4a4a;color:#ffb0b0}'
+  +'#dvbtn{position:absolute;z-index:7;left:50%;translate:-50% 0;bottom:calc(6px + env(safe-area-inset-bottom,0px));background:rgba(10,12,20,.85);border:2px solid #b6ff00;color:#b6ff00;border-radius:999px;padding:3px 10px;font:700 12px ui-monospace,monospace;cursor:pointer}#app.cine #dvbtn{display:none}';document.head.appendChild(st);
+  const b=document.createElement('button');b.id='dvbtn';b.textContent='🛠️ DEV (`)';b.hidden=!DEV.on;b.onclick=()=>dvcToggle();$('app').appendChild(b);})();
+function dvcToggle(force){const open=force===undefined?!DVC.open:force;if(open===DVC.open)return;DVC.open=open;
+  if(open){if(!DEV.on){DEV.on=true;devSave();}$('dvbtn').hidden=false;DVC.prev=S.mode;if(S.mode==='play')S.mode='dev';const el=document.createElement('div');el.id='dvc';$('app').appendChild(el);DVC.el=el;dvcRender();}
+  else{if(DVC.el)DVC.el.remove();DVC.el=null;if(S.mode==='dev')S.mode=DVC.prev==='play'?'play':DVC.prev||'play';}}
+addEventListener('keydown',e=>{if(e.code==='Backquote'||e.code==='F2'){e.preventDefault();if(!e.repeat)dvcToggle();}else if(e.code==='Escape'&&DVC.open){dvcToggle(false);}});
+function dvcAct(fn,msg){try{fn();}catch(err){toast('🛠️ failed: '+err.message);return;}if(msg)toast('🛠️ '+msg);if(S.mode!=='title')save();hudCache.q=null;dvcRender();}
+function dvcGo(fn){dvcToggle(false);if(S.mode==='title'){begin(loadSave());}setTimeout(()=>{S.mode==='dialog'&&dlgSkipAll();fn();},S.mode==='play'?0:400);}
+function dvcRender(){const el=DVC.el;if(!el)return;const inGame=S.mode!=='title';const q=inGame?Q38():{};
+  const T=[['go','TELEPORT'],['pre','PRESETS'],['give','GIVE'],['tog','TOGGLES'],['cine','CINEMATICS'],['story','STORY']];
+  let h='<header><b>🛠️ DEV CONSOLE</b><button data-x="close">close ✕</button></header><nav>'+T.map(t=>'<button data-t="'+t[0]+'" class="'+(DVC.tab===t[0]?'on':'')+'">'+t[1]+'</button>').join('')+'</nav>';
+  h+='<div class="st">'+(inGame?'pos '+PL.x.toFixed(1)+', '+PL.y.toFixed(1)+', '+PL.z.toFixed(1)+' · zone '+(S.inPk?'pk_'+S.inPk:S.zone)+'\naura '+fmt(S.aura)+' · cells '+S.cells+'/'+S.max+' · relics '+['grok','fable','astra'].filter(k=>S.relics[k]).length+'/3':'on the title screen · teleports and presets start a game')+'\n` or F2 opens this · Esc closes</div><div class="bd">';
+  const g=(title,btns)=>'<h5>'+title+'</h5><div class="g">'+btns.join('')+'</div>',B=(a,l,c)=>'<button data-a="'+a+'"'+(c?' class="'+c+'"':'')+'>'+l+'</button>';
+  if(DVC.tab==='go'){h+=g('PLACES',devPlaces().filter(p=>p[0]).map(p=>'<button data-w="'+p[0]+'">'+p[1]+'</button>'));
+    h+=g('SPECIAL SPOTS',[B('w_plaza','Prompt Plaza'),B('w_boss','The For-You Page (boss fight)'),B('w_land','Nick Land (the outside)'),B('w_board','VAN DOWN evidence board'),B('w_van','On top of the van pole')].concat(STK.list.map((t,i)=>B('w_stk'+i,'Top of '+ABY[t.id].name))));}
+  if(DVC.tab==='pre'){let cur='';h+='<h5>PROGRESSION PRESETS</h5><p style="opacity:.7;margin:0 0 4px">Each one sets up the save and drops you in the right spot.</p>';DEVP.forEach(p=>{if(p[0]==='g'){h+=(cur?'</div>':'')+'<h5>'+p[1]+'</h5><div class="g">';cur=1;}else if(p[2])h+='<button data-p="'+p[0]+'">'+p[1]+'</button>';});if(cur)h+='</div>';}
+  if(DVC.tab==='give'){h+=g('RESOURCES',[B('aura','+1,000,000 aura'),B('heal','Full brain cells'),B('cells','+5 max brain cells')]);
+    h+=g('STORY ITEMS',[B('relics','All 3 relics (opens the portal)'),B('shards','4 sun shards (finishes their 4 quests)'),B('frags','All 12 prompt fragments')]);
+    h+=g('UNLOCKS',[B('hats','Every hat'),B('cheats','Every cheat'),B('chars','Every playable character'),B('found','Mark every place found'),B('reels','Every show watched + every cinematic unlocked')]);
+    h+=g('NEW QUESTS',[B('ev','VAN DOWN: all 6 evidence'),B('num','Hyperstition: all 10 digits'),B('stk','All 10 slop stack summits')]);}
+  if(DVC.tab==='tog'){const on=k=>DEV[k]?'on':'';h+=g('PLAYER',[B('god','God mode (no damage, Filler-safe): '+(DEV.god?'ON':'OFF'),on('god')),B('fly','Fly: '+(DEV.fly?'ON · hold Space up, C down':'OFF'),on('fly')),B('fast','Turbo run: '+(DEV.fast?'ON':'OFF'),on('fast'))]);
+    h+=g('SCREEN',[B('hud','HUD: '+($('hud').classList.contains('devhide')?'HIDDEN':'SHOWN')),B('fps','FPS meter: '+(DEV.fps?'ON':'OFF'),on('fps')),B('coords','Live coordinates: '+(DEV.coords?'ON':'OFF'),on('coords'))]);
+    h+=g('BOOT',[B('skip','Skip the intro on boot: '+(DEV.skip?'ON':'OFF'),on('skip')),B('allc','Unlock every cinematic in Unlocks: '+(DEV.allc?'ON':'OFF'),on('allc'))]);
+    h+=g('SWITCH OFF',[B('off','Turn dev tools off (hides the 🛠️ button)','warn')]);}
+  if(DVC.tab==='cine'){h+=g('MOVIES',[B('c_intro','📼 The intro'),B('c_trailer','🎬 The trailer')]);h+=g('SHOWS',RL.list.map((R,i)=>B('c_r'+i,R.e+' '+R.title)));}
+  if(DVC.tab==='story'){h+=g('FIGHT',[B('boss','Fight the Algorithm now'),B('win','Beat the game now (shows the ending, clears the save)','warn'),B('bottie','Fight lil Bottie now')]);
+    h+=g('SAVE',[B('savenow','Save now'),B('reset',DVC.arm>performance.now()?'Tap again to erase the save':'Erase the save and reload','warn')]);}
+  el.innerHTML=h+'</div>';
+  el.querySelector('[data-x]').onclick=()=>dvcToggle(false);el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{DVC.tab=b.dataset.t;dvcRender();});
+  el.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{const id=b.dataset.w;dvcGo(()=>devWarp(id));});
+  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const id=b.dataset.p;dvcGo(()=>devPreset(id));});
+  el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>dvcDo(b.dataset.a));}
+function dvcDo(a){const T=()=>S.mode!=='title';
+  const warp=(x,z,y,card)=>dvcGo(()=>warpTo(x,z,y,undefined,[card,'🛠️ dev']));
+  if(a==='w_plaza')return warp(0,8,undefined,'PROMPT PLAZA');
+  if(a==='w_boss')return dvcGo(()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);syncWorld();enterBoss();});
+  if(a==='w_land')return warp(NLX.x+4,NLX.z+4,undefined,'THE OUTSIDE');
+  if(a==='w_board')return warp(VDN.board.x,VDN.board.z+3,undefined,'VAN DOWN');
+  if(a==='w_van')return warp(VDN.top.x+1.5,VDN.top.z+1.5,VDN.top.y+1,'THE TOP OF THE POLE');
+  if(a.indexOf('w_stk')===0){const t=STK.list[+a.slice(5)];return warp(t.x+2,t.z+2,t.top+1.5,'SUMMIT');}
+  if(a==='c_intro'){dvcToggle(false);return movieRun(()=>{NAV.reset();});}
+  if(a==='c_trailer'){dvcToggle(false);return movieRun(()=>{NAV.reset();},'trailer');}
+  if(a.indexOf('c_r')===0){const R=RL.list[+a.slice(3)];dvcToggle(false);return movieRun(()=>{NAV.reset();},{reel:R});}
+  const toggles={god:'god',fly:'fly',fast:'fast',fps:'fps',coords:'coords',skip:'skip',allc:'allc'};
+  if(toggles[a]){DEV[a]=!DEV[a];devSave();fpsShow();dvcCoords();return dvcRender();}
+  if(a==='hud'){$('hud').classList.toggle('devhide');return dvcRender();}
+  if(a==='off'){DEV.on=false;devSave();$('dvbtn').hidden=true;return dvcToggle(false);}
+  if(!T()){toast('🛠️ start a game first (CONTINUE or NEW GAME, or a teleport)');return;}
+  const q=Q38();
+  if(a==='aura')return dvcAct(()=>addAura(1000000,PL.x,PL.y+3,PL.z),'+1,000,000 aura');
+  if(a==='heal')return dvcAct(()=>{S.cells=S.max;},'full brain cells');
+  if(a==='cells')return dvcAct(()=>{S.max+=5;S.cells=S.max;},'+5 max brain cells');
+  if(a==='relics')return dvcAct(()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);syncWorld();},'all relics, portal open');
+  if(a==='shards')return dvcAct(()=>{X.flow=Math.max(X.flow,4);X.erin=Math.max(X.erin,3);X.clank=Math.max(X.clank,3);X.hour=Math.max(X.hour,2);syncX();},'4 sun shards (Flow Pros, Erin, the Clanker Yard and the Hour Garden marked done)');
+  if(a==='frags')return dvcAct(()=>{X.frag=[0,1,2,3,4,5,6,7,8,9,10,11];X.tj=1;},'all 12 fragments + triple jump');
+  if(a==='hats')return dvcAct(()=>{HATS.forEach(hh=>{if(!X.hats.includes(hh[0]))X.hats.push(hh[0]);});},'every hat');
+  if(a==='cheats')return dvcAct(()=>{const c=chQ().ch;CHEATS.forEach(ch=>{if(!c.own.includes(ch[0]))c.own.push(ch[0]);});},'every cheat (toggle them in the CHEATS tab)');
+  if(a==='chars')return dvcAct(()=>{DEV.all=true;devSave();},'every character');
+  if(a==='found')return dvcAct(()=>{AREAS.forEach(A=>{if(!X.vis.includes(A.id))X.vis.push(A.id);});['pk_maze','pk_patch','pk_lab','pk_hole','swing'].forEach(v=>{if(!X.vis.includes(v))X.vis.push(v);});},'every place found, every warp pad open');
+  if(a==='reels')return dvcAct(()=>{q.reel=RL.list.map(R=>R.id);SEEN.add('trailer');RL.list.forEach(R=>SEEN.add('reel:'+R.id));},'every show watched');
+  if(a==='ev')return dvcAct(()=>{q.vd=1;q.ev=[0,1,2,3,4,5];},'all 6 evidence · go to the board');
+  if(a==='num')return dvcAct(()=>{q.nlm=1;q.num=[0,1,2,3,4,5,6,7,8,9];},'all 10 digits · go see Nick Land');
+  if(a==='stk')return dvcAct(()=>{q.stk=[0,1,2,3,4,5,6,7,8,9];STK.list.forEach(t=>{if(!X.vis.includes(t.id))X.vis.push(t.id);});},'all stacks summited');
+  if(a==='boss')return dvcGo(()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);syncWorld();enterBoss();});
+  if(a==='win'){dvcToggle(false);return win();}
+  if(a==='bottie')return dvcGo(()=>{X.clank=2;syncX();warpTo(BOT.x+12,BOT.z+16,undefined,undefined,['LIL BOTTIE','🛠️ dev: boss fight']);});
+  if(a==='savenow')return dvcAct(()=>save(),'saved');
+  if(a==='reset'){if(DVC.arm>performance.now()){clearSave();location.reload();return;}DVC.arm=performance.now()+3000;return dvcRender();}}
+// fly, turbo run, live coordinates
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(!DEV.on)return;
+  if(DEV.fly&&S.mode==='play'){const v=keys.Space?22:keys.KeyC?-22:0;PL.vy=0;PL.y+=v*dt;PL.vis=PL.y;PL.grounded=false;}
+  if(DEV.fast&&S.mode==='play'&&!VAN.driving){PL.x+=(PL.vx||0)*dt;PL.z+=(PL.vz||0)*dt;}
+  if(DEV.coords){const c=$('dvco');if(c)c.textContent=PL.x.toFixed(1)+', '+PL.y.toFixed(1)+', '+PL.z.toFixed(1)+' · '+(S.inPk?'pk_'+S.inPk:S.zone);}};}
+function dvcCoords(){let c=$('dvco');const on=DEV.on&&DEV.coords;if(on&&!c){c=document.createElement('div');c.id='dvco';c.style.cssText='position:absolute;z-index:7;left:50%;translate:-50% 0;bottom:calc(32px + env(safe-area-inset-bottom,0px));font:700 11px ui-monospace,monospace;color:#9fe8ff;background:rgba(0,0,0,.6);padding:2px 8px;border-radius:6px;pointer-events:none';$('app').appendChild(c);}if(!on&&c)c.remove();}
+dvcCoords();
+(function(){const st=document.createElement('style');st.textContent='#hud.devhide>*:not(#dialog){visibility:hidden}';document.head.appendChild(st);})();
+// god mode also keeps fly and fast from killing you on landing; the title DEV TOOLS panel points here
+{const dp=devPanel;devPanel=function(){dp();const p=$('tpanel');if(!p)return;const box=p.querySelector('.box');const x=document.createElement('p');x.innerHTML='<button id="tdvc">🛠️ OPEN THE DEV CONSOLE (` or F2, any time)</button>';box.insertBefore(x,box.lastElementChild);$('tdvc').onclick=()=>{p.remove();dvcToggle(true);};};}
 
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
 ['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
@@ -6332,7 +6439,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
