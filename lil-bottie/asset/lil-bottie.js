@@ -90,7 +90,7 @@
     [-1, 1].forEach(function (s) { J.push(P(Box(.018, .46, .02), CHROME2, M(s * .085, .3, .285)), P(Box(.04, .05, .03), CHROME, M(s * .085, .07, .29))); });   // zip
     J.push(P(roll(.3, .31, .04), 0x9aa0ac, M(0, .0, 0, 0, 0, 0, 1, 1, .88)));   // the elastic hem
     [-1, 1].forEach(function (s) { J.push(P(Box(.012, .11, .014), CHROME2, M(s * .27, .19, .2, 0, s * .9, s * .35))); });   // pocket zips
-    torso.add(new THREE.Mesh(bake(J), pufferM));
+    var jacket = new THREE.Mesh(bake(J), pufferM); jacket.scale.set(.9, 1, .9); torso.add(jacket);
 
     // ---- arms: shoulder, elbow, wrist; four fingers with two joints each, and a thumb
     var fA = bake([P(Box(.026, .055, .03), CHROME, M(0, -.0275, 0)), P(Box(.031, .013, .035), 0x4a4e58, M(0, -.003, 0))]);
@@ -99,11 +99,11 @@
     var tB = bake([P(Box(.028, .044, .03), CHROME2, M(0, -.022, 0)), P(Box(.032, .011, .034), 0x4a4e58, M(0, -.003, 0))]);
     var arms = [], phoneCv = null, phoneTx = null, phoneT = 0;
     [-1, 1].forEach(function (s) {
-      var sh = new THREE.Group(); sh.position.set(s * .36, .5, 0); torso.add(sh);
+      var sh = new THREE.Group(); sh.position.set(s * .335, .5, 0); torso.add(sh);
       var up = [P(Sph(.125, 8, 6), SILVER, M(0, -.01, 0)), P(Cyl(.115, .11, .12, 8), SILVER2, M(0, -.11, 0)), P(Cyl(.11, .105, .11, 8), SILVER, M(0, -.225, 0))];
-      sh.add(new THREE.Mesh(bake(up), pufferM));
+      var upM = new THREE.Mesh(bake(up), pufferM); upM.scale.set(.86, 1, .86); sh.add(upM);
       var el = new THREE.Group(); el.position.y = -.29; sh.add(el);
-      el.add(new THREE.Mesh(bake([P(Sph(.1, 8, 6), SILVER2, M(0, 0, 0)), P(Cyl(.105, .1, .11, 8), SILVER2, M(0, -.06, 0)), P(Cyl(.1, .09, .11, 8), SILVER, M(0, -.165, 0))]), pufferM));
+      var loM = new THREE.Mesh(bake([P(Sph(.1, 8, 6), SILVER2, M(0, 0, 0)), P(Cyl(.105, .1, .11, 8), SILVER2, M(0, -.06, 0)), P(Cyl(.1, .09, .11, 8), SILVER, M(0, -.165, 0))]), pufferM); loM.scale.set(.88, 1, .88); el.add(loM);
       el.add(new THREE.Mesh(bake([P(Cyl(.075, .07, .06, 8), BLACK, M(0, -.245, 0))]), clothM));
       if (s < 0) el.add(new THREE.Mesh(bake([P(Cyl(.079, .079, .038, 12), 0xdfe4ee, M(0, -.262, 0)), P(Cyl(.05, .05, .02, 12), ICE, M(0, -.262, -.074, Math.PI / 2)), P(Cyl(.036, .036, .024, 10), 0xcfc6ae, M(0, -.262, -.077, Math.PI / 2)), P(Box(.004, .03, .006), 0x1a1a1a, M(0, -.254, -.091)), P(Box(.02, .004, .006), 0x1a1a1a, M(.008, -.262, -.091))]), iceM));   // the iced watch, on the back of his right wrist
       var hg = new THREE.Group(); hg.position.y = -.28; el.add(hg);   // the wrist
@@ -131,21 +131,21 @@
 
     // ---- head: riveted chrome dome, ear cups, a black screen with the LED face
     var head = new THREE.Group(); head.position.y = .725; head.scale.setScalar(.9); torso.add(head);
-    var Hh = [P(new THREE.SphereGeometry(.3, 12, 8, 0, TAU, 0, Math.PI * .62), CHROME, M(0, .2, 0)), P(Cyl(.31, .302, .04, 14), CHROME2, M(0, .11, 0)), P(Cyl(.16, .13, .1, 10), 0x4a4e58, M(0, -.02, 0))];   // the dome ends in a rolled rim; the hair comes out from under it
+    var Hh = [P(new THREE.SphereGeometry(.3, 12, 8, 0, TAU, 0, Math.PI * .62), CHROME, M(0, .2, 0)), P(new THREE.CylinderGeometry(.31, .302, .04, 14, 1, false, .95, TAU - 1.9), CHROME2, M(0, .11, 0)), P(Cyl(.16, .13, .1, 10), 0x4a4e58, M(0, -.02, 0))];   // the dome ends in a rolled rim; the hair comes out from under it
     var hseed = 11; function hrand() { hseed = (hseed * 16807) % 2147483647; return hseed / 2147483647; }
     for (var q = 0; q < 90; q++) {   // hammered chrome: small dark dimples pressed into the shell, uneven like the real one
       var el2 = .12 + hrand() * 1.55, ra = (hrand() - .5) * 3.3, dx = Math.sin(ra) * Math.sin(el2), dy = Math.cos(el2), dz = Math.cos(ra) * Math.sin(el2); if (dz < -.05 || (dz > .52 && dy < .5)) continue;
       var dsz = .012 + hrand() * .014; Hh.push(P(Sph(dsz, 6, 4), hrand() < .5 ? 0x2a2e36 : 0x3c414c, M(dx * .297, .2 + dy * .297, dz * .297, Math.atan2(Math.hypot(dx, dz), dy) * (dz >= 0 ? 1 : -1) * Math.abs(Math.cos(ra)), ra, 0, 1, .22, 1))); }
     [-1, 1].forEach(function (s) { Hh.push(P(Cyl(.085, .085, .06, 12), CHROME2, M(s * .29, .16, 0, 0, 0, Math.PI / 2)), P(Cyl(.05, .05, .07, 10), 0x4a4e58, M(s * .3, .16, 0, 0, 0, Math.PI / 2))); });
-    Hh.push(P(Box(.46, .34, .06), CHROME2, M(0, .17, .255)), P(Box(.41, .29, .07), 0x050508, M(0, .17, .262)));   // bezel and glass
-    Hh.push(P(Box(.48, .035, .09), CHROME, M(0, .355, .25, .25)), P(Box(.3, .07, .1), CHROME2, M(0, -.035, .2)), P(Box(.22, .03, .11), 0x4a4e58, M(0, -.035, .205)), P(Box(.02, .3, .02), 0x7a808c, M(0, .36, 0, 0, 0, 0, 1, 1, 14)));   // brow ridge, jaw, vent, centre seam
-    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { Hh.push(P(Cyl(.013, .013, .006, 6), 0x2a2e36, M(c[0] * .215, .17 + c[1] * .155, .287, Math.PI / 2))); });   // bezel screws, sunk flush
+    Hh.push(P(Box(.46, .34, .09), CHROME2, M(0, .17, .262)), P(Box(.41, .29, .07), 0x050508, M(0, .17, .284)));   // bezel and glass, set forward so the dome and rim stay behind the glass
+    Hh.push(P(Box(.48, .035, .09), CHROME, M(0, .357, .272, .25)), P(Box(.3, .07, .1), CHROME2, M(0, -.035, .2)), P(Box(.22, .03, .11), 0x4a4e58, M(0, -.035, .205)), P(Box(.02, .3, .02), 0x7a808c, M(0, .36, 0, 0, 0, 0, 1, 1, 14)));   // brow ridge, jaw, vent, centre seam
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) { Hh.push(P(Cyl(.013, .013, .006, 6), 0x2a2e36, M(c[0] * .215, .17 + c[1] * .155, .308, Math.PI / 2))); });   // bezel screws, sunk flush
     [-1, 1].forEach(function (s) { Hh.push(P(Cyl(.03, .03, .08, 8), CHROME, M(s * .31, .16, 0, 0, 0, Math.PI / 2)), P(Box(.02, .1, .02), CHROME2, M(s * .27, .3, .02, 0, 0, s * -.5))); });   // ear cup hub and band
     head.add(new THREE.Mesh(bake(Hh), chromeM));
     var faceCv = document.createElement('canvas'); faceCv.width = 160; faceCv.height = 112;
     var faceTx = new THREE.CanvasTexture(faceCv); faceTx.magFilter = THREE.LinearFilter;
     var screen = new THREE.Mesh(new THREE.PlaneGeometry(.39, .273), new THREE.MeshBasicMaterial({ map: faceTx, fog: false }));
-    screen.position.set(0, .17, .2985); head.add(screen);
+    screen.position.set(0, .17, .3205); head.add(screen);
 
     // ---- dreads: each one is a chain of five points joined by four segments. The points are simulated (they have
     //      weight and momentum) and are pushed out of the head, jacket, hood, shoulders and arms, so they drape
@@ -246,6 +246,8 @@
         if (on) { g.fillStyle = 'rgba(80,170,255,.34)'; g.beginPath(); g.arc(px, py, 7, 0, TAU); g.fill(); g.fillStyle = '#e6f6ff'; g.beginPath(); g.arc(px, py, 1.7, 0, TAU); g.fill(); } }
       faceTx.needsUpdate = true;
     }
+    var JACKETS = { silver: [0xffffff, 0x1c1e24], black: [0x2c2e36, 0x040406], white: [0xffffff, 0x4a4c54], gold: [0xffc94a, 0x2a1c00], rose: [0xff8fb8, 0x2a0a18], red: [0xe8343a, 0x2a0406], blue: [0x3f7dff, 0x04102a], ice: [0x9fe8ff, 0x0a2028], purple: [0x9a5cff, 0x14062a], slime: [0x9dff3a, 0x102400], orange: [0xff8a1f, 0x2a1200], camo: [0x7a8a52, 0x10140a] }, jacketName = 'silver';
+    function setJacket(name) { var J2 = JACKETS[name]; if (!J2) return; jacketName = name; pufferM.color.setHex(J2[0]); pufferM.emissive.setHex(J2[1]); }   // the quilting and the shine stay; only the colour of the shell changes
     function setExpression(eyes, mouth) { if (EYES[eyes]) fx.eyes = eyes; if (MOUTHS[mouth]) fx.mouth = mouth; fx.icon = null; drawFace(); }
     function setIcon(name) { fx.icon = ICONS[name] ? name : null; drawFace(); }
     function setFace(name) { if (PRESET[name]) { fx.lip = 0; setExpression(PRESET[name][0], PRESET[name][1]); } else if (ICONS[name]) setIcon(name); }
@@ -367,8 +369,8 @@
         g.L = A({ sx: -.9, out: .35, ex: -2.0, wy: 1.2, hand: 'fist' }); g.R = A({ sx: .3 * e - .6, out: .5, ex: -1.6, wy: 1.2, hand: 'fist' }); },
       punch: function (g, t, bt) { var i = Math.floor(bt), p = Math.exp(-6 * frac(bt)), lft = i % 2 === 0, hit = A({ sx: -1.5, out: .05, ex: -.1 - (1 - p) * 1.6, wy: 1.57, hand: 'fist' }), grd = A({ sx: -.9, out: .3, ex: -2.05, wy: 1.2, hand: 'fist' }); crouch(g, .16); g.ll.o = .14; g.rl.o = .14; g.tx = .12; g.hx = .08; g.ty = (lft ? -1 : 1) * .5 * p; g.ll.h -= .15; g.rl.h += .15;
         if (lft) { g.L = hit; g.R = grd; } else { g.R = hit; g.L = grd; } },
-      dab: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)); crouch(g, .1 + b * .08); g.hx = .38; g.hy = .5; g.tz = -.14; g.brz = -.05; g.ll.o = .14; g.rl.o = .14;
-        g.L = A({ sx: -.2, out: 2.15 + b * .08, ex: -.05, wy: 0, hand: 'open' }); g.R = A({ sx: -1.55, out: .1, tw: -1.2, ex: -1.9, wy: 1.2, hand: 'open' }); },
+      dab: function (g, t, bt) { var b = Math.exp(-5 * frac(bt)); crouch(g, .1 + b * .08); g.hx = .3; g.hy = .45; g.tz = -.14; g.brz = -.05; g.ll.o = .14; g.rl.o = .14;
+        g.L = A({ sx: -.2, out: 2.15 + b * .08, ex: -.05, wy: 0, hand: 'open' }); g.R = A({ sx: -1.75, out: .25, tw: -1.0, ex: -1.35, wy: 1.2, hand: 'open' }); },
       robot: function (g, t, bt) { var q = Math.floor(bt), a = q % 4; g.hy = [.55, 0, -.55, 0][a]; g.ty = [.3, 0, -.3, 0][a]; g.tz = [0, .08, 0, -.08][a]; crouch(g, .06 + (a % 2) * .1); g.ll.o = .1; g.rl.o = .1;   // right angles, held, then snapped to the next
         g.L = A({ sx: -1.57 * (a % 2), out: a === 2 ? 1.57 : 0, ex: -1.57 * (a < 2 ? 1 : 0), wy: 1.57, wx: a === 3 ? -.8 : 0, hand: 'open' }); g.R = A({ sx: -1.57 * ((a + 1) % 2), out: a === 0 ? 1.57 : 0, ex: -1.57 * (a >= 2 ? 1 : 0), wy: 1.57, wx: a === 1 ? -.8 : 0, hand: 'open' }); },
       armwave: function (g, t, bt) { var f = bt * Math.PI; g.brz = Math.sin(f - 2) * .05; g.tz = Math.sin(f - 2) * .06; g.hz = Math.sin(f - 2) * .12; crouch(g, .08); g.ll.o = .1; g.rl.o = .1;   // a wave that runs in one hand, across his shoulders and out the other
@@ -427,11 +429,11 @@
     };
     var prevTurn = 0, prevBy = 0, V1 = new THREE.Vector3(), V2 = new THREE.Vector3(), INV = new THREE.Matrix4(), TINV = new THREE.Matrix4(), simDreads = true, dInit = false;
     // keep forearms and hands out of the jacket: measure how far a point is inside the torso and swing the arm out, or forward, by that much
-    var ARMPTS = [['el', 0, 0, .105], ['el', -.15, 0, .095], ['hand', 0, 0, .07], ['hand', -.09, 0, .062], ['hand', -.2, 0, .04]], PHONEPTS = [['hand', -.05, .06, .05], ['hand', -.17, .06, .05]];
-    var BALLS = [[head, 0, .2, 0, .3], [head, 0, .17, .19, .19], [head, 0, -.02, .0, .16]], OTHER = new THREE.Vector3();
+    var ARMPTS = [['el', 0, 0, .092], ['el', -.15, 0, .085], ['hand', 0, 0, .07], ['hand', -.09, 0, .062], ['hand', -.2, 0, .04]], PHONEPTS = [['hand', -.05, .06, .05], ['hand', -.17, .06, .05]];
+    var BALLS = [[head, 0, .2, 0, .3], [head, 0, .17, .2, .2], [head, .13, .17, .22, .14], [head, -.13, .17, .22, .14], [head, 0, -.02, .0, .16]], OTHER = new THREE.Vector3();
     function armPen(a, oth, phone) { var worst = 0;
       for (var i = 0; i < ARMPTS.length + (phone ? 2 : 0); i++) { var q = i < ARMPTS.length ? ARMPTS[i] : PHONEPTS[i - ARMPTS.length]; V1.set(0, q[1], q[2]).applyMatrix4(a[q[0]].matrixWorld); V2.copy(V1).applyMatrix4(TINV);
-        if (V2.y > -.06 && V2.y < .6) { var e = Math.sqrt(Math.pow(V2.x / (.345 + q[3]), 2) + Math.pow(V2.z / (.3 + q[3]), 2)); if (e < 1) worst = Math.max(worst, (1 - e) * (.32 + q[3])); }
+        if (V2.y > -.06 && V2.y < .6) { var e = Math.sqrt(Math.pow(V2.x / (.312 + q[3]), 2) + Math.pow(V2.z / (.272 + q[3]), 2)); if (e < 1) worst = Math.max(worst, (1 - e) * (.29 + q[3])); }
         for (var b = 0; b < BALLS.length; b++) { var B = BALLS[b]; V2.set(B[1], B[2], B[3]).applyMatrix4(B[0].matrixWorld); var d = V1.distanceTo(V2) / gscale, R = B[4] + q[3]; if (d < R) worst = Math.max(worst, R - d); }
         if (oth && i >= 2) { var d2 = V1.distanceTo(oth) / gscale; if (d2 < .075 + q[3] * .6) worst = Math.max(worst, (.075 + q[3] * .6 - d2) * .6); } }
       for (var l = 0; l < 2; l++) { V2.set(0, -.1, 0).applyMatrix4(legs[l].hip.matrixWorld); for (var j = 2; j < 5; j++) { V1.set(0, ARMPTS[j][1], 0).applyMatrix4(a.hand.matrixWorld); var d3 = V1.distanceTo(V2) / gscale, R3 = .13 + ARMPTS[j][3]; if (d3 < R3) worst = Math.max(worst, R3 - d3); } }
@@ -445,8 +447,8 @@
         if (bi < 0) break; cS += TRY[bi][0] * step; cO += TRY[bi][1] * step; cE += TRY[bi][2] * step; cur = best; }
       a.sh.rotation.x = bx + cS; a.sh.rotation.z = bz + a.s * cO; a.el.rotation.x = Math.min(-.02, be + cE); a.sh.updateMatrixWorld(true); }
     // the things the dreads cannot pass through: [joint, x, y, z, radius], measured in that joint's own space
-    var CAPS = [[head, 0, .2, 0, .312], [head, 0, .15, .13, .26], [head, .3, .16, 0, .1], [head, -.3, .16, 0, .1], [torso, 0, .1, 0, .335], [torso, 0, .24, 0, .355], [torso, 0, .38, 0, .355], [torso, 0, .5, 0, .31], [torso, 0, .6, -.14, .2], [torso, 0, .62, 0, .15]];
-    arms.forEach(function (a) { CAPS.push([a.sh, 0, 0, 0, .15], [a.sh, 0, -.15, 0, .13], [a.el, 0, 0, 0, .125], [a.el, 0, -.14, 0, .115], [a.hand, 0, -.08, 0, .085]); });
+    var CAPS = [[head, 0, .2, 0, .312], [head, 0, .16, .16, .26], [head, .16, .2, .2, .16], [head, -.16, .2, .2, .16], [head, 0, .17, .46, .3], [head, 0, .3, .36, .2],   /* the last two are a guard in front of the glass: hair goes round his face, never across it */ [head, .3, .16, 0, .1], [head, -.3, .16, 0, .1], [torso, 0, .1, 0, .305], [torso, 0, .24, 0, .32], [torso, 0, .38, 0, .32], [torso, 0, .5, 0, .285], [torso, 0, .6, -.14, .2], [torso, 0, .62, 0, .15]];
+    arms.forEach(function (a) { CAPS.push([a.sh, 0, 0, 0, .132], [a.sh, 0, -.15, 0, .115], [a.el, 0, 0, 0, .11], [a.el, 0, -.14, 0, .102], [a.hand, 0, -.08, 0, .085]); });
     legs.forEach(function (l) { CAPS.push([l.hip, 0, -.05, 0, .14], [l.knee, 0, 0, 0, .125]); });
     var CW = CAPS.map(function () { return new THREE.Vector3(); });
     function dSolve(D, iters) { var rad = .026 * D.th, np = D.np;
@@ -498,7 +500,7 @@
     }
     update(0, 1);
     return { group: group, parts: { body: body, torso: torso, head: head, screen: screen, arms: arms, legs: legs, pendant: pendant, dreads: dreads },
-      poses: Object.keys(POSES), hands: Object.keys(HANDS), faces: Object.keys(PRESET), icons: Object.keys(ICONS), eyes: Object.keys(EYES), mouths: Object.keys(MOUTHS), setFace: setFace, setExpression: setExpression, setIcon: setIcon, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.63 };
+      poses: Object.keys(POSES), hands: Object.keys(HANDS), faces: Object.keys(PRESET), icons: Object.keys(ICONS), eyes: Object.keys(EYES), mouths: Object.keys(MOUTHS), jackets: Object.keys(JACKETS), setJacket: setJacket, setFace: setFace, setExpression: setExpression, setIcon: setIcon, setMouth: setMouth, setPose: setPose, setTempo: setTempo, defs: POSES, arm: A, simDreads: function (v) { simDreads = v; }, update: update, height: 1.63 };
   }
   // suggest(line): a pose, eyes, mouth and icon for a lyric line, from the words in it. First rule that matches wins.
   var RULES = [
@@ -518,5 +520,5 @@
     [/\blove|\bheart|\blikes?\b/i, 'thumbs', 'heart', 'grin', 'heart'], [/strong|flex|muscle/i, 'flex', 'hype', 'grin', null], [/know|think|mind|brain|smart/i, 'think', 'side', 'smirk', null], [/\bme\b|\bmine\b|\bmyself/i, 'me', 'happy', 'grin', null], [/\byou\b|\byour\b|y'all/i, 'point', 'happy', 'smile', null], [/\?/, 'shrug', 'side', 'smirk', 'what']];
   var FALLBACK = ['rap', 'dance', 'bodyroll', 'mic', 'shake', 'robot', 'gang', 'armwave', 'lead', 'slide', 'dab', 'me'];
   function suggest(line, n) { var txt = String(line || ''); for (var i = 0; i < RULES.length; i++) if (RULES[i][0].test(txt)) return { pose: RULES[i][1], eyes: RULES[i][2], mouth: RULES[i][3], icon: RULES[i][4] }; return { pose: FALLBACK[(n || 0) % FALLBACK.length], eyes: 'happy', mouth: 'grin', icon: null }; }
-  root.LilBottie = { build: build, suggest: suggest, version: '0.8' };
+  root.LilBottie = { build: build, suggest: suggest, version: '0.9' };
 })(typeof window !== 'undefined' ? window : this);

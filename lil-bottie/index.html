@@ -50,12 +50,12 @@ body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(14px +
 @media (max-width:560px){#top span{display:none}}
 </style>
 <canvas id="c"></canvas>
-<div id="top"><b>LIL BOTTIE</b><span>asset v0.8 · his songs, line by line · drag to turn him</span></div>
+<div id="top"><b>LIL BOTTIE</b><span>asset v0.9 · his songs, line by line · drag to turn him</span></div>
 <div id="lyric"><i id="sec"></i><b id="line"></b><u id="what"></u></div>
 <div id="ui">
   <div class="row"><select id="songSel" aria-label="Song"></select><button class="go" id="play">▶ play</button><button id="prev" aria-label="Previous line">⏮</button><button id="next" aria-label="Next line">⏭</button><span id="clock">0:00.0 / 3:20</span><button id="lines" aria-label="All lines">☰</button><button id="moreb" aria-label="More controls">⋯</button><button id="hide" aria-label="Hide the controls">hide</button></div>
   <div id="bar" role="slider" aria-label="Song position" tabindex="0"><u></u></div>
-  <div class="row" id="more" hidden><select id="poseSel" aria-label="Pose"></select><select id="faceSel" aria-label="Face"></select><button id="auto" class="on">follow the song</button><button id="slow">½ speed</button><button id="tap">⏱ time it yourself</button>
+  <div class="row" id="more" hidden><select id="poseSel" aria-label="Pose"></select><select id="faceSel" aria-label="Face"></select><select id="jackSel" aria-label="Jacket"></select><button id="auto" class="on">follow the song</button><button id="slow">½ speed</button><button id="tap">⏱ time it yourself</button>
     <button id="back" aria-label="Lyrics earlier">lyrics −¼s</button><button id="fwd" aria-label="Lyrics later">lyrics +¼s</button><span class="lab" id="off">offset 0.00s</span><span id="mine"></span></div>
 </div>
 <button id="show" hidden>show controls</button>
@@ -91,8 +91,10 @@ body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(14px +
   function fill(sel,first,groups){var h='<option value="">'+first+'</option>';groups.forEach(function(gr){h+='<optgroup label="'+gr[0]+'">'+gr[1].map(function(n){return '<option>'+n+'</option>';}).join('')+'</optgroup>';});$(sel).innerHTML=h;}
   fill('poseSel','pose…',[['poses',B.poses]]);fill('faceSel','face…',[['expressions',B.faces],['icons',B.icons]]);
   $('poseSel').onchange=function(){if(this.value){setFollow(false);B.setPose(this.value);}};$('faceSel').onchange=function(){if(this.value){setFollow(false);B.setMouth(0);B.setFace(this.value);}};
+  var JACK={'the-algorithm':'silver','boot-up':'white','overclocked':'red','born-in-the-server':'ice','terms-and-conditions':'black','root-access':'slime','no-wi-fi-still-online':'blue','aura-farming':'purple','rate-limit':'orange','blue-screen':'blue','run-the-bank':'gold','nuke-the-data-center':'camo','clanka-szn':'rose'},jackPick=false;
+  $('jackSel').innerHTML='<option value="">jacket…</option>'+B.jackets.map(function(n){return '<option>'+n+'</option>';}).join('');$('jackSel').onchange=function(){if(this.value){jackPick=true;B.setJacket(this.value);}else{jackPick=false;B.setJacket(JACK[CUR.id]||'silver');}};
   $('auto').onclick=function(){setFollow(!follow);if(follow){$('poseSel').value='';$('faceSel').value='';lastK=-9;}};
-  var h=location.hash.slice(1).split('-');if(h[0]&&B.poses.indexOf(h[0])>=0){setFollow(false);B.setPose(h[0]);}if(h[1]){setFollow(false);B.setFace(h[1]);}if(h[2]){yaw=+h[2];auto=false;}
+  var h=location.hash.slice(1).split('-');if(h[0]&&B.poses.indexOf(h[0])>=0){setFollow(false);B.setPose(h[0]);}if(h[1]){setFollow(false);B.setFace(h[1]);}if(h[3]){B.setJacket(h[3]);}if(h[2]){yaw=+h[2];auto=false;}
   // ---- the song
   var AUDIO=$('song'),VC={currentTime:0,paused:true,playbackRate:1,duration:1,play:function(){this.paused=false;return Promise.resolve();},pause:function(){this.paused=true;}};
   var ALGO=LINES,ALGOGRID=LINES.map(function(L){return L[0];}),SONGS=[{id:'the-algorithm',title:'The Algorithm',audio:true,lines:ALGO}].concat(OTHERS.map(function(o){var cnt={},lastS='',n=0;return{id:o.id,title:o.title,audio:false,lines:o.lines.map(function(q,i){var sg=LilBottie.suggest(q[1],i);return[2+i*3.4975,q[0],q[1],sg.pose,sg.eyes,sg.mouth,sg.icon];})};})),CUR=SONGS[0];
@@ -117,7 +119,7 @@ body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(14px +
   var GRID=LINES.map(function(L){return L[0];});
   $('songSel').innerHTML=SONGS.map(function(s,i){return '<option value="'+i+'">'+s.title+(s.audio?' ♪':' (run-through)')+'</option>';}).join('');
   $('songSel').onchange=function(){AUDIO.pause();VC.pause();CUR=SONGS[+this.value];LINES=CUR.lines;song=CUR.audio?AUDIO:VC;VC.currentTime=0;VC.duration=LINES[LINES.length-1][0]+6;offset=0;$('off').textContent='offset 0.00s';started=false;lastK=-9;
-    GRID=CUR.audio?ALGOGRID:LINES.map(function(L){return L[0];});$('tap').hidden=!CUR.audio;$('back').hidden=$('fwd').hidden=$('off').hidden=!CUR.audio;$('listT').textContent=CUR.title.toUpperCase();$('sec').textContent=CUR.audio?'':'RUN-THROUGH · THERE IS NO RECORDING OF THIS ONE IN THE REPO, SO IT RUNS SILENT AT ONE LINE A BAR';$('line').textContent='';$('what').textContent='';setFollow(true);B.setPose('idle');B.setFace('smile');buildList();size();};
+    GRID=CUR.audio?ALGOGRID:LINES.map(function(L){return L[0];});$('tap').hidden=!CUR.audio;$('back').hidden=$('fwd').hidden=$('off').hidden=!CUR.audio;$('listT').textContent=CUR.title.toUpperCase();if(!jackPick)B.setJacket(JACK[CUR.id]||'silver');$('sec').textContent=CUR.audio?'':'RUN-THROUGH · THERE IS NO RECORDING OF THIS ONE IN THE REPO, SO IT RUNS SILENT AT ONE LINE A BAR';$('line').textContent='';$('what').textContent='';setFollow(true);B.setPose('idle');B.setFace('smile');buildList();size();};
   function times(){return LINES.map(function(L){return L[0];});}
   function store(){if(!CUR.audio)return;try{localStorage.setItem('lb-algorithm-timing',JSON.stringify(times()));}catch(e){}mineLabel(true);}
   function mineLabel(on){$('mine').innerHTML=on?'using your timing · <a href="#" id="resetT" style="color:inherit">reset</a>':'';var r=$('resetT');if(r)r.onclick=function(e){e.preventDefault();LINES.forEach(function(L,i){L[0]=GRID[i];});try{localStorage.removeItem('lb-algorithm-timing');}catch(x){}mineLabel(false);buildList();};}

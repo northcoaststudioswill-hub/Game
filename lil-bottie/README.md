@@ -102,6 +102,19 @@ How he moves (v0.4):
 
 ![the action moves](asset/lil-bottie-action-moves.png)
 
+## v0.9: a clean face, a slimmer jacket, jacket colours
+
+- **Face:** the helmet's rim ring was wider than the screen is deep, so its front poked through the glass as a
+  grey wedge under his mouth, and the dome grazed the glass at its centre. The rim is now open at the front and
+  the screen sits forward of the dome. An invisible guard in front of the glass sends hair round his face.
+- **Jacket:** 10% slimmer in the body, 12 to 14% in the sleeves, with the arms set closer in.
+- **Jacket colours:** `b.setJacket(name)` with silver (his own), black, white, gold, rose, red, blue, ice, purple,
+  slime, orange, camo. The quilting and shine stay; only the shell colour changes. On the page each song has its
+  own (Blue Screen is blue, Overclocked red, Run the Bank gold …) and there is a jacket picker under ⋯.
+
+![twelve jackets, and the face in the shake](asset/lil-bottie-jackets.png)
+![the face from twelve angles and poses](asset/lil-bottie-face.png)
+
 ## The Algorithm, line by line
 
 `lyrics/the-algorithm.choreo.json` gives every one of the 52 lines a pose, eyes, a resting mouth and (for some)
