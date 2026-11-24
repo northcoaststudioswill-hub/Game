@@ -29,4 +29,16 @@ const mv = await p.evaluate(() => __pit.MT.me.mv && __pit.MT.me.mv.mv.id);
 ok(L.some(s => s.st === 'move') && mv === 'hesi' && L[L.length - 1].live === 'drib' && !L.some(s => s.st === 'fake'), `pump on the drive: a hesi (${mv}), still dribbling (${L[L.length - 1].live})`);
 // 5. a dribble move on the move keeps the dribble alive
 L = await keys(['KeyD', 'KeyL'], 2); L = L.concat(await keys(['KeyD'], 40)); ok(L.some(s => s.st === 'move') && L[L.length - 1].live === 'drib', `a crossover on the move keeps the dribble (${L[L.length - 1].live})`);
+// 6. a defender up in your chest can force a pickup (dice loaded so the test is quick)
+r = await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES[0], P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(220);
+  const M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), d = opp[0]; M.phase = 'live'; M.needClear = false; M.clock = 14; for (const q of M.P) if (q !== me && q !== d) { q.x = 7.5; q.z = 12.5; q.st = 'stagger'; q.stg = { dur: 99, fall: false }; q.t = 0; }
+  me.x = 0; me.z = 7; me.vx = me.vz = 0; me.face = Math.PI; M.B.state = 'held'; M.B.holder = me; M.off = me.team; me.live = 'drib'; d.x = 0; d.z = 6.25; d.ai.tick = 999; d.aiLvl = 0; d.user = true; d.ctrl = 5;
+  while (P.IN.length < 6) P.IN.push({ mx: 0, my: 0, rx: 0, ry: 0, sprint: false, a: false, b: false, aP: false, bP: false, bR: false, flick: null, rdir: null });
+  const rnd = Math.random; Math.random = () => 0.01; let t = -1, dbg = []; for (let i = 0; i < 120; i++) { window.__tick(1); if (i % 20 === 0) dbg.push([M.phase, me.st, me.live, +(Math.hypot(d.x - me.x, d.z - me.z)).toFixed(2), +(me.pressT || 0).toFixed(2), d.st, M.B.holder === me, +me.face.toFixed(2)].join(' ')); if (me.live === 'dead') { t = i; break; } } Math.random = rnd; return { live: me.live, secs: +(t / 60).toFixed(2), dbg }; });
+ok(r.live === 'dead', `a defender up in your chest forces a pickup (after ${r.secs} s of pressure)`);
+// 7. an AI ball handler with a dead ball gets rid of it instead of dribbling
+r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), h = opp[0], mate = opp[1]; for (const q of M.P) { q.st = 'free'; q.stg = null; }
+  me.x = 6; me.z = 11; h.user = false; h.ctrl = -1; h.x = -2; h.z = 7; h.vx = h.vz = 0; mate.x = 3; mate.z = 8; M.B.state = 'held'; M.B.holder = h; M.off = h.team; M.needClear = false; h.live = 'dead'; h.ai.tick = 0; h.ai.hold = 0; h.aiLvl = 0.8; const x0 = h.x, z0 = h.z;
+  let got = '', moved = 0; for (let i = 0; i < 90; i++) { window.__tick(1); moved = Math.max(moved, Math.hypot(h.x - x0, h.z - z0)); if (M.B.holder !== h) { got = M.B.state; break; } if (h.st === 'move') { got = 'MOVED'; break; } } return { got, moved: +moved.toFixed(2) }; });
+ok((r.got === 'pass' || r.got === 'shot' || r.got === 'held') && r.moved < 0.3, `AI with a dead ball: ${r.got || 'kept it'} without dribbling (moved ${r.moved} m)`);
 console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close();

@@ -196,7 +196,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.9.2';
+const VERSION = '0.9.3';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -2165,6 +2165,11 @@ function aiThink(p, dt) {
       const d = dHoop(p), [o, od] = nearestOpp(p), open = od > 1.7, style = p.b.build.style;
       const mates = MT.P.filter(q => q.team === p.team && q !== p && q.st === 'free');
       const tryPass = (pred) => { const c = mates.filter(q => passLane(p, q) && (!pred || pred(q))); if (!c.length) return false; c.sort((m, n) => nearestOpp(n)[1] - nearestOpp(m)[1]); doPass(p, c[0]); return true; };
+      if (p.live === 'dead') {        // picked up: no dribble left. Get rid of it, or go up with it
+        if (d < 2.4) { startFinish(p, 0, false, 0, { layup: 1, kind: 'power' }); return; }
+        if (tryPass() || (mates.length && Math.random() < 0.6 && (doPass(p, mates[0]), true))) return;
+        startShot(p, 'ai'); return;
+      }
       if (MT.needClear) {
         if (beyondArc(p.x, p.z)) { /* cleared next frame */ }
         else { const l = d || 1; aiGo(p, p.x / l * 8.0 + (p.x === 0 ? 0.1 : 0), Math.max(p.z / l * 8.0, 4.5), true); if (Math.random() < 0.35 && tryPass(q => beyondArc(q.x, q.z))) return; }
@@ -2324,11 +2329,20 @@ function stepPlayer(p, dt) {
     case 'celeb': lock = 0; p.vx *= 0.85; p.vz *= 0.85; if (M_.phase === 'live') p.st = 'free'; break;
   }
   // no double dribble: you can stop and keep dribbling, but a pump fake after dribbling picks the ball up for good
-  if (hasBall && dribRules(p)) {
-    const push = Math.hypot(p.in.dx, p.in.dz);
-    if (p.live === 'hold' && (push > 0.25 || p.st === 'move')) p.live = 'drib';
+  if (hasBall && dribRules(p)) { const push = Math.hypot(p.in.dx, p.in.dz); if (p.live === 'hold' && (push > 0.25 || p.st === 'move')) p.live = 'drib'; }
+  else if (hasBall && p.live === 'hold') p.live = 'drib';
+  // a defender can force a pickup: up in your chest, in front of you, while you are not getting anywhere
+  if (hasBall && p.live === 'drib' && p.st === 'free' && M_.phase === 'live' && !M_.practice) {
+    const [o, od] = nearestOpp(p), fx = Math.sin(p.face), fz = Math.cos(p.face);
+    if (o && od < 1.25 && ((o.x - p.x) * fx + (o.z - p.z) * fz) > od * 0.5 && Math.hypot(p.vx, p.vz) < 1.6 && (o.st === 'free' || o.st === 'steal')) {
+      p.pressT = (p.pressT || 0) + dt;
+      if (p.pressT >= 0.6) { p.pressT = 0; const ch = clamp(0.1 + (att(o, 'perd') - att(p, 'handle')) * 0.006 + 0.05 * bt(o, 'ground') - 0.05 * bt(p, 'nda') + (o.handsUp ? 0.04 : 0), 0.02, 0.3);
+        if (Math.random() < ch) { p.live = 'dead'; floatTxt(p, 'FORCED PICKUP', '#ff8a1f'); floatTxt(o, 'LOCKED UP', '#7de3ff'); addBrav(o, 0.08); } }
+    } else p.pressT = 0;
+  }
+  if (hasBall) {
     if (p.live === 'dead' && p.st === 'free') { lock = 0; const k = Math.pow(0.002, dt); p.vx *= k; p.vz *= k; }      /* feet stay put: pivot only */
-  } else if (hasBall && p.live !== 'drib') p.live = 'drib';
+  }
   if (M_.phase !== 'live' && M_.phase !== 'check') lock = Math.min(lock, p.st === 'celeb' ? 0 : 0.5);
   if (M_.phase === 'check') lock = 0;
   // defensive assist (people only, not sprinting): stay between your man and the rim, mirror his steps, sag off the
