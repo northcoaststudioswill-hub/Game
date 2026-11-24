@@ -751,7 +751,7 @@ function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
 function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
 // button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
 // between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
-function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = false; I.flick = null; } }
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
@@ -778,7 +778,10 @@ function pollInput() {
       const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; if (ls[0] || ls[1]) analog = true; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
       if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1;
-      sprint = sprint || B(7) || B(5); a = a || B(0); b = b || B(2) || B(3); st = st || B(9); bk = bk || B(1);
+      // on defense (2K layout): X steals, Y jumps to block; A still steals. With the ball and off it: X or Y shoots / jumps
+      const def = typeof padDefense === 'function' && padDefense(i);
+      sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
+      const lb = B(4), rb = B(5); I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
@@ -2041,6 +2044,11 @@ function startShot(p, src, floater, opt) {
   else if ((!p.user || p.afk) && !opt.hopped) { const sd = 0.17 - p.aiLvl * 0.10; p.shot.aiRel = p.shot.rel * (1 + clamp((Math.random() + Math.random() + Math.random() - 1.5) * sd * 1.6, -0.4, 0.45)); }
   p.face = Math.atan2(-p.x, -p.z); return true;
 }
+// is controller i's player defending right now? (decides what X does)
+function padDefense(i) {
+  const M_ = MT; if (!M_ || M_.phase !== 'live') return false; const p = i === 0 ? M_.me : M_.P.find(q => q.ctrl === i && !q.remote); if (!p) return false;
+  const B = M_.B; return B.holder !== p && !(M_.off === p.team && B.state !== 'loose' && B.state !== 'shot') && B.state !== 'loose';
+}
 function releaseShot(p) {
   const s = p.shot; if (s.released) return; s.released = true; const B = MT.B;
   const held = s.hold != null ? s.hold : p.t;
@@ -2061,6 +2069,7 @@ function releaseShot(p) {
   const e = Math.abs(err); let green = e <= w, prob;
   if (green) prob = c > 0.55 ? 0.8 : 1; else prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
   if (!p.user) green = green && Math.random() < 0.5;
+  else if (s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
@@ -4044,7 +4053,24 @@ function rerender(reset) {
 }
 function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
-function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range]')); }
+function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],.card[data-k],.sw[data-k]')).filter(e => e.offsetParent !== null); }
+// controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
+function navDir(f, from, m) {
+  const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2; let best = -1, bs = 1e9;
+  f.forEach((el, i) => { if (i === from) return; const r = el.getBoundingClientRect(); if (!r.width) return;
+    const dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy, horiz = m === 'L' || m === 'R';
+    const main = m === 'R' ? dx : m === 'L' ? -dx : m === 'D' ? dy : -dy; if (main <= 6) return;
+    const over = horiz ? Math.max(0, Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top)) : Math.max(0, Math.min(a.right, r.right) - Math.max(a.left, r.left));
+    const cross = horiz ? Math.abs(dy) : Math.abs(dx), s = main + (over > 0 ? 0 : cross * 2.2); if (s < bs) { bs = s; best = i; } });
+  if (best < 0 && (m === 'U' || m === 'D')) best = (from + (m === 'D' ? 1 : -1) + f.length) % f.length;      /* nothing that way: step through the list */
+  return best < 0 ? from : best;
+}
+// LB / RB flip through the tabs at the top of a menu
+function navTab(d) {
+  const tb = Array.from($('panel').querySelectorAll('.tabs .btn')); if (!tb.length) return false;
+  let k = tb.findIndex(b => b.classList.contains('sel')); if (k < 0) k = tb.findIndex(b => !b.classList.contains('alt')); if (k < 0) k = 0;
+  tb[(k + d + tb.length) % tb.length].click(); const f = focusables(), first = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, first); paintFocus(); sfx('ui'); return true;
+}
 function paintFocus() { if (IS_TOUCH) return; const f = focusables(); f.forEach((b, i) => b.classList.toggle('focus', i === UI.focus)); }
 addEventListener('click', e => { const b = e.target.closest('[data-em]'); if (!b) return; e.stopPropagation(); audioInit(); if (b.dataset.em === 'chat') chatOpen(); else emote(b.dataset.em); });
 function uiInit() {
@@ -4064,8 +4090,9 @@ function uiStep(dt) {
   if (m && UI.navT <= 0 && f.length) {
     UI.navT = 0.17; const cur = f[UI.focus];
     if (cur && cur.type === 'range' && (m === 'L' || m === 'R')) { cur.value = +cur.value + (m === 'R' ? 1 : -1) * (+cur.step || 1); cur.dispatchEvent(new Event('input', { bubbles: true })); }
-    else { UI.focus = (UI.focus + (m === 'D' || m === 'R' ? 1 : -1) + f.length) % f.length; paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
+    else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
+  if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
   if (I.aP && f[UI.focus] && !IS_TOUCH) f[UI.focus].click();
   if (I.back && UI.cur) uiBack();
 }
@@ -5522,7 +5549,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), packBuild: b => packBuild(b), unpackBuild: c => unpackBuild(c), myBuild: () => myBuild(), shotPose: (a, u, n) => shotPose(a, u, n), idlePose: (a, t, o) => idlePose(a, t, o), profileFromBuild: s => profileFromBuild(s), animProfile: s => animProfile(s), alabOpen: () => alabOpen(), get ALAB() { return ALAB; }, uiDev: b => uiDev(b), aiBuild: (o, r) => aiBuild(o, r), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s) => startShot(p, s), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), releaseShot: p => releaseShot(p), startPractice2: 0, packBuild: b => packBuild(b), unpackBuild: c => unpackBuild(c), myBuild: () => myBuild(), shotPose: (a, u, n) => shotPose(a, u, n), idlePose: (a, t, o) => idlePose(a, t, o), profileFromBuild: s => profileFromBuild(s), animProfile: s => animProfile(s), alabOpen: () => alabOpen(), get ALAB() { return ALAB; }, uiDev: b => uiDev(b), aiBuild: (o, r) => aiBuild(o, r), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s, f, o) => startShot(p, s, f, o), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera); window.__info = () => { let m = 0, s = 0, t = 0; scene.traverse(o => { if (o.isSprite) s++; else if (o.isMesh) m++; }); return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, meshes: m, sprites: s }; };
   // test hook: draw the player in one pose and hand back the frame

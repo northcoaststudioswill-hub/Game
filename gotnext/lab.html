@@ -620,7 +620,7 @@ function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
 function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
 // button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
 // between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
-function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = false; I.flick = null; } }
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
@@ -647,7 +647,10 @@ function pollInput() {
       const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; if (ls[0] || ls[1]) analog = true; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
       if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1;
-      sprint = sprint || B(7) || B(5); a = a || B(0); b = b || B(2) || B(3); st = st || B(9); bk = bk || B(1);
+      // on defense (2K layout): X steals, Y jumps to block; A still steals. With the ball and off it: X or Y shoots / jumps
+      const def = typeof padDefense === 'function' && padDefense(i);
+      sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
+      const lb = B(4), rb = B(5); I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }

@@ -13,7 +13,24 @@ function rerender(reset) {
 }
 function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
-function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range]')); }
+function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],.card[data-k],.sw[data-k]')).filter(e => e.offsetParent !== null); }
+// controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
+function navDir(f, from, m) {
+  const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2; let best = -1, bs = 1e9;
+  f.forEach((el, i) => { if (i === from) return; const r = el.getBoundingClientRect(); if (!r.width) return;
+    const dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy, horiz = m === 'L' || m === 'R';
+    const main = m === 'R' ? dx : m === 'L' ? -dx : m === 'D' ? dy : -dy; if (main <= 6) return;
+    const over = horiz ? Math.max(0, Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top)) : Math.max(0, Math.min(a.right, r.right) - Math.max(a.left, r.left));
+    const cross = horiz ? Math.abs(dy) : Math.abs(dx), s = main + (over > 0 ? 0 : cross * 2.2); if (s < bs) { bs = s; best = i; } });
+  if (best < 0 && (m === 'U' || m === 'D')) best = (from + (m === 'D' ? 1 : -1) + f.length) % f.length;      /* nothing that way: step through the list */
+  return best < 0 ? from : best;
+}
+// LB / RB flip through the tabs at the top of a menu
+function navTab(d) {
+  const tb = Array.from($('panel').querySelectorAll('.tabs .btn')); if (!tb.length) return false;
+  let k = tb.findIndex(b => b.classList.contains('sel')); if (k < 0) k = tb.findIndex(b => !b.classList.contains('alt')); if (k < 0) k = 0;
+  tb[(k + d + tb.length) % tb.length].click(); const f = focusables(), first = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, first); paintFocus(); sfx('ui'); return true;
+}
 function paintFocus() { if (IS_TOUCH) return; const f = focusables(); f.forEach((b, i) => b.classList.toggle('focus', i === UI.focus)); }
 addEventListener('click', e => { const b = e.target.closest('[data-em]'); if (!b) return; e.stopPropagation(); audioInit(); if (b.dataset.em === 'chat') chatOpen(); else emote(b.dataset.em); });
 function uiInit() {
@@ -33,8 +50,9 @@ function uiStep(dt) {
   if (m && UI.navT <= 0 && f.length) {
     UI.navT = 0.17; const cur = f[UI.focus];
     if (cur && cur.type === 'range' && (m === 'L' || m === 'R')) { cur.value = +cur.value + (m === 'R' ? 1 : -1) * (+cur.step || 1); cur.dispatchEvent(new Event('input', { bubbles: true })); }
-    else { UI.focus = (UI.focus + (m === 'D' || m === 'R' ? 1 : -1) + f.length) % f.length; paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
+    else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
+  if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
   if (I.aP && f[UI.focus] && !IS_TOUCH) f[UI.focus].click();
   if (I.back && UI.cur) uiBack();
 }

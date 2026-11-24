@@ -181,6 +181,11 @@ function startShot(p, src, floater, opt) {
   else if ((!p.user || p.afk) && !opt.hopped) { const sd = 0.17 - p.aiLvl * 0.10; p.shot.aiRel = p.shot.rel * (1 + clamp((Math.random() + Math.random() + Math.random() - 1.5) * sd * 1.6, -0.4, 0.45)); }
   p.face = Math.atan2(-p.x, -p.z); return true;
 }
+// is controller i's player defending right now? (decides what X does)
+function padDefense(i) {
+  const M_ = MT; if (!M_ || M_.phase !== 'live') return false; const p = i === 0 ? M_.me : M_.P.find(q => q.ctrl === i && !q.remote); if (!p) return false;
+  const B = M_.B; return B.holder !== p && !(M_.off === p.team && B.state !== 'loose' && B.state !== 'shot') && B.state !== 'loose';
+}
 function releaseShot(p) {
   const s = p.shot; if (s.released) return; s.released = true; const B = MT.B;
   const held = s.hold != null ? s.hold : p.t;
@@ -201,6 +206,7 @@ function releaseShot(p) {
   const e = Math.abs(err); let green = e <= w, prob;
   if (green) prob = c > 0.55 ? 0.8 : 1; else prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
   if (!p.user) green = green && Math.random() < 0.5;
+  else if (s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
