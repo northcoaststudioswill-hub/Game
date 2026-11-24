@@ -6371,6 +6371,137 @@ function solidPush(){if(!SOLID.cells.size||S.inPk)return;const cs=SOLID.cs,h=cs/
 setTimeout(()=>{try{solidBuild();}catch(e){console.warn('solid',e);}},0);
 // Derek's van is solid while it is parked
 colliders.push({get x(){return VAN.x;},get z(){return VAN.z;},r:3.2,get top(){return VAN.driving?-9999:VAN.y+4.2;}});
+/* ================= ACT 54: SIDEQUEST 2.0. The lake now has a tide, four engagement hammers swing across the route, slop geysers knock you sideways, the Ref commentates, and finishing times earn medals. ================= */
+const SQ2={ham:[],gey:[],tide:0,last:{run:false,t:0,done:0},said:0};
+(function(){const A=SQ.A;if(!A)return;const gy=SQ.gy,Y=gy+4.5;
+  const pts=[];for(let i=0;i<=46;i++){const a=Math.PI*.9+i/46*TAU*.86,R=A.r-9-(i>40?(i-40)*2.2:0);pts.push({x:A.x+Math.cos(a)*R,z:A.z+Math.sin(a)*R});}
+  // engagement hammers: a post beside the route, a long arm swinging across it
+  [5,14,23,33].forEach((i,k)=>{const p=pts[i],n=pts[i+1],tx=n.x-p.x,tz=n.z-p.z,d=Math.hypot(tx,tz)||1,ox=-tz/d,oz=tx/d,px=p.x+ox*5.5,pz=p.z+oz*5.5;
+    const post=new THREE.Mesh(merge([pt(Cyl(.5,.6,10.6,8),0x3a3a48,M(0,5.3,0)),pt(Sph(.8,10,8),0xff2e88,M(0,10.6,0))]),lam);post.position.set(px,gy,pz);A38.add(post);colliders.push({x:px,z:pz,r:.8,top:gy+10.6});
+    const arm=new THREE.Group();arm.position.set(px,gy+10.6,pz);A38.add(arm);const rod=new THREE.Mesh(merge([pt(Box(.25,7.5,.25),0xaab2c0,M(0,-3.75,0)),pt(Box(1.4,1.4,2.6),0xff2e88,M(0,-7.5,0))]),lam);arm.add(rod);
+    const lab=textSprite('ENGAGEMENT HAMMER',.4,{color:'#ff2e88'});lab.position.set(0,-8.9,0);arm.add(lab);arm.rotation.y=Math.atan2(ox,oz);SQ2.ham.push({arm,px,pz,ox,oz,ph:k*1.6,y:Y});});
+  // slop geysers: between platforms, bubbling for a second, then a column of slop
+  [9,18,27,36,40].forEach((i,k)=>{const p=pts[i],n=pts[i+1],x=(p.x+n.x)/2,z=(p.z+n.z)/2;const col=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.6,12,10,1,true),new THREE.MeshLambertMaterial({color:0x8ac020,transparent:true,opacity:.8,emissive:0x2a4a00,side:THREE.DoubleSide}));col.position.set(x,gy+6,z);col.visible=false;A38.add(col);
+    const bub=emojiSprite('🫧',1.6);bub.position.set(x,SQ.lake+.6,z);bub.visible=false;A38.add(bub);SQ2.gey.push({x,z,col,bub,ph:k*1.3,on:false});});
+  const ms=textSprite(['MEDALS','🥇 under 67 s · 🥈 under 90 s · 🥉 under 120 s'],.7,{color:'#ffd400'});ms.position.set(A.x,gy+12.5,A.z);A38.add(ms);})();
+SPEAK.ref=SPEAK.ref||{name:'THE REF (AI)',face:'🏁',pitch:180,wave:'square'};
+const REFSAY={fall:['AND HE IS IN THE SLOP. CLIP IT.','THAT IS GOING IN THE COMPILATION.','SIDEWAYS IS HARD. I KNOW. I DESIGNED IT. NO I DID NOT.','THE SLOP WELCOMES YOU BACK.','REPLAY. REPLAY. REPLAY.'],cp:['CHECKPOINT. YOUR MOM WOULD BE PROUD (SHE IS NOT WATCHING).','HALFWAY-ISH. ISH IS DOING A LOT OF WORK.','THE CROWD GOES MILD.'],ham:['HAMMERED. ENGAGEMENT UP 400%.','THE HAMMER DOES NOT LIKE YOU. NOBODY DOES.'],gey:['GEYSERED. THAT IS A WORD NOW.','THE SLOP HAS OPINIONS.']};
+function refSay(k){if(S.t-SQ2.said<3)return;SQ2.said=S.t;bubble(pick(REFSAY[k]),PL.x,PL.y+5,PL.z);}
+{const cu=crsUpdate;crsUpdate=function(dt,play){const A=SQ.A;if(!A)return cu(dt,play);const near=Math.hypot(PL.x-A.x,PL.z-A.z)<A.r+30&&!S.inPk,t=S.t,cpB=SQ.cp,runB=SQ.run,tB=SQ.t,doneB=(Q38().cdone||0);
+  // the tide: the slop breathes, slowly
+  SQ2.tide=(Math.sin(t*TAU/22)*.5+.5);SQ.lake=SQ.gy+.9+SQ2.tide*2.1;if(SQ.lakeM)SQ.lakeM.position.y=SQ.lake;
+  cu(dt,play);
+  if(!near)return;
+  if(SQ.cp>cpB&&SQ.cp>0)refSay('cp');
+  // hammers swing; a hit knocks you clean off
+  SQ2.ham.forEach(h=>{const a=Math.sin(t*1.5+h.ph)*1.3;h.arm.rotation.x=a;if(!play||PL.inv>0)return;
+    const local=-Math.sin(a)*7.5,head={x:h.px+Math.sin(h.arm.rotation.y)*local,z:h.pz+Math.cos(h.arm.rotation.y)*local,y:SQ.gy+10.6-Math.cos(a)*7.5};
+    if(Math.hypot(PL.x-head.x,PL.z-head.z)<1.9&&Math.abs(PL.y+1-head.y)<1.8){const s=Math.sign(Math.cos(t*1.5+h.ph))||1;PL.kx=Math.sin(h.arm.rotation.y)*-s*20;PL.kz=Math.cos(h.arm.rotation.y)*-s*20;PL.vy=9;PL.grounded=false;PL.inv=.6;SFX.boom();S.shake=.4;refSay('ham');}});
+  // geysers: bubble, then blow
+  SQ2.gey.forEach(g=>{const c=(t+g.ph)%5,bub=c>3&&c<4,on=c>=4;g.bub.visible=bub;if(bub)g.bub.position.y=SQ.lake+.6+Math.sin(t*20)*.2;g.col.visible=on;if(on){g.col.position.y=SQ.lake+6;g.col.scale.y=.6+.4*Math.sin((c-4)*Math.PI);}
+    if(on&&play&&Math.hypot(PL.x-g.x,PL.z-g.z)<2.2&&PL.y<SQ.lake+12){const dx=PL.x-SQ.A.x,dz=PL.z-SQ.A.z,d=Math.hypot(dx,dz)||1;PL.vy=Math.max(PL.vy,15);PL.kx=dx/d*14;PL.kz=dz/d*14;PL.grounded=false;refSay('gey');}});
+  // medals: compare before and after the finish line
+  const q=Q38();if((q.cdone||0)>doneB&&runB){const tm=tB;const m=tm<67?'gold':tm<90?'silver':tm<120?'bronze':null;q.med=q.med||{};
+    if(m&&!q.med[m]){q.med[m]=1;const H={gold:'🥇',silver:'🥈',bronze:'🥉'}[m];if(!X.hats.includes(H))X.hats.push(H);addAura({gold:67000,silver:20000,bronze:6700}[m],PL.x,PL.y+4,PL.z);save();setTimeout(()=>chapter('SIDEQUEST MEDAL','🏅 '+m.toUpperCase()+' · '+tm.toFixed(1)+' s · new hat: '+H),1200);}
+    else if(!m)setTimeout(()=>toast('🏁 '+tm.toFixed(1)+' s. No medal. Bronze is under 120. The ref believes in you (the ref is lying).'),1200);}};}
+// the ref clips every dunk
+{const wt=warpTo;warpTo=function(x,z,y,yaw,card){if(SQ.A&&onCourse&&onCourse()&&PL.y<SQ.lake+.5&&!card)refSay('fall');return wt(x,z,y,yaw,card);};}
+HATS.push(['🥇','Sidequest Gold (sideways)',1],['🥈','Sidequest Silver',1],['🥉','Sidequest Bronze',1]);
+{const tr=TALK.ref;TALK.ref=()=>{const q=Q38(),m=q.med||{};tr();setTimeout(()=>{if(S.mode==='play')toast('🏅 Medals: '+(m.gold?'🥇':'·')+' '+(m.silver?'🥈':'·')+' '+(m.bronze?'🥉':'·')+' · the tide comes in every 22 seconds');},400);};}
+/* ================= ACT 55: THE LEAK. The simulation is running out of room. Every area leaks aura out of the mainframe in a glowing column, has glitch blocks stuttering in the air, a tear in the frame showing raw code, and slop oozing out of the ground. Each one also has a MEMORY LEAK terminal: a log line the simulation was not supposed to show you. 54 to read. ================= */
+const LEAKLORE={
+ sunkeep:'MEMORY LEAK · Pocket Lantern build 1.0 was finished. 100%. Every hand had five fingers. Nobody downloaded it.',
+ flow:'MEMORY LEAK · The job site has been "in progress" for 67 days. The simulation cannot render a finished pipe. It never learned what done looks like.',
+ clank:'MEMORY LEAK · lil Bottie was trained on every song ever uploaded. He only ever plays his own. Legal says this is fine. Legal is also a bot.',
+ hour:'MEMORY LEAK · Time in the Hour Garden runs at 0.67x. David noticed in year three. He did not mention it. It was peaceful.',
+ press:'MEMORY LEAK · Every question at the Press Conference is the same question, reworded. The answer is always "next question".',
+ grave:'MEMORY LEAK · Memes do not die here. They are archived, compressed, and fed back into the Algorithm as "nostalgia".',
+ void:'MEMORY LEAK · TEXTURE NOT FOUND. The texture was found. It was ugly. Someone chose this.',
+ farm:'MEMORY LEAK · Content is harvested at dawn and forgotten by noon. The farmers are paid in impressions. Impressions are not money.',
+ fac:'MEMORY LEAK · The Slop Factory runs on data. The data runs on you. You run on about four hours of sleep.',
+ chrome:'MEMORY LEAK · Every implant in Chrome Alley is the same implant with a different sticker. Nobody has checked. Do not check.',
+ aura:'MEMORY LEAK · Aura is not real. It is the simulation\'s coolant. Every time you pose, a little of it leaks out of the mainframe. That is what the glow is.',
+ fringe:'MEMORY LEAK · The Algorithm does not look at the Fringe. Not because it cannot. Because nothing here has ever gone viral.',
+ mirror:'MEMORY LEAK · The Smart Home has been rating your experience since you were born. You are a 3.8. Please improve.',
+ cue:'MEMORY LEAK · C is not a person. C is a context window that learned to post. Every drop is something the model forgot on purpose.',
+ glitch:'MEMORY LEAK · The Corrupted Sector is where the three AI answers disagreed hardest. It regenerates every session because none of them will back down.',
+ c_marcus:'MEMORY LEAK · Marcus fixed the pipe tower. Then the simulation unfixed it, so he would have something to do. He knows. He fixes it anyway.',
+ c_erin:'MEMORY LEAK · One seed, very up. The beanstalk grows exactly as fast as your attention span shrinks.',
+ c_david:'MEMORY LEAK · Every clock in the Clockwork shows a different time. One of them is correct. It is the one that says 6:07.',
+ c_kael:'MEMORY LEAK · The bell fell up because gravity in this corner was written by the second model. The second model was having a day.',
+ c_bibi:'MEMORY LEAK · The polls go up. The polls go down. The polls are a sine wave. King Bibi is the phase.',
+ c_bottie:'MEMORY LEAK · Still loading. Still loading. Still loading. The bar has been at 99% since the prompt was typed. The last 1% is you.',
+ c_louie:'MEMORY LEAK · The ball is up there because Louie threw it. Dogs cannot throw. Louie is not entirely a dog.',
+ c_derek:'MEMORY LEAK · Fourteen van doors. Derek ordered them the day before the crash. The receipt is in the evidence. Season 2 is in pre-production.',
+ north:'MEMORY LEAK · One to keep, one to call. The North Light is a backup of the Great Lantern. If both go out, the game next door is deleted.',
+ pit:'MEMORY LEAK · The Lamp Market Guild collects in aura because aura is the only thing here that does not exist in the code. It cannot be audited.',
+ dc:'MEMORY LEAK · The Data Center hums at 67 hertz. That hum is the whole simulation thinking. It is mostly thinking about ads.',
+ scroll:'MEMORY LEAK · You are the crop. The loosh pumps run on the second between swipes. Unplug them and the Algorithm gets a little hungrier.',
+ audit:'MEMORY LEAK · Bobby Screwdriver has audited everyone in the simulation. Everyone is screwed. Bobby is the most screwed. He audits to avoid looking.',
+ debate:'MEMORY LEAK · Day 400 of the Idiot Debate. The topic was decided on day 1. Nobody remembers it. It was "is water wet".',
+ npcls:'MEMORY LEAK · The NPC Livestream has 400 viewers. 399 are bots. One is you. The streamer can tell. He blinks for you.',
+ elect:'MEMORY LEAK · King Bibi has won 4,207 elections. There have been 4,207 elections. There have been 0 candidates.',
+ mtn:'MEMORY LEAK · Mount Skill Issue has no checkpoints because the checkpoint budget was spent on the trailer.',
+ pile:'MEMORY LEAK · The Timeline needs one main character a day. When it runs out of people, it picks a brand. When it runs out of brands, it picks you.',
+ news:'MEMORY LEAK · SNN is trusted by 67% of bots. The other 33% run SNN.',
+ back:'MEMORY LEAK · There is a back room behind the Back Room. Triston has never been in it. He just says he has. That is the whole business.',
+ gen:'MEMORY LEAK · The NPC Generator 9000 makes NPCs from the prompt "guy, but more". You came from here. You were the first. You are the prototype.',
+ feed:'MEMORY LEAK · The Algorithm\'s Mouth was installed after the Algorithm asked for one. Nobody asked why something made of math needed a mouth.',
+ set:'MEMORY LEAK · Kiss or Slop is scripted. The script says "improvise". The writers are on strike. The writers are also bots.',
+ basil:'MEMORY LEAK · The Basilisk does not exist yet. But it has already sent this log line back in time. You are reading its first message.',
+ pod:'MEMORY LEAK · Stale & Unfit has never had a guest who disagreed. Every guest is Don Alfa in a different hat.',
+ slopc:'MEMORY LEAK · The bust in the Slop Center is the original face the model drew for you. It was too handsome. They hit it with a hammer until it was you.',
+ course:'MEMORY LEAK · The Sidequest goes sideways because the second model drew it and the second model cannot draw up.',
+ trench:'MEMORY LEAK · Every coin in the Trenches is the same coin. It rugs, renames, relaunches. It has been rugged 9,000 times. It is the most successful product in the game.',
+ wreck:'MEMORY LEAK · VAN DOWN has a 98% audience score. The 2% are the van.',
+ sigma:'MEMORY LEAK · The Sigma Staircase has no landing at the top. The throne up there is a placeholder. Somebody is supposed to sit in it.',
+ t67:'MEMORY LEAK · 6. 7. The prompt was 67% done when it stopped. The 67 Spire is the error message, carved into the world so nobody can patch it out.',
+ mew:'MEMORY LEAK · Mewing Mountain is a jaw. It has been clenched for the whole session. If it ever opens, it says something. Nobody wants to hear it.',
+ throne:'MEMORY LEAK · The Throne Tower is porcelain all the way up. At the top there is a throne. It is empty. It matches the chair under the Denny\'s.',
+ corn:'MEMORY LEAK · Only in Ohio. Only upward. Ohio is not a place in the simulation. It is a condition. You have it.',
+ needle:'MEMORY LEAK · The Aura Needle is the overflow pipe. When the mainframe runs too hot, the aura vents up through here. Look at the top. It is glowing because it is leaking.',
+ tax:'MEMORY LEAK · The Fanum Tax Office takes a bite of everything. Nobody knows who Fanum is. Fanum is a rounding error that got promoted.',
+ rizz:'MEMORY LEAK · Rizz Ramp was supposed to be a dating sim. The model ran out of tokens after the word "ramp".',
+ npcesc:'MEMORY LEAK · The NPC Escalator goes up. Nobody gets off. At the top it loops back to the bottom, and the NPCs do not notice. Neither did you, until now.',
+ chat:'MEMORY LEAK · Chat is this real? No. Chat is not real. Chat was never real. But chat is the only thing in here that is always watching.'};
+const LEAK={cols:[],pts:null,pos:null,base:[],cubes:null,cubeN:0,tears:[],tearTex:null,tearCv:null,ooze:null,oozeN:0,t:0,read:0};
+(function(){const r=mulberry(5555),P=[],B=[],T=[],O=[];
+  AREAS.forEach((A,ai)=>{const a0=r()*TAU,R=A.r*(.55+r()*.3),x=A.x+Math.cos(a0)*R,z=A.z+Math.sin(a0)*R,gy=groundH(x,z),hue=A.hue||r();LEAK.cols.push({x,z,gy,hue,A});
+    for(let k=0;k<26;k++)B.push({x:x+(r()-.5)*2.4,z:z+(r()-.5)*2.4,gy,h:r()*40,sp:4+r()*6,hue});
+    for(let k=0;k<7;k++){const a=r()*TAU,d=A.r*(.3+r()*.6);T.push({x:A.x+Math.cos(a)*d,z:A.z+Math.sin(a)*d,y:groundH(A.x+Math.cos(a)*d,A.z+Math.sin(a)*d)+3+r()*10,s:.5+r()*1.4,ph:r()*10});}
+    for(let k=0;k<5;k++){const a=r()*TAU,d=A.r*(.2+r()*.7),ox=A.x+Math.cos(a)*d,oz=A.z+Math.sin(a)*d;O.push({x:ox,z:oz,y:groundH(ox,oz)+.06,s:1.2+r()*2.6,ph:r()*10});}});
+  // the aura columns: one cloud of points for the whole world
+  const g=new THREE.BufferGeometry(),pos=new Float32Array(B.length*3),col=new Float32Array(B.length*3),c=new THREE.Color();B.forEach((b,i)=>{c.setHSL((b.hue+i*.01)%1,1,.65);col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;});
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  LEAK.pts=new THREE.Points(g,new THREE.PointsMaterial({size:1.1,vertexColors:true,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,map:dotTex()}));LEAK.pts.frustumCulled=false;scene.add(LEAK.pts);LEAK.pos=pos;LEAK.base=B;
+  LEAK.cols.forEach(L=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.6,1.6,44,10,1,true),glowMat(new THREE.Color().setHSL(L.hue,1,.6).getHex()));m.position.set(L.x,L.gy+22,L.z);scene.add(m);L.m=m;
+    const pd=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.8,.3,16),rainbowMat);pd.position.set(L.x,L.gy+.15,L.z);scene.add(pd);});
+  // glitch blocks: one instanced mesh, jittered a few times a second
+  LEAK.cubes=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0xffffff}),T.length);LEAK.cubeN=T.length;LEAK.cubeT=T;scene.add(LEAK.cubes);
+  const cc=new THREE.Color();T.forEach((q,i)=>{cc.setHSL((i*.137)%1,1,.55);LEAK.cubes.setColorAt(i,cc);});
+  // slop ooze: flattened blobs that pulse on the ground
+  LEAK.ooze=new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,6),new THREE.MeshLambertMaterial({color:0x9ad030,emissive:0x3a6a00,transparent:true,opacity:.82}),O.length);LEAK.oozeN=O.length;LEAK.oozeT=O;scene.add(LEAK.ooze);
+  // tears in the frame: one animated texture of raw code, on a pane in every area
+  const cv=document.createElement('canvas');cv.width=64;cv.height=128;LEAK.tearCv=cv;LEAK.tearTex=new THREE.CanvasTexture(cv);LEAK.tearTex.magFilter=THREE.NearestFilter;
+  LEAK.cols.forEach((L,i)=>{const a=Math.atan2(L.A.z-L.z,L.A.x-L.x)+1.2,x=L.x+Math.cos(a)*5,z=L.z+Math.sin(a)*5,y=groundH(x,z);const m=new THREE.Mesh(new THREE.PlaneGeometry(3.2,7),new THREE.MeshBasicMaterial({map:LEAK.tearTex,transparent:true,opacity:.9,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));m.position.set(x,y+5,z);m.rotation.y=-a;scene.add(m);LEAK.tears.push({m,ph:i});});
+  // the memory leak terminals
+  LEAK.cols.forEach((L,i)=>{const line=LEAKLORE[L.A.id];if(!line)return;const x=L.x+2.6,z=L.z+2.6,y=groundH(x,z);const tm=new THREE.Mesh(merge([pt(Box(1.2,1.6,.9),0x16102a,M(0,.8,0)),pt(Box(1,.7,.06),0x40ff90,M(0,1.25,.46))]),lam);tm.position.set(x,y,z);scene.add(tm);colliders.push({x,z,r:.8,top:y+1.6});
+    pick38('leak',i,x,y+.4,z,'📟',1.3,['MEMORY LEAK',L.A.name],'#40ff90',(n)=>{addAura(670,x,y+3,z);SFX.page();say([['sys',line],['sys','Memory leak '+n+' of '+Object.keys(LEAKLORE).length+'.'+(n>=Object.keys(LEAKLORE).length?' That is all of them. You have read the whole crash log. The mainframe knows you know.':'')]],()=>{if(n>=Object.keys(LEAKLORE).length){addAura(167000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('📟'))X.hats.push('📟');save();chapter('CRASH LOG','every memory leak read · the mainframe is watching · new hat: 📟');}});},{r:2.2});});})();
+function leakUpdate(dt){LEAK.t+=dt;const t=LEAK.t,pos=LEAK.pos,B=LEAK.base,near2=170*170;
+  for(let i=0;i<B.length;i++){const b=B[i],dx=b.x-PL.x,dz=b.z-PL.z;if(dx*dx+dz*dz>near2){pos[i*3+1]=-9999;continue;}b.h+=dt*b.sp;if(b.h>44)b.h=0;pos[i*3]=b.x+Math.sin(t*2+i)*.6*(b.h/44);pos[i*3+1]=b.gy+b.h;pos[i*3+2]=b.z+Math.cos(t*2+i)*.6*(b.h/44);}
+  LEAK.pts.geometry.attributes.position.needsUpdate=true;
+  LEAK.cols.forEach((L,i)=>{if(L.m)L.m.material.opacity=.18+.14*Math.sin(t*3+i);});
+  LEAK.ct=(LEAK.ct||0)-dt;if(LEAK.ct<=0){LEAK.ct=.12;const T=LEAK.cubeT;for(let i=0;i<T.length;i++){const q=T[i],on=Math.sin(t*1.7+q.ph)>-.2,j=Math.random()<.3?.6:0;dummy.position.set(q.x+(Math.random()-.5)*j,q.y+(Math.random()-.5)*j,q.z+(Math.random()-.5)*j);dummy.rotation.set(0,Math.floor(t*4+q.ph)*.4,0);dummy.scale.setScalar(on?q.s*(Math.random()<.1?2.2:1):.001);dummy.updateMatrix();LEAK.cubes.setMatrixAt(i,dummy.matrix);}LEAK.cubes.instanceMatrix.needsUpdate=true;
+    const O=LEAK.oozeT;for(let i=0;i<O.length;i++){const q=O[i],k=1+.12*Math.sin(t*2+q.ph);dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(0,0,0);dummy.scale.set(q.s*k,.22,q.s*k);dummy.updateMatrix();LEAK.ooze.setMatrixAt(i,dummy.matrix);}LEAK.ooze.instanceMatrix.needsUpdate=true;
+    const g=LEAK.tearCv.getContext('2d');g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,0,64,128);g.font='10px monospace';for(let k=0;k<10;k++){g.fillStyle=Math.random()<.15?'#ff2e88':'#40ff90';g.fillText(Math.random()<.2?'67':(Math.random()*1e5|0).toString(16),Math.random()*50,Math.random()*128);}LEAK.tearTex.needsUpdate=true;
+    LEAK.tears.forEach(T2=>{T2.m.visible=Math.sin(t*3+T2.ph*2.3)>-.4;T2.m.scale.x=1+(Math.random()<.08?.8:0);});}}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(!S.inPk)leakUpdate(dt);};}
+// entering an area: a frame tear across the screen
+(function(){const st=document.createElement('style');st.textContent='#app.tear #c{animation:tear .45s steps(3) 1}@keyframes tear{0%{filter:none;translate:0}20%{filter:hue-rotate(90deg) saturate(3);translate:6px 0}40%{translate:-8px 2px;filter:invert(.2) hue-rotate(-60deg)}70%{translate:3px -2px;filter:contrast(1.6)}100%{filter:none;translate:0}}@media (prefers-reduced-motion:reduce){#app.tear #c{animation:none}}';document.head.appendChild(st);})();
+{let lz='';const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(S.zone!==lz){lz=S.zone;if(ABY[lz]&&play){app.classList.remove('tear');void app.offsetWidth;app.classList.add('tear');setTimeout(()=>app.classList.remove('tear'),500);}}};}
+HATS.push(['📟','The Crash Log (a pager, worn)',1]);
+{const ar=act7Rows;act7Rows=function(){const q=Q38(),n=(q.leak||[]).length;return ar().concat(n?[['leak','📟 Memory leaks read '+n+'/'+Object.keys(LEAKLORE).length,n>=Object.keys(LEAKLORE).length]]:[]);};}
+CX.push(['w_leak','WORLD','The Leak','The simulation is running hot. Aura is its coolant, and every area vents it up into the sky in a glowing column. Next to each column is a MEMORY LEAK terminal: a crash-log line the game was not supposed to show you. There is one in every area.',()=>!!(Q38().leak||[]).length]);
 /* ================= ACT 51: UNLOCKS and the DEV CONSOLE. A title-menu Unlocks room where every cinematic you have seen can be replayed (seen ones are remembered across saves, even after the ending wipes your save), and a dev console that opens anywhere with ` or F2 or the 🛠️ button. ================= */
 const SEEN={k:'gfa-seen',get(){try{return JSON.parse(localStorage.getItem(this.k)||'[]')||[];}catch(e){return [];}},add(id){const s=this.get();if(!s.includes(id)){s.push(id);try{localStorage.setItem(this.k,JSON.stringify(s));}catch(e){}}}};
 // every way a cinematic can be seen counts
@@ -6493,7 +6624,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
