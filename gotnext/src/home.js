@@ -449,7 +449,7 @@ function netVisit(peer) {
 }
 const _ray = new THREE.Raycaster(), _pl = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), _mp = new THREE.Vector2(), _hit = new THREE.Vector3();
 function buildPointer(e, click) {
-  if (!BLD.on || !W || !W.build || UI.cur || e.target.id !== 'gl') return; _mp.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); _ray.setFromCamera(_mp, camera);
+  if (!BLD.on || !W || !W.build || UI.cur || !(e.target.id === 'gl' || (e.target.closest && e.target.closest('#touch') && !e.target.closest('.tbtn')))) return;    /* on a phone the touch layer sits over the view */ _mp.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); _ray.setFromCamera(_mp, camera);
   if (_ray.ray.intersectPlane(_pl, _hit)) { W.build.mouse = [_hit.x, _hit.z]; if (click) { W.build.fx = _hit.x; W.build.fz = _hit.z; const gs = W.build.sel && HOME_ITEM[W.build.sel].small ? 4 : 2; W.build.x = Math.round(_hit.x * gs) / gs; W.build.z = Math.round(_hit.z * gs) / gs; if (e.pointerType === 'mouse') buildPlace(); } }
 }
 addEventListener('pointermove', e => { if (e.pointerType === 'mouse') buildPointer(e, false); });

@@ -85,7 +85,8 @@ body:not([data-state=world]) #prompt{display:none!important}
 #build .card.sel{border-color:var(--ice,#7de3ff);background:#1a2a34}#build .card.lock{opacity:.4}
 body.building #whud,body.building #tL,body.building #tR,body.building #prompt,body.building .tbtn,body.building #tB{display:none!important}
 #vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(5,4,12,.42) 100%);display:none;z-index:1}body[data-state=world] #vig,body[data-state=match] #vig{display:block}
-#emobar{position:fixed;right:10px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:6px;z-index:4}#emobar button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(14,14,18,.85);font-size:17px;cursor:pointer}
+#emobar{position:fixed;right:calc(10px + var(--sar, 0px));top:42%;transform:translateY(-50%);display:none;flex-direction:column;gap:6px;z-index:6;touch-action:manipulation}
+body.touch #emobar{top:calc(58px + var(--sat, 0px));right:calc(10px + var(--sar, 0px));transform:none;flex-direction:row}#emobar button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(14,14,18,.85);font-size:17px;cursor:pointer}
 body[data-state=world]:not(.busy):not(.building) #emobar{display:flex}
 #chatbox{position:fixed;left:50%;bottom:22%;transform:translateX(-50%);width:min(420px,86vw);display:none;z-index:8;background:#ece9e2;color:#111;border:0;border-radius:12px;padding:11px 14px;font:700 14px var(--m);box-shadow:0 4px 0 #0a0a0e}
 .bub.me{background:#fff3b0}.bub.net{background:#bfe8ff}

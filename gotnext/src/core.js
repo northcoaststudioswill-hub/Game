@@ -130,7 +130,7 @@ function setupTouch() {
   function start(e) {
     audioInit();
     for (const t of e.changedTouches) {
-      if (t.target.closest('.tbtn')) continue;
+      if (t.target.closest('.tbtn')) continue; if (document.body.classList.contains('building') && t.clientX >= innerWidth / 2) continue;
       const side = t.clientX < innerWidth / 2 ? 'L' : 'R'; if (touch[side]) continue;
       touch[side] = { id: t.identifier, ox: t.clientX, oy: t.clientY, x: 0, y: 0 }; ids[t.identifier] = side; place($('stick' + side), touch[side]);
     }
