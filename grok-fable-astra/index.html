@@ -4472,7 +4472,7 @@ function fillerUpdate(dt,play){const can=play&&!S.dead&&!S.inPk&&!S.inBoss&&!S.i
     const left=FIL.max-FIL.e;if(left<5&&Math.ceil(left)!==FIL.beep){FIL.beep=Math.ceil(left);tone(220+FIL.beep*40,.12,'square',.07,0,180);if(FIL.beep===4)toast('⚠️ The Filler is padding you out. Get to some content.');}
     if(FIL.e>=FIL.max){FIL.e=0;fillerDie();}}
   else{FIL.on=false;if(!S.dead)FIL.e=Math.max(0,FIL.e-dt*2.5);}
-  const show=FIL.e>.05;if(show!==FIL.cls){FIL.cls=show;app.classList.toggle('filler',show);$('filbar').hidden=!show;}$('filvig').style.opacity=show?Math.min(1,FIL.e/FIL.max*1.1).toFixed(2):'0';
+  const show=FIL.e>.05;if(show!==FIL.cls){FIL.cls=show;app.classList.toggle('filler',show);$('filbar').hidden=!show;}$('filvig').style.opacity=show?Math.min(.5,FIL.e/FIL.max*.6).toFixed(2):'0';
   if(show){const bar=$('filbar');bar.firstChild.style.transform='scaleX('+(FIL.e/FIL.max)+')';const t='THE FILLER · '+Math.max(0,FIL.max-FIL.e).toFixed(1)+'s'+(inF?'':' · recovering');if(bar.lastChild.textContent!==t)bar.lastChild.textContent=t;}
   // bits
   if(!X.fb)X.fb=[];const C=FIL.cc;FIL.bits.forEach(b=>{const got=X.fb.includes(b.i);if(b.s.visible===got){b.s.visible=b.l.visible=b.beam.visible=!got;}if(got)return;b.s.position.y=b.gy+2+Math.sin(S.t*2+b.i)*.4;
@@ -6467,13 +6467,13 @@ const LEAKLORE={
 const LEAK={cols:[],pts:null,pos:null,base:[],cubes:null,cubeN:0,tears:[],tearTex:null,tearCv:null,ooze:null,oozeN:0,t:0,read:0};
 (function(){const r=mulberry(5555),P=[],B=[],T=[],O=[];
   AREAS.forEach((A,ai)=>{const a0=r()*TAU,R=A.r*(.55+r()*.3),x=A.x+Math.cos(a0)*R,z=A.z+Math.sin(a0)*R,gy=groundH(x,z),hue=A.hue||r();LEAK.cols.push({x,z,gy,hue,A});
-    for(let k=0;k<26;k++)B.push({x:x+(r()-.5)*2.4,z:z+(r()-.5)*2.4,gy,h:r()*40,sp:4+r()*6,hue});
+    for(let k=0;k<26;k++)B.push({x:x+(r()-.5)*2.4,z:z+(r()-.5)*2.4,gy,h:r()*7,sp:1.5+r()*2.5,hue});
     for(let k=0;k<7;k++){const a=r()*TAU,d=A.r*(.3+r()*.6);T.push({x:A.x+Math.cos(a)*d,z:A.z+Math.sin(a)*d,y:groundH(A.x+Math.cos(a)*d,A.z+Math.sin(a)*d)+3+r()*10,s:.5+r()*1.4,ph:r()*10});}
     for(let k=0;k<5;k++){const a=r()*TAU,d=A.r*(.2+r()*.7),ox=A.x+Math.cos(a)*d,oz=A.z+Math.sin(a)*d;O.push({x:ox,z:oz,y:groundH(ox,oz)+.06,s:1.2+r()*2.6,ph:r()*10});}});
   // the aura columns: one cloud of points for the whole world
   const g=new THREE.BufferGeometry(),pos=new Float32Array(B.length*3),col=new Float32Array(B.length*3),c=new THREE.Color();B.forEach((b,i)=>{c.setHSL((b.hue+i*.01)%1,1,.65);col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;});
   g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
-  LEAK.pts=new THREE.Points(g,new THREE.PointsMaterial({size:1.1,vertexColors:true,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,map:dotTex()}));LEAK.pts.frustumCulled=false;scene.add(LEAK.pts);LEAK.pos=pos;LEAK.base=B;
+  LEAK.pts=new THREE.Points(g,new THREE.PointsMaterial({size:.8,vertexColors:true,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,map:dotTex()}));LEAK.pts.frustumCulled=false;scene.add(LEAK.pts);LEAK.pos=pos;LEAK.base=B;
   LEAK.cols.forEach(L=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.6,1.6,44,10,1,true),glowMat(new THREE.Color().setHSL(L.hue,1,.6).getHex()));m.position.set(L.x,L.gy+22,L.z);scene.add(m);L.m=m;
     const pd=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.8,.3,16),rainbowMat);pd.position.set(L.x,L.gy+.15,L.z);scene.add(pd);});
   // glitch blocks: one instanced mesh, jittered a few times a second
@@ -6488,7 +6488,7 @@ const LEAK={cols:[],pts:null,pos:null,base:[],cubes:null,cubeN:0,tears:[],tearTe
   LEAK.cols.forEach((L,i)=>{const line=LEAKLORE[L.A.id];if(!line)return;const x=L.x+2.6,z=L.z+2.6,y=groundH(x,z);const tm=new THREE.Mesh(merge([pt(Box(1.2,1.6,.9),0x16102a,M(0,.8,0)),pt(Box(1,.7,.06),0x40ff90,M(0,1.25,.46))]),lam);tm.position.set(x,y,z);scene.add(tm);colliders.push({x,z,r:.8,top:y+1.6});
     pick38('leak',i,x,y+.4,z,'📟',1.3,['MEMORY LEAK',L.A.name],'#40ff90',(n)=>{addAura(670,x,y+3,z);SFX.page();say([['sys',line],['sys','Memory leak '+n+' of '+Object.keys(LEAKLORE).length+'.'+(n>=Object.keys(LEAKLORE).length?' That is all of them. You have read the whole crash log. The mainframe knows you know.':'')]],()=>{if(n>=Object.keys(LEAKLORE).length){addAura(167000,PL.x,PL.y+4,PL.z);if(!X.hats.includes('📟'))X.hats.push('📟');save();chapter('CRASH LOG','every memory leak read · the mainframe is watching · new hat: 📟');}});},{r:2.2});});})();
 function leakUpdate(dt){LEAK.t+=dt;const t=LEAK.t,pos=LEAK.pos,B=LEAK.base,near2=170*170;
-  for(let i=0;i<B.length;i++){const b=B[i],dx=b.x-PL.x,dz=b.z-PL.z;if(dx*dx+dz*dz>near2){pos[i*3+1]=-9999;continue;}b.h+=dt*b.sp;if(b.h>44)b.h=0;pos[i*3]=b.x+Math.sin(t*2+i)*.6*(b.h/44);pos[i*3+1]=b.gy+b.h;pos[i*3+2]=b.z+Math.cos(t*2+i)*.6*(b.h/44);}
+  for(let i=0;i<B.length;i++){const b=B[i],dx=b.x-PL.x,dz=b.z-PL.z;if(dx*dx+dz*dz>near2){pos[i*3+1]=-9999;continue;}b.h+=dt*b.sp;if(b.h>7)b.h=0;pos[i*3]=b.x+Math.sin(t*2+i)*1.1*(b.h/7);pos[i*3+1]=b.gy+.4+b.h;pos[i*3+2]=b.z+Math.cos(t*2+i)*1.1*(b.h/7);}
   LEAK.pts.geometry.attributes.position.needsUpdate=true;
   LEAK.cols.forEach((L,i)=>{if(L.m)L.m.material.opacity=.18+.14*Math.sin(t*3+i);});
   LEAK.ct=(LEAK.ct||0)-dt;if(LEAK.ct<=0){LEAK.ct=.12;const T=LEAK.cubeT;for(let i=0;i<T.length;i++){const q=T[i],on=Math.sin(t*1.7+q.ph)>-.2,j=Math.random()<.3?.6:0;dummy.position.set(q.x+(Math.random()-.5)*j,q.y+(Math.random()-.5)*j,q.z+(Math.random()-.5)*j);dummy.rotation.set(0,Math.floor(t*4+q.ph)*.4,0);dummy.scale.setScalar(on?q.s*(Math.random()<.1?2.2:1):.001);dummy.updateMatrix();LEAK.cubes.setMatrixAt(i,dummy.matrix);}LEAK.cubes.instanceMatrix.needsUpdate=true;
@@ -6502,6 +6502,17 @@ function leakUpdate(dt){LEAK.t+=dt;const t=LEAK.t,pos=LEAK.pos,B=LEAK.base,near2
 HATS.push(['📟','The Crash Log (a pager, worn)',1]);
 {const ar=act7Rows;act7Rows=function(){const q=Q38(),n=(q.leak||[]).length;return ar().concat(n?[['leak','📟 Memory leaks read '+n+'/'+Object.keys(LEAKLORE).length,n>=Object.keys(LEAKLORE).length]]:[]);};}
 CX.push(['w_leak','WORLD','The Leak','The simulation is running hot. Aura is its coolant, and every area vents it up into the sky in a glowing column. Next to each column is a MEMORY LEAK terminal: a crash-log line the game was not supposed to show you. There is one in every area.',()=>!!(Q38().leak||[]).length]);
+/* ================= ACT 56: QUIET SKY. No more lines into the sky: only the portal and the three relic zones keep a beam. The aura leaks bubble low instead of shooting up. The Filler is toned down: a quarter of the Matrix rain (and shorter), a third of the glitch cubes, a fainter curtain, a gentler screen tint. ================= */
+(function(){const keep=[[portal.x,portal.z]].concat(ZONES.map(Z=>[Z.x,Z.z]));let hid=0;
+  scene.traverse(o=>{if(!o.isMesh||!o.geometry||o.geometry.type!=='CylinderGeometry')return;const P=o.geometry.parameters;
+    if(P.height===320){if(keep.some(k=>Math.hypot(o.position.x-k[0],o.position.z-k[1])<1)){return;}o.material=o.material.clone();o.material.visible=false;hid++;}});
+  LEAK.cols.forEach(L=>{if(L.m)L.m.material.visible=false;});
+  MTX.cols.forEach((c,i)=>{if(i%4){c.p.visible=false;c.p.material=c.p.material.clone();c.p.material.visible=false;return;}const h=c.p.geometry.parameters.height,k=Math.min(1,8/h);c.p.scale.y=k;c.p.position.y=groundH(c.x,c.z)+h*k/2;});
+  MTX.cubes.forEach((c,i)=>{if(i%3){c.m.material.visible=false;}});
+  if(MTX.curtain&&MTX.curtain.material){MTX.curtain.material.opacity=(MTX.curtain.material.opacity||1)*.45;MTX.curtain.material.transparent=true;}
+  scene.traverse(o=>{if(o.isMesh&&o.material&&o.material.type==='MeshPhongMaterial'&&o.material.vertexColors&&o.material.transparent&&Math.abs(o.material.opacity-.7)<.01&&o.parent===A38)o.material.opacity=.32;});
+  const st=document.createElement('style');st.textContent='#app.filler #c{filter:saturate(.7) sepia(.12) contrast(.97)}#mtxo{opacity:.35!important}';document.head.appendChild(st);
+  LEAK.hid=hid;})();
 /* ================= ACT 51: UNLOCKS and the DEV CONSOLE. A title-menu Unlocks room where every cinematic you have seen can be replayed (seen ones are remembered across saves, even after the ending wipes your save), and a dev console that opens anywhere with ` or F2 or the 🛠️ button. ================= */
 const SEEN={k:'gfa-seen',get(){try{return JSON.parse(localStorage.getItem(this.k)||'[]')||[];}catch(e){return [];}},add(id){const s=this.get();if(!s.includes(id)){s.push(id);try{localStorage.setItem(this.k,JSON.stringify(s));}catch(e){}}}};
 // every way a cinematic can be seen counts
