@@ -173,8 +173,9 @@ function netWorldStep(dt) {
   // hanging out at a crib with someone online for a minute: +15 Respect once a day, for each of you
   if (W.kind === 'crib' && Object.keys(seen).length) { W.hangT = (W.hangT || 0) + dt; const H = home(); if (W.hangT >= 60 && H.hang !== today) { H.hang = today; gainRep(15); save(); toast('HUNG OUT', '+15 Respect. Good company counts.', 'ach'); } }
 }
-function nameTag(name, sub, H) {
-  const tex = canvasTex(256, 80, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = 'rgba(8,8,10,.8)'; x.fillRect(0, 8, w, 60); x.fillStyle = '#ff2d78'; x.fillRect(0, 8, 6, 60); x.fillStyle = '#ece9e2'; x.font = '900 expanded 26px Archivo, sans-serif'; x.textBaseline = 'middle'; x.fillText(String(name).slice(0, 12), 16, 32, 232); x.fillStyle = '#7de3ff'; x.font = '500 14px "JetBrains Mono", monospace'; x.fillText(String(sub).toUpperCase(), 16, 54, 232); });
+function nameTag(name, sub, H, col) {
+  col = col || '#ff2d78';
+  const tex = canvasTex(256, 80, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = 'rgba(8,8,10,.88)'; x.fillRect(0, 8, w, 60); x.fillStyle = col; x.fillRect(0, 8, 12, 60); x.fillRect(12, 62, w - 12, 6); x.fillStyle = col === '#ff2d78' ? '#ece9e2' : col; x.font = '900 expanded 26px Archivo, sans-serif'; x.textBaseline = 'middle'; x.fillText(String(name).slice(0, 12), 22, 30, 226); x.fillStyle = '#ece9e2'; x.font = '500 14px "JetBrains Mono", monospace'; x.fillText(String(sub).toUpperCase(), 22, 50, 226); });
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true })); s.scale.set(1.5, 0.47, 1); s.position.set(0, H + 0.5, 0); s.renderOrder = 9; return s;
 }
 

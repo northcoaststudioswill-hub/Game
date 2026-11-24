@@ -196,7 +196,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.8.5';
+const VERSION = '0.8.6';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -1680,7 +1680,8 @@ function startMatch(cfg) {
     p.rig = makeRig(sp.b); p.H = p.rig.H; scene.add(p.rig.root);
     const ringC = ti === 0 ? 0x33a0ff : 0xff4040;
     p.ring = M(geo('ring', () => new THREE.RingGeometry(0.36, 0.46, 20)), new THREE.MeshBasicMaterial({ color: p.user ? (p.ctrl === 0 ? 0xffe14a : 0x4dff9a) : ringC, transparent: true, opacity: 0.85, depthWrite: false }), 0, 0.02, 0, p.rig.root); p.ring.rotation.x = -Math.PI / 2;
-    if (!mine) { const tg = nameTag(sp.b.name, sp.peer ? 'online' : sp.ctrl === 1 ? 'player 2' : '', p.H); tg.scale.multiplyScalar(0.72); tg.material.opacity = 0.8; p.rig.root.add(tg); }
+    { const myT = Math.max(0, cfg.teams.findIndex(t => t.some(x => x.mine === true))), col = mine ? '#ffe14a' : sp.ctrl === 1 ? '#4dff9a' : ti === myT ? '#33a0ff' : '#ff5a4a';      /* names carry the team colour: you gold, your squad blue, them red */
+      const tg = nameTag(sp.b.name, mine ? 'you' : sp.peer ? 'online' : sp.ctrl === 1 ? 'player 2' : ti === myT ? 'squad' : 'them', p.H, col); tg.scale.multiplyScalar(mine ? 0.7 : 0.9); tg.material.opacity = mine ? 0.85 : 1; p.rig.root.add(tg); if (mine) tg.position.y += 0.34; }
     if (p.user) { p.arrow = M(geo('arrow', () => new THREE.ConeGeometry(0.11, 0.24, 4)), flat(p.ctrl === 0 ? 0xffe14a : 0x4dff9a), 0, p.H + 0.42, 0, p.rig.root); p.arrow.rotation.x = Math.PI; }
     MT.P.push(p);
   }));
@@ -2263,7 +2264,16 @@ function stepPlayer(p, dt) {
   if (p.st === 'shoot' || p.st === 'finish' || p.st === 'hop') tf = Math.atan2(-p.x, -p.z);
   else if (p.st === 'celeb') tf = 0;
   else if (B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && sp < 2.5) tf = Math.atan2(-p.x, -p.z);
-  else if (def && B.holder) { const m = p.user ? B.holder : (p.man || B.holder); const tgt = dist(p, B.holder) < 4 ? B.holder : m; tf = Math.atan2(tgt.x - p.x, tgt.z - p.z); }
+  else if (def && B.holder) {
+    // who you are guarding: the nearest opponent if you are a person (so it is whoever you chose to pick up), your
+    // assignment if you are the AI; either way the ball handler when he is right on you
+    const h = B.holder; let g = p.man || h;
+    if (p.user) { let bd = 3.2, bo = null; for (const q of M_.P) if (q.team !== p.team && q.st !== 'stagger') { const d = dist(p, q); if (d < bd) { bd = d; bo = q; } } g = bo || (dist(p, h) < 5 ? h : (p.man || h)); }
+    else if (dist(p, h) < 2.2) g = h;
+    p.guard = g; const am = Math.atan2(g.x - p.x, g.z - p.z);
+    // on the ball: square to him. Off the ball: face your man when tight, open up between man and ball as you sag off
+    if (g === h) tf = am; else tf = lerpAng(am, Math.atan2(h.x - p.x, h.z - p.z), clamp((dist(p, g) - 1.4) / 3.2, 0, 0.5));
+  }
   else if (hasBall && !p.sprinting && p.st === 'free') { const hf = Math.atan2(-p.x, -p.z); tf = sp > 1.5 ? lerpAng(Math.atan2(p.vx, p.vz), hf, 0.45) : hf; }
   else if (sp > 0.6) tf = Math.atan2(p.vx, p.vz);
   else if (B.holder && B.holder !== p) tf = Math.atan2(B.holder.x - p.x, B.holder.z - p.z);
@@ -2445,7 +2455,7 @@ function animPlayer(p, dt) {
   }
   if (p.forceAn && p.st === 'free' && !hasBall) { an = p.forceAn; o.ph = p.runPh; }
   if (p.st !== 'finish' && p.st !== 'move') R.extraYaw = 0;       /* whatever ended a spin or a reverse, the body faces where it faces */
-  if (!hasBall && an !== 'stagger' && an !== 'sulk' && an !== 'celeb' && p.st !== 'finish' && p.st !== 'move') { let a = Math.atan2(B.pos.x - p.x, B.pos.z - p.z) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.look = a; }
+  if (!hasBall && an !== 'stagger' && an !== 'sulk' && an !== 'celeb' && p.st !== 'finish' && p.st !== 'move') { let a = Math.atan2(B.pos.x - p.x, B.pos.z - p.z) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.look = p.def && p.guard && p.guard !== B.holder && B.state === 'held' ? a * 0.5 : a; }      /* guarding off the ball: the body is on your man, the head only half-turns to the ball (see both) */
   if (p.speed > 2 && (an === 'run' || an === 'dribble')) { let a = Math.atan2(p.vx || 0, p.vz || 0) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.bank = -a * 0.35 * spN; }
   // presentation velocity from actual movement (works the same on a guest, who only gets positions)
   let avx = (p.x - (p.lx === undefined ? p.x : p.lx)) / dt, avz = (p.z - (p.lz === undefined ? p.z : p.lz)) / dt; p.lx = p.x; p.lz = p.z;
@@ -2490,7 +2500,7 @@ function animPlayer(p, dt) {
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
   if (p.arrow) { p.arrow.position.y = p.H + 0.42 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }
   // ring colours: your matchup glows when you are on defence
-  if (!p.user) { const marked = M_.me && M_.me.def && M_.me.man === p && M_.phase === 'live'; p.ring.material.color.setHex(marked ? 0xff4fd8 : p.team === M_.me.team ? 0x33a0ff : 0xff4040); p.ring.scale.setScalar(marked ? 1.25 : 1); }
+  if (!p.user) { const marked = M_.me && M_.me.def && (M_.me.guard || M_.me.man) === p && M_.phase === 'live'; p.ring.material.color.setHex(marked ? 0xff4fd8 : p.team === M_.me.team ? 0x33a0ff : 0xff4040); p.ring.scale.setScalar(marked ? 1.25 : 1); }
   if (p.bravT > 0 || p.fire) { if (Math.random() < 0.35) burst(p.x + rnd(-0.3, 0.3), rnd(0.2, 1.8) + p.y, p.z + rnd(-0.3, 0.3), p.fire ? 0xff7a1f : 0xffc531, 1); }
   if (p.sprinting && p.speed > 4 && Math.sin(p.runPh) * Math.sin(p.runPh - dt * 12) < 0 && p.user) sfxM('step');
 }
@@ -4114,8 +4124,9 @@ function netWorldStep(dt) {
   // hanging out at a crib with someone online for a minute: +15 Respect once a day, for each of you
   if (W.kind === 'crib' && Object.keys(seen).length) { W.hangT = (W.hangT || 0) + dt; const H = home(); if (W.hangT >= 60 && H.hang !== today) { H.hang = today; gainRep(15); save(); toast('HUNG OUT', '+15 Respect. Good company counts.', 'ach'); } }
 }
-function nameTag(name, sub, H) {
-  const tex = canvasTex(256, 80, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = 'rgba(8,8,10,.8)'; x.fillRect(0, 8, w, 60); x.fillStyle = '#ff2d78'; x.fillRect(0, 8, 6, 60); x.fillStyle = '#ece9e2'; x.font = '900 expanded 26px Archivo, sans-serif'; x.textBaseline = 'middle'; x.fillText(String(name).slice(0, 12), 16, 32, 232); x.fillStyle = '#7de3ff'; x.font = '500 14px "JetBrains Mono", monospace'; x.fillText(String(sub).toUpperCase(), 16, 54, 232); });
+function nameTag(name, sub, H, col) {
+  col = col || '#ff2d78';
+  const tex = canvasTex(256, 80, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = 'rgba(8,8,10,.88)'; x.fillRect(0, 8, w, 60); x.fillStyle = col; x.fillRect(0, 8, 12, 60); x.fillRect(12, 62, w - 12, 6); x.fillStyle = col === '#ff2d78' ? '#ece9e2' : col; x.font = '900 expanded 26px Archivo, sans-serif'; x.textBaseline = 'middle'; x.fillText(String(name).slice(0, 12), 22, 30, 226); x.fillStyle = '#ece9e2'; x.font = '500 14px "JetBrains Mono", monospace'; x.fillText(String(sub).toUpperCase(), 22, 50, 226); });
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true })); s.scale.set(1.5, 0.47, 1); s.position.set(0, H + 0.5, 0); s.renderOrder = 9; return s;
 }
 
