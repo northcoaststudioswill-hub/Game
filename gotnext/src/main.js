@@ -39,7 +39,7 @@ function studioStep(dt) {
 // ---------- progression ----------
 function achVal(k) {
   if (k === 'owned') return S.owned.length; if (k === 'cribs') { let n = 0; for (const c in S.crib) n += S.crib[c]; return n; }
-  if (k === 'ovr') return S.attrs.layup ? ovrOf(S.attrs) : 0; if (k === 'homies') return Math.max(S.life.homies || 0, S.homies.length);
+  if (k === 'ovr') return S.attrs.layup ? ovrOf(S.attrs) : 0; if (k === 'ladder') return S.ladder || 0; if (k === 'homies') return Math.max(S.life.homies || 0, S.homies.length);
   return S.life[k] || 0;
 }
 function checkAch() {
@@ -81,7 +81,7 @@ function launchGame(m, tier, st) {
   uiClose(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
 }
 function finishGame(res, m, tier, st, cfg) {
-  twoPlayer = false; enterWorld('pit', pitDoorX(MODES.indexOf(m)), -1.6, Math.PI);
+  twoPlayer = false; const gate = MODES.indexOf(m); enterWorld('pit', gate >= 0 ? pitDoorX(gate) : 0, gate >= 0 ? -1.6 : 5.2, Math.PI);
   if (res.quit) { if (res.lost) toast('CONNECTION LOST', 'The other player dropped. No harm, no pay.'); else toast('FORFEIT', 'No VC. No Respect. The park saw that.'); return; }
   const s = res.stats, L = S.life, notes = [];
   let vc = (res.win ? 70 : 30) * tier.mult + s.pts * 4 + s.ast * 6 + s.reb * 4 + s.stl * 8 + s.blk * 8 + s.ankles * 10 + s.dunks * 5 + s.greens * 4;
@@ -91,6 +91,8 @@ function finishGame(res, m, tier, st, cfg) {
   let rep = (res.win ? 45 : 12) * tier.mult + s.pts + s.ast * 2 + s.stl * 2 + s.blk * 2 + s.ankles * 3 + res.bonusRep;
   const rm = (ORIGIN[S.build.origin].k === 'rep' ? 0.15 : 0) + cribFx('rep'); if (rm) { rep *= 1 + rm; notes.push(`+${Math.round(rm * 100)}% Respect`); }
   if (res.shutout && res.win) { rep += 40; notes.push('SKUNK: +40 Respect'); }
+  if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% VC'); }
+  if (cfg.bonus) { const bo = cfg.bonus(res); if (bo) { vc += bo.vc; rep += bo.rep || 0; notes.push(bo.note); } }
   vc = Math.round(vc); rep = Math.round(rep);
   const bx = { F: 12 + s.dunks * 20 + (s.fgm - s.threes) * 7, S: 12 + s.greens * 12 + s.threes * 14, P: 12 + s.ast * 22 + s.ankles * 24, D: 12 + s.stl * 24 + s.blk * 24 + s.reb * 9 };
   const mS = 1 + cribFx('bxS') + cribFx('bxSF'), mF = 1 + cribFx('bxSF'); bx.S = Math.round(bx.S * mS); bx.F = Math.round(bx.F * mF);
@@ -155,7 +157,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera);
   // test hook: draw the player in one pose and hand back the frame

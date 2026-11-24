@@ -18,7 +18,7 @@ function newSave() {
     owned: DRIP.filter(d => d.src === 'start').map(d => d.id),
     worn: { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tank', arm: 'a_none', bottom: 'b_basic', socks: 's_low', shoes: 'k_beat', back: 'bk_none', ball: 'bl_std' },
     moves: { owned: ['cross', 'stepback', 'spin', 'textbook', 'twohand', 'flex'], side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'twohand', celeb: 'flex' },
-    crib: {}, boosts: [], life: {}, ach: {}, homies: [], seenRank: 0, bumDay: 0,
+    crib: {}, boosts: [], life: {}, drills: {}, ladder: 0, ach: {}, homies: [], seenRank: 0, bumDay: 0,
     set: { sfx: 1, music: 1, meter: 1 },
   };
 }

@@ -76,7 +76,8 @@ function enterWorld(kind, sx, sz, face) {
   W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] };
   musicMode = 'hub'; $('prompt').style.display = 'none';
   if (kind === 'hub') buildHub(); else if (kind === 'pit') buildPit(); else buildCrib();
-  worldPlayerRig(); W.camInit = false; $('wtag').textContent = kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : 'MY CRIB';
+  worldPlayerRig(); W.camInit = false; $('wtag').textContent = (kind === 'hub' ? 'THE BLOCK · USA 2145' : kind === 'pit' ? 'THE CAGES' : 'MY CRIB') + ' · TODAY: ' + todayEvent().n;
+  if (S.created && S.seenEventDay !== dayKey()) { S.seenEventDay = dayKey(); daily(); setTimeout(() => toast('TODAY · ' + todayEvent().n, todayEvent().d + ' The old head has new contracts.', 'rank'), 800); }
   document.body.dataset.state = 'world'; uiHud();
 }
 
@@ -160,12 +161,18 @@ function buildHub() {
   const pl = sign('THE FREEDOM EAGLE · "HE DUNKED SO YOU COULD SCROLL"', 2.6, 0.28, '#f2c14e', '#16181c', { border: false }); pl.position.set(0, 0.5, 3.12); scene.add(pl);
   // Money Rack: a side hoop and a man with a marker
   const h2 = hoopMesh(1, 'street'); h2.position.set(8.2, 0, 10.6); h2.rotation.y = Math.PI; scene.add(h2); solid(7.6, 8.8, 11.6, 12.4);
-  const hb = aiBuild(75, 'sniper'); hb.name = 'Sharpie'; addNpc(hb, 6.3, 9.6, 2.4, 'idle'); spot(7.2, 8.4, 2.0, 'MONEY RACK (shootout)', () => uiRack());
+  const hb = aiBuild(75, 'sniper'); hb.name = 'Sharpie'; addNpc(hb, 6.3, 9.6, 2.4, 'idle'); spot(7.2, 8.4, 2.0, 'SHARPIE (Money Rack · H-O-R-S-E)', () => uiRack());
   ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), 5.2, 0.45, 11.6, scene), 1.04); for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(4.75 + i * 0.3, 1.03, 11.6); scene.add(b); }
   // the old head, his bench, his crates
   ink(M(box(2.4, 0.12, 0.6), toon('#7a5a3a'), -8, 0.5, -3.2, scene), 1.05); M(box(0.12, 0.5, 0.5), toon('#20242c'), -9, 0.25, -3.2, scene); M(box(0.12, 0.5, 0.5), toon('#20242c'), -7, 0.25, -3.2, scene); solid(-9.4, -6.6, -3.7, -2.7);
   const ob = aiBuild(60, 'general'); ob.worn.hair = 'h_bald'; ob.worn.head = 'hd_band'; ob.worn.face = 'f_goggles'; addNpc(ob, -8, -3.12, 0.5, 'sit');
-  spot(-8, -1.9, 2.0, 'TALK TO THE OLD HEAD', () => uiDialog('OLD HEAD', pick(OLDHEAD), [['Respect.', null]]));
+  spot(-8, -1.9, 2.0, 'OLD HEAD (daily contracts)', () => uiContracts());
+  // the coach and his board: every drill on the block pays
+  const cb = aiBuild(70, 'general'); cb.name = 'Coach Overtime'; cb.worn = Object.assign(cb.worn, { hair: 'h_bald', head: 'hd_cap', face: 'f_none', top: 't_hoodie', bottom: 'b_long', shoes: 'k_white', back: 'bk_towel' });
+  addNpc(cb, -3.6, 5.0, Math.PI * 0.85, 'idle');
+  { const g = grp(scene, -4.9, 0, 6.3); g.rotation.y = Math.PI * 0.8; ink(M(box(2.2, 1.4, 0.08), toon('#1f3a2c'), 0, 1.5, 0, g), 1.03); M(box(2.36, 0.1, 0.12), toon('#7a5a3a'), 0, 0.78, 0, g); for (const sx of [-1, 1]) M(cyl(0.04, 0.04, 1.5, 5), toon('#3a3c44'), sx * 0.95, 0.75, -0.05, g);
+    const t = sign('DRILLS\nLAYUPS · THREES · SPOTS\nHANDLES · DEFENSE', 2.0, 1.2, '#ece9e2', '#1f3a2c', { border: false }); t.position.set(0, 1.5, 0.05); g.add(t); solid(-6.2, -3.6, 5.6, 7.0); }
+  spot(-3.4, 4.0, 2.0, 'COACH OVERTIME (drills)', () => uiDrills('hub'));
   for (const [cx, cy, cz, cc] of [[-10.2, 0.2, -3.4, '#e04848'], [-10.2, 0.6, -3.35, '#2f5bff'], [-10.75, 0.2, -3.0, '#f2c14e']]) ink(M(box(0.5, 0.4, 0.5), toon(cc), cx, cy, cz, scene), 1.05);
   // fiends
   [[5, -7.4], [-5.5, -8.6], [-3.4, 8.8], [10.4, 1.4]].forEach((b, i) => { const bb = aiBuild(50); bb.worn = randomWorn(0, true); bb.name = BUM_NAMES[i % BUM_NAMES.length]; const n = addNpc(bb, b[0], b[1], rnd(0, 6), 'beg', { bum: true, wander: true, name: bb.name, range: 1.4 }); spot(b[0], b[1], 1.9, 'TALK', () => uiBum(n)); n.spot = W.spots[W.spots.length - 1]; });
@@ -228,6 +235,10 @@ function buildPit() {
   spot(-7.2, 2, 1.9, 'THE LINK (friends)', () => uiHomie());
   // out
   for (const sx of [-1, 1]) ink(M(box(0.22, 4.4, 0.22), toon('#1c1d22'), sx * 1.7, 2.2, 10.5, scene), 1.08); const ex = sign('THE BLOCK', 3.2, 0.6, '#ece9e2', '#0a0a0e'); ex.position.set(0, 3.9, 10.4); ex.rotation.y = Math.PI; scene.add(ex);
+  // the ladder: six people who will play you one on one, in order
+  { const b = sign('THE LADDER\nONES · TO 7', 2.6, 1.0, '#ff2d78', '#0a0a0e'); b.position.set(9.92, 3.6, 7.2); b.rotation.y = -Math.PI / 2; scene.add(b); }
+  LADDER.forEach((L, i) => { const x = [-6.4, -4.3, -2.2, 2.2, 4.3, 6.4][i], z = [6.2, 7.1, 7.6, 7.6, 7.1, 6.2][i], n = addNpc(ladderBuild(i), x, z, Math.atan2(-x, -z + 2), (S.ladder || 0) > i ? 'cheer' : i === 6 ? 'idle' : 'idle');
+    n.rig.root.add(nameTag(L.name, (S.ladder || 0) > i ? 'beaten' : (S.ladder || 0) === i ? 'ladder · next up' : 'ladder · ' + (i + 1), n.rig.H)); spot(x, z - 0.8, 1.2, 'CHALLENGE ' + L.name.toUpperCase(), () => uiLadder(i)); });
   spot(0, 8.9, 1.9, 'BACK TO THE BLOCK', () => enterWorld('hub', 0, -8.4, 0));
   stringLights(-10, -1, 10, -1.4, 6.4, 14); stringLights(-10, 5.5, 10, 5.2, 6.2, 14);
   for (let i = 0; i < 4; i++) { poster(scene, -9.96, 2.2, -4.6 + i * 1.55, Math.PI / 2, i % 2); poster(scene, 9.96, 2.2, 4.4 + (i > 1 ? 1.55 * (i - 2) : -9 + i * 1.55), -Math.PI / 2, (i + 1) % 2); }
@@ -249,6 +260,7 @@ function buildCrib() {
   // workbench: upgrades
   ink(M(box(1.6, 0.9, 0.8), toon('#7a5a3a'), 8.6, 0.45, 10.5, scene), 1.04); const ws = sign('CRIB UPGRADES', 2, 0.5, '#ffc531', '#20242c'); ws.position.set(8.6, 1.5, 10.5); ws.rotation.y = -0.6; scene.add(ws); solid(7.7, 9.5, 10, 11);
   spot(7.5, 10.9, 2.0, 'CRIB UPGRADES', () => uiCrib());
+  spot(-4.5, 9.5, 1.8, 'DRILLS', () => uiDrills('crib'));
   spot(0, 6.5, 2.2, 'SHOOT AROUND', () => startPractice('free'));
   spot(0, 14.6, 1.8, 'BACK TO THE BLOCK', () => enterWorld('hub', -12.4, 5.8, Math.PI / 2));
   const ex = sign('THE BLOCK ↓', 3, 0.7, '#ffe9a8', '#0a0a14'); ex.position.set(0, 3.4, 16); ex.rotation.y = Math.PI; scene.add(ex);

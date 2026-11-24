@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.5: animation and control overhaul: planted feet with leg IK, a dribble that lives in the hand, responsive fixed-step controls.** Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.6: the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events.** Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -43,6 +43,51 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
   packages, celebrations), 8 crib upgrade lines with passive buffs, 29 trophies, 8 Respect ranks.
 - **Friends.** Export your build as a code; a friend imports it and your player is in their park as a teammate or the
   rival. On a computer a second player joins with a controller or on a split keyboard, co-op or versus.
+
+## The grind (v0.6)
+
+Ways to earn VC and Respect away from the gates.
+
+- **Drills.** Coach Overtime's board on The Block, or DRILLS at your crib:
+
+  | Drill | Badge XP |
+  |---|---|
+  | Layup Lines, Mikan Drill | Finishing |
+  | Free Throws, Spot Shooting, Around the World, 3-Point Contest (money balls), Catch & Shoot (quick-release bonus) | Shooting |
+  | Cone Weave (style points for moves at the cones) | Playmaking |
+  | Defensive Slides (sprinting does not count) | Defense |
+
+  Each drill keeps a personal best and has bronze, silver and gold scores. The first time to each medal pays a bonus
+  (100 / 250 / 600 VC). The same drill pays less after three runs in a day.
+- **H-O-R-S-E with Sharpie.** 50 VC to play, 250 if you spell him out. He shoots too, and you match his makes from his
+  spot.
+- **The Money Rack.** Unchanged: 40 seconds of deep balls, 5 VC a point.
+- **The ladder.** Six people in The Cages play you one on one to 7, in order:
+  1. Lil Kickstand
+  2. Two-Ply
+  3. Deacon Gains
+  4. Mini Mortgage
+  5. Static
+  6. The Commissioner
+
+  A first win pays 160–960 VC and Respect, and they become a homie who can run on your squad. Rematches pay 30%.
+- **Daily contracts.** The old head has three a day, drawn from a pool of 14 (win games, assists, greens, finish
+  drills, beat Sharpie, climb the ladder, help a fiend and so on). Progress counts from the start of the day.
+- **The daily event.** One a day, the same for everyone:
+  - Grind Day: drills +50%
+  - Green Day: greens double in drills
+  - Ladder Night: ladder pays double
+  - Horse Derby: H-O-R-S-E pays double
+  - Bucket Bonanza: games +25%
+  - Fiend Appreciation Day: helping a fiend earns 10 Respect
+
+  It shows in the corner of the screen and on the boards.
+- **Trophies:** Clocked In, Gym Rat (25 drills), Gold Standard (gold in all nine), Spelling Bee, On the Ladder,
+  Top Rung.
+
+| Coach's board | 3-Point Contest | The ladder in The Cages |
+|---|---|---|
+| ![board](docs/img/grind-board.jpg) | ![three](docs/img/grind-three.jpg) | ![ladder](docs/img/grind-ladder.jpg) |
 
 ## Model lab
 
@@ -106,6 +151,7 @@ tests/sim.sh                      # an all-AI game in each mode, printed as box 
 node tests/online.mjs             # two pages in one simulated live room: meet, invite, play a shared game, both get paid
 node tests/crew.mjs               # three pages: form a crew, follow the leader, run a 3v3 with a member on each side
 node tests/poses.mjs              # renders every pose to tests/shots/pose-NN.png
+node tests/grind.mjs              # every drill, H-O-R-S-E, a ladder match and a contract, played by a bot; each must pay
 node tests/accept.mjs             # the eight animation/control acceptance scenarios, with numbers
 node tests/feel.mjs [file.html]   # movement metrics for any build (reversal time, foot slip, ball in hand, FPS drift)
 node tests/strip.mjs run|drib|shot|def [file.html]   # side-on filmstrips of real gameplay

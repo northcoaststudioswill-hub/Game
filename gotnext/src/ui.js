@@ -46,7 +46,7 @@ function project(x, y, z) { _v.set(x, y, z).project(camera); return [(_v.x * 0.5
 function hudShow(on) {
   $('hud').style.display = on ? 'block' : 'none'; if (!on || !MT) return;
   $('modeTag').textContent = MT.cfg.mode.n + (MT.practice ? '' : ' · ' + MT.cfg.tier.n + ' · FIRST TO ' + MT.cfg.mode.to);
-  $('sb').style.display = MT.practice ? 'none' : 'flex'; $('rackHud').style.display = MT.practice === 'rack' ? 'block' : 'none'; $('brav').style.display = MT.practice ? 'none' : 'block';
+  $('sb').style.display = MT.practice ? 'none' : 'flex'; $('rackHud').style.display = MT.practice === 'rack' || MT.practice === 'drill' ? 'block' : 'none'; $('brav').style.display = MT.practice ? 'none' : 'block';
   $('n0').textContent = (S.name || 'YOU').slice(0, 10); $('flts').innerHTML = ''; $('call').className = '';
 }
 function hudCall(big, small, col, dur) { const c = $('call'); c.firstElementChild.textContent = big; c.lastElementChild.textContent = small || ''; c.firstElementChild.style.color = col || '#fff'; c.className = ''; void c.offsetWidth; c.style.animationDuration = (dur || 1.2) + 's'; c.className = 'go'; }
@@ -64,7 +64,8 @@ function hudMatch() {
     $('meterZone').style.bottom = (z * 100 - 5) + '%'; $('meterZone').style.height = '10%';
   } else mt.style.display = 'none';
   $('clear').style.display = M_.needClear && M_.off === me.team && M_.phase === 'live' ? 'block' : 'none';
-  if (M_.practice === 'rack') $('rackHud').innerHTML = `<span class="ye">${M_.rackScore}</span> PTS<br><span style="font-size:20px">${Math.max(0, Math.ceil(M_.rackT))}s</span>`;
+  if (M_.drill) $('rackHud').innerHTML = M_.drill.id === 'horse' ? horseHud() : drillHud();
+  else if (M_.practice === 'rack') $('rackHud').innerHTML = `<span class="ye">${M_.rackScore}</span> PTS<br><span style="font-size:20px">${Math.max(0, Math.ceil(M_.rackT))}s</span>`;
   if (IS_TOUCH) {
     const has = M_.B.holder === me, offb = M_.off === me.team;
     const a = has ? 'PASS' : offb ? 'CALL' : M_.arcade ? 'SHOVE' : 'STEAL', b = has ? 'SHOOT' : 'JUMP', h = has ? '↓ HOLD SHOOT · ↑ DRIVE · ←→ MOVES' : offb ? 'SKILL STICK' : '↑ HANDS UP · ↓ ' + (M_.arcade ? 'SHOVE' : 'STEAL');
@@ -325,7 +326,7 @@ function uiBum(n) {
   const amt = Math.max(3, Math.round((6 + rankOf(S.rep) * 6 + rnd(0, 6)) * (1 - cribFx('bum'))));
   uiDialog(n.name, pick(BUM_ASK).replace('{n}', amt), [
     [`Give ${amt} VC`, () => {
-      S.vc -= amt; S.life.gave = (S.life.gave || 0) + 1; n.blessed = true; n.anim = 'cheer'; n.wander = false; sfx('coin'); gainRep(3);
+      S.vc -= amt; S.life.gave = (S.life.gave || 0) + 1; n.blessed = true; n.anim = 'cheer'; n.wander = false; sfx('coin'); gainRep(evOn('fiend') ? 10 : 3);
       let extra = '';
       if (!S.owned.includes('hd_crown') && Math.random() < 0.22) { S.owned.push('hd_crown'); extra = ' He hands you a CARDBOARD CROWN.'; toast('NEW DRIP: Cardboard Crown', 'EPIC · +1 Passing', 'ach'); sfx('unlock'); }
       save(); checkAch(); uiDialog(n.name, pick(BUM_THANKS) + extra, [['+3 Respect. Worth it.', null]]);
@@ -334,9 +335,10 @@ function uiBum(n) {
   ]);
 }
 function uiRack() {
-  uiDialog('SHARPIE THE HUSTLER', `Money Rack. 40 seconds, deep balls only. Makes pay 2, greens pay 3, and I pay 5 VC a point. Entry is 25 VC. Your best: ${S.life.bestRack || 0}.`, [
-    ['Play (25 VC)', () => { S.vc -= 25; save(); startPractice('rack'); }, '', S.vc < 25], ['Nah', null, 'alt']]);
+  uiDialog('SHARPIE THE HUSTLER', `Two games. MONEY RACK: 40 seconds, deep balls only, I pay 5 VC a point, entry 25 (your best: ${S.life.bestRack || 0}). Or H-O-R-S-E, you and me: 50 to play, beat me for ${evOn('horse') ? 500 : 250}.`, [
+    ['Money Rack (25)', () => { S.vc -= 25; save(); startPractice('rack'); }, '', S.vc < 25], ['H-O-R-S-E (50)', () => { uiClose(); startHorse(); }, '', S.vc < 50], ['Nah', null, 'alt']]);
 }
+
 
 // ---------- results ----------
 function uiResults(res, rw, again) {

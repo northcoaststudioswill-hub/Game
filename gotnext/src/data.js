@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.5';
+const VERSION = '0.6';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -354,6 +354,12 @@ const ACH = [
   { id: 'crib5', n: 'Homeowner (!)', d: 'Buy 5 crib upgrades. In this economy.', k: 'cribs', t: 5, vc: 500 },
   { id: 'ovr80', n: 'Somebody', d: 'Reach 80 OVR.', k: 'ovr', t: 80, vc: 600 },
   { id: 'ovr95', n: 'Problem', d: 'Reach 95 OVR.', k: 'ovr', t: 95, vc: 3000 },
+  { id: 'drill1', n: 'Clocked In', d: 'Finish a drill.', k: 'drills', t: 1, vc: 50 },
+  { id: 'drill25', n: 'Gym Rat', d: 'Finish 25 drills.', k: 'drills', t: 25, vc: 600 },
+  { id: 'golds', n: 'Gold Standard', d: 'Gold in all nine drills.', k: 'drillGolds', t: 9, vc: 3000 },
+  { id: 'horse5', n: 'Spelling Bee', d: 'Beat Sharpie at H-O-R-S-E five times.', k: 'horseWins', t: 5, vc: 700 },
+  { id: 'ladder1', n: 'On the Ladder', d: 'Beat someone on the ladder in The Cages.', k: 'ladder', t: 1, vc: 150 },
+  { id: 'ladder6', n: 'Top Rung', d: 'Beat The Commissioner.', k: 'ladder', t: 6, vc: 3000 },
   { id: 'homie', n: 'Networking', d: 'Import a friend\'s build.', k: 'homies', t: 1, vc: 150 },
 ];
 
