@@ -1881,6 +1881,7 @@ const OPENING=()=>[
   ['grok','GROK RELIC IN OHIO BADLANDS. RATIO 8 HALLUCINATIONS. GET BASED STONE.',{cam:SH.grok}],
   ['fable','Mine rests in the Delve Woods. Kindly gather my 6 lost pages. I hope this helps!',{cam:SH.fable}],
   ['astra','✨ mine is at the top of the floaty stairs in the nebula. i forgot to attach them to anything ✨',{cam:SH.astra}],
+  ['fable','That is step one! There are further steps. I have not been told them. Nobody has. Is that not exciting.',{cam:SH.fable}],
   ['sys','Also: people from the game next door wandered in through the hole. A plumber, a gardener, a dog, a robot, a prime minister. And the buddies came through dim. Go find them.',{cam:SH.hubwide}],
   ['grok','FOLLOW ARROW AT TOP OF SCREEN. EXPLORE. BOUNCE ON RAINBOW PADS. TOUCH GRASS. BUT VIRTUAL.',{cam:SH.grok}]];
 function storyBeat(){const rel=(S.relics.grok?1:0)+(S.relics.fable?1:0)+(S.relics.astra?1:0);
@@ -2691,7 +2692,7 @@ const SUSHI={t:0};
 const COIN={p:1,h:[1],name:'$SLOP',n:1,dead:0,open:false,t:0};
 const coinName=()=>pick(['$SLOP','$SLOP 2','$SLOP 3: THE RUGENING','$DEREK','$OHIO','$AURA','$67','$FROG','$VAN','$GRASS'])+(COIN.n>3?' v'+COIN.n:'');
 function coinTick(){if(COIN.dead>0){COIN.dead-=.5;if(COIN.dead<=0){COIN.n++;COIN.name=coinName();COIN.p=.5+Math.random();COIN.h=[COIN.p];X.coin=0;toast('🚀 NEW COIN JUST DROPPED: '+COIN.name+'. This one is different (it is not).');}return;}
-  const pump=COIN.p<3?1.03:1.0;COIN.p=Math.max(.01,COIN.p*(pump+(Math.random()-.47)*.14));if(Math.random()<.01+COIN.p*.002){COIN.p=.0001;COIN.dead=30;toast('🚩 '+COIN.name+' GOT RUG PULLED. The dev is now in the Bahamas. Your bag is worth nothing.');if(X.coin>0)X.c.rugged=(X.c.rugged||0)+1;}
+  const pump=COIN.p<3?1.03:1.0;COIN.p=Math.max(.01,COIN.p*(pump+(Math.random()-.47)*.14));if(S.mode==='play'&&X.ch>=1&&Math.random()<.01+COIN.p*.002){COIN.p=.0001;COIN.dead=30;toast('🚩 '+COIN.name+' GOT RUG PULLED. The dev is now in the Bahamas. Your bag is worth nothing.');if(X.coin>0)X.c.rugged=(X.c.rugged||0)+1;}
   COIN.h.push(COIN.p);if(COIN.h.length>80)COIN.h.shift();if(COIN.open)coinRender();}
 function openCoin(){COIN.open=true;$('shop').hidden=false;coinRender();SFX.page();}
 function coinRender(){const b=$('shopb'),mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e;};b.textContent='';
@@ -4812,7 +4813,7 @@ function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.
   resetOrbs();spawnWorldEnemies();syncWorld();xReset();hudCache={};$('bossbar').hidden=true;$('hud').classList.remove('boss');$('ratio').hidden=true;$('dialog').hidden=true;}
 function begin(d){audioInit();$('title').hidden=true;$('end').hidden=true;$('hud').hidden=false;resetGame(d);S.mode='play';flash(.9,700);
   const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap (or slam / yell) · R pose · hold X: lag spike · SHIFT dash · G hook';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
-  if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('Tip: tap a quest to track it');});}
+  if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else{S.defZ='grok';say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('Tip: the arrow up top points at Ohio first. Tap any quest to point it somewhere else.');});}}
 $('play').addEventListener('click',()=>{clearSave();begin(null);});
 const sv=loadSave();if(sv){$('cont').hidden=false;$('cont').addEventListener('click',()=>begin(loadSave()));}
 $('again').addEventListener('click',()=>begin(null));
@@ -7017,7 +7018,7 @@ function f67Hint(recall){const st=stq();if(st.hint)return;st.hint=1;save();say((
   return{x:portal.x,z:portal.z,l:'THE PORTAL'};};}
 // the locked portal says what it is waiting for
 {const ai=act15Interact;act15Interact=function(){if(!S.dead&&!S.inPk&&storyStep()===5&&npcs.david&&Math.hypot(PL.x-npcs.david.x,PL.z-npcs.david.z)<5.5)return{label:(Q38().dgold||[]).length>=DNEED?'🪙 GIVE DAVID THE GOLD':'💬 ASK DAVID FOR THE TRUTH',fn:TALK.david};const r=ai();if(r)return r;if(!S.dead&&!S.inPk&&!portal.open&&Math.hypot(PL.x-portal.x,PL.z-portal.z)<6){const step=storyStep(),w=['','all 3 relics','the Great Lantern lit','the Algorithm\'s three feeds cut','an answer from the bottom of the Slop Hole','the truth from David'][step]||'something';
-  return{label:'🔒 THE PORTAL WANTS '+w.toUpperCase(),fn:()=>{toast('🔒 The portal is waiting for '+w+'. Tap the STORY line in your quests to point the compass at it.');SFX.hit();}};}return null;};}
+  return{label:'🔒 THE PORTAL WANTS '+w.toUpperCase(),fn:()=>{toast(step===1?'🔒 The portal is waiting for all 3 relics. They are the first three lines in your quests.':'🔒 The portal is waiting for '+w+'. Tap the STORY line in your quests to point the compass at it.');SFX.hit();}};}return null;};}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);STY.t-=dt;if(STY.t<=0){STY.t=1;if(play){storyBeat();storyTick();}DGOLD.forEach((g,i)=>{const p=STY['g'+i];p.nug.visible=!!stq().hint&&!(Q38().dgold||[]).includes(i);});if(stq().truth&&!DT.made)tunnelGoldRush();}};}
 // ---- the ending keeps your save, and you can keep playing
 (function(){const b=document.createElement('button');b.className='big alt';b.id='keepgo';b.textContent='▶ KEEP PLAYING';const a=$('again');a.parentNode.insertBefore(b,a);a.textContent='↻ NEW GAME (ERASES THIS ONE)';
