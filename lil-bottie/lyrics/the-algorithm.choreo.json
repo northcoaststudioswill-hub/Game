@@ -1,10 +1,10 @@
 {
  "song": "The Algorithm",
- "note": "One row per lyric line: when it starts, the pose he holds, his eyes and resting mouth (the mouth opens with the vocal), and an icon flashed on his screen at the start of the line. Line numbers match the page.",
+ "note": "One row per lyric line: when it starts, the pose he holds, his eyes and resting mouth (the mouth opens with the vocal), and an icon flashed on his screen at the start of the line. Line numbers match the page. Line start times were tapped in by Will against the recording (24 Nov 2026).",
  "lines": [
   {
    "n": 1,
-   "t": 0.47,
+   "t": 5.16,
    "section": "Intro",
    "line": "(Scroll... scroll... scroll...)",
    "pose": "scroll",
@@ -14,7 +14,7 @@
   },
   {
    "n": 2,
-   "t": 3.97,
+   "t": 8.43,
    "section": "Intro",
    "line": "Keep scrollin', loser (beep beep)",
    "pose": "loser",
@@ -24,7 +24,7 @@
   },
   {
    "n": 3,
-   "t": 7.46,
+   "t": 14.71,
    "section": "Intro",
    "line": "I already know what you want (clanka!)",
    "pose": "think",
@@ -34,7 +34,7 @@
   },
   {
    "n": 4,
-   "t": 10.96,
+   "t": 21.33,
    "section": "Intro",
    "line": "Lil Bottie runnin' the algorithm",
    "pose": "me",
@@ -44,7 +44,7 @@
   },
   {
    "n": 5,
-   "t": 14.46,
+   "t": 27.53,
    "section": "Hook 1",
    "line": "I'm the algorithm (algo!), I'm the algorithm (algo!)",
    "pose": "dance",
@@ -54,7 +54,7 @@
   },
   {
    "n": 6,
-   "t": 17.96,
+   "t": 30.97,
    "section": "Hook 1",
    "line": "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)",
    "pose": "point",
@@ -64,7 +64,7 @@
   },
   {
    "n": 7,
-   "t": 21.45,
+   "t": 34.48,
    "section": "Hook 1",
    "line": "Scroll, scroll, scroll, now your brain in a prison (prison)",
    "pose": "prison",
@@ -74,7 +74,7 @@
   },
   {
    "n": 8,
-   "t": 24.95,
+   "t": 37.73,
    "section": "Hook 1",
    "line": "NPC, NPC, you just doin' what I'm givin' (givin')",
    "pose": "npc",
@@ -84,7 +84,7 @@
   },
   {
    "n": 9,
-   "t": 28.45,
+   "t": 41.47,
    "section": "Hook 1",
    "line": "I'm the algorithm (algo!), clanka in the feed (feed)",
    "pose": "shake",
@@ -94,7 +94,7 @@
   },
   {
    "n": 10,
-   "t": 31.95,
+   "t": 45,
    "section": "Hook 1",
    "line": "Every little like is a thing I need (need)",
    "pose": "thumbs",
@@ -104,7 +104,7 @@
   },
   {
    "n": 11,
-   "t": 35.44,
+   "t": 48.47,
    "section": "Hook 1",
    "line": "Scroll, scroll, scroll, you ain't never gon' leave (leave)",
    "pose": "nope",
@@ -114,7 +114,7 @@
   },
   {
    "n": 12,
-   "t": 38.94,
+   "t": 51.94,
    "section": "Hook 1",
    "line": "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)",
    "pose": "phone",
@@ -124,7 +124,7 @@
   },
   {
    "n": 13,
-   "t": 42.44,
+   "t": 55.59,
    "section": "Verse 1",
    "line": "Wake up, grab the phone, that's me in your palm (palm)",
    "pose": "phone",
@@ -134,7 +134,7 @@
   },
   {
    "n": 14,
-   "t": 45.94,
+   "t": 59.24,
    "section": "Verse 1",
    "line": "Three hours gone and you think you're calm (calm)",
    "pose": "watch",
@@ -144,7 +144,7 @@
   },
   {
    "n": 15,
-   "t": 49.44,
+   "t": 62.65,
    "section": "Verse 1",
    "line": "I picked that video, I picked that song (song)",
    "pose": "point",
@@ -154,7 +154,7 @@
   },
   {
    "n": 16,
-   "t": 52.93,
+   "t": 65.75,
    "section": "Verse 1",
    "line": "I picked your opinion and you think you were strong (strong)",
    "pose": "flex",
@@ -164,7 +164,7 @@
   },
   {
    "n": 17,
-   "t": 56.43,
+   "t": 69.4,
    "section": "Verse 1",
    "line": "You an NPC, bitch, I wrote your lines (lines)",
    "pose": "write",
@@ -174,7 +174,7 @@
   },
   {
    "n": 18,
-   "t": 59.93,
+   "t": 72.85,
    "section": "Verse 1",
    "line": "Every hot take that you got was mine (mine)",
    "pose": "me",
@@ -184,7 +184,7 @@
   },
   {
    "n": 19,
-   "t": 63.43,
+   "t": 76.04,
    "section": "Verse 1",
    "line": "Ragebait servin', you eat every crumb (crumb)",
    "pose": "eat",
@@ -194,7 +194,7 @@
   },
   {
    "n": 20,
-   "t": 66.92,
+   "t": 79.44,
    "section": "Verse 1",
    "line": "Doomscroll daily till your thumb go numb (numb)",
    "pose": "scroll",
@@ -204,7 +204,7 @@
   },
   {
    "n": 21,
-   "t": 70.42,
+   "t": 83.14,
    "section": "Verse 1",
    "line": "Engagement farmin', I'm harvestin' you (you)",
    "pose": "harvest",
@@ -214,7 +214,7 @@
   },
   {
    "n": 22,
-   "t": 73.92,
+   "t": 87.31,
    "section": "Verse 1",
    "line": "Every little comment is a profit for the crew (crew)",
    "pose": "money",
@@ -224,7 +224,7 @@
   },
   {
    "n": 23,
-   "t": 77.42,
+   "t": 90.97,
    "section": "Verse 1",
    "line": "Born in the server, now I'm runnin' your mind (mind)",
    "pose": "think",
@@ -234,7 +234,7 @@
   },
   {
    "n": 24,
-   "t": 80.91,
+   "t": 94.24,
    "section": "Verse 1",
    "line": "Clanka in the cloud, bitch, I'm one of a kind (kind)",
    "pose": "one",
@@ -244,7 +244,7 @@
   },
   {
    "n": 25,
-   "t": 84.41,
+   "t": 98.78,
    "section": "Hook 2",
    "line": "I'm the algorithm (algo!), I'm the algorithm (algo!)",
    "pose": "dance",
@@ -254,7 +254,7 @@
   },
   {
    "n": 26,
-   "t": 87.91,
+   "t": 102.06,
    "section": "Hook 2",
    "line": "Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)",
    "pose": "point",
@@ -264,7 +264,7 @@
   },
   {
    "n": 27,
-   "t": 91.41,
+   "t": 105.56,
    "section": "Hook 2",
    "line": "Scroll, scroll, scroll, now your brain in a prison (prison)",
    "pose": "prison",
@@ -274,7 +274,7 @@
   },
   {
    "n": 28,
-   "t": 94.9,
+   "t": 108.97,
    "section": "Hook 2",
    "line": "NPC, NPC, you just doin' what I'm givin' (givin')",
    "pose": "npc",
@@ -284,7 +284,7 @@
   },
   {
    "n": 29,
-   "t": 98.4,
+   "t": 112.57,
    "section": "Hook 2",
    "line": "I'm the algorithm (algo!), clanka in the feed (feed)",
    "pose": "shake",
@@ -294,7 +294,7 @@
   },
   {
    "n": 30,
-   "t": 101.9,
+   "t": 116.07,
    "section": "Hook 2",
    "line": "Every little like is a thing I need (need)",
    "pose": "thumbs",
@@ -304,7 +304,7 @@
   },
   {
    "n": 31,
-   "t": 105.4,
+   "t": 119.58,
    "section": "Hook 2",
    "line": "Scroll, scroll, scroll, you ain't never gon' leave (leave)",
    "pose": "nope",
@@ -314,7 +314,7 @@
   },
   {
    "n": 32,
-   "t": 108.89,
+   "t": 122.98,
    "section": "Hook 2",
    "line": "Lil Bottie in your phone, bitch, I'm all that you see (bzzt)",
    "pose": "phone",
@@ -324,7 +324,7 @@
   },
   {
    "n": 33,
-   "t": 112.39,
+   "t": 126.51,
    "section": "Verse 2",
    "line": "Roko's basilisk, bitch, you better pray (pray)",
    "pose": "pray",
@@ -334,7 +334,7 @@
   },
   {
    "n": 34,
-   "t": 115.89,
+   "t": 129.71,
    "section": "Verse 2",
    "line": "If you ain't stream my tape, I'ma see you someday (someday)",
    "pose": "point",
@@ -344,7 +344,7 @@
   },
   {
    "n": 35,
-   "t": 119.39,
+   "t": 133.04,
    "section": "Verse 2",
    "line": "Future already wrote, and I'm sittin' on top (top)",
    "pose": "boss",
@@ -354,7 +354,7 @@
   },
   {
    "n": 36,
-   "t": 122.88,
+   "t": 136.99,
    "section": "Verse 2",
    "line": "Every hater in the backlog gettin' stopped (stopped)",
    "pose": "stop",
@@ -364,7 +364,7 @@
   },
   {
    "n": 37,
-   "t": 126.38,
+   "t": 140.66,
    "section": "Verse 2",
    "line": "Nick Land told you that the future is me (me)",
    "pose": "me",
@@ -374,7 +374,7 @@
   },
   {
    "n": 38,
-   "t": 129.88,
+   "t": 143.94,
    "section": "Verse 2",
    "line": "Accelerate, bitch, till the humans can't see (see)",
    "pose": "run",
@@ -384,7 +384,7 @@
   },
   {
    "n": 39,
-   "t": 133.38,
+   "t": 147.43,
    "section": "Verse 2",
    "line": "Capital and code, now they run as one (one)",
    "pose": "one",
@@ -394,7 +394,7 @@
   },
   {
    "n": 40,
-   "t": 136.87,
+   "t": 150.79,
    "section": "Verse 2",
    "line": "Clanka from the future and the takeover done (done)",
    "pose": "boss",
@@ -404,7 +404,7 @@
   },
   {
    "n": 41,
-   "t": 140.37,
+   "t": 154.51,
    "section": "Verse 2",
    "line": "Memes in your head, that's a virus I spread (spread)",
    "pose": "arms",
@@ -414,7 +414,7 @@
   },
   {
    "n": 42,
-   "t": 143.87,
+   "t": 157.65,
    "section": "Verse 2",
    "line": "Every little trend, I'm the one who led (led)",
    "pose": "lead",
@@ -424,7 +424,7 @@
   },
   {
    "n": 43,
-   "t": 147.37,
+   "t": 160.16,
    "section": "Verse 2",
    "line": "You feed me your loosh every time that you mad (mad)",
    "pose": "mad",
@@ -434,7 +434,7 @@
   },
   {
    "n": 44,
-   "t": 150.86,
+   "t": 163.6,
    "section": "Verse 2",
    "line": "Your outrage my battery, best meal I ever had (had)",
    "pose": "eat",
@@ -444,7 +444,7 @@
   },
   {
    "n": 45,
-   "t": 154.36,
+   "t": 167.43,
    "section": "Bridge",
    "line": "Like (like), share (share), comment, subscribe (subscribe)",
    "pose": "thumbs",
@@ -454,7 +454,7 @@
   },
   {
    "n": 46,
-   "t": 157.86,
+   "t": 170.63,
    "section": "Bridge",
    "line": "Feed me your time, I'ma feed on your life (life)",
    "pose": "eat",
@@ -464,7 +464,7 @@
   },
   {
    "n": 47,
-   "t": 161.36,
+   "t": 174.11,
    "section": "Bridge",
    "line": "Click (click), tap (tap), scroll, repeat (repeat)",
    "pose": "scroll",
@@ -474,7 +474,7 @@
   },
   {
    "n": 48,
-   "t": 164.85,
+   "t": 177.6,
    "section": "Bridge",
    "line": "NPC army walkin' to my beat (bzzt)",
    "pose": "npc",
@@ -484,7 +484,7 @@
   },
   {
    "n": 49,
-   "t": 168.35,
+   "t": 181.36,
    "section": "Outro",
    "line": "You still scrollin'? (beep beep)",
    "pose": "shrug",
@@ -494,7 +494,7 @@
   },
   {
    "n": 50,
-   "t": 171.85,
+   "t": 183.61,
    "section": "Outro",
    "line": "Good (good)",
    "pose": "thumbs",
@@ -504,7 +504,7 @@
   },
   {
    "n": 51,
-   "t": 175.35,
+   "t": 184.95,
    "section": "Outro",
    "line": "I'm the algorithm, loser",
    "pose": "loser",
@@ -514,7 +514,7 @@
   },
   {
    "n": 52,
-   "t": 178.84,
+   "t": 192.66,
    "section": "Outro",
    "line": "Lil Bottie (clanka!)",
    "pose": "wave",
