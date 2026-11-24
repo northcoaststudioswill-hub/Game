@@ -145,7 +145,8 @@ body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(48px +
   function tapShow(){var n=TAP.n,done=n>=LINES.length;$('tapprog').textContent=done?'all '+LINES.length+' lines timed':'line '+(n+1)+' of '+LINES.length+' · '+LINES[Math.min(n,LINES.length-1)][1];$('tapnext').textContent=done?'Done.':LINES[n][2];$('tapafter').textContent=done?'':(LINES[n+1]?'then: '+LINES[n+1][2]:'(last line)');
     $('tapbtn').hidden=done;$('tapout').hidden=!done;$('tapdone').hidden=!done;if(done){TAP.t.forEach(function(t,i){LINES[i][0]=t;});offset=0;store();$('tapout').value=CUR.title+' line start times (seconds):\n'+JSON.stringify(TAP.t);$('taphelp').textContent='Saved in this browser. Close this and press play to watch it with your timing. Copy the numbers and send them to make them permanent.';}}
   function tapStart(){TAP.on=true;TAP.n=0;TAP.t=[];$('tapper').hidden=false;$('taptitle').textContent='TIME THE LYRICS · '+CUR.title.toUpperCase();$('taphelp').innerHTML='The song plays from the start. Tap the big button (or press Space) the moment he <b>starts</b> each line. Wrong tap? Use undo.';setFollow(true);AUDIO.playbackRate=VC.playbackRate=1;started=true;song.currentTime=0;play();tapShow();}
-  function tapHit(){if(!TAP.on||TAP.n>=LINES.length)return;TAP.t.push(Math.max(0,Math.round((song.currentTime-.08)*100)/100));TAP.n++;tapShow();}
+  function LAT(){return AC&&CUR.src&&song===AUDIO?Math.min(.5,(AC.outputLatency||0)+(AC.baseLatency||0)):0;}
+  function tapHit(){if(!TAP.on||TAP.n>=LINES.length)return;TAP.t.push(Math.max(0,Math.round((song.currentTime-LAT()-.08)*100)/100));TAP.n++;tapShow();}
   $('tapbtn').addEventListener('pointerdown',function(e){e.preventDefault();tapHit();});
   $('tapundo').onclick=function(){if(!TAP.on||!TAP.n)return;TAP.n--;var t=TAP.t.pop();song.currentTime=Math.max(0,t-3);if(song.paused)play();tapShow();};$('taprestart').onclick=function(){if(TAP.on)tapStart();};
   $('tapquit').onclick=function(){TAP.on=false;$('tapper').hidden=true;lastK=-9;render();};
@@ -161,7 +162,7 @@ body.clean #ui,body.clean #top{display:none}body.clean #lyric{bottom:calc(48px +
   var t0=performance.now(),last=t0;(function loop(now){requestAnimationFrame(loop);var t=(now-t0)/1000,dt=Math.min(.05,(now-last)/1000);last=now;
     if(song===VC&&!VC.paused){VC.currentTime+=dt*VC.playbackRate;if(VC.currentTime>=VC.duration){VC.pause();VC.currentTime=0;ended();}}
     var playing=started&&!song.paused,pt=playing?'❚❚':'▶';if($('play').textContent!==pt)$('play').textContent=pt;if(auto){if(playing)yaw=Math.sin(t*.22)*.7;else yaw+=dt*.35;}
-    if(started){var ct=song.currentTime,k=lineAt(ct),dur=song.duration||VC.duration;$('clock').textContent=fmt(ct)+' / '+fmt(dur);$('bar').firstChild.style.width=(ct/dur*100)+'%';
+    if(started){var ct=song.currentTime,k=lineAt(ct-(typeof LAT==='function'?LAT():0)),dur=song.duration||VC.duration;$('clock').textContent=fmt(ct)+' / '+fmt(dur);$('bar').firstChild.style.width=(ct/dur*100)+'%';
       var past=k>=0&&k===LINES.length-1&&ct-(LINES[k][0]+offset)>3.6,L=k>=0&&!past?LINES[k]:null;
       if(k!==lastK||past&&lastK!==-3){lastK=past?-3:k;lineT0=ct;$('sec').textContent=L?'#'+(k+1)+' · '+fmt(L[0]+offset)+' · '+L[1].toUpperCase():past?'NO MORE LINES ON THE SHEET':'';$('line').textContent=L?L[2]:'';
         if(tab==='lines'){var cur=$('sheet').querySelector('.cur');if(cur)cur.classList.remove('cur');var el=$('sheet').querySelector('.ln[data-k="'+k+'"]');if(el&&L){el.classList.add('cur');el.scrollIntoView({block:'nearest'});}}
