@@ -7,7 +7,7 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
   window.__tick = n => { if (!window.__patched && window.THREE && THREE.Object3D) { window.__patched = 1; const orig = THREE.Object3D.prototype.lookAt; THREE.Object3D.prototype.lookAt = function (x, y, z) { if (this.isPerspectiveCamera && window.__camFn) { const t = window.__camFn(this); return orig.call(this, t[0], t[1], t[2]); } return orig.call(this, x, y, z); }; }
     for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
-const T = n => page.evaluate(n => window.__tick(n), n), shot = async n => { await page.screenshot({ path: path.join(out, n + '.jpg'), type: 'jpeg', quality: 82 }); };
+const T = n => page.evaluate(n => window.__tick(n), n), shot = async n => { await page.screenshot({ path: path.join(out, n + '.jpg'), type: 'jpeg', quality: 82, timeout: 180000 }); };
 await page.goto('file://' + path.resolve(dir, '..', 'index.html')); await T(120); await shot('01-title');
 await page.click('#titleBtns .btn'); await T(30); await page.fill('#bname', 'JAYLO'); await T(5); await shot('02-builder');
 await page.click('#panel .pf .btn'); await T(60);
