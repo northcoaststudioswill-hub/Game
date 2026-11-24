@@ -181,7 +181,73 @@ Changes (pose `loco` and the foot planner, only off the court and fading out abo
 
 The court is unchanged: all eight acceptance tests still pass.
 
-## 8. Not checked
+## 8. Finishes, jumper variations and the Dev Room (v0.7)
+
+![Dunks](img/finishes-dunks.png)
+![Layups](img/finishes-layups.png)
+![Jumpers and moves](img/finishes-jumpers.png)
+
+All filmed from the game with `node tests/reel.mjs <group>`, which plays the Dev Room reel through the real game loop.
+
+**New:**
+- **Dunks:**
+  - Rock The Cradle (ball on the forearm at the hip, swung up behind and thrown down)
+  - Double Dip (double clutch: up, down to the waist with the knees tucked, back up)
+  - The Loophole (between the legs: the right hand passes the ball under the right thigh, the left hand finishes; the
+    ball really changes hands)
+  - the reverse dunk (anyone who can dunk: stick away from the rim)
+- **Layups:**
+  - lay-in
+  - finger roll (full speed from a step out)
+  - scoop (underhand, when someone is close)
+  - power layup (two feet, two hands; strong players use it under pressure)
+  - euro step
+  - reverse (under the rim and up the far side, back to the rim; the body turns with the path and keeps facing the
+    way it ends up, with no snap back)
+- **Hop step:** a two-foot hop and gather, then a strong finish. Contests and blocks count for about 22% less.
+- **Jumpers:**
+  - fadeaway (drifts away from the rim in the air, off leg kicked out, harder to block, slightly harder to make)
+  - side-step (a quick step across the rim line before the rise)
+  - hop-step jumper (↑ from mid-range)
+- **Dribble moves:**
+  - Insider Trading (in-and-out, same hand)
+  - Hostile Takeover (killer crossover, very low)
+  - Clawback (snatch-back)
+- **The AI uses them too:**
+  - hop steps and reverses when the lane is closed
+  - fadeaways when someone is on its jumper
+- **Online:** guests see the same finish, jumper and move as the host. The state, the finish kind and the move id are
+  sent with each player.
+
+**Refinements to the engine found while filming:**
+- **Dunk take-off:** both knees used to tuck so deep that the feet stayed near the floor, so dunks did not look
+  airborne. Now:
+  - one-hand dunks leave off one foot: drive knee up, the take-off leg trailing straight
+  - two-hand dunks jump off both feet
+  - the body rises a little higher with Vertical
+- **A leg-flick at every jump take-off (an old bug):**
+  - The leg IK could store a hip angle a full turn away (5.77 rad instead of −0.51).
+  - As the IK faded out on take-off, blending back to the pose swung the leg the long way round, through the floor,
+    for a frame or two.
+  - Fixed by keeping the IK angle on the near side of the pose angle.
+- **Airborne feet:** while the IK fades out in the air, it now aims at where the pose has the feet, not at the
+  floor. Before, it pulled the hips down 0.22 m on every jump.
+
+**Design choice, caught by acceptance test 4:**
+- Letting go of the stick and shooting at speed first triggered a hop-step jumper. That turns an ordinary pull-up into
+  something the player did not ask for.
+- So the hop-step jumper moved to ↑ from mid-range. Letting go only hops near the rim, at more than 2.5 m/s.
+
+**Dev Room:** see the README. A maxed-out player, any build, every move to equip and preview, games against maxed
+players, and the reel.
+
+**Checks:**
+- `node tests/gestures.mjs`: eight inputs from real key presses each produce the right finish or jumper, and max then
+  restore gives back the exact player.
+- `node tests/devroom.mjs`: clicks through every tab, a reel and a 1v1 against a maxed player, with no page errors.
+- The eight court acceptance tests, smoke, input, online and crew all pass.
+
+## 9. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

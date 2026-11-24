@@ -31,7 +31,10 @@ function studioStep(dt) {
     handPos(ST.dunker, 'R', ST.ball.position); ST.ball.position.y += 0.1;
     const a = ST.t * 0.12 + 0.6; camera.position.set(Math.sin(a) * 7.5, 2.2 + Math.sin(ST.t * 0.3) * 0.4, 5.5 + Math.cos(a) * 3.5); camera.lookAt(0, 2.5, 0.5);
   } else if (ST.rig) {
-    ST.rig.root.rotation.y = Math.sin(ST.t * 0.5) * 0.7 + 0.2; applyPose(ST.rig, poseOf('idle', ST.t), dt);
+    ST.rig.root.rotation.y = Math.sin(ST.t * 0.5) * 0.7 + 0.2;
+    const dp = ST.devPose;          // the Dev Room previews a move by looping its pose
+    if (dp) { const cyc = dp.o.cyc || 1.2, lt = (ST.t - dp.t0) % (cyc + 0.6), tt = Math.min(lt, cyc); applyPose(ST.rig, poseOf(dp.an, tt, Object.assign({ leg: ST.rig.legLen }, dp.o, { u: tt / cyc * (dp.o.u || 1) * 1.1 })), dt); }
+    else applyPose(ST.rig, poseOf('idle', ST.t), dt);
     if (portrait) { camera.position.set(0, 0.2, 7.2); camera.lookAt(0, -0.9, 0); } else { camera.position.set(1.9, 1.3, 5.0); camera.lookAt(1.9, 1.0, 0); }
   }
 }
@@ -157,7 +160,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera);
   // test hook: draw the player in one pose and hand back the frame

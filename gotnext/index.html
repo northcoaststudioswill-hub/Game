@@ -175,7 +175,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.6';
+const VERSION = '0.7';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -297,9 +297,12 @@ const MOVES = [
   { id: 'cross', slot: 'side', n: 'Basic Cross', d: 'Left-right. Honest work.', dur: .34, burst: 5.2, ank: 0, st: 6, cost: 0, rank: 0, need: 0 },
   { id: 'tween', slot: 'side', n: 'Tween Machine', d: 'Between the legs, quicker recovery.', dur: .28, burst: 5.6, ank: .04, st: 6, cost: 600, rank: 1, need: 60 },
   { id: 'behind', slot: 'side', n: 'Behind The Back Taxes', d: 'Wide, slow, devastating.', dur: .42, burst: 6.6, ank: .09, st: 8, cost: 1500, rank: 2, need: 72 },
+  { id: 'inout', slot: 'side', n: 'Insider Trading', d: 'In and out. Sell the cross, keep the ball in the same hand.', dur: .32, burst: 5.8, ank: .07, st: 6, cost: 1100, rank: 1, need: 66, keep: 1 },
+  { id: 'killer', slot: 'side', n: 'Hostile Takeover', d: 'Killer crossover. Big shoulder fake, low and wide, then gone.', dur: .38, burst: 6.8, ank: .11, st: 8, cost: 2600, rank: 3, need: 78 },
   { id: 'shammgod', slot: 'side', n: 'The Shell Company', d: 'Ball goes one way, liability goes another.', dur: .46, burst: 7.4, ank: .15, st: 10, cost: 4000, rank: 4, need: 86 },
   { id: 'stepback', slot: 'back', n: 'Stepback', d: 'Create space, then file for separation.', dur: .36, burst: 5.4, ank: .02, st: 7, cost: 0, rank: 0, need: 0 },
   { id: 'hesi', slot: 'back', n: 'Hesi Pull', d: 'Freeze frame. Defender buffers.', dur: .30, burst: 2.0, ank: .08, st: 5, cost: 800, rank: 1, need: 62 },
+  { id: 'snatch', slot: 'back', n: 'Clawback', d: 'Snatch-back. One hand yanks the ball home while you hop away.', dur: .34, burst: 6.4, ank: .06, st: 8, cost: 2000, rank: 2, need: 74 },
   { id: 'moonwalk', slot: 'back', n: 'Moonwalk Stepback', d: 'Enormous space. Enormous ego.', dur: .44, burst: 7.6, ank: .08, st: 10, cost: 3500, rank: 3, need: 82 },
   { id: 'spin', slot: 'diag', n: 'Spin Cycle', d: 'Roll off the defender toward the rim.', dur: .44, burst: 6.2, ank: .03, st: 8, cost: 0, rank: 0, need: 0 },
   { id: 'halfspin', slot: 'diag', n: 'Fake News Spin', d: 'Half spin, come back. Nobody checks.', dur: .40, burst: 6.0, ank: .12, st: 8, cost: 1800, rank: 2, need: 75 },
@@ -317,9 +320,26 @@ const DUNKS = [
   { id: 'twohand', n: 'Two-Hand Tax Return', d: 'Safe, reliable, filed on time.', bonus: .06, rep: 0, cost: 0, rank: 0, need: 0 },
   { id: 'tomahawk', n: 'Tomahawk Missile', d: 'One hand, way back. +2 Respect per dunk.', bonus: 0, rep: 2, cost: 1200, rank: 1, need: 70 },
   { id: 'windmill', n: 'Wind Turbine', d: 'Renewable energy. +4 Respect per dunk.', bonus: -.04, rep: 4, cost: 2800, rank: 3, need: 80 },
+  { id: 'cradle', n: 'Rock The Cradle', d: 'Ball cradled on the forearm, rocked back, thrown home. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 3600, rank: 3, need: 84 },
+  { id: 'clutch', n: 'Double Dip', d: 'Double clutch: up, down to the waist, back up, through. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 4200, rank: 4, need: 86 },
   { id: 'three60', n: '360 No-Scope', d: 'Full rotation. +7 Respect per dunk.', bonus: -.08, rep: 7, cost: 6000, rank: 5, need: 90 },
+  { id: 'legs', n: 'The Loophole', d: 'Between the legs in mid-air. Legal, technically. +9 Respect per dunk.', bonus: -.12, rep: 9, cost: 9000, rank: 6, need: 95 },
 ];
 const DUNK = {}; DUNKS.forEach(m => DUNK[m.id] = m);
+DUNK.reverse = { id: 'reverse', n: 'Reverse Mortgage', d: 'Back to the rim, two hands over the head. Anyone who can dunk: pull the stick away from the rim.', bonus: -.02, rep: 3 };
+// finishes and jumper variations everyone has. The left stick picks one as you go up (see the MOVES tab).
+const FINISHES = [
+  { id: 'lay', n: 'Lay-in', d: 'Off the glass. Stick toward the rim.' },
+  { id: 'finger', n: 'Finger Roll', d: 'At full speed from a step out, rolled off the fingertips.' },
+  { id: 'scoop', n: 'Scoop', d: 'Underhand, under a defender\'s arm.' },
+  { id: 'power', n: 'Power Layup', d: 'Two feet, two hands, through the contact. Strong players do it under pressure.' },
+  { id: 'euro', n: 'Euro Step', d: 'Stick sideways as you go up: one step, then the other way.' },
+  { id: 'reverse', n: 'Reverse', d: 'Stick away from the rim: under it and up the other side. Dunkers reverse-dunk.' },
+  { id: 'hop', n: 'Hop Step', d: 'Let go of the move stick at speed as you go to the rim: a two-foot hop, then up strong. Gets around defenders.' },
+  { id: 'fade', n: 'Fadeaway', d: 'Stick away from the rim as you shoot. Harder to block, a little harder to make.' },
+  { id: 'side', n: 'Side-Step', d: 'Stick sideways from a stand as you shoot: a quick step out of the contest.' },
+  { id: 'hopj', n: 'Hop-Step Jumper', d: 'Push ↑ (drive) from mid-range, outside floater range: hop, plant, rise. The timing is automatic.' },
+];
 const CELEBS = [
   { id: 'flex', n: 'The Flex', cost: 0, rank: 0 },
   { id: 'salute', n: 'Salute The Flag', cost: 500, rank: 1 },
@@ -1056,15 +1076,63 @@ function poseOf(anim, t, o) {
       if (u < 0.45) { p.y = -0.13 * (u / 0.45); legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); }       // dip: ball to the pocket
       else if (u < 1) { legs(-0.05, 0.12, -k * 0.9, 0.12 + k * 0.5, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); }   // set point: wrist cocked
       else { legs(0.05, 0.05, -k * 1.1, k * 0.3, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); }                                          // follow-through: gooseneck
+      if (o.fadeA && u >= 0.45) {        // fadeaway: hips back, shoulders back, the off leg kicks out front for balance
+        const a = o.fadeA; S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
+      }
+      if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
       p.rate = anim === 'fake' ? 30 : 20; break;
     }
     case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
-    case 'layup': { const eu = o.euro || 0; legs(0.3, 0.3, -1.3, 1.5); S_('anR', 0.9); S_('hips', 0, 0, -eu * 0.25); S_('spine', 0.08, 0, -eu * 0.15); S_('chest', -0.05, -eu * 0.3, 0); S_('neck', -0.2); S_('shR', -2.95, 0, 0.1 + eu * 0.2); S_('elR', -0.18); S_('wrR', (o.u || 0) > 0.7 ? -0.9 : 0.6); S_('shL', -0.5, 0, 0.45); S_('elL', -1.1); p.rate = 18; break; }
+    case 'layup': {
+      const eu = o.euro || 0, u = o.u || 0, k = o.kind || 'lay', rel = u > 0.7;
+      legs(0.3, 0.3, -1.3, 1.5); S_('anR', 0.9); S_('hips', 0, 0, -eu * 0.25); S_('spine', 0.08, 0, -eu * 0.15); S_('chest', -0.05, -eu * 0.3, 0); S_('neck', -0.2); S_('shR', -2.95, 0, 0.1 + eu * 0.2); S_('elR', -0.18); S_('wrR', rel ? -0.9 : 0.6); S_('shL', -0.5, 0, 0.45); S_('elL', -1.1); p.rate = 18;
+      if (k === 'finger') {          // long reach out in front, the ball rolls off the fingertips, palm up
+        legs(0.35, 0.2, -1.45, 1.2); S_('spine', -0.02); S_('chest', -0.1); S_('neck', -0.3); S_('shR', -2.35, 0, 0.05); S_('elR', -0.04); S_('wrR', rel ? 1.1 : 0.2, rel ? 1.2 : 0, 0); S_('shL', -0.3, 0, 0.6); S_('elL', -0.7);
+      } else if (k === 'reverse') {  // back to the rim: arch, look up over the shoulder, reach back over the head
+        legs(0.2, 0.45, -1.15, 1.45); S_('spine', -0.12); S_('chest', -0.28, 0.25, 0); S_('neck', -0.6, 0.35, 0); S_('shR', -3.45, 0, -0.15); S_('elR', -0.25); S_('wrR', rel ? -1.0 : 0.3); S_('shL', -0.7, 0, 0.7); S_('elL', -0.9);
+      } else if (k === 'scoop') {    // underhand from low, under the shot-blocker's arm
+        const sw = clamp((u - 0.25) / 0.5, 0, 1); legs(0.3, 0.35, -1.2, 1.55); S_('spine', 0.28); S_('chest', 0.12); S_('neck', -0.35); S_('shR', -0.25 - sw * 1.95, 0, 0.15); S_('elR', -0.12); S_('wrR', 1.25); S_('shL', -0.9, 0, 0.75); S_('elL', -1.35); p.rate = 22;
+      } else if (k === 'power') {    // two feet, two hands, square to the glass
+        legs(-0.35, 0.75, -0.35, 0.75, 0.1); S_('anR', 0.7); S_('anL', 0.7); S_('spine', 0.04); S_('chest', -0.12); S_('neck', -0.3); S_('shR', -2.85, 0, 0.18); S_('shL', -2.85, 0, -0.18); S_('elR', -0.35); S_('elL', -0.35); S_('wrR', rel ? -0.7 : 0.5); S_('wrL', rel ? -0.7 : 0.5); p.rate = 20;
+      }
+      break;
+    }
+    case 'hop': {                    // the hop step: gather to the chest, both feet off, land together low
+      const u = clamp(o.u || 0, 0, 1);
+      if (u < 0.72) { const e = Math.sin(Math.PI * u / 0.72); legs(-0.5 - e * 0.25, 0.75 + e * 0.35, -0.4 - e * 0.2, 0.7 + e * 0.3, 0.1); S_('anR', 0.6); S_('anL', 0.6); }
+      else { p.y = -0.09; legs(-0.62, 1.05, -0.62, 1.05, 0.16); }
+      S_('spine', 0.32); S_('chest', 0.14); S_('neck', -0.4); S_('shR', -0.85, 0, 0.25); S_('shL', -0.85, 0, -0.25); S_('elR', -1.65); S_('elL', -1.65); S_('wrR', 0.45); S_('wrL', 0.45); p.rate = 26; break;
+    }
     case 'dunk': {
       const u = o.u || 0, st = o.style || 'twohand', slam = u > 0.72, hang = u > 0.8;
-      legs(hang ? -0.5 : -0.95, hang ? 0.9 : 1.55, hang ? -0.3 : -0.5, hang ? 0.7 : 1.25, 0.1); S_('spine', slam ? 0.22 : -0.2); S_('chest', slam ? 0.3 : -0.35); S_('neck', slam ? 0.2 : -0.3);
+      // one-hand dunks leave off one foot: the drive knee comes up, the take-off leg trails straight with the toe pointed.
+      // two-hand dunks jump off both, knees tucked. Hanging after the slam, the legs dangle.
+      const oneFoot = st !== 'twohand' && st !== 'clutch' && st !== 'reverse';
+      if (hang) legs(-0.3, 0.45, -0.12, 0.3, 0.06);
+      else if (oneFoot) { legs(0.18, 0.4, -1.35, 1.75, 0.06); S_('anR', 0.65); }
+      else legs(-0.75, 1.1, -0.6, 1.0, 0.12);
+      S_('spine', slam ? 0.22 : -0.2); S_('chest', slam ? 0.3 : -0.35); S_('neck', slam ? 0.2 : -0.3);
       if (st === 'twohand') { const a = slam ? -1.95 : -3.3; S_('shR', a, 0, 0.12); S_('shL', a, 0, -0.12); S_('elR', slam ? -0.2 : -0.95); S_('elL', slam ? -0.2 : -0.95); S_('wrR', slam ? -0.9 : 0.5); S_('wrL', slam ? -0.9 : 0.5); }
       else if (st === 'windmill') { const a = slam ? -1.95 : (0.4 - u / 0.72 * 4.4); S_('shR', a, 0, -0.1); S_('elR', -0.1); S_('wrR', slam ? -0.9 : 0); S_('shL', -0.6, 0, 0.75); S_('elL', -0.8); p.rate = 30; }
+      else if (st === 'reverse') {   // back to the rim, both hands go up and back over the head, then down behind
+        const a = slam ? -3.75 : -2.9; S_('shR', a, 0, 0.15); S_('shL', a, 0, -0.15); S_('elR', slam ? -0.1 : -0.7); S_('elL', slam ? -0.1 : -0.7); S_('wrR', slam ? -0.8 : 0.4); S_('wrL', slam ? -0.8 : 0.4); S_('spine', slam ? -0.3 : -0.12); S_('chest', slam ? -0.35 : -0.15); S_('neck', -0.55);
+      }
+      else if (st === 'cradle') {    // ball rocked on the forearm by the hip, swung up behind and over, thrown down
+        const w = clamp((u - 0.42) / 0.3, 0, 1), a = slam ? -1.95 : u < 0.42 ? 0.35 : lerp(0.35, -3.7, w);
+        S_('shR', a, 0, u < 0.42 ? -0.25 : -0.05); S_('elR', slam ? -0.15 : u < 0.42 ? -1.7 : -0.4); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -0.7, 0, 0.8); S_('elL', -0.8); S_('chest', slam ? 0.3 : -0.25, u < 0.42 ? -0.35 : 0.1, 0); p.rate = 26;
+      }
+      else if (st === 'clutch') {    // up, down to the waist with the knees tucked, back up, through
+        const down = u > 0.3 && u < 0.52, a = slam ? -1.95 : down ? -0.55 : -3.1;
+        if (down) legs(-1.35, 1.9, -1.2, 1.8, 0.12);
+        S_('shR', a, 0, 0.12); S_('shL', a, 0, -0.12); S_('elR', slam ? -0.2 : down ? -1.5 : -0.6); S_('elL', slam ? -0.2 : down ? -1.5 : -0.6); S_('wrR', slam ? -0.9 : 0.5); S_('wrL', slam ? -0.9 : 0.5); if (down) { S_('spine', 0.25); S_('chest', 0.15); S_('neck', -0.4); } p.rate = 30;
+      }
+      else if (st === 'legs') {      // between the legs in the air: right hand under the right thigh, left hand takes it and finishes
+        const under = u > 0.22 && u < 0.56;
+        if (under) { legs(-1.55, 1.25, 0.35, 1.1, 0.18); S_('spine', 0.3); S_('chest', 0.2); S_('neck', -0.35); S_('shR', -0.15, 0, 0.35); S_('elR', -0.35); S_('wrR', 0.4); S_('shL', 0.05, 0, -0.5); S_('elL', -0.3); S_('wrL', 0.5); }
+        else if (u <= 0.22) { S_('shR', -1.4, 0, 0.1); S_('shL', -1.4, 0, -0.1); S_('elR', -1.1); S_('elL', -1.1); }
+        else { S_('shL', slam ? -1.95 : -3.6, 0, 0.1); S_('elL', slam ? -0.15 : -1.0); S_('wrL', slam ? -1.0 : 0.6); S_('shR', -0.5, 0, -0.85); S_('elR', -0.9); }
+        p.rate = 32;
+      }
       else { S_('shR', slam ? -1.95 : -3.75, 0, -0.1); S_('elR', slam ? -0.15 : -1.25); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -0.5, 0, 0.85); S_('elL', -0.9); }
       p.rate = Math.max(p.rate, 22); break;
     }
@@ -1091,6 +1159,15 @@ function poseOf(anim, t, o) {
       else if (k === 'behind' || k === 'shammgod') { S_('spine', 0.12); S_('chest', -0.05, -s * 0.5, 0); S_('shR', 0.75 * (s > 0 ? 1 : 0.2), 0, -0.35); S_('elR', -1.2); S_('shL', 0.75 * (s < 0 ? 1 : 0.2), 0, 0.35); S_('elL', -1.2); if (k === 'shammgod') { p.y = -0.24; S_('sh' + (s > 0 ? 'L' : 'R'), -1.5, 0, s * 0.9); S_('el' + (s > 0 ? 'L' : 'R'), -0.1); } }
       else if (k === 'stepback' || k === 'moonwalk') { p.y = -0.1 + e * 0.12; legs(-0.3 - e * 0.5, 0.5 + e * 0.7, 0.35, 0.4, 0.18); S_('spine', -0.08); S_('chest', -0.1); S_('neck', -0.05); S_('hips', -0.12, 0, 0); }
       else if (k === 'hesi') { p.y = -0.04 + e * 0.05; legs(-0.2, 0.3, 0.1, 0.25, 0.14); S_('spine', 0.0); S_('chest', -0.05); S_('neck', 0.05); S_('shR', -1.3, 0, 0.1); S_('elR', -1.7); S_('shL', -1.1, 0, -0.2); S_('elL', -1.6); }
+      else if (k === 'inout') {        // shoulders and the ball hand sell the cross, then come straight back
+        const d = s > 0 ? 1 : -1; p.y = -0.15; legs(-0.7, 1.1, -0.7, 1.1, 0.3 + e * 0.1); S_('hips', 0.06, 0, -d * 0.2 * e); S_('chest', 0.12, -d * 0.55 * e, 0); S_('neck', -0.3, -d * 0.3 * e, 0); const h = o.hand === 'L' ? 'L' : 'R'; S_('sh' + h, -0.75, 0, -d * 0.7 * e); S_('el' + h, -0.9);
+      }
+      else if (k === 'killer') {       // the killer: very low and wide, the whole upper body dips the wrong way first
+        const d = s > 0 ? 1 : -1, sw = u < 0.4 ? -1 : 1; p.y = -0.26; legs(-0.95, 1.45, -0.95, 1.45, 0.48); S_('hips', 0.12, 0, -d * 0.24 * sw); S_('spine', 0.4, 0, -d * 0.14 * sw); S_('chest', 0.15, -d * 0.4 * sw, 0); S_('neck', -0.45, d * 0.25, 0);
+      }
+      else if (k === 'snatch') {       // snatch-back: a hop away while one arm yanks the ball home to the hip
+        p.y = -0.08 + e * 0.15; legs(-0.25 - e * 0.35, 0.5 + e * 0.5, 0.25 + e * 0.15, 0.5 + e * 0.4, 0.16); S_('spine', -0.1); S_('chest', -0.12); S_('hips', -0.1); const h = o.hand === 'L' ? 'L' : 'R'; S_('sh' + h, 0.55 * e - 0.4 * (1 - e), 0, 0); S_('el' + h, -1.6);
+      }
       else if (k === 'spin' || k === 'halfspin') { p.y = -0.15; legs(-0.6, 1.0, -0.2, 0.6, 0.15); S_('shR', -0.5, 0, 0.3); S_('elR', -1.8); S_('shL', -0.5, 0, -0.3); S_('elL', -1.8); S_('spine', 0.25); }
       p.rate = 26; break;
     }
@@ -1311,9 +1388,9 @@ function gaitStep(R, c) {
   const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), wide = c.wide || 0;
   const home = (s, out) => { const lx = (s === 'R' ? -1 : 1) * (R.hipW + 0.045 + 0.15 * wide + 0.035 * (G.sw || 0)); return out.set(c.x + lx * cy, 0, c.z - lx * sy); };
   if (!c.grounded) {                       // airborne: the pose owns the legs; remember where the feet are for the landing
-    G.air = true; for (const s of ['R', 'L']) { const f = G.ft[s]; R.joints['an' + s].getWorldPosition(f.p); f.p.y = 0; f.sw = false; f.lift = 0; }
+    G.air = true; for (const s of ['R', 'L']) { const f = G.ft[s]; R.joints['an' + s].getWorldPosition(f.p); f.lift = Math.max(0, f.p.y - 0.04); f.p.y = 0; f.sw = false; }   /* the fading IK aims where the pose has the foot, not at the floor */
   } else {
-    if (G.air) { G.air = false; G.land = 0.17; }
+    if (G.air) { G.air = false; G.land = 0.17; G.ft.R.lift = G.ft.L.lift = 0; }
     // a wide, low stance (defense) takes short quick steps instead of long strides
     // stride grows with speed; a foot lands a reachable distance ahead (never further than the leg can reach), and
     // the swing takes as long as a real one (~0.3 s), so a sprint gets a short flight phase instead of frantic steps
@@ -1366,8 +1443,12 @@ function legIK(R, dt) {
     const k = Math.PI - Math.acos(clamp((L1 * L1 + L2 * L2 - D * D) / (2 * L1 * L2), -1, 1));
     // exact for the rig's Euler order (X·Y·Z): the bent leg lies in the hip's YZ plane, is rolled by Z, then pitched by X
     const A = L1 + L2 * Math.cos(k), hz = Math.asin(clamp(_g1.x / A, -1, 1)), y0 = -A * Math.cos(hz), z0 = -L2 * Math.sin(k);
-    const hx = Math.atan2(_g1.z, _g1.y) - Math.atan2(z0, y0);
-    const h = hp.rotation, kn = J['kn' + s].rotation, an = J['an' + s].rotation;
+    let hx = Math.atan2(_g1.z, _g1.y) - Math.atan2(z0, y0);
+    const h = hp.rotation;
+    // the difference of two angles can land a full turn away (5.77 instead of -0.51): blended with the pose that swings the
+    // leg the long way round, a backward kick through the floor while the IK fades out on take-off. Keep it the near way.
+    while (hx - h.x > Math.PI) hx -= 6.283185307; while (hx - h.x < -Math.PI) hx += 6.283185307;
+    const kn = J['kn' + s].rotation, an = J['an' + s].rotation;
     h.x = lerp(h.x, hx, w); h.y = lerp(h.y, 0, w); h.z = lerp(h.z, hz, w); kn.x = lerp(kn.x, k, w); kn.y = lerp(kn.y, 0, w); kn.z = lerp(kn.z, 0, w);
     const toe = f.sw ? 0.35 * Math.sin(Math.PI * Math.min(1, f.t / f.T)) : 0;              // toe-off during the swing, flat foot when planted
     an.x = lerp(an.x, -(hips.rotation.x + hx + k) + toe * (1 - 0.5 * (G.sw || 0)), w); an.y = lerp(an.y, (s === 'R' ? -1 : 1) * 0.16 * (G.sw || 0), w);
@@ -1501,14 +1582,34 @@ function contestOn(p, rad) {
   }
   return Math.min(0.9, c);
 }
-function startShot(p, src, floater) {
+// where the move stick points, relative to the rim: tw toward it (+) or away (-), lat across it, mag how hard
+function gest(p) { const l = dHoop(p) || 1, dx = p.in.dx || 0, dz = p.in.dz || 0; return { tw: (dx * -p.x + dz * -p.z) / l, lat: dx * (p.z / l) - dz * (p.x / l), mag: Math.hypot(dx, dz) }; }
+const HOP_T = 0.34;
+// hop step: a two-foot hop and gather, then a strong finish (or a jumper). Gets the ball past a reaching defender.
+function startHop(p, next, src, opt) {
   if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
-  const d = dHoop(p);
-  if (!floater && (d < 2.0 || (d < finishRange(p) && Math.hypot(p.vx, p.vz) > 2.2 && (p.vx * -p.x + p.vz * -p.z) > 0 && src !== 'ai'))) return startFinish(p, p.user ? euroOf(p) : 0);
+  const sp = Math.hypot(p.vx, p.vz), d = dHoop(p) || 1; let ux = sp > 1 ? p.vx / sp : -p.x / d, uz = sp > 1 ? p.vz / sp : -p.z / d;
+  const len = next === 'finish' ? clamp(d - 1.1, 0.3, 1.15) : 0.9;
+  p.st = 'hop'; p.t = 0; p.hop = { dur: HOP_T, sx: p.x, sz: p.z, tx: p.x + ux * len, tz: p.z + uz * len, next, src, opt: opt || null };
+  if (p.user) floatTxt(p, 'HOP STEP', '#f2c14e'); sfxM('step'); return true;
+}
+function startShot(p, src, floater, opt) {
+  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
+  opt = opt || {}; const d = dHoop(p), sp0 = Math.hypot(p.vx, p.vz);
+  if (!floater && !opt.hopped && !opt.fade && !opt.side && (d < 2.0 || (d < finishRange(p) && sp0 > 2.2 && (p.vx * -p.x + p.vz * -p.z) > 0 && src !== 'ai'))) return startFinish(p, p.user ? euroOf(p) : 0);
+  // the move stick picks the jumper: away from the rim fades, sideways from a stand side-steps, let go on a drive hops
+  let fade = opt.fade ? 1 : 0, side = opt.side || 0;
+  if (!floater && !opt.hopped && !fade && !side) {
+    if (p.user && !p.afk && src !== 'reel') { const g = gest(p); if (g.tw < -0.5) fade = 1; else if (Math.abs(g.lat) > 0.6 && sp0 < 2.6) side = Math.sign(g.lat); }
+    else if (!p.user && contestOn(p) > 0.3 && Math.random() < 0.3 + nAtt(p, 'mid') * 0.25) fade = 1;
+  }
   const j = JUMPER[p.b.moves.jumper] || JUMPERS[0];
-  p.st = 'shoot'; p.t = 0; p.shot = { rel: j.rel * (p.fire ? 0.85 : 1), j, src, released: false, kind: shotKind(p), sp: Math.hypot(p.vx, p.vz), aiRel: 0 };
+  p.st = 'shoot'; p.t = 0; p.shot = { rel: j.rel * (p.fire ? 0.85 : 1), j, src, released: false, kind: shotKind(p), sp: sp0, aiRel: 0, fade, side, fx: p.x / (d || 1), fz: p.z / (d || 1) };
+  if (side) { const sh = p.shot, l = d || 1; sh.sx = -p.z / l * side; sh.sz = p.x / l * side; /* across the rim line, the way the stick went */ if (sh.sx * (p.in.dx || 0) + sh.sz * (p.in.dz || 0) < 0) { sh.sx = -sh.sx; sh.sz = -sh.sz; } }
+  if (p.user && fade) floatTxt(p, 'FADE', '#f2c14e'); else if (p.user && side) floatTxt(p, 'SIDE STEP', '#f2c14e');
+  if (opt.hopped) { const sh = p.shot; sh.auto = true; sh.aiRel = sh.rel * (1 + clamp((Math.random() + Math.random() - 1) * (0.2 - nAtt(p, 'iq') * 0.14), -0.3, 0.3)); }
   if (floater) { const sh = p.shot; sh.floater = true; sh.auto = true; sh.rel = 0.36; sh.kind = 'close'; sh.aiRel = sh.rel * (1 + clamp((Math.random() + Math.random() - 1) * (0.22 - nAtt(p, 'close') * 0.14), -0.3, 0.3)); }
-  else if (!p.user || p.afk) { const sd = 0.17 - p.aiLvl * 0.10; p.shot.aiRel = p.shot.rel * (1 + clamp((Math.random() + Math.random() + Math.random() - 1.5) * sd * 1.6, -0.4, 0.45)); }
+  else if ((!p.user || p.afk) && !opt.hopped) { const sd = 0.17 - p.aiLvl * 0.10; p.shot.aiRel = p.shot.rel * (1 + clamp((Math.random() + Math.random() + Math.random() - 1.5) * sd * 1.6, -0.4, 0.45)); }
   p.face = Math.atan2(-p.x, -p.z); return true;
 }
 function releaseShot(p) {
@@ -1516,10 +1617,11 @@ function releaseShot(p) {
   const held = s.hold != null ? s.hold : p.t;
   if (p.user && !s.auto && held < s.rel * 0.3) { s.released = false; return startFake(p); }      // let go early = pump fake
   const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
-  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster'));
+  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= 0.7; if (s.side) c *= 0.85;
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
   let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
   if (s.floater) base -= Math.max(0, d - 2.2) * 0.045;
+  if (s.fade) base -= 0.05 * (1 - nAtt(p, 'mid') * 0.6);
   if (d > 7.6) base -= (d - 7.6) * 0.09 * (1 - 0.18 * bt(p, 'manifest'));
   if (c < 0.06) base += 0.03 + 0.025 * bt(p, 'opencarry');
   if (p.stam < 25) base *= 0.85; if (s.sp > 2.8) base *= 0.9;
@@ -1533,7 +1635,7 @@ function releaseShot(p) {
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
-    const pb = (0.06 + nAtt(o, 'block') * 0.28 + 0.04 * bt(o, 'nofly')) * (s.j.id === 'quick' ? 0.7 : 1) * (kind === 'three' ? 0.8 : 1);
+    const pb = (0.06 + nAtt(o, 'block') * 0.28 + 0.04 * bt(o, 'nofly')) * (s.j.id === 'quick' ? 0.7 : 1) * (kind === 'three' ? 0.8 : 1) * (s.fade ? 0.55 : 1);
     if (Math.random() < pb) return blocked(p, o);
   }
   const make = Math.random() < prob; p.stats.fga++;
@@ -1567,19 +1669,38 @@ function blocked(p, o) {
   for (const f of MT.fans) f.hype = 1.2; B.rebound = false;
 }
 function finishRange(p) { return MT.arcade ? 5.6 : 2.5 + nAtt(p, 'vert') * 0.6 + 0.25 * bt(p, 'gravity'); }
-function startFinish(p, euro, forceDunk, y0) {
+// opt: hopped (after a hop step), rev (reverse), layup (no dunk), kind (a layup from FINISHES), style (a dunk), euro
+function startFinish(p, euro, forceDunk, y0, opt) {
   if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
-  const d = dHoop(p), canDunk = (MT.arcade || att(p, 'dunk') >= 55) && d <= finishRange(p) && (MT.arcade || att(p, 'dunk') + att(p, 'vert') * 0.4 > 78 + (2.0 - p.H) * 40 || att(p, 'dunk') >= 75);
-  if (!p.user && !euro && !forceDunk && !laneOpen(p) && Math.random() < 0.35) euro = Math.random() < 0.5 ? -1 : 1;
+  opt = opt || {};
+  const d = dHoop(p), sp = Math.hypot(p.vx, p.vz), canDunk = (MT.arcade || att(p, 'dunk') >= 55) && d <= finishRange(p) && (MT.arcade || att(p, 'dunk') + att(p, 'vert') * 0.4 > 78 + (2.0 - p.H) * 40 || att(p, 'dunk') >= 75);
+  let rev = opt.rev || opt.kind === 'reverse' || opt.style === 'reverse'; if (opt.kind === 'euro' || opt.euro) euro = opt.euro || euro || 1;
+  if (!opt.hopped && !forceDunk && !opt.kind && !opt.style && !opt.layup) {
+    // the move stick picks the finish: sideways euro-steps (euroOf), away reverses, let go hops
+    if (p.user && !p.afk) { const g = gest(p); if (g.mag < 0.25 && sp > 2.5 && d > 1.5) return startHop(p, 'finish'); if (!euro && g.tw < -0.45) rev = true; }
+    else if (!p.user && !laneOpen(p)) { const r = Math.random(); if (r < 0.16 && d > 1.6) return startHop(p, 'finish'); if (!euro && r < 0.48) euro = Math.random() < 0.5 ? -1 : 1; else if (r < 0.62 && Math.abs(p.x) > 1.4 && p.z < 2.4) rev = true; }
+  }
   let ax = p.x, az = Math.max(p.z, 0.15); const l = Math.hypot(ax, az) || 1; ax /= l; az /= l;
-  const type = canDunk || forceDunk ? 'dunk' : 'layup';
+  const type = opt.layup ? 'layup' : canDunk || forceDunk || opt.style ? 'dunk' : 'layup';
+  const near = nearestOpp(p), cont = near[0] && near[1] < 1.6;
+  const kind = type === 'dunk' ? '' : opt.kind || (opt.hopped ? 'power' : euro ? 'euro' : rev ? 'reverse' : cont ? (nAtt(p, 'str') > 0.62 ? 'power' : 'scoop') : sp > 4 && d > 1.7 ? 'finger' : 'lay');
+  const style = type !== 'dunk' ? p.b.moves.dunk : opt.style || (rev ? 'reverse' : p.b.moves.dunk);
   p.st = 'finish'; p.t = 0;
-  p.finish = { type, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.5, 3.22 - p.H * 1.36) + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0), style: p.b.moves.dunk, spin: (type === 'dunk' && (p.b.moves.dunk === 'three60' || (MT.arcade && d > 3.5))) ? 1 : 0 };
+  const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R' };
+  if (rev) {
+    // under the rim and out the other side, back to the rim: keep the line you drove on and finish past the hoop
+    let vx = sp > 1 ? p.vx / sp : az, vz = sp > 1 ? p.vz / sp : -ax; const tAl = -(p.x * vx + p.z * vz);
+    if (tAl < 0.2) { vx = az * (p.x * az - p.z * ax > 0 ? -1 : 1); vz = -ax * (p.x * az - p.z * ax > 0 ? -1 : 1); }
+    const go = Math.max(0.2, -(p.x * vx + p.z * vz)) + (type === 'dunk' ? 0.35 : 0.7);
+    f.tx = p.x + vx * go; f.tz = Math.max(-0.45, p.z + vz * go);
+    f.turn = (vx * -p.z - vz * -p.x > 0 ? 1 : -1) * Math.PI; f.dur += 0.08; f.euro = 0;
+  }
+  if (p.user && (kind === 'reverse' || style === 'reverse' && type === 'dunk')) floatTxt(p, 'REVERSE', '#f2c14e'); else if (p.user && kind === 'euro') floatTxt(p, 'EURO', '#f2c14e');
   p.face = Math.atan2(-p.x, -p.z); sfxM('whoosh'); return true;
 }
 function resolveFinish(p) {
   const f = p.finish, B = MT.B; f.done = true; if (B.holder !== p) return;
-  let c = 0; const soft = (f.euro ? 0.72 : 1) * (f.oop ? 0.6 : 1);
+  let c = 0; const soft = (f.euro ? 0.72 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1);
   for (const o of MT.P) { if (o.team === p.team || o.st === 'stagger') continue; const d = dist(o, p); if (d > 1.9) continue; c = Math.max(c, (1 - d / 1.9) * (0.5 + 0.5 * nAtt(o, 'intd')) * (o.st === 'jump' ? 1 : 0.55)); }
   c *= (1 - 0.13 * bt(p, 'lobby')) * soft;
   for (const o of MT.P) {
@@ -1604,15 +1725,17 @@ function resolveFinish(p) {
     }
     B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
-  const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put - c * 0.6 + (p.fire ? 0.3 : 0);
-  handPos(p.rig, 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
+  const kAdj = { finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02 }[f.kind] || 0;
+  const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
+  handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
 }
 function startMove(p, slot, dx, dz) {
   if (p.moveCool > 0 || p.stam < 6) return;
-  const mv = MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot); const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
+  const mv = MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot);
+  if (mv.keep) { dx *= 0.45; dz = -0.9; }            /* in-and-out: the fake goes sideways, the burst goes forward */ const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
-  p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; if (mv.slot === 'side') p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
+  p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
   p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh');
   // ankle check on the nearest defender
   let o = null, od = 2.1; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
@@ -1657,9 +1780,9 @@ function startSteal(p) {
 function resolveSteal(p) {
   p.stealDone = true; const B = MT.B, h = B.holder; if (!h || h.team === p.team || dist(h, p) > 1.5) { p.slowT = 0.25; return; }
   let ch = 0.11 + (att(p, 'steal') - att(h, 'handle')) * 0.0045 + 0.03 * bt(p, 'repo') - 0.04 * bt(h, 'nda') + (h.st === 'move' ? -0.04 : 0) + (h.sprinting ? 0.05 : 0) + (h.st === 'shoot' && h.t < h.shot.rel * 0.4 ? 0.06 : 0);
-  if (h.st === 'finish') ch *= 0.3;
+  if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
   if (Math.random() < clamp(ch, 0.01, 0.45)) {
-    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish') { h.st = 'free'; h.y = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
+    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); for (const f of MT.fans) f.hype = 1.2;
   } else { p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0; }
 }
 function startJump(p) { if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); }
@@ -1679,6 +1802,7 @@ function canCancel(p) {
   return false;
 }
 function humanThink(p, dt) {
+  if (MT.reel && p.ctrl === 0) { reelThink(p, dt); return; }
   let I = IN[p.ctrl];
   const B = MT.B; p.in.dx = I.mx; p.in.dz = I.my; p.in.sprint = I.sprint; p.handsUp = false;
   if (MT.phase !== 'live') return;
@@ -1705,7 +1829,7 @@ function humanThink(p, dt) {
   if (hasBall) {
     if (I.bP) { startShot(p, 'btn'); return; }
     if (I.flick === 'D') { startShot(p, 'stick'); return; }
-    if (I.flick === 'U') { const d = dHoop(p); if (d <= finishRange(p) + 0.6) startFinish(p, euroOf(p)); else if (d <= 5.4) startShot(p, 'stick', true); else startMove(p, 'diag', 0, -1); return; }
+    if (I.flick === 'U') { const d = dHoop(p); if (d <= finishRange(p) + 0.6) startFinish(p, euroOf(p)); else if (d <= 5.4) startShot(p, 'stick', true); else if (d <= 7.6) startHop(p, 'shot', 'stick'); else startMove(p, 'diag', 0, -1); return; }
     if (I.flick === 'L' || I.flick === 'R') { startMove(p, 'side', I.flick === 'L' ? -1 : 1, -0.15); return; }
     if (I.flick === 'DL' || I.flick === 'DR') { startMove(p, 'back', I.flick === 'DL' ? -0.55 : 0.55, 1); return; }
     if (I.flick === 'UL' || I.flick === 'UR') { startMove(p, 'diag', I.flick === 'UL' ? -0.8 : 0.8, -0.8); return; }
@@ -1867,7 +1991,7 @@ function stepPlayer(p, dt) {
   switch (p.st) {
     case 'shoot': {
       const s = p.shot, j0 = s.rel * 0.42, air = 0.56;
-      if (p.y > 0.01) { lock = 0; const dmp = Math.pow(0.35, dt); p.vx *= dmp; p.vz *= dmp; } else lock = s.released ? 0.5 : 0.05;   /* plant on the gather (pull-up), drift in the air, walk off the landing */ const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (0.32 + nAtt(p, 'vert') * 0.2) * Math.sin(Math.PI * u) * (M_.arcade ? 1.4 : 1) : 0;
+      if (p.y > 0.01) { lock = 0; const dmp = Math.pow(0.35, dt); p.vx *= dmp; p.vz *= dmp; if (s.fade) { p.vx = s.fx * 1.7; p.vz = s.fz * 1.7; } } else if (s.side && p.t < j0) { lock = 0; const k = 3.8 * (1 - p.t / j0); p.vx = s.sx * k; p.vz = s.sz * k; } else lock = s.released ? 0.5 : 0.05;   /* plant on the gather (pull-up), drift in the air, walk off the landing */ const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (0.32 + nAtt(p, 'vert') * 0.2) * Math.sin(Math.PI * u) * (M_.arcade ? 1.4 : 1) : 0;
       if (s.released && u >= 1 && p.t > s.rel + 0.2) { p.st = 'free'; p.y = 0; }
       break;
     }
@@ -1877,7 +2001,14 @@ function stepPlayer(p, dt) {
       const e = Math.min(1, u / 0.8), sw = f.euro ? Math.sin(e * Math.PI) * 1.05 * f.euro : 0; p.x = lerp(f.sx, f.tx, e) + f.px * sw; p.z = lerp(f.sz, f.tz, e) + f.pz * sw; p.vx = p.vz = 0;
       p.y = Math.max(f.y0 * (1 - u * 2.2), u < 0.75 ? f.peak * Math.sin(u / 0.75 * Math.PI / 2) : Math.max(0, f.peak * (1 - Math.pow((u - 0.75) / 0.4, 2))));
       if (u >= 0.75 && !f.done) resolveFinish(p);
-      if (u >= 1.15) { p.st = 'free'; p.y = 0; p.rig.extraYaw = 0; }
+      if (f.style === 'legs' && f.type === 'dunk') f.bh = u > 0.46 ? 'L' : 'R';
+      if (u >= 1.15) { p.st = 'free'; p.y = 0; if (f.turn) p.face += f.turn; p.rig.extraYaw = 0; }
+      break;
+    }
+    case 'hop': {
+      const h = p.hop, u = Math.min(1, p.t / h.dur), e = Math.min(1, u / 0.72); lock = 0; p.vx = p.vz = 0;
+      const k = 1 - (1 - e) * (1 - e); p.x = lerp(h.sx, h.tx, k); p.z = lerp(h.sz, h.tz, k); p.y = u < 0.72 ? 0.17 * Math.sin(Math.PI * e) : 0;
+      if (u >= 1) { p.st = 'free'; p.y = 0; const o2 = Object.assign({ hopped: 1 }, h.opt || {}), ok = h.next === 'shot' ? startShot(p, h.src || 'btn', false, o2) : startFinish(p, 0, false, 0, o2); if (!ok) p.st = 'free'; }
       break;
     }
     case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; const k = m.v * (1 - u * 0.6), st = 2.4 * Math.min(1, u * 1.6); p.vx = m.dx * k + p.in.dx * st; p.vz = m.dz * k + p.in.dz * st; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; } break; }
@@ -1909,7 +2040,7 @@ function stepPlayer(p, dt) {
   if (p.z < -0.5 && Math.abs(p.x) < 0.5 && p.st !== 'finish') p.z = -0.5;
   // facing
   const sp = Math.hypot(p.vx, p.vz); let tf = p.face;
-  if (p.st === 'shoot' || p.st === 'finish') tf = Math.atan2(-p.x, -p.z);
+  if (p.st === 'shoot' || p.st === 'finish' || p.st === 'hop') tf = Math.atan2(-p.x, -p.z);
   else if (p.st === 'celeb') tf = 0;
   else if (B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && sp < 2.5) tf = Math.atan2(-p.x, -p.z);
   else if (def && B.holder) { const m = p.user ? B.holder : (p.man || B.holder); const tgt = dist(p, B.holder) < 4 ? B.holder : m; tf = Math.atan2(tgt.x - p.x, tgt.z - p.z); }
@@ -2005,7 +2136,7 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
   if (vx === undefined) { vx = p.avx || 0; vz = p.avz || 0; }
   const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = fz, rz = -fx, sgn = D.hand === 'R' ? -1 : 1, v = Math.hypot(vx, vz);
   let side = 0.3, fwd = 0.3 + Math.min(0.45, v * 0.06);                 // ordinary dribble: outside the foot, ahead more at speed
-  if (kind === 'cross') { side = 0.02; fwd = 0.45; }
+  if (kind === 'cross' || kind === 'killer') { side = 0.02; fwd = kind === 'killer' ? 0.3 : 0.45; }
   else if (kind === 'tween') { side = 0.0; fwd = 0.04; }
   else if (kind === 'behind') { side = 0.0; fwd = -0.32; }
   else if (kind === 'shammgod') { side = -0.55; fwd = 0.55; }
@@ -2016,10 +2147,10 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
 // a dribble move takes the ball out of whatever it was doing and sends it where the move needs it
 function dribMove(p, mv) {
   const D = p.drib; if (!D || MT.B.holder !== p) return;
-  const k = mv.id, change = { cross: 1, tween: 1, behind: 1, shammgod: 1 }[k];
+  const k = mv.id, change = { cross: 1, tween: 1, behind: 1, shammgod: 1, killer: 1 }[k];
   if (k === 'spin' || k === 'halfspin') { D.ph = 'carry'; D.t = 0; D.T = mv.dur * 0.8; return; }
   if (change) D.hand = p.hand;                                         // startMove already chose the new hand
-  D.ph = 'down'; D.t = 0; D.T = Math.max(0.09, mv.dur * 0.32); D.P0 = MT.B.pos.clone(); D.kind = change ? k : (k === 'stepback' || k === 'moonwalk' ? 'retreat' : k === 'hesi' ? 'hesi' : '');
+  D.ph = 'down'; D.t = 0; D.T = Math.max(0.09, mv.dur * 0.32); D.P0 = MT.B.pos.clone(); D.kind = change ? k : (k === 'stepback' || k === 'moonwalk' || k === 'snatch' ? 'retreat' : k === 'hesi' ? 'hesi' : '');
   const mvx = p.mv.dx * p.mv.v * 0.8, mvz = p.mv.dz * p.mv.v * 0.8; D.F = dribFloor(p, D, D.kind, D.T, mvx, mvz); D.upT = Math.max(0.12, mv.dur * 0.42);
 }
 function ballFollow(B, target, dt, exact) {
@@ -2031,9 +2162,9 @@ function ballHeld(p, dt) {
   const M_ = MT, B = M_.B; let D = p.drib || (p.drib = newDrib(p, B.pos)); if (p.reset) { p.reset = false; D = resetDrib(p); } D.t += dt;
   if (B.pos.distanceTo(_bp.set(p.x, B.pos.y, p.z)) > 2.5 || (D.F && Math.hypot(D.F.x - p.x, D.F.z - p.z) > 2.5)) D = resetDrib(p);
   const st = p.st;
-  if (st === 'shoot' || st === 'finish' || st === 'fake' || (st === 'pass')) {
+  if (st === 'shoot' || st === 'finish' || st === 'fake' || st === 'pass' || st === 'hop') {
     // gather: ball between the hands, then up into the shooting hand
-    handPos(p.rig, 'R', _bp); handPos(p.rig, 'L', _bq);
+    const bh = st === 'finish' && p.finish.bh === 'L' ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
     const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
     _bp.lerp(_bq, 0.5 * (1 - lift)); _bp.y += 0.06 + 0.05 * lift;
     ballFollow(B, _bp, dt, true); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
@@ -2071,10 +2202,11 @@ function animPlayer(p, dt) {
   p.runPh += dt * (4 + p.speed * 2.1);
   const spN = clamp(p.speed / 6.5, 0, 1);
   switch (p.st) {
-    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
+    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.fadeA = p.shot.fade ? 1 : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
     case 'fake': an = 'fake'; o.rel = 0.6; break;
-    case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.euro = f.euro || 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; break; }
-    case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u;
+    case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.kind = f.kind; o.euro = f.euro || 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; else if (f.turn) { const k = clamp(o.u / 0.7, 0, 1); R.extraYaw = f.turn * k * k * (3 - 2 * k); } break; }
+    case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
+    case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
     case 'stagger': an = 'stagger'; o.fall = p.stg.fall; break;
     case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
@@ -2090,6 +2222,7 @@ function animPlayer(p, dt) {
       else if (M_.phase === 'scored' && M_.lastScorer && M_.lastScorer.team !== p.team) an = 'sulk';
   }
   if (p.forceAn && p.st === 'free' && !hasBall) { an = p.forceAn; o.ph = p.runPh; }
+  if (p.st !== 'finish' && p.st !== 'move') R.extraYaw = 0;       /* whatever ended a spin or a reverse, the body faces where it faces */
   if (!hasBall && an !== 'stagger' && an !== 'sulk' && an !== 'celeb' && p.st !== 'finish' && p.st !== 'move') { let a = Math.atan2(B.pos.x - p.x, B.pos.z - p.z) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.look = a; }
   if (p.speed > 2 && (an === 'run' || an === 'dribble')) { let a = Math.atan2(p.vx || 0, p.vz || 0) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.bank = -a * 0.35 * spN; }
   // presentation velocity from actual movement (works the same on a guest, who only gets positions)
@@ -2107,7 +2240,7 @@ function animPlayer(p, dt) {
   const t = an === 'idle' || an === 'celeb' || an === 'call' || an === 'sulk' ? M_.time : an === 'fake' ? 0.3 + p.t : p.t;
   applyPose(R, poseOf(an, t, o), dt);
   R.root.position.set(p.x, p.y, p.z); R.root.rotation.y = p.face + (R.extraYaw || 0);
-  const air = p.y > 0.01 || p.st === 'finish' || (p.st === 'jump' && p.t > 0.04);
+  const air = p.y > 0.01 || p.st === 'finish' || (p.st === 'hop' && p.t < (p.hop ? p.hop.dur : HOP_T) * 0.7) || (p.st === 'jump' && p.t > 0.04);
   gaitStep(R, { x: p.x, z: p.z, yaw: R.root.rotation.y, vx: p.avx, vz: p.avz, grounded: !air, wide: an === 'slide' ? 1 : p.protect ? 0.6 : an === 'idle' || an === 'catch' ? 0.25 : 0.05, want: p.st === 'stagger' ? (p.stg && p.stg.fall ? 0 : 0.4) : 1, dt });
   legIK(R, dt);
   R.shadow.position.y = 0.015 - p.y; R.shadow.scale.setScalar(clamp(1 - p.y * 0.25, 0.4, 1)); p.ring.position.y = 0.02 - p.y;
@@ -2575,7 +2708,7 @@ function uiTitle() {
   $('titleBtns').innerHTML = (S.created ? Btn('Continue · ' + esc(S.name), () => { hideTitle(); enterWorld('hub', 0, 9, Math.PI); }) : '') + Btn(S.created ? 'New player' : 'Build your player', () => {
     const go = () => { if (S.created) S = newSave(); hideTitle(); uiBuilder(); };
     if (S.created) uiDialog('START OVER', 'Start over? This erases your player, drip, crib and Respect. It is only kept once you finish the new build.', [['Erase and start over', go, 'red'], ['Keep my player', () => { uiClose(); uiTitle(); }, 'alt']]); else go();
-  }, S.created ? 'alt' : '');
+  }, S.created ? 'alt' : '') + Btn('Dev room', () => uiDev('title'), 'alt');
   paintFocus();
 }
 function hideTitle() { $('title').style.display = 'none'; if (!UI.cur) document.body.classList.remove('busy'); sfx('uiok'); }
@@ -2669,6 +2802,7 @@ function uiPlayer(tab) {
       };
       h += `<p class="mu">The right stick is your skill stick. With the ball: flick ← → for your side move, ↙ ↘ for your stepback, ↖ ↗ for your spin, pull ↓ and hold to shoot, push ↑ to attack the rim.</p>`;
       sec('SIDE MOVE  ← →', MOVES.filter(m => m.slot === 'side'), 'side', 'handle'); sec('STEPBACK  ↙ ↘', MOVES.filter(m => m.slot === 'back'), 'back', 'handle'); sec('SPIN  ↖ ↗', MOVES.filter(m => m.slot === 'diag'), 'diag', 'handle');
+      h += `<div class="cat">FINISHES AND JUMPER VARIATIONS</div><div class="card"><p>Everyone has these. The move stick picks one as you go up.</p>` + FINISHES.map(f => `<p><b>${f.n}</b> · ${f.d}</p>`).join('') + `</div>`;
       sec('JUMPSHOT', JUMPERS, 'jumper'); sec('DUNK PACKAGE', DUNKS, 'dunk', 'dunk'); sec('CELEBRATION', CELEBS, 'celeb');
     } else if (st.tab === 'crew') {
       h += NET.room && NET.connected ? onlineBlock(null, null) : `<div class="card"><h3>OFFLINE</h3><p>Online play works from the game's shared Claude link, for people signed in that it is shared with. Opened as a file, the game is single player (plus local player 2 with a controller on a computer).</p></div>`;
@@ -2686,6 +2820,7 @@ function uiPlayer(tab) {
     } else {
       h += `<div class="card"><h3>SOUND</h3><div style="margin-top:6px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Cages with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (JAM: shove) · jump to block and board.</p></div>`;
+      h += `<div class="card"><h3>DEV ROOM</h3><p>A maxed-out player, every build, every move, and a reel that plays them all. F2 on The Block opens it too.</p><div style="margin-top:6px">${Btn('OPEN DEV ROOM', () => { uiClose(); uiDev('hub'); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => uiDialog('ARE YOU SURE', 'Erase your player, drip, crib and Respect for good?', [['Erase it all', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } S = newSave(); uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'red'], ['Never mind', null, 'alt']]), 'sm red')}</div></div>`;
     }
     return h + `</div>`;
@@ -2848,7 +2983,7 @@ function uiPause() {
 // viewer the platform does not connect, every one of these is absent and the game is simply single player.
 'use strict';
 const NET = { room: null, db: null, uid: null, me: null, peers: [], out: null, seenInv: {}, seenGo: {}, known: {}, crew: null, inCrew: null, inSince: 0, waitGo: null, game: null, pub: {}, pubT: 0, cloudT: null, cloudBusy: false, cloudDirty: false, connected: false };
-const ST_CODES = ['free', 'shoot', 'finish', 'move', 'stagger', 'jump', 'steal', 'shove', 'pass', 'celeb'];
+const ST_CODES = ['free', 'shoot', 'finish', 'move', 'stagger', 'jump', 'steal', 'shove', 'pass', 'celeb', 'hop'];
 const BSTATES = ['held', 'shot', 'through', 'pass', 'loose'];
 const r2 = v => Math.round(v * 100) / 100;
 
@@ -3077,7 +3212,7 @@ function netSnapshot(end) {
   const s = { q: ++G.q, ph: M_.phase, sc: M_.score, ck: r2(M_.clock), of: M_.off, nc: M_.needClear ? 1 : 0, ev: G.ev,
     P: M_.P.map(p => {
       const a = [r2(p.x), r2(p.z), r2(p.y), r2(p.face), ST_CODES.indexOf(p.st), r2(p.t), (p.handsUp ? 1 : 0) | (p.sprinting ? 2 : 0) | (p.bravT > 0 ? 4 : 0) | (p.fire ? 8 : 0) | (p.hand === 'L' ? 16 : 0) | (p.st === 'shoot' && p.shot.released ? 32 : 0), Math.round(p.stam), r2(p.brav)];
-      if (p.st === 'shoot') a.push(r2(p.shot.rel)); else if (p.st === 'finish') a.push(p.finish.type === 'dunk' ? 1 : 0, r2(p.finish.dur), p.finish.spin); else if (p.st === 'move') a.push(r2(p.mv.dx), ['side', 'back', 'diag'].indexOf(p.mv.slot), p.mv.mv.dur); else if (p.st === 'stagger') a.push(p.stg.fall ? 1 : 0);
+      if (p.st === 'shoot') a.push(r2(p.shot.rel), p.shot.fade ? 1 : 0, p.shot.side || 0); else if (p.st === 'finish') { const f = p.finish; a.push(f.type === 'dunk' ? 1 : 0, r2(f.dur), f.spin, f.type === 'dunk' ? f.style : f.kind, r2(f.turn || 0), f.euro || 0); } else if (p.st === 'move') a.push(r2(p.mv.dx), ['side', 'back', 'diag'].indexOf(p.mv.slot), p.mv.mv.dur, p.mv.mv.id); else if (p.st === 'hop') a.push(r2(p.hop.dur)); else if (p.st === 'stagger') a.push(p.stg.fall ? 1 : 0);
       return a;
     }),
     B: [BSTATES.indexOf(B.state), r2(B.pos.x), r2(B.pos.y), r2(B.pos.z), B.holder ? B.holder.i : -1, B.green ? 1 : 0, B.shooter && B.shooter.fire ? 1 : 0] };
@@ -3128,9 +3263,10 @@ function netGuestStep(dt) {
       const p = M_.P[i]; if (!p || !Array.isArray(a)) return; p.tx = +a[0] || 0; p.tz = +a[1] || 0; p.ty = +a[2] || 0; p.tf = +a[3] || 0;
       const st = ST_CODES[a[4]] || 'free', fl = a[6] | 0; if (st !== p.st || Math.abs(p.t - a[5]) > 0.25) p.t = +a[5] || 0; p.st = st;
       p.handsUp = !!(fl & 1); p.sprinting = !!(fl & 2); p.bravT = fl & 4 ? 1 : 0; p.fire = !!(fl & 8); p.hand = fl & 16 ? 'L' : 'R'; p.stam = +a[7] || 0; p.brav = +a[8] || 0;
-      if (st === 'shoot') p.shot = { rel: +a[9] || 0.6, j: JUMPER[p.b.moves.jumper] || JUMPERS[0], released: !!(fl & 32) };
-      else if (st === 'finish') p.finish = { type: a[9] ? 'dunk' : 'layup', dur: +a[10] || 0.6, style: p.b.moves.dunk, spin: a[11] | 0 };
-      else if (st === 'move') p.mv = { dx: +a[9] || 0, slot: ['side', 'back', 'diag'][a[10]] || 'side', mv: { dur: +a[11] || 0.35 } };
+      if (st === 'shoot') p.shot = { rel: +a[9] || 0.6, j: JUMPER[p.b.moves.jumper] || JUMPERS[0], released: !!(fl & 32), fade: a[10] ? 1 : 0, side: +a[11] || 0 };
+      else if (st === 'finish') { const k = String(a[12] || ''); p.finish = { type: a[9] ? 'dunk' : 'layup', dur: +a[10] || 0.6, style: a[9] && (DUNK[k]) ? k : p.b.moves.dunk, kind: a[9] ? '' : (FINISHES.find(x => x.id === k) ? k : 'lay'), spin: a[11] | 0, turn: +a[13] || 0, euro: +a[14] || 0 }; }
+      else if (st === 'move') p.mv = { dx: +a[9] || 0, slot: ['side', 'back', 'diag'][a[10]] || 'side', mv: { dur: +a[11] || 0.35, id: MOVE[a[12]] ? String(a[12]) : 'cross' } };
+      else if (st === 'hop') p.hop = { dur: +a[9] || HOP_T };
       else if (st === 'stagger') p.stg = { fall: !!a[9] };
       if (st !== 'finish' && st !== 'move') p.rig.extraYaw = 0;
     });
@@ -3495,6 +3631,166 @@ function uiContracts() {
     return h + `<p class="mu">Contracts count what you do from the moment the day starts: games, drills, the ladder, H-O-R-S-E, the fiends.</p></div>`;
   });
 }
+// GOT NEXT — the Dev Room: a maxed-out player, any build, every move, and a reel that plays them all on a real court.
+// Open it from the title screen, or press F2 on The Block. Games played from here pay nothing.
+'use strict';
+const DEV = { back: 'title', tab: 'profile', prev: null, opp: 'max', oppOvr: 85, oppStyle: 'lockdown' };
+
+// ---------- builds ----------
+// every attribute 99, every badge iced out, the flashiest move in every slot
+function maxBuild(style, name, h) {
+  const st = style || 'showman', attrs = {}, badges = {};
+  for (const a of ATTRS) attrs[a.id] = 99; for (const b of BADGES) badges[b.id] = 4;
+  const hb = h || { sniper: 77, slasher: 78, general: 74, lockdown: 79, glass: 84, showman: 77 }[st];
+  return { name: name || 'MAXED OUT', build: { style: st, origin: 'rustbelt', body: { h: hb, w: 0, s: 0.4 }, skin: 2 }, attrs, badges,
+    worn: Object.assign({}, newSave().worn, { shoes: 'k_gold', bottom: 'b_gold', back: 'bk_cape' }), moves: { side: 'shammgod', back: 'moonwalk', diag: 'halfspin', jumper: 'lawsuit', dunk: 'legs', celeb: 'eagle' } };
+}
+// the first time the Dev Room changes your player, the real one is put aside (inside the save, so it follows a cloud save)
+function devKeep() { if (!S.devBak) { const { name, build, attrs, badges, moves, owned, worn, vc, rep, created, seenRank } = S; S.devBak = JSON.parse(JSON.stringify({ name, build, attrs, badges, moves, owned, worn, vc, rep, created, seenRank })); } }
+function devMax() {
+  devKeep();
+  for (const a of ATTRS) S.attrs[a.id] = 99; for (const b of BADGES) S.badges[b.id] = 4;
+  S.moves.owned = Array.from(new Set(S.moves.owned.concat(MOVES.map(m => m.id), JUMPERS.map(m => m.id), DUNKS.map(m => m.id), CELEBS.map(m => m.id))));
+  Object.assign(S.moves, { side: 'shammgod', back: 'moonwalk', diag: 'halfspin', jumper: 'lawsuit', dunk: 'legs', celeb: 'eagle' });
+  S.owned = Array.from(new Set(S.owned.concat(DRIP.map(d => d.id))));
+  S.vc = Math.max(S.vc, 250000); S.rep = Math.max(S.rep, RANKS[RANKS.length - 1].rep); S.seenRank = RANKS.length - 1; S.created = true; save();
+}
+function devRestore() {
+  const b = S.devBak; if (!b) return; Object.assign(S, JSON.parse(JSON.stringify(b))); delete S.devBak; save();
+}
+function devEdit(fn) { devKeep(); fn(); save(); devRig(); rerender(); }
+
+// ---------- the room ----------
+function devRig() { if (ST && ST.kind === 'studio') studioRig(myBuild()); }
+function uiDev(back) {
+  if (back) DEV.back = back; hideTitleQuiet();
+  if (!S.attrs || !ATTRS.every(a => S.attrs[a.id] > 0)) S.attrs = Object.assign(startAttrs(S.build), S.attrs || {});   /* no player made yet: start from a rookie */ document.body.dataset.state = 'create'; studioScene(); devRig(); ST.devPose = DEV.prev;
+  openPanel(devRender, 'side', devLeave);
+}
+function hideTitleQuiet() { $('title').style.display = 'none'; }
+function devLeave() {
+  uiClose(); if (ST) ST.devPose = null;
+  if (DEV.back === 'hub' && S.created) enterWorld('hub', 0, 9, Math.PI); else { titleScene(); uiTitle(); }
+}
+function devPreview(an, o) { DEV.prev = { an, o: o || {}, t0: ST ? ST.t : 0 }; if (ST) ST.devPose = DEV.prev; }
+function devRender() {
+  const tabs = [['profile', 'PROFILE'], ['build', 'BUILD'], ['moves', 'MOVES'], ['play', 'PLAY'], ['reel', 'REEL']];
+  let h = `<div class="ph"><h2>DEV ROOM</h2></div><div class="tabs">` + tabs.map(([k, n]) => Btn(n, () => { DEV.tab = k; rerender(true); }, 'sm ' + (DEV.tab === k ? '' : 'alt'))).join('') + `</div><div class="pb">`;
+  h += `<div class="card"><div class="row" style="gap:12px"><div class="ovr">${ovrOf(S.attrs)}</div><div><div class="f" style="font-size:18px">${esc(S.name)}</div><div class="mu">${STYLE[S.build.style].n} · ${fmtH(S.build.body.h)} · ${RANKS[rankOf(S.rep)].n}${S.devBak ? ' · <span class="ye">dev player (your real one is saved)</span>' : ''}</div></div></div></div>`;
+  const t = DEV.tab;
+  if (t === 'profile') {
+    h += `<div class="card"><h3>MAXED OUT</h3><p>Every attribute 99, every badge iced out, every move, jumper, dunk, celebration and piece of drip owned, top rank, 250,000 VC. The flashiest package is equipped.</p><div style="margin-top:6px">${Btn('MAX ME OUT', () => { devMax(); devRig(); sfx('unlock'); toast('MAXED OUT', '99 everything. Go look in the mirror.', 'rank'); rerender(); })}</div></div>`;
+    h += `<div class="card"><h3>YOUR REAL PLAYER</h3><p>${S.devBak ? `Saved: <b>${esc(S.devBak.name)}</b>, ${ovrOf(S.devBak.attrs)} OVR, ${S.devBak.vc.toLocaleString()} VC. Restoring puts everything back exactly as it was, and throws away the dev changes.` : 'Nothing changed yet. The first change made here puts your real player aside so you can get them back.'}</p>${S.devBak ? `<div style="margin-top:6px">${Btn('RESTORE MY PLAYER', () => { devRestore(); devRig(); sfx('uiok'); toast('RESTORED', 'Back to the real you.'); rerender(); }, 'alt')}</div>` : ''}</div>`;
+    h += `<div class="card"><h3>BUILD CODE</h3><p>Paste a code to become that player, or copy yours.</p><input type="text" id="devCode" placeholder="GN1-..." style="width:100%"><div style="margin-top:6px">${Btn('LOAD CODE', () => { const b = decodeBuild(($('devCode').value || '')); if (!b) { toast('BAD CODE', 'That code did not read.'); return; } devEdit(() => { S.name = b.name; S.build = b.build; S.attrs = b.attrs; S.badges = b.badges; S.worn = b.worn; Object.assign(S.moves, b.moves); }); toast('LOADED', b.name); }, 'sm')} ${Btn('COPY MINE', () => { const c = encodeBuild(myBuild()); try { navigator.clipboard.writeText(c); } catch (e) { } $('devCode').value = c; toast('COPIED', 'Build code is on the clipboard.'); }, 'sm alt')}</div></div>`;
+  } else if (t === 'build') {
+    const caps = capsFor(S.build);
+    h += `<div class="cat">PLAYSTYLE</div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === S.build.style ? 'sel' : ''}" data-k="${on(() => devEdit(() => { S.build.style = s.id; }))}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
+    h += `<div class="cat">QUICK SET</div><div class="card">` + [['Max all 99', () => { for (const a of ATTRS) S.attrs[a.id] = 99; }], ['Cap out this style', () => { for (const a of ATTRS) S.attrs[a.id] = caps[a.id]; }], ['Fresh rookie', () => { S.attrs = startAttrs(S.build); }], ['All badges iced', () => { for (const b of BADGES) S.badges[b.id] = 4; }], ['No badges', () => { S.badges = {}; }]].map(([n, f]) => Btn(n, () => devEdit(f), 'sm alt')).join(' ') + `</div>`;
+    h += `<div class="cat">ARCHETYPES <span class="mu" style="text-transform:none;letter-spacing:.02em">— each style capped out at its signature height</span></div><div class="card">` + STYLES.map(s => Btn(s.n, () => devEdit(() => { const m = maxBuild(s.id); S.build = m.build; const c = capsFor(S.build); for (const a of ATTRS) S.attrs[a.id] = c[a.id]; }), 'sm alt')).join(' ') + `</div>`;
+    h += `<div class="cat">BODY</div><div class="card"><label class="sl">HEIGHT <b id="dh">${fmtH(S.build.body.h)}</b></label><input type="range" min="${H_MIN}" max="${H_MAX}" step="1" value="${S.build.body.h}" data-k="${on(el => { devKeep(); S.build.body.h = +el.value; $('dh').textContent = fmtH(S.build.body.h); save(); devRig(); })}">`;
+    h += `<label class="sl">WEIGHT</label><input type="range" min="-10" max="10" step="1" value="${Math.round(S.build.body.w * 10)}" data-k="${on(el => { devKeep(); S.build.body.w = el.value / 10; save(); devRig(); })}"><label class="sl">WINGSPAN</label><input type="range" min="-10" max="10" step="1" value="${Math.round(S.build.body.s * 10)}" data-k="${on(el => { devKeep(); S.build.body.s = el.value / 10; save(); devRig(); })}"></div>`;
+    h += `<div class="cat">ATTRIBUTES <span class="mu" style="text-transform:none;letter-spacing:.02em">— 25 to 99, caps ignored here (the mark is this style's cap)</span></div><div class="card">`;
+    for (const c in CATS) { h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]}</div>`; for (const a of ATTRS) if (a.cat === c) h += `<label class="sl">${a.n} <b id="da_${a.id}">${S.attrs[a.id]}</b> <small class="mu">cap ${caps[a.id]}</small></label><input type="range" min="25" max="99" step="1" value="${S.attrs[a.id]}" data-k="${on(el => { devKeep(); S.attrs[a.id] = +el.value; $('da_' + a.id).textContent = el.value; save(); })}">`; }
+    h += `</div><div class="cat">BADGES <span class="mu" style="text-transform:none;letter-spacing:.02em">— tap to cycle the tier</span></div><div class="grid">`;
+    h += BADGES.map(b => { const v = S.badges[b.id] || 0; return `<div class="card" data-k="${on(() => devEdit(() => { S.badges[b.id] = ((S.badges[b.id] || 0) + 1) % 5; }))}"><h3 style="color:${TIER_COL[v]}">${b.n}</h3><p>${b.d}</p><span class="tag" style="color:${TIER_COL[v]}">${TIERS[v]}</span></div>`; }).join('') + `</div>`;
+  } else if (t === 'moves') {
+    h += `<p class="mu">Equip anything, owned or not. PREVIEW poses the player here; the REEL tab plays the real thing on a court.</p>`;
+    const sec = (title, list, slot, an) => {
+      h += `<div class="cat">${title}</div><div class="grid">`;
+      for (const m of list) { const eq = slot && S.moves[slot] === m.id; h += `<div class="card ${eq ? 'sel' : ''}"><h3>${m.n}</h3><p>${m.d || ''}</p><div style="margin-top:5px">${slot ? (eq ? `<span class="tag on">EQUIPPED</span> ` : Btn('EQUIP', () => devEdit(() => { S.moves[slot] = m.id; if (!S.moves.owned.includes(m.id)) S.moves.owned.push(m.id); }), 'sm') + ' ') : ''}${an ? Btn('PREVIEW', () => { devPreview(...an(m)); rerender(); }, 'sm alt') : ''}</div></div>`; }
+      h += `</div>`;
+    };
+    const mvA = m => ['move', { kind: m.id, side: 1, cyc: m.dur }];
+    sec('SIDE MOVE  ← →', MOVES.filter(m => m.slot === 'side'), 'side', mvA); sec('STEPBACK  ↙ ↘', MOVES.filter(m => m.slot === 'back'), 'back', mvA); sec('SPIN  ↖ ↗', MOVES.filter(m => m.slot === 'diag'), 'diag', mvA);
+    sec('JUMPSHOT', JUMPERS, 'jumper', m => ['shoot', { rel: m.rel, kick: m.id === 'lawsuit', cyc: m.rel * 1.6 }]);
+    sec('DUNK PACKAGE', DUNKS.concat([DUNK.reverse]), null, m => ['dunk', { style: m.id, cyc: 0.9, u: 1 }]);
+    h += `<div class="card">${DUNKS.map(m => Btn((S.moves.dunk === m.id ? '✓ ' : '') + m.n, () => devEdit(() => { S.moves.dunk = m.id; if (!S.moves.owned.includes(m.id)) S.moves.owned.push(m.id); }), 'sm ' + (S.moves.dunk === m.id ? '' : 'alt'))).join(' ')}</div>`;
+    sec('FINISHES AND JUMPER VARIATIONS (everyone has these)', FINISHES, null, m => ({ fade: ['shoot', { rel: 0.6, fadeA: 1, cyc: 1 }], side: ['shoot', { rel: 0.6, sideS: 1, cyc: 1 }], hopj: ['hop', { cyc: HOP_T * 2 }], hop: ['hop', { cyc: HOP_T * 2 }] }[m.id] || ['layup', { kind: m.id === 'euro' ? 'lay' : m.id, euro: m.id === 'euro' ? 1 : 0, cyc: 0.9, u: 1 }]));
+    sec('CELEBRATION', CELEBS, 'celeb', m => ['celeb', { style: m.id }]);
+  } else if (t === 'play') {
+    h += `<p class="mu">Your current build, on a real court. Nothing here pays VC or Respect.</p>`;
+    h += `<div class="card"><h3>SHOOT AROUND</h3><p>Just you, a hoop and a rebounder that gives the ball back.</p>${Btn('GO', () => devPlay('solo'), 'sm')}</div>`;
+    const os = DEV.opp === 'max' ? `a maxed-out ${STYLE[DEV.oppStyle].n}` : `a ${DEV.oppOvr} OVR`;
+    h += `<div class="card"><h3>OPPONENT</h3><p>Next games are against ${os}.</p><div>${Btn('MAXED OUT', () => { DEV.opp = 'max'; rerender(); }, 'sm ' + (DEV.opp === 'max' ? '' : 'alt'))} ${Btn('BY OVR', () => { DEV.opp = 'ovr'; rerender(); }, 'sm ' + (DEV.opp === 'ovr' ? '' : 'alt'))}</div>`;
+    h += DEV.opp === 'max' ? `<div style="margin-top:6px">${STYLES.map(s => Btn(s.n, () => { DEV.oppStyle = s.id; rerender(); }, 'sm ' + (DEV.oppStyle === s.id ? '' : 'alt'))).join(' ')}</div>` : `<label class="sl">OVR <b id="dov">${DEV.oppOvr}</b></label><input type="range" min="50" max="99" step="1" value="${DEV.oppOvr}" data-k="${on(el => { DEV.oppOvr = +el.value; $('dov').textContent = el.value; })}">`;
+    h += `</div><div class="card"><h3>GAMES</h3><div>${Btn('1 v 1 · to 11', () => devPlay('1v1'), 'sm')} ${Btn('STREET 3v3', () => devPlay('s3'), 'sm')} ${Btn('JAM 2v2', () => devPlay('j2'), 'sm')} ${Btn('JAM 3v3', () => devPlay('j3'), 'sm')}</div></div>`;
+  } else if (t === 'reel') {
+    h += `<p class="mu">Plays every animation in the group with your current build, on a court, through the same code as a game. It loops; pause to leave.</p>`;
+    for (const k in REELS) h += `<div class="card"><h3>${REELS[k].n}</h3><p>${REELS[k].list().map(e => e.n).join(' · ')}</p>${Btn('PLAY REEL', () => devReel(k), 'sm')}</div>`;
+  }
+  return h + `</div><div class="pf">${Btn('LEAVE', devLeave, 'alt')}</div>`;
+}
+
+// ---------- playing ----------
+function devOpp(ovr) { return DEV.opp === 'max' ? maxBuild(DEV.oppStyle, pick(NPC_NAMES)) : Object.assign(aiBuild(ovr || DEV.oppOvr), {}); }
+function devPlay(kind) {
+  uiClose(); document.body.dataset.state = 'match'; ST = null;
+  const back = res => { hudShow(false); uiDev(); if (res && !res.quit && res.score) toast(res.win ? 'DUB' : 'L', `${res.score[0]} — ${res.score[1]} · dev game, no pay`); };
+  if (kind === 'solo' || kind === 'reel') {
+    startMatch({ mode: { id: 'dev', n: 'DEV ROOM', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: 'dev', court: 'street', hoopTier: 2, ball: S.worn.ball, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], []], onEnd: back });
+    return;
+  }
+  const m = kind === '1v1' ? { id: '1v1', n: 'DEV 1V1', size: 1, arcade: false, to: 11 } : MODES.find(x => x.id === kind);
+  const lvl = DEV.opp === 'max' ? 1 : clamp((DEV.oppOvr - 50) / 45, 0.3, 1);
+  const team = (mine) => { const t = []; for (let i = 0; i < m.size; i++) t.push(mine && i === 0 ? { b: myBuild(), ctrl: 0, mine: true } : { b: devOpp(), ctrl: -1, ai: lvl }); return t; };
+  const used = new Set([S.name]); const tm = [team(true), team(false)]; for (const t of tm) for (const sp of t) if (!sp.mine) { let n = sp.b.name; while (used.has(n)) n = pick(NPC_NAMES); used.add(n); sp.b.name = n; }
+  startMatch({ mode: m, tier: TIERS_COURT[3], teams: tm, boosts: [], ball: S.worn.ball, seed: 2, firstOff: 0, p2: 'off', onEnd: back });
+}
+
+// ---------- the reel: every animation, played through the real game ----------
+// each entry: n name, at start spot, dir run direction, spr sprint, when(p) trigger (or run seconds), go(p) the action
+const toRim = (x, z) => { const l = Math.hypot(x, z); return [-x / l, -z / l]; };
+function reelDunk(id, n) { return { n, d: 'Dunk', at: [1.4, 6.6], dir: toRim(1.4, 6.6), spr: 1, when: p => dHoop(p) < 2.9, go: p => startFinish(p, 0, true, 0, { style: id }) }; }
+const REELS = {
+  dunks: { n: 'DUNKS', list: () => DUNKS.map(m => reelDunk(m.id, m.n)).concat([
+    { n: 'Reverse Mortgage', d: 'Reverse dunk · baseline drive, stick away from the rim', at: [5.6, 1.0], dir: [-1, -0.05], spr: 1, when: p => Math.abs(p.x) < 2.3, go: p => startFinish(p, 0, true, 0, { style: 'reverse' }) },
+    { n: 'Hop Step Slam', d: 'Hop step · let go of the stick on the way in', at: [-1.2, 7.0], dir: toRim(-1.2, 7.0), spr: 1, when: p => dHoop(p) < 3.6, go: p => startHop(p, 'finish') }]) },
+  layups: { n: 'LAYUPS', list: () => [
+    { n: 'Lay-in', d: 'Stick toward the rim', at: [1.8, 5.2], dir: toRim(1.8, 5.2), spr: 0, when: p => dHoop(p) < 2.0, go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'lay' }) },
+    { n: 'Finger Roll', d: 'Full speed from a step out', at: [-1.0, 7.4], dir: toRim(-1.0, 7.4), spr: 1, when: p => dHoop(p) < 3.0, go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'finger' }) },
+    { n: 'Euro Step', d: 'Stick sideways as you go up', at: [2.4, 6.4], dir: toRim(2.4, 6.4), spr: 1, when: p => dHoop(p) < 3.0, go: p => startFinish(p, -1, false, 0, { layup: 1, kind: 'euro', euro: -1 }) },
+    { n: 'Reverse Layup', d: 'Baseline, stick away from the rim', at: [-5.6, 1.0], dir: [1, -0.05], spr: 1, when: p => Math.abs(p.x) < 2.2, go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'reverse' }) },
+    { n: 'Scoop', d: 'Underhand, under the shot-blocker', at: [0.6, 6.0], dir: toRim(0.6, 6.0), spr: 1, when: p => dHoop(p) < 2.4, go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'scoop' }) },
+    { n: 'Power Layup', d: 'Two feet, two hands', at: [-2.0, 4.6], dir: toRim(-2.0, 4.6), spr: 0, when: p => dHoop(p) < 1.9, go: p => startFinish(p, 0, false, 0, { layup: 1, kind: 'power' }) },
+    { n: 'Hop Step Layup', d: 'Let go of the stick on the way in', at: [1.0, 7.0], dir: toRim(1.0, 7.0), spr: 1, when: p => dHoop(p) < 3.4, go: p => startHop(p, 'finish', null, { layup: 1 }) },
+    { n: 'Floater', d: 'Push ↑ from just outside the paint', at: [-0.8, 7.6], dir: toRim(-0.8, 7.6), spr: 1, when: p => dHoop(p) < 4.6, go: p => startShot(p, 'reel', true) }] },
+  jumpers: { n: 'JUMPERS', list: () => [
+    { n: 'Pull-Up', d: 'Your jumpshot: ' + (JUMPER[S.moves.jumper] || JUMPERS[0]).n, at: [2.6, 8.0], dir: toRim(2.6, 8.0), spr: 1, when: p => dHoop(p) < 5.6, go: p => startShot(p, 'reel', false, { hopped: 0 }) },
+    { n: 'Fadeaway', d: 'Stick away from the rim as you shoot', at: [-3.0, 3.4], dir: toRim(-3.0, 3.4), spr: 0, run: 0.5, go: p => startShot(p, 'reel', false, { fade: 1 }) },
+    { n: 'Side-Step', d: 'Stick sideways from a stand', at: [3.4, 5.4], dir: [0, 0], run: 0.4, go: p => startShot(p, 'reel', false, { side: 1 }) },
+    { n: 'Hop-Step Jumper', d: 'Push ↑ (drive) from mid-range', at: [-0.6, 9.6], dir: toRim(-0.6, 9.6), spr: 1, when: p => dHoop(p) < 6.2, go: p => startHop(p, 'shot', 'reel') },
+    { n: 'Stepback Three', d: '↙ ↘ then shoot', at: [1.8, 6.6], dir: toRim(1.8, 6.6), spr: 0, run: 0.5, go: p => startMove(p, 'back', 0.5, 1), then: [[0.42, p => startShot(p, 'reel', false, { hopped: 0 })]] },
+    { n: 'Killer Into A Fade', d: 'Combo: Hostile Takeover, then fade', at: [-1.2, 6.2], dir: toRim(-1.2, 6.2), spr: 0, run: 0.5, go: p => { p.b.moves.side = 'killer'; startMove(p, 'side', 1, -0.15); }, then: [[0.45, p => startShot(p, 'reel', false, { fade: 1 })]] }] },
+  handles: { n: 'HANDLES', list: () => MOVES.map(m => ({ n: m.n, d: { side: '← →', back: '↙ ↘', diag: '↖ ↗' }[m.slot] + ' · ' + m.d, at: [0.4, 8.2], dir: [0, -0.45], spr: 0, run: 0.7, go: p => { p.b.moves[m.slot] = m.id; if (m.slot === 'side') startMove(p, 'side', 1, -0.15); else if (m.slot === 'back') startMove(p, 'back', 0.55, 1); else startMove(p, 'diag', 0.8, -0.8); } })) },
+};
+REELS.all = { n: 'EVERYTHING', list: () => REELS.dunks.list().concat(REELS.layups.list(), REELS.jumpers.list(), REELS.handles.list()) };
+function devReel(k) {
+  devPlay('reel'); const keep = Object.assign({}, MT.me.b.moves);
+  MT.reel = { k, list: REELS[k].list(), i: 0, ph: 'setup', t: 0, keep };
+}
+function reelThink(p, dt) {
+  const R = MT.reel, B = MT.B, e = R.list[R.i]; p.handsUp = false;
+  if (MT.phase !== 'live') { p.in.dx = p.in.dz = 0; return; }
+  R.t += dt;
+  if (R.ph === 'setup') {
+    p.in.dx = p.in.dz = 0; p.in.sprint = false;
+    if (B.holder !== p) { if ((B.state === 'shot' || B.state === 'through') && R.t < 2.5) return; give(p); }
+    Object.assign(p.b.moves, R.keep);
+    p.st = 'free'; p.y = 0; p.x = e.at[0]; p.z = e.at[1]; p.vx = p.vz = 0; p.lx = p.x; p.lz = p.z; p.reset = true; p.rig.gait = null; p.face = Math.atan2(-p.x, -p.z); p.rig.extraYaw = 0;
+    call(e.n, `${R.i + 1}/${R.list.length} · ${e.d || ''}`, '#ffc531', 1.6); R.ph = 'run'; R.t = 0; return;
+  }
+  if (R.ph === 'run') {
+    p.in.dx = e.dir[0]; p.in.dz = e.dir[1]; p.in.sprint = !!e.spr;
+    if ((e.when ? e.when(p) : R.t >= (e.run || 0.5)) || R.t > 3) { e.go(p); R.ph = 'act'; R.t = 0; R.done = {}; }
+    return;
+  }
+  // act: let it play out; release jumpers on time; run any follow-ups
+  p.in.dx = p.in.dz = 0; p.in.sprint = false;
+  if (e.then) e.then.forEach(([t, fn], i) => { if (!R.done[i] && R.t >= t && (p.st === 'free' || p.st === 'move' && canCancel(p))) { R.done[i] = 1; p.st = 'free'; fn(p); } });
+  if (p.st === 'shoot' && !p.shot.released && !p.shot.auto && p.t >= p.shot.rel) releaseShot(p);
+  if ((p.st === 'free' && R.t > 1.3 && (!e.then || Object.keys(R.done).length === e.then.length)) || R.t > 4) { R.i = (R.i + 1) % R.list.length; R.ph = 'setup'; R.t = 0; }
+}
+addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.created) { ev.preventDefault(); uiDev('hub'); } });
 // GOT NEXT — boot, the loop, rewards
 'use strict';
 let ST = null;   // studio / title scene state
@@ -3528,7 +3824,10 @@ function studioStep(dt) {
     handPos(ST.dunker, 'R', ST.ball.position); ST.ball.position.y += 0.1;
     const a = ST.t * 0.12 + 0.6; camera.position.set(Math.sin(a) * 7.5, 2.2 + Math.sin(ST.t * 0.3) * 0.4, 5.5 + Math.cos(a) * 3.5); camera.lookAt(0, 2.5, 0.5);
   } else if (ST.rig) {
-    ST.rig.root.rotation.y = Math.sin(ST.t * 0.5) * 0.7 + 0.2; applyPose(ST.rig, poseOf('idle', ST.t), dt);
+    ST.rig.root.rotation.y = Math.sin(ST.t * 0.5) * 0.7 + 0.2;
+    const dp = ST.devPose;          // the Dev Room previews a move by looping its pose
+    if (dp) { const cyc = dp.o.cyc || 1.2, lt = (ST.t - dp.t0) % (cyc + 0.6), tt = Math.min(lt, cyc); applyPose(ST.rig, poseOf(dp.an, tt, Object.assign({ leg: ST.rig.legLen }, dp.o, { u: tt / cyc * (dp.o.u || 1) * 1.1 })), dt); }
+    else applyPose(ST.rig, poseOf('idle', ST.t), dt);
     if (portrait) { camera.position.set(0, 0.2, 7.2); camera.lookAt(0, -0.9, 0); } else { camera.position.set(1.9, 1.3, 5.0); camera.lookAt(1.9, 1.0, 0); }
   }
 }
@@ -3654,7 +3953,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera);
   // test hook: draw the player in one pose and hand back the frame

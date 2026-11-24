@@ -235,15 +235,63 @@ function poseOf(anim, t, o) {
       if (u < 0.45) { p.y = -0.13 * (u / 0.45); legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); }       // dip: ball to the pocket
       else if (u < 1) { legs(-0.05, 0.12, -k * 0.9, 0.12 + k * 0.5, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); }   // set point: wrist cocked
       else { legs(0.05, 0.05, -k * 1.1, k * 0.3, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); }                                          // follow-through: gooseneck
+      if (o.fadeA && u >= 0.45) {        // fadeaway: hips back, shoulders back, the off leg kicks out front for balance
+        const a = o.fadeA; S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
+      }
+      if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
       p.rate = anim === 'fake' ? 30 : 20; break;
     }
     case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
-    case 'layup': { const eu = o.euro || 0; legs(0.3, 0.3, -1.3, 1.5); S_('anR', 0.9); S_('hips', 0, 0, -eu * 0.25); S_('spine', 0.08, 0, -eu * 0.15); S_('chest', -0.05, -eu * 0.3, 0); S_('neck', -0.2); S_('shR', -2.95, 0, 0.1 + eu * 0.2); S_('elR', -0.18); S_('wrR', (o.u || 0) > 0.7 ? -0.9 : 0.6); S_('shL', -0.5, 0, 0.45); S_('elL', -1.1); p.rate = 18; break; }
+    case 'layup': {
+      const eu = o.euro || 0, u = o.u || 0, k = o.kind || 'lay', rel = u > 0.7;
+      legs(0.3, 0.3, -1.3, 1.5); S_('anR', 0.9); S_('hips', 0, 0, -eu * 0.25); S_('spine', 0.08, 0, -eu * 0.15); S_('chest', -0.05, -eu * 0.3, 0); S_('neck', -0.2); S_('shR', -2.95, 0, 0.1 + eu * 0.2); S_('elR', -0.18); S_('wrR', rel ? -0.9 : 0.6); S_('shL', -0.5, 0, 0.45); S_('elL', -1.1); p.rate = 18;
+      if (k === 'finger') {          // long reach out in front, the ball rolls off the fingertips, palm up
+        legs(0.35, 0.2, -1.45, 1.2); S_('spine', -0.02); S_('chest', -0.1); S_('neck', -0.3); S_('shR', -2.35, 0, 0.05); S_('elR', -0.04); S_('wrR', rel ? 1.1 : 0.2, rel ? 1.2 : 0, 0); S_('shL', -0.3, 0, 0.6); S_('elL', -0.7);
+      } else if (k === 'reverse') {  // back to the rim: arch, look up over the shoulder, reach back over the head
+        legs(0.2, 0.45, -1.15, 1.45); S_('spine', -0.12); S_('chest', -0.28, 0.25, 0); S_('neck', -0.6, 0.35, 0); S_('shR', -3.45, 0, -0.15); S_('elR', -0.25); S_('wrR', rel ? -1.0 : 0.3); S_('shL', -0.7, 0, 0.7); S_('elL', -0.9);
+      } else if (k === 'scoop') {    // underhand from low, under the shot-blocker's arm
+        const sw = clamp((u - 0.25) / 0.5, 0, 1); legs(0.3, 0.35, -1.2, 1.55); S_('spine', 0.28); S_('chest', 0.12); S_('neck', -0.35); S_('shR', -0.25 - sw * 1.95, 0, 0.15); S_('elR', -0.12); S_('wrR', 1.25); S_('shL', -0.9, 0, 0.75); S_('elL', -1.35); p.rate = 22;
+      } else if (k === 'power') {    // two feet, two hands, square to the glass
+        legs(-0.35, 0.75, -0.35, 0.75, 0.1); S_('anR', 0.7); S_('anL', 0.7); S_('spine', 0.04); S_('chest', -0.12); S_('neck', -0.3); S_('shR', -2.85, 0, 0.18); S_('shL', -2.85, 0, -0.18); S_('elR', -0.35); S_('elL', -0.35); S_('wrR', rel ? -0.7 : 0.5); S_('wrL', rel ? -0.7 : 0.5); p.rate = 20;
+      }
+      break;
+    }
+    case 'hop': {                    // the hop step: gather to the chest, both feet off, land together low
+      const u = clamp(o.u || 0, 0, 1);
+      if (u < 0.72) { const e = Math.sin(Math.PI * u / 0.72); legs(-0.5 - e * 0.25, 0.75 + e * 0.35, -0.4 - e * 0.2, 0.7 + e * 0.3, 0.1); S_('anR', 0.6); S_('anL', 0.6); }
+      else { p.y = -0.09; legs(-0.62, 1.05, -0.62, 1.05, 0.16); }
+      S_('spine', 0.32); S_('chest', 0.14); S_('neck', -0.4); S_('shR', -0.85, 0, 0.25); S_('shL', -0.85, 0, -0.25); S_('elR', -1.65); S_('elL', -1.65); S_('wrR', 0.45); S_('wrL', 0.45); p.rate = 26; break;
+    }
     case 'dunk': {
       const u = o.u || 0, st = o.style || 'twohand', slam = u > 0.72, hang = u > 0.8;
-      legs(hang ? -0.5 : -0.95, hang ? 0.9 : 1.55, hang ? -0.3 : -0.5, hang ? 0.7 : 1.25, 0.1); S_('spine', slam ? 0.22 : -0.2); S_('chest', slam ? 0.3 : -0.35); S_('neck', slam ? 0.2 : -0.3);
+      // one-hand dunks leave off one foot: the drive knee comes up, the take-off leg trails straight with the toe pointed.
+      // two-hand dunks jump off both, knees tucked. Hanging after the slam, the legs dangle.
+      const oneFoot = st !== 'twohand' && st !== 'clutch' && st !== 'reverse';
+      if (hang) legs(-0.3, 0.45, -0.12, 0.3, 0.06);
+      else if (oneFoot) { legs(0.18, 0.4, -1.35, 1.75, 0.06); S_('anR', 0.65); }
+      else legs(-0.75, 1.1, -0.6, 1.0, 0.12);
+      S_('spine', slam ? 0.22 : -0.2); S_('chest', slam ? 0.3 : -0.35); S_('neck', slam ? 0.2 : -0.3);
       if (st === 'twohand') { const a = slam ? -1.95 : -3.3; S_('shR', a, 0, 0.12); S_('shL', a, 0, -0.12); S_('elR', slam ? -0.2 : -0.95); S_('elL', slam ? -0.2 : -0.95); S_('wrR', slam ? -0.9 : 0.5); S_('wrL', slam ? -0.9 : 0.5); }
       else if (st === 'windmill') { const a = slam ? -1.95 : (0.4 - u / 0.72 * 4.4); S_('shR', a, 0, -0.1); S_('elR', -0.1); S_('wrR', slam ? -0.9 : 0); S_('shL', -0.6, 0, 0.75); S_('elL', -0.8); p.rate = 30; }
+      else if (st === 'reverse') {   // back to the rim, both hands go up and back over the head, then down behind
+        const a = slam ? -3.75 : -2.9; S_('shR', a, 0, 0.15); S_('shL', a, 0, -0.15); S_('elR', slam ? -0.1 : -0.7); S_('elL', slam ? -0.1 : -0.7); S_('wrR', slam ? -0.8 : 0.4); S_('wrL', slam ? -0.8 : 0.4); S_('spine', slam ? -0.3 : -0.12); S_('chest', slam ? -0.35 : -0.15); S_('neck', -0.55);
+      }
+      else if (st === 'cradle') {    // ball rocked on the forearm by the hip, swung up behind and over, thrown down
+        const w = clamp((u - 0.42) / 0.3, 0, 1), a = slam ? -1.95 : u < 0.42 ? 0.35 : lerp(0.35, -3.7, w);
+        S_('shR', a, 0, u < 0.42 ? -0.25 : -0.05); S_('elR', slam ? -0.15 : u < 0.42 ? -1.7 : -0.4); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -0.7, 0, 0.8); S_('elL', -0.8); S_('chest', slam ? 0.3 : -0.25, u < 0.42 ? -0.35 : 0.1, 0); p.rate = 26;
+      }
+      else if (st === 'clutch') {    // up, down to the waist with the knees tucked, back up, through
+        const down = u > 0.3 && u < 0.52, a = slam ? -1.95 : down ? -0.55 : -3.1;
+        if (down) legs(-1.35, 1.9, -1.2, 1.8, 0.12);
+        S_('shR', a, 0, 0.12); S_('shL', a, 0, -0.12); S_('elR', slam ? -0.2 : down ? -1.5 : -0.6); S_('elL', slam ? -0.2 : down ? -1.5 : -0.6); S_('wrR', slam ? -0.9 : 0.5); S_('wrL', slam ? -0.9 : 0.5); if (down) { S_('spine', 0.25); S_('chest', 0.15); S_('neck', -0.4); } p.rate = 30;
+      }
+      else if (st === 'legs') {      // between the legs in the air: right hand under the right thigh, left hand takes it and finishes
+        const under = u > 0.22 && u < 0.56;
+        if (under) { legs(-1.55, 1.25, 0.35, 1.1, 0.18); S_('spine', 0.3); S_('chest', 0.2); S_('neck', -0.35); S_('shR', -0.15, 0, 0.35); S_('elR', -0.35); S_('wrR', 0.4); S_('shL', 0.05, 0, -0.5); S_('elL', -0.3); S_('wrL', 0.5); }
+        else if (u <= 0.22) { S_('shR', -1.4, 0, 0.1); S_('shL', -1.4, 0, -0.1); S_('elR', -1.1); S_('elL', -1.1); }
+        else { S_('shL', slam ? -1.95 : -3.6, 0, 0.1); S_('elL', slam ? -0.15 : -1.0); S_('wrL', slam ? -1.0 : 0.6); S_('shR', -0.5, 0, -0.85); S_('elR', -0.9); }
+        p.rate = 32;
+      }
       else { S_('shR', slam ? -1.95 : -3.75, 0, -0.1); S_('elR', slam ? -0.15 : -1.25); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -0.5, 0, 0.85); S_('elL', -0.9); }
       p.rate = Math.max(p.rate, 22); break;
     }
@@ -270,6 +318,15 @@ function poseOf(anim, t, o) {
       else if (k === 'behind' || k === 'shammgod') { S_('spine', 0.12); S_('chest', -0.05, -s * 0.5, 0); S_('shR', 0.75 * (s > 0 ? 1 : 0.2), 0, -0.35); S_('elR', -1.2); S_('shL', 0.75 * (s < 0 ? 1 : 0.2), 0, 0.35); S_('elL', -1.2); if (k === 'shammgod') { p.y = -0.24; S_('sh' + (s > 0 ? 'L' : 'R'), -1.5, 0, s * 0.9); S_('el' + (s > 0 ? 'L' : 'R'), -0.1); } }
       else if (k === 'stepback' || k === 'moonwalk') { p.y = -0.1 + e * 0.12; legs(-0.3 - e * 0.5, 0.5 + e * 0.7, 0.35, 0.4, 0.18); S_('spine', -0.08); S_('chest', -0.1); S_('neck', -0.05); S_('hips', -0.12, 0, 0); }
       else if (k === 'hesi') { p.y = -0.04 + e * 0.05; legs(-0.2, 0.3, 0.1, 0.25, 0.14); S_('spine', 0.0); S_('chest', -0.05); S_('neck', 0.05); S_('shR', -1.3, 0, 0.1); S_('elR', -1.7); S_('shL', -1.1, 0, -0.2); S_('elL', -1.6); }
+      else if (k === 'inout') {        // shoulders and the ball hand sell the cross, then come straight back
+        const d = s > 0 ? 1 : -1; p.y = -0.15; legs(-0.7, 1.1, -0.7, 1.1, 0.3 + e * 0.1); S_('hips', 0.06, 0, -d * 0.2 * e); S_('chest', 0.12, -d * 0.55 * e, 0); S_('neck', -0.3, -d * 0.3 * e, 0); const h = o.hand === 'L' ? 'L' : 'R'; S_('sh' + h, -0.75, 0, -d * 0.7 * e); S_('el' + h, -0.9);
+      }
+      else if (k === 'killer') {       // the killer: very low and wide, the whole upper body dips the wrong way first
+        const d = s > 0 ? 1 : -1, sw = u < 0.4 ? -1 : 1; p.y = -0.26; legs(-0.95, 1.45, -0.95, 1.45, 0.48); S_('hips', 0.12, 0, -d * 0.24 * sw); S_('spine', 0.4, 0, -d * 0.14 * sw); S_('chest', 0.15, -d * 0.4 * sw, 0); S_('neck', -0.45, d * 0.25, 0);
+      }
+      else if (k === 'snatch') {       // snatch-back: a hop away while one arm yanks the ball home to the hip
+        p.y = -0.08 + e * 0.15; legs(-0.25 - e * 0.35, 0.5 + e * 0.5, 0.25 + e * 0.15, 0.5 + e * 0.4, 0.16); S_('spine', -0.1); S_('chest', -0.12); S_('hips', -0.1); const h = o.hand === 'L' ? 'L' : 'R'; S_('sh' + h, 0.55 * e - 0.4 * (1 - e), 0, 0); S_('el' + h, -1.6);
+      }
       else if (k === 'spin' || k === 'halfspin') { p.y = -0.15; legs(-0.6, 1.0, -0.2, 0.6, 0.15); S_('shR', -0.5, 0, 0.3); S_('elR', -1.8); S_('shL', -0.5, 0, -0.3); S_('elL', -1.8); S_('spine', 0.25); }
       p.rate = 26; break;
     }
@@ -490,9 +547,9 @@ function gaitStep(R, c) {
   const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), wide = c.wide || 0;
   const home = (s, out) => { const lx = (s === 'R' ? -1 : 1) * (R.hipW + 0.045 + 0.15 * wide + 0.035 * (G.sw || 0)); return out.set(c.x + lx * cy, 0, c.z - lx * sy); };
   if (!c.grounded) {                       // airborne: the pose owns the legs; remember where the feet are for the landing
-    G.air = true; for (const s of ['R', 'L']) { const f = G.ft[s]; R.joints['an' + s].getWorldPosition(f.p); f.p.y = 0; f.sw = false; f.lift = 0; }
+    G.air = true; for (const s of ['R', 'L']) { const f = G.ft[s]; R.joints['an' + s].getWorldPosition(f.p); f.lift = Math.max(0, f.p.y - 0.04); f.p.y = 0; f.sw = false; }   /* the fading IK aims where the pose has the foot, not at the floor */
   } else {
-    if (G.air) { G.air = false; G.land = 0.17; }
+    if (G.air) { G.air = false; G.land = 0.17; G.ft.R.lift = G.ft.L.lift = 0; }
     // a wide, low stance (defense) takes short quick steps instead of long strides
     // stride grows with speed; a foot lands a reachable distance ahead (never further than the leg can reach), and
     // the swing takes as long as a real one (~0.3 s), so a sprint gets a short flight phase instead of frantic steps
@@ -545,8 +602,12 @@ function legIK(R, dt) {
     const k = Math.PI - Math.acos(clamp((L1 * L1 + L2 * L2 - D * D) / (2 * L1 * L2), -1, 1));
     // exact for the rig's Euler order (X·Y·Z): the bent leg lies in the hip's YZ plane, is rolled by Z, then pitched by X
     const A = L1 + L2 * Math.cos(k), hz = Math.asin(clamp(_g1.x / A, -1, 1)), y0 = -A * Math.cos(hz), z0 = -L2 * Math.sin(k);
-    const hx = Math.atan2(_g1.z, _g1.y) - Math.atan2(z0, y0);
-    const h = hp.rotation, kn = J['kn' + s].rotation, an = J['an' + s].rotation;
+    let hx = Math.atan2(_g1.z, _g1.y) - Math.atan2(z0, y0);
+    const h = hp.rotation;
+    // the difference of two angles can land a full turn away (5.77 instead of -0.51): blended with the pose that swings the
+    // leg the long way round, a backward kick through the floor while the IK fades out on take-off. Keep it the near way.
+    while (hx - h.x > Math.PI) hx -= 6.283185307; while (hx - h.x < -Math.PI) hx += 6.283185307;
+    const kn = J['kn' + s].rotation, an = J['an' + s].rotation;
     h.x = lerp(h.x, hx, w); h.y = lerp(h.y, 0, w); h.z = lerp(h.z, hz, w); kn.x = lerp(kn.x, k, w); kn.y = lerp(kn.y, 0, w); kn.z = lerp(kn.z, 0, w);
     const toe = f.sw ? 0.35 * Math.sin(Math.PI * Math.min(1, f.t / f.T)) : 0;              // toe-off during the swing, flat foot when planted
     an.x = lerp(an.x, -(hips.rotation.x + hx + k) + toe * (1 - 0.5 * (G.sw || 0)), w); an.y = lerp(an.y, (s === 'R' ? -1 : 1) * 0.16 * (G.sw || 0), w);

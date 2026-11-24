@@ -4,7 +4,7 @@
 
 A park-basketball career game in one HTML file. Phone first, plays on a computer, two players with a controller.
 You build a player, walk The Block, take games in The Cages, and spend what you earn on your player, your drip and your
-crib. A North Coast Studios game. **Version 0.6: the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events.** Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
+crib. A North Coast Studios game. **Version 0.7: more finishes (four new dunks, five layups, hop steps), fadeaways and side-steps, three new dribble moves, and a Dev Room with a maxed-out player.** v0.6 added the grind: nine drills that pay, H-O-R-S-E, a 1v1 ladder, daily contracts and events. Details and measurements: [`docs/ANIMATION.md`](docs/ANIMATION.md).
 
 **Where it stands, bugs, and everything asked so far:** [`docs/STATUS.md`](docs/STATUS.md). It is a standalone game, not a Pocket Lantern cartridge.
 
@@ -117,6 +117,35 @@ game through The Link. Built by `python3 build.py` alongside the game; source in
 Skill stick with the ball: **↓ hold** shoot, **↑** drive (layup or dunk), **← →** side move, **↙ ↘** stepback,
 **↖ ↗** spin. Without it: **↑** hands up, **↓** steal (JAM: shove).
 
+The **move stick** (left) picks the finish or the jumper as you go up:
+
+| Move stick as you go up | Near the rim (↑ or shoot) | Jumper (shoot) |
+|---|---|---|
+| Toward the rim | lay-in, finger roll at full speed, scoop or power layup when someone is on you, or your dunk | pull-up |
+| Sideways | euro step | side-step (from a stand) |
+| Away from the rim | reverse layup / reverse dunk | fadeaway |
+| Let go, at speed | hop step, then up strong | — |
+
+**↑** from mid-range (outside floater range) is a hop-step jumper with automatic timing.
+
+## Dev Room (v0.7)
+
+From the title screen, the OPTIONS tab of My Player, or **F2** on The Block.
+
+- **Profile:** MAX ME OUT (every attribute 99, every badge iced out, everything owned, top rank, 250,000 VC), RESTORE MY
+  PLAYER (the real one is kept inside the save the moment the Dev Room first changes anything), build codes in and out.
+- **Build:** any style, height, weight and wingspan, every attribute 25–99 (caps ignored, the style's cap is shown), every
+  badge tier, and one-tap archetypes (each style capped out).
+- **Moves:** equip anything, owned or not, and preview the pose.
+- **Play:** shoot-around, 1v1 to 11, Street 3v3, JAM 2v2 and 3v3, against maxed-out players of any style or a chosen OVR.
+  Nothing played here pays VC or Respect.
+- **Reel:** plays every dunk, layup, jumper variation and dribble move with your build, on a court, through the same code
+  as a game.
+
+![New dunks](docs/img/finishes-dunks.png)
+![New layups and the hop step](docs/img/finishes-layups.png)
+![Fadeaway, side-step and the new moves](docs/img/finishes-jumpers.png)
+
 ## Build
 
 Source is in `src/`. After editing, run:
@@ -155,6 +184,9 @@ node tests/grind.mjs              # every drill, H-O-R-S-E, a ladder match and a
 node tests/accept.mjs             # the eight animation/control acceptance scenarios, with numbers
 node tests/feel.mjs [file.html]   # movement metrics for any build (reversal time, foot slip, ball in hand, FPS drift)
 node tests/strip.mjs run|drib|shot|def [file.html]   # side-on filmstrips of real gameplay
+node tests/reel.mjs dunks|layups|jumpers|handles      # films every move in a Dev Room reel and lists what each one did
+node tests/gestures.mjs           # each finish and jumper variation from real key presses; Dev Room max and restore
+node tests/devroom.mjs            # clicks through every Dev Room tab, a reel and a 1v1 against a maxed player
 ```
 
 ## Online

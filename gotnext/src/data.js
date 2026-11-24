@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.6';
+const VERSION = '0.7';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -122,9 +122,12 @@ const MOVES = [
   { id: 'cross', slot: 'side', n: 'Basic Cross', d: 'Left-right. Honest work.', dur: .34, burst: 5.2, ank: 0, st: 6, cost: 0, rank: 0, need: 0 },
   { id: 'tween', slot: 'side', n: 'Tween Machine', d: 'Between the legs, quicker recovery.', dur: .28, burst: 5.6, ank: .04, st: 6, cost: 600, rank: 1, need: 60 },
   { id: 'behind', slot: 'side', n: 'Behind The Back Taxes', d: 'Wide, slow, devastating.', dur: .42, burst: 6.6, ank: .09, st: 8, cost: 1500, rank: 2, need: 72 },
+  { id: 'inout', slot: 'side', n: 'Insider Trading', d: 'In and out. Sell the cross, keep the ball in the same hand.', dur: .32, burst: 5.8, ank: .07, st: 6, cost: 1100, rank: 1, need: 66, keep: 1 },
+  { id: 'killer', slot: 'side', n: 'Hostile Takeover', d: 'Killer crossover. Big shoulder fake, low and wide, then gone.', dur: .38, burst: 6.8, ank: .11, st: 8, cost: 2600, rank: 3, need: 78 },
   { id: 'shammgod', slot: 'side', n: 'The Shell Company', d: 'Ball goes one way, liability goes another.', dur: .46, burst: 7.4, ank: .15, st: 10, cost: 4000, rank: 4, need: 86 },
   { id: 'stepback', slot: 'back', n: 'Stepback', d: 'Create space, then file for separation.', dur: .36, burst: 5.4, ank: .02, st: 7, cost: 0, rank: 0, need: 0 },
   { id: 'hesi', slot: 'back', n: 'Hesi Pull', d: 'Freeze frame. Defender buffers.', dur: .30, burst: 2.0, ank: .08, st: 5, cost: 800, rank: 1, need: 62 },
+  { id: 'snatch', slot: 'back', n: 'Clawback', d: 'Snatch-back. One hand yanks the ball home while you hop away.', dur: .34, burst: 6.4, ank: .06, st: 8, cost: 2000, rank: 2, need: 74 },
   { id: 'moonwalk', slot: 'back', n: 'Moonwalk Stepback', d: 'Enormous space. Enormous ego.', dur: .44, burst: 7.6, ank: .08, st: 10, cost: 3500, rank: 3, need: 82 },
   { id: 'spin', slot: 'diag', n: 'Spin Cycle', d: 'Roll off the defender toward the rim.', dur: .44, burst: 6.2, ank: .03, st: 8, cost: 0, rank: 0, need: 0 },
   { id: 'halfspin', slot: 'diag', n: 'Fake News Spin', d: 'Half spin, come back. Nobody checks.', dur: .40, burst: 6.0, ank: .12, st: 8, cost: 1800, rank: 2, need: 75 },
@@ -142,9 +145,26 @@ const DUNKS = [
   { id: 'twohand', n: 'Two-Hand Tax Return', d: 'Safe, reliable, filed on time.', bonus: .06, rep: 0, cost: 0, rank: 0, need: 0 },
   { id: 'tomahawk', n: 'Tomahawk Missile', d: 'One hand, way back. +2 Respect per dunk.', bonus: 0, rep: 2, cost: 1200, rank: 1, need: 70 },
   { id: 'windmill', n: 'Wind Turbine', d: 'Renewable energy. +4 Respect per dunk.', bonus: -.04, rep: 4, cost: 2800, rank: 3, need: 80 },
+  { id: 'cradle', n: 'Rock The Cradle', d: 'Ball cradled on the forearm, rocked back, thrown home. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 3600, rank: 3, need: 84 },
+  { id: 'clutch', n: 'Double Dip', d: 'Double clutch: up, down to the waist, back up, through. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 4200, rank: 4, need: 86 },
   { id: 'three60', n: '360 No-Scope', d: 'Full rotation. +7 Respect per dunk.', bonus: -.08, rep: 7, cost: 6000, rank: 5, need: 90 },
+  { id: 'legs', n: 'The Loophole', d: 'Between the legs in mid-air. Legal, technically. +9 Respect per dunk.', bonus: -.12, rep: 9, cost: 9000, rank: 6, need: 95 },
 ];
 const DUNK = {}; DUNKS.forEach(m => DUNK[m.id] = m);
+DUNK.reverse = { id: 'reverse', n: 'Reverse Mortgage', d: 'Back to the rim, two hands over the head. Anyone who can dunk: pull the stick away from the rim.', bonus: -.02, rep: 3 };
+// finishes and jumper variations everyone has. The left stick picks one as you go up (see the MOVES tab).
+const FINISHES = [
+  { id: 'lay', n: 'Lay-in', d: 'Off the glass. Stick toward the rim.' },
+  { id: 'finger', n: 'Finger Roll', d: 'At full speed from a step out, rolled off the fingertips.' },
+  { id: 'scoop', n: 'Scoop', d: 'Underhand, under a defender\'s arm.' },
+  { id: 'power', n: 'Power Layup', d: 'Two feet, two hands, through the contact. Strong players do it under pressure.' },
+  { id: 'euro', n: 'Euro Step', d: 'Stick sideways as you go up: one step, then the other way.' },
+  { id: 'reverse', n: 'Reverse', d: 'Stick away from the rim: under it and up the other side. Dunkers reverse-dunk.' },
+  { id: 'hop', n: 'Hop Step', d: 'Let go of the move stick at speed as you go to the rim: a two-foot hop, then up strong. Gets around defenders.' },
+  { id: 'fade', n: 'Fadeaway', d: 'Stick away from the rim as you shoot. Harder to block, a little harder to make.' },
+  { id: 'side', n: 'Side-Step', d: 'Stick sideways from a stand as you shoot: a quick step out of the contest.' },
+  { id: 'hopj', n: 'Hop-Step Jumper', d: 'Push ↑ (drive) from mid-range, outside floater range: hop, plant, rise. The timing is automatic.' },
+];
 const CELEBS = [
   { id: 'flex', n: 'The Flex', cost: 0, rank: 0 },
   { id: 'salute', n: 'Salute The Flag', cost: 500, rank: 1 },
