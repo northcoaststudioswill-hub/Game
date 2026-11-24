@@ -1186,7 +1186,7 @@ const DLG={q:[],i:0,chars:0,done:null,text:'',who:null};
 function say(lines,done){$('dskip').hidden=lines.length<3;DLG.shot=null;DLG.q=lines;DLG.i=0;DLG.done=done||null;S.mode='dialog';$('dialog').hidden=false;$('bTalk').hidden=true;showLine();}
 function showLine(){const l=DLG.q[DLG.i];DLG.who=SPEAK[l[0]];DLG.text=l[1];DLG.chars=0;$('dport').textContent=DLG.who.face;$('dname').textContent=DLG.who.name;$('dtext').textContent='';const o=l[2];if(o){if('cam' in o)DLG.shot=o.cam;if(o.fn)o.fn();}app.classList.toggle('cine',!!DLG.shot);}
 function advance(){if(S.mode!=='dialog')return;if(DLG.chars<DLG.text.length){DLG.chars=DLG.text.length;$('dtext').textContent=DLG.text;return;}
-  DLG.i++;if(DLG.i>=DLG.q.length){$('dialog').hidden=true;S.mode='play';DLG.shot=null;app.classList.remove('cine');if(!boss.active)boss.g.visible=false;const d=DLG.done;DLG.done=null;if(d)d();}else showLine();}
+  DLG.i++;if(DLG.i>=DLG.q.length){$('dialog').hidden=true;S.mode='play';DLG.endT=performance.now();DLG.shot=null;app.classList.remove('cine');if(!boss.active)boss.g.visible=false;const d=DLG.done;DLG.done=null;if(d)d();}else showLine();}
 function updateDialog(dt){if(DLG.chars<DLG.text.length){const before=Math.floor(DLG.chars);DLG.chars=Math.min(DLG.text.length,DLG.chars+dt*52);const now=Math.floor(DLG.chars);if(now!==before){$('dtext').textContent=DLG.text.slice(0,now);if(DLG.text[now-1]==='█'){if(now%2===0)tone(1000,.08,'sine',.12);}else if(now%3===0)SFX.blip(DLG.who.pitch,DLG.who.wave);}}}
 $('dialog').addEventListener('click',advance);
 $('dskip').addEventListener('click',e=>{e.stopPropagation();if(S.mode!=='dialog')return;DLG.i=DLG.q.length-1;showLine();DLG.chars=DLG.text.length;$('dtext').textContent=DLG.text;advance();});
@@ -1405,7 +1405,7 @@ function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)
   if(!S.inBoss&&!S.inSlop&&!S.inSim&&!S.inMM&&!S.inPk){const xi=xInteract();if(xi)interact=xi;}
   if(!S.inBoss&&!S.inSlop&&!S.inSim&&!S.inMM){const ni=act15Interact();if(ni)interact=ni;}
   const b=$('bTalk');if(interact){if(b.hidden||hudCache.talk!==interact.label){b.hidden=false;b.textContent=interact.label+(app.classList.contains('touchy')?'':app.classList.contains('gp')?'  [B]':'  [E]');hudCache.talk=interact.label;}}else if(!b.hidden)b.hidden=true;}
-function doInteract(){if(S.mode!=='play'||!interact||S.dead)return;if(typeof interact.fn==='function'){interact.fn();return;}let b=null,bd=9;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd){bd=d;b=n;}}if(b)say([[b.id,pick((typeof BARK!=='undefined'&&BARK[b.id])||['...'])]]);}
+function doInteract(){if(S.mode!=='play'||!interact||S.dead)return;if(performance.now()-(DLG.endT||0)<650)return;if(typeof interact.fn==='function'){interact.fn();return;}let b=null,bd=9;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd){bd=d;b=n;}}if(b)say([[b.id,pick((typeof BARK!=='undefined'&&BARK[b.id])||['...'])]]);}
 $('bTalk').addEventListener('click',doInteract);
 function compassTarget(){if(S.inSlop)return slopTarget();if(S.inBoss)return boss.active?{x:boss.x,z:boss.z,l:'THE ALGORITHM'}:null;
   if(S.track&&XQ.includes(S.track)){const t=xTarget(S.track);if(t)return t;S.track=null;}
@@ -1420,7 +1420,7 @@ function compassTarget(){if(S.inSlop)return slopTarget();if(S.inBoss)return boss
   return{x:Z.x,z:Z.z,l:Z.name};}
 function updateHUD(){setText('aura',fmt(S.aura)+(app.clientWidth<640?' ✨':' AURA'));setText('cells',app.clientWidth<640?'🧠×'+Math.max(0,S.cells):'🧠'.repeat(Math.max(0,S.cells))+'💀'.repeat(Math.max(0,S.max-S.cells)));renderQuests();
   const t=compassTarget(),ar=$('arrow');if(t){const dx=t.x-PL.x,dz=t.z-PL.z,d=Math.hypot(dx,dz),fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw),rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw);
-    const rel=Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz);ar.style.transform='rotate('+rel.toFixed(2)+'rad)';setText('ctext',t.l+' · '+Math.round(d)+'m');ar.style.visibility='visible';}else{ar.style.visibility='hidden';setText('ctext','');}
+    const rel=Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz);ar.style.transform='rotate('+rel.toFixed(2)+'rad)';setText('ctext',t.l+' · '+Math.round(d)+'m · '+(Math.abs(rel)<.45?'ahead':Math.abs(rel)>2.7?'behind you':rel>0?(Math.abs(rel)>1.9?'behind, right':'to the right'):(Math.abs(rel)>1.9?'behind, left':'to the left')));ar.style.visibility='visible';}else{ar.style.visibility='hidden';setText('ctext','');}
   if(boss.active)$('bossfill').style.width=(clamp(boss.hp/boss.max)*100)+'%';}
 
 /* ================= world animation + sky ================= */
@@ -4921,7 +4921,7 @@ MENU.tabs=()=>['col','cx','who','ctl','sys'].concat(DEV.on?['dev']:[]);
 {const mr=menuRender;menuRender=function(){MENU.devb.hidden=!DEV.on;if(MENU.tab==='dev'&&!DEV.on)MENU.tab='sys';mr();const B=$('mbody');
   if(MENU.tab==='ctl'){B.innerHTML='<h4>CONTROLS</h4>'+(app.classList.contains('touchy')?ctlTable('touch'):'<p><b>Controller</b></p>'+ctlTable('pad')+'<p><b>Keyboard</b></p>'+ctlTable('key'));B.querySelectorAll('td:first-child').forEach(td=>{td.style.fontWeight='800';});}
   if(MENU.tab==='sys'){B.innerHTML='<h4>SYSTEM</h4><div class="sysb"><button data-a="resume">▶ RESUME</button><button data-a="save">💾 SAVE NOW</button><button data-a="ctl">🎮 SHOW THE CONTROLS CARD</button><button data-a="snd">'+(AU.muted?'🔇 SOUND: OFF':'🔊 SOUND: ON')+'</button><button data-a="quit">⏏ SAVE AND QUIT TO TITLE</button></div>';
-    B.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='resume')menuClose();else if(a==='save'){save();toast('💾 Saved. Your aura remembers.');}else if(a==='ctl'){menuClose();S.mode='menu';ctlCard(()=>{S.mode='play';},'▶ BACK TO THE GAME');}else if(a==='snd'){audioInit();setMute(!AU.muted);menuRender();}else if(a==='quit'){save();location.reload();}NAV.reset();});}
+    B.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a==='resume')menuClose();else if(a==='save'){save();toast('💾 Saved. Your aura remembers.');}else if(a==='ctl'){menuClose();S.mode='menu';ctlCard(()=>{S.mode='play';},'▶ BACK TO THE GAME');}else if(a==='snd'){audioInit();setMute(!AU.muted);menuRender();}else if(a==='quit'){save();try{sessionStorage.setItem('gfa-skipboot','1');}catch(e){}location.reload();}NAV.reset();});}
   if(MENU.tab==='dev'){const P=devPlaces().filter(p=>p[0]);B.innerHTML='<h4>🛠️ DEV TOOLS</h4><p><b>Teleport</b></p><div class="dv">'+P.map(p=>'<button data-w="'+p[0]+'">'+p[1]+'</button>').join('')+'</div><p><b>Slop Hole layer</b></p><div class="dv">'+[0,1,2,3,4,5].map(i=>'<button data-w="hole'+i+'">'+(i<5?'Layer '+(i+1):'The bottom')+'</button>').join('')+'</div>'+
     '<p><b>Give and unlock</b></p><div class="dv"><button data-d="found">Mark every place found</button><button data-d="chars">Unlock all characters</button><button data-d="aura">+1,000,000 aura</button><button data-d="bits">6 filler bits + open the Slop Hole</button><button data-d="fed">Feed the Algorithm to 60/67</button><button data-d="kc">Corbin: 3 segments filmed</button><button data-d="lose">Make Bibi lose an election</button><button data-d="heal">Full brain cells</button></div>'+
     '<p><b>Toggles</b></p><div class="dv"><button data-d="god">God mode: '+(DEV.god?'ON':'OFF')+'</button><button data-d="fps">FPS meter: '+(DEV.fps?'ON':'OFF')+'</button></div><p style="font-size:12px;opacity:.7">Position: '+PL.x.toFixed(1)+', '+PL.y.toFixed(1)+', '+PL.z.toFixed(1)+' · zone: '+(S.inPk?'pk_'+S.inPk:S.zone)+'</p>';
@@ -4951,7 +4951,8 @@ function navMove(r,dx,dy){const it=navItems(r);if(!it.length)return;if(!NAV.el||
   else if(NAV.el){NAV.el.classList.remove('gpf');NAV.el=null;}
   for(let i=0;i<gp.buttons.length;i++)NAV.prev[i]=b(i);})();
 // show the splash on load
-if(location.hash!=='#test')runSplash(()=>{NAV.reset();});
+const SKIPBOOT=(function(){try{const v=sessionStorage.getItem('gfa-skipboot');sessionStorage.removeItem('gfa-skipboot');return !!v;}catch(e){return false;}})();
+if(location.hash!=='#test'&&!SKIPBOOT)runSplash(()=>{NAV.reset();});
 
 /* ================= ACT 35: dev progression presets, and no giant name tags in the cutscenes ================= */
 function devRelics(){S.relics={grok:true,fable:true,astra:true};S.kills=Math.max(S.kills,KILLS_NEEDED);S.pages=[1,1,1,1,1,1];X.ch=Math.max(X.ch,3);syncWorld();S.track='portal';}
@@ -6315,7 +6316,7 @@ function opnMusic(){if(!AU.ctx||AU.muted||!MOV.on)return;const now=AU.ctx.curren
 // the opening plays on boot-up and (if it has not been seen) after the boot-up text on a new game
 {const ri=runIntro;runIntro=function(done){if((DEV.on&&DEV.skip)||location.hash==='#test'){done();return;}ri(()=>MOV.seen?done():movieRun(done));};}
 // the trailer plays on boot-up, straight after the studio splash and before the title screen
-if(location.hash!=='#test'&&!(DEV.on&&DEV.skip)){MOV.bootHide=true;$('title').hidden=true;const iv=setInterval(()=>{const sp=$('splash');if(sp&&sp.style.opacity!=='0')return;clearInterval(iv);MOV.bootHide=false;if(S.mode==='title'&&!$('intro')&&!$('ctlcard')&&!MOV.seen){$('title').hidden=false;movieRun(()=>{NAV.reset();});}else if(S.mode==='title')$('title').hidden=false;},50);}
+if(location.hash!=='#test'&&!SKIPBOOT&&!(DEV.on&&DEV.skip)){MOV.bootHide=true;$('title').hidden=true;const iv=setInterval(()=>{const sp=$('splash');if(sp&&sp.style.opacity!=='0')return;clearInterval(iv);MOV.bootHide=false;if(S.mode==='title'&&!$('intro')&&!$('ctlcard')&&!MOV.seen){$('title').hidden=false;movieRun(()=>{NAV.reset();});}else if(S.mode==='title')$('title').hidden=false;},50);}
 (function(){const m=document.querySelector('#title .menu');if(!m)return;const b=document.createElement('button');b.id='tMov';b.textContent='🎬 WATCH THE TRAILER';m.insertBefore(b,$('tCred'));b.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();},'trailer');};const o=document.createElement('button');o.id='tOpn';o.textContent='📼 WATCH THE INTRO';m.insertBefore(o,b);o.onclick=()=>{audioInit();movieRun(()=>{NAV.reset();});};})();
 /* ================= ACT 52: THE TUNNEL FIX. Tunnel and vault walls are boxes now, not circles, so their corners stop snagging you. The camera down there stays inside the corridor and under the ceiling instead of being shoved through the walls. Also: followers you can dismiss. ================= */
 const BOXES=[];
@@ -6531,7 +6532,7 @@ function reelShots(R){const A=R.A,gy=groundH(A.x,A.z),c=[A.x,gy,A.z],a0=R.face+M
 function unlocksPanel(){const seen=SEEN.get(),all=DEV.on&&DEV.allc,has=id=>all||seen.includes(id)||id==='intro';
   const items=[['intro','📼','THE INTRO','How the game got made'],['trailer','🎬','THE TRAILER','Slop: The Motion Picture']].concat(RL.list.map(R=>['reel:'+R.id,R.e,R.title,ABY[R.id]?ABY[R.id].name:'']));
   const n=items.filter(it=>has(it[0])).length;
-  tPanel('<h3>🏆 UNLOCKS</h3><p>Every cinematic you have seen, any time. Watch a show at its screen in the game to unlock it here. '+n+' of '+items.length+' unlocked.</p><div class="unl">'+items.map((it,i)=>has(it[0])?'<button data-u="'+i+'"><b>'+it[1]+'</b><span>'+it[2]+'<small>'+it[3]+'</small></span></button>':'<button disabled><b>🔒</b><span>???<small>'+it[3]+'</small></span></button>').join('')+'</div>',
+  tPanel('<h3>🏆 UNLOCKS</h3><p>Every cinematic you have seen, any time. Watch a show at its screen in the game to unlock it here. '+n+' of '+items.length+' unlocked.</p><div class="unl">'+items.map((it,i)=>has(it[0])?'<button data-u="'+i+'"><b>'+it[1]+'</b><span>'+it[2]+'<small>'+it[3]+'</small></span></button>':'<button disabled><b>🔒</b><span>???<small>not seen yet</small></span></button>').join('')+'</div>',
     p=>{p.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const it=items[+b.dataset.u];p.remove();audioInit();const back=()=>{NAV.reset();unlocksPanel();};
       if(it[0]==='intro')movieRun(back);else if(it[0]==='trailer')movieRun(back,'trailer');else{const R=RL.list.find(r=>'reel:'+r.id===it[0]);movieRun(back,{reel:R});}});});}
 (function(){const st=document.createElement('style');st.textContent='#tpanel .unl{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:56vh;overflow:auto;margin:8px 0}#tpanel .unl button{display:flex;gap:10px;align-items:center;text-align:left;padding:8px 10px;border-radius:10px;border:3px solid var(--ink);background:var(--paper);color:var(--ink);font:700 13px/1.2 var(--body)}#tpanel .unl button:disabled{opacity:.45}#tpanel .unl b{font-size:24px}#tpanel .unl small{display:block;font-weight:400;font-size:11px;opacity:.75}';document.head.appendChild(st);
@@ -7027,6 +7028,21 @@ DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','THE STORY
   ['s_5','Chapter 4: hint heard, all 7 gold, at David',()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);X.flow=4;X.erin=3;X.clank=3;X.hour=2;X.lit=1;X.cloud=1;X.cores=[1,1,1,1];X.loosh=[1,1,1,1];const q=Q38();q.hcw=1;const st=stq();st.b2=st.b3=st.b4=1;st.hint=1;q.dgold=[0,1,2,3,4,5,6];syncX();syncWorld();warpTo(npcs.david.x+4,npcs.david.z+4);}],
   ['s_6','Final chapter: truth told, portal open',()=>{['grok','fable','astra'].forEach(k=>S.relics[k]=true);X.flow=4;X.erin=3;X.clank=3;X.hour=2;X.lit=1;X.cloud=1;X.cores=[1,1,1,1];X.loosh=[1,1,1,1];const q=Q38();q.hcw=1;const st=stq();st.b2=st.b3=st.b4=1;st.hint=1;st.truth=1;q.dgold=[0,1,2,3,4,5,6];syncX();syncWorld();warpTo(0,10);}]);
 CX.push(['w_story','WORLD','The Long Way','Three relics are not enough. The portal also wants the Great Lantern lit, the Algorithm\'s three feeds cut (THE CLOUD, the Scroll Farm, the switch under King Bibi), and the truth, which only David has, and which he sells for gold.',()=>allRelics()]);
+/* ================= ACT 63: PLAYTEST FIXES. From the first-time bot's report: the quest list stays on screen and scrolls, the page itself can never scroll, Tab no longer moves focus onto HUD buttons, floating labels and speech bubbles sit under the HUD, toasts sit above menus, the title fits short windows, Esc closes the controls card, and the Filler explains itself the first time. ================= */
+(function(){const st=document.createElement('style');st.textContent='#quests{max-height:calc(100% - var(--gt) - 250px);overflow-y:auto;overscroll-behavior:contain;pointer-events:auto;scrollbar-width:thin;padding-right:2px}#quests::-webkit-scrollbar{width:5px}#quests::-webkit-scrollbar-thumb{background:rgba(255,255,255,.4);border-radius:3px}'
+  +'#stats,#right,#quests,#compass,#bossbar{z-index:3}#floats{position:absolute;inset:0;z-index:1;pointer-events:none}#toasts{z-index:25}'
+  +'.logo{font-size:clamp(46px,min(17vw,21vh),170px)}@media (max-height:720px){#title{gap:6px;justify-content:flex-start;padding-top:calc(var(--gt) + 4px)}#title .tag{font-size:12px}#title .menu button{padding-top:5px;padding-bottom:5px}}'
+  +'#ctlcard{overflow:auto}#ctlcard button:last-of-type{position:sticky;bottom:8px}';document.head.appendChild(st);})();
+// the page never scrolls, whatever gets focused
+addEventListener('scroll',()=>{if(scrollX||scrollY)scrollTo(0,0);},true);document.addEventListener('scroll',()=>{const d=document.scrollingElement;if(d&&(d.scrollTop||d.scrollLeft)){d.scrollTop=0;d.scrollLeft=0;}},true);
+// Tab is the pause key, not a focus key; HUD buttons do not keep keyboard focus (so Enter cannot press them again)
+addEventListener('keydown',e=>{if(e.code==='Tab'&&!(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)))e.preventDefault();},true);
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('#hud button');if(b&&!b.closest('#log,#shop,#menu,#dialog'))setTimeout(()=>b.blur(),0);},true);
+// Esc closes the controls card
+addEventListener('keydown',e=>{if(e.code!=='Escape')return;const c=$('ctlcard');if(!c)return;const bs=c.querySelectorAll('button');if(bs.length)bs[bs.length-1].click();});
+// the Filler explains itself, once
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(!play||!FIL.on)return;const q=Q38();if(q.filT)return;q.filT=1;save();
+  say([['sys','This is the Filler: the empty stretch the machine padded the map with. Nothing was generated out here.'],['sys','You can cross it, but not for long. The bar at the top is how long you have before it pads you out and sends you back to Prompt Plaza.'],['sys','Stay inside named places, or keep moving until you reach one.']]);};}
 // the Kiss or Slop contestants had a talk prompt and nothing behind it
 ['c1','c2','c3','c4','c5','c6'].forEach(k=>{if(npcs[k]&&typeof TALK[k]!=='function')TALK[k]=()=>say([[k,pick(BARK[k]||['...'])],[k,pick(['Are you the new bombshell? You have no face. The producers will love that.','I have been on this set for six seasons. It has been one afternoon.','If I get eliminated, I go back to the NPC Generator. Do not let them eliminate me.','My strategy is to be in every shot. Like you. You are in every shot.'])]]);});
 /* ================= main loop ================= */
