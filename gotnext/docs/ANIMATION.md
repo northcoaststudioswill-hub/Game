@@ -158,7 +158,30 @@ Now off the court there is one motion that blends walk, jog and sprint by real s
 
 The court passes all eight acceptance tests with the new stride settings.
 
-## 7. Not checked
+## 7. Street walk (v0.6.1)
+
+![Street walk on The Block, side on](img/street-walk.png)
+
+The default walk on The Block was a fast 3.3 m/s jog with high knees, so it read as stomping. Written animation
+references (no video was watched) agree on what reads as swagger:
+- a backward lean reads as confidence
+- a constant tilt to one side reads as cool (an alternating tilt reads as a limp)
+- hips lead and shoulders follow
+- low bounce, with the hip dropping on the swinging side
+- the arms drag: shoulder, then elbow, then wrist
+
+Changes (pose `loco` and the foot planner, only off the court and fading out above a jog):
+- Default speed is now a stroll, 1.85 m/s (sprint 6.2). Cadence is about 1.9 steps a second; it was about 3.
+- Steps take 30% longer to swing, ease in and out, and lift the foot about half as high.
+- The feet sit a little wider, with the toes turned out. Landings sink in softly instead of snapping.
+- The body leans back slightly and tilts constantly to one side. The chest rolls against the hips, and the head stays up
+  with a small nod on the beat.
+- The arms swing unevenly (right +25%, left −40%) and lag at the elbow and wrist.
+- People on The Block get a random amount of this (0.4–1.0), so they don't all walk the same.
+
+The court is unchanged: all eight acceptance tests still pass.
+
+## 8. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

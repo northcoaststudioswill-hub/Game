@@ -60,16 +60,16 @@ const PIT_DOOR_Z = -5.6; function pitDoorX(i) { return -6.75 + i * 4.5; }
 
 // walking around off the court: speed measured from actual movement drives the walk/jog/sprint blend, the hips and
 // shoulders, a lean into speeding up and slowing down, and the planted-feet layer
-function locoAnim(R, x, z, face, dt, vx, vz) {
+function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const L = R.loco || (R.loco = { x, z, vx: 0, vz: 0, lean: 0 });
   if (vx === undefined) { vx = (x - L.x) / Math.max(dt, 1e-3); vz = (z - L.z) / Math.max(dt, 1e-3); if (Math.hypot(x - L.x, z - L.z) > 1) vx = vz = 0; }
   const ax = (vx - L.vx) / Math.max(dt, 1e-3), az = (vz - L.vz) / Math.max(dt, 1e-3); L.x = x; L.z = z; L.vx = vx; L.vz = vz;
   const v = Math.hypot(vx, vz), fwdA = ax * Math.sin(face) + az * Math.cos(face);
   L.lean = lerp(L.lean, clamp(fwdA * 0.014, -0.18, 0.2), 1 - Math.exp(-8 * dt));
   let hipYaw = 0; if (v > 0.6) { let a = Math.atan2(vx, vz) - face; a = Math.atan2(Math.sin(a), Math.cos(a)); if (Math.abs(a) < 2.3) hipYaw = clamp(a, -0.5, 0.5) * Math.min(1, v / 2.5) * 0.6; }
-  applyPose(R, poseOf(v > 0.15 || (R.gait && (R.gait.ft.R.sw || R.gait.ft.L.sw)) ? 'loco' : 'idle', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw }), dt);
+  applyPose(R, poseOf(v > 0.15 || (R.gait && (R.gait.ft.R.sw || R.gait.ft.L.sw)) ? 'loco' : 'idle', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw, swag: swag === undefined ? 1 : swag }), dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;
-  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: v < 0.3 ? 0.22 : 0, want: 1, dt }); legIK(R, dt);
+  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: v < 0.3 ? 0.22 : 0, want: 1, dt, swag: swag === undefined ? 1 : swag }); legIK(R, dt);
 }
 function enterWorld(kind, sx, sz, face) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
@@ -284,7 +284,7 @@ function worldStep(dt) {
   if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
-  const sp = I.sprint ? 6.6 : 3.3;          // a jog around the block; sprint when you mean it
+  const sp = I.sprint ? 6.2 : 1.85;          // walk the block with some swagger; run when you need to be somewhere
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
@@ -303,7 +303,7 @@ function worldStep(dt) {
       if (l > 0.3) { n.x += dx / l * 1.1 * dt; n.z += dz / l * 1.1 * dt; n.face = lerpAng(n.face, Math.atan2(dx, dz), 0.1); an = 'loco'; if (n.spot) { n.spot.x = n.x; n.spot.z = n.z; } }
       else if (Math.hypot(me.x - n.x, me.z - n.z) < 5 && n.bum) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08);
     }
-    if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
+    if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt, undefined, undefined, n.swag === undefined ? (n.swag = 0.4 + RNG() * 0.6) : n.swag); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
     else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }

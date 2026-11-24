@@ -1118,15 +1118,22 @@ function poseOf(anim, t, o) {
       S_('hpR', -0.25 - Math.max(0, s) * 0.5, 0, -0.15); S_('knR', 0.4 + Math.max(0, s) * 0.8); S_('anR', Math.max(0, s) * 0.5); S_('hpL', -0.25 - Math.max(0, -s) * 0.5, 0, 0.15); S_('knL', 0.4 + Math.max(0, -s) * 0.8); S_('anL', Math.max(0, -s) * 0.5); p.rate = 20; break; }
     case 'warm': { const s = Math.sin(t * 2 + (o.ph || 0)); S_('shR', -1.25, 0, 0.15); S_('shL', -1.25, 0, -0.15); S_('elR', -0.5 + s * 0.08); S_('elL', -0.5 - s * 0.08); S_('wrR', 0.9); S_('wrL', 0.9); S_('spine', 0.1); S_('chest', 0.1); p.y = -0.03; legs(-0.15, 0.2, -0.15, 0.2); break; }
     case 'loco': {
-      // walking around: one motion that blends walk → jog → sprint by real speed (o.v, m/s); legs come from the IK layer
-      const v = o.v || 0, k = clamp((v - 1.4) / 4.6, 0, 1), still = clamp(v / 1.2, 0, 1), s = Math.sin(o.ph || 0), c = Math.cos(o.ph || 0);
-      const amp = (0.32 + 0.7 * k) * still;
-      S_('shR', s * amp, 0, -(0.07 + 0.06 * k)); S_('shL', -s * amp, 0, 0.07 + 0.06 * k);
-      S_('elR', -(0.18 + 1.25 * k) - Math.max(0, -s) * (0.15 + 0.3 * k) * still); S_('elL', -(0.18 + 1.25 * k) - Math.max(0, s) * (0.15 + 0.3 * k) * still);
-      S_('wrR', -0.12 - 0.15 * k); S_('wrL', -0.12 - 0.15 * k);
-      const lean = 0.03 + 0.24 * k * still, tw = s * (0.1 + 0.12 * k) * still;
-      S_('hips', 0, -tw * 0.7, 0); S_('spine', lean * 0.6); S_('chest', lean * 0.4, tw, 0); S_('neck', -lean * 0.9, -tw * 0.8, 0); S_('head', -0.02);
-      p.y = (-0.012 - 0.03 * k + 0.028 * Math.abs(c) * (0.5 + 0.5 * k)) * still;
+      // walking around: one motion that blends walk → jog → sprint by real speed (o.v, m/s); legs come from the IK layer.
+      // o.swag (0..1) turns the walk into a street walk: laid back with a slight constant side lean, shoulders that roll,
+      // a head that leads and nods on the beat, loose arms that drag (shoulder → elbow → wrist), low bounce, hips that drop
+      const v = o.v || 0, k = clamp((v - 1.4) / 4.6, 0, 1), still = clamp(v / 1.0, 0, 1), ph = o.ph || 0, s = Math.sin(ph), c = Math.cos(ph);
+      const sw = (o.swag || 0) * (1 - clamp((v - 2.6) / 1.6, 0, 1)) * still;            // swag fades out as he breaks into a run
+      const amp = (0.32 + 0.7 * k) * still * (1 - 0.35 * sw), lag1 = Math.sin(ph - 0.45 * sw), lag2 = Math.sin(ph - 0.9 * sw);
+      const armR = 1 + 0.25 * sw, armL = 1 - 0.4 * sw;                                    // one arm swings, the other mostly hangs
+      S_('shR', s * amp * armR, 0, -(0.07 + 0.06 * k) - 0.12 * sw); S_('shL', -s * amp * armL, 0, 0.07 + 0.06 * k + 0.1 * sw);
+      S_('elR', -(0.18 + 1.25 * k) - 0.2 * sw - Math.max(0, -lag1) * (0.15 + 0.3 * k + 0.25 * sw) * still); S_('elL', -(0.18 + 1.25 * k) - 0.3 * sw - Math.max(0, lag1) * (0.15 + 0.3 * k) * still);
+      S_('wrR', -0.12 - 0.15 * k - 0.25 * sw + lag2 * 0.3 * sw, 0, 0); S_('wrL', -0.12 - 0.15 * k - 0.35 * sw);
+      const lean = (0.03 + 0.24 * k) * still - 0.09 * sw, tw = s * (0.1 + 0.12 * k + 0.12 * sw) * still, nod = Math.max(0, Math.cos(2 * ph)) * 0.07 * sw;
+      S_('hips', 0, -tw * (0.7 + 0.4 * sw), s * 0.07 * sw);                              // hips turn more and drop on the swinging side
+      S_('spine', lean * 0.6, 0, -0.035 * sw);                                            // a little back, a little to one side, the whole time
+      S_('chest', lean * 0.4, tw, -s * 0.06 * sw);                                        // shoulders roll with the step
+      S_('neck', -lean * 0.9 - 0.06 * sw + nod, -tw * 0.8, 0.03 * sw); S_('head', -0.02 - 0.05 * sw);
+      p.y = (-0.012 - 0.03 * k + (0.028 * (1 - 0.6 * sw)) * Math.abs(c) * (0.5 + 0.5 * k)) * still;
       S_('hpR', -s * 0.5 * still); S_('hpL', s * 0.5 * still); S_('knR', 0.2 + 0.6 * Math.max(0, -c) * still); S_('knL', 0.2 + 0.6 * Math.max(0, c) * still);
       p.rate = 14; break;
     }
@@ -1302,7 +1309,7 @@ function gaitStep(R, c) {
   const dt = c.dt, v = Math.hypot(c.vx, c.vz), vn = clamp(v / 7, 0, 1);
   G.w += ((c.grounded ? c.want : 0) - G.w) * (1 - Math.exp(-16 * dt));
   const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), wide = c.wide || 0;
-  const home = (s, out) => { const lx = (s === 'R' ? -1 : 1) * (R.hipW + 0.045 + 0.15 * wide); return out.set(c.x + lx * cy, 0, c.z - lx * sy); };
+  const home = (s, out) => { const lx = (s === 'R' ? -1 : 1) * (R.hipW + 0.045 + 0.15 * wide + 0.035 * (G.sw || 0)); return out.set(c.x + lx * cy, 0, c.z - lx * sy); };
   if (!c.grounded) {                       // airborne: the pose owns the legs; remember where the feet are for the landing
     G.air = true; for (const s of ['R', 'L']) { const f = G.ft[s]; R.joints['an' + s].getWorldPosition(f.p); f.p.y = 0; f.sw = false; f.lift = 0; }
   } else {
@@ -1311,13 +1318,15 @@ function gaitStep(R, c) {
     // stride grows with speed; a foot lands a reachable distance ahead (never further than the leg can reach), and
     // the swing takes as long as a real one (~0.3 s), so a sprint gets a short flight phase instead of frantic steps
     const reach = 0.42 * (R.thigh + R.shin);
-    const thr = Math.min(0.85 * (R.thigh + R.shin), 0.08 + 0.12 * v * (1 - 0.55 * wide)), T = clamp(0.36 - 0.013 * v, 0.24, 0.36) * (1 - 0.35 * wide), lead = Math.min(T * 0.55, reach / Math.max(v, 0.01));
+    const sw = (c.swag || 0) * (1 - clamp((v - 2.6) / 1.6, 0, 1));    // the street walk: fewer, longer, lower, softer steps
+    const thr = Math.min(0.85 * (R.thigh + R.shin), 0.08 + 0.12 * v * (1 - 0.55 * wide) + 0.08 * sw * Math.min(1, v)), T = clamp(0.36 - 0.013 * v, 0.24, 0.36) * (1 - 0.35 * wide) * (1 + 0.3 * sw), lead = Math.min(T * 0.55, reach / Math.max(v, 0.01));
+    G.sw = sw;
     for (const s of ['R', 'L']) {
       const f = G.ft[s], o = G.ft[s === 'R' ? 'L' : 'R']; home(s, _g1);
       if (f.sw) {
         f.t += dt; const u = Math.min(1, f.t / f.T), rem = f.T * (1 - u) + lead;
         _g2.set(_g1.x + c.vx * rem, 0, _g1.z + c.vz * rem);
-        const e = u * u * (3 - 2 * u); f.p.set(lerp(f.a.x, _g2.x, e), 0, lerp(f.a.z, _g2.z, e)); f.lift = Math.sin(Math.PI * u) * (0.045 + 0.1 * vn);
+        const e = u * u * u * (u * (u * 6 - 15) + 10); f.p.set(lerp(f.a.x, _g2.x, e), 0, lerp(f.a.z, _g2.z, e)); f.lift = Math.sin(Math.PI * Math.pow(u, 0.8)) * (0.045 + 0.1 * vn) * (1 - 0.55 * (G.sw || 0));   /* glide the foot down, don't drop it */
         if (u >= 1) { f.sw = false; f.lift = 0; G.steps++; }
       } else {
         const ex = _g1.x + c.vx * lead - f.p.x, ez = _g1.z + c.vz * lead - f.p.z, err = Math.hypot(ex, ez);
@@ -1345,7 +1354,7 @@ function legIK(R, dt) {
   // so the legs never have to stretch past what they can reach and the planted foot stays put
   R.root.updateMatrixWorld(true); let need = 0;
   for (const s of ['R', 'L']) { const f = G.ft[s]; _g1.set(f.p.x, 0.04 + f.lift, f.p.z); hips.worldToLocal(_g1); _g1.sub(J['hp' + s].position); need = Math.max(need, _g1.length() - maxL); }
-  const tgt = clamp(need + 0.008, 0, 0.22); G.drop = tgt > G.drop ? tgt : G.drop + (tgt - G.drop) * (1 - Math.exp(-10 * dt));
+  const tgt = clamp(need + 0.008, 0, 0.22); G.drop += (tgt - G.drop) * (1 - Math.exp(-(tgt > G.drop ? (G.sw ? 18 : 60) : 10) * dt));
   const landDip = G.land > 0 ? Math.sin(Math.PI * (1 - G.land / 0.17)) * 0.075 : 0;        // soak up the landing
   hips.position.y -= (G.drop + landDip) * w; hips.updateMatrixWorld(true);
   // pass 2: two-bone IK for each leg, blended with the pose by the gait weight
@@ -1361,7 +1370,7 @@ function legIK(R, dt) {
     const h = hp.rotation, kn = J['kn' + s].rotation, an = J['an' + s].rotation;
     h.x = lerp(h.x, hx, w); h.y = lerp(h.y, 0, w); h.z = lerp(h.z, hz, w); kn.x = lerp(kn.x, k, w); kn.y = lerp(kn.y, 0, w); kn.z = lerp(kn.z, 0, w);
     const toe = f.sw ? 0.35 * Math.sin(Math.PI * Math.min(1, f.t / f.T)) : 0;              // toe-off during the swing, flat foot when planted
-    an.x = lerp(an.x, -(hips.rotation.x + hx + k) + toe, w);
+    an.x = lerp(an.x, -(hips.rotation.x + hx + k) + toe * (1 - 0.5 * (G.sw || 0)), w); an.y = lerp(an.y, (s === 'R' ? -1 : 1) * 0.16 * (G.sw || 0), w);
   }
 }
 function disposeScene(sc) {
@@ -2192,16 +2201,16 @@ const PIT_DOOR_Z = -5.6; function pitDoorX(i) { return -6.75 + i * 4.5; }
 
 // walking around off the court: speed measured from actual movement drives the walk/jog/sprint blend, the hips and
 // shoulders, a lean into speeding up and slowing down, and the planted-feet layer
-function locoAnim(R, x, z, face, dt, vx, vz) {
+function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const L = R.loco || (R.loco = { x, z, vx: 0, vz: 0, lean: 0 });
   if (vx === undefined) { vx = (x - L.x) / Math.max(dt, 1e-3); vz = (z - L.z) / Math.max(dt, 1e-3); if (Math.hypot(x - L.x, z - L.z) > 1) vx = vz = 0; }
   const ax = (vx - L.vx) / Math.max(dt, 1e-3), az = (vz - L.vz) / Math.max(dt, 1e-3); L.x = x; L.z = z; L.vx = vx; L.vz = vz;
   const v = Math.hypot(vx, vz), fwdA = ax * Math.sin(face) + az * Math.cos(face);
   L.lean = lerp(L.lean, clamp(fwdA * 0.014, -0.18, 0.2), 1 - Math.exp(-8 * dt));
   let hipYaw = 0; if (v > 0.6) { let a = Math.atan2(vx, vz) - face; a = Math.atan2(Math.sin(a), Math.cos(a)); if (Math.abs(a) < 2.3) hipYaw = clamp(a, -0.5, 0.5) * Math.min(1, v / 2.5) * 0.6; }
-  applyPose(R, poseOf(v > 0.15 || (R.gait && (R.gait.ft.R.sw || R.gait.ft.L.sw)) ? 'loco' : 'idle', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw }), dt);
+  applyPose(R, poseOf(v > 0.15 || (R.gait && (R.gait.ft.R.sw || R.gait.ft.L.sw)) ? 'loco' : 'idle', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw, swag: swag === undefined ? 1 : swag }), dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;
-  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: v < 0.3 ? 0.22 : 0, want: 1, dt }); legIK(R, dt);
+  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: v < 0.3 ? 0.22 : 0, want: 1, dt, swag: swag === undefined ? 1 : swag }); legIK(R, dt);
 }
 function enterWorld(kind, sx, sz, face) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
@@ -2416,7 +2425,7 @@ function worldStep(dt) {
   if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
-  const sp = I.sprint ? 6.6 : 3.3;          // a jog around the block; sprint when you mean it
+  const sp = I.sprint ? 6.2 : 1.85;          // walk the block with some swagger; run when you need to be somewhere
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
@@ -2435,7 +2444,7 @@ function worldStep(dt) {
       if (l > 0.3) { n.x += dx / l * 1.1 * dt; n.z += dz / l * 1.1 * dt; n.face = lerpAng(n.face, Math.atan2(dx, dz), 0.1); an = 'loco'; if (n.spot) { n.spot.x = n.x; n.spot.z = n.z; } }
       else if (Math.hypot(me.x - n.x, me.z - n.z) < 5 && n.bum) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08);
     }
-    if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
+    if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt, undefined, undefined, n.swag === undefined ? (n.swag = 0.4 + RNG() * 0.6) : n.swag); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
     else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }

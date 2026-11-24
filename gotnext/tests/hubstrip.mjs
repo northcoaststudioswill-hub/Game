@@ -9,10 +9,10 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
 const page = await ctx.newPage(); page.on('pageerror', e => console.log('ERR', e.message));
 await page.goto('file://' + file); await page.evaluate(() => window.__tick(60, 16.67));
 await page.click('#titleBtns .btn'); await page.evaluate(() => window.__tick(5, 16.67)); await page.click('#panel .pf .btn'); await page.evaluate(() => window.__tick(10, 16.67));
-await page.evaluate(() => { const P = __pit; P.uiClose && P.uiClose(); P.enterWorld('hub', -11, 0.5, Math.PI / 2); window.__tick(20, 16.67); const W = P.W; W.yaw = Math.PI / 2; for (const n of W.npcs) { n.rig.root.visible = false; if (n.ball) n.ball.visible = false; }   // camera looks along +x, so W walks the player toward +x
-  window.__camFn = cam => { const me = __pit.W.me; cam.position.set(me.x, 1.0, me.z + 4.0); if (cam.fov !== 40) { cam.fov = 40; cam.updateProjectionMatrix(); } return [me.x, 0.95, me.z]; }; });
+await page.evaluate(() => { const P = __pit; P.uiClose && P.uiClose(); P.enterWorld('hub', -11, 0.5, Math.PI / 2); window.__tick(20, 16.67); const W = P.W; W.yaw = Math.PI / 2; for (const n of W.npcs) { n.rig.root.visible = false; if (n.ball) n.ball.visible = false; } document.getElementById('toasts').style.display = 'none';   // camera looks along +x, so W walks the player toward +x
+  window.__camFn = cam => { const me = __pit.W.me; cam.position.set(me.x, 1.0, me.z + 4.6); if (cam.fov !== 40) { cam.fov = 40; cam.updateProjectionMatrix(); } return [me.x, 0.95, me.z]; }; });
 const shots = [];
-for (const [n, keys] of [[42, ['KeyW']], [36, ['KeyW', 'ShiftLeft']], [18, []]]) for (let i = 0; i < n; i++) {
+for (const [n, keys] of [[72, ['KeyW']], [24, ['KeyW', 'ShiftLeft']], [12, []]]) for (let i = 0; i < n; i++) {
   await page.evaluate(keys => { const K = __pit.keys; for (const k in K) K[k] = false; for (const k of keys) K[k] = true; __pit.W.yaw = Math.PI / 2; window.__tick(1, 16.67); }, keys);
   if (i % 3 === 0) shots.push(await page.screenshot());
 }
