@@ -139,7 +139,26 @@ is why the same code works on an online guest that only receives positions.
 | No travelling rules | Pivot-foot legality is not enforced | Track a pivot foot when the dribble is picked up |
 | People walking on The Block (not players) | Still use the simple leg cycle | Run the locomotion layer for them too (cost: phone performance) |
 
-## 6. Not checked
+## 6. Walking around The Block (v0.5.1)
+
+Off the court the walk and run looked bad, and filming them showed four causes:
+- The park reused the court's sprint pose at walking speed.
+- The arms froze whenever both feet were down.
+- Steps were far too short and fast: a sprint took about 7 steps a second, with feet aimed further ahead than a leg
+  can reach.
+- The people walking around had no planted feet at all.
+
+Now off the court there is one motion that blends walk, jog and sprint by real speed (pose `loco`):
+- The arm rhythm runs continuously at the measured step rate.
+- Strides lengthen with speed, feet land within reach, swings take a real ~0.3 s, and a sprint gets a short flight
+  phase. Cadence went from 7.5 to 4–5 steps a second at a sprint, which is about real.
+- The default speed on The Block is a jog (3.3 m/s), sprint 6.6.
+- Acceleration and braking work as on the court.
+- Everyone walking around The Block, and online players, now walk on planted feet.
+
+The court passes all eight acceptance tests with the new stride settings.
+
+## 7. Not checked
 
 - **Not seen in motion by a person.** Only scripted runs, frame metrics and filmstrips.
 - **Not checked with a real controller.** The controller path uses the same code as the simulated one.

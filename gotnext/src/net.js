@@ -156,8 +156,7 @@ function netWorldStep(dt) {
     const tx = clamp(pr.x, -60, 60), tz = clamp(pr.z, -60, 60), k = 1 - Math.exp(-9 * dt), ox = g.x, oz = g.z;
     g.x += (tx - g.x) * k; g.z += (tz - g.z) * k; g.f = lerpAng(g.f, +pr.f || 0, k);
     const v = Math.hypot(g.x - ox, g.z - oz) / Math.max(dt, 0.001); g.ph += dt * (4 + v * 1.6);
-    applyPose(g.rig, poseOf(v > 0.5 ? 'run' : 'idle', v > 0.5 ? 0 : W.t, { sp: v / 8, ph: g.rig.gait ? g.rig.gait.ph : g.ph }), dt); g.rig.root.position.set(g.x, 0, g.z); g.rig.root.rotation.y = g.f;
-    gaitStep(g.rig, { x: g.x, z: g.z, yaw: g.f, vx: (g.x - ox) / Math.max(dt, 0.001), vz: (g.z - oz) / Math.max(dt, 0.001), grounded: true, wide: 0, want: 1, dt }); legIK(g.rig, dt);
+    locoAnim(g.rig, g.x, g.z, g.f, dt);
   }
   for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); delete rigs[k]; }
 }

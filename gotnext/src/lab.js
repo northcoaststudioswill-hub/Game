@@ -6,8 +6,10 @@ const LS = 'gotnext-lab-v1';
 const POSES = [
   // [id, label, group, fn(t) -> [anim, time, opts, extra]]  extra: { y: height off the floor, ball: 'hand'|'drib'|'chest'|null, yaw }
   ['idle', 'Idle', 'Stance', t => ['idle', t, {}, { ball: 'hip' }]],
-  ['jog', 'Jog', 'Stance', t => ['run', 0, { sp: 0.45, ph: t * 6 }, {}]],
-  ['run', 'Sprint', 'Stance', t => ['run', 0, { sp: 1, ph: t * 9 }, { y: 0.03 * Math.abs(Math.sin(t * 9)) }]],
+  ['walk', 'Walk (park)', 'Stance', t => ['loco', 0, { v: 1.5, ph: t * 6 }, {}]],
+  ['jog', 'Jog (park)', 'Stance', t => ['loco', 0, { v: 3.3, ph: t * 8 }, {}]],
+  ['run', 'Sprint (park)', 'Stance', t => ['loco', 0, { v: 6.6, ph: t * 9.5 }, { y: 0.03 * Math.abs(Math.sin(t * 9.5)) }]],
+  ['courtrun', 'Run (court)', 'Stance', t => ['run', 0, { sp: 1, ph: t * 9 }, { y: 0.03 * Math.abs(Math.sin(t * 9)) }]],
   ['slide', 'Defense slide', 'Defense', t => ['slide', 0, { ph: t * 7 }, {}]],
   ['contest', 'Contest', 'Defense', t => ['slide', 0, { ph: t * 7, up: true }, {}]],
   ['steal', 'Steal reach', 'Defense', t => ['steal', (t % 0.6) * 0.6, {}, {}]],

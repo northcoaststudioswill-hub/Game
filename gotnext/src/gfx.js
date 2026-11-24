@@ -296,6 +296,19 @@ function poseOf(anim, t, o) {
       S_('shR', -1.2 - c * 0.9, 0, -0.5 + s * 0.3); S_('elR', -1.3 + s * 0.5); S_('wrR', s2 * 0.6); S_('shL', -1.2 + c * 0.9, 0, 0.5 + s * 0.3); S_('elL', -1.3 - s * 0.5); S_('wrL', -s2 * 0.6);
       S_('hpR', -0.25 - Math.max(0, s) * 0.5, 0, -0.15); S_('knR', 0.4 + Math.max(0, s) * 0.8); S_('anR', Math.max(0, s) * 0.5); S_('hpL', -0.25 - Math.max(0, -s) * 0.5, 0, 0.15); S_('knL', 0.4 + Math.max(0, -s) * 0.8); S_('anL', Math.max(0, -s) * 0.5); p.rate = 20; break; }
     case 'warm': { const s = Math.sin(t * 2 + (o.ph || 0)); S_('shR', -1.25, 0, 0.15); S_('shL', -1.25, 0, -0.15); S_('elR', -0.5 + s * 0.08); S_('elL', -0.5 - s * 0.08); S_('wrR', 0.9); S_('wrL', 0.9); S_('spine', 0.1); S_('chest', 0.1); p.y = -0.03; legs(-0.15, 0.2, -0.15, 0.2); break; }
+    case 'loco': {
+      // walking around: one motion that blends walk → jog → sprint by real speed (o.v, m/s); legs come from the IK layer
+      const v = o.v || 0, k = clamp((v - 1.4) / 4.6, 0, 1), still = clamp(v / 1.2, 0, 1), s = Math.sin(o.ph || 0), c = Math.cos(o.ph || 0);
+      const amp = (0.32 + 0.7 * k) * still;
+      S_('shR', s * amp, 0, -(0.07 + 0.06 * k)); S_('shL', -s * amp, 0, 0.07 + 0.06 * k);
+      S_('elR', -(0.18 + 1.25 * k) - Math.max(0, -s) * (0.15 + 0.3 * k) * still); S_('elL', -(0.18 + 1.25 * k) - Math.max(0, s) * (0.15 + 0.3 * k) * still);
+      S_('wrR', -0.12 - 0.15 * k); S_('wrL', -0.12 - 0.15 * k);
+      const lean = 0.03 + 0.24 * k * still, tw = s * (0.1 + 0.12 * k) * still;
+      S_('hips', 0, -tw * 0.7, 0); S_('spine', lean * 0.6); S_('chest', lean * 0.4, tw, 0); S_('neck', -lean * 0.9, -tw * 0.8, 0); S_('head', -0.02);
+      p.y = (-0.012 - 0.03 * k + 0.028 * Math.abs(c) * (0.5 + 0.5 * k)) * still;
+      S_('hpR', -s * 0.5 * still); S_('hpL', s * 0.5 * still); S_('knR', 0.2 + 0.6 * Math.max(0, -c) * still); S_('knL', 0.2 + 0.6 * Math.max(0, c) * still);
+      p.rate = 14; break;
+    }
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
   // layered on top of every pose: eyes on the ball, lean into the turn
@@ -474,7 +487,10 @@ function gaitStep(R, c) {
   } else {
     if (G.air) { G.air = false; G.land = 0.17; }
     // a wide, low stance (defense) takes short quick steps instead of long strides
-    const thr = 0.08 + 0.1 * v * (1 - 0.55 * wide), T = clamp(0.3 - 0.024 * v, 0.13, 0.3) * (1 - 0.3 * wide), lead = T * 0.55;
+    // stride grows with speed; a foot lands a reachable distance ahead (never further than the leg can reach), and
+    // the swing takes as long as a real one (~0.3 s), so a sprint gets a short flight phase instead of frantic steps
+    const reach = 0.42 * (R.thigh + R.shin);
+    const thr = Math.min(0.85 * (R.thigh + R.shin), 0.08 + 0.12 * v * (1 - 0.55 * wide)), T = clamp(0.36 - 0.013 * v, 0.24, 0.36) * (1 - 0.35 * wide), lead = Math.min(T * 0.55, reach / Math.max(v, 0.01));
     for (const s of ['R', 'L']) {
       const f = G.ft[s], o = G.ft[s === 'R' ? 'L' : 'R']; home(s, _g1);
       if (f.sw) {
@@ -485,12 +501,18 @@ function gaitStep(R, c) {
       } else {
         const ex = _g1.x + c.vx * lead - f.p.x, ez = _g1.z + c.vz * lead - f.p.z, err = Math.hypot(ex, ez);
         if (err > 1.8) f.p.copy(_g1);
-        else if ((err > thr || f.over > 0.015) && (!o.sw || o.t > o.T * 0.6 || err > thr * 1.8 || f.over > 0.06)) { f.sw = true; f.t = 0; f.T = T; f.a.copy(f.p); f.over = 0; }     // also step when the leg can no longer reach it
+        else if ((err > thr || f.over > 0.015) && (!o.sw || o.t > o.T * 0.6 || err > thr * 1.8 || f.over > 0.06)) { f.sw = true; f.off = true; f.t = 0; f.T = T; f.a.copy(f.p); f.over = 0; }     // also step when the leg can no longer reach it
       }
     }
   }
-  const fr = G.ft.R, fl = G.ft.L;            // a phase for the arms: right foot swinging 0..π, left π..2π
-  if (fr.sw) G.ph = Math.PI * fr.t / fr.T; else if (fl.sw) G.ph = Math.PI + Math.PI * fl.t / fl.T;
+  // a continuous phase for the arms and trunk (right foot swinging = 0..π, left = π..2π). It runs at the measured
+  // step rate and is nudged toward the swinging foot, so the arms never freeze while both feet are down
+  const fr = G.ft.R, fl = G.ft.L; G.clock = (G.clock || 0) + dt;
+  for (const s of ['R', 'L']) { const f = G.ft[s]; if (f.off) { f.off = false; if (G.lastOff) G.rate = lerp(G.rate || 0, Math.PI / clamp(G.clock - G.lastOff, 0.12, 0.8), 0.5); G.lastOff = G.clock; } }
+  if (v < 0.25 && !fr.sw && !fl.sw) G.rate = (G.rate || 0) * Math.exp(-4 * dt);
+  G.ph = (G.ph || 0) + (G.rate || 0) * dt;
+  const want = fr.sw ? Math.PI * fr.t / fr.T : fl.sw ? Math.PI + Math.PI * fl.t / fl.T : null;
+  if (want !== null) { let e = want - G.ph; e = Math.atan2(Math.sin(e), Math.cos(e)); G.ph += e * Math.min(1, 10 * dt); }
   if (G.land > 0) G.land -= dt;
   return G;
 }

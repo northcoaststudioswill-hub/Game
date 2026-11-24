@@ -58,6 +58,19 @@ function stringLights(x0, z0, x1, z1, y, n) {
 function shoeProp(col, sole, x, y, z, ry, parent) { const g = grp(parent || scene, x, y, z); g.rotation.y = ry || 0; ink(M(box(0.13, 0.11, 0.34), toon(col), 0, 0.07, 0, g), 1.12); M(box(0.14, 0.035, 0.36), toon(sole), 0, 0.015, 0, g); M(box(0.125, 0.1, 0.12), toon(col), 0, 0.15, -0.1, g); return g; }
 const PIT_DOOR_Z = -5.6; function pitDoorX(i) { return -6.75 + i * 4.5; }
 
+// walking around off the court: speed measured from actual movement drives the walk/jog/sprint blend, the hips and
+// shoulders, a lean into speeding up and slowing down, and the planted-feet layer
+function locoAnim(R, x, z, face, dt, vx, vz) {
+  const L = R.loco || (R.loco = { x, z, vx: 0, vz: 0, lean: 0 });
+  if (vx === undefined) { vx = (x - L.x) / Math.max(dt, 1e-3); vz = (z - L.z) / Math.max(dt, 1e-3); if (Math.hypot(x - L.x, z - L.z) > 1) vx = vz = 0; }
+  const ax = (vx - L.vx) / Math.max(dt, 1e-3), az = (vz - L.vz) / Math.max(dt, 1e-3); L.x = x; L.z = z; L.vx = vx; L.vz = vz;
+  const v = Math.hypot(vx, vz), fwdA = ax * Math.sin(face) + az * Math.cos(face);
+  L.lean = lerp(L.lean, clamp(fwdA * 0.014, -0.18, 0.2), 1 - Math.exp(-8 * dt));
+  let hipYaw = 0; if (v > 0.6) { let a = Math.atan2(vx, vz) - face; a = Math.atan2(Math.sin(a), Math.cos(a)); if (Math.abs(a) < 2.3) hipYaw = clamp(a, -0.5, 0.5) * Math.min(1, v / 2.5) * 0.6; }
+  applyPose(R, poseOf(v > 0.15 || (R.gait && (R.gait.ft.R.sw || R.gait.ft.L.sw)) ? 'loco' : 'idle', W.t, { v, ph: R.gait ? R.gait.ph : 0, leanF: L.lean, hipYaw }), dt);
+  R.root.position.set(x, 0, z); R.root.rotation.y = face;
+  gaitStep(R, { x, z, yaw: face, vx, vz, grounded: true, wide: v < 0.3 ? 0.22 : 0, want: 1, dt }); legIK(R, dt);
+}
 function enterWorld(kind, sx, sz, face) {
   disposeScene(scene); scene = new THREE.Scene(); MT = null; hudShow(false);
   W = { kind, me: { x: sx || 0, z: sz || 0, face: face === undefined ? Math.PI : face, vx: 0, vz: 0, rig: null, ph: 0 }, yaw: face === undefined ? Math.PI : face, npcs: [], spots: [], solids: [], cars: [], near: null, t: 0, bounds: [-30, 30, -30, 30] };
@@ -259,26 +272,27 @@ function worldStep(dt) {
   if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
-  const sp = I.sprint ? 7.2 : 4.4;
-  const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp;
-  me.vx += (tvx - me.vx) * Math.min(1, 12 * dt); me.vz += (tvz - me.vz) * Math.min(1, 12 * dt);
+  const sp = I.sprint ? 6.6 : 3.3;          // a jog around the block; sprint when you mean it
+  const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
+  const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
+  if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
   let nx = me.x + me.vx * dt, nz = me.z + me.vz * dt;
   for (const s of W.solids) { if (nx > s[0] && nx < s[1] && nz > s[2] && nz < s[3]) { const px = Math.min(nx - s[0], s[1] - nx), pz = Math.min(nz - s[2], s[3] - nz); if (px < pz) nx = nx - s[0] < s[1] - nx ? s[0] : s[1]; else nz = nz - s[2] < s[3] - nz ? s[2] : s[3]; } }
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
-  const R = me.rig; applyPose(R, poseOf(v > 0.5 ? 'run' : 'idle', v > 0.5 ? 0 : W.t, { sp: v / 8, ph: R.gait ? R.gait.ph : me.ph }), dt); R.root.position.set(me.x, 0, me.z); R.root.rotation.y = me.face; R.capeSwing = v / 8;
-  gaitStep(R, { x: me.x, z: me.z, yaw: me.face, vx: me.vx, vz: me.vz, grounded: true, wide: v < 0.3 ? 0.25 : 0, want: 1, dt }); legIK(R, dt);
+  const R = me.rig; locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
   for (const n of W.npcs) {
     let an = n.anim === 'ball' ? 'dribble' : n.anim, o = { ph: n.ph, leg: n.rig.legLen, sp: 0, dr: Math.abs(Math.sin(W.t * 7 + n.ph)) };
     if (n.wander && !(n.bum && W.talk === n)) {
       n.wt -= dt; if (n.wt <= 0) { n.wt = rnd(3, 9); const rg = n.range || 2.5; n.tx = n.hx + rnd(-rg, rg); n.tz = n.hz + rnd(-rg, rg); }
       const dx = n.tx - n.x, dz = n.tz - n.z, l = Math.hypot(dx, dz);
-      if (l > 0.3) { n.x += dx / l * 1.1 * dt; n.z += dz / l * 1.1 * dt; n.face = lerpAng(n.face, Math.atan2(dx, dz), 0.1); n.ph += dt * 5.5; an = 'walk'; o = { sp: 0.12, ph: n.ph }; if (n.spot) { n.spot.x = n.x; n.spot.z = n.z; } }
+      if (l > 0.3) { n.x += dx / l * 1.1 * dt; n.z += dz / l * 1.1 * dt; n.face = lerpAng(n.face, Math.atan2(dx, dz), 0.1); an = 'loco'; if (n.spot) { n.spot.x = n.x; n.spot.z = n.z; } }
       else if (Math.hypot(me.x - n.x, me.z - n.z) < 5 && n.bum) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08);
     }
-    n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt);
+    if (an === 'loco' || (n.wander && an === n.anim && (an === 'idle' || an === 'beg'))) { if (an === 'loco') locoAnim(n.rig, n.x, n.z, n.face, dt); else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); gaitStep(n.rig, { x: n.x, z: n.z, yaw: n.face, vx: 0, vz: 0, grounded: true, wide: 0.2, want: 1, dt }); legIK(n.rig, dt); } }
+    else { n.rig.root.position.set(n.x, n.yFix || 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, poseOf(an, W.t, o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }
   for (const c of W.cars) { c.a += c.s * dt; c.c.position.set(Math.cos(c.a) * c.r, c.y, Math.sin(c.a) * c.r); c.c.rotation.y = -c.a + (c.s > 0 ? -Math.PI / 2 : Math.PI / 2); }
