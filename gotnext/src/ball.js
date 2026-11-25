@@ -816,6 +816,8 @@ function aiThink(p, dt) {
           if (a.viaT > 0) { a.viaT = 0; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } }
         { const us = mates.find(q => q.user && q.screen && dist(q, p) < 4.5); if (us && a.usedScr !== us && Math.random() < 0.7) { a.usedScr = us; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } if (!us) a.usedScr = null; }      /* you set him a screen: he comes off it */
         if (o && od < 1.9 && o.st === 'steal' && p.reachBy === o && a.reachSeen !== p.reachAt && d > 2.6 && Math.random() < 0.35 + L * 0.55) { a.reachSeen = p.reachAt; a.mode = 'drive'; aiGo(p, 0, 0.6, true); p.sprWas = false; a.tick = 0.5; return; }      /* he reached and came up empty: go right now, past the hand he threw */
+        // nothing there and the dribble is dying: swing it. Holding it longer against a set defender is how possessions die
+        if (a.hold > 1.6 && !open && !MT.arcade && Math.random() < 0.35 + L * 0.35 && tryPass(q => nearestOpp(q)[1] > 1.1 && q !== p.catchFrom)) return;
         const caller = mates.find(q => q.callT > 0);
         if (caller && passLane(p, caller) && Math.random() < 0.9) { doPass(p, caller); return; }
         if (!MT.arcade && p.live === 'drib' && d < 6.2 && d > 3.2 && o && od < 1.7 && nAtt(p, 'str') - nAtt(o, 'str') > 0.1 && p.H - o.H > 0.03 && Math.random() < 0.3 + L * 0.3) { a.postT = 2.6; floatTxt(p, 'POSTING UP', '#f2c14e'); return; }      /* a mismatch: take him down low */
@@ -1301,7 +1303,7 @@ function ballHeld(p, dt) {
   } else if (D.ph === 'hand') {
     // the hand rides the ball down, then lets go
     // receive (the hand gives with the ball as it rises), then push it back down
-    const Th = Tc * 0.36, u = Math.min(1, D.t / Th); p.dribH = u < 0.35 ? 0.88 + 0.12 * (u / 0.35) : 1 - 0.8 * ((u - 0.35) / 0.65);
+    const Th = Tc * 0.27, u = Math.min(1, D.t / Th);      /* the hand is on the ball a beat, not a third of every bounce (it read as carrying) */ p.dribH = u < 0.35 ? 0.88 + 0.12 * (u / 0.35) : 1 - 0.8 * ((u - 0.35) / 0.65);
     palm(p, D.hand, _bp); ballFollow(B, _bp, dt, true);
     if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = '';
       const want = p.st === 'free' && !p.post ? autoHand(p) : null;      /* switch hands with a quick crossover dribble in front of the body */

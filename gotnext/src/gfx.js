@@ -343,9 +343,11 @@ function poseOf(anim, t, o) {
       S_('shR', s * amp * 0.85, 0, -0.12); S_('shL', -s * amp * 0.85, 0, 0.12); S_('elR', -0.5 - a * 1.0 - Math.max(0, -s) * 0.3); S_('elL', -0.5 - a * 1.0 - Math.max(0, s) * 0.3); S_('wrR', -0.15); S_('wrL', -0.15);
       if (anim === 'dribble') {
         const d = o.dr || 0, hand = o.hand === 'L' ? 'L' : 'R', sg = hand === 'R' ? -1 : 1, off = hand === 'R' ? 'L' : 'R';
-        p.y -= 0.08; S_('spine', 0.2 + a * 0.1); S_('chest', 0.1, s * 0.12 * amp + sg * -0.12, 0); S_('neck', -0.28, 0, 0); p.knR[0] += 0.28; p.knL[0] += 0.28; p.hpR[0] -= 0.24; p.hpL[0] -= 0.24;
-        S_('sh' + hand, -0.5 - d * 0.22, 0, sg * 0.28); S_('el' + hand, -0.55 - d * 0.75); S_('wr' + hand, 0.5 - d * 1.0);     // the wrist snaps the ball down
-        S_('sh' + off, -0.35, 0, -sg * 0.55); S_('el' + off, -1.25); S_('wr' + off, -0.3); p.rate = 22;                     // off arm up, shielding
+        // a dribbling stance, not a man standing over a ball: standing still the hips sit back and the knees bend (less on the run, where the stride does it)
+        const low = 1 - a * 0.6; p.y -= 0.08 + 0.1 * low; S_('spine', 0.2 + a * 0.1 + 0.1 * low); S_('chest', 0.1, s * 0.12 * amp + sg * -0.12, 0); S_('neck', -0.28 - 0.1 * low, 0, 0);
+        p.knR[0] += 0.28 + 0.3 * low; p.knL[0] += 0.28 + 0.3 * low; p.hpR[0] -= 0.24 + 0.24 * low; p.hpL[0] -= 0.24 + 0.24 * low; p.hpR[2] -= 0.06 * low; p.hpL[2] += 0.06 * low;
+        S_('sh' + hand, -0.5 - d * 0.22, 0, sg * 0.24); S_('el' + hand, -0.55 - d * 0.75); S_('wr' + hand, 0.5 - d * 1.0);     // the wrist snaps the ball down
+        S_('sh' + off, -0.8, 0, sg * 0.12); S_('el' + off, -1.4); S_('wr' + off, -0.2); p.rate = 22;                     // off arm bent across in front, shielding the ball
       }
       if (anim === 'slide') { const up = o.up ? 1 : 0; p.y = -0.16; S_('hips', 0.05, 0, 0); legs(-0.6 - s * 0.16, 1.0, -0.6 + s * 0.16, 1.0, 0.36); S_('spine', 0.14); S_('chest', 0.1); S_('neck', -0.22);
         S_('shR', up ? -2.9 : -0.35, 0, up ? -0.15 : -1.05); S_('shL', -0.35, 0, 1.05); S_('elR', up ? -0.2 : -0.45); S_('elL', -0.55); S_('wrR', up ? 0.3 : -0.4); S_('wrL', -0.4); }
