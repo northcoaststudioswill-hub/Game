@@ -482,7 +482,7 @@ function startSteal(p) {
     return;
   }
   // the handler sees the reach coming (Handles, and Non-Disclosure): the ball goes to the far hand and the swipe finds less of it
-  if (h && h.team !== p.team && dist(h, p) < 2.2 && h.st === 'free' && !MT.arcade) { h.reachBy = p; h.reachAt = now; h.reachSaw = Math.random() < 0.2 + nAtt(h, 'handle') * 0.6 + 0.07 * bt(h, 'nda') - (h.sprinting ? 0.15 : 0); }
+  if (h && h.team !== p.team && dist(h, p) < 2.2 && h.st === 'free' && !MT.arcade) { h.reachBy = p; h.reachAt = now; h.reachSaw = Math.random() < 0.12 + nAtt(h, 'handle') * 0.5 + 0.07 * bt(h, 'nda') - (h.sprinting ? 0.15 : 0); }
   if (MT.arcade) {   // RUCKUS: shove; hold LT for a haymaker; at a sprint it is a clothesline (AI throws the odd punch too)
     const kind = p.sprinting && Math.hypot(p.vx, p.vz) > 3.6 ? 'clothes' : (p.ltHeld || (!p.user && Math.random() < 0.22)) ? 'punch' : 'shove';
     if (kind !== 'shove') { startHit(p, kind); return; }
@@ -510,7 +510,7 @@ function stealChance(p, h) {
   if (dB > dH + 0.1) ch *= 0.5;                                                   /* the ball is on his far side: protected */
   if (h.drib && (h.drib.ph === 'down' || h.drib.ph === 'up') && B.pos.y < 0.7 && reach < 0.7) ch *= 1.2;
   if (h.protect) ch *= 0.75;
-  if (h.reachSaw && h.reachBy === p && MT.time - h.reachAt < 0.9) ch *= 0.62;      /* he saw it and pulled the ball across */
+  if (h.reachSaw && h.reachBy === p && MT.time - h.reachAt < 0.9) ch *= 0.74;      /* he saw it and pulled the ball across */
   if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
   ch *= (1 + px(p, 'steal')) * (1 - px(h, 'secure')) * (MT.stops && MT.stops[p.team] >= 3 ? 1.1 : 1);
   return { ch: clamp(ch, 0.01, 0.6), reach };

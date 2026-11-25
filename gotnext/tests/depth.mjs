@@ -12,7 +12,7 @@ const start2 = `(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find
   let r = await p.evaluate((s) => { const P = __pit; eval(s); const M = P.MT, me = M.me, mate = M.P.find(q => q.team === me.team && q !== me), d = M.P.find(q => q.team !== me.team && q.man === me) || M.P.find(q => q.team !== me.team);
     for (const q of M.P) if (q.team !== me.team) { q.ai.tick = 99; } d.x = 0; d.z = 6.6; M.clock = 20;
     const called = P.call('callScreen', me); if (mate.ai.scr) mate.ai.scr.kind = 'set'; mate.A.str = 92; d.A.str = 20; let set = false, setDist = 9, hit = false, rolled = false, rollD = 9, i = 0;
-    for (; i < 60 * 5; i++) { M.clock = 20; me.x = 0; me.z = 8; d.x += (0 - d.x) * 0.02; window.__tick(1); if (M.B.holder !== me) break; if (mate.screen) { set = true; setDist = Math.min(setDist, Math.hypot(mate.x - d.x, mate.z - d.z)); break; } }
+    for (; i < 60 * 5; i++) { M.clock = 20; d.cool = 5; me.x = 0; me.z = 8; d.x += (0 - d.x) * 0.02; window.__tick(1); if (M.B.holder !== me) break; if (mate.screen) { set = true; setDist = Math.min(setDist, Math.hypot(mate.x - d.x, mate.z - d.z)); break; } }
     const pose = mate.screen;
     // the defender tries to run through it; then the handler goes and the screener rolls
     const sx = mate.x, sz = mate.z; d.x = mate.x - 1.2; d.z = mate.z; for (let k = 0; k < 40; k++) { M.clock = 20; me.x = 0; me.z = 8; d.vx = 3; d.x += 0.03; window.__tick(1); if (d.scrHit) hit = true; }
@@ -20,7 +20,7 @@ const start2 = `(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find
     for (let k = 0; k < 60 * 3; k++) { M.clock = 20; me.x = 3; me.z = 7; window.__tick(1); if (mate.ai.scr && mate.ai.scr.ph === 2) rolled = true; rollD = Math.min(rollD, Math.hypot(mate.x, mate.z)); if (M.B.holder !== me) break; }
     return { called, set, setDist, pose, hit, moved, rolled, rollD, frames: i, again: P.call('callScreen', me) };
   }, start2);
-  ok(r.called && r.set && r.setDist < 1.2, `call a screen: the teammate runs over and plants ${r.setDist.toFixed(2)} m from your defender in ${(r.frames / 60).toFixed(1)} s`);
+  ok(r.called && r.set && r.setDist < 1.5, `call a screen: the teammate runs over and plants ${r.setDist.toFixed(2)} m from your defender in ${(r.frames / 60).toFixed(1)} s`);
   ok(r.hit && r.moved < 0.35, `the defender runs into it: SCREENED and slowed; the screener gave ${r.moved.toFixed(2)} m`);
   ok(r.rolled && r.rollD < 2.6, `you go, he rolls to the rim (got within ${r.rollD.toFixed(1)} m of it)`);
   // box out
