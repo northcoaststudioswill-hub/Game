@@ -93,7 +93,7 @@ function makeRig(spec, lowDetail) {
   out(M(tgLo, toon(top.c), 0, loH / 2, 0, spine), 1.06);
   const chestJ = grp(spine, 0, loH, 0); out(M(tgUp, toon(top.c), 0, upH / 2, 0, chestJ), 1.06);
   M(cyl(0.118 * wS, 0.118 * wS, 0.03, 10), toon(top.c2 || top.c), 0, 0.03, 0, spine).scale.z = 0.62;       // hem
-  if (top.kind === 'jersey') { const st = M(box(shW * 1.5, 0.05, 0.02), toon(top.c2), 0, upH * 0.3, 0.105 * wS, chestJ); st.rotation.x = -0.12; }
+  if (top.kind === 'jersey') { const st = M(geo('jstripe' + shW.toFixed(3) + midR.toFixed(3), () => { const r = lerp(midR, shW * 0.98, 0.3) + 0.004, g = new THREE.CylinderGeometry(r, r, 0.05, 14, 1, true, -1.0, 2.0); g.scale(1, 1, 0.585); return g; }), toon(top.c2), 0, upH * 0.3, 0, chestJ); st.material.side = THREE.DoubleSide; }      /* the stripe wraps the chest instead of a flat bar floating off it */
   // a number on the back (and a small one on the chest) of jerseys, tees and tanks: the same number every time for the same name
   if (!lowDetail && (top.kind === 'jersey' || top.kind === 'tee' || top.kind === 'tank') && spec.name) {
     let hsh = 0; for (const ch of String(spec.name)) hsh = (hsh * 31 + ch.charCodeAt(0)) >>> 0; const num = String(hsh % 100), lum = c => { const v = new THREE.Color(c); return v.r * 0.3 + v.g * 0.59 + v.b * 0.11; }, ink0 = top.kind === 'jersey' && top.c2 ? top.c2 : (lum(top.c) > 0.45 ? '#16181c' : '#f4f1ea');
@@ -173,9 +173,11 @@ function makeRig(spec, lowDetail) {
   const arm = D('arm');
   for (const side of ['R', 'L']) {
     const sx = side === 'R' ? -1 : 1;
-    const sh = grp(chest, sx * (shW + 0.015), -0.035, 0);
-    out(M(capsule(0.043 * lW, up), skin, 0, -up / 2 + 0.03, 0, sh), 1.12);
-    M(sph(0.055 * lW), top.kind === 'tank' ? skin : toon(top.c), 0, 0, 0, sh);
+    // the shoulder joint sits inside the edge of the chest, a little below its top: the arm comes out of the body instead of
+    // hanging off a ball stuck on the outside of it (which read as shoulders popping out of every shirt)
+    const sh = grp(chest, sx * shW * 0.86, -0.065, 0);
+    out(M(capsule(0.043 * lW, up), skin, 0, -up / 2 + 0.004, 0, sh), 1.12);
+    M(sph(0.05 * lW), top.kind === 'tank' ? skin : toon(top.c), 0, -0.004, 0, sh).scale.set(1, 0.92, 0.9);
     if (top.kind === 'tee' || top.kind === 'jersey') M(capsule(0.052 * lW, up * (top.kind === 'tee' ? 0.55 : 0.3)), toon(top.c), 0, -up * 0.16, 0, sh);
     const el = grp(sh, 0, -up + 0.03, 0);
     out(M(capsule(0.036 * lW, fore), skin, 0, -fore / 2 + 0.02, 0, el), 1.13);
