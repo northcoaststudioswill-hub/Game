@@ -148,7 +148,7 @@ function dbgDraw(dt) {
 function frame(now) {
   requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
   pollInput(); netPollRemote();
-  if (uiBusy()) uiStep(dt); padHint();
+  if (uiBusy()) uiStep(dt); padHint(); keysHint();
   if (MT) {
     if (!UI.cur && (IN[0].start || IN[1].start)) { uiPause(); clearEdges(); }
     else {

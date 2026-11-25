@@ -51,7 +51,7 @@ function padHint() {
   let t = '';
   if (UI.cur) t = 'Ⓐ SELECT · Ⓑ BACK · STICK / D-PAD MOVE' + ($('panel').querySelector('.tabs') ? ' · LB RB TABS' : '') + ' · ←→ ON A SLIDER OR LIST';
   else if (typeof BLD !== 'undefined' && BLD.on && W && W.build) t = (W.build.sel ? 'Ⓐ PLACE · Ⓧ ROTATE · ' + (W.build.pick ? 'Ⓨ STORE · LT SELL · ' : '') + 'Ⓑ PUT BACK' : 'Ⓐ PICK UP · Ⓑ DONE') + '<br>D-PAD ←→ CATALOG · LB RB CATEGORY · D-PAD ↑ LOOK · ↓ SETS · R3 TURN VIEW · STICK MOVE (RT FAST)';
-  else if (MT) t = '';
+  else if (MT) t = '';      /* in a game the controls strip (#keys) does it, with the real buttons */
   else if (W) t = 'Ⓐ INTERACT · START MY PLAYER · RT RUN' + ((W.kind === 'crib' || W.kind === 'room') && !W.visit ? ' · Ⓨ BUILD' : '');
   else if ($('title').style.display === 'flex') t = 'Ⓐ SELECT · D-PAD MOVE';
   if (el._t !== t) { el._t = t; el.innerHTML = t; } el.style.display = t ? 'block' : 'none';
@@ -117,7 +117,25 @@ function uiHud() {
   const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
   $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
   const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = (on ? `<b>${on}</b> online with you` : 'online · nobody else here') + (NET.crew ? ` · crew of <b>${NET.crew.m.length + 1}</b>` : NET.inCrew ? ' · in a crew' : '');
-  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · Q (LT) post up / body up / box out · R (LB) call a screen / switch · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
+  keysHint(true);
+}
+// the controls strip, bottom left: the buttons of whatever you are holding (controller or keyboard), and only what they do right now
+const KC = { A: '<i class="kc ka">A</i>', B: '<i class="kc kb">B</i>', X: '<i class="kc kx">X</i>', Y: '<i class="kc ky">Y</i>' }, kk = t => `<i class="kc">${t}</i>`;
+function keysHint(force) {
+  const el = $('keys'); if (!el) return; const I = IN[0], pad = !!(I && I.hasPad && (I.padAt || 0) >= (window.__kbAt || 0));
+  let ctx = 'world', t = '';
+  if (MT && MT.me && !MT.replay) { const me = MT.me, B = MT.B; ctx = MT.phase !== 'live' ? 'dead' : B.holder === me ? 'ball' : MT.off === me.team && B.state !== 'loose' ? 'off' : B.state === 'loose' ? 'loose' : 'def'; if (MT.arcade && ctx === 'def') ctx = 'defR'; }
+  const key = ctx + (pad ? 'p' : 'k'); if (!force && el._k === key) return; el._k = key;
+  const P = pad ? { mv: 'LEFT STICK', spr: kk('RT'), shoot: KC.X, pass: KC.A, steal: KC.A + KC.X, block: KC.Y, moves: 'RIGHT STICK', lt: kk('LT'), lb: kk('LB'), menu: kk('START'), look: 'RIGHT STICK', act: KC.A }
+    : { mv: kk('WASD'), spr: kk('SHIFT'), shoot: kk('SPACE'), pass: kk('E'), steal: kk('E'), block: kk('SPACE'), moves: kk('IJKL'), lt: kk('Q'), lb: kk('R'), menu: kk('P'), look: kk('J') + kk('L'), act: kk('E') };
+  const g = (b, w) => `<span>${b} ${w}</span>`;
+  if (ctx === 'world') t = [g(P.mv, 'move'), g(P.spr, 'run'), g(P.act, 'talk / use'), g(P.look, 'look'), g(P.menu, 'my player')].join('');
+  else if (ctx === 'ball') t = [g(P.shoot, 'shoot: hold, let go at the top'), g(P.pass, pad ? 'pass (aim with the stick)' : 'pass (aim with WASD)'), g(P.spr, 'turbo'), g(P.moves, 'dribble moves'), g(P.lt, 'post up'), g(P.lb, 'call a screen')].join('');
+  else if (ctx === 'off') t = [g(P.pass, 'call for it'), g(P.shoot, 'jump'), g(P.moves, 'cut'), g(P.lb, 'set a screen'), g(P.lt, 'box out'), g(P.spr, 'sprint')].join('');
+  else if (ctx === 'def' || ctx === 'defR') t = [g(P.steal, ctx === 'defR' ? 'shove (hold LT: punch)' : 'steal'), g(P.block, 'jump / contest'), g(P.lt, 'body up'), g(P.lb, 'switch'), g(P.spr, 'sprint')].join('');
+  else if (ctx === 'loose') t = [g(P.mv, 'get to it'), g(P.steal, 'dive'), g(P.block, 'jump for it')].join('');
+  else t = [g(P.menu, 'pause')].join('');
+  el.innerHTML = t;
 }
 function vcLine() { return `<span class="chip" style="margin:0">HC <b>${S.vc.toLocaleString()}</b></span>`; }
 

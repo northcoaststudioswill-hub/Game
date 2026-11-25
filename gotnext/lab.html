@@ -737,6 +737,7 @@ function pollInput() {
     if (p) {
       const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; if (ls[0] || ls[1]) analog = true; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
+      if (p.buttons.some(x => x && x.pressed) || p.axes.some(v => Math.abs(v) > 0.4)) I.padAt = performance.now();      /* the controls strip shows whichever you touched last */
       const bld = typeof BLD !== 'undefined' && BLD.on && !(typeof UI !== 'undefined' && UI.cur);      /* in the home builder the d-pad browses the catalog; the stick moves the cursor */
       if (!bld) { if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1; }
       { const now = { y: B(3), x: B(2), lt: B(6) || (p.buttons[6] && p.buttons[6].value > 0.35), rt: B(7), sel: B(8) || B(11) || B(10), dl: B(14), dr: B(15), du: B(12), dd: B(13) }, pv = I._pe || {}, pe = I.pe || (I.pe = {}); for (const k in now) if (now[k] && !pv[k]) pe[k] = true; I._pe = now; I.hasPad = true; }
@@ -756,7 +757,7 @@ function pollInput() {
   }
 }
 function anyPadStart() { const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected); return pads.length; }
-addEventListener('keydown', e => { if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return; keys[e.code] = true; if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Slash', 'Backspace'].includes(e.code) && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) e.preventDefault(); audioInit(); });
+addEventListener('keydown', e => { if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return; keys[e.code] = true; window.__kbAt = performance.now(); if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Slash', 'Backspace'].includes(e.code) && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) e.preventDefault(); audioInit(); });
 addEventListener('keyup', e => { keys[e.code] = false; });
 addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
 
