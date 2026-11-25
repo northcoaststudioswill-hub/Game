@@ -20,12 +20,13 @@ const cases = await p.evaluate(() => { const P = __pit, PK = P.ev('PACKS'), MV =
   for (const m of MV) if (['side', 'back', 'diag'].includes(m.slot)) add('move', m.id, 'single', { slot: m.slot });
   for (const s of ['euro', 'reverse']) add('lay', s, 'stick'); for (const s of ['hop']) add('hop', s, 'stick');
   return c; });
+{ const o = process.argv.find(x => x.startsWith('--only=')); if (o) { const keep = o.slice(7).split(','); for (let i = cases.length - 1; i >= 0; i--) if (!keep.includes(cases[i].k + ':' + cases[i].v)) cases.splice(i, 1); } }
 console.log(cases.length + ' moves to run');
 await p.evaluate(() => { const P = __pit; P.uiClose(); P.startPractice('free'); window.__tick(180); });
 const run = (cs, snapAt) => p.evaluate(([cs, snapAt]) => { const P = __pit, M = P.MT, me = M.me, B = M.B, R = me.rig, J = R.joints, names = Object.keys(J);
   // reset: the ball in his hands at the top of the key, everything settled
   for (const k in P.keys) P.keys[k] = false; M.phase = 'live'; M.clock = 20; me.st = 'free'; me.t = 0; me.y = 0; me.vx = me.vz = 0; me.stam = 100; me.moveCool = 0; me.cool = 0; me.slowT = 0; me.post = false;
-  const pos = { dunk: [0.6, 4.8], lay: [1.2, 4.2], move: [0, 6.6], drop: [1.4, 2.6], swag: [0, 6.6], hop: [0.8, 4.6] }[cs.k]; me.x = pos[0]; me.z = pos[1]; me.face = Math.PI; B.state = 'held'; B.holder = me; P.call('give', me); me.live = 'drib';
+  const pos = { dunk: [0.5, 3.0], lay: [1.0, 2.9], move: [0, 6.6], drop: [1.4, 2.6], swag: [0, 6.6], hop: [0.8, 4.6] }[cs.k]; me.x = pos[0]; me.z = pos[1]; me.face = Math.PI; B.state = 'held'; B.holder = me; P.call('give', me); me.live = 'drib';
   me.b.moves.dunkpk = 'dk_base'; me.b.moves.laypk = 'lp_base'; me.b.moves.dribpk = 'dr_base'; me.b.moves.swagpk = 'sw_all';
   window.__tick(40);
   const V = new THREE.Vector3(), W = new THREE.Vector3(), H1 = new THREE.Vector3(), H2 = new THREE.Vector3(), rows = []; let started = false;
@@ -41,7 +42,7 @@ const run = (cs, snapAt) => p.evaluate(([cs, snapAt]) => { const P = __pit, M = 
     if (f === 4) started = !!go();
     if (cs.k === 'swag') { M.clock = 20; me.x = pos[0]; me.z = pos[1]; me.vx = me.vz = 0; }
     window.__tick(1); if (P.MT !== M) break; P.ev('scene.updateMatrixWorld()');
-    if (snapAt && snapAt.includes(f)) { P.ev('renderer.render(scene, camera)'); window.__snapReq = (window.__snapReq || []).concat([f]); }
+    if (snapAt && snapAt.includes(f)) { P.ev('scene.updateMatrixWorld()'); const rp = R.root.position, fa = me.face + Math.PI / 2; P.ev(`camera.position.set(${rp.x} + Math.sin(${fa}) * 2.6, ${1.5 + rp.y}, ${rp.z} + Math.cos(${fa}) * 2.6); camera.lookAt(${rp.x}, ${1.5 + rp.y}, ${rp.z}); renderer.render(scene, camera)`); return { snapped: f }; }
     const act = cs.k === 'swag' ? true : (me.st === { dunk: 'finish', lay: 'finish', drop: 'finish', hop: 'hop', move: 'move' }[cs.k] || (cs.k === 'hop' && me.st === 'finish'));
     if (act) window.__endF = f; const live = f > 4 && (act || f - (window.__endF || -99) <= 12); if (!live) { prev = null; prev2 = null; lastB = null; continue; }
     // joints
@@ -65,5 +66,5 @@ for (const cs of cases) { let r; try { r = await run(cs); } catch (e) { r = { er
 fs.writeFileSync(path.join(out, 'packlab.json'), JSON.stringify(res, null, 1));
 if (SHOTS) for (const { cs, r } of res.filter(x => x.r.flags && x.r.flags.length && !x.r.err)) {
   const fr = [...new Set([r.fs, r.fp, r.offF, r.teleF].filter(f => f > 0))].slice(0, 2);
-  for (const f of fr) { for (const g of [f - 2, f]) { await run(cs, [g]).catch(() => {}); await p.evaluate(() => __pit.ev('renderer.render(scene, camera)')); await p.waitForTimeout(1200); await p.screenshot({ path: path.join(out, `${cs.k}-${cs.v}-f${g}.png`), timeout: 300000 }); } } }
+  for (const f of fr) { for (const g of [f - 2, f]) { await run(cs, [g]).catch(() => {}); await p.waitForTimeout(1200); await p.screenshot({ path: path.join(out, `${cs.k}-${cs.v}-f${g}.png`), timeout: 300000 }); } } }
 const nf = res.filter(x => x.r.flags && x.r.flags.length).length; console.log(`\n${nf} of ${res.length} flagged`, errs.length ? 'PAGE ERRORS: ' + errs.slice(0, 3).join(' | ') : 'no page errors'); await b.close();

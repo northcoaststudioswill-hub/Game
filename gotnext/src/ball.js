@@ -1274,7 +1274,7 @@ function ballHeld(p, dt) {
     // between the hands only while the hands are together; with them apart (one arm already rising) it rides in the hand that has it
     const sep = _bp.distanceTo(_bq); _bp.lerp(_bq, 0.5 * (1 - lift) * clamp((0.42 - sep) / 0.2, 0, 1)); _bp.y += 0.06 + 0.05 * lift;
     // a dunk carries it into the rim: over the last of the rise the ball is pulled to the cylinder with the hand, so it does not jump there when it counts
-    if (st === 'finish' && p.finish.type === 'dunk' && !p.finish.done) { const u = p.t / p.finish.dur, w = clamp((u - 0.5) / 0.25, 0, 1); if (w > 0) { const ws = w * w * (3 - 2 * w); _bq.set(0, HOOP_Y + 0.12, 0.05); _bp.lerp(_bq, ws * 0.85); } }
+    if (st === 'finish' && p.finish.type === 'dunk' && !p.finish.done) { const u = p.t / p.finish.dur, w = clamp((u - 0.62) / 0.13, 0, 1); if (w > 0) { const ws = w * w * (3 - 2 * w); _bq.set(0, HOOP_Y + 0.12, 0.05); _bp.lerp(_bq, ws * 0.7); }      /* only once the throw-down starts: through the windup it stays in his hands */ }
     ballFollow(B, _bp, dt, true, st === 'finish' || st === 'hop' ? 20 : 11); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
   }
   if (D.ph === 'gather') { D.ph = 'up'; D.t = 0; D.T = 0.14; D.F = B.pos.clone(); D.hand = p.hand; }
