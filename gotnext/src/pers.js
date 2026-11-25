@@ -73,7 +73,7 @@ function bubble(p, line) {
 function bubStep(dt) {
   const M_ = MT; if (!M_ || !M_.bubs || !M_.bubs.length) return;
   M_.bubs = M_.bubs.filter(b => { b.t += dt; if (b.t >= b.dur) { b.el.remove(); return false; }
-    const [x, y] = project(b.p.x, b.p.H + 0.42 + b.p.y, b.p.z); b.el.style.left = clamp(x, 70, innerWidth - 70) + 'px'; b.el.style.top = Math.max(46, y) + 'px'; b.el.style.opacity = b.t < 0.15 ? b.t / 0.15 : b.dur - b.t < 0.3 ? (b.dur - b.t) / 0.3 : 1; return true; });
+    const [x, y] = project(b.p.x, b.p.H + 0.42 + b.p.y, b.p.z); b.el.style.left = clamp(x, 112, innerWidth - 112) + 'px'; b.el.style.top = Math.max(46, y) + 'px'; b.el.style.opacity = b.t < 0.15 ? b.t / 0.15 : b.dur - b.t < 0.3 ? (b.dur - b.t) / 0.3 : 1; return true; });
 }
 function bubClear() { const M_ = MT; if (M_ && M_.bubs) { for (const b of M_.bubs) b.el.remove(); M_.bubs = []; } }
 // ---- menus
