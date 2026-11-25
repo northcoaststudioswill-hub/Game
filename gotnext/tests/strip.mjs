@@ -2,7 +2,7 @@
 // Writes tests/shots/strip-<name>.png. Scenarios: run (sprint, reverse), drib (dribble + crossover), shot (pull-up), def (slide + contest)
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
-const dir = path.dirname(fileURLToPath(import.meta.url)); const name = process.argv[2] || 'run', file = path.resolve(process.argv[3] || path.join(dir, '..', 'index.html'));
+const dir = path.dirname(fileURLToPath(import.meta.url)); const name = process.argv[2] || 'run', file = path.resolve(process.argv[3] || process.env.GN_HTML || path.join(dir, '..', 'index.html'));
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await browser.newContext({ viewport: { width: 260, height: 300 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0;
   window.__tick = (n, ms) => {

@@ -9,7 +9,7 @@ const page = await ctx.newPage(); const errs = [];
 page.on('pageerror', e => { errs.push(e.message); console.log('PAGEERROR', e.message, (e.stack || '').split('\n').slice(0, 4).join(' | ')); });
 page.on('console', m => { if (m.type() === 'error') { errs.push(m.text()); console.log('CONSOLE', m.text()); } });
 const tag = PORTRAIT ? 'p-' : 'l-'; const shot = n => page.screenshot({ path: path.join(shots, tag + n + '.png') });
-await page.goto('file://' + path.join(dir, '..', 'index.html')); await page.waitForTimeout(1500); await shot('01-title');
+await page.goto('file://' + (process.env.GN_HTML || path.join(dir, '..', 'index.html'))); await page.waitForTimeout(1500); await shot('01-title');
 await page.click('#titleBtns .btn'); await page.waitForTimeout(800); await page.fill('#bname', 'WILL'); await shot('02-builder');
 await page.evaluate(() => { const b = document.querySelector('#panel .pb'); b.scrollTop = b.scrollHeight; }); await page.waitForTimeout(200); await shot('03-builder-caps');
 await page.click('#panel .pf .btn'); await page.waitForTimeout(1500); await shot('04-hub');

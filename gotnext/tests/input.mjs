@@ -7,7 +7,7 @@ const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, ha
 const page = await ctx.newPage(); let errs = 0; page.on('pageerror', e => { errs++; console.log('PAGEERROR', e.message); });
 const cdp = await ctx.newCDPSession(page);
 const touch = (type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map((p, i) => ({ x: p[0], y: p[1], id: p[2] ?? i })) });
-await page.goto('file://' + path.join(dir, '..', 'index.html')); await page.waitForTimeout(800);
+await page.goto('file://' + (process.env.GN_HTML || path.join(dir, '..', 'index.html'))); await page.waitForTimeout(800);
 await page.tap('#titleBtns .btn'); await page.waitForTimeout(300); await page.tap('#panel .pf .btn'); await page.waitForTimeout(600);
 // hub: push the left stick up, expect the player to walk north (−z)
 const z0 = await page.evaluate(() => __pit.W.me.z);

@@ -2,7 +2,7 @@
 //   node tests/accept.mjs [file.html]
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || 'playwright');
 import path from 'path'; import { fileURLToPath } from 'url';
-const dir = path.dirname(fileURLToPath(import.meta.url)); const file = path.resolve(process.argv[2] || path.join(dir, '..', 'index.html'));
+const dir = path.dirname(fileURLToPath(import.meta.url)); const file = path.resolve(process.argv[2] || process.env.GN_HTML || path.join(dir, '..', 'index.html'));
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const ctx = await browser.newContext({ viewport: { width: 480, height: 270 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = (n, ms) => { for (let i = 0; i < n; i++) { window.__now += ms; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });

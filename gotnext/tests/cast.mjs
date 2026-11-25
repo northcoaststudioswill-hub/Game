@@ -6,7 +6,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 960, height: 540 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
 let r = await p.evaluate(() => { const W = __pit.W, C = W.cast; return { cast: C && C.list.map(n => n.cast), louie: !!(C && C.louie), park: !!W.park, spots: W.spots.map(s => s.label).filter(l => /NEXX|MARK|AARON|BOTTIE|LOUIE|BRENNICK/.test(l)) }; });
 ok(r.cast && r.cast.includes('nexx') && r.louie && r.park && r.spots.length === 6, `on the Block: ${r.cast.join(', ')}, Louie, the run in the cage; spots ${r.spots.join(' · ')}`);

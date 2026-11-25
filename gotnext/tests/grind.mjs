@@ -7,7 +7,7 @@ const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable
 const ctx = await browser.newContext({ viewport: { width: 640, height: 360 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = (n, ms) => { for (let i = 0; i < n; i++) { window.__now += ms; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const page = await ctx.newPage(); let errs = 0; page.on('pageerror', e => { errs++; console.log('PAGEERROR', e.message, (e.stack || '').split('\n')[1]); });
-await page.goto('file://' + path.join(dir, '..', 'index.html')); await page.evaluate(() => window.__tick(60, 16.67));
+await page.goto('file://' + (process.env.GN_HTML || path.join(dir, '..', 'index.html'))); await page.evaluate(() => window.__tick(60, 16.67));
 await page.click('#titleBtns .btn'); await page.evaluate(() => window.__tick(5, 16.67)); await page.click('#panel .pf .btn'); await page.evaluate(() => window.__tick(30, 16.67));
 await page.evaluate(() => {
   // a simple bot: shoot on time, attack the rim in finishing drills, weave the cones, slide line to line

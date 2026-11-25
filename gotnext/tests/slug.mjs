@@ -8,7 +8,7 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
   navigator.getGamepads = () => window.__usePad ? [window.__pad] : [];
   window.__press = (n, hold) => { window.__pad.buttons[n].pressed = true; window.__tick(hold || 2); window.__pad.buttons[n].pressed = false; window.__tick(2); }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
 const launch = mi => p.evaluate(mi => { const P = __pit; if (P.MT) P.MT.cfg.onEnd = () => {}; P.uiClose(); window.__usePad = false; P.launchGame(P.MODES[mi], P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(220); window.__usePad = true; }, mi);
 const set = `var P = __pit, M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), d = opp[0]; M.phase = 'live'; M.needClear = false; M.clock = 20; M.brawl = null; for (const q of M.P) { q.st = 'free'; q.y = 0; q.cool = 0; q.vx = q.vz = 0; q.ko = 0; if (q.ai) q.ai.tick = 999; q.x = 7; q.z = 12; } __pad.axes = [0, 0, 0, 0]; for (const bt of __pad.buttons) bt.pressed = false;`;

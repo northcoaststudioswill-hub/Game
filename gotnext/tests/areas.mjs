@@ -2,7 +2,7 @@
 // Writes tests/shots/area-<tag>-<view>.png
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
-const dir = path.dirname(fileURLToPath(import.meta.url)), tag = process.argv[2] || 'now', file = path.resolve(process.argv[3] || path.join(dir, '..', 'index.html'));
+const dir = path.dirname(fileURLToPath(import.meta.url)), tag = process.argv[2] || 'now', file = path.resolve(process.argv[3] || process.env.GN_HTML || path.join(dir, '..', 'index.html'));
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await browser.newContext({ viewport: { width: 960, height: 560 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0;
   window.__tick = n => { if (!window.__patched && window.THREE && THREE.Object3D) { window.__patched = 1; const orig = THREE.Object3D.prototype.lookAt; THREE.Object3D.prototype.lookAt = function (x, y, z) { if (this.isPerspectiveCamera && window.__camFn) { const t = window.__camFn(this); return orig.call(this, t[0], t[1], t[2]); } return orig.call(this, x, y, z); }; }

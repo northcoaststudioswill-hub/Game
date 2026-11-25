@@ -2,7 +2,7 @@
 // node tests/reel.mjs <dunks|layups|jumpers|handles> [file.html]. Writes tests/shots/reel-<group>-<n>-<frame>.png and prints what each entry did.
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
-const dir = path.dirname(fileURLToPath(import.meta.url)); const grp = process.argv[2] || 'dunks', file = path.resolve(process.argv[3] || path.join(dir, '..', 'index.html'));
+const dir = path.dirname(fileURLToPath(import.meta.url)); const grp = process.argv[2] || 'dunks', file = path.resolve(process.argv[3] || process.env.GN_HTML || path.join(dir, '..', 'index.html'));
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await browser.newContext({ viewport: { width: 300, height: 340 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0;
   window.__tick = (n, ms) => { if (!window.__patched && window.THREE && THREE.Object3D) { window.__patched = 1; const orig = THREE.Object3D.prototype.lookAt; THREE.Object3D.prototype.lookAt = function (x, y, z) { if (this.isPerspectiveCamera && window.__camFn) { const t = window.__camFn(this); return orig.call(this, t[0], t[1], t[2]); } return orig.call(this, x, y, z); }; }

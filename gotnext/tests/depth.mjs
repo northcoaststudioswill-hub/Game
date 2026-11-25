@@ -5,13 +5,13 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const fake = () => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; };
 let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; }; const errs = [];
-async function open(ctx) { await ctx.addInitScript(fake); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60)); await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10)); return p; }
+async function open(ctx) { await ctx.addInitScript(fake); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60)); await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10)); return p; }
 const start2 = `(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.size === 2), P.TIERS_COURT[1], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(200); const M = P.MT, me = M.me; var g = 0; while (M.phase !== 'live' && g++ < 600) window.__tick(1); if (M.B.holder !== me) { P.call('give', me); P.call('changePoss', me.team); } M.needClear = false; me.x = 0; me.z = 8; return M.phase; })()`;
 {
   const ctx = await b.newContext({ viewport: { width: 1100, height: 620 } }); const p = await open(ctx);
   let r = await p.evaluate((s) => { const P = __pit; eval(s); const M = P.MT, me = M.me, mate = M.P.find(q => q.team === me.team && q !== me), d = M.P.find(q => q.team !== me.team && q.man === me) || M.P.find(q => q.team !== me.team);
     for (const q of M.P) if (q.team !== me.team) { q.ai.tick = 99; } d.x = 0; d.z = 6.6; M.clock = 20;
-    const called = P.call('callScreen', me); let set = false, setDist = 9, hit = false, rolled = false, rollD = 9, i = 0;
+    const called = P.call('callScreen', me); if (mate.ai.scr) mate.ai.scr.kind = 'set'; mate.A.str = 92; d.A.str = 20; let set = false, setDist = 9, hit = false, rolled = false, rollD = 9, i = 0;
     for (; i < 60 * 5; i++) { M.clock = 20; me.x = 0; me.z = 8; d.x += (0 - d.x) * 0.02; window.__tick(1); if (M.B.holder !== me) break; if (mate.screen) { set = true; setDist = Math.min(setDist, Math.hypot(mate.x - d.x, mate.z - d.z)); break; } }
     const pose = mate.screen;
     // the defender tries to run through it; then the handler goes and the screener rolls

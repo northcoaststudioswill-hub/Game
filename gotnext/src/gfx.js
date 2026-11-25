@@ -394,7 +394,7 @@ function poseOf(anim, t, o) {
       else if (st === 'hammer') {    // basic: arm locked straight overhead, then the whole body snaps down with it
         S_('shR', slam ? -1.75 : -3.3, 0, 0.02); S_('elR', slam ? -0.05 : -0.1); S_('wrR', slam ? -1.1 : 0.3); S_('shL', slam ? -0.2 : -1.1, 0, 0.8); S_('elL', -0.6); S_('spine', slam ? 0.45 : -0.32); S_('chest', slam ? 0.4 : -0.3); S_('neck', slam ? 0.25 : -0.35); p.rate = 30; }
       else if (st === 'lean') {      // basic: coming across the rim, the body laid out sideways, one hand
-        S_('hips', 0, 0, slam ? 0.1 : 0.32); S_('spine', slam ? 0.2 : -0.1, 0, slam ? 0.1 : 0.3); S_('chest', slam ? 0.25 : -0.2, 0.2, slam ? 0 : 0.22); S_('shR', slam ? -1.9 : -3.05, 0, -0.25); S_('elR', slam ? -0.15 : -0.4); S_('wrR', slam ? -1.0 : 0.5); S_('shL', 0.2, 0, 0.75); S_('elL', -0.4); }
+        S_('hips', 0, 0, slam ? 0.06 : 0.17); S_('spine', slam ? 0.2 : -0.1, 0, slam ? 0.05 : 0.16); S_('chest', slam ? 0.25 : -0.2, 0.2, slam ? 0 : 0.12); S_('shR', slam ? -1.9 : -3.05, 0, -0.25); S_('elR', slam ? -0.15 : -0.4); S_('wrR', slam ? -1.0 : 0.5); S_('shL', 0.2, 0, 0.75); S_('elL', -0.4); }
       else if (st === 'hangtwo') {   // basic: two hands, then pull up and hang a beat
         const a = slam ? (hang ? -2.9 : -2.0) : -3.3; S_('shR', a, 0, 0.14); S_('shL', a, 0, -0.14); S_('elR', slam ? (hang ? -0.9 : -0.25) : -0.95); S_('elL', slam ? (hang ? -0.9 : -0.25) : -0.95); S_('wrR', slam ? -0.6 : 0.5); S_('wrL', slam ? -0.6 : 0.5); if (hang) { S_('spine', 0.1); S_('neck', -0.35); } }
       else if (st === 'tip') {       // basic putback: one long arm, caught at the top and pushed straight back down

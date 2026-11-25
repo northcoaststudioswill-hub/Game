@@ -5,7 +5,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1280, height: 720 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 const audit = (name, open) => p.evaluate(([name, open]) => { const P = __pit; try { P.ev(open); } catch (e) { return { name, err: e.message }; } window.__tick(3);
   const f = P.call('focusables'), n = f.length; if (!n) return { name, n: 0 };
   const seen = new Set([0]), q = [0]; while (q.length) { const i = q.shift(); for (const m of ['U', 'D', 'L', 'R']) { const j = P.call('navDir', f, i, m); if (!seen.has(j)) { seen.add(j); q.push(j); } } }

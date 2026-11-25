@@ -3,7 +3,7 @@
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || 'playwright');
 import path from 'path'; import fs from 'fs'; import http from 'http'; import { fileURLToPath } from 'url';
 const dir = path.dirname(fileURLToPath(import.meta.url)); fs.mkdirSync(path.join(dir, 'shots'), { recursive: true });
-const html = fs.readFileSync(path.join(dir, '..', 'index.html'));
+const html = fs.readFileSync(process.env.GN_HTML || path.join(dir, '..', 'index.html'));
 const srv = http.createServer((q, r) => { r.writeHead(200, { 'content-type': 'text/html' }); r.end(html); }).listen(0); const url = 'http://127.0.0.1:' + srv.address().port + '/';
 import { MOCK } from './room-mock.mjs';
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });

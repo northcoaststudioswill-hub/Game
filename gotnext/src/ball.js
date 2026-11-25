@@ -331,7 +331,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   // a quick guard with a shot-blocker closing gets it up early off the wrong foot
   if (type === 'layup' && (kind === 'lay' || kind === 'scoop') && !read && !opt.kind && cont && att(p, 'speed') >= 72 && sp > 3 && Math.random() < 0.4) kind = 'quick';
   // the rest of the free package: with a man there, show it and bring it under his arm, float it over the top, or spin; alone, the odd high one off the glass
-  if (type === 'layup' && !read && !opt.kind && !opt.hopped && !euro && !rev && (kind === 'lay' || kind === 'scoop' || kind === 'power')) { const r = Math.random();
+  if (type === 'layup' && !read && !opt.kind && !opt.hopped && !euro && !rev && (kind === 'lay' || kind === 'scoop' || kind === 'power' || (!cont && kind === 'finger'))) { const r = Math.random();
     if (cont) kind = r < 0.2 ? 'under' : r < 0.38 ? 'over' : r < 0.5 && sp > 3 && fq >= 60 ? 'spin' : kind; else if (r < 0.15) kind = 'over'; }
   let style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
   // the basic package is not one dunk: off the run it is one hand, cocked back if he can get up; standing or in traffic, two hands

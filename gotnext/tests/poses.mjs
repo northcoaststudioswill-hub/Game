@@ -4,7 +4,7 @@ import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url
 const dir = path.dirname(fileURLToPath(import.meta.url)); fs.mkdirSync(path.join(dir, 'shots'), { recursive: true });
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: 300, height: 400 } })).newPage(); page.on('pageerror', e => console.log('PAGEERROR', e.message));
-await page.goto('file://' + path.join(dir, '..', 'index.html')); await page.waitForTimeout(1000);
+await page.goto('file://' + (process.env.GN_HTML || path.join(dir, '..', 'index.html'))); await page.waitForTimeout(1000);
 await page.click('#titleBtns .btn'); await page.waitForTimeout(300); await page.click('#panel .pf .btn'); await page.waitForTimeout(500);
 const L = [['idle', 0, {}], ['run', 0, { sp: 1, ph: 1.2 }], ['dribble', 0, { sp: 0.5, ph: 0.6, dr: 0.2, hand: 'R' }], ['slide', 0, { ph: 1, up: true, ry: -0.4 }],
   ['shoot', 0.15, { rel: 0.6 }], ['shoot', 0.45, { rel: 0.6 }], ['shoot', 0.8, { rel: 0.6 }], ['floater', 0.25, {}],

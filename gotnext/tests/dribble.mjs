@@ -5,7 +5,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const b = await chromium.launch({ args: ['--use-gl=swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 300, height: 200 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
 await p.evaluate(() => { const P = __pit; P.uiClose(); P.startPractice('free'); window.__tick(170); P.MT.phase = 'live'; });
 const keys = (ks, n) => p.evaluate(([ks, n]) => { const P = __pit, K = P.keys, M = P.MT, me = M.me; const o = []; for (let i = 0; i < n; i++) { for (const k in K) K[k] = false; for (const k of ks) K[k] = true; window.__tick(1); o.push({ live: me.live, st: me.st, x: me.x, z: me.z, an: me.an, hold: M.B.holder === me }); } for (const k in K) K[k] = false; return o; }, [ks, n]);

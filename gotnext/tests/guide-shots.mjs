@@ -8,7 +8,7 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
     for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
 const T = n => page.evaluate(n => window.__tick(n), n), shot = async n => { await page.screenshot({ path: path.join(out, n + '.jpg'), type: 'jpeg', quality: 82, timeout: 180000 }); };
-await page.goto('file://' + path.resolve(dir, '..', 'index.html')); await T(120); await shot('01-title');
+await page.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await T(120); await shot('01-title');
 await page.click('#titleBtns .btn'); await T(30); await page.fill('#bname', 'JAYLO'); await T(5); await shot('02-builder');
 await page.click('#panel .pf .btn'); await T(60);
 await page.evaluate(() => { const st = document.createElement('style'); st.textContent = '#toasts{display:none!important}'; document.head.appendChild(st); const S = __pit.S; S.vc = 4200; S.rep = 2300; __pit.uiClose(); __pit.enterWorld('hub', 0, 9, Math.PI); __pit.W.yaw = Math.PI; }); await T(120); await shot('03-block');

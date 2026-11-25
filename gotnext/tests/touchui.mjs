@@ -4,7 +4,7 @@ import path from 'path'; import { fileURLToPath } from 'url';
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ ...devices['iPhone 13'] });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.waitForTimeout(1200);
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.waitForTimeout(1200);
 await p.tap('#titleBtns .btn'); await p.waitForTimeout(400); await p.tap('#panel .pf .btn'); await p.waitForTimeout(1500);
 await p.evaluate(() => { __pit.uiClose(); __pit.S.vc = 5000; __pit.enterWorld('crib', -16, 8, Math.PI); }); await p.waitForTimeout(1200);
 for (const k of ['wave', 'dance', 'sit', 'cheer', 'celeb']) { await p.tap(`#emobar [data-em="${k}"]`); await p.waitForTimeout(250); ok((await p.evaluate(() => __pit.W.me.emote)) === k, `tap the ${k} button in the crib`); }

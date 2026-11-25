@@ -8,7 +8,7 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
     for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 const T = n => p.evaluate(n => window.__tick(n), n), shot = n => p.screenshot({ path: path.join(dir, 'shots', `room-${n}.png`), timeout: 120000 });
-await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await T(60); await p.click('#titleBtns .btn'); await T(5); await p.click('#panel .pf .btn'); await T(30);
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await T(60); await p.click('#titleBtns .btn'); await T(5); await p.click('#panel .pf .btn'); await T(30);
 await p.evaluate(() => { const st = document.createElement('style'); st.textContent = '#toasts{display:none!important}'; document.head.appendChild(st); __pit.S.vc = 20000; __pit.S.rep = 3000; __pit.uiClose(); __pit.enterWorld('crib', 10.1, -0.4, -Math.PI / 2); });
 await T(30);
 let r = await p.evaluate(() => { const s = __pit.W.spots.find(x => /GO INSIDE/.test(x.label)); s.fn(); window.__tick(30); return { kind: __pit.W.kind, tag: document.getElementById('wtag').textContent, walls: __pit.W.walls.length }; });

@@ -5,7 +5,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const VP = process.argv[2] === 'land' ? { width: 844, height: 390 } : { width: 390, height: 844 }; const ctx = await b.newContext({ viewport: VP, hasTouch: true, isMobile: true, deviceScaleFactor: 1 });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 const audit = (name, open) => p.evaluate(([name, open]) => { const P = __pit; try { P.ev(open); } catch (e) { return { name, err: e.message }; } window.__tick(3);
   const root = P.UI.cur ? document.getElementById('panel') : document.getElementById('title'), W_ = innerWidth, out = { name, small: [], off: [], n: 0 };
   const pb = root.querySelector('.pb'); out.hscroll = document.documentElement.scrollWidth > W_ + 1 || (pb && pb.scrollWidth > pb.clientWidth + 2);

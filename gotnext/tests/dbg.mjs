@@ -4,7 +4,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: 640, height: 360 } })).newPage();
 page.on('pageerror', e => console.log('PAGEERROR', e.message, e.stack));
-await page.goto('file://' + path.join(dir, '..', 'index.html')); await page.waitForTimeout(800);
+await page.goto('file://' + (process.env.GN_HTML || path.join(dir, '..', 'index.html'))); await page.waitForTimeout(800);
 await page.click('#titleBtns .btn'); await page.waitForTimeout(300); await page.click('#panel .pf .btn'); await page.waitForTimeout(500);
 // all-AI game: the user's player is driven by the AI too, at high speed
 const out = await page.evaluate(async (mode) => {
