@@ -256,9 +256,17 @@ function crowdHeat(v, fromNet) {
   const M_ = MT, K = M_ && M_.crowd; if (!K) return; K.heat += v;
   while (K.heat >= 1 && M_.net !== 'guest') { K.heat -= 1; const b = K.pool.shift() || null, f = crowdAdd(b, false); if (!f) { K.heat = 0; break; } if (f.name) hudFb(f.name + ' pulled up to watch', '#ece9e2'); if (M_.net === 'host') netEv({ k: 'ca', n: f.name }); }
 }
+// somebody in the crowd has something to say about it (a bubble over one of the people at the fence)
+const FAN_LINES = { dunk: ['OHHHH!', 'He DID that!', 'Somebody call his mama!', 'Put it on a poster!'], ankles: ['He FELL!', 'Check his ankles!', 'Don\'t get up!'], block: ['Get that outta here!', 'Not today!', 'Send it back!'], three: ['Cash!', 'From the parking lot!', 'Wet!'], steal: ['Cookies!', 'Pick his pocket!'], win: ['Winners stay!', 'Who got next?'], hit: ['Ooooh!', 'That\'s a foul somewhere!'], ko: ['Somebody get the man some water!'], air: ['AIR-BALL! AIR-BALL!', 'That hit nothing!'] };
+function fanSay(play, team) {
+  const M_ = MT; if (!M_ || !M_.fans || !M_.fans.length || !FAN_LINES[play] || (S.set && S.set.talk === 0) || M_.time - (M_.fanSayAt || -9) < 5 || typeof bubble !== 'function') return;
+  const c = M_.fans.filter(f => !f.walk && (team === undefined || f.team === team)); const f = pick(c.filter(x => x.name).length && Math.random() < 0.7 ? c.filter(x => x.name) : c.length ? c : M_.fans); if (!f) return;
+  M_.fanSayAt = M_.time; f.vox = f.vox || { x: f.x, z: f.z, H: 1.8, y: 0, team: f.team }; f.vox.x = f.r.root.position.x; f.vox.z = f.r.root.position.z; bubble(f.vox, pick(FAN_LINES[play]));
+}
 function crowdReact(play, team, fromNet) {
   const M_ = MT; if (!M_ || !M_.fans) return; if (!fromNet && M_.net === 'host') netEv({ k: 'cr', p: play, t: team });
   if (!fromNet) crowdHeat({ dunk: 0.55, ankles: 0.6, block: 0.4, three: 0.3, ko: 0.8, hit: 0.3, steal: 0.15, score: 0.1, win: 0 }[play] || 0);
+  if (Math.random() < (play === 'dunk' || play === 'ankles' || play === 'win' ? 0.7 : 0.35)) fanSay(play, team);
   const ch = play === 'score' ? 0.35 : play === 'steal' ? 0.6 : 0.9;
   for (const f of M_.fans) { if (Math.random() > ch) continue; f.react = { kind: crowdReaction(play, team === undefined ? undefined : f.team === team), t: -rnd(0, 0.35), dur: rnd(1.5, 2.7) }; f.hype = f.react.dur; }
 }

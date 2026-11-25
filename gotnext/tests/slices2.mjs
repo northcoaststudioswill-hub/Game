@@ -1,0 +1,26 @@
+// Rim behaviour (short, long, airball, rattle), breathers, crowd voices, AI post-ups. node tests/slices2.mjs
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1100, height: 620 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
+await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => { window.__tick(10); });
+await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.size === 2 && !m.arcade), P.TIERS_COURT[1], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(200); const M = P.MT; var g = 0; while (M.phase !== 'live' && g++ < 600) window.__tick(1);
+  window.T = { set(h) { const M = P.MT; P.call('give', h); P.call('changePoss', h.team); M.needClear = false; M.phase = 'live'; M.clock = 20; for (const q of M.P) { q.ai.tick = 99; q.ai.postT = 0; q.post = false; q.st = 'free'; q.y = 0; q.vx = q.vz = 0; q.slowT = 0; if (q !== h) { q.x = 7.5; q.z = 11 + q.i * 0.4; } } h.live = 'drib'; } }; });
+let r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, out = { short: 0, long: 0, air: 0, rattle: 0, n: 80 }; const el = document.getElementById('call');
+  const miss = (err) => { T.set(me); me.x = 0; me.z = 6; me.st = 'shoot'; me.shot = { err }; M.B.pos.set(0, 2.2, 5.6); P.call('launch', me, false, 1, false, 1, 'mid'); me.st = 'free'; let g = 0; while (M.B.state === 'shot' && g++ < 200) P.call('stepBall', 0.016); return [M.B.vel.z, el.textContent]; };
+  for (let i = 0; i < out.n; i++) { if (miss(-0.25)[0] > 0.39) out.short++; const l = miss(0.25); if (l[0] < 1.6) out.long++; const a = miss(0.6); if (/AIRBALL/.test(a[1]) && M.B.pos.y < 3.0) out.air++; el.textContent = ''; }
+  for (let i = 0; i < 200; i++) { T.set(me); me.x = 0; me.z = 6; me.st = 'shoot'; me.shot = { err: 0.05 }; M.B.pos.set(0, 2.2, 5.6); P.call('launch', me, true, 1, false, 1, 'mid'); me.st = 'free'; let g = 0; while (M.B.state === 'shot' && g++ < 200) P.call('stepBall', 0.016); if (M.B.state === 'through' && M.B.vel.y > 0) out.rattle++; M.phase = 'live'; M.score = [0, 0]; M.hl = null; }
+  return out; });
+ok(r.short === r.n && r.long === r.n && r.air === r.n && r.rattle > 25 && r.rattle < 110, `misses have a shape: early ones come off short toward the shooter (${r.short}/${r.n}), late ones go long (${r.long}/${r.n}), way off is an AIRBALL (${r.air}/${r.n}); ${r.rattle}/200 makes rattle in instead of swishing`);
+r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me; me.stam = 30; P.call('setCheck', me.team, false); const s = me.stam; M.phase = 'live';
+  const rn = Math.random; Math.random = () => 0.1; M.fanSayAt = -99; const n0 = document.querySelectorAll('#flts .bub').length; P.call('crowdReact', 'dunk', me.team); Math.random = rn; const bubs = [...document.querySelectorAll('#flts .bub')]; return { s, n0, n1: bubs.length, line: bubs.length ? bubs[bubs.length - 1].textContent : '' }; });
+ok(r.s === 46 && r.n1 === r.n0 + 1 && r.line, `a check-up is a breather (stamina 30 → ${r.s}); the crowd has a voice: “${r.line}”`);
+r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), big = opp[0]; let posted = 0, went = 0, pushed = 0;
+  for (let i = 0; i < 40; i++) { T.set(big); big.x = 2.2; big.z = 4.2; big.A.str = 92; big.H = 2.06; big.aiLvl = 0.9; me.A.str = 40; me.H = 1.85; me.x = 1.7; me.z = 3.3; big.ai.tick = 0; big.ai.hold = 0; big.ai.mode = ''; const rn = Math.random; Math.random = () => 0.2; P.call('aiThink', big, 0.016); Math.random = rn;
+    if (big.ai.postT > 0) { posted++; const d0 = Math.hypot(big.x, big.z); let g = 0; while (g++ < 240 && big.st === 'free' && M.B.holder === big) { big.ai.tick = 99; M.clock = 20; window.__tick(1); } if (big.st === 'finish' || big.st === 'shoot' || M.B.state === 'shot') went++; if (Math.hypot(big.x, big.z) < d0 - 0.4) pushed++; } }
+  return { posted, went, pushed }; });
+ok(r.posted >= 30 && r.went >= r.posted * 0.8 && r.pushed >= r.posted * 0.7, `a strong, taller AI with a smaller man on him posts up (${r.posted}/40), backs him down (${r.pushed}) and goes up with it (${r.went})`);
+console.log(errs.length ? 'PAGE ERRORS: ' + errs.join(' | ') : 'no page errors', '·', fails ? fails + ' FAILED' : 'ALL PASS'); await b.close(); process.exit(fails || errs.length ? 1 : 0);

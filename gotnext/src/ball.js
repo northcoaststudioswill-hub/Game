@@ -89,6 +89,7 @@ function startMatch(cfg) {
 // ---------- flow ----------
 function setCheck(team, first) {
   const M_ = MT; M_.phase = 'check'; M_.pt = first ? 2.2 : 1.15; M_.off = team; M_.needClear = false; M_.clock = 14; M_.looseT = 0;
+  for (const q of M_.P) if (q.stam !== undefined) { q.stam = Math.min(100, q.stam + 16); q.gassed = false; }      /* a check-up is a breather */
   const offs = M_.P.filter(p => p.team === team), defs = M_.P.filter(p => p.team !== team);
   // the human takes the check when it is their ball
   offs.sort((a, b) => (b.user ? 1 : 0) - (a.user ? 1 : 0) || a.k - b.k);
@@ -216,7 +217,7 @@ function releaseShot(p) {
   const s = p.shot; if (s.released) return; s.released = true; const B = MT.B;
   const held = s.hold != null ? s.hold : p.t;
   if (p.user && !s.auto && held < s.rel * 0.3) { s.released = false; return startFake(p); }      // let go early = pump fake
-  const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
+  const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p); s.err = err;
   (p.tend || (p.tend = { three: 0, mid: 0, close: 0, drive: 0 }))[kind]++;
   let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85; c *= 1 - px(p, 'calm'); if (MT.stops && MT.stops[1 - p.team] >= 3) c *= 1.08;
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
@@ -277,7 +278,7 @@ function startFake(p) {
 }
 function euroOf(p) { const l = Math.hypot(p.x, p.z) || 1, lat = p.in.dx * (p.z / l) - p.in.dz * (p.x / l); return Math.abs(lat) > 0.55 ? Math.sign(lat) : 0; }
 function launch(p, make, pts, green, arc, kind) {
-  const B = MT.B; B.state = 'shot'; B.holder = null; B.shooter = p; B.lastTeam = p.team; B.make = make; B.pts = pts; B.green = green; B.kind = kind; B.t = 0; B.shotId = (B.shotId || 0) + 1; B.tipped = false; B.clockAt = MT.clock;
+  const B = MT.B; B.state = 'shot'; B.holder = null; B.shooter = p; B.lastTeam = p.team; B.make = make; B.pts = pts; B.green = green; B.kind = kind; B.t = 0; B.shotId = (B.shotId || 0) + 1; B.tipped = false; B.clockAt = MT.clock; B.err = p.st === 'shoot' && p.shot && isFinite(p.shot.err) ? p.shot.err : 0; B.sx = p.x; B.sz = p.z;
   const d = Math.hypot(B.pos.x, B.pos.z);
   let ex = 0, ez = 0; if (!make) { const a = rnd(0, 6.283), r = rnd(0.2, 0.34); ex = Math.cos(a) * r; ez = Math.sin(a) * r * 0.8 + 0.05; }
   B.T = clamp(0.48 + d * 0.085, 0.42, 1.5) * (0.9 + 0.1 * (arc || 1)) * (arc > 1.3 ? 1.15 : 1);
@@ -737,7 +738,7 @@ function gamePoint(p) {
 }
 function aiGo(p, x, z, sprint) { p.ai.tx = x; p.ai.tz = z; p.ai.spr = !!sprint; }
 function aiThink(p, dt) {
-  const B = MT.B, a = p.ai, L = p.aiLvl; p.handsUp = false; a.spr = false;
+  const B = MT.B, a = p.ai, L = p.aiLvl; p.handsUp = false; a.spr = false; if (B.holder !== p || !(a.postT > 0)) { p.post = false; a.postT = 0; }
   if (MT.reel) { reelDefThink(p); return; }
   if (a.scr && (MT.off !== p.team || MT.phase !== 'live')) a.scr = null; if (!a.scr || a.scr.ph !== 1) p.screen = false;
   p.box = false;
@@ -760,6 +761,10 @@ function aiThink(p, dt) {
     }
   } else if (hasBall) {
     a.hold += dt;
+    if (a.postT > 0 && p.st === 'free') {      // backing a smaller man down: to the rim for a drop step, or a hook from where the clock runs out
+      a.postT -= dt; p.post = true; aiGo(p, 0, 0.9, false); const d2 = dHoop(p);
+      if (d2 < 2.9 || a.postT <= 0 || MT.clock < 2.5) { p.post = false; a.postT = 0; const [o2] = nearestOpp(p); if (d2 < 3.6) startFinish(p, o2 && (o2.x - p.x) > 0 ? -1 : 1, false, 0, { layup: 1, kind: 'power' }); else { p.face = Math.atan2(-p.x, -p.z); startShot(p, 'ai', true); } return; }
+      const dxp = a.tx - p.x, dzp = a.tz - p.z, lp = Math.hypot(dxp, dzp) || 1; p.in.dx = dxp / lp; p.in.dz = dzp / lp; p.in.sprint = false; return; }
     if (a.tick <= 0) {
       a.tick = 0.34 - L * 0.16 + rnd(0, 0.08);
       const d = dHoop(p), [o, od] = nearestOpp(p), open = od > 1.7, style = p.b.build.style;
@@ -784,6 +789,7 @@ function aiThink(p, dt) {
         { const us = mates.find(q => q.user && q.screen && dist(q, p) < 4.5); if (us && a.usedScr !== us && Math.random() < 0.7) { a.usedScr = us; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } if (!us) a.usedScr = null; }      /* you set him a screen: he comes off it */
         const caller = mates.find(q => q.callT > 0);
         if (caller && passLane(p, caller) && Math.random() < 0.9) { doPass(p, caller); return; }
+        if (!MT.arcade && p.live === 'drib' && d < 6.2 && d > 3.2 && o && od < 1.7 && nAtt(p, 'str') - nAtt(o, 'str') > 0.1 && p.H - o.H > 0.03 && Math.random() < 0.3 + L * 0.3) { a.postT = 2.6; floatTxt(p, 'POSTING UP', '#f2c14e'); return; }      /* a mismatch: take him down low */
         const fr = MT.arcade ? Math.min(finishRange(p), 3.2 + L * 2) : finishRange(p);
         if (d < Math.max(2.4, fr * 0.92) && (laneOpen(p) || d < 2.3 || a.hold > 4)) { startFinish(p); return; }
         if (MT.clock < 2.5) { startShot(p, 'ai'); return; }
@@ -860,6 +866,7 @@ function matchStep(dtReal) {
   M_.time += dt; const B = M_.B; hlStep(dtReal); bubStep(dtReal);
   // phases
   if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
+  if (!M_.introDone && M_.phase === 'check' && M_.pt < 1.5 && !M_.practice && !M_.drill) { M_.introDone = true; for (const q of M_.P) if (q.team !== M_.me.team) floatTxt(q, (q === M_.me.man ? 'YOUR MAN · ' : '') + 'OVR ' + ovrOf(q.A) + (q.pers && q.pers[0] ? ' · ' + q.pers[0].n : ''), q === M_.me.man ? '#f2c14e' : '#ece9e2'); }      /* who you are up against */
   if (M_.late && M_.late.length && M_.phase !== 'over') { for (const c of M_.late) c.t -= dt; if (M_.late[0].t <= 0) { const c = M_.late.shift(); call(c.big, c.small, c.col, 1.3); } }
   if (M_.gpCall > 0 && M_.phase !== 'over') { M_.gpCall -= dt; if (M_.gpCall <= 0) call('GAME POINT', M_.score[0] === M_.score[1] ? 'Next bucket wins' : M_.gpTeam === M_.me.team ? 'One more. Close it out.' : 'Get a stop.', '#f2c14e', 1.6); }
   else if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
@@ -1013,7 +1020,7 @@ function stepPlayer(p, dt) {
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
   if (p.sprinting) { top *= 1.28; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * (1 + px(p, 'stam')) * dt);
-  if (p.stam < 20) top *= 0.86; if (p.slowT > 0) top *= 0.45;
+  if (p.stam < 20) { top *= 0.86; if (!p.gassed && p.stam < 12) { p.gassed = true; floatTxt(p, 'GASSED', '#8d8d99'); } } if (p.slowT > 0) top *= 0.45;
   const def = M_.off !== p.team && !hasBall && B.state !== 'loose'; if (def && !p.sprinting) top *= 0.92;
   if (lock > 0) {
     const tvx = p.in.dx * top * lock, tvz = p.in.dz * top * lock, opp = p.vx * tvx + p.vz * tvz < 0 || (Math.abs(tvx) + Math.abs(tvz) < 0.05);
@@ -1069,6 +1076,7 @@ function stepBall(dt) {
       const p = B.shooter;
       if (B.make) {
         B.state = 'through'; B.t = 0; B.pos.set(0, HOOP_Y, 0); B.vel.set(0, -4.5, 0); sfxM(B.green ? 'green' : 'swish');
+        if (!B.green && B.kind !== 'close' && Math.random() < 0.3) { B.pos.y = HOOP_Y + 0.06; B.vel.set(rnd(-0.22, 0.22), rnd(1.8, 2.6), rnd(-0.18, 0.18)); sfxM('rim'); M_.hoopT = 0.25; }      /* not every make is a swish: this one rattles round and drops */
         if (B.kind === 'three') p.stats.threes++;
         if (M_.practice === 'rack') { if (B.kind === 'three') { const v = B.green ? 3 : 2; M_.rackScore += v; floatTxt(p, '+' + v, B.green ? '#33ff88' : '#ffc531'); } else floatTxt(p, 'Deep balls only!', '#ff8a1f'); }
         else if (!M_.practice) call(B.green ? pick(CALLS.green) : B.kind === 'three' ? pick(CALLS.three) : pick(CALLS.make), p.b.name + ` +${B.pts}`, B.green ? '#33ff88' : '#fff', 1.1);
@@ -1078,7 +1086,12 @@ function stepBall(dt) {
       } else if (B.foulBy) {
         const d = B.foulBy; B.foulBy = null; B.state = 'loose'; B.t = 0; B.vel.set(rnd(-1, 1), 3, rnd(0.5, 1.5)); sfxM('rim'); foul(d, p, 'shooting');      /* missed and fouled: their ball again */
       } else {
-        B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfxM('rim'); if (M_.drill) drillEvent('miss', p, { kind: B.kind }); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3); missed(p); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14); { const [o, od] = nearestOpp(p); if (o && od < 3.5 && Math.random() < 0.3) say(o, 'w'); }
+        B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfxM('rim'); if (M_.drill) drillEvent('miss', p, { kind: B.kind }); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3);
+        { // where a miss goes depends on how it was missed: early is short (front rim, back toward the shooter), late is long (back iron, over the top), way off is an airball
+          const e = B.err || 0, sl = Math.hypot(B.sx || 0, B.sz || 1) || 1, ux = (B.sx || 0) / sl, uz = (B.sz || 1) / sl, jx = rnd(-0.9, 0.9);
+          if (Math.abs(e) > 0.42 && !M_.practice && B.kind !== 'close') { B.vel.set(-ux * 1.5 + jx, -1, -uz * 1.5); B.pos.y = HOOP_Y - 0.5; call('AIRBALL', p.b.name, '#8d8d99', 1.1); const [ao] = nearestOpp(p); if (ao) say(ao, 'w', 1); if (typeof fanSay === 'function') fanSay('air', 1 - p.team); }
+          else if (e < -0.1) { const v = rnd(2.2, 3.8); B.vel.set(ux * v + jx, rnd(2.5, 4), Math.max(0.4, uz * v)); }
+          else if (e > 0.1) { const v = rnd(1.0, 2.2); B.vel.set(-ux * v + jx * 1.3, rnd(3.5, 5.2), Math.max(0.3, -uz * v + 1.2)); } } missed(p); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14); { const [o, od] = nearestOpp(p); if (o && od < 3.5 && Math.random() < 0.3) say(o, 'w'); }
         if (M_.practice) floatTxt(p, pick(CALLS.miss), '#ff8a1f');
       }
     }
