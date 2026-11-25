@@ -760,10 +760,13 @@ function applyPose(R, p, dt) {
     J[n].rotation.set(c[0] + (R.rest && R.rest[n] || 0), c[1], c[2]);
   }
   R.yOff += ((p.y || 0) - R.yOff) * k; J.hips.position.y = R.legLen + R.yOff;
-  if (R.cape) R.cape.rotation.x = 0.12 + (R.capeSwing || 0);
+  if (R.cape) {      // a cape hangs from the shoulders: it follows the way he faces and swings back with speed, but not the bends and twists of the trunk
+    const g = R.cape, par = g.parent; R.root.updateWorldMatrix(true, true); par.getWorldQuaternion(_capeQ); R.root.getWorldQuaternion(_capeR);
+    _capeE.set(0.12 + Math.min(0.75, R.capeSwing || 0), 0, 0); _capeS.setFromEuler(_capeE); _capeR.multiply(_capeS); g.quaternion.copy(_capeQ.invert().multiply(_capeR)); }
   if (R.wings) { const f = Math.sin(performance.now() / 180) * 0.25; R.wings[0].rotation.y = -0.5 - f; R.wings[1].rotation.y = 0.5 + f; }
 }
 POSE.zero = [0, 0, 0];
+const _capeQ = new THREE.Quaternion(), _capeR = new THREE.Quaternion(), _capeS = new THREE.Quaternion(), _capeE = new THREE.Euler();
 
 // random streetballer for AI / hub NPCs
 // no two built-in players alike: a look is its hair, top, shorts and skin. Called for every AI in a game and on the Block.

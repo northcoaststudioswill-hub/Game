@@ -937,7 +937,7 @@ function matchStep(dtReal) {
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
-    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : 0.56;
+    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : 0.56;      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
     if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && o.st !== 'stagger' && M_.time - (o.scrHit || -9) > 1.5) screenHit(s, o);
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;

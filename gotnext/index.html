@@ -1807,10 +1807,13 @@ function applyPose(R, p, dt) {
     J[n].rotation.set(c[0] + (R.rest && R.rest[n] || 0), c[1], c[2]);
   }
   R.yOff += ((p.y || 0) - R.yOff) * k; J.hips.position.y = R.legLen + R.yOff;
-  if (R.cape) R.cape.rotation.x = 0.12 + (R.capeSwing || 0);
+  if (R.cape) {      // a cape hangs from the shoulders: it follows the way he faces and swings back with speed, but not the bends and twists of the trunk
+    const g = R.cape, par = g.parent; R.root.updateWorldMatrix(true, true); par.getWorldQuaternion(_capeQ); R.root.getWorldQuaternion(_capeR);
+    _capeE.set(0.12 + Math.min(0.75, R.capeSwing || 0), 0, 0); _capeS.setFromEuler(_capeE); _capeR.multiply(_capeS); g.quaternion.copy(_capeQ.invert().multiply(_capeR)); }
   if (R.wings) { const f = Math.sin(performance.now() / 180) * 0.25; R.wings[0].rotation.y = -0.5 - f; R.wings[1].rotation.y = 0.5 + f; }
 }
 POSE.zero = [0, 0, 0];
+const _capeQ = new THREE.Quaternion(), _capeR = new THREE.Quaternion(), _capeS = new THREE.Quaternion(), _capeE = new THREE.Euler();
 
 // random streetballer for AI / hub NPCs
 // no two built-in players alike: a look is its hair, top, shorts and skin. Called for every AI in a game and on the Block.
@@ -3243,7 +3246,7 @@ function matchStep(dtReal) {
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
-    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : 0.56;
+    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : 0.56;      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
     if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && o.st !== 'stagger' && M_.time - (o.scrHit || -9) > 1.5) screenHit(s, o);
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
