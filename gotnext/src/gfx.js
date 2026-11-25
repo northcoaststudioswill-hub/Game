@@ -197,6 +197,7 @@ function makeRig(spec, lowDetail) {
   R.yOff = 0;
   // blob shadow
   R.shadow = M(geo('blob', () => new THREE.CircleGeometry(0.34, 14)), flat(0x000000, { transparent: true, opacity: 0.32, depthWrite: false }), 0, 0.015, 0, root); R.shadow.rotation.x = -Math.PI / 2;
+  if (spec.bot && typeof botLook === 'function') botLook(R, skin, hr);      /* Lil Bottie: chrome, dreads, puffer (vice.js) */
   return R;
 }
 function handPos(R, side, out) { return R['hand' + (side || 'R')].getWorldPosition(out); }

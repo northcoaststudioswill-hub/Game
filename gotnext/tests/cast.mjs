@@ -8,7 +8,7 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
-let r = await p.evaluate(() => { const W = __pit.W, C = W.cast; return { cast: C && C.list.map(n => n.cast), louie: !!(C && C.louie), park: !!W.park, spots: W.spots.map(s => s.label).filter(l => /NEXX|MARK|ERIN|BOTTIE|LOUIE|BRENNICK/.test(l)) }; });
+let r = await p.evaluate(() => { const W = __pit.W, C = W.cast; return { cast: C && C.list.map(n => n.cast), louie: !!(C && C.louie), park: !!W.park, spots: W.spots.map(s => s.label).filter(l => /NEXX|MARK|AARON|BOTTIE|LOUIE|BRENNICK/.test(l)) }; });
 ok(r.cast && r.cast.includes('nexx') && r.louie && r.park && r.spots.length === 6, `on the Block: ${r.cast.join(', ')}, Louie, the run in the cage; spots ${r.spots.join(' · ')}`);
 // Nexx's menu
 r = await p.evaluate(() => { const P = __pit; P.uiNexx(); window.__tick(2); return Array.from(document.querySelectorAll('#panel .btn')).map(b => b.textContent); });
@@ -27,7 +27,7 @@ await p.evaluate(() => { __pit.enterWorld('hub', -9.5, -6.5, Math.PI); window.__
 r = await p.evaluate(() => { const P = __pit, S = P.S, rp = S.rep; P.uiLouie(); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent === 'SCRATCHES').click(); window.__tick(2); return S.rep - rp; });
 ok(r === 3, `Louie: scratches, +${r} Respect`);
 r = await p.evaluate(() => { const P = __pit, S = P.S; S.vc = 100; P.uiErin(); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent.startsWith('FARM')).click(); window.__tick(2); return { b: S.boosts.includes('smoothie'), vc: S.vc }; });
-ok(r.b && r.vc === 60, `Erin's stand: a farm smoothie in your boosts, 40 VC`);
+ok(r.b && r.vc === 60, `Aaron's stand: a farm smoothie in your boosts, 40 VC`);
 r = await p.evaluate(() => { const W = __pit.W, nx = W.cast.nexx; W.me.x = nx.x + 1.5; W.me.z = nx.z + 2.5; window.__tick(30); return nx.amb; });
 ok(r === 'film', `walk up to Nexx and he films you (${r})`);
 r = await p.evaluate(() => { const W = __pit.W, L = W.cast.louie, x0 = L.x, z0 = L.z; L.zoom = 3; window.__tick(60); return +Math.hypot(L.x - x0, L.z - z0).toFixed(1); });

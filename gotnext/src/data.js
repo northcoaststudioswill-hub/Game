@@ -292,6 +292,10 @@ const SKINS = ['#f1c9a5', '#e0ac69', '#c68642', '#8d5524', '#5a3620', '#3b2416']
 // ---------- crib (home court) ----------
 // each line has tiers; buying tier n requires rank
 const CRIB = [
+  { id: 'bottie', n: 'Lil Bottie', tiers: [
+    { n: 'Not Here', d: 'A robot rapper needs somewhere to charge.', cost: 0, rank: 0 },
+    { n: 'Moved In', d: 'Bottie lives at your crib: a track about you every day, and he posts your games. +3% Respect.', cost: 3500, rank: 2, k: 'rep', v: .03 },
+    { n: 'Home Studio', d: 'A booth in the yard. The feed pays: +4% VC from games, bigger daily posts.', cost: 9000, rank: 4, k: 'vc', v: .04 } ] },
   { id: 'floor', n: 'Court Surface', tiers: [
     { n: 'Cracked Driveway', d: 'It came with the lot.', cost: 0, rank: 0 },
     { n: 'Sealed Blacktop', d: '+5% Respect from games.', cost: 600, rank: 1, k: 'rep', v: .05 },
@@ -332,6 +336,7 @@ const CRIB = [
 // ---------- last-call boosts (one game) ----------
 const BOOSTS = [
   { id: 'dog', n: 'Soy Dog', d: '+4 Stamina this game.', cost: 15, buff: { stam: 4 }, hidden: true },
+  { id: 'nap', n: 'A Nap', d: '+8 Stamina this game.', cost: 0, buff: { stam: 8 }, hidden: true },
   { id: 'goji', n: 'Goji Berry Wrap', d: '+3 Speed, +3 Acceleration, +5 Stamina this game.', cost: 0, buff: { speed: 3, accel: 3, stam: 5 }, hidden: true },
   { id: 'smoothie', n: "Erin's Farm Smoothie", d: '+6 Stamina, +2 Strength this game.', cost: 40, buff: { stam: 6, str: 2 }, hidden: true },
   { id: 'paste', n: 'GatorGrade Energy Paste', d: '+5 Speed, +10 Stamina this game.', cost: 60, buff: { speed: 5, stam: 10 } },

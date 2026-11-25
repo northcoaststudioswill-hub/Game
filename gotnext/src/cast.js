@@ -18,7 +18,7 @@ const CAST_LINES = {
   mark: ["BRO. I'VE GOT A GUY. THE GUY IS ME.", "I'm not an NPC. I'm between protagonists.", "I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."],
   markBet: ["I HAD MONEY ON THAT, BRO."],
   d: ["I drive the van. That's my whole part.", "YO. THE TRUCK NEEDS A PART. THE PART NEEDS A TRUCK TO GO GET IT.", "YO! THE FLOW PROS TRUCK DIED. AGAIN. GOT FRIES?"],
-  erin: ["A SLOW DAY IS STILL A GOOD DAY.", "GO WATER YOURSELF.", "Back soon. Don't let Marcus touch my seeds.", "BECAUSE I NEVER CHANGE MY MIND."],
+  erin: ["A SLOW DAY IS STILL A GOOD DAY.", "GO WATER YOURSELF.", "Back soon. Don't let Mark touch my seeds.", "BECAUSE I NEVER CHANGE MY MIND."],
   bottie: ["BZZT. THIS IS GOING ON THE FEED.", "CONTEXT WINDOW: FULL OF YOUR MISTAKES.", "BZZT. I PRESSED ONE BUTTON. ONE. EVERYBODY IS SO DRAMATIC.", "PLEASE RATE THIS RESPONSE."],
   kael: ['Aye. And aye.', 'Top three.', 'Then I plan to be insufferable for a very long time.', 'Listen.', 'Somebody has to fix the valves.', 'Boring as a bread line.', "I'm early. You're high.", 'Then one will have to be added.'],
   kaelLose: ['You don\'t know how to make one.', 'Top three.'],
@@ -39,16 +39,16 @@ function castInit() {
   // MARK and D: by the cage fence, watching the run, Mark with money on it
   const mk = castNpc('MARK', 'slasher', { top: 't_tee', head: 'hd_cap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
   const dd = castNpc('D', 'glass', { head: 'hd_cap', face: 'f_shades' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
-  spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
-  // ERIN'S STAND: fresh food off the farm, by the cage on the other side
+  spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [["MARK'S BOOK (bet on games)", () => uiBook()], ['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
+  // AARON'S STAND (Erin, name masked): fresh food off the farm, by the cage on the other side
   { const g = grp(scene, 7.6, 0, -10.6); ink(M(box(2.2, 0.9, 0.8), toon('#7a5a3a'), 0, 0.45, 0, g), 1.03); M(box(2.3, 0.08, 0.9), toon('#4f8a3c'), 0, 0.93, 0, g);
     for (let i = 0; i < 9; i++) M(sph(0.07, 6, 5), toon(pick(['#e0452c', '#f2c14e', '#7ac74f', '#ff8a3c'])), -0.9 + (i % 5) * 0.42, 1.02, -0.18 + Math.floor(i / 5) * 0.3, g);
     for (const sx of [-1.05, 1.05]) M(cyl(0.03, 0.03, 1.4, 5), toon('#3a2a1a'), sx, 1.6, -0.3, g); M(box(2.4, 0.06, 1.0), toon('#4f8a3c'), 0, 2.3, -0.2, g);
-    const sg = sign("ERIN'S STAND", 1.8, 0.36, '#f2c14e', '#203a1a', { border: false }); sg.position.set(0, 2.05, 0.18); g.add(sg); solid(6.4, 8.8, -11.1, -10.1); }
-  const er = castNpc('ERIN', 'general', { top: 't_tee' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
-  spot(7.6, -9.4, 1.8, "ERIN'S STAND", () => uiErin());
+    const sg = sign("AARON'S STAND", 1.8, 0.36, '#f2c14e', '#203a1a', { border: false }); sg.position.set(0, 2.05, 0.18); g.add(sg); solid(6.4, 8.8, -11.1, -10.1); }
+  const er = castNpc('AARON', 'general', { top: 't_tee' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
+  spot(7.6, -9.4, 1.8, "AARON'S STAND", () => uiErin());
   // BOTTIE: chrome, dreads, puffer; films the run for the feed
-  const bt = castNpc('BOTTIE', 'showman', { hair: 'h_braids', face: 'f_visor', top: 't_hoodie' }, 3.6, -10.9, Math.PI, { cast: 'bottie' }); bt.amb = 'film'; C.list.push(bt);
+  const bt = addNpc(bottieBuild(), 3.6, -10.9, Math.PI, 'idle', { still: true }); bt.cast = 'bottie';      /* his own body: chrome, dreads, puffer (vice.js) */ bt.amb = 'film'; C.list.push(bt);
   spot(3.6, -9.8, 1.5, 'BOTTIE', () => uiDialog('BOTTIE', pick(CAST_LINES.bottie), [['Later']]));
   // BRENNICK (Kael, from Sootborn): the valve hand. First one out here, last to leave, counts every rep.
   { const kb = kaelBuild(); const n = addNpc(kb, -2.6, -6.6, Math.PI, 'idle', { still: true }); n.cast = 'kael'; n.amb = 'cross'; C.list.push(n); C.kael = n;
@@ -118,10 +118,10 @@ function nexxCheck(res) {
   if ((res.stats[G[0]] || 0) >= G[1]) { N.done = true; return { vc: 200, rep: 60, note: `NEXX posted your clip: ${(5 + Math.random() * 40).toFixed(1)}K views (+200 VC, +60 Respect)` }; }
   return null;
 }
-// ---- ERIN'S STAND ----
+// ---- AARON'S STAND ----
 function uiErin() {
-  uiDialog('ERIN', pick(CAST_LINES.erin), [
-    ['FARM SMOOTHIE (40 VC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("ERIN'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
+  uiDialog('AARON', pick(CAST_LINES.erin), [
+    ['FARM SMOOTHIE (40 VC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("AARON'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
     ['Later'],
   ]);
 }

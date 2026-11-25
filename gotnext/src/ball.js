@@ -73,6 +73,7 @@ function startMatch(cfg) {
   // man-to-man by slot
   for (const p of MT.P) { const opp = MT.P.filter(o => o.team !== p.team); p.man = opp.length ? opp[p.k % opp.length] : null; }
   MT.humans = MT.P.filter(p => p.user); MT.me = MT.P.find(p => p.mine) || MT.humans[0]; MT.locals = MT.humans.filter(p => !p.remote);
+  if (!MT.me) { MT.me = MT.P[0]; MT.spectate = true; }      /* nobody playing: a game you are watching (the book) */
   // --- ball ---
   const B = MT.B = { mesh: makeBall(cfg.ball || 'bl_std'), pos: V3(0, 1, 9), vel: V3(), state: 'held', holder: null, t: 0, shooter: null, lastTeam: 0, spin: 0 };
   scene.add(B.mesh); B.shadow = M(geo('bshadow', () => new THREE.CircleGeometry(0.14, 10)), flat(0x000000, { transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.016, 0, scene); B.shadow.rotation.x = -Math.PI / 2;
@@ -1121,6 +1122,7 @@ function matchCam(dt) {
   const M_ = MT, hs = M_.locals.length ? M_.locals : [M_.me || M_.P[0]]; let fx = 0, fz = 0; for (const h of hs) { fx += h.x; fz += h.z; } fx /= hs.length; fz /= hs.length;
   const portrait = innerWidth < innerHeight, B = M_.B;
   // lean the frame toward the ball so passes and boards stay on screen
+  if (M_.spectate) { fx = B.pos.x * 0.7; fz = clamp(B.pos.z, 2, 8) * 0.6 + 2; }
   fx = lerp(fx, B.pos.x, 0.25); fz = lerp(fz, B.pos.z, 0.2);
   const back = portrait ? 8.6 : 7.4, up = portrait ? 4.9 : 4.3;
   _v.set(fx * 0.62, up + fz * 0.1, fz + back + (hs.length > 1 ? 2 : 0));

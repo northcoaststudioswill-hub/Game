@@ -488,6 +488,10 @@ const SKINS = ['#f1c9a5', '#e0ac69', '#c68642', '#8d5524', '#5a3620', '#3b2416']
 // ---------- crib (home court) ----------
 // each line has tiers; buying tier n requires rank
 const CRIB = [
+  { id: 'bottie', n: 'Lil Bottie', tiers: [
+    { n: 'Not Here', d: 'A robot rapper needs somewhere to charge.', cost: 0, rank: 0 },
+    { n: 'Moved In', d: 'Bottie lives at your crib: a track about you every day, and he posts your games. +3% Respect.', cost: 3500, rank: 2, k: 'rep', v: .03 },
+    { n: 'Home Studio', d: 'A booth in the yard. The feed pays: +4% VC from games, bigger daily posts.', cost: 9000, rank: 4, k: 'vc', v: .04 } ] },
   { id: 'floor', n: 'Court Surface', tiers: [
     { n: 'Cracked Driveway', d: 'It came with the lot.', cost: 0, rank: 0 },
     { n: 'Sealed Blacktop', d: '+5% Respect from games.', cost: 600, rank: 1, k: 'rep', v: .05 },
@@ -528,6 +532,7 @@ const CRIB = [
 // ---------- last-call boosts (one game) ----------
 const BOOSTS = [
   { id: 'dog', n: 'Soy Dog', d: '+4 Stamina this game.', cost: 15, buff: { stam: 4 }, hidden: true },
+  { id: 'nap', n: 'A Nap', d: '+8 Stamina this game.', cost: 0, buff: { stam: 8 }, hidden: true },
   { id: 'goji', n: 'Goji Berry Wrap', d: '+3 Speed, +3 Acceleration, +5 Stamina this game.', cost: 0, buff: { speed: 3, accel: 3, stam: 5 }, hidden: true },
   { id: 'smoothie', n: "Erin's Farm Smoothie", d: '+6 Stamina, +2 Strength this game.', cost: 40, buff: { stam: 6, str: 2 }, hidden: true },
   { id: 'paste', n: 'GatorGrade Energy Paste', d: '+5 Speed, +10 Stamina this game.', cost: 60, buff: { speed: 5, stam: 10 } },
@@ -1109,6 +1114,7 @@ function makeRig(spec, lowDetail) {
   R.yOff = 0;
   // blob shadow
   R.shadow = M(geo('blob', () => new THREE.CircleGeometry(0.34, 14)), flat(0x000000, { transparent: true, opacity: 0.32, depthWrite: false }), 0, 0.015, 0, root); R.shadow.rotation.x = -Math.PI / 2;
+  if (spec.bot && typeof botLook === 'function') botLook(R, skin, hr);      /* Lil Bottie: chrome, dreads, puffer (vice.js) */
   return R;
 }
 function handPos(R, side, out) { return R['hand' + (side || 'R')].getWorldPosition(out); }
@@ -2001,6 +2007,7 @@ function startMatch(cfg) {
   // man-to-man by slot
   for (const p of MT.P) { const opp = MT.P.filter(o => o.team !== p.team); p.man = opp.length ? opp[p.k % opp.length] : null; }
   MT.humans = MT.P.filter(p => p.user); MT.me = MT.P.find(p => p.mine) || MT.humans[0]; MT.locals = MT.humans.filter(p => !p.remote);
+  if (!MT.me) { MT.me = MT.P[0]; MT.spectate = true; }      /* nobody playing: a game you are watching (the book) */
   // --- ball ---
   const B = MT.B = { mesh: makeBall(cfg.ball || 'bl_std'), pos: V3(0, 1, 9), vel: V3(), state: 'held', holder: null, t: 0, shooter: null, lastTeam: 0, spin: 0 };
   scene.add(B.mesh); B.shadow = M(geo('bshadow', () => new THREE.CircleGeometry(0.14, 10)), flat(0x000000, { transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.016, 0, scene); B.shadow.rotation.x = -Math.PI / 2;
@@ -3049,6 +3056,7 @@ function matchCam(dt) {
   const M_ = MT, hs = M_.locals.length ? M_.locals : [M_.me || M_.P[0]]; let fx = 0, fz = 0; for (const h of hs) { fx += h.x; fz += h.z; } fx /= hs.length; fz /= hs.length;
   const portrait = innerWidth < innerHeight, B = M_.B;
   // lean the frame toward the ball so passes and boards stay on screen
+  if (M_.spectate) { fx = B.pos.x * 0.7; fz = clamp(B.pos.z, 2, 8) * 0.6 + 2; }
   fx = lerp(fx, B.pos.x, 0.25); fz = lerp(fz, B.pos.z, 0.2);
   const back = portrait ? 8.6 : 7.4, up = portrait ? 4.9 : 4.3;
   _v.set(fx * 0.62, up + fz * 0.1, fz + back + (hs.length > 1 ? 2 : 0));
@@ -3666,7 +3674,8 @@ function buildHub() {
   floodlight(-15, -13, 10, -4, -22); floodlight(15, -13, 10, 4, -22); floodlight(-15, -31, 10, -3, -23); floodlight(15, -31, 10, 3, -23);
   for (let r = 0; r < 3; r++) ink(M(box(12, 0.4, 0.9), toon('#3a3c44'), 0, 0.3 + r * 0.45, -31 - r * 0.9, scene), 1.02);
   parkInit(scene);      /* park.js: a real 2v2 run on the show court, and the bleachers watching it */
-  castInit();      /* cast.js: Nexx, Mark and D, Erin's stand, Bottie, Louie */
+  castInit();      /* cast.js: Nexx, Mark and D, Aaron's stand, Bottie, Louie */
+  viceInit();      /* vice.js: Trey's Bones */
   spot(0, -10.3, 2.4, 'ENTER THE CAGES', () => enterWorld('pit', 0, 3.4, Math.PI));
   // elevated train behind it all
   M(box(120, 0.6, 3), toon('#23242a'), 0, 9.2, -37, scene); for (let x = -50; x <= 50; x += 10) M(box(0.8, 9, 0.8), toon('#23242a'), x, 4.5, -37, scene);
@@ -3871,7 +3880,7 @@ function worldStep(dt) {
       else applyPose(n.rig, poseOf(an, W.t, an === 'idle' ? Object.assign({ prof: n.rig.prof, ph: n.ph }, o) : o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }
-  if (W.park) parkStep(dt); if (W.cast) castStep(dt);
+  if (W.park) parkStep(dt); if (W.cast) castStep(dt); holoStep(dt);
   for (const c of W.cars) { c.a += c.s * dt; c.c.position.set(Math.cos(c.a) * c.r, c.y, Math.sin(c.a) * c.r); c.c.rotation.y = -c.a + (c.s > 0 ? -Math.PI / 2 : Math.PI / 2); }
   if (W.train) { W.train.position.x += dt * 16; if (W.train.position.x > 95) W.train.position.x = -140 - rnd(0, 120); }
   if (W.eq) { W.eq.forEach((e, i) => { const v = 0.2 + Math.abs(Math.sin(W.t * (6 + i * 1.3) + i)) * (0.5 + 0.5 * Math.abs(Math.sin(W.t * 1.9))); e.scale.y = v * 2; e.position.y = 1.02 + v * 0.3; }); const pu = 1 + Math.max(0, Math.sin(W.t * 11.4)) * 0.08; for (const sp of W.speakers) sp.scale.set(pu, 1, pu); }
@@ -4028,7 +4037,7 @@ const CAST_LINES = {
   mark: ["BRO. I'VE GOT A GUY. THE GUY IS ME.", "I'm not an NPC. I'm between protagonists.", "I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."],
   markBet: ["I HAD MONEY ON THAT, BRO."],
   d: ["I drive the van. That's my whole part.", "YO. THE TRUCK NEEDS A PART. THE PART NEEDS A TRUCK TO GO GET IT.", "YO! THE FLOW PROS TRUCK DIED. AGAIN. GOT FRIES?"],
-  erin: ["A SLOW DAY IS STILL A GOOD DAY.", "GO WATER YOURSELF.", "Back soon. Don't let Marcus touch my seeds.", "BECAUSE I NEVER CHANGE MY MIND."],
+  erin: ["A SLOW DAY IS STILL A GOOD DAY.", "GO WATER YOURSELF.", "Back soon. Don't let Mark touch my seeds.", "BECAUSE I NEVER CHANGE MY MIND."],
   bottie: ["BZZT. THIS IS GOING ON THE FEED.", "CONTEXT WINDOW: FULL OF YOUR MISTAKES.", "BZZT. I PRESSED ONE BUTTON. ONE. EVERYBODY IS SO DRAMATIC.", "PLEASE RATE THIS RESPONSE."],
   kael: ['Aye. And aye.', 'Top three.', 'Then I plan to be insufferable for a very long time.', 'Listen.', 'Somebody has to fix the valves.', 'Boring as a bread line.', "I'm early. You're high.", 'Then one will have to be added.'],
   kaelLose: ['You don\'t know how to make one.', 'Top three.'],
@@ -4049,16 +4058,16 @@ function castInit() {
   // MARK and D: by the cage fence, watching the run, Mark with money on it
   const mk = castNpc('MARK', 'slasher', { top: 't_tee', head: 'hd_cap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
   const dd = castNpc('D', 'glass', { head: 'hd_cap', face: 'f_shades' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
-  spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
-  // ERIN'S STAND: fresh food off the farm, by the cage on the other side
+  spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [["MARK'S BOOK (bet on games)", () => uiBook()], ['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
+  // AARON'S STAND (Erin, name masked): fresh food off the farm, by the cage on the other side
   { const g = grp(scene, 7.6, 0, -10.6); ink(M(box(2.2, 0.9, 0.8), toon('#7a5a3a'), 0, 0.45, 0, g), 1.03); M(box(2.3, 0.08, 0.9), toon('#4f8a3c'), 0, 0.93, 0, g);
     for (let i = 0; i < 9; i++) M(sph(0.07, 6, 5), toon(pick(['#e0452c', '#f2c14e', '#7ac74f', '#ff8a3c'])), -0.9 + (i % 5) * 0.42, 1.02, -0.18 + Math.floor(i / 5) * 0.3, g);
     for (const sx of [-1.05, 1.05]) M(cyl(0.03, 0.03, 1.4, 5), toon('#3a2a1a'), sx, 1.6, -0.3, g); M(box(2.4, 0.06, 1.0), toon('#4f8a3c'), 0, 2.3, -0.2, g);
-    const sg = sign("ERIN'S STAND", 1.8, 0.36, '#f2c14e', '#203a1a', { border: false }); sg.position.set(0, 2.05, 0.18); g.add(sg); solid(6.4, 8.8, -11.1, -10.1); }
-  const er = castNpc('ERIN', 'general', { top: 't_tee' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
-  spot(7.6, -9.4, 1.8, "ERIN'S STAND", () => uiErin());
+    const sg = sign("AARON'S STAND", 1.8, 0.36, '#f2c14e', '#203a1a', { border: false }); sg.position.set(0, 2.05, 0.18); g.add(sg); solid(6.4, 8.8, -11.1, -10.1); }
+  const er = castNpc('AARON', 'general', { top: 't_tee' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
+  spot(7.6, -9.4, 1.8, "AARON'S STAND", () => uiErin());
   // BOTTIE: chrome, dreads, puffer; films the run for the feed
-  const bt = castNpc('BOTTIE', 'showman', { hair: 'h_braids', face: 'f_visor', top: 't_hoodie' }, 3.6, -10.9, Math.PI, { cast: 'bottie' }); bt.amb = 'film'; C.list.push(bt);
+  const bt = addNpc(bottieBuild(), 3.6, -10.9, Math.PI, 'idle', { still: true }); bt.cast = 'bottie';      /* his own body: chrome, dreads, puffer (vice.js) */ bt.amb = 'film'; C.list.push(bt);
   spot(3.6, -9.8, 1.5, 'BOTTIE', () => uiDialog('BOTTIE', pick(CAST_LINES.bottie), [['Later']]));
   // BRENNICK (Kael, from Sootborn): the valve hand. First one out here, last to leave, counts every rep.
   { const kb = kaelBuild(); const n = addNpc(kb, -2.6, -6.6, Math.PI, 'idle', { still: true }); n.cast = 'kael'; n.amb = 'cross'; C.list.push(n); C.kael = n;
@@ -4128,10 +4137,10 @@ function nexxCheck(res) {
   if ((res.stats[G[0]] || 0) >= G[1]) { N.done = true; return { vc: 200, rep: 60, note: `NEXX posted your clip: ${(5 + Math.random() * 40).toFixed(1)}K views (+200 VC, +60 Respect)` }; }
   return null;
 }
-// ---- ERIN'S STAND ----
+// ---- AARON'S STAND ----
 function uiErin() {
-  uiDialog('ERIN', pick(CAST_LINES.erin), [
-    ['FARM SMOOTHIE (40 VC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("ERIN'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
+  uiDialog('AARON', pick(CAST_LINES.erin), [
+    ['FARM SMOOTHIE (40 VC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("AARON'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
     ['Later'],
   ]);
 }
@@ -4164,6 +4173,235 @@ function runKael() {
     return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 VC' : 'Beat Brennick again +150 VC' }; };
   cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
   save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
+}
+// GOT NEXT — the bones and the book, Lil Bottie's body, and things to do at home.
+//   TREY'S BONES   dice games on grey holodice (the Wisp Table from Guttercrown, moved to the Block): Thirteen,
+//                  Twenty-One, Poker Bones, High Bones
+//   MARK'S BOOK    bet VC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
+//   BOTTIE         a chrome robot body for the rig; lives at your crib as an upgrade
+//   HOME           cookouts, the heavy bag, trick shots, naps, bones at your own table
+// VC only. Both the table and the book stop paying out past a daily win limit, so neither is a way to max a build.
+'use strict';
+
+// ---------------- Lil Bottie's body ----------------
+function botLook(R, skin, hr) {
+  const chrome = toon('#c3ccd6'), dark = toon('#1a1c22'), J = R.joints;
+  R.root.traverse(o => { if (o.isMesh && o.material === skin) o.material = chrome; });
+  const head = J.head, chest = J.chest;
+  // dreads: thick ropes off the crown, hanging to the shoulders, in two tones
+  for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2, back = Math.cos(a) < 0.55, len = back ? 0.2 + (i % 3) * 0.04 : 0.11; if (!back && Math.abs(Math.sin(a)) < 0.5) continue;
+    const d = M(cyl(0.018, 0.014, len, 5), toon(i % 3 ? '#16181c' : '#33e0ff'), Math.sin(a) * hr * 0.9, hr * 1.55 - len / 2, Math.cos(a) * hr * 0.85, head); d.rotation.z = -Math.sin(a) * 0.22; d.rotation.x = Math.cos(a) * 0.22; }
+  M(sph(hr * 0.98, 10, 6), toon('#16181c'), 0, hr * 1.5, -0.01, head).scale.set(1, 0.55, 1);
+  // a visor strip that glows, an antenna, bolts at the temples
+  M(box(hr * 1.7, hr * 0.42, 0.03), flat(0x33e0ff), 0, hr * 1.14, hr * 0.92, head); for (const sx of [-1, 1]) M(cyl(0.022, 0.022, 0.03, 8), dark, sx * hr * 0.93, hr * 1.1, 0, head).rotation.z = Math.PI / 2;
+  // the puffer: three fat rolls round the chest, a high collar, rolls on the upper arms
+  const pc = toon('#ff2d78'), w = (R.shW || 0.36);
+  for (let k = 0; k < 3; k++) ink(M(sph(0.2, 10, 6), pc, 0, -0.08 - k * 0.13, 0, chest), 1.04).scale.set(1.05 + (k === 1 ? 0.06 : 0), 0.42, 0.78);
+  ink(M(cyl(0.085, 0.1, 0.09, 10, true), pc, 0, 0.05, 0, chest), 1.05);
+  for (const s of ['R', 'L']) { const sh = J['sh' + s]; if (!sh) continue; for (let k = 0; k < 2; k++) M(sph(0.075, 8, 6), pc, 0, -0.07 - k * 0.11, 0, sh).scale.set(1, 0.8, 1); }
+  // the chain
+  const ch = M(geo('botChain', () => new THREE.TorusGeometry(0.1, 0.012, 5, 14)), toon('#f2c14e'), 0, -0.1, 0.13, chest); ch.rotation.x = 1.2; M(box(0.05, 0.05, 0.015), toon('#f2c14e'), 0, -0.2, 0.17, chest);
+}
+function bottieBuild() { const b = withSeed(4242, () => aiBuild(84, 'showman')); b.name = 'BOTTIE'; b.bot = true; b.build.body = { h: 75, w: -0.2, s: 0.3 }; b.worn = Object.assign(randomWorn(1), { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tank', bottom: 'b_basic', shoes: 'k_white', back: 'bk_none' }); return b; }
+
+// ---------------- holodice ----------------
+// the grey ones: a pillar on a pale foot, a brown cap, a black dome, and the number hanging in the light above it
+function holoNumTex(n) { return geoTex('holo' + n, () => canvasTex(64, 64, x => { x.clearRect(0, 0, 64, 64); x.fillStyle = '#b3401a'; x.beginPath(); x.arc(32, 32, 25, 0, 6.3); x.fill(); x.strokeStyle = '#ffb347'; x.lineWidth = 4; x.stroke(); x.fillStyle = '#ffe2a8'; x.font = '900 38px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.fillText(String(n), 32, 46); })); }
+function holodiceMesh(g) {
+  ink(M(box(0.3, 0.1, 0.3), toon('#3a3d44'), 0, 0.05, 0, g), 1.04); M(box(0.27, 0.07, 0.27), toon('#d5d9de'), 0, 0.135, 0, g); ink(M(box(0.24, 0.5, 0.24), toon('#8f959d'), 0, 0.42, 0, g), 1.04);
+  ink(M(box(0.34, 0.06, 0.34), toon('#5a3a22'), 0, 0.7, 0, g), 1.05); M(sph(0.12, 12, 8), toon('#0d0d10'), 0, 0.73, 0, g).scale.set(1, 0.75, 1);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: holoNumTex(1 + Math.floor(Math.random() * 6)), transparent: true, depthWrite: false })); sp.scale.setScalar(0.26); sp.position.y = 1.02; g.add(sp); g.userData.holo = sp;
+  if (typeof W !== 'undefined' && W) (W.holo = W.holo || []).push({ sp, t: rnd(2, 9), roll: 0 }); return g;
+}
+function holoStep(dt) { if (!W || !W.holo) return; for (const h of W.holo) { if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; if (h.ft <= 0) { h.ft = 0.07; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 14)) * 0.05; } else { h.t -= dt; h.sp.position.y = 1.02; if (h.t <= 0) { h.t = rnd(4, 12); h.roll = 0.7; } } } }
+function holoRollAll() { if (W && W.holo) for (const h of W.holo) h.roll = rnd(0.5, 0.9); }
+
+// ---------------- daily limits ----------------
+const VICE_CAP = { bones: 1500, book: 2500 };
+function vice() { const t = dayKey(); if (!S.vice || S.vice.day !== t) S.vice = { day: t, bones: 0, book: 0, w: (S.vice && S.vice.w) || 0, l: (S.vice && S.vice.l) || 0, net: (S.vice && S.vice.net) || 0 }; return S.vice; }
+function viceRoom(k) { return VICE_CAP[k] - vice()[k]; }      /* how much more you can win there today */
+function vicePay(k, delta) { const V = vice(); S.vc += delta; V[k] += delta; V.net += delta; if (delta > 0) V.w++; else if (delta < 0) V.l++; save(); if (typeof uiHud === 'function' && W) uiHud(); }
+
+// ---------------- TREY'S BONES ----------------
+const TREY = {
+  hello: ['Trey Dedrick, the Third. At your service and at your expense. Pick a game.', 'Another brave wallet. Sit. Well. Stand. There are no chairs.', 'The dice are honest. I am merely charming.'],
+  bust: ['Over. Dreadful luck. I shall treasure it.', 'Bust! My grandfather would have wept. With joy.', 'Too many. The light giveth and so on.'],
+  win: ['Well rolled. I hate it. Here is your VC.', 'You win. I shall be gracious about it later, in private.', 'Splendid. Do it again so I can win it back.'],
+  lose: ['The house prevails, as houses do.', 'Mine. Thank you ever so.', 'Unlucky. Lucky for me, which is the important bit.'],
+  push: ['A draw. Your stake back, and my respect, which is worth less.', 'Even. Nobody is happy. Perfect.'],
+  dead: ['DEAD ON. Triple! I shall need a moment.', 'Exactly the number. Triple, curse you.'],
+  roll: ['Another?', 'And one more…', 'The light is warm tonight.', 'Steady hands.'],
+  broke: ['Your wallet is empty, friend. Come back heavier.'], capped: ['You have cleaned me out for today. Come back tomorrow. I shall be rested and you shall be poorer.'],
+};
+const BONES = {
+  t13: { n: 'THIRTEEN', d: 'Roll one die at a time. Stand close to 13; Trey has to match or beat you. A dead 13 pays triple.', target: 13 },
+  t21: { n: 'TWENTY-ONE', d: 'The long game: the same, to 21. A dead 21 pays triple.', target: 21 },
+  poker: { n: 'POKER BONES', d: 'Five dice each. Tap dice to hold them, throw the rest once. Best hand wins.' },
+  high: { n: 'HIGH BONES', d: 'Two dice each, highest total wins. PRESS once: double the stake and rethrow your worst.' },
+};
+const d6 = () => 1 + Math.floor(Math.random() * 6);
+// poker hands on five dice: [rank, tiebreak...]; higher is better
+function bonesHand(d) {
+  const c = {}; for (const v of d) c[v] = (c[v] || 0) + 1; const g = Object.entries(c).map(([v, n]) => [n, +v]).sort((a, b) => b[0] - a[0] || b[1] - a[1]), s = d.slice().sort((a, b) => a - b).join('');
+  const kick = g.map(x => x[1]);
+  if (g[0][0] === 5) return [7, ...kick]; if (g[0][0] === 4) return [6, ...kick]; if (g[0][0] === 3 && g[1][0] === 2) return [5, ...kick];
+  if (s === '12345' || s === '23456') return [4, d.reduce((a, b) => a + b, 0)]; if (g[0][0] === 3) return [3, ...kick]; if (g[0][0] === 2 && g[1][0] === 2) return [2, ...kick]; if (g[0][0] === 2) return [1, ...kick]; return [0, ...kick];
+}
+const HAND_N = ['HIGH DIE', 'A PAIR', 'TWO PAIR', 'THREE OF A KIND', 'STRAIGHT', 'FULL HOUSE', 'FOUR OF A KIND', 'FIVE OF A KIND'];
+function handCmp(a, b) { for (let i = 0; i < Math.max(a.length, b.length); i++) { const d = (a[i] || 0) - (b[i] || 0); if (d) return d; } return 0; }
+function treyHolds(d) { const h = bonesHand(d); if (h[0] >= 4) return d.map(() => true); const c = {}; for (const v of d) c[v] = (c[v] || 0) + 1; const best = Math.max(...Object.values(c)); if (best === 1) { const mx = Math.max(...d); return d.map(v => v === mx && v >= 5); } return d.map(v => c[v] >= 2); }
+// one full hand of a totals game with you standing at `stand` (used by the test to measure the house edge)
+function bonesSim(target, stand) { let y = 0; while (y < stand) y += d6(); if (y > target) return -1; if (y === target) return 2; let h = 0; while (h < y) h += d6(); return h > target ? 1 : -1; }      /* Trey takes a tie: with best play the house keeps 2-3% */
+function holoHTML(v, o) { o = o || {}; return `<span data-k="${o.k === undefined ? '' : o.k}" style="display:inline-block;width:46px;margin:0 3px;text-align:center;cursor:${o.k === undefined ? 'default' : 'pointer'};opacity:${o.dim ? 0.45 : 1}"><span style="display:block;height:30px;font:900 22px var(--display,Archivo);color:${o.held ? '#3dffa0' : '#ffb347'};text-shadow:0 0 10px ${o.held ? '#3dffa0' : '#ff7a1f'}">${v || '·'}</span><span style="display:block;width:20px;height:10px;margin:0 auto;background:#0d0d10;border-radius:10px 10px 0 0"></span><span style="display:block;width:34px;height:6px;margin:0 auto;background:#5a3a22"></span><span style="display:block;width:24px;height:34px;margin:0 auto;background:linear-gradient(90deg,#7c828a,#a5abb3 45%,#8a9098)"></span><span style="display:block;width:28px;height:6px;margin:0 auto;background:#d5d9de"></span><span style="display:block;width:32px;height:7px;margin:0 auto;background:#3a3d44"></span></span>`; }
+function uiBones(home) {
+  const G = { game: null, stake: home ? 25 : 50, phase: 'pick', you: [], him: [], hold: [], msg: pick(TREY.hello), pressed: false, bet: 0 };
+  const host = home ? 'HOUSE RULES' : 'TREY', stakes = home ? [10, 25, 50] : [25, 50, 100, 250], say = k => home ? ({ win: 'You win.', lose: 'The house takes it.', push: 'Push.', bust: 'Bust.', dead: 'DEAD ON. Triple.', roll: '', broke: 'Not enough VC.', capped: 'Enough for today.' }[k]) : pick(TREY[k]);
+  const sum = a => a.reduce((x, y) => x + y, 0);
+  const settle = (res, mult) => { const win = res > 0 ? Math.round(G.bet * (mult || 1)) : res < 0 ? -G.bet : 0; vicePay('bones', win); G.phase = 'done'; G.res = res; G.won = win; sfx(res > 0 ? 'coin' : res < 0 ? 'no' : 'ui'); holoRollAll(); };
+  const start = id => { if (S.vc < G.stake) { G.msg = say('broke'); return rerender(); } if (viceRoom('bones') <= 0) { G.msg = say('capped'); return rerender(); }
+    G.game = id; G.bet = G.stake; G.you = []; G.him = []; G.hold = [false, false, false, false, false]; G.pressed = false; G.res = 0; G.phase = 'you'; sfx('uiok');
+    if (id === 'poker') { G.you = [d6(), d6(), d6(), d6(), d6()]; G.msg = 'Tap the dice you want to keep. Then throw the rest.'; }
+    else if (id === 'high') { G.you = [d6(), d6()]; G.him = [d6(), d6()]; G.msg = `You show ${sum(G.you)}. Stand, or press: double the stake and rethrow your worst.`; }
+    else { G.you = [d6()]; G.msg = say('roll'); } rerender(); };
+  const treyTotals = () => { const T = BONES[G.game].target, y = sum(G.you); while (sum(G.him) < y) G.him.push(d6()); const h = sum(G.him); if (h > T) { G.msg = say('win'); settle(1); } else { G.msg = say('lose'); settle(-1); } };
+  const act = a => {
+    const T = BONES[G.game] && BONES[G.game].target;
+    if (G.game === 't13' || G.game === 't21') {
+      if (a === 'roll') { G.you.push(d6()); const y = sum(G.you); sfx('ui'); if (y > T) { G.msg = say('bust'); settle(-1); } else if (y === T) { G.msg = say('dead'); settle(1, 2); } else G.msg = say('roll'); }
+      else if (a === 'stand') treyTotals();
+    } else if (G.game === 'poker') {
+      if (a === 'throw') { G.you = G.you.map((v, i) => G.hold[i] ? v : d6()); let h = [d6(), d6(), d6(), d6(), d6()]; const k = treyHolds(h); h = h.map((v, i) => k[i] ? v : d6()); G.him = h;
+        const a1 = bonesHand(G.you), b1 = bonesHand(G.him), c = handCmp(a1, b1); G.msg = `${HAND_N[a1[0]]} against ${HAND_N[b1[0]]}. ` + say(c > 0 ? 'win' : c < 0 ? 'lose' : 'push'); settle(c > 0 ? 1 : c < 0 ? -1 : 0); }
+    } else if (G.game === 'high') {
+      if (a === 'press' && !G.pressed && S.vc >= G.bet * 2) { G.pressed = true; G.bet *= 2; const i = G.you[0] <= G.you[1] ? 0 : 1; G.you[i] = d6(); sfx('ui'); }
+      if (a === 'press' || a === 'stand') { const y = sum(G.you), h = sum(G.him); G.msg = `${y} against ${h}. ` + say(y > h ? 'win' : 'lose'); settle(y > h ? 1 : -1); }      /* Trey takes a tie */
+    }
+    rerender();
+  };
+  openPanel(() => {
+    const V = vice(); let h = `<div class="ph"><h2>${home ? 'BONES AT HOME' : "TREY'S BONES"}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><div class="card sel"><h3 class="mono" style="font-size:10px;color:var(--heat)">${host}</h3><p style="font-size:15px;margin:6px 0">${esc(G.msg)}</p></div>`;
+    if (G.phase === 'pick') {
+      h += `<div class="cat">STAKE</div><div class="card">` + stakes.map(s => Btn(s + ' VC', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join(' ') + `</div><div class="cat">GAME</div>`;
+      for (const id in BONES) h += `<div class="card"><h3>${BONES[id].n}</h3><p class="mu">${BONES[id].d}</p><div style="margin-top:6px">${Btn('PLAY · ' + G.stake + ' VC', () => start(id), 'sm', S.vc < G.stake)}</div></div>`;
+      h += `<p class="mu">Today at the table: ${V.bones >= 0 ? '+' : ''}${V.bones} VC. The table stops paying once you are up ${VICE_CAP.bones} in a day.</p>`;
+    } else {
+      const B_ = BONES[G.game], tot = G.game === 'poker' ? '' : ` · ${sum(G.you)}`;
+      h += `<div class="cat">${B_.n} · ${G.bet} VC</div><div class="card"><p class="mono" style="font-size:10px">YOU${tot}</p><div style="margin:6px 0">` + G.you.map((v, i) => holoHTML(v, G.game === 'poker' && G.phase === 'you' ? { k: on(() => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }), held: G.hold[i] } : {})).join('') + `</div>`;
+      h += `<p class="mono" style="font-size:10px;margin-top:8px">${home ? 'THE HOUSE' : 'TREY'}${G.him.length && G.game !== 'poker' ? ' · ' + sum(G.him) : ''}</p><div style="margin:6px 0">` + (G.him.length ? G.him.map(v => holoHTML(v)).join('') : holoHTML(0, { dim: true })) + `</div></div>`;
+      if (G.phase === 'you') h += `<div class="pf">` + (G.game === 'poker' ? Btn('THROW THE REST', () => act('throw')) : G.game === 'high' ? Btn('STAND', () => act('stand')) + Btn('PRESS (' + G.bet * 2 + ')', () => act('press'), 'alt', S.vc < G.bet * 2) : Btn('ROLL', () => act('roll')) + Btn('STAND ON ' + sum(G.you), () => act('stand'), 'alt')) + `</div>`;
+      else h += `<p class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin:8px 0">${G.won > 0 ? '+' + G.won : G.won} VC</p><div class="pf">${Btn('AGAIN · ' + G.stake, () => start(G.game), '', S.vc < G.stake)}${Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'alt')}</div>`;
+    }
+    return h + `</div>`;
+  }, 'side', () => uiClose());
+}
+
+// ---------------- MARK'S BOOK ----------------
+const CREWS = ['Rust Belt Rejects', 'Parking Lot Legends', 'The Refund Kings', 'Vat 44', 'Low Gravity', 'Food Court Five', 'The Subscriptions', 'Silo Boys', 'Moon Money', 'The Pre-Orders', 'Knee Payment Plan', 'Open Run'];
+function bkTeam(name, ovr, size, seed) { const ps = []; for (let i = 0; i < size; i++) { const o = clamp(Math.round(ovr + (i === 0 ? 5 : -3) + rnd(-3, 3)), 52, 97), style = pick(STYLES).id; const b = withSeed(seed + i, () => aiBuild(o, style)); ps.push({ n: b.name, ovr: o, style, seed: seed + i }); } return { n: name, ovr, ps }; }
+// a quick model of a game: possessions until someone gets to the target. Used for the lines and for SIM.
+function bkSim(g) {
+  const to = g.to, sc = [0, 0], pts = [g.t[0].ps.map(() => 0), g.t[1].ps.map(() => 0)]; let off = Math.random() < 0.5 ? 0 : 1, guard = 0;
+  while (sc[0] < to && sc[1] < to && guard++ < 400) { const o = g.t[off], d = g.t[1 - off], q = clamp(0.44 + (o.ovr - d.ovr) * 0.007, 0.2, 0.7);
+    if (Math.random() < q) { const w = o.ps.map(p => Math.pow(p.ovr / 80, 4)), tot = w.reduce((a, b) => a + b, 0); let r = Math.random() * tot, k = 0; while (k < w.length - 1 && r > w[k]) { r -= w[k]; k++; } const v = Math.random() < 0.22 ? 2 : 1; sc[off] += v; pts[off][k] += v; off = 1 - off; }
+    else if (Math.random() > 0.28) off = 1 - off; }
+  return { sc, pts };
+}
+function bkLines(g) {
+  let w0 = 0; const mg = [], st = [[], []]; for (let i = 0; i < 400; i++) { const r = bkSim(g); if (r.sc[0] > r.sc[1]) w0++; mg.push(r.sc[0] - r.sc[1]); st[0].push(r.pts[0][0]); st[1].push(r.pts[1][0]); }
+  const med = a => a.slice().sort((x, y) => x - y)[a.length >> 1], p = clamp(w0 / 400, 0.08, 0.92), ml = q => Math.max(1.06, Math.round(0.93 / q * 100) / 100), m = med(mg), fav = m >= 0 ? 0 : 1;
+  g.ml = [ml(p), ml(1 - p)]; g.fav = fav; g.sp = Math.max(0.5, Math.floor(Math.abs(m) * 0.9) + 0.5); g.pr = [Math.floor(med(st[0])) + 0.5, Math.floor(med(st[1])) + 0.5];
+}
+function bkSlate() {
+  const names = CREWS.slice().sort(() => Math.random() - 0.5), games = [];
+  for (let i = 0; i < 3; i++) { const mi = pick([0, 0, 1, 2]), m = MODES[mi], base = Math.round(rnd(62, 90)), g = { id: i, mi, to: m.to, n: m.n, t: [bkTeam(names[i * 2], base + Math.round(rnd(-2, 2)), m.size, 9000 + Math.floor(Math.random() * 1e6)), bkTeam(names[i * 2 + 1], base + Math.round(rnd(-9, 9)), m.size, 9000 + Math.floor(Math.random() * 1e6))], res: null }; bkLines(g); games.push(g); }
+  return { games, slip: null };
+}
+function book() { if (!S.book || !S.book.slate) S.book = Object.assign({ w: 0, l: 0, net: 0 }, S.book || {}, { slate: bkSlate() }); return S.book; }
+function bkLegLabel(g, L) { const t = g.t[L.s]; return L.k === 'ml' ? `${t.n} to win` : L.k === 'sp' ? `${t.n} ${L.s === g.fav ? '-' : '+'}${g.sp}` : `${g.t[L.s].ps[0].n} ${L.o ? 'over' : 'under'} ${g.pr[L.s]} pts`; }
+function bkLegOdds(g, L) { return L.k === 'ml' ? g.ml[L.s] : 1.87; }
+function bkLegWon(g, L) { const r = g.res; if (!r) return null; const m = r.sc[L.s] - r.sc[1 - L.s]; if (L.k === 'ml') return m > 0; if (L.k === 'sp') return L.s === g.fav ? m > g.sp : m > -g.sp; const p = r.star[L.s]; return L.o ? p > g.pr[L.s] : p < g.pr[L.s]; }
+function bkFinish(gi, r) { const B = book(), g = B.slate.games[gi]; g.res = r; save(); bkSettle(); }
+function bkSettle() {
+  const B = book(), sl = B.slate.slip; if (!sl || sl.done) return; const gs = B.slate.games; if (sl.legs.some(L => !gs[L.g].res)) return;
+  const won = sl.legs.every(L => bkLegWon(gs[L.g], L)); sl.done = true; sl.won = won; const pay = won ? Math.round(sl.stake * sl.odds) : 0; sl.pay = pay;
+  if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; } else { B.l++; B.net -= sl.stake; }
+  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} VC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
+}
+function bkBuilds(t) { return t.ps.map(p => { const b = withSeed(p.seed, () => aiBuild(p.ovr, p.style)); b.name = p.n; return { b, ctrl: -1, ai: clamp((p.ovr - 50) / 45, 0.3, 1) }; }); }
+function bkWatch(gi) {
+  const B = book(), g = B.slate.games[gi], m = MODES[g.mi], tier = TIERS_COURT[clamp(Math.floor((Math.max(g.t[0].ovr, g.t[1].ovr) - 55) / 11), 0, 3)];
+  uiClose(); const cfg = { mode: m, tier, teams: [bkBuilds(g.t[0]), bkBuilds(g.t[1])], boosts: [], ball: 'bl_std', seed: gi + 3, firstOff: Math.random() < 0.5 ? 0 : 1, spectate: true };
+  cfg.onEnd = res => { enterWorld('hub', -4.8, -8.6, Math.PI);
+    if (res.quit || !res.box) { const r = bkSim(g); bkFinish(gi, { sc: r.sc, star: [r.pts[0][0], r.pts[1][0]], sim: true }); toast('YOU LEFT EARLY', 'The game finished without you.'); }
+    else { const star = s => { const b = res.box.find(x => x.n === g.t[s].ps[0].n && x.team === s); return b ? b.s.pts : 0; }; bkFinish(gi, { sc: res.score.slice(), star: [star(0), star(1)] }); }
+    setTimeout(() => uiBook(), 300); };
+  save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud(); const n0 = $('n0'); if (n0) n0.textContent = g.t[0].n.slice(0, 10);
+}
+function uiBook() {
+  const B = book(), st = { legs: [], stake: 50 };
+  const has = (g, k) => st.legs.find(L => L.g === g && L.k === k), tog = (g, k, s, o) => { const i = st.legs.findIndex(L => L.g === g && L.k === k); const same = i >= 0 && st.legs[i].s === s && st.legs[i].o === o; if (i >= 0) st.legs.splice(i, 1); if (!same && st.legs.length < 5) st.legs.push({ g, k, s, o }); sfx('ui'); rerender(); };
+  const odds = () => Math.round(st.legs.reduce((a, L) => a * bkLegOdds(B.slate.games[L.g], L), 1) * 100) / 100;
+  openPanel(() => {
+    const SL = B.slate, sl = SL.slip, V = vice(); let h = `<div class="ph"><h2>MARK'S BOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"BRO. I'VE GOT A GUY. THE GUY IS ME." Pick winners, spreads and points. One pick is a single; more is a parlay: every one has to hit. Then watch the games, or let them run.</p>`;
+    for (const g of SL.games) { const a = g.t[0], b = g.t[1], open = !sl && !g.res, sel = (k, s, o) => { const L = has(g.id, k); return L && L.s === s && L.o === o ? '' : 'alt'; };
+      h += `<div class="card"><h3>${esc(a.n)} <span class="mu">${a.ovr}</span> vs ${esc(b.n)} <span class="mu">${b.ovr}</span></h3><p class="mu">${g.n} · first to ${g.to}${g.res ? ` · <b class="cy">FINAL ${g.res.sc[0]} — ${g.res.sc[1]}</b>${g.res.sim ? ' (sim)' : ''}` : ''}</p>`;
+      if (open) { h += `<div style="margin-top:6px"><span class="mono" style="font-size:10px">WINNER</span> ${Btn(`${esc(a.n)} ${g.ml[0]}`, () => tog(g.id, 'ml', 0), 'sm ' + sel('ml', 0))} ${Btn(`${esc(b.n)} ${g.ml[1]}`, () => tog(g.id, 'ml', 1), 'sm ' + sel('ml', 1))}</div>`;
+        h += `<div style="margin-top:4px"><span class="mono" style="font-size:10px">SPREAD</span> ${Btn(`${esc(g.t[g.fav].n)} -${g.sp}`, () => tog(g.id, 'sp', g.fav), 'sm ' + sel('sp', g.fav))} ${Btn(`${esc(g.t[1 - g.fav].n)} +${g.sp}`, () => tog(g.id, 'sp', 1 - g.fav), 'sm ' + sel('sp', 1 - g.fav))} <span class="mu">1.87</span></div>`;
+        for (const s of [0, 1]) h += `<div style="margin-top:4px"><span class="mono" style="font-size:10px">${esc(g.t[s].ps[0].n.toUpperCase())} PTS</span> ${Btn('OVER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 1), 'sm ' + sel('pr' + s, s, 1))} ${Btn('UNDER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 0), 'sm ' + sel('pr' + s, s, 0))} <span class="mu">1.87</span></div>`; }
+      else if (!g.res) h += `<div style="margin-top:6px">${Btn('WATCH IT', () => bkWatch(g.id), 'sm')} ${Btn('SIM IT', () => { const r = bkSim(g); bkFinish(g.id, { sc: r.sc, star: [r.pts[0][0], r.pts[1][0]], sim: true }); sfx('ui'); rerender(); }, 'sm alt')}</div>`;
+      h += `</div>`; }
+    if (sl) { h += `<div class="card sel"><h3>YOUR TICKET · ${sl.legs.length > 1 ? sl.legs.length + '-LEG PARLAY' : 'SINGLE'} · ${sl.stake} VC at ${sl.odds}</h3>` + sl.legs.map(L => { const g = SL.games[L.g], w = bkLegWon(g, L); return `<p>${w === null ? '○' : w ? '<span class="cy">✔</span>' : '<span class="warn">✘</span>'} ${esc(bkLegLabel(g, L))} <span class="mu">${bkLegOdds(g, L)}</span></p>`; }).join('') + (sl.done ? `<p class="${sl.won ? 'cy' : 'warn'}" style="font-size:16px;margin-top:6px">${sl.won ? 'CASHED: +' + sl.pay + ' VC' : 'DEAD TICKET'}</p>` : `<p class="mu" style="margin-top:6px">Pays ${Math.round(sl.stake * sl.odds)} VC if every pick hits.</p>`) + `</div>`;
+      if (sl.done || SL.games.every(g => g.res)) h += Btn('NEW SLATE', () => { B.slate = bkSlate(); save(); sfx('uiok'); st.legs = []; rerender(true); }); }
+    else if (SL.games.every(g => g.res)) h += Btn('NEW SLATE', () => { B.slate = bkSlate(); save(); rerender(true); });
+    else { const o = odds(), room = viceRoom('book'), maxPay = Math.round(st.stake * o), okStake = S.vc >= st.stake, capped = room <= 0;
+      h += `<div class="card sel"><h3>BET SLIP${st.legs.length > 1 ? ' · ' + st.legs.length + '-LEG PARLAY' : ''}</h3>` + (st.legs.length ? st.legs.map(L => `<p>${esc(bkLegLabel(SL.games[L.g], L))} <span class="mu">${bkLegOdds(SL.games[L.g], L)}</span></p>`).join('') : '<p class="mu">Nothing picked yet.</p>')
+        + `<div style="margin-top:6px">${[25, 50, 100, 250, 500].map(s => Btn(s + '', () => { st.stake = s; rerender(); }, 'sm ' + (st.stake === s ? '' : 'alt'))).join(' ')}</div>`
+        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} VC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'MARK IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' VC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
+    h += `<p class="mu">Your record with Mark: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} VC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
+    return h + `</div>`;
+  }, 'side', () => uiClose());
+}
+
+// ---------------- on the Block ----------------
+function viceInit() {
+  const cx = -10, cz = 5, g = grp(scene, cx, 0, cz);
+  ink(M(cyl(0.9, 0.9, 0.08, 16), toon('#1f6a3a'), 0, 0.78, 0, g), 1.03); ink(M(cyl(0.16, 0.3, 0.76, 8), toon('#2a2c33'), 0, 0.38, 0, g), 1.04);
+  for (let i = 0; i < 7; i++) { const a = -0.6 + i * (Math.PI + 1.2) / 6 + Math.PI / 2, h = grp(g, Math.cos(a) * 1.7, 0, Math.sin(a) * 1.7); holodiceMesh(h); }
+  const sg = sign("TREY'S BONES", 2.2, 0.4, '#ffb347', '#0a0a0e', { border: false }); sg.position.set(0, 2.5, -1.9); g.add(sg); for (const sx of [-1.1, 1.1]) M(cyl(0.03, 0.03, 2.5, 5), toon('#2a2c33'), sx, 1.25, -1.9, g);
+  solid(cx - 0.9, cx + 0.9, cz - 0.9, cz + 0.9);
+  const tb = withSeed(3003, () => aiBuild(70, 'general')); tb.name = 'TREY'; tb.worn = Object.assign(randomWorn(3), { head: 'hd_cap', face: 'f_shades', top: 't_hoodie' }); const n = addNpc(tb, cx, cz - 1.5, 0, 'idle', { still: true }); n.cast = 'trey'; n.amb = 'cross'; if (W.cast) W.cast.list.push(n);
+  CAST_LINES.trey = TREY.hello.concat(['The dice are honest. I am merely charming.']);
+  spot(cx, cz + 1.6, 1.8, "TREY'S BONES (dice)", () => uiBones(false));
+}
+
+// ---------------- at home ----------------
+function bottieAtCrib() {
+  if (!cribTier('bottie') || W.visit) return; const n = addNpc(bottieBuild(), 6.6, 15.4, -2.4, 'idle', { still: true }); n.cast = 'bottie'; n.amb = 'film'; W.cast = W.cast || { list: [], t: 0 }; W.cast.list.push(n);
+  if (cribTier('bottie') > 1) { const b = grp(scene, 8.3, 0, 16.2); ink(M(box(1.5, 2.1, 1.5), toon('#23242a'), 0, 1.05, 0, b), 1.03); M(box(0.7, 1.1, 0.04), flat(0x33e0ff), 0, 1.2, 0.77, b); const s = sign('THE BOOTH', 1.3, 0.26, '#ff2d78', '#0a0a0e', { border: false }); s.position.set(0, 2.25, 0.78); b.add(s); if (W.solids) W.solids.push([7.5, 9.1, 15.4, 17]); }
+  W.spots.push({ x: 6.2, z: 14.6, r: 1.7, label: 'BOTTIE', fn: () => uiBottieHome() });
+}
+const BOT_BARS = ['BZZT. {n} with the rock, {d} dunks on the clock, {a} ankles in a sock. GANG.', 'CLANK. {g} greens, no in-betweens, {n} on the feed by any means. GANG.', 'BZZT. {w} wins, where do I begin, {n} cooked your whole team again. GANG.', 'Born in the server, raised by the code, {n} got {p} points on the road. GANG.'];
+function uiBottieHome() {
+  const t = cribTier('bottie'), today = dayKey(), H = home(), L = S.life || {}, did = k => H.used['bot_' + k] === today;
+  const bar = pick(BOT_BARS).replace('{n}', S.name).replace('{d}', L.dunks || 0).replace('{a}', L.ankles || 0).replace('{g}', L.greens || 0).replace('{w}', L.wins || 0).replace('{p}', L.pts || 0);
+  uiDialog('BOTTIE', pick(CAST_LINES.bottie), [
+    [did('track') ? 'TRACK DROPPED TODAY' : 'DROP A TRACK', () => { H.used.bot_track = today; const r = t > 1 ? 35 : 20; gainRep(r); save(); sfx('unlock'); uiDialog('BOTTIE', bar, [['+' + r + ' Respect']]); }, '', did('track')],
+    [did('post') ? 'POSTED TODAY' : 'POST TO THE FEED', () => { H.used.bot_post = today; const v = t > 1 ? 180 : 80; S.vc += v; save(); sfx('coin'); uiClose(); toast('THE FEED', `"BZZT. THIS IS GOING ON THE FEED." +${v} VC`); }, '', did('post')],
+    ['Later'],
+  ]);
+}
+function homeUse2(k, done) {
+  const H = home(), today = dayKey(), L = homeLevel().lvl, need = { grill: 3, minihoop: 2, bed: 1, bag: 1, holodice: 4 }[k], nm = { grill: 'COOKOUT', minihoop: 'TRICK SHOT', bed: 'NAP', bag: 'HEAVY BAG', holodice: 'BONES AT HOME' }[k];
+  if (L < need) return toast(nm + ' IS LOCKED', `Crib level ${need} opens it. You are level ${L}: place more stuff.`);
+  if (k === 'holodice') return uiBones(true);
+  if (done) return toast(nm, 'Once a day. Come back tomorrow.');
+  H.used[k] = today;
+  if (k === 'grill') { gainRep(20); W.party = true; for (const n of W.npcs) if (n.homie || n.visitor) n.anim = 'dance'; toast('COOKOUT', 'Soy burgers for the block. +20 Respect, and everybody on the lot is dancing.'); sfx('unlock'); }
+  else if (k === 'bag') { S.bxp.P += 25; while (S.bxp.P >= 100) { S.bxp.P -= 100; S.bp.P++; } toast('HEAVY BAG', 'Hand speed. +25 Playmaking badge XP.'); sfx('bump'); }
+  else if (k === 'bed') { S.boosts.push('nap'); toast('NAP', 'Slept like a subscription you forgot about. +8 Stamina next game.'); sfx('coin'); }
+  else if (k === 'minihoop') { const ch = clamp(0.3 + ((S.attrs.three || 50) + (S.attrs.mid || 50)) / 500, 0.3, 0.7); let m = 0; const shots = [0, 0, 0].map(() => { const ok = Math.random() < ch; if (ok) m++; return ok ? 'SPLASH' : 'brick'; }); const v = m * 30 + (m === 3 ? 60 : 0); S.vc += v;
+    uiDialog('TRICK SHOT', `Off the fence, off the roof, off the fridge: ${shots.join(' · ')}.` + (m === 3 ? ' Three for three.' : ''), [[v ? '+' + v + ' VC' : 'Tomorrow, then']]); sfx(m ? 'swish' : 'rim'); }
+  save();
 }
 // GOT NEXT — My Crib: the lot, the house, the street, and the home builder.
 // Place anything anywhere in the yards you own, turn it, move it, store it, sell it. Everything has Vibe; Vibe levels the
@@ -4225,7 +4463,7 @@ hitem('hammock', 'seat', 'Hammock', 1400, 3, 2.6, 1.0, { comfort: 7 }, g => { fo
 // food & drink
 hitem('cooler', 'food', 'Cooler', 80, 0, 0.7, 0.5, { party: 2 }, g => { _B(g, 0.65, 0.45, 0.45, '#2f6ad8'); _B(g, 0.67, 0.08, 0.47, '#ece9e2', 0, 0.48); }, { top: 0.52 });
 hitem('picnic', 'food', 'Picnic Table', 300, 0, 2.0, 1.6, { party: 3, comfort: 2 }, g => { _B(g, 1.9, 0.07, 0.8, '#8a6a44', 0, 0.75); for (const sz of [-0.65, 0.65]) _B(g, 1.9, 0.06, 0.3, '#8a6a44', 0, 0.45, sz); for (const sx of [-0.8, 0.8]) { _B(g, 0.08, 0.75, 1.5, '#6a5034', sx, 0.38); } for (let i = 0; i < 3; i++) _C(g, 0.04, 0.035, 0.12, ['#e04848', '#f2c14e', '#3dffa0'][i], -0.4 + i * 0.35, 0.85, 0.1, 8); }, { sit: 0.45, sitZ: 0.65, top: 0.79 });
-hitem('grill', 'food', 'Grill', 450, 1, 0.9, 0.7, { party: 5 }, g => { ink(M(sph(0.38, 12, 8, 0), toon('#16181c'), 0, 0.85, 0, g), 1.03).scale.set(1, 0.6, 0.8); for (const a of [0, 2.1, 4.2]) _B(g, 0.04, 0.8, 0.04, '#3a3c44', Math.cos(a) * 0.22, 0.4, Math.sin(a) * 0.18).rotation.z = Math.cos(a) * 0.2; glow(0, 0.95, 0, 0xff8a3c, 0.9, g, 0.6); }, { emit: ['smoke', 0, 1.05, 0, 3] });
+hitem('grill', 'food', 'Grill', 450, 1, 0.9, 0.7, { party: 5 }, g => { ink(M(sph(0.38, 12, 8, 0), toon('#16181c'), 0, 0.85, 0, g), 1.03).scale.set(1, 0.6, 0.8); for (const a of [0, 2.1, 4.2]) _B(g, 0.04, 0.8, 0.04, '#3a3c44', Math.cos(a) * 0.22, 0.4, Math.sin(a) * 0.18).rotation.z = Math.cos(a) * 0.2; glow(0, 0.95, 0, 0xff8a3c, 0.9, g, 0.6); }, { emit: ['smoke', 0, 1.05, 0, 3] , use: 'grill' });
 hitem('vending', 'food', 'Vending Machine', 900, 2, 1.0, 0.8, { tech: 2, party: 2 }, g => { _B(g, 0.95, 1.9, 0.75, '#c8482c'); M(box(0.6, 1.3, 0.04), flat(0xfff2c8), -0.1, 1.15, 0.38, g); for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) M(cyl(0.05, 0.05, 0.14, 6), toon(pick(['#3dffa0', '#f2c14e', '#7de3ff', '#ff2d78'])), -0.3 + c * 0.2, 0.7 + r * 0.3, 0.32, g); }, { glow: [0xfff2c8, 0, 1.2, 0.5, 2.2] });
 hitem('fridge', 'food', 'Yard Fridge', 700, 1, 0.8, 0.7, { comfort: 2, party: 1 }, g => { _B(g, 0.75, 1.5, 0.65, '#ece9e2'); M(box(0.04, 0.4, 0.04), toon('#6a707c'), 0.3, 1.0, 0.34, g); M(box(0.7, 0.02, 0.02), toon('#6a707c'), 0, 1.1, 0.33, g); }, { use: 'fridge' });
 hitem('dogcart', 'food', 'Soy Dog Cart', 2200, 3, 1.8, 0.9, { party: 6 }, g => { _B(g, 1.7, 0.85, 0.8, '#c8d0d8', 0, 0.75); _B(g, 1.72, 0.1, 0.82, '#e04848', 0, 1.22); _C(g, 0.03, 0.03, 1.6, '#6a707c', 0, 2.0, 0, 5); const u = M(geo('umb', () => new THREE.ConeGeometry(1.3, 0.5, 10, 1, true)), new THREE.MeshToonMaterial({ color: '#f2c14e', gradientMap: ramp(), side: THREE.DoubleSide }), 0, 2.75, 0, g); ink(u, 1.02); }, { emit: ['steam', 0, 1.3, 0.1, 2.5] });
@@ -4243,8 +4481,8 @@ hitem('cones', 'gym', 'Cone Set', 40, 0, 1.0, 1.0, { hoops: 1 }, g => { for (let
 hitem('tires', 'gym', 'Tire Stack', 60, 0, 0.9, 0.9, { hoops: 1 }, g => { for (let i = 0; i < 3; i++) ink(M(geo('tire', () => new THREE.TorusGeometry(0.32, 0.12, 8, 16)), toon('#16181c'), 0, 0.12 + i * 0.22, 0, g), 1.03).rotation.x = Math.PI / 2; });
 hitem('weights', 'gym', 'Weight Rack', 800, 1, 1.6, 0.7, { hoops: 4 }, g => { _B(g, 1.5, 0.08, 0.5, '#3a3c44', 0, 0.9); _B(g, 1.5, 0.08, 0.5, '#3a3c44', 0, 0.4); for (const sx of [-0.7, 0.7]) _B(g, 0.06, 1.0, 0.5, '#20242c', sx, 0.5); for (let i = 0; i < 5; i++) for (const y of [0.55, 1.05]) M(cyl(0.07 + i * 0.01, 0.07 + i * 0.01, 0.12, 10), toon('#16181c'), -0.55 + i * 0.27, y, 0, g).rotation.z = Math.PI / 2; }, { use: 'weights' });
 hitem('bpress', 'gym', 'Bench Press', 1100, 2, 1.8, 1.0, { hoops: 5 }, g => { _B(g, 0.4, 0.45, 1.3, '#c8482c', 0, 0.25); for (const sx of [-0.55, 0.55]) _B(g, 0.06, 1.15, 0.06, '#3a3c44', sx, 0.58, -0.45); const bar = M(cyl(0.025, 0.025, 1.7, 6), toon('#c8d0d8'), 0, 1.08, -0.45, g); bar.rotation.z = Math.PI / 2; for (const sx of [-0.72, 0.72]) M(cyl(0.22, 0.22, 0.07, 14), toon('#16181c'), sx, 1.08, -0.45, g).rotation.z = Math.PI / 2; }, { use: 'bpress' });
-hitem('bag', 'gym', 'Heavy Bag', 600, 1, 0.8, 0.8, { hoops: 3 }, g => { _B(g, 0.08, 2.2, 0.08, '#20242c', -0.35, 1.1); _B(g, 0.6, 0.06, 0.06, '#20242c', -0.08, 2.2); const b = grp(g, 0.2, 2.15, 0); ink(M(cyl(0.2, 0.2, 1.0, 12), toon('#c8482c'), 0, -0.85, 0, b), 1.04); b.userData.swing = 1; }, { anim: 'swing' });
-hitem('minihoop', 'gym', 'Mini Hoop', 250, 0, 0.8, 0.8, { hoops: 3, party: 1 }, g => { _B(g, 0.06, 1.6, 0.06, '#c8d0d8', 0, 0.8, -0.3); _B(g, 0.6, 0.42, 0.04, '#ece9e2', 0, 1.65, -0.28); ink(M(geo('mrim', () => new THREE.TorusGeometry(0.15, 0.015, 6, 16)), toon('#ff6a1f'), 0, 1.5, -0.12, g), 1.1).rotation.x = Math.PI / 2; });
+hitem('bag', 'gym', 'Heavy Bag', 600, 1, 0.8, 0.8, { hoops: 3 }, g => { _B(g, 0.08, 2.2, 0.08, '#20242c', -0.35, 1.1); _B(g, 0.6, 0.06, 0.06, '#20242c', -0.08, 2.2); const b = grp(g, 0.2, 2.15, 0); ink(M(cyl(0.2, 0.2, 1.0, 12), toon('#c8482c'), 0, -0.85, 0, b), 1.04); b.userData.swing = 1; }, { anim: 'swing', use: 'bag' });
+hitem('minihoop', 'gym', 'Mini Hoop', 250, 0, 0.8, 0.8, { hoops: 3, party: 1 }, g => { _B(g, 0.06, 1.6, 0.06, '#c8d0d8', 0, 0.8, -0.3); _B(g, 0.6, 0.42, 0.04, '#ece9e2', 0, 1.65, -0.28); ink(M(geo('mrim', () => new THREE.TorusGeometry(0.15, 0.015, 6, 16)), toon('#ff6a1f'), 0, 1.5, -0.12, g), 1.1).rotation.x = Math.PI / 2; }, { use: 'minihoop' });
 hitem('shotclock', 'gym', 'Shot Clock Pole', 1300, 2, 0.5, 0.5, { hoops: 4, tech: 2 }, g => { _C(g, 0.06, 0.06, 2.6, '#3a3c44', 0, 1.3, 0, 6); _B(g, 0.7, 0.45, 0.3, '#16181c', 0, 2.8); const t = sign('14', 0.55, 0.36, '#ff3a3a', '#16181c', { border: false }); t.position.set(0, 2.8, 0.16); g.add(t); t.userData.clock = 1; }, { anim: 'clock', glow: [0xff3a3a, 0, 2.8, 0.3, 1.3] });
 // display
 hitem('kicks', 'show', 'Sneaker Wall', 1600, 2, 2.4, 0.5, { drip: 8 }, g => { _B(g, 2.3, 1.9, 0.12, '#16181c', 0, 0.95, -0.15); const own = DRIP.filter(d => d.slot === 'shoes' && S.owned.includes(d.id)), list = own.length ? own : DRIP.filter(d => d.slot === 'shoes').slice(0, 3); for (let r = 0; r < 3; r++) { _B(g, 2.2, 0.04, 0.3, '#6a707c', 0, 0.45 + r * 0.55); for (let c = 0; c < 4; c++) { const k = list[(r * 4 + c) % list.length]; shoeProp(k.c, k.c2 || '#fff', -0.8 + c * 0.55, 0.55 + r * 0.55, 0, 0.3, g); } } }, { glow: [0xfff2c8, 0, 1.2, 0.3, 2.4] });
@@ -4293,10 +4531,11 @@ hitem('r_goldhoop', 'rare', 'Golden Hoop Lamp', 5000, 2, 0.6, 0.6, { drip: 9, ho
 hitem('r_throne', 'rare', 'Holo Throne', 9000, 4, 1.0, 1.0, { drip: 12, tech: 6 }, g => { _B(g, 0.8, 0.15, 0.7, '#20242c', 0, 0.45); _B(g, 0.8, 1.6, 0.15, '#20242c', 0, 1.25, -0.3); for (const sx of [-0.45, 0.45]) _B(g, 0.12, 0.5, 0.7, '#20242c', sx, 0.55); M(box(0.6, 1.3, 0.02), new THREE.MeshBasicMaterial({ color: 0x33e0ff, transparent: true, opacity: 0.5 }), 0, 1.3, -0.21, g); M(box(0.84, 0.04, 0.72), flat(0x33e0ff), 0, 0.53, 0, g); }, { rare: 1, sit: 0.53, glow: [0x33e0ff, 0, 1.2, -0.1, 2.4] });
 hitem('r_fountain', 'rare', 'Soda Fountain', 7000, 3, 1.0, 1.0, { party: 12 }, g => { _C(g, 0.48, 0.5, 0.3, '#c8d0d8', 0, 0.15, 0, 14); M(cyl(0.44, 0.44, 0.02, 14), flat(0xff6a3d), 0, 0.29, 0, g); _C(g, 0.06, 0.08, 0.8, '#c8d0d8', 0, 0.7, 0, 8); _C(g, 0.25, 0.1, 0.12, '#c8d0d8', 0, 1.1, 0, 10); M(cyl(0.22, 0.22, 0.02, 12), flat(0xff6a3d), 0, 1.16, 0, g); }, { rare: 1, emit: ['spark', 0, 1.2, 0, 3], glow: [0xff6a3d, 0, 0.6, 0, 2] });
 hitem('r_aquarium', 'rare', 'Aquarium', 8000, 3, 1.6, 0.6, { comfort: 10, tech: 3 }, g => { _B(g, 1.6, 0.6, 0.6, '#16181c', 0, 0.3); M(box(1.5, 0.8, 0.5), new THREE.MeshBasicMaterial({ color: 0x2a8ad8, transparent: true, opacity: 0.55, depthWrite: false }), 0, 1.0, 0, g); const f = grp(g, 0, 1.0, 0); for (let i = 0; i < 4; i++) M(sph(0.05, 6, 4), flat([0xff8a1f, 0xf2c14e, 0xff2d78, 0x3dffa0][i]), -0.5 + i * 0.3, (i % 2) * 0.2 - 0.1, (i % 2 ? 0.1 : -0.1), f).scale.set(1.6, 1, 0.6); f.userData.fish = 1; _B(g, 1.6, 0.06, 0.6, '#16181c', 0, 1.43); }, { rare: 1, anim: 'fish', glow: [0x2a8ad8, 0, 1.0, 0.3, 2.2] });
-hitem('bed', 'seat', 'King Bed', 1100, 1, 2.0, 2.4, { comfort: 8 }, g => { _B(g, 1.9, 0.35, 2.3, '#3a2a1c', 0, 0.18); _B(g, 1.85, 0.25, 2.2, '#ece9e2', 0, 0.45); _B(g, 1.86, 0.08, 1.4, '#2440a8', 0, 0.6, 0.35); for (const sx of [-0.45, 0.45]) _B(g, 0.7, 0.14, 0.4, '#ece9e2', sx, 0.62, -0.85); _B(g, 1.95, 1.0, 0.12, '#3a2a1c', 0, 0.5, -1.12); }, { sit: 0.55 });
+hitem('bed', 'seat', 'King Bed', 1100, 1, 2.0, 2.4, { comfort: 8 }, g => { _B(g, 1.9, 0.35, 2.3, '#3a2a1c', 0, 0.18); _B(g, 1.85, 0.25, 2.2, '#ece9e2', 0, 0.45); _B(g, 1.86, 0.08, 1.4, '#2440a8', 0, 0.6, 0.35); for (const sx of [-0.45, 0.45]) _B(g, 0.7, 0.14, 0.4, '#ece9e2', sx, 0.62, -0.85); _B(g, 1.95, 1.0, 0.12, '#3a2a1c', 0, 0.5, -1.12); }, { sit: 0.55 , use: 'bed' });
 hitem('records', 'tech', 'Record Shelf', 450, 0, 1.4, 0.45, { party: 3, drip: 1 }, g => { _B(g, 1.35, 1.0, 0.4, '#5a4030', 0, 0.5); for (let r = 0; r < 2; r++) for (let i = 0; i < 9; i++) M(box(0.02, 0.32, 0.3), toon(pick(['#e04848', '#2440a8', '#f2c14e', '#16181c', '#ece9e2', '#3dffa0'])), -0.55 + i * 0.13, 0.25 + r * 0.45, 0.02, g); M(cyl(0.18, 0.18, 0.04, 16), toon('#16181c'), 0.3, 1.04, 0, g); }, { top: 1.02 });
 hitem('flamp', 'light', 'Arc Floor Lamp', 380, 0, 0.6, 0.6, { comfort: 2 }, g => { _C(g, 0.22, 0.25, 0.06, '#16181c', 0, 0.03); const a = M(cyl(0.025, 0.025, 2.0, 6), toon('#c8d0d8'), 0, 1.0, 0, g); void a; M(cyl(0.025, 0.025, 0.9, 6), toon('#c8d0d8'), 0.38, 1.95, 0, g).rotation.z = -1.2; M(geo('shade', () => new THREE.ConeGeometry(0.22, 0.24, 12, 1, true)), toon('#f2c14e'), 0.8, 1.72, 0, g).material.side = THREE.DoubleSide; glow(0.8, 1.6, 0, 0xffd8a0, 1.8, g, 0.7); }, { beam: [0xffd8a0, 1.6, 1.4] });
 hitem('poster', 'wall', 'Framed Poster', 140, 0, 1.0, 0.2, { drip: 2 }, g => { const t = geoTex('pst', () => canvasTex(128, 160, (x, w, h) => { x.fillStyle = '#1a1030'; x.fillRect(0, 0, w, h); x.fillStyle = '#ff2d78'; x.font = '900 34px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.fillText('GOT', w / 2, 60); x.fillStyle = '#7de3ff'; x.fillText('NEXT', w / 2, 100); x.fillStyle = '#f2c14e'; x.font = '700 12px monospace'; x.fillText('RUN 01', w / 2, 140); })); _B(g, 0.06, 1.4, 0.06, '#16181c', 0, 0.7, -0.05); _B(g, 0.85, 1.05, 0.05, '#16181c', 0, 1.65, 0); M(new THREE.PlaneGeometry(0.75, 0.95), new THREE.MeshBasicMaterial({ map: t }), 0, 1.65, 0.03, g); });
+hitem('holodice', 'tech', 'Holodice', 900, 2, 0.6, 0.6, { tech: 3, party: 3 }, g => { holodiceMesh(g); }, { use: 'holodice' });
 const HOME_ITEM = {}; HOME_ITEMS.forEach(i => HOME_ITEM[i.id] = i);
 const RARES = HOME_ITEMS.filter(i => i.rare);
 function rareToday() { return RARES[dayHash(dayKey(), 31) % RARES.length]; }
@@ -4447,6 +4686,7 @@ function buildCrib() {
   }
   // people on the street
   const nb = []; for (let i = 0; i < 2; i++) { const b = aiBuild(55); b.worn = randomWorn(1); nb.push(addNpc(b, -18 + i * 30, 31.2, Math.PI, i ? 'sit' : 'idle', { talk: 'neighbor' })); }
+  bottieAtCrib();      /* vice.js: Lil Bottie, if he has moved in */
   W.baseSolids = W.solids.slice(); W.baseSpots = W.spots.slice();     /* fixed things only; placed pieces are added on top */
   buildHomeItems(); if (!V) homeVisitors();
   pigeons(-6, 27, 5); pigeons(15, 19, 4); litter(10, -24, 24, 24.6, 30.4); skyLife(70, 'MORTGAGES FOR MINORS · ASK US'); W.weather = weather();
@@ -4525,7 +4765,7 @@ function buildHomeItems() {
     if (d.beam) { const [c, h, rr, up] = d.beam, fx = Math.sin(it.r * Math.PI / 2), fz = Math.cos(it.r * Math.PI / 2); const b = up ? beam(it.x + fx * 0.2, h, it.z + fz * 0.2, it.x + fx * 4, h + 8, it.z + fz * 4, c, rr, 0.06) : beam(it.x, h, it.z, it.x, 0, it.z, c, rr, 0.05); W.homeG.attach(b); if (!up) { const p = pool(it.x, it.z, c, 3.6, 3.6, 0.25); W.homeG.attach(p); } }
     if (d.anim) W.homeAnim.push({ g, k: d.anim });
     const fx = Math.sin(it.r * Math.PI / 2), fz = Math.cos(it.r * Math.PI / 2), half = (it.r & 1 ? d.w : d.d) / 2 + 0.5;
-    if (d.use) sp.push({ x: it.x + fx * half, z: it.z + fz * half, r: 1.4, label: { fridge: 'GRAB A SNACK (daily)', weights: 'LIFT (daily)', bpress: 'BENCH (daily)', tv: 'WATCH HIGHLIGHTS', arcade: 'PLAY BASKETBALL 2146 (DEMO)', dj: 'SPIN A SET', mirror: 'MIRROR (drip)', case: 'TROPHIES' }[d.use], fn: () => homeUse(d.use, it) });
+    if (d.use) sp.push({ x: it.x + fx * half, z: it.z + fz * half, r: 1.4, label: { fridge: 'GRAB A SNACK (daily)', weights: 'LIFT (daily)', bpress: 'BENCH (daily)', tv: 'WATCH HIGHLIGHTS', grill: 'COOKOUT (daily)', bag: 'HIT THE BAG (daily)', minihoop: 'TRICK SHOT (daily)', bed: 'NAP (daily)', holodice: 'ROLL BONES', arcade: 'PLAY BASKETBALL 2146 (DEMO)', dj: 'SPIN A SET', mirror: 'MIRROR (drip)', case: 'TROPHIES' }[d.use], fn: () => homeUse(d.use, it) });
     if (d.sit) sp.push({ x: it.x + fx * half, z: it.z + fz * half, r: 1.1, label: 'SIT DOWN', fn: () => homeSit(d, it) });
   }
   W.solids = (W.baseSolids || W.solids).concat(sol); W.spots = (W.baseSpots || W.spots).concat(sp);
@@ -4538,6 +4778,7 @@ function homeUse(k, it) {
   else if (k === 'tv') { const L = S.life || {}; uiDialog('HIGHLIGHTS', `Your career so far: ${L.games || 0} games, ${L.wins || 0} wins, ${L.pts || 0} points, ${L.dunks || 0} dunks, ${L.ankles || 0} ankles broken, ${L.greens || 0} greens. The commentator calls you "a real person who exists".`, [['Nice', null]]); }
   else if (k === 'arcade') uiDialog('BASKETBALL 2146 (DEMO DISC)', 'It is a 40 minute loading screen, then a menu asking you to pre-order the full game. You beat your high score of 0.', [['Again', null], ['Walk away', null, 'alt']]);
   else if (k === 'dj') { W.party = !W.party; for (const n of W.npcs) if (n.homie || n.visitor) n.anim = W.party ? 'dance' : n.anim0; toast(W.party ? 'SET STARTED' : 'SET OVER', W.party ? 'Everybody on the lot is dancing.' : 'Back to regular hanging out.'); sfx('uiok'); }
+  else if (['grill', 'bag', 'minihoop', 'bed', 'holodice'].includes(k)) homeUse2(k, done);      /* vice.js */
   else if (k === 'mirror') uiShop(true);
   else if (k === 'case') uiPlayer('ach');
 }
@@ -6246,7 +6487,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), uiKael: () => uiKael(), uiNexx: () => uiNexx(), nexxCheck: r => nexxCheck(r), uiLouie: () => uiLouie(), uiErin: () => uiErin(), castStep: dt => castStep(dt), puStep: dt => puStep(dt), POWERUPS: () => POWERUPS, scorePts: (p, n, h) => scorePts(p, n, h), releaseShot: p => releaseShot(p), startPractice2: 0, packBuild: b => packBuild(b), unpackBuild: c => unpackBuild(c), myBuild: () => myBuild(), shotPose: (a, u, n) => shotPose(a, u, n), idlePose: (a, t, o) => idlePose(a, t, o), profileFromBuild: s => profileFromBuild(s), animProfile: s => animProfile(s), alabOpen: () => alabOpen(), get ALAB() { return ALAB; }, uiDev: b => uiDev(b), aiBuild: (o, r) => aiBuild(o, r), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s, f, o) => startShot(p, s, f, o), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), uiBones: h => uiBones(h), uiBook: () => uiBook(), book: () => book(), bkSim: g => bkSim(g), bkWatch: i => bkWatch(i), bkLegWon: (g, L) => bkLegWon(g, L), bonesSim: (t, s) => bonesSim(t, s), bonesHand: d => bonesHand(d), vice: () => vice(), homeUse2: (k, d) => homeUse2(k, d), uiBottieHome: () => uiBottieHome(), homeLevelN: () => homeLevel().lvl, uiCrib: () => uiCrib(), homeUse: (k, it) => homeUse(k, it), uiKael: () => uiKael(), uiNexx: () => uiNexx(), nexxCheck: r => nexxCheck(r), uiLouie: () => uiLouie(), uiErin: () => uiErin(), castStep: dt => castStep(dt), puStep: dt => puStep(dt), POWERUPS: () => POWERUPS, scorePts: (p, n, h) => scorePts(p, n, h), releaseShot: p => releaseShot(p), startPractice2: 0, packBuild: b => packBuild(b), unpackBuild: c => unpackBuild(c), myBuild: () => myBuild(), shotPose: (a, u, n) => shotPose(a, u, n), idlePose: (a, t, o) => idlePose(a, t, o), profileFromBuild: s => profileFromBuild(s), animProfile: s => animProfile(s), alabOpen: () => alabOpen(), get ALAB() { return ALAB; }, uiDev: b => uiDev(b), aiBuild: (o, r) => aiBuild(o, r), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s, f, o) => startShot(p, s, f, o), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera); window.__info = () => { let m = 0, s = 0, t = 0; scene.traverse(o => { if (o.isSprite) s++; else if (o.isMesh) m++; }); return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, meshes: m, sprites: s }; };
   // test hook: draw the player in one pose and hand back the frame
