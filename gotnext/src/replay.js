@@ -55,6 +55,8 @@ function replayStep(dt) {
   else if (Rp.cam === 1) { const an = 0.6 + Rp.t * 0.35 + Rp.loops * 1.3, r = pt ? 5.6 : 4.6; _v.set(sx + Math.sin(an) * r, 1.9 + sy * 0.6, sz + Math.cos(an) * r); _v2.set(sx, 1.25 + sy * 0.8, sz); }
   else { _v.set(sx * 0.35 + (sx > 0 ? -1.2 : 1.2), 0.7, -0.9); _v2.set(sx, 1.6 + sy, sz); }
   camera.position.lerp(_v, Rp.snap ? 1 : 1 - Math.exp(-6 * dt)); Rp.snap = false; M_.look = M_.look || _v2.clone(); M_.look.lerp(_v2, 1 - Math.exp(-8 * dt)); camera.lookAt(M_.look);
+  // a body right in front of the lens fills the screen: anybody within arm's length of the camera steps out of the shot (the star never does)
+  for (const q of M_.P) { const rp0 = q.rig.root.position, near = q !== star && Math.hypot(rp0.x - camera.position.x, rp0.z - camera.position.z) < 1.5; q.rig.root.visible = !near; if (q.tag) q.tag.visible = !near; }
   const fov = Rp.cam === 1 ? 40 : Rp.cam === 2 ? 58 : (pt ? 74 : 50); if (Math.abs(camera.fov - fov) > 0.1) { camera.fov += (fov - camera.fov) * 0.15; camera.updateProjectionMatrix(); }
   if (typeof crowdStep === 'function' && M_.fans) crowdStep(dt * 0.5);
 }

@@ -9,7 +9,7 @@ await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => { window.__tick(10); __pit.S.tut = 1; });
 await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.size === 2 && !m.arcade), P.TIERS_COURT[1], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(200); const M = P.MT; var g = 0; while (M.phase !== 'live' && g++ < 600) window.__tick(1); for (let i = 0; i < 60 * 6; i++) { M.clock = Math.max(M.clock, 5); window.__tick(1); }
   const me = M.me, d = M.P.find(q => q.team !== me.team); M.hl = null; M.hlAt = -99; P.call('highlight', 'poster', me, d); for (let i = 0; i < 50; i++) window.__tick(1); });
-await p.waitForTimeout(1900);
+for (let i = 0; i < 40 && !(await p.evaluate(() => (__pit.S.reps || []).length)); i++) { await p.waitForTimeout(500); await p.evaluate(() => window.__tick(2)); }
 let r = await p.evaluate(() => { const P = __pit, S = P.S, rp = (S.reps || [])[0], it = S.mag && S.mag.list[0]; if (!rp) return { none: true, mag: !!it }; const slim = JSON.parse(P.call('saveSlim', S));
   return { kb: Math.round(JSON.stringify(rp).length / 1024), n: rp.n, np: rp.np, joints: rp.j.length, linked: it && it.rp === rp.id, valid: P.call('repValid', rp), secs: rp.n / rp.hz, slimReps: slim.reps === undefined, slimImg: slim.mag.list[0].img === '' }; });
 ok(!r.none && r.linked && r.valid && r.secs >= 4 && r.np === 4 && r.kb < 60, `a highlight of yours keeps its ${r.secs.toFixed(1)} s replay with the cover: ${r.np} players, ${r.joints} joints each, ${r.kb} KB`);
