@@ -186,7 +186,7 @@ function buildHub() {
   floodlight(-15, -13, 10, -4, -22); floodlight(15, -13, 10, 4, -22); floodlight(-15, -31, 10, -3, -23); floodlight(15, -31, 10, 3, -23);
   for (let r = 0; r < 3; r++) ink(M(box(12, 0.4, 0.9), toon('#3a3c44'), 0, 0.3 + r * 0.45, -31 - r * 0.9, scene), 1.02);
   parkInit(scene);      /* park.js: a real 2v2 run on the show court, and the bleachers watching it */
-  castInit();      /* cast.js: Nexx, Mark and D, Aaron's stand, Bottie, Louie */
+  castInit();      /* cast.js: Nexx, Aaron's stand, Bottie, Louie */
   viceInit();      /* vice.js: Trey's Bones */
   spot(0, -10.3, 2.4, 'ENTER THE CAGES', () => enterWorld('pit', 0, 3.4, Math.PI));
   // elevated train behind it all

@@ -1,5 +1,5 @@
 // GOT NEXT — people on the Block with a bit more going on. NEXX (new), and a few regulars borrowed from the crew in
-// the other games (names hinted, lines taken from those games as written): Mark, D, Erin's stand, Bottie, and Louie.
+// the other games (names hinted, lines taken from those games as written): Erin's stand, Bottie, Louie (Mark's hustle lives on at Trey's table).
 // Who's who is in docs/CAST.md.
 'use strict';
 const NEXX_LINES = [
@@ -17,7 +17,6 @@ const NEXX_GOALS = [['dunks', 2, 'Throw down 2 dunks'], ['greens', 3, 'Hit 3 gre
 const CAST_LINES = {
   mark: ["BRO. I'VE GOT A GUY. THE GUY IS ME.", "I'm not an NPC. I'm between protagonists.", "I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."],
   markBet: ["I HAD MONEY ON THAT, BRO."],
-  d: ["I drive the van. That's my whole part.", "YO. THE TRUCK NEEDS A PART. THE PART NEEDS A TRUCK TO GO GET IT.", "YO! THE FLOW PROS TRUCK DIED. AGAIN. GOT FRIES?"],
   erin: ["A SLOW DAY IS STILL A GOOD DAY.", "GO WATER YOURSELF.", "Back soon. Don't let Mark touch my seeds.", "BECAUSE I NEVER CHANGE MY MIND."],
   bottie: ["BZZT. THIS IS GOING ON THE FEED.", "CONTEXT WINDOW: FULL OF YOUR MISTAKES.", "BZZT. I PRESSED ONE BUTTON. ONE. EVERYBODY IS SO DRAMATIC.", "PLEASE RATE THIS RESPONSE."],
   kael: ['Aye. And aye.', 'Top three.', 'Then I plan to be insufferable for a very long time.', 'Listen.', 'Somebody has to fix the valves.', 'Boring as a bread line.', "I'm early. You're high.", 'Then one will have to be added.'],
@@ -36,10 +35,7 @@ function castInit() {
   const pl = sign('NEXX', 0.9, 0.24, '#7de3ff', '#0a0a0e', { border: false }); pl.position.set(-10.86, 0.55, -10.3); pl.rotation.y = Math.PI / 2; scene.add(pl);
   const nx = castNpc('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }, -10.2, -9.4, 0.6, { cast: 'nexx' }); nx.amb = 'phone';
   spot(-9.6, -8.6, 1.9, 'NEXX', () => uiNexx()); C.list.push(nx); C.nexx = nx;
-  // MARK and D: by the cage fence, watching the run, Mark with money on it
-  const mk = castNpc('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
-  const dd = castNpc('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
-  spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [["MARK'S BOOK (bet on games)", () => uiBook()], ['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
+  // Mark and D are no longer on the Block: the book is at Trey's table now (vice.js)
   // AARON'S STAND (Erin, name masked): fresh food off the farm, by the cage on the other side
   { const g = grp(scene, 7.6, 0, -10.6); ink(M(box(2.2, 0.9, 0.8), toon('#7a5a3a'), 0, 0.45, 0, g), 1.03); M(box(2.3, 0.08, 0.9), toon('#4f8a3c'), 0, 0.93, 0, g);
     for (let i = 0; i < 9; i++) M(sph(0.07, 6, 5), toon(pick(['#e0452c', '#f2c14e', '#7ac74f', '#ff8a3c'])), -0.9 + (i % 5) * 0.42, 1.02, -0.18 + Math.floor(i / 5) * 0.3, g);
@@ -159,8 +155,7 @@ function runKael() {
 // ---- everybody on the Block, as people who can walk up to a game (courts.js): the same faces, the same names ----
 function blockBuild(name, style, worn, ovr, tier) { const b = withSeed(hashStr('block|' + name), () => aiBuild(ovr || 75, style)); b.name = name; b.worn = Object.assign(withSeed(hashStr('fit|' + name), () => randomWorn(tier === undefined ? 2 : tier)), worn || {}); b.keepLook = true; return b; }
 function blockRoster() {
-  const L = [blockBuild('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }), blockBuild('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }), blockBuild('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }),
-    blockBuild('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }), bottieBuild(), blockBuild('TREY', 'general', { head: 'hd_dedrick', face: 'f_shades', top: 't_gutter' }), kaelBuild(),
+  const L = [blockBuild('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }), blockBuild('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }), bottieBuild(), blockBuild('TREY', 'general', { head: 'hd_dedrick', face: 'f_shades', top: 't_gutter' }), kaelBuild(),
     blockBuild('SHARPIE', 'sniper', {}), blockBuild('COACH OVERTIME', 'general', { head: 'hd_cap', top: 't_tee' }), blockBuild('OLD HEAD', 'general', { hair: 'h_bald', head: 'hd_band', face: 'f_goggles' }, 60), blockBuild('SOY DOG SAL', 'glass', { head: 'hd_cap', top: 't_patch' }, 55)];
   for (let i = 0; i < LADDER.length; i++) L.push(ladderBuild(i));
   BUM_NAMES.slice(0, 4).forEach(n => { const b = blockBuild(n, 'showman', {}, 50, 0); b.worn = Object.assign(b.worn, { top: 't_tank', bottom: 'b_camo', shoes: 'k_beat', back: 'bk_none' }); L.push(b); });

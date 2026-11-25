@@ -3235,10 +3235,10 @@ function matchStep(dtReal) {
   if (!M_.introDone && M_.phase === 'check' && M_.pt < 1.5 && !M_.practice && !M_.drill) { M_.introDone = true; for (const q of M_.P) if (q.team !== M_.me.team) floatTxt(q, (q === M_.me.man ? 'YOUR MAN · ' : '') + 'OVR ' + ovrOf(q.A) + (q.pers && q.pers[0] ? ' · ' + q.pers[0].n : ''), q === M_.me.man ? '#f2c14e' : '#ece9e2'); }      /* who you are up against */
   if (M_.late && M_.late.length && M_.phase !== 'over') { for (const c of M_.late) c.t -= dt; if (M_.late[0].t <= 0) { const c = M_.late.shift(); call(c.big, c.small, c.col, 1.3); } }
   if (M_.gpCall > 0 && M_.phase !== 'over') { M_.gpCall -= dt; if (M_.gpCall <= 0) call('GAME POINT', M_.score[0] === M_.score[1] ? 'Next bucket wins' : M_.gpTeam === M_.me.team ? 'One more. Close it out.' : 'Get a stop.', '#f2c14e', 1.6); }
-  else if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
+  if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
   if (M_.brawl) { M_.brawl.t -= dt; if (M_.brawl.t <= 0) calledFoul(); }
-  if (M_.brawlHeat) M_.brawlHeat = Math.max(0, M_.brawlHeat - dt * 0.05);
-  else if (M_.phase === 'over') { M_.pt -= dt; if (M_.pt <= 0 && !M_.over) { M_.over = true; endMatch(); return; } }
+  if (M_.brawlHeat) M_.brawlHeat = Math.max(0, M_.brawlHeat - dt * 0.05);      /* its own line: it used to sit in the chain below, so after any shoving the game could not end and the shot clock stopped */
+  if (M_.phase === 'over') { M_.pt -= dt; if (M_.pt <= 0 && !M_.over) { M_.over = true; endMatch(); return; } }
   else if (M_.phase === 'live' && !M_.practice) {
     if (B.state === 'held') { if (M_.clock > 8) M_.clkWarn = false; else if (M_.clock < 4 && !M_.clkWarn && B.holder) { M_.clkWarn = true; floatTxt(B.holder, 'CLOCK!', '#ff4040'); sfxM('whistle'); } M_.clock -= dt; if (M_.clock <= 0) { sfxM('buzz'); call('SHOT CLOCK', 'Attention span expired', '#ff4040', 1.2); M_.viol = (M_.viol || 0) + 1; const t = 1 - M_.off; M_.lastScorer = { team: M_.off }; M_.phase = 'scored'; M_.pt = 1.2; void t; } }
     if (M_.needClear && B.holder && beyondArc(B.holder.x, B.holder.z)) { M_.needClear = false; }
@@ -4406,7 +4406,7 @@ function buildHub() {
   floodlight(-15, -13, 10, -4, -22); floodlight(15, -13, 10, 4, -22); floodlight(-15, -31, 10, -3, -23); floodlight(15, -31, 10, 3, -23);
   for (let r = 0; r < 3; r++) ink(M(box(12, 0.4, 0.9), toon('#3a3c44'), 0, 0.3 + r * 0.45, -31 - r * 0.9, scene), 1.02);
   parkInit(scene);      /* park.js: a real 2v2 run on the show court, and the bleachers watching it */
-  castInit();      /* cast.js: Nexx, Mark and D, Aaron's stand, Bottie, Louie */
+  castInit();      /* cast.js: Nexx, Aaron's stand, Bottie, Louie */
   viceInit();      /* vice.js: Trey's Bones */
   spot(0, -10.3, 2.4, 'ENTER THE CAGES', () => enterWorld('pit', 0, 3.4, Math.PI));
   // elevated train behind it all
@@ -4756,7 +4756,7 @@ function parkStep(dt) {
 // a sound from the park, quieter the further you are
 function sfxNear(n, x, z, r) { if (!W || !W.me) return; const d = Math.hypot(W.me.x - x, W.me.z - z); if (d < r) sfx(n); }
 // GOT NEXT — people on the Block with a bit more going on. NEXX (new), and a few regulars borrowed from the crew in
-// the other games (names hinted, lines taken from those games as written): Mark, D, Erin's stand, Bottie, and Louie.
+// the other games (names hinted, lines taken from those games as written): Erin's stand, Bottie, Louie (Mark's hustle lives on at Trey's table).
 // Who's who is in docs/CAST.md.
 'use strict';
 const NEXX_LINES = [
@@ -4774,7 +4774,6 @@ const NEXX_GOALS = [['dunks', 2, 'Throw down 2 dunks'], ['greens', 3, 'Hit 3 gre
 const CAST_LINES = {
   mark: ["BRO. I'VE GOT A GUY. THE GUY IS ME.", "I'm not an NPC. I'm between protagonists.", "I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."],
   markBet: ["I HAD MONEY ON THAT, BRO."],
-  d: ["I drive the van. That's my whole part.", "YO. THE TRUCK NEEDS A PART. THE PART NEEDS A TRUCK TO GO GET IT.", "YO! THE FLOW PROS TRUCK DIED. AGAIN. GOT FRIES?"],
   erin: ["A SLOW DAY IS STILL A GOOD DAY.", "GO WATER YOURSELF.", "Back soon. Don't let Mark touch my seeds.", "BECAUSE I NEVER CHANGE MY MIND."],
   bottie: ["BZZT. THIS IS GOING ON THE FEED.", "CONTEXT WINDOW: FULL OF YOUR MISTAKES.", "BZZT. I PRESSED ONE BUTTON. ONE. EVERYBODY IS SO DRAMATIC.", "PLEASE RATE THIS RESPONSE."],
   kael: ['Aye. And aye.', 'Top three.', 'Then I plan to be insufferable for a very long time.', 'Listen.', 'Somebody has to fix the valves.', 'Boring as a bread line.', "I'm early. You're high.", 'Then one will have to be added.'],
@@ -4793,10 +4792,7 @@ function castInit() {
   const pl = sign('NEXX', 0.9, 0.24, '#7de3ff', '#0a0a0e', { border: false }); pl.position.set(-10.86, 0.55, -10.3); pl.rotation.y = Math.PI / 2; scene.add(pl);
   const nx = castNpc('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }, -10.2, -9.4, 0.6, { cast: 'nexx' }); nx.amb = 'phone';
   spot(-9.6, -8.6, 1.9, 'NEXX', () => uiNexx()); C.list.push(nx); C.nexx = nx;
-  // MARK and D: by the cage fence, watching the run, Mark with money on it
-  const mk = castNpc('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
-  const dd = castNpc('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
-  spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [["MARK'S BOOK (bet on games)", () => uiBook()], ['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
+  // Mark and D are no longer on the Block: the book is at Trey's table now (vice.js)
   // AARON'S STAND (Erin, name masked): fresh food off the farm, by the cage on the other side
   { const g = grp(scene, 7.6, 0, -10.6); ink(M(box(2.2, 0.9, 0.8), toon('#7a5a3a'), 0, 0.45, 0, g), 1.03); M(box(2.3, 0.08, 0.9), toon('#4f8a3c'), 0, 0.93, 0, g);
     for (let i = 0; i < 9; i++) M(sph(0.07, 6, 5), toon(pick(['#e0452c', '#f2c14e', '#7ac74f', '#ff8a3c'])), -0.9 + (i % 5) * 0.42, 1.02, -0.18 + Math.floor(i / 5) * 0.3, g);
@@ -4916,8 +4912,7 @@ function runKael() {
 // ---- everybody on the Block, as people who can walk up to a game (courts.js): the same faces, the same names ----
 function blockBuild(name, style, worn, ovr, tier) { const b = withSeed(hashStr('block|' + name), () => aiBuild(ovr || 75, style)); b.name = name; b.worn = Object.assign(withSeed(hashStr('fit|' + name), () => randomWorn(tier === undefined ? 2 : tier)), worn || {}); b.keepLook = true; return b; }
 function blockRoster() {
-  const L = [blockBuild('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }), blockBuild('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }), blockBuild('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }),
-    blockBuild('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }), bottieBuild(), blockBuild('TREY', 'general', { head: 'hd_dedrick', face: 'f_shades', top: 't_gutter' }), kaelBuild(),
+  const L = [blockBuild('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }), blockBuild('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }), bottieBuild(), blockBuild('TREY', 'general', { head: 'hd_dedrick', face: 'f_shades', top: 't_gutter' }), kaelBuild(),
     blockBuild('SHARPIE', 'sniper', {}), blockBuild('COACH OVERTIME', 'general', { head: 'hd_cap', top: 't_tee' }), blockBuild('OLD HEAD', 'general', { hair: 'h_bald', head: 'hd_band', face: 'f_goggles' }, 60), blockBuild('SOY DOG SAL', 'glass', { head: 'hd_cap', top: 't_patch' }, 55)];
   for (let i = 0; i < LADDER.length; i++) L.push(ladderBuild(i));
   BUM_NAMES.slice(0, 4).forEach(n => { const b = blockBuild(n, 'showman', {}, 50, 0); b.worn = Object.assign(b.worn, { top: 't_tank', bottom: 'b_camo', shoes: 'k_beat', back: 'bk_none' }); L.push(b); });
@@ -4927,7 +4922,7 @@ function blockRoster() {
 // GOT NEXT — the bones and the book, Lil Bottie's body, and things to do at home.
 //   TREY'S BONES   dice games on grey holodice (the Wisp Table from Guttercrown, moved to the Block): Thirteen,
 //                  Twenty-One, Poker Bones, High Bones
-//   MARK'S BOOK    bet HC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
+//   TREY'S BOOK    bet HC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
 //   BOTTIE         a chrome robot body for the rig; lives at your crib as an upgrade
 //   HOME           cookouts, the heavy bag, trick shots, naps, bones at your own table
 // HC only. Both the table and the book stop paying out past a daily win limit, so neither is a way to max a build.
@@ -5072,7 +5067,7 @@ function uiBones(home) {
   if (!home && W && W.bones) UI.cur.onClose = bonesLeave;
 }
 
-// ---------------- MARK'S BOOK ----------------
+// ---------------- TREY'S BOOK (it used to be Mark's; Trey kept the hustle) ----------------
 const CREWS = ['Rust Belt Rejects', 'Parking Lot Legends', 'The Refund Kings', 'Vat 44', 'Low Gravity', 'Food Court Five', 'The Subscriptions', 'Silo Boys', 'Moon Money', 'The Pre-Orders', 'Knee Payment Plan', 'Open Run'];
 function bkTeam(name, ovr, size, seed) { const ps = []; for (let i = 0; i < size; i++) { const o = clamp(Math.round(ovr + (i === 0 ? 5 : -3) + rnd(-3, 3)), 52, 97), style = pick(STYLES).id; const b = withSeed(seed + i, () => aiBuild(o, style)); ps.push({ n: b.name, ovr: o, style, seed: seed + i }); } return { n: name, ovr, ps }; }
 // a quick model of a game: possessions until someone gets to the target. Used for the lines and for SIM.
@@ -5102,7 +5097,7 @@ function bkSettle() {
   const B = book(), sl = B.slate.slip; if (!sl || sl.done) return; const gs = B.slate.games; if (sl.legs.some(L => !gs[L.g].res)) return;
   const won = sl.legs.every(L => bkLegWon(gs[L.g], L)); sl.done = true; sl.won = won; const pay = won ? Math.round(sl.stake * sl.odds) : 0; sl.pay = pay;
   if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; if (sl.legs.length >= 3) deedDrip('hd_bookie', 'Cashed a 3-leg parlay'); } else { B.l++; B.net -= sl.stake; }
-  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} HC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
+  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} HC. Trey: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Trey: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
 }
 function bkBuilds(t) { return t.ps.map(p => { const b = withSeed(p.seed, () => aiBuild(p.ovr, p.style)); b.name = p.n; return { b, ctrl: -1, ai: clamp((p.ovr - 50) / 45, 0.3, 1) }; }); }
 function bkWatch(gi) {
@@ -5119,7 +5114,7 @@ function uiBook() {
   const has = (g, k) => st.legs.find(L => L.g === g && L.k === k), tog = (g, k, s, o) => { const i = st.legs.findIndex(L => L.g === g && L.k === k); const same = i >= 0 && st.legs[i].s === s && st.legs[i].o === o; if (i >= 0) st.legs.splice(i, 1); if (!same && st.legs.length < 5) st.legs.push({ g, k, s, o }); sfx('ui'); rerender(); };
   const odds = () => Math.round(st.legs.reduce((a, L) => a * bkLegOdds(B.slate.games[L.g], L), 1) * 100) / 100;
   openPanel(() => {
-    const SL = B.slate, sl = SL.slip, V = vice(); let h = `<div class="ph"><h2>MARK'S BOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"BRO. I'VE GOT A GUY. THE GUY IS ME." Pick winners, spreads and points. One pick is a single; more is a parlay: every one has to hit. Then watch the games, or let them run.</p>`;
+    const SL = B.slate, sl = SL.slip, V = vice(); let h = `<div class="ph"><h2>TREY'S BOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"BRO. I'VE GOT A GUY. THE GUY IS ME." Pick winners, spreads and points. One pick is a single; more is a parlay: every one has to hit. Then watch the games, or let them run.</p>`;
     for (const g of SL.games) { const a = g.t[0], b = g.t[1], open = !sl && !g.res, sel = (k, s, o) => { const L = has(g.id, k); return L && L.s === s && L.o === o ? '' : 'alt'; };
       h += `<div class="card"><h3>${esc(a.n)} <span class="mu">${a.ovr}</span> vs ${esc(b.n)} <span class="mu">${b.ovr}</span></h3><p class="mu">${g.n} · first to ${g.to}${g.res ? ` · <b class="cy">FINAL ${g.res.sc[0]} — ${g.res.sc[1]}</b>${g.res.sim ? ' (sim)' : ''}` : ''}</p>`;
       if (open) { h += `<div style="margin-top:6px"><span class="mono" style="font-size:10px">WINNER</span> ${Btn(`${esc(a.n)} ${g.ml[0]}`, () => tog(g.id, 'ml', 0), 'sm ' + sel('ml', 0))} ${Btn(`${esc(b.n)} ${g.ml[1]}`, () => tog(g.id, 'ml', 1), 'sm ' + sel('ml', 1))}</div>`;
@@ -5133,8 +5128,8 @@ function uiBook() {
     else { const o = odds(), room = viceRoom('book'), maxPay = Math.round(st.stake * o), okStake = S.vc >= st.stake, capped = room <= 0;
       h += `<div class="card sel"><h3>BET SLIP${st.legs.length > 1 ? ' · ' + st.legs.length + '-LEG PARLAY' : ''}</h3>` + (st.legs.length ? st.legs.map(L => `<p>${esc(bkLegLabel(SL.games[L.g], L))} <span class="mu">${bkLegOdds(SL.games[L.g], L)}</span></p>`).join('') : '<p class="mu">Nothing picked yet.</p>')
         + `<div style="margin-top:6px">${[25, 50, 100, 250, 500].map(s => Btn(s + '', () => { st.stake = s; rerender(); }, 'sm ' + (st.stake === s ? '' : 'alt'))).join(' ')}</div>`
-        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} HC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'MARK IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' HC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
-    h += `<p class="mu">Your record with Mark: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} HC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
+        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} HC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'TREY IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' HC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
+    h += `<p class="mu">Your record with Trey: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} HC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
     return h + `</div>`;
   }, 'side', () => uiClose());
 }
@@ -5150,7 +5145,7 @@ function viceInit() {
   solid(cx - 2.0, cx + 2.0, cz - 1.3, cz + 1.5);
   const tb = withSeed(3003, () => aiBuild(70, 'general')); tb.name = 'TREY'; tb.worn = Object.assign(randomWorn(3), { head: 'hd_cap', face: 'f_shades', top: 't_hoodie' }); const n = addNpc(tb, cx, cz - 1.5, 0, 'idle', { still: true }); n.cast = 'trey'; n.amb = 'cross'; if (W.cast) W.cast.list.push(n);
   CAST_LINES.trey = TREY.hello.concat(['The dice are honest. I am merely charming.']);
-  spot(cx, cz + 2.3, 1.8, "TREY'S BONES (dice)", () => uiBones(false));
+  spot(cx, cz + 2.3, 1.8, "TREY (dice and bets)", () => uiDialog('TREY', pick(TREY.hello.concat(CAST_LINES.mark)), [["TREY'S BONES (dice)", () => uiBones(false)], ["TREY'S BOOK (bet on games)", () => uiBook()], ['Later']]));
 }
 
 // ---------------- at home ----------------
@@ -5432,7 +5427,7 @@ const HOWTO = [
   { t: 'Loose balls and boards', b: 'Box out (LT) before the rebound, jump for it. Press pass/steal near a loose ball to dive. Two men on it at once is a tie-up; the arrow alternates.' },
   { t: 'HC, Respect and Street Smarts', b: 'HC is money: games, drills and contracts pay it, and you spend it on attributes, packages, drip and the crib. Respect is reputation: it sets your rank, and rank opens courts and shelves. Street Smarts are perks you earn points for by doing the thing in real games.' },
   { t: 'Packages and personality', b: 'In MY PLAYER → MOVES you wear one package each of dunks, layups, dribble moves, post moves, idle dribbling and stance. PERSONALITY is three traits: they pick your trash talk and each gives a small edge.' },
-  { t: 'The Block', b: 'The Cages (north) is where games are. The Lab sells attributes, The Plug sells drip, Tape Deck sells moves. Sharpie runs shooting games for HC, Mark takes bets, Trey rolls bones, Old Head hands out contracts. Your crib is down the alley.' },
+  { t: 'The Block', b: 'The Cages (north) is where games are. The Lab sells attributes, The Plug sells drip, Tape Deck sells moves. Sharpie runs shooting games for HC, Trey rolls bones and takes bets, Old Head hands out contracts. Your crib is down the alley.' },
 ];
 const LESSONS = [
   { id: 'read', n: 'Read HOW IT WORKS', done: () => !!S.tutRead },
@@ -5721,7 +5716,7 @@ hitem('sunkeepbed', 'food', 'Sunkeep Planter Bed', 650, 1, 1.6, 0.8, { comfort: 
 hitem('sproutpot', 'food', 'Potted Sprout (Sproutwild)', 280, 0, 0.5, 0.5, { comfort: 2 }, g => { _C(g, 0.16, 0.12, 0.26, '#c8482c'); M(cyl(0.02, 0.02, 0.22, 5), toon('#7ac74f'), 0, 0.36, 0, g); for (const sx of [-1, 1]) { const l = M(sph(0.08, 6, 5), toon('#7ac74f'), sx * 0.07, 0.5, 0, g); l.scale.set(1, 0.4, 0.6); } M(sph(0.016, 5, 4), flat(0x16181c), -0.03, 0.42, 0.03, g); M(sph(0.016, 5, 4), flat(0x16181c), 0.03, 0.42, 0.03, g); }, { small: 1 });
 hitem('kobell', 'gym', 'Knockout Ring Bell', 800, 1, 0.5, 0.5, { hoops: 2, party: 3 }, g => { _B(g, 0.4, 0.9, 0.06, '#3a2a1c', 0, 0.45, -0.1); M(sph(0.16, 10, 8), toon('#f2c14e'), 0, 0.75, 0.04, g).scale.set(1, 0.7, 0.5); M(box(0.04, 0.18, 0.04), toon('#16181c'), 0.16, 0.55, 0.08, g); });
 hitem('koposter', 'wall', 'North Coast Knockout Fight Poster', 380, 0, 1.0, 0.2, { drip: 3 }, g => { ink(M(box(0.95, 1.3, 0.04), toon('#c8102e'), 0, 1.5, 0, g), 1.03); _S(g, 'KNOCKOUT', 0.85, 0.24, '#f4f4f4', '#c8102e', 0, 1.9); _S(g, 'NORTH COAST', 0.7, 0.14, '#f2c14e', '#c8102e', 0, 2.08); _S(g, 'MARCUS vs EVERYBODY', 0.85, 0.12, '#16181c', '#f4f4f4', 0, 1.05); });
-hitem('flowvan', 'yard', 'Flow Pros Van (Dead. Again.)', 5200, 3, 4.2, 2.0, { drip: 6, party: 3 }, g => { ink(M(box(4.0, 1.5, 1.8), toon('#2a5ea8'), 0, 1.0, 0, g), 1.02); ink(M(box(1.0, 0.9, 1.7), toon('#16181c'), 1.45, 1.35, 0, g), 1.02); for (const sx of [-1.3, 1.3]) for (const sz of [-0.9, 0.9]) M(cyl(0.34, 0.34, 0.25, 12), toon('#16181c'), sx, 0.3, sz, g).rotation.x = Math.PI / 2; const s1 = _S(g, 'FLOW PROS', 2.2, 0.5, '#f2c14e', '#2a5ea8', -0.4, 1.15, 0.92); void s1; const s2 = _S(g, 'I HAVE A GUY', 1.6, 0.2, '#f4f4f4', '#2a5ea8', -0.4, 0.7, 0.92); void s2; });
+hitem('flowvan', 'yard', 'Flow Pros Van', 5200, 3, 4.2, 2.0, { drip: 6, party: 3 }, g => { ink(M(box(4.0, 1.5, 1.8), toon('#2a5ea8'), 0, 1.0, 0, g), 1.02); ink(M(box(1.0, 0.9, 1.7), toon('#16181c'), 1.45, 1.35, 0, g), 1.02); for (const sx of [-1.3, 1.3]) for (const sz of [-0.9, 0.9]) M(cyl(0.34, 0.34, 0.25, 12), toon('#16181c'), sx, 0.3, sz, g).rotation.x = Math.PI / 2; const s1 = _S(g, 'FLOW PROS', 2.2, 0.5, '#f2c14e', '#2a5ea8', -0.4, 1.15, 0.92); void s1; const s2 = _S(g, 'I HAVE A GUY', 1.6, 0.2, '#f4f4f4', '#2a5ea8', -0.4, 0.7, 0.92); void s2; });
 hitem('louiebed', 'seat', "Louie's Bed", 450, 0, 0.9, 0.7, { comfort: 4 }, g => { ink(M(cyl(0.42, 0.45, 0.16, 14), toon('#d9853b'), 0, 0.08, 0, g), 1.03).scale.z = 0.75; M(cyl(0.32, 0.32, 0.06, 14), toon('#f3e6cf'), 0, 0.16, 0, g).scale.z = 0.72; M(sph(0.06, 6, 5), toon('#e0452c'), 0.2, 0.22, 0.1, g); });
 hitem('nexxrack', 'show', 'NEXX SUPPLY Merch Rack', 2200, 2, 1.6, 0.6, { drip: 8 }, g => { for (const sx of [-0.7, 0.7]) _B(g, 0.05, 1.7, 0.05, '#c8d0d8', sx, 0.85); _B(g, 1.45, 0.04, 0.04, '#c8d0d8', 0, 1.68); ['#111216', '#7de3ff', '#111216', '#ff2d78', '#7de3ff'].forEach((c, i) => ink(M(box(0.24, 0.6, 0.08), toon(c), -0.52 + i * 0.26, 1.3, 0, g), 1.03)); _S(g, 'NEXX', 0.6, 0.18, '#7de3ff', '#0a0a0e', 0, 1.85); });
 hitem('bottiespeaker', 'tech', "Bottie's Tower Speaker", 1800, 2, 0.6, 0.6, { party: 6, tech: 3 }, g => { _B(g, 0.5, 1.6, 0.5, '#c3ccd6'); for (const y of [0.45, 1.1]) M(cyl(0.17, 0.17, 0.04, 14), toon('#16181c'), 0, y, 0.26, g).rotation.x = Math.PI / 2; M(box(0.4, 0.06, 0.02), flat(0xff2d78), 0, 1.5, 0.26, g); });

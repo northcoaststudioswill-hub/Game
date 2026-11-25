@@ -1,7 +1,7 @@
 // GOT NEXT — the bones and the book, Lil Bottie's body, and things to do at home.
 //   TREY'S BONES   dice games on grey holodice (the Wisp Table from Guttercrown, moved to the Block): Thirteen,
 //                  Twenty-One, Poker Bones, High Bones
-//   MARK'S BOOK    bet HC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
+//   TREY'S BOOK    bet HC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
 //   BOTTIE         a chrome robot body for the rig; lives at your crib as an upgrade
 //   HOME           cookouts, the heavy bag, trick shots, naps, bones at your own table
 // HC only. Both the table and the book stop paying out past a daily win limit, so neither is a way to max a build.
@@ -146,7 +146,7 @@ function uiBones(home) {
   if (!home && W && W.bones) UI.cur.onClose = bonesLeave;
 }
 
-// ---------------- MARK'S BOOK ----------------
+// ---------------- TREY'S BOOK (it used to be Mark's; Trey kept the hustle) ----------------
 const CREWS = ['Rust Belt Rejects', 'Parking Lot Legends', 'The Refund Kings', 'Vat 44', 'Low Gravity', 'Food Court Five', 'The Subscriptions', 'Silo Boys', 'Moon Money', 'The Pre-Orders', 'Knee Payment Plan', 'Open Run'];
 function bkTeam(name, ovr, size, seed) { const ps = []; for (let i = 0; i < size; i++) { const o = clamp(Math.round(ovr + (i === 0 ? 5 : -3) + rnd(-3, 3)), 52, 97), style = pick(STYLES).id; const b = withSeed(seed + i, () => aiBuild(o, style)); ps.push({ n: b.name, ovr: o, style, seed: seed + i }); } return { n: name, ovr, ps }; }
 // a quick model of a game: possessions until someone gets to the target. Used for the lines and for SIM.
@@ -176,7 +176,7 @@ function bkSettle() {
   const B = book(), sl = B.slate.slip; if (!sl || sl.done) return; const gs = B.slate.games; if (sl.legs.some(L => !gs[L.g].res)) return;
   const won = sl.legs.every(L => bkLegWon(gs[L.g], L)); sl.done = true; sl.won = won; const pay = won ? Math.round(sl.stake * sl.odds) : 0; sl.pay = pay;
   if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; if (sl.legs.length >= 3) deedDrip('hd_bookie', 'Cashed a 3-leg parlay'); } else { B.l++; B.net -= sl.stake; }
-  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} HC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
+  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} HC. Trey: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Trey: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
 }
 function bkBuilds(t) { return t.ps.map(p => { const b = withSeed(p.seed, () => aiBuild(p.ovr, p.style)); b.name = p.n; return { b, ctrl: -1, ai: clamp((p.ovr - 50) / 45, 0.3, 1) }; }); }
 function bkWatch(gi) {
@@ -193,7 +193,7 @@ function uiBook() {
   const has = (g, k) => st.legs.find(L => L.g === g && L.k === k), tog = (g, k, s, o) => { const i = st.legs.findIndex(L => L.g === g && L.k === k); const same = i >= 0 && st.legs[i].s === s && st.legs[i].o === o; if (i >= 0) st.legs.splice(i, 1); if (!same && st.legs.length < 5) st.legs.push({ g, k, s, o }); sfx('ui'); rerender(); };
   const odds = () => Math.round(st.legs.reduce((a, L) => a * bkLegOdds(B.slate.games[L.g], L), 1) * 100) / 100;
   openPanel(() => {
-    const SL = B.slate, sl = SL.slip, V = vice(); let h = `<div class="ph"><h2>MARK'S BOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"BRO. I'VE GOT A GUY. THE GUY IS ME." Pick winners, spreads and points. One pick is a single; more is a parlay: every one has to hit. Then watch the games, or let them run.</p>`;
+    const SL = B.slate, sl = SL.slip, V = vice(); let h = `<div class="ph"><h2>TREY'S BOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"BRO. I'VE GOT A GUY. THE GUY IS ME." Pick winners, spreads and points. One pick is a single; more is a parlay: every one has to hit. Then watch the games, or let them run.</p>`;
     for (const g of SL.games) { const a = g.t[0], b = g.t[1], open = !sl && !g.res, sel = (k, s, o) => { const L = has(g.id, k); return L && L.s === s && L.o === o ? '' : 'alt'; };
       h += `<div class="card"><h3>${esc(a.n)} <span class="mu">${a.ovr}</span> vs ${esc(b.n)} <span class="mu">${b.ovr}</span></h3><p class="mu">${g.n} · first to ${g.to}${g.res ? ` · <b class="cy">FINAL ${g.res.sc[0]} — ${g.res.sc[1]}</b>${g.res.sim ? ' (sim)' : ''}` : ''}</p>`;
       if (open) { h += `<div style="margin-top:6px"><span class="mono" style="font-size:10px">WINNER</span> ${Btn(`${esc(a.n)} ${g.ml[0]}`, () => tog(g.id, 'ml', 0), 'sm ' + sel('ml', 0))} ${Btn(`${esc(b.n)} ${g.ml[1]}`, () => tog(g.id, 'ml', 1), 'sm ' + sel('ml', 1))}</div>`;
@@ -207,8 +207,8 @@ function uiBook() {
     else { const o = odds(), room = viceRoom('book'), maxPay = Math.round(st.stake * o), okStake = S.vc >= st.stake, capped = room <= 0;
       h += `<div class="card sel"><h3>BET SLIP${st.legs.length > 1 ? ' · ' + st.legs.length + '-LEG PARLAY' : ''}</h3>` + (st.legs.length ? st.legs.map(L => `<p>${esc(bkLegLabel(SL.games[L.g], L))} <span class="mu">${bkLegOdds(SL.games[L.g], L)}</span></p>`).join('') : '<p class="mu">Nothing picked yet.</p>')
         + `<div style="margin-top:6px">${[25, 50, 100, 250, 500].map(s => Btn(s + '', () => { st.stake = s; rerender(); }, 'sm ' + (st.stake === s ? '' : 'alt'))).join(' ')}</div>`
-        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} HC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'MARK IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' HC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
-    h += `<p class="mu">Your record with Mark: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} HC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
+        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} HC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'TREY IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' HC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
+    h += `<p class="mu">Your record with Trey: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} HC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
     return h + `</div>`;
   }, 'side', () => uiClose());
 }
@@ -224,7 +224,7 @@ function viceInit() {
   solid(cx - 2.0, cx + 2.0, cz - 1.3, cz + 1.5);
   const tb = withSeed(3003, () => aiBuild(70, 'general')); tb.name = 'TREY'; tb.worn = Object.assign(randomWorn(3), { head: 'hd_cap', face: 'f_shades', top: 't_hoodie' }); const n = addNpc(tb, cx, cz - 1.5, 0, 'idle', { still: true }); n.cast = 'trey'; n.amb = 'cross'; if (W.cast) W.cast.list.push(n);
   CAST_LINES.trey = TREY.hello.concat(['The dice are honest. I am merely charming.']);
-  spot(cx, cz + 2.3, 1.8, "TREY'S BONES (dice)", () => uiBones(false));
+  spot(cx, cz + 2.3, 1.8, "TREY (dice and bets)", () => uiDialog('TREY', pick(TREY.hello.concat(CAST_LINES.mark)), [["TREY'S BONES (dice)", () => uiBones(false)], ["TREY'S BOOK (bet on games)", () => uiBook()], ['Later']]));
 }
 
 // ---------------- at home ----------------

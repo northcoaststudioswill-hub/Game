@@ -11,7 +11,7 @@ const HOWTO = [
   { t: 'Loose balls and boards', b: 'Box out (LT) before the rebound, jump for it. Press pass/steal near a loose ball to dive. Two men on it at once is a tie-up; the arrow alternates.' },
   { t: 'HC, Respect and Street Smarts', b: 'HC is money: games, drills and contracts pay it, and you spend it on attributes, packages, drip and the crib. Respect is reputation: it sets your rank, and rank opens courts and shelves. Street Smarts are perks you earn points for by doing the thing in real games.' },
   { t: 'Packages and personality', b: 'In MY PLAYER → MOVES you wear one package each of dunks, layups, dribble moves, post moves, idle dribbling and stance. PERSONALITY is three traits: they pick your trash talk and each gives a small edge.' },
-  { t: 'The Block', b: 'The Cages (north) is where games are. The Lab sells attributes, The Plug sells drip, Tape Deck sells moves. Sharpie runs shooting games for HC, Mark takes bets, Trey rolls bones, Old Head hands out contracts. Your crib is down the alley.' },
+  { t: 'The Block', b: 'The Cages (north) is where games are. The Lab sells attributes, The Plug sells drip, Tape Deck sells moves. Sharpie runs shooting games for HC, Trey rolls bones and takes bets, Old Head hands out contracts. Your crib is down the alley.' },
 ];
 const LESSONS = [
   { id: 'read', n: 'Read HOW IT WORKS', done: () => !!S.tutRead },

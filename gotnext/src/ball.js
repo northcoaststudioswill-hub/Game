@@ -915,10 +915,10 @@ function matchStep(dtReal) {
   if (!M_.introDone && M_.phase === 'check' && M_.pt < 1.5 && !M_.practice && !M_.drill) { M_.introDone = true; for (const q of M_.P) if (q.team !== M_.me.team) floatTxt(q, (q === M_.me.man ? 'YOUR MAN · ' : '') + 'OVR ' + ovrOf(q.A) + (q.pers && q.pers[0] ? ' · ' + q.pers[0].n : ''), q === M_.me.man ? '#f2c14e' : '#ece9e2'); }      /* who you are up against */
   if (M_.late && M_.late.length && M_.phase !== 'over') { for (const c of M_.late) c.t -= dt; if (M_.late[0].t <= 0) { const c = M_.late.shift(); call(c.big, c.small, c.col, 1.3); } }
   if (M_.gpCall > 0 && M_.phase !== 'over') { M_.gpCall -= dt; if (M_.gpCall <= 0) call('GAME POINT', M_.score[0] === M_.score[1] ? 'Next bucket wins' : M_.gpTeam === M_.me.team ? 'One more. Close it out.' : 'Get a stop.', '#f2c14e', 1.6); }
-  else if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
+  if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
   if (M_.brawl) { M_.brawl.t -= dt; if (M_.brawl.t <= 0) calledFoul(); }
-  if (M_.brawlHeat) M_.brawlHeat = Math.max(0, M_.brawlHeat - dt * 0.05);
-  else if (M_.phase === 'over') { M_.pt -= dt; if (M_.pt <= 0 && !M_.over) { M_.over = true; endMatch(); return; } }
+  if (M_.brawlHeat) M_.brawlHeat = Math.max(0, M_.brawlHeat - dt * 0.05);      /* its own line: it used to sit in the chain below, so after any shoving the game could not end and the shot clock stopped */
+  if (M_.phase === 'over') { M_.pt -= dt; if (M_.pt <= 0 && !M_.over) { M_.over = true; endMatch(); return; } }
   else if (M_.phase === 'live' && !M_.practice) {
     if (B.state === 'held') { if (M_.clock > 8) M_.clkWarn = false; else if (M_.clock < 4 && !M_.clkWarn && B.holder) { M_.clkWarn = true; floatTxt(B.holder, 'CLOCK!', '#ff4040'); sfxM('whistle'); } M_.clock -= dt; if (M_.clock <= 0) { sfxM('buzz'); call('SHOT CLOCK', 'Attention span expired', '#ff4040', 1.2); M_.viol = (M_.viol || 0) + 1; const t = 1 - M_.off; M_.lastScorer = { team: M_.off }; M_.phase = 'scored'; M_.pt = 1.2; void t; } }
     if (M_.needClear && B.holder && beyondArc(B.holder.x, B.holder.z)) { M_.needClear = false; }
