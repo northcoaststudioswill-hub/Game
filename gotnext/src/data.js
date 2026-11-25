@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.16.1';
+const VERSION = '0.16.2';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -13,7 +13,7 @@ const BRAND = {
 // cat: F finishing, S shooting, P playmaking, D defense, A athletics
 const ATTRS = [
   { id: 'layup', n: 'Layup', cat: 'F', d: 'Finishing at the rim without leaving your dignity up there.' },
-  { id: 'dunk', n: 'Dunk', cat: 'F', d: 'How violently you may address the rim. Need about 55 to dunk on Street courts; taller players need less.' },
+  { id: 'dunk', n: 'Dunk', cat: 'F', d: 'How violently you may address the rim. About 45 with a clear run, 55 otherwise, on Street courts; taller players need less.' },
   { id: 'close', n: 'Close Shot', cat: 'F', d: 'Hooks, floaters and bunnies inside ten feet.' },
   { id: 'mid', n: 'Mid-Range', cat: 'S', d: 'The lost art. Scouts in 2145 call it "treason".' },
   { id: 'three', n: 'Deep Ball', cat: 'S', d: 'Shots from behind the arc. Worth double on the blacktop.' },

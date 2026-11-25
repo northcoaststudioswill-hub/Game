@@ -308,7 +308,8 @@ function rimThreat(p) {
 function startFinish(p, euro, forceDunk, y0, opt) {
   if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
   opt = opt || {};
-  const d = dHoop(p), sp = Math.hypot(p.vx, p.vz), canDunk = (MT.arcade || att(p, 'dunk') >= 55) && d <= finishRange(p) && (MT.arcade || att(p, 'dunk') + att(p, 'vert') * 0.4 > 78 + (2.0 - p.H) * 40 || att(p, 'dunk') >= 75);
+  const d = dHoop(p), sp = Math.hypot(p.vx, p.vz), canDunk = (MT.arcade || att(p, 'dunk') >= 55) && d <= finishRange(p) && (MT.arcade || att(p, 'dunk') + att(p, 'vert') * 0.4 > 78 + (2.0 - p.H) * 40 || att(p, 'dunk') >= 75)
+    || (!MT.arcade && att(p, 'dunk') >= 45 && sp > 3.3 && d <= finishRange(p) && att(p, 'dunk') + att(p, 'vert') * 0.4 > 60 + (2.0 - p.H) * 40 && !(rimThreat(p) && rimThreat(p).s > 0.35));      /* the base package: with a clear run at it, a starter can get up for a basic dunk */
   if (!opt.oopCatch && chargeCheck(p, euro || opt.euro)) return false;
   let rev = opt.rev || opt.kind === 'reverse' || opt.style === 'reverse'; if (opt.kind === 'euro' || opt.euro) euro = opt.euro || euro || 1;
   if (!opt.hopped && !forceDunk && !opt.kind && !opt.style && !opt.layup) {
@@ -342,11 +343,15 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   // a quick guard with a shot-blocker closing gets it up early off the wrong foot
   if (type === 'layup' && (kind === 'lay' || kind === 'scoop') && !read && !opt.kind && cont && att(p, 'speed') >= 72 && sp > 3 && Math.random() < 0.4) kind = 'quick';
   // the rest of the free package: with a man there, show it and bring it under his arm, float it over the top, or spin; alone, the odd high one off the glass
-  if (type === 'layup' && !read && !opt.kind && !opt.hopped && !euro && !rev && (kind === 'lay' || kind === 'scoop' || kind === 'power' || (!cont && kind === 'finger'))) { const r = Math.random();
-    if (cont) kind = r < 0.2 ? 'under' : r < 0.38 ? 'over' : r < 0.5 && sp > 3 && fq >= 60 ? 'spin' : kind; else if (r < 0.15) kind = 'over'; }
+  if (type === 'layup' && !read && !opt.kind && !opt.hopped && !euro && !rev && (kind === 'lay' || kind === 'scoop' || kind === 'power' || kind === 'quick' || (!cont && kind === 'finger'))) { const r = Math.random();
+    if (p.user) {      // your own finishes come out of a pool, never the same one twice running
+      const L = cont ? ['under', 'over', 'scoop', 'power'].concat(sp > 3 ? ['spin', 'quick'] : []) : ['lay', 'finger', 'over'];
+      kind = L[poolNext(p, cont ? 'layC' + L.length : 'layO', L.length)]; }
+    else if (cont) kind = r < 0.2 ? 'under' : r < 0.38 ? 'over' : r < 0.5 && sp > 3 && fq >= 60 ? 'spin' : kind; else if (r < 0.15) kind = 'over'; }
   let style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
   // the basic package is not one dunk: off the run it is one hand, cocked back if he can get up; standing or in traffic, two hands
-  if (type === 'dunk' && style === 'twohand' && !opt.style) { const r = Math.random();
+  if (type === 'dunk' && style === 'twohand' && !opt.style && p.user && !(p.putT > 1.1 && d < 2.5)) { const tr = (thr && thr.s > 0.35) || sp < 2.4 || opt.hopped, L = tr ? ['twohand', 'hangtwo'] : ['onehand', 'lean', 'twohand'].concat(dq >= 68 ? ['cock', 'hammer'] : []); style = L[poolNext(p, 'dk' + L.length, L.length)]; }
+  else if (type === 'dunk' && style === 'twohand' && !opt.style) { const r = Math.random();
     style = p.putT > 1.1 && d < 2.5 && r < 0.75 ? 'tip' : (thr && thr.s > 0.35) || sp < 2.4 || opt.hopped ? (r < 0.55 ? 'twohand' : 'hangtwo') : dq >= 78 ? (r < 0.28 ? 'cock' : r < 0.52 ? 'hammer' : r < 0.74 ? 'onehand' : r < 0.9 ? 'lean' : 'twohand') : (r < 0.45 ? 'onehand' : r < 0.7 ? 'lean' : 'twohand'); }
   p.st = 'finish'; p.t = 0;
   const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse' && style !== 'contact'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R', cont: cont ? 1 : 0, ox: 0, oz: 0, hit: null, contact: 0, blocked: false };
@@ -355,7 +360,8 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   if (kind === 'quick') f.dur = Math.max(0.4, f.dur - 0.1); if (kind === 'spin') { f.dur += 0.1; f.spin = 1; } if (kind === 'under') f.dur += 0.12; if (kind === 'over') f.dur += 0.04;
   if (p.user && !read && (kind === 'under' || kind === 'over' || kind === 'spin' || kind === 'quick')) floatTxt(p, { under: 'UP AND UNDER', over: 'OVER THE TOP', spin: '360 LAYUP', quick: 'WRONG FOOT' }[kind], '#7de3ff');
   // the off hand: on the left side of the rim (as you face it) a one-hander goes up with the left, away from the help
-  if (type === 'layup' && (kind === 'lay' || kind === 'finger' || kind === 'scoop' || kind === 'quick' || kind === 'over') && !euro && fq >= 62 && p.x < -0.7) { f.lh = true; f.bh = 'L'; }
+  if (type === 'layup' && (kind === 'lay' || kind === 'finger' || kind === 'scoop' || kind === 'quick' || kind === 'over') && !euro) {      // which hand: the left on the left side; down the middle, the one away from the nearest man
+    const nd = near[0] && near[1] < 1.8 ? near[0] : null; if (p.x < -0.5 || (Math.abs(p.x) <= 0.5 && nd && nd.x > p.x + 0.15)) { f.lh = true; f.bh = 'L'; } }
   if (p.user && read && read !== 'euro' && read !== 'reverse') floatTxt(p, { spin: 'SPIN LAYUP', hang: 'HANG', switch: 'SWITCH HANDS', power: 'POWER', scoop: 'SCOOP', bail: 'PULLED OUT' }[read] || '', '#7de3ff');
   if (rev) {
     // under the rim and out the other side, back to the rim: keep the line you drove on and finish past the hoop

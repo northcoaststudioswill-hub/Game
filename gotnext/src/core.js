@@ -168,8 +168,9 @@ function setupTouch() {
   pad.addEventListener('touchend', end); pad.addEventListener('touchcancel', end);
   for (const [id, k] of [['tA', 'a'], ['tB', 'b'], ['tLT', 'lt'], ['tPK', 'pk'], ['tMenu', 'start']]) {
     const el = $(id);
-    el.addEventListener('touchstart', e => { touch[k] = true; touch[k + 'Tap'] = true; el.classList.add('on');      /* latched: a tap shorter than a frame still counts */ e.preventDefault(); e.stopPropagation(); audioInit(); }, { passive: false });
-    const up = e => { touch[k] = false; el.classList.remove('on'); e.preventDefault(); };
+    el.addEventListener('touchstart', e => { if (k === 'lt') { touch.lt = !touch.lt; el.classList.toggle('on', touch.lt); e.preventDefault(); e.stopPropagation(); audioInit(); return; }      /* the gold button is a switch on a phone: tap on, tap off (you need that thumb for the sticks) */
+      touch[k] = true; touch[k + 'Tap'] = true; el.classList.add('on');      /* latched: a tap shorter than a frame still counts */ e.preventDefault(); e.stopPropagation(); audioInit(); }, { passive: false });
+    const up = e => { if (k === 'lt') { e.preventDefault(); return; } touch[k] = false; el.classList.remove('on'); e.preventDefault(); };
     el.addEventListener('touchend', up); el.addEventListener('touchcancel', up);
   }
 }
