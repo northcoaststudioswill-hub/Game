@@ -217,7 +217,7 @@ function uiPlayer(tab) {
     } else if (st.tab === 'moves') {
       const r = rankOf(S.rep);
       { const A = S.anim || (S.anim = JSON.parse(JSON.stringify(animProfile({ mine: true, name: S.name, build: S.build })))), bb = (list, key) => list.map(([k, n]) => Btn(n, () => { A[key] = k; save(); sfx('ui'); if (W && W.me) worldPlayerRig(); rerender(); }, 'sm ' + ((A[key] || '') === k ? '' : 'alt'))).join(' ');      /* free: how the jumper is put together */
-        h += `<div class="cat">JUMP SHOT BASES <span class="mu" style="text-transform:none;letter-spacing:.02em">— free. Looks only: timing comes from the jumper you equip below</span></div><div class="card"><h3>LOWER <span class="mu">feet, knees, hips</span></h3><div>${bb(LOWER_BASES, 'lower')}</div><h3 style="margin-top:8px">UPPER <span class="mu">the release</span></h3><div>${bb(UPPER_BASES, 'upper')}</div></div>`; }
+        h += `<div class="cat">JUMP SHOT BASES <span class="mu" style="text-transform:none;letter-spacing:.02em">— free. Looks only: timing comes from the jumper you equip below</span></div><div class="card"><h3>LOWER <span class="mu">feet, knees, hips</span></h3><div>${bb(LOWER_BASES, 'lower')}</div><h3 style="margin-top:8px">UPPER <span class="mu">the release</span></h3><div>${bb(UPPER_BASES, 'upper')}</div><h3 style="margin-top:8px">RUN STYLE</h3><div>${bb(RUN_STYLES, 'run')}</div></div>`; }
       const sec = (title, list, slot, needAttr) => {
         h += `<div class="cat">${title}</div><div class="grid">`;
         for (const m of list) {

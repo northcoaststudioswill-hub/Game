@@ -235,7 +235,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.14.0';
+const VERSION = '0.15.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -1297,6 +1297,16 @@ function runPose(p, o) {
     const f = Math.cos(2 * Math.PI * (ps - off) + 0.5), fl = (-11 + (27 + 8 * k) * f) * D2R;
     S_('sh' + side, -fl, 0, side === 'R' ? -0.07 : 0.07); S_('el' + side, -(1.3 + 0.35 * Math.max(0, f) - 0.3 * Math.max(0, -f))); S_('wr' + side, -0.05);
   }
+  // run styles (the player's profile): the legs stay the measured stride, the trunk, head and arms carry the character
+  const rs = o.rs; if (rs) { const sw = Math.sin(2 * Math.PI * ps), ad = (k2, x, y, z) => { const v = p[k2]; v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    if (rs === 'upright') { ad('spine', -lean * 0.3); ad('chest', -lean * 0.2); ad('neck', lean * 0.5); ad('elR', -0.28); ad('elL', -0.28); }      /* tall, chest up, hands high */
+    else if (rs === 'lean') { ad('spine', 0.12); ad('chest', 0.06); ad('neck', -0.14); ad('shR', 0.12); ad('shL', 0.12); }      /* a sprinter's forward lean, arms driving back */
+    else if (rs === 'pump') { p.shR[0] *= 1.45; p.shL[0] *= 1.45; p.elR[0] = -1.55; p.elL[0] = -1.55; ad('chest', 0, -0.1 * c, 0); }      /* big arm pump, elbows locked at ninety */
+    else if (rs === 'glide') { p.shR[0] *= 0.5; p.shL[0] *= 0.5; p.elR[0] *= 0.62; p.elL[0] *= 0.62; p.chest[1] *= 0.4; p.y *= 0.88; }      /* quiet arms carried low, hardly any bounce */
+    else if (rs === 'heavy') { ad('shR', 0, 0, -0.22); ad('shL', 0, 0, 0.22); ad('spine', 0.04, 0, 0.07 * sw); ad('chest', 0, 0, 0.05 * sw); p.y *= 1.1; }      /* arms wide, the trunk rocks side to side */
+    else if (rs === 'bouncy') { p.y *= 1.2; ad('neck', 0.05); p.shR[0] *= 1.15; p.shL[0] *= 1.15; ad('wrR', 0.3); ad('wrL', 0.3); }      /* up on the toes, loose wrists */
+    else if (rs === 'low') { ad('spine', 0.11); ad('chest', 0.05); ad('neck', -0.12); p.shR[0] *= 0.8; p.shL[0] *= 0.8; ad('elR', -0.2); ad('elL', -0.2); }      /* hunched and tight, eyes up */
+  }
   p.rate = 40;
 }
 function blendPose(A, B, t) { const o = { y: lerp(A.y || 0, B.y || 0, t), rate: Math.max(A.rate || 16, B.rate || 16) }; const z = POSE.zero; for (const k of new Set([...Object.keys(A), ...Object.keys(B)])) { if (k === 'y' || k === 'rate') continue; const a = A[k] || z, b = B[k] || z; o[k] = [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; } return o; }
@@ -1335,6 +1345,20 @@ function poseOf(anim, t, o) {
         if (!fs) S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
       }
       if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
+      if (anim === 'shoot' && !o.fadeA && !o.sideS) {      // variant pools: the same jumper does not look identical twice running
+        const ad = (k2, x, y, z) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+        if (u < 0.42) { const g = 1 - u / 0.42;      // the gather: 1 a one-two step in, 2 a hop onto both feet, 3 a turn into it
+          if (o.gf === 1) { ad('hpR', -0.35 * g); ad('knR', 0.3 * g); ad('hpL', 0.22 * g); ad('chest', 0, 0.12 * g, 0); }
+          else if (o.gf === 2) { ad('knR', 0.25 * g); ad('knL', 0.25 * g); ad('hpR', -0.16 * g); ad('hpL', -0.16 * g); p.y = (p.y || 0) - 0.05 * g; }
+          else if (o.gf === 3) { ad('hips', 0, 0.4 * g, 0); ad('chest', 0, 0.25 * g, 0); ad('hpL', 0, 0, 0.1 * g); } }
+        if (u > 1.05) { const f = clamp((u - 1.05) / 0.25, 0, 1);      // the follow-through: 1 the arm drops early, 2 held high while the guide hand falls, 3 pointing after it
+          if (o.ft === 1) { ad('shR', 1.5 * f); ad('elR', -0.5 * f); ad('wrR', 0.6 * f); }
+          else if (o.ft === 2) { ad('wrR', -0.25 * f); ad('neck', -0.12 * f); ad('shL', 1.0 * f); ad('elL', 0.3 * f); }
+          else if (o.ft === 3) { ad('shR', 0.35 * f); ad('wrR', 0.9 * f); ad('shL', 1.2 * f); ad('chest', 0, -0.1 * f, 0); } }
+        if (u > 1.3) { const l2 = clamp((u - 1.3) / 0.2, 0, 1);      // the landing: 1 one foot and a step, 2 soft and deep
+          if (o.ld === 1) { ad('hpR', -0.25 * l2); ad('knR', 0.3 * l2); ad('hpL', 0.15 * l2); }
+          else if (o.ld === 2) { ad('knR', 0.3 * l2); ad('knL', 0.3 * l2); ad('hpR', -0.2 * l2); ad('hpL', -0.2 * l2); ad('spine', 0.08 * l2); } }
+      }
       p.rate = anim === 'fake' ? 30 : 24; if (lefty) Object.assign(p, mirrorPose(p)); break;
     }
     case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
@@ -1452,9 +1476,16 @@ function poseOf(anim, t, o) {
       if (o.blocked) { S_('shR', -1.4, 0, -0.6); S_('elR', -0.6); S_('wrR', 0.6); S_('spine', -0.25); S_('chest', -0.3); S_('neck', 0.15); legs(-0.4, 0.7, -0.2, 0.5, 0.1); }   // stuffed
       p.rate = Math.max(p.rate, 22); break;
     }
-    case 'jump': legs(0.05, 0.25, 0.02, 0.15, 0.05); S_('anR', 0.8); S_('anL', 0.8); S_('spine', -0.04); S_('chest', -0.1); S_('neck', -0.25); S_('shR', -3.0, 0, 0.12); S_('shL', -2.9, 0, -0.12); S_('elR', -0.1); S_('elL', -0.15); S_('wrR', 0.4); S_('wrL', 0.4); p.rate = 22; break;
+    case 'jump': legs(0.05, 0.25, 0.02, 0.15, 0.05); S_('anR', 0.8); S_('anL', 0.8); S_('spine', -0.04); S_('chest', -0.1); S_('neck', -0.25); S_('shR', -3.0, 0, 0.12); S_('shL', -2.9, 0, -0.12); S_('elR', -0.1); S_('elL', -0.15); S_('wrR', 0.4); S_('wrL', 0.4); p.rate = 22;
+      if (o.v === 1) { S_('shL', -0.9, 0, 0.7); S_('elL', -0.7); S_('chest', -0.1, 0.25, 0); }      /* contest variants: right hand only */
+      else if (o.v === 2) { S_('shR', -0.9, 0, -0.7); S_('elR', -0.7); S_('chest', -0.1, -0.25, 0); }      /* left hand only */
+      else if (o.v === 3) { S_('spine', 0.14); S_('chest', 0.05); S_('shR', -2.55, 0, 0.1); S_('shL', -2.55, 0, -0.1); legs(0.25, 0.3, 0.2, 0.25, 0.05); }      /* flying at him, both hands out front */
+      break;
     case 'swat': legs(0.1, 0.3, -0.3, 0.5, 0.08); S_('anR', 0.8); S_('spine', 0.1); S_('chest', 0.15, 0.5, 0); S_('neck', -0.1); S_('shR', -1.7, 0, 0.5); S_('elR', -0.05); S_('wrR', -0.9); S_('shL', -0.4, 0, 0.6); S_('elL', -0.8); p.rate = 34; break;
-    case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28; break; }
+    case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28;
+      if (o.v === 1) { S_('chest', 0.18, -0.5 + u * 1.0, 0); S_('shL', -1.3, 0, 0.9 - u * 1.6); S_('elL', -0.2); S_('wrL', -0.5); S_('shR', 0.4, 0, -0.5); S_('elR', 0); }      /* the other hand */
+      else if (o.v === 2) { S_('spine', 0.52); S_('chest', 0.2); S_('shR', -0.9 - u * 0.5, 0, 0.15); S_('shL', -0.9 - u * 0.5, 0, -0.15); S_('elR', -0.4); S_('elL', -0.4); }      /* both hands digging down at it */
+      break; }
     case 'punch': { const u = clamp(t / 0.45, 0, 1); p.y = -0.06; legs(-0.5, 0.6, 0.25, 0.25, 0.12); S_('spine', 0.12);      // haymaker: load the right hand back, then throw it through
       if (u < 0.3) { S_('chest', 0, 0.5, 0); S_('shR', 0.55, 0, -0.35); S_('elR', -2.0); S_('shL', -1.0, 0, 0.2); S_('elL', -1.8); }
       else { S_('chest', 0.05, -0.5, 0); S_('neck', 0, 0.3, 0); S_('shR', -1.55, 0, 0.05); S_('elR', -0.08); S_('wrR', 0.1); S_('shL', -0.5, 0, 0.35); S_('elL', -1.9); }
@@ -1470,7 +1501,10 @@ function poseOf(anim, t, o) {
       else if (!snap) { S_('shR', -0.9, 0, 0.3); S_('shL', -0.9, 0, -0.3); S_('elR', -1.8); S_('elL', -1.8); S_('wrR', 0.5); S_('wrL', 0.5); }
       else { S_('shR', -1.5, 0, 0.2); S_('shL', -1.5, 0, -0.2); S_('elR', -0.12); S_('elL', -0.12); S_('wrR', -0.7); S_('wrL', -0.7); } p.rate = 30; break; }
     case 'boxout': legs(-0.55, 0.75, -0.55, 0.75, 0.45); p.y = -0.14; S_('hips', 0.25); S_('spine', 0.22); S_('chest', 0.05); S_('neck', -0.35); S_('shR', -0.4, 0, -1.2); S_('shL', -0.4, 0, 1.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.3); S_('wrL', 0.3); p.rate = 18; break;
-    case 'catch': S_('shR', -1.2, 0, 0.2); S_('shL', -1.2, 0, -0.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.5); S_('wrL', 0.5); S_('neck', -0.1); break;
+    case 'catch': S_('shR', -1.2, 0, 0.2); S_('shL', -1.2, 0, -0.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.5); S_('wrL', 0.5); S_('neck', -0.1);
+      if (o.v === 1) { S_('shR', -2.4, 0, 0.18); S_('shL', -2.4, 0, -0.18); S_('elR', -0.6); S_('elL', -0.6); S_('neck', -0.3); }      /* reaching up for a high one */
+      else if (o.v === 2) { S_('shR', -1.3, 0, -0.75); S_('elR', -0.4); S_('shL', -0.7, 0, -0.1); S_('elL', -1.4); S_('chest', 0, -0.3, 0); }      /* one hand, out to the side */
+      break;
     case 'call': armsDown(); S_('shR', -2.85, 0, -0.2); S_('elR', -0.3); S_('wrR', 0.4 + Math.sin(t * 14) * 0.4); S_('neck', -0.1); break;
     case 'move': {   // each dribble move has its own shape
       const s = o.side || 0, k = o.kind || 'cross', u = clamp(o.u || 0, 0, 1), e = Math.sin(u * Math.PI);
@@ -1623,6 +1657,19 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (o.dv || o.ov || o.jab) {      // small upper-body and footwork pools so standing players are not all doing the same thing
+    const to = (k2, x, y, z, w) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] = lerp(v[0], x, w); v[1] = lerp(v[1], y, w); v[2] = lerp(v[2], z, w); };
+    if (o.dv && anim === 'slide') {      // off-ball defensive hands: 1 one high one low, 2 both wide and low, 3 an arm in the passing lane
+      if (o.dv === 1) { to('shR', -2.2, 0, -0.2, 0.8); to('elR', -0.4, 0, 0, 0.8); to('shL', -0.5, 0, 0.9, 0.8); to('elL', -0.6, 0, 0, 0.8); }
+      else if (o.dv === 2) { to('shR', -0.7, 0, -1.1, 0.8); to('shL', -0.7, 0, 1.1, 0.8); to('elR', -0.5, 0, 0, 0.8); to('elL', -0.5, 0, 0, 0.8); to('wrR', 0.6, 0, 0, 0.8); to('wrL', 0.6, 0, 0, 0.8); }
+      else if (o.dv === 3) { to('shL', -1.45, 0, 1.35, 0.8); to('elL', -0.1, 0, 0, 0.8); to('shR', -0.9, 0, -0.3, 0.8); to('elR', -1.3, 0, 0, 0.8); to('chest', 0.1, 0.25, 0, 0.6); } }
+    if (o.ov && anim === 'idle') { const w = clamp(Math.min((o.ovT || 0) / 0.3, (2.4 - (o.ovT || 0)) / 0.3), 0, 1);      // off the ball: 1 a hand up for it, 2 clapping for it, 3 pointing where to go
+      if (w > 0) { if (o.ov === 1) { to('shR', -2.8, 0, -0.2, w); to('elR', -0.3, 0, 0, w); to('wrR', 0.4 + Math.sin(t * 12) * 0.3, 0, 0, w); }
+        else if (o.ov === 2) { const c2 = Math.abs(Math.sin(t * 9)) * 0.35; to('shR', -1.1, 0, 0.45 - c2, w); to('shL', -1.1, 0, -0.45 + c2, w); to('elR', -1.3, 0, 0, w); to('elL', -1.3, 0, 0, w); }
+        else { to('shR', -1.5, 0, -0.55, w); to('elR', -0.1, 0, 0, w); to('neck', 0, -0.3, 0, w * 0.6); } } }
+    if (o.jab && anim === 'hold') { const j = Math.abs(o.jab), sd = o.jab > 0 ? 'R' : 'L', sg = o.jab > 0 ? 1 : -1, hv = p['hp' + sd] || (p['hp' + sd] = [0, 0, 0]), kv = p['kn' + sd] || (p['kn' + sd] = [0, 0, 0]);      // triple threat: a jab step, alternating feet
+      hv[0] -= 0.55 * j; kv[0] += 0.35 * j; const sp2 = p.spine || (p.spine = [0, 0, 0]); sp2[0] += 0.12 * j; const ch = p.chest || (p.chest = [0, 0, 0]); ch[1] -= 0.2 * sg * j; p.y = (p.y || 0) - 0.04 * j; }
+  }
   if (o.dive) {      // on the floor after a loose ball: laid out, both arms reaching
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     p.hips = [1.15, 0, 0]; p.spine = [0.15, 0, 0]; p.neck = [-0.6, 0, 0]; p.shR = [-2.7, 0, 0.2]; p.shL = [-2.7, 0, -0.2]; p.elR = [-0.2, 0, 0]; p.elL = [-0.2, 0, 0]; p.hpR = [0.25, 0, -0.1]; p.hpL = [0.1, 0, 0.1]; p.knR = [0.3, 0, 0]; p.knL = [0.7, 0, 0]; p.y = -0.55; p.rate = 30; void ad; }
@@ -2015,6 +2062,7 @@ function baseTrack(id) {
   const mk = k => mkPose((S_, legs, p) => { _TR[k](S_, legs, p); B[k](S_, legs, p); }), dip = mk('dip'), set = mk('set'), follow = mk('follow');
   return (_baseKeys[id] = [[H.gather, slerpPose(dip, set, 0.0)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.55)], [H.set, set], [H.release, slerpPose(set, follow, 0.45)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.2)], [H.recover, slerpPose(follow, dip, 0.65)]]);
 }
+const RUN_STYLES = [['', 'Natural'], ['upright', 'Upright'], ['lean', 'Forward lean'], ['pump', 'Arm pumper'], ['glide', 'Glider'], ['heavy', 'Heavy'], ['bouncy', 'Bouncy'], ['low', 'Low and tight']];
 function validBase(list, id) { return list.some(b => b[0] === id) ? id : ''; }
 
 const IDLE_STYLES = [['relaxed', 'Relaxed'], ['athletic', 'Athletic'], ['wide', 'Wide']];
@@ -2035,7 +2083,7 @@ const PROF_KEYS = [
   ['follow', 'Follow-through hold', 0.5, 1.6], ['shoulder', 'Shoulder turn', -1, 1], ['cadence', 'Idle tempo', 0.6, 1.5], ['intensity', 'Movement intensity', 0.6, 1.4],
   ['recovery', 'Recovery speed', 0.6, 1.5], ['restless', 'Idle restlessness', 0, 1], ['dribLow', 'Dribble crouch', -1, 1], ['defLow', 'Defensive crouch', -1, 1], ['arms', 'Run arm carry', -1, 1], ['swag', 'Walk swagger', 0, 1],
 ];
-const PROF_DEF = { lower: '', upper: '', shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
+const PROF_DEF = { run: '', lower: '', upper: '', shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function seededRnd(seed) { let a = seed || 1; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function normW(o) { let s = 0; for (const k in o) s += Math.max(0, o[k]); if (s <= 0) return o; const r = {}; for (const k in o) r[k] = Math.max(0, o[k]) / s; return r; }
@@ -2052,14 +2100,15 @@ function profileFromBuild(spec) {
   if (st === 'lockdown') P.defLow = clamp(P.defLow + 0.4, -1, 1); if (st === 'showman') { P.swag = clamp(P.swag + 0.35, 0, 1); P.restless = clamp(P.restless + 0.2, 0, 1); }
   // about half of everybody shoots off a named base instead of the pure blend (drawn last, so nothing above changes for existing players)
   if (!(spec && spec.mine)) { if (r() < 0.5) P.lower = LOWER_BASES[1 + Math.floor(r() * (LOWER_BASES.length - 1))][0]; if (r() < 0.5) P.upper = UPPER_BASES[1 + Math.floor(r() * (UPPER_BASES.length - 1))][0];
-  if (st === 'glass' && P.upper === 'sling') P.upper = 'over'; }      /* your own player keeps the blend until you pick a base */
+  if (st === 'glass' && P.upper === 'sling') P.upper = 'over';
+    if (r() < 0.7) P.run = RUN_STYLES[1 + Math.floor(r() * (RUN_STYLES.length - 1))][0]; if (st === 'glass' && r() < 0.5) P.run = 'heavy'; }      /* your own player keeps the blend until you pick a base */
   return P;
 }
 // anything that arrives from outside (save, another player online) is clamped here
 function cleanProfile(a) {
   if (!a || typeof a !== 'object') return null; const P = JSON.parse(JSON.stringify(PROF_DEF));
   for (const g of ['shot', 'idle']) if (a[g] && typeof a[g] === 'object') for (const k in P[g]) { const v = +a[g][k]; if (isFinite(v)) P[g][k] = clamp(v, 0, 1); }
-  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R'; P.lower = validBase(LOWER_BASES, a.lower || ''); P.upper = validBase(UPPER_BASES, a.upper || '');
+  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R'; P.run = validBase(RUN_STYLES, a.run || ''); P.lower = validBase(LOWER_BASES, a.lower || ''); P.upper = validBase(UPPER_BASES, a.upper || '');
   for (const [k, , lo, hi] of PROF_KEYS) { const v = +a[k]; if (isFinite(v)) P[k] = clamp(v, lo, hi); }
   return P;
 }
@@ -2275,7 +2324,7 @@ function setCheck(team, first) {
 // p.live: 'hold' (ball held, dribble still available), 'drib' (dribbling), 'dead' (picked up: pass, shoot, fake or pivot)
 function dribRules(p) { return p.user && !p.afk && !MT.reel; }
 function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); p.live = dribRules(p) && Math.hypot(p.vx, p.vz) < 1.5 ? 'hold' : 'drib'; p.stopT = 0; }
-function changePoss(team) { if (MT.off !== team) { if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) lateCall(0.4, 'LOCKED IN', 'Three stops in a row', '#33e0ff'); }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; } } }
+function changePoss(team) { if (MT.off !== team) { if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) lateCall(0.4, 'LOCKED IN', 'Three stops in a row', '#33e0ff'); }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; p.dv = poolNext(p, 'dv', 4); } } }
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
   if (!p.user || p.bravT > 0 || MT.practice) return;
@@ -2365,6 +2414,7 @@ function startShot(p, src, floater, opt) {
   }
   const j = JUMPER[p.b.moves.jumper] || JUMPERS[0];
   p.st = 'shoot'; p.t = 0; p.shot = { rel: j.rel * (p.fire ? 0.85 : 1), j, src, released: false, kind: shotKind(p), sp: sp0, vx: p.vx, vz: p.vz, aiRel: 0, fade, side, fx: p.x / (d || 1), fz: p.z / (d || 1) };
+  { const sh = p.shot; sh.gf = sp0 > 2 ? 1 + poolNext(p, 'gfm', 2) : [0, 3, 0, 2][poolNext(p, 'gfs', 4)]; sh.ft = poolNext(p, 'ft', 4); sh.ld = poolNext(p, 'ld', 3); }
   if (side) { const sh = p.shot, l = d || 1; sh.sx = -p.z / l * side; sh.sz = p.x / l * side; /* across the rim line, the way the stick went */ if (sh.sx * (p.in.dx || 0) + sh.sz * (p.in.dz || 0) < 0) { sh.sx = -sh.sx; sh.sz = -sh.sz; } }
   if (fade) {      // the fade reads the coverage: lean straight back from a body in your chest, drift away from a hand on one side
     const sh = p.shot, [o, od] = nearestOpp(p), ax = sh.fx, az = sh.fz; sh.fadeK = 'fade';
@@ -2602,7 +2652,7 @@ function doPass(p, to) {
   if (!to || MT.B.holder !== p) return; const B = MT.B;
   const oop = MT.phase === 'live' && !MT.needClear && to.st === 'free' && dHoop(to) < 3.7 && dHoop(to) > 0.9 && dist(p, to) > 3 && (MT.arcade || att(to, 'dunk') >= 62) && nearestOpp(to)[1] > 0.95 && (to.callT > 0 || to.vx * -to.x + to.vz * -to.z > 1.2);
   p.flashy = !oop && (p.b.build.style === 'showman' || bt(p, 'trickle') >= 2) && Math.random() < 0.45;
-  p.st = 'pass'; p.t = 0; p.face = Math.atan2(to.x - p.x, to.z - p.z);
+  p.st = 'pass'; p.t = 0; p.face = Math.atan2(to.x - p.x, to.z - p.z); to.cv = poolNext(to, 'cv', 3);
   B.state = 'pass'; B.holder = null; B.target = to; B.from = p; B.t = 0; B.tried = {}; B.lastTeam = p.team; B.bounced = false;
   if (B.pos.y < 0.7) B.pos.y = 0.7;     /* a pass leaves from the hands, wherever the dribble had the ball */ B.speed = (11 + nAtt(p, 'pass') * 7) * (1 + px(p, 'pass')); sfxM('whoosh');
   const dd = dist(p, to); B.pk = oop ? 'lob' : (!passLane(p, to) && dd < 7) ? 'bounce' : dd > 7.5 ? 'overhead' : Math.hypot(p.vx, p.vz) > 3.2 ? 'one' : 'chest'; p.pk = B.pk;
@@ -2647,7 +2697,7 @@ function calledFoul() {
   deadBall(v.team, 2.8); M_.brawlHeat = 0;
 }
 function startSteal(p) {
-  const B = MT.B, h = B.holder, now = MT.time; p.reach = (p.reach || []).filter(t => now - t < 1.6); p.reach.push(now);
+  const B = MT.B, h = B.holder, now = MT.time; p.reach = (p.reach || []).filter(t => now - t < 1.6); p.reach.push(now); if (p.st === 'free') p.sv = poolNext(p, 'sv', 3);
   if (p.cool > 0) {      // still recovering from the last reach: swiping again is a hand check
     if (h && h.team !== p.team && dist(h, p) < 1.4 && p.reach.length >= 3 && Math.random() < 0.09 * (p.reach.length - 2)) foul(p, h, 'hand check');
     return;
@@ -2702,7 +2752,7 @@ function resolveSteal(p) {
   }
 }
 function startJump(p) {
-  if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); p.lunge = null;
+  if (p.st !== 'free' || p.y > 0) return; p.st = 'jump'; p.t = 0; p.jv = poolNext(p, 'jv', 4); p.jumpH = (0.38 + nAtt(p, 'vert') * 0.42) * (MT.arcade ? 1.8 : 1); p.lunge = null;
   // contesting a shooter: close out at him as you go up (not all the way: you stop a step short)
   let s = null, sd = 3.2; for (const q of MT.P) if (q.team !== p.team && (q.st === 'shoot' || q.st === 'fake') && dist(q, p) < sd) { sd = dist(q, p); s = q; }
   if (s && sd > 0.75) { const k = Math.min(3.2, (sd - 0.7) / 0.3); p.lunge = [(s.x - p.x) / sd * k, (s.z - p.z) / sd * k, 0.3]; p.face = Math.atan2(s.x - p.x, s.z - p.z); }
@@ -2900,6 +2950,8 @@ function startDive(p) {
   const M_ = MT, B = M_.B; if (B.state !== 'loose' || p.st !== 'free' || M_.time - (p.diveAt || -9) < 1.5) return false; const dx = B.pos.x - p.x, dz = B.pos.z - p.z, d = Math.hypot(dx, dz); if (d > 3.2 || d < 0.2 || B.pos.y > 1.6) return false;
   p.diveAt = M_.time; p.diveT = 0.34; p.dvx = dx / d * 5.2; p.dvz = dz / d * 5.2; p.face = Math.atan2(dx, dz); p.stam = Math.max(0, p.stam - 7); floatTxt(p, 'DIVE', '#f2c14e'); sfxM('whoosh'); return true;
 }
+// variant pools: pick one of n looks for an action, never the same one twice running
+function poolNext(p, key, n) { const P = p.pools || (p.pools = {}); let v = Math.floor(Math.random() * n); if (n > 1 && v === P[key]) v = (v + 1 + Math.floor(Math.random() * (n - 1))) % n; P[key] = v; return v; }
 // one bucket from the win: everybody tightens up
 function gamePoint(p) {
   const M_ = MT; if (M_.practice || M_.drill || M_.phase === 'over' || M_.score[p.team] < M_.cfg.mode.to - 2 || (M_.gpSaid || (M_.gpSaid = [0, 0]))[p.team]) return;
@@ -3408,17 +3460,17 @@ function animPlayer(p, dt) {
   p.runPh += dt * (4 + p.speed * 2.1);
   const spN = clamp(p.speed / 6.5, 0, 1);
   switch (p.st) {
-    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.n = p.stats.fga + 1; o.fadeA = p.shot.fade ? (p.shot.fadeK === 'deep' ? 1.45 : 1) : 0; o.fadeS = p.shot.fadeK === 'drift' ? p.shot.fadeS : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
+    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.gf = p.shot.gf; o.ft = p.shot.ft; o.ld = p.shot.ld; o.rel = p.shot.rel; o.n = p.stats.fga + 1; o.fadeA = p.shot.fade ? (p.shot.fadeK === 'deep' ? 1.45 : 1) : 0; o.fadeS = p.shot.fadeK === 'drift' ? p.shot.fadeS : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
     case 'fake': an = 'fake'; o.rel = 0.6; break;
     case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.kind = f.kind; o.euro = f.euro || 0; o.cont = f.cont; o.blocked = f.blocked; o.hit = !!f.hit; o.onRim = f.done && f.hangT > 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; else if (f.turn) { const k = clamp(o.u / 0.7, 0, 1); R.extraYaw = f.turn * k * k * (3 - 2 * k); } break; }
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
     case 'stagger': an = 'stagger'; o.kind = p.stg.kind; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
-    case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'punch': an = 'punch'; break; case 'clothes': an = 'clothes'; o.sp = 1; o.ph = p.runPh; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
+    case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; o.v = p.jv || 0; break; case 'steal': an = 'steal'; o.v = p.sv || 0; break; case 'shove': an = 'shove'; break; case 'punch': an = 'punch'; break; case 'clothes': an = 'clothes'; o.sp = 1; o.ph = p.runPh; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
     case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
-      if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
+      if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; const jc = M_.time + p.i * 0.9, jt = jc % 2.8; if (jt < 0.55 && p.live === 'hold' && p.speed < 0.3) o.jab = Math.sin(Math.PI * jt / 0.55) * (Math.floor(jc / 2.8) % 2 ? 1 : -1); }
       else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); }
         // he is giving you room: show-off dribbles, a new one every few seconds (rock, between the legs, behind the back, yo-yo, size-up, waving him up)
         { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? SWAGS[Math.floor((M_.time + p.i * 1.7) / 2.8) % SWAGS.length] : null; o.swag = p.swag; o.swT = M_.time + p.i; if (p.swag && bt(p, 'showtime') && M_.net !== 'guest') addBrav(p, dt * 0.012 * bt(p, 'showtime')); } }
@@ -3427,8 +3479,10 @@ function animPlayer(p, dt) {
         else if (!p.handsUp && !p.bodyUp && B.holder && (p.guard || p.man) === B.holder) {      // on the ball: sag stance when he has room, active hands when it is tight
           const h = B.holder, dg = dist(p, h); o.defMode = dg > 2.5 ? 'sag' : dg < 1.4 ? 'tight' : ''; o.ballSide = ((B.pos.x - p.x) * Math.cos(p.face) - (B.pos.z - p.z) * Math.sin(p.face)) >= 0 ? 1 : -1; o.swT = M_.time + p.i * 0.7; } }
       else if (p.speed > 0.4) { an = 'run'; o.sp = spN; o.ph = p.runPh; }
-      else if (B.state === 'pass' && B.target === p) an = 'catch';
+      else if (B.state === 'pass' && B.target === p) { an = 'catch'; o.v = p.cv || 0; }
       if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
+      if (an === 'slide' && !o.defMode && !o.up && !o.bodyUp) o.dv = p.dv || 0;
+      if (an === 'idle' && M_.phase === 'live' && M_.off === p.team && !hasBall && !p.user && B.state === 'held') { const oc = M_.time + p.i * 1.7, ph = Math.floor(oc / 3.2); if (p.ovPh !== ph) { p.ovPh = ph; p.ov = Math.random() < 0.45 ? 1 + poolNext(p, 'ov', 3) : 0; } o.ov = p.ov; o.ovT = oc % 3.2; }
       if (B.state === 'pass' && B.target === p && Math.hypot(B.pos.x - p.x, B.pos.z - p.z) < 4) o.catchArms = true;
       else if (M_.phase === 'scored' && M_.lastScorer && !M_.lastScorer.dead && M_.lastScorer.team !== p.team) an = 'sulk';
   }
@@ -3464,7 +3518,7 @@ function animPlayer(p, dt) {
       const stepW = R.legLen * 0.74 * clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), step = lerp(Math.max(asp, 0.5) / cad, stepW, wWalk); p.psi = ((p.psi || 0) + asp * dt / (2 * step)) % 1;
       let Pr = null;
       if (wWalk < 1) { let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)) < need) lo = m; else hi = m; }
-        Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin }); }
+        Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin, rs: R.prof && R.prof.run }); }
       if (wWalk > 0) { let lo = 0.2, hi = 2.4; const need = 1.2 * stepW - 0.12; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (R.legLen * (Math.sin((11 + 19 * m) * D2R) + Math.sin((20 * m - 11) * D2R)) < need) lo = m; else hi = m; }
         const amp = clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), Pw = poseOf('gait', 0, { psi: p.psi, amp, hipA: Math.min(lo, 1.6), swag: R.prof ? 0.2 + R.prof.swag * 0.4 : 0.3, thigh: R.thigh, shin: R.shin, leg: R.legLen });
         Pr = Pr ? blendPose(Pr, Pw, wWalk) : Pw; }
@@ -4068,7 +4122,7 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const stanceDist = v * duty * 2 / cad, hipR = Math.min(solveR(stanceDist - 0.1), 1.5), flight = (0.5 - duty) * 2 / cad;
   let P = wWalk > 0 ? poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen }) : null;
   if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, { prof: R.prof }), clamp(1 - v / 0.12, 0, 1));
-  if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
+  if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin, rs: R.prof && R.prof.run }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
   { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
   applyPose(R, P, dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;
@@ -5877,7 +5931,7 @@ function uiPlayer(tab) {
     } else if (st.tab === 'moves') {
       const r = rankOf(S.rep);
       { const A = S.anim || (S.anim = JSON.parse(JSON.stringify(animProfile({ mine: true, name: S.name, build: S.build })))), bb = (list, key) => list.map(([k, n]) => Btn(n, () => { A[key] = k; save(); sfx('ui'); if (W && W.me) worldPlayerRig(); rerender(); }, 'sm ' + ((A[key] || '') === k ? '' : 'alt'))).join(' ');      /* free: how the jumper is put together */
-        h += `<div class="cat">JUMP SHOT BASES <span class="mu" style="text-transform:none;letter-spacing:.02em">— free. Looks only: timing comes from the jumper you equip below</span></div><div class="card"><h3>LOWER <span class="mu">feet, knees, hips</span></h3><div>${bb(LOWER_BASES, 'lower')}</div><h3 style="margin-top:8px">UPPER <span class="mu">the release</span></h3><div>${bb(UPPER_BASES, 'upper')}</div></div>`; }
+        h += `<div class="cat">JUMP SHOT BASES <span class="mu" style="text-transform:none;letter-spacing:.02em">— free. Looks only: timing comes from the jumper you equip below</span></div><div class="card"><h3>LOWER <span class="mu">feet, knees, hips</span></h3><div>${bb(LOWER_BASES, 'lower')}</div><h3 style="margin-top:8px">UPPER <span class="mu">the release</span></h3><div>${bb(UPPER_BASES, 'upper')}</div><h3 style="margin-top:8px">RUN STYLE</h3><div>${bb(RUN_STYLES, 'run')}</div></div>`; }
       const sec = (title, list, slot, needAttr) => {
         h += `<div class="cat">${title}</div><div class="grid">`;
         for (const m of list) {
@@ -6083,8 +6137,8 @@ const r2 = v => Math.round(v * 100) / 100;
 
 // ---------- builds on the wire ----------
 // an animation profile on the wire: rounded numbers, a few dozen bytes
-function packAnim(a) { const r = v => Math.round(v * 100) / 100, o = { s: [r(a.shot.trad), r(a.shot.high), r(a.shot.quick)], i: [r(a.idle.relaxed), r(a.idle.athletic), r(a.idle.wide)], h: a.hand, lo: a.lower || '', up: a.upper || '' }; for (const [k] of PROF_KEYS) o[k] = r(a[k]); return o; }
-function unpackAnim(o) { if (!o || !Array.isArray(o.s) || !Array.isArray(o.i)) return undefined; const a = { shot: { trad: o.s[0], high: o.s[1], quick: o.s[2] }, idle: { relaxed: o.i[0], athletic: o.i[1], wide: o.i[2] }, hand: o.h, lower: typeof o.lo === 'string' ? o.lo : '', upper: typeof o.up === 'string' ? o.up : '' }; for (const [k] of PROF_KEYS) a[k] = o[k]; return a; }
+function packAnim(a) { const r = v => Math.round(v * 100) / 100, o = { s: [r(a.shot.trad), r(a.shot.high), r(a.shot.quick)], i: [r(a.idle.relaxed), r(a.idle.athletic), r(a.idle.wide)], h: a.hand, lo: a.lower || '', up: a.upper || '', rn: a.run || '' }; for (const [k] of PROF_KEYS) o[k] = r(a[k]); return o; }
+function unpackAnim(o) { if (!o || !Array.isArray(o.s) || !Array.isArray(o.i)) return undefined; const a = { shot: { trad: o.s[0], high: o.s[1], quick: o.s[2] }, idle: { relaxed: o.i[0], athletic: o.i[1], wide: o.i[2] }, hand: o.h, lower: typeof o.lo === 'string' ? o.lo : '', upper: typeof o.up === 'string' ? o.up : '', run: typeof o.rn === 'string' ? o.rn : '' }; for (const [k] of PROF_KEYS) a[k] = o[k]; return a; }
 function packBuild(b) {
   return { n: b.name, st: b.build.style, og: b.build.origin, h: b.build.body.h, w: r2(b.build.body.w), s: r2(b.build.body.s), sk: b.build.skin, a: ATTRS.map(a => b.attrs[a.id]), bd: b.badges, wn: SLOTS.map(s => b.worn[s[0]]), mv: [b.moves.side, b.moves.back, b.moves.diag, b.moves.jumper, b.moves.dunk, b.moves.celeb], an: b.anim ? packAnim(b.anim) : undefined };
 }
@@ -6957,7 +7011,7 @@ addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.cr
 const ALAB = { a: null, b: null, act: 'shoot', speed: 1, paused: false, ball: true, t: 0, step: 0, prof: null, solo: null, ui: 'blend' };
 const ALAB_ACTS = [
   ['shoot', 'Jump shot'], ['fake', 'Pump fake'], ['idle', 'Idle'], ['dribble', 'Dribble'], ['hold', 'Triple threat'], ['slide', 'Defense'], ['run', 'Run'], ['walk', 'Walk'], ['pass', 'Pass'], ['jump', 'Contest'],
-  ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'], ['def:screen', 'Set a screen'], ['def:screen2', 'Hard screen'], ['def:screen3', 'Soft screen (slip)'], ['def:fight', 'Fight over a screen'], ['def:under', 'Go under a screen'], ['def:stuck', 'Caught on a screen'], ['def:box', 'Box out'], ['def:dive', 'Dive on a loose ball'],
+  ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'], ['def:screen', 'Set a screen'], ['def:screen2', 'Hard screen'], ['def:screen3', 'Soft screen (slip)'], ['def:fight', 'Fight over a screen'], ['def:under', 'Go under a screen'], ['def:stuck', 'Caught on a screen'], ['def:box', 'Box out'], ['jump:1', 'Contest: right hand'], ['jump:2', 'Contest: left hand'], ['jump:3', 'Contest: flying'], ['steal:1', 'Steal: other hand'], ['steal:2', 'Steal: two-hand dig'], ['def:dive', 'Dive on a loose ball'],
   ['layup', 'Layup'], ['layup:finger', 'Layup: finger roll'], ['layup:under', 'Layup: up and under'], ['layup:over', 'Layup: over the top'], ['layup:reverse', 'Layup: reverse'], ['layup:spin', 'Layup: 360'], ['layup:quick', 'Layup: wrong foot'], ['layup:scoop', 'Layup: scoop'], ['layup:power', 'Layup: power'], ['dunk', 'Dunk'], ['dunk:onehand', 'Dunk: one hand'], ['dunk:cock', 'Dunk: cocked back'], ['dunk:hammer', 'Dunk: hammer'], ['dunk:lean', 'Dunk: leaner'], ['dunk:hangtwo', 'Dunk: two hands and hang'], ['dunk:tip', 'Dunk: tip slam'], ['cross', 'Crossover'], ['post', 'Post up (LT)'], ['bodyup', 'Body up (LT)'], ['steal', 'Steal'], ['shove', 'Shove'], ['punch', 'Haymaker'], ['clothes', 'Clothesline'], ['stagger', 'Fall: sit'], ['fall:face', 'Fall: face first'], ['fall:flat', 'Fall: laid out'], ['fall:spin', 'Fall: spun round'], ['fall:knee', 'Fall: to a knee'],
   ['celeb:airflex', 'Celeb: air flex'], ['celeb:goggles', 'Celeb: three goggles'], ['celeb:bow', 'Celeb: take a bow'], ['celeb:callme', 'Celeb: call me'], ['celeb:flexdown', 'Celeb: crab flex'], ['celeb:toosmall', 'Celeb: too small'], ['celeb:stare', 'Celeb: stare down'], ['celeb:pout', 'Celeb: pout'], ['celeb:shh', 'Celeb: shh'], ['celeb:rock', 'Celeb: rock the baby'], ['celeb:nightnight', 'Celeb: night night'], ['celeb:pound', 'Celeb: chest pound'], ['celeb:shrug', 'Celeb: shrug'], ['celeb:floor', 'Celeb: slap the floor'], ['celeb:wag', 'Celeb: finger wag'], ['celeb:greenbean', 'Celeb: green bean'], ['celeb:greengiant', 'Celeb: green giant'], ['celeb:iceveins', 'Celeb: ice in my veins'], ['celeb:fentlean', 'Celeb: fent lean'], ['celeb:pour40', 'Celeb: pour out the 40'],
   ['fan:up', 'Fan: arms up'], ['fan:jump', 'Fan: jump'], ['fan:ohh', 'Fan: OHHH'], ['fan:point', 'Fan: point & laugh'], ['fan:cover', 'Fan: hand over mouth'], ['fan:boo', 'Fan: boo'], ['fan:count', 'Fan: three'], ['fan:wave', 'Fan: towel'], ['fan:clap', 'Fan: clap'], ['fan:phone', 'Fan: phone'], ['fan:film', 'Fan: filming'], ['fan:talk', 'Fan: talking'], ['fan:bob', 'Fan: bobbing'], ['fan:cross', 'Fan: arms crossed'],
@@ -6993,10 +7047,11 @@ function alabAt(t) {
 function alabPose(F, s, dt) {
   const R = F.R, prof = R.prof; let an = s.an, P, y = 0, o = { leg: R.legLen, prof };
   if (an === 'shoot' || an === 'fake') { const rel = an === 'fake' ? 0.6 : 0.6, u = s.t / rel; o.rel = rel; o.n = 1; P = poseOf(an, s.t, o); if (an === 'shoot') y = u > 0.62 && u < 1.42 ? 0.42 * Math.sin(Math.PI * (u - 0.62) / 0.8) : 0; }
-  else if (an === 'run') { const psi = (s.t * 1.45) % 1; P = poseOf('sprint', 0, { psi, duty: 0.33, k: 0.6, hipA: 1.1, flight: 0.08, thigh: R.thigh, shin: R.shin }); profilePosture(P, 'run', prof); }
+  else if (an === 'run') { const psi = (s.t * 1.45) % 1; P = poseOf('sprint', 0, { rs: prof.run, psi, duty: 0.33, k: 0.6, hipA: 1.1, flight: 0.08, thigh: R.thigh, shin: R.shin }); profilePosture(P, 'run', prof); }
   else if (an === 'walk') { P = poseOf('gait', 0, { psi: (s.t * 0.95) % 1, amp: 1, hipA: 1, swag: 0.35 + prof.swag * 0.8, thigh: R.thigh, shin: R.shin, leg: R.legLen }); }
   else if (an === 'dribble') { o.sp = 0; o.ph = s.t * 7; o.dr = 0.8; o.hand = prof.hand; P = poseOf('dribble', s.t, o); profilePosture(P, 'dribble', prof); }
   else if (an === 'slide') { o.ph = s.t * 6; o.up = true; P = poseOf('slide', s.t, o); profilePosture(P, 'slide', prof); }
+  else if (/^(jump|steal):\d$/.test(an)) { o.v = +an.slice(-1); const bs = an.split(':')[0]; P = poseOf(bs, s.t, o); y = bs === 'jump' && s.t < 0.6 ? 0.5 * Math.sin(Math.PI * s.t / 0.6) : 0; }
   else if (an === 'jump') { P = poseOf('jump', s.t, o); y = s.t < 0.6 ? 0.5 * Math.sin(Math.PI * s.t / 0.6) : 0; }
   else if (an.startsWith('layup:') || an.startsWith('dunk:')) { const bs = an.split(':')[0], kd = an.split(':')[1]; o.u = s.t / ALAB_DUR[bs]; if (bs === 'dunk') o.style = kd; else o.kind = kd; P = poseOf(bs, s.t, o); y = Math.sin(Math.PI * clamp((o.u - 0.25) / 0.7, 0, 1)) * (bs === 'dunk' ? 0.85 : 0.55); }
   else if (an === 'layup' || an === 'dunk') { o.u = s.t / ALAB_DUR[an]; o.style = an === 'dunk' ? 'twohand' : undefined; P = poseOf(an, s.t, o); y = Math.sin(Math.PI * clamp((o.u - 0.25) / 0.7, 0, 1)) * (an === 'dunk' ? 0.85 : 0.55); }
@@ -7047,7 +7102,7 @@ function alabRender() {
   h += `<div class="cat">LEFT PLAYER'S PROFILE <span class="mu" style="text-transform:none;letter-spacing:.02em">— cosmetic only, never changes a gameplay number</span></div><div class="card"><h3>JUMP SHOT BLEND</h3>`;
   const wset = (g, k) => v => { P[g][k] = v; const n = normW(P[g]); Object.assign(P[g], n); for (const kk in n) { const e = $('al_' + g + kk); if (e) e.textContent = n[kk].toFixed(2); } };
   for (const [k, n] of SHOT_STYLES) h += sl(n.toUpperCase(), P.shot[k], 0, 1, 0.01, wset('shot', k), 'al_shot' + k);
-  h += `<h3 style="margin-top:8px">LOWER BASE <span class="mu">feet, knees, hips</span></h3><div>` + LOWER_BASES.map(([k, n]) => Btn(n, () => { P.lower = k; rerender(); }, 'sm ' + ((P.lower || '') === k ? '' : 'alt'))).join(' ') + `</div><h3 style="margin-top:8px">UPPER BASE <span class="mu">the release</span></h3><div>` + UPPER_BASES.map(([k, n]) => Btn(n, () => { P.upper = k; rerender(); }, 'sm ' + ((P.upper || '') === k ? '' : 'alt'))).join(' ') + `</div>`;
+  h += `<h3 style="margin-top:8px">RUN STYLE</h3><div>` + RUN_STYLES.map(([k, n]) => Btn(n, () => { P.run = k; rerender(); }, 'sm ' + ((P.run || '') === k ? '' : 'alt'))).join(' ') + `</div><h3 style="margin-top:8px">LOWER BASE <span class="mu">feet, knees, hips</span></h3><div>` + LOWER_BASES.map(([k, n]) => Btn(n, () => { P.lower = k; rerender(); }, 'sm ' + ((P.lower || '') === k ? '' : 'alt'))).join(' ') + `</div><h3 style="margin-top:8px">UPPER BASE <span class="mu">the release</span></h3><div>` + UPPER_BASES.map(([k, n]) => Btn(n, () => { P.upper = k; rerender(); }, 'sm ' + ((P.upper || '') === k ? '' : 'alt'))).join(' ') + `</div>`;
   h += `<h3 style="margin-top:8px">IDLE BLEND</h3>`; for (const [k, n] of IDLE_STYLES) h += sl(n.toUpperCase(), P.idle[k], 0, 1, 0.01, wset('idle', k), 'al_idle' + k);
   h += `<h3 style="margin-top:8px">POSTURE AND TIMING</h3><div style="margin:4px 0">${Btn('SHOOTS ' + (P.hand === 'L' ? 'LEFT' : 'RIGHT'), () => { P.hand = P.hand === 'L' ? 'R' : 'L'; rerender(); }, 'sm alt')}</div>`;
   for (const [k, n, lo, hi] of PROF_KEYS) h += sl(n.toUpperCase(), P[k], lo, hi, 0.01, v => { P[k] = v; }, 'al_' + k);

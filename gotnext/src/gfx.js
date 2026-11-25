@@ -288,6 +288,16 @@ function runPose(p, o) {
     const f = Math.cos(2 * Math.PI * (ps - off) + 0.5), fl = (-11 + (27 + 8 * k) * f) * D2R;
     S_('sh' + side, -fl, 0, side === 'R' ? -0.07 : 0.07); S_('el' + side, -(1.3 + 0.35 * Math.max(0, f) - 0.3 * Math.max(0, -f))); S_('wr' + side, -0.05);
   }
+  // run styles (the player's profile): the legs stay the measured stride, the trunk, head and arms carry the character
+  const rs = o.rs; if (rs) { const sw = Math.sin(2 * Math.PI * ps), ad = (k2, x, y, z) => { const v = p[k2]; v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    if (rs === 'upright') { ad('spine', -lean * 0.3); ad('chest', -lean * 0.2); ad('neck', lean * 0.5); ad('elR', -0.28); ad('elL', -0.28); }      /* tall, chest up, hands high */
+    else if (rs === 'lean') { ad('spine', 0.12); ad('chest', 0.06); ad('neck', -0.14); ad('shR', 0.12); ad('shL', 0.12); }      /* a sprinter's forward lean, arms driving back */
+    else if (rs === 'pump') { p.shR[0] *= 1.45; p.shL[0] *= 1.45; p.elR[0] = -1.55; p.elL[0] = -1.55; ad('chest', 0, -0.1 * c, 0); }      /* big arm pump, elbows locked at ninety */
+    else if (rs === 'glide') { p.shR[0] *= 0.5; p.shL[0] *= 0.5; p.elR[0] *= 0.62; p.elL[0] *= 0.62; p.chest[1] *= 0.4; p.y *= 0.88; }      /* quiet arms carried low, hardly any bounce */
+    else if (rs === 'heavy') { ad('shR', 0, 0, -0.22); ad('shL', 0, 0, 0.22); ad('spine', 0.04, 0, 0.07 * sw); ad('chest', 0, 0, 0.05 * sw); p.y *= 1.1; }      /* arms wide, the trunk rocks side to side */
+    else if (rs === 'bouncy') { p.y *= 1.2; ad('neck', 0.05); p.shR[0] *= 1.15; p.shL[0] *= 1.15; ad('wrR', 0.3); ad('wrL', 0.3); }      /* up on the toes, loose wrists */
+    else if (rs === 'low') { ad('spine', 0.11); ad('chest', 0.05); ad('neck', -0.12); p.shR[0] *= 0.8; p.shL[0] *= 0.8; ad('elR', -0.2); ad('elL', -0.2); }      /* hunched and tight, eyes up */
+  }
   p.rate = 40;
 }
 function blendPose(A, B, t) { const o = { y: lerp(A.y || 0, B.y || 0, t), rate: Math.max(A.rate || 16, B.rate || 16) }; const z = POSE.zero; for (const k of new Set([...Object.keys(A), ...Object.keys(B)])) { if (k === 'y' || k === 'rate') continue; const a = A[k] || z, b = B[k] || z; o[k] = [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; } return o; }
@@ -326,6 +336,20 @@ function poseOf(anim, t, o) {
         if (!fs) S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
       }
       if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
+      if (anim === 'shoot' && !o.fadeA && !o.sideS) {      // variant pools: the same jumper does not look identical twice running
+        const ad = (k2, x, y, z) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+        if (u < 0.42) { const g = 1 - u / 0.42;      // the gather: 1 a one-two step in, 2 a hop onto both feet, 3 a turn into it
+          if (o.gf === 1) { ad('hpR', -0.35 * g); ad('knR', 0.3 * g); ad('hpL', 0.22 * g); ad('chest', 0, 0.12 * g, 0); }
+          else if (o.gf === 2) { ad('knR', 0.25 * g); ad('knL', 0.25 * g); ad('hpR', -0.16 * g); ad('hpL', -0.16 * g); p.y = (p.y || 0) - 0.05 * g; }
+          else if (o.gf === 3) { ad('hips', 0, 0.4 * g, 0); ad('chest', 0, 0.25 * g, 0); ad('hpL', 0, 0, 0.1 * g); } }
+        if (u > 1.05) { const f = clamp((u - 1.05) / 0.25, 0, 1);      // the follow-through: 1 the arm drops early, 2 held high while the guide hand falls, 3 pointing after it
+          if (o.ft === 1) { ad('shR', 1.5 * f); ad('elR', -0.5 * f); ad('wrR', 0.6 * f); }
+          else if (o.ft === 2) { ad('wrR', -0.25 * f); ad('neck', -0.12 * f); ad('shL', 1.0 * f); ad('elL', 0.3 * f); }
+          else if (o.ft === 3) { ad('shR', 0.35 * f); ad('wrR', 0.9 * f); ad('shL', 1.2 * f); ad('chest', 0, -0.1 * f, 0); } }
+        if (u > 1.3) { const l2 = clamp((u - 1.3) / 0.2, 0, 1);      // the landing: 1 one foot and a step, 2 soft and deep
+          if (o.ld === 1) { ad('hpR', -0.25 * l2); ad('knR', 0.3 * l2); ad('hpL', 0.15 * l2); }
+          else if (o.ld === 2) { ad('knR', 0.3 * l2); ad('knL', 0.3 * l2); ad('hpR', -0.2 * l2); ad('hpL', -0.2 * l2); ad('spine', 0.08 * l2); } }
+      }
       p.rate = anim === 'fake' ? 30 : 24; if (lefty) Object.assign(p, mirrorPose(p)); break;
     }
     case 'floater': legs(-1.2, 1.4, 0.25, 0.25); S_('anL', 0.8); S_('spine', 0.05); S_('chest', -0.08); S_('neck', -0.15); S_('shR', -2.7, 0, 0.1); S_('elR', -0.5); S_('wrR', t > 0.2 ? -1.1 : 0.8); S_('shL', -0.5, 0, 0.5); S_('elL', -1.1); p.rate = 22; break;
@@ -443,9 +467,16 @@ function poseOf(anim, t, o) {
       if (o.blocked) { S_('shR', -1.4, 0, -0.6); S_('elR', -0.6); S_('wrR', 0.6); S_('spine', -0.25); S_('chest', -0.3); S_('neck', 0.15); legs(-0.4, 0.7, -0.2, 0.5, 0.1); }   // stuffed
       p.rate = Math.max(p.rate, 22); break;
     }
-    case 'jump': legs(0.05, 0.25, 0.02, 0.15, 0.05); S_('anR', 0.8); S_('anL', 0.8); S_('spine', -0.04); S_('chest', -0.1); S_('neck', -0.25); S_('shR', -3.0, 0, 0.12); S_('shL', -2.9, 0, -0.12); S_('elR', -0.1); S_('elL', -0.15); S_('wrR', 0.4); S_('wrL', 0.4); p.rate = 22; break;
+    case 'jump': legs(0.05, 0.25, 0.02, 0.15, 0.05); S_('anR', 0.8); S_('anL', 0.8); S_('spine', -0.04); S_('chest', -0.1); S_('neck', -0.25); S_('shR', -3.0, 0, 0.12); S_('shL', -2.9, 0, -0.12); S_('elR', -0.1); S_('elL', -0.15); S_('wrR', 0.4); S_('wrL', 0.4); p.rate = 22;
+      if (o.v === 1) { S_('shL', -0.9, 0, 0.7); S_('elL', -0.7); S_('chest', -0.1, 0.25, 0); }      /* contest variants: right hand only */
+      else if (o.v === 2) { S_('shR', -0.9, 0, -0.7); S_('elR', -0.7); S_('chest', -0.1, -0.25, 0); }      /* left hand only */
+      else if (o.v === 3) { S_('spine', 0.14); S_('chest', 0.05); S_('shR', -2.55, 0, 0.1); S_('shL', -2.55, 0, -0.1); legs(0.25, 0.3, 0.2, 0.25, 0.05); }      /* flying at him, both hands out front */
+      break;
     case 'swat': legs(0.1, 0.3, -0.3, 0.5, 0.08); S_('anR', 0.8); S_('spine', 0.1); S_('chest', 0.15, 0.5, 0); S_('neck', -0.1); S_('shR', -1.7, 0, 0.5); S_('elR', -0.05); S_('wrR', -0.9); S_('shL', -0.4, 0, 0.6); S_('elL', -0.8); p.rate = 34; break;
-    case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28; break; }
+    case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28;
+      if (o.v === 1) { S_('chest', 0.18, -0.5 + u * 1.0, 0); S_('shL', -1.3, 0, 0.9 - u * 1.6); S_('elL', -0.2); S_('wrL', -0.5); S_('shR', 0.4, 0, -0.5); S_('elR', 0); }      /* the other hand */
+      else if (o.v === 2) { S_('spine', 0.52); S_('chest', 0.2); S_('shR', -0.9 - u * 0.5, 0, 0.15); S_('shL', -0.9 - u * 0.5, 0, -0.15); S_('elR', -0.4); S_('elL', -0.4); }      /* both hands digging down at it */
+      break; }
     case 'punch': { const u = clamp(t / 0.45, 0, 1); p.y = -0.06; legs(-0.5, 0.6, 0.25, 0.25, 0.12); S_('spine', 0.12);      // haymaker: load the right hand back, then throw it through
       if (u < 0.3) { S_('chest', 0, 0.5, 0); S_('shR', 0.55, 0, -0.35); S_('elR', -2.0); S_('shL', -1.0, 0, 0.2); S_('elL', -1.8); }
       else { S_('chest', 0.05, -0.5, 0); S_('neck', 0, 0.3, 0); S_('shR', -1.55, 0, 0.05); S_('elR', -0.08); S_('wrR', 0.1); S_('shL', -0.5, 0, 0.35); S_('elL', -1.9); }
@@ -461,7 +492,10 @@ function poseOf(anim, t, o) {
       else if (!snap) { S_('shR', -0.9, 0, 0.3); S_('shL', -0.9, 0, -0.3); S_('elR', -1.8); S_('elL', -1.8); S_('wrR', 0.5); S_('wrL', 0.5); }
       else { S_('shR', -1.5, 0, 0.2); S_('shL', -1.5, 0, -0.2); S_('elR', -0.12); S_('elL', -0.12); S_('wrR', -0.7); S_('wrL', -0.7); } p.rate = 30; break; }
     case 'boxout': legs(-0.55, 0.75, -0.55, 0.75, 0.45); p.y = -0.14; S_('hips', 0.25); S_('spine', 0.22); S_('chest', 0.05); S_('neck', -0.35); S_('shR', -0.4, 0, -1.2); S_('shL', -0.4, 0, 1.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.3); S_('wrL', 0.3); p.rate = 18; break;
-    case 'catch': S_('shR', -1.2, 0, 0.2); S_('shL', -1.2, 0, -0.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.5); S_('wrL', 0.5); S_('neck', -0.1); break;
+    case 'catch': S_('shR', -1.2, 0, 0.2); S_('shL', -1.2, 0, -0.2); S_('elR', -1.2); S_('elL', -1.2); S_('wrR', 0.5); S_('wrL', 0.5); S_('neck', -0.1);
+      if (o.v === 1) { S_('shR', -2.4, 0, 0.18); S_('shL', -2.4, 0, -0.18); S_('elR', -0.6); S_('elL', -0.6); S_('neck', -0.3); }      /* reaching up for a high one */
+      else if (o.v === 2) { S_('shR', -1.3, 0, -0.75); S_('elR', -0.4); S_('shL', -0.7, 0, -0.1); S_('elL', -1.4); S_('chest', 0, -0.3, 0); }      /* one hand, out to the side */
+      break;
     case 'call': armsDown(); S_('shR', -2.85, 0, -0.2); S_('elR', -0.3); S_('wrR', 0.4 + Math.sin(t * 14) * 0.4); S_('neck', -0.1); break;
     case 'move': {   // each dribble move has its own shape
       const s = o.side || 0, k = o.kind || 'cross', u = clamp(o.u || 0, 0, 1), e = Math.sin(u * Math.PI);
@@ -614,6 +648,19 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (o.dv || o.ov || o.jab) {      // small upper-body and footwork pools so standing players are not all doing the same thing
+    const to = (k2, x, y, z, w) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] = lerp(v[0], x, w); v[1] = lerp(v[1], y, w); v[2] = lerp(v[2], z, w); };
+    if (o.dv && anim === 'slide') {      // off-ball defensive hands: 1 one high one low, 2 both wide and low, 3 an arm in the passing lane
+      if (o.dv === 1) { to('shR', -2.2, 0, -0.2, 0.8); to('elR', -0.4, 0, 0, 0.8); to('shL', -0.5, 0, 0.9, 0.8); to('elL', -0.6, 0, 0, 0.8); }
+      else if (o.dv === 2) { to('shR', -0.7, 0, -1.1, 0.8); to('shL', -0.7, 0, 1.1, 0.8); to('elR', -0.5, 0, 0, 0.8); to('elL', -0.5, 0, 0, 0.8); to('wrR', 0.6, 0, 0, 0.8); to('wrL', 0.6, 0, 0, 0.8); }
+      else if (o.dv === 3) { to('shL', -1.45, 0, 1.35, 0.8); to('elL', -0.1, 0, 0, 0.8); to('shR', -0.9, 0, -0.3, 0.8); to('elR', -1.3, 0, 0, 0.8); to('chest', 0.1, 0.25, 0, 0.6); } }
+    if (o.ov && anim === 'idle') { const w = clamp(Math.min((o.ovT || 0) / 0.3, (2.4 - (o.ovT || 0)) / 0.3), 0, 1);      // off the ball: 1 a hand up for it, 2 clapping for it, 3 pointing where to go
+      if (w > 0) { if (o.ov === 1) { to('shR', -2.8, 0, -0.2, w); to('elR', -0.3, 0, 0, w); to('wrR', 0.4 + Math.sin(t * 12) * 0.3, 0, 0, w); }
+        else if (o.ov === 2) { const c2 = Math.abs(Math.sin(t * 9)) * 0.35; to('shR', -1.1, 0, 0.45 - c2, w); to('shL', -1.1, 0, -0.45 + c2, w); to('elR', -1.3, 0, 0, w); to('elL', -1.3, 0, 0, w); }
+        else { to('shR', -1.5, 0, -0.55, w); to('elR', -0.1, 0, 0, w); to('neck', 0, -0.3, 0, w * 0.6); } } }
+    if (o.jab && anim === 'hold') { const j = Math.abs(o.jab), sd = o.jab > 0 ? 'R' : 'L', sg = o.jab > 0 ? 1 : -1, hv = p['hp' + sd] || (p['hp' + sd] = [0, 0, 0]), kv = p['kn' + sd] || (p['kn' + sd] = [0, 0, 0]);      // triple threat: a jab step, alternating feet
+      hv[0] -= 0.55 * j; kv[0] += 0.35 * j; const sp2 = p.spine || (p.spine = [0, 0, 0]); sp2[0] += 0.12 * j; const ch = p.chest || (p.chest = [0, 0, 0]); ch[1] -= 0.2 * sg * j; p.y = (p.y || 0) - 0.04 * j; }
+  }
   if (o.dive) {      // on the floor after a loose ball: laid out, both arms reaching
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     p.hips = [1.15, 0, 0]; p.spine = [0.15, 0, 0]; p.neck = [-0.6, 0, 0]; p.shR = [-2.7, 0, 0.2]; p.shL = [-2.7, 0, -0.2]; p.elR = [-0.2, 0, 0]; p.elL = [-0.2, 0, 0]; p.hpR = [0.25, 0, -0.1]; p.hpL = [0.1, 0, 0.1]; p.knR = [0.3, 0, 0]; p.knL = [0.7, 0, 0]; p.y = -0.55; p.rate = 30; void ad; }

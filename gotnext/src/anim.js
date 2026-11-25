@@ -111,6 +111,7 @@ function baseTrack(id) {
   const mk = k => mkPose((S_, legs, p) => { _TR[k](S_, legs, p); B[k](S_, legs, p); }), dip = mk('dip'), set = mk('set'), follow = mk('follow');
   return (_baseKeys[id] = [[H.gather, slerpPose(dip, set, 0.0)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.55)], [H.set, set], [H.release, slerpPose(set, follow, 0.45)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.2)], [H.recover, slerpPose(follow, dip, 0.65)]]);
 }
+const RUN_STYLES = [['', 'Natural'], ['upright', 'Upright'], ['lean', 'Forward lean'], ['pump', 'Arm pumper'], ['glide', 'Glider'], ['heavy', 'Heavy'], ['bouncy', 'Bouncy'], ['low', 'Low and tight']];
 function validBase(list, id) { return list.some(b => b[0] === id) ? id : ''; }
 
 const IDLE_STYLES = [['relaxed', 'Relaxed'], ['athletic', 'Athletic'], ['wide', 'Wide']];
@@ -131,7 +132,7 @@ const PROF_KEYS = [
   ['follow', 'Follow-through hold', 0.5, 1.6], ['shoulder', 'Shoulder turn', -1, 1], ['cadence', 'Idle tempo', 0.6, 1.5], ['intensity', 'Movement intensity', 0.6, 1.4],
   ['recovery', 'Recovery speed', 0.6, 1.5], ['restless', 'Idle restlessness', 0, 1], ['dribLow', 'Dribble crouch', -1, 1], ['defLow', 'Defensive crouch', -1, 1], ['arms', 'Run arm carry', -1, 1], ['swag', 'Walk swagger', 0, 1],
 ];
-const PROF_DEF = { lower: '', upper: '', shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
+const PROF_DEF = { run: '', lower: '', upper: '', shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function seededRnd(seed) { let a = seed || 1; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function normW(o) { let s = 0; for (const k in o) s += Math.max(0, o[k]); if (s <= 0) return o; const r = {}; for (const k in o) r[k] = Math.max(0, o[k]) / s; return r; }
@@ -148,14 +149,15 @@ function profileFromBuild(spec) {
   if (st === 'lockdown') P.defLow = clamp(P.defLow + 0.4, -1, 1); if (st === 'showman') { P.swag = clamp(P.swag + 0.35, 0, 1); P.restless = clamp(P.restless + 0.2, 0, 1); }
   // about half of everybody shoots off a named base instead of the pure blend (drawn last, so nothing above changes for existing players)
   if (!(spec && spec.mine)) { if (r() < 0.5) P.lower = LOWER_BASES[1 + Math.floor(r() * (LOWER_BASES.length - 1))][0]; if (r() < 0.5) P.upper = UPPER_BASES[1 + Math.floor(r() * (UPPER_BASES.length - 1))][0];
-  if (st === 'glass' && P.upper === 'sling') P.upper = 'over'; }      /* your own player keeps the blend until you pick a base */
+  if (st === 'glass' && P.upper === 'sling') P.upper = 'over';
+    if (r() < 0.7) P.run = RUN_STYLES[1 + Math.floor(r() * (RUN_STYLES.length - 1))][0]; if (st === 'glass' && r() < 0.5) P.run = 'heavy'; }      /* your own player keeps the blend until you pick a base */
   return P;
 }
 // anything that arrives from outside (save, another player online) is clamped here
 function cleanProfile(a) {
   if (!a || typeof a !== 'object') return null; const P = JSON.parse(JSON.stringify(PROF_DEF));
   for (const g of ['shot', 'idle']) if (a[g] && typeof a[g] === 'object') for (const k in P[g]) { const v = +a[g][k]; if (isFinite(v)) P[g][k] = clamp(v, 0, 1); }
-  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R'; P.lower = validBase(LOWER_BASES, a.lower || ''); P.upper = validBase(UPPER_BASES, a.upper || '');
+  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R'; P.run = validBase(RUN_STYLES, a.run || ''); P.lower = validBase(LOWER_BASES, a.lower || ''); P.upper = validBase(UPPER_BASES, a.upper || '');
   for (const [k, , lo, hi] of PROF_KEYS) { const v = +a[k]; if (isFinite(v)) P[k] = clamp(v, lo, hi); }
   return P;
 }

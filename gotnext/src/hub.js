@@ -86,7 +86,7 @@ function locoAnim(R, x, z, face, dt, vx, vz, swag) {
   const stanceDist = v * duty * 2 / cad, hipR = Math.min(solveR(stanceDist - 0.1), 1.5), flight = (0.5 - duty) * 2 / cad;
   let P = wWalk > 0 ? poseOf('gait', W.t, { psi: L.psi, amp, hipA, swag: sg * 0.6, thigh: R.thigh, shin: R.shin, leg: R.legLen }) : null;
   if (P && v < 0.12) P = blendPose(P, poseOf('idle', W.t, { prof: R.prof }), clamp(1 - v / 0.12, 0, 1));
-  if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
+  if (wWalk < 1) { const Pr = poseOf('sprint', W.t, { psi: L.psi, duty, k, hipA: hipR, flight, thigh: R.thigh, shin: R.shin, rs: R.prof && R.prof.run }); P = P ? blendPose(Pr, P, wWalk) : Pr; }
   { const sp = P.spine; sp[0] += L.lean * 0.5; const h = P.hips; h[1] += hipYaw * 0.5; }
   applyPose(R, P, dt);
   R.root.position.set(x, 0, z); R.root.rotation.y = face;

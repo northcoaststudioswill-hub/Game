@@ -1,0 +1,36 @@
+// Run styles and the variant pools (shot gather / follow-through / landing, contests, steals, catches, defensive hands, off-ball gestures, jab steps). node tests/pools.mjs
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1100, height: 620 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
+await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => { window.__tick(10); });
+let r = await p.evaluate(() => { const P = __pit, RS = P.ev('RUN_STYLES'), SK = P.ev('SKEL'); const pose = (rs, psi) => P.call('poseOf', 'sprint', 0, { rs, psi, duty: 0.33, k: 0.6, hipA: 1.1, flight: 0.08, thigh: 0.48, shin: 0.48 });
+  const dif = (A, B, keys) => keys.reduce((s, k) => s + (A[k] && B[k] ? Math.abs(A[k][0] - B[k][0]) + Math.abs(A[k][1] - B[k][1]) + Math.abs(A[k][2] - B[k][2]) : 0), 0); let distinct = 0, legs = 0, bad = 0; const sigs = new Set();
+  for (const [k] of RS) { let up = 0; for (const psi of [0.1, 0.35, 0.6, 0.85]) { const A = pose(k, psi), N = pose('', psi); up += dif(A, N, SK.upper) + Math.abs(A.y - N.y) * 4; legs += dif(A, N, ['hpR', 'knR', 'anR', 'hpL', 'knL', 'anL']); for (const j in A) if (Array.isArray(A[j]) && A[j].some(v => !isFinite(v))) bad++; } if (k === '' || up > 0.2) distinct++; sigs.add(up.toFixed(2)); }
+  const names = []; for (let i = 0; i < 80; i++) names.push('Hooper' + i); const runs = new Set(names.map(n => P.call('animProfile', { name: n, build: { style: ['sniper', 'slasher', 'glass', 'general'][i2(n)], body: { h: 190 } } }).run)); function i2(n) { return n.length % 4; }
+  return { n: RS.length, distinct, legs: +legs.toFixed(4), bad, sigs: sigs.size, runs: runs.size, mine: P.call('animProfile', { mine: true, name: 'ROOKIE', build: P.S.build }).run }; });
+ok(r.n === 8 && r.distinct === 8 && r.sigs === 8 && r.legs === 0 && r.bad === 0, `${r.n} run styles, each carries the trunk, head and arms differently and none touches the stride (leg difference ${r.legs})`);
+ok(r.runs >= 6 && r.mine === '', `80 AI players run in ${r.runs} of the styles; yours stays natural until you pick one`);
+r = await p.evaluate(() => { const P = __pit; P.ev("uiClose(); uiPlayer('moves')"); window.__tick(3); const bt = [...document.querySelectorAll('#panel .card .btn')].find(e => e.textContent === 'Glider'); bt.click(); window.__tick(2); return P.S.anim.run; });
+ok(r === 'glide', `MOVES → RUN STYLE: picked the Glider (${r})`);
+r = await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.size === 2 && !m.arcade), P.TIERS_COURT[1], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(200); const M = P.MT, me = M.me, o = M.P.find(q => q.team !== me.team); var g = 0; while (M.phase !== 'live' && g++ < 600) window.__tick(1); const out = {};
+  let rep = 0; for (const [key, n] of [['a', 4], ['b', 3], ['c', 2]]) { let last = -1; for (let i = 0; i < 400; i++) { const v = P.call('poolNext', me, key, n); if (v === last) rep++; if (v < 0 || v >= n) rep += 1000; last = v; } } out.rep = rep;
+  const set = () => { P.call('give', me); P.call('changePoss', me.team); M.needClear = false; M.phase = 'live'; me.st = 'free'; me.y = 0; me.live = 'drib'; for (const q of M.P) { q.ai.tick = 99; if (q !== me) { q.st = 'free'; q.x = 7.5; q.z = 11 + q.i * 0.4; } } };
+  const gf = new Set(), ft = new Set(), ld = new Set(); let same = 0, lastK = ''; for (let i = 0; i < 60; i++) { set(); me.x = 0; me.z = 5; me.vx = i % 2 ? 3 : 0; me.vz = 0; P.call('startShot', me, 'btn'); const s = me.shot; gf.add(s.gf); ft.add(s.ft); ld.add(s.ld); const k = s.ft + '/' + s.ld; if (k === lastK) same++; lastK = k; }
+  out.gf = gf.size; out.ft = ft.size; out.ld = ld.size; out.same = same;
+  const PD = P.ev('PROF_DEF'), sh = (o2, u) => P.call('poseOf', 'shoot', u * 0.6, Object.assign({ rel: 0.6, prof: PD, n: 1 }, o2)); const sig = A => ['shR', 'elR', 'wrR', 'shL', 'hpR', 'knR', 'hpL', 'chest', 'hips'].map(k => (A[k] || [0, 0, 0]).map(v => v.toFixed(2)).join()).join('|') + (A.y || 0).toFixed(2);
+  out.ftSig = new Set([0, 1, 2, 3].map(v => sig(sh({ ft: v }, 1.32)))).size; out.gfSig = new Set([0, 1, 2, 3].map(v => sig(sh({ gf: v }, 0.15)))).size; out.ldSig = new Set([0, 1, 2].map(v => sig(sh({ ld: v }, 1.5)))).size;
+  out.rel = sig(sh({ ft: 0, gf: 0 }, 1.0)) === sig(sh({ ft: 3, gf: 2, ld: 2 }, 1.0));
+  const one = (an, n, t) => new Set(Array.from({ length: n }, (_, v) => sig(P.call('poseOf', an, t, { v })))).size; out.jump = one('jump', 4, 0.3); out.steal = one('steal', 3, 0.2); out.catch = one('catch', 3, 0.1);
+  let bad = 0; const chk = A => { for (const j in A) if (Array.isArray(A[j]) && A[j].some(v => !isFinite(v))) bad++; }; for (const dv of [1, 2, 3]) chk(P.call('poseOf', 'slide', 0.3, { dv, ph: 1 })); for (const ov of [1, 2, 3]) chk(P.call('poseOf', 'idle', 0.3, { ov, ovT: 1, prof: PD })); chk(P.call('poseOf', 'hold', 0.3, { jab: 0.8 })); chk(P.call('poseOf', 'hold', 0.3, { jab: -0.8 })); out.bad = bad;
+  out.dv = new Set([0, 1, 2, 3].map(dv => sig(P.call('poseOf', 'slide', 0.3, { dv, ph: 1 })))).size;
+  // a minute of real play with the pools on: no errors, and the pools are in use
+  for (const q of M.P) q.ai.tick = 0; for (let i = 0; i < 60 * 40; i++) { M.clock = Math.max(M.clock, 3); window.__tick(1); if (!P.MT) break; } out.used = M.P.filter(q => q.pools && Object.keys(q.pools).length > 1).length; void o; return out; });
+ok(r.rep === 0, `a pool never hands out the same look twice running (1,200 draws)`);
+ok(r.gf >= 3 && r.ft === 4 && r.ld === 3 && r.ftSig === 4 && r.gfSig === 4 && r.ldSig === 3 && r.rel, `jump shots: ${r.gfSig} gathers, ${r.ftSig} follow-throughs, ${r.ldSig} landings, all different; the pose at the release itself is untouched; ${r.same}/60 back-to-back repeats of follow-through plus landing`);
+ok(r.jump === 4 && r.steal === 3 && r.catch === 3 && r.dv === 4 && r.bad === 0, `${r.jump} contests, ${r.steal} steal reaches, ${r.catch} catches, ${r.dv} sets of off-ball defensive hands, off-ball gestures and jab steps: all distinct and clean`);
+ok(r.used >= 3, `40 seconds of a live 2v2 with it all on: ${r.used} of 4 players have drawn from several pools`);
+console.log(errs.length ? 'PAGE ERRORS: ' + errs.join(' | ') : 'no page errors', '·', fails ? fails + ' FAILED' : 'ALL PASS'); await b.close(); process.exit(fails || errs.length ? 1 : 0);

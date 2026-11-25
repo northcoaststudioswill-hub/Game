@@ -9,8 +9,8 @@ const r2 = v => Math.round(v * 100) / 100;
 
 // ---------- builds on the wire ----------
 // an animation profile on the wire: rounded numbers, a few dozen bytes
-function packAnim(a) { const r = v => Math.round(v * 100) / 100, o = { s: [r(a.shot.trad), r(a.shot.high), r(a.shot.quick)], i: [r(a.idle.relaxed), r(a.idle.athletic), r(a.idle.wide)], h: a.hand, lo: a.lower || '', up: a.upper || '' }; for (const [k] of PROF_KEYS) o[k] = r(a[k]); return o; }
-function unpackAnim(o) { if (!o || !Array.isArray(o.s) || !Array.isArray(o.i)) return undefined; const a = { shot: { trad: o.s[0], high: o.s[1], quick: o.s[2] }, idle: { relaxed: o.i[0], athletic: o.i[1], wide: o.i[2] }, hand: o.h, lower: typeof o.lo === 'string' ? o.lo : '', upper: typeof o.up === 'string' ? o.up : '' }; for (const [k] of PROF_KEYS) a[k] = o[k]; return a; }
+function packAnim(a) { const r = v => Math.round(v * 100) / 100, o = { s: [r(a.shot.trad), r(a.shot.high), r(a.shot.quick)], i: [r(a.idle.relaxed), r(a.idle.athletic), r(a.idle.wide)], h: a.hand, lo: a.lower || '', up: a.upper || '', rn: a.run || '' }; for (const [k] of PROF_KEYS) o[k] = r(a[k]); return o; }
+function unpackAnim(o) { if (!o || !Array.isArray(o.s) || !Array.isArray(o.i)) return undefined; const a = { shot: { trad: o.s[0], high: o.s[1], quick: o.s[2] }, idle: { relaxed: o.i[0], athletic: o.i[1], wide: o.i[2] }, hand: o.h, lower: typeof o.lo === 'string' ? o.lo : '', upper: typeof o.up === 'string' ? o.up : '', run: typeof o.rn === 'string' ? o.rn : '' }; for (const [k] of PROF_KEYS) a[k] = o[k]; return a; }
 function packBuild(b) {
   return { n: b.name, st: b.build.style, og: b.build.origin, h: b.build.body.h, w: r2(b.build.body.w), s: r2(b.build.body.s), sk: b.build.skin, a: ATTRS.map(a => b.attrs[a.id]), bd: b.badges, wn: SLOTS.map(s => b.worn[s[0]]), mv: [b.moves.side, b.moves.back, b.moves.diag, b.moves.jumper, b.moves.dunk, b.moves.celeb], an: b.anim ? packAnim(b.anim) : undefined };
 }
