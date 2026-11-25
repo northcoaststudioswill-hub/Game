@@ -9,11 +9,11 @@ const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push
 await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => { window.__tick(10); const P = __pit; P.S.vc = 5000;
   window.__ev = {}; const E = window.__ev, c = k => { E[k] = (E[k] || 0) + 1; };
-  P.ev(`(function () { const f0 = floatTxt, c0 = call, h0 = highlight, b0 = bubble, s0 = startFinish, sh0 = releaseShot, st0 = startShot;
+  P.ev(`(function () { const f0 = floatTxt, c0 = call, h0 = highlight, b0 = persBub, s0 = startFinish, sh0 = releaseShot, st0 = startShot;
     floatTxt = function (p, t, col) { const k = String(t).replace(/[0-9]+/g, '#'); window.__ev['f:' + k] = (window.__ev['f:' + k] || 0) + 1; return f0(p, t, col); };
     call = function (big, small, col, d) { const k = String(big).replace(/[0-9]+/g, '#'); window.__ev['c:' + k] = (window.__ev['c:' + k] || 0) + 1; return c0(big, small, col, d); };
     highlight = function (k, p, v) { const was = MT && MT.hl; const r = h0(k, p, v); if (MT && MT.hl && MT.hl !== was) window.__ev['hl:' + k] = (window.__ev['hl:' + k] || 0) + 1; return r; };
-    bubble = function (p, l) { window.__ev['bubble'] = (window.__ev['bubble'] || 0) + 1; return b0(p, l); };
+    persBub = function (p, l) { window.__ev['bubble'] = (window.__ev['bubble'] || 0) + 1; return b0(p, l); };
     startFinish = function (p, e, f, y, o) { const r = s0(p, e, f, y, o); if (r && p.st === 'finish') { const k = p.finish.type === 'dunk' ? 'dunk:' + p.finish.style : 'lay:' + p.finish.kind + (p.finish.lh ? '(L)' : ''); window.__ev[k] = (window.__ev[k] || 0) + 1; } return r; };
     startShot = function (p, src, fl, o) { let c0 = 0; try { c0 = contestOn(p); } catch (e) { } p.__c0 = c0; p.__why = fl ? 'floater' : (o && o.hopped) ? 'hop' : (MT.clock < 2.6 ? 'clock' : p.live === 'dead' ? 'dead' : p.ai && p.ai.postT > 0 ? 'post' : 'pick'); const r = st0(p, src, fl, o); if (p.st === 'shoot' && p.shot && p.shot.fade) { const k = 'fade:' + p.shot.fadeK; window.__ev[k] = (window.__ev[k] || 0) + 1; } return r; };
     const l0 = launch, dp0 = doPass, cp0 = changePoss, sc0 = setCheck; window.__sh = []; window.__pace = { pass: 0, poss: 0, live: 0, dead: 0 };

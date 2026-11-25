@@ -8,7 +8,7 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
 const p = await ctx.newPage(); p.on('pageerror', e => console.log('ERR', e.message)); await p.goto('file://' + file); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
 const r = await p.evaluate(() => {
-  const P = __pit; P.uiClose(); P.enterWorld('hub', 0, 10, Math.PI); window.__tick(20); const V = new THREE.Vector3(), rows = [];
+  const P = __pit; P.S.tut = 1; P.uiClose(); P.enterWorld('hub', 0, 10, Math.PI); window.__tick(20); const V = new THREE.Vector3(), rows = [];
   for (let i = 0; i < 240; i++) { P.keys.KeyW = true; window.__tick(1); if (i < 60) continue; const R = P.W.me.rig, J = R.joints; const f = {}; for (const s of ['R', 'L']) { J['an' + s].getWorldPosition(V); f[s] = [V.x, V.y, V.z]; } J.neck.getWorldPosition(V); const nk = [V.x, V.y, V.z]; J.hips.getWorldPosition(V); rows.push({ f, hip: [V.x, V.y, V.z], nk, x: P.W.me.x, z: P.W.me.z, psi: R.loco ? R.loco.psi : -1 }); }
   P.keys.KeyW = false; return rows;
 });

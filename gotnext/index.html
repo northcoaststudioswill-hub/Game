@@ -4004,7 +4004,7 @@ const FAN_LINES = { dunk: ['OHHHH!', 'He DID that!', 'Somebody call his mama!', 
 function fanSay(play, team) {
   const M_ = MT; if (!M_ || !M_.fans || !M_.fans.length || !FAN_LINES[play] || (S.set && S.set.talk === 0) || M_.time - (M_.fanSayAt || -9) < 5 || typeof bubble !== 'function') return;
   const c = M_.fans.filter(f => !f.walk && (team === undefined || f.team === team)); const f = pick(c.filter(x => x.name).length && Math.random() < 0.7 ? c.filter(x => x.name) : c.length ? c : M_.fans); if (!f) return;
-  M_.fanSayAt = M_.time; f.vox = f.vox || { x: f.x, z: f.z, H: 1.8, y: 0, team: f.team }; f.vox.x = f.r.root.position.x; f.vox.z = f.r.root.position.z; bubble(f.vox, pick(FAN_LINES[play]));
+  M_.fanSayAt = M_.time; f.vox = f.vox || { x: f.x, z: f.z, H: 1.8, y: 0, team: f.team }; f.vox.x = f.r.root.position.x; f.vox.z = f.r.root.position.z; persBub(f.vox, pick(FAN_LINES[play]));
 }
 function crowdReact(play, team, fromNet) {
   const M_ = MT; if (!M_ || !M_.fans) return; if (!fromNet && M_.net === 'host') netEv({ k: 'cr', p: play, t: team });
@@ -5293,9 +5293,9 @@ function say(p, ev, force) {
   if (!force && (M_.time - (M_.sayAt || -9) < 3.6 || M_.time - (p.sayAt || -99) < 9)) return false;
   const pool = []; for (const t of p.pers) for (const l of (t.t[ev] || [])) pool.push(l); if (!pool.length) return false;
   let line = pick(pool); if (line === p.sayLast && pool.length > 1) line = pick(pool.filter(l => l !== line));
-  M_.sayAt = p.sayAt = M_.time; p.sayLast = line; bubble(p, line); if (M_.net === 'host') netEv({ k: 'sb', i: p.i, t: line }); return true;
+  M_.sayAt = p.sayAt = M_.time; p.sayLast = line; persBub(p, line); if (M_.net === 'host') netEv({ k: 'sb', i: p.i, t: line }); return true;
 }
-function bubble(p, line) {
+function persBub(p, line) {
   const M_ = MT, box = $('flts'); if (!M_ || !box) return; M_.bubs = (M_.bubs || []).filter(b => { if (b.p === p) { b.el.remove(); return false; } return true; });
   const el = document.createElement('div'); el.className = 'bub' + (p.team === M_.me.team ? '' : ' them'); el.textContent = line; box.appendChild(el); M_.bubs.push({ p, el, t: 0, dur: clamp(1.6 + line.length * 0.035, 1.8, 3.4) });
 }
@@ -6879,7 +6879,7 @@ function netGuestStep(dt) {
       else if (e.k === 'pu') puNet(e);
       else if (e.k === 'ca') { const K = M_.crowd; if (K) { const i = K.pool.findIndex(b => b.name === e.n), b = i >= 0 ? K.pool.splice(i, 1)[0] : null; crowdAdd(b, false); } }
       else if (e.k === 'cs') { const p = M_.P[e.i | 0]; if (p) p.celebStyle = String(e.s || '').slice(0, 14); }
-      else if (e.k === 'sb') { const p = M_.P[e.i | 0]; if (p && !(S.set && S.set.talk === 0)) bubble(p, String(e.t || '').slice(0, 100)); }
+      else if (e.k === 'sb') { const p = M_.P[e.i | 0]; if (p && !(S.set && S.set.talk === 0)) persBub(p, String(e.t || '').slice(0, 100)); }
       else if (e.k === 'ta') { const p = M_.P[e.i | 0]; if (p) p.tauntT = 1.3; }
       else if (e.k === 'cr') crowdReact(String(e.p || ''), e.t === undefined ? undefined : e.t | 0, true);
       else if (e.k === 'ko') { const p = M_.P[e.i | 0]; if (p) p.ko = clamp(+e.d || 3, 0, 6); }

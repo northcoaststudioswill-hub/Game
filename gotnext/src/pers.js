@@ -64,9 +64,9 @@ function say(p, ev, force) {
   if (!force && (M_.time - (M_.sayAt || -9) < 3.6 || M_.time - (p.sayAt || -99) < 9)) return false;
   const pool = []; for (const t of p.pers) for (const l of (t.t[ev] || [])) pool.push(l); if (!pool.length) return false;
   let line = pick(pool); if (line === p.sayLast && pool.length > 1) line = pick(pool.filter(l => l !== line));
-  M_.sayAt = p.sayAt = M_.time; p.sayLast = line; bubble(p, line); if (M_.net === 'host') netEv({ k: 'sb', i: p.i, t: line }); return true;
+  M_.sayAt = p.sayAt = M_.time; p.sayLast = line; persBub(p, line); if (M_.net === 'host') netEv({ k: 'sb', i: p.i, t: line }); return true;
 }
-function bubble(p, line) {
+function persBub(p, line) {
   const M_ = MT, box = $('flts'); if (!M_ || !box) return; M_.bubs = (M_.bubs || []).filter(b => { if (b.p === p) { b.el.remove(); return false; } return true; });
   const el = document.createElement('div'); el.className = 'bub' + (p.team === M_.me.team ? '' : ' them'); el.textContent = line; box.appendChild(el); M_.bubs.push({ p, el, t: 0, dur: clamp(1.6 + line.length * 0.035, 1.8, 3.4) });
 }

@@ -9,9 +9,9 @@ await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn');
 const WANT = { 'SCREENED': 8, 'LAID OUT': 14, 'TOOK THE CHARGE': 10, 'DIVE': 10, 'POSTING UP': 40, 'TIPPED OUT': 8, 'SWITCH': 6, 'EXTRA PASS': 4, 'CUTTING': 20, 'LOB': 22, 'c:AIRBALL': 10, 'c:ON A RUN': 10, 'c:LOCKED IN': 10, 'hl': 34, 'bubble': 6, 'c:TIE UP': 8, 'FOUGHT OVER': 8, 'c:GAME POINT': 10 };
 await p.evaluate((WANT) => { window.__tick(10); const P = __pit; window.__seen = {}; window.__hit = null; window.__W = WANT;
-  P.ev(`(function () { const f0 = floatTxt, c0 = call, h0 = highlight, b0 = bubble; const mark = (k) => { if (window.__W[k] === undefined || window.__hit) return; window.__seen[k] = (window.__seen[k] || 0) + 1; if (window.__seen[k] <= 1) window.__hit = k; };
+  P.ev(`(function () { const f0 = floatTxt, c0 = call, h0 = highlight, b0 = persBub; const mark = (k) => { if (window.__W[k] === undefined || window.__hit) return; window.__seen[k] = (window.__seen[k] || 0) + 1; if (window.__seen[k] <= 1) window.__hit = k; };
     floatTxt = function (p, t, c) { mark(String(t)); return f0(p, t, c); }; call = function (a, s, c, d) { mark('c:' + a); return c0(a, s, c, d); };
-    highlight = function (k, p, v) { const was = MT && MT.hl; const r = h0(k, p, v); if (MT && MT.hl && MT.hl !== was) mark('hl'); return r; }; bubble = function (p, l) { mark('bubble'); return b0(p, l); }; })()`); }, WANT);
+    highlight = function (k, p, v) { const was = MT && MT.hl; const r = h0(k, p, v); if (MT && MT.hl && MT.hl !== was) mark('hl'); return r; }; persBub = function (p, l) { mark('bubble'); return b0(p, l); }; })()`); }, WANT);
 let shots = 0, games = 0;
 while (shots < 16 && games < 5) { games++;
   await p.evaluate((g) => { const P = __pit; P.uiClose(); const m = P.MODES.find(x => x.id === (g % 2 ? 's3' : 's2')); P.launchGame(m, P.TIERS_COURT[1], { mates: Array(m.size - 1).fill(-1), rival: -1, p2: 'off' }); window.__tick(30); const M = P.MT; M.me.user = false; M.locals = []; for (const q of M.P) q.aiLvl = 0.5 + 0.4 * ((q.i * 7) % 5) / 4; }, games);

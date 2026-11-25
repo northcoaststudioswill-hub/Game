@@ -261,7 +261,7 @@ const FAN_LINES = { dunk: ['OHHHH!', 'He DID that!', 'Somebody call his mama!', 
 function fanSay(play, team) {
   const M_ = MT; if (!M_ || !M_.fans || !M_.fans.length || !FAN_LINES[play] || (S.set && S.set.talk === 0) || M_.time - (M_.fanSayAt || -9) < 5 || typeof bubble !== 'function') return;
   const c = M_.fans.filter(f => !f.walk && (team === undefined || f.team === team)); const f = pick(c.filter(x => x.name).length && Math.random() < 0.7 ? c.filter(x => x.name) : c.length ? c : M_.fans); if (!f) return;
-  M_.fanSayAt = M_.time; f.vox = f.vox || { x: f.x, z: f.z, H: 1.8, y: 0, team: f.team }; f.vox.x = f.r.root.position.x; f.vox.z = f.r.root.position.z; bubble(f.vox, pick(FAN_LINES[play]));
+  M_.fanSayAt = M_.time; f.vox = f.vox || { x: f.x, z: f.z, H: 1.8, y: 0, team: f.team }; f.vox.x = f.r.root.position.x; f.vox.z = f.r.root.position.z; persBub(f.vox, pick(FAN_LINES[play]));
 }
 function crowdReact(play, team, fromNet) {
   const M_ = MT; if (!M_ || !M_.fans) return; if (!fromNet && M_.net === 'host') netEv({ k: 'cr', p: play, t: team });

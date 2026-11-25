@@ -315,7 +315,7 @@ function netGuestStep(dt) {
       else if (e.k === 'pu') puNet(e);
       else if (e.k === 'ca') { const K = M_.crowd; if (K) { const i = K.pool.findIndex(b => b.name === e.n), b = i >= 0 ? K.pool.splice(i, 1)[0] : null; crowdAdd(b, false); } }
       else if (e.k === 'cs') { const p = M_.P[e.i | 0]; if (p) p.celebStyle = String(e.s || '').slice(0, 14); }
-      else if (e.k === 'sb') { const p = M_.P[e.i | 0]; if (p && !(S.set && S.set.talk === 0)) bubble(p, String(e.t || '').slice(0, 100)); }
+      else if (e.k === 'sb') { const p = M_.P[e.i | 0]; if (p && !(S.set && S.set.talk === 0)) persBub(p, String(e.t || '').slice(0, 100)); }
       else if (e.k === 'ta') { const p = M_.P[e.i | 0]; if (p) p.tauntT = 1.3; }
       else if (e.k === 'cr') crowdReact(String(e.p || ''), e.t === undefined ? undefined : e.t | 0, true);
       else if (e.k === 'ko') { const p = M_.P[e.i | 0]; if (p) p.ko = clamp(+e.d || 3, 0, 6); }
