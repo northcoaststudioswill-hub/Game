@@ -240,8 +240,8 @@ function buildHub() {
   spot(-3.4, 4.0, 2.0, 'COACH OVERTIME (drills)', () => uiDrills('hub'));
   for (const [cx, cy, cz, cc] of [[-10.2, 0.2, -3.4, '#e04848'], [-10.2, 0.6, -3.35, '#2f5bff'], [-10.75, 0.2, -3.0, '#f2c14e']]) ink(M(box(0.5, 0.4, 0.5), toon(cc), cx, cy, cz, scene), 1.05);
   // fiends
-  [[5, -7.4], [-5.5, -8.6], [-3.4, 8.8], [10.4, 1.4]].forEach((b, i) => { const bb = aiBuild(50); bb.worn = randomWorn(0, true); bb.name = BUM_NAMES[i % BUM_NAMES.length]; const n = addNpc(bb, b[0], b[1], rnd(0, 6), 'beg', { bum: true, wander: true, name: bb.name, range: 1.4 }); spot(b[0], b[1], 1.9, 'TALK', () => uiBum(n)); n.spot = W.spots[W.spots.length - 1]; });
-  for (let i = 0; i < 3; i++) { const b = aiBuild(rnd(65, 92)); b.worn = randomWorn(2); addNpc(b, rnd(-9, 9), rnd(-7, -4), rnd(0, 6), i ? 'idle' : 'ball', { wander: i > 0, range: 2 }); }
+  [[5, -7.4], [-9.4, 3.4], [-3.4, 8.8], [10.4, 1.4]].forEach((b, i) => { const bb = aiBuild(50); bb.worn = randomWorn(0, true); bb.name = BUM_NAMES[i % BUM_NAMES.length]; const n = addNpc(bb, b[0], b[1], rnd(0, 6), 'beg', { bum: true, wander: true, name: bb.name, range: 1.4 }); spot(b[0], b[1], 1.9, 'TALK', () => uiBum(n)); n.spot = W.spots[W.spots.length - 1]; });
+  for (let i = 0; i < 3; i++) { const b = aiBuild(rnd(65, 92)); b.worn = randomWorn(2); addNpc(b, [-6.5, 0.5, 6.5][i] + rnd(-1.5, 1.5), rnd(-3.5, 3), rnd(0, 6), i ? 'idle' : 'ball', { wander: i > 0, range: 2.5 }); }      /* spread across the middle of the lot, not bunched by the cage */
   // barrel fire, hydrant, cans
   ink(M(cyl(0.42, 0.38, 0.95, 10), toon('#3a2a22'), -11, 0.48, 9.6, scene), 1.05); W.flames = []; for (let i = 0; i < 4; i++) W.flames.push(M(geo('flame', () => new THREE.ConeGeometry(0.2, 0.7, 5)), flat([0xff8a3c, 0xf2c14e, 0xff2d78, 0xffd28a][i]), -11 + rnd(-0.15, 0.15), 1.2, 9.6 + rnd(-0.15, 0.15), scene)); solid(-11.6, -10.4, 9, 10.2);
   for (let i = 0; i < 2; i++) { const b = aiBuild(55); b.worn = randomWorn(1, true); addNpc(b, -12.2 + i * 2.3, 10.4 - i * 1.7, i ? -1.2 : 0.9, 'warm'); }
