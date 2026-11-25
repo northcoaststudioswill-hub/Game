@@ -1603,7 +1603,12 @@ function poseOf(anim, t, o) {
   if (o.post) { const off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1; p.y = (p.y || 0) - 0.1;
     p.hpR = [-0.55, 0, -0.24]; p.knR = [0.95, 0, 0]; p.anR = [-0.3, 0, 0.1]; p.hpL = [-0.55, 0, 0.24]; p.knL = [0.95, 0, 0]; p.anL = [-0.3, 0, -0.1];
     p.spine = [0.36, 0, 0]; p.chest = [0.1, 0.22 * sg, 0]; p.neck = [-0.3, -0.5 * sg, 0];
-    p['sh' + off] = [0.5, 0, 0.65 * sg]; p['el' + off] = [-1.4, 0, 0]; p['wr' + off] = [0.1, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
+    p['sh' + off] = [0.5, 0, 0.65 * sg]; p['el' + off] = [-1.4, 0, 0]; p['wr' + off] = [0.1, 0, 0]; p.rate = Math.max(p.rate || 16, 20);
+    // backing him down has a beat: on each push the hips drop and drive back into him, the off arm swings to hold him off,
+    // the shoulders rock, the head checks the rim over the shoulder
+    const ph = o.postPh || 0, bmp = Math.pow(Math.max(0, Math.sin(ph * 2 * Math.PI)), 2), rk = Math.sin(ph * Math.PI);
+    p.y -= 0.035 * bmp; p.spine[0] -= 0.14 * bmp; p.spine[2] = 0.08 * rk; p.chest[1] += 0.12 * rk; p.hpR[0] -= 0.12 * bmp; p.hpL[0] -= 0.12 * bmp; p.knR[0] += 0.12 * bmp; p.knL[0] += 0.12 * bmp;
+    p['sh' + off][0] += 0.35 * bmp; p['sh' + off][2] += 0.15 * sg * bmp; p['el' + off][0] += 0.3 * bmp; p.neck[1] = -0.5 * sg + 0.25 * sg * Math.max(0, -rk); }
   // room to work: show-off dribbles on top of the standing dribble
   if (o.swag) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; }, tt = o.swT || 0, off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1, w = Math.sin(tt * 2.4), q = Math.sin(tt * 7);
     if (o.swag === 'rock') { p.y = (p.y || 0) + 0.04; ad('hips', 0, 0, w * 0.13); ad('spine', -0.1, 0, -w * 0.09); ad('chest', 0, w * 0.16, 0); ad('neck', 0.06 * Math.abs(w), 0, w * 0.06); p['sh' + off] = [-0.15, 0, sg * 0.55]; p['el' + off] = [-0.5 - 0.1 * w, 0, 0]; }

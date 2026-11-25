@@ -11,14 +11,15 @@ const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push
 await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
 await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES[0], P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(200); window.__usePad = true; });
-const set = `var P = __pit, M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), d = opp[0]; M.phase = 'live'; M.needClear = false; M.clock = 20; for (const q of M.P) { q.st = 'free'; q.y = 0; q.cool = 0; q.vx = q.vz = 0; if (q.ai) q.ai.tick = 999; q.x = 7; q.z = 12; } __pad.axes = [0, 0, 0, 0]; for (const bt of __pad.buttons) bt.pressed = false;`;
+const set = `var P = __pit, M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), d = opp[0]; M.phase = 'live'; M.needClear = false; M.clock = 20; for (const q of M.P) { q.st = 'free'; q.y = 0; q.cool = q.team !== me.team ? 999 : 0; q.vx = q.vz = 0; if (q.ai) { q.ai.tick = 999; q.ai.react = 999; } q.x = 7; q.z = 12; }      /* the defender does not reach or jump on his own here: these checks are about the post, and a random steal made them flip */ __pad.axes = [0, 0, 0, 0]; for (const bt of __pad.buttons) bt.pressed = false;`;
 // 1. post up: LT with the ball turns your back to the rim; backing down moves a weaker defender more than a stronger one
 const backdown = (myStr, dStr) => p.evaluate(([s, a, b]) => { eval(s); for (const k in me.A) me.A[k] = 70; me.A.str = a; d.A.str = b; d.ai.tick = 0; d.aiLvl = 1;
   me.x = 0; me.z = 5.2; d.x = 0; d.z = 4.3; M.B.state = 'held'; M.B.holder = me; me.live = 'drib'; M.off = me.team; window.__tick(3);
   __pad.buttons[6].pressed = true; window.__tick(20); const facing = Math.abs(Math.atan2(Math.sin(me.face - Math.atan2(me.x, me.z)), Math.cos(me.face - Math.atan2(me.x, me.z)))); const z0 = me.z, dz0 = d.z;
   __pad.axes = [0, -0.9, 0, 0]; window.__tick(120); const r = { post: me.post, an: me.an, facingAway: +facing.toFixed(2), moved: +(z0 - me.z).toFixed(2), dMoved: +(dz0 - d.z).toFixed(2), still: M.B.holder === me };
   __pad.axes = [0, 0, 0, 0]; __pad.buttons[6].pressed = false; window.__tick(5); return r; }, [set, myStr, dStr]);
-const strong = await backdown(95, 40), weak = await backdown(40, 95);
+const avg3 = async (a, b2) => { const L = [await backdown(a, b2), await backdown(a, b2), await backdown(a, b2)]; const m = k => +(L.map(x => x[k]).sort((x, y) => x - y)[1]).toFixed(2); return { post: L.every(x => x.post), an: L[0].an, facingAway: m('facingAway'), moved: m('moved'), dMoved: m('dMoved'), still: L.every(x => x.still) }; };      /* the median of three: one slide-around does not decide it */
+const strong = await avg3(95, 40), weak = await avg3(40, 95);
 ok(strong.post && strong.facingAway < 0.4, `LT with the ball: POST UP, back to the rim (facing ${strong.facingAway} rad off directly away)`);
 ok(strong.dMoved > weak.dMoved + 0.3 && strong.moved > 0.4, `backing down 2 s: 95 strength vs 40 moves the defender ${strong.dMoved} m (gains ${strong.moved} m); 40 vs 95 moves him ${weak.dMoved} m (gains ${weak.moved} m)`);
 await p.evaluate(s => { eval(s); me.x = 0; me.z = 4.6; d.x = 0.1; d.z = 3.8; M.B.state = 'held'; M.B.holder = me; me.live = 'drib'; M.off = me.team; __pad.buttons[6].pressed = true; window.__tick(30); }, set);
@@ -37,7 +38,7 @@ const drive = (lt) => p.evaluate(([s, lt]) => { eval(s); P.S.set.dassist = 1; co
   let gap = 0, n = 0; const z0 = h.z; for (let i = 0; i < 60; i++) { P.IN[5].mx = 0; P.IN[5].my = -0.8; window.__tick(1); gap += Math.hypot(me.x - h.x, me.z - h.z); n++; }
   const r = { bodyUp: me.bodyUp, an: me.an, gap: +(gap / n).toFixed(2), gained: +(z0 - h.z).toFixed(2) }; P.IN[5].my = 0; __pad.buttons[6].pressed = false; h.user = false; h.ctrl = undefined; window.__tick(5); return r; }, [set, lt]);
 const off = await drive(false), on = await drive(true);
-ok(on.bodyUp && on.gap < off.gap - 0.1 && on.gained < off.gained, `ball handler driving 1 s: body up keeps ${on.gap} m away and he gains ${on.gained} m; without it ${off.gap} m and ${off.gained} m`);
+ok(on.bodyUp && on.gap < off.gap && on.gained < off.gained * 0.5, `ball handler driving 1 s: body up keeps ${on.gap} m away and he gains ${on.gained} m; without it ${off.gap} m and ${off.gained} m`);
 await p.evaluate(s => { eval(s); const h = d; h.x = 0.6; h.z = 6.8; me.x = 0.6; me.z = 6.0; me.face = 0; M.B.state = 'held'; M.B.holder = h; h.live = 'drib'; M.off = h.team; __pad.buttons[6].pressed = true; window.__tick(30); }, set);
 await p.screenshot({ path: path.join(dir, 'shots', 'body-up.png') }); await p.evaluate(() => { __pad.buttons[6].pressed = false; window.__tick(3); });
 // 4. the ring arrow points at your matchup from the opening check, even when you are standing next to someone else

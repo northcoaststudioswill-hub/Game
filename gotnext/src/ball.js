@@ -946,7 +946,7 @@ function matchStep(dtReal) {
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
-    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : a.team !== b.team && (M_.B.holder === a || M_.B.holder === b) && !a.post && !b.post ? 0.72 : 0.56;      /* a crouched defender and a dribbler both lean in: keep the room so they do not meet in the middle (a post-up is meant to be contact) */      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
+    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : a.team !== b.team && (M_.B.holder === a || M_.B.holder === b) && !a.post && !b.post && !a.bodyUp && !b.bodyUp ? 0.72 : 0.56;      /* a crouched defender and a dribbler both lean in: keep the room so they do not meet in the middle (a post-up is meant to be contact) */      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
     if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && o.st !== 'stagger' && M_.time - (o.scrHit || -9) > 1.5) screenHit(s, o);
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
@@ -963,7 +963,7 @@ function matchStep(dtReal) {
       }
     }
     if (d < R && d > 0.001) { const push = (R - d) / 2; if (push > 0.05) for (const q of [a, b]) { const sg = q === a ? -1 : 1, lx = dx / d * sg, lz = dz / d * sg, fx = Math.sin(q.face), fz = Math.cos(q.face); q.bumpT = 0.3; q.bumpX = clamp((lx * fx + lz * fz) * -push * 3, -0.25, 0.25); q.bumpZ = clamp((lx * fz - lz * fx) * push * 3, -0.25, 0.25); }
-      const wa = a.st === 'stagger' ? 0.2 : a.screen ? 0.06 : a.box ? 0.35 : 1, wb = b.st === 'stagger' ? 0.2 : b.screen ? 0.06 : b.box ? 0.35 : 1, pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
+      const wa = a.st === 'stagger' ? 0.2 : a.screen ? 0.06 : a.box || a.bodyUp ? 0.35 : 1, wb = b.st === 'stagger' ? 0.2 : b.screen ? 0.06 : b.box || b.bodyUp ? 0.35 : 1,      /* a man bodying up holds his ground */ pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
   }
   puStep(dt); stepBall(dt);
   for (const p of M_.P) animPlayer(p, dt); repRec(dtReal);
@@ -1078,7 +1078,7 @@ function stepPlayer(p, dt) {
   const jogV = 2.7 + nAtt(p, 'speed') * 1.6, sprV = 4.2 + nAtt(p, 'speed') * 3.2; let top = jogV * (M_.arcade ? 1.15 : 1);
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
-  top *= 1 + px(p, 'speed'); if (p.screen && p.user) top *= 0.2; if (p.bodyUp) top *= 0.86; if (p.box) top *= 0.62;
+  top *= 1 + px(p, 'speed'); if (p.screen && p.user) top *= 0.2; if (p.bodyUp) { const h = B.holder; top *= h && h.team !== p.team && dist(h, p) < 1.3 ? 1 : 0.86; }      /* bodied up on him, your feet keep up with his; only away from him is the stance slower */ if (p.box) top *= 0.62;
   if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5) - 0.03 * bt(o, 'clamps'), 0.55, 0.95); }      /* a hand on your body slows the drive */
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
@@ -1342,7 +1342,7 @@ function animPlayer(p, dt) {
     case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; const jc = M_.time + p.i * 0.9, jt = jc % 2.8; if (jt < 0.55 && p.live === 'hold' && p.speed < 0.3) o.jab = Math.sin(Math.PI * jt / 0.55) * (Math.floor(jc / 2.8) % 2 ? 1 : -1); }
-      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); }
+      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { p.postPh = (p.postPh || 0) + dt * (1.6 + Math.min(1.6, Math.hypot(p.vx, p.vz)) * 1.4); o.postPh = p.postPh; o.post = 1; o.dr = Math.min(o.dr, 0.5); }
         // he is giving you room: show-off dribbles, a new one every few seconds (rock, between the legs, behind the back, yo-yo, size-up, waving him up)
         { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? (SW_ => SW_[Math.floor((M_.time + p.i * 1.7) / 2.8) % SW_.length])(pk(p, 'swagpk').list || SWAGS) : null; o.swag = p.swag; o.swT = M_.time + p.i; if (p.swag && bt(p, 'showtime') && M_.net !== 'guest') addBrav(p, dt * 0.012 * bt(p, 'showtime')); } }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
