@@ -17,7 +17,7 @@ function newSave() {
     badges: {}, bp: { F: 0, S: 0, P: 0, D: 0 }, bxp: { F: 0, S: 0, P: 0, D: 0 },
     owned: DRIP.filter(d => d.src === 'start').map(d => d.id),
     worn: { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tank', arm: 'a_none', bottom: 'b_basic', socks: 's_low', shoes: 'k_beat', back: 'bk_none', ball: 'bl_std' },
-    moves: { owned: ['cross', 'stepback', 'spin', 'textbook', 'twohand', 'flex'], side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'twohand', celeb: 'flex' },
+    moves: { owned: ['cross', 'stepback', 'spin', 'textbook', 'twohand', 'flex'], side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'twohand', celeb: 'flex', dunkpk: 'dk_base', laypk: 'lp_base', dribpk: 'dr_base', postpk: 'po_base', swagpk: 'sw_base', stancepk: 'st_base' },
     crib: {}, home: { lot: 0, items: [], store: {}, look: { house: 0, trim: 0, fence: 0, ground: 1 }, used: {}, tour: '' }, boosts: [], life: {}, drills: {}, ladder: 0, ach: {}, homies: [], seenRank: 0, bumDay: 0,
     set: { sfx: 1, music: 1, meter: 1, sfxVol: 80, musVol: 80 },
   };
@@ -30,7 +30,7 @@ function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); 
 function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
 // ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
 // fit; HC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
-const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb'];
+const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb', 'dunkpk', 'laypk', 'dribpk', 'postpk', 'swagpk', 'stancepk'];
 const cloneJ = o => JSON.parse(JSON.stringify(o));
 function slotSnap() { const mv = {}; for (const k of MOVE_SLOTS) mv[k] = S.moves[k]; return cloneJ({ name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, bp: S.bp, bxp: S.bxp, moves: mv, worn: S.worn, anim: S.anim || null, made: S.created }); }
 function slotLoad(t) { const d = newSave(); S.name = t.name || d.name; S.build = cloneJ(t.build || d.build); S.attrs = cloneJ(t.attrs || {}); S.badges = cloneJ(t.badges || {}); S.bp = cloneJ(t.bp || d.bp); S.bxp = cloneJ(t.bxp || d.bxp);
@@ -44,7 +44,7 @@ function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v + (typeof homeFx === 'function' ? homeFx(k) : 0); }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }
 function myBuild() {   // a portable snapshot of the player (also what export codes carry)
-  return { mine: true, name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
+  return { mine: true, name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb, dunkpk: S.moves.dunkpk, laypk: S.moves.laypk, dribpk: S.moves.dribpk, postpk: S.moves.postpk, swagpk: S.moves.swagpk, stancepk: S.moves.stancepk } };
 }
 function encodeBuild(b) { return BRAND.code + '1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
 function decodeBuild(code) {
@@ -67,7 +67,7 @@ function sanitizeBuild(j) {
     if (!MOVE[j.moves.side] || MOVE[j.moves.side].slot !== 'side') j.moves.side = m.side;
     if (!MOVE[j.moves.back] || MOVE[j.moves.back].slot !== 'back') j.moves.back = m.back;
     if (!MOVE[j.moves.diag] || MOVE[j.moves.diag].slot !== 'diag') j.moves.diag = m.diag;
-    if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk; for (const c of CELEBS) if (!c.cost && j.moves.owned && !j.moves.owned.includes(c.id)) j.moves.owned.push(c.id);      /* the free celebrations belong to everybody */
+    if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk; if (typeof PACK_BASE !== 'undefined') for (const k in PACK_BASE) if (!PACK[j.moves[k]] || PACK[j.moves[k]].slot !== k || (PACK[j.moves[k]].cost && !j.moves.owned.includes(j.moves[k]))) j.moves[k] = PACK_BASE[k]; for (const c of CELEBS) if (!c.cost && j.moves.owned && !j.moves.owned.includes(c.id)) j.moves.owned.push(c.id);      /* the free celebrations belong to everybody */
     j.anim = typeof cleanProfile === 'function' ? cleanProfile(j.anim) || undefined : undefined;
     return j;
   } catch (e) { return null; }

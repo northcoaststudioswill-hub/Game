@@ -65,7 +65,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.16.2';
+const VERSION = '0.17.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -218,11 +218,11 @@ const DUNKS = [
   { id: 'windmill', n: 'Wind Turbine', d: 'Renewable energy. +4 Respect per dunk.', bonus: -.04, rep: 4, cost: 2800, rank: 3, need: 80 },
   { id: 'cradle', n: 'Rock The Cradle', d: 'Ball cradled on the forearm, rocked back, thrown home. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 3600, rank: 3, need: 84 },
   { id: 'clutch', n: 'Double Dip', d: 'Double clutch: up, down to the waist, back up, through. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 4200, rank: 4, need: 86 },
-  { id: 'three60', n: '360 No-Scope', d: 'Full rotation. +7 Respect per dunk.', bonus: -.08, rep: 7, cost: 6000, rank: 5, need: 90 },
-  { id: 'scratch', n: 'Back Scratcher', d: 'Ball taken so far behind the head it touches your back, then thrown down. +6 Respect per dunk.', bonus: -.06, rep: 6, cost: 5000, rank: 4, need: 88 },
+  { id: 'three60', sig: 1, n: '360 No-Scope', d: 'Full rotation. +7 Respect per dunk.', bonus: -.08, rep: 7, cost: 6000, rank: 5, need: 90 },
+  { id: 'scratch', sig: 1, n: 'Back Scratcher', d: 'Ball taken so far behind the head it touches your back, then thrown down. +6 Respect per dunk.', bonus: -.06, rep: 6, cost: 5000, rank: 4, need: 88 },
   { id: 'gavel', n: 'The Gavel', d: 'Arm straight out to the side, swung over like a judge\'s hammer. Court adjourned. +4 Respect per dunk.', bonus: -.03, rep: 4, cost: 3200, rank: 3, need: 82 },
   { id: 'squat', n: 'Rim Squatter', d: 'Two hands, then hang on the rim with the knees up. Squatter\'s rights. +5 Respect per dunk.', bonus: -.02, rep: 5, cost: 3800, rank: 3, need: 84 },
-  { id: 'legs', n: 'The Loophole', d: 'Between the legs in mid-air. Legal, technically. +9 Respect per dunk.', bonus: -.12, rep: 9, cost: 9000, rank: 6, need: 95 },
+  { id: 'legs', sig: 1, n: 'The Loophole', d: 'Between the legs in mid-air. Legal, technically. +9 Respect per dunk.', bonus: -.12, rep: 9, cost: 9000, rank: 6, need: 95 },
 ];
 const DUNK = {}; DUNKS.forEach(m => DUNK[m.id] = m);
 DUNK.contact = { id: 'contact', n: 'Posterizer', d: 'Not for sale. Dunk 90+ with Strength 78+ (or Dunk 97+): when someone is waiting at the rim, you go through them.', bonus: 0, rep: 8 };
@@ -282,6 +282,19 @@ drip('hair', 'h_mohawk', 'Bald Eagle Mohawk', 'mohawk', '#f4f4f4', 0, 2, 900, 2)
 drip('hair', 'h_flame', 'Flamin\' Hot Dye Job', 'fro', '#ff5a1f', 0, 2, 1200, 3);
 drip('hair', 'h_bald', 'Aerodynamic', 'bald', '#000', 0, 0, 0, 0, null, 'start');
 drip('hair', 'h_bun', 'Man Bun (Deregulated)', 'bun', '#5a3a1c', 0, 1, 300, 1);
+drip('hair', 'h_waves', '360 Waves', 'waves', '#16110d', 0, 0, 0, 0, null, 'start');
+drip('hair', 'h_rows', 'Straight-Backs', 'cornrows', '#16110d', 0, 0, 0, 0, null, 'start');
+drip('hair', 'h_curly', 'Curly Top', 'curly', '#1a1410', 0, 0, 0, 0, null, 'start');
+drip('hair', 'h_twists', 'Two-Strand Twists', 'twists', '#1a1410', 0, 0, 200, 0);
+drip('hair', 'h_flat', 'Flat Top (Level Checked)', 'flattop', '#1a1410', 0, 0, 250, 0);
+drip('hair', 'h_pony', 'Slick-Back Ponytail', 'ponytail', '#2a1c12', 0, 1, 300, 1);
+drip('hair', 'h_locs', 'Shoulder Locs', 'dreads', '#1a1410', 0, 1, 450, 1);
+drip('hair', 'h_puffs', 'Afro Puffs', 'puffs', '#1a1410', 0, 1, 400, 1);
+drip('hair', 'h_pine', 'Pineapple Locs', 'pineapple', '#1a1410', 0, 1, 700, 2);
+drip('hair', 'h_frost', 'Frosted Twists', 'twists', '#1a1410', '#f2c14e', 2, 900, 2);
+drip('hair', 'h_icelocs', 'Ice Locs', 'dreads', '#e8eef2', 0, 2, 1400, 3);
+drip('hair', 'h_mullet', 'The Mullet (Business Up Front)', 'mullet', '#6b4a2a', 0, 1, 500, 1);
+drip('hair', 'h_pinkpuffs', 'Bubblegum Puffs', 'puffs', '#ff5aa8', 0, 2, 1100, 2);
 // head
 drip('head', 'hd_none', 'Nothing', 'none', '#000', 0, 0, 0, 0, null, 'start');
 drip('head', 'hd_band', 'Sweatband', 'band', '#f4f4f4', 0, 0, 80, 0);
@@ -608,7 +621,7 @@ function newSave() {
     badges: {}, bp: { F: 0, S: 0, P: 0, D: 0 }, bxp: { F: 0, S: 0, P: 0, D: 0 },
     owned: DRIP.filter(d => d.src === 'start').map(d => d.id),
     worn: { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tank', arm: 'a_none', bottom: 'b_basic', socks: 's_low', shoes: 'k_beat', back: 'bk_none', ball: 'bl_std' },
-    moves: { owned: ['cross', 'stepback', 'spin', 'textbook', 'twohand', 'flex'], side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'twohand', celeb: 'flex' },
+    moves: { owned: ['cross', 'stepback', 'spin', 'textbook', 'twohand', 'flex'], side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'twohand', celeb: 'flex', dunkpk: 'dk_base', laypk: 'lp_base', dribpk: 'dr_base', postpk: 'po_base', swagpk: 'sw_base', stancepk: 'st_base' },
     crib: {}, home: { lot: 0, items: [], store: {}, look: { house: 0, trim: 0, fence: 0, ground: 1 }, used: {}, tour: '' }, boosts: [], life: {}, drills: {}, ladder: 0, ach: {}, homies: [], seenRank: 0, bumDay: 0,
     set: { sfx: 1, music: 1, meter: 1, sfxVol: 80, musVol: 80 },
   };
@@ -621,7 +634,7 @@ function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); 
 function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
 // ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
 // fit; HC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
-const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb'];
+const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb', 'dunkpk', 'laypk', 'dribpk', 'postpk', 'swagpk', 'stancepk'];
 const cloneJ = o => JSON.parse(JSON.stringify(o));
 function slotSnap() { const mv = {}; for (const k of MOVE_SLOTS) mv[k] = S.moves[k]; return cloneJ({ name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, bp: S.bp, bxp: S.bxp, moves: mv, worn: S.worn, anim: S.anim || null, made: S.created }); }
 function slotLoad(t) { const d = newSave(); S.name = t.name || d.name; S.build = cloneJ(t.build || d.build); S.attrs = cloneJ(t.attrs || {}); S.badges = cloneJ(t.badges || {}); S.bp = cloneJ(t.bp || d.bp); S.bxp = cloneJ(t.bxp || d.bxp);
@@ -635,7 +648,7 @@ function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v + (typeof homeFx === 'function' ? homeFx(k) : 0); }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }
 function myBuild() {   // a portable snapshot of the player (also what export codes carry)
-  return { mine: true, name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
+  return { mine: true, name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb, dunkpk: S.moves.dunkpk, laypk: S.moves.laypk, dribpk: S.moves.dribpk, postpk: S.moves.postpk, swagpk: S.moves.swagpk, stancepk: S.moves.stancepk } };
 }
 function encodeBuild(b) { return BRAND.code + '1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
 function decodeBuild(code) {
@@ -658,7 +671,7 @@ function sanitizeBuild(j) {
     if (!MOVE[j.moves.side] || MOVE[j.moves.side].slot !== 'side') j.moves.side = m.side;
     if (!MOVE[j.moves.back] || MOVE[j.moves.back].slot !== 'back') j.moves.back = m.back;
     if (!MOVE[j.moves.diag] || MOVE[j.moves.diag].slot !== 'diag') j.moves.diag = m.diag;
-    if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk; for (const c of CELEBS) if (!c.cost && j.moves.owned && !j.moves.owned.includes(c.id)) j.moves.owned.push(c.id);      /* the free celebrations belong to everybody */
+    if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk; if (typeof PACK_BASE !== 'undefined') for (const k in PACK_BASE) if (!PACK[j.moves[k]] || PACK[j.moves[k]].slot !== k || (PACK[j.moves[k]].cost && !j.moves.owned.includes(j.moves[k]))) j.moves[k] = PACK_BASE[k]; for (const c of CELEBS) if (!c.cost && j.moves.owned && !j.moves.owned.includes(c.id)) j.moves.owned.push(c.id);      /* the free celebrations belong to everybody */
     j.anim = typeof cleanProfile === 'function' ? cleanProfile(j.anim) || undefined : undefined;
     return j;
   } catch (e) { return null; }
@@ -959,6 +972,16 @@ function makeRig(spec, lowDetail) {
     case 'hightop': out(M(cyl(hr * 0.98, hr * 0.9, 0.15, 10), hc, 0, hy + 0.14, -0.005, head), 1.06); break;
     case 'mohawk': out(M(box(0.035, 0.11, 0.2), hc, 0, hy + 0.13, -0.02, head), 1.1); break;
     case 'bun': M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.012, 0, head).rotation.x = -0.3; out(M(sph(0.05), hc, 0, hy + 0.12, -0.07, head)); break;
+    case 'waves': { const m = M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.014, 0, head); m.scale.set(0.95, 1.12, 1.02); m.rotation.x = -0.25; for (let i = 0; i < 3; i++) { const rg = M(geo('wv' + i, () => new THREE.TorusGeometry(hr * (0.34 + i * 0.24), 0.006, 4, 16)), toon('#2c231b'), 0, hy + 0.105 - i * 0.03, -0.012, head); rg.rotation.x = Math.PI / 2 - 0.25; } break; }
+    case 'cornrows': { M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), toon('#3a2a1e'), 0, hy + 0.008, 0, head).rotation.x = -0.25; for (let i = 0; i < 6; i++) { const x = (i - 2.5) * 0.034, rw = M(geo('row', () => new THREE.TorusGeometry(hr * 1.0, 0.011, 5, 12, Math.PI * 0.9)), hc, x, hy - 0.005, -0.005, head); rw.rotation.set(0.25, Math.PI / 2, 0); rw.scale.setScalar(Math.cos(x / hr * 1.1)); } break; }
+    case 'curly': { M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.005, 0, head).rotation.x = -0.3; for (let i = 0; i < 9; i++) { const a = i * 2.4, rr = 0.02 + 0.045 * ((i * 7) % 5) / 4; M(sph(0.034, 6, 5), hc, Math.cos(a) * rr, hy + 0.115 + ((i * 3) % 4) * 0.008, Math.sin(a) * rr - 0.01, head); } break; }
+    case 'twists': { M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.005, 0, head).rotation.x = -0.3; const c2 = hair.c2 ? toon(hair.c2, hair.c2) : hc; for (let i = 0; i < 14; i++) { const a = i * 2.4, rr = 0.025 + 0.06 * ((i * 5) % 7) / 6, tw = M(capsule(0.011, 0.05), i % 2 ? c2 : hc, Math.cos(a) * rr, hy + 0.12, Math.sin(a) * rr - 0.01, head); tw.rotation.set(Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5); } break; }
+    case 'flattop': out(M(box(hr * 1.75, 0.1, hr * 1.7), hc, 0, hy + 0.115, -0.008, head), 1.05); M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.005, 0, head).rotation.x = -0.3; break;
+    case 'ponytail': { M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.012, 0, head).rotation.x = -0.3; const t = M(capsule(0.024, 0.16), hc, 0, hy - 0.03, -hr * 1.05, head); t.rotation.x = 0.55; out(t); M(sph(0.03, 6, 5), hc, 0, hy + 0.06, -hr * 0.95, head); break; }
+    case 'dreads': { M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.012, 0, head).rotation.x = -0.3; for (let i = 0; i < 11; i++) { const a = Math.PI * (0.08 + 0.84 * i / 10), x = Math.cos(a) * hr * 1.02, z = -Math.sin(a) * hr * 0.98, d = M(capsule(0.014, 0.17 + ((i * 3) % 4) * 0.015), hc, x, hy - 0.09, z, head); d.rotation.set(-0.12 * Math.sin(a), 0, -0.14 * Math.cos(a)); } break; }
+    case 'puffs': M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.008, 0, head).rotation.x = -0.3; for (const sx of [-1, 1]) out(M(sph(0.062, 9, 7), hc, sx * hr * 0.92, hy + 0.1, -0.03, head), 1.06); break;
+    case 'pineapple': { M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.008, 0, head).rotation.x = -0.3; M(cyl(0.04, 0.045, 0.03, 8), toon('#c8482c'), 0, hy + 0.115, -0.01, head); for (let i = 0; i < 10; i++) { const a = i * 0.628, d = M(capsule(0.013, 0.1), hc, Math.cos(a) * 0.04, hy + 0.18, Math.sin(a) * 0.04 - 0.01, head); d.rotation.set(Math.sin(a) * 0.75, 0, -Math.cos(a) * 0.75); } break; }
+    case 'mullet': { const m = M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.02, 0, head); m.rotation.x = -0.3; m.scale.set(1, 1.15, 1); for (let i = 0; i < 5; i++) { const x = (i - 2) * 0.033, d = M(capsule(0.017, 0.14), hc, x, hy - 0.07, -hr * 0.98 + Math.abs(i - 2) * 0.012, head); d.rotation.x = 0.2; } break; }
     case 'braids': {
       M(geo('buzz', () => new THREE.SphereGeometry(hr * 1.03, 12, 8, 0, 6.3, 0, 1.35)), hc, 0, hy + 0.012, 0, head).rotation.x = -0.3;
       for (let i = 0; i < 7; i++) { const a = Math.PI * (0.15 + 0.7 * i / 6) + Math.PI / 2 * 0; const br = M(capsule(0.014, 0.2), i % 2 ? toon(hair.c2 || hair.c, hair.c2) : hc, Math.cos(a + Math.PI) * hr * 0.9 * (i < 3.5 ? 1 : 1), hy - 0.07, -Math.abs(Math.sin(a)) * hr * 0.85, head); br.position.x = (i - 3) * 0.03; }
@@ -1136,6 +1159,8 @@ function runPose(p, o) {
     else if (rs === 'glide') { p.shR[0] *= 0.5; p.shL[0] *= 0.5; p.elR[0] *= 0.62; p.elL[0] *= 0.62; p.chest[1] *= 0.4; p.y *= 0.88; }      /* quiet arms carried low, hardly any bounce */
     else if (rs === 'heavy') { ad('shR', 0, 0, -0.22); ad('shL', 0, 0, 0.22); ad('spine', 0.04, 0, 0.07 * sw); ad('chest', 0, 0, 0.05 * sw); p.y *= 1.1; }      /* arms wide, the trunk rocks side to side */
     else if (rs === 'bouncy') { p.y *= 1.2; ad('neck', 0.05); p.shR[0] *= 1.15; p.shL[0] *= 1.15; ad('wrR', 0.3); ad('wrL', 0.3); }      /* up on the toes, loose wrists */
+    else if (rs === 'highstep') { ad('spine', -lean * 0.5); ad('chest', -0.06); ad('neck', 0.06); p.shR[0] = p.shR[0] * 1.2 - 0.25; p.shL[0] = p.shL[0] * 1.2 - 0.25; ad('elR', -0.3); ad('elL', -0.3); p.y = p.y * 1.25 + 0.012; }      /* from ON TWO: tall, chest out, hands up by the chest, prancing */
+    else if (rs === 'shifty') { ad('hips', 0, 0.16 * sw, 0.05 * sw); ad('spine', 0.05, -0.1 * sw, 0); ad('chest', 0, -0.22 * sw, 0); ad('neck', 0, 0.2 * sw, 0); p.shR[0] *= 0.85; p.shL[0] *= 0.85; ad('shR', 0, 0, -0.1); ad('shL', 0, 0, 0.1); }      /* from ON TWO: hips and shoulders going, the head stays still */
     else if (rs === 'low') { ad('spine', 0.11); ad('chest', 0.05); ad('neck', -0.12); p.shR[0] *= 0.8; p.shL[0] *= 0.8; ad('elR', -0.2); ad('elL', -0.2); }      /* hunched and tight, eyes up */
   }
   p.rate = 40;
@@ -1893,7 +1918,7 @@ function baseTrack(id) {
   const mk = k => mkPose((S_, legs, p) => { _TR[k](S_, legs, p); B[k](S_, legs, p); }), dip = mk('dip'), set = mk('set'), follow = mk('follow');
   return (_baseKeys[id] = [[H.gather, slerpPose(dip, set, 0.0)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.55)], [H.set, set], [H.release, slerpPose(set, follow, 0.45)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.2)], [H.recover, slerpPose(follow, dip, 0.65)]]);
 }
-const RUN_STYLES = [['', 'Natural'], ['upright', 'Upright'], ['lean', 'Forward lean'], ['pump', 'Arm pumper'], ['glide', 'Glider'], ['heavy', 'Heavy'], ['bouncy', 'Bouncy'], ['low', 'Low and tight']];
+const RUN_STYLES = [['', 'Natural'], ['upright', 'Upright'], ['lean', 'Forward lean'], ['pump', 'Arm pumper'], ['glide', 'Glider'], ['heavy', 'Heavy'], ['bouncy', 'Bouncy'], ['low', 'Low and tight'], ['highstep', 'High stepper'], ['shifty', 'Shifty']];
 function validBase(list, id) { return list.some(b => b[0] === id) ? id : ''; }
 
 const IDLE_STYLES = [['relaxed', 'Relaxed'], ['athletic', 'Athletic'], ['wide', 'Wide']];

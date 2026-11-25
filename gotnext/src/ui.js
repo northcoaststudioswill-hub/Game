@@ -232,10 +232,11 @@ function uiPlayer(tab) {
         }
         h += `</div>`;
       };
+      h += `<p class="mu">Animations come in <b>packages</b>: you wear one of each kind and the game rotates through it by the situation, never the same one twice running.</p>` + packsUI(r);
       h += `<p class="mu">The right stick is your skill stick. With the ball: flick ← → for your side move, ↙ ↘ for your stepback, ↖ ↗ for your spin, pull ↓ and hold to shoot, push ↑ to attack the rim.</p>`;
-      sec('SIDE MOVE  ← →', MOVES.filter(m => m.slot === 'side'), 'side', 'handle'); sec('STEPBACK  ↙ ↘', MOVES.filter(m => m.slot === 'back'), 'back', 'handle'); sec('SPIN  ↖ ↗', MOVES.filter(m => m.slot === 'diag'), 'diag', 'handle');
+      h += `<p class="mu">Single moves: these three are what the <b>Your Picks</b> dribble package uses.</p>`; sec('SIDE MOVE  ← →', MOVES.filter(m => m.slot === 'side'), 'side', 'handle'); sec('STEPBACK  ↙ ↘', MOVES.filter(m => m.slot === 'back'), 'back', 'handle'); sec('SPIN  ↖ ↗', MOVES.filter(m => m.slot === 'diag'), 'diag', 'handle');
       h += `<div class="cat">FINISHES AND JUMPER VARIATIONS</div><div class="card"><p>Everyone has these. The move stick picks one as you go up.</p>` + FINISHES.map(f => `<p><b>${f.n}</b> · ${f.d}</p>`).join('') + `</div>`;
-      sec('JUMPSHOT', JUMPERS, 'jumper'); sec('DUNK PACKAGE', DUNKS, 'dunk', 'dunk'); sec('CELEBRATION', CELEBS, 'celeb');
+      sec('JUMPSHOT', JUMPERS, 'jumper'); sec('SIGNATURE DUNK <span class="mu" style="text-transform:none;letter-spacing:.02em">— one show-stopper that joins your dunk package</span>', DUNKS.filter(m => m.sig || m.id === 'twohand' || S.moves.owned.includes(m.id)).map(m => m.id === 'twohand' ? Object.assign({}, m, { n: 'None', d: 'Just the package.' }) : m), 'dunk', 'dunk'); sec('CELEBRATION', CELEBS, 'celeb');
     } else if (st.tab === 'crew') {
       h += NET.room && NET.connected ? onlineBlock(null, null) : `<div class="card"><h3>OFFLINE</h3><p>Online play works from the game's shared Claude link, for people signed in that it is shared with. Opened as a file, the game is single player (plus local player 2 with a controller on a computer).</p></div>`;
       h += `<div class="cat">HOMIES · ${S.homies.length}</div>` + (S.homies.length ? S.homies.map(b => `<div class="card"><h3>${esc(b.name)} <span class="mu">${ovrOf(b.attrs)} OVR</span></h3><p>${STYLE[b.build.style].n} · ${fmtH(b.build.body.h)}${b.net ? ' · met online' : ''}</p></div>`).join('') : `<p class="mu">Nobody yet.</p>`);

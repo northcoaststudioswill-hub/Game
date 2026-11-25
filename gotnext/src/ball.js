@@ -57,7 +57,7 @@ function startMatch(cfg) {
     const mine = sp.mine === true;
     const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, remote: sp.ctrl >= 2, peer: sp.peer || null, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
       stats: { fouls: 0, pts: 0, ast: 0, reb: 0, stl: 0, blk: 0, ankles: 0, greens: 0, dunks: 0, threes: 0, fga: 0, fgm: 0, bravs: 0, fires: 0 }, ai: { tick: rnd(0, 0.3), spot: null, spotT: 0, tx: 0, tz: 0, mx: 0, mz: 0, hold: 0, mode: '', react: 0 } };
-    p.A = effAttrs(sp.b, mine); p.pers = persFor(sp.b, mine); p.aiLvl = sp.ai === undefined ? cfg.tier.ai : sp.ai;
+    p.A = effAttrs(sp.b, mine); p.pers = persFor(sp.b, mine); if (!mine && !sp.peer && sp.b) sp.b.moves = Object.assign({}, sp.b.moves || {}, aiPacks(sp.b));      /* everybody else wears packages too */ p.aiLvl = sp.ai === undefined ? cfg.tier.ai : sp.ai;
     p.rig = makeRig(sp.b); p.H = p.rig.H; scene.add(p.rig.root);
     // one colour per team for the ring and the name: your team blue, theirs red. You are the thicker ring with the arrow.
     const myT = Math.max(0, cfg.teams.findIndex(t => t.some(x => x.mine === true))); p.teamCol = ti === myT ? 0x33a0ff : 0xff4a4a;
@@ -219,7 +219,7 @@ function releaseShot(p) {
   if (p.user && !s.auto && held < s.rel * 0.3) { s.released = false; return startFake(p); }      // let go early = pump fake
   const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p); s.err = err;
   (p.tend || (p.tend = { three: 0, mid: 0, close: 0, drive: 0 }))[kind]++;
-  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85; c *= 1 - px(p, 'calm'); if (MT.stops && MT.stops[1 - p.team] >= 3) c *= 1.08;
+  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5 * (pk(p, 'postpk').hook || 1); c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= (s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7) * (pk(p, 'postpk').fade || 1); if (s.side) c *= 0.85; c *= 1 - px(p, 'calm'); if (MT.stops && MT.stops[1 - p.team] >= 3) c *= 1.08;
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
   let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
   if (s.floater) base -= Math.max(0, d - 2.2) * 0.045;
@@ -267,7 +267,7 @@ function startFake(p) {
     const sp = Math.max(p.shot ? p.shot.sp : 0, Math.hypot(p.vx, p.vz));
     if (sp > 1.8) {
       const vx = p.shot && p.shot.vx !== undefined ? p.shot.vx : p.vx, vz = p.shot && p.shot.vz !== undefined ? p.shot.vz : p.vz, l = Math.hypot(vx, vz) || 1, keep = p.b.moves.back;
-      p.st = 'free'; p.y = 0; p.moveCool = 0; p.b.moves.back = 'hesi'; startMove(p, 'back', vx / l, vz / l); p.b.moves.back = keep;
+      p.st = 'free'; p.y = 0; p.moveCool = 0; p.b.moves.back = 'hesi'; p.noPack = true; startMove(p, 'back', vx / l, vz / l); p.noPack = false; p.b.moves.back = keep;
       if (p.st === 'move') { floatTxt(p, 'HESI', '#f2c14e'); return; }
     }
     p.live = 'dead'; floatTxt(p, 'PICKED UP', '#f2c14e');
@@ -345,14 +345,16 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   // the rest of the free package: with a man there, show it and bring it under his arm, float it over the top, or spin; alone, the odd high one off the glass
   if (type === 'layup' && !read && !opt.kind && !opt.hopped && !euro && !rev && (kind === 'lay' || kind === 'scoop' || kind === 'power' || kind === 'quick' || (!cont && kind === 'finger'))) { const r = Math.random();
     if (p.user) {      // your own finishes come out of a pool, never the same one twice running
-      const L = cont ? ['under', 'over', 'scoop', 'power'].concat(sp > 3 ? ['spin', 'quick'] : []) : ['lay', 'finger', 'over'];
-      kind = L[poolNext(p, cont ? 'layC' + L.length : 'layO', L.length)]; }
-    else if (cont) kind = r < 0.2 ? 'under' : r < 0.38 ? 'over' : r < 0.5 && sp > 3 && fq >= 60 ? 'spin' : kind; else if (r < 0.15) kind = 'over'; }
+      const LP = pk(p, 'laypk'), L = cont ? LP.cont.filter(k => sp > 3 || (k !== 'spin' && k !== 'quick')) : LP.open;
+      kind = L[poolNext(p, (cont ? 'layC' : 'layO') + L.length, L.length)]; }
+    else if (r < (cont ? 0.6 : 0.3)) { const LP = pk(p, 'laypk'), L = cont ? LP.cont.filter(k => sp > 3 || (k !== 'spin' && k !== 'quick')) : LP.open; kind = L[poolNext(p, (cont ? 'layC' : 'layO') + L.length, L.length)]; } }
   let style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
   // the basic package is not one dunk: off the run it is one hand, cocked back if he can get up; standing or in traffic, two hands
-  if (type === 'dunk' && style === 'twohand' && !opt.style && p.user && !(p.putT > 1.1 && d < 2.5)) { const tr = (thr && thr.s > 0.35) || sp < 2.4 || opt.hopped, L = tr ? ['twohand', 'hangtwo'] : ['onehand', 'lean', 'twohand'].concat(dq >= 68 ? ['cock', 'hammer'] : []); style = L[poolNext(p, 'dk' + L.length, L.length)]; }
-  else if (type === 'dunk' && style === 'twohand' && !opt.style) { const r = Math.random();
-    style = p.putT > 1.1 && d < 2.5 && r < 0.75 ? 'tip' : (thr && thr.s > 0.35) || sp < 2.4 || opt.hopped ? (r < 0.55 ? 'twohand' : 'hangtwo') : dq >= 78 ? (r < 0.28 ? 'cock' : r < 0.52 ? 'hammer' : r < 0.74 ? 'onehand' : r < 0.9 ? 'lean' : 'twohand') : (r < 0.45 ? 'onehand' : r < 0.7 ? 'lean' : 'twohand'); }
+  if (type === 'dunk' && !opt.style && !style0 && !rev) {      // the dunk comes out of the package he wears, by the situation; his signature dunk (if he equipped one) joins the rotation off a clear run
+    const P_ = pk(p, 'dunkpk'), tr = (thr && thr.s > 0.35) || sp < 2.4 || opt.hopped, sig = p.b.moves.dunk;
+    if (p.putT > 1.1 && d < 2.5 && Math.random() < 0.75) style = 'tip';
+    else { let L = (tr ? P_.traffic : P_.run).filter(id => dunkNeed(id) <= dq || MT.arcade); if (!tr && sig && sig !== 'twohand' && DUNK[sig] && (DUNK[sig].need <= dq || MT.arcade) && !L.includes(sig)) L = L.concat([sig]);
+      if (L.length < 3) for (const id of (tr ? PACK.dk_base.traffic : PACK.dk_base.run)) if (!L.includes(id) && dunkNeed(id) <= dq) L = L.concat([id]);      /* not good enough yet for most of the package: the base dunks fill it out */ style = L[poolNext(p, 'dk' + (tr ? 't' : 'r') + L.length, L.length)]; } }
   p.st = 'finish'; p.t = 0;
   const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse' && style !== 'contact'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R', cont: cont ? 1 : 0, ox: 0, oz: 0, hit: null, contact: 0, blocked: false };
   if (kind === 'hang') f.dur += 0.16; if (kind === 'switch') f.dur += 0.06; if (style === 'squat') f.dur += 0.04;
@@ -405,13 +407,13 @@ function resolveFinish(p) {
     missed(p); B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
   const kAdj = { under: -0.04, over: -0.03, quick: -0.03, spin: -0.05, finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
-  const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj + px(p, 'fin') + px(p, 'close') - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
+  const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj + px(p, 'fin') + px(p, 'close') + (f.postFin || 0) - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
   handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
 }
 function startMove(p, slot, dx, dz) {
   if (p.moveCool > 0 || p.stam < 6) return;
-  const mv = MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot);
+  const mv = packMove(p, slot) || MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot);
   if (mv.keep) { dx *= 0.45; dz = -0.9; }            /* in-and-out: the fake goes sideways, the burst goes forward */ const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
   p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
@@ -606,7 +608,7 @@ function humanThink(p, dt) {
         const hx = -p.x / (d || 1), hz = -p.z / (d || 1), sx = p.in.dx || 0, sz = p.in.dz || 0, sm = Math.hypot(sx, sz), along = sm > 0.3 ? (sx * hx + sz * hz) / sm : 0, lat = sm > 0.3 ? (sx * -hz + sz * hx) / sm : 0;
         p.post = false;
         if (along > 0.55) {      // into the defender, toward the rim: drop step to the side he is not on, or a hook from further out
-          if (d < 3.6) { const [o] = nearestOpp(p); const ol = o ? (o.x - p.x) * -hz + (o.z - p.z) * hx : 0; const side = Math.abs(lat) > 0.3 ? Math.sign(lat) : (ol > 0 ? -1 : 1); floatTxt(p, 'DROP STEP', '#f2c14e'); startFinish(p, side, false, 0, { layup: 1, kind: 'power' }); return; }
+          if (d < 3.6) { const [o] = nearestOpp(p); const ol = o ? (o.x - p.x) * -hz + (o.z - p.z) * hx : 0; const side = Math.abs(lat) > 0.3 ? Math.sign(lat) : (ol > 0 ? -1 : 1); dropStep(p, side); return; }
           p.face = hf; startShot(p, 'stick', true); floatTxt(p, 'HOOK', '#f2c14e'); return;
         }
         if (along < -0.55) { startShot(p, 'btn', false, { fade: true }); floatTxt(p, 'POST FADE', '#f2c14e'); return; }      /* away from the rim: fadeaway */
@@ -616,7 +618,7 @@ function humanThink(p, dt) {
       if (I.flick === 'D') { p.post = false; startShot(p, 'stick', false, { fade: true }); floatTxt(p, 'TURNAROUND', '#f2c14e'); return; }
       if (I.flick === 'U' && d < 5.2) { p.post = false; p.face = hf; startShot(p, 'stick', true); floatTxt(p, 'HOOK', '#f2c14e'); return; }
       if (I.flick && I.flick !== 'U') { const side = I.flick.includes('L') ? -1 : I.flick.includes('R') ? 1 : 0; p.post = false; p.face = hf;
-        if (d < 3.8 && side) { floatTxt(p, 'DROP STEP', '#f2c14e'); startFinish(p, side, false, 0, { layup: 1, kind: 'power' }); return; }
+        if (d < 3.8 && side) { dropStep(p, side); return; }
         floatTxt(p, 'FACE UP', '#f2c14e'); p.vx += side * 2.4; p.vz += 0; return; }
     }
     if (I.bP) { startShot(p, 'btn'); return; }
@@ -738,6 +740,8 @@ function startDive(p) {
 }
 // variant pools: pick one of n looks for an action, never the same one twice running
 function poolNext(p, key, n) { const P = p.pools || (p.pools = {}); let v = Math.floor(Math.random() * n); if (n > 1 && v === P[key]) v = (v + 1 + Math.floor(Math.random() * (n - 1))) % n; P[key] = v; return v; }
+// the drop step out of the post: what it turns into depends on the post package (power, an up-and-under, a spin)
+function dropStep(p, side) { const P_ = pk(p, 'postpk'), L = P_.drop || ['power'], kind = L[poolNext(p, 'drop' + L.length, L.length)]; if (!startFinish(p, side, false, 0, { layup: 1, kind })) return false; p.finish.postFin = P_.fin || 0; if (kind === 'spin') { p.finish.spin = 1; p.finish.dur += 0.1; } if (kind === 'under') p.finish.dur += 0.12; if (p.user) floatTxt(p, kind === 'under' ? 'UP AND UNDER' : kind === 'spin' ? 'SPIN OFF' : 'DROP STEP', '#f2c14e'); return true; }
 // one bucket from the win: everybody tightens up
 function gamePoint(p) {
   const M_ = MT; if (M_.practice || M_.drill || M_.phase === 'over' || M_.score[p.team] < M_.cfg.mode.to - 2 || (M_.gpSaid || (M_.gpSaid = [0, 0]))[p.team]) return;
@@ -770,7 +774,7 @@ function aiThink(p, dt) {
     a.hold += dt;
     if (a.postT > 0 && p.st === 'free') {      // backing a smaller man down: to the rim for a drop step, or a hook from where the clock runs out
       a.postT -= dt; p.post = true; aiGo(p, 0, 0.9, false); const d2 = dHoop(p);
-      if (d2 < 2.9 || a.postT <= 0 || MT.clock < 2.5) { p.post = false; a.postT = 0; const [o2] = nearestOpp(p); if (d2 < 3.6) startFinish(p, o2 && (o2.x - p.x) > 0 ? -1 : 1, false, 0, { layup: 1, kind: 'power' }); else { p.face = Math.atan2(-p.x, -p.z); startShot(p, 'ai', true); } return; }
+      if (d2 < 2.9 || a.postT <= 0 || MT.clock < 2.5) { p.post = false; a.postT = 0; const [o2] = nearestOpp(p); if (d2 < 3.6) dropStep(p, o2 && (o2.x - p.x) > 0 ? -1 : 1); else { p.face = Math.atan2(-p.x, -p.z); startShot(p, 'ai', true); } return; }
       const dxp = a.tx - p.x, dzp = a.tz - p.z, lp = Math.hypot(dxp, dzp) || 1; p.in.dx = dxp / lp; p.in.dz = dzp / lp; p.in.sprint = false; return; }
     if (a.tick <= 0) {
       a.tick = 0.34 - L * 0.16 + rnd(0, 0.08);
@@ -998,7 +1002,7 @@ function stepPlayer(p, dt) {
   if (hasBall && p.post && p.st === 'free' && M_.phase === 'live') {
     const dh = dHoop(p) || 1, hx = -p.x / dh, hz = -p.z / dh, va = p.vx * hx + p.vz * hz;
     for (const o of M_.P) { if (o.team === p.team || o.st === 'jump') continue; const rx = o.x - p.x, rz = o.z - p.z, rl = Math.hypot(rx, rz); if (rl > 1.05 || (rx * hx + rz * hz) < rl * 0.4) continue;
-      if (va > 0.2) { const push = clamp(0.3 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.6 - (o.bodyUp ? 0.2 : 0) + 0.06 * bt(p, 'postman') + px(p, 'post'), 0.05, 0.9); o.x += hx * va * push * dt; o.z += hz * va * push * dt; p.stam = Math.max(0, p.stam - dt * 2.5); o.stam = Math.max(0, o.stam - dt * 2);
+      if (va > 0.2) { const push = clamp(0.3 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.6 - (o.bodyUp ? 0.2 : 0) + 0.06 * bt(p, 'postman') + px(p, 'post') + (pk(p, 'postpk').push || 0), 0.05, 0.9); o.x += hx * va * push * dt; o.z += hz * va * push * dt; p.stam = Math.max(0, p.stam - dt * 2.5); o.stam = Math.max(0, o.stam - dt * 2);
         p.bumpTk = (p.bumpTk || 0) - dt; if (p.bumpTk <= 0) { p.bumpTk = 0.45; sfxM('bump'); } } }
   }
   // leaning on the ball handler all day gets called eventually (a hand check)
@@ -1274,7 +1278,7 @@ function animPlayer(p, dt) {
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; const jc = M_.time + p.i * 0.9, jt = jc % 2.8; if (jt < 0.55 && p.live === 'hold' && p.speed < 0.3) o.jab = Math.sin(Math.PI * jt / 0.55) * (Math.floor(jc / 2.8) % 2 ? 1 : -1); }
       else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); }
         // he is giving you room: show-off dribbles, a new one every few seconds (rock, between the legs, behind the back, yo-yo, size-up, waving him up)
-        { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? SWAGS[Math.floor((M_.time + p.i * 1.7) / 2.8) % SWAGS.length] : null; o.swag = p.swag; o.swT = M_.time + p.i; if (p.swag && bt(p, 'showtime') && M_.net !== 'guest') addBrav(p, dt * 0.012 * bt(p, 'showtime')); } }
+        { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? (SW_ => SW_[Math.floor((M_.time + p.i * 1.7) / 2.8) % SW_.length])(pk(p, 'swagpk').list || SWAGS) : null; o.swag = p.swag; o.swT = M_.time + p.i; if (p.swag && bt(p, 'showtime') && M_.net !== 'guest') addBrav(p, dt * 0.012 * bt(p, 'showtime')); } }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
       else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; o.bodyUp = p.bodyUp ? 1 : 0; if (p.sprinting) { an = 'run'; o.sp = spN; }
         else if (!p.handsUp && !p.bodyUp && B.holder && (p.guard || p.man) === B.holder) {      // on the ball: sag stance when he has room, active hands when it is tight

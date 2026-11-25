@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.16.2';
+const VERSION = '0.17.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -153,11 +153,11 @@ const DUNKS = [
   { id: 'windmill', n: 'Wind Turbine', d: 'Renewable energy. +4 Respect per dunk.', bonus: -.04, rep: 4, cost: 2800, rank: 3, need: 80 },
   { id: 'cradle', n: 'Rock The Cradle', d: 'Ball cradled on the forearm, rocked back, thrown home. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 3600, rank: 3, need: 84 },
   { id: 'clutch', n: 'Double Dip', d: 'Double clutch: up, down to the waist, back up, through. +5 Respect per dunk.', bonus: -.05, rep: 5, cost: 4200, rank: 4, need: 86 },
-  { id: 'three60', n: '360 No-Scope', d: 'Full rotation. +7 Respect per dunk.', bonus: -.08, rep: 7, cost: 6000, rank: 5, need: 90 },
-  { id: 'scratch', n: 'Back Scratcher', d: 'Ball taken so far behind the head it touches your back, then thrown down. +6 Respect per dunk.', bonus: -.06, rep: 6, cost: 5000, rank: 4, need: 88 },
+  { id: 'three60', sig: 1, n: '360 No-Scope', d: 'Full rotation. +7 Respect per dunk.', bonus: -.08, rep: 7, cost: 6000, rank: 5, need: 90 },
+  { id: 'scratch', sig: 1, n: 'Back Scratcher', d: 'Ball taken so far behind the head it touches your back, then thrown down. +6 Respect per dunk.', bonus: -.06, rep: 6, cost: 5000, rank: 4, need: 88 },
   { id: 'gavel', n: 'The Gavel', d: 'Arm straight out to the side, swung over like a judge\'s hammer. Court adjourned. +4 Respect per dunk.', bonus: -.03, rep: 4, cost: 3200, rank: 3, need: 82 },
   { id: 'squat', n: 'Rim Squatter', d: 'Two hands, then hang on the rim with the knees up. Squatter\'s rights. +5 Respect per dunk.', bonus: -.02, rep: 5, cost: 3800, rank: 3, need: 84 },
-  { id: 'legs', n: 'The Loophole', d: 'Between the legs in mid-air. Legal, technically. +9 Respect per dunk.', bonus: -.12, rep: 9, cost: 9000, rank: 6, need: 95 },
+  { id: 'legs', sig: 1, n: 'The Loophole', d: 'Between the legs in mid-air. Legal, technically. +9 Respect per dunk.', bonus: -.12, rep: 9, cost: 9000, rank: 6, need: 95 },
 ];
 const DUNK = {}; DUNKS.forEach(m => DUNK[m.id] = m);
 DUNK.contact = { id: 'contact', n: 'Posterizer', d: 'Not for sale. Dunk 90+ with Strength 78+ (or Dunk 97+): when someone is waiting at the rim, you go through them.', bonus: 0, rep: 8 };
@@ -217,6 +217,19 @@ drip('hair', 'h_mohawk', 'Bald Eagle Mohawk', 'mohawk', '#f4f4f4', 0, 2, 900, 2)
 drip('hair', 'h_flame', 'Flamin\' Hot Dye Job', 'fro', '#ff5a1f', 0, 2, 1200, 3);
 drip('hair', 'h_bald', 'Aerodynamic', 'bald', '#000', 0, 0, 0, 0, null, 'start');
 drip('hair', 'h_bun', 'Man Bun (Deregulated)', 'bun', '#5a3a1c', 0, 1, 300, 1);
+drip('hair', 'h_waves', '360 Waves', 'waves', '#16110d', 0, 0, 0, 0, null, 'start');
+drip('hair', 'h_rows', 'Straight-Backs', 'cornrows', '#16110d', 0, 0, 0, 0, null, 'start');
+drip('hair', 'h_curly', 'Curly Top', 'curly', '#1a1410', 0, 0, 0, 0, null, 'start');
+drip('hair', 'h_twists', 'Two-Strand Twists', 'twists', '#1a1410', 0, 0, 200, 0);
+drip('hair', 'h_flat', 'Flat Top (Level Checked)', 'flattop', '#1a1410', 0, 0, 250, 0);
+drip('hair', 'h_pony', 'Slick-Back Ponytail', 'ponytail', '#2a1c12', 0, 1, 300, 1);
+drip('hair', 'h_locs', 'Shoulder Locs', 'dreads', '#1a1410', 0, 1, 450, 1);
+drip('hair', 'h_puffs', 'Afro Puffs', 'puffs', '#1a1410', 0, 1, 400, 1);
+drip('hair', 'h_pine', 'Pineapple Locs', 'pineapple', '#1a1410', 0, 1, 700, 2);
+drip('hair', 'h_frost', 'Frosted Twists', 'twists', '#1a1410', '#f2c14e', 2, 900, 2);
+drip('hair', 'h_icelocs', 'Ice Locs', 'dreads', '#e8eef2', 0, 2, 1400, 3);
+drip('hair', 'h_mullet', 'The Mullet (Business Up Front)', 'mullet', '#6b4a2a', 0, 1, 500, 1);
+drip('hair', 'h_pinkpuffs', 'Bubblegum Puffs', 'puffs', '#ff5aa8', 0, 2, 1100, 2);
 // head
 drip('head', 'hd_none', 'Nothing', 'none', '#000', 0, 0, 0, 0, null, 'start');
 drip('head', 'hd_band', 'Sweatband', 'band', '#f4f4f4', 0, 0, 80, 0);

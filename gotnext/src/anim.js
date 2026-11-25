@@ -111,7 +111,7 @@ function baseTrack(id) {
   const mk = k => mkPose((S_, legs, p) => { _TR[k](S_, legs, p); B[k](S_, legs, p); }), dip = mk('dip'), set = mk('set'), follow = mk('follow');
   return (_baseKeys[id] = [[H.gather, slerpPose(dip, set, 0.0)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.55)], [H.set, set], [H.release, slerpPose(set, follow, 0.45)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.2)], [H.recover, slerpPose(follow, dip, 0.65)]]);
 }
-const RUN_STYLES = [['', 'Natural'], ['upright', 'Upright'], ['lean', 'Forward lean'], ['pump', 'Arm pumper'], ['glide', 'Glider'], ['heavy', 'Heavy'], ['bouncy', 'Bouncy'], ['low', 'Low and tight']];
+const RUN_STYLES = [['', 'Natural'], ['upright', 'Upright'], ['lean', 'Forward lean'], ['pump', 'Arm pumper'], ['glide', 'Glider'], ['heavy', 'Heavy'], ['bouncy', 'Bouncy'], ['low', 'Low and tight'], ['highstep', 'High stepper'], ['shifty', 'Shifty']];
 function validBase(list, id) { return list.some(b => b[0] === id) ? id : ''; }
 
 const IDLE_STYLES = [['relaxed', 'Relaxed'], ['athletic', 'Athletic'], ['wide', 'Wide']];
