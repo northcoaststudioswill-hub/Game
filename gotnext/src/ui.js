@@ -13,7 +13,7 @@ function rerender(reset) {
   UI.handlers = []; el.className = UI.cur.cls; el.innerHTML = `<div class="pin">${UI.cur.render()}</div>`; el.style.display = 'block';
   const pb2 = el.querySelector('.pb'); if (pb2) pb2.scrollTop = sc; const tb2 = el.querySelector('.tabs'); if (tb2) tb2.scrollLeft = ts; paintFocus();
 }
-function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
+function uiClose() { if (UI.cur && UI.cur.onClose) { const f = UI.cur.onClose; UI.cur.onClose = null; f(); } UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
 function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],input[type=text],select,.card[data-k],.sw[data-k],span[data-k]:not([data-k=""])')).filter(e => e.offsetParent !== null); }
 // controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
@@ -258,7 +258,7 @@ function uiShop(closet) {
   const r = () => rankOf(S.rep);
   openPanel(() => {
     let h = `<div class="ph"><h2>${closet ? 'CLOSET' : 'THE PLUG'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="tabs">` + SLOTS.map(s => Btn(s[1], () => { st.slot = s[0]; sfx('ui'); rerender(true); }, st.slot === s[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb"><div class="grid">`;
-    let items = DRIP.filter(d => d.slot === st.slot && (closet || d.src !== 'nexx'));      /* NEXX SUPPLY is only at Nexx */ if (closet) items = items.filter(d => S.owned.includes(d.id)); else items = items.slice().sort((a, b) => a.r - b.r || a.cost - b.cost);
+    let items = DRIP.filter(d => d.slot === st.slot && (closet || (d.src !== 'nexx' && d.src !== 'deed')));      /* NEXX SUPPLY is only at Nexx */ if (closet) items = items.filter(d => S.owned.includes(d.id)); else items = items.slice().sort((a, b) => a.r - b.r || a.cost - b.cost);
     for (const d of items) {
       const own = S.owned.includes(d.id), eq = S.worn[d.slot] === d.id, price = shopPrice(d.cost), lockR = d.rank > r();
       const bf = d.buff ? Object.keys(d.buff).map(k => `+${d.buff[k]} ${ATTR[k].n}`).join(' · ') : '';

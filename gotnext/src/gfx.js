@@ -94,6 +94,16 @@ function makeRig(spec, lowDetail) {
   const chestJ = grp(spine, 0, loH, 0); out(M(tgUp, toon(top.c), 0, upH / 2, 0, chestJ), 1.06);
   M(cyl(0.118 * wS, 0.118 * wS, 0.03, 10), toon(top.c2 || top.c), 0, 0.03, 0, spine).scale.z = 0.62;       // hem
   if (top.kind === 'jersey') { const st = M(box(shW * 1.5, 0.05, 0.02), toon(top.c2), 0, upH * 0.3, 0.105 * wS, chestJ); st.rotation.x = -0.12; }
+  // a human back instead of two stacked cans: rounded shoulder blades, the slope of the traps into the neck, a chest,
+  // the small of the back and a seat. With the rest curve below (R.rest) the spine reads as an S from the side.
+  { const tc = toon(top.c), bc = toon(bot.c);
+    M(sph(shW * 0.6, 10, 8), tc, 0, upH * 0.52, -0.05 * wS, chestJ).scale.set(1.3, 0.95, 0.5);            // upper back
+    M(sph(shW * 0.5, 10, 8), tc, 0, upH * 0.58, 0.05 * wS, chestJ).scale.set(1.45, 0.72, 0.45);          // chest
+    for (const sx of [-1, 1]) { const t = M(cyl(0.028 * lW, 0.05 * lW, shW * 0.62, 6), skin, sx * shW * 0.42, upH + 0.012, -0.012, chestJ); t.rotation.z = sx * 1.12; }      // traps
+    M(sph(0.105 * wS, 10, 8), tc, 0, loH * 0.5, 0.018, spine).scale.set(1.02, 1.5, 0.62);               // belly / small of the back fill
+    for (const sx of [-1, 1]) M(sph(0.072 * wS, 8, 6), bc, sx * 0.052 * wS, -0.045, -0.055, hips).scale.set(1, 1.05, 0.9);      // seat
+  }
+  R.rest = { spine: -0.07, chest: 0.13, neck: -0.09, head: 0.03 };      /* lumbar curve in, upper back out, head carried over the shoulders */
   const chest = grp(chestJ, 0, upH, 0);
   // neck + head
   const neck = grp(chest, 0, 0, 0); M(cyl(0.045 * P.limb, 0.05 * P.limb, 0.1 * P.neck, 8), skin, 0, 0.04 * P.neck, 0, neck);
@@ -472,6 +482,16 @@ function poseOf(anim, t, o) {
         S_('sh' + inn, -1.6 * e, 0, -so * 0.5 * e); S_('el' + inn, -0.6 * e - 0.2); S_('wr' + inn, 0.4 * e);
         p.rate = 24; break;
       }
+      if (o.fall && o.kind && o.kind !== 'sit') {      // other ways to go down: 'face' (forward onto the hands and chest), 'spin' (twisted round onto a hip), 'flat' (laid out on the back, arms wide), 'knee' (to one knee, a hand down)
+        const fT2 = 0.32, gT2 = Math.min(0.6, D * 0.4), f2 = sm(clamp(t / fT2, 0, 1)), g2 = sm(clamp((t - (D - gT2)) / gT2, 0, 1)), fl = -(L - 0.14), Q = { rate: 22 }; const Zq = (k, x, y, z) => { Q[k] = [x || 0, y || 0, z || 0]; };
+        if (o.kind === 'face') { Q.y = fl + 0.06; Zq('hips', 1.35); Zq('spine', 0.12); Zq('chest', -0.1); Zq('neck', -0.55); Zq('hpR', 0.15, 0, -0.12); Zq('hpL', 0.05, 0, 0.14); Zq('knR', 0.25); Zq('knL', 0.6); Zq('shR', -2.5, 0, -0.5); Zq('shL', -2.3, 0, 0.6); Zq('elR', -1.2); Zq('elL', -1.0); }
+        else if (o.kind === 'flat') { Q.y = fl + 0.02; Zq('hips', -1.45); Zq('spine', -0.05); Zq('neck', 0.2); Zq('hpR', 0.1, 0, -0.25); Zq('hpL', -0.25, 0, 0.3); Zq('knR', 0.2); Zq('knL', 0.9); Zq('shR', -0.3, 0, -1.35); Zq('shL', -0.2, 0, 1.4); Zq('elR', -0.3); Zq('elL', -0.5); }
+        else if (o.kind === 'spin') { Q.y = fl + 0.05; Zq('hips', -0.35, 1.2 * (sd || 1), 0.75 * (sd || 1)); Zq('spine', 0.25, 0.3 * (sd || 1), 0); Zq('neck', 0, -0.6 * (sd || 1), 0); Zq('hpR', -1.1, 0, -0.2); Zq('hpL', -0.5, 0, 0.3); Zq('knR', 1.5); Zq('knL', 0.9); Zq('shR', -0.9, 0, -0.9); Zq('shL', 0.6, 0, 0.5); Zq('elR', -0.7); Zq('elL', -0.3); }
+        else { Q.y = -0.42; Zq('hips', 0.25); Zq('spine', 0.4); Zq('chest', 0.15); Zq('neck', -0.35); Zq('hpR', -1.45); Zq('knR', 1.6); Zq('hpL', 0.05); Zq('knL', 1.75); Zq('anL', 0.5); Zq('shR', -0.9, 0, -0.2); Zq('elR', -0.4); Zq('shL', -0.4, 0, 0.3); Zq('elL', -1.0); }
+        const dr = {}; for (const k in Q) dr[k] = Array.isArray(Q[k]) ? Q[k].map(v => v * f2) : Q[k]; dr.y = Q.y * f2 * f2; dr.rate = 22;
+        const cr = { y: -0.38, rate: 22, hips: [0.2, 0, 0], hpR: [-1.3, 0, -0.1], hpL: [-1.3, 0, 0.1], knR: [1.9, 0, 0], knL: [1.9, 0, 0], anR: [-0.6, 0, 0], anL: [-0.6, 0, 0], spine: [0.45, 0, 0], chest: [0.15, 0, 0], neck: [-0.4, 0, 0], shR: [-0.6, 0, -0.2], shL: [-0.6, 0, 0.2], elR: [-0.8, 0, 0], elL: [-0.8, 0, 0] };
+        const A0 = t < fT2 ? dr : Q, A1 = g2 < 0.5 ? blendPose(A0, cr, g2 * 2) : blendPose(cr, poseOf('idle', t, {}), (g2 - 0.5) * 2); for (const k in A1) p[k] = A1[k]; p.rate = 22; break;
+      }
       // DOWN: legs go, he sits down hard on the side he bit to, posts a hand behind, watches the play, then gets up
       const fT = 0.3, gT = Math.min(0.55, D * 0.42), f = sm(clamp(t / fT, 0, 1)), g = sm(clamp((t - (D - gT)) / gT, 0, 1)), floor = -(L - 0.13);
       const post = sd === 0 ? 'both' : sd > 0 ? 'R' : 'L', other = sd > 0 ? 'L' : 'R';
@@ -493,6 +513,18 @@ function poseOf(anim, t, o) {
     case 'celeb': {
       const s = Math.sin(t * 9);
       switch (o.style) {
+        case 'flexdown': legs(-0.9, 1.3, -0.9, 1.3, 0.38); p.y = -0.3; S_('spine', 0.4); S_('chest', 0.1); S_('neck', -0.3); S_('shR', -0.6, 0, -0.9); S_('elR', -2.0 + s * 0.1); S_('shL', -0.6, 0, 0.9); S_('elL', -2.0 - s * 0.1); S_('wrR', -0.5); S_('wrL', -0.5); break;      /* crab flex, low, screaming at the floor */
+        case 'toosmall': legs(-0.8, 1.1, -0.6, 0.9, 0.16); p.y = -0.24; S_('spine', 0.7); S_('neck', -0.55); S_('shR', -0.75, 0, -0.1); S_('elR', -0.1); S_('wrR', 1.3 + s * 0.15); S_('shL', 0.1, 0, 0.2); S_('elL', -0.4); break;      /* hand flat by the knee: too small */
+        case 'stare': armsDown(); S_('spine', 0.1); S_('chest', 0.12); S_('neck', 0.45); S_('shR', 0.15, 0, -0.25); S_('shL', 0.15, 0, 0.25); S_('elR', -0.1); S_('elL', -0.1); S_('hpR', 0, 0, -0.12); S_('hpL', 0, 0, 0.12); break;      /* stands over him and looks down */
+        case 'pout': S_('shR', -0.25, 0, 0.5); S_('elR', -1.55); S_('shL', -0.25, 0, -0.5); S_('elL', -1.55); S_('spine', -0.1); S_('chest', -0.12); S_('neck', -0.2 + s * 0.04, 0.35, 0); S_('hpR', 0, 0, -0.1); S_('hpL', 0, 0, 0.14); break;      /* arms crossed, chin up, looking off */
+        case 'shh': armsDown(); S_('shR', -1.3, 0, 0.35); S_('elR', -2.3); S_('wrR', 0.2); S_('neck', -0.05, s * 0.25, 0); S_('chest', -0.05); break;      /* finger to the lips, to the crowd */
+        case 'rock': S_('shR', -0.9, 0, 0.5); S_('elR', -1.5); S_('shL', -0.9, 0, -0.5); S_('elL', -1.5); S_('chest', 0, s * 0.3, s * 0.1); S_('spine', 0, s * 0.12, 0); S_('neck', 0.3); break;      /* rock the baby */
+        case 'nightnight': S_('shR', -1.5, 0, 0.6); S_('elR', -2.2); S_('shL', -1.4, 0, -0.5); S_('elL', -2.2); S_('neck', 0, 0, 0.45); S_('chest', 0, 0, 0.12); S_('spine', 0.05); break;      /* hands together by the cheek */
+        case 'pound': { const b2 = Math.max(0, Math.sin(t * 12)); S_('shR', -0.9, 0, 0.5 - b2 * 0.2); S_('elR', -2.0 - b2 * 0.3); S_('shL', -0.2, 0, 1.2); S_('elL', -0.4); S_('chest', -0.2); S_('neck', -0.4); legs(-0.2, 0.3, -0.2, 0.3, 0.15); break; }      /* chest pound, head back */
+        case 'shrug': S_('shR', -0.5, 0, -0.9); S_('elR', -1.6); S_('wrR', -1.0); S_('shL', -0.5, 0, 0.9); S_('elL', -1.6); S_('wrL', -1.0); S_('neck', 0, 0, s * 0.1); S_('chest', -0.05); break;
+        case 'floor': { const b2 = Math.max(0, Math.sin(t * 10)); legs(-0.9, 1.2, -0.9, 1.2, 0.2); p.y = -0.3; S_('spine', 0.6); S_('neck', -0.5); S_('shR', -0.9 - b2 * 0.2, 0, -0.2); S_('shL', -0.9 - b2 * 0.2, 0, 0.2); S_('elR', -0.3); S_('elL', -0.3); S_('wrR', 0.8); S_('wrL', 0.8); break; }      /* slaps the floor */
+        case 'wag': armsDown(); S_('shR', -1.9, 0, -0.1); S_('elR', -1.2); S_('wrR', 0, 0, s * 0.7); S_('neck', 0, s * 0.2, 0); S_('chest', -0.06); break;      /* finger wag: not in here */
+        case 'airflex': S_('shR', -0.2, 0, -1.55); S_('elR', -2.3); S_('shL', -0.2, 0, 1.55); S_('elL', -2.3); S_('wrR', -0.6); S_('wrL', -0.6); S_('chest', -0.25); S_('neck', -0.35); S_('hpR', -0.9, 0, -0.15); S_('knR', 1.5); S_('hpL', -0.5, 0, 0.15); S_('knL', 1.2); break;      /* double bicep in the air, knees tucked */
         case 'salute': S_('shR', -0.7, 0, -1.25); S_('elR', -2.3); S_('wrR', 0.2); S_('shL', 0.05, 0, 0.08); S_('spine', -0.05); S_('chest', -0.08); S_('neck', -0.05); break;
         case 'count': S_('shR', -1.0, 0, 0.3); S_('elR', -1.4 + s * 0.3); S_('wrR', s * 0.8); S_('shL', -1.0, 0, -0.3); S_('elL', -1.4 - s * 0.3); S_('wrL', -s * 0.8); S_('chest', -0.1); S_('neck', 0.25); break;
         case 'eagle': S_('shR', 0, 0, -1.4 + s * 0.5); S_('shL', 0, 0, 1.4 - s * 0.5); S_('wrR', s * 0.5); S_('wrL', s * 0.5); S_('hpL', -1.2); S_('knL', 1.6); S_('chest', -0.2); S_('neck', -0.3); p.y = 0.03 * s; break;
@@ -560,7 +592,7 @@ function applyPose(R, p, dt) {
   for (const n in J) {
     const tg = p[n] || POSE.zero, c = C[n];
     c[0] += (tg[0] - c[0]) * k; c[1] += (tg[1] - c[1]) * k; c[2] += (tg[2] - c[2]) * k;
-    J[n].rotation.set(c[0], c[1], c[2]);
+    J[n].rotation.set(c[0] + (R.rest && R.rest[n] || 0), c[1], c[2]);
   }
   R.yOff += ((p.y || 0) - R.yOff) * k; J.hips.position.y = R.legLen + R.yOff;
   if (R.cape) R.cape.rotation.x = 0.12 + (R.capeSwing || 0);
@@ -569,8 +601,14 @@ function applyPose(R, p, dt) {
 POSE.zero = [0, 0, 0];
 
 // random streetballer for AI / hub NPCs
+// no two built-in players alike: a look is its hair, top, shorts and skin. Called for every AI in a game and on the Block.
+function uniqLook(b, used, tier) {
+  const sig = x => [x.worn.hair, x.worn.top, x.worn.bottom, x.build.skin].join('|'), tops = () => used.tops || (used.tops = new Set());
+  for (let k = 0; k < 24 && (used.has(sig(b)) || tops().has(b.worn.top + '|' + b.build.skin)); k++) { const w = randomWorn(tier === undefined ? 2 : tier); b.worn.top = w.top; b.worn.bottom = w.bottom; b.worn.hair = w.hair; b.worn.head = w.head; b.worn.shoes = w.shoes; b.worn.socks = w.socks; if (k > 10) b.build.skin = Math.floor(Math.random() * SKINS.length); }
+  used.add(sig(b)); tops().add(b.worn.top + '|' + b.build.skin); return b;
+}
 function randomWorn(tier, ragged) {
-  const pool = s => DRIP.filter(d => d.slot === s && d.r <= tier && d.kind !== 'eagle');
+  const pool = s => DRIP.filter(d => d.slot === s && d.r <= tier && d.kind !== 'eagle' && d.src !== 'deed' && d.src !== 'nexx');
   const w = {}; for (const [s] of SLOTS) { const p = pool(s); w[s] = p.length ? pick(p).id : null; }
   if (ragged) { w.top = 't_tank'; w.bottom = 'b_camo'; w.shoes = 'k_beat'; w.head = RNG() < 0.3 ? 'hd_crown' : 'hd_none'; w.back = 'bk_none'; w.arm = 'a_none'; }
   return w;

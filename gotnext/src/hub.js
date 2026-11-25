@@ -6,6 +6,7 @@ function worldPlayerRig() {
   W.me.rig = makeRig(myBuild()); scene.add(W.me.rig.root);
 }
 function addNpc(build, x, z, face, anim, extra) {
+  if (W && !build.bot && !(extra && (extra.cast || extra.still || extra.low)) && !build.keepLook && build.worn && build.worn.top) uniqLook(build, W.looks || (W.looks = new Set()), 2);
   const r = makeRig(build, !!(extra && extra.low)); r.root.position.set(x, 0, z); r.root.rotation.y = face; scene.add(r.root);
   const n = Object.assign({ rig: r, name: build.name, x, z, face, anim: anim || 'idle', ph: rnd(0, 6), hx: x, hz: z, tx: x, tz: z, wt: rnd(1, 5) }, extra || {}); if (n.anim === 'ball') { n.ball = makeBall(pick(['bl_std', 'bl_rwb', 'bl_neon'])); scene.add(n.ball); } W.npcs.push(n); return n;
 }
@@ -396,6 +397,7 @@ function worldStep(dt) {
   const cb = W.camBox, blocked = (x, z) => (cb && (x < cb[0] || x > cb[1] || z < cb[2] || z > cb[3])) || W.solids.some(s => x > s[0] + 0.25 && x < s[1] - 0.25 && z > s[2] + 0.25 && z < s[3] - 0.25);
   for (let b = back; b > 0.9; b -= 0.4) { cx = me.x - fx * b; cz = me.z - fz * b; lift = (back - b) * 0.42; let ok = true; for (let t = 1.0; t <= b; t += 0.6) if (blocked(me.x - fx * t, me.z - fz * t)) { ok = false; break; } if (ok && !blocked(cx, cz)) break; }
   if (W.kind === 'crib') { cx = clamp(cx, W.bounds[0] - 6, W.bounds[1] + 6); cz = clamp(cz, W.bounds[2] - 1, W.bounds[3] + 6); }
+  if (W.camO) { camera.position.lerp(W.camO.p, 1 - Math.exp(-5 * dt)); camera.lookAt(W.camO.l); return; }      /* watching the bones */
   if (W.look) {   // shop / closet: swing round to look at your drip
     const mfx = Math.sin(me.face), mfz = Math.cos(me.face), sx = mfz, sz = -mfx;
     if (portrait) { _v.set(me.x + mfx * 5.6, 0.6, me.z + mfz * 5.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(me.x, -0.6, me.z); }

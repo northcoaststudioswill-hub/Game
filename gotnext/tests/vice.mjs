@@ -16,22 +16,24 @@ r = await p.evaluate(() => { const P = __pit; return [P.bonesHand([6, 6, 6, 6, 6
 ok(r.join() === '7,5,4,1', `poker bones hands rank: five of a kind ${r[0]}, full house ${r[1]}, straight ${r[2]}, pair ${r[3]}`);
 // --- a hand of each game at Trey's ---
 r = await p.evaluate(() => { const P = __pit, W = P.W; return { holo: (W.holo || []).length, trey: W.spots.some(s => /TREY/.test(s.label)), aaron: W.spots.some(s => /AARON/.test(s.label)), erin: W.spots.some(s => /ERIN/.test(s.label)) }; });
-ok(r.holo === 7 && r.trey && r.aaron && !r.erin, `the Block: ${r.holo} holodice round Trey's table; the stand is AARON'S (no "Erin" on screen: ${!r.erin})`);
+ok(r.holo === 16 && r.trey && r.aaron && !r.erin, `the Block: ${r.holo} holodice at Trey's table (eight yours, eight his); the stand is AARON'S (no "Erin" on screen: ${!r.erin})`);
 await p.evaluate(() => { __pit.S.vc = 5000; __pit.uiBones(false); window.__tick(2); });
 const vc0 = await p.evaluate(() => __pit.S.vc);
-await btn('PLAY · 50'); let bl = await btns(); ok(bl.includes('ROLL') && bl.some(t => t.startsWith('STAND ON')), `Thirteen: ${bl.filter(t => t !== '✕').join(' · ')}`);
-for (let i = 0; i < 12 && await btn('ROLL'); i++) { const s = await p.evaluate(() => { const m = document.querySelector('#panel .pb').textContent.match(/YOU · (\d+)/); return m ? +m[1] : 99; }); if (s >= 10) { await btn('STAND ON'); break; } }
-r = await p.evaluate(() => ({ vc: __pit.S.vc, v: __pit.vice().bones, done: /AGAIN/.test(document.querySelector('#panel').textContent) }));
-ok(r.done && Math.abs(r.vc - vc0) % 50 === 0 && r.v === r.vc - vc0, `a hand of Thirteen settles: ${r.vc - vc0 >= 0 ? '+' : ''}${r.vc - vc0} VC, tracked for today (${r.v})`);
-await btn('OTHER GAMES'); await p.evaluate(() => { Array.from(document.querySelectorAll('#panel .card')).find(c => /POKER BONES/.test(c.textContent)).querySelector('.btn').click(); window.__tick(2); });
-r = await p.evaluate(() => { const d = document.querySelectorAll('#panel span[data-k]'); const held = Array.from(d).filter(x => x.dataset.k !== ''); if (held[0]) held[0].click(); window.__tick(2); return held.length; });
-await btn('THROW THE REST'); const pk = await p.evaluate(() => document.querySelector('#panel .card.sel p').textContent);
-ok(r === 5 && /against/.test(pk), `Poker Bones: five dice to hold, then "${pk}"`);
-await btn('OTHER GAMES'); await p.evaluate(() => { Array.from(document.querySelectorAll('#panel .card')).find(c => /HIGH BONES/.test(c.textContent)).querySelector('.btn').click(); window.__tick(2); });
-bl = await btns(); await btn('PRESS'); const hb = await p.evaluate(() => document.querySelector('#panel .card.sel p').textContent);
+const table = () => p.evaluate(() => { const T = __pit.W.bones; window.__tick(90); return { on: T.on, you: T.you.filter(h => h.val && h.sp.visible).map(h => h.val), him: T.him.filter(h => h.val && h.sp.visible).map(h => h.val), cam: !!__pit.W.camO, side: document.getElementById('panel').className }; });
+await btn('THIRTEEN'); let bl = await btns(); let tb = await table();
+ok(bl.includes('ROLL') && bl.some(t => t.startsWith('STAND ON')) && tb.on && tb.you.length === 1 && tb.cam && tb.side === 'clear', `Thirteen is played on the table: your first die shows ${tb.you[0]} on a holodice, the camera is on the table, the menu is a slim bar (${bl.join(' · ')})`);
+for (let i = 0; i < 12 && await btn('ROLL'); i++) { const s = await p.evaluate(() => { const m = document.querySelector('#panel h3').textContent.match(/YOU (\d+)/); return m ? +m[1] : 99; }); if (s >= 11) { await btn('STAND ON'); break; } }
+tb = await table(); r = await p.evaluate(() => ({ vc: __pit.S.vc, v: __pit.vice().bones, done: /AGAIN/.test(document.querySelector('#panel').textContent) }));
+ok(r.done && Math.abs(r.vc - vc0) % 50 === 0 && r.v === r.vc - vc0 && tb.you.length >= 2, `the hand settles on the dice: yours ${tb.you.join('+')}, Trey's ${tb.him.join('+') || '—'} → ${r.vc - vc0 >= 0 ? '+' : ''}${r.vc - vc0} VC`);
+await btn('OTHER GAMES'); await btn('POKER BONES'); tb = await table(); bl = await btns();
+await p.evaluate(() => { Array.from(document.querySelectorAll('#panel .btn'))[0].click(); window.__tick(2); }); const held = await p.evaluate(() => __pit.W.bones.you.filter(h => h.held).length);
+await btn('THROW THE REST'); const pk = await p.evaluate(() => document.querySelector('#panel .card.sel p').textContent); const tb2 = await table();
+ok(tb.you.length === 5 && held === 1 && tb2.him.length === 5 && /against/.test(pk), `Poker Bones: five dice on your row, the one you keep lifts and turns green, Trey's five land: "${pk}"`);
+await btn('OTHER GAMES'); await btn('HIGH BONES'); bl = await btns(); await btn('PRESS'); const hb = await p.evaluate(() => document.querySelector('#panel .card.sel p').textContent);
 ok(bl.some(t => t.startsWith('PRESS')) && /against/.test(hb), `High Bones: stand or press, then "${hb}"`);
-await p.screenshot({ path: path.join(dir, 'shots', 'bones.png'), timeout: 300000 });
-r = await p.evaluate(() => { const P = __pit; P.vice().bones = 1500; P.uiBones(false); window.__tick(2); document.querySelector('#panel .card .btn'); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent.startsWith('PLAY')).click(); window.__tick(2); const t = document.querySelector('#panel .card.sel p').textContent; P.vice().bones = 0; return t; });
+await p.evaluate(() => window.__tick(60)); await p.screenshot({ path: path.join(dir, 'shots', 'bones.png'), timeout: 300000 });
+r = await p.evaluate(() => { __pit.uiClose(); window.__tick(3); const T = __pit.W.bones; return { on: T.on, cam: !!__pit.W.camO }; }); ok(!r.on && !r.cam, 'leaving the table clears the dice and gives the camera back');
+r = await p.evaluate(() => { const P = __pit; P.vice().bones = 1500; P.uiBones(false); window.__tick(2); Array.from(document.querySelectorAll('#panel .btn')).find(b => b.textContent === 'THIRTEEN').click(); window.__tick(2); const t = document.querySelector('#panel .card.sel p').textContent; P.vice().bones = 0; return t; });
 ok(/cleaned me out/.test(r), `up 1,500 in a day and Trey closes: "${r.slice(0, 44)}…"`);
 // --- the book ---
 await p.evaluate(() => { const P = __pit; P.S.vc = 3000; P.uiClose(); P.uiBook(); window.__tick(2); });

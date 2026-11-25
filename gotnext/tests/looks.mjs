@@ -1,0 +1,20 @@
+// No two AI players alike, the crossover drip, and the earned pieces. node tests/looks.mjs
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 960, height: 540 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
+await p.goto('file://' + path.resolve(dir, '..', 'index.html')); await p.evaluate(() => window.__tick(60));
+await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => window.__tick(10));
+let r = await p.evaluate(() => { const W = __pit.W, sig = n => [n.rig.spec.worn.hair, n.rig.spec.worn.top, n.rig.spec.worn.bottom, n.rig.spec.build.skin].join('|'); const ppl = W.npcs.filter(n => !n.cast && !n.low && n.rig.spec.worn && !n.bum); const s = ppl.map(sig); return { n: s.length, uniq: new Set(s).size }; });
+ok(r.uniq === r.n, `the Block: ${r.n} ordinary people, ${r.uniq} different looks`);
+r = await p.evaluate(() => { const P = __pit; let dup = 0, tot = 0; for (let g = 0; g < 12; g++) { if (P.MT) P.MT.cfg.onEnd = () => {}; P.uiClose(); P.launchGame(P.MODES[g % 2 ? 1 : 3], P.TIERS_COURT[g % 4], { mates: [-1, -1], rival: -1, p2: 'off' }); window.__tick(3); const s = P.MT.P.filter(q => !q.user).map(q => [q.b.worn.hair, q.b.worn.top, q.b.worn.bottom, q.b.build.skin].join('|')), t = P.MT.P.filter(q => !q.user).map(q => q.b.worn.top + '|' + q.b.build.skin); tot += s.length; dup += s.length - new Set(s).size + (t.length - new Set(t).size); } P.MT.cfg.onEnd = () => {}; return { dup, tot }; });
+ok(r.dup === 0, `12 games of 3v3: ${r.tot} AI players, ${r.dup} twins (same look, or same top on the same skin)`);
+r = await p.evaluate(() => { const P = __pit, D = P.ev('DRIP'); const cross = D.filter(d => /Flow Pros|Sunkeep|Lantern|Knockout|Cinderwell|Guttercrown|Sproutwild|Patch|Gilded|Dedrick|Gutter|Sprout|Wisp|Valve|Bank Seven|Yukon|Lift Zero|Corbin|Cloak|Erin|Syndicate|Tier Six|Soot|Clanker|Iron Dome|Good Boys|Garden|Van Shades/.test(d.n)), deed = D.filter(d => d.src === 'deed'); return { cross: cross.length, cost: cross.reduce((a, d) => a + d.cost, 0), deed: deed.map(d => d.n), total: D.length }; });
+ok(r.cross >= 34 && r.deed.length === 3, `${r.cross} pieces from the other games (${r.cost.toLocaleString()} VC to buy them all), ${r.deed.length} that can only be earned: ${r.deed.join(', ')}; ${r.total} pieces of drip in all`);
+r = await p.evaluate(() => { const P = __pit; P.uiClose(); P.S.owned = P.S.owned.filter(x => x !== 'f_dead13'); P.call('deedDrip', 'f_dead13', 'test'); const a = P.S.owned.includes('f_dead13'); P.ev("uiShop()"); window.__tick(2); const shopHas = /Dead-On/.test(document.getElementById('panel').textContent); P.uiClose(); return { a, shopHas }; });
+ok(r.a && !r.shopHas, 'an earned piece lands in the closet and is not for sale');
+await p.evaluate(() => { const P = __pit; if (P.MT) P.MT.cfg.onEnd = () => {}; P.uiClose(); P.enterWorld('hub', -11.5, 4.6, Math.PI); window.__tick(60); document.querySelectorAll('#emobar,#whud,#keys,#toasts,#prompt').forEach(e => e.style.visibility = 'hidden'); });
+await p.screenshot({ path: path.join(dir, 'shots', 'trey.png'), timeout: 300000 });
+console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close();

@@ -249,7 +249,7 @@ function netSnapshot(end) {
   const s = { q: ++G.q, ph: M_.phase, sc: M_.score, ck: r2(M_.clock), of: M_.off, nc: M_.needClear ? 1 : 0, ev: G.ev,
     P: M_.P.map(p => {
       const a = [r2(p.x), r2(p.z), r2(p.y), r2(p.face), ST_CODES.indexOf(p.st), r2(p.t), (p.handsUp ? 1 : 0) | (p.sprinting ? 2 : 0) | (p.bravT > 0 ? 4 : 0) | (p.fire ? 8 : 0) | (p.hand === 'L' ? 16 : 0) | (p.st === 'shoot' && p.shot.released ? 32 : 0) | (p.live === 'hold' || p.live === 'dead' ? 64 : 0), Math.round(p.stam), r2(p.brav)];
-      if (p.st === 'shoot') a.push(r2(p.shot.rel), p.shot.fade ? 1 : 0, p.shot.side || 0); else if (p.st === 'finish') { const f = p.finish; a.push(f.type === 'dunk' ? 1 : 0, r2(f.dur), f.spin, f.type === 'dunk' ? f.style : f.kind, r2(f.turn || 0), f.euro || 0, (f.cont ? 1 : 0) | (f.blocked ? 2 : 0) | (f.hit ? 4 : 0)); } else if (p.st === 'move') a.push(r2(p.mv.dx), ['side', 'back', 'diag'].indexOf(p.mv.slot), p.mv.mv.dur, p.mv.mv.id); else if (p.st === 'hop') a.push(r2(p.hop.dur)); else if (p.st === 'stagger') a.push(p.stg.fall ? 1 : 0, p.stg.side === undefined ? 1 : p.stg.side, r2(p.stg.dur || 1));
+      if (p.st === 'shoot') a.push(r2(p.shot.rel), p.shot.fade ? 1 : 0, p.shot.side || 0); else if (p.st === 'finish') { const f = p.finish; a.push(f.type === 'dunk' ? 1 : 0, r2(f.dur), f.spin, f.type === 'dunk' ? f.style : f.kind, r2(f.turn || 0), f.euro || 0, (f.cont ? 1 : 0) | (f.blocked ? 2 : 0) | (f.hit ? 4 : 0)); } else if (p.st === 'move') a.push(r2(p.mv.dx), ['side', 'back', 'diag'].indexOf(p.mv.slot), p.mv.mv.dur, p.mv.mv.id); else if (p.st === 'hop') a.push(r2(p.hop.dur)); else if (p.st === 'stagger') a.push(p.stg.fall ? 1 : 0, p.stg.side === undefined ? 1 : p.stg.side, r2(p.stg.dur || 1), p.stg.kind || '');
       return a;
     }),
     B: [BSTATES.indexOf(B.state), r2(B.pos.x), r2(B.pos.y), r2(B.pos.z), B.holder ? B.holder.i : -1, B.green ? 1 : 0, B.shooter && B.shooter.fire ? 1 : 0] };
@@ -304,7 +304,7 @@ function netGuestStep(dt) {
       else if (st === 'finish') { const k = String(a[12] || ''); p.finish = { type: a[9] ? 'dunk' : 'layup', dur: +a[10] || 0.6, style: a[9] && (DUNK[k]) ? k : p.b.moves.dunk, kind: a[9] ? '' : (FINISHES.find(x => x.id === k) ? k : 'lay'), spin: a[11] | 0, turn: +a[13] || 0, euro: +a[14] || 0, cont: a[15] & 1, blocked: !!(a[15] & 2), hit: a[15] & 4 ? 1 : null }; }
       else if (st === 'move') p.mv = { dx: +a[9] || 0, slot: ['side', 'back', 'diag'][a[10]] || 'side', mv: { dur: +a[11] || 0.35, id: MOVE[a[12]] ? String(a[12]) : 'cross' } };
       else if (st === 'hop') p.hop = { dur: +a[9] || HOP_T };
-      else if (st === 'stagger') p.stg = { fall: !!a[9], side: clamp(+a[10] || 0, -1, 1), dur: clamp(+a[11] || 1, 0.3, 5) };
+      else if (st === 'stagger') p.stg = { fall: !!a[9], side: clamp(+a[10] || 0, -1, 1), dur: clamp(+a[11] || 1, 0.3, 5), kind: ['sit', 'face', 'flat', 'spin', 'knee'].includes(a[12]) ? a[12] : 'sit' };
       if (st !== 'finish' && st !== 'move') p.rig.extraYaw = 0;
     });
     B.state = BSTATES[s.B[0]] || 'loose'; B.tp = B.tp || V3(); B.tp.set(+s.B[1] || 0, +s.B[2] || 0, +s.B[3] || 0); B.holder = M_.P[s.B[4]] || null; B.green = !!s.B[5]; B.shooter = s.B[6] ? { fire: true } : null;
@@ -313,6 +313,8 @@ function netGuestStep(dt) {
       if (e.k === 'c') hudCall(String(e.b || ''), String(e.s || ''), cssCol(e.c), +e.d || 1.2);
       else if (e.k === 'f') { const p = M_.P[e.i]; if (p) hudFloat(p, String(e.t || ''), cssCol(e.c)); }
       else if (e.k === 'pu') puNet(e);
+      else if (e.k === 'cs') { const p = M_.P[e.i | 0]; if (p) p.celebStyle = String(e.s || '').slice(0, 14); }
+      else if (e.k === 'ta') { const p = M_.P[e.i | 0]; if (p) p.tauntT = 1.3; }
       else if (e.k === 'cr') crowdReact(String(e.p || ''), e.t === undefined ? undefined : e.t | 0, true);
       else if (e.k === 'ko') { const p = M_.P[e.i | 0]; if (p) p.ko = clamp(+e.d || 3, 0, 6); }
       else if (e.k === 'fb') { if (!e.to || e.to === NET.me) hudFb(String(e.t || ''), cssCol(e.c)); }

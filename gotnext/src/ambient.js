@@ -116,7 +116,7 @@ function ambientStep(dt, cam, me) {
     pa.needsUpdate = true;
     for (const s of AMB.splash) { s.t -= dt; if (s.t <= 0) { s.t = rnd(0.3, 0.7); s.m.position.set(cx + rnd(-9, 9), 0.02, cz + rnd(-12, 2)); } const k = 1 - s.t / 0.5; s.m.scale.setScalar(0.5 + k * 2); s.m.material.opacity = Math.max(0, 0.5 * (1 - k)); }
   }
-  if (AMB.bubs) AMB.bubs = AMB.bubs.filter(b => { b.t -= dt; const p = b.obj.position; _v.set(p.x, p.y + b.h, p.z).project(camera); if (b.t <= 0 || !b.obj.parent) { b.el.remove(); return false; } b.el.style.display = _v.z > 1 ? 'none' : ''; const [sx, sy] = project(p.x, p.y + b.h, p.z); b.el.style.left = sx + 'px'; b.el.style.top = sy + 'px'; b.el.style.opacity = b.t > 0.3 ? 1 : b.t / 0.3; return true; });
+  if (AMB.bubs) AMB.bubs = AMB.bubs.filter(b => { b.t -= dt; const p = b.obj.position; _v.set(p.x, p.y + b.h, p.z).project(camera); if (b.t <= 0 || !b.obj.parent) { b.el.remove(); return false; } const [sx, sy] = project(p.x, p.y + b.h, p.z), far = me ? Math.hypot(p.x - me.x, p.z - me.z) > 11 : false; b.el.style.display = _v.z > 1 || far || sy < 30 || sx < -40 || sx > innerWidth + 40 ? 'none' : ''; b.el.style.left = clamp(sx, 118, innerWidth - 118) + 'px'; b.el.style.top = Math.max(60, sy) + 'px';      /* kept on screen; nobody is heard from across the Block */ b.el.style.opacity = b.t > 0.3 ? 1 : b.t / 0.3; return true; });
   // speech bubbles
   if (AMB.npcs && AMB.lines && me) {
     AMB.talkT -= dt;

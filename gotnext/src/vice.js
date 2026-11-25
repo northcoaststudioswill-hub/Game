@@ -37,8 +37,23 @@ function holodiceMesh(g) {
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: holoNumTex(1 + Math.floor(Math.random() * 6)), transparent: true, depthWrite: false })); sp.scale.setScalar(0.26); sp.position.y = 1.02; g.add(sp); g.userData.holo = sp;
   if (typeof W !== 'undefined' && W) (W.holo = W.holo || []).push({ sp, t: rnd(2, 9), roll: 0 }); return g;
 }
-function holoStep(dt) { if (!W || !W.holo) return; for (const h of W.holo) { if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; if (h.ft <= 0) { h.ft = 0.07; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 14)) * 0.05; } else { h.t -= dt; h.sp.position.y = 1.02; if (h.t <= 0) { h.t = rnd(4, 12); h.roll = 0.7; } } } }
+function holoStep(dt) { if (!W || !W.holo) return; if (W.bones && W.bones.on && !(UI.cur && UI.cur.onClose)) bonesLeave(); const play = W.bones && W.bones.on;
+  for (const h of W.holo) {
+    if (h.table && play) {      // a die in play: flickers while it rolls, then shows its number; empty places are dark
+      if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; h.sp.visible = true; if (h.ft <= 0) { h.ft = 0.06; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 16)) * 0.07; if (h.roll <= 0 && h.val) { h.sp.material.map = holoNumTex(h.val); sfx('ui'); } }
+      else { h.sp.visible = h.val > 0; h.sp.position.y = 1.02 + (h.held ? 0.08 : 0); h.sp.material.color.setHex(h.held ? 0x7dffb0 : 0xffffff); h.sp.scale.setScalar(h.held ? 0.32 : 0.28); }
+      continue; }
+    h.sp.visible = true; h.sp.material.color.setHex(0xffffff);
+    if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; if (h.ft <= 0) { h.ft = 0.07; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 14)) * 0.05; } else { h.t -= dt; h.sp.position.y = 1.02; if (h.t <= 0) { h.t = rnd(4, 12); h.roll = 0.7; } } }
+}
+// put a game's dice on the table: a place whose number changed rolls first (his a beat after yours)
+function bonesSync(you, him, hold) { const T = W && W.bones; if (!T) return; T.on = true; const set = (row, vals, delay) => row.forEach((h, i) => { const v = vals[i] || 0, hd = !!(hold && hold[i] && row === T.you); if (v !== h.val) { h.val = v; h.roll = v ? 0.45 + delay + i * 0.05 : 0; } h.held = hd; }); set(T.you, you.slice(-8), 0); set(T.him, him.slice(-8), 0.35); }
+function bonesBusy() { const T = W && W.bones; return !!(T && T.on && T.you.concat(T.him).some(h => h.roll > 0)); }
+function bonesLeave() { const T = W && W.bones; if (!T) return; T.on = false; for (const h of T.you.concat(T.him)) { h.val = 0; h.held = false; h.roll = 0; } W.camO = null; }
 function holoRollAll() { if (W && W.holo) for (const h of W.holo) h.roll = rnd(0.5, 0.9); }
+
+// drip you cannot buy: earned by doing the thing
+function deedDrip(id, why) { if (S.owned.includes(id)) return; S.owned.push(id); save(); setTimeout(() => { toast('UNLOCKED: ' + DRIPS[id].n.toUpperCase(), why + '. It is in your closet.', 'ach'); sfx('unlock'); }, 1200); }
 
 // ---------------- daily limits ----------------
 const VICE_CAP = { bones: 1500, book: 2500 };
@@ -91,7 +106,7 @@ function uiBones(home) {
   const act = a => {
     const T = BONES[G.game] && BONES[G.game].target;
     if (G.game === 't13' || G.game === 't21') {
-      if (a === 'roll') { G.you.push(d6()); const y = sum(G.you); sfx('ui'); if (y > T) { G.msg = say('bust'); settle(-1); } else if (y === T) { G.msg = say('dead'); settle(1, 2); } else G.msg = say('roll'); }
+      if (a === 'roll') { G.you.push(d6()); const y = sum(G.you); sfx('ui'); if (y > T) { G.msg = say('bust'); settle(-1); } else if (y === T) { G.msg = say('dead'); settle(1, 2); if (T === 13) deedDrip('f_dead13', 'Hit a dead 13'); } else G.msg = say('roll'); }
       else if (a === 'stand') treyTotals();
     } else if (G.game === 'poker') {
       if (a === 'throw') { G.you = G.you.map((v, i) => G.hold[i] ? v : d6()); let h = [d6(), d6(), d6(), d6(), d6()]; const k = treyHolds(h); h = h.map((v, i) => k[i] ? v : d6()); G.him = h;
@@ -102,7 +117,18 @@ function uiBones(home) {
     }
     rerender();
   };
+  const bar = () => {
+    bonesSync(G.phase === 'pick' ? [] : G.you, G.phase === 'pick' ? [] : G.him, G.game === 'poker' && G.phase === 'you' ? G.hold : null);
+    const T = W.bones, pt = innerWidth < innerHeight; W.camO = { p: new THREE.Vector3(T.cx + 0.2, pt ? 5.6 : 3.7, T.cz + (pt ? 8.2 : 5.6)), l: new THREE.Vector3(T.cx, 0.1, T.cz + 1.1) };
+    const tot = G.phase !== 'pick' && G.game !== 'poker' && G.you.length ? ` · YOU ${sum(G.you)}${G.him.length ? ' · TREY ' + sum(G.him) : ''}` : '';
+    let h = `<div style="flex:1"></div><div class="card sel" style="max-width:720px;margin:0 auto;width:100%"><div class="row"><h3 class="mono" style="font-size:10px;color:var(--heat)">TREY${G.phase !== 'pick' ? ' · ' + BONES[G.game].n + ' · ' + G.bet + ' VC' + tot : ''}</h3>${vcLine()}</div><p style="font-size:14px;margin:6px 0 8px">${esc(G.msg)}</p><div class="pf" style="flex-wrap:wrap;gap:6px">`;
+    if (G.phase === 'pick') h += stakes.map(s => Btn(s + '', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join('') + Object.keys(BONES).map(id => Btn(BONES[id].n, () => start(id), 'sm', S.vc < G.stake)).join('') + Btn('LEAVE', uiClose, 'sm alt');
+    else if (G.phase === 'you') h += (G.game === 'poker' ? G.you.map((v, i) => Btn((G.hold[i] ? 'KEEP ' : '') + v, () => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }, 'sm ' + (G.hold[i] ? '' : 'alt'))).join('') + Btn('THROW THE REST', () => act('throw'), 'sm') : G.game === 'high' ? Btn('STAND', () => act('stand'), 'sm') + Btn('PRESS (' + G.bet * 2 + ')', () => act('press'), 'sm alt', S.vc < G.bet * 2) : Btn('ROLL', () => act('roll'), 'sm') + Btn('STAND ON ' + sum(G.you), () => act('stand'), 'sm alt'));
+    else h += `<b class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin-right:8px">${G.won > 0 ? '+' + G.won : G.won} VC</b>` + Btn('AGAIN · ' + G.stake, () => start(G.game), 'sm', S.vc < G.stake) + Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'sm alt') + Btn('LEAVE', uiClose, 'sm alt');
+    return h + `</div>${G.phase === 'pick' ? `<p class="mu" style="margin-top:6px;font-size:11px">${Object.values(BONES).map(b => b.n + ': ' + b.d).join(' ')}</p>` : ''}</div><div style="height:4%"></div>`;
+  };
   openPanel(() => {
+    if (!home && W && W.bones) return bar();
     const V = vice(); let h = `<div class="ph"><h2>${home ? 'BONES AT HOME' : "TREY'S BONES"}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><div class="card sel"><h3 class="mono" style="font-size:10px;color:var(--heat)">${host}</h3><p style="font-size:15px;margin:6px 0">${esc(G.msg)}</p></div>`;
     if (G.phase === 'pick') {
       h += `<div class="cat">STAKE</div><div class="card">` + stakes.map(s => Btn(s + ' VC', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join(' ') + `</div><div class="cat">GAME</div>`;
@@ -116,7 +142,8 @@ function uiBones(home) {
       else h += `<p class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin:8px 0">${G.won > 0 ? '+' + G.won : G.won} VC</p><div class="pf">${Btn('AGAIN · ' + G.stake, () => start(G.game), '', S.vc < G.stake)}${Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'alt')}</div>`;
     }
     return h + `</div>`;
-  }, 'side', () => uiClose());
+  }, !home && W && W.bones ? 'clear' : 'side', () => uiClose());
+  if (!home && W && W.bones) UI.cur.onClose = bonesLeave;
 }
 
 // ---------------- MARK'S BOOK ----------------
@@ -148,7 +175,7 @@ function bkFinish(gi, r) { const B = book(), g = B.slate.games[gi]; g.res = r; s
 function bkSettle() {
   const B = book(), sl = B.slate.slip; if (!sl || sl.done) return; const gs = B.slate.games; if (sl.legs.some(L => !gs[L.g].res)) return;
   const won = sl.legs.every(L => bkLegWon(gs[L.g], L)); sl.done = true; sl.won = won; const pay = won ? Math.round(sl.stake * sl.odds) : 0; sl.pay = pay;
-  if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; } else { B.l++; B.net -= sl.stake; }
+  if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; if (sl.legs.length >= 3) deedDrip('hd_bookie', 'Cashed a 3-leg parlay'); } else { B.l++; B.net -= sl.stake; }
   save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} VC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
 }
 function bkBuilds(t) { return t.ps.map(p => { const b = withSeed(p.seed, () => aiBuild(p.ovr, p.style)); b.name = p.n; return { b, ctrl: -1, ai: clamp((p.ovr - 50) / 45, 0.3, 1) }; }); }
@@ -188,14 +215,16 @@ function uiBook() {
 
 // ---------------- on the Block ----------------
 function viceInit() {
-  const cx = -10, cz = 5, g = grp(scene, cx, 0, cz);
+  const cx = -12.9, cz = -0.2, g = grp(scene, cx, 0, cz);      /* against the west wall, between The Lab and the crib door: clear ground */
   ink(M(cyl(0.9, 0.9, 0.08, 16), toon('#1f6a3a'), 0, 0.78, 0, g), 1.03); ink(M(cyl(0.16, 0.3, 0.76, 8), toon('#2a2c33'), 0, 0.38, 0, g), 1.04);
-  for (let i = 0; i < 7; i++) { const a = -0.6 + i * (Math.PI + 1.2) / 6 + Math.PI / 2, h = grp(g, Math.cos(a) * 1.7, 0, Math.sin(a) * 1.7); holodiceMesh(h); }
+  // sixteen holodice: your eight in front of the felt, Trey's eight behind it. The game is played on these.
+  const T = W.bones = { you: [], him: [], cx, cz, on: false };
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 8; i++) { const h = grp(g, (i - 3.5) * 0.46, 0, r === 0 ? 1.25 : -1.0); holodiceMesh(h); const e = W.holo[W.holo.length - 1]; e.table = true; e.val = 0; (r === 0 ? T.you : T.him).push(e); }
   const sg = sign("TREY'S BONES", 2.2, 0.4, '#ffb347', '#0a0a0e', { border: false }); sg.position.set(0, 2.5, -1.9); g.add(sg); for (const sx of [-1.1, 1.1]) M(cyl(0.03, 0.03, 2.5, 5), toon('#2a2c33'), sx, 1.25, -1.9, g);
-  solid(cx - 0.9, cx + 0.9, cz - 0.9, cz + 0.9);
+  solid(cx - 2.0, cx + 2.0, cz - 1.3, cz + 1.5);
   const tb = withSeed(3003, () => aiBuild(70, 'general')); tb.name = 'TREY'; tb.worn = Object.assign(randomWorn(3), { head: 'hd_cap', face: 'f_shades', top: 't_hoodie' }); const n = addNpc(tb, cx, cz - 1.5, 0, 'idle', { still: true }); n.cast = 'trey'; n.amb = 'cross'; if (W.cast) W.cast.list.push(n);
   CAST_LINES.trey = TREY.hello.concat(['The dice are honest. I am merely charming.']);
-  spot(cx, cz + 1.6, 1.8, "TREY'S BONES (dice)", () => uiBones(false));
+  spot(cx, cz + 2.3, 1.8, "TREY'S BONES (dice)", () => uiBones(false));
 }
 
 // ---------------- at home ----------------

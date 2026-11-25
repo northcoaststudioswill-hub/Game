@@ -375,6 +375,9 @@ const CELEBS = [
   { id: 'salute', n: 'Salute The Flag', cost: 500, rank: 1 },
   { id: 'count', n: 'Count The VC', cost: 1500, rank: 2 },
   { id: 'eagle', n: 'Freedom Eagle', cost: 3000, rank: 4 },
+  { id: 'shrug', n: 'The Shrug', cost: 400, rank: 0 }, { id: 'shh', n: 'Quiet, Please', cost: 700, rank: 1 }, { id: 'pound', n: 'Chest Pound', cost: 900, rank: 1 },
+  { id: 'pout', n: 'The Pout', cost: 1200, rank: 2 }, { id: 'rock', n: 'Rock The Baby', cost: 1800, rank: 2 }, { id: 'nightnight', n: 'Night Night', cost: 2400, rank: 3 },
+  { id: 'toosmall', n: 'Too Small', cost: 2800, rank: 3 }, { id: 'floor', n: 'Slap The Floor', cost: 2000, rank: 3 }, { id: 'stare', n: 'The Stare Down', cost: 3500, rank: 4 }, { id: 'flexdown', n: 'Crab Flex', cost: 4500, rank: 5 },
 ];
 
 // ---------- ranks (Respect) ----------
@@ -461,6 +464,47 @@ drip('socks', 's_flag', 'Bald Eagle Socks', 'high', '#2440a8', '#ff3c3c', 2, 900
 drip('socks', 's_neon', 'Glow Socks', 'high', '#33ff88', 0, 2, 1000, 3, { speed: 1 });
 // shoes
 drip('shoes', 'k_beat', 'Beaters', 'low', '#b9b9b9', '#666', 0, 0, 0, null, 'start');
+// THE CROSSOVER: gear from the crew's other games (Pocket Lantern, Sprouts, Sproutwild, Knockout, Patch & Plate,
+// Guttercrown, Sootborn). Sold at The Plug like everything else; the 'deed' ones are earned, never sold.
+drip('top', 't_flowpros', 'Flow Pros Work Shirt', 'tee', '#2a5ea8', '#f2c14e', 1, 700, 1, { str: 1 });
+drip('top', 't_sunkeep', 'Sunkeep Garden Tee', 'tee', '#4f8a3c', '#f3e6cf', 1, 600, 0, { stam: 1 });
+drip('top', 't_lantern', 'Pocket Lantern Hoodie', 'hoodie', '#1c2440', '#ffd76a', 2, 1900, 2, { iq: 1 });
+drip('top', 't_knockout', 'North Coast Knockout Jersey', 'jersey', '#c8102e', '#f4f4f4', 2, 2200, 3, { str: 1, intd: 1 });
+drip('top', 't_cinder', 'Cinderwell Soot Tank', 'tank', '#2b2b30', '#b8682a', 1, 800, 1);
+drip('top', 't_gutter', 'Guttercrown Syndicate Jersey', 'jersey', '#26204a', '#f0c95a', 3, 4200, 4, { steal: 1, handle: 1 });
+drip('top', 't_sprout', 'Sproutwild Trainer Jacket', 'hoodie', '#7ac74f', '#2a3440', 2, 2600, 3, { speed: 1 });
+drip('top', 't_patch', 'Patch & Plate Apron Tee', 'tee', '#e0452c', '#f3e6cf', 0, 350, 0);
+drip('top', 't_gilded', 'Gilded Assay Whites', 'jersey', '#f4f1e8', '#e9cf7a', 4, 9000, 6, { mid: 1, three: 1, iq: 1 });
+drip('head', 'hd_flowcap', 'Flow Pros Cap', 'cap', '#2a5ea8', '#f2c14e', 0, 300, 0);
+drip('head', 'hd_dedrick', 'Dedrick Widebrim', 'cap', '#26204a', '#f0c95a', 2, 1700, 2);
+drip('head', 'hd_gutter', 'The Gutter Crown', 'crown', '#f0c95a', '#26204a', 4, 12000, 6, { dunk: 1, swb: 1 });
+drip('head', 'hd_sprout', 'Sprout On Your Head', 'antenna', '#7ac74f', 0, 1, 900, 1);
+drip('head', 'hd_lantern', 'Lantern Halo', 'halo', '#ffd76a', 0, 3, 5200, 4, { iq: 1 });
+drip('head', 'hd_bibi', 'Iron Dome Headband', 'band', '#c8d0d8', 0, 1, 650, 1, { block: 1 });
+drip('face', 'f_gold', 'Gilded Eyes', 'visor', '#e9cf7a', 0, 3, 4800, 5, { iq: 1 });
+drip('face', 'f_clanker', 'Clanker Visor', 'visor', '#33e0ff', 0, 2, 2100, 3);
+drip('face', 'f_soot', 'Soot Rag', 'mask', '#3d5a6a', 0, 1, 500, 1);
+drip('face', 'f_derek', "D's Van Shades", 'shades', '#111', 0, 1, 450, 0);
+drip('arm', 'a_valve', 'Valve-Hand Wraps', 'sleeve', '#b8682a', 0, 2, 1500, 2, { steal: 1 });
+drip('arm', 'a_garden', 'Garden Gloves', 'wrist', '#7ac74f', 0, 0, 220, 0);
+drip('bottom', 'b_flow', 'Flow Pros Work Shorts', 'shorts', '#2a3440', '#f2c14e', 1, 550, 1);
+drip('bottom', 'b_cinder', 'Tier Six Cut-Offs', 'shorts', '#3d5a6a', '#b8682a', 1, 700, 1);
+drip('bottom', 'b_gutter', 'Syndicate Shorts', 'shorts', '#26204a', '#f0c95a', 3, 3600, 4, { speed: 1 });
+drip('bottom', 'b_sunkeep', 'Sunkeep Shorts', 'shorts', '#4f8a3c', '#f3e6cf', 0, 320, 0);
+drip('socks', 's_wisp', 'Wisplight Socks', 'high', '#6cf0ff', '#26204a', 2, 1300, 2);
+drip('socks', 's_soot', 'Soot-Line Socks', 'high', '#2b2b30', '#b8682a', 1, 400, 1);
+drip('shoes', 'k_wisp', 'Wispdice 6s', 'high', '#6cf0ff', '#26204a', 3, 5200, 4, { vert: 1, accel: 1 });
+drip('shoes', 'k_valve', 'Bank Seven Boots', 'high', '#5a3a22', '#b8682a', 2, 2400, 3, { str: 1, reb: 1 });
+drip('shoes', 'k_louie', 'Good Boys', 'low', '#d9853b', '#f3e6cf', 1, 950, 1, { speed: 1 });
+drip('shoes', 'k_yukon', 'Yukon XLs', 'high', '#1c1d22', '#c8d0d8', 2, 2800, 3, { str: 1 });
+drip('shoes', 'k_gilded', 'Lift Zero Golds', 'high', '#e9cf7a', '#f4f1e8', 4, 11000, 6, { speed: 1, vert: 1, accel: 1 });
+drip('back', 'bk_kiss', "Corbin's Cape", 'cape', '#ff4fd8', '#f4f4f4', 2, 2000, 2);
+drip('back', 'bk_white', 'The Cloak That Is Not Mine', 'cape', '#f4f1e8', '#e9cf7a', 4, 8500, 6, { dunk: 1, layup: 1 });
+drip('back', 'bk_sprouts', 'Sprout Pack', 'pack', '#7ac74f', '#5a3a22', 1, 1100, 1, { stam: 1 });
+drip('back', 'bk_towelwhip', "Erin's Towel Whip", 'towel', '#f3e6cf', 0, 1, 600, 1, { stam: 1 });
+drip('back', 'bk_washer', 'Washer On A Cord', 'towel', '#c8a24a', 0, 3, 0, 0, { layup: 1, iq: 1 }, 'deed');
+drip('head', 'hd_bookie', "The Bookie's Visor", 'cap', '#1f6a3a', '#f4f4f4', 3, 0, 0, { iq: 1 }, 'deed');
+drip('face', 'f_dead13', 'Dead-On Thirteens', 'shades', '#b3401a', 0, 3, 0, 0, { three: 1 }, 'deed');
 // NEXX SUPPLY: only Nexx sells these (cast.js)
 drip('top', 't_nexx', 'NEXX Studio Hoodie', 'hoodie', '#111216', '#7de3ff', 2, 1200, 0, { handle: 1, swb: 1 }, 'nexx');
 drip('head', 'hd_nexx', 'NEXX Snapback', 'cap', '#7de3ff', '#111216', 1, 450, 0, null, 'nexx');
@@ -1016,6 +1060,16 @@ function makeRig(spec, lowDetail) {
   const chestJ = grp(spine, 0, loH, 0); out(M(tgUp, toon(top.c), 0, upH / 2, 0, chestJ), 1.06);
   M(cyl(0.118 * wS, 0.118 * wS, 0.03, 10), toon(top.c2 || top.c), 0, 0.03, 0, spine).scale.z = 0.62;       // hem
   if (top.kind === 'jersey') { const st = M(box(shW * 1.5, 0.05, 0.02), toon(top.c2), 0, upH * 0.3, 0.105 * wS, chestJ); st.rotation.x = -0.12; }
+  // a human back instead of two stacked cans: rounded shoulder blades, the slope of the traps into the neck, a chest,
+  // the small of the back and a seat. With the rest curve below (R.rest) the spine reads as an S from the side.
+  { const tc = toon(top.c), bc = toon(bot.c);
+    M(sph(shW * 0.6, 10, 8), tc, 0, upH * 0.52, -0.05 * wS, chestJ).scale.set(1.3, 0.95, 0.5);            // upper back
+    M(sph(shW * 0.5, 10, 8), tc, 0, upH * 0.58, 0.05 * wS, chestJ).scale.set(1.45, 0.72, 0.45);          // chest
+    for (const sx of [-1, 1]) { const t = M(cyl(0.028 * lW, 0.05 * lW, shW * 0.62, 6), skin, sx * shW * 0.42, upH + 0.012, -0.012, chestJ); t.rotation.z = sx * 1.12; }      // traps
+    M(sph(0.105 * wS, 10, 8), tc, 0, loH * 0.5, 0.018, spine).scale.set(1.02, 1.5, 0.62);               // belly / small of the back fill
+    for (const sx of [-1, 1]) M(sph(0.072 * wS, 8, 6), bc, sx * 0.052 * wS, -0.045, -0.055, hips).scale.set(1, 1.05, 0.9);      // seat
+  }
+  R.rest = { spine: -0.07, chest: 0.13, neck: -0.09, head: 0.03 };      /* lumbar curve in, upper back out, head carried over the shoulders */
   const chest = grp(chestJ, 0, upH, 0);
   // neck + head
   const neck = grp(chest, 0, 0, 0); M(cyl(0.045 * P.limb, 0.05 * P.limb, 0.1 * P.neck, 8), skin, 0, 0.04 * P.neck, 0, neck);
@@ -1394,6 +1448,16 @@ function poseOf(anim, t, o) {
         S_('sh' + inn, -1.6 * e, 0, -so * 0.5 * e); S_('el' + inn, -0.6 * e - 0.2); S_('wr' + inn, 0.4 * e);
         p.rate = 24; break;
       }
+      if (o.fall && o.kind && o.kind !== 'sit') {      // other ways to go down: 'face' (forward onto the hands and chest), 'spin' (twisted round onto a hip), 'flat' (laid out on the back, arms wide), 'knee' (to one knee, a hand down)
+        const fT2 = 0.32, gT2 = Math.min(0.6, D * 0.4), f2 = sm(clamp(t / fT2, 0, 1)), g2 = sm(clamp((t - (D - gT2)) / gT2, 0, 1)), fl = -(L - 0.14), Q = { rate: 22 }; const Zq = (k, x, y, z) => { Q[k] = [x || 0, y || 0, z || 0]; };
+        if (o.kind === 'face') { Q.y = fl + 0.06; Zq('hips', 1.35); Zq('spine', 0.12); Zq('chest', -0.1); Zq('neck', -0.55); Zq('hpR', 0.15, 0, -0.12); Zq('hpL', 0.05, 0, 0.14); Zq('knR', 0.25); Zq('knL', 0.6); Zq('shR', -2.5, 0, -0.5); Zq('shL', -2.3, 0, 0.6); Zq('elR', -1.2); Zq('elL', -1.0); }
+        else if (o.kind === 'flat') { Q.y = fl + 0.02; Zq('hips', -1.45); Zq('spine', -0.05); Zq('neck', 0.2); Zq('hpR', 0.1, 0, -0.25); Zq('hpL', -0.25, 0, 0.3); Zq('knR', 0.2); Zq('knL', 0.9); Zq('shR', -0.3, 0, -1.35); Zq('shL', -0.2, 0, 1.4); Zq('elR', -0.3); Zq('elL', -0.5); }
+        else if (o.kind === 'spin') { Q.y = fl + 0.05; Zq('hips', -0.35, 1.2 * (sd || 1), 0.75 * (sd || 1)); Zq('spine', 0.25, 0.3 * (sd || 1), 0); Zq('neck', 0, -0.6 * (sd || 1), 0); Zq('hpR', -1.1, 0, -0.2); Zq('hpL', -0.5, 0, 0.3); Zq('knR', 1.5); Zq('knL', 0.9); Zq('shR', -0.9, 0, -0.9); Zq('shL', 0.6, 0, 0.5); Zq('elR', -0.7); Zq('elL', -0.3); }
+        else { Q.y = -0.42; Zq('hips', 0.25); Zq('spine', 0.4); Zq('chest', 0.15); Zq('neck', -0.35); Zq('hpR', -1.45); Zq('knR', 1.6); Zq('hpL', 0.05); Zq('knL', 1.75); Zq('anL', 0.5); Zq('shR', -0.9, 0, -0.2); Zq('elR', -0.4); Zq('shL', -0.4, 0, 0.3); Zq('elL', -1.0); }
+        const dr = {}; for (const k in Q) dr[k] = Array.isArray(Q[k]) ? Q[k].map(v => v * f2) : Q[k]; dr.y = Q.y * f2 * f2; dr.rate = 22;
+        const cr = { y: -0.38, rate: 22, hips: [0.2, 0, 0], hpR: [-1.3, 0, -0.1], hpL: [-1.3, 0, 0.1], knR: [1.9, 0, 0], knL: [1.9, 0, 0], anR: [-0.6, 0, 0], anL: [-0.6, 0, 0], spine: [0.45, 0, 0], chest: [0.15, 0, 0], neck: [-0.4, 0, 0], shR: [-0.6, 0, -0.2], shL: [-0.6, 0, 0.2], elR: [-0.8, 0, 0], elL: [-0.8, 0, 0] };
+        const A0 = t < fT2 ? dr : Q, A1 = g2 < 0.5 ? blendPose(A0, cr, g2 * 2) : blendPose(cr, poseOf('idle', t, {}), (g2 - 0.5) * 2); for (const k in A1) p[k] = A1[k]; p.rate = 22; break;
+      }
       // DOWN: legs go, he sits down hard on the side he bit to, posts a hand behind, watches the play, then gets up
       const fT = 0.3, gT = Math.min(0.55, D * 0.42), f = sm(clamp(t / fT, 0, 1)), g = sm(clamp((t - (D - gT)) / gT, 0, 1)), floor = -(L - 0.13);
       const post = sd === 0 ? 'both' : sd > 0 ? 'R' : 'L', other = sd > 0 ? 'L' : 'R';
@@ -1415,6 +1479,18 @@ function poseOf(anim, t, o) {
     case 'celeb': {
       const s = Math.sin(t * 9);
       switch (o.style) {
+        case 'flexdown': legs(-0.9, 1.3, -0.9, 1.3, 0.38); p.y = -0.3; S_('spine', 0.4); S_('chest', 0.1); S_('neck', -0.3); S_('shR', -0.6, 0, -0.9); S_('elR', -2.0 + s * 0.1); S_('shL', -0.6, 0, 0.9); S_('elL', -2.0 - s * 0.1); S_('wrR', -0.5); S_('wrL', -0.5); break;      /* crab flex, low, screaming at the floor */
+        case 'toosmall': legs(-0.8, 1.1, -0.6, 0.9, 0.16); p.y = -0.24; S_('spine', 0.7); S_('neck', -0.55); S_('shR', -0.75, 0, -0.1); S_('elR', -0.1); S_('wrR', 1.3 + s * 0.15); S_('shL', 0.1, 0, 0.2); S_('elL', -0.4); break;      /* hand flat by the knee: too small */
+        case 'stare': armsDown(); S_('spine', 0.1); S_('chest', 0.12); S_('neck', 0.45); S_('shR', 0.15, 0, -0.25); S_('shL', 0.15, 0, 0.25); S_('elR', -0.1); S_('elL', -0.1); S_('hpR', 0, 0, -0.12); S_('hpL', 0, 0, 0.12); break;      /* stands over him and looks down */
+        case 'pout': S_('shR', -0.25, 0, 0.5); S_('elR', -1.55); S_('shL', -0.25, 0, -0.5); S_('elL', -1.55); S_('spine', -0.1); S_('chest', -0.12); S_('neck', -0.2 + s * 0.04, 0.35, 0); S_('hpR', 0, 0, -0.1); S_('hpL', 0, 0, 0.14); break;      /* arms crossed, chin up, looking off */
+        case 'shh': armsDown(); S_('shR', -1.3, 0, 0.35); S_('elR', -2.3); S_('wrR', 0.2); S_('neck', -0.05, s * 0.25, 0); S_('chest', -0.05); break;      /* finger to the lips, to the crowd */
+        case 'rock': S_('shR', -0.9, 0, 0.5); S_('elR', -1.5); S_('shL', -0.9, 0, -0.5); S_('elL', -1.5); S_('chest', 0, s * 0.3, s * 0.1); S_('spine', 0, s * 0.12, 0); S_('neck', 0.3); break;      /* rock the baby */
+        case 'nightnight': S_('shR', -1.5, 0, 0.6); S_('elR', -2.2); S_('shL', -1.4, 0, -0.5); S_('elL', -2.2); S_('neck', 0, 0, 0.45); S_('chest', 0, 0, 0.12); S_('spine', 0.05); break;      /* hands together by the cheek */
+        case 'pound': { const b2 = Math.max(0, Math.sin(t * 12)); S_('shR', -0.9, 0, 0.5 - b2 * 0.2); S_('elR', -2.0 - b2 * 0.3); S_('shL', -0.2, 0, 1.2); S_('elL', -0.4); S_('chest', -0.2); S_('neck', -0.4); legs(-0.2, 0.3, -0.2, 0.3, 0.15); break; }      /* chest pound, head back */
+        case 'shrug': S_('shR', -0.5, 0, -0.9); S_('elR', -1.6); S_('wrR', -1.0); S_('shL', -0.5, 0, 0.9); S_('elL', -1.6); S_('wrL', -1.0); S_('neck', 0, 0, s * 0.1); S_('chest', -0.05); break;
+        case 'floor': { const b2 = Math.max(0, Math.sin(t * 10)); legs(-0.9, 1.2, -0.9, 1.2, 0.2); p.y = -0.3; S_('spine', 0.6); S_('neck', -0.5); S_('shR', -0.9 - b2 * 0.2, 0, -0.2); S_('shL', -0.9 - b2 * 0.2, 0, 0.2); S_('elR', -0.3); S_('elL', -0.3); S_('wrR', 0.8); S_('wrL', 0.8); break; }      /* slaps the floor */
+        case 'wag': armsDown(); S_('shR', -1.9, 0, -0.1); S_('elR', -1.2); S_('wrR', 0, 0, s * 0.7); S_('neck', 0, s * 0.2, 0); S_('chest', -0.06); break;      /* finger wag: not in here */
+        case 'airflex': S_('shR', -0.2, 0, -1.55); S_('elR', -2.3); S_('shL', -0.2, 0, 1.55); S_('elL', -2.3); S_('wrR', -0.6); S_('wrL', -0.6); S_('chest', -0.25); S_('neck', -0.35); S_('hpR', -0.9, 0, -0.15); S_('knR', 1.5); S_('hpL', -0.5, 0, 0.15); S_('knL', 1.2); break;      /* double bicep in the air, knees tucked */
         case 'salute': S_('shR', -0.7, 0, -1.25); S_('elR', -2.3); S_('wrR', 0.2); S_('shL', 0.05, 0, 0.08); S_('spine', -0.05); S_('chest', -0.08); S_('neck', -0.05); break;
         case 'count': S_('shR', -1.0, 0, 0.3); S_('elR', -1.4 + s * 0.3); S_('wrR', s * 0.8); S_('shL', -1.0, 0, -0.3); S_('elL', -1.4 - s * 0.3); S_('wrL', -s * 0.8); S_('chest', -0.1); S_('neck', 0.25); break;
         case 'eagle': S_('shR', 0, 0, -1.4 + s * 0.5); S_('shL', 0, 0, 1.4 - s * 0.5); S_('wrR', s * 0.5); S_('wrL', s * 0.5); S_('hpL', -1.2); S_('knL', 1.6); S_('chest', -0.2); S_('neck', -0.3); p.y = 0.03 * s; break;
@@ -1482,7 +1558,7 @@ function applyPose(R, p, dt) {
   for (const n in J) {
     const tg = p[n] || POSE.zero, c = C[n];
     c[0] += (tg[0] - c[0]) * k; c[1] += (tg[1] - c[1]) * k; c[2] += (tg[2] - c[2]) * k;
-    J[n].rotation.set(c[0], c[1], c[2]);
+    J[n].rotation.set(c[0] + (R.rest && R.rest[n] || 0), c[1], c[2]);
   }
   R.yOff += ((p.y || 0) - R.yOff) * k; J.hips.position.y = R.legLen + R.yOff;
   if (R.cape) R.cape.rotation.x = 0.12 + (R.capeSwing || 0);
@@ -1491,8 +1567,14 @@ function applyPose(R, p, dt) {
 POSE.zero = [0, 0, 0];
 
 // random streetballer for AI / hub NPCs
+// no two built-in players alike: a look is its hair, top, shorts and skin. Called for every AI in a game and on the Block.
+function uniqLook(b, used, tier) {
+  const sig = x => [x.worn.hair, x.worn.top, x.worn.bottom, x.build.skin].join('|'), tops = () => used.tops || (used.tops = new Set());
+  for (let k = 0; k < 24 && (used.has(sig(b)) || tops().has(b.worn.top + '|' + b.build.skin)); k++) { const w = randomWorn(tier === undefined ? 2 : tier); b.worn.top = w.top; b.worn.bottom = w.bottom; b.worn.hair = w.hair; b.worn.head = w.head; b.worn.shoes = w.shoes; b.worn.socks = w.socks; if (k > 10) b.build.skin = Math.floor(Math.random() * SKINS.length); }
+  used.add(sig(b)); tops().add(b.worn.top + '|' + b.build.skin); return b;
+}
 function randomWorn(tier, ragged) {
-  const pool = s => DRIP.filter(d => d.slot === s && d.r <= tier && d.kind !== 'eagle');
+  const pool = s => DRIP.filter(d => d.slot === s && d.r <= tier && d.kind !== 'eagle' && d.src !== 'deed' && d.src !== 'nexx');
   const w = {}; for (const [s] of SLOTS) { const p = pool(s); w[s] = p.length ? pick(p).id : null; }
   if (ragged) { w.top = 't_tank'; w.bottom = 'b_camo'; w.shoes = 'k_beat'; w.head = RNG() < 0.3 ? 'hd_crown' : 'hd_none'; w.back = 'bk_none'; w.arm = 'a_none'; }
   return w;
@@ -1991,6 +2073,7 @@ function startMatch(cfg) {
   if (style === 'street' || style === 'arcade') { weather(); litter(6, -8, 8, -1, 12); skyLife(60, arcade ? 'RUCKUS · NO RULES · NO REFUNDS' : 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); }
   if (!cfg.practice) crowdInit();      /* courts.js: people along the baseline and both sidelines */
   // --- players ---
+  { const used = new Set(); cfg.teams.forEach(team => team.forEach(sp => { if (sp.ctrl < 0 && !sp.b.bot && sp.b.net === undefined && !sp.b.keepLook) uniqLook(sp.b, used, 3); else used.add([sp.b.worn.hair, sp.b.worn.top, sp.b.worn.bottom, sp.b.build.skin].join('|')); })); }      /* no two AI players dressed alike */
   cfg.teams.forEach((team, ti) => team.forEach((sp, k) => {
     const mine = sp.mine === true;
     const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, remote: sp.ctrl >= 2, peer: sp.peer || null, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
@@ -2073,7 +2156,10 @@ function scorePts(p, pts, how) {
   addBrav(p, how === 'dunk' ? 0.16 : 0.10);
   if (M_.drill) drillEvent('make', p, { how, kind: how === 'dunk' ? 'dunk' : M_.B.kind, green: how !== 'dunk' && M_.B.green });
   if (M_.practice) return;
-  M_.phase = 'scored'; M_.pt = 1.45; p.st = 'celeb'; p.t = 0;
+  M_.phase = 'scored'; M_.pt = how === 'dunk' ? 2.1 : 1.45; p.st = 'celeb'; p.t = 0;
+  { const eq = p.b.moves.celeb, vic = how === 'dunk' && p.finish ? p.finish.hit : null;      // what he does about it: his own celebration, or one that fits the play
+    p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout'])) : pts >= 2 ? pick([eq, eq, 'shh', 'shrug', 'nightnight', 'pout']) : pick([eq, eq, eq, 'shrug', 'pound']);
+    p.celebAt = vic || null; if (M_.net === 'host') netEv({ k: 'cs', i: p.i, s: p.celebStyle }); }
   if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
@@ -2199,7 +2285,7 @@ function blocked(p, o) {
   const B = MT.B; p.stats.fga++; o.stats.blk++; o.swatT = 0.45; MT.hoopT = 0.2; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
   call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; p.finish.blocked = true; p.bumpT = 0.3; p.bumpX = -0.3; p.bumpZ = rnd(-0.15, 0.15); }
-  crowdReact('block', o.team); B.rebound = false;
+  crowdReact('block', o.team); B.rebound = false; o.tauntT = 1.3; floatTxt(o, pick(['GET THAT OUT', 'PACKED', 'NOT IN HERE', 'SEND IT BACK']), '#33e0ff'); if (MT.net === 'host') netEv({ k: 'ta', i: o.i });
 }
 function finishRange(p) { return MT.arcade ? 5.6 : 2.5 + nAtt(p, 'vert') * 0.6 + 0.25 * bt(p, 'gravity'); }
 // who is in the way of this finish: the opponent most in the lane between you and the rim (or waiting under it).
@@ -2284,7 +2370,7 @@ function resolveFinish(p) {
       B.state = 'through'; B.holder = null; B.pos.set(0, HOOP_Y - 0.05, 0); B.vel.set(0, -5, 0); B.t = 0; B.scored = true;
       p.stats.dunks++; sfxM('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
       let vic = f.hit && f.hit.st !== 'stagger' && dist(f.hit, p) < 1.6 ? f.hit : null; if (!vic) for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
-      if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2 }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
+      if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2, kind: pick(['sit', 'flat', 'flat']) }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
       f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : 0); MT.hoopT = 0.6;
       call(f.oop ? 'ALLEY-OOP!' : f.put ? 'PUTBACK!' : vic ? 'POSTER!' : pick(CALLS.dunk), p.b.name + (vic ? ' on ' + vic.b.name : ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
       scorePts(p, pts, 'dunk'); if (f.foulBy) { foul(f.foulBy, p, 'blocking', false); andOne(p, f.foulBy); } return;
@@ -2312,7 +2398,7 @@ function startMove(p, slot, dx, dz) {
     const fall = Math.random() < 0.4 + p.combo * 0.1; o.st = 'stagger'; o.t = 0;
     // he bit on the fake: his weight goes the opposite way to where the ball handler really went
     const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
-    o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5 };
+    o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5, kind: pick(['sit', 'sit', 'spin', 'knee']) };
     p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
   } else o.slowT = 0.22 + mv.ank;
 }
@@ -2347,7 +2433,7 @@ function applyHit(p, o, kind) {
   const M_ = MT, B = M_.B; p.hitList.push(o); const dd = dist(o, p) || 1, dir = [(o.x - p.x) / dd, (o.z - p.z) / dd];
   if (kind === 'punch' && Math.random() > 0.72 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.35) { floatTxt(o, 'SHRUGGED IT OFF', '#8d8d99'); sfxM('bump'); return; }
   const ko = Math.random() < (kind === 'clothes' ? 0.36 : 0.18) + Math.min(0.3, (M_.brawlHeat || 0) * 0.08);
-  o.st = 'stagger'; o.t = 0; o.stg = { dur: ko ? 4.2 : kind === 'clothes' ? 2.0 : 1.5, fall: true, side: 0, dir, push: kind === 'clothes' ? 3.4 : 2.2 };
+  o.st = 'stagger'; o.t = 0; o.stg = { dur: ko ? 4.2 : kind === 'clothes' ? 2.0 : 1.5, fall: true, side: 0, dir, push: kind === 'clothes' ? 3.4 : 2.2, kind: ko ? pick(['flat', 'face']) : kind === 'clothes' ? 'flat' : pick(['sit', 'spin', 'flat']) };
   if (ko) { o.ko = 4.2; if (M_.net === 'host') netEv({ k: 'ko', i: o.i, d: 4.2 }); }
   sfxM('block'); M_.shake = ko ? 0.55 : 0.3; crowdReact(ko ? 'ko' : 'hit', p.team); burst(o.x, 1.3, o.z, ko ? 0xff4040 : 0xffc531, ko ? 18 : 10);
   floatTxt(o, ko ? 'KO' : kind === 'clothes' ? 'CLOTHESLINED' : 'POW', ko ? '#ff4040' : '#ffc531');
@@ -2376,7 +2462,7 @@ function startSteal(p) {
     let o = null, od = 1.35; for (const q of MT.P) { if (q.team === p.team || q.st === 'stagger') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
     p.st = 'shove'; p.t = 0; p.cool = 1.3;
     if (o && Math.random() < 0.62 + nAtt(p, 'str') * 0.2 - nAtt(o, 'str') * 0.3) {
-      { const dd = dist(o, p) || 1; o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: 0, dir: [(o.x - p.x) / dd, (o.z - p.z) / dd], push: 2.4 }; } sfxM('block'); MT.shake = 0.2;
+      { const dd = dist(o, p) || 1; o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: 0, dir: [(o.x - p.x) / dd, (o.z - p.z) / dd], push: 2.4, kind: pick(['sit', 'face', 'spin']) }; } sfxM('block'); MT.shake = 0.2;
       if (B.holder === o) { B.state = 'loose'; B.holder = null; B.pos.set(o.x, 1, o.z); B.vel.set(rnd(-3, 3), 3, rnd(-3, 3)); B.t = 0; B.rebound = false; B.lastTeam = p.team; p.stats.stl++; call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); addBrav(p, 0.12); }
     }
     return;
@@ -2642,6 +2728,19 @@ function matchStep(dtReal) {
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
     const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), R = 0.56;
+    if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
+      const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
+      if (vn > 1.2 && M_.time - (a.bumpAt || -9) > 0.3 && M_.time - (b.bumpAt || -9) > 0.3 && a.st !== 'stagger' && b.st !== 'stagger') {
+        const mass = q => (0.7 + nAtt(q, 'str') * 0.9) * (1 + (q.b.build.body.w || 0) * 0.15) * (q.H / 1.95) * (q.post || q.bodyUp ? 1.3 : 1), ma = mass(a), mb = mass(b), j = vn * 0.85;
+        a.vx -= nx * j * mb / (ma + mb); a.vz -= nz * j * mb / (ma + mb); b.vx += nx * j * ma / (ma + mb); b.vz += nz * j * ma / (ma + mb); a.bumpAt = b.bumpAt = M_.time;
+        if (vn > 2.6) sfxM('bump');
+        const hard = vn > 4.3, lite = ma < mb ? a : b, heavy = lite === a ? b : a, ratio = Math.max(ma, mb) / Math.min(ma, mb);
+        if (hard && ratio > 1.18 && lite.st === 'free' && lite.y < 0.05) { const sg = lite === a ? -1 : 1;
+          if (B.holder === lite) { lite.slowT = Math.max(lite.slowT || 0, 0.35); }      /* the ball handler keeps it but loses his step */
+          else { lite.st = 'stagger'; lite.t = 0; lite.stg = { dur: 0.55, fall: false, side: Math.random() < 0.5 ? 1 : -1, dir: [nx * sg, nz * sg], push: Math.min(2.4, vn * 0.4) }; }
+          M_.shake = Math.max(M_.shake || 0, 0.12); void heavy; }
+      }
+    }
     if (d < R && d > 0.001) { const push = (R - d) / 2; if (push > 0.05) for (const q of [a, b]) { const sg = q === a ? -1 : 1, lx = dx / d * sg, lz = dz / d * sg, fx = Math.sin(q.face), fz = Math.cos(q.face); q.bumpT = 0.3; q.bumpX = clamp((lx * fx + lz * fz) * -push * 3, -0.25, 0.25); q.bumpZ = clamp((lx * fz - lz * fx) * push * 3, -0.25, 0.25); }
       const wa = a.st === 'stagger' ? 0.2 : 1, wb = b.st === 'stagger' ? 0.2 : 1, pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
   }
@@ -2781,7 +2880,7 @@ function stepPlayer(p, dt) {
   // facing
   const sp = Math.hypot(p.vx, p.vz); let tf = p.face;
   if (p.st === 'shoot' || p.st === 'finish' || p.st === 'hop') tf = Math.atan2(-p.x, -p.z);
-  else if (p.st === 'celeb') tf = 0;
+  else if (p.st === 'celeb') tf = p.celebAt && (p.celebStyle === 'stare' || p.celebStyle === 'toosmall' || p.celebStyle === 'flexdown') ? Math.atan2(p.celebAt.x - p.x, p.celebAt.z - p.z) : 0;      /* over the man he dunked on, or to the crowd */
   else if (B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && sp < 2.5) tf = Math.atan2(-p.x, -p.z);
   else if (def && B.holder) {
     // who you are guarding: the nearest opponent if you are a person (so it is whoever you chose to pick up), your
@@ -2974,9 +3073,9 @@ function animPlayer(p, dt) {
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
-    case 'stagger': an = 'stagger'; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
+    case 'stagger': an = 'stagger'; o.kind = p.stg.kind; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
     case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'punch': an = 'punch'; break; case 'clothes': an = 'clothes'; o.sp = 1; o.ph = p.runPh; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
-    case 'celeb': an = 'celeb'; o.style = p.b.moves.celeb; break;
+    case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
       else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); } }
@@ -3036,6 +3135,7 @@ function animPlayer(p, dt) {
   // layers (anim.js): profile posture on the moving poses, a landing that soaks up the drop; then the transition rate
   // out of whatever the body was doing (it always blends from its current pose; gameplay never waits for it)
   profilePosture(P, an, R.prof); landLayer(P, R, p, dt, R.prof);
+  if (p.tauntT > 0) { p.tauntT -= dt; if (p.st === 'free' && !hasBall && p.y < 0.05) { const w = Math.sin(M_.time * 14); P.shR = [-1.9, 0, -0.1]; P.elR = [-1.2, 0, 0]; P.wrR = [0, 0, w * 0.7]; const n = P.neck || (P.neck = [0, 0, 0]); n[1] += w * 0.15; P.rate = Math.max(P.rate || 16, 24); } }      /* finger wag after a block, while the play goes on */
   if (an !== R.anPrev) { const r = transRate(R.anPrev || an, an), rec = R.prof ? R.prof.recovery : 1; R.trRate = /^(shoot|jump|swat|stagger|dunk|layup|floater|hop)$/.test(R.anPrev || '') ? r * rec : r; R.trPair = !!TRANS[(R.anPrev || '') + '>' + an]; R.trT = 0; R.anPrev = an; }
   R.trT = (R.trT || 0) + dt; if (R.trT < 2.5 / R.trRate) P.rate = R.trPair ? lerp(R.trRate, P.rate || 16, R.trT * R.trRate / 2.5) : Math.max(P.rate || 16, R.trRate);
   applyPose(R, P, dt);
@@ -3500,7 +3600,7 @@ function ambientStep(dt, cam, me) {
     pa.needsUpdate = true;
     for (const s of AMB.splash) { s.t -= dt; if (s.t <= 0) { s.t = rnd(0.3, 0.7); s.m.position.set(cx + rnd(-9, 9), 0.02, cz + rnd(-12, 2)); } const k = 1 - s.t / 0.5; s.m.scale.setScalar(0.5 + k * 2); s.m.material.opacity = Math.max(0, 0.5 * (1 - k)); }
   }
-  if (AMB.bubs) AMB.bubs = AMB.bubs.filter(b => { b.t -= dt; const p = b.obj.position; _v.set(p.x, p.y + b.h, p.z).project(camera); if (b.t <= 0 || !b.obj.parent) { b.el.remove(); return false; } b.el.style.display = _v.z > 1 ? 'none' : ''; const [sx, sy] = project(p.x, p.y + b.h, p.z); b.el.style.left = sx + 'px'; b.el.style.top = sy + 'px'; b.el.style.opacity = b.t > 0.3 ? 1 : b.t / 0.3; return true; });
+  if (AMB.bubs) AMB.bubs = AMB.bubs.filter(b => { b.t -= dt; const p = b.obj.position; _v.set(p.x, p.y + b.h, p.z).project(camera); if (b.t <= 0 || !b.obj.parent) { b.el.remove(); return false; } const [sx, sy] = project(p.x, p.y + b.h, p.z), far = me ? Math.hypot(p.x - me.x, p.z - me.z) > 11 : false; b.el.style.display = _v.z > 1 || far || sy < 30 || sx < -40 || sx > innerWidth + 40 ? 'none' : ''; b.el.style.left = clamp(sx, 118, innerWidth - 118) + 'px'; b.el.style.top = Math.max(60, sy) + 'px';      /* kept on screen; nobody is heard from across the Block */ b.el.style.opacity = b.t > 0.3 ? 1 : b.t / 0.3; return true; });
   // speech bubbles
   if (AMB.npcs && AMB.lines && me) {
     AMB.talkT -= dt;
@@ -3519,6 +3619,7 @@ function worldPlayerRig() {
   W.me.rig = makeRig(myBuild()); scene.add(W.me.rig.root);
 }
 function addNpc(build, x, z, face, anim, extra) {
+  if (W && !build.bot && !(extra && (extra.cast || extra.still || extra.low)) && !build.keepLook && build.worn && build.worn.top) uniqLook(build, W.looks || (W.looks = new Set()), 2);
   const r = makeRig(build, !!(extra && extra.low)); r.root.position.set(x, 0, z); r.root.rotation.y = face; scene.add(r.root);
   const n = Object.assign({ rig: r, name: build.name, x, z, face, anim: anim || 'idle', ph: rnd(0, 6), hx: x, hz: z, tx: x, tz: z, wt: rnd(1, 5) }, extra || {}); if (n.anim === 'ball') { n.ball = makeBall(pick(['bl_std', 'bl_rwb', 'bl_neon'])); scene.add(n.ball); } W.npcs.push(n); return n;
 }
@@ -3909,6 +4010,7 @@ function worldStep(dt) {
   const cb = W.camBox, blocked = (x, z) => (cb && (x < cb[0] || x > cb[1] || z < cb[2] || z > cb[3])) || W.solids.some(s => x > s[0] + 0.25 && x < s[1] - 0.25 && z > s[2] + 0.25 && z < s[3] - 0.25);
   for (let b = back; b > 0.9; b -= 0.4) { cx = me.x - fx * b; cz = me.z - fz * b; lift = (back - b) * 0.42; let ok = true; for (let t = 1.0; t <= b; t += 0.6) if (blocked(me.x - fx * t, me.z - fz * t)) { ok = false; break; } if (ok && !blocked(cx, cz)) break; }
   if (W.kind === 'crib') { cx = clamp(cx, W.bounds[0] - 6, W.bounds[1] + 6); cz = clamp(cz, W.bounds[2] - 1, W.bounds[3] + 6); }
+  if (W.camO) { camera.position.lerp(W.camO.p, 1 - Math.exp(-5 * dt)); camera.lookAt(W.camO.l); return; }      /* watching the bones */
   if (W.look) {   // shop / closet: swing round to look at your drip
     const mfx = Math.sin(me.face), mfz = Math.cos(me.face), sx = mfz, sz = -mfx;
     if (portrait) { _v.set(me.x + mfx * 5.6, 0.6, me.z + mfz * 5.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(me.x, -0.6, me.z); }
@@ -4101,7 +4203,7 @@ function castStep(dt) {
     else { n.ambT = (n.ambT || 5) - dt; if (n.ambT <= 0) { n.amb = pick(n.cast === 'mark' ? ['cross', 'watch', 'talk', 'point'] : n.cast === 'erin' ? ['watch', 'clap', 'cross'] : ['watch', 'phone', 'cross']); n.ambT = rnd(4, 9); } }
     n.rig.root.position.set(n.x, 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, crowdPose(n.amb, W.t, { ph: n.ph }, n.rig.prof), dt);
     // a line now and then when you walk past
-    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 6 && n.sayT <= 0) { n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
+    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 5 && n.sayT <= 0 && C.t - (C.lastSay || -9) > 5) { C.lastSay = C.t;      /* one of them at a time */ n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
   }
   // Mark has money on the run in the cage
   if (W.park && C.mark) { const s = W.park.score[0] + W.park.score[1]; if (C.lastPark !== undefined && s !== C.lastPark && Math.random() < 0.5) { bubble(C.mark.rig.root, pick(Math.random() < 0.6 ? CAST_LINES.markBet : CAST_LINES.mark), 3.5, C.mark.rig.H + 0.35); C.mark.amb = Math.random() < 0.5 ? 'ohh' : 'up'; C.mark.ambT = 1.8; } C.lastPark = s; }
@@ -4158,7 +4260,7 @@ function uiLouie() {
 
 // ---- BRENNICK ----
 function kaelBuild() {
-  const b = withSeed(2207, () => aiBuild(88, 'slasher')); b.name = 'Brennick'; b.build.body.h = 79; b.build.skin = 2;
+  const b = withSeed(2207, () => aiBuild(88, 'slasher')); b.name = 'Brennick'; b.keepLook = true; b.build.body.h = 79; b.build.skin = 2;
   b.worn = Object.assign(randomWorn(2), { top: 't_tee', head: 'hd_none', face: 'f_none', shoes: 'k_beat' });
   b.anim = { shot: { trad: 0.25, high: 0.6, quick: 0.15 }, idle: { relaxed: 0.2, athletic: 0.7, wide: 0.1 }, hand: 'R', knee: 1.2, elbow: -0.2, lean: 0.2, stance: 1.1, follow: 1.3, shoulder: 0, cadence: 0.8, intensity: 1.25, recovery: 1.3, restless: 0.1, dribLow: 0.4, defLow: 0.6, arms: 0.2, swag: 0.1 };      /* patient, low, explosive */
   return b;
@@ -4175,7 +4277,7 @@ function runKael() {
   uiClose(); const tier = TIERS_COURT[2], b = kaelBuild(), first = !S.kaelBeat;
   const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: 77, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) { setTimeout(() => toast('BRENNICK', '"' + pick(CAST_LINES.kaelLose) + '"'), 1600); return null; }
-    if (first) { S.kaelBeat = true; const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
+    if (first) { S.kaelBeat = true; deedDrip('bk_washer', 'Beat Brennick'); const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
     return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 VC' : 'Beat Brennick again +150 VC' }; };
   cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
   save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
@@ -4219,8 +4321,23 @@ function holodiceMesh(g) {
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: holoNumTex(1 + Math.floor(Math.random() * 6)), transparent: true, depthWrite: false })); sp.scale.setScalar(0.26); sp.position.y = 1.02; g.add(sp); g.userData.holo = sp;
   if (typeof W !== 'undefined' && W) (W.holo = W.holo || []).push({ sp, t: rnd(2, 9), roll: 0 }); return g;
 }
-function holoStep(dt) { if (!W || !W.holo) return; for (const h of W.holo) { if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; if (h.ft <= 0) { h.ft = 0.07; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 14)) * 0.05; } else { h.t -= dt; h.sp.position.y = 1.02; if (h.t <= 0) { h.t = rnd(4, 12); h.roll = 0.7; } } } }
+function holoStep(dt) { if (!W || !W.holo) return; if (W.bones && W.bones.on && !(UI.cur && UI.cur.onClose)) bonesLeave(); const play = W.bones && W.bones.on;
+  for (const h of W.holo) {
+    if (h.table && play) {      // a die in play: flickers while it rolls, then shows its number; empty places are dark
+      if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; h.sp.visible = true; if (h.ft <= 0) { h.ft = 0.06; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 16)) * 0.07; if (h.roll <= 0 && h.val) { h.sp.material.map = holoNumTex(h.val); sfx('ui'); } }
+      else { h.sp.visible = h.val > 0; h.sp.position.y = 1.02 + (h.held ? 0.08 : 0); h.sp.material.color.setHex(h.held ? 0x7dffb0 : 0xffffff); h.sp.scale.setScalar(h.held ? 0.32 : 0.28); }
+      continue; }
+    h.sp.visible = true; h.sp.material.color.setHex(0xffffff);
+    if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; if (h.ft <= 0) { h.ft = 0.07; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 14)) * 0.05; } else { h.t -= dt; h.sp.position.y = 1.02; if (h.t <= 0) { h.t = rnd(4, 12); h.roll = 0.7; } } }
+}
+// put a game's dice on the table: a place whose number changed rolls first (his a beat after yours)
+function bonesSync(you, him, hold) { const T = W && W.bones; if (!T) return; T.on = true; const set = (row, vals, delay) => row.forEach((h, i) => { const v = vals[i] || 0, hd = !!(hold && hold[i] && row === T.you); if (v !== h.val) { h.val = v; h.roll = v ? 0.45 + delay + i * 0.05 : 0; } h.held = hd; }); set(T.you, you.slice(-8), 0); set(T.him, him.slice(-8), 0.35); }
+function bonesBusy() { const T = W && W.bones; return !!(T && T.on && T.you.concat(T.him).some(h => h.roll > 0)); }
+function bonesLeave() { const T = W && W.bones; if (!T) return; T.on = false; for (const h of T.you.concat(T.him)) { h.val = 0; h.held = false; h.roll = 0; } W.camO = null; }
 function holoRollAll() { if (W && W.holo) for (const h of W.holo) h.roll = rnd(0.5, 0.9); }
+
+// drip you cannot buy: earned by doing the thing
+function deedDrip(id, why) { if (S.owned.includes(id)) return; S.owned.push(id); save(); setTimeout(() => { toast('UNLOCKED: ' + DRIPS[id].n.toUpperCase(), why + '. It is in your closet.', 'ach'); sfx('unlock'); }, 1200); }
 
 // ---------------- daily limits ----------------
 const VICE_CAP = { bones: 1500, book: 2500 };
@@ -4273,7 +4390,7 @@ function uiBones(home) {
   const act = a => {
     const T = BONES[G.game] && BONES[G.game].target;
     if (G.game === 't13' || G.game === 't21') {
-      if (a === 'roll') { G.you.push(d6()); const y = sum(G.you); sfx('ui'); if (y > T) { G.msg = say('bust'); settle(-1); } else if (y === T) { G.msg = say('dead'); settle(1, 2); } else G.msg = say('roll'); }
+      if (a === 'roll') { G.you.push(d6()); const y = sum(G.you); sfx('ui'); if (y > T) { G.msg = say('bust'); settle(-1); } else if (y === T) { G.msg = say('dead'); settle(1, 2); if (T === 13) deedDrip('f_dead13', 'Hit a dead 13'); } else G.msg = say('roll'); }
       else if (a === 'stand') treyTotals();
     } else if (G.game === 'poker') {
       if (a === 'throw') { G.you = G.you.map((v, i) => G.hold[i] ? v : d6()); let h = [d6(), d6(), d6(), d6(), d6()]; const k = treyHolds(h); h = h.map((v, i) => k[i] ? v : d6()); G.him = h;
@@ -4284,7 +4401,18 @@ function uiBones(home) {
     }
     rerender();
   };
+  const bar = () => {
+    bonesSync(G.phase === 'pick' ? [] : G.you, G.phase === 'pick' ? [] : G.him, G.game === 'poker' && G.phase === 'you' ? G.hold : null);
+    const T = W.bones, pt = innerWidth < innerHeight; W.camO = { p: new THREE.Vector3(T.cx + 0.2, pt ? 5.6 : 3.7, T.cz + (pt ? 8.2 : 5.6)), l: new THREE.Vector3(T.cx, 0.1, T.cz + 1.1) };
+    const tot = G.phase !== 'pick' && G.game !== 'poker' && G.you.length ? ` · YOU ${sum(G.you)}${G.him.length ? ' · TREY ' + sum(G.him) : ''}` : '';
+    let h = `<div style="flex:1"></div><div class="card sel" style="max-width:720px;margin:0 auto;width:100%"><div class="row"><h3 class="mono" style="font-size:10px;color:var(--heat)">TREY${G.phase !== 'pick' ? ' · ' + BONES[G.game].n + ' · ' + G.bet + ' VC' + tot : ''}</h3>${vcLine()}</div><p style="font-size:14px;margin:6px 0 8px">${esc(G.msg)}</p><div class="pf" style="flex-wrap:wrap;gap:6px">`;
+    if (G.phase === 'pick') h += stakes.map(s => Btn(s + '', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join('') + Object.keys(BONES).map(id => Btn(BONES[id].n, () => start(id), 'sm', S.vc < G.stake)).join('') + Btn('LEAVE', uiClose, 'sm alt');
+    else if (G.phase === 'you') h += (G.game === 'poker' ? G.you.map((v, i) => Btn((G.hold[i] ? 'KEEP ' : '') + v, () => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }, 'sm ' + (G.hold[i] ? '' : 'alt'))).join('') + Btn('THROW THE REST', () => act('throw'), 'sm') : G.game === 'high' ? Btn('STAND', () => act('stand'), 'sm') + Btn('PRESS (' + G.bet * 2 + ')', () => act('press'), 'sm alt', S.vc < G.bet * 2) : Btn('ROLL', () => act('roll'), 'sm') + Btn('STAND ON ' + sum(G.you), () => act('stand'), 'sm alt'));
+    else h += `<b class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin-right:8px">${G.won > 0 ? '+' + G.won : G.won} VC</b>` + Btn('AGAIN · ' + G.stake, () => start(G.game), 'sm', S.vc < G.stake) + Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'sm alt') + Btn('LEAVE', uiClose, 'sm alt');
+    return h + `</div>${G.phase === 'pick' ? `<p class="mu" style="margin-top:6px;font-size:11px">${Object.values(BONES).map(b => b.n + ': ' + b.d).join(' ')}</p>` : ''}</div><div style="height:4%"></div>`;
+  };
   openPanel(() => {
+    if (!home && W && W.bones) return bar();
     const V = vice(); let h = `<div class="ph"><h2>${home ? 'BONES AT HOME' : "TREY'S BONES"}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><div class="card sel"><h3 class="mono" style="font-size:10px;color:var(--heat)">${host}</h3><p style="font-size:15px;margin:6px 0">${esc(G.msg)}</p></div>`;
     if (G.phase === 'pick') {
       h += `<div class="cat">STAKE</div><div class="card">` + stakes.map(s => Btn(s + ' VC', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join(' ') + `</div><div class="cat">GAME</div>`;
@@ -4298,7 +4426,8 @@ function uiBones(home) {
       else h += `<p class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin:8px 0">${G.won > 0 ? '+' + G.won : G.won} VC</p><div class="pf">${Btn('AGAIN · ' + G.stake, () => start(G.game), '', S.vc < G.stake)}${Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'alt')}</div>`;
     }
     return h + `</div>`;
-  }, 'side', () => uiClose());
+  }, !home && W && W.bones ? 'clear' : 'side', () => uiClose());
+  if (!home && W && W.bones) UI.cur.onClose = bonesLeave;
 }
 
 // ---------------- MARK'S BOOK ----------------
@@ -4330,7 +4459,7 @@ function bkFinish(gi, r) { const B = book(), g = B.slate.games[gi]; g.res = r; s
 function bkSettle() {
   const B = book(), sl = B.slate.slip; if (!sl || sl.done) return; const gs = B.slate.games; if (sl.legs.some(L => !gs[L.g].res)) return;
   const won = sl.legs.every(L => bkLegWon(gs[L.g], L)); sl.done = true; sl.won = won; const pay = won ? Math.round(sl.stake * sl.odds) : 0; sl.pay = pay;
-  if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; } else { B.l++; B.net -= sl.stake; }
+  if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; if (sl.legs.length >= 3) deedDrip('hd_bookie', 'Cashed a 3-leg parlay'); } else { B.l++; B.net -= sl.stake; }
   save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} VC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
 }
 function bkBuilds(t) { return t.ps.map(p => { const b = withSeed(p.seed, () => aiBuild(p.ovr, p.style)); b.name = p.n; return { b, ctrl: -1, ai: clamp((p.ovr - 50) / 45, 0.3, 1) }; }); }
@@ -4370,14 +4499,16 @@ function uiBook() {
 
 // ---------------- on the Block ----------------
 function viceInit() {
-  const cx = -10, cz = 5, g = grp(scene, cx, 0, cz);
+  const cx = -12.9, cz = -0.2, g = grp(scene, cx, 0, cz);      /* against the west wall, between The Lab and the crib door: clear ground */
   ink(M(cyl(0.9, 0.9, 0.08, 16), toon('#1f6a3a'), 0, 0.78, 0, g), 1.03); ink(M(cyl(0.16, 0.3, 0.76, 8), toon('#2a2c33'), 0, 0.38, 0, g), 1.04);
-  for (let i = 0; i < 7; i++) { const a = -0.6 + i * (Math.PI + 1.2) / 6 + Math.PI / 2, h = grp(g, Math.cos(a) * 1.7, 0, Math.sin(a) * 1.7); holodiceMesh(h); }
+  // sixteen holodice: your eight in front of the felt, Trey's eight behind it. The game is played on these.
+  const T = W.bones = { you: [], him: [], cx, cz, on: false };
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 8; i++) { const h = grp(g, (i - 3.5) * 0.46, 0, r === 0 ? 1.25 : -1.0); holodiceMesh(h); const e = W.holo[W.holo.length - 1]; e.table = true; e.val = 0; (r === 0 ? T.you : T.him).push(e); }
   const sg = sign("TREY'S BONES", 2.2, 0.4, '#ffb347', '#0a0a0e', { border: false }); sg.position.set(0, 2.5, -1.9); g.add(sg); for (const sx of [-1.1, 1.1]) M(cyl(0.03, 0.03, 2.5, 5), toon('#2a2c33'), sx, 1.25, -1.9, g);
-  solid(cx - 0.9, cx + 0.9, cz - 0.9, cz + 0.9);
+  solid(cx - 2.0, cx + 2.0, cz - 1.3, cz + 1.5);
   const tb = withSeed(3003, () => aiBuild(70, 'general')); tb.name = 'TREY'; tb.worn = Object.assign(randomWorn(3), { head: 'hd_cap', face: 'f_shades', top: 't_hoodie' }); const n = addNpc(tb, cx, cz - 1.5, 0, 'idle', { still: true }); n.cast = 'trey'; n.amb = 'cross'; if (W.cast) W.cast.list.push(n);
   CAST_LINES.trey = TREY.hello.concat(['The dice are honest. I am merely charming.']);
-  spot(cx, cz + 1.6, 1.8, "TREY'S BONES (dice)", () => uiBones(false));
+  spot(cx, cz + 2.3, 1.8, "TREY'S BONES (dice)", () => uiBones(false));
 }
 
 // ---------------- at home ----------------
@@ -4992,7 +5123,7 @@ function rerender(reset) {
   UI.handlers = []; el.className = UI.cur.cls; el.innerHTML = `<div class="pin">${UI.cur.render()}</div>`; el.style.display = 'block';
   const pb2 = el.querySelector('.pb'); if (pb2) pb2.scrollTop = sc; const tb2 = el.querySelector('.tabs'); if (tb2) tb2.scrollLeft = ts; paintFocus();
 }
-function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
+function uiClose() { if (UI.cur && UI.cur.onClose) { const f = UI.cur.onClose; UI.cur.onClose = null; f(); } UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
 function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],input[type=text],select,.card[data-k],.sw[data-k],span[data-k]:not([data-k=""])')).filter(e => e.offsetParent !== null); }
 // controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
@@ -5237,7 +5368,7 @@ function uiShop(closet) {
   const r = () => rankOf(S.rep);
   openPanel(() => {
     let h = `<div class="ph"><h2>${closet ? 'CLOSET' : 'THE PLUG'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="tabs">` + SLOTS.map(s => Btn(s[1], () => { st.slot = s[0]; sfx('ui'); rerender(true); }, st.slot === s[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb"><div class="grid">`;
-    let items = DRIP.filter(d => d.slot === st.slot && (closet || d.src !== 'nexx'));      /* NEXX SUPPLY is only at Nexx */ if (closet) items = items.filter(d => S.owned.includes(d.id)); else items = items.slice().sort((a, b) => a.r - b.r || a.cost - b.cost);
+    let items = DRIP.filter(d => d.slot === st.slot && (closet || (d.src !== 'nexx' && d.src !== 'deed')));      /* NEXX SUPPLY is only at Nexx */ if (closet) items = items.filter(d => S.owned.includes(d.id)); else items = items.slice().sort((a, b) => a.r - b.r || a.cost - b.cost);
     for (const d of items) {
       const own = S.owned.includes(d.id), eq = S.worn[d.slot] === d.id, price = shopPrice(d.cost), lockR = d.rank > r();
       const bf = d.buff ? Object.keys(d.buff).map(k => `+${d.buff[k]} ${ATTR[k].n}`).join(' · ') : '';
@@ -5634,7 +5765,7 @@ function netSnapshot(end) {
   const s = { q: ++G.q, ph: M_.phase, sc: M_.score, ck: r2(M_.clock), of: M_.off, nc: M_.needClear ? 1 : 0, ev: G.ev,
     P: M_.P.map(p => {
       const a = [r2(p.x), r2(p.z), r2(p.y), r2(p.face), ST_CODES.indexOf(p.st), r2(p.t), (p.handsUp ? 1 : 0) | (p.sprinting ? 2 : 0) | (p.bravT > 0 ? 4 : 0) | (p.fire ? 8 : 0) | (p.hand === 'L' ? 16 : 0) | (p.st === 'shoot' && p.shot.released ? 32 : 0) | (p.live === 'hold' || p.live === 'dead' ? 64 : 0), Math.round(p.stam), r2(p.brav)];
-      if (p.st === 'shoot') a.push(r2(p.shot.rel), p.shot.fade ? 1 : 0, p.shot.side || 0); else if (p.st === 'finish') { const f = p.finish; a.push(f.type === 'dunk' ? 1 : 0, r2(f.dur), f.spin, f.type === 'dunk' ? f.style : f.kind, r2(f.turn || 0), f.euro || 0, (f.cont ? 1 : 0) | (f.blocked ? 2 : 0) | (f.hit ? 4 : 0)); } else if (p.st === 'move') a.push(r2(p.mv.dx), ['side', 'back', 'diag'].indexOf(p.mv.slot), p.mv.mv.dur, p.mv.mv.id); else if (p.st === 'hop') a.push(r2(p.hop.dur)); else if (p.st === 'stagger') a.push(p.stg.fall ? 1 : 0, p.stg.side === undefined ? 1 : p.stg.side, r2(p.stg.dur || 1));
+      if (p.st === 'shoot') a.push(r2(p.shot.rel), p.shot.fade ? 1 : 0, p.shot.side || 0); else if (p.st === 'finish') { const f = p.finish; a.push(f.type === 'dunk' ? 1 : 0, r2(f.dur), f.spin, f.type === 'dunk' ? f.style : f.kind, r2(f.turn || 0), f.euro || 0, (f.cont ? 1 : 0) | (f.blocked ? 2 : 0) | (f.hit ? 4 : 0)); } else if (p.st === 'move') a.push(r2(p.mv.dx), ['side', 'back', 'diag'].indexOf(p.mv.slot), p.mv.mv.dur, p.mv.mv.id); else if (p.st === 'hop') a.push(r2(p.hop.dur)); else if (p.st === 'stagger') a.push(p.stg.fall ? 1 : 0, p.stg.side === undefined ? 1 : p.stg.side, r2(p.stg.dur || 1), p.stg.kind || '');
       return a;
     }),
     B: [BSTATES.indexOf(B.state), r2(B.pos.x), r2(B.pos.y), r2(B.pos.z), B.holder ? B.holder.i : -1, B.green ? 1 : 0, B.shooter && B.shooter.fire ? 1 : 0] };
@@ -5689,7 +5820,7 @@ function netGuestStep(dt) {
       else if (st === 'finish') { const k = String(a[12] || ''); p.finish = { type: a[9] ? 'dunk' : 'layup', dur: +a[10] || 0.6, style: a[9] && (DUNK[k]) ? k : p.b.moves.dunk, kind: a[9] ? '' : (FINISHES.find(x => x.id === k) ? k : 'lay'), spin: a[11] | 0, turn: +a[13] || 0, euro: +a[14] || 0, cont: a[15] & 1, blocked: !!(a[15] & 2), hit: a[15] & 4 ? 1 : null }; }
       else if (st === 'move') p.mv = { dx: +a[9] || 0, slot: ['side', 'back', 'diag'][a[10]] || 'side', mv: { dur: +a[11] || 0.35, id: MOVE[a[12]] ? String(a[12]) : 'cross' } };
       else if (st === 'hop') p.hop = { dur: +a[9] || HOP_T };
-      else if (st === 'stagger') p.stg = { fall: !!a[9], side: clamp(+a[10] || 0, -1, 1), dur: clamp(+a[11] || 1, 0.3, 5) };
+      else if (st === 'stagger') p.stg = { fall: !!a[9], side: clamp(+a[10] || 0, -1, 1), dur: clamp(+a[11] || 1, 0.3, 5), kind: ['sit', 'face', 'flat', 'spin', 'knee'].includes(a[12]) ? a[12] : 'sit' };
       if (st !== 'finish' && st !== 'move') p.rig.extraYaw = 0;
     });
     B.state = BSTATES[s.B[0]] || 'loose'; B.tp = B.tp || V3(); B.tp.set(+s.B[1] || 0, +s.B[2] || 0, +s.B[3] || 0); B.holder = M_.P[s.B[4]] || null; B.green = !!s.B[5]; B.shooter = s.B[6] ? { fire: true } : null;
@@ -5698,6 +5829,8 @@ function netGuestStep(dt) {
       if (e.k === 'c') hudCall(String(e.b || ''), String(e.s || ''), cssCol(e.c), +e.d || 1.2);
       else if (e.k === 'f') { const p = M_.P[e.i]; if (p) hudFloat(p, String(e.t || ''), cssCol(e.c)); }
       else if (e.k === 'pu') puNet(e);
+      else if (e.k === 'cs') { const p = M_.P[e.i | 0]; if (p) p.celebStyle = String(e.s || '').slice(0, 14); }
+      else if (e.k === 'ta') { const p = M_.P[e.i | 0]; if (p) p.tauntT = 1.3; }
       else if (e.k === 'cr') crowdReact(String(e.p || ''), e.t === undefined ? undefined : e.t | 0, true);
       else if (e.k === 'ko') { const p = M_.P[e.i | 0]; if (p) p.ko = clamp(+e.d || 3, 0, 6); }
       else if (e.k === 'fb') { if (!e.to || e.to === NET.me) hudFb(String(e.t || ''), cssCol(e.c)); }
@@ -6020,7 +6153,7 @@ const LADDER = [
   { name: 'The Commissioner', style: 'showman', ovr: 92, line: 'I do not play people. I review them.', worn: { hair: 'h_flame', head: 'hd_capflag', face: 'f_gold', top: 't_gold', arm: 'a_chrome', bottom: 'b_gold', socks: 's_flag', shoes: 'k_gold', back: 'bk_cape', ball: 'bl_gold' } },
 ];
 const ONES = { id: '1v1', n: 'ONES', size: 1, arcade: false, to: 7, d: 'One on one to 7. Ones and twos. Winners stay.' };
-function ladderBuild(i) { const L = LADDER[i]; const b = withSeed(1000 + i, () => aiBuild(L.ovr, L.style)); b.name = L.name; b.worn = Object.assign({}, L.worn); return b; }
+function ladderBuild(i) { const L = LADDER[i]; const b = withSeed(1000 + i, () => aiBuild(L.ovr, L.style)); b.name = L.name; b.keepLook = true; b.worn = Object.assign({}, L.worn); return b; }
 function uiLadder(i) {
   const L = LADDER[i], beaten = (S.ladder || 0) > i, open = (S.ladder || 0) >= i, pay = Math.round(ladderPay(i) * (beaten ? 0.3 : 1));
   if (!open) return uiDialog(L.name.toUpperCase(), `"Beat ${LADDER[i - 1].name} first. I don't play people nobody's heard of."`, [['Fair.', null]]);
@@ -6264,7 +6397,8 @@ addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.cr
 const ALAB = { a: null, b: null, act: 'shoot', speed: 1, paused: false, ball: true, t: 0, step: 0, prof: null, solo: null, ui: 'blend' };
 const ALAB_ACTS = [
   ['shoot', 'Jump shot'], ['fake', 'Pump fake'], ['idle', 'Idle'], ['dribble', 'Dribble'], ['hold', 'Triple threat'], ['slide', 'Defense'], ['run', 'Run'], ['walk', 'Walk'], ['pass', 'Pass'], ['jump', 'Contest'],
-  ['layup', 'Layup'], ['dunk', 'Dunk'], ['cross', 'Crossover'], ['post', 'Post up (LT)'], ['bodyup', 'Body up (LT)'], ['steal', 'Steal'], ['shove', 'Shove'], ['punch', 'Haymaker'], ['clothes', 'Clothesline'], ['stagger', 'Knocked down'],
+  ['layup', 'Layup'], ['dunk', 'Dunk'], ['cross', 'Crossover'], ['post', 'Post up (LT)'], ['bodyup', 'Body up (LT)'], ['steal', 'Steal'], ['shove', 'Shove'], ['punch', 'Haymaker'], ['clothes', 'Clothesline'], ['stagger', 'Fall: sit'], ['fall:face', 'Fall: face first'], ['fall:flat', 'Fall: laid out'], ['fall:spin', 'Fall: spun round'], ['fall:knee', 'Fall: to a knee'],
+  ['celeb:airflex', 'Celeb: air flex'], ['celeb:flexdown', 'Celeb: crab flex'], ['celeb:toosmall', 'Celeb: too small'], ['celeb:stare', 'Celeb: stare down'], ['celeb:pout', 'Celeb: pout'], ['celeb:shh', 'Celeb: shh'], ['celeb:rock', 'Celeb: rock the baby'], ['celeb:nightnight', 'Celeb: night night'], ['celeb:pound', 'Celeb: chest pound'], ['celeb:shrug', 'Celeb: shrug'], ['celeb:floor', 'Celeb: slap the floor'], ['celeb:wag', 'Celeb: finger wag'],
   ['fan:up', 'Fan: arms up'], ['fan:jump', 'Fan: jump'], ['fan:ohh', 'Fan: OHHH'], ['fan:point', 'Fan: point & laugh'], ['fan:cover', 'Fan: hand over mouth'], ['fan:boo', 'Fan: boo'], ['fan:count', 'Fan: three'], ['fan:wave', 'Fan: towel'], ['fan:clap', 'Fan: clap'], ['fan:phone', 'Fan: phone'], ['fan:film', 'Fan: filming'], ['fan:talk', 'Fan: talking'], ['fan:bob', 'Fan: bobbing'], ['fan:cross', 'Fan: arms crossed'],
   ['seq:idle,shoot,run', 'Idle → shot → land → run'], ['seq:dribble,shoot,idle', 'Dribble → shot'], ['seq:dribble,pass,idle', 'Dribble → pass'], ['seq:run,idle', 'Run → stop'], ['seq:slide,run,dribble', 'Defense → run → offense'], ['seq:walk,run,idle', 'Walk → run → stop'],
 ];
@@ -6291,7 +6425,7 @@ function alabRigs() {
 }
 // what a player is doing at lab time t: a single action loops; a sequence plays its parts back to back
 function alabAt(t) {
-  const act = ALAB.act; if (!act.startsWith('seq:')) { const d = ALAB_DUR[act] || 1; return { an: act, t: t % (d + 0.5), d }; }
+  const act = ALAB.act; if (!act.startsWith('seq:')) { const d = act.startsWith('fall:') ? 2.2 : ALAB_DUR[act] || 1; return { an: act, t: t % (d + 0.5), d }; }
   const parts = act.slice(4).split(','), tot = parts.reduce((s, a) => s + (ALAB_DUR[a] || 1), 0); let u = t % tot;
   for (const a of parts) { const d = ALAB_DUR[a] || 1; if (u < d) return { an: a, t: u, d }; u -= d; } return { an: parts[0], t: 0, d: 1 };
 }
@@ -6310,12 +6444,14 @@ function alabPose(F, s, dt) {
   else if (an === 'clothes') { o.sp = 1; o.ph = s.t * 9; P = poseOf('clothes', s.t, o); }
   else if (an === 'stagger') { o.fall = true; o.dur = 2.2; o.side = 0; P = poseOf('stagger', s.t, o); }
   else if (an.startsWith('fan:')) P = crowdPose(an.slice(4), ALAB.t, { ph: 0 }, prof);
+  else if (an.startsWith('fall:')) { o.fall = true; o.dur = 2.2; o.side = 1; o.kind = an.slice(5); P = poseOf('stagger', s.t % 2.7, o); }
+  else if (an.startsWith('celeb:')) { o.style = an.slice(6); P = poseOf('celeb', ALAB.t, o); y = o.style === 'airflex' ? 0.6 : 0; }
   else P = poseOf(an, an === 'idle' ? ALAB.t : s.t, o);
   F.y = y; landLayer(P, R, F, dt, prof);
   if (an !== F.an) { F.rate = transRate(F.an || an, an); F.trT = 0; F.an = an; } F.trT = (F.trT || 0) + dt; if (F.trT < 2.5 / F.rate) P.rate = Math.max(P.rate || 16, F.rate);
   applyPose(R, P, dt); R.root.position.y = y; R.root.updateMatrixWorld(true);
   // the ball: in the hands, up into the shooting hand, gone at the release; bouncing under the dribble hand
-  const B = F.ball; B.visible = ALAB.ball && !/^(run|walk|slide|jump|idle|bodyup|steal|shove|punch|clothes|stagger)$/.test(an) && !an.startsWith('fan:');
+  const B = F.ball; B.visible = ALAB.ball && !/^(run|walk|slide|jump|idle|bodyup|steal|shove|punch|clothes|stagger)$/.test(an) && !an.startsWith('fan:') && !an.startsWith('fall:') && !an.startsWith('celeb:');
   if (B.visible) { const sh = prof.hand === 'L' ? 'L' : 'R', off = sh === 'R' ? 'L' : 'R', a = new THREE.Vector3(), b = new THREE.Vector3(); handPos(R, sh, a); handPos(R, off, b);
     if (an === 'shoot' || an === 'fake') { const u = s.t / 0.6, lift = clamp((u - 0.35) / 0.4, 0, 1); if (an === 'shoot' && u > 1) { const f = u - 1; B.position.set(F.x, a.y + f * 4.5 - f * f * 3, a.z - f * 2.2); } else { a.lerp(b, 0.5 * (1 - lift)); a.y += 0.06 + 0.05 * lift; B.position.copy(a); } }
     else if (an === 'dribble' || an === 'post' || an === 'cross') { handPos(R, prof.hand === 'L' ? 'L' : 'R', a); const c = Math.abs(Math.sin(s.t * 7 / 2)); B.position.set(a.x, 0.12 + (a.y - 0.18) * c, a.z + 0.05); }

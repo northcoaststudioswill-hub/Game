@@ -293,7 +293,7 @@ const LADDER = [
   { name: 'The Commissioner', style: 'showman', ovr: 92, line: 'I do not play people. I review them.', worn: { hair: 'h_flame', head: 'hd_capflag', face: 'f_gold', top: 't_gold', arm: 'a_chrome', bottom: 'b_gold', socks: 's_flag', shoes: 'k_gold', back: 'bk_cape', ball: 'bl_gold' } },
 ];
 const ONES = { id: '1v1', n: 'ONES', size: 1, arcade: false, to: 7, d: 'One on one to 7. Ones and twos. Winners stay.' };
-function ladderBuild(i) { const L = LADDER[i]; const b = withSeed(1000 + i, () => aiBuild(L.ovr, L.style)); b.name = L.name; b.worn = Object.assign({}, L.worn); return b; }
+function ladderBuild(i) { const L = LADDER[i]; const b = withSeed(1000 + i, () => aiBuild(L.ovr, L.style)); b.name = L.name; b.keepLook = true; b.worn = Object.assign({}, L.worn); return b; }
 function uiLadder(i) {
   const L = LADDER[i], beaten = (S.ladder || 0) > i, open = (S.ladder || 0) >= i, pay = Math.round(ladderPay(i) * (beaten ? 0.3 : 1));
   if (!open) return uiDialog(L.name.toUpperCase(), `"Beat ${LADDER[i - 1].name} first. I don't play people nobody's heard of."`, [['Fair.', null]]);

@@ -76,7 +76,7 @@ function castStep(dt) {
     else { n.ambT = (n.ambT || 5) - dt; if (n.ambT <= 0) { n.amb = pick(n.cast === 'mark' ? ['cross', 'watch', 'talk', 'point'] : n.cast === 'erin' ? ['watch', 'clap', 'cross'] : ['watch', 'phone', 'cross']); n.ambT = rnd(4, 9); } }
     n.rig.root.position.set(n.x, 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, crowdPose(n.amb, W.t, { ph: n.ph }, n.rig.prof), dt);
     // a line now and then when you walk past
-    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 6 && n.sayT <= 0) { n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
+    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 5 && n.sayT <= 0 && C.t - (C.lastSay || -9) > 5) { C.lastSay = C.t;      /* one of them at a time */ n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
   }
   // Mark has money on the run in the cage
   if (W.park && C.mark) { const s = W.park.score[0] + W.park.score[1]; if (C.lastPark !== undefined && s !== C.lastPark && Math.random() < 0.5) { bubble(C.mark.rig.root, pick(Math.random() < 0.6 ? CAST_LINES.markBet : CAST_LINES.mark), 3.5, C.mark.rig.H + 0.35); C.mark.amb = Math.random() < 0.5 ? 'ohh' : 'up'; C.mark.ambT = 1.8; } C.lastPark = s; }
@@ -133,7 +133,7 @@ function uiLouie() {
 
 // ---- BRENNICK ----
 function kaelBuild() {
-  const b = withSeed(2207, () => aiBuild(88, 'slasher')); b.name = 'Brennick'; b.build.body.h = 79; b.build.skin = 2;
+  const b = withSeed(2207, () => aiBuild(88, 'slasher')); b.name = 'Brennick'; b.keepLook = true; b.build.body.h = 79; b.build.skin = 2;
   b.worn = Object.assign(randomWorn(2), { top: 't_tee', head: 'hd_none', face: 'f_none', shoes: 'k_beat' });
   b.anim = { shot: { trad: 0.25, high: 0.6, quick: 0.15 }, idle: { relaxed: 0.2, athletic: 0.7, wide: 0.1 }, hand: 'R', knee: 1.2, elbow: -0.2, lean: 0.2, stance: 1.1, follow: 1.3, shoulder: 0, cadence: 0.8, intensity: 1.25, recovery: 1.3, restless: 0.1, dribLow: 0.4, defLow: 0.6, arms: 0.2, swag: 0.1 };      /* patient, low, explosive */
   return b;
@@ -150,7 +150,7 @@ function runKael() {
   uiClose(); const tier = TIERS_COURT[2], b = kaelBuild(), first = !S.kaelBeat;
   const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: 77, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) { setTimeout(() => toast('BRENNICK', '"' + pick(CAST_LINES.kaelLose) + '"'), 1600); return null; }
-    if (first) { S.kaelBeat = true; const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
+    if (first) { S.kaelBeat = true; deedDrip('bk_washer', 'Beat Brennick'); const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
     return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 VC' : 'Beat Brennick again +150 VC' }; };
   cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
   save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();

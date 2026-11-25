@@ -52,6 +52,7 @@ function startMatch(cfg) {
   if (style === 'street' || style === 'arcade') { weather(); litter(6, -8, 8, -1, 12); skyLife(60, arcade ? 'RUCKUS · NO RULES · NO REFUNDS' : 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); }
   if (!cfg.practice) crowdInit();      /* courts.js: people along the baseline and both sidelines */
   // --- players ---
+  { const used = new Set(); cfg.teams.forEach(team => team.forEach(sp => { if (sp.ctrl < 0 && !sp.b.bot && sp.b.net === undefined && !sp.b.keepLook) uniqLook(sp.b, used, 3); else used.add([sp.b.worn.hair, sp.b.worn.top, sp.b.worn.bottom, sp.b.build.skin].join('|')); })); }      /* no two AI players dressed alike */
   cfg.teams.forEach((team, ti) => team.forEach((sp, k) => {
     const mine = sp.mine === true;
     const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, remote: sp.ctrl >= 2, peer: sp.peer || null, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
@@ -134,7 +135,10 @@ function scorePts(p, pts, how) {
   addBrav(p, how === 'dunk' ? 0.16 : 0.10);
   if (M_.drill) drillEvent('make', p, { how, kind: how === 'dunk' ? 'dunk' : M_.B.kind, green: how !== 'dunk' && M_.B.green });
   if (M_.practice) return;
-  M_.phase = 'scored'; M_.pt = 1.45; p.st = 'celeb'; p.t = 0;
+  M_.phase = 'scored'; M_.pt = how === 'dunk' ? 2.1 : 1.45; p.st = 'celeb'; p.t = 0;
+  { const eq = p.b.moves.celeb, vic = how === 'dunk' && p.finish ? p.finish.hit : null;      // what he does about it: his own celebration, or one that fits the play
+    p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout'])) : pts >= 2 ? pick([eq, eq, 'shh', 'shrug', 'nightnight', 'pout']) : pick([eq, eq, eq, 'shrug', 'pound']);
+    p.celebAt = vic || null; if (M_.net === 'host') netEv({ k: 'cs', i: p.i, s: p.celebStyle }); }
   if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
@@ -260,7 +264,7 @@ function blocked(p, o) {
   const B = MT.B; p.stats.fga++; o.stats.blk++; o.swatT = 0.45; MT.hoopT = 0.2; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
   call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; p.finish.blocked = true; p.bumpT = 0.3; p.bumpX = -0.3; p.bumpZ = rnd(-0.15, 0.15); }
-  crowdReact('block', o.team); B.rebound = false;
+  crowdReact('block', o.team); B.rebound = false; o.tauntT = 1.3; floatTxt(o, pick(['GET THAT OUT', 'PACKED', 'NOT IN HERE', 'SEND IT BACK']), '#33e0ff'); if (MT.net === 'host') netEv({ k: 'ta', i: o.i });
 }
 function finishRange(p) { return MT.arcade ? 5.6 : 2.5 + nAtt(p, 'vert') * 0.6 + 0.25 * bt(p, 'gravity'); }
 // who is in the way of this finish: the opponent most in the lane between you and the rim (or waiting under it).
@@ -345,7 +349,7 @@ function resolveFinish(p) {
       B.state = 'through'; B.holder = null; B.pos.set(0, HOOP_Y - 0.05, 0); B.vel.set(0, -5, 0); B.t = 0; B.scored = true;
       p.stats.dunks++; sfxM('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
       let vic = f.hit && f.hit.st !== 'stagger' && dist(f.hit, p) < 1.6 ? f.hit : null; if (!vic) for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
-      if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2 }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
+      if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2, kind: pick(['sit', 'flat', 'flat']) }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
       f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : 0); MT.hoopT = 0.6;
       call(f.oop ? 'ALLEY-OOP!' : f.put ? 'PUTBACK!' : vic ? 'POSTER!' : pick(CALLS.dunk), p.b.name + (vic ? ' on ' + vic.b.name : ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
       scorePts(p, pts, 'dunk'); if (f.foulBy) { foul(f.foulBy, p, 'blocking', false); andOne(p, f.foulBy); } return;
@@ -373,7 +377,7 @@ function startMove(p, slot, dx, dz) {
     const fall = Math.random() < 0.4 + p.combo * 0.1; o.st = 'stagger'; o.t = 0;
     // he bit on the fake: his weight goes the opposite way to where the ball handler really went
     const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
-    o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5 };
+    o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5, kind: pick(['sit', 'sit', 'spin', 'knee']) };
     p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
   } else o.slowT = 0.22 + mv.ank;
 }
@@ -408,7 +412,7 @@ function applyHit(p, o, kind) {
   const M_ = MT, B = M_.B; p.hitList.push(o); const dd = dist(o, p) || 1, dir = [(o.x - p.x) / dd, (o.z - p.z) / dd];
   if (kind === 'punch' && Math.random() > 0.72 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.35) { floatTxt(o, 'SHRUGGED IT OFF', '#8d8d99'); sfxM('bump'); return; }
   const ko = Math.random() < (kind === 'clothes' ? 0.36 : 0.18) + Math.min(0.3, (M_.brawlHeat || 0) * 0.08);
-  o.st = 'stagger'; o.t = 0; o.stg = { dur: ko ? 4.2 : kind === 'clothes' ? 2.0 : 1.5, fall: true, side: 0, dir, push: kind === 'clothes' ? 3.4 : 2.2 };
+  o.st = 'stagger'; o.t = 0; o.stg = { dur: ko ? 4.2 : kind === 'clothes' ? 2.0 : 1.5, fall: true, side: 0, dir, push: kind === 'clothes' ? 3.4 : 2.2, kind: ko ? pick(['flat', 'face']) : kind === 'clothes' ? 'flat' : pick(['sit', 'spin', 'flat']) };
   if (ko) { o.ko = 4.2; if (M_.net === 'host') netEv({ k: 'ko', i: o.i, d: 4.2 }); }
   sfxM('block'); M_.shake = ko ? 0.55 : 0.3; crowdReact(ko ? 'ko' : 'hit', p.team); burst(o.x, 1.3, o.z, ko ? 0xff4040 : 0xffc531, ko ? 18 : 10);
   floatTxt(o, ko ? 'KO' : kind === 'clothes' ? 'CLOTHESLINED' : 'POW', ko ? '#ff4040' : '#ffc531');
@@ -437,7 +441,7 @@ function startSteal(p) {
     let o = null, od = 1.35; for (const q of MT.P) { if (q.team === p.team || q.st === 'stagger') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
     p.st = 'shove'; p.t = 0; p.cool = 1.3;
     if (o && Math.random() < 0.62 + nAtt(p, 'str') * 0.2 - nAtt(o, 'str') * 0.3) {
-      { const dd = dist(o, p) || 1; o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: 0, dir: [(o.x - p.x) / dd, (o.z - p.z) / dd], push: 2.4 }; } sfxM('block'); MT.shake = 0.2;
+      { const dd = dist(o, p) || 1; o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: 0, dir: [(o.x - p.x) / dd, (o.z - p.z) / dd], push: 2.4, kind: pick(['sit', 'face', 'spin']) }; } sfxM('block'); MT.shake = 0.2;
       if (B.holder === o) { B.state = 'loose'; B.holder = null; B.pos.set(o.x, 1, o.z); B.vel.set(rnd(-3, 3), 3, rnd(-3, 3)); B.t = 0; B.rebound = false; B.lastTeam = p.team; p.stats.stl++; call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); addBrav(p, 0.12); }
     }
     return;
@@ -703,6 +707,19 @@ function matchStep(dtReal) {
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
     const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), R = 0.56;
+    if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
+      const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
+      if (vn > 1.2 && M_.time - (a.bumpAt || -9) > 0.3 && M_.time - (b.bumpAt || -9) > 0.3 && a.st !== 'stagger' && b.st !== 'stagger') {
+        const mass = q => (0.7 + nAtt(q, 'str') * 0.9) * (1 + (q.b.build.body.w || 0) * 0.15) * (q.H / 1.95) * (q.post || q.bodyUp ? 1.3 : 1), ma = mass(a), mb = mass(b), j = vn * 0.85;
+        a.vx -= nx * j * mb / (ma + mb); a.vz -= nz * j * mb / (ma + mb); b.vx += nx * j * ma / (ma + mb); b.vz += nz * j * ma / (ma + mb); a.bumpAt = b.bumpAt = M_.time;
+        if (vn > 2.6) sfxM('bump');
+        const hard = vn > 4.3, lite = ma < mb ? a : b, heavy = lite === a ? b : a, ratio = Math.max(ma, mb) / Math.min(ma, mb);
+        if (hard && ratio > 1.18 && lite.st === 'free' && lite.y < 0.05) { const sg = lite === a ? -1 : 1;
+          if (B.holder === lite) { lite.slowT = Math.max(lite.slowT || 0, 0.35); }      /* the ball handler keeps it but loses his step */
+          else { lite.st = 'stagger'; lite.t = 0; lite.stg = { dur: 0.55, fall: false, side: Math.random() < 0.5 ? 1 : -1, dir: [nx * sg, nz * sg], push: Math.min(2.4, vn * 0.4) }; }
+          M_.shake = Math.max(M_.shake || 0, 0.12); void heavy; }
+      }
+    }
     if (d < R && d > 0.001) { const push = (R - d) / 2; if (push > 0.05) for (const q of [a, b]) { const sg = q === a ? -1 : 1, lx = dx / d * sg, lz = dz / d * sg, fx = Math.sin(q.face), fz = Math.cos(q.face); q.bumpT = 0.3; q.bumpX = clamp((lx * fx + lz * fz) * -push * 3, -0.25, 0.25); q.bumpZ = clamp((lx * fz - lz * fx) * push * 3, -0.25, 0.25); }
       const wa = a.st === 'stagger' ? 0.2 : 1, wb = b.st === 'stagger' ? 0.2 : 1, pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
   }
@@ -842,7 +859,7 @@ function stepPlayer(p, dt) {
   // facing
   const sp = Math.hypot(p.vx, p.vz); let tf = p.face;
   if (p.st === 'shoot' || p.st === 'finish' || p.st === 'hop') tf = Math.atan2(-p.x, -p.z);
-  else if (p.st === 'celeb') tf = 0;
+  else if (p.st === 'celeb') tf = p.celebAt && (p.celebStyle === 'stare' || p.celebStyle === 'toosmall' || p.celebStyle === 'flexdown') ? Math.atan2(p.celebAt.x - p.x, p.celebAt.z - p.z) : 0;      /* over the man he dunked on, or to the crowd */
   else if (B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && sp < 2.5) tf = Math.atan2(-p.x, -p.z);
   else if (def && B.holder) {
     // who you are guarding: the nearest opponent if you are a person (so it is whoever you chose to pick up), your
@@ -1035,9 +1052,9 @@ function animPlayer(p, dt) {
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
-    case 'stagger': an = 'stagger'; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
+    case 'stagger': an = 'stagger'; o.kind = p.stg.kind; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
     case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; break; case 'steal': an = 'steal'; break; case 'shove': an = 'shove'; break; case 'punch': an = 'punch'; break; case 'clothes': an = 'clothes'; o.sp = 1; o.ph = p.runPh; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
-    case 'celeb': an = 'celeb'; o.style = p.b.moves.celeb; break;
+    case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
       else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); } }
@@ -1097,6 +1114,7 @@ function animPlayer(p, dt) {
   // layers (anim.js): profile posture on the moving poses, a landing that soaks up the drop; then the transition rate
   // out of whatever the body was doing (it always blends from its current pose; gameplay never waits for it)
   profilePosture(P, an, R.prof); landLayer(P, R, p, dt, R.prof);
+  if (p.tauntT > 0) { p.tauntT -= dt; if (p.st === 'free' && !hasBall && p.y < 0.05) { const w = Math.sin(M_.time * 14); P.shR = [-1.9, 0, -0.1]; P.elR = [-1.2, 0, 0]; P.wrR = [0, 0, w * 0.7]; const n = P.neck || (P.neck = [0, 0, 0]); n[1] += w * 0.15; P.rate = Math.max(P.rate || 16, 24); } }      /* finger wag after a block, while the play goes on */
   if (an !== R.anPrev) { const r = transRate(R.anPrev || an, an), rec = R.prof ? R.prof.recovery : 1; R.trRate = /^(shoot|jump|swat|stagger|dunk|layup|floater|hop)$/.test(R.anPrev || '') ? r * rec : r; R.trPair = !!TRANS[(R.anPrev || '') + '>' + an]; R.trT = 0; R.anPrev = an; }
   R.trT = (R.trT || 0) + dt; if (R.trT < 2.5 / R.trRate) P.rate = R.trPair ? lerp(R.trRate, P.rate || 16, R.trT * R.trRate / 2.5) : Math.max(P.rate || 16, R.trRate);
   applyPose(R, P, dt);

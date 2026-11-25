@@ -176,6 +176,9 @@ const CELEBS = [
   { id: 'salute', n: 'Salute The Flag', cost: 500, rank: 1 },
   { id: 'count', n: 'Count The VC', cost: 1500, rank: 2 },
   { id: 'eagle', n: 'Freedom Eagle', cost: 3000, rank: 4 },
+  { id: 'shrug', n: 'The Shrug', cost: 400, rank: 0 }, { id: 'shh', n: 'Quiet, Please', cost: 700, rank: 1 }, { id: 'pound', n: 'Chest Pound', cost: 900, rank: 1 },
+  { id: 'pout', n: 'The Pout', cost: 1200, rank: 2 }, { id: 'rock', n: 'Rock The Baby', cost: 1800, rank: 2 }, { id: 'nightnight', n: 'Night Night', cost: 2400, rank: 3 },
+  { id: 'toosmall', n: 'Too Small', cost: 2800, rank: 3 }, { id: 'floor', n: 'Slap The Floor', cost: 2000, rank: 3 }, { id: 'stare', n: 'The Stare Down', cost: 3500, rank: 4 }, { id: 'flexdown', n: 'Crab Flex', cost: 4500, rank: 5 },
 ];
 
 // ---------- ranks (Respect) ----------
@@ -262,6 +265,47 @@ drip('socks', 's_flag', 'Bald Eagle Socks', 'high', '#2440a8', '#ff3c3c', 2, 900
 drip('socks', 's_neon', 'Glow Socks', 'high', '#33ff88', 0, 2, 1000, 3, { speed: 1 });
 // shoes
 drip('shoes', 'k_beat', 'Beaters', 'low', '#b9b9b9', '#666', 0, 0, 0, null, 'start');
+// THE CROSSOVER: gear from the crew's other games (Pocket Lantern, Sprouts, Sproutwild, Knockout, Patch & Plate,
+// Guttercrown, Sootborn). Sold at The Plug like everything else; the 'deed' ones are earned, never sold.
+drip('top', 't_flowpros', 'Flow Pros Work Shirt', 'tee', '#2a5ea8', '#f2c14e', 1, 700, 1, { str: 1 });
+drip('top', 't_sunkeep', 'Sunkeep Garden Tee', 'tee', '#4f8a3c', '#f3e6cf', 1, 600, 0, { stam: 1 });
+drip('top', 't_lantern', 'Pocket Lantern Hoodie', 'hoodie', '#1c2440', '#ffd76a', 2, 1900, 2, { iq: 1 });
+drip('top', 't_knockout', 'North Coast Knockout Jersey', 'jersey', '#c8102e', '#f4f4f4', 2, 2200, 3, { str: 1, intd: 1 });
+drip('top', 't_cinder', 'Cinderwell Soot Tank', 'tank', '#2b2b30', '#b8682a', 1, 800, 1);
+drip('top', 't_gutter', 'Guttercrown Syndicate Jersey', 'jersey', '#26204a', '#f0c95a', 3, 4200, 4, { steal: 1, handle: 1 });
+drip('top', 't_sprout', 'Sproutwild Trainer Jacket', 'hoodie', '#7ac74f', '#2a3440', 2, 2600, 3, { speed: 1 });
+drip('top', 't_patch', 'Patch & Plate Apron Tee', 'tee', '#e0452c', '#f3e6cf', 0, 350, 0);
+drip('top', 't_gilded', 'Gilded Assay Whites', 'jersey', '#f4f1e8', '#e9cf7a', 4, 9000, 6, { mid: 1, three: 1, iq: 1 });
+drip('head', 'hd_flowcap', 'Flow Pros Cap', 'cap', '#2a5ea8', '#f2c14e', 0, 300, 0);
+drip('head', 'hd_dedrick', 'Dedrick Widebrim', 'cap', '#26204a', '#f0c95a', 2, 1700, 2);
+drip('head', 'hd_gutter', 'The Gutter Crown', 'crown', '#f0c95a', '#26204a', 4, 12000, 6, { dunk: 1, swb: 1 });
+drip('head', 'hd_sprout', 'Sprout On Your Head', 'antenna', '#7ac74f', 0, 1, 900, 1);
+drip('head', 'hd_lantern', 'Lantern Halo', 'halo', '#ffd76a', 0, 3, 5200, 4, { iq: 1 });
+drip('head', 'hd_bibi', 'Iron Dome Headband', 'band', '#c8d0d8', 0, 1, 650, 1, { block: 1 });
+drip('face', 'f_gold', 'Gilded Eyes', 'visor', '#e9cf7a', 0, 3, 4800, 5, { iq: 1 });
+drip('face', 'f_clanker', 'Clanker Visor', 'visor', '#33e0ff', 0, 2, 2100, 3);
+drip('face', 'f_soot', 'Soot Rag', 'mask', '#3d5a6a', 0, 1, 500, 1);
+drip('face', 'f_derek', "D's Van Shades", 'shades', '#111', 0, 1, 450, 0);
+drip('arm', 'a_valve', 'Valve-Hand Wraps', 'sleeve', '#b8682a', 0, 2, 1500, 2, { steal: 1 });
+drip('arm', 'a_garden', 'Garden Gloves', 'wrist', '#7ac74f', 0, 0, 220, 0);
+drip('bottom', 'b_flow', 'Flow Pros Work Shorts', 'shorts', '#2a3440', '#f2c14e', 1, 550, 1);
+drip('bottom', 'b_cinder', 'Tier Six Cut-Offs', 'shorts', '#3d5a6a', '#b8682a', 1, 700, 1);
+drip('bottom', 'b_gutter', 'Syndicate Shorts', 'shorts', '#26204a', '#f0c95a', 3, 3600, 4, { speed: 1 });
+drip('bottom', 'b_sunkeep', 'Sunkeep Shorts', 'shorts', '#4f8a3c', '#f3e6cf', 0, 320, 0);
+drip('socks', 's_wisp', 'Wisplight Socks', 'high', '#6cf0ff', '#26204a', 2, 1300, 2);
+drip('socks', 's_soot', 'Soot-Line Socks', 'high', '#2b2b30', '#b8682a', 1, 400, 1);
+drip('shoes', 'k_wisp', 'Wispdice 6s', 'high', '#6cf0ff', '#26204a', 3, 5200, 4, { vert: 1, accel: 1 });
+drip('shoes', 'k_valve', 'Bank Seven Boots', 'high', '#5a3a22', '#b8682a', 2, 2400, 3, { str: 1, reb: 1 });
+drip('shoes', 'k_louie', 'Good Boys', 'low', '#d9853b', '#f3e6cf', 1, 950, 1, { speed: 1 });
+drip('shoes', 'k_yukon', 'Yukon XLs', 'high', '#1c1d22', '#c8d0d8', 2, 2800, 3, { str: 1 });
+drip('shoes', 'k_gilded', 'Lift Zero Golds', 'high', '#e9cf7a', '#f4f1e8', 4, 11000, 6, { speed: 1, vert: 1, accel: 1 });
+drip('back', 'bk_kiss', "Corbin's Cape", 'cape', '#ff4fd8', '#f4f4f4', 2, 2000, 2);
+drip('back', 'bk_white', 'The Cloak That Is Not Mine', 'cape', '#f4f1e8', '#e9cf7a', 4, 8500, 6, { dunk: 1, layup: 1 });
+drip('back', 'bk_sprouts', 'Sprout Pack', 'pack', '#7ac74f', '#5a3a22', 1, 1100, 1, { stam: 1 });
+drip('back', 'bk_towelwhip', "Erin's Towel Whip", 'towel', '#f3e6cf', 0, 1, 600, 1, { stam: 1 });
+drip('back', 'bk_washer', 'Washer On A Cord', 'towel', '#c8a24a', 0, 3, 0, 0, { layup: 1, iq: 1 }, 'deed');
+drip('head', 'hd_bookie', "The Bookie's Visor", 'cap', '#1f6a3a', '#f4f4f4', 3, 0, 0, { iq: 1 }, 'deed');
+drip('face', 'f_dead13', 'Dead-On Thirteens', 'shades', '#b3401a', 0, 3, 0, 0, { three: 1 }, 'deed');
 // NEXX SUPPLY: only Nexx sells these (cast.js)
 drip('top', 't_nexx', 'NEXX Studio Hoodie', 'hoodie', '#111216', '#7de3ff', 2, 1200, 0, { handle: 1, swb: 1 }, 'nexx');
 drip('head', 'hd_nexx', 'NEXX Snapback', 'cap', '#7de3ff', '#111216', 1, 450, 0, null, 'nexx');
