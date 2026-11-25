@@ -89,7 +89,7 @@ function startMatch(cfg) {
 
 // ---------- flow ----------
 function setCheck(team, first) {
-  const M_ = MT; M_.phase = 'check'; M_.pt = first ? 2.2 : 1.15; M_.off = team; M_.needClear = false; M_.clock = 14; M_.looseT = 0;
+  const M_ = MT; M_.pp = 0; M_.phase = 'check'; M_.pt = first ? 2.2 : 1.15; M_.off = team; M_.needClear = false; M_.clock = 14; M_.looseT = 0;
   for (const q of M_.P) if (q.stam !== undefined) { q.stam = Math.min(100, q.stam + 16); q.gassed = false; }      /* a check-up is a breather */
   const offs = M_.P.filter(p => p.team === team), defs = M_.P.filter(p => p.team !== team);
   // the human takes the check when it is their ball
@@ -104,7 +104,7 @@ function setCheck(team, first) {
 // p.live: 'hold' (ball held, dribble still available), 'drib' (dribbling), 'dead' (picked up: pass, shoot, fake or pivot)
 function dribRules(p) { return p.user && !p.afk && !MT.reel; }
 function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); p.live = dribRules(p) && Math.hypot(p.vx, p.vz) < 1.5 ? 'hold' : 'drib'; p.stopT = 0; }
-function changePoss(team) { if (MT.off !== team) { if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) lateCall(0.4, 'LOCKED IN', 'Three stops in a row', '#33e0ff'); }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; p.dv = poolNext(p, 'dv', 4); } } }
+function changePoss(team) { if (MT.off !== team) { MT.pp = 0; if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) lateCall(0.4, 'LOCKED IN', 'Three stops in a row', '#33e0ff'); }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; p.dv = poolNext(p, 'dv', 4); } } }
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
   if (!p.user || p.bravT > 0 || MT.practice) return;
@@ -442,7 +442,7 @@ function startMove(p, slot, dx, dz) {
   else o.slowT = 0.22 + mv.ank;
 }
 function doPass(p, to) {
-  if (!to || MT.B.holder !== p) return; const B = MT.B;
+  if (!to || MT.B.holder !== p) return; const B = MT.B; MT.pp = (MT.pp || 0) + 1;      /* passes this possession */
   const oop = MT.phase === 'live' && !MT.needClear && to.st === 'free' && dHoop(to) < 3.7 && dHoop(to) > 0.9 && dist(p, to) > 3 && (MT.arcade || att(to, 'dunk') >= 62) && nearestOpp(to)[1] > 0.95 && (to.callT > 0 || to.vx * -to.x + to.vz * -to.z > 1.2);
   p.flashy = !oop && (p.b.build.style === 'showman' || bt(p, 'trickle') >= 2) && Math.random() < 0.45;
   p.st = 'pass'; p.t = 0; p.face = Math.atan2(to.x - p.x, to.z - p.z); to.cv = poolNext(to, 'cv', 3);
@@ -831,7 +831,7 @@ function aiThink(p, dt) {
         // the look, read off the hands actually near him: a good shooter waits for a clean one, a bad decision-maker takes what is there
         const cn = contestOn(p);
         if (p.catchT && MT.time - p.catchT < 0.9 && cn >= 0.2 && !MT.arcade && Math.random() < 0.3 + L * 0.5 && tryPass(q => contestOn(q) < 0.1 && passVal(q) > 0.45 && q !== p.catchFrom)) return;      /* caught it with a hand up: swing it on, do not hold it */
-        const look = cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3;
+        const look = (cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3) * (!MT.arcade && !(MT.pp > 0) && a.hold < 1.3 && cn > 0.06 && MT.clock > 6 ? 0.3 + px(p, 'brav') * 2 : 1);      /* first touch of the trip: move it first unless he is wide open (gunners less patient) */
         if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < 0.45 * look * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
         if (!beyondArc(p.x, p.z) && d > 2.8 && Math.random() < 0.42 * look * (0.25 + mid) * sel) { startShot(p, 'ai'); return; }
         // feed an open human sometimes; nobody likes an AI ball hog
