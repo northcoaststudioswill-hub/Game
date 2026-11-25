@@ -499,7 +499,15 @@ function buildStep(dt) {
   if (B.mouse) { B.fx = B.mouse[0]; B.fz = B.mouse[1]; B.mouse = null; }
   if (inRoom()) { B.fx = clamp(B.fx, ROOM.x0, ROOM.x1); B.fz = clamp(B.fz, ROOM.z0, ROOM.z1); } else { B.fx = clamp(B.fx, -23.5, 23.5); B.fz = clamp(B.fz, -2.8, 23); } const gs = B.sel && HOME_ITEM[B.sel].small ? 4 : 2; B.x = Math.round(B.fx * gs) / gs; B.z = Math.round(B.fz * gs) / gs;      /* small things snap to a quarter metre */
   if (B.sel) { const d = HOME_ITEM[B.sel]; if ((B.rot & 1 ? d.d : d.w) % 1 !== 0 && (B.rot & 1 ? d.d : d.w) * 2 % 2 === 1) { /* half-metre footprints sit on the half grid */ } }
-  if (!busy) { if (I.aP) buildPlace(); if (I.bP) buildRotate(); if (I.back) buildExit(); }
+  if (!busy) {
+    const pe = I.pe || {}, list = () => (BLD.cat === 'store' ? HOME_ITEMS.filter(i => home().store[i.id] > 0) : HOME_ITEMS.filter(i => i.cat === BLD.cat)).filter(i => { const st = home().store[i.id] || 0; return !((i.rank > rankOf(S.rep) && !st) || (i.rare && i.id !== rareToday().id && !st)); });
+    if (I.aP) buildPlace(); if (pe.x || (I.bP && !I.hasPad)) buildRotate();
+    if (pe.y && B.pick) buildStore(); if (pe.lt && B.pick) buildSell(); if (pe.sel) { B.yaw = (B.yaw + 1) % 4; sfx('ui'); }
+    if (I.lbP || I.rbP) { const cats = HOME_CATS.map(c => c[0]).concat(['store']), i = cats.indexOf(BLD.cat); BLD.cat = cats[(i + (I.rbP ? 1 : -1) + cats.length) % cats.length]; sfx('ui'); buildPanel(); }
+    if (pe.dl || pe.dr) { const L = list(); if (L.length) { const i = L.findIndex(x => x.id === B.sel), n = L[(i + (pe.dr ? 1 : -1) + L.length) % L.length]; if (i < 0 && pe.dl) BLD.act.pick(L[L.length - 1].id); else BLD.act.pick(n.id); sfx('ui'); const el = document.querySelector('#build [data-b="pick"][data-v="' + (W.build.sel || '') + '"]'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', inline: 'center' }); } }
+    if (pe.du) uiHomeLot(); if (pe.dd) uiHomeSets();
+    if (I.back) { if (B.sel) buildCancel(); else buildExit(); }
+  }
   if (!W.build) return;
   if (B.ghost) { const tu = HOME_ITEM[B.sel].small ? topUnder(itemRect({ i: B.sel, x: B.x, z: B.z, r: B.rot }), B.pick ? -1 : undefined) : null; B.ghost.position.set(B.x, tu ? tu.h : 0, B.z); B.ghost.rotation.y = B.rot * Math.PI / 2; const ok = !buildFits(B.sel, B.x, B.z, B.rot, B.pick ? -1 : undefined); if (ok !== B.ok) { B.ok = ok; B.ghost.traverse(o => { if (o.isMesh) o.material = ok ? _ghostOK : _ghostBad; }); } B.ghost.children[0].position.y = 0.04 + Math.sin(W.t * 6) * 0.03; }
   // hover outline on placed things

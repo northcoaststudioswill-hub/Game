@@ -91,7 +91,7 @@ function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
 function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
 // button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
 // between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
-function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; } }
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; I.pe = {}; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
@@ -117,7 +117,9 @@ function pollInput() {
     if (p) {
       const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; if (ls[0] || ls[1]) analog = true; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
-      if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1;
+      const bld = typeof BLD !== 'undefined' && BLD.on && !(typeof UI !== 'undefined' && UI.cur);      /* in the home builder the d-pad browses the catalog; the stick moves the cursor */
+      if (!bld) { if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1; }
+      { const now = { y: B(3), x: B(2), lt: B(6) || (p.buttons[6] && p.buttons[6].value > 0.35), rt: B(7), sel: B(8) || B(11) || B(10), dl: B(14), dr: B(15), du: B(12), dd: B(13) }, pv = I._pe || {}, pe = I.pe || (I.pe = {}); for (const k in now) if (now[k] && !pv[k]) pe[k] = true; I._pe = now; I.hasPad = true; }
       // on defense (2K layout): X steals, Y jumps to block; A still steals. With the ball and off it: X or Y shoots / jumps
       const def = typeof padDefense === 'function' && padDefense(i);
       sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);

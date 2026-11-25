@@ -762,7 +762,7 @@ function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
 function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
 // button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
 // between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
-function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; } }
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; I.pe = {}; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
@@ -788,7 +788,9 @@ function pollInput() {
     if (p) {
       const ls = stick(p.axes[0] || 0, p.axes[1] || 0, 0.17), rs = stick(p.axes[2] || 0, p.axes[3] || 0, 0.22); mx += ls[0]; my += ls[1]; if (ls[0] || ls[1]) analog = true; rx += rs[0]; ry += rs[1];
       const B = n => p.buttons[n] && p.buttons[n].pressed;
-      if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1;
+      const bld = typeof BLD !== 'undefined' && BLD.on && !(typeof UI !== 'undefined' && UI.cur);      /* in the home builder the d-pad browses the catalog; the stick moves the cursor */
+      if (!bld) { if (B(14)) mx -= 1; if (B(15)) mx += 1; if (B(12)) my -= 1; if (B(13)) my += 1; }
+      { const now = { y: B(3), x: B(2), lt: B(6) || (p.buttons[6] && p.buttons[6].value > 0.35), rt: B(7), sel: B(8) || B(11) || B(10), dl: B(14), dr: B(15), du: B(12), dd: B(13) }, pv = I._pe || {}, pe = I.pe || (I.pe = {}); for (const k in now) if (now[k] && !pv[k]) pe[k] = true; I._pe = now; I.hasPad = true; }
       // on defense (2K layout): X steals, Y jumps to block; A still steals. With the ball and off it: X or Y shoots / jumps
       const def = typeof padDefense === 'function' && padDefense(i);
       sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
@@ -3896,6 +3898,7 @@ function worldStep(dt) {
   if (building) { buildStep(dt); return; }
   if (!busy && W.near && I.aP) { sfx('uiok'); W.near.fn(); }
   else if (!busy && I.start) uiPlayer('attrs');
+  else if (!busy && I.pe && I.pe.y && (W.kind === 'crib' || W.kind === 'room') && !W.visit && !W.build && typeof buildEnter === 'function') buildEnter();
   // camera
   const portrait = innerWidth < innerHeight, back = portrait ? 7.5 : 6.2, up = portrait ? 3.8 : 3.1;
   let cx = me.x - fx * back, cz = me.z - fz * back, lift = 0;
@@ -4904,7 +4907,15 @@ function buildStep(dt) {
   if (B.mouse) { B.fx = B.mouse[0]; B.fz = B.mouse[1]; B.mouse = null; }
   if (inRoom()) { B.fx = clamp(B.fx, ROOM.x0, ROOM.x1); B.fz = clamp(B.fz, ROOM.z0, ROOM.z1); } else { B.fx = clamp(B.fx, -23.5, 23.5); B.fz = clamp(B.fz, -2.8, 23); } const gs = B.sel && HOME_ITEM[B.sel].small ? 4 : 2; B.x = Math.round(B.fx * gs) / gs; B.z = Math.round(B.fz * gs) / gs;      /* small things snap to a quarter metre */
   if (B.sel) { const d = HOME_ITEM[B.sel]; if ((B.rot & 1 ? d.d : d.w) % 1 !== 0 && (B.rot & 1 ? d.d : d.w) * 2 % 2 === 1) { /* half-metre footprints sit on the half grid */ } }
-  if (!busy) { if (I.aP) buildPlace(); if (I.bP) buildRotate(); if (I.back) buildExit(); }
+  if (!busy) {
+    const pe = I.pe || {}, list = () => (BLD.cat === 'store' ? HOME_ITEMS.filter(i => home().store[i.id] > 0) : HOME_ITEMS.filter(i => i.cat === BLD.cat)).filter(i => { const st = home().store[i.id] || 0; return !((i.rank > rankOf(S.rep) && !st) || (i.rare && i.id !== rareToday().id && !st)); });
+    if (I.aP) buildPlace(); if (pe.x || (I.bP && !I.hasPad)) buildRotate();
+    if (pe.y && B.pick) buildStore(); if (pe.lt && B.pick) buildSell(); if (pe.sel) { B.yaw = (B.yaw + 1) % 4; sfx('ui'); }
+    if (I.lbP || I.rbP) { const cats = HOME_CATS.map(c => c[0]).concat(['store']), i = cats.indexOf(BLD.cat); BLD.cat = cats[(i + (I.rbP ? 1 : -1) + cats.length) % cats.length]; sfx('ui'); buildPanel(); }
+    if (pe.dl || pe.dr) { const L = list(); if (L.length) { const i = L.findIndex(x => x.id === B.sel), n = L[(i + (pe.dr ? 1 : -1) + L.length) % L.length]; if (i < 0 && pe.dl) BLD.act.pick(L[L.length - 1].id); else BLD.act.pick(n.id); sfx('ui'); const el = document.querySelector('#build [data-b="pick"][data-v="' + (W.build.sel || '') + '"]'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', inline: 'center' }); } }
+    if (pe.du) uiHomeLot(); if (pe.dd) uiHomeSets();
+    if (I.back) { if (B.sel) buildCancel(); else buildExit(); }
+  }
   if (!W.build) return;
   if (B.ghost) { const tu = HOME_ITEM[B.sel].small ? topUnder(itemRect({ i: B.sel, x: B.x, z: B.z, r: B.rot }), B.pick ? -1 : undefined) : null; B.ghost.position.set(B.x, tu ? tu.h : 0, B.z); B.ghost.rotation.y = B.rot * Math.PI / 2; const ok = !buildFits(B.sel, B.x, B.z, B.rot, B.pick ? -1 : undefined); if (ok !== B.ok) { B.ok = ok; B.ghost.traverse(o => { if (o.isMesh) o.material = ok ? _ghostOK : _ghostBad; }); } B.ghost.children[0].position.y = 0.04 + Math.sin(W.t * 6) * 0.03; }
   // hover outline on placed things
@@ -4970,7 +4981,9 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
 function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
 function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
-function openPanel(render, cls, onBack) { UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy'); }
+function openPanel(render, cls, onBack) { UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
+  // a controller starts on the panel's main action (RESUME, PLAY…), else on the first thing that is not a tab or the close button
+  const f = focusables(); let i = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')); if (i < 0) i = f.findIndex(e => e.closest('.pf')); if (i < 0) i = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, i); paintFocus(); }
 function rerender(reset) {
   if (!UI.cur) return; const el = $('panel'), pb = el.querySelector('.pb'), sc = pb && !reset ? pb.scrollTop : 0, tb = el.querySelector('.tabs'), ts = tb && !reset ? tb.scrollLeft : 0;
   UI.handlers = []; el.className = UI.cur.cls; el.innerHTML = `<div class="pin">${UI.cur.render()}</div>`; el.style.display = 'block';
@@ -4978,7 +4991,7 @@ function rerender(reset) {
 }
 function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
-function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],.card[data-k],.sw[data-k]')).filter(e => e.offsetParent !== null); }
+function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],input[type=text],select,.card[data-k],.sw[data-k],span[data-k]:not([data-k=""])')).filter(e => e.offsetParent !== null); }
 // controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
 function navDir(f, from, m) {
   const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2; let best = -1, bs = 1e9;
@@ -5007,6 +5020,18 @@ function uiInit() {
   $('panel').addEventListener('input', e => { const b = e.target.closest('[data-k]'); if (b) { const h = UI.handlers[+b.dataset.k]; if (h) h(b); } });
   $('prompt').addEventListener('click', () => { if (W && W.near && !uiBusy()) { audioInit(); sfx('uiok'); W.near.fn(); } });
 }
+// a small strip, bottom left, that says what the controller does right here (only while a controller is in use)
+function padHint() {
+  let el = $('padhint'); if (!el) { el = document.createElement('div'); el.id = 'padhint'; el.style.cssText = 'position:fixed;left:10px;bottom:26px;z-index:60;font:600 10px var(--m);letter-spacing:.05em;color:#ece9e2;background:rgba(10,10,14,.82);border-left:3px solid #ff2d78;padding:5px 9px;pointer-events:none;max-width:46vw;line-height:1.55'; document.body.appendChild(el); }
+  const I = IN[0]; if (!I.hasPad || IS_TOUCH) { el.style.display = 'none'; return; }
+  let t = '';
+  if (UI.cur) t = 'Ⓐ SELECT · Ⓑ BACK · STICK / D-PAD MOVE' + ($('panel').querySelector('.tabs') ? ' · LB RB TABS' : '') + ' · ←→ ON A SLIDER OR LIST';
+  else if (typeof BLD !== 'undefined' && BLD.on && W && W.build) t = (W.build.sel ? 'Ⓐ PLACE · Ⓧ ROTATE · ' + (W.build.pick ? 'Ⓨ STORE · LT SELL · ' : '') + 'Ⓑ PUT BACK' : 'Ⓐ PICK UP · Ⓑ DONE') + '<br>D-PAD ←→ CATALOG · LB RB CATEGORY · D-PAD ↑ LOOK · ↓ SETS · R3 TURN VIEW · STICK MOVE (RT FAST)';
+  else if (MT) t = '';
+  else if (W) t = 'Ⓐ INTERACT · START MY PLAYER · RT RUN' + ((W.kind === 'crib' || W.kind === 'room') && !W.visit ? ' · Ⓨ BUILD' : '');
+  else if ($('title').style.display === 'flex') t = 'Ⓐ SELECT · D-PAD MOVE';
+  if (el._t !== t) { el._t = t; el.innerHTML = t; } el.style.display = t ? 'block' : 'none';
+}
 function uiStep(dt) {
   const I = IN[0], f = focusables(); UI.navT -= dt; const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName) && document.activeElement.type !== 'range';
   if (typing) { if (keys.Escape) document.activeElement.blur(); return; }
@@ -5014,12 +5039,13 @@ function uiStep(dt) {
   if (!m) UI.navT = 0;
   if (m && UI.navT <= 0 && f.length) {
     UI.navT = 0.17; const cur = f[UI.focus];
-    if (cur && cur.type === 'range' && (m === 'L' || m === 'R')) { cur.value = +cur.value + (m === 'R' ? 1 : -1) * (+cur.step || 1); cur.dispatchEvent(new Event('input', { bubbles: true })); }
+    if (cur && cur.tagName === 'SELECT' && (m === 'L' || m === 'R')) { cur.selectedIndex = (cur.selectedIndex + (m === 'R' ? 1 : -1) + cur.options.length) % cur.options.length; cur.dispatchEvent(new Event('change', { bubbles: true })); sfx('ui'); }
+    else if (cur && cur.type === 'range' && (m === 'L' || m === 'R')) { cur.value = +cur.value + (m === 'R' ? 1 : -1) * (+cur.step || 1); cur.dispatchEvent(new Event('input', { bubbles: true })); }
     else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
   if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
-  if (I.aP && f[UI.focus] && !IS_TOUCH) f[UI.focus].click();
-  if (I.back && UI.cur) uiBack();
+  if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') e.focus(); else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
+  if (I.back && UI.cur) { uiBack(); I.back = false; }
 }
 
 // ---------- toasts ----------
@@ -6467,7 +6493,7 @@ function dbgDraw(dt) {
 function frame(now) {
   requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
   pollInput(); netPollRemote();
-  if (uiBusy()) uiStep(dt);
+  if (uiBusy()) uiStep(dt); padHint();
   if (MT) {
     if (!UI.cur && (IN[0].start || IN[1].start)) { uiPause(); clearEdges(); }
     else {
@@ -6487,7 +6513,7 @@ function boot() {
   loadSave(); gfxInit(); setupTouch(); uiInit(); titleScene(); uiTitle(); netInit();
   addEventListener('pointerdown', audioInit, { once: false });
   document.addEventListener('visibilitychange', () => { if (document.hidden && MT && !MT.practice && !UI.cur) uiPause(); });
-  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), uiBones: h => uiBones(h), uiBook: () => uiBook(), book: () => book(), bkSim: g => bkSim(g), bkWatch: i => bkWatch(i), bkLegWon: (g, L) => bkLegWon(g, L), bonesSim: (t, s) => bonesSim(t, s), bonesHand: d => bonesHand(d), vice: () => vice(), homeUse2: (k, d) => homeUse2(k, d), uiBottieHome: () => uiBottieHome(), homeLevelN: () => homeLevel().lvl, uiCrib: () => uiCrib(), homeUse: (k, it) => homeUse(k, it), uiKael: () => uiKael(), uiNexx: () => uiNexx(), nexxCheck: r => nexxCheck(r), uiLouie: () => uiLouie(), uiErin: () => uiErin(), castStep: dt => castStep(dt), puStep: dt => puStep(dt), POWERUPS: () => POWERUPS, scorePts: (p, n, h) => scorePts(p, n, h), releaseShot: p => releaseShot(p), startPractice2: 0, packBuild: b => packBuild(b), unpackBuild: c => unpackBuild(c), myBuild: () => myBuild(), shotPose: (a, u, n) => shotPose(a, u, n), idlePose: (a, t, o) => idlePose(a, t, o), profileFromBuild: s => profileFromBuild(s), animProfile: s => animProfile(s), alabOpen: () => alabOpen(), get ALAB() { return ALAB; }, uiDev: b => uiDev(b), aiBuild: (o, r) => aiBuild(o, r), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s, f, o) => startShot(p, s, f, o), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
+  window.__pit = { get S() { return S; }, get MT() { return MT; }, get W() { return W; }, IN, keys, save, enterWorld, launchGame, uiClose, gainRep, checkAch, MODES, TIERS_COURT, startPractice, get UI() { return UI; }, NET, netGo, DRILL, startDrill, uiDev, devMax, devRestore, devReel, devPlay, REELS, maxBuild, buildEnter, buildExit, buildPlace, buildFits, buildItemAt, buildCancel, buildRotate, buildStore, buildSell, BLD, uiHomeLot, buildPickUpIdx: k => buildPickUp(k), devSampleCrib, rareToday: () => rareToday(), RARES: () => RARES, touch, OST, contestOn: p => contestOn(p), stealChance: (p, h) => stealChance(p, h), doPass: (p, t) => doPass(p, t), startSteal: p => startSteal(p), call: (n, ...a) => eval(n)(...a), ev: s => eval(s), uiBones: h => uiBones(h), uiBook: () => uiBook(), book: () => book(), bkSim: g => bkSim(g), bkWatch: i => bkWatch(i), bkLegWon: (g, L) => bkLegWon(g, L), bonesSim: (t, s) => bonesSim(t, s), bonesHand: d => bonesHand(d), vice: () => vice(), homeUse2: (k, d) => homeUse2(k, d), uiBottieHome: () => uiBottieHome(), homeLevelN: () => homeLevel().lvl, uiCrib: () => uiCrib(), homeUse: (k, it) => homeUse(k, it), uiKael: () => uiKael(), uiNexx: () => uiNexx(), nexxCheck: r => nexxCheck(r), uiLouie: () => uiLouie(), uiErin: () => uiErin(), castStep: dt => castStep(dt), puStep: dt => puStep(dt), POWERUPS: () => POWERUPS, scorePts: (p, n, h) => scorePts(p, n, h), releaseShot: p => releaseShot(p), startPractice2: 0, packBuild: b => packBuild(b), unpackBuild: c => unpackBuild(c), myBuild: () => myBuild(), shotPose: (a, u, n) => shotPose(a, u, n), idlePose: (a, t, o) => idlePose(a, t, o), profileFromBuild: s => profileFromBuild(s), animProfile: s => animProfile(s), alabOpen: () => alabOpen(), get ALAB() { return ALAB; }, uiDev: b => uiDev(b), aiBuild: (o, r) => aiBuild(o, r), slotNew: () => slotNew(), slotSwitch: i => slotSwitch(i), slotLoad: t => slotLoad(t), slotDelete: i => slotDelete(i), attrCost: v => attrCost(v), uiPlayer: t => uiPlayer(t), ovrOf: a => ovrOf(a), resolveSteal: p => resolveSteal(p), startJump: p => startJump(p), startShot: (p, s, f, o) => startShot(p, s, f, o), vol: () => ({ mus: +musBus.gain.value.toFixed(3), sfx: +sfxBus.gain.value.toFixed(3) }), homeLevel, homeSets, homeFx, netVisit: id => netVisit(id), emote: k => emote(k), chatSend: t => chatSend(t), likeCrib: () => likeCrib(), packHome: () => packHome() };
   window.__step = dt => { if (MT) matchStep(dt); };
   window.__camera = camera; window.__render = () => renderer.render(scene, camera); window.__info = () => { let m = 0, s = 0, t = 0; scene.traverse(o => { if (o.isSprite) s++; else if (o.isMesh) m++; }); return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, meshes: m, sprites: s }; };
   // test hook: draw the player in one pose and hand back the frame

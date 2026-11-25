@@ -388,6 +388,7 @@ function worldStep(dt) {
   if (building) { buildStep(dt); return; }
   if (!busy && W.near && I.aP) { sfx('uiok'); W.near.fn(); }
   else if (!busy && I.start) uiPlayer('attrs');
+  else if (!busy && I.pe && I.pe.y && (W.kind === 'crib' || W.kind === 'room') && !W.visit && !W.build && typeof buildEnter === 'function') buildEnter();
   // camera
   const portrait = innerWidth < innerHeight, back = portrait ? 7.5 : 6.2, up = portrait ? 3.8 : 3.1;
   let cx = me.x - fx * back, cz = me.z - fz * back, lift = 0;

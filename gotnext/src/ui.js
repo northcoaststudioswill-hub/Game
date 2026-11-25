@@ -5,7 +5,9 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
 function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
 function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
-function openPanel(render, cls, onBack) { UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy'); }
+function openPanel(render, cls, onBack) { UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
+  // a controller starts on the panel's main action (RESUME, PLAY…), else on the first thing that is not a tab or the close button
+  const f = focusables(); let i = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')); if (i < 0) i = f.findIndex(e => e.closest('.pf')); if (i < 0) i = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, i); paintFocus(); }
 function rerender(reset) {
   if (!UI.cur) return; const el = $('panel'), pb = el.querySelector('.pb'), sc = pb && !reset ? pb.scrollTop : 0, tb = el.querySelector('.tabs'), ts = tb && !reset ? tb.scrollLeft : 0;
   UI.handlers = []; el.className = UI.cur.cls; el.innerHTML = `<div class="pin">${UI.cur.render()}</div>`; el.style.display = 'block';
@@ -13,7 +15,7 @@ function rerender(reset) {
 }
 function uiClose() { UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
-function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],.card[data-k],.sw[data-k]')).filter(e => e.offsetParent !== null); }
+function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],input[type=text],select,.card[data-k],.sw[data-k],span[data-k]:not([data-k=""])')).filter(e => e.offsetParent !== null); }
 // controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
 function navDir(f, from, m) {
   const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2; let best = -1, bs = 1e9;
@@ -42,6 +44,18 @@ function uiInit() {
   $('panel').addEventListener('input', e => { const b = e.target.closest('[data-k]'); if (b) { const h = UI.handlers[+b.dataset.k]; if (h) h(b); } });
   $('prompt').addEventListener('click', () => { if (W && W.near && !uiBusy()) { audioInit(); sfx('uiok'); W.near.fn(); } });
 }
+// a small strip, bottom left, that says what the controller does right here (only while a controller is in use)
+function padHint() {
+  let el = $('padhint'); if (!el) { el = document.createElement('div'); el.id = 'padhint'; el.style.cssText = 'position:fixed;left:10px;bottom:26px;z-index:60;font:600 10px var(--m);letter-spacing:.05em;color:#ece9e2;background:rgba(10,10,14,.82);border-left:3px solid #ff2d78;padding:5px 9px;pointer-events:none;max-width:46vw;line-height:1.55'; document.body.appendChild(el); }
+  const I = IN[0]; if (!I.hasPad || IS_TOUCH) { el.style.display = 'none'; return; }
+  let t = '';
+  if (UI.cur) t = 'Ⓐ SELECT · Ⓑ BACK · STICK / D-PAD MOVE' + ($('panel').querySelector('.tabs') ? ' · LB RB TABS' : '') + ' · ←→ ON A SLIDER OR LIST';
+  else if (typeof BLD !== 'undefined' && BLD.on && W && W.build) t = (W.build.sel ? 'Ⓐ PLACE · Ⓧ ROTATE · ' + (W.build.pick ? 'Ⓨ STORE · LT SELL · ' : '') + 'Ⓑ PUT BACK' : 'Ⓐ PICK UP · Ⓑ DONE') + '<br>D-PAD ←→ CATALOG · LB RB CATEGORY · D-PAD ↑ LOOK · ↓ SETS · R3 TURN VIEW · STICK MOVE (RT FAST)';
+  else if (MT) t = '';
+  else if (W) t = 'Ⓐ INTERACT · START MY PLAYER · RT RUN' + ((W.kind === 'crib' || W.kind === 'room') && !W.visit ? ' · Ⓨ BUILD' : '');
+  else if ($('title').style.display === 'flex') t = 'Ⓐ SELECT · D-PAD MOVE';
+  if (el._t !== t) { el._t = t; el.innerHTML = t; } el.style.display = t ? 'block' : 'none';
+}
 function uiStep(dt) {
   const I = IN[0], f = focusables(); UI.navT -= dt; const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName) && document.activeElement.type !== 'range';
   if (typing) { if (keys.Escape) document.activeElement.blur(); return; }
@@ -49,12 +63,13 @@ function uiStep(dt) {
   if (!m) UI.navT = 0;
   if (m && UI.navT <= 0 && f.length) {
     UI.navT = 0.17; const cur = f[UI.focus];
-    if (cur && cur.type === 'range' && (m === 'L' || m === 'R')) { cur.value = +cur.value + (m === 'R' ? 1 : -1) * (+cur.step || 1); cur.dispatchEvent(new Event('input', { bubbles: true })); }
+    if (cur && cur.tagName === 'SELECT' && (m === 'L' || m === 'R')) { cur.selectedIndex = (cur.selectedIndex + (m === 'R' ? 1 : -1) + cur.options.length) % cur.options.length; cur.dispatchEvent(new Event('change', { bubbles: true })); sfx('ui'); }
+    else if (cur && cur.type === 'range' && (m === 'L' || m === 'R')) { cur.value = +cur.value + (m === 'R' ? 1 : -1) * (+cur.step || 1); cur.dispatchEvent(new Event('input', { bubbles: true })); }
     else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
   if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
-  if (I.aP && f[UI.focus] && !IS_TOUCH) f[UI.focus].click();
-  if (I.back && UI.cur) uiBack();
+  if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') e.focus(); else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
+  if (I.back && UI.cur) { uiBack(); I.back = false; }
 }
 
 // ---------- toasts ----------
