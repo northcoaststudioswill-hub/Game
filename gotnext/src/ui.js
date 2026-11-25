@@ -86,7 +86,8 @@ function hudShow(on) {
 function hudCall(big, small, col, dur) { const c = $('call'); c.firstElementChild.textContent = big; c.lastElementChild.textContent = small || ''; c.firstElementChild.style.color = col || '#fff'; c.className = ''; void c.offsetWidth; c.style.animationDuration = (dur || 1.2) + 's'; c.className = 'go'; }
 let fbT = null;
 function hudFb(txt, col) { const f = $('fb'); f.textContent = txt; f.style.color = col || '#fff'; f.style.opacity = 1; clearTimeout(fbT); fbT = setTimeout(() => f.style.opacity = 0, 1300); }
-function hudFloat(p, txt, col) { const [x, y] = project(p.x, p.H + 0.5 + p.y, p.z); const d = document.createElement('div'); d.className = 'flt'; d.textContent = txt; d.style.cssText = `left:${x}px;top:${y}px;color:${col || '#fff'}`; $('flts').appendChild(d); setTimeout(() => d.remove(), 1100); }
+// words over a player's head. They stack instead of landing on top of each other, and no player carries more than three at once
+function hudFloat(p, txt, col) { const now = performance.now(); p.fl = (p.fl || []).filter(t => now - t < 900); if (p.fl.length >= 3) return; const lvl = p.fl.length; p.fl.push(now); const [x, y] = project(p.x, p.H + 0.5 + p.y, p.z); const d = document.createElement('div'); d.className = 'flt'; d.textContent = txt; d.style.cssText = `left:${x}px;top:${y - lvl * 19}px;color:${col || '#fff'}`; $('flts').appendChild(d); setTimeout(() => d.remove(), 1100); }
 function hudMatch() {
   const M_ = MT, me = M_.me; $('s0').textContent = M_.score[me.team]; $('s1').textContent = M_.score[1 - me.team]; $('clock').textContent = Math.max(0, Math.ceil(M_.clock));
   $('stam').firstElementChild.style.width = me.stam + '%';

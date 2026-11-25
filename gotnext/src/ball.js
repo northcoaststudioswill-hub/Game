@@ -79,6 +79,7 @@ function startMatch(cfg) {
   const B = MT.B = { mesh: makeBall(cfg.ball || 'bl_std'), pos: V3(0, 1, 9), vel: V3(), state: 'held', holder: null, t: 0, shooter: null, lastTeam: 0, spin: 0 };
   scene.add(B.mesh); B.shadow = M(geo('bshadow', () => new THREE.CircleGeometry(0.14, 10)), flat(0x000000, { transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.016, 0, scene); B.shadow.rotation.x = -Math.PI / 2;
   for (let i = 0; i < 36; i++) { const m = M(sph(0.07, 6, 5), new THREE.MeshBasicMaterial({ color: 0xff8a1f, transparent: true }), 0, -5, 0, scene); MT.parts.push({ m, life: 0, v: V3() }); }
+  MT.trail = []; for (let i = 0; i < 7; i++) { const m = M(sph(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff8a1f, transparent: true, opacity: 0, depthWrite: false }), 0, -5, 0, scene); MT.trail.push({ m, p: V3() }); } MT.trailT = 0;
   camera.position.set(0, 7, 20);
   musicMode = arcade ? 'jam' : 'game'; ostRoom('game');
   hudShow(true); setCheck(MT.off, true);
@@ -151,6 +152,8 @@ function scorePts(p, pts, how) {
   if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); say(p, 'end', 1); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
+// a little dust off the court: landings, hard cuts, bodies hitting the floor
+function puff(x, z, n, sp) { let k = 0; for (const q of MT.parts) { if (q.life > 0) continue; q.life = rnd(0.25, 0.45); q.max = q.life; q.m.position.set(x + rnd(-0.12, 0.12), 0.05, z + rnd(-0.12, 0.12)); const a = rnd(0, 6.28), v = rnd(0.4, 1.1) * (sp || 1); q.v.set(Math.cos(a) * v, rnd(0.5, 1.3), Math.sin(a) * v); q.m.material.color.setHex(0xb9b2a4); if (++k >= n) break; } }
 function burst(x, y, z, col, n) {
   let k = 0; for (const q of MT.parts) { if (q.life > 0) continue; q.life = rnd(0.35, 0.7); q.max = q.life; q.m.position.set(x, y, z); q.v.set(rnd(-2.5, 2.5), rnd(0.5, 4), rnd(-2.5, 2.5)); q.m.material.color.setHex(col); if (++k >= n) break; }
 }
@@ -904,8 +907,9 @@ function matchStep(dtReal) {
     if (p.bravT > 0) { p.bravT -= dt; p.brav = Math.max(0, p.bravT / 20); if (p.bravT <= 0) p.brav = 0; }
     if (p.user && !(p.remote && p.afk)) humanThink(p, dt); else aiThink(p, dt);
     stepPlayer(p, dt);
-    { const sp = Math.hypot(p.vx, p.vz), lx = p.lvx || 0, lz = p.lvz || 0, ls = Math.hypot(lx, lz); if (sp > 2.2 && ls > 2.2 && (p.vx * lx + p.vz * lz) / (sp * ls) < 0.55 && M_.time - (p.sqAt || -9) > 0.3 && M_.time - (M_.sqAt || -9) > 0.09 && p.y < 0.05) { p.sqAt = M_.sqAt = M_.time; sfx('squeak'); } if (M_.time - (p.lvT || -9) > 0.12) { p.lvT = M_.time; p.lvx = p.vx; p.lvz = p.vz; }
-      if (p.st === 'stagger' && p.stg && p.stg.fall && !p.stg.thud && p.t > 0.3) { p.stg.thud = true; sfx('thud'); } }
+    if (p.y <= 0.001 && p.wasY > 0.25) puff(p.x, p.z, 4, 1);      /* came down from a jump */ p.wasY = p.y > 0.001 ? Math.max(p.wasY || 0, p.y) : 0;
+    { const sp = Math.hypot(p.vx, p.vz), lx = p.lvx || 0, lz = p.lvz || 0, ls = Math.hypot(lx, lz); if (sp > 2.2 && ls > 2.2 && (p.vx * lx + p.vz * lz) / (sp * ls) < 0.55 && M_.time - (p.sqAt || -9) > 0.3 && M_.time - (M_.sqAt || -9) > 0.09 && p.y < 0.05) { p.sqAt = M_.sqAt = M_.time; sfx('squeak'); puff(p.x, p.z, 2, 0.8); } if (M_.time - (p.lvT || -9) > 0.12) { p.lvT = M_.time; p.lvx = p.vx; p.lvz = p.vz; }
+      if (p.st === 'stagger' && p.stg && p.stg.fall && !p.stg.thud && p.t > 0.3) { p.stg.thud = true; sfx('thud'); puff(p.x, p.z, 6, 1.4); } }
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
@@ -939,6 +943,9 @@ function matchFx(dt) {
   if (M_.hoopT > 0) { M_.hoopT -= dt; const k = Math.max(0, M_.hoopT); M_.hoop.rotation.x = Math.sin(M_.time * 46) * 0.035 * k; M_.hoop.rotation.z = Math.sin(M_.time * 39) * 0.02 * k; } else if (M_.hoop.rotation.x) { M_.hoop.rotation.x = 0; M_.hoop.rotation.z = 0; }
   for (const q of M_.parts) { if (q.life <= 0) continue; q.life -= dt; q.v.y -= 6 * dt; q.m.position.addScaledVector(q.v, dt); q.m.material.opacity = Math.max(0, q.life / q.max); q.m.scale.setScalar(0.5 + q.life / q.max); if (q.life <= 0) q.m.position.y = -5; }
   crowdStep(dt);
+  // the shot leaves a short streak behind it: green on a green release, orange otherwise
+  { const B = M_.B, T = M_.trail; if (T) { const on = B.state === 'shot' && B.t > 0.05; M_.trailT += dt; if (on && M_.trailT > 0.03) { M_.trailT = 0; const last = T.pop(); last.p.copy(B.pos); last.life = 1; T.unshift(last); }
+      T.forEach((q, i) => { q.life = Math.max(0, (q.life || 0) - dt * (on ? 2.6 : 6)); if (q.life <= 0) { q.m.material.opacity = 0; return; } q.m.position.copy(q.p); q.m.material.opacity = q.life * 0.34 * (1 - i / T.length); q.m.scale.setScalar(0.45 + 0.55 * q.life * (1 - i / T.length)); q.m.material.color.setHex(B.green ? 0x3dffa0 : 0xff8a1f); }); } }
   if (M_.netT > 0) { M_.netT -= dt; const n = M_.hoop.userData.net; if (n) n.scale.set(1 - M_.netT, 1 + M_.netT * 1.5, 1 - M_.netT); }
 }
 function stepPlayer(p, dt) {

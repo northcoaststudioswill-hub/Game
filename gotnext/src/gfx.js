@@ -94,6 +94,14 @@ function makeRig(spec, lowDetail) {
   const chestJ = grp(spine, 0, loH, 0); out(M(tgUp, toon(top.c), 0, upH / 2, 0, chestJ), 1.06);
   M(cyl(0.118 * wS, 0.118 * wS, 0.03, 10), toon(top.c2 || top.c), 0, 0.03, 0, spine).scale.z = 0.62;       // hem
   if (top.kind === 'jersey') { const st = M(box(shW * 1.5, 0.05, 0.02), toon(top.c2), 0, upH * 0.3, 0.105 * wS, chestJ); st.rotation.x = -0.12; }
+  // a number on the back (and a small one on the chest) of jerseys, tees and tanks: the same number every time for the same name
+  if (!lowDetail && (top.kind === 'jersey' || top.kind === 'tee' || top.kind === 'tank') && spec.name) {
+    let hsh = 0; for (const ch of String(spec.name)) hsh = (hsh * 31 + ch.charCodeAt(0)) >>> 0; const num = String(hsh % 100), lum = c => { const v = new THREE.Color(c); return v.r * 0.3 + v.g * 0.59 + v.b * 0.11; }, ink0 = top.kind === 'jersey' && top.c2 ? top.c2 : (lum(top.c) > 0.45 ? '#16181c' : '#f4f1ea');
+    const tex = geoTex('num' + num + ink0, () => canvasTex(128, 128, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = ink0; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = '900 96px Archivo, "Arial Black", Impact, sans-serif'; x.fillText(num, w / 2, h / 2 + 6); }));
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+    const back = M(geo('numPlane', () => new THREE.PlaneGeometry(1, 1)), mat, 0, upH * 0.5, -(0.118 * wS + 0.012), chestJ); back.rotation.y = Math.PI; back.scale.set(shW * 1.05, shW * 1.05, 1);
+    const front = M(geo('numPlane', () => new THREE.PlaneGeometry(1, 1)), mat, shW * 0.38, upH * 0.66, 0.106 * wS + 0.012, chestJ); front.scale.set(shW * 0.42, shW * 0.42, 1); front.rotation.x = -0.1;
+  }
   // a human back instead of two stacked cans: rounded shoulder blades, the slope of the traps into the neck, a chest,
   // the small of the back and a seat. With the rest curve below (R.rest) the spine reads as an S from the side.
   { const tc = toon(top.c), bc = toon(bot.c);
