@@ -3126,7 +3126,9 @@ function aiThink(p, dt) {
         const three = nAtt(p, 'three'), mid = nAtt(p, 'mid');
         const sel = (p.fire ? 2 : 1) * (1 + a.hold * 0.35) * (MT.clock < 6 ? 2 : 1) * (MT.gamePt ? 1 + px(p, 'clutch') * 5 : 1);      /* the cold-blooded want the last one */
         // the look, read off the hands actually near him: a good shooter waits for a clean one, a bad decision-maker takes what is there
-        const cn = contestOn(p), look = cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3;
+        const cn = contestOn(p);
+        if (p.catchT && MT.time - p.catchT < 0.9 && cn >= 0.2 && !MT.arcade && Math.random() < 0.3 + L * 0.5 && tryPass(q => contestOn(q) < 0.1 && passVal(q) > 0.45 && q !== p.catchFrom)) return;      /* caught it with a hand up: swing it on, do not hold it */
+        const look = cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3;
         if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < 0.45 * look * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
         if (!beyondArc(p.x, p.z) && d > 2.8 && Math.random() < 0.42 * look * (0.25 + mid) * sel) { startShot(p, 'ai'); return; }
         // feed an open human sometimes; nobody likes an AI ball hog
