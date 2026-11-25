@@ -102,7 +102,7 @@ function setCheck(team, first) {
 // p.live: 'hold' (ball held, dribble still available), 'drib' (dribbling), 'dead' (picked up: pass, shoot, fake or pivot)
 function dribRules(p) { return p.user && !p.afk && !MT.reel; }
 function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); p.live = dribRules(p) && Math.hypot(p.vx, p.vz) < 1.5 ? 'hold' : 'drib'; p.stopT = 0; }
-function changePoss(team) { if (MT.off !== team) { MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; } } }
+function changePoss(team) { if (MT.off !== team) { if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) lateCall(0.4, 'LOCKED IN', 'Three stops in a row', '#33e0ff'); }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; } } }
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
   if (!p.user || p.bravT > 0 || MT.practice) return;
@@ -125,8 +125,9 @@ function andOne(p, d) {
 }
 function scorePts(p, pts, how) {
   const M_ = MT; if (p.pu && p.pu.id === 'double' && !M_.practice) { pts *= 2; p.pu = null; p.puA = null; if (M_.net === 'host') netEv({ k: 'pu', a: 'x', i: p.i }); call('DOUBLE UP', p.b.name + ' · that one counts ' + pts, '#ff4fd8', 1.2); }
-  M_.score[p.team] += pts; p.stats.pts += pts; p.stats.fgm++; p.hot++; p.cold = 0; M_.lastScorer = p;
+  M_.score[p.team] += pts; p.stats.pts += pts; p.stats.fgm++; p.hot++; p.cold = 0; M_.lastScorer = p; if (M_.stops) M_.stops[1 - p.team] = 0;
   if (!M_.arcade && p.hot === 3) floatTxt(p, 'HEATING UP', '#ff8a1f');
+  if (how !== 'dunk' && M_.B.shooter === p && M_.B.clockAt !== undefined && M_.B.clockAt < 1.6 && !M_.practice && !M_.drill) { highlight('buzzer', p); lateCall(0.9, 'BUZZER BEATER', p.b.name + ' beat the clock', '#ffc531'); M_.B.clockAt = undefined; }
   { const R = M_.runS || (M_.runS = { team: -1, n: 0, pts: 0 });      // unanswered buckets: three in a row is a run
     if (R.team === p.team) { R.n++; R.pts += pts; } else { if (R.n >= 3) lateCall(1.5, 'RUN OVER', p.b.name + ' stops the bleeding', '#7de3ff'); R.team = p.team; R.n = 1; R.pts = pts; }
     if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', `${R.pts}–0`, '#ffc531'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, '', '#ffc531'); }
@@ -216,7 +217,7 @@ function releaseShot(p) {
   if (p.user && !s.auto && held < s.rel * 0.3) { s.released = false; return startFake(p); }      // let go early = pump fake
   const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
   (p.tend || (p.tend = { three: 0, mid: 0, close: 0, drive: 0 }))[kind]++;
-  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85; c *= 1 - px(p, 'calm');
+  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85; c *= 1 - px(p, 'calm'); if (MT.stops && MT.stops[1 - p.team] >= 3) c *= 1.08;
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
   let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
   if (s.floater) base -= Math.max(0, d - 2.2) * 0.045;
@@ -275,7 +276,7 @@ function startFake(p) {
 }
 function euroOf(p) { const l = Math.hypot(p.x, p.z) || 1, lat = p.in.dx * (p.z / l) - p.in.dz * (p.x / l); return Math.abs(lat) > 0.55 ? Math.sign(lat) : 0; }
 function launch(p, make, pts, green, arc, kind) {
-  const B = MT.B; B.state = 'shot'; B.holder = null; B.shooter = p; B.lastTeam = p.team; B.make = make; B.pts = pts; B.green = green; B.kind = kind; B.t = 0; B.shotId = (B.shotId || 0) + 1; B.tipped = false;
+  const B = MT.B; B.state = 'shot'; B.holder = null; B.shooter = p; B.lastTeam = p.team; B.make = make; B.pts = pts; B.green = green; B.kind = kind; B.t = 0; B.shotId = (B.shotId || 0) + 1; B.tipped = false; B.clockAt = MT.clock;
   const d = Math.hypot(B.pos.x, B.pos.z);
   let ex = 0, ez = 0; if (!make) { const a = rnd(0, 6.283), r = rnd(0.2, 0.34); ex = Math.cos(a) * r; ez = Math.sin(a) * r * 0.8 + 0.05; }
   B.T = clamp(0.48 + d * 0.085, 0.42, 1.5) * (0.9 + 0.1 * (arc || 1)) * (arc > 1.3 ? 1.15 : 1);
@@ -509,7 +510,7 @@ function stealChance(p, h) {
   if (h.protect) ch *= 0.75;
   if (h.reachSaw && h.reachBy === p && MT.time - h.reachAt < 0.9) ch *= 0.62;      /* he saw it and pulled the ball across */
   if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
-  ch *= (1 + px(p, 'steal')) * (1 - px(h, 'secure'));
+  ch *= (1 + px(p, 'steal')) * (1 - px(h, 'secure')) * (MT.stops && MT.stops[p.team] >= 3 ? 1.1 : 1);
   return { ch: clamp(ch, 0.01, 0.6), reach };
 }
 function resolveSteal(p) {
@@ -654,7 +655,7 @@ function callScreen(p, hard) {
   if (!c) { if (p.user && M_.P.filter(q => q.team === p.team).length < 2) floatTxt(p, 'NOBODY TO SET IT', '#ff8a1f'); return false; }
   // three kinds: a hard screen (sprint held, or a strong man who likes contact) holds longer and can put the defender on the floor;
   // a soft one is a brush and an early slip to the rim; otherwise a plain set screen
-  const st = nAtt(c, 'str'), kind = hard || (!p.user && st > 0.62 && Math.random() < 0.5) ? 'hard' : (st < 0.42 || Math.random() < 0.22) ? 'soft' : 'set';
+  const st = nAtt(c, 'str'), kind = hard || (!p.user && st > 0.62 && Math.random() < 0.5) || (px(c, 'screen') > 0 && Math.random() < 0.7) ? 'hard' : (st < 0.42 || Math.random() < 0.22) ? 'soft' : 'set';
   p.scrAt = M_.time; c.ai.scr = { h: p, t: 0, ph: 0, kind }; floatTxt(p, kind === 'hard' ? 'HARD SCREEN!' : kind === 'soft' ? 'SLIP IT!' : 'SCREEN!', '#f2c14e'); floatTxt(c, kind === 'hard' ? 'BRING HIM' : 'I GOT YOU', '#fff'); return true;
 }
 function aiScreen(p, dt) {
@@ -680,7 +681,7 @@ function aiScreen(p, dt) {
 function screenHit(s, o) {
   const M_ = MT, sc = s.ai.scr, k = (sc && sc.kind) || 'set', hh = (sc && sc.h) || (M_.B.holder && M_.B.holder.team === s.team ? M_.B.holder : null), spd = Math.hypot(o.vx, o.vz);
   const ds = nAtt(s, 'str') - nAtt(o, 'str') + (k === 'hard' ? 0.15 : k === 'soft' ? -0.2 : 0) + px(s, 'screen');
-  o.scrHit = M_.time; if (sc) sc.hit = true; sfxM('bump'); const dx = o.x - s.x, dz = o.z - s.z, l = Math.hypot(dx, dz) || 1;
+  o.scrHit = M_.time; if (sc) sc.hit = true; sfxM('bump'); if (s.user) s.stats.scr = (s.stats.scr || 0) + 1; const dx = o.x - s.x, dz = o.z - s.z, l = Math.hypot(dx, dz) || 1;
   const fight = o.user ? !!o.ltHeld : Math.random() < 0.2 + nAtt(o, 'str') * 0.5;
   if (k === 'hard' && spd > 2.0 && Math.random() < clamp(0.1 + ds * 0.5, 0.03, 0.4)) {      // laid out
     o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: Math.random() < 0.5 ? 1 : -1, dir: [dx / l, dz / l], push: 1.8, kind: pick(['flat', 'sit', 'spin']) };
@@ -749,7 +750,7 @@ function aiThink(p, dt) {
     if (mates.indexOf(p) < 2 || MT.cfg.mode.size === 2) {
       aiGo(p, tx, tz, true);
       // a rebounder with a body near him seals it off first
-      if (a.boxFor !== B.shotId) { a.boxFor = B.shotId; a.boxOn = Math.random() < 0.15 + L * 0.3 + nAtt(p, 'reb') * 0.45; }
+      if (a.boxFor !== B.shotId) { a.boxFor = B.shotId; a.boxOn = Math.random() < 0.15 + L * 0.3 + nAtt(p, 'reb') * 0.45 + px(p, 'reb') * 3; }
       if (a.boxOn && dHoop(p) < 4.6 && nearestOpp(p)[1] < 1.5 && !(B.state === 'shot' && B.make)) p.box = true;
       if (B.state === 'loose' && B.pos.y < 0.9 && Math.hypot(p.x - B.pos.x, p.z - B.pos.z) < 2.8 && MT.P.some(o => o.team !== p.team && Math.hypot(o.x - B.pos.x, o.z - B.pos.z) < 3) && Math.random() < (0.5 + L * 2.5) * dt) startDive(p);
       if (B.state === 'loose' && Math.hypot(p.x - B.pos.x, p.z - B.pos.z) < 1.1 && B.pos.y > p.H * 1.3 && B.vel.y < 1 && Math.random() < 0.1 + L * 0.2) startJump(p);
@@ -784,9 +785,9 @@ function aiThink(p, dt) {
         if (d < Math.max(2.4, fr * 0.92) && (laneOpen(p) || d < 2.3 || a.hold > 4)) { startFinish(p); return; }
         if (MT.clock < 2.5) { startShot(p, 'ai'); return; }
         if (d > 2.6 && d < 4.7 && !laneOpen(p) && a.mode === 'drive' && Math.random() < 0.3) { a.mode = ''; startShot(p, 'ai', true); return; }
-        if (!open && d < 7.6 && Math.random() < 0.05 + L * 0.05) { startFake(p); a.tick = 0.3; return; }
+        if (!open && d < 7.6 && Math.random() < 0.05 + L * 0.05 + px(p, 'brav') * 0.4) { startFake(p); a.tick = 0.3; return; }
         const three = nAtt(p, 'three'), mid = nAtt(p, 'mid');
-        const sel = (p.fire ? 2 : 1) * (1 + a.hold * 0.35) * (MT.clock < 6 ? 2 : 1);
+        const sel = (p.fire ? 2 : 1) * (1 + a.hold * 0.35) * (MT.clock < 6 ? 2 : 1) * (MT.gamePt ? 1 + px(p, 'clutch') * 5 : 1);      /* the cold-blooded want the last one */
         if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < (open ? 0.45 : 0.05) * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
         if (!beyondArc(p.x, p.z) && d > 2.8 && Math.random() < (open ? 0.42 : 0.07) * (0.25 + mid) * sel) { startShot(p, 'ai'); return; }
         // feed an open human sometimes; nobody likes an AI ball hog
@@ -839,7 +840,7 @@ function aiThink(p, dt) {
       if ((h.st === 'shoot' && !h.shot.released && h.t > h.shot.rel * (0.75 - L * 0.3) && dh < 1.7) || (h.st === 'finish' && !h.finish.done && h.t > h.finish.dur * 0.3 && dh < 2.0)) {
         if (a.react <= 0) { a.react = 0.8; if (Math.random() < 0.3 + L * 0.5) startJump(p); }
       }
-      if (onBall && dh < 1.5 && p.cool <= 0 && h.st === 'free' && Math.random() < (0.25 + L * 0.35) * dt * (0.5 + nAtt(p, 'steal'))) startSteal(p);
+      if (onBall && dh < 1.5 && p.cool <= 0 && h.st === 'free' && Math.random() < (0.25 + L * 0.35) * dt * (0.5 + nAtt(p, 'steal')) * (1 + px(p, 'steal') * 6)) startSteal(p);      /* thieves by nature reach more */
     }
     a.react -= dt;
   }
@@ -863,7 +864,7 @@ function matchStep(dtReal) {
   if (M_.brawlHeat) M_.brawlHeat = Math.max(0, M_.brawlHeat - dt * 0.05);
   else if (M_.phase === 'over') { M_.pt -= dt; if (M_.pt <= 0 && !M_.over) { M_.over = true; endMatch(); return; } }
   else if (M_.phase === 'live' && !M_.practice) {
-    if (B.state === 'held') { M_.clock -= dt; if (M_.clock <= 0) { sfxM('buzz'); call('SHOT CLOCK', 'Attention span expired', '#ff4040', 1.2); M_.viol = (M_.viol || 0) + 1; const t = 1 - M_.off; M_.lastScorer = { team: M_.off }; M_.phase = 'scored'; M_.pt = 1.2; void t; } }
+    if (B.state === 'held') { if (M_.clock > 8) M_.clkWarn = false; else if (M_.clock < 4 && !M_.clkWarn && B.holder) { M_.clkWarn = true; floatTxt(B.holder, 'CLOCK!', '#ff4040'); sfxM('whistle'); } M_.clock -= dt; if (M_.clock <= 0) { sfxM('buzz'); call('SHOT CLOCK', 'Attention span expired', '#ff4040', 1.2); M_.viol = (M_.viol || 0) + 1; const t = 1 - M_.off; M_.lastScorer = { team: M_.off }; M_.phase = 'scored'; M_.pt = 1.2; void t; } }
     if (M_.needClear && B.holder && beyondArc(B.holder.x, B.holder.z)) { M_.needClear = false; }
   }
   if (M_.practice === 'rack' && !M_.over) { M_.rackT -= dt; if (M_.rackT <= 0) { M_.over = true; sfxM('buzz'); endMatch(); return; } }
@@ -1087,7 +1088,7 @@ function stepBall(dt) {
       // straight on: the touch pass you asked for, or an AI with a man flying at him and a teammate wide open
       let nx = to.touchTo; to.touchTo = null;
       if (!nx && !to.user && to.st === 'free' && !wasTouch && !M_.needClear && nearestOpp(to)[1] < 1.6) { const c = M_.P.filter(q => q.team === to.team && q !== to && q !== from && q.st === 'free' && nearestOpp(q)[1] > 2.3 && passLane(to, q)).sort((x, y) => nearestOpp(y)[1] - nearestOpp(x)[1])[0]; if (c && Math.random() < 0.12 + to.aiLvl * 0.4) { nx = c; floatTxt(to, 'EXTRA PASS', '#7de3ff'); } }
-      if (nx && nx.team === to.team && nx.st === 'free' && to.st === 'free' && M_.phase === 'live') { doPass(to, nx); if (M_.B.state === 'pass') { M_.B.touch = true; M_.B.speed *= 1.12; } } }
+      if (nx && nx.team === to.team && nx.st === 'free' && to.st === 'free' && M_.phase === 'live') { doPass(to, nx); if (M_.B.state === 'pass') { M_.B.touch = true; M_.B.speed *= 1.12; to.stats.touch = (to.stats.touch || 0) + 1; } } }
     else {
       B.pos.addScaledVector(_v, stepL / l);
       // the flight's height follows the kind of pass: chest (flat), bounce (off the floor at 60%), overhead and lob (arcs)
@@ -1105,22 +1106,25 @@ function stepBall(dt) {
     if (B.pos.y < 0.125) { B.pos.y = 0.125; if (Math.abs(B.vel.y) > 1.2) sfxM('bounce'); B.vel.y *= -0.62; B.vel.x *= 0.8; B.vel.z *= 0.8; }
     if (B.pos.x < -8.3 || B.pos.x > 8.3) { B.vel.x *= -0.6; B.pos.x = clamp(B.pos.x, -8.3, 8.3); } if (B.pos.z < -2.3 || B.pos.z > 13.3) { B.vel.z *= -0.6; B.pos.z = clamp(B.pos.z, -2.3, 13.3); }
     if (B.t > 0.18) {
-      let best = null, bs = -9;
+      let best = null, bs = -9; const tb = [-9, -9];
       for (const p of M_.P) {
         if (p.st !== 'free' && p.st !== 'jump') continue; const reach = p.H * 1.3 + p.y + 0.12 + 0.06 * bt(p, 'eminent');
         if (Math.hypot(p.x - B.pos.x, p.z - B.pos.z) > (p.diveT > 0 ? 1.35 : 0.8) + 0.05 * bt(p, 'eminent') || B.pos.y > reach) continue;
         let s = nAtt(p, 'reb') + Math.random() * 0.5 + (p.st === 'jump' ? 0.3 : 0) + p.H * 0.2; if (p.diveT > 0) s += 0.7; if (B.rebound) { s += px(p, 'reb'); if (p.box) s += 0.18; for (const o of M_.P) if (o.team !== p.team && o.box && dist(o, p) < 1.3 && dHoop(o) < dHoop(p)) { s -= 0.22; break; } }      /* sealed off behind a box-out */
-        if (s > bs) { bs = s; best = p; }
+        if (s > tb[p.team]) tb[p.team] = s; if (s > bs) { bs = s; best = p; }
       }
       if (!best && M_.looseT > 6) best = M_.P.slice().sort((a, b) => Math.hypot(a.x - B.pos.x, a.z - B.pos.z) - Math.hypot(b.x - B.pos.x, b.z - B.pos.z))[0];
+      // two men on it at once and nothing between them: a tie-up. The arrow decides, then flips
+      if (best && !B.rebound && !M_.arcade && tb[0] > -9 && tb[1] > -9 && Math.abs(tb[0] - tb[1]) < 0.08 && M_.time - (M_.tieAt || -99) > 12 && M_.phase === 'live') {
+        M_.tieAt = M_.time; if (M_.arrow === undefined) M_.arrow = 1 - best.team; const tm = M_.arrow; M_.arrow = 1 - tm; sfxM('whistle'); call('TIE UP', 'Arrow: ' + (tm === M_.me.team ? 'your ball' : 'their ball'), '#fff', 1.3); for (const q of M_.P) if (Math.hypot(q.x - B.pos.x, q.z - B.pos.z) < 1) floatTxt(q, 'TIE UP', '#fff'); deadBall(tm); best = null; }
       // in a crowd at the top of his jump he cannot hold it: he tips it out to a teammate
       if (best && B.rebound && !B.tipped && best.st === 'jump' && M_.P.some(o => o.team !== best.team && dist(o, best) < 1.0) && Math.random() < 0.3) {
         const m = M_.P.filter(q => q.team === best.team && q !== best).sort((x, y) => dist(x, best) - dist(y, best))[0];
         if (m) { B.tipped = true; const dx = m.x - B.pos.x, dz = m.z - B.pos.z, l = Math.hypot(dx, dz) || 1, v = Math.min(6, l * 1.4 + 1.5); B.vel.set(dx / l * v, 3.4, dz / l * v); B.t = 0; floatTxt(best, 'TIPPED OUT', '#fff'); sfxM('bounce'); best = null; } }
       if (best) {
-        if (best.diveT > 0) { best.slowT = Math.max(best.slowT || 0, 0.55); best.diveT = 0; if (best.user) floatTxt(best, 'GOT IT', '#3dffa0'); addBrav(best, 0.06); }
+        if (best.diveT > 0) { best.slowT = Math.max(best.slowT || 0, 0.55); best.diveT = 0; if (best.user) floatTxt(best, 'GOT IT', '#3dffa0'); addBrav(best, 0.06); best.stats.dive = (best.stats.dive || 0) + 1; }
         const wasOff = M_.off === best.team;
-        if (B.rebound) { best.stats.reb++; addBrav(best, 0.05); if (best.user) floatTxt(best, wasOff ? 'OFFENSIVE BOARD' : best.box ? 'BOXED OUT · BOARD' : 'BOARD', '#fff'); if (wasOff) { best.putT = 2; M_.clock = 14; } }
+        if (B.rebound) { best.stats.reb++; if (best.box) best.stats.box = (best.stats.box || 0) + 1; addBrav(best, 0.05); if (best.user) floatTxt(best, wasOff ? 'OFFENSIVE BOARD' : best.box ? 'BOXED OUT · BOARD' : 'BOARD', '#fff'); if (wasOff) { best.putT = 2; M_.clock = 14; } }
         const wasReb = B.rebound, air = best.st === 'jump';
         give(best); changePoss(best.team); B.rebound = false; B.assist = null; best.ai.hold = 0; best.ai.tick = 0.3;
         if (wasReb && wasOff && air && !M_.practice && dHoop(best) < 2.0 && (M_.arcade || att(best, 'dunk') >= 68) && Math.random() < (M_.arcade ? 0.8 : 0.3 + 0.15 * bt(best, 'putback'))) { if (startFinish(best, 0, true, best.y)) { best.finish.put = true; best.finish.dur = 0.5; } }

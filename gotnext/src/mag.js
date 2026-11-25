@@ -6,6 +6,7 @@ const HL_KINDS = [
   { k: 'dunk', n: 'SHOWTIME', line: (a) => `${a} PUTS ON A SHOW`, sub: 'Style points are still points.' },
   { k: 'ankles', n: 'ANKLE BREAKER', line: (a, v) => `${a} PUTS ${v || 'HIM'} ON SKATES`, sub: 'Witnesses say he is still falling.' },
   { k: 'swat', n: 'SWAT', line: (a, v) => `${a} SENDS ${v ? v + "'S SHOT" : 'IT'} BACK`, sub: 'Not in here. Not today.' },
+  { k: 'buzzer', n: 'BUZZER BEATER', line: (a) => `${a} BEATS THE CLOCK`, sub: 'One second is a long time if you are calm.' },
   { k: 'winner', n: 'GAME WINNER', line: (a) => `${a} ENDS IT`, sub: 'Winners stay. Everybody else walks.' },
 ];
 const HL = {}; HL_KINDS.forEach(h => HL[h.k] = h);

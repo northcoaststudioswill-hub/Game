@@ -100,6 +100,9 @@ function finishGame(res, m, tier, st, cfg) {
   if (res.shutout && res.win) { rep += 40; notes.push('SKUNK: +40 Respect'); }
   if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% HC'); }
   if (cfg.bonus) { const bo = cfg.bonus(res); if (bo) { vc += bo.vc; rep += bo.rep || 0; notes.push(bo.note); } }
+  { // teammate grade: the things that do not show up as points
+    const g = (s.ast || 0) * 2 + (s.scr || 0) * 1.5 + (s.chg || 0) * 3 + (s.dive || 0) * 2 + (s.touch || 0) * 1.5 + (s.box || 0) + (s.stl || 0) + (s.blk || 0) + (s.reb || 0) * 0.5 - (s.fouls || 0) * 1.5 - Math.max(0, (s.fga || 0) - (s.fgm || 0) - 3) * 0.6;
+    const gr = g >= 10 ? ['A', 60] : g >= 6 ? ['B', 35] : g >= 3 ? ['C', 15] : g >= 1 ? ['D', 0] : ['F', 0]; res.grade = gr[0]; if (m.size > 1) { vc += gr[1]; notes.push(`TEAMMATE GRADE ${gr[0]}` + (gr[1] ? ` · +${gr[1]} HC` : '')); } }
   { const nx = nexxCheck(res); if (nx) { vc += nx.vc; rep += nx.rep; notes.push(nx.note); } }      /* Nexx filmed it */
   vc = Math.round(vc); rep = Math.round(rep);
   const bx = { F: 12 + s.dunks * 20 + (s.fgm - s.threes) * 7, S: 12 + s.greens * 12 + s.threes * 14, P: 12 + s.ast * 22 + s.ankles * 24, D: 12 + s.stl * 24 + s.blk * 24 + s.reb * 9 };
