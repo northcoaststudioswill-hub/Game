@@ -121,7 +121,7 @@ function foul(d, o, kind, keep) {
 const COURT = { x0: -8, x1: 8, z0: -1.6, z1: 13 };      /* the painted lines */
 function andOne(p, d) {
   const M_ = MT; if (M_.phase === 'over') return; M_.score[p.team] += 1; p.stats.pts += 1; call('AND ONE', p.b.name + ' +1 · ' + d.b.name + ' fouled', '#ffc531', 1.4);
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function scorePts(p, pts, how) {
   const M_ = MT; if (p.pu && p.pu.id === 'double' && !M_.practice) { pts *= 2; p.pu = null; p.puA = null; if (M_.net === 'host') netEv({ k: 'pu', a: 'x', i: p.i }); call('DOUBLE UP', p.b.name + ' · that one counts ' + pts, '#ff4fd8', 1.2); }
@@ -137,9 +137,9 @@ function scorePts(p, pts, how) {
   if (M_.practice) return;
   M_.phase = 'scored'; M_.pt = how === 'dunk' ? 2.1 : 1.45; p.st = 'celeb'; p.t = 0;
   { const eq = p.b.moves.celeb, vic = how === 'dunk' && p.finish ? p.finish.hit : null;      // what he does about it: his own celebration, or one that fits the play
-    p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout', 'greengiant', 'pour40', 'fentlean'])) : pts >= 2 ? pick([eq, eq, 'shh', 'shrug', 'nightnight', 'pout', 'iceveins', 'greenbean']) : pick([eq, eq, eq, 'shrug', 'pound']);
+    p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout', 'greengiant', 'pour40', 'fentlean'])) : pts >= 2 ? pick([eq, eq, 'goggles', 'goggles', 'shh', 'shrug', 'nightnight', 'pout', 'iceveins', 'greenbean', 'callme']) : pick([eq, eq, eq, 'shrug', 'pound', 'bow', 'callme']);
     p.celebAt = vic || null; if (M_.net === 'host') netEv({ k: 'cs', i: p.i, s: p.celebStyle }); }
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
 function burst(x, y, z, col, n) {
@@ -166,6 +166,10 @@ function startHop(p, next, src, opt) {
   if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
   const sp = Math.hypot(p.vx, p.vz), d = dHoop(p) || 1; let ux = sp > 1 ? p.vx / sp : -p.x / d, uz = sp > 1 ? p.vz / sp : -p.z / d;
   const len = next === 'finish' ? clamp(d - 1.1, 0.3, 1.15) : 0.9;
+  // a hop step past a man who is leaning: he is frozen for a beat (Handles against his Perimeter D). Straight into a set body, it goes nowhere
+  { const [o, od] = nearestOpp(p); if (o && od < 1.7 && o.st === 'free') { const fwd = ((o.x - p.x) * ux + (o.z - p.z) * uz) / (od || 1);
+      if (fwd > 0.86 && od < 1.0) { p.slowT = Math.max(p.slowT || 0, 0.25); if (p.user) floatTxt(p, 'INTO HIS CHEST', '#ff8a1f'); }
+      else if (fwd > 0.1 && Math.random() < clamp(0.42 + (att(p, 'handle') - att(o, 'perd')) * 0.008 + (o.bodyUp ? 0.12 : 0), 0.1, 0.75)) { o.slowT = Math.max(o.slowT || 0, 0.32); floatTxt(o, 'FROZEN', '#f2c14e'); addBrav(p, 0.04); } } }
   p.st = 'hop'; p.t = 0; p.hop = { dur: HOP_T, sx: p.x, sz: p.z, tx: p.x + ux * len, tz: p.z + uz * len, next, src, opt: opt || null };
   if (p.user) floatTxt(p, 'HOP STEP', '#f2c14e'); sfxM('step'); return true;
 }
@@ -182,7 +186,14 @@ function startShot(p, src, floater, opt) {
   const j = JUMPER[p.b.moves.jumper] || JUMPERS[0];
   p.st = 'shoot'; p.t = 0; p.shot = { rel: j.rel * (p.fire ? 0.85 : 1), j, src, released: false, kind: shotKind(p), sp: sp0, vx: p.vx, vz: p.vz, aiRel: 0, fade, side, fx: p.x / (d || 1), fz: p.z / (d || 1) };
   if (side) { const sh = p.shot, l = d || 1; sh.sx = -p.z / l * side; sh.sz = p.x / l * side; /* across the rim line, the way the stick went */ if (sh.sx * (p.in.dx || 0) + sh.sz * (p.in.dz || 0) < 0) { sh.sx = -sh.sx; sh.sz = -sh.sz; } }
-  if (p.user && fade) floatTxt(p, 'FADE', '#f2c14e'); else if (p.user && side) floatTxt(p, 'SIDE STEP', '#f2c14e');
+  if (fade) {      // the fade reads the coverage: lean straight back from a body in your chest, drift away from a hand on one side
+    const sh = p.shot, [o, od] = nearestOpp(p), ax = sh.fx, az = sh.fz; sh.fadeK = 'fade';
+    if (o && od < 2.3) { const lat = (o.x - p.x) * -az + (o.z - p.z) * ax, al = (o.x - p.x) * -ax + (o.z - p.z) * -az;
+      if (Math.abs(lat) > 0.4 && al < 1.1) { const sg = lat > 0 ? -1 : 1, nx = ax * 0.55 + -az * sg * 0.85, nz = az * 0.55 + ax * sg * 0.85, l = Math.hypot(nx, nz) || 1; sh.fx = nx / l; sh.fz = nz / l; sh.fadeK = 'drift'; sh.fadeS = sg; }
+      else if (od < 1.05) sh.fadeK = 'deep'; }
+    else sh.fadeK = 'open';      /* nobody there: a fade for no reason costs a little */
+  }
+  if (p.user && fade) floatTxt(p, { drift: 'DRIFT FADE', deep: 'LEAN BACK', open: 'FADE', fade: 'FADE' }[p.shot.fadeK], '#f2c14e'); else if (p.user && side) floatTxt(p, 'SIDE STEP', '#f2c14e');
   if (opt.hopped) { const sh = p.shot; sh.auto = true; sh.aiRel = sh.rel * (1 + clamp((Math.random() + Math.random() - 1) * (0.2 - nAtt(p, 'iq') * 0.14), -0.3, 0.3)); }
   if (floater) { const sh = p.shot; sh.floater = true; sh.auto = true; sh.rel = 0.36; sh.kind = 'close'; sh.aiRel = sh.rel * (1 + clamp((Math.random() + Math.random() - 1) * (0.22 - nAtt(p, 'close') * 0.14), -0.3, 0.3)); }
   else if ((!p.user || p.afk) && !opt.hopped) { const sd = 0.17 - p.aiLvl * 0.10; p.shot.aiRel = p.shot.rel * (1 + clamp((Math.random() + Math.random() + Math.random() - 1.5) * sd * 1.6, -0.4, 0.45)); }
@@ -198,11 +209,11 @@ function releaseShot(p) {
   const held = s.hold != null ? s.hold : p.t;
   if (p.user && !s.auto && held < s.rel * 0.3) { s.released = false; return startFake(p); }      // let go early = pump fake
   const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
-  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= 0.7; if (s.side) c *= 0.85;
+  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85;
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
   let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
   if (s.floater) base -= Math.max(0, d - 2.2) * 0.045;
-  if (s.fade) base -= 0.05 * (1 - nAtt(p, 'mid') * 0.6);
+  if (s.fade) base -= (s.fadeK === 'deep' ? 0.08 : s.fadeK === 'open' ? 0.06 : 0.05) * (1 - nAtt(p, 'mid') * 0.6);
   if (d > 7.6) base -= (d - 7.6) * 0.09 * (1 - 0.18 * bt(p, 'manifest'));
   if (c < 0.06) base += 0.03 + 0.025 * bt(p, 'opencarry');
   if (p.stam < 25) base *= 0.85; if (s.sp > 2.8) base *= 0.9;
@@ -264,6 +275,7 @@ function launch(p, make, pts, green, arc, kind) {
 function blocked(p, o) {
   const B = MT.B; p.stats.fga++; o.stats.blk++; o.swatT = 0.45; MT.hoopT = 0.2; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
+  if (p.st === 'finish') highlight('swat', o, p);
   call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; p.finish.blocked = true; p.bumpT = 0.3; p.bumpX = -0.3; p.bumpZ = rnd(-0.15, 0.15); }
   crowdReact('block', o.team); B.rebound = false; o.tauntT = 1.3; floatTxt(o, pick(['GET THAT OUT', 'PACKED', 'NOT IN HERE', 'SEND IT BACK']), '#33e0ff'); if (MT.net === 'host') netEv({ k: 'ta', i: o.i });
 }
@@ -305,18 +317,26 @@ function startFinish(p, euro, forceDunk, y0, opt) {
     if (type === 'layup') {
       if (fq >= 88) {        // elite: pick the finish the defense gives you
         // whatever the defense allows, mixed up so a shot-blocker cannot sit on one answer
-        const opts = [['hang', 3], ['switch', 2]]; if (thr.along > 1.2) opts.push(['euro', 4]); if (thr.rim < 1.4 && Math.abs(p.x) > 0.9) opts.push(['reverse', 2]);
+        const opts = [['hang', 3], ['switch', 2], ['spin', 2]]; if (thr.along > 1.2) opts.push(['euro', 4]); if (thr.rim < 1.4 && Math.abs(p.x) > 0.9) opts.push(['reverse', 2]);
         let r = Math.random() * opts.reduce((a, o) => a + o[1], 0); for (const o of opts) { r -= o[1]; if (r <= 0) { read = o[0]; break; } } read = read || 'hang';
         if (read === 'euro') euro = thr.lat > 0 ? -1 : 1; else if (read === 'reverse') rev = true;
       } else if (fq >= 75) { read = str >= 80 ? 'power' : thr.along > 1.4 ? (euro = thr.lat > 0 ? -1 : 1, 'euro') : 'scoop'; }
     }
   }
-  const kind = type === 'dunk' ? '' : opt.kind || (opt.hopped ? 'power' : euro ? 'euro' : rev ? 'reverse' : read === 'hang' || read === 'switch' || read === 'power' || read === 'scoop' ? read : cont ? (fq < 75 ? 'lay' : nAtt(p, 'str') > 0.62 ? 'power' : 'scoop') : sp > 4 && d > 1.7 ? 'finger' : 'lay');
-  const style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
+  let kind = type === 'dunk' ? '' : opt.kind || (opt.hopped ? 'power' : euro ? 'euro' : rev ? 'reverse' : read === 'hang' || read === 'switch' || read === 'power' || read === 'scoop' || read === 'spin' ? read : cont ? (fq < 75 ? 'lay' : nAtt(p, 'str') > 0.62 ? 'power' : 'scoop') : sp > 4 && d > 1.7 ? 'finger' : 'lay');
+  // a quick guard with a shot-blocker closing gets it up early off the wrong foot
+  if (type === 'layup' && (kind === 'lay' || kind === 'scoop') && !read && !opt.kind && cont && att(p, 'speed') >= 72 && sp > 3 && Math.random() < 0.5) kind = 'quick';
+  let style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
+  // the basic package is not one dunk: off the run it is one hand, cocked back if he can get up; standing or in traffic, two hands
+  if (type === 'dunk' && style === 'twohand' && !opt.style) style = cont || sp < 2.4 || opt.hopped ? 'twohand' : (dq >= 78 && Math.random() < 0.45 ? 'cock' : Math.random() < 0.75 ? 'onehand' : 'twohand');
   p.st = 'finish'; p.t = 0;
   const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse' && style !== 'contact'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R', cont: cont ? 1 : 0, ox: 0, oz: 0, hit: null, contact: 0, blocked: false };
   if (kind === 'hang') f.dur += 0.16; if (kind === 'switch') f.dur += 0.06; if (style === 'squat') f.dur += 0.04;
-  if (p.user && read && read !== 'euro' && read !== 'reverse') floatTxt(p, { hang: 'HANG', switch: 'SWITCH HANDS', power: 'POWER', scoop: 'SCOOP', bail: 'PULLED OUT' }[read] || '', '#7de3ff');
+  if (euro && thr && thr.s > 0.25) { f.euroBad = euro !== (thr.lat > 0 ? -1 : 1); if (p.user && f.euroBad) floatTxt(p, 'EURO · INTO HIM', '#ff8a1f'); }      /* the step has to go away from the shot-blocker */
+  if (kind === 'quick') f.dur = Math.max(0.4, f.dur - 0.1); if (kind === 'spin') { f.dur += 0.1; f.spin = 1; }
+  // the off hand: on the left side of the rim (as you face it) a one-hander goes up with the left, away from the help
+  if (type === 'layup' && (kind === 'lay' || kind === 'finger' || kind === 'scoop' || kind === 'quick') && !euro && fq >= 62 && p.x < -0.7) { f.lh = true; f.bh = 'L'; }
+  if (p.user && read && read !== 'euro' && read !== 'reverse') floatTxt(p, { spin: 'SPIN LAYUP', hang: 'HANG', switch: 'SWITCH HANDS', power: 'POWER', scoop: 'SCOOP', bail: 'PULLED OUT' }[read] || '', '#7de3ff');
   if (rev) {
     // under the rim and out the other side, back to the rim: keep the line you drove on and finish past the hoop
     let vx = sp > 1 ? p.vx / sp : az, vz = sp > 1 ? p.vz / sp : -ax; const tAl = -(p.x * vx + p.z * vz);
@@ -330,7 +350,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
 }
 function resolveFinish(p) {
   const f = p.finish, B = MT.B; f.done = true; if (B.holder !== p) return;
-  let c = 0; const soft = (f.euro ? 0.72 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'hang' ? 0.6 : f.kind === 'switch' ? 0.7 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1) * (f.style === 'contact' && f.type === 'dunk' ? 0.45 : 1);
+  let c = 0; const soft = (f.euro ? (f.euroBad ? 1.05 : 0.6) : 1) * (f.kind === 'quick' ? 0.78 : f.kind === 'spin' ? 0.66 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'hang' ? 0.6 : f.kind === 'switch' ? 0.7 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1) * (f.style === 'contact' && f.type === 'dunk' ? 0.45 : 1);
   if (f.contact) c = Math.max(c, f.contact * 0.55);           /* got hit in the air and lost the line */
   for (const o of MT.P) { if (o.team === p.team || o.st === 'stagger') continue; const d = dist(o, p); if (d > 1.9) continue; c = Math.max(c, (1 - d / 1.9) * (0.5 + 0.5 * nAtt(o, 'intd')) * (o.st === 'jump' ? 1 : 0.55)); }
   const fs = clamp((att(p, f.type === 'dunk' ? 'dunk' : 'layup') - 70) / 29, 0, 1);       /* finishing skill above 70 */
@@ -352,12 +372,13 @@ function resolveFinish(p) {
       let vic = f.hit && f.hit.st !== 'stagger' && dist(f.hit, p) < 1.6 ? f.hit : null; if (!vic) for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
       if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2, kind: pick(['sit', 'flat', 'flat']) }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
       f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : 0); MT.hoopT = 0.6;
+      highlight(vic ? 'poster' : f.oop ? 'oop' : f.put ? 'putback' : (f.spin || ds.rep >= 6) ? 'dunk' : null, p, vic);
       call(f.oop ? 'ALLEY-OOP!' : f.put ? 'PUTBACK!' : vic ? 'POSTER!' : pick(CALLS.dunk), p.b.name + (vic ? ' on ' + vic.b.name : ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
       scorePts(p, pts, 'dunk'); if (f.foulBy) { foul(f.foulBy, p, 'blocking', false); andOne(p, f.foulBy); } return;
     }
     B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
-  const kAdj = { finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
+  const kAdj = { quick: -0.03, spin: -0.05, finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
   const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
   handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
@@ -379,7 +400,7 @@ function startMove(p, slot, dx, dz) {
     // he bit on the fake: his weight goes the opposite way to where the ball handler really went
     const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
     o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5, kind: pick(['sit', 'sit', 'spin', 'knee']) };
-    p.stats.ankles++; call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
+    p.stats.ankles++; highlight('ankles', p, o); call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
   } else o.slowT = 0.22 + mv.ank;
 }
 function doPass(p, to) {
@@ -436,6 +457,8 @@ function startSteal(p) {
     if (h && h.team !== p.team && dist(h, p) < 1.4 && p.reach.length >= 3 && Math.random() < 0.09 * (p.reach.length - 2)) foul(p, h, 'hand check');
     return;
   }
+  // the handler sees the reach coming (Handles, and Non-Disclosure): the ball goes to the far hand and the swipe finds less of it
+  if (h && h.team !== p.team && dist(h, p) < 2.2 && h.st === 'free' && !MT.arcade) { h.reachBy = p; h.reachAt = now; h.reachSaw = Math.random() < 0.2 + nAtt(h, 'handle') * 0.6 + 0.07 * bt(h, 'nda') - (h.sprinting ? 0.15 : 0); }
   if (MT.arcade) {   // RUCKUS: shove; hold LT for a haymaker; at a sprint it is a clothesline (AI throws the odd punch too)
     const kind = p.sprinting && Math.hypot(p.vx, p.vz) > 3.6 ? 'clothes' : (p.ltHeld || (!p.user && Math.random() < 0.22)) ? 'punch' : 'shove';
     if (kind !== 'shove') { startHit(p, kind); return; }
@@ -463,6 +486,7 @@ function stealChance(p, h) {
   if (dB > dH + 0.1) ch *= 0.5;                                                   /* the ball is on his far side: protected */
   if (h.drib && (h.drib.ph === 'down' || h.drib.ph === 'up') && B.pos.y < 0.7 && reach < 0.7) ch *= 1.2;
   if (h.protect) ch *= 0.75;
+  if (h.reachSaw && h.reachBy === p && MT.time - h.reachAt < 0.9) ch *= 0.62;      /* he saw it and pulled the ball across */
   if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
   return { ch: clamp(ch, 0.01, 0.6), reach };
 }
@@ -474,6 +498,7 @@ function resolveSteal(p) {
     p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); crowdReact('steal', p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); 
   } else {
     p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0;
+    if (h.reachSaw && h.reachBy === p) { p.slowT += 0.18; if (h.user) floatTxt(h, 'PROTECTED', '#7de3ff'); addBrav(h, 0.02); }      /* reached at air: he is off balance and the lane is there */
     const hf = [Math.sin(h.face), Math.cos(h.face)], dh = dist(h, p) || 1, behind = ((p.x - h.x) * hf[0] + (p.z - h.z) * hf[1]) / dh < -0.3, spam = Math.max(0, (p.reach || []).length - 1);
     const fch = (0.05 + 0.08 * spam + (sc.reach > 0.9 ? 0.12 : 0) + (behind ? 0.15 : 0)) * (1 - nAtt(p, 'steal') * 0.4) * (1 - 0.15 * bt(p, 'repo')) * (1 - 0.15 * bt(p, 'hardhat'));
     if (Math.random() < fch) foul(p, h, behind ? 'reach from behind' : 'reach-in');
@@ -647,7 +672,9 @@ function aiThink(p, dt) {
       a.tick = 0.34 - L * 0.16 + rnd(0, 0.08);
       const d = dHoop(p), [o, od] = nearestOpp(p), open = od > 1.7, style = p.b.build.style;
       const mates = MT.P.filter(q => q.team === p.team && q !== p && q.st === 'free');
-      const tryPass = (pred) => { const c = mates.filter(q => passLane(p, q) && (!pred || pred(q))); if (!c.length) return false; c.sort((m, n) => nearestOpp(n)[1] - nearestOpp(m)[1]); doPass(p, c[0]); return true; };
+      // what a pass is worth: how open he is, whether he can make the shot from there, and whether he is at the rim
+      const passVal = q => { const op = Math.min(nearestOpp(q)[1], 3) / 3, dq = dHoop(q); return op * (0.35 + (beyondArc(q.x, q.z) ? nAtt(q, 'three') : dq < 3 ? 0.9 : nAtt(q, 'mid')) * 0.65) + (dq < 3 ? op * 0.4 : 0) + (q.callT > 0 ? 0.25 : 0) + (q.fire ? 0.2 : 0); };
+      const tryPass = (pred) => { const c = mates.filter(q => passLane(p, q) && (!pred || pred(q))); if (!c.length) return false; c.sort((m, n) => passVal(n) - passVal(m)); doPass(p, c[0]); return true; };
       if (p.live === 'dead') {        // picked up: no dribble left. Get rid of it, or go up with it
         if (d < 2.4) { startFinish(p, 0, false, 0, { layup: 1, kind: 'power' }); return; }
         if (tryPass() || (mates.length && Math.random() < 0.6 && (doPass(p, mates[0]), true))) return;
@@ -657,6 +684,11 @@ function aiThink(p, dt) {
         if (beyondArc(p.x, p.z)) { /* cleared next frame */ }
         else { const l = d || 1; aiGo(p, p.x / l * 8.0 + (p.x === 0 ? 0.1 : 0), Math.max(p.z / l * 8.0, 4.5), true); if (Math.random() < 0.35 && tryPass(q => beyondArc(q.x, q.z))) return; }
       } else {
+        // a man cutting to the rim with nobody on him: throw it up there (a lob if he can dunk it, a dump-off if not)
+        const cutter = mates.find(q => dHoop(q) < 3.7 && dHoop(q) > 0.9 && dist(p, q) > 3 && nearestOpp(q)[1] > 1.05 && q.vx * -q.x + q.vz * -q.z > 1.2 && passLane(p, q));
+        if (cutter && Math.random() < 0.3 + L * 0.55) { doPass(p, cutter); return; }
+        // drive and kick: the help came, somebody is open
+        if (a.mode === 'drive' && !laneOpen(p) && d < 5.5 && Math.random() < 0.25 + L * 0.35 && tryPass(q => nearestOpp(q)[1] > 1.8)) { a.mode = ''; return; }
         const caller = mates.find(q => q.callT > 0);
         if (caller && passLane(p, caller) && Math.random() < 0.9) { doPass(p, caller); return; }
         const fr = MT.arcade ? Math.min(finishRange(p), 3.2 + L * 2) : finishRange(p);
@@ -692,9 +724,13 @@ function aiThink(p, dt) {
     if (!a.spot || a.spotT <= 0) {
       a.spotT = rnd(2.2, 4.5); const st = p.b.build.style; let cands = SPOTS.filter((s, i) => (st === 'glass' ? i >= 5 || Math.random() < 0.3 : i < 5 || Math.random() < 0.3));
       cands = cands.filter(s => MT.P.every(q => q === p || q.team !== p.team || (Math.hypot(q.x - s[0], q.z - s[1]) > 3 && (!q.ai.spot || q.ai.spot !== s))));
-      a.spot = cands.length ? pick(cands) : pick(SPOTS); if (Math.random() < 0.14) { a.spot = [rnd(-1, 1), 1.4]; a.spotT = 1.3; }
+      a.spot = cands.length ? pick(cands) : pick(SPOTS); a.cut = false;
+      // backdoor: the lane from here is empty and his man is watching the ball (or playing too high): go, hand up
+      { const h = B.holder, [o, od] = nearestOpp(p), dp = dHoop(p), high = o ? dHoop(o) > dp - 0.2 : true;
+        if (h && h !== p && dp > 3.6 && dp < 8.5 && laneOpen(p) && (high || od > 1.9) && Math.random() < 0.22 + L * 0.3 + (att(p, 'dunk') >= 62 ? 0.12 : 0)) { a.spot = [clamp(p.x * 0.15, -0.9, 0.9), 1.3]; a.spotT = 1.5; a.cut = true; if (h.user) { p.callT = 1.4; floatTxt(p, 'CUTTING', '#fff'); } }
+        else if (Math.random() < 0.08) { a.spot = [rnd(-1, 1), 1.4]; a.spotT = 1.3; a.cut = true; } }
     }
-    aiGo(p, a.spot[0], a.spot[1], Math.hypot(a.spot[0] - p.x, a.spot[1] - p.z) > 3);
+    aiGo(p, a.spot[0], a.spot[1], a.cut || Math.hypot(a.spot[0] - p.x, a.spot[1] - p.z) > 3);
   } else {
     // defence
     const h = B.holder, m = p.man; if (!m) return;
@@ -726,7 +762,7 @@ function matchStep(dtReal) {
   const M_ = MT; if (!M_ || (M_.paused && !M_.net)) return;
   if (M_.net === 'guest') return netGuestStep(dtReal);
   let dt = dtReal; if (M_.slow > 0) { M_.slow -= dtReal; dt *= 0.35; }
-  M_.time += dt; const B = M_.B;
+  M_.time += dt; const B = M_.B; hlStep(dtReal);
   // phases
   if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
   if (M_.gpCall > 0 && M_.phase !== 'over') { M_.gpCall -= dt; if (M_.gpCall <= 0) call('GAME POINT', M_.score[0] === M_.score[1] ? 'Next bucket wins' : M_.gpTeam === M_.me.team ? 'One more. Close it out.' : 'Get a stop.', '#f2c14e', 1.6); }
@@ -785,7 +821,7 @@ function stepPlayer(p, dt) {
   switch (p.st) {
     case 'shoot': {
       const s = p.shot, j0 = s.rel * 0.42, air = 0.56;
-      if (p.y > 0.01) { lock = 0; const dmp = Math.pow(0.35, dt); p.vx *= dmp; p.vz *= dmp; if (s.fade) { p.vx = s.fx * 1.7; p.vz = s.fz * 1.7; } } else if (s.side && p.t < j0) { lock = 0; const k = 3.8 * (1 - p.t / j0); p.vx = s.sx * k; p.vz = s.sz * k; } else lock = s.released ? 0.5 : 0.05;   /* plant on the gather (pull-up), drift in the air, walk off the landing */ const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (0.32 + nAtt(p, 'vert') * 0.2) * Math.sin(Math.PI * u) * (M_.arcade ? 1.4 : 1) : 0;
+      if (p.y > 0.01) { lock = 0; const dmp = Math.pow(0.35, dt); p.vx *= dmp; p.vz *= dmp; if (s.fade) { const fk = s.fadeK === 'deep' ? 2.3 : s.fadeK === 'drift' ? 2.0 : 1.7; p.vx = s.fx * fk; p.vz = s.fz * fk; } } else if (s.side && p.t < j0) { lock = 0; const k = 3.8 * (1 - p.t / j0); p.vx = s.sx * k; p.vz = s.sz * k; } else lock = s.released ? 0.5 : 0.05;   /* plant on the gather (pull-up), drift in the air, walk off the landing */ const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (0.32 + nAtt(p, 'vert') * 0.2) * Math.sin(Math.PI * u) * (M_.arcade ? 1.4 : 1) : 0;
       if (s.released && u >= 1 && p.t > s.rel + 0.2) { p.st = 'free'; p.y = 0; }
       break;
     }
@@ -1027,6 +1063,7 @@ const SWAGS = ['rock', 'tween', 'yoyo', 'sizeup', 'behind', 'wave', 'tween', 'ro
 // which hand the ball wants to be in: away from a defender who is close, otherwise the hand on the side you are going
 function autoHand(p) {
   const fx = Math.sin(p.face), fz = Math.cos(p.face), [o, od] = nearestOpp(p);
+  if (p.reachSaw && p.reachBy && MT.time - p.reachAt < 0.7) { const r = p.reachBy, lat = (r.x - p.x) * -fz + (r.z - p.z) * fx; if (Math.abs(lat) > 0.04) return lat > 0 ? 'L' : 'R'; }      /* a hand is coming: away from it, now */
   if (o && od < 1.7) { const lat = (o.x - p.x) * -fz + (o.z - p.z) * fx, fwd = (o.x - p.x) * fx + (o.z - p.z) * fz; if (fwd > -0.3 && Math.abs(lat) > 0.12) return lat > 0 ? 'L' : 'R'; if (od < 1.2) return null; }
   const dh = dHoop(p) || 1, hx = -p.x / dh, hz = -p.z / dh, lv = (p.avx || 0) * -hz + (p.avz || 0) * hx;      /* sideways, as seen looking at the rim */
   return lv > 1.1 ? 'R' : lv < -1.1 ? 'L' : null;
@@ -1093,7 +1130,7 @@ function animPlayer(p, dt) {
   p.runPh += dt * (4 + p.speed * 2.1);
   const spN = clamp(p.speed / 6.5, 0, 1);
   switch (p.st) {
-    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.n = p.stats.fga + 1; o.fadeA = p.shot.fade ? 1 : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
+    case 'shoot': an = p.shot.floater ? 'floater' : 'shoot'; o.rel = p.shot.rel; o.n = p.stats.fga + 1; o.fadeA = p.shot.fade ? (p.shot.fadeK === 'deep' ? 1.45 : 1) : 0; o.fadeS = p.shot.fadeK === 'drift' ? p.shot.fadeS : 0; o.sideS = p.shot.side || 0; o.kick = p.shot.j.id === 'lawsuit'; if (M_.net !== 'guest') { p.fadeK = lerp(p.fadeK || 0, contestOn(p), 0.2); o.fade = p.fadeK; } { const fx = Math.sin(p.face), fz = Math.cos(p.face); o.drift = ((p.avx || 0) * fz - (p.avz || 0) * fx) * -0.06; } break;
     case 'fake': an = 'fake'; o.rel = 0.6; break;
     case 'finish': { const f = p.finish; an = f.type; o.u = p.t / f.dur; o.style = f.style; o.kind = f.kind; o.euro = f.euro || 0; o.cont = f.cont; o.blocked = f.blocked; o.hit = !!f.hit; o.onRim = f.done && f.hangT > 0; if (f.spin) R.extraYaw = Math.min(1, o.u / 0.75) * Math.PI * 2; else if (f.turn) { const k = clamp(o.u / 0.7, 0, 1); R.extraYaw = f.turn * k * k * (3 - 2 * k); } break; }
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
@@ -1139,7 +1176,7 @@ function animPlayer(p, dt) {
   // advances with distance (knee drive, heel recovery, a flight phase); arms stay with the ball when dribbling.
   // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
   if (p.screen) o.screen = 1; if (p.box && p.st === 'free') o.box = 1;
-  let P = poseOf(an, t, o), duty = 0.38;
+  let P = poseOf(an, t, o), duty = 0.38; if (p.st === 'finish' && p.finish.lh && p.finish.type === 'layup') P = mirrorPose(P);
   { const yawR = p.face + (R.extraYaw || 0); let da = Math.atan2(p.avx, p.avz) - yawR; da = Math.atan2(Math.sin(da), Math.cos(da));
     const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 1.2 && Math.abs(da) < 0.7 && !p.protect;      /* jogging counts too (was 3 m/s: a half-pushed stick fell back to the old stepping, the "stomp") */
     p.strideW = lerp(p.strideW || 0, fwd ? 1 : 0, 1 - Math.exp(-(fwd ? 9 : 14) * dt)); const w = p.strideW;
@@ -1196,16 +1233,20 @@ function matchCam(dt) {
   fx = lerp(fx, B.pos.x, 0.25); fz = lerp(fz, B.pos.z, 0.2);
   const back = portrait ? 8.6 : 7.4, up = portrait ? 4.9 : 4.3;
   _v.set(fx * 0.62, up + fz * 0.1, fz + back + (hs.length > 1 ? 2 : 0));
-  camera.position.lerp(_v, 1 - Math.exp(-4 * dt));
-  const fovT = (portrait ? 74 : 52) - (M_.slow > 0 ? 7 : 0); if (Math.abs(camera.fov - fovT) > 0.05) { camera.fov += (fovT - camera.fov) * (1 - Math.exp(-9 * dt)); camera.updateProjectionMatrix(); }
+  (M_.camB || (M_.camB = camera.position.clone())).lerp(_v, 1 - Math.exp(-4 * dt)); camera.position.copy(M_.camB);
+  const hz = hlZoom(), fovT = (portrait ? 74 : 52) - (M_.slow > 0 ? 7 : 0) - hz * (portrait ? 26 : 16); if (Math.abs(camera.fov - fovT) > 0.05) { camera.fov += (fovT - camera.fov) * (1 - Math.exp(-9 * dt)); camera.updateProjectionMatrix(); }
   if (M_.shake > 0) { M_.shake -= dt; camera.position.x += rnd(-1, 1) * M_.shake * 0.25; camera.position.y += rnd(-1, 1) * M_.shake * 0.25; }
-  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2)); M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt)); camera.lookAt(M_.look);
+  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2)); M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt));
+  if (hz > 0) {      // highlight: push in on the man who did it, from where the camera already is
+    const q = M_.hl.p, cy = q.H * 0.62 + q.y * 0.9; _v.set(q.x, cy, q.z); const dx = camera.position.x - q.x, dz = camera.position.z - q.z, l = Math.hypot(dx, dz) || 1, r = portrait ? 5.6 : 4.8;
+    _v2.set(q.x + dx / l * r + (q.x > 0 ? -0.9 : 0.9), cy + 0.5, q.z + dz / l * r); camera.position.lerp(_v2, hz); _v2.copy(M_.look).lerp(_v, hz); camera.lookAt(_v2);
+  } else camera.lookAt(M_.look);
 }
 
 function endMatch() {
-  const M_ = MT, me = M_.me, cfg = M_.cfg;
+  const M_ = MT, me = M_.me, cfg = M_.cfg; hlEnd();
   hudShow(false);
   const res = { practice: M_.practice, drill: M_.drill ? { id: M_.drill.id, score: M_.drill.score } : null, rack: M_.rackScore, win: M_.score[0] > M_.score[1], score: M_.score.slice(), stats: me.stats, mode: cfg.mode, tier: cfg.tier, bonusRep: M_.bonusRep || 0, shutout: M_.score[1] === 0 && M_.score[0] > 0, box: M_.P.map(p => ({ n: p.b.name, team: p.team, user: p.user, s: p.stats })) };
   netHostEnd(res); MT = null; cfg.onEnd(res);
 }
-function quitMatch() { if (!MT) return; const cfg = MT.cfg, pr = MT.practice; hudShow(false); if (MT.net) netLeave(NET.game); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }
+function quitMatch() { if (!MT) return; hlEnd(); const cfg = MT.cfg, pr = MT.practice; hudShow(false); if (MT.net) netLeave(NET.game); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }

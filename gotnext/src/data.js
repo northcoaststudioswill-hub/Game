@@ -1,6 +1,6 @@
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.10.0';
+const VERSION = '0.12.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -179,10 +179,11 @@ const FINISHES = [
 ];
 const CELEBS = [
   { id: 'flex', n: 'The Flex', cost: 0, rank: 0 },
+  { id: 'goggles', n: 'Three Goggles', cost: 0, rank: 0 }, { id: 'bow', n: 'Take A Bow', cost: 0, rank: 0 }, { id: 'callme', n: 'Call Me', cost: 0, rank: 0 },
   { id: 'salute', n: 'Salute The Flag', cost: 500, rank: 1 },
   { id: 'count', n: 'Count The HC', cost: 1500, rank: 2 },
   { id: 'eagle', n: 'Freedom Eagle', cost: 3000, rank: 4 },
-  { id: 'shrug', n: 'The Shrug', cost: 400, rank: 0 }, { id: 'shh', n: 'Quiet, Please', cost: 700, rank: 1 }, { id: 'pound', n: 'Chest Pound', cost: 900, rank: 1 },
+  { id: 'shrug', n: 'The Shrug', cost: 0, rank: 0 }, { id: 'shh', n: 'Quiet, Please', cost: 700, rank: 1 }, { id: 'pound', n: 'Chest Pound', cost: 900, rank: 1 },
   { id: 'pout', n: 'The Pout', cost: 1200, rank: 2 }, { id: 'rock', n: 'Rock The Baby', cost: 1800, rank: 2 }, { id: 'nightnight', n: 'Night Night', cost: 2400, rank: 3 },
   { id: 'toosmall', n: 'Too Small', cost: 2800, rank: 3 }, { id: 'greenbean', n: 'Green Bean', cost: 1100, rank: 1 }, { id: 'greengiant', n: 'Green Giant', cost: 2600, rank: 3 }, { id: 'iceveins', n: 'Ice In My Veins', cost: 3200, rank: 3 }, { id: 'fentlean', n: 'Fent Lean', cost: 3800, rank: 4 }, { id: 'pour40', n: 'Pour Out The 40', cost: 4000, rank: 4 }, { id: 'floor', n: 'Slap The Floor', cost: 2000, rank: 3 }, { id: 'stare', n: 'The Stare Down', cost: 3500, rank: 4 }, { id: 'flexdown', n: 'Crab Flex', cost: 4500, rank: 5 },
 ];

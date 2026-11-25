@@ -322,7 +322,8 @@ function poseOf(anim, t, o) {
       Object.assign(p, shotPose(o.prof, u, o.n, true));       /* traditional / high / quick, blended by the player's profile (anim.js) */
       if (k && u >= 0.45) { if (u < 1) { S_('hpL', -0.9, 0, 0.04); S_('knL', 0.62); } else { S_('hpL', -1.1, 0, 0.03); S_('knL', 0.3); } }      /* The Lawsuit: the leg kick */
       if (o.fadeA && u >= 0.45) {        // fadeaway: hips back, shoulders back, the off leg kicks out front for balance
-        const a = o.fadeA; S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
+        const a = o.fadeA, fs = o.fadeS || 0; if (fs) { S_('hips', -0.1, 0, fs * 0.2); S_('spine', -0.16, 0, fs * 0.22); S_('chest', -0.14, 0, fs * 0.16); }      /* a drift fade leans to the side it is going */
+        if (!fs) S_('hips', -0.14 * a); S_('spine', -0.24 * a); S_('chest', -0.2 * a); S_('neck', 0.16 * a); S_('hpR', 0.12, 0, -0.04); S_('knR', 0.12); S_('hpL', -1.0 * a, 0, 0.08); S_('knL', 0.75 * a); S_('anL', 0.45); S_('anR', 0.85);
       }
       if (o.sideS && u < 0.45) { const d = o.sideS; S_('hips', 0, 0, -d * 0.18); S_('spine', 0.1, 0, d * 0.12); legs(-0.45, 0.8, -0.45, 0.8, 0.26); }   // side-step: wide and low, the body follows the hips
       p.rate = anim === 'fake' ? 30 : 24; if (lefty) Object.assign(p, mirrorPose(p)); break;
@@ -348,6 +349,12 @@ function poseOf(anim, t, o) {
         else if (u < 0.6) { S_('shR', -1.4, 0, 0.2); S_('shL', -1.4, 0, -0.2); S_('elR', -1.3); S_('elL', -1.3); S_('chest', 0, 0, 0); }
         else { S_('shL', -2.95, 0, 0.1); S_('elL', -0.15); S_('wrL', u > 0.8 ? -0.9 : 0.5); S_('shR', -1.35, 0, -0.85); S_('elR', -1.6); S_('chest', -0.08, -0.35, 0); S_('hips', 0, -0.15, 0); }
         S_('neck', -0.3); p.rate = 24;
+      } else if (k === 'quick') {    // early, off the wrong foot: short arm, flicked up before the blocker loads
+        legs(-1.25, 1.45, 0.3, 0.3); S_('anL', 0.9); S_('spine', 0.12); S_('chest', 0.02); S_('neck', -0.3); S_('shR', -2.3, 0, 0.2); S_('elR', -0.75); S_('wrR', rel ? -1.0 : 0.7); S_('shL', -0.7, 0, 0.5); S_('elL', -1.3); p.rate = 28;
+      } else if (k === 'spin') {     // spin in the air: tucked through the turn, then a long reach on the far side
+        if (u < 0.6) { legs(-0.9, 1.5, -0.8, 1.4, 0.08); S_('spine', 0.2); S_('chest', 0.1); S_('neck', -0.3); S_('shR', -1.0, 0, 0.25); S_('shL', -1.0, 0, -0.25); S_('elR', -1.6); S_('elL', -1.6); }
+        else { legs(0.3, 0.3, -0.9, 1.1); S_('spine', -0.04); S_('chest', -0.14); S_('neck', -0.35); S_('shR', -2.9, 0, 0.12); S_('elR', -0.14); S_('wrR', u > 0.82 ? -0.9 : 0.5); S_('shL', -0.8, 0, 0.7); S_('elL', -1.1); }
+        p.rate = 26;
       } else if (k === 'power') {    // two feet, two hands, square to the glass
         legs(-0.35, 0.75, -0.35, 0.75, 0.1); S_('anR', 0.7); S_('anL', 0.7); S_('spine', 0.04); S_('chest', -0.12); S_('neck', -0.3); S_('shR', -2.85, 0, 0.18); S_('shL', -2.85, 0, -0.18); S_('elR', -0.35); S_('elL', -0.35); S_('wrR', rel ? -0.7 : 0.5); S_('wrL', rel ? -0.7 : 0.5); p.rate = 20;
       }
@@ -375,6 +382,10 @@ function poseOf(anim, t, o) {
       else legs(-0.75, 1.1, -0.6, 1.0, 0.12);
       S_('spine', slam ? 0.22 : -0.2); S_('chest', slam ? 0.3 : -0.35); S_('neck', slam ? 0.2 : -0.3);
       if (st === 'twohand') { const a = slam ? -1.95 : -3.3; S_('shR', a, 0, 0.12); S_('shL', a, 0, -0.12); S_('elR', slam ? -0.2 : -0.95); S_('elL', slam ? -0.2 : -0.95); S_('wrR', slam ? -0.9 : 0.5); S_('wrL', slam ? -0.9 : 0.5); }
+      else if (st === 'onehand') {   // basic, off the run: one arm straight up, the other out for balance
+        S_('shR', slam ? -1.95 : -3.15, 0, 0.05); S_('elR', slam ? -0.15 : -0.3); S_('wrR', slam ? -1.0 : 0.5); S_('shL', -0.55, 0, 0.85); S_('elL', -0.75); S_('chest', slam ? 0.3 : -0.3, slam ? 0 : 0.2, 0); }
+      else if (st === 'cock') {      // basic, with lift: ball cocked behind the ear, chest open, then thrown
+        S_('shR', slam ? -1.9 : -3.35, 0, -0.3); S_('elR', slam ? -0.12 : -1.5); S_('wrR', slam ? -1.0 : 0.7); S_('shL', -0.9, 0, 0.7); S_('elL', -1.2); if (!slam) { S_('spine', -0.26); S_('chest', -0.38, 0.22, 0); } p.rate = 26; }
       else if (st === 'windmill') { const a = slam ? -1.95 : (0.4 - u / 0.72 * 4.4); S_('shR', a, 0, -0.1); S_('elR', -0.1); S_('wrR', slam ? -0.9 : 0); S_('shL', -0.6, 0, 0.75); S_('elL', -0.8); p.rate = 30; }
       else if (st === 'contact') {   // posterizer: ball cocked way back, forearm into the defender's chest, then through
         S_('shR', slam ? -1.8 : -3.7, 0, -0.08); S_('elR', slam ? -0.1 : -1.45); S_('wrR', slam ? -1.0 : 0.6); S_('shL', -1.35, 0, 0.45); S_('elL', -1.85); S_('wrL', 0.2);
@@ -529,6 +540,9 @@ function poseOf(anim, t, o) {
         case 'greengiant': { const st2 = Math.max(0, Math.sin(t * 4)); S_('shR', -0.25, 0, -0.75); S_('elR', -1.75); S_('wrR', 0.4); S_('shL', -0.25, 0, 0.75); S_('elL', -1.75); S_('wrL', 0.4); S_('spine', -0.16); S_('chest', -0.2); S_('neck', -0.25); S_('hpR', -0.5 * st2, 0, -0.28); S_('knR', 0.9 * st2); S_('hpL', 0, 0, 0.28); p.y = 0.02; break; }      /* fists on the hips, chest out, a slow stomp */
         case 'iceveins': armsDown(); S_('shL', -1.35, 0, 0.1); S_('elL', -0.15); S_('wrL', 0.2); S_('shR', -1.15, 0, 0.75); S_('elR', -1.35 + 0.12 * Math.max(0, s)); S_('wrR', 0.5); S_('neck', 0.3, 0.2, 0); S_('chest', 0.05, 0.12, 0); break;      /* one arm out, two fingers tapping the forearm */
         case 'fentlean': legs(-0.15, 0.55, -0.1, 0.5, 0.12); p.y = -0.06; S_('hips', 0.5); S_('spine', 0.75); S_('chest', 0.45); S_('neck', 0.6 + 0.03 * s); S_('shR', -1.3, 0, -0.08); S_('elR', -0.12); S_('shL', -1.25, 0, 0.08); S_('elL', -0.12); S_('wrR', 0.2); S_('wrL', 0.2); p.rate = 8; break;      /* folded at the waist, arms hanging, frozen there */
+        case 'goggles': armsDown(); S_('shR', -1.75, 0, -0.5); S_('elR', -2.3); S_('wrR', 0.2); S_('shL', -1.75, 0, 0.5); S_('elL', -2.3); S_('wrL', 0.2); S_('neck', 0, 0.35 * Math.sin(t * 3), 0); S_('spine', -0.06); legs(-0.1, 0.2, -0.1, 0.2, 0.14); break;      /* three goggles: circles over both eyes, looking round at everybody */
+        case 'bow': { const b2 = clamp(Math.sin(t * 2.6), 0, 1); armsDown(); S_('hips', 0.15 + b2 * 0.5); S_('spine', 0.2 + b2 * 0.55); S_('neck', -0.2 + b2 * 0.3); S_('shR', -0.4 - b2 * 0.3, 0, -0.9 + b2 * 0.5); S_('elR', -0.6 - b2 * 0.9); S_('shL', 0.5, 0, 0.7); S_('elL', -0.3); break; }      /* take a bow: one arm sweeps across, the other out behind */
+        case 'callme': armsDown(); S_('shR', -1.5, 0, -0.6); S_('elR', -2.35); S_('wrR', 0, 0, 0.5 + s * 0.12); S_('neck', 0, 0, -0.22); S_('shL', -0.3, 0, 0.9); S_('elL', -0.2); S_('wrL', 1.2); S_('hips', 0, 0.15, 0); break;      /* phone to the ear, other hand waving them off */
         case 'pour40': armsDown(); S_('shR', -1.2, 0, -0.75); S_('elR', -0.5); S_('wrR', 0, 0, 1.3 + 0.1 * s); S_('neck', 0.5, -0.25, 0); S_('chest', 0.12, 0, 0.08); S_('spine', 0.1); S_('shL', -0.5, 0, -0.45); S_('elL', -1.6); break;      /* arm out, wrist tipped over, head down, the other hand on the heart */
         case 'salute': S_('shR', -0.7, 0, -1.25); S_('elR', -2.3); S_('wrR', 0.2); S_('shL', 0.05, 0, 0.08); S_('spine', -0.05); S_('chest', -0.08); S_('neck', -0.05); break;
         case 'count': S_('shR', -1.0, 0, 0.3); S_('elR', -1.4 + s * 0.3); S_('wrR', s * 0.8); S_('shL', -1.0, 0, -0.3); S_('elL', -1.4 - s * 0.3); S_('wrL', -s * 0.8); S_('chest', -0.1); S_('neck', 0.25); break;

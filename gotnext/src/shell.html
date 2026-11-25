@@ -73,6 +73,30 @@ body:not([data-state=world]) #prompt{display:none!important}
 .bar span{position:absolute;left:0;top:5px;font:500 8px var(--m);letter-spacing:.16em;color:rgba(236,233,226,.6)}
 #stam i{background:var(--bone)}#brav i{background:var(--foil)}#brav.on{box-shadow:0 0 14px var(--heat);animation:pulse .4s infinite}
 @keyframes pulse{50%{filter:brightness(1.7)}}
+/* highlight close-up: letterbox, a slanted banner, the fit, a flash when the photo is taken */
+#hl{position:absolute;inset:0;pointer-events:none;visibility:hidden}#hl.on{visibility:visible}
+#hl .lb{position:absolute;left:0;right:0;height:11vh;background:#050506;transform:scaleY(0);transition:transform .18s}#hl .lb.t{top:0;transform-origin:top}#hl .lb.b{bottom:0;transform-origin:bottom}#hl.on .lb{transform:scaleY(1)}
+#hl .hb{position:absolute;left:0;bottom:13vh;padding:10px 34px 12px calc(18px + var(--sal));background:linear-gradient(90deg,var(--heat),#ff2d78cc 70%,transparent);transform:translateX(-110%) skewX(-9deg);transform-origin:left bottom;transition:transform .28s cubic-bezier(.2,.9,.2,1) .05s}
+#hl.them .hb{background:linear-gradient(90deg,#33e0ff,#33e0ffcc 70%,transparent)}
+#hl.on .hb{transform:translateX(0) skewX(-9deg)}
+#hl .hb small{display:block;font:700 10px var(--m);letter-spacing:.22em;color:var(--ink)}
+#hl .hb b{display:block;font:900 min(11vw,68px)/.9 var(--d);font-stretch:125%;letter-spacing:-.02em;color:#fff;text-shadow:3px 3px 0 var(--ink)}
+#hl .hb .who{display:inline-block;margin-top:5px;background:var(--ink);color:var(--bone);font:700 min(3.4vw,13px) var(--m);letter-spacing:.14em;padding:3px 9px;text-transform:uppercase}
+#hl .fit{position:absolute;right:calc(14px + var(--sar));bottom:calc(11vh + 10px);font:700 min(2.8vw,11px) var(--m);letter-spacing:.16em;color:var(--gold);text-transform:uppercase;background:rgba(5,5,6,.75);padding:4px 9px;border-left:3px solid var(--gold);opacity:0;transform:translateX(30px);transition:opacity .25s .3s,transform .25s .3s}#hl.on .fit{opacity:1;transform:none}#hl .fit:empty{display:none}
+#hl::after{content:"";position:absolute;inset:11vh 0;background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.14) 1px,transparent 1.6px) 0 0/7px 7px;-webkit-mask-image:linear-gradient(115deg,#000,transparent 28%,transparent 72%,#000);mask-image:linear-gradient(115deg,#000,transparent 28%,transparent 72%,#000)}
+#hl .fl{position:absolute;inset:0;background:#fff;opacity:0}#hl.snap .fl{animation:hlfl .35s both}@keyframes hlfl{0%{opacity:.85}100%{opacity:0}}
+#hl .clip{position:absolute;right:calc(14px + var(--sar));top:calc(11vh + 10px);font:800 min(3vw,12px) var(--m);letter-spacing:.16em;color:#fff;background:#d0142c;padding:5px 10px;transform:rotate(3deg);opacity:0}#hl.snap .clip{opacity:1}
+/* CAGE covers */
+.maggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.magcell{display:flex;flex-direction:column;gap:6px}
+.mag{position:relative;aspect-ratio:4/5;background-size:cover;background-position:center;overflow:hidden;border:1px solid var(--line);color:#fff;container-type:inline-size}
+.mag::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,6,.55),transparent 26%,transparent 46%,rgba(5,5,6,.9))}
+.mag>*{position:relative}.mag .mh{padding:3cqw 4cqw 0}.mag .mh b{display:block;font:900 27cqw/.82 var(--d);font-stretch:125%;letter-spacing:-.04em;color:var(--heat);text-shadow:.6cqw .6cqw 0 var(--ink)}
+.mag .mh span{display:block;font:700 2.6cqw var(--m);letter-spacing:.18em;margin-top:1.2cqw}
+.mag .mk{position:absolute;right:-1cqw;top:33cqw;background:var(--gold);color:var(--ink);font:900 5cqw var(--d);font-stretch:125%;padding:1cqw 4cqw 1cqw 3cqw;transform:rotate(-4deg)}
+.mag .ml{position:absolute;left:4cqw;right:4cqw;bottom:17cqw}.mag .ml b{display:block;font:900 8.2cqw/.95 var(--d);font-stretch:125%;letter-spacing:-.02em;text-shadow:.4cqw .4cqw 0 var(--ink)}.mag .ml span{display:block;font:500 3.1cqw var(--m);margin-top:1.4cqw;color:var(--bone)}
+.mag .mf{position:absolute;left:4cqw;right:4cqw;bottom:3.4cqw;font:700 2.5cqw var(--m);letter-spacing:.12em;color:var(--gold)}.mag .mf span{display:block;padding-right:22cqw}
+.mag .mf i{position:absolute;right:0;bottom:3.4cqw;width:17cqw;height:7cqw;background:repeating-linear-gradient(90deg,#fff 0 .6cqw,transparent .6cqw 1cqw,#fff 1cqw 1.3cqw,transparent 1.3cqw 2.3cqw);opacity:.9}.mag .mf em{position:absolute;right:0;bottom:0;font-style:normal;color:#fff}
+.mag.big{width:max(200px,min(92vw,420px,calc((100vh - 150px)*.8)));max-width:100%;margin:0 0 12px}.mag.nopic .ml b{color:var(--bone)}
 #call{position:absolute;left:0;right:0;top:20%;text-align:center;opacity:0;transform:skewX(-7deg)}
 #call b{display:block;font:900 min(10vw,60px)/0.95 var(--d);font-stretch:125%;letter-spacing:-.02em;text-transform:uppercase;text-shadow:0 2px 0 var(--ink),0 0 24px rgba(8,8,10,.8);padding:0 12px}
 #call small{font:500 min(3.2vw,13px) var(--m);letter-spacing:.14em;text-transform:uppercase;background:var(--ink);padding:3px 8px;display:inline-block;margin-top:6px}#call small:empty{display:none}
@@ -179,7 +203,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div id="bars"><div class="bar" id="stam"><i></i><span>STAMINA</span></div><div class="bar" id="brav"><i></i><span>BRAVADO</span></div></div>
   <div id="sb"><div class="lbl" id="n0">YOU</div><div class="t0" id="s0">0</div><div id="clock">14</div><div class="t1" id="s1">0</div><div class="lbl" id="n1">THEM</div></div>
   <div id="modeTag"></div><div id="clear">TAKE IT BACK ↓ PAST THE ARC</div><div id="rackHud"></div>
-  <div id="call"><b></b><small></small></div><div id="fb"></div>
+  <div id="hl"><i class="lb t"></i><i class="lb b"></i><div class="hb"><small>CAGE MAG · HIGHLIGHT</small><b></b><span class="who"></span></div><div class="fit"></div><div class="clip">● CLIPPED FOR THE COVER</div><i class="fl"></i></div><div id="call"><b></b><small></small></div><div id="fb"></div>
   <div id="meter"><div id="meterZone"></div><div id="meterFill"></div></div><div id="flts"></div>
 </div>
 <div id="panel"></div>
@@ -211,6 +235,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 /*@include park.js*/
 /*@include cast.js*/
 /*@include vice.js*/
+/*@include mag.js*/
 /*@include home.js*/
 /*@include ui.js*/
 /*@include net.js*/

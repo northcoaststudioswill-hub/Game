@@ -157,6 +157,7 @@ function frame(now) {
   else if (W) { worldStep(dt); netWorldStep(dt); clearEdges(); }
   else { if (ST && !ST.frozen) studioStep(dt); clearEdges(); }
   if (scene) renderer.render(scene, camera);
+  if (MT && MT.hl) hlCapture();
   dbgDraw(dt);
 }
 function boot() {

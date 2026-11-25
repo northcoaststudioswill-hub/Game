@@ -67,7 +67,7 @@ function sanitizeBuild(j) {
     if (!MOVE[j.moves.side] || MOVE[j.moves.side].slot !== 'side') j.moves.side = m.side;
     if (!MOVE[j.moves.back] || MOVE[j.moves.back].slot !== 'back') j.moves.back = m.back;
     if (!MOVE[j.moves.diag] || MOVE[j.moves.diag].slot !== 'diag') j.moves.diag = m.diag;
-    if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk;
+    if (!JUMPER[j.moves.jumper]) j.moves.jumper = m.jumper; if (!DUNK[j.moves.dunk]) j.moves.dunk = m.dunk; for (const c of CELEBS) if (!c.cost && j.moves.owned && !j.moves.owned.includes(c.id)) j.moves.owned.push(c.id);      /* the free celebrations belong to everybody */
     j.anim = typeof cleanProfile === 'function' ? cleanProfile(j.anim) || undefined : undefined;
     return j;
   } catch (e) { return null; }

@@ -39,6 +39,8 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
   stepback, spin; hands up and steal on defense).
 - **HC** is Hooper Coins, the money. The crowd at a game starts at five and grows with big plays: the Block's own people walk over to watch. 19 celebrations, 17 branded home pieces (this game and the crew's others).
 - **Call a screen:** LB, R or the PICK button with the ball. A teammate plants on your defender, then rolls to the rim. **Box out:** hold LT while the shot is in the air. **Game point:** one bucket from the win, the release window follows your Shot IQ.
+- **Highlights and CAGE:** big plays get a close-up, a banner and a photo; your photos become CAGE magazine covers to collect (MY PLAYER → CAGE MAG).
+- **Finishing:** fades read the coverage, the free dunk and layup package varies with the approach, euros have a right and a wrong side, AI cuts and throws lobs.
 - **22 street smarts** in four tiers, earned with smarts XP from real games. **Bravado** meter: big plays fill it, a full bar is
   +8 to everything for 20 seconds.
 - **Unlocks:** 74 pieces of drip in ten slots (some carry small buffs), 22 animations (dribble moves, jumpshots, dunk
