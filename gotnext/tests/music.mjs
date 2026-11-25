@@ -16,7 +16,7 @@ console.log('at the crib:', JSON.stringify(c));
 const t0 = await p.evaluate(() => __pit.OST.cur); await p.keyboard.press('KeyN'); await p.waitForTimeout(1500); const t1 = await p.evaluate(() => ({ cur: __pit.OST.cur, playing: !__pit.OST.el.paused }));
 console.log('N skips:', t0, '→', JSON.stringify(t1));
 // the volume sliders in Options: music and effects move separately, and are remembered
-await p.keyboard.press('KeyP'); await p.waitForTimeout(400); await p.evaluate(() => [...document.querySelectorAll('#panel .tabs .btn')].find(b => b.textContent === 'OPTIONS').click()); await p.waitForTimeout(300);
+await p.evaluate(() => { __pit.S.tut = 1; if (__pit.W && __pit.W.guide) __pit.W.guide.st = 'rest'; __pit.uiClose(); }); await p.keyboard.press('KeyP'); await p.waitForTimeout(400); await p.evaluate(() => [...document.querySelectorAll('#panel .tabs .btn')].find(b => b.textContent === 'OPTIONS').click()); await p.waitForTimeout(300);
 const v = await p.evaluate(async () => { const set = (id, val) => { const el = document.getElementById(id); el.value = val; el.dispatchEvent(new Event('input', { bubbles: true })); }; const g0 = __pit.vol(); set('vmus', 40); set('vsfx', 100); await new Promise(r => setTimeout(r, 500)); const g1 = __pit.vol(); return { g0, g1, saved: JSON.parse(localStorage.getItem('gotnext_v1')).set }; });
 console.log('sliders:', JSON.stringify(v)); const vok = Math.abs(v.g0.mus - 1) < 0.02 && Math.abs(v.g1.mus - 0.5) < 0.03 && Math.abs(v.g1.sfx - 1.25) < 0.03 && v.saved.musVol === 40 && v.saved.sfxVol === 100;
 console.log(vok ? 'PASS music and effects sliders set their own levels and are saved' : 'FAIL sliders');
