@@ -48,4 +48,13 @@ r = await p.evaluate(() => { const P = __pit, M = T.start(3), me = M.me, mates =
   out.extra = extra; return out; });
 ok(r.set && r.got && r.held <= 2 && r.touchT, `touch pass: press pass with the ball on its way and it goes straight on to the man your stick points at (in your hands ${r.held} frames)`);
 ok(r.extra > 30 && r.extra < 180, `an AI catching it with a defender on him and a teammate open makes the extra pass ${r.extra}/200 times`);
+// ---- dribble combos and reads
+r = await p.evaluate(() => { const P = __pit, M = T.start(2), me = M.me, d = M.P.find(q => q.team !== me.team), out = {}; me.A.handle = 80; d.A.perd = 75;
+  const run = (seq) => { let ank = 0, read = 0; for (let i = 0; i < 300; i++) { T.set(me); me.x = 0; me.z = 7; d.x = 0; d.z = 5.9; me.mvHist = []; me.combo = 0; me.comboT = -9; me.stam = 100; for (const [slot, dx, dz] of seq) { me.st = 'free'; me.moveCool = 0; d.st = 'free'; d.slowT = 0; me.slowT = 0; M.hl = null; M.hlAt = -99; P.call('startMove', me, slot, dx, dz); if (d.st === 'stagger') { ank++; break; } if (me.slowT > 0.1) read++; } M.slow = 0; } return [ank, read]; };
+  out.same = run([['side', 1, -0.15], ['side', 1, -0.15], ['side', 1, -0.15], ['side', 1, -0.15]]); out.mix = run([['side', 1, -0.15], ['back', -0.55, 1], ['side', -1, -0.15], ['diag', 0.8, -0.8]]); return out; });
+ok(r.mix[0] > r.same[0] && r.same[1] > 40 && r.mix[1] === 0, `four moves in a row: mixed up they break ankles ${r.mix[0]}/300 times, the same one four times ${r.same[0]}/300 and it gets READ ${r.same[1]} times`);
+// ---- scouting
+r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, d = M.P.find(q => q.team !== me.team && q.man === me) || M.P.find(q => q.team !== me.team); d.man = me; d.aiLvl = 0.8; const gapAt = (tend) => { T.set(me); me.tend = tend; me.x = 0; me.z = 8.5; d.x = 0; d.z = 4; d.ai.mx = me.x; d.ai.mz = me.z; d.ai.scout = ''; for (let i = 0; i < 4; i++) P.call('aiThink', d, 0.2); return Math.hypot(d.ai.tx - me.x, d.ai.tz - me.z); };
+  return { none: gapAt(null), shooter: gapAt({ three: 5, mid: 1, close: 0, drive: 0 }), driver: gapAt({ three: 0, mid: 0, close: 2, drive: 5 }) }; });
+ok(r.shooter < r.none - 0.15 && r.driver > r.none + 0.15, `scouting: the on-ball gap is ${r.none.toFixed(2)} m to start, ${r.shooter.toFixed(2)} m against a man who keeps shooting, ${r.driver.toFixed(2)} m against one who keeps driving`);
 console.log(errs.length ? 'PAGE ERRORS: ' + errs.join(' | ') : 'no page errors', '·', fails ? fails + ' FAILED' : 'ALL PASS'); await b.close(); process.exit(fails || errs.length ? 1 : 0);

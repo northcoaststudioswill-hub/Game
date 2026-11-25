@@ -215,6 +215,7 @@ function releaseShot(p) {
   const held = s.hold != null ? s.hold : p.t;
   if (p.user && !s.auto && held < s.rel * 0.3) { s.released = false; return startFake(p); }      // let go early = pump fake
   const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
+  (p.tend || (p.tend = { three: 0, mid: 0, close: 0, drive: 0 }))[kind]++;
   let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85; c *= 1 - px(p, 'calm');
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
   let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
@@ -364,7 +365,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   p.face = Math.atan2(-p.x, -p.z); sfxM('whoosh'); return true;
 }
 function resolveFinish(p) {
-  const f = p.finish, B = MT.B; f.done = true; if (B.holder !== p) return;
+  const f = p.finish, B = MT.B; f.done = true; if (B.holder !== p) return; (p.tend || (p.tend = { three: 0, mid: 0, close: 0, drive: 0 })).drive++;
   let c = 0; const soft = (f.euro ? (f.euroBad ? 1.05 : 0.6) : 1) * (f.kind === 'quick' ? 0.78 : f.kind === 'spin' ? 0.66 : f.kind === 'under' ? 0.64 : f.kind === 'over' ? 0.72 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'hang' ? 0.6 : f.kind === 'switch' ? 0.7 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1) * (f.style === 'contact' && f.type === 'dunk' ? 0.45 : 1);
   if (f.contact) c = Math.max(c, f.contact * 0.55);           /* got hit in the air and lost the line */
   for (const o of MT.P) { if (o.team === p.team || o.st === 'stagger') continue; const d = dist(o, p); if (d > 1.9) continue; c = Math.max(c, (1 - d / 1.9) * (0.5 + 0.5 * nAtt(o, 'intd')) * (o.st === 'jump' ? 1 : 0.55)); }
@@ -405,18 +406,23 @@ function startMove(p, slot, dx, dz) {
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
   p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
   p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh');
+  // the same move the same way, again and again, gets read; mixing them up builds a combo
+  const sig = slot + (dx > 0.2 ? 'R' : dx < -0.2 ? 'L' : 'C'), H = p.mvHist || (p.mvHist = []), rep = H.filter(h => h.s === sig && MT.time - h.t < 6).length, fresh = H.length && H[H.length - 1].s !== sig && MT.time - H[H.length - 1].t < 1.4; H.push({ s: sig, t: MT.time }); if (H.length > 4) H.shift();
+  if (p.user && p.combo >= 2 && fresh) floatTxt(p, 'COMBO ×' + (p.combo + 1), '#f2c14e');
   // ankle check on the nearest defender
   let o = null, od = 2.1; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
   if (!o) return;
   let ch = 0.05 + (att(p, 'handle') - att(o, 'perd')) * 0.006 + mv.ank + 0.035 * bt(p, 'ankletax') - 0.035 * bt(o, 'ground') + p.combo * 0.035 + (MT.arcade ? 0.08 : 0);
   if (o.vx * dx + o.vz * dz < -1.2) ch += 0.13;
+  ch += (fresh ? 0.04 : 0) - rep * 0.07; const readIt = rep >= 2 && Math.random() < 0.5 + nAtt(o, 'perd') * 0.4;
   if (Math.random() < clamp(ch, 0.02, 0.6)) {
     const fall = Math.random() < 0.4 + p.combo * 0.1; o.st = 'stagger'; o.t = 0;
     // he bit on the fake: his weight goes the opposite way to where the ball handler really went
     const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
     o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5, kind: pick(['sit', 'sit', 'spin', 'knee']) };
     p.stats.ankles++; say(p, 's'); highlight('ankles', p, o); call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
-  } else o.slowT = 0.22 + mv.ank;
+  } else if (readIt) { floatTxt(o, 'READ IT', '#7de3ff'); p.slowT = Math.max(p.slowT || 0, 0.18); }      /* he has seen that one: no step gained, and you lose a beat */
+  else o.slowT = 0.22 + mv.ank;
 }
 function doPass(p, to) {
   if (!to || MT.B.holder !== p) return; const B = MT.B;
@@ -820,6 +826,8 @@ function aiThink(p, dt) {
     const onBall = h === m;
     const rate = 3.5 + L * 6 + nAtt(p, 'perd') * 5; a.mx += (m.x - a.mx) * Math.min(1, rate * dt); a.mz += (m.z - a.mz) * Math.min(1, rate * dt);
     const md = Math.hypot(a.mx, a.mz) || 1; let gap = onBall ? (beyondArc(m.x, m.z) ? 1.25 - L * 0.25 : 0.95) : 1.9;
+    // scouting: after a few trips a decent defender plays what you keep doing. A shooter gets crowded, a driver gets room
+    if (onBall && m.tend && L > 0.35) { const t = m.tend, n = t.three + t.mid + t.close + t.drive; if (n >= 4) { const sh = (t.three + t.mid) / n, adj = sh > 0.6 ? -0.28 : sh < 0.35 ? 0.32 : 0; gap += adj * Math.min(1, L * 1.4); const tag = adj < 0 ? 'up' : adj > 0 ? 'sag' : ''; if (tag !== (a.scout || '')) { a.scout = tag; if (tag) floatTxt(p, tag === 'up' ? 'PLAYING UP ON YOU' : 'SAGGING OFF YOU', '#8d8d99'); } } }
     let tx = a.mx - a.mx / md * gap, tz = a.mz - a.mz / md * gap;
     if (!onBall && h) { tx += (h.x - tx) * 0.22; tz += (h.z - tz) * 0.22; }
     // help at the rim
