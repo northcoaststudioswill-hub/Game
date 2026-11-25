@@ -1079,7 +1079,7 @@ function stepPlayer(p, dt) {
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
   top *= 1 + px(p, 'speed'); if (p.screen && p.user) top *= 0.2; if (p.bodyUp) { const h = B.holder; top *= h && h.team !== p.team && dist(h, p) < 1.3 ? 1 : 0.86; }      /* bodied up on him, your feet keep up with his; only away from him is the stance slower */ if (p.box) top *= 0.62;
-  if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5) - 0.03 * bt(o, 'clamps'), 0.55, 0.95); }      /* a hand on your body slows the drive */
+  if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp((od < 0.75 ? 0.3 : 0.62) + 0.22 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5) - 0.03 * bt(o, 'clamps'), 0.15, 0.9); }      /* a man bodied up on you: you do not walk through him. In his chest you go at a third of the pace (Strength against Strength decides how much) */
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
   // TURBO: the moment you squeeze sprint with the ball, a burst. It costs a chunk of stamina and can beat your man off the first step

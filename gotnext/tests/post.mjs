@@ -35,7 +35,7 @@ ok(m3.st === 'finish', `post + stick to the side: drop step into a power finish 
 // 3. body up: LT on defense plays tighter on the ball and slows his drive
 const drive = (lt) => p.evaluate(([s, lt]) => { eval(s); P.S.set.dassist = 1; const h = d; h.user = true; h.ctrl = 5; while (P.IN.length < 6) P.IN.push({ mx: 0, my: 0, rx: 0, ry: 0, sprint: false, a: false, b: false, aP: false, bP: false, bR: false, flick: null, rdir: null });
   h.x = 0; h.z = 7; me.x = 0; me.z = 6.1; M.B.state = 'held'; M.B.holder = h; h.live = 'drib'; M.off = h.team; me.man = h; __pad.buttons[6].pressed = lt; window.__tick(30);
-  let gap = 0, n = 0; const z0 = h.z; for (let i = 0; i < 60; i++) { P.IN[5].mx = 0; P.IN[5].my = -0.8; window.__tick(1); gap += Math.hypot(me.x - h.x, me.z - h.z); n++; }
+  let gap = 0, n = 0; const z0 = h.z; window.__trace = []; for (let i = 0; i < 60; i++) { P.IN[5].mx = 0; P.IN[5].my = -0.8; window.__tick(1); gap += Math.hypot(me.x - h.x, me.z - h.z); n++; if (i % 6 === 0) window.__trace.push(`${i} me ${me.st} bu=${me.bodyUp} ${me.x.toFixed(2)},${me.z.toFixed(2)} h ${h.st} ${h.x.toFixed(2)},${h.z.toFixed(2)}`); }
   const r = { bodyUp: me.bodyUp, an: me.an, gap: +(gap / n).toFixed(2), gained: +(z0 - h.z).toFixed(2) }; P.IN[5].my = 0; __pad.buttons[6].pressed = false; h.user = false; h.ctrl = undefined; window.__tick(5); return r; }, [set, lt]);
 const off = await drive(false), on = await drive(true);
 ok(on.bodyUp && on.gap < off.gap && on.gained < off.gained * 0.5, `ball handler driving 1 s: body up keeps ${on.gap} m away and he gains ${on.gained} m; without it ${off.gap} m and ${off.gained} m`);
