@@ -614,6 +614,9 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (o.dive) {      // on the floor after a loose ball: laid out, both arms reaching
+    const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    p.hips = [1.15, 0, 0]; p.spine = [0.15, 0, 0]; p.neck = [-0.6, 0, 0]; p.shR = [-2.7, 0, 0.2]; p.shL = [-2.7, 0, -0.2]; p.elR = [-0.2, 0, 0]; p.elL = [-0.2, 0, 0]; p.hpR = [0.25, 0, -0.1]; p.hpL = [0.1, 0, 0.1]; p.knR = [0.3, 0, 0]; p.knL = [0.7, 0, 0]; p.y = -0.55; p.rate = 30; void ad; }
   if (o.box) {      // boxing out: sit into him, arms out wide and back to hold the space
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     ad('knR', 0.42); ad('knL', 0.42); ad('hpR', -0.36, 0, -0.14); ad('hpL', -0.36, 0, 0.14); ad('spine', 0.26); ad('neck', -0.3); p.y = (p.y || 0) - 0.1;

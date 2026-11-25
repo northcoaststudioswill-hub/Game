@@ -1,0 +1,31 @@
+// Defense: taking a charge, switching on screens (AI and by hand). node tests/defense.mjs
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1100, height: 620 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
+await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => { window.__tick(10); });
+await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.size === 2 && !m.arcade), P.TIERS_COURT[1], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(200); const M = P.MT; var g = 0; while (M.phase !== 'live' && g++ < 600) window.__tick(1);
+  window.T = { set(h) { const M = P.MT; P.call('give', h); P.call('changePoss', h.team); M.needClear = false; M.phase = 'live'; M.clock = 20; for (const q of M.P) { q.ai.tick = 99; q.st = 'free'; q.y = 0; q.vx = q.vz = 0; q.slowT = 0; if (q !== h) { q.x = 7.5; q.z = 11 + q.i * 0.4; } } h.live = 'drib'; } }; });
+let r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, d = M.P.find(q => q.team !== me.team), out = {};
+  const drive = (o) => { T.set(me); me.x = 0; me.z = 5; me.vx = 0; me.vz = -4.4; d.x = 0; d.z = 4.2; d.face = 0; d.aiLvl = 0.9; d.A.perd = 85; if (o.move) { d.vx = 2; } if (o.circle) { me.z = 1.9; d.z = 1.1; } if (o.back) d.face = Math.PI; const res = P.call('startFinish', me, o.euro || 0); const chg = M.phase === 'scored' && M.lastScorer.team === me.team && M.lastScorer.dead; return chg; };
+  const cnt = (o, n) => { let c = 0; for (let i = 0; i < n; i++) if (drive(o)) c++; return c; };
+  out.set = cnt({}, 300); out.euro = cnt({ euro: 1 }, 300); out.moving = cnt({ move: 1 }, 150); out.circle = cnt({ circle: 1 }, 150); out.back = cnt({ back: 1 }, 150);
+  drive({}); let guard = 0; while (!(M.phase === 'scored' && M.lastScorer.dead) && guard++ < 50) drive({}); const who = M.lastScorer.team; for (let i = 0; i < 200 && M.phase !== 'live'; i++) window.__tick(1); out.ballTo = M.B.holder ? M.B.holder.team : -1; out.defTeam = d.team; out.phase = M.phase; out.chg = d.stats.chg; void who; return out; });
+ok(r.set > 20 && r.set < 150 && r.euro < r.set * 0.7 && r.moving === 0 && r.circle === 0 && r.back === 0, `charge: a set AI defender in the lane takes ${r.set}/300 drives; a euro step gets round him (${r.euro}/300); none if he is moving (${r.moving}), under the rim (${r.circle}) or has his back turned (${r.back})`);
+ok(r.ballTo === r.defTeam && r.chg > 0, `after the call the defense checks the ball up (holder team ${r.ballTo}, defender's team ${r.defTeam})`);
+r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), h = opp[0], mate = M.P.find(q => q.team === me.team && q !== me); let lt = 0, no = 0;
+  const one = (hold) => { T.set(h); h.x = 0; h.z = 5; h.vx = 0; h.vz = -4.4; me.x = 0; me.z = 4.2; me.face = 0; me.ltHeld = hold; me.A.perd = 85; P.call('startFinish', h, 0); return M.phase === 'scored' && M.lastScorer.dead; };
+  for (let i = 0; i < 200; i++) { if (one(true)) lt++; if (one(false)) no++; } void mate; return { lt, no }; });
+ok(r.lt > 80 && r.no === 0, `you take a charge by holding LT with your feet set: ${r.lt}/200; standing there without it: ${r.no}/200`);
+r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, mate = M.P.find(q => q.team === me.team && q !== me), opp = M.P.filter(q => q.team !== me.team); let sw = 0, okMen = true;
+  for (let i = 0; i < 300; i++) { T.set(me); opp[0].man = me; opp[1].man = mate; opp[0].aiLvl = opp[1].aiLvl = 0.8; mate.ai.scr = { h: me, t: 0, ph: 1, kind: 'set' }; mate.screen = true; mate.x = 0; mate.z = 6; mate.A.str = 90; opp[0].A.str = 20; opp[0].x = -0.5; opp[0].z = 6; opp[0].vx = 3; opp[1].x = 0.8; opp[1].z = 5.4; opp[0].scrHit = -9; const rn = Math.random; let k = 0; Math.random = () => (k++ === 0 ? 0.99 : rn()); P.call('screenHit', mate, opp[0]); Math.random = rn;
+    if (opp[1].man === me && opp[0].man === mate) sw++; else if (!(opp[0].man === me && opp[1].man === mate)) okMen = false; }
+  mate.ai.scr = null; mate.screen = false; return { sw, okMen }; });
+ok(r.sw > 100 && r.sw < 290 && r.okMen, `AI defenders caught on a screen switch ${r.sw}/300 times; every man is still guarded by exactly one`);
+r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, mate = M.P.find(q => q.team === me.team && q !== me), opp = M.P.filter(q => q.team !== me.team); T.set(opp[1]); me.man = opp[0]; mate.man = opp[1]; me.switchAt = -9; me.x = 0; me.z = 5; opp[1].x = 1; opp[1].z = 6;
+  P.keys.KeyR = true; window.__tick(2); P.keys.KeyR = false; window.__tick(2); const a = [me.man === opp[1], mate.man === opp[0]]; return { a, hint: document.getElementById('keys').textContent.includes('switch') }; });
+ok(r.a[0] && r.a[1] && r.hint, `R / LB / SWITCH on defense: you take the ball handler and your teammate takes your man`);
+console.log(errs.length ? 'PAGE ERRORS: ' + errs.join(' | ') : 'no page errors', '·', fails ? fails + ' FAILED' : 'ALL PASS'); await b.close(); process.exit(fails || errs.length ? 1 : 0);

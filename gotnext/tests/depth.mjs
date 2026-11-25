@@ -47,8 +47,8 @@ const start2 = `(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find
   await p.touchscreen.tap(...(await p.evaluate(() => { const q = document.getElementById('tPK').getBoundingClientRect(); return [q.left + q.width / 2, q.top + q.height / 2]; })));
   r = await p.evaluate(() => { const M = __pit.MT, me = M.me; M.clock = 20; window.__tick(3); return { scr: M.P.some(q => q.team === me.team && q.ai.scr) }; });
   ok(r.scr, 'tapping PICK calls the screen');
-  r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, o = M.P.find(q => q.team !== me.team); P.call('give', o); P.call('changePoss', o.team); for (const q of M.P) q.ai.tick = 99; M.clock = 20; window.__tick(3); const a = document.getElementById('tPK'); const hid = getComputedStyle(a).display === 'none'; const B = M.B; B.state = 'shot'; B.holder = null; B.t = 0; B.T = 9; window.__tick(1); const lt = document.getElementById('tLT').textContent; return { hid, lt }; });
-  ok(r.hid && r.lt === 'BOX OUT', `on defense PICK goes away; with a shot in the air the gold button reads ${r.lt}`);
+  r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, o = M.P.find(q => q.team !== me.team); P.call('give', o); P.call('changePoss', o.team); for (const q of M.P) q.ai.tick = 99; M.clock = 20; window.__tick(3); const a = document.getElementById('tPK'); const hid = a.textContent === 'SWITCH' && getComputedStyle(a).display !== 'none'; const B = M.B; B.state = 'shot'; B.holder = null; B.t = 0; B.T = 9; window.__tick(1); const lt = document.getElementById('tLT').textContent; return { hid, lt }; });
+  ok(r.hid && r.lt === 'BOX OUT', `on defense the cyan button reads SWITCH; with a shot in the air the gold button reads ${r.lt}`);
   await ctx.close();
 }
 console.log(errs.length ? 'PAGE ERRORS: ' + errs.join(' | ') : 'no page errors', '·', fails ? fails + ' FAILED' : 'ALL PASS'); await b.close(); process.exit(fails || errs.length ? 1 : 0);
