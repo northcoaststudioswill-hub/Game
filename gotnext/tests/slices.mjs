@@ -31,7 +31,7 @@ ok(r.run === 3 && /ON A RUN/.test(r.calls1.join('|')) && /RUN OVER/.test(r.calls
 ok(r.gHot > r.gCold + 6 && r.cold === 3, `streaks move the release window: ${r.gHot} greens in 400 when heating up and on a run, ${r.gFlat} flat, ${r.gCold} ice cold`);
 // ---- loose balls
 r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, o = M.P.find(q => q.team !== me.team), out = {}; let dive = 0, plain = 0;
-  const loose = () => { T.set(me); const B = M.B; B.state = 'loose'; B.holder = null; B.rebound = false; B.pos.set(0, 0.3, 6); B.vel.set(0, 0, 0); B.t = 0.3; M.looseT = 0; me.x = -2.4; me.z = 6; o.x = 3.0; o.z = 6; o.vx = -4; me.diveAt = -9; P.keys.KeyD = true; };
+  me.A.speed = 55; me.A.accel = 55; o.A.speed = 85; o.A.accel = 85; const loose = () => { T.set(me); const B = M.B; B.state = 'loose'; B.holder = null; B.rebound = false; B.pos.set(0, 0.3, 6); B.vel.set(0, 0, 0); B.t = 0.3; M.looseT = 0; me.x = -2.4; me.z = 6; o.x = 3.0; o.z = 6; o.vx = -4; me.diveAt = -9; P.keys.KeyD = true; };
   for (let i = 0; i < 60; i++) { loose(); P.keys.KeyE = true; window.__tick(1); P.keys.KeyE = false; let g = 0; while (M.B.state === 'loose' && g++ < 40) { o.ai.tick = 99; o.in.dx = -1; o.in.dz = 0; window.__tick(1); } if (M.B.holder === me) dive++; }
   for (let i = 0; i < 60; i++) { loose(); let g = 0; while (M.B.state === 'loose' && g++ < 40) { o.ai.tick = 99; o.in.dx = -1; o.in.dz = 0; window.__tick(1); } if (M.B.holder === me) plain++; }
   P.keys.KeyD = false; out.dive = dive; out.plain = plain;
