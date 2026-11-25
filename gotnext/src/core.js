@@ -33,10 +33,10 @@ function saveLocal() {
   const day = new Date().toISOString().slice(0, 10);
   try { if (S.bakDay !== day) { const prev = localStorage.getItem(SAVE_KEY); if (prev && prev.length > 50) { try { localStorage.setItem(SAVE_KEY + '.bak', saveSlim(prev)); } catch (e) { } } S.bakDay = day; } } catch (e) { }
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); S.saveBad = 0; return true; } catch (e) { }
-  try { if (S.mag && S.mag.list) for (const it of S.mag.list) it.img = ''; localStorage.removeItem(SAVE_KEY + '.bak'); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); if (!S.saveBad && typeof toast === 'function') toast('SAVE WAS FULL', 'The CAGE photos were dropped to make room. Covers keep their headlines.'); S.saveBad = 1; return true; } catch (e) { }
+  try { if (S.mag && S.mag.list) for (const it of S.mag.list) it.img = ''; S.reps = []; localStorage.removeItem(SAVE_KEY + '.bak'); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); if (!S.saveBad && typeof toast === 'function') toast('SAVE WAS FULL', 'The CAGE photos and replays were dropped to make room. Covers keep their headlines.'); S.saveBad = 1; return true; } catch (e) { }
   if (S.saveBad !== 2 && typeof toast === 'function') toast('COULD NOT SAVE', 'This browser is not letting the game store anything. Copy a save code in OPTIONS to keep your player.'); S.saveBad = 2; return false;
 }
-function saveSlim(raw) { try { const j = typeof raw === 'string' ? JSON.parse(raw) : JSON.parse(JSON.stringify(raw)); if (j.mag && j.mag.list) for (const it of j.mag.list) it.img = ''; return JSON.stringify(j); } catch (e) { return typeof raw === 'string' ? raw : ''; } }
+function saveSlim(raw) { try { const j = typeof raw === 'string' ? JSON.parse(raw) : JSON.parse(JSON.stringify(raw)); if (j.mag && j.mag.list) for (const it of j.mag.list) it.img = ''; delete j.reps; return JSON.stringify(j); } catch (e) { return typeof raw === 'string' ? raw : ''; } }
 function saveCode() { if (S.slots) S.slots[S.slot] = slotSnap(); return 'GOTNEXT1:' + btoa(unescape(encodeURIComponent(saveSlim(S)))); }
 function saveFromCode(code) {
   try { const m = String(code || '').trim().match(/^GOTNEXT1:([A-Za-z0-9+/=\s]+)$/); if (!m) return 'That is not a GOT NEXT save code.'; const j = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/\s+/g, ''))))); if (!j || j.v !== 1 || !j.build || typeof j.vc !== 'number') return 'The code is damaged.';

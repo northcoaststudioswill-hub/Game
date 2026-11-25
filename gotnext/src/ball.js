@@ -879,7 +879,7 @@ function aiThink(p, dt) {
 
 // ---------- step ----------
 function matchStep(dtReal) {
-  const M_ = MT; if (!M_ || (M_.paused && !M_.net)) return;
+  const M_ = MT; if (!M_ || (M_.paused && !M_.net)) return; if (M_.replay) return replayStep(dtReal);
   if (M_.net === 'guest') return netGuestStep(dtReal);
   let dt = dtReal; if (M_.slow > 0) { M_.slow -= dtReal; dt *= 0.35; }
   M_.time += dt; const B = M_.B; hlStep(dtReal); bubStep(dtReal);
@@ -929,7 +929,7 @@ function matchStep(dtReal) {
       const wa = a.st === 'stagger' ? 0.2 : a.screen ? 0.06 : a.box ? 0.35 : 1, wb = b.st === 'stagger' ? 0.2 : b.screen ? 0.06 : b.box ? 0.35 : 1, pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
   }
   puStep(dt); stepBall(dt);
-  for (const p of M_.P) animPlayer(p, dt);
+  for (const p of M_.P) animPlayer(p, dt); repRec(dtReal);
   if (B.state === 'held' && B.holder) ballHeld(B.holder, dt); ballMesh();
   matchFx(dt); matchCam(dtReal); hudMatch(); if (M_.net === 'host') netHostStep(dtReal);
 }

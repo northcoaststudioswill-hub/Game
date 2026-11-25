@@ -37,6 +37,7 @@ function hlCapture() {
   const G = magState(), first = !G.got[h.kind]; G.got[h.kind] = (G.got[h.kind] || 0) + 1; G.n++;
   G.list.unshift({ k: h.kind, who: h.p.b.name, vs: h.vic ? h.vic.b.name : '', court: M_.cfg.tier ? M_.cfg.tier.n : 'THE CAGES', mode: M_.cfg.mode.n, sc: M_.score[M_.me.team] + '–' + M_.score[1 - M_.me.team], iss: G.n, day: new Date().toLocaleDateString('en', { month: 'short', day: 'numeric' }).toUpperCase(), fit: fitOf(h.p.b), img });
   if (G.list.length > MAG_KEEP) G.list.length = MAG_KEEP; G.list.forEach((it, i) => { if (i >= MAG_PICS && it.img) it.img = ''; });      /* only the newest covers keep their photo: the save has to stay small */
+  { const it = G.list[0], h2 = h, M2 = M_; setTimeout(() => { if (MT === M2 && !M2.replay) { const id = repKeep(h2); if (id) { it.rp = id; save(); } } }, 1500); }      /* and the seconds around it, as a replay */
   const e = $('hl'); if (e) e.classList.add('snap'); sfx('unlock');
   if (first) { S.vc += MAG_FIRST; const got = HL_KINDS.filter(k => G.got[k.k]).length; toast('NEW CLIP · ' + HL[h.kind].n, `${got} / ${HL_KINDS.length} collected · +${MAG_FIRST} HC`, 'ach');
     if (got === HL_KINDS.length && !G.full) { G.full = 1; S.vc += MAG_SET; setTimeout(() => toast('THE FULL SET', `Every kind of highlight, on a CAGE cover. +${MAG_SET.toLocaleString()} HC`, 'ach'), 1800); } }
@@ -52,10 +53,10 @@ function magCover(it, big) {
 function magTab() {
   const G = magState(); let h = `<p class="mu">CAGE puts the big plays on the cover: your posters, lobs, putbacks, show dunks, ankle-breakers, swats and game winners. The first of each kind pays ${MAG_FIRST} HC, the full set ${MAG_SET.toLocaleString()}. The newest ${MAG_PICS} covers keep their photo.</p>`;
   h += `<div class="card"><div class="row" style="flex-wrap:wrap;gap:6px">` + HL_KINDS.map(k => `<span class="tag" style="${G.got[k.k] ? 'border-color:var(--gold);color:var(--gold)' : 'opacity:.45'}">${G.got[k.k] ? '✓ ' : ''}${k.n}${G.got[k.k] > 1 ? ' ×' + G.got[k.k] : ''}</span>`).join('') + `</div></div>`;
-  if (!G.list.length) return h + `<div class="card"><p>No covers yet. Dunk on somebody.</p></div>`;
-  h += `<div class="maggrid">` + G.list.map((it, i) => `<div class="magcell">${magCover(it)}${Btn('READ', () => uiMag(i), 'sm')}</div>`).join('') + `</div>`; return h;
+  if (!G.list.length) return h + `<div class="card"><p>No covers yet. Dunk on somebody.</p></div>` + wallUI();
+  h += `<div class="maggrid">` + G.list.map((it, i) => `<div class="magcell">${magCover(it)}${Btn(it.rp && repGet(it.rp) ? 'READ · ▶ REPLAY' : 'READ', () => uiMag(i), 'sm')}</div>`).join('') + `</div>`; return h + wallUI();
 }
 function uiMag(i) {
   openPanel(() => { const G = magState(), it = G.list[i]; if (!it) return `<h2>CAGE</h2>` + Btn('BACK', () => uiPlayer('mag'));
-    return `<h2>CAGE · ISSUE ${String(it.iss).padStart(3, '0')}</h2>${magCover(it, true)}<div class="pf">${Btn('BACK', () => uiPlayer('mag'))} ${i > 0 ? Btn('NEWER', () => uiMag(i - 1), 'alt') : ''} ${i < G.list.length - 1 ? Btn('OLDER', () => uiMag(i + 1), 'alt') : ''} ${Btn('BIN IT', () => { G.list.splice(i, 1); save(); uiPlayer('mag'); }, 'alt')}</div>`; }, '', () => uiPlayer('mag'));
+    return `<h2>CAGE · ISSUE ${String(it.iss).padStart(3, '0')}</h2>${magCover(it, true)}<div class="pf">${Btn('BACK', () => uiPlayer('mag'))} ${i > 0 ? Btn('NEWER', () => uiMag(i - 1), 'alt') : ''} ${it.rp && repGet(it.rp) ? Btn('WATCH THE REPLAY', () => replayPlay(repGet(it.rp), () => { enterWorld('hub', 0, 9, Math.PI); uiMag(i); })) : ''} ${i < G.list.length - 1 ? Btn('OLDER', () => uiMag(i + 1), 'alt') : ''} ${Btn('BIN IT', () => { G.list.splice(i, 1); save(); uiPlayer('mag'); }, 'alt')}</div>`; }, '', () => uiPlayer('mag'));
 }

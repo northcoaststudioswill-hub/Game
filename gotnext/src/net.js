@@ -48,7 +48,7 @@ function cloudSave() {
   if (!NET.db || !NET.uid || !S.created) return; NET.cloudDirty = true; if (NET.cloudT || NET.cloudBusy) return;
   NET.cloudT = setTimeout(async () => {
     NET.cloudT = null; NET.cloudBusy = true; NET.cloudDirty = false;
-    try { await NET.db.collection('data/users/' + NET.uid).doc('save').set({ ts: S.ts || Date.now(), save: JSON.stringify(S) }); } catch (e) { }
+    try { await NET.db.collection('data/users/' + NET.uid).doc('save').set({ ts: S.ts || Date.now(), save: saveSlim(S) });      /* without the photos and replays: a document has a size limit, and those stay on the device */ } catch (e) { }
     NET.cloudBusy = false; if (NET.cloudDirty) cloudSave();
   }, 4000);
 }
