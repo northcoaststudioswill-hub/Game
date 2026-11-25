@@ -570,6 +570,14 @@ function poseOf(anim, t, o) {
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
   // LT on defense: body up. Lower, wider, the lead hand on his hip, the other arm out for the ball
+  if (o.screen) {      // a set screen: feet wide, knees bent, arms crossed tight on the chest
+    const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('knR', 0.3); ad('knL', 0.3); ad('hpR', -0.2, 0, -0.16); ad('hpL', -0.2, 0, 0.16); ad('spine', 0.1); p.y = (p.y || 0) - 0.07;
+    p.shR = [-0.75, 0, 0.55]; p.elR = [-1.75, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [-0.75, 0, -0.55]; p.elL = [-1.75, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
+  if (o.box) {      // boxing out: sit into him, arms out wide and back to hold the space
+    const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('knR', 0.42); ad('knL', 0.42); ad('hpR', -0.36, 0, -0.14); ad('hpL', -0.36, 0, 0.14); ad('spine', 0.26); ad('neck', -0.3); p.y = (p.y || 0) - 0.1;
+    p.shR = [0.25, 0, -1.05]; p.elR = [-0.5, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [0.25, 0, 1.05]; p.elL = [-0.5, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 22); }
   if (o.bodyUp) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     ad('knR', 0.22); ad('knL', 0.22); ad('hpR', -0.16, 0, -0.05); ad('hpL', -0.16, 0, 0.05); ad('spine', 0.14); p.y = (p.y || 0) - 0.05;
     p.shR = [-1.2, 0, 0.12]; p.elR = [-0.35, 0, 0]; p.wrR = [0.45, 0, 0]; p.shL = [-0.85, 0, 0.8]; p.elL = [-0.55, 0, 0]; p.wrL = [0.2, 0, 0]; p.rate = Math.max(p.rate || 16, 22); }

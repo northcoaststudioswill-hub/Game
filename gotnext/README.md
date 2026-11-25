@@ -38,6 +38,7 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
 - **Two-stick control,** on a phone too: left stick moves, right stick is the skill stick (shoot, drive, side move,
   stepback, spin; hands up and steal on defense).
 - **HC** is Hooper Coins, the money. The crowd at a game starts at five and grows with big plays: the Block's own people walk over to watch. 19 celebrations, 17 branded home pieces (this game and the crew's others).
+- **Call a screen:** LB, R or the PICK button with the ball. A teammate plants on your defender, then rolls to the rim. **Box out:** hold LT while the shot is in the air. **Game point:** one bucket from the win, the release window follows your Shot IQ.
 - **22 street smarts** in four tiers, earned with smarts XP from real games. **Bravado** meter: big plays fill it, a full bar is
   +8 to everything for 20 seconds.
 - **Unlocks:** 74 pieces of drip in ten slots (some carry small buffs), 22 animations (dribble moves, jumpshots, dunk

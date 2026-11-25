@@ -103,7 +103,8 @@ function hudMatch() {
   if (IS_TOUCH) {
     const has = M_.B.holder === me, offb = M_.off === me.team;
     const a = has ? 'PASS' : offb ? 'CALL' : M_.arcade ? 'SHOVE' : 'STEAL', b = has ? 'SHOOT' : 'JUMP', h = has ? (me.live === 'dead' ? 'DRIBBLE USED · PASS · SHOOT · FAKE · STICK PIVOTS' : '↓ HOLD SHOOT · ↑ DRIVE · ←→ MOVES') : offb ? 'SKILL STICK' : '↑ HANDS UP · ↓ ' + (M_.arcade ? 'SHOVE' : 'STEAL') + ' · JUMP AT THE RELEASE TO CONTEST';
-    { const l = has ? 'POST' : offb ? (M_.arcade ? 'SWING' : 'POST') : M_.arcade ? 'SWING' : 'BODY UP', e = $('tLT'); if (e && e.textContent !== l) e.textContent = l; }
+    { const up = !has && (M_.B.state === 'shot' || (M_.B.state === 'loose' && M_.B.rebound)), l = up && !M_.arcade ? 'BOX OUT' : has ? 'POST' : offb ? (M_.arcade ? 'SWING' : 'POST') : M_.arcade ? 'SWING' : 'BODY UP', e = $('tLT'); if (e && e.textContent !== l) e.textContent = l; }
+    $('tPK').classList.toggle('off', !(has && M_.phase === 'live' && M_.P.some(q => q.team === me.team && q !== me && !q.user)));
     if ($('tA').textContent !== a) $('tA').textContent = a; if ($('tB').textContent !== b) $('tB').textContent = b; if ($('hintR').textContent !== h) $('hintR').textContent = h;
   }
 }
@@ -112,7 +113,7 @@ function uiHud() {
   const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
   $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
   const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = (on ? `<b>${on}</b> online with you` : 'online · nobody else here') + (NET.crew ? ` · crew of <b>${NET.crew.m.length + 1}</b>` : NET.inCrew ? ' · in a crew' : '');
-  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · Q (LT) post up / body up · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
+  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · Q (LT) post up / body up / box out · R (LB) call a screen · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
 }
 function vcLine() { return `<span class="chip" style="margin:0">HC <b>${S.vc.toLocaleString()}</b></span>`; }
 

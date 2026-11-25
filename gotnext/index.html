@@ -27,16 +27,25 @@ h1,h2,h3,.f{font-family:var(--d);font-weight:900;font-stretch:125%;letter-spacin
 @keyframes foil{to{background-position:-220% 0}}
 /* ---- touch ---- */
 #touch{position:fixed;inset:0;z-index:5}
-.stick{position:absolute;width:120px;height:120px;border-radius:50%;border:1.5px solid rgba(236,233,226,.4);background:rgba(8,8,10,.25);opacity:0;transition:opacity .12s;pointer-events:none}
-.stick i{position:absolute;left:36px;top:36px;width:48px;height:48px;border-radius:50%;background:rgba(236,233,226,.8)}
-#stickR{border-color:var(--heat)}#stickR i{background:var(--heat)}
-.tbtn{position:absolute;display:none;align-items:center;justify-content:center;width:68px;height:68px;border-radius:50%;font:700 10px var(--m);letter-spacing:.1em;color:var(--bone);background:rgba(8,8,10,.55);border:1.5px solid rgba(236,233,226,.55);text-align:center;line-height:1;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.tbtn.on{background:var(--bone);color:var(--ink);transform:scale(.94)}
+.stick{position:absolute;width:128px;height:128px;border-radius:50%;border:2px solid rgba(236,233,226,.5);background:radial-gradient(circle,rgba(8,8,10,.05) 38%,rgba(8,8,10,.42) 100%);box-shadow:0 0 0 5px rgba(8,8,10,.22),inset 0 0 22px rgba(236,233,226,.12);opacity:0;transition:opacity .12s;pointer-events:none}
+.stick i{position:absolute;left:38px;top:38px;width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff,rgba(236,233,226,.85) 45%,rgba(150,148,142,.9));box-shadow:0 3px 10px rgba(0,0,0,.55),inset 0 -4px 8px rgba(0,0,0,.25)}
+#stickR{border-color:rgba(255,45,120,.75);box-shadow:0 0 0 5px rgba(8,8,10,.22),0 0 20px rgba(255,45,120,.25),inset 0 0 22px rgba(255,45,120,.14)}#stickR i{background:radial-gradient(circle at 36% 30%,#ff9cc0,#ff2d78 50%,#b0144a)}
+/* action buttons: glass discs in the colour of what they do. --c is the ring colour, --tb the height of the cluster */
+#touch{--tb:46%}
+.tbtn{--c:236,233,226;position:absolute;display:none;align-items:center;justify-content:center;width:74px;height:74px;border-radius:50%;font:800 11px var(--m);letter-spacing:.08em;color:#fff;text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.7);text-align:center;line-height:1.05;padding:0 4px;
+  background:radial-gradient(circle at 34% 26%,rgba(var(--c),.42),rgba(var(--c),.13) 52%,rgba(8,8,10,.66) 100%);border:2px solid rgba(var(--c),.92);
+  box-shadow:0 0 0 4px rgba(8,8,10,.38),0 0 18px rgba(var(--c),.38),inset 0 0 14px rgba(var(--c),.28),inset 0 -7px 12px rgba(0,0,0,.4);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform .06s,box-shadow .1s,background .1s;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.tbtn::after{content:"";position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(var(--c),.3);pointer-events:none}
+.tbtn.on{background:radial-gradient(circle at 50% 42%,rgba(var(--c),1),rgba(var(--c),.72));color:#0a0a0c;text-shadow:none;transform:scale(.9);box-shadow:0 0 0 4px rgba(var(--c),.28),0 0 30px rgba(var(--c),.85)}
+.tbtn.off{display:none!important}
 body.touch .tbtn{display:flex}
-#tA{right:calc(14px + var(--sar));bottom:46%}
-#tB{right:calc(92px + var(--sar));bottom:calc(46% + 40px);border-color:var(--heat)}
-#tLT{right:calc(100px + var(--sar));bottom:calc(46% - 44px);width:56px;height:56px;font-size:9px;border-color:var(--gold)}body:not([data-state=match]) #tLT{display:none!important}
-#tMenu{right:calc(10px + var(--sar));top:calc(8px + var(--sat));width:42px;height:42px;font-size:16px;border-radius:0;clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
+#tA{--c:61,255,160;right:calc(14px + var(--sar));bottom:var(--tb)}
+#tB{--c:255,45,120;width:84px;height:84px;font-size:12px;right:calc(96px + var(--sar));bottom:calc(var(--tb) + 38px)}
+#tLT{--c:242,193,78;width:62px;height:62px;font-size:9.5px;right:calc(104px + var(--sar));bottom:calc(var(--tb) - 38px)}
+#tPK{--c:51,224,255;width:60px;height:60px;font-size:9.5px;right:calc(20px + var(--sar));bottom:calc(var(--tb) + 88px)}
+body:not([data-state=match]) #tLT,body:not([data-state=match]) #tPK{display:none!important}
+#tMenu{right:calc(10px + var(--sar));top:calc(8px + var(--sat));width:44px;height:44px;font-size:17px;border-radius:12px;box-shadow:0 0 0 3px rgba(8,8,10,.3),inset 0 0 10px rgba(236,233,226,.15)}#tMenu::after{display:none}
 body[data-state=world] #tB,body[data-state=title] .tbtn,body[data-state=create] .tbtn,body.busy .tbtn{display:none}
 .hintL,.hintR{position:absolute;bottom:calc(16px + var(--sab));font:500 10px var(--m);letter-spacing:.14em;color:rgba(236,233,226,.4);display:none;pointer-events:none}
 .hintL{left:calc(24px + var(--sal))}.hintR{right:calc(24px + var(--sar));text-align:right}
@@ -150,7 +159,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 .toast{background:rgba(17,17,20,.96);border:1px solid var(--line);border-left:3px solid var(--gold);padding:9px 12px;font:900 12px/1.2 var(--d);font-stretch:125%;text-transform:uppercase;animation:tin 3.4s forwards;width:100%}
 .toast small{display:block;font:500 10px/1.4 var(--m);letter-spacing:.04em;text-transform:none;color:var(--ash);margin-top:3px}.toast.ach{border-left-color:var(--heat)}.toast.rank{border-left-color:var(--ice);font-size:15px}
 @keyframes tin{0%{opacity:0;transform:translateX(40px)}6%{opacity:1;transform:none}90%{opacity:1}100%{opacity:0}}
-@media (orientation:portrait){#tA{bottom:27%}#tB{bottom:calc(27% + 44px)}#bars{top:calc(70px + var(--sat))}#fb{bottom:40%}}
+@media (orientation:portrait){#touch{--tb:27%}#bars{top:calc(70px + var(--sat))}#fb{bottom:40%}}
 #dbg{position:fixed;left:8px;bottom:30px;z-index:60;display:none;margin:0;padding:8px 10px;background:rgba(8,8,10,.82);border:1px solid var(--line);font:500 10.5px/1.45 var(--m);color:var(--bone);pointer-events:none;white-space:pre}
 @media (prefers-reduced-motion:reduce){.foil,#ticker span,#brav.on{animation:none}}
 </style>
@@ -160,7 +169,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 <div id="touch">
   <div class="stick" id="stickL"><i></i></div><div class="stick" id="stickR"><i></i></div>
   <div class="hintL">MOVE</div><div class="hintR" id="hintR">SKILL STICK</div>
-  <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tLT">POST</div><div class="tbtn" id="tMenu">≡</div>
+  <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tLT">POST</div><div class="tbtn off" id="tPK">PICK</div><div class="tbtn" id="tMenu">≡</div>
 </div>
 <div id="whud"><div><span class="chip">HC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
 <div id="emobar"><button data-em="wave" title="1">👋</button><button data-em="dance" title="2">💃</button><button data-em="sit" title="3">🪑</button><button data-em="cheer" title="4">🙌</button><button data-em="celeb" title="5">🏆</button><button data-em="chat" title="T">💬</button></div>
@@ -815,11 +824,11 @@ function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
 function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
 // button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
 // between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
-function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; I.pe = {}; } }
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = I.pkP = false; I.flick = null; I.pe = {}; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
-    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false, lt = false;
+    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false, lt = false, pk = false;
     // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
     const split = twoPlayer && pads.length === 0;
     if (i === 1 && split) {
@@ -830,7 +839,7 @@ function pollInput() {
     if (i === 0) {
       if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
-      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ;
+      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ; pk = !!keys.KeyR || !!touch.pk || !!touch.pkTap; touch.pkTap = false;
       if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       lt = lt || !!touch.lt; a = a || touch.a || touch.aTap; b = b || touch.b || touch.bTap; st = st || touch.start || touch.startTap; touch.aTap = touch.bTap = touch.startTap = false;
@@ -848,14 +857,14 @@ function pollInput() {
       const def = typeof padDefense === 'function' && padDefense(i);
       sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
       lt = lt || B(6) || (p.buttons[6] && p.buttons[6].value > 0.35);      /* LT: body up on defense, post up on offense */
-      const lb = B(4), rb = B(5); I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
+      const lb = B(4), rb = B(5); pk = pk || lb; I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
     I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.lt = lt; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
-    I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
+    I.pkP = I.pkP || (pk && !I._pk); I._pk = pk; I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
     const d = dir8(rx, ry); if (d && !I._rd) { I.flick = d; I.tPress = now; } I.rRel = I.rRel || (!d && !!I._rd); I.rdir = d; I._rd = d;
   }
 }
@@ -890,7 +899,7 @@ function setupTouch() {
   function end(e) { for (const t of e.changedTouches) { const side = ids[t.identifier]; if (!side) continue; delete ids[t.identifier]; touch[side] = null; $('stick' + side).style.opacity = 0; } }
   pad.addEventListener('touchstart', start, { passive: false }); pad.addEventListener('touchmove', move, { passive: false });
   pad.addEventListener('touchend', end); pad.addEventListener('touchcancel', end);
-  for (const [id, k] of [['tA', 'a'], ['tB', 'b'], ['tLT', 'lt'], ['tMenu', 'start']]) {
+  for (const [id, k] of [['tA', 'a'], ['tB', 'b'], ['tLT', 'lt'], ['tPK', 'pk'], ['tMenu', 'start']]) {
     const el = $(id);
     el.addEventListener('touchstart', e => { touch[k] = true; touch[k + 'Tap'] = true; el.classList.add('on');      /* latched: a tap shorter than a frame still counts */ e.preventDefault(); e.stopPropagation(); audioInit(); }, { passive: false });
     const up = e => { touch[k] = false; el.classList.remove('on'); e.preventDefault(); };
@@ -1542,6 +1551,14 @@ function poseOf(anim, t, o) {
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
   // LT on defense: body up. Lower, wider, the lead hand on his hip, the other arm out for the ball
+  if (o.screen) {      // a set screen: feet wide, knees bent, arms crossed tight on the chest
+    const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('knR', 0.3); ad('knL', 0.3); ad('hpR', -0.2, 0, -0.16); ad('hpL', -0.2, 0, 0.16); ad('spine', 0.1); p.y = (p.y || 0) - 0.07;
+    p.shR = [-0.75, 0, 0.55]; p.elR = [-1.75, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [-0.75, 0, -0.55]; p.elL = [-1.75, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
+  if (o.box) {      // boxing out: sit into him, arms out wide and back to hold the space
+    const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('knR', 0.42); ad('knL', 0.42); ad('hpR', -0.36, 0, -0.14); ad('hpL', -0.36, 0, 0.14); ad('spine', 0.26); ad('neck', -0.3); p.y = (p.y || 0) - 0.1;
+    p.shR = [0.25, 0, -1.05]; p.elR = [-0.5, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [0.25, 0, 1.05]; p.elL = [-0.5, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 22); }
   if (o.bodyUp) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     ad('knR', 0.22); ad('knL', 0.22); ad('hpR', -0.16, 0, -0.05); ad('hpL', -0.16, 0, 0.05); ad('spine', 0.14); p.y = (p.y || 0) - 0.05;
     p.shR = [-1.2, 0, 0.12]; p.elR = [-0.35, 0, 0]; p.wrR = [0.45, 0, 0]; p.shL = [-0.85, 0, 0.8]; p.elL = [-0.55, 0, 0]; p.wrL = [0.2, 0, 0]; p.rate = Math.max(p.rate || 16, 22); }
@@ -2169,7 +2186,7 @@ function foul(d, o, kind, keep) {
 const COURT = { x0: -8, x1: 8, z0: -1.6, z1: 13 };      /* the painted lines */
 function andOne(p, d) {
   const M_ = MT; if (M_.phase === 'over') return; M_.score[p.team] += 1; p.stats.pts += 1; call('AND ONE', p.b.name + ' +1 · ' + d.b.name + ' fouled', '#ffc531', 1.4);
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function scorePts(p, pts, how) {
   const M_ = MT; if (p.pu && p.pu.id === 'double' && !M_.practice) { pts *= 2; p.pu = null; p.puA = null; if (M_.net === 'host') netEv({ k: 'pu', a: 'x', i: p.i }); call('DOUBLE UP', p.b.name + ' · that one counts ' + pts, '#ff4fd8', 1.2); }
@@ -2187,7 +2204,7 @@ function scorePts(p, pts, how) {
   { const eq = p.b.moves.celeb, vic = how === 'dunk' && p.finish ? p.finish.hit : null;      // what he does about it: his own celebration, or one that fits the play
     p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout', 'greengiant', 'pour40', 'fentlean'])) : pts >= 2 ? pick([eq, eq, 'shh', 'shrug', 'nightnight', 'pout', 'iceveins', 'greenbean']) : pick([eq, eq, eq, 'shrug', 'pound']);
     p.celebAt = vic || null; if (M_.net === 'host') netEv({ k: 'cs', i: p.i, s: p.celebStyle }); }
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
 function burst(x, y, z, col, n) {
@@ -2258,6 +2275,7 @@ function releaseShot(p) {
   if (p.fire) base += 0.35; if (kind === 'close') base += 0.03 * bt(p, 'softmoney');
   let w = (0.05 + nAtt(p, 'iq') * 0.05 + 0.012 * bt(p, 'greencard') + s.j.win + (p.mine ? cribFx('green') * 0.1 : 0)) * (0.55 + n * 0.65) * (1 - c * 0.6);
   if (MT.practice) w *= 1.1; if (p.pu && p.pu.id === 'hot') w *= 1.6;
+  if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;      /* game point: nerves shrink the window, a high Shot IQ widens it */
   const e = Math.abs(err); let green = e <= w, prob;
   if (green) prob = c > 0.55 ? 0.8 : 1; else prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
   if (!p.user) green = green && Math.random() < 0.5;
@@ -2302,7 +2320,7 @@ function startFake(p) {
 }
 function euroOf(p) { const l = Math.hypot(p.x, p.z) || 1, lat = p.in.dx * (p.z / l) - p.in.dz * (p.x / l); return Math.abs(lat) > 0.55 ? Math.sign(lat) : 0; }
 function launch(p, make, pts, green, arc, kind) {
-  const B = MT.B; B.state = 'shot'; B.holder = null; B.shooter = p; B.lastTeam = p.team; B.make = make; B.pts = pts; B.green = green; B.kind = kind; B.t = 0;
+  const B = MT.B; B.state = 'shot'; B.holder = null; B.shooter = p; B.lastTeam = p.team; B.make = make; B.pts = pts; B.green = green; B.kind = kind; B.t = 0; B.shotId = (B.shotId || 0) + 1;
   const d = Math.hypot(B.pos.x, B.pos.z);
   let ex = 0, ez = 0; if (!make) { const a = rnd(0, 6.283), r = rnd(0.2, 0.34); ex = Math.cos(a) * r; ez = Math.sin(a) * r * 0.8 + 0.05; }
   B.T = clamp(0.48 + d * 0.085, 0.42, 1.5) * (0.9 + 0.1 * (arc || 1)) * (arc > 1.3 ? 1.15 : 1);
@@ -2553,13 +2571,16 @@ function humanThink(p, dt) {
   if (MT.reel && p.ctrl === 0) { reelThink(p, dt); return; }
   let I = IN[p.ctrl];
   const B = MT.B; p.in.dx = I.mx; p.in.dz = I.my; p.in.sprint = I.sprint; p.handsUp = false;
-  if (MT.phase !== 'live') { p.post = p.bodyUp = false; return; }
+  if (MT.phase !== 'live') { p.post = p.bodyUp = p.box = false; return; }
   const hasBall = B.holder === p;
   // LT: with the ball and a live dribble, back to the basket (post up); on defense against the ball, body up
   const postNow = !!I.lt && hasBall && p.live === 'drib' && (p.st === 'free' || p.st === 'move') && !MT.arcade;
   if (postNow && !p.post) floatTxt(p, 'POST UP', '#f2c14e'); p.post = postNow;
   p.ltHeld = !!I.lt;
   p.bodyUp = !!I.lt && !hasBall && MT.off !== p.team && !!B.holder && B.holder.team !== p.team && p.st === 'free';
+  // LT with a shot in the air or a board coming down: box out. LB / R / PICK with the ball: call a screen
+  { const bx = !!I.lt && !hasBall && (B.state === 'shot' || (B.state === 'loose' && B.rebound)) && (p.st === 'free' || p.st === 'jump'); if (bx && !p.box) floatTxt(p, 'BOX OUT', '#f2c14e'); p.box = bx; }
+  if (I.pkP && hasBall) callScreen(p);
   if (p.st === 'shoot' && !p.shot.released && p.shot.auto) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
   if (p.remote) {          // the guest times their own release; the host just takes their word for the hold
     if (I.relEdge) p.pendRel = I.rh;
@@ -2633,10 +2654,42 @@ function passLane(p, to) {
   for (const o of MT.P) { if (o.team === p.team) continue; const rx = o.x - p.x, rz = o.z - p.z, along = (rx * dx + rz * dz) / l; if (along < 0.8 || along > l - 0.3) continue; if (Math.abs(rx * dz - rz * dx) / l < 0.75) return false; }
   return true;
 }
+// ---------- screens: the handler calls one, the nearest AI teammate sets it on his defender's hip, then rolls to the rim ----------
+function callScreen(p) {
+  const M_ = MT; if (M_.phase !== 'live' || M_.needClear || M_.time - (p.scrAt || -9) < 3) return false;
+  const c = M_.P.filter(q => q.team === p.team && q !== p && !q.user && q.st === 'free' && !q.ai.scr).sort((m, n) => dist(m, p) - dist(n, p))[0];
+  if (!c) { if (p.user && M_.P.filter(q => q.team === p.team).length < 2) floatTxt(p, 'NOBODY TO SET IT', '#ff8a1f'); return false; }
+  p.scrAt = M_.time; c.ai.scr = { h: p, t: 0, ph: 0 }; floatTxt(p, 'SCREEN!', '#f2c14e'); floatTxt(c, 'I GOT YOU', '#fff'); return true;
+}
+function aiScreen(p, dt) {
+  const a = p.ai, s = a.scr, h = s.h, B = MT.B; s.t += dt;
+  if (s.ph === 2) {      // the roll: straight to the rim with a hand up
+    p.screen = false; aiGo(p, clamp(p.x * 0.25, -1.2, 1.2), 1.3, true); p.callT = 0.3;
+    if (s.t > 2.6 || B.holder !== h) { a.scr = null; return false; } return true;
+  }
+  if (B.holder !== h || h.st === 'shoot' || h.st === 'finish') { a.scr = null; p.screen = false; return false; }
+  if (s.ph === 0) {
+    const d = MT.P.find(o => o.team !== p.team && o.man === h) || nearestOpp(h)[0]; if (!d || s.t > 4) { a.scr = null; return false; }
+    if (!s.side) { const l = dHoop(h) || 1; s.lx = -h.z / l; s.lz = h.x / l; const st = (h.in.dx || 0) * s.lx + (h.in.dz || 0) * s.lz; s.side = Math.abs(st) > 0.3 ? Math.sign(st) : ((p.x - h.x) * s.lx + (p.z - h.z) * s.lz > 0 ? 1 : -1); }
+    const tx = d.x + s.lx * s.side * 0.75, tz = d.z + s.lz * s.side * 0.75; aiGo(p, tx, tz, true);
+    if (Math.hypot(tx - p.x, tz - p.z) < 0.45) { s.ph = 1; s.t = 0; s.px = p.x; s.pz = p.z; s.hx = h.x; s.hz = h.z; p.screen = true; p.face = Math.atan2(d.x - p.x, d.z - p.z); }
+    return true;
+  }
+  aiGo(p, s.px, s.pz, false); p.screen = true;      // planted: feet set, arms in
+  if (Math.hypot(h.x - s.hx, h.z - s.hz) > 1.7 || s.t > 2.6) { s.ph = 2; s.t = 0; p.screen = false; if (h.user) floatTxt(p, 'ROLLING', '#fff'); }
+  return true;
+}
+// one bucket from the win: everybody tightens up
+function gamePoint(p) {
+  const M_ = MT; if (M_.practice || M_.drill || M_.phase === 'over' || M_.score[p.team] < M_.cfg.mode.to - 2 || (M_.gpSaid || (M_.gpSaid = [0, 0]))[p.team]) return;
+  M_.gpSaid[p.team] = 1; M_.gamePt = true; M_.gpCall = 1.5; M_.gpTeam = p.team; if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1.2);
+}
 function aiGo(p, x, z, sprint) { p.ai.tx = x; p.ai.tz = z; p.ai.spr = !!sprint; }
 function aiThink(p, dt) {
   const B = MT.B, a = p.ai, L = p.aiLvl; p.handsUp = false; a.spr = false;
   if (MT.reel) { reelDefThink(p); return; }
+  if (a.scr && (MT.off !== p.team || MT.phase !== 'live')) a.scr = null; if (!a.scr || a.scr.ph !== 1) p.screen = false;
+  p.box = false;
   if (MT.phase !== 'live') { p.in.dx = p.in.dz = 0; return; }
   if (p.st === 'shoot' && !p.shot.released) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
   if (p.st !== 'free') return;
@@ -2648,6 +2701,9 @@ function aiThink(p, dt) {
     const mates = MT.P.filter(o => o.team === p.team).sort((m, n) => Math.hypot(m.x - tx, m.z - tz) - Math.hypot(n.x - tx, n.z - tz));
     if (mates.indexOf(p) < 2 || MT.cfg.mode.size === 2) {
       aiGo(p, tx, tz, true);
+      // a rebounder with a body near him seals it off first
+      if (a.boxFor !== B.shotId) { a.boxFor = B.shotId; a.boxOn = Math.random() < 0.15 + L * 0.3 + nAtt(p, 'reb') * 0.45; }
+      if (a.boxOn && dHoop(p) < 4.6 && nearestOpp(p)[1] < 1.5 && !(B.state === 'shot' && B.make)) p.box = true;
       if (B.state === 'loose' && Math.hypot(p.x - B.pos.x, p.z - B.pos.z) < 1.1 && B.pos.y > p.H * 1.3 && B.vel.y < 1 && Math.random() < 0.1 + L * 0.2) startJump(p);
     }
   } else if (hasBall) {
@@ -2685,6 +2741,7 @@ function aiThink(p, dt) {
         else {
           const r = Math.random();
           if (r < 0.2 + L * 0.2 && o && od < 2.2 && p.stam > 20) { const side = (o.x - p.x) > 0 ? -1 : 1; const r2 = Math.random(); if (r2 < 0.6) startMove(p, 'side', side, -0.2); else if (r2 < 0.8) startMove(p, 'back', side * 0.5, 1); else startMove(p, 'diag', side * 0.8, -0.8); a.tick = 0.15; return; }
+          if (!open && a.hold > 1.4 && Math.random() < 0.22 + L * 0.25 && callScreen(p)) { a.tick = 0.6; return; }
           if (r < 0.55 + a.hold * 0.08 && tryPass(q => nearestOpp(q)[1] > 1.3)) return;
           // probe: drift to a wing or the elbow
           a.mode = ''; const sp = pick(SPOTS.slice(2, 8)); aiGo(p, sp[0] * 0.8, sp[1], false);
@@ -2692,6 +2749,8 @@ function aiThink(p, dt) {
       }
     }
     if (a.mode === 'drive') { aiGo(p, 0, 0.6, true); if (dHoop(p) < 2.2) { a.mode = ''; startFinish(p); return; } }
+  } else if (MT.off === p.team && a.scr && aiScreen(p, dt)) {
+    /* setting a screen or rolling off it */
   } else if (MT.off === p.team) {
     // off-ball offence: spacing and the odd cut
     a.spotT -= dt;
@@ -2735,6 +2794,7 @@ function matchStep(dtReal) {
   M_.time += dt; const B = M_.B;
   // phases
   if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
+  if (M_.gpCall > 0 && M_.phase !== 'over') { M_.gpCall -= dt; if (M_.gpCall <= 0) call('GAME POINT', M_.score[0] === M_.score[1] ? 'Next bucket wins' : M_.gpTeam === M_.me.team ? 'One more. Close it out.' : 'Get a stop.', '#f2c14e', 1.6); }
   else if (M_.phase === 'scored') { M_.pt -= dt; if (M_.pt <= 0) setCheck(1 - M_.lastScorer.team); }
   if (M_.brawl) { M_.brawl.t -= dt; if (M_.brawl.t <= 0) calledFoul(); }
   if (M_.brawlHeat) M_.brawlHeat = Math.max(0, M_.brawlHeat - dt * 0.05);
@@ -2754,11 +2814,12 @@ function matchStep(dtReal) {
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
-    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), R = 0.56;
+    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : 0.56;
+    if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && M_.time - (o.scrHit || -9) > 1.5) { o.scrHit = M_.time; o.slowT = Math.max(o.slowT || 0, 0.3 + nAtt(s, 'str') * 0.25); floatTxt(o, 'SCREENED', '#f2c14e'); sfxM('bump'); const hh = s.ai.scr && s.ai.scr.h; if (hh) addBrav(hh, 0.03); }
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
       if (vn > 1.2 && M_.time - (a.bumpAt || -9) > 0.3 && M_.time - (b.bumpAt || -9) > 0.3 && a.st !== 'stagger' && b.st !== 'stagger') {
-        const mass = q => (0.7 + nAtt(q, 'str') * 0.9) * (1 + (q.b.build.body.w || 0) * 0.15) * (q.H / 1.95) * (q.post || q.bodyUp ? 1.3 : 1), ma = mass(a), mb = mass(b), j = vn * 0.85;
+        const mass = q => (0.7 + nAtt(q, 'str') * 0.9) * (1 + (q.b.build.body.w || 0) * 0.15) * (q.H / 1.95) * (q.post || q.bodyUp ? 1.3 : 1) * (q.screen ? 2.4 : q.box ? 1.5 : 1), ma = mass(a), mb = mass(b), j = vn * 0.85;
         a.vx -= nx * j * mb / (ma + mb); a.vz -= nz * j * mb / (ma + mb); b.vx += nx * j * ma / (ma + mb); b.vz += nz * j * ma / (ma + mb); a.bumpAt = b.bumpAt = M_.time;
         if (vn > 2.6) sfxM('bump');
         const hard = vn > 4.3, lite = ma < mb ? a : b, heavy = lite === a ? b : a, ratio = Math.max(ma, mb) / Math.min(ma, mb);
@@ -2769,7 +2830,7 @@ function matchStep(dtReal) {
       }
     }
     if (d < R && d > 0.001) { const push = (R - d) / 2; if (push > 0.05) for (const q of [a, b]) { const sg = q === a ? -1 : 1, lx = dx / d * sg, lz = dz / d * sg, fx = Math.sin(q.face), fz = Math.cos(q.face); q.bumpT = 0.3; q.bumpX = clamp((lx * fx + lz * fz) * -push * 3, -0.25, 0.25); q.bumpZ = clamp((lx * fz - lz * fx) * push * 3, -0.25, 0.25); }
-      const wa = a.st === 'stagger' ? 0.2 : 1, wb = b.st === 'stagger' ? 0.2 : 1, pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
+      const wa = a.st === 'stagger' ? 0.2 : a.screen ? 0.06 : a.box ? 0.35 : 1, wb = b.st === 'stagger' ? 0.2 : b.screen ? 0.06 : b.box ? 0.35 : 1, pst = a.post || b.post, sa = pst ? 0.2 + nAtt(b, 'str') * 1.4 + (b.bodyUp ? 0.35 : 0) : 0.5 + nAtt(b, 'str') * 0.5, sb = pst ? 0.2 + nAtt(a, 'str') * 1.4 + (a.bodyUp ? 0.35 : 0) : 0.5 + nAtt(a, 'str') * 0.5, tot = sa * wa + sb * wb || 1; a.x -= dx / d * push * 2 * sa * wa / tot; a.z -= dz / d * push * 2 * sa * wa / tot; b.x += dx / d * push * 2 * sb * wb / tot; b.z += dz / d * push * 2 * sb * wb / tot; }
   }
   puStep(dt); stepBall(dt);
   for (const p of M_.P) animPlayer(p, dt);
@@ -2880,7 +2941,7 @@ function stepPlayer(p, dt) {
   let top = (3.3 + nAtt(p, 'speed') * 2.5) * (M_.arcade ? 1.15 : 1);
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
-  if (p.bodyUp) top *= 0.86;
+  if (p.bodyUp) top *= 0.86; if (p.box) top *= 0.62;
   if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5) - 0.03 * bt(o, 'clamps'), 0.55, 0.95); }      /* a hand on your body slows the drive */
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
@@ -2981,12 +3042,13 @@ function stepBall(dt) {
       for (const p of M_.P) {
         if (p.st !== 'free' && p.st !== 'jump') continue; const reach = p.H * 1.3 + p.y + 0.12 + 0.06 * bt(p, 'eminent');
         if (Math.hypot(p.x - B.pos.x, p.z - B.pos.z) > 0.8 + 0.05 * bt(p, 'eminent') || B.pos.y > reach) continue;
-        const s = nAtt(p, 'reb') + Math.random() * 0.5 + (p.st === 'jump' ? 0.3 : 0) + p.H * 0.2; if (s > bs) { bs = s; best = p; }
+        let s = nAtt(p, 'reb') + Math.random() * 0.5 + (p.st === 'jump' ? 0.3 : 0) + p.H * 0.2; if (B.rebound) { if (p.box) s += 0.18; for (const o of M_.P) if (o.team !== p.team && o.box && dist(o, p) < 1.3 && dHoop(o) < dHoop(p)) { s -= 0.22; break; } }      /* sealed off behind a box-out */
+        if (s > bs) { bs = s; best = p; }
       }
       if (!best && M_.looseT > 6) best = M_.P.slice().sort((a, b) => Math.hypot(a.x - B.pos.x, a.z - B.pos.z) - Math.hypot(b.x - B.pos.x, b.z - B.pos.z))[0];
       if (best) {
         const wasOff = M_.off === best.team;
-        if (B.rebound) { best.stats.reb++; addBrav(best, 0.05); if (best.user) floatTxt(best, wasOff ? 'OFFENSIVE BOARD' : 'BOARD', '#fff'); if (wasOff) { best.putT = 2; M_.clock = 14; } }
+        if (B.rebound) { best.stats.reb++; addBrav(best, 0.05); if (best.user) floatTxt(best, wasOff ? 'OFFENSIVE BOARD' : best.box ? 'BOXED OUT · BOARD' : 'BOARD', '#fff'); if (wasOff) { best.putT = 2; M_.clock = 14; } }
         const wasReb = B.rebound, air = best.st === 'jump';
         give(best); changePoss(best.team); B.rebound = false; B.assist = null; best.ai.hold = 0; best.ai.tick = 0.3;
         if (wasReb && wasOff && air && !M_.practice && dHoop(best) < 2.0 && (M_.arcade || att(best, 'dunk') >= 68) && Math.random() < (M_.arcade ? 0.8 : 0.3 + 0.15 * bt(best, 'putback'))) { if (startFinish(best, 0, true, best.y)) { best.finish.put = true; best.finish.dur = 0.5; } }
@@ -3141,6 +3203,7 @@ function animPlayer(p, dt) {
   // running forward at speed (with or without the ball): the legs follow real running curves on a stride clock that
   // advances with distance (knee drive, heel recovery, a flight phase); arms stay with the ball when dribbling.
   // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
+  if (p.screen) o.screen = 1; if (p.box && p.st === 'free') o.box = 1;
   let P = poseOf(an, t, o), duty = 0.38;
   { const yawR = p.face + (R.extraYaw || 0); let da = Math.atan2(p.avx, p.avz) - yawR; da = Math.atan2(Math.sin(da), Math.cos(da));
     const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 1.2 && Math.abs(da) < 0.7 && !p.protect;      /* jogging counts too (was 3 m/s: a half-pushed stick fell back to the old stepping, the "stomp") */
@@ -5296,7 +5359,8 @@ function hudMatch() {
   if (IS_TOUCH) {
     const has = M_.B.holder === me, offb = M_.off === me.team;
     const a = has ? 'PASS' : offb ? 'CALL' : M_.arcade ? 'SHOVE' : 'STEAL', b = has ? 'SHOOT' : 'JUMP', h = has ? (me.live === 'dead' ? 'DRIBBLE USED · PASS · SHOOT · FAKE · STICK PIVOTS' : '↓ HOLD SHOOT · ↑ DRIVE · ←→ MOVES') : offb ? 'SKILL STICK' : '↑ HANDS UP · ↓ ' + (M_.arcade ? 'SHOVE' : 'STEAL') + ' · JUMP AT THE RELEASE TO CONTEST';
-    { const l = has ? 'POST' : offb ? (M_.arcade ? 'SWING' : 'POST') : M_.arcade ? 'SWING' : 'BODY UP', e = $('tLT'); if (e && e.textContent !== l) e.textContent = l; }
+    { const up = !has && (M_.B.state === 'shot' || (M_.B.state === 'loose' && M_.B.rebound)), l = up && !M_.arcade ? 'BOX OUT' : has ? 'POST' : offb ? (M_.arcade ? 'SWING' : 'POST') : M_.arcade ? 'SWING' : 'BODY UP', e = $('tLT'); if (e && e.textContent !== l) e.textContent = l; }
+    $('tPK').classList.toggle('off', !(has && M_.phase === 'live' && M_.P.some(q => q.team === me.team && q !== me && !q.user)));
     if ($('tA').textContent !== a) $('tA').textContent = a; if ($('tB').textContent !== b) $('tB').textContent = b; if ($('hintR').textContent !== h) $('hintR').textContent = h;
   }
 }
@@ -5305,7 +5369,7 @@ function uiHud() {
   const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
   $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
   const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = (on ? `<b>${on}</b> online with you` : 'online · nobody else here') + (NET.crew ? ` · crew of <b>${NET.crew.m.length + 1}</b>` : NET.inCrew ? ' · in a crew' : '');
-  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · Q (LT) post up / body up · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
+  $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · Q (LT) post up / body up / box out · R (LB) call a screen · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
 }
 function vcLine() { return `<span class="chip" style="margin:0">HC <b>${S.vc.toLocaleString()}</b></span>`; }
 
@@ -6481,7 +6545,7 @@ addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.cr
 const ALAB = { a: null, b: null, act: 'shoot', speed: 1, paused: false, ball: true, t: 0, step: 0, prof: null, solo: null, ui: 'blend' };
 const ALAB_ACTS = [
   ['shoot', 'Jump shot'], ['fake', 'Pump fake'], ['idle', 'Idle'], ['dribble', 'Dribble'], ['hold', 'Triple threat'], ['slide', 'Defense'], ['run', 'Run'], ['walk', 'Walk'], ['pass', 'Pass'], ['jump', 'Contest'],
-  ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'],
+  ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'], ['def:screen', 'Set a screen'], ['def:box', 'Box out'],
   ['layup', 'Layup'], ['dunk', 'Dunk'], ['cross', 'Crossover'], ['post', 'Post up (LT)'], ['bodyup', 'Body up (LT)'], ['steal', 'Steal'], ['shove', 'Shove'], ['punch', 'Haymaker'], ['clothes', 'Clothesline'], ['stagger', 'Fall: sit'], ['fall:face', 'Fall: face first'], ['fall:flat', 'Fall: laid out'], ['fall:spin', 'Fall: spun round'], ['fall:knee', 'Fall: to a knee'],
   ['celeb:airflex', 'Celeb: air flex'], ['celeb:flexdown', 'Celeb: crab flex'], ['celeb:toosmall', 'Celeb: too small'], ['celeb:stare', 'Celeb: stare down'], ['celeb:pout', 'Celeb: pout'], ['celeb:shh', 'Celeb: shh'], ['celeb:rock', 'Celeb: rock the baby'], ['celeb:nightnight', 'Celeb: night night'], ['celeb:pound', 'Celeb: chest pound'], ['celeb:shrug', 'Celeb: shrug'], ['celeb:floor', 'Celeb: slap the floor'], ['celeb:wag', 'Celeb: finger wag'], ['celeb:greenbean', 'Celeb: green bean'], ['celeb:greengiant', 'Celeb: green giant'], ['celeb:iceveins', 'Celeb: ice in my veins'], ['celeb:fentlean', 'Celeb: fent lean'], ['celeb:pour40', 'Celeb: pour out the 40'],
   ['fan:up', 'Fan: arms up'], ['fan:jump', 'Fan: jump'], ['fan:ohh', 'Fan: OHHH'], ['fan:point', 'Fan: point & laugh'], ['fan:cover', 'Fan: hand over mouth'], ['fan:boo', 'Fan: boo'], ['fan:count', 'Fan: three'], ['fan:wave', 'Fan: towel'], ['fan:clap', 'Fan: clap'], ['fan:phone', 'Fan: phone'], ['fan:film', 'Fan: filming'], ['fan:talk', 'Fan: talking'], ['fan:bob', 'Fan: bobbing'], ['fan:cross', 'Fan: arms crossed'],
@@ -6530,6 +6594,7 @@ function alabPose(F, s, dt) {
   else if (an === 'stagger') { o.fall = true; o.dur = 2.2; o.side = 0; P = poseOf('stagger', s.t, o); }
   else if (an.startsWith('fan:')) P = crowdPose(an.slice(4), ALAB.t, { ph: 0 }, prof);
   else if (an.startsWith('swag:')) { o.sp = 0; o.ph = ALAB.t * 7; o.dr = 0.8; o.hand = 'R'; o.swag = an.slice(5); o.swT = ALAB.t; P = poseOf('dribble', ALAB.t, o); }
+  else if (an === 'def:screen' || an === 'def:box') { o[an.slice(4)] = 1; P = poseOf('idle', ALAB.t, o); }
   else if (an.startsWith('def:')) { o.ph = ALAB.t * 6; o.defMode = an.slice(4); o.ballSide = 1; o.swT = ALAB.t; P = poseOf('slide', ALAB.t, o); }
   else if (an.startsWith('fall:')) { o.fall = true; o.dur = 2.2; o.side = 1; o.kind = an.slice(5); P = poseOf('stagger', s.t % 2.7, o); }
   else if (an.startsWith('celeb:')) { o.style = an.slice(6); P = poseOf('celeb', ALAB.t, o); y = o.style === 'airflex' ? 0.6 : 0; }

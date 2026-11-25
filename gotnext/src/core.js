@@ -91,11 +91,11 @@ function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
 function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
 // button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
 // between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
-function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = false; I.flick = null; I.pe = {}; } }
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = I.pkP = false; I.flick = null; I.pe = {}; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
-    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false, lt = false;
+    const I = IN[i]; let analog = false, tsp = false, mx = 0, my = 0, rx = 0, ry = 0, sprint = false, a = false, b = false, st = false, bk = false, lt = false, pk = false;
     // two players and no controller: split the keyboard. P1 left hand (WASD, IJKL), P2 right side (arrows, numpad)
     const split = twoPlayer && pads.length === 0;
     if (i === 1 && split) {
@@ -106,7 +106,7 @@ function pollInput() {
     if (i === 0) {
       if (keys.KeyA || (!split && keys.ArrowLeft)) mx -= 1; if (keys.KeyD || (!split && keys.ArrowRight)) mx += 1; if (keys.KeyW || (!split && keys.ArrowUp)) my -= 1; if (keys.KeyS || (!split && keys.ArrowDown)) my += 1;
       if (keys.KeyJ) rx -= 1; if (keys.KeyL) rx += 1; if (keys.KeyI) ry -= 1; if (keys.KeyK) ry += 1;
-      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ;
+      sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ; pk = !!keys.KeyR || !!touch.pk || !!touch.pkTap; touch.pkTap = false;
       if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
       lt = lt || !!touch.lt; a = a || touch.a || touch.aTap; b = b || touch.b || touch.bTap; st = st || touch.start || touch.startTap; touch.aTap = touch.bTap = touch.startTap = false;
@@ -124,14 +124,14 @@ function pollInput() {
       const def = typeof padDefense === 'function' && padDefense(i);
       sprint = sprint || B(7) || B(5); a = a || B(0) || (def && B(2)); b = b || (def ? B(3) : B(2) || B(3)); st = st || B(9); bk = bk || B(1);
       lt = lt || B(6) || (p.buttons[6] && p.buttons[6].value > 0.35);      /* LT: body up on defense, post up on offense */
-      const lb = B(4), rb = B(5); I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
+      const lb = B(4), rb = B(5); pk = pk || lb; I.lbP = I.lbP || (lb && !I._lb); I.rbP = I.rbP || (rb && !I._rb); I._lb = lb; I._rb = rb;
     }
     const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
     const r = Math.hypot(rx, ry); if (r > 1) { rx /= r; ry /= r; }
     I.mx = mx; I.my = my; I.rx = rx; I.ry = ry; I.lt = lt; I.sprintBtn = sprint; I.sprint = sprint || tsp; I.analog = analog;
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
-    I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
+    I.pkP = I.pkP || (pk && !I._pk); I._pk = pk; I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
     const d = dir8(rx, ry); if (d && !I._rd) { I.flick = d; I.tPress = now; } I.rRel = I.rRel || (!d && !!I._rd); I.rdir = d; I._rd = d;
   }
 }
@@ -166,7 +166,7 @@ function setupTouch() {
   function end(e) { for (const t of e.changedTouches) { const side = ids[t.identifier]; if (!side) continue; delete ids[t.identifier]; touch[side] = null; $('stick' + side).style.opacity = 0; } }
   pad.addEventListener('touchstart', start, { passive: false }); pad.addEventListener('touchmove', move, { passive: false });
   pad.addEventListener('touchend', end); pad.addEventListener('touchcancel', end);
-  for (const [id, k] of [['tA', 'a'], ['tB', 'b'], ['tLT', 'lt'], ['tMenu', 'start']]) {
+  for (const [id, k] of [['tA', 'a'], ['tB', 'b'], ['tLT', 'lt'], ['tPK', 'pk'], ['tMenu', 'start']]) {
     const el = $(id);
     el.addEventListener('touchstart', e => { touch[k] = true; touch[k + 'Tap'] = true; el.classList.add('on');      /* latched: a tap shorter than a frame still counts */ e.preventDefault(); e.stopPropagation(); audioInit(); }, { passive: false });
     const up = e => { touch[k] = false; el.classList.remove('on'); e.preventDefault(); };
