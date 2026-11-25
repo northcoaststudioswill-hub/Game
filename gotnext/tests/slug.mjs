@@ -14,7 +14,7 @@ const launch = mi => p.evaluate(mi => { const P = __pit; if (P.MT) P.MT.cfg.onEn
 const set = `var P = __pit, M = P.MT, me = M.me, opp = M.P.filter(q => q.team !== me.team), d = opp[0]; M.phase = 'live'; M.needClear = false; M.clock = 20; M.brawl = null; for (const q of M.P) { q.st = 'free'; q.y = 0; q.cool = 0; q.vx = q.vz = 0; q.ko = 0; if (q.ai) q.ai.tick = 999; q.x = 7; q.z = 12; } __pad.axes = [0, 0, 0, 0]; for (const bt of __pad.buttons) bt.pressed = false;`;
 await launch(0);
 // 1. post moves: hold LT, push the stick, press X
-const post = (ax, az) => p.evaluate(([s, ax, az]) => { eval(s); me.x = 0.3; me.z = 3.2; d.x = 0.25; d.z = 2.4; M.B.state = 'held'; M.B.holder = me; me.live = 'drib'; M.off = me.team; __pad.buttons[6].pressed = true; window.__tick(25);
+const post = (ax, az) => p.evaluate(([s, ax, az]) => { eval(s); for (const q of opp) q.cool = 9; me.x = 0.3; me.z = 3.2; d.x = 0.25; d.z = 2.4; M.B.state = 'held'; M.B.holder = me; me.live = 'drib'; M.off = me.team; __pad.buttons[6].pressed = true; window.__tick(25);
   __pad.axes = [ax, az, 0, 0]; window.__tick(2); __pad.buttons[2].pressed = true; window.__tick(3); const r = { st: me.st, fade: me.shot && me.shot.fade, floater: me.shot && me.shot.floater, kind: me.finish && me.finish.kind };
   __pad.axes = [0, 0, 0, 0]; for (const bt of __pad.buttons) bt.pressed = false; window.__tick(150); return r; }, [set, ax, az]);
 const away = await post(0, 1), toward = await post(0, -1), across = await post(1, 0), still = await post(0, 0);
