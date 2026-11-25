@@ -319,6 +319,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   }
   let ax = p.x, az = Math.max(p.z, 0.15); const l = Math.hypot(ax, az) || 1; ax /= l; az /= l;
   let type = opt.layup ? 'layup' : canDunk || forceDunk || opt.style ? 'dunk' : 'layup';
+  if (type === 'dunk' && !p.user && !forceDunk && !opt.style && !MT.arcade && !(p.putT > 0) && Math.random() < (att(p, 'dunk') >= 88 ? 0.15 : att(p, 'dunk') >= 75 ? 0.35 : 0.5)) type = 'layup';      /* AI lays some of them up: more of the layup package, and not every trip ends on the rim */
   const near = nearestOpp(p), thr = rimThreat(p), cont = (near[0] && near[1] < 1.6) || !!(thr && thr.s > 0.35);
   // a finisher reads the defense on the way up; how well depends on how good they are (Layup / Dunk / Strength)
   const fq = att(p, 'layup'), dq = att(p, 'dunk'), str = att(p, 'str'), free = !opt.kind && !opt.style && !opt.layup && !euro && !rev && !opt.hopped && !forceDunk;
@@ -711,10 +712,10 @@ function switchTo(p) {
 // a driver who runs through a defender with his feet set outside the circle: offensive foul, ball goes the other way
 function chargeCheck(p, euro) {
   const M_ = MT; if (M_.arcade || M_.practice || M_.drill || M_.phase !== 'live' || M_.B.holder !== p) return false; const sp = Math.hypot(p.vx, p.vz); if (sp < 3.2) return false; const ux = p.vx / sp, uz = p.vz / sp;
-  for (const o of M_.P) { if (o.team === p.team || o.st !== 'free' || o.y > 0.05 || Math.hypot(o.vx, o.vz) > 0.9 || dHoop(o) < 1.3) continue;
-    const dx = o.x - p.x, dz = o.z - p.z, d = Math.hypot(dx, dz); if (d > 1.05 || d < 0.01 || (dx * ux + dz * uz) / d < 0.78) continue;
+  for (const o of M_.P) { if (o.team === p.team || o.st !== 'free' || o.y > 0.05 || Math.hypot(o.vx, o.vz) > (o.user ? 0.9 : 1.5) || dHoop(o) < 1.3) continue;
+    const dx = o.x - p.x, dz = o.z - p.z, d = Math.hypot(dx, dz); if (d > 1.2 || d < 0.01 || (dx * ux + dz * uz) / d < 0.75) continue;
     if ((Math.sin(o.face) * -dx + Math.cos(o.face) * -dz) / d < 0.4) continue;      /* he has to be facing the drive */
-    if (!(o.user ? o.ltHeld : Math.random() < 0.05 + o.aiLvl * 0.2)) continue;      /* holding his ground: LT for you, a read for the AI */
+    if (!(o.user ? o.ltHeld : Math.random() < 0.1 + o.aiLvl * 0.35)) continue;      /* holding his ground: LT for you, a read for the AI */
     if (Math.random() > clamp(0.6 + (att(o, 'perd') - 70) * 0.006 - (euro ? 0.35 : 0), 0.12, 0.9)) continue;
     sfxM('whistle'); if (M_.net === 'host') netEv({ k: 's', s2: 'whistle' }); call('CHARGE', `${o.b.name} took it from ${p.b.name}`, '#33e0ff', 1.4); floatTxt(o, 'TOOK THE CHARGE', '#33e0ff');
     o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.2, fall: true, side: 0, dir: [ux, uz], push: 1.6, kind: 'sit' }; p.st = 'stagger'; p.t = 0; p.stg = { dur: 0.6, fall: false, side: 1, dir: [-ux, -uz], push: 1.0 };
@@ -786,6 +787,9 @@ function aiThink(p, dt) {
         if (cutter && Math.random() < 0.3 + L * 0.55) { doPass(p, cutter); return; }
         // drive and kick: the help came, somebody is open
         if (a.mode === 'drive' && !laneOpen(p) && d < 5.5 && Math.random() < 0.25 + L * 0.35 && tryPass(q => nearestOpp(q)[1] > 1.8)) { a.mode = ''; return; }
+        { const ms = mates.find(q => q.ai.scr && q.ai.scr.h === p && q.ai.scr.ph === 1 && !q.ai.scr.used && dist(q, p) < 5);      /* the screen he called is set: brush past its far shoulder, then turn the corner */
+          if (ms && o) { ms.ai.scr.used = true; const ex = ms.x - o.x, ez = ms.z - o.z, el = Math.hypot(ex, ez) || 1; aiGo(p, ms.x + ex / el * 0.85, ms.z + ez / el * 0.85, true); a.mode = ''; a.viaT = 0.55; a.tick = 0.55; return; }
+          if (a.viaT > 0) { a.viaT = 0; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } }
         { const us = mates.find(q => q.user && q.screen && dist(q, p) < 4.5); if (us && a.usedScr !== us && Math.random() < 0.7) { a.usedScr = us; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } if (!us) a.usedScr = null; }      /* you set him a screen: he comes off it */
         const caller = mates.find(q => q.callT > 0);
         if (caller && passLane(p, caller) && Math.random() < 0.9) { doPass(p, caller); return; }
@@ -1103,7 +1107,7 @@ function stepBall(dt) {
     if (l <= Math.max(0.45, stepL)) { const from = B.from, wasTouch = !!B.touch; give(to); to.catchT = M_.time; to.catchFrom = from; B.assist = from; B.touch = false; if (wasTouch) to.touchT = M_.time; if (to.st === 'free') to.ai.tick = 0.25;
       // straight on: the touch pass you asked for, or an AI with a man flying at him and a teammate wide open
       let nx = to.touchTo; to.touchTo = null;
-      if (!nx && !to.user && to.st === 'free' && !wasTouch && !M_.needClear && nearestOpp(to)[1] < 1.6) { const c = M_.P.filter(q => q.team === to.team && q !== to && q !== from && q.st === 'free' && nearestOpp(q)[1] > 2.3 && passLane(to, q)).sort((x, y) => nearestOpp(y)[1] - nearestOpp(x)[1])[0]; if (c && Math.random() < 0.12 + to.aiLvl * 0.4) { nx = c; floatTxt(to, 'EXTRA PASS', '#7de3ff'); } }
+      if (!nx && !to.user && to.st === 'free' && !wasTouch && !M_.needClear && nearestOpp(to)[1] < 1.6) { const c = M_.P.filter(q => q.team === to.team && q !== to && (q.st === 'free' || q === from) && nearestOpp(q)[1] > (q === from ? 2.8 : 2.3) && passLane(to, q)).sort((x, y) => nearestOpp(y)[1] - nearestOpp(x)[1])[0]; if (c && Math.random() < 0.12 + to.aiLvl * 0.4) { nx = c; floatTxt(to, 'EXTRA PASS', '#7de3ff'); } }
       if (nx && nx.team === to.team && (nx.st === 'free' || nx.st === 'pass') && to.st === 'free' && M_.phase === 'live') { doPass(to, nx); if (M_.B.state === 'pass') { M_.B.touch = true; M_.B.speed *= 1.12; to.stats.touch = (to.stats.touch || 0) + 1; } } }
     else {
       B.pos.addScaledVector(_v, stepL / l);
@@ -1131,7 +1135,7 @@ function stepBall(dt) {
       }
       if (!best && M_.looseT > 6) best = M_.P.slice().sort((a, b) => Math.hypot(a.x - B.pos.x, a.z - B.pos.z) - Math.hypot(b.x - B.pos.x, b.z - B.pos.z))[0];
       // two men on it at once and nothing between them: a tie-up. The arrow decides, then flips
-      if (best && !B.rebound && !M_.arcade && tb[0] > -9 && tb[1] > -9 && Math.abs(tb[0] - tb[1]) < 0.08 && M_.time - (M_.tieAt || -99) > 12 && M_.phase === 'live') {
+      if (best && !B.rebound && !M_.arcade && tb[0] > -9 && tb[1] > -9 && Math.abs(tb[0] - tb[1]) < 0.16 && M_.time - (M_.tieAt || -99) > 12 && M_.phase === 'live') {
         M_.tieAt = M_.time; if (M_.arrow === undefined) M_.arrow = 1 - best.team; const tm = M_.arrow; M_.arrow = 1 - tm; sfxM('whistle'); call('TIE UP', 'Arrow: ' + (tm === M_.me.team ? 'your ball' : 'their ball'), '#fff', 1.3); for (const q of M_.P) if (Math.hypot(q.x - B.pos.x, q.z - B.pos.z) < 1) floatTxt(q, 'TIE UP', '#fff'); deadBall(tm); best = null; }
       // in a crowd at the top of his jump he cannot hold it: he tips it out to a teammate
       if (best && B.rebound && !B.tipped && best.st === 'jump' && M_.P.some(o => o.team !== best.team && dist(o, best) < 1.0) && Math.random() < 0.3) {

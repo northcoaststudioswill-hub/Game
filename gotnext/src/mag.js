@@ -17,7 +17,7 @@ function fitOf(b) { const w = (b && b.worn) || {}, nm = id => { const d = DRIP.f
 // called by the match on a big play. One at a time, and not every trip down the floor
 function highlight(kind, p, vic) {
   const M_ = MT; if (!kind || !M_ || !HL[kind] || M_.practice || M_.drill || M_.reel || M_.net === 'guest') return;
-  if (kind !== 'winner' && (M_.hl || M_.time - (M_.hlAt || -99) < 7)) return;
+  if (kind !== 'winner' && (M_.hl || M_.time - (M_.hlAt || -99) < 12)) return;
   M_.hlAt = M_.time; M_.hl = { kind, p, vic: vic || null, t: 0, dur: kind === 'winner' ? 2.3 : 1.7, cap: !!p.mine && !M_.spectate, shot: false };
   M_.slow = Math.max(M_.slow || 0, kind === 'winner' ? 1.1 : 0.8);
   const e = $('hl'); if (!e) return; const fit = fitOf(p.b);
