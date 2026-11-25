@@ -235,7 +235,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.17.0';
+const VERSION = '0.17.1';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -1122,10 +1122,9 @@ function makeRig(spec, lowDetail) {
   { const tc = toon(top.c), bc = toon(bot.c);
     M(sph(shW * 0.6, 10, 8), tc, 0, upH * 0.52, -0.05 * wS, chestJ).scale.set(1.3, 0.95, 0.5);            // upper back
     M(sph(shW * 0.5, 10, 8), tc, 0, upH * 0.58, 0.05 * wS, chestJ).scale.set(1.45, 0.72, 0.45);          // chest
-    // traps: the slope from the neck to the shoulder. Under a shirt it is shirt; in a tank it is skin with the strap lying over it
+    // traps: the slope from the neck to the shoulder. Under a shirt it is shirt; in a tank it is bare
     const tank = top.kind === 'tank';
-    for (const sx of [-1, 1]) { const t = M(cyl(0.028 * lW, 0.05 * lW, shW * 0.62, 6), tank ? skin : tc, sx * shW * 0.42, upH + 0.012, -0.012, chestJ); t.rotation.z = sx * 1.12;
-      if (tank) { const st = M(box(0.052 * lW, 0.02, 0.15 * wS), tc, sx * shW * 0.46, upH + 0.036, -0.006, chestJ); st.rotation.z = sx * -0.42; } }
+    for (const sx of [-1, 1]) { const t = M(cyl(0.028 * lW, 0.05 * lW, shW * 0.62, 6), tank ? skin : tc, sx * shW * 0.42, upH + 0.012, -0.012, chestJ); t.rotation.z = sx * 1.12; }
     M(sph(0.105 * wS, 10, 8), tc, 0, loH * 0.5, 0.018, spine).scale.set(1.02, 1.5, 0.62);               // belly / small of the back fill
     for (const sx of [-1, 1]) M(sph(0.072 * wS, 8, 6), bc, sx * 0.052 * wS, -0.045, -0.055, hips).scale.set(1, 1.05, 0.9);      // seat
   }
@@ -1686,6 +1685,27 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (anim === 'stagger' && o.hit) {
+    // HIT LAYER: the same stumble or fall, driven by where and how hard he was hit. The chest turns with the push first,
+    // the head lags the other way, the hips follow a beat later, each leg goes its own way, and on the floor he bounces
+    // once and settles instead of freezing. tw: sideways part of the push (+ = toward his left), fb: + pushed from behind,
+    // pw: how hard, s1 / s2: this fall's own randomness (which leg kicks, which knee drops).
+    const H = o.hit, D = o.dur || 1, sm = x => x * x * (3 - 2 * x), ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    const e1 = sm(clamp(t / 0.1, 0, 1)) * (1 - sm(clamp((t - 0.16) / 0.5, 0, 1))), e2 = sm(clamp((t - 0.09) / 0.16, 0, 1)) * (1 - sm(clamp((t - 0.34) / 0.55, 0, 1))), pw = H.pw || 1, tw = H.tw || 0, fb = H.fb || 0;
+    ad('chest', fb * 0.26 * pw * e1, tw * 0.62 * pw * e1, 0); ad('spine', fb * 0.12 * pw * e1, tw * 0.3 * pw * e1, -tw * 0.1 * pw * e1); ad('neck', -fb * 0.34 * pw * e1, -tw * 0.5 * pw * e1 + tw * 0.4 * pw * e2, 0);
+    ad('hips', 0, tw * 0.5 * pw * e2, tw * 0.08 * pw * e2);
+    // arms: the one on the side he was hit from is thrown across the body, the other flies up and out
+    { const near = tw > 0 ? 'R' : 'L', far = tw > 0 ? 'L' : 'R', sn = tw > 0 ? -1 : 1, m = Math.max(Math.abs(tw), Math.abs(fb) * 0.6) * pw; ad('sh' + near, -0.35 * m * e1, 0, -sn * 0.55 * m * e1); ad('el' + near, -0.4 * m * e1); ad('sh' + far, -0.75 * m * e1, 0, sn * 0.45 * m * e1); ad('wr' + far, 0.4 * m * e1); }
+    // legs, each by itself: one catches the weight out to the side, the other comes off the floor
+    { const lead = tw > 0 ? 'L' : 'R', trail = tw > 0 ? 'R' : 'L', sl = lead === 'L' ? 1 : -1, s1 = H.s1 || 0; ad('hp' + lead, -0.12 * pw * e2, 0, sl * 0.3 * Math.abs(tw) * pw * e2); ad('kn' + lead, 0.25 * pw * e2); ad('hp' + trail, (-0.3 - 0.25 * Math.abs(s1)) * pw * e2 * (fb < 0 ? 1 : -0.6), 0, 0); ad('kn' + trail, (0.35 + 0.3 * Math.abs(s1)) * pw * e2); }
+    if (o.fall) {      // on the floor: one bounce, then the loose bits settle (until he starts to get up)
+      const gT = Math.min(0.6, D * 0.4), up = sm(clamp((t - (D - gT)) / gT, 0, 1)), tg = t - 0.32, grd = tg > 0 ? sm(clamp(tg / 0.3, 0, 1)) * (1 - up) : 0, s1 = H.s1 || 0, s2 = H.s2 || 0;
+      if (tg > 0 && tg < 0.6) p.y = (p.y || 0) + 0.07 * pw * Math.abs(Math.sin(tg * 13)) * Math.exp(-tg * 7) * (1 - up);
+      const kd = s2 > 0 ? 'R' : 'L'; ad('kn' + kd, 0.3 * Math.abs(s2) * grd); ad('hp' + kd, 0, 0, (kd === 'R' ? -1 : 1) * 0.22 * Math.abs(s2) * grd); ad('neck', 0, 0.3 * s1 * grd, 0.12 * s2 * grd);
+      ad('shR', 0, 0, -0.14 * s1 * grd); ad('shL', 0, 0, 0.14 * s2 * grd); ad('hips', 0, tw * 0.18 * grd, 0); ad('spine', 0, tw * 0.12 * grd, 0);
+      const br = Math.sin(t * 5.5) * 0.03 * grd; ad('chest', br); ad('spine', br * 0.5);      /* winded */
+    }
+  }
   if (o.dv || o.ov || o.jab) {      // small upper-body and footwork pools so standing players are not all doing the same thing
     const to = (k2, x, y, z, w) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] = lerp(v[0], x, w); v[1] = lerp(v[1], y, w); v[2] = lerp(v[2], z, w); };
     if (o.dv && anim === 'slide') {      // off-ball defensive hands: 1 one high one low, 2 both wide and low, 3 an arm in the passing lane
@@ -3522,7 +3542,9 @@ function animPlayer(p, dt) {
     case 'hop': an = 'hop'; o.u = p.t / ((p.hop && p.hop.dur) || HOP_T); break;
     case 'move': { const k = p.mv.mv.id || 'cross', u = Math.min(1, p.t / p.mv.mv.dur), sg = p.mv.dx > 0 ? -1 : 1; an = 'move'; o.side = p.mv.dx; o.kind = k; o.u = u; o.hand = p.hand;
       if (k === 'spin') R.extraYaw = u * Math.PI * 2 * sg; else if (k === 'halfspin') R.extraYaw = Math.sin(u * Math.PI) * 2.4 * sg; break; }
-    case 'stagger': an = 'stagger'; o.kind = p.stg.kind; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side; break;
+    case 'stagger': an = 'stagger'; o.kind = p.stg.kind; o.fall = p.stg.fall; o.dur = p.stg.dur; o.side = p.stg.side === undefined ? 1 : p.stg.side;
+      { const g = p.stg; if (!g.hit) { const d = g.dir || [0, 0], fx = Math.sin(p.face), fz = Math.cos(p.face), l = Math.hypot(d[0], d[1]) || 1; g.hit = { tw: (d[0] * fz - d[1] * fx) / l, fb: (d[0] * fx + d[1] * fz) / l, pw: clamp((g.push || 1.5) / 2, 0.5, 1.5), s1: Math.random() * 2 - 1, s2: Math.random() * 2 - 1 }; } o.hit = g.hit; }      /* where the push came from, as he saw it, once per fall */
+      break;
     case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; o.v = p.jv || 0; break; case 'steal': an = 'steal'; o.v = p.sv || 0; break; case 'shove': an = 'shove'; break; case 'punch': an = 'punch'; break; case 'clothes': an = 'clothes'; o.sp = 1; o.ph = p.runPh; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
     case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
@@ -7200,6 +7222,7 @@ function alabAt(t) {
 }
 function alabPose(F, s, dt) {
   const R = F.R, prof = R.prof; let an = s.an, P, y = 0, o = { leg: R.legLen, prof };
+  if (an === 'stagger' || an.startsWith('fall:')) { const n = Math.floor(ALAB.t / 2.7); o.hit = { tw: Math.sin(n * 2.1 + (F === ALAB.b ? 1.6 : 0)), fb: Math.cos(n * 1.3) * 0.8, pw: 1, s1: Math.sin(n * 3.7), s2: Math.cos(n * 2.9) }; }      /* a different hit every loop */
   if (an === 'shoot' || an === 'fake') { const rel = an === 'fake' ? 0.6 : 0.6, u = s.t / rel; o.rel = rel; o.n = 1; P = poseOf(an, s.t, o); if (an === 'shoot') y = u > 0.62 && u < 1.42 ? 0.42 * Math.sin(Math.PI * (u - 0.62) / 0.8) : 0; }
   else if (an === 'run') { const psi = (s.t * 1.45) % 1; P = poseOf('sprint', 0, { rs: prof.run, psi, duty: 0.33, k: 0.6, hipA: 1.1, flight: 0.08, thigh: R.thigh, shin: R.shin }); profilePosture(P, 'run', prof); }
   else if (an === 'walk') { P = poseOf('gait', 0, { psi: (s.t * 0.95) % 1, amp: 1, hipA: 1, swag: 0.35 + prof.swag * 0.8, thigh: R.thigh, shin: R.shin, leg: R.legLen }); }

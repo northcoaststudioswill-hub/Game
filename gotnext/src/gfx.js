@@ -99,10 +99,9 @@ function makeRig(spec, lowDetail) {
   { const tc = toon(top.c), bc = toon(bot.c);
     M(sph(shW * 0.6, 10, 8), tc, 0, upH * 0.52, -0.05 * wS, chestJ).scale.set(1.3, 0.95, 0.5);            // upper back
     M(sph(shW * 0.5, 10, 8), tc, 0, upH * 0.58, 0.05 * wS, chestJ).scale.set(1.45, 0.72, 0.45);          // chest
-    // traps: the slope from the neck to the shoulder. Under a shirt it is shirt; in a tank it is skin with the strap lying over it
+    // traps: the slope from the neck to the shoulder. Under a shirt it is shirt; in a tank it is bare
     const tank = top.kind === 'tank';
-    for (const sx of [-1, 1]) { const t = M(cyl(0.028 * lW, 0.05 * lW, shW * 0.62, 6), tank ? skin : tc, sx * shW * 0.42, upH + 0.012, -0.012, chestJ); t.rotation.z = sx * 1.12;
-      if (tank) { const st = M(box(0.052 * lW, 0.02, 0.15 * wS), tc, sx * shW * 0.46, upH + 0.036, -0.006, chestJ); st.rotation.z = sx * -0.42; } }
+    for (const sx of [-1, 1]) { const t = M(cyl(0.028 * lW, 0.05 * lW, shW * 0.62, 6), tank ? skin : tc, sx * shW * 0.42, upH + 0.012, -0.012, chestJ); t.rotation.z = sx * 1.12; }
     M(sph(0.105 * wS, 10, 8), tc, 0, loH * 0.5, 0.018, spine).scale.set(1.02, 1.5, 0.62);               // belly / small of the back fill
     for (const sx of [-1, 1]) M(sph(0.072 * wS, 8, 6), bc, sx * 0.052 * wS, -0.045, -0.055, hips).scale.set(1, 1.05, 0.9);      // seat
   }
