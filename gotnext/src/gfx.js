@@ -573,6 +573,22 @@ function poseOf(anim, t, o) {
     p.hpR = [-0.55, 0, -0.24]; p.knR = [0.95, 0, 0]; p.anR = [-0.3, 0, 0.1]; p.hpL = [-0.55, 0, 0.24]; p.knL = [0.95, 0, 0]; p.anL = [-0.3, 0, -0.1];
     p.spine = [0.36, 0, 0]; p.chest = [0.1, 0.22 * sg, 0]; p.neck = [-0.3, -0.5 * sg, 0];
     p['sh' + off] = [0.5, 0, 0.65 * sg]; p['el' + off] = [-1.4, 0, 0]; p['wr' + off] = [0.1, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
+  // room to work: show-off dribbles on top of the standing dribble
+  if (o.swag) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; }, tt = o.swT || 0, off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1, w = Math.sin(tt * 2.4), q = Math.sin(tt * 7);
+    if (o.swag === 'rock') { p.y = (p.y || 0) + 0.04; ad('hips', 0, 0, w * 0.13); ad('spine', -0.1, 0, -w * 0.09); ad('chest', 0, w * 0.16, 0); ad('neck', 0.06 * Math.abs(w), 0, w * 0.06); p['sh' + off] = [-0.15, 0, sg * 0.55]; p['el' + off] = [-0.5 - 0.1 * w, 0, 0]; }
+    else if (o.swag === 'tween') { ad('hpR', -0.25, 0, -0.26); ad('hpL', -0.25, 0, 0.26); ad('knR', 0.45); ad('knL', 0.45); p.y = (p.y || 0) - 0.11; ad('spine', 0.22); ad('neck', -0.25); p['sh' + off] = [-0.5, 0, sg * 0.35]; p['el' + off] = [-0.9, 0, 0]; }
+    else if (o.swag === 'behind') { p.y = (p.y || 0) + 0.03; ad('hips', -0.08); ad('spine', -0.16); ad('chest', -0.08, q * 0.08, 0); ad('neck', 0.05); p['sh' + off] = [0.35, 0, sg * 0.3]; p['el' + off] = [-0.7, 0, 0]; }
+    else if (o.swag === 'yoyo') { ad('hips', 0, 0, -sg * 0.1); ad('spine', 0, 0, -sg * 0.14); ad('chest', 0, q * 0.16, 0); ad('neck', 0, -sg * 0.2, 0); p['sh' + off] = [0.1, 0, sg * 0.75]; p['el' + off] = [-1.7, 0, 0]; p['wr' + off] = [0.3, 0, 0]; }      /* off hand on the hip, shoulders shimmy */
+    else if (o.swag === 'sizeup') { p.y = (p.y || 0) - 0.13; ad('knR', 0.5 + 0.14 * Math.max(0, q)); ad('knL', 0.5 + 0.14 * Math.max(0, -q)); ad('hpR', -0.35, 0, -0.14); ad('hpL', -0.35, 0, 0.14); ad('spine', 0.3); ad('neck', -0.3 + 0.07 * q); p['sh' + off] = [-1.0, 0, sg * 0.3]; p['el' + off] = [-0.9, 0, 0]; }
+    else if (o.swag === 'wave') { p.y = (p.y || 0) + 0.04; ad('spine', -0.08); ad('neck', -0.12); p['sh' + off] = [-1.25, 0, sg * 0.25]; p['el' + off] = [-1.2 + 0.45 * Math.max(0, q), 0, 0]; p['wr' + off] = [0.9 * Math.max(0, q), 0, 0]; }      /* come on, guard me */
+    p.rate = Math.max(p.rate || 16, 18); }
+  // guarding the ball: sagging off (upright, a hand toward the ball, a hand in the lane, on the toes) or up close (a hand digging at the ball, a hand in his face)
+  if (o.defMode) { const tt = o.swT || 0, bs = o.ballSide > 0 ? 'R' : 'L', os = bs === 'R' ? 'L' : 'R', sg = bs === 'R' ? -1 : 1, q = Math.sin(tt * 6), talk = (tt % 5.5) < 1.1;
+    if (o.defMode === 'sag') { p.y = (p.y || 0) + 0.07 + 0.012 * q; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] -= 0.1; p['sh' + bs] = [-0.85, 0, sg * 0.25]; p['el' + bs] = [-0.25, 0, 0]; p['wr' + bs] = [0.5, 0, 0];
+      p['sh' + os] = talk ? [-1.7, 0, -sg * 0.5] : [-0.2, 0, -sg * 1.15]; p['el' + os] = [talk ? -0.15 : -0.35, 0, 0]; }      /* now and then he points and calls it out */
+    else { p.y = (p.y || 0) - 0.05; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] += 0.12; p['sh' + bs] = [-0.75 - 0.12 * Math.max(0, q), 0, sg * 0.15]; p['el' + bs] = [-0.45, 0, 0]; p['wr' + bs] = [0.7, 0, 0];
+      p['sh' + os] = [-2.25, 0, -sg * 0.2]; p['el' + os] = [-0.85, 0, 0]; p['wr' + os] = [0.3, 0, 0]; }
+    p.rate = Math.max(p.rate || 16, 20); }
   // layered on top of every pose: eyes on the ball, lean into the turn
   if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
   if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }

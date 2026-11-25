@@ -1539,6 +1539,22 @@ function poseOf(anim, t, o) {
     p.hpR = [-0.55, 0, -0.24]; p.knR = [0.95, 0, 0]; p.anR = [-0.3, 0, 0.1]; p.hpL = [-0.55, 0, 0.24]; p.knL = [0.95, 0, 0]; p.anL = [-0.3, 0, -0.1];
     p.spine = [0.36, 0, 0]; p.chest = [0.1, 0.22 * sg, 0]; p.neck = [-0.3, -0.5 * sg, 0];
     p['sh' + off] = [0.5, 0, 0.65 * sg]; p['el' + off] = [-1.4, 0, 0]; p['wr' + off] = [0.1, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
+  // room to work: show-off dribbles on top of the standing dribble
+  if (o.swag) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; }, tt = o.swT || 0, off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1, w = Math.sin(tt * 2.4), q = Math.sin(tt * 7);
+    if (o.swag === 'rock') { p.y = (p.y || 0) + 0.04; ad('hips', 0, 0, w * 0.13); ad('spine', -0.1, 0, -w * 0.09); ad('chest', 0, w * 0.16, 0); ad('neck', 0.06 * Math.abs(w), 0, w * 0.06); p['sh' + off] = [-0.15, 0, sg * 0.55]; p['el' + off] = [-0.5 - 0.1 * w, 0, 0]; }
+    else if (o.swag === 'tween') { ad('hpR', -0.25, 0, -0.26); ad('hpL', -0.25, 0, 0.26); ad('knR', 0.45); ad('knL', 0.45); p.y = (p.y || 0) - 0.11; ad('spine', 0.22); ad('neck', -0.25); p['sh' + off] = [-0.5, 0, sg * 0.35]; p['el' + off] = [-0.9, 0, 0]; }
+    else if (o.swag === 'behind') { p.y = (p.y || 0) + 0.03; ad('hips', -0.08); ad('spine', -0.16); ad('chest', -0.08, q * 0.08, 0); ad('neck', 0.05); p['sh' + off] = [0.35, 0, sg * 0.3]; p['el' + off] = [-0.7, 0, 0]; }
+    else if (o.swag === 'yoyo') { ad('hips', 0, 0, -sg * 0.1); ad('spine', 0, 0, -sg * 0.14); ad('chest', 0, q * 0.16, 0); ad('neck', 0, -sg * 0.2, 0); p['sh' + off] = [0.1, 0, sg * 0.75]; p['el' + off] = [-1.7, 0, 0]; p['wr' + off] = [0.3, 0, 0]; }      /* off hand on the hip, shoulders shimmy */
+    else if (o.swag === 'sizeup') { p.y = (p.y || 0) - 0.13; ad('knR', 0.5 + 0.14 * Math.max(0, q)); ad('knL', 0.5 + 0.14 * Math.max(0, -q)); ad('hpR', -0.35, 0, -0.14); ad('hpL', -0.35, 0, 0.14); ad('spine', 0.3); ad('neck', -0.3 + 0.07 * q); p['sh' + off] = [-1.0, 0, sg * 0.3]; p['el' + off] = [-0.9, 0, 0]; }
+    else if (o.swag === 'wave') { p.y = (p.y || 0) + 0.04; ad('spine', -0.08); ad('neck', -0.12); p['sh' + off] = [-1.25, 0, sg * 0.25]; p['el' + off] = [-1.2 + 0.45 * Math.max(0, q), 0, 0]; p['wr' + off] = [0.9 * Math.max(0, q), 0, 0]; }      /* come on, guard me */
+    p.rate = Math.max(p.rate || 16, 18); }
+  // guarding the ball: sagging off (upright, a hand toward the ball, a hand in the lane, on the toes) or up close (a hand digging at the ball, a hand in his face)
+  if (o.defMode) { const tt = o.swT || 0, bs = o.ballSide > 0 ? 'R' : 'L', os = bs === 'R' ? 'L' : 'R', sg = bs === 'R' ? -1 : 1, q = Math.sin(tt * 6), talk = (tt % 5.5) < 1.1;
+    if (o.defMode === 'sag') { p.y = (p.y || 0) + 0.07 + 0.012 * q; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] -= 0.1; p['sh' + bs] = [-0.85, 0, sg * 0.25]; p['el' + bs] = [-0.25, 0, 0]; p['wr' + bs] = [0.5, 0, 0];
+      p['sh' + os] = talk ? [-1.7, 0, -sg * 0.5] : [-0.2, 0, -sg * 1.15]; p['el' + os] = [talk ? -0.15 : -0.35, 0, 0]; }      /* now and then he points and calls it out */
+    else { p.y = (p.y || 0) - 0.05; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] += 0.12; p['sh' + bs] = [-0.75 - 0.12 * Math.max(0, q), 0, sg * 0.15]; p['el' + bs] = [-0.45, 0, 0]; p['wr' + bs] = [0.7, 0, 0];
+      p['sh' + os] = [-2.25, 0, -sg * 0.2]; p['el' + os] = [-0.85, 0, 0]; p['wr' + os] = [0.3, 0, 0]; }
+    p.rate = Math.max(p.rate || 16, 20); }
   // layered on top of every pose: eyes on the ball, lean into the turn
   if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
   if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }
@@ -2999,6 +3015,7 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
   // bounced level with the hips, and a runner then outran it)
   return _bq.set(p.x + vx * tAhead + rx * side * sgn + fx * fwd, 0.125, p.z + vz * tAhead + rz * side * sgn + fz * fwd).clone();
 }
+const SWAGS = ['rock', 'tween', 'yoyo', 'sizeup', 'behind', 'wave', 'tween', 'rock'];
 // which hand the ball wants to be in: away from a defender who is close, otherwise the hand on the side you are going
 function autoHand(p) {
   const fx = Math.sin(p.face), fz = Math.cos(p.face), [o, od] = nearestOpp(p);
@@ -3045,6 +3062,7 @@ function ballHeld(p, dt) {
     if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = '';
       const want = p.st === 'free' && !p.post ? autoHand(p) : null;      /* switch hands with a quick crossover dribble in front of the body */
       if (want && want !== D.hand && M_.time - (p.handSwT || -9) > 0.75) { p.hand = want; D.hand = want; D.kind = 'cross'; p.handSwT = M_.time; }
+      else if (!want && p.st === 'free' && (p.swag === 'tween' || p.swag === 'behind') && M_.time >= (p.handSwT || 0)) { const nh = D.hand === 'R' ? 'L' : 'R'; p.hand = nh; D.hand = nh; D.kind = p.swag; }      /* showing off: through the legs or round the back, every bounce */
       D.F = dribFloor(p, D, D.kind, D.T); D.upT = Tc * 0.38; }
   } else if (D.ph === 'down') {
     if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) / 10);     /* no faster than a hard real push */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
@@ -3078,9 +3096,13 @@ function animPlayer(p, dt) {
     case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
-      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); } }
+      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); }
+        // he is giving you room: show-off dribbles, a new one every few seconds (rock, between the legs, behind the back, yo-yo, size-up, waving him up)
+        { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? SWAGS[Math.floor((M_.time + p.i * 1.7) / 2.8) % SWAGS.length] : null; o.swag = p.swag; o.swT = M_.time + p.i; } }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
-      else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; o.bodyUp = p.bodyUp ? 1 : 0; if (p.sprinting) { an = 'run'; o.sp = spN; } }
+      else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; o.bodyUp = p.bodyUp ? 1 : 0; if (p.sprinting) { an = 'run'; o.sp = spN; }
+        else if (!p.handsUp && !p.bodyUp && B.holder && (p.guard || p.man) === B.holder) {      // on the ball: sag stance when he has room, active hands when it is tight
+          const h = B.holder, dg = dist(p, h); o.defMode = dg > 2.5 ? 'sag' : dg < 1.4 ? 'tight' : ''; o.ballSide = ((B.pos.x - p.x) * Math.cos(p.face) - (B.pos.z - p.z) * Math.sin(p.face)) >= 0 ? 1 : -1; o.swT = M_.time + p.i * 0.7; } }
       else if (p.speed > 0.4) { an = 'run'; o.sp = spN; o.ph = p.runPh; }
       else if (B.state === 'pass' && B.target === p) an = 'catch';
       if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
@@ -6397,6 +6419,7 @@ addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.cr
 const ALAB = { a: null, b: null, act: 'shoot', speed: 1, paused: false, ball: true, t: 0, step: 0, prof: null, solo: null, ui: 'blend' };
 const ALAB_ACTS = [
   ['shoot', 'Jump shot'], ['fake', 'Pump fake'], ['idle', 'Idle'], ['dribble', 'Dribble'], ['hold', 'Triple threat'], ['slide', 'Defense'], ['run', 'Run'], ['walk', 'Walk'], ['pass', 'Pass'], ['jump', 'Contest'],
+  ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'],
   ['layup', 'Layup'], ['dunk', 'Dunk'], ['cross', 'Crossover'], ['post', 'Post up (LT)'], ['bodyup', 'Body up (LT)'], ['steal', 'Steal'], ['shove', 'Shove'], ['punch', 'Haymaker'], ['clothes', 'Clothesline'], ['stagger', 'Fall: sit'], ['fall:face', 'Fall: face first'], ['fall:flat', 'Fall: laid out'], ['fall:spin', 'Fall: spun round'], ['fall:knee', 'Fall: to a knee'],
   ['celeb:airflex', 'Celeb: air flex'], ['celeb:flexdown', 'Celeb: crab flex'], ['celeb:toosmall', 'Celeb: too small'], ['celeb:stare', 'Celeb: stare down'], ['celeb:pout', 'Celeb: pout'], ['celeb:shh', 'Celeb: shh'], ['celeb:rock', 'Celeb: rock the baby'], ['celeb:nightnight', 'Celeb: night night'], ['celeb:pound', 'Celeb: chest pound'], ['celeb:shrug', 'Celeb: shrug'], ['celeb:floor', 'Celeb: slap the floor'], ['celeb:wag', 'Celeb: finger wag'],
   ['fan:up', 'Fan: arms up'], ['fan:jump', 'Fan: jump'], ['fan:ohh', 'Fan: OHHH'], ['fan:point', 'Fan: point & laugh'], ['fan:cover', 'Fan: hand over mouth'], ['fan:boo', 'Fan: boo'], ['fan:count', 'Fan: three'], ['fan:wave', 'Fan: towel'], ['fan:clap', 'Fan: clap'], ['fan:phone', 'Fan: phone'], ['fan:film', 'Fan: filming'], ['fan:talk', 'Fan: talking'], ['fan:bob', 'Fan: bobbing'], ['fan:cross', 'Fan: arms crossed'],
@@ -6444,6 +6467,8 @@ function alabPose(F, s, dt) {
   else if (an === 'clothes') { o.sp = 1; o.ph = s.t * 9; P = poseOf('clothes', s.t, o); }
   else if (an === 'stagger') { o.fall = true; o.dur = 2.2; o.side = 0; P = poseOf('stagger', s.t, o); }
   else if (an.startsWith('fan:')) P = crowdPose(an.slice(4), ALAB.t, { ph: 0 }, prof);
+  else if (an.startsWith('swag:')) { o.sp = 0; o.ph = ALAB.t * 7; o.dr = 0.8; o.hand = 'R'; o.swag = an.slice(5); o.swT = ALAB.t; P = poseOf('dribble', ALAB.t, o); }
+  else if (an.startsWith('def:')) { o.ph = ALAB.t * 6; o.defMode = an.slice(4); o.ballSide = 1; o.swT = ALAB.t; P = poseOf('slide', ALAB.t, o); }
   else if (an.startsWith('fall:')) { o.fall = true; o.dur = 2.2; o.side = 1; o.kind = an.slice(5); P = poseOf('stagger', s.t % 2.7, o); }
   else if (an.startsWith('celeb:')) { o.style = an.slice(6); P = poseOf('celeb', ALAB.t, o); y = o.style === 'airflex' ? 0.6 : 0; }
   else P = poseOf(an, an === 'idle' ? ALAB.t : s.t, o);
@@ -6451,10 +6476,10 @@ function alabPose(F, s, dt) {
   if (an !== F.an) { F.rate = transRate(F.an || an, an); F.trT = 0; F.an = an; } F.trT = (F.trT || 0) + dt; if (F.trT < 2.5 / F.rate) P.rate = Math.max(P.rate || 16, F.rate);
   applyPose(R, P, dt); R.root.position.y = y; R.root.updateMatrixWorld(true);
   // the ball: in the hands, up into the shooting hand, gone at the release; bouncing under the dribble hand
-  const B = F.ball; B.visible = ALAB.ball && !/^(run|walk|slide|jump|idle|bodyup|steal|shove|punch|clothes|stagger)$/.test(an) && !an.startsWith('fan:') && !an.startsWith('fall:') && !an.startsWith('celeb:');
+  const B = F.ball; B.visible = ALAB.ball && !/^(run|walk|slide|jump|idle|bodyup|steal|shove|punch|clothes|stagger)$/.test(an) && !an.startsWith('fan:') && !an.startsWith('def:') && !an.startsWith('fall:') && !an.startsWith('celeb:');
   if (B.visible) { const sh = prof.hand === 'L' ? 'L' : 'R', off = sh === 'R' ? 'L' : 'R', a = new THREE.Vector3(), b = new THREE.Vector3(); handPos(R, sh, a); handPos(R, off, b);
     if (an === 'shoot' || an === 'fake') { const u = s.t / 0.6, lift = clamp((u - 0.35) / 0.4, 0, 1); if (an === 'shoot' && u > 1) { const f = u - 1; B.position.set(F.x, a.y + f * 4.5 - f * f * 3, a.z - f * 2.2); } else { a.lerp(b, 0.5 * (1 - lift)); a.y += 0.06 + 0.05 * lift; B.position.copy(a); } }
-    else if (an === 'dribble' || an === 'post' || an === 'cross') { handPos(R, prof.hand === 'L' ? 'L' : 'R', a); const c = Math.abs(Math.sin(s.t * 7 / 2)); B.position.set(a.x, 0.12 + (a.y - 0.18) * c, a.z + 0.05); }
+    else if (an === 'dribble' || an === 'post' || an === 'cross' || an.startsWith('swag:')) { handPos(R, prof.hand === 'L' ? 'L' : 'R', a); const c = Math.abs(Math.sin(s.t * 7 / 2)); B.position.set(a.x, 0.12 + (a.y - 0.18) * c, a.z + 0.05); }
     else if (an === 'pass') { const f = s.t / 0.6; a.lerp(b, 0.5); B.position.set(a.x, a.y, a.z + (f > 0.45 ? (f - 0.45) * 6 : 0)); }
     else { a.lerp(b, 0.5); B.position.copy(a); } }
 }

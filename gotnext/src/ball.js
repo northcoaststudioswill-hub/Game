@@ -978,6 +978,7 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
   // bounced level with the hips, and a runner then outran it)
   return _bq.set(p.x + vx * tAhead + rx * side * sgn + fx * fwd, 0.125, p.z + vz * tAhead + rz * side * sgn + fz * fwd).clone();
 }
+const SWAGS = ['rock', 'tween', 'yoyo', 'sizeup', 'behind', 'wave', 'tween', 'rock'];
 // which hand the ball wants to be in: away from a defender who is close, otherwise the hand on the side you are going
 function autoHand(p) {
   const fx = Math.sin(p.face), fz = Math.cos(p.face), [o, od] = nearestOpp(p);
@@ -1024,6 +1025,7 @@ function ballHeld(p, dt) {
     if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = '';
       const want = p.st === 'free' && !p.post ? autoHand(p) : null;      /* switch hands with a quick crossover dribble in front of the body */
       if (want && want !== D.hand && M_.time - (p.handSwT || -9) > 0.75) { p.hand = want; D.hand = want; D.kind = 'cross'; p.handSwT = M_.time; }
+      else if (!want && p.st === 'free' && (p.swag === 'tween' || p.swag === 'behind') && M_.time >= (p.handSwT || 0)) { const nh = D.hand === 'R' ? 'L' : 'R'; p.hand = nh; D.hand = nh; D.kind = p.swag; }      /* showing off: through the legs or round the back, every bounce */
       D.F = dribFloor(p, D, D.kind, D.T); D.upT = Tc * 0.38; }
   } else if (D.ph === 'down') {
     if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) / 10);     /* no faster than a hard real push */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
@@ -1057,9 +1059,13 @@ function animPlayer(p, dt) {
     case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
-      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); } }
+      else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); }
+        // he is giving you room: show-off dribbles, a new one every few seconds (rock, between the legs, behind the back, yo-yo, size-up, waving him up)
+        { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? SWAGS[Math.floor((M_.time + p.i * 1.7) / 2.8) % SWAGS.length] : null; o.swag = p.swag; o.swT = M_.time + p.i; } }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
-      else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; o.bodyUp = p.bodyUp ? 1 : 0; if (p.sprinting) { an = 'run'; o.sp = spN; } }
+      else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; o.bodyUp = p.bodyUp ? 1 : 0; if (p.sprinting) { an = 'run'; o.sp = spN; }
+        else if (!p.handsUp && !p.bodyUp && B.holder && (p.guard || p.man) === B.holder) {      // on the ball: sag stance when he has room, active hands when it is tight
+          const h = B.holder, dg = dist(p, h); o.defMode = dg > 2.5 ? 'sag' : dg < 1.4 ? 'tight' : ''; o.ballSide = ((B.pos.x - p.x) * Math.cos(p.face) - (B.pos.z - p.z) * Math.sin(p.face)) >= 0 ? 1 : -1; o.swT = M_.time + p.i * 0.7; } }
       else if (p.speed > 0.4) { an = 'run'; o.sp = spN; o.ph = p.runPh; }
       else if (B.state === 'pass' && B.target === p) an = 'catch';
       if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
