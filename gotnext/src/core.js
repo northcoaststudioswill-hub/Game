@@ -109,7 +109,7 @@ function pollInput() {
       sprint = !!(keys.ShiftLeft || (!split && keys.ShiftRight)); a = !!(keys.KeyE || (!split && keys.Enter)); b = !!keys.Space; st = !!keys.KeyP; bk = !!keys.Escape; lt = !!keys.KeyQ;
       if (touch.L) { mx += touch.L.x; my += touch.L.y; const tm = Math.hypot(touch.L.x, touch.L.y); I._ts = tm > 0.93 || (I._ts && tm > 0.85); if (I._ts) tsp = true; analog = true; }   /* sprint on at 93%, off below 85%: a thumb at full push must not flicker it */
       if (touch.R) { rx += touch.R.x; ry += touch.R.y; }
-      a = a || touch.a || touch.aTap; b = b || touch.b || touch.bTap; st = st || touch.start || touch.startTap; touch.aTap = touch.bTap = touch.startTap = false;
+      lt = lt || !!touch.lt; a = a || touch.a || touch.aTap; b = b || touch.b || touch.bTap; st = st || touch.start || touch.startTap; touch.aTap = touch.bTap = touch.startTap = false;
     }
     // pads: with two players and one pad, the pad belongs to player 2
     let p = null;
@@ -166,7 +166,7 @@ function setupTouch() {
   function end(e) { for (const t of e.changedTouches) { const side = ids[t.identifier]; if (!side) continue; delete ids[t.identifier]; touch[side] = null; $('stick' + side).style.opacity = 0; } }
   pad.addEventListener('touchstart', start, { passive: false }); pad.addEventListener('touchmove', move, { passive: false });
   pad.addEventListener('touchend', end); pad.addEventListener('touchcancel', end);
-  for (const [id, k] of [['tA', 'a'], ['tB', 'b'], ['tMenu', 'start']]) {
+  for (const [id, k] of [['tA', 'a'], ['tB', 'b'], ['tLT', 'lt'], ['tMenu', 'start']]) {
     const el = $(id);
     el.addEventListener('touchstart', e => { touch[k] = true; touch[k + 'Tap'] = true; el.classList.add('on');      /* latched: a tap shorter than a frame still counts */ e.preventDefault(); e.stopPropagation(); audioInit(); }, { passive: false });
     const up = e => { touch[k] = false; el.classList.remove('on'); e.preventDefault(); };

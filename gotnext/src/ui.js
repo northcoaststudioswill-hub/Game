@@ -103,6 +103,7 @@ function hudMatch() {
   if (IS_TOUCH) {
     const has = M_.B.holder === me, offb = M_.off === me.team;
     const a = has ? 'PASS' : offb ? 'CALL' : M_.arcade ? 'SHOVE' : 'STEAL', b = has ? 'SHOOT' : 'JUMP', h = has ? (me.live === 'dead' ? 'DRIBBLE USED · PASS · SHOOT · FAKE · STICK PIVOTS' : '↓ HOLD SHOOT · ↑ DRIVE · ←→ MOVES') : offb ? 'SKILL STICK' : '↑ HANDS UP · ↓ ' + (M_.arcade ? 'SHOVE' : 'STEAL') + ' · JUMP AT THE RELEASE TO CONTEST';
+    { const l = has ? 'POST' : offb ? (M_.arcade ? 'SWING' : 'POST') : M_.arcade ? 'SWING' : 'BODY UP', e = $('tLT'); if (e && e.textContent !== l) e.textContent = l; }
     if ($('tA').textContent !== a) $('tA').textContent = a; if ($('tB').textContent !== b) $('tB').textContent = b; if ($('hintR').textContent !== h) $('hintR').textContent = h;
   }
 }

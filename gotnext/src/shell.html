@@ -35,6 +35,7 @@ h1,h2,h3,.f{font-family:var(--d);font-weight:900;font-stretch:125%;letter-spacin
 body.touch .tbtn{display:flex}
 #tA{right:calc(14px + var(--sar));bottom:46%}
 #tB{right:calc(92px + var(--sar));bottom:calc(46% + 40px);border-color:var(--heat)}
+#tLT{right:calc(100px + var(--sar));bottom:calc(46% - 44px);width:56px;height:56px;font-size:9px;border-color:var(--gold)}body:not([data-state=match]) #tLT{display:none!important}
 #tMenu{right:calc(10px + var(--sar));top:calc(8px + var(--sat));width:42px;height:42px;font-size:16px;border-radius:0;clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
 body[data-state=world] #tB,body[data-state=title] .tbtn,body[data-state=create] .tbtn,body.busy .tbtn{display:none}
 .hintL,.hintR{position:absolute;bottom:calc(16px + var(--sab));font:500 10px var(--m);letter-spacing:.14em;color:rgba(236,233,226,.4);display:none;pointer-events:none}
@@ -110,6 +111,8 @@ body[data-state=world]:not(.busy):not(.building) #emobar{display:flex}
 .btn.alt{background:var(--grit);color:var(--bone);box-shadow:inset 0 0 0 1px var(--line)}.btn.red{background:var(--heat);color:#fff}.btn.ye,.btn.gr,.btn.or,.btn.mu{color:var(--ink)}.btn.cy{background:var(--ice);color:var(--ink)}
 .btn.sm{font-size:10px;padding:8px 16px 8px 11px;--cut:7px}
 .btn:disabled,.btn[disabled]{opacity:.3;cursor:default}.btn.focus{background:var(--heat);color:#fff}.btn:active:not(:disabled){transform:translateY(1px);background:var(--heat);color:#fff}
+body.touch .btn{min-height:42px}body.touch .btn.sm{min-height:38px;padding:10px 16px 10px 12px;font-size:10.5px}body.touch .ph .btn.sm{min-width:44px;min-height:40px}body.touch select{min-height:40px;font-size:14px}body.touch input[type=range]{height:36px}
+body.touch .tabs{flex-wrap:wrap;overflow-x:visible}body.touch .tabs .btn{min-height:38px;padding:10px 12px}body.touch .card .btn.sm{margin:2px 0}
 .tabs{display:flex;gap:2px;overflow-x:auto;flex:none;margin-bottom:12px;touch-action:pan-x;scrollbar-width:none;border-bottom:1px solid var(--line)}.tabs::-webkit-scrollbar{display:none}
 .tabs .btn{font-size:10px;padding:10px 14px;flex:none;clip-path:none;background:transparent;color:var(--ash);box-shadow:none}.tabs .btn.sel{color:var(--bone);box-shadow:inset 0 -3px 0 var(--heat)}.tabs .btn.focus{background:var(--grit);color:var(--bone)}
 .card{background:var(--tar);border:1px solid var(--line);padding:11px 12px;margin-bottom:6px;position:relative}
@@ -157,7 +160,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 <div id="touch">
   <div class="stick" id="stickL"><i></i></div><div class="stick" id="stickR"><i></i></div>
   <div class="hintL">MOVE</div><div class="hintR" id="hintR">SKILL STICK</div>
-  <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tMenu">≡</div>
+  <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tLT">POST</div><div class="tbtn" id="tMenu">≡</div>
 </div>
 <div id="whud"><div><span class="chip">VC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
 <div id="emobar"><button data-em="wave" title="1">👋</button><button data-em="dance" title="2">💃</button><button data-em="sit" title="3">🪑</button><button data-em="cheer" title="4">🙌</button><button data-em="celeb" title="5">🏆</button><button data-em="chat" title="T">💬</button></div>
