@@ -40,6 +40,7 @@ function alabAt(t) {
 }
 function alabPose(F, s, dt) {
   const R = F.R, prof = R.prof; let an = s.an, P, y = 0, o = { leg: R.legLen, prof };
+  if (an === 'stagger' || an.startsWith('fall:')) { const n = Math.floor(ALAB.t / 2.7); o.hit = { tw: Math.sin(n * 2.1 + (F === ALAB.b ? 1.6 : 0)), fb: Math.cos(n * 1.3) * 0.8, pw: 1, s1: Math.sin(n * 3.7), s2: Math.cos(n * 2.9) }; }      /* a different hit every loop */
   if (an === 'shoot' || an === 'fake') { const rel = an === 'fake' ? 0.6 : 0.6, u = s.t / rel; o.rel = rel; o.n = 1; P = poseOf(an, s.t, o); if (an === 'shoot') y = u > 0.62 && u < 1.42 ? 0.42 * Math.sin(Math.PI * (u - 0.62) / 0.8) : 0; }
   else if (an === 'run') { const psi = (s.t * 1.45) % 1; P = poseOf('sprint', 0, { rs: prof.run, psi, duty: 0.33, k: 0.6, hipA: 1.1, flight: 0.08, thigh: R.thigh, shin: R.shin }); profilePosture(P, 'run', prof); }
   else if (an === 'walk') { P = poseOf('gait', 0, { psi: (s.t * 0.95) % 1, amp: 1, hipA: 1, swag: 0.35 + prof.swag * 0.8, thigh: R.thigh, shin: R.shin, leg: R.legLen }); }

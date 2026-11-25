@@ -663,6 +663,27 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (anim === 'stagger' && o.hit) {
+    // HIT LAYER: the same stumble or fall, driven by where and how hard he was hit. The chest turns with the push first,
+    // the head lags the other way, the hips follow a beat later, each leg goes its own way, and on the floor he bounces
+    // once and settles instead of freezing. tw: sideways part of the push (+ = toward his left), fb: + pushed from behind,
+    // pw: how hard, s1 / s2: this fall's own randomness (which leg kicks, which knee drops).
+    const H = o.hit, D = o.dur || 1, sm = x => x * x * (3 - 2 * x), ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    const e1 = sm(clamp(t / 0.1, 0, 1)) * (1 - sm(clamp((t - 0.16) / 0.5, 0, 1))), e2 = sm(clamp((t - 0.09) / 0.16, 0, 1)) * (1 - sm(clamp((t - 0.34) / 0.55, 0, 1))), pw = H.pw || 1, tw = H.tw || 0, fb = H.fb || 0;
+    ad('chest', fb * 0.26 * pw * e1, tw * 0.62 * pw * e1, 0); ad('spine', fb * 0.12 * pw * e1, tw * 0.3 * pw * e1, -tw * 0.1 * pw * e1); ad('neck', -fb * 0.34 * pw * e1, -tw * 0.5 * pw * e1 + tw * 0.4 * pw * e2, 0);
+    ad('hips', 0, tw * 0.5 * pw * e2, tw * 0.08 * pw * e2);
+    // arms: the one on the side he was hit from is thrown across the body, the other flies up and out
+    { const near = tw > 0 ? 'R' : 'L', far = tw > 0 ? 'L' : 'R', sn = tw > 0 ? -1 : 1, m = Math.max(Math.abs(tw), Math.abs(fb) * 0.6) * pw; ad('sh' + near, -0.35 * m * e1, 0, -sn * 0.55 * m * e1); ad('el' + near, -0.4 * m * e1); ad('sh' + far, -0.75 * m * e1, 0, sn * 0.45 * m * e1); ad('wr' + far, 0.4 * m * e1); }
+    // legs, each by itself: one catches the weight out to the side, the other comes off the floor
+    { const lead = tw > 0 ? 'L' : 'R', trail = tw > 0 ? 'R' : 'L', sl = lead === 'L' ? 1 : -1, s1 = H.s1 || 0; ad('hp' + lead, -0.12 * pw * e2, 0, sl * 0.3 * Math.abs(tw) * pw * e2); ad('kn' + lead, 0.25 * pw * e2); ad('hp' + trail, (-0.3 - 0.25 * Math.abs(s1)) * pw * e2 * (fb < 0 ? 1 : -0.6), 0, 0); ad('kn' + trail, (0.35 + 0.3 * Math.abs(s1)) * pw * e2); }
+    if (o.fall) {      // on the floor: one bounce, then the loose bits settle (until he starts to get up)
+      const gT = Math.min(0.6, D * 0.4), up = sm(clamp((t - (D - gT)) / gT, 0, 1)), tg = t - 0.32, grd = tg > 0 ? sm(clamp(tg / 0.3, 0, 1)) * (1 - up) : 0, s1 = H.s1 || 0, s2 = H.s2 || 0;
+      if (tg > 0 && tg < 0.6) p.y = (p.y || 0) + 0.07 * pw * Math.abs(Math.sin(tg * 13)) * Math.exp(-tg * 7) * (1 - up);
+      const kd = s2 > 0 ? 'R' : 'L'; ad('kn' + kd, 0.3 * Math.abs(s2) * grd); ad('hp' + kd, 0, 0, (kd === 'R' ? -1 : 1) * 0.22 * Math.abs(s2) * grd); ad('neck', 0, 0.3 * s1 * grd, 0.12 * s2 * grd);
+      ad('shR', 0, 0, -0.14 * s1 * grd); ad('shL', 0, 0, 0.14 * s2 * grd); ad('hips', 0, tw * 0.18 * grd, 0); ad('spine', 0, tw * 0.12 * grd, 0);
+      const br = Math.sin(t * 5.5) * 0.03 * grd; ad('chest', br); ad('spine', br * 0.5);      /* winded */
+    }
+  }
   if (o.dv || o.ov || o.jab) {      // small upper-body and footwork pools so standing players are not all doing the same thing
     const to = (k2, x, y, z, w) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] = lerp(v[0], x, w); v[1] = lerp(v[1], y, w); v[2] = lerp(v[2], z, w); };
     if (o.dv && anim === 'slide') {      // off-ball defensive hands: 1 one high one low, 2 both wide and low, 3 an arm in the passing lane
