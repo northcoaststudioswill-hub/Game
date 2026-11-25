@@ -347,7 +347,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   let style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
   // the basic package is not one dunk: off the run it is one hand, cocked back if he can get up; standing or in traffic, two hands
   if (type === 'dunk' && style === 'twohand' && !opt.style) { const r = Math.random();
-    style = p.putT > 0 ? 'tip' : (thr && thr.s > 0.35) || sp < 2.4 || opt.hopped ? (r < 0.55 ? 'twohand' : 'hangtwo') : dq >= 78 ? (r < 0.28 ? 'cock' : r < 0.52 ? 'hammer' : r < 0.74 ? 'onehand' : r < 0.9 ? 'lean' : 'twohand') : (r < 0.45 ? 'onehand' : r < 0.7 ? 'lean' : 'twohand'); }
+    style = p.putT > 1.1 && d < 2.5 && r < 0.75 ? 'tip' : (thr && thr.s > 0.35) || sp < 2.4 || opt.hopped ? (r < 0.55 ? 'twohand' : 'hangtwo') : dq >= 78 ? (r < 0.28 ? 'cock' : r < 0.52 ? 'hammer' : r < 0.74 ? 'onehand' : r < 0.9 ? 'lean' : 'twohand') : (r < 0.45 ? 'onehand' : r < 0.7 ? 'lean' : 'twohand'); }
   p.st = 'finish'; p.t = 0;
   const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse' && style !== 'contact'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R', cont: cont ? 1 : 0, ox: 0, oz: 0, hit: null, contact: 0, blocked: false };
   if (kind === 'hang') f.dur += 0.16; if (kind === 'switch') f.dur += 0.06; if (style === 'squat') f.dur += 0.04;
@@ -508,9 +508,9 @@ function stealChance(p, h) {
   const reach = Math.hypot(B.pos.x - rx, B.pos.z - rz) + Math.max(0, B.pos.y - 1.2) * 0.6, dB = Math.hypot(B.pos.x - p.x, B.pos.z - p.z), dH = dist(h, p);
   let ch = 0.145 + (att(p, 'steal') - att(h, 'handle')) * 0.0045 + 0.03 * bt(p, 'repo') - 0.04 * bt(h, 'nda') + (h.st === 'move' ? -0.04 : 0) + (h.sprinting ? 0.05 : 0) + (h.st === 'shoot' && h.t < h.shot.rel * 0.4 ? 0.06 : 0);
   ch *= reach < 0.35 ? 1.8 : reach < 0.6 ? 1.25 : reach < 0.9 ? 0.8 : 0.35;
-  if (dB > dH + 0.1) ch *= 0.5;                                                   /* the ball is on his far side: protected */
+  if (dB > dH + 0.1) ch *= 0.65;                                                   /* the ball is on his far side: protected */
   if (h.drib && (h.drib.ph === 'down' || h.drib.ph === 'up') && B.pos.y < 0.7 && reach < 0.7) ch *= 1.2;
-  if (h.protect) ch *= 0.75;
+  if (h.protect) ch *= 0.85;
   if (h.reachSaw && h.reachBy === p && MT.time - h.reachAt < 0.9) ch *= 0.74;      /* he saw it and pulled the ball across */
   if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
   ch *= (1 + px(p, 'steal')) * (1 - px(h, 'secure')) * (MT.stops && MT.stops[p.team] >= 3 ? 1.1 : 1);
@@ -853,7 +853,7 @@ function aiThink(p, dt) {
       if ((h.st === 'shoot' && !h.shot.released && h.t > h.shot.rel * (0.75 - L * 0.3) && dh < 1.7) || (h.st === 'finish' && !h.finish.done && h.t > h.finish.dur * 0.3 && dh < 2.0)) {
         if (a.react <= 0) { a.react = 0.8; if (Math.random() < 0.3 + L * 0.5) startJump(p); }
       }
-      if (onBall && dh < 1.5 && p.cool <= 0 && h.st === 'free' && Math.random() < (0.25 + L * 0.35) * dt * (0.5 + nAtt(p, 'steal')) * (1 + px(p, 'steal') * 6)) startSteal(p);      /* thieves by nature reach more */
+      if (onBall && dh < 1.5 && p.cool <= 0 && h.st === 'free' && Math.random() < (0.32 + L * 0.42) * dt * (0.5 + nAtt(p, 'steal')) * (1 + px(p, 'steal') * 6)) startSteal(p);      /* thieves by nature reach more */
     }
     a.react -= dt;
   }
