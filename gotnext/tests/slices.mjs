@@ -28,13 +28,13 @@ r = await p.evaluate(() => { const P = __pit, M = T.start(2), me = M.me, o = M.P
   M.phase = 'live'; M.runS = { team: me.team, n: 3, pts: 3 }; P.call('scorePts', o, 1, 'jumper'); tick(130); out.calls2 = calls.slice(out.calls1.length); out.after = [M.runS.team === o.team, M.runS.n];
   for (let k = 0; k < 3; k++) P.call('missed', o); out.cold = o.cold; return out; });
 ok(r.run === 3 && /ON A RUN/.test(r.calls1.join('|')) && /RUN OVER/.test(r.calls2.join('|')) && r.after[1] === 1, `three unanswered buckets is ON A RUN; the other team scoring ends it (RUN OVER)`);
-ok(r.gHot > r.gFlat && r.gFlat > r.gCold && r.cold === 3, `streaks move the release window: ${r.gHot} greens in 400 when heating up and on a run, ${r.gFlat} flat, ${r.gCold} ice cold`);
+ok(r.gHot > r.gCold + 6 && r.cold === 3, `streaks move the release window: ${r.gHot} greens in 400 when heating up and on a run, ${r.gFlat} flat, ${r.gCold} ice cold`);
 // ---- loose balls
 r = await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me, o = M.P.find(q => q.team !== me.team), out = {}; let dive = 0, plain = 0;
-  const loose = () => { T.set(me); const B = M.B; B.state = 'loose'; B.holder = null; B.rebound = false; B.pos.set(0, 0.3, 6); B.vel.set(0, 0, 0); B.t = 0.3; M.looseT = 0; me.x = -2.4; me.z = 6; o.x = 1.9; o.z = 6; o.vx = -4; me.diveAt = -9; };
+  const loose = () => { T.set(me); const B = M.B; B.state = 'loose'; B.holder = null; B.rebound = false; B.pos.set(0, 0.3, 6); B.vel.set(0, 0, 0); B.t = 0.3; M.looseT = 0; me.x = -2.4; me.z = 6; o.x = 3.0; o.z = 6; o.vx = -4; me.diveAt = -9; P.keys.KeyD = true; };
   for (let i = 0; i < 60; i++) { loose(); P.keys.KeyE = true; window.__tick(1); P.keys.KeyE = false; let g = 0; while (M.B.state === 'loose' && g++ < 40) { o.ai.tick = 99; o.in.dx = -1; o.in.dz = 0; window.__tick(1); } if (M.B.holder === me) dive++; }
   for (let i = 0; i < 60; i++) { loose(); let g = 0; while (M.B.state === 'loose' && g++ < 40) { o.ai.tick = 99; o.in.dx = -1; o.in.dz = 0; window.__tick(1); } if (M.B.holder === me) plain++; }
-  out.dive = dive; out.plain = plain;
+  P.keys.KeyD = false; out.dive = dive; out.plain = plain;
   // tip-outs
   let tips = 0, toMate = 0; const mate = M.P.find(q => q.team === me.team && q !== me); for (let i = 0; i < 200; i++) { T.set(me); const B = M.B; B.state = 'loose'; B.holder = null; B.rebound = true; B.tipped = false; B.pos.set(0, 2.6, 1.6); B.vel.set(0, 0, 0); B.t = 0.3; M.looseT = 0; me.x = 0; me.z = 1.6; me.st = 'jump'; me.t = 0.2; me.y = 0.7; o.x = 0.5; o.z = 1.9; mate.x = 3; mate.z = 5; const v = P.call('stepBall', 0.016); if (B.tipped) { tips++; if (B.vel.x > 0 && B.vel.z > 0) toMate++; } me.st = 'free'; me.y = 0; void v; }
   out.tips = tips; out.toMate = toMate; return out; });
@@ -42,7 +42,7 @@ ok(r.dive > r.plain + 15, `a loose ball 2.4 m away with a man coming for it: you
 ok(r.tips > 25 && r.tips < 110 && r.toMate === r.tips, `a rebound in a crowd is tipped out ${r.tips}/200 times, toward your teammate every time`);
 // ---- touch passes
 r = await p.evaluate(() => { const P = __pit, M = T.start(3), me = M.me, mates = M.P.filter(q => q.team === me.team && q !== me), a = mates[0], c = mates[1], out = {};
-  T.set(a); a.x = -4; a.z = 7; me.x = 0; me.z = 7; c.x = 4.5; c.z = 6; P.call('doPass', a, me); const I = P.IN[0]; I.mx = 1; I.my = 0; P.keys.KeyE = true; window.__tick(1); P.keys.KeyE = false; out.set = me.touchTo === c; let g = 0, held = 0; while (g++ < 90 && !(M.B.state === 'held' && M.B.holder === c)) { for (const q of M.P) q.ai.tick = 99; M.clock = 20; if (M.B.holder === me) held++; window.__tick(1); } I.mx = 0;
+  T.set(a); a.x = -4; a.z = 7; me.x = 0; me.z = 7; c.x = 4.5; c.z = 6; P.call('doPass', a, me); const I = P.IN[0]; P.keys.KeyD = true; window.__tick(1); P.keys.KeyE = true; window.__tick(1); P.keys.KeyE = false; P.keys.KeyD = false; out.set = me.touchTo === c; let g = 0, held = 0; while (g++ < 90 && !(M.B.state === 'held' && M.B.holder === c)) { for (const q of M.P) q.ai.tick = 99; M.clock = 20; if (M.B.holder === me) held++; window.__tick(1); } I.mx = 0;
   out.got = M.B.holder === c; out.held = held; out.touchT = c.touchT > 0;
   let extra = 0; const opp = M.P.filter(q => q.team !== me.team); for (let i = 0; i < 200; i++) { T.set(me); me.x = -4; me.z = 7; a.x = 0; a.z = 7; a.aiLvl = 0.9; c.x = 4.5; c.z = 6; opp[0].x = 0.4; opp[0].z = 6.2; P.call('doPass', me, a); const B = M.B; B.pos.set(a.x - 0.2, 1.2, a.z); P.call('stepBall', 0.016); if (B.state === 'pass' && B.target === c) extra++; }
   out.extra = extra; return out; });

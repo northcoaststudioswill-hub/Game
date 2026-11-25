@@ -352,7 +352,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   if (kind === 'quick') f.dur = Math.max(0.4, f.dur - 0.1); if (kind === 'spin') { f.dur += 0.1; f.spin = 1; } if (kind === 'under') f.dur += 0.12; if (kind === 'over') f.dur += 0.04;
   if (p.user && !read && (kind === 'under' || kind === 'over' || kind === 'spin' || kind === 'quick')) floatTxt(p, { under: 'UP AND UNDER', over: 'OVER THE TOP', spin: '360 LAYUP', quick: 'WRONG FOOT' }[kind], '#7de3ff');
   // the off hand: on the left side of the rim (as you face it) a one-hander goes up with the left, away from the help
-  if (type === 'layup' && (kind === 'lay' || kind === 'finger' || kind === 'scoop' || kind === 'quick') && !euro && fq >= 62 && p.x < -0.7) { f.lh = true; f.bh = 'L'; }
+  if (type === 'layup' && (kind === 'lay' || kind === 'finger' || kind === 'scoop' || kind === 'quick' || kind === 'over') && !euro && fq >= 62 && p.x < -0.7) { f.lh = true; f.bh = 'L'; }
   if (p.user && read && read !== 'euro' && read !== 'reverse') floatTxt(p, { spin: 'SPIN LAYUP', hang: 'HANG', switch: 'SWITCH HANDS', power: 'POWER', scoop: 'SCOOP', bail: 'PULLED OUT' }[read] || '', '#7de3ff');
   if (rev) {
     // under the rim and out the other side, back to the rim: keep the line you drove on and finish past the hoop
@@ -1088,7 +1088,7 @@ function stepBall(dt) {
       // straight on: the touch pass you asked for, or an AI with a man flying at him and a teammate wide open
       let nx = to.touchTo; to.touchTo = null;
       if (!nx && !to.user && to.st === 'free' && !wasTouch && !M_.needClear && nearestOpp(to)[1] < 1.6) { const c = M_.P.filter(q => q.team === to.team && q !== to && q !== from && q.st === 'free' && nearestOpp(q)[1] > 2.3 && passLane(to, q)).sort((x, y) => nearestOpp(y)[1] - nearestOpp(x)[1])[0]; if (c && Math.random() < 0.12 + to.aiLvl * 0.4) { nx = c; floatTxt(to, 'EXTRA PASS', '#7de3ff'); } }
-      if (nx && nx.team === to.team && nx.st === 'free' && to.st === 'free' && M_.phase === 'live') { doPass(to, nx); if (M_.B.state === 'pass') { M_.B.touch = true; M_.B.speed *= 1.12; to.stats.touch = (to.stats.touch || 0) + 1; } } }
+      if (nx && nx.team === to.team && (nx.st === 'free' || nx.st === 'pass') && to.st === 'free' && M_.phase === 'live') { doPass(to, nx); if (M_.B.state === 'pass') { M_.B.touch = true; M_.B.speed *= 1.12; to.stats.touch = (to.stats.touch || 0) + 1; } } }
     else {
       B.pos.addScaledVector(_v, stepL / l);
       // the flight's height follows the kind of pass: chest (flat), bounce (off the floor at 60%), overhead and lob (arcs)
