@@ -134,7 +134,7 @@ body[data-state=world]:not(.busy):not(.building) #emobar{display:flex}
 #rackHud{position:absolute;right:calc(14px + var(--sar));top:calc(60px + var(--sat));font:900 30px var(--d);font-stretch:125%;text-align:right;text-shadow:0 2px 0 var(--ink);display:none}
 #clear{position:absolute;left:50%;transform:translateX(-50%);top:calc(74px + var(--sat));font:700 10px var(--m);background:var(--warn);color:var(--ink);padding:3px 10px;letter-spacing:.14em;display:none;white-space:nowrap}
 /* ---- panels ---- */
-#panel{position:fixed;inset:0;z-index:35;display:none;background:rgba(8,8,10,.9);overflow:hidden}
+#panel{position:fixed;inset:0;z-index:35;display:none;background:rgba(8,8,10,.94);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);overflow:hidden}
 #panel.side{background:linear-gradient(90deg,rgba(8,8,10,0) 0,rgba(8,8,10,0) 34%,rgba(8,8,10,.96) 44%)}
 #panel.clear{background:linear-gradient(180deg,rgba(8,8,10,.1),rgba(8,8,10,.75))}
 .pin{position:absolute;inset:0;display:flex;flex-direction:column;padding:calc(14px + var(--sat)) max(16px,var(--sar)) calc(12px + var(--sab)) max(16px,var(--sal));max-width:1000px;margin:0 auto}
@@ -151,6 +151,7 @@ body[data-state=world]:not(.busy):not(.building) #emobar{display:flex}
 body.touch .btn{min-height:42px}body.touch .btn.sm{min-height:38px;padding:10px 16px 10px 12px;font-size:10.5px}body.touch .ph .btn.sm{min-width:44px;min-height:40px}body.touch select{min-height:40px;font-size:14px}body.touch input[type=range]{height:36px}
 body.touch .tabs{flex-wrap:wrap;overflow-x:visible}body.touch .tabs .btn{min-height:38px;padding:10px 12px}body.touch .card .btn.sm{margin:2px 0}
 .tabs{display:flex;gap:2px;flex-wrap:wrap;flex:none;margin-bottom:12px;touch-action:pan-x;scrollbar-width:none;border-bottom:1px solid var(--line)}.tabs::-webkit-scrollbar{display:none}
+@media (max-width:1180px){body:not(.touch) .tabs .btn{padding:10px 8px}}
 .tabs .btn{font-size:10px;padding:10px 12px;flex:none;clip-path:none;background:transparent;color:var(--ash);box-shadow:none}.tabs .btn.sel{color:var(--bone);box-shadow:inset 0 -3px 0 var(--heat)}.tabs .btn.focus{background:var(--grit);color:var(--bone)}
 .card{background:var(--tar);border:1px solid var(--line);padding:11px 12px;margin-bottom:6px;position:relative}
 .card h3{font-size:13px;line-height:1.15}.card p{margin:4px 0 0;color:var(--ash);font-size:12.5px;line-height:1.35}
@@ -1803,7 +1804,9 @@ function applyPose(R, p, dt) {
   const k = 1 - Math.exp(-(p.rate || 16) * dt), J = R.joints, C = R.cur;
   for (const n in J) {
     const tg = p[n] || POSE.zero, c = C[n];
-    c[0] += (tg[0] - c[0]) * k; c[1] += (tg[1] - c[1]) * k; c[2] += (tg[2] - c[2]) * k;
+    // ease toward the pose, but no joint turns faster than a body can: a big change (an arm coming down from over the rim) used to cover half of it in one frame
+    const mx = (n === 'wrR' || n === 'wrL' ? 30 : n === 'hips' || n === 'spine' || n === 'chest' ? 14 : 20) * dt * (p.rate > 60 ? 2 : 1);
+    for (let a = 0; a < 3; a++) { let d = (tg[a] - c[a]) * k; if (d > mx) d = mx; else if (d < -mx) d = -mx; c[a] += d; }
     J[n].rotation.set(c[0] + (R.rest && R.rest[n] || 0), c[1], c[2]);
   }
   R.yOff += ((p.y || 0) - R.yOff) * k; J.hips.position.y = R.legLen + R.yOff;
@@ -2031,6 +2034,14 @@ function legIK(R, dt) {
     const toe = f.sw ? 0.35 * Math.sin(Math.PI * Math.min(1, f.t / f.T)) : 0;              // toe-off during the swing, flat foot when planted
     an.x = lerp(an.x, -(hips.rotation.x + hx + k) + toe * (1 - 0.5 * (G.sw || 0)), w); an.y = lerp(an.y, (s === 'R' ? -1 : 1) * 0.16 * (G.sw || 0), w);
   }
+}
+// the legs are written last (pose, then foot planting): no hip, knee or ankle may turn faster than a leg can between two frames.
+// A foot plant fading in or out at the start of a dribble move used to fold a knee 50 degrees in one frame
+function legCap(R, dt) {
+  const J = R.joints, P = R.legOut || (R.legOut = {}), mx = 24 * dt, rp = R.root.position, lp = R.legPos || (R.legPos = rp.clone()); if (Math.hypot(rp.x - lp.x, rp.z - lp.z) > 0.6) R.legSkip = true; lp.copy(rp);      /* placed somewhere new (a check, a replay): no catching up */
+  for (const n of ['hpR', 'hpL', 'knR', 'knL', 'anR', 'anL']) { const r = J[n].rotation, q = P[n]; if (!q || R.legSkip) { P[n] = [r.x, r.y, r.z]; continue; }
+    r.x = q[0] + clamp(r.x - q[0], -mx, mx); r.y = q[1] + clamp(r.y - q[1], -mx, mx); r.z = q[2] + clamp(r.z - q[2], -mx, mx); q[0] = r.x; q[1] = r.y; q[2] = r.z; }
+  R.legSkip = false;
 }
 function disposeScene(sc) {
   if (!sc) return;
@@ -3567,10 +3578,10 @@ function dribMove(p, mv) {
   D.ph = 'down'; D.t = 0; D.T = Math.max(0.09, mv.dur * 0.32); D.P0 = MT.B.pos.clone(); D.kind = change ? k : (k === 'stepback' || k === 'moonwalk' || k === 'snatch' ? 'retreat' : k === 'hesi' ? 'hesi' : '');
   const pk = p.mv.slot === 'side' ? 0.3 : 0.8, mvx = p.mv.dx * p.mv.v * pk, mvz = p.mv.dz * p.mv.v * pk;      /* side moves set up before they explode: the body has not gone far when the ball lands */ D.F = dribFloor(p, D, D.kind, D.T, mvx, mvz); D.upT = Math.max(0.12, mv.dur * 0.42);
 }
-function ballFollow(B, target, dt, exact) {
+function ballFollow(B, target, dt, exact, vmax) {
   // never teleport: if the ball is far from where it should be (a state change), it closes the gap fast instead of jumping
   const d = B.pos.distanceTo(target);
-  if (exact && d < 0.2) B.pos.copy(target); else if (d > 0) { const m = Math.min(d, Math.max(d * (1 - Math.exp(-22 * dt)), 0), 11 * dt); B.pos.addScaledVector(_bq.copy(target).sub(B.pos), m / d); }
+  if (exact && d < 0.2) B.pos.copy(target); else if (d > 0) { const m = Math.min(d, Math.max(d * (1 - Math.exp(-22 * dt)), 0), (vmax || 11) * dt); B.pos.addScaledVector(_bq.copy(target).sub(B.pos), m / d); }
 }
 function ballHeld(p, dt) {
   const M_ = MT, B = M_.B; let D = p.drib || (p.drib = newDrib(p, B.pos)); if (p.reset) { p.reset = false; D = resetDrib(p); } D.t += dt;
@@ -3580,8 +3591,11 @@ function ballHeld(p, dt) {
     // gather: ball between the hands, then up into the shooting hand
     const bh = (st === 'finish' && p.finish.bh === 'L') || ((st === 'shoot' || st === 'fake') && p.rig.prof && p.rig.prof.hand === 'L') ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
     const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
-    _bp.lerp(_bq, 0.5 * (1 - lift)); _bp.y += 0.06 + 0.05 * lift;
-    ballFollow(B, _bp, dt, true); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
+    // between the hands only while the hands are together; with them apart (one arm already rising) it rides in the hand that has it
+    const sep = _bp.distanceTo(_bq); _bp.lerp(_bq, 0.5 * (1 - lift) * clamp((0.42 - sep) / 0.2, 0, 1)); _bp.y += 0.06 + 0.05 * lift;
+    // a dunk carries it into the rim: over the last of the rise the ball is pulled to the cylinder with the hand, so it does not jump there when it counts
+    if (st === 'finish' && p.finish.type === 'dunk' && !p.finish.done) { const u = p.t / p.finish.dur, w = clamp((u - 0.5) / 0.25, 0, 1); if (w > 0) { const ws = w * w * (3 - 2 * w); _bq.set(0, HOOP_Y + 0.12, 0.05); _bp.lerp(_bq, ws * 0.85); } }
+    ballFollow(B, _bp, dt, true, st === 'finish' || st === 'hop' ? 20 : 11); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
   }
   if (D.ph === 'gather') { D.ph = 'up'; D.t = 0; D.T = 0.14; D.F = B.pos.clone(); D.hand = p.hand; }
   const v = Math.hypot(p.avx || 0, p.avz || 0), hesi = p.st === 'move' && p.mv.mv.id === 'hesi';
@@ -3705,7 +3719,7 @@ function animPlayer(p, dt) {
   if ((p.strideW || 0) > 0.3) gaitLock(R, p.psi, R.root.rotation.y, p.strideW, duty); else R.lock = null;
   const air = p.y > 0.01 || p.st === 'finish' || (p.st === 'hop' && p.t < (p.hop ? p.hop.dur : HOP_T) * 0.7) || (p.st === 'jump' && p.t > 0.04);
   gaitStep(R, { x: p.x, z: p.z, yaw: R.root.rotation.y, vx: p.avx, vz: p.avz, grounded: !air, quick: p.st === 'move' ? 1 : 0, wide: an === 'slide' ? 1 : p.protect ? 0.6 : an === 'idle' || an === 'catch' ? 0.25 : 0.05, want: (p.st === 'stagger' ? (p.stg && p.stg.fall ? 0 : 0.4) : 1) * (1 - (p.strideW || 0)), dt });
-  legIK(R, dt);
+  legIK(R, dt); legCap(R, dt);
   R.shadow.position.y = 0.015 - p.y; R.shadow.scale.setScalar(clamp(1 - p.y * 0.25, 0.4, 1)); p.ring.position.y = 0.02 - p.y;
   if (p.ptr) { const guest = M_.net === 'guest', near = () => { let best = null, bd = 1e9; for (const q of M_.P) if (q.team !== p.team) { const d = dist(q, p); if (d < bd) { bd = d; best = q; } } return best; };      /* a guest doesn't run the defense brain: point at the closest man */
     const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.man || p.guard || (guest ? near() : null));      /* your matchup from the opening check, not whoever you happen to be near */ p.ptr.visible = !!tg && dist(tg, p) > 0.5;

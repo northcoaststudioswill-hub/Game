@@ -12,12 +12,12 @@ const tot = { frames: 0, over: 0, byPair: {}, simGap: [], worst: [] };
 for (const mode of PLAN) {
   const r = await p.evaluate((mode) => { const P = __pit; P.uiClose(); const m = P.MODES.find(x => x.id === mode); P.launchGame(m, P.TIERS_COURT[1], { mates: Array(m.size - 1).fill(-1), rival: -1, p2: 'off' }); window.__tick(30); const M = P.MT; M.me.user = false; M.locals = []; for (const q of M.P) q.aiLvl = 0.75;
     const V = new THREE.Vector3(), W = new THREE.Vector3(), o = { frames: 0, over: 0, byPair: {}, simGap: [], worst: [] }; const lbl = q => q.screen ? 'screen' : q.post ? 'post' : q.box ? 'box' : q.st === 'celeb' ? 'celeb' : q.st;
-    for (let f = 0; f < 60 * 240 && P.MT && P.MT.phase !== 'over'; f++) { window.__tick(1); const MM = P.MT; if (!MM) break; o.frames++;
+    for (let f = 0; f < 60 * 240 && P.MT && P.MT.phase !== 'over'; f++) { window.__tick(1); const MM = P.MT; if (!MM) break; o.frames++; P.ev('scene.updateMatrixWorld()');
       for (let i = 0; i < MM.P.length; i++) for (let j = i + 1; j < MM.P.length; j++) { const a = MM.P[i], c = MM.P[j]; if (a.y > 0.3 || c.y > 0.3) continue;
-        a.rig.joints.chest.getWorldPosition(V); c.rig.joints.chest.getWorldPosition(W); const dc = Math.hypot(V.x - W.x, V.z - W.z), dy = Math.abs(V.y - W.y); if (dc > 0.3 || dy > 0.5) continue;
-        o.over++; const k = [lbl(a), lbl(c)].sort().join('+') + (a.team === c.team ? ' (mates)' : '') + ' ' + MM.phase; o.byPair[k] = (o.byPair[k] || 0) + 1; const ds = Math.hypot(a.x - c.x, a.z - c.z); o.simGap.push(+ds.toFixed(2)); if (o.worst.length < 12 && dc < 0.18) o.worst.push(k + ' chest ' + dc.toFixed(2) + ' m, standing ' + ds.toFixed(2) + ' m'); } }
+        a.rig.joints.chest.getWorldPosition(V); c.rig.joints.chest.getWorldPosition(W); const dc = Math.hypot(V.x - W.x, V.z - W.z), dy = Math.abs(V.y - W.y); if (dc > 0.42 || dy > 0.5) continue;
+        o.over++; const k = [lbl(a), lbl(c)].sort().join('+') + (a.team === c.team ? ' (mates)' : '') + ' ' + MM.phase; o.byPair[k] = (o.byPair[k] || 0) + 1; const ds = Math.hypot(a.x - c.x, a.z - c.z); o.simGap.push(+ds.toFixed(2)); if (o.worst.length < 12 && dc < 0.34) o.worst.push(k + ' chest ' + dc.toFixed(2) + ' m, standing ' + ds.toFixed(2) + ' m'); } }
     P.call('quitMatch'); window.__tick(5); P.uiClose(); return o; }, mode);
-  tot.frames += r.frames; tot.over += r.over; for (const k in r.byPair) tot.byPair[k] = (tot.byPair[k] || 0) + r.byPair[k]; tot.simGap.push(...r.simGap); tot.worst.push(...r.worst); console.log(mode + ': ' + r.frames + ' frames, ' + r.over + ' pair-frames with chests inside 30 cm');
+  tot.frames += r.frames; tot.over += r.over; for (const k in r.byPair) tot.byPair[k] = (tot.byPair[k] || 0) + r.byPair[k]; tot.simGap.push(...r.simGap); tot.worst.push(...r.worst); console.log(mode + ': ' + r.frames + ' frames, ' + r.over + ' pair-frames with chests inside 42 cm');
 }
 const g = tot.simGap.sort((a, c) => a - c), q = f => g.length ? g[Math.floor(g.length * f)] : '-';
 console.log('\nOVERLAPS ' + tot.over + ' pair-frames in ' + tot.frames + ' frames (' + (tot.over / Math.max(1, tot.frames) * 60).toFixed(1) + ' per second)');

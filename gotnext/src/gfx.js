@@ -756,7 +756,9 @@ function applyPose(R, p, dt) {
   const k = 1 - Math.exp(-(p.rate || 16) * dt), J = R.joints, C = R.cur;
   for (const n in J) {
     const tg = p[n] || POSE.zero, c = C[n];
-    c[0] += (tg[0] - c[0]) * k; c[1] += (tg[1] - c[1]) * k; c[2] += (tg[2] - c[2]) * k;
+    // ease toward the pose, but no joint turns faster than a body can: a big change (an arm coming down from over the rim) used to cover half of it in one frame
+    const mx = (n === 'wrR' || n === 'wrL' ? 30 : n === 'hips' || n === 'spine' || n === 'chest' ? 14 : 20) * dt * (p.rate > 60 ? 2 : 1);
+    for (let a = 0; a < 3; a++) { let d = (tg[a] - c[a]) * k; if (d > mx) d = mx; else if (d < -mx) d = -mx; c[a] += d; }
     J[n].rotation.set(c[0] + (R.rest && R.rest[n] || 0), c[1], c[2]);
   }
   R.yOff += ((p.y || 0) - R.yOff) * k; J.hips.position.y = R.legLen + R.yOff;
@@ -984,6 +986,14 @@ function legIK(R, dt) {
     const toe = f.sw ? 0.35 * Math.sin(Math.PI * Math.min(1, f.t / f.T)) : 0;              // toe-off during the swing, flat foot when planted
     an.x = lerp(an.x, -(hips.rotation.x + hx + k) + toe * (1 - 0.5 * (G.sw || 0)), w); an.y = lerp(an.y, (s === 'R' ? -1 : 1) * 0.16 * (G.sw || 0), w);
   }
+}
+// the legs are written last (pose, then foot planting): no hip, knee or ankle may turn faster than a leg can between two frames.
+// A foot plant fading in or out at the start of a dribble move used to fold a knee 50 degrees in one frame
+function legCap(R, dt) {
+  const J = R.joints, P = R.legOut || (R.legOut = {}), mx = 24 * dt, rp = R.root.position, lp = R.legPos || (R.legPos = rp.clone()); if (Math.hypot(rp.x - lp.x, rp.z - lp.z) > 0.6) R.legSkip = true; lp.copy(rp);      /* placed somewhere new (a check, a replay): no catching up */
+  for (const n of ['hpR', 'hpL', 'knR', 'knL', 'anR', 'anL']) { const r = J[n].rotation, q = P[n]; if (!q || R.legSkip) { P[n] = [r.x, r.y, r.z]; continue; }
+    r.x = q[0] + clamp(r.x - q[0], -mx, mx); r.y = q[1] + clamp(r.y - q[1], -mx, mx); r.z = q[2] + clamp(r.z - q[2], -mx, mx); q[0] = r.x; q[1] = r.y; q[2] = r.z; }
+  R.legSkip = false;
 }
 function disposeScene(sc) {
   if (!sc) return;

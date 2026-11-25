@@ -1258,10 +1258,10 @@ function dribMove(p, mv) {
   D.ph = 'down'; D.t = 0; D.T = Math.max(0.09, mv.dur * 0.32); D.P0 = MT.B.pos.clone(); D.kind = change ? k : (k === 'stepback' || k === 'moonwalk' || k === 'snatch' ? 'retreat' : k === 'hesi' ? 'hesi' : '');
   const pk = p.mv.slot === 'side' ? 0.3 : 0.8, mvx = p.mv.dx * p.mv.v * pk, mvz = p.mv.dz * p.mv.v * pk;      /* side moves set up before they explode: the body has not gone far when the ball lands */ D.F = dribFloor(p, D, D.kind, D.T, mvx, mvz); D.upT = Math.max(0.12, mv.dur * 0.42);
 }
-function ballFollow(B, target, dt, exact) {
+function ballFollow(B, target, dt, exact, vmax) {
   // never teleport: if the ball is far from where it should be (a state change), it closes the gap fast instead of jumping
   const d = B.pos.distanceTo(target);
-  if (exact && d < 0.2) B.pos.copy(target); else if (d > 0) { const m = Math.min(d, Math.max(d * (1 - Math.exp(-22 * dt)), 0), 11 * dt); B.pos.addScaledVector(_bq.copy(target).sub(B.pos), m / d); }
+  if (exact && d < 0.2) B.pos.copy(target); else if (d > 0) { const m = Math.min(d, Math.max(d * (1 - Math.exp(-22 * dt)), 0), (vmax || 11) * dt); B.pos.addScaledVector(_bq.copy(target).sub(B.pos), m / d); }
 }
 function ballHeld(p, dt) {
   const M_ = MT, B = M_.B; let D = p.drib || (p.drib = newDrib(p, B.pos)); if (p.reset) { p.reset = false; D = resetDrib(p); } D.t += dt;
@@ -1271,8 +1271,11 @@ function ballHeld(p, dt) {
     // gather: ball between the hands, then up into the shooting hand
     const bh = (st === 'finish' && p.finish.bh === 'L') || ((st === 'shoot' || st === 'fake') && p.rig.prof && p.rig.prof.hand === 'L') ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
     const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
-    _bp.lerp(_bq, 0.5 * (1 - lift)); _bp.y += 0.06 + 0.05 * lift;
-    ballFollow(B, _bp, dt, true); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
+    // between the hands only while the hands are together; with them apart (one arm already rising) it rides in the hand that has it
+    const sep = _bp.distanceTo(_bq); _bp.lerp(_bq, 0.5 * (1 - lift) * clamp((0.42 - sep) / 0.2, 0, 1)); _bp.y += 0.06 + 0.05 * lift;
+    // a dunk carries it into the rim: over the last of the rise the ball is pulled to the cylinder with the hand, so it does not jump there when it counts
+    if (st === 'finish' && p.finish.type === 'dunk' && !p.finish.done) { const u = p.t / p.finish.dur, w = clamp((u - 0.5) / 0.25, 0, 1); if (w > 0) { const ws = w * w * (3 - 2 * w); _bq.set(0, HOOP_Y + 0.12, 0.05); _bp.lerp(_bq, ws * 0.85); } }
+    ballFollow(B, _bp, dt, true, st === 'finish' || st === 'hop' ? 20 : 11); D.ph = 'gather'; p.dribH = 0.6; B.spin += dt * 2; return;
   }
   if (D.ph === 'gather') { D.ph = 'up'; D.t = 0; D.T = 0.14; D.F = B.pos.clone(); D.hand = p.hand; }
   const v = Math.hypot(p.avx || 0, p.avz || 0), hesi = p.st === 'move' && p.mv.mv.id === 'hesi';
@@ -1396,7 +1399,7 @@ function animPlayer(p, dt) {
   if ((p.strideW || 0) > 0.3) gaitLock(R, p.psi, R.root.rotation.y, p.strideW, duty); else R.lock = null;
   const air = p.y > 0.01 || p.st === 'finish' || (p.st === 'hop' && p.t < (p.hop ? p.hop.dur : HOP_T) * 0.7) || (p.st === 'jump' && p.t > 0.04);
   gaitStep(R, { x: p.x, z: p.z, yaw: R.root.rotation.y, vx: p.avx, vz: p.avz, grounded: !air, quick: p.st === 'move' ? 1 : 0, wide: an === 'slide' ? 1 : p.protect ? 0.6 : an === 'idle' || an === 'catch' ? 0.25 : 0.05, want: (p.st === 'stagger' ? (p.stg && p.stg.fall ? 0 : 0.4) : 1) * (1 - (p.strideW || 0)), dt });
-  legIK(R, dt);
+  legIK(R, dt); legCap(R, dt);
   R.shadow.position.y = 0.015 - p.y; R.shadow.scale.setScalar(clamp(1 - p.y * 0.25, 0.4, 1)); p.ring.position.y = 0.02 - p.y;
   if (p.ptr) { const guest = M_.net === 'guest', near = () => { let best = null, bd = 1e9; for (const q of M_.P) if (q.team !== p.team) { const d = dist(q, p); if (d < bd) { bd = d; best = q; } } return best; };      /* a guest doesn't run the defense brain: point at the closest man */
     const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.man || p.guard || (guest ? near() : null));      /* your matchup from the opening check, not whoever you happen to be near */ p.ptr.visible = !!tg && dist(tg, p) > 0.5;
