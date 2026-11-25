@@ -1426,7 +1426,16 @@ function poseOf(anim, t, o) {
   if (o.screen) {      // a set screen: feet wide, knees bent, arms crossed tight on the chest
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     ad('knR', 0.3); ad('knL', 0.3); ad('hpR', -0.2, 0, -0.16); ad('hpL', -0.2, 0, 0.16); ad('spine', 0.1); p.y = (p.y || 0) - 0.07;
-    p.shR = [-0.75, 0, 0.55]; p.elR = [-1.75, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [-0.75, 0, -0.55]; p.elL = [-1.75, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
+    p.shR = [-0.75, 0, 0.55]; p.elR = [-1.75, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [-0.75, 0, -0.55]; p.elL = [-1.75, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 20);
+    if (o.screen === 2) { ad('knR', 0.22); ad('knL', 0.22); ad('hpR', -0.16); ad('hpL', -0.16); ad('spine', 0.2, 0.35, 0); ad('neck', -0.15, -0.3, 0); p.y -= 0.07; p.shR = [-1.05, 0, 0.35]; p.elR = [-1.9, 0, 0]; p.shL = [-0.35, 0, -0.3]; p.elL = [-1.5, 0, 0]; }      /* hard: lower, a shoulder turned into him, forearm braced */
+    else if (o.screen === 3) { ad('knR', -0.18); ad('knL', -0.18); ad('spine', -0.08, -0.3, 0); p.y += 0.05; p.shR = [-0.25, 0, 0.3]; p.elR = [-1.2, 0, 0]; p.shL = [-1.6, 0, -0.5]; p.elL = [-0.7, 0, 0]; }      /* soft: tall, half open to the rim, a hand already up for the slip */
+  }
+  if (o.scrR) {      // the defender on a screen: fighting over, sliding under, or stuck on it
+    const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    if (o.scrR === 'fight') { ad('spine', 0.3, 0.5, 0); ad('chest', 0.1, 0.25, 0); ad('neck', -0.2, -0.45, 0); ad('knR', 0.2); ad('knL', 0.2); p.shR = [-2.2, 0, 0.3]; p.elR = [-0.9, 0, 0]; p.wrR = [0.5, 0, 0]; p.shL = [0.5, 0, 0.5]; p.elL = [-0.6, 0, 0]; }      /* shoulder down, arm swims over the top */
+    else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
+    else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
+    p.rate = Math.max(p.rate || 16, 24); }
   if (o.box) {      // boxing out: sit into him, arms out wide and back to hold the space
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     ad('knR', 0.42); ad('knL', 0.42); ad('hpR', -0.36, 0, -0.14); ad('hpL', -0.36, 0, 0.14); ad('spine', 0.26); ad('neck', -0.3); p.y = (p.y || 0) - 0.1;

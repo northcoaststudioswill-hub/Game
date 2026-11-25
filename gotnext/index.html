@@ -125,6 +125,9 @@ body[data-state=world]:not(.busy):not(.building) #emobar{display:flex}
 #chatbox{position:fixed;left:50%;bottom:22%;transform:translateX(-50%);width:min(420px,86vw);display:none;z-index:8;background:#ece9e2;color:#111;border:0;border-radius:12px;padding:11px 14px;font:700 14px var(--m);box-shadow:0 4px 0 #0a0a0e}
 .bub.me{background:#fff3b0}.bub.net{background:#bfe8ff}
 .bub{position:absolute;transform:translate(-50%,-100%);background:#ece9e2;color:#111114;font:700 11px/1.25 var(--m);padding:6px 9px;border-radius:10px;max-width:220px;text-align:center;pointer-events:none;z-index:3;box-shadow:0 3px 0 #0a0a0e;transition:opacity .2s}.bub:after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-top-color:#ece9e2;border-bottom:0}
+.bub{position:absolute;transform:translate(-50%,-100%);max-width:min(46vw,210px);background:#f4f1ea;color:#0b0b0d;font:700 12px/1.2 var(--b);padding:6px 9px;border-radius:11px;box-shadow:0 2px 0 rgba(0,0,0,.55);text-align:center;pointer-events:none;white-space:normal}
+.bub::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-top-color:#f4f1ea;border-bottom:0}
+.bub.them{background:#1b1b20;color:#f4f1ea;box-shadow:0 0 0 1px #ff2d78,0 2px 0 rgba(0,0,0,.55)}.bub.them::after{border-top-color:#ff2d78}
 .flt{position:absolute;font:900 16px var(--d);font-stretch:125%;text-transform:uppercase;text-shadow:0 2px 0 var(--ink);animation:flt 1.1s forwards;white-space:nowrap;transform:translateX(-50%)}
 @keyframes flt{to{margin-top:-50px;opacity:0}}
 #rackHud{position:absolute;right:calc(14px + var(--sar));top:calc(60px + var(--sat));font:900 30px var(--d);font-stretch:125%;text-align:right;text-shadow:0 2px 0 var(--ink);display:none}
@@ -146,8 +149,8 @@ body[data-state=world]:not(.busy):not(.building) #emobar{display:flex}
 .btn:disabled,.btn[disabled]{opacity:.3;cursor:default}.btn.focus{background:var(--heat);color:#fff}.btn:active:not(:disabled){transform:translateY(1px);background:var(--heat);color:#fff}
 body.touch .btn{min-height:42px}body.touch .btn.sm{min-height:38px;padding:10px 16px 10px 12px;font-size:10.5px}body.touch .ph .btn.sm{min-width:44px;min-height:40px}body.touch select{min-height:40px;font-size:14px}body.touch input[type=range]{height:36px}
 body.touch .tabs{flex-wrap:wrap;overflow-x:visible}body.touch .tabs .btn{min-height:38px;padding:10px 12px}body.touch .card .btn.sm{margin:2px 0}
-.tabs{display:flex;gap:2px;overflow-x:auto;flex:none;margin-bottom:12px;touch-action:pan-x;scrollbar-width:none;border-bottom:1px solid var(--line)}.tabs::-webkit-scrollbar{display:none}
-.tabs .btn{font-size:10px;padding:10px 14px;flex:none;clip-path:none;background:transparent;color:var(--ash);box-shadow:none}.tabs .btn.sel{color:var(--bone);box-shadow:inset 0 -3px 0 var(--heat)}.tabs .btn.focus{background:var(--grit);color:var(--bone)}
+.tabs{display:flex;gap:2px;flex-wrap:wrap;flex:none;margin-bottom:12px;touch-action:pan-x;scrollbar-width:none;border-bottom:1px solid var(--line)}.tabs::-webkit-scrollbar{display:none}
+.tabs .btn{font-size:10px;padding:10px 12px;flex:none;clip-path:none;background:transparent;color:var(--ash);box-shadow:none}.tabs .btn.sel{color:var(--bone);box-shadow:inset 0 -3px 0 var(--heat)}.tabs .btn.focus{background:var(--grit);color:var(--bone)}
 .card{background:var(--tar);border:1px solid var(--line);padding:11px 12px;margin-bottom:6px;position:relative}
 .card h3{font-size:13px;line-height:1.15}.card p{margin:4px 0 0;color:var(--ash);font-size:12.5px;line-height:1.35}
 .card[data-k]{cursor:pointer}.card.sel{border-color:var(--bone);background:var(--grit)}.card.sel::after{content:"";position:absolute;right:0;top:0;border:7px solid var(--heat);border-left-color:transparent;border-bottom-color:transparent}.card.lock{opacity:.45}
@@ -1593,7 +1596,16 @@ function poseOf(anim, t, o) {
   if (o.screen) {      // a set screen: feet wide, knees bent, arms crossed tight on the chest
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     ad('knR', 0.3); ad('knL', 0.3); ad('hpR', -0.2, 0, -0.16); ad('hpL', -0.2, 0, 0.16); ad('spine', 0.1); p.y = (p.y || 0) - 0.07;
-    p.shR = [-0.75, 0, 0.55]; p.elR = [-1.75, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [-0.75, 0, -0.55]; p.elL = [-1.75, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 20); }
+    p.shR = [-0.75, 0, 0.55]; p.elR = [-1.75, 0, 0]; p.wrR = [0, 0, 0]; p.shL = [-0.75, 0, -0.55]; p.elL = [-1.75, 0, 0]; p.wrL = [0, 0, 0]; p.rate = Math.max(p.rate || 16, 20);
+    if (o.screen === 2) { ad('knR', 0.22); ad('knL', 0.22); ad('hpR', -0.16); ad('hpL', -0.16); ad('spine', 0.2, 0.35, 0); ad('neck', -0.15, -0.3, 0); p.y -= 0.07; p.shR = [-1.05, 0, 0.35]; p.elR = [-1.9, 0, 0]; p.shL = [-0.35, 0, -0.3]; p.elL = [-1.5, 0, 0]; }      /* hard: lower, a shoulder turned into him, forearm braced */
+    else if (o.screen === 3) { ad('knR', -0.18); ad('knL', -0.18); ad('spine', -0.08, -0.3, 0); p.y += 0.05; p.shR = [-0.25, 0, 0.3]; p.elR = [-1.2, 0, 0]; p.shL = [-1.6, 0, -0.5]; p.elL = [-0.7, 0, 0]; }      /* soft: tall, half open to the rim, a hand already up for the slip */
+  }
+  if (o.scrR) {      // the defender on a screen: fighting over, sliding under, or stuck on it
+    const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    if (o.scrR === 'fight') { ad('spine', 0.3, 0.5, 0); ad('chest', 0.1, 0.25, 0); ad('neck', -0.2, -0.45, 0); ad('knR', 0.2); ad('knL', 0.2); p.shR = [-2.2, 0, 0.3]; p.elR = [-0.9, 0, 0]; p.wrR = [0.5, 0, 0]; p.shL = [0.5, 0, 0.5]; p.elL = [-0.6, 0, 0]; }      /* shoulder down, arm swims over the top */
+    else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
+    else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
+    p.rate = Math.max(p.rate || 16, 24); }
   if (o.box) {      // boxing out: sit into him, arms out wide and back to hold the space
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     ad('knR', 0.42); ad('knL', 0.42); ad('hpR', -0.36, 0, -0.14); ad('hpL', -0.36, 0, 0.14); ad('spine', 0.26); ad('neck', -0.3); p.y = (p.y || 0) - 0.1;
@@ -2161,7 +2173,7 @@ function startMatch(cfg) {
     const mine = sp.mine === true;
     const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, remote: sp.ctrl >= 2, peer: sp.peer || null, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
       stats: { fouls: 0, pts: 0, ast: 0, reb: 0, stl: 0, blk: 0, ankles: 0, greens: 0, dunks: 0, threes: 0, fga: 0, fgm: 0, bravs: 0, fires: 0 }, ai: { tick: rnd(0, 0.3), spot: null, spotT: 0, tx: 0, tz: 0, mx: 0, mz: 0, hold: 0, mode: '', react: 0 } };
-    p.A = effAttrs(sp.b, mine); p.aiLvl = sp.ai === undefined ? cfg.tier.ai : sp.ai;
+    p.A = effAttrs(sp.b, mine); p.pers = persFor(sp.b, mine); p.aiLvl = sp.ai === undefined ? cfg.tier.ai : sp.ai;
     p.rig = makeRig(sp.b); p.H = p.rig.H; scene.add(p.rig.root);
     // one colour per team for the ring and the name: your team blue, theirs red. You are the thicker ring with the arrow.
     const myT = Math.max(0, cfg.teams.findIndex(t => t.some(x => x.mine === true))); p.teamCol = ti === myT ? 0x33a0ff : 0xff4a4a;
@@ -2210,7 +2222,7 @@ function changePoss(team) { if (MT.off !== team) { MT.off = team; MT.needClear =
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
   if (!p.user || p.bravT > 0 || MT.practice) return;
-  let m = 1; if (p.mine) { if (ORIGIN[S.build.origin].k === 'brav') m += 0.2; if (MT.boosts.includes('hype')) m += 0.5; }
+  let m = 1 + px(p, 'brav'); if (p.mine) { if (ORIGIN[S.build.origin].k === 'brav') m += 0.2; if (MT.boosts.includes('hype')) m += 0.5; }
   p.brav += v * m;
   if (p.brav >= 1) { p.brav = 1; p.bravT = 20; p.stats.bravs++; call(pick(CALLS.brav), p.b.name + ' gets +8 to everything', '#ffc531', 1.6); sfxM('rank'); burst(p.x, 1.2, p.z, 0xffc531, 18); }
 }
@@ -2225,7 +2237,7 @@ function foul(d, o, kind, keep) {
 const COURT = { x0: -8, x1: 8, z0: -1.6, z1: 13 };      /* the painted lines */
 function andOne(p, d) {
   const M_ = MT; if (M_.phase === 'over') return; M_.score[p.team] += 1; p.stats.pts += 1; call('AND ONE', p.b.name + ' +1 · ' + d.b.name + ' fouled', '#ffc531', 1.4);
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); say(p, 'end', 1); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function scorePts(p, pts, how) {
   const M_ = MT; if (p.pu && p.pu.id === 'double' && !M_.practice) { pts *= 2; p.pu = null; p.puA = null; if (M_.net === 'host') netEv({ k: 'pu', a: 'x', i: p.i }); call('DOUBLE UP', p.b.name + ' · that one counts ' + pts, '#ff4fd8', 1.2); }
@@ -2236,6 +2248,8 @@ function scorePts(p, pts, how) {
   if (p.mine && cribFx('bucket')) M_.bonusRep = (M_.bonusRep || 0) + 1;
   crowdReact(how === 'dunk' ? 'dunk' : pts >= 2 ? 'three' : 'score', p.team);
   if (M_.hoop.userData.net) M_.netT = 0.35;
+  { const lead = M_.score[p.team] - M_.score[1 - p.team], dfn = M_.P.find(o => o.team !== p.team && o.man === p);      // somebody has something to say about it
+    if (lead >= 5 && Math.random() < 0.6) say(p, 'up'); else if (Math.random() < 0.5) say(p, 's'); else if (dfn && Math.random() < 0.5) say(dfn, 'dn'); }
   addBrav(p, how === 'dunk' ? 0.16 : 0.10);
   if (M_.drill) drillEvent('make', p, { how, kind: how === 'dunk' ? 'dunk' : M_.B.kind, green: how !== 'dunk' && M_.B.green });
   if (M_.practice) return;
@@ -2243,7 +2257,7 @@ function scorePts(p, pts, how) {
   { const eq = p.b.moves.celeb, vic = how === 'dunk' && p.finish ? p.finish.hit : null;      // what he does about it: his own celebration, or one that fits the play
     p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout', 'greengiant', 'pour40', 'fentlean'])) : pts >= 2 ? pick([eq, eq, 'goggles', 'goggles', 'shh', 'shrug', 'nightnight', 'pout', 'iceveins', 'greenbean', 'callme']) : pick([eq, eq, eq, 'shrug', 'pound', 'bow', 'callme']);
     p.celebAt = vic || null; if (M_.net === 'host') netEv({ k: 'cs', i: p.i, s: p.celebStyle }); }
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
+  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); say(p, 'end', 1); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
 function burst(x, y, z, col, n) {
@@ -2313,7 +2327,7 @@ function releaseShot(p) {
   const held = s.hold != null ? s.hold : p.t;
   if (p.user && !s.auto && held < s.rel * 0.3) { s.released = false; return startFake(p); }      // let go early = pump fake
   const err = (held - s.rel) / s.rel, kind = s.kind, d = dHoop(p);
-  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85;
+  let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5; c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7; if (s.side) c *= 0.85; c *= 1 - px(p, 'calm');
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
   let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
   if (s.floater) base -= Math.max(0, d - 2.2) * 0.045;
@@ -2322,10 +2336,11 @@ function releaseShot(p) {
   if (c < 0.06) base += 0.03 + 0.025 * bt(p, 'opencarry');
   if (p.stam < 25) base *= 0.85; if (s.sp > 2.8) base *= 0.9;
   if (p.catchFrom && MT.time - p.catchT < 1.6) base += 0.02 * bt(p.catchFrom, 'trickle') + 0.02;
-  if (p.fire) base += 0.35; if (kind === 'close') base += 0.03 * bt(p, 'softmoney');
+  if (p.fire) base += 0.35; if (kind === 'close') base += 0.03 * bt(p, 'softmoney'); base += px(p, kind);
   let w = (0.05 + nAtt(p, 'iq') * 0.05 + 0.012 * bt(p, 'greencard') + s.j.win + (p.mine ? cribFx('green') * 0.1 : 0)) * (0.55 + n * 0.65) * (1 - c * 0.6);
   if (MT.practice) w *= 1.1; if (p.pu && p.pu.id === 'hot') w *= 1.6;
-  if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;      /* game point: nerves shrink the window, a high Shot IQ widens it */
+  if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;
+  { const lead = MT.score[p.team] - MT.score[1 - p.team]; w *= 1 + px(p, 'green') + (MT.gamePt ? px(p, 'clutch') : 0) + (p.hot >= 2 ? px(p, 'hot') : 0) + (lead <= -3 ? px(p, 'behind') : 0) + (lead >= 3 ? px(p, 'ahead') : 0); }      /* personality */      /* game point: nerves shrink the window, a high Shot IQ widens it */
   const e = Math.abs(err); let green = e <= w, prob;
   if (green) prob = c > 0.55 ? 0.8 : 1; else prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
   if (!p.user) green = green && Math.random() < 0.5;
@@ -2333,7 +2348,7 @@ function releaseShot(p) {
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
-    const pb = (0.06 + nAtt(o, 'block') * 0.28 + 0.04 * bt(o, 'nofly')) * (s.j.id === 'quick' ? 0.7 : 1) * (kind === 'three' ? 0.8 : 1) * (s.fade ? 0.55 : 1);
+    const pb = (1 + px(o, 'block')) * (0.06 + nAtt(o, 'block') * 0.28 + 0.04 * bt(o, 'nofly')) * (s.j.id === 'quick' ? 0.7 : 1) * (kind === 'three' ? 0.8 : 1) * (s.fade ? 0.55 : 1);
     if (Math.random() < pb) return blocked(p, o);
   }
   B.foulBy = null;
@@ -2379,7 +2394,7 @@ function launch(p, make, pts, green, arc, kind) {
 function blocked(p, o) {
   const B = MT.B; p.stats.fga++; o.stats.blk++; o.swatT = 0.45; MT.hoopT = 0.2; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
-  if (p.st === 'finish') highlight('swat', o, p);
+  if (p.st === 'finish') highlight('swat', o, p); say(o, 'd');
   call(pick(CALLS.block), o.b.name, '#33e0ff', 1.1); sfxM('block'); addBrav(o, 0.15); MT.slow = 0.25; if (p.st === 'finish') { p.finish.done = true; p.finish.blocked = true; p.bumpT = 0.3; p.bumpX = -0.3; p.bumpZ = rnd(-0.15, 0.15); }
   crowdReact('block', o.team); B.rebound = false; o.tauntT = 1.3; floatTxt(o, pick(['GET THAT OUT', 'PACKED', 'NOT IN HERE', 'SEND IT BACK']), '#33e0ff'); if (MT.net === 'host') netEv({ k: 'ta', i: o.i });
 }
@@ -2483,7 +2498,7 @@ function resolveFinish(p) {
     B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
   const kAdj = { quick: -0.03, spin: -0.05, finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
-  const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
+  const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj + px(p, 'fin') + px(p, 'close') - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
   handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
 }
@@ -2504,7 +2519,7 @@ function startMove(p, slot, dx, dz) {
     // he bit on the fake: his weight goes the opposite way to where the ball handler really went
     const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
     o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5, kind: pick(['sit', 'sit', 'spin', 'knee']) };
-    p.stats.ankles++; highlight('ankles', p, o); call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
+    p.stats.ankles++; say(p, 's'); highlight('ankles', p, o); call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
   } else o.slowT = 0.22 + mv.ank;
 }
 function doPass(p, to) {
@@ -2513,7 +2528,7 @@ function doPass(p, to) {
   p.flashy = !oop && (p.b.build.style === 'showman' || bt(p, 'trickle') >= 2) && Math.random() < 0.45;
   p.st = 'pass'; p.t = 0; p.face = Math.atan2(to.x - p.x, to.z - p.z);
   B.state = 'pass'; B.holder = null; B.target = to; B.from = p; B.t = 0; B.tried = {}; B.lastTeam = p.team; B.bounced = false;
-  if (B.pos.y < 0.7) B.pos.y = 0.7;     /* a pass leaves from the hands, wherever the dribble had the ball */ B.speed = 11 + nAtt(p, 'pass') * 7; sfxM('whoosh');
+  if (B.pos.y < 0.7) B.pos.y = 0.7;     /* a pass leaves from the hands, wherever the dribble had the ball */ B.speed = (11 + nAtt(p, 'pass') * 7) * (1 + px(p, 'pass')); sfxM('whoosh');
   const dd = dist(p, to); B.pk = oop ? 'lob' : (!passLane(p, to) && dd < 7) ? 'bounce' : dd > 7.5 ? 'overhead' : Math.hypot(p.vx, p.vz) > 3.2 ? 'one' : 'chest'; p.pk = B.pk;
   B.y0 = B.pos.y; B.h0 = Math.max(0.5, Math.hypot(to.x - B.pos.x, to.z - B.pos.z));
   if (oop && startFinish(to, 0, true)) { to.finish.oop = true; to.finish.dur = Math.max(to.finish.dur, 0.66); B.speed = Math.max(7, dist(p, to) / (to.finish.dur * 0.6)); B.oop = true; floatTxt(p, 'LOB', '#f2c14e'); } else B.oop = false;
@@ -2592,6 +2607,7 @@ function stealChance(p, h) {
   if (h.protect) ch *= 0.75;
   if (h.reachSaw && h.reachBy === p && MT.time - h.reachAt < 0.9) ch *= 0.62;      /* he saw it and pulled the ball across */
   if (h.st === 'finish') ch *= 0.3; else if (h.st === 'hop') ch *= 0.6;
+  ch *= (1 + px(p, 'steal')) * (1 - px(h, 'secure'));
   return { ch: clamp(ch, 0.01, 0.6), reach };
 }
 function resolveSteal(p) {
@@ -2599,13 +2615,14 @@ function resolveSteal(p) {
   const sc = stealChance(p, h), ch = sc.ch;
   if (p.user && sc.reach > 0.9) floatTxt(p, 'REACHED', '#8d8d99');
   if (Math.random() < ch) {
-    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); crowdReact('steal', p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); 
+    p.stats.stl++; if (h.st === 'shoot' || h.st === 'finish' || h.st === 'hop') { h.st = 'free'; h.y = 0; h.rig.extraYaw = 0; } give(p); changePoss(p.team); crowdReact('steal', p.team); call(pick(CALLS.steal), p.b.name, '#33e0ff', 1); sfxM('steal'); addBrav(p, 0.15); say(p, 'd');
   } else {
     p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0;
     if (h.reachSaw && h.reachBy === p) { p.slowT += 0.18; if (h.user) floatTxt(h, 'PROTECTED', '#7de3ff'); addBrav(h, 0.02); }      /* reached at air: he is off balance and the lane is there */
     const hf = [Math.sin(h.face), Math.cos(h.face)], dh = dist(h, p) || 1, behind = ((p.x - h.x) * hf[0] + (p.z - h.z) * hf[1]) / dh < -0.3, spam = Math.max(0, (p.reach || []).length - 1);
-    const fch = (0.05 + 0.08 * spam + (sc.reach > 0.9 ? 0.12 : 0) + (behind ? 0.15 : 0)) * (1 - nAtt(p, 'steal') * 0.4) * (1 - 0.15 * bt(p, 'repo')) * (1 - 0.15 * bt(p, 'hardhat'));
+    const fch = (0.05 + 0.08 * spam + (sc.reach > 0.9 ? 0.12 : 0) + (behind ? 0.15 : 0)) * (1 - nAtt(p, 'steal') * 0.4) * (1 - 0.15 * bt(p, 'repo')) * (1 - 0.15 * bt(p, 'hardhat')) * (1 - px(p, 'whistle'));
     if (Math.random() < fch) foul(p, h, behind ? 'reach from behind' : 'reach-in');
+    else if (spam >= 1 && Math.random() < 0.75) say(h, 'w');      /* swiping and getting nothing: he hears about it */
   }
 }
 function startJump(p) {
@@ -2644,7 +2661,7 @@ function humanThink(p, dt) {
   p.bodyUp = !!I.lt && !hasBall && MT.off !== p.team && !!B.holder && B.holder.team !== p.team && p.st === 'free';
   // LT with a shot in the air or a board coming down: box out. LB / R / PICK with the ball: call a screen
   { const bx = !!I.lt && !hasBall && (B.state === 'shot' || (B.state === 'loose' && B.rebound)) && (p.st === 'free' || p.st === 'jump'); if (bx && !p.box) floatTxt(p, 'BOX OUT', '#f2c14e'); p.box = bx; }
-  if (I.pkP && hasBall) callScreen(p);
+  if (I.pkP && hasBall) callScreen(p, !!I.sprint);
   if (p.st === 'shoot' && !p.shot.released && p.shot.auto) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
   if (p.remote) {          // the guest times their own release; the host just takes their word for the hold
     if (I.relEdge) p.pendRel = I.rh;
@@ -2719,11 +2736,14 @@ function passLane(p, to) {
   return true;
 }
 // ---------- screens: the handler calls one, the nearest AI teammate sets it on his defender's hip, then rolls to the rim ----------
-function callScreen(p) {
+function callScreen(p, hard) {
   const M_ = MT; if (M_.phase !== 'live' || M_.needClear || M_.time - (p.scrAt || -9) < 3) return false;
   const c = M_.P.filter(q => q.team === p.team && q !== p && !q.user && q.st === 'free' && !q.ai.scr).sort((m, n) => dist(m, p) - dist(n, p))[0];
   if (!c) { if (p.user && M_.P.filter(q => q.team === p.team).length < 2) floatTxt(p, 'NOBODY TO SET IT', '#ff8a1f'); return false; }
-  p.scrAt = M_.time; c.ai.scr = { h: p, t: 0, ph: 0 }; floatTxt(p, 'SCREEN!', '#f2c14e'); floatTxt(c, 'I GOT YOU', '#fff'); return true;
+  // three kinds: a hard screen (sprint held, or a strong man who likes contact) holds longer and can put the defender on the floor;
+  // a soft one is a brush and an early slip to the rim; otherwise a plain set screen
+  const st = nAtt(c, 'str'), kind = hard || (!p.user && st > 0.62 && Math.random() < 0.5) ? 'hard' : (st < 0.42 || Math.random() < 0.22) ? 'soft' : 'set';
+  p.scrAt = M_.time; c.ai.scr = { h: p, t: 0, ph: 0, kind }; floatTxt(p, kind === 'hard' ? 'HARD SCREEN!' : kind === 'soft' ? 'SLIP IT!' : 'SCREEN!', '#f2c14e'); floatTxt(c, kind === 'hard' ? 'BRING HIM' : 'I GOT YOU', '#fff'); return true;
 }
 function aiScreen(p, dt) {
   const a = p.ai, s = a.scr, h = s.h, B = MT.B; s.t += dt;
@@ -2740,8 +2760,27 @@ function aiScreen(p, dt) {
     return true;
   }
   aiGo(p, s.px, s.pz, false); p.screen = true;      // planted: feet set, arms in
-  if (Math.hypot(h.x - s.hx, h.z - s.hz) > 1.7 || s.t > 2.6) { s.ph = 2; s.t = 0; p.screen = false; if (h.user) floatTxt(p, 'ROLLING', '#fff'); }
+  if (Math.hypot(h.x - s.hx, h.z - s.hz) > 1.7 || s.t > (s.kind === 'hard' ? 3.2 : s.kind === 'soft' ? 0.8 : 2.6) || (s.kind === 'soft' && s.hit)) { s.ph = 2; s.t = 0; p.screen = false; if (h.user) floatTxt(p, s.kind === 'soft' ? 'SLIPPING' : 'ROLLING', '#fff'); }
   return true;
+}
+// a defender runs into a set screen. What happens depends on the kind of screen, who is stronger, and how he plays it:
+// hold LT (or be a strong AI) to fight over the top; otherwise he is caught and has to go under. A hard screen can lay him out.
+function screenHit(s, o) {
+  const M_ = MT, sc = s.ai.scr, k = (sc && sc.kind) || 'set', hh = sc && sc.h, spd = Math.hypot(o.vx, o.vz);
+  const ds = nAtt(s, 'str') - nAtt(o, 'str') + (k === 'hard' ? 0.15 : k === 'soft' ? -0.2 : 0) + px(s, 'screen');
+  o.scrHit = M_.time; if (sc) sc.hit = true; sfxM('bump'); const dx = o.x - s.x, dz = o.z - s.z, l = Math.hypot(dx, dz) || 1;
+  const fight = o.user ? !!o.ltHeld : Math.random() < 0.2 + nAtt(o, 'str') * 0.5;
+  if (k === 'hard' && spd > 2.0 && Math.random() < clamp(0.1 + ds * 0.5, 0.03, 0.4)) {      // laid out
+    o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: Math.random() < 0.5 ? 1 : -1, dir: [dx / l, dz / l], push: 1.8, kind: pick(['flat', 'sit', 'spin']) };
+    floatTxt(o, 'LAID OUT', '#ff5a3c'); M_.shake = Math.max(M_.shake || 0, 0.25); crowdReact('hit', s.team); say(s, 'd'); if (hh) addBrav(hh, 0.08); return 'down';
+  }
+  if (fight && Math.random() < clamp(0.45 - ds * 0.9, 0.1, 0.85)) {      // over the top: barely slowed
+    o.slowT = Math.max(o.slowT || 0, 0.12); o.scrR = { k: 'fight', t: 0.55 }; floatTxt(o, 'FOUGHT OVER', '#7de3ff');
+    if (ds < -0.25 && k !== 'hard' && Math.random() < 0.3) { s.st = 'stagger'; s.t = 0; s.stg = { dur: 0.6, fall: false, side: 1, dir: [-dx / l, -dz / l], push: 1.3 }; floatTxt(s, 'BLOWN UP', '#ff8a1f'); s.ai.scr = null; s.screen = false; return 'blown'; }
+    return 'over';
+  }
+  o.slowT = Math.max(o.slowT || 0, (k === 'soft' ? 0.18 : 0.3) + nAtt(s, 'str') * 0.25 + (k === 'hard' ? 0.15 : 0)); o.scrR = { k: fight ? 'stuck' : 'under', t: 0.65 };
+  floatTxt(o, 'SCREENED', '#f2c14e'); if (hh) addBrav(hh, 0.03); return 'caught';
 }
 // one bucket from the win: everybody tightens up
 function gamePoint(p) {
@@ -2866,7 +2905,7 @@ function matchStep(dtReal) {
   const M_ = MT; if (!M_ || (M_.paused && !M_.net)) return;
   if (M_.net === 'guest') return netGuestStep(dtReal);
   let dt = dtReal; if (M_.slow > 0) { M_.slow -= dtReal; dt *= 0.35; }
-  M_.time += dt; const B = M_.B; hlStep(dtReal);
+  M_.time += dt; const B = M_.B; hlStep(dtReal); bubStep(dtReal);
   // phases
   if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
   if (M_.gpCall > 0 && M_.phase !== 'over') { M_.gpCall -= dt; if (M_.gpCall <= 0) call('GAME POINT', M_.score[0] === M_.score[1] ? 'Next bucket wins' : M_.gpTeam === M_.me.team ? 'One more. Close it out.' : 'Get a stop.', '#f2c14e', 1.6); }
@@ -2882,7 +2921,7 @@ function matchStep(dtReal) {
   if (M_.drill && !M_.over) { drillStep(dt); if (MT !== M_) return; }
 
   for (const p of M_.P) {
-    p.in = p.in || { dx: 0, dz: 0, sprint: false }; if (p.buf) p.buf.ttl -= dt; p.t += dt; p.swatT = (p.swatT || 0) - dt; p.cool -= dt; p.moveCool -= dt; p.slowT -= dt; p.callT -= dt; p.putT -= dt;
+    p.in = p.in || { dx: 0, dz: 0, sprint: false }; if (p.scrR && (p.scrR.t -= dt) <= 0) p.scrR = null; if (p.buf) p.buf.ttl -= dt; p.t += dt; p.swatT = (p.swatT || 0) - dt; p.cool -= dt; p.moveCool -= dt; p.slowT -= dt; p.callT -= dt; p.putT -= dt;
     if (p.bravT > 0) { p.bravT -= dt; p.brav = Math.max(0, p.bravT / 20); if (p.bravT <= 0) p.brav = 0; }
     if (p.user && !(p.remote && p.afk)) humanThink(p, dt); else aiThink(p, dt);
     stepPlayer(p, dt);
@@ -2890,7 +2929,7 @@ function matchStep(dtReal) {
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
     const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : 0.56;
-    if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && M_.time - (o.scrHit || -9) > 1.5) { o.scrHit = M_.time; o.slowT = Math.max(o.slowT || 0, 0.3 + nAtt(s, 'str') * 0.25); floatTxt(o, 'SCREENED', '#f2c14e'); sfxM('bump'); const hh = s.ai.scr && s.ai.scr.h; if (hh) addBrav(hh, 0.03); }
+    if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && o.st !== 'stagger' && M_.time - (o.scrHit || -9) > 1.5) screenHit(s, o);
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
       if (vn > 1.2 && M_.time - (a.bumpAt || -9) > 0.3 && M_.time - (b.bumpAt || -9) > 0.3 && a.st !== 'stagger' && b.st !== 'stagger') {
@@ -2989,7 +3028,7 @@ function stepPlayer(p, dt) {
   if (hasBall && p.post && p.st === 'free' && M_.phase === 'live') {
     const dh = dHoop(p) || 1, hx = -p.x / dh, hz = -p.z / dh, va = p.vx * hx + p.vz * hz;
     for (const o of M_.P) { if (o.team === p.team || o.st === 'jump') continue; const rx = o.x - p.x, rz = o.z - p.z, rl = Math.hypot(rx, rz); if (rl > 1.05 || (rx * hx + rz * hz) < rl * 0.4) continue;
-      if (va > 0.2) { const push = clamp(0.3 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.6 - (o.bodyUp ? 0.2 : 0) + 0.06 * bt(p, 'postman'), 0.05, 0.9); o.x += hx * va * push * dt; o.z += hz * va * push * dt; p.stam = Math.max(0, p.stam - dt * 2.5); o.stam = Math.max(0, o.stam - dt * 2);
+      if (va > 0.2) { const push = clamp(0.3 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.6 - (o.bodyUp ? 0.2 : 0) + 0.06 * bt(p, 'postman') + px(p, 'post'), 0.05, 0.9); o.x += hx * va * push * dt; o.z += hz * va * push * dt; p.stam = Math.max(0, p.stam - dt * 2.5); o.stam = Math.max(0, o.stam - dt * 2);
         p.bumpTk = (p.bumpTk || 0) - dt; if (p.bumpTk <= 0) { p.bumpTk = 0.45; sfxM('bump'); } } }
   }
   // leaning on the ball handler all day gets called eventually (a hand check)
@@ -3016,11 +3055,11 @@ function stepPlayer(p, dt) {
   let top = (3.3 + nAtt(p, 'speed') * 2.5) * (M_.arcade ? 1.15 : 1);
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
-  if (p.bodyUp) top *= 0.86; if (p.box) top *= 0.62;
+  top *= 1 + px(p, 'speed'); if (p.bodyUp) top *= 0.86; if (p.box) top *= 0.62;
   if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5) - 0.03 * bt(o, 'clamps'), 0.55, 0.95); }      /* a hand on your body slows the drive */
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
-  if (p.sprinting) { top *= 1.28; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * dt);
+  if (p.sprinting) { top *= 1.28; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * (1 + px(p, 'stam')) * dt);
   if (p.stam < 20) top *= 0.86; if (p.slowT > 0) top *= 0.45;
   const def = M_.off !== p.team && !hasBall && B.state !== 'loose'; if (def && !p.sprinting) top *= 0.92;
   if (lock > 0) {
@@ -3086,7 +3125,7 @@ function stepBall(dt) {
       } else if (B.foulBy) {
         const d = B.foulBy; B.foulBy = null; B.state = 'loose'; B.t = 0; B.vel.set(rnd(-1, 1), 3, rnd(0.5, 1.5)); sfxM('rim'); foul(d, p, 'shooting');      /* missed and fouled: their ball again */
       } else {
-        B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfxM('rim'); if (M_.drill) drillEvent('miss', p, { kind: B.kind }); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14);
+        B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfxM('rim'); if (M_.drill) drillEvent('miss', p, { kind: B.kind }); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14); { const [o, od] = nearestOpp(p); if (o && od < 3.5 && Math.random() < 0.3) say(o, 'w'); }
         if (M_.practice) floatTxt(p, pick(CALLS.miss), '#ff8a1f');
       }
     }
@@ -3117,7 +3156,7 @@ function stepBall(dt) {
       for (const p of M_.P) {
         if (p.st !== 'free' && p.st !== 'jump') continue; const reach = p.H * 1.3 + p.y + 0.12 + 0.06 * bt(p, 'eminent');
         if (Math.hypot(p.x - B.pos.x, p.z - B.pos.z) > 0.8 + 0.05 * bt(p, 'eminent') || B.pos.y > reach) continue;
-        let s = nAtt(p, 'reb') + Math.random() * 0.5 + (p.st === 'jump' ? 0.3 : 0) + p.H * 0.2; if (B.rebound) { if (p.box) s += 0.18; for (const o of M_.P) if (o.team !== p.team && o.box && dist(o, p) < 1.3 && dHoop(o) < dHoop(p)) { s -= 0.22; break; } }      /* sealed off behind a box-out */
+        let s = nAtt(p, 'reb') + Math.random() * 0.5 + (p.st === 'jump' ? 0.3 : 0) + p.H * 0.2; if (B.rebound) { s += px(p, 'reb'); if (p.box) s += 0.18; for (const o of M_.P) if (o.team !== p.team && o.box && dist(o, p) < 1.3 && dHoop(o) < dHoop(p)) { s -= 0.22; break; } }      /* sealed off behind a box-out */
         if (s > bs) { bs = s; best = p; }
       }
       if (!best && M_.looseT > 6) best = M_.P.slice().sort((a, b) => Math.hypot(a.x - B.pos.x, a.z - B.pos.z) - Math.hypot(b.x - B.pos.x, b.z - B.pos.z))[0];
@@ -3279,7 +3318,7 @@ function animPlayer(p, dt) {
   // running forward at speed (with or without the ball): the legs follow real running curves on a stride clock that
   // advances with distance (knee drive, heel recovery, a flight phase); arms stay with the ball when dribbling.
   // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
-  if (p.screen) o.screen = 1; if (p.box && p.st === 'free') o.box = 1;
+  if (p.screen) o.screen = p.ai.scr && p.ai.scr.kind === 'hard' ? 2 : p.ai.scr && p.ai.scr.kind === 'soft' ? 3 : 1; if (p.box && p.st === 'free') o.box = 1; if (p.scrR && p.st === 'free') o.scrR = p.scrR.k;
   let P = poseOf(an, t, o), duty = 0.38; if (p.st === 'finish' && p.finish.lh && p.finish.type === 'layup') P = mirrorPose(P);
   { const yawR = p.face + (R.extraYaw || 0); let da = Math.atan2(p.avx, p.avz) - yawR; da = Math.atan2(Math.sin(da), Math.cos(da));
     const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 1.2 && Math.abs(da) < 0.7 && !p.protect;      /* jogging counts too (was 3 m/s: a half-pushed stick fell back to the old stepping, the "stomp") */
@@ -3348,12 +3387,12 @@ function matchCam(dt) {
 }
 
 function endMatch() {
-  const M_ = MT, me = M_.me, cfg = M_.cfg; hlEnd();
+  const M_ = MT, me = M_.me, cfg = M_.cfg; hlEnd(); bubClear();
   hudShow(false);
   const res = { practice: M_.practice, drill: M_.drill ? { id: M_.drill.id, score: M_.drill.score } : null, rack: M_.rackScore, win: M_.score[0] > M_.score[1], score: M_.score.slice(), stats: me.stats, mode: cfg.mode, tier: cfg.tier, bonusRep: M_.bonusRep || 0, shutout: M_.score[1] === 0 && M_.score[0] > 0, box: M_.P.map(p => ({ n: p.b.name, team: p.team, user: p.user, s: p.stats })) };
   netHostEnd(res); MT = null; cfg.onEnd(res);
 }
-function quitMatch() { if (!MT) return; hlEnd(); const cfg = MT.cfg, pr = MT.practice; hudShow(false); if (MT.net) netLeave(NET.game); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }
+function quitMatch() { if (!MT) return; hlEnd(); bubClear(); const cfg = MT.cfg, pr = MT.practice; hudShow(false); if (MT.net) netLeave(NET.game); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }
 // GOT NEXT — the courts, dressed. Park courts get real asphalt (grit, resurfacing patches, worn paint, rubber scuffs,
 // lane hashes, a centre logo) painted in their tier's colours, plus courtside life and a flip scoreboard on the fence.
 // RUCKUS courts become an arcade: a neon floor, LED strips that chase and flash on scores, a jumbotron, and power-ups.
@@ -4807,6 +4846,95 @@ function uiMag(i) {
   openPanel(() => { const G = magState(), it = G.list[i]; if (!it) return `<h2>CAGE</h2>` + Btn('BACK', () => uiPlayer('mag'));
     return `<h2>CAGE · ISSUE ${String(it.iss).padStart(3, '0')}</h2>${magCover(it, true)}<div class="pf">${Btn('BACK', () => uiPlayer('mag'))} ${i > 0 ? Btn('NEWER', () => uiMag(i - 1), 'alt') : ''} ${i < G.list.length - 1 ? Btn('OLDER', () => uiMag(i + 1), 'alt') : ''} ${Btn('BIN IT', () => { G.list.splice(i, 1); save(); uiPlayer('mag'); }, 'alt')}</div>`; }, '', () => uiPlayer('mag'));
 }
+// GOT NEXT — personality: 40 traits, you wear three. They pick what you say (little speech bubbles, never in the way)
+// and each gives a small edge. 7 come with the builder, the rest are sold at Tape Deck. Buckets of lines:
+// s = I scored · d = I made a stop · w = you whiffed (swiping at air, bricks) · up = we are running away with it · dn = it is going badly · end = we won
+const PERS = [
+  // ---- the seven you can start with
+  ['quiet', 'Quiet Storm', 0, 0, 'Game point: release window +8%.', { clutch: 0.08 }, { s: ['Mm.', 'That\'s two.'], d: ['No.'], w: ['Take your time.', 'I can wait.'], up: ['Keep it quiet.'], dn: ['Still here.'], end: ['Good game.'] }],
+  ['loud', 'Loudmouth', 0, 0, 'Bravado fills 10% faster.', { brav: 0.10 }, { s: ['BUCKET! Write it down!', 'Somebody tell his mama!'], d: ['GIMME THAT!'], w: ['You swiping at ghosts!', 'Reach again! I dare you!'], up: ['This ain\'t even close! Who made this game?!'], dn: ['Don\'t get comfortable!'], end: ['RUN IT BACK! Oh wait, you can\'t!'] }],
+  ['clown', 'Class Clown', 0, 0, 'Stamina comes back 6% faster.', { stam: 0.06 }, { s: ['Did that count? Asking for me.', 'Honk honk.'], d: ['Yoink.'], w: ['You\'re playing patty-cake out here.', 'That shot had a family.'], up: ['Should we switch teams? For science?'], dn: ['I\'m doing a bit. The bit is losing.'], end: ['And that\'s the show, folks.'] }],
+  ['oldsoul', 'Old Soul', 0, 0, 'Mid-range +1.5%.', { mid: 0.015 }, { s: ['Fundamentals, young man.', 'Elbow jumper never left.'], d: ['Feet first. Hands second.'], w: ['Reaching is a habit. Break it.', 'Follow through next time.'], up: ['We could slow it down. Out of respect.'], dn: ['Long game. Stay patient.'], end: ['Shake hands. That\'s how it\'s done.'] }],
+  ['hype', 'Hype Man', 0, 0, 'Bravado +6%, Respect from games +3%.', { brav: 0.06, rep: 0.03 }, { s: ['LET\'S GOOO!', 'That\'s my dawg! That\'s ME!'], d: ['DEFENSE! DE-FENSE!'], w: ['He\'s shook! He\'s SHOOK!', 'Nothing! He got NOTHING!'], up: ['We\'re cooking! Somebody get a plate!'], dn: ['We good! We good! Next one!'], end: ['EVERYBODY EATS!'] }],
+  ['stone', 'Stone Face', 0, 0, 'Hands in your face count 5% less.', { calm: 0.05 }, { s: ['.', 'Next.'], d: ['Mine.'], w: ['...', 'Again.'], up: ['Same thing.'], dn: ['Noted.'], end: ['Done.'] }],
+  ['grinder', 'Grinder', 0, 0, 'Wins more boards.', { reb: 0.06 }, { s: ['Earned.', 'Second effort.'], d: ['Every. Loose. Ball.'], w: ['You got tired first.', 'Shortcut didn\'t work, huh.'], up: ['Don\'t let up. Not one trip.'], dn: ['Good. More work.'], end: ['Outworked.'] }],
+  // ---- Tape Deck
+  ['villain', 'The Villain', 1800, 2, 'When you are ahead by 3 or more: release window +6%.', { ahead: 0.06 }, { s: ['Boo me louder.', 'I love it when you\'re sad.'], d: ['Hope is expensive.'], w: ['Keep reaching. It feeds me.', 'Your shot called. It\'s not coming home.'], up: ['Somebody stop me. No, really. Try.'], dn: ['Enjoy the lead. I\'m going to take it personally.'], end: ['Cry on your own time.'] }],
+  ['showboat', 'Showboat', 1500, 1, 'Bravado +12%. Fouls on you 3% more.', { brav: 0.12, whistle: -0.03 }, { s: ['Did you get that on camera?', 'I\'d pay to watch me.'], d: ['Autographs after.'], w: ['You almost touched greatness.', 'Close! No it wasn\'t.'], up: ['I\'m going left-handed. For the content.'], dn: ['Setting up the comeback arc.'], end: ['Thank you, thank you. No photos. Okay, photos.'] }],
+  ['prof', 'The Professor', 2200, 3, 'Release window +4%.', { green: 0.04 }, { s: ['As the diagram predicted.', 'Class is in session.'], d: ['Poor shot selection. See me after.'], w: ['Reaching: a 4% success rate. I checked.', 'Your elbow is flaring. Noted in the margins.'], up: ['This is now a lecture.'], dn: ['A small sample size.'], end: ['Homework: watch the tape.'] }],
+  ['preacher', 'The Preacher', 1200, 1, 'Behind by 3 or more: release window +8%.', { behind: 0.08 }, { s: ['Can I get an amen?', 'The rim is forgiving today.'], d: ['Thou shalt not.'], w: ['Reaching hands find nothing, brother.', 'That shot needed prayer.'], up: ['The congregation may be seated.'], dn: ['The last shall be first. Watch.'], end: ['Go in peace. And lose somewhere else.'] }],
+  ['truther', 'Conspiracy Guy', 900, 1, 'Steals +5%.', { steal: 0.05 }, { s: ['They don\'t want you to know I can shoot.', 'The rim is in on it.'], d: ['I knew he\'d go left. They always do.'], w: ['Who told you to reach? Who\'s paying you?', 'That miss was staged.'], up: ['Too easy. Something\'s up.'], dn: ['The scoreboard is controlled.'], end: ['Exactly as I predicted in 2139.'] }],
+  ['accountant', 'The Accountant', 2500, 3, 'HC from games +4%.', { hc: 0.04 }, { s: ['Two. Filed.', 'That\'s a write-off for you.'], d: ['Denied. See form 9.'], w: ['Three reaches, zero returns. Bad investment.', 'That shot depreciated in the air.'], up: ['We\'re up big. Diversify.'], dn: ['A temporary deficit.'], end: ['Books are closed.'] }],
+  ['poet', 'Corner Poet', 1100, 1, 'Threes +1.5%.', { three: 0.015 }, { s: ['Net like rain on a tin roof.', 'Soft hands, hard truth.'], d: ['A door, closing.'], w: ['You grasp at air and call it defense.', 'The ball wept on its way down.'], up: ['The score is a long, sad poem. Yours.'], dn: ['Every villain gets a second verse.'], end: ['And so, the cage falls quiet.'] }],
+  ['dad', 'Dad Jokes', 700, 0, 'Stamina +4%, Bravado +4%.', { stam: 0.04, brav: 0.04 }, { s: ['Hi Hungry, I\'m Buckets.', 'That one\'s going on the fridge.'], d: ['Not while you live under my roof.'], w: ['You\'re reaching. Like my back does.', 'Nice brick. Building a house?'], up: ['Should I turn this game around?'], dn: ['I\'m not mad. I\'m disappointed.'], end: ['Who wants ice cream?'] }],
+  ['sarge', 'Drill Sergeant', 2000, 2, 'Top speed +1.5%.', { speed: 0.015 }, { s: ['OUTSTANDING!', 'THAT IS HOW YOU DO IT, MAGGOT!'], d: ['NOT ON MY WATCH!'], w: ['MY GRANDMOTHER REACHES FASTER!', 'YOU CALL THAT A JUMP SHOT?!'], up: ['NO MERCY! MERCY IS FOR WARM-UPS!'], dn: ['PAIN IS A TEACHER!'], end: ['DISMISSED!'] }],
+  ['zen', 'Zen Monk', 2400, 3, 'Hands in your face count 8% less.', { calm: 0.08 }, { s: ['The ball wanted to go in.', 'Breathe out. Two points.'], d: ['The shot returns to its owner.'], w: ['You chase the ball. Let it come.', 'The rim is also on a journey.'], up: ['Winning is an illusion. A nice one.'], dn: ['The river does not rush.'], end: ['Namaste. Good run.'] }],
+  ['gymrat', 'Gym Rat', 1600, 2, 'Backing down in the post moves him more.', { post: 0.06 }, { s: ['Leg day pays.', 'Protein.'], d: ['Do you even lift?'], w: ['Skipped arm day, I see.', 'No legs on that shot.'], up: ['Light weight, baby.'], dn: ['One more set.'], end: ['Good pump.'] }],
+  ['sneaker', 'Sneakerhead', 1300, 1, 'Respect from games +5%.', { rep: 0.05 }, { s: ['Don\'t crease them on the way back.', 'These? One of one.'], d: ['Not in these shoes.'], w: ['You stepped on my toe box for THAT?', 'Brick. In those? Embarrassing.'], up: ['Your whole team is general release.'], dn: ['I\'m breaking these in. Relax.'], end: ['Deadstock performance.'] }],
+  ['foodie', 'Foodie', 800, 0, 'Stamina +7%.', { stam: 0.07 }, { s: ['Chef\'s kiss.', 'Cooked. Medium rare.'], d: ['Kitchen\'s closed.'], w: ['You\'re reaching for seconds and there were no firsts.', 'Underseasoned shot.'], up: ['It\'s a buffet out here.'], dn: ['Letting it marinate.'], end: ['Check, please.'] }],
+  ['influencer', 'Influencer', 1700, 2, 'Bravado +8%, HC +2%.', { brav: 0.08, hc: 0.02 }, { s: ['Like and subscribe.', 'That\'s going on the feed.'], d: ['Blocked. And reported.'], w: ['Zero engagement on that reach.', 'Ratio.'], up: ['This lead is sponsored.'], dn: ['Doing it for the comeback edit.'], end: ['Link in bio.'] }],
+  ['lawyer', 'The Lawyer', 2600, 4, 'Fouls on you 8% less.', { whistle: 0.08 }, { s: ['I rest my case.', 'Let the record show: wet.'], d: ['Objection.'], w: ['That\'s assault. I have witnesses.', 'Inadmissible shot.'], up: ['We\'d accept a settlement.'], dn: ['I\'ll be filing an appeal.'], end: ['Case closed.'] }],
+  ['weather', 'Weatherman', 1000, 1, 'Threes +1%, mid-range +1%.', { three: 0.01, mid: 0.01 }, { s: ['Forecast: buckets.', 'It\'s raining. Bring a coat.'], d: ['Cold front moving in.'], w: ['Windy out here with all that swiping.', 'Zero percent chance of that going in.'], up: ['Storm warning for your whole team.'], dn: ['Clearing up by the fourth.'], end: ['Back to you in the studio.'] }],
+  ['gamer', 'The Gamer', 1400, 1, 'On a run (2 makes in a row): release window +8%.', { hot: 0.08 }, { s: ['GG.', 'Combo.'], d: ['Countered.'], w: ['Stop mashing steal.', 'Skill issue.'], up: ['Is this the tutorial?'], dn: ['Lag.'], end: ['EZ. Rematch?'] }],
+  ['grandpa', 'Grandpa', 900, 0, 'Close shots +2%.', { close: 0.02 }, { s: ['Off the glass. Like 2090.', 'They don\'t teach that anymore.'], d: ['Get off my lawn.'], w: ['In my day we kept our hands home.', 'Back up and try a layup, sonny.'], up: ['Wake me when it\'s over.'], dn: ['I\'ve been down worse. With one knee.'], end: ['Now help me find my keys.'] }],
+  ['astro', 'Astrologer', 1100, 1, 'Game point: release window +5%. Bravado +4%.', { clutch: 0.05, brav: 0.04 }, { s: ['Mercury is in my bag.', 'Written in the stars. And the net.'], d: ['Your chart said no.'], w: ['Classic Gemini reach.', 'That shot was in retrograde.'], up: ['The universe picked a side.'], dn: ['My moon is rising. Wait for it.'], end: ['The stars thank you for playing.'] }],
+  ['sales', 'Salesman', 2100, 3, 'HC from games +5%.', { hc: 0.05 }, { s: ['And that\'s the introductory offer.', 'Sold.'], d: ['No returns.'], w: ['Can I interest you in a jump shot?', 'You look like a man who needs insurance.'], up: ['Limited time blowout. Everything must go.'], dn: ['Every no is closer to a yes.'], end: ['Pleasure doing business.'] }],
+  ['mime', 'The Mime', 600, 0, 'You are harder to strip: steals on you 5% less.', { secure: 0.05 }, { s: ['*tips invisible hat*', '*counts on fingers: two*'], d: ['*closes invisible door*'], w: ['*pretends to be stuck in a box*', '*plays a tiny violin*'], up: ['*yawns, checks invisible watch*'], dn: ['*wipes one tear*'], end: ['*bows*'] }],
+  ['petty', 'Petty', 1500, 2, 'Behind by 3 or more: release window +6%. Steals +2%.', { behind: 0.06, steal: 0.02 }, { s: ['Remember what you said in warm-ups?', 'That\'s for last week.'], d: ['I kept the receipt.'], w: ['I\'m counting your reaches. That\'s six.', 'I\'ll bring that miss up later. Forever.'], up: ['I\'m not stopping. You know why.'], dn: ['I\'m writing all of this down.'], end: ['Tell your friends. Tell them exactly.'] }],
+  ['humble', 'Humble Bragger', 1000, 1, 'Release window +3%.', { green: 0.03 }, { s: ['Honestly? I got lucky. Again.', 'I barely practice that one.'], d: ['Sorry, reflex.'], w: ['You\'re so close. I believe in you.', 'Tough shot. I\'d have made it, but tough.'], up: ['I feel bad. I really do.'], dn: ['Good for you guys. Seriously.'], end: ['It\'s really a team award. But me.'] }],
+  ['coachkid', 'Coach\'s Kid', 1900, 2, 'Passes faster, fouls on you 4% less.', { whistle: 0.04, pass: 0.06 }, { s: ['Triple threat. Read. React.', 'That\'s the right play.'], d: ['Ball you man.'], w: ['Move your feet, not your hands.', 'Bad shot. Early in the clock.'], up: ['Starters can sit.'], dn: ['We\'re getting good looks. Trust it.'], end: ['Line up. Shake hands.'] }],
+  ['heel', 'Wrestling Heel', 2300, 3, 'Your screens hit harder; blocks +5%.', { screen: 0.12, block: 0.05 }, { s: ['WHO\'S THE CHAMP?!', 'AND THE CROWD GOES MILD!'], d: ['FROM THE TOP ROPE!'], w: ['YOU CAN\'T TOUCH THIS BELT!', 'WEAK! WEAK!'], up: ['RING THE BELL! IT\'S OVER!'], dn: ['THE REF IS BLIND!'], end: ['AND STILL!'] }],
+  ['cold', 'Cold Blooded', 3200, 4, 'Game point: release window +12%.', { clutch: 0.12 }, { s: ['Ice.', 'You felt that.'], d: ['Too slow.'], w: ['Warm hands. Cold results.', 'That had no pulse.'], up: ['I don\'t get tired of this.'], dn: ['It gets colder.'], end: ['Lights out.'] }],
+  ['sorewin', 'Sore Winner', 1200, 1, 'Ahead by 3 or more: release window +4%. Bravado +5%.', { ahead: 0.04, brav: 0.05 }, { s: ['Scoreboard.', 'Say it. Say I\'m better.'], d: ['And another thing.'], w: ['Keep swiping. I\'m telling everyone.', 'I\'m going to describe that miss at dinner.'], up: ['I\'m going to be like this all week.'], dn: ['This doesn\'t count.'], end: ['I\'m never going to let this go.'] }],
+  ['doomer', 'Doomer', 800, 0, 'Behind by 3 or more: release window +10%.', { behind: 0.10 }, { s: ['Doesn\'t matter. Sun explodes eventually.', 'A brief joy.'], d: ['Nothing gets through. Like hope.'], w: ['Reaching for meaning. Aren\'t we all.', 'It was never going in. Nothing is.'], up: ['We\'ll find a way to feel bad about this.'], dn: ['As expected.'], end: ['We won. I feel nothing.'] }],
+  ['narrator', 'The Narrator', 1400, 2, 'Release window +3%, Bravado +4%.', { green: 0.03, brav: 0.04 }, { s: ['He rises. He fires. He is me.', 'And the crowd, as one, exhales.'], d: ['But our hero had other plans.'], w: ['Again he reaches. Again, nothing.', 'The shot, like his dreams, falls short.'], up: ['It was, by now, a formality.'], dn: ['Every story needs a second act.'], end: ['Roll credits.'] }],
+  ['barber', 'The Barber', 1000, 1, 'Steals +4%, harder to strip 3%.', { steal: 0.04, secure: 0.03 }, { s: ['Clean. Like a fresh line-up.', 'Taper that.'], d: ['Just a little off the top.'], w: ['You\'re chopping at it. Use the guard.', 'That shot needs a trim.'], up: ['Next! Who\'s next in the chair?'], dn: ['I can fix this. Sit still.'], end: ['Cash only.'] }],
+  ['landlord', 'The Landlord', 2800, 4, 'Wins more boards; backing down moves him more.', { reb: 0.05, post: 0.04 }, { s: ['Rent\'s due.', 'This paint is mine. You\'re visiting.'], d: ['Evicted.'], w: ['That reach is coming out of your deposit.', 'No pets, no bricks.'], up: ['I\'m raising the rent. On everybody.'], dn: ['I\'ll allow it. For now.'], end: ['Leave the keys on the way out.'] }],
+  ['nightowl', 'Night Owl', 1300, 1, 'Stamina +5%, top speed +1%.', { stam: 0.05, speed: 0.01 }, { s: ['I do this at 3 a.m.', 'Lights don\'t bother me.'], d: ['I see everything out here.'], w: ['You tired? It\'s early.', 'Past your bedtime shot.'], up: ['We got all night.'], dn: ['The night is young.'], end: ['Go home. I\'m staying.'] }],
+  ['mama', 'Mama\'s Boy', 900, 0, 'Close shots +1.5%, Respect +3%.', { close: 0.015, rep: 0.03 }, { s: ['Mama said knock you out.', 'She\'s watching. Wave.'], d: ['Mama raised a defender.'], w: ['Mama says hands to yourself.', 'I\'m telling her about that shot.'], up: ['Mama said be nice. Mama isn\'t here.'], dn: ['Don\'t tell her the score.'], end: ['Home by dinner.'] }],
+].map(a => ({ id: a[0], n: a[1], cost: a[2], rank: a[3], d: a[4], fx: a[5], t: a[6], base: !a[2] }));
+const PER = {}; PERS.forEach(t => PER[t.id] = t);
+const PERS_BASE = PERS.filter(t => t.base);
+function persOwned(id) { return !!PER[id] && (PER[id].base || (S.persOwn || []).includes(id)); }
+function persEq() { const b = S.build; if (!Array.isArray(b.pers)) b.pers = ['quiet', '', '']; while (b.pers.length < 3) b.pers.push(''); b.pers = b.pers.slice(0, 3).map(id => persOwned(id) ? id : ''); return b.pers; }
+function persFx(key) { let v = 0; for (const id of persEq()) if (id && PER[id].fx[key]) v += PER[id].fx[key]; return v; }
+// who a player in a match is: yours are what you set; everybody else gets three that stay theirs (seeded by name)
+function persFor(b, mine) {
+  if (mine) return persEq().filter(Boolean).map(id => PER[id]);
+  if (b.build && Array.isArray(b.build.pers)) { const l = b.build.pers.filter(id => PER[id]).map(id => PER[id]); if (l.length) return l; }
+  let h = 7; for (const c of String(b.name || 'x')) h = (h * 31 + c.charCodeAt(0)) >>> 0; const out = [];
+  for (let i = 0; i < 3; i++) { h = (h * 1664525 + 1013904223) >>> 0; const t = PERS[h % PERS.length]; if (!out.includes(t)) out.push(t); } return out;
+}
+function px(p, key) { if (!p.pers) return 0; let v = 0; for (const t of p.pers) if (t.fx[key]) v += t.fx[key]; return v; }
+// ---- talk
+function say(p, ev, force) {
+  const M_ = MT; if (!M_ || !p || !p.pers || !p.pers.length || M_.practice || M_.drill || M_.net === 'guest' || (S.set && S.set.talk === 0)) return false;
+  if (!force && (M_.time - (M_.sayAt || -9) < 2.4 || M_.time - (p.sayAt || -99) < 7)) return false;
+  const pool = []; for (const t of p.pers) for (const l of (t.t[ev] || [])) pool.push(l); if (!pool.length) return false;
+  let line = pick(pool); if (line === p.sayLast && pool.length > 1) line = pick(pool.filter(l => l !== line));
+  M_.sayAt = p.sayAt = M_.time; p.sayLast = line; bubble(p, line); if (M_.net === 'host') netEv({ k: 'sb', i: p.i, t: line }); return true;
+}
+function bubble(p, line) {
+  const M_ = MT, box = $('flts'); if (!M_ || !box) return; M_.bubs = (M_.bubs || []).filter(b => { if (b.p === p) { b.el.remove(); return false; } return true; });
+  const el = document.createElement('div'); el.className = 'bub' + (p.team === M_.me.team ? '' : ' them'); el.textContent = line; box.appendChild(el); M_.bubs.push({ p, el, t: 0, dur: clamp(1.6 + line.length * 0.035, 1.8, 3.4) });
+}
+function bubStep(dt) {
+  const M_ = MT; if (!M_ || !M_.bubs || !M_.bubs.length) return;
+  M_.bubs = M_.bubs.filter(b => { b.t += dt; if (b.t >= b.dur) { b.el.remove(); return false; }
+    const [x, y] = project(b.p.x, b.p.H + 0.42 + b.p.y, b.p.z); b.el.style.left = clamp(x, 70, innerWidth - 70) + 'px'; b.el.style.top = Math.max(46, y) + 'px'; b.el.style.opacity = b.t < 0.15 ? b.t / 0.15 : b.dur - b.t < 0.3 ? (b.dur - b.t) / 0.3 : 1; return true; });
+}
+function bubClear() { const M_ = MT; if (M_ && M_.bubs) { for (const b of M_.bubs) b.el.remove(); M_.bubs = []; } }
+// ---- menus
+function persCard(t, extra) { return `<div class="card ${extra.cls || ''}"><div class="row"><h3>${esc(t.n)}</h3>${t.base ? '<span class="tag">BASE</span>' : ''}</div><p style="color:var(--go)">${esc(t.d)}</p><p class="mu">“${esc(t.t.w[0])}”</p><div style="margin-top:6px">${extra.btn || ''}</div></div>`; }
+function persTab() {
+  const eq = persEq(), r = rankOf(S.rep); let h = `<p class="mu">Wear three. They decide what you say on the court (small bubbles over your head; they never stop play) and each one gives a small edge. Seven come free; the rest are sold here at Tape Deck.</p>`;
+  h += `<div class="cat">YOUR THREE</div><div class="grid">` + eq.map((id, i) => { const t = PER[id]; return `<div class="card sel"><div class="row"><h3>${i + 1}. ${t ? esc(t.n) : 'EMPTY'}</h3></div><p style="color:var(--go)">${t ? esc(t.d) : 'Pick one below.'}</p>${t ? `<p class="mu">“${esc(t.t.s[0])}”</p>` + Btn('TAKE OFF', () => { eq[i] = ''; save(); sfx('ui'); rerender(); }, 'sm alt') : ''}</div>`; }).join('') + `</div>`;
+  const row = (t) => { const own = persOwned(t.id), on_ = eq.includes(t.id), full = eq.every(Boolean);
+    const btn = on_ ? `<span class="tag" style="border-color:var(--go);color:var(--go)">ON</span>` : own ? Btn(full ? 'SWAP INTO 3' : 'WEAR', () => { const k = eq.indexOf(''); eq[k < 0 ? 2 : k] = t.id; save(); sfx('unlock'); rerender(); }, 'sm')
+      : t.rank > r ? `<span class="tag">NEEDS ${RANKS[t.rank].n.toUpperCase()}</span>` : Btn(t.cost.toLocaleString() + ' HC', () => { if (S.vc < t.cost) { toast('NOT ENOUGH HC', t.n + ' costs ' + t.cost.toLocaleString()); return; } S.vc -= t.cost; (S.persOwn || (S.persOwn = [])).push(t.id); const k = eq.indexOf(''); if (k >= 0) eq[k] = t.id; save(); sfx('buy'); toast('NEW PERSONALITY', t.n, 'ach'); uiHud(); rerender(); }, 'sm');
+    return persCard(t, { btn, cls: on_ ? 'sel' : (!own && t.rank > r ? 'lock' : '') }); };
+  h += `<div class="cat">BASE</div><div class="grid">` + PERS_BASE.map(row).join('') + `</div><div class="cat">TAPE DECK <span class="mu" style="text-transform:none;letter-spacing:.02em">— ${PERS.length - PERS_BASE.length} more</span></div><div class="grid">` + PERS.filter(t => !t.base).map(row).join('') + `</div>`; return h;
+}
 // GOT NEXT — My Crib: the lot, the house, the street, and the home builder.
 // Place anything anywhere in the yards you own, turn it, move it, store it, sell it. Everything has Vibe; Vibe levels the
 // crib up (perks that follow you into games), and themed sets give their own bonus. Some pieces do something.
@@ -5548,6 +5676,7 @@ function uiBuilder(opts) {
     h += `<div class="cat">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}">`;
     h += `<div class="cat">PLAYSTYLE <span class="mu" style="text-transform:none;letter-spacing:.02em">— sets what you can become</span></div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === T.build.style ? 'sel' : ''}" data-k="${on(() => { T.build.style = s.id; sfx('ui'); rig(); rerender(); })}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">ORIGIN <span class="mu" style="text-transform:none;letter-spacing:.02em">— where 2145 America grew you</span></div><div class="grid">` + ORIGINS.map(o => `<div class="card ${o.id === T.build.origin ? 'sel' : ''}" data-k="${on(() => { T.build.origin = o.id; sfx('ui'); rerender(); })}"><h3>${o.n}</h3><p>${o.d}</p><p class="buff">${o.perk}</p></div>`).join('') + `</div>`;
+    h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. You can wear three; more at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
     h += `<div class="cat">BODY <span class="mu" style="text-transform:none;letter-spacing:.02em">— every inch moves your caps</span></div><div class="card"><div id="bodyLbl" style="display:none"></div>`;
     h += `<label class="sl">HEIGHT <b id="lh">${fmtH(T.build.body.h)}</b></label><input type="range" min="${H_MIN}" max="${H_MAX}" step="1" value="${T.build.body.h}" data-k="${on(el => { T.build.body.h = +el.value; $('lh').textContent = fmtH(T.build.body.h); upd(); })}">`;
     h += `<label class="sl">WEIGHT <b id="lw">${lbs()} lbs</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.w * 10)}" data-k="${on(el => { T.build.body.w = el.value / 10; upd(); })}">`;
@@ -5574,7 +5703,7 @@ function header() {
 }
 function uiPlayer(tab) {
   const st = { tab: tab || 'attrs' };
-  const tabs = [['builds', 'BUILDS'], ['attrs', 'ATTRIBUTES'], ['badges', 'STREET SMARTS'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['mag', 'CAGE MAG'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
+  const tabs = [['builds', 'BUILDS'], ['attrs', 'ATTRIBUTES'], ['badges', 'STREET SMARTS'], ['moves', 'MOVES'], ['pers', 'PERSONALITY'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['mag', 'CAGE MAG'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
   openPanel(() => {
     UI.cur.live = st.tab === 'crew';
     let h = `<div class="ph"><h2>MY PLAYER</h2>${Btn('✕', uiClose, 'alt sm')}</div>` + header() + `<div class="tabs">` + tabs.map(t => Btn(t[1], () => { st.tab = t[0]; sfx('ui'); rerender(true); }, st.tab === t[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb">`;
@@ -5633,6 +5762,8 @@ function uiPlayer(tab) {
       const done = ACH.filter(a => S.ach[a.id]).length; h += `<p class="mu">${done} / ${ACH.length} trophies.</p><div class="grid">`;
       for (const a of ACH) { const v = Math.min(a.t, achVal(a.k)), d = S.ach[a.id]; h += `<div class="card ${d ? 'sel' : ''}"><h3 style="color:${d ? 'var(--gold)' : 'var(--bone)'}">${d ? '✓ ' : ''}${a.n}</h3><p>${a.d}</p><div class="row" style="margin-top:4px"><div class="ab"><i style="width:${v / a.t * 100}%;background:var(--heat)"></i></div><div class="av" style="width:auto;font-size:11px">${v}/${a.t}</div></div><p class="buff">+${a.vc} HC${a.drip ? ' · ' + DRIPS[a.drip].n : ''}</p></div>`; }
       h += `</div>`;
+    } else if (st.tab === 'pers') {
+      h += persTab();
     } else if (st.tab === 'mag') {
       h += magTab();
     } else if (st.tab === 'road') {
@@ -5642,7 +5773,7 @@ function uiPlayer(tab) {
         h += `<div class="card ${i === r ? 'sel' : ''} ${i > r ? 'lock' : ''}"><div class="row"><h3 class="g" style="color:${i <= r ? 'var(--ice)' : 'var(--bone)'}">${i <= r ? '✓ ' : ''}${k.n}</h3><span class="f mu">${k.rep.toLocaleString()} RESPECT</span></div><p>${un.length ? 'Unlocks in shops: ' + un.join(' · ') : 'Where everyone starts. Even the Founding Fathers. Allegedly.'}</p></div>`;
       });
     } else {
-      h += `<div class="card"><h3>HIGHLIGHTS</h3><p>Big plays get a close-up and a banner, and yours are photographed for CAGE.</p>${Btn('CLOSE-UP CAMERA: ' + (S.set.hlcam === 0 ? 'OFF' : 'ON'), () => { S.set.hlcam = S.set.hlcam === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div><div class="card"><h3>SOUND</h3>${volSliders()}<div style="margin-top:8px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${OST.el ? Btn('SKIP TRACK (N)' + (OST.cur ? ' · now: ' + esc(OST.cur) : ''), () => { ostNext(); setTimeout(rerender, 300); }, 'sm alt') : ''} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('DEFENSE ASSIST: ' + (S.set.dassist === 0 ? 'OFF' : 'ON'), () => { S.set.dassist = S.set.dassist === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div></div>`;
+      h += `<div class="card"><h3>TRASH TALK</h3><p>Speech bubbles over players during games.</p>${Btn('BUBBLES: ' + (S.set.talk === 0 ? 'OFF' : 'ON'), () => { S.set.talk = S.set.talk === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div><div class="card"><h3>HIGHLIGHTS</h3><p>Big plays get a close-up and a banner, and yours are photographed for CAGE.</p>${Btn('CLOSE-UP CAMERA: ' + (S.set.hlcam === 0 ? 'OFF' : 'ON'), () => { S.set.hlcam = S.set.hlcam === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div><div class="card"><h3>SOUND</h3>${volSliders()}<div style="margin-top:8px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${OST.el ? Btn('SKIP TRACK (N)' + (OST.cur ? ' · now: ' + esc(OST.cur) : ''), () => { ostNext(); setTimeout(rerender, 300); }, 'sm alt') : ''} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('DEFENSE ASSIST: ' + (S.set.dassist === 0 ? 'OFF' : 'ON'), () => { S.set.dassist = S.set.dassist === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Cages with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (RUCKUS: shove) · jump to block and board.</p></div>`;
       h += `<div class="card"><h3>DEV ROOM</h3><p>A maxed-out player, every build, every move, and a reel that plays them all. F2 on The Block opens it too.</p><div style="margin-top:6px">${Btn('OPEN DEV ROOM', () => { uiClose(); uiDev('hub'); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => uiDialog('ARE YOU SURE', 'Erase your player, drip, crib and Respect for good?', [['Erase it all', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } S = newSave(); uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'red'], ['Never mind', null, 'alt']]), 'sm red')}</div></div>`;
@@ -6120,6 +6251,7 @@ function netGuestStep(dt) {
       else if (e.k === 'pu') puNet(e);
       else if (e.k === 'ca') { const K = M_.crowd; if (K) { const i = K.pool.findIndex(b => b.name === e.n), b = i >= 0 ? K.pool.splice(i, 1)[0] : null; crowdAdd(b, false); } }
       else if (e.k === 'cs') { const p = M_.P[e.i | 0]; if (p) p.celebStyle = String(e.s || '').slice(0, 14); }
+      else if (e.k === 'sb') { const p = M_.P[e.i | 0]; if (p && !(S.set && S.set.talk === 0)) bubble(p, String(e.t || '').slice(0, 100)); }
       else if (e.k === 'ta') { const p = M_.P[e.i | 0]; if (p) p.tauntT = 1.3; }
       else if (e.k === 'cr') crowdReact(String(e.p || ''), e.t === undefined ? undefined : e.t | 0, true);
       else if (e.k === 'ko') { const p = M_.P[e.i | 0]; if (p) p.ko = clamp(+e.d || 3, 0, 6); }
@@ -6687,7 +6819,7 @@ addEventListener('keydown', ev => { if (ev.code === 'F2' && W && !UI.cur && S.cr
 const ALAB = { a: null, b: null, act: 'shoot', speed: 1, paused: false, ball: true, t: 0, step: 0, prof: null, solo: null, ui: 'blend' };
 const ALAB_ACTS = [
   ['shoot', 'Jump shot'], ['fake', 'Pump fake'], ['idle', 'Idle'], ['dribble', 'Dribble'], ['hold', 'Triple threat'], ['slide', 'Defense'], ['run', 'Run'], ['walk', 'Walk'], ['pass', 'Pass'], ['jump', 'Contest'],
-  ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'], ['def:screen', 'Set a screen'], ['def:box', 'Box out'],
+  ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'], ['def:screen', 'Set a screen'], ['def:screen2', 'Hard screen'], ['def:screen3', 'Soft screen (slip)'], ['def:fight', 'Fight over a screen'], ['def:under', 'Go under a screen'], ['def:stuck', 'Caught on a screen'], ['def:box', 'Box out'],
   ['layup', 'Layup'], ['dunk', 'Dunk'], ['cross', 'Crossover'], ['post', 'Post up (LT)'], ['bodyup', 'Body up (LT)'], ['steal', 'Steal'], ['shove', 'Shove'], ['punch', 'Haymaker'], ['clothes', 'Clothesline'], ['stagger', 'Fall: sit'], ['fall:face', 'Fall: face first'], ['fall:flat', 'Fall: laid out'], ['fall:spin', 'Fall: spun round'], ['fall:knee', 'Fall: to a knee'],
   ['celeb:airflex', 'Celeb: air flex'], ['celeb:goggles', 'Celeb: three goggles'], ['celeb:bow', 'Celeb: take a bow'], ['celeb:callme', 'Celeb: call me'], ['celeb:flexdown', 'Celeb: crab flex'], ['celeb:toosmall', 'Celeb: too small'], ['celeb:stare', 'Celeb: stare down'], ['celeb:pout', 'Celeb: pout'], ['celeb:shh', 'Celeb: shh'], ['celeb:rock', 'Celeb: rock the baby'], ['celeb:nightnight', 'Celeb: night night'], ['celeb:pound', 'Celeb: chest pound'], ['celeb:shrug', 'Celeb: shrug'], ['celeb:floor', 'Celeb: slap the floor'], ['celeb:wag', 'Celeb: finger wag'], ['celeb:greenbean', 'Celeb: green bean'], ['celeb:greengiant', 'Celeb: green giant'], ['celeb:iceveins', 'Celeb: ice in my veins'], ['celeb:fentlean', 'Celeb: fent lean'], ['celeb:pour40', 'Celeb: pour out the 40'],
   ['fan:up', 'Fan: arms up'], ['fan:jump', 'Fan: jump'], ['fan:ohh', 'Fan: OHHH'], ['fan:point', 'Fan: point & laugh'], ['fan:cover', 'Fan: hand over mouth'], ['fan:boo', 'Fan: boo'], ['fan:count', 'Fan: three'], ['fan:wave', 'Fan: towel'], ['fan:clap', 'Fan: clap'], ['fan:phone', 'Fan: phone'], ['fan:film', 'Fan: filming'], ['fan:talk', 'Fan: talking'], ['fan:bob', 'Fan: bobbing'], ['fan:cross', 'Fan: arms crossed'],
@@ -6736,6 +6868,8 @@ function alabPose(F, s, dt) {
   else if (an === 'stagger') { o.fall = true; o.dur = 2.2; o.side = 0; P = poseOf('stagger', s.t, o); }
   else if (an.startsWith('fan:')) P = crowdPose(an.slice(4), ALAB.t, { ph: 0 }, prof);
   else if (an.startsWith('swag:')) { o.sp = 0; o.ph = ALAB.t * 7; o.dr = 0.8; o.hand = 'R'; o.swag = an.slice(5); o.swT = ALAB.t; P = poseOf('dribble', ALAB.t, o); }
+  else if (/^def:screen[23]$/.test(an)) { o.screen = +an.slice(-1); P = poseOf('idle', ALAB.t, o); }
+  else if (/^def:(fight|under|stuck)$/.test(an)) { o.scrR = an.slice(4); P = poseOf('slide', ALAB.t, o); }
   else if (an === 'def:screen' || an === 'def:box') { o[an.slice(4)] = 1; P = poseOf('idle', ALAB.t, o); }
   else if (an.startsWith('def:')) { o.ph = ALAB.t * 6; o.defMode = an.slice(4); o.ballSide = 1; o.swT = ALAB.t; P = poseOf('slide', ALAB.t, o); }
   else if (an.startsWith('fall:')) { o.fall = true; o.dur = 2.2; o.side = 1; o.kind = an.slice(5); P = poseOf('stagger', s.t % 2.7, o); }
@@ -6875,9 +7009,11 @@ function finishGame(res, m, tier, st, cfg) {
   const s = res.stats, L = S.life, notes = [];
   let vc = (res.win ? 70 : 30) * tier.mult + s.pts * 4 + s.ast * 6 + s.reb * 4 + s.stl * 8 + s.blk * 8 + s.ankles * 10 + s.dunks * 5 + s.greens * 4;
   if (m.arcade) vc *= 0.75;       // RUCKUS games are faster and score more
+  { const ph = persFx('hc'); if (ph) { vc *= 1 + ph; notes.push(`Personality +${Math.round(ph * 100)}% HC`); } }
   const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Crib +${Math.round(cv * 100)}% HC`); }
   if (cfg.boosts.includes('lotto')) { if (Math.random() < 0.5) { vc *= 2; notes.push('SCRATCH-OFF HIT: HC doubled'); } else notes.push('Scratch-off: "PLAY AGAIN"'); }
   let rep = (res.win ? 45 : 12) * tier.mult + s.pts + s.ast * 2 + s.stl * 2 + s.blk * 2 + s.ankles * 3 + res.bonusRep;
+  { const pr = persFx('rep'); if (pr) { rep *= 1 + pr; notes.push(`Personality +${Math.round(pr * 100)}% Respect`); } }
   const rm = (ORIGIN[S.build.origin].k === 'rep' ? 0.15 : 0) + cribFx('rep'); if (rm) { rep *= 1 + rm; notes.push(`+${Math.round(rm * 100)}% Respect`); }
   if (res.shutout && res.win) { rep += 40; notes.push('SKUNK: +40 Respect'); }
   if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% HC'); }

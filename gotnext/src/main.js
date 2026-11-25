@@ -91,9 +91,11 @@ function finishGame(res, m, tier, st, cfg) {
   const s = res.stats, L = S.life, notes = [];
   let vc = (res.win ? 70 : 30) * tier.mult + s.pts * 4 + s.ast * 6 + s.reb * 4 + s.stl * 8 + s.blk * 8 + s.ankles * 10 + s.dunks * 5 + s.greens * 4;
   if (m.arcade) vc *= 0.75;       // RUCKUS games are faster and score more
+  { const ph = persFx('hc'); if (ph) { vc *= 1 + ph; notes.push(`Personality +${Math.round(ph * 100)}% HC`); } }
   const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Crib +${Math.round(cv * 100)}% HC`); }
   if (cfg.boosts.includes('lotto')) { if (Math.random() < 0.5) { vc *= 2; notes.push('SCRATCH-OFF HIT: HC doubled'); } else notes.push('Scratch-off: "PLAY AGAIN"'); }
   let rep = (res.win ? 45 : 12) * tier.mult + s.pts + s.ast * 2 + s.stl * 2 + s.blk * 2 + s.ankles * 3 + res.bonusRep;
+  { const pr = persFx('rep'); if (pr) { rep *= 1 + pr; notes.push(`Personality +${Math.round(pr * 100)}% Respect`); } }
   const rm = (ORIGIN[S.build.origin].k === 'rep' ? 0.15 : 0) + cribFx('rep'); if (rm) { rep *= 1 + rm; notes.push(`+${Math.round(rm * 100)}% Respect`); }
   if (res.shutout && res.win) { rep += 40; notes.push('SKUNK: +40 Respect'); }
   if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% HC'); }

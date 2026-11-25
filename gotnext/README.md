@@ -41,6 +41,8 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
 - **Call a screen:** LB, R or the PICK button with the ball. A teammate plants on your defender, then rolls to the rim. **Box out:** hold LT while the shot is in the air. **Game point:** one bucket from the win, the release window follows your Shot IQ.
 - **Highlights and CAGE:** big plays get a close-up, a banner and a photo; your photos become CAGE magazine covers to collect (MY PLAYER → CAGE MAG).
 - **Finishing:** fades read the coverage, the free dunk and layup package varies with the approach, euros have a right and a wrong side, AI cuts and throws lobs.
+- **Personality:** 40 traits, wear three (MY PLAYER → PERSONALITY). They choose your trash talk, shown as small speech bubbles, and each gives a small edge. Seven are free in the builder; the rest are sold at Tape Deck.
+- **Screens** come hard (hold sprint when you call it), set or soft; on defense hold LT to fight over the top.
 - **22 street smarts** in four tiers, earned with smarts XP from real games. **Bravado** meter: big plays fill it, a full bar is
   +8 to everything for 20 seconds.
 - **Unlocks:** 74 pieces of drip in ten slots (some carry small buffs), 22 animations (dribble moves, jumpshots, dunk
