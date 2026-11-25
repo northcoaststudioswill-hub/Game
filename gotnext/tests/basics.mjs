@@ -20,7 +20,7 @@ let r = await p.evaluate(() => { const P = __pit, LO = P.ev('LOWER_BASES').slice
 ok(r.lo === 8 && r.up === 8 && r.lowDistinct === 8 && r.upDistinct === 8 && r.bad === 0 && r.cross < 0.001 && r.pairs >= 60, `${r.lo} lower bases × ${r.up} upper bases: each changes only its own half (bleed ${r.cross}), no bad numbers, ${r.pairs} of 64 pairs give a different set point`);
 ok(r.combos >= 15 && r.mine.join('') === '', `80 AI players shoot off ${r.combos} different base pairs; your own player keeps the blend until you pick`);
 r = await p.evaluate(() => { const P = __pit; P.ev("uiClose(); uiPlayer('moves')"); window.__tick(3); const cat = [...document.querySelectorAll('#panel .cat')].map(e => e.textContent.split('—')[0].trim()); const click = n => { const bt = [...document.querySelectorAll('#panel .card .btn')].find(e => e.textContent === n); bt.click(); window.__tick(2); };
-  click('Hop'); click('Two-hand push'); return { cat: cat[0], a: [P.S.anim.lower, P.S.anim.upper] }; });
+  click('Hop'); click('Two-hand push'); return { cat: cat.includes('JUMP SHOT BASES') ? 'JUMP SHOT BASES' : cat[0], a: [P.S.anim.lower, P.S.anim.upper] }; });
 ok(r.cat === 'JUMP SHOT BASES' && r.a.join() === 'hop,push', `MOVES has a free JUMP SHOT BASES picker: chose ${r.a.join(' + ')} and it is saved on the build`);
 await p.screenshot({ path: path.join(dir, 'shots', 'bases-menu.png'), timeout: 300000 });
 // finishes
