@@ -34,7 +34,7 @@ const ballJump = L => { let m = 0; for (let i = 1; i < L.length; i++) if (L[i].h
 
 // 1. sprint, reverse, sprint again: no sliding, no delayed control
 { const L = await page.evaluate(() => { T.setup('free', 60); const me = __pit.MT.me; me.x = -4; me.z = 6; window.__tick(10, 16.67); return T.run(60, [[1.1, ['KeyD', 'ShiftLeft']], [1.1, ['KeyA', 'ShiftLeft']], [0.3, ['KeyD', 'ShiftLeft']]], T.me); });
-  const f = L.findIndex(s => s.keys === 'KeyA+ShiftLeft'), top = Math.max(...L.slice(0, f).map(s => s.vx)), turn = L.slice(f).find(s => s.vx < -0.2), full = L.slice(f).find(s => s.vx < -0.9 * top), sl = plantedSlide(L);
+  const f = L.findIndex(s => s.keys === 'KeyA+ShiftLeft'), top = L[f - 1].vx /* the settled sprint, after the turbo burst has faded */, turn = L.slice(f).find(s => s.vx < -0.2), full = L.slice(f).find(s => s.vx < -0.9 * top), sl = plantedSlide(L);
   const flip = (turn.t - L[f].t) * 1000, fullMs = (full.t - L[f].t) * 1000;
   check(1, 'Sprint, reverse, sprint again', flip <= 150 && fullMs <= 420 && sl.p90 < 0.45, `moving the other way after ${flip.toFixed(0)} ms, full speed after ${fullMs.toFixed(0)} ms (was 283 / 517); planted feet p50 ${sl.p50.toFixed(2)} p90 ${sl.p90.toFixed(2)} m/s at ${top.toFixed(1)} m/s body speed (was ~2x body speed)`); }
 // 2. diagonal dribble into a crossover: no snapping, no teleporting ball

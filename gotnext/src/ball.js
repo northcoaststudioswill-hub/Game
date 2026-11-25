@@ -225,7 +225,7 @@ function releaseShot(p) {
   (p.tend || (p.tend = { three: 0, mid: 0, close: 0, drive: 0 }))[kind]++;
   let c = contestOn(p); if (s.j.id === 'moon') c *= 0.8; if (s.floater) c *= 0.5 * (pk(p, 'postpk').hook || 1); c *= (1 - 0.12 * bt(p, 'filibuster')); if (s.fade) c *= (s.fadeK === 'deep' ? 0.5 : s.fadeK === 'drift' ? 0.58 : 0.7) * (pk(p, 'postpk').fade || 1); if (s.side) c *= 0.85; c *= 1 - px(p, 'calm'); if (MT.stops && MT.stops[1 - p.team] >= 3) c *= 1.08;
   const rating = kind === 'three' ? 'three' : kind === 'mid' ? 'mid' : 'close', n = nAtt(p, rating);
-  let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.28 + n * 0.31 : 0.42 + n * 0.30;
+  let base = kind === 'three' ? 0.20 + n * 0.33 : kind === 'mid' ? 0.32 + n * 0.31 : 0.42 + n * 0.30;
   if (s.floater) base -= Math.max(0, d - 2.2) * 0.045;
   if (s.fade) base -= (s.fadeK === 'deep' ? 0.08 : s.fadeK === 'open' ? 0.06 : 0.05) * (1 - nAtt(p, 'mid') * 0.6);
   if (d > 7.6) base -= (d - 7.6) * 0.09 * (1 - 0.18 * bt(p, 'manifest'));
@@ -239,9 +239,10 @@ function releaseShot(p) {
   if (!MT.arcade) { if (p.hot >= 3) w *= 1.08; else if (p.cold >= 3 && bt(p, 'heatcheck') < 2) w *= 0.9; if (MT.runS && MT.runS.n >= 3) w *= MT.runS.team === p.team ? 1.05 : 0.97; }      /* streaks and runs */
   { const lead = MT.score[p.team] - MT.score[1 - p.team]; w *= 1 + px(p, 'green') + (MT.gamePt ? px(p, 'clutch') : 0) + (p.hot >= 2 ? px(p, 'hot') : 0) + (lead <= -3 ? px(p, 'behind') : 0) + (lead >= 3 ? px(p, 'ahead') : 0); }      /* personality */      /* game point: nerves shrink the window, a high Shot IQ widens it */
   const e = Math.abs(err); let green = e <= w, prob;
-  if (green) prob = c > 0.55 ? 0.8 : 1; else prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
-  if (!p.user) green = green && Math.random() < 0.5;
-  else if (s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
+  if (green && !p.user && Math.random() >= 0.5) green = false;      /* the AI lands in the window half as often as its timing says (it used to keep the sure make anyway) */
+  // perfect timing beats an open look every time; a hand in the face still costs a good release (smothered, about two in three)
+  if (green) prob = c < 0.15 ? 1 : 1 - (c - 0.15) * 0.7; else prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
+  if (p.user && s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
@@ -257,9 +258,9 @@ function releaseShot(p) {
   const make = Math.random() < prob; p.stats.fga++;
   const pts = MT.arcade ? (kind === 'three' ? 3 : 2) : (kind === 'three' ? 2 : 1);
   handPos(p.rig, 'R', B.pos); B.pos.y += 0.12;
-  launch(p, make, pts, green && make, s.floater ? 1.5 : s.j.arc, kind);
+  launch(p, make, pts, green && make && c < 0.4, s.floater ? 1.5 : s.j.arc, kind);
   if (p.user && !s.auto) {
-    const lbl = green && make ? 'GREEN' : e < w * 2.2 ? (err < 0 ? 'Slightly early' : 'Slightly late') : err < 0 ? (e > 0.45 ? 'Very early' : 'Early') : (e > 0.45 ? 'Very late' : 'Late');
+    const lbl = green && make ? (c < 0.4 ? 'GREEN' : 'GREEN · THROUGH A HAND') : green ? 'Perfect release · too much hand' : e < w * 2.2 ? (err < 0 ? 'Slightly early' : 'Slightly late') : err < 0 ? (e > 0.45 ? 'Very early' : 'Early') : (e > 0.45 ? 'Very late' : 'Late');
     fb(p, lbl + (c > 0.06 ? ` · ${Math.round(c * 100)}% contested` : ' · wide open'), green && make ? '#33ff88' : '#fff');
     if (green && make) { p.stats.greens++; sfxM('green'); addBrav(p, 0.05); }
   }
@@ -449,6 +450,8 @@ function doPass(p, to) {
   if (B.pos.y < 0.7) B.pos.y = 0.7;     /* a pass leaves from the hands, wherever the dribble had the ball */ B.speed = (11 + nAtt(p, 'pass') * 7) * (1 + px(p, 'pass')); sfxM('whoosh');
   const dd = dist(p, to); B.pk = oop ? 'lob' : (!passLane(p, to) && dd < 7) ? 'bounce' : dd > 7.5 ? 'overhead' : Math.hypot(p.vx, p.vz) > 3.2 ? 'one' : 'chest'; p.pk = B.pk;
   B.y0 = B.pos.y; B.h0 = Math.max(0.5, Math.hypot(to.x - B.pos.x, to.z - B.pos.z));
+  // give and go: the passer does not stand and admire it. With a lane he cuts behind the pass, hand up
+  if (!oop && !p.user && p.ai && !MT.arcade && !MT.needClear && MT.phase === 'live' && dHoop(p) > 4.2 && dHoop(p) < 8.6 && dHoop(to) > 3.5 && laneOpen(p) && Math.random() < 0.14 + p.aiLvl * 0.26) { p.ai.spot = [clamp(p.x * 0.15, -0.9, 0.9), 1.3]; p.ai.spotT = 1.6; p.ai.cut = true; if (to.user) { p.callT = 1.5; floatTxt(p, 'GIVE AND GO', '#fff'); } }
   if (oop && startFinish(to, 0, true)) { to.finish.oop = true; to.finish.dur = Math.max(to.finish.dur, 0.66); B.speed = Math.max(7, dist(p, to) / (to.finish.dur * 0.6)); B.oop = true; floatTxt(p, 'LOB', '#f2c14e'); } else B.oop = false;
 }
 function passTarget(p, mx, mz) {
@@ -805,6 +808,7 @@ function aiThink(p, dt) {
           if (ms && o) { ms.ai.scr.used = true; const ex = ms.x - o.x, ez = ms.z - o.z, el = Math.hypot(ex, ez) || 1; aiGo(p, ms.x + ex / el * 0.85, ms.z + ez / el * 0.85, true); a.mode = ''; a.viaT = 0.55; a.tick = 0.55; return; }
           if (a.viaT > 0) { a.viaT = 0; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } }
         { const us = mates.find(q => q.user && q.screen && dist(q, p) < 4.5); if (us && a.usedScr !== us && Math.random() < 0.7) { a.usedScr = us; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } if (!us) a.usedScr = null; }      /* you set him a screen: he comes off it */
+        if (o && od < 1.9 && o.st === 'steal' && p.reachBy === o && a.reachSeen !== p.reachAt && d > 2.6 && Math.random() < 0.35 + L * 0.55) { a.reachSeen = p.reachAt; a.mode = 'drive'; aiGo(p, 0, 0.6, true); p.sprWas = false; a.tick = 0.5; return; }      /* he reached and came up empty: go right now, past the hand he threw */
         const caller = mates.find(q => q.callT > 0);
         if (caller && passLane(p, caller) && Math.random() < 0.9) { doPass(p, caller); return; }
         if (!MT.arcade && p.live === 'drib' && d < 6.2 && d > 3.2 && o && od < 1.7 && nAtt(p, 'str') - nAtt(o, 'str') > 0.1 && p.H - o.H > 0.03 && Math.random() < 0.3 + L * 0.3) { a.postT = 2.6; floatTxt(p, 'POSTING UP', '#f2c14e'); return; }      /* a mismatch: take him down low */
@@ -815,8 +819,10 @@ function aiThink(p, dt) {
         if (!open && d < 7.6 && Math.random() < 0.05 + L * 0.05 + px(p, 'brav') * 0.4) { startFake(p); a.tick = 0.3; return; }
         const three = nAtt(p, 'three'), mid = nAtt(p, 'mid');
         const sel = (p.fire ? 2 : 1) * (1 + a.hold * 0.35) * (MT.clock < 6 ? 2 : 1) * (MT.gamePt ? 1 + px(p, 'clutch') * 5 : 1);      /* the cold-blooded want the last one */
-        if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < (open ? 0.45 : 0.05) * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
-        if (!beyondArc(p.x, p.z) && d > 2.8 && Math.random() < (open ? 0.42 : 0.07) * (0.25 + mid) * sel) { startShot(p, 'ai'); return; }
+        // the look, read off the hands actually near him: a good shooter waits for a clean one, a bad decision-maker takes what is there
+        const cn = contestOn(p), look = cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3;
+        if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < 0.45 * look * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
+        if (!beyondArc(p.x, p.z) && d > 2.8 && Math.random() < 0.42 * look * (0.25 + mid) * sel) { startShot(p, 'ai'); return; }
         // feed an open human sometimes; nobody likes an AI ball hog
         const hum = mates.find(q => q.user);
         if (hum && nearestOpp(hum)[1] > 1.6 && passLane(p, hum) && Math.random() < 0.22 + a.hold * 0.1) { doPass(p, hum); return; }
@@ -849,6 +855,13 @@ function aiThink(p, dt) {
         if (h && h !== p && dp > 3.6 && dp < 8.5 && laneOpen(p) && (high || od > 1.9) && Math.random() < 0.22 + L * 0.3 + (att(p, 'dunk') >= 62 ? 0.12 : 0)) { a.spot = [clamp(p.x * 0.15, -0.9, 0.9), 1.3]; a.spotT = 1.5; a.cut = true; if (h.user) { p.callT = 1.4; floatTxt(p, 'CUTTING', '#fff'); } }
         else if (Math.random() < 0.08) { a.spot = [rnd(-1, 1), 1.4]; a.spotT = 1.3; a.cut = true; } }
     }
+    // the ball is going to the rim: get out of the driver's way and into a window he can see, hands ready
+    { const h = B.holder; if (h && h !== p && !a.cut && !MT.needClear && !MT.arcade && dHoop(h) < 5.6 && (h.user ? h.sprinting && h.vx * -h.x + h.vz * -h.z > 2 : h.ai.mode === 'drive')) {
+        if (a.fillFor !== h || (a.fillT -= dt) <= 0) { a.fillFor = h; a.fillT = 0.7; let best = null, bs = -9;
+          for (let i = 0; i < 5; i++) { const s = SPOTS[i], ds = Math.hypot(s[0] - p.x, s[1] - p.z); if (ds > 6.5) continue; if (MT.P.some(q => q !== p && q.team === p.team && q !== h && Math.hypot(q.x - s[0], q.z - s[1]) < 2.6)) continue;
+            let od = 9; for (const q of MT.P) if (q.team !== p.team) od = Math.min(od, Math.hypot(q.x - s[0], q.z - s[1])); const sc = Math.min(od, 4) - ds * 0.25 + (passLane(h, { x: s[0], z: s[1] }) ? 1.2 : 0) - (Math.abs(s[0] - h.x) < 1.6 && s[1] < h.z ? 2 : 0); if (sc > bs) { bs = sc; best = s; } }
+          if (best) { a.spot = best; a.spotT = 1.6; } }
+      } else a.fillFor = null; }
     aiGo(p, a.spot[0], a.spot[1], a.cut || Math.hypot(a.spot[0] - p.x, a.spot[1] - p.z) > 3);
   } else {
     // defence
@@ -858,10 +871,19 @@ function aiThink(p, dt) {
     const md = Math.hypot(a.mx, a.mz) || 1; let gap = onBall ? (beyondArc(m.x, m.z) ? 1.25 - L * 0.25 : 0.95) : 1.9;
     // scouting: after a few trips a decent defender plays what you keep doing. A shooter gets crowded, a driver gets room
     if (onBall && m.tend && L > 0.35) { const t = m.tend, n = t.three + t.mid + t.close + t.drive; if (n >= 4) { const sh = (t.three + t.mid) / n, adj = sh > 0.6 ? -0.28 : sh < 0.35 ? 0.32 : 0; gap += adj * Math.min(1, L * 1.4); const tag = adj < 0 ? 'up' : adj > 0 ? 'sag' : ''; if (tag !== (a.scout || '')) { a.scout = tag; if (tag) floatTxt(p, tag === 'up' ? 'PLAYING UP ON YOU' : 'SAGGING OFF YOU', '#8d8d99'); } } }
+    // off the ball it depends how far the ball is: one pass away he sits in the lane to his man, two passes away he sinks to the paint.
+    // A shooter is never left alone for long, and a slow-witted defender just ball-watches from the same spot.
+    let shade = 0.22; a.helping = false;
+    if (!onBall && h && h.team !== p.team && !MT.arcade) { const far = dist(m, h), iq = clamp((L - 0.3) * 1.8, 0, 1), shooter = beyondArc(m.x, m.z) ? nAtt(m, 'three') : 0.3;
+      if (far < 7) { gap += (1.25 - gap) * iq; shade += (0.14 - shade) * iq; } else { gap += (2.7 - shooter * 0.9 - gap) * iq; shade += (0.40 - shade) * iq; }
+      if (m.fire) gap = Math.min(gap, 1.2); gap = Math.min(gap, Math.max(0.8, md - 0.9)); }
     let tx = a.mx - a.mx / md * gap, tz = a.mz - a.mz / md * gap;
-    if (!onBall && h) { tx += (h.x - tx) * 0.22; tz += (h.z - tz) * 0.22; }
+    if (!onBall && h) { tx += (h.x - tx) * shade; tz += (h.z - tz) * shade; }
     // help at the rim
-    if (h && h !== m && h.team !== p.team && dHoop(h) < 3.6 && dHoop(p) < 4.5 && L > 0.4) { tx = h.x * 0.5; tz = h.z * 0.5; }
+    if (h && h !== m && h.team !== p.team && dHoop(h) < 3.6 && dHoop(p) < 4.5 && L > 0.4) { tx = h.x * 0.5; tz = h.z * 0.5; a.helping = true; }
+    // help the helper: a teammate left his man to stop the ball, so the last man back splits the two left open and plays the pass
+    else if (!onBall && h && h.team !== p.team && L > 0.5 && !MT.arcade) { const hp = MT.P.find(q => q.team === p.team && q !== p && !q.user && q.ai.helping && q.man && q.man !== h);
+      if (hp) { const w = dHoop(hp.man) < dHoop(m) ? 0.6 : 0.4; tx = m.x + (hp.man.x - m.x) * w; tz = m.z + (hp.man.z - m.z) * w; const tl = Math.hypot(tx, tz) || 1; tx -= tx / tl * 0.9; tz -= tz / tl * 0.9; } }
     // a driver coming straight at him from a few steps away: a smart defender plants and takes it (outside the circle)
     if (h && h.team !== p.team && h.sprinting && !MT.arcade && dHoop(p) > 1.4 && dHoop(p) < 4.6) { const hv = Math.hypot(h.vx, h.vz) || 1, rx = p.x - h.x, rz = p.z - h.z, rd = Math.hypot(rx, rz) || 1; if (rd < 3.2 && rd > 0.9 && (rx * h.vx + rz * h.vz) / (rd * hv) > 0.9) { if (a.setFor !== h.turboAt + ':' + Math.floor(MT.time / 2)) { a.setFor = h.turboAt + ':' + Math.floor(MT.time / 2); a.setOn = Math.random() < 0.15 + L * 0.45; } if (a.setOn) { tx = p.x; tz = p.z; p.face = Math.atan2(-rx, -rz); } } }
     aiGo(p, tx, tz, Math.hypot(tx - p.x, tz - p.z) > 2.2);
