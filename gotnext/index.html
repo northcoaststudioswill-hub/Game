@@ -103,6 +103,7 @@ body:not([data-state=world]) #prompt{display:none!important}
 #call.go{animation:callin 1.2s both}
 @keyframes callin{0%{opacity:0;transform:skewX(-7deg) translateX(-40px)}10%{opacity:1;transform:skewX(-7deg)}82%{opacity:1}100%{opacity:0;transform:skewX(-7deg) translateX(30px)}}
 #fb{position:absolute;left:0;right:0;bottom:31%;text-align:center;font:700 11px var(--m);letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 0 var(--ink),0 0 10px var(--ink);opacity:0;transition:opacity .2s}
+#mstam{position:absolute;width:54px;height:5px;margin-left:-27px;background:rgba(8,8,10,.7);outline:1px solid rgba(236,233,226,.35);display:none;pointer-events:none}#mstam i{display:block;height:100%;background:var(--go)}#mstam.low i{background:var(--warn)}#mstam.out i{background:#ff4040}
 #meter{position:absolute;width:8px;height:92px;background:rgba(8,8,10,.75);display:none;outline:1px solid rgba(236,233,226,.7);overflow:hidden}
 #meterZone{position:absolute;left:0;right:0;background:var(--go)}#meterFill{position:absolute;left:0;right:0;bottom:0;background:var(--bone);mix-blend-mode:difference}
 #build{position:fixed;left:0;right:0;bottom:0;z-index:6;display:none;font:500 11px var(--m);color:var(--bone);pointer-events:none}
@@ -207,7 +208,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div id="sb"><div class="lbl" id="n0">YOU</div><div class="t0" id="s0">0</div><div id="clock">14</div><div class="t1" id="s1">0</div><div class="lbl" id="n1">THEM</div></div>
   <div id="modeTag"></div><div id="clear">TAKE IT BACK ↓ PAST THE ARC</div><div id="rackHud"></div>
   <div id="hl"><i class="lb t"></i><i class="lb b"></i><div class="hb"><small>CAGE MAG · HIGHLIGHT</small><b></b><span class="who"></span></div><div class="fit"></div><div class="clip">● CLIPPED FOR THE COVER</div><i class="fl"></i></div><div id="call"><b></b><small></small></div><div id="fb"></div>
-  <div id="meter"><div id="meterZone"></div><div id="meterFill"></div></div><div id="flts"></div>
+  <div id="mstam"><i></i></div><div id="meter"><div id="meterZone"></div><div id="meterFill"></div></div><div id="flts"></div>
 </div>
 <div id="panel"></div>
 <div id="title">
@@ -235,7 +236,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.17.2';
+const VERSION = '0.18.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -247,20 +248,20 @@ const BRAND = {
 // ---------- attributes ----------
 // cat: F finishing, S shooting, P playmaking, D defense, A athletics
 const ATTRS = [
-  { id: 'layup', n: 'Layup', cat: 'F', d: 'Finishing at the rim without leaving your dignity up there.' },
-  { id: 'dunk', n: 'Dunk', cat: 'F', d: 'How violently you may address the rim. About 45 with a clear run, 55 otherwise, on Street courts; taller players need less.' },
+  { id: 'layup', n: 'Layup', cat: 'F', d: 'Finishing at the rim. Every layup in your package runs on this.' },
+  { id: 'dunk', n: 'Dunk', cat: 'F', d: 'Getting up and throwing it down. About 45 with a clear run, 55 otherwise, on Street courts; taller players need less.' },
   { id: 'close', n: 'Close Shot', cat: 'F', d: 'Hooks, floaters and bunnies inside ten feet.' },
-  { id: 'mid', n: 'Mid-Range', cat: 'S', d: 'The lost art. Scouts in 2145 call it "treason".' },
-  { id: 'three', n: 'Deep Ball', cat: 'S', d: 'Shots from behind the arc. Worth double on the blacktop.' },
+  { id: 'mid', n: 'Mid-Range', cat: 'S', d: 'Pull-ups, fades and elbow jumpers. The shot nobody guards any more.' },
+  { id: 'three', n: 'Deep Ball', cat: 'S', d: 'Shots from behind the arc. Worth two out here.' },
   { id: 'iq', n: 'Shot IQ', cat: 'S', d: 'Widens your timing window and softens bad releases.' },
-  { id: 'handle', n: 'Handles', cat: 'P', d: 'Powers stick moves, ankle breakers and keeps the rock off thieves.' },
+  { id: 'handle', n: 'Handles', cat: 'P', d: 'Dribble moves, ankle breakers, and keeping the ball when he reaches.' },
   { id: 'pass', n: 'Passing', cat: 'P', d: 'Pass speed and how hard you are to pick off.' },
   { id: 'swb', n: 'Speed w/ Ball', cat: 'P', d: 'How much speed you keep while dribbling.' },
-  { id: 'perd', n: 'Perimeter D', cat: 'D', d: 'Stay in front, contest jumpers, keep your ankles.' },
+  { id: 'perd', n: 'Perimeter D', cat: 'D', d: 'Staying in front, contesting jumpers, keeping your ankles.' },
   { id: 'intd', n: 'Interior D', cat: 'D', d: 'Contests at the rim.' },
-  { id: 'steal', n: 'Steal', cat: 'D', d: 'Pick pockets and passing lanes.' },
-  { id: 'block', n: 'Block', cat: 'D', d: 'Return shots to sender.' },
-  { id: 'reb', n: 'Rebound', cat: 'D', d: 'Win boards over taller, richer people.' },
+  { id: 'steal', n: 'Steal', cat: 'D', d: 'Picking pockets and jumping passing lanes.' },
+  { id: 'block', n: 'Block', cat: 'D', d: 'Sending shots back where they came from.' },
+  { id: 'reb', n: 'Rebound', cat: 'D', d: 'Winning boards, including over people taller than you.' },
   { id: 'speed', n: 'Speed', cat: 'A', d: 'Top speed without the ball.' },
   { id: 'accel', n: 'Burst', cat: 'A', d: 'First step and how fast you hit top speed.' },
   { id: 'str', n: 'Strength', cat: 'A', d: 'Finish through contact, resist shoves, hold your spot.' },
@@ -338,21 +339,21 @@ const BADGES = [
   { id: 'hardhat', cat: 'D', n: 'Hard Hat', d: 'The whistle likes you: fewer reach-ins and shooting fouls called on you.', req: ['perd', 55, 68, 80, 92] },
   { id: 'clamps', cat: 'D', n: 'Clamps', d: 'Bodying up (LT) slows the ball handler more.', req: ['str', 55, 66, 78, 90] },
   { id: 'ironchin', cat: 'D', n: 'Iron Chin', d: 'RUCKUS: shrug off more punches, and it takes more to knock you out.', req: ['str', 58, 70, 82, 93] },
-  { id: 'lobby', cat: 'F', n: 'Rim Lobbyist', d: 'Contests on your drives matter less. You have friends at the rim.', req: ['layup', 55, 68, 80, 92] },
-  { id: 'gravity', cat: 'F', n: 'Gravity Waiver', d: 'Dunk from further out and more often in traffic.', req: ['dunk', 60, 72, 84, 94] },
-  { id: 'softmoney', cat: 'F', n: 'Soft Money', d: 'Layups and close shots drop softer.', req: ['close', 52, 64, 76, 88] },
-  { id: 'putback', cat: 'F', n: 'Putback Patriot', d: 'Big finishing boost right after an offensive board.', req: ['reb', 50, 62, 74, 86] },
-  { id: 'manifest', cat: 'S', n: 'Manifest Destiny', d: 'Deep, deep threes lose less accuracy. That land was always yours.', req: ['three', 62, 74, 85, 94] },
-  { id: 'opencarry', cat: 'S', n: 'Open Carry', d: 'Extra accuracy when left wide open.', req: ['three', 50, 62, 74, 86] },
-  { id: 'filibuster', cat: 'S', n: 'Filibuster', d: 'Hands in your face count for less on jumpers.', req: ['mid', 58, 70, 82, 92] },
-  { id: 'greencard', cat: 'S', n: 'Green Card', d: 'Wider green release window.', req: ['iq', 55, 68, 80, 92] },
-  { id: 'ankletax', cat: 'P', n: 'Ankle Tax', d: 'Stick moves break ankles more often. Collected at the source.', req: ['handle', 60, 72, 84, 94] },
-  { id: 'trickle', cat: 'P', n: 'Trickle Down', d: 'Teammates shoot better off your passes. For once it works.', req: ['pass', 55, 68, 80, 92] },
+  { id: 'lobby', cat: 'F', n: 'Through Traffic', d: 'Contests on your drives matter less.', req: ['layup', 55, 68, 80, 92] },
+  { id: 'gravity', cat: 'F', n: 'Air Time', d: 'Dunk from further out and more often in traffic.', req: ['dunk', 60, 72, 84, 94] },
+  { id: 'softmoney', cat: 'F', n: 'Soft Touch', d: 'Layups and close shots drop softer.', req: ['close', 52, 64, 76, 88] },
+  { id: 'putback', cat: 'F', n: 'Second Chance', d: 'Big finishing boost right after an offensive board.', req: ['reb', 50, 62, 74, 86] },
+  { id: 'manifest', cat: 'S', n: 'Parking Lot Range', d: 'Very deep threes lose less accuracy.', req: ['three', 62, 74, 85, 94] },
+  { id: 'opencarry', cat: 'S', n: 'Leave Him Open', d: 'Extra accuracy when they leave you wide open.', req: ['three', 50, 62, 74, 86] },
+  { id: 'filibuster', cat: 'S', n: 'Hand Down, Man Down', d: 'Hands in your face count for less on jumpers.', req: ['mid', 58, 70, 82, 92] },
+  { id: 'greencard', cat: 'S', n: 'Green Light', d: 'Wider green release window.', req: ['iq', 55, 68, 80, 92] },
+  { id: 'ankletax', cat: 'P', n: 'Ankle Breaker', d: 'Dribble moves break ankles more often.', req: ['handle', 60, 72, 84, 94] },
+  { id: 'trickle', cat: 'P', n: 'Dime Dropper', d: 'Teammates shoot better off your passes.', req: ['pass', 55, 68, 80, 92] },
   { id: 'getaway', cat: 'P', n: 'Getaway Driver', d: 'Bigger burst out of every dribble move.', req: ['swb', 58, 70, 82, 92] },
-  { id: 'nda', cat: 'P', n: 'Non-Disclosure', d: 'Much harder to strip. The ball has signed paperwork.', req: ['handle', 50, 64, 78, 90] },
-  { id: 'ground', cat: 'D', n: 'Stand Your Ground', d: 'Resist ankle breakers and contest harder.', req: ['perd', 58, 70, 82, 93] },
-  { id: 'eminent', cat: 'D', n: 'Eminent Domain', d: 'Longer reach on rebounds. That board is being seized.', req: ['reb', 58, 70, 82, 93] },
-  { id: 'repo', cat: 'D', n: 'Repo Man', d: 'Steal attempts land more often and whiff less.', req: ['steal', 58, 70, 82, 93] },
+  { id: 'nda', cat: 'P', n: 'Tight Handle', d: 'Much harder to strip, and you see more reaches coming.', req: ['handle', 50, 64, 78, 90] },
+  { id: 'ground', cat: 'D', n: 'Sit Down Defense', d: 'Resist ankle breakers and contest harder.', req: ['perd', 58, 70, 82, 93] },
+  { id: 'eminent', cat: 'D', n: 'Long Arms', d: 'Longer reach on rebounds.', req: ['reb', 58, 70, 82, 93] },
+  { id: 'repo', cat: 'D', n: 'Pickpocket', d: 'Steal attempts land more often and whiff less.', req: ['steal', 58, 70, 82, 93] },
   { id: 'nofly', cat: 'D', n: 'No Fly Zone', d: 'Block more shots and dunks.', req: ['block', 55, 68, 80, 92] },
 ];
 const BADGE = {}; BADGES.forEach(b => BADGE[b.id] = b);
@@ -663,7 +664,7 @@ const TIERS_COURT = [
 // ---------- achievements ----------
 // stat key in save.life (lifetime counters); n target; reward vc / drip
 const ACH = [
-  { id: 'first', n: 'First Blood (Legal)', d: 'Score your first bucket.', k: 'pts', t: 1, vc: 50 },
+  { id: 'first', n: 'First Bucket', d: 'Score your first bucket.', k: 'pts', t: 1, vc: 50 },
   { id: 'w1', n: 'Dub', d: 'Win a game.', k: 'wins', t: 1, vc: 100 },
   { id: 'w10', n: 'Regular', d: 'Win 10 games.', k: 'wins', t: 10, vc: 400 },
   { id: 'w50', n: 'Park Fixture', d: 'Win 50 games.', k: 'wins', t: 50, vc: 2000, drip: 'hd_crowngold' },
@@ -673,11 +674,11 @@ const ACH = [
   { id: 'd50', n: 'Rim Vandal', d: '50 dunks.', k: 'dunks', t: 50, vc: 800, drip: 'hd_eagle' },
   { id: 'g10', n: 'Wet', d: '10 green releases.', k: 'greens', t: 10, vc: 150 },
   { id: 'g200', n: 'Money Printer', d: '200 green releases.', k: 'greens', t: 200, vc: 1200, drip: 'bl_void' },
-  { id: 't25', n: 'From Downtown (Uptown)', d: 'Hit 25 deep balls.', k: 'threes', t: 25, vc: 300 },
+  { id: 't25', n: 'From Downtown', d: 'Hit 25 deep balls.', k: 'threes', t: 25, vc: 300 },
   { id: 'a1', n: 'Ankle Insurance', d: 'Break someone\'s ankles.', k: 'ankles', t: 1, vc: 100 },
   { id: 'a40', n: 'Podiatrist\'s Nightmare', d: '40 ankle breakers.', k: 'ankles', t: 40, vc: 900, drip: 'k_hover' },
-  { id: 'as25', n: 'Socialist', d: '25 assists. Sharing is still legal.', k: 'ast', t: 25, vc: 300 },
-  { id: 's20', n: 'Repossessed', d: '20 steals.', k: 'stl', t: 20, vc: 300 },
+  { id: 'as25', n: 'Share The Rock', d: '25 assists.', k: 'ast', t: 25, vc: 300 },
+  { id: 's20', n: 'Sticky Fingers', d: '20 steals.', k: 'stl', t: 20, vc: 300 },
   { id: 'b20', n: 'Return To Sender', d: '20 blocks.', k: 'blk', t: 20, vc: 300 },
   { id: 'r50', n: 'Board Member', d: '50 rebounds.', k: 'reb', t: 50, vc: 350 },
   { id: 'fire', n: 'Fire Hazard', d: 'Catch fire in a RUCKUS game.', k: 'fires', t: 1, vc: 200 },
@@ -688,7 +689,7 @@ const ACH = [
   { id: 'so', n: 'Sharpshooter', d: 'Score 20+ in a Money Rack shootout.', k: 'bestRack', t: 20, vc: 500 },
   { id: 'drip10', n: 'Drip Check', d: 'Own 16 pieces of drip.', k: 'owned', t: 16, vc: 200 },
   { id: 'drip30', n: 'Walking Billboard', d: 'Own 36 pieces of drip.', k: 'owned', t: 36, vc: 1000 },
-  { id: 'crib5', n: 'Homeowner (!)', d: 'Buy 5 crib upgrades. In this economy.', k: 'cribs', t: 5, vc: 500 },
+  { id: 'crib5', n: 'Homeowner', d: 'Buy 5 crib upgrades.', k: 'cribs', t: 5, vc: 500 },
   { id: 'ovr80', n: 'Somebody', d: 'Reach 80 OVR.', k: 'ovr', t: 80, vc: 600 },
   { id: 'ovr95', n: 'Problem', d: 'Reach 95 OVR.', k: 'ovr', t: 95, vc: 3000 },
   { id: 'drill1', n: 'Clocked In', d: 'Finish a drill.', k: 'drills', t: 1, vc: 50 },
@@ -705,7 +706,7 @@ const BUM_NAMES = ['Deshawn "99 OVR"', 'Tre the Grinder', 'Lil Microtransaction'
 const BUM_ASK = [
   'Yo, lemme hold {n} HC. My center on Basketball 2146 is ONE upgrade from a 61 overall.',
   'Spare {n} HC? PS88 servers go down in a year, I gotta finish my build before they do.',
-  'Please. {n} HC. My guy still got bronze Rim Lobbyist. BRONZE. I can\'t be seen like this.',
+  'Please. {n} HC. My guy still got bronze Through Traffic. BRONZE. I can\'t be seen like this.',
   'I sold my hover-car for HC, bro. Then they dropped Basketball 2146. Just {n}. For the animations.',
   'I ain\'t eaten in two days but my player got the new jumpshot. Worth it. Got {n} HC?',
   '{n} HC and I\'m out your face. My build is a 7\'3" point guard, it\'s gonna be meta, trust.',
@@ -744,15 +745,15 @@ const CHAT = {
   neighbor: ['Nice place you got.', 'Your speakers are LOUD. Respect.', 'I heard you can dunk from the free throw line.'],
 };
 const CALLS = {
-  make: ['BUCKET!', 'CASH!', 'WET!', 'THAT\'S AMERICA\'S SHOT!', 'DIRECT DEPOSIT!'],
-  green: ['GREEN!', 'PURE!', 'TAX-FREE!', 'ALL NET, NO GROSS!'],
-  three: ['FROM THE PARKING LOT!', 'FREEDOM FROM DEEP!', 'MANIFEST DESTINY!', 'LONG-DISTANCE CALL!'],
-  dunk: ['SLAMMA JAMMA!', 'RIM DESERVED THAT!', 'HE VOTED!', 'CALL HIS LAWYER!', 'LIBERTY AND DUNKS FOR ALL!'],
-  ankle: ['ANKLES: REPOSSESSED!', 'HE FELL! BILL HIM!', 'SOMEBODY CALL A PODIATRIST!', 'TAXED!'],
-  block: ['RETURN TO SENDER!', 'NOT IN THIS ECONOMY!', 'DENIED! LIKE THE LOAN!'],
-  steal: ['YOINK!', 'REPOSSESSED!', 'FINDERS KEEPERS!'],
+  make: ['BUCKET!', 'CASH!', 'WET!', 'BOTTOMS!', 'TOO EASY!', 'COUNT IT!'],
+  green: ['GREEN!', 'PURE!', 'NOTHING BUT NET!', 'DON\'T EVEN LOOK!'],
+  three: ['FROM THE PARKING LOT!', 'FROM WAY OUT!', 'HE\'S GOT RANGE!', 'LONG-DISTANCE CALL!'],
+  dunk: ['SLAMMA JAMMA!', 'RIM DESERVED THAT!', 'THROW IT DOWN!', 'GET UP!', 'ON HIS HEAD!'],
+  ankle: ['ANKLES: GONE!', 'HE FELL!', 'SOMEBODY HELP HIM UP!', 'PUT HIM ON SKATES!'],
+  block: ['RETURN TO SENDER!', 'NOT IN HERE!', 'DENIED!', 'GET THAT OUT!'],
+  steal: ['YOINK!', 'COOKIES!', 'FINDERS KEEPERS!', 'PICKED HIM CLEAN!'],
   miss: ['BRICK!', 'CLANK!', 'BUILDING A HOUSE!'],
-  fire: ['HE\'S ON FIRE! (LITERALLY. HELP.)', 'FIRE HAZARD!'],
+  fire: ['HE\'S ON FIRE!', 'SOMEBODY COOL HIM OFF!'],
   brav: ['BRAVADO!', 'MAIN CHARACTER ENERGY!'],
 };
 const NPC_NAMES = ['Dre', 'Tank', 'Juice', 'Ghost', 'Slim', 'Maverick', 'Tex', 'Brick', 'Chrome', 'Vegas', 'Dallas', 'Nitro', 'Ace', 'Cash', 'Rocket', 'Duke', 'Eagle', 'Blaze', 'Ohio', 'Diesel', 'Pop', 'Zeke', 'Money', 'Truck'];
@@ -798,9 +799,25 @@ function newSave() {
 }
 function loadSave() {
   try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); return; } } catch (e) { }
+  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY + '.bak')); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); S.restored = 1; return; } } catch (e) { }      /* the save would not read: yesterday's copy */
   S = newSave(); slotsInit();
 }
-function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
+// Save safety: a copy of the last good save is kept once a day; if the save does not fit, the magazine photos go first
+// (covers keep their headline), then you are told. saveCode / saveFromCode let you carry a save out and back in as text.
+function saveLocal() {
+  const day = new Date().toISOString().slice(0, 10);
+  try { if (S.bakDay !== day) { const prev = localStorage.getItem(SAVE_KEY); if (prev && prev.length > 50) { try { localStorage.setItem(SAVE_KEY + '.bak', saveSlim(prev)); } catch (e) { } } S.bakDay = day; } } catch (e) { }
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); S.saveBad = 0; return true; } catch (e) { }
+  try { if (S.mag && S.mag.list) for (const it of S.mag.list) it.img = ''; localStorage.removeItem(SAVE_KEY + '.bak'); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); if (!S.saveBad && typeof toast === 'function') toast('SAVE WAS FULL', 'The CAGE photos were dropped to make room. Covers keep their headlines.'); S.saveBad = 1; return true; } catch (e) { }
+  if (S.saveBad !== 2 && typeof toast === 'function') toast('COULD NOT SAVE', 'This browser is not letting the game store anything. Copy a save code in OPTIONS to keep your player.'); S.saveBad = 2; return false;
+}
+function saveSlim(raw) { try { const j = typeof raw === 'string' ? JSON.parse(raw) : JSON.parse(JSON.stringify(raw)); if (j.mag && j.mag.list) for (const it of j.mag.list) it.img = ''; return JSON.stringify(j); } catch (e) { return typeof raw === 'string' ? raw : ''; } }
+function saveCode() { if (S.slots) S.slots[S.slot] = slotSnap(); return 'GOTNEXT1:' + btoa(unescape(encodeURIComponent(saveSlim(S)))); }
+function saveFromCode(code) {
+  try { const m = String(code || '').trim().match(/^GOTNEXT1:([A-Za-z0-9+/=\s]+)$/); if (!m) return 'That is not a GOT NEXT save code.'; const j = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/\s+/g, ''))))); if (!j || j.v !== 1 || !j.build || typeof j.vc !== 'number') return 'The code is damaged.';
+    try { localStorage.setItem(SAVE_KEY + '.bak', saveSlim(S)); } catch (e) { } S = Object.assign(newSave(), j); slotsInit(); save(); return ''; } catch (e) { return 'The code is damaged.'; }
+}
+function saveRestoreBackup() { try { const j = JSON.parse(localStorage.getItem(SAVE_KEY + '.bak')); if (!j || j.v !== 1) return 'There is no backup yet.'; const cur = saveSlim(S); S = Object.assign(newSave(), j); slotsInit(); save(); try { localStorage.setItem(SAVE_KEY + '.bak', cur); } catch (e) { } return ''; } catch (e) { return 'There is no backup yet.'; } }
 function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
 // ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
 // fit; HC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
@@ -980,6 +997,13 @@ function sfx(n) {
     case 'bounce': tone(120, t, .09, 'sine', .5, 60); noise(t, .03, .12, 300, 900); break;
     case 'swish': noise(t, .28, .5, 2500, 7000); break;
     case 'green': noise(t, .3, .5, 2500, 7000); tone(880, t, .12, 'triangle', .25); tone(1320, t + .08, .2, 'triangle', .25); break;
+    case 'squeak': { const f0 = 1900 + Math.random() * 900; tone(f0, t, .055 + Math.random() * .03, 'sawtooth', .035, f0 * (1.25 + Math.random() * .3)); noise(t, .05, .05, 3200, 7000); break; }      /* a sneaker biting the court */
+    case 'rattle': tone(310, t, .12, 'square', .13, 290); tone(463, t + .09, .1, 'square', .1, 440); tone(330, t + .2, .12, 'square', .09, 300); noise(t + .34, .22, .4, 2500, 7000); break;      /* round the rim and in */
+    case 'net2': noise(t, .2, .42, 1800, 5200); noise(t + .05, .16, .3, 3500, 8000); break;      /* a softer, lower swish */
+    case 'crowdup': noise(t, 1.1, .16, 250, 1300); noise(t + .15, .9, .13, 700, 2600); tone(180, t, .9, 'sawtooth', .02, 260); break;      /* the fence getting loud */
+    case 'ooh': noise(t, .7, .13, 200, 900); tone(210, t, .6, 'sawtooth', .025, 150); break;      /* a groan */
+    case 'thud': tone(70, t, .16, 'sine', .55, 40); noise(t, .08, .2, 100, 500); break;      /* a body on the court */
+    case 'turbo': noise(t, .18, .16, 900, 3600); tone(300, t, .16, 'triangle', .08, 620); break;
     case 'rim': tone(310, t, .25, 'square', .14, 280); tone(463, t, .2, 'square', .1, 440); break;
     case 'dunk': tone(90, t, .4, 'sawtooth', .5, 40); noise(t, .3, .6, 100, 900); tone(310, t + .02, .5, 'square', .12, 290); break;
     case 'whoosh': noise(t, .16, .22, 500, 2500); break;
@@ -1685,6 +1709,9 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (o.jolt) {      // contact: the same idea as the hit layer, small and short. The trunk takes it, the head lags, the knees give a little; the feet stay where they are
+    const J = o.jolt, jt = J.t || 0, sm = x => x * x * (3 - 2 * x), e = sm(clamp(jt / 0.07, 0, 1)) * (1 - sm(clamp((jt - 0.1) / 0.38, 0, 1))), pw = (J.pw || 1) * 0.55, ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('chest', J.fb * 0.3 * pw * e, J.tw * 0.55 * pw * e, 0); ad('spine', J.fb * 0.14 * pw * e, J.tw * 0.25 * pw * e, -J.tw * 0.1 * pw * e); ad('neck', -J.fb * 0.3 * pw * e, -J.tw * 0.4 * pw * e, 0); ad('hips', 0, J.tw * 0.2 * pw * e, 0); ad('knR', 0.12 * pw * e); ad('knL', 0.12 * pw * e); p.y = (p.y || 0) - 0.02 * pw * e; }
   if (anim === 'stagger' && o.hit) {
     // HIT LAYER: the same stumble or fall, driven by where and how hard he was hit. The chest turns with the push first,
     // the head lags the other way, the hips follow a beat later, each leg goes its own way, and on the floor he bounces
@@ -2399,6 +2426,7 @@ function scorePts(p, pts, how) {
   const M_ = MT; if (p.pu && p.pu.id === 'double' && !M_.practice) { pts *= 2; p.pu = null; p.puA = null; if (M_.net === 'host') netEv({ k: 'pu', a: 'x', i: p.i }); call('DOUBLE UP', p.b.name + ' · that one counts ' + pts, '#ff4fd8', 1.2); }
   M_.score[p.team] += pts; p.stats.pts += pts; p.stats.fgm++; p.hot++; p.cold = 0; M_.lastScorer = p; if (M_.stops) M_.stops[1 - p.team] = 0;
   if (!M_.arcade && p.hot === 3) floatTxt(p, 'HEATING UP', '#ff8a1f');
+  if (how === 'dunk' || pts >= 2 || (M_.runS && M_.runS.n >= 2)) sfx('crowdup');
   if (how !== 'dunk' && M_.B.shooter === p && M_.B.clockAt !== undefined && M_.B.clockAt < 1.6 && !M_.practice && !M_.drill) { highlight('buzzer', p); lateCall(0.9, 'BUZZER BEATER', p.b.name + ' beat the clock', '#ffc531'); M_.B.clockAt = undefined; }
   { const R = M_.runS || (M_.runS = { team: -1, n: 0, pts: 0 });      // unanswered buckets: three in a row is a run
     if (R.team === p.team) { R.n++; R.pts += pts; } else { if (R.n >= 3) lateCall(1.5, 'RUN OVER', p.b.name + ' stops the bleeding', '#7de3ff'); R.team = p.team; R.n = 1; R.pts = pts; }
@@ -2688,7 +2716,7 @@ function startMove(p, slot, dx, dz) {
   if (mv.keep) { dx *= 0.45; dz = -0.9; }            /* in-and-out: the fake goes sideways, the burst goes forward */ const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
   p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
-  p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh');
+  p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh'); sfx('squeak');
   // the same move the same way, again and again, gets read; mixing them up builds a combo
   const sig = slot + (dx > 0.2 ? 'R' : dx < -0.2 ? 'L' : 'C'), H = p.mvHist || (p.mvHist = []), rep = H.filter(h => h.s === sig && MT.time - h.t < 6).length, fresh = H.length && H[H.length - 1].s !== sig && MT.time - H[H.length - 1].t < 1.4; H.push({ s: sig, t: MT.time }); if (H.length > 4) H.shift();
   if (p.user && p.combo >= 2 && fresh) floatTxt(p, 'COMBO ×' + (p.combo + 1), '#f2c14e');
@@ -2761,7 +2789,7 @@ function startSteal(p) {
     if (h && h.team !== p.team && dist(h, p) < 1.4 && p.reach.length >= 3 && Math.random() < 0.09 * (p.reach.length - 2)) foul(p, h, 'hand check');
     return;
   }
-  // the handler sees the reach coming (Handles, and Non-Disclosure): the ball goes to the far hand and the swipe finds less of it
+  // the handler sees the reach coming (Handles, and Tight Handle): the ball goes to the far hand and the swipe finds less of it
   if (h && h.team !== p.team && dist(h, p) < 2.2 && h.st === 'free' && !MT.arcade) { h.reachBy = p; h.reachAt = now; h.reachSaw = Math.random() < 0.12 + nAtt(h, 'handle') * 0.5 + 0.07 * bt(h, 'nda') - (h.sprinting ? 0.15 : 0); }
   if (MT.arcade) {   // RUCKUS: shove; hold LT for a haymaker; at a sprint it is a clothesline (AI throws the odd punch too)
     const kind = p.sprinting && Math.hypot(p.vx, p.vz) > 3.6 ? 'clothes' : (p.ltHeld || (!p.user && Math.random() < 0.22)) ? 'punch' : 'shove';
@@ -2963,7 +2991,7 @@ function aiScreen(p, dt) {
 function screenHit(s, o) {
   const M_ = MT, sc = s.ai.scr, k = (sc && sc.kind) || 'set', hh = (sc && sc.h) || (M_.B.holder && M_.B.holder.team === s.team ? M_.B.holder : null), spd = Math.hypot(o.vx, o.vz);
   const ds = nAtt(s, 'str') - nAtt(o, 'str') + (k === 'hard' ? 0.15 : k === 'soft' ? -0.2 : 0) + px(s, 'screen');
-  o.scrHit = M_.time; if (sc) sc.hit = true; sfxM('bump'); if (s.user) s.stats.scr = (s.stats.scr || 0) + 1; const dx = o.x - s.x, dz = o.z - s.z, l = Math.hypot(dx, dz) || 1;
+  o.scrHit = M_.time; if (sc) sc.hit = true; sfxM('bump'); { const dx0 = o.x - s.x, dz0 = o.z - s.z, l0 = Math.hypot(dx0, dz0) || 1, fx = Math.sin(o.face), fz = Math.cos(o.face), jx = dx0 / l0, jz = dz0 / l0; o.jolt = { tw: jx * fz - jz * fx, fb: jx * fx + jz * fz, pw: 1, t: 0 }; } if (s.user) s.stats.scr = (s.stats.scr || 0) + 1; const dx = o.x - s.x, dz = o.z - s.z, l = Math.hypot(dx, dz) || 1;
   const fight = o.user ? !!o.ltHeld : Math.random() < 0.2 + nAtt(o, 'str') * 0.5;
   if (k === 'hard' && spd > 2.0 && Math.random() < clamp(0.1 + ds * 0.5, 0.03, 0.4)) {      // laid out
     o.st = 'stagger'; o.t = 0; o.stg = { dur: 1.3, fall: true, side: Math.random() < 0.5 ? 1 : -1, dir: [dx / l, dz / l], push: 1.8, kind: pick(['flat', 'sit', 'spin']) };
@@ -3088,7 +3116,7 @@ function aiThink(p, dt) {
         const hum = mates.find(q => q.user);
         if (hum && nearestOpp(hum)[1] > 1.6 && passLane(p, hum) && Math.random() < 0.22 + a.hold * 0.1) { doPass(p, hum); return; }
         const driveBias = { slasher: 0.75, showman: 0.6, general: 0.5, glass: 0.6, lockdown: 0.45, sniper: 0.25 }[style] || 0.5;
-        if (laneOpen(p) && Math.random() < driveBias + 0.2) { a.mode = 'drive'; aiGo(p, 0, 0.6, true); }
+        if (laneOpen(p) && Math.random() < driveBias + 0.2) { a.mode = 'drive'; aiGo(p, 0, 0.6, true); p.sprWas = false; }      /* a fresh squeeze: the AI gets its turbo burst too */
         else {
           const r = Math.random();
           if (r < 0.2 + L * 0.2 && o && od < 2.2 && p.stam > 20) { const side = (o.x - p.x) > 0 ? -1 : 1; const r2 = Math.random(); if (r2 < 0.6) startMove(p, 'side', side, -0.2); else if (r2 < 0.8) startMove(p, 'back', side * 0.5, 1); else startMove(p, 'diag', side * 0.8, -0.8); a.tick = 0.15; return; }
@@ -3100,6 +3128,8 @@ function aiThink(p, dt) {
       }
     }
     if (a.mode === 'drive') { aiGo(p, 0, 0.6, true); if (dHoop(p) < 2.2) { a.mode = ''; startFinish(p); return; } }
+  } else if (MT.off === p.team && !a.scr && B.holder && B.holder.user && B.holder.team === p.team && !MT.needClear && !MT.arcade && (a.offerT = (a.offerT || 0) + dt) > 3.2 && dHoop(B.holder) > 4.5 && nearestOpp(B.holder)[1] < 2 && (a.offerT = 0, Math.random() < 0.25 + L * 0.4) && callScreen(B.holder)) {
+    /* your teammate saw you held up and came to set one without being asked */
   } else if (MT.off === p.team && a.scr && aiScreen(p, dt)) {
     /* setting a screen or rolling off it */
   } else if (MT.off === p.team) {
@@ -3127,6 +3157,8 @@ function aiThink(p, dt) {
     if (!onBall && h) { tx += (h.x - tx) * 0.22; tz += (h.z - tz) * 0.22; }
     // help at the rim
     if (h && h !== m && h.team !== p.team && dHoop(h) < 3.6 && dHoop(p) < 4.5 && L > 0.4) { tx = h.x * 0.5; tz = h.z * 0.5; }
+    // a driver coming straight at him from a few steps away: a smart defender plants and takes it (outside the circle)
+    if (h && h.team !== p.team && h.sprinting && !MT.arcade && dHoop(p) > 1.4 && dHoop(p) < 4.6) { const hv = Math.hypot(h.vx, h.vz) || 1, rx = p.x - h.x, rz = p.z - h.z, rd = Math.hypot(rx, rz) || 1; if (rd < 3.2 && rd > 0.9 && (rx * h.vx + rz * h.vz) / (rd * hv) > 0.9) { if (a.setFor !== h.turboAt + ':' + Math.floor(MT.time / 2)) { a.setFor = h.turboAt + ':' + Math.floor(MT.time / 2); a.setOn = Math.random() < 0.15 + L * 0.45; } if (a.setOn) { tx = p.x; tz = p.z; p.face = Math.atan2(-rx, -rz); } } }
     aiGo(p, tx, tz, Math.hypot(tx - p.x, tz - p.z) > 2.2);
     if (h && h.team !== p.team) {
       const dh = dist(h, p);
@@ -3166,10 +3198,12 @@ function matchStep(dtReal) {
   if (M_.drill && !M_.over) { drillStep(dt); if (MT !== M_) return; }
 
   for (const p of M_.P) {
-    p.in = p.in || { dx: 0, dz: 0, sprint: false }; if (p.scrR && (p.scrR.t -= dt) <= 0) p.scrR = null; if (p.diveT > 0) { p.diveT -= dt; if (p.st === 'free') { p.x = clamp(p.x + p.dvx * dt, -8.6, 8.6); p.z = clamp(p.z + p.dvz * dt, -2, 13.4); } } if (p.buf) p.buf.ttl -= dt; p.t += dt; p.swatT = (p.swatT || 0) - dt; p.cool -= dt; p.moveCool -= dt; p.slowT -= dt; p.callT -= dt; p.putT -= dt;
+    p.in = p.in || { dx: 0, dz: 0, sprint: false }; if (p.jolt && (p.jolt.t += dt) > 0.5) p.jolt = null; if (p.scrR && (p.scrR.t -= dt) <= 0) p.scrR = null; if (p.diveT > 0) { p.diveT -= dt; if (p.st === 'free') { p.x = clamp(p.x + p.dvx * dt, -8.6, 8.6); p.z = clamp(p.z + p.dvz * dt, -2, 13.4); } } if (p.buf) p.buf.ttl -= dt; p.t += dt; p.swatT = (p.swatT || 0) - dt; p.cool -= dt; p.moveCool -= dt; p.slowT -= dt; p.callT -= dt; p.putT -= dt;
     if (p.bravT > 0) { p.bravT -= dt; p.brav = Math.max(0, p.bravT / 20); if (p.bravT <= 0) p.brav = 0; }
     if (p.user && !(p.remote && p.afk)) humanThink(p, dt); else aiThink(p, dt);
     stepPlayer(p, dt);
+    { const sp = Math.hypot(p.vx, p.vz), lx = p.lvx || 0, lz = p.lvz || 0, ls = Math.hypot(lx, lz); if (sp > 2.2 && ls > 2.2 && (p.vx * lx + p.vz * lz) / (sp * ls) < 0.55 && M_.time - (p.sqAt || -9) > 0.3 && M_.time - (M_.sqAt || -9) > 0.09 && p.y < 0.05) { p.sqAt = M_.sqAt = M_.time; sfx('squeak'); } if (M_.time - (p.lvT || -9) > 0.12) { p.lvT = M_.time; p.lvx = p.vx; p.lvz = p.vz; }
+      if (p.st === 'stagger' && p.stg && p.stg.fall && !p.stg.thud && p.t > 0.3) { p.stg.thud = true; sfx('thud'); } }
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
@@ -3177,6 +3211,7 @@ function matchStep(dtReal) {
     if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && o.st !== 'stagger' && M_.time - (o.scrHit || -9) > 1.5) screenHit(s, o);
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
+      if (vn > 1.6) for (const [q, sg] of [[a, -1], [b, 1]]) { const fx = Math.sin(q.face), fz = Math.cos(q.face), jx = nx * sg, jz = nz * sg; q.jolt = { tw: jx * fz - jz * fx, fb: jx * fx + jz * fz, pw: clamp(vn / 4.5, 0.35, 1.2), t: 0 }; }      /* both bodies show it */
       if (vn > 1.2 && M_.time - (a.bumpAt || -9) > 0.3 && M_.time - (b.bumpAt || -9) > 0.3 && a.st !== 'stagger' && b.st !== 'stagger') {
         const mass = q => (0.7 + nAtt(q, 'str') * 0.9) * (1 + (q.b.build.body.w || 0) * 0.15) * (q.H / 1.95) * (q.post || q.bodyUp ? 1.3 : 1) * (q.screen ? 2.4 : q.box ? 1.5 : 1), ma = mass(a), mb = mass(b), j = vn * 0.85;
         a.vx -= nx * j * mb / (ma + mb); a.vz -= nz * j * mb / (ma + mb); b.vx += nx * j * ma / (ma + mb); b.vz += nz * j * ma / (ma + mb); a.bumpAt = b.bumpAt = M_.time;
@@ -3304,6 +3339,12 @@ function stepPlayer(p, dt) {
   if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5) - 0.03 * bt(o, 'clamps'), 0.55, 0.95); }      /* a hand on your body slows the drive */
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
+  // TURBO: the moment you squeeze sprint with the ball, a burst. It costs a chunk of stamina and can beat your man off the first step
+  { const edge = p.in.sprint && !p.sprWas; p.sprWas = p.in.sprint; if (p.turboT > 0) p.turboT -= dt;
+    if (edge && hasBall && p.sprinting && p.live === 'drib' && p.st === 'free' && p.stam > 18 && M_.time - (p.turboAt || -9) > 1.4 && M_.phase === 'live') {
+      p.turboAt = M_.time; p.turboT = 0.6; p.stam -= 9; if (p.user) floatTxt(p, 'TURBO', '#3dffa0'); sfx('turbo'); sfx('squeak');
+      const [o, od] = nearestOpp(p); if (o && od < 1.9 && o.st === 'free' && Math.random() < clamp(0.3 + (att(p, 'accel') - att(o, 'perd')) * 0.008 - (o.bodyUp ? 0.15 : 0), 0.08, 0.65)) { o.slowT = Math.max(o.slowT || 0, 0.22); floatTxt(o, 'BEAT', '#f2c14e'); } }
+    if (p.turboT > 0 && p.sprinting) top *= 1.16; }
   if (p.sprinting) { top *= 1.28; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * (1 + px(p, 'stam')) * dt);
   if (p.stam < 20) { top *= 0.86; if (!p.gassed && p.stam < 12) { p.gassed = true; floatTxt(p, 'GASSED', '#8d8d99'); } } if (p.slowT > 0) top *= 0.45;
   const def = M_.off !== p.team && !hasBall && B.state !== 'loose'; if (def && !p.sprinting) top *= 0.92;
@@ -3360,8 +3401,9 @@ function stepBall(dt) {
     if (B.t >= B.T) {
       const p = B.shooter;
       if (B.make) {
-        B.state = 'through'; B.t = 0; B.pos.set(0, HOOP_Y, 0); B.vel.set(0, -4.5, 0); sfxM(B.green ? 'green' : 'swish');
-        if (!B.green && B.kind !== 'close' && Math.random() < 0.3) { B.pos.y = HOOP_Y + 0.06; B.vel.set(rnd(-0.22, 0.22), rnd(1.8, 2.6), rnd(-0.18, 0.18)); sfxM('rim'); M_.hoopT = 0.25; }      /* not every make is a swish: this one rattles round and drops */
+        B.state = 'through'; B.t = 0; B.pos.set(0, HOOP_Y, 0); B.vel.set(0, -4.5, 0);
+        if (!B.green && B.kind !== 'close' && Math.random() < 0.3) { B.pos.y = HOOP_Y + 0.06; B.vel.set(rnd(-0.22, 0.22), rnd(1.8, 2.6), rnd(-0.18, 0.18)); sfxM('rattle'); M_.hoopT = 0.25; }
+        else sfxM(B.green ? 'green' : Math.random() < 0.4 ? 'net2' : 'swish');      /* not every make is a swish: this one rattles round and drops */
         if (B.kind === 'three') p.stats.threes++;
         if (M_.practice === 'rack') { if (B.kind === 'three') { const v = B.green ? 3 : 2; M_.rackScore += v; floatTxt(p, '+' + v, B.green ? '#33ff88' : '#ffc531'); } else floatTxt(p, 'Deep balls only!', '#ff8a1f'); }
         else if (!M_.practice) call(B.green ? pick(CALLS.green) : B.kind === 'three' ? pick(CALLS.three) : pick(CALLS.make), p.b.name + ` +${B.pts}`, B.green ? '#33ff88' : '#fff', 1.1);
@@ -3374,7 +3416,7 @@ function stepBall(dt) {
         B.state = 'loose'; B.t = 0; M_.looseT = 0; B.rebound = true; sfxM('rim'); if (M_.drill) drillEvent('miss', p, { kind: B.kind }); const a = rnd(-1.3, 1.3); const s = rnd(1.5, 4.2); B.vel.set(Math.sin(a) * s, rnd(2, 4.5), Math.abs(Math.cos(a)) * s * 0.9 + 0.3);
         { // where a miss goes depends on how it was missed: early is short (front rim, back toward the shooter), late is long (back iron, over the top), way off is an airball
           const e = B.err || 0, sl = Math.hypot(B.sx || 0, B.sz || 1) || 1, ux = (B.sx || 0) / sl, uz = (B.sz || 1) / sl, jx = rnd(-0.9, 0.9);
-          if (Math.abs(e) > 0.42 && !M_.practice && B.kind !== 'close') { B.vel.set(-ux * 1.5 + jx, -1, -uz * 1.5); B.pos.y = HOOP_Y - 0.5; call('AIRBALL', p.b.name, '#8d8d99', 1.1); const [ao] = nearestOpp(p); if (ao) say(ao, 'w', 1); if (typeof fanSay === 'function') fanSay('air', 1 - p.team); }
+          if (Math.abs(e) > 0.42 && !M_.practice && B.kind !== 'close') { B.vel.set(-ux * 1.5 + jx, -1, -uz * 1.5); B.pos.y = HOOP_Y - 0.5; call('AIRBALL', p.b.name, '#8d8d99', 1.1); sfxM('ooh'); const [ao] = nearestOpp(p); if (ao) say(ao, 'w', 1); if (typeof fanSay === 'function') fanSay('air', 1 - p.team); }
           else if (e < -0.1) { const v = rnd(2.2, 3.8); B.vel.set(ux * v + jx, rnd(2.5, 4), Math.max(0.4, uz * v)); }
           else if (e > 0.1) { const v = rnd(1.0, 2.2); B.vel.set(-ux * v + jx * 1.3, rnd(3.5, 5.2), Math.max(0.3, -uz * v + 1.2)); } } missed(p); p.hot = 0; if (p.fire) p.fire = false; M_.clock = Math.max(M_.clock, 14); { const [o, od] = nearestOpp(p); if (o && od < 3.5 && Math.random() < 0.3) say(o, 'w'); }
         if (M_.practice) floatTxt(p, pick(CALLS.miss), '#ff8a1f');
@@ -3585,7 +3627,7 @@ function animPlayer(p, dt) {
   // running forward at speed (with or without the ball): the legs follow real running curves on a stride clock that
   // advances with distance (knee drive, heel recovery, a flight phase); arms stay with the ball when dribbling.
   // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
-  if (p.diveT > 0 && p.st === 'free') o.dive = 1; if (p.screen) o.screen = p.ai.scr && p.ai.scr.kind === 'hard' ? 2 : p.ai.scr && p.ai.scr.kind === 'soft' ? 3 : 1; if (p.box && p.st === 'free') o.box = 1; if (p.scrR && p.st === 'free') o.scrR = p.scrR.k;
+  if (p.jolt && p.st !== 'stagger') o.jolt = p.jolt; if (p.diveT > 0 && p.st === 'free') o.dive = 1; if (p.screen) o.screen = p.ai.scr && p.ai.scr.kind === 'hard' ? 2 : p.ai.scr && p.ai.scr.kind === 'soft' ? 3 : 1; if (p.box && p.st === 'free') o.box = 1; if (p.scrR && p.st === 'free') o.scrR = p.scrR.k;
   let P = poseOf(an, t, o), duty = 0.38; if (p.st === 'finish' && p.finish.lh && p.finish.type === 'layup') P = mirrorPose(P);
   { const yawR = p.face + (R.extraYaw || 0); let da = Math.atan2(p.avx, p.avz) - yawR; da = Math.atan2(Math.sin(da), Math.cos(da));
     const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 1.2 && Math.abs(da) < 0.7 && !p.protect;      /* jogging counts too (was 3 m/s: a half-pushed stick fell back to the old stepping, the "stomp") */
@@ -4397,6 +4439,7 @@ function buildHub() {
   for (let i = 0; i < 3; i++) { const a = i / 3 * 6.283, b = aiBuild(60); b.worn = randomWorn(1); addNpc(b, 11.4 + Math.cos(a) * 0.9, -8.6 + Math.sin(a) * 0.9, Math.atan2(-Math.cos(a), -Math.sin(a)), 'beg', { talk: 'dice' }); }
   for (let i = 0; i < 2; i++) { const d = M(box(0.07, 0.07, 0.07), toon('#ece9e2'), 11.3 + i * 0.12, 0.04, -8.6 + i * 0.05, scene); d.rotation.y = i; }
   solid(10.3, 12.5, -9.7, -7.5);
+  guideInit();      /* guide.js: Walk-On meets a new player and takes them to Coach */
   npcSpace();
   chatter(W.npcs, n => n.bum ? CHAT.fiend : n.talk ? CHAT[n.talk] : n.anim === 'dance' ? CHAT.dance : n.anim === 'warm' ? CHAT.fire : n.anim === 'sit' ? CHAT.oldhead : n.cage ? CHAT.cage : CHAT.block);
   W.bounds = [-14.3, 14.3, -10.9, 11.5]; W.camBox = [-15.1, 15.1, -11.7, 18.6];
@@ -4517,7 +4560,7 @@ function worldStep(dt) {
       else applyPose(n.rig, poseOf(an, W.t, an === 'idle' ? Object.assign({ prof: n.rig.prof, ph: n.ph }, o) : o), dt); }
     if (n.anim === 'ball' && n.ball) { const hgt = Math.abs(Math.sin(W.t * 7 + n.ph)); n.ball.position.set(n.x + Math.sin(n.face) * 0.3 - Math.cos(n.face) * 0.27, 0.125 + hgt * 0.75, n.z + Math.cos(n.face) * 0.3 + Math.sin(n.face) * 0.27); o.dr = hgt; }
   }
-  if (W.park) parkStep(dt); if (W.cast) castStep(dt); holoStep(dt);
+  if (W.guide) guideStep(dt); if (W.park) parkStep(dt); if (W.cast) castStep(dt); holoStep(dt);
   for (const c of W.cars) { c.a += c.s * dt; c.c.position.set(Math.cos(c.a) * c.r, c.y, Math.sin(c.a) * c.r); c.c.rotation.y = -c.a + (c.s > 0 ? -Math.PI / 2 : Math.PI / 2); }
   if (W.train) { W.train.position.x += dt * 16; if (W.train.position.x > 95) W.train.position.x = -140 - rnd(0, 120); }
   if (W.eq) { W.eq.forEach((e, i) => { const v = 0.2 + Math.abs(Math.sin(W.t * (6 + i * 1.3) + i)) * (0.5 + 0.5 * Math.abs(Math.sin(W.t * 1.9))); e.scale.y = v * 2; e.position.y = 1.02 + v * 0.3; }); const pu = 1 + Math.max(0, Math.sin(W.t * 11.4)) * 0.08; for (const sp of W.speakers) sp.scale.set(pu, 1, pu); }
@@ -5319,6 +5362,60 @@ function packsUI(r) {
   }
   return h;
 }
+// GOT NEXT — the first ten minutes. Walk-On meets a new player where they come in, walks them to Coach Overtime, and
+// Coach's board teaches the rest: drills that pay you to learn, HOW IT WORKS for every system, and a short lesson plan.
+const HOWTO = [
+  { t: 'Moving and the ball', b: 'Left stick (or WASD) moves. Squeeze sprint (RT, Shift, or push the phone stick all the way) for a TURBO burst: it costs stamina, shown under your feet, and can beat your man off the first step. Out of stamina you are slow and your shot gets worse. A check-up gives everybody some back.', drill: 'weave' },
+  { t: 'Shooting', b: 'Hold the shoot button (X, Space, SHOOT) or pull the skill stick down, and let go at the top of the jump. The meter by your player shows the window: inside it is a green, and greens go in. Your stick picks the shot: away from the rim is a fade (lean back, drift, by how you are covered), sideways is a side step.', drill: 'spots' },
+  { t: 'Finishing', b: 'Push the skill stick up (or shoot while driving) near the rim. The game picks a layup or dunk from your package by the situation and never the same one twice running. Stick sideways is a euro step: go away from the shot-blocker. Let go of the stick for a hop step. Driving into a defender with his feet set is a charge.', drill: 'layups' },
+  { t: 'Dribble moves', b: 'Flick the skill stick: sideways for your side move, down and to a side for a stepback, up and to a side for a spin. Mixing them builds a combo and breaks ankles. The same move the same way gets read.', drill: 'weave' },
+  { t: 'The post', b: 'Hold LT with a live dribble (tap the gold button on a phone) to turn your back and back him down. Then shoot with the stick toward the rim for a drop step, away for a fadeaway, across for a jump hook, or still for a turnaround.', drill: 'mikan' },
+  { t: 'Passing and teammates', b: 'Pass (A, E, PASS) goes where your stick points. LB, R or PICK calls a screen: hold sprint for a hard one. Press pass while the ball is on its way to you for a touch pass. Off the ball: pass calls for it, flick the stick to cut, hold LT standing still to set a screen yourself.', drill: 'catch' },
+  { t: 'Defense', b: 'Stay between your man (the arrow) and the rim; let go of the stick and you guard him. Steal is X / E / STEAL: time it, spamming gets fouls. Jump (Y / Space / JUMP) at the release to contest. Hold LT to body up, to box out when a shot goes up, and with your feet set in a driver\'s way to take a charge. LB / R / SWITCH takes the ball handler.', drill: 'slides' },
+  { t: 'Loose balls and boards', b: 'Box out (LT) before the rebound, jump for it. Press pass/steal near a loose ball to dive. Two men on it at once is a tie-up; the arrow alternates.' },
+  { t: 'HC, Respect and Street Smarts', b: 'HC is money: games, drills and contracts pay it, and you spend it on attributes, packages, drip and the crib. Respect is reputation: it sets your rank, and rank opens courts and shelves. Street Smarts are perks you earn points for by doing the thing in real games.' },
+  { t: 'Packages and personality', b: 'In MY PLAYER → MOVES you wear one package each of dunks, layups, dribble moves, post moves, idle dribbling and stance. PERSONALITY is three traits: they pick your trash talk and each gives a small edge.' },
+  { t: 'The Block', b: 'The Cages (north) is where games are. The Lab sells attributes, The Plug sells drip, Tape Deck sells moves. Sharpie runs shooting games for HC, Mark takes bets, Trey rolls bones, Old Head hands out contracts. Your crib is down the alley.' },
+];
+const LESSONS = [
+  { id: 'read', n: 'Read HOW IT WORKS', done: () => !!S.tutRead },
+  { id: 'layups', n: 'Bronze in Layup Lines', done: () => ((S.drills.layups || {}).medal || 0) >= 1 },
+  { id: 'spots', n: 'Bronze in Spot Shooting', done: () => ((S.drills.spots || {}).medal || 0) >= 1 },
+  { id: 'weave', n: 'Bronze in Cone Weave', done: () => ((S.drills.weave || {}).medal || 0) >= 1 },
+  { id: 'slides', n: 'Bronze in Defensive Slides', done: () => ((S.drills.slides || {}).medal || 0) >= 1 },
+  { id: 'game', n: 'Play a game in The Cages', done: () => (S.life.games || 0) >= 1 },
+];
+const LESSON_PAY = 60, LESSON_ALL = 300;
+function lessonCheck() { const L = S.lesson || (S.lesson = {}); let got = 0; for (const l of LESSONS) if (!L[l.id] && l.done()) { L[l.id] = 1; got += LESSON_PAY; } if (!L.all && LESSONS.every(l => L[l.id])) { L.all = 1; got += LESSON_ALL; toast('LESSON PLAN DONE', 'Coach nods. +' + LESSON_ALL + ' HC', 'ach'); } if (got) { S.vc += got; save(); if (typeof uiHud === 'function') uiHud(); } return got; }
+function howTab(back) {
+  if (!S.tutRead) { S.tutRead = 1; save(); }
+  return `<p class="mu">Everything in the game, in the order you will need it. TRY IT runs the drill that practises it.</p><div class="grid">` + HOWTO.map(x => `<div class="card"><h3>${x.t}</h3><p>${x.b}</p>${x.drill ? `<div style="margin-top:6px">${Btn('TRY IT · ' + (DRILL_DEFS.find(d => d.id === x.drill) || { n: '' }).n, () => startDrill(x.drill, back), 'sm alt')}</div>` : ''}</div>`).join('') + `</div>`;
+}
+function lessonTab() {
+  const got = lessonCheck(), L = S.lesson || {};
+  return `<p class="mu">Six things, ${LESSON_PAY} HC each, ${LESSON_ALL} more for all of them.${got ? ` <b style="color:var(--go)">+${got} HC just now.</b>` : ''}</p><div class="grid">` + LESSONS.map((l, i) => `<div class="card ${L[l.id] ? 'sel' : ''}"><h3 style="color:${L[l.id] ? 'var(--go)' : 'var(--bone)'}">${L[l.id] ? '✓ ' : (i + 1) + '. '}${l.n}</h3><p class="mu">${L[l.id] ? 'Paid.' : '+' + LESSON_PAY + ' HC'}</p></div>`).join('') + `</div>`;
+}
+// ---- Walk-On
+function guideInit() {
+  if (W.kind !== 'hub' || W.visit) return; const b = blockBuild('WALK-ON', 'general', { top: 't_tee', head: 'hd_band' }, 62); const fresh = !S.tut;
+  const n = addNpc(b, fresh ? W.me.x + 1.5 : -1.7, fresh ? W.me.z - 1.9 : 5.9, fresh ? 0 : Math.PI * 0.8, 'idle', { still: true }); n.cast = 'guide';
+  W.guide = { n, st: fresh ? 'greet' : 'rest', t: 0 };
+  spot(-1.7, 5.0, 1.5, 'WALK-ON (show me around)', () => { if (W.guide.st === 'rest') uiDialog('WALK-ON', 'Coach has it all on the board. Want the short version again?', [['How it works', () => uiDrills('hub', 'how')], ['The lesson plan', () => uiDrills('hub', 'plan')], ['Later', uiClose, 'alt']]); });
+}
+function guideStep(dt) {
+  const G = W.guide; if (!G) return; const n = G.n, me = W.me; G.t += dt; let moving = false, wave = false; const dm = Math.hypot(me.x - n.x, me.z - n.z);
+  if (G.st === 'greet') { n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.15); wave = true;
+    if (G.t > 1.0 && !UI.cur) { G.st = 'asked'; uiDialog('WALK-ON', 'First day? I\'m Walk-On. I carry the cones. Coach Overtime is right over there and he teaches everything: come on, I\'ll take you.', [['Show me', () => { uiClose(); G.st = 'lead'; G.t = 0; toast('FOLLOW WALK-ON', 'He is taking you to Coach Overtime.'); }], ['I know my way around', () => { uiClose(); S.tut = 1; save(); G.st = 'lead'; G.quiet = true; }, 'alt']]); } }
+  else if (G.st === 'lead') { const tx = -1.7, tz = 5.9, dx = tx - n.x, dz = tz - n.z, l = Math.hypot(dx, dz);
+    if (l < 0.35) { G.st = G.quiet ? 'rest' : 'arrive'; G.t = 0; n.face = Math.PI * 0.8; }
+    else if (!G.quiet && dm > 5.5) { n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.12); wave = true; }      /* waits for you */
+    else { const v = G.quiet ? 2.6 : 2.3; n.x += dx / l * v * dt; n.z += dz / l * v * dt; n.face = lerpAng(n.face, Math.atan2(dx, dz), 0.2); moving = true; } }
+  else if (G.st === 'arrive') { n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.12); wave = dm > 3.5;
+    if (dm < 3.5 && !UI.cur && G.t > 0.4) { G.st = 'rest'; S.tut = 1; save(); uiDialog('WALK-ON', 'This is Coach. Drills pay you to learn. HOW IT WORKS explains everything else, and the LESSON PLAN pays you for doing the first six things. I\'ll be right here.', [['Open the board', () => uiDrills('hub', 'how')], ['Later', uiClose, 'alt']]); } }
+  n.hx = n.x; n.hz = n.z;
+  if (moving) locoAnim(n.rig, n.x, n.z, n.face, dt, undefined, undefined, 0.5);
+  else { n.rig.root.position.set(n.x, 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, wave ? poseOf('call', W.t, {}) : crowdPose('watch', W.t, { ph: n.ph }, n.rig.prof), dt); }
+}
 // GOT NEXT — My Crib: the lot, the house, the street, and the home builder.
 // Place anything anywhere in the yards you own, turn it, move it, store it, sell it. Everything has Vibe; Vibe levels the
 // crib up (perks that follow you into games), and themed sets give their own bonus. Some pieces do something.
@@ -5997,7 +6094,8 @@ function hudFb(txt, col) { const f = $('fb'); f.textContent = txt; f.style.color
 function hudFloat(p, txt, col) { const [x, y] = project(p.x, p.H + 0.5 + p.y, p.z); const d = document.createElement('div'); d.className = 'flt'; d.textContent = txt; d.style.cssText = `left:${x}px;top:${y}px;color:${col || '#fff'}`; $('flts').appendChild(d); setTimeout(() => d.remove(), 1100); }
 function hudMatch() {
   const M_ = MT, me = M_.me; $('s0').textContent = M_.score[me.team]; $('s1').textContent = M_.score[1 - me.team]; $('clock').textContent = Math.max(0, Math.ceil(M_.clock));
-  $('stam').firstElementChild.style.width = me.stam + '%'; const bv = $('brav'); bv.firstElementChild.style.width = (me.brav * 100) + '%'; bv.classList.toggle('on', me.bravT > 0);
+  $('stam').firstElementChild.style.width = me.stam + '%';
+  { const ms = $('mstam'), show = me.stam < 99 && M_.phase === 'live' && !M_.spectate && !M_.hl; if (show) { const [sx, sy] = project(me.x, 0.02, me.z); ms.style.display = 'block'; ms.style.left = sx + 'px'; ms.style.top = (sy + 30) + 'px'; ms.firstElementChild.style.width = Math.max(0, me.stam) + '%'; ms.className = me.stam < 15 ? 'out' : me.stam < 35 ? 'low' : ''; } else ms.style.display = 'none'; }      /* stamina under your feet, where you are looking, while it matters */ const bv = $('brav'); bv.firstElementChild.style.width = (me.brav * 100) + '%'; bv.classList.toggle('on', me.bravT > 0);
   const sh = M_.locals.find(h => h.st === 'shoot' && !h.shot.floater), mt = $('meter');
   if (sh && S.set.meter) {
     const [x, y] = project(sh.x, sh.H * 0.6 + sh.y, sh.z); const u = sh.t / (sh.shot.rel * 1.55), z = 1 / 1.55;
@@ -6163,7 +6261,7 @@ function uiPlayer(tab) {
         h += `<div class="card ${i === r ? 'sel' : ''} ${i > r ? 'lock' : ''}"><div class="row"><h3 class="g" style="color:${i <= r ? 'var(--ice)' : 'var(--bone)'}">${i <= r ? '✓ ' : ''}${k.n}</h3><span class="f mu">${k.rep.toLocaleString()} RESPECT</span></div><p>${un.length ? 'Unlocks in shops: ' + un.join(' · ') : 'Where everyone starts. Even the Founding Fathers. Allegedly.'}</p></div>`;
       });
     } else {
-      h += `<div class="card"><h3>TRASH TALK</h3><p>Speech bubbles over players during games.</p>${Btn('BUBBLES: ' + (S.set.talk === 0 ? 'OFF' : 'ON'), () => { S.set.talk = S.set.talk === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div><div class="card"><h3>HIGHLIGHTS</h3><p>Big plays get a close-up and a banner, and yours are photographed for CAGE.</p>${Btn('CLOSE-UP CAMERA: ' + (S.set.hlcam === 0 ? 'OFF' : 'ON'), () => { S.set.hlcam = S.set.hlcam === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div><div class="card"><h3>SOUND</h3>${volSliders()}<div style="margin-top:8px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${OST.el ? Btn('SKIP TRACK (N)' + (OST.cur ? ' · now: ' + esc(OST.cur) : ''), () => { ostNext(); setTimeout(rerender, 300); }, 'sm alt') : ''} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('DEFENSE ASSIST: ' + (S.set.dassist === 0 ? 'OFF' : 'ON'), () => { S.set.dassist = S.set.dassist === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div></div>`;
+      h += `<div class="card"><h3>SAVE</h3><p>A copy of your save is kept once a day on this device. A save code carries your player to another browser or keeps it safe.</p>${Btn('COPY SAVE CODE', () => { const c = saveCode(), ta = $('saveTa'); ta.style.display = 'block'; ta.value = c; ta.focus(); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) { } if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(c).then(() => toast('SAVE CODE COPIED', Math.round(c.length / 1024) + ' KB of text. Paste it somewhere safe.'), () => { }); else if (ok) toast('SAVE CODE COPIED', 'Paste it somewhere safe.'); }, 'sm alt')} ${Btn('LOAD A SAVE CODE', () => { const ta = $('saveTa'); if (ta.style.display !== 'block' || !ta.value.trim() || ta.value.trim() === saveCode()) { ta.style.display = 'block'; ta.value = ''; ta.placeholder = 'Paste a save code here, then press LOAD A SAVE CODE again'; ta.focus(); return; } const code = ta.value; uiDialog('LOAD THIS SAVE?', 'It replaces the player on this device. Your current one is kept as the backup.', [['Load it', () => { const er = saveFromCode(code); uiClose(); if (er) toast('NOT LOADED', er); else { toast('SAVE LOADED', S.name); enterWorld('hub', 0, 9, Math.PI); } }, 'red'], ['Cancel', () => uiPlayer('opt'), 'alt']]); }, 'sm alt')} ${Btn('RESTORE YESTERDAY', () => uiDialog('RESTORE THE BACKUP?', 'Goes back to the copy kept at the start of the day. Today\'s save becomes the backup.', [['Restore', () => { const er = saveRestoreBackup(); uiClose(); if (er) toast('NOT RESTORED', er); else { toast('BACKUP RESTORED', S.name); enterWorld('hub', 0, 9, Math.PI); } }, 'red'], ['Cancel', () => uiPlayer('opt'), 'alt']]), 'sm alt')}<textarea id="saveTa" spellcheck="false" style="display:none;width:100%;height:70px;margin-top:8px;background:var(--ink);color:var(--bone);border:1px solid var(--line);font:11px var(--m);padding:6px"></textarea></div><div class="card"><h3>TRASH TALK</h3><p>Speech bubbles over players during games.</p>${Btn('BUBBLES: ' + (S.set.talk === 0 ? 'OFF' : 'ON'), () => { S.set.talk = S.set.talk === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div><div class="card"><h3>HIGHLIGHTS</h3><p>Big plays get a close-up and a banner, and yours are photographed for CAGE.</p>${Btn('CLOSE-UP CAMERA: ' + (S.set.hlcam === 0 ? 'OFF' : 'ON'), () => { S.set.hlcam = S.set.hlcam === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div><div class="card"><h3>SOUND</h3>${volSliders()}<div style="margin-top:8px">${Btn('SFX: ' + (S.set.sfx ? 'ON' : 'OFF'), () => { S.set.sfx = S.set.sfx ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('MUSIC: ' + (S.set.music ? 'ON' : 'OFF'), () => { S.set.music = S.set.music ? 0 : 1; save(); rerender(); }, 'sm alt')} ${OST.el ? Btn('SKIP TRACK (N)' + (OST.cur ? ' · now: ' + esc(OST.cur) : ''), () => { ostNext(); setTimeout(rerender, 300); }, 'sm alt') : ''} ${Btn('SHOT METER: ' + (S.set.meter ? 'ON' : 'OFF'), () => { S.set.meter = S.set.meter ? 0 : 1; save(); rerender(); }, 'sm alt')} ${Btn('DEFENSE ASSIST: ' + (S.set.dassist === 0 ? 'OFF' : 'ON'), () => { S.set.dassist = S.set.dassist === 0 ? 1 : 0; save(); rerender(); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>CONTROLS</h3><p><b>Phone:</b> left thumb moves (push all the way to sprint). Right thumb is the skill stick. PASS / SHOOT buttons sit above it.</p><p><b>Keyboard:</b> WASD move · Shift sprint · Space shoot / jump (hold, release at the top) · E pass / steal / interact · I J K L skill stick · P pause.</p><p><b>Controller:</b> left stick move · right stick skill stick · A pass / steal · X shoot / jump · RT sprint · Start pause. A second player joins from any game door in The Cages with a controller.</p><p><b>Offense:</b> ↓ hold = shoot, release in the green · ↑ = drive / dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin.</p><p><b>Defense:</b> ↑ = hands up · ↓ = steal (RUCKUS: shove) · jump to block and board.</p></div>`;
       h += `<div class="card"><h3>DEV ROOM</h3><p>A maxed-out player, every build, every move, and a reel that plays them all. F2 on The Block opens it too.</p><div style="margin-top:6px">${Btn('OPEN DEV ROOM', () => { uiClose(); uiDev('hub'); }, 'sm alt')}</div></div>`;
       h += `<div class="card"><h3>DANGER ZONE</h3><div style="margin-top:6px">${Btn('BACK TO TITLE', () => { uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'sm alt')} ${Btn('ERASE EVERYTHING', () => uiDialog('ARE YOU SURE', 'Erase your player, drip, crib and Respect for good?', [['Erase it all', () => { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } S = newSave(); uiClose(); disposeScene(scene); scene = null; W = null; titleScene(); uiTitle(); }, 'red'], ['Never mind', null, 'alt']]), 'sm red')}</div></div>`;
@@ -6886,11 +6984,12 @@ function drillEnd(res, back) {
 }
 
 // ---------- the drills board ----------
-function uiDrills(back) {
-  daily();
+function uiDrills(back, tab0) {
+  daily(); let tab = tab0 || 'drills';
   openPanel(() => {
     const ev = todayEvent();
     let h = `<div class="ph"><h2>${back === 'crib' ? 'HOME DRILLS' : 'COACH\'S BOARD'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
+    if (back !== 'crib') { h += `<div class="tabs">` + [['drills', 'DRILLS'], ['how', 'HOW IT WORKS'], ['plan', 'LESSON PLAN']].map(([k, n]) => Btn(n, () => { tab = k; rerender(); }, tab === k ? 'sel' : '')).join('') + `</div>`; lessonCheck(); if (tab === 'how') return h + howTab(back) + `</div>`; if (tab === 'plan') return h + lessonTab() + `</div>`; }
     h += `<div class="card sel"><h3 class="ye">TODAY · ${ev.n}</h3><p>${ev.d}</p></div>`;
     h += `<p class="mu">Drills pay HC, Respect and smarts XP. First time to each medal pays a bonus. The same drill pays less after three runs in a day.</p><div class="grid">`;
     for (const d of DRILL_DEFS) {

@@ -306,7 +306,7 @@ Skill stick with the ball: **↓ hold** shoot, **↑** drive (layup or dunk), **
   - driving (above a jog): a hesitation dribble instead (HESI), and you keep dribbling
 - **Forced pickups:** a defender up in your chest can force you to pick it up. That means within about 1.2 m, in front
   of you, while you are standing or barely moving. Every 0.6 s of that pressure is a check of his Perimeter D against
-  your Handles, with street smarts: Stand Your Ground helps him, Non-Disclosure helps you. Hands up helps a little. You see
+  your Handles, with street smarts: Sit Down Defense helps him, Tight Handle helps you. Hands up helps a little. You see
   FORCED PICKUP; he gets LOCKED UP and a little Bravado. Your defense can force the AI to pick up too: a picked-up AI
   passes, shoots or powers up.
 - **A picked-up ball** can be passed, shot or pump-faked. The stick pivots you (the feet stay put).

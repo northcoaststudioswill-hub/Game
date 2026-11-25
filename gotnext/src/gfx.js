@@ -662,6 +662,9 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (o.jolt) {      // contact: the same idea as the hit layer, small and short. The trunk takes it, the head lags, the knees give a little; the feet stay where they are
+    const J = o.jolt, jt = J.t || 0, sm = x => x * x * (3 - 2 * x), e = sm(clamp(jt / 0.07, 0, 1)) * (1 - sm(clamp((jt - 0.1) / 0.38, 0, 1))), pw = (J.pw || 1) * 0.55, ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('chest', J.fb * 0.3 * pw * e, J.tw * 0.55 * pw * e, 0); ad('spine', J.fb * 0.14 * pw * e, J.tw * 0.25 * pw * e, -J.tw * 0.1 * pw * e); ad('neck', -J.fb * 0.3 * pw * e, -J.tw * 0.4 * pw * e, 0); ad('hips', 0, J.tw * 0.2 * pw * e, 0); ad('knR', 0.12 * pw * e); ad('knL', 0.12 * pw * e); p.y = (p.y || 0) - 0.02 * pw * e; }
   if (anim === 'stagger' && o.hit) {
     // HIT LAYER: the same stumble or fall, driven by where and how hard he was hit. The chest turns with the push first,
     // the head lags the other way, the hips follow a beat later, each leg goes its own way, and on the floor he bounces

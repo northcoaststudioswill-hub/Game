@@ -103,6 +103,7 @@ body:not([data-state=world]) #prompt{display:none!important}
 #call.go{animation:callin 1.2s both}
 @keyframes callin{0%{opacity:0;transform:skewX(-7deg) translateX(-40px)}10%{opacity:1;transform:skewX(-7deg)}82%{opacity:1}100%{opacity:0;transform:skewX(-7deg) translateX(30px)}}
 #fb{position:absolute;left:0;right:0;bottom:31%;text-align:center;font:700 11px var(--m);letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 0 var(--ink),0 0 10px var(--ink);opacity:0;transition:opacity .2s}
+#mstam{position:absolute;width:54px;height:5px;margin-left:-27px;background:rgba(8,8,10,.7);outline:1px solid rgba(236,233,226,.35);display:none;pointer-events:none}#mstam i{display:block;height:100%;background:var(--go)}#mstam.low i{background:var(--warn)}#mstam.out i{background:#ff4040}
 #meter{position:absolute;width:8px;height:92px;background:rgba(8,8,10,.75);display:none;outline:1px solid rgba(236,233,226,.7);overflow:hidden}
 #meterZone{position:absolute;left:0;right:0;background:var(--go)}#meterFill{position:absolute;left:0;right:0;bottom:0;background:var(--bone);mix-blend-mode:difference}
 #build{position:fixed;left:0;right:0;bottom:0;z-index:6;display:none;font:500 11px var(--m);color:var(--bone);pointer-events:none}
@@ -207,7 +208,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div id="sb"><div class="lbl" id="n0">YOU</div><div class="t0" id="s0">0</div><div id="clock">14</div><div class="t1" id="s1">0</div><div class="lbl" id="n1">THEM</div></div>
   <div id="modeTag"></div><div id="clear">TAKE IT BACK ↓ PAST THE ARC</div><div id="rackHud"></div>
   <div id="hl"><i class="lb t"></i><i class="lb b"></i><div class="hb"><small>CAGE MAG · HIGHLIGHT</small><b></b><span class="who"></span></div><div class="fit"></div><div class="clip">● CLIPPED FOR THE COVER</div><i class="fl"></i></div><div id="call"><b></b><small></small></div><div id="fb"></div>
-  <div id="meter"><div id="meterZone"></div><div id="meterFill"></div></div><div id="flts"></div>
+  <div id="mstam"><i></i></div><div id="meter"><div id="meterZone"></div><div id="meterFill"></div></div><div id="flts"></div>
 </div>
 <div id="panel"></div>
 <div id="title">
@@ -241,6 +242,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 /*@include mag.js*/
 /*@include pers.js*/
 /*@include packs.js*/
+/*@include guide.js*/
 /*@include home.js*/
 /*@include ui.js*/
 /*@include net.js*/

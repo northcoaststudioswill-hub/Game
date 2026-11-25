@@ -65,7 +65,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 (function(){
 // GOT NEXT — data: everything a designer would want to edit lives here.
 'use strict';
-const VERSION = '0.17.2';
+const VERSION = '0.18.0';
 // The brand in one place. Rename the game here and the title, signs, codes and docs strings follow.
 const BRAND = {
   name: 'GOT NEXT', a: 'GOT', b: 'NEXT', code: 'GN',
@@ -77,20 +77,20 @@ const BRAND = {
 // ---------- attributes ----------
 // cat: F finishing, S shooting, P playmaking, D defense, A athletics
 const ATTRS = [
-  { id: 'layup', n: 'Layup', cat: 'F', d: 'Finishing at the rim without leaving your dignity up there.' },
-  { id: 'dunk', n: 'Dunk', cat: 'F', d: 'How violently you may address the rim. About 45 with a clear run, 55 otherwise, on Street courts; taller players need less.' },
+  { id: 'layup', n: 'Layup', cat: 'F', d: 'Finishing at the rim. Every layup in your package runs on this.' },
+  { id: 'dunk', n: 'Dunk', cat: 'F', d: 'Getting up and throwing it down. About 45 with a clear run, 55 otherwise, on Street courts; taller players need less.' },
   { id: 'close', n: 'Close Shot', cat: 'F', d: 'Hooks, floaters and bunnies inside ten feet.' },
-  { id: 'mid', n: 'Mid-Range', cat: 'S', d: 'The lost art. Scouts in 2145 call it "treason".' },
-  { id: 'three', n: 'Deep Ball', cat: 'S', d: 'Shots from behind the arc. Worth double on the blacktop.' },
+  { id: 'mid', n: 'Mid-Range', cat: 'S', d: 'Pull-ups, fades and elbow jumpers. The shot nobody guards any more.' },
+  { id: 'three', n: 'Deep Ball', cat: 'S', d: 'Shots from behind the arc. Worth two out here.' },
   { id: 'iq', n: 'Shot IQ', cat: 'S', d: 'Widens your timing window and softens bad releases.' },
-  { id: 'handle', n: 'Handles', cat: 'P', d: 'Powers stick moves, ankle breakers and keeps the rock off thieves.' },
+  { id: 'handle', n: 'Handles', cat: 'P', d: 'Dribble moves, ankle breakers, and keeping the ball when he reaches.' },
   { id: 'pass', n: 'Passing', cat: 'P', d: 'Pass speed and how hard you are to pick off.' },
   { id: 'swb', n: 'Speed w/ Ball', cat: 'P', d: 'How much speed you keep while dribbling.' },
-  { id: 'perd', n: 'Perimeter D', cat: 'D', d: 'Stay in front, contest jumpers, keep your ankles.' },
+  { id: 'perd', n: 'Perimeter D', cat: 'D', d: 'Staying in front, contesting jumpers, keeping your ankles.' },
   { id: 'intd', n: 'Interior D', cat: 'D', d: 'Contests at the rim.' },
-  { id: 'steal', n: 'Steal', cat: 'D', d: 'Pick pockets and passing lanes.' },
-  { id: 'block', n: 'Block', cat: 'D', d: 'Return shots to sender.' },
-  { id: 'reb', n: 'Rebound', cat: 'D', d: 'Win boards over taller, richer people.' },
+  { id: 'steal', n: 'Steal', cat: 'D', d: 'Picking pockets and jumping passing lanes.' },
+  { id: 'block', n: 'Block', cat: 'D', d: 'Sending shots back where they came from.' },
+  { id: 'reb', n: 'Rebound', cat: 'D', d: 'Winning boards, including over people taller than you.' },
   { id: 'speed', n: 'Speed', cat: 'A', d: 'Top speed without the ball.' },
   { id: 'accel', n: 'Burst', cat: 'A', d: 'First step and how fast you hit top speed.' },
   { id: 'str', n: 'Strength', cat: 'A', d: 'Finish through contact, resist shoves, hold your spot.' },
@@ -168,21 +168,21 @@ const BADGES = [
   { id: 'hardhat', cat: 'D', n: 'Hard Hat', d: 'The whistle likes you: fewer reach-ins and shooting fouls called on you.', req: ['perd', 55, 68, 80, 92] },
   { id: 'clamps', cat: 'D', n: 'Clamps', d: 'Bodying up (LT) slows the ball handler more.', req: ['str', 55, 66, 78, 90] },
   { id: 'ironchin', cat: 'D', n: 'Iron Chin', d: 'RUCKUS: shrug off more punches, and it takes more to knock you out.', req: ['str', 58, 70, 82, 93] },
-  { id: 'lobby', cat: 'F', n: 'Rim Lobbyist', d: 'Contests on your drives matter less. You have friends at the rim.', req: ['layup', 55, 68, 80, 92] },
-  { id: 'gravity', cat: 'F', n: 'Gravity Waiver', d: 'Dunk from further out and more often in traffic.', req: ['dunk', 60, 72, 84, 94] },
-  { id: 'softmoney', cat: 'F', n: 'Soft Money', d: 'Layups and close shots drop softer.', req: ['close', 52, 64, 76, 88] },
-  { id: 'putback', cat: 'F', n: 'Putback Patriot', d: 'Big finishing boost right after an offensive board.', req: ['reb', 50, 62, 74, 86] },
-  { id: 'manifest', cat: 'S', n: 'Manifest Destiny', d: 'Deep, deep threes lose less accuracy. That land was always yours.', req: ['three', 62, 74, 85, 94] },
-  { id: 'opencarry', cat: 'S', n: 'Open Carry', d: 'Extra accuracy when left wide open.', req: ['three', 50, 62, 74, 86] },
-  { id: 'filibuster', cat: 'S', n: 'Filibuster', d: 'Hands in your face count for less on jumpers.', req: ['mid', 58, 70, 82, 92] },
-  { id: 'greencard', cat: 'S', n: 'Green Card', d: 'Wider green release window.', req: ['iq', 55, 68, 80, 92] },
-  { id: 'ankletax', cat: 'P', n: 'Ankle Tax', d: 'Stick moves break ankles more often. Collected at the source.', req: ['handle', 60, 72, 84, 94] },
-  { id: 'trickle', cat: 'P', n: 'Trickle Down', d: 'Teammates shoot better off your passes. For once it works.', req: ['pass', 55, 68, 80, 92] },
+  { id: 'lobby', cat: 'F', n: 'Through Traffic', d: 'Contests on your drives matter less.', req: ['layup', 55, 68, 80, 92] },
+  { id: 'gravity', cat: 'F', n: 'Air Time', d: 'Dunk from further out and more often in traffic.', req: ['dunk', 60, 72, 84, 94] },
+  { id: 'softmoney', cat: 'F', n: 'Soft Touch', d: 'Layups and close shots drop softer.', req: ['close', 52, 64, 76, 88] },
+  { id: 'putback', cat: 'F', n: 'Second Chance', d: 'Big finishing boost right after an offensive board.', req: ['reb', 50, 62, 74, 86] },
+  { id: 'manifest', cat: 'S', n: 'Parking Lot Range', d: 'Very deep threes lose less accuracy.', req: ['three', 62, 74, 85, 94] },
+  { id: 'opencarry', cat: 'S', n: 'Leave Him Open', d: 'Extra accuracy when they leave you wide open.', req: ['three', 50, 62, 74, 86] },
+  { id: 'filibuster', cat: 'S', n: 'Hand Down, Man Down', d: 'Hands in your face count for less on jumpers.', req: ['mid', 58, 70, 82, 92] },
+  { id: 'greencard', cat: 'S', n: 'Green Light', d: 'Wider green release window.', req: ['iq', 55, 68, 80, 92] },
+  { id: 'ankletax', cat: 'P', n: 'Ankle Breaker', d: 'Dribble moves break ankles more often.', req: ['handle', 60, 72, 84, 94] },
+  { id: 'trickle', cat: 'P', n: 'Dime Dropper', d: 'Teammates shoot better off your passes.', req: ['pass', 55, 68, 80, 92] },
   { id: 'getaway', cat: 'P', n: 'Getaway Driver', d: 'Bigger burst out of every dribble move.', req: ['swb', 58, 70, 82, 92] },
-  { id: 'nda', cat: 'P', n: 'Non-Disclosure', d: 'Much harder to strip. The ball has signed paperwork.', req: ['handle', 50, 64, 78, 90] },
-  { id: 'ground', cat: 'D', n: 'Stand Your Ground', d: 'Resist ankle breakers and contest harder.', req: ['perd', 58, 70, 82, 93] },
-  { id: 'eminent', cat: 'D', n: 'Eminent Domain', d: 'Longer reach on rebounds. That board is being seized.', req: ['reb', 58, 70, 82, 93] },
-  { id: 'repo', cat: 'D', n: 'Repo Man', d: 'Steal attempts land more often and whiff less.', req: ['steal', 58, 70, 82, 93] },
+  { id: 'nda', cat: 'P', n: 'Tight Handle', d: 'Much harder to strip, and you see more reaches coming.', req: ['handle', 50, 64, 78, 90] },
+  { id: 'ground', cat: 'D', n: 'Sit Down Defense', d: 'Resist ankle breakers and contest harder.', req: ['perd', 58, 70, 82, 93] },
+  { id: 'eminent', cat: 'D', n: 'Long Arms', d: 'Longer reach on rebounds.', req: ['reb', 58, 70, 82, 93] },
+  { id: 'repo', cat: 'D', n: 'Pickpocket', d: 'Steal attempts land more often and whiff less.', req: ['steal', 58, 70, 82, 93] },
   { id: 'nofly', cat: 'D', n: 'No Fly Zone', d: 'Block more shots and dunks.', req: ['block', 55, 68, 80, 92] },
 ];
 const BADGE = {}; BADGES.forEach(b => BADGE[b.id] = b);
@@ -493,7 +493,7 @@ const TIERS_COURT = [
 // ---------- achievements ----------
 // stat key in save.life (lifetime counters); n target; reward vc / drip
 const ACH = [
-  { id: 'first', n: 'First Blood (Legal)', d: 'Score your first bucket.', k: 'pts', t: 1, vc: 50 },
+  { id: 'first', n: 'First Bucket', d: 'Score your first bucket.', k: 'pts', t: 1, vc: 50 },
   { id: 'w1', n: 'Dub', d: 'Win a game.', k: 'wins', t: 1, vc: 100 },
   { id: 'w10', n: 'Regular', d: 'Win 10 games.', k: 'wins', t: 10, vc: 400 },
   { id: 'w50', n: 'Park Fixture', d: 'Win 50 games.', k: 'wins', t: 50, vc: 2000, drip: 'hd_crowngold' },
@@ -503,11 +503,11 @@ const ACH = [
   { id: 'd50', n: 'Rim Vandal', d: '50 dunks.', k: 'dunks', t: 50, vc: 800, drip: 'hd_eagle' },
   { id: 'g10', n: 'Wet', d: '10 green releases.', k: 'greens', t: 10, vc: 150 },
   { id: 'g200', n: 'Money Printer', d: '200 green releases.', k: 'greens', t: 200, vc: 1200, drip: 'bl_void' },
-  { id: 't25', n: 'From Downtown (Uptown)', d: 'Hit 25 deep balls.', k: 'threes', t: 25, vc: 300 },
+  { id: 't25', n: 'From Downtown', d: 'Hit 25 deep balls.', k: 'threes', t: 25, vc: 300 },
   { id: 'a1', n: 'Ankle Insurance', d: 'Break someone\'s ankles.', k: 'ankles', t: 1, vc: 100 },
   { id: 'a40', n: 'Podiatrist\'s Nightmare', d: '40 ankle breakers.', k: 'ankles', t: 40, vc: 900, drip: 'k_hover' },
-  { id: 'as25', n: 'Socialist', d: '25 assists. Sharing is still legal.', k: 'ast', t: 25, vc: 300 },
-  { id: 's20', n: 'Repossessed', d: '20 steals.', k: 'stl', t: 20, vc: 300 },
+  { id: 'as25', n: 'Share The Rock', d: '25 assists.', k: 'ast', t: 25, vc: 300 },
+  { id: 's20', n: 'Sticky Fingers', d: '20 steals.', k: 'stl', t: 20, vc: 300 },
   { id: 'b20', n: 'Return To Sender', d: '20 blocks.', k: 'blk', t: 20, vc: 300 },
   { id: 'r50', n: 'Board Member', d: '50 rebounds.', k: 'reb', t: 50, vc: 350 },
   { id: 'fire', n: 'Fire Hazard', d: 'Catch fire in a RUCKUS game.', k: 'fires', t: 1, vc: 200 },
@@ -518,7 +518,7 @@ const ACH = [
   { id: 'so', n: 'Sharpshooter', d: 'Score 20+ in a Money Rack shootout.', k: 'bestRack', t: 20, vc: 500 },
   { id: 'drip10', n: 'Drip Check', d: 'Own 16 pieces of drip.', k: 'owned', t: 16, vc: 200 },
   { id: 'drip30', n: 'Walking Billboard', d: 'Own 36 pieces of drip.', k: 'owned', t: 36, vc: 1000 },
-  { id: 'crib5', n: 'Homeowner (!)', d: 'Buy 5 crib upgrades. In this economy.', k: 'cribs', t: 5, vc: 500 },
+  { id: 'crib5', n: 'Homeowner', d: 'Buy 5 crib upgrades.', k: 'cribs', t: 5, vc: 500 },
   { id: 'ovr80', n: 'Somebody', d: 'Reach 80 OVR.', k: 'ovr', t: 80, vc: 600 },
   { id: 'ovr95', n: 'Problem', d: 'Reach 95 OVR.', k: 'ovr', t: 95, vc: 3000 },
   { id: 'drill1', n: 'Clocked In', d: 'Finish a drill.', k: 'drills', t: 1, vc: 50 },
@@ -535,7 +535,7 @@ const BUM_NAMES = ['Deshawn "99 OVR"', 'Tre the Grinder', 'Lil Microtransaction'
 const BUM_ASK = [
   'Yo, lemme hold {n} HC. My center on Basketball 2146 is ONE upgrade from a 61 overall.',
   'Spare {n} HC? PS88 servers go down in a year, I gotta finish my build before they do.',
-  'Please. {n} HC. My guy still got bronze Rim Lobbyist. BRONZE. I can\'t be seen like this.',
+  'Please. {n} HC. My guy still got bronze Through Traffic. BRONZE. I can\'t be seen like this.',
   'I sold my hover-car for HC, bro. Then they dropped Basketball 2146. Just {n}. For the animations.',
   'I ain\'t eaten in two days but my player got the new jumpshot. Worth it. Got {n} HC?',
   '{n} HC and I\'m out your face. My build is a 7\'3" point guard, it\'s gonna be meta, trust.',
@@ -574,15 +574,15 @@ const CHAT = {
   neighbor: ['Nice place you got.', 'Your speakers are LOUD. Respect.', 'I heard you can dunk from the free throw line.'],
 };
 const CALLS = {
-  make: ['BUCKET!', 'CASH!', 'WET!', 'THAT\'S AMERICA\'S SHOT!', 'DIRECT DEPOSIT!'],
-  green: ['GREEN!', 'PURE!', 'TAX-FREE!', 'ALL NET, NO GROSS!'],
-  three: ['FROM THE PARKING LOT!', 'FREEDOM FROM DEEP!', 'MANIFEST DESTINY!', 'LONG-DISTANCE CALL!'],
-  dunk: ['SLAMMA JAMMA!', 'RIM DESERVED THAT!', 'HE VOTED!', 'CALL HIS LAWYER!', 'LIBERTY AND DUNKS FOR ALL!'],
-  ankle: ['ANKLES: REPOSSESSED!', 'HE FELL! BILL HIM!', 'SOMEBODY CALL A PODIATRIST!', 'TAXED!'],
-  block: ['RETURN TO SENDER!', 'NOT IN THIS ECONOMY!', 'DENIED! LIKE THE LOAN!'],
-  steal: ['YOINK!', 'REPOSSESSED!', 'FINDERS KEEPERS!'],
+  make: ['BUCKET!', 'CASH!', 'WET!', 'BOTTOMS!', 'TOO EASY!', 'COUNT IT!'],
+  green: ['GREEN!', 'PURE!', 'NOTHING BUT NET!', 'DON\'T EVEN LOOK!'],
+  three: ['FROM THE PARKING LOT!', 'FROM WAY OUT!', 'HE\'S GOT RANGE!', 'LONG-DISTANCE CALL!'],
+  dunk: ['SLAMMA JAMMA!', 'RIM DESERVED THAT!', 'THROW IT DOWN!', 'GET UP!', 'ON HIS HEAD!'],
+  ankle: ['ANKLES: GONE!', 'HE FELL!', 'SOMEBODY HELP HIM UP!', 'PUT HIM ON SKATES!'],
+  block: ['RETURN TO SENDER!', 'NOT IN HERE!', 'DENIED!', 'GET THAT OUT!'],
+  steal: ['YOINK!', 'COOKIES!', 'FINDERS KEEPERS!', 'PICKED HIM CLEAN!'],
   miss: ['BRICK!', 'CLANK!', 'BUILDING A HOUSE!'],
-  fire: ['HE\'S ON FIRE! (LITERALLY. HELP.)', 'FIRE HAZARD!'],
+  fire: ['HE\'S ON FIRE!', 'SOMEBODY COOL HIM OFF!'],
   brav: ['BRAVADO!', 'MAIN CHARACTER ENERGY!'],
 };
 const NPC_NAMES = ['Dre', 'Tank', 'Juice', 'Ghost', 'Slim', 'Maverick', 'Tex', 'Brick', 'Chrome', 'Vegas', 'Dallas', 'Nitro', 'Ace', 'Cash', 'Rocket', 'Duke', 'Eagle', 'Blaze', 'Ohio', 'Diesel', 'Pop', 'Zeke', 'Money', 'Truck'];
@@ -628,9 +628,25 @@ function newSave() {
 }
 function loadSave() {
   try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); return; } } catch (e) { }
+  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY + '.bak')); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); S.restored = 1; return; } } catch (e) { }      /* the save would not read: yesterday's copy */
   S = newSave(); slotsInit();
 }
-function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
+// Save safety: a copy of the last good save is kept once a day; if the save does not fit, the magazine photos go first
+// (covers keep their headline), then you are told. saveCode / saveFromCode let you carry a save out and back in as text.
+function saveLocal() {
+  const day = new Date().toISOString().slice(0, 10);
+  try { if (S.bakDay !== day) { const prev = localStorage.getItem(SAVE_KEY); if (prev && prev.length > 50) { try { localStorage.setItem(SAVE_KEY + '.bak', saveSlim(prev)); } catch (e) { } } S.bakDay = day; } } catch (e) { }
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); S.saveBad = 0; return true; } catch (e) { }
+  try { if (S.mag && S.mag.list) for (const it of S.mag.list) it.img = ''; localStorage.removeItem(SAVE_KEY + '.bak'); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); if (!S.saveBad && typeof toast === 'function') toast('SAVE WAS FULL', 'The CAGE photos were dropped to make room. Covers keep their headlines.'); S.saveBad = 1; return true; } catch (e) { }
+  if (S.saveBad !== 2 && typeof toast === 'function') toast('COULD NOT SAVE', 'This browser is not letting the game store anything. Copy a save code in OPTIONS to keep your player.'); S.saveBad = 2; return false;
+}
+function saveSlim(raw) { try { const j = typeof raw === 'string' ? JSON.parse(raw) : JSON.parse(JSON.stringify(raw)); if (j.mag && j.mag.list) for (const it of j.mag.list) it.img = ''; return JSON.stringify(j); } catch (e) { return typeof raw === 'string' ? raw : ''; } }
+function saveCode() { if (S.slots) S.slots[S.slot] = slotSnap(); return 'GOTNEXT1:' + btoa(unescape(encodeURIComponent(saveSlim(S)))); }
+function saveFromCode(code) {
+  try { const m = String(code || '').trim().match(/^GOTNEXT1:([A-Za-z0-9+/=\s]+)$/); if (!m) return 'That is not a GOT NEXT save code.'; const j = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/\s+/g, ''))))); if (!j || j.v !== 1 || !j.build || typeof j.vc !== 'number') return 'The code is damaged.';
+    try { localStorage.setItem(SAVE_KEY + '.bak', saveSlim(S)); } catch (e) { } S = Object.assign(newSave(), j); slotsInit(); save(); return ''; } catch (e) { return 'The code is damaged.'; }
+}
+function saveRestoreBackup() { try { const j = JSON.parse(localStorage.getItem(SAVE_KEY + '.bak')); if (!j || j.v !== 1) return 'There is no backup yet.'; const cur = saveSlim(S); S = Object.assign(newSave(), j); slotsInit(); save(); try { localStorage.setItem(SAVE_KEY + '.bak', cur); } catch (e) { } return ''; } catch (e) { return 'There is no backup yet.'; } }
 function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
 // ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
 // fit; HC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
@@ -810,6 +826,13 @@ function sfx(n) {
     case 'bounce': tone(120, t, .09, 'sine', .5, 60); noise(t, .03, .12, 300, 900); break;
     case 'swish': noise(t, .28, .5, 2500, 7000); break;
     case 'green': noise(t, .3, .5, 2500, 7000); tone(880, t, .12, 'triangle', .25); tone(1320, t + .08, .2, 'triangle', .25); break;
+    case 'squeak': { const f0 = 1900 + Math.random() * 900; tone(f0, t, .055 + Math.random() * .03, 'sawtooth', .035, f0 * (1.25 + Math.random() * .3)); noise(t, .05, .05, 3200, 7000); break; }      /* a sneaker biting the court */
+    case 'rattle': tone(310, t, .12, 'square', .13, 290); tone(463, t + .09, .1, 'square', .1, 440); tone(330, t + .2, .12, 'square', .09, 300); noise(t + .34, .22, .4, 2500, 7000); break;      /* round the rim and in */
+    case 'net2': noise(t, .2, .42, 1800, 5200); noise(t + .05, .16, .3, 3500, 8000); break;      /* a softer, lower swish */
+    case 'crowdup': noise(t, 1.1, .16, 250, 1300); noise(t + .15, .9, .13, 700, 2600); tone(180, t, .9, 'sawtooth', .02, 260); break;      /* the fence getting loud */
+    case 'ooh': noise(t, .7, .13, 200, 900); tone(210, t, .6, 'sawtooth', .025, 150); break;      /* a groan */
+    case 'thud': tone(70, t, .16, 'sine', .55, 40); noise(t, .08, .2, 100, 500); break;      /* a body on the court */
+    case 'turbo': noise(t, .18, .16, 900, 3600); tone(300, t, .16, 'triangle', .08, 620); break;
     case 'rim': tone(310, t, .25, 'square', .14, 280); tone(463, t, .2, 'square', .1, 440); break;
     case 'dunk': tone(90, t, .4, 'sawtooth', .5, 40); noise(t, .3, .6, 100, 900); tone(310, t + .02, .5, 'square', .12, 290); break;
     case 'whoosh': noise(t, .16, .22, 500, 2500); break;
@@ -1515,6 +1538,9 @@ function poseOf(anim, t, o) {
     else if (o.scrR === 'under') { ad('knR', 0.35); ad('knL', 0.35); ad('hpR', -0.3); ad('hpL', -0.3); ad('spine', 0.22, -0.3, 0); p.y = (p.y || 0) - 0.08; p.shL = [-1.1, 0, 0.9]; p.elL = [-0.4, 0, 0]; p.shR = [-0.4, 0, -0.5]; p.elR = [-1.0, 0, 0]; }      /* low, a hand out feeling for the screen */
     else { ad('spine', -0.22); ad('chest', -0.15); ad('neck', 0.2); p.shR = [-1.3, 0, -0.5]; p.elR = [-1.6, 0, 0]; p.shL = [-1.3, 0, 0.5]; p.elL = [-1.6, 0, 0]; }      /* stuck: rocked back, arms up between them */
     p.rate = Math.max(p.rate || 16, 24); }
+  if (o.jolt) {      // contact: the same idea as the hit layer, small and short. The trunk takes it, the head lags, the knees give a little; the feet stay where they are
+    const J = o.jolt, jt = J.t || 0, sm = x => x * x * (3 - 2 * x), e = sm(clamp(jt / 0.07, 0, 1)) * (1 - sm(clamp((jt - 0.1) / 0.38, 0, 1))), pw = (J.pw || 1) * 0.55, ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    ad('chest', J.fb * 0.3 * pw * e, J.tw * 0.55 * pw * e, 0); ad('spine', J.fb * 0.14 * pw * e, J.tw * 0.25 * pw * e, -J.tw * 0.1 * pw * e); ad('neck', -J.fb * 0.3 * pw * e, -J.tw * 0.4 * pw * e, 0); ad('hips', 0, J.tw * 0.2 * pw * e, 0); ad('knR', 0.12 * pw * e); ad('knL', 0.12 * pw * e); p.y = (p.y || 0) - 0.02 * pw * e; }
   if (anim === 'stagger' && o.hit) {
     // HIT LAYER: the same stumble or fall, driven by where and how hard he was hit. The chest turns with the push first,
     // the head lags the other way, the hips follow a beat later, each leg goes its own way, and on the floor he bounces

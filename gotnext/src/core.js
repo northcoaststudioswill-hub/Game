@@ -24,9 +24,25 @@ function newSave() {
 }
 function loadSave() {
   try { const j = JSON.parse(localStorage.getItem(SAVE_KEY) || localStorage.getItem(OLD_SAVE_KEY)); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); return; } } catch (e) { }
+  try { const j = JSON.parse(localStorage.getItem(SAVE_KEY + '.bak')); if (j && j.v === 1) { S = Object.assign(newSave(), j); slotsInit(); S.restored = 1; return; } } catch (e) { }      /* the save would not read: yesterday's copy */
   S = newSave(); slotsInit();
 }
-function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
+// Save safety: a copy of the last good save is kept once a day; if the save does not fit, the magazine photos go first
+// (covers keep their headline), then you are told. saveCode / saveFromCode let you carry a save out and back in as text.
+function saveLocal() {
+  const day = new Date().toISOString().slice(0, 10);
+  try { if (S.bakDay !== day) { const prev = localStorage.getItem(SAVE_KEY); if (prev && prev.length > 50) { try { localStorage.setItem(SAVE_KEY + '.bak', saveSlim(prev)); } catch (e) { } } S.bakDay = day; } } catch (e) { }
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); S.saveBad = 0; return true; } catch (e) { }
+  try { if (S.mag && S.mag.list) for (const it of S.mag.list) it.img = ''; localStorage.removeItem(SAVE_KEY + '.bak'); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); if (!S.saveBad && typeof toast === 'function') toast('SAVE WAS FULL', 'The CAGE photos were dropped to make room. Covers keep their headlines.'); S.saveBad = 1; return true; } catch (e) { }
+  if (S.saveBad !== 2 && typeof toast === 'function') toast('COULD NOT SAVE', 'This browser is not letting the game store anything. Copy a save code in OPTIONS to keep your player.'); S.saveBad = 2; return false;
+}
+function saveSlim(raw) { try { const j = typeof raw === 'string' ? JSON.parse(raw) : JSON.parse(JSON.stringify(raw)); if (j.mag && j.mag.list) for (const it of j.mag.list) it.img = ''; return JSON.stringify(j); } catch (e) { return typeof raw === 'string' ? raw : ''; } }
+function saveCode() { if (S.slots) S.slots[S.slot] = slotSnap(); return 'GOTNEXT1:' + btoa(unescape(encodeURIComponent(saveSlim(S)))); }
+function saveFromCode(code) {
+  try { const m = String(code || '').trim().match(/^GOTNEXT1:([A-Za-z0-9+/=\s]+)$/); if (!m) return 'That is not a GOT NEXT save code.'; const j = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/\s+/g, ''))))); if (!j || j.v !== 1 || !j.build || typeof j.vc !== 'number') return 'The code is damaged.';
+    try { localStorage.setItem(SAVE_KEY + '.bak', saveSlim(S)); } catch (e) { } S = Object.assign(newSave(), j); slotsInit(); save(); return ''; } catch (e) { return 'The code is damaged.'; }
+}
+function saveRestoreBackup() { try { const j = JSON.parse(localStorage.getItem(SAVE_KEY + '.bak')); if (!j || j.v !== 1) return 'There is no backup yet.'; const cur = saveSlim(S); S = Object.assign(newSave(), j); slotsInit(); save(); try { localStorage.setItem(SAVE_KEY + '.bak', cur); } catch (e) { } return ''; } catch (e) { return 'There is no backup yet.'; } }
 function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
 // ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
 // fit; HC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
@@ -206,6 +222,13 @@ function sfx(n) {
     case 'bounce': tone(120, t, .09, 'sine', .5, 60); noise(t, .03, .12, 300, 900); break;
     case 'swish': noise(t, .28, .5, 2500, 7000); break;
     case 'green': noise(t, .3, .5, 2500, 7000); tone(880, t, .12, 'triangle', .25); tone(1320, t + .08, .2, 'triangle', .25); break;
+    case 'squeak': { const f0 = 1900 + Math.random() * 900; tone(f0, t, .055 + Math.random() * .03, 'sawtooth', .035, f0 * (1.25 + Math.random() * .3)); noise(t, .05, .05, 3200, 7000); break; }      /* a sneaker biting the court */
+    case 'rattle': tone(310, t, .12, 'square', .13, 290); tone(463, t + .09, .1, 'square', .1, 440); tone(330, t + .2, .12, 'square', .09, 300); noise(t + .34, .22, .4, 2500, 7000); break;      /* round the rim and in */
+    case 'net2': noise(t, .2, .42, 1800, 5200); noise(t + .05, .16, .3, 3500, 8000); break;      /* a softer, lower swish */
+    case 'crowdup': noise(t, 1.1, .16, 250, 1300); noise(t + .15, .9, .13, 700, 2600); tone(180, t, .9, 'sawtooth', .02, 260); break;      /* the fence getting loud */
+    case 'ooh': noise(t, .7, .13, 200, 900); tone(210, t, .6, 'sawtooth', .025, 150); break;      /* a groan */
+    case 'thud': tone(70, t, .16, 'sine', .55, 40); noise(t, .08, .2, 100, 500); break;      /* a body on the court */
+    case 'turbo': noise(t, .18, .16, 900, 3600); tone(300, t, .16, 'triangle', .08, 620); break;
     case 'rim': tone(310, t, .25, 'square', .14, 280); tone(463, t, .2, 'square', .1, 440); break;
     case 'dunk': tone(90, t, .4, 'sawtooth', .5, 40); noise(t, .3, .6, 100, 900); tone(310, t + .02, .5, 'square', .12, 290); break;
     case 'whoosh': noise(t, .16, .22, 500, 2500); break;

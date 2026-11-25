@@ -214,11 +214,12 @@ function drillEnd(res, back) {
 }
 
 // ---------- the drills board ----------
-function uiDrills(back) {
-  daily();
+function uiDrills(back, tab0) {
+  daily(); let tab = tab0 || 'drills';
   openPanel(() => {
     const ev = todayEvent();
     let h = `<div class="ph"><h2>${back === 'crib' ? 'HOME DRILLS' : 'COACH\'S BOARD'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
+    if (back !== 'crib') { h += `<div class="tabs">` + [['drills', 'DRILLS'], ['how', 'HOW IT WORKS'], ['plan', 'LESSON PLAN']].map(([k, n]) => Btn(n, () => { tab = k; rerender(); }, tab === k ? 'sel' : '')).join('') + `</div>`; lessonCheck(); if (tab === 'how') return h + howTab(back) + `</div>`; if (tab === 'plan') return h + lessonTab() + `</div>`; }
     h += `<div class="card sel"><h3 class="ye">TODAY · ${ev.n}</h3><p>${ev.d}</p></div>`;
     h += `<p class="mu">Drills pay HC, Respect and smarts XP. First time to each medal pays a bonus. The same drill pays less after three runs in a day.</p><div class="grid">`;
     for (const d of DRILL_DEFS) {
