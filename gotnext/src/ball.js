@@ -423,7 +423,7 @@ function startMove(p, slot, dx, dz) {
     // he bit on the fake: his weight goes the opposite way to where the ball handler really went
     const ox = Math.cos(o.face), oz = -Math.sin(o.face), lat = -(dx * ox + dz * oz);
     o.stg = { dur: fall ? rnd(1.4, 1.8) : rnd(0.75, 0.95), fall, side: lat >= 0 ? 1 : -1, dir: [-dx, -dz], push: fall ? 2.0 : 1.5, kind: pick(['sit', 'sit', 'spin', 'knee']) };
-    p.stats.ankles++; say(p, 's'); highlight('ankles', p, o); call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
+    p.stats.ankles++; say(p, 's'); if (fall) highlight('ankles', p, o);      /* only the ones that put him on the floor make the reel */ call(pick(CALLS.ankle), `${p.b.name} put ${o.b.name} on skates`, '#ffc531', 1.3); sfxM('ankle'); addBrav(p, 0.2); MT.slow = 0.3; crowdReact('ankles', p.team);
   } else if (readIt) { floatTxt(o, 'READ IT', '#7de3ff'); p.slowT = Math.max(p.slowT || 0, 0.18); }      /* he has seen that one: no step gained, and you lose a beat */
   else o.slowT = 0.22 + mv.ank;
 }
@@ -657,7 +657,7 @@ function callScreen(p, hard) {
   if (!c) { if (p.user && M_.P.filter(q => q.team === p.team).length < 2) floatTxt(p, 'NOBODY TO SET IT', '#ff8a1f'); return false; }
   // three kinds: a hard screen (sprint held, or a strong man who likes contact) holds longer and can put the defender on the floor;
   // a soft one is a brush and an early slip to the rim; otherwise a plain set screen
-  const st = nAtt(c, 'str'), kind = hard || (!p.user && st > 0.62 && Math.random() < 0.5) || (px(c, 'screen') > 0 && Math.random() < 0.7) ? 'hard' : (st < 0.42 || Math.random() < 0.22) ? 'soft' : 'set';
+  const st = nAtt(c, 'str'), sr = Math.random(), kind = hard || (!p.user && sr < 0.1 + st * 0.5) || (px(c, 'screen') > 0 && sr < 0.7) ? 'hard' : sr > 0.72 + st * 0.2 ? 'soft' : 'set';      /* mostly a plain set screen; the strong lean hard, the light slip */
   p.scrAt = M_.time; c.ai.scr = { h: p, t: 0, ph: 0, kind }; floatTxt(p, kind === 'hard' ? 'HARD SCREEN!' : kind === 'soft' ? 'SLIP IT!' : 'SCREEN!', '#f2c14e'); floatTxt(c, kind === 'hard' ? 'BRING HIM' : 'I GOT YOU', '#fff'); return true;
 }
 function aiScreen(p, dt) {

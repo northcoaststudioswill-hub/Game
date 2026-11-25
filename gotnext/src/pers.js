@@ -61,7 +61,7 @@ function px(p, key) { if (!p.pers) return 0; let v = 0; for (const t of p.pers) 
 // ---- talk
 function say(p, ev, force) {
   const M_ = MT; if (!M_ || !p || !p.pers || !p.pers.length || M_.practice || M_.drill || M_.net === 'guest' || (S.set && S.set.talk === 0)) return false;
-  if (!force && (M_.time - (M_.sayAt || -9) < 2.4 || M_.time - (p.sayAt || -99) < 7)) return false;
+  if (!force && (M_.time - (M_.sayAt || -9) < 3.6 || M_.time - (p.sayAt || -99) < 9)) return false;
   const pool = []; for (const t of p.pers) for (const l of (t.t[ev] || [])) pool.push(l); if (!pool.length) return false;
   let line = pick(pool); if (line === p.sayLast && pool.length > 1) line = pick(pool.filter(l => l !== line));
   M_.sayAt = p.sayAt = M_.time; p.sayLast = line; bubble(p, line); if (M_.net === 'host') netEv({ k: 'sb', i: p.i, t: line }); return true;
