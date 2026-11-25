@@ -7,8 +7,27 @@ function worldPlayerRig() {
 }
 function addNpc(build, x, z, face, anim, extra) {
   if (W && !build.bot && !(extra && (extra.cast || extra.still || extra.low)) && !build.keepLook && build.worn && build.worn.top) uniqLook(build, W.looks || (W.looks = new Set()), 2);
+  if (W && build.name && !build.bot && !(extra && (extra.cast || extra.still)) && typeof NPC_NAMES !== 'undefined' && NPC_NAMES.includes(build.name) && W.npcs.some(m => m.name === build.name)) { const free = NPC_NAMES.filter(x => !W.npcs.some(m => m.name === x)); if (free.length) build.name = free[Math.floor(Math.random() * free.length)]; }      /* two people with the same name on one corner */
   const r = makeRig(build, !!(extra && extra.low)); r.root.position.set(x, 0, z); r.root.rotation.y = face; scene.add(r.root);
   const n = Object.assign({ rig: r, name: build.name, x, z, face, anim: anim || 'idle', ph: rnd(0, 6), hx: x, hz: z, tx: x, tz: z, wt: rnd(1, 5) }, extra || {}); if (n.anim === 'ball') { n.ball = makeBall(pick(['bl_std', 'bl_rwb', 'bl_neon'])); scene.add(n.ball); } W.npcs.push(n); return n;
+}
+// Nobody stands on top of anybody. Run once a place is populated: people who are free to move are eased apart until they
+// are a couple of metres from each other, clear of the spots you walk up to (other than their own) and of where you come in.
+// People with a fixed place (the cast, anyone seated, the dice ring) stay put; nobody is moved far, into a wall or off the lot.
+function npcSpace() {
+  const N = W.npcs, fixed = n => !!(n.cast || n.still || n.anim === 'sit' || n.talk === 'dice' || (typeof LADDER !== 'undefined' && LADDER.some(L => L.name === n.name))), MIN = 2.0, B = W.bounds || [-14, 14, -10.5, 11];
+  const inSolid = (x, z) => W.solids.some(s => x > s[0] && x < s[1] && z > s[2] && z < s[3]), me = W.me;
+  for (const n of N) { n.ox = n.x; n.oz = n.z; }
+  for (let it = 0; it < 80; it++) { let moved = false;
+    for (const n of N) { if (fixed(n)) continue; let px = 0, pz = 0;
+      const away = (ox, oz, min, w) => { let dx = n.x - ox, dz = n.z - oz, d = Math.hypot(dx, dz); if (d >= min) return; if (d < 0.01) { dx = Math.cos(n.ph || 0); dz = Math.sin(n.ph || 0); d = 1; } px += dx / d * (min - d) * w; pz += dz / d * (min - d) * w; };
+      for (const o of N) if (o !== n) away(o.x, o.z, MIN, fixed(o) ? 1 : 0.5);
+      for (const s of W.spots) if (s !== n.spot) away(s.x, s.z, 1.5, 1);
+      if (me) away(me.x, me.z, 2.2, 1);
+      if (!px && !pz) continue; let nx = n.x + px * 0.6, nz = n.z + pz * 0.6; const od = Math.hypot(nx - n.ox, nz - n.oz); if (od > 2.8) { nx = n.ox + (nx - n.ox) / od * 2.8; nz = n.oz + (nz - n.oz) / od * 2.8; }
+      nx = clamp(nx, B[0] + 0.6, B[1] - 0.6); nz = clamp(nz, B[2] + 0.6, B[3] - 0.6); if (inSolid(nx, nz) && !inSolid(n.x, n.z)) continue; if (Math.abs(nx - n.x) + Math.abs(nz - n.z) < 0.004) continue; n.x = nx; n.z = nz; moved = true; }
+    if (!moved) break; }
+  for (const n of N) { if (n.x !== n.ox || n.z !== n.oz) { n.hx = n.tx = n.x; n.hz = n.tz = n.z; n.rig.root.position.set(n.x, n.yFix || 0, n.z); if (n.spot) { n.spot.x = n.x; n.spot.z = n.z; } } }
 }
 function spot(x, z, r, label, fn) { W.spots.push({ x, z, r, label, fn }); }
 function solid(x0, x1, z0, z1) { W.solids.push([x0, x1, z0, z1]); }
@@ -256,6 +275,7 @@ function buildHub() {
   for (let i = 0; i < 3; i++) { const a = i / 3 * 6.283, b = aiBuild(60); b.worn = randomWorn(1); addNpc(b, 11.4 + Math.cos(a) * 0.9, -8.6 + Math.sin(a) * 0.9, Math.atan2(-Math.cos(a), -Math.sin(a)), 'beg', { talk: 'dice' }); }
   for (let i = 0; i < 2; i++) { const d = M(box(0.07, 0.07, 0.07), toon('#ece9e2'), 11.3 + i * 0.12, 0.04, -8.6 + i * 0.05, scene); d.rotation.y = i; }
   solid(10.3, 12.5, -9.7, -7.5);
+  npcSpace();
   chatter(W.npcs, n => n.bum ? CHAT.fiend : n.talk ? CHAT[n.talk] : n.anim === 'dance' ? CHAT.dance : n.anim === 'warm' ? CHAT.fire : n.anim === 'sit' ? CHAT.oldhead : n.cage ? CHAT.cage : CHAT.block);
   W.bounds = [-14.3, 14.3, -10.9, 11.5]; W.camBox = [-15.1, 15.1, -11.7, 18.6];
 }
@@ -310,6 +330,7 @@ function buildPit() {
   for (let i = 0; i < 4; i++) { const b = aiBuild(rnd(62, 92)); b.worn = randomWorn(2); addNpc(b, rnd(-5.5, 5.5), rnd(-1.5, 4.5), rnd(0, 6), ['ball', 'idle', 'cheer', 'dance'][i], { wander: i === 1, range: 1.5 }); }
   MODES.forEach((m, i) => { glow(pitDoorX(i), 1.8, PIT_DOOR_Z - 0.6, new THREE.Color(cols[i]).getHex(), 4.2, null, 0.35); glow(pitDoorX(i), 4.4, PIT_DOOR_Z - 0.1, new THREE.Color(cols[i]).getHex(), 3.4, null, 0.4); });
   glow(8.6, 2.4, 2, 0x3dffa0, 3, null, 0.5); glow(-8.3, 1.8, 2, 0x7de3ff, 2.4, null, 0.5); litter(8, -9, 9, -4, 9); skyLife(56, 'THE CAGES · WINNERS STAY'); W.weather = weather();
+  npcSpace();
   chatter(W.npcs, n => n.name && LADDER.some(L => L.name === n.name) ? CHAT.ladder : CHAT.cage);
   W.bounds = [-9.2, 9.2, -4.6, 9.6]; W.camBox = [-9.7, 9.7, -5.4, 10.2];
 }
@@ -362,8 +383,9 @@ function worldStep(dt) {
     if (n.cast) continue;      /* cast.js animates its own people */
     let an = n.anim === 'ball' ? 'dribble' : n.anim, o = { ph: n.ph, leg: n.rig.legLen, sp: 0, dr: Math.abs(Math.sin(W.t * 7 + n.ph)) };
     if (n.wander && !(n.bum && W.talk === n)) {
-      n.wt -= dt; if (n.wt <= 0) { n.wt = rnd(3, 9); const rg = n.range || 2.5; n.tx = n.hx + rnd(-rg, rg); n.tz = n.hz + rnd(-rg, rg); }
+      n.wt -= dt; if (n.wt <= 0) { n.wt = rnd(3, 9); const rg = n.range || 2.5; for (let k = 0; k < 8; k++) { const tx = n.hx + rnd(-rg, rg), tz = n.hz + rnd(-rg, rg); if (W.npcs.some(o => o !== n && Math.hypot(o.x - tx, o.z - tz) < 1.8) || W.spots.some(s => s !== n.spot && Math.hypot(s.x - tx, s.z - tz) < 1.4) || W.solids.some(s => tx > s[0] && tx < s[1] && tz > s[2] && tz < s[3])) continue; n.tx = tx; n.tz = tz; break; } }      /* somewhere nobody is standing */
       const dx = n.tx - n.x, dz = n.tz - n.z, l = Math.hypot(dx, dz);
+      for (const o of W.npcs) { if (o === n) continue; const ex = n.x - o.x, ez = n.z - o.z, ed = Math.hypot(ex, ez); if (ed < 1.3 && ed > 0.01) { n.x += ex / ed * (1.3 - ed) * 2 * dt; n.z += ez / ed * (1.3 - ed) * 2 * dt; } }      /* and never through each other on the way */
       if (l > 0.3) { n.x += dx / l * 1.1 * dt; n.z += dz / l * 1.1 * dt; n.face = lerpAng(n.face, Math.atan2(dx, dz), 0.1); an = 'loco'; if (n.spot) { n.spot.x = n.x; n.spot.z = n.z; } }
       else if (Math.hypot(me.x - n.x, me.z - n.z) < 5 && n.bum) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08);
     }
