@@ -900,7 +900,7 @@ function aiThink(p, dt) {
     aiGo(p, tx, tz, Math.hypot(tx - p.x, tz - p.z) > 2.2 || (onBall && h && h.sprinting && Math.random() < 0.1 + L * 0.9) || (!onBall && h && h.sprinting && dHoop(h) < 6 && L > 0.45));      /* he runs, you run: a defender who only jogs gets circled */
     if (h && h.team !== p.team) {
       const dh = dist(h, p);
-      if (dh < 2.3) p.handsUp = h.st === 'shoot' || (onBall && dHoop(h) < 7.5 && Math.random() < 0.9);
+      if (dh < 2.3) p.handsUp = h.st === 'shoot' || h.st === 'fake' || (onBall && h.live !== 'drib' && dHoop(h) < 7.5);      /* a hand goes up at a shooter or a man who picked up his dribble; on a dribbler it is the low, wide stance (it used to flip a coin every frame) */
       if ((h.st === 'shoot' && !h.shot.released && h.t > h.shot.rel * (0.75 - L * 0.3) && dh < 1.7) || (h.st === 'finish' && !h.finish.done && h.t > h.finish.dur * 0.3 && dh < 2.0)) {
         if (a.react <= 0) { a.react = 0.8; if (Math.random() < 0.3 + L * 0.5) startJump(p); }
       }
@@ -946,7 +946,7 @@ function matchStep(dtReal) {
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
-    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : 0.56;      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
+    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : a.team !== b.team && (M_.B.holder === a || M_.B.holder === b) && !a.post && !b.post ? 0.72 : 0.56;      /* a crouched defender and a dribbler both lean in: keep the room so they do not meet in the middle (a post-up is meant to be contact) */      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
     if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && o.st !== 'stagger' && M_.time - (o.scrHit || -9) > 1.5) screenHit(s, o);
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
@@ -1354,7 +1354,7 @@ function animPlayer(p, dt) {
       if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
       if (an === 'slide' && !o.defMode && !o.up && !o.bodyUp) o.dv = p.dv || 0;
       if (an === 'idle' && M_.phase === 'live' && M_.off === p.team && !hasBall && !p.user && B.state === 'held') { const oc = M_.time + p.i * 1.7, ph = Math.floor(oc / 3.2); if (p.ovPh !== ph) { p.ovPh = ph; p.ov = Math.random() < 0.45 ? 1 + poolNext(p, 'ov', 3) : 0; } o.ov = p.ov; o.ovT = oc % 3.2; }
-      if (B.state === 'pass' && B.target === p && Math.hypot(B.pos.x - p.x, B.pos.z - p.z) < 4) o.catchArms = true;
+      if (B.state === 'pass' && B.target === p) { const bd = Math.hypot(B.pos.x - p.x, B.pos.z - p.z); if (bd < 3.2) o.catchArms = clamp(1 - (bd - 0.7) / 2.5, 0, 1); }      /* the hands come up as the ball gets there, not for the whole flight */
       else if (M_.phase === 'scored' && M_.lastScorer && !M_.lastScorer.dead && M_.lastScorer.team !== p.team) an = 'sulk';
   }
   if (p.forceAn && p.st === 'free' && !hasBall) { an = p.forceAn; o.ph = p.runPh; }

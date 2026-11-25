@@ -286,7 +286,7 @@ function runPose(p, o) {
   const ps = ((o.psi || 0) % 1 + 1) % 1, d = o.duty || 0.38, k = o.k || 0, ah = o.hipA === undefined ? 1 : o.hipA, th = o.thigh || 0.48, sh = o.shin || 0.48, full = th + sh;
   const warp = u => u < d ? u / d * 0.38 : 0.38 + (u - d) / (1 - d) * 0.62;       // stance and swing re-timed for this speed
   const leg = u => { const w = warp(((u % 1) + 1) % 1), st = w < 0.38; const sw = st ? 0 : (w - 0.38) / 0.62, land = clamp((sw - 0.8) / 0.2, 0, 1), c0 = 3 + 20 * ah;       /* the swing ends where the stance begins: no snap at foot strike */
-    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.5 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; return { hip, kn, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
+    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; return { hip, kn, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
   let low = 0, stance = false;
   for (const [side, off] of [['R', 0], ['L', 0.5]]) {
     const u = ((ps + off) % 1 + 1) % 1, L = leg(u);
@@ -757,7 +757,9 @@ function poseOf(anim, t, o) {
   // a contested or moving shot fades back / drifts; a pass on its way in gets the hands up whatever the feet are doing
   if (o.fade) { const c = p.chest || (p.chest = [0, 0, 0]); c[0] -= o.fade * 0.35; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] -= o.fade * 0.15; }
   if (o.drift) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.drift, -0.3, 0.3); }
-  if (o.catchArms) { p.shR = [-1.25, 0, 0.2]; p.shL = [-1.25, 0, -0.2]; p.elR = [-1.15, 0, 0]; p.elL = [-1.15, 0, 0]; p.wrR = [0.5, 0, 0]; p.wrL = [0.5, 0, 0]; p.rate = Math.max(p.rate, 20); }
+  if (o.catchArms) {      // blend from whatever the arms were doing into a soft target: elbows bent, hands at chest height, a little apart
+    const e = o.catchArms === true ? 1 : o.catchArms, e2 = e * e * (3 - 2 * e), bl = (k, t) => { const v = p[k] || [0, 0, 0]; p[k] = [lerp(v[0], t[0], e2), lerp(v[1], t[1], e2), lerp(v[2], t[2], e2)]; };
+    bl('shR', [-1.05, 0, 0.28]); bl('shL', [-1.05, 0, -0.28]); bl('elR', [-1.25, 0, 0]); bl('elL', [-1.25, 0, 0]); bl('wrR', [0.35, 0, 0]); bl('wrL', [0.35, 0, 0]); p.rate = Math.max(p.rate || 16, 18); }
   return p;
 }
 function R_fallY(o) { return (o.leg || 0.95) * 0.82; }
