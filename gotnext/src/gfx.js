@@ -286,7 +286,7 @@ function runPose(p, o) {
   const ps = ((o.psi || 0) % 1 + 1) % 1, d = o.duty || 0.38, k = o.k || 0, ah = o.hipA === undefined ? 1 : o.hipA, th = o.thigh || 0.48, sh = o.shin || 0.48, full = th + sh;
   const warp = u => u < d ? u / d * 0.38 : 0.38 + (u - d) / (1 - d) * 0.62;       // stance and swing re-timed for this speed
   const leg = u => { const w = warp(((u % 1) + 1) % 1), st = w < 0.38; const sw = st ? 0 : (w - 0.38) / 0.62, land = clamp((sw - 0.8) / 0.2, 0, 1), c0 = 3 + 20 * ah;       /* the swing ends where the stance begins: no snap at foot strike */
-    const hipS = gcurve(RUN_HIP, w) * (1 + 0.1 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.22 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; return { hip, kn, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
+    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.5 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; return { hip, kn, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
   let low = 0, stance = false;
   for (const [side, off] of [['R', 0], ['L', 0.5]]) {
     const u = ((ps + off) % 1 + 1) % 1, L = leg(u);
@@ -300,15 +300,15 @@ function runPose(p, o) {
   }
   p.y *= 0.72;          /* a runner's joints soak up some of the rise and fall: a glide, not a pogo */
   // trunk leans into the run; pelvis and shoulders counter-rotate; the head stays level
-  const c = Math.cos(2 * Math.PI * ps), lean = 0.06 + 0.07 * k, py = 0.08 * c, pz = -0.05 * Math.sin(2 * Math.PI * ps);
+  const c = Math.cos(2 * Math.PI * ps), lean = 0.05 + 0.2 * k, py = (0.06 + 0.04 * k) * c, pz = -0.05 * Math.sin(2 * Math.PI * ps);
   S_('hips', lean * 0.35, py, pz); for (const s of ['R', 'L']) { const h = p['hp' + s]; h[0] += lean * 0.35; h[1] -= py; h[2] -= pz; }
   S_('spine', lean * 0.4, -0.05 * c, 0); S_('chest', lean * 0.25, -0.13 * c, 0); S_('neck', -lean * 0.8, 0.12 * c, 0); S_('head', -0.03);
   // arms: elbows near a right angle, driven from the shoulder, opposite the legs; the hand comes up toward the chin
   for (const [side, off] of [['R', 0.5], ['L', 0]]) {
     // the upper arm swings mostly BEHIND the body (about 40 degrees back, 15-20 forward); the elbow closes as the hand
     // comes up in front and opens as it passes the hip going back
-    const f = Math.cos(2 * Math.PI * (ps - off) + 0.5), fl = (-11 + (27 + 8 * k) * f) * D2R;
-    S_('sh' + side, -fl, 0, side === 'R' ? -0.07 : 0.07); S_('el' + side, -(1.3 + 0.35 * Math.max(0, f) - 0.3 * Math.max(0, -f))); S_('wr' + side, -0.05);
+    const f = Math.cos(2 * Math.PI * (ps - off) + 0.5), fl = (-11 + (19 + 34 * k) * f) * D2R;      /* a jog swings the arms loosely; a sprint pumps them */
+    S_('sh' + side, -fl, 0, side === 'R' ? -0.07 : 0.07); S_('el' + side, -(1.3 + (0.25 + 0.3 * k) * Math.max(0, f) - (0.2 + 0.2 * k) * Math.max(0, -f)) * (0.85 + 0.15 * k)); S_('wr' + side, -0.05);
   }
   // run styles (the player's profile): the legs stay the measured stride, the trunk, head and arms carry the character
   const rs = o.rs; if (rs) { const sw = Math.sin(2 * Math.PI * ps), ad = (k2, x, y, z) => { const v = p[k2]; v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
@@ -495,6 +495,9 @@ function poseOf(anim, t, o) {
       if (o.v === 1) { S_('shL', -0.9, 0, 0.7); S_('elL', -0.7); S_('chest', -0.1, 0.25, 0); }      /* contest variants: right hand only */
       else if (o.v === 2) { S_('shR', -0.9, 0, -0.7); S_('elR', -0.7); S_('chest', -0.1, -0.25, 0); }      /* left hand only */
       else if (o.v === 3) { S_('spine', 0.14); S_('chest', 0.05); S_('shR', -2.55, 0, 0.1); S_('shL', -2.55, 0, -0.1); legs(0.25, 0.3, 0.2, 0.25, 0.05); }      /* flying at him, both hands out front */
+      else if (o.v === 4 || o.v === 5) {      /* closeout: chop steps, one hand stabbing up at the ball, the other out low for balance, body still coming forward */
+        const r = o.v === 4 ? 'R' : 'L', l = r === 'R' ? 'L' : 'R', sg = r === 'R' ? 1 : -1; legs(-0.55, 0.85, 0.35, 0.55, 0.12); S_('an' + (r === 'R' ? 'L' : 'R'), 0.5);
+        S_('spine', 0.22); S_('chest', 0.1, 0.18 * sg, 0); S_('neck', -0.45); S_('sh' + r, -3.05, 0, sg * 0.05); S_('el' + r, -0.08); S_('wr' + r, 0.5); S_('sh' + l, -0.55, 0, -sg * 0.85); S_('el' + l, -0.55); S_('wr' + l, 0.2); }
       break;
     case 'swat': legs(0.1, 0.3, -0.3, 0.5, 0.08); S_('anR', 0.8); S_('spine', 0.1); S_('chest', 0.15, 0.5, 0); S_('neck', -0.1); S_('shR', -1.7, 0, 0.5); S_('elR', -0.05); S_('wrR', -0.9); S_('shL', -0.4, 0, 0.6); S_('elL', -0.8); p.rate = 34; break;
     case 'steal': { const u = clamp(t / 0.3, 0, 1); p.y = -0.17; legs(-0.95, 1.05, 0.2, 0.5, 0.1); S_('spine', 0.38); S_('chest', 0.18, 0.5 - u * 1.0, 0); S_('neck', -0.4); S_('shR', -1.3, 0, -0.9 + u * 1.6); S_('elR', -0.2); S_('wrR', -0.5); S_('shL', 0.4, 0, 0.5); p.rate = 28;
@@ -747,6 +750,10 @@ function poseOf(anim, t, o) {
   if (o.leanF) { const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] += o.leanF; }
   if (o.hipYaw) { const h = p.hips || (p.hips = [0, 0, 0]); h[1] += o.hipYaw; const c = p.chest || (p.chest = [0, 0, 0]); c[1] -= o.hipYaw * 0.8; }
   if (o.bump) { const c = p.chest || (p.chest = [0, 0, 0]); c[0] += o.bump[0]; c[2] += o.bump[1]; }
+  if (o.plant) {      // plant and go: hips drop (the legs bend to keep the feet down), the trunk leans back against the way he was going, arms out for balance
+    const e = o.plant.e, ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x; v[1] += y || 0; v[2] += z || 0; };
+    p.y = (p.y || 0) - 0.1 * e; ad('spine', -0.32 * o.plant.fb * e, 0, 0.25 * o.plant.lat * e); ad('chest', -0.12 * o.plant.fb * e, 0, 0.1 * o.plant.lat * e); ad('neck', 0.2 * o.plant.fb * e);
+    ad('shR', -0.25 * e, 0, -0.35 * e); ad('shL', -0.25 * e, 0, 0.35 * e); p.rate = Math.max(p.rate || 16, 26); }
   // a contested or moving shot fades back / drifts; a pass on its way in gets the hands up whatever the feet are doing
   if (o.fade) { const c = p.chest || (p.chest = [0, 0, 0]); c[0] -= o.fade * 0.35; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] -= o.fade * 0.15; }
   if (o.drift) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.drift, -0.3, 0.3); }

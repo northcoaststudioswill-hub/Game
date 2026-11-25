@@ -551,6 +551,13 @@ function startJump(p) {
   // contesting a shooter: close out at him as you go up (not all the way: you stop a step short)
   let s = null, sd = 3.2; for (const q of MT.P) if (q.team !== p.team && (q.st === 'shoot' || q.st === 'fake') && dist(q, p) < sd) { sd = dist(q, p); s = q; }
   if (s && sd > 0.75) { const k = Math.min(3.2, (sd - 0.7) / 0.3); p.lunge = [(s.x - p.x) / sd * k, (s.z - p.z) / sd * k, 0.3]; p.face = Math.atan2(s.x - p.x, s.z - p.z); }
+  // the spacing decides the contest. Right on him: straight up, both arms (verticality). A step off: one hand, on his shooting
+  // side, a lower jump leaning in. Late and far: a closeout, a short chop-step hop with one hand high, the other out for balance
+  if (s) { const lefty = s.rig && s.rig.prof && s.rig.prof.hand === 'L', fx = Math.sin(p.face), fz = Math.cos(p.face), side = (s.x - p.x) * fz - (s.z - p.z) * fx;
+    if (sd < 0.85) { p.jv = 0; }
+    else if (sd < 1.6) { p.jv = (lefty ? side < 0 : side >= 0) ? 1 : 2; p.jumpH *= 0.78; }
+    else { p.jv = 4 + (poolNext(p, 'cl', 2)); p.jumpH *= 0.38; } }
+  else { const f = MT.P.find(q => q.team !== p.team && (q.st === 'finish' || q.st === 'hop') && dist(q, p) < 2.6); if (f) p.jv = dist(f, p) > 1.1 ? 3 : 0; }      /* at the rim: flying at the finisher, or straight up when he is on you */
 }
 
 // ---------- human control ----------
@@ -880,6 +887,8 @@ function aiThink(p, dt) {
       if (far < 7) { gap += (1.25 - gap) * iq; shade += (0.14 - shade) * iq; } else { gap += (2.7 - shooter * 0.9 - gap) * iq; shade += (0.40 - shade) * iq; }
       if (m.fire) gap = Math.min(gap, 1.2); gap = Math.min(gap, Math.max(0.8, md - 0.9)); }
     let tx = a.mx - a.mx / md * gap, tz = a.mz - a.mz / md * gap;
+    // he is running at you: play where he is going, not where he was. Cut off the line to the rim, earlier the better you read it
+    if (onBall && m.sprinting && L > 0.4) { const w = clamp((L - 0.4) / 0.4, 0, 1), lead = 0.26 + L * 0.06, px0 = m.x + m.vx * lead, pz0 = m.z + m.vz * lead, pl = Math.hypot(px0, pz0) || 1; tx += (px0 - px0 / pl * Math.min(gap, pl * 0.5) - tx) * w; tz += (pz0 - pz0 / pl * Math.min(gap, pl * 0.5) - tz) * w; }
     if (!onBall && h) { tx += (h.x - tx) * shade; tz += (h.z - tz) * shade; }
     // help at the rim
     if (h && h !== m && h.team !== p.team && dHoop(h) < 3.6 && dHoop(p) < 4.5 && L > 0.4) { tx = h.x * 0.5; tz = h.z * 0.5; a.helping = true; }
@@ -888,14 +897,14 @@ function aiThink(p, dt) {
       if (hp) { const w = dHoop(hp.man) < dHoop(m) ? 0.6 : 0.4; tx = m.x + (hp.man.x - m.x) * w; tz = m.z + (hp.man.z - m.z) * w; const tl = Math.hypot(tx, tz) || 1; tx -= tx / tl * 0.9; tz -= tz / tl * 0.9; } }
     // a driver coming straight at him from a few steps away: a smart defender plants and takes it (outside the circle)
     if (h && h.team !== p.team && h.sprinting && !MT.arcade && dHoop(p) > 1.4 && dHoop(p) < 4.6) { const hv = Math.hypot(h.vx, h.vz) || 1, rx = p.x - h.x, rz = p.z - h.z, rd = Math.hypot(rx, rz) || 1; if (rd < 3.2 && rd > 0.9 && (rx * h.vx + rz * h.vz) / (rd * hv) > 0.9) { if (a.setFor !== h.turboAt + ':' + Math.floor(MT.time / 2)) { a.setFor = h.turboAt + ':' + Math.floor(MT.time / 2); a.setOn = Math.random() < 0.15 + L * 0.45; } if (a.setOn) { tx = p.x; tz = p.z; p.face = Math.atan2(-rx, -rz); } } }
-    aiGo(p, tx, tz, Math.hypot(tx - p.x, tz - p.z) > 2.2);
+    aiGo(p, tx, tz, Math.hypot(tx - p.x, tz - p.z) > 2.2 || (onBall && h && h.sprinting && Math.random() < 0.1 + L * 0.9) || (!onBall && h && h.sprinting && dHoop(h) < 6 && L > 0.45));      /* he runs, you run: a defender who only jogs gets circled */
     if (h && h.team !== p.team) {
       const dh = dist(h, p);
       if (dh < 2.3) p.handsUp = h.st === 'shoot' || (onBall && dHoop(h) < 7.5 && Math.random() < 0.9);
       if ((h.st === 'shoot' && !h.shot.released && h.t > h.shot.rel * (0.75 - L * 0.3) && dh < 1.7) || (h.st === 'finish' && !h.finish.done && h.t > h.finish.dur * 0.3 && dh < 2.0)) {
         if (a.react <= 0) { a.react = 0.8; if (Math.random() < 0.3 + L * 0.5) startJump(p); }
       }
-      if (onBall && dh < 1.5 && p.cool <= 0 && h.st === 'free' && Math.random() < (0.32 + L * 0.42) * dt * (0.5 + nAtt(p, 'steal')) * (1 + px(p, 'steal') * 6)) startSteal(p);      /* thieves by nature reach more */
+      if (onBall && dh < 1.5 && p.cool <= 0 && h.st === 'free' && Math.random() < (0.32 + L * 0.42) * (h.sprinting ? 1 - L * 0.75 : 1) * dt * (0.5 + nAtt(p, 'steal')) * (1 + px(p, 'steal') * 6)) startSteal(p);      /* thieves by nature reach more */
     }
     a.react -= dt;
   }
@@ -1065,7 +1074,8 @@ function stepPlayer(p, dt) {
     }
   } else p.assist = 0;
   // locomotion
-  let top = (3.3 + nAtt(p, 'speed') * 2.5) * (M_.arcade ? 1.15 : 1);
+  // a jog is a jog and a sprint is a sprint: jog 2.7-4.3 m/s by Speed, sprint 4.2-7.4 (it used to be 3.3-5.8 against 4.2-7.4, which read the same)
+  const jogV = 2.7 + nAtt(p, 'speed') * 1.6, sprV = 4.2 + nAtt(p, 'speed') * 3.2; let top = jogV * (M_.arcade ? 1.15 : 1);
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
   top *= 1 + px(p, 'speed'); if (p.screen && p.user) top *= 0.2; if (p.bodyUp) top *= 0.86; if (p.box) top *= 0.62;
@@ -1078,12 +1088,17 @@ function stepPlayer(p, dt) {
       p.turboAt = M_.time; p.turboT = 0.6; p.stam -= 9; if (p.user) floatTxt(p, 'TURBO', '#3dffa0'); sfx('turbo'); sfx('squeak');
       const [o, od] = nearestOpp(p); if (o && od < 1.9 && o.st === 'free' && Math.random() < clamp(0.3 + (att(p, 'accel') - att(o, 'perd')) * 0.008 - (o.bodyUp ? 0.15 : 0), 0.08, 0.65)) { o.slowT = Math.max(o.slowT || 0, 0.22); floatTxt(o, 'BEAT', '#f2c14e'); } }
     if (p.turboT > 0 && p.sprinting) top *= 1.16; }
-  if (p.sprinting) { top *= 1.28; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * (1 + px(p, 'stam')) * dt);
+  if (p.sprinting) { top *= sprV / jogV; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * (1 + px(p, 'stam')) * dt);
   if (p.stam < 20) { top *= 0.86; if (!p.gassed && p.stam < 12) { p.gassed = true; floatTxt(p, 'GASSED', '#8d8d99'); } } if (p.slowT > 0) top *= 0.45;
   const def = M_.off !== p.team && !hasBall && B.state !== 'loose'; if (def && !p.sprinting) top *= 0.92;
   if (lock > 0) {
-    const tvx = p.in.dx * top * lock, tvz = p.in.dz * top * lock, opp = p.vx * tvx + p.vz * tvz < 0 || (Math.abs(tvx) + Math.abs(tvz) < 0.05);
-    const acc = (11 + nAtt(p, 'accel') * 15) * (opp ? 2.4 : 1) * dt;      // braking and reversing bite harder than speeding up
+    let tvx = p.in.dx * top * lock, tvz = p.in.dz * top * lock; const opp = p.vx * tvx + p.vz * tvz < 0 || (Math.abs(tvx) + Math.abs(tvz) < 0.05);
+    // plant and go: a hard cut at speed means a foot goes down and the body stops before it can go the new way (quicker with Acceleration)
+    { const sp0 = Math.hypot(p.vx, p.vz), tl = Math.hypot(tvx, tvz);
+      const onBallD = def && B.holder && B.holder.team !== p.team && dist(B.holder, p) < 3; p.onBallD = onBallD;      /* the man guarding the ball slides: no plant, sharper feet */
+      if (!onBallD && !(p.plantT > 0) && p.st === 'free' && p.y < 0.05 && sp0 > 2.6 && tl > 1 && (p.vx * tvx + p.vz * tvz) / (sp0 * tl) < 0.3) { p.plantD = 0.14 + 0.12 * (1 - nAtt(p, 'accel')); p.plantT = p.plantD; p.plantX = p.vx / sp0; p.plantZ = p.vz / sp0; sfx('squeak'); }
+      if (p.plantT > 0) { p.plantT -= dt; if (p.plantT > p.plantD * 0.45) { tvx = 0; tvz = 0; } } }
+    const acc = (9 + nAtt(p, 'accel') * 12) * (opp ? 1.9 : 1) * (p.onBallD ? 1 + (0.45 + 0.35 * nAtt(p, 'perd')) * (p.user ? 1 : clamp((p.aiLvl - 0.2) / 0.6, 0, 1)) : 1) * dt;      // braking and reversing bite harder than speeding up
     const ddx = tvx - p.vx, ddz = tvz - p.vz, dl = Math.hypot(ddx, ddz); if (dl <= acc || dl === 0) { p.vx = tvx; p.vz = tvz; } else { p.vx += ddx / dl * acc; p.vz += ddz / dl * acc; }
   }
   // guarding a post-up: hold your ground (you do not walk into him); the contact itself decides who gives, by strength
@@ -1357,6 +1372,7 @@ function animPlayer(p, dt) {
   const asp = Math.hypot(p.avx, p.avz);
   if (asp > 0.6 && (p.st === 'free' || p.st === 'move')) { let a = Math.atan2(p.avx, p.avz) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; if (Math.abs(a) < 2.3) o.hipYaw = clamp(a, -0.6, 0.6) * Math.min(1, asp / 3) * 0.75; }
   if (p.bumpT > 0) { p.bumpT -= dt; const k = p.bumpT / 0.3; o.bump = [p.bumpX * k, p.bumpZ * k]; }
+  if (p.plantT > 0 && p.st === 'free') { const u = 1 - p.plantT / p.plantD, fs = Math.sin(p.face), fc = Math.cos(p.face); o.plant = { e: Math.sin(Math.PI * Math.min(1, u * 1.15)), fb: p.plantX * fs + p.plantZ * fc, lat: p.plantX * fc - p.plantZ * fs }; }
   if (R.gait && (an === 'run' || an === 'dribble' || an === 'slide')) o.ph = R.gait.ph;       // arms swing with the feet that are actually stepping
   p.an = an;
   const t = an === 'idle' || an === 'celeb' || an === 'call' || an === 'sulk' ? M_.time : an === 'fake' ? 0.3 + p.t : p.t;
