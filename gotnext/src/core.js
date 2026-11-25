@@ -44,7 +44,7 @@ function cribTier(id) { return S.crib[id] || 0; }
 function cribFx(k) { let v = 0; for (const c of CRIB) { const t = c.tiers[cribTier(c.id)]; if (t && t.k === k) v += t.v; } return v + (typeof homeFx === 'function' ? homeFx(k) : 0); }
 function shopPrice(c) { return Math.round(c * (ORIGIN[S.build.origin].k === 'shop' ? 0.9 : 1)); }
 function myBuild() {   // a portable snapshot of the player (also what export codes carry)
-  return { name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
+  return { mine: true, name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, worn: S.worn, anim: S.anim || undefined, moves: { side: S.moves.side, back: S.moves.back, diag: S.moves.diag, jumper: S.moves.jumper, dunk: S.moves.dunk, celeb: S.moves.celeb } };
 }
 function encodeBuild(b) { return BRAND.code + '1-' + btoa(unescape(encodeURIComponent(JSON.stringify(b)))).replace(/=+$/, ''); }
 function decodeBuild(code) {

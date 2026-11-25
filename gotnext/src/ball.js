@@ -304,6 +304,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   if (!opt.hopped && !forceDunk && !opt.kind && !opt.style && !opt.layup) {
     // the move stick picks the finish: sideways euro-steps (euroOf), away reverses, let go hops
     if (p.user && !p.afk) { const g = gest(p); if (g.mag < 0.25 && sp > 2.5 && d > 1.5) return startHop(p, 'finish'); if (!euro && g.tw < -0.45) rev = true; }
+    if (!rev && !euro && Math.abs(p.x) > 1.3 && p.z < 1.4 && sp > 2 && Math.random() < 0.5) rev = true;      /* along the baseline: under the rim and up the other side */
     else if (!p.user && !laneOpen(p)) { const r = Math.random(); if (r < 0.16 && d > 1.6) return startHop(p, 'finish'); if (!euro && r < 0.48) euro = Math.random() < 0.5 ? -1 : 1; else if (r < 0.62 && Math.abs(p.x) > 1.4 && p.z < 2.4) rev = true; }
   }
   let ax = p.x, az = Math.max(p.z, 0.15); const l = Math.hypot(ax, az) || 1; ax /= l; az /= l;
@@ -328,15 +329,20 @@ function startFinish(p, euro, forceDunk, y0, opt) {
   }
   let kind = type === 'dunk' ? '' : opt.kind || (opt.hopped ? 'power' : euro ? 'euro' : rev ? 'reverse' : read === 'hang' || read === 'switch' || read === 'power' || read === 'scoop' || read === 'spin' ? read : cont ? (fq < 75 ? 'lay' : nAtt(p, 'str') > 0.62 ? 'power' : 'scoop') : sp > 4 && d > 1.7 ? 'finger' : 'lay');
   // a quick guard with a shot-blocker closing gets it up early off the wrong foot
-  if (type === 'layup' && (kind === 'lay' || kind === 'scoop') && !read && !opt.kind && cont && att(p, 'speed') >= 72 && sp > 3 && Math.random() < 0.5) kind = 'quick';
+  if (type === 'layup' && (kind === 'lay' || kind === 'scoop') && !read && !opt.kind && cont && att(p, 'speed') >= 72 && sp > 3 && Math.random() < 0.4) kind = 'quick';
+  // the rest of the free package: with a man there, show it and bring it under his arm, float it over the top, or spin; alone, the odd high one off the glass
+  if (type === 'layup' && !read && !opt.kind && !opt.hopped && !euro && !rev && (kind === 'lay' || kind === 'scoop' || kind === 'power')) { const r = Math.random();
+    if (cont) kind = r < 0.2 ? 'under' : r < 0.38 ? 'over' : r < 0.5 && sp > 3 && fq >= 60 ? 'spin' : kind; else if (r < 0.15) kind = 'over'; }
   let style = type !== 'dunk' ? p.b.moves.dunk : opt.style || style0 || (rev ? 'reverse' : p.b.moves.dunk);
   // the basic package is not one dunk: off the run it is one hand, cocked back if he can get up; standing or in traffic, two hands
-  if (type === 'dunk' && style === 'twohand' && !opt.style) style = cont || sp < 2.4 || opt.hopped ? 'twohand' : (dq >= 78 && Math.random() < 0.45 ? 'cock' : Math.random() < 0.75 ? 'onehand' : 'twohand');
+  if (type === 'dunk' && style === 'twohand' && !opt.style) { const r = Math.random();
+    style = p.putT > 0 ? 'tip' : cont || sp < 2.4 || opt.hopped ? (r < 0.55 ? 'twohand' : 'hangtwo') : dq >= 78 ? (r < 0.28 ? 'cock' : r < 0.52 ? 'hammer' : r < 0.74 ? 'onehand' : r < 0.9 ? 'lean' : 'twohand') : (r < 0.45 ? 'onehand' : r < 0.7 ? 'lean' : 'twohand'); }
   p.st = 'finish'; p.t = 0;
   const f = p.finish = { type, kind, sx: p.x, sz: p.z, tx: ax * (type === 'dunk' ? 0.42 : 0.75), tz: az * (type === 'dunk' ? 0.42 : 0.75), dur: clamp(0.42 + d * 0.085, 0.45, 1.0) + (euro ? 0.1 : 0) + (kind === 'finger' ? 0.06 : 0), done: false, euro: euro || 0, px: az, pz: -ax, y0: y0 || 0, oop: false, peak: type === 'dunk' ? Math.max(0.62, 3.22 - p.H * 1.36) + nAtt(p, 'vert') * 0.2 + (MT.arcade ? 0.7 : 0) : 0.55 + (MT.arcade ? 0.4 : 0) + (kind === 'power' ? -0.08 : 0), style, spin: (type === 'dunk' && (style === 'three60' || (MT.arcade && d > 3.5 && style !== 'reverse' && style !== 'contact'))) ? 1 : 0, hopped: !!opt.hopped, turn: 0, bh: 'R', cont: cont ? 1 : 0, ox: 0, oz: 0, hit: null, contact: 0, blocked: false };
   if (kind === 'hang') f.dur += 0.16; if (kind === 'switch') f.dur += 0.06; if (style === 'squat') f.dur += 0.04;
   if (euro && thr && thr.s > 0.25) { f.euroBad = euro !== (thr.lat > 0 ? -1 : 1); if (p.user && f.euroBad) floatTxt(p, 'EURO · INTO HIM', '#ff8a1f'); }      /* the step has to go away from the shot-blocker */
-  if (kind === 'quick') f.dur = Math.max(0.4, f.dur - 0.1); if (kind === 'spin') { f.dur += 0.1; f.spin = 1; }
+  if (kind === 'quick') f.dur = Math.max(0.4, f.dur - 0.1); if (kind === 'spin') { f.dur += 0.1; f.spin = 1; } if (kind === 'under') f.dur += 0.12; if (kind === 'over') f.dur += 0.04;
+  if (p.user && !read && (kind === 'under' || kind === 'over' || kind === 'spin' || kind === 'quick')) floatTxt(p, { under: 'UP AND UNDER', over: 'OVER THE TOP', spin: '360 LAYUP', quick: 'WRONG FOOT' }[kind], '#7de3ff');
   // the off hand: on the left side of the rim (as you face it) a one-hander goes up with the left, away from the help
   if (type === 'layup' && (kind === 'lay' || kind === 'finger' || kind === 'scoop' || kind === 'quick') && !euro && fq >= 62 && p.x < -0.7) { f.lh = true; f.bh = 'L'; }
   if (p.user && read && read !== 'euro' && read !== 'reverse') floatTxt(p, { spin: 'SPIN LAYUP', hang: 'HANG', switch: 'SWITCH HANDS', power: 'POWER', scoop: 'SCOOP', bail: 'PULLED OUT' }[read] || '', '#7de3ff');
@@ -353,7 +359,7 @@ function startFinish(p, euro, forceDunk, y0, opt) {
 }
 function resolveFinish(p) {
   const f = p.finish, B = MT.B; f.done = true; if (B.holder !== p) return;
-  let c = 0; const soft = (f.euro ? (f.euroBad ? 1.05 : 0.6) : 1) * (f.kind === 'quick' ? 0.78 : f.kind === 'spin' ? 0.66 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'hang' ? 0.6 : f.kind === 'switch' ? 0.7 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1) * (f.style === 'contact' && f.type === 'dunk' ? 0.45 : 1);
+  let c = 0; const soft = (f.euro ? (f.euroBad ? 1.05 : 0.6) : 1) * (f.kind === 'quick' ? 0.78 : f.kind === 'spin' ? 0.66 : f.kind === 'under' ? 0.64 : f.kind === 'over' ? 0.72 : 1) * (f.oop ? 0.6 : 1) * (f.hopped ? 0.78 : 1) * (f.kind === 'scoop' ? 0.8 : f.kind === 'hang' ? 0.6 : f.kind === 'switch' ? 0.7 : f.kind === 'reverse' || f.style === 'reverse' && f.type === 'dunk' ? 0.75 : 1) * (f.style === 'contact' && f.type === 'dunk' ? 0.45 : 1);
   if (f.contact) c = Math.max(c, f.contact * 0.55);           /* got hit in the air and lost the line */
   for (const o of MT.P) { if (o.team === p.team || o.st === 'stagger') continue; const d = dist(o, p); if (d > 1.9) continue; c = Math.max(c, (1 - d / 1.9) * (0.5 + 0.5 * nAtt(o, 'intd')) * (o.st === 'jump' ? 1 : 0.55)); }
   const fs = clamp((att(p, f.type === 'dunk' ? 'dunk' : 'layup') - 70) / 29, 0, 1);       /* finishing skill above 70 */
@@ -374,14 +380,14 @@ function resolveFinish(p) {
       p.stats.dunks++; sfxM('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
       let vic = f.hit && f.hit.st !== 'stagger' && dist(f.hit, p) < 1.6 ? f.hit : null; if (!vic) for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
       if (vic) { const dd = dist(vic, p) || 1; vic.st = 'stagger'; vic.t = 0; vic.stg = { dur: 1.5, fall: true, side: 0, dir: [(vic.x - p.x) / dd, (vic.z - p.z) / dd], push: 2.2, kind: pick(['sit', 'flat', 'flat']) }; addBrav(p, 0.1); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + 3; }
-      f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : 0); MT.hoopT = 0.6;
+      f.hangT = (MT.arcade ? 0.34 : 0.22) + (f.style === 'squat' ? 0.3 : f.style === 'hangtwo' ? 0.2 : 0); MT.hoopT = 0.6;
       highlight(vic ? 'poster' : f.oop ? 'oop' : f.put ? 'putback' : (f.spin || ds.rep >= 6) ? 'dunk' : null, p, vic);
       call(f.oop ? 'ALLEY-OOP!' : f.put ? 'PUTBACK!' : vic ? 'POSTER!' : pick(CALLS.dunk), p.b.name + (vic ? ' on ' + vic.b.name : ds.rep ? ` · ${ds.n}` : ''), '#ff5a3c', 1.3); if (p.mine) MT.bonusRep = (MT.bonusRep || 0) + ds.rep;
       scorePts(p, pts, 'dunk'); if (f.foulBy) { foul(f.foulBy, p, 'blocking', false); andOne(p, f.foulBy); } return;
     }
     B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
-  const kAdj = { quick: -0.03, spin: -0.05, finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
+  const kAdj = { under: -0.04, over: -0.03, quick: -0.03, spin: -0.05, finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
   const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj + px(p, 'fin') + px(p, 'close') - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
   handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }

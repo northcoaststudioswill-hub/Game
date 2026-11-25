@@ -81,6 +81,38 @@ function shotTrack(style) {
   return (_shotKeys[style] = K);
 }
 const SHOT_STYLES = [['trad', 'Traditional'], ['high', 'High release'], ['quick', 'Quick release']];
+// ---- shot bases: a jumper can also be put together from a lower base (feet, knees, hips) and an upper base (the release).
+// '' means "use the blend above" for that half. Every base keeps the same beats, so the release still lands at u = 1.
+const LOWER_BASES = [['', 'From the blend'], ['trad', 'Square'], ['high', 'Tall'], ['quick', 'Compact'], ['hop', 'Hop'], ['wide', 'Wide base'], ['stag', 'Staggered'], ['sway', 'Sway'], ['set', 'Set shot']];
+const UPPER_BASES = [['', 'From the blend'], ['trad', 'Textbook'], ['high', 'High release'], ['quick', 'Quick release'], ['push', 'Two-hand push'], ['over', 'Over the head'], ['sling', 'Slingshot'], ['flick', 'One-hand flick'], ['ear', 'Cocked by the ear']];
+const _TR = {
+  dip: (S_, legs, p) => { p.y = -0.13; legs(-0.45, 0.7, -0.45, 0.7, 0.06); S_('spine', 0.12); S_('chest', 0.08); S_('neck', -0.12); S_('shR', -1.0, 0, 0.1); S_('shL', -0.95, 0, -0.3); S_('elR', -2.2); S_('elL', -2.0); S_('wrR', 0.7); S_('wrL', 0.2); },
+  set: (S_, legs) => { legs(-0.05, 0.12, 0, 0.12, 0.04); S_('anR', 0.7); S_('anL', 0.7); S_('spine', -0.03); S_('chest', -0.06); S_('neck', -0.05); S_('shR', -2.55, 0, 0.05); S_('shL', -2.35, 0, -0.32); S_('elR', -1.55); S_('elL', -1.25); S_('wrR', 0.95); S_('wrL', 0.3); },
+  follow: (S_, legs) => { legs(0.05, 0.05, 0, 0, 0.03); S_('anR', 0.9); S_('anL', 0.9); S_('spine', -0.05); S_('chest', -0.04); S_('neck', -0.1); S_('shR', -2.95, 0, 0); S_('elR', -0.08); S_('wrR', -1.25); S_('shL', -2.1, 0, -0.4); S_('elL', -0.95); S_('wrL', -0.1); },
+};
+const _BASE = {
+  // lower
+  hop: { dip: (S_, legs, p) => { p.y = -0.2; legs(-0.62, 0.98, -0.62, 0.98, 0.03); }, set: (S_, legs) => { legs(-0.14, 0.34, -0.14, 0.34, 0.02); S_('anR', 0.95); S_('anL', 0.95); }, follow: (S_, legs) => { legs(0.02, 0.1, 0.02, 0.1, 0.02); S_('anR', 1.0); S_('anL', 1.0); } },
+  wide: { dip: (S_, legs, p) => { p.y = -0.15; legs(-0.5, 0.78, -0.5, 0.78, 0.2); }, set: (S_, legs) => { legs(-0.04, 0.12, -0.04, 0.12, 0.16); S_('anR', 0.7); S_('anL', 0.7); }, follow: (S_, legs) => { legs(0.03, 0.05, 0.03, 0.05, 0.14); S_('anR', 0.85); S_('anL', 0.85); } },
+  stag: { dip: (S_, legs, p) => { p.y = -0.13; legs(-0.66, 0.78, -0.26, 0.66, 0.07); }, set: (S_, legs) => { legs(-0.2, 0.18, 0.08, 0.1, 0.05); S_('anR', 0.6); S_('anL', 0.8); }, follow: (S_, legs) => { legs(-0.1, 0.06, 0.08, 0.04, 0.04); S_('anR', 0.8); S_('anL', 0.9); } },
+  sway: { dip: (S_, legs, p) => { p.y = -0.14; legs(-0.48, 0.72, -0.48, 0.72, 0.06); }, set: (S_, legs) => { legs(-0.3, 0.1, -0.3, 0.1, 0.05); S_('anR', 0.5); S_('anL', 0.5); S_('hips', -0.12); }, follow: (S_, legs) => { legs(-0.44, 0.06, -0.44, 0.06, 0.05); S_('anR', 0.4); S_('anL', 0.4); S_('hips', -0.17); } },
+  set: { dip: (S_, legs, p) => { p.y = -0.07; legs(-0.25, 0.4, -0.25, 0.4, 0.08); }, set: (S_, legs) => { legs(-0.03, 0.06, -0.03, 0.06, 0.08); S_('anR', 0.3); S_('anL', 0.3); }, follow: (S_, legs) => { legs(0, 0.02, 0, 0.02, 0.08); S_('anR', 0.45); S_('anL', 0.45); } },
+  // upper
+  push: { dip: (S_) => { S_('shR', -0.9, 0, 0.15); S_('shL', -0.9, 0, -0.15); S_('elR', -2.15); S_('elL', -2.15); S_('wrR', 0.5); S_('wrL', 0.5); }, set: (S_) => { S_('spine', 0.02); S_('chest', 0); S_('shR', -1.7, 0, 0.16); S_('shL', -1.7, 0, -0.16); S_('elR', -1.95); S_('elL', -1.95); S_('wrR', 0.7); S_('wrL', 0.7); }, follow: (S_) => { S_('shR', -2.6, 0, 0.1); S_('shL', -2.6, 0, -0.1); S_('elR', -0.15); S_('elL', -0.15); S_('wrR', -1.0); S_('wrL', -1.0); } },
+  over: { dip: () => { }, set: (S_) => { S_('spine', -0.1); S_('chest', -0.16); S_('neck', 0.05); S_('shR', -3.0, 0, 0.02); S_('elR', -2.0); S_('wrR', 1.1); S_('shL', -2.9, 0, -0.25); S_('elL', -1.8); S_('wrL', 0.4); }, follow: (S_) => { S_('spine', -0.08); S_('chest', -0.08); S_('shR', -3.08, 0, 0); S_('elR', -0.04); S_('wrR', -1.35); S_('shL', -2.4, 0, -0.35); S_('elL', -0.8); } },
+  sling: { dip: (S_) => { S_('chest', 0.08, 0.32, 0); S_('shR', -0.35, 0, -0.25); S_('elR', -1.6); S_('wrR', 0.4); S_('shL', -0.75, 0, -0.6); S_('elL', -1.5); }, set: (S_) => { S_('chest', -0.04, 0.16, 0); S_('shR', -1.9, 0, -0.1); S_('elR', -1.7); S_('wrR', 0.9); S_('shL', -1.7, 0, -0.42); S_('elL', -1.4); }, follow: (S_) => { S_('chest', -0.04, -0.06, 0); S_('shR', -2.9, 0, 0); S_('elR', -0.1); S_('wrR', -1.25); S_('shL', -1.6, 0, -0.4); S_('elL', -1.0); } },
+  flick: { dip: (S_) => { S_('shR', -1.25, 0, 0.12); S_('elR', -2.1); S_('shL', -1.1, 0, -0.28); S_('elL', -1.9); }, set: (S_) => { S_('shR', -2.45, 0, 0.06); S_('elR', -1.6); S_('wrR', 1.0); S_('shL', -1.2, 0, -0.3); S_('elL', -1.5); S_('wrL', 0.1); }, follow: (S_) => { S_('shR', -3.0, 0, 0); S_('elR', -0.05); S_('wrR', -1.4); S_('shL', -0.5, 0, -0.3); S_('elL', -0.6); S_('wrL', 0); } },
+  ear: { dip: () => { }, set: (S_) => { S_('neck', -0.05, 0.12, 0); S_('shR', -2.3, 0, -0.25); S_('elR', -2.25); S_('wrR', 1.1); S_('shL', -2.2, 0, -0.45); S_('elL', -1.5); }, follow: (S_) => { S_('shR', -2.9, 0, -0.05); S_('elR', -0.1); S_('wrR', -1.2); S_('shL', -2.0, 0, -0.4); S_('elL', -1.0); } },
+};
+const _baseKeys = {};
+function baseTrack(id) {
+  if (id === 'trad' || id === 'high' || id === 'quick') return shotTrack(id);
+  if (_baseKeys[id]) return _baseKeys[id]; const B = _BASE[id]; if (!B) return shotTrack('trad'); const H = SHOT_PH;
+  const mk = k => mkPose((S_, legs, p) => { _TR[k](S_, legs, p); B[k](S_, legs, p); }), dip = mk('dip'), set = mk('set'), follow = mk('follow');
+  return (_baseKeys[id] = [[H.gather, slerpPose(dip, set, 0.0)], [H.dip, dip], [H.extend, slerpPose(dip, set, 0.55)], [H.set, set], [H.release, slerpPose(set, follow, 0.45)], [H.follow, follow], [H.land, slerpPose(follow, dip, 0.2)], [H.recover, slerpPose(follow, dip, 0.65)]]);
+}
+function validBase(list, id) { return list.some(b => b[0] === id) ? id : ''; }
+
 const IDLE_STYLES = [['relaxed', 'Relaxed'], ['athletic', 'Athletic'], ['wide', 'Wide']];
 // idles: the original idle is "relaxed"; the others are built in the same terms
 function idleBase(style, t) {
@@ -99,7 +131,7 @@ const PROF_KEYS = [
   ['follow', 'Follow-through hold', 0.5, 1.6], ['shoulder', 'Shoulder turn', -1, 1], ['cadence', 'Idle tempo', 0.6, 1.5], ['intensity', 'Movement intensity', 0.6, 1.4],
   ['recovery', 'Recovery speed', 0.6, 1.5], ['restless', 'Idle restlessness', 0, 1], ['dribLow', 'Dribble crouch', -1, 1], ['defLow', 'Defensive crouch', -1, 1], ['arms', 'Run arm carry', -1, 1], ['swag', 'Walk swagger', 0, 1],
 ];
-const PROF_DEF = { shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
+const PROF_DEF = { lower: '', upper: '', shot: { trad: 1, high: 0, quick: 0 }, idle: { relaxed: 1, athletic: 0, wide: 0 }, hand: 'R', knee: 1, elbow: 0, lean: 0, stance: 1, follow: 1, shoulder: 0, cadence: 1, intensity: 1, recovery: 1, restless: 0.4, dribLow: 0, defLow: 0, arms: 0, swag: 0.3 };
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function seededRnd(seed) { let a = seed || 1; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function normW(o) { let s = 0; for (const k in o) s += Math.max(0, o[k]); if (s <= 0) return o; const r = {}; for (const k in o) r[k] = Math.max(0, o[k]) / s; return r; }
@@ -114,13 +146,16 @@ function profileFromBuild(spec) {
   for (const [k, , lo, hi] of PROF_KEYS) { const d = PROF_DEF[k], span = (hi - lo) * 0.18; P[k] = clamp(j(d, span), lo, hi); }
   if (st === 'glass') { P.stance = clamp(P.stance + 0.15, 0.6, 1.5); P.knee = clamp(P.knee - 0.1, 0.6, 1.4); }
   if (st === 'lockdown') P.defLow = clamp(P.defLow + 0.4, -1, 1); if (st === 'showman') { P.swag = clamp(P.swag + 0.35, 0, 1); P.restless = clamp(P.restless + 0.2, 0, 1); }
+  // about half of everybody shoots off a named base instead of the pure blend (drawn last, so nothing above changes for existing players)
+  if (!(spec && spec.mine)) { if (r() < 0.5) P.lower = LOWER_BASES[1 + Math.floor(r() * (LOWER_BASES.length - 1))][0]; if (r() < 0.5) P.upper = UPPER_BASES[1 + Math.floor(r() * (UPPER_BASES.length - 1))][0];
+  if (st === 'glass' && P.upper === 'sling') P.upper = 'over'; }      /* your own player keeps the blend until you pick a base */
   return P;
 }
 // anything that arrives from outside (save, another player online) is clamped here
 function cleanProfile(a) {
   if (!a || typeof a !== 'object') return null; const P = JSON.parse(JSON.stringify(PROF_DEF));
   for (const g of ['shot', 'idle']) if (a[g] && typeof a[g] === 'object') for (const k in P[g]) { const v = +a[g][k]; if (isFinite(v)) P[g][k] = clamp(v, 0, 1); }
-  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R';
+  P.shot = normW(P.shot); P.idle = normW(P.idle); P.hand = a.hand === 'L' ? 'L' : 'R'; P.lower = validBase(LOWER_BASES, a.lower || ''); P.upper = validBase(UPPER_BASES, a.upper || '');
   for (const [k, , lo, hi] of PROF_KEYS) { const v = +a[k]; if (isFinite(v)) P[k] = clamp(v, lo, hi); }
   return P;
 }
@@ -133,6 +168,8 @@ function shotPose(prof, u, n) {
   let uu = u; if (u > SHOT_PH.release) { const f = prof.follow || 1; uu = SHOT_PH.release + (u - SHOT_PH.release) / f; }
   const list = []; for (const [k] of SHOT_STYLES) if (w[k] > 0.001) list.push([evalTrack(shotTrack(k), uu), Math.max(0, w[k] + vj(0.04))]);
   const P = blendPoses(list), out = {}; for (const k in P) out[k] = Array.isArray(P[k]) ? P[k].slice() : P[k];
+  if (prof.lower) { const L = evalTrack(baseTrack(prof.lower), uu); for (const k of SKEL.lower) if (L[k]) out[k] = L[k].slice(); out.y = L.y; }
+  if (prof.upper) { const U = evalTrack(baseTrack(prof.upper), uu); for (const k of SKEL.upper) if (U[k]) out[k] = U[k].slice(); }
   // posture on top of the blend: deeper or shallower knees (the dip), elbow in or out, torso lean, stance width
   const dipK = clamp(1 - Math.abs(uu - SHOT_PH.dip) / 0.35, 0, 1), kn = (prof.knee || 1) - 1 + vj(0.04);
   for (const s of ['R', 'L']) { if (out['kn' + s]) out['kn' + s][0] *= 1 + kn * dipK; if (out['hp' + s]) { out['hp' + s][0] *= 1 + kn * dipK; out['hp' + s][2] *= prof.stance || 1; } if (out['an' + s]) out['an' + s][0] *= 1 + kn * dipK * 0.6; }
