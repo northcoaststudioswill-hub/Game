@@ -29,15 +29,16 @@ The brand, its rules and the names reserved for later are in [`docs/BRAND.md`](d
   Details and limits are under *Online* below.
 - **Your friends' players, solo.** Everyone you meet online is kept as a homie, and homies fill your squad by default,
   so a 3v3 with your friends' builds works with nobody else online.
-- **The Block.** One tight street corner; The Cages is a floodlit chain-link cage across the north side. Third-person hub: The Cages, The Plug (drip), The Lab (attributes and badges), the Tape Deck (moves), your crib, the Money Rack
-  shootout, the old head, and six build fiends who need VC for their Basketball 2146 builds on PS88.
+- **The Block.** One tight street corner; The Cages is a floodlit chain-link cage across the north side. Third-person hub: The Cages, The Plug (drip), The Lab (attributes and street smarts), the Tape Deck (moves), your crib, the Money Rack
+  shootout, the old head, and six build fiends who need HC for their Basketball 2146 builds on PS88.
 - **The Cages.** Four doors: Street 2v2, Street 3v3, RUCKUS 2v2, RUCKUS 3v3. A side kiosk (Last Call) for one-game boosts and
   The Link for build codes. Four court tiers, opened by Respect.
 - **The basketball.** Half court, camera on your player. Street: 1s and 2s to 11, take it back past the arc, 14-second
   clock. RUCKUS: 2s and 3s to 21, shoving is legal, dunks from the logo, three makes in a row sets you on fire.
 - **Two-stick control,** on a phone too: left stick moves, right stick is the skill stick (shoot, drive, side move,
   stepback, spin; hands up and steal on defense).
-- **16 badges** in four tiers, earned with badge XP from real games. **Bravado** meter: big plays fill it, a full bar is
+- **HC** is Hooper Coins, the money. The crowd at a game starts at five and grows with big plays: the Block's own people walk over to watch. 19 celebrations, 17 branded home pieces (this game and the crew's others).
+- **22 street smarts** in four tiers, earned with smarts XP from real games. **Bravado** meter: big plays fill it, a full bar is
   +8 to everything for 20 seconds.
 - **Unlocks:** 74 pieces of drip in ten slots (some carry small buffs), 22 animations (dribble moves, jumpshots, dunk
   packages, celebrations), 8 crib upgrade lines with passive buffs, 29 trophies, 8 Respect ranks.
@@ -64,7 +65,7 @@ Every place got an atmosphere pass. It uses no new libraries, and all of it is l
 - **People talk:** walk near someone and they say something that suits who they are. Fiends ask about the PS88, the old
   head talks about 2129, the dice crew argues, homies at your crib compliment the couch.
 - **New on The Block:**
-  - Soy Dog Sal's cart (15 VC, +4 Stamina next game)
+  - Soy Dog Sal's cart (15 HC, +4 Stamina next game)
   - a dice crew by the hydrant
   - more lamps
 - **Game courts** get light poles with beams, light on the ground, the weather and the sky.
@@ -112,8 +113,8 @@ published game has the reverb. If no track loads, the old synth loop plays inste
 - **Size:** the room holds 60 pieces, on top of the yard's 90.
 - **New pieces:** King Bed, Record Shelf (things stack on it), Arc Floor Lamp, Framed Poster.
 - **Room look** (in build mode):
-  - walls: 8 styles, 350 VC each (plaster, brick, midnight, hot pink, pinstripe, neon grid, gold, mint)
-  - floor: 6 styles, 450 VC each (boards, checker tile, shag carpet, concrete, hardwood court, marble)
+  - walls: 8 styles, 350 HC each (plaster, brick, midnight, hot pink, pinstripe, neon grid, gold, mint)
+  - floor: 6 styles, 450 HC each (boards, checker tile, shag carpet, concrete, hardwood court, marble)
 - **Vibe and sets:** everything in the room counts toward crib level and sets.
 - **Homies** come inside and sit on your furniture.
 - **The camera:** the same third-person camera as outside. The wall between you and the camera fades out. From above
@@ -157,7 +158,7 @@ published game has the reverb. If no track loads, the old synth loop plays inste
   - a fence with your name over the gate
   - a street out front with parked cars and lamps
   - neighbours' rowhouses all around
-- **The Side Yard** is yours from the start. **The East Yard** (2,500 VC) and **The Front Yard** (7,500 VC) are for sale
+- **The Side Yard** is yours from the start. **The East Yard** (2,500 HC) and **The Front Yard** (7,500 HC) are for sale
   until you buy them.
 - **Lot & look:**
   - house paint (6)
@@ -170,7 +171,7 @@ published game has the reverb. If no track loads, the old synth loop plays inste
 ![Building](docs/img/home-builder.png)
 
 - **The pieces:** 50, in 8 categories: seating, food & drink, tech & games, hoops & gym, display, lights, yard, walls &
-  art. Each one is built from shapes in code, like everything else, and costs VC. Some unlock with rank.
+  art. Each one is built from shapes in code, like everything else, and costs HC. Some unlock with rank.
 - **Placing:**
   - Snap to a half-metre grid and turn in quarter steps.
   - A green ghost means it fits; red says why not (outside your yards, something in the way, overlaps something).
@@ -185,11 +186,11 @@ published game has the reverb. If no track loads, the old synth loop plays inste
 - **Vibe:** every piece adds Vibe in five kinds: comfort, drip, hoops, tech, party. A third copy of the same piece
   counts half, a fifth a fifth.
 - **Crib levels:** total Vibe sets the crib level (1–10). Each level adds a perk that follows you into games:
-  - +VC and +Respect from games
+  - +HC and +Respect from games
   - Stamina
   - starting Bravado
   - +1 to every attribute
-  - Tour Stop: tourists pay 60 VC a day
+  - Tour Stop: tourists pay 60 HC a day
   - Kingdom: your crib goes on The Block's billboard
 - **Sets:** 8 themed sets, each with its own bonus when every piece is placed:
   - Cookout
@@ -203,7 +204,7 @@ published game has the reverb. If no track loads, the old synth loop plays inste
 - **Pieces that do something:**
   - Sit on any seat.
   - The yard fridge gives a free soy dog boost once a day.
-  - The weight rack and bench press give badge XP once a day.
+  - The weight rack and bench press give smarts XP once a day.
   - The big screen shows your career highlights.
   - The DJ booth starts a party: everyone on the lot dances.
   - The mirror opens the closet, and the trophy case opens your trophies.
@@ -218,11 +219,11 @@ is in a legal spot, and checks the visitors, sitting and the fridge.
 
 ## The grind (v0.6)
 
-Ways to earn VC and Respect away from the gates.
+Ways to earn HC and Respect away from the gates.
 
 - **Drills.** Coach Overtime's board on The Block, or DRILLS at your crib:
 
-  | Drill | Badge XP |
+  | Drill | Smarts XP |
   |---|---|
   | Layup Lines, Mikan Drill | Finishing |
   | Free Throws, Spot Shooting, Around the World, 3-Point Contest (money balls), Catch & Shoot (quick-release bonus) | Shooting |
@@ -230,10 +231,10 @@ Ways to earn VC and Respect away from the gates.
   | Defensive Slides (sprinting does not count) | Defense |
 
   Each drill keeps a personal best and has bronze, silver and gold scores. The first time to each medal pays a bonus
-  (100 / 250 / 600 VC). The same drill pays less after three runs in a day.
-- **H-O-R-S-E with Sharpie.** 50 VC to play, 250 if you spell him out. He shoots too, and you match his makes from his
+  (100 / 250 / 600 HC). The same drill pays less after three runs in a day.
+- **H-O-R-S-E with Sharpie.** 50 HC to play, 250 if you spell him out. He shoots too, and you match his makes from his
   spot.
-- **The Money Rack.** Unchanged: 40 seconds of deep balls, 5 VC a point.
+- **The Money Rack.** Unchanged: 40 seconds of deep balls, 5 HC a point.
 - **The ladder.** Six people in The Cages play you one on one to 7, in order:
   1. Lil Kickstand
   2. Two-Ply
@@ -242,7 +243,7 @@ Ways to earn VC and Respect away from the gates.
   5. Static
   6. The Commissioner
 
-  A first win pays 160–960 VC and Respect, and they become a homie who can run on your squad. Rematches pay 30%.
+  A first win pays 160–960 HC and Respect, and they become a homie who can run on your squad. Rematches pay 30%.
 - **Daily contracts.** The old head has three a day, drawn from a pool of 14 (win games, assists, greens, finish
   drills, beat Sharpie, climb the ladder, help a fiend and so on). Progress counts from the start of the day.
 - **The daily event.** One a day, the same for everyone:
@@ -298,7 +299,7 @@ Skill stick with the ball: **↓ hold** shoot, **↑** drive (layup or dunk), **
   - driving (above a jog): a hesitation dribble instead (HESI), and you keep dribbling
 - **Forced pickups:** a defender up in your chest can force you to pick it up. That means within about 1.2 m, in front
   of you, while you are standing or barely moving. Every 0.6 s of that pressure is a check of his Perimeter D against
-  your Handles, with badges: Stand Your Ground helps him, Non-Disclosure helps you. Hands up helps a little. You see
+  your Handles, with street smarts: Stand Your Ground helps him, Non-Disclosure helps you. Hands up helps a little. You see
   FORCED PICKUP; he gets LOCKED UP and a little Bravado. Your defense can force the AI to pick up too: a picked-up AI
   passes, shoots or powers up.
 - **A picked-up ball** can be passed, shot or pump-faked. The stick pivots you (the feet stay put).
@@ -320,13 +321,13 @@ The **move stick** (left) picks the finish or the jumper as you go up:
 
 From the title screen, the OPTIONS tab of My Player, or **F2** on The Block.
 
-- **Profile:** MAX ME OUT (every attribute 99, every badge iced out, everything owned, top rank, 250,000 VC), RESTORE MY
+- **Profile:** MAX ME OUT (every attribute 99, every street smart iced out, everything owned, top rank, 250,000 HC), RESTORE MY
   PLAYER (the real one is kept inside the save the moment the Dev Room first changes anything), build codes in and out.
 - **Build:** any style, height, weight and wingspan, every attribute 25–99 (caps ignored, the style's cap is shown), every
-  badge tier, and one-tap archetypes (each style capped out).
+  smarts tier, and one-tap archetypes (each style capped out).
 - **Moves:** equip anything, owned or not, and preview the pose.
 - **Play:** shoot-around, 1v1 to 11, Street 3v3, RUCKUS 2v2 and 3v3, against maxed-out players of any style or a chosen OVR.
-  Nothing played here pays VC or Respect.
+  Nothing played here pays HC or Respect.
 - **Reel:** plays every dunk, layup, jumper variation and dribble move with your build, on a court, through the same code
   as a game.
 
@@ -344,7 +345,7 @@ python3 build.py        # writes index.html
 
 | File | What it holds |
 |---|---|
-| `src/data.js` | Every table: attributes, playstyles, origins, badges, moves, drip, crib, boosts, modes, trophies, all the writing |
+| `src/data.js` | Every table: attributes, playstyles, origins, street smarts, moves, drip, crib, boosts, modes, trophies, all the writing |
 | `src/core.js` | Save, build codes, input (touch sticks, keyboard, gamepads), synthesised sound and music |
 | `src/gfx.js` | Renderer, cel shading and ink lines, the player rig and its drip, poses, courts, signs |
 | `src/ball.js` | The basketball: rules, shooting, finishing, dribble moves, steals, blocks, rebounds, AI, camera |
@@ -403,7 +404,7 @@ It runs on the claude.ai artifact's live room, so it only works from the publish
   up to six; members follow the leader between The Block and The Cages.
 - **Playing together:** at a gate the leader sets each crew member to MY TEAM or THEIR TEAM and presses RUN IT WITH THE
   CREW; AI fills the empty spots. Without a crew, SAME TEAM or VERSUS next to a name calls a one-off game. Each of you
-  earns your own VC, Respect and badge XP.
+  earns your own HC, Respect and smarts XP.
 - **Your player travels:** each person plays with the player they built, on every screen. When the game is opened from
   the link, the save is also kept on your account, so the same player is there on your phone and your computer.
 - **How it works:** the caller's device runs the game and the other one sends its sticks and draws what it is told.
@@ -430,4 +431,4 @@ It runs on the claude.ai artifact's live room, so it only works from the publish
 - No fouls, no out of bounds (the cage keeps the ball in), no alley-oops, no screens.
 - Two players share one camera, so they can drift apart on screen.
 - Court tiers change opponents and pay, not the look of the court.
-- The rebrand in v0.2 covers the name, the mark, type, colour, every menu, the HUD, signs, shop names, ranks and rarity names. Still in the old joke voice: badge names, attribute blurbs, origins, trophies, the announcer calls. The 3D world got brick, concrete and posters but not a full art pass.
+- The rebrand in v0.2 covers the name, the mark, type, colour, every menu, the HUD, signs, shop names, ranks and rarity names. Still in the old joke voice: street smarts names, attribute blurbs, origins, trophies, the announcer calls. The 3D world got brick, concrete and posters but not a full art pass.

@@ -54,12 +54,12 @@ const STYLE = {}; STYLES.forEach(s => STYLE[s.id] = s);
 
 // ---------- origins (the "background") ----------
 const ORIGINS = [
-  { id: 'mallrat', n: 'Mall Rat', d: 'Raised in the last open food court in Ohio.', perk: 'Shops charge 10% less VC.', k: 'shop', v: 0.10 },
+  { id: 'mallrat', n: 'Mall Rat', d: 'Raised in the last open food court in Ohio.', perk: 'Shops charge 10% less HC.', k: 'shop', v: 0.10 },
   { id: 'labgrown', n: 'Lab-Grown', d: 'Vat #44, premium batch. Still under warranty.', perk: '+3 to every Athletics cap.', k: 'ath', v: 3 },
   { id: 'rustbelt', n: 'Rust Belt Kid', d: 'Learned the game on a rim welded to a silo.', perk: '+15% Respect from every game.', k: 'rep', v: 0.15 },
   { id: 'orbital', n: 'Orbital Transfer', d: 'Grew up in low gravity. Earth is rude.', perk: '+4 Vertical cap, +2 Deep Ball cap.', k: 'orb', v: 1 },
   { id: 'exmascot', n: 'Ex-Mascot', d: 'Nine years inside the Freedom Eagle. Never again.', perk: 'Bravado fills 20% faster.', k: 'brav', v: 0.20 },
-  { id: 'nepo', n: 'Nepo Baby', d: 'Dad owned a team. Dad owned a moon.', perk: 'Start with 400 extra VC. Everyone knows.', k: 'vc', v: 400 },
+  { id: 'nepo', n: 'Nepo Baby', d: 'Dad owned a team. Dad owned a moon.', perk: 'Start with 400 extra HC. Everyone knows.', k: 'vc', v: 400 },
 ];
 const ORIGIN = {}; ORIGINS.forEach(o => ORIGIN[o.id] = o);
 
@@ -84,7 +84,7 @@ function capsFor(build) {
   return out;
 }
 function startAttrs(build) { const c = capsFor(build), o = {}; for (const a of ATTRS) o[a.id] = Math.max(30, Math.round(c[a.id] * 0.60)); return o; }
-function attrCost(v) { const b = 6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16; return Math.round(b * (1 + Math.pow(Math.max(0, v - 55) / 13, 1.6))); }   // VC for +1 from v: cheap early, steep near the top (maxing a build is weeks of play, not one night)
+function attrCost(v) { const b = 6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16; return Math.round(b * (1 + Math.pow(Math.max(0, v - 55) / 13, 1.6))); }   // HC for +1 from v: cheap early, steep near the top (maxing a build is weeks of play, not one night)
 const OVR_W = { layup: 1, dunk: .7, close: .7, mid: 1, three: 1.2, iq: .8, handle: 1.1, pass: .8, swb: .8, perd: 1, intd: .7, steal: .8, block: .7, reb: .8, speed: 1, accel: 1, str: .6, vert: .7, stam: .6 };
 function ovrOf(attrs) {
   // best 12 weighted, so specialists are not punished for dump stats
@@ -97,6 +97,12 @@ const TIERS = ['—', 'BRONZE', 'SILVER', 'GOLD', 'ICED OUT'];
 const TIER_COL = ['#555', '#c9814a', '#c8d0d8', '#f2c14e', '#7de3ff'];
 const TIER_COST = [0, 1, 2, 3, 4];
 const BADGES = [
+  { id: 'postman', cat: 'F', n: 'The Postman', d: 'Backing down in the post moves the defender further.', req: ['str', 55, 68, 80, 90] },
+  { id: 'heatcheck', cat: 'S', n: 'Heat Check', d: 'Hop jumpers and floaters catch green more often.', req: ['iq', 55, 68, 80, 92] },
+  { id: 'showtime', cat: 'P', n: 'Showtime', d: 'Show-off dribbles with room to work fill your Bravado.', req: ['handle', 58, 70, 82, 93] },
+  { id: 'hardhat', cat: 'D', n: 'Hard Hat', d: 'The whistle likes you: fewer reach-ins and shooting fouls called on you.', req: ['perd', 55, 68, 80, 92] },
+  { id: 'clamps', cat: 'D', n: 'Clamps', d: 'Bodying up (LT) slows the ball handler more.', req: ['str', 55, 66, 78, 90] },
+  { id: 'ironchin', cat: 'D', n: 'Iron Chin', d: 'RUCKUS: shrug off more punches, and it takes more to knock you out.', req: ['str', 58, 70, 82, 93] },
   { id: 'lobby', cat: 'F', n: 'Rim Lobbyist', d: 'Contests on your drives matter less. You have friends at the rim.', req: ['layup', 55, 68, 80, 92] },
   { id: 'gravity', cat: 'F', n: 'Gravity Waiver', d: 'Dunk from further out and more often in traffic.', req: ['dunk', 60, 72, 84, 94] },
   { id: 'softmoney', cat: 'F', n: 'Soft Money', d: 'Layups and close shots drop softer.', req: ['close', 52, 64, 76, 88] },
@@ -174,11 +180,11 @@ const FINISHES = [
 const CELEBS = [
   { id: 'flex', n: 'The Flex', cost: 0, rank: 0 },
   { id: 'salute', n: 'Salute The Flag', cost: 500, rank: 1 },
-  { id: 'count', n: 'Count The VC', cost: 1500, rank: 2 },
+  { id: 'count', n: 'Count The HC', cost: 1500, rank: 2 },
   { id: 'eagle', n: 'Freedom Eagle', cost: 3000, rank: 4 },
   { id: 'shrug', n: 'The Shrug', cost: 400, rank: 0 }, { id: 'shh', n: 'Quiet, Please', cost: 700, rank: 1 }, { id: 'pound', n: 'Chest Pound', cost: 900, rank: 1 },
   { id: 'pout', n: 'The Pout', cost: 1200, rank: 2 }, { id: 'rock', n: 'Rock The Baby', cost: 1800, rank: 2 }, { id: 'nightnight', n: 'Night Night', cost: 2400, rank: 3 },
-  { id: 'toosmall', n: 'Too Small', cost: 2800, rank: 3 }, { id: 'floor', n: 'Slap The Floor', cost: 2000, rank: 3 }, { id: 'stare', n: 'The Stare Down', cost: 3500, rank: 4 }, { id: 'flexdown', n: 'Crab Flex', cost: 4500, rank: 5 },
+  { id: 'toosmall', n: 'Too Small', cost: 2800, rank: 3 }, { id: 'greenbean', n: 'Green Bean', cost: 1100, rank: 1 }, { id: 'greengiant', n: 'Green Giant', cost: 2600, rank: 3 }, { id: 'iceveins', n: 'Ice In My Veins', cost: 3200, rank: 3 }, { id: 'fentlean', n: 'Fent Lean', cost: 3800, rank: 4 }, { id: 'pour40', n: 'Pour Out The 40', cost: 4000, rank: 4 }, { id: 'floor', n: 'Slap The Floor', cost: 2000, rank: 3 }, { id: 'stare', n: 'The Stare Down', cost: 3500, rank: 4 }, { id: 'flexdown', n: 'Crab Flex', cost: 4500, rank: 5 },
 ];
 
 // ---------- ranks (Respect) ----------
@@ -339,7 +345,7 @@ const CRIB = [
   { id: 'bottie', n: 'Lil Bottie', tiers: [
     { n: 'Not Here', d: 'A robot rapper needs somewhere to charge.', cost: 0, rank: 0 },
     { n: 'Moved In', d: 'Bottie lives at your crib: a track about you every day, and he posts your games. +3% Respect.', cost: 3500, rank: 2, k: 'rep', v: .03 },
-    { n: 'Home Studio', d: 'A booth in the yard. The feed pays: +4% VC from games, bigger daily posts.', cost: 9000, rank: 4, k: 'vc', v: .04 } ] },
+    { n: 'Home Studio', d: 'A booth in the yard. The feed pays: +4% HC from games, bigger daily posts.', cost: 9000, rank: 4, k: 'vc', v: .04 } ] },
   { id: 'floor', n: 'Court Surface', tiers: [
     { n: 'Cracked Driveway', d: 'It came with the lot.', cost: 0, rank: 0 },
     { n: 'Sealed Blacktop', d: '+5% Respect from games.', cost: 600, rank: 1, k: 'rep', v: .05 },
@@ -347,9 +353,9 @@ const CRIB = [
     { n: 'Hologram Hardwood', d: '+18% Respect from games.', cost: 6500, rank: 5, k: 'rep', v: .18 }] },
   { id: 'hoop', n: 'Home Hoop', tiers: [
     { n: 'Milk Crate', d: 'A classic. Technically a rim.', cost: 0, rank: 0 },
-    { n: 'Chain Net', d: '+10% Shooting badge XP.', cost: 500, rank: 1, k: 'bxS', v: .10 },
-    { n: 'Glass Backboard', d: '+20% Shooting badge XP.', cost: 2000, rank: 2, k: 'bxS', v: .20 },
-    { n: 'Anti-Grav Rim', d: '+35% Shooting & Finishing badge XP.', cost: 6000, rank: 5, k: 'bxSF', v: .35 }] },
+    { n: 'Chain Net', d: '+10% Shooting smarts XP.', cost: 500, rank: 1, k: 'bxS', v: .10 },
+    { n: 'Glass Backboard', d: '+20% Shooting smarts XP.', cost: 2000, rank: 2, k: 'bxS', v: .20 },
+    { n: 'Anti-Grav Rim', d: '+35% Shooting & Finishing smarts XP.', cost: 6000, rank: 5, k: 'bxSF', v: .35 }] },
   { id: 'shotdoc', n: 'Shot Doctor 3000', tiers: [
     { n: 'Not installed', d: '', cost: 0, rank: 0 },
     { n: 'Shot Doctor 3000', d: 'Green window +4% everywhere.', cost: 1800, rank: 2, k: 'green', v: .04 },
@@ -360,9 +366,9 @@ const CRIB = [
     { n: 'Steak Fabricator', d: '+8 Stamina, +3 Strength in every game.', cost: 3600, rank: 3, k: 'stam2', v: 8 }] },
   { id: 'trophy', n: 'Trophy Wall', tiers: [
     { n: 'Bare wall', d: '', cost: 0, rank: 0 },
-    { n: 'Participation Shelf', d: '+6% VC from games.', cost: 1000, rank: 1, k: 'vc', v: .06 },
-    { n: 'Trophy Wall', d: '+12% VC from games.', cost: 3200, rank: 3, k: 'vc', v: .12 },
-    { n: 'Personal Hall of Fame', d: '+20% VC from games.', cost: 8000, rank: 6, k: 'vc', v: .20 }] },
+    { n: 'Participation Shelf', d: '+6% HC from games.', cost: 1000, rank: 1, k: 'vc', v: .06 },
+    { n: 'Trophy Wall', d: '+12% HC from games.', cost: 3200, rank: 3, k: 'vc', v: .12 },
+    { n: 'Personal Hall of Fame', d: '+20% HC from games.', cost: 8000, rank: 6, k: 'vc', v: .20 }] },
   { id: 'couch', n: 'Couch of Champions', tiers: [
     { n: 'Milk crate (seat)', d: '', cost: 0, rank: 0 },
     { n: 'Couch of Champions', d: 'Start every game with 25% Bravado.', cost: 1400, rank: 2, k: 'brav', v: .25 },
@@ -387,7 +393,7 @@ const BOOSTS = [
   { id: 'rosin', n: 'Rosin Vape (grape)', d: '+4 to every Shooting attribute this game.', cost: 80, buff: { mid: 4, three: 4, iq: 4 } },
   { id: 'knees', n: 'Knee Subscription (1 day)', d: '+6 Vertical, +4 Dunk this game.', cost: 80, buff: { vert: 6, dunk: 4 } },
   { id: 'glue', n: 'Legal Stickum', d: '+5 Handles, +5 Steal this game.', cost: 70, buff: { handle: 5, steal: 5 } },
-  { id: 'lotto', n: 'Scratch-Off Ticket', d: '50/50: double VC this game, or nothing extra.', cost: 50, k: 'lotto' },
+  { id: 'lotto', n: 'Scratch-Off Ticket', d: '50/50: double HC this game, or nothing extra.', cost: 50, k: 'lotto' },
   { id: 'hype', n: 'Rent-A-Hype-Man', d: 'Bravado fills 50% faster this game.', cost: 90, k: 'hype' },
 ];
 
@@ -427,8 +433,8 @@ const ACH = [
   { id: 'r50', n: 'Board Member', d: '50 rebounds.', k: 'reb', t: 50, vc: 350 },
   { id: 'fire', n: 'Fire Hazard', d: 'Catch fire in a RUCKUS game.', k: 'fires', t: 1, vc: 200 },
   { id: 'brav', n: 'Main Character', d: 'Trigger Bravado 10 times.', k: 'bravs', t: 10, vc: 400, drip: 'bk_wings' },
-  { id: 'bum1', n: 'Philanthropist', d: 'Give VC to a build fiend.', k: 'gave', t: 1, vc: 20 },
-  { id: 'bum20', n: 'Enabler', d: 'Give VC to build fiends 20 times.', k: 'gave', t: 20, vc: 500 },
+  { id: 'bum1', n: 'Philanthropist', d: 'Give HC to a build fiend.', k: 'gave', t: 1, vc: 20 },
+  { id: 'bum20', n: 'Enabler', d: 'Give HC to build fiends 20 times.', k: 'gave', t: 20, vc: 500 },
   { id: 'shut', n: 'Skunked', d: 'Win a game without letting them score.', k: 'shutouts', t: 1, vc: 600 },
   { id: 'so', n: 'Sharpshooter', d: 'Score 20+ in a Money Rack shootout.', k: 'bestRack', t: 20, vc: 500 },
   { id: 'drip10', n: 'Drip Check', d: 'Own 16 pieces of drip.', k: 'owned', t: 16, vc: 200 },
@@ -448,14 +454,14 @@ const ACH = [
 // ---------- writing ----------
 const BUM_NAMES = ['Deshawn "99 OVR"', 'Tre the Grinder', 'Lil Microtransaction', 'Uncle Patch Notes', 'Big Loot Box', 'Season Pass Steve', 'Greta Got-Next', 'Two-Way Tina'];
 const BUM_ASK = [
-  'Yo, lemme hold {n} VC. My center on Basketball 2146 is ONE upgrade from a 61 overall.',
-  'Spare {n} VC? PS88 servers go down in a year, I gotta finish my build before they do.',
-  'Please. {n} VC. My guy still got bronze Rim Lobbyist. BRONZE. I can\'t be seen like this.',
-  'I sold my hover-car for VC, bro. Then they dropped Basketball 2146. Just {n}. For the animations.',
-  'I ain\'t eaten in two days but my player got the new jumpshot. Worth it. Got {n} VC?',
-  '{n} VC and I\'m out your face. My build is a 7\'3" point guard, it\'s gonna be meta, trust.',
-  'They patched my build, man. THEY PATCHED MY BUILD. I need {n} VC to start over.',
-  'Psst. {n} VC. I\'ll pay you back when my player gets drafted. In the video game. Which I am losing at.',
+  'Yo, lemme hold {n} HC. My center on Basketball 2146 is ONE upgrade from a 61 overall.',
+  'Spare {n} HC? PS88 servers go down in a year, I gotta finish my build before they do.',
+  'Please. {n} HC. My guy still got bronze Rim Lobbyist. BRONZE. I can\'t be seen like this.',
+  'I sold my hover-car for HC, bro. Then they dropped Basketball 2146. Just {n}. For the animations.',
+  'I ain\'t eaten in two days but my player got the new jumpshot. Worth it. Got {n} HC?',
+  '{n} HC and I\'m out your face. My build is a 7\'3" point guard, it\'s gonna be meta, trust.',
+  'They patched my build, man. THEY PATCHED MY BUILD. I need {n} HC to start over.',
+  'Psst. {n} HC. I\'ll pay you back when my player gets drafted. In the video game. Which I am losing at.',
 ];
 const BUM_THANKS = [
   'God bless America and God bless YOU. +1 three-point rating, here I come.',
@@ -467,7 +473,7 @@ const BUM_NO = ['Aight. I see how it is. Enjoy your PHYSICAL basketball.', 'Cold
 const ADS = [
   'BASKETBALL 2146\nONLY ON PS88\nPRE-ORDER YOUR PRE-ORDER',
   'FREEDOM COLA\nNOW WITH 40% MORE\nFREEDOM*\n*corn',
-  'VC LOANS\n900% APR\nYOU DESERVE DRIP',
+  'HC LOANS\n900% APR\nYOU DESERVE DRIP',
   'KNEES™\nSUBSCRIBE TODAY\nCANCEL NEVER',
   'USA! USA!\n(A SUBSIDIARY OF\nUSA HOLDINGS LLC)',
   'DEFENSE WINS\nCHAMPIONSHIPS\nOFFENSE WINS\nBRAND DEALS',
@@ -476,14 +482,14 @@ const ADS = [
 ];
 // what people on the block say when you walk by
 const CHAT = {
-  fiend: ['Spare 5 VC? PS88 ain\'t gonna pre-order itself.', 'I had 99 OVR once. Then they patched me.', 'You got next? I got NEXT next.', 'Basketball 2146 got real sweat physics, I heard.', 'They nerfed my knees in a hotfix.'],
+  fiend: ['Spare 5 HC? PS88 ain\'t gonna pre-order itself.', 'I had 99 OVR once. Then they patched me.', 'You got next? I got NEXT next.', 'Basketball 2146 got real sweat physics, I heard.', 'They nerfed my knees in a hotfix.'],
   dance: ['THIS my song!', 'Tape Deck stay knocking.', 'Run it back, DJ!', 'You can\'t stand still to this. Federal law.'],
   fire: ['Coldest summer since the weather got privatized.', 'Barrel fire is the only free thing left.', 'Warm your hands, not your jumper.'],
   oldhead: ['In \'29 we played with real gravity.', 'Back in my day the rim was ten feet. Every day.', 'Kids today got shoes that dribble for them.', 'Contracts on the bench. Check \'em.'],
   cage: ['Who got next?', 'He traveled. Ain\'t no refs though.', 'Kings court been undefeated since Tuesday.', 'That boy cooking!', 'Run it back!'],
   ladder: ['You want this smoke?', 'Climb the ladder, see what happens.', 'One on one. No help. No excuses.'],
   block: ['You see that windmill in the Cages?', 'My knees on a payment plan.', 'Coach Overtime made me run Mikans for an hour.', 'Sharpie hustled me again.', 'They raised the price of air at The Plug.', 'Freedom Eagle dunked so we could scroll.'],
-  vendor: ['Soy dogs! Hot and dog-adjacent!', 'Extra relish is extra VC, chief.', 'Fifteen VC. Cheapest protein on the block.'],
+  vendor: ['Soy dogs! Hot and dog-adjacent!', 'Extra relish is extra HC, chief.', 'Fifteen HC. Cheapest protein on the block.'],
   dice: ['Seven! Pay up!', 'Snake eyes, man...', 'Roll it, don\'t pray on it.', 'Who brought these dice? They weighted.'],
   homie: ['Your crib hard, not gonna lie.', 'Can I get a run on your court later?', 'Who picked this couch? Elite.', 'I\'m just here for the cookout.', 'Neighbors gonna call the HOA.'],
   neighbor: ['Nice place you got.', 'Your speakers are LOUD. Respect.', 'I heard you can dunk from the free throw line.'],
@@ -504,7 +510,7 @@ const NPC_NAMES = ['Dre', 'Tank', 'Juice', 'Ghost', 'Slim', 'Maverick', 'Tex', '
 const OLDHEAD = [
   'Back in 2099 we played with a REAL ball. Leather. From a real cow. You wouldn\'t understand.',
   'Tip from an old head: flick the right stick sideways to cross \'em. Flick it down-left or down-right to step back. Pull it straight DOWN and hold to shoot.',
-  'Respect unlocks courts. VC unlocks drip. Neither one unlocks happiness. I checked.',
+  'Respect unlocks courts. HC unlocks drip. Neither one unlocks happiness. I checked.',
   'Hands up on defense, young blood. Push the right stick UP to contest. Tap STEAL only when they get careless.',
   'Your crib is your court. Fix it up. A man with a milk crate hoop is still a man. Barely.',
   'Get the ball back past the arc after a stop. That\'s the law. Only law left, really.',

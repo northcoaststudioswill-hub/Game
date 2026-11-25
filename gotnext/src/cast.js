@@ -26,7 +26,7 @@ const CAST_LINES = {
 };
 // ---- the people ----
 function castNpc(name, style, wornExtra, x, z, face, opts) {
-  const b = aiBuild(opts && opts.ovr || 78, style); b.name = name; b.worn = Object.assign(randomWorn(2), wornExtra || {}); const n = addNpc(b, x, z, face, 'idle', Object.assign({ still: true }, opts || {}));
+  const b = blockBuild(name, style, wornExtra, opts && opts.ovr || 78);      /* the same face and fit every time, here and in the crowd at a game */ const n = addNpc(b, x, z, face, 'idle', Object.assign({ still: true }, opts || {}));
   n.cast = (opts && opts.cast) || name; return n;
 }
 function castInit() {
@@ -37,15 +37,15 @@ function castInit() {
   const nx = castNpc('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }, -10.2, -9.4, 0.6, { cast: 'nexx' }); nx.amb = 'phone';
   spot(-9.6, -8.6, 1.9, 'NEXX', () => uiNexx()); C.list.push(nx); C.nexx = nx;
   // MARK and D: by the cage fence, watching the run, Mark with money on it
-  const mk = castNpc('MARK', 'slasher', { top: 't_tee', head: 'hd_cap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
-  const dd = castNpc('D', 'glass', { head: 'hd_cap', face: 'f_shades' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
+  const mk = castNpc('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
+  const dd = castNpc('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
   spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [["MARK'S BOOK (bet on games)", () => uiBook()], ['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
   // AARON'S STAND (Erin, name masked): fresh food off the farm, by the cage on the other side
   { const g = grp(scene, 7.6, 0, -10.6); ink(M(box(2.2, 0.9, 0.8), toon('#7a5a3a'), 0, 0.45, 0, g), 1.03); M(box(2.3, 0.08, 0.9), toon('#4f8a3c'), 0, 0.93, 0, g);
     for (let i = 0; i < 9; i++) M(sph(0.07, 6, 5), toon(pick(['#e0452c', '#f2c14e', '#7ac74f', '#ff8a3c'])), -0.9 + (i % 5) * 0.42, 1.02, -0.18 + Math.floor(i / 5) * 0.3, g);
     for (const sx of [-1.05, 1.05]) M(cyl(0.03, 0.03, 1.4, 5), toon('#3a2a1a'), sx, 1.6, -0.3, g); M(box(2.4, 0.06, 1.0), toon('#4f8a3c'), 0, 2.3, -0.2, g);
     const sg = sign("AARON'S STAND", 1.8, 0.36, '#f2c14e', '#203a1a', { border: false }); sg.position.set(0, 2.05, 0.18); g.add(sg); solid(6.4, 8.8, -11.1, -10.1); }
-  const er = castNpc('AARON', 'general', { top: 't_tee' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
+  const er = castNpc('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
   spot(7.6, -9.4, 1.8, "AARON'S STAND", () => uiErin());
   // BOTTIE: chrome, dreads, puffer; films the run for the feed
   const bt = addNpc(bottieBuild(), 3.6, -10.9, Math.PI, 'idle', { still: true }); bt.cast = 'bottie';      /* his own body: chrome, dreads, puffer (vice.js) */ bt.amb = 'film'; C.list.push(bt);
@@ -100,7 +100,7 @@ function uiNexx() {
   const G = NEXX_GOALS[S.nexx.goal];
   uiDialog('NEXX', pick(NEXX_LINES), [
     ['RIDE', () => uiDialog('NEXX', "Seatbelt. I don't walk anywhere. Where to?", [['MY CRIB', () => { uiClose(); toast('NEXX DROPPED YOU OFF', '"Don\'t slam my door."'); enterWorld('crib', 0, 19.2, Math.PI); }], ['THE CAGES', () => { uiClose(); toast('NEXX DROPPED YOU OFF', '"Go cook."'); enterWorld('pit', 0, 3.4, Math.PI); }], ['Never mind']])],
-    [S.nexx.done ? 'CLIP POSTED TODAY' : 'CONTENT: ' + G[2].toUpperCase(), () => uiDialog('NEXX', S.nexx.done ? 'Clip did numbers. Come back tomorrow, I need new content.' : `I'm filming your next game. ${G[2]} and I post it. Views pay, bro: 200 VC and 60 Respect.`, [['Bet']]), '', S.nexx.done],
+    [S.nexx.done ? 'CLIP POSTED TODAY' : 'CONTENT: ' + G[2].toUpperCase(), () => uiDialog('NEXX', S.nexx.done ? 'Clip did numbers. Come back tomorrow, I need new content.' : `I'm filming your next game. ${G[2]} and I post it. Views pay, bro: 200 HC and 60 Respect.`, [['Bet']]), '', S.nexx.done],
     [S.nexx.wrap ? 'NO MORE WRAPS TODAY' : 'GOJI WRAP (free)', () => { S.nexx.wrap = true; S.boosts.push('goji'); save(); sfx('buy'); uiClose(); toast('GOJI BERRY WRAP', '+3 Speed, +3 Acceleration, +5 Stamina next game. "Antioxidants."'); }, '', S.nexx.wrap],
     ['MERCH', () => uiNexxMerch()],
     ['THE SERVER', () => { uiClose(); toast('NEXX', '"Join the Discord. I\'m in there 24/7."'); uiHomie(); }],
@@ -110,18 +110,18 @@ function uiNexx() {
 function uiNexxMerch() {
   const items = DRIP.filter(d => d.src === 'nexx');
   openPanel(() => `<div class="ph"><h2>NEXX SUPPLY</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"Designed it, printed it, posted it. Limited. Not really, I'll make more."</p>` + items.map(d => { const own = S.owned.includes(d.id), price = shopPrice(d.cost);
-    return `<div class="card"><h3>${d.n}</h3><p class="mu">${d.slot.toUpperCase()}${d.buff ? ' · ' + Object.entries(d.buff).map(([k, v]) => '+' + v + ' ' + k).join(', ') : ''}</p><div style="margin-top:6px">${own ? '<span class="tag on">OWNED</span> ' + Btn('WEAR', () => { S.worn[d.slot] = d.id; save(); if (W && W.me) worldPlayerRig(); sfx('ui'); rerender(); }, 'sm alt') : Btn(price + ' VC', () => { if (S.vc < price) { sfx('no'); return; } S.vc -= price; S.owned.push(d.id); save(); sfx('buy'); toast('NEXX SUPPLY', d.n + ' is yours.'); rerender(); }, 'sm', S.vc < price)}</div></div>`; }).join('') + `</div>`, 'side', () => uiClose());
+    return `<div class="card"><h3>${d.n}</h3><p class="mu">${d.slot.toUpperCase()}${d.buff ? ' · ' + Object.entries(d.buff).map(([k, v]) => '+' + v + ' ' + k).join(', ') : ''}</p><div style="margin-top:6px">${own ? '<span class="tag on">OWNED</span> ' + Btn('WEAR', () => { S.worn[d.slot] = d.id; save(); if (W && W.me) worldPlayerRig(); sfx('ui'); rerender(); }, 'sm alt') : Btn(price + ' HC', () => { if (S.vc < price) { sfx('no'); return; } S.vc -= price; S.owned.push(d.id); save(); sfx('buy'); toast('NEXX SUPPLY', d.n + ' is yours.'); rerender(); }, 'sm', S.vc < price)}</div></div>`; }).join('') + `</div>`, 'side', () => uiClose());
 }
 // NEXX's content: checked after every Cages game (main.js)
 function nexxCheck(res) {
   const N = S.nexx; if (!N || N.day !== dayKey() || N.done || res.quit || !res.stats) return null; const G = NEXX_GOALS[N.goal];
-  if ((res.stats[G[0]] || 0) >= G[1]) { N.done = true; return { vc: 200, rep: 60, note: `NEXX posted your clip: ${(5 + Math.random() * 40).toFixed(1)}K views (+200 VC, +60 Respect)` }; }
+  if ((res.stats[G[0]] || 0) >= G[1]) { N.done = true; return { vc: 200, rep: 60, note: `NEXX posted your clip: ${(5 + Math.random() * 40).toFixed(1)}K views (+200 HC, +60 Respect)` }; }
   return null;
 }
 // ---- AARON'S STAND ----
 function uiErin() {
   uiDialog('AARON', pick(CAST_LINES.erin), [
-    ['FARM SMOOTHIE (40 VC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("AARON'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
+    ['FARM SMOOTHIE (40 HC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("AARON'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
     ['Later'],
   ]);
 }
@@ -142,7 +142,7 @@ function uiKael() {
   const today = dayKey(), worked = S.kaelWork === today, beat = !!S.kaelBeat;
   uiDialog('BRENNICK · 88 OVR', pick(CAST_LINES.kael), [
     [beat ? 'RUN ONES (rematch)' : 'RUN ONES', () => runKael()],
-    [worked ? 'EARLY WORK: DONE TODAY' : 'EARLY WORK', () => { const cats = ['F', 'S', 'P', 'D'], c = pick(cats); S.kaelWork = today; S.bxp[c] += 40; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; toast('BADGE POINT', '+1 ' + CATS[c][0]); } save(); uiClose(); sfx('unlock'); toast('BRENNICK', '"Listen." +40 ' + CATS[c][0] + ' badge XP'); }, '', worked],
+    [worked ? 'EARLY WORK: DONE TODAY' : 'EARLY WORK', () => { const cats = ['F', 'S', 'P', 'D'], c = pick(cats); S.kaelWork = today; S.bxp[c] += 40; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; toast('SMARTS POINT', '+1 ' + CATS[c][0]); } save(); uiClose(); sfx('unlock'); toast('BRENNICK', '"Listen." +40 ' + CATS[c][0] + ' smarts XP'); }, '', worked],
     ['Later'],
   ]);
 }
@@ -151,7 +151,19 @@ function runKael() {
   const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: 77, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) { setTimeout(() => toast('BRENNICK', '"' + pick(CAST_LINES.kaelLose) + '"'), 1600); return null; }
     if (first) { S.kaelBeat = true; deedDrip('bk_washer', 'Beat Brennick'); const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
-    return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 VC' : 'Beat Brennick again +150 VC' }; };
+    return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 HC' : 'Beat Brennick again +150 HC' }; };
   cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
   save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
+}
+
+// ---- everybody on the Block, as people who can walk up to a game (courts.js): the same faces, the same names ----
+function blockBuild(name, style, worn, ovr, tier) { const b = withSeed(hashStr('block|' + name), () => aiBuild(ovr || 75, style)); b.name = name; b.worn = Object.assign(withSeed(hashStr('fit|' + name), () => randomWorn(tier === undefined ? 2 : tier)), worn || {}); b.keepLook = true; return b; }
+function blockRoster() {
+  const L = [blockBuild('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }), blockBuild('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }), blockBuild('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }),
+    blockBuild('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }), bottieBuild(), blockBuild('TREY', 'general', { head: 'hd_dedrick', face: 'f_shades', top: 't_gutter' }), kaelBuild(),
+    blockBuild('SHARPIE', 'sniper', {}), blockBuild('COACH OVERTIME', 'general', { head: 'hd_cap', top: 't_tee' }), blockBuild('OLD HEAD', 'general', { hair: 'h_bald', head: 'hd_band', face: 'f_goggles' }, 60), blockBuild('SOY DOG SAL', 'glass', { head: 'hd_cap', top: 't_patch' }, 55)];
+  for (let i = 0; i < LADDER.length; i++) L.push(ladderBuild(i));
+  BUM_NAMES.slice(0, 4).forEach(n => { const b = blockBuild(n, 'showman', {}, 50, 0); b.worn = Object.assign(b.worn, { top: 't_tank', bottom: 'b_camo', shoes: 'k_beat', back: 'bk_none' }); L.push(b); });
+  for (const h of (S.homies || [])) L.push(JSON.parse(JSON.stringify(h)));
+  return L;
 }

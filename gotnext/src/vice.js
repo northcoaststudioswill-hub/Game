@@ -1,10 +1,10 @@
 // GOT NEXT — the bones and the book, Lil Bottie's body, and things to do at home.
 //   TREY'S BONES   dice games on grey holodice (the Wisp Table from Guttercrown, moved to the Block): Thirteen,
 //                  Twenty-One, Poker Bones, High Bones
-//   MARK'S BOOK    bet VC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
+//   MARK'S BOOK    bet HC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
 //   BOTTIE         a chrome robot body for the rig; lives at your crib as an upgrade
 //   HOME           cookouts, the heavy bag, trick shots, naps, bones at your own table
-// VC only. Both the table and the book stop paying out past a daily win limit, so neither is a way to max a build.
+// HC only. Both the table and the book stop paying out past a daily win limit, so neither is a way to max a build.
 'use strict';
 
 // ---------------- Lil Bottie's body ----------------
@@ -65,7 +65,7 @@ function vicePay(k, delta) { const V = vice(); S.vc += delta; V[k] += delta; V.n
 const TREY = {
   hello: ['Trey Dedrick, the Third. At your service and at your expense. Pick a game.', 'Another brave wallet. Sit. Well. Stand. There are no chairs.', 'The dice are honest. I am merely charming.'],
   bust: ['Over. Dreadful luck. I shall treasure it.', 'Bust! My grandfather would have wept. With joy.', 'Too many. The light giveth and so on.'],
-  win: ['Well rolled. I hate it. Here is your VC.', 'You win. I shall be gracious about it later, in private.', 'Splendid. Do it again so I can win it back.'],
+  win: ['Well rolled. I hate it. Here is your HC.', 'You win. I shall be gracious about it later, in private.', 'Splendid. Do it again so I can win it back.'],
   lose: ['The house prevails, as houses do.', 'Mine. Thank you ever so.', 'Unlucky. Lucky for me, which is the important bit.'],
   push: ['A draw. Your stake back, and my respect, which is worth less.', 'Even. Nobody is happy. Perfect.'],
   dead: ['DEAD ON. Triple! I shall need a moment.', 'Exactly the number. Triple, curse you.'],
@@ -94,7 +94,7 @@ function bonesSim(target, stand) { let y = 0; while (y < stand) y += d6(); if (y
 function holoHTML(v, o) { o = o || {}; return `<span data-k="${o.k === undefined ? '' : o.k}" style="display:inline-block;width:46px;margin:0 3px;text-align:center;cursor:${o.k === undefined ? 'default' : 'pointer'};opacity:${o.dim ? 0.45 : 1}"><span style="display:block;height:30px;font:900 22px var(--display,Archivo);color:${o.held ? '#3dffa0' : '#ffb347'};text-shadow:0 0 10px ${o.held ? '#3dffa0' : '#ff7a1f'}">${v || '·'}</span><span style="display:block;width:20px;height:10px;margin:0 auto;background:#0d0d10;border-radius:10px 10px 0 0"></span><span style="display:block;width:34px;height:6px;margin:0 auto;background:#5a3a22"></span><span style="display:block;width:24px;height:34px;margin:0 auto;background:linear-gradient(90deg,#7c828a,#a5abb3 45%,#8a9098)"></span><span style="display:block;width:28px;height:6px;margin:0 auto;background:#d5d9de"></span><span style="display:block;width:32px;height:7px;margin:0 auto;background:#3a3d44"></span></span>`; }
 function uiBones(home) {
   const G = { game: null, stake: home ? 25 : 50, phase: 'pick', you: [], him: [], hold: [], msg: pick(TREY.hello), pressed: false, bet: 0 };
-  const host = home ? 'HOUSE RULES' : 'TREY', stakes = home ? [10, 25, 50] : [25, 50, 100, 250], say = k => home ? ({ win: 'You win.', lose: 'The house takes it.', push: 'Push.', bust: 'Bust.', dead: 'DEAD ON. Triple.', roll: '', broke: 'Not enough VC.', capped: 'Enough for today.' }[k]) : pick(TREY[k]);
+  const host = home ? 'HOUSE RULES' : 'TREY', stakes = home ? [10, 25, 50] : [25, 50, 100, 250], say = k => home ? ({ win: 'You win.', lose: 'The house takes it.', push: 'Push.', bust: 'Bust.', dead: 'DEAD ON. Triple.', roll: '', broke: 'Not enough HC.', capped: 'Enough for today.' }[k]) : pick(TREY[k]);
   const sum = a => a.reduce((x, y) => x + y, 0);
   const settle = (res, mult) => { const win = res > 0 ? Math.round(G.bet * (mult || 1)) : res < 0 ? -G.bet : 0; vicePay('bones', win); G.phase = 'done'; G.res = res; G.won = win; sfx(res > 0 ? 'coin' : res < 0 ? 'no' : 'ui'); holoRollAll(); };
   const start = id => { if (S.vc < G.stake) { G.msg = say('broke'); return rerender(); } if (viceRoom('bones') <= 0) { G.msg = say('capped'); return rerender(); }
@@ -121,25 +121,25 @@ function uiBones(home) {
     bonesSync(G.phase === 'pick' ? [] : G.you, G.phase === 'pick' ? [] : G.him, G.game === 'poker' && G.phase === 'you' ? G.hold : null);
     const T = W.bones, pt = innerWidth < innerHeight; W.camO = { p: new THREE.Vector3(T.cx + 0.15, pt ? 5.2 : 3.0, T.cz + (pt ? 7.4 : 4.3)), l: new THREE.Vector3(T.cx, 0.15, T.cz + 0.75) };
     const tot = G.phase !== 'pick' && G.game !== 'poker' && G.you.length ? ` · YOU ${sum(G.you)}${G.him.length ? ' · TREY ' + sum(G.him) : ''}` : '';
-    let h = `<div style="flex:1"></div><div class="card sel" style="max-width:720px;margin:0 auto;width:100%"><div class="row"><h3 class="mono" style="font-size:10px;color:var(--heat)">TREY${G.phase !== 'pick' ? ' · ' + BONES[G.game].n + ' · ' + G.bet + ' VC' + tot : ''}</h3>${vcLine()}</div><p style="font-size:14px;margin:6px 0 8px">${esc(G.msg)}</p><div class="pf" style="flex-wrap:wrap;gap:6px">`;
+    let h = `<div style="flex:1"></div><div class="card sel" style="max-width:720px;margin:0 auto;width:100%"><div class="row"><h3 class="mono" style="font-size:10px;color:var(--heat)">TREY${G.phase !== 'pick' ? ' · ' + BONES[G.game].n + ' · ' + G.bet + ' HC' + tot : ''}</h3>${vcLine()}</div><p style="font-size:14px;margin:6px 0 8px">${esc(G.msg)}</p><div class="pf" style="flex-wrap:wrap;gap:6px">`;
     if (G.phase === 'pick') h += stakes.map(s => Btn(s + '', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join('') + Object.keys(BONES).map(id => Btn(BONES[id].n, () => start(id), 'sm', S.vc < G.stake)).join('') + Btn('LEAVE', uiClose, 'sm alt');
     else if (G.phase === 'you') h += (G.game === 'poker' ? G.you.map((v, i) => Btn((G.hold[i] ? 'KEEP ' : '') + v, () => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }, 'sm ' + (G.hold[i] ? '' : 'alt'))).join('') + Btn('THROW THE REST', () => act('throw'), 'sm') : G.game === 'high' ? Btn('STAND', () => act('stand'), 'sm') + Btn('PRESS (' + G.bet * 2 + ')', () => act('press'), 'sm alt', S.vc < G.bet * 2) : Btn('ROLL', () => act('roll'), 'sm') + Btn('STAND ON ' + sum(G.you), () => act('stand'), 'sm alt'));
-    else h += `<b class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin-right:8px">${G.won > 0 ? '+' + G.won : G.won} VC</b>` + Btn('AGAIN · ' + G.stake, () => start(G.game), 'sm', S.vc < G.stake) + Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'sm alt') + Btn('LEAVE', uiClose, 'sm alt');
+    else h += `<b class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin-right:8px">${G.won > 0 ? '+' + G.won : G.won} HC</b>` + Btn('AGAIN · ' + G.stake, () => start(G.game), 'sm', S.vc < G.stake) + Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'sm alt') + Btn('LEAVE', uiClose, 'sm alt');
     return h + `</div>${G.phase === 'pick' ? `<p class="mu" style="margin-top:6px;font-size:11px">${Object.values(BONES).map(b => b.n + ': ' + b.d).join(' ')}</p>` : ''}</div><div style="height:4%"></div>`;
   };
   openPanel(() => {
     if (!home && W && W.bones) return bar();
     const V = vice(); let h = `<div class="ph"><h2>${home ? 'BONES AT HOME' : "TREY'S BONES"}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><div class="card sel"><h3 class="mono" style="font-size:10px;color:var(--heat)">${host}</h3><p style="font-size:15px;margin:6px 0">${esc(G.msg)}</p></div>`;
     if (G.phase === 'pick') {
-      h += `<div class="cat">STAKE</div><div class="card">` + stakes.map(s => Btn(s + ' VC', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join(' ') + `</div><div class="cat">GAME</div>`;
-      for (const id in BONES) h += `<div class="card"><h3>${BONES[id].n}</h3><p class="mu">${BONES[id].d}</p><div style="margin-top:6px">${Btn('PLAY · ' + G.stake + ' VC', () => start(id), 'sm', S.vc < G.stake)}</div></div>`;
-      h += `<p class="mu">Today at the table: ${V.bones >= 0 ? '+' : ''}${V.bones} VC. The table stops paying once you are up ${VICE_CAP.bones} in a day.</p>`;
+      h += `<div class="cat">STAKE</div><div class="card">` + stakes.map(s => Btn(s + ' HC', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join(' ') + `</div><div class="cat">GAME</div>`;
+      for (const id in BONES) h += `<div class="card"><h3>${BONES[id].n}</h3><p class="mu">${BONES[id].d}</p><div style="margin-top:6px">${Btn('PLAY · ' + G.stake + ' HC', () => start(id), 'sm', S.vc < G.stake)}</div></div>`;
+      h += `<p class="mu">Today at the table: ${V.bones >= 0 ? '+' : ''}${V.bones} HC. The table stops paying once you are up ${VICE_CAP.bones} in a day.</p>`;
     } else {
       const B_ = BONES[G.game], tot = G.game === 'poker' ? '' : ` · ${sum(G.you)}`;
-      h += `<div class="cat">${B_.n} · ${G.bet} VC</div><div class="card"><p class="mono" style="font-size:10px">YOU${tot}</p><div style="margin:6px 0">` + G.you.map((v, i) => holoHTML(v, G.game === 'poker' && G.phase === 'you' ? { k: on(() => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }), held: G.hold[i] } : {})).join('') + `</div>`;
+      h += `<div class="cat">${B_.n} · ${G.bet} HC</div><div class="card"><p class="mono" style="font-size:10px">YOU${tot}</p><div style="margin:6px 0">` + G.you.map((v, i) => holoHTML(v, G.game === 'poker' && G.phase === 'you' ? { k: on(() => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }), held: G.hold[i] } : {})).join('') + `</div>`;
       h += `<p class="mono" style="font-size:10px;margin-top:8px">${home ? 'THE HOUSE' : 'TREY'}${G.him.length && G.game !== 'poker' ? ' · ' + sum(G.him) : ''}</p><div style="margin:6px 0">` + (G.him.length ? G.him.map(v => holoHTML(v)).join('') : holoHTML(0, { dim: true })) + `</div></div>`;
       if (G.phase === 'you') h += `<div class="pf">` + (G.game === 'poker' ? Btn('THROW THE REST', () => act('throw')) : G.game === 'high' ? Btn('STAND', () => act('stand')) + Btn('PRESS (' + G.bet * 2 + ')', () => act('press'), 'alt', S.vc < G.bet * 2) : Btn('ROLL', () => act('roll')) + Btn('STAND ON ' + sum(G.you), () => act('stand'), 'alt')) + `</div>`;
-      else h += `<p class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin:8px 0">${G.won > 0 ? '+' + G.won : G.won} VC</p><div class="pf">${Btn('AGAIN · ' + G.stake, () => start(G.game), '', S.vc < G.stake)}${Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'alt')}</div>`;
+      else h += `<p class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin:8px 0">${G.won > 0 ? '+' + G.won : G.won} HC</p><div class="pf">${Btn('AGAIN · ' + G.stake, () => start(G.game), '', S.vc < G.stake)}${Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'alt')}</div>`;
     }
     return h + `</div>`;
   }, !home && W && W.bones ? 'clear' : 'side', () => uiClose());
@@ -176,7 +176,7 @@ function bkSettle() {
   const B = book(), sl = B.slate.slip; if (!sl || sl.done) return; const gs = B.slate.games; if (sl.legs.some(L => !gs[L.g].res)) return;
   const won = sl.legs.every(L => bkLegWon(gs[L.g], L)); sl.done = true; sl.won = won; const pay = won ? Math.round(sl.stake * sl.odds) : 0; sl.pay = pay;
   if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; if (sl.legs.length >= 3) deedDrip('hd_bookie', 'Cashed a 3-leg parlay'); } else { B.l++; B.net -= sl.stake; }
-  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} VC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
+  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} HC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
 }
 function bkBuilds(t) { return t.ps.map(p => { const b = withSeed(p.seed, () => aiBuild(p.ovr, p.style)); b.name = p.n; return { b, ctrl: -1, ai: clamp((p.ovr - 50) / 45, 0.3, 1) }; }); }
 function bkWatch(gi) {
@@ -201,14 +201,14 @@ function uiBook() {
         for (const s of [0, 1]) h += `<div style="margin-top:4px"><span class="mono" style="font-size:10px">${esc(g.t[s].ps[0].n.toUpperCase())} PTS</span> ${Btn('OVER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 1), 'sm ' + sel('pr' + s, s, 1))} ${Btn('UNDER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 0), 'sm ' + sel('pr' + s, s, 0))} <span class="mu">1.87</span></div>`; }
       else if (!g.res) h += `<div style="margin-top:6px">${Btn('WATCH IT', () => bkWatch(g.id), 'sm')} ${Btn('SIM IT', () => { const r = bkSim(g); bkFinish(g.id, { sc: r.sc, star: [r.pts[0][0], r.pts[1][0]], sim: true }); sfx('ui'); rerender(); }, 'sm alt')}</div>`;
       h += `</div>`; }
-    if (sl) { h += `<div class="card sel"><h3>YOUR TICKET · ${sl.legs.length > 1 ? sl.legs.length + '-LEG PARLAY' : 'SINGLE'} · ${sl.stake} VC at ${sl.odds}</h3>` + sl.legs.map(L => { const g = SL.games[L.g], w = bkLegWon(g, L); return `<p>${w === null ? '○' : w ? '<span class="cy">✔</span>' : '<span class="warn">✘</span>'} ${esc(bkLegLabel(g, L))} <span class="mu">${bkLegOdds(g, L)}</span></p>`; }).join('') + (sl.done ? `<p class="${sl.won ? 'cy' : 'warn'}" style="font-size:16px;margin-top:6px">${sl.won ? 'CASHED: +' + sl.pay + ' VC' : 'DEAD TICKET'}</p>` : `<p class="mu" style="margin-top:6px">Pays ${Math.round(sl.stake * sl.odds)} VC if every pick hits.</p>`) + `</div>`;
+    if (sl) { h += `<div class="card sel"><h3>YOUR TICKET · ${sl.legs.length > 1 ? sl.legs.length + '-LEG PARLAY' : 'SINGLE'} · ${sl.stake} HC at ${sl.odds}</h3>` + sl.legs.map(L => { const g = SL.games[L.g], w = bkLegWon(g, L); return `<p>${w === null ? '○' : w ? '<span class="cy">✔</span>' : '<span class="warn">✘</span>'} ${esc(bkLegLabel(g, L))} <span class="mu">${bkLegOdds(g, L)}</span></p>`; }).join('') + (sl.done ? `<p class="${sl.won ? 'cy' : 'warn'}" style="font-size:16px;margin-top:6px">${sl.won ? 'CASHED: +' + sl.pay + ' HC' : 'DEAD TICKET'}</p>` : `<p class="mu" style="margin-top:6px">Pays ${Math.round(sl.stake * sl.odds)} HC if every pick hits.</p>`) + `</div>`;
       if (sl.done || SL.games.every(g => g.res)) h += Btn('NEW SLATE', () => { B.slate = bkSlate(); save(); sfx('uiok'); st.legs = []; rerender(true); }); }
     else if (SL.games.every(g => g.res)) h += Btn('NEW SLATE', () => { B.slate = bkSlate(); save(); rerender(true); });
     else { const o = odds(), room = viceRoom('book'), maxPay = Math.round(st.stake * o), okStake = S.vc >= st.stake, capped = room <= 0;
       h += `<div class="card sel"><h3>BET SLIP${st.legs.length > 1 ? ' · ' + st.legs.length + '-LEG PARLAY' : ''}</h3>` + (st.legs.length ? st.legs.map(L => `<p>${esc(bkLegLabel(SL.games[L.g], L))} <span class="mu">${bkLegOdds(SL.games[L.g], L)}</span></p>`).join('') : '<p class="mu">Nothing picked yet.</p>')
         + `<div style="margin-top:6px">${[25, 50, 100, 250, 500].map(s => Btn(s + '', () => { st.stake = s; rerender(); }, 'sm ' + (st.stake === s ? '' : 'alt'))).join(' ')}</div>`
-        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} VC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'MARK IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' VC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
-    h += `<p class="mu">Your record with Mark: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} VC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
+        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} HC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'MARK IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' HC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
+    h += `<p class="mu">Your record with Mark: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} HC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
     return h + `</div>`;
   }, 'side', () => uiClose());
 }
@@ -239,7 +239,7 @@ function uiBottieHome() {
   const bar = pick(BOT_BARS).replace('{n}', S.name).replace('{d}', L.dunks || 0).replace('{a}', L.ankles || 0).replace('{g}', L.greens || 0).replace('{w}', L.wins || 0).replace('{p}', L.pts || 0);
   uiDialog('BOTTIE', pick(CAST_LINES.bottie), [
     [did('track') ? 'TRACK DROPPED TODAY' : 'DROP A TRACK', () => { H.used.bot_track = today; const r = t > 1 ? 35 : 20; gainRep(r); save(); sfx('unlock'); uiDialog('BOTTIE', bar, [['+' + r + ' Respect']]); }, '', did('track')],
-    [did('post') ? 'POSTED TODAY' : 'POST TO THE FEED', () => { H.used.bot_post = today; const v = t > 1 ? 180 : 80; S.vc += v; save(); sfx('coin'); uiClose(); toast('THE FEED', `"BZZT. THIS IS GOING ON THE FEED." +${v} VC`); }, '', did('post')],
+    [did('post') ? 'POSTED TODAY' : 'POST TO THE FEED', () => { H.used.bot_post = today; const v = t > 1 ? 180 : 80; S.vc += v; save(); sfx('coin'); uiClose(); toast('THE FEED', `"BZZT. THIS IS GOING ON THE FEED." +${v} HC`); }, '', did('post')],
     ['Later'],
   ]);
 }
@@ -250,9 +250,9 @@ function homeUse2(k, done) {
   if (done) return toast(nm, 'Once a day. Come back tomorrow.');
   H.used[k] = today;
   if (k === 'grill') { gainRep(20); W.party = true; for (const n of W.npcs) if (n.homie || n.visitor) n.anim = 'dance'; toast('COOKOUT', 'Soy burgers for the block. +20 Respect, and everybody on the lot is dancing.'); sfx('unlock'); }
-  else if (k === 'bag') { S.bxp.P += 25; while (S.bxp.P >= 100) { S.bxp.P -= 100; S.bp.P++; } toast('HEAVY BAG', 'Hand speed. +25 Playmaking badge XP.'); sfx('bump'); }
+  else if (k === 'bag') { S.bxp.P += 25; while (S.bxp.P >= 100) { S.bxp.P -= 100; S.bp.P++; } toast('HEAVY BAG', 'Hand speed. +25 Playmaking smarts XP.'); sfx('bump'); }
   else if (k === 'bed') { S.boosts.push('nap'); toast('NAP', 'Slept like a subscription you forgot about. +8 Stamina next game.'); sfx('coin'); }
   else if (k === 'minihoop') { const ch = clamp(0.3 + ((S.attrs.three || 50) + (S.attrs.mid || 50)) / 500, 0.3, 0.7); let m = 0; const shots = [0, 0, 0].map(() => { const ok = Math.random() < ch; if (ok) m++; return ok ? 'SPLASH' : 'brick'; }); const v = m * 30 + (m === 3 ? 60 : 0); S.vc += v;
-    uiDialog('TRICK SHOT', `Off the fence, off the roof, off the fridge: ${shots.join(' · ')}.` + (m === 3 ? ' Three for three.' : ''), [[v ? '+' + v + ' VC' : 'Tomorrow, then']]); sfx(m ? 'swish' : 'rim'); }
+    uiDialog('TRICK SHOT', `Off the fence, off the roof, off the fridge: ${shots.join(' · ')}.` + (m === 3 ? ' Three for three.' : ''), [[v ? '+' + v + ' HC' : 'Tomorrow, then']]); sfx(m ? 'swish' : 'rim'); }
   save();
 }

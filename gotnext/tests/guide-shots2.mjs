@@ -13,7 +13,7 @@ await page.click('#titleBtns .btn'); await T(30); await page.fill('#bname', 'JAY
 await page.evaluate(() => { const st = document.createElement('style'); st.textContent = '#toasts{display:none!important}'; document.head.appendChild(st); const S = __pit.S; S.vc = 4200; S.rep = 2300; __pit.uiClose(); __pit.enterWorld('crib', 0, 19, Math.PI); });
 const step = async (n, fn, ticks) => { if (process.env.ONLY && !process.env.ONLY.split(',').includes(n.slice(0, 2))) return; try { await page.evaluate(fn); await T(ticks || 30); await shot(n); console.log('ok', n); } catch (e) { console.log('FAIL', n, e.message.split('\n')[0]); } };
 await step('11-attributes', () => { __pit.uiClose(); __pit.keys.KeyP = true; window.__tick(2); __pit.keys.KeyP = false; }, 10);
-await step('12-badges', () => { [...document.querySelectorAll('#panel .tabs .btn')].find(b => b.textContent === 'BADGES').click(); }, 10);
+await step('12-badges', () => { [...document.querySelectorAll('#panel .tabs .btn')].find(b => b.textContent === 'STREET SMARTS').click(); }, 10);
 await step('13-moves', () => { [...document.querySelectorAll('#panel .tabs .btn')].find(b => b.textContent === 'MOVES').click(); }, 10);
 await step('14-shop', () => { __pit.uiClose(); __pit.enterWorld('hub', 13.6, -5.6, -Math.PI / 2); window.__tick(10); __pit.W.spots.find(s => /PLUG/.test(s.label)).fn(); }, 40);
 await step('15-crib', () => { __pit.uiClose(); __pit.devSampleCrib(); __pit.S.homies = [__pit.maxBuild('showman', 'Lil Kickstand'), __pit.maxBuild('glass', 'Two-Ply')]; __pit.enterWorld('crib', -17, 14, Math.PI); __pit.W.yaw = Math.PI; }, 120);

@@ -20,9 +20,9 @@ ok(r.c1 !== r.c0 && r.c2 === r.c0 && r.s1 && r.s2 !== r.s1 && r.s3 === r.s1, `RB
 r = await p.evaluate(() => { const P = __pit, B = P.W.build, n0 = P.S.home.items.length, vc = P.S.vc, x0 = B.x; __pad.axes = [1, 0, 0, 0]; window.__tick(20); __pad.axes = [0, 0, 0, 0]; window.__tick(2); const moved = B.x - x0; const rot0 = B.rot; __press(2); const rot = B.rot !== rot0;
   let placed = false; for (let k = 0; k < 30 && !placed; k++) { __press(0); placed = P.S.home.items.length > n0; if (!placed) { __pad.axes = [0, 1, 0, 0]; window.__tick(8); __pad.axes = [0, 0, 0, 0]; window.__tick(2); } }
   return { moved: +moved.toFixed(1), rot, placed, spent: vc - P.S.vc, n: P.S.home.items.length }; });
-ok(r.moved !== 0 && r.rot && r.placed && r.spent > 0, `stick moves the cursor (${r.moved} m), Ⓧ rotates, Ⓐ places it (${r.spent} VC, ${r.n} piece on the lot)`);
+ok(r.moved !== 0 && r.rot && r.placed && r.spent > 0, `stick moves the cursor (${r.moved} m), Ⓧ rotates, Ⓐ places it (${r.spent} HC, ${r.n} piece on the lot)`);
 r = await p.evaluate(() => { const P = __pit, B = P.W.build; if (B.sel) __press(1); const n0 = P.S.home.items.length, it = P.S.home.items[n0 - 1]; B.fx = it.x; B.fz = it.z; window.__tick(3); __press(0); const picked = !!B.pick; const vc = P.S.vc; __press(6); return { picked, sold: P.S.vc - vc, n: P.S.home.items.length, n0 }; });
-ok(r.picked && r.sold > 0 && r.n === r.n0 - 1, `Ⓐ picks a placed piece up, LT sells it (+${r.sold} VC)`);
+ok(r.picked && r.sold > 0 && r.n === r.n0 - 1, `Ⓐ picks a placed piece up, LT sells it (+${r.sold} HC)`);
 r = await p.evaluate(() => { const P = __pit; __press(12); const lot = document.querySelector('#panel h2') && document.querySelector('#panel h2').textContent; __press(13, 6); const f1 = document.querySelector('#panel .focus'); __press(1); const closed = !P.UI.cur; __press(13); const sets = document.querySelector('#panel h2') && document.querySelector('#panel h2').textContent; __press(1); __press(1); return { lot, focus: !!f1, closed, sets, out: !P.W.build }; });
 ok(r.lot && r.focus && r.closed && r.sets && r.out, `d-pad ↑ opens "${r.lot}" (navigable, Ⓑ closes), ↓ opens "${r.sets}", Ⓑ leaves the builder`);
 // a dropdown and a text box in menus

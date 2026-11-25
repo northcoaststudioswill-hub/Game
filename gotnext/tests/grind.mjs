@@ -58,7 +58,7 @@ for (const id of (process.env.ONLY === 'side' ? [] : ['three', 'weave'])) { awai
   ok('Ladder match', r.ended && r.roster.split(':').length === 3 && (r.ladder === 1 ? r.homie && r.vcDelta > 160 : r.vcDelta > 0), JSON.stringify(r)); await snap('grind-ladder-result.png'); }
 // contracts: the panel shows three with progress, and a finished one pays
 { const r = await page.evaluate(() => { const P = __pit, S = P.S; P.uiClose(); P.enterWorld('hub', -8, -1.9, 0); window.__tick(5, 16.67); P.W.spots.find(s => /OLD HEAD/.test(s.label)).fn(); window.__tick(2, 16.67);
-    const cards = [...document.querySelectorAll('#panel .card')].filter(c => c.querySelector('.ab')).length; const paid = [...document.querySelectorAll('#panel .btn')].find(b => /VC$/.test(b.textContent) && !b.disabled); const vc0 = S.vc; if (paid) paid.click(); window.__tick(2, 16.67);
+    const cards = [...document.querySelectorAll('#panel .card')].filter(c => c.querySelector('.ab')).length; const paid = [...document.querySelectorAll('#panel .btn')].find(b => /HC$/.test(b.textContent) && !b.disabled); const vc0 = S.vc; if (paid) paid.click(); window.__tick(2, 16.67);
     return { cards, hadFinished: !!paid, vcDelta: S.vc - vc0, event: document.getElementById('wtag').textContent }; });
   ok('Daily contracts', r.cards === 3, JSON.stringify(r)); await snap('grind-contracts.png'); }
 await page.evaluate(() => { __pit.uiClose(); __pit.enterWorld('hub', -2.5, 2.6, 2.6); window.__tick(10, 16.67); }); await snap('grind-coach.png');

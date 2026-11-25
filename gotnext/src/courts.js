@@ -232,22 +232,41 @@ function dressCourt(sc, cfg, style) {
 // People along the baseline fence and both sidelines. Each has their own body, movement profile and habits, follows
 // the ball with their head, and reacts to big plays by their kind and by whose side they are on.
 function crowdInit() {
-  const M_ = MT, spots = []; for (let i = 0; i < 9; i++) spots.push([-8 + i * 2 + rnd(-0.35, 0.35), -3.3 - rnd(0, 0.9)]);
+  // a handful to start with. The better the game gets (big plays, a tight score late), the more of the Block walks
+  // over to watch: the people from the main area, by name, in the fits they wear there.
+  const M_ = MT, spots = []; for (let i = 0; i < 9; i++) spots.push([-8 + i * 2 + rnd(-0.35, 0.35), -3.3 - rnd(0, 0.5)]);
   for (const sd of [-1, 1]) for (const z of [1.2, 4.8, 8.6]) spots.push([sd * (9.9 + rnd(0, 0.5)), z + rnd(-0.6, 0.6)]);
+  for (let i = 0; i < 8; i++) spots.push([-7 + i * 2 + rnd(-0.3, 0.3), -4.7 - rnd(0, 0.5)]); for (const sd of [-1, 1]) for (const z of [3, 6.8, 10.4]) spots.push([sd * (11.1 + rnd(0, 0.4)), z]);
   const myT = Math.max(0, M_.cfg.teams.findIndex(t => t.some(x => x.mine === true)));
-  for (const [x, z] of spots) {
-    const b = aiBuild(Math.round(rnd(50, 75))); b.name = 'FAN' + Math.floor(Math.random() * 1e6); const r = makeRig(b, true); r.root.position.set(x, 0, z); const face = Math.atan2(0 - x, 5 - z); r.root.rotation.y = face; r.shadow.visible = false; scene.add(r.root);
-    M_.fans.push({ r, x, z, face, ph: rnd(0, 6), prof: r.prof, amb: pick(CROWD_AMBIENT), ambT: rnd(2, 8), react: null, team: Math.random() < 0.6 ? myT : 1 - myT, hype: 0 });
-  }
+  M_.crowd = { spots, used: 0, heat: 0, myT, pool: [] };
+  const playing = new Set(M_.cfg.teams.flat().map(x => x.b.name)); try { M_.crowd.pool = blockRoster().filter(b => !playing.has(b.name)).sort(() => Math.random() - 0.5); } catch (e) { M_.crowd.pool = []; }
+  for (let k = 0; k < 5; k++) crowdAdd(null, true);
+}
+function crowdAdd(build, instant) {
+  const M_ = MT, K = M_.crowd; if (!K || K.used >= K.spots.length) return null; const order = instant ? [0, 2, 4, 6, 8, 9, 12][K.used] : null; let si = K.used; if (instant && order !== undefined) si = order;
+  const free = K.spots.map((s, i) => i).filter(i => !M_.fans.some(f => f.si === i)); if (!free.length) return null; if (!free.includes(si)) si = free[0];
+  const [x, z] = K.spots[si], b = build || (() => { const q = aiBuild(Math.round(rnd(50, 75))); q.name = ''; return q; })(), r = makeRig(b, true), face = Math.atan2(0 - x, 5 - z); r.shadow.visible = false; scene.add(r.root);
+  const f = { r, si, x, z, face, tx: x, tz: z, ph: rnd(0, 6), prof: r.prof, amb: pick(CROWD_AMBIENT), ambT: rnd(2, 8), react: null, team: Math.random() < 0.6 ? K.myT : 1 - K.myT, hype: 0, name: b.name || '' };
+  if (!instant) { f.x = x < -9 ? -17 : x > 9 ? 17 : x + rnd(-3, 3); f.z = Math.abs(x) > 9 ? z + rnd(-2, 2) : -11; f.walk = true; f.psi = 0; }
+  if (f.name && typeof nameTag === 'function') { const tg = nameTag(f.name, 'from the block', r.H, '#ece9e2'); tg.scale.multiplyScalar(0.62); r.root.add(tg); }
+  r.root.position.set(f.x, 0, f.z); r.root.rotation.y = face; K.used++; M_.fans.push(f); return f;
+}
+// the game got better: somebody else comes over
+function crowdHeat(v, fromNet) {
+  const M_ = MT, K = M_ && M_.crowd; if (!K) return; K.heat += v;
+  while (K.heat >= 1 && M_.net !== 'guest') { K.heat -= 1; const b = K.pool.shift() || null, f = crowdAdd(b, false); if (!f) { K.heat = 0; break; } if (f.name) hudFb(f.name + ' pulled up to watch', '#ece9e2'); if (M_.net === 'host') netEv({ k: 'ca', n: f.name }); }
 }
 function crowdReact(play, team, fromNet) {
   const M_ = MT; if (!M_ || !M_.fans) return; if (!fromNet && M_.net === 'host') netEv({ k: 'cr', p: play, t: team });
+  if (!fromNet) crowdHeat({ dunk: 0.55, ankles: 0.6, block: 0.4, three: 0.3, ko: 0.8, hit: 0.3, steal: 0.15, score: 0.1, win: 0 }[play] || 0);
   const ch = play === 'score' ? 0.35 : play === 'steal' ? 0.6 : 0.9;
   for (const f of M_.fans) { if (Math.random() > ch) continue; f.react = { kind: crowdReaction(play, team === undefined ? undefined : f.team === team), t: -rnd(0, 0.35), dur: rnd(1.5, 2.7) }; f.hype = f.react.dur; }
 }
 function crowdStep(dt) {
   const M_ = MT, B = M_.B, bx = B.pos.x, bz = B.pos.z;
+  { const K = M_.crowd, to = M_.cfg.mode.to; if (K && M_.phase === 'live' && M_.net !== 'guest' && Math.min(M_.score[0], M_.score[1]) >= to * 0.55 && Math.abs(M_.score[0] - M_.score[1]) <= 2) crowdHeat(dt * 0.07); }      /* tight and late: word gets round */
   for (const f of M_.fans) {
+    if (f.walk) { const dx = f.tx - f.x, dz = f.tz - f.z, l = Math.hypot(dx, dz); if (l < 0.15) { f.walk = false; f.r.root.rotation.y = f.face; } else { const v = 1.7; f.x += dx / l * v * dt; f.z += dz / l * v * dt; f.psi = (f.psi + v * dt / 1.5) % 1; f.r.root.position.set(f.x, 0, f.z); f.r.root.rotation.y = Math.atan2(dx, dz); applyPose(f.r, poseOf('gait', 0, { psi: f.psi, amp: 1, hipA: 1, swag: 0.4, thigh: f.r.thigh, shin: f.r.shin, leg: f.r.legLen }), dt); continue; } }
     let kind = f.amb, u = 1;
     if (f.react) { f.react.t += dt; if (f.react.t >= f.react.dur) f.react = null; else if (f.react.t >= 0) { kind = f.react.kind; u = Math.min(1, f.react.t / 0.25); } }
     else { f.ambT -= dt; if (f.ambT <= 0) { f.amb = pick(CROWD_AMBIENT); f.ambT = rnd(3, 9); } }

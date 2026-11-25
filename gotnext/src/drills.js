@@ -1,4 +1,4 @@
-// GOT NEXT — the grind: drills that pay VC, H-O-R-S-E with Sharpie, the 1v1 ladder in The Cages, the old head's daily
+// GOT NEXT — the grind: drills that pay HC, H-O-R-S-E with Sharpie, the 1v1 ladder in The Cages, the old head's daily
 // contracts and the daily event. Drills run on the practice court with the real shooting and finishing; a drill only
 // places you, hands you the ball, and counts what happens.
 'use strict';
@@ -9,7 +9,7 @@ const SPOTMID = [[-4.3, 0.5], [-3.8, 2.8], [-2.4, 4.3], [0, 4.9], [2.4, 4.3], [3
 const FT = [0, 4.6];
 
 // ---------- the drills ----------
-// medals: score for bronze / silver / gold.  pay: [base VC, VC per point].  cat: badge XP group.
+// medals: score for bronze / silver / gold.  pay: [base HC, HC per point].  cat: smarts XP group.
 const DRILL_DEFS = [
   { id: 'layups', n: 'Layup Lines', cat: 'F', time: 45, medals: [8, 12, 16], pay: [30, 6], unit: 'pts',
     d: 'Start at a cone, attack the rim, finish. Alternate sides for 45 seconds. Layups 1, dunks 2.',
@@ -36,11 +36,11 @@ const DRILL = {}; DRILL_DEFS.forEach(d => DRILL[d.id] = d);
 
 // ---------- the day: one event and three contracts, the same for everyone that day ----------
 const DAY_EVENTS = [
-  { id: 'grind', n: 'GRIND DAY', d: 'Drills pay 50% more VC.' },
+  { id: 'grind', n: 'GRIND DAY', d: 'Drills pay 50% more HC.' },
   { id: 'green', n: 'GREEN DAY', d: 'Greens count double in every shooting drill.' },
   { id: 'ladder', n: 'LADDER NIGHT', d: 'Ladder wins in The Cages pay double.' },
   { id: 'horse', n: 'HORSE DERBY', d: 'Beating Sharpie at H-O-R-S-E pays double.' },
-  { id: 'bucket', n: 'BUCKET BONANZA', d: 'Games in The Cages pay 25% more VC.' },
+  { id: 'bucket', n: 'BUCKET BONANZA', d: 'Games in The Cages pay 25% more HC.' },
   { id: 'fiend', n: 'FIEND APPRECIATION DAY', d: 'Helping a fiend earns 10 Respect instead of 3.' },
 ];
 const CONTRACTS = [
@@ -202,13 +202,13 @@ function drillEnd(res, back) {
   let vc = Math.round((d.pay[0] + score * d.pay[1]) * rpt * (evOn('grind') ? 1.5 : 1) * (1 + cribFx('vc')));
   let rep = Math.round(score * 0.6 + medal * 6);
   if (rpt < 1) notes.push(`Run ${rec.today} of this drill today: ${Math.round(rpt * 100)}% pay`); if (evOn('grind')) notes.push('GRIND DAY +50%');
-  if (medal > rec.medal) { const bonus = [0, 100, 250, 600][medal], rb = [0, 20, 50, 120][medal]; vc += bonus; rep += rb; notes.push(['', 'BRONZE', 'SILVER', 'GOLD'][medal] + ` medal: +${bonus} VC, +${rb} Respect`); lifeAdd('medals', medal - rec.medal); if (medal === 3) lifeAdd('drillGolds'); rec.medal = medal; }
+  if (medal > rec.medal) { const bonus = [0, 100, 250, 600][medal], rb = [0, 20, 50, 120][medal]; vc += bonus; rep += rb; notes.push(['', 'BRONZE', 'SILVER', 'GOLD'][medal] + ` medal: +${bonus} HC, +${rb} Respect`); lifeAdd('medals', medal - rec.medal); if (medal === 3) lifeAdd('drillGolds'); rec.medal = medal; }
   if (newBest) { rec.best = score; notes.push('Personal best'); }
-  S.vc += vc; lifeAdd('drills'); S.bxp[d.cat] += Math.round(10 + score * 1.5); while (S.bxp[d.cat] >= 100) { S.bxp[d.cat] -= 100; S.bp[d.cat]++; notes.push('+1 ' + CATS[d.cat][0] + ' badge point'); }
+  S.vc += vc; lifeAdd('drills'); S.bxp[d.cat] += Math.round(10 + score * 1.5); while (S.bxp[d.cat] >= 100) { S.bxp[d.cat] -= 100; S.bp[d.cat]++; notes.push('+1 ' + CATS[d.cat][0] + ' smarts point'); }
   gainRep(rep); checkAch(); save();
   sfx(medal ? 'unlock' : 'buy');
   const mcol = ['#8d8d99', '#c9814a', '#c8d0d8', '#f2c14e'][medal];
-  uiDialog(d.n.toUpperCase(), `${score} ${d.unit}. ${medal ? ['', 'Bronze', 'Silver', 'Gold'][medal] + '.' : 'No medal yet: bronze is ' + d.medals[0] + '.'} +${vc} VC · +${rep} Respect.${notes.length ? '  ' + notes.join(' · ') + '.' : ''}`,
+  uiDialog(d.n.toUpperCase(), `${score} ${d.unit}. ${medal ? ['', 'Bronze', 'Silver', 'Gold'][medal] + '.' : 'No medal yet: bronze is ' + d.medals[0] + '.'} +${vc} HC · +${rep} Respect.${notes.length ? '  ' + notes.join(' · ') + '.' : ''}`,
     [['Again', () => startDrill(id, back)], ['All drills', () => uiDrills(back)], ['Done', null, 'alt']]);
   setTimeout(() => { const t = $('panel').querySelector('h3'); if (t) t.style.color = mcol; }, 0);
 }
@@ -220,7 +220,7 @@ function uiDrills(back) {
     const ev = todayEvent();
     let h = `<div class="ph"><h2>${back === 'crib' ? 'HOME DRILLS' : 'COACH\'S BOARD'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
     h += `<div class="card sel"><h3 class="ye">TODAY · ${ev.n}</h3><p>${ev.d}</p></div>`;
-    h += `<p class="mu">Drills pay VC, Respect and badge XP. First time to each medal pays a bonus. The same drill pays less after three runs in a day.</p><div class="grid">`;
+    h += `<p class="mu">Drills pay HC, Respect and smarts XP. First time to each medal pays a bonus. The same drill pays less after three runs in a day.</p><div class="grid">`;
     for (const d of DRILL_DEFS) {
       const r = S.drills[d.id] || { best: 0, medal: 0 }, m = r.medal || 0;
       h += `<div class="card"><div class="row"><h3 class="g">${d.n}</h3><span class="tag" style="color:${CATS[d.cat][1]}">${CATS[d.cat][0]}</span></div><p>${d.d}</p>
@@ -269,7 +269,7 @@ DRILL_RUN.horse = {
 };
 function horseHud() { const d = MT.drill.data, l = n => HORSE.split('').map((c, i) => `<span style="color:${i < n ? 'var(--heat)' : 'var(--line)'}">${c}</span>`).join(''); return `<span style="font-size:16px">YOU ${l(d.you)}<br>SHARPIE ${l(d.him)}</span><br><span style="font-size:11px;color:var(--ash)">${d.turn === 'you' ? (d.mode === 'match' ? 'MATCH HIS SHOT' : 'YOUR SHOT: ANYWHERE') : 'SHARPIE SHOOTS'}</span>`; }
 function startHorse() {
-  if (S.vc < 50) { toast('50 VC TO PLAY', 'Sharpie does not do credit.'); return; }
+  if (S.vc < 50) { toast('50 HC TO PLAY', 'Sharpie does not do credit.'); return; }
   S.vc -= 50; save(); startDrill('horse', 'hub');
 }
 function horseEnd(res) {
@@ -277,8 +277,8 @@ function horseEnd(res) {
   if (res.quit) { toast('YOU WALKED', 'Sharpie keeps the 50.'); return; }
   const won = res.drill.score === 1, pay = (evOn('horse') ? 2 : 1) * 250;
   if (won) { S.vc += pay; lifeAdd('horseWins'); gainRep(30); sfx('unlock'); } else sfx('no'); checkAch(); save();
-  uiDialog('SHARPIE THE HUSTLER', won ? `You spelled me out. ${pay} VC, take it. ${evOn('horse') ? 'Derby day, I pay double. Do not tell anyone.' : 'Run it back any time.'}` : 'H-O-R-S-E. That\'s you. The 50 is mine. Come back when your jumper does.',
-    [['Again (50 VC)', () => { uiClose(); startHorse(); }, '', S.vc < 50], ['Later', null, 'alt']]);
+  uiDialog('SHARPIE THE HUSTLER', won ? `You spelled me out. ${pay} HC, take it. ${evOn('horse') ? 'Derby day, I pay double. Do not tell anyone.' : 'Run it back any time.'}` : 'H-O-R-S-E. That\'s you. The 50 is mine. Come back when your jumper does.',
+    [['Again (50 HC)', () => { uiClose(); startHorse(); }, '', S.vc < 50], ['Later', null, 'alt']]);
 }
 
 // =====================================================================
@@ -297,7 +297,7 @@ function ladderBuild(i) { const L = LADDER[i]; const b = withSeed(1000 + i, () =
 function uiLadder(i) {
   const L = LADDER[i], beaten = (S.ladder || 0) > i, open = (S.ladder || 0) >= i, pay = Math.round(ladderPay(i) * (beaten ? 0.3 : 1));
   if (!open) return uiDialog(L.name.toUpperCase(), `"Beat ${LADDER[i - 1].name} first. I don't play people nobody's heard of."`, [['Fair.', null]]);
-  uiDialog(L.name.toUpperCase() + ` · ${L.ovr} OVR`, `"${L.line}"  One on one to 7. ${beaten ? 'Rematch pays ' + pay + ' VC.' : 'Beat me: ' + pay + ' VC, ' + (40 * (i + 1)) + ' Respect, and I\'ll run with you any time.'}${evOn('ladder') ? ' Ladder Night: double.' : ''}`,
+  uiDialog(L.name.toUpperCase() + ` · ${L.ovr} OVR`, `"${L.line}"  One on one to 7. ${beaten ? 'Rematch pays ' + pay + ' HC.' : 'Beat me: ' + pay + ' HC, ' + (40 * (i + 1)) + ' Respect, and I\'ll run with you any time.'}${evOn('ladder') ? ' Ladder Night: double.' : ''}`,
     [['Run ones', () => runLadder(i)], ['Not now', null, 'alt']]);
 }
 const ladderPay = i => 160 * (i + 1);
@@ -307,7 +307,7 @@ function runLadder(i) {
   const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: lvl }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: i, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) return null; const beaten = (S.ladder || 0) > i; let vc = Math.round(ladderPay(i) * (beaten ? 0.3 : 1) * (evOn('ladder') ? 2 : 1)); lifeAdd('ladderWins');
     if (!beaten) { S.ladder = i + 1; const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast(L.name.toUpperCase() + ' RUNS WITH YOU NOW', 'They are a homie: put them on your squad.', 'ach'), 1800); }
-    return { vc, rep: beaten ? 10 : 40 * (i + 1), note: (beaten ? 'Ladder rematch' : 'Beat ' + L.name) + ` +${vc} VC${evOn('ladder') ? ' (Ladder Night x2)' : ''}` }; };
+    return { vc, rep: beaten ? 10 : 40 * (i + 1), note: (beaten ? 'Ladder rematch' : 'Beat ' + L.name) + ` +${vc} HC${evOn('ladder') ? ' (Ladder Night x2)' : ''}` }; };
   cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
   save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
 }
@@ -324,7 +324,7 @@ function uiContracts() {
     for (const id of D.picks) {
       const c = CONTRACTS.find(x => x.id === id), prog = Math.min(c.t, Math.max(0, (S.life[c.k] || 0) - (D.base[c.k] || 0))), done = prog >= c.t, got = D.claimed.includes(id);
       h += `<div class="card ${got ? 'sel' : ''}"><div class="row"><div class="g"><h3>${c.n}</h3><div class="row" style="margin-top:5px"><div class="ab"><i style="width:${prog / c.t * 100}%;background:var(--go)"></i></div><span class="av" style="width:auto;font-size:11px">${prog}/${c.t}</span></div></div>
-        ${got ? '<span class="tag on">PAID</span>' : Btn(`${c.vc} VC`, () => { D.claimed.push(id); S.vc += c.vc; gainRep(25); sfx('buy'); toast('CONTRACT PAID', `${c.n} · +${c.vc} VC · +25 Respect`, 'ach'); save(); rerender(); }, 'sm', !done)}</div></div>`;
+        ${got ? '<span class="tag on">PAID</span>' : Btn(`${c.vc} HC`, () => { D.claimed.push(id); S.vc += c.vc; gainRep(25); sfx('buy'); toast('CONTRACT PAID', `${c.n} · +${c.vc} HC · +25 Respect`, 'ach'); save(); rerender(); }, 'sm', !done)}</div></div>`;
     }
     return h + `<p class="mu">Contracts count what you do from the moment the day starts: games, drills, the ladder, H-O-R-S-E, the fiends.</p></div>`;
   });

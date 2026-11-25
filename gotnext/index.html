@@ -162,7 +162,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div class="hintL">MOVE</div><div class="hintR" id="hintR">SKILL STICK</div>
   <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tLT">POST</div><div class="tbtn" id="tMenu">≡</div>
 </div>
-<div id="whud"><div><span class="chip">VC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
+<div id="whud"><div><span class="chip">HC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
 <div id="emobar"><button data-em="wave" title="1">👋</button><button data-em="dance" title="2">💃</button><button data-em="sit" title="3">🪑</button><button data-em="cheer" title="4">🙌</button><button data-em="celeb" title="5">🏆</button><button data-em="chat" title="T">💬</button></div>
 <div id="prompt"></div>
 <div id="keys"></div>
@@ -253,12 +253,12 @@ const STYLE = {}; STYLES.forEach(s => STYLE[s.id] = s);
 
 // ---------- origins (the "background") ----------
 const ORIGINS = [
-  { id: 'mallrat', n: 'Mall Rat', d: 'Raised in the last open food court in Ohio.', perk: 'Shops charge 10% less VC.', k: 'shop', v: 0.10 },
+  { id: 'mallrat', n: 'Mall Rat', d: 'Raised in the last open food court in Ohio.', perk: 'Shops charge 10% less HC.', k: 'shop', v: 0.10 },
   { id: 'labgrown', n: 'Lab-Grown', d: 'Vat #44, premium batch. Still under warranty.', perk: '+3 to every Athletics cap.', k: 'ath', v: 3 },
   { id: 'rustbelt', n: 'Rust Belt Kid', d: 'Learned the game on a rim welded to a silo.', perk: '+15% Respect from every game.', k: 'rep', v: 0.15 },
   { id: 'orbital', n: 'Orbital Transfer', d: 'Grew up in low gravity. Earth is rude.', perk: '+4 Vertical cap, +2 Deep Ball cap.', k: 'orb', v: 1 },
   { id: 'exmascot', n: 'Ex-Mascot', d: 'Nine years inside the Freedom Eagle. Never again.', perk: 'Bravado fills 20% faster.', k: 'brav', v: 0.20 },
-  { id: 'nepo', n: 'Nepo Baby', d: 'Dad owned a team. Dad owned a moon.', perk: 'Start with 400 extra VC. Everyone knows.', k: 'vc', v: 400 },
+  { id: 'nepo', n: 'Nepo Baby', d: 'Dad owned a team. Dad owned a moon.', perk: 'Start with 400 extra HC. Everyone knows.', k: 'vc', v: 400 },
 ];
 const ORIGIN = {}; ORIGINS.forEach(o => ORIGIN[o.id] = o);
 
@@ -283,7 +283,7 @@ function capsFor(build) {
   return out;
 }
 function startAttrs(build) { const c = capsFor(build), o = {}; for (const a of ATTRS) o[a.id] = Math.max(30, Math.round(c[a.id] * 0.60)); return o; }
-function attrCost(v) { const b = 6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16; return Math.round(b * (1 + Math.pow(Math.max(0, v - 55) / 13, 1.6))); }   // VC for +1 from v: cheap early, steep near the top (maxing a build is weeks of play, not one night)
+function attrCost(v) { const b = 6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16; return Math.round(b * (1 + Math.pow(Math.max(0, v - 55) / 13, 1.6))); }   // HC for +1 from v: cheap early, steep near the top (maxing a build is weeks of play, not one night)
 const OVR_W = { layup: 1, dunk: .7, close: .7, mid: 1, three: 1.2, iq: .8, handle: 1.1, pass: .8, swb: .8, perd: 1, intd: .7, steal: .8, block: .7, reb: .8, speed: 1, accel: 1, str: .6, vert: .7, stam: .6 };
 function ovrOf(attrs) {
   // best 12 weighted, so specialists are not punished for dump stats
@@ -296,6 +296,12 @@ const TIERS = ['—', 'BRONZE', 'SILVER', 'GOLD', 'ICED OUT'];
 const TIER_COL = ['#555', '#c9814a', '#c8d0d8', '#f2c14e', '#7de3ff'];
 const TIER_COST = [0, 1, 2, 3, 4];
 const BADGES = [
+  { id: 'postman', cat: 'F', n: 'The Postman', d: 'Backing down in the post moves the defender further.', req: ['str', 55, 68, 80, 90] },
+  { id: 'heatcheck', cat: 'S', n: 'Heat Check', d: 'Hop jumpers and floaters catch green more often.', req: ['iq', 55, 68, 80, 92] },
+  { id: 'showtime', cat: 'P', n: 'Showtime', d: 'Show-off dribbles with room to work fill your Bravado.', req: ['handle', 58, 70, 82, 93] },
+  { id: 'hardhat', cat: 'D', n: 'Hard Hat', d: 'The whistle likes you: fewer reach-ins and shooting fouls called on you.', req: ['perd', 55, 68, 80, 92] },
+  { id: 'clamps', cat: 'D', n: 'Clamps', d: 'Bodying up (LT) slows the ball handler more.', req: ['str', 55, 66, 78, 90] },
+  { id: 'ironchin', cat: 'D', n: 'Iron Chin', d: 'RUCKUS: shrug off more punches, and it takes more to knock you out.', req: ['str', 58, 70, 82, 93] },
   { id: 'lobby', cat: 'F', n: 'Rim Lobbyist', d: 'Contests on your drives matter less. You have friends at the rim.', req: ['layup', 55, 68, 80, 92] },
   { id: 'gravity', cat: 'F', n: 'Gravity Waiver', d: 'Dunk from further out and more often in traffic.', req: ['dunk', 60, 72, 84, 94] },
   { id: 'softmoney', cat: 'F', n: 'Soft Money', d: 'Layups and close shots drop softer.', req: ['close', 52, 64, 76, 88] },
@@ -373,11 +379,11 @@ const FINISHES = [
 const CELEBS = [
   { id: 'flex', n: 'The Flex', cost: 0, rank: 0 },
   { id: 'salute', n: 'Salute The Flag', cost: 500, rank: 1 },
-  { id: 'count', n: 'Count The VC', cost: 1500, rank: 2 },
+  { id: 'count', n: 'Count The HC', cost: 1500, rank: 2 },
   { id: 'eagle', n: 'Freedom Eagle', cost: 3000, rank: 4 },
   { id: 'shrug', n: 'The Shrug', cost: 400, rank: 0 }, { id: 'shh', n: 'Quiet, Please', cost: 700, rank: 1 }, { id: 'pound', n: 'Chest Pound', cost: 900, rank: 1 },
   { id: 'pout', n: 'The Pout', cost: 1200, rank: 2 }, { id: 'rock', n: 'Rock The Baby', cost: 1800, rank: 2 }, { id: 'nightnight', n: 'Night Night', cost: 2400, rank: 3 },
-  { id: 'toosmall', n: 'Too Small', cost: 2800, rank: 3 }, { id: 'floor', n: 'Slap The Floor', cost: 2000, rank: 3 }, { id: 'stare', n: 'The Stare Down', cost: 3500, rank: 4 }, { id: 'flexdown', n: 'Crab Flex', cost: 4500, rank: 5 },
+  { id: 'toosmall', n: 'Too Small', cost: 2800, rank: 3 }, { id: 'greenbean', n: 'Green Bean', cost: 1100, rank: 1 }, { id: 'greengiant', n: 'Green Giant', cost: 2600, rank: 3 }, { id: 'iceveins', n: 'Ice In My Veins', cost: 3200, rank: 3 }, { id: 'fentlean', n: 'Fent Lean', cost: 3800, rank: 4 }, { id: 'pour40', n: 'Pour Out The 40', cost: 4000, rank: 4 }, { id: 'floor', n: 'Slap The Floor', cost: 2000, rank: 3 }, { id: 'stare', n: 'The Stare Down', cost: 3500, rank: 4 }, { id: 'flexdown', n: 'Crab Flex', cost: 4500, rank: 5 },
 ];
 
 // ---------- ranks (Respect) ----------
@@ -538,7 +544,7 @@ const CRIB = [
   { id: 'bottie', n: 'Lil Bottie', tiers: [
     { n: 'Not Here', d: 'A robot rapper needs somewhere to charge.', cost: 0, rank: 0 },
     { n: 'Moved In', d: 'Bottie lives at your crib: a track about you every day, and he posts your games. +3% Respect.', cost: 3500, rank: 2, k: 'rep', v: .03 },
-    { n: 'Home Studio', d: 'A booth in the yard. The feed pays: +4% VC from games, bigger daily posts.', cost: 9000, rank: 4, k: 'vc', v: .04 } ] },
+    { n: 'Home Studio', d: 'A booth in the yard. The feed pays: +4% HC from games, bigger daily posts.', cost: 9000, rank: 4, k: 'vc', v: .04 } ] },
   { id: 'floor', n: 'Court Surface', tiers: [
     { n: 'Cracked Driveway', d: 'It came with the lot.', cost: 0, rank: 0 },
     { n: 'Sealed Blacktop', d: '+5% Respect from games.', cost: 600, rank: 1, k: 'rep', v: .05 },
@@ -546,9 +552,9 @@ const CRIB = [
     { n: 'Hologram Hardwood', d: '+18% Respect from games.', cost: 6500, rank: 5, k: 'rep', v: .18 }] },
   { id: 'hoop', n: 'Home Hoop', tiers: [
     { n: 'Milk Crate', d: 'A classic. Technically a rim.', cost: 0, rank: 0 },
-    { n: 'Chain Net', d: '+10% Shooting badge XP.', cost: 500, rank: 1, k: 'bxS', v: .10 },
-    { n: 'Glass Backboard', d: '+20% Shooting badge XP.', cost: 2000, rank: 2, k: 'bxS', v: .20 },
-    { n: 'Anti-Grav Rim', d: '+35% Shooting & Finishing badge XP.', cost: 6000, rank: 5, k: 'bxSF', v: .35 }] },
+    { n: 'Chain Net', d: '+10% Shooting smarts XP.', cost: 500, rank: 1, k: 'bxS', v: .10 },
+    { n: 'Glass Backboard', d: '+20% Shooting smarts XP.', cost: 2000, rank: 2, k: 'bxS', v: .20 },
+    { n: 'Anti-Grav Rim', d: '+35% Shooting & Finishing smarts XP.', cost: 6000, rank: 5, k: 'bxSF', v: .35 }] },
   { id: 'shotdoc', n: 'Shot Doctor 3000', tiers: [
     { n: 'Not installed', d: '', cost: 0, rank: 0 },
     { n: 'Shot Doctor 3000', d: 'Green window +4% everywhere.', cost: 1800, rank: 2, k: 'green', v: .04 },
@@ -559,9 +565,9 @@ const CRIB = [
     { n: 'Steak Fabricator', d: '+8 Stamina, +3 Strength in every game.', cost: 3600, rank: 3, k: 'stam2', v: 8 }] },
   { id: 'trophy', n: 'Trophy Wall', tiers: [
     { n: 'Bare wall', d: '', cost: 0, rank: 0 },
-    { n: 'Participation Shelf', d: '+6% VC from games.', cost: 1000, rank: 1, k: 'vc', v: .06 },
-    { n: 'Trophy Wall', d: '+12% VC from games.', cost: 3200, rank: 3, k: 'vc', v: .12 },
-    { n: 'Personal Hall of Fame', d: '+20% VC from games.', cost: 8000, rank: 6, k: 'vc', v: .20 }] },
+    { n: 'Participation Shelf', d: '+6% HC from games.', cost: 1000, rank: 1, k: 'vc', v: .06 },
+    { n: 'Trophy Wall', d: '+12% HC from games.', cost: 3200, rank: 3, k: 'vc', v: .12 },
+    { n: 'Personal Hall of Fame', d: '+20% HC from games.', cost: 8000, rank: 6, k: 'vc', v: .20 }] },
   { id: 'couch', n: 'Couch of Champions', tiers: [
     { n: 'Milk crate (seat)', d: '', cost: 0, rank: 0 },
     { n: 'Couch of Champions', d: 'Start every game with 25% Bravado.', cost: 1400, rank: 2, k: 'brav', v: .25 },
@@ -586,7 +592,7 @@ const BOOSTS = [
   { id: 'rosin', n: 'Rosin Vape (grape)', d: '+4 to every Shooting attribute this game.', cost: 80, buff: { mid: 4, three: 4, iq: 4 } },
   { id: 'knees', n: 'Knee Subscription (1 day)', d: '+6 Vertical, +4 Dunk this game.', cost: 80, buff: { vert: 6, dunk: 4 } },
   { id: 'glue', n: 'Legal Stickum', d: '+5 Handles, +5 Steal this game.', cost: 70, buff: { handle: 5, steal: 5 } },
-  { id: 'lotto', n: 'Scratch-Off Ticket', d: '50/50: double VC this game, or nothing extra.', cost: 50, k: 'lotto' },
+  { id: 'lotto', n: 'Scratch-Off Ticket', d: '50/50: double HC this game, or nothing extra.', cost: 50, k: 'lotto' },
   { id: 'hype', n: 'Rent-A-Hype-Man', d: 'Bravado fills 50% faster this game.', cost: 90, k: 'hype' },
 ];
 
@@ -626,8 +632,8 @@ const ACH = [
   { id: 'r50', n: 'Board Member', d: '50 rebounds.', k: 'reb', t: 50, vc: 350 },
   { id: 'fire', n: 'Fire Hazard', d: 'Catch fire in a RUCKUS game.', k: 'fires', t: 1, vc: 200 },
   { id: 'brav', n: 'Main Character', d: 'Trigger Bravado 10 times.', k: 'bravs', t: 10, vc: 400, drip: 'bk_wings' },
-  { id: 'bum1', n: 'Philanthropist', d: 'Give VC to a build fiend.', k: 'gave', t: 1, vc: 20 },
-  { id: 'bum20', n: 'Enabler', d: 'Give VC to build fiends 20 times.', k: 'gave', t: 20, vc: 500 },
+  { id: 'bum1', n: 'Philanthropist', d: 'Give HC to a build fiend.', k: 'gave', t: 1, vc: 20 },
+  { id: 'bum20', n: 'Enabler', d: 'Give HC to build fiends 20 times.', k: 'gave', t: 20, vc: 500 },
   { id: 'shut', n: 'Skunked', d: 'Win a game without letting them score.', k: 'shutouts', t: 1, vc: 600 },
   { id: 'so', n: 'Sharpshooter', d: 'Score 20+ in a Money Rack shootout.', k: 'bestRack', t: 20, vc: 500 },
   { id: 'drip10', n: 'Drip Check', d: 'Own 16 pieces of drip.', k: 'owned', t: 16, vc: 200 },
@@ -647,14 +653,14 @@ const ACH = [
 // ---------- writing ----------
 const BUM_NAMES = ['Deshawn "99 OVR"', 'Tre the Grinder', 'Lil Microtransaction', 'Uncle Patch Notes', 'Big Loot Box', 'Season Pass Steve', 'Greta Got-Next', 'Two-Way Tina'];
 const BUM_ASK = [
-  'Yo, lemme hold {n} VC. My center on Basketball 2146 is ONE upgrade from a 61 overall.',
-  'Spare {n} VC? PS88 servers go down in a year, I gotta finish my build before they do.',
-  'Please. {n} VC. My guy still got bronze Rim Lobbyist. BRONZE. I can\'t be seen like this.',
-  'I sold my hover-car for VC, bro. Then they dropped Basketball 2146. Just {n}. For the animations.',
-  'I ain\'t eaten in two days but my player got the new jumpshot. Worth it. Got {n} VC?',
-  '{n} VC and I\'m out your face. My build is a 7\'3" point guard, it\'s gonna be meta, trust.',
-  'They patched my build, man. THEY PATCHED MY BUILD. I need {n} VC to start over.',
-  'Psst. {n} VC. I\'ll pay you back when my player gets drafted. In the video game. Which I am losing at.',
+  'Yo, lemme hold {n} HC. My center on Basketball 2146 is ONE upgrade from a 61 overall.',
+  'Spare {n} HC? PS88 servers go down in a year, I gotta finish my build before they do.',
+  'Please. {n} HC. My guy still got bronze Rim Lobbyist. BRONZE. I can\'t be seen like this.',
+  'I sold my hover-car for HC, bro. Then they dropped Basketball 2146. Just {n}. For the animations.',
+  'I ain\'t eaten in two days but my player got the new jumpshot. Worth it. Got {n} HC?',
+  '{n} HC and I\'m out your face. My build is a 7\'3" point guard, it\'s gonna be meta, trust.',
+  'They patched my build, man. THEY PATCHED MY BUILD. I need {n} HC to start over.',
+  'Psst. {n} HC. I\'ll pay you back when my player gets drafted. In the video game. Which I am losing at.',
 ];
 const BUM_THANKS = [
   'God bless America and God bless YOU. +1 three-point rating, here I come.',
@@ -666,7 +672,7 @@ const BUM_NO = ['Aight. I see how it is. Enjoy your PHYSICAL basketball.', 'Cold
 const ADS = [
   'BASKETBALL 2146\nONLY ON PS88\nPRE-ORDER YOUR PRE-ORDER',
   'FREEDOM COLA\nNOW WITH 40% MORE\nFREEDOM*\n*corn',
-  'VC LOANS\n900% APR\nYOU DESERVE DRIP',
+  'HC LOANS\n900% APR\nYOU DESERVE DRIP',
   'KNEES™\nSUBSCRIBE TODAY\nCANCEL NEVER',
   'USA! USA!\n(A SUBSIDIARY OF\nUSA HOLDINGS LLC)',
   'DEFENSE WINS\nCHAMPIONSHIPS\nOFFENSE WINS\nBRAND DEALS',
@@ -675,14 +681,14 @@ const ADS = [
 ];
 // what people on the block say when you walk by
 const CHAT = {
-  fiend: ['Spare 5 VC? PS88 ain\'t gonna pre-order itself.', 'I had 99 OVR once. Then they patched me.', 'You got next? I got NEXT next.', 'Basketball 2146 got real sweat physics, I heard.', 'They nerfed my knees in a hotfix.'],
+  fiend: ['Spare 5 HC? PS88 ain\'t gonna pre-order itself.', 'I had 99 OVR once. Then they patched me.', 'You got next? I got NEXT next.', 'Basketball 2146 got real sweat physics, I heard.', 'They nerfed my knees in a hotfix.'],
   dance: ['THIS my song!', 'Tape Deck stay knocking.', 'Run it back, DJ!', 'You can\'t stand still to this. Federal law.'],
   fire: ['Coldest summer since the weather got privatized.', 'Barrel fire is the only free thing left.', 'Warm your hands, not your jumper.'],
   oldhead: ['In \'29 we played with real gravity.', 'Back in my day the rim was ten feet. Every day.', 'Kids today got shoes that dribble for them.', 'Contracts on the bench. Check \'em.'],
   cage: ['Who got next?', 'He traveled. Ain\'t no refs though.', 'Kings court been undefeated since Tuesday.', 'That boy cooking!', 'Run it back!'],
   ladder: ['You want this smoke?', 'Climb the ladder, see what happens.', 'One on one. No help. No excuses.'],
   block: ['You see that windmill in the Cages?', 'My knees on a payment plan.', 'Coach Overtime made me run Mikans for an hour.', 'Sharpie hustled me again.', 'They raised the price of air at The Plug.', 'Freedom Eagle dunked so we could scroll.'],
-  vendor: ['Soy dogs! Hot and dog-adjacent!', 'Extra relish is extra VC, chief.', 'Fifteen VC. Cheapest protein on the block.'],
+  vendor: ['Soy dogs! Hot and dog-adjacent!', 'Extra relish is extra HC, chief.', 'Fifteen HC. Cheapest protein on the block.'],
   dice: ['Seven! Pay up!', 'Snake eyes, man...', 'Roll it, don\'t pray on it.', 'Who brought these dice? They weighted.'],
   homie: ['Your crib hard, not gonna lie.', 'Can I get a run on your court later?', 'Who picked this couch? Elite.', 'I\'m just here for the cookout.', 'Neighbors gonna call the HOA.'],
   neighbor: ['Nice place you got.', 'Your speakers are LOUD. Respect.', 'I heard you can dunk from the free throw line.'],
@@ -703,7 +709,7 @@ const NPC_NAMES = ['Dre', 'Tank', 'Juice', 'Ghost', 'Slim', 'Maverick', 'Tex', '
 const OLDHEAD = [
   'Back in 2099 we played with a REAL ball. Leather. From a real cow. You wouldn\'t understand.',
   'Tip from an old head: flick the right stick sideways to cross \'em. Flick it down-left or down-right to step back. Pull it straight DOWN and hold to shoot.',
-  'Respect unlocks courts. VC unlocks drip. Neither one unlocks happiness. I checked.',
+  'Respect unlocks courts. HC unlocks drip. Neither one unlocks happiness. I checked.',
   'Hands up on defense, young blood. Push the right stick UP to contest. Tap STEAL only when they get careless.',
   'Your crib is your court. Fix it up. A man with a milk crate hoop is still a man. Barely.',
   'Get the ball back past the arc after a stop. That\'s the law. Only law left, really.',
@@ -747,7 +753,7 @@ function loadSave() {
 function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
 function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
 // ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
-// fit; VC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
+// fit; HC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
 const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb'];
 const cloneJ = o => JSON.parse(JSON.stringify(o));
 function slotSnap() { const mv = {}; for (const k of MOVE_SLOTS) mv[k] = S.moves[k]; return cloneJ({ name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, bp: S.bp, bxp: S.bxp, moves: mv, worn: S.worn, anim: S.anim || null, made: S.created }); }
@@ -1491,6 +1497,11 @@ function poseOf(anim, t, o) {
         case 'floor': { const b2 = Math.max(0, Math.sin(t * 10)); legs(-0.9, 1.2, -0.9, 1.2, 0.2); p.y = -0.3; S_('spine', 0.6); S_('neck', -0.5); S_('shR', -0.9 - b2 * 0.2, 0, -0.2); S_('shL', -0.9 - b2 * 0.2, 0, 0.2); S_('elR', -0.3); S_('elL', -0.3); S_('wrR', 0.8); S_('wrL', 0.8); break; }      /* slaps the floor */
         case 'wag': armsDown(); S_('shR', -1.9, 0, -0.1); S_('elR', -1.2); S_('wrR', 0, 0, s * 0.7); S_('neck', 0, s * 0.2, 0); S_('chest', -0.06); break;      /* finger wag: not in here */
         case 'airflex': S_('shR', -0.2, 0, -1.55); S_('elR', -2.3); S_('shL', -0.2, 0, 1.55); S_('elL', -2.3); S_('wrR', -0.6); S_('wrL', -0.6); S_('chest', -0.25); S_('neck', -0.35); S_('hpR', -0.9, 0, -0.15); S_('knR', 1.5); S_('hpL', -0.5, 0, 0.15); S_('knL', 1.2); break;      /* double bicep in the air, knees tucked */
+        case 'greenbean': { const w2 = Math.sin(t * 6); S_('shR', -3.0, 0, 0.18); S_('shL', -3.0, 0, -0.18); S_('elR', -0.15); S_('elL', -0.15); S_('hips', 0, 0, w2 * 0.2); S_('spine', 0, 0, -w2 * 0.28); S_('chest', 0, 0, w2 * 0.2); S_('neck', 0, 0, -w2 * 0.15); S_('hpR', 0, 0, -0.02); S_('hpL', 0, 0, 0.02); p.y = 0.02 * Math.abs(w2); break; }      /* long and thin, hands together overhead, swaying like a stalk */
+        case 'greengiant': { const st2 = Math.max(0, Math.sin(t * 4)); S_('shR', -0.25, 0, -0.75); S_('elR', -1.75); S_('wrR', 0.4); S_('shL', -0.25, 0, 0.75); S_('elL', -1.75); S_('wrL', 0.4); S_('spine', -0.16); S_('chest', -0.2); S_('neck', -0.25); S_('hpR', -0.5 * st2, 0, -0.28); S_('knR', 0.9 * st2); S_('hpL', 0, 0, 0.28); p.y = 0.02; break; }      /* fists on the hips, chest out, a slow stomp */
+        case 'iceveins': armsDown(); S_('shL', -1.35, 0, 0.1); S_('elL', -0.15); S_('wrL', 0.2); S_('shR', -1.15, 0, 0.75); S_('elR', -1.35 + 0.12 * Math.max(0, s)); S_('wrR', 0.5); S_('neck', 0.3, 0.2, 0); S_('chest', 0.05, 0.12, 0); break;      /* one arm out, two fingers tapping the forearm */
+        case 'fentlean': legs(-0.15, 0.55, -0.1, 0.5, 0.12); p.y = -0.06; S_('hips', 0.5); S_('spine', 0.75); S_('chest', 0.45); S_('neck', 0.6 + 0.03 * s); S_('shR', -1.3, 0, -0.08); S_('elR', -0.12); S_('shL', -1.25, 0, 0.08); S_('elL', -0.12); S_('wrR', 0.2); S_('wrL', 0.2); p.rate = 8; break;      /* folded at the waist, arms hanging, frozen there */
+        case 'pour40': armsDown(); S_('shR', -1.2, 0, -0.75); S_('elR', -0.5); S_('wrR', 0, 0, 1.3 + 0.1 * s); S_('neck', 0.5, -0.25, 0); S_('chest', 0.12, 0, 0.08); S_('spine', 0.1); S_('shL', -0.5, 0, -0.45); S_('elL', -1.6); break;      /* arm out, wrist tipped over, head down, the other hand on the heart */
         case 'salute': S_('shR', -0.7, 0, -1.25); S_('elR', -2.3); S_('wrR', 0.2); S_('shL', 0.05, 0, 0.08); S_('spine', -0.05); S_('chest', -0.08); S_('neck', -0.05); break;
         case 'count': S_('shR', -1.0, 0, 0.3); S_('elR', -1.4 + s * 0.3); S_('wrR', s * 0.8); S_('shL', -1.0, 0, -0.3); S_('elL', -1.4 - s * 0.3); S_('wrL', -s * 0.8); S_('chest', -0.1); S_('neck', 0.25); break;
         case 'eagle': S_('shR', 0, 0, -1.4 + s * 0.5); S_('shL', 0, 0, 1.4 - s * 0.5); S_('wrR', s * 0.5); S_('wrL', s * 0.5); S_('hpL', -1.2); S_('knL', 1.6); S_('chest', -0.2); S_('neck', -0.3); p.y = 0.03 * s; break;
@@ -2174,7 +2185,7 @@ function scorePts(p, pts, how) {
   if (M_.practice) return;
   M_.phase = 'scored'; M_.pt = how === 'dunk' ? 2.1 : 1.45; p.st = 'celeb'; p.t = 0;
   { const eq = p.b.moves.celeb, vic = how === 'dunk' && p.finish ? p.finish.hit : null;      // what he does about it: his own celebration, or one that fits the play
-    p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout'])) : pts >= 2 ? pick([eq, eq, 'shh', 'shrug', 'nightnight', 'pout']) : pick([eq, eq, eq, 'shrug', 'pound']);
+    p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout', 'greengiant', 'pour40', 'fentlean'])) : pts >= 2 ? pick([eq, eq, 'shh', 'shrug', 'nightnight', 'pout', 'iceveins', 'greenbean']) : pick([eq, eq, eq, 'shrug', 'pound']);
     p.celebAt = vic || null; if (M_.net === 'host') netEv({ k: 'cs', i: p.i, s: p.celebStyle }); }
   if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }
 }
@@ -2250,7 +2261,7 @@ function releaseShot(p) {
   const e = Math.abs(err); let green = e <= w, prob;
   if (green) prob = c > 0.55 ? 0.8 : 1; else prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
   if (!p.user) green = green && Math.random() < 0.5;
-  else if (s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
+  else if (s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
@@ -2260,7 +2271,7 @@ function releaseShot(p) {
   B.foulBy = null;
   if (!MT.arcade && !MT.practice) for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump') continue; const dd = dist(o, p); if (dd > 0.78) continue;
-    const fch = clamp(0.3 + (o.lunge ? 0.22 : 0) + (0.78 - dd) * 0.6 - nAtt(o, 'perd') * 0.25 - 0.05 * bt(o, 'ground'), 0.05, 0.75);
+    const fch = clamp(0.3 + (o.lunge ? 0.22 : 0) + (0.78 - dd) * 0.6 - nAtt(o, 'perd') * 0.25 - 0.05 * bt(o, 'ground') - 0.07 * bt(o, 'hardhat'), 0.04, 0.75);
     if (Math.random() < fch) { B.foulBy = o; break; }
   }
   const make = Math.random() < prob; p.stats.fga++;
@@ -2447,8 +2458,8 @@ function hitScan(p, kind, reach, frontMin) {
 }
 function applyHit(p, o, kind) {
   const M_ = MT, B = M_.B; p.hitList.push(o); const dd = dist(o, p) || 1, dir = [(o.x - p.x) / dd, (o.z - p.z) / dd];
-  if (kind === 'punch' && Math.random() > 0.72 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.35) { floatTxt(o, 'SHRUGGED IT OFF', '#8d8d99'); sfxM('bump'); return; }
-  const ko = Math.random() < (kind === 'clothes' ? 0.36 : 0.18) + Math.min(0.3, (M_.brawlHeat || 0) * 0.08);
+  if (kind === 'punch' && Math.random() > 0.72 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.35 - 0.08 * bt(o, 'ironchin')) { floatTxt(o, 'SHRUGGED IT OFF', '#8d8d99'); sfxM('bump'); return; }
+  const ko = Math.random() < ((kind === 'clothes' ? 0.36 : 0.18) + Math.min(0.3, (M_.brawlHeat || 0) * 0.08)) * (1 - 0.18 * bt(o, 'ironchin'));
   o.st = 'stagger'; o.t = 0; o.stg = { dur: ko ? 4.2 : kind === 'clothes' ? 2.0 : 1.5, fall: true, side: 0, dir, push: kind === 'clothes' ? 3.4 : 2.2, kind: ko ? pick(['flat', 'face']) : kind === 'clothes' ? 'flat' : pick(['sit', 'spin', 'flat']) };
   if (ko) { o.ko = 4.2; if (M_.net === 'host') netEv({ k: 'ko', i: o.i, d: 4.2 }); }
   sfxM('block'); M_.shake = ko ? 0.55 : 0.3; crowdReact(ko ? 'ko' : 'hit', p.team); burst(o.x, 1.3, o.z, ko ? 0xff4040 : 0xffc531, ko ? 18 : 10);
@@ -2511,7 +2522,7 @@ function resolveSteal(p) {
   } else {
     p.slowT = 0.4 - 0.05 * bt(p, 'repo'); p.cool = 1.3; p.bumpT = 0.3; p.bumpX = 0.3; p.bumpZ = 0;
     const hf = [Math.sin(h.face), Math.cos(h.face)], dh = dist(h, p) || 1, behind = ((p.x - h.x) * hf[0] + (p.z - h.z) * hf[1]) / dh < -0.3, spam = Math.max(0, (p.reach || []).length - 1);
-    const fch = (0.05 + 0.08 * spam + (sc.reach > 0.9 ? 0.12 : 0) + (behind ? 0.15 : 0)) * (1 - nAtt(p, 'steal') * 0.4) * (1 - 0.15 * bt(p, 'repo'));
+    const fch = (0.05 + 0.08 * spam + (sc.reach > 0.9 ? 0.12 : 0) + (behind ? 0.15 : 0)) * (1 - nAtt(p, 'steal') * 0.4) * (1 - 0.15 * bt(p, 'repo')) * (1 - 0.15 * bt(p, 'hardhat'));
     if (Math.random() < fch) foul(p, h, behind ? 'reach from behind' : 'reach-in');
   }
 }
@@ -2842,7 +2853,7 @@ function stepPlayer(p, dt) {
   if (hasBall && p.post && p.st === 'free' && M_.phase === 'live') {
     const dh = dHoop(p) || 1, hx = -p.x / dh, hz = -p.z / dh, va = p.vx * hx + p.vz * hz;
     for (const o of M_.P) { if (o.team === p.team || o.st === 'jump') continue; const rx = o.x - p.x, rz = o.z - p.z, rl = Math.hypot(rx, rz); if (rl > 1.05 || (rx * hx + rz * hz) < rl * 0.4) continue;
-      if (va > 0.2) { const push = clamp(0.3 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.6 - (o.bodyUp ? 0.2 : 0), 0.05, 0.8); o.x += hx * va * push * dt; o.z += hz * va * push * dt; p.stam = Math.max(0, p.stam - dt * 2.5); o.stam = Math.max(0, o.stam - dt * 2);
+      if (va > 0.2) { const push = clamp(0.3 + (nAtt(p, 'str') - nAtt(o, 'str')) * 0.6 - (o.bodyUp ? 0.2 : 0) + 0.06 * bt(p, 'postman'), 0.05, 0.9); o.x += hx * va * push * dt; o.z += hz * va * push * dt; p.stam = Math.max(0, p.stam - dt * 2.5); o.stam = Math.max(0, o.stam - dt * 2);
         p.bumpTk = (p.bumpTk || 0) - dt; if (p.bumpTk <= 0) { p.bumpTk = 0.45; sfxM('bump'); } } }
   }
   // leaning on the ball handler all day gets called eventually (a hand check)
@@ -2870,7 +2881,7 @@ function stepPlayer(p, dt) {
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
   if (p.bodyUp) top *= 0.86;
-  if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5), 0.6, 0.95); }      /* a hand on your body slows the drive */
+  if (hasBall && !p.post) { const [o, od] = nearestOpp(p); if (o && o.bodyUp && od < 1.0 && ((o.x - p.x) * Math.sin(p.face) + (o.z - p.z) * Math.cos(p.face)) > 0) top *= clamp(0.72 + 0.16 * (nAtt(p, 'str') - nAtt(o, 'str') + 0.5) - 0.03 * bt(o, 'clamps'), 0.55, 0.95); }      /* a hand on your body slows the drive */
   const want = Math.hypot(p.in.dx, p.in.dz), canSprint = p.in.sprint && (p.stam > 4 || p.fire) && want > 0.5 && !p.post && !p.bodyUp;
   p.sprinting = canSprint && lock > 0.9;
   if (p.sprinting) { top *= 1.28; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * dt);
@@ -3098,7 +3109,7 @@ function animPlayer(p, dt) {
       if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; }
       else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { o.post = 1; o.dr = Math.min(o.dr, 0.5); }
         // he is giving you room: show-off dribbles, a new one every few seconds (rock, between the legs, behind the back, yo-yo, size-up, waving him up)
-        { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? SWAGS[Math.floor((M_.time + p.i * 1.7) / 2.8) % SWAGS.length] : null; o.swag = p.swag; o.swT = M_.time + p.i; } }
+        { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? SWAGS[Math.floor((M_.time + p.i * 1.7) / 2.8) % SWAGS.length] : null; o.swag = p.swag; o.swT = M_.time + p.i; if (p.swag && bt(p, 'showtime') && M_.net !== 'guest') addBrav(p, dt * 0.012 * bt(p, 'showtime')); } }
       else if (p.callT > 0 && p.speed < 2) an = 'call';
       else if (p.def && M_.phase === 'live') { an = 'slide'; o.ph = p.runPh; o.up = p.handsUp; o.bodyUp = p.bodyUp ? 1 : 0; if (p.sprinting) { an = 'run'; o.sp = spN; }
         else if (!p.handsUp && !p.bodyUp && B.holder && (p.guard || p.man) === B.holder) {      // on the ball: sag stance when he has room, active hands when it is tight
@@ -3434,22 +3445,41 @@ function dressCourt(sc, cfg, style) {
 // People along the baseline fence and both sidelines. Each has their own body, movement profile and habits, follows
 // the ball with their head, and reacts to big plays by their kind and by whose side they are on.
 function crowdInit() {
-  const M_ = MT, spots = []; for (let i = 0; i < 9; i++) spots.push([-8 + i * 2 + rnd(-0.35, 0.35), -3.3 - rnd(0, 0.9)]);
+  // a handful to start with. The better the game gets (big plays, a tight score late), the more of the Block walks
+  // over to watch: the people from the main area, by name, in the fits they wear there.
+  const M_ = MT, spots = []; for (let i = 0; i < 9; i++) spots.push([-8 + i * 2 + rnd(-0.35, 0.35), -3.3 - rnd(0, 0.5)]);
   for (const sd of [-1, 1]) for (const z of [1.2, 4.8, 8.6]) spots.push([sd * (9.9 + rnd(0, 0.5)), z + rnd(-0.6, 0.6)]);
+  for (let i = 0; i < 8; i++) spots.push([-7 + i * 2 + rnd(-0.3, 0.3), -4.7 - rnd(0, 0.5)]); for (const sd of [-1, 1]) for (const z of [3, 6.8, 10.4]) spots.push([sd * (11.1 + rnd(0, 0.4)), z]);
   const myT = Math.max(0, M_.cfg.teams.findIndex(t => t.some(x => x.mine === true)));
-  for (const [x, z] of spots) {
-    const b = aiBuild(Math.round(rnd(50, 75))); b.name = 'FAN' + Math.floor(Math.random() * 1e6); const r = makeRig(b, true); r.root.position.set(x, 0, z); const face = Math.atan2(0 - x, 5 - z); r.root.rotation.y = face; r.shadow.visible = false; scene.add(r.root);
-    M_.fans.push({ r, x, z, face, ph: rnd(0, 6), prof: r.prof, amb: pick(CROWD_AMBIENT), ambT: rnd(2, 8), react: null, team: Math.random() < 0.6 ? myT : 1 - myT, hype: 0 });
-  }
+  M_.crowd = { spots, used: 0, heat: 0, myT, pool: [] };
+  const playing = new Set(M_.cfg.teams.flat().map(x => x.b.name)); try { M_.crowd.pool = blockRoster().filter(b => !playing.has(b.name)).sort(() => Math.random() - 0.5); } catch (e) { M_.crowd.pool = []; }
+  for (let k = 0; k < 5; k++) crowdAdd(null, true);
+}
+function crowdAdd(build, instant) {
+  const M_ = MT, K = M_.crowd; if (!K || K.used >= K.spots.length) return null; const order = instant ? [0, 2, 4, 6, 8, 9, 12][K.used] : null; let si = K.used; if (instant && order !== undefined) si = order;
+  const free = K.spots.map((s, i) => i).filter(i => !M_.fans.some(f => f.si === i)); if (!free.length) return null; if (!free.includes(si)) si = free[0];
+  const [x, z] = K.spots[si], b = build || (() => { const q = aiBuild(Math.round(rnd(50, 75))); q.name = ''; return q; })(), r = makeRig(b, true), face = Math.atan2(0 - x, 5 - z); r.shadow.visible = false; scene.add(r.root);
+  const f = { r, si, x, z, face, tx: x, tz: z, ph: rnd(0, 6), prof: r.prof, amb: pick(CROWD_AMBIENT), ambT: rnd(2, 8), react: null, team: Math.random() < 0.6 ? K.myT : 1 - K.myT, hype: 0, name: b.name || '' };
+  if (!instant) { f.x = x < -9 ? -17 : x > 9 ? 17 : x + rnd(-3, 3); f.z = Math.abs(x) > 9 ? z + rnd(-2, 2) : -11; f.walk = true; f.psi = 0; }
+  if (f.name && typeof nameTag === 'function') { const tg = nameTag(f.name, 'from the block', r.H, '#ece9e2'); tg.scale.multiplyScalar(0.62); r.root.add(tg); }
+  r.root.position.set(f.x, 0, f.z); r.root.rotation.y = face; K.used++; M_.fans.push(f); return f;
+}
+// the game got better: somebody else comes over
+function crowdHeat(v, fromNet) {
+  const M_ = MT, K = M_ && M_.crowd; if (!K) return; K.heat += v;
+  while (K.heat >= 1 && M_.net !== 'guest') { K.heat -= 1; const b = K.pool.shift() || null, f = crowdAdd(b, false); if (!f) { K.heat = 0; break; } if (f.name) hudFb(f.name + ' pulled up to watch', '#ece9e2'); if (M_.net === 'host') netEv({ k: 'ca', n: f.name }); }
 }
 function crowdReact(play, team, fromNet) {
   const M_ = MT; if (!M_ || !M_.fans) return; if (!fromNet && M_.net === 'host') netEv({ k: 'cr', p: play, t: team });
+  if (!fromNet) crowdHeat({ dunk: 0.55, ankles: 0.6, block: 0.4, three: 0.3, ko: 0.8, hit: 0.3, steal: 0.15, score: 0.1, win: 0 }[play] || 0);
   const ch = play === 'score' ? 0.35 : play === 'steal' ? 0.6 : 0.9;
   for (const f of M_.fans) { if (Math.random() > ch) continue; f.react = { kind: crowdReaction(play, team === undefined ? undefined : f.team === team), t: -rnd(0, 0.35), dur: rnd(1.5, 2.7) }; f.hype = f.react.dur; }
 }
 function crowdStep(dt) {
   const M_ = MT, B = M_.B, bx = B.pos.x, bz = B.pos.z;
+  { const K = M_.crowd, to = M_.cfg.mode.to; if (K && M_.phase === 'live' && M_.net !== 'guest' && Math.min(M_.score[0], M_.score[1]) >= to * 0.55 && Math.abs(M_.score[0] - M_.score[1]) <= 2) crowdHeat(dt * 0.07); }      /* tight and late: word gets round */
   for (const f of M_.fans) {
+    if (f.walk) { const dx = f.tx - f.x, dz = f.tz - f.z, l = Math.hypot(dx, dz); if (l < 0.15) { f.walk = false; f.r.root.rotation.y = f.face; } else { const v = 1.7; f.x += dx / l * v * dt; f.z += dz / l * v * dt; f.psi = (f.psi + v * dt / 1.5) % 1; f.r.root.position.set(f.x, 0, f.z); f.r.root.rotation.y = Math.atan2(dx, dz); applyPose(f.r, poseOf('gait', 0, { psi: f.psi, amp: 1, hipA: 1, swag: 0.4, thigh: f.r.thigh, shin: f.r.shin, leg: f.r.legLen }), dt); continue; } }
     let kind = f.amb, u = 1;
     if (f.react) { f.react.t += dt; if (f.react.t >= f.react.dur) f.react = null; else if (f.react.t >= 0) { kind = f.react.kind; u = Math.min(1, f.react.t / 0.25); } }
     else { f.ambT -= dt; if (f.ambT <= 0) { f.amb = pick(CROWD_AMBIENT); f.ambT = rnd(3, 9); } }
@@ -3886,7 +3916,7 @@ function buildHub() {
     const um = M(geo('umb', () => new THREE.ConeGeometry(1.3, 0.5, 10, 1, true)), new THREE.MeshToonMaterial({ color: '#f2c14e', gradientMap: ramp(), side: THREE.DoubleSide }), 0, 2.9, 0, c); ink(um, 1.02);
     const s = sign('SOY DOGS · 15', 1.6, 0.36, '#f2c14e', '#0a0a0e', { border: false }); s.position.set(0, 1.0, 0.47); c.add(s); solid(10.8, 12, -3.6, -1.6);
     const vb = aiBuild(55, 'glass'); vb.worn = Object.assign(randomWorn(1), { head: 'hd_cap', top: 't_tee' }); vb.name = 'Soy Dog Sal'; addNpc(vb, 12.4, -2.6, -Math.PI / 2, 'idle', { talk: 'vendor' }); emitter('steam', 11.4, 1.35, -2.4, 2.5);
-    spot(10.2, -2.6, 1.8, 'SOY DOG SAL (15 VC)', () => uiDialog('SOY DOG SAL', 'Soy dog, extra relish, 15 VC. Legally I have to say it is "dog-adjacent". +4 Stamina next game.', [['One dog (15)', () => { S.vc -= 15; S.boosts.push('dog'); save(); uiHud(); toast('SOY DOG', '+4 Stamina next game. Do not ask.'); sfx('coin'); }, '', S.vc < 15], ['Nah', null, 'alt']])); }
+    spot(10.2, -2.6, 1.8, 'SOY DOG SAL (15 HC)', () => uiDialog('SOY DOG SAL', 'Soy dog, extra relish, 15 HC. Legally I have to say it is "dog-adjacent". +4 Stamina next game.', [['One dog (15)', () => { S.vc -= 15; S.boosts.push('dog'); save(); uiHud(); toast('SOY DOG', '+4 Stamina next game. Do not ask.'); sfx('coin'); }, '', S.vc < 15], ['Nah', null, 'alt']])); }
   // the dice crew by the hydrant
   for (let i = 0; i < 3; i++) { const a = i / 3 * 6.283, b = aiBuild(60); b.worn = randomWorn(1); addNpc(b, 11.4 + Math.cos(a) * 0.9, -8.6 + Math.sin(a) * 0.9, Math.atan2(-Math.cos(a), -Math.sin(a)), 'beg', { talk: 'dice' }); }
   for (let i = 0; i < 2; i++) { const d = M(box(0.07, 0.07, 0.07), toon('#ece9e2'), 11.3 + i * 0.12, 0.04, -8.6 + i * 0.05, scene); d.rotation.y = i; }
@@ -4175,7 +4205,7 @@ const CAST_LINES = {
 };
 // ---- the people ----
 function castNpc(name, style, wornExtra, x, z, face, opts) {
-  const b = aiBuild(opts && opts.ovr || 78, style); b.name = name; b.worn = Object.assign(randomWorn(2), wornExtra || {}); const n = addNpc(b, x, z, face, 'idle', Object.assign({ still: true }, opts || {}));
+  const b = blockBuild(name, style, wornExtra, opts && opts.ovr || 78);      /* the same face and fit every time, here and in the crowd at a game */ const n = addNpc(b, x, z, face, 'idle', Object.assign({ still: true }, opts || {}));
   n.cast = (opts && opts.cast) || name; return n;
 }
 function castInit() {
@@ -4186,15 +4216,15 @@ function castInit() {
   const nx = castNpc('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }, -10.2, -9.4, 0.6, { cast: 'nexx' }); nx.amb = 'phone';
   spot(-9.6, -8.6, 1.9, 'NEXX', () => uiNexx()); C.list.push(nx); C.nexx = nx;
   // MARK and D: by the cage fence, watching the run, Mark with money on it
-  const mk = castNpc('MARK', 'slasher', { top: 't_tee', head: 'hd_cap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
-  const dd = castNpc('D', 'glass', { head: 'hd_cap', face: 'f_shades' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
+  const mk = castNpc('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }, -4.3, -10.7, Math.PI, { cast: 'mark' }); mk.amb = 'cross'; C.list.push(mk); C.mark = mk;
+  const dd = castNpc('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }, -5.3, -11.0, Math.PI + 0.3, { cast: 'd' }); dd.amb = 'watch'; C.list.push(dd);
   spot(-4.8, -9.6, 1.6, 'MARK & D', () => uiDialog('MARK', pick(CAST_LINES.mark), [["MARK'S BOOK (bet on games)", () => uiBook()], ['Talk to D', () => uiDialog('D', pick(CAST_LINES.d), [['Later']])], ['Later']]));
   // AARON'S STAND (Erin, name masked): fresh food off the farm, by the cage on the other side
   { const g = grp(scene, 7.6, 0, -10.6); ink(M(box(2.2, 0.9, 0.8), toon('#7a5a3a'), 0, 0.45, 0, g), 1.03); M(box(2.3, 0.08, 0.9), toon('#4f8a3c'), 0, 0.93, 0, g);
     for (let i = 0; i < 9; i++) M(sph(0.07, 6, 5), toon(pick(['#e0452c', '#f2c14e', '#7ac74f', '#ff8a3c'])), -0.9 + (i % 5) * 0.42, 1.02, -0.18 + Math.floor(i / 5) * 0.3, g);
     for (const sx of [-1.05, 1.05]) M(cyl(0.03, 0.03, 1.4, 5), toon('#3a2a1a'), sx, 1.6, -0.3, g); M(box(2.4, 0.06, 1.0), toon('#4f8a3c'), 0, 2.3, -0.2, g);
     const sg = sign("AARON'S STAND", 1.8, 0.36, '#f2c14e', '#203a1a', { border: false }); sg.position.set(0, 2.05, 0.18); g.add(sg); solid(6.4, 8.8, -11.1, -10.1); }
-  const er = castNpc('AARON', 'general', { top: 't_tee' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
+  const er = castNpc('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
   spot(7.6, -9.4, 1.8, "AARON'S STAND", () => uiErin());
   // BOTTIE: chrome, dreads, puffer; films the run for the feed
   const bt = addNpc(bottieBuild(), 3.6, -10.9, Math.PI, 'idle', { still: true }); bt.cast = 'bottie';      /* his own body: chrome, dreads, puffer (vice.js) */ bt.amb = 'film'; C.list.push(bt);
@@ -4249,7 +4279,7 @@ function uiNexx() {
   const G = NEXX_GOALS[S.nexx.goal];
   uiDialog('NEXX', pick(NEXX_LINES), [
     ['RIDE', () => uiDialog('NEXX', "Seatbelt. I don't walk anywhere. Where to?", [['MY CRIB', () => { uiClose(); toast('NEXX DROPPED YOU OFF', '"Don\'t slam my door."'); enterWorld('crib', 0, 19.2, Math.PI); }], ['THE CAGES', () => { uiClose(); toast('NEXX DROPPED YOU OFF', '"Go cook."'); enterWorld('pit', 0, 3.4, Math.PI); }], ['Never mind']])],
-    [S.nexx.done ? 'CLIP POSTED TODAY' : 'CONTENT: ' + G[2].toUpperCase(), () => uiDialog('NEXX', S.nexx.done ? 'Clip did numbers. Come back tomorrow, I need new content.' : `I'm filming your next game. ${G[2]} and I post it. Views pay, bro: 200 VC and 60 Respect.`, [['Bet']]), '', S.nexx.done],
+    [S.nexx.done ? 'CLIP POSTED TODAY' : 'CONTENT: ' + G[2].toUpperCase(), () => uiDialog('NEXX', S.nexx.done ? 'Clip did numbers. Come back tomorrow, I need new content.' : `I'm filming your next game. ${G[2]} and I post it. Views pay, bro: 200 HC and 60 Respect.`, [['Bet']]), '', S.nexx.done],
     [S.nexx.wrap ? 'NO MORE WRAPS TODAY' : 'GOJI WRAP (free)', () => { S.nexx.wrap = true; S.boosts.push('goji'); save(); sfx('buy'); uiClose(); toast('GOJI BERRY WRAP', '+3 Speed, +3 Acceleration, +5 Stamina next game. "Antioxidants."'); }, '', S.nexx.wrap],
     ['MERCH', () => uiNexxMerch()],
     ['THE SERVER', () => { uiClose(); toast('NEXX', '"Join the Discord. I\'m in there 24/7."'); uiHomie(); }],
@@ -4259,18 +4289,18 @@ function uiNexx() {
 function uiNexxMerch() {
   const items = DRIP.filter(d => d.src === 'nexx');
   openPanel(() => `<div class="ph"><h2>NEXX SUPPLY</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"Designed it, printed it, posted it. Limited. Not really, I'll make more."</p>` + items.map(d => { const own = S.owned.includes(d.id), price = shopPrice(d.cost);
-    return `<div class="card"><h3>${d.n}</h3><p class="mu">${d.slot.toUpperCase()}${d.buff ? ' · ' + Object.entries(d.buff).map(([k, v]) => '+' + v + ' ' + k).join(', ') : ''}</p><div style="margin-top:6px">${own ? '<span class="tag on">OWNED</span> ' + Btn('WEAR', () => { S.worn[d.slot] = d.id; save(); if (W && W.me) worldPlayerRig(); sfx('ui'); rerender(); }, 'sm alt') : Btn(price + ' VC', () => { if (S.vc < price) { sfx('no'); return; } S.vc -= price; S.owned.push(d.id); save(); sfx('buy'); toast('NEXX SUPPLY', d.n + ' is yours.'); rerender(); }, 'sm', S.vc < price)}</div></div>`; }).join('') + `</div>`, 'side', () => uiClose());
+    return `<div class="card"><h3>${d.n}</h3><p class="mu">${d.slot.toUpperCase()}${d.buff ? ' · ' + Object.entries(d.buff).map(([k, v]) => '+' + v + ' ' + k).join(', ') : ''}</p><div style="margin-top:6px">${own ? '<span class="tag on">OWNED</span> ' + Btn('WEAR', () => { S.worn[d.slot] = d.id; save(); if (W && W.me) worldPlayerRig(); sfx('ui'); rerender(); }, 'sm alt') : Btn(price + ' HC', () => { if (S.vc < price) { sfx('no'); return; } S.vc -= price; S.owned.push(d.id); save(); sfx('buy'); toast('NEXX SUPPLY', d.n + ' is yours.'); rerender(); }, 'sm', S.vc < price)}</div></div>`; }).join('') + `</div>`, 'side', () => uiClose());
 }
 // NEXX's content: checked after every Cages game (main.js)
 function nexxCheck(res) {
   const N = S.nexx; if (!N || N.day !== dayKey() || N.done || res.quit || !res.stats) return null; const G = NEXX_GOALS[N.goal];
-  if ((res.stats[G[0]] || 0) >= G[1]) { N.done = true; return { vc: 200, rep: 60, note: `NEXX posted your clip: ${(5 + Math.random() * 40).toFixed(1)}K views (+200 VC, +60 Respect)` }; }
+  if ((res.stats[G[0]] || 0) >= G[1]) { N.done = true; return { vc: 200, rep: 60, note: `NEXX posted your clip: ${(5 + Math.random() * 40).toFixed(1)}K views (+200 HC, +60 Respect)` }; }
   return null;
 }
 // ---- AARON'S STAND ----
 function uiErin() {
   uiDialog('AARON', pick(CAST_LINES.erin), [
-    ['FARM SMOOTHIE (40 VC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("AARON'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
+    ['FARM SMOOTHIE (40 HC)', () => { if (S.vc < 40) { sfx('no'); return; } S.vc -= 40; S.boosts.push('smoothie'); save(); uiHud(); sfx('buy'); uiClose(); toast("AARON'S STAND", '+6 Stamina, +2 Strength next game. "A slow day is still a good day."'); }, '', S.vc < 40 || S.boosts.includes('smoothie')],
     ['Later'],
   ]);
 }
@@ -4291,7 +4321,7 @@ function uiKael() {
   const today = dayKey(), worked = S.kaelWork === today, beat = !!S.kaelBeat;
   uiDialog('BRENNICK · 88 OVR', pick(CAST_LINES.kael), [
     [beat ? 'RUN ONES (rematch)' : 'RUN ONES', () => runKael()],
-    [worked ? 'EARLY WORK: DONE TODAY' : 'EARLY WORK', () => { const cats = ['F', 'S', 'P', 'D'], c = pick(cats); S.kaelWork = today; S.bxp[c] += 40; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; toast('BADGE POINT', '+1 ' + CATS[c][0]); } save(); uiClose(); sfx('unlock'); toast('BRENNICK', '"Listen." +40 ' + CATS[c][0] + ' badge XP'); }, '', worked],
+    [worked ? 'EARLY WORK: DONE TODAY' : 'EARLY WORK', () => { const cats = ['F', 'S', 'P', 'D'], c = pick(cats); S.kaelWork = today; S.bxp[c] += 40; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; toast('SMARTS POINT', '+1 ' + CATS[c][0]); } save(); uiClose(); sfx('unlock'); toast('BRENNICK', '"Listen." +40 ' + CATS[c][0] + ' smarts XP'); }, '', worked],
     ['Later'],
   ]);
 }
@@ -4300,17 +4330,29 @@ function runKael() {
   const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: 77, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) { setTimeout(() => toast('BRENNICK', '"' + pick(CAST_LINES.kaelLose) + '"'), 1600); return null; }
     if (first) { S.kaelBeat = true; deedDrip('bk_washer', 'Beat Brennick'); const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
-    return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 VC' : 'Beat Brennick again +150 VC' }; };
+    return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 HC' : 'Beat Brennick again +150 HC' }; };
   cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
   save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
+}
+
+// ---- everybody on the Block, as people who can walk up to a game (courts.js): the same faces, the same names ----
+function blockBuild(name, style, worn, ovr, tier) { const b = withSeed(hashStr('block|' + name), () => aiBuild(ovr || 75, style)); b.name = name; b.worn = Object.assign(withSeed(hashStr('fit|' + name), () => randomWorn(tier === undefined ? 2 : tier)), worn || {}); b.keepLook = true; return b; }
+function blockRoster() {
+  const L = [blockBuild('NEXX', 'showman', { top: 't_nexx', head: 'hd_nexx', shoes: 'k_nexx' }), blockBuild('MARK', 'slasher', { top: 't_flowpros', head: 'hd_flowcap' }), blockBuild('D', 'glass', { head: 'hd_flowcap', face: 'f_derek', top: 't_flowpros' }),
+    blockBuild('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }), bottieBuild(), blockBuild('TREY', 'general', { head: 'hd_dedrick', face: 'f_shades', top: 't_gutter' }), kaelBuild(),
+    blockBuild('SHARPIE', 'sniper', {}), blockBuild('COACH OVERTIME', 'general', { head: 'hd_cap', top: 't_tee' }), blockBuild('OLD HEAD', 'general', { hair: 'h_bald', head: 'hd_band', face: 'f_goggles' }, 60), blockBuild('SOY DOG SAL', 'glass', { head: 'hd_cap', top: 't_patch' }, 55)];
+  for (let i = 0; i < LADDER.length; i++) L.push(ladderBuild(i));
+  BUM_NAMES.slice(0, 4).forEach(n => { const b = blockBuild(n, 'showman', {}, 50, 0); b.worn = Object.assign(b.worn, { top: 't_tank', bottom: 'b_camo', shoes: 'k_beat', back: 'bk_none' }); L.push(b); });
+  for (const h of (S.homies || [])) L.push(JSON.parse(JSON.stringify(h)));
+  return L;
 }
 // GOT NEXT — the bones and the book, Lil Bottie's body, and things to do at home.
 //   TREY'S BONES   dice games on grey holodice (the Wisp Table from Guttercrown, moved to the Block): Thirteen,
 //                  Twenty-One, Poker Bones, High Bones
-//   MARK'S BOOK    bet VC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
+//   MARK'S BOOK    bet HC on AI games: winner, spread, a star's points, parlays; then watch the game or sim it
 //   BOTTIE         a chrome robot body for the rig; lives at your crib as an upgrade
 //   HOME           cookouts, the heavy bag, trick shots, naps, bones at your own table
-// VC only. Both the table and the book stop paying out past a daily win limit, so neither is a way to max a build.
+// HC only. Both the table and the book stop paying out past a daily win limit, so neither is a way to max a build.
 'use strict';
 
 // ---------------- Lil Bottie's body ----------------
@@ -4371,7 +4413,7 @@ function vicePay(k, delta) { const V = vice(); S.vc += delta; V[k] += delta; V.n
 const TREY = {
   hello: ['Trey Dedrick, the Third. At your service and at your expense. Pick a game.', 'Another brave wallet. Sit. Well. Stand. There are no chairs.', 'The dice are honest. I am merely charming.'],
   bust: ['Over. Dreadful luck. I shall treasure it.', 'Bust! My grandfather would have wept. With joy.', 'Too many. The light giveth and so on.'],
-  win: ['Well rolled. I hate it. Here is your VC.', 'You win. I shall be gracious about it later, in private.', 'Splendid. Do it again so I can win it back.'],
+  win: ['Well rolled. I hate it. Here is your HC.', 'You win. I shall be gracious about it later, in private.', 'Splendid. Do it again so I can win it back.'],
   lose: ['The house prevails, as houses do.', 'Mine. Thank you ever so.', 'Unlucky. Lucky for me, which is the important bit.'],
   push: ['A draw. Your stake back, and my respect, which is worth less.', 'Even. Nobody is happy. Perfect.'],
   dead: ['DEAD ON. Triple! I shall need a moment.', 'Exactly the number. Triple, curse you.'],
@@ -4400,7 +4442,7 @@ function bonesSim(target, stand) { let y = 0; while (y < stand) y += d6(); if (y
 function holoHTML(v, o) { o = o || {}; return `<span data-k="${o.k === undefined ? '' : o.k}" style="display:inline-block;width:46px;margin:0 3px;text-align:center;cursor:${o.k === undefined ? 'default' : 'pointer'};opacity:${o.dim ? 0.45 : 1}"><span style="display:block;height:30px;font:900 22px var(--display,Archivo);color:${o.held ? '#3dffa0' : '#ffb347'};text-shadow:0 0 10px ${o.held ? '#3dffa0' : '#ff7a1f'}">${v || '·'}</span><span style="display:block;width:20px;height:10px;margin:0 auto;background:#0d0d10;border-radius:10px 10px 0 0"></span><span style="display:block;width:34px;height:6px;margin:0 auto;background:#5a3a22"></span><span style="display:block;width:24px;height:34px;margin:0 auto;background:linear-gradient(90deg,#7c828a,#a5abb3 45%,#8a9098)"></span><span style="display:block;width:28px;height:6px;margin:0 auto;background:#d5d9de"></span><span style="display:block;width:32px;height:7px;margin:0 auto;background:#3a3d44"></span></span>`; }
 function uiBones(home) {
   const G = { game: null, stake: home ? 25 : 50, phase: 'pick', you: [], him: [], hold: [], msg: pick(TREY.hello), pressed: false, bet: 0 };
-  const host = home ? 'HOUSE RULES' : 'TREY', stakes = home ? [10, 25, 50] : [25, 50, 100, 250], say = k => home ? ({ win: 'You win.', lose: 'The house takes it.', push: 'Push.', bust: 'Bust.', dead: 'DEAD ON. Triple.', roll: '', broke: 'Not enough VC.', capped: 'Enough for today.' }[k]) : pick(TREY[k]);
+  const host = home ? 'HOUSE RULES' : 'TREY', stakes = home ? [10, 25, 50] : [25, 50, 100, 250], say = k => home ? ({ win: 'You win.', lose: 'The house takes it.', push: 'Push.', bust: 'Bust.', dead: 'DEAD ON. Triple.', roll: '', broke: 'Not enough HC.', capped: 'Enough for today.' }[k]) : pick(TREY[k]);
   const sum = a => a.reduce((x, y) => x + y, 0);
   const settle = (res, mult) => { const win = res > 0 ? Math.round(G.bet * (mult || 1)) : res < 0 ? -G.bet : 0; vicePay('bones', win); G.phase = 'done'; G.res = res; G.won = win; sfx(res > 0 ? 'coin' : res < 0 ? 'no' : 'ui'); holoRollAll(); };
   const start = id => { if (S.vc < G.stake) { G.msg = say('broke'); return rerender(); } if (viceRoom('bones') <= 0) { G.msg = say('capped'); return rerender(); }
@@ -4427,25 +4469,25 @@ function uiBones(home) {
     bonesSync(G.phase === 'pick' ? [] : G.you, G.phase === 'pick' ? [] : G.him, G.game === 'poker' && G.phase === 'you' ? G.hold : null);
     const T = W.bones, pt = innerWidth < innerHeight; W.camO = { p: new THREE.Vector3(T.cx + 0.15, pt ? 5.2 : 3.0, T.cz + (pt ? 7.4 : 4.3)), l: new THREE.Vector3(T.cx, 0.15, T.cz + 0.75) };
     const tot = G.phase !== 'pick' && G.game !== 'poker' && G.you.length ? ` · YOU ${sum(G.you)}${G.him.length ? ' · TREY ' + sum(G.him) : ''}` : '';
-    let h = `<div style="flex:1"></div><div class="card sel" style="max-width:720px;margin:0 auto;width:100%"><div class="row"><h3 class="mono" style="font-size:10px;color:var(--heat)">TREY${G.phase !== 'pick' ? ' · ' + BONES[G.game].n + ' · ' + G.bet + ' VC' + tot : ''}</h3>${vcLine()}</div><p style="font-size:14px;margin:6px 0 8px">${esc(G.msg)}</p><div class="pf" style="flex-wrap:wrap;gap:6px">`;
+    let h = `<div style="flex:1"></div><div class="card sel" style="max-width:720px;margin:0 auto;width:100%"><div class="row"><h3 class="mono" style="font-size:10px;color:var(--heat)">TREY${G.phase !== 'pick' ? ' · ' + BONES[G.game].n + ' · ' + G.bet + ' HC' + tot : ''}</h3>${vcLine()}</div><p style="font-size:14px;margin:6px 0 8px">${esc(G.msg)}</p><div class="pf" style="flex-wrap:wrap;gap:6px">`;
     if (G.phase === 'pick') h += stakes.map(s => Btn(s + '', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join('') + Object.keys(BONES).map(id => Btn(BONES[id].n, () => start(id), 'sm', S.vc < G.stake)).join('') + Btn('LEAVE', uiClose, 'sm alt');
     else if (G.phase === 'you') h += (G.game === 'poker' ? G.you.map((v, i) => Btn((G.hold[i] ? 'KEEP ' : '') + v, () => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }, 'sm ' + (G.hold[i] ? '' : 'alt'))).join('') + Btn('THROW THE REST', () => act('throw'), 'sm') : G.game === 'high' ? Btn('STAND', () => act('stand'), 'sm') + Btn('PRESS (' + G.bet * 2 + ')', () => act('press'), 'sm alt', S.vc < G.bet * 2) : Btn('ROLL', () => act('roll'), 'sm') + Btn('STAND ON ' + sum(G.you), () => act('stand'), 'sm alt'));
-    else h += `<b class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin-right:8px">${G.won > 0 ? '+' + G.won : G.won} VC</b>` + Btn('AGAIN · ' + G.stake, () => start(G.game), 'sm', S.vc < G.stake) + Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'sm alt') + Btn('LEAVE', uiClose, 'sm alt');
+    else h += `<b class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin-right:8px">${G.won > 0 ? '+' + G.won : G.won} HC</b>` + Btn('AGAIN · ' + G.stake, () => start(G.game), 'sm', S.vc < G.stake) + Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'sm alt') + Btn('LEAVE', uiClose, 'sm alt');
     return h + `</div>${G.phase === 'pick' ? `<p class="mu" style="margin-top:6px;font-size:11px">${Object.values(BONES).map(b => b.n + ': ' + b.d).join(' ')}</p>` : ''}</div><div style="height:4%"></div>`;
   };
   openPanel(() => {
     if (!home && W && W.bones) return bar();
     const V = vice(); let h = `<div class="ph"><h2>${home ? 'BONES AT HOME' : "TREY'S BONES"}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><div class="card sel"><h3 class="mono" style="font-size:10px;color:var(--heat)">${host}</h3><p style="font-size:15px;margin:6px 0">${esc(G.msg)}</p></div>`;
     if (G.phase === 'pick') {
-      h += `<div class="cat">STAKE</div><div class="card">` + stakes.map(s => Btn(s + ' VC', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join(' ') + `</div><div class="cat">GAME</div>`;
-      for (const id in BONES) h += `<div class="card"><h3>${BONES[id].n}</h3><p class="mu">${BONES[id].d}</p><div style="margin-top:6px">${Btn('PLAY · ' + G.stake + ' VC', () => start(id), 'sm', S.vc < G.stake)}</div></div>`;
-      h += `<p class="mu">Today at the table: ${V.bones >= 0 ? '+' : ''}${V.bones} VC. The table stops paying once you are up ${VICE_CAP.bones} in a day.</p>`;
+      h += `<div class="cat">STAKE</div><div class="card">` + stakes.map(s => Btn(s + ' HC', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join(' ') + `</div><div class="cat">GAME</div>`;
+      for (const id in BONES) h += `<div class="card"><h3>${BONES[id].n}</h3><p class="mu">${BONES[id].d}</p><div style="margin-top:6px">${Btn('PLAY · ' + G.stake + ' HC', () => start(id), 'sm', S.vc < G.stake)}</div></div>`;
+      h += `<p class="mu">Today at the table: ${V.bones >= 0 ? '+' : ''}${V.bones} HC. The table stops paying once you are up ${VICE_CAP.bones} in a day.</p>`;
     } else {
       const B_ = BONES[G.game], tot = G.game === 'poker' ? '' : ` · ${sum(G.you)}`;
-      h += `<div class="cat">${B_.n} · ${G.bet} VC</div><div class="card"><p class="mono" style="font-size:10px">YOU${tot}</p><div style="margin:6px 0">` + G.you.map((v, i) => holoHTML(v, G.game === 'poker' && G.phase === 'you' ? { k: on(() => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }), held: G.hold[i] } : {})).join('') + `</div>`;
+      h += `<div class="cat">${B_.n} · ${G.bet} HC</div><div class="card"><p class="mono" style="font-size:10px">YOU${tot}</p><div style="margin:6px 0">` + G.you.map((v, i) => holoHTML(v, G.game === 'poker' && G.phase === 'you' ? { k: on(() => { G.hold[i] = !G.hold[i]; sfx('ui'); rerender(); }), held: G.hold[i] } : {})).join('') + `</div>`;
       h += `<p class="mono" style="font-size:10px;margin-top:8px">${home ? 'THE HOUSE' : 'TREY'}${G.him.length && G.game !== 'poker' ? ' · ' + sum(G.him) : ''}</p><div style="margin:6px 0">` + (G.him.length ? G.him.map(v => holoHTML(v)).join('') : holoHTML(0, { dim: true })) + `</div></div>`;
       if (G.phase === 'you') h += `<div class="pf">` + (G.game === 'poker' ? Btn('THROW THE REST', () => act('throw')) : G.game === 'high' ? Btn('STAND', () => act('stand')) + Btn('PRESS (' + G.bet * 2 + ')', () => act('press'), 'alt', S.vc < G.bet * 2) : Btn('ROLL', () => act('roll')) + Btn('STAND ON ' + sum(G.you), () => act('stand'), 'alt')) + `</div>`;
-      else h += `<p class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin:8px 0">${G.won > 0 ? '+' + G.won : G.won} VC</p><div class="pf">${Btn('AGAIN · ' + G.stake, () => start(G.game), '', S.vc < G.stake)}${Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'alt')}</div>`;
+      else h += `<p class="${G.won > 0 ? 'cy' : G.won < 0 ? 'warn' : 'mu'}" style="font-size:16px;margin:8px 0">${G.won > 0 ? '+' + G.won : G.won} HC</p><div class="pf">${Btn('AGAIN · ' + G.stake, () => start(G.game), '', S.vc < G.stake)}${Btn('OTHER GAMES', () => { G.phase = 'pick'; G.msg = say('roll') || 'Pick a game.'; rerender(); }, 'alt')}</div>`;
     }
     return h + `</div>`;
   }, !home && W && W.bones ? 'clear' : 'side', () => uiClose());
@@ -4482,7 +4524,7 @@ function bkSettle() {
   const B = book(), sl = B.slate.slip; if (!sl || sl.done) return; const gs = B.slate.games; if (sl.legs.some(L => !gs[L.g].res)) return;
   const won = sl.legs.every(L => bkLegWon(gs[L.g], L)); sl.done = true; sl.won = won; const pay = won ? Math.round(sl.stake * sl.odds) : 0; sl.pay = pay;
   if (won) { S.vc += pay; vice().book += pay; vice().net += pay; B.w++; B.net += pay - sl.stake; if (sl.legs.length >= 3) deedDrip('hd_bookie', 'Cashed a 3-leg parlay'); } else { B.l++; B.net -= sl.stake; }
-  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} VC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
+  save(); setTimeout(() => toast(won ? 'TICKET CASHED' : 'TICKET DEAD', won ? `+${pay} HC. Mark: "${pick(["I LET YOU HAVE ONE HIT. STRATEGY.", "READ MY REVIEWS, BRO. FIVE STARS."])}"` : 'Mark: "I HAD MONEY ON THAT, BRO." (Yours.)', won ? 'ach' : ''), 600);
 }
 function bkBuilds(t) { return t.ps.map(p => { const b = withSeed(p.seed, () => aiBuild(p.ovr, p.style)); b.name = p.n; return { b, ctrl: -1, ai: clamp((p.ovr - 50) / 45, 0.3, 1) }; }); }
 function bkWatch(gi) {
@@ -4507,14 +4549,14 @@ function uiBook() {
         for (const s of [0, 1]) h += `<div style="margin-top:4px"><span class="mono" style="font-size:10px">${esc(g.t[s].ps[0].n.toUpperCase())} PTS</span> ${Btn('OVER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 1), 'sm ' + sel('pr' + s, s, 1))} ${Btn('UNDER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 0), 'sm ' + sel('pr' + s, s, 0))} <span class="mu">1.87</span></div>`; }
       else if (!g.res) h += `<div style="margin-top:6px">${Btn('WATCH IT', () => bkWatch(g.id), 'sm')} ${Btn('SIM IT', () => { const r = bkSim(g); bkFinish(g.id, { sc: r.sc, star: [r.pts[0][0], r.pts[1][0]], sim: true }); sfx('ui'); rerender(); }, 'sm alt')}</div>`;
       h += `</div>`; }
-    if (sl) { h += `<div class="card sel"><h3>YOUR TICKET · ${sl.legs.length > 1 ? sl.legs.length + '-LEG PARLAY' : 'SINGLE'} · ${sl.stake} VC at ${sl.odds}</h3>` + sl.legs.map(L => { const g = SL.games[L.g], w = bkLegWon(g, L); return `<p>${w === null ? '○' : w ? '<span class="cy">✔</span>' : '<span class="warn">✘</span>'} ${esc(bkLegLabel(g, L))} <span class="mu">${bkLegOdds(g, L)}</span></p>`; }).join('') + (sl.done ? `<p class="${sl.won ? 'cy' : 'warn'}" style="font-size:16px;margin-top:6px">${sl.won ? 'CASHED: +' + sl.pay + ' VC' : 'DEAD TICKET'}</p>` : `<p class="mu" style="margin-top:6px">Pays ${Math.round(sl.stake * sl.odds)} VC if every pick hits.</p>`) + `</div>`;
+    if (sl) { h += `<div class="card sel"><h3>YOUR TICKET · ${sl.legs.length > 1 ? sl.legs.length + '-LEG PARLAY' : 'SINGLE'} · ${sl.stake} HC at ${sl.odds}</h3>` + sl.legs.map(L => { const g = SL.games[L.g], w = bkLegWon(g, L); return `<p>${w === null ? '○' : w ? '<span class="cy">✔</span>' : '<span class="warn">✘</span>'} ${esc(bkLegLabel(g, L))} <span class="mu">${bkLegOdds(g, L)}</span></p>`; }).join('') + (sl.done ? `<p class="${sl.won ? 'cy' : 'warn'}" style="font-size:16px;margin-top:6px">${sl.won ? 'CASHED: +' + sl.pay + ' HC' : 'DEAD TICKET'}</p>` : `<p class="mu" style="margin-top:6px">Pays ${Math.round(sl.stake * sl.odds)} HC if every pick hits.</p>`) + `</div>`;
       if (sl.done || SL.games.every(g => g.res)) h += Btn('NEW SLATE', () => { B.slate = bkSlate(); save(); sfx('uiok'); st.legs = []; rerender(true); }); }
     else if (SL.games.every(g => g.res)) h += Btn('NEW SLATE', () => { B.slate = bkSlate(); save(); rerender(true); });
     else { const o = odds(), room = viceRoom('book'), maxPay = Math.round(st.stake * o), okStake = S.vc >= st.stake, capped = room <= 0;
       h += `<div class="card sel"><h3>BET SLIP${st.legs.length > 1 ? ' · ' + st.legs.length + '-LEG PARLAY' : ''}</h3>` + (st.legs.length ? st.legs.map(L => `<p>${esc(bkLegLabel(SL.games[L.g], L))} <span class="mu">${bkLegOdds(SL.games[L.g], L)}</span></p>`).join('') : '<p class="mu">Nothing picked yet.</p>')
         + `<div style="margin-top:6px">${[25, 50, 100, 250, 500].map(s => Btn(s + '', () => { st.stake = s; rerender(); }, 'sm ' + (st.stake === s ? '' : 'alt'))).join(' ')}</div>`
-        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} VC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'MARK IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' VC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
-    h += `<p class="mu">Your record with Mark: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} VC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
+        + (st.legs.length ? `<p style="margin-top:6px">Odds <b>${o}</b> · pays <b class="cy">${maxPay} HC</b></p>` : '') + `<div style="margin-top:6px">${Btn(capped ? 'MARK IS TAPPED OUT TODAY' : 'PLACE IT · ' + st.stake + ' HC', () => { S.vc -= st.stake; vice().book -= st.stake; vice().net -= st.stake; SL.slip = { legs: st.legs.map(L => ({ g: L.g, k: L.k.slice(0, 2), s: L.s, o: L.o })), stake: st.stake, odds: o, done: false }; save(); uiHud(); sfx('buy'); rerender(true); }, '', !st.legs.length || !okStake || capped)}</div></div>`; }
+    h += `<p class="mu">Your record with Mark: ${B.w}-${B.l}, ${B.net >= 0 ? '+' : ''}${B.net} HC. Today: ${V.book >= 0 ? '+' : ''}${V.book}. He stops taking bets once you are up ${VICE_CAP.book} in a day.</p>`;
     return h + `</div>`;
   }, 'side', () => uiClose());
 }
@@ -4545,7 +4587,7 @@ function uiBottieHome() {
   const bar = pick(BOT_BARS).replace('{n}', S.name).replace('{d}', L.dunks || 0).replace('{a}', L.ankles || 0).replace('{g}', L.greens || 0).replace('{w}', L.wins || 0).replace('{p}', L.pts || 0);
   uiDialog('BOTTIE', pick(CAST_LINES.bottie), [
     [did('track') ? 'TRACK DROPPED TODAY' : 'DROP A TRACK', () => { H.used.bot_track = today; const r = t > 1 ? 35 : 20; gainRep(r); save(); sfx('unlock'); uiDialog('BOTTIE', bar, [['+' + r + ' Respect']]); }, '', did('track')],
-    [did('post') ? 'POSTED TODAY' : 'POST TO THE FEED', () => { H.used.bot_post = today; const v = t > 1 ? 180 : 80; S.vc += v; save(); sfx('coin'); uiClose(); toast('THE FEED', `"BZZT. THIS IS GOING ON THE FEED." +${v} VC`); }, '', did('post')],
+    [did('post') ? 'POSTED TODAY' : 'POST TO THE FEED', () => { H.used.bot_post = today; const v = t > 1 ? 180 : 80; S.vc += v; save(); sfx('coin'); uiClose(); toast('THE FEED', `"BZZT. THIS IS GOING ON THE FEED." +${v} HC`); }, '', did('post')],
     ['Later'],
   ]);
 }
@@ -4556,10 +4598,10 @@ function homeUse2(k, done) {
   if (done) return toast(nm, 'Once a day. Come back tomorrow.');
   H.used[k] = today;
   if (k === 'grill') { gainRep(20); W.party = true; for (const n of W.npcs) if (n.homie || n.visitor) n.anim = 'dance'; toast('COOKOUT', 'Soy burgers for the block. +20 Respect, and everybody on the lot is dancing.'); sfx('unlock'); }
-  else if (k === 'bag') { S.bxp.P += 25; while (S.bxp.P >= 100) { S.bxp.P -= 100; S.bp.P++; } toast('HEAVY BAG', 'Hand speed. +25 Playmaking badge XP.'); sfx('bump'); }
+  else if (k === 'bag') { S.bxp.P += 25; while (S.bxp.P >= 100) { S.bxp.P -= 100; S.bp.P++; } toast('HEAVY BAG', 'Hand speed. +25 Playmaking smarts XP.'); sfx('bump'); }
   else if (k === 'bed') { S.boosts.push('nap'); toast('NAP', 'Slept like a subscription you forgot about. +8 Stamina next game.'); sfx('coin'); }
   else if (k === 'minihoop') { const ch = clamp(0.3 + ((S.attrs.three || 50) + (S.attrs.mid || 50)) / 500, 0.3, 0.7); let m = 0; const shots = [0, 0, 0].map(() => { const ok = Math.random() < ch; if (ok) m++; return ok ? 'SPLASH' : 'brick'; }); const v = m * 30 + (m === 3 ? 60 : 0); S.vc += v;
-    uiDialog('TRICK SHOT', `Off the fence, off the roof, off the fridge: ${shots.join(' · ')}.` + (m === 3 ? ' Three for three.' : ''), [[v ? '+' + v + ' VC' : 'Tomorrow, then']]); sfx(m ? 'swish' : 'rim'); }
+    uiDialog('TRICK SHOT', `Off the fence, off the roof, off the fridge: ${shots.join(' · ')}.` + (m === 3 ? ' Three for three.' : ''), [[v ? '+' + v + ' HC' : 'Tomorrow, then']]); sfx(m ? 'swish' : 'rim'); }
   save();
 }
 // GOT NEXT — My Crib: the lot, the house, the street, and the home builder.
@@ -4584,25 +4626,25 @@ const LOOK_COST = { house: 300, trim: 150, fence: 400, ground: 500 };
 // crib levels: total Vibe needed, and what each level gives (k/v work like the crib upgrades)
 const HOME_LEVELS = [0, 10, 25, 45, 70, 100, 140, 190, 250, 330];
 const HOME_PERKS = [
-  { lvl: 2, n: 'Lived-In', d: '+3% VC from games.', k: 'vc', v: 0.03 },
+  { lvl: 2, n: 'Lived-In', d: '+3% HC from games.', k: 'vc', v: 0.03 },
   { lvl: 3, n: 'Homies Hang Out', d: 'Your homies come by and use your stuff. +3% Respect.', k: 'rep', v: 0.03 },
   { lvl: 4, n: 'Neighbors Notice', d: 'Neighbors drop in. +2 Stamina in games.', k: 'a_stam', v: 2 },
-  { lvl: 5, n: 'Block Favorite', d: '+5% VC from games.', k: 'vc', v: 0.05 },
+  { lvl: 5, n: 'Block Favorite', d: '+5% HC from games.', k: 'vc', v: 0.05 },
   { lvl: 6, n: 'Party House', d: 'With music placed, people dance. Start games with 10% Bravado.', k: 'brav', v: 0.10 },
   { lvl: 7, n: 'Local Landmark', d: '+1 to every attribute in games.', k: 'all', v: 1 },
-  { lvl: 8, n: 'Tour Stop', d: 'Tourists pay 60 VC a day to look at your crib (on your first visit each day).', k: 'tour', v: 60 },
+  { lvl: 8, n: 'Tour Stop', d: 'Tourists pay 60 HC a day to look at your crib (on your first visit each day).', k: 'tour', v: 60 },
   { lvl: 9, n: 'Legendary', d: '+6% Respect from games.', k: 'rep', v: 0.06 },
   { lvl: 10, n: 'Kingdom', d: 'Your crib is on The Block\'s billboard. +1 more to every attribute.', k: 'all', v: 1 },
 ];
 const HOME_SETS = [
   { id: 'cookout', n: 'COOKOUT', items: ['grill', 'cooler', 'picnic', 'speaker'], d: '+4 Stamina in games.', k: 'a_stam', v: 4 },
   { id: 'arcade', n: 'ARCADE NIGHT', items: ['arcade', 'beanbag', 'lava', 'tv'], d: 'Green window +2% everywhere.', k: 'green', v: 0.02 },
-  { id: 'museum', n: 'SNEAKER MUSEUM', items: ['kicks', 'case', 'spot', 'mirror'], d: '+5% VC from games.', k: 'vc', v: 0.05 },
+  { id: 'museum', n: 'SNEAKER MUSEUM', items: ['kicks', 'case', 'spot', 'mirror'], d: '+5% HC from games.', k: 'vc', v: 0.05 },
   { id: 'iron', n: 'IRON PARADISE', items: ['weights', 'bpress', 'bag', 'tires'], d: '+3 Strength in games.', k: 'a_str', v: 3 },
   { id: 'barber', n: 'BARBERSHOP SATURDAY', items: ['barber', 'mirror', 'bench', 'boombox'], d: '+5% Respect from games.', k: 'rep', v: 0.05 },
   { id: 'garden', n: 'GARDEN OF EDEN', items: ['planter', 'palm', 'hedge', 'gnome'], d: 'Fiends ask for 20% less. They feel at peace.', k: 'bum', v: 0.2 },
   { id: 'party', n: 'BLOCK PARTY', items: ['dj', 'speaker', 'strings', 'fire'], d: 'Start games with 15% more Bravado.', k: 'brav', v: 0.15 },
-  { id: 'hoops', n: 'HOOP HEAVEN', items: ['rack', 'minihoop', 'shotclock', 'cones'], d: '+10% Shooting badge XP.', k: 'bxS', v: 0.10 },
+  { id: 'hoops', n: 'HOOP HEAVEN', items: ['rack', 'minihoop', 'shotclock', 'cones'], d: '+10% Shooting smarts XP.', k: 'bxS', v: 0.10 },
 ];
 // ---------- the catalog ----------
 // w, d: footprint (metres) facing +z; v: Vibe; use: what pressing E next to it does; floor: lies flat, things can sit on it
@@ -4694,6 +4736,25 @@ hitem('bed', 'seat', 'King Bed', 1100, 1, 2.0, 2.4, { comfort: 8 }, g => { _B(g,
 hitem('records', 'tech', 'Record Shelf', 450, 0, 1.4, 0.45, { party: 3, drip: 1 }, g => { _B(g, 1.35, 1.0, 0.4, '#5a4030', 0, 0.5); for (let r = 0; r < 2; r++) for (let i = 0; i < 9; i++) M(box(0.02, 0.32, 0.3), toon(pick(['#e04848', '#2440a8', '#f2c14e', '#16181c', '#ece9e2', '#3dffa0'])), -0.55 + i * 0.13, 0.25 + r * 0.45, 0.02, g); M(cyl(0.18, 0.18, 0.04, 16), toon('#16181c'), 0.3, 1.04, 0, g); }, { top: 1.02 });
 hitem('flamp', 'light', 'Arc Floor Lamp', 380, 0, 0.6, 0.6, { comfort: 2 }, g => { _C(g, 0.22, 0.25, 0.06, '#16181c', 0, 0.03); const a = M(cyl(0.025, 0.025, 2.0, 6), toon('#c8d0d8'), 0, 1.0, 0, g); void a; M(cyl(0.025, 0.025, 0.9, 6), toon('#c8d0d8'), 0.38, 1.95, 0, g).rotation.z = -1.2; M(geo('shade', () => new THREE.ConeGeometry(0.22, 0.24, 12, 1, true)), toon('#f2c14e'), 0.8, 1.72, 0, g).material.side = THREE.DoubleSide; glow(0.8, 1.6, 0, 0xffd8a0, 1.8, g, 0.7); }, { beam: [0xffd8a0, 1.6, 1.4] });
 hitem('poster', 'wall', 'Framed Poster', 140, 0, 1.0, 0.2, { drip: 2 }, g => { const t = geoTex('pst', () => canvasTex(128, 160, (x, w, h) => { x.fillStyle = '#1a1030'; x.fillRect(0, 0, w, h); x.fillStyle = '#ff2d78'; x.font = '900 34px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.fillText('GOT', w / 2, 60); x.fillStyle = '#7de3ff'; x.fillText('NEXT', w / 2, 100); x.fillStyle = '#f2c14e'; x.font = '700 12px monospace'; x.fillText('RUN 01', w / 2, 140); })); _B(g, 0.06, 1.4, 0.06, '#16181c', 0, 0.7, -0.05); _B(g, 0.85, 1.05, 0.05, '#16181c', 0, 1.65, 0); M(new THREE.PlaneGeometry(0.75, 0.95), new THREE.MeshBasicMaterial({ map: t }), 0, 1.65, 0.03, g); });
+// ---- branded pieces: this game, and the crew's other ones ----
+const _S = (g, text, w, h, fg, bg, x, y, z) => { const s = sign(text, w, h, fg, bg, { border: false }); s.position.set(x || 0, y, z || 0.03); g.add(s); return s; };
+hitem('gnneon', 'light', 'GOT NEXT Neon', 1600, 2, 2.4, 0.4, { party: 4, drip: 4 }, g => { for (const sx of [-1, 1]) _B(g, 0.08, 1.4, 0.08, '#20242c', sx * 1.0, 0.7); _S(g, 'GOT NEXT', 2.3, 0.7, '#ff2d78', '#0a0a0e', 0, 1.7); });
+hitem('ruckusled', 'light', 'RUCKUS LED Strip', 900, 2, 2.0, 0.2, { party: 4, tech: 2 }, g => { _B(g, 2.0, 0.06, 0.12, '#16181c', 0, 0.03); for (let i = 0; i < 8; i++) M(box(0.18, 0.05, 0.08), flat(i % 2 ? 0x33e0ff : 0xff4fd8), -0.84 + i * 0.24, 0.08, 0, g); });
+hitem('treysign', 'light', "TREY'S BONES Sign", 1200, 2, 2.0, 0.4, { party: 3, drip: 2 }, g => { for (const sx of [-1, 1]) _B(g, 0.06, 1.6, 0.06, '#2a2c33', sx * 0.9, 0.8); _S(g, "TREY'S BONES", 2.0, 0.4, '#ffb347', '#0a0a0e', 0, 1.8); });
+hitem('cageflag', 'wall', 'The Cages Banner', 500, 1, 1.6, 0.2, { drip: 3, hoops: 2 }, g => { _B(g, 1.6, 0.06, 0.06, '#2a2c33', 0, 2.2); ink(M(box(1.5, 1.1, 0.03), toon('#16181c'), 0, 1.6, 0, g), 1.02); _S(g, 'THE CAGES', 1.4, 0.34, '#ece9e2', '#16181c', 0, 1.75); _S(g, 'WINNERS STAY', 1.2, 0.2, '#ff2d78', '#16181c', 0, 1.35); });
+hitem('hcvault', 'show', 'HC Vault', 15000, 5, 1.2, 1.0, { drip: 14, tech: 3 }, g => { _B(g, 1.1, 1.4, 0.9, '#3a3d44'); M(cyl(0.3, 0.3, 0.06, 16), toon('#f2c14e'), 0, 0.8, 0.47, g).rotation.x = Math.PI / 2; _S(g, 'HC', 0.4, 0.26, '#16181c', '#f2c14e', 0, 0.8, 0.51); for (const a of [0, 1.57]) { const sp = M(box(0.5, 0.05, 0.03), toon('#c8d0d8'), 0, 0.8, 0.5, g); sp.rotation.z = a; } });
+hitem('lanterncab', 'tech', 'Pocket Lantern Cabinet', 2400, 2, 0.8, 0.8, { tech: 6, party: 2 }, g => { _B(g, 0.75, 1.8, 0.7, '#1c2440'); M(box(0.55, 0.42, 0.03), flat(0xffd76a), 0, 1.3, 0.36, g); _B(g, 0.75, 0.1, 0.35, '#16181c', 0, 0.95, 0.4); _S(g, 'POCKET LANTERN', 0.7, 0.16, '#ffd76a', '#1c2440', 0, 1.68, 0.36); }, { use: 'arcade' });
+hitem('wisptable', 'tech', 'The Wisp Table (Guttercrown)', 3200, 3, 1.8, 1.0, { tech: 4, party: 5, drip: 2 }, g => { _B(g, 1.7, 0.1, 0.9, '#1f6a3a', 0, 0.85); for (const sx of [-0.7, 0.7]) for (const sz of [-0.35, 0.35]) _B(g, 0.1, 0.8, 0.1, '#3a2a1c', sx, 0.4, sz); for (let i = 0; i < 4; i++) M(box(0.1, 0.1, 0.1), flat(0x6cf0ff, { transparent: true, opacity: 0.75 }), -0.45 + i * 0.3, 0.97, 0.05 * (i % 2 ? 1 : -1), g).rotation.y = i; });
+hitem('gutterthrone', 'seat', 'Guttercrown Throne', 6500, 4, 1.0, 1.0, { comfort: 5, drip: 9 }, g => { _B(g, 0.8, 0.14, 0.8, '#26204a', 0, 0.5); _B(g, 0.8, 1.6, 0.14, '#26204a', 0, 1.3, -0.33); for (const sx of [-0.4, 0.4]) _B(g, 0.1, 0.5, 0.7, '#f0c95a', sx, 0.75); for (const sx of [-0.25, 0, 0.25]) M(geo('thrSp', () => new THREE.ConeGeometry(0.07, 0.24, 4)), toon('#f0c95a'), sx, 2.2, -0.33, g); }, { sit: 0.57 });
+hitem('valvebank', 'show', 'Bank Seven Valve Wall (Sootborn)', 2800, 3, 2.0, 0.5, { tech: 5, drip: 4 }, g => { ink(M(box(2.0, 1.8, 0.2), toon('#2b2b30'), 0, 0.9, -0.1, g), 1.02); for (let i = 0; i < 4; i++) { const p = M(cyl(0.05, 0.05, 1.6, 8), toon('#5a3a22'), -0.75 + i * 0.5, 0.9, 0.05, g); void p; const w = M(geo('valveW', () => new THREE.TorusGeometry(0.12, 0.025, 6, 12)), toon(i === 2 ? '#b8682a' : '#8f959d'), -0.75 + i * 0.5, 1.0 + (i % 2) * 0.3, 0.12, g); void w; } _S(g, 'AUX-9', 0.4, 0.14, '#b8682a', '#2b2b30', 0.7, 1.65, 0.02); });
+hitem('sunkeepbed', 'food', 'Sunkeep Planter Bed', 650, 1, 1.6, 0.8, { comfort: 3, party: 1 }, g => { _B(g, 1.6, 0.35, 0.8, '#6b4a2e'); _B(g, 1.5, 0.06, 0.7, '#3a2a1a', 0, 0.36); for (let i = 0; i < 6; i++) { M(cyl(0.015, 0.02, 0.3, 5), toon('#4f8a3c'), -0.6 + (i % 3) * 0.6, 0.52, -0.18 + Math.floor(i / 3) * 0.36, g); M(sph(0.07, 6, 5), toon(['#e0452c', '#f2c14e', '#ff8a3c'][i % 3]), -0.6 + (i % 3) * 0.6, 0.7, -0.18 + Math.floor(i / 3) * 0.36, g); } });
+hitem('sproutpot', 'food', 'Potted Sprout (Sproutwild)', 280, 0, 0.5, 0.5, { comfort: 2 }, g => { _C(g, 0.16, 0.12, 0.26, '#c8482c'); M(cyl(0.02, 0.02, 0.22, 5), toon('#7ac74f'), 0, 0.36, 0, g); for (const sx of [-1, 1]) { const l = M(sph(0.08, 6, 5), toon('#7ac74f'), sx * 0.07, 0.5, 0, g); l.scale.set(1, 0.4, 0.6); } M(sph(0.016, 5, 4), flat(0x16181c), -0.03, 0.42, 0.03, g); M(sph(0.016, 5, 4), flat(0x16181c), 0.03, 0.42, 0.03, g); }, { small: 1 });
+hitem('kobell', 'gym', 'Knockout Ring Bell', 800, 1, 0.5, 0.5, { hoops: 2, party: 3 }, g => { _B(g, 0.4, 0.9, 0.06, '#3a2a1c', 0, 0.45, -0.1); M(sph(0.16, 10, 8), toon('#f2c14e'), 0, 0.75, 0.04, g).scale.set(1, 0.7, 0.5); M(box(0.04, 0.18, 0.04), toon('#16181c'), 0.16, 0.55, 0.08, g); });
+hitem('koposter', 'wall', 'North Coast Knockout Fight Poster', 380, 0, 1.0, 0.2, { drip: 3 }, g => { ink(M(box(0.95, 1.3, 0.04), toon('#c8102e'), 0, 1.5, 0, g), 1.03); _S(g, 'KNOCKOUT', 0.85, 0.24, '#f4f4f4', '#c8102e', 0, 1.9); _S(g, 'NORTH COAST', 0.7, 0.14, '#f2c14e', '#c8102e', 0, 2.08); _S(g, 'MARCUS vs EVERYBODY', 0.85, 0.12, '#16181c', '#f4f4f4', 0, 1.05); });
+hitem('flowvan', 'yard', 'Flow Pros Van (Dead. Again.)', 5200, 3, 4.2, 2.0, { drip: 6, party: 3 }, g => { ink(M(box(4.0, 1.5, 1.8), toon('#2a5ea8'), 0, 1.0, 0, g), 1.02); ink(M(box(1.0, 0.9, 1.7), toon('#16181c'), 1.45, 1.35, 0, g), 1.02); for (const sx of [-1.3, 1.3]) for (const sz of [-0.9, 0.9]) M(cyl(0.34, 0.34, 0.25, 12), toon('#16181c'), sx, 0.3, sz, g).rotation.x = Math.PI / 2; const s1 = _S(g, 'FLOW PROS', 2.2, 0.5, '#f2c14e', '#2a5ea8', -0.4, 1.15, 0.92); void s1; const s2 = _S(g, 'I HAVE A GUY', 1.6, 0.2, '#f4f4f4', '#2a5ea8', -0.4, 0.7, 0.92); void s2; });
+hitem('louiebed', 'seat', "Louie's Bed", 450, 0, 0.9, 0.7, { comfort: 4 }, g => { ink(M(cyl(0.42, 0.45, 0.16, 14), toon('#d9853b'), 0, 0.08, 0, g), 1.03).scale.z = 0.75; M(cyl(0.32, 0.32, 0.06, 14), toon('#f3e6cf'), 0, 0.16, 0, g).scale.z = 0.72; M(sph(0.06, 6, 5), toon('#e0452c'), 0.2, 0.22, 0.1, g); });
+hitem('nexxrack', 'show', 'NEXX SUPPLY Merch Rack', 2200, 2, 1.6, 0.6, { drip: 8 }, g => { for (const sx of [-0.7, 0.7]) _B(g, 0.05, 1.7, 0.05, '#c8d0d8', sx, 0.85); _B(g, 1.45, 0.04, 0.04, '#c8d0d8', 0, 1.68); ['#111216', '#7de3ff', '#111216', '#ff2d78', '#7de3ff'].forEach((c, i) => ink(M(box(0.24, 0.6, 0.08), toon(c), -0.52 + i * 0.26, 1.3, 0, g), 1.03)); _S(g, 'NEXX', 0.6, 0.18, '#7de3ff', '#0a0a0e', 0, 1.85); });
+hitem('bottiespeaker', 'tech', "Bottie's Tower Speaker", 1800, 2, 0.6, 0.6, { party: 6, tech: 3 }, g => { _B(g, 0.5, 1.6, 0.5, '#c3ccd6'); for (const y of [0.45, 1.1]) M(cyl(0.17, 0.17, 0.04, 14), toon('#16181c'), 0, y, 0.26, g).rotation.x = Math.PI / 2; M(box(0.4, 0.06, 0.02), flat(0xff2d78), 0, 1.5, 0.26, g); });
 hitem('holodice', 'tech', 'Holodice', 900, 2, 0.6, 0.6, { tech: 3, party: 3 }, g => { holodiceMesh(g); }, { use: 'holodice' });
 const HOME_ITEM = {}; HOME_ITEMS.forEach(i => HOME_ITEM[i.id] = i);
 const RARES = HOME_ITEMS.filter(i => i.rare);
@@ -4851,7 +4912,7 @@ function buildCrib() {
   pigeons(-6, 27, 5); pigeons(15, 19, 4); litter(10, -24, 24, 24.6, 30.4); skyLife(70, 'MORTGAGES FOR MINORS · ASK US'); W.weather = weather();
   chatter(W.npcs, n => n.homie ? CHAT.homie : n.talk ? CHAT[n.talk] : CHAT.neighbor);
   // first visit of the day at a Tour Stop crib: tourists paid to look
-  if (!V && homeFx('tour') && S.home.tour !== dayKey()) { S.home.tour = dayKey(); S.vc += homeFx('tour'); save(); setTimeout(() => toast('CRIB TOURS', `Tourists paid ${homeFx('tour')} VC to look at your crib today.`, 'ach'), 1200); }
+  if (!V && homeFx('tour') && S.home.tour !== dayKey()) { S.home.tour = dayKey(); S.vc += homeFx('tour'); save(); setTimeout(() => toast('CRIB TOURS', `Tourists paid ${homeFx('tour')} HC to look at your crib today.`, 'ach'), 1200); }
   W.bounds = [-23.4, 23.4, -2.9, 23.2]; W.camBox = [-24, 24, -3.4, 30];
 }
 // ---------- inside the house ----------
@@ -4933,7 +4994,7 @@ function homeUse(k, it) {
   if (W.visit && k !== 'dj' && k !== 'tv' && k !== 'arcade') return toast('NOT YOUR CRIB', 'Ask ' + W.visit.name + ' first.');
   const H = home(), today = dayKey(), done = H.used[k] === today;
   if (k === 'fridge') { if (done) return toast('FRIDGE', 'Empty until tomorrow. Somebody ate the last soy dog.'); H.used[k] = today; S.boosts.push('dog'); save(); toast('YARD FRIDGE', 'Soy dog loaded: +4 Stamina next game.'); sfx('coin'); }
-  else if (k === 'weights' || k === 'bpress') { if (done) return toast('ALREADY LIFTED', 'Your arms filed a complaint. Come back tomorrow.'); H.used[k] = today; const c = k === 'weights' ? 'F' : 'D'; S.bxp[c] += 30; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; } save(); toast(k === 'weights' ? 'LEG DAY' : 'CHEST DAY', `+30 ${CATS[c][0]} badge XP.`); sfx('uiok'); }
+  else if (k === 'weights' || k === 'bpress') { if (done) return toast('ALREADY LIFTED', 'Your arms filed a complaint. Come back tomorrow.'); H.used[k] = today; const c = k === 'weights' ? 'F' : 'D'; S.bxp[c] += 30; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; } save(); toast(k === 'weights' ? 'LEG DAY' : 'CHEST DAY', `+30 ${CATS[c][0]} smarts XP.`); sfx('uiok'); }
   else if (k === 'tv') { const L = S.life || {}; uiDialog('HIGHLIGHTS', `Your career so far: ${L.games || 0} games, ${L.wins || 0} wins, ${L.pts || 0} points, ${L.dunks || 0} dunks, ${L.ankles || 0} ankles broken, ${L.greens || 0} greens. The commentator calls you "a real person who exists".`, [['Nice', null]]); }
   else if (k === 'arcade') uiDialog('BASKETBALL 2146 (DEMO DISC)', 'It is a 40 minute loading screen, then a menu asking you to pre-order the full game. You beat your high score of 0.', [['Again', null], ['Walk away', null, 'alt']]);
   else if (k === 'dj') { W.party = !W.party; for (const n of W.npcs) if (n.homie || n.visitor) n.anim = W.party ? 'dance' : n.anim0; toast(W.party ? 'SET STARTED' : 'SET OVER', W.party ? 'Everybody on the lot is dancing.' : 'Back to regular hanging out.'); sfx('uiok'); }
@@ -5021,7 +5082,7 @@ function buildPlace() {
   const B = W.build, H = home(); if (!B.sel) { const k = buildItemAt(B.x, B.z); if (k >= 0) buildPickUp(k); return; }
   const why = buildFits(B.sel, B.x, B.z, B.rot, B.pick === null ? undefined : -1); if (why) { toast("CAN'T PUT THAT THERE", why); sfx('no'); return; }
   const d = HOME_ITEM[B.sel];
-  if (B.pick === null) { if ((H.store[B.sel] || 0) > 0) H.store[B.sel]--; else { if (S.vc < d.cost) { toast('NOT ENOUGH VC', `${d.n} costs ${d.cost} VC.`); sfx('no'); return; } S.vc -= d.cost; } }
+  if (B.pick === null) { if ((H.store[B.sel] || 0) > 0) H.store[B.sel]--; else { if (S.vc < d.cost) { toast('NOT ENOUGH HC', `${d.n} costs ${d.cost} HC.`); sfx('no'); return; } S.vc -= d.cost; } }
   const lv0 = homeLevel().lvl, sets0 = homeSets().filter(s => s.done).length;
   if (HOME_ITEM[B.sel].rare && B.pick === null && !(H.store[B.sel] > 0) && rareToday().id !== B.sel) { toast('NOT TODAY', 'That rare is only sold on its day.'); return; }
   const t = HOME_ITEM[B.sel].small ? topUnder(itemRect({ i: B.sel, x: B.x, z: B.z, r: B.rot })) : null;
@@ -5036,18 +5097,18 @@ function buildPickUp(k) { const B = W.build, H = home(), it0 = homeList()[k];
   const it = homeList().splice(k, 1)[0]; buildHomeItems(); buildGhost(it.i); B.rot = it.r; B.pick = it; B.x = it.x; B.z = it.z; sfx('ui'); buildPanel(); }
 function buildCancel() { const B = W.build; if (B.pick) { homeList().push(B.pick); B.pick = null; buildHomeItems(); } buildGhost(null); buildPanel(); }
 function buildStore() { const B = W.build, H = home(); if (B.pick) { H.store[B.pick.i] = (H.store[B.pick.i] || 0) + 1; toast('STORED', HOME_ITEM[B.pick.i].n + ' is in storage.'); B.pick = null; buildGhost(null); save(); buildPanel(); return; } const k = buildItemAt(B.x, B.z); if (k >= 0) { const it = homeList().splice(k, 1)[0]; H.store[it.i] = (H.store[it.i] || 0) + 1; buildHomeItems(); save(); toast('STORED', HOME_ITEM[it.i].n + ' is in storage.'); buildPanel(); } }
-function buildSell() { const B = W.build, H = home(); let id = null; if (B.pick) { id = B.pick.i; B.pick = null; buildGhost(null); } else { const k = buildItemAt(B.x, B.z); if (k >= 0) { id = homeList().splice(k, 1)[0].i; buildHomeItems(); } } if (!id) return; const v = Math.round(HOME_ITEM[id].cost * 0.5); S.vc += v; save(); uiHud(); toast('SOLD', `${HOME_ITEM[id].n} for ${v} VC.`); sfx('coin'); buildPanel(); }
+function buildSell() { const B = W.build, H = home(); let id = null; if (B.pick) { id = B.pick.i; B.pick = null; buildGhost(null); } else { const k = buildItemAt(B.x, B.z); if (k >= 0) { id = homeList().splice(k, 1)[0].i; buildHomeItems(); } } if (!id) return; const v = Math.round(HOME_ITEM[id].cost * 0.5); S.vc += v; save(); uiHud(); toast('SOLD', `${HOME_ITEM[id].n} for ${v} HC.`); sfx('coin'); buildPanel(); }
 function buildRotate() { const B = W.build; B.rot = (B.rot + 1) % 4; sfx('ui'); }
 function buildPanel() {
   let el = $('build'); if (!el) { el = document.createElement('div'); el.id = 'build'; document.body.appendChild(el); el.addEventListener('click', e => { const b = e.target.closest('[data-b]'); if (!b) return; e.stopPropagation(); audioInit(); BLD.act[b.dataset.b](b.dataset.v); }); }
   const H = home(), lv = homeLevel(), v = homeVibe(), B = W.build, sets = homeSets();
   const items = HOME_ITEMS.filter(i => i.cat === BLD.cat), r = rankOf(S.rep), rt = rareToday();
   el.style.display = 'block';
-  el.innerHTML = `<div class="bt"><div><b>CRIB LEVEL ${lv.lvl}</b> <span class="mu">VIBE ${lv.tot}${lv.next ? ' / ' + lv.next : ' · MAX'}</span></div><div class="vb">${VIBES.map(([k, n, c]) => `<span style="color:${c}">${n} ${v[k]}</span>`).join('')}</div><div class="vc">VC ${S.vc.toLocaleString()}</div>
+  el.innerHTML = `<div class="bt"><div><b>CRIB LEVEL ${lv.lvl}</b> <span class="mu">VIBE ${lv.tot}${lv.next ? ' / ' + lv.next : ' · MAX'}</span></div><div class="vb">${VIBES.map(([k, n, c]) => `<span style="color:${c}">${n} ${v[k]}</span>`).join('')}</div><div class="vc">HC ${S.vc.toLocaleString()}</div>
     <div class="bb"><button data-b="sets">SETS ${sets.filter(s => s.done).length}/${HOME_SETS.length}</button><button data-b="lot">${inRoom() ? 'ROOM LOOK' : 'LOT & LOOK'}</button><button data-b="cam">⟳ VIEW</button><button data-b="exit" class="x">DONE</button></div></div>
-    <div class="bact">${B && B.sel ? `<button data-b="rot">↻ ROTATE (R)</button><button data-b="place" class="go">PLACE (E)</button>${B.pick ? '<button data-b="store">STORE (F)</button>' : ''}${B.pick ? '<button data-b="sell">SELL (X)</button>' : ''}<button data-b="cancel">CANCEL</button>` : `<button data-b="place">PICK UP (E)</button><button data-b="store">STORE (F)</button><button data-b="sell">SELL ½ (X)</button>`}<span class="hint">${B && B.sel ? HOME_ITEM[B.sel].n + (B.pick ? ' · moving' : (H.store[B.sel] ? ' · from storage' : ' · ' + HOME_ITEM[B.sel].cost + ' VC')) : 'Point at something you placed to pick it up, store it or sell it. Or pick something below.'}</span></div>
+    <div class="bact">${B && B.sel ? `<button data-b="rot">↻ ROTATE (R)</button><button data-b="place" class="go">PLACE (E)</button>${B.pick ? '<button data-b="store">STORE (F)</button>' : ''}${B.pick ? '<button data-b="sell">SELL (X)</button>' : ''}<button data-b="cancel">CANCEL</button>` : `<button data-b="place">PICK UP (E)</button><button data-b="store">STORE (F)</button><button data-b="sell">SELL ½ (X)</button>`}<span class="hint">${B && B.sel ? HOME_ITEM[B.sel].n + (B.pick ? ' · moving' : (H.store[B.sel] ? ' · from storage' : ' · ' + HOME_ITEM[B.sel].cost + ' HC')) : 'Point at something you placed to pick it up, store it or sell it. Or pick something below.'}</span></div>
     <div class="bcat">${HOME_CATS.map(([k, n]) => `<button data-b="cat" data-v="${k}" class="${k === BLD.cat ? 'on' : ''}">${n}</button>`).join('')}<button data-b="cat" data-v="store" class="${BLD.cat === 'store' ? 'on' : ''}">STORAGE ${Object.values(H.store).reduce((a, b) => a + b, 0)}</button></div>
-    <div class="bitems">${(BLD.cat === 'store' ? HOME_ITEMS.filter(i => H.store[i.id] > 0) : items).map(i => { const st = H.store[i.id] || 0, off = i.rare && i.id !== rt.id && !st, lock = (i.rank > r && !st) || off; return `<button data-b="pick" data-v="${i.id}" class="card ${B && B.sel === i.id ? 'sel' : ''} ${lock ? 'lock' : ''}" ${lock ? 'disabled' : ''}><b>${i.rare ? '★ ' : ''}${i.n}</b><small>${st ? 'IN STORAGE ×' + st : off ? 'BACK ON ITS DAY' : i.rank > r ? 'RANK: ' + RANKS[i.rank].n : (i.rare ? 'TODAY ONLY · ' : '') + i.cost + ' VC'}</small><i>${Object.entries(i.v).map(([k, x]) => `<em style="color:${VIBES.find(q => q[0] === k)[2]}">+${x} ${k}</em>`).join(' ') || '&nbsp;'}</i>${HOME_SETS.filter(s => s.items.includes(i.id)).map(s => `<u>${s.n}</u>`).join('')}</button>`; }).join('') || '<p class="mu">Nothing in storage.</p>'}</div>`;
+    <div class="bitems">${(BLD.cat === 'store' ? HOME_ITEMS.filter(i => H.store[i.id] > 0) : items).map(i => { const st = H.store[i.id] || 0, off = i.rare && i.id !== rt.id && !st, lock = (i.rank > r && !st) || off; return `<button data-b="pick" data-v="${i.id}" class="card ${B && B.sel === i.id ? 'sel' : ''} ${lock ? 'lock' : ''}" ${lock ? 'disabled' : ''}><b>${i.rare ? '★ ' : ''}${i.n}</b><small>${st ? 'IN STORAGE ×' + st : off ? 'BACK ON ITS DAY' : i.rank > r ? 'RANK: ' + RANKS[i.rank].n : (i.rare ? 'TODAY ONLY · ' : '') + i.cost + ' HC'}</small><i>${Object.entries(i.v).map(([k, x]) => `<em style="color:${VIBES.find(q => q[0] === k)[2]}">+${x} ${k}</em>`).join(' ') || '&nbsp;'}</i>${HOME_SETS.filter(s => s.items.includes(i.id)).map(s => `<u>${s.n}</u>`).join('')}</button>`; }).join('') || '<p class="mu">Nothing in storage.</p>'}</div>`;
 }
 BLD.act = {
   exit: () => buildExit(), rot: () => buildRotate(), place: () => buildPlace(), store: () => buildStore(), sell: () => buildSell(), cancel: () => buildCancel(),
@@ -5117,13 +5178,13 @@ function uiHomeSets() {
 function uiHomeLot() {
   openPanel(() => {
     const H = home(), r = rankOf(S.rep); let h = `<div class="ph"><h2>LOT & LOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><div class="cat">THE LOT</div>`;
-    LOTS.forEach((L, i) => { const own = i <= (H.lot || 0), next = i === (H.lot || 0) + 1; h += `<div class="card ${own ? 'sel' : ''}"><h3>${own ? '✓ ' : ''}${L.n}</h3><p>${L.d}</p>${next ? (L.rank > r ? `<span class="tag or">RANK: ${RANKS[L.rank].n}</span>` : Btn('BUY · ' + L.cost + ' VC', () => { S.vc -= L.cost; H.lot = i; save(); sfx('unlock'); toast('NEW LAND', L.n + ' is yours. Build on it.', 'rank'); homeRebuild(); }, 'sm', S.vc < L.cost)) : ''}</div>`; });
+    LOTS.forEach((L, i) => { const own = i <= (H.lot || 0), next = i === (H.lot || 0) + 1; h += `<div class="card ${own ? 'sel' : ''}"><h3>${own ? '✓ ' : ''}${L.n}</h3><p>${L.d}</p>${next ? (L.rank > r ? `<span class="tag or">RANK: ${RANKS[L.rank].n}</span>` : Btn('BUY · ' + L.cost + ' HC', () => { S.vc -= L.cost; H.lot = i; save(); sfx('unlock'); toast('NEW LAND', L.n + ' is yours. Build on it.', 'rank'); homeRebuild(); }, 'sm', S.vc < L.cost)) : ''}</div>`; });
     if (inRoom()) { const RL = homeRoom().look; h = `<div class="ph"><h2>ROOM LOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
-      for (const k of ['wall', 'floor']) { h += `<div class="cat">${k === 'wall' ? 'WALLS' : 'FLOOR'} <span class="mu" style="text-transform:none">— ${ROOM_COST[k]} VC to change</span></div><div class="card">` + ROOM_LOOKS[k].map((o, i) => Btn((RL[k] === i ? '✓ ' : '') + o[0], () => { if (RL[k] === i) return; if (S.vc < ROOM_COST[k]) { toast('NOT ENOUGH VC', ''); return; } S.vc -= ROOM_COST[k]; RL[k] = i; save(); sfx('buy'); homeRebuild(); }, 'sm ' + (RL[k] === i ? '' : 'alt'))).join(' ') + `</div>`; }
+      for (const k of ['wall', 'floor']) { h += `<div class="cat">${k === 'wall' ? 'WALLS' : 'FLOOR'} <span class="mu" style="text-transform:none">— ${ROOM_COST[k]} HC to change</span></div><div class="card">` + ROOM_LOOKS[k].map((o, i) => Btn((RL[k] === i ? '✓ ' : '') + o[0], () => { if (RL[k] === i) return; if (S.vc < ROOM_COST[k]) { toast('NOT ENOUGH HC', ''); return; } S.vc -= ROOM_COST[k]; RL[k] = i; save(); sfx('buy'); homeRebuild(); }, 'sm ' + (RL[k] === i ? '' : 'alt'))).join(' ') + `</div>`; }
       return h + `</div>`; }
     for (const k of ['house', 'trim', 'fence', 'ground']) {
-      h += `<div class="cat">${{ house: 'HOUSE PAINT', trim: 'TRIM', fence: 'FENCE', ground: 'YARD GROUND' }[k]} <span class="mu" style="text-transform:none">— ${LOOK_COST[k]} VC to change</span></div><div class="card">`;
-      h += LOOKS[k].map((o, i) => Btn((H.look[k] === i ? '✓ ' : '') + o[0], () => { if (H.look[k] === i) return; if (S.vc < LOOK_COST[k]) { toast('NOT ENOUGH VC', ''); return; } S.vc -= LOOK_COST[k]; H.look[k] = i; save(); sfx('buy'); homeRebuild(); }, 'sm ' + (H.look[k] === i ? '' : 'alt'))).join(' ') + `</div>`;
+      h += `<div class="cat">${{ house: 'HOUSE PAINT', trim: 'TRIM', fence: 'FENCE', ground: 'YARD GROUND' }[k]} <span class="mu" style="text-transform:none">— ${LOOK_COST[k]} HC to change</span></div><div class="card">`;
+      h += LOOKS[k].map((o, i) => Btn((H.look[k] === i ? '✓ ' : '') + o[0], () => { if (H.look[k] === i) return; if (S.vc < LOOK_COST[k]) { toast('NOT ENOUGH HC', ''); return; } S.vc -= LOOK_COST[k]; H.look[k] = i; save(); sfx('buy'); homeRebuild(); }, 'sm ' + (H.look[k] === i ? '' : 'alt'))).join(' ') + `</div>`;
     }
     return h + `</div>`;
   }, 'side');
@@ -5246,7 +5307,7 @@ function uiHud() {
   const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = (on ? `<b>${on}</b> online with you` : 'online · nobody else here') + (NET.crew ? ` · crew of <b>${NET.crew.m.length + 1}</b>` : NET.inCrew ? ' · in a crew' : '');
   $('keys').textContent = MT ? 'WASD move · SHIFT sprint · SPACE shoot/jump (hold & release) · E pass/steal · IJKL skill stick · Q (LT) post up / body up · P pause' : 'WASD move · SHIFT run · E interact · J/L look · P my player';
 }
-function vcLine() { return `<span class="chip" style="margin:0">VC <b>${S.vc.toLocaleString()}</b></span>`; }
+function vcLine() { return `<span class="chip" style="margin:0">HC <b>${S.vc.toLocaleString()}</b></span>`; }
 
 // ---------- title ----------
 function uiTitle() {
@@ -5292,7 +5353,7 @@ function uiBuilder(opts) {
     h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
       const nm = ($('bname').value || '').trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
-      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); if (opts.prev !== undefined) toast('NEW BUILD', `${S.name} is on the Block. Switch builds in MY PLAYER → BUILDS.`, 'rank'); else toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for VC.', 'rank');
+      uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); if (opts.prev !== undefined) toast('NEW BUILD', `${S.name} is on the Block. Switch builds in MY PLAYER → BUILDS.`, 'rank'); else toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for HC.', 'rank');
     })}${opts.prev !== undefined ? Btn('CANCEL', () => { S.slots.splice(S.slot, 1); S.slot = opts.prev; slotLoad(S.slots[opts.prev]); save(); uiClose(); enterWorld('hub', 0, 9, Math.PI); }, 'alt') : ''}</div>`;
     return h;
   }, 'side', () => { });
@@ -5309,12 +5370,12 @@ function header() {
 }
 function uiPlayer(tab) {
   const st = { tab: tab || 'attrs' };
-  const tabs = [['builds', 'BUILDS'], ['attrs', 'ATTRIBUTES'], ['badges', 'BADGES'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
+  const tabs = [['builds', 'BUILDS'], ['attrs', 'ATTRIBUTES'], ['badges', 'STREET SMARTS'], ['moves', 'MOVES'], ['crew', 'CREW'], ['ach', 'TROPHIES'], ['road', 'RANK ROAD'], ['opt', 'OPTIONS']];
   openPanel(() => {
     UI.cur.live = st.tab === 'crew';
     let h = `<div class="ph"><h2>MY PLAYER</h2>${Btn('✕', uiClose, 'alt sm')}</div>` + header() + `<div class="tabs">` + tabs.map(t => Btn(t[1], () => { st.tab = t[0]; sfx('ui'); rerender(true); }, st.tab === t[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb">`;
     if (st.tab === 'builds') {
-      h += `<p class="mu" style="margin:2px 0 8px">Up to ${MAX_SLOTS} builds. Each has its own body, attributes, badges, moves and fit. VC, Respect, the drip and moves you own, and your crib are shared. Online games use the active build.</p>`;
+      h += `<p class="mu" style="margin:2px 0 8px">Up to ${MAX_SLOTS} builds. Each has its own body, attributes, street smarts, moves and fit. HC, Respect, the drip and moves you own, and your crib are shared. Online games use the active build.</p>`;
       S.slots[S.slot] = slotSnap();
       if (S.devBak) h += `<p class="warn">Dev Room maxed player is on. Restore your real player in the Dev Room before switching builds.</p>`;
       S.slots.forEach((t, i) => { const on = i === S.slot, st2 = STYLE[t.build.style] || {};
@@ -5333,7 +5394,7 @@ function uiPlayer(tab) {
         }
       }
     } else if (st.tab === 'badges') {
-      h += `<p class="mu">Earn badge XP by doing the thing in real games. 100 XP = 1 point in that category. Higher tiers need the attribute to back it up.</p>`;
+      h += `<p class="mu">Earn smarts XP by doing the thing in real games. 100 XP = 1 point in that category. Higher tiers need the attribute to back it up.</p>`;
       for (const c of ['F', 'S', 'P', 'D']) {
         h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]} · <span class="ye">${S.bp[c]} PTS</span> <span class="mu">· ${Math.floor(S.bxp[c])}/100 XP</span></div><div class="grid">`;
         for (const b of BADGES) if (b.cat === c) {
@@ -5353,7 +5414,7 @@ function uiPlayer(tab) {
           h += `<div class="card ${eq ? 'sel' : ''} ${!own && (lockR || lockA) ? 'lock' : ''}"><h3>${m.n}</h3><p>${m.d || ''}</p><div style="margin-top:5px">` +
             (eq ? `<span class="tag on">EQUIPPED</span>` : own ? Btn('EQUIP', () => { S.moves[slot] = m.id; sfx('uiok'); save(); rerender(); if (W) worldPlayerRig(); }, 'sm') :
               lockR ? `<span class="tag or">RANK: ${RANKS[m.rank].n}</span>` : lockA ? `<span class="tag or">NEEDS ${ATTR[needAttr].n} ${m.need}</span>` :
-                Btn('BUY · ' + price + ' VC', () => { S.vc -= price; S.moves.owned.push(m.id); S.moves[slot] = m.id; sfx('buy'); toast('NEW ANIMATION', m.n); save(); rerender(); }, 'sm', S.vc < price)) + `</div></div>`;
+                Btn('BUY · ' + price + ' HC', () => { S.vc -= price; S.moves.owned.push(m.id); S.moves[slot] = m.id; sfx('buy'); toast('NEW ANIMATION', m.n); save(); rerender(); }, 'sm', S.vc < price)) + `</div></div>`;
         }
         h += `</div>`;
       };
@@ -5366,7 +5427,7 @@ function uiPlayer(tab) {
       h += `<div class="cat">HOMIES · ${S.homies.length}</div>` + (S.homies.length ? S.homies.map(b => `<div class="card"><h3>${esc(b.name)} <span class="mu">${ovrOf(b.attrs)} OVR</span></h3><p>${STYLE[b.build.style].n} · ${fmtH(b.build.body.h)}${b.net ? ' · met online' : ''}</p></div>`).join('') : `<p class="mu">Nobody yet.</p>`);
     } else if (st.tab === 'ach') {
       const done = ACH.filter(a => S.ach[a.id]).length; h += `<p class="mu">${done} / ${ACH.length} trophies.</p><div class="grid">`;
-      for (const a of ACH) { const v = Math.min(a.t, achVal(a.k)), d = S.ach[a.id]; h += `<div class="card ${d ? 'sel' : ''}"><h3 style="color:${d ? 'var(--gold)' : 'var(--bone)'}">${d ? '✓ ' : ''}${a.n}</h3><p>${a.d}</p><div class="row" style="margin-top:4px"><div class="ab"><i style="width:${v / a.t * 100}%;background:var(--heat)"></i></div><div class="av" style="width:auto;font-size:11px">${v}/${a.t}</div></div><p class="buff">+${a.vc} VC${a.drip ? ' · ' + DRIPS[a.drip].n : ''}</p></div>`; }
+      for (const a of ACH) { const v = Math.min(a.t, achVal(a.k)), d = S.ach[a.id]; h += `<div class="card ${d ? 'sel' : ''}"><h3 style="color:${d ? 'var(--gold)' : 'var(--bone)'}">${d ? '✓ ' : ''}${a.n}</h3><p>${a.d}</p><div class="row" style="margin-top:4px"><div class="ab"><i style="width:${v / a.t * 100}%;background:var(--heat)"></i></div><div class="av" style="width:auto;font-size:11px">${v}/${a.t}</div></div><p class="buff">+${a.vc} HC${a.drip ? ' · ' + DRIPS[a.drip].n : ''}</p></div>`; }
       h += `</div>`;
     } else if (st.tab === 'road') {
       const r = rankOf(S.rep);
@@ -5400,7 +5461,7 @@ function uiShop(closet) {
       else if (d.src === 'ach') act = `<span class="tag" style="color:var(--heat)">TROPHY REWARD</span>`;
       else if (d.src === 'bum') act = `<span class="tag" style="color:var(--heat)">A FIEND MIGHT HAVE ONE</span>`;
       else if (lockR) act = `<span class="tag or">RANK: ${RANKS[d.rank].n}</span>`;
-      else act = Btn('BUY · ' + price + ' VC', () => { S.vc -= price; S.owned.push(d.id); S.worn[d.slot] = d.id; sfx('buy'); toast('NEW DRIP: ' + d.n, RAR[d.r][0] + (bf ? ' · ' + bf : '')); save(); worldPlayerRig(); checkAch(); rerender(); }, 'sm', S.vc < price);
+      else act = Btn('BUY · ' + price + ' HC', () => { S.vc -= price; S.owned.push(d.id); S.worn[d.slot] = d.id; sfx('buy'); toast('NEW DRIP: ' + d.n, RAR[d.r][0] + (bf ? ' · ' + bf : '')); save(); worldPlayerRig(); checkAch(); rerender(); }, 'sm', S.vc < price);
       h += `<div class="card ${eq ? 'sel' : ''} ${!own && lockR ? 'lock' : ''}" style="border-left:5px solid ${RAR[d.r][1]}"><div class="row"><span class="sw" style="background:${d.c};width:22px;height:22px;margin:0;border-width:2px"></span><h3 class="g">${d.n}</h3></div><span class="tag" style="color:${RAR[d.r][1]}">${RAR[d.r][0]}</span> <span class="buff">${bf}</span><div style="margin-top:6px">${act}</div></div>`;
     }
     if (!items.length) h += `<p class="mu">Nothing here yet.</p>`;
@@ -5416,7 +5477,7 @@ function uiCrib() {
     for (const c of CRIB) {
       const t = cribTier(c.id), cur = c.tiers[t], nx = c.tiers[t + 1];
       h += `<div class="card"><div class="row"><div class="g"><h3>${c.n}: <span class="cy">${cur.n}</span></h3><p>${cur.d || '&nbsp;'}</p>`;
-      if (nx) { const price = shopPrice(nx.cost), lock = nx.rank > r; h += `<p class="ye">NEXT → ${nx.n}: <span class="buff">${nx.d}</span></p></div>` + (lock ? `<span class="tag or">RANK: ${RANKS[nx.rank].n}</span>` : Btn(price + ' VC', () => { S.vc -= price; S.crib[c.id] = t + 1; sfx('buy'); toast('CRIB UPGRADE', nx.n + ' — ' + nx.d, 'ach'); save(); checkAch(); const m = W.me; uiClose(); enterWorld('crib', m.x, m.z, m.face); uiCrib(); }, '', S.vc < price)); }
+      if (nx) { const price = shopPrice(nx.cost), lock = nx.rank > r; h += `<p class="ye">NEXT → ${nx.n}: <span class="buff">${nx.d}</span></p></div>` + (lock ? `<span class="tag or">RANK: ${RANKS[nx.rank].n}</span>` : Btn(price + ' HC', () => { S.vc -= price; S.crib[c.id] = t + 1; sfx('buy'); toast('CRIB UPGRADE', nx.n + ' — ' + nx.d, 'ach'); save(); checkAch(); const m = W.me; uiClose(); enterWorld('crib', m.x, m.z, m.face); uiCrib(); }, '', S.vc < price)); }
       else h += `<p class="ye">Fully upgraded.</p></div>`;
       h += `</div><div class="pips" style="margin-top:5px">${c.tiers.slice(1).map((x, i) => `<i style="background:${i < t ? 'var(--ice)' : 'var(--line)'}"></i>`).join('')}</div></div>`;
     }
@@ -5442,7 +5503,7 @@ function uiMode(m) {
     if (!IS_TOUCH) h += `<div class="cat">PLAYER 2 <span class="mu" style="text-transform:none;letter-spacing:.02em">— same screen, controller or split keyboard</span></div>${Btn('P2: ' + ({ off: 'OFF', coop: 'CO-OP (your teammate)', vs: 'VERSUS (other team)' }[st.p2]) + ' ▸', () => { st.p2 = st.p2 === 'off' ? 'coop' : st.p2 === 'coop' ? 'vs' : 'off'; sfx('ui'); rerender(); }, 'alt sm')}<p class="mu">${anyPadStart() ? anyPadStart() + ' controller(s) connected: player 2 is on ' + (anyPadStart() > 1 ? 'controller 2, player 1 on controller 1 or the keyboard.' : 'the controller, player 1 on the keyboard.') : 'No controller: the keyboard splits. Player 1: WASD move, Shift sprint, Space shoot, E pass, IJKL skill stick. Player 2: arrows move, right Shift sprint, / shoot, . pass, numpad 8 4 5 6 skill stick.'}</p>`;
     if (online && !crewFirst) h += onlineBlock(m, st);
     if (S.boosts.length) h += `<div class="cat">LOADED BOOSTS</div><p class="buff">${S.boosts.map(b => BOOSTS.find(x => x.id === b).n).join(' · ')}</p>`;
-    h += `</div><div class="pf">${Btn('RUN IT', () => { S.lastTier = st.tier; launchGame(m, t, st); })}<span class="mu" style="align-self:center">Win ≈ ${Math.round(70 * t.mult + 60)} VC · ${Math.round(45 * t.mult + 15)} Respect</span></div>`;
+    h += `</div><div class="pf">${Btn('RUN IT', () => { S.lastTier = st.tier; launchGame(m, t, st); })}<span class="mu" style="align-self:center">Win ≈ ${Math.round(70 * t.mult + 60)} HC · ${Math.round(45 * t.mult + 15)} Respect</span></div>`;
     return h;
   });
   UI.cur.live = true;
@@ -5475,7 +5536,7 @@ function onlineBlock(m, st) {
 function uiKiosk() {
   openPanel(() => {
     let h = `<div class="ph"><h2>LAST CALL</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"One game only. No refunds. Side effects include winning." Everything here is used up in your next Pit game.</p><div class="grid">`;
-    for (const b of BOOSTS.filter(x => !x.hidden)) { const has = S.boosts.includes(b.id), price = shopPrice(b.cost); h += `<div class="card ${has ? 'sel' : ''}"><h3>${b.n}</h3><p class="buff">${b.d}</p><div style="margin-top:6px">${has ? '<span class="tag hot">LOADED</span>' : Btn(price + ' VC', () => { S.vc -= price; S.boosts.push(b.id); sfx('buy'); save(); rerender(); }, 'sm', S.vc < price)}</div></div>`; }
+    for (const b of BOOSTS.filter(x => !x.hidden)) { const has = S.boosts.includes(b.id), price = shopPrice(b.cost); h += `<div class="card ${has ? 'sel' : ''}"><h3>${b.n}</h3><p class="buff">${b.d}</p><div style="margin-top:6px">${has ? '<span class="tag hot">LOADED</span>' : Btn(price + ' HC', () => { S.vc -= price; S.boosts.push(b.id); sfx('buy'); save(); rerender(); }, 'sm', S.vc < price)}</div></div>`; }
     return h + `</div></div>`;
   });
 }
@@ -5503,7 +5564,7 @@ function uiBum(n) {
   if (n.blessed) return uiDialog(n.name, pick(BUM_THANKS), [['Stay up.', null]]);
   const amt = Math.max(3, Math.round((6 + rankOf(S.rep) * 6 + rnd(0, 6)) * (1 - cribFx('bum'))));
   uiDialog(n.name, pick(BUM_ASK).replace('{n}', amt), [
-    [`Give ${amt} VC`, () => {
+    [`Give ${amt} HC`, () => {
       S.vc -= amt; S.life.gave = (S.life.gave || 0) + 1; n.blessed = true; n.anim = 'cheer'; n.wander = false; sfx('coin'); gainRep(evOn('fiend') ? 10 : 3);
       let extra = '';
       if (!S.owned.includes('hd_crown') && Math.random() < 0.22) { S.owned.push('hd_crown'); extra = ' He hands you a CARDBOARD CROWN.'; toast('NEW DRIP: Cardboard Crown', 'EPIC · +1 Passing', 'ach'); sfx('unlock'); }
@@ -5513,7 +5574,7 @@ function uiBum(n) {
   ]);
 }
 function uiRack() {
-  uiDialog('SHARPIE THE HUSTLER', `Two games. MONEY RACK: 40 seconds, deep balls only, I pay 5 VC a point, entry 25 (your best: ${S.life.bestRack || 0}). Or H-O-R-S-E, you and me: 50 to play, beat me for ${evOn('horse') ? 500 : 250}.`, [
+  uiDialog('SHARPIE THE HUSTLER', `Two games. MONEY RACK: 40 seconds, deep balls only, I pay 5 HC a point, entry 25 (your best: ${S.life.bestRack || 0}). Or H-O-R-S-E, you and me: 50 to play, beat me for ${evOn('horse') ? 500 : 250}.`, [
     ['Money Rack (25)', () => { S.vc -= 25; save(); startPractice('rack'); }, '', S.vc < 25], ['H-O-R-S-E (50)', () => { uiClose(); startHorse(); }, '', S.vc < 50], ['Nah', null, 'alt']]);
 }
 
@@ -5523,7 +5584,7 @@ function uiResults(res, rw, again) {
   const s = res.stats;
   openPanel(() => {
     let h = `<div class="ph"><h2 style="color:${res.win ? 'var(--go)' : 'var(--heat)'}">${res.win ? 'DUB' : 'L'} · ${res.score[0]} — ${res.score[1]}</h2></div><div class="pb">`;
-    h += `<div class="card sel"><div class="row" style="flex-wrap:wrap;gap:18px"><div><div class="mu f">VC</div><div class="big ye" id="rvc">0</div></div><div><div class="mu f">RESPECT</div><div class="big cy" id="rrep">0</div></div><div class="g"><div class="mu f">BADGE XP</div>${['F', 'S', 'P', 'D'].map(c => `<span class="tag" style="color:${CATS[c][1]}">${CATS[c][0]} +${rw.bxp[c]}</span>`).join(' ')}${rw.pts.length ? `<p class="buff">${rw.pts.join(' · ')}</p>` : ''}</div></div>${rw.notes.length ? `<p class="buff">${rw.notes.join(' · ')}</p>` : ''}</div>`;
+    h += `<div class="card sel"><div class="row" style="flex-wrap:wrap;gap:18px"><div><div class="mu f">HC</div><div class="big ye" id="rvc">0</div></div><div><div class="mu f">RESPECT</div><div class="big cy" id="rrep">0</div></div><div class="g"><div class="mu f">BADGE XP</div>${['F', 'S', 'P', 'D'].map(c => `<span class="tag" style="color:${CATS[c][1]}">${CATS[c][0]} +${rw.bxp[c]}</span>`).join(' ')}${rw.pts.length ? `<p class="buff">${rw.pts.join(' · ')}</p>` : ''}</div></div>${rw.notes.length ? `<p class="buff">${rw.notes.join(' · ')}</p>` : ''}</div>`;
     h += `<div class="card"><table><tr><th>PLAYER</th><th>PTS</th><th>AST</th><th>REB</th><th>STL</th><th>BLK</th><th>ANK</th><th>PF</th><th>FG</th></tr>` + res.box.map(b => `<tr style="color:${b.user ? 'var(--gold)' : b.team === 0 ? 'var(--ice)' : '#ff9ab8'}"><td>${esc(b.n)}</td><td>${b.s.pts}</td><td>${b.s.ast}</td><td>${b.s.reb}</td><td>${b.s.stl}</td><td>${b.s.blk}</td><td>${b.s.ankles}</td><td>${b.s.fouls || 0}</td><td>${b.s.fgm}/${b.s.fga}</td></tr>`).join('') + `</table></div>`;
     h += `<p class="mu">${s.greens} greens · ${s.dunks} dunks · ${s.threes} deep balls · ${s.bravs} Bravado</p>`;
     return h + `</div><div class="pf">${again ? Btn('RUN IT BACK', again) : ''}${Btn('BACK TO THE CAGES', uiClose, again ? 'alt' : '')}</div>`;
@@ -5851,6 +5912,7 @@ function netGuestStep(dt) {
       if (e.k === 'c') hudCall(String(e.b || ''), String(e.s || ''), cssCol(e.c), +e.d || 1.2);
       else if (e.k === 'f') { const p = M_.P[e.i]; if (p) hudFloat(p, String(e.t || ''), cssCol(e.c)); }
       else if (e.k === 'pu') puNet(e);
+      else if (e.k === 'ca') { const K = M_.crowd; if (K) { const i = K.pool.findIndex(b => b.name === e.n), b = i >= 0 ? K.pool.splice(i, 1)[0] : null; crowdAdd(b, false); } }
       else if (e.k === 'cs') { const p = M_.P[e.i | 0]; if (p) p.celebStyle = String(e.s || '').slice(0, 14); }
       else if (e.k === 'ta') { const p = M_.P[e.i | 0]; if (p) p.tauntT = 1.3; }
       else if (e.k === 'cr') crowdReact(String(e.p || ''), e.t === undefined ? undefined : e.t | 0, true);
@@ -5880,7 +5942,7 @@ function netGuestStep(dt) {
 }
 function cleanStats(s) { const o = {}; for (const k of ['pts', 'ast', 'reb', 'stl', 'blk', 'ankles', 'greens', 'dunks', 'threes', 'fga', 'fgm', 'bravs', 'fires', 'fouls']) o[k] = clamp((s && s[k]) | 0, 0, 999); return o; }
 function cssCol(c) { return typeof c === 'string' && /^#[0-9a-f]{3,8}$/i.test(c) ? c : '#fff'; }
-// GOT NEXT — the grind: drills that pay VC, H-O-R-S-E with Sharpie, the 1v1 ladder in The Cages, the old head's daily
+// GOT NEXT — the grind: drills that pay HC, H-O-R-S-E with Sharpie, the 1v1 ladder in The Cages, the old head's daily
 // contracts and the daily event. Drills run on the practice court with the real shooting and finishing; a drill only
 // places you, hands you the ball, and counts what happens.
 'use strict';
@@ -5891,7 +5953,7 @@ const SPOTMID = [[-4.3, 0.5], [-3.8, 2.8], [-2.4, 4.3], [0, 4.9], [2.4, 4.3], [3
 const FT = [0, 4.6];
 
 // ---------- the drills ----------
-// medals: score for bronze / silver / gold.  pay: [base VC, VC per point].  cat: badge XP group.
+// medals: score for bronze / silver / gold.  pay: [base HC, HC per point].  cat: smarts XP group.
 const DRILL_DEFS = [
   { id: 'layups', n: 'Layup Lines', cat: 'F', time: 45, medals: [8, 12, 16], pay: [30, 6], unit: 'pts',
     d: 'Start at a cone, attack the rim, finish. Alternate sides for 45 seconds. Layups 1, dunks 2.',
@@ -5918,11 +5980,11 @@ const DRILL = {}; DRILL_DEFS.forEach(d => DRILL[d.id] = d);
 
 // ---------- the day: one event and three contracts, the same for everyone that day ----------
 const DAY_EVENTS = [
-  { id: 'grind', n: 'GRIND DAY', d: 'Drills pay 50% more VC.' },
+  { id: 'grind', n: 'GRIND DAY', d: 'Drills pay 50% more HC.' },
   { id: 'green', n: 'GREEN DAY', d: 'Greens count double in every shooting drill.' },
   { id: 'ladder', n: 'LADDER NIGHT', d: 'Ladder wins in The Cages pay double.' },
   { id: 'horse', n: 'HORSE DERBY', d: 'Beating Sharpie at H-O-R-S-E pays double.' },
-  { id: 'bucket', n: 'BUCKET BONANZA', d: 'Games in The Cages pay 25% more VC.' },
+  { id: 'bucket', n: 'BUCKET BONANZA', d: 'Games in The Cages pay 25% more HC.' },
   { id: 'fiend', n: 'FIEND APPRECIATION DAY', d: 'Helping a fiend earns 10 Respect instead of 3.' },
 ];
 const CONTRACTS = [
@@ -6084,13 +6146,13 @@ function drillEnd(res, back) {
   let vc = Math.round((d.pay[0] + score * d.pay[1]) * rpt * (evOn('grind') ? 1.5 : 1) * (1 + cribFx('vc')));
   let rep = Math.round(score * 0.6 + medal * 6);
   if (rpt < 1) notes.push(`Run ${rec.today} of this drill today: ${Math.round(rpt * 100)}% pay`); if (evOn('grind')) notes.push('GRIND DAY +50%');
-  if (medal > rec.medal) { const bonus = [0, 100, 250, 600][medal], rb = [0, 20, 50, 120][medal]; vc += bonus; rep += rb; notes.push(['', 'BRONZE', 'SILVER', 'GOLD'][medal] + ` medal: +${bonus} VC, +${rb} Respect`); lifeAdd('medals', medal - rec.medal); if (medal === 3) lifeAdd('drillGolds'); rec.medal = medal; }
+  if (medal > rec.medal) { const bonus = [0, 100, 250, 600][medal], rb = [0, 20, 50, 120][medal]; vc += bonus; rep += rb; notes.push(['', 'BRONZE', 'SILVER', 'GOLD'][medal] + ` medal: +${bonus} HC, +${rb} Respect`); lifeAdd('medals', medal - rec.medal); if (medal === 3) lifeAdd('drillGolds'); rec.medal = medal; }
   if (newBest) { rec.best = score; notes.push('Personal best'); }
-  S.vc += vc; lifeAdd('drills'); S.bxp[d.cat] += Math.round(10 + score * 1.5); while (S.bxp[d.cat] >= 100) { S.bxp[d.cat] -= 100; S.bp[d.cat]++; notes.push('+1 ' + CATS[d.cat][0] + ' badge point'); }
+  S.vc += vc; lifeAdd('drills'); S.bxp[d.cat] += Math.round(10 + score * 1.5); while (S.bxp[d.cat] >= 100) { S.bxp[d.cat] -= 100; S.bp[d.cat]++; notes.push('+1 ' + CATS[d.cat][0] + ' smarts point'); }
   gainRep(rep); checkAch(); save();
   sfx(medal ? 'unlock' : 'buy');
   const mcol = ['#8d8d99', '#c9814a', '#c8d0d8', '#f2c14e'][medal];
-  uiDialog(d.n.toUpperCase(), `${score} ${d.unit}. ${medal ? ['', 'Bronze', 'Silver', 'Gold'][medal] + '.' : 'No medal yet: bronze is ' + d.medals[0] + '.'} +${vc} VC · +${rep} Respect.${notes.length ? '  ' + notes.join(' · ') + '.' : ''}`,
+  uiDialog(d.n.toUpperCase(), `${score} ${d.unit}. ${medal ? ['', 'Bronze', 'Silver', 'Gold'][medal] + '.' : 'No medal yet: bronze is ' + d.medals[0] + '.'} +${vc} HC · +${rep} Respect.${notes.length ? '  ' + notes.join(' · ') + '.' : ''}`,
     [['Again', () => startDrill(id, back)], ['All drills', () => uiDrills(back)], ['Done', null, 'alt']]);
   setTimeout(() => { const t = $('panel').querySelector('h3'); if (t) t.style.color = mcol; }, 0);
 }
@@ -6102,7 +6164,7 @@ function uiDrills(back) {
     const ev = todayEvent();
     let h = `<div class="ph"><h2>${back === 'crib' ? 'HOME DRILLS' : 'COACH\'S BOARD'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
     h += `<div class="card sel"><h3 class="ye">TODAY · ${ev.n}</h3><p>${ev.d}</p></div>`;
-    h += `<p class="mu">Drills pay VC, Respect and badge XP. First time to each medal pays a bonus. The same drill pays less after three runs in a day.</p><div class="grid">`;
+    h += `<p class="mu">Drills pay HC, Respect and smarts XP. First time to each medal pays a bonus. The same drill pays less after three runs in a day.</p><div class="grid">`;
     for (const d of DRILL_DEFS) {
       const r = S.drills[d.id] || { best: 0, medal: 0 }, m = r.medal || 0;
       h += `<div class="card"><div class="row"><h3 class="g">${d.n}</h3><span class="tag" style="color:${CATS[d.cat][1]}">${CATS[d.cat][0]}</span></div><p>${d.d}</p>
@@ -6151,7 +6213,7 @@ DRILL_RUN.horse = {
 };
 function horseHud() { const d = MT.drill.data, l = n => HORSE.split('').map((c, i) => `<span style="color:${i < n ? 'var(--heat)' : 'var(--line)'}">${c}</span>`).join(''); return `<span style="font-size:16px">YOU ${l(d.you)}<br>SHARPIE ${l(d.him)}</span><br><span style="font-size:11px;color:var(--ash)">${d.turn === 'you' ? (d.mode === 'match' ? 'MATCH HIS SHOT' : 'YOUR SHOT: ANYWHERE') : 'SHARPIE SHOOTS'}</span>`; }
 function startHorse() {
-  if (S.vc < 50) { toast('50 VC TO PLAY', 'Sharpie does not do credit.'); return; }
+  if (S.vc < 50) { toast('50 HC TO PLAY', 'Sharpie does not do credit.'); return; }
   S.vc -= 50; save(); startDrill('horse', 'hub');
 }
 function horseEnd(res) {
@@ -6159,8 +6221,8 @@ function horseEnd(res) {
   if (res.quit) { toast('YOU WALKED', 'Sharpie keeps the 50.'); return; }
   const won = res.drill.score === 1, pay = (evOn('horse') ? 2 : 1) * 250;
   if (won) { S.vc += pay; lifeAdd('horseWins'); gainRep(30); sfx('unlock'); } else sfx('no'); checkAch(); save();
-  uiDialog('SHARPIE THE HUSTLER', won ? `You spelled me out. ${pay} VC, take it. ${evOn('horse') ? 'Derby day, I pay double. Do not tell anyone.' : 'Run it back any time.'}` : 'H-O-R-S-E. That\'s you. The 50 is mine. Come back when your jumper does.',
-    [['Again (50 VC)', () => { uiClose(); startHorse(); }, '', S.vc < 50], ['Later', null, 'alt']]);
+  uiDialog('SHARPIE THE HUSTLER', won ? `You spelled me out. ${pay} HC, take it. ${evOn('horse') ? 'Derby day, I pay double. Do not tell anyone.' : 'Run it back any time.'}` : 'H-O-R-S-E. That\'s you. The 50 is mine. Come back when your jumper does.',
+    [['Again (50 HC)', () => { uiClose(); startHorse(); }, '', S.vc < 50], ['Later', null, 'alt']]);
 }
 
 // =====================================================================
@@ -6179,7 +6241,7 @@ function ladderBuild(i) { const L = LADDER[i]; const b = withSeed(1000 + i, () =
 function uiLadder(i) {
   const L = LADDER[i], beaten = (S.ladder || 0) > i, open = (S.ladder || 0) >= i, pay = Math.round(ladderPay(i) * (beaten ? 0.3 : 1));
   if (!open) return uiDialog(L.name.toUpperCase(), `"Beat ${LADDER[i - 1].name} first. I don't play people nobody's heard of."`, [['Fair.', null]]);
-  uiDialog(L.name.toUpperCase() + ` · ${L.ovr} OVR`, `"${L.line}"  One on one to 7. ${beaten ? 'Rematch pays ' + pay + ' VC.' : 'Beat me: ' + pay + ' VC, ' + (40 * (i + 1)) + ' Respect, and I\'ll run with you any time.'}${evOn('ladder') ? ' Ladder Night: double.' : ''}`,
+  uiDialog(L.name.toUpperCase() + ` · ${L.ovr} OVR`, `"${L.line}"  One on one to 7. ${beaten ? 'Rematch pays ' + pay + ' HC.' : 'Beat me: ' + pay + ' HC, ' + (40 * (i + 1)) + ' Respect, and I\'ll run with you any time.'}${evOn('ladder') ? ' Ladder Night: double.' : ''}`,
     [['Run ones', () => runLadder(i)], ['Not now', null, 'alt']]);
 }
 const ladderPay = i => 160 * (i + 1);
@@ -6189,7 +6251,7 @@ function runLadder(i) {
   const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: lvl }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: i, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) return null; const beaten = (S.ladder || 0) > i; let vc = Math.round(ladderPay(i) * (beaten ? 0.3 : 1) * (evOn('ladder') ? 2 : 1)); lifeAdd('ladderWins');
     if (!beaten) { S.ladder = i + 1; const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast(L.name.toUpperCase() + ' RUNS WITH YOU NOW', 'They are a homie: put them on your squad.', 'ach'), 1800); }
-    return { vc, rep: beaten ? 10 : 40 * (i + 1), note: (beaten ? 'Ladder rematch' : 'Beat ' + L.name) + ` +${vc} VC${evOn('ladder') ? ' (Ladder Night x2)' : ''}` }; };
+    return { vc, rep: beaten ? 10 : 40 * (i + 1), note: (beaten ? 'Ladder rematch' : 'Beat ' + L.name) + ` +${vc} HC${evOn('ladder') ? ' (Ladder Night x2)' : ''}` }; };
   cfg.onEnd = res => finishGame(res, ONES, tier, null, cfg);
   save(); document.body.dataset.state = 'match'; startMatch(cfg); uiHud();
 }
@@ -6206,7 +6268,7 @@ function uiContracts() {
     for (const id of D.picks) {
       const c = CONTRACTS.find(x => x.id === id), prog = Math.min(c.t, Math.max(0, (S.life[c.k] || 0) - (D.base[c.k] || 0))), done = prog >= c.t, got = D.claimed.includes(id);
       h += `<div class="card ${got ? 'sel' : ''}"><div class="row"><div class="g"><h3>${c.n}</h3><div class="row" style="margin-top:5px"><div class="ab"><i style="width:${prog / c.t * 100}%;background:var(--go)"></i></div><span class="av" style="width:auto;font-size:11px">${prog}/${c.t}</span></div></div>
-        ${got ? '<span class="tag on">PAID</span>' : Btn(`${c.vc} VC`, () => { D.claimed.push(id); S.vc += c.vc; gainRep(25); sfx('buy'); toast('CONTRACT PAID', `${c.n} · +${c.vc} VC · +25 Respect`, 'ach'); save(); rerender(); }, 'sm', !done)}</div></div>`;
+        ${got ? '<span class="tag on">PAID</span>' : Btn(`${c.vc} HC`, () => { D.claimed.push(id); S.vc += c.vc; gainRep(25); sfx('buy'); toast('CONTRACT PAID', `${c.n} · +${c.vc} HC · +25 Respect`, 'ach'); save(); rerender(); }, 'sm', !done)}</div></div>`;
     }
     return h + `<p class="mu">Contracts count what you do from the moment the day starts: games, drills, the ladder, H-O-R-S-E, the fiends.</p></div>`;
   });
@@ -6217,7 +6279,7 @@ function uiContracts() {
 const DEV = { back: 'title', tab: 'profile', prev: null, opp: 'max', oppOvr: 85, oppStyle: 'lockdown' };
 
 // ---------- builds ----------
-// every attribute 99, every badge iced out, the flashiest move in every slot
+// every attribute 99, every street smart iced out, the flashiest move in every slot
 function maxBuild(style, name, h) {
   const st = style || 'showman', attrs = {}, badges = {};
   for (const a of ATTRS) attrs[a.id] = 99; for (const b of BADGES) badges[b.id] = 4;
@@ -6275,21 +6337,21 @@ function devRender() {
   if (t === 'anim') {
     h += `<div class="card"><h3>ANIM LAB</h3><p>Every player has a movement profile: how their jump shot blends the three foundations (traditional, high release, quick release), how they stand around (relaxed, athletic, wide), and their posture and timing. It is cosmetic: it never changes release timing or any rating.</p><p style="margin-top:6px">Two players side by side, any action or transition, slow motion, pause and frame step, sliders for the left one, save to your builds or homies.</p><div style="margin-top:6px">${Btn('OPEN ANIM LAB', () => { uiClose(); alabOpen(); })}</div></div>`;
   } else if (t === 'profile') {
-    h += `<div class="card"><h3>MAXED OUT</h3><p>Every attribute 99, every badge iced out, every move, jumper, dunk, celebration and piece of drip owned, top rank, 250,000 VC. The flashiest package is equipped.</p><div style="margin-top:6px">${Btn('MAX ME OUT', () => { devMax(); devRig(); sfx('unlock'); toast('MAXED OUT', '99 everything. Go look in the mirror.', 'rank'); rerender(); })}</div></div>`;
-    h += `<div class="card"><h3>YOUR REAL PLAYER</h3><p>${S.devBak ? `Saved: <b>${esc(S.devBak.name)}</b>, ${ovrOf(S.devBak.attrs)} OVR, ${S.devBak.vc.toLocaleString()} VC. Restoring puts everything back exactly as it was, and throws away the dev changes.` : 'Nothing changed yet. The first change made here puts your real player aside so you can get them back.'}</p>${S.devBak ? `<div style="margin-top:6px">${Btn('RESTORE MY PLAYER', () => { devRestore(); devRig(); sfx('uiok'); toast('RESTORED', 'Back to the real you.'); rerender(); }, 'alt')}</div>` : ''}</div>`;
+    h += `<div class="card"><h3>MAXED OUT</h3><p>Every attribute 99, every street smart iced out, every move, jumper, dunk, celebration and piece of drip owned, top rank, 250,000 HC. The flashiest package is equipped.</p><div style="margin-top:6px">${Btn('MAX ME OUT', () => { devMax(); devRig(); sfx('unlock'); toast('MAXED OUT', '99 everything. Go look in the mirror.', 'rank'); rerender(); })}</div></div>`;
+    h += `<div class="card"><h3>YOUR REAL PLAYER</h3><p>${S.devBak ? `Saved: <b>${esc(S.devBak.name)}</b>, ${ovrOf(S.devBak.attrs)} OVR, ${S.devBak.vc.toLocaleString()} HC. Restoring puts everything back exactly as it was, and throws away the dev changes.` : 'Nothing changed yet. The first change made here puts your real player aside so you can get them back.'}</p>${S.devBak ? `<div style="margin-top:6px">${Btn('RESTORE MY PLAYER', () => { devRestore(); devRig(); sfx('uiok'); toast('RESTORED', 'Back to the real you.'); rerender(); }, 'alt')}</div>` : ''}</div>`;
     h += `<div class="card"><h3>WORLD</h3><p>Weather today: <b>${todayWeather()}</b>${weatherOverride ? ' (forced)' : ''}. It changes by the day; force it here to look around.</p><div style="margin-top:6px">${['clear', 'drizzle', 'fog'].map(w => Btn(w, () => { weatherOverride = w; toast('WEATHER', w + ' (next place you enter)'); rerender(); }, 'sm ' + (weatherOverride === w ? '' : 'alt'))).join(' ')} ${Btn('by the day', () => { weatherOverride = null; rerender(); }, 'sm alt')}</div>
       <p style="margin-top:8px">Crib: level ${homeLevel().lvl}, ${home().items.length} pieces, lot ${home().lot + 1}/3.</p><div style="margin-top:6px">${Btn('DECORATE MY CRIB (sample)', () => { devKeep(); devSampleCrib(); toast('CRIB DECORATED', 'All three yards, a few sets. Go home and look.'); rerender(); }, 'sm alt')} ${Btn('EMPTY MY CRIB', () => { devKeep(); home().items = []; home().store = {}; save(); rerender(); }, 'sm alt')}</div></div>`;
     h += `<div class="card"><h3>BUILD CODE</h3><p>Paste a code to become that player, or copy yours.</p><input type="text" id="devCode" placeholder="GN1-..." style="width:100%"><div style="margin-top:6px">${Btn('LOAD CODE', () => { const b = decodeBuild(($('devCode').value || '')); if (!b) { toast('BAD CODE', 'That code did not read.'); return; } devEdit(() => { S.name = b.name; S.build = b.build; S.attrs = b.attrs; S.badges = b.badges; S.worn = b.worn; Object.assign(S.moves, b.moves); }); toast('LOADED', b.name); }, 'sm')} ${Btn('COPY MINE', () => { const c = encodeBuild(myBuild()); try { navigator.clipboard.writeText(c); } catch (e) { } $('devCode').value = c; toast('COPIED', 'Build code is on the clipboard.'); }, 'sm alt')}</div></div>`;
   } else if (t === 'build') {
     const caps = capsFor(S.build);
     h += `<div class="cat">PLAYSTYLE</div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === S.build.style ? 'sel' : ''}" data-k="${on(() => devEdit(() => { S.build.style = s.id; }))}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
-    h += `<div class="cat">QUICK SET</div><div class="card">` + [['Max all 99', () => { for (const a of ATTRS) S.attrs[a.id] = 99; }], ['Cap out this style', () => { for (const a of ATTRS) S.attrs[a.id] = caps[a.id]; }], ['Fresh rookie', () => { S.attrs = startAttrs(S.build); }], ['All badges iced', () => { for (const b of BADGES) S.badges[b.id] = 4; }], ['No badges', () => { S.badges = {}; }]].map(([n, f]) => Btn(n, () => devEdit(f), 'sm alt')).join(' ') + `</div>`;
+    h += `<div class="cat">QUICK SET</div><div class="card">` + [['Max all 99', () => { for (const a of ATTRS) S.attrs[a.id] = 99; }], ['Cap out this style', () => { for (const a of ATTRS) S.attrs[a.id] = caps[a.id]; }], ['Fresh rookie', () => { S.attrs = startAttrs(S.build); }], ['All smarts iced', () => { for (const b of BADGES) S.badges[b.id] = 4; }], ['No smarts', () => { S.badges = {}; }]].map(([n, f]) => Btn(n, () => devEdit(f), 'sm alt')).join(' ') + `</div>`;
     h += `<div class="cat">ARCHETYPES <span class="mu" style="text-transform:none;letter-spacing:.02em">— each style capped out at its signature height</span></div><div class="card">` + STYLES.map(s => Btn(s.n, () => devEdit(() => { const m = maxBuild(s.id); S.build = m.build; const c = capsFor(S.build); for (const a of ATTRS) S.attrs[a.id] = c[a.id]; }), 'sm alt')).join(' ') + `</div>`;
     h += `<div class="cat">BODY</div><div class="card"><label class="sl">HEIGHT <b id="dh">${fmtH(S.build.body.h)}</b></label><input type="range" min="${H_MIN}" max="${H_MAX}" step="1" value="${S.build.body.h}" data-k="${on(el => { devKeep(); S.build.body.h = +el.value; $('dh').textContent = fmtH(S.build.body.h); save(); devRig(); })}">`;
     h += `<label class="sl">WEIGHT</label><input type="range" min="-10" max="10" step="1" value="${Math.round(S.build.body.w * 10)}" data-k="${on(el => { devKeep(); S.build.body.w = el.value / 10; save(); devRig(); })}"><label class="sl">WINGSPAN</label><input type="range" min="-10" max="10" step="1" value="${Math.round(S.build.body.s * 10)}" data-k="${on(el => { devKeep(); S.build.body.s = el.value / 10; save(); devRig(); })}"></div>`;
     h += `<div class="cat">ATTRIBUTES <span class="mu" style="text-transform:none;letter-spacing:.02em">— 25 to 99, caps ignored here (the mark is this style's cap)</span></div><div class="card">`;
     for (const c in CATS) { h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]}</div>`; for (const a of ATTRS) if (a.cat === c) h += `<label class="sl">${a.n} <b id="da_${a.id}">${S.attrs[a.id]}</b> <small class="mu">cap ${caps[a.id]}</small></label><input type="range" min="25" max="99" step="1" value="${S.attrs[a.id]}" data-k="${on(el => { devKeep(); S.attrs[a.id] = +el.value; $('da_' + a.id).textContent = el.value; save(); })}">`; }
-    h += `</div><div class="cat">BADGES <span class="mu" style="text-transform:none;letter-spacing:.02em">— tap to cycle the tier</span></div><div class="grid">`;
+    h += `</div><div class="cat">STREET SMARTS <span class="mu" style="text-transform:none;letter-spacing:.02em">— tap to cycle the tier</span></div><div class="grid">`;
     h += BADGES.map(b => { const v = S.badges[b.id] || 0; return `<div class="card" data-k="${on(() => devEdit(() => { S.badges[b.id] = ((S.badges[b.id] || 0) + 1) % 5; }))}"><h3 style="color:${TIER_COL[v]}">${b.n}</h3><p>${b.d}</p><span class="tag" style="color:${TIER_COL[v]}">${TIERS[v]}</span></div>`; }).join('') + `</div>`;
   } else if (t === 'moves') {
     h += `<p class="mu">Equip anything, owned or not. PREVIEW poses the player here; the REEL tab plays the real thing on a court.</p>`;
@@ -6306,7 +6368,7 @@ function devRender() {
     sec('FINISHES AND JUMPER VARIATIONS (everyone has these)', FINISHES, null, m => ({ fade: ['shoot', { rel: 0.6, fadeA: 1, cyc: 1 }], side: ['shoot', { rel: 0.6, sideS: 1, cyc: 1 }], hopj: ['hop', { cyc: HOP_T * 2 }], hop: ['hop', { cyc: HOP_T * 2 }] }[m.id] || ['layup', { kind: m.id === 'euro' ? 'lay' : m.id, euro: m.id === 'euro' ? 1 : 0, cyc: 0.9, u: 1 }]));
     sec('CELEBRATION', CELEBS, 'celeb', m => ['celeb', { style: m.id }]);
   } else if (t === 'play') {
-    h += `<p class="mu">Your current build, on a real court. Nothing here pays VC or Respect.</p>`;
+    h += `<p class="mu">Your current build, on a real court. Nothing here pays HC or Respect.</p>`;
     h += `<div class="card"><h3>SHOOT AROUND</h3><p>Just you, a hoop and a rebounder that gives the ball back.</p>${Btn('GO', () => devPlay('solo'), 'sm')}</div>`;
     const os = DEV.opp === 'max' ? `a maxed-out ${STYLE[DEV.oppStyle].n}` : `a ${DEV.oppOvr} OVR`;
     h += `<div class="card"><h3>OPPONENT</h3><p>Next games are against ${os}.</p><div>${Btn('MAXED OUT', () => { DEV.opp = 'max'; rerender(); }, 'sm ' + (DEV.opp === 'max' ? '' : 'alt'))} ${Btn('BY OVR', () => { DEV.opp = 'ovr'; rerender(); }, 'sm ' + (DEV.opp === 'ovr' ? '' : 'alt'))}</div>`;
@@ -6421,7 +6483,7 @@ const ALAB_ACTS = [
   ['shoot', 'Jump shot'], ['fake', 'Pump fake'], ['idle', 'Idle'], ['dribble', 'Dribble'], ['hold', 'Triple threat'], ['slide', 'Defense'], ['run', 'Run'], ['walk', 'Walk'], ['pass', 'Pass'], ['jump', 'Contest'],
   ['swag:rock', 'Swag: rock'], ['swag:tween', 'Swag: through the legs'], ['swag:behind', 'Swag: behind the back'], ['swag:yoyo', 'Swag: yo-yo'], ['swag:sizeup', 'Swag: size-up'], ['swag:wave', 'Swag: wave him up'], ['def:sag', 'Defense: sagging off'], ['def:tight', 'Defense: up close'],
   ['layup', 'Layup'], ['dunk', 'Dunk'], ['cross', 'Crossover'], ['post', 'Post up (LT)'], ['bodyup', 'Body up (LT)'], ['steal', 'Steal'], ['shove', 'Shove'], ['punch', 'Haymaker'], ['clothes', 'Clothesline'], ['stagger', 'Fall: sit'], ['fall:face', 'Fall: face first'], ['fall:flat', 'Fall: laid out'], ['fall:spin', 'Fall: spun round'], ['fall:knee', 'Fall: to a knee'],
-  ['celeb:airflex', 'Celeb: air flex'], ['celeb:flexdown', 'Celeb: crab flex'], ['celeb:toosmall', 'Celeb: too small'], ['celeb:stare', 'Celeb: stare down'], ['celeb:pout', 'Celeb: pout'], ['celeb:shh', 'Celeb: shh'], ['celeb:rock', 'Celeb: rock the baby'], ['celeb:nightnight', 'Celeb: night night'], ['celeb:pound', 'Celeb: chest pound'], ['celeb:shrug', 'Celeb: shrug'], ['celeb:floor', 'Celeb: slap the floor'], ['celeb:wag', 'Celeb: finger wag'],
+  ['celeb:airflex', 'Celeb: air flex'], ['celeb:flexdown', 'Celeb: crab flex'], ['celeb:toosmall', 'Celeb: too small'], ['celeb:stare', 'Celeb: stare down'], ['celeb:pout', 'Celeb: pout'], ['celeb:shh', 'Celeb: shh'], ['celeb:rock', 'Celeb: rock the baby'], ['celeb:nightnight', 'Celeb: night night'], ['celeb:pound', 'Celeb: chest pound'], ['celeb:shrug', 'Celeb: shrug'], ['celeb:floor', 'Celeb: slap the floor'], ['celeb:wag', 'Celeb: finger wag'], ['celeb:greenbean', 'Celeb: green bean'], ['celeb:greengiant', 'Celeb: green giant'], ['celeb:iceveins', 'Celeb: ice in my veins'], ['celeb:fentlean', 'Celeb: fent lean'], ['celeb:pour40', 'Celeb: pour out the 40'],
   ['fan:up', 'Fan: arms up'], ['fan:jump', 'Fan: jump'], ['fan:ohh', 'Fan: OHHH'], ['fan:point', 'Fan: point & laugh'], ['fan:cover', 'Fan: hand over mouth'], ['fan:boo', 'Fan: boo'], ['fan:count', 'Fan: three'], ['fan:wave', 'Fan: towel'], ['fan:clap', 'Fan: clap'], ['fan:phone', 'Fan: phone'], ['fan:film', 'Fan: filming'], ['fan:talk', 'Fan: talking'], ['fan:bob', 'Fan: bobbing'], ['fan:cross', 'Fan: arms crossed'],
   ['seq:idle,shoot,run', 'Idle → shot → land → run'], ['seq:dribble,shoot,idle', 'Dribble → shot'], ['seq:dribble,pass,idle', 'Dribble → pass'], ['seq:run,idle', 'Run → stop'], ['seq:slide,run,dribble', 'Defense → run → offense'], ['seq:walk,run,idle', 'Walk → run → stop'],
 ];
@@ -6566,7 +6628,7 @@ function checkAch() {
   for (const a of ACH) {
     if (S.ach[a.id] || achVal(a.k) < a.t) continue; S.ach[a.id] = 1; S.vc += a.vc;
     if (a.drip && !S.owned.includes(a.drip)) S.owned.push(a.drip);
-    toast(a.n, `+${a.vc} VC` + (a.drip ? ' · NEW DRIP: ' + DRIPS[a.drip].n : ''), 'ach'); sfx('unlock');
+    toast(a.n, `+${a.vc} HC` + (a.drip ? ' · NEW DRIP: ' + DRIPS[a.drip].n : ''), 'ach'); sfx('unlock');
   }
   save(); uiHud();
 }
@@ -6602,35 +6664,35 @@ function launchGame(m, tier, st) {
 }
 function finishGame(res, m, tier, st, cfg) {
   twoPlayer = false; const gate = MODES.indexOf(m); enterWorld('pit', gate >= 0 ? pitDoorX(gate) : 0, gate >= 0 ? -1.6 : 5.2, Math.PI);
-  if (res.quit) { if (res.lost) toast('CONNECTION LOST', 'The other player dropped. No harm, no pay.'); else toast('FORFEIT', 'No VC. No Respect. The park saw that.'); return; }
+  if (res.quit) { if (res.lost) toast('CONNECTION LOST', 'The other player dropped. No harm, no pay.'); else toast('FORFEIT', 'No HC. No Respect. The park saw that.'); return; }
   const s = res.stats, L = S.life, notes = [];
   let vc = (res.win ? 70 : 30) * tier.mult + s.pts * 4 + s.ast * 6 + s.reb * 4 + s.stl * 8 + s.blk * 8 + s.ankles * 10 + s.dunks * 5 + s.greens * 4;
   if (m.arcade) vc *= 0.75;       // RUCKUS games are faster and score more
-  const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Crib +${Math.round(cv * 100)}% VC`); }
-  if (cfg.boosts.includes('lotto')) { if (Math.random() < 0.5) { vc *= 2; notes.push('SCRATCH-OFF HIT: VC doubled'); } else notes.push('Scratch-off: "PLAY AGAIN"'); }
+  const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Crib +${Math.round(cv * 100)}% HC`); }
+  if (cfg.boosts.includes('lotto')) { if (Math.random() < 0.5) { vc *= 2; notes.push('SCRATCH-OFF HIT: HC doubled'); } else notes.push('Scratch-off: "PLAY AGAIN"'); }
   let rep = (res.win ? 45 : 12) * tier.mult + s.pts + s.ast * 2 + s.stl * 2 + s.blk * 2 + s.ankles * 3 + res.bonusRep;
   const rm = (ORIGIN[S.build.origin].k === 'rep' ? 0.15 : 0) + cribFx('rep'); if (rm) { rep *= 1 + rm; notes.push(`+${Math.round(rm * 100)}% Respect`); }
   if (res.shutout && res.win) { rep += 40; notes.push('SKUNK: +40 Respect'); }
-  if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% VC'); }
+  if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% HC'); }
   if (cfg.bonus) { const bo = cfg.bonus(res); if (bo) { vc += bo.vc; rep += bo.rep || 0; notes.push(bo.note); } }
   { const nx = nexxCheck(res); if (nx) { vc += nx.vc; rep += nx.rep; notes.push(nx.note); } }      /* Nexx filmed it */
   vc = Math.round(vc); rep = Math.round(rep);
   const bx = { F: 12 + s.dunks * 20 + (s.fgm - s.threes) * 7, S: 12 + s.greens * 12 + s.threes * 14, P: 12 + s.ast * 22 + s.ankles * 24, D: 12 + s.stl * 24 + s.blk * 24 + s.reb * 9 };
   const mS = 1 + cribFx('bxS') + cribFx('bxSF'), mF = 1 + cribFx('bxSF'); bx.S = Math.round(bx.S * mS); bx.F = Math.round(bx.F * mF);
   const pts = [];
-  for (const c in bx) { bx[c] = Math.round(bx[c] * (res.win ? 1 : 0.7) * (0.8 + tier.mult * 0.2)); S.bxp[c] += bx[c]; let n = 0; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; n++; } if (n) pts.push(`+${n} ${CATS[c][0]} badge point${n > 1 ? 's' : ''}`); }
+  for (const c in bx) { bx[c] = Math.round(bx[c] * (res.win ? 1 : 0.7) * (0.8 + tier.mult * 0.2)); S.bxp[c] += bx[c]; let n = 0; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; n++; } if (n) pts.push(`+${n} ${CATS[c][0]} smarts point${n > 1 ? 's' : ''}`); }
   S.vc += vc;
   for (const k of ['pts', 'ast', 'reb', 'stl', 'blk', 'ankles', 'greens', 'dunks', 'threes', 'bravs', 'fires']) L[k] = (L[k] || 0) + s[k];
   L.games = (L.games || 0) + 1; if (res.win) L.wins = (L.wins || 0) + 1; if (res.shutout && res.win) L.shutouts = (L.shutouts || 0) + 1;
   gainRep(rep); checkAch(); save();
-  if (pts.length) setTimeout(() => { toast('BADGE POINTS', pts.join(' · '), 'ach'); sfx('unlock'); }, 1600);
+  if (pts.length) setTimeout(() => { toast('STREET SMARTS', pts.join(' · '), 'ach'); sfx('unlock'); }, 1600);
   uiResults(res, { vc, rep, bxp: bx, pts, notes }, st ? () => launchGame(m, tier, st) : null);
 }
 function afterPractice(res, back) {
   if (back === 'hub') enterWorld('hub', 6.4, 7.4, 0.7); else enterWorld('crib', 0, 9, Math.PI);
   if (res.practice === 'rack' && !res.quit) {
     const pay = res.rack * 5; S.vc += pay; S.life.bestRack = Math.max(S.life.bestRack || 0, res.rack); save(); checkAch();
-    uiDialog('SHARPIE THE HUSTLER', res.rack >= 20 ? `${res.rack}?! Who ARE you. Take your ${pay} VC and stop embarrassing me.` : res.rack >= 8 ? `${res.rack} points. ${pay} VC. Respectable. Barely.` : `${res.rack} points. Here's ${pay} VC. Buy a jumpshot with it.`, [['Take the bag', null]]); sfx('buy');
+    uiDialog('SHARPIE THE HUSTLER', res.rack >= 20 ? `${res.rack}?! Who ARE you. Take your ${pay} HC and stop embarrassing me.` : res.rack >= 8 ? `${res.rack} points. ${pay} HC. Respectable. Barely.` : `${res.rack} points. Here's ${pay} HC. Buy a jumpshot with it.`, [['Take the bag', null]]); sfx('buy');
   }
 }
 

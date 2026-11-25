@@ -29,7 +29,7 @@ function loadSave() {
 function saveLocal() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
 function save() { S.ts = Date.now(); if (S.slots) S.slots[S.slot] = slotSnap(); saveLocal(); cloudSave(); }
 // ---- build slots: up to 5 players on one account. Each build has its own body, attributes, badges, equipped moves and
-// fit; VC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
+// fit; HC, Respect, the drip and moves you own, the crib and lifetime stats are shared. Online uses the active build.
 const MAX_SLOTS = 5, MOVE_SLOTS = ['side', 'back', 'diag', 'jumper', 'dunk', 'celeb'];
 const cloneJ = o => JSON.parse(JSON.stringify(o));
 function slotSnap() { const mv = {}; for (const k of MOVE_SLOTS) mv[k] = S.moves[k]; return cloneJ({ name: S.name, build: S.build, attrs: S.attrs, badges: S.badges, bp: S.bp, bxp: S.bxp, moves: mv, worn: S.worn, anim: S.anim || null, made: S.created }); }

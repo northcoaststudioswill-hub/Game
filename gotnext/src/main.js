@@ -51,7 +51,7 @@ function checkAch() {
   for (const a of ACH) {
     if (S.ach[a.id] || achVal(a.k) < a.t) continue; S.ach[a.id] = 1; S.vc += a.vc;
     if (a.drip && !S.owned.includes(a.drip)) S.owned.push(a.drip);
-    toast(a.n, `+${a.vc} VC` + (a.drip ? ' · NEW DRIP: ' + DRIPS[a.drip].n : ''), 'ach'); sfx('unlock');
+    toast(a.n, `+${a.vc} HC` + (a.drip ? ' · NEW DRIP: ' + DRIPS[a.drip].n : ''), 'ach'); sfx('unlock');
   }
   save(); uiHud();
 }
@@ -87,35 +87,35 @@ function launchGame(m, tier, st) {
 }
 function finishGame(res, m, tier, st, cfg) {
   twoPlayer = false; const gate = MODES.indexOf(m); enterWorld('pit', gate >= 0 ? pitDoorX(gate) : 0, gate >= 0 ? -1.6 : 5.2, Math.PI);
-  if (res.quit) { if (res.lost) toast('CONNECTION LOST', 'The other player dropped. No harm, no pay.'); else toast('FORFEIT', 'No VC. No Respect. The park saw that.'); return; }
+  if (res.quit) { if (res.lost) toast('CONNECTION LOST', 'The other player dropped. No harm, no pay.'); else toast('FORFEIT', 'No HC. No Respect. The park saw that.'); return; }
   const s = res.stats, L = S.life, notes = [];
   let vc = (res.win ? 70 : 30) * tier.mult + s.pts * 4 + s.ast * 6 + s.reb * 4 + s.stl * 8 + s.blk * 8 + s.ankles * 10 + s.dunks * 5 + s.greens * 4;
   if (m.arcade) vc *= 0.75;       // RUCKUS games are faster and score more
-  const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Crib +${Math.round(cv * 100)}% VC`); }
-  if (cfg.boosts.includes('lotto')) { if (Math.random() < 0.5) { vc *= 2; notes.push('SCRATCH-OFF HIT: VC doubled'); } else notes.push('Scratch-off: "PLAY AGAIN"'); }
+  const cv = cribFx('vc'); if (cv) { vc *= 1 + cv; notes.push(`Crib +${Math.round(cv * 100)}% HC`); }
+  if (cfg.boosts.includes('lotto')) { if (Math.random() < 0.5) { vc *= 2; notes.push('SCRATCH-OFF HIT: HC doubled'); } else notes.push('Scratch-off: "PLAY AGAIN"'); }
   let rep = (res.win ? 45 : 12) * tier.mult + s.pts + s.ast * 2 + s.stl * 2 + s.blk * 2 + s.ankles * 3 + res.bonusRep;
   const rm = (ORIGIN[S.build.origin].k === 'rep' ? 0.15 : 0) + cribFx('rep'); if (rm) { rep *= 1 + rm; notes.push(`+${Math.round(rm * 100)}% Respect`); }
   if (res.shutout && res.win) { rep += 40; notes.push('SKUNK: +40 Respect'); }
-  if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% VC'); }
+  if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% HC'); }
   if (cfg.bonus) { const bo = cfg.bonus(res); if (bo) { vc += bo.vc; rep += bo.rep || 0; notes.push(bo.note); } }
   { const nx = nexxCheck(res); if (nx) { vc += nx.vc; rep += nx.rep; notes.push(nx.note); } }      /* Nexx filmed it */
   vc = Math.round(vc); rep = Math.round(rep);
   const bx = { F: 12 + s.dunks * 20 + (s.fgm - s.threes) * 7, S: 12 + s.greens * 12 + s.threes * 14, P: 12 + s.ast * 22 + s.ankles * 24, D: 12 + s.stl * 24 + s.blk * 24 + s.reb * 9 };
   const mS = 1 + cribFx('bxS') + cribFx('bxSF'), mF = 1 + cribFx('bxSF'); bx.S = Math.round(bx.S * mS); bx.F = Math.round(bx.F * mF);
   const pts = [];
-  for (const c in bx) { bx[c] = Math.round(bx[c] * (res.win ? 1 : 0.7) * (0.8 + tier.mult * 0.2)); S.bxp[c] += bx[c]; let n = 0; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; n++; } if (n) pts.push(`+${n} ${CATS[c][0]} badge point${n > 1 ? 's' : ''}`); }
+  for (const c in bx) { bx[c] = Math.round(bx[c] * (res.win ? 1 : 0.7) * (0.8 + tier.mult * 0.2)); S.bxp[c] += bx[c]; let n = 0; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; n++; } if (n) pts.push(`+${n} ${CATS[c][0]} smarts point${n > 1 ? 's' : ''}`); }
   S.vc += vc;
   for (const k of ['pts', 'ast', 'reb', 'stl', 'blk', 'ankles', 'greens', 'dunks', 'threes', 'bravs', 'fires']) L[k] = (L[k] || 0) + s[k];
   L.games = (L.games || 0) + 1; if (res.win) L.wins = (L.wins || 0) + 1; if (res.shutout && res.win) L.shutouts = (L.shutouts || 0) + 1;
   gainRep(rep); checkAch(); save();
-  if (pts.length) setTimeout(() => { toast('BADGE POINTS', pts.join(' · '), 'ach'); sfx('unlock'); }, 1600);
+  if (pts.length) setTimeout(() => { toast('STREET SMARTS', pts.join(' · '), 'ach'); sfx('unlock'); }, 1600);
   uiResults(res, { vc, rep, bxp: bx, pts, notes }, st ? () => launchGame(m, tier, st) : null);
 }
 function afterPractice(res, back) {
   if (back === 'hub') enterWorld('hub', 6.4, 7.4, 0.7); else enterWorld('crib', 0, 9, Math.PI);
   if (res.practice === 'rack' && !res.quit) {
     const pay = res.rack * 5; S.vc += pay; S.life.bestRack = Math.max(S.life.bestRack || 0, res.rack); save(); checkAch();
-    uiDialog('SHARPIE THE HUSTLER', res.rack >= 20 ? `${res.rack}?! Who ARE you. Take your ${pay} VC and stop embarrassing me.` : res.rack >= 8 ? `${res.rack} points. ${pay} VC. Respectable. Barely.` : `${res.rack} points. Here's ${pay} VC. Buy a jumpshot with it.`, [['Take the bag', null]]); sfx('buy');
+    uiDialog('SHARPIE THE HUSTLER', res.rack >= 20 ? `${res.rack}?! Who ARE you. Take your ${pay} HC and stop embarrassing me.` : res.rack >= 8 ? `${res.rack} points. ${pay} HC. Respectable. Barely.` : `${res.rack} points. Here's ${pay} HC. Buy a jumpshot with it.`, [['Take the bag', null]]); sfx('buy');
   }
 }
 

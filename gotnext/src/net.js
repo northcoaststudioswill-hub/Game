@@ -313,6 +313,7 @@ function netGuestStep(dt) {
       if (e.k === 'c') hudCall(String(e.b || ''), String(e.s || ''), cssCol(e.c), +e.d || 1.2);
       else if (e.k === 'f') { const p = M_.P[e.i]; if (p) hudFloat(p, String(e.t || ''), cssCol(e.c)); }
       else if (e.k === 'pu') puNet(e);
+      else if (e.k === 'ca') { const K = M_.crowd; if (K) { const i = K.pool.findIndex(b => b.name === e.n), b = i >= 0 ? K.pool.splice(i, 1)[0] : null; crowdAdd(b, false); } }
       else if (e.k === 'cs') { const p = M_.P[e.i | 0]; if (p) p.celebStyle = String(e.s || '').slice(0, 14); }
       else if (e.k === 'ta') { const p = M_.P[e.i | 0]; if (p) p.tauntT = 1.3; }
       else if (e.k === 'cr') crowdReact(String(e.p || ''), e.t === undefined ? undefined : e.t | 0, true);

@@ -57,7 +57,7 @@ await page.evaluate(() => { __pit.keys.KeyP = true; }); await page.waitForTimeou
 await page.evaluate(() => { [...document.querySelectorAll('#panel .btn')].find(x => /LEAVE/.test(x.textContent)).click(); }); await page.waitForTimeout(500);
 await page.evaluate(() => { const P = __pit; P.W.spots.find(s => /BACK/.test(s.label)).fn(); }); await page.waitForTimeout(300);
 await page.evaluate(() => { __pit.keys.KeyP = true; }); await page.waitForTimeout(300); await page.evaluate(() => { __pit.keys.KeyP = false; }); await page.waitForTimeout(200); await shot('22-attrs');
-for (const [t, n] of [['BADGES', '23-badges'], ['MOVES', '24-moves'], ['TROPHIES', '25-trophies'], ['RANK ROAD', '26-road']]) { await page.evaluate(t => [...document.querySelectorAll('#panel .tabs .btn')].find(x => x.textContent === t).click(), t); await page.waitForTimeout(200); await shot(n); }
+for (const [t, n] of [['STREET SMARTS', '23-badges'], ['MOVES', '24-moves'], ['TROPHIES', '25-trophies'], ['RANK ROAD', '26-road']]) { await page.evaluate(t => [...document.querySelectorAll('#panel .tabs .btn')].find(x => x.textContent === t).click(), t); await page.waitForTimeout(200); await shot(n); }
 const sum = await page.evaluate(() => ({ vc: __pit.S.vc, rep: __pit.S.rep, life: __pit.S.life, bxp: __pit.S.bxp, ach: Object.keys(__pit.S.ach) }));
 console.log('ticks', n, JSON.stringify(sum)); console.log(errs.length ? 'ERRORS ' + errs.length : 'NO ERRORS');
 await browser.close(); process.exit(errs.length ? 1 : 0);

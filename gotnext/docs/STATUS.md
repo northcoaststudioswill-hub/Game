@@ -18,17 +18,17 @@ in section 3 are fixed by it.
 ## 1. What is in the game
 
 ### The loop
-Build a player → walk The Block → play in The Cages → earn VC (spent) and Respect (rank, never spent) and badge XP →
-spend on attributes, badges, moves, drip, the crib and one-game boosts → rank up → new courts and shelves open.
+Build a player → walk The Block → play in The Cages → earn HC (spent) and Respect (rank, never spent) and smarts XP →
+spend on attributes, street smarts, moves, drip, the crib and one-game boosts → rank up → new courts and shelves open.
 
 ### The builder
 - 6 playstyles (each a full table of 19 attribute caps), 6 origins (one perk each), and height (5'7"–7'3"), weight and
   wingspan sliders. The caps move live as you drag.
-- 19 attributes in 5 groups. You start at 60% of each cap and buy the rest with VC; the price climbs steeply.
+- 19 attributes in 5 groups. You start at 60% of each cap and buy the rest with HC; the price climbs steeply.
 - Overall is the average of your best 12 attributes, so specialists are not punished for dump stats.
 
-### Badges and progression
-- 16 badges, 4 per skill group, 4 tiers (Bronze, Silver, Gold, Iced Out). Earned with badge XP from doing that thing
+### Street Smarts and progression
+- 22 street smarts, 4 per skill group, 4 tiers (Bronze, Silver, Gold, Iced Out). Earned with smarts XP from doing that thing
   in games; each tier also needs an attribute to be high enough.
 - 8 Respect ranks; 4 court tiers that open with rank and pay more.
 - 29 trophies, 5 of which give drip you cannot buy.
@@ -44,7 +44,7 @@ spend on attributes, badges, moves, drip, the crib and one-game boosts → rank 
 ### Places
 - **The Block:** one tight street corner. The Cages (a floodlit chain-link cage with a show court and a crowd) across
   the north side; The Lab, My Crib, The Plug and Tape Deck facing each other; murals, posters, string lights, kicks on
-  a wire, a boombox with dancers, a barrel fire, the gold statue, the old head, four VC fiends, the Money Rack
+  a wire, a boombox with dancers, a barrel fire, the gold statue, the old head, four HC fiends, the Money Rack
   shootout, a chained UPTOWN LINE gate held for later, an elevated train.
 - **The Cages:** four gates (Street 2v2, Street 3v3, JAM 2v2, JAM 3v3), Last Call (boosts), The Link (build codes).
 - **My Crib:** home court for shooting around; closet; upgrade bench.
@@ -134,8 +134,8 @@ Ranked by how badly they would hurt a first real session.
 11. **Homies are matched by name.** Two different friends named the same overwrite each other.
 12. **Online games fill empty spots with random AI**, not with homies, and the joining players' crib bonuses and
     boosts do not apply (only the host's).
-13. **Economy is untuned.** VC and Respect rates are first guesses; JAM games pay 75%; losing pays about a third.
-14. **Leftover joke voice** in badge names, attribute blurbs, origins, trophies and calls (it clashes with the slick
+13. **Economy is untuned.** HC and Respect rates are first guesses; JAM games pay 75%; losing pays about a third.
+14. **Leftover joke voice** in street smarts names, attribute blurbs, origins, trophies and calls (it clashes with the slick
     brand in the menus).
 15. **Phone layout** of the long menus (attributes, drip) has only been looked at in a 390×844 screenshot.
 
@@ -156,11 +156,11 @@ COPY CODE buttons had invisible labels.
 | Export builds, play friends in the modes | Done: build codes; and now online |
 | Regular courts, NBA Jam-style arcade courts | Done: Street and JAM rules |
 | MyPlayer camera focused on your player | Partly: the camera follows you from behind and above; not a true over-the-shoulder 2K cam |
-| Home, home court, unlock as you earn Respect and VC | Done: crib with 8 upgrade lines, ranks, shops |
+| Home, home court, unlock as you earn Respect and HC | Done: crib with 8 upgrade lines, ranks, shops |
 | "Gutterborn DNA" | Built from your description. I could not find Gutterborn in the repo, so it is not compared against it |
 | Lots of drip, achievements, dopamine rush | Done: 74 drip, 22 moves, 29 trophies, count-ups, toasts, rank-ups |
 | 2145 America parody, bravado, sports domineering | Done in the world (ads, statue, fiends); menus are now slick on purpose |
-| Bums asking VC for Basketball 2146 on PS88 | Done |
+| Bums asking HC for Basketball 2146 on PS88 | Done |
 | Hub, the courts with mode doors in another room, last-minute things | Done: The Cages, Last Call |
 | Builder and shops written in this world | Done |
 | Not Gutterborn's graphics; 3rd-person hub cam | Done |
@@ -168,7 +168,7 @@ COPY CODE buttons had invisible labels.
 | Basketball dress, drip and lines | Drip yes; "lines" (players talking) **no** |
 | Deep builder; moves on a stick; research attributes/buffs | Done; research in `docs/DESIGN.md` |
 | Cel shaded, thin, built to animate, easy to dress | Done, but primitive (see section 2) |
-| Badges like MyPlayer | Done |
+| Street smarts (street smarts) like MyPlayer | Done |
 | Total rebrand, slick, save space for more | Done: GOT NEXT, `docs/BRAND.md` |
 | Way more urban, players dripping in swag and flash | World: yes. **Players: not yet.** The biggest open item. |
 | "Cage" and "born" not in the title | Done |
@@ -185,14 +185,16 @@ COPY CODE buttons had invisible labels.
 | Fouls to stop steal spam | Done (0.9.4): reach-ins, hand checks on repeat swipes, shooting and blocking fouls, and-ones; offense keeps the ball. Not in JAM. Balance is a first pass |
 | Out of bounds, not too easy to run out | Done (0.9.4): ball handler over a line is a turnover; outward drift near a line is damped unless you sprint at it on purpose. Loose balls are not called out yet |
 | Ring pointer to your man | Done (0.9.4): magenta arrow on your ring on defense |
-| Don't earn VC too fast (no 99 in one session) | Done (0.10): upgrades past 55 get steep. Maxing a build is ~72-110k VC (about 20 hours); 80 OVR is ~32-39k. Early upgrades cost what they did |
-| 5 savable builds | Done (0.10): MY PLAYER → BUILDS. Own body, attributes, badges, moves, fit and movement profile per build; VC, Respect, owned drip and moves, crib shared. Online uses the active build |
+| Don't earn HC too fast (no 99 in one session) | Done (0.10): upgrades past 55 get steep. Maxing a build is ~72-110k HC (about 20 hours); 80 OVR is ~32-39k. Early upgrades cost what they did |
+| 5 savable builds | Done (0.10): MY PLAYER → BUILDS. Own body, attributes, street smarts, moves, fit and movement profile per build; HC, Respect, owned drip and moves, crib shared. Online uses the active build |
 | Stomping when jogging on the court | Fixed (0.10): the running stride only kicked in above 3 m/s, so a half-pushed stick fell back to old stepping. Now the Block's walk-to-run gait runs on the court from 1.2 m/s, and a jogging ball handler turns toward where he's going |
 | Controller on every menu; home builder with a pad | Done: tests/padmenus.mjs opens 38 menus and checks every control is reachable; builder mapped (A place, X rotate, Y store, LT sell, d-pad catalog, LB/RB category) with a hint strip |
 | Phone controls | Done: 38 menus pass in portrait and landscape (no sideways scroll, every button 30 px or more); on-screen LT button |
 | Watch the holodice, not a menu | Done: games at Trey's are played on sixteen holodice with the camera on the table; only a slim bar for buttons. Bones at home keeps the panel |
 | Backs, bumps, falls, celebrations | Done: torso geometry and a rest curve; momentum exchange on collisions by strength, weight and height; falls: sit, face, flat, spin, knee; celebrations chosen by the play, air flex off a dunk, finger wag after a block |
-| Wearables from the other games; no twin bots | Done: 36 crossover pieces (94k VC), 3 earned; AI looks made unique per game and on the Block |
+| HC, Street Smarts, more to unlock | Done (0.11): VC is now HC (Hooper Coins) and badges are Street Smarts in every menu (save fields unchanged). 22 street smarts (new: The Postman, Heat Check, Showtime, Hard Hat, Clamps, Iron Chin), 19 celebrations (new: Green Bean, Green Giant, Ice In My Veins, Fent Lean, Pour Out The 40), 17 branded home pieces (46k HC). tests/hc.mjs |
+| Crowd grows with the game | Done (0.11): five watchers at tip; big plays and a tight late score bring named Block people walking to the fence, up to a full cage. Online guests get the same arrivals |
+| Wearables from the other games; no twin bots | Done: 36 crossover pieces (94k HC), 3 earned; AI looks made unique per game and on the Block |
 | Post moves by direction; auto dribble hand; JAM slugfest | Done (0.10): LT + X with the stick picks drop step / hook / fade / jump hook / turnaround. Ball goes to the hand of travel or away from a defender within 1.7 m (manual crossovers hold 1.5 s). JAM: haymaker, clothesline, KO, called foul with ball reset. No new animation for the hand switch beyond the crossover dribble |
 | Nicer courts; arcade JAM courts with power-ups | Done (0.10): courts.js. Park courts: asphalt grit, resurfacing, worn paint, scuffs, lane hashes, centre logo, tier paint, benches and a flip scoreboard. JAM: neon floor, LED strips (score flash, fire), jumbotron, five power-ups, synced online. AI doesn't go after power-ups on purpose |
 | Post game (LT on offense) and body up (LT on defense) | Done (0.10): first pass. Back-down by strength, turnaround fade, hook, drop step, face up. AI offense doesn't post up yet; there is no touch button for LT yet |
@@ -234,14 +236,14 @@ COPY CODE buttons had invisible labels.
 - Cap = playstyle base + height × h + weight × w + wingspan × s, per attribute (`BODY_MOD`), plus origin perks,
   clamped 35–99. Height buys rebounding, blocks and inside play and costs speed, handles and the deep ball; weight
   buys strength and costs quickness; wingspan buys steals, blocks and boards and costs shooting.
-- Price of +1 = `6 + (v − 30)^1.55 × 0.16` VC: about 36 at 60, 150 at 90. Maxing a build is a long goal by design.
-- Badges change one named term in one formula each, so they are easy to tune.
+- Price of +1 = `6 + (v − 30)^1.55 × 0.16` HC: about 36 at 60, 150 at 90. Maxing a build is a long goal by design.
+- Street Smarts change one named term in one formula each, so they are easy to tune.
 - In-game value of an attribute = its number + drip buffs + crib buffs + boosts + Bravado.
 - Full write-up: `docs/DESIGN.md`.
 
 ### 5.3 Shooting and finishing
 - Jumper: base chance from attribute and distance, cut by contest (nearest defender, hands up or jumping, their
-  defense). A green window around the ideal release, widened by Shot IQ, the Green Card badge, the jumpshot, the Shot
+  defense). A green window around the ideal release, widened by Shot IQ, the Green Card street smart, the jumpshot, the Shot
   Doctor; narrowed by a hand in your face. Green = in (80% if smothered); outside it, the chance falls with how early
   or late.
 - Floater: fixed quick release, half the contest, falls off past 2.2 m.
@@ -270,5 +272,5 @@ basketball, `src/hub.js` places, `src/ui.js` menus/HUD, `src/net.js` online, `sr
 3. **Phone performance.** Measure first, then merge static meshes, cap lights, cheaper outlines.
 4. **Online polish.** Host hand-off, guest prediction, homies as AI fill, quick chat.
 5. **Minigames.** 21, H-O-R-S-E, a dunk contest at the cage, a skills course: short, repeatable, with their own rewards.
-6. **Copy pass.** Rewrite badges, trophies, origins and calls in the street voice of the brand.
+6. **Copy pass.** Rewrite street smarts, trophies, origins and calls in the street voice of the brand.
 7. **Animation clips** for the signature moves and dunks.
