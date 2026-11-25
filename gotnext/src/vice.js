@@ -30,21 +30,21 @@ function bottieBuild() { const b = withSeed(4242, () => aiBuild(84, 'showman'));
 
 // ---------------- holodice ----------------
 // the grey ones: a pillar on a pale foot, a brown cap, a black dome, and the number hanging in the light above it
-function holoNumTex(n) { return geoTex('holo' + n, () => canvasTex(64, 64, x => { x.clearRect(0, 0, 64, 64); x.fillStyle = '#b3401a'; x.beginPath(); x.arc(32, 32, 25, 0, 6.3); x.fill(); x.strokeStyle = '#ffb347'; x.lineWidth = 4; x.stroke(); x.fillStyle = '#ffe2a8'; x.font = '900 38px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.fillText(String(n), 32, 46); })); }
+function holoNumTex(n) { return geoTex('holoB' + n, () => canvasTex(64, 64, x => { x.clearRect(0, 0, 64, 64); x.shadowColor = '#ff7a1f'; x.shadowBlur = 10; x.fillStyle = '#ffb347'; x.font = '900 50px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.fillText(String(n), 32, 50); x.shadowBlur = 4; x.fillStyle = '#ffe9c0'; x.fillText(String(n), 32, 50); })); }      /* just the glowing number: it sits inside the black dome */
 function holodiceMesh(g) {
   ink(M(box(0.3, 0.1, 0.3), toon('#3a3d44'), 0, 0.05, 0, g), 1.04); M(box(0.27, 0.07, 0.27), toon('#d5d9de'), 0, 0.135, 0, g); ink(M(box(0.24, 0.5, 0.24), toon('#8f959d'), 0, 0.42, 0, g), 1.04);
-  ink(M(box(0.34, 0.06, 0.34), toon('#5a3a22'), 0, 0.7, 0, g), 1.05); M(sph(0.12, 12, 8), toon('#0d0d10'), 0, 0.73, 0, g).scale.set(1, 0.75, 1);
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: holoNumTex(1 + Math.floor(Math.random() * 6)), transparent: true, depthWrite: false })); sp.scale.setScalar(0.26); sp.position.y = 1.02; g.add(sp); g.userData.holo = sp;
+  ink(M(box(0.34, 0.06, 0.34), toon('#5a3a22'), 0, 0.7, 0, g), 1.05); M(sph(0.15, 14, 10), flat(0x08080b), 0, 0.73, 0, g).scale.set(1, 0.9, 1);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: holoNumTex(1 + Math.floor(Math.random() * 6)), transparent: true, depthWrite: false })); sp.scale.setScalar(0.2); sp.position.y = 0.79; sp.material.depthTest = false; sp.renderOrder = 5; g.add(sp); g.userData.holo = sp;
   if (typeof W !== 'undefined' && W) (W.holo = W.holo || []).push({ sp, t: rnd(2, 9), roll: 0 }); return g;
 }
 function holoStep(dt) { if (!W || !W.holo) return; if (W.bones && W.bones.on && !(UI.cur && UI.cur.onClose)) bonesLeave(); const play = W.bones && W.bones.on;
   for (const h of W.holo) {
     if (h.table && play) {      // a die in play: flickers while it rolls, then shows its number; empty places are dark
-      if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; h.sp.visible = true; if (h.ft <= 0) { h.ft = 0.06; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 16)) * 0.07; if (h.roll <= 0 && h.val) { h.sp.material.map = holoNumTex(h.val); sfx('ui'); } }
-      else { h.sp.visible = h.val > 0; h.sp.position.y = 1.02 + (h.held ? 0.08 : 0); h.sp.material.color.setHex(h.held ? 0x7dffb0 : 0xffffff); h.sp.scale.setScalar(h.held ? 0.32 : 0.28); }
+      if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; h.sp.visible = true; if (h.ft <= 0) { h.ft = 0.06; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 0.79; if (h.roll <= 0 && h.val) { h.sp.material.map = holoNumTex(h.val); sfx('ui'); } }
+      else { h.sp.visible = h.val > 0; h.sp.position.y = 0.79; h.sp.material.color.setHex(h.held ? 0x7dffb0 : 0xffffff); h.sp.scale.setScalar(h.held ? 0.24 : 0.2); }
       continue; }
     h.sp.visible = true; h.sp.material.color.setHex(0xffffff);
-    if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; if (h.ft <= 0) { h.ft = 0.07; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 1.02 + Math.abs(Math.sin(h.roll * 14)) * 0.05; } else { h.t -= dt; h.sp.position.y = 1.02; if (h.t <= 0) { h.t = rnd(4, 12); h.roll = 0.7; } } }
+    if (h.roll > 0) { h.roll -= dt; h.ft = (h.ft || 0) - dt; if (h.ft <= 0) { h.ft = 0.07; h.sp.material.map = holoNumTex(1 + Math.floor(Math.random() * 6)); } h.sp.position.y = 0.79; } else { h.t -= dt; h.sp.position.y = 0.79; if (h.t <= 0) { h.t = rnd(4, 12); h.roll = 0.7; } } }
 }
 // put a game's dice on the table: a place whose number changed rolls first (his a beat after yours)
 function bonesSync(you, him, hold) { const T = W && W.bones; if (!T) return; T.on = true; const set = (row, vals, delay) => row.forEach((h, i) => { const v = vals[i] || 0, hd = !!(hold && hold[i] && row === T.you); if (v !== h.val) { h.val = v; h.roll = v ? 0.45 + delay + i * 0.05 : 0; } h.held = hd; }); set(T.you, you.slice(-8), 0); set(T.him, him.slice(-8), 0.35); }
@@ -119,7 +119,7 @@ function uiBones(home) {
   };
   const bar = () => {
     bonesSync(G.phase === 'pick' ? [] : G.you, G.phase === 'pick' ? [] : G.him, G.game === 'poker' && G.phase === 'you' ? G.hold : null);
-    const T = W.bones, pt = innerWidth < innerHeight; W.camO = { p: new THREE.Vector3(T.cx + 0.2, pt ? 5.6 : 3.7, T.cz + (pt ? 8.2 : 5.6)), l: new THREE.Vector3(T.cx, 0.1, T.cz + 1.1) };
+    const T = W.bones, pt = innerWidth < innerHeight; W.camO = { p: new THREE.Vector3(T.cx + 0.15, pt ? 5.2 : 3.0, T.cz + (pt ? 7.4 : 4.3)), l: new THREE.Vector3(T.cx, 0.15, T.cz + 0.75) };
     const tot = G.phase !== 'pick' && G.game !== 'poker' && G.you.length ? ` · YOU ${sum(G.you)}${G.him.length ? ' · TREY ' + sum(G.him) : ''}` : '';
     let h = `<div style="flex:1"></div><div class="card sel" style="max-width:720px;margin:0 auto;width:100%"><div class="row"><h3 class="mono" style="font-size:10px;color:var(--heat)">TREY${G.phase !== 'pick' ? ' · ' + BONES[G.game].n + ' · ' + G.bet + ' VC' + tot : ''}</h3>${vcLine()}</div><p style="font-size:14px;margin:6px 0 8px">${esc(G.msg)}</p><div class="pf" style="flex-wrap:wrap;gap:6px">`;
     if (G.phase === 'pick') h += stakes.map(s => Btn(s + '', () => { G.stake = s; rerender(); }, 'sm ' + (G.stake === s ? '' : 'alt'))).join('') + Object.keys(BONES).map(id => Btn(BONES[id].n, () => start(id), 'sm', S.vc < G.stake)).join('') + Btn('LEAVE', uiClose, 'sm alt');
