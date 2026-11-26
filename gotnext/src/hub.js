@@ -5,6 +5,12 @@ function worldPlayerRig() {
   if (W.me.rig) scene.remove(W.me.rig.root);
   W.me.rig = makeRig(myBuild()); scene.add(W.me.rig.root);
 }
+// a name that floats over somebody you are meant to find
+function worldTag(n, name, sub) {
+  if (!n || !n.rig) return; const tex = canvasTex(512, 128, (x, w, h) => { x.fillStyle = 'rgba(8,8,10,.78)'; x.fillRect(0, 10, w, h - 20); x.fillStyle = '#ff5a2a'; x.fillRect(0, 10, 10, h - 20);
+    x.fillStyle = '#f4efe6'; x.font = '900 46px Arial'; x.textAlign = 'center'; x.fillText(name, w / 2 + 4, sub ? 64 : 80); if (sub) { x.fillStyle = '#b9b3a8'; x.font = '600 28px Arial'; x.fillText(sub, w / 2 + 4, 102); } });
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); s.scale.set(1.9, 0.475, 1); s.position.set(0, (n.rig.H || 1.9) + 0.5, 0); s.renderOrder = 8; n.rig.root.add(s); n.tag = s; return s;
+}
 function addNpc(build, x, z, face, anim, extra) {
   if (W && !build.bot && !(extra && (extra.cast || extra.still || extra.low)) && !build.keepLook && build.worn && build.worn.top) uniqLook(build, W.looks || (W.looks = new Set()), 2);
   if (W && build.name && !build.bot && !(extra && (extra.cast || extra.still)) && typeof NPC_NAMES !== 'undefined' && NPC_NAMES.includes(build.name) && W.npcs.some(m => m.name === build.name)) { const free = NPC_NAMES.filter(x => !W.npcs.some(m => m.name === x)); if (free.length) build.name = free[Math.floor(Math.random() * free.length)]; }      /* two people with the same name on one corner */
@@ -234,7 +240,7 @@ function buildHub() {
   spot(-8, -1.9, 2.0, 'OLD HEAD (daily contracts)', () => uiContracts());
   // the coach and his board: every drill on the block pays
   const cb = aiBuild(70, 'general'); cb.name = 'Coach Overtime'; cb.worn = Object.assign(cb.worn, { hair: 'h_bald', head: 'hd_cap', face: 'f_none', top: 't_hoodie', bottom: 'b_long', shoes: 'k_white', back: 'bk_towel' });
-  addNpc(cb, -3.6, 5.0, Math.PI * 0.85, 'idle');
+  { const n = addNpc(cb, -3.6, 5.0, Math.PI * 0.85, 'idle'); worldTag(n, 'COACH OVERTIME', 'drills'); }      /* a new player has to be able to find him (the blind playtest never did) */
   { const g = grp(scene, -4.9, 0, 6.3); g.rotation.y = Math.PI * 0.8; ink(M(box(2.2, 1.4, 0.08), toon('#1f3a2c'), 0, 1.5, 0, g), 1.03); M(box(2.36, 0.1, 0.12), toon('#7a5a3a'), 0, 0.78, 0, g); for (const sx of [-1, 1]) M(cyl(0.04, 0.04, 1.5, 5), toon('#3a3c44'), sx * 0.95, 0.75, -0.05, g);
     const t = sign('DRILLS\nLAYUPS · THREES · SPOTS\nHANDLES · DEFENSE', 2.0, 1.2, '#ece9e2', '#1f3a2c', { border: false }); t.position.set(0, 1.5, 0.05); g.add(t); solid(-6.2, -3.6, 5.6, 7.0); }
   spot(-3.4, 4.0, 2.0, 'COACH OVERTIME (drills)', () => uiDrills('hub'));

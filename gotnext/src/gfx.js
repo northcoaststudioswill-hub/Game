@@ -281,12 +281,14 @@ const RUN_KNEE = [[0, 18], [0.12, 34], [0.2, 36], [0.38, 20], [0.5, 62], [0.62, 
 const RUN_ANKLE = [[0, 6], [0.12, 20], [0.2, 22], [0.38, -24], [0.5, -14], [0.7, 0], [1, 6]];
 // o.psi stride phase, o.duty stance share of the stride (0.42 jog .. 0.28 sprint), o.k 0 jog .. 1 sprint,
 // o.flight seconds in the air between steps, o.hipA stance hip-swing scale
+// each run style's swing leg (only the leg in the air, so a planted foot never slides): extra thigh lift, extra knee fold
+const RUN_LEGS = { highstep: [0.42, 0.5], bouncy: [0.1, 0.28], glide: [-0.1, -0.32], heavy: [-0.08, -0.24], low: [0.05, 0.26], lean: [0.12, 0.1], pump: [0.16, 0.16], shifty: [0.04, 0.12] };
 function runPose(p, o) {
   const S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
   const ps = ((o.psi || 0) % 1 + 1) % 1, d = o.duty || 0.38, k = o.k || 0, ah = o.hipA === undefined ? 1 : o.hipA, th = o.thigh || 0.48, sh = o.shin || 0.48, full = th + sh;
   const warp = u => u < d ? u / d * 0.38 : 0.38 + (u - d) / (1 - d) * 0.62;       // stance and swing re-timed for this speed
   const leg = u => { const w = warp(((u % 1) + 1) % 1), st = w < 0.38; const sw = st ? 0 : (w - 0.38) / 0.62, land = clamp((sw - 0.8) / 0.2, 0, 1), c0 = 3 + 20 * ah;       /* the swing ends where the stance begins: no snap at foot strike */
-    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; const hs = !st && o.rs === 'highstep' ? Math.sin(Math.PI * sw) * (0.6 + 0.4 * k) : 0; return { hip: hip + hs * 0.42, kn: kn + hs * 0.5, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
+    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; const lg = RUN_LEGS[o.rs], hs = !st && lg ? Math.sin(Math.PI * sw) * (0.6 + 0.4 * k) : 0; return { hip: hip + hs * (lg ? lg[0] : 0), kn: kn + hs * (lg ? lg[1] : 0), an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
   let low = 0, stance = false;
   for (const [side, off] of [['R', 0], ['L', 0.5]]) {
     const u = ((ps + off) % 1 + 1) % 1, L = leg(u);

@@ -1333,12 +1333,14 @@ const RUN_KNEE = [[0, 18], [0.12, 34], [0.2, 36], [0.38, 20], [0.5, 62], [0.62, 
 const RUN_ANKLE = [[0, 6], [0.12, 20], [0.2, 22], [0.38, -24], [0.5, -14], [0.7, 0], [1, 6]];
 // o.psi stride phase, o.duty stance share of the stride (0.42 jog .. 0.28 sprint), o.k 0 jog .. 1 sprint,
 // o.flight seconds in the air between steps, o.hipA stance hip-swing scale
+// each run style's swing leg (only the leg in the air, so a planted foot never slides): extra thigh lift, extra knee fold
+const RUN_LEGS = { highstep: [0.42, 0.5], bouncy: [0.1, 0.28], glide: [-0.1, -0.32], heavy: [-0.08, -0.24], low: [0.05, 0.26], lean: [0.12, 0.1], pump: [0.16, 0.16], shifty: [0.04, 0.12] };
 function runPose(p, o) {
   const S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
   const ps = ((o.psi || 0) % 1 + 1) % 1, d = o.duty || 0.38, k = o.k || 0, ah = o.hipA === undefined ? 1 : o.hipA, th = o.thigh || 0.48, sh = o.shin || 0.48, full = th + sh;
   const warp = u => u < d ? u / d * 0.38 : 0.38 + (u - d) / (1 - d) * 0.62;       // stance and swing re-timed for this speed
   const leg = u => { const w = warp(((u % 1) + 1) % 1), st = w < 0.38; const sw = st ? 0 : (w - 0.38) / 0.62, land = clamp((sw - 0.8) / 0.2, 0, 1), c0 = 3 + 20 * ah;       /* the swing ends where the stance begins: no snap at foot strike */
-    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; const hs = !st && o.rs === 'highstep' ? Math.sin(Math.PI * sw) * (0.6 + 0.4 * k) : 0; return { hip: hip + hs * 0.42, kn: kn + hs * 0.5, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
+    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; const lg = RUN_LEGS[o.rs], hs = !st && lg ? Math.sin(Math.PI * sw) * (0.6 + 0.4 * k) : 0; return { hip: hip + hs * (lg ? lg[0] : 0), kn: kn + hs * (lg ? lg[1] : 0), an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
   let low = 0, stance = false;
   for (const [side, off] of [['R', 0], ['L', 0.5]]) {
     const u = ((ps + off) % 1 + 1) % 1, L = leg(u);
@@ -4335,6 +4337,12 @@ function worldPlayerRig() {
   if (W.me.rig) scene.remove(W.me.rig.root);
   W.me.rig = makeRig(myBuild()); scene.add(W.me.rig.root);
 }
+// a name that floats over somebody you are meant to find
+function worldTag(n, name, sub) {
+  if (!n || !n.rig) return; const tex = canvasTex(512, 128, (x, w, h) => { x.fillStyle = 'rgba(8,8,10,.78)'; x.fillRect(0, 10, w, h - 20); x.fillStyle = '#ff5a2a'; x.fillRect(0, 10, 10, h - 20);
+    x.fillStyle = '#f4efe6'; x.font = '900 46px Arial'; x.textAlign = 'center'; x.fillText(name, w / 2 + 4, sub ? 64 : 80); if (sub) { x.fillStyle = '#b9b3a8'; x.font = '600 28px Arial'; x.fillText(sub, w / 2 + 4, 102); } });
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })); s.scale.set(1.9, 0.475, 1); s.position.set(0, (n.rig.H || 1.9) + 0.5, 0); s.renderOrder = 8; n.rig.root.add(s); n.tag = s; return s;
+}
 function addNpc(build, x, z, face, anim, extra) {
   if (W && !build.bot && !(extra && (extra.cast || extra.still || extra.low)) && !build.keepLook && build.worn && build.worn.top) uniqLook(build, W.looks || (W.looks = new Set()), 2);
   if (W && build.name && !build.bot && !(extra && (extra.cast || extra.still)) && typeof NPC_NAMES !== 'undefined' && NPC_NAMES.includes(build.name) && W.npcs.some(m => m.name === build.name)) { const free = NPC_NAMES.filter(x => !W.npcs.some(m => m.name === x)); if (free.length) build.name = free[Math.floor(Math.random() * free.length)]; }      /* two people with the same name on one corner */
@@ -4564,7 +4572,7 @@ function buildHub() {
   spot(-8, -1.9, 2.0, 'OLD HEAD (daily contracts)', () => uiContracts());
   // the coach and his board: every drill on the block pays
   const cb = aiBuild(70, 'general'); cb.name = 'Coach Overtime'; cb.worn = Object.assign(cb.worn, { hair: 'h_bald', head: 'hd_cap', face: 'f_none', top: 't_hoodie', bottom: 'b_long', shoes: 'k_white', back: 'bk_towel' });
-  addNpc(cb, -3.6, 5.0, Math.PI * 0.85, 'idle');
+  { const n = addNpc(cb, -3.6, 5.0, Math.PI * 0.85, 'idle'); worldTag(n, 'COACH OVERTIME', 'drills'); }      /* a new player has to be able to find him (the blind playtest never did) */
   { const g = grp(scene, -4.9, 0, 6.3); g.rotation.y = Math.PI * 0.8; ink(M(box(2.2, 1.4, 0.08), toon('#1f3a2c'), 0, 1.5, 0, g), 1.03); M(box(2.36, 0.1, 0.12), toon('#7a5a3a'), 0, 0.78, 0, g); for (const sx of [-1, 1]) M(cyl(0.04, 0.04, 1.5, 5), toon('#3a3c44'), sx * 0.95, 0.75, -0.05, g);
     const t = sign('DRILLS\nLAYUPS · THREES · SPOTS\nHANDLES · DEFENSE', 2.0, 1.2, '#ece9e2', '#1f3a2c', { border: false }); t.position.set(0, 1.5, 0.05); g.add(t); solid(-6.2, -3.6, 5.6, 7.0); }
   spot(-3.4, 4.0, 2.0, 'COACH OVERTIME (drills)', () => uiDrills('hub'));
