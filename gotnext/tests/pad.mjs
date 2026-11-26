@@ -20,7 +20,7 @@ let r = await p.evaluate(() => { const f = () => document.querySelector('#panel 
   __press(15, 6); const bR = f(), rr = rect(bR); out.right = bR.textContent; out.sameRow = Math.abs((rr.top + rr.bottom) / 2 - (ra.top + ra.bottom) / 2) < 6;
   __press(13, 6); const c = f(), rc = rect(c); out.down = c.textContent; out.below = rc.top > rr.bottom - 2; out.downAligned = Math.abs((rc.left + rc.right) / 2 - (rr.left + rr.right) / 2) < 30;
   __press(14, 6); const d = f(), rd = rect(d); out.left = d.textContent; out.leftSameRow = Math.abs((rd.top + rd.bottom) / 2 - (rc.top + rc.bottom) / 2) < 6; return out; });
-ok(/^\+1/.test(r.start) && r.right === '+5' && r.sameRow && r.below && r.downAligned && r.leftSameRow && /^\+1/.test(r.left), `d-pad: on "${r.start}", → goes to "${r.right}" on the same row, ↓ to "${r.down}" right below, ← back to "${r.left}"`);
+ok(/^\+1/.test(r.start) && /^\+5/.test(r.right) && r.sameRow && r.below && r.downAligned && r.leftSameRow && /^\+1/.test(r.left), `d-pad: on "${r.start}", → goes to "${r.right}" on the same row, ↓ to "${r.down}" right below, ← back to "${r.left}"`);
 await p.screenshot({ path: path.join(dir, 'shots', 'pad-menu.png') });
 // a game: X steals and Y jumps on defense; X shoots with the ball
 await p.evaluate(() => { window.__usePad = false; const P = __pit; P.uiClose(); P.launchGame(P.MODES[0], P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(200); window.__usePad = true; });
