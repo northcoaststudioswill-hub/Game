@@ -660,6 +660,9 @@ function poseOf(anim, t, o) {
     }
     case 'gait': walkPose(p, o); break;
     case 'hold': p.y = -0.1; legs(-0.45, 0.7, -0.35, 0.6, 0.14); S_('spine', 0.2); S_('chest', 0.08); S_('neck', -0.15); S_('shR', -0.55, 0, 0.12); S_('elR', -1.7); S_('wrR', 0.3); S_('shL', -0.65, 0, -0.28); S_('elL', -1.5); S_('wrL', 0.3); p.rate = 18; break;   /* triple threat: ball at the hip, both hands on it */
+    case 'knees': { const br = Math.sin(t * 4.2), up = (t % 7) < 1.4 ? Math.sin(Math.PI * (t % 7) / 1.4) : 0;      /* gassed at a dead ball: bent over, hands on the knees, breathing hard, now and then a look up the floor */
+      legs(-0.42, 0.42, -0.42, 0.42, 0.12); p.y = -0.07; S_('hips', 0.5); S_('spine', 0.42 + br * 0.04); S_('chest', 0.16 + br * 0.03); S_('neck', -0.15 - 0.55 * up);
+      S_('shR', -0.62, 0, 0.08); S_('elR', -0.12); S_('wrR', 0.5); S_('shL', -0.62, 0, -0.08); S_('elL', -0.12); S_('wrL', 0.5); p.rate = 10; break; }
     case 'sprint': runPose(p, o); break;
     case 'sit': p.y = -0.42 * (o.leg || 1); S_('hpR', -1.5, 0, -0.1); S_('hpL', -1.5, 0, 0.1); S_('knR', 1.5); S_('knL', 1.5); S_('shR', -0.4); S_('shL', -0.4); S_('elR', -0.9); S_('elL', -0.9); S_('spine', 0.05); S_('chest', 0.06); break;
   }
@@ -750,6 +753,31 @@ function poseOf(anim, t, o) {
     else { p.y = (p.y || 0) - 0.05; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] += 0.12; p['sh' + bs] = [-0.75 - 0.12 * Math.max(0, q), 0, sg * 0.15]; p['el' + bs] = [-0.45, 0, 0]; p['wr' + bs] = [0.7, 0, 0];
       p['sh' + os] = [-2.25, 0, -sg * 0.2]; p['el' + os] = [-0.85, 0, 0]; p['wr' + os] = [0.3, 0, 0]; }
     p.rate = Math.max(p.rate || 16, 20); }
+  // off-ball defence by where your man is (FIBA: body low, hand and foot in the passing lane; help side: ball-you-man, pistols)
+  if (o.offD) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
+    const arm = (side, a, w) => { const sg = side === 'L' ? 1 : -1, k = clamp(Math.abs(a) / 1.57, 0, 1.3), out = clamp(sg * a / 1.57, -0.25, 1.2);      /* straight arm toward a heading: forward, then out to its own side */
+      const tgt = [-1.45 * (1 - Math.min(1, k)) + (k > 1 ? 0.35 * (k - 1) / 0.3 : 0), 0, sg * 1.45 * Math.max(0, out)]; const v = p['sh' + side] || (p['sh' + side] = [0, 0, 0]); for (let i = 0; i < 3; i++) v[i] = lerp(v[i], tgt[i], w);
+      const e = p['el' + side] || (p['el' + side] = [0, 0, 0]); e[0] = lerp(e[0], -0.15, w); const wv = p['wr' + side] || (p['wr' + side] = [0, 0, 0]); wv[0] = lerp(wv[0], 0.45, w); };
+    const bs = o.ballA > 0 ? 'L' : 'R', ms = bs === 'L' ? 'R' : 'L';
+    if (o.offD === 'deny') { ad('knR', 0.18); ad('knL', 0.18); ad('hpR', -0.14); ad('hpL', -0.14); ad('spine', 0.12); p.y = (p.y || 0) - 0.05; ad('chest', 0, clamp(o.manA, -0.8, 0.8) * 0.25, 0);
+      arm(bs, o.ballA * 0.75, 0.9); const v = p['sh' + ms] || (p['sh' + ms] = [0, 0, 0]); p['sh' + ms] = [lerp(v[0], -0.55, 0.8), 0, (ms === 'L' ? 1 : -1) * 0.5]; p['el' + ms] = [-0.9, 0, 0]; }      /* lead hand in the lane, the other feeling for his man */
+    else { ad('hips', 0, clamp((o.ballA + o.manA) / 2, -0.9, 0.9) * 0.35, 0); ad('knR', 0.08); ad('knL', 0.08); arm(bs, o.ballA, 0.85); arm(ms, o.manA, 0.85); p.y = (p.y || 0) + 0.02; }      /* opened up: one finger on the ball, one on his man */
+    p.rate = Math.max(p.rate || 16, 14); }
+  // the closeout: last few steps chopped short, hips down so a drive does not blow by, high hand to the shooting hand, low hand for the drive
+  if (o.close) { const w = o.close, c = Math.sin(o.closePh || 0), ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += (x || 0) * w; v[1] += (y || 0) * w; v[2] += (z || 0) * w; };
+    ad('knR', 0.3 + 0.12 * Math.max(0, c)); ad('knL', 0.3 + 0.12 * Math.max(0, -c)); ad('hpR', -0.22); ad('hpL', -0.22); ad('spine', -0.06); p.y = (p.y || 0) - 0.08 * w;
+    const hi = o.shootR ? 'L' : 'R', lo = hi === 'L' ? 'R' : 'L', sh = hi === 'L' ? 1 : -1, to = (k2, v3) => { const v = p[k2] || (p[k2] = [0, 0, 0]); for (let i = 0; i < 3; i++) v[i] = lerp(v[i], v3[i], w); };
+    to('sh' + hi, [-2.65, 0, sh * 0.12]); to('el' + hi, [-0.2, 0, 0]); to('wr' + hi, [0.3, 0, 0]); to('sh' + lo, [-0.55, 0, -sh * 0.65]); to('el' + lo, [-0.35, 0, 0]); to('wr' + lo, [0.6, 0, 0]); p.rate = Math.max(p.rate || 16, 26); }
+  // chin it: came down with it in traffic. Ball under the chin, elbows out wide, hips back
+  if (o.chin && anim === 'hold') { p.shR = [-1.05, 0, -0.62]; p.elR = [-2.15, 0, 0]; p.wrR = [0.55, 0, 0]; p.shL = [-1.05, 0, 0.62]; p.elL = [-2.15, 0, 0]; p.wrL = [0.55, 0, 0];
+    const n = p.neck || (p.neck = [0, 0, 0]); n[0] -= 0.12; const sp = p.spine || (p.spine = [0, 0, 0]); sp[0] += 0.08; p.rate = Math.max(p.rate || 16, 22); }
+  // open off the ball: sit down a little, hands up at the chest showing the passer where he wants it
+  if (o.target && anim === 'idle') { const w = o.target, to = (k2, v3) => { const v = p[k2] || (p[k2] = [0, 0, 0]); for (let i = 0; i < 3; i++) v[i] = lerp(v[i], v3[i], w); }, ad = (k, x) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x * w; };
+    ad('knR', 0.3); ad('knL', 0.3); ad('hpR', -0.22); ad('hpL', -0.22); ad('spine', 0.14); p.y = (p.y || 0) - 0.06 * w;
+    to('shR', [-1.25, 0, 0.18]); to('elR', [-1.0, 0, 0]); to('wrR', [0.75, 0, 0]); to('shL', [-1.25, 0, -0.18]); to('elL', [-1.0, 0, 0]); to('wrL', [0.75, 0, 0]); }
+  // that was you: a point back at the man who found him
+  if (o.point !== undefined && o.pointW > 0) { const a = Math.atan2(Math.sin(o.point), Math.cos(o.point)), sd = a > 0 ? 'L' : 'R', sg = sd === 'L' ? 1 : -1, k = clamp(Math.abs(a) / 1.57, 0, 1), w = clamp(o.pointW, 0, 1);
+    const tg = [-1.55 * (1 - k) - 0.25, 0, sg * 1.35 * k], v = p['sh' + sd] || (p['sh' + sd] = [0, 0, 0]); for (let i = 0; i < 3; i++) v[i] = lerp(v[i], tg[i], w); const e = p['el' + sd] || (p['el' + sd] = [0, 0, 0]); e[0] = lerp(e[0], -0.05, w); const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(a, -1, 1) * 0.4 * w; }
   // layered on top of every pose: eyes on the ball, lean into the turn
   if (o.look) { const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(o.look, -1.1, 1.1) * 0.7; const c = p.chest || (p.chest = [0, 0, 0]); c[1] += clamp(o.look, -1.1, 1.1) * 0.2; }
   if (o.bank) { const h = p.hips || (p.hips = [0, 0, 0]); h[2] += clamp(o.bank, -0.35, 0.35); }

@@ -135,7 +135,7 @@ function scorePts(p, pts, how) {
     if (R.team === p.team) { R.n++; R.pts += pts; } else { if (R.n >= 3) lateCall(1.5, 'RUN OVER', p.b.name + ' stops the bleeding', '#7de3ff'); R.team = p.team; R.n = 1; R.pts = pts; }
     if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', (M_.me && p.team === M_.me.team ? 'Your team · ' : 'Them · ') + `${R.pts}–0`, M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, M_.me && p.team === M_.me.team ? 'Your team' : 'Them', M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); }
   for (const o of M_.P) if (o.team !== p.team) { o.hot = 0; if (o.fire) { o.fire = false; } }
-  if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
+  if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { p.pointAt = M_.B.assist; p.pointT = 1.6; M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
   if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfxM('fire'); }
   if (p.mine && cribFx('bucket')) M_.bonusRep = (M_.bonusRep || 0) + 1;
   crowdReact(how === 'dunk' ? 'dunk' : pts >= 2 ? 'three' : 'score', p.team);
@@ -1225,7 +1225,7 @@ function stepBall(dt) {
       if (best) {
         if (best.diveT > 0) { best.slowT = Math.max(best.slowT || 0, 0.55); best.diveT = 0; if (best.user) floatTxt(best, 'GOT IT', '#3dffa0'); addBrav(best, 0.06); best.stats.dive = (best.stats.dive || 0) + 1; }
         const wasOff = M_.off === best.team;
-        if (B.rebound) { best.stats.reb++; if (best.box) best.stats.box = (best.stats.box || 0) + 1; addBrav(best, 0.05); if (best.user) floatTxt(best, wasOff ? 'OFFENSIVE BOARD' : best.box ? 'BOXED OUT · BOARD' : 'BOARD', '#fff'); if (wasOff) { best.putT = 2; M_.clock = 14; } }
+        if (B.rebound) { best.rebT = 0.9; best.stats.reb++; if (best.box) best.stats.box = (best.stats.box || 0) + 1; addBrav(best, 0.05); if (best.user) floatTxt(best, wasOff ? 'OFFENSIVE BOARD' : best.box ? 'BOXED OUT · BOARD' : 'BOARD', '#fff'); if (wasOff) { best.putT = 2; M_.clock = 14; } }
         const wasReb = B.rebound, air = best.st === 'jump';
         give(best); changePoss(best.team); B.rebound = false; B.assist = null; best.ai.hold = 0; best.ai.tick = 0.3;
         if (wasReb && wasOff && air && !M_.practice && dHoop(best) < 2.0 && (M_.arcade || att(best, 'dunk') >= 68) && Math.random() < (M_.arcade ? 0.8 : 0.3 + 0.15 * bt(best, 'putback'))) { if (startFinish(best, 0, true, best.y)) { best.finish.put = true; best.finish.dur = 0.5; } }
@@ -1292,7 +1292,7 @@ function ballHeld(p, dt) {
   const M_ = MT, B = M_.B; let D = p.drib || (p.drib = newDrib(p, B.pos)); if (p.reset) { p.reset = false; D = resetDrib(p); } D.t += dt;
   if (B.pos.distanceTo(_bp.set(p.x, B.pos.y, p.z)) > 2.5 || (D.F && Math.hypot(D.F.x - p.x, D.F.z - p.z) > 2.5)) D = resetDrib(p);
   const st = p.st;
-  if (st === 'shoot' || st === 'finish' || st === 'fake' || st === 'pass' || st === 'hop' || ((p.live === 'hold' || p.live === 'dead') && st === 'free')) {
+  if (st === 'shoot' || st === 'finish' || st === 'fake' || st === 'pass' || st === 'hop' || ((p.live === 'hold' || p.live === 'dead' || (!p.user && p.rebT > 0 && p.speed < 1.5)) && st === 'free')) {
     // gather: ball between the hands, then up into the shooting hand
     const bh = (st === 'finish' && p.finish.bh === 'L') || ((st === 'shoot' || st === 'fake') && p.rig.prof && p.rig.prof.hand === 'L') ? 'L' : 'R'; handPos(p.rig, bh, _bp); handPos(p.rig, bh === 'R' ? 'L' : 'R', _bq);
     const lift = st === 'shoot' ? clamp((p.t - p.shot.rel * 0.35) / (p.shot.rel * 0.4), 0, 1) : st === 'finish' ? clamp(p.t / (p.finish.dur * 0.5), 0, 1) : 0;
@@ -1349,9 +1349,10 @@ function animPlayer(p, dt) {
       { const g = p.stg; if (!g.hit) { const d = g.dir || [0, 0], fx = Math.sin(p.face), fz = Math.cos(p.face), l = Math.hypot(d[0], d[1]) || 1; g.hit = { tw: (d[0] * fz - d[1] * fx) / l, fb: (d[0] * fx + d[1] * fz) / l, pw: clamp((g.push || 1.5) / 2, 0.5, 1.5), s1: Math.random() * 2 - 1, s2: Math.random() * 2 - 1 }; } o.hit = g.hit; }      /* where the push came from, as he saw it, once per fall */
       break;
     case 'jump': an = p.swatT > 0 ? 'swat' : 'jump'; o.v = p.jv || 0; break; case 'steal': an = 'steal'; o.v = p.sv || 0; break; case 'shove': an = 'shove'; break; case 'punch': an = 'punch'; break; case 'clothes': an = 'clothes'; o.sp = 1; o.ph = p.runPh; break; case 'pass': an = 'pass'; o.flashy = p.flashy; o.pk = p.pk; break;
-    case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); break;      /* still in the air off a dunk: flex up there, then the celebration on the floor */
+    case 'celeb': an = 'celeb'; o.style = p.y > 0.2 ? 'airflex' : (p.celebStyle || p.b.moves.celeb); if (p.pointT > 0 && p.pointAt && p.y < 0.05) { an = 'idle'; o.point = Math.atan2(p.pointAt.x - p.x, p.pointAt.z - p.z) - p.face; o.pointW = Math.min(1, p.pointT / 0.3, (1.6 - p.pointT) / 0.2); } break;      /* assisted: first he points at the passer, then his own celebration */      /* still in the air off a dunk: flex up there, then the celebration on the floor */
     default:
-      if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; const jc = M_.time + p.i * 0.9, jt = jc % 2.8; if (jt < 0.55 && p.live === 'hold' && p.speed < 0.3) o.jab = Math.sin(Math.PI * jt / 0.55) * (Math.floor(jc / 2.8) % 2 ? 1 : -1); }
+      if (hasBall && !p.user && p.rebT > 0 && p.speed < 1.5) { an = 'hold'; o.chin = 1; }
+      else if (hasBall && (p.live === 'hold' || p.live === 'dead')) { an = 'hold'; const jc = M_.time + p.i * 0.9, jt = jc % 2.8; if (jt < 0.55 && p.live === 'hold' && p.speed < 0.3) o.jab = Math.sin(Math.PI * jt / 0.55) * (Math.floor(jc / 2.8) % 2 ? 1 : -1); }
       else if (hasBall) { an = 'dribble'; o.sp = spN; o.ph = p.runPh; o.dr = p.dribH === undefined ? 0.8 : p.dribH; o.hand = p.drib ? p.drib.hand : p.hand; o.protect = p.protect; if (p.post) { p.postPh = (p.postPh || 0) + dt * (1.6 + Math.min(1.6, Math.hypot(p.vx, p.vz)) * 1.4); o.postPh = p.postPh; o.post = 1; o.dr = Math.min(o.dr, 0.5); }
         // he is giving you room: show-off dribbles, a new one every few seconds (rock, between the legs, behind the back, yo-yo, size-up, waving him up)
         { const od = nearestOpp(p)[1]; p.swag = !p.post && p.st === 'free' && p.speed < 1.3 && M_.phase === 'live' && od > 2.3 && !M_.practice ? (SW_ => SW_[Math.floor((M_.time + p.i * 1.7) / 2.8) % SW_.length])(pk(p, 'swagpk').list || SWAGS) : null; o.swag = p.swag; o.swT = M_.time + p.i; if (p.swag && bt(p, 'showtime') && M_.net !== 'guest') addBrav(p, dt * 0.012 * bt(p, 'showtime')); } }
@@ -1362,12 +1363,29 @@ function animPlayer(p, dt) {
       else if (p.speed > 0.4) { an = 'run'; o.sp = spN; o.ph = p.runPh; }
       else if (B.state === 'pass' && B.target === p) { an = 'catch'; o.v = p.cv || 0; }
       if (!hasBall && B.state === 'shot' && B.t > 0.25 && dHoop(p) < 4.5 && p.speed < 2.5 && p.st === 'free') an = 'boxout';
-      if (an === 'slide' && !o.defMode && !o.up && !o.bodyUp) o.dv = p.dv || 0;
+      if (an === 'slide' && !o.defMode && !o.up && !o.bodyUp && !o.offD) o.dv = p.dv || 0;
       if (an === 'idle' && M_.phase === 'live' && M_.off === p.team && !hasBall && !p.user && B.state === 'held') { const oc = M_.time + p.i * 1.7, ph = Math.floor(oc / 3.2); if (p.ovPh !== ph) { p.ovPh = ph; p.ov = Math.random() < 0.45 ? 1 + poolNext(p, 'ov', 3) : 0; } o.ov = p.ov; o.ovT = oc % 3.2; }
       if (B.state === 'pass' && B.target === p) { const bd = Math.hypot(B.pos.x - p.x, B.pos.z - p.z); if (bd < 3.2) o.catchArms = clamp(1 - (bd - 0.7) / 2.5, 0, 1); }      /* the hands come up as the ball gets there, not for the whole flight */
       else if (M_.phase === 'scored' && M_.lastScorer && !M_.lastScorer.dead && M_.lastScorer.team !== p.team) an = 'sulk';
   }
   if (p.forceAn && p.st === 'free' && !hasBall) { an = p.forceAn; o.ph = p.runPh; }
+  // what real players do between the big moves (coaching sources: closeouts, ball-you-man, chin the ball, triple threat)
+  if (p.rebT > 0) p.rebT -= dt; if (p.pointT > 0) p.pointT -= dt;
+  if (an === 'hold' && p.st === 'free' && (p.rebT > 0 || nearestOpp(p)[1] < 0.95)) o.chin = 1;      /* came down with it in traffic: ball to the chin, elbows out */
+  if (an === 'slide' && p.def && !o.defMode && !o.up && !o.bodyUp && B.holder && B.holder.team !== p.team) {
+    const mm = p.guard || p.man, h = B.holder;
+    if (mm && mm !== h) { const dm = dist(mm, h), toB = Math.atan2(h.x - p.x, h.z - p.z) - p.face, toM = Math.atan2(mm.x - p.x, mm.z - p.z) - p.face, wr = a => Math.atan2(Math.sin(a), Math.cos(a));
+      o.offD = dm < 5.2 ? 'deny' : 'help'; o.ballA = wr(toB); o.manA = wr(toM); o.dv = 0; }      /* one pass away: hand and foot in the lane; further: open up, a finger on the ball and one on your man */
+    }
+  if (p.def && B.holder && (p.guard || p.man) === B.holder && p.st === 'free' && (an === 'slide' || an === 'run')) {      // closing out: sprint, then chop the feet, sit down, high hand, low hand
+    const h = B.holder, dx = h.x - p.x, dz = h.z - p.z, dd = Math.hypot(dx, dz) || 1, cs = ((p.avx || 0) * dx + (p.avz || 0) * dz) / dd;
+    if (dd > 1.1 && dd < 3.4 && cs > 1.6) { o.close = clamp((cs - 1.6) / 2, 0, 1) * clamp((3.4 - dd) / 1.2, 0, 1); o.closePh = p.runPh * 2.2; o.shootR = h.hand !== 'L'; }
+  }
+  if (!hasBall && p.st === 'free' && M_.phase === 'live' && M_.off === p.team && B.state === 'held' && B.holder && B.holder.team === p.team && an === 'idle' && !p.user) {
+    const od = nearestOpp(p)[1], hd = dist(p, B.holder); if (od > 2.0 && hd > 2.5 && hd < 9) o.target = clamp((od - 2) / 1.2, 0, 1);      /* open on the wing: knees bent, hands up showing the passer a target */
+  }
+  if (p.pointT > 0 && p.pointAt && p.st === 'free' && !hasBall) { o.point = Math.atan2(p.pointAt.x - p.x, p.pointAt.z - p.z) - p.face; o.pointW = Math.min(1, p.pointT / 0.3, (1.6 - p.pointT) / 0.2); }      /* points back at the man who found him */
+  if (!hasBall && (M_.phase === 'scored' || M_.phase === 'check') && (p.stam === undefined ? 100 : p.stam) < 45 && p.speed < 0.3 && an === 'idle' && p.st === 'free') an = 'knees';      /* gassed at a dead ball: hands on the knees */
   if (an === 'idle') { o.ph = p.i * 1.7; o.tired = clamp((35 - (p.stam === undefined ? 100 : p.stam)) / 35, 0, 1); o.alert = M_.phase === 'live' ? clamp(1.6 - Math.hypot(B.pos.x - p.x, B.pos.z - p.z) / 4, 0, 1) : 0; }      /* readier the closer the ball, heavier when gassed */
   if (p.st !== 'finish' && p.st !== 'move') R.extraYaw = 0;       /* whatever ended a spin or a reverse, the body faces where it faces */
   if (!hasBall && an !== 'stagger' && an !== 'sulk' && an !== 'celeb' && p.st !== 'finish' && p.st !== 'move') { let a = Math.atan2(B.pos.x - p.x, B.pos.z - p.z) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; o.look = p.def && p.guard && p.guard !== B.holder && B.state === 'held' ? a * 0.5 : a; }      /* guarding off the ball: the body is on your man, the head only half-turns to the ball (see both) */
@@ -1384,8 +1402,8 @@ function animPlayer(p, dt) {
   if (p.bumpT > 0) { p.bumpT -= dt; const k = p.bumpT / 0.3; o.bump = [p.bumpX * k, p.bumpZ * k]; }
   if (p.plantT > 0 && p.st === 'free') { const u = 1 - p.plantT / p.plantD, fs = Math.sin(p.face), fc = Math.cos(p.face); o.plant = { e: Math.sin(Math.PI * Math.min(1, u * 1.15)), fb: p.plantX * fs + p.plantZ * fc, lat: p.plantX * fc - p.plantZ * fs }; }
   if (R.gait && (an === 'run' || an === 'dribble' || an === 'slide')) o.ph = R.gait.ph;       // arms swing with the feet that are actually stepping
-  p.an = an;
-  const t = an === 'idle' || an === 'celeb' || an === 'call' || an === 'sulk' ? M_.time : an === 'fake' ? 0.3 + p.t : p.t;
+  p.an = an; p.anO = o;
+  const t = an === 'idle' || an === 'knees' || an === 'celeb' || an === 'call' || an === 'sulk' ? M_.time : an === 'fake' ? 0.3 + p.t : p.t;
   // running forward at speed (with or without the ball): the legs follow real running curves on a stride clock that
   // advances with distance (knee drive, heel recovery, a flight phase); arms stay with the ball when dribbling.
   // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
