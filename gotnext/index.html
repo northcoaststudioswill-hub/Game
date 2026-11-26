@@ -1338,7 +1338,7 @@ function runPose(p, o) {
   const ps = ((o.psi || 0) % 1 + 1) % 1, d = o.duty || 0.38, k = o.k || 0, ah = o.hipA === undefined ? 1 : o.hipA, th = o.thigh || 0.48, sh = o.shin || 0.48, full = th + sh;
   const warp = u => u < d ? u / d * 0.38 : 0.38 + (u - d) / (1 - d) * 0.62;       // stance and swing re-timed for this speed
   const leg = u => { const w = warp(((u % 1) + 1) % 1), st = w < 0.38; const sw = st ? 0 : (w - 0.38) / 0.62, land = clamp((sw - 0.8) / 0.2, 0, 1), c0 = 3 + 20 * ah;       /* the swing ends where the stance begins: no snap at foot strike */
-    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; return { hip, kn, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
+    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; const hs = !st && o.rs === 'highstep' ? Math.sin(Math.PI * sw) * (0.6 + 0.4 * k) : 0; return { hip: hip + hs * 0.42, kn: kn + hs * 0.5, an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
   let low = 0, stance = false;
   for (const [side, off] of [['R', 0], ['L', 0.5]]) {
     const u = ((ps + off) % 1 + 1) % 1, L = leg(u);
@@ -3618,7 +3618,7 @@ function stepBall(dt) {
 const _bp = new THREE.Vector3(), _bq = new THREE.Vector3();
 function palm(p, hand, out) { handPos(p.rig, hand, out); out.y -= 0.115; return out; }
 // a reset (check, teleport): the ball starts in the hand instead of flying in from wherever it was
-function resetDrib(p) { const D = newDrib(p, MT.B.pos); const pl = palm(p, D.hand, _bp); if (MT.B.pos.distanceTo(pl) > 3) MT.B.pos.copy(pl); else D.glide = 1; D.ph = 'hand'; D.t = 0; D.F = null; p.drib = D; return D; }      /* only a real teleport (a check, a reset) snaps it; otherwise the hand goes and gets it (a move at full speed used to jump it 1.4 m in a frame) */
+function resetDrib(p) { const D = newDrib(p, MT.B.pos); const pl = palm(p, D.hand, _bp); if (MT.B.pos.distanceTo(pl) > 3) MT.B.pos.copy(pl); else D.glide = 1e-6; D.ph = 'hand'; D.t = 0; D.F = null; p.drib = D; return D; }      /* only a real teleport (a check, a reset) snaps it; otherwise the hand goes and gets it (a move at full speed used to jump it 1.4 m in a frame) */
 function newDrib(p, from) { return { ph: 'up', t: 0, T: 0.16, hand: p.hand || 'R', F: from.clone(), P0: from.clone(), kind: '', push: 1 }; }
 // where this bounce lands, in the player's frame: side (+ = dribble hand side), forward
 function dribFloor(p, D, kind, tAhead, vx, vz) {
@@ -3675,7 +3675,9 @@ function ballHeld(p, dt) {
   }
   if (D.ph === 'gather') { D.ph = 'up'; D.t = 0; D.T = 0.14; D.F = B.pos.clone(); D.hand = p.hand; }
   const v = Math.hypot(p.avx || 0, p.avz || 0), hesi = p.st === 'move' && p.mv.mv.id === 'hesi';
-  const Tc = clamp(0.56 - v * 0.032, 0.36, 0.56) * (p.protect ? 0.8 : 1) * (hesi ? 1.35 : 1);
+  let Tc = clamp(0.56 - v * 0.032, 0.36, 0.56) * (p.protect ? 0.8 : 1) * (hesi ? 1.35 : 1);
+  const ride = p.st === 'free' && !p.protect && (p.strideW || 0) > 0.6 && p.stridePer && !p.swag && !(p.plantT > 0) && v > 2.2, perStep = ride && p.stridePer > 0.66, cyc = perStep ? 0.5 : 1;      /* slow: a bounce every step; running: every other step */      /* running: one bounce every two steps, on the beat of the feet */
+  if (ride) Tc = clamp(p.stridePer * cyc, 0.36, 0.64);
   if (D.ph === 'carry') {
     palm(p, D.hand, _bp); ballFollow(B, _bp, dt, true); p.dribH = 0.75;
     if (D.t >= D.T || p.st !== 'move') { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = ''; D.F = dribFloor(p, D, '', D.T); D.upT = Tc * 0.38; }
@@ -3683,11 +3685,13 @@ function ballHeld(p, dt) {
     // the hand rides the ball down, then lets go
     // receive (the hand gives with the ball as it rises), then push it back down
     const Th = Tc * 0.27, u = Math.min(1, D.t / Th);      /* the hand is on the ball a beat, not a third of every bounce (it read as carrying) */ p.dribH = u < 0.35 ? 0.88 + 0.12 * (u / 0.35) : 1 - 0.8 * ((u - 0.35) / 0.65);
-    palm(p, D.hand, _bp); if (D.glide) { ballFollow(B, _bp, dt, false, 15); if (B.pos.distanceTo(_bp) < 0.05) D.glide = 0; else D.t = Math.min(D.t, Th * 0.5); } else ballFollow(B, _bp, dt, true);
-    if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = '';
+    palm(p, D.hand, _bp); if (D.glide) { ballFollow(B, _bp, dt, false, 15); D.glide += dt; if (B.pos.distanceTo(_bp) < 0.18 || D.glide > 0.3) { D.glide = 0; ballFollow(B, _bp, dt, true, 15); } else D.t = Math.min(D.t, Th * 0.5); }      /* close enough (or long enough): the hand has it */ else ballFollow(B, _bp, dt, true);
+    const early = ride && !(M_.time - (p.handSwT || -9) < 0.8) && D.t >= Th && D.t < Th + Tc * 0.14 && ((((D.hand === 'R' ? 0.5 : 0) - (p.psi || 0)) % cyc) + cyc) % cyc / cyc * Tc > Tc * 0.4;      /* ahead of the feet: the hand rides it a beat longer */
+    if (D.t >= Th && !early) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = '';
       const want = p.st === 'free' && !p.post ? autoHand(p) : null;      /* switch hands with a quick crossover dribble in front of the body */
       if (want && want !== D.hand && M_.time - (p.handSwT || -9) > 0.75) { p.hand = want; D.hand = want; D.kind = 'cross'; p.handSwT = M_.time; }
       else if (!want && p.st === 'free' && (p.swag === 'tween' || p.swag === 'behind') && M_.time >= (p.handSwT || 0)) { const nh = D.hand === 'R' ? 'L' : 'R'; p.hand = nh; D.hand = nh; D.kind = p.swag; }      /* showing off: through the legs or round the back, every bounce */
+      if (ride && !D.kind) { const tgt = D.hand === 'R' ? 0.5 : 0, rem = (((tgt - (p.psi || 0)) % cyc) + cyc) % cyc / cyc * Tc; D.T = clamp(rem > Tc * 0.85 ? rem - Tc : rem, Tc * 0.16, Tc * 0.45); }      /* it lands as the far foot comes down (right hand: left foot) */
       D.F = dribFloor(p, D, D.kind, D.T); D.upT = Tc * 0.38; }
   } else if (D.ph === 'down') {
     if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) * 1.5 / 10);     /* no faster than a hard real push: the drop speeds up as it goes (u^1.5), so its top speed is 1.5x the average */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
@@ -3714,7 +3718,7 @@ function ballClear(p) {      // a bounced ball goes round a leg, never through i
       let hx = dx, hz = dz, hl = Math.hypot(hx, hz); if (hl < 1e-3) { const sg = (D => D && D.hand === 'L' ? 1 : -1)(p.drib); hx = Math.cos(p.face) * sg; hz = -Math.sin(p.face) * sg; hl = 1; }      /* dead centre: out to the dribbling side */
       const push = need - d3; _clr.x += hx / hl * push; _clr.z += hz / hl * push; } } }
 function ballMesh() { const B = MT.B; _clr.set(0, 0, 0); if (B.holder && B.state === 'held' && B.holder.drib && (B.holder.st === 'free' || B.holder.st === 'move') && B.holder.live === 'drib' && B.holder.drib.ph !== 'hand' && B.holder.drib.ph !== 'carry') ballClear(B.holder);
-  B.clr = B.clr || new THREE.Vector3(); { const dx = _clr.x - B.clr.x, dz = _clr.z - B.clr.z, dl = Math.hypot(dx, dz), mx = 0.045; if (dl > mx) { B.clr.x += dx / dl * mx; B.clr.z += dz / dl * mx; } else { B.clr.x = _clr.x; B.clr.z = _clr.z; } }      /* at most ~2.7 m/s of extra drift: it slides round the leg, never pops */      /* eased in and out, so going round a leg never jumps the ball */ B.mesh.position.copy(B.pos); if (B.clr) B.mesh.position.add(B.clr); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3)); }
+  B.clr = B.clr || new THREE.Vector3(); { const dx = _clr.x - B.clr.x, dz = _clr.z - B.clr.z, dl = Math.hypot(dx, dz), mx = 0.06; if (dl > mx) { B.clr.x += dx / dl * mx; B.clr.z += dz / dl * mx; } else { B.clr.x = _clr.x; B.clr.z = _clr.z; } }      /* at most ~2.7 m/s of extra drift: it slides round the leg, never pops */      /* eased in and out, so going round a leg never jumps the ball */ B.mesh.position.copy(B.pos); if (B.clr) B.mesh.position.add(B.clr); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3)); }
 function animPlayer(p, dt) {
   const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen, prof: R.prof };
   p.protect = hasBall && p.st === 'free' && nearestOpp(p)[1] < 1.7 && Math.hypot(p.avx || 0, p.avz || 0) < 3;
@@ -3797,7 +3801,7 @@ function animPlayer(p, dt) {
     if (w > 0.02) {
       // the same stride clock as walking around the Block: walking gait curves up to a brisk walk, running curves above
       const k = clamp((asp - 2.6) / 3.6, 0, 1), cad = 2.7 + 1.1 * k, wWalk = 1 - clamp((asp - 2.2) / 0.9, 0, 1); duty = 0.4 - 0.14 * k;
-      const stepW = R.legLen * 0.74 * clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), step = lerp(Math.max(asp, 0.5) / cad, stepW, wWalk); p.psi = ((p.psi || 0) + asp * dt / (2 * step)) % 1;
+      const stepW = R.legLen * 0.74 * clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), step = lerp(Math.max(asp, 0.5) / cad, stepW, wWalk); p.psi = ((p.psi || 0) + asp * dt / (2 * step)) % 1; p.stridePer = 2 * step / Math.max(asp, 0.5);
       let Pr = null;
       if (wWalk < 1) { let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)) < need) lo = m; else hi = m; }
         Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin, rs: R.prof && R.prof.run }); }
