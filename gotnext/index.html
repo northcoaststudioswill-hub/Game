@@ -3528,7 +3528,7 @@ function stepPlayer(p, dt) {
   // working the ball side to side, a handler keeps his chest to the rim and steps laterally: the body does not swivel with
   // every flick of the stick (it swung the ball round him like a sling). Heading away from the basket he turns and goes.
   if (hasBall && (p.st === 'free' || (p.st === 'move' && p.mv && !/spin/.test(p.mv.mv.id))) && !p.post && p.live !== 'dead' && sp > 0.6 && !MT.arcade) { const hf = Math.atan2(-p.x, -p.z), vd = Math.atan2(p.vx, p.vz); let rel = Math.atan2(Math.sin(vd - hf), Math.cos(vd - hf));
-    if (Math.abs(rel) < 2.0) { const lim = p.sprinting ? 1.05 : 0.6; let r2 = Math.atan2(Math.sin(tf - hf), Math.cos(tf - hf)); r2 = clamp(r2, -lim, lim); tf = hf + r2; } }
+    if (Math.abs(rel) < 2.0) { const lim = lerp(p.sprinting ? 1.05 : 0.6, 3.2, p.st === 'free' && MT.time - (p.comboT || -9) > 0.5 ? clamp((sp - 3.5) / 2, 0, 1) : 0);      /* at full speed he faces where he is running (the legs run, they do not crab) */ let r2 = Math.atan2(Math.sin(tf - hf), Math.cos(tf - hf)); r2 = clamp(r2, -lim, lim); tf = hf + r2; } }
   if (p.faceLock !== undefined) tf = p.faceLock;
   p.face = lerpAng(p.face, tf, 1 - Math.exp(-12 * dt));
   p.def = def; p.speed = sp; p.topSpeed = top;
