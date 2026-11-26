@@ -293,6 +293,7 @@ function launch(p, make, pts, green, arc, kind) {
   const d = Math.hypot(B.pos.x, B.pos.z);
   let ex = 0, ez = 0; if (!make) { const a = rnd(0, 6.283), r = rnd(0.2, 0.34); ex = Math.cos(a) * r; ez = Math.sin(a) * r * 0.8 + 0.05; }
   B.T = clamp(0.48 + d * 0.085, 0.42, 1.5) * (0.9 + 0.1 * (arc || 1)) * (arc > 1.3 ? 1.15 : 1);
+  if (d > 3 && (kind === 'three' || kind === 'mid')) { const dy = HOOP_Y + 0.06 - B.pos.y, ang = (47 + ((arc || 1) - 1) * 10) * Math.PI / 180; B.T = clamp(Math.sqrt(Math.max(0.05, 2 * (Math.tan(ang) * d - dy) / GRAV)), 0.6, 1.7); }      /* a shooter's arc, about 47 degrees (a moonball higher, a line drive lower): a high arc makes the rim bigger */
   B.vel.set((ex - B.pos.x) / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, (ez - B.pos.z) / B.T);
 }
 function blocked(p, o) {
@@ -996,8 +997,8 @@ function stepPlayer(p, dt) {
   const M_ = MT, B = M_.B, hasBall = B.holder === p; let lock = 1;
   switch (p.st) {
     case 'shoot': {
-      const s = p.shot, j0 = s.rel * 0.42, air = 0.56;
-      if (p.y > 0.01) { lock = 0; const dmp = Math.pow(0.35, dt); p.vx *= dmp; p.vz *= dmp; if (s.fade) { const fk = s.fadeK === 'deep' ? 2.3 : s.fadeK === 'drift' ? 2.0 : 1.7; p.vx = s.fx * fk; p.vz = s.fz * fk; } } else if (s.side && p.t < j0) { lock = 0; const k = 3.8 * (1 - p.t / j0); p.vx = s.sx * k; p.vz = s.sz * k; } else lock = s.released ? 0.5 : 0.05;   /* plant on the gather (pull-up), drift in the air, walk off the landing */ const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (0.32 + nAtt(p, 'vert') * 0.2) * Math.sin(Math.PI * u) * (M_.arcade ? 1.4 : 1) : 0;
+      const s = p.shot, j0 = s.rel * 0.72, air = s.rel * (0.62 + nAtt(p, 'vert') * 0.16) * (s.floater ? 0.9 : 1), hop = 9.8 * air * air / 8;      /* off the floor as the legs finish extending (the pose's takeoff), down as the pose lands; released on the way up, a few inches high, the height real gravity gives that airtime */
+      if (p.y > 0.01) { lock = 0; const dmp = Math.pow(0.35, dt); p.vx *= dmp; p.vz *= dmp; if (s.fade) { const fk = s.fadeK === 'deep' ? 2.3 : s.fadeK === 'drift' ? 2.0 : 1.7; p.vx = s.fx * fk; p.vz = s.fz * fk; } } else if (s.side && p.t < j0) { lock = 0; const k = 3.8 * (1 - p.t / j0); p.vx = s.sx * k; p.vz = s.sz * k; } else lock = s.released ? 0.5 : 0.05;   /* plant on the gather (pull-up), drift in the air, walk off the landing */ const u = (p.t - j0) / air; p.y = u > 0 && u < 1 ? (s.fade ? Math.max(hop, 0.3) : hop) * Math.sin(Math.PI * u) * (M_.arcade ? 1.6 : 1) : 0;
       if (s.released && u >= 1 && p.t > s.rel + 0.2) { p.st = 'free'; p.y = 0; }
       break;
     }
