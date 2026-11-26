@@ -4,7 +4,7 @@
 // node tests/dribscan.mjs [--shots] [--only=name]
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
-const dir = path.dirname(fileURLToPath(import.meta.url)), shots = process.argv.includes('--shots'), only = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7), out = path.join(dir, 'shots', 'drib'); if (shots) fs.mkdirSync(out, { recursive: true });
+const RUNSTYLE = (process.argv.find(a => a.startsWith('--run=')) || '').slice(6); const dir = path.dirname(fileURLToPath(import.meta.url)), shots = process.argv.includes('--shots'), only = (process.argv.find(a => a.startsWith('--only=')) || '').slice(7), out = path.join(dir, 'shots', 'drib'); if (shots) fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1280, height: 720 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
@@ -25,10 +25,10 @@ const RUNS = {
   crossrun: [[0.8, ['KeyW', 'ShiftLeft']], [0.1, ['KeyW', 'ShiftLeft', 'KeyL']], [0.9, ['KeyW', 'ShiftLeft']], [0.1, ['KeyW', 'ShiftLeft', 'KeyJ']], [0.9, ['KeyW', 'ShiftLeft']]],
 };
 const names = Object.keys(RUNS).filter(n => !only || only.split(',').includes(n)); const rows = [];
-await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.id === 's2'), P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(40); });
+await p.evaluate((rs) => { if (rs) window.__rs = rs; }, RUNSTYLE); if (process.env.PACK) await p.evaluate((pk) => __pit.ev(`packEquip(PACKS.find(q => q.id === '${pk}'))`), process.env.PACK); await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.id === 's2'), P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(40); });
 for (const name of names) {
   const segs = RUNS[name]; let frames = [];
-  await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me; M.phase = 'live'; M.clock = 99; M.needClear = false; for (const q of M.P) if (q !== me) { q.x = q.team === me.team ? -7 : 7; q.z = 12; q.ai.react = 99; q.cool = 99; q.st = 'free'; q.vx = q.vz = 0; q.frozen = true; } M.B.state = 'held'; M.B.holder = me; me.x = 0; me.z = 9.5; me.face = Math.PI; me.vx = me.vz = 0; me.st = 'free'; me.live = 'drib'; me.drib = null; me.stam = 100; M.off = me.team; window.__tick(20); for (const q of M.P) if (q !== me) { q.x = q.team === me.team ? -7 : 7; q.z = 12; } });
+  await p.evaluate(() => { const P = __pit, M = P.MT, me = M.me; M.phase = 'live'; M.clock = 99; M.needClear = false; for (const q of M.P) if (q !== me) { q.x = q.team === me.team ? -7 : 7; q.z = 12; q.ai.react = 99; q.cool = 99; q.st = 'free'; q.vx = q.vz = 0; q.frozen = true; } M.B.state = 'held'; M.B.holder = me; me.x = 0; me.z = 9.5; me.face = Math.PI; me.vx = me.vz = 0; me.st = 'free'; me.live = 'drib'; me.drib = null; me.stam = 100; M.off = me.team; if (window.__rs !== undefined && me.rig.prof) me.rig.prof.run = window.__rs; window.__tick(20); for (const q of M.P) if (q !== me) { q.x = q.team === me.team ? -7 : 7; q.z = 12; } });
   for (const [secs, keys] of segs) {
     const n = Math.round(secs * 60);
     for (let f0 = 0; f0 < n; f0 += 10) { const k = Math.min(10, n - f0);
@@ -43,7 +43,7 @@ for (const name of names) {
           row.leg = legMin; row.legW = which; row.foot = footMin; rows.push(row); }
         let shot = null; if (grab) { const [sx, sy] = P.ev('project')(me.x, 0.8, me.z); shot = [sx, sy]; } return { rows, shot }; }, [keys, k, shots && (f0 % 20 === 0)]);
       for (const rr of r.rows) rr.n = frames.length + r.rows.indexOf(rr); frames.push(...r.rows);
-      if (r.shot && shots) { const w = 200, h = 240, cx = Math.max(0, Math.min(1280 - w, r.shot[0] - w / 2)), cy = Math.max(0, Math.min(720 - h, r.shot[1] - h * 0.55)); await p.screenshot({ path: path.join(out, `${name}-${String(frames.length).padStart(3, '0')}.png`), clip: { x: cx, y: cy, width: w, height: h } }); }
+      if (r.shot && shots) { const w = 200, h = 240, cx = Math.max(0, Math.min(1280 - w, r.shot[0] - w / 2)), cy = Math.max(0, Math.min(720 - h, r.shot[1] - h * 0.55)); await p.screenshot({ path: path.join(out, `${RUNSTYLE ? RUNSTYLE + '-' : ''}${name}-${String(frames.length).padStart(3, '0')}.png`), clip: { x: cx, y: cy, width: w, height: h } }); }
     }
   }
   // analysis
