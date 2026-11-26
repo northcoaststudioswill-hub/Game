@@ -1148,7 +1148,7 @@ function stepPlayer(p, dt) {
   // working the ball side to side, a handler keeps his chest to the rim and steps laterally: the body does not swivel with
   // every flick of the stick (it swung the ball round him like a sling). Heading away from the basket he turns and goes.
   if (hasBall && (p.st === 'free' || (p.st === 'move' && p.mv && !/spin/.test(p.mv.mv.id))) && !p.post && p.live !== 'dead' && sp > 0.6 && !MT.arcade) { const hf = Math.atan2(-p.x, -p.z), vd = Math.atan2(p.vx, p.vz); let rel = Math.atan2(Math.sin(vd - hf), Math.cos(vd - hf));
-    if (Math.abs(rel) < 2.0) { const lim = lerp(p.sprinting ? 1.05 : 0.6, 3.2, p.st === 'free' && MT.time - (p.comboT || -9) > 0.5 ? clamp((sp - 3.5) / 2, 0, 1) : 0);      /* at full speed he faces where he is running (the legs run, they do not crab) */ let r2 = Math.atan2(Math.sin(tf - hf), Math.cos(tf - hf)); r2 = clamp(r2, -lim, lim); tf = hf + r2; } }
+    if (Math.abs(rel) < 2.0) { const lim = lerp(p.st === 'move' ? 0.7 : p.sprinting ? 1.05 : 0.6, 3.2, p.st === 'free' && MT.time - (p.comboT || -9) > 0.5 ? clamp((sp - 3.5) / 2, 0, 1) : 0);      /* at full speed he faces where he is running (the legs run, they do not crab) */ let r2 = Math.atan2(Math.sin(tf - hf), Math.cos(tf - hf)); r2 = clamp(r2, -lim, lim); tf = hf + r2; } }
   if (p.faceLock !== undefined) tf = p.faceLock;
   p.face = lerpAng(p.face, tf, 1 - Math.exp(-12 * dt));
   p.def = def; p.speed = sp; p.topSpeed = top;
@@ -1336,7 +1336,7 @@ function ballHeld(p, dt) {
   } else if (D.ph === 'down') {
     if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) * 1.5 / 10);     /* no faster than a hard real push: the drop speeds up as it goes (u^1.5), so its top speed is 1.5x the average */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
     const u = Math.min(1, D.t / D.T), e = Math.pow(u, 1.5); p.dribH = 0.25 + 0.6 * u;
-    { if (D.ox === undefined || D.t <= dt * 1.01) { D.ox = p.x; D.oz = p.z; } const sx = p.x - D.ox, sz = p.z - D.oz; D.ox = p.x; D.oz = p.z; D.P0.x += sx; D.P0.z += sz; D.F.x += sx; D.F.z += sz;      /* the whole bounce travels with him */
+    { if (D.ox === undefined || D.t <= dt * 1.01) { D.ox = p.x; D.oz = p.z; } const sx = p.x - D.ox, sz = p.z - D.oz; D.ox = p.x; D.oz = p.z; D.P0.x += sx; D.P0.z += sz;      /* where it left the hand travels with him; the landing spot was already aimed at where he will be (moving it too counted his run twice and threw the ball past the hand on every crossover) */
       if (p.st === 'free' && u < 0.85) { const Fn = dribFloor(p, D, D.kind, Math.max(0, D.T - D.t)), k = 1 - Math.exp(-14 * dt); D.F.x = lerp(D.F.x, Fn.x, k); D.F.z = lerp(D.F.z, Fn.z, k); } }      /* and still lands where his body is going now, not where it was going a beat ago */
     B.pos.set(lerp(D.P0.x, D.F.x, u), lerp(D.P0.y, 0.125, e), lerp(D.P0.z, D.F.z, u));
     if (u >= 1) { D.ph = 'up'; D.t = 0; D.C0 = null; D.T = D.upT || Tc * 0.5; D.F.copy(B.pos); if (M_.phase === 'live' && !M_.bounceMute) sfx('bounce'); }
