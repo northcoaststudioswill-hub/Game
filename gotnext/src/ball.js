@@ -1248,19 +1248,19 @@ function stepBall(dt) {
 const _bp = new THREE.Vector3(), _bq = new THREE.Vector3();
 function palm(p, hand, out) { handPos(p.rig, hand, out); out.y -= 0.115; return out; }
 // a reset (check, teleport): the ball starts in the hand instead of flying in from wherever it was
-function resetDrib(p) { const D = newDrib(p, MT.B.pos); palm(p, D.hand, MT.B.pos); D.ph = 'hand'; D.t = 0; D.F = null; p.drib = D; return D; }
+function resetDrib(p) { const D = newDrib(p, MT.B.pos); const pl = palm(p, D.hand, _bp); if (MT.B.pos.distanceTo(pl) > 3) MT.B.pos.copy(pl); else D.glide = 1; D.ph = 'hand'; D.t = 0; D.F = null; p.drib = D; return D; }      /* only a real teleport (a check, a reset) snaps it; otherwise the hand goes and gets it (a move at full speed used to jump it 1.4 m in a frame) */
 function newDrib(p, from) { return { ph: 'up', t: 0, T: 0.16, hand: p.hand || 'R', F: from.clone(), P0: from.clone(), kind: '', push: 1 }; }
 // where this bounce lands, in the player's frame: side (+ = dribble hand side), forward
 function dribFloor(p, D, kind, tAhead, vx, vz) {
   if (vx === undefined) { vx = p.avx || 0; vz = p.avz || 0; }
   const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = fz, rz = -fx, sgn = D.hand === 'R' ? -1 : 1, v = Math.hypot(vx, vz);
-  let side = 0.3, fwd = 0.3 + Math.min(0.45, v * 0.06);                 // ordinary dribble: outside the foot, ahead more at speed
+  let side = 0.34, fwd = 0.3 + Math.min(0.45, v * 0.06);      /* outside the foot, clear of the knee on the way up */                 // ordinary dribble: outside the foot, ahead more at speed
   if (kind === 'cross' || kind === 'killer') { side = 0.02; fwd = kind === 'killer' ? 0.3 : 0.45; }
   else if (kind === 'tween') { side = 0.0; fwd = 0.04; }
   else if (kind === 'behind') { side = 0.0; fwd = -0.32; }
   else if (kind === 'shammgod') { side = -0.42; fwd = 0.34; }
   else if (kind === 'retreat') { side = 0.32; fwd = 0.1; }
-  else if (p.protect) { side = 0.42; fwd = 0.05; }                     // ball kept away from the defender, low and to the side
+  else if (p.protect) { side = 0.5; fwd = 0.14; }      /* out past the knee of the crouch */                     // ball kept away from the defender, low and to the side
   // forward of the body along the way he faces (the offset was worked out above but never applied: the ball always
   // bounced level with the hips, and a runner then outran it)
   return _bq.set(p.x + vx * tAhead + rx * side * sgn + fx * fwd, 0.125, p.z + vz * tAhead + rz * side * sgn + fz * fwd).clone();
@@ -1312,14 +1312,14 @@ function ballHeld(p, dt) {
     // the hand rides the ball down, then lets go
     // receive (the hand gives with the ball as it rises), then push it back down
     const Th = Tc * 0.27, u = Math.min(1, D.t / Th);      /* the hand is on the ball a beat, not a third of every bounce (it read as carrying) */ p.dribH = u < 0.35 ? 0.88 + 0.12 * (u / 0.35) : 1 - 0.8 * ((u - 0.35) / 0.65);
-    palm(p, D.hand, _bp); ballFollow(B, _bp, dt, true);
+    palm(p, D.hand, _bp); if (D.glide) { ballFollow(B, _bp, dt, false, 15); if (B.pos.distanceTo(_bp) < 0.05) D.glide = 0; else D.t = Math.min(D.t, Th * 0.5); } else ballFollow(B, _bp, dt, true);
     if (D.t >= Th) { D.ph = 'down'; D.t = 0; D.T = Tc * 0.26; D.P0 = B.pos.clone(); D.kind = '';
       const want = p.st === 'free' && !p.post ? autoHand(p) : null;      /* switch hands with a quick crossover dribble in front of the body */
       if (want && want !== D.hand && M_.time - (p.handSwT || -9) > 0.75) { p.hand = want; D.hand = want; D.kind = 'cross'; p.handSwT = M_.time; }
       else if (!want && p.st === 'free' && (p.swag === 'tween' || p.swag === 'behind') && M_.time >= (p.handSwT || 0)) { const nh = D.hand === 'R' ? 'L' : 'R'; p.hand = nh; D.hand = nh; D.kind = p.swag; }      /* showing off: through the legs or round the back, every bounce */
       D.F = dribFloor(p, D, D.kind, D.T); D.upT = Tc * 0.38; }
   } else if (D.ph === 'down') {
-    if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) / 10);     /* no faster than a hard real push */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
+    if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) * 1.5 / 10);     /* no faster than a hard real push: the drop speeds up as it goes (u^1.5), so its top speed is 1.5x the average */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
     const u = Math.min(1, D.t / D.T), e = Math.pow(u, 1.5); p.dribH = 0.25 + 0.6 * u;
     B.pos.set(lerp(D.P0.x, D.F.x, u), lerp(D.P0.y, 0.125, e), lerp(D.P0.z, D.F.z, u));
     if (u >= 1) { D.ph = 'up'; D.t = 0; D.C0 = null; D.T = D.upT || Tc * 0.5; D.F.copy(B.pos); if (M_.phase === 'live' && !M_.bounceMute) sfx('bounce'); }
@@ -1332,7 +1332,18 @@ function ballHeld(p, dt) {
   }
   B.spin += dt * (D.ph === 'down' ? 9 : 4);
 }
-function ballMesh() { const B = MT.B; B.mesh.position.copy(B.pos); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3)); }
+const _lg = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+const _clr = new THREE.Vector3();
+function ballClear(p) {      // a bounced ball goes round a leg, never through it (the pose and the bounce path are worked out apart)
+  const B = MT.B, R = p.rig; _clr.set(0, 0, 0); if (!R || !R.joints.hpR) return; const need = 0.175;
+  for (const s of ['R', 'L']) { R.joints['hp' + s].getWorldPosition(_lg[0]); R.joints['kn' + s].getWorldPosition(_lg[1]); R.joints['an' + s].getWorldPosition(_lg[2]);
+    for (let k = 0; k < 2; k++) { const a = _lg[k], c = _lg[k + 1], abx = c.x - a.x, aby = c.y - a.y, abz = c.z - a.z, l2 = abx * abx + aby * aby + abz * abz || 1;
+      const t = clamp(((B.pos.x - a.x) * abx + (B.pos.y - a.y) * aby + (B.pos.z - a.z) * abz) / l2, 0, 1), qx = a.x + abx * t, qz = a.z + abz * t, qy = a.y + aby * t;
+      const dx = B.pos.x - qx, dz = B.pos.z - qz, d3 = Math.hypot(dx, B.pos.y - qy, dz); if (d3 >= need) continue;
+      let hx = dx, hz = dz, hl = Math.hypot(hx, hz); if (hl < 1e-3) { const sg = (D => D && D.hand === 'L' ? 1 : -1)(p.drib); hx = Math.cos(p.face) * sg; hz = -Math.sin(p.face) * sg; hl = 1; }      /* dead centre: out to the dribbling side */
+      const push = need - d3; _clr.x += hx / hl * push; _clr.z += hz / hl * push; } } }
+function ballMesh() { const B = MT.B; _clr.set(0, 0, 0); if (B.holder && B.state === 'held' && B.holder.drib && (B.holder.st === 'free' || B.holder.st === 'move') && B.holder.live === 'drib' && B.holder.drib.ph !== 'hand' && B.holder.drib.ph !== 'carry') ballClear(B.holder);
+  B.clr = B.clr || new THREE.Vector3(); { const dx = _clr.x - B.clr.x, dz = _clr.z - B.clr.z, dl = Math.hypot(dx, dz), mx = 0.045; if (dl > mx) { B.clr.x += dx / dl * mx; B.clr.z += dz / dl * mx; } else { B.clr.x = _clr.x; B.clr.z = _clr.z; } }      /* at most ~2.7 m/s of extra drift: it slides round the leg, never pops */      /* eased in and out, so going round a leg never jumps the ball */ B.mesh.position.copy(B.pos); if (B.clr) B.mesh.position.add(B.clr); B.mesh.rotation.x = B.spin; B.shadow.position.set(B.pos.x, 0.016, B.pos.z); B.shadow.scale.setScalar(clamp(1.3 - B.pos.y * 0.15, 0.4, 1.3)); }
 function animPlayer(p, dt) {
   const M_ = MT, B = M_.B, R = p.rig, hasBall = B.holder === p; let an = 'idle', o = { leg: R.legLen, prof: R.prof };
   p.protect = hasBall && p.st === 'free' && nearestOpp(p)[1] < 1.7 && Math.hypot(p.avx || 0, p.avz || 0) < 3;
