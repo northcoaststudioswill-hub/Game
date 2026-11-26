@@ -15,9 +15,9 @@ const g1 = await p.evaluate(() => { const g = document.getElementById('goal'); r
 check('goal line shows for a new player', g1.on && /coach/i.test(g1.t), g1.t.replace(/\n/g, ' / '));
 if (shots) await p.screenshot({ path: path.join(dir, 'shots', 'rf-goal.png') });
 // 2. from spawn, hold W (and a touch of D) to the Cages: does the statue stop us?
-const walk = await p.evaluate(async () => { const P = __pit, K = P.keys, W = P.ev('W'); W.me.x = 0; W.me.z = 9; W.yaw = Math.PI; W.me.vx = W.me.vz = 0; K.KeyW = true; K.ShiftLeft = true; let minZ = 99; for (let i = 0; i < 60 * 5; i++) { window.__tick(1); minZ = Math.min(minZ, W.me.z); } K.KeyW = false; K.ShiftLeft = false; window.__tick(5); return { z: +W.me.z.toFixed(2), x: +W.me.x.toFixed(2), minZ: +minZ.toFixed(2) }; });
+const walk = await p.evaluate(async () => { const P = __pit, K = P.keys, W = P.ev('W'); if (W.guide) W.guide.st = 'rest'; P.uiClose(); window.__tick(2); W.me.x = 0; W.me.z = 9; W.yaw = Math.PI; W.me.vx = W.me.vz = 0; K.KeyW = true; K.ShiftLeft = true; let minZ = 99; for (let i = 0; i < 60 * 5; i++) { window.__tick(1); minZ = Math.min(minZ, W.me.z); } K.KeyW = false; K.ShiftLeft = false; window.__tick(5); return { z: +W.me.z.toFixed(2), x: +W.me.x.toFixed(2), minZ: +minZ.toFixed(2) }; });
 check('straight run from spawn slides past the statue', walk.minZ < -1, JSON.stringify(walk));
-const gate = await p.evaluate(() => { const W = __pit.ev('W'); W.me.x = 2.2; W.me.z = -1.5; window.__tick(3); return document.getElementById('prompt').innerText; });
+const gate = await p.evaluate(() => { let W = __pit.W; const en = W.spots.find(s => /ENTER THE CAGES/.test(s.label)); en.fn(); window.__tick(60); __pit.uiClose(); W = __pit.W; W.me.x = 0; W.me.z = -3.6; window.__tick(3); return document.getElementById('prompt').innerText; });
 check('gate prompt reaches between gates', /2v2|3v3/i.test(gate), gate);
 // 3. results screen survives an E press held from the game
 const res = await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.id === 's2'), P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(30); const M = P.MT; M.score[M.me.team] = 10; P.call('scorePts', M.me, 1, 'j'); let shown = false; for (let i = 0; i < 60 * 8 && !shown; i++) { window.__tick(1); shown = !!document.querySelector('#panel') && /DUB|TOUGH|L ·|W ·/i.test(document.getElementById('panel').innerText) && getComputedStyle(document.getElementById('panel')).display !== 'none'; }
@@ -26,11 +26,10 @@ check('results screen shown', res.shown, res.first.replace(/\n/g, ' '));
 check('E right after the buzzer does not skip it', res.after === res.first && !res.inGame, res.after.replace(/\n/g, ' '));
 if (shots) await p.screenshot({ path: path.join(dir, 'shots', 'rf-results.png') });
 // 4. streak banner names the team
-const st = await p.evaluate(() => { const P = __pit; P.uiClose(); window.__tick(5); P.launchGame(P.MODES.find(m => m.id === 's2'), P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(30); const M = P.MT; M.phase = 'live'; M.stops = [0, 0]; const them = 1 - M.me.team; let got = ''; const orig = P.ev('hudCall'); P.ev('window.__hc = hudCall; hudCall = function (b, s) { window.__last = b + ' | ' + s; return window.__hc.apply(this, arguments); }');
-  for (let k = 0; k < 3; k++) { M.off = M.me.team; P.call('changePoss', them); } window.__tick(40); got = window.__last; P.ev('hudCall = window.__hc'); return got; });
+const st = await p.evaluate(() => { const P = __pit; P.uiClose(); window.__tick(5); P.launchGame(P.MODES.find(m => m.id === 's2'), P.TIERS_COURT[0], { mates: [-1], rival: -1, p2: 'off' }); window.__tick(30); const M = P.MT; M.phase = 'live'; M.stops = [0, 0]; const them = 1 - M.me.team; for (let k = 0; k < 3; k++) { M.off = M.me.team; P.call('changePoss', them); } const L = (M.late || []).find(x => x.big === 'LOCKED IN'); return L ? L.small : ''; });
 check('LOCKED IN says whose D', /their d/i.test(st || ''), st);
 // 5. meter window follows the real one, and the +5 button has a price
-const mz = await p.evaluate(() => { const P = __pit, M = P.MT; const me = M.me; const open = P.call('shotWin', me, 0, 0.3), hand = P.call('shotWin', me, 0.6, 0.3); return { open: +open.toFixed(3), hand: +hand.toFixed(3) }; });
+const mz = await p.evaluate(() => { const P = __pit, M = P.MT; const me = M.me; me.shot = me.shot || { j: { win: 0 } }; const open = P.call('shotWin', me, 0, 0.3), hand = P.call('shotWin', me, 0.6, 0.3); return { open: +open.toFixed(3), hand: +hand.toFixed(3) }; });
 check('green window narrows with a hand up (floor kept)', mz.hand <= mz.open && mz.hand >= 0.035, JSON.stringify(mz));
 const plus = await p.evaluate(() => { const P = __pit; P.call('quitMatch'); window.__tick(10); P.uiClose(); P.uiPlayer('attrs'); window.__tick(3); return [...document.querySelectorAll('#panel button')].map(b => b.textContent).filter(t => /^\+\d/.test(t)).slice(0, 4); });
 check('+5 button shows its total price', plus.some(t => /^\+5 · \d+/.test(t)), plus.join(', '));

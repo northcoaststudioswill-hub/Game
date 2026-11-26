@@ -387,7 +387,7 @@ function worldStep(dt) {
   if (me.sit) { me.vx = me.vz = 0; }
   let nx = me.sit ? me.x : me.x + me.vx * dt, nz = me.sit ? me.z : me.z + me.vz * dt;
   if (!me.sit) for (const s of W.solids) { if (nx > s[0] && nx < s[1] && nz > s[2] && nz < s[3]) { const px = Math.min(nx - s[0], s[1] - nx), pz = Math.min(nz - s[2], s[3] - nz); if (px < pz) nx = nx - s[0] < s[1] - nx ? s[0] : s[1]; else nz = nz - s[2] < s[3] - nz ? s[2] : s[3]; } }
-  if (!me.sit && W.rounds) for (const [cx, cz, cr] of W.rounds) { const ex = nx - cx, ez = nz - cz, ed = Math.hypot(ex, ez); if (ed < cr && ed > 1e-4) { nx = cx + ex / ed * cr; nz = cz + ez / ed * cr; } }
+  if (!me.sit && W.rounds) for (const [cx, cz, cr] of W.rounds) { const ex = nx - cx, ez = nz - cz, ed = Math.hypot(ex, ez); if (ed < cr && ed > 1e-4) { let ux = ex / ed, uz = ez / ed; const tx = -uz, tz = ux, tv = me.vx * tx + me.vz * tz, nv = me.vx * ux + me.vz * uz; if (nv < 0) { const side = Math.abs(tv) > 0.4 ? Math.sign(tv) : (me.x - cx >= 0 ? 1 : -1), k = Math.min(0.12, -nv * dt * 1.2); const ax = ux + tx * side * k * 4, az = uz + tz * side * k * 4, al = Math.hypot(ax, az); ux = ax / al; uz = az / al; } nx = cx + ux * cr; nz = cz + uz * cr; } }      /* head-on you are eased round it, never pinned */
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
