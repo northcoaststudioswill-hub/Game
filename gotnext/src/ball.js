@@ -1379,7 +1379,7 @@ function animPlayer(p, dt) {
     }
   if (p.def && B.holder && (p.guard || p.man) === B.holder && p.st === 'free' && (an === 'slide' || an === 'run')) {      // closing out: sprint, then chop the feet, sit down, high hand, low hand
     const h = B.holder, dx = h.x - p.x, dz = h.z - p.z, dd = Math.hypot(dx, dz) || 1, cs = ((p.avx || 0) * dx + (p.avz || 0) * dz) / dd;
-    if (dd > 1.1 && dd < 3.4 && cs > 1.6) { o.close = clamp((cs - 1.6) / 2, 0, 1) * clamp((3.4 - dd) / 1.2, 0, 1); o.closePh = p.runPh * 2.2; o.shootR = h.hand !== 'L'; }
+    if (dd > 1.1 && dd < 3.4 && cs > 1.6) { o.close = clamp((cs - 1.6) / 2, 0, 1) * clamp((3.4 - dd) / 1.2, 0, 1); o.closePh = p.runPh * 2.2; o.shootR = h.hand !== 'L'; if (o.close > 0.45 && an === 'run') { an = 'slide'; o.ph = p.runPh; o.sp = 0; } }      /* the last steps are chopped, not a sprint stride */
   }
   if (!hasBall && p.st === 'free' && M_.phase === 'live' && M_.off === p.team && B.state === 'held' && B.holder && B.holder.team === p.team && an === 'idle' && !p.user) {
     const od = nearestOpp(p)[1], hd = dist(p, B.holder); if (od > 2.0 && hd > 2.5 && hd < 9) o.target = clamp((od - 2) / 1.2, 0, 1);      /* open on the wing: knees bent, hands up showing the passer a target */
@@ -1427,7 +1427,7 @@ function animPlayer(p, dt) {
       for (const key of ['hpR', 'knR', 'anR', 'hpL', 'knL', 'anL']) mix(key, w); P.y = lerp(P.y || 0, Pr.y, w);
       const ub = an === 'run' ? w : w * 0.45; for (const key of ['hips', 'spine', 'chest', 'neck']) mix(key, ub);
       if (an === 'dribble') { P.spine[0] += 0.2 * w; P.chest[0] += 0.12 * w; P.neck[0] -= 0.26 * w; }
-      if (an === 'run') for (const key of ['shR', 'elR', 'wrR', 'shL', 'elL', 'wrL']) mix(key, w); else { const off = (o.hand === 'L') ? 'R' : 'L'; for (const key of ['sh' + off, 'el' + off, 'wr' + off]) mix(key, w * 0.95); }
+      if (an === 'run' && !(o.close > 0.2)) for (const key of ['shR', 'elR', 'wrR', 'shL', 'elL', 'wrL']) mix(key, w); else { const off = (o.hand === 'L') ? 'R' : 'L'; for (const key of ['sh' + off, 'el' + off, 'wr' + off]) mix(key, w * 0.95); }
       if (o.leanF) P.spine[0] += o.leanF * w * 0.5; P.rate = Math.max(P.rate || 16, 16 + 24 * w);
       const uR = p.psi, uL = (p.psi + 0.5) % 1; p.stR = uR < duty; p.stL = uL < duty;
     }
