@@ -8,7 +8,7 @@
   wrap('pit', st => { const lad = document.querySelector('#panel .ladder'); if (!lad) return;
     const dead = [...lad.querySelectorAll('.opp.beaten')], names = dead.map(el => (el.querySelector('b') || {}).textContent).filter(Boolean); dead.forEach(el => el.remove());
     if (names.length) { const d = document.createElement('div'); d.className = 'ruled'; d.innerHTML = '<small>RULED THROUGH</small> ' + names.map(n => '<s>' + n + '</s>').join(' · '); lad.insertBefore(d, lad.querySelector('.tier') || lad.firstChild); }
-    const why = lad.querySelector('.uc-why'); if (why) { if ((st.boutN || 0) >= 3 || names.length) why.remove(); else why.innerHTML = 'Nobody is handed a name. Win the <b>undercard</b> bouts below and the Keeper writes you in against the next one.'; }
+    const why = lad.querySelector('.uc-why'); if (why) why.remove();       // the Ledger's own first line already says this; it was printed twice
     const sealed = [...lad.querySelectorAll('.opp.locked')]; if (sealed.length > 2) { sealed.slice(2).forEach(el => el.remove()); const m = document.createElement('p'); m.className = 'dim more'; m.textContent = (sealed.length - 2) + ' more name' + (sealed.length - 2 === 1 ? '' : 's') + ' above these, and the Pale Queen at the top.'; lad.appendChild(m); }
     const intro = document.querySelector('#panel .card > p.dim'); if (intro && (st.boutN || 0) >= 1) intro.remove(); });
 

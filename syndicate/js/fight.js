@@ -33,6 +33,7 @@
 
   F.start = function (o) { if (G.clearPreview) G.clearPreview(); if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false); hazT = 0; haz.length = 0; { const ar = G.world.get('arena'); if (ar.remains) ar.remains(o && (o.spar || o.garden) ? 0 : Math.random() < 0.7 ? 2 + Math.floor(Math.random() * 6) : 0); }
     opp = o; const st = G.state, h = st.hero;
+    if (!o.spar && !o.garden && !G.guest) { st.boutOpen = { id: o.id, name: o.name }; G.save(); }       // a bout in progress is written down, so closing the page mid-fight cannot undo it
     arena = G.world.get('arena'); sc = arena.scene; gfx.setScene(sc);
     if (F.P) [F.P, F.E].forEach(e => { if (e.vis) { sc.remove(e.vis.g); if (e.vis.tele) sc.remove(e.vis.tele); } });
     (fx || []).forEach(killFx); (projs || []).forEach(p => p.m && sc.remove(p.m)); (zones || []).forEach(z => z.m && sc.remove(z.m));
@@ -1335,6 +1336,7 @@
   let dtFx = 0;
   F.update = function (rdt) {
     if (!F.active) return;
+    if (arena && arena.seeThrough && P && E) arena.seeThrough([[P.x / S, 1.1, P.y / S], [E.x / S, 1.1, E.y / S]], rdt);
     if (F.paused) { dtFx = 0; sync(0); return; }
     let dt = rdt * F.speed;
     dtFx = dt;       // blade wakes fade in real time, even while a hit holds the frame
@@ -1495,6 +1497,13 @@
   F.eggApi = { hit, text, spark, blood, mark, sever, S, fx: o => fx.push(o), shake: v => { shake = Math.max(shake, v); }, stop: v => { hitstop = Math.max(hitstop, v); }, alive: e => e && e.hp > 0 && phase === 'fight' };
   F.edgeApi = { text, heal, setBuff: (e, k, t, a) => setBuff(e, k, t, a), knockdown: (e, t) => knockdown(e, t), spark, S, fx: o => fx.push(o) };
   F.koEntity = e => ko(e); F.inFight = () => phase === 'fight';
+  // a save that comes back with a bout still open means the fighter walked out of the pit mid-fight: the same as Forfeit
+  function walkedOut(st) { const b = st.boutOpen; delete st.boutOpen; if (!b || !st.hero) return;
+    const lost = Math.round((st.coin || 0) * (G.owned && G.owned(st).strongbox ? 0.15 : 0.5)); st.coin -= lost; st.deaths = (st.deaths || 0) + 1; st.soulDebt = (st.soulDebt || 0) + 1; st.losses = (st.losses || 0) + 1;
+    const floor = G.RANKS[G.rankOf(st.respect)].at; st.respect = Math.max(floor, st.respect - Math.max(3, Math.round((st.respect - floor) * 0.12)));
+    G.save(); G.walkedOutMsg = 'You left the pit against ' + (b.name || 'your opponent') + ' before it was settled. The Ledger counts it as a death' + (lost ? ', and the Guild took ' + lost + ' coin.' : '.');
+    setTimeout(() => { if (G.walkedOutMsg && G.ui && G.ui.toast) { G.ui.toast(G.walkedOutMsg); G.walkedOutMsg = null; } }, 1500); }
+  { const ld = G.load; G.load = function () { const ok = ld.apply(this, arguments); if (ok && G.state && G.state.boutOpen && !F.active) walkedOut(G.state); return ok; }; }
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
   function finish() {
@@ -1502,7 +1511,7 @@
       G.save(); gfx.cam.shake = 0; gfx.clearFloats(); gfx.cine = null; document.getElementById('foeArrow').className = 'hidden';
       const cb = opp.onDone; opp.onDone = null; return cb ? cb(result.win && !result.forfeit) : G.ui.hub();
     }
-    const st = G.state, win = result.win, first = !st.wins[opp.id];
+    const st = G.state, win = result.win, first = !st.wins[opp.id]; delete st.boutOpen;
     const hy = Math.round(hype), base = win ? (first ? 1 : 0.6) : 0.25;
     const r = {
       win, opp, first, hype: hy, forfeit: result.forfeit,

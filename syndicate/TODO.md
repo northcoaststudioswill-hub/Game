@@ -2,6 +2,23 @@
 
 Kept current as work lands. Newest section first.
 
+## From the first blind playtest (26 Nov)
+
+A bot played about 40 minutes without reading the code: mouse and keyboard, a simulated controller, and touch on phone-sized windows. Fixed straight away: a reload mid-bout erasing a death; controller focus lost on the builder's cards (and LB/RB now change tabs); walking stuck on guards and counters; E doing nothing a few steps from a stall; the corner pillar hiding the fight; ability names running together on the fight bar; Escape closing a whole page instead of stepping back; Fire Bolt listed twice for sorcerers; a Ledger line printed twice; the unreadable line on the Open Sand card; pre-fight quotes with no speaker; market names cut off at the screen edge; blade wording on casters' upgrades at the Fence.
+
+Not done, to look at:
+
+- **First bout feels like a stunlock** (Hesper chains Shield Bash, stun, posture break and wall hits). The test machine ran in slow motion, which made it worse, but nothing tells you that you are stunned or why your clicks do nothing. Show it.
+- **Too much to read before the first fight**: How to Play is 17 bullets; Pip's tour says "tap" on desktop; the Finisher list shows 12 entries locked behind ranks nobody has explained; the Guildmaster's "You have something to choose" does not point at anything.
+- **Builder**: the panel changes height per tab so Next moves under the pointer; picking a third art silently drops the first; the name field only appears on the last tab (a controller player is named automatically); a Fighter starts with Fire Bolt before the cantrip is explained.
+- **Halberd** looks squashed in the builder preview, and the blade fills the corner of dialogue close-ups.
+- **Phone, landscape**: the logo covers Continue and the lower title buttons fall off screen. Check on a real phone first (the bot's copy of the game lacked the phone viewport setting the published page has).
+- **Phone crowding**: health bars full width with Pause squeezed between; small Parry/Dodge/Taunt labels; Erase sits right under Continue on the save list.
+- **Market**: some names still overlap each other (the Sergeant and Pip); two street lines can run together; the player can stand hidden behind the lamp post.
+- **Controller**: dialogue Skip shows no button and B skips Pip's whole tour without asking; on the title Continue is gold while the focus ring is on New Fighter.
+- **Bodies pass through the Sergeant, Old Marrow Tibb and the Guildmaster's counter** (they are not obstacles).
+- **No message if three.js fails to load**: the title is a plain black screen.
+
 ## The Guest List (Easter egg roster)
 
 Done so far:

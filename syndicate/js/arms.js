@@ -60,7 +60,7 @@
     shop0.apply(this, arguments);
     const st = G.state, first = document.querySelector('#panel .ab-row'); if (!first) return;
     const row = document.createElement('div'); row.className = 'ab-row'; const n = G.ARMS.filter(w => w.cls === st.hero.cls);
-    row.innerHTML = '<div class="ab-ic pas">⚔</div><div class="ab-tx"><b>The Armoury</b><small>Carrying: ' + G.ARM_BY[G.armOf(st.hero)].name + '</small><p>Weapons change your reach, speed and how hard you hit posture. ' + n.filter(w => G.armOwned(st, w)).length + ' of ' + n.length + ' owned.</p></div><button class="big">Browse</button>';
+    row.innerHTML = '<div class="ab-ic pas">⚔</div><div class="ab-tx"><b>The Armoury</b><small>' + ((st.hero.cls === 'sorcerer' || st.hero.cls === 'warlock') ? 'Casting: ' : 'Carrying: ') + G.ARM_BY[G.armOf(st.hero)].name + '</small><p>Weapons change your reach, speed and how hard you hit posture. ' + n.filter(w => G.armOwned(st, w)).length + ' of ' + n.length + ' owned.</p></div><button class="big">Browse</button>';
     row.querySelector('button').onclick = () => { G.sfx('ui'); ui.armory(); }; first.parentNode.insertBefore(row, first);
   };
   // the first time into the pit, say how the new tempo works

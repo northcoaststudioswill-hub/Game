@@ -108,10 +108,12 @@
       else { ban(0, '#7a1c22'); torch(-1.8); torch(1.8); }
     }
     // pillars and braziers at the corners
+    const pillars = [];
     V.forEach((v, i) => {
       const x = v[0] * 1.1, z = v[1] * 1.1, far = i >= 3 || i === 0;
       if (far) {
-        box(1.3, 4.9, 1.3, mat, x, 2.45, z, s); box(1.6, 0.3, 1.6, matDark, x, 5.05, z, s); box(1.55, 0.4, 1.55, matDark, x, 0.2, z, s);
+        const pm = mat.clone(), pd = matDark.clone(); pm.transparent = pd.transparent = true;       // each pillar has its own stone, so it alone can turn see-through
+        pillars.push({ mats: [pm, pd], o: 1, meshes: [box(1.3, 4.9, 1.3, pm, x, 2.45, z, s), box(1.6, 0.3, 1.6, pd, x, 5.05, z, s), box(1.55, 0.4, 1.55, pd, x, 0.2, z, s)] });
         gfx.fire(s, x, 5.5, z, 0xff8a30, 1.1, (i === 5 || i === 6) ? 40 : (i === 4 || i === 7) ? 26 : 0);
         mesh(new T.CylinderGeometry(0.55, 0.3, 0.3, 8), gfx.lambert(0x1c1a1e), x, 5.35, z, s);
       } else { box(1.0, 0.9, 1.0, mat, x, 0.45, z, s); brazier(s, x, 0.9, z, 30); }
@@ -246,7 +248,15 @@
       if (hypeNow > 0.75 && n && Math.random() < 0.35) { const p = crowdSpots[Math.floor(Math.random() * n)]; gfx.emit(p[0], p[1] + 1, p[2], -p[0] * R(0.25, 0.5), R(2, 4), -p[2] * R(0.25, 0.5), 1.4, 0xffd36b, 9); }
     };
     update(0);
-    return { scene: s, update, remains: n => setRemains(n | 0), garden: v => { v = !!v; if (v === gardenG.visible) return; gardenG.visible = v; if (v && perch && !davidC && G.oracle && G.oracle.look) { davidC = G.makeChar(G.oracle.look()); perch.add(davidC.root); } stash(v); s.background = v ? gardenSky : bg0; s.fog = v ? new T.Fog(0xe4eef4, 96, 190) : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
+    // a pillar standing between the camera and a fighter fades to a ghost of itself, and comes back when nobody is behind it
+    const rc = new T.Raycaster(), ndc = new T.Vector2(), pv = new T.Vector3();
+    const seeThrough = (pts, dt) => { const cam = gfx.camera; if (!cam || gfx.cine) { pillars.forEach(p => { p.o = 1; p.mats.forEach(m => { m.opacity = 1; m.depthWrite = true; }); }); return; }
+      pillars.forEach(p => p.want = 1);
+      const rt = new T.Vector3().setFromMatrixColumn(cam.matrixWorld, 0).normalize(), S6 = [[0, 0.5], [0, 1.2], [0, 1.95], [-0.42, 1.1], [0.42, 1.1], [0, 0.15]];       // head, chest, legs and both sides: a pillar over a shoulder counts too
+      pts.forEach(q => S6.forEach(o => { const wx = q[0] + rt.x * o[0], wy = o[1], wz = q[2] + rt.z * o[0]; pv.set(wx, wy, wz).project(cam); ndc.set(pv.x, pv.y); rc.setFromCamera(ndc, cam); pv.set(wx, wy, wz); const d0 = rc.ray.origin.distanceTo(pv);       // an orthographic ray starts on the near plane, not at the camera: measure from there
+        pillars.forEach(p => { if (p.want < 1) return; const h = rc.intersectObjects(p.meshes, false)[0]; if (h && h.distance < d0 - 0.3) p.want = 0.22; }); }));
+      pillars.forEach(p => { p.o += (p.want - p.o) * Math.min(1, (dt || 1 / 60) * 8); const o = p.o > 0.985 ? 1 : p.o; p.mats.forEach(m => { m.opacity = o; m.depthWrite = o >= 1; }); }); };
+    return { scene: s, update, seeThrough, pillars, remains: n => setRemains(n | 0), garden: v => { v = !!v; if (v === gardenG.visible) return; gardenG.visible = v; if (v && perch && !davidC && G.oracle && G.oracle.look) { davidC = G.makeChar(G.oracle.look()); perch.add(davidC.root); } stash(v); s.background = v ? gardenSky : bg0; s.fog = v ? new T.Fog(0xe4eef4, 96, 190) : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
   }
 
   W.get = function (name) {

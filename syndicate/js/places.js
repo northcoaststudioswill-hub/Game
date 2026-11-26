@@ -403,10 +403,10 @@
     if (!pl.bounds) return null;
     const B = pl.bounds, sx = Math.max(B[0], Math.min(B[2], Math.round(from.x))), sz = Math.max(B[1], Math.min(B[3], Math.round(from.z)));
     let gx = Math.max(B[0], Math.min(B[2], Math.round(to.x))), gz = Math.max(B[1], Math.min(B[3], Math.round(to.z)));
-    const key = (x, z) => x + ',' + z, free = (x, z) => x >= B[0] && z >= B[1] && x <= B[2] && z <= B[3] && !pl.blocked(x, z);
+    const key = (x, z) => x + ',' + z, C = 0.22, free = (x, z) => x >= B[0] && z >= B[1] && x <= B[2] && z <= B[3] && !pl.blocked(x, z) && !pl.blocked(x + C, z) && !pl.blocked(x - C, z) && !pl.blocked(x, z + C) && !pl.blocked(x, z - C);       // a step is only planned where there is a little room either side: a route that grazes a corner snags the walker on it
     if (!free(gx, gz)) { let best = null, bd = 1e9; for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) if (free(gx + dx, gz + dz)) { const d = Math.hypot(gx + dx - to.x, gz + dz - to.z); if (d < bd) { bd = d; best = [gx + dx, gz + dz]; } } if (!best) return null; gx = best[0]; gz = best[1]; }
     const prev = {}, q = [[sx, sz]]; prev[key(sx, sz)] = 0; let found = false;
-    for (let n = 0; n < q.length && n < 900; n++) {
+    for (let n = 0; n < q.length && n < 4000; n++) {       // the market is about 970 squares; at 900 a walk to the far side found no route and went straight into whatever was in the way
       const c = q[n]; if (c[0] === gx && c[1] === gz) { found = true; break; }
       for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
         const nx = c[0] + d[0], nz = c[1] + d[1], k = key(nx, nz); if (k in prev || !free(nx, nz)) continue;
@@ -433,7 +433,7 @@
     if (pl.refresh) pl.refresh();
     return pl;
   };
-  W.walkTo = function (spot) { walker.target = spot; walker.emote = null; walker.lift = 0; walker.path = walker.place && walker.place.bounds ? W.findPath(walker.place, walker, spot) : null; };
+  W.walkTo = function (spot) { walker.retry = 0; walker.target = spot; walker.emote = null; walker.lift = 0; walker.path = walker.place && walker.place.bounds ? W.findPath(walker.place, walker, spot) : null; };
   W.updateWalk = function (dt, t, frozen) {
     const pl = walker.place; if (!pl) return null;
     const In = G.input, k = In.keys;
@@ -458,7 +458,7 @@
       const inside = pl.blocked(walker.x, walker.z);       // if something ever leaves you standing in a wall, you can always walk out of it
       if (inside || !pl.blocked(nx, walker.z)) walker.x = nx;
       if (inside || !pl.blocked(walker.x, nz)) walker.z = nz;
-      if (walker.target && Math.hypot(walker.x - ox, walker.z - oz) < sp * 0.2) { walker.stuckT = (walker.stuckT || 0) + dt; if (walker.stuckT > 0.5) { walker.target = null; walker.stuckT = 0; } } else walker.stuckT = 0;
+      if (walker.target && Math.hypot(walker.x - ox, walker.z - oz) < sp * 0.2) { walker.stuckT = (walker.stuckT || 0) + dt; if (walker.stuckT > 0.35) { walker.stuckT = 0; if ((walker.retry = (walker.retry || 0) + 1) <= 2) { const np = W.findPath(pl, { x: walker.x + (walker.x % 1 > 0.5 ? 0.3 : -0.3), z: walker.z + (walker.z % 1 > 0.5 ? 0.3 : -0.3) }, walker.target); walker.path = np && np.length ? np : walker.path; } else { walker.target = null; walker.retry = 0; } } } else { walker.stuckT = 0; if (!walker.target) walker.retry = 0; }       // snagged on a corner: plan again from here twice before giving up
       walker.face = Math.atan2(mx, mz); { const w0 = walker.walk; walker.walk += dt * (3 + 8 * walker.v); if (Math.floor(walker.walk / Math.PI) !== Math.floor(w0 / Math.PI) && !frozen) G.sfx('step'); }
     }
     if (walker.moving) { walker.emote = null; walker.lift = 0; } else walker.v = 0;

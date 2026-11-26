@@ -919,3 +919,13 @@ button.saveslot.egslot { width: 100%; text-align: left; display: flex; align-ite
 #eggcine.kcut { place-items: end center; background: linear-gradient(transparent 55%, rgba(8, 6, 10, 0.75)); animation: kcIn 1.5s ease-out forwards; } @keyframes kcIn { 0% { opacity: 0; } 12%, 80% { opacity: 1; } 100% { opacity: 0; } }
 .kc { margin-bottom: 14vh; text-align: center; font-family: sans-serif; } .kc b { display: block; font: 900 min(10vw, 11vh)/1 sans-serif; letter-spacing: 0.12em; color: var(--kc); text-shadow: 0 0 2rem var(--kc), 0.2rem 0.2rem 0 #141018; animation: kcB 0.3s ease-out; } @keyframes kcB { from { transform: scale(1.4); letter-spacing: 0.4em; } }
 .kc span { display: block; margin-top: 0.4rem; font: 700 min(3.6vw, 4vh)/1.2 sans-serif; letter-spacing: 0.24em; color: #f0ece0; opacity: 0; animation: kcL 0.01s linear forwards 0.35s; } .kc span + span { animation-delay: 0.75s; color: var(--kc); } @keyframes kcL { to { opacity: 1; } }
+
+/* controller focus inside the builder: drawn inside the card, so the panel edge cannot clip it, and brighter than the gold of a picked card */
+body.pad .builder button:focus { outline: 3px solid #fff3c4; outline-offset: -3px; box-shadow: 0 0 0 2px #0b090d inset, 0 0 1.1rem rgba(255, 230, 150, 0.75); transform: translateY(-1px); z-index: 1; }
+/* ability names under the bar: each wraps onto two short lines within its own slot, instead of running into the next name */
+#hud:not(.touch) #abar.named .abn { white-space: normal; width: calc(3.7rem + 1.4rem); text-align: center; line-height: 1.05; font-size: 0.56rem; }
+/* the Open Sand card sits on the same parchment as the rest of the Ledger: its line was pale blue on cream and could not be read */
+.opp.exh .taunt { color: #1f4a66; }
+/* who said it, under a quote on the pre-fight card */
+.quote small.said { display: inline; margin-left: 0.4em; font-style: normal; font-family: var(--display); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.quote small.said::before { content: '— '; }

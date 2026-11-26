@@ -46,11 +46,11 @@
     if (G.scene === 'cine') { if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space') e.preventDefault(); return; }      // the intro is skipped by holding, in cine.js
     G.audioInit();
     if (G.scene === 'fight') {
-      if (e.code === 'Escape' || e.code === 'KeyP') { if (G.fight.paused) { G.ui.close(); G.fight.paused = false; } else G.ui.pause(); }
+      if (e.code === 'Escape' || e.code === 'KeyP') { if (G.fight.paused) { if (e.code === 'Escape' && G.ui.isOpen() && !document.querySelector('#panel #pset') && G._pad && G._pad.back()) return; G.ui.close(); G.fight.paused = false; } else G.ui.pause(); }       // Escape inside Settings or Controls steps back to the pause menu, like B
       if (KEYMAP[e.code] && !e.repeat) In.pressed.push(KEYMAP[e.code]);
     } else if (G.scene === 'hub' || G.scene === 'hideout') {
-      if (e.code === 'Escape' && G.ui.isOpen()) { G.ui.close(); G.ui.topbar(); }
-      else if ((e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space') && !G.ui.isOpen() && !G.placing && !G.talk && G.near && !e.repeat) G.near.go();
+      if (e.code === 'Escape' && G.ui.isOpen()) { if (!(G._pad && G._pad.back())) G.ui.close(); G.ui.topbar(); }       // a page's own Back first (the Finisher list back to the Guildmaster), then close
+      else if ((e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space') && !G.ui.isOpen() && !G.placing && !G.talk && !e.repeat) { if (G.near) G.near.go(); else G.reachNear(); }
     }
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
     In.keys[e.code] = true;
@@ -116,16 +116,22 @@
   const setPad = on => { if (In.usingPad !== on) { In.usingPad = on; document.body.classList.toggle('pad', on); G.ui.refreshKeys(); } };
   window.addEventListener('mousemove', () => setPad(false)); window.addEventListener('keydown', () => setPad(false)); window.addEventListener('touchstart', () => setPad(false), { passive: true });
   G.rumble = (ms, strong) => { try { const gp = In.gp && navigator.getGamepads()[In.gp]; if (In.usingPad && gp && gp.vibrationActuator) gp.vibrationActuator.playEffect('dual-rumble', { duration: ms, strongMagnitude: strong, weakMagnitude: strong * 0.6 }); } catch (e) { } };
+  // E or A with nothing quite in reach: the closest stall within a few steps is walked to and opened, rather than nothing happening
+  G.reachNear = () => { const pl = W.walker.place; if (!pl || !pl.spots || G.ui.isOpen() || G.placing || G.talk) return false; let b = null, bd = 4.4; pl.spots.forEach(sp => { if (sp.x < -50 || (sp.isLocked && sp.isLocked())) return; const d = Math.hypot(sp.x - W.walker.x, sp.z - W.walker.z); if (d < bd) { bd = d; b = sp; } }); if (!b) return false; G.sfx('ui'); W.walkTo(b); return true; };
   function menuButtons() {
     const roots = G.ui.isOpen() ? [$('panel')] : G.dicing ? [document.getElementById('dicebar')] : [$('placebar'), $('prompt'), $('decorBtn'), $('topbar')];
     const out = [];
     roots.forEach(r => { if (!r || r.classList.contains('hidden')) return; (r.tagName === 'BUTTON' ? [r] : r.querySelectorAll('button')).forEach(el => { if (!el.disabled && el.offsetParent !== null) out.push(el); }); });
     return out;
   }
+  const sigOf = el => !el ? '' : el.id ? '#' + el.id : [...el.attributes].filter(a => a.name.startsWith('data-')).map(a => a.name + '=' + a.value).join('&') || 't:' + (el.textContent || '').trim().slice(0, 40);
+  let lastSig = ''; document.addEventListener('focusin', e => { if (e.target && e.target.tagName === 'BUTTON') lastSig = sigOf(e.target); });
+  // after a card redraws itself (picking a class, a weapon, an art), focus goes back to the same choice instead of jumping to the big button
+  const refocus = list => (lastSig && list.find(b => sigOf(b) === lastSig)) || list.find(b => b.classList.contains('big')) || list[0];
   function navigate(dx, dy) {
     const list = menuButtons(); if (!list.length) return;
     const cur = list.includes(document.activeElement) ? document.activeElement : null;
-    if (!cur) { (list.find(b => b.classList.contains('big')) || list[0]).focus({ preventScroll: true }); return; }
+    if (!cur) { refocus(list).focus({ preventScroll: true }); return; }
     const r = cur.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     let best = null, bs = 1e9;
     list.forEach(el => {
@@ -173,11 +179,12 @@
       if (hit(0) && list.includes(document.activeElement)) document.activeElement.click(); if (hit(1)) { const bk = document.querySelector('#dicebar #dback, #dicebar #dleave'); if (bk) bk.click(); }
     } else if (open || sc === 'title' || sc === 'create') {
       if (nx || ny) navigate(nx, ny);
-      const list = menuButtons(); if (list.length && !list.includes(document.activeElement)) (list.find(b => b.classList.contains('big')) || list[0]).focus();
+      const list = menuButtons(); if (list.length && !list.includes(document.activeElement)) refocus(list).focus({ preventScroll: true });
       if (hit(0) && list.includes(document.activeElement)) document.activeElement.click();
+      if (hit(4) || hit(5)) { const tabs = [...document.querySelectorAll('#panel .bsteps button')]; if (tabs.length) { const i = tabs.findIndex(b => b.classList.contains('sel')), j = Math.max(0, Math.min(tabs.length - 1, i + (hit(5) ? 1 : -1))); if (j !== i) { tabs[j].click(); G.sfx('ui'); } } }       // LB / RB step through the builder's tabs
       if (hit(1) || (paused && hit(9))) padBack();
     } else if (sc === 'hub' || sc === 'hideout') {
-      if (hit(0) && G.near) { G.sfx('ui'); G.near.go(); }
+      if (hit(0)) { if (G.near) { G.sfx('ui'); G.near.go(); } else G.reachNear(); }
       if (hit(3)) { G.sfx('ui'); if (sc === 'hideout') G.ui.catalog(); else G.ui.sheet(); }
       if (hit(2) && sc === 'hideout') { const w = W.walker, H = W.get('hideout'); let i = H.itemAt(w.x + Math.sin(w.face), w.z + Math.cos(w.face)); if (i < 0) i = H.itemAt(w.x, w.z); if (i >= 0) G.ui.pickUp(i); }
     }
@@ -195,7 +202,7 @@
     const hide = G.ui.isOpen() || !!G.placing || !!G.talk;
     place.spots.forEach((sp, i) => {
       const p = gfx.project(sp.x, sp.y, sp.z), el = tagEls[i];
-      el.style.transform = 'translate(' + p.x.toFixed(0) + 'px,' + p.y.toFixed(0) + 'px) translate(-50%,-50%)';
+      { const hw = (el.offsetWidth || 0) / 2 + 6, px = hw * 2 < innerWidth ? Math.max(hw, Math.min(innerWidth - hw, p.x)) : p.x; el.style.transform = 'translate(' + px.toFixed(0) + 'px,' + p.y.toFixed(0) + 'px) translate(-50%,-50%)'; }       // a name near the edge slides in rather than being cut off
       // a name only when you are close to it; a small marker from further off, and only where there is a reason to go
       const locked = sp.x < -50 || !!(sp.isLocked && sp.isLocked()), wk = W.walker, close = sp === near || Math.hypot(sp.x - wk.x, sp.z - wk.z) < 4.4, badge = !!(sp.badge && sp.badge()), goal = !!(G.goalSpot && G.goalSpot() === sp);
       el.classList.toggle('near', sp === near); el.classList.toggle('far', !close); el.classList.toggle('goal', goal); el.classList.toggle('badge', badge);

@@ -106,3 +106,14 @@
     [4, 5].forEach(i => { if (now[i] && !was[i] && ui.isOpen()) { const card = document.querySelector('#panel .card'), d = i === 5 ? 1 : -1; { const tabs = [...document.querySelectorAll('#panel .tl-tabs .chip')]; const k = tabs.findIndex(b => b.classList.contains('sel')); if (tabs.length) tabs[(k + d + tabs.length) % tabs.length].click(); } } });
     was = now; }, 60);
 })();
+// a caster's weapon is the focus they throw bolts through: the Fence names the upgrades that way for them (the bonus already lands on the basic bolt)
+(function () {
+  'use strict';
+  const G = window.G, ui = G.ui, CAST = { sorcerer: 1, warlock: 1 };
+  const NAME = { 'Runed Edge': 'Runed Focus', 'Syndicate Relic': 'Syndicate Orb', 'Guild-Forged Edge': 'Guild-Cut Focus', 'Warden Steel': 'Warden Glass', 'Crownsmith’s Work': 'Crownsmith’s Focus' };
+  const sh0 = ui.shop; if (!sh0) return;
+  ui.shop = function () { const r = sh0.apply(this, arguments), h = G.state && G.state.hero; if (!h || !CAST[h.cls]) return r;
+    const card = document.querySelector('#panel .card'); if (!card) return r;
+    card.querySelectorAll('.ab-tx b, .ab-tx small, .ab-tx p').forEach(el => { let t = el.innerHTML; Object.keys(NAME).forEach(k => { t = t.split(k).join(NAME[k]); }); t = t.replace(/damage on weapon hits/g, 'damage on your basic bolt').replace(/A proper crossguard and a cyan edge\./g, 'A focus stone with a cyan heart.').replace(/Gold edge, set with a blue stone\./g, 'A gold cage around a blue stone.').replace(/>Weapon tier/g, '>Focus tier').replace(/^Weapon tier/, 'Focus tier'); if (t !== el.innerHTML) el.innerHTML = t; });
+    return r; };
+})();
