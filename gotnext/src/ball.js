@@ -1267,6 +1267,7 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
   else if (kind === 'shammgod') { side = -0.42; fwd = 0.34; }
   else if (kind === 'retreat') { side = 0.32; fwd = 0.1; }
   else if (p.protect) { side = 0.5; fwd = 0.14; }      /* out past the knee of the crouch */                     // ball kept away from the defender, low and to the side
+  if (!kind || kind === 'hesi') { const lv = Math.abs(vx * rx + vz * rz); if (lv > 0.8) { const k = clamp((lv - 0.8) / 1.6, 0, 1); fwd += 0.3 * k; side *= 1 - 0.35 * k; } }      /* shuffling sideways the lead leg reaches out where the ball was: push it out in front instead */
   { const st = p.rig && p.rig.prof && p.rig.prof.stance || 1; if (st > 1.02 && kind !== 'tween' && kind !== 'behind' && kind !== 'cross' && kind !== 'killer') side *= Math.pow(st, 0.9); }      /* a wide stance (Showtime) puts the knee where the ball used to go */
   // forward of the body along the way he faces (the offset was worked out above but never applied: the ball always
   // bounced level with the hips, and a runner then outran it)
@@ -1336,7 +1337,7 @@ function ballHeld(p, dt) {
     if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) * 1.5 / 10);     /* no faster than a hard real push: the drop speeds up as it goes (u^1.5), so its top speed is 1.5x the average */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
     const u = Math.min(1, D.t / D.T), e = Math.pow(u, 1.5); p.dribH = 0.25 + 0.6 * u;
     { if (D.ox === undefined || D.t <= dt * 1.01) { D.ox = p.x; D.oz = p.z; } const sx = p.x - D.ox, sz = p.z - D.oz; D.ox = p.x; D.oz = p.z; D.P0.x += sx; D.P0.z += sz; D.F.x += sx; D.F.z += sz;      /* the whole bounce travels with him */
-      if (p.st === 'free' && u < 0.85) { const Fn = dribFloor(p, D, D.kind, Math.max(0, D.T - D.t), 0, 0), k = 1 - Math.exp(-14 * dt); D.F.x = lerp(D.F.x, Fn.x, k); D.F.z = lerp(D.F.z, Fn.z, k); } }      /* and still lands where his body is going now, not where it was going a beat ago */
+      if (p.st === 'free' && u < 0.85) { const Fn = dribFloor(p, D, D.kind, Math.max(0, D.T - D.t)), k = 1 - Math.exp(-14 * dt); D.F.x = lerp(D.F.x, Fn.x, k); D.F.z = lerp(D.F.z, Fn.z, k); } }      /* and still lands where his body is going now, not where it was going a beat ago */
     B.pos.set(lerp(D.P0.x, D.F.x, u), lerp(D.P0.y, 0.125, e), lerp(D.P0.z, D.F.z, u));
     if (u >= 1) { D.ph = 'up'; D.t = 0; D.C0 = null; D.T = D.upT || Tc * 0.5; D.F.copy(B.pos); if (M_.phase === 'live' && !M_.bounceMute) sfx('bounce'); }
   } else {   // up: off the floor to wherever the receiving hand is now
