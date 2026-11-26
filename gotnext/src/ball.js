@@ -821,7 +821,7 @@ function aiThink(p, dt) {
         { const ms = mates.find(q => q.ai.scr && q.ai.scr.h === p && q.ai.scr.ph === 1 && !q.ai.scr.used && dist(q, p) < 5);      /* the screen he called is set: brush past its far shoulder, then turn the corner */
           if (ms && o) { ms.ai.scr.used = true; const ex = ms.x - o.x, ez = ms.z - o.z, el = Math.hypot(ex, ez) || 1; aiGo(p, ms.x + ex / el * 0.85, ms.z + ez / el * 0.85, true); a.mode = ''; a.viaT = 0.55; a.tick = 0.55; return; }
           if (a.viaT > 0) { a.viaT = 0; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } }
-        { const us = mates.find(q => q.user && q.screen && dist(q, p) < 4.5); if (us && a.usedScr !== us && Math.random() < 0.7) { a.usedScr = us; a.mode = 'drive'; aiGo(p, 0, 0.6, true); return; } if (!us) a.usedScr = null; }      /* you set him a screen: he comes off it */
+        { const us = mates.find(q => q.screen && dist(q, p) < 4.5); if (us && a.usedScr !== us && Math.random() < (us.user ? 0.7 : 0.85)) { a.usedScr = us; a.mode = 'drive'; const sx = us.x - p.x, sz = us.z - p.z, sl = Math.hypot(sx, sz) || 1; aiGo(p, us.x + sx / sl * 1.4 - us.x * 0.15, us.z + sz / sl * 1.4 - us.z * 0.25, true); p.sprWas = false; a.tick = 0.45; return; } if (!us) a.usedScr = null; }      /* a teammate set him a screen: he comes off it, shoulder to the screener's hip, then turns the corner */
         if (o && od < 1.9 && o.st === 'steal' && p.reachBy === o && a.reachSeen !== p.reachAt && d > 2.6 && Math.random() < 0.35 + L * 0.55) { a.reachSeen = p.reachAt; a.mode = 'drive'; aiGo(p, 0, 0.6, true); p.sprWas = false; a.tick = 0.5; return; }      /* he reached and came up empty: go right now, past the hand he threw */
         // nothing there and the dribble is dying: swing it. Holding it longer against a set defender is how possessions die
         if (a.hold > 1.6 && !open && !MT.arcade && Math.random() < 0.35 + L * 0.35 && tryPass(q => nearestOpp(q)[1] > 1.1 && q !== p.catchFrom)) return;
@@ -838,6 +838,7 @@ function aiThink(p, dt) {
         // the look, read off the hands actually near him: a good shooter waits for a clean one, a bad decision-maker takes what is there
         const cn = contestOn(p);
         { const hum = mates.find(q => q.user && !q.afk); if (hum && cn >= 0.12 && nearestOpp(hum)[1] > 2.2 && passLane(p, hum) && !MT.arcade && Math.random() < 0.4) { doPass(p, hum); return; } }      /* you are wide open and he is not: you get it first */
+        if (!MT.arcade && a.hold > 0.7 && o && od < 1.6 && cn >= 0.12 && MT.clock > 5 && Math.random() < 0.14 + L * 0.14 && callScreen(p)) { a.tick = 0.5; return; }      /* locked up: bring a big up for a pick and roll */
         if (p.catchT && MT.time - p.catchT < 0.9 && cn >= 0.2 && !MT.arcade && Math.random() < 0.3 + L * 0.5 && tryPass(q => contestOn(q) < 0.1 && passVal(q) > 0.45 && q !== p.catchFrom)) return;      /* caught it with a hand up: swing it on, do not hold it */
         const look = (cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3) * (!MT.arcade && !(MT.pp > 0) && a.hold < 1.3 && cn > 0.06 && MT.clock > 6 ? 0.3 + px(p, 'brav') * 2 : 1);      /* first touch of the trip: move it first unless he is wide open (gunners less patient) */
         if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < 0.45 * look * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
