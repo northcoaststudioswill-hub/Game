@@ -4,7 +4,7 @@
 import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
 const dir = path.dirname(fileURLToPath(import.meta.url)), shots = process.argv.includes('--shots'), out = path.join(dir, 'shots', 'real'); if (shots) fs.mkdirSync(out, { recursive: true });
-const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 2 });
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 1280, height: 720 } });
 await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
@@ -20,7 +20,7 @@ for (let chunk = 0; chunk < 150; chunk++) {
   if (!r) break; frames += 30; for (const k in r.c) count[k] = (count[k] || 0) + r.c[k];
   if (shots) for (const [k, i] of r.hits) if (!got[k]) { got[k] = 1;
     const box = await p.evaluate((i) => { const P = __pit, q = P.MT.P[i]; P.ev('scene.updateMatrixWorld()'); const [x, y] = P.ev('project')(q.x, q.H * 0.5, q.z); return [x, y]; }, i);
-    await p.waitForTimeout(400); const w = 190, h = 190; await p.screenshot({ path: path.join(out, k + '.png'), clip: { x: Math.max(0, Math.min(1280 - w, box[0] - w / 2)), y: Math.max(0, Math.min(720 - h, box[1] - h / 2)), width: w, height: h } }); }
+    await p.waitForTimeout(400); const w = 170, h = 170; await p.screenshot({ path: path.join(out, k + '.png'), clip: { x: Math.max(0, Math.min(1280 - w, box[0] - w / 2)), y: Math.max(0, Math.min(720 - h, box[1] - h / 2)), width: w, height: h } }); }
 }
 const pl = await p.evaluate(() => __pit.MT ? __pit.MT.P.length : 6);
 console.log(`${frames} frames, ${pl} players. Share of player-frames in each:`);
