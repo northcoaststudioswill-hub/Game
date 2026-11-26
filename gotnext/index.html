@@ -3708,15 +3708,19 @@ function ballHeld(p, dt) {
   } else if (D.ph === 'down') {
     if (D.t <= dt * 1.01) { const T0 = D.T; D.T = Math.max(D.T, D.P0.distanceTo(D.F) * 1.5 / 10);     /* no faster than a hard real push: the drop speeds up as it goes (u^1.5), so its top speed is 1.5x the average */ if (D.T > T0 * 1.05 && p.st === 'free' && !D.kind) D.F = dribFloor(p, D, '', D.T); }   /* a longer drop from a high hand lands further ahead, where the runner will be */
     const u = Math.min(1, D.t / D.T), e = Math.pow(u, 1.5); p.dribH = 0.25 + 0.6 * u;
+    { if (D.ox === undefined || D.t <= dt * 1.01) { D.ox = p.x; D.oz = p.z; } const sx = p.x - D.ox, sz = p.z - D.oz; D.ox = p.x; D.oz = p.z; D.P0.x += sx; D.P0.z += sz; D.F.x += sx; D.F.z += sz;      /* the whole bounce travels with him */
+      if (p.st === 'free' && u < 0.85) { const Fn = dribFloor(p, D, D.kind, Math.max(0, D.T - D.t), 0, 0), k = 1 - Math.exp(-14 * dt); D.F.x = lerp(D.F.x, Fn.x, k); D.F.z = lerp(D.F.z, Fn.z, k); } }      /* and still lands where his body is going now, not where it was going a beat ago */
     B.pos.set(lerp(D.P0.x, D.F.x, u), lerp(D.P0.y, 0.125, e), lerp(D.P0.z, D.F.z, u));
     if (u >= 1) { D.ph = 'up'; D.t = 0; D.C0 = null; D.T = D.upT || Tc * 0.5; D.F.copy(B.pos); if (M_.phase === 'live' && !M_.bounceMute) sfx('bounce'); }
   } else {   // up: off the floor to wherever the receiving hand is now
     const u = Math.min(1, D.t / D.T), e = 1 - (1 - u) * (1 - u); p.dribH = 0.85 + 0.15 * u;
+    { if (D.ux === undefined || D.t <= dt * 1.01) { D.ux = p.x; D.uz = p.z; } D.F.x += p.x - D.ux; D.F.z += p.z - D.uz; D.ux = p.x; D.uz = p.z; }
     palm(p, D.hand, _bp); _bq.set(lerp(D.F.x, _bp.x, u), lerp(D.F.y, _bp.y, e), lerp(D.F.z, _bp.z, u));
     // a real ball has a top speed: chase the path, but never faster than ~11 m/s; the catch happens when ball and hand meet
     const gap = B.pos.distanceTo(_bq), cap = 11 * dt; if (gap > cap) B.pos.lerp(_bq, cap / gap); else B.pos.copy(_bq);
     if (u >= 0.85 && B.pos.distanceTo(_bp) < 0.12) { D.ph = 'hand'; D.t = 0; }      // fingertips take it a touch before the palm
   }
+  if (D.ph === 'down' || D.ph === 'up') { const hx = B.pos.x - p.x, hz = B.pos.z - p.z, hd = Math.hypot(hx, hz), mx = D.kind === 'behind' || D.kind === 'tween' ? 0.7 : 0.9; if (hd > mx) { B.pos.x = p.x + hx / hd * lerp(hd, mx, 0.5); B.pos.z = p.z + hz / hd * lerp(hd, mx, 0.5); } }      /* a handle, not a ball on a string */
   B.spin += dt * (D.ph === 'down' ? 9 : 4);
 }
 const _lg = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
