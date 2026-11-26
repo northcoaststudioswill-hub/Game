@@ -3525,6 +3525,10 @@ function stepPlayer(p, dt) {
   else if (hasBall && !p.sprinting && p.st === 'free') { const hf = Math.atan2(-p.x, -p.z); tf = sp > 1.5 ? lerpAng(Math.atan2(p.vx, p.vz), hf, 0.45 * clamp((3.6 - sp) / 2.1, 0.15, 1)) : hf; }      /* jogging with it, the body turns to where it is going (feet and run curves line up); creeping, it squares to the rim */
   else if (sp > 0.6) tf = Math.atan2(p.vx, p.vz);
   else if (B.holder && B.holder !== p) tf = Math.atan2(B.holder.x - p.x, B.holder.z - p.z);
+  // working the ball side to side, a handler keeps his chest to the rim and steps laterally: the body does not swivel with
+  // every flick of the stick (it swung the ball round him like a sling). Heading away from the basket he turns and goes.
+  if (hasBall && (p.st === 'free' || (p.st === 'move' && p.mv && !/spin/.test(p.mv.mv.id))) && !p.post && p.live !== 'dead' && sp > 0.6 && !MT.arcade) { const hf = Math.atan2(-p.x, -p.z), vd = Math.atan2(p.vx, p.vz); let rel = Math.atan2(Math.sin(vd - hf), Math.cos(vd - hf));
+    if (Math.abs(rel) < 2.0) { const lim = p.sprinting ? 1.05 : 0.6; let r2 = Math.atan2(Math.sin(tf - hf), Math.cos(tf - hf)); r2 = clamp(r2, -lim, lim); tf = hf + r2; } }
   if (p.faceLock !== undefined) tf = p.faceLock;
   p.face = lerpAng(p.face, tf, 1 - Math.exp(-12 * dt));
   p.def = def; p.speed = sp; p.topSpeed = top;
@@ -3658,9 +3662,12 @@ function autoHand(p) {
   return lv > 1.1 ? 'R' : lv < -1.1 ? 'L' : null;
 }
 // a dribble move takes the ball out of whatever it was doing and sends it where the move needs it
-function dribMove(p, mv) {
+function dribMove(p, mv, now) {
   const D = p.drib; if (!D || MT.B.holder !== p) return;
   const k = mv.id, change = { cross: 1, tween: 1, behind: 1, shammgod: 1, killer: 1 }[k];
+  // the ball only changes direction when a hand is on it: pressed with the ball in the air, the move waits for the catch
+  // (it used to turn the ball round in mid-air, which with quick stick work sent it zigzagging all over)
+  if (!now && k !== 'spin' && k !== 'halfspin' && (D.ph === 'up' || (D.ph === 'down' && D.t > D.T * 0.3))) { D.queue = { mv, hand: p.hand, dx: p.mv.dx, dz: p.mv.dz, v: p.mv.v, slot: p.mv.slot }; return; }
   if (k === 'spin' || k === 'halfspin') { D.ph = 'carry'; D.t = 0; D.T = mv.dur * 0.8; return; }
   if (change) D.hand = p.hand;                                         // startMove already chose the new hand
   D.ph = 'down'; D.t = 0; D.T = Math.max(0.09, mv.dur * 0.32); D.P0 = MT.B.pos.clone(); D.kind = change ? k : (k === 'stepback' || k === 'moonwalk' || k === 'snatch' ? 'retreat' : k === 'hesi' ? 'hesi' : '');
@@ -3718,7 +3725,7 @@ function ballHeld(p, dt) {
     palm(p, D.hand, _bp); _bq.set(lerp(D.F.x, _bp.x, u), lerp(D.F.y, _bp.y, e), lerp(D.F.z, _bp.z, u));
     // a real ball has a top speed: chase the path, but never faster than ~11 m/s; the catch happens when ball and hand meet
     const gap = B.pos.distanceTo(_bq), cap = 11 * dt; if (gap > cap) B.pos.lerp(_bq, cap / gap); else B.pos.copy(_bq);
-    if (u >= 0.85 && B.pos.distanceTo(_bp) < 0.12) { D.ph = 'hand'; D.t = 0; }      // fingertips take it a touch before the palm
+    if ((u >= 0.85 && B.pos.distanceTo(_bp) < 0.12) || (D.queue && u >= 0.6 && B.pos.distanceTo(_bp) < 0.22)) { D.ph = 'hand'; D.t = 0; if (D.queue) { const q = D.queue; D.queue = null; if (p.st === 'move' || MT.time - (p.comboT || 0) < 0.6) { const keep = p.mv; p.mv = p.mv || {}; Object.assign(p.mv, { dx: q.dx, dz: q.dz, v: q.v, slot: q.slot }); D.hand = q.hand; dribMove(p, q.mv, true); if (!keep) p.mv = keep; } } }      // fingertips take it a touch before the palm; a move that was waiting goes now
   }
   if (D.ph === 'down' || D.ph === 'up') { const hx = B.pos.x - p.x, hz = B.pos.z - p.z, hd = Math.hypot(hx, hz), mx = D.kind === 'behind' || D.kind === 'tween' ? 0.7 : 0.9; if (hd > mx) { B.pos.x = p.x + hx / hd * lerp(hd, mx, 0.5); B.pos.z = p.z + hz / hd * lerp(hd, mx, 0.5); } }      /* a handle, not a ball on a string */
   B.spin += dt * (D.ph === 'down' ? 9 : 4);

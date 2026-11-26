@@ -22,6 +22,8 @@ const RUNS = {
   sideways: [[2.5, ['KeyD']]],
   backpedal: [[1, ['KeyW']], [2, ['KeyS']]],
   uturn: [[1.2, ['KeyW', 'ShiftLeft']], [1.6, ['KeyS', 'ShiftLeft']]],
+  stickzig: [[0.3, ['KeyA']], [0.3, ['KeyD']], [0.3, ['KeyA']], [0.3, ['KeyD']], [0.3, ['KeyA']], [0.3, ['KeyD']], [0.3, ['KeyA']], [0.3, ['KeyD']]],
+  crosszig: [[0.25, ['KeyW', 'KeyA']], [0.08, ['KeyW', 'KeyA', 'KeyL']], [0.27, ['KeyW', 'KeyD']], [0.08, ['KeyW', 'KeyD', 'KeyJ']], [0.27, ['KeyW', 'KeyA']], [0.08, ['KeyW', 'KeyA', 'KeyL']], [0.27, ['KeyW', 'KeyD']], [0.08, ['KeyW', 'KeyD', 'KeyJ']], [0.27, ['KeyW', 'KeyA']], [0.08, ['KeyW', 'KeyA', 'KeyL']], [0.3, ['KeyW']]],
   crossrun: [[0.8, ['KeyW', 'ShiftLeft']], [0.1, ['KeyW', 'ShiftLeft', 'KeyL']], [0.9, ['KeyW', 'ShiftLeft']], [0.1, ['KeyW', 'ShiftLeft', 'KeyJ']], [0.9, ['KeyW', 'ShiftLeft']]],
 };
 const names = Object.keys(RUNS).filter(n => !only || only.split(',').includes(n)); const rows = [];
@@ -47,7 +49,8 @@ for (const name of names) {
     }
   }
   // analysis
-  const row0 = {}; const dt = 1 / 60, held = frames.filter(f => f.hold && (f.st === 'free' || f.st === 'move') && !f.tp); let legHits = 0, footBounces = 0, bounces = 0, catchGaps = [], vmax = 0, behind = 0, ahead = 0, jumps = 0, worst = [];
+  const row0 = {}; const dt = 1 / 60, held = frames.filter(f => f.hold && (f.st === 'free' || f.st === 'move') && !f.tp); let midTurns = 0; for (let i = 2; i < held.length; i++) { const a = held[i - 2], m = held[i - 1], f = held[i]; if (f.n !== m.n + 1 || m.n !== a.n + 1 || !['up', 'down'].includes(m.ph) || m.ph !== f.ph || a.ph !== m.ph) continue; const v1x = (m.bx - a.bx) - (m.x - a.x), v1z = (m.bz - a.bz) - (m.z - a.z), v2x = (f.bx - m.bx) - (f.x - m.x), v2z = (f.bz - m.bz) - (f.z - m.z), s1 = Math.hypot(v1x, v1z) * 60, s2 = Math.hypot(v2x, v2z) * 60; if (s1 > 1.5 && s2 > 1.5 && (v1x * v2x + v1z * v2z) / (s1 * s2 / 3600) < 0) midTurns++; }
+  let legHits = 0, footBounces = 0, bounces = 0, catchGaps = [], vmax = 0, behind = 0, ahead = 0, jumps = 0, worst = [];
   for (let i = 1; i < held.length; i++) { const a = held[i - 1], f = held[i]; if (f.n !== a.n + 1) continue; const v = Math.hypot(f.bx - a.bx, f.by - a.by, f.bz - a.bz) / dt; if (v > vmax) vmax = v; if (v > 14) { jumps++; if (worst.length < 4) worst.push(`ball ${v.toFixed(1)} m/s (${a.ph}→${f.ph}, ${a.st}→${f.st}, player moved ${Math.hypot(f.x - a.x, f.z - a.z).toFixed(2)} m, ball from hand ${Math.hypot(a.bx - a.hx, a.bz - a.hz).toFixed(2)}→${Math.hypot(f.bx - f.hx, f.bz - f.hz).toFixed(2)})`); }
     if (f.leg < 0.15) { legHits++; if (worst.length < 8 && f.leg < 0.11) worst.push(`ball through the ${f.legW} (${(f.leg * 100).toFixed(0)} cm, ${f.ph})`); }
     if (a.ph === 'down' && f.ph === 'up') { bounces++; if (f.foot < 0.14) footBounces++; }
@@ -57,8 +60,8 @@ for (const name of names) {
     let rb = 0, onBeat = 0; for (let i = 1; i < held.length; i++) { const a = held[i - 1], f = held[i]; if (a.ph === 'down' && f.ph === 'up' && f.sw > 0.6 && Math.hypot(f.vx, f.vz) > 2.5) { rb++; const far = (f.hand === 'R' ? strikes.L : strikes.R).concat(Math.hypot(f.vx, f.vz) < 4.5 ? (f.hand === 'R' ? strikes.R : strikes.L) : []); if (far.some(n => Math.abs(n - f.n) <= 4)) onBeat++; } }
     row0.beat = rb ? Math.round(onBeat / rb * 100) + '% of ' + rb : '-'; }
   const secs = held.length / 60, run = held.filter(f => Math.hypot(f.vx, f.vz) > 2.5).length;
-  const row = { name, secs: +secs.toFixed(1), bounces, perSec: +(bounces / Math.max(0.1, secs)).toFixed(2), legHits, legPct: +(legHits / Math.max(1, held.length) * 100).toFixed(1), footBounces, behindPct: run ? +(behind / run * 100).toFixed(0) : 0, aheadPct: run ? +(ahead / run * 100).toFixed(0) : 0, catchMax: catchGaps.length ? +(Math.max(...catchGaps) * 100).toFixed(0) : 0, vmax: +vmax.toFixed(1), jumps, worst };
-  rows.push(row); console.log(`${name.padEnd(9)} ${row.secs}s  bounces ${row.bounces} (${row.perSec}/s)  ball in a leg ${row.legPct}% of frames  bounced on a foot ${row.footBounces}  ball behind the runner ${row.behindPct}%  >1m ahead ${row.aheadPct}%  catch gap max ${row.catchMax} cm  top ball speed ${row.vmax} m/s  speed spikes ${row.jumps}  running bounces on a footstep (far foot when fast) ${row0.beat}  hand-to-ball while in hand: median ${row0.hg ? (row0.hg.sort((x, y) => x - y)[row0.hg.length >> 1] * 100).toFixed(0) : '-'} cm, max ${row0.hg ? (Math.max(...row0.hg) * 100).toFixed(0) : '-'} cm${worst.length ? '\n          ' + worst.join(' | ') : ''}`);
+  const row = { midTurns, name, secs: +secs.toFixed(1), bounces, perSec: +(bounces / Math.max(0.1, secs)).toFixed(2), legHits, legPct: +(legHits / Math.max(1, held.length) * 100).toFixed(1), footBounces, behindPct: run ? +(behind / run * 100).toFixed(0) : 0, aheadPct: run ? +(ahead / run * 100).toFixed(0) : 0, catchMax: catchGaps.length ? +(Math.max(...catchGaps) * 100).toFixed(0) : 0, vmax: +vmax.toFixed(1), jumps, worst };
+  rows.push(row); console.log(`${name.padEnd(9)} ${row.secs}s  bounces ${row.bounces} (${row.perSec}/s)  ball in a leg ${row.legPct}% of frames  bounced on a foot ${row.footBounces}  ball behind the runner ${row.behindPct}%  >1m ahead ${row.aheadPct}%  catch gap max ${row.catchMax} cm  top ball speed ${row.vmax} m/s  speed spikes ${row.jumps}  mid-air turns ${midTurns}  running bounces on a footstep (far foot when fast) ${row0.beat}  hand-to-ball while in hand: median ${row0.hg ? (row0.hg.sort((x, y) => x - y)[row0.hg.length >> 1] * 100).toFixed(0) : '-'} cm, max ${row0.hg ? (Math.max(...row0.hg) * 100).toFixed(0) : '-'} cm${worst.length ? '\n          ' + worst.join(' | ') : ''}`);
 }
 // AI ball handlers in real 3v3 games
 if (!only || only.includes('ai')) {
