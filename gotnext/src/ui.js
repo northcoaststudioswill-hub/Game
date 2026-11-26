@@ -5,7 +5,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
 function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
 function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
-function openPanel(render, cls, onBack) { UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
+function openPanel(render, cls, onBack) { UI.openT = performance.now(); UI.lockMs = 450; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
   // a controller starts on the panel's main action (RESUME, PLAY…), else on the first thing that is not a tab or the close button
   const f = focusables(); let i = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')); if (i < 0) i = f.findIndex(e => e.closest('.pf')); if (i < 0) i = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, i); paintFocus(); }
 function rerender(reset) {
@@ -68,6 +68,7 @@ function uiStep(dt) {
     else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
   if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
+  if (I.aP && UI.cur && performance.now() - (UI.openT || 0) < (UI.lockMs || 450)) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results) */
   if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') e.focus(); else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
   if (I.back && UI.cur) { uiBack(); I.back = false; }
 }
@@ -97,7 +98,7 @@ function hudMatch() {
     const [x, y] = project(sh.x, sh.H * 0.6 + sh.y, sh.z); const u = sh.t / (sh.shot.rel * 1.55), z = 1 / 1.55;
     mt.style.display = 'block'; mt.style.left = (x + 34) + 'px'; mt.style.top = (y - 60) + 'px';
     const rel = sh.shot.released; if (!rel) { $('meterFill').style.height = Math.min(100, u * 100) + '%'; $('meterFill').style.background = ''; } else $('meterFill').style.background = MT.B.green ? '#3dffa0' : '#ff8a3c';
-    $('meterZone').style.bottom = (z * 100 - 5) + '%'; $('meterZone').style.height = '10%';
+    { const wz = clamp(shotWin(sh, contestOn(sh), nAtt(sh, sh.shot.kind === 'three' ? 'three' : sh.shot.kind === 'mid' ? 'mid' : 'close')) * z * 100, 1.2, 14); $('meterZone').style.bottom = (z * 100 - wz) + '%'; $('meterZone').style.height = (wz * 2) + '%'; }      /* the real window, shrinking with the hand in your face */
   } else mt.style.display = 'none';
   $('clear').style.display = M_.needClear && M_.off === me.team && M_.phase === 'live' ? 'block' : 'none';
   if (M_.drill) $('rackHud').innerHTML = M_.drill.id === 'horse' ? horseHud() : drillHud();
@@ -221,7 +222,7 @@ function uiPlayer(tab) {
         h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]}</div>`;
         for (const a of ATTRS) if (a.cat === c) {
           const v = S.attrs[a.id], cap = caps[a.id], cost = attrCost(v), mx = v >= cap;
-          h += `<div class="card" style="padding:6px 9px"><div class="row"><div class="an"><b>${a.n}</b></div><div class="ab"><i style="width:${cap}%;background:${CATS[c][1]};opacity:.28"></i><i style="width:${v}%;background:${CATS[c][1]}"></i></div><div class="av">${v}${bf[a.id] ? `<span class="buff">+${bf[a.id]}</span>` : ''}<small>/${cap}</small></div>${mx ? '<span class="tag on">MAX</span>' : Btn('+1 · ' + cost, () => buy(a.id, 1), 'sm', S.vc < cost) + Btn('+5', () => buy(a.id, 5), 'sm alt', S.vc < cost)}</div><p>${a.d}</p></div>`;
+          h += `<div class="card" style="padding:6px 9px"><div class="row"><div class="an"><b>${a.n}</b></div><div class="ab"><i style="width:${cap}%;background:${CATS[c][1]};opacity:.28"></i><i style="width:${v}%;background:${CATS[c][1]}"></i></div><div class="av">${v}${bf[a.id] ? `<span class="buff">+${bf[a.id]}</span>` : ''}<small>/${cap}</small></div>${mx ? '<span class="tag on">MAX</span>' : Btn('+1 · ' + cost, () => buy(a.id, 1), 'sm', S.vc < cost) + (() => { let t = 0, k = 0, vv = v; while (k < 5 && vv < cap) { t += attrCost(vv); vv++; k++; } return k > 1 ? Btn('+' + k + ' · ' + t, () => buy(a.id, k), 'sm alt', S.vc < t) : ''; })()}</div><p>${a.d}</p></div>`;
         }
       }
     } else if (st.tab === 'badges') {
@@ -428,6 +429,7 @@ function uiResults(res, rw, again) {
     h += `<p class="mu">${s.greens} greens · ${s.dunks} dunks · ${s.threes} deep balls · ${s.bravs} Bravado</p>`;
     return h + `</div><div class="pf">${again ? Btn('RUN IT BACK', again) : ''}${Btn('BACK TO THE CAGES', uiClose, again ? 'alt' : '')}</div>`;
   });
+  UI.lockMs = 1100;      /* the buzzer often comes mid-press */
   // the count-up
   let t = 0; const iv = setInterval(() => { t += 0.05; const k = Math.min(1, t); const a = $('rvc'), b = $('rrep'); if (!a) { clearInterval(iv); return; } a.textContent = '+' + Math.round(rw.vc * k); b.textContent = '+' + Math.round(rw.rep * k); if (k < 1) sfx('coin'); else { clearInterval(iv); sfx('buy'); } }, 45);
 }

@@ -53,6 +53,9 @@ body.touch:not(.busy)[data-state=match] .hintL,body.touch:not(.busy)[data-state=
 /* ---- world hud ---- */
 #whud{position:fixed;left:calc(12px + var(--sal));top:calc(10px + var(--sat));z-index:6;display:none;pointer-events:none}
 body[data-state=world] #whud{display:block}
+#goal{display:none;margin-top:6px;align-items:center;gap:8px;background:rgba(8,8,10,.78);border-left:3px solid var(--heat);padding:6px 12px 6px 8px;font:800 12px var(--d);letter-spacing:.06em;text-transform:uppercase;color:var(--bone);width:max-content;max-width:calc(100vw - 32px)}
+#goal i{font-style:normal;display:inline-block;color:var(--heat);font-size:15px;transition:transform .12s linear}
+#goal small{display:block;font:500 10px var(--m);letter-spacing:.08em;color:var(--ash);text-transform:none}
 .chip{display:inline-flex;align-items:baseline;gap:6px;background:rgba(8,8,10,.72);border:1px solid var(--line);padding:5px 10px;margin:0 6px 6px 0;font:500 10px var(--m);letter-spacing:.1em;color:var(--ash);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .chip b{font:900 15px var(--d);font-stretch:125%;letter-spacing:0;color:var(--gold)}.chip.rep b{color:var(--ice);font-size:12px}#wonline{color:var(--go)}#wonline b{color:var(--go);font-size:12px}
 #wtag{font:500 10px var(--m);letter-spacing:.16em;color:rgba(236,233,226,.5);margin-top:6px}
@@ -200,7 +203,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
   <div class="hintL">MOVE</div><div class="hintR" id="hintR">SKILL STICK</div>
   <div class="tbtn" id="tA">PASS</div><div class="tbtn" id="tB">SHOOT</div><div class="tbtn" id="tLT">POST</div><div class="tbtn off" id="tPK">PICK</div><div class="tbtn" id="tMenu">≡</div>
 </div>
-<div id="whud"><div><span class="chip">HC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div></div>
+<div id="whud"><div><span class="chip">HC <b id="wvc">0</b></span><span class="chip rep"><b id="wrank">—</b></span><span class="chip" id="wonline" style="display:none"></span></div><div id="repbar"><i></i></div><div id="wtag"></div><div id="goal"><i>➤</i><span></span></div></div>
 <div id="emobar"><button data-em="wave" title="1">👋</button><button data-em="dance" title="2">💃</button><button data-em="sit" title="3">🪑</button><button data-em="cheer" title="4">🙌</button><button data-em="celeb" title="5">🏆</button><button data-em="chat" title="T">💬</button></div>
 <div id="prompt"></div>
 <div id="keys"></div>
@@ -2443,7 +2446,7 @@ function setCheck(team, first) {
 // p.live: 'hold' (ball held, dribble still available), 'drib' (dribbling), 'dead' (picked up: pass, shoot, fake or pivot)
 function dribRules(p) { return p.user && !p.afk && !MT.reel; }
 function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); p.live = dribRules(p) && Math.hypot(p.vx, p.vz) < 1.5 ? 'hold' : 'drib'; p.stopT = 0; }
-function changePoss(team) { if (MT.off !== team) { MT.pp = 0; if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) lateCall(0.4, 'LOCKED IN', 'Three stops in a row', '#33e0ff'); }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; p.dv = poolNext(p, 'dv', 4); } } }
+function changePoss(team) { if (MT.off !== team) { MT.pp = 0; if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) { const mine = MT.me && team === MT.me.team; lateCall(0.4, 'LOCKED IN', (mine ? 'Your D' : 'Their D') + ' · three stops in a row', mine ? '#33e0ff' : '#ff6a5a'); } }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; p.dv = poolNext(p, 'dv', 4); } } }
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
   if (!p.user || p.bravT > 0 || MT.practice) return;
@@ -2472,7 +2475,7 @@ function scorePts(p, pts, how) {
   if (how !== 'dunk' && M_.B.shooter === p && M_.B.clockAt !== undefined && M_.B.clockAt < 1.6 && !M_.practice && !M_.drill) { highlight('buzzer', p); lateCall(0.9, 'BUZZER BEATER', p.b.name + ' beat the clock', '#ffc531'); M_.B.clockAt = undefined; }
   { const R = M_.runS || (M_.runS = { team: -1, n: 0, pts: 0 });      // unanswered buckets: three in a row is a run
     if (R.team === p.team) { R.n++; R.pts += pts; } else { if (R.n >= 3) lateCall(1.5, 'RUN OVER', p.b.name + ' stops the bleeding', '#7de3ff'); R.team = p.team; R.n = 1; R.pts = pts; }
-    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', `${R.pts}–0`, '#ffc531'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, '', '#ffc531'); }
+    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', (M_.me && p.team === M_.me.team ? 'Your team · ' : 'Them · ') + `${R.pts}–0`, M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, M_.me && p.team === M_.me.team ? 'Your team' : 'Them', M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); }
   for (const o of M_.P) if (o.team !== p.team) { o.hot = 0; if (o.fire) { o.fire = false; } }
   if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
   if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfxM('fire'); }
@@ -2556,6 +2559,16 @@ function padDefense(i) {
   const M_ = MT; if (!M_ || M_.phase !== 'live') return false; const p = i === 0 ? M_.me : M_.P.find(q => q.ctrl === i && !q.remote); if (!p) return false;
   const B = M_.B; return B.holder !== p && !(M_.off === p.team && B.state !== 'loose' && B.state !== 'shot') && B.state !== 'loose';
 }
+// the green window for this shot right now (also what the meter draws)
+function shotWin(p, c, n) {
+  let w = (0.05 + nAtt(p, 'iq') * 0.05 + 0.012 * bt(p, 'greencard') + p.shot.j.win + (p.mine ? cribFx('green') * 0.1 : 0)) * (0.55 + n * 0.65) * (1 - c * 0.6);
+  if (MT.practice) w *= 1.1; if (p.pu && p.pu.id === 'hot') w *= 1.6;
+  if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;
+  if (!MT.arcade) { if (p.hot >= 3) w *= 1.08; else if (p.cold >= 3 && bt(p, 'heatcheck') < 2) w *= 0.9; if (MT.runS && MT.runS.n >= 3) w *= MT.runS.team === p.team ? 1.05 : 0.97; }      /* streaks and runs */
+  { const lead = MT.score[p.team] - MT.score[1 - p.team]; w *= 1 + px(p, 'green') + (MT.gamePt ? px(p, 'clutch') : 0) + (p.hot >= 2 ? px(p, 'hot') : 0) + (lead <= -3 ? px(p, 'behind') : 0) + (lead >= 3 ? px(p, 'ahead') : 0); }      /* personality */      /* game point: nerves shrink the window, a high Shot IQ widens it */
+  if (p.user && !MT.arcade) w = Math.max(w, 0.035);      /* a floor: a low-rated build still gets about two frames either side */
+  return w;
+}
 function releaseShot(p) {
   const s = p.shot; if (s.released) return; s.released = true; const B = MT.B;
   const held = s.hold != null ? s.hold : p.t;
@@ -2572,15 +2585,11 @@ function releaseShot(p) {
   if (p.stam < 25) base *= 0.85; if (s.sp > 2.8) base *= 0.9;
   if (p.catchFrom && MT.time - p.catchT < 1.6) base += 0.02 * bt(p.catchFrom, 'trickle') + 0.02 + (p.touchT && MT.time - p.touchT < 1.6 ? 0.025 : 0);      /* off a touch pass the defense is still turning */
   if (p.fire) base += 0.35; if (kind === 'close') base += 0.03 * bt(p, 'softmoney'); base += px(p, kind);
-  let w = (0.05 + nAtt(p, 'iq') * 0.05 + 0.012 * bt(p, 'greencard') + s.j.win + (p.mine ? cribFx('green') * 0.1 : 0)) * (0.55 + n * 0.65) * (1 - c * 0.6);
-  if (MT.practice) w *= 1.1; if (p.pu && p.pu.id === 'hot') w *= 1.6;
-  if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;
-  if (!MT.arcade) { if (p.hot >= 3) w *= 1.08; else if (p.cold >= 3 && bt(p, 'heatcheck') < 2) w *= 0.9; if (MT.runS && MT.runS.n >= 3) w *= MT.runS.team === p.team ? 1.05 : 0.97; }      /* streaks and runs */
-  { const lead = MT.score[p.team] - MT.score[1 - p.team]; w *= 1 + px(p, 'green') + (MT.gamePt ? px(p, 'clutch') : 0) + (p.hot >= 2 ? px(p, 'hot') : 0) + (lead <= -3 ? px(p, 'behind') : 0) + (lead >= 3 ? px(p, 'ahead') : 0); }      /* personality */      /* game point: nerves shrink the window, a high Shot IQ widens it */
+  let w = shotWin(p, c, n);
   const e = Math.abs(err); let green = e <= w, prob;
   if (green && !p.user && Math.random() >= 0.5) green = false;      /* the AI lands in the window half as often as its timing says (it used to keep the sure make anyway) */
   // perfect timing beats an open look every time; a hand in the face still costs a good release (smothered, about two in three)
-  if (green) prob = c < 0.12 ? 1 : Math.max(0.2, 1 - (c - 0.12) * 1.5); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
+  if (green) prob = (c < 0.12 ? 1 : Math.max(0.2, 1 - (c - 0.12) * 1.5)) * (d > 7.6 ? Math.max(0.3, 1 - (d - 7.6) * 0.12) : 1); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
   if (p.user && s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
   // blocked?
   for (const o of MT.P) {
@@ -2618,7 +2627,7 @@ function startFake(p) {
   }
   p.st = 'fake'; p.t = 0; p.y = 0; sfxM('whoosh');
   let o = null, od = 2.4; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
-  if (o && !o.user && Math.random() < clamp(0.3 + (1 - o.aiLvl) * 0.3 - nAtt(o, 'perd') * 0.22 + nAtt(p, 'iq') * 0.15, 0.08, 0.7)) { startJump(o); o.ai.react = 0.9; floatTxt(o, 'BIT ON IT', '#f2c14e'); addBrav(p, 0.06); }
+  if (o && !o.user && Math.random() < clamp(0.3 + (1 - o.aiLvl) * 0.3 - nAtt(o, 'perd') * 0.22 + nAtt(p, 'iq') * 0.15, 0.08, 0.7) * (o.ai.bitAt && MT.time - o.ai.bitAt < 6 ? 0.3 : 1)) { o.ai.bitAt = MT.time; startJump(o); o.ai.react = 0.9; floatTxt(o, 'BIT ON IT', '#f2c14e'); addBrav(p, 0.06); }
 }
 function euroOf(p) { const l = Math.hypot(p.x, p.z) || 1, lat = p.in.dx * (p.z / l) - p.in.dz * (p.x / l); return Math.abs(lat) > 0.55 ? Math.sign(lat) : 0; }
 function launch(p, make, pts, green, arc, kind) {
@@ -3170,6 +3179,7 @@ function aiThink(p, dt) {
         const sel = (p.fire ? 2 : 1) * (1 + a.hold * 0.35) * (MT.clock < 6 ? 2 : 1) * (MT.gamePt ? 1 + px(p, 'clutch') * 5 : 1);      /* the cold-blooded want the last one */
         // the look, read off the hands actually near him: a good shooter waits for a clean one, a bad decision-maker takes what is there
         const cn = contestOn(p);
+        { const hum = mates.find(q => q.user && !q.afk); if (hum && cn >= 0.12 && nearestOpp(hum)[1] > 2.2 && passLane(p, hum) && !MT.arcade && Math.random() < 0.4) { doPass(p, hum); return; } }      /* you are wide open and he is not: you get it first */
         if (p.catchT && MT.time - p.catchT < 0.9 && cn >= 0.2 && !MT.arcade && Math.random() < 0.3 + L * 0.5 && tryPass(q => contestOn(q) < 0.1 && passVal(q) > 0.45 && q !== p.catchFrom)) return;      /* caught it with a hand up: swing it on, do not hold it */
         const look = (cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3) * (!MT.arcade && !(MT.pp > 0) && a.hold < 1.3 && cn > 0.06 && MT.clock > 6 ? 0.3 + px(p, 'brav') * 2 : 1);      /* first touch of the trip: move it first unless he is wide open (gunners less patient) */
         if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < 0.45 * look * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
@@ -4477,7 +4487,7 @@ function buildHub() {
   mural('KINGS\nSTAY', 5.4, 3.0, ['#081a2a', '#7de3ff', '#a78bff', '#ffffff', '#08080a'], 15.42, 2.3, 0.2, -Math.PI / 2);
   for (let i = 0; i < 2; i++) { poster(scene, -15.42, 2.1, -10.9 + i * 1.55, Math.PI / 2, i % 2); poster(scene, 15.42, 2.1, 10.2 + i * 1.55 * -1, -Math.PI / 2, (i + 1) % 2); poster(scene, -15.42, 2.1, 10.9 - i * 1.55, Math.PI / 2, (i + 1) % 2); }
   // centrepiece: the Freedom Eagle, gold, mid-dunk
-  ink(M(cyl(1.3, 1.6, 0.9, 8), toon('#3a3c44'), 0, 0.45, 1.6, scene), 1.03); solid(-1.6, 1.6, 0, 3.2);
+  ink(M(cyl(1.3, 1.6, 0.9, 8), toon('#3a3c44'), 0, 0.45, 1.6, scene), 1.03); W.rounds = [[0, 1.6, 1.72]];      /* round, so you slide around it (the square box stopped you dead on the walk to the Cages) */
   const stb = aiBuild(99, 'slasher'); stb.worn = { hair: 'h_bald', head: 'hd_eagle', face: 'f_none', top: 't_jersey', arm: 'a_none', bottom: 'b_basic', socks: 's_high', shoes: 'k_gold', back: 'bk_wings', ball: 'bl_gold' };
   const stt = makeRig(stb, true); const gold = toon('#f2c14e'); stt.root.traverse(o => { if (o.isMesh && o.material !== INK) o.material = gold; }); stt.shadow.visible = false;
   stt.root.position.set(0, 1.35, 1.6); stt.root.scale.setScalar(1.25); stt.root.rotation.y = 0.5; scene.add(stt.root); applyPose(stt, poseOf('dunk', 0, { u: 0.5, style: 'tomahawk' }), 10);
@@ -4498,7 +4508,7 @@ function buildHub() {
   spot(-3.4, 4.0, 2.0, 'COACH OVERTIME (drills)', () => uiDrills('hub'));
   for (const [cx, cy, cz, cc] of [[-10.2, 0.2, -3.4, '#e04848'], [-10.2, 0.6, -3.35, '#2f5bff'], [-10.75, 0.2, -3.0, '#f2c14e']]) ink(M(box(0.5, 0.4, 0.5), toon(cc), cx, cy, cz, scene), 1.05);
   // fiends
-  [[5, -7.4], [-9.4, 3.4], [-3.4, 8.8], [10.4, 1.4]].forEach((b, i) => { const bb = aiBuild(50); bb.worn = randomWorn(0, true); bb.name = BUM_NAMES[i % BUM_NAMES.length]; const n = addNpc(bb, b[0], b[1], rnd(0, 6), 'beg', { bum: true, wander: true, name: bb.name, range: 1.4 }); spot(b[0], b[1], 1.9, 'TALK', () => uiBum(n)); n.spot = W.spots[W.spots.length - 1]; });
+  [[5, -7.4], [-9.4, 3.4], [-3.4, 8.8], [10.4, 1.4]].forEach((b, i) => { const bb = aiBuild(50); bb.worn = randomWorn(0, true); bb.name = BUM_NAMES[i % BUM_NAMES.length]; const n = addNpc(bb, b[0], b[1], rnd(0, 6), 'beg', { bum: true, wander: true, name: bb.name, range: 1.4 }); spot(b[0], b[1], 1.6, 'TALK', () => uiBum(n)); n.spot = W.spots[W.spots.length - 1]; n.spot.low = 1; });
   for (let i = 0; i < 3; i++) { const b = aiBuild(rnd(65, 92)); b.worn = randomWorn(2); addNpc(b, [-6.5, 0.5, 6.5][i] + rnd(-1.5, 1.5), rnd(-3.5, 3), rnd(0, 6), i ? 'idle' : 'ball', { wander: i > 0, range: 2.5 }); }      /* spread across the middle of the lot, not bunched by the cage */
   // barrel fire, hydrant, cans
   ink(M(cyl(0.42, 0.38, 0.95, 10), toon('#3a2a22'), -11, 0.48, 9.6, scene), 1.05); W.flames = []; for (let i = 0; i < 4; i++) W.flames.push(M(geo('flame', () => new THREE.ConeGeometry(0.2, 0.7, 5)), flat([0xff8a3c, 0xf2c14e, 0xff2d78, 0xffd28a][i]), -11 + rnd(-0.15, 0.15), 1.2, 9.6 + rnd(-0.15, 0.15), scene)); solid(-11.6, -10.4, 9, 10.2);
@@ -4565,7 +4575,7 @@ function buildPit() {
     const ct = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 9), new THREE.MeshBasicMaterial({ color: m.arcade ? 0x2a1450 : 0x3b4252 })); ct.rotation.x = -Math.PI / 2; ct.position.set(x, 0.01, PIT_DOOR_Z - 5.4); scene.add(ct);
     M(box(4.3, 0.02, 0.1), flat(cols[i]), x, 0.03, PIT_DOOR_Z - 1.0, scene);
     const hp = hoopMesh(2, m.arcade ? 'arcade' : 'street'); hp.position.set(x, 0, PIT_DOOR_Z - 9); hp.scale.setScalar(0.9); scene.add(hp);
-    spot(x, PIT_DOOR_Z + 1.2, 1.9, m.n, () => uiMode(m));
+    spot(x, PIT_DOOR_Z + 1.4, 2.5, m.n, () => uiMode(m));
   });
   // Last Call: a cart with a light on, east side
   ink(M(box(1.3, 1.1, 2.6), toon('#1c1d22'), 8.6, 0.55, 2, scene), 1.03); ink(M(box(1.6, 0.12, 3.0), toon('#3dffa0', '#3dffa0'), 8.6, 2.5, 2, scene), 1.03); for (const sz of [-1.3, 1.3]) M(cyl(0.04, 0.04, 1.4, 5), toon('#6a707c'), 8.1, 1.8, 2 + sz, scene); solid(7.8, 10, 0.6, 3.4);
@@ -4611,25 +4621,41 @@ addEventListener('keydown', e => {
 
 // buildCrib lives in home.js (the lot, the house and the home builder)
 
+// first days on the Block: one line under the HC chip saying what to do next, with an arrow that points there.
+// It stays until it is done (the welcome toast was gone in 3.5 s and never came back)
+function goalStep(me) {
+  const g = $('goal'); if (!g) return; let G = null;
+  if (W.kind === 'hub' && !W.visit && !MT) {
+    const drilled = Object.values(S.drills || {}).some(d => (d.medal || 0) >= 1), games = (S.life && S.life.games) || 0;
+    if (!drilled && games < 1) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
+    else if (games < 1) G = { t: 'Call next at THE CAGES', s: 'walk up to a court gate and press ' + (I.hasPad && I.padAt >= (window.__kbAt || 0) ? 'A' : 'E'), x: 0, z: -10.3 };
+  }
+  if (!G) { if (g.style.display !== 'none') g.style.display = 'none'; return; }
+  if (g.dataset.t !== G.t) { g.dataset.t = G.t; g.lastElementChild.innerHTML = esc(G.t) + '<small>' + esc(G.s) + '</small>'; }
+  g.style.display = 'flex';
+  const a = Math.atan2(G.x - me.x, G.z - me.z) - W.yaw, here = Math.hypot(G.x - me.x, G.z - me.z) < 2.5;      /* screen-up is the way the camera looks */
+  g.firstElementChild.style.transform = here ? 'rotate(90deg)' : `rotate(${(-a * 180 / Math.PI - 90).toFixed(0)}deg)`;
+}
 function worldStep(dt) {
   if (!W) return; W.t += dt; const me = W.me, I = IN[0], building = !!W.build, busy = uiBusy() || building;
   let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my;
   if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
-  if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
+  if (!busy) W.yaw -= (I.rx * 2.4 + mx * (I.analog ? 0.9 : 0.45) * Math.min(1, Math.abs(my) + 0.4)) * dt;      /* on keys A/D mostly strafe; the camera follows less */
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
   // speed off the court: keys walk (Shift runs). A stick or thumb sets it by how far you push: a walk up to about 80%,
   // then a smooth ramp into the run at full push (no on/off flip at a threshold, which made the body jerk between gaits)
   const RUNV = 5.6, sm = Math.min(1, Math.hypot(mx, my)), ramp = (u => u * u * (3 - 2 * u))(clamp((sm - 0.8) / 0.18, 0, 1));
-  const sp = I.analog ? (I.sprintBtn ? RUNV : (1.5 + (RUNV - 1.5) * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? RUNV : 1.5);
+  const sp = I.analog ? (I.sprintBtn ? RUNV : (1.5 + (RUNV - 1.5) * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? RUNV : 2.4);      /* keys jog: walking pace made the Block feel huge */
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
   if (me.sit) { me.vx = me.vz = 0; }
   let nx = me.sit ? me.x : me.x + me.vx * dt, nz = me.sit ? me.z : me.z + me.vz * dt;
   if (!me.sit) for (const s of W.solids) { if (nx > s[0] && nx < s[1] && nz > s[2] && nz < s[3]) { const px = Math.min(nx - s[0], s[1] - nx), pz = Math.min(nz - s[2], s[3] - nz); if (px < pz) nx = nx - s[0] < s[1] - nx ? s[0] : s[1]; else nz = nz - s[2] < s[3] - nz ? s[2] : s[3]; } }
+  if (!me.sit && W.rounds) for (const [cx, cz, cr] of W.rounds) { const ex = nx - cx, ez = nz - cz, ed = Math.hypot(ex, ez); if (ed < cr && ed > 1e-4) { nx = cx + ex / ed * cr; nz = cz + ez / ed * cr; } }
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
@@ -4664,9 +4690,10 @@ function worldStep(dt) {
   ambientStep(dt, camera, me); homeAnimStep(dt);
   if (W.flag) { const pa = W.flag.geometry.attributes.position; for (let i = 0; i < pa.count; i++) pa.setZ(i, Math.sin(pa.getX(i) * 1.2 + W.t * 3) * 0.25 * (pa.getX(i) / 3 + 1)); pa.needsUpdate = true; }
   // nearest interactable
-  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d < s.r && d < nd) { nd = d; near = s; } }
+  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d < s.r && d + (s.low ? 1.2 : 0) < nd) { nd = d + (s.low ? 1.2 : 0); near = s; } }      /* a wandering beggar never takes the prompt off somebody you came to see */
   if (near !== W.near) { W.near = near; const p = $('prompt'); if (near) { p.textContent = near.label; p.style.display = 'block'; } else p.style.display = 'none'; }
   if (busy) $('prompt').style.display = 'none'; else if (W.near) $('prompt').style.display = 'block';
+  goalStep(me);
   if (building) { buildStep(dt); return; }
   if (!busy && W.near && I.aP) { sfx('uiok'); W.near.fn(); }
   else if (!busy && I.start) uiPlayer('attrs');
@@ -6201,7 +6228,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
 function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
 function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
-function openPanel(render, cls, onBack) { UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
+function openPanel(render, cls, onBack) { UI.openT = performance.now(); UI.lockMs = 450; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
   // a controller starts on the panel's main action (RESUME, PLAY…), else on the first thing that is not a tab or the close button
   const f = focusables(); let i = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')); if (i < 0) i = f.findIndex(e => e.closest('.pf')); if (i < 0) i = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, i); paintFocus(); }
 function rerender(reset) {
@@ -6264,6 +6291,7 @@ function uiStep(dt) {
     else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
   if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
+  if (I.aP && UI.cur && performance.now() - (UI.openT || 0) < (UI.lockMs || 450)) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results) */
   if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') e.focus(); else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
   if (I.back && UI.cur) { uiBack(); I.back = false; }
 }
@@ -6293,7 +6321,7 @@ function hudMatch() {
     const [x, y] = project(sh.x, sh.H * 0.6 + sh.y, sh.z); const u = sh.t / (sh.shot.rel * 1.55), z = 1 / 1.55;
     mt.style.display = 'block'; mt.style.left = (x + 34) + 'px'; mt.style.top = (y - 60) + 'px';
     const rel = sh.shot.released; if (!rel) { $('meterFill').style.height = Math.min(100, u * 100) + '%'; $('meterFill').style.background = ''; } else $('meterFill').style.background = MT.B.green ? '#3dffa0' : '#ff8a3c';
-    $('meterZone').style.bottom = (z * 100 - 5) + '%'; $('meterZone').style.height = '10%';
+    { const wz = clamp(shotWin(sh, contestOn(sh), nAtt(sh, sh.shot.kind === 'three' ? 'three' : sh.shot.kind === 'mid' ? 'mid' : 'close')) * z * 100, 1.2, 14); $('meterZone').style.bottom = (z * 100 - wz) + '%'; $('meterZone').style.height = (wz * 2) + '%'; }      /* the real window, shrinking with the hand in your face */
   } else mt.style.display = 'none';
   $('clear').style.display = M_.needClear && M_.off === me.team && M_.phase === 'live' ? 'block' : 'none';
   if (M_.drill) $('rackHud').innerHTML = M_.drill.id === 'horse' ? horseHud() : drillHud();
@@ -6417,7 +6445,7 @@ function uiPlayer(tab) {
         h += `<div class="cat" style="color:${CATS[c][1]}">${CATS[c][0]}</div>`;
         for (const a of ATTRS) if (a.cat === c) {
           const v = S.attrs[a.id], cap = caps[a.id], cost = attrCost(v), mx = v >= cap;
-          h += `<div class="card" style="padding:6px 9px"><div class="row"><div class="an"><b>${a.n}</b></div><div class="ab"><i style="width:${cap}%;background:${CATS[c][1]};opacity:.28"></i><i style="width:${v}%;background:${CATS[c][1]}"></i></div><div class="av">${v}${bf[a.id] ? `<span class="buff">+${bf[a.id]}</span>` : ''}<small>/${cap}</small></div>${mx ? '<span class="tag on">MAX</span>' : Btn('+1 · ' + cost, () => buy(a.id, 1), 'sm', S.vc < cost) + Btn('+5', () => buy(a.id, 5), 'sm alt', S.vc < cost)}</div><p>${a.d}</p></div>`;
+          h += `<div class="card" style="padding:6px 9px"><div class="row"><div class="an"><b>${a.n}</b></div><div class="ab"><i style="width:${cap}%;background:${CATS[c][1]};opacity:.28"></i><i style="width:${v}%;background:${CATS[c][1]}"></i></div><div class="av">${v}${bf[a.id] ? `<span class="buff">+${bf[a.id]}</span>` : ''}<small>/${cap}</small></div>${mx ? '<span class="tag on">MAX</span>' : Btn('+1 · ' + cost, () => buy(a.id, 1), 'sm', S.vc < cost) + (() => { let t = 0, k = 0, vv = v; while (k < 5 && vv < cap) { t += attrCost(vv); vv++; k++; } return k > 1 ? Btn('+' + k + ' · ' + t, () => buy(a.id, k), 'sm alt', S.vc < t) : ''; })()}</div><p>${a.d}</p></div>`;
         }
       }
     } else if (st.tab === 'badges') {
@@ -6624,6 +6652,7 @@ function uiResults(res, rw, again) {
     h += `<p class="mu">${s.greens} greens · ${s.dunks} dunks · ${s.threes} deep balls · ${s.bravs} Bravado</p>`;
     return h + `</div><div class="pf">${again ? Btn('RUN IT BACK', again) : ''}${Btn('BACK TO THE CAGES', uiClose, again ? 'alt' : '')}</div>`;
   });
+  UI.lockMs = 1100;      /* the buzzer often comes mid-press */
   // the count-up
   let t = 0; const iv = setInterval(() => { t += 0.05; const k = Math.min(1, t); const a = $('rvc'), b = $('rrep'); if (!a) { clearInterval(iv); return; } a.textContent = '+' + Math.round(rw.vc * k); b.textContent = '+' + Math.round(rw.rep * k); if (k < 1) sfx('coin'); else { clearInterval(iv); sfx('buy'); } }, 45);
 }

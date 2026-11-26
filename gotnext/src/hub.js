@@ -219,7 +219,7 @@ function buildHub() {
   mural('KINGS\nSTAY', 5.4, 3.0, ['#081a2a', '#7de3ff', '#a78bff', '#ffffff', '#08080a'], 15.42, 2.3, 0.2, -Math.PI / 2);
   for (let i = 0; i < 2; i++) { poster(scene, -15.42, 2.1, -10.9 + i * 1.55, Math.PI / 2, i % 2); poster(scene, 15.42, 2.1, 10.2 + i * 1.55 * -1, -Math.PI / 2, (i + 1) % 2); poster(scene, -15.42, 2.1, 10.9 - i * 1.55, Math.PI / 2, (i + 1) % 2); }
   // centrepiece: the Freedom Eagle, gold, mid-dunk
-  ink(M(cyl(1.3, 1.6, 0.9, 8), toon('#3a3c44'), 0, 0.45, 1.6, scene), 1.03); solid(-1.6, 1.6, 0, 3.2);
+  ink(M(cyl(1.3, 1.6, 0.9, 8), toon('#3a3c44'), 0, 0.45, 1.6, scene), 1.03); W.rounds = [[0, 1.6, 1.72]];      /* round, so you slide around it (the square box stopped you dead on the walk to the Cages) */
   const stb = aiBuild(99, 'slasher'); stb.worn = { hair: 'h_bald', head: 'hd_eagle', face: 'f_none', top: 't_jersey', arm: 'a_none', bottom: 'b_basic', socks: 's_high', shoes: 'k_gold', back: 'bk_wings', ball: 'bl_gold' };
   const stt = makeRig(stb, true); const gold = toon('#f2c14e'); stt.root.traverse(o => { if (o.isMesh && o.material !== INK) o.material = gold; }); stt.shadow.visible = false;
   stt.root.position.set(0, 1.35, 1.6); stt.root.scale.setScalar(1.25); stt.root.rotation.y = 0.5; scene.add(stt.root); applyPose(stt, poseOf('dunk', 0, { u: 0.5, style: 'tomahawk' }), 10);
@@ -240,7 +240,7 @@ function buildHub() {
   spot(-3.4, 4.0, 2.0, 'COACH OVERTIME (drills)', () => uiDrills('hub'));
   for (const [cx, cy, cz, cc] of [[-10.2, 0.2, -3.4, '#e04848'], [-10.2, 0.6, -3.35, '#2f5bff'], [-10.75, 0.2, -3.0, '#f2c14e']]) ink(M(box(0.5, 0.4, 0.5), toon(cc), cx, cy, cz, scene), 1.05);
   // fiends
-  [[5, -7.4], [-9.4, 3.4], [-3.4, 8.8], [10.4, 1.4]].forEach((b, i) => { const bb = aiBuild(50); bb.worn = randomWorn(0, true); bb.name = BUM_NAMES[i % BUM_NAMES.length]; const n = addNpc(bb, b[0], b[1], rnd(0, 6), 'beg', { bum: true, wander: true, name: bb.name, range: 1.4 }); spot(b[0], b[1], 1.9, 'TALK', () => uiBum(n)); n.spot = W.spots[W.spots.length - 1]; });
+  [[5, -7.4], [-9.4, 3.4], [-3.4, 8.8], [10.4, 1.4]].forEach((b, i) => { const bb = aiBuild(50); bb.worn = randomWorn(0, true); bb.name = BUM_NAMES[i % BUM_NAMES.length]; const n = addNpc(bb, b[0], b[1], rnd(0, 6), 'beg', { bum: true, wander: true, name: bb.name, range: 1.4 }); spot(b[0], b[1], 1.6, 'TALK', () => uiBum(n)); n.spot = W.spots[W.spots.length - 1]; n.spot.low = 1; });
   for (let i = 0; i < 3; i++) { const b = aiBuild(rnd(65, 92)); b.worn = randomWorn(2); addNpc(b, [-6.5, 0.5, 6.5][i] + rnd(-1.5, 1.5), rnd(-3.5, 3), rnd(0, 6), i ? 'idle' : 'ball', { wander: i > 0, range: 2.5 }); }      /* spread across the middle of the lot, not bunched by the cage */
   // barrel fire, hydrant, cans
   ink(M(cyl(0.42, 0.38, 0.95, 10), toon('#3a2a22'), -11, 0.48, 9.6, scene), 1.05); W.flames = []; for (let i = 0; i < 4; i++) W.flames.push(M(geo('flame', () => new THREE.ConeGeometry(0.2, 0.7, 5)), flat([0xff8a3c, 0xf2c14e, 0xff2d78, 0xffd28a][i]), -11 + rnd(-0.15, 0.15), 1.2, 9.6 + rnd(-0.15, 0.15), scene)); solid(-11.6, -10.4, 9, 10.2);
@@ -307,7 +307,7 @@ function buildPit() {
     const ct = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 9), new THREE.MeshBasicMaterial({ color: m.arcade ? 0x2a1450 : 0x3b4252 })); ct.rotation.x = -Math.PI / 2; ct.position.set(x, 0.01, PIT_DOOR_Z - 5.4); scene.add(ct);
     M(box(4.3, 0.02, 0.1), flat(cols[i]), x, 0.03, PIT_DOOR_Z - 1.0, scene);
     const hp = hoopMesh(2, m.arcade ? 'arcade' : 'street'); hp.position.set(x, 0, PIT_DOOR_Z - 9); hp.scale.setScalar(0.9); scene.add(hp);
-    spot(x, PIT_DOOR_Z + 1.2, 1.9, m.n, () => uiMode(m));
+    spot(x, PIT_DOOR_Z + 1.4, 2.5, m.n, () => uiMode(m));
   });
   // Last Call: a cart with a light on, east side
   ink(M(box(1.3, 1.1, 2.6), toon('#1c1d22'), 8.6, 0.55, 2, scene), 1.03); ink(M(box(1.6, 0.12, 3.0), toon('#3dffa0', '#3dffa0'), 8.6, 2.5, 2, scene), 1.03); for (const sz of [-1.3, 1.3]) M(cyl(0.04, 0.04, 1.4, 5), toon('#6a707c'), 8.1, 1.8, 2 + sz, scene); solid(7.8, 10, 0.6, 3.4);
@@ -353,25 +353,41 @@ addEventListener('keydown', e => {
 
 // buildCrib lives in home.js (the lot, the house and the home builder)
 
+// first days on the Block: one line under the HC chip saying what to do next, with an arrow that points there.
+// It stays until it is done (the welcome toast was gone in 3.5 s and never came back)
+function goalStep(me) {
+  const g = $('goal'); if (!g) return; let G = null;
+  if (W.kind === 'hub' && !W.visit && !MT) {
+    const drilled = Object.values(S.drills || {}).some(d => (d.medal || 0) >= 1), games = (S.life && S.life.games) || 0;
+    if (!drilled && games < 1) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
+    else if (games < 1) G = { t: 'Call next at THE CAGES', s: 'walk up to a court gate and press ' + (I.hasPad && I.padAt >= (window.__kbAt || 0) ? 'A' : 'E'), x: 0, z: -10.3 };
+  }
+  if (!G) { if (g.style.display !== 'none') g.style.display = 'none'; return; }
+  if (g.dataset.t !== G.t) { g.dataset.t = G.t; g.lastElementChild.innerHTML = esc(G.t) + '<small>' + esc(G.s) + '</small>'; }
+  g.style.display = 'flex';
+  const a = Math.atan2(G.x - me.x, G.z - me.z) - W.yaw, here = Math.hypot(G.x - me.x, G.z - me.z) < 2.5;      /* screen-up is the way the camera looks */
+  g.firstElementChild.style.transform = here ? 'rotate(90deg)' : `rotate(${(-a * 180 / Math.PI - 90).toFixed(0)}deg)`;
+}
 function worldStep(dt) {
   if (!W) return; W.t += dt; const me = W.me, I = IN[0], building = !!W.build, busy = uiBusy() || building;
   let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my;
   if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
-  if (!busy) W.yaw -= (I.rx * 2.4 + mx * 0.9 * Math.min(1, Math.abs(my) + 0.4)) * dt;
+  if (!busy) W.yaw -= (I.rx * 2.4 + mx * (I.analog ? 0.9 : 0.45) * Math.min(1, Math.abs(my) + 0.4)) * dt;      /* on keys A/D mostly strafe; the camera follows less */
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
   // speed off the court: keys walk (Shift runs). A stick or thumb sets it by how far you push: a walk up to about 80%,
   // then a smooth ramp into the run at full push (no on/off flip at a threshold, which made the body jerk between gaits)
   const RUNV = 5.6, sm = Math.min(1, Math.hypot(mx, my)), ramp = (u => u * u * (3 - 2 * u))(clamp((sm - 0.8) / 0.18, 0, 1));
-  const sp = I.analog ? (I.sprintBtn ? RUNV : (1.5 + (RUNV - 1.5) * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? RUNV : 1.5);
+  const sp = I.analog ? (I.sprintBtn ? RUNV : (1.5 + (RUNV - 1.5) * ramp) / Math.max(sm, 0.01) * Math.min(1, sm / 0.75)) : (I.sprint ? RUNV : 2.4);      /* keys jog: walking pace made the Block feel huge */
   const tvx = (fx * -my + rx * mx) * sp, tvz = (fz * -my + rz * mx) * sp, ddx = tvx - me.vx, ddz = tvz - me.vz, dl = Math.hypot(ddx, ddz);
   const brake = me.vx * tvx + me.vz * tvz < 0 || Math.hypot(tvx, tvz) < 0.1, acc = (brake ? 34 : 17) * dt;
   if (dl <= acc) { me.vx = tvx; me.vz = tvz; } else { me.vx += ddx / dl * acc; me.vz += ddz / dl * acc; }
   if (me.sit) { me.vx = me.vz = 0; }
   let nx = me.sit ? me.x : me.x + me.vx * dt, nz = me.sit ? me.z : me.z + me.vz * dt;
   if (!me.sit) for (const s of W.solids) { if (nx > s[0] && nx < s[1] && nz > s[2] && nz < s[3]) { const px = Math.min(nx - s[0], s[1] - nx), pz = Math.min(nz - s[2], s[3] - nz); if (px < pz) nx = nx - s[0] < s[1] - nx ? s[0] : s[1]; else nz = nz - s[2] < s[3] - nz ? s[2] : s[3]; } }
+  if (!me.sit && W.rounds) for (const [cx, cz, cr] of W.rounds) { const ex = nx - cx, ez = nz - cz, ed = Math.hypot(ex, ez); if (ed < cr && ed > 1e-4) { nx = cx + ex / ed * cr; nz = cz + ez / ed * cr; } }
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
@@ -406,9 +422,10 @@ function worldStep(dt) {
   ambientStep(dt, camera, me); homeAnimStep(dt);
   if (W.flag) { const pa = W.flag.geometry.attributes.position; for (let i = 0; i < pa.count; i++) pa.setZ(i, Math.sin(pa.getX(i) * 1.2 + W.t * 3) * 0.25 * (pa.getX(i) / 3 + 1)); pa.needsUpdate = true; }
   // nearest interactable
-  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d < s.r && d < nd) { nd = d; near = s; } }
+  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d < s.r && d + (s.low ? 1.2 : 0) < nd) { nd = d + (s.low ? 1.2 : 0); near = s; } }      /* a wandering beggar never takes the prompt off somebody you came to see */
   if (near !== W.near) { W.near = near; const p = $('prompt'); if (near) { p.textContent = near.label; p.style.display = 'block'; } else p.style.display = 'none'; }
   if (busy) $('prompt').style.display = 'none'; else if (W.near) $('prompt').style.display = 'block';
+  goalStep(me);
   if (building) { buildStep(dt); return; }
   if (!busy && W.near && I.aP) { sfx('uiok'); W.near.fn(); }
   else if (!busy && I.start) uiPlayer('attrs');

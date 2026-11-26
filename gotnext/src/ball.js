@@ -104,7 +104,7 @@ function setCheck(team, first) {
 // p.live: 'hold' (ball held, dribble still available), 'drib' (dribbling), 'dead' (picked up: pass, shoot, fake or pivot)
 function dribRules(p) { return p.user && !p.afk && !MT.reel; }
 function give(p) { const B = MT.B; B.state = 'held'; B.holder = p; B.lastTeam = p.team; B.shooter = null; p.drib = newDrib(p, B.pos); p.live = dribRules(p) && Math.hypot(p.vx, p.vz) < 1.5 ? 'hold' : 'drib'; p.stopT = 0; }
-function changePoss(team) { if (MT.off !== team) { MT.pp = 0; if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) lateCall(0.4, 'LOCKED IN', 'Three stops in a row', '#33e0ff'); }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; p.dv = poolNext(p, 'dv', 4); } } }
+function changePoss(team) { if (MT.off !== team) { MT.pp = 0; if (MT.phase === 'live' && !MT.practice && MT.off !== undefined) { const S_ = MT.stops || (MT.stops = [0, 0]); S_[team]++; if (S_[team] === 3) { const mine = MT.me && team === MT.me.team; lateCall(0.4, 'LOCKED IN', (mine ? 'Your D' : 'Their D') + ' · three stops in a row', mine ? '#33e0ff' : '#ff6a5a'); } }      /* the defense got it back without giving up a bucket */ MT.off = team; MT.needClear = !MT.practice; MT.clock = 14; for (const p of MT.P) { p.ai.mode = ''; p.ai.hold = 0; p.dv = poolNext(p, 'dv', 4); } } }
 function call(big, small, col, dur) { hudCall(big, small, col, dur); if (MT && MT.net === 'host') netEv({ k: 'c', b: big, s: small || '', c: col || '#fff', d: dur || 1.2 }); }
 function addBrav(p, v) {
   if (!p.user || p.bravT > 0 || MT.practice) return;
@@ -133,7 +133,7 @@ function scorePts(p, pts, how) {
   if (how !== 'dunk' && M_.B.shooter === p && M_.B.clockAt !== undefined && M_.B.clockAt < 1.6 && !M_.practice && !M_.drill) { highlight('buzzer', p); lateCall(0.9, 'BUZZER BEATER', p.b.name + ' beat the clock', '#ffc531'); M_.B.clockAt = undefined; }
   { const R = M_.runS || (M_.runS = { team: -1, n: 0, pts: 0 });      // unanswered buckets: three in a row is a run
     if (R.team === p.team) { R.n++; R.pts += pts; } else { if (R.n >= 3) lateCall(1.5, 'RUN OVER', p.b.name + ' stops the bleeding', '#7de3ff'); R.team = p.team; R.n = 1; R.pts = pts; }
-    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', `${R.pts}–0`, '#ffc531'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, '', '#ffc531'); }
+    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', (M_.me && p.team === M_.me.team ? 'Your team · ' : 'Them · ') + `${R.pts}–0`, M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, M_.me && p.team === M_.me.team ? 'Your team' : 'Them', M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); }
   for (const o of M_.P) if (o.team !== p.team) { o.hot = 0; if (o.fire) { o.fire = false; } }
   if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
   if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfxM('fire'); }
@@ -217,6 +217,16 @@ function padDefense(i) {
   const M_ = MT; if (!M_ || M_.phase !== 'live') return false; const p = i === 0 ? M_.me : M_.P.find(q => q.ctrl === i && !q.remote); if (!p) return false;
   const B = M_.B; return B.holder !== p && !(M_.off === p.team && B.state !== 'loose' && B.state !== 'shot') && B.state !== 'loose';
 }
+// the green window for this shot right now (also what the meter draws)
+function shotWin(p, c, n) {
+  let w = (0.05 + nAtt(p, 'iq') * 0.05 + 0.012 * bt(p, 'greencard') + p.shot.j.win + (p.mine ? cribFx('green') * 0.1 : 0)) * (0.55 + n * 0.65) * (1 - c * 0.6);
+  if (MT.practice) w *= 1.1; if (p.pu && p.pu.id === 'hot') w *= 1.6;
+  if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;
+  if (!MT.arcade) { if (p.hot >= 3) w *= 1.08; else if (p.cold >= 3 && bt(p, 'heatcheck') < 2) w *= 0.9; if (MT.runS && MT.runS.n >= 3) w *= MT.runS.team === p.team ? 1.05 : 0.97; }      /* streaks and runs */
+  { const lead = MT.score[p.team] - MT.score[1 - p.team]; w *= 1 + px(p, 'green') + (MT.gamePt ? px(p, 'clutch') : 0) + (p.hot >= 2 ? px(p, 'hot') : 0) + (lead <= -3 ? px(p, 'behind') : 0) + (lead >= 3 ? px(p, 'ahead') : 0); }      /* personality */      /* game point: nerves shrink the window, a high Shot IQ widens it */
+  if (p.user && !MT.arcade) w = Math.max(w, 0.035);      /* a floor: a low-rated build still gets about two frames either side */
+  return w;
+}
 function releaseShot(p) {
   const s = p.shot; if (s.released) return; s.released = true; const B = MT.B;
   const held = s.hold != null ? s.hold : p.t;
@@ -233,15 +243,11 @@ function releaseShot(p) {
   if (p.stam < 25) base *= 0.85; if (s.sp > 2.8) base *= 0.9;
   if (p.catchFrom && MT.time - p.catchT < 1.6) base += 0.02 * bt(p.catchFrom, 'trickle') + 0.02 + (p.touchT && MT.time - p.touchT < 1.6 ? 0.025 : 0);      /* off a touch pass the defense is still turning */
   if (p.fire) base += 0.35; if (kind === 'close') base += 0.03 * bt(p, 'softmoney'); base += px(p, kind);
-  let w = (0.05 + nAtt(p, 'iq') * 0.05 + 0.012 * bt(p, 'greencard') + s.j.win + (p.mine ? cribFx('green') * 0.1 : 0)) * (0.55 + n * 0.65) * (1 - c * 0.6);
-  if (MT.practice) w *= 1.1; if (p.pu && p.pu.id === 'hot') w *= 1.6;
-  if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;
-  if (!MT.arcade) { if (p.hot >= 3) w *= 1.08; else if (p.cold >= 3 && bt(p, 'heatcheck') < 2) w *= 0.9; if (MT.runS && MT.runS.n >= 3) w *= MT.runS.team === p.team ? 1.05 : 0.97; }      /* streaks and runs */
-  { const lead = MT.score[p.team] - MT.score[1 - p.team]; w *= 1 + px(p, 'green') + (MT.gamePt ? px(p, 'clutch') : 0) + (p.hot >= 2 ? px(p, 'hot') : 0) + (lead <= -3 ? px(p, 'behind') : 0) + (lead >= 3 ? px(p, 'ahead') : 0); }      /* personality */      /* game point: nerves shrink the window, a high Shot IQ widens it */
+  let w = shotWin(p, c, n);
   const e = Math.abs(err); let green = e <= w, prob;
   if (green && !p.user && Math.random() >= 0.5) green = false;      /* the AI lands in the window half as often as its timing says (it used to keep the sure make anyway) */
   // perfect timing beats an open look every time; a hand in the face still costs a good release (smothered, about two in three)
-  if (green) prob = c < 0.12 ? 1 : Math.max(0.2, 1 - (c - 0.12) * 1.5); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
+  if (green) prob = (c < 0.12 ? 1 : Math.max(0.2, 1 - (c - 0.12) * 1.5)) * (d > 7.6 ? Math.max(0.3, 1 - (d - 7.6) * 0.12) : 1); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.75) * (e < w * 2.2 ? 1.12 : 1);
   if (p.user && s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
   // blocked?
   for (const o of MT.P) {
@@ -279,7 +285,7 @@ function startFake(p) {
   }
   p.st = 'fake'; p.t = 0; p.y = 0; sfxM('whoosh');
   let o = null, od = 2.4; for (const q of MT.P) { if (q.team === p.team || q.st !== 'free') continue; const d = dist(q, p); if (d < od) { od = d; o = q; } }
-  if (o && !o.user && Math.random() < clamp(0.3 + (1 - o.aiLvl) * 0.3 - nAtt(o, 'perd') * 0.22 + nAtt(p, 'iq') * 0.15, 0.08, 0.7)) { startJump(o); o.ai.react = 0.9; floatTxt(o, 'BIT ON IT', '#f2c14e'); addBrav(p, 0.06); }
+  if (o && !o.user && Math.random() < clamp(0.3 + (1 - o.aiLvl) * 0.3 - nAtt(o, 'perd') * 0.22 + nAtt(p, 'iq') * 0.15, 0.08, 0.7) * (o.ai.bitAt && MT.time - o.ai.bitAt < 6 ? 0.3 : 1)) { o.ai.bitAt = MT.time; startJump(o); o.ai.react = 0.9; floatTxt(o, 'BIT ON IT', '#f2c14e'); addBrav(p, 0.06); }
 }
 function euroOf(p) { const l = Math.hypot(p.x, p.z) || 1, lat = p.in.dx * (p.z / l) - p.in.dz * (p.x / l); return Math.abs(lat) > 0.55 ? Math.sign(lat) : 0; }
 function launch(p, make, pts, green, arc, kind) {
@@ -831,6 +837,7 @@ function aiThink(p, dt) {
         const sel = (p.fire ? 2 : 1) * (1 + a.hold * 0.35) * (MT.clock < 6 ? 2 : 1) * (MT.gamePt ? 1 + px(p, 'clutch') * 5 : 1);      /* the cold-blooded want the last one */
         // the look, read off the hands actually near him: a good shooter waits for a clean one, a bad decision-maker takes what is there
         const cn = contestOn(p);
+        { const hum = mates.find(q => q.user && !q.afk); if (hum && cn >= 0.12 && nearestOpp(hum)[1] > 2.2 && passLane(p, hum) && !MT.arcade && Math.random() < 0.4) { doPass(p, hum); return; } }      /* you are wide open and he is not: you get it first */
         if (p.catchT && MT.time - p.catchT < 0.9 && cn >= 0.2 && !MT.arcade && Math.random() < 0.3 + L * 0.5 && tryPass(q => contestOn(q) < 0.1 && passVal(q) > 0.45 && q !== p.catchFrom)) return;      /* caught it with a hand up: swing it on, do not hold it */
         const look = (cn < 0.15 ? 1 : cn < 0.35 ? 0.4 - L * 0.15 : 0.08 - L * 0.06 + px(p, 'brav') * 0.3) * (!MT.arcade && !(MT.pp > 0) && a.hold < 1.3 && cn > 0.06 && MT.clock > 6 ? 0.3 + px(p, 'brav') * 2 : 1);      /* first touch of the trip: move it first unless he is wide open (gunners less patient) */
         if (beyondArc(p.x, p.z) && d < 8.3 && Math.random() < 0.45 * look * (0.25 + three) * sel) { startShot(p, 'ai'); return; }
