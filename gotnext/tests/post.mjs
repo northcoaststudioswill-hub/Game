@@ -37,8 +37,10 @@ const drive = (lt) => p.evaluate(([s, lt]) => { eval(s); P.S.set.dassist = 1; co
   h.x = 0; h.z = 7; me.x = 0; me.z = 6.1; M.B.state = 'held'; M.B.holder = h; h.live = 'drib'; M.off = h.team; me.man = h; __pad.buttons[6].pressed = lt; window.__tick(30);
   let gap = 0, n = 0; const z0 = h.z; window.__trace = []; for (let i = 0; i < 60; i++) { P.IN[5].mx = 0; P.IN[5].my = -0.8; window.__tick(1); gap += Math.hypot(me.x - h.x, me.z - h.z); n++; if (i % 6 === 0) window.__trace.push(`${i} me ${me.st} bu=${me.bodyUp} ${me.x.toFixed(2)},${me.z.toFixed(2)} h ${h.st} ${h.x.toFixed(2)},${h.z.toFixed(2)}`); }
   const r = { bodyUp: me.bodyUp, an: me.an, gap: +(gap / n).toFixed(2), gained: +(z0 - h.z).toFixed(2) }; P.IN[5].my = 0; __pad.buttons[6].pressed = false; h.user = false; h.ctrl = undefined; window.__tick(5); return r; }, [set, lt]);
-const off = await drive(false), on = await drive(true);
-ok(on.bodyUp && on.gap < off.gap && on.gained < off.gained * 0.7, `ball handler driving 1 s: body up keeps ${on.gap} m away and he gains ${on.gained} m; without it ${off.gap} m and ${off.gained} m`);
+const med = a => a.slice().sort((x, y) => x - y)[a.length >> 1]; const offs = [], ons = []; for (let i = 0; i < 5; i++) { offs.push(await drive(false)); ons.push(await drive(true)); }
+const off = { gap: med(offs.map(r => r.gap)), gained: med(offs.map(r => r.gained)) }, on = { bodyUp: ons.every(r => r.bodyUp), gap: med(ons.map(r => r.gap)), gained: med(ons.map(r => r.gained)) };
+console.log('   body up, 5 runs each: gained with ' + ons.map(r => r.gained).join(' ') + ' · without ' + offs.map(r => r.gained).join(' '));
+ok(on.bodyUp && on.gap < off.gap && on.gained < off.gained * 0.7, `ball handler driving 1 s (median of 5): body up keeps ${on.gap} m away and he gains ${on.gained} m; without it ${off.gap} m and ${off.gained} m`);
 await p.evaluate(s => { eval(s); const h = d; h.x = 0.6; h.z = 6.8; me.x = 0.6; me.z = 6.0; me.face = 0; M.B.state = 'held'; M.B.holder = h; h.live = 'drib'; M.off = h.team; __pad.buttons[6].pressed = true; window.__tick(30); }, set);
 await p.screenshot({ path: path.join(dir, 'shots', 'body-up.png') }); await p.evaluate(() => { __pad.buttons[6].pressed = false; window.__tick(3); });
 // 4. the ring arrow points at your matchup from the opening check, even when you are standing next to someone else

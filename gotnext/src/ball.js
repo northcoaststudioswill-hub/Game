@@ -600,8 +600,8 @@ function humanThink(p, dt) {
   { const scr = !!I.lt && !hasBall && MT.off === p.team && !!B.holder && B.state === 'held' && p.st === 'free' && Math.hypot(p.vx, p.vz) < 1.2 && !MT.arcade && MT.phase === 'live'; if (scr && !p.screen) floatTxt(p, 'SCREEN SET', '#f2c14e'); p.screen = scr; }
   if (I.pkP && hasBall) callScreen(p, !!I.sprint); else if (I.pkP && MT.off !== p.team) switchTo(p);
   if (p.st === 'shoot' && !p.shot.released && p.shot.auto) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
-  if (p.remote) {          // the guest times their own release; the host just takes their word for the hold
-    if (I.relEdge) p.pendRel = I.rh;
+  if (p.remote) {          // the guest times their own release (their screen, their thumb); the host checks it against its own clock
+    if (I.relEdge) { const meas = p.st === 'shoot' ? p.t : 0; p.pendRel = clamp(I.rh, meas - 0.07, meas + 0.07); if (Math.abs(I.rh - meas) > 0.07) p.relOff = (p.relOff || 0) + 1; }      /* the press and the let-go both came over the wire, so the host knows the hold to within network jitter: a reported hold more than 70 ms off its own count is pulled back (a doctored client sending a perfect hold every time gets its real one) */
     if (p.st === 'shoot' && !p.shot.released) { if ((p.pendRel != null && p.t >= Math.min(p.pendRel, p.shot.rel * 1.55)) || p.t > p.shot.rel * 1.55 + 0.6) { p.shot.hold = p.pendRel; p.pendRel = null; releaseShot(p); } return; }
     if (p.st !== 'shoot' && p.pendRel != null && !I.bP && I.flick !== 'D') p.pendRel = null;
   }
