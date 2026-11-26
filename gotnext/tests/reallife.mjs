@@ -9,13 +9,13 @@ await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__
 const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
 await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => { window.__tick(10); __pit.S.tut = 1; });
-const KINDS = ['deny', 'help', 'close', 'chin', 'target', 'point', 'knees'];
+const KINDS = ['deny', 'help', 'close', 'chin', 'target', 'point', 'knees', 'burst', 'dip', 'attack', 'probe'];
 const kindOf = (o, an) => an === 'knees' ? 'knees' : o.offD || (o.close > 0.4 ? 'close' : o.chin ? 'chin' : o.target > 0.5 ? 'target' : o.point !== undefined && o.pointW > 0.6 ? 'point' : null);
 await p.evaluate(() => { const P = __pit; P.uiClose(); P.launchGame(P.MODES.find(m => m.id === 's3'), P.TIERS_COURT[2], { mates: [-1, -1], rival: -1, p2: 'off' }); window.__tick(30); const M = P.MT; M.me.user = false; M.locals = []; for (const q of M.P) { q.aiLvl = 0.8; q.stam = q.stam === undefined ? 100 : q.stam; } window.__kindOf = null; });
 const count = {}, got = {}; let frames = 0;
 for (let chunk = 0; chunk < 150; chunk++) {
   const r = await p.evaluate((KINDS) => { const P = __pit, M = P.MT; if (!M || M.phase === 'over') return null; const c = {}, hits = []; if (M.phase === 'scored' && Math.random() < 0.5) for (const q of M.P) q.stam = 30;      /* make some gassed players to see */
-    for (let f = 0; f < 30; f++) { window.__tick(1); for (const q of M.P) { const o = q.anO || {}, an = q.an; const k = an === 'knees' ? 'knees' : o.offD || (o.close > 0.4 ? 'close' : o.chin ? 'chin' : o.target > 0.5 ? 'target' : o.point !== undefined && o.pointW > 0.6 ? 'point' : null); if (k) { c[k] = (c[k] || 0) + 1; if (f === 29) hits.push([k, q.i]); } } }
+    for (let f = 0; f < 30; f++) { window.__tick(1); for (const q of M.P) { const o = q.anO || {}, an = q.an; const k = an === 'knees' ? 'knees' : o.offD || (o.close > 0.4 ? 'close' : o.chin ? 'chin' : o.target > 0.5 ? 'target' : o.point !== undefined && o.pointW > 0.6 ? 'point' : o.burst > 0.5 ? 'burst' : o.dip > 0.6 ? 'dip' : o.atk > 0.6 ? 'attack' : o.probe > 0.6 ? 'probe' : null); if (k) { c[k] = (c[k] || 0) + 1; if (f === 29) hits.push([k, q.i]); } } }
     return { c, hits }; }, KINDS);
   if (!r) break; frames += 30; for (const k in r.c) count[k] = (count[k] || 0) + r.c[k];
   if (shots) for (const [k, i] of r.hits) if (!got[k]) { got[k] = 1;

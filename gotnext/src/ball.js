@@ -1099,6 +1099,7 @@ function stepPlayer(p, dt) {
       p.turboAt = M_.time; p.turboT = 0.6; p.stam -= 9; if (p.user) floatTxt(p, 'TURBO', '#3dffa0'); sfx('turbo'); sfx('squeak');
       const [o, od] = nearestOpp(p); if (o && od < 1.9 && o.st === 'free' && Math.random() < clamp(0.3 + (att(p, 'accel') - att(o, 'perd')) * 0.008 - (o.bodyUp ? 0.15 : 0), 0.08, 0.65)) { o.slowT = Math.max(o.slowT || 0, 0.22); floatTxt(o, 'BEAT', '#f2c14e'); } }
     if (p.turboT > 0 && p.sprinting) top *= 1.16; }
+  if (!p.user && hasBall && !p.sprinting && p.ai && p.ai.mode !== 'drive' && MT.phase === 'live' && !MT.arcade && nearestOpp(p)[1] > 2.3) top *= 0.62;      /* first gear: probing with room (Luka, Ja), so the burst reads as a burst */
   if (p.sprinting) { top *= sprV / jogV; if (!p.fire && !(p.pu && p.pu.id === 'turbo')) p.stam -= (hasBall ? 10 : 8) * dt * (1.3 - nAtt(p, 'stam') * 0.5); } else p.stam = Math.min(100, p.stam + (6 + nAtt(p, 'stam') * 7) * (1 + px(p, 'stam')) * dt);
   if (p.stam < 20) { top *= 0.86; if (!p.gassed && p.stam < 12) { p.gassed = true; floatTxt(p, 'GASSED', '#8d8d99'); } } if (p.slowT > 0) top *= 0.45;
   const def = M_.off !== p.team && !hasBall && B.state !== 'loose'; if (def && !p.sprinting) top *= 0.92;
@@ -1414,6 +1415,14 @@ function animPlayer(p, dt) {
   p.avx = lerp(p.avx || 0, avx, 0.5); p.avz = lerp(p.avz || 0, avz, 0.5);
   const fwdA = ((p.avx - (p.pavx || 0)) * Math.sin(p.face) + (p.avz - (p.pavz || 0)) * Math.cos(p.face)) / dt; p.pavx = p.avx; p.pavz = p.avz;
   p.leanF = lerp(p.leanF || 0, clamp(fwdA * 0.016, -0.24, 0.26), 1 - Math.exp(-9 * dt)); o.leanF = p.leanF;
+  if (an === 'dribble' && p.st === 'free') {      // how good ball handlers carry the dribble (see docs/STATUS.md for the film notes)
+    const sp = Math.hypot(p.avx, p.avz), [od0, odd] = nearestOpp(p);
+    p.burstW = lerp(p.burstW || 0, fwdA > 6 && sp < 5 ? clamp((fwdA - 6) / 10, 0, 1) : 0, 1 - Math.exp(-(fwdA > 6 ? 14 : 5) * dt)); if (p.burstW > 0.05) o.burst = p.burstW;      /* the first step out of a slow dribble: low, long lean, ball pushed out (Rose, Ja) */
+    if (od0 && odd < 1.5 && sp > 3) { const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = od0.x - p.x, rz = od0.z - p.z, fw = rx * fx + rz * fz, lat = rx * fz - rz * fx; if (fw > -0.4) { p.dipW = lerp(p.dipW || 0, 1, 1 - Math.exp(-10 * dt)); p.dipS = lat > 0 ? -1 : 1; } else p.dipW = lerp(p.dipW || 0, 0, 1 - Math.exp(-8 * dt)); }
+    else p.dipW = lerp(p.dipW || 0, 0, 1 - Math.exp(-8 * dt)); if (p.dipW > 0.05) { o.dip = p.dipW; o.dipS = p.dipS; }      /* turning the corner on him: lead shoulder dropped into his chest, the off arm up (LeBron) */
+    const atk = odd < 2.2 && !p.swag ? clamp((2.2 - odd) / 1.2, 0, 1) : 0, probe = !p.user && odd > 2.3 && sp > 0.4 && sp < 3.4 && !p.sprinting ? 1 : 0;
+    p.atkW = lerp(p.atkW || 0, atk, 1 - Math.exp(-6 * dt)); p.probeW = lerp(p.probeW || 0, probe, 1 - Math.exp(-4 * dt)); if (p.atkW > 0.05) o.atk = p.atkW; if (p.probeW > 0.05) o.probe = p.probeW;      /* tight: sit lower and dribble harder; room: taller, eyes up, a lazy bounce (first gear) */
+  }
   const asp = Math.hypot(p.avx, p.avz);
   if (asp > 0.6 && (p.st === 'free' || p.st === 'move')) { let a = Math.atan2(p.avx, p.avz) - p.face; while (a > Math.PI) a -= 6.2832; while (a < -Math.PI) a += 6.2832; if (Math.abs(a) < 2.3) o.hipYaw = clamp(a, -0.6, 0.6) * Math.min(1, asp / 3) * 0.75; }
   if (p.bumpT > 0) { p.bumpT -= dt; const k = p.bumpT / 0.3; o.bump = [p.bumpX * k, p.bumpZ * k]; }
