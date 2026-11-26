@@ -1261,6 +1261,7 @@ function dribFloor(p, D, kind, tAhead, vx, vz) {
   else if (kind === 'shammgod') { side = -0.42; fwd = 0.34; }
   else if (kind === 'retreat') { side = 0.32; fwd = 0.1; }
   else if (p.protect) { side = 0.5; fwd = 0.14; }      /* out past the knee of the crouch */                     // ball kept away from the defender, low and to the side
+  { const st = p.rig && p.rig.prof && p.rig.prof.stance || 1; if (st > 1.02 && kind !== 'tween' && kind !== 'behind' && kind !== 'cross' && kind !== 'killer') side *= Math.pow(st, 0.9); }      /* a wide stance (Showtime) puts the knee where the ball used to go */
   // forward of the body along the way he faces (the offset was worked out above but never applied: the ball always
   // bounced level with the hips, and a runner then outran it)
   return _bq.set(p.x + vx * tAhead + rx * side * sgn + fx * fwd, 0.125, p.z + vz * tAhead + rz * side * sgn + fz * fwd).clone();
