@@ -168,6 +168,10 @@ function buildHub() {
     // the key and arc run out of the cage gate, like the court spilled onto the block
     x.fillStyle = 'rgba(255,45,120,.5)'; x.fillRect(X(-2.45), Z(-12), 4.9 * u, 6.2 * u);
     x.strokeStyle = '#ece9e2'; x.lineWidth = 6; x.strokeRect(X(-2.45), Z(-12), 4.9 * u, 6.2 * u); x.beginPath(); x.arc(X(0), Z(-5.8), 1.8 * u, 0, 6.3); x.stroke(); x.beginPath(); x.arc(X(0), Z(-12), 9 * u, 0.12, Math.PI - 0.12); x.stroke();
+    // the shootaround's corner under Sharpie's hoop: a short lane, a free-throw circle, the word on the ground
+    x.fillStyle = 'rgba(125,227,255,.14)'; x.fillRect(X(6.37), Z(6.0), 3.66 * u, 5.2 * u); x.strokeStyle = 'rgba(236,233,226,.78)'; x.lineWidth = 5; x.strokeRect(X(6.37), Z(6.0), 3.66 * u, 5.2 * u);
+    x.beginPath(); x.arc(X(8.2), Z(6.0), 1.8 * u, Math.PI, Math.PI * 2); x.stroke(); x.setLineDash([14, 12]); x.beginPath(); x.arc(X(8.2), Z(6.0), 1.8 * u, 0, Math.PI); x.stroke(); x.setLineDash([]);
+    x.save(); x.translate(X(8.2), Z(3.7)); x.textAlign = 'center'; x.font = '900 30px Archivo, Impact, sans-serif'; x.fillStyle = 'rgba(125,227,255,.7)'; x.fillText('SHOOTAROUND', 0, 0); x.restore();
     x.save(); x.translate(X(0), Z(6.4)); x.transform(1, 0, -0.14, 1, 0, 0); x.textAlign = 'center'; x.font = '900 expanded 84px Archivo, Impact, sans-serif'; x.fillStyle = 'rgba(236,233,226,.8)'; x.fillText(BRAND.a, -14, -6); x.fillStyle = 'rgba(255,45,120,.85)'; x.fillText(BRAND.b, 20, 68); x.restore();
     x.fillStyle = 'rgba(236,233,226,.75)'; for (let i = 0; i < 12; i++) x.fillRect(X(-9 + i * 1.6), Z(11.2), 0.8 * u, 2.2 * u);
     x.font = '500 22px "JetBrains Mono", monospace'; x.fillStyle = 'rgba(242,193,78,.8)'; x.save(); x.translate(X(-9), Z(-1)); x.rotate(-0.3); x.fillText('WINNERS STAY →', 0, 0); x.restore(); x.save(); x.translate(X(6), Z(-2.5)); x.rotate(0.2); x.fillText('NO REFS. NO MERCY.', 0, 0); x.restore();
@@ -227,8 +231,8 @@ function buildHub() {
   M(box(2.6, 0.04, 3.4), flat(0x050506), -6.4, 0.03, 10.2, scene); for (const [rx, rz, rw, rd] of [[-7.75, 10.2, 0.1, 3.4], [-5.05, 10.2, 0.1, 3.4], [-6.4, 11.9, 2.8, 0.1]]) ink(M(box(rw, 1.0, rd), toon('#3dffa0'), rx, 0.5, rz, scene), 1.06); solid(-7.85, -4.95, 8.45, 12.0);      /* the subway stairwell rail is solid (legs sank into it: the bot called it the green dumpster) */ for (let i = 0; i < 5; i++) M(box(2.5, 0.05, 0.3), toon('#3a3c44'), -6.4, -0.02 - i * 0.02, 9.0 + i * 0.5, scene);
   fadeable(M(cyl(0.06, 0.06, 3.2, 6), toon('#1c1d22'), -7.75, 1.6, 8.5, scene), -7.75, 8.5); const sb = sign('UPTOWN LINE', 2.4, 0.5, '#3dffa0', '#0a0a0e'); sb.position.set(-6.6, 3.0, 8.5); scene.add(sb); for (let i = 0; i < 5; i++) M(box(0.06, 1.4, 0.06), toon('#6a707c'), -7.4 + i * 0.5, 0.7, 8.55, scene); M(box(2.4, 0.06, 0.06), toon('#6a707c'), -6.4, 0.9, 8.55, scene); solid(-8, -4.8, 8.4, 12.2);
   spot(-6.4, 7.6, 1.8, 'UPTOWN LINE', () => uiDialog('UPTOWN LINE', 'Gate is chained. A sticker on it says: MORE CITY SOON. Somebody wrote "that\'s what they said in 2139" under it.', [['Aight.', null]]));
-  mural('NO\nREFS', 5.4, 3.4, ['#2a1408', '#ff6a3d', '#f2c14e', '#fff3b0', '#ffffff'], -15.42, 2.4, -0.4, Math.PI / 2);
-  mural('KINGS\nSTAY', 5.4, 3.0, ['#081a2a', '#7de3ff', '#a78bff', '#ffffff', '#08080a'], 15.42, 2.3, 0.2, -Math.PI / 2);
+  // (the NO REFS and KINGS STAY murals that hung across the two alleys are gone: the alleys are open)
+  blockDress();
   for (let i = 0; i < 2; i++) { poster(scene, -15.42, 2.1, -10.9 + i * 1.55, Math.PI / 2, i % 2); poster(scene, 15.42, 2.1, 10.2 + i * 1.55 * -1, -Math.PI / 2, (i + 1) % 2); poster(scene, -15.42, 2.1, 10.9 - i * 1.55, Math.PI / 2, (i + 1) % 2); }
   // centrepiece: the Freedom Eagle, gold, mid-dunk
   ink(M(cyl(1.3, 1.6, 0.9, 8), toon('#3a3c44'), 0, 0.45, 1.6, scene), 1.03); W.rounds = [[0, 1.6, 1.72]];      /* round, so you slide around it (the square box stopped you dead on the walk to the Cages) */
@@ -239,7 +243,8 @@ function buildHub() {
   // Money Rack: a side hoop and a man with a marker
   const h2 = hoopMesh(1, 'street'); h2.position.set(8.2, 0, 10.6); h2.rotation.y = Math.PI; scene.add(h2); solid(7.6, 8.8, 11.6, 12.4);
   const hb = aiBuild(75, 'sniper'); hb.name = 'Sharpie'; addNpc(hb, 6.3, 9.6, 2.4, 'idle'); spot(7.2, 8.4, 2.0, 'SHARPIE (Money Rack · H-O-R-S-E)', () => uiRack());
-  ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), 5.2, 0.45, 11.6, scene), 1.04); for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(4.75 + i * 0.3, 1.03, 11.6); scene.add(b); }
+  ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), 5.2, 0.45, 11.6, scene), 1.04); const rackB = []; for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(4.75 + i * 0.3, 1.03, 11.6); scene.add(b); rackB.push(b); }
+  if (typeof saInit === 'function') saInit({ x: 8.2, z: 10.6, dz: -1 }, { x: 5.2, z: 11.6 }, rackB);      /* the shootaround (shootaround.js): grab a ball off the crate and shoot at Sharpie's hoop */
   // the old head, his bench, his crates
   ink(M(box(2.4, 0.12, 0.6), toon('#7a5a3a'), -8, 0.5, -3.2, scene), 1.05); M(box(0.12, 0.5, 0.5), toon('#20242c'), -9, 0.25, -3.2, scene); M(box(0.12, 0.5, 0.5), toon('#20242c'), -7, 0.25, -3.2, scene); solid(-9.4, -6.6, -3.7, -2.7);
   const ob = aiBuild(60, 'general'); ob.worn.hair = 'h_bald'; ob.worn.head = 'hd_band'; ob.worn.face = 'f_goggles'; addNpc(ob, -8, -3.12, 0.5, 'sit');
@@ -383,7 +388,7 @@ function goalStep(me) {
 }
 function worldStep(dt) {
   if (!W) return; W.t += dt; const me = W.me, I = IN[0], building = !!W.build, busy = uiBusy() || building;
-  let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my;
+  let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my; if (W.sa && W.sa.shot) { mx = 0; my = 0; }      /* planted for the shot */
   if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
@@ -404,8 +409,10 @@ function worldStep(dt) {
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
+  if (W.sa) saStep(dt, me, I, busy); else if (document.body.classList.contains('saBall')) document.body.classList.remove('saBall');
   const R = me.rig;
-  if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
+  if (W.sa && !me.sit && !(me.emote && v < 0.3) && saPose(R, me, dt, v)) { }
+  else if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
   else if (me.emote && v < 0.3) { const e = EMOTES[me.emote]; R.root.position.set(me.x, e.y || 0, me.z); R.root.rotation.y = me.face; applyPose(R, emotePose(e, R, W.t, S.moves.celeb), dt); R.gait = null; }
   else locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
@@ -470,4 +477,31 @@ function startPractice(kind) {
   uiClose(); document.body.dataset.state = 'match';
   startMatch({ mode: { n: kind === 'rack' ? 'MONEY RACK' : 'SHOOT AROUND', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: kind, court: kind === 'rack' ? 'street' : ['drive', 'black', 'show', 'wood'][fl], hoopTier: kind === 'rack' ? 1 : cribTier('hoop'), ball: S.worn.ball,
     teams: [[{ b: myBuild(), ctrl: 0, mine: true }], []], onEnd: res => afterPractice(res, back) });
+}
+
+// ---------------- the Block, dressed ----------------
+// the two alleys (open now: pavement running back, a gate, a dumpster, crates, a bulb, steam, a lit door at the end),
+// a curb along the shop fronts, and puddles that catch the neon
+function blockDress() {
+  for (const sd of [-1, 1]) {
+    const ax = x => sd * x, zc = -0.15;
+    M(box(12.5, 0.02, 1.5), toon('#121217'), ax(21.3), 0.012, zc, scene);
+    ink(M(box(0.2, 5.2, 1.6), toon('#3a2a24'), ax(26.9), 2.6, zc, scene), 1.02);
+    M(box(0.05, 2.0, 0.9), flat(0x2a1606), ax(26.78), 1.0, zc, scene); M(box(0.04, 0.12, 0.9), flat(0xffb347), ax(26.76), 2.05, zc, scene);      /* a back door, a strip of light over it */
+    glow(ax(26.3), 2.3, zc, 0xffa040, 2.2, null, 0.5);
+    for (const zz of [zc - 0.72, zc + 0.72]) ink(M(box(0.06, 2.3, 0.06), toon('#5a5f68'), ax(17.6), 1.15, zz, scene), 1.04);
+    ink(M(box(0.06, 0.06, 1.5), toon('#5a5f68'), ax(17.6), 2.3, zc, scene), 1.04);
+    const fence = M(box(0.02, 2.2, 1.44), flat(0xb8c0cc, { transparent: true, opacity: 0.22 }), ax(17.6), 1.12, zc, scene); fence.material.depthWrite = false;
+    ink(M(box(1.5, 1.0, 0.62), toon('#1f5a3a'), ax(20.2), 0.5, zc - 0.36, scene), 1.04); M(box(1.56, 0.08, 0.68), toon('#163f2a'), ax(20.2), 1.04, zc - 0.36, scene).rotation.x = sd * 0.0;
+    ink(M(box(0.55, 0.45, 0.5), toon('#7a5a3a'), ax(16.2), 0.23, zc + 0.4, scene), 1.04); ink(M(box(0.45, 0.4, 0.45), toon('#8a6a42'), ax(16.25), 0.66, zc + 0.38, scene), 1.04).rotation.y = 0.3;
+    M(cyl(0.006, 0.006, 0.9, 4), toon('#16181c'), ax(19), 3.75, zc, scene); M(sph(0.07, 8, 6), flat(0xffd890), ax(19), 3.28, zc, scene); glow(ax(19), 3.2, zc, 0xffc070, 2.6, null, 0.55);
+    emitter('steam', ax(22.5), 0.05, zc + 0.3, 2);
+  }
+  // the curb along the shop fronts, broken at the alleys
+  for (const sd of [-1, 1]) for (const [z0, z1] of [[-10.3, -0.9], [0.6, 11.0]]) M(box(0.42, 0.11, z1 - z0), toon('#4c4c55'), sd * 14.86, 0.055, (z0 + z1) / 2, scene);
+  // puddles under the signs: a soft patch of the sign's colour on the wet ground
+  const pud = (x, z, w, d, col) => { const t = geoTex('pud' + col, () => canvasTex(128, 128, (c, W_, H_) => { const g = c.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, col); g.addColorStop(0.55, col.replace(/[\d.]+\)$/, '0.35)')); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(64, 64, 62, 46, 0.3, 0, 6.3); c.fill(); }));
+    const m = M(geo('pudP', () => new THREE.PlaneGeometry(1, 1)), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.55 }), x, 0.018, z, scene); m.rotation.x = -Math.PI / 2; m.scale.set(w, d, 1); };
+  pud(12.6, -5.2, 3.2, 2.0, 'rgba(242,193,78,.55)'); pud(12.4, 4.4, 2.8, 1.8, 'rgba(255,45,120,.55)'); pud(-12.6, 4.2, 2.8, 1.9, 'rgba(125,227,255,.5)'); pud(-12.4, -4.6, 3.0, 2.0, 'rgba(61,255,160,.45)');
+  pud(-3.6, -9.6, 2.4, 1.4, 'rgba(236,233,226,.35)'); pud(4.4, 2.2, 2.2, 1.3, 'rgba(167,139,255,.35)'); pud(-6.2, 9.4, 2.0, 1.2, 'rgba(61,255,160,.4)');
 }

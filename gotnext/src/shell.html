@@ -46,7 +46,8 @@ body.touch .tbtn{display:flex}
 #tPK{--c:51,224,255;width:60px;height:60px;font-size:9.5px;right:calc(20px + var(--sar));bottom:calc(var(--tb) + 88px)}
 body:not([data-state=match]) #tLT,body:not([data-state=match]) #tPK{display:none!important}
 #tMenu{right:calc(10px + var(--sar));top:calc(8px + var(--sat));width:44px;height:44px;font-size:17px;border-radius:12px;box-shadow:0 0 0 3px rgba(8,8,10,.3),inset 0 0 10px rgba(236,233,226,.15)}#tMenu::after{display:none}
-body[data-state=world] #tB,body[data-state=title] .tbtn,body[data-state=create] .tbtn,body.busy .tbtn{display:none}
+body.touch.saBall[data-state=world]:not(.busy) #tB{display:flex}
+body[data-state=world]:not(.saBall) #tB,body[data-state=title] .tbtn,body[data-state=create] .tbtn,body.busy .tbtn{display:none}
 .hintL,.hintR{position:absolute;bottom:calc(16px + var(--sab));font:500 10px var(--m);letter-spacing:.14em;color:rgba(236,233,226,.4);display:none;pointer-events:none}
 .hintL{left:calc(24px + var(--sal))}.hintR{right:calc(24px + var(--sar));text-align:right}
 body.touch:not(.busy)[data-state=match] .hintL,body.touch:not(.busy)[data-state=match] .hintR,body.touch:not(.busy)[data-state=world] .hintL,body.touch:not(.busy)[data-state=world] .hintR{display:block}
@@ -241,6 +242,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 /*@include music.js*/
 /*@include ambient.js*/
 /*@include hub.js*/
+/*@include shootaround.js*/
 /*@include park.js*/
 /*@include cast.js*/
 /*@include vice.js*/

@@ -46,7 +46,8 @@ body.touch .tbtn{display:flex}
 #tPK{--c:51,224,255;width:60px;height:60px;font-size:9.5px;right:calc(20px + var(--sar));bottom:calc(var(--tb) + 88px)}
 body:not([data-state=match]) #tLT,body:not([data-state=match]) #tPK{display:none!important}
 #tMenu{right:calc(10px + var(--sar));top:calc(8px + var(--sat));width:44px;height:44px;font-size:17px;border-radius:12px;box-shadow:0 0 0 3px rgba(8,8,10,.3),inset 0 0 10px rgba(236,233,226,.15)}#tMenu::after{display:none}
-body[data-state=world] #tB,body[data-state=title] .tbtn,body[data-state=create] .tbtn,body.busy .tbtn{display:none}
+body.touch.saBall[data-state=world]:not(.busy) #tB{display:flex}
+body[data-state=world]:not(.saBall) #tB,body[data-state=title] .tbtn,body[data-state=create] .tbtn,body.busy .tbtn{display:none}
 .hintL,.hintR{position:absolute;bottom:calc(16px + var(--sab));font:500 10px var(--m);letter-spacing:.14em;color:rgba(236,233,226,.4);display:none;pointer-events:none}
 .hintL{left:calc(24px + var(--sal))}.hintR{right:calc(24px + var(--sar));text-align:right}
 body.touch:not(.busy)[data-state=match] .hintL,body.touch:not(.busy)[data-state=match] .hintR,body.touch:not(.busy)[data-state=world] .hintL,body.touch:not(.busy)[data-state=world] .hintR{display:block}
@@ -4926,6 +4927,10 @@ function buildHub() {
     // the key and arc run out of the cage gate, like the court spilled onto the block
     x.fillStyle = 'rgba(255,45,120,.5)'; x.fillRect(X(-2.45), Z(-12), 4.9 * u, 6.2 * u);
     x.strokeStyle = '#ece9e2'; x.lineWidth = 6; x.strokeRect(X(-2.45), Z(-12), 4.9 * u, 6.2 * u); x.beginPath(); x.arc(X(0), Z(-5.8), 1.8 * u, 0, 6.3); x.stroke(); x.beginPath(); x.arc(X(0), Z(-12), 9 * u, 0.12, Math.PI - 0.12); x.stroke();
+    // the shootaround's corner under Sharpie's hoop: a short lane, a free-throw circle, the word on the ground
+    x.fillStyle = 'rgba(125,227,255,.14)'; x.fillRect(X(6.37), Z(6.0), 3.66 * u, 5.2 * u); x.strokeStyle = 'rgba(236,233,226,.78)'; x.lineWidth = 5; x.strokeRect(X(6.37), Z(6.0), 3.66 * u, 5.2 * u);
+    x.beginPath(); x.arc(X(8.2), Z(6.0), 1.8 * u, Math.PI, Math.PI * 2); x.stroke(); x.setLineDash([14, 12]); x.beginPath(); x.arc(X(8.2), Z(6.0), 1.8 * u, 0, Math.PI); x.stroke(); x.setLineDash([]);
+    x.save(); x.translate(X(8.2), Z(3.7)); x.textAlign = 'center'; x.font = '900 30px Archivo, Impact, sans-serif'; x.fillStyle = 'rgba(125,227,255,.7)'; x.fillText('SHOOTAROUND', 0, 0); x.restore();
     x.save(); x.translate(X(0), Z(6.4)); x.transform(1, 0, -0.14, 1, 0, 0); x.textAlign = 'center'; x.font = '900 expanded 84px Archivo, Impact, sans-serif'; x.fillStyle = 'rgba(236,233,226,.8)'; x.fillText(BRAND.a, -14, -6); x.fillStyle = 'rgba(255,45,120,.85)'; x.fillText(BRAND.b, 20, 68); x.restore();
     x.fillStyle = 'rgba(236,233,226,.75)'; for (let i = 0; i < 12; i++) x.fillRect(X(-9 + i * 1.6), Z(11.2), 0.8 * u, 2.2 * u);
     x.font = '500 22px "JetBrains Mono", monospace'; x.fillStyle = 'rgba(242,193,78,.8)'; x.save(); x.translate(X(-9), Z(-1)); x.rotate(-0.3); x.fillText('WINNERS STAY →', 0, 0); x.restore(); x.save(); x.translate(X(6), Z(-2.5)); x.rotate(0.2); x.fillText('NO REFS. NO MERCY.', 0, 0); x.restore();
@@ -4985,8 +4990,8 @@ function buildHub() {
   M(box(2.6, 0.04, 3.4), flat(0x050506), -6.4, 0.03, 10.2, scene); for (const [rx, rz, rw, rd] of [[-7.75, 10.2, 0.1, 3.4], [-5.05, 10.2, 0.1, 3.4], [-6.4, 11.9, 2.8, 0.1]]) ink(M(box(rw, 1.0, rd), toon('#3dffa0'), rx, 0.5, rz, scene), 1.06); solid(-7.85, -4.95, 8.45, 12.0);      /* the subway stairwell rail is solid (legs sank into it: the bot called it the green dumpster) */ for (let i = 0; i < 5; i++) M(box(2.5, 0.05, 0.3), toon('#3a3c44'), -6.4, -0.02 - i * 0.02, 9.0 + i * 0.5, scene);
   fadeable(M(cyl(0.06, 0.06, 3.2, 6), toon('#1c1d22'), -7.75, 1.6, 8.5, scene), -7.75, 8.5); const sb = sign('UPTOWN LINE', 2.4, 0.5, '#3dffa0', '#0a0a0e'); sb.position.set(-6.6, 3.0, 8.5); scene.add(sb); for (let i = 0; i < 5; i++) M(box(0.06, 1.4, 0.06), toon('#6a707c'), -7.4 + i * 0.5, 0.7, 8.55, scene); M(box(2.4, 0.06, 0.06), toon('#6a707c'), -6.4, 0.9, 8.55, scene); solid(-8, -4.8, 8.4, 12.2);
   spot(-6.4, 7.6, 1.8, 'UPTOWN LINE', () => uiDialog('UPTOWN LINE', 'Gate is chained. A sticker on it says: MORE CITY SOON. Somebody wrote "that\'s what they said in 2139" under it.', [['Aight.', null]]));
-  mural('NO\nREFS', 5.4, 3.4, ['#2a1408', '#ff6a3d', '#f2c14e', '#fff3b0', '#ffffff'], -15.42, 2.4, -0.4, Math.PI / 2);
-  mural('KINGS\nSTAY', 5.4, 3.0, ['#081a2a', '#7de3ff', '#a78bff', '#ffffff', '#08080a'], 15.42, 2.3, 0.2, -Math.PI / 2);
+  // (the NO REFS and KINGS STAY murals that hung across the two alleys are gone: the alleys are open)
+  blockDress();
   for (let i = 0; i < 2; i++) { poster(scene, -15.42, 2.1, -10.9 + i * 1.55, Math.PI / 2, i % 2); poster(scene, 15.42, 2.1, 10.2 + i * 1.55 * -1, -Math.PI / 2, (i + 1) % 2); poster(scene, -15.42, 2.1, 10.9 - i * 1.55, Math.PI / 2, (i + 1) % 2); }
   // centrepiece: the Freedom Eagle, gold, mid-dunk
   ink(M(cyl(1.3, 1.6, 0.9, 8), toon('#3a3c44'), 0, 0.45, 1.6, scene), 1.03); W.rounds = [[0, 1.6, 1.72]];      /* round, so you slide around it (the square box stopped you dead on the walk to the Cages) */
@@ -4997,7 +5002,8 @@ function buildHub() {
   // Money Rack: a side hoop and a man with a marker
   const h2 = hoopMesh(1, 'street'); h2.position.set(8.2, 0, 10.6); h2.rotation.y = Math.PI; scene.add(h2); solid(7.6, 8.8, 11.6, 12.4);
   const hb = aiBuild(75, 'sniper'); hb.name = 'Sharpie'; addNpc(hb, 6.3, 9.6, 2.4, 'idle'); spot(7.2, 8.4, 2.0, 'SHARPIE (Money Rack · H-O-R-S-E)', () => uiRack());
-  ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), 5.2, 0.45, 11.6, scene), 1.04); for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(4.75 + i * 0.3, 1.03, 11.6); scene.add(b); }
+  ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), 5.2, 0.45, 11.6, scene), 1.04); const rackB = []; for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(4.75 + i * 0.3, 1.03, 11.6); scene.add(b); rackB.push(b); }
+  if (typeof saInit === 'function') saInit({ x: 8.2, z: 10.6, dz: -1 }, { x: 5.2, z: 11.6 }, rackB);      /* the shootaround (shootaround.js): grab a ball off the crate and shoot at Sharpie's hoop */
   // the old head, his bench, his crates
   ink(M(box(2.4, 0.12, 0.6), toon('#7a5a3a'), -8, 0.5, -3.2, scene), 1.05); M(box(0.12, 0.5, 0.5), toon('#20242c'), -9, 0.25, -3.2, scene); M(box(0.12, 0.5, 0.5), toon('#20242c'), -7, 0.25, -3.2, scene); solid(-9.4, -6.6, -3.7, -2.7);
   const ob = aiBuild(60, 'general'); ob.worn.hair = 'h_bald'; ob.worn.head = 'hd_band'; ob.worn.face = 'f_goggles'; addNpc(ob, -8, -3.12, 0.5, 'sit');
@@ -5141,7 +5147,7 @@ function goalStep(me) {
 }
 function worldStep(dt) {
   if (!W) return; W.t += dt; const me = W.me, I = IN[0], building = !!W.build, busy = uiBusy() || building;
-  let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my;
+  let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my; if (W.sa && W.sa.shot) { mx = 0; my = 0; }      /* planted for the shot */
   if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
@@ -5162,8 +5168,10 @@ function worldStep(dt) {
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
+  if (W.sa) saStep(dt, me, I, busy); else if (document.body.classList.contains('saBall')) document.body.classList.remove('saBall');
   const R = me.rig;
-  if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
+  if (W.sa && !me.sit && !(me.emote && v < 0.3) && saPose(R, me, dt, v)) { }
+  else if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
   else if (me.emote && v < 0.3) { const e = EMOTES[me.emote]; R.root.position.set(me.x, e.y || 0, me.z); R.root.rotation.y = me.face; applyPose(R, emotePose(e, R, W.t, S.moves.celeb), dt); R.gait = null; }
   else locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
@@ -5229,6 +5237,153 @@ function startPractice(kind) {
   startMatch({ mode: { n: kind === 'rack' ? 'MONEY RACK' : 'SHOOT AROUND', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: kind, court: kind === 'rack' ? 'street' : ['drive', 'black', 'show', 'wood'][fl], hoopTier: kind === 'rack' ? 1 : cribTier('hoop'), ball: S.worn.ball,
     teams: [[{ b: myBuild(), ctrl: 0, mine: true }], []], onEnd: res => afterPractice(res, back) });
 }
+
+// ---------------- the Block, dressed ----------------
+// the two alleys (open now: pavement running back, a gate, a dumpster, crates, a bulb, steam, a lit door at the end),
+// a curb along the shop fronts, and puddles that catch the neon
+function blockDress() {
+  for (const sd of [-1, 1]) {
+    const ax = x => sd * x, zc = -0.15;
+    M(box(12.5, 0.02, 1.5), toon('#121217'), ax(21.3), 0.012, zc, scene);
+    ink(M(box(0.2, 5.2, 1.6), toon('#3a2a24'), ax(26.9), 2.6, zc, scene), 1.02);
+    M(box(0.05, 2.0, 0.9), flat(0x2a1606), ax(26.78), 1.0, zc, scene); M(box(0.04, 0.12, 0.9), flat(0xffb347), ax(26.76), 2.05, zc, scene);      /* a back door, a strip of light over it */
+    glow(ax(26.3), 2.3, zc, 0xffa040, 2.2, null, 0.5);
+    for (const zz of [zc - 0.72, zc + 0.72]) ink(M(box(0.06, 2.3, 0.06), toon('#5a5f68'), ax(17.6), 1.15, zz, scene), 1.04);
+    ink(M(box(0.06, 0.06, 1.5), toon('#5a5f68'), ax(17.6), 2.3, zc, scene), 1.04);
+    const fence = M(box(0.02, 2.2, 1.44), flat(0xb8c0cc, { transparent: true, opacity: 0.22 }), ax(17.6), 1.12, zc, scene); fence.material.depthWrite = false;
+    ink(M(box(1.5, 1.0, 0.62), toon('#1f5a3a'), ax(20.2), 0.5, zc - 0.36, scene), 1.04); M(box(1.56, 0.08, 0.68), toon('#163f2a'), ax(20.2), 1.04, zc - 0.36, scene).rotation.x = sd * 0.0;
+    ink(M(box(0.55, 0.45, 0.5), toon('#7a5a3a'), ax(16.2), 0.23, zc + 0.4, scene), 1.04); ink(M(box(0.45, 0.4, 0.45), toon('#8a6a42'), ax(16.25), 0.66, zc + 0.38, scene), 1.04).rotation.y = 0.3;
+    M(cyl(0.006, 0.006, 0.9, 4), toon('#16181c'), ax(19), 3.75, zc, scene); M(sph(0.07, 8, 6), flat(0xffd890), ax(19), 3.28, zc, scene); glow(ax(19), 3.2, zc, 0xffc070, 2.6, null, 0.55);
+    emitter('steam', ax(22.5), 0.05, zc + 0.3, 2);
+  }
+  // the curb along the shop fronts, broken at the alleys
+  for (const sd of [-1, 1]) for (const [z0, z1] of [[-10.3, -0.9], [0.6, 11.0]]) M(box(0.42, 0.11, z1 - z0), toon('#4c4c55'), sd * 14.86, 0.055, (z0 + z1) / 2, scene);
+  // puddles under the signs: a soft patch of the sign's colour on the wet ground
+  const pud = (x, z, w, d, col) => { const t = geoTex('pud' + col, () => canvasTex(128, 128, (c, W_, H_) => { const g = c.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, col); g.addColorStop(0.55, col.replace(/[\d.]+\)$/, '0.35)')); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(64, 64, 62, 46, 0.3, 0, 6.3); c.fill(); }));
+    const m = M(geo('pudP', () => new THREE.PlaneGeometry(1, 1)), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.55 }), x, 0.018, z, scene); m.rotation.x = -Math.PI / 2; m.scale.set(w, d, 1); };
+  pud(12.6, -5.2, 3.2, 2.0, 'rgba(242,193,78,.55)'); pud(12.4, 4.4, 2.8, 1.8, 'rgba(255,45,120,.55)'); pud(-12.6, 4.2, 2.8, 1.9, 'rgba(125,227,255,.5)'); pud(-12.4, -4.6, 3.0, 2.0, 'rgba(61,255,160,.45)');
+  pud(-3.6, -9.6, 2.4, 1.4, 'rgba(236,233,226,.35)'); pud(4.4, 2.2, 2.2, 1.3, 'rgba(167,139,255,.35)'); pud(-6.2, 9.4, 2.0, 1.2, 'rgba(61,255,160,.4)');
+}
+// GOT NEXT — the shootaround: Sharpie's hoop by the tracks, a crate of balls, and nobody keeping score.
+// Grab a ball off the crate (E / A / tap the prompt), dribble anywhere, hold SHOOT and let go at the top of your jump.
+// Close to the rim it is a layup. Makes drop through the net; misses come off the rim and the board and roll, and you go
+// get them. Friends on the Block see you dribbling and see every shot you take (each of you shoots your own balls: the
+// shot is sent once, and the same flight plays on their screen).
+'use strict';
+const SA_R = 0.12, SA_RIM = 0.23, SA_G = 9.8;
+// hoop: where the rim's centre is (x, z), and which way the hoop faces (dz: -1 = it faces -z); crate: the balls' rack
+function saInit(hoop, crate, balls) {
+  const sa = W.sa = { rim: { x: hoop.x, y: 3.05, z: hoop.z }, board: hoop.z - hoop.dz * 0.38, dz: hoop.dz, crate, balls: [], held: null, shot: null, made: 0, att: 0, streak: 0, ghosts: [], pubI: 0 };
+  for (const m of balls) sa.balls.push({ m, x: m.position.x, y: m.position.y, z: m.position.z, vx: 0, vy: 0, vz: 0, st: 'rack', hx: m.position.x, hy: m.position.y, hz: m.position.z });
+  W.spots.push({ x: crate.x, z: crate.z - 0.9, r: 1.5, label: 'SHOOTAROUND · grab a ball', fn: saGrab, sa: true });
+}
+function saGrab() {
+  const sa = W.sa; if (!sa) return;
+  if (sa.held) { const b = sa.held; sa.held = null; b.st = 'rack'; b.x = b.hx; b.y = b.hy; b.z = b.hz; b.vx = b.vy = b.vz = 0; document.body.classList.remove('saBall'); sfx('ui'); return; }      /* back on the crate */
+  const b = sa.balls.find(q => q.st === 'rack'); if (!b) { toast('CRATE IS EMPTY', 'Go get one off the ground.'); return; }
+  saHold(b);
+}
+function saHold(b) { const sa = W.sa; b.st = 'held'; sa.held = b; document.body.classList.add('saBall'); sfx('bounce'); if (!sa.told) { sa.told = true; toast('SHOOTAROUND', (typeof I_PAD === 'function' && I_PAD() ? 'Hold Ⓧ' : document.body.classList.contains('touch') ? 'Hold SHOOT' : 'Hold SPACE') + ', let go at the top of your jump. Close in, it is a layup.'); } }
+// the player's shot: called every frame from worldStep (after the move, before the pose)
+function saStep(dt, me, I, busy) {
+  const sa = W.sa; if (!sa) return;
+  const b = sa.held, R = me.rig;
+  // pick a loose ball up by walking onto it
+  if (!b && !sa.shot) for (const q of sa.balls) if (q.st === 'loose' && q.y < 1.0 && Math.hypot(q.x - me.x, q.z - me.z) < 0.65) { saHold(q); break; }
+  if (b && !sa.shot && !busy && I.bP) {      // start the shot: face the rim, plant
+    const d = Math.hypot(sa.rim.x - me.x, sa.rim.z - me.z), lay = d < 2.1;
+    sa.shot = { t: 0, lay, d, rel: lay ? 0.42 : 0.58 + 0.04 * Math.min(1, d / 7), done: false, x0: me.x, z0: me.z, dir: Math.atan2(sa.rim.x - me.x, sa.rim.z - me.z) };
+    if (lay) { const k = Math.max(0, d - 0.9) / Math.max(d, 0.01); sa.shot.lx = (sa.rim.x - me.x) * k; sa.shot.lz = (sa.rim.z - me.z) * k; }      /* the layup carries him in toward the rim */
+  }
+  const s = sa.shot;
+  if (s) { s.t += dt; me.vx = me.vz = 0; me.face = lerpAng(me.face, s.dir, 1 - Math.exp(-14 * dt));
+    if (s.lay && s.t < s.rel) { const k = dt / s.rel; me.x += s.lx * k; me.z += s.lz * k; }
+    if (!s.done && (s.lay ? s.t >= s.rel : (!I.b || s.t > s.rel + 0.32))) { s.done = true; saRelease(me, s); }
+    if (s.t > s.rel + 0.55) sa.shot = null; }
+  // where the ball is while you have it: dribbling at your side, or in your hands for the shot
+  if (b && b.st === 'held') {
+    if (s) { const hp = handPos(R, 'R', new THREE.Vector3()), hl = handPos(R, 'L', new THREE.Vector3()); b.x = (hp.x + hl.x) / 2; b.y = (hp.y + hl.y) / 2 + 0.08; b.z = (hp.z + hl.z) / 2; }
+    else { const hgt = Math.abs(Math.sin(W.t * 7.5)), sf = Math.sin(me.face), cf = Math.cos(me.face); b.x = me.x + sf * 0.3 - cf * 0.27; b.y = 0.125 + hgt * 0.75; b.z = me.z + cf * 0.3 + sf * 0.27; if (hgt < 0.08 && !sa.bt) { sa.bt = 1; } else if (hgt > 0.3) sa.bt = 0; }
+  }
+  saPhysics(dt);
+  // the prompt: your count while you are on it
+  const sp = W.spots.find(x => x.sa); if (sp) sp.label = sa.held ? 'PUT IT BACK' : sa.att ? `SHOOTAROUND ${sa.made}/${sa.att} · grab a ball` : 'SHOOTAROUND · grab a ball';
+}
+// let it go: how good the release was, the shooter's touch from there, and a flight that goes in or does not
+function saRelease(me, s) {
+  const sa = W.sa, b = sa.held; if (!b) return; sa.held = null; document.body.classList.remove('saBall');
+  const d = Math.hypot(sa.rim.x - b.x, sa.rim.z - b.z), A = S.attrs || {}, att = s.lay ? (A.layup || 60) : d < 6.75 ? (A.mid || 60) : (A.three || 60), sk = clamp((att - 25) / 74, 0, 1.1);
+  const off = s.lay ? 0 : Math.abs(s.t - s.rel), green = !s.lay && off < 0.035 + 0.015 * sk, q = s.lay ? 1 : clamp(1 - off / 0.2, 0, 1);
+  const base = s.lay ? 0.86 : d < 4.5 ? 0.6 : d < 6.75 ? 0.5 : d < 8.5 ? 0.42 : 0.14;
+  const make = green && d < 9 ? true : Math.random() < base * (0.7 + 0.5 * sk) * (0.35 + 0.65 * q);
+  // aim: the middle of the rim for a make, a spot on the iron for a miss (short, long or off the side)
+  let tx = sa.rim.x, tz = sa.rim.z; if (!make) { const a = Math.random() * Math.PI * 2, r = rnd(0.2, 0.34); tx += Math.cos(a) * r; tz += Math.sin(a) * r; }
+  const ty = sa.rim.y + (make ? 0.02 : 0.05), T = s.lay ? 0.55 : clamp(0.78 + d * 0.085, 0.85, 1.45);
+  const L = { x: b.x, y: b.y, z: b.z, vx: (tx - b.x) / T, vy: (ty - b.y + 0.5 * SA_G * T * T) / T, vz: (tz - b.z) / T };
+  saLaunch(b, L); sa.att++; sa.pubI++; sa.pub = Object.assign({ i: sa.pubI }, roundL(L));
+  sfx(green ? 'green' : 'whoosh'); if (green) bubble(me.rig.root, 'GREEN', 1.6, me.rig.H + 0.4);
+}
+function roundL(L) { const o = {}; for (const k in L) o[k] = Math.round(L[k] * 1000) / 1000; return o; }
+function saLaunch(b, L) { b.st = 'air'; b.x = L.x; b.y = L.y; b.z = L.z; b.vx = L.vx; b.vy = L.vy; b.vz = L.vz; b.scored = false; b.counted = false; b.t = 0; }
+// the flight, the rim, the board, the net, the ground. Fixed small steps, so a friend's copy of a shot flies the same way.
+function saPhysics(dt) {
+  const sa = W.sa; sa.acc = (sa.acc || 0) + Math.min(dt, 0.1);
+  while (sa.acc >= 1 / 120) { sa.acc -= 1 / 120; for (const b of sa.balls.concat(sa.ghosts)) if (b.st === 'air' || b.st === 'loose') saBallStep(b, 1 / 120); }
+  for (const b of sa.balls) b.m.position.set(b.x, b.y, b.z);
+  for (let i = sa.ghosts.length - 1; i >= 0; i--) { const g = sa.ghosts[i]; g.m.position.set(g.x, g.y, g.z); g.life -= dt; if (g.life <= 0) { scene.remove(g.m); sa.ghosts.splice(i, 1); } }
+}
+function saBallStep(b, h) {
+  const sa = W.sa, rim = sa.rim; b.t = (b.t || 0) + h;
+  b.vy -= SA_G * h; b.x += b.vx * h; b.y += b.vy * h; b.z += b.vz * h;
+  // the rim: a ring of radius SA_RIM; the ball bounces off the nearest point of the iron
+  const dx = b.x - rim.x, dz = b.z - rim.z, rh = Math.hypot(dx, dz) || 1e-4, cx = rim.x + dx / rh * SA_RIM, cz = rim.z + dz / rh * SA_RIM;
+  const nx = b.x - cx, ny = b.y - rim.y, nz = b.z - cz, nd = Math.hypot(nx, ny, nz);
+  if (nd < SA_R + 0.01 && nd > 1e-4) { const ux = nx / nd, uy = ny / nd, uz = nz / nd, vn = b.vx * ux + b.vy * uy + b.vz * uz;
+    if (vn < 0) { b.vx -= 1.55 * vn * ux; b.vy -= 1.55 * vn * uy; b.vz -= 1.55 * vn * uz; b.vx *= 0.9; b.vz *= 0.9; sfx('rim'); }
+    const push = SA_R + 0.01 - nd; b.x += ux * push; b.y += uy * push; b.z += uz * push; }
+  // the board: a plane behind the rim
+  const bz = sa.board, toward = sa.dz;      /* the side of the board the shooter is on */
+  if (Math.abs(b.x - rim.x) < 0.9 && b.y > 2.9 && b.y < 3.95 && (b.z - bz) * toward < SA_R && (b.z - bz) * toward > -0.3) { const vIn = b.vz * toward; if (vIn < 0) { b.vz = -b.vz * 0.6; sfx('thud'); } b.z = bz + toward * SA_R; }
+  // through the net: crosses the rim's height going down, inside the ring
+  if (!b.scored && b.vy < 0 && b.y < rim.y && b.y > rim.y - 0.25 && rh < SA_RIM - SA_R * 0.55 && b.prevY >= rim.y) { b.scored = true; b.vx *= 0.2; b.vz *= 0.2; b.vy = Math.min(b.vy, -2.4); saMade(b); }
+  if (b.scored && b.y > rim.y - 0.5 && b.y < rim.y) { b.vx *= 0.9; b.vz *= 0.9; b.x += (rim.x - b.x) * 0.08; b.z += (rim.z - b.z) * 0.08; }      /* the net holds it */
+  b.prevY = b.y;
+  // the ground, and the edges of the Block
+  if (b.y < SA_R) { b.y = SA_R; if (b.vy < -0.8) sfx('bounce'); b.vy = -b.vy * 0.62; b.vx *= 0.86; b.vz *= 0.86; if (Math.abs(b.vy) < 0.5) { b.vy = 0; b.vx *= 0.985; b.vz *= 0.985; } b.st = b.ghost ? b.st : 'loose'; }
+  const B = W.bounds; if (b.x < B[0] || b.x > B[1]) { b.x = clamp(b.x, B[0], B[1]); b.vx = -b.vx * 0.5; } if (b.z < B[2] || b.z > B[3]) { b.z = clamp(b.z, B[2], B[3]); b.vz = -b.vz * 0.5; }
+  for (const s of W.solids) if (b.y < 1.2 && b.x > s[0] && b.x < s[1] && b.z > s[2] && b.z < s[3]) { const px = Math.min(b.x - s[0], s[1] - b.x), pz = Math.min(b.z - s[2], s[3] - b.z); if (px < pz) { b.x = b.x - s[0] < s[1] - b.x ? s[0] : s[1]; b.vx = -b.vx * 0.5; } else { b.z = b.z - s[2] < s[3] - b.z ? s[2] : s[3]; b.vz = -b.vz * 0.5; } }
+  if (b.st === 'loose' && Math.hypot(b.vx, b.vz) < 0.05 && b.y <= SA_R + 0.001) { b.vx = b.vz = 0; }
+}
+function saMade(b) {
+  const sa = W.sa; sfx(Math.random() < 0.5 ? 'swish' : 'net2'); if (b.ghost) return;
+  sa.made++; sa.streak++;
+  const me = W.me, t = sa.streak >= 10 ? 'ON FIRE · ' + sa.streak + ' STRAIGHT' : sa.streak >= 3 ? sa.streak + ' IN A ROW' : pick(['BUCKET', 'COOKIES', 'WET', 'CASH']);
+  bubble(me.rig.root, t, 1.8, me.rig.H + 0.4);
+}
+// a miss breaks the streak once the ball is on the ground without having gone in
+function saStreakCheck() { const sa = W.sa; if (!sa) return; for (const b of sa.balls) if (b.st === 'loose' && !b.scored && !b.counted && b.t > 0.3) { b.counted = true; sa.streak = 0; } else if (b.st === 'loose' && b.scored) b.counted = true; }
+// the pose: dribbling while you have it, the jumper or the layup while you shoot. Returns true when it posed the rig.
+function saPose(R, me, dt, v) {
+  const sa = W.sa; if (!sa) return false; saStreakCheck();
+  if (sa.shot) { const s = sa.shot, u = clamp(s.t / s.rel, 0, 1.6), jumpH = s.lay ? 0.45 : 0.28 + 0.1 * clamp(((S.attrs || {}).vert || 60) / 99, 0, 1), y = jumpH * Math.max(0, Math.sin(Math.PI * clamp((s.t - s.rel * 0.35) / (s.rel * 1.25), 0, 1)));
+    R.root.position.set(me.x, y, me.z); R.root.rotation.y = me.face; applyPose(R, s.lay ? poseOf('layup', s.t, { u: clamp(s.t / (s.rel + 0.3), 0, 1), leg: R.legLen }) : poseOf('shoot', s.t, { rel: s.rel, prof: R.prof, n: 0 }), dt); R.gait = null; return true; }
+  if (sa.held) { R.root.position.set(me.x, 0, me.z); R.root.rotation.y = me.face; applyPose(R, poseOf('dribble', W.t, { ph: me.ph, leg: R.legLen, sp: v, dr: Math.abs(Math.sin(W.t * 7.5)) }), dt); R.gait = null; return true; }
+  return false;
+}
+// friends: what you send (holding a ball, your last shot), and what you see of theirs
+function saPresence(patch, P) {
+  const sa = W && W.sa, hb = sa && sa.held ? 1 : 0; if (hb !== (P.sahb | 0)) { P.sahb = hb; patch.sahb = hb; }
+  if (sa && sa.pub && (!P.sas || P.sas.i !== sa.pub.i)) { P.sas = sa.pub; patch.sas = sa.pub; }
+}
+function saPeer(g, pr, dt) {
+  const sa = W.sa; if (!sa) return false;
+  if (pr.sas && typeof pr.sas.i === 'number' && pr.sas.i !== g.sasI) { const first = g.sasI === undefined; g.sasI = pr.sas.i; if (!first) { const L = pr.sas; if ([L.x, L.y, L.z, L.vx, L.vy, L.vz].every(Number.isFinite)) { const m = makeBall('bl_std'); scene.add(m); const gb = { m, ghost: true, life: 6, st: 'air' }; saLaunch(gb, L); gb.st = 'air'; gb.ghost = true; sa.ghosts.push(gb); g.shootT = 0.75; } } }
+  if (pr.sahb && !g.ball) { g.ball = makeBall('bl_std'); scene.add(g.ball); } else if (!pr.sahb && g.ball) { scene.remove(g.ball); g.ball = null; }
+  if (g.shootT > 0) { g.shootT -= dt; g.rig.root.position.set(g.x, 0.25 * Math.sin(Math.PI * clamp(1 - g.shootT / 0.75, 0, 1)), g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, poseOf('shoot', 0.75 - g.shootT, { rel: 0.5, prof: g.rig.prof, n: 0 }), dt); g.rig.gait = null; return true; }
+  if (g.ball) { const hgt = Math.abs(Math.sin(W.t * 7.5 + 1)), sf = Math.sin(g.f), cf = Math.cos(g.f); g.ball.position.set(g.x + sf * 0.3 - cf * 0.27, 0.125 + hgt * 0.75, g.z + cf * 0.3 + sf * 0.27); g.rig.root.position.set(g.x, 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, poseOf('dribble', W.t, { ph: g.ph, leg: g.rig.legLen, sp: 0, dr: hgt }), dt); g.rig.gait = null; return true; }
+  return false;
+}
+function saPeerGone(g) { if (g.ball) { scene.remove(g.ball); g.ball = null; } }
 // GOT NEXT — the run inside the cage on the Block: four hoopers actually playing 2v2, with a ball, passes, drives,
 // jumpers, rebounds and possessions, and people on the bleachers reacting. Lightweight and scripted (not the match
 // engine), so it costs little to draw behind you while you walk around.
@@ -7423,6 +7578,7 @@ function netPublish(force) {
   const bj = JSON.stringify(packBuild(myBuild())); if (bj !== P.bj) { P.bj = bj; patch.b = JSON.parse(bj); patch.o = ovrOf(S.attrs); patch.r = rankOf(S.rep); }
   if (w !== P.w) { P.w = w; patch.w = w; }
   if (me && (Math.abs(me.x - (P.x || 0)) > 0.04 || Math.abs(me.z - (P.z || 0)) > 0.04 || Math.abs(me.face - (P.f || 0)) > 0.05)) { P.x = me.x; P.z = me.z; P.f = me.face; patch.x = r2(me.x); patch.z = r2(me.z); patch.f = r2(me.face); }
+  if (W && typeof saPresence === 'function') saPresence(patch, P);      /* the shootaround: holding a ball, your last shot */
   if (Object.keys(patch).length) { NET.pubT = now; NET.room.presence(patch).catch(() => { }); }
 }
 function netInvite(peer, m, tierIdx, kind) {
@@ -7453,11 +7609,12 @@ function netWorldStep(dt) {
     g.x += (tx - g.x) * k; g.z += (tz - g.z) * k; g.f = lerpAng(g.f, +pr.f || 0, k);
     const v = Math.hypot(g.x - ox, g.z - oz) / Math.max(dt, 0.001); g.ph += dt * (4 + v * 1.6);
     const em = typeof pr.em === 'string' && EMOTES[pr.em] ? EMOTES[pr.em] : null;
-    if (em && v < 0.3) { g.rig.root.position.set(g.x, em.y || 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, emotePose(em, g.rig, W.t, 'flex'), dt); g.rig.gait = null; }
+    if (typeof saPeer === 'function' && saPeer(g, pr, dt)) { }
+    else if (em && v < 0.3) { g.rig.root.position.set(g.x, em.y || 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, emotePose(em, g.rig, W.t, 'flex'), dt); g.rig.gait = null; }
     else locoAnim(g.rig, g.x, g.z, g.f, dt);
     if (pr.say && typeof pr.say.t === 'string' && pr.say.i !== g.sayI) { bubble(g.rig.root, pr.say.t.replace(/[<>]/g, '').slice(0, 60), 5, g.rig.H + 0.45, 'net'); g.sayI = pr.say.i; }
   }
-  for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); delete rigs[k]; }
+  for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); if (typeof saPeerGone === 'function') saPeerGone(rigs[k]); delete rigs[k]; }
   // hanging out at a crib with someone online for a minute: +15 Respect once a day, for each of you
   if ((W.kind === 'crib' || W.kind === 'room') && Object.keys(seen).length) { W.hangT = (W.hangT || 0) + dt; const H = home(); if (W.hangT >= 60 && H.hang !== today) { H.hang = today; gainRep(15); save(); toast('HUNG OUT', '+15 Respect. Good company counts.', 'ach'); } }
 }
