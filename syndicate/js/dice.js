@@ -7,7 +7,7 @@
   const NAME = 'Sir Dedrick III', C = { x: 30.9, z: 6.2 }, DS = 0.27, TOP = 1.09, MAN = [0.95, 0];      // C is the booth; the felt runs along z at x 0.2
   const d6 = () => 1 + Math.floor(Math.random() * 6), pick = a => a[Math.floor(Math.random() * a.length)];
   const D = G.dice = { on: false };
-  const LOOK = { cls: 'cleric', race: 'human', tint: { cloth: '#26204a', armor: '#3a3060', armor2: '#1c1830', trim: '#f0c95a', hair: '#d8d4cc', legs: '#1c1830' }, cos: { head: 'widehat', back: 'greatcloak' }, scale: 0.98 };
+  const LOOK = { id: 'dedrick', cls: 'cleric', race: 'human', tint: { cloth: '#26204a', armor: '#3a3060', armor2: '#1c1830', trim: '#f0c95a', hair: '#d8d4cc', legs: '#1c1830' }, cos: { head: 'widehat', back: 'greatcloak' }, scale: 0.98 };
   const LINES = {
     hello: ['Sir Dedrick the Third, at your service and at your expense. Choose a game.', 'Ah. Another brave purse. Sit, sit. Well. Stand. There are no chairs.', 'The dice are honest. I am merely charming. Pick your game.'],
     bust: ['Over. Dreadful luck. I shall treasure it.', 'Bust! My grandfather would have wept. With joy.', 'Too many. The light giveth and so on.'],

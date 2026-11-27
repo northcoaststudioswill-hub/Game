@@ -1,6 +1,7 @@
 // Guttercrown — the Knuckle Table: arm-wrestling on Tallow Row, for coin, between bouts.
 (function () {
   'use strict';
+  window.G.LOOKDEF = window.G.LOOKDEF || {}; window.G.LOOKDEF['knuckle-fighter'] = { id: 'knuckle-fighter', cls: 'fighter', race: 'halforc', tint: { cloth: '#5a4a3a', armor: '#4a3a2a', armor2: '#2e2418' } };       // in the asset registry: see assets/REGISTRY.md
   const G = window.G, ui = G.ui, T = THREE, show = (h, c) => ui._show(h, c), on = (s, f) => ui._on(s, f), pick = a => a[Math.floor(Math.random() * a.length)];
   const WHO = [['Big Annic', 'who carries barrels for a living', 0], ['Tolly Greaves', 'a gate-man on his night off', 1], ['Mother Hesk', 'who has never lost at this table', 2], ['The Smelter', 'whose forearms have their own names', 3]];
   const SAY = { win: ['“Hah. All right. ALL right. Do not tell the gate-men.”', '“Again. No. My wrist says no. Take your coin.”', '“You have done this before. Nobody is that rude by accident.”'], lose: ['“Soft hands. Pit hands, but soft.”', '“Come back when you have eaten something.”', '“That is the rent paid. Kind of you.”'] };
@@ -34,7 +35,7 @@
   const hub0 = G.world.buildHub;
   G.world.buildHub = function () { const h = hub0.apply(this, arguments), s = h.scene, gfx = G.gfx, wood = gfx.lambert(0x6a4a2c), X = -8.6, Z = 20.75;
     gfx.mesh(new T.CylinderGeometry(0.42, 0.38, 0.85, 10), wood, X, 0.42, Z, s); gfx.mesh(new T.CylinderGeometry(0.46, 0.46, 0.06, 10), gfx.lambert(0x3a2616), X, 0.87, Z, s); [-0.8, 0.8].forEach(dx => gfx.mesh(new T.CylinderGeometry(0.2, 0.2, 0.45, 8), wood, X + dx, 0.22, Z, s));
-    const c = G.makeChar({ cls: 'fighter', race: 'halforc', tint: { cloth: '#5a4a3a', armor: '#4a3a2a', armor2: '#2e2418' } }); c.root.position.set(X + 0.8, -0.28, Z); c.root.rotation.y = -1.57; s.add(c.root); const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); c.pose({ t: t + 3, act: 'sit' }); };
+    const c = G.makeChar(G.LOOKDEF['knuckle-fighter']); c.root.position.set(X + 0.8, -0.28, Z); c.root.rotation.y = -1.57; s.add(c.root); const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); c.pose({ t: t + 3, act: 'sit' }); };
     h.spots.push({ x: X - 0.2, z: Z - 1.1, r: 1.4, y: 2.4, label: 'The Knuckle Table', act: 'Arm-wrestle', go: () => ui.knuckle(), badge: () => !G.state.knk && (G.state.boutN || 0) >= 1 });
     return h; };
   const close0 = ui.close; ui.close = function () { stop(); return close0.apply(this, arguments); };

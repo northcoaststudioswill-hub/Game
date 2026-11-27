@@ -1,0 +1,2748 @@
+{
+ "characters": [
+  {
+   "id": "fighter:grubb",
+   "name": "Grubb the Rat-Catcher",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "rogue",
+    "race": "halforc",
+    "tint": {
+     "armor": "#4a4031",
+     "cloth": "#5b4a2a",
+     "trim": "#8a7a4a"
+    },
+    "scale": 1,
+    "cos": {}
+   },
+   "defined": "js/data.js:121"
+  },
+  {
+   "id": "fighter:dolly",
+   "name": "Dolly Two-Teeth Queen of the Scrap Heap",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "fighter",
+    "race": "dwarf",
+    "tint": {
+     "armor": "#6a5a3a",
+     "armor2": "#3d3424",
+     "cloth": "#7a3a2a",
+     "trim": "#c8a24a",
+     "hair": "#b8522a"
+    },
+    "scale": 0.96,
+    "cos": {}
+   },
+   "defined": "js/data.js:122"
+  },
+  {
+   "id": "fighter:maul",
+   "name": "Sister Maul of the Sunless Chapel",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "cleric",
+    "race": "dwarf",
+    "tint": {
+     "armor": "#5a2a2a",
+     "cloth": "#2c2228",
+     "trim": "#d8b04a"
+    },
+    "scale": 1,
+    "cos": {}
+   },
+   "defined": "js/data.js:123"
+  },
+  {
+   "id": "fighter:ansel",
+   "name": "Ansel Vane the Gentleman Thief",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "rogue",
+    "race": "human",
+    "tint": {
+     "armor": "#2a2a3a",
+     "cloth": "#5a1f3a",
+     "trim": "#d8d0b0",
+     "hair": "#1a1a1a"
+    },
+    "scale": 1,
+    "cos": {}
+   },
+   "defined": "js/data.js:124"
+  },
+  {
+   "id": "fighter:kessa",
+   "name": "Kessa Cinderhand Ash of the Deep Guild",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "sorcerer",
+    "race": "tiefling",
+    "tint": {
+     "cloth": "#3a1f4a",
+     "trim": "#ff9a3a",
+     "armor": "#2a1830"
+    },
+    "scale": 1,
+    "cos": {}
+   },
+   "defined": "js/data.js:125"
+  },
+  {
+   "id": "fighter:sallow",
+   "name": "Old Sallow Who Signed Something",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "warlock",
+    "race": "tiefling",
+    "tint": {
+     "cloth": "#2a2a1f",
+     "armor": "#3a3320",
+     "trim": "#9ad04a",
+     "hair": "#d8d8c8"
+    },
+    "scale": 1,
+    "cos": {}
+   },
+   "defined": "js/data.js:126"
+  },
+  {
+   "id": "fighter:brakk",
+   "name": "Brakk Ironjaw Wall of the Lower Ring",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "fighter",
+    "race": "halforc",
+    "tint": {
+     "armor": "#3b4048",
+     "cloth": "#1e3a2a",
+     "trim": "#9aa3ad"
+    },
+    "scale": 1.12,
+    "cos": {}
+   },
+   "defined": "js/data.js:127"
+  },
+  {
+   "id": "fighter:beatrix",
+   "name": "Iron Beatrix the Magistrate’s Mistake",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "cleric",
+    "race": "human",
+    "tint": {
+     "armor": "#8a8f98",
+     "armor2": "#4a4f58",
+     "cloth": "#1f2a4a",
+     "trim": "#e8e0c0",
+     "hair": "#5a3a2a"
+    },
+    "scale": 1.06,
+    "cos": {}
+   },
+   "defined": "js/data.js:128"
+  },
+  {
+   "id": "fighter:vexa",
+   "name": "Vexa the Pale Queen, Pit Champion",
+   "group": "Fighters on the Ledger",
+   "file": "js/data.js",
+   "look": {
+    "cls": "rogue",
+    "race": "elf",
+    "tint": {
+     "armor": "#d8d2e6",
+     "cloth": "#6a2a8a",
+     "trim": "#ffd36b",
+     "hair": "#f2eefc"
+    },
+    "scale": 1,
+    "cos": {}
+   },
+   "defined": "js/data.js:129"
+  },
+  {
+   "id": "fighter:asc_captain",
+   "name": "Captain Hale Morrow, of the Seal-Wardens",
+   "group": "The Long Stair",
+   "file": "js/ascent.js",
+   "look": {
+    "cls": "fighter",
+    "race": "human",
+    "tint": {
+     "armor": "#e8e4f0",
+     "armor2": "#b0b8cc",
+     "cloth": "#f4f0ff",
+     "trim": "#f0c95a",
+     "legs": "#9aa0b4"
+    },
+    "scale": 1,
+    "cos": {}
+   },
+   "defined": "js/ascent.js:9"
+  },
+  {
+   "id": "fighter:asc_king",
+   "name": "Vilhelm van Koheneim IV, the hand in the iron glove",
+   "group": "The Long Stair",
+   "file": "js/ascent.js",
+   "look": {
+    "cls": "fighter",
+    "race": "human",
+    "tint": {
+     "armor": "#3a3640",
+     "armor2": "#201c26",
+     "cloth": "#5a1f7a",
+     "trim": "#f0c95a",
+     "legs": "#26222c",
+     "hair": "#c8c0b0"
+    },
+    "scale": 1.08,
+    "cos": {}
+   },
+   "defined": "js/ascent.js:11"
+  },
+  {
+   "id": "fighter:asc_queen",
+   "name": "Queen Eerin Koheneim, faerie-born, of the Koheneim throne",
+   "group": "The Long Stair",
+   "file": "js/ascent.js",
+   "look": {
+    "cls": "sorcerer",
+    "race": "elf",
+    "tint": {
+     "armor": "#e6e4f0",
+     "armor2": "#b8b0d8",
+     "cloth": "#f4f0ff",
+     "trim": "#c8b8ff",
+     "legs": "#8a80b0",
+     "hair": "#f2eefc"
+    },
+    "scale": 1,
+    "cos": {
+     "back": "wings"
+    }
+   },
+   "defined": "js/ascent.js:13"
+  },
+  {
+   "id": "marc",
+   "name": "Marc dé Fleuprau",
+   "group": "The market",
+   "file": "js/mark.js",
+   "look": {
+    "id": "marc",
+    "cls": "sorcerer",
+    "race": "human",
+    "tint": {
+     "hair": "#2a1c10"
+    },
+    "cos": {
+     "dye": "emerald",
+     "head": "laurel",
+     "back": null,
+     "weapon": "gilded",
+     "aura": null
+    }
+   },
+   "defined": "js/mark.js:22"
+  },
+  {
+   "id": "pip",
+   "name": "Pip Tallow",
+   "group": "The market",
+   "file": "js/guide.js",
+   "look": {
+    "id": "pip",
+    "cls": "rogue",
+    "race": "human",
+    "tint": {
+     "cloth": "#7a5a2a",
+     "armor": "#5a4630",
+     "armor2": "#3a2c1e",
+     "trim": "#c8a060",
+     "legs": "#3a3024",
+     "hair": "#8a5a2a"
+    },
+    "scale": 0.86
+   },
+   "defined": "js/guide.js:45"
+  },
+  {
+   "id": "fence",
+   "name": "The Fence",
+   "group": "The market",
+   "file": "js/places.js",
+   "look": {
+    "id": "fence",
+    "cls": "rogue",
+    "race": "human",
+    "tint": {
+     "cloth": "#245a44",
+     "armor": "#3a4a40"
+    }
+   },
+   "defined": "js/places.js:71"
+  },
+  {
+   "id": "guildmaster",
+   "name": "The Guildmaster",
+   "group": "The market",
+   "file": "js/places.js",
+   "look": {
+    "id": "guildmaster",
+    "cls": "sorcerer",
+    "race": "elf",
+    "tint": {
+     "cloth": "#4a2a7a",
+     "armor": "#3a2060",
+     "armor2": "#2a1648",
+     "hair": "#e8e2f4",
+     "trim": "#d9a93c"
+    }
+   },
+   "defined": "js/places.js:75"
+  },
+  {
+   "id": "dedrick",
+   "name": "Sir Dedrick III",
+   "group": "The market",
+   "file": "js/dice.js",
+   "look": {
+    "id": "dedrick",
+    "cls": "cleric",
+    "race": "human",
+    "tint": {
+     "cloth": "#26204a",
+     "armor": "#3a3060",
+     "armor2": "#1c1830",
+     "trim": "#f0c95a",
+     "hair": "#d8d4cc",
+     "legs": "#1c1830"
+    },
+    "cos": {
+     "head": "widehat",
+     "back": "greatcloak"
+    },
+    "scale": 0.98
+   },
+   "defined": "js/dice.js:10"
+  },
+  {
+   "id": "tibb",
+   "name": "Old Marrow Tibb",
+   "group": "The market",
+   "file": "js/guide.js",
+   "look": {
+    "id": "tibb",
+    "cls": "cleric",
+    "race": "dwarf",
+    "tint": {
+     "cloth": "#5a4a3a",
+     "armor": "#4a4038",
+     "armor2": "#2e2822",
+     "trim": "#8a7a5a",
+     "hair": "#c8c0b0"
+    }
+   },
+   "defined": "js/guide.js:135"
+  },
+  {
+   "id": "carr",
+   "name": "Sergeant Ysolde Carr",
+   "group": "The market",
+   "file": "js/guide.js",
+   "look": {
+    "id": "carr",
+    "cls": "fighter",
+    "race": "human",
+    "tint": {
+     "armor": "#8a8a94",
+     "armor2": "#5a5a66",
+     "cloth": "#4a4a56",
+     "trim": "#a89868",
+     "legs": "#44464e",
+     "hair": "#5a3a2a"
+    }
+   },
+   "defined": "js/guide.js:139"
+  },
+  {
+   "id": "ilva",
+   "name": "Ilvaren of the Hanging Markets",
+   "group": "The market",
+   "file": "js/guide.js",
+   "look": {
+    "id": "ilva",
+    "cls": "rogue",
+    "race": "drow",
+    "tint": {
+     "cloth": "#2a2a44",
+     "armor": "#22222e",
+     "armor2": "#14141c",
+     "trim": "#8a8aff",
+     "legs": "#1a1a24"
+    }
+   },
+   "defined": "js/guide.js:143"
+  },
+  {
+   "id": "david",
+   "name": "David Roseinbeirg",
+   "group": "The market",
+   "file": "js/oracle.js",
+   "look": {
+    "id": "david",
+    "cls": "sorcerer",
+    "ring": "hourmark",
+    "race": "human",
+    "tint": {
+     "cloth": "#2a1a3a",
+     "armor": "#1a1024",
+     "armor2": "#120a1a",
+     "trim": "#f0c95a",
+     "hair": "#e8e2f4"
+    },
+    "cos": {
+     "head": "widehat",
+     "back": "greatcloak",
+     "aura": "gold"
+    }
+   },
+   "defined": "js/oracle.js:20"
+  },
+  {
+   "id": "ledger-keeper",
+   "name": "The Ledger-Keeper, in the Guild box",
+   "group": "The pit",
+   "file": "js/life.js",
+   "look": {
+    "id": "ledger-keeper",
+    "cls": "sorcerer",
+    "race": "elf",
+    "tint": {
+     "cloth": "#4a2a7a",
+     "armor": "#3a2060",
+     "armor2": "#2a1648",
+     "hair": "#e8e2f4",
+     "trim": "#d9a93c"
+    }
+   },
+   "defined": "js/life.js:133"
+  },
+  {
+   "id": "box-guard-west",
+   "name": "Guild box guard, west",
+   "group": "The pit",
+   "file": "js/life.js",
+   "look": {
+    "id": "box-guard-west",
+    "cls": "fighter",
+    "race": "halforc",
+    "tint": {
+     "cloth": "#5a1f7a",
+     "armor": "#2a2428",
+     "armor2": "#1a1618"
+    }
+   },
+   "defined": "js/life.js:134"
+  },
+  {
+   "id": "box-guard-east",
+   "name": "Guild box guard, east",
+   "group": "The pit",
+   "file": "js/life.js",
+   "look": {
+    "id": "box-guard-east",
+    "cls": "fighter",
+    "race": "human",
+    "tint": {
+     "cloth": "#5a1f7a",
+     "armor": "#2a2428",
+     "armor2": "#1a1618"
+    }
+   },
+   "defined": "js/life.js:134"
+  },
+  {
+   "id": "pit-guard-west",
+   "name": "Pit gate guard, west",
+   "group": "The pit",
+   "file": "js/life.js",
+   "look": {
+    "id": "pit-guard-west",
+    "cls": "fighter",
+    "race": "halforc",
+    "tint": {
+     "cloth": "#5a1418",
+     "armor": "#2a2428",
+     "armor2": "#1a1618"
+    }
+   },
+   "defined": "js/life.js:40"
+  },
+  {
+   "id": "pit-guard-east",
+   "name": "Pit gate guard, east",
+   "group": "The pit",
+   "file": "js/life.js",
+   "look": {
+    "id": "pit-guard-east",
+    "cls": "fighter",
+    "race": "human",
+    "tint": {
+     "cloth": "#5a1418",
+     "armor": "#2a2428",
+     "armor2": "#1a1618"
+    }
+   },
+   "defined": "js/life.js:40"
+  },
+  {
+   "id": "stair-warden-elf",
+   "name": "Seal-Warden at the Stair (elf)",
+   "group": "The Long Stair and the throne",
+   "file": "js/life.js",
+   "look": {
+    "id": "stair-warden-elf",
+    "cls": "fighter",
+    "race": "elf",
+    "gear": {
+     "weapon": "#000001",
+     "armor": "#000002"
+    },
+    "tint": {
+     "cloth": "#e8e4f8",
+     "armor": "#dfe2ec",
+     "armor2": "#a8b0c4",
+     "trim": "#f0c95a",
+     "legs": "#8a90a4"
+    },
+    "arm": "f_spear"
+   },
+   "defined": "js/life.js:78"
+  },
+  {
+   "id": "stair-warden-human",
+   "name": "Seal-Warden at the Stair (human)",
+   "group": "The Long Stair and the throne",
+   "file": "js/life.js",
+   "look": {
+    "id": "stair-warden-human",
+    "cls": "fighter",
+    "race": "human",
+    "gear": {
+     "weapon": "#000001",
+     "armor": "#000002"
+    },
+    "tint": {
+     "cloth": "#e8e4f8",
+     "armor": "#dfe2ec",
+     "armor2": "#a8b0c4",
+     "trim": "#f0c95a",
+     "legs": "#8a90a4"
+    },
+    "arm": "f_spear"
+   },
+   "defined": "js/life.js:79"
+  },
+  {
+   "id": "throne-king",
+   "name": "King Vilhelm van Koheneim IV",
+   "group": "The Long Stair and the throne",
+   "file": "js/cine.js",
+   "look": {
+    "id": "throne-king",
+    "cls": "fighter",
+    "race": "human",
+    "tint": {
+     "cloth": "#5a1418",
+     "armor": "#2a2428",
+     "armor2": "#16121a",
+     "trim": "#f0c95a",
+     "hair": "#8a8a90"
+    },
+    "gear": {
+     "weapon": "#000002",
+     "armor": "#000002"
+    },
+    "cos": {
+     "head": "crown",
+     "back": "greatcloak"
+    }
+   },
+   "defined": "js/cine.js:4"
+  },
+  {
+   "id": "throne-queen",
+   "name": "Queen Eerin Koheneim",
+   "group": "The Long Stair and the throne",
+   "file": "js/cine.js",
+   "look": {
+    "id": "throne-queen",
+    "cls": "sorcerer",
+    "race": "elf",
+    "tint": {
+     "cloth": "#e8e4f8",
+     "armor": "#b8a8e8",
+     "armor2": "#8a78c8",
+     "hair": "#f4f0ff",
+     "trim": "#f0c95a"
+    },
+    "cos": {
+     "head": "crown",
+     "aura": "sigils"
+    }
+   },
+   "defined": "js/cine.js:5"
+  },
+  {
+   "id": "marcs-punter",
+   "name": "Marc’s punter",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "marcs-punter",
+    "cls": "fighter",
+    "race": "dwarf",
+    "tint": {
+     "cloth": "#5a3a2a",
+     "armor": "#4a4038"
+    }
+   },
+   "defined": "js/places.js:92"
+  },
+  {
+   "id": "wisp-gambler",
+   "name": "Gambler at the Wisp Table",
+   "group": "Townsfolk",
+   "file": "js/life.js",
+   "look": {
+    "id": "wisp-gambler",
+    "cls": "cleric",
+    "race": "human",
+    "tint": {
+     "cloth": "#5a2a4a",
+     "armor": "#3a3040"
+    }
+   },
+   "defined": "js/life.js:36"
+  },
+  {
+   "id": "odds-arguer-human",
+   "name": "Arguing about the odds (human)",
+   "group": "Townsfolk",
+   "file": "js/life.js",
+   "look": {
+    "id": "odds-arguer-human",
+    "cls": "rogue",
+    "race": "human",
+    "tint": {
+     "cloth": "#6a5a3a",
+     "armor": "#4a4438"
+    }
+   },
+   "defined": "js/life.js:41"
+  },
+  {
+   "id": "odds-arguer-dwarf",
+   "name": "Arguing about the odds (dwarf)",
+   "group": "Townsfolk",
+   "file": "js/life.js",
+   "look": {
+    "id": "odds-arguer-dwarf",
+    "cls": "sorcerer",
+    "race": "dwarf",
+    "tint": {
+     "cloth": "#3a5a3a",
+     "armor": "#3a4038"
+    }
+   },
+   "defined": "js/life.js:41"
+  },
+  {
+   "id": "busker",
+   "name": "The busker",
+   "group": "Townsfolk",
+   "file": "js/life.js",
+   "look": {
+    "id": "busker",
+    "cls": "rogue",
+    "race": "elf",
+    "tint": {
+     "cloth": "#7a3a5a",
+     "armor": "#4a2a40",
+     "hair": "#f0c95a"
+    }
+   },
+   "defined": "js/life.js:44"
+  },
+  {
+   "id": "stallkeeper-dwarf",
+   "name": "Stall-keeper (dwarf)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "stallkeeper-dwarf",
+    "cls": "cleric",
+    "race": "dwarf",
+    "tint": {
+     "cloth": "#3a3038",
+     "armor": "#4a4048"
+    }
+   },
+   "defined": "js/places.js:128"
+  },
+  {
+   "id": "stallkeeper-halforc",
+   "name": "Stall-keeper (half-orc)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "stallkeeper-halforc",
+    "cls": "rogue",
+    "race": "halforc",
+    "tint": {
+     "cloth": "#6a3a1a",
+     "armor": "#4a3a30"
+    }
+   },
+   "defined": "js/places.js:128"
+  },
+  {
+   "id": "stallkeeper-human",
+   "name": "Stall-keeper (human)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "stallkeeper-human",
+    "cls": "sorcerer",
+    "race": "human",
+    "tint": {
+     "cloth": "#1a4a6a",
+     "armor": "#203a50",
+     "hair": "#2a2a2a"
+    }
+   },
+   "defined": "js/places.js:128"
+  },
+  {
+   "id": "stallkeeper-tiefling",
+   "name": "Stall-keeper (tiefling)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "stallkeeper-tiefling",
+    "cls": "cleric",
+    "race": "tiefling",
+    "tint": {
+     "cloth": "#6a1a2a",
+     "armor": "#4a2028"
+    }
+   },
+   "defined": "js/places.js:128"
+  },
+  {
+   "id": "corner-sitter-dwarf",
+   "name": "Sitting in the corner (dwarf)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "corner-sitter-dwarf",
+    "cls": "rogue",
+    "race": "dwarf",
+    "tint": {
+     "cloth": "#3a3028",
+     "armor": "#3a3430"
+    }
+   },
+   "defined": "js/places.js:132"
+  },
+  {
+   "id": "corner-sitter-human",
+   "name": "Sitting in the corner (human)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "corner-sitter-human",
+    "cls": "cleric",
+    "race": "human",
+    "tint": {
+     "cloth": "#4a4238",
+     "armor": "#3a3632"
+    }
+   },
+   "defined": "js/places.js:132"
+  },
+  {
+   "id": "tallow-neighbour-dwarf",
+   "name": "Tallow Row neighbour (dwarf)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "tallow-neighbour-dwarf",
+    "cls": "cleric",
+    "race": "dwarf",
+    "tint": {
+     "cloth": "#6a5a4a",
+     "armor": "#5a4a3a",
+     "armor2": "#3a3026",
+     "hair": "#b8b0a0"
+    }
+   },
+   "defined": "js/places.js:113"
+  },
+  {
+   "id": "tallow-neighbour-child",
+   "name": "Tallow Row neighbour (child)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "tallow-neighbour-child",
+    "cls": "rogue",
+    "race": "human",
+    "tint": {
+     "cloth": "#4a5a6a",
+     "armor": "#3a4450",
+     "hair": "#5a3a1a"
+    },
+    "scale": 0.8
+   },
+   "defined": "js/places.js:113"
+  },
+  {
+   "id": "tallow-neighbour-halforc",
+   "name": "Tallow Row neighbour (half-orc)",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "tallow-neighbour-halforc",
+    "cls": "sorcerer",
+    "race": "halforc",
+    "tint": {
+     "cloth": "#5a3a4a",
+     "armor": "#3a2a34"
+    }
+   },
+   "defined": "js/places.js:113"
+  },
+  {
+   "id": "passer-by-1",
+   "name": "Passer-by 1",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "passer-by-1",
+    "cls": "rogue",
+    "race": "human",
+    "tint": {
+     "cloth": "#5a3a2a",
+     "armor": "#4a4038"
+    }
+   },
+   "defined": "js/places.js"
+  },
+  {
+   "id": "passer-by-2",
+   "name": "Passer-by 2",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "passer-by-2",
+    "cls": "cleric",
+    "race": "dwarf",
+    "tint": {
+     "cloth": "#2a4a5a",
+     "armor": "#3a4048"
+    }
+   },
+   "defined": "js/places.js"
+  },
+  {
+   "id": "passer-by-3",
+   "name": "Passer-by 3",
+   "group": "Townsfolk",
+   "file": "js/places.js",
+   "look": {
+    "id": "passer-by-3",
+    "cls": "fighter",
+    "race": "elf",
+    "tint": {
+     "cloth": "#5a2a4a",
+     "armor": "#3a3040"
+    }
+   },
+   "defined": "js/places.js"
+  },
+  {
+   "id": "knife-kid",
+   "name": "The knife-throwing kid",
+   "group": "Townsfolk",
+   "file": "js/knives.js",
+   "look": {
+    "id": "knife-kid",
+    "cls": "rogue",
+    "race": "human",
+    "tint": {
+     "cloth": "#6a4a3a",
+     "armor": "#4a3a30",
+     "hair": "#2a1c10"
+    },
+    "scale": 0.72
+   },
+   "defined": "js/knives.js:4"
+  },
+  {
+   "id": "knuckle-fighter",
+   "name": "The knuckle fighter",
+   "group": "Townsfolk",
+   "file": "js/knuckle.js",
+   "look": {
+    "id": "knuckle-fighter",
+    "cls": "fighter",
+    "race": "halforc",
+    "tint": {
+     "cloth": "#5a4a3a",
+     "armor": "#4a3a2a",
+     "armor2": "#2e2418"
+    }
+   },
+   "defined": "js/knuckle.js:4"
+  }
+ ],
+ "frames": [
+  {
+   "id": "fighter",
+   "name": "Fighter",
+   "colours": {
+    "armor": "#8a909c",
+    "armor2": "#4a4e58",
+    "trim": "#b09a5a",
+    "cloth": "#8a1c22",
+    "legs": "#565a66",
+    "hair": "#3a2a20",
+    "weapon": "#dfe6ee"
+   },
+   "note": "",
+   "defined": "js/data.js:69"
+  },
+  {
+   "id": "rogue",
+   "name": "Rogue",
+   "colours": {
+    "armor": "#4a4454",
+    "armor2": "#2c2834",
+    "trim": "#8a7240",
+    "cloth": "#3a3048",
+    "legs": "#3a3642",
+    "hair": "#1a1a1a",
+    "weapon": "#d0d8e2"
+   },
+   "note": "",
+   "defined": "js/data.js:77"
+  },
+  {
+   "id": "sorcerer",
+   "name": "Sorcerer",
+   "colours": {
+    "armor": "#8a1c24",
+    "armor2": "#4f1016",
+    "trim": "#e0a844",
+    "cloth": "#a0222a",
+    "legs": "#3a1216",
+    "hair": "#5a1418",
+    "weapon": "#ff8a3c"
+   },
+   "note": "",
+   "defined": "js/data.js:85"
+  },
+  {
+   "id": "cleric",
+   "name": "Cleric",
+   "colours": {
+    "armor": "#777480",
+    "armor2": "#45424c",
+    "trim": "#e8c860",
+    "cloth": "#e2dcc8",
+    "legs": "#34323a",
+    "hair": "#d8d2c2",
+    "weapon": "#f0d880"
+   },
+   "note": "",
+   "defined": "js/models.js:53"
+  },
+  {
+   "id": "druid",
+   "name": "Druid",
+   "colours": {
+    "armor": "#4a5a34",
+    "armor2": "#2e3a22",
+    "trim": "#c8b070",
+    "cloth": "#5a6e3a",
+    "legs": "#3a3226",
+    "hair": "#6a5a3a",
+    "weapon": "#8a6a3a"
+   },
+   "note": "uses the cleric body",
+   "defined": "js/edge.js:11"
+  },
+  {
+   "id": "warlock",
+   "name": "Warlock",
+   "colours": {
+    "armor": "#2a1e3a",
+    "armor2": "#181024",
+    "trim": "#8aff9a",
+    "cloth": "#32204a",
+    "legs": "#1a1422",
+    "hair": "#1a1420",
+    "weapon": "#b070ff"
+   },
+   "note": "uses the sorcerer body",
+   "defined": "js/edge.js:12"
+  }
+ ],
+ "peoples": [
+  {
+   "id": "human",
+   "name": "Human",
+   "skin": "#c9977a",
+   "scale": 1,
+   "defined": "js/data.js:16"
+  },
+  {
+   "id": "dwarf",
+   "name": "Dwarf",
+   "skin": "#c08a6c",
+   "scale": 0.86,
+   "defined": "js/data.js:17"
+  },
+  {
+   "id": "elf",
+   "name": "Elf",
+   "skin": "#d8c3ae",
+   "scale": 1.03,
+   "defined": "js/data.js:18"
+  },
+  {
+   "id": "halforc",
+   "name": "Half-Orc",
+   "skin": "#7f9a62",
+   "scale": 1.1,
+   "defined": "js/data.js:19"
+  },
+  {
+   "id": "tiefling",
+   "name": "Tiefling",
+   "skin": "#b5564e",
+   "scale": 1.02,
+   "defined": "js/data.js:20"
+  },
+  {
+   "id": "drow",
+   "name": "Drow",
+   "skin": "#6a6278",
+   "scale": 1.01,
+   "defined": "js/data.js"
+  }
+ ],
+ "weapons": [
+  {
+   "id": "f_basic",
+   "name": "Longsword",
+   "cls": "fighter",
+   "family": "",
+   "temper": "Riposte",
+   "defined": "js/arms.js:10"
+  },
+  {
+   "id": "f_spear",
+   "name": "Pit Spear",
+   "cls": "fighter",
+   "family": "",
+   "temper": "Tip of the Spear",
+   "defined": "js/arms2.js:11"
+  },
+  {
+   "id": "f_axe",
+   "name": "Greataxe",
+   "cls": "fighter",
+   "family": "",
+   "temper": "Hewing",
+   "defined": "js/arms2.js:12"
+  },
+  {
+   "id": "f_hammer",
+   "name": "Warhammer",
+   "cls": "fighter",
+   "family": "",
+   "temper": "Bonebreaker",
+   "defined": "js/arms2.js:13"
+  },
+  {
+   "id": "r_basic",
+   "name": "Twin Daggers",
+   "cls": "rogue",
+   "family": "",
+   "temper": "Flurry",
+   "defined": "js/arms.js:14"
+  },
+  {
+   "id": "r_rapier",
+   "name": "Duellist’s Rapier",
+   "cls": "rogue",
+   "family": "",
+   "temper": "Point Control",
+   "defined": "js/arms2.js:16"
+  },
+  {
+   "id": "r_axes",
+   "name": "Hand Axes",
+   "cls": "rogue",
+   "family": "",
+   "temper": "Chop and Hook",
+   "defined": "js/arms2.js:17"
+  },
+  {
+   "id": "s_basic",
+   "name": "Fire Bolt",
+   "cls": "sorcerer",
+   "family": "",
+   "temper": "Kindling",
+   "defined": "js/arms.js:17"
+  },
+  {
+   "id": "s_frost",
+   "name": "Frost Shard",
+   "cls": "sorcerer",
+   "family": "",
+   "temper": "Brittle",
+   "defined": "js/arms2.js:29"
+  },
+  {
+   "id": "s_spark",
+   "name": "Arc Spark",
+   "cls": "sorcerer",
+   "family": "",
+   "temper": "Arc",
+   "defined": "js/arms2.js:30"
+  },
+  {
+   "id": "c_basic",
+   "name": "Mace",
+   "cls": "cleric",
+   "family": "",
+   "temper": "Blessed Iron",
+   "defined": "js/arms.js:20"
+  },
+  {
+   "id": "c_flail",
+   "name": "Penitent’s Flail",
+   "cls": "cleric",
+   "family": "",
+   "temper": "Over the Guard",
+   "defined": "js/arms2.js:21"
+  },
+  {
+   "id": "c_pick",
+   "name": "War Pick",
+   "cls": "cleric",
+   "family": "",
+   "temper": "Armour Piercer",
+   "defined": "js/arms2.js:20"
+  },
+  {
+   "id": "f_halberd",
+   "name": "Stairguard Halberd",
+   "cls": "fighter",
+   "family": "",
+   "temper": "Hook and Haul",
+   "defined": "js/arms2.js:36"
+  },
+  {
+   "id": "r_chain",
+   "name": "Weighted Chain",
+   "cls": "rogue",
+   "family": "",
+   "temper": "Long Weight",
+   "defined": "js/arms2.js:37"
+  },
+  {
+   "id": "s_acid",
+   "name": "Acid Splash",
+   "cls": "sorcerer",
+   "family": "",
+   "temper": "Corrode",
+   "defined": "js/arms2.js:38"
+  },
+  {
+   "id": "c_staff",
+   "name": "Pilgrim’s Staff",
+   "cls": "cleric",
+   "family": "",
+   "temper": "Pilgrim's Ward",
+   "defined": "js/arms2.js:39"
+  },
+  {
+   "id": "d_staff",
+   "name": "Thornwood Staff",
+   "cls": "druid",
+   "family": "",
+   "temper": "Thornwood Sweep",
+   "defined": "js/arms2.js:26"
+  },
+  {
+   "id": "d_spear",
+   "name": "Stalactite Spear",
+   "cls": "druid",
+   "family": "",
+   "temper": "Stalactite Cold",
+   "defined": "js/arms2.js:25"
+  },
+  {
+   "id": "d_flail",
+   "name": "Thorn Whip",
+   "cls": "druid",
+   "family": "",
+   "temper": "Snare",
+   "defined": "js/arms2.js:23"
+  },
+  {
+   "id": "d_hammer",
+   "name": "Root Maul",
+   "cls": "druid",
+   "family": "",
+   "temper": "Rooted",
+   "defined": "js/arms2.js:24"
+  },
+  {
+   "id": "w_basic",
+   "name": "Eldritch Blast",
+   "cls": "warlock",
+   "family": "",
+   "temper": "Repelling Blast",
+   "defined": "js/arms2.js:32"
+  },
+  {
+   "id": "w_frost",
+   "name": "Grave Chill",
+   "cls": "warlock",
+   "family": "",
+   "temper": "Grave Cold",
+   "defined": "js/arms2.js:33"
+  },
+  {
+   "id": "w_acid",
+   "name": "Gnawing Dark",
+   "cls": "warlock",
+   "family": "",
+   "temper": "Gnaw",
+   "defined": "js/classes.js:89"
+  },
+  {
+   "id": "w_spark",
+   "name": "Witch Bolt",
+   "cls": "warlock",
+   "family": "",
+   "temper": "Tether",
+   "defined": "js/arms2.js:34"
+  },
+  {
+   "id": "f_flail",
+   "name": "Pit Flail",
+   "cls": "fighter",
+   "family": "",
+   "temper": "Over the Guard",
+   "defined": "js/arms2.js:14"
+  },
+  {
+   "id": "r_spear",
+   "name": "Gutter Pike",
+   "cls": "rogue",
+   "family": "",
+   "temper": "Gutter Reach",
+   "defined": "js/arms2.js:18"
+  },
+  {
+   "id": "s_staff",
+   "name": "Emberwood Staff",
+   "cls": "sorcerer",
+   "family": "",
+   "temper": "Ember Burst",
+   "defined": "js/arms2.js:31"
+  },
+  {
+   "id": "c_hammer",
+   "name": "Bell-Hammer",
+   "cls": "cleric",
+   "family": "",
+   "temper": "The Toll",
+   "defined": "js/arms2.js:22"
+  },
+  {
+   "id": "d_axes",
+   "name": "Bone Sickles",
+   "cls": "druid",
+   "family": "",
+   "temper": "Bone Sickles",
+   "defined": "js/arms2.js:27"
+  },
+  {
+   "id": "w_staff",
+   "name": "Rod of the Pact-Keeper",
+   "cls": "warlock",
+   "family": "",
+   "temper": "Pact Drain",
+   "defined": "js/arms2.js:46"
+  }
+ ],
+ "weaponSkins": [
+  {
+   "id": "ember",
+   "name": "",
+   "defined": "js/crew.js:109"
+  },
+  {
+   "id": "frost",
+   "name": "",
+   "defined": "js/crew.js:101"
+  },
+  {
+   "id": "gilded",
+   "name": "",
+   "defined": "js/crew.js:111"
+  },
+  {
+   "id": "obsidian",
+   "name": "",
+   "defined": "js/crew.js:107"
+  },
+  {
+   "id": "bronze",
+   "name": "",
+   "defined": "js/crew.js:108"
+  },
+  {
+   "id": "mirror",
+   "name": "",
+   "defined": "js/crew.js:105"
+  },
+  {
+   "id": "luckyedge",
+   "name": "",
+   "defined": "js/crew.js:106"
+  },
+  {
+   "id": "voidsteel",
+   "name": "",
+   "defined": "js/crew.js:102"
+  },
+  {
+   "id": "wisp",
+   "name": "",
+   "defined": "js/crew.js:103"
+  },
+  {
+   "id": "blood",
+   "name": "",
+   "defined": "js/crew.js:96"
+  },
+  {
+   "id": "toxic",
+   "name": "",
+   "defined": "js/crew.js:97"
+  },
+  {
+   "id": "void",
+   "name": "",
+   "defined": "js/crew.js:112"
+  }
+ ],
+ "armourSets": [
+  {
+   "id": "issue",
+   "name": "Guild Issue",
+   "text": "",
+   "defined": "js/kits.js"
+  },
+  {
+   "id": "rags",
+   "name": "Beggar’s Rags",
+   "text": "",
+   "defined": "js/gear.js:24"
+  },
+  {
+   "id": "leathers",
+   "name": "Pit Leathers",
+   "text": "",
+   "defined": "js/gear.js:25"
+  },
+  {
+   "id": "silks",
+   "name": "Duellist’s Silks",
+   "text": "",
+   "defined": "js/gear.js:26"
+  },
+  {
+   "id": "wraps",
+   "name": "Penitent’s Wraps",
+   "text": "",
+   "defined": "js/gear.js:27"
+  },
+  {
+   "id": "chain",
+   "name": "Chain Hauberk",
+   "text": "",
+   "defined": "js/fight.js:377"
+  },
+  {
+   "id": "plate",
+   "name": "Guild Plate",
+   "text": "",
+   "defined": "js/gear.js:29"
+  },
+  {
+   "id": "warden",
+   "name": "Warden’s Harness",
+   "text": "",
+   "defined": "js/gear.js:30"
+  },
+  {
+   "id": "ashcloak",
+   "name": "Raider’s Ashcloak",
+   "text": "",
+   "defined": "js/gear.js:31"
+  },
+  {
+   "id": "gilded",
+   "name": "Hourglass Regalia",
+   "text": "",
+   "defined": "js/crew.js:111"
+  },
+  {
+   "id": "crownguard",
+   "name": "Crownbearer’s Mail",
+   "text": "",
+   "defined": "js/gear.js:33"
+  },
+  {
+   "id": "mosshide",
+   "name": "Moss-Hide Mantle",
+   "text": "",
+   "defined": "js/kits.js"
+  },
+  {
+   "id": "pactrobes",
+   "name": "Robes of the Low Pact",
+   "text": "",
+   "defined": "js/kits.js"
+  }
+ ],
+ "cosmetics": [
+  {
+   "id": "crimson",
+   "name": "Pit Crimson",
+   "slot": "dye",
+   "cost": 60,
+   "desc": "Deep red cloth, brass trim. Hides the stains.",
+   "defined": "js/crew.js:57"
+  },
+  {
+   "id": "midnight",
+   "name": "Midnight Blue",
+   "slot": "dye",
+   "cost": 60,
+   "desc": "The colour of the lower levels.",
+   "defined": "js/crew.js:58"
+  },
+  {
+   "id": "emerald",
+   "name": "Glowcap Green",
+   "slot": "dye",
+   "cost": 80,
+   "desc": "Dyed with crushed cave moss.",
+   "defined": "js/crew.js:59"
+  },
+  {
+   "id": "bone",
+   "name": "Bone White",
+   "slot": "dye",
+   "cost": 110,
+   "desc": "Pale armour. Brave, down here.",
+   "defined": "js/crew.js:60"
+  },
+  {
+   "id": "ashen",
+   "name": "Ash and Blood",
+   "slot": "dye",
+   "cost": 140,
+   "desc": "Charcoal plate with red edging.",
+   "defined": "js/crew.js:61"
+  },
+  {
+   "id": "royal",
+   "name": "Royal Violet",
+   "slot": "dye",
+   "cost": 220,
+   "desc": "Guild purple and gold. You have to earn the nerve.",
+   "defined": "js/crew.js:62"
+  },
+  {
+   "id": "cinder",
+   "name": "Cinder",
+   "slot": "dye",
+   "cost": 90,
+   "desc": "Charcoal and furnace orange.",
+   "defined": "js/crew.js:63"
+  },
+  {
+   "id": "venom",
+   "name": "Sewer Venom",
+   "slot": "dye",
+   "cost": 120,
+   "desc": "Black-green plate with acid edging.",
+   "defined": "js/crew.js:64"
+  },
+  {
+   "id": "rime",
+   "name": "Rime",
+   "slot": "dye",
+   "cost": 160,
+   "desc": "Ice-blue and white. Shows every drop.",
+   "defined": "js/crew.js:65"
+  },
+  {
+   "id": "gilt",
+   "name": "Black and Gilt",
+   "slot": "dye",
+   "cost": 260,
+   "desc": "Lamp-black armour with gold at every edge.",
+   "defined": "js/crew.js:66"
+  },
+  {
+   "id": "widehat",
+   "name": "Gambler’s Brim",
+   "slot": "head",
+   "cost": 80,
+   "desc": "A wide hat with a long feather.",
+   "defined": "js/crew.js:67"
+  },
+  {
+   "id": "jester",
+   "name": "Fool’s Cap",
+   "slot": "head",
+   "cost": 110,
+   "desc": "Three points, three bells. They never see it coming.",
+   "defined": "js/crew.js:68"
+  },
+  {
+   "id": "antlers",
+   "name": "Stag Antlers",
+   "slot": "head",
+   "cost": 170,
+   "desc": "A full rack, lashed to a leather band.",
+   "defined": "js/crew.js:69"
+  },
+  {
+   "id": "thorns",
+   "name": "Crown of Thorns",
+   "slot": "head",
+   "cost": 230,
+   "desc": "Black iron briar. It bites the wearer too.",
+   "defined": "js/crew.js:70"
+  },
+  {
+   "id": "lucky",
+   "name": "Marc’s Lucky Laurel",
+   "slot": "head",
+   "cost": 9999,
+   "desc": "Won from Marc in a friendly. He says it is lucky. He lost while wearing it.",
+   "defined": "js/crew.js:71"
+  },
+  {
+   "id": "rust",
+   "name": "Old Rust",
+   "slot": "dye",
+   "cost": 70,
+   "desc": "Iron left in the wet. It suits the place.",
+   "defined": "js/crew.js:72"
+  },
+  {
+   "id": "bonewhite",
+   "name": "Bone and Black",
+   "slot": "dye",
+   "cost": 140,
+   "desc": "Ivory plate over black cloth, with a red edge.",
+   "defined": "js/crew.js:73"
+  },
+  {
+   "id": "royal",
+   "name": "Guild Violet",
+   "slot": "dye",
+   "cost": 220,
+   "desc": "The Guild’s own colour. Wearing it is a statement.",
+   "defined": "js/crew.js:62"
+  },
+  {
+   "id": "house",
+   "name": "House Colours",
+   "slot": "dye",
+   "cost": 9999,
+   "desc": "Long Odds green and gold. You are a walking advertisement.",
+   "defined": "js/crew.js:75"
+  },
+  {
+   "id": "hood",
+   "name": "Deep Cowl",
+   "slot": "head",
+   "cost": 70,
+   "desc": "A heavy hood. Nobody sees where you are looking.",
+   "defined": "js/crew.js:76"
+  },
+  {
+   "id": "mohawk",
+   "name": "Pit Crest",
+   "slot": "head",
+   "cost": 100,
+   "desc": "A stiff dyed crest. The crowd can find you from the back row.",
+   "defined": "js/crew.js:77"
+  },
+  {
+   "id": "candles",
+   "name": "Lampwright’s Crown",
+   "slot": "head",
+   "cost": 210,
+   "desc": "A ring of lit candles. Hot wax is part of the look.",
+   "defined": "js/crew.js:78"
+  },
+  {
+   "id": "dicecrown",
+   "name": "High Roller’s Crown",
+   "slot": "head",
+   "cost": 9999,
+   "desc": "Gold band, four wispdice. Marc wore it once and lost a house.",
+   "defined": "js/crew.js:79"
+  },
+  {
+   "id": "bloodied",
+   "name": "First Blood",
+   "slot": "dye",
+   "cost": 9999,
+   "desc": "Deed: First Blood. Dried red over black.",
+   "defined": "js/crew.js:80"
+  },
+  {
+   "id": "masonry",
+   "name": "Pit Stone",
+   "slot": "dye",
+   "cost": 9999,
+   "desc": "Deed: Mason. The colour of the wall you keep putting people into.",
+   "defined": "js/crew.js:81"
+  },
+  {
+   "id": "palequeen",
+   "name": "The Pale Queen’s Colours",
+   "slot": "dye",
+   "cost": 9999,
+   "desc": "Deed: The Guttercrown. White, violet and gold. Hers, until you.",
+   "defined": "js/crew.js:82"
+  },
+  {
+   "id": "exechood",
+   "name": "Executioner’s Hood",
+   "slot": "head",
+   "cost": 9999,
+   "desc": "Deed: Executioner. Black, pointed, two red eyes.",
+   "defined": "js/crew.js:83"
+  },
+  {
+   "id": "horned",
+   "name": "Horned Helm",
+   "slot": "head",
+   "cost": 90,
+   "desc": "Two great curved horns.",
+   "defined": "js/crew.js:84"
+  },
+  {
+   "id": "plague",
+   "name": "Plague Beak",
+   "slot": "head",
+   "cost": 120,
+   "desc": "A long leather beak and glass eyes.",
+   "defined": "js/crew.js:85"
+  },
+  {
+   "id": "skull",
+   "name": "Skull Visor",
+   "slot": "head",
+   "cost": 150,
+   "desc": "Somebody else’s face, worn over yours.",
+   "defined": "js/crew.js:86"
+  },
+  {
+   "id": "laurel",
+   "name": "Victor’s Laurel",
+   "slot": "head",
+   "cost": 200,
+   "desc": "Gilded leaves for a proven winner.",
+   "defined": "js/crew.js:87"
+  },
+  {
+   "id": "crown",
+   "name": "Pretender’s Crown",
+   "slot": "head",
+   "cost": 320,
+   "desc": "Not the real one. Yet.",
+   "defined": "js/crew.js:88"
+  },
+  {
+   "id": "pack",
+   "name": "Bedroll and Quiver",
+   "slot": "back",
+   "cost": 70,
+   "desc": "Everything you own, on your back.",
+   "defined": "js/crew.js:89"
+  },
+  {
+   "id": "greatcloak",
+   "name": "Fur Greatcloak",
+   "slot": "back",
+   "cost": 130,
+   "desc": "Heavy, long, and collared in fur.",
+   "defined": "js/crew.js:90"
+  },
+  {
+   "id": "banner",
+   "name": "Back Banner",
+   "slot": "back",
+   "cost": 180,
+   "desc": "Your colours flying behind you.",
+   "defined": "js/crew.js:91"
+  },
+  {
+   "id": "wings",
+   "name": "Raven Wings",
+   "slot": "back",
+   "cost": 300,
+   "desc": "Black feathers on an iron frame.",
+   "defined": "js/crew.js:92"
+  },
+  {
+   "id": "greatsword",
+   "name": "Spare Greatsword",
+   "slot": "back",
+   "cost": 150,
+   "desc": "A second blade across your back, for the look of it.",
+   "defined": "js/crew.js:93"
+  },
+  {
+   "id": "lanternpole",
+   "name": "Lantern Pole",
+   "slot": "back",
+   "cost": 190,
+   "desc": "Your own lamp, carried high. Down here that means something.",
+   "defined": "js/crew.js:94"
+  },
+  {
+   "id": "skullrack",
+   "name": "Trophy Rack",
+   "slot": "back",
+   "cost": 280,
+   "desc": "Three skulls on iron spikes.",
+   "defined": "js/crew.js:95"
+  },
+  {
+   "id": "blood",
+   "name": "Bloodletter",
+   "slot": "weapon",
+   "cost": 180,
+   "desc": "Red to the hilt, and it stays that way.",
+   "defined": "js/crew.js:96"
+  },
+  {
+   "id": "toxic",
+   "name": "Sewer-Quenched",
+   "slot": "weapon",
+   "cost": 180,
+   "desc": "A sick green shine.",
+   "defined": "js/crew.js:97"
+  },
+  {
+   "id": "quiver",
+   "name": "Javelin Quiver",
+   "slot": "back",
+   "cost": 120,
+   "desc": "Three short spears you will never throw.",
+   "defined": "js/crew.js:98"
+  },
+  {
+   "id": "ratcage",
+   "name": "Mistake’s Cousin",
+   "slot": "back",
+   "cost": 170,
+   "desc": "A rat in a cage on your back. He is not fast either.",
+   "defined": "js/crew.js:99"
+  },
+  {
+   "id": "moneybag",
+   "name": "Sack of Winnings",
+   "slot": "back",
+   "cost": 9999,
+   "desc": "A fat sack with coin spilling from the neck. Mostly washers.",
+   "defined": "js/crew.js:100"
+  },
+  {
+   "id": "frost",
+   "name": "Rimed Edge",
+   "slot": "weapon",
+   "cost": 180,
+   "desc": "Pale as lake ice.",
+   "defined": "js/crew.js:101"
+  },
+  {
+   "id": "voidsteel",
+   "name": "Voidsteel",
+   "slot": "weapon",
+   "cost": 260,
+   "desc": "Black metal with a violet burn in it.",
+   "defined": "js/crew.js:102"
+  },
+  {
+   "id": "wisp",
+   "name": "Wisplight Edge",
+   "slot": "weapon",
+   "cost": 9999,
+   "desc": "The same light the dice are made of, on a blade.",
+   "defined": "js/crew.js:103"
+  },
+  {
+   "id": "pennants",
+   "name": "Crowd’s Pennants",
+   "slot": "back",
+   "cost": 9999,
+   "desc": "Deed: Crowd Favourite. Two flags they threw down to you.",
+   "defined": "js/crew.js:104"
+  },
+  {
+   "id": "mirror",
+   "name": "Mirror Polish",
+   "slot": "weapon",
+   "cost": 9999,
+   "desc": "Deed: Deflector. Bright enough to parry by.",
+   "defined": "js/crew.js:105"
+  },
+  {
+   "id": "luckyedge",
+   "name": "Partner’s Edge",
+   "slot": "weapon",
+   "cost": 9999,
+   "desc": "Deed: Silent Partner. Green with a gold shine, like Marc’s promises.",
+   "defined": "js/crew.js:106"
+  },
+  {
+   "id": "obsidian",
+   "name": "Obsidian",
+   "slot": "weapon",
+   "cost": 9999,
+   "desc": "Deed: Posture Breaker. Black glass with a red heart.",
+   "defined": "js/crew.js:107"
+  },
+  {
+   "id": "bronze",
+   "name": "Old Bronze",
+   "slot": "weapon",
+   "cost": 9999,
+   "desc": "Deed: Heavy Hand. The metal the first pit fighters used.",
+   "defined": "js/crew.js:108"
+  },
+  {
+   "id": "ember",
+   "name": "Emberforged",
+   "slot": "weapon",
+   "cost": 120,
+   "desc": "The edge glows like a coal.",
+   "defined": "js/crew.js:109"
+  },
+  {
+   "id": "frost",
+   "name": "Frostbitten",
+   "slot": "weapon",
+   "cost": 120,
+   "desc": "Cold enough to smoke.",
+   "defined": "js/crew.js:101"
+  },
+  {
+   "id": "gilded",
+   "name": "Gilded",
+   "slot": "weapon",
+   "cost": 200,
+   "desc": "Gold leaf over good steel.",
+   "defined": "js/crew.js:111"
+  },
+  {
+   "id": "void",
+   "name": "Voidglass",
+   "slot": "weapon",
+   "cost": 260,
+   "desc": "Purple-black and faintly humming.",
+   "defined": "js/crew.js:112"
+  },
+  {
+   "id": "embers",
+   "name": "Ember Motes",
+   "slot": "aura",
+   "cost": 150,
+   "desc": "Sparks that follow you around.",
+   "defined": "js/crew.js:113"
+  },
+  {
+   "id": "mist",
+   "name": "Grave Mist",
+   "slot": "aura",
+   "cost": 150,
+   "desc": "A cold blue haze at your feet.",
+   "defined": "js/crew.js:114"
+  },
+  {
+   "id": "sigils",
+   "name": "Violet Sigils",
+   "slot": "aura",
+   "cost": 190,
+   "desc": "Guild-work glyphs that orbit you.",
+   "defined": "js/crew.js:115"
+  },
+  {
+   "id": "snow",
+   "name": "Rime Fall",
+   "slot": "aura",
+   "cost": 190,
+   "desc": "A cold white drift that never settles.",
+   "defined": "js/crew.js:116"
+  },
+  {
+   "id": "bloodmist",
+   "name": "Red Mist",
+   "slot": "aura",
+   "cost": 240,
+   "desc": "It followed you out of the pit.",
+   "defined": "js/crew.js:117"
+  },
+  {
+   "id": "moths",
+   "name": "Lamp Moths",
+   "slot": "aura",
+   "cost": 130,
+   "desc": "They think you are the First Lamp.",
+   "defined": "js/crew.js:118"
+  },
+  {
+   "id": "spores",
+   "name": "Glowcap Spores",
+   "slot": "aura",
+   "cost": 170,
+   "desc": "Do not breathe in. Marc does.",
+   "defined": "js/crew.js:119"
+  },
+  {
+   "id": "wisps",
+   "name": "Loose Wisps",
+   "slot": "aura",
+   "cost": 9999,
+   "desc": "Escaped from the table. They like you.",
+   "defined": "js/crew.js:120"
+  },
+  {
+   "id": "afterimage",
+   "name": "Afterimage",
+   "slot": "aura",
+   "cost": 9999,
+   "desc": "Deed: Not There. Pale echoes of where you just were.",
+   "defined": "js/crew.js:121"
+  },
+  {
+   "id": "saintly",
+   "name": "Untouched Light",
+   "slot": "aura",
+   "cost": 9999,
+   "desc": "Deed: Untouched. Nothing has laid a hand on you.",
+   "defined": "js/crew.js:122"
+  },
+  {
+   "id": "hearth",
+   "name": "Hearth Glow",
+   "slot": "aura",
+   "cost": 9999,
+   "desc": "Deed: House Proud. You smell faintly of a good fire.",
+   "defined": "js/crew.js:123"
+  },
+  {
+   "id": "steam",
+   "name": "Forge Steam",
+   "slot": "aura",
+   "cost": 9999,
+   "desc": "Deed: Immovable. You run hot.",
+   "defined": "js/crew.js:124"
+  },
+  {
+   "id": "gold",
+   "name": "Halo of Coin",
+   "slot": "aura",
+   "cost": 280,
+   "desc": "The crowd’s favour, made visible.",
+   "defined": "js/crew.js:125"
+  },
+  {
+   "id": "vossband",
+   "name": "Voss’s Band",
+   "slot": "head",
+   "cost": 9999,
+   "desc": "Won from Ferren Voss, twice. A teal fighting-band with a brass ring.",
+   "defined": "js/story.js:112"
+  }
+ ],
+ "dyes": [
+  {
+   "id": "crimson",
+   "colours": {
+    "armor": "#7a2026",
+    "armor2": "#4a1216",
+    "cloth": "#b0262e",
+    "trim": "#e0b050",
+    "legs": "#3a1418"
+   },
+   "defined": "js/crew.js:57"
+  },
+  {
+   "id": "midnight",
+   "colours": {
+    "armor": "#2a3250",
+    "armor2": "#181c30",
+    "cloth": "#24306a",
+    "trim": "#9ab0e0",
+    "legs": "#1c2038"
+   },
+   "defined": "js/crew.js:58"
+  },
+  {
+   "id": "bone",
+   "colours": {
+    "armor": "#d8d2c0",
+    "armor2": "#9a9484",
+    "cloth": "#efe8d6",
+    "trim": "#8a6a34",
+    "legs": "#6a6458"
+   },
+   "defined": "js/crew.js:60"
+  },
+  {
+   "id": "emerald",
+   "colours": {
+    "armor": "#2a5a44",
+    "armor2": "#183828",
+    "cloth": "#2f8a5a",
+    "trim": "#d8c060",
+    "legs": "#1c3024"
+   },
+   "defined": "js/crew.js:59"
+  },
+  {
+   "id": "royal",
+   "colours": {
+    "armor": "#3a2a6a",
+    "armor2": "#241848",
+    "cloth": "#5a2a8a",
+    "trim": "#d8dce6",
+    "legs": "#1c1430"
+   },
+   "defined": "js/crew.js:62"
+  },
+  {
+   "id": "gilt",
+   "colours": {
+    "armor": "#1c1a1e",
+    "armor2": "#0e0d10",
+    "cloth": "#2a2428",
+    "trim": "#ffd36b",
+    "legs": "#141216"
+   },
+   "defined": "js/crew.js:66"
+  },
+  {
+   "id": "venom",
+   "colours": {
+    "armor": "#2a3a22",
+    "armor2": "#16200f",
+    "cloth": "#6aa82a",
+    "trim": "#b8ff5a",
+    "legs": "#1a2414"
+   },
+   "defined": "js/crew.js:64"
+  },
+  {
+   "id": "rime",
+   "colours": {
+    "armor": "#cfe6f2",
+    "armor2": "#8fb0c4",
+    "cloth": "#9fd6ee",
+    "trim": "#ffffff",
+    "legs": "#6a8a9c"
+   },
+   "defined": "js/crew.js:65"
+  },
+  {
+   "id": "cinder",
+   "colours": {
+    "armor": "#3a2a24",
+    "armor2": "#201612",
+    "cloth": "#d0581a",
+    "trim": "#ffb060",
+    "legs": "#241a16"
+   },
+   "defined": "js/crew.js:63"
+  },
+  {
+   "id": "bonewhite",
+   "colours": {
+    "armor": "#e6dcc4",
+    "armor2": "#b8ac90",
+    "cloth": "#1a1618",
+    "trim": "#8a1c1c",
+    "legs": "#2a2428"
+   },
+   "defined": "js/crew.js:73"
+  },
+  {
+   "id": "rust",
+   "colours": {
+    "armor": "#8a4a2a",
+    "armor2": "#5a2e1a",
+    "cloth": "#3a3430",
+    "trim": "#2a2428",
+    "legs": "#2a2220"
+   },
+   "defined": "js/crew.js:72"
+  },
+  {
+   "id": "house",
+   "colours": {
+    "armor": "#1f5a3a",
+    "armor2": "#143a2c",
+    "cloth": "#0e2a1e",
+    "trim": "#f0c95a",
+    "legs": "#10241a"
+   },
+   "defined": "js/crew.js:75"
+  },
+  {
+   "id": "bloodied",
+   "colours": {
+    "armor": "#3a1416",
+    "armor2": "#200a0c",
+    "cloth": "#7a1418",
+    "trim": "#1a1618",
+    "legs": "#1c0c0e"
+   },
+   "defined": "js/crew.js:80"
+  },
+  {
+   "id": "masonry",
+   "colours": {
+    "armor": "#8a8680",
+    "armor2": "#5e5a56",
+    "cloth": "#4a4644",
+    "trim": "#cfc8b8",
+    "legs": "#3a3836"
+   },
+   "defined": "js/crew.js:81"
+  },
+  {
+   "id": "palequeen",
+   "colours": {
+    "armor": "#efeaf4",
+    "armor2": "#bfb4d0",
+    "cloth": "#5a1f7a",
+    "trim": "#f0c95a",
+    "legs": "#2a1438"
+   },
+   "defined": "js/crew.js:82"
+  },
+  {
+   "id": "ashen",
+   "colours": {
+    "armor": "#4a4a4e",
+    "armor2": "#2a2a2e",
+    "cloth": "#1c1c20",
+    "trim": "#c22a22",
+    "legs": "#202024"
+   },
+   "defined": "js/crew.js:61"
+  }
+ ],
+ "rings": [
+  {
+   "id": "cinder",
+   "name": "Cinder Ring",
+   "desc": "The first thing your blood does on its own: a circle of embers it will not let you step out of.",
+   "defined": "js/crew.js:63"
+  },
+  {
+   "id": "glass",
+   "name": "Wet Glass",
+   "desc": "Cold blue light out of the Wet Galleries, where the water has not moved in a hundred years.",
+   "defined": "js/crowd.js:26"
+  },
+  {
+   "id": "storm",
+   "name": "The Stormcall",
+   "desc": "A ring of lightning teeth: the Ember Rows still say a storm-born child crackles in the cradle.",
+   "defined": "js/deeds.js:23"
+  },
+  {
+   "id": "wyrm",
+   "name": "Wyrm’s Eye",
+   "desc": "Your blood remembers something with scales. Now the sand under you does too.",
+   "defined": "js/rings.js:9"
+  },
+  {
+   "id": "pale",
+   "name": "Pale Crown",
+   "desc": "A Koheneim mandala, the Queen’s own sign. Nobody gave it to you. You simply have one now.",
+   "defined": "js/rings.js:10"
+  },
+  {
+   "id": "ash",
+   "name": "Ash Circle",
+   "desc": "What is left on the floor after the first bargain: a ring of ash that never quite blows away.",
+   "defined": "js/rings.js:11"
+  },
+  {
+   "id": "line",
+   "name": "The Signed Line",
+   "desc": "The clause you signed, written round you in a hand that is not yours, still checking you keep it.",
+   "defined": "js/rings.js:12"
+  },
+  {
+   "id": "teeth",
+   "name": "Teeth Below",
+   "desc": "The thing under the pit opens its mouth a little wider each time you call on it.",
+   "defined": "js/rings.js:13"
+  },
+  {
+   "id": "seal",
+   "name": "The Bargain Seal",
+   "desc": "Your patron’s own seal, pressed into the sand. Others in the pact can see it from a long way off.",
+   "defined": "js/mark3.js:27"
+  },
+  {
+   "id": "unspoken",
+   "name": "Name Unspoken",
+   "desc": "Seven points for seven letters you promised never to say aloud. It glows a little brighter every time you nearly do.",
+   "defined": "js/rings.js:15"
+  },
+  {
+   "id": "hourmark",
+   "name": "The Roseinbeirg Hourmark",
+   "desc": "David’s own. Nobody else stands on it twice.",
+   "defined": "js/rings.js:16"
+  }
+ ],
+ "furniture": [
+  {
+   "id": "lantern",
+   "name": "Iron Lantern",
+   "cost": 15,
+   "defined": "js/data.js:134"
+  },
+  {
+   "id": "rug",
+   "name": "Guild Rug",
+   "cost": 25,
+   "defined": "js/data.js:135"
+  },
+  {
+   "id": "glowcaps",
+   "name": "Glowcap Patch",
+   "cost": 35,
+   "defined": "js/data.js:136"
+  },
+  {
+   "id": "bed",
+   "name": "Feather Bed",
+   "cost": 60,
+   "defined": "js/data.js:137"
+  },
+  {
+   "id": "trophies",
+   "name": "Trophy Shelf",
+   "cost": 90,
+   "defined": "js/data.js:138"
+  },
+  {
+   "id": "desk",
+   "name": "Planning Desk",
+   "cost": 100,
+   "defined": "js/data.js:139"
+  },
+  {
+   "id": "banner",
+   "name": "Syndicate Banner",
+   "cost": 110,
+   "defined": "js/data.js:140"
+  },
+  {
+   "id": "bloom",
+   "name": "Crystal Bloom",
+   "cost": 120,
+   "defined": "js/data.js:141"
+  },
+  {
+   "id": "fountain",
+   "name": "Moonwater Fountain",
+   "cost": 160,
+   "defined": "js/data.js:142"
+  },
+  {
+   "id": "cauldron",
+   "name": "Alchemist's Cauldron",
+   "cost": 180,
+   "defined": "js/data.js:143"
+  },
+  {
+   "id": "statues",
+   "name": "Guardian Statue",
+   "cost": 200,
+   "defined": "js/data.js:144"
+  },
+  {
+   "id": "crystals",
+   "name": "Starlight Spire",
+   "cost": 240,
+   "defined": "js/data.js:145"
+  },
+  {
+   "id": "fern",
+   "name": "Cave Fern",
+   "cost": 20,
+   "defined": "js/data.js:146"
+  },
+  {
+   "id": "bench",
+   "name": "Stone Bench",
+   "cost": 40,
+   "defined": "js/data.js:147"
+  },
+  {
+   "id": "weaponrack",
+   "name": "Weapon Rack",
+   "cost": 60,
+   "defined": "js/data.js:148"
+  },
+  {
+   "id": "table",
+   "name": "Long Table",
+   "cost": 70,
+   "defined": "js/data.js:149"
+  },
+  {
+   "id": "firebowl",
+   "name": "Fire Bowl",
+   "cost": 55,
+   "defined": "js/data.js:150"
+  },
+  {
+   "id": "bookshelf",
+   "name": "Bookshelf",
+   "cost": 80,
+   "defined": "js/data.js:151"
+  },
+  {
+   "id": "hearth",
+   "name": "Stone Hearth",
+   "cost": 130,
+   "defined": "js/data.js:152"
+  },
+  {
+   "id": "dummy",
+   "name": "Training Dummy",
+   "cost": 120,
+   "defined": "js/data.js:153"
+  },
+  {
+   "id": "willow",
+   "name": "Glow-Willow",
+   "cost": 220,
+   "defined": "js/data.js:154"
+  },
+  {
+   "id": "wardrobe",
+   "name": "Wardrobe",
+   "cost": 110,
+   "defined": "js/home.js:8"
+  },
+  {
+   "id": "armourstand",
+   "name": "Armour Stand",
+   "cost": 130,
+   "defined": "js/home.js:11"
+  },
+  {
+   "id": "strongbox",
+   "name": "Strongbox",
+   "cost": 150,
+   "defined": "js/home.js:14"
+  },
+  {
+   "id": "dicetable",
+   "name": "Card and Dice Table",
+   "cost": 160,
+   "defined": "js/home.js:17"
+  },
+  {
+   "id": "queenstatue",
+   "name": "Statuette of the Queen",
+   "cost": 180,
+   "defined": "js/home.js:20"
+  },
+  {
+   "id": "bearskin",
+   "name": "Cave-Bear Skin",
+   "cost": 90,
+   "defined": "js/home.js:23"
+  },
+  {
+   "id": "washtub",
+   "name": "Copper Washtub",
+   "cost": 70,
+   "defined": "js/home.js:26"
+  },
+  {
+   "id": "stove",
+   "name": "Iron Stove",
+   "cost": 140,
+   "defined": "js/home2.js:27"
+  },
+  {
+   "id": "maptable",
+   "name": "Map Table",
+   "cost": 220,
+   "defined": "js/home2.js:32"
+  },
+  {
+   "id": "shrine",
+   "name": "Hourglass Shrine",
+   "cost": 260,
+   "defined": "js/home2.js:37"
+  },
+  {
+   "id": "still",
+   "name": "Copper Still",
+   "cost": 170,
+   "defined": "js/tune2.js:20"
+  },
+  {
+   "id": "lodger",
+   "name": "Lodger’s Cot",
+   "cost": 240,
+   "defined": "js/tune2.js:23"
+  },
+  {
+   "id": "ratcage",
+   "name": "Marc’s Rat Cages",
+   "cost": 190,
+   "defined": "js/crew.js:99"
+  }
+ ],
+ "wallPieces": [
+  {
+   "id": "poster",
+   "name": "Wanted Poster",
+   "defined": "js/room.js:29"
+  },
+  {
+   "id": "sconce",
+   "name": "Wall Sconce",
+   "defined": "js/room.js:30"
+  },
+  {
+   "id": "blades",
+   "name": "Crossed Blades",
+   "defined": "js/room.js:31"
+  },
+  {
+   "id": "jars",
+   "name": "Shelf of Jars",
+   "defined": "js/room.js:32"
+  },
+  {
+   "id": "tapestry",
+   "name": "Guild Tapestry",
+   "defined": "js/room.js:33"
+  },
+  {
+   "id": "portrait",
+   "name": "Your Portrait",
+   "defined": "js/room.js:34"
+  },
+  {
+   "id": "skull",
+   "name": "Mounted Skull",
+   "defined": "js/room.js:35"
+  },
+  {
+   "id": "stone",
+   "name": "Bare Stone",
+   "defined": "js/room.js:17"
+  },
+  {
+   "id": "plaster",
+   "name": "Limewash",
+   "defined": "js/room.js:18"
+  },
+  {
+   "id": "panel",
+   "name": "Wood Panelling",
+   "defined": "js/room.js:19"
+  },
+  {
+   "id": "pitred",
+   "name": "Pit Red",
+   "defined": "js/room.js:20"
+  },
+  {
+   "id": "guild",
+   "name": "Guild Violet",
+   "defined": "js/room.js:21"
+  }
+ ],
+ "floors": [
+  {
+   "id": "flag",
+   "name": "Flagstones",
+   "defined": "js/room.js:10"
+  },
+  {
+   "id": "checker",
+   "name": "Chequerboard",
+   "defined": "js/room.js:11"
+  },
+  {
+   "id": "wood",
+   "name": "Scavenged Planks",
+   "defined": "js/room.js:12"
+  },
+  {
+   "id": "carpet",
+   "name": "Pit-Red Carpet",
+   "defined": "js/room.js:13"
+  },
+  {
+   "id": "mosaic",
+   "name": "Old Mosaic",
+   "defined": "js/room.js:14"
+  }
+ ],
+ "gardens": [
+  {
+   "id": "moss",
+   "name": "Cave Moss",
+   "defined": "js/room.js:24"
+  },
+  {
+   "id": "gravel",
+   "name": "Raked Gravel",
+   "defined": "js/room.js:25"
+  },
+  {
+   "id": "glow",
+   "name": "Glowmoss",
+   "defined": "js/room.js:26"
+  }
+ ],
+ "stances": [
+  {
+   "id": "stance-0",
+   "name": "Guild Standard",
+   "sub": "How the weapon was taught",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-1",
+   "name": "The Crouch",
+   "sub": "Low, coiled, eyes up",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-2",
+   "name": "Parade Rest",
+   "sub": "Upright, one hand behind the back",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-3",
+   "name": "The Long Line",
+   "sub": "Side-on, blade raised, off hand behind",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-4",
+   "name": "The Roof",
+   "sub": "Held high over the head",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-5",
+   "name": "Gutter Guard",
+   "sub": "Fists up, chin down, always moving",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-6",
+   "name": "Tavern Lean",
+   "sub": "On the shoulder, hand on the hip",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-7",
+   "name": "The Hound",
+   "sub": "Bent double, arms hanging, swaying",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-8",
+   "name": "Stillness",
+   "sub": "Hanging in the air, nothing more",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-9",
+   "name": "The Seated Hour",
+   "sub": "Legs folded under, hands on the knees",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-10",
+   "name": "Open Hands",
+   "sub": "Arms wide, head back, toes down",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-11",
+   "name": "The Recline",
+   "sub": "Lying back on nothing, arms folded",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-12",
+   "name": "The Coil",
+   "sub": "One knee drawn up, one hand out",
+   "defined": "js/stance.js"
+  },
+  {
+   "id": "stance-13",
+   "name": "The Drowned",
+   "sub": "Limp, head on one side, turning slowly",
+   "defined": "js/stance.js"
+  }
+ ],
+ "guests": [
+  {
+   "id": "david",
+   "name": "David Roseinbeirg",
+   "race": "eg_old",
+   "title": "",
+   "defined": "js/oracle.js:20"
+  },
+  {
+   "id": "bottie",
+   "name": "Lil Bottie",
+   "race": "eg_clanker",
+   "title": "",
+   "defined": "js/eggs.js:103"
+  },
+  {
+   "id": "marcus",
+   "name": "Marcus",
+   "race": "eg_bro",
+   "title": "",
+   "defined": "js/eggs.js:105"
+  },
+  {
+   "id": "will",
+   "name": "Will",
+   "race": "eg_founder",
+   "title": "",
+   "defined": "js/eggs.js:107"
+  },
+  {
+   "id": "erin",
+   "name": "Erin",
+   "race": "eg_gardener",
+   "title": "",
+   "defined": "js/eggs.js:109"
+  },
+  {
+   "id": "louie",
+   "name": "Louie",
+   "race": "eg_shiba",
+   "title": "",
+   "defined": "js/eggs.js:111"
+  },
+  {
+   "id": "bibi",
+   "name": "King Bibi",
+   "race": "eg_incumbent",
+   "title": "",
+   "defined": "js/eggs.js:113"
+  },
+  {
+   "id": "sprout",
+   "name": "A Sprout",
+   "race": "eg_sprout",
+   "title": "",
+   "defined": "js/eggs.js:115"
+  },
+  {
+   "id": "kael",
+   "name": "Kael Brennick",
+   "race": "eg_spacer",
+   "title": "",
+   "defined": "js/eggs.js:117"
+  },
+  {
+   "id": "_derek",
+   "title": "",
+   "defined": "js/eggs.js"
+  }
+ ],
+ "places": [
+  {
+   "id": "hub",
+   "name": "The Lamp Market",
+   "defined": "js/places.js"
+  },
+  {
+   "id": "arena",
+   "name": "The Blood Pit",
+   "defined": "js/places.js"
+  },
+  {
+   "id": "hideout",
+   "name": "Your Hideout",
+   "defined": "js/places.js"
+  },
+  {
+   "id": "cellar",
+   "name": "David’s cellar",
+   "defined": "js/places.js"
+  }
+ ],
+ "generated": "2026-11-27"
+}

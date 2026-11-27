@@ -1,6 +1,8 @@
 // Guttercrown — the opening cinematic. A free perspective camera (crane, orbit, dolly-zoom, whip-pan) films the
 // three places and a montage of scripted exhibition bouts that use the real combat abilities and effects.
 (function () {
+  window.G.LOOKDEF = window.G.LOOKDEF || {}; window.G.LOOKDEF['throne-king'] = { id: 'throne-king', cls: 'fighter', race: 'human', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#16121a', trim: '#f0c95a', hair: '#8a8a90' }, gear: { weapon: 2, armor: 2 }, cos: { head: 'crown', back: 'greatcloak' } };       // in the asset registry: see assets/REGISTRY.md
+  window.G.LOOKDEF = window.G.LOOKDEF || {}; window.G.LOOKDEF['throne-queen'] = { id: 'throne-queen', cls: 'sorcerer', race: 'elf', tint: { cloth: '#e8e4f8', armor: '#b8a8e8', armor2: '#8a78c8', hair: '#f4f0ff', trim: '#f0c95a' }, cos: { head: 'crown', aura: 'sigils' } };       // in the asset registry: see assets/REGISTRY.md
   const G = window.G, T = THREE, gfx = G.gfx, W = G.world, F = G.fight, S = gfx.S;
   const C = G.cine = { active: false };
   let el, sub, fade, logo, card, flashEl, shots, idx, t, now, onDone, savedItems, lastLine, fired, ex, crown, arena, camPos;
@@ -49,8 +51,8 @@
     [[-0.95, 0x3a2a6a], [0.95, 0x5a1418]].forEach(q => { box(1.1, 2.9, 0.3, L(q[1]), q[0], 2.1, -1.5, s); box(1.25, 0.2, 0.4, gold, q[0], 3.6, -1.5, s); mesh(new T.ConeGeometry(0.2, 0.5, 4), gold, q[0], 3.95, -1.5, s); box(1.1, 0.25, 0.9, L(q[1]), q[0], 0.9, -1.0, s); });
     for (let i = 0; i < 8; i++) { const a = -0.5 + i * 0.6, x = Math.sin(a) * 7.2 * (i % 2 ? 1 : -1), z = -3 - Math.abs(Math.cos(a)) * 2.5 - (i >> 1) * 0.9; mesh(new T.CylinderGeometry(0.42, 0.5, 9, 8), marble, x, 4.5, z, s); box(1.3, 0.3, 1.3, gold, x, 0.15, z, s); }
     [-3.3, 3.3].forEach((x, i) => { const m = new T.Mesh(new T.PlaneGeometry(1.5, 5), new T.MeshLambertMaterial({ map: gfx.bannerTex(i ? '#5a1418' : '#3a2a6a', '#f0c95a'), transparent: true, alphaTest: 0.5, side: T.DoubleSide })); m.position.set(x, 3.6, -2.4); s.add(m); });
-    const queen = G.makeChar({ cls: 'sorcerer', race: 'elf', tint: { cloth: '#e8e4f8', armor: '#b8a8e8', armor2: '#8a78c8', hair: '#f4f0ff', trim: '#f0c95a' }, cos: { head: 'crown', aura: 'sigils' } });
-    const king = G.makeChar({ cls: 'fighter', race: 'human', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#16121a', trim: '#f0c95a', hair: '#8a8a90' }, gear: { weapon: 2, armor: 2 }, cos: { head: 'crown', back: 'greatcloak' } });
+    const queen = G.makeChar(G.LOOKDEF['throne-queen']);
+    const king = G.makeChar(G.LOOKDEF['throne-king']);
     queen.root.position.set(-0.95, 0.65, -0.1); king.root.position.set(0.95, 0.65, -0.1); s.add(queen.root, king.root);
     const wing = new T.MeshBasicMaterial({ color: 0xc8b8ff, transparent: true, opacity: 0.26, side: T.DoubleSide, blending: T.AdditiveBlending, depthWrite: false }), wings = [];
     [-1, 1].forEach(sd => [0, 1].forEach(lo => { const g = new T.Group(), w = new T.Mesh(new T.CircleGeometry(lo ? 0.55 : 0.8, 5, 0, Math.PI), wing); w.scale.set(0.8, lo ? 1.1 : 1.6, 1); w.rotation.z = -Math.PI / 2 * sd; w.position.x = sd * 0.05; g.add(w); g.position.set(-0.95 + sd * 0.14, lo ? 1.75 : 2.15, -0.42); g.rotation.z = sd * (lo ? 0.5 : -0.25); s.add(g); wings.push([g, sd]); }));

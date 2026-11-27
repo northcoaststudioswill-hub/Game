@@ -19,7 +19,7 @@
   const ENDS = ['put {l} into the wall in the second exchange.', 'bled {l} out slowly. The crowd got restless.', 'took one clean shot from {l} and answered with six.', 'was losing badly until {l} whiffed a finisher.', 'parried everything {l} had. It was honestly rude.', 'won ugly. {l} will not be fighting again.', 'ended it with a single mortal blow. {l} never saw it.'];
 
   const mk = G.mark = {
-    look: { cls: 'sorcerer', race: 'human', tint: { hair: '#2a1c10' }, cos: { dye: 'emerald', head: 'laurel', back: null, weapon: 'gilded', aura: null } },
+    look: { id: 'marc', cls: 'sorcerer', race: 'human', tint: { hair: '#2a1c10' }, cos: { dye: 'emerald', head: 'laurel', back: null, weapon: 'gilded', aura: null } },
     card: function () {                          // tonight's undercard
       const st = G.state; if (st.card && st.card.bouts) return st.card;
       const pool = NAMES.slice().sort(() => Math.random() - 0.5), bouts = [];

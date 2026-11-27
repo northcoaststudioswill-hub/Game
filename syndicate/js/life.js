@@ -33,15 +33,15 @@
     [-1.5, 1.5].forEach(z => { mesh(new T.CylinderGeometry(0.05, 0.07, 0.9, 6), L(0xd9a93c), -2.2, 0.45, z, booth); mesh(new T.SphereGeometry(0.09, 6, 5), L(0xd9a93c), -2.2, 0.95, z, booth); });
     [-0.9, 0.9].forEach(z => mesh(new T.CylinderGeometry(0.2, 0.2, 0.5, 7), wood, -1.0, 0.25, z, booth));
     W.wispBooth = { g: booth, idle: dice, x: BX, z: BZ };
-    const roller = npc(s, { cls: 'cleric', race: 'human', tint: { cloth: '#5a2a4a', armor: '#3a3040' } }, BX - 0.75, BZ - 0.75, Math.PI / 2);
+    const roller = npc(s, { id: 'wisp-gambler', cls: 'cleric', race: 'human', tint: { cloth: '#5a2a4a', armor: '#3a3040' } }, BX - 0.75, BZ - 0.75, Math.PI / 2);
     obstacles.push([BX - 0.9, BZ - 1.7, BX + 1.5, BZ + 1.7]);
 
     // ---- pit gate guards, and a pair arguing about the odds
-    const guards = [npc(s, { cls: 'fighter', race: 'halforc', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#1a1618' } }, 3.2, 0.5, 0.2), npc(s, { cls: 'fighter', race: 'human', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#1a1618' } }, 6.8, 0.5, -0.2)];
-    const arg = [npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#6a5a3a', armor: '#4a4438' } }, 22.9, 0.3, 0.3), npc(s, { cls: 'sorcerer', race: 'dwarf', tint: { cloth: '#3a5a3a', armor: '#3a4038' } }, 23.2, 1.3, -2.8)];
+    const guards = [npc(s, { id: 'pit-guard-west', cls: 'fighter', race: 'halforc', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#1a1618' } }, 3.2, 0.5, 0.2), npc(s, { id: 'pit-guard-east', cls: 'fighter', race: 'human', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#1a1618' } }, 6.8, 0.5, -0.2)];
+    const arg = [npc(s, { id: 'odds-arguer-human', cls: 'rogue', race: 'human', tint: { cloth: '#6a5a3a', armor: '#4a4438' } }, 22.9, 0.3, 0.3), npc(s, { id: 'odds-arguer-dwarf', cls: 'sorcerer', race: 'dwarf', tint: { cloth: '#3a5a3a', armor: '#3a4038' } }, 23.2, 1.3, -2.8)];
     obstacles.push([2.9, 0.2, 3.5, 0.8], [6.5, 0.2, 7.1, 0.8], [22.6, 0, 23.5, 1.6]);
     // ---- a busker by the First Lamp, hat on the ground
-    const busk = npc(s, { cls: 'rogue', race: 'elf', tint: { cloth: '#7a3a5a', armor: '#4a2a40', hair: '#f0c95a' } }, 18.4, 12.6, 2.2);
+    const busk = npc(s, { id: 'busker', cls: 'rogue', race: 'elf', tint: { cloth: '#7a3a5a', armor: '#4a2a40', hair: '#f0c95a' } }, 18.4, 12.6, 2.2);
     mesh(new T.CylinderGeometry(0.22, 0.16, 0.12, 8), L(0x2a2228), 19.0, 0.06, 13.3, s); for (let i = 0; i < 4; i++) mesh(new T.CylinderGeometry(0.05, 0.05, 0.02, 6), new T.MeshPhongMaterial({ color: 0xf0c95a, shininess: 90 }), 18.95 + i * 0.04, 0.13, 13.27 + (i % 2) * 0.06, s).castShadow = false;
     obstacles.push([18.1, 12.3, 18.7, 12.9]);
     // ---- a cat on the crates by the notice board
@@ -75,8 +75,8 @@
       [[-2.3, '#3a2a6a'], [2.3, '#5a1418']].forEach(q => { const bn = new T.Mesh(new T.PlaneGeometry(1.1, 2.6), new T.MeshLambertMaterial({ map: gfx.bannerTex(q[1], '#f0c95a'), transparent: true, alphaTest: 0.5, side: T.DoubleSide })); bn.position.set(-1.42, 3.0, GZ + q[0]); bn.rotation.y = Math.PI / 2; s.add(bn); });
       const sl2 = new T.PointLight(0xdfe6ff, 12, 9, 1.6); sl2.position.set(-0.4, 2.8, GZ); s.add(sl2); gfx.glow(0xdfe6ff, 2.2, -1.2, 2.6, GZ, s, 0.35);
       box(0.6, 0.4, 0.42, woodD, -0.55, 0.2, GZ + 1.05, s); box(0.64, 0.08, 0.46, goldM, -0.55, 0.42, GZ + 1.05, s);
-      const wl = { cls: 'fighter', race: 'elf', gear: { weapon: 1, armor: 2 }, tint: { cloth: '#e8e4f8', armor: '#dfe2ec', armor2: '#a8b0c4', trim: '#f0c95a', legs: '#8a90a4' }, arm: 'f_spear' };
-      var wardens = [npc(s, wl, 0.35, GZ - 1.3, Math.PI / 2), npc(s, Object.assign({}, wl, { race: 'human' }), 0.35, GZ + 1.3, Math.PI / 2)];
+      const wl = { id: 'stair-warden-elf', cls: 'fighter', race: 'elf', gear: { weapon: 1, armor: 2 }, tint: { cloth: '#e8e4f8', armor: '#dfe2ec', armor2: '#a8b0c4', trim: '#f0c95a', legs: '#8a90a4' }, arm: 'f_spear' };
+      var wardens = [npc(s, wl, 0.35, GZ - 1.3, Math.PI / 2), npc(s, Object.assign({}, wl, { id: 'stair-warden-human', race: 'human' }), 0.35, GZ + 1.3, Math.PI / 2)];
       obstacles.push([0.05, GZ - 1.6, 0.65, GZ - 1.0], [0.05, GZ + 1.0, 0.65, GZ + 1.6], [-0.9, GZ + 0.8, -0.2, GZ + 1.3]); }
     const WARD = ['Seal.', 'Nobody climbs.', 'By order of the throne.', 'Step back from the gate.'];
     let wardT = 8;
@@ -130,8 +130,8 @@
     [-2.2, 2.2].forEach(x => box(0.5, 2.4, 0.08, L(0x471862), x, 3.0, -0.9, bx));
     box(0.9, 1.5, 0.2, L(0x2a1438), 0, 2.2, -0.6, bx); box(0.9, 0.16, 0.8, L(0x5a1f7a), 0, 1.86, -0.2, bx); [-0.5, 0.5].forEach(x => { box(0.12, 0.5, 0.8, gold, x, 2.05, -0.2, bx); mesh(new T.SphereGeometry(0.1, 6, 5), gold, x, 3.0, -0.6, bx); });
     const mkBox = (look, x, z, rot) => { const c = G.makeChar(look); c.root.position.set(x, 1.44, z); c.root.rotation.y = rot; bx.add(c.root); return c; };
-    const keeper = mkBox({ cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 0, 0.25, 0);
-    const bg = [mkBox({ cls: 'fighter', race: 'halforc', tint: { cloth: '#5a1f7a', armor: '#2a2428', armor2: '#1a1618' } }, -1.5, 0.3, 0.15), mkBox({ cls: 'fighter', race: 'human', tint: { cloth: '#5a1f7a', armor: '#2a2428', armor2: '#1a1618' } }, 1.5, 0.3, -0.15)];
+    const keeper = mkBox({ id: 'ledger-keeper', cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 0, 0.25, 0);
+    const bg = [mkBox({ id: 'box-guard-west', cls: 'fighter', race: 'halforc', tint: { cloth: '#5a1f7a', armor: '#2a2428', armor2: '#1a1618' } }, -1.5, 0.3, 0.15), mkBox({ id: 'box-guard-east', cls: 'fighter', race: 'human', tint: { cloth: '#5a1f7a', armor: '#2a2428', armor2: '#1a1618' } }, 1.5, 0.3, -0.15)];
     const cloak = mkBox({ cls: 'rogue', race: 'human', tint: { cloth: '#4a4a52', armor: '#33333a', armor2: '#26262c' }, cos: { head: 'hood', back: 'greatcloak' } }, 0.95, -0.45, -0.25);       // they say he comes once a year, for the champion's bout
     const bxL = new T.PointLight(0xc79bff, 9, 9, 1.6); bxL.position.set(0, 3.4, 0.8); bx.add(bxL);
     // ---- eyes behind the gate bars

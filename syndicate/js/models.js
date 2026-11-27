@@ -2,7 +2,7 @@
 (function () {
   const G = window.G, T = THREE, gfx = G.gfx;
 
-  const BASE = {
+  const BASE = G.MODEL_BASE = {
     fighter: { armor: 0x8a909c, armor2: 0x4a4e58, trim: 0xb09a5a, cloth: 0x8a1c22, legs: 0x565a66, hair: 0x3a2a20, weapon: 0xdfe6ee },
     rogue: { armor: 0x4a4454, armor2: 0x2c2834, trim: 0x8a7240, cloth: 0x3a3048, legs: 0x3a3642, hair: 0x1a1a1a, weapon: 0xd0d8e2 },
     sorcerer: { armor: 0x8a1c24, armor2: 0x4f1016, trim: 0xe0a844, cloth: 0xa0222a, legs: 0x3a1216, hair: 0x5a1418, weapon: 0xff8a3c },

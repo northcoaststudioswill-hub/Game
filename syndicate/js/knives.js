@@ -1,6 +1,7 @@
 // Guttercrown — the Knife Board: three knives at a painted board on Tallow Row. No buffs, no chores. Just a game.
 (function () {
   'use strict';
+  window.G.LOOKDEF = window.G.LOOKDEF || {}; window.G.LOOKDEF['knife-kid'] = { id: 'knife-kid', cls: 'rogue', race: 'human', tint: { cloth: '#6a4a3a', armor: '#4a3a30', hair: '#2a1c10' }, scale: 0.72 };       // in the asset registry: see assets/REGISTRY.md
   const G = window.G, ui = G.ui, T = THREE, show = (h, c) => ui._show(h, c), on = (s, f) => ui._on(s, f), pick = a => a[Math.floor(Math.random() * a.length)];
   let iv = null; const stop = () => { if (iv) { clearInterval(iv); iv = null; } };
   const RING = [[0.09, 10, 'BULL'], [0.2, 7, 'Inner'], [0.33, 4, 'Middle'], [0.47, 2, 'Outer']];
@@ -27,7 +28,7 @@
   G.world.buildHub = function () { const h = hub0.apply(this, arguments), s = h.scene, gfx = G.gfx, X = -11.4, Z = 21.2;
     gfx.box(1.5, 1.7, 0.12, gfx.lambert(0x5a4028), X, 1.5, Z, s); [[0.62, 0xd8d0c0], [0.46, 0x8a1c1c], [0.3, 0xd8d0c0], [0.14, 0xf0c95a]].forEach((q, i) => { const m = new T.Mesh(new T.CircleGeometry(q[0], 20), new T.MeshBasicMaterial({ color: q[1] })); m.position.set(X, 1.55, Z - 0.07 - i * 0.004); m.rotation.y = Math.PI; s.add(m); });
     [[-0.2, 1.7], [0.3, 1.35]].forEach(q => { const k = gfx.box(0.04, 0.04, 0.34, new T.MeshPhongMaterial({ color: 0xaab2bc, shininess: 60 }), X + q[0], q[1], Z - 0.24, s); k.rotation.x = 0.2; });
-    const kid = G.makeChar({ cls: 'rogue', race: 'human', tint: { cloth: '#6a4a3a', armor: '#4a3a30', hair: '#2a1c10' }, scale: 0.72 }); kid.root.position.set(X + 1.3, 0, Z - 0.9); kid.root.rotation.y = -2.2; s.add(kid.root); const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); kid.pose({ t: t + 5, act: 'idle' }); };
+    const kid = G.makeChar(G.LOOKDEF['knife-kid']); kid.root.position.set(X + 1.3, 0, Z - 0.9); kid.root.rotation.y = -2.2; s.add(kid.root); const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); kid.pose({ t: t + 5, act: 'idle' }); };
     h.spots.push({ x: X, z: Z - 1.3, r: 1.4, y: 2.9, label: 'The Knife Board', act: 'Throw knives', go: () => ui.knives() }); return h; };
   const close0 = ui.close; ui.close = function () { stop(); return close0.apply(this, arguments); };
 })();

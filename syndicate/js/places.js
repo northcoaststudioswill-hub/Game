@@ -68,11 +68,11 @@
     crate(s, 12.6, -0.7, 0.8); crate(s, 13.3, -0.9, 0.6);
     // ---- the Fence
     stall(s, 15.6, -0.3, 0x245a44, [0x7ad0ff, 0xffd36b, 0xff7a7a, 0x9aff8a], -1);
-    const fence = npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#245a44', armor: '#3a4a40' } }, 15.6, -1.0, 0);
+    const fence = npc(s, { id: 'fence', cls: 'rogue', race: 'human', tint: { cloth: '#245a44', armor: '#3a4a40' } }, 15.6, -1.0, 0);
     lantern(s, 17.6, 0, -0.9, 0xffb060, 16);
     // ---- the Guildmaster
     ban(20.4, 3.1, -1.5, 0, '#5a1f7a');
-    const gm = npc(s, { cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 20.4, -0.2, 0.2);
+    const gm = npc(s, { id: 'guildmaster', cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 20.4, -0.2, 0.2);
     box(1.8, 0.25, 1.8, m1, 20.4, 0.02, -0.2, s); box(1.0, 1.0, 0.6, woodD(), 21.6, 0.5, -0.6, s); box(0.8, 0.1, 0.5, L(0x5a1f1f), 21.6, 1.05, -0.6, s);
     lantern(s, 19, 0, -0.8, 0xb070ff, 18);
     // ---- Marc's corner: the Long Odds
@@ -89,7 +89,7 @@
     gfx.fire(mk, -1.9, 1.5, 1.7, 0x8aff5a, 0.4, 0); gfx.fire(mk, 1.9, 1.5, 1.7, 0xffd36b, 0.4, 0);
     const mkL = new T.PointLight(0xa0ffb0, 16, 11, 1.6); mkL.position.set(0, 2.2, 0.8); mk.add(mkL);
     const mark = npc(s, G.mark.look, 25.6, -0.5, 0);
-    const punter = npc(s, { cls: 'fighter', race: 'dwarf', tint: { cloth: '#5a3a2a', armor: '#4a4038' } }, 24.4, 1.4, 1.2);
+    const punter = npc(s, { id: 'marcs-punter', cls: 'fighter', race: 'dwarf', tint: { cloth: '#5a3a2a', armor: '#4a4038' } }, 24.4, 1.4, 1.2);
     // ---- west side: the Low Lamp, your door, a shuttered chandler's
     doorway(s, -1.45, 3, Math.PI / 2, 0xffb060, 1.4, 2.4);
     box(0.08, 0.5, 0.9, woodD(), -1.0, 3.1, 3, s); { const lm = new T.Mesh(new T.BoxGeometry(0.2, 0.26, 0.2), emis(0xffe0a0)); lm.position.set(-0.8, 2.7, 3); s.add(lm); gfx.fire(s, -0.8, 2.5, 3, 0xffb060, 0.4, 12); }
@@ -110,7 +110,7 @@
       // washing strung across, house to yard wall
       [[-5.6, 0], [-10.6, 1]].forEach(q => { const ln = box(0.03, 0.03, 4.6, woodD(), q[0], 3.3, 19.3, s); ln.castShadow = false; [0xd8d0c0, 0x7a3a3a, 0x3a5a7a, 0xc8b070, 0xd8d0c0].forEach((c, k) => { const sh = new T.Mesh(new T.PlaneGeometry(0.5, k % 2 ? 0.7 : 0.5), new T.MeshLambertMaterial({ color: c, side: T.DoubleSide })); sh.position.set(q[0], 3.0 - (k % 2 ? 0.1 : 0), 17.8 + k * 0.75); sh.rotation.y = Math.PI / 2; s.add(sh); }); box(0.1, 3.4, 0.1, woodD(), q[0], 1.7, 21.5, s); });
       lantern(s, -6.9, 0, 17.8, 0xffb060, 12, 2.3); lantern(s, -12.2, 0, 21.1, 0xffb060, 10, 2.0); lantern(s, -2.2, 0, 17.6, 0x60b8ff, 14, 2.2);
-      const n1 = npc(s, { cls: 'cleric', race: 'dwarf', tint: { cloth: '#6a5a4a', armor: '#5a4a3a', armor2: '#3a3026', hair: '#b8b0a0' } }, -6.3, 17.95, 0); const n2 = npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#4a5a6a', armor: '#3a4450', hair: '#5a3a1a' }, scale: 0.8 }, -10.9, 20.8, 2.6); const n3 = npc(s, { cls: 'sorcerer', race: 'halforc', tint: { cloth: '#5a3a4a', armor: '#3a2a34' } }, -3.6, 20.9, 3.4);
+      const n1 = npc(s, { id: 'tallow-neighbour-dwarf', cls: 'cleric', race: 'dwarf', tint: { cloth: '#6a5a4a', armor: '#5a4a3a', armor2: '#3a3026', hair: '#b8b0a0' } }, -6.3, 17.95, 0); const n2 = npc(s, { id: 'tallow-neighbour-child', cls: 'rogue', race: 'human', tint: { cloth: '#4a5a6a', armor: '#3a4450', hair: '#5a3a1a' }, scale: 0.8 }, -10.9, 20.8, 2.6); const n3 = npc(s, { id: 'tallow-neighbour-halforc', cls: 'sorcerer', race: 'halforc', tint: { cloth: '#5a3a4a', armor: '#3a2a34' } }, -3.6, 20.9, 3.4);
       s.userData.rowFolk = [[n1, 'sit', ['Evening.', 'You are the one in the pit? Keep the noise down coming home.', 'Mind the step. It minds nobody.']], [n2, 'idle', ['Are you a real fighter? Did you bring anything back?', 'My da says your door used to be the coal store.']], [n3, 'idle', ['If the Guild asks, I have not seen you. I never see anybody.', 'Third door has soup on. She makes too much. Knock.']]]; }
     lantern(s, -0.9, 0, 10.7, 0x60b8ff, 16, 2.0).rotation.y = -Math.PI / 2;
     // (the Long Stair gate stands here: see life.js)
@@ -125,11 +125,11 @@
     stall(s, 11.8, 17.6, 0x6a3a1a, [0xffc070, 0xff9050, 0xffe0a0]).rotation.y = Math.PI;
     stall(s, 21.5, 16.8, 0x1a4a6a, [0x80d0ff, 0xa0ffe0, 0xd0f0ff]).rotation.y = Math.PI;
     stall(s, 28.8, 12.2, 0x6a1a2a, [0xff7a7a, 0xffb0a0, 0xffd36b]).rotation.y = -Math.PI / 2;
-    const k1 = npc(s, { cls: 'cleric', race: 'dwarf', tint: { cloth: '#3a3038', armor: '#4a4048' } }, 6.5, 16.2, Math.PI), k2 = npc(s, { cls: 'rogue', race: 'halforc', tint: { cloth: '#6a3a1a', armor: '#4a3a30' } }, 11.8, 18.4, Math.PI), k3 = npc(s, { cls: 'sorcerer', race: 'human', tint: { cloth: '#1a4a6a', armor: '#203a50', hair: '#2a2a2a' } }, 21.5, 17.6, Math.PI), k4 = npc(s, { cls: 'cleric', race: 'tiefling', tint: { cloth: '#6a1a2a', armor: '#4a2028' } }, 29.7, 12.2, -Math.PI / 2);
+    const k1 = npc(s, { id: 'stallkeeper-dwarf', cls: 'cleric', race: 'dwarf', tint: { cloth: '#3a3038', armor: '#4a4048' } }, 6.5, 16.2, Math.PI), k2 = npc(s, { id: 'stallkeeper-halforc', cls: 'rogue', race: 'halforc', tint: { cloth: '#6a3a1a', armor: '#4a3a30' } }, 11.8, 18.4, Math.PI), k3 = npc(s, { id: 'stallkeeper-human', cls: 'sorcerer', race: 'human', tint: { cloth: '#1a4a6a', armor: '#203a50', hair: '#2a2a2a' } }, 21.5, 17.6, Math.PI), k4 = npc(s, { id: 'stallkeeper-tiefling', cls: 'cleric', race: 'tiefling', tint: { cloth: '#6a1a2a', armor: '#4a2028' } }, 29.7, 12.2, -Math.PI / 2);
     // ---- a well, a beggars' fire, carts and clutter
     mesh(new T.CylinderGeometry(0.9, 1.0, 0.8, 10), m2, 3.4, 0.4, 18.4, s); const wt = new T.Mesh(new T.CylinderGeometry(0.72, 0.72, 0.05, 10), emis(0x162838)); wt.position.set(3.4, 0.72, 18.4); s.add(wt); [-0.85, 0.85].forEach(x => box(0.12, 1.6, 0.12, woodD(), 3.4 + x, 1.4, 18.4, s)); box(2.0, 0.12, 0.3, woodD(), 3.4, 2.2, 18.4, s);
     mesh(new T.CylinderGeometry(0.4, 0.34, 0.8, 8), iron(), 30.4, 0.4, 18.8, s); gfx.fire(s, 30.4, 0.9, 18.8, 0xff8a30, 0.7, 14);
-    const sit = npc(s, { cls: 'rogue', race: 'dwarf', tint: { cloth: '#3a3028', armor: '#3a3430' } }, 29.3, 19.3, 1.3), sit2 = npc(s, { cls: 'cleric', race: 'human', tint: { cloth: '#4a4238', armor: '#3a3632' } }, 31.3, 17.9, -2.6);
+    const sit = npc(s, { id: 'corner-sitter-dwarf', cls: 'rogue', race: 'dwarf', tint: { cloth: '#3a3028', armor: '#3a3430' } }, 29.3, 19.3, 1.3), sit2 = npc(s, { id: 'corner-sitter-human', cls: 'cleric', race: 'human', tint: { cloth: '#4a4238', armor: '#3a3632' } }, 31.3, 17.9, -2.6);
     { const c = new T.Group(); c.position.set(16.6, 0, 19.4); c.rotation.y = 0.4; s.add(c); box(2.2, 0.14, 1.2, wood(), 0, 0.7, 0, c); box(2.2, 0.5, 0.08, woodD(), 0, 1.0, 0.6, c); box(2.2, 0.5, 0.08, woodD(), 0, 1.0, -0.6, c); [-0.8, 0.8].forEach(x => { const w = mesh(new T.CylinderGeometry(0.5, 0.5, 0.1, 10), woodD(), x, 0.5, 0.7, c); w.rotation.x = Math.PI / 2; const w2 = mesh(new T.CylinderGeometry(0.5, 0.5, 0.1, 10), woodD(), x, 0.5, -0.7, c); w2.rotation.x = Math.PI / 2; }); crate(c, -0.4, 0, 0.6); c.children[c.children.length - 1].position.y = 1.07; c.children[c.children.length - 2].position.y = 1.07; }
     crate(s, 0.3, 12.4, 0.7); crate(s, 1.0, 12.9, 0.5); barrel(s, 28.4, 2.6); barrel(s, 28.5, 8.1); crate(s, 9.2, -0.6, 0.6); barrel(s, 22.8, -0.7); crate(s, 16.5, 8.2, 0.5);
     [[9, 5.5], [19.5, 5.5], [9.2, 14.2], [20, 9.5], [26.2, 15], [3, 7.2], [14.6, 15.4], [25, 19.4], [31.4, 8.6], [8, 20], [30.6, 14.6]].forEach((q, i) => lantern(s, q[0], 0, q[1], i % 3 === 2 ? 0xb070ff : 0xffb060, i < 3 ? 15 : 0));
@@ -140,7 +140,7 @@
     // ---- people going about their business (routes kept apart so the square never bunches up)
     const TINTS = [{ cloth: '#5a3a2a', armor: '#4a4038' }, { cloth: '#2a4a5a', armor: '#3a4048' }, { cloth: '#5a2a4a', armor: '#3a3040' }, { cloth: '#3a5a3a', armor: '#3a4038' }, { cloth: '#6a5a3a', armor: '#4a4438' }, { cloth: '#3a3a5a', armor: '#30304a' }];
     const walkers = [[[1.5, 5.4], [21.4, 5.2]], [[24.6, 19.8], [24.4, 12.2]], [[1.5, 20.3], [14, 20.4]]]
-      .map((pth, i) => ({ c: npc(s, { cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue', 'cleric'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: Math.random() * 3, sp: 0.03 + i * 0.006 }));
+      .map((pth, i) => ({ c: npc(s, { id: 'passer-by-' + (i + 1), cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue', 'cleric'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: Math.random() * 3, sp: 0.03 + i * 0.006 }));
     const CHAT = ['…heard Vexa has never once blinked.', 'Long live Queen Eerin. From up there.', 'They say Vilhelm the Fourth watches the pit in a plain cloak.', 'No seals down here. That is the whole point.', 'Crown’s tithe went up the stair this morning.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.', 'Marc owes me money. Marc owes everyone money.', 'Meet me by the First Lamp.'];
     const MARKSAY = ['I have got a guy, bro. The guy is me.', 'Real ones bet big.', 'Odds! Fresh odds!', 'Bro. BRO. Look at this roll.', '…what were we doing?', 'Respect. Respect.'];
     let chatT = 4, markT = 6;
