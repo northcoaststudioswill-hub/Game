@@ -1,0 +1,17 @@
+// The Block camera while walking past the statue and props: how jerky is it? Frame-to-frame jumps in the camera's
+// speed (a hitch is a sudden change). node tests/hubcam.mjs
+import { createRequire } from 'module'; const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT || '/opt/node-tools/node_modules/playwright/index.js');
+import path from 'path'; import { fileURLToPath } from 'url';
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const b = await chromium.launch({ args: ['--use-gl=swiftshader'] }); const ctx = await b.newContext({ viewport: { width: 400, height: 300 } });
+await ctx.addInitScript(() => { window.requestAnimationFrame = cb => { window.__raf = cb; return 1; }; window.__now = 0; window.__tick = n => { for (let i = 0; i < n; i++) { window.__now += 16.67; const f = window.__raf; window.__raf = null; if (f) f(window.__now); } }; });
+const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+await p.goto('file://' + (process.env.GN_HTML || path.resolve(dir, '..', 'index.html'))); await p.evaluate(() => window.__tick(60));
+await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); await p.click('#panel .pf .btn'); await p.evaluate(() => { window.__tick(10); __pit.S.tut = 1; __pit.uiClose(); __pit.ev('renderer.render = function () { }'); });
+const r = await p.evaluate(() => { const P = __pit, W = P.W, K = P.keys; if (W.guide) W.guide.st = 'rest'; W.me.x = 0; W.me.z = 9; W.yaw = Math.PI; window.__tick(30);
+  const cam = P.ev('camera'), pos = [], route = [['KeyW', 90], ['KeyD', 30], ['KeyW', 40], ['KeyS', 120], ['KeyA', 50], ['KeyW', 100], ['KeyD', 60], ['KeyS', 80]];
+  const turn = []; let prevK = null; for (const [k, n] of route) for (let i = 0; i < n; i++) { if (prevK !== k) { for (const c of ['KeyW', 'KeyA', 'KeyS', 'KeyD']) K[c] = false; prevK = k; } K[k] = true; K.ShiftLeft = true; window.__tick(1); pos.push([cam.position.x, cam.position.y, cam.position.z]); turn.push(i < 25); (window.__lg = window.__lg || []).push([W.camPull, W.me.face, W.yaw, W.me.x, W.me.z]); } for (const k of ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft']) K[k] = false;
+  const acc = []; for (let i = 2; i < pos.length; i++) { const a = pos[i - 2], m = pos[i - 1], c = pos[i]; acc.push(Math.hypot(c[0] - 2 * m[0] + a[0], c[1] - 2 * m[1] + a[1], c[2] - 2 * m[2] + a[2]) * 3600); if (!turn[i]) { (window.__st = window.__st || []).push(acc[acc.length - 1]); if (acc[acc.length - 1] > 40 && (window.__why = window.__why || []).length < 12) { const L = window.__lg; window.__why.push(`pull ${(L[i][0] - L[i - 1][0]).toFixed(3)} yaw ${(L[i][2] - L[i - 1][2]).toFixed(3)} face ${(L[i][1] - L[i - 1][1]).toFixed(3)} at ${L[i][3].toFixed(1)},${L[i][4].toFixed(1)}`); } } }
+  acc.sort((x, y) => x - y); return { p50: acc[acc.length >> 1], p99: acc[Math.floor(acc.length * 0.99)], max: acc[acc.length - 1], spikes: acc.filter(x => x > 40).length, straight: (window.__st || []).filter(x => x > 40).length, why: window.__why || [], n: acc.length }; });
+console.log(`camera acceleration over ${r.n} frames: median ${r.p50.toFixed(1)}, p99 ${r.p99.toFixed(1)}, max ${r.max.toFixed(1)} m/s² · hitches (over 40 m/s²) ${r.spikes}, of them while walking straight (not just after a turn) ${r.straight}`);
+console.log(r.why.join('\n')); console.log(errs.length ? 'PAGE ERRORS: ' + errs.slice(0, 3).join(' | ') : 'no page errors'); await b.close();

@@ -437,21 +437,24 @@ function worldStep(dt) {
   else if (!busy && I.start) uiPlayer('attrs');
   else if (!busy && I.pe && I.pe.y && (W.kind === 'crib' || W.kind === 'room') && !W.visit && !W.build && typeof buildEnter === 'function') buildEnter();
   // camera
+  if (!W.cf || Math.hypot(me.x - W.cf.x, me.z - W.cf.z) > 3) W.cf = { x: me.x, z: me.z }; { const kf = 1 - Math.exp(-14 * dt); W.cf.x += (me.x - W.cf.x) * kf; W.cf.z += (me.z - W.cf.z) * kf; } const cm = W.cf;      /* the camera follows a smoothed you: sliding round the statue nudged the body every frame and the camera copied the wobble */
   const portrait = innerWidth < innerHeight, back = portrait ? 7.5 : 6.2, up = portrait ? 3.8 : 3.1;
-  let cx = me.x - fx * back, cz = me.z - fz * back, lift = 0;
+  let cx = cm.x - fx * back, cz = cm.z - fz * back, lift = 0;
   // keep the camera inside the place and the player in sight: pull it in (and up) until the line to them is clear
   const cb = W.camBox, blocked = (x, z) => (cb && (x < cb[0] || x > cb[1] || z < cb[2] || z > cb[3])) || W.solids.some(s => x > s[0] + 0.06 && x < s[1] - 0.06 && z > s[2] + 0.06 && z < s[3] - 0.06) || (W.rounds || []).some(([rx, rz, rr]) => Math.hypot(x - rx, z - rz) < rr - 0.05);      /* the statue is round now; it blocked the view because only boxes counted */
-  for (let b = back; b > 0.9; b -= 0.4) { cx = me.x - fx * b; cz = me.z - fz * b; lift = -Math.min(up - 2.0, (back - b) * 0.3);      /* pushed in close it drops toward shoulder height, a third-person camera, not a bird looking straight down */ let ok = true; for (let t = 1.0; t <= b; t += 0.6) if (blocked(me.x - fx * t, me.z - fz * t)) { ok = false; break; } if (ok && !blocked(cx, cz)) break; }
+  let bT = back; for (let b = back; b > 0.9; b -= 0.2) { bT = b; let ok = true; for (let t = 1.0; t <= b; t += 0.3) if (blocked(cm.x - fx * t, cm.z - fz * t)) { ok = false; break; } if (ok && !blocked(cm.x - fx * b, cm.z - fz * b)) break; }
+  { const cur = W.camPull === undefined ? bT : W.camPull; W.camPull = cur + (bT - cur) * (1 - Math.exp(-(bT < cur ? 10 : 2.5) * dt)); }      /* glide in quickly when something gets in the way, ease back out slowly: no hitch passing a pole */
+  { const b = W.camPull; cx = cm.x - fx * b; cz = cm.z - fz * b; lift = -Math.min(up - 2.0, (back - b) * 0.3); }      /* pushed in close it drops toward shoulder height, a third-person camera */
   if (W.kind === 'crib') { cx = clamp(cx, W.bounds[0] - 6, W.bounds[1] + 6); cz = clamp(cz, W.bounds[2] - 1, W.bounds[3] + 6); }
   if (W.camO) { camera.position.lerp(W.camO.p, 1 - Math.exp(-5 * dt)); camera.lookAt(W.camO.l); return; }      /* watching the bones */
   if (W.look) {   // shop / closet: swing round to look at your drip
     const mfx = Math.sin(me.face), mfz = Math.cos(me.face), sx = mfz, sz = -mfx;
-    if (portrait) { _v.set(me.x + mfx * 5.6, 0.6, me.z + mfz * 5.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(me.x, -0.6, me.z); }
-    else { _v.set(me.x + mfx * 4.2 + sx * 1.6, 1.3, me.z + mfz * 4.2 + sz * 1.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(me.x + sx * 1.6, 1.0, me.z + sz * 1.6); }
+    if (portrait) { _v.set(cm.x + mfx * 5.6, 0.6, cm.z + mfz * 5.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(cm.x, -0.6, cm.z); }
+    else { _v.set(cm.x + mfx * 4.2 + sx * 1.6, 1.3, cm.z + mfz * 4.2 + sz * 1.6); camera.position.lerp(_v, 1 - Math.exp(-6 * dt)); camera.lookAt(cm.x + sx * 1.6, 1.0, cm.z + sz * 1.6); }
     return;
   }
   _v.set(cx, up + lift, cz); if (!W.camInit) { camera.position.copy(_v); W.camInit = true; } else camera.position.lerp(_v, 1 - Math.exp(-7 * dt));
-  { const k = clamp(-lift / 1.1, 0, 1) * 0.6; camera.lookAt(me.x + fx * 2 * (1 - k), 1.7 - 0.6 * k, me.z + fz * 2 * (1 - k)); }      /* pulled in close past something: look at him, not over his head */
+  { const k = clamp(-lift / 1.1, 0, 1) * 0.6; camera.lookAt(cm.x + fx * 2 * (1 - k), 1.7 - 0.6 * k, cm.z + fz * 2 * (1 - k)); }      /* pulled in close past something: look at him, not over his head */
 }
 
 function startPractice(kind) {

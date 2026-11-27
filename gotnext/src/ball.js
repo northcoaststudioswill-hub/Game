@@ -1506,7 +1506,7 @@ function matchCam(dt) {
   // lean the frame toward the ball so passes and boards stay on screen
   if (M_.spectate) { fx = B.pos.x * 0.7; fz = clamp(B.pos.z, 2, 8) * 0.6 + 2; }
   fx = lerp(fx, B.pos.x, 0.25); fz = lerp(fz, B.pos.z, 0.2);
-  const back = portrait ? 8.3 : 7.0, up = portrait ? 5.8 : 5.2;      /* a steeper look down: a defender in front of you no longer hides you and the ball */
+  const back = portrait ? 8.6 : 7.4, up = portrait ? 4.9 : 4.3;      /* the original broadcast height (a steeper one was tried and the old one played better) */
   _v.set(fx * 0.62, up + fz * 0.1, fz + back + (hs.length > 1 ? 2 : 0));
   (M_.camB || (M_.camB = camera.position.clone())).lerp(_v, 1 - Math.exp(-4 * dt)); camera.position.copy(M_.camB);
   const hz = hlZoom(), fovT = (portrait ? 74 : 52) - (M_.slow > 0 ? 7 : 0) - hz * (portrait ? 26 : 16); if (Math.abs(camera.fov - fovT) > 0.05) { camera.fov += (fovT - camera.fov) * (1 - Math.exp(-9 * dt)); camera.updateProjectionMatrix(); }
