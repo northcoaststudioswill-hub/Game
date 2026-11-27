@@ -1,2 +1,4 @@
 # screenshots the test scripts write on every run
 tests/*.png
+# built pages (tools/build_artifact.py)
+dist/
