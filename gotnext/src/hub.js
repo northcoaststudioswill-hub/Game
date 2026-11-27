@@ -52,7 +52,13 @@ function building(x, z, w, d, h, col, label, labelCol, face) {
   for (let i = 0; i < 3; i++) for (let j = 0; h > 7 && j < 1; j++) { const o = (i - 1) * 2.6; M(box(ew ? 0.1 : 1.3, 1.3, ew ? 1.3 : 0.1), flat(RNG() < 0.6 ? 0xffd28a : 0x20222a), ew ? fx : fx + o, h - 1.3 + j, ew ? fz + o : fz, scene); }
   return { fx, fz, ry, gl };
 }
-function lamp(x, z, col) { M(cyl(0.07, 0.09, 5, 6), toon('#20242c'), x, 2.5, z, scene); M(sph(0.28, 8, 6), flat(col || 0xffe9a8), x, 5.1, z, scene); const g = M(geo('glow', () => new THREE.CircleGeometry(2.6, 16)), flat(col || 0xffe9a8, { transparent: true, opacity: 0.1, depthWrite: false }), x, 0.03, z, scene); g.rotation.x = -Math.PI / 2; glow(x, 5.1, z, col || 0xffe9a8, 2.6); pool(x, z, col || 0xffe9a8, 5, 5, 0.3); beam(x, 5.0, z, x, 0, z, col || 0xffe9a8, 2.2, 0.05, 5); }
+// thin things that stand between the camera and you go see-through (pulling the camera in for every pole would make it jump)
+function fadeable(m, x, z) { if (!W) return m; m.material = m.material.clone(); m.material.transparent = true; (W.fades || (W.fades = [])).push({ m, x, z, o: 1 }); return m; }
+function fadeStep(cam, me, dt) {
+  if (!W.fades) return; const ax = cam.x, az = cam.z, bx = me.x, bz = me.z, vx = bx - ax, vz = bz - az, l2 = vx * vx + vz * vz || 1;
+  for (const f of W.fades) { const t = ((f.x - ax) * vx + (f.z - az) * vz) / l2, px = ax + vx * t, pz = az + vz * t, near = t > 0.05 && t < 0.97 && Math.hypot(f.x - px, f.z - pz) < 0.55;
+    const want = near ? 0.18 : 1; f.o += (want - f.o) * (1 - Math.exp(-10 * dt)); f.m.material.opacity = f.o; f.m.material.depthWrite = f.o > 0.95; for (const c of f.m.children) c.visible = f.o > 0.6; } }
+function lamp(x, z, col) { fadeable(M(cyl(0.07, 0.09, 5, 6), toon('#20242c'), x, 2.5, z, scene), x, z); M(sph(0.28, 8, 6), flat(col || 0xffe9a8), x, 5.1, z, scene); const g = M(geo('glow', () => new THREE.CircleGeometry(2.6, 16)), flat(col || 0xffe9a8, { transparent: true, opacity: 0.1, depthWrite: false }), x, 0.03, z, scene); g.rotation.x = -Math.PI / 2; glow(x, 5.1, z, col || 0xffe9a8, 2.6); pool(x, z, col || 0xffe9a8, 5, 5, 0.3); beam(x, 5.0, z, x, 0, z, col || 0xffe9a8, 2.2, 0.05, 5); }
 // spray-paint piece: big leaning letters, outline, shine, drips
 function mural(text, w, h, cols, x, y, z, ry) {
   const tex = canvasTex(1024, Math.round(1024 * h / w), (c, W_, H_) => {
@@ -74,7 +80,7 @@ function mural(text, w, h, cols, x, y, z, ry) {
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex })); m.position.set(x, y, z); m.rotation.y = ry; scene.add(m); return m;
 }
 function floodlight(x, z, h, tx, tz) {
-  M(cyl(0.12, 0.16, h, 6), toon('#2a2c33'), x, h / 2, z, scene); const head = M(box(1.6, 0.7, 0.3), toon('#2a2c33'), x, h + 0.2, z, scene); head.lookAt(tx, 0, tz);
+  fadeable(M(cyl(0.12, 0.16, h, 6), toon('#2a2c33'), x, h / 2, z, scene), x, z); const head = M(box(1.6, 0.7, 0.3), toon('#2a2c33'), x, h + 0.2, z, scene); head.lookAt(tx, 0, tz);
   const lit = M(box(1.4, 0.5, 0.06), flat(0xfff6dc), x, h + 0.2, z, scene); lit.lookAt(tx, 0, tz); lit.translateZ(0.17);
   const cone = M(geo('cone', () => { const g = new THREE.ConeGeometry(4.2, 11, 14, 1, true); g.translate(0, -5.5, 0); return g; }), flat(0xfff2c8, { transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }), x, h + 0.2, z, scene);
   cone.lookAt(tx, h + 0.2 - 9, tz); cone.rotateX(Math.PI / 2);
@@ -178,7 +184,7 @@ function buildHub() {
   const ft = () => { const t = fenceTex(); return t; };
   const fenceSeg = (x0, x1, z, h) => { const w = x1 - x0, t = ft(); t.repeat.set(w / 1.1, h / 1.1); const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, transparent: true, side: THREE.DoubleSide, depthWrite: false })); m.position.set((x0 + x1) / 2, h / 2, z); scene.add(m); M(box(w, 0.1, 0.1), toon('#6a707c'), (x0 + x1) / 2, h, z, scene); M(box(w, 0.1, 0.1), toon('#6a707c'), (x0 + x1) / 2, 0.05, z, scene); };
   fenceSeg(-16, -2.2, -12, 6.5); fenceSeg(2.2, 16, -12, 6.5); solid(-16.5, -2.2, -12.6, -11.6); solid(2.2, 16.5, -12.6, -11.6);
-  for (const x of [-16, -11.4, -6.8, -2.2, 2.2, 6.8, 11.4, 16]) ink(M(cyl(0.09, 0.09, 6.5, 6), toon('#6a707c'), x, 3.25, -12, scene), 1.2);
+  for (const x of [-16, -11.4, -6.8, -2.2, 2.2, 6.8, 11.4, 16]) fadeable(ink(M(cyl(0.09, 0.09, 6.5, 6), toon('#6a707c'), x, 3.25, -12, scene), 1.2), x, -12);
   for (const sx of [-1, 1]) { const t = ft(); t.repeat.set(18, 6); const m = new THREE.Mesh(new THREE.PlaneGeometry(20, 6.5), new THREE.MeshBasicMaterial({ map: t, transparent: true, side: THREE.DoubleSide, depthWrite: false })); m.position.set(sx * 16, 3.25, -22); m.rotation.y = Math.PI / 2; scene.add(m); }
   // gate: steel truss with the name on it
   for (const sx of [-1, 1]) ink(M(box(0.35, 8.4, 0.35), toon('#1c1d22'), sx * 2.4, 4.2, -12, scene), 1.06);
@@ -218,8 +224,8 @@ function buildHub() {
   mural('BALL\nIS LIFE', 8.5, 4.4, ['#1a1030', '#ff2d78', '#7de3ff', '#fff3b0', '#ffffff'], -10, 3.1, 19.05, Math.PI);
   mural('RUN IT\nBACK', 8.5, 4.4, ['#0e2a2a', '#f2c14e', '#ff6a3d', '#ffffff', '#08080a'], 1, 3.1, 19.05, Math.PI);
   mural('WHO GOT\nNEXT', 8.5, 4.6, ['#141418', '#ff2d78', '#a78bff', '#ece9e2', '#08080a'], 12, 3.1, 19.05, Math.PI);
-  M(box(2.6, 0.04, 3.4), flat(0x050506), -6.4, 0.03, 10.2, scene); for (const [rx, rz, rw, rd] of [[-7.75, 10.2, 0.1, 3.4], [-5.05, 10.2, 0.1, 3.4], [-6.4, 11.9, 2.8, 0.1]]) ink(M(box(rw, 1.0, rd), toon('#3dffa0'), rx, 0.5, rz, scene), 1.06); for (let i = 0; i < 5; i++) M(box(2.5, 0.05, 0.3), toon('#3a3c44'), -6.4, -0.02 - i * 0.02, 9.0 + i * 0.5, scene);
-  M(cyl(0.06, 0.06, 3.2, 6), toon('#1c1d22'), -7.75, 1.6, 8.5, scene); const sb = sign('UPTOWN LINE', 2.4, 0.5, '#3dffa0', '#0a0a0e'); sb.position.set(-6.6, 3.0, 8.5); scene.add(sb); for (let i = 0; i < 5; i++) M(box(0.06, 1.4, 0.06), toon('#6a707c'), -7.4 + i * 0.5, 0.7, 8.55, scene); M(box(2.4, 0.06, 0.06), toon('#6a707c'), -6.4, 0.9, 8.55, scene); solid(-8, -4.8, 8.4, 12.2);
+  M(box(2.6, 0.04, 3.4), flat(0x050506), -6.4, 0.03, 10.2, scene); for (const [rx, rz, rw, rd] of [[-7.75, 10.2, 0.1, 3.4], [-5.05, 10.2, 0.1, 3.4], [-6.4, 11.9, 2.8, 0.1]]) ink(M(box(rw, 1.0, rd), toon('#3dffa0'), rx, 0.5, rz, scene), 1.06); solid(-7.85, -4.95, 8.45, 12.0);      /* the subway stairwell rail is solid (legs sank into it: the bot called it the green dumpster) */ for (let i = 0; i < 5; i++) M(box(2.5, 0.05, 0.3), toon('#3a3c44'), -6.4, -0.02 - i * 0.02, 9.0 + i * 0.5, scene);
+  fadeable(M(cyl(0.06, 0.06, 3.2, 6), toon('#1c1d22'), -7.75, 1.6, 8.5, scene), -7.75, 8.5); const sb = sign('UPTOWN LINE', 2.4, 0.5, '#3dffa0', '#0a0a0e'); sb.position.set(-6.6, 3.0, 8.5); scene.add(sb); for (let i = 0; i < 5; i++) M(box(0.06, 1.4, 0.06), toon('#6a707c'), -7.4 + i * 0.5, 0.7, 8.55, scene); M(box(2.4, 0.06, 0.06), toon('#6a707c'), -6.4, 0.9, 8.55, scene); solid(-8, -4.8, 8.4, 12.2);
   spot(-6.4, 7.6, 1.8, 'UPTOWN LINE', () => uiDialog('UPTOWN LINE', 'Gate is chained. A sticker on it says: MORE CITY SOON. Somebody wrote "that\'s what they said in 2139" under it.', [['Aight.', null]]));
   mural('NO\nREFS', 5.4, 3.4, ['#2a1408', '#ff6a3d', '#f2c14e', '#fff3b0', '#ffffff'], -15.42, 2.4, -0.4, Math.PI / 2);
   mural('KINGS\nSTAY', 5.4, 3.0, ['#081a2a', '#7de3ff', '#a78bff', '#ffffff', '#08080a'], 15.42, 2.3, 0.2, -Math.PI / 2);
@@ -454,6 +460,7 @@ function worldStep(dt) {
     return;
   }
   _v.set(cx, up + lift, cz); if (!W.camInit) { camera.position.copy(_v); W.camInit = true; } else camera.position.lerp(_v, 1 - Math.exp(-7 * dt));
+  fadeStep(camera.position, me, dt);
   { const k = clamp(-lift / 1.1, 0, 1) * 0.6; camera.lookAt(cm.x + fx * 2 * (1 - k), 1.7 - 0.6 * k, cm.z + fz * 2 * (1 - k)); }      /* pulled in close past something: look at him, not over his head */
 }
 

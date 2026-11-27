@@ -53,6 +53,12 @@ function startMatch(cfg) {
   if (!cfg.practice) crowdInit();      /* courts.js: people along the baseline and both sidelines */
   // --- players ---
   { const used = new Set(); cfg.teams.forEach(team => team.forEach(sp => { if (sp.ctrl < 0 && !sp.b.bot && sp.b.net === undefined && !sp.b.keepLook) uniqLook(sp.b, used, 3); else used.add([sp.b.worn.hair, sp.b.worn.top, sp.b.worn.bottom, sp.b.build.skin].join('|')); })); }      /* no two AI players dressed alike */
+  // the AI on each side wear the same top so you can read the teams at a glance; hair, shorts, shoes and the rest stay
+  // their own (the swag is the point). Your side light, the other side dark; you, online players and the cast keep theirs.
+  if (!cfg.practice && !cfg.drill) { const lum = c => { const n = parseInt(String(c || '#888').slice(1), 16); return ((n >> 16 & 255) * 0.3 + (n >> 8 & 255) * 0.59 + (n & 255) * 0.11) / 255; };
+    const tops = DRIP.filter(d => d.slot === 'top' && d.c && d.kind !== 'none'), light = tops.filter(d => lum(d.c) > 0.62), dark = tops.filter(d => lum(d.c) < 0.28), myT0 = Math.max(0, cfg.teams.findIndex(t => t.some(x => x.mine === true)));
+    cfg.teams.forEach((team, ti) => { const pool = ti === myT0 ? light : dark; if (!pool.length) return; const top = pool[Math.floor(Math.random() * pool.length)];
+      for (const sp of team) if (sp.ctrl < 0 && !sp.mine && !sp.peer && sp.b && !sp.b.keepLook && !sp.b.bot && sp.b.net === undefined && sp.b.worn) { sp.b = Object.assign({}, sp.b, { worn: Object.assign({}, sp.b.worn, { top: top.id }) }); } }); }
   cfg.teams.forEach((team, ti) => team.forEach((sp, k) => {
     const mine = sp.mine === true;
     const p = { i: MT.P.length, team: ti, k, ctrl: sp.ctrl, user: sp.ctrl >= 0, remote: sp.ctrl >= 2, peer: sp.peer || null, mine, b: sp.b, x: 0, z: 0, y: 0, vx: 0, vz: 0, face: Math.PI, st: 'free', t: 0, stam: 100, runPh: 0, dribPh: 0, hand: 'R', hot: 0, fire: false, brav: mine ? cribFx('brav') : 0, bravT: 0, slowT: 0, cool: 0, moveCool: 0, combo: 0, comboT: 0, catchT: -9, catchFrom: null, putT: 0, callT: 0, handsUp: false, sprinting: false,
@@ -96,7 +102,7 @@ function setCheck(team, first) {
   offs.sort((a, b) => (b.user ? 1 : 0) - (a.user ? 1 : 0) || a.k - b.k);
   const oSpots = [[0, 9.3], [-5.4, 5.6], [5.4, 5.6]];
   offs.forEach((p, i) => { p.x = oSpots[i][0]; p.z = oSpots[i][1]; });
-  defs.forEach(p => { const m = p.man && p.man.team === team ? p.man : offs[0]; const d = Math.hypot(m.x, m.z) || 1; p.x = m.x - m.x / d * 1.5; p.z = m.z - m.z / d * 1.5; });
+  { const taken = new Set(); defs.forEach(p => { let m = p.man && p.man.team === team && !taken.has(p.man) ? p.man : offs.find(o => !taken.has(o)) || offs[0]; taken.add(m); p.man = m; const d = Math.hypot(m.x, m.z) || 1; p.x = m.x - m.x / d * 1.5; p.z = m.z - m.z / d * 1.5; }); }      /* one man each: two defenders on the same man were dropped on the same spot, one inside the other */
   for (const p of M_.P) { p.vx = p.vz = 0; p.y = 0; p.st = 'free'; p.t = 0; p.ai.mode = ''; p.ai.hold = 0; p.ai.spot = null; p.slowT = 0; p.callT = 0; p.ai.tx = p.x; p.ai.tz = p.z; }
   give(offs[0]); M_.B.assist = null;
   if (!M_.practice) call(first ? 'CHECK UP' : 'CHECK', first ? `${M_.cfg.mode.n} · first to ${M_.cfg.mode.to}` : '', '#fff', 1.2);
@@ -962,7 +968,7 @@ function matchStep(dtReal) {
   }
   // body collisions
   for (let i = 0; i < M_.P.length; i++) for (let j = i + 1; j < M_.P.length; j++) {
-    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : a.team !== b.team && (M_.B.holder === a || M_.B.holder === b) && !a.post && !b.post && !a.bodyUp && !b.bodyUp ? 0.72 : 0.56;      /* a crouched defender and a dribbler both lean in: keep the room so they do not meet in the middle (a post-up is meant to be contact) */      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
+    const a = M_.P[i], b = M_.P[j]; if (a.y > 0.5 || b.y > 0.5) continue; const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), wide = a.team !== b.team && (a.screen || b.screen || a.box || b.box), R = wide ? 0.84 : a.team !== b.team && (a.st === 'steal' || b.st === 'steal' || a.st === 'shove' || b.st === 'shove') ? 0.8 : (a.st === 'stagger' || b.st === 'stagger') ? 0.74 : a.team !== b.team && (M_.B.holder === a || M_.B.holder === b) && !a.post && !b.post && !a.bodyUp && !b.bodyUp ? 0.72 : (a.team !== b.team && (a.post || b.post)) ? 0.64 : 0.56;      /* a crouched defender and a dribbler both lean in: keep the room so they do not meet in the middle (a post-up is meant to be contact) */      /* a reach throws the trunk forward: give it the room so it does not end up inside him */
     if (wide && d < R) for (const [s, o] of [[a, b], [b, a]]) if (s.screen && o.st !== 'stagger' && M_.time - (o.scrHit || -9) > 1.5) screenHit(s, o);
     if (d < R && d > 0.001 && M_.phase === 'live') {      // momentum: bodies that run into each other trade speed by weight; a hard hit knocks the lighter one off his line
       const nx = dx / d, nz = dz / d, vn = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
