@@ -124,7 +124,7 @@
         S('you', me, 'Where do they come from?', 'you'),
         S('npc', 'The Fence', 'Highmarch. Whatever Queen Eerin Koheneim and Vilhelm van Koheneim IV forbid up there, somebody still wants. So it comes down the stair, and it finds me.', 'npc'),
         S('npc', 'The Fence', 'They fell off a cart. Different carts. Steel, plate, potions, and round the side a rack of things to wear. Coin only. I do not keep a ledger.', 'ots')], done: then }; },
-    vexa: (then) => { const me = G.state.hero.name, o = G.OPPONENTS.find(q => q.id === 'vexa'); return { place: 'arena', npc: [-1.6, -1.6], you: [1.9, 1.9], spawn: { look: { cls: o.cls, race: o.race, tint: o.tint }, crown: true }, lines: [
+    vexa: (then) => { const me = G.state.hero.name, o = G.OPPONENTS.find(q => q.id === 'vexa'); return { place: 'arena', npc: [-1.6, -1.6], you: [1.9, 1.9], spawn: { look: { id: 'fighter:vexa', cls: o.cls, race: o.race, tint: o.tint }, crown: true }, lines: [
         S('', '', 'The crowd goes quiet when she walks out. It has done so for seven years.', 'wide'),
         S('npc', 'Vexa, the Pale Queen', 'So you are the one they have all been betting on. Marc has not shut up about you.', 'npc'),
         S('you', me, 'I am here for the crown.', 'you'),

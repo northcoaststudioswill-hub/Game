@@ -13,7 +13,7 @@
     { id: 'asc_queen', name: 'Queen ' + QUEEN, title: 'faerie-born, of the Koheneim throne', cls: 'sorcerer', race: 'elf', level: 10, sub: 'draconic', known: ['ray_frost', 'misty_step', 'lightning_bolt', 'glyph'], ult: 'fireball', arm: 's_frost', hpMul: 1.55, dmgMul: 1.0, ai: { react: 0.2, aggro: 0.8, dodge: 0.4 }, xp: 1000, coin: 1500, respect: 500, boss: 1,
       tint: { armor: '#e6e4f0', armor2: '#b8b0d8', cloth: '#f4f0ff', trim: '#c8b8ff', legs: '#8a80b0', hair: '#f2eefc' }, cos: { back: 'wings' }, taunt: 'I have ruled since before your people had a word for king. Did the little clock-maker tell you that, when he sent you up?', bio: 'Eerin Koheneim, crowned before most living families had names. She has never once come down the Long Stair. She did not need to. You came up.' }
   ];
-  FOES.forEach((o, i) => { o.ascent = i; G.BIOS[o.id] = o.bio; o.look = { cls: o.cls, race: o.race, tint: o.tint, arm: o.arm, kit: o.lookKit, cos: o.cos, scale: o.scale, gear: { weapon: 2, armor: 2 } }; });
+  FOES.forEach((o, i) => { o.ascent = i; G.BIOS[o.id] = o.bio; o.look = { id: 'fighter:' + o.id, cls: o.cls, race: o.race, tint: o.tint, arm: o.arm, kit: o.lookKit, cos: o.cos, scale: o.scale, gear: { weapon: 2, armor: 2 } }; });
   const stage = st => st.ascent || 0;
   const open = st => !!(st.wins && st.wins.vexa) && ((tied(st) && G.defended(st) >= 2) || G.defended(st) >= 5);
   G.ascent = { FOES, open, stage, begin: () => begin() };

@@ -98,7 +98,7 @@
     const st = G.state; if (!st.exh || st.exh.told || G.talk || ui.isOpen() || G.scene !== 'hub' || (G.pipComing && G.pipComing())) return;
     const K = KINDS[st.exh.kind], o = exhOpp(st), w = W.walker, hub = W.get('hub'), nx = w.x + (w.x > 16 ? -2.4 : 2.4), nz = w.z + 0.4, p = purse(st, K), L = K.say(o.name);
     st.exh.told = 1; G.save();
-    actor = G.makeChar({ cls: o.cls, race: o.race, tint: o.tint }); actor.root.position.set(nx, 0, nz); actor.root.rotation.y = Math.atan2(w.x - nx, w.z - nz); actor.pose({ t: 1, act: 'idle' }); hub.scene.add(actor.root);
+    actor = G.makeChar({ id: o.id && !o.gen ? 'fighter:' + o.id : undefined, cls: o.cls, race: o.race, tint: o.tint }); actor.root.position.set(nx, 0, nz); actor.root.rotation.y = Math.atan2(w.x - nx, w.z - nz); actor.pose({ t: 1, act: 'idle' }); hub.scene.add(actor.root);
     const gone = () => { if (actor) { hub.scene.remove(actor.root); actor = null; } };
     G.playScene({ place: 'hub', npc: [nx, nz], you: [w.x, w.z], lines: [S('', '', 'Somebody has been waiting for you by the lamp. ' + K.t + '.', 'wide'), S('npc', o.name, L[0], 'npc'), S('npc', o.name, L[1], 'npc'), S('you', st.hero.name, 'To the yield. What is in it?', 'you'), S('npc', o.name, (p.coin ? p.coin + ' coin if you win. ' : 'No coin. ') + 'And the stands will talk about it either way.', 'ots')],
       choices: [{ label: 'Take the bout (nobody dies)', go: () => { gone(); fightExh(); } }, { label: 'Not tonight (it stays on the Ledger)', go: () => { gone(); ui.toast(o.name + ' will be at the Blood Pit if you change your mind.'); } }], done: gone });

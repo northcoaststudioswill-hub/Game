@@ -49,6 +49,7 @@
     ed.maxHp = Math.round(ed.maxHp * o.hpMul); ed.dmgMul *= o.dmgMul * (o.level >= 3 ? 1.12 : 1.04);
     let foeGear = 0; if (G.gearRace && !o.spar) { foeGear = G.gearRace.of(o); ed.weapon += G.gearRace.W[foeGear]; ed.dr += G.gearRace.A[foeGear]; ed.dmgMul *= 1 + G.gearRace.D[foeGear]; }
     const eLook = o.look || G.lookOf(eh, null); if (!o.look && foeGear) eLook.gear = { weapon: Math.min(2, foeGear), armor: Math.min(2, foeGear) };
+    if (o.id && !o.gen && !eLook.id) eLook.id = 'fighter:' + o.id;       // a named fighter is built with any approved Workshop edit (fit as well as colours)
     E = makeEntity(eh, ed, eLook, false); E.gearTier = foeGear;
     E.ai = Object.assign({ react: 0.5, aggro: 0.5, dodge: 0.1, guard: Math.min(0.6, 0.14 + o.level * 0.09), parry: Math.min(0.26, 0.02 + o.level * 0.045) }, o.ai); E.boss = o.boss;
     G.fightTrack = o.boss ? 'boss' : 'fight';
