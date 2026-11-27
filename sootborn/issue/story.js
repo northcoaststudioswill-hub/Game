@@ -253,7 +253,7 @@
     W.addInteract({ id: 'loft', x: -27.8, y: 9, z: -26.7, fx: -29.7, fz: -26.7, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => !F.clue_loft, act: clue('loft', [
       { who: 'cap', text: 'A signal hut. The lamp inside is aimed straight down the Spire, and the glass is still warm.' },
       { who: 'hero', text: 'They did not only know. They *answered*. Every Warden under the docks is on that stair by now.' }]) });
-    W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 4.4, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
+    W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 4.4, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate && (F.key || F.e_street || !SC.enemies.some(m => m.state !== 'dead' && SC.dist2(m.pos.x, m.pos.z, pl.pos.x, pl.pos.z) < 12)), act: () => {
       if (!F.key && !F.e_street) { U.toast('LOCKED. SOMEBODY ON THIS QUAY CARRIES THE KEY.', 2.6); SC.audio.sfx('deny'); return; }
       W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); U.toast('THE GATE ROLLS BACK.', 2); } });
     W.addInteract({ id: 'breaker', x: 31.1, y: 0, z: -8, fx: 32, fz: -8, r: 2, label: 'BREAKER', marker: 'act', mh: 2.6, when: () => F.e_yard && !F.breaker, act: () => {
