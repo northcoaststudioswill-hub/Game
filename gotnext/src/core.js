@@ -107,7 +107,7 @@ function dead(v) { return Math.abs(v) < 0.16 ? 0 : v; }
 function stick(x, y, dz) { const m = Math.hypot(x, y); if (m < dz) return [0, 0]; const s = Math.min(1, (m - dz) / (1 - dz)) / m; return [x * s, y * s]; }
 // button presses and stick flicks are latched until a simulation step has used them, so a tap is never lost
 // between steps (at 120 FPS some frames run no step; at 30 FPS some run two)
-function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = I.pkP = false; I.flick = null; I.pe = {}; } }
+function clearEdges() { for (const I of IN) { I.aP = I.bP = I.bR = I.rRel = I.relEdge = I.lbP = I.rbP = I.pkP = false; I.flick = null; I.spinP = 0; I.pe = {}; } }
 function pollInput() {
   const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected);
   for (let i = 0; i < 2; i++) {
@@ -149,7 +149,9 @@ function pollInput() {
     const now = performance.now(); if ((a && !I._a) || (b && !I._b)) I.tPress = now;
     I.aP = I.aP || (a && !I._a); I.bP = I.bP || (b && !I._b); I.bR = I.bR || (!b && I._b); I.a = a; I.b = b; I._a = a; I._b = b;
     I.pkP = I.pkP || (pk && !I._pk); I._pk = pk; I.start = st && !I._st; I._st = st; I.back = bk && !I._bk; I._bk = bk;
-    const d = dir8(rx, ry); if (d && !I._rd) { I.flick = d; I.tPress = now; } I.rRel = I.rRel || (!d && !!I._rd); I.rdir = d; I._rd = d;
+    const d = dir8(rx, ry); if (d && !I._rd) { I.flick = d; I.tPress = now; I.rot = 0; I.rotT = now; I.rotA = Math.atan2(ry, rx); } I.rRel = I.rRel || (!d && !!I._rd); I.rdir = d; I._rd = d;
+    if (d && I.rotA !== undefined) { const a = Math.atan2(ry, rx); let da = a - I.rotA; da = Math.atan2(Math.sin(da), Math.cos(da)); I.rot += da; I.rotA = a; if (Math.abs(I.rot) > 2.3 && now - I.rotT < 450 && !I.rotDone) { I.spinP = Math.sign(I.rot); I.rotDone = true; } }      /* a half circle on the skill stick: spin */
+    if (!d) { I.rotA = undefined; I.rotDone = false; }
   }
 }
 function anyPadStart() { const pads = (navigator.getGamepads ? Array.from(navigator.getGamepads()) : []).filter(p => p && p.connected); return pads.length; }

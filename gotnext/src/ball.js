@@ -195,6 +195,7 @@ function startHop(p, next, src, opt) {
 function startShot(p, src, floater, opt) {
   if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
   opt = opt || {}; const d = dHoop(p), sp0 = Math.hypot(p.vx, p.vz);
+  if (!floater && !opt.fade && p.user && ((p.lastMv && /stepback|moonwalk|snatch/.test(p.lastMv.id) && MT.time - p.lastMv.at < 0.45) || (p.mv && /stepback|moonwalk|snatch/.test(p.mv.mv.id) && MT.time - (p.comboT || -9) < 0.9))) { opt = Object.assign({}, opt, { fade: true, jumper: true }); p.stepJ = true; } else p.stepJ = false;      /* off a step-back: the step-back jumper (leaning away from the room you made) */
   if (!floater && !opt.hopped && !opt.fade && !opt.side && !opt.jumper && (d < 2.0 || (d < finishRange(p) && sp0 > 2.2 && (p.vx * -p.x + p.vz * -p.z) > 0 && src !== 'ai'))) return startFinish(p, p.user ? euroOf(p) : 0);
   // the move stick picks the jumper: away from the rim fades, sideways from a stand side-steps, let go on a drive hops
   let fade = opt.fade ? 1 : 0, side = opt.side || 0;
@@ -213,7 +214,7 @@ function startShot(p, src, floater, opt) {
       else if (od < 1.05) sh.fadeK = 'deep'; }
     else sh.fadeK = 'open';      /* nobody there: a fade for no reason costs a little */
   }
-  if (p.user && fade) floatTxt(p, { drift: 'DRIFT FADE', deep: 'LEAN BACK', open: 'FADE', fade: 'FADE' }[p.shot.fadeK], '#f2c14e'); else if (p.user && side) floatTxt(p, 'SIDE STEP', '#f2c14e');
+  if (p.user && p.stepJ) floatTxt(p, 'STEP-BACK', '#f2c14e'); else if (p.user && fade) floatTxt(p, { drift: 'DRIFT FADE', deep: 'LEAN BACK', open: 'FADE', fade: 'FADE' }[p.shot.fadeK], '#f2c14e'); else if (p.user && side) floatTxt(p, 'SIDE STEP', '#f2c14e');
   if (opt.hopped) { const sh = p.shot; sh.auto = true; sh.aiRel = sh.rel * (1 + clamp((Math.random() + Math.random() - 1) * (0.2 - nAtt(p, 'iq') * 0.14), -0.3, 0.3)); }
   if (floater) { const sh = p.shot; sh.floater = true; sh.auto = true; sh.rel = 0.36; sh.kind = 'close'; sh.aiRel = sh.rel * (1 + clamp((Math.random() + Math.random() - 1) * (0.22 - nAtt(p, 'close') * 0.14), -0.3, 0.3)); }
   else if ((!p.user || p.afk) && !opt.hopped) { const sd = 0.17 - p.aiLvl * 0.10; p.shot.aiRel = p.shot.rel * (1 + clamp((Math.random() + Math.random() + Math.random() - 1.5) * sd * 1.6, -0.4, 0.45)); }
@@ -619,6 +620,7 @@ function humanThink(p, dt) {
     if ((p.shot.src === 'btn' && !I.b) || (p.shot.src === 'stick' && I.rdir !== 'D' && I.rdir !== 'DL' && I.rdir !== 'DR') || p.t > p.shot.rel * 1.55) releaseShot(p);
     return;
   }
+  if (I.spinP && B.holder === p && p.live === 'drib' && (p.st === 'free' || (p.st === 'move' && p.t < 0.22 && p.mv && !/spin/.test(p.mv.mv.id)))) { const sg = I.spinP; I.spinP = 0; const keep = p.b.moves.diag; p.b.moves.diag = 'spin'; p.noPack = true; p.moveCool = 0; if (p.st === 'move') { p.st = 'free'; p.rig.extraYaw = 0; } startMove(p, 'diag', sg > 0 ? -0.8 : 0.8, -0.8); p.noPack = false; p.b.moves.diag = keep; floatTxt(p, 'SPIN', '#f2c14e'); return; }      /* roll the skill stick round: a spin (it replaces the crossover the first part of the roll started) */
   // an action pressed while busy is held for 0.3 s and fires as soon as the current one can be cut short
   const pressed = I.bP || I.aP || !!I.flick;
   if (p.st !== 'free') {
@@ -1045,7 +1047,7 @@ function stepPlayer(p, dt) {
       if (u >= 1) { p.st = 'free'; p.y = 0; const o2 = Object.assign({ hopped: 1 }, h.opt || {}), ok = h.next === 'shot' ? startShot(p, h.src || 'btn', false, o2) : startFinish(p, 0, false, 0, o2); if (!ok) p.st = 'free'; }
       break;
     }
-    case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; const k = m.v * (m.slot === 'side' ? (u < 0.3 ? 0.12 + 0.3 * (u / 0.3) * (u / 0.3) : 1.2 * (1 - (u - 0.3) / 0.7 * 0.55)) : 1 - u * 0.6), st = 2.4 * Math.min(1, u * 1.6);      /* side moves: set the defender up first, then explode */ p.vx = m.dx * k + p.in.dx * st; p.vz = m.dz * k + p.in.dz * st; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; } break; }
+    case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; const k = m.v * (m.slot === 'side' ? (u < 0.3 ? 0.12 + 0.3 * (u / 0.3) * (u / 0.3) : 1.2 * (1 - (u - 0.3) / 0.7 * 0.55)) : 1 - u * 0.6), st = 2.4 * Math.min(1, u * 1.6);      /* side moves: set the defender up first, then explode */ p.vx = m.dx * k + p.in.dx * st; p.vz = m.dz * k + p.in.dz * st; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; p.lastMv = { id: m.mv.id, slot: m.slot, at: MT.time }; } break; }
     case 'stagger': { lock = 0; const g = p.stg; if (g.dir && p.t < 0.28) { const k = (g.push || 1.5) * (1 - p.t / 0.28); p.vx = g.dir[0] * k; p.vz = g.dir[1] * k; } else { p.vx *= 0.85; p.vz *= 0.85; } if (p.t >= g.dur) p.st = 'free'; break; }      /* the first steps go where he bit, then he is stuck there */
     case 'fake': lock = 0.25; if (p.t > 0.27) p.st = 'free'; break;
     case 'jump': { lock = 0.35; if (p.lunge && p.t < p.lunge[2]) { lock = 0; p.vx = p.lunge[0]; p.vz = p.lunge[1]; } const u = p.t / 0.62; p.y = p.jumpH * Math.sin(Math.PI * Math.min(1, u)); if (u >= 1) { p.st = 'free'; p.y = 0; } break; }
@@ -1501,6 +1503,8 @@ function animPlayer(p, dt) {
     const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.man || p.guard || (guest ? near() : null));      /* your matchup from the opening check, not whoever you happen to be near */ p.ptr.visible = !!tg && dist(tg, p) > 0.5;
     if (p.ptr.visible) { p.ptr.position.y = 0.03 - p.y; p.ptr.rotation.y = Math.atan2(tg.x - p.x, tg.z - p.z) - R.root.rotation.y; p.ptr.children[0].material.opacity = 0.6 + 0.3 * Math.sin(M_.time * 6); } }
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
+  if (p.user && !M_.arcade) { if (!p.arcRing) { p.arcRing = M(geo('arcRing', () => new THREE.RingGeometry(0.54, 0.62, 28)), new THREE.MeshBasicMaterial({ color: 0xffc531, transparent: true, opacity: 0, depthWrite: false }), 0, 0.03, 0, scene); p.arcRing.rotation.x = -Math.PI / 2; }
+    const want = M_.phase === 'live' && M_.off === p.team && beyondArc(p.x, p.z) && !M_.hl ? 0.85 : 0; p.arcRing.material.opacity += (want - p.arcRing.material.opacity) * Math.min(1, dt * 12); p.arcRing.position.set(p.x, 0.03, p.z); p.arcRing.visible = p.arcRing.material.opacity > 0.02; }      /* a gold ring: you are behind the line, a three counts */
   if (p.arrow) { p.arrow.visible = !M_.hl; p.arrow.position.y = p.H + 0.36 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }      /* hidden in a highlight: zoomed in it was a giant white triangle */
   if (p.tag) p.tag.position.set(p.x, 0.04, p.z + 0.62);      /* just in front of the feet, toward the camera */
   // ring colours: your matchup glows when you are on defence
@@ -1520,7 +1524,7 @@ function matchCam(dt) {
   (M_.camB || (M_.camB = camera.position.clone())).lerp(_v, 1 - Math.exp(-4 * dt)); camera.position.copy(M_.camB);
   const hz = hlZoom(), fovT = (portrait ? 74 : 52) - (M_.slow > 0 ? 7 : 0) - hz * (portrait ? 26 : 16); if (Math.abs(camera.fov - fovT) > 0.05) { camera.fov += (fovT - camera.fov) * (1 - Math.exp(-9 * dt)); camera.updateProjectionMatrix(); }
   if (M_.shake > 0) { M_.shake -= dt; camera.position.x += rnd(-1, 1) * M_.shake * 0.25; camera.position.y += rnd(-1, 1) * M_.shake * 0.25; }
-  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, Math.max(fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2), Math.max(...hs.map(h => h.z)) - (portrait ? 3.6 : 3.0)));      /* out at the top of the key you stay in the frame, not cut off at the bottom */ M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt));
+  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, Math.max(fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2), Math.max(...hs.map(h => h.z)) - (portrait ? 3.0 : 2.3)));      /* room behind you, so the arc you are standing on stays in the picture */      /* out at the top of the key you stay in the frame, not cut off at the bottom */ M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt));
   if (hz > 0) {      // highlight: push in on the man who did it, from where the camera already is
     const q = M_.hl.p, cy = q.H * 0.62 + q.y * 0.9; _v.set(q.x, cy, q.z); const dx = camera.position.x - q.x, dz = camera.position.z - q.z, l = Math.hypot(dx, dz) || 1, r = portrait ? 5.6 : 4.8;
     _v2.set(q.x + dx / l * r + (q.x > 0 ? -0.9 : 0.9), cy + 0.5, q.z + dz / l * r); camera.position.lerp(_v2, hz); _v2.copy(M_.look).lerp(_v, hz); camera.lookAt(_v2);

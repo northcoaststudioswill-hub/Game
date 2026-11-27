@@ -136,7 +136,7 @@ function keysHint(force) {
     : { mv: kk('WASD'), spr: kk('SHIFT'), shoot: kk('SPACE'), pass: kk('E'), steal: kk('E'), block: kk('SPACE'), moves: kk('IJKL'), lt: kk('Q'), lb: kk('R'), menu: kk('P'), look: kk('J') + kk('L'), act: kk('E') };
   const g = (b, w) => `<span>${b} ${w}</span>`;
   if (ctx === 'world') t = [g(P.mv, 'move'), g(P.spr, 'run'), g(P.act, 'talk / use'), g(P.look, 'look'), g(P.menu, 'my player')].join('');
-  else if (ctx === 'ball') t = [g(P.shoot, 'shoot: hold, let go at the top'), g(P.pass, pad ? 'pass (aim with the stick)' : 'pass (aim with WASD)'), g(P.spr, 'turbo'), g(P.moves, 'dribble moves'), g(P.lt, 'post up'), g(P.lb, 'call a screen')].join('');
+  else if (ctx === 'ball') t = [g(P.shoot, 'shoot: hold, let go at the top'), g(P.pass, pad ? 'pass (aim with the stick)' : 'pass (aim with WASD)'), g(P.spr, 'turbo'), g(P.moves, 'moves · ↙↘ step-back · roll it: spin'), g(P.lt, 'post up'), g(P.lb, 'call a screen')].join('');
   else if (ctx === 'off') t = [g(P.pass, 'call for it'), g(P.shoot, 'jump'), g(P.moves, 'cut'), g(P.lb, 'set a screen'), g(P.lt, 'box out'), g(P.spr, 'sprint')].join('');
   else if (ctx === 'def' || ctx === 'defR') t = [g(P.steal, ctx === 'defR' ? 'shove (hold LT: punch)' : 'steal'), g(P.block, 'jump / contest'), g(P.lt, 'body up'), g(P.lb, 'switch'), g(P.spr, 'sprint')].join('');
   else if (ctx === 'loose') t = [g(P.mv, 'get to it'), g(P.steal, 'dive'), g(P.block, 'jump for it')].join('');
