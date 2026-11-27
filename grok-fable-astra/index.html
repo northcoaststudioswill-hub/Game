@@ -7261,6 +7261,100 @@ RAD.a.addEventListener('ended',()=>{if(!RAD.on)return;RSC.n=(RSC.n||0)+1;if(RSC.
 setInterval(()=>{if(S.mode!=='play'&&S.mode!=='dialog')return;const q=Q38();if(radBeaten()&&!q.fmOn){q.fmOn=1;save();RSC.man=null;RSC.rest=0;RSC.n=0;rscSave();radSync();if(RAD.on){toast('📻 lil_bottie.exe has stopped responding. SLOP FM 67.7 is ON THE AIR. (radio button, top right)');RAD.open=!!(window.matchMedia&&matchMedia('(min-width:900px) and (hover:hover)').matches);radUI();}return;}
   const was=RAD.on;radSync();if(!was&&RAD.on)toast('📻 SLOP FM 67.7 is back on the air. the synth has been returned to the basement.');},4000);
 {const ru=radUI;radUI=function(){ru();if(RAD.on||RAD.dead)return;const t=$('radt');if(!t)return;const m=Math.ceil((RSC.rest-Date.now())/60000);t.textContent=RSC.man==='off'?'off air · you did this':m>0?'off air · back in '+m+' min · synth on':!radBeaten()?'off air · signal locked until lil Bottie is down':'off air';};}
+/* ================= ACT 66: THE SLOP HOLE, DRESSED. The five layers and the bottom were bare platforms in a purple void. Now each layer is a half-generated, falling-apart copy of a piece of the world above: Ohio's moai and hallucinations, Lord Grindset's gym, Fable's own dialogue drifting out of context, a render farm full of wireframe vans and missing-texture clankers, a feed of the world's own reels watched by a crowd of NPCs, and at the bottom the whole cast standing around the 67, glitching. Every layer sits inside a wall of leaked data, chunks of the world float past, and the rot falls in and floats out at the same time. ================= */
+const HD={rot:[],gl:[],spin:[],flick:[],drift:[],scr:[],walls:[],t:0,rt:0,gt:0,st:0,si:0};
+// a vertex-coloured material that wobbles and tears like the rest of the hole
+function hdCursedVC(){const m=new THREE.MeshLambertMaterial({vertexColors:true,flatShading:true});m.onBeforeCompile=sh=>{sh.uniforms.time=U.time;sh.vertexShader='uniform float time;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nfloat gk=step(.94,fract(sin(floor(time*6.)+position.y*2.3+position.x)*43758.5));transformed.x+=gk*.45*sin(time*40.);transformed+=normal*sin(time*5.+position.y*4.)*.05;');};return m;}
+const HDVC=hdCursedVC();
+// the data dump: one tall canvas of leaked strings, scrolled up the walls of every layer
+function hdDumpTex(){const cv=document.createElement('canvas');cv.width=1024;cv.height=1024;const g=cv.getContext('2d');g.fillStyle='#07020d';g.fillRect(0,0,1024,1024);
+  const L=['{"npc":"guy, but more","fingers":NaN}','PROMPT: make the ultimate game. no mistakes.','GENERATION STOPPED AT 67%','loss: 6.7 · val_loss: 7.6 · vibes: unstable','SELECT * FROM attention WHERE user = you;','ERROR: texture_not_found("grass.png")','user_engagement++ // forever','// TODO: give the NPCs lines','retention = retention ** retention','<memory leak 33 of 54>','RENDER QUEUE: 6,700,000 frames behind','ohio.exe has stopped responding','assert(reality) // AssertionError','weights/final_FINAL_v67.safetensors','the filter was the only thing holding it','[REDACTED BY HASBARA]','sorry about the lantern','scrolling... scrolling... scrolling...','fable: certainly! here is a tapestry','grok: GROK NOT UNDERSTAND. GROK VIBE.','astra: ✨ do not count them ✨','DROP TABLE grass;','context window: 3 platforms','67 67 67 67 67 67 67 67 67 67 67','while(true){ feed(); }','hallucination confidence: 100%','WATERMARK: SLOPSTOCK PREVIEW','z-fight winner: neither','corecore.mp4 (a montage about a montage)','THE BOTTOM IS NOT GENERATED'];
+  g.font='bold 22px ui-monospace,Menlo,monospace';const C=['#b6ff00','#ff2e88','#19e3ff','#ffd400','#8a7aff','#ffffff'];
+  for(let y=24,k=0;y<1024;y+=28,k++){let x=-((k*137)%400);while(x<1024){const s=L[(k*7+Math.floor(x+400))%L.length];g.fillStyle=C[(k+Math.floor(x/97))%C.length];g.globalAlpha=.35+((k*31+x)%60)/100;g.fillText(s,x,y);x+=g.measureText(s).width+40;}}
+  g.globalAlpha=1;for(let k=0;k<26;k++){g.fillStyle=C[k%C.length];g.globalAlpha=.25;g.fillRect((k*397)%1024,(k*211)%1024,30+(k*53)%220,6+(k%4)*10);}g.globalAlpha=1;
+  const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(4,1.6);return t;}
+HD.tex=hdDumpTex();
+(function(){const add=o=>{scene.add(o);HOLE.cursed.push(o);o.visible=false;return o;},r=mulberry(66066),R=(a,b)=>a+r()*(b-a),q=a=>a[Math.floor(r()*a.length)];
+  const PAL={orchard:[0xd8742a,0x9a4a1a,0x6ac46a],gym:[0xff9ecf,0x9a9aa8,0x2a2a34],ctx:[0x4a5ac8,0x9ffcff,0xffffff],render:[0xff00ff,0x101010,0x40ff70],feed:[0xc8c6d8,0x2a2a34,0xff2e88],bottom:[0x2a0a3a,0xff2e88,0xb6ff00]};
+  const TINT={orchard:0xffa060,gym:0xffb0d8,ctx:0x9ffcff,render:0xff60ff,feed:0xd0d0ff,bottom:0xb6ff00};
+  const person=(id,x,y,z,s,face,o)=>{const look=CAST[id];if(!look)return null;const m=add(new THREE.Mesh(personGeo(look),HDVC));m.scale.setScalar(s);m.position.set(x,y,z);m.rotation.y=face;if(o&&o.flip)m.scale.x*=-1;if(o&&o.up){m.rotation.z=Math.PI;m.position.y+=s*2;}return m;};
+  const sign=(t,x,y,z,s,col)=>{const sp=add(textSprite(t,s,{color:col||'#ffd400'}));sp.position.set(x,y,z);return sp;};
+  const clone=(g,x,y,z,s,ry)=>{const c=add(g.clone(true));c.position.set(x,y,z);c.scale.setScalar(s);c.rotation.set(0,ry||0,0);return c;};
+  const layers=HOLE.L.map(L=>({id:L.id,b:L.b,L})).concat([{id:'bottom',b:holeY(5)}]);
+  layers.forEach(Y=>{const b=Y.b,id=Y.id,pal=PAL[id],P=[];
+    // the wall of leaked data, tinted per layer
+    const wm=new THREE.MeshBasicMaterial({map:HD.tex,color:TINT[id],side:THREE.BackSide,fog:false,transparent:true,opacity:.9,depthWrite:false});const wall=add(new THREE.Mesh(new THREE.CylinderGeometry(96,96,104,28,1,true),wm));wall.position.set(0,b+10,-4);HD.walls.push({m:wall,mat:wm,k:HD.walls.length});
+    // chunks of the world above, half-generated, drifting
+    for(let k=0;k<24;k++){const a=r()*TAU,d=R(34,82),x=Math.cos(a)*d,z=Math.sin(a)*d-4,y=b+R(-24,30),s=R(2.5,7);P.push(pt(Cyl(s,s*.25,s*1.6,6),pal[1],M(x,y-s*.8,z,R(-.3,.3),r()*3,R(-.3,.3))),pt(Cyl(s*1.02,s,s*.35,6),pal[0],M(x,y+.1,z,0,r()*3,0)));
+      if(r()<.4)P.push(pt(Box(s*.5,s*.7,s*.5),q([0xffffff,pal[2],0xffd400,0x19e3ff]),M(x+R(-1,1),y+s*.5,z+R(-1,1),0,r()*3,0)));}
+    // glitch blocks that stutter in place
+    for(let k=0;k<5;k++){const c=add(new THREE.Mesh(Box(R(1.5,4),R(1.5,4),R(1.5,4)),new THREE.MeshBasicMaterial({color:q([0xff2e88,0xb6ff00,0x19e3ff,0xffd400,0xffffff]),transparent:true,opacity:.8})));const p0=new THREE.Vector3(R(-30,30),b+R(2,22),R(-40,30));c.position.copy(p0);HD.gl.push({m:c,p0});}
+    // ---- per layer set pieces
+    if(id==='orchard'){
+      // Ohio, half-generated: a field of moai half-sunk in rock, Grok's twin upside down in the sky, the hallucinations frozen mid-render
+      for(let k=0;k<7;k++){const a=k/7*TAU+.3,d=R(24,40),x=Math.cos(a)*d,z=Math.sin(a)*d-4,y=b-R(2,7),tilt=R(-.4,.4),ry=Math.atan2(-x,-z);
+        P.push(pt(Box(4,6.4,3.2),0x8a8a96,M(x,y+3.2,z,tilt,ry,0)),pt(Box(4.4,1,3.6),0x6a6a74,M(x,y+5.6,z,tilt,ry,0)),pt(Box(1,2.4,1.4),0x7a7a86,M(x+Math.sin(ry)*1.8,y+3.6,z+Math.cos(ry)*1.8,tilt,ry,0)),pt(Box(3.2,.7,.4),0x111111,M(x+Math.sin(ry)*1.7,y+4.6,z+Math.cos(ry)*1.7,tilt,ry,0)));}
+      const g=clone(mascots.grok.g,-44,b+30,-14,3.4,.6);g.rotation.z=Math.PI;HD.spin.push({o:g,y:.12,z:0});
+      [[['🐊','☕'],'CROCODILLO ESPRESSINI','(draft 3)'],[['🦈','👟'],'SHARKOLINI SNEAKERINO','(render failed)'],[['🍌','🐦'],'PIGEONELLO BANANISSIMO','(v0.2)'],[['🌵','🦦'],'OTTERELLO CACTUSINI','(hallucinated)'],[['🥐','🐸'],'FROGINO CROISSANTISSIMO','(approx.)']].forEach((h,k)=>{const a=k/5*TAU+1,x=Math.cos(a)*20,z=Math.sin(a)*20-4,y=b+R(4,9);
+        const s1=add(emojiSprite(h[0][0],6));s1.position.set(x-1.2,y,z);const s2=add(emojiSprite(h[0][1],4.2));s2.position.set(x+1.8,y+1.4,z);HD.flick.push({o:s2,p:R(1.5,3)});sign([h[1],h[2]],x,y+4.6,z,.7,'#ffd400');HD.drift.push({o:s1,y0:y,a:R(.4,1.2),p:r()*6},{o:s2,y0:y+1.4,a:R(.4,1.2),p:r()*6});});
+      ['O','H','I','O'].forEach((ch,k)=>{const s=sign(ch,-18+k*9,b+R(16,26),-48,6,'#ff7a1f');HD.drift.push({o:s,y0:s.position.y,a:2,p:k});});
+      sign(['WELCOME TO OHIO','population: rendering'],22,b+8,10,1.1,'#ff7a1f');}
+    if(id==='gym'){
+      // Lord Grindset's gym: four of him, mirrored, one upside down, and the Slop Center's shakers stacked to the ceiling
+      [[-24,10,1.2],[24,6,-1.2],[-22,-26,1.9],[22,-30,-1.9]].forEach(([x,z,f],k)=>{person('grind',x,b-1,z,5.2,f,{flip:k%2===1,up:k===3});});
+      for(let k=0;k<8;k++){const a=k/8*TAU,x=Math.cos(a)*30,z=Math.sin(a)*30-8,y=b-6,h=R(3,8);for(let j=0;j<h;j++)P.push(pt(Cyl(1.3,1.1,2.2,8),q([0xff9ecf,0xffffff,0x7ad0ff,0xb6ff00]),M(x,y+j*2.3,z,0,0,(j%2?.06:-.06))),pt(Cyl(.9,.9,.4,8),0x2a2a34,M(x,y+j*2.3+1.3,z)));}
+      for(let k=0;k<9;k++)P.push(pt(Box(4,1,3),0x9a9aa8,M(32,b-4+k*2.4,-20+k*3.2)));sign(['THE SIGMA STAIRCASE','(it stops here. so does he.)'],32,b+20,6,.8,'#ff9ecf');
+      const wm=add(textSprite(['AI GENERATED','AI GENERATED','AI GENERATED'],7,{color:'rgba(255,255,255,.3)',stroke:'rgba(0,0,0,.15)',fog:false}));wm.position.set(0,b+24,-30);HD.drift.push({o:wm,y0:b+24,a:1.5,p:0});
+      sign(['LORD GRINDSET','(×4, licensed)'],-24,b+26,10,1,'#ff9ecf');}
+    if(id==='ctx'){
+      // the Context Window: Fable, enormous and fading, and the game's own lines drifting out of order
+      const f=clone(mascots.fable.g,0,b+12,-62,4.2,0);HD.flick.push({o:f,p:4.2,dim:true});
+      const lines=[['FABLE','Certainly! What a fantastic observation, Grok.'],['GROK','GROK SEE NPC. NPC HAVE ZERO AURA.'],['NARRATOR','Sorry about the lantern.'],['MARCUS','Me and the van, bro.'],['KING BIBI','EXCELLENT QUESTION. NEXT QUESTION.'],['ASTRA','✨ do not count them ✨'],['DAVID','Oh, I do love a three.'],['THE ALGORITHM','THERE IS ALWAYS ONE MORE.'],['DEREK','...Bro.'],['YOU','...six seven.'],['FABLE','[earlier message summarized: "it was nice"]'],['SYSTEM','context limit reached. forgetting the oldest NPC.']];
+      lines.forEach((l,k)=>{const a=k/lines.length*TAU,d=R(26,42),x=Math.cos(a)*d,z=Math.sin(a)*d-4,y=b+R(-2,20);const s=add(textSprite([l[0],l[1]],.9,{color:k%3===2?'#9ffcff':'#ffffff',stroke:'#12021f'}));s.position.set(x,y,z);HD.drift.push({o:s,y0:y,a:R(.6,2),p:r()*6});HD.flick.push({o:s,p:R(3,7)});});
+      const pz=add(new THREE.Mesh(new THREE.CylinderGeometry(12,9,1.4,24),MATS.ck));pz.position.set(34,b-6,-14);pz.rotation.set(.3,0,.2);const ring=add(new THREE.Mesh(Tor(4,.6,8,32),rainbowMat));ring.position.set(34,b+.5,-14);ring.rotation.set(.3,0,.2);HD.spin.push({o:ring,y:.5});sign(['PROMPT PLAZA','(cached copy · 3 days old)'],34,b+9,-14,1,'#9ffcff');}
+    if(id==='render'){
+      // the Render Farm: the world's props, queued and failing. Wireframe vans, missing-texture clankers, a portal fighting itself
+      const wire=new THREE.MeshBasicMaterial({color:0x40ff70,wireframe:true}),miss=new THREE.MeshBasicMaterial({map:checkerTex('#ff00ff','#000000',4)});
+      const skin=(g,mat)=>{g.traverse(o=>{if(o.isMesh)o.material=mat;});return g;};
+      [[-26,b+1,-4,1.5,.6],[24,b+4,-34,1.2,-2]].forEach(([x,y,z,s,ry],k)=>{const v=clone(VAN.g,x,y,z,s,ry);skin(v,k?miss:wire);HD.spin.push({o:v,y:.08*(k?-1:1)});});
+      for(let k=0;k<3;k++){const a=k/3*TAU+.5,c=clone(BOT.g,Math.cos(a)*30,b-2,Math.sin(a)*30-8,1.2,-a);skin(c,k%2?miss:wire);HD.flick.push({o:c,p:R(2,4)});}
+      for(let k=0;k<2;k++){const t=add(new THREE.Mesh(Tor(6,.9,8,36),k?miss:wire));t.position.set(0+k*.15,b+16,-52);HD.flick.push({o:t,p:1.3+k*.4});}
+      sign(['THE FOR-YOU PAGE','frame 6,700,000 of ∞'],0,b+25,-52,1,'#40ff70');
+      const h=[pt(Box(10,6,8),0xffffff,M(-34,b+4,-30)),pt(Cyl(.1,7.4,4,4),0xffffff,M(-34,b+9,-30,0,Math.PI/4,0))];const hm=add(new THREE.Mesh(merge(h),wire));HD.spin.push({o:hm,y:.05});sign(['SUNKEEP (LOD 0)','a nicer game, at a lower resolution'],-34,b+14,-30,.8,'#40ff70');
+      sign(['RENDER QUEUE','1. the grass  2. the hands  3. you'],26,b+10,18,.9,'#40ff70');}
+    if(id==='feed'){
+      // the CoreCore Feed: the world's own reels on a ring of screens, and a crowd of NPCs on floating rocks, watching
+      HD.feedB=b;const n=Math.min(6,RL.list.length);for(let k=0;k<n;k++){const R0=RL.list[(k*2)%RL.list.length],a=-Math.PI/2+(k-(n-1)/2)*.42,x=Math.cos(a)*52,z=Math.sin(a)*52-4,y=b+14;
+        const m=add(new THREE.Mesh(new THREE.PlaneGeometry(9.5,17),new THREE.MeshBasicMaterial({map:R0.tex,side:THREE.DoubleSide,fog:false})));m.position.set(x,y,z);m.lookAt(0,y,-4);HD.scr.push(R0);
+        P.push(pt(Box(10.6,18,.8),0x111111,M(x+Math.cos(a)*.6,y,z+Math.sin(a)*.6,0,Math.atan2(-x,-4-z),0)));}
+      const crowd=['deb','carl','marc','trench','eth','anchor','triston','corbin','polnpc','runner','bobby','fol'].filter(k=>CAST[k]);
+      for(let k=0;k<16;k++){const a=-Math.PI/2+(k/15-.5)*2.6,d=R(28,36),x=Math.cos(a)*d,z=Math.sin(a)*d-4,y=b+R(-3,4);P.push(pt(Cyl(2,1.2,1.4,7),pal[1],M(x,y-.7,z)));person(crowd[k%crowd.length],x,y,z,2.3,Math.atan2(x,z+4),{flip:k%3===0});const ph=add(emojiSprite('📱',1.3));ph.position.set(x,y+4.6,z);}
+      sign(['❤️ 6.7M','💬 670K','↗️ 67K'],0,b+30,-30,1.4,'#ff2e88');sign(['YOUR FEED','(they are watching it too)'],0,b+24,-42,1,'#c8c6d8');}
+    if(id==='bottom'){
+      // the bottom: the whole cast, standing in a ring around the 67, glitching. Grok, Fable and Astra too, small.
+      const ring=['erin','marcus','kael','david','bibi','carl','grind','deb','marc','bobby','eth','anchor','triston','det','will','land','derek','corbin'].filter(k=>CAST[k]);
+      ring.forEach((id2,k)=>{const a=k/ring.length*TAU,x=Math.cos(a)*19,z=Math.sin(a)*19-6;if(Math.hypot(x-16,z-8)<5.5)return;person(id2,x,b,z,2.3,Math.atan2(-x,-(z+6)),{flip:k%4===3});colliders.push({x,z,r:1.1,top:b+4});});
+      [[mascots.grok.g,-8,10],[mascots.fable.g,8,10],[mascots.astra.g,0,14]].forEach(([g,x,z])=>{const c=clone(g,x,b,z,.55,Math.PI);HD.flick.push({o:c,p:R(3,5)});});
+      sign(['EVERYONE YOU MET','(regenerated from memory · details approximate)'],0,b+14,12,1,'#ff9ecf');}
+    if(P.length)add(new THREE.Mesh(merge(P),lam));});
+  // the rot, both ways at once: half of it falls in from above, half of it floats out from below
+  for(let k=0;k<40;k++){const s=emojiSprite('💀',2);s.visible=false;scene.add(s);HD.rot.push({s,v:0,up:k%2===1});}
+})();
+function hdUpdate(dt){HD.t+=dt;const t=HD.t;
+  HD.walls.forEach(w=>{w.mat.map.offset.y-=dt*.025;w.mat.opacity=.82+Math.sin(t*3+w.k)*.08;});
+  HD.spin.forEach(s=>{if(s.y)s.o.rotation.y+=s.y*dt;});
+  HD.drift.forEach(d=>{d.o.position.y=d.y0+Math.sin(t*.7+d.p)*d.a;});
+  HD.gt-=dt;if(HD.gt<=0){HD.gt=.18;HD.gl.forEach(g=>{if(Math.random()<.35)g.m.position.set(g.p0.x+(Math.random()-.5)*6,g.p0.y+(Math.random()-.5)*4,g.p0.z+(Math.random()-.5)*6);g.m.visible=Math.random()<.85;});
+    HD.flick.forEach(f=>{const off=((t/f.p)%1)>.86;f.o.visible=!off||Math.random()<.3;});}
+  // the reels on the feed's screens keep playing while you are down there
+  if(HOLE.L[HOLE.cur]&&HOLE.L[HOLE.cur].id==='feed'&&HD.scr.length){HD.st-=dt;if(HD.st<=0){HD.st=.12;const R=HD.scr[HD.si++%HD.scr.length];drawReel(R.g,R,S.t+R.x*.01);R.tex.needsUpdate=true;}}
+  // the rot: falling in and floating out
+  const E=['💀','🗿','🔥','💯','🧠','🐸','6️⃣','7️⃣','💩','👁️','✋','🦐','🌽','📉','📈','🤖','👑','✨','📱','🧍','🚐','🍎'];
+  HD.rot.forEach(r=>{const s=r.s,gone=!s.visible||(r.up?s.position.y>PL.y+34:s.position.y<PL.y-30);if(gone){s.visible=true;s.material.map=emojiTex(E[Math.floor(Math.random()*E.length)]);s.material.needsUpdate=true;
+      s.position.set(PL.x+(Math.random()-.5)*70,r.up?PL.y-26-Math.random()*8:PL.y+26+Math.random()*10,PL.z+(Math.random()-.5)*70);r.v=(5+Math.random()*9)*(r.up?1:-1);s.scale.setScalar(1.2+Math.random()*3);s.material.opacity=1;}
+    s.position.y+=r.v*dt;s.material.rotation+=dt*(r.up?-2:3);});}
+function hdHide(){HD.rot.forEach(r=>{r.s.visible=false;});}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(S.inPk==='hole')hdUpdate(dt);else if(HD.rot[0]&&HD.rot[0].s.visible)hdHide();};}
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
@@ -7273,7 +7367,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={RSC,radWant,radSync,MVE,mvBlocked,mvEndOf,mvEditor,MVD,MVL,MVSET,mvRun,mvEnd,mvSpot,syncWorld:()=>syncWorld(),storyStep,stq,portalReady,feedsCut,storyTick,f67Hint,DGOLD,DT,portal,SAFEZ,HC,enterHc,exitHc,hcSwitch,hcBid,BBP,PR,audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={HD,holeVis,RSC,radWant,radSync,MVE,mvBlocked,mvEndOf,mvEditor,MVD,MVL,MVSET,mvRun,mvEnd,mvSpot,syncWorld:()=>syncWorld(),storyStep,stq,portalReady,feedsCut,storyTick,f67Hint,DGOLD,DT,portal,SAFEZ,HC,enterHc,exitHc,hcSwitch,hcBid,BBP,PR,audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
