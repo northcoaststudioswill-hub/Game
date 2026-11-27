@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.84 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.85 (2026-11-26).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,10 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.85 (from the playtest bots; needs your hands)
+- The home's door marked OUT; enemies cover up against mashing (say if it is too strict); the last Keep fight tells you ELEVEN ends it; the camp and the cloak less crowded.
+- **Where both bots got stuck** (needs your play to judge): the stealth missions, the 2D Assay missions, the comic-book level routes, the walk-about days in the square, and the Count.
 
 ## Built in v0.83 (needs your hands)
 - **The yard gate opens by itself with the key.** Tell me if you get through. If not, say what the box at the top right says when you stand at it.

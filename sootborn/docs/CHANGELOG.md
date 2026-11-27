@@ -1,4 +1,19 @@
-# SOOTBORN — changelog (latest v0.84 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.85 · 2026-11-26)
+
+## v0.85 · 2026-11-26 — fixes from two playtest bots
+Two bots played from a new game on a controller. The first knew nothing and pressed at random for 90 minutes (it reached the last flash). The second knows a little: it walks to people and things, fights in combos with pauses, dodges a wind-up and holds strike for ELEVEN (an hour; it reached the Pinning). Neither found an error.
+
+- **The way out of the home is marked.** On Row K's home, when the objective is somewhere else (the bay, Mara, the square), the door has an OUT marker. The blind bot spent both walk-about days inside the room.
+- **Mashing no longer wins by itself.** Six strikes in one unbroken rhythm and the man covers up; a pause, a kick, a dodge or a throw resets it. The first time it happens: HE READ IT. BREAK THE RHYTHM. (Random presses had won 17 of 21 fights.)
+- **The last Keep fight says what ends it.** Once Lucan is at half, every five seconds: ONLY ELEVEN ENDS IT: FILL THE BAR, or HOLD X: ELEVEN ENDS IT when the bar is full.
+- **Less crowding:** the camp by day is spread across the clearing and its cadets stand back by the tents; in the cloak the column that follows you keeps a wider space.
+
+**Checked:** the second bot won every fight it met by playing, including the last Keep fight (59 seconds, by following the prompt). It walked the camp by day and last bell on its own. A simple fight bot that varies its presses still won the Pairing, the Ford, the Scuffle and Thorne. The camp by day and the cloak walked end to end. The whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. Whether the anti-mash rule is too strict for a person who strings combos fast. The camp by day still looks busy up close.
+
 
 ## v0.84 · 2026-11-20 — the hand to the washer, in the comic-book levels
 - **Before ELEVEN in the comic-book levels**, in the half second where he sinks and the gold draws in, his off hand now goes to the washer at his collar. It is now in all three kinds of fight.

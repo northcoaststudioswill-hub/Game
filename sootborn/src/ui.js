@@ -390,11 +390,11 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.84';
-const DEV_NEW = 'the hand to the washer before ELEVEN in the comic-book levels too.';
+const GAME_VER = '0.85';
+const DEV_NEW = 'from the blind playtest: the way out of the home is marked; enemies cover up against button mashing; the last Keep fight says what ends it; the camp by day and the cloak are less crowded.';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
-  [/High Docks/i, '0.83'], [/Pairing|Ford/i, '0.82'], [/Scuffle/i, '0.80'], [/fever ward/i, '0.78'], [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
+  [/camp by day|cloak|Keep/i, '0.85'], [/High Docks/i, '0.83'], [/Pairing|Ford/i, '0.82'], [/Scuffle/i, '0.80'], [/fever ward/i, '0.78'], [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
   [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],
