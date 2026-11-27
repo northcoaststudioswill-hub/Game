@@ -100,10 +100,11 @@
   }
   // going down: the market gives way to the golden room for as long as his menu is open
   let inside = false;
-  const leave = () => { if (!inside) return; inside = false; gfx.cine = null; if (G.scene === 'hub') gfx.setScene(W.get('hub').scene); document.getElementById('panel').classList.remove('cellar'); };
+  const leave = () => { if (!inside) return; inside = false; O.visitLine = null; gfx.cine = null; if (G.scene === 'hub') gfx.setScene(W.get('hub').scene); document.getElementById('panel').classList.remove('cellar'); };
   const or0 = ui.oracle;
-  ui.oracle = function () {
-    if (G.scene === 'hub') { if (!room) room = build(); if (!inside) { inside = true; G.sfx('page'); } gfx.setScene(room.scene); room.update(performance.now() / 1000); }
+  ui.oracle = function (line) {
+    let fresh = false; if (G.scene === 'hub') { if (!room) room = build(); if (!inside) { inside = true; fresh = true; G.sfx('page'); } gfx.setScene(room.scene); room.update(performance.now() / 1000); }
+    if (fresh) { const piece = O.loreNext && G.state && G.state.davidMet ? O.loreNext(G.state) : null; O.visitLine = piece ? piece.filter(Boolean).join(' ') : null; }       // each new visit, the next piece of what he wants, held for the whole visit
     const r = or0.apply(this, arguments);
     if (inside) document.getElementById('panel').classList.add('cellar');
     return r;
