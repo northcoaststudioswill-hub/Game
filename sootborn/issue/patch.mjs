@@ -704,6 +704,131 @@ rep("  function steer(e, tx, tz, speed, dt) {", `  SC.detour = function (e, d, d
 /* ---- end COMBAT ---- */
 
 /* ---- v0.90 WORLD-A team patches (rendering, docks, riser, gild) go here ---- */
+// the look of every level: hemisphere light and fog per place, contact shadows, one particle system (steam, mist, soot, dust, splashes), wind on the docks, the sky fleet merged
+const WA_GFX = String.raw`'use strict';
+/* SOOTBORN v0.90 WORLD-A - the look of every level: the air of each place (hemisphere light, fog), a contact shadow under everybody,
+   one particle system for steam, mist, soot, dust and splashes, wind on the docks, and the sky fleet merged into a dozen draw calls. */
+(function () {
+  const G = SC.gfx, WA = G.wa = { em: [] }, v3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  /* the fleet in the sky was ~180 meshes; each ring is now one mesh per colour (the riding lamps keep their own three, which wink) */
+  function mergeSky() {
+    const sky = G.sky; if (!sky || !sky.rings) return;
+    sky.updateMatrixWorld(true);
+    sky.rings.forEach(ring => {
+      const buckets = new Map(), inv = new THREE.Matrix4().copy(ring.matrixWorld).invert(), dead = [];
+      ring.traverse(o => { if (!o.isMesh) return; let vis = true; for (let p = o; p && p !== ring; p = p.parent) if (!p.visible) vis = false; dead.push(o); if (!vis) return;
+        const shared = sky.bcm.indexOf(o.material) >= 0, key = shared ? o.material.uuid : 'c' + o.material.color.getHexString();
+        let b = buckets.get(key); if (!b) buckets.set(key, b = { mat: o.material, pos: [] });
+        const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry, p = g.attributes.position, m = new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld), v = new THREE.Vector3();
+        for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).applyMatrix4(m); b.pos.push(v.x, v.y, v.z); } });
+      dead.forEach(o => { if (o.parent) o.parent.remove(o); });
+      buckets.forEach(b => { if (!b.pos.length) return; const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(b.pos, 3)); g.computeBoundingSphere(); ring.add(new THREE.Mesh(g, b.mat)); });
+    });
+  }
+  /* ---------- the air of each place ---------- */
+  const MOOD = {
+    // above the weather at night: moonlit indigo over warm stone; no rain up here (the clouds are below the rail), wind instead
+    docks: { sky: 0x7680d0, gnd: 0xb08a70, hemi: 0.55, amb: 0.62, fog: 0x232a5c, near: 40, far: 170, rain: false, wind: 1, wisp: 1, sootN: 30 },
+    // the valley at night in rain: cold blue from above, wet grass below, mist lying in the low places
+    riser: { sky: 0x5274b4, gnd: 0x2a4434, hemi: 0.7, amb: 0.45, fog: 0x15283e, near: 22, far: 112, mist: 1, splash: 1 },
+    // a sealed pump room: the lamp is everything; the floor sends a little of it back
+    gild: { sky: 0x3a3450, gnd: 0x5a4028, hemi: 0.45, amb: 0.8, dust: 1 },
+    stair: { sky: 0xffb48a, gnd: 0x7a4a62, hemi: 0.45, amb: 0.75 },
+    stack: { sky: 0x7a8ca8, gnd: 0x3a3c44, hemi: 0.5, amb: 0.7, sootN: 40 },
+    array: { sky: 0x3c5a50, gnd: 0x4a3a26, hemi: 0.5, amb: 0.75, sootN: 50 }
+  };
+  G.waMood = function (key) {
+    const M = WA.mood = MOOD[key] || MOOD.docks;
+    G.amb.color.multiplyScalar(M.amb);
+    const h = WA.hemi = new THREE.HemisphereLight(M.sky, M.gnd, Math.PI * M.hemi); h.position.set(0, 1, 0); G.scene.add(h);
+    if (M.fog !== undefined) { G.scene.fog.color.set(M.fog); G.scene.fog.near = M.near; G.scene.fog.far = M.far; }
+    if (M.rain === false && G.rainMesh) G.rainMesh.visible = false;
+    mergeSky(); buildParts(M); buildBlobs(); if (M.wind) buildWind();
+  };
+  /* ---------- contact shadows: a soft dark disc on the ground under every body, one draw call for all of them ---------- */
+  function buildBlobs() {
+    const tex = G.canvasTex(64, 64, g => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,.75)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); });
+    const geo = new THREE.PlaneGeometry(1, 1); geo.rotateX(-Math.PI / 2);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, color: 0x07070d, transparent: true, opacity: 0.42, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const m = WA.blobs = new THREE.InstancedMesh(geo, mat, 40); m.count = 0; m.frustumCulled = false; m.renderOrder = 1; G.scene.add(m);
+  }
+  const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3();
+  function blob(g, x, z, feet, top, r) {
+    const W = SC.world; if (!W || !W.ground) return; const gy = W.ground(x, z, feet + 0.05), hgt = Math.max(0, top - gy); if (hgt > 7) return;
+    const k = 1 / (1 + hgt * 0.35), s = r * 2.1 * k; _p.set(x, gy + 0.02, z); _s.set(s, 1, s); _m.compose(_p, _q, _s); WA.blobs.setMatrixAt(WA.blobs.count++, _m);
+  }
+  function updateBlobs() {
+    const m = WA.blobs; if (!m) return; m.count = 0; const pl = SC.player;
+    if (pl && pl.model && pl.model.group.visible && pl.model.group.parent) { const g = pl.model.group; blob(g, g.position.x, g.position.z, pl.pos.y, g.position.y + pl.model.inner.position.y, 0.5); }
+    for (const e of SC.enemies || []) { if (m.count >= 39) break; const g = e.model && e.model.group; if (!g || !g.visible || !g.parent || e.gone) continue; blob(g, g.position.x, g.position.z, e.pos.y, g.position.y, (e.r || 0.45) * 1.1); }
+    const c = SC.story && SC.story.clerk; if (c && c.group && c.group.visible && c.group.parent && m.count < 40) blob(c.group, c.group.position.x, c.group.position.z, c.group.position.y, c.group.position.y, 0.45);
+    m.instanceMatrix.needsUpdate = true;
+  }
+  /* ---------- the particles: steam, mist, soot, dust, splashes. One Points draw, soft discs drawn in the shader ---------- */
+  const N = 420; let P = null;
+  function buildParts(M) {
+    const geo = new THREE.BufferGeometry(), pos = new Float32Array(N * 3), col = new Float32Array(N * 3), sz = new Float32Array(N), al = new Float32Array(N);
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('aCol', new THREE.BufferAttribute(col, 3)); geo.setAttribute('aSize', new THREE.BufferAttribute(sz, 1)); geo.setAttribute('aAlpha', new THREE.BufferAttribute(al, 1));
+    const mat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uScale: { value: 300 } },
+      vertexShader: 'attribute vec3 aCol; attribute float aSize; attribute float aAlpha; uniform float uScale; varying vec3 vC; varying float vA; varying float vHard;\nvoid main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vC = aCol; vA = aAlpha; vHard = aSize < 0.0 ? 1.0 : 0.0; gl_PointSize = clamp(abs(aSize) * uScale / max(0.1, -mv.z), 0.0, 220.0); if (aAlpha <= 0.001) gl_PointSize = 0.0; gl_Position = projectionMatrix * mv; }',
+      fragmentShader: 'varying vec3 vC; varying float vA; varying float vHard;\nvoid main(){ float d = length(gl_PointCoord - 0.5) * 2.0; float a = vHard > 0.5 ? 1.0 - smoothstep(0.55, 0.8, d) : (1.0 - smoothstep(0.0, 1.0, d)); if (a < 0.01) discard; gl_FragColor = vec4(vC, a * vA); }' });
+    P = WA.parts = new THREE.Points(geo, mat); P.frustumCulled = false; P.renderOrder = 8; G.scene.add(P);
+    P.d = []; for (let i = 0; i < N; i++) P.d.push({ k: 0, t: 0, life: 1 });
+    P.M = M; P.acc = { soot: 0, mist: 0, splash: 0, dust: 0, wisp: 0 };
+  }
+  function spawn(kind, x, y, z, o) {
+    const d = P.d; let i = -1; for (let j = 0; j < N; j++) { const q = (P.next = ((P.next || 0) + 1) % N); if (!d[q].k) { i = q; break; } } if (i < 0) return null;
+    const q = d[i]; Object.assign(q, { k: kind, t: 0, x, y, z, vx: 0, vy: 0, vz: 0, s0: 0.1, s1: 0.1, a: 0.5, life: 1, c: 0xffffff, hard: false, grav: 0 }, o || {}); q.col = new THREE.Color(q.c); return q;
+  }
+  WA.spawn = (k, x, y, z, o) => P && spawn(k, x, y, z, o);
+  /* emitters a level places while it is built: G.wa.steam(x, y, z, {rate, size, up, col}) and G.wa.sparks(x, y, z, {rate}) */
+  WA.steam = (x, y, z, o) => { WA.em.push(Object.assign({ kind: 'steam', x, y, z, rate: 3, size: 0.6, up: 1.1, c: 0xe8ecf4, a: 0.42, acc: Math.random() }, o || {})); };
+  WA.sparks = (x, y, z, o) => { WA.em.push(Object.assign({ kind: 'spark', x, y, z, rate: 0.4, acc: 0 }, o || {})); };
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function updateParts(dt, rdt) {
+    if (!P) return;
+    if (!P.warm && SC.player && SC.world && SC.world.ground) { P.warm = 1; for (let i = 0; i < 160; i++) updateParts(0.05, 0.05); } const M = P.M, c = G.camera.position, pl = SC.player ? SC.player.pos : c, d = P.d, ft = Math.min(rdt, 0.05);
+    if (ft <= 0) return;
+    const W = SC.world, roof = (x, y, z) => W && W.underRoof && W.underRoof(x, y, z);
+    // what the place breathes out
+    if (M.sootN) { P.acc.soot += ft * M.sootN / 6; while (P.acc.soot > 1) { P.acc.soot--; const a = Math.random() * 6.283, r = rnd(2, 14); spawn('soot', pl.x + Math.cos(a) * r, pl.y + rnd(0.2, 5), pl.z + Math.sin(a) * r, { vx: rnd(-0.3, 0.3) + (M.wind ? 1.2 : 0), vy: rnd(-0.25, 0.1), vz: rnd(-0.3, 0.3), s0: 0.05, s1: 0.05, a: 0.7, life: rnd(4, 7), c: M.wind ? 0xd8d2e8 : 0x2a2630, hard: true, wob: rnd(0, 6) }); } }
+    if (M.wisp) { P.acc.wisp += ft * 1.4; while (P.acc.wisp > 1) { P.acc.wisp--; const a = Math.random() * 6.283, r = rnd(14, 34); spawn('wisp', c.x + Math.cos(a) * r - 10, rnd(-4, 3), c.z + Math.sin(a) * r, { vx: rnd(2.2, 3.4), vy: rnd(0.15, 0.4), vz: rnd(-0.3, 0.3), s0: rnd(4, 6), s1: rnd(7, 10), a: 0.16, life: rnd(7, 10), c: 0xb9b6e6 }); } }
+    if (M.mist) { P.acc.mist += ft * 2.2; while (P.acc.mist > 1) { P.acc.mist--; const a = Math.random() * 6.283, r = rnd(3, 22); spawn('mist', pl.x + Math.cos(a) * r, rnd(0.25, 0.9), pl.z + Math.sin(a) * r, { vx: rnd(0.2, 0.45), vy: 0.02, vz: rnd(-0.1, 0.1), s0: rnd(2.2, 3.4), s1: rnd(3.6, 5), a: 0.11, life: rnd(6, 9), c: 0x9ab4cc }); } }
+    if (M.splash && (!G.rainMesh || G.rainMesh.visible)) { P.acc.splash += ft * 34; while (P.acc.splash > 1) { P.acc.splash--; const x = c.x + rnd(-11, 11), z = c.z + rnd(-11, 11); if (roof(x, 1, z)) continue; const gy = W && W.ground ? W.ground(x, z, pl.y + 3) : 0; spawn('splash', x, gy + 0.04, z, { s0: 0.05, s1: 0.2, a: 0.55, life: 0.18, c: 0xcfe0ff, hard: true }); } }
+    if (M.dust) { P.acc.dust += ft * 6; while (P.acc.dust > 1) { P.acc.dust--; const a = Math.random() * 6.283, r = Math.sqrt(Math.random()) * 1.4; spawn('dust', Math.cos(a) * r, rnd(0.6, 3.2), Math.sin(a) * r, { vx: rnd(-0.04, 0.04), vy: rnd(-0.03, 0.05), vz: rnd(-0.04, 0.04), s0: 0.025, s1: 0.025, a: 0.75, life: rnd(5, 9), c: 0xffe6b0, hard: true, wob: rnd(0, 6) }); } }
+    for (const e of WA.em) { if (Math.hypot(e.x - pl.x, e.z - pl.z) > 45) continue; e.acc += ft * e.rate; while (e.acc > 1) { e.acc--;
+      if (e.kind === 'steam') spawn('steam', e.x + rnd(-0.12, 0.12), e.y, e.z + rnd(-0.12, 0.12), { vx: rnd(-0.15, 0.15) + (M.wind ? 0.9 : 0), vy: e.up * rnd(0.8, 1.2), vz: rnd(-0.15, 0.15), s0: e.size * 0.5, s1: e.size * 2.4, a: e.a, life: rnd(1.6, 2.6), c: e.c });
+      else for (let k = 0; k < 5; k++) spawn('spark', e.x, e.y, e.z, { vx: rnd(-1.4, 1.4), vy: rnd(0.5, 2.6), vz: rnd(-1.4, 1.4), s0: 0.05, s1: 0.02, a: 1, life: rnd(0.35, 0.7), c: k % 2 ? 0xffd23a : 0xff8a2a, hard: true, grav: 9 }); } }
+    const pa = P.geometry.attributes, pos = pa.position.array, col = pa.aCol.array, sz = pa.aSize.array, al = pa.aAlpha.array;
+    for (let i = 0; i < N; i++) { const q = d[i], j = i * 3; if (!q.k) { al[i] = 0; continue; }
+      q.t += ft; const k = q.t / q.life; if (k >= 1) { q.k = 0; al[i] = 0; continue; }
+      q.vy -= q.grav * ft; q.x += q.vx * ft; q.y += q.vy * ft; q.z += q.vz * ft;
+      if (q.wob !== undefined) { q.x += Math.sin(q.t * 1.7 + q.wob) * 0.12 * ft; q.z += Math.cos(q.t * 1.3 + q.wob) * 0.12 * ft; }
+      pos[j] = q.x; pos[j + 1] = q.y; pos[j + 2] = q.z; col[j] = q.col.r; col[j + 1] = q.col.g; col[j + 2] = q.col.b;
+      const s = q.s0 + (q.s1 - q.s0) * k; sz[i] = q.hard ? -s : s; al[i] = q.a * Math.min(1, k * 5) * (1 - k * k); }
+    pa.position.needsUpdate = pa.aCol.needsUpdate = pa.aSize.needsUpdate = pa.aAlpha.needsUpdate = true;
+    P.material.uniforms.uScale.value = G.renderer.domElement.height / (2 * Math.tan(G.camera.fov * Math.PI / 360));
+  }
+  /* ---------- wind on the docks: thin ink-white strokes going past, the way a comic draws air moving ---------- */
+  let wind = null;
+  function buildWind() {
+    const NW = 70, pos = new Float32Array(NW * 6), geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const m = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xe6e4ff, transparent: true, opacity: 0.32, fog: false, depthWrite: false })); m.frustumCulled = false; G.scene.add(m);
+    wind = { m, pos, d: [], NW }; for (let i = 0; i < NW; i++) wind.d.push({ x: rnd(-22, 22), y: rnd(0.2, 9), z: rnd(-22, 22), s: rnd(9, 16), l: rnd(0.8, 2.4) });
+  }
+  function updateWind(rdt) {
+    if (!wind) return; const c = G.camera.position, p = wind.pos, W = SC.world;
+    for (let i = 0; i < wind.NW; i++) { const d = wind.d[i]; d.x += d.s * rdt; if (d.x > 22) { d.x = -22; d.y = rnd(0.2, 9); d.z = rnd(-22, 22); }
+      const x = c.x + d.x, y = c.y - 3 + d.y, z = c.z + d.z, hide = W && W.underRoof && W.underRoof(x, y, z), j = i * 6;
+      p[j] = x; p[j + 1] = hide ? -60 : y; p[j + 2] = z; p[j + 3] = x + d.l; p[j + 4] = hide ? -60 : y + d.l * 0.04; p[j + 5] = z; }
+    wind.m.geometry.attributes.position.needsUpdate = true;
+  }
+  const up0 = G.update;
+  G.update = function (dt, rdt, focus) { up0.apply(this, arguments); updateBlobs(); updateParts(dt, rdt); updateWind(rdt); };
+})();
+`;
+rep("\n'use strict';\n/* SECOND CHANCE - rig:", "\n" + WA_GFX + "\n'use strict';\n/* SECOND CHANCE - rig:");
+rep("    SC.world.build();\n    pl.init(); SC.cam.init();", "    if (G.waMood) G.waMood(SC.issue);\n    SC.world.build();\n    pl.init(); SC.cam.init();");
 
 /* ---- end WORLD-A ---- */
 
