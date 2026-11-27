@@ -1,0 +1,33 @@
+<header>
+  <h1>SOOTBORN · Asset Atlas</h1>
+  <p class="lede">Everything in the game, captured from the running build (v0.85): every person's sprite and portrait, every 2D map, every place you walk, every fight, the comic-book levels and the drawn stills, then how the code fits together.</p>
+  <div class="how"><span><b>Tap anything</b> to see it large.</span><span><b>Mark it</b> Needs fix, Question or Looks good, and write what is wrong.</span><span><b>Tell Claude "read the atlas notes"</b>: it reads them here, fixes the source, rebuilds the game and refreshes this page.</span></div>
+  <div class="dbstate" id="dbstate">Connecting notes…</div>
+</header>
+<nav aria-label="Sections">
+  <a href="#chars">People</a><a href="#maps">2D maps</a><a href="#walks">Places to walk</a><a href="#fights">Fights</a><a href="#levels">Comic levels</a><a href="#stills">Drawn stills</a><a href="#modules">How it works</a><a href="#notes">Notes <span id="ncount"></span></a>
+  <button id="onlyNotes" aria-pressed="false">Only with notes</button>
+  <input id="q" type="search" placeholder="Search" aria-label="Search assets">
+</nav>
+<section id="chars"><h2>People</h2><p class="sub">Each person's 2D sprite sheet (three directions; stand, two steps, blink) and the portrait used in dialogue. The 3D bodies of the same people are in the Fights and Comic levels sections. Kael's forms: <b>kael</b> (below), <b>kael2</b> (gilded), <b>kael3</b>, <b>kaelc</b> (clerk's coat).</p><div class="grid small" data-sec="chars"></div></section>
+<section id="maps"><h2>2D maps</h2><p class="sub">The top-down maps, whole, without people: below the rock and the Assay's valley.</p><div class="grid" data-sec="maps"></div></section>
+<section id="walks"><h2>Places to walk (2.5D)</h2><p class="sub">Flat figures in a 3D space, a few seconds after the scene starts.</p><div class="grid" data-sec="walks"></div></section>
+<section id="fights"><h2>Fights</h2><p class="sub">Every fight a few seconds in: 2D arenas below the rock, real 3D above it.</p><div class="grid" data-sec="fights"></div></section>
+<section id="levels"><h2>Comic-book levels (3D)</h2><p class="sub">Each level at its first moment of play. Kael's look changes by level (plate, clerk's coat, work shirt).</p><div class="grid" data-sec="levels"></div></section>
+<section id="stills"><h2>Drawn stills</h2><p class="sub">The moving pictures used for flashes, intros and the losing picture, caught partway through their move.</p><div class="grid" data-sec="stills"></div></section>
+<section id="modules"><h2>How it works</h2><p class="sub">One HTML file, no downloaded art: everything is drawn in code. How a play-through moves between the parts:</p>
+  <div class="flow"><span>Title</span><i>→</i><span>Cutscene (cinema.js)</span><i>→ hands off to →</i><span>2D world (systems.js)</span><span>Fight or walk (brawl.js · g3.js)</span><span>2D mission (assay.js)</span><span>Comic level (issue/)</span><span>Drawn still / the Count (prelude.js)</span><i>→ back to the cutscene</i></div>
+  <div class="mods" id="mods"></div></section>
+<section id="notes"><h2>Notes</h2><p class="sub">Everything marked so far, newest first. Claude reads this list.</p><div class="row" style="margin-bottom:10px"><span class="empty" id="nempty">No notes yet.</span><button class="copy" id="copyAll">Copy all notes</button></div><div class="notes" id="nlist"></div></section>
+<footer>Captured from the build by script. Not captured yet: 3D models on their own (turnarounds), cards and transitions, the HUD, sounds and music.</footer>
+<div class="shade" id="shade"></div>
+<aside class="sheet" id="sheet" aria-label="Asset detail" aria-hidden="true">
+  <div class="big"><img id="sImg" alt=""></div>
+  <div class="body">
+    <div><h3 id="sTitle"></h3><div class="meta" id="sMeta"></div></div>
+    <div class="chips" role="group" aria-label="Status"><button data-s="fix" aria-pressed="false">Needs fix</button><button data-s="q" aria-pressed="false">Question</button><button data-s="ok" aria-pressed="false">Looks good</button></div>
+    <label for="sText" class="meta">What is wrong, or what you want</label>
+    <textarea id="sText" placeholder="e.g. his cape floats; the hair should be darker; this fight's ground is too busy"></textarea>
+    <div class="row"><span class="saved" id="sSaved"></span><span><button class="close" id="sClose">Close</button> <button class="save" id="sSave">Save note</button></span></div>
+  </div>
+</aside>
