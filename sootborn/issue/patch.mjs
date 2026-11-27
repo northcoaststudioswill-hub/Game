@@ -734,7 +734,7 @@ const WA_GFX = String.raw`'use strict';
     // a sealed pump room: the lamp is everything; the floor sends a little of it back
     gild: { sky: 0x3a3450, gnd: 0x5a4028, hemi: 0.45, amb: 0.8, dust: 1 },
     stair: { sky: 0xffb48a, gnd: 0x7a4a62, hemi: 0.45, amb: 0.75 },
-    stack: { sky: 0x7a8ca8, gnd: 0x3a3c44, hemi: 0.5, amb: 0.7, sootN: 40 },
+    stack: { sky: 0x7a8ca8, gnd: 0x3a3c44, hemi: 0.5, amb: 0.7, sootN: 40, fog: 0x34465e, near: 30, far: 160 },   // far valley and the dais stay in sight (WORLD-B)
     array: { sky: 0x3c5a50, gnd: 0x4a3a26, hemi: 0.5, amb: 0.75, sootN: 50 }
   };
   G.waMood = function (key) {
