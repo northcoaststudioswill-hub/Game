@@ -568,7 +568,7 @@
     const STAIR = () => {
       W.underRoof = () => false; W.inside = () => false;
       cloudSea(-26, 90, 77);
-      { const R = 62, cx = -71, cz = -8, rAt = y => R + 6 * (270 - y) / 300; let g = new THREE.CylinderGeometry(R, R + 6, 320, 64, 1, true); const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * 98, uv.getY(k) * 76);
+      { const R = 62, cx = -76.5, cz = -8, rAt = y => R + 6 * (270 - y) / 300; let g = new THREE.CylinderGeometry(R, R + 6, 320, 64, 1, true); const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * 98, uv.getY(k) * 76);
         batch.add('concrete', g, G.mx(cx, 110, cz), 0xf0e2cc, 0); g.dispose();
         [54, 92, 140].forEach(y => { const r = rAt(y) + 0.9; g = new THREE.CylinderGeometry(r, r + 0.1, 2.2, 64, 1, true); batch.add('flat', g, G.mx(cx, y, cz), GILT, 0); g.dispose(); }); }
       const W0 = 7;
@@ -621,6 +621,32 @@
       D('flat', 6.4, 18.5, -54.6, 1.6, 0.08, 1.0, IVORY, { outline: 0.04 }); D('flat', 6.4, 18.24, -54.6, 0.2, 0.5, 0.2, GILT, { outline: 0.03 }); D('flat', 6.4, 18.57, -54.6, 0.5, 0.03, 0.4, 0xece6d6, { ry: 0.2, outline: 0 }); cyl('glow', 6.9, 18.66, -54.4, 0.04, 0.04, 0.24, LAMP, { seg: 6, outline: 0 }); D('flat', 5.9, 18.6, -54.8, 0.1, 0.12, 0.1, 0x15151f, { outline: 0.02 });
       // the frame the kneeling bell hangs in, on the first landing
       [-0.7, 0.7].forEach(o => D('wood', -5.3, 7.5, 15.6 + o, 0.14, 3, 0.14, 0x4a3524, { outline: 0.03 })); D('wood', -5.3, 9.05, 15.6, 0.16, 0.16, 1.7, 0x4a3524, { outline: 0.03 }); D('flat', -5.3, 8.92, 15.6, 0.05, 0.14, 0.05, IRON, { outline: 0 }); solid(-5.5, 14.7, -5.1, 16.5, 6, 9, { cam: false });
+      /* ---- v0.90 WORLD-B: the Stair. (The Spire above moved 5.5 m west: its flank stood 3 m into the left of both landings, with a statue and a lamp inside it.) ---- */
+      // things a man walked through: the lamp columns, the loads, the standards, the Auditor's table
+      [[W0 - 1.2, 16.8, 6], [-W0 + 1.2, 5.2, 6], [W0 - 1.2, -9.2, 12], [-W0 + 1.2, -20.8, 12]].forEach(c => solid(c[0] - 0.4, c[1] - 0.4, c[0] + 0.4, c[1] + 0.4, c[2], c[2] + 4.6, { cam: false }));
+      [[-5.6, 6, 8.2], [-5.2, 6, 10.4], [-5.8, 12, -12.6], [5.6, 12, -9.6], [-7.8, 18, -36.6]].forEach(l => solid(l[0] - 0.4, l[2] - 0.35, l[0] + 0.4, l[2] + 0.35, l[1], l[1] + 0.95, { cam: false }));
+      [[-8.6, 44.6], [7.4, 44.6]].forEach(p => solid(p[0] - 0.15, p[1] - 0.15, p[0] + 0.15, p[1] + 0.15, 0, 5, { cam: false }));
+      solid(5.6, -55.1, 7.2, -54.1, 18, 18.6, { cam: false });
+      // nine hundred steps: the porters count them, and somebody cut the count into the lamp column at each landing
+      const plaque = (t, x, y, z) => { D('flat', x, y, z - 0.02, 1.16, 0.46, 0.06, GILT, { outline: 0.03 }); sign(t, x, y, z + 0.03, 0, 1.0, 0.36, '#2a2030', '#f0d27a'); };
+      plaque('STEP 852', W0 - 1.2, 7.7, 17.12); plaque('STEP 876', W0 - 1.2, 13.7, -8.88);
+      D('concrete', 5.8, 18.7, -35.3, 1.3, 1.4, 0.4, STONE, { outline: 0.05 }); D('flat', 5.8, 19.46, -35.3, 1.42, 0.12, 0.5, GILT, { outline: 0.03 }); solid(5.15, -35.5, 6.45, -35.1, 18, 19.4, { cam: false }); plaque('STEP 900', 5.8, 18.85, -35.08);
+      // the lift. The Accredited ride it up the Spire's face and have never set foot on the stair. It has stopped where the bell stopped it
+      { const lx = -9.5, lz0 = -3.4, lz1 = -0.6, cy = 10.4, mz = (lz0 + lz1) / 2;
+        [lz0, lz1].forEach(z => { D('flat', lx - 0.2, 10, z, 0.24, 80, 0.24, IRON, { outline: 0.03 }); D('flat', lx - 0.05, 10, z, 0.08, 80, 0.32, GILT, { outline: 0 }); });
+        for (let y = -26; y < 46; y += 6) D('flat', lx - 0.25, y, mz, 0.14, 0.18, lz1 - lz0 + 0.5, IRON, { outline: 0.02 });
+        B('flat', lx + 0.1, lz0 + 0.1, lx + 1.7, lz1 - 0.1, cy - 0.15, cy, GILT, { outline: 0.04, col: false }); B('flat', lx + 0.1, lz0 + 0.1, lx + 1.7, lz1 - 0.1, cy + 2.8, cy + 3.0, GILT, { outline: 0.04, col: false });
+        D('flat', lx + 0.9, cy + 3.25, mz, 0.9, 0.5, 0.9, GILT, { outline: 0.04 }); cyl('flat', lx + 0.9, cy + 3.6, mz, 0.3, 0.42, 0.25, GILT, { seg: 10, outline: 0.03 });
+        for (let i = 0; i <= 6; i++) D('flat', lx + 1.66, cy + 1.4, SC.lerp(lz0 + 0.15, lz1 - 0.15, i / 6), 0.06, 2.8, 0.06, GILT, { outline: 0.015 });
+        [lz0 + 0.15, lz1 - 0.15].forEach(z => { for (let i = 1; i < 4; i++) D('flat', lx + 0.1 + i * 0.4, cy + 1.4, z, 0.06, 2.8, 0.06, GILT, { outline: 0.015 }); });
+        D('flat', lx + 0.9, cy + 0.45, mz, 0.8, 0.9, 0.9, 0x8a1f3a, { outline: 0.03 }); D('flat', lx + 0.55, cy + 1.2, mz, 0.12, 0.8, 0.9, 0x8a1f3a, { outline: 0.03 });   // one red chair, for one
+        D('glow', lx + 0.9, cy + 2.6, mz, 0.3, 0.3, 0.3, LAMP, { outline: 0 });
+        line(lx + 0.9, cy + 3.7, mz, lx + 0.9, 46, mz, 0.05, IRON); }
+      // the white door is the light at the top of the stair: something to climb towards from the terrace
+      { const halo = new THREE.Mesh(new THREE.PlaneGeometry(14, 16), new THREE.MeshBasicMaterial({ map: G.tex.disc, color: 0xfff0c8, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+        halo.position.set(0, 22.4, -57.7); halo.renderOrder = 4; G.scene.add(halo); W.dyn.push(t => { halo.material.opacity = 0.42 + Math.sin(t * 1.3) * 0.08; }); }
+      // the service keeps to the painted line; the notice says what it costs to step off it
+      sign('OFF THE LINE · ONE DAY OF AIR', -W0 + 0.42, 13.6, -19, Math.PI / 2, 4.4, 0.5, '#e8c25a', '#07070d');
     };
     // ===== THE VENT STACK: the island in the river on day thirty-one. One white chimney, and the iron stair the people who keep it climb =====
     const STACK = () => {
@@ -628,13 +654,28 @@
       const C = 5, O = 8.4, IR = 0x3a3f4c, WHITE = 0xe9e6dc, BLUE = 0x5fd0ff, rs = SC.seeded(31);
       // the river, the island, its shingle
       D('roof', 0, -0.9, 0, 260, 1, 260, 0x1c4a5e, { outline: 0 }); cyl('roof', 0, -0.3, 0, 31, 33, 0.6, 0x8a8674, { seg: 44, outline: 0 }); cyl('roof', 0, -0.26, 0, 28, 29, 0.6, 0x2c5a40, { seg: 44, outline: 0 });
-      [[-26, -26, 26, -25], [-26, 25, 26, 26], [-26, -26, -25, 26], [25, -26, 26, 26]].forEach(w => wall(w[0], w[1], w[2], w[3]));
-      for (let i = 0; i < 30; i++) { const a = i / 30 * 6.283 + rs() * 0.1, r = 21 + rs() * 5; const px = Math.cos(a) * r, pz = Math.sin(a) * r * 0.95; if (pz > 8 && Math.abs(px + 5) < 15) continue; pine(px, pz, 1.2 + rs() * 1.1, r < 24.5); }
-      for (let i = 0; i < 70; i++) { const a = i / 70 * 6.283, r = 60 + rs() * 40; pine(Math.cos(a) * r, Math.sin(a) * r, 1.6 + rs() * 1.6); }
+      /* v0.90 WORLD-B: the edge of the island is a ring of unseen wall at the shingle. It was a square, and its corners stood
+         five metres out in the river, where a man could walk on the water */
+      for (let i = 0; i < 64; i++) { const a = i / 64 * 6.283, x = Math.cos(a) * 28.4, z = Math.sin(a) * 28.4; wall(x - 1.5, z - 1.5, x + 1.5, z + 1.5); }
+      for (let i = 0; i < 30; i++) { const a = i / 30 * 6.283 + rs() * 0.1, r = 21 + rs() * 5; const px = Math.cos(a) * r, pz = Math.sin(a) * r * 0.95; if (pz > 8 && Math.abs(px + 5) < 15) continue; pine(px, pz, 1.2 + rs() * 1.1, true); }
+      // the river runs north to south past the island; the far banks, their pines, and the ridge behind them
+      [-1, 1].forEach(k => { D('roof', k * 96, -0.25, 0, 92, 0.7, 300, 0x24503a, { outline: 0 }); D('roof', k * 51.5, -0.32, 0, 3, 0.5, 300, 0x8a8674, { outline: 0 });
+        for (let i = 0; i < 5; i++) { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(34 + i * 4, 14 + (i % 3) * 7, 40); batch.add('flat', g, G.mx(k * (104 + (i % 2) * 8), -2, -110 + i * 55, i), [0x1c2a2e, 0x203238, 0x18262a][i % 3], 0); g.dispose(); } });
+      for (let i = 0; i < 70; i++) { const k = i % 2 ? 1 : -1; pine(k * (56 + rs() * 40), -120 + rs() * 240, 1.6 + rs() * 1.6); }
+      // reeds at the shingle: he came round the pickets on his belly through these
+      for (let i = 0; i < 110; i++) { const a = rs() * 6.283, r = 29.6 + rs() * 3, h = 0.8 + rs() * 0.9; D('flat', Math.cos(a) * r, -0.2 + h / 2, Math.sin(a) * r, 0.07, h, 0.07, i % 3 ? 0x6e7a3e : 0x8a8a4a, { ry: a, rz: (rs() - 0.5) * 0.4, rx: (rs() - 0.5) * 0.3, outline: 0 }); }
+      // the ford to the west bank, thigh-deep: paler water and the stones of it
+      D('roof', -41, -0.37, -4, 21, 0.04, 4.4, 0x3e7a88, { outline: 0 }); for (let i = 0; i < 9; i++) D('concrete', -33 + i * -2.1, -0.3, -4 + (i % 3 - 1) * 0.9, 0.9, 0.3, 0.7, 0x8a8674, { ry: i, outline: 0.03 });
+      // across the river: the dais with its cold white banner and its six lamps, east; west, our own camp, and the fire a coal
+      { const dx = 66, dz = -34; D('concrete', dx, 0.6, dz, 12, 1.2, 6, 0xe9e6dc, { outline: 0.06 }); D('flat', dx, 1.24, dz, 12.4, 0.1, 6.4, GILT, { outline: 0.03 });
+        cyl('flat', dx, 5.2, dz - 2, 0.1, 0.12, 8, IR, { outline: 0.03 }); D('flat', dx + 1.6, 6.6, dz - 2, 3, 4.6, 0.08, 0xf4f2ea, { outline: 0.05 }); D('flat', dx + 1.6, 4.25, dz - 2, 3, 0.2, 0.1, GILT, { outline: 0 });
+        for (let i = 0; i < 6; i++) { const lx = dx - 5 + i * 2; cyl('flat', lx, 2.2, dz + 2.6, 0.06, 0.08, 2, IR, { outline: 0.02 }); D('glow', lx, 3.3, dz + 2.6, 0.3, 0.36, 0.3, LAMP, { outline: 0 }); } }
+      { const cx = -64, cz = 30; tentD(cx - 4, cz + 2, 0.4, VIOLET); tentD(cx + 3, cz + 4, -0.6, VIOLET); tentD(cx - 1, cz - 4, 1.4, VIOLET);
+        D('glow', cx, 0.3, cz, 0.9, 0.35, 0.9, 0xff7a1f, { outline: 0 }); D('glow', cx, 0.6, cz, 0.4, 0.5, 0.4, 0xffd23a, { outline: 0 }); standard(cx + 5, cz - 1, 0, 5, VIOLET); }
       // House Teal's camp, south of the stack, and the pump house the lamps run from
-      tentD(-15, 17, 0.5, TEAL); tentD(-19, 11, 1.1, TEAL); tentD(13, 19, -0.4, TEAL); standard(8.6, 21, 0, 5, TEAL); standard(-11.4, 21.6, 0, 5, TEAL);
+      tentD(-15, 17, 0.5, TEAL); tentD(-19, 11, 1.1, TEAL); tentD(13, 19, -0.4, TEAL); [[-15, 17], [-19, 11], [13, 19]].forEach(t => solid(t[0] - 1.1, t[1] - 1.1, t[0] + 1.1, t[1] + 1.1, 0, 1.6, { cam: false })); standard(8.6, 21, 0, 5, TEAL); standard(-11.4, 21.6, 0, 5, TEAL);
       B('brick', 13, 2, 20, 9, 0, 3.6, 0xd8d0bc, { outline: 0.1 }); D('roof', 16.5, 3.9, 5.5, 8, 0.5, 8, 0x4a4234, { outline: 0.06 }); D('flat', 12.96, 1.3, 5.5, 0.1, 2.2, 1.3, 0x2a2630, { outline: 0.03 }); sign('PUMP', 12.94, 2.9, 5.5, -Math.PI / 2, 1.6, 0.5, '#e8c25a', '#07070d');
-      D('flat', 9, 0.5, 5.5, 8, 0.5, 0.5, IR, { outline: 0.04 }); D('flat', 5.4, 2.2, 5.5, 0.5, 4, 0.5, IR, { outline: 0.04 });
+      B('flat', 5, 5.25, 13, 5.75, 0.25, 0.75, IR, { outline: 0.04, s: { cam: false } }); cyl('flat', 5.12, 0.5, 5.5, 0.5, 0.5, 0.16, GILT, { rz: Math.PI / 2, seg: 12, outline: 0.03 }); cyl('flat', 9, 1.05, 5.5, 0.32, 0.32, 0.12, 0xa8482a, { seg: 10, outline: 0.03 }); D('flat', 9, 0.85, 5.5, 0.08, 0.3, 0.08, IR, { outline: 0 });   // the pipe from the pump house goes in at the foot of the stack: one wheel on it
       for (let i = 0; i < 9; i++) { const a = -0.6 + i * 0.5, r = 15 + (i % 3) * 3; cyl('flat', Math.sin(a) * r, 0.04, 14 + Math.cos(a) * 6, 0.09, 0.1, 0.06, IR, { seg: 8, outline: 0.02 }); cyl('glow', Math.sin(a) * r, 0.18, 14 + Math.cos(a) * 6, 0.07, 0.08, 0.22, TLAMP, { seg: 8, outline: 0 }); }
       crate(-3, 20, 0.9, 0, 'hp'); crate(4.5, 17, 0.9, 0, 'meter'); crateStatic(10.5, 12, 1.2, 0); crateStatic(-12.5, 13.6, 1.1, 0);
       // the stack: white enamel, gilt bands, thirty-six metres of it, and the soot of whoever keeps it
@@ -642,6 +683,7 @@
       [0.5, 12, 24, 35.4].forEach(y => D('flat', 0, y, 0, 2 * C + 0.5, 0.7, 2 * C + 0.5, GILT, { outline: 0.05 }));
       for (let i = 0; i < 14; i++) { const sd = i % 4, u = -4 + rs() * 8, y = 3 + rs() * 30, h = 2 + rs() * 5; D('flat', sd === 0 ? u : sd === 1 ? C + 0.02 : sd === 2 ? u : -C - 0.02, y, sd === 0 ? C + 0.02 : sd === 1 ? u : sd === 2 ? -C - 0.02 : u, sd % 2 ? 0.03 : 0.5, h, sd % 2 ? 0.5 : 0.03, 0x8a8478, { outline: 0 }); }
       watcher(0, 30, C + 0.06, 0, 1.5); sign('AUTHORITY VENT · SEALED BY THE COUNT', 0, 8.4, C + 0.08, 0, 6, 0.6, '#e8c25a', '#07070d');
+      [3, 6, 9, 15, 18, 21, 27, 30, 33].forEach(y => { D('flat', 0, y, C + 0.015, 2 * C, 0.07, 0.03, 0xb8b4a8, { outline: 0 }); D('flat', 0, y, -C - 0.015, 2 * C, 0.07, 0.03, 0xb8b4a8, { outline: 0 }); D('flat', C + 0.015, y, 0, 0.03, 0.07, 2 * C, 0xb8b4a8, { outline: 0 }); D('flat', -C - 0.015, y, 0, 0.03, 0.07, 2 * C, 0xb8b4a8, { outline: 0 }); });   // v0.90 WORLD-B: dressed plates, riveted
       // the keeper's stair: iron, four flights to a turn, three turns
       const post = (x, y, z) => D('flat', x, y + 0.55, z, 0.1, 1.1, 0.1, IR, { outline: 0.02 });
       const edge = (x0, z0, x1, z1, ya, yb) => { if (z0 === z1) solid(x0, z0 - 0.1, x1, z0 + 0.1, Math.min(ya, yb) - 0.5, Math.max(ya, yb) + 1.25, { cam: false }); else solid(x0 - 0.1, z0, x0 + 0.1, z1, Math.min(ya, yb) - 0.5, Math.max(ya, yb) + 1.25, { cam: false });
@@ -668,7 +710,7 @@
       cyl('flat', 0, 36.06, 3.6, 0.7, 0.7, 0.1, GILT, { seg: 14, outline: 0.03 }); cyl('glow', 0, 36.13, 3.6, 0.5, 0.5, 0.04, BLUE, { seg: 14, outline: 0 });
       for (let k = 0; k < 6; k++) { const g = new THREE.IcosahedronGeometry(1, 1), sz = 1.4 + k * 0.7; g.scale(sz, sz * 0.8, sz); batch.add('flat', g, G.mx(k * k * 0.5, 39 + k * 3.4, -k * 0.9, k), [0xc9d6e2, 0xb4c4d4, 0x9fb2c6][Math.min(2, k >> 1)], 0); g.dispose(); }
       // the keeper's marks: slate tags wired to the rail, and the plate that says where the air comes from
-      D('flat', -13.86, 13.1, 9.6, 0.04, 0.5, 0.36, 0x23232e, { outline: 0.02 }); D('flat', -C - 0.06, 25.6, 3.4, 0.05, 0.9, 1.5, GILT, { outline: 0.03 }); D('flat', -C - 0.1, 25.6, 3.4, 0.03, 0.6, 1.2, 0x23232e, { outline: 0 });
+      D('flat', -13.86, 13.1, 9.6, 0.04, 0.5, 0.36, 0x23232e, { outline: 0.02 }); sign('CHECKED · K.D.', -13.8, 13.1, 9.6, Math.PI / 2, 0.42, 0.3, '#e8e4da', '#3a3f4c'); D('flat', -C - 0.06, 25.6, 3.4, 0.05, 0.9, 1.6, GILT, { outline: 0.03 }); sign('DRAWN FROM RISER NINE', -C - 0.1, 25.6, 3.4, -Math.PI / 2, 1.44, 0.5, '#1a1a22', '#e8c25a');
       chalkW(-C - 0.04, 13.2, 6.6, -Math.PI / 2, 0.24); chalkW(C + 0.04, 4.4, 1, Math.PI / 2, 0.22);
     };
     // ===== THE DEEP ARRAY: under the floor of Tier Six, forty-three days after the furnace. The machine the air comes from, and what is left of it =====
@@ -690,18 +732,33 @@
       // the long catwalk across the hall, and a bay to stand in while the watch lamp goes by
       pad(-18, 0, 18, 4, 8); edge(-18, 0, 14.6, 0, 8, 8); edge(-14.6, 4, -12, 4, 8, 8); edge(-8, 4, 18, 4, 8, 8);
       pad(-12, 4, -8, 7.4, 8); edge(-12, 7.4, -8, 7.4, 8, 8); edge(-12, 4, -12, 7.4, 8, 8); edge(-8, 4, -8, 7.4, 8, 8); crateStatic(-11, 6.5, 1.3, 8); crateStatic(-9.4, 6.7, 0.9, 8);
-      for (let x = -15; x <= 15; x += 6) [0.3, 3.7].forEach(z => D('flat', x, 3.8, z, 0.26, 7.6, 0.26, IR, { outline: 0.03 }));
+      for (let x = -15; x <= 15; x += 6) [0.3, 3.7].forEach(z => { D('flat', x, 3.8, z, 0.26, 7.6, 0.26, IR, { outline: 0.03 }); solid(x - 0.14, z - 0.14, x + 0.14, z + 0.14, 0, 7.55, { cam: false }); });   // v0.90 WORLD-B: the legs of the catwalk were not there to a body
       D('flat', 3, 13.2, 2, 16, 0.14, 0.14, IR, { outline: 0.02 });   // the rail the watch lamp runs on
       // the east stair down to the floor
       ramp('flat', 14.6, -20, 18, 0, -0.45, 0, 8, 'z', IR, { steps: true }); edge(14.6, -20, 14.6, 0, 0, 8);
       // the floor: the heart of it, the main, forty-eight banks
       cyl('flat', 0, 2.2, -18, 4.2, 4.8, 4.4, RUST, { seg: 20, outline: 0.1 }); cyl('flat', 0, 4.6, -18, 4.5, 4.5, 0.4, BR, { seg: 20, outline: 0.06 }); solid(-4.3, -22.3, 4.3, -13.7, 0, 4.8, {});
       cyl('glow', 0, 1.5, -13.52, 0.5, 0.5, 0.1, SEAL, { seg: 12, outline: 0 }); D('glow', 0, 0.9, -13.5, 0.12, 1.2, 0.06, SEAL, { outline: 0 }); D('flat', 0, 0.02, -12.6, 2.4, 0.02, 1.8, 0x1f4a48, { outline: 0 });
-      D('flat', 0, 1.3, -6.5, 1.7, 1.7, 14, BR, { outline: 0.08 }); solid(-0.85, -13.5, 0.85, 0.5, 0, 2.15, { cam: false });
-      [[-9.5, 0x8a7a5a], [-6.2, 0x6a5a48], [-2.6, 0x9a8468]].forEach(p => D('wood', 0, 1.3, p[0], 1.86, 1.86, 0.7, p[1], { outline: 0.03 }));
-      for (let i = 0; i < 4; i++) D('flat', (i < 2 ? -1 : 1) * 9, 1.1, -18 + (i % 2 ? 5 : -5), 14, 1.1, 1.1, i % 2 ? RUST : BR, { outline: 0.06 });
-      for (let k = 0; k < 48; k++) { const side = k < 24 ? -1 : 1, i = k % 24, x = side * (16.4 - (i % 2) * 2.4), z = -26 + Math.floor(i / 2) * 3.6, live = (k * 7) % 48 < 31;
-        D('flat', x, 0.65, z, 0.5, 1.3, 0.5, IR, { outline: 0.03 }); cyl('flat', x, 1.4, z, 0.52, 0.52, 0.09, live ? BR : 0x4a3a2c, { seg: 10, outline: 0.03 }); D(live ? 'glow' : 'flat', x, 1.62, z, 0.14, 0.14, 0.14, live ? SEAL : 0x2a2220, { outline: 0 }); }
+      /* v0.90 WORLD-B: the main. It was one solid wall across the floor from the heart to the catwalk, so the floor was two
+         rooms and the watch on the far side could not reach a man; it humps over a crossing now, the way mains do where people
+         have to walk. North of the catwalk it goes down under the floor, to the tiers. */
+      D('flat', 0, 1.3, -9.975, 1.7, 1.7, 7.05, BR, { outline: 0.08 }); D('flat', 0, 1.3, -0.125, 1.7, 1.7, 1.25, BR, { outline: 0.08 });
+      D('flat', 0, 2.45, -5.6, 1.7, 4.0, 1.7, BR, { outline: 0.08 }); D('flat', 0, 2.45, -1.6, 1.7, 4.0, 1.7, BR, { outline: 0.08 }); D('flat', 0, 3.6, -3.6, 1.7, 1.7, 2.3, BR, { outline: 0.08 });
+      [[-6.45, 1.3], [-4.75, 3.6], [-2.45, 3.6], [-0.75, 1.3]].forEach(f => D('flat', 0, f[1], f[0], 1.95, 1.95, 0.16, IR, { outline: 0.03 }));   // flanges at the elbows
+      solid(-0.85, -13.5, 0.85, -6.45, 0, 2.15, { cam: false }); solid(-0.85, -6.45, 0.85, -4.75, 0, 4.45, { cam: false }); solid(-0.85, -4.75, 0.85, -2.45, 2.75, 4.45, { cam: false }); solid(-0.85, -2.45, 0.85, -0.75, 0, 4.45, { cam: false }); solid(-0.85, -0.75, 0.85, 0.5, 0, 2.15, { cam: false });
+      D('flat', 0, 0.025, -3.6, 2.6, 0.05, 2.3, 0x6a6030, { outline: 0 }); for (let k = 0; k < 5; k++) D('flat', 0, 0.055, -4.5 + k * 0.45, 2.6, 0.02, 0.16, 0x15151f, { outline: 0 });   // the crossing, painted on the floor
+      D('flat', 0, 0.65, 0.95, 1.7, 1.3, 1.2, BR, { outline: 0.08 }); D('flat', 0, 0.03, 14.6, 2.2, 0.06, 27, 0x23262a, { outline: 0 }); for (let z = 2; z < 28; z += 1.2) D('flat', 0, 0.065, z, 2.2, 0.02, 0.12, 0x101214, { outline: 0 });
+      // nine patches on one pipe, rag and wire and tar, each with its date chalked beside it
+      [[-12.8, 0x8a7a5a], [-11.6, 0x6a5a48], [-10.4, 0x9a8468], [-9.2, 0x5a4a38], [-8.0, 0x8a7a5a], [-7.0, 0x6a5a48], [-4.2, 0x2a2622], [-3.0, 0x9a8468], [-0.1, 0x6a5a48]].forEach((p, i) => {
+        const top = i === 6 || i === 7, y = top ? 3.6 : 1.3; D('wood', 0, y, p[0], 1.86, 1.86, 0.44 + (i % 3) * 0.12, p[1], { outline: 0.03 }); D('flat', 0, y, p[0], 1.9, 0.1, 0.5, 0x15151f, { rx: 0.5 + i, outline: 0 });
+        if (!top) [-1, 1].forEach(k => { D('flat', k * 0.88, 0.62, p[0], 0.02, 0.05, 0.36, CHALK, { outline: 0 }); D('flat', k * 0.88, 0.5, p[0] + 0.05, 0.02, 0.05, 0.24, CHALK, { outline: 0 }); }); });
+      // the feeds from the heart to the banks go overhead, out of the way of the floor (they were across it at knee height, and walked through)
+      for (let i = 0; i < 4; i++) { const x = (i < 2 ? -1 : 1) * 9.6, z = -18 + (i % 2 ? 5 : -5); D('flat', x, 4.3, z, 12.8, 0.9, 0.9, i % 2 ? RUST : BR, { outline: 0.06 }); [-4, 0, 4].forEach(o => line(x + o, 4.75, z, x + o, 24, z, 0.04, IR)); D('flat', x + (i < 2 ? -6.2 : 6.2), 2.4, z, 0.6, 3.8, 0.6, i % 2 ? RUST : BR, { outline: 0.05 }); }
+      for (let k = 0; k < 48; k++) { const side = k < 24 ? -1 : 1, i = k % 24, z = -26 + Math.floor(i / 2) * 3.6, live = (k * 7) % 48 < 31;
+        const x = side > 0 && i % 2 === 0 && z > -21 && z < -13 ? 11.6 : side * (16.4 - (i % 2) * 2.4);   // v0.90 WORLD-B: two banks stood up through the treads of the east stair
+        D('flat', x, 0.65, z, 0.5, 1.3, 0.5, IR, { outline: 0.03 }); cyl('flat', x, 1.4, z, 0.52, 0.52, 0.09, live ? BR : 0x4a3a2c, { seg: 10, outline: 0.03 }); D(live ? 'glow' : 'flat', x, 1.62, z, 0.14, 0.14, 0.14, live ? SEAL : 0x2a2220, { outline: 0 });
+        solid(x - 0.3, z - 0.3, x + 0.3, z + 0.3, 0, 1.5, { cam: false }); cyl('flat', x - side * 0.3, 0.95, z, 0.26, 0.26, 0.05, live ? 0xa8482a : 0x4a3a2c, { rz: Math.PI / 2, seg: 10, outline: 0.02 });   // the wheel a hand turns
+        if (!live) { D('flat', x - side * 0.26, 0.55, z, 0.02, 0.05, 0.34, CHALK, { outline: 0 }); D('flat', x - side * 0.26, 0.45, z + 0.04, 0.02, 0.05, 0.26, CHALK, { outline: 0 }); } }   // and on a dark one, the date it went, in a hand somebody knew
       // the board on the south wall, repainted when somebody can be bothered
       sign('BANKS LIVE   31 OF 48', 0, 9.4, -27.94, 0, 11, 1.3, '#e8c25a', '#07070d'); for (let k = 0; k < 48; k++) { const live = (k * 7) % 48 < 31; D(live ? 'glow' : 'flat', -8.2 + (k % 16) * 1.09, 7.6 - Math.floor(k / 16) * 0.7, -27.94, 0.5, 0.36, 0.06, live ? SEAL : 0x2a2220, { outline: 0 }); }
       watcher(0, 14, -27.9, 0, 1.6); sign('GRATITUDE IS BREATH', 0, 11.6, -27.94, 0, 8, 0.7, '#e8c25a', '#07070d');
@@ -709,6 +766,16 @@
       [[-6, -10], [5, -9.4], [-3, 2.6], [11, -22]].forEach(p => { cyl('flat', p[0], 0.04, p[1], 0.1, 0.11, 0.06, IR, { seg: 8, outline: 0.02 }); cyl('glow', p[0], 0.2, p[1], 0.08, 0.09, 0.26, LAMP, { seg: 8, outline: 0 }); });
       cyl('flat', 1.6, 0.3, -5, 0.34, 0.3, 0.6, 0x15151f, { seg: 10, outline: 0.03 }); chalkW(0.88, 1.5, -9.5, Math.PI / 2, 0.22); chalkW(0.88, 1.4, -6.2, Math.PI / 2, 0.2); chalkW(-0.88, 1.5, -2.6, -Math.PI / 2, 0.22); chalkF(-14, 12.03, 23.5, 0.22);
       crate(-12, -6, 0.9, 0, 'hp'); crate(10, -4, 0.9, 0, 'hp'); crateStatic(-13, -22, 1.3, 0); crateStatic(12.6, -25, 1.1, 0);
+      /* ---- v0.90 WORLD-B: the Deep Array ---- */
+      // the four fans in the west wall, each in its housing (the blades turn in story.js)
+      [-22, -13, -4, 5].forEach((z, i) => { cyl('flat', -17.95, 15.5, z, 3.75, 3.75, 0.12, 0x101414, { rz: Math.PI / 2, seg: 20, outline: 0 }); cyl('flat', -17.92, 15.5, z, 3.95, 3.95, 0.14, i < 2 ? IR : 0x2a2622, { rz: Math.PI / 2, seg: 18, outline: 0.05 }); });
+      // where the watch keeps its book: a desk at the foot of the heart, and a spike of work orders. He had read this place's name on a thousand of them
+      B('wood', 5.8, -26.6, 7.6, -25.6, 0.9, 1.0, 0x6a5038, { outline: 0.04, s: { cam: false } }); solid(5.8, -26.6, 7.6, -25.6, 0, 1.0, { cam: false }); [[5.9, -26.5], [7.5, -26.5], [5.9, -25.7], [7.5, -25.7]].forEach(p => D('wood', p[0], 0.45, p[1], 0.08, 0.9, 0.08, 0x4a3524, { outline: 0.02 }));
+      for (let k = 0; k < 7; k++) D('flat', 6.2 + (k % 2) * 0.05, 1.05 + k * 0.035, -26.1, 0.36, 0.02, 0.48, k % 3 ? 0xece6d6 : 0xd8d0bc, { ry: k * 0.4, outline: 0 }); D('flat', 6.2, 1.28, -26.1, 0.02, 0.3, 0.02, IR, { outline: 0 });
+      D('flat', 7.0, 1.04, -26.0, 0.5, 0.03, 0.36, 0x23232e, { ry: 0.2, outline: 0.02 }); cyl('glow', 7.3, 1.14, -26.4, 0.05, 0.06, 0.18, WARM, { seg: 6, outline: 0 });
+      // the way across and down, lit by the people who work it: a lamp at the head of each stair and one at the foot
+      [[-16.3, 14.4, 21.6], [15.2, 10.6, 0.6], [16.3, 2.8, -21.9]].forEach(l => { D('flat', l[0], l[1] + 0.3, l[2], 0.5, 0.12, 0.5, IR, { outline: 0.03 }); D('glow', l[0], l[1], l[2], 0.34, 0.44, 0.34, WARM, { outline: 0 }); line(l[0], l[1] + 0.36, l[2], l[0], 24, l[2], 0.03, IR); });
+      sign('ARRAY AUTHORITY · BOARD AND WATCH ONLY', -11.6, 14.2, 27.9, Math.PI, 5.2, 0.5, '#e8c25a', '#07070d');
     };
     if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else if (SC.issue === 'gild') GILD(); else if (SC.issue === 'stack') STACK(); else if (SC.issue === 'array') ARRAY(); else { DOCKS_A(); DOCKS_B(); }
 

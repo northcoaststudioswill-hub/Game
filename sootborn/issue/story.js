@@ -125,7 +125,8 @@
     const soft = G.canvasTex(64, 64, g => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.22, 'rgba(255,255,255,.9)'); gr.addColorStop(.5, 'rgba(255,255,255,.3)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); });
     const mk = (col, op, add) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: soft, color: col, transparent: true, opacity: op, depthWrite: false, fog: false, blending: add ? THREE.AdditiveBlending : THREE.NormalBlending })); G.scene.add(s); return s; };
     const wrap = (v, c, span) => c + ((((v - c) % span) + span * 1.5) % span) - span / 2, L = [];
-    if (kind === 'stair') for (let i = 0; i < 60; i++) { const s = mk(i % 3 ? 0xff8a2a : 0xffd890, .95, true), z = .3 + (i % 4) * .1; s.scale.set(z, z, 1); L.push({ s, x: i * 3.7, z: i * 5.3, ph: i * .61, sp: .7 + (i % 5) * .26, k: 0 }); }
+    if (kind === 'stair') [[0xff8a2a, 40, 0.4], [0xffd890, 20, 0.32]].forEach((c, j) => wbMotes(c[1], c[0], c[2], true, (q, tt) => { const i = q.k * 3 + j, ph = i * .61, sp = .7 + (i % 5) * .26, y = (tt * sp + ph * 3) % 10, p = pl.pos;   /* v0.90 WORLD-B: the embers, as points */
+      q.x = wrap(i * 3.7 + tt * 1.3 + Math.sin(tt * .9 + ph) * .7, p.x, 26); q.y = y < 9.6 ? p.y - .6 + y : -99; q.z = wrap(i * 5.3 + Math.sin(tt * .5 + ph) * .5, p.z, 26); }));
     W.dyn.push((tt, dt) => { const p = pl.pos;
       for (const q of L) { if (q.k === 0) { const y = (tt * q.sp + q.ph * 3) % 10; q.s.position.set(wrap(q.x + tt * 1.3 + Math.sin(tt * .9 + q.ph) * .7, p.x, 26), p.y - .6 + y, wrap(q.z + Math.sin(tt * .5 + q.ph) * .5, p.z, 26)); q.s.material.opacity = Math.min(1, y * .8) * Math.max(0, 1 - y / 10) * (.8 + .2 * Math.sin(tt * 9 + q.ph)); }
         else q.s.position.set(wrap(q.x + tt * q.sp, p.x, 44), p.y + .5 + (q.ph % 1) * .9 + Math.sin(tt * .3 + q.ph) * .15, wrap(q.z + Math.sin(tt * .11 + q.ph) * 2, p.z, 40)); } });
@@ -312,6 +313,17 @@
   };
 
 //@@ALT
+  /* v0.90 WORLD-B: embers, steam, drips and motes for the Stair, the stack and the Array: one cloud of points each, one draw
+     call, where a sprite apiece was one draw call apiece. step(p, t, dt) moves a point; p.ph is fixed per point, 0 to 1 */
+  function wbMotes(n, col, size, add, step) {
+    const pos = new Float32Array(n * 3), geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const tex = wbMotes.tex || (wbMotes.tex = G.canvasTex(32, 32, g => { const gr = g.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,255,255,.75)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); }));
+    const m = new THREE.Points(geo, new THREE.PointsMaterial({ map: tex, color: col, size, sizeAttenuation: true, transparent: true, depthWrite: false, fog: false, blending: add ? THREE.AdditiveBlending : THREE.NormalBlending }));
+    m.frustumCulled = false; m.renderOrder = 5; G.scene.add(m);
+    const L = []; for (let i = 0; i < n; i++) L.push({ ph: (i * 0.6180339) % 1, k: i, x: 0, y: -99, z: 0 });
+    W.dyn.push((t, dt) => { for (let i = 0; i < n; i++) { const p = L[i]; step(p, t, dt || 0); pos[i * 3] = p.x; pos[i * 3 + 1] = p.y; pos[i * 3 + 2] = p.z; } geo.attributes.position.needsUpdate = true; });
+    return m;
+  }
   /* ================= the other two levels: the same engine and the same man, a different night ================= */
   if (SC.issue === 'riser' || SC.issue === 'stair') {
     const RIS = SC.issue === 'riser', BY = RIS ? 0 : 18, done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
@@ -420,7 +432,7 @@
         ], n), 0.6, n => { done(); n(); }]);
     };
     S.init = function () {
-      if (!RIS) { clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false; { let ph = 0; W.dyn.push((t, dt) => { if (!clerk.group.visible) return; const g = clerk.group.position, yaw = pl.yaw, tx = pl.pos.x - Math.sin(yaw) * 1.9 + Math.cos(yaw) * 1.35, tz = pl.pos.z - Math.cos(yaw) * 1.9 - Math.sin(yaw) * 1.35, dx = tx - g.x, dz = tz - g.z, d = Math.hypot(dx, dz);
+      if (!RIS) { clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false; { let ph = 0; W.dyn.push((t, dt) => { if (!clerk.group.visible) return; const g = clerk.group.position, yaw = pl.yaw, tx = pl.pos.x - Math.sin(yaw) * 0.6 + Math.cos(yaw) * 1.5, tz = pl.pos.z - Math.cos(yaw) * 0.6 - Math.sin(yaw) * 1.5, dx = tx - g.x, dz = tz - g.z, d = Math.hypot(dx, dz);
           if (dt > 0 && SC.state === 'play' && !S.enc && pl.control && d > 0.7 && d < 45) { const sp = Math.min(6.4, 1.2 + d * 2), k = Math.min(1, sp * dt / d); g.x += dx * k; g.z += dz * k; g.y = SC.damp(g.y, W.ground(g.x, g.z, g.y + 0.7), 16, dt); clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(dx, dz), 9, dt); ph += sp * dt * 1.7; clerk.anim.apply(P.run(ph, sp / 6.4), 16, dt); }
           else { if (dt > 0) clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(pl.pos.x - g.x, pl.pos.z - g.z), 3, dt); clerk.anim.apply(P.idle(t), 6, 0.016); } }); } }
       else clerk = { group: { visible: false, position: v3(0, 0, 0), rotation: {}, updateMatrixWorld() {} }, anim: { apply() {} } };
@@ -491,7 +503,7 @@
             oswinUp(e); F.oswin = 1; save(); e.armorT = 1.5; e.state = 'chase'; e.st = 0; e.cool = 0.8; e.model.face('angry');
             FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); objective(); cam.lock = e; n(); }]);
       });
-      S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
+      S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[RIS ? S.cp : F.e_l2 ? 'roof' : F.e_l1 ? 'yard' : S.cp] || CROSS.alley;   /* v0.90 WORLD-B: on the Stair, to the landing of the last fight won, not a flight down if he walked past its sun */ if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
       SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted || !SC.input.touch ? 'WIDE OPEN. GET CLOSE AND PRESS *' + SC.btn('use') + '* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
       SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I'VE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
       SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
@@ -527,7 +539,7 @@
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
     Object.assign(CROSS, { alley: { x: -6.5, y: 0, z: 17.5, yaw: Math.PI }, yard: { x: -9.6, y: 12, z: 9.6, yaw: Math.PI / 2 }, roof: { x: -9.6, y: 24, z: 9.6, yaw: Math.PI / 2 } });
     /* death, the second chance and I AM STUCK: the stack and the array had none of the three, so a second death left him lying there for good */
-    S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
+    S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[F.e_l2 ? 'roof' : F.e_l1 ? 'yard' : S.cp] || CROSS.alley;   /* v0.90 WORLD-B: to the platform of the last fight won, not a whole turn down if he walked past its sun */ if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
     SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     Object.assign(ENC, {
@@ -584,6 +596,19 @@
       Object.keys(CROSS).forEach(id => { const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.07, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
         const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35); W.dyn.push(t => { a.rotation.z = t * 0.25; b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; }); });
       const glow = new THREE.PointLight(0x5fd0ff, 0, 30, 1.4); glow.position.set(0, 38.4, 0); G.scene.add(glow); W.dyn.push(t => { glow.intensity = F.charged ? 70 + Math.sin(t * 9) * 16 : 14 + Math.sin(t * 2) * 4; });
+      /* ---- v0.90 WORLD-B: the stack ---- */
+      // a chain across the edge of the crown until the boots are live: a man who walked off it before then fell thirty-six metres and climbed again
+      { const ch = W.solid(-5, 8.2, 5, 8.6, 35.6, 38, { cam: false }), cm = new THREE.Mesh(new THREE.BoxGeometry(10, 0.07, 0.07), G.toon({ color: 0xa8482a })); cm.position.set(0, 36.75, 8.4); G.scene.add(cm);
+        W.dyn.push(() => { ch.on = !F.charged; cm.visible = !F.charged; }); }
+      // what comes off the crown: the stack is carrying more air than it should, and the wind takes it east
+      wbMotes(26, 0xc9d6e2, 2.2, false, (q, t) => { const a = (t * 0.16 + q.ph) % 1; q.x = a * 14 + Math.sin(q.k * 1.7) * 0.8; q.y = 37.4 + a * 9 + Math.sin(t + q.k) * 0.3; q.z = -a * 3 + Math.cos(q.k * 2.3) * 0.8; });
+      // the lamps of House Teal, small and bright
+      { const pts = [[-13.2, 0.2, 6.2], [-13.2, 12.2, 6.2], [-13.2, 24.2, 6.2]]; for (let i = 0; i < 9; i++) { const a = -0.6 + i * 0.5, r = 15 + (i % 3) * 3; pts.push([Math.sin(a) * r, 0.2, 14 + Math.cos(a) * 6]); }
+        wbMotes(pts.length, 0x5ff2e2, 1.1, true, q => { const p = pts[q.k]; q.x = p[0]; q.y = p[1] + 0.05; q.z = p[2]; }); }
+      // the storm: far lightning on the ridges, and the whole island white for a breath
+      { const base = G.amb.intensity, bolt = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xeaf4ff, fog: false })); bolt.visible = false; G.scene.add(bolt); let next = 6, on = 0;
+        W.dyn.push((t, dt) => { if (!dt) return; next -= dt; if (next <= 0) { next = 7 + Math.random() * 9; on = 0.42; const a = Math.random() * 6.283, r = 100, pts = []; let x = Math.cos(a) * r, z = Math.sin(a) * r, y = 70; while (y > 4) { pts.push(new THREE.Vector3(x, y, z)); x += (Math.random() - 0.5) * 7; z += (Math.random() - 0.5) * 7; y -= 6 + Math.random() * 6; } pts.push(new THREE.Vector3(x, 2, z)); bolt.geometry.dispose(); bolt.geometry = new THREE.BufferGeometry().setFromPoints(pts); }
+          if (on > 0) { on -= dt; const f = on > 0.3 || (on > 0.08 && on < 0.18) ? 1 : 0; G.amb.intensity = base * (1 + f * 1.4); bolt.visible = f > 0; if (on <= 0) { G.amb.intensity = base; bolt.visible = false; } } }); }
       W.addInteract({ id: 'collar', x: 0, y: 36, z: 3.6, fx: 0, fz: 0, r: 1.9, label: 'STAND THE BOOTS ON IT', marker: 'act', mh: 1.4, when: () => F.e_l2 && !F.charged && !S.enc, act: () => { setFlag('charged'); pl.control = false; SC.audio.sfx('clue'); U.say([
         { who: 'cap', text: 'A collar on the crown of the stack, worn bright where a hundred Assayers have stood their heels. I put the dead boots on it, and my own weight on them.' },
         { who: 'cap', text: 'They took one long breath, the way a ward fan does when the branch comes up. Then they burned blue.' },
@@ -616,7 +641,7 @@
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
     Object.assign(CROSS, { alley: { x: -14, y: 12, z: 23.5, yaw: Math.PI }, yard: { x: 16.3, y: 8, z: 2, yaw: Math.PI }, roof: { x: 9, y: 0, z: -11, yaw: -Math.PI / 2 } });
     /* death, the second chance and I AM STUCK: the stack and the array had none of the three, so a second death left him lying there for good */
-    S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
+    S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[F.down ? 'roof' : F.across ? 'yard' : S.cp] || CROSS.alley;   /* v0.90 WORLD-B: to the part of the hall he has reached */ if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
     SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     Object.assign(ENC, {
@@ -672,7 +697,7 @@
     };
     S.init = function () {
       clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false;
-      { let ph = 0; W.dyn.push((t, dt) => { if (!clerk.group.visible) return; const g = clerk.group.position, yaw = pl.yaw, tx = pl.pos.x - Math.sin(yaw) * 1.9 + Math.cos(yaw) * 1.35, tz = pl.pos.z - Math.cos(yaw) * 1.9 - Math.sin(yaw) * 1.35, dx = tx - g.x, dz = tz - g.z, d = Math.hypot(dx, dz);
+      { let ph = 0; W.dyn.push((t, dt) => { if (!clerk.group.visible) return; const g = clerk.group.position, yaw = pl.yaw, tx = pl.pos.x - Math.sin(yaw) * 0.6 + Math.cos(yaw) * 1.5, tz = pl.pos.z - Math.cos(yaw) * 0.6 - Math.sin(yaw) * 1.5, dx = tx - g.x, dz = tz - g.z, d = Math.hypot(dx, dz);
           if (dt > 0 && SC.state === 'play' && !S.enc && pl.control && !(S.runT > 0) && d > 0.7 && d < 45) { const sp = Math.min(6.4, 1.2 + d * 2), k = Math.min(1, sp * dt / d); g.x += dx * k; g.z += dz * k; g.y = SC.damp(g.y, W.ground(g.x, g.z, g.y + 0.7), 16, dt); clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(dx, dz), 9, dt); ph += sp * dt * 1.7; clerk.anim.apply(P.run ? P.run(ph) : P.idle(t), 12, dt); }
           else { if (dt > 0) clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(pl.pos.x - g.x, pl.pos.z - g.z), 3, dt); clerk.anim.apply(P.idle(t), 6, 0.016); } }); }
       pl.model.setGlow(0xffd98a, '#ffd98a');
@@ -683,12 +708,18 @@
       // light: warm where people work, sea-green where the Array still runs
       [[-14, 15, 24, 0xffb060, 60], [0, 6, -18, 0x5ff2e2, 70], [0, 12, -24, 0xffe9a0, 40], [10, 6, -6, 0xffb060, 30], [-10, 6, -8, 0x5ff2e2, 26]].forEach(l => { const p = new THREE.PointLight(l[3], l[4], 34, 1.4); p.position.set(l[0], l[1], l[2]); G.scene.add(p); });
       // four great fans in the west wall. One turns. One is trying to. Two have stopped
-      const fans = [[-22, 1.6], [-13, 0.22], [-4, 0], [-25.4, 0]].map((f, i) => { const g = new THREE.Group(), m = G.toon({ color: i < 2 ? 0xb8863a : 0x4a3a2c }); for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.6, 0.7), m); b.position.y = 1.8; const h = new THREE.Group(); h.add(b); h.rotation.x = k * Math.PI / 2; g.add(h); } const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.3, 10), m); hub.rotation.z = Math.PI / 2; g.add(hub); g.position.set(-17.7, i === 3 ? 17 : 15.5, i === 3 ? -14 : f[0]); G.scene.add(g); return { g, sp: f[1] }; });
+      const fans = [[-22, 1.6], [-13, 0.22], [-4, 0], [5, 0]].map((f, i) => { const g = new THREE.Group(), m = G.toon({ color: i < 2 ? 0xb8863a : 0x4a3a2c }); for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.6, 0.7), m); b.position.y = 1.8; const h = new THREE.Group(); h.add(b); h.rotation.x = k * Math.PI / 2; g.add(h); } const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.3, 10), m); hub.rotation.z = Math.PI / 2; g.add(hub); g.position.set(-17.7, 15.5, f[0]); G.scene.add(g); return { g, sp: f[1] }; });   // v0.90 WORLD-B: the fourth hung over the second
       W.dyn.push((t, dt) => { fans.forEach((f, i) => { if (f.sp) f.g.rotation.x += dt * f.sp * (i === 1 ? (Math.sin(t * 0.9) > 0.2 ? 1 : 0.05) : 1); }); });
       // the watch lamp: it runs up and down a rail over the middle of the catwalk
       const lamp = new THREE.PointLight(0xffe9a0, 60, 16, 1.6), cone = new THREE.Mesh(new THREE.ConeGeometry(2.5, 5, 18, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9a0, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, fog: false })), spot = new THREE.Mesh(new THREE.CircleGeometry(2.5, 24), new THREE.MeshBasicMaterial({ color: 0xffe9a0, transparent: true, opacity: 0.3, depthWrite: false, fog: false })), box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.5), new THREE.MeshBasicMaterial({ color: 0xfff2c0, fog: false }));
       spot.rotation.x = -Math.PI / 2; [lamp, cone, spot, box].forEach(o => G.scene.add(o)); S.lampX = 3;
       W.dyn.push(t => { const on = !F.across && !F.e_w1, x = 3 + Math.sin(t * 0.42) * 8.5; S.lampX = x; lamp.position.set(x, 12.6, 2); lamp.intensity = on ? 60 : 0; cone.position.set(x, 10.6, 2); spot.position.set(x, 8.05, 2); box.position.set(x, 13, 2); cone.visible = spot.visible = on; box.material.color.set(on ? 0xfff2c0 : 0x2a2a30); });
+      /* ---- v0.90 WORLD-B: the Array ---- */
+      // the main seal weeps, the way a bank does a year before it goes; when it has gone, it pours
+      wbMotes(10, 0x5ff2e2, 0.16, true, (q, t) => { const r = S.runT > 0 || F.e_l1 ? 2.6 : 1, a = (t * 0.7 * r + q.ph) % 1; q.x = (q.k % 3 - 1) * 0.14; q.y = 1.45 - a * a * 1.45; q.z = -13.42 + a * 0.12; });
+      wbMotes(18, 0x9fb0a8, 1.3, false, (q, t) => { const src = [[0, 1.6, -13.4], [0.9, 1.4, -9.2], [-0.9, 3.9, -3.0]][q.k % 3], a = (t * 0.22 + q.ph) % 1; q.x = src[0] + Math.sin(q.k + t * 0.6) * 0.3 * a; q.y = src[1] + a * 3.2; q.z = src[2] + a * 0.6; });
+      wbMotes(40, 0xd8e8c8, 0.09, true, (q, t) => { const p = pl.pos, s = 18; q.x = p.x + ((q.k * 7.31 + Math.sin(t * 0.13 + q.k) * 2 - p.x) % s + s * 1.5) % s - s / 2; q.y = Math.max(0.3, p.y - 1) + ((q.k * 2.37 + t * 0.12) % 7); q.z = p.z + ((q.k * 3.71 + Math.cos(t * 0.11 + q.k) * 2 - p.z) % s + s * 1.5) % s - s / 2; });
+      { const L = [[-16.3, 14.4, 21.6], [15.2, 10.6, 0.6], [16.3, 2.8, -21.9], [-14, 23.9, 27.2], [7.3, 1.14, -26.4]]; wbMotes(L.length, 0xffb060, 3.2, true, q => { const l = L[q.k]; q.x = l[0]; q.y = l[1]; q.z = l[2]; }); }
       const said = (flag, lines, after) => () => { setFlag(flag); SC.audio.sfx('clue'); pl.control = false; U.say(lines, () => { pl.control = true; if (after) after(); objective(); }); };
       W.addInteract({ id: 'heart', x: 0, y: 0, z: -12.4, fx: 0, fz: -14, r: 2, label: 'PUT A HAND ON IT', marker: 'act', mh: 2, when: () => F.down && !F.heart && !S.enc, act: said('heart', [
         { who: 'cap', text: 'The heart of the Array. Every breath on six tiers comes through this drum, and every breath above them. The main seal was weeping under my palm, the way a bank does a year before it goes.' },
