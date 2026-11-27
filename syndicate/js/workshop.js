@@ -56,9 +56,10 @@
     if (el) return; G.ui.close && G.ui.close();
     if (!document.getElementById('wscss')) { const s = document.createElement('style'); s.id = 'wscss'; s.textContent = css; document.head.appendChild(s); }
     el = document.createElement('div'); el.id = 'workshop';
-    el.innerHTML = '<div class="ws-list"><h2>Workshop</h2><div class="ws-wait"></div><select class="ws-pick" aria-label="Character"></select><input type="search" placeholder="Find a character" aria-label="Find a character"><div class="ws-all"></div></div>' +
+    el.innerHTML = '<div class="ws-list"><h2>Workshop</h2><p class="ws-note ws-build"></p><div class="ws-wait"></div><select class="ws-pick" aria-label="Character"></select><input type="search" placeholder="Find a character" aria-label="Find a character"><div class="ws-all"></div></div>' +
       '<div class="ws-view"><canvas></canvas><div class="ws-top"><div class="ws-name"><b></b><small></small></div></div><div class="ws-poses"></div></div><div class="ws-ctl"></div>';
     document.body.appendChild(el); G.workshopOpen = true;
+    el.querySelector('.ws-build').textContent = 'Made from the game’s ' + G.buildName().replace(/^Build/, 'build') + '. The game shows its build at the bottom of Settings: when the two match, this is what the game has.';
     const reg = G.registry(), list = el.querySelector('.ws-all'), pick = el.querySelector('.ws-pick');
     drawList = q => { status(); list.innerHTML = ''; let g = ''; reg.filter(r => !q || r.name.toLowerCase().includes(q)).forEach(r => { if (r.group !== g) { g = r.group; const h = document.createElement('div'); h.className = 'ws-g'; h.textContent = g; list.appendChild(h); }
       const b = document.createElement('button'); b.className = 'ws-i' + (cur && cur.id === r.id ? ' on' : ''); b.textContent = r.name; if (EDITS[r.id]) { const d = document.createElement('span'); d.className = 'dot'; d.title = 'Edited'; b.appendChild(d); } b.onclick = () => choose(r); list.appendChild(b); }); };

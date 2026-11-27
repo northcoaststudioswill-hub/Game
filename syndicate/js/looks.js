@@ -78,5 +78,9 @@
     : clone(SEEN[r.id] || G.LOOKDEF[r.id] || (r.id === 'marc' && G.mark && G.mark.look) || (r.id === 'david' && G.oracle && G.oracle.look && G.oracle.look()) || null);
 
   applyAll();
+  // which build this is: the same stamp shows at the top of the Workshop, so the two can be compared
+  G.buildName = () => window.BUILD && window.BUILD.commit ? 'Build ' + window.BUILD.commit + ' · ' + window.BUILD.date : 'Build: a local copy';
+  const set0 = G.ui && G.ui.settings;
+  if (set0) G.ui.settings = function () { const r = set0.apply(this, arguments), card = document.querySelector('#panel .card'), end = card && card.querySelector('.row.end'); if (end && !card.querySelector('.buildname')) { const p = document.createElement('p'); p.className = 'dim buildname'; p.style.cssText = 'font-size:.8rem;margin:.6rem 0 0'; p.textContent = G.buildName(); end.parentNode.insertBefore(p, end); } return r; };
   G.looks = { merge, rebuild, applyAll, base: r => baseOf(r), seen: SEEN, edits: EDITS, colourOf, hexs, COLS, SLOTS, FRAMES, mk0, clone };
 })();
