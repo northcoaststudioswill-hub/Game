@@ -56,8 +56,8 @@ const Issue = {
     let ax = 0, ay = 0, lx = 0, ly = 0, r3 = 0; try { for (const gp of (navigator.getGamepads ? navigator.getGamepads() : [])) { if (!gp || !gp.connected) continue; const dz = v => Math.abs(v) < .18 ? 0 : Math.round(v * 10) / 10; ax = dz(gp.axes[0] || 0); ay = dz(gp.axes[1] || 0); lx = dz(gp.axes[2] || 0); ly = dz(gp.axes[3] || 0); r3 = gp.buttons[11] && gp.buttons[11].pressed ? 1 : 0; break; } } catch (e) { /* no pad */ }
     if (r3 && !this.r3) press.push('lock'); this.r3 = r3;
     const sx = ax || ay ? ax : x, sy = ax || ay ? -ay : y;
-    const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, pad = Input.device === 'pad' ? 1 : 0, k = sx + ',' + sy + ',' + lx + ',' + ly + ',' + hold.a + hold.y + pad; if (k === this.sent && !press.length) return; this.sent = k;
-    try { this.el.contentWindow.postMessage({ sootborn: 'in', x: sx, y: sy, lk: [lx, ly], press, hold, pad }, '*'); } catch (e) { /* frame is going away */ }
+    const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, pad = Input.device === 'pad' ? 1 : 0, dev = Input.device, k = sx + ',' + sy + ',' + lx + ',' + ly + ',' + hold.a + hold.y + pad + dev; if (k === this.sent && !press.length) return; this.sent = k;
+    try { this.el.contentWindow.postMessage({ sootborn: 'in', x: sx, y: sy, lk: [lx, ly], press, hold, pad, dev }, '*'); } catch (e) { /* frame is going away */ }
   },
   finish(ok, data) {
     if (!this.on) return;

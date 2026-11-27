@@ -21,7 +21,7 @@
     const STONE = 0xe4dfd2, STONE2 = 0xcfc9bc, DECK = 0xa7a3c0, DECK2 = 0x8f8bb0, GILT = 0xe8c25a, IRON = 0x23232e, TEAL = 0x2f8f8a, VIOLET = 0x5a3aa8, SLATE = 0x5a6088, IVORY = 0xefe8d4, HULL = 0x6e5a48, LAMP = 0xffe9a0, TLAMP = 0x5ff2e2;
     const rnd = SC.seeded(77);
     /* unseen walls keep bodies on the deck; the camera is allowed to swing out over the drop */
-    const wall = (x0, z0, x1, z1, y0, y1) => solid(x0, z0, x1, z1, y0 || 0, y1 || 9, { cam: false });
+    const wall = (x0, z0, x1, z1, y0, y1) => solid(x0, z0, x1, z1, y0 || 0, y1 || 9, { cam: false, inv: true });
     function rail(x0, z0, x1, z1, y) {
       const ax = Math.abs(x1 - x0) > Math.abs(z1 - z0), len = ax ? x1 - x0 : z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, L = Math.abs(len);
       D('concrete', cx, y + 0.12, cz, ax ? L : 0.5, 0.24, ax ? 0.5 : L, STONE2, { outline: 0.04 });
@@ -67,7 +67,7 @@
       const m = new THREE.Matrix4().compose(a.clone().add(b).multiplyScalar(0.5), new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.sub(a).normalize()), new THREE.Vector3(1, 1, 1));
       batch.add('flat', g, m, col === undefined ? IRON : col, r > 0.09 ? 0.03 : 0); g.dispose();
     }
-    function bollard(x, z, y) { y = y || 0; cyl('flat', x, y + 0.4, z, 0.2, 0.26, 0.8, IRON, { outline: 0.04 }); cyl('flat', x, y + 0.86, z, 0.3, 0.22, 0.14, GILT, { outline: 0.03 }); }
+    function bollard(x, z, y) { y = y || 0; solid(x - 0.32, z - 0.32, x + 0.32, z + 0.32, y, y + 1, { cam: false, co: true }); cyl('flat', x, y + 0.4, z, 0.2, 0.26, 0.8, IRON, { outline: 0.04 }); cyl('flat', x, y + 0.86, z, 0.3, 0.22, 0.14, GILT, { outline: 0.03 }); }
     /* a lantern on a stone column */
     function column(x, z, h, col) {
       cyl('concrete', x, h / 2, z, 0.22, 0.28, h, STONE, { outline: 0.04 }); D('concrete', x, 0.2, z, 0.8, 0.4, 0.8, STONE2, { outline: 0.04 }); D('flat', x, h + 0.08, z, 0.6, 0.16, 0.6, GILT, { outline: 0.03 });
@@ -204,7 +204,7 @@
     // ----- the freight yard -----
     B('metal', 6, 5.7, 16, 6, 0, 3.2, IVORY, { outline: 0.05 }); B('metal', 20, 5.7, 32, 6, 0, 3.2, IVORY, { outline: 0.05 });
     B('flat', 5.95, 5.65, 16, 6.05, 3.2, 3.42, GILT, { outline: 0.03, col: false }); B('flat', 20, 5.65, 32.05, 6.05, 3.2, 3.42, GILT, { outline: 0.03, col: false });
-    D('concrete', 16.1, 2.1, 5.85, 0.6, 4.2, 0.7, STONE, { outline: 0.05 }); D('concrete', 19.9, 2.1, 5.85, 0.6, 4.2, 0.7, STONE, { outline: 0.05 });
+    D('concrete', 16.1, 2.1, 5.85, 0.6, 4.2, 0.7, STONE, { outline: 0.05 }); D('concrete', 19.9, 2.1, 5.85, 0.6, 4.2, 0.7, STONE, { outline: 0.05 }); solid(15.8, 5.5, 16.4, 6.2, 0, 4.2, { cam: false }); solid(19.6, 5.5, 20.2, 6.2, 0, 4.2, { cam: false });   // the gate posts stand in the way of the camera and of him
     D('glow', 16.1, 4.5, 5.85, 0.36, 0.5, 0.36, LAMP, { outline: 0 }); D('glow', 19.9, 4.5, 5.85, 0.36, 0.5, 0.36, LAMP, { outline: 0 });
     sign('HIGH DOCKS FREIGHT', 11, 4.4, 6.05, 0, 7, 1.2, '#e8c25a', '#0b0d24');
     const gateMat = G.toon({ map: G.tex.metal, color: 0xc9a063 });
@@ -399,7 +399,7 @@
     };
     const cloudSea = (y, n, seed) => { D('flat', 0, y - 30, 0, 1400, 2, 1400, 0x343a80, { outline: 0 }); const rc = SC.seeded(seed), ico = new THREE.IcosahedronGeometry(1, 1);
       for (let i = 0; i < n; i++) { const a = rc() * 6.283, r = 50 + rc() * 250, sc = 14 + rc() * 26, g = ico.clone(); g.scale(sc, sc * 0.3, sc * 0.8); batch.add('flat', g, G.mx(Math.cos(a) * r, y - rc() * 20, Math.sin(a) * r, rc() * 3), [0xe0a08a, 0xc98aa8, 0xf2c8a0][i % 3], 0); g.dispose(); } };
-    const pine = (x, z, s, solidToo) => { if (solidToo) solid(x - 0.4, z - 0.4, x + 0.4, z + 0.4, 0, 6, { cam: false }); cyl('wood', x, 1.1 * s, z, 0.16 * s, 0.24 * s, 2.2 * s, 0x4a3524, { outline: 0.05 });
+    const pine = (x, z, s, solidToo) => { if (solidToo) solid(x - 0.4, z - 0.4, x + 0.4, z + 0.4, 0, 6, { cam: false }); solid(x - 1.25 * s, z - 1.25 * s, x + 1.25 * s, z + 1.25 * s, 1.2 * s, 7.2 * s, { cam: false, co: true }); cyl('wood', x, 1.1 * s, z, 0.16 * s, 0.24 * s, 2.2 * s, 0x4a3524, { outline: 0.05 });
       [[2.6, 1.9, 3.0], [4.4, 1.45, 2.6], [5.9, 0.95, 2.2]].forEach(c => { const g = new THREE.ConeGeometry(c[1] * s, c[2] * s, 7); batch.add('flat', g, G.mx(x, c[0] * s, z, x), c[0] > 5 ? 0x2f6a4c : 0x24543c, 0.07); g.dispose(); }); };
 
     /* ===== RISER NINE: the Assay valley, five years on, at night in the rain. Grass, pines, the pump house, and a hatch. ===== */
@@ -450,6 +450,7 @@
       [-0.34, 0.34].forEach(x => D('flat', x, 1.5, HZ + 1.25, 0.09, 2.6, 0.09, 0xe8b23a, { rx: -0.14, outline: 0.03 })); [0.62, 0.98, 1.34, 1.7, 2.06, 2.42].forEach(y => D('flat', 0, y, HZ + 1.25 + (y - 1.5) * 0.14, 0.62, 0.06, 0.06, 0xe8e0cc, { outline: 0.02 }));   // the ladder head: yellow rails standing well clear of the collar, pale rungs
       { const top = [0, 3.5, HZ]; [[-1.9, 1.1], [1.9, 1.1], [0, -1.95]].forEach(f => { const dx = top[0] - f[0], dz = -f[1], L = Math.hypot(dx, 3.5, dz); const g = new THREE.CylinderGeometry(0.06, 0.08, L, 6); const m = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(dx, 3.5, dz).normalize())); m.setPosition(f[0] + dx / 2, 1.75, HZ + f[1] + dz / 2); batch.add('wood', g, m, 0x5a4030, 0.03); g.dispose(); });
         cyl('metal', 0, 3.3, HZ, 0.2, 0.2, 0.1, IRON, { rz: Math.PI / 2, seg: 8, outline: 0.03 }); D('flat', 0, 1.9, HZ, 0.03, 2.9, 0.03, 0xd8c8a0, { outline: 0 }); D('glow', 0.5, 2.7, HZ, 0.16, 0.24, 0.16, 0xffb060, { outline: 0 }); D('flat', 0.5, 2.86, HZ, 0.2, 0.06, 0.2, IRON, { outline: 0.02 }); }   // a hoist of three poles over the shaft, a rope down it, a lamp hung on it
+      solid(-1.9, HZ - 1.95, 1.9, HZ + 1.1, 0.5, 3.6, { cam: false, co: true });   // the camera does not stand in the hoist (it opened the level looking through the rope)
       cyl('metal', 3.1, 0.13, HZ + 0.5, 1.5, 1.5, 0.16, 0x8d94ac, { seg: 10, outline: 0.05 }); cyl('flat', 3.1, 0.22, HZ + 0.5, 0.5, 0.5, 0.04, IRON, { seg: 8, outline: 0.03 }); D('flat', 3.1, 0.25, HZ + 0.5, 1.5, 0.05, 0.1, IRON, { ry: 0.5, outline: 0.02 }); D('flat', 3.1, 0.25, HZ + 0.5, 1.5, 0.05, 0.1, IRON, { ry: 2.07, outline: 0.02 }); D('flat', 2.0, 0.3, HZ + 0.2, 0.5, 0.1, 0.16, IRON, { ry: 0.3, outline: 0.03 });   // the lid, thrown back on the grass, wheel uppermost
       sign('RISER 9', -1.5, 1.3, HZ + 2.46, Math.PI, 1.7, 0.46, '#e8c25a', '#07070d'); D('concrete', -1.5, 1.3, HZ + 2.62, 1.9, 0.66, 0.3, 0x565a68, { outline: 0.04 });   // cut into a slab against the rock, where nothing can get behind it
       { const l = new THREE.PointLight(0xff8a2e, 60, 15, 1.6); l.position.set(0, 1.5, HZ - 0.4); G.scene.add(l); }

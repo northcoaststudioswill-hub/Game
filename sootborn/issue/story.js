@@ -1,6 +1,8 @@
 //@@OBJECTIVE
   function objective() {
     let t = '', g = null;
+    // the bond house stair up to the gallery, the back stair up to the roof door, the gangway to Mooring One
+    S.links = S.links || [{ a: [-12.6, 0, 3.7], b: [-23.3, 4, 3.7], w: 1.3 }, { a: [-23.3, 4, -18.2], b: [-13.3, 8.4, -18.2], w: 1.2 }, { a: [-11.3, 9, -34.25], b: [-0.8, 11, -34.25], w: 1.25 }];
     if (S.enc) t = S.enc.id === 'boss' ? 'CAPTAIN ROOK HOLDS MOORING ONE. TAKE IT.' : 'PUT THE DOCK GUARD DOWN';
     else if (!F.path) { t = 'ONTO THE CAUSEWAY'; g = CROSS.alley; }
     else if (!F.e_alley) t = 'PUT THE DOCK GUARD DOWN';
@@ -18,8 +20,9 @@
   }
 //@@ENCDONE
   function encDone(id) {
+    const again = !!F['e_' + id];
     if (id === 'street') F.key = 1;   // the key first, before anything else can go wrong: a save with the quay cleared and no key is a level nobody can finish
-    setFlag('e_' + id);
+    setFlag('e_' + id); if (again) return;
     if (id === 'alley') U.toast('DOCK GUARD. ON THE STAIR ALREADY, WITH THEIR LAMPS LIT.', 3.5);
     if (id === 'street') { F.key = 1; save(); SC.audio.sfx('clue'); U.toast('THE STAIR BLADE CARRIED A *YARD KEY*. HIGH DOCKS FREIGHT.', 4); }
     if (id === 'yard') U.toast('THE SHUTTER IS DOWN. THERE WILL BE A *WINCH BREAKER*.', 3.5);
@@ -149,15 +152,13 @@
   function wake() {
     SC.emit('letterbox', true); pl.st = 0; pl.scriptRate = 7; pl.faceOverride = 'neutral'; pl.script = t => P.idle(t);
     cam.move(v3(-2.3, 1.0, 42.3), v3(0.6, 1.4, 39.4), v3(-2.5, 1.6, 36.6), v3(0.8, 1.4, 39.1), 3.4, 44);
-    run([1.6, n => { pl.yaw = Math.PI * 0.95; U.say([
-        { who: 'clerk', text: 'Lamps, Brennick. Trimmed and lit. *They were told the hour.*' },
-        { who: 'hero', face: 'shock', text: 'I wrote that rota. It was nine minutes.' },
-        { who: 'clerk', text: 'It is no minutes. I hold the stair. You cut the moorings. *Mooring One* is the last pair, on the far roof.' },
+    run([0.5, n => { pl.yaw = Math.PI * 0.95; U.say([
+        { who: 'clerk', text: 'Lamps, Brennick. Trimmed and lit. They were told the hour, and your nine minutes are *no minutes*. I hold the stair. You cut the moorings. *Mooring One* is the last pair, on the far roof.' },
         { who: 'hero', face: 'angry', text: 'Brand.' },
         { who: 'clerk', text: 'You do not argue, and you do not come back for me. Count your eleven, decide how you mean to fight, and *go*.' }
       ], n); },
       n => { brandOnStair(); SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.snapBehind(Math.PI); cam.endCine(0.9); U.showHud(true); setFlag('intro');
-        U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS AND USES; HELD, THREE HEAVY BLOWS. *B* DODGES.' : SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
+        U.toast(SC.hosted && SC.dev() === 'touch' ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS AND USES; HELD, THREE HEAVY BLOWS. *B* DODGES.' : SC.hosted && SC.dev() === 'pad' ? 'DRAG THE PICTURE TO LOOK ROUND.' : SC.hosted ? 'DRAG THE MOUSE TO LOOK ROUND. *E* CUTS AND USES; HELD, THREE HEAVY BLOWS. *X* DODGES.' : SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
   }
   function bossIntro() {
     const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
@@ -302,7 +303,7 @@
     SC.on('kill', () => { S.killN = (S.killN || 0) + 1; if (S.killN % 5 === 0 && SC.enemies.some(m => m.state !== 'dead' && m.state !== 'wait')) { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); } });
     SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
     SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
-    SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
+    SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted || !SC.input.touch ? 'WIDE OPEN. GET CLOSE AND PRESS *' + SC.btn('use') + '* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
     SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I'VE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
@@ -361,7 +362,7 @@
       else { brandOnStair(); U.toast(id === 'alley' ? 'THE TERRACE IS OURS. *UP.*' : id === 'l1' ? 'TAVI: "ON YOUR LEFT. KEEP GOING."' : 'ONE FLIGHT LEFT. *THE WHITE DOOR.*', 3.4); }
     };
     const begin = () => { SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.mode = 'follow'; cam.snapBehind(Math.PI); U.showHud(true); setFlag('intro');
-      U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS; HELD, THREE HEAVY BLOWS. *JUMP*, HELD, HOVERS.' : 'WASD MOVES. J STRIKES. K DODGES. F IS THE BOOTS.', 5.5); };
+      U.toast(SC.hosted && SC.dev() === 'touch' ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS; HELD, THREE HEAVY BLOWS. *JUMP*, HELD, HOVERS.' : SC.hosted && SC.dev() === 'pad' ? 'DRAG THE PICTURE TO LOOK ROUND.' : SC.hosted ? 'DRAG THE MOUSE TO LOOK ROUND. *E* CUTS; HELD, THREE HEAVY BLOWS. *F*, HELD, HOVERS.' : 'WASD MOVES. J STRIKES. K DODGES. F IS THE BOOTS.', 5.5); };
     intro = function () {
       SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
       pl.place(0, 0, RIS ? 10.4 : 41, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
@@ -491,7 +492,7 @@
             FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); objective(); cam.lock = e; n(); }]);
       });
       S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
-      SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
+      SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted || !SC.input.touch ? 'WIDE OPEN. GET CLOSE AND PRESS *' + SC.btn('use') + '* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
       SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I'VE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
       SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
       SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
@@ -537,6 +538,8 @@
     Object.keys(ENC).forEach(k => { ENC[k].id = k; });
     brandOnStair = function () {};
     S.noBoots = () => !F.charged;   // Voss's boots are dead until they have stood on the collar
+    // the keeper's stair: four flights to a turn, three turns, each from corner to corner of the stack
+    S.links = []; for (let t = 0; t < 3; t++) { const H = t * 12; S.links.push({ a: [-6.2, H, 6.7], b: [6.7, H + 3, 6.7], w: 1.7 }, { a: [6.7, H + 3, 6.7], b: [6.7, H + 6, -6.7], w: 1.7 }, { a: [6.7, H + 6, -6.7], b: [-6.7, H + 9, -6.7], w: 1.7 }, { a: [-6.7, H + 9, -6.7], b: [-6.7, H + 12, 6.4], w: 1.7 }); }
     objective = function () {
       let t = '', g = null;
       if (S.enc) t = S.enc.id === 'alley' ? "HOUSE TEAL'S PICKETS. THE STAIR IS BEHIND THEM." : S.enc.id === 'l2' ? 'A WARDEN OF THE DAIS. HE SAW WHAT I DID TO VOSS.' : 'CLEAR THE PLATFORM';
@@ -598,6 +601,7 @@
       if (pl.control) S.time += rdt;
       updateEnc(dt);
       if (S.enc && S.enc.arena && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }
+      if (S.enc && S.enc.arena && S.enc.floor > 1 && pl.state !== 'dead' && pl.pos.y < S.enc.floor - 0.6) { const A = S.enc.arena; pl.place(SC.clamp(pl.pos.x, A[0] + 0.9, A[2] - 0.9), S.enc.floor, SC.clamp(pl.pos.z, A[1] + 0.9, A[3] - 0.9), pl.yaw); }   // a dodge through the rail of a landing in a fight: back on the landing, not left on the ground under it with the fight still up there
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
       { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && (F.path ? Math.hypot(x - c.x, z - c.z) < 1.6 : id === 'alley' && (Math.hypot(x - c.x, z - c.z) < 2.2 || z < c.z - 0.8))) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
@@ -617,10 +621,12 @@
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     Object.assign(ENC, {
       w1: { arena: [-13.6, 0.3, 14, 3.7], floor: 8, waves: [[['hollow', 12, 2], ['hollow', -12.6, 2]]] },
-      l1: { arena: [-13, -27, 13, -5.6], floor: 0, waves: [[['hollow', 11, -8], ['hollow', -11, -9]], [['hollow', 10, -24], ['hollow', -10, -24], ['hollow', 0, -7]]] }
+      l1: { arena: [-13, -27, 13, 2.6], floor: 0, waves: [[['hollow', 11, -8], ['hollow', -11, -9]], [['hollow', 10, -24], ['hollow', -10, -24], ['hollow', 3.4, -6]]] }
     });
     Object.keys(ENC).forEach(k => { ENC[k].id = k; });
     S.noBoots = () => true; S.plain = () => true;   // nothing he has not learned yet
+    // the west stair from the hatch gantry down to the catwalk, and the east stair from the catwalk down to the floor (its foot is clear of the rail)
+    S.links = [{ a: [-16.3, 8, 2.6], b: [-16.3, 12, 20.6], w: 1.7 }, { a: [16.3, 0, -22], b: [16.3, 8, 0.8], w: 1.7 }];
     const dace = (x, y, z, yaw) => { const g = clerk.group.position; if (clerk.group.visible && Math.hypot(g.x - pl.pos.x, g.z - pl.pos.z) < 26 && Math.abs(g.y - pl.pos.y) < 9) return; showClerk(x, y, z, yaw === undefined ? Math.PI : yaw); };
     brandOnStair = function () { if (F.heart) dace(3, 0, -11); else if (F.down) dace(15, 0, -22, 0); else dace(-12.4, 12, 25.4, 2.6); };
     const left = () => Math.max(0, Math.ceil(S.runT || 0));
@@ -671,6 +677,7 @@
           else { if (dt > 0) clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(pl.pos.x - g.x, pl.pos.z - g.z), 3, dt); clerk.anim.apply(P.idle(t), 6, 0.016); } }); }
       pl.model.setGlow(0xffd98a, '#ffd98a');
       try { const st = document.createElement('style'); st.textContent = '#tagPw,#tagEc{display:none!important}'; document.head.appendChild(st); } catch (e) { /* the chips stay */ }   // no ELEVEN and no Count on a man who has not learned them
+      { const t0 = U.toast; U.toast = function (m, d) { if (typeof m === 'string' && /FURY BAR|FURY FULL|HOLD THE CUT|ELEVEN\*/.test(m)) return; return t0.call(U, m, d); }; }
       Object.keys(CROSS).forEach(id => { const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.07, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
         const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35); W.dyn.push(t => { a.rotation.z = t * 0.25; b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; }); });
       // light: warm where people work, sea-green where the Array still runs
@@ -702,6 +709,7 @@
       if (pl.control) S.time += rdt;
       updateEnc(dt);
       if (S.enc && S.enc.arena && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }
+      if (S.enc && S.enc.arena && S.enc.floor > 1 && pl.state !== 'dead' && pl.pos.y < S.enc.floor - 0.6) { const A = S.enc.arena; pl.place(SC.clamp(pl.pos.x, A[0] + 0.9, A[2] - 0.9), S.enc.floor, SC.clamp(pl.pos.z, A[1] + 0.9, A[3] - 0.9), pl.yaw); }   // a dodge through the rail of a landing in a fight: back on the landing, not left on the ground under it with the fight still up there
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
       { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && (F.path ? Math.hypot(x - c.x, z - c.z) < 1.6 : id === 'alley' && (Math.hypot(x - c.x, z - c.z) < 2.2 || z < c.z - 0.8))) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
@@ -816,3 +824,27 @@
       next();
     };
   }
+//@@WAY
+    /* the objective marker leads the way a man walks. SC.story.links lists the stairs and ladders of a level, each
+       { a: foot [x, y, z], b: head [x, y, z], w: half width }. On a stair, the marker shows its far end; on another
+       floor from the goal, the foot (or head) of the stair on this floor that goes the right way; on the goal's floor, the goal. */
+    if (!SC.way) SC.way = function (g, p, depth) {
+      const L = SC.story.links; if (!g || !L || !L.length || (depth || 0) > 3) return g;
+      const gy = g.y || 0, P3 = q => ({ x: q[0], y: q[1], z: q[2], way: 1 }), at = (q, d) => Math.hypot(q[0] - p.x, q[2] - p.z) < d && Math.abs(q[1] - p.y) < 1.6;
+      for (const k of L) {
+        const a = k.a, b = k.b, dx = b[0] - a[0], dz = b[2] - a[2], len = Math.hypot(dx, dz) || 1, t = ((p.x - a[0]) * dx + (p.z - a[2]) * dz) / (len * len);
+        if (t * len < 0.6 || (1 - t) * len < 0.6) continue;
+        if (Math.hypot(a[0] + dx * t - p.x, a[2] + dz * t - p.z) > (k.w || 1.6)) continue;
+        if (Math.abs(a[1] + (b[1] - a[1]) * t - p.y) > 1.6) continue;
+        const end = gy < (a[1] + b[1]) / 2 ? a : b;
+        return at(end, 1.2) ? SC.way(g, { x: end[0], y: end[1], z: end[2] }, (depth || 0) + 1) : P3(end);
+      }
+      if (Math.abs(gy - p.y) < 1.2) return g;
+      const up = gy > p.y; let best = null, bs = 1e9;
+      for (const k of L) { const s = up ? k.a : k.b, e = up ? k.b : k.a;
+        if (Math.abs(s[1] - p.y) > 1.3 || (up ? e[1] > gy + 1.3 : e[1] < gy - 1.3)) continue;
+        const c = Math.hypot(s[0] - p.x, s[2] - p.z) + Math.hypot(e[0] - g.x, e[1] - gy, e[2] - g.z); if (c < bs) { bs = c; best = k; } }
+      if (!best) return g;
+      const s = up ? best.a : best.b, e = up ? best.b : best.a;
+      return at(s, 1.2) ? P3(e) : P3(s);
+    };

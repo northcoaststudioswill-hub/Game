@@ -650,5 +650,54 @@ rep("SC.clearEnemies(); timers.length = 0; S.done = false;", "SC.clearEnemies();
 // a guard still standing at his post is not a fight: with him counted, the High Docks roof door could never be opened, and E swung at the air
 rep("for (const e of E) if (e.state !== 'dead' && SC.dist2(e.pos.x, e.pos.z, pl.pos.x, pl.pos.z) < 20", "for (const e of E) if (e.state !== 'dead' && e.state !== 'wait' && SC.dist2(e.pos.x, e.pos.z, pl.pos.x, pl.pos.z) < 20");
 
+/* ---- v0.89: comic-level fixes from the v0.87 playtest ---- */
+// the button names follow the device in hand: on a pad the cut is X (A is the jump), on a keyboard it is E, on the glass it is the A button
+rep("SC.host = function (t, d) {", "SC.dev = function () { return SC.hosted ? (SC.devN || (SC.pad ? 'pad' : 'kb')) : (SC.input && SC.input.touch ? 'touch' : 'kb'); };\nSC.btn = function (n) { const M = { use: { pad: 'X', kb: 'E', touch: 'A' }, dodge: { pad: 'B', kb: 'X', touch: 'B' }, jump: { pad: 'A', kb: 'F', touch: 'JUMP' }, kick: { pad: 'Y', kb: 'C', touch: 'KICK' } }; return (M[n] || M.use)[SC.dev()] || 'E'; };\nSC.host = function (t, d) {");
+rep("SC.input.extL = d.lk || null;", "if (d.dev) SC.devN = d.dev; SC.input.extL = d.lk || null;");
+rep("if (label !== lastPrompt) {\n      lastPrompt = label; ", "if (label + SC.dev() !== lastPrompt) {\n      lastPrompt = label + SC.dev(); ");
+rep("(SC.hosted ? '<kbd>A</kbd>' : SC.input.touch ? '' : '<kbd>E</kbd>') + label", "(SC.hosted || !SC.input.touch ? '<kbd>' + SC.btn('use') + '</kbd>' : '') + label");
+// a man with no ELEVEN is not told to use it (the Deep Array)
+rep("U.toast('FURY FULL. *HOLD STRIKE: ELEVEN.*', 2.6);", "if (!(SC.story.plain && SC.story.plain())) U.toast('FURY FULL. *HOLD ' + SC.btn('use') + ': ELEVEN.*', 2.6);");
+rep("SC.ui.cut('LINE STRUCK', 'ELEVEN, COUNTED', true);", "SC.ui.cut('LINE STRUCK', SC.story.plain && SC.story.plain() ? 'COUNTED TO THE END' : 'ELEVEN, COUNTED', true);");
+// the pad legend: big enough to read, and only what he can do in this level (no ELEVEN or hook in the Array, no boots till they are charged)
+rep("font:700 9px/17px system-ui,sans-serif;", "font:700 12px/21px system-ui,sans-serif;");
+rep("#padleg b{display:inline-block;min-width:14px;height:14px;line-height:14px;border-radius:7px;padding:0 2px;margin:0 3px 0 8px;text-align:center;color:#07070d;background:#c8c8c8;text-shadow:none;font-size:8px}", "#padleg b{display:inline-block;min-width:19px;height:19px;line-height:19px;border-radius:10px;padding:0 3px;margin:0 4px 0 10px;text-align:center;color:#07070d;background:#c8c8c8;text-shadow:none;font-size:11px}");
+rep(`el.innerHTML = '<b class="x">X</b>CUT &middot; HELD: HEAVY, ELEVEN<b class="y">Y</b>KICK<br><b class="a">A</b>JUMP &middot; HELD: BOOTS<b class="b">B</b>DODGE<b>RB</b>LUNGE<b>LB</b>HOOK<b>RS</b>LOOK';`, `SC.padLeg = () => { const S = SC.story, plain = S.plain && S.plain(), dead = S.noBoots && S.noBoots(); return '<b class="x">X</b>CUT &middot; HELD: HEAVY' + (plain ? '' : ', ELEVEN') + '<br><b class="a">A</b>JUMP' + (dead ? '' : ' &middot; HELD: BOOTS') + '<b class="y">Y</b>KICK<br><b class="b">B</b>DODGE<b>RB</b>LUNGE<br>' + (plain ? '' : '<b>LB</b>HOOK') + '<b>RS</b>LOOK'; }; el.innerHTML = SC.padLeg();`);
+rep("setInterval(() => { el.style.visibility = SC.ui.blocking() || SC.state !== 'play' ? 'hidden' : 'visible'; }, 200);", "setInterval(() => { el.style.visibility = SC.ui.blocking() || SC.state !== 'play' ? 'hidden' : 'visible'; const h = SC.padLeg(); if (h !== el._h) { el._h = h; el.innerHTML = h; } }, 200);");
+// the objective marker leads the way a man walks: to the foot of the stair on this floor, up it, then on (SC.way, in story.js)
+rep("    // objective marker\n    const g = SC.story.goal, el = $('goal');", ST.WAY + "    // objective marker\n    const g0 = SC.story.goal, g = SC.way(g0, p.pos), el = $('goal');");
+rep("      if (dist < 3.5) el.classList.add('hide');", "      if (dist < 3.5 && g === g0) el.classList.add('hide');");
+rep("x = SC.clamp(x, -0.9, 0.9); y = SC.clamp(y, -0.62, 0.72);", "x = SC.clamp(x, -0.9, 0.9); y = SC.clamp(y, SC.pad ? -0.38 : -0.62, 0.72);");
+// the camera: a solid it may look past (a rail, a pine's crown, a bollard) still never has the lens inside it
+rep("const s = L[i]; if (!s.on || x < s.x0 || x > s.x1 || z < s.z0 || z > s.z1) continue;", "const s = L[i]; if (!s.on || s.co || x < s.x0 || x > s.x1 || z < s.z0 || z > s.z1) continue;");
+rep("const s = L[i]; if (!s.on || s.y0 >= feet + h) continue;", "const s = L[i]; if (!s.on || s.co || s.y0 >= feet + h) continue;");
+rep("const s = L[i]; if (!s.on || !s.cam) continue;", "const s = L[i]; if (!s.on || (!s.cam && !W.rayAll)) continue;");
+rep("  W.underRoof = (x, y, z) =>", "  W.camIn = function (p, m) { m = m || 0.2; const L = W.solids; for (let i = 0; i < L.length; i++) { const s = L[i]; if (!s.on || s.cam || s.inv) continue; if (p.x < s.x0 - m || p.x > s.x1 + m || p.z < s.z0 - m || p.z > s.z1 + m || p.y < s.y0 - m) continue; if (p.y > W.topAt(s, SC.clamp(p.x, s.x0, s.x1), SC.clamp(p.z, s.z0, s.z1)) + m) continue; return s; } return null; };\n  W.underRoof = (x, y, z) =>");
+rep("      _p.copy(cam.pivot).addScaledVector(_d, cam.dist);", "      _p.copy(cam.pivot).addScaledVector(_d, cam.dist);\n      if (W.camIn(_p) && !W.camIn(cam.pivot, 0)) { W.rayAll = 1; const d2 = W.ray(cam.pivot.x, cam.pivot.y, cam.pivot.z, _d.x, _d.y, _d.z, cam.dist + 0.3) - 0.4; W.rayAll = 0; if (d2 < cam.dist) { cam.dist = Math.max(0.9, d2); _p.copy(cam.pivot).addScaledVector(_d, cam.dist); } }");
+// a guard who has made no ground on him for a second and a half, with something solid in the way, goes round it (the Deep Array's main pipe split its floor in two)
+rep("          steer(e, tx, tz, sp, dt);", "          { const q = SC.detour(e, d, dt, playerOK); if (q) { tx = q.x; tz = q.z; sp = K.speed; } }\n          steer(e, tx, tz, sp, dt);");
+rep("  function steer(e, tx, tz, speed, dt) {", `  SC.detour = function (e, d, dt, ok) {
+    const p = SC.player.pos, K = e.K, W = SC.world, r = e.r + 0.05, A = e.enc && e.enc.arena;
+    const cut = (s, ax, az, bx, bz, m) => { const x0 = s.x0 - m, x1 = s.x1 + m, z0 = s.z0 - m, z1 = s.z1 + m; let t0 = 0, t1 = 1; const dx = bx - ax, dz = bz - az;
+      for (const [q, lo, hi, o] of [[dx, x0, x1, ax], [dz, z0, z1, az]]) { if (Math.abs(q) < 1e-6) { if (o < lo || o > hi) return -1; continue; } let a = (lo - o) / q, b = (hi - o) / q; if (a > b) { const w = a; a = b; b = w; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) return -1; } return t0; };
+    const wall = (s, y) => s.on && !s.co && !s.ramp && s.y0 < y + 1.4 && W.topAt(s, s.x0, s.z0) > y + SC.T.step + 0.05;
+    const block = (ax, az, bx, bz, y) => { let best = null, bt = 2; for (const s of W.solids) { if (!wall(s, y)) continue; const t = cut(s, ax, az, bx, bz, e.r - 0.06); if (t >= 0 && t < bt) { bt = t; best = s; } } return best; };
+    if (!ok || d < K.range + 0.6) { e.dtr = null; e.dpr = 0; return null; }
+    if (e.dtr) { const q = e.dtr; q.t -= dt; if (Math.hypot(q.x - e.pos.x, q.z - e.pos.z) < 0.6) { e.dtr = null; e.dnx = 1; } else if (q.t <= 0) e.dtr = null; else return q; }
+    if (!e.dnx) { e.dpt = (e.dpt || 0) + dt; if (e.dpt < 0.5) return null; e.dpt = 0;
+      const was = e.dpd === undefined ? d + 1 : e.dpd; e.dpd = d; if (d < was - 0.6) { e.dpr = 0; return null; }
+      e.dpr = (e.dpr || 0) + 1; if (e.dpr < 3) return null; }
+    e.dnx = 0; e.dpd = d;
+    const s = block(e.pos.x, e.pos.z, p.x, p.z, e.pos.y); if (!s) return null;
+    const m = r + 0.55; let bc = null, bs = 1e9;
+    for (const [cx, cz] of [[s.x0 - m, s.z0 - m], [s.x1 + m, s.z0 - m], [s.x0 - m, s.z1 + m], [s.x1 + m, s.z1 + m]]) {
+      if (Math.hypot(cx - e.pos.x, cz - e.pos.z) < 0.9 || (A && (cx < A[0] || cx > A[2] || cz < A[1] || cz > A[3]))) continue;
+      if (W.solids.some(o => wall(o, e.pos.y) && cx > o.x0 - r && cx < o.x1 + r && cz > o.z0 - r && cz < o.z1 + r)) continue;
+      if (block(e.pos.x, e.pos.z, cx, cz, e.pos.y)) continue;
+      const c = Math.hypot(cx - e.pos.x, cz - e.pos.z) + Math.hypot(p.x - cx, p.z - cz); if (c < bs) { bs = c; bc = [cx, cz]; } }
+    if (!bc) return null; e.dpr = 0; e.dtr = { x: bc[0], z: bc[1], t: 4 }; return e.dtr;
+  };
+  function steer(e, tx, tz, speed, dt) {`);
+
 writeFileSync(dir + 'issue.html', s);
 console.log('issue.html', (s.length / 1024).toFixed(1) + ' KB,', n, 'patches');
