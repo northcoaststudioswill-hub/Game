@@ -305,7 +305,7 @@
     SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
     SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
     SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted || !SC.input.touch ? 'WIDE OPEN. GET CLOSE AND PRESS *' + SC.btn('use') + '* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-    SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I'VE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
+    SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I HAVE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
     SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
@@ -398,7 +398,7 @@
         { img: a, area: '1 / 1 / 2 / 2', cap: 'NINE HUNDRED STEPS. AT THE TOP, A WHITE DOOR.', cap2: 'SOMEBODY WAS STANDING IN FRONT OF IT.', fx: 'UP' },
         { img: b, area: '1 / 2 / 2 / 3', cap2: '*I KNEW THE WAY HE STOOD.*' }
       ] }, () => done()); };
-    const oswinUp = e => { e.maxHp = Math.round(e.maxHp * 0.85); e.hp = e.maxHp; e.K = Object.assign({}, e.K, { speed: e.K.speed * 1.22, wind: e.K.wind * 0.78, rec: e.K.rec * 0.8, cool: [0.4, 0.9], dmg: e.K.dmg + 5 }); e.phase = 2; };
+    const oswinUp = e => { e.maxHp = Math.round(e.maxHp * 0.85); e.hp = e.maxHp; const st = !(SC.diff | 0); e.K = Object.assign({}, e.K, { speed: e.K.speed * (st ? 1.1 : 1.22), wind: e.K.wind * (st ? 0.92 : 0.78), rec: e.K.rec * (st ? 0.95 : 0.8), cool: st ? [0.7, 1.3] : [0.4, 0.9], dmg: e.K.dmg + (st ? 2 : 5) }); e.phase = 2; };   // on Story, Oswin is quicker than the Blade, not a wall
     bossIntro = function () {
       const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
       S.vossName = S.vossName || U.SPEAK.voss.name; const osw = !RIS && !!F.oswin; if (!RIS) { S.stage2 = osw; SC.SPECS.boss.face = osw ? 'oswin' : 'halfmask'; U.SPEAK.voss.name = osw ? 'OSWIN HALE' : S.vossName; }
@@ -505,7 +505,7 @@
       });
       S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[RIS ? S.cp : F.e_l2 ? 'roof' : F.e_l1 ? 'yard' : S.cp] || CROSS.alley;   /* v0.90 WORLD-B: on the Stair, to the landing of the last fight won, not a flight down if he walked past its sun */ if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
       SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted || !SC.input.touch ? 'WIDE OPEN. GET CLOSE AND PRESS *' + SC.btn('use') + '* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-      SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I'VE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
+      SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I HAVE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
       SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
       SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
       SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
@@ -1057,9 +1057,9 @@
       else if (d < 3.3 && r < 0.62) startMove(e, 'chop');
       else if (d < e.K.range + 0.6) string(e, 2);
     } else {                      // the Blade does not jump: the leg does not bend. He comes along the ground, and through the ink
-      if (d > 4.2 && d < 11 && los && r < (osw ? 0.6 : 0.45)) startMove(e, 'fleche');
+      if (d > 4.2 && d < 11 && los && r < (osw && SC.diff ? 0.6 : 0.45)) startMove(e, 'fleche');
       else if (d > 3 && p2 && !osw && r < 0.75) { e.state = 'blink'; e.st = 0; e.lp = { step: 0 }; alert(e); _a.copy(e.head); FX.word('NOTED.', _a, '#dfe6ff', 0.9); }
-      else if (d < e.K.range + 0.6) string(e, osw ? 3 : 2);
+      else if (d < e.K.range + 0.6) string(e, osw && SC.diff ? 3 : 2);
     }
     return true;
   };
