@@ -1231,7 +1231,14 @@ function poseOf(anim, t, o) {
         S_('sh' + off, -0.8, 0, sg * 0.12); S_('el' + off, -1.4); S_('wr' + off, -0.2); p.rate = 22;                     // off arm bent across in front, shielding the ball
       }
       if (anim === 'slide') { const up = o.up ? 1 : 0; p.y = -0.16; S_('hips', 0.05, 0, 0); legs(-0.6 - s * 0.16, 1.0, -0.6 + s * 0.16, 1.0, 0.36); S_('spine', 0.14); S_('chest', 0.1); S_('neck', -0.22);
-        S_('shR', up ? -2.9 : -0.35, 0, up ? -0.15 : -1.05); S_('shL', -0.35, 0, 1.05); S_('elR', up ? -0.2 : -0.45); S_('elL', -0.55); S_('wrR', up ? 0.3 : -0.4); S_('wrL', -0.4); }
+        S_('shR', up ? -2.9 : -0.35, 0, up ? -0.15 : -1.05); S_('shL', -0.35, 0, 1.05); S_('elR', up ? -0.2 : -0.45); S_('elL', -0.55); S_('wrR', up ? 0.3 : -0.4); S_('wrL', -0.4);
+        // the hands the right stick picked: both high (a wall), one high with the other low for the drive, or both low and digging
+        const hs = o.hs, w = Math.sin((o.ph || 0) * 2) * 0.12;      /* the hands stay alive, small stabs with the slide */
+        if (hs === 'B') { S_('shR', -2.85, 0, -0.2); S_('shL', -2.85, 0, 0.2); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', 0.3); S_('wrL', 0.3); S_('neck', -0.3); }
+        else if (hs === 'R' || hs === 'L') { const h = hs, l = h === 'R' ? 'L' : 'R', sg = h === 'R' ? -1 : 1;
+          S_('sh' + h, -2.9 + w * 0.5, 0, sg * 0.3); S_('el' + h, -0.15); S_('wr' + h, 0.35); S_('sh' + l, -0.55 + w, 0, -sg * 0.95); S_('el' + l, -0.4); S_('wr' + l, -0.35); S_('chest', 0.1, -sg * 0.12, 0); }
+        else if (hs === 'lowR' || hs === 'lowL') { const h = hs.slice(3), l = h === 'R' ? 'L' : 'R', sg = h === 'R' ? -1 : 1; p.y = -0.2; S_('spine', 0.3); S_('neck', -0.35);
+          S_('sh' + h, -1.0 + w * 1.5, 0, sg * 0.25); S_('el' + h, -0.2); S_('wr' + h, -0.5); S_('sh' + l, -0.75 - w, 0, -sg * 0.55); S_('el' + l, -0.35); S_('wr' + l, -0.4); S_('chest', 0.15, -sg * 0.18, 0); } }
       break;
     }
     case 'shoot': case 'fake': {
