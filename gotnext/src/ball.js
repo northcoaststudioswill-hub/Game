@@ -36,20 +36,21 @@ function startMatch(cfg) {
   baseLights(scene, arcade ? 0xc8a8ff : 0xdde8ff, arcade ? 0x301850 : 0x404858, arcade ? 0xffd0ff : 0xfff0d8, arcade ? 1.7 : 1.5);
   const g = M(new THREE.PlaneGeometry(300, 300), toon(arcade ? '#0c0618' : '#20242c'), 0, -0.02, 0, scene); g.rotation.x = -Math.PI / 2;
   MT.hoop = dressCourt(scene, cfg, style);      /* courts.js: tier-painted park courts, the RUCKUS arcade, power-ups */
-  addFence(scene, -8.6, 8.6, -2.6, 13.6, 4.2, arcade ? 0xff8ff0 : 0xffffff);
+  const lot = style === 'backlot';      /* the back lot on the Block (courts.js): its own walls, no fence, no stock billboards */
+  if (!lot) addFence(scene, -8.6, 8.6, -2.6, 13.6, 4.2, arcade ? 0xff8ff0 : 0xffffff);
   skyline(scene, 34, 60, arcade ? ['#ff4fd8', '#33e0ff', '#ffc531'] : ['#ffc531', '#ffe9a8', '#33e0ff'], 30);
-  billboard(scene, ADS[(MT.cfg.seed || 0) % ADS.length], -13, 7, -6, 0.5, 9, 5);
-  billboard(scene, ADS[((MT.cfg.seed || 0) + 3) % ADS.length], 13, 7.5, -7, -0.5, 9, 5);
-  billboard(scene, arcade ? 'RUCKUS\nNO RULES\nNO REFUNDS' : (cfg.practice ? (cfg.practice === 'drill' ? (cfg.court === 'street' ? 'THE BLOCK\nPRACTICE' : 'HOME COURT\nPRACTICE') : cfg.practice === 'rack' ? 'MONEY RACK' : 'HOME COURT') : (cfg.mode.id === '1v1' ? 'THE LADDER\nONES' : 'THE CAGES\n' + cfg.tier.n)), 0, 9.5, -9, 0, 12, 4.5, arcade ? '#ff4fd8' : '#ffc531');
+  if (!lot) billboard(scene, ADS[(MT.cfg.seed || 0) % ADS.length], -13, 7, -6, 0.5, 9, 5);
+  if (!lot) billboard(scene, ADS[((MT.cfg.seed || 0) + 3) % ADS.length], 13, 7.5, -7, -0.5, 9, 5);
+  if (!lot) billboard(scene, arcade ? 'RUCKUS\nNO RULES\nNO REFUNDS' : (cfg.practice ? (cfg.practice === 'drill' ? (cfg.court === 'street' ? 'THE BLOCK\nPRACTICE' : 'HOME COURT\nPRACTICE') : cfg.practice === 'rack' ? 'MONEY RACK' : 'HOME COURT') : (cfg.mode.id === '1v1' ? 'THE LADDER\nONES' : 'THE CAGES\n' + cfg.tier.n)), 0, 9.5, -9, 0, 12, 4.5, arcade ? '#ff4fd8' : '#ffc531');
   // spectators behind the baseline fence
   MT.fans = [];
   // atmosphere: four light poles over the court, light pooled on the ground, the day's weather, paper in the wind
   ambInit();
-  for (const [lx, lz] of [[-9.4, -2.2], [9.4, -2.2], [-9.4, 13], [9.4, 13]]) {
+  if (!lot) for (const [lx, lz] of [[-9.4, -2.2], [9.4, -2.2], [-9.4, 13], [9.4, 13]]) {
     M(cyl(0.1, 0.13, 8.5, 6), toon('#2a2c33'), lx, 4.25, lz, scene); const hx = lx * 0.93, hz = lz < 0 ? lz + 0.3 : lz - 0.3; M(box(1.2, 0.4, 0.5), toon('#2a2c33'), hx, 8.6, hz, scene);
     glow(hx, 8.45, hz, arcade ? 0xffb8f0 : 0xfff2dc, 4, null, 0.85); beam(hx, 8.4, hz, lx * 0.45, 0, lz < 0 ? 2 : 8, arcade ? 0xffb8f0 : 0xfff2c8, 3.2, 0.05, 8); pool(lx * 0.5, lz < 0 ? 1.5 : 9, arcade ? 0xff8ff0 : 0xffe9c0, 7, 7, 0.16);
   }
-  if (style === 'street' || style === 'arcade') { weather(); litter(6, -8, 8, -1, 12); skyLife(60, arcade ? 'RUCKUS · NO RULES · NO REFUNDS' : 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); }
+  if (style === 'street' || style === 'arcade' || lot) { weather(); litter(6, -8, 8, -1, 12); skyLife(60, arcade ? 'RUCKUS · NO RULES · NO REFUNDS' : 'BASKETBALL 2146 · PRE-ORDER YOUR KNEES'); }
   if (!cfg.practice) crowdInit();      /* courts.js: people along the baseline and both sidelines */
   // --- players ---
   { const used = new Set(); cfg.teams.forEach(team => team.forEach(sp => { if (sp.ctrl < 0 && !sp.b.bot && sp.b.net === undefined && !sp.b.keepLook) uniqLook(sp.b, used, 3); else used.add([sp.b.worn.hair, sp.b.worn.top, sp.b.worn.bottom, sp.b.build.skin].join('|')); })); }      /* no two AI players dressed alike */
@@ -275,6 +276,7 @@ function releaseShot(p) {
   }
   { const u = MT.me; if (u && u.team !== p.team && !p.user && c >= 0.4 && dist(u, p) < 2.2 && (u.st === 'jump' || u.handsUp)) floatTxt(u, c >= 0.6 ? 'SMOTHERED' : 'GOOD CONTEST', c >= 0.6 ? '#33e0ff' : '#9fe6ff'); }      /* your defense, said out loud */
   const make = Math.random() < prob; p.stats.fga++;
+  if (typeof vipShot === 'function') vipShot(p, { kind, c, make, green, step: !!p.stepJ, fade: !!s.fade, flo: !!s.floater, cs: p.catchT !== undefined && MT.time - p.catchT < 1.2 });      /* Sharpie's book (vip.js) */
   const pts = MT.arcade ? (kind === 'three' ? 3 : 2) : (kind === 'three' ? 2 : 1);
   handPos(p.rig, 'R', B.pos); B.pos.y += 0.12;
   launch(p, make, pts, green && make && c < 0.4, s.floater ? 1.5 : s.j.arc, kind);
@@ -310,6 +312,7 @@ function launch(p, make, pts, green, arc, kind) {
   B.vel.set((ex - B.pos.x) / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, (ez - B.pos.z) / B.T);
 }
 function blocked(p, o) {
+  if (typeof vipBlocked === 'function') vipBlocked(p);
   const B = MT.B; p.stats.fga++; o.stats.blk++; o.swatT = 0.45; MT.hoopT = 0.2; B.state = 'loose'; B.holder = null; B.shooter = null; B.lastTeam = o.team; B.t = 0; MT.looseT = 0;
   handPos(p.rig, 'R', B.pos); const a = Math.atan2(p.x - o.x, p.z - o.z) + rnd(-0.8, 0.8); B.vel.set(Math.sin(a) * rnd(3, 6), rnd(1, 3), Math.cos(a) * rnd(3, 6));
   if (p.st === 'finish') highlight('swat', o, p); say(o, 'd');
@@ -419,7 +422,8 @@ function resolveFinish(p) {
   if (f.type === 'dunk') {
     const ds = DUNK[f.style] || DUNKS[0];
     const prob = 0.74 + nAtt(p, 'dunk') * 0.24 + ds.bonus + 0.04 * bt(p, 'gravity') + put - c * 0.5 + (MT.arcade ? 0.15 : 0) + (p.fire ? 0.3 : 0);
-    if (Math.random() < prob) {
+    const dk = Math.random() < prob; if (typeof vipFin === 'function') vipFin(p, 'dunk', dk, c);
+    if (dk) {
       B.state = 'through'; B.holder = null; B.pos.set(0, HOOP_Y - 0.05, 0); B.vel.set(0, -5, 0); B.t = 0; B.scored = true;
       p.stats.dunks++; sfxM('dunk'); MT.shake = 0.45; MT.slow = 0.35; burst(0, 3, 0, 0xffc531, 14);
       let vic = f.hit && f.hit.st !== 'stagger' && dist(f.hit, p) < 1.6 ? f.hit : null; if (!vic) for (const o of MT.P) if (o.team !== p.team && o.st !== 'stagger' && dist(o, p) < 1.25) vic = o;
@@ -433,7 +437,8 @@ function resolveFinish(p) {
   }
   const kAdj = { under: -0.04, over: -0.03, quick: -0.03, spin: -0.05, finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
   const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj + px(p, 'fin') + px(p, 'close') + (f.postFin || 0) - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
-  handPos(p.rig, f.bh || 'R', B.pos); launch(p, Math.random() < prob, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
+  const lk = Math.random() < prob; if (typeof vipFin === 'function') vipFin(p, f.kind || 'lay', lk, c);
+  handPos(p.rig, f.bh || 'R', B.pos); launch(p, lk, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
 }
 function startMove(p, slot, dx, dz) {
@@ -441,6 +446,7 @@ function startMove(p, slot, dx, dz) {
   const mv = packMove(p, slot) || MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot);
   if (mv.keep) { dx *= 0.45; dz = -0.9; }            /* in-and-out: the fake goes sideways, the burst goes forward */ const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
+  if (typeof vipMove === 'function') vipMove(p, mv.id);
   p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
   p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh'); sfx('squeak');
   // the same move the same way, again and again, gets read; mixing them up builds a combo
@@ -955,8 +961,9 @@ function aiThink(p, dt) {
 function matchStep(dtReal) {
   const M_ = MT; if (!M_ || (M_.paused && !M_.net)) return; if (M_.replay) return replayStep(dtReal);
   if (M_.net === 'guest') return netGuestStep(dtReal);
+  if (M_.cfg.lot && IN[0].aP && !M_.over && M_.me) { M_.cfg.lot.at = [M_.me.x, M_.me.z, M_.me.face]; M_.over = true; quitMatch(); return; }      /* the back lot: A puts the ball down, you are back on the Block where you stand */
   let dt = dtReal; if (M_.slow > 0) { M_.slow -= dtReal; dt *= 0.35; }
-  M_.time += dt; const B = M_.B; hlStep(dtReal); bubStep(dtReal);
+  M_.time += dt; const B = M_.B; hlStep(dtReal); bubStep(dtReal); if (M_.me && typeof vipTick === 'function') vipTick(M_.me);
   // phases
   if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
   if (!M_.introDone && M_.phase === 'check' && M_.pt < 1.5 && !M_.practice && !M_.drill) { M_.introDone = true; for (const q of M_.P) if (q.team !== M_.me.team) floatTxt(q, (q === M_.me.man ? 'YOUR MAN · ' : '') + 'OVR ' + ovrOf(q.A) + (q.pers && q.pers[0] ? ' · ' + q.pers[0].n : ''), q === M_.me.man ? '#f2c14e' : '#ece9e2'); }      /* who you are up against */
@@ -1558,6 +1565,7 @@ function matchCam(dt) {
 }
 
 function endMatch() {
+  if (MT && !MT.practice && !MT.drill && typeof vipGame === 'function') vipGame();
   const M_ = MT, me = M_.me, cfg = M_.cfg; hlEnd(); bubClear();
   hudShow(false);
   const res = { practice: M_.practice, drill: M_.drill ? { id: M_.drill.id, score: M_.drill.score } : null, rack: M_.rackScore, win: M_.score[0] > M_.score[1], score: M_.score.slice(), stats: me.stats, mode: cfg.mode, tier: cfg.tier, bonusRep: M_.bonusRep || 0, shutout: M_.score[1] === 0 && M_.score[0] > 0, box: M_.P.map(p => ({ n: p.b.name, team: p.team, user: p.user, s: p.stats })) };

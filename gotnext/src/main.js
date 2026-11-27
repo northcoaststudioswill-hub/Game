@@ -116,7 +116,8 @@ function finishGame(res, m, tier, st, cfg) {
   if (pts.length) setTimeout(() => { toast('STREET SMARTS', pts.join(' · '), 'ach'); sfx('unlock'); }, 1600);
   uiResults(res, { vc, rep, bxp: bx, pts, notes }, st ? () => launchGame(m, tier, st) : null);
 }
-function afterPractice(res, back) {
+function afterPractice(res, back, lot) {
+  if (back === 'lot') { const at = lot && lot.at, [x, z] = at ? lotToWorld(at[0], at[1]) : [LOT.hx - 5.6, LOT.hz - 0.6]; enterWorld('hub', clamp(x, -14, 14), clamp(z, 3.5, 18.4), at ? at[2] - Math.PI : Math.PI); return; }      /* off the lot: where you stood, facing the way you faced */
   if (back === 'hub') enterWorld('hub', 6.4, 7.4, 0.7); else enterWorld('crib', 0, 9, Math.PI);
   if (res.practice === 'rack' && !res.quit) {
     const pay = res.rack * 5; S.vc += pay; S.life.bestRack = Math.max(S.life.bestRack || 0, res.rack); save(); checkAch();

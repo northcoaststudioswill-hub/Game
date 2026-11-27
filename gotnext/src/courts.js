@@ -221,6 +221,7 @@ function courtFx(dt) {
 // set the court up for a match (called from startMatch); returns the hoop
 function dressCourt(sc, cfg, style) {
   const hoopTier = cfg.hoopTier === undefined ? 2 : cfg.hoopTier;
+  if (style === 'backlot') return backlotDressing(sc, cfg);
   if (style === 'arcade') { const fl = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), new THREE.MeshBasicMaterial({ map: arcadeCourtTex() })); fl.rotation.x = -Math.PI / 2; fl.position.set(0, 0, 6); sc.add(fl);
     const h = hoopMesh(hoopTier, 'arcade'); sc.add(h); arcadeDressing(sc); if (!cfg.practice) puInit(); return h; }
   if (style === 'street' && !cfg.practice) { const ti = tierIndex(cfg); const fl = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), new THREE.MeshToonMaterial({ map: parkCourtTex(ti), gradientMap: ramp() })); fl.rotation.x = -Math.PI / 2; fl.position.set(0, 0, 6); sc.add(fl);
@@ -282,4 +283,53 @@ function crowdStep(dt) {
     if (kind !== 'phone' && kind !== 'talk') { let a = Math.atan2(bx - f.x, bz - f.z) - f.face; a = Math.atan2(Math.sin(a), Math.cos(a)); a = clamp(a, -1.1, 1.1); const n = P.neck || (P.neck = [0, 0, 0]); n[1] += a * 0.6; const c = P.chest || (P.chest = [0, 0, 0]); c[1] += a * 0.25; }      /* eyes on the ball */
     applyPose(f.r, P, dt);
   }
+}
+
+// ---------------- the back lot ----------------
+// The street behind the tracks on the Block, painted as a half court with the hoop against the RUN IT BACK wall. The
+// same painted court is laid on the Block (hub.js) and on the practice court you play on when you pick up a ball there
+// (startPractice('lot')), so walking onto it and picking up a ball looks like the same place. Drawn with the hoop at the
+// top: 13.9 m across, from 1.3 m behind the rim to 7.4 m in front of it.
+const LOT = { hx: 2, hz: 17.6, w: 13.9, d0: -1.3, d1: 7.4 };      /* the rim on the Block (it faces -z there) */
+function lotToMatch(x, z) { return [LOT.hx - x, LOT.hz - z]; }      /* the Block to the practice court (the hoop at the origin facing +z) */
+function lotToWorld(x, z) { return [LOT.hx - x, LOT.hz - z]; }
+function lotCourtTex() {
+  return geoTex('lotCourt', () => canvasTex(1024, 640, (x, W_, H_) => {
+    const u = W_ / LOT.w, X = v => W_ / 2 + v * u, Z = d => (d - LOT.d0) * u;      /* d: metres in front of the rim */
+    x.fillStyle = '#26272d'; x.fillRect(0, 0, W_, H_);
+    for (let i = 0; i < 900; i++) { x.fillStyle = `rgba(${Math.random() < 0.5 ? '0,0,0' : '255,255,255'},${0.02 + Math.random() * 0.04})`; x.fillRect(Math.random() * W_, Math.random() * H_, 2 + Math.random() * 16, 2 + Math.random() * 4); }
+    x.fillStyle = 'rgba(14,42,42,.85)'; x.fillRect(X(-2.45), Z(-1.2), 4.9 * u, 5.8 * u);      /* the lane, in the RUN IT BACK teal */
+    x.strokeStyle = 'rgba(236,233,226,.86)'; x.lineWidth = 6;
+    x.beginPath(); x.moveTo(0, Z(-1.2)); x.lineTo(W_, Z(-1.2)); x.stroke();      /* baseline */
+    x.strokeRect(X(-2.45), Z(-1.2), 4.9 * u, 5.8 * u);
+    x.beginPath(); x.arc(X(0), Z(4.6), 1.8 * u, 0, Math.PI); x.stroke(); x.setLineDash([16, 14]); x.beginPath(); x.arc(X(0), Z(4.6), 1.8 * u, Math.PI, Math.PI * 2); x.stroke(); x.setLineDash([]);
+    x.beginPath(); x.arc(X(0), Z(0), 1.25 * u, 0, Math.PI); x.stroke();      /* restricted area */
+    const cx = 6.6, cd = Math.sqrt(6.75 * 6.75 - cx * cx); x.beginPath(); x.moveTo(X(-cx), Z(-1.2)); x.lineTo(X(-cx), Z(cd)); x.arc(X(0), Z(0), 6.75 * u, Math.PI - Math.asin(cd / 6.75), Math.asin(cd / 6.75), true); x.lineTo(X(cx), Z(-1.2)); x.stroke();
+    x.save(); x.translate(X(0), Z(6.6)); x.textAlign = 'center'; x.font = '900 46px Archivo, Impact, sans-serif'; x.fillStyle = 'rgba(242,193,78,.75)'; x.fillText('THE BACK LOT', 0, 0); x.restore();
+    x.fillStyle = 'rgba(236,233,226,.5)'; x.font = '700 18px "JetBrains Mono", monospace'; x.textAlign = 'left'; x.fillText('SHARPIE KEEPS THE BOOK', X(3.1), Z(-0.6));
+  }));
+}
+function lotCourtMesh(sc, onBlock) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(LOT.w, LOT.d1 - LOT.d0), new THREE.MeshToonMaterial({ map: lotCourtTex(), gradientMap: ramp() }));
+  const dc = (LOT.d0 + LOT.d1) / 2; if (onBlock) { m.rotation.set(-Math.PI / 2, 0, Math.PI); m.position.set(LOT.hx, 0.016, LOT.hz - dc); } else { m.rotation.x = -Math.PI / 2; m.position.set(0, 0.012, dc); }
+  sc.add(m); return m;
+}
+// the practice court for the lot: the RUN IT BACK wall and its murals behind the hoop, the parked cars, the curb and the
+// crossing, brick on both sides, lights strung over it. Everything placed where it stands on the Block.
+function backlotDressing(sc, cfg) {
+  const P = (x, z) => lotToMatch(x, z);
+  lotCourtMesh(sc, false);
+  const h = hoopMesh(cfg.hoopTier === undefined ? 1 : cfg.hoopTier, 'street'); sc.add(h);
+  { const [wx, wz] = P(0, 19.4); ink(M(box(40, 6, 0.6), brickMat('#55413a', 40, 6), wx, 3, wz, sc), 1.01); }
+  for (const [t, x, cols] of [['BALL\nIS LIFE', -10, ['#1a1030', '#ff2d78', '#7de3ff', '#fff3b0', '#ffffff']], ['RUN IT\nBACK', 1, ['#0e2a2a', '#f2c14e', '#ff6a3d', '#ffffff', '#08080a']], ['WHO GOT\nNEXT', 12, ['#141418', '#ff2d78', '#a78bff', '#ece9e2', '#08080a']]]) { const [mx, mz] = P(x, 19.05); mural(t, 8.5, 4.4, cols, mx, 3.1, mz, 0); }
+  for (const [cx, cz, cc] of [[-12, 15.6, '#ff2d78'], [12.6, 16.0, '#ece9e2']]) { const [x, z] = P(cx, cz), c = grp(sc, x, 0.75, z); c.rotation.y = Math.PI; ink(M(box(4.4, 0.8, 1.9), toon(cc), 0, 0, 0, c), 1.04); ink(M(box(2.3, 0.6, 1.7), toon('#16181c'), -0.2, 0.65, 0, c), 1.04); M(box(4.0, 0.1, 1.7), flat(0x7de3ff), 0, -0.5, 0, c); for (const sx of [-1.4, 1.4]) for (const sz of [-0.95, 0.95]) M(cyl(0.34, 0.34, 0.25, 10), toon('#16181c'), sx, -0.42, sz, c).rotation.x = Math.PI / 2; }
+  for (const [x0, x1] of [[-17, -5.2], [9.2, 17]]) { const [a] = P(x0, 0), [b] = P(x1, 0), [, z] = P(0, 12.1); M(box(Math.abs(a - b), 0.22, 0.5), toon('#8a8378'), (a + b) / 2, 0.11, z, sc); }
+  for (const sx of [15.1, -15.1]) { const [x, z0] = P(sx, 19.1), [, z1] = P(sx, -2); ink(M(box(0.6, 7, Math.abs(z1 - z0)), brickMat('#4a3c38', Math.abs(z1 - z0), 7), x, 3.5, (z0 + z1) / 2, sc), 1.01); }
+  // the crate of balls by the hoop, and the lights strung over the lot
+  { const [x, z] = P(-3.8, 18.3); ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), x, 0.45, z, sc), 1.04); for (let i = 0; i < 3; i++) { const b = makeBall(['bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(x - 0.35 + i * 0.35, 1.03, z); sc.add(b); } }
+  for (const zz of [12.6, 15.8]) for (let i = 0; i < 12; i++) { const [x, z] = P(-9 + i * 1.7, zz); M(sph(0.07, 6, 5), flat([0xffe9a8, 0xff2d78, 0x7de3ff][i % 3]), x, 4.4 - Math.sin(i / 11 * Math.PI) * 0.6, z, sc); }
+  for (const [lx, lz] of [[-5.5, 16], [9.5, 16], [2, 11]]) { const [x, z] = P(lx, lz); pool(x, z, 0xffe9c0, 7, 7, 0.14); }
+  { const [x, z] = P(-14.2, 18.4); M(cyl(0.1, 0.13, 6, 6), toon('#2a2c33'), x, 3, z, sc); glow(x, 6, z, 0xfff2dc, 3, null, 0.8); }
+  { const [x, z] = P(14.2, 18.4); M(cyl(0.1, 0.13, 6, 6), toon('#2a2c33'), x, 3, z, sc); glow(x, 6, z, 0xfff2dc, 3, null, 0.8); }
+  return h;
 }

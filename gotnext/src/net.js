@@ -138,7 +138,6 @@ function netPublish(force) {
   const bj = JSON.stringify(packBuild(myBuild())); if (bj !== P.bj) { P.bj = bj; patch.b = JSON.parse(bj); patch.o = ovrOf(S.attrs); patch.r = rankOf(S.rep); }
   if (w !== P.w) { P.w = w; patch.w = w; }
   if (me && (Math.abs(me.x - (P.x || 0)) > 0.04 || Math.abs(me.z - (P.z || 0)) > 0.04 || Math.abs(me.face - (P.f || 0)) > 0.05)) { P.x = me.x; P.z = me.z; P.f = me.face; patch.x = r2(me.x); patch.z = r2(me.z); patch.f = r2(me.face); }
-  if (W && typeof saPresence === 'function') saPresence(patch, P);      /* the shootaround: holding a ball, your last shot */
   if (Object.keys(patch).length) { NET.pubT = now; NET.room.presence(patch).catch(() => { }); }
 }
 function netInvite(peer, m, tierIdx, kind) {
@@ -169,12 +168,11 @@ function netWorldStep(dt) {
     g.x += (tx - g.x) * k; g.z += (tz - g.z) * k; g.f = lerpAng(g.f, +pr.f || 0, k);
     const v = Math.hypot(g.x - ox, g.z - oz) / Math.max(dt, 0.001); g.ph += dt * (4 + v * 1.6);
     const em = typeof pr.em === 'string' && EMOTES[pr.em] ? EMOTES[pr.em] : null;
-    if (typeof saPeer === 'function' && saPeer(g, pr, dt)) { }
-    else if (em && v < 0.3) { g.rig.root.position.set(g.x, em.y || 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, emotePose(em, g.rig, W.t, 'flex'), dt); g.rig.gait = null; }
+    if (em && v < 0.3) { g.rig.root.position.set(g.x, em.y || 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, emotePose(em, g.rig, W.t, 'flex'), dt); g.rig.gait = null; }
     else locoAnim(g.rig, g.x, g.z, g.f, dt);
     if (pr.say && typeof pr.say.t === 'string' && pr.say.i !== g.sayI) { bubble(g.rig.root, pr.say.t.replace(/[<>]/g, '').slice(0, 60), 5, g.rig.H + 0.45, 'net'); g.sayI = pr.say.i; }
   }
-  for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); if (typeof saPeerGone === 'function') saPeerGone(rigs[k]); delete rigs[k]; }
+  for (const k in rigs) if (!seen[k]) { scene.remove(rigs[k].rig.root); delete rigs[k]; }
   // hanging out at a crib with someone online for a minute: +15 Respect once a day, for each of you
   if ((W.kind === 'crib' || W.kind === 'room') && Object.keys(seen).length) { W.hangT = (W.hangT || 0) + dt; const H = home(); if (W.hangT >= 60 && H.hang !== today) { H.hang = today; gainRep(15); save(); toast('HUNG OUT', '+15 Respect. Good company counts.', 'ach'); } }
 }

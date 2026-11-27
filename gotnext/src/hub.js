@@ -168,10 +168,6 @@ function buildHub() {
     // the key and arc run out of the cage gate, like the court spilled onto the block
     x.fillStyle = 'rgba(255,45,120,.5)'; x.fillRect(X(-2.45), Z(-12), 4.9 * u, 6.2 * u);
     x.strokeStyle = '#ece9e2'; x.lineWidth = 6; x.strokeRect(X(-2.45), Z(-12), 4.9 * u, 6.2 * u); x.beginPath(); x.arc(X(0), Z(-5.8), 1.8 * u, 0, 6.3); x.stroke(); x.beginPath(); x.arc(X(0), Z(-12), 9 * u, 0.12, Math.PI - 0.12); x.stroke();
-    // the shootaround's corner under Sharpie's hoop: a short lane, a free-throw circle, the word on the ground
-    x.fillStyle = 'rgba(125,227,255,.14)'; x.fillRect(X(6.37), Z(6.0), 3.66 * u, 5.2 * u); x.strokeStyle = 'rgba(236,233,226,.78)'; x.lineWidth = 5; x.strokeRect(X(6.37), Z(6.0), 3.66 * u, 5.2 * u);
-    x.beginPath(); x.arc(X(8.2), Z(6.0), 1.8 * u, Math.PI, Math.PI * 2); x.stroke(); x.setLineDash([14, 12]); x.beginPath(); x.arc(X(8.2), Z(6.0), 1.8 * u, 0, Math.PI); x.stroke(); x.setLineDash([]);
-    x.save(); x.translate(X(8.2), Z(3.7)); x.textAlign = 'center'; x.font = '900 30px Archivo, Impact, sans-serif'; x.fillStyle = 'rgba(125,227,255,.7)'; x.fillText('SHOOTAROUND', 0, 0); x.restore();
     x.save(); x.translate(X(0), Z(6.4)); x.transform(1, 0, -0.14, 1, 0, 0); x.textAlign = 'center'; x.font = '900 expanded 84px Archivo, Impact, sans-serif'; x.fillStyle = 'rgba(236,233,226,.8)'; x.fillText(BRAND.a, -14, -6); x.fillStyle = 'rgba(255,45,120,.85)'; x.fillText(BRAND.b, 20, 68); x.restore();
     x.fillStyle = 'rgba(236,233,226,.75)'; for (let i = 0; i < 12; i++) x.fillRect(X(-9 + i * 1.6), Z(11.2), 0.8 * u, 2.2 * u);
     x.font = '500 22px "JetBrains Mono", monospace'; x.fillStyle = 'rgba(242,193,78,.8)'; x.save(); x.translate(X(-9), Z(-1)); x.rotate(-0.3); x.fillText('WINNERS STAY →', 0, 0); x.restore(); x.save(); x.translate(X(6), Z(-2.5)); x.rotate(0.2); x.fillText('NO REFS. NO MERCY.', 0, 0); x.restore();
@@ -223,8 +219,8 @@ function buildHub() {
   M(box(2.2, 0.08, 0.3), toon('#b9bec7'), 0, 1.55, 0, bx); W.eq = []; for (let i = 0; i < 7; i++) W.eq.push(M(box(0.08, 0.3, 0.02), flat([0x3dffa0, 0xf2c14e, 0xff2d78][i % 3]), -0.3 + i * 0.1, 1.15, 0.36, bx)); solid(13.2, 15, 8.4, 10.8);
   for (let i = 0; i < 2; i++) { const b = aiBuild(80, 'showman'); b.worn = randomWorn(3); addNpc(b, 11.6 + i * 1.3, 9.2 - i * 1.4, -1.6 - i * 0.6, 'dance'); }
   // south wall: murals, and the way to the rest of the city (not open yet)
-  ink(M(box(40, 6, 0.6), brickMat('#55413a', 40, 6), 0, 3, 19.4, scene), 1.01); M(box(34, 0.22, 0.5), toon('#8a8378'), 0, 0.11, 12.1, scene);
-  for (const [cx, cz, cc, cr] of [[-5, 15.6, '#ff2d78', 0.08], [7.5, 16.2, '#ece9e2', -0.05]]) { const c = grp(scene, cx, 0.75, cz); c.rotation.y = cr; ink(M(box(4.4, 0.8, 1.9), toon(cc), 0, 0, 0, c), 1.04); ink(M(box(2.3, 0.6, 1.7), toon('#16181c'), -0.2, 0.65, 0, c), 1.04); M(box(4.0, 0.1, 1.7), flat(0x7de3ff), 0, -0.5, 0, c); M(box(0.1, 0.25, 1.5), flat(0xff2d78), -2.22, 0.1, 0, c); M(box(0.1, 0.25, 1.5), flat(0xfff2c8), 2.22, 0.1, 0, c); }
+  ink(M(box(40, 6, 0.6), brickMat('#55413a', 40, 6), 0, 3, 19.4, scene), 1.01); for (const [x0, x1] of [[-17, -5.2], [9.2, 17]]) M(box(x1 - x0, 0.22, 0.5), toon('#8a8378'), (x0 + x1) / 2, 0.11, 12.1, scene);      /* the curb, open where the lot's court runs through */
+  for (const [cx, cz, cc, cr] of [[-12, 15.6, '#ff2d78', 0.04], [12.6, 16.0, '#ece9e2', -0.03]]) { solid(cx - 2.3, cx + 2.3, cz - 1.0, cz + 1.0); const c = grp(scene, cx, 0.75, cz); c.rotation.y = cr; ink(M(box(4.4, 0.8, 1.9), toon(cc), 0, 0, 0, c), 1.04); ink(M(box(2.3, 0.6, 1.7), toon('#16181c'), -0.2, 0.65, 0, c), 1.04); M(box(4.0, 0.1, 1.7), flat(0x7de3ff), 0, -0.5, 0, c); M(box(0.1, 0.25, 1.5), flat(0xff2d78), -2.22, 0.1, 0, c); M(box(0.1, 0.25, 1.5), flat(0xfff2c8), 2.22, 0.1, 0, c); }
   mural('BALL\nIS LIFE', 8.5, 4.4, ['#1a1030', '#ff2d78', '#7de3ff', '#fff3b0', '#ffffff'], -10, 3.1, 19.05, Math.PI);
   mural('RUN IT\nBACK', 8.5, 4.4, ['#0e2a2a', '#f2c14e', '#ff6a3d', '#ffffff', '#08080a'], 1, 3.1, 19.05, Math.PI);
   mural('WHO GOT\nNEXT', 8.5, 4.6, ['#141418', '#ff2d78', '#a78bff', '#ece9e2', '#08080a'], 12, 3.1, 19.05, Math.PI);
@@ -240,11 +236,14 @@ function buildHub() {
   const stt = makeRig(stb, true); const gold = toon('#f2c14e'); stt.root.traverse(o => { if (o.isMesh && o.material !== INK) o.material = gold; }); stt.shadow.visible = false;
   stt.root.position.set(0, 1.35, 1.6); stt.root.scale.setScalar(1.25); stt.root.rotation.y = 0.5; scene.add(stt.root); applyPose(stt, poseOf('dunk', 0, { u: 0.5, style: 'tomahawk' }), 10);
   const pl = sign('THE FREEDOM EAGLE · "HE DUNKED SO YOU COULD SCROLL"', 2.6, 0.28, '#f2c14e', '#16181c', { border: false }); pl.position.set(0, 0.5, 3.12); scene.add(pl);
-  // Money Rack: a side hoop and a man with a marker
-  const h2 = hoopMesh(1, 'street'); h2.position.set(8.2, 0, 10.6); h2.rotation.y = Math.PI; scene.add(h2); solid(7.6, 8.8, 11.6, 12.4);
-  const hb = aiBuild(75, 'sniper'); hb.name = 'Sharpie'; addNpc(hb, 6.3, 9.6, 2.4, 'idle'); spot(7.2, 8.4, 2.0, 'SHARPIE (Money Rack · H-O-R-S-E)', () => uiRack());
-  ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), 5.2, 0.45, 11.6, scene), 1.04); const rackB = []; for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(4.75 + i * 0.3, 1.03, 11.6); scene.add(b); rackB.push(b); }
-  if (typeof saInit === 'function') saInit({ x: 8.2, z: 10.6, dz: -1 }, { x: 5.2, z: 11.6 }, rackB);      /* the shootaround (shootaround.js): grab a ball off the crate and shoot at Sharpie's hoop */
+  // THE BACK LOT: the street behind the tracks is a half court now, the hoop against the RUN IT BACK wall (courts.js
+  // LOT). Pick up a ball off the crate and you are on it with every move in the game; Ⓐ puts it down. Sharpie keeps
+  // the book on you from the sideline: Money Rack, H-O-R-S-E, and what you do in every game you play.
+  lotCourtMesh(scene, true); { const h2 = hoopMesh(1, 'street'); h2.position.set(LOT.hx, 0, LOT.hz); h2.rotation.y = Math.PI; scene.add(h2); solid(LOT.hx - 0.4, LOT.hx + 0.4, LOT.hz + 0.9, LOT.hz + 1.6); }
+  ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), -3.8, 0.45, 18.3, scene), 1.04); for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(-4.25 + i * 0.3, 1.03, 18.3); scene.add(b); } solid(-4.5, -3.1, 18.0, 18.6);
+  spot(-3.6, 17.2, 1.8, 'THE BACK LOT · pick up a ball', () => startPractice('lot'));
+  const hb = aiBuild(75, 'sniper'); hb.name = 'Sharpie'; addNpc(hb, 9.6, 14.2, -1.9, 'idle'); spot(9.0, 13.6, 2.0, "SHARPIE (your book · Money Rack · H-O-R-S-E)", () => uiRack());
+  for (const zz of [12.6, 15.8]) for (let i = 0; i < 12; i++) M(sph(0.07, 6, 5), flat([0xffe9a8, 0xff2d78, 0x7de3ff][i % 3]), -9 + i * 1.7, 4.4 - Math.sin(i / 11 * Math.PI) * 0.6, zz, scene);
   // the old head, his bench, his crates
   ink(M(box(2.4, 0.12, 0.6), toon('#7a5a3a'), -8, 0.5, -3.2, scene), 1.05); M(box(0.12, 0.5, 0.5), toon('#20242c'), -9, 0.25, -3.2, scene); M(box(0.12, 0.5, 0.5), toon('#20242c'), -7, 0.25, -3.2, scene); solid(-9.4, -6.6, -3.7, -2.7);
   const ob = aiBuild(60, 'general'); ob.worn.hair = 'h_bald'; ob.worn.head = 'hd_band'; ob.worn.face = 'f_goggles'; addNpc(ob, -8, -3.12, 0.5, 'sit');
@@ -295,7 +294,7 @@ function buildHub() {
   guideInit();      /* guide.js: Walk-On meets a new player and takes them to Coach */
   npcSpace();
   chatter(W.npcs, n => n.bum ? CHAT.fiend : n.talk ? CHAT[n.talk] : n.anim === 'dance' ? CHAT.dance : n.anim === 'warm' ? CHAT.fire : n.anim === 'sit' ? CHAT.oldhead : n.cage ? CHAT.cage : CHAT.block);
-  W.bounds = [-14.3, 14.3, -10.9, 11.5]; W.camBox = [-15.1, 15.1, -11.7, 18.6];
+  W.bounds = [-14.3, 14.3, -10.9, 18.5]; W.camBox = [-15.1, 15.1, -11.7, 19.0];      /* the street behind the tracks (the back lot) is open */
 }
 
 function buildPit() {
@@ -388,7 +387,7 @@ function goalStep(me) {
 }
 function worldStep(dt) {
   if (!W) return; W.t += dt; const me = W.me, I = IN[0], building = !!W.build, busy = uiBusy() || building;
-  let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my; if (W.sa && W.sa.shot) { mx = 0; my = 0; }      /* planted for the shot */
+  let mx = busy ? 0 : I.mx, my = busy ? 0 : I.my;
   if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
@@ -409,10 +408,8 @@ function worldStep(dt) {
   me.x = clamp(nx, W.bounds[0], W.bounds[1]); me.z = clamp(nz, W.bounds[2], W.bounds[3]);
   const v = Math.hypot(me.vx, me.vz); if (v > 0.5) me.face = lerpAng(me.face, Math.atan2(me.vx, me.vz), 1 - Math.exp(-12 * dt));
   me.ph += dt * (4 + v * 1.6);
-  if (W.sa) saStep(dt, me, I, busy); else if (document.body.classList.contains('saBall')) document.body.classList.remove('saBall');
   const R = me.rig;
-  if (W.sa && !me.sit && !(me.emote && v < 0.3) && saPose(R, me, dt, v)) { }
-  else if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
+  if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
   else if (me.emote && v < 0.3) { const e = EMOTES[me.emote]; R.root.position.set(me.x, e.y || 0, me.z); R.root.rotation.y = me.face; applyPose(R, emotePose(e, R, W.t, S.moves.celeb), dt); R.gait = null; }
   else locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
@@ -473,11 +470,13 @@ function worldStep(dt) {
 }
 
 function startPractice(kind) {
-  const fl = cribTier('floor'), back = W.kind;
+  const fl = cribTier('floor'), lot = kind === 'lot', back = lot ? 'lot' : W.kind, from = lot && W ? [W.me.x, W.me.z, W.me.face] : null;
   uiClose(); document.body.dataset.state = 'match';
-  startMatch({ mode: { n: kind === 'rack' ? 'MONEY RACK' : 'SHOOT AROUND', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: kind, court: kind === 'rack' ? 'street' : ['drive', 'black', 'show', 'wood'][fl], hoopTier: kind === 'rack' ? 1 : cribTier('hoop'), ball: S.worn.ball,
-    teams: [[{ b: myBuild(), ctrl: 0, mine: true }], []], onEnd: res => afterPractice(res, back) });
+  startMatch({ mode: { n: lot ? 'THE BACK LOT' : kind === 'rack' ? 'MONEY RACK' : 'SHOOT AROUND', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: lot ? 'free' : kind, court: lot ? 'backlot' : kind === 'rack' ? 'street' : ['drive', 'black', 'show', 'wood'][fl], hoopTier: lot || kind === 'rack' ? 1 : cribTier('hoop'), ball: S.worn.ball, lot: lot ? {} : null,
+    teams: [[{ b: myBuild(), ctrl: 0, mine: true }], []], onEnd: res => afterPractice(res, back, lot ? MT_lastLot : null) });
+  if (lot && MT && MT.me && from) { const [x, z] = lotToMatch(from[0], from[1]), me = MT.me; me.x = clamp(x, COURT.x0 - 0.8, COURT.x1 + 0.8); me.z = clamp(z, COURT.z0 - 0.5, COURT.z1 + 0.8); me.face = from[2] + Math.PI; MT.phase = 'live'; MT.needClear = false; give(me); MT_lastLot = MT.cfg.lot; }
 }
+let MT_lastLot = null;
 
 // ---------------- the Block, dressed ----------------
 // the two alleys (open now: pavement running back, a gate, a dumpster, crates, a bulb, steam, a lit door at the end),
