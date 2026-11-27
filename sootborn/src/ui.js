@@ -34,7 +34,7 @@ const HUD = {
     s.classList.toggle('hidden', !world || Dialogue.active || Puzzle.active || Brawl.active);
     if (Puzzle.active) { o.querySelector('b').textContent = Puzzle.defs[Puzzle.si].wo || ('WO-114 · VALVE ' + Puzzle.defs[Puzzle.si].name); o.querySelector('span').textContent = Puzzle.defs[Puzzle.si].tip; }
     else { o.querySelector('b').textContent = 'OBJECTIVE'; o.querySelector('span').textContent = this.objective(); }
-    s.textContent = G.heist === 3 ? (Mission.def.where || 'The Assay · four years after the furnace') : `${whenS(G.day).replace(' the furnace', '')} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
+    s.textContent = G.heist === 3 ? (Mission.def.where || 'The Assay · four years after the furnace') : G.heist === 1 ? `Four days before · ${G.scrip} scrip` : `${whenS(G.day).replace(' the furnace', '')} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
     document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
@@ -178,7 +178,7 @@ const Menus = {
     const S = Settings.d, upd = () => { Settings.save(); Settings.apply(); };
     const cyc = (k, n) => d => { S[k] = (S[k] + d + n) % n; upd(); };
     UI.push(modal({ title: 'Settings', build(b) { b.innerHTML = `<p style="opacity:.7">Saves: ${Store.ok ? 'kept in this browser' : 'this session only (storage blocked) — export from Save data'}. Keyboard: WASD/arrows, E/Enter, Esc, M menu, Q/R tabs, H hint. Controller supported.</p>`; }, items: [
-      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 1 : S.diff], act: () => { S.diff = ((S.diff === undefined ? 1 : S.diff) + 1) % 3; upd(); } },
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 0 : S.diff], act: () => { S.diff = ((S.diff === undefined ? 0 : S.diff) + 1) % 3; upd(); } },
       { label: 'Graphics (3D fights)', value: () => ['Low', 'Medium', 'High'][S.gfx === undefined ? 2 : S.gfx], act: () => { S.gfx = ((S.gfx === undefined ? 2 : S.gfx) + 1) % 3; upd(); } },
       { label: 'Show frame time', value: () => S.fps ? 'On' : 'Off', act: () => { S.fps = S.fps ? 0 : 1; upd(); } },
       { label: 'Sound test', value: () => !Sound.ctx ? 'audio off' : Sound.ctx.state === 'running' ? 'tap to hear' : 'blocked: tap again', act: () => { Sound.unlock(); setTimeout(() => { Sound.play('horn'); Sound.play('win'); }, 60); } },
@@ -299,7 +299,7 @@ const Menus = {
     UI.push(modal({ title: 'Dev menu', build(b) { b.innerHTML = '<p>Version ' + GAME_VER + '. Jump straight to any fight or story beat. Your save slots are not touched until the game autosaves.</p><p><b>New in ' + GAME_VER + ':</b> ' + DEV_NEW + '</p>'; }, items: [
       { label: 'Training room (all moves, nobody loses)', act: () => { const q = DEV.quick; DEV._tq = q; UI.clear(); DEV.quick = 1; DEV.from = 'main'; $('#devback').classList.remove('hidden'); ffScene('TRAINING', 'A sealed pump room.', () => FF.training(), () => { DEV.quick = q; Game.toTitle(); }); } },
       { label: 'Fights', act: sub('Fights') }, { label: 'Assay missions (2D) ★', act: sub('Assay missions (2D)') }, { label: 'Levels in 3D (comic) ★', act: sub('Levels in 3D (comic)') }, { label: 'Story beats', act: sub('Story beats') }, { label: 'Cutscenes', act: sub('Cutscenes') },
-      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][Settings.d.diff === undefined ? 1 : Settings.d.diff], adj: () => { Settings.d.diff = ((Settings.d.diff === undefined ? 1 : Settings.d.diff) + 1) % 3; Settings.save(); } },
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][Settings.d.diff === undefined ? 0 : Settings.d.diff], adj: () => { Settings.d.diff = ((Settings.d.diff === undefined ? 0 : Settings.d.diff) + 1) % 3; Settings.save(); } },
       { label: 'Start fights at full fury', value: () => onoff(DEV.fury), adj: () => { DEV.fury = DEV.fury ? 0 : 1; } },
       { label: 'Skip fight intro films', value: () => onoff(DEV.quick), adj: () => { DEV.quick = DEV.quick ? 0 : 1; } },
       { label: 'Back', act: () => { DEV.from = null; UI.pop(); } }] }));

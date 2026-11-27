@@ -234,7 +234,7 @@ const PROLOGUE_A = [
   { say: 'kael', t: "And if he sees both of us?" },
   { say: 'seren', t: "Then we're newlyweds looking for somewhere private. Try to look embarrassed. Shouldn't be hard." },
   { fade: 'out' },
-  { card: 'Bay Three · Second bell', sub: 'Cross the bay to the audit relay on the far (east) wall and hold A to cut it. Then reach Valve Bank Seven on the north wall. A marker points the way. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
+  { card: 'Bay Three · Second bell', sub: 'Cross the bay to the audit relay on the far (east) wall and hold the work button (E, or Ⓐ on a pad) to cut it. Then reach Valve Bank Seven on the north wall. A marker points the way. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
 ];
 
 // ================= PROLOGUE B: the audit, the sentence, the furnace =================

@@ -32,7 +32,7 @@ const Game = {
     G.heist = 1; World.load('bay', { x: 24, y: 7 * 16 + 4, dir: 3 }, true); World.darkOverride = 'rgba(3,2,9,.8)';
     G.mode = 'world'; Game.resetHeist(); Sound.music('mystery');
     Fade.a = 1; Fade.dir = -1; Fade.sp = 1; Fade.busy = true;
-    setTimeout(() => HUD.toast('Hold A at the relay · B throws a bolt'), 900);
+    setTimeout(() => { const d = Input.device, a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A', b = d === 'kb' ? 'X' : d === 'pad' ? 'Ⓑ' : 'B'; HUD.toast(`Hold ${a} at the relay · ${b} throws a bolt`); }, 900);
   },
   resetHeist() {
     if (G.heist === 3) return Mission.reset();
