@@ -62,7 +62,7 @@ body[data-state=world] #whud{display:block}
 #repbar{width:150px;height:2px;background:var(--line)}#repbar i{display:block;height:100%;background:var(--ice)}
 #prompt{position:fixed;left:50%;bottom:calc(24% + var(--sab));transform:translateX(-50%);z-index:7;display:none;background:var(--bone);color:var(--ink);font:900 14px var(--d);font-stretch:125%;text-transform:uppercase;padding:12px 26px 12px 18px;cursor:pointer;white-space:nowrap;clip-path:polygon(0 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%);border-left:4px solid var(--heat)}
 body:not([data-state=world]) #prompt{display:none!important}
-#keys{position:fixed;left:12px;bottom:10px;z-index:6;font:600 11px var(--m);letter-spacing:.04em;color:#ece9e2;pointer-events:none;display:flex;flex-wrap:wrap;gap:6px;max-width:min(760px,70vw)}#keys span{background:rgba(10,10,14,.78);padding:4px 8px 4px 5px;border-radius:3px;white-space:nowrap;text-shadow:0 1px 2px #000}#keys .kc{display:inline-block;font-style:normal;min-width:18px;height:18px;line-height:18px;padding:0 4px;margin-right:3px;border-radius:3px;background:#ece9e2;color:#0a0a0e;font-weight:800;text-align:center;font-size:10px}#keys .ka,#keys .kb,#keys .kx,#keys .ky{border-radius:50%;width:18px;padding:0;color:#fff}#keys .ka{background:#3aa655}#keys .kb{background:#d23a3a}#keys .kx{background:#2f6fd6}#keys .ky{background:#e0b21f;color:#0a0a0e}body.touch #keys,body.busy #keys{display:none}
+#keys{position:fixed;left:12px;bottom:10px;z-index:6;font:600 11px var(--m);letter-spacing:.04em;color:#ece9e2;pointer-events:none;display:flex;flex-wrap:wrap;gap:6px;max-width:min(760px,70vw)}#keys span{background:rgba(10,10,14,.78);padding:4px 8px 4px 5px;border-radius:3px;white-space:nowrap;text-shadow:0 1px 2px #000}#keys .kc{display:inline-block;font-style:normal;min-width:18px;height:18px;line-height:18px;padding:0 4px;margin-right:3px;border-radius:3px;background:#ece9e2;color:#0a0a0e;font-weight:800;text-align:center;font-size:10px}#keys .ka,#keys .kb,#keys .kx,#keys .ky{border-radius:50%;width:18px;padding:0;color:#fff}#keys .ka{background:#3aa655}#keys .kb{background:#d23a3a}#keys .kx{background:#2f6fd6}#keys .ky{background:#e0b21f;color:#0a0a0e}body.touch #keys,body.busy #keys{display:none}body.phint #panel{padding-bottom:46px;box-sizing:border-box}.focus{outline:3px solid #ffe23a!important;outline-offset:2px;box-shadow:0 0 0 6px rgba(255,226,58,.18)}
 /* ---- match hud ---- */
 #hud{position:fixed;inset:0;z-index:6;pointer-events:none;display:none}
 #sb{position:absolute;left:50%;top:calc(8px + var(--sat));transform:translateX(-50%);display:flex;align-items:stretch;background:rgba(8,8,10,.8);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
@@ -4225,7 +4225,7 @@ function ostImpulse(secs, decay) {
 function ostNext() {
   if (!OST.el) return; OST.i = (OST.i + 1) % TRACKS.length; const t = TRACKS[OST.order[OST.i]];
   OST.el.src = 'music/' + t[0] + '.mp3'; OST.cur = t[1];
-  if (S && S.set.music) OST.el.play().then(() => { if (typeof toast === 'function' && document.body.dataset.state !== 'match' && !(typeof UI !== 'undefined' && UI.cur)) toast('♪ ' + t[1], 'GOT NEXT soundtrack · N skips'); }).catch(() => { });
+  if (S && S.set.music) OST.el.play().then(() => { if (typeof toast === 'function' && document.body.dataset.state !== 'match' && !(typeof UI !== 'undefined' && UI.cur)) toast('♪ ' + t[1], 'GOT NEXT soundtrack' + (IN[0] && IN[0].hasPad && (IN[0].padAt || 0) >= (window.__kbAt || 0) || (typeof IS_TOUCH !== 'undefined' && IS_TOUCH) ? '' : ' · N skips')); }).catch(() => { });
 }
 // glide the room settings when you change places
 function ostRoom(k) {
@@ -4735,7 +4735,7 @@ function goalStep(me) {
   const g = $('goal'); if (!g) return; let G = null;
   if (W.kind === 'hub' && !W.visit && !MT) {
     const drilled = Object.values(S.drills || {}).some(d => (d.medal || 0) >= 1), games = (S.life && S.life.games) || 0;
-    if (!drilled && games < 1) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
+    if (!drilled && games < 3) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
     else if (games < 1) G = { t: 'Call next at THE CAGES', s: 'walk up to a court gate and press ' + (I.hasPad && I.padAt >= (window.__kbAt || 0) ? 'A' : 'E'), x: 0, z: -10.3 };
   }
   if (!G) { if (g.style.display !== 'none') g.style.display = 'none'; return; }
@@ -6336,7 +6336,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
 function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
 function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
-function openPanel(render, cls, onBack) { UI.openT = performance.now(); UI.lockMs = 450; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
+function openPanel(render, cls, onBack) { UI.openN = UI.stepN || 0; UI.openT = performance.now(); UI.lockMs = 450; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
   // a controller starts on the panel's main action (RESUME, PLAY…), else on the first thing that is not a tab or the close button
   const f = focusables(); let i = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')); if (i < 0) i = f.findIndex(e => e.closest('.pf')); if (i < 0) i = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, i); paintFocus(); }
 function rerender(reset) {
@@ -6364,6 +6364,7 @@ function navTab(d) {
   let k = tb.findIndex(b => b.classList.contains('sel')); if (k < 0) k = tb.findIndex(b => !b.classList.contains('alt')); if (k < 0) k = 0;
   tb[(k + d + tb.length) % tb.length].click(); const f = focusables(), first = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, first); paintFocus(); sfx('ui'); return true;
 }
+function I_PAD() { const I = IN[0]; return !!(I && I.hasPad && (I.padAt || 0) >= (window.__kbAt || 0)); }
 function paintFocus() { if (IS_TOUCH) return; const f = focusables(); f.forEach((b, i) => b.classList.toggle('focus', i === UI.focus)); }
 addEventListener('click', e => { const b = e.target.closest('[data-em]'); if (!b) return; e.stopPropagation(); audioInit(); if (b.dataset.em === 'chat') chatOpen(); else emote(b.dataset.em); });
 function uiInit() {
@@ -6383,11 +6384,13 @@ function padHint() {
   if (UI.cur) t = 'Ⓐ SELECT · Ⓑ BACK · STICK / D-PAD MOVE' + ($('panel').querySelector('.tabs') ? ' · LB RB TABS' : '') + ' · ←→ ON A SLIDER OR LIST';
   else if (typeof BLD !== 'undefined' && BLD.on && W && W.build) t = (W.build.sel ? 'Ⓐ PLACE · Ⓧ ROTATE · ' + (W.build.pick ? 'Ⓨ STORE · LT SELL · ' : '') + 'Ⓑ PUT BACK' : 'Ⓐ PICK UP · Ⓑ DONE') + '<br>D-PAD ←→ CATALOG · LB RB CATEGORY · D-PAD ↑ LOOK · ↓ SETS · R3 TURN VIEW · STICK MOVE (RT FAST)';
   else if (MT) t = '';      /* in a game the controls strip (#keys) does it, with the real buttons */
-  else if (W) t = 'Ⓐ INTERACT · START MY PLAYER · RT RUN' + ((W.kind === 'crib' || W.kind === 'room') && !W.visit ? ' · Ⓨ BUILD' : '');
+  else if (W) t = (W.kind === 'crib' || W.kind === 'room') && !W.visit ? 'Ⓨ BUILD' : '';      /* the controls strip (#keys) shows the rest with real buttons; two bars overlapped */
   else if ($('title').style.display === 'flex') t = 'Ⓐ SELECT · D-PAD MOVE';
   if (el._t !== t) { el._t = t; el.innerHTML = t; } el.style.display = t ? 'block' : 'none';
+  document.body.classList.toggle('phint', !!t && !!UI.cur);      /* the menu keeps its bottom buttons clear of this bar */
 }
 function uiStep(dt) {
+  UI.stepN = (UI.stepN || 0) + 1;
   const I = IN[0], f = focusables(); UI.navT -= dt; const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName) && document.activeElement.type !== 'range';
   if (typing) { if (keys.Escape) document.activeElement.blur(); return; }
   const m = Math.abs(I.mx) > Math.abs(I.my) ? (I.mx > 0.6 ? 'R' : I.mx < -0.6 ? 'L' : '') : (I.my > 0.6 ? 'D' : I.my < -0.6 ? 'U' : '');
@@ -6400,8 +6403,9 @@ function uiStep(dt) {
   }
   if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
   if (I.aP && UI.cur && performance.now() - (UI.openT || 0) < (UI.lockMs || 450)) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results) */
-  if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') e.focus(); else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
+  if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') { if (e.dataset.padkb && I_PAD()) e.dispatchEvent(new CustomEvent('padkb', { bubbles: true })); else e.focus(); } else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
   if (I.back && UI.cur) { uiBack(); I.back = false; }
+  else if (I.start && UI.cur && UI.cur.startCloses && (UI.stepN || 0) - (UI.openN || 0) > 6) { uiBack(); I.start = false; }      /* START opened it, START closes it (on a pad only B did) */
 }
 
 // ---------- toasts ----------
@@ -6503,7 +6507,10 @@ function uiBuilder(opts) {
   openPanel(() => {
     const st = STYLE[T.build.style];
     let h = `<div class="ph"><h2>BUILD YOUR PLAYER</h2></div><div class="pb">`;
-    h += `<div class="cat">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}">`;
+    h += `<div class="cat">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}" data-padkb="1">`;
+    if (T.kb) {      // a controller has no keys: letters on the screen, picked with the stick and A
+      const add = c => () => { if ((T.name || '').length < 12) T.name = (T.name || '') + c; sfx('ui'); rerender(); };
+      h += `<div class="card padkb" style="display:flex;flex-wrap:wrap;gap:4px">` + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => Btn(c, add(c), 'sm alt')).join('') + Btn('SPACE', add(' '), 'sm alt') + Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt') + Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt') + Btn('DONE ✓', () => { T.kb = false; rerender(); }, 'sm') + `</div>`; }
     h += `<div class="cat">PLAYSTYLE <span class="mu" style="text-transform:none;letter-spacing:.02em">— sets what you can become</span></div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === T.build.style ? 'sel' : ''}" data-k="${on(() => { T.build.style = s.id; sfx('ui'); rig(); rerender(); })}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">ORIGIN <span class="mu" style="text-transform:none;letter-spacing:.02em">— where 2145 America grew you</span></div><div class="grid">` + ORIGINS.map(o => `<div class="card ${o.id === T.build.origin ? 'sel' : ''}" data-k="${on(() => { T.build.origin = o.id; sfx('ui'); rerender(); })}"><h3>${o.n}</h3><p>${o.d}</p><p class="buff">${o.perk}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. You can wear three; more at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
@@ -6514,7 +6521,8 @@ function uiBuilder(opts) {
     h += `<div class="cat">LOOK</div><div class="card">` + SKINS.map((c, i) => `<span class="sw ${i === T.build.skin ? 'sel' : ''}" style="background:${c}" data-k="${on(() => { T.build.skin = i; rig(); rerender(); })}"></span>`).join('') + `<div style="margin-top:8px">` + DRIP.filter(d => d.slot === 'hair' && d.src === 'start').map(d => Btn(d.n, () => { T.hair = d.id; rig(); rerender(); }, 'sm ' + (T.hair === d.id ? '' : 'alt'))).join(' ') + `</div></div>`;
     h += `<div class="cat">ATTRIBUTE CAPS <span class="mu" style="text-transform:none;letter-spacing:.02em">— ${st.n}, max potential</span></div><div class="card" id="capbox">${capBars(T.build)}</div>`;
     h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
-      const nm = ($('bname').value || '').trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
+      if (!(($('bname').value || T.name || '').trim()) && !T.warned && I_PAD()) { T.warned = true; T.kb = true; toast('NAME YOUR PLAYER', 'Or press HIT THE BLOCK again to go as ROOKIE.'); rerender(); if (!T.kb) $('bname').focus(); return; }      /* no more accidental "Nobody" */
+      const nm = (($('bname').value || T.name || '')).trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
       uiClose(); sfx('unlock'); enterWorld('hub', 0, 9, Math.PI); if (opts.prev !== undefined) toast('NEW BUILD', `${S.name} is on the Block. Switch builds in MY PLAYER → BUILDS.`, 'rank'); else toast('WELCOME TO THE BLOCK', 'Walk to THE CAGES and call next. Fiends will ask for HC.', 'rank');
     })}${opts.prev !== undefined ? Btn('CANCEL', () => { S.slots.splice(S.slot, 1); S.slot = opts.prev; slotLoad(S.slots[opts.prev]); save(); uiClose(); enterWorld('hub', 0, 9, Math.PI); }, 'alt') : ''}</div>`;
@@ -6522,6 +6530,9 @@ function uiBuilder(opts) {
   }, 'side', () => { });
   function upd() { $('lw').textContent = lbs() + ' lbs'; $('ls').textContent = fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5)); $('capbox').innerHTML = capBars(T.build); rig(); }
   $('panel').addEventListener('change', e => { if (e.target.id === 'bname') T.name = e.target.value; });
+  $('panel').addEventListener('input', e => { if (e.target.id === 'bname') T.name = e.target.value; });
+  $('panel').addEventListener('padkb', e => { if (e.target.id === 'bname') { T.kb = true; rerender(); const f = focusables(), i = f.findIndex(b => b.closest && b.closest('.padkb')); if (i >= 0) { UI.focus = i; paintFocus(); } } });
+  { const f = focusables(), i = f.findIndex(b => b.id === 'bname'); if (i >= 0) { UI.focus = i; paintFocus(); } }      /* start on the name, not on HIT THE BLOCK (a second A press made "Nobody") */
   void body;
 }
 
@@ -6614,6 +6625,7 @@ function uiPlayer(tab) {
     }
     return h + `</div>`;
   });
+  if (UI.cur) UI.cur.startCloses = true;      /* START toggles it */
 }
 
 // ---------- drip depot / closet ----------
@@ -6671,7 +6683,7 @@ function uiMode(m) {
     for (let i = 0; i < m.size - 1; i++) { const v = st.mates[i] === undefined ? -1 : st.mates[i]; h += `<div style="margin-bottom:8px">${Btn(`TEAMMATE ${i + 1}: ${v < 0 ? 'RANDOM FROM THE PARK' : esc(S.homies[v].name) + ' (homie)'} ▸`, () => { st.mates[i] = cyc(v, S.homies.length); sfx('ui'); rerender(); }, 'alt sm')}</div>`; }
     h += `<div style="margin-bottom:8px">${Btn(`RIVAL: ${st.rival < 0 ? 'RANDOMS' : esc(S.homies[st.rival].name) + ' (homie) + crew'} ▸`, () => { st.rival = cyc(st.rival, S.homies.length); sfx('ui'); rerender(); }, 'alt sm')}</div>`;
     h += S.homies.length ? `<p class="mu">Your homies fill the squad first. Anyone you meet online becomes a homie, so their player runs with you even when they are not here.</p>` : `<p class="mu">Meet friends online, or import their build at THE LINK, and their players can run with you here.</p>`;
-    if (!IS_TOUCH) h += `<div class="cat">PLAYER 2 <span class="mu" style="text-transform:none;letter-spacing:.02em">— same screen, controller or split keyboard</span></div>${Btn('P2: ' + ({ off: 'OFF', coop: 'CO-OP (your teammate)', vs: 'VERSUS (other team)' }[st.p2]) + ' ▸', () => { st.p2 = st.p2 === 'off' ? 'coop' : st.p2 === 'coop' ? 'vs' : 'off'; sfx('ui'); rerender(); }, 'alt sm')}<p class="mu">${anyPadStart() ? anyPadStart() + ' controller(s) connected: player 2 is on ' + (anyPadStart() > 1 ? 'controller 2, player 1 on controller 1 or the keyboard.' : 'the controller, player 1 on the keyboard.') : 'No controller: the keyboard splits. Player 1: WASD move, Shift sprint, Space shoot, E pass, IJKL skill stick. Player 2: arrows move, right Shift sprint, / shoot, . pass, numpad 8 4 5 6 skill stick.'}</p>`;
+    if (!IS_TOUCH) h += `<div class="cat">PLAYER 2 <span class="mu" style="text-transform:none;letter-spacing:.02em">— same screen, controller or split keyboard</span></div>${Btn('P2: ' + ({ off: 'OFF', coop: 'CO-OP (your teammate)', vs: 'VERSUS (other team)' }[st.p2]) + ' ▸', () => { st.p2 = st.p2 === 'off' ? 'coop' : st.p2 === 'coop' ? 'vs' : 'off'; sfx('ui'); rerender(); }, 'alt sm')}<p class="mu">${st.p2 === 'off' ? 'Off: just you. Turn it on and a second player joins on ' + (anyPadStart() > 1 ? 'controller 2.' : anyPadStart() ? 'a second controller, or the keyboard while you stay on yours.' : 'a controller, or the other half of the keyboard.') : anyPadStart() ? anyPadStart() + ' controller(s) connected: player 2 is on ' + (anyPadStart() > 1 ? 'controller 2, player 1 on controller 1 or the keyboard.' : 'the controller, player 1 on the keyboard.') : 'No controller: the keyboard splits. Player 1: WASD move, Shift sprint, Space shoot, E pass, IJKL skill stick. Player 2: arrows move, right Shift sprint, / shoot, . pass, numpad 8 4 5 6 skill stick.'}</p>`;
     if (online && !crewFirst) h += onlineBlock(m, st);
     if (S.boosts.length) h += `<div class="cat">LOADED BOOSTS</div><p class="buff">${S.boosts.map(b => BOOSTS.find(x => x.id === b).n).join(' · ')}</p>`;
     h += `</div><div class="pf">${Btn('RUN IT', () => { S.lastTier = st.tier; launchGame(m, t, st); })}<span class="mu" style="align-self:center">Win ≈ ${Math.round(70 * t.mult + 60)} HC · ${Math.round(45 * t.mult + 15)} Respect</span></div>`;
@@ -6768,6 +6780,7 @@ function volSliders() { return `<label class="sl">MUSIC VOLUME <b id="lmv">${S.s
 function uiPause() {
   if (!MT || MT.over) return; MT.paused = true; const online = !!MT.net;
   openPanel(() => `<div class="ph"><h2>${online ? 'MENU · the game is still live' : 'PAUSED'}</h2></div><div class="pb"><div class="card"><h3>SOUND</h3>${volSliders()}</div><div class="card"><h3>WITH THE BALL</h3><p>Skill stick ↓ hold & release = shoot (release in the green band) · ↑ = drive, layup or dunk · ← → = side move · ↙ ↘ = stepback · ↖ ↗ = spin. PASS throws to the teammate you are pushing toward.</p></div><div class="card"><h3>WITHOUT IT</h3><p>On defense: skill stick ↑ = hands up, ↓ = steal${MT.arcade ? ' / shove' : ''}, JUMP to block or rebound. On offense: CALL asks for the rock. After a stop, take it back past the arc.</p></div><div class="card"><h3>BRAVADO</h3><p>Big plays fill the bar. Full bar = +8 to every attribute for 20 seconds.</p></div></div><div class="pf">${Btn('RESUME', uiClose)}${Btn(MT.practice ? 'LEAVE' : 'FORFEIT', () => { uiClose(); quitMatch(); }, 'red')}</div>`, '', uiClose);
+  if (UI.cur) UI.cur.startCloses = true;      /* START toggles it */
 }
 // GOT NEXT — online: who else has the game open right now, invites, a shared game, and your player saved to your account.
 // Runs on the claude.ai artifact "room" (live presence), "user" and "db" capabilities. Outside an artifact, or for a

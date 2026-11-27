@@ -365,7 +365,7 @@ function goalStep(me) {
   const g = $('goal'); if (!g) return; let G = null;
   if (W.kind === 'hub' && !W.visit && !MT) {
     const drilled = Object.values(S.drills || {}).some(d => (d.medal || 0) >= 1), games = (S.life && S.life.games) || 0;
-    if (!drilled && games < 1) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
+    if (!drilled && games < 3) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
     else if (games < 1) G = { t: 'Call next at THE CAGES', s: 'walk up to a court gate and press ' + (I.hasPad && I.padAt >= (window.__kbAt || 0) ? 'A' : 'E'), x: 0, z: -10.3 };
   }
   if (!G) { if (g.style.display !== 'none') g.style.display = 'none'; return; }

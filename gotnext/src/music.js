@@ -30,7 +30,7 @@ function ostImpulse(secs, decay) {
 function ostNext() {
   if (!OST.el) return; OST.i = (OST.i + 1) % TRACKS.length; const t = TRACKS[OST.order[OST.i]];
   OST.el.src = 'music/' + t[0] + '.mp3'; OST.cur = t[1];
-  if (S && S.set.music) OST.el.play().then(() => { if (typeof toast === 'function' && document.body.dataset.state !== 'match' && !(typeof UI !== 'undefined' && UI.cur)) toast('♪ ' + t[1], 'GOT NEXT soundtrack · N skips'); }).catch(() => { });
+  if (S && S.set.music) OST.el.play().then(() => { if (typeof toast === 'function' && document.body.dataset.state !== 'match' && !(typeof UI !== 'undefined' && UI.cur)) toast('♪ ' + t[1], 'GOT NEXT soundtrack' + (IN[0] && IN[0].hasPad && (IN[0].padAt || 0) >= (window.__kbAt || 0) || (typeof IS_TOUCH !== 'undefined' && IS_TOUCH) ? '' : ' · N skips')); }).catch(() => { });
 }
 // glide the room settings when you change places
 function ostRoom(k) {
