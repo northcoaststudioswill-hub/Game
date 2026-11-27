@@ -481,7 +481,7 @@
       { const l = new THREE.PointLight(0xffa24a, 26, 9, 1.6); l.position.set(-6.2, 0.9, HZ - 0.6); G.scene.add(l); }
       chalkW(-10.93, 0.5, -10.4, Math.PI / 2, 0.16); chalkF(-2.6, 0.016, HZ - 2.6, 0.22); chalkW(0, 0.6, -19.78, 0, 0.18);
       // the Authority's notice on the pylon, and the tally of the riser's air
-      sign('SEALED BY THE COUNT', 0, 2.6, -19.78, 0, 2.2, 0.4, '#07070d', '#e8c25a'); sign('NINE HOUSES. ONE STANDING.', -10.92, 3.1, -9, Math.PI / 2, 4.2, 0.36, '#e8c25a', '#07070d');
+      sign('SEALED BY THE COUNT', 0, 2.6, -19.78, 0, 2.2, 0.4, '#07070d', '#e8c25a'); sign('TWELVE HOUSES. ONE STANDING.', -10.92, 3.1, -9, Math.PI / 2, 4.2, 0.36, '#e8c25a', '#07070d');
     };
 
     /* ===== THE STAIR: the last flights up the Sun Spire at sunset, nine years on. Three flights, three landings, the white door. ===== */

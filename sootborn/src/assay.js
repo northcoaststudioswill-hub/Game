@@ -106,7 +106,7 @@ const MISSIONS = {
           narr('It draws. The water comes up warm.'), fx(() => Sound.play('heart')),
           narr('Warm. There is only one thing under this rock that makes water warm. I know the line. I have bled it.'),
           narr('The Assay valley is the roof of Cinderwell. Their children are playing at war on top of Tier Four, and the pump they cannot work is fed off the same Array my tier is rationed from.'),
-          narr('I stand there with my hand on the pipe and listen. Eleven hundred people, forty feet down. I cannot hear one of them.'),
+          narr('I stand there with my hand on the pipe and listen. Eleven hundred people, nine floors down. I cannot hear one of them.'),
           fx(() => rage(2))]); }))]); }
       if (t.id === 'fire') { if (!(MF('wood') && MF('pump'))) return Dialogue.start([narr(MF('wood') ? 'Wood, and no water to cook with. The pump first.' : 'A ring of stones somebody laid for them. Cold. It wants wood.')]);
         return Dialogue.start([narr('Flint off the pump housing. A curl of bark. Strike, strike, and breathe.')], () => World.seqStart('AABAAB', 'STRIKE  -  BREATHE', () => { MAPS.vcamp.props.find(p => p.t === 'campfire').a = 1; World.layer = renderMapLayer(World.map); MAPS.vcamp.lights.push({ x: 200, y: 150, r: 74, c: '#ffb050', m: 1 }); Sound.play('pillar'); Dialogue.start([

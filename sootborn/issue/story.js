@@ -446,7 +446,7 @@
           { who: 'cap', text: 'She did not say thank you. She said: is the sky blue. I said: go and look.' }], () => { S.walk = 0.001; U.toast('*FORTY* UP THE RISER. ONE MORE LAMP ON THE ROAD. *HIS.*', 3.4); }) });
         W.addInteract({ id: 'lintel', x: -9.9, y: 0, z: -9, fx: -11, fz: -9, r: 1.45, label: 'LOOK', marker: 'clue', mh: 2.2, when: () => F.e_alley && !F.clue_lintel, act: clue('lintel', [
           { who: 'cap', text: 'Names cut in the lintel, one Assay under another. Most are scored through. Mine is there, with a gold nail in it. It is not my name.' },
-          { who: 'hero', face: 'angry', text: 'Sorrel, E. ...Forty feet under this grass there is a tier they are striking tonight.' }]) });
+          { who: 'hero', face: 'angry', text: 'Sorrel, E. ...Nine floors under this grass there is a tier they are striking tonight.' }]) });
         W.addInteract({ id: 'shoe', x: 2.5, y: 0, z: 12.2, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.e_alley && !F.clue_shoe, act: clue('shoe', [
           { who: 'cap', text: 'A child\'s shoe by the hatch. Somebody went into the pines with one foot bare and did not come back for it.' },
           { who: 'hero', face: 'hurt', text: 'Good. Do not come back.' }]) });
@@ -586,7 +586,7 @@
         { who: 'hero', face: 'smirk', text: 'Somebody up here does the rounds. Somebody up here knows what a seal is.' }]) });
       W.addInteract({ id: 'plate', x: -6.4, y: 24, z: 6.4, fx: -5, fz: 3.4, r: 1.6, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => F.e_l2 && !F.clue_plate, act: clue('plate', [
         { who: 'cap', text: 'A gilt plate riveted to the stack. DRAWN FROM RISER NINE. The lamps, the pump, the boots: all of it comes up one pipe from under the floor.' },
-        { who: 'hero', face: 'angry', text: 'Forty feet under this grass somebody is turning a wheel so that an Assayer need not touch the ground.' }]) });
+        { who: 'hero', face: 'angry', text: 'Nine floors under this grass somebody is turning a wheel so that an Assayer need not touch the ground.' }]) });
     };
     S.update = function (dt, rdt) {
       for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }

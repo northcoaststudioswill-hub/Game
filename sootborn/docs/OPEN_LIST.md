@@ -3,10 +3,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 
 ## Built in v0.87 (continuity pass; four answers wanted)
 - 88 changes so the whole game agrees with the rules sheet and the chapters. Read the changelog list.
-- **Your call:** Celestine says "fifty years" at nine years (the dates make it fifty-three). Keep it as a round number, or change it?
-- **Your call:** Riser Nine is "nine floors of ladder" and also "forty feet under this grass". Which goes?
-- **Your call:** the pump-house sign says NINE HOUSES; the Assay has twelve. A typo, or nine fallen?
-- **To build:** the Valley on day forty is against two Houses, but those cadets still wear Teal's colours. They need another House's look.
+- **Decided (2026-11-27, owner asked Claude to choose):** Celestine says "fifty-three years" (she keeps the Count; she would be exact). Riser Nine stays nine floors: the three "forty feet" lines now say nine floors. The pump-house sign reads TWELVE HOUSES. ONE STANDING. The two Houses on day forty wear their own look (cadets with a dark red sash, `cado1`/`cado2`), not Teal's.
 
 ## Built in v0.86 (the story fix list; needs your eye)
 - The script audit's fix list is in: 55 line fixes, Kael's father in the ledger, Proctor becomes Assayer (the Assay) or Tallyman (below), Dace becomes Harl. Read a few of the new lines in place.

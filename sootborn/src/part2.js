@@ -534,7 +534,7 @@ const P2 = {
     { say: 'celestine', t: 'At the Pinning one said you reminded one of someone, and then that you did not. It is the only false entry I have made in fifty years.' },
     { say: 'celestine', t: 'A girl at a furnace door, who looked past me as if I were weather. And a boy kneeling in a square, six weeks on, looking at me exactly so. One knew you on the steps of the keep. One pinned the sun on you with one\'s own hands.' },
     { say: 'kael', t: 'Why.' },
-    { say: 'celestine', t: 'Because the Array will not see ten winters, and my engineers ring for a servant when a seat weeps. Because my son is kind. Because in fifty years one person balanced a bank under my eye and left it tidier than he found it.' },
+    { say: 'celestine', t: 'Because the Array will not see ten winters, and my engineers ring for a servant when a seat weeps. Because my son is kind. Because in fifty-three years one person balanced a bank under my eye and left it tidier than he found it.' },
     { say: 'celestine', t: 'When you hummed in this room, one put down a cup. One had waited two years for you to slip, so that it could be said aloud. One did not let a thief up the lift, little ember. One sent for a successor.' },
     { music: null }, { sfx: 'heart' }, { wait: 0.8 },
     { narr: 'For nine years I had thought I was a knife she had not seen. I was a line in her book, entered in her own hand, with a date.' },

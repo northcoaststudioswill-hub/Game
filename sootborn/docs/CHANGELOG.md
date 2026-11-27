@@ -17,7 +17,7 @@ After v0.86 put the fix list in, every on-screen line was read again, in four pa
 
 **The whole-story bot:** new game to THE END, no errors.
 
-**Not checked:** nothing by hand. The Valley's enemies on day forty still wear Teal's colours (only their names changed); they need another House's look. Left for you: Celestine's "fifty years" at nine years (fifty-three by the dates); Riser Nine is "nine floors of ladder" but also "forty feet under this grass"; the pump-house sign says NINE HOUSES.
+**Not checked:** nothing by hand. Then decided (same day, owner asked Claude to choose): Celestine says "fifty-three years"; Riser Nine is nine floors (the "forty feet" lines changed); the pump-house sign says TWELVE HOUSES; the two Houses on day forty have their own cadets with a dark red sash.
 
 
 ## v0.86 · 2026-11-27 — the story made to match the script rules
