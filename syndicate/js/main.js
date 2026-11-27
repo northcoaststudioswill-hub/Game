@@ -49,6 +49,7 @@
       if (e.code === 'Escape' || e.code === 'KeyP') { if (G.fight.paused) { if (e.code === 'Escape' && G.ui.isOpen() && !document.querySelector('#panel #pset') && G._pad && G._pad.back()) return; G.ui.close(); G.fight.paused = false; } else G.ui.pause(); }       // Escape inside Settings or Controls steps back to the pause menu, like B
       if (KEYMAP[e.code] && !e.repeat) In.pressed.push(KEYMAP[e.code]);
     } else if (G.scene === 'hub' || G.scene === 'hideout') {
+      if (e.code === 'Tab' && !G.ui.isOpen()) e.preventDefault();       // held, Tab shows every place's name
       if (e.code === 'Escape' && G.ui.isOpen()) { if (!(G._pad && G._pad.back())) G.ui.close(); G.ui.topbar(); }       // a page's own Back first (the Finisher list back to the Guildmaster), then close
       else if ((e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space') && !G.ui.isOpen() && !G.placing && !G.talk && !e.repeat) { if (G.near) G.near.go(); else G.reachNear(); }
     }
@@ -192,7 +193,15 @@
   }
 
   // ---------------------------------------------------------------- floating name tags over doors and stalls
+  // a Places button beside Menu shows every name in the market; otherwise only nearby names and pins for where to go
+  let showAll = false; try { showAll = localStorage.getItem('guttercrown_allplaces') === '1'; } catch (e) { }
+  const placesBtn = place => { const tb = $('topbar'), m = $('tbMute'); let b = $('tbPlaces'); const want = !!place && G.scene === 'hub';
+    if (!want) { if (b) b.remove(); document.body.classList.remove('allplaces'); return; }
+    if (!b && tb && m) { b = document.createElement('button'); b.id = 'tbPlaces'; b.className = 'mini'; b.onclick = e => { e.stopPropagation(); showAll = !showAll; try { localStorage.setItem('guttercrown_allplaces', showAll ? '1' : '0'); } catch (er) { } G.sfx && G.sfx('ui'); }; m.parentNode.insertBefore(b, m); }
+    if (b) { b.textContent = showAll ? 'Hide places' : 'Places'; b.classList.toggle('on', showAll); }
+    document.body.classList.toggle('allplaces', showAll || !!In.keys.Tab); };
   function tags(place, near) {
+    placesBtn(place);
     const host = $('tags');
     if (tagPlace !== place) {
       host.innerHTML = ''; tagEls = []; tagPlace = place;

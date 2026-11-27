@@ -929,3 +929,16 @@ body.pad .builder button:focus { outline: 3px solid #fff3c4; outline-offset: -3p
 /* who said it, under a quote on the pre-fight card */
 .quote small.said { display: inline; margin-left: 0.4em; font-style: normal; font-family: var(--display); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
 .quote small.said::before { content: '— '; }
+
+/* market names: close by, a place shows its name; from further off only where there is a reason to go (the guide's goal,
+   something new), and then as a small pin. The Places button (or holding Tab) shows every name. */
+.tag.far { opacity: 0; pointer-events: none !important; transition: opacity 0.25s; }
+.tag.far.goal, .tag.far.badge { opacity: 1; pointer-events: auto !important; font-size: 0; padding: 0; width: 1.05rem; height: 1.05rem; border-radius: 50%; letter-spacing: 0; }
+.tag.far.goal { background: radial-gradient(circle at 40% 35%, #fff3c4, #e0b04a 55%, #8a5a14); border-color: #fff3c4; }
+.tag.far.badge:not(.goal) { background: radial-gradient(circle at 40% 35%, #f6d874, #a8741f); border-color: #20140a; }
+.tag.far.badge::after { top: -0.55rem; right: -0.55rem; }
+.tag.far.shut { opacity: 0; }
+body.allplaces .tag.far, body.allplaces .tag.far.goal, body.allplaces .tag.far.badge { opacity: 0.92; pointer-events: auto !important; font-size: 0.62rem; padding: 0.26em 0.55em; width: auto; height: auto; border-radius: 0.25rem; }
+body.allplaces .tag.far.shut { opacity: 0.5; }
+#tbPlaces { align-self: center; } #tbPlaces.on { border-color: var(--gold); color: #fff3cf; }
+@media (orientation: portrait) { #tbPlaces { font-size: 0; padding: 0.4rem 0.5rem; flex: none; } #tbPlaces::before { content: '\2316'; font-size: 1.15rem; } }
