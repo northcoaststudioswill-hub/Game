@@ -303,7 +303,8 @@ function uiShop(closet) {
   const st = { slot: 'top' }; if (W) { W.look = true; W.me.face = W.yaw + Math.PI; W.me.vx = W.me.vz = 0; }
   const r = () => rankOf(S.rep);
   openPanel(() => {
-    let h = `<div class="ph"><h2>${closet ? 'CLOSET' : 'THE PLUG'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="tabs">` + SLOTS.map(s => Btn(s[1], () => { st.slot = s[0]; sfx('ui'); rerender(true); }, st.slot === s[0] ? 'sel' : 'alt')).join('') + `</div><div class="pb"><div class="grid">`;
+    let h = `<div class="ph"><h2>${closet ? 'CLOSET' : 'THE PLUG'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="tabs">` + SLOTS.map(s => Btn(s[1], () => { st.slot = s[0]; sfx('ui'); rerender(true); }, st.slot === s[0] ? 'sel' : 'alt')).join('') + Btn('★ FITS', () => { st.slot = 'fits'; sfx('ui'); rerender(true); }, st.slot === 'fits' ? 'sel' : 'alt') + `</div><div class="pb"><div class="grid">`;
+    if (st.slot === 'fits') return h + fitCards(closet, rerender) + `</div></div>`;
     let items = DRIP.filter(d => d.slot === st.slot && (closet || (d.src !== 'nexx' && d.src !== 'deed')));      /* NEXX SUPPLY is only at Nexx */ if (closet) items = items.filter(d => S.owned.includes(d.id)); else items = items.slice().sort((a, b) => a.r - b.r || a.cost - b.cost);
     for (const d of items) {
       const own = S.owned.includes(d.id), eq = S.worn[d.slot] === d.id, price = shopPrice(d.cost), lockR = d.rank > r();
@@ -320,6 +321,28 @@ function uiShop(closet) {
     if (!items.length) h += `<p class="mu">Nothing here yet.</p>`;
     return h + `</div></div>`;
   }, 'side');
+}
+
+// whole outfits from one game. Buying one gets every piece you are missing at 15% off and puts it all on.
+function fitCards(closet, rerender) {
+  const r = rankOf(S.rep); let h = closet ? '' : `<p class="mu" style="grid-column:1/-1">Whole fits from the crew's games. You only pay for the pieces you don't own, 15% off, and it all goes on at once.</p>`, n = 0;
+  for (const ft of FITS) {
+    const ps = ft.items.map(id => DRIPS[id]).filter(Boolean), miss = ps.filter(d => !S.owned.includes(d.id)); if (closet && miss.length) continue; n++;
+    const blocked = miss.find(d => d.src !== 'shop'), lockR = miss.reduce((m, d) => Math.max(m, d.rank), 0), price = Math.round(miss.reduce((t, d) => t + shopPrice(d.cost), 0) * 0.85);
+    const wearing = ps.every(d => S.worn[d.slot] === d.id), rar = ps.reduce((m, d) => Math.max(m, d.r), 0);
+    const wearAll = () => { for (const d of ps) S.worn[d.slot] = d.id; save(); worldPlayerRig(); };
+    let act;
+    if (wearing) act = `<span class="tag on">WEARING</span>`;
+    else if (!miss.length) act = Btn('WEAR FIT', () => { wearAll(); sfx('uiok'); rerender(); }, 'sm');
+    else if (blocked) act = `<span class="tag" style="color:var(--heat)">${esc(blocked.n)}: NOT SOLD HERE</span>`;
+    else if (lockR > r) act = `<span class="tag or">RANK: ${RANKS[lockR].n}</span>`;
+    else act = Btn('BUY FIT · ' + price + ' HC', () => { S.vc -= price; for (const d of miss) S.owned.push(d.id); wearAll(); sfx('buy'); toast('NEW FIT: ' + ft.n, ft.g + ' · ' + miss.length + ' new piece' + (miss.length > 1 ? 's' : '')); checkAch(); rerender(); }, 'sm', S.vc < price);
+    h += `<div class="card ${wearing ? 'sel' : ''}" style="border-left:5px solid ${RAR[rar][1]}"><div class="row"><span class="g"><h3>${esc(ft.n)}</h3><span class="tag" style="color:${RAR[rar][1]}">${esc(ft.g)}</span></span></div>`
+      + `<div class="row" style="flex-wrap:wrap;gap:4px;margin:6px 0">${ps.map(d => `<span class="sw" title="${esc(d.n)}" style="background:${d.c};width:16px;height:16px;margin:0;border-width:2px;${S.owned.includes(d.id) ? '' : 'opacity:.45'}"></span>`).join('')}</div>`
+      + `<p class="mu" style="font-size:11px">${ps.map(d => (S.owned.includes(d.id) ? '✓ ' : '') + esc(d.n)).join(' · ')}</p><div style="margin-top:6px">${act}</div></div>`;
+  }
+  if (!n) h += `<p class="mu">${closet ? 'No full fits yet. Buy every piece of one (or the whole fit at The Plug).' : 'Nothing here yet.'}</p>`;
+  return h;
 }
 
 // ---------- crib ----------

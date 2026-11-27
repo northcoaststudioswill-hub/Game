@@ -95,7 +95,7 @@ function makeRig(spec, lowDetail) {
   M(cyl(0.118 * wS, 0.118 * wS, 0.03, 10), toon(top.c2 || top.c), 0, 0.03, 0, spine).scale.z = 0.62;       // hem
   if (top.kind === 'jersey') { const st = M(geo('jstripe' + shW.toFixed(3) + midR.toFixed(3), () => { const r = lerp(midR, shW * 0.98, 0.3) + 0.004, g = new THREE.CylinderGeometry(r, r, 0.05, 14, 1, true, -1.0, 2.0); g.scale(1, 1, 0.585); return g; }), toon(top.c2), 0, upH * 0.3, 0, chestJ); st.material.side = THREE.DoubleSide; }      /* the stripe wraps the chest instead of a flat bar floating off it */
   // a number on the back (and a small one on the chest) of jerseys, tees and tanks: the same number every time for the same name
-  if (!lowDetail && (top.kind === 'jersey' || top.kind === 'tee' || top.kind === 'tank') && spec.name) {
+  if (!lowDetail && (top.kind === 'jersey' || top.kind === 'tee' || top.kind === 'tank' || top.kind === 'pads') && spec.name) {
     let hsh = 0; for (const ch of String(spec.name)) hsh = (hsh * 31 + ch.charCodeAt(0)) >>> 0; const num = String(hsh % 100), lum = c => { const v = new THREE.Color(c); return v.r * 0.3 + v.g * 0.59 + v.b * 0.11; }, ink0 = top.kind === 'jersey' && top.c2 ? top.c2 : (lum(top.c) > 0.45 ? '#16181c' : '#f4f1ea');
     const tex = geoTex('num' + num + ink0, () => canvasTex(128, 128, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = ink0; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = '900 96px Archivo, "Arial Black", Impact, sans-serif'; x.fillText(num, w / 2, h / 2 + 6); }));
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
@@ -113,6 +113,22 @@ function makeRig(spec, lowDetail) {
     M(sph(0.105 * wS, 10, 8), tc, 0, loH * 0.5, 0.018, spine).scale.set(1.02, 1.5, 0.62);               // belly / small of the back fill
     for (const sx of [-1, 1]) M(sph(0.072 * wS, 8, 6), bc, sx * 0.052 * wS, -0.045, -0.055, hips).scale.set(1, 1.05, 0.9);      // seat
   }
+  // the heavier tops: plate armour (a breastplate over the chest, a backplate, a trimmed belt), a suit (a shirt and a tie
+  // under the jacket front), football pads (a wide yoke across the shoulders)
+  if (top.kind === 'armor') { const pc = toon(top.c), tc = toon(top.c2 || top.c);
+    out(M(sph(shW * 0.62, 10, 8), pc, 0, upH * 0.52, 0.045 * wS, chestJ), 1.05).scale.set(1.5, 1.05, 0.62);
+    out(M(sph(shW * 0.62, 10, 8), pc, 0, upH * 0.5, -0.05 * wS, chestJ), 1.05).scale.set(1.45, 1.0, 0.55);
+    M(box(0.03, upH * 0.8, 0.02), tc, 0, upH * 0.5, 0.045 * wS + shW * 0.39, chestJ);      /* the ridge down the middle */
+    out(M(cyl(0.128 * wS, 0.13 * wS, 0.06, 10), tc, 0, 0.04, 0, spine), 1.04).scale.z = 0.66;
+    out(M(cyl(0.075, 0.1, 0.06, 10), tc, 0, upH + 0.005, 0.004, chestJ), 1.05).scale.z = 0.8;      /* a gorget round the neck */
+    for (const sy of [0.3, 0.62]) M(box(shW * 1.25, 0.014, 0.012), tc, 0, upH * sy, 0.045 * wS + shW * 0.35 - Math.abs(sy - 0.5) * 0.06, chestJ);      /* plate seams across the chest */
+    for (let i = 0; i < 2; i++) M(cyl(0.122 * wS - i * 0.004, 0.124 * wS, 0.045, 10), pc, 0, loH * (0.38 + i * 0.3), 0.004, spine).scale.z = 0.64; }      /* banded plates over the belly */
+  if (top.kind === 'suit') { const fz = 0.106 * wS + 0.014;
+    M(box(0.085, upH * 0.78, 0.012), toon('#f4f1e8'), 0, upH * 0.56, fz, chestJ).rotation.x = -0.12;      /* the shirt */
+    M(box(0.028, upH * 0.66, 0.012), toon(top.c2 || '#c8102e'), 0, upH * 0.52, fz + 0.006, chestJ).rotation.x = -0.12;      /* the tie */
+    for (const sx of [-1, 1]) { const l = M(box(0.04, upH * 0.62, 0.014), toon(top.c), sx * 0.05, upH * 0.6, fz + 0.002, chestJ); l.rotation.z = sx * 0.28; l.rotation.x = -0.12; } }      /* lapels */
+  if (top.kind === 'pads') { const yk = out(M(box(shW * 2.25, 0.075, 0.27 * wS), toon(top.c), 0, upH * 0.96, 0, chestJ), 1.05); yk.rotation.x = 0.04;
+    for (const sx of [-1, 1]) out(M(sph(0.085, 8, 6), toon(top.c), sx * shW * 0.95, upH * 0.92, 0, chestJ), 1.05).scale.set(1.2, 0.7, 1.4); }
   R.rest = { spine: -0.07, chest: 0.13, neck: -0.09, head: 0.03 };      /* lumbar curve in, upper back out, head carried over the shoulders */
   const chest = grp(chestJ, 0, upH, 0);
   // neck + head
@@ -154,6 +170,14 @@ function makeRig(spec, lowDetail) {
       case 'cap': { const m = out(M(geo('cap', () => new THREE.SphereGeometry(hr * 1.1, 12, 8, 0, 6.3, 0, 1.5)), c, 0, hy + 0.03, 0, head), 1.05); m.scale.set(0.95, 1.05, 1.02); M(box(0.15, 0.012, 0.11), c2, 0, hy + 0.045, -hr - 0.03, head); break; }
       case 'halo': { const m = M(geo('halo', () => new THREE.TorusGeometry(0.1, 0.012, 6, 20)), flat(hd.c), 0, hy + 0.24, 0, head); m.rotation.x = Math.PI / 2; break; }
       case 'crown': { M(cyl(hr * 0.9, hr * 0.85, 0.05, 10, true), c, 0, hy + 0.11, 0, head).material.side = THREE.DoubleSide; for (let i = 0; i < 6; i++) { const a = i / 6 * 6.283; M(geo('cpt', () => new THREE.ConeGeometry(0.025, 0.07, 4)), i % 2 ? c2 : c, Math.cos(a) * hr * 0.86, hy + 0.165, Math.sin(a) * hr * 0.86, head); } break; }
+      case 'helm': { const m = out(M(geo('helm', () => new THREE.SphereGeometry(hr * 1.16, 12, 8, 0, 6.3, 0, 1.75)), c, 0, hy, -0.005, head), 1.05); m.scale.set(1, 1.08, 1.04);
+        M(box(0.03, 0.07, hr * 2.0), c2, 0, hy + hr * 1.2, -0.01, head);      /* the crest */
+        M(cyl(hr * 1.17, hr * 1.17, 0.03, 12), c2, 0, hy + 0.015, -0.005, head);      /* the brow band */
+        M(box(0.024, 0.1, 0.022), c, 0, hr * 0.98, hr * 1.06, head);      /* the nose guard */
+        for (const sx of [-1, 1]) { const ck = M(box(0.05, 0.09, 0.02), c, sx * hr * 0.72, hr * 0.85, hr * 0.78, head); ck.rotation.y = sx * 0.7; } break; }      /* cheek guards */
+      case 'hood': { const m = out(M(geo('hood', () => new THREE.SphereGeometry(hr * 1.3, 12, 9, Math.PI / 2 + 0.75, Math.PI * 2 - 1.5, 0, 2.2)), c, 0, hy - 0.01, -0.03, head), 1.04); m.material.side = THREE.DoubleSide; m.scale.set(1, 1.1, 1.05); break; }
+      case 'captain': { M(cyl(hr * 1.55, hr * 1.55, 0.02, 3), c, 0, hy + 0.1, -0.01, head).rotation.y = Math.PI / 6; out(M(cyl(hr * 0.88, hr * 0.98, 0.1, 10), c, 0, hy + 0.15, -0.01, head), 1.05); M(cyl(hr * 0.99, hr * 0.99, 0.022, 10), c2, 0, hy + 0.115, -0.01, head); break; }      /* a tricorn: the brim is a triangle */
+      case 'beanie': { const m = out(M(geo('beanie', () => new THREE.SphereGeometry(hr * 1.1, 12, 8, 0, 6.3, 0, 1.45)), c, 0, hy + 0.035, -0.005, head), 1.05); m.scale.set(0.96, 1.18, 1.02); M(cyl(hr * 1.07, hr * 1.07, 0.04, 12), c2, 0, hy + 0.05, -0.005, head); out(M(sph(0.032, 7, 6), c2, 0, hy + hr * 1.35, -0.01, head)); break; }
       case 'antenna': { M(cyl(0.006, 0.006, 0.26, 5), c, 0.05, hy + 0.2, -0.02, head); M(sph(0.022), flat(hd.c2), 0.05, hy + 0.34, -0.02, head); break; }
       case 'eagle': { out(M(sph(hr * 1.22, 12, 10), c, 0, hy + 0.03, -0.01, head), 1.05); const bk = M(geo('beak', () => new THREE.ConeGeometry(0.045, 0.14, 6)), c2, 0, hy + 0.0, hr + 0.07, head); bk.rotation.x = Math.PI / 2 + 0.25; for (const sx of [-1, 1]) M(sph(0.02), flat(0x101014), sx * 0.06, hy + 0.07, hr * 1.02, head); break; }
     }
@@ -165,6 +189,7 @@ function makeRig(spec, lowDetail) {
       case 'shades': for (const sx of [-1, 1]) M(box(0.058, 0.036, 0.016), toon(fc.c), sx * 0.042, ey, fz, head); M(box(0.03, 0.008, 0.012), toon(fc.c), 0, ey + 0.008, fz, head); break;
       case 'visor': M(box(0.17, 0.04, 0.03), flat(fc.c, { transparent: true, opacity: 0.85 }), 0, ey, fz - 0.004, head); break;
       case 'mask': M(box(0.13, 0.065, 0.045), toon(fc.c), 0, ey - 0.065, fz - 0.018, head); break;
+      case 'patch': M(cyl(0.032, 0.032, 0.012, 10), toon(fc.c), 0.042, ey, fz + 0.002, head).rotation.x = Math.PI / 2; M(geo('band', () => new THREE.TorusGeometry(hr * 0.97, 0.008, 6, 16)), toon(fc.c), 0, ey + 0.01, 0.005, head).rotation.set(Math.PI / 2 - 0.2, 0.25, 0); break;
       case 'goggles': for (const sx of [-1, 1]) M(cyl(0.03, 0.03, 0.02, 10), toon(fc.c), sx * 0.042, ey, fz, head).rotation.x = Math.PI / 2; M(box(0.2, 0.014, 0.19), toon(fc.c2 || fc.c), 0, ey, 0, head); break;
     }
   }
@@ -178,9 +203,14 @@ function makeRig(spec, lowDetail) {
     const sh = grp(chest, sx * shW * 0.86, -0.065, 0);
     out(M(capsule(0.043 * lW, up), skin, 0, -up / 2 + 0.004, 0, sh), 1.12);
     M(sph(0.05 * lW), top.kind === 'tank' ? skin : toon(top.c), 0, -0.004, 0, sh).scale.set(1, 0.92, 0.9);
-    if (top.kind === 'tee' || top.kind === 'jersey') M(capsule(0.052 * lW, up * (top.kind === 'tee' ? 0.55 : 0.3)), toon(top.c), 0, -up * 0.16, 0, sh);
+    if (top.kind === 'tee' || top.kind === 'jersey' || top.kind === 'pads') M(capsule(0.052 * lW, up * (top.kind === 'tee' ? 0.55 : 0.3)), toon(top.c), 0, -up * 0.16, 0, sh);
+    const longS = top.kind === 'suit' || top.kind === 'longsleeve';
+    if (longS) out(M(capsule(0.05 * lW, up * 0.9), toon(top.c), 0, -up / 2 + 0.01, 0, sh), 1.06);
+    if (top.kind === 'armor') { for (let i = 0; i < 2; i++) { const pd = out(M(geo('pauld', () => new THREE.SphereGeometry(0.08, 10, 6, 0, 6.3, 0, 1.5)), toon(i ? top.c2 || top.c : top.c), sx * 0.012, 0.035 - i * 0.045, 0, sh), 1.07); pd.scale.set(1.35 * lW - i * 0.08, 0.8, 1.3 * lW - i * 0.08); pd.rotation.z = sx * 0.2; } }      /* layered shoulder plates sitting on top of the shoulder */
     const el = grp(sh, 0, -up + 0.03, 0);
     out(M(capsule(0.036 * lW, fore), skin, 0, -fore / 2 + 0.02, 0, el), 1.13);
+    if (longS) { out(M(capsule(0.043 * lW, fore * 0.82), toon(top.c), 0, -fore / 2 + 0.03, 0, el), 1.07); M(cyl(0.046 * lW, 0.046 * lW, 0.03, 8), toon(top.kind === 'suit' ? '#f4f1e8' : (top.c2 || top.c)), 0, -fore + 0.085, 0, el); }
+    if (top.kind === 'armor') out(M(cyl(0.047 * lW, 0.042 * lW, fore * 0.45, 8), toon(top.c2 || top.c), 0, -fore * 0.68, 0, el), 1.06);      /* bracers */
     const wr = grp(el, 0, -fore + 0.045, 0); const hand = out(M(sph(0.046), skin, 0, -0.045, 0, wr), 1.1); hand.scale.set(0.85 * P.hand, 1.35 * P.hand, 0.5 * P.hand); R.joints['wr' + side] = wr;
     if (arm && arm.kind !== 'none') {
       const ac = toon(arm.c);
@@ -200,10 +230,11 @@ function makeRig(spec, lowDetail) {
     const sx = side === 'R' ? -1 : 1;
     const hp = grp(hips, sx * hipW, -0.04, 0);
     out(M(capsule(0.062 * lW, thigh), skin, 0, -thigh / 2 + 0.03, 0, hp), 1.1);
-    const sl = thigh * (baggy ? 0.98 : 0.62);
+    const pants = bot.kind === 'pants', sl = thigh * (baggy || pants ? 0.98 : 0.62);
     out(M(geo('short' + wS.toFixed(2) + sl.toFixed(3), () => new THREE.CylinderGeometry(0.074 * lW, 0.086 * lW, sl, 8)), sc, 0, -sl / 2 + 0.03, 0, hp), 1.07);
     const kn = grp(hp, 0, -thigh + 0.03, 0);
     out(M(capsule(0.045 * lW, shin), skin, 0, -shin / 2 + 0.02, 0, kn), 1.12);
+    if (pants) { out(M(cyl(0.064 * lW, 0.055 * lW, shin * 0.84, 8), sc, 0, -shin * 0.42 + 0.03, 0, kn), 1.06); if (bot.c2) M(cyl(0.057 * lW, 0.057 * lW, 0.02, 8), toon(bot.c2), 0, -shin * 0.84 + 0.035, 0, kn); }
     const sockH = socks.kind === 'high' ? shin * 0.62 : shin * 0.2;
     M(cyl(0.047 * lW, 0.043 * lW, sockH, 8), toon(socks.c), 0, -shin + 0.06 + sockH / 2, 0, kn);
     if (socks.c2 && socks.kind === 'high') M(cyl(0.049 * lW, 0.049 * lW, 0.025, 8), toon(socks.c2), 0, -shin + 0.04 + sockH, 0, kn);
@@ -211,6 +242,7 @@ function makeRig(spec, lowDetail) {
     out(M(box(0.095, 0.075, 0.25), toon(shoes.c), 0, -0.01, 0.055, foot), 1.1);
     M(box(0.1, 0.022, 0.26), toon(shoes.c2 || '#fff'), 0, -0.045, 0.055, foot);
     if (shoes.kind === 'high') M(cyl(0.052, 0.05, 0.08, 8), toon(shoes.c), 0, 0.045, 0, foot);
+    if (shoes.kind === 'boot') { out(M(cyl(0.056, 0.054, 0.17, 8), toon(shoes.c), 0, 0.09, 0, foot), 1.06); M(cyl(0.058, 0.058, 0.02, 8), toon(shoes.c2 || shoes.c), 0, 0.17, 0, foot); }
     R.joints['hp' + side] = hp; R.joints['kn' + side] = kn; R.thigh = thigh; R.shin = shin; R.hipW = hipW;
   }
   // back
@@ -220,6 +252,8 @@ function makeRig(spec, lowDetail) {
     switch (bk.kind) {
       case 'towel': M(box(0.09, 0.2, 0.03), c, -0.07, -0.13, 0.11, hips).rotation.z = 0.1; break;
       case 'cape': { const g = grp(chest, 0, -0.02, -0.09); const m = M(box(shW * 1.9, torso * 1.6, 0.012), c, 0, -torso * 0.8, 0, g); M(box(shW * 1.9, 0.08, 0.016), c2, 0, -0.06, 0, g); g.rotation.x = 0.12; R.cape = g; m.material.side = THREE.DoubleSide; break; }
+      case 'sword': { const g = grp(chest, 0, -0.14, -0.13); g.rotation.z = 0.7; M(box(0.035, 0.62, 0.012), flat(bk.c), 0, 0.05, 0, g); M(box(0.05, 0.62, 0.03), c2, 0, 0.0, -0.012, g); M(box(0.16, 0.025, 0.035), c2, 0, 0.36, 0, g); M(cyl(0.014, 0.014, 0.13, 6), toon('#3a2a1c'), 0, 0.44, 0, g); M(sph(0.022, 6, 5), c2, 0, 0.51, 0, g); break; }      /* a sheathed blade across the back, the hilt over the right shoulder */
+      case 'shield': { const g = grp(chest, 0, -0.17, -0.15); const d = out(M(cyl(0.2, 0.2, 0.035, 14), c, 0, 0, 0, g), 1.05); d.rotation.x = Math.PI / 2; M(geo('shRim', () => new THREE.TorusGeometry(0.2, 0.014, 5, 18)), c2, 0, 0, -0.019, g); M(sph(0.045, 8, 6), c2, 0, 0, -0.03, g); break; }
       case 'pack': out(M(box(0.2, 0.26, 0.09), c, 0, -0.16, -0.14, chest), 1.06); for (const sx of [-1, 1]) { M(cyl(0.035, 0.045, 0.12, 8), c2, sx * 0.06, -0.33, -0.14, chest); } break;
       case 'wings': for (const sx of [-1, 1]) { const g = grp(chest, sx * 0.06, -0.08, -0.1); const w = M(geo('wing', () => { const s = new THREE.Shape(); s.moveTo(0, 0); s.lineTo(0.55, 0.3); s.lineTo(0.5, 0.05); s.lineTo(0.42, -0.1); s.lineTo(0.28, -0.22); s.lineTo(0.1, -0.3); s.lineTo(0, -0.12); return new THREE.ShapeGeometry(s); }), toon(bk.c), 0, 0, 0, g); w.material.side = THREE.DoubleSide; g.scale.x = sx; g.rotation.y = sx * 0.5; (R.wings = R.wings || []).push(g); } break;
     }

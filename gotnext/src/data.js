@@ -204,7 +204,7 @@ function rankOf(rep) { let r = 0; for (let i = 0; i < RANKS.length; i++) if (rep
 // ---------- drip ----------
 // rarity, in sneaker terms: 0 general release, 1 limited, 2 exclusive, 3 grail, 4 one of one
 const RAR = [['GR', '#8d8d99'], ['LIMITED', '#5aa9ff'], ['EXCLUSIVE', '#a78bff'], ['GRAIL', '#f2c14e'], ['1 OF 1', '#ff2d78']];
-const SLOTS = [['hair', 'Hair'], ['head', 'Headwear'], ['face', 'Face'], ['top', 'Top'], ['arm', 'Arms'], ['bottom', 'Shorts'], ['socks', 'Socks'], ['shoes', 'Kicks'], ['back', 'Back'], ['ball', 'Ball']];
+const SLOTS = [['hair', 'Hair'], ['head', 'Headwear'], ['face', 'Face'], ['top', 'Top'], ['arm', 'Arms'], ['bottom', 'Bottoms'], ['socks', 'Socks'], ['shoes', 'Kicks'], ['back', 'Back'], ['ball', 'Ball']];
 // each item: id, slot, n(ame), kind (shape), c (main colour), c2 (accent), r(arity), cost, rank, buff {attr:+n}, src: 'shop'|'ach'|'bum'|'start'
 const DRIP = [];
 function drip(slot, id, n, kind, c, c2, r, cost, rank, buff, src) { DRIP.push({ id, slot, n, kind, c, c2, r, cost, rank: rank || 0, buff: buff || null, src: src || 'shop' }); }
@@ -302,7 +302,7 @@ drip('head', 'hd_gutter', 'The Gutter Crown', 'crown', '#f0c95a', '#26204a', 4, 
 drip('head', 'hd_sprout', 'Sprout On Your Head', 'antenna', '#7ac74f', 0, 1, 900, 1);
 drip('head', 'hd_lantern', 'Lantern Halo', 'halo', '#ffd76a', 0, 3, 5200, 4, { iq: 1 });
 drip('head', 'hd_bibi', 'Iron Dome Headband', 'band', '#c8d0d8', 0, 1, 650, 1, { block: 1 });
-drip('face', 'f_gold', 'Gilded Eyes', 'visor', '#e9cf7a', 0, 3, 4800, 5, { iq: 1 });
+drip('face', 'f_gilded', 'Gilded Eyes', 'visor', '#e9cf7a', 0, 3, 4800, 5, { iq: 1 });
 drip('face', 'f_clanker', 'Clanker Visor', 'visor', '#33e0ff', 0, 2, 2100, 3);
 drip('face', 'f_soot', 'Soot Rag', 'mask', '#3d5a6a', 0, 1, 500, 1);
 drip('face', 'f_derek', "D's Van Shades", 'shades', '#111', 0, 1, 450, 0);
@@ -326,6 +326,99 @@ drip('back', 'bk_towelwhip', "Erin's Towel Whip", 'towel', '#f3e6cf', 0, 1, 600,
 drip('back', 'bk_washer', 'Washer On A Cord', 'towel', '#c8a24a', 0, 3, 0, 0, { layup: 1, iq: 1 }, 'deed');
 drip('head', 'hd_bookie', "The Bookie's Visor", 'cap', '#1f6a3a', '#f4f4f4', 3, 0, 0, { iq: 1 }, 'deed');
 drip('face', 'f_dead13', 'Dead-On Thirteens', 'shades', '#b3401a', 0, 3, 0, 0, { three: 1 }, 'deed');
+// THE CROSSOVER, PART TWO: the rest of the studio's games. New cuts: plate armour, suits, long sleeves, football pads,
+// long pants, boots, helms, hoods, tricorns, beanies, eye patches, swords and shields on the back.
+// FRONT OFFICE (the franchise sim with the pixel broadcast)
+drip('top', 't_fo_suit', 'Front Office Three-Piece', 'suit', '#1f2a3a', '#c8102e', 3, 4800, 4, { iq: 2, pass: 1 });
+drip('top', 't_fo_polo', 'GM Sideline Polo', 'tee', '#0f3d2e', '#f2c14e', 1, 700, 1, { iq: 1 });
+drip('top', 't_fo_pads', 'War Room Pads', 'pads', '#0b2a5a', '#f2c14e', 2, 2300, 2, { str: 1, intd: 1 });
+drip('head', 'hd_fo_headset', "Coach's Headset", 'band', '#16181c', 0, 1, 500, 1, { iq: 1 });
+drip('bottom', 'b_fo_slacks', 'Front Office Slacks', 'pants', '#1f2a3a', 0, 2, 1400, 2, { pass: 1 });
+drip('shoes', 'k_fo_oxfords', 'Draft Day Oxfords', 'low', '#3a2416', '#16181c', 2, 1600, 2, { iq: 1 });
+// ON TWO (street football; GRIDLOCK is the only football game anybody knows, FOREVER TEAM its dead mode)
+drip('top', 't_ontwo', 'ON TWO Hot Pink Pads', 'pads', '#16181c', '#ff2d78', 3, 3800, 3, { pass: 2, str: 1 });
+drip('top', 't_gridlock', "GRIDLOCK '45 Launch Tee", 'tee', '#2a2a2a', '#9be15d', 1, 600, 0);
+drip('top', 't_forever', 'FOREVER TEAM (Servers Offline) Tee', 'tee', '#e8e2d0', '#c8102e', 1, 650, 0, { stam: 1 });
+drip('head', 'hd_ontwo', 'Quarterback Beanie', 'beanie', '#ff2d78', '#16181c', 1, 450, 0);
+drip('arm', 'a_ontwo', 'Playcard Wristbands', 'wrist', '#f4f1e8', 0, 1, 550, 1, { pass: 1 });
+// ERIN AND THE HIDDEN KINGDOM (sailing, islands, the Pale Elf)
+drip('head', 'hd_erin', "Hidden Kingdom Captain's Hat", 'captain', '#1a2a4a', '#e9cf7a', 3, 3600, 3, { iq: 1, pass: 1 });
+drip('top', 't_erin', 'Deckhand Longsleeve', 'longsleeve', '#f4f1e8', '#2a5ea8', 1, 800, 1, { stam: 1 });
+drip('top', 't_erincoat', "Erin's Sailing Coat", 'suit', '#2a5ea8', '#e9cf7a', 3, 4400, 3, { speed: 1, pass: 1 });
+drip('bottom', 'b_erin', 'Salt-Stained Sailcloth Pants', 'pants', '#d8ccb0', '#7a5a3a', 1, 700, 1);
+drip('shoes', 'k_erin', 'Deck Boots', 'boot', '#3a2a1c', '#e9cf7a', 2, 1900, 2, { accel: 1, reb: 1 });
+drip('face', 'f_erin', "Pale Elf's Eye Patch", 'patch', '#16181c', 0, 2, 1200, 2, { three: 1 });
+drip('back', 'bk_erin', 'Hidden Kingdom Sail Cape', 'cape', '#f4f1e8', '#2a5ea8', 2, 2100, 2, { stam: 1 });
+// KIRA: GHOST SIGNAL (Vesper City, Rooftop District 07)
+drip('top', 't_kira', 'Vesper City Ghost Jacket', 'longsleeve', '#15131f', '#ff3cac', 3, 4200, 3, { handle: 1, accel: 1 });
+drip('head', 'hd_kira', 'Signal Hood', 'hood', '#15131f', '#ff3cac', 2, 1800, 2, { steal: 1 });
+drip('face', 'f_kira', 'Ghost Signal Visor', 'visor', '#ff3cac', 0, 2, 1700, 2, { perd: 1 });
+drip('bottom', 'b_kira', 'Rooftop 07 Cargo Pants', 'pants', '#22202e', '#33e0ff', 2, 1500, 2, { speed: 1 });
+drip('shoes', 'k_kira', 'Telekinesis Hi-Tops', 'high', '#15131f', '#ff3cac', 3, 4600, 4, { vert: 2 });
+// STARHAVEN (the fae court)
+drip('top', 't_star', 'Fae Court Plate', 'armor', '#c9d8e8', '#c8a0ff', 4, 9500, 6, { block: 1, perd: 1, str: 1 });
+drip('head', 'hd_star', 'Fae Circlet', 'crown', '#c8a0ff', '#f4f1e8', 3, 4000, 4, { iq: 1 });
+drip('shoes', 'k_star', 'Moonsteel Greaves', 'boot', '#c9d8e8', '#c8a0ff', 3, 4200, 4, { vert: 1 });
+drip('back', 'bk_star', 'Moonsteel Sword', 'sword', '#e8eef8', '#c8a0ff', 3, 4500, 4, { dunk: 1, str: 1 });
+drip('back', 'bk_starsh', 'Fae Court Shield', 'shield', '#3a2a6a', '#e9cf7a', 2, 2400, 3, { block: 1 });
+// GUTTERCROWN (the pit): armour
+drip('top', 't_gutarmor', "Pit Fighter's Plate", 'armor', '#6a6e78', '#b3401a', 3, 5600, 4, { str: 2, intd: 1 });
+drip('head', 'hd_guthelm', 'Guttercrown Pit Helm', 'helm', '#6a6e78', '#b3401a', 3, 4800, 4, { str: 1, block: 1 });
+drip('shoes', 'k_gutboot', 'Pit Greaves', 'boot', '#6a6e78', '#26204a', 3, 3900, 3, { str: 1, reb: 1 });
+drip('back', 'bk_gutsword', 'Syndicate Shortsword', 'sword', '#c8d0d8', '#f0c95a', 3, 4200, 3, { steal: 1 });
+// SECOND CHANCE (Dez Calloway, the man with the ledger)
+drip('top', 't_dez', "Dez Calloway's Courier Jacket", 'longsleeve', '#2a2a30', '#e8742a', 2, 2200, 2, { speed: 1 });
+drip('head', 'hd_shade', 'Shade Hood', 'hood', '#101014', 0, 3, 3800, 3, { steal: 1, perd: 1 });
+drip('top', 't_ledger', "The Ledger Man's Suit", 'suit', '#16181c', '#b3401a', 4, 10000, 6, { iq: 2, pass: 1, three: 1 });
+drip('bottom', 'b_ledger', "The Ledger Man's Trousers", 'pants', '#16181c', 0, 3, 3200, 4, { iq: 1 });
+drip('arm', 'a_ember', 'Ember Wraps', 'sleeves', '#ff6a2a', '#ffd23a', 2, 1600, 2, { dunk: 1 });
+// SOOTBORN (the undercity)
+drip('top', 't_soot', 'Undercity Scrap Plate', 'armor', '#2b2b30', '#b8682a', 2, 2600, 2, { str: 1 });
+drip('head', 'hd_soot', 'Soot Beanie', 'beanie', '#3d5a6a', '#b8682a', 0, 250, 0);
+// LIL BOTTIE
+drip('top', 't_bottie', "lil Bottie: Clankin' in the Cloud Tee", 'tee', '#7de3ff', '#16181c', 1, 750, 0, { swb: 1 });
+drip('top', 't_bottiehood', 'Spawns Got Spawns Hoodie', 'hoodie', '#ffd23a', '#16181c', 2, 1700, 1, { handle: 1 });
+drip('head', 'hd_bottie', 'Bottie Antenna', 'antenna', '#c8d0d8', '#7de3ff', 1, 600, 0);
+drip('ball', 'bl_bottie', 'Bottie Battery Ball', 'ball', '#ffd23a', '#16181c', 2, 1400, 1);
+// NORTH COAST OVERDRIVE (the kart racer)
+drip('top', 't_overdrive', 'Overdrive Pit Crew Longsleeve', 'longsleeve', '#e02828', '#f4f1e8', 2, 1900, 2, { accel: 1 });
+drip('head', 'hd_overdrive', 'Overdrive Racing Helmet', 'helm', '#f4f1e8', '#e02828', 3, 4200, 3, { speed: 1, accel: 1 });
+drip('shoes', 'k_overdrive', 'Checkered Flag Lows', 'low', '#f4f1e8', '#16181c', 1, 900, 1, { speed: 1 });
+// GODMODE.EXE
+drip('top', 't_godmode', 'CYCLES Spent Tee', 'tee', '#f4f1e8', '#ffd23a', 2, 1500, 1, { iq: 1 });
+drip('head', 'hd_godmode', 'Singularity Halo', 'halo', '#7df9ff', 0, 4, 9000, 6, { iq: 1, three: 1, pass: 1 });
+// BLIND SPOT, LANTERN LEAGUE
+drip('top', 't_ithara', 'Ithara Basin Tank', 'tank', '#2f4a5a', '#f2c14e', 1, 600, 0);
+drip('socks', 's_lantern', 'Hover-Pod Socks', 'high', '#ffd76a', '#1c2440', 1, 500, 1, { vert: 1 });
+// OZ (1880 to 1920, the war room)
+drip('head', 'hd_oz', "Grand Strategist's Bicorne", 'captain', '#1c1d22', '#c8102e', 3, 3800, 3, { iq: 2 });
+drip('top', 't_oz', '1880 Officer\'s Coat', 'suit', '#2c3a2a', '#c8a24a', 3, 4600, 4, { iq: 1, perd: 1 });
+drip('bottom', 'b_oz', 'Cavalry Trousers', 'pants', '#d8d0b8', '#c8102e', 2, 1600, 2);
+drip('shoes', 'k_oz', 'Riding Boots', 'boot', '#1c1d22', '#5a3a22', 2, 2200, 2, { speed: 1 });
+// GOT NEXT warm-ups
+drip('top', 't_gnwarm', 'GOT NEXT Warm-Up Longsleeve', 'longsleeve', '#16181c', '#ff2d78', 1, 700, 0);
+drip('bottom', 'b_gnwarm', 'Cages Warm-Up Pants', 'pants', '#16181c', '#ff2d78', 1, 650, 0, { stam: 1 });
+drip('head', 'hd_gnbeanie', 'Bone Knit Beanie', 'beanie', '#ece9e2', '#ff2d78', 0, 180, 0);
+drip('ball', 'bl_kira', 'Vesper Night Rock', 'ball', '#15131f', '#ff3cac', 2, 1500, 2);
+drip('ball', 'bl_star', 'Moonsteel Rock', 'ball', '#c9d8e8', '#c8a0ff', 3, 3200, 3);
+drip('ball', 'bl_erin', 'Sea Glass Rock', 'ball', '#2a5ea8', '#f4f1e8', 1, 700, 1);
+// FITS: whole outfits from the same games. Buying a fit gets every piece you are missing at 15% off and puts it all on.
+const FITS = [
+  { id: 'fo', n: 'The Front Office', g: 'Front Office', items: ['t_fo_suit', 'b_fo_slacks', 'k_fo_oxfords', 'hd_fo_headset'] },
+  { id: 'fopads', n: 'War Room Walk-Through', g: 'Front Office', items: ['t_fo_pads', 'hd_fo_headset', 'b_fo_slacks', 'k_white'] },
+  { id: 'captain', n: 'Hidden Kingdom Captain', g: 'Erin and the Hidden Kingdom', items: ['hd_erin', 't_erincoat', 'b_erin', 'k_erin', 'bk_erin'] },
+  { id: 'deck', n: 'Pale Elf Deckhand', g: 'Erin and the Hidden Kingdom', items: ['t_erin', 'f_erin', 'b_erin', 'k_erin'] },
+  { id: 'ghost', n: 'Ghost Signal', g: 'KIRA: Ghost Signal', items: ['hd_kira', 'f_kira', 't_kira', 'b_kira', 'k_kira', 'bl_kira'] },
+  { id: 'fae', n: 'Fae Court Knight', g: 'Starhaven', items: ['t_star', 'hd_star', 'k_star', 'bk_star', 'bl_star'] },
+  { id: 'pit', n: 'Pit Fighter', g: 'Guttercrown', items: ['t_gutarmor', 'hd_guthelm', 'k_gutboot', 'bk_gutsword', 'b_gutter'] },
+  { id: 'ledger', n: 'The Man With The Ledger', g: 'Second Chance', items: ['t_ledger', 'b_ledger', 'k_fo_oxfords', 'f_shades'] },
+  { id: 'dez', n: 'Courier, 11:48 PM', g: 'Second Chance', items: ['t_dez', 'hd_shade', 'a_ember', 'b_long'] },
+  { id: 'qb', n: 'Street QB', g: 'ON TWO', items: ['t_ontwo', 'hd_ontwo', 'a_ontwo', 'b_gnwarm'] },
+  { id: 'pitcrew', n: 'Overdrive Pit Crew', g: 'North Coast Overdrive', items: ['hd_overdrive', 't_overdrive', 'k_overdrive', 'b_gnwarm'] },
+  { id: 'officer', n: '1880 War Room', g: 'oz', items: ['hd_oz', 't_oz', 'b_oz', 'k_oz'] },
+  { id: 'bottie', n: 'Clankin\' in the Cloud', g: 'lil Bottie', items: ['t_bottie', 'hd_bottie', 'bl_bottie', 'k_volt'] },
+  { id: 'warmup', n: 'Cages Warm-Up', g: 'GOT NEXT', items: ['t_gnwarm', 'b_gnwarm', 'hd_gnbeanie', 'k_red'] },
+];
 // NEXX SUPPLY: only Nexx sells these (cast.js)
 drip('top', 't_nexx', 'NEXX Studio Hoodie', 'hoodie', '#111216', '#7de3ff', 2, 1200, 0, { handle: 1, swb: 1 }, 'nexx');
 drip('head', 'hd_nexx', 'NEXX Snapback', 'cap', '#7de3ff', '#111216', 1, 450, 0, null, 'nexx');
@@ -407,6 +500,16 @@ const BOOSTS = [
   { id: 'rosin', n: 'Rosin Vape (grape)', d: '+4 to every Shooting attribute this game.', cost: 80, buff: { mid: 4, three: 4, iq: 4 } },
   { id: 'knees', n: 'Knee Subscription (1 day)', d: '+6 Vertical, +4 Dunk this game.', cost: 80, buff: { vert: 6, dunk: 4 } },
   { id: 'glue', n: 'Legal Stickum', d: '+5 Handles, +5 Steal this game.', cost: 70, buff: { handle: 5, steal: 5 } },
+  // drinks from the crew's other games
+  { id: 'slop', n: 'SLOP FM Energy (tall can)', d: '+4 Speed, +4 Burst this game. Tastes like a jingle.', cost: 70, buff: { speed: 4, accel: 4 } },
+  { id: 'sunkeeptea', n: 'Sunkeep Iced Tea', d: '+8 Stamina, +2 Rebound this game. Brewed in a garden somewhere better.', cost: 35, buff: { stam: 8, reb: 2 } },
+  { id: 'wisptonic', n: 'Wisp Tonic (Guttercrown)', d: '+5 Steal, +3 Perimeter D this game. It glows a little.', cost: 75, buff: { steal: 5, perd: 3 } },
+  { id: 'lemonade', n: "Erin's Sea-Salt Lemonade", d: '+4 Stamina, +3 Deep Ball this game. Sailors swear by it.', cost: 45, buff: { stam: 4, three: 3 } },
+  { id: 'ghostcola', n: 'Ghost Signal Cola', d: '+4 Handles, +3 Speed this game. Vesper City, in a bottle.', cost: 70, buff: { handle: 4, speed: 3 } },
+  { id: 'cycles', n: 'CYCLES Cold Brew (GODMODE)', d: '+4 Shot IQ, +4 Passing this game. You see the whole island.', cost: 65, buff: { iq: 4, pass: 4 } },
+  { id: 'gridfuel', n: 'GRIDLOCK Gamer Fuel', d: '+5 Strength, +3 Interior D this game. Comes with a pack code that does not work.', cost: 65, buff: { str: 5, intd: 3 } },
+  { id: 'nectar', n: 'Fae Nectar (Starhaven)', d: '+5 Vertical, +3 Block this game. Do not ask what is in it.', cost: 85, buff: { vert: 5, block: 3 } },
+  { id: 'battery', n: 'Bottie Battery Juice', d: '+3 Dunk, +3 Layup, +2 Speed this game. Clank clank.', cost: 60, buff: { dunk: 3, layup: 3, speed: 2 } },
   { id: 'lotto', n: 'Scratch-Off Ticket', d: '50/50: double HC this game, or nothing extra.', cost: 50, k: 'lotto' },
   { id: 'hype', n: 'Rent-A-Hype-Man', d: 'Bravado fills 50% faster this game.', cost: 90, k: 'hype' },
 ];
