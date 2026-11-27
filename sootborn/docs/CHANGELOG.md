@@ -1,4 +1,38 @@
-# SOOTBORN — changelog (latest v0.88 · 2026-11-27)
+# SOOTBORN — changelog (latest v0.89 · 2026-11-27)
+
+## v0.89 · 2026-11-27 — every playtest finding
+The open list from the v0.87 playtest (docs/PLAYTEST_v0.87.md), all of it, by three teams working apart: fights, story flow, comic-book levels.
+
+**Fights**
+- **Hard and Brutal are harder; Story is not.** Bosses have more health on Hard and Brutal, the dodge forgives less, the opening after it is shorter. Each late boss has one pattern to learn (Hard and Brutal only): Vant feints, the Twins pincer (one swings, the other comes from behind a beat later), the Assayer plants the halberd after four quick hits (only a kick, ram, breach or roar opens it), the Blade grabs ("COME HERE.": dodge or jump it), Cade waits and cuts whatever comes in ("COME, THEN.": wait him out), Lucan and Celestine use long cuts, feints and the grab. The Riser's wardens take turns, and mashing no longer beats the Warden Captain.
+- **The second and third swing of a double strike glint first**, with a ring and a red mark on the ground.
+- **ELEVEN on a boss takes about a quarter of his health** (was a tenth), and fury fills more slowly against a boss, so saving it is a choice. ELEVEN in the air matches the ground rush.
+- **The guard specials land:** a wider, faster wide cut through guards; a breach that reaches; a roar that knocks a boss out of his swing; a parry window shown by a big white "!".
+- **The anti-mash rule does what it says:** a pause, dodge, kick, throw or jump resets it; strikes in the air never count; long ground mashing is read. The first time, it says so in big text.
+- **First-time prompts:** "HE IS GUARDING · KICK IT OPEN, OR WAIT" and "FURY IS FULL · HOLD E: ELEVEN", with the keys for the device in use.
+- **ELEVEN is always called ELEVEN** in the prompt and the moves list (IRON SKY, THE RECKONING stay as cut-in titles).
+- **The camera keeps both fighters in frame while Kael flies** (the foe was off screen up to 93% of the time; now none), steps aside when one body covers the other, and pillars between the camera and the fighters are drawn as their base only. The ELEVEN impact frame is a short lift, not a white screen.
+- The bottom of the 3D screen no longer crowds; the 2D fights after the Drill are a little harder on Hard and Brutal; the training room says how to leave it.
+
+**Story flow and the first five minutes**
+- The intro is skipped by holding a key for a second (a bar fills), never by the press that started New Game.
+- Walk-place exits ask "Leave now?" and name who you have not seen yet. The Service Stair starts by the wheel, away from the door.
+- The talk after the first fight is broken by two walks: Kael walks to Seren in the square and to Tavi at home. Every line is kept. The first lines say "E: NEXT · M: SKIP SCENE".
+- "Press any key" is bright and pulses; the Skip button no longer covers dialogue; the objective line is larger.
+- Serenline marks the step that is ready and says "NOT YET. FIRST: …" at the others.
+- The heist card is one line, and "STAY OUT OF THE LAMPLIGHT" shows the first time a guard comes near.
+- Mission hints name the keys for the device in use.
+
+**Comic-book levels**
+- The marker follows the stairs: it points at the foot of the stair on your floor, then its top, then the goal (vent stack, Deep Array, High Docks).
+- Button letters are right for keyboard, pad and touch; no touch wording on a PC.
+- No ELEVEN in the Deep Array: not in the prompts, the legend or the kill banners.
+- The Deep Array enemy that stuck behind the pipe walks round it; an enemy stuck behind a solid now finds its way round. A fall from a landing mid-fight puts Kael back on it.
+- The High Docks intro is about half as many presses. The camera no longer clips into bollards, rails or the Riser hoist. The pad legend is 12 px.
+
+**Checked:** each team ran its fixes with key presses or the game's own input (numbers in their reports). Story: a mashing bot still wins every fight first try, the Ford and the Assayer included. The whole-story bot: new game to THE END, no errors.
+
+**Not checked:** a human hand on any of it; touch and a real pad (faked by device setting); 3D at a real 60 fps; the walk-exit confirm in the circle, row, ward, camps, last bell and barge (built the same way, not played).
 
 ## v0.88 · 2026-11-27 — fixes from three playtest bots
 Three bots played the v0.87 build: a first-timer on keyboard (every fight and walk place, and New Game cold), a skilled controller player (every fight, Hard and Brutal), and two players through all six comic-book levels. These are the fixes for what blocked a player outright.

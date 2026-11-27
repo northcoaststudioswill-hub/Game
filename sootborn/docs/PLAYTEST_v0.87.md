@@ -9,7 +9,7 @@ All three played a frozen copy of v0.87 with real key presses or real pad button
 ## Fixed in v0.88
 Default difficulty Hard → Story; heist HUD date and keys; no death screen in the vent stack and Deep Array; I AM STUCK missing there; Riser boss never returning after a death; High Docks roof door; air hook dead on the pad; early dodges dropped; Memory Arts suppressed after the first fight; "?" for brackets in the Drill tip. See CHANGELOG v0.88.
 
-## Still open (to decide)
+## Still open (to decide) — all built in v0.89; see CHANGELOG
 
 **Teaching and the first five minutes (novice)**
 - Any key after 0.5 s skips the whole animated intro; both cold runs saw about 2 s of it.
