@@ -22,7 +22,7 @@ After the cold open, time only moves forward inside each thread.
 | 6 | **First Fire** | Free play; before the ceremony, **the Ford** (3D fight); the ceremony; **the lantern climb** | +42 days; Assay day 19 |
 | 7 | That night | What the Assay is; **the Island** (2D level); **the Standard** (3D fight) | Assay night 25, day 26 |
 | 8 | **The Ledger** | Lift Zero, Celestine, the window, **Under the Floor** (2D fight) | +43 days |
-| 9 | That night | **The Lamp** (2D level, the fire in 2.5D), **the Dais** (2D level), **the Proctor** (3D), **On the Ground** (2D) | Assay nights 28 to 31 |
+| 9 | That night | **The Lamp** (2D level, the fire in 2.5D), **the Dais** (2D level), **the Assayer** (3D), **On the Ground** (2D) | Assay nights 28 to 31 |
 | 10 | **The Way Out** | The months, Mara, **the Way Out** (2D fight), Ilse; last dream: **the Last Night** (2D level), **the Keep** (3D). END OF PART ONE | +160 days; Assay night 49, last day |
 | 11 | After Part One | **The Pinning** (3D) | +4y |
 | 12 | The Post | The Seat Knife; the desk; **the Gallery** (3D) | +4y and a season |
@@ -32,7 +32,7 @@ After the cold open, time only moves forward inside each thread.
 | 16 | The Count | **The Stair** (3D comic); **Little Ember** (3D); the endings | +9y |
 
 ## 3. The order before (v0.64 and earlier)
-The Assay played: day 40, night 1, day 19, nights 28–31, night 49, last day, day 3, night 25, day 26, the Pinning. The Ford was on the first night; the Lamp, Dais and Proctor interrupted the festival; No Gloves, the Last Night and the Keep were on the second night; the Camp, Island and Standard on the third.
+The Assay played: day 40, night 1, day 19, nights 28–31, night 49, last day, day 3, night 25, day 26, the Pinning. The Ford was on the first night; the Lamp, Dais and Assayer interrupted the festival; No Gloves, the Last Night and the Keep were on the second night; the Camp, Island and Standard on the third.
 
 ## 4. People: who they are, what is told, what is not, and what they are for
 "Play" is how they earn their place in a game: a fight, a level, or a body standing in the world that you can go back to.
@@ -46,9 +46,9 @@ The Assay played: day 40, night 1, day 19, nights 28–31, night 49, last day, d
 | **Ivo** | Best friend; held Kael down; cart | Thin | He says it once (the Night Before). Nothing of his own | NPC. Wants one errand of his own below |
 | **Nell** | Runs the fever ward | Good | Her cold crates, before Sable | NPC |
 | **Hollis** | Welder; struck for humming; carries Brand's halberd up the Stair | Good | Meeting Brand, the man who struck him | A scene worth writing: **Hollis and Brand, one line each** |
-| **Dace Morrow** | Seren's partner; went under the floor; the Unlit | Good | Seven years under the floor | NPC under the floor; could **send you on finds** |
+| **Harl Morrow** | Seren's partner; went under the floor; the Unlit | Good | Seven years under the floor | NPC under the floor; could **send you on finds** |
 | **Inspector Vale** | Born Tier Four, counted up; struck his own entry | Good | His sister's ward on Tier Eight | NPC; one optional scene |
-| **Proctor Sull** | Scrubs the sun; the night watch; learns to look away | Good arc | — | Fight; NPC |
+| **Tallyman Sull** | Scrubs the sun; the night watch; learns to look away | Good arc | — | Fight; NPC |
 | **Celestine Aurel** | High Auditor; seventy; knew him at the Pinning | Complete | Her own Assay, fifty years ago | Final fight. A **memory of hers** would cost little and land hard |
 | **Lucan Aurel** | Her son; kind | Two fights, two branches | What he does after | Fight twice; could be an **ally in the last level** if befriended |
 | **Ilse Marrin** | Kept a column; asked to see the person; gilded Kael | Good | Who she was above; her death or not | NPC. No fight, and should not have one |
@@ -59,7 +59,7 @@ The Assay played: day 40, night 1, day 19, nights 28–31, night 49, last day, d
 | **Severin Cade / Marshal Cade** | Nephew and uncle | Thin | Why the Marshal balances tiers | Two fights. Thinnest villains in the game |
 | **Vant** | Captain at the Ford, later Dockmaster | Fine | — | Fight; a dinner |
 | **Ansel Rook** | Stair Captain; decent | Good | — | Boss |
-| **Halden Voss** | Proctor paid by two Houses | Good | — | Fight in two halves |
+| **Halden Voss** | Assayer paid by two Houses | Good | — | Fight in two halves |
 | **Oswin Hale** | Violet cadet; the leg; the Auditor's Blade | The best slow arc | — | Camp NPC, then final-level boss |
 | **Petra Lune** | Violet cadet; keeps a column | Fine | — | NPC; a letter |
 | **Corin, Merrow, Thorne, the Sisters Vey** | Assay cadets | Enough | — | Fights, a choice |
@@ -74,7 +74,7 @@ The Assay played: day 40, night 1, day 19, nights 28–31, night 49, last day, d
 | What the writing says | What is on screen | Fix | Cost |
 |---|---|---|---|
 | Every valve hand carries a **seat knife**, counted back onto a board at last bell | Nobody below carries one; no board | A knife on the belt of Crew Three; **the board in Bay 3, and counting the knives back** as the last thing you do each day | Low |
-| Kael wears **the Proctor's white cloak** back to camp on day 31, and the cadets follow him from that night | His cape stays violet in the Valley, the Last Night and the Keep | White cape from day 31 on | Very low |
+| Kael wears **the Assayer's white cloak** back to camp on day 31, and the cadets follow him from that night | His cape stays violet in the Valley, the Last Night and the Keep | White cape from day 31 on | Very low |
 | He **takes the boots on day 31** | He cannot fly until the last day | Decide: either he flies from the Valley on, or a line says the boots have no charge away from the vent stack | Low |
 | As **Edric Sorrel he is a clerk** with a sun on his collar; he drops it off the docks | In every Part Two scene he is in Assay plate | A clerk's coat for the Spire scenes and the High Docks; plate only where he is fighting openly | Medium |
 | He **wore gloves for a year**, and hides his palms on the Spire | Hands are never an issue on screen | Gloves on the clerk's model; one beat where Kestrel turns his hand over (written, not shown) | Low |
@@ -102,7 +102,7 @@ The Assay played: day 40, night 1, day 19, nights 28–31, night 49, last day, d
 | The Table (the Gilding) | A− | B+ | The comic stills suit it | Sound: it is nearly silent |
 | The lesson with the slate | A | B | Does a lot in two minutes | — |
 | What the Assay is (the map) | B | B− | Useful, flat | Fold it into the Camp so you learn it by walking |
-| Fight films (Pairing, Ford, Standard, Proctor, Keep, Pinning) | B | C+ | Captions good; pictures are fighters standing in a field | Three comic-style stills each in place of posed 3D |
+| Fight films (Pairing, Ford, Standard, Assayer, Keep, Pinning) | B | C+ | Captions good; pictures are fighters standing in a field | Three comic-style stills each in place of posed 3D |
 | First Fire: ceremony and the sun on the square | A− | B | The lantern pays off the whole day | — |
 | The Ledger (Lift Zero, the window) | A− | B− | "The sky is blue" lands | A real picture of the window |
 | The Way Out | B+ | C+ | Borrowed rooms | Its own tunnel picture; the tin going to Row K |
@@ -151,7 +151,7 @@ Agreed in talk, not built. Nothing here changes the game until you approve it.
 - **Today the present never plays the Assay.** It runs through the four days below, then skips from The Way Out to the Pinning; the gilding, training and the Assay are only ever flashes. Two ways to build it, **your pick**:
   1. **The Assay stays as flashes**, in any order, each earned by a trigger below. Shorter game.
   2. **The Assay becomes its own act.** After The Way Out the present moves up: gilded, trained, the Assay in order. A few flash-forwards stay below as teasers; Cinderwell becomes flashbacks. Longer game, matches the rule exactly.
-- **Echo pairings proposed** (if option 1): First Fire → the Lamp and the Circle (fire answers fire); The Ledger → the Proctor (the day he learns who keeps the book, he beats one of the scorekeepers); The Way Out → the Last Night and the Keep (leaving below, finishing above).
+- **Echo pairings proposed** (if option 1): First Fire → the Lamp and the Circle (fire answers fire); The Ledger → the Assayer (the day he learns who keeps the book, he beats one of the scorekeepers); The Way Out → the Last Night and the Keep (leaving below, finishing above).
 
 ### 9b. The cold open: the Keep
 Replaces the Valley as the first thing you play. The Valley goes back to its place in order.
@@ -204,8 +204,8 @@ Day one is Ashgate; the present moves forward from there; everything else is a f
 | 5a | **New** | **The Assay camp by day** (day 3): Dorian's bread, Oswin, Petra, the cadets as people | 2.5D, story |
 | 6 | **Present: First Fire** | Free play; the Ford; **new: Bay 3 at last bell, counting the knives back** (2.5D, story); the ceremony; the lantern climb | 2D, 3D, 2.5D |
 | 7 | That night | **The Lamp: the Circle stays 2.5D through its fight**; the Island; the Standard | 2.5D, 2D, 3D |
-| 8 | **Present: The Ledger** | Lift Zero, Celestine, the window, Under the Floor; **new: the Deep Array** with Dace, the lore never shown | 2D, **comic level** |
-| 9 | That night | The Dais; **new: the vent stack, day 31, where he takes the boots**; the Proctor; On the Ground | 2D, **comic level**, 3D |
+| 8 | **Present: The Ledger** | Lift Zero, Celestine, the window, Under the Floor; **new: the Deep Array** with Harl, the lore never shown | 2D, **comic level** |
+| 9 | That night | The Dais; **new: the vent stack, day 31, where he takes the boots**; the Assayer; On the Ground | 2D, **comic level**, 3D |
 | 10 | **Present: The Way Out** | The months, Mara, the Way Out, Ilse; last dream: the Valley, the Last Night, **the Keep again, and the blow lands**. END OF PART ONE | 2D, 3D |
 | 11 | **Present: the Spire** | The Pinning | 3D |
 | 12 | The Post | The desk, the Gallery; **flash: the Assay camp, the white cloak, the cadets following** | 3D, 2.5D flash |

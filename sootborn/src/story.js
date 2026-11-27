@@ -16,12 +16,12 @@ const CAST = {
   ivo: { name: 'Ivo', look: () => ({ knife: 1, skin: '#d8a07a', hair: '#c8a040', style: 'spiky', extra: 'goggles', shirt: '#5a6a34', pants: '#3a3028' }) },
   orin: { name: 'Old Orin', look: () => ({ skin: '#b07a5a', hair: '#d8d0c0', style: 'bald', extra: 'beard', shirt: '#5a4a6a', pants: '#2a2430' }) },
   nell: { name: 'Nell', look: () => ({ skin: '#7a4e36', hair: '#1a1014', style: 'long', extra: 'coat', shirt: '#d8dcd8', pants: '#3a4a5a' }) },
-  dace: { name: 'Dace Morrow', look: () => ({ skin: '#e0b090', hair: '#5a3a20', style: 'short', extra: 'hat', shirt: '#3d5a6a', pants: '#2a3440' }) },
+  dace: { name: 'Harl Morrow', look: () => ({ skin: '#e0b090', hair: '#5a3a20', style: 'short', extra: 'hat', shirt: '#3d5a6a', pants: '#2a3440' }) },
   pell: { name: 'Pell', look: () => ({ skin: '#9a6448', hair: '#8a8a8a', style: 'short', shirt: '#6a3a2a', pants: '#3a2a24' }) },
   juno: { name: 'Juno', look: () => ({ skin: '#5e3a2a', hair: '#1a1014', style: 'bun', shirt: '#c87a2a', pants: '#3a2a24', kid: 1 }) },
   bao: { name: 'Bao', look: () => ({ skin: '#c08060', hair: '#2a1a14', style: 'short', shirt: '#a83a2a', pants: '#2a2020', extra: 'apron' }) },
   watchman: { name: 'Night Watchman', look: () => ({ skin: '#a87a5a', hair: '#2a2a2e', style: 'short', shirt: '#4a4e58', pants: '#2a2c32', extra: 'hat', clean: 1 }) },
-  proctor: { name: 'Proctor Sull', look: () => ({ skin: '#c8a080', hair: '#3a3a40', style: 'short', shirt: '#6a6e78', pants: '#3a3c44', extra: 'hat', clean: 1 }) },
+  proctor: { name: 'Tallyman Sull', look: () => ({ skin: '#c8a080', hair: '#3a3a40', style: 'short', shirt: '#6a6e78', pants: '#3a3c44', extra: 'hat', clean: 1 }) },
   vale: { name: 'Inspector Vale', look: () => ({ skin: '#b89070', hair: '#2a2a2e', style: 'short', shirt: '#5a5e66', pants: '#2a2c32', extra: 'pin', clean: 1 }) },
   celestine: { name: 'High Auditor Celestine Aurel', look: () => ({ accredited: 1, skin: '#f4e6dc', hair: '#f6eac0', robe: '#f4f2ec', trim: '#e8c25a', crown: 1, gloves: '#a8905c' }) },   // gloves, always: she let them take the burns off her palms
   warden: { name: 'Warden', look: () => ({ accredited: 1, warden: 1, skin: '#e8dcd0', hair: '#c8ccd4', robe: '#c8ccd8', trim: '#e8c25a' }) },
@@ -44,7 +44,7 @@ const CAST = {
   sable: { name: 'Sable', look: () => ({ skin: '#8a5a3e', hair: '#1a1418', style: 'long', shirt: '#3a4a3a', pants: '#2a2a22', scarf: '#c8a45a' }) },
   wren: { name: 'Kestrel Dray', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dcc8', hair: '#c88a4a', style: 'short', robe: '#e8e4dc', armor: '#e8e4dc', trim: '#e8c25a', sash: '#4a8ac8' }) },
   teo: { name: 'Dorian Aldane', look: () => ({ accredited: 1, cadet: 1, skin: '#e8c8a8', hair: '#d8b070', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },
-  voss: { name: 'Proctor Voss', look: () => ({ skirt: 1, accredited: 1, cadet: 1, skin: '#f0e0d4', hair: '#e8e4dc', style: 'short', circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#f4f0e6', cape: '#f4f2ec' }) },
+  voss: { name: 'Assayer Voss', look: () => ({ skirt: 1, accredited: 1, cadet: 1, skin: '#f0e0d4', hair: '#e8e4dc', style: 'short', circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#f4f0e6', cape: '#f4f2ec' }) },
   lucan: { name: 'Lucan Aurel', look: () => ({ accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, heir: 1, circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#2f7fd0', cape: '#e9c860' }) },
   hollis: { name: 'Hollis the welder', look: crowd('#8a5a3e', '#2a1a14', 'short', '#5a4a3a') },
   marrow: { name: 'Marrow', look: crowd('#c08a6a', '#4a3020', 'long', '#4a4a5a') },
@@ -82,21 +82,21 @@ const NPCS = [
 // ---- journal
 const JOURNAL = {
   p_seren: { tab: 'people', title: 'Seren Holloway', body: "Crew Three pressure-runner. Quick hands, quicker mouth. The person you loved. She took the blame for the valve you turned, and the Authority committed her to the heart-furnace. Her last words: 'Balance the bank, Kael.'" },
-  p_tavi: { tab: 'people', title: 'Tavi', body: 'Your little sibling. The fever nearly took them. The air you stole is why they are still here to steal your bread.' },
+  p_tavi: { tab: 'people', title: 'Tavi', body: 'Your little brother. The fever nearly took him. The air you stole is why he is still here to steal your bread.' },
   p_mara: { tab: 'people', title: 'Mara Venn', body: 'Foreperson, Crew Three. She held you down in the square so you would not die beside Seren. You have not decided whether to thank her.' },
   p_ivo: { tab: 'people', title: 'Ivo', body: 'Childhood friend, scavenger, owner of exactly one boot. He had your other arm that day.' },
   p_orin: { tab: 'people', title: 'Old Orin', body: 'Retired grid engineer. Talks to pipes. Says Seren came asking him about the forbidden line weeks before you ever touched it.' },
   p_nell: { tab: 'people', title: 'Nell', body: 'Clinic tech. Seren ran air canisters to her fever ward. Keeps a tally of shortages that "nobody" causes.' },
   p_vale: { tab: 'people', title: 'Inspector Vale', body: 'Born in the Cinders, raised up to wear grey and a silver pin. He read the charge against Seren. He asked for you on Bank Seven.' },
   p_celestine: { tab: 'people', title: 'High Auditor Celestine Aurel', body: 'Of the Array Authority. Came down Lift 0 in light, called Seren "little ember," and balanced the account. You will not forget her face. Nobody could.' },
-  p_sull: { tab: 'people', title: 'Proctor Sull', body: () => 'Authority Proctor, Ashgate beat. Scrubs Seren\'s sun off the Pillar every week with a wire brush.' + (F('threatenedProctor') ? ' You told him what you would do with that brush. He wrote your name down.' : F('charmedProctor') ? ' He left one ray. Maybe by accident.' : '') },
+  p_sull: { tab: 'people', title: 'Tallyman Sull', body: () => 'Authority Tallyman, Ashgate beat. Scrubs Seren\'s sun off the Pillar every week with a wire brush.' + (F('threatenedProctor') ? ' You told him what you would do with that brush. He wrote your name down.' : F('charmedProctor') ? ' He left one ray. Maybe by accident.' : '') },
   e_drawing: { tab: 'evidence', title: "Mosi's drawing", body: 'Crayon on a ration wrapper: Seren with a sun for a head, holding hands with forty stick children. You keep it inside your jacket, over your heart. High up. Where the sky would be.' },
   e_tin: { tab: 'evidence', title: 'The tin', body: 'Ash, a blackened brass washer, and an invoice for the fuel that burned her. Fourteen scrip, in installments, out of your wages. Gratitude is breath.' },
-  p_dace: { tab: 'people', title: 'Dace Morrow', body: "Seren's runner partner on Crew Three. Joked with you before shift. Gone from the roster by evening — no reassignment listed." },
+  p_dace: { tab: 'people', title: 'Harl Morrow', body: "Seren's runner partner on Crew Three. Joked with you before shift. Gone from the roster by evening — no reassignment listed." },
   e_aux9: { tab: 'evidence', title: 'Outlet AUX-9', body: 'The forbidden line has a name now, freshly stenciled: AUX-9. The line you tapped to save the clinic. Bank Seven will not balance unless it is fed. It is feeding something.' },
   e_crate: { tab: 'evidence', title: 'The cold crate', body: () => "Tagged as slag. Too light, too cold. Real manifest: 40 kg hydroponic greens for 'Meridian Terrace, Tier 1.' Cinderwell starts at Tier 4." + (F('tookSlip') ? ' (The manifest slip is in your pocket.)' : F('reportedCrate') ? ' (You flagged it with Dispatch.)' : '') },
   e_lift: { tab: 'evidence', title: 'Lift 0', body: () => F('ivoTalk2') ? "Lift 0 brought the High Auditor down in light. Ivo says its call light came on again last night — green, eleven seconds. Nobody came down. Something went up." : 'Authority use only. It came down full of light, and went back up full of light. Nobody from Cinderwell got in.' },
-  e_chalk: { tab: 'evidence', title: 'Two hands in chalk', body: "On the AUX-9 line: an old arrow pointing up, initialed O.R. Below it, fresh chalk: 'STILL FLOWING. — D.M.' Dace Morrow?" },
+  e_chalk: { tab: 'evidence', title: 'Two hands in chalk', body: "On the AUX-9 line: an old arrow pointing up, initialed O.R. Below it, fresh chalk: 'STILL FLOWING. — H.M.' Harl Morrow?" },
   e_riser: { tab: 'evidence', title: 'Riser 9', body: 'AUX-9 runs through the old tunnel and straight up into a sealed riser. The destination plate is scratched out. The air falling from it is warm, and smells green.' },
   e_glove: { tab: 'evidence', title: 'A Crew Three glove', body: 'Someone has been clearing a collapse in the old tunnel. They left a work glove behind, Crew Three tag stitched inside.' },
   pl_cinder: { tab: 'places', title: 'Cinderwell', body: 'Home. Tiers 4 through 9, built around the Deep Array that keeps the air breathable. The Authority calls it "the Cinders." It calls us soot.' },
@@ -180,7 +180,7 @@ const TALK = {
       say('mara', 'Done?'),
       ...(F('tookSlip') ? [say('mara', "Whatever's in your pocket — I didn't see it. Neither did you.")] : []),
       ...(F('reportedCrate') ? [say('mara', 'Dispatch says you flagged a crate. Sable will have heard by now. Latch your door tonight.')] : []),
-      say('mara', "Dace isn't on tomorrow's roster."),
+      say('mara', "Harl isn't on tomorrow's roster."),
       say('you', "Where'd they move him?"),
       say('mara', "Roster doesn't say. Roster never says."),
       say('mara', "He was her partner, Kael. Forty-one days, and now him. Go home. Eat something that isn't a brick."),
@@ -196,7 +196,7 @@ const TALK = {
         { t: '(Say nothing. Hold his eyes.)', fx: () => setF('valeSilent'), then: [say('vale', 'Good. Silence suits you. It suited her too, in the end. Almost.')] },
         { t: "Rehabilitate me all the way up, Inspector. I'm a fast learner.", fx: () => setF('valeNoted'), then: [say('vale', '...Ambition. In a valve tech. How novel.'), say('vale', "I'll make a note. I make a great many notes.")] }
       ] },
-      ...(F('threatenedProctor') ? [say('vale', 'Also. You threatened a Proctor in Ashgate this morning. With a brush, I\'m told. I wrote it down. I write everything down.')] : []),
+      ...(F('threatenedProctor') ? [say('vale', 'Also. You threatened a Tallyman in Ashgate this morning. With a brush, I\'m told. I wrote it down. I write everything down.')] : []),
       say('vale', "Bank Seven has been re-stenciled since the incident. You'll find every line properly labeled now."),
       say('vale', "Do your work. Touch only what is yours. You'll find that's a very short list."),
       fx(() => { setF('metVale'); addJ('p_vale'); })
@@ -263,7 +263,7 @@ const TALK = {
       say('proctor', 'Move along, soot. Nothing to see. Just cleaning up graffiti.'),
       narr("He is scrubbing Seren's sun off the Pillar with a wire brush. The little rays come off one at a time."),
       { choice: [
-        { t: 'Missed a spot, Proctor. Want me to hold the bucket? I am famously good with buckets.', fx: () => setF('charmedProctor'), then: [say('proctor', '...Get out of my light, Brennick.'), narr('He gathers his bucket and goes. He leaves one ray. Maybe by accident.')] },
+        { t: 'Missed a spot, Tallyman. Want me to hold the bucket? I am famously good with buckets.', fx: () => setF('charmedProctor'), then: [say('proctor', '...Get out of my light, Brennick.'), narr('He gathers his bucket and goes. He leaves one ray. Maybe by accident.')] },
         { t: '(Grab the brush.) Touch her sun again and I will feed you this brush.', fx: () => { setF('threatenedProctor'); fury(2); }, then: [
           say('proctor', '...Say that again, soot. Slower. So I get the spelling right.'),
           say('kael', 'K-A-E-L. B-R-E-N-N-I-C-K. Crew Three. Write it big.'),
@@ -274,13 +274,13 @@ const TALK = {
     ];
   },
   hollis() { return [say('hollis', 'Kael. ...Took a halberd at her commitment for humming. Still can\'t lift my left arm above the shoulder.'), say('hollis', 'Worth it. We hummed her all the way to the door. She heard us. I know she did.')]; },
-  marrow() { return [say('marrow', 'They docked my family\'s air ration a week for humming. Gratitude is breath, the Proctor said.'), say('marrow', 'My breath, apparently. Not theirs.'), ...(F('chalkedSun') ? [say('marrow', 'I saw you redraw her sun. Bigger. Good. Make them scrub harder.')] : [])]; },
+  marrow() { return [say('marrow', 'They docked my family\'s air ration a week for humming. Gratitude is breath, the Tallyman said.'), say('marrow', 'My breath, apparently. Not theirs.'), ...(F('chalkedSun') ? [say('marrow', 'I saw you redraw her sun. Bigger. Good. Make them scrub harder.')] : [])]; },
   fen() { return [say('fen', '*cough* Air for an old man? Spare a breath? ...No? Smart lad.'), say('fen', "Air's the only thing worth stealing down here. Everyone knows that. Your wife knew it.")]; },
   kit() { return [say('kit', "Freight Three goes up nine floors. The sign says six. You didn't hear it from me."), say('kit', 'Nobody hears anything from me. Nobody hears anything from anyone. That\'s how you get to keep breathing.')]; },
   pip() { return [say('pip', "You're Seren's Kael! She said you'd be grumpy and tall. You're only grumpy."), say('pip', 'She told us the sky is blue. Like the inside of a gas flame. Is that true?'),
     { choice: [{ t: "It's true. She saw it in a book.", then: [say('pip', "I KNEW it. Mosi said it was green.")] }, { t: "I don't know yet. I'm going to find out.", fx: () => setF('promisedPip'), then: [say('pip', 'Then come back and tell us. Promise. She always came back.')] }] }]; },
   mosi() { return [say('mosi', "I drew her. Look. That's her, and that's the sun. Her head is the sun because she's warm."), narr('The drawing is crayon on the back of a ration wrapper. A woman with a sun for a head, holding hands with forty stick children.'),
-    ...(F('gotDrawing') ? [] : [{ choice: [{ t: 'Can I keep it?', fx: () => { setF('gotDrawing'); addJ('e_drawing'); }, then: [say('mosi', "...Aye. But you have to put it somewhere high up. Where the sky would be.")] }, { t: "It's perfect. Keep it safe.", then: [say('mosi', "I'm putting it under my pillow. The Proctors don't check under pillows.")] }] }])]; },
+    ...(F('gotDrawing') ? [] : [{ choice: [{ t: 'Can I keep it?', fx: () => { setF('gotDrawing'); addJ('e_drawing'); }, then: [say('mosi', "...Aye. But you have to put it somewhere high up. Where the sky would be.")] }, { t: "It's perfect. Keep it safe.", then: [say('mosi', "I'm putting it under my pillow. The Tallymen don't check under pillows.")] }] }])]; },
   ada() { if (F('bledAgain')) return [say('ada', 'The storm came back! The fan did the storm again! ...Was that you?'), say('kael', 'Storms just happen, sweetheart. Nobody does them.'), say('ada', '...Seren said that too. Exactly like that.')]; return [narr('Ada is very small and very still. She is breathing on her own, slow and steady, which six weeks ago she could not do.'), say('ada', '...Is she coming back to fix the fan again?'), say('kael', '...No, sweetheart. But I will. I\'m very good at fans.')]; },
   pell() { const l = ["Sorry about Seren, Kael. She swept better than me. Don't tell anyone.", "Festival's tomorrow. I'm sweeping early. Like a professional.", "Pillar's going white soon. Day's half gone."]; return [say('pell', l[(G.talkCount.pell = (G.talkCount.pell || 0) + 1) % l.length])]; },
   juno() { const l = ["I drew Seren's sun on the Pillar again! The grey men scrub it. I draw it faster.", 'My brother says the sky is fire. My other brother says it\'s soup.', "When I grow up I'm gonna ride Lift Zero and never come back. Except for noodles."]; return [say('juno', l[(G.talkCount.juno = (G.talkCount.juno || 0) + 1) % l.length])]; },
@@ -309,7 +309,7 @@ const HOT = {
     narr(F('ivoTalk2') ? 'The call light is dark now. You stare at it anyway.' : "Behind the grille, the call light is dark. You'd swear it's warm."), fx(() => addJ('e_lift', true))],
   clinic: () => [narr('CLINIC — CLOSED FOR STOCKTAKING. Again.'), narr('Six weeks ago the fever wards were breathing each other\'s breath. Then, for three days, they weren\'t.')],
   pillar: () => {
-    if (!F('proctorDone')) return [narr('A Proctor is kneeling at the Pillar\'s base with a bucket and a wire brush.')];
+    if (!F('proctorDone')) return [narr('A Tallyman is kneeling at the Pillar\'s base with a bucket and a wire brush.')];
     const done = F('chalkedSun');
     return [narr('The Lumen Pillar fakes a day: amber at first bell, white at noon, red at last bell. It turned red an hour early the day they took her.'),
       narr("At its base, someone has chalked a small sun. Seren's sun. The Authority scrubs it every week. It's back every morning."),
@@ -318,7 +318,7 @@ const HOT = {
         { t: 'Leave it. Not where Vale can see.', fx: () => setF('leftSun'), then: [narr("You keep walking. You'll come back when no one's watching. You always do.")] }
       ] }]), fx(() => addJ('pl_square', true)),
       ...(F('sqMem') || typeof walkSquare !== 'function' ? [] : [{ choice: [
-        { t: 'Stand here a moment. (A memory. It changes nothing.)', fx: () => setF('sqMem'), then: [narr('The stone is the same stone. I let it be an ordinary night, a year and more ago, with the last bell just gone.'), fx(() => Brawl.start(walkSquare(), () => { G.mode = 'world'; HUD.dirty = true; Dialogue.start([narr('The Pillar is red. The stall is shut. I have been standing here long enough for a Proctor to look round.')]); }))] },
+        { t: 'Stand here a moment. (A memory. It changes nothing.)', fx: () => setF('sqMem'), then: [narr('The stone is the same stone. I let it be an ordinary night, a year and more ago, with the last bell just gone.'), fx(() => Brawl.start(walkSquare(), () => { G.mode = 'world'; HUD.dirty = true; Dialogue.start([narr('The Pillar is red. The stall is shut. I have been standing here long enough for a Tallyman to look round.')]); }))] },
         { t: 'Keep walking.' }] }])];
   },
   bench: () => [narr('A bench polished smooth by forty years of tired people. You and Seren split noodles here the night before the lift came down.')],
@@ -333,9 +333,9 @@ const HOT = {
       ] }];
   },
   shiftboard: () => {
-    if (F('puzzleDone')) return [narr("CREW 3 — TOMORROW: Mara Venn · Kael Brennick · and a strip of fresh tape where 'Dace Morrow' used to be."), narr("Under the tape you can still see an older strip. 'S. Holloway.'"), fx(() => { if (!G.journal.includes('p_dace')) { addJ('p_dace'); Sound.play('clue'); } })];
+    if (F('puzzleDone')) return [narr("CREW 3 — TOMORROW: Mara Venn · Kael Brennick · and a strip of fresh tape where 'Harl Morrow' used to be."), narr("Under the tape you can still see an older strip. 'S. Holloway.'"), fx(() => { if (!G.journal.includes('p_dace')) { addJ('p_dace'); Sound.play('clue'); } })];
     if (!F('talkedMara1')) return [narr('CREW 3 — WORK ORDERS.'), narr("You can feel Mara watching you read it. Better check in with her first.")];
-    if (!F('tookOrder')) return [narr('CREW 3 — WORK ORDERS'), narr('WO-114  Valve Bank 7 — rebalance — K. Brennick\nWO-115  Conveyor 2 — grease — D. Morrow\nWO-116  Fuse room C — inspect — tomorrow'),
+    if (!F('tookOrder')) return [narr('CREW 3 — WORK ORDERS'), narr('WO-114  Valve Bank 7 — rebalance — K. Brennick\nWO-115  Conveyor 2 — grease — H. Morrow\nWO-116  Fuse room C — inspect — tomorrow'),
       narr('You initial WO-114. Her bank. Your hands.'), fx(() => { setF('tookOrder'); Sound.play('ok'); Game.autosave(); })];
     return [narr('WO-114  Valve Bank 7 — rebalance — K. Brennick. North wall, right of the board.')];
   },
@@ -346,7 +346,7 @@ const HOT = {
   },
   suns: () => [narr("Seren's little suns, painted straight onto the plaster. Seventeen of them. She added one every time something good happened."), narr('The last one is half-finished. You have not been able to decide whether to finish it.')],
   tools: () => [narr('Your valve keys, pressure wrenches, the bent pick you use for seized couplings. All of it clean. Seren used to say you loved those tools more than her. You used to let her think she was joking.')],
-  cot: () => [narr("Tavi's cot. They have slept in your bed since the fever. Neither of you has said why. Neither of you needs to.")],
+  cot: () => [narr("Tavi's cot. He has slept in your bed since the fever. Neither of you has said why. Neither of you needs to.")],
   screen: () => [narr("An Authority screen. It cycles the same four messages from first bell to last: GRATITUDE IS BREATH. THE SURFACE BURNS. REPORT AIR THEFT. THE AUTHORITY PROVIDES."), narr("Between messages, for one frame, the emblem: a golden sun with an open eye in its center. Kids call it 'the Watcher.' Adults don't call it anything.")],
   poster0: () => [narr("GRATITUDE IS BREATH. Every surface in Cinderwell says it. You've started hearing it in Celestine's voice.")],
   poster1: () => [narr('REPORT AIR THEFT. REWARD: 50 SCRIP.'), narr('Fifty scrip. Seren was worth fifty scrip to somebody. You wonder who collected.')],
@@ -356,7 +356,7 @@ const HOT = {
   poster3: () => [narr('THE SURFACE BURNS. STAY BELOW. STAY GRATEFUL.'), narr('The illustration shows a red sky and a skeleton. It is very well drawn. Somebody up there has a lot of time for drawing.')],
   poster4: () => [narr('WORK IS WORSHIP. Underneath, in grease pencil: "THEN WHO\'S THE GOD?"')],
   vent: () => [narr('A floor vent breathing out warm, stale air. Tier 6\'s ration, recycled for the fourth time today. It tastes like pennies.')],
-  relay: () => [narr("The audit relay. The fuse you pulled forty-one days ago has been replaced with a sealed Authority unit, wired in gold."), narr('Of course it has.')],
+  relay: () => [narr("The audit relay. The fuse you pulled forty-five days ago has been replaced with a sealed Authority unit, wired in gold."), narr('Of course it has.')],
   kidsuns: () => [narr("The kids have painted suns all over the ward wall, copying Seren's. Some are yellow. Some are blue. One is green, with a face."), narr('Under them, in Nell\'s neat hand: "FOR SEREN, WHO BROUGHT THE AIR."')],
   fanvent: () => [narr('The ward fan, turning slow. Ration speed.'), narr('For three nights it spun so fast the kids called it "the storm." You were the storm. She was the reason.')],
   wardboard: () => [narr('BREATHING ON THEIR OWN: 40 / 40.'), narr("Forty names in chalk. Tavi's is ninth. Next to the board somebody has added a forty-first line, no name, just a little sun."),
@@ -371,7 +371,7 @@ const HOT = {
       { choice: [{ t: 'Climb down.', then: [fx(() => { Sound.play('door'); Fade.go(() => { World.load('tunnel', { x: 2 * 16 + 8, y: 4 * 16 + 4, dir: 3 }); addJ('pl_tunnel', true); Game.autosave(); }); })] }, { t: 'Not now.' }] }];
   },
   sealdoor: () => [narr('SERVICE CORRIDOR 4 — SEALED AFTER PRESSURE EVENT, YEAR 2231.'), ...byTend({ tinkerer: 'The weld bead on the seal is clean and modern. Much newer than 2231.', seeker: 'The date was stenciled over an older date. You can still see its ghost underneath.', caretaker: 'Somebody left a candle stub at the foot of the door. For whoever was on the other side.' })],
-  chalk: () => [narr('Chalk on the AUX-9 line, faded but careful: an arrow pointing up, and initials. O.R.'), narr("Below it, fresh chalk in a different hand: 'STILL FLOWING. — D.M.'"), narr('D.M. Dace Morrow. Seren\'s partner. He kept going after they burned her.'), fx(() => { if (!G.journal.includes('e_chalk')) Sound.play('clue'); addJ('e_chalk'); setF('sawChalk'); Game.autosave(); })],
+  chalk: () => [narr('Chalk on the AUX-9 line, faded but careful: an arrow pointing up, and initials. O.R.'), narr("Below it, fresh chalk in a different hand: 'STILL FLOWING. — H.M.'"), narr('H.M. Harl Morrow. Seren\'s partner. He kept going after they burned her.'), fx(() => { if (!G.journal.includes('e_chalk')) Sound.play('clue'); addJ('e_chalk'); setF('sawChalk'); Game.autosave(); })],
   rubble: () => [narr('An old collapse. But someone has been moving the rocks: there is a neat stack to one side.'), narr('Wedged between two stones, a work glove. A Crew Three tag is stitched inside.'), fx(() => { addJ('e_glove'); setF('sawGlove'); })],
   tpipe: () => [narr('AUX-9. The pipe is warm, and it hums. Pressure is going somewhere in a hurry.')],
   riser: () => {
@@ -396,7 +396,7 @@ const HOT = {
       { t: 'Press your palm to the furnace door.', fx: () => { setF('touchedFurnace'); fury(1); }, then: [narr('You hold it there until it hurts. You want it to hurt. When you pull away, the shape of your hand stays on the iron for a moment, then fades, like everything they burn.')] },
       { t: 'Turn away. Not here. Not in front of Vale.', fx: () => setF('turnedFromFurnace'), then: [narr('You turn away. Somewhere behind you, Vale makes a note.')] }] }])],
   freight: () => [narr('FREIGHT LIFT 3 — DISPATCH PERSONNEL ONLY.'), ...byTend({ tinkerer: 'The cable drum is rated for three times the tiers on the sign.', seeker: 'The floor indicator has nine marks. Someone painted over the top three.', caretaker: "Sable's runners ride it up and come back with new boots." })],
-  conveyor: () => [narr(F('puzzleDone') ? "Conveyor Two has gone quiet. Dace's grease rag hangs off the rail, still wet." : 'Conveyor Two, clanking along. Dace is elbow-deep in its gearbox.')],
+  conveyor: () => [narr(F('puzzleDone') ? "Conveyor Two has gone quiet. Harl's grease rag hangs off the rail, still wet." : 'Conveyor Two, clanking along. Harl is elbow-deep in its gearbox.')],
   crateA: () => !F('maraDebrief') ? [narr('Outbound freight. Not your job — yet.')] : [narr('Crate A. Tag: SLAG — RECLAIM DEPOT 4.'), narr('Manifest: slag, 200 kg. Heavy as sin. It matches.'), fx(() => setF('crateA'))],
   crateB: () => !F('maraDebrief') ? [narr('Outbound freight. Not your job — yet.')] : [narr('Crate B. Tag: FILTER CORES, SPENT.'), narr('Manifest: 12 spent filter cores. Smells like the inside of a lung. It matches.'), fx(() => setF('crateB'))],
   crateC: () => {

@@ -23,9 +23,9 @@ const once = (k, a, b) => F(k) ? b : a.concat([fx(() => setF(k))]);
 Object.assign(JOURNAL, {
   q_list: { tab: 'evidence', title: "Seren's list", body: () => "Found folded into her lantern frame. WIRE — Ivo owes me. GOLD — Orin has chalk-gold, don't ask where. WICK — Nell, trade her a joke. MAKE KAEL CARRY IT. HE'LL PRETEND HE DOESN'T WANT TO." + (F('lanternBuilt') ? ` (Finished. ${rays()} rays on it that she never painted.)` : ` (${parts()} of 3 found.)`) },
   e_l0: { tab: 'evidence', title: 'L0 STBY', body: () => 'Under forty years of grime in Fuse Room C: the "standby" bus is Lift Zero. Every First Fire the lamps of Tier 6 go dim, and everyone calls it ceremony. It is the lift, charging, on our lights.' + (F('spareOn') ? ' (You threw the spare breaker onto Tier 6. Tonight is two amps brighter.)' : '') },
-  e_remit: { tab: 'evidence', title: 'The envelopes', body: () => "INFORMANT REMITTANCE — 50 SCRIP — WITH GRATITUDE. Sealed, in Dace's locker. His note: nobody informed. The Authority sends one to everyone near a commitment, so the whole row wonders about each other forever." + (F('tookBlood') ? ' (You took it. Fifty scrip.)' : F('burnBlood') ? ' (You are carrying it to the fire.)' : ' (You left it sealed.)') },
+  e_remit: { tab: 'evidence', title: 'The envelopes', body: () => "INFORMANT REMITTANCE — 50 SCRIP — WITH GRATITUDE. Sealed, in Harl's locker. His note: nobody informed. The Authority sends one to everyone near a commitment, so the whole row wonders about each other forever." + (F('tookBlood') ? ' (You took it. Fifty scrip.)' : F('burnBlood') ? ' (You are carrying it to the fire.)' : ' (You left it sealed.)') },
   e_ticket: { tab: 'evidence', title: 'A ticket stub', body: 'Yellow paper, soft with age: LIFT 0 — ASCENT — ONE (1) — VOID. Fen found it in a drain as a boy. Somebody from down here went up once. With a ticket. Like it was a tram.' },
-  e_dacenote: { tab: 'evidence', title: "Dace's chalk", body: "The collapse in the old tunnel has a gap now, shoulder-wide. His lamp was still warm. On the wall: 'K — IF YOU FOUND THIS, DON'T FOLLOW YET. LIGHT HER LANTERN FIRST. THEN COME. — D.M.' He is alive. He is down there." },
+  e_dacenote: { tab: 'evidence', title: "Harl's chalk", body: "The collapse in the old tunnel has a gap now, shoulder-wide. His lamp was still warm. On the wall: 'K — IF YOU FOUND THIS, DON'T FOLLOW YET. LIGHT HER LANTERN FIRST. THEN COME. — H.M.' He is alive. He is down there." },
   e_slip: { tab: 'evidence', title: '"More yellow than that"', body: 'Tavi told the High Auditor the lantern was the sun. She said: "Is it. It is rather more yellow than—" and stopped. You were raised on gauges. You know a needle twitch when you see one. More yellow than WHAT?' },
   e_belt: { tab: 'evidence', title: 'The Ember Ring belt', body: "A strip of conveyor belting with three notches. Two are Seren's. One is yours. First Fire rules: fists, stay in the chalk, and nothing that happens inside it gets written down." },
   e_leaf: { tab: 'evidence', title: 'A leaf', body: "Lift Zero opened by itself, empty, for eleven seconds. Clean water on the floor, and one green leaf the size of a child's hand. Tavi asked what a leaf was." },
@@ -43,9 +43,9 @@ const RING = [
     def: { title: 'BOUT ONE', sub: 'IVO - HE BITES', foes: [{ id: 'ivo', name: 'Ivo', kind: 'jab', hp: 9 }], taunt: { 0: ['NOT THE FACE!', 'OW! RUDE!'] } },
     win: [say('ivo', 'I let you win. Tell Tavi I let you win.'), fx(() => { G.scrip += 4; Sound.play('coin'); HUD.toast('+4 scrip'); })] }),
   () => F('threatenedProctor') ? {
-    pre: [say('hollis', '...Kael. Proctor at the chalk.'), say('proctor', "Old rule, isn't it? Anyone steps in. Nothing gets written down."), say('proctor', "I'd like that. Five minutes with nothing written down.")],
-    def: { title: 'BOUT TWO', sub: 'PROCTOR SULL - NOTHING GETS WRITTEN DOWN', foes: [{ id: 'proctor', name: 'Sull', kind: 'baton', hp: 22 }], taunt: { 0: ['SPELL IT NOW, SOOT!', 'STAY DOWN!'] } },
-    win: [narr('Sull sits in the chalk dust with his lip split, breathing like a bellows. The square has gone silent. Nobody down here has ever seen a Proctor on the ground.'), say('proctor', '...Nothing written down.'), say('kael', 'Nothing written down.'), narr("He gets up by himself. You don't offer a hand and he doesn't look for one. But he will walk tonight's patrol with a limp."), fx(() => { setF('beatSull'); G.scrip += 8; Sound.play('coin'); })]
+    pre: [say('hollis', '...Kael. Tallyman at the chalk.'), say('proctor', "Old rule, isn't it? Anyone steps in. Nothing gets written down."), say('proctor', "I'd like that. Five minutes with nothing written down.")],
+    def: { title: 'BOUT TWO', sub: 'TALLYMAN SULL - NOTHING GETS WRITTEN DOWN', foes: [{ id: 'proctor', name: 'Sull', kind: 'baton', hp: 22 }], taunt: { 0: ['SPELL IT NOW, SOOT!', 'STAY DOWN!'] } },
+    win: [narr('Sull sits in the chalk dust with his lip split, breathing like a bellows. The square has gone silent. Nobody down here has ever seen a Tallyman on the ground.'), say('proctor', '...Nothing written down.'), say('kael', 'Nothing written down.'), narr("He gets up by himself. You don't offer a hand and he doesn't look for one. But he will walk tonight's patrol with a limp."), fx(() => { setF('beatSull'); G.scrip += 8; Sound.play('coin'); })]
   } : {
     pre: [say('hollis', 'Crew Five. The Garran brothers. They share one brain, and most of it is in the big one.'), say('garran', 'Two on one. Crew Five rules.'), say('kael', 'Crew Five can count to two? Mara owes me a scrip.')],
     def: { title: 'BOUT TWO', sub: 'TWO ON ONE - CREW FIVE RULES', foes: [{ id: 'garran', name: 'Garran', kind: 'heavy', hp: 16 }, { id: 'pike', name: 'Pike', kind: 'quick', hp: 8 }], taunt: { 0: ['HOLD STILL!'], 1: ['TOO SLOW!'] } },
@@ -85,7 +85,7 @@ const D2T = {
       { choice: [
         { t: "I don't want to carry it.", then: [say('tavi', "...She SAID you'd say that. It's on the LIST, Kael.")] },
         { t: 'Then we finish it. Tonight it burns.', fx: () => trust('tavi', 1), then: [say('tavi', "Really? Not 'we'll see'? Not the face?"), say('you', 'Not the face.')] },
-        { t: "A lantern won't bring her back, Tav.", fx: () => setF('bitterLantern'), then: [say('tavi', "I know that. I'm eleven, not stupid."), say('tavi', "It's not for bringing her back. It's so they have to LOOK at her.")] }
+        { t: "A lantern won't bring her back, Tav.", fx: () => setF('bitterLantern'), then: [say('tavi', "I know that. I'm seven, not stupid."), say('tavi', "It's not for bringing her back. It's so they have to LOOK at her.")] }
       ] },
       say('tavi', "And get rays. Paper ones. Everybody who loved her gets to add a ray. That's the rule. I made the rule. It's a good rule."),
       say('tavi', 'Mara wants you first, though. Board says Fuse Room C.'),
@@ -99,7 +99,7 @@ const D2T = {
   mara() {
     if (!F('mara2')) return [
       say('mara', "You're early. Don't make it a habit, I'll start expecting things."),
-      say('mara', "Dace's locker is still locked. Nobody has come for his things. Nobody has come to tell me to stop waiting for him, either."),
+      say('mara', "Harl's locker is still locked. Nobody has come for his things. Nobody has come to tell me to stop waiting for him, either."),
       ...(F('bledAgain') ? [say('mara', 'Ward gauge ran fat for an hour yesterday. Vale pulled the Seven logbook at first bell. I am telling you so your face is ready.')] : []),
       say('mara', 'WO-116. Fuse Room C. Festival load. Every year the Authority wants the standby bus topped up before First Fire, and every year our lamps go dim to pay for it.'),
       say('you', 'Standby for what?'),
@@ -128,12 +128,12 @@ const D2T = {
       say('proctor', 'Brennick. K-A-E-L. See? I kept the spelling.'),
       say('proctor', 'Random inspection. Pockets.'),
       narr('He takes his time. He finds your wage chit and reads it like a menu.'),
-      say('proctor', "Fine for obstructing a Proctor: five scrip. Fine for the tone: nothing. The tone I'm keeping."),
+      say('proctor', "Fine for obstructing a Tallyman: five scrip. Fine for the tone: nothing. The tone I'm keeping."),
       fx(() => { const n = Math.min(5, G.scrip); G.scrip -= n; Sound.play('deny'); HUD.toast(`−${n} scrip`); }),
       say('proctor', 'Your kid. Tavi. Ninth name on the ward board. I can read too, see.'),
       { choice: [
         { t: '(Step into him.) Say that name again.', fx: () => { setF('sullWar'); fury(2); }, then: [narr("Close enough to count his eyelashes. He doesn't step back. But his hand finds his whistle, and stays there."), say('proctor', "Tonight. First Fire. Give me one reason. I'm begging you, soot."), say('proctor', '...Or step in the chalk. Old rule. Nothing gets written down in the chalk.')] },
-        { t: '(Breathe. Every breath is hers.) Happy First Fire, Proctor.', fx: () => setF('sullSwallow'), then: [narr('It costs you more than five scrip. He looks almost disappointed.')] }
+        { t: '(Breathe. Every breath is hers.) Happy First Fire, Tallyman.', fx: () => setF('sullSwallow'), then: [narr('It costs you more than five scrip. He looks almost disappointed.')] }
       ] }, tail];
     if (F('charmedProctor')) return [
       say('proctor', "Don't. Don't do the bucket thing."),
@@ -188,7 +188,7 @@ const D2T = {
       say('you', "Seren's list says you have a wick. I'm supposed to trade you a joke."),
       say('nell', 'Go on, then.'),
       { choice: [
-        { t: 'What did the valve say to the Proctor? "Gratitude is breath. And yours stinks."', then: [say('nell', "...That's terrible. She would have been so proud.")] },
+        { t: 'What did the valve say to the Tallyman? "Gratitude is breath. And yours stinks."', then: [say('nell', "...That's terrible. She would have been so proud.")] },
         { t: "I haven't got one. She took all the jokes with her.", then: [say('nell', 'No. She left them here. Pip tells her noodle joke every morning. Badly. I will take that as payment.')] },
         { t: "A man walks into Lift Zero. That's it. That's the joke.", then: [say('nell', "Ha. — Don't say that one in the square.")] }
       ] },
@@ -207,7 +207,7 @@ const D2T = {
   ada() { return [say('ada', 'Will the lantern be warm?'), say('kael', 'Warm as she was.'), say('ada', 'Then hold it near the window. I want to feel it through the glass.')]; },
   bao() {
     return once('ray_baoSeen', [say('bao', 'First Fire broth! Double chili! Half price for widowers, which is a discount I invented this morning.'),
-      say('bao', 'They license the lanterns now, you hear? One candle-hour each. A Proctor comes round with a stamp. I asked what happens to an unlicensed light. He said: "It goes out."'),
+      say('bao', 'They license the lanterns now, you hear? One candle-hour each. A Tallyman comes round with a stamp. I asked what happens to an unlicensed light. He said: "It goes out."'),
       narr('He wipes his hands and takes something from under the counter. A square of greasy paper, kept flat under a bowl.'),
       say('bao', 'Her last order. She wrote it down herself, because she said I never listen. "EXTRA CHILI. KAEL PAYS."'), fx(() => ray('bao'))],
     [say('bao', 'Eat before the bell. Nobody should watch an Accredited on an empty stomach.'),
@@ -254,7 +254,7 @@ const D2T = {
   kit() {
     return once('ray_kitSeen', [
       say('kit', 'Brennick. Sable sends regards.'),
-      F('tookSlip') ? say('kit', "She knows a slip walked off Crate C. She's not angry. She's interested. That's worse.") : say('kit', 'You flagged her crate. It cost her twelve scrip to a Proctor to un-flag it. She says you owe her twelve scrip or one favor. She prefers favors.'),
+      F('tookSlip') ? say('kit', "She knows a slip walked off Crate C. She's not angry. She's interested. That's worse.") : say('kit', 'You flagged her crate. It cost her twelve scrip to a Tallyman to un-flag it. She says you owe her twelve scrip or one favor. She prefers favors.'),
       say('kit', "After the festival. Freight Three. Come alone, or don't. She'll know either way."), fx(() => setF('sableHook')),
       say('kit', "...And a ray. From me. I didn't even like her."), say('kit', 'She paid my fine once. Never said. Here.'), fx(() => ray('kit'))],
     [say('kit', 'Freight Three. After. Nine floors, Brennick. Not six.')]);
@@ -303,9 +303,9 @@ const D2H = {
   bench: () => [narr('One year ago tonight you sat on this bench with a brass washer in your pocket, sweating through your good shirt, while she pretended not to notice.')],
   screen: () => [narr("The Authority screen has a fifth message today: FIRST FIRE TONIGHT. BE GRATEFUL IN AN ORDERLY FASHION.")],
   shiftboard: () => [narr("CREW 3 — TODAY\nWO-116  Fuse room C — festival load — K. Brennick\nWO-117  Conveyor 2 — grease — (unassigned)"), narr("Under two layers of tape you can still read both names.")],
-  conveyor: () => [narr("Conveyor Two, still. Dace's rag has dried stiff on the rail. Nobody has moved it.")],
+  conveyor: () => [narr("Conveyor Two, still. Harl's rag has dried stiff on the rail. Nobody has moved it.")],
   furnace: () => [fx(() => { World.fxFlash('#ff6a20', 0.6); Sound.play('roar'); }), narr('The heat. The doors. Eleven seconds. It does not get smaller.'),
-    narr("There is a Proctor's seal on the furnace door today, and beside it a brass cup on a chain. Polished. Waiting."), say('kael', "...The First Fire. They draw it from here. Tonight they'll light every lantern in Cinderwell from this."), say('kael', 'From her.'), fx(() => setF('knowsFire'))],
+    narr("There is a Tallyman's seal on the furnace door today, and beside it a brass cup on a chain. Polished. Waiting."), say('kael', "...The First Fire. They draw it from here. Tonight they'll light every lantern in Cinderwell from this."), say('kael', 'From her.'), fx(() => setF('knowsFire'))],
   valves: () => [narr("Bank Seven hums. AUX-9 reads full. Vale's thumbprint is on the logbook cover, in graphite.")],
   breakers() {
     if (F('fuseDone')) return [narr('Both buses steady. TIER 6 LIGHTS: ' + (F('spareOn') ? '17, with the spare thrown.' : '15.') + ' And under your thumbprint in the grime, the brass plate: L0 STBY — 19.')];
@@ -313,10 +313,10 @@ const D2H = {
   },
   lockerS: () => [narr('The nameplate has been unscrewed. The four little holes are still there.'), narr('Inside: nothing. The Authority cleared it the same afternoon. They even wiped the shelf.'),
     narr('But on the inside of the door, low down, where you would only see it kneeling: a sun, scratched with a valve key. And under it: K + S. BALANCED.'), fx(() => setF('sawLockerS'))],
-  lockerK: () => [narr('Your locker. Spare gloves. A heel of bread gone to stone.'), narr("And the note she left you on the morning of the wedding. You have read it so many times the folds have gone soft: DON'T BE LATE. I'LL START WITHOUT YOU.")],
+  lockerK: () => [narr('Your locker. Spare gloves. A heel of bread gone to stone.'), narr("And the note she left you the morning after the wedding, on her way to first bell. You have read it so many times the folds have gone soft: DON'T BE LATE. I'LL START WITHOUT YOU.")],
   lockerD() {
-    if (F('lockerD')) return [narr("Dace's locker. The flat-packed lantern is still inside. FOR S. — I'LL CARRY IT.")];
-    return [narr('D. MORROW. Locked. Nobody has come for his things.'),
+    if (F('lockerD')) return [narr("Harl's locker. The flat-packed lantern is still inside. FOR S. — I'LL CARRY IT.")];
+    return [narr('H. MORROW. Locked. Nobody has come for his things.'),
       { choice: [
         { t: 'Pick it. You have the bent pick, and no shame.', then: [
           narr('Four seconds. Seren could do it in two.'),
@@ -340,8 +340,8 @@ const D2H = {
   fusebench: () => [narr("Crew Three's bench. Forty years of initials carved in it. The newest: S.H., with a little sun for the dot of a letter that has no dot.")],
   rubble() {
     return [narr('The stack of moved rocks is taller today. Much taller. There is a gap in the collapse now, shoulder-wide, with a draft coming through it.'),
-      narr("Dace's lamp sits on the stack. Wick trimmed. The glass is still faintly warm. He was here last night."),
-      narr("On the wall beside the gap, fresh chalk: 'K — IF YOU FOUND THIS, DON'T FOLLOW YET. LIGHT HER LANTERN FIRST. THEN COME. — D.M.'"),
+      narr("Harl's lamp sits on the stack. Wick trimmed. The glass is still faintly warm. He was here last night."),
+      narr("On the wall beside the gap, fresh chalk: 'K — IF YOU FOUND THIS, DON'T FOLLOW YET. LIGHT HER LANTERN FIRST. THEN COME. — H.M.'"),
       say('you', "...He's alive. He's down there, and he's leaving me homework."),
       fx(() => { if (!G.journal.includes('e_dacenote')) Sound.play('clue'); addJ('e_dacenote'); setF('daceNote'); Game.autosave(); })];
   },
@@ -436,10 +436,10 @@ function festA() {
     { say: 'kael', t: 'I know what she means.' },
     { say: 'celestine', t: 'Gratitude is breath. Come. Take your light.' },
     { kneel: 'all', v: 0 },
-    { narr: "Proctors carry tapers down the rows. The flame passes hand to hand, lantern to lantern. Seren's fire, coming toward you one candle at a time." },
+    { narr: "Tallymen carry tapers down the rows. The flame passes hand to hand, lantern to lantern. Seren's fire, coming toward you one candle at a time." },
     { choice: [
       { t: "Take it. It's HER fire. They don't get to keep it.", fx: () => setF('fireTheirs'), then: [narr('The taper touches the wick. The paper sun fills up gold from the inside, and for a moment you cannot see anything else in the world.'), say('kael', '(There you are.)')] },
-      { t: 'Close your hand over the wick. Strike your own.', fx: () => { setF('fireOwn'); fury(1); }, then: [narr('The Proctor with the taper stops. The row stops. You take out your striker, the one that lights the Bank Seven pilot, and thumb it. Once. Twice.'), narr('It catches. An unlicensed light. Small, and blue at the root, and yours.')] },
+      { t: 'Close your hand over the wick. Strike your own.', fx: () => { setF('fireOwn'); fury(1); }, then: [narr('The Tallyman with the taper stops. The row stops. You take out your striker, the one that lights the Bank Seven pilot, and thumb it. Once. Twice.'), narr('It catches. An unlicensed light. Small, and blue at the root, and yours.')] },
       { t: 'Give Tavi the striker.', fx: () => { setF('fireTavi'); trust('tavi', 1); }, then: [narr("Tavi's hands are shaking. It takes four tries. On the fourth, the wick catches, and Tavi makes a sound you have not heard since before the fever. A laugh, with nothing wrong with it.")] }
     ] },
     { fx: () => { Cutscene.glowK = 1; } },
@@ -469,7 +469,7 @@ function festA() {
     F('bledAgain') || F('nearlyCaught') ? { narr: 'Vale does not look at you. It is the loudest thing he has ever not done.' } : null,
     { move: 'wl', to: [12, 1], spd: 16 }, { move: 'wr', to: [14, 1], spd: 16 }, { move: 'celestine', to: [13, 1], spd: 16, wait: true },
     { remove: 'celestine' }, { remove: 'wl' }, { remove: 'wr' }, { beam: 0 }, { music: 'mystery' }, { fx: () => { Cutscene.lift = 1; } },
-    { narr: 'She goes up in light. The lamps come back. The Proctors string a cordon around the Pillar, where every lantern in Ashgate has hung since before Orin was born.' },
+    { narr: 'She goes up in light. The lamps come back. The Tallymen string a cordon around the Pillar, where every lantern in Ashgate has hung since before Orin was born.' },
     { pan: [8, 10], dur: 1.2 }, { zoom: 2.6 },
     { say: 'ivo', t: "Every year. Every year, hers went up first. Top hook. She'd climb the base like a rat up a pipe." },
     { say: 'tavi', t: "There's still a top hook." },
@@ -480,7 +480,7 @@ function festA() {
     F('beatSull') ? { say: 'ivo', t: "And he's limping. I wonder why. I wonder who could possibly have done that, in a chalk ring, where nothing gets written down." } : null,
     { say: 'tavi', t: "Make them look at her, Kael." },
     { fade: 'out' },
-    { card: 'Ashgate Square · after last bell', sub: "Hang her lantern on the Pillar. Stay out of the Proctors' lamplight. Throw a bolt to pull them away.", min: 1.2, max: 5 }
+    { card: 'Ashgate Square · after last bell', sub: "Hang her lantern on the Pillar. Stay out of the Tallymen's lamplight. Throw a bolt to pull them away.", min: 1.2, max: 5 }
   ].filter(Boolean);
 }
 
@@ -506,7 +506,7 @@ function festB() {
         { narr: 'Nobody raises a fist. They just stand. In a row. The way the envelopes were supposed to make sure they never would again.' }]
       : row === 2 ? [{ move: 'hollis', to: [12, 9], spd: 40 }, { move: 'bao', to: [14, 9], spd: 40 }, { move: 'marrow', to: [13, 9], spd: 30, wait: true },
         { narr: 'Sull gets three steps. Then Hollis is in front of him, bad arm and all. Then Bao. Then, after a breath, Marrow. Three people. It is not a wall. It is enough to make him stop.' }]
-      : [{ move: 'mara', to: [13, 9], spd: 40, wait: true }, { narr: 'Sull gets three steps before Mara is in front of him. Just Mara. Arms folded. Forty years of forewoman in her face.' }, { say: 'mara', t: "It's a lantern, Proctor. On First Fire. Write that down and see how it reads." }]),
+      : [{ move: 'mara', to: [13, 9], spd: 40, wait: true }, { narr: 'Sull gets three steps before Mara is in front of him. Just Mara. Arms folded. Forty years of forewoman in her face.' }, { say: 'mara', t: "It's a lantern, Tallyman. On First Fire. Write that down and see how it reads." }]),
     { narr: 'And from somewhere in the back, low, through closed teeth: the shift song.' },
     { narr: 'For forty-two days they have played it at us through the speakers at every bell, so it would mean the furnace. Tonight the tier takes it back.' },
     F('sullTip') ? { say: 'proctor', t: "...One candle-hour. It's licensed for one candle-hour. Then it comes down." } : F('sullWar') || F('beatSull') ? { say: 'proctor', t: "Brennick. I've got your name spelled right. You hear me? I've got it spelled RIGHT." } : { say: 'proctor', t: "It comes down at first bell. I'll scrub the light off the stones if I have to." },

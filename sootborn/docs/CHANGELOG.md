@@ -1,4 +1,21 @@
-# SOOTBORN — changelog (latest v0.85 · 2026-11-26)
+# SOOTBORN — changelog (latest v0.86 · 2026-11-27)
+
+## v0.86 · 2026-11-27 — the story made to match the script rules
+The fix list from the script audit (`muse/sootborn-script-audit/FIX-LIST.md`, written against v0.84 on another branch) is now in the game. The voiced Chapter One films were made from the fixed story; the game now tells the same one.
+
+- **55 line fixes:** Tavi is a boy throughout; ages and spans agree with the canon dates (Tavi is seven at the furnace; Celestine is seventy-three; three years on the Spire); Mara sends forty-four names up with Tavi; Seren's tag is in the Warden's tray; the old Blade at the Pinning; ten years come off with the wire; and the rest of the sheet.
+- **Kael's father in the ledger** (the Count hall, Part Two): "Brennick. Tier Six. Reassigned to the service. Struck." It pays off Mara's "your father thought he was being promoted, too."
+- **Proctors are gone.** The graders of the Assay are **Assayers** (Assayer Voss); the police below are **Tallymen** (Tallyman Sull, the Night Tallyman). Code ids such as `proctor` and `threatenedProctor` are unchanged, so saves carry over.
+- **Dace Morrow is Harl Morrow** (H.M. on the chalk, H. MORROW on the locker). The id `dace` and its flags are unchanged.
+- **The fallback fights** (played only if a comic-book level fails to load) now agree with the levels: Kael holds the top of Riser Nine and Brand waits at the ladder; he rode the lift past the nine hundred steps; Mara could not stop *him*; the Blade on the Stair is Oswin Hale; Harl comes up for the docks; Vant has had three years.
+- Docs: Proctor and Dace renamed in the story bible, handoff, master timeline, script and plan, cards and open list (the changelog archives keep the old names as history).
+
+**Checked:** every find on the sheet matched exactly once before it was replaced; no on-screen Proctor or Dace is left (only code comments). The whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. The new lines were not read in place on screen. The comment in `issue/rig.js` on Oswin's leg (night forty-nine against the game's day twenty-six) is still there.
+
 
 ## v0.85 · 2026-11-26 — fixes from two playtest bots
 Two bots played from a new game on a controller. The first knew nothing and pressed at random for 90 minutes (it reached the last flash). The second knows a little: it walks to people and things, fights in combos with pauses, dodges a wind-up and holds strike for ELEVEN (an hour; it reached the Pinning). Neither found an error.

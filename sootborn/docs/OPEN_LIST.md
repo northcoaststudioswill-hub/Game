@@ -1,5 +1,9 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.85 (2026-11-26).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.86 (2026-11-27).
+
+## Built in v0.86 (the story fix list; needs your eye)
+- The script audit's fix list is in: 55 line fixes, Kael's father in the ledger, Proctor becomes Assayer (the Assay) or Tallyman (below), Dace becomes Harl. Read a few of the new lines in place.
+- The fallback fights were rewritten to agree with the comic-book levels (Riser Nine, the Stair, the docks). Say if any of those lines should read differently.
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -101,7 +105,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - Kael's hook on the seat board is 307, next to Seren's empty 306. New; say if the number should be something else.
 
 ## Built in v0.68 (needs your eye)
-- **The animated intro:** eleven pictures counted to ELEVEN, in place of the opening film. Seen only as stills so far. Say if any picture is weak, if it is too long or too short, and whether the faces (the three cadets, the Proctor) are good enough.
+- **The animated intro:** eleven pictures counted to ELEVEN, in place of the opening film. Seen only as stills so far. Say if any picture is weak, if it is too long or too short, and whether the faces (the three cadets, the Assayer) are good enough.
 - **The Keep's ending:** his blade breaks on an ELEVEN begun at half health or less, and he kneels. Say if being unable to finish him any other way feels like a cheat.
 - **The white cloak** from day thirty-one. Kael and Lucan are both in white in the Keep now; say if they are hard to tell apart and I will give Kael's a violet lining.
 - **The Table at the door** when Ilse comes for him.
@@ -115,7 +119,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 ## Untested, built blind (check these first when playing)
 - **v0.66: the four fixes above.** Checked by script and stills only.
 - **v0.63: arena figures.** Torso plate, baldric, scabbard, and a blade that is a sword.
-- **v0.62: the Proctors** behind the Dorian fight (low balcony, in the dark) and on the valley dais.
+- **v0.62: the Assayers** behind the Dorian fight (low balcony, in the dark) and on the valley dais.
 - **v0.61: two more memories to walk in.** Row K (the ledge of suns by your door) and the fever ward (the ward board in the clinic).
 - **v0.60: arena boots.** The camera follows you up and closes in on dives; hook in the air hauls a man up, strike cuts him down.
 - **v0.60: new kit** on Dock Guards, Stair Blades, Wardens, Rook, the other two bosses and Tavi.
@@ -131,7 +135,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 
 ## Matching the writing (from the master plan, v0.65)
 - ~~The seat knife~~ built in v0.69: on Kael's, Seren's, Mara's and Ivo's belts; the board in Bay Three; counting back at last bell on First Fire. Still open: the count at the end of the other days.
-- ~~The Proctor's white cloak on Kael from day 31~~ built in v0.68 (Valley, Last Night, Keep, Pinning).
+- ~~The Assayer's white cloak on Kael from day 31~~ built in v0.68 (Valley, Last Night, Keep, Pinning).
 - ~~A clerk's coat for Kael on the Spire and at the High Docks; gloves~~ built in v0.75.
 - ~~Oswin's stiff leg as the Auditor's Blade~~ built in v0.75. Lucan's stick: still only in the words.
 - Deliberate animations: hand flat on the pipe (Seren, Kael, Kestrel); soot turn their heads and the Accredited do not; the kneel at the bell; hand to the washer before ELEVEN everywhere; humming sway; Brand and Hollis grounding the halberd; Tavi on the left.
@@ -144,7 +148,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
 4. **Tavi:** re-kitted (v0.60: bedroll, satchel, scarf, lamp). Needs your eye.
 5. **Rook** and the other two bosses re-kitted (v0.60). Still short of Kael: faces, weapons, their own idle.
-6. **The Proctors:** done as detailed flat figures in the valley and the Pairing room (v0.62). Needs your eye. Open: the same treatment for Celestine and her Wardens on the Keep's dais; the crowd in other 3D rooms.
+6. **The Assayers:** done as detailed flat figures in the valley and the Pairing room (v0.62). Needs your eye. Open: the same treatment for Celestine and her Wardens on the Keep's dais; the crowd in other 3D rooms.
 
 ## Places
 7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rules: (1) from here on, new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot (the fire was already in the story, so it stands). (2) Do not change an existing area to another dimension (2D, 2.5D, 3D) unless you name the area and the dimension.** All five candidates below are approved, to be built after the rest of this list has been gone over. Built in v0.61: Row K the morning after the wedding; the fever ward with the fans up. Built in v0.69: the Assay camp by day. Built in v0.72: the Spire's fourth ring at night. Built in v0.73: the deck of a barge in the two years, and the service stair. Also still open: the whole square explorable this way in the present, not only as a memory.
@@ -165,7 +169,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
 16a. **Built (v0.67 the cold open, v0.68 the intro and the ending; needs your eye).** The Keep as the cold open (master plan 9b): black and the shift song; a 25-second animated intro of moving drawn stills counting to eleven; the Keep at dawn as a duel you cannot lose (strike, dodge, fly); ELEVEN, cut before the blow; then the prologue. The Valley returns to its place. The same fight on the last day, where the blow lands.
 16b. **Built in v0.73 except the last two (the Count's one flash and the played ending are Step 9).** **Part Two flashbacks** (master plan 9c): the Post → the white cloak at the Assay; What She Knows → Celestine's own Assay, played as her; Two Years → Seren tracing the line first; the Count → no cuts, then one flash to the furnace at eleven; the ending as a played sequence of pictures.
-16c. **Both built (the vent stack v0.70, the Deep Array v0.71; need your eye).** Two more comic-book levels in the first half (master plan 9e): the Deep Array with Dace (The Ledger); the vent stack on day 31, where he takes the boots.
+16c. **Both built (the vent stack v0.70, the Deep Array v0.71; need your eye).** Two more comic-book levels in the first half (master plan 9e): the Deep Array with Harl (The Ledger); the vent stack on day 31, where he takes the boots.
 16d. **Built in v0.69 (needs your eye).** Two more 2.5D parts with story in the first half: the Assay camp by day (its people: Dorian, Oswin, Petra); Bay 3 at last bell, counting the knives back.
 16e. **Built (v0.72, v0.73; needs your eye).** **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
 16f. **The Assay's art in the opening:** the expression, the ring, ELEVEN. Its people and story should be felt, not only fought.

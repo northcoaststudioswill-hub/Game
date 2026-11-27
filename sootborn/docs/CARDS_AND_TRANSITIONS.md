@@ -9,13 +9,13 @@ I walked the whole of timeline v2 against what the build says now (the bot's log
 ### Problems, with a fix for each
 1. **What "day one" means.** You wrote that the present should start "after he is officially gold". I built v2 with day one = Ashgate (41 days after the furnace, Kael still a valve hand), because that is where the game's present already lives. If you meant the present starts at the Gilding, the Assay becomes its own act and this whole script changes. **Your call; everything below assumes Ashgate.**
 2. **The Keep bookend can't kill Lucan.** The cold open cuts before Kael's blow lands on Lucan, and Part One ends with the blow landing. But Lucan is alive at +6 (The Son). **Fix:** the blow lands on his blade and breaks it; Lucan goes to his knees in front of his mother. That is exactly what Kael says he wants ("if I put him on his knees in front of her").
-3. **The boots.** The dream already says the Proctors' boots run off the island's vent stack. Kael cuts Voss's boots off him on day 31. **Fix:** the new vent-stack level comes *after* On the Ground: he carries the cut boots up the stack, gets them charged, and jumps. He flies from then on: the Valley (day 40), the Keep. This settles the open question about the boots.
+3. **The boots.** The dream already says the Assayers' boots run off the island's vent stack. Kael cuts Voss's boots off him on day 31. **Fix:** the new vent-stack level comes *after* On the Ground: he carries the cut boots up the stack, gets them charged, and jumps. He flies from then on: the Valley (day 40), the Keep. This settles the open question about the boots.
 4. **Tavi's age.** The lines say twelve at +5 and sixteen at +9, so he was seven at the furnace. The bible says six. **Fix:** change the bible to seven. No line in the game has to change.
 5. **The Deep Array level is on the day Kael is still untrained.** The Drill is two years later. **Fix:** no boots, no ELEVEN, no Assay moves in that level. It is a climb, a hide and a scramble; any fight is a brawl with a wrench. That also makes it feel different from the levels above.
 6. **Two DOCK STAIR cards and two HIGH DOCKS cards** in Part Two now (the bot saw both twice). **Fix:** one card each; the second becomes a short line in the scene.
 7. **The Pinning plays between END OF PART ONE and PART TWO.** **Fix:** PART TWO comes first, then the Pinning opens it.
 8. **"THE ASSAY | Four years after the furnace. Day nineteen."** is the only Assay card whose title isn't the date. **Fix:** same format as the rest (below).
-9. **"The expression"** in the Assay art for the opening: I've read it as the faces (Kael's, the cadets', the Proctors' watching). Say if you meant something else.
+9. **"The expression"** in the Assay art for the opening: I've read it as the faces (Kael's, the cadets', the Assayers' watching). Say if you meant something else.
 
 ### Already holds together
 - The furnace at zero, the four days below (41, 42, 43, 160 days after), the Gilding at half a year, training at two and two and a half, the Assay at four years. "Three years of that" (the Gilding to the Assay is three and a half) is fair speech.
@@ -49,7 +49,7 @@ Each kind of jump has one look, used every time, so the player learns it once.
 ### Opening
 | # | Card(s) | In | Trigger | Plays | Out |
 |---|---|---|---|---|---|
-| 0a | none | from the title | New game | **Animated intro, about 25 s.** Black; one voice humming the shift song. Drawn stills that move: a hand flat on a pipe → a gauntlet closing on a hilt; a chalk sun on a wall → the real sun over the valley; faces in the ring; a Proctor's pen; the count, one to eleven, under it all | ELEVEN |
+| 0a | none | from the title | New game | **Animated intro, about 25 s.** Black; one voice humming the shift song. Drawn stills that move: a hand flat on a pipe → a gauntlet closing on a hilt; a chalk sun on a wall → the real sun over the valley; faces in the ring; an Assayer's pen; the count, one to eleven, under it all | ELEVEN |
 | 0b | **FOUR YEARS AFTER THE FURNACE** / *The Assay. The last day.* | STRIP | the count reaching eleven | **The Keep**, the cold open: one duel at dawn, strike, dodge, fly; can't be lost. At full fury ELEVEN lights; the blade comes down | CUT, before it lands |
 | 1 | **BEFORE THE FURNACE** / *Cinderwell. Six tiers under the rock.* | CUT (to dark) | the hum carries over | World panel | FURNACE |
 | 1a | **ELEVEN MONTHS BEFORE THE FURNACE** / *The Festival of the First Fire. Ashgate Square.* | FURNACE | — | The festival, the wedding | CUT |
@@ -81,12 +81,12 @@ Each kind of jump has one look, used every time, so the player learns it once.
 | 7d | **FIRST FIRE** / *One candle-hour. It burned for three.* | WAKE | | | CUT |
 | 8 | **THE LEDGER** / *Forty-three days after the furnace.* | WAKE | — | Lift Zero, Celestine, the window | — |
 | 8a | *He came down at second bell* / *with a pass stamped in gold, and four hundred people watching the light to see if he would.* | CUT | | **Under the Floor** (2D) | CUT |
-| 8b | **UNDER THE FLOOR** / *Forty-three days after the furnace. Dace.* | CUT | Dace: "You want to see what they're counting?" | **New: the Deep Array** (comic level). A climb, a hide, a scramble; a brawl with a wrench; no boots, no ELEVEN | PAGE |
+| 8b | **UNDER THE FLOOR** / *Forty-three days after the furnace. Harl.* | CUT | Harl: "You want to see what they're counting?" | **New: the Deep Array** (comic level). A climb, a hide, a scramble; a brawl with a wrench; no boots, no ELEVEN | PAGE |
 | 9 | **THAT NIGHT** / *Further in than it has gone before.* | CUT | the Array's hum in his ears | | STRIP |
 | 9a | **NIGHT THIRTY** / *The Assay. The night before day thirty-one.* | STRIP | | **The Dais** | CUT |
-| 9b | **MORNING** / *The Assay. Day thirty-one. He has noticed the page.* | CUT | | **The Proctor**; **On the Ground** (he cuts the boots off Voss) | CUT |
+| 9b | **MORNING** / *The Assay. Day thirty-one. He has noticed the page.* | CUT | | **The Assayer**; **On the Ground** (he cuts the boots off Voss) | CUT |
 | 9c | **DAY THIRTY-ONE** / *The Assay. The island's vent stack.* | PAGE | the cut boots, dead in his hands | **New: the vent stack** (comic level): climb it with the boots, charge them at the top, jump. He flies from here on | PAGE |
-| 9d | none | CUT | a white cloak over his arm | The Proctor's white cloak on Kael from here; the cadets follow him into camp | WAKE |
+| 9d | none | CUT | a white cloak over his arm | The Assayer's white cloak on Kael from here; the cadets follow him into camp | WAKE |
 | 9e | **THE LEDGER** / *Forty-three days after the furnace. The day ends.* | WAKE | | The hum slip (the book, the pen, gold on his cuff) | CUT |
 | 10 | **THE WAY OUT** / *One hundred and sixty days after the furnace.* | WAKE | — | The months, Mara, **the Way Out**, Ilse | — |
 | 10a | **THAT NIGHT** / *The last dream below. It runs to the end.* | CUT | the lift's light going up | | STRIP |

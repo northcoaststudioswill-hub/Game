@@ -623,7 +623,7 @@ rep("    if (SC.issue === 'gild') { G.scene.background.set(0x07060a);", "    if 
 rep("wantHook = can && inp.buffered('hook', 0.2)", "wantHook = can && !(SC.story.plain && SC.story.plain()) && inp.buffered('hook', 0.2)");
 rep("else if (wantPow && pl.path && pl.onGround && free)", "else if (wantPow && pl.path && !(SC.story.plain && SC.story.plain()) && pl.onGround && free)");
 rep("if (pl.path && pl.meter >= T.powerCost) { if (pl.holdA > 0.2", "if (pl.path && !(SC.story.plain && SC.story.plain()) && pl.meter >= T.powerCost) { if (pl.holdA > 0.2");
-rep("clerk: { name: SC.issue === 'stair' ? 'TAVI' : 'BRAND',", "clerk: { name: SC.issue === 'stair' ? 'TAVI' : SC.issue === 'array' ? 'DACE' : 'BRAND',");
+rep("clerk: { name: SC.issue === 'stair' ? 'TAVI' : 'BRAND',", "clerk: { name: SC.issue === 'stair' ? 'TAVI' : SC.issue === 'array' ? 'HARL' : 'BRAND',");
 rep("    if (SC.issue === 'stack') { G.scene.background.set(0x1c2740);", "    if (SC.issue === 'array') { G.scene.background.set(0x090d0c); G.scene.fog.color.set(0x14201c); G.scene.fog.near = 18; G.scene.fog.far = 84; G.amb.color.setRGB(0.34, 0.38, 0.34); G.sun.color.setRGB(0.5, 0.46, 0.36); }\n    if (SC.issue === 'stack') { G.scene.background.set(0x1c2740);");
 rep("const bands = SC.issue === 'stack' ? ", "const bands = SC.issue === 'array' ? ['#060908', '#0a100e', '#0e1614', '#121c18', '#16221e', '#1a2822'] : SC.issue === 'stack' ? ");
 

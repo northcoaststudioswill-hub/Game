@@ -66,7 +66,7 @@
     bike: [{ k: 'freight0', cap: 'LAST NIGHT. FREIGHT THREE.', cap2: '"IF THE NINE MINUTES ARE NOT THERE, THE STAIR WILL WANT HOLDING. *I HOLD IT.*"' }, { k: 'dockstair0', cap2: 'BRAND SAID IT LIKE A MAN READING OUT A LINE THAT WAS ALREADY WRITTEN.' }],
     masks: [{ k: 'furnace0', cap: 'YEAR NOUGHT. THE HEART-FURNACE.', cap2: 'A WARDEN PUT A HALBERD BUTT INTO HOLLIS FOR HUMMING. *THAT WARDEN IS HOLDING THE STAIR BEHIND ME.*' }],
     ledger: [{ k: 'desk4', cap: 'FIVE YEARS AFTER THE FURNACE. THE MORNING AFTER RISER NINE.', cap2: '"SOMEONE WHO HAD DONE IT BEFORE," CADE SAID. HE LOOKED AT ME FOR AS LONG AS IT TAKES TO COUNT TO ELEVEN.' }, { k: 'ledger2', cap2: 'FOUR HUNDRED AND SIX LINES I HAVE STRUCK MYSELF. *I LEARNED EVERY ONE.*' }],
-    lintel: [{ k: 'under0', cap: 'THE YEAR OF THE FURNACE. THE OLD TUNNEL.', cap2: 'DACE CHALKED TWO WORDS WHERE THE AUTHORITY WOULD NEVER LOOK. *STILL FLOWING.* THE AIR WENT UP. IT HAS ALWAYS GONE UP.' }],
+    lintel: [{ k: 'under0', cap: 'THE YEAR OF THE FURNACE. THE OLD TUNNEL.', cap2: 'HARL CHALKED TWO WORDS WHERE THE AUTHORITY WOULD NEVER LOOK. *STILL FLOWING.* THE AIR WENT UP. IT HAS ALWAYS GONE UP.' }],
     shoe: [{ k: 'ward0', cap: 'THE FEVER WARD. TIER SIX.', cap2: 'FORTY BEDS. FORTY CHILDREN BREATHING BECAUSE OF HER. *THE NUMBER FOLLOWS ME ABOUT.*' }],
     plates: [{ k: 'row0', cap: 'ROW K.', cap2: 'MARA KNELT AT FORTY-FOUR COMMITMENTS AND COUNTED EVERY ONE. *SHE STOOD UP AT THE FORTY-FIFTH.*' }],
     halberd: [{ k: 'dockstair0', cap: 'SEVEN YEARS AFTER THE FURNACE. THE DOCK STAIR.', cap2: 'ELEVEN MINUTES. SOMEBODY TIMED IT. *I ASKED THEM TO.*' }],
@@ -86,8 +86,8 @@
         { k: 'desk3', cap: 'THE EAST MANIFOLD. LAST YEAR.', cap2: 'KESTREL DRAY TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
         { k: 'hands0', cap2: 'THE WASHER WAS UNDER MY COLLAR. I WAITED FOR IT TO GET HEAVIER. *IT DID NOT, AND I HAVE NOT FORGIVEN IT.*' }] },
       roof: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
-        { k: 'assay0', cap: 'THE ASSAY. FOUR YEARS AFTER THE FURNACE.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. TEO ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
-        { k: 'ward0', cap: 'TIER SIX. THE FEVER WARD.', cap2: 'THE NIGHT THE FEVER BROKE, TAVI ASKED FOR BREAD. I NEVER TOLD TEO THERE WAS A SHE. *THERE WERE FORTY BEDS, AND A SHE.*' }] } },
+        { k: 'assay0', cap: 'THE ASSAY. FOUR YEARS AFTER THE FURNACE.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. DORIAN ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
+        { k: 'ward0', cap: 'TIER SIX. THE FEVER WARD.', cap2: 'THE NIGHT THE FEVER BROKE, TAVI ASKED FOR BREAD. I NEVER TOLD DORIAN THERE WAS A SHE. *THERE WERE FORTY BEDS, AND A SHE.*' }] } },
     riser: {
       yard: { fury: 1, toast: 'HANDS. *FURY.*', p: [
         { k: 'island0', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'AN APPRENTICE KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
@@ -367,7 +367,7 @@
       pl.place(0, 0, RIS ? 10.4 : 41, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
       const pg = RIS ? [
         { img: shot(-9.5, 5.2, 4.5, 0.6, 0.6, 14, 42, 768, 720), area: '1 / 1 / 3 / 2', cap: 'RISER NINE. FIVE YEARS AFTER THE FURNACE.', cap2: 'NINE FLOORS OF LADDER UNDER TIER FOUR. IT COMES UP IN THE VALLEY WHERE I WON THEIR ASSAY.', fx: 'THE HATCH' },
-        { img: shot(-1.2, 1.7, 8.1, 0, 1.75, 10.4, 30), area: '1 / 2 / 2 / 3', cap2: 'THE ORDER SAID ELEVEN HUNDRED. DACE SAID: HOLD THE TOP FOR AN HOUR. *A CLERK CANNOT BE SEEN TO FIGHT. I WORE A MASK.*' },
+        { img: shot(-1.2, 1.7, 8.1, 0, 1.75, 10.4, 30), area: '1 / 2 / 2 / 3', cap2: 'THE ORDER SAID ELEVEN HUNDRED. HARL SAID: HOLD THE TOP FOR AN HOUR. *A CLERK CANNOT BE SEEN TO FIGHT. I WORE A MASK.*' },
         { img: shot(1.6, 2.0, 13.2, 0, 5.2, -21, 40), area: '2 / 2 / 3 / 3', cap: 'THE WARDENS WERE ALREADY ON THE HILL ROAD.', cap2: 'FORTY PEOPLE BEHIND ME ON A LADDER.' }
       ] : [
         { img: shot(9, 4.5, 47, 0, 7, 10, 46, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE SUN SPIRE. NINE YEARS AFTER THE FURNACE.', cap2: 'FOUR HUNDRED HULLS CAME DOWN ON THE TERRACES AT DAWN. BY SUNSET THERE WAS ONE STAIR LEFT.', fx: 'THEY ARE HUMMING' },
@@ -483,7 +483,7 @@
             { who: 'hero', face: 'shock', text: 'Oswin.' },
             { who: 'voss', face: 'hurt', text: 'One\'s father finished ninth for thirty years. She said one need not. *She only wanted the name.*' },
             { who: 'hero', face: 'hurt', text: "You said you'd carry the water yourself. You said not to tell your mother." },
-            { who: 'voss', face: 'angry', text: 'It is *noted*. One has been paying on it nine years. Come and collect, Sorrel.' },
+            { who: 'voss', face: 'angry', text: 'It is *noted*. One has been paying on it five years. Come and collect, Sorrel.' },
             { who: 'cap', text: 'He drew the second blade and set the bad leg behind him. The salve came eleven days late. He had finished second in the Assay, behind a man who lit a fire.' }
           ], n),
           n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true);
@@ -552,8 +552,8 @@
       SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
       pl.place(-6.5, 0, 21.5, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true);
       const pg = [
-        { img: shot(-24, 7, 30, 0, 17, 0, 50, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE VENT STACK. THE ASSAY, DAY THIRTY-ONE.', cap2: 'THE ONLY ONE IN THE VALLEY. THE LAMPS RUN OFF IT, AND THE PUMP, AND THE BOOTS THE PROCTORS STAND ON.', fx: 'COLD' },
-        { img: shot(-5.2, 1.6, 19.2, -6.5, 1.5, 21.5, 30), area: '1 / 2 / 2 / 3', cap2: "I HAD VOSS'S BOOTS AND THEY WERE DEAD IN MY HANDS. *A PROCTOR CHARGES THEM AT THE TOP.*" },
+        { img: shot(-24, 7, 30, 0, 17, 0, 50, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE VENT STACK. THE ASSAY, DAY THIRTY-ONE.', cap2: 'THE ONLY ONE IN THE VALLEY. THE LAMPS RUN OFF IT, AND THE PUMP, AND THE BOOTS THE ASSAYERS STAND ON.', fx: 'COLD' },
+        { img: shot(-5.2, 1.6, 19.2, -6.5, 1.5, 21.5, 30), area: '1 / 2 / 2 / 3', cap2: "I HAD VOSS'S BOOTS AND THEY WERE DEAD IN MY HANDS. *AN ASSAYER CHARGES THEM AT THE TOP.*" },
         { img: shot(-8, 2.4, 26, 0, 3, 11, 46), area: '2 / 2 / 3 / 3', cap: 'HOUSE TEAL HOLDS THE ISLAND.', cap2: 'THE STAIR IS FOR WHOEVER KEEPS THE STACK. BELOW, THAT IS US.' }
       ];
       pl.model.expr = null; U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: pg }, begin);
@@ -566,7 +566,7 @@
       still(0, 31, 13, 0, P.leap); const b = shot(0, 44, 9.5, 0, 30, 13.4, 50);
       still(7, 44, 30, 0.4, P.leap); const c = shot(-30, 6, 44, 2, 30, 14, 52);
       U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
-        { img: a, area: '1 / 1 / 3 / 2', cap: 'THIRTY-SIX METRES. THE WHOLE VALLEY UNDER MY HEELS.', cap2: 'THEY HAD TOLD US THE BOOTS WERE WHAT MADE A PROCTOR.', fx: 'LIVE' },
+        { img: a, area: '1 / 1 / 3 / 2', cap: 'THIRTY-SIX METRES. THE WHOLE VALLEY UNDER MY HEELS.', cap2: 'THEY HAD TOLD US THE BOOTS WERE WHAT MADE AN ASSAYER.', fx: 'LIVE' },
         { img: b, area: '1 / 2 / 2 / 3', cap2: 'THEY ARE A BATTERY, AND A STACK,' },
         { img: c, area: '2 / 2 / 3 / 3', cap2: "*AND A MAN WHO ISN'T AFRAID OF THE HEIGHT.*" }
       ] }, () => done());
@@ -578,7 +578,7 @@
         const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35); W.dyn.push(t => { a.rotation.z = t * 0.25; b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; }); });
       const glow = new THREE.PointLight(0x5fd0ff, 0, 30, 1.4); glow.position.set(0, 38.4, 0); G.scene.add(glow); W.dyn.push(t => { glow.intensity = F.charged ? 70 + Math.sin(t * 9) * 16 : 14 + Math.sin(t * 2) * 4; });
       W.addInteract({ id: 'collar', x: 0, y: 36, z: 3.6, fx: 0, fz: 0, r: 1.9, label: 'STAND THE BOOTS ON IT', marker: 'act', mh: 1.4, when: () => F.e_l2 && !F.charged && !S.enc, act: () => { setFlag('charged'); pl.control = false; SC.audio.sfx('clue'); U.say([
-        { who: 'cap', text: 'A collar on the crown of the stack, worn bright where a hundred Proctors have stood their heels. I put the dead boots on it, and my own weight on them.' },
+        { who: 'cap', text: 'A collar on the crown of the stack, worn bright where a hundred Assayers have stood their heels. I put the dead boots on it, and my own weight on them.' },
         { who: 'cap', text: 'They took one long breath, the way a ward fan does when the branch comes up. Then they burned blue.' },
         { who: 'hero', face: 'smirk', text: 'It is our air. They have been flying on our air.' }], () => { pl.control = true; FX.burst(v3(0, 36.3, 3.6), 0x5fd0ff, 1.8); SC.cam.shake(0.4); U.toast('THE BOOTS ARE *LIVE*. THE EDGE.', 3.4); objective(); }); } });
       W.addInteract({ id: 'tag', x: -13.2, y: 12, z: 9.6, fx: -14, fz: 9.6, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_l1 && !F.clue_tag, act: clue('tag', [
@@ -586,7 +586,7 @@
         { who: 'hero', face: 'smirk', text: 'Somebody up here does the rounds. Somebody up here knows what a seal is.' }]) });
       W.addInteract({ id: 'plate', x: -6.4, y: 24, z: 6.4, fx: -5, fz: 3.4, r: 1.6, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => F.e_l2 && !F.clue_plate, act: clue('plate', [
         { who: 'cap', text: 'A gilt plate riveted to the stack. DRAWN FROM RISER NINE. The lamps, the pump, the boots: all of it comes up one pipe from under the floor.' },
-        { who: 'hero', face: 'angry', text: 'Forty feet under this grass somebody is turning a wheel so that a Proctor need not touch the ground.' }]) });
+        { who: 'hero', face: 'angry', text: 'Forty feet under this grass somebody is turning a wheel so that an Assayer need not touch the ground.' }]) });
     };
     S.update = function (dt, rdt) {
       for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
@@ -619,7 +619,7 @@
     objective = function () {
       let t = '', g = null;
       if (S.enc) t = S.enc.id === 'w1' ? 'THE ARRAY WATCH. THEY HAVE SEEN US.' : 'THE ARRAY WATCH. A WRENCH WILL HAVE TO DO.';
-      else if (!F.path) { t = 'DOWN THE LADDER, AFTER DACE'; g = CROSS.alley; }
+      else if (!F.path) { t = 'DOWN THE LADDER, AFTER HARL'; g = CROSS.alley; }
       else if (!F.across) { t = 'CROSS THE CATWALK WHEN THE LAMP HAS GONE BY'; g = { x: 16.3, y: 8, z: 2 }; }
       else if (!F.down) { t = 'DOWN TO THE FLOOR'; g = { x: 16.3, y: 0, z: -22 }; }
       else if (!F.heart) { t = 'THE HEART OF IT'; g = { x: 0, y: 0, z: -12.4 }; }
@@ -630,7 +630,7 @@
     S.objective = objective;
     encDone = function (id) { setFlag('e_' + id); S.pending = false; SC.audio.sfx('clue');
       if (id === 'w1') U.toast('TWO OF THE WATCH, AND NOBODY TO MISS THEM TILL THE BELL. *GO ON.*', 3.4);
-      else { S.runT = 60; SC.cam.shake(0.8); U.toast('THE SEAL HAS GONE. *THE HATCH.* DACE IS ALREADY RUNNING.', 3.6); showClerk(-13, 12, 25, 2.6); }
+      else { S.runT = 60; SC.cam.shake(0.8); U.toast('THE SEAL HAS GONE. *THE HATCH.* HARL IS ALREADY RUNNING.', 3.6); showClerk(-13, 12, 25, 2.6); }
       objective(); };
     const begin = () => { SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.mode = 'follow'; cam.snapBehind(Math.PI); U.showHud(true); setFlag('intro');
       U.toast(SC.hosted ? 'A WRENCH AND TWO HANDS. *NO BOOTS, NO LINE, NO COUNT.*' : 'WASD MOVES. J STRIKES. K DODGES. THAT IS ALL HE KNOWS YET.', 5); };
@@ -639,7 +639,7 @@
       pl.place(-14, 12, 26, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
       const pg = [
         { img: shot(-16, 15.5, 27, 4, 3, -16, 58, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE DEEP ARRAY. FORTY-THREE DAYS AFTER THE FURNACE.', cap2: 'UNDER THE FLOOR, UNDER ALL SIX TIERS. THE MACHINE THE AIR COMES FROM.', fx: 'THIRTY-ONE' },
-        { img: shot(-11.6, 13.5, 23.6, -13.4, 13.4, 25.8, 34), area: '1 / 2 / 2 / 3', cap2: '"YOU WANT TO SEE WHAT THEY\'RE COUNTING?" DACE SAID. *I HAD A WRENCH, AND NO IDEA.*' },
+        { img: shot(-11.6, 13.5, 23.6, -13.4, 13.4, 25.8, 34), area: '1 / 2 / 2 / 3', cap2: '"YOU WANT TO SEE WHAT THEY\'RE COUNTING?" HARL SAID. *I HAD A WRENCH, AND NO IDEA.*' },
         { img: shot(-16.6, 10.4, 6, 12, 8.6, 2, 46), area: '2 / 2 / 3 / 3', cap: 'I HAD READ ITS NAME ON A THOUSAND WORK ORDERS.', cap2: 'NOBODY FROM TIER SIX HAS BEEN LET IN TO SEE IT.' }
       ];
       pl.model.expr = null; U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: pg }, begin);
@@ -652,7 +652,7 @@
       const a = shot(-11, 13.6, 22.4, -13.6, 13.3, 26.2, 36, 768, 720), b = shot(-15, 17, 24, 2, 3, -17, 54), c = shot(2, 7, -8, 0, 8, -27.9, 40);
       U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
         { img: a, area: '1 / 1 / 3 / 2', cap: 'I CAME UP THROUGH THE FLOOR WITH TAR ON MY HANDS.', cap2: 'I HAD BEEN KEEPING IT ALIVE FOR TEN YEARS, ONE VALVE AT A TIME, AND NOBODY HAD EVER LET ME SEE IT.', fx: 'OURS' },
-        { img: b, area: '1 / 2 / 2 / 3', cap2: '"NOW YOU KNOW WHAT THEY ARE COUNTING," DACE SAID.' },
+        { img: b, area: '1 / 2 / 2 / 3', cap2: '"NOW YOU KNOW WHAT THEY ARE COUNTING," HARL SAID.' },
         { img: c, area: '2 / 2 / 3 / 3', cap2: '*NOT WHO BREATHES. HOW LONG.*' }
       ] }, () => done());
     };

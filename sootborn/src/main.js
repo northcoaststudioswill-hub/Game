@@ -127,9 +127,9 @@ const Game = {
         say('vale', 'A clean shift yesterday. Bank balanced. Mouth mostly shut. I wrote: "Compliant." Do you know how rarely I get to use that word?'),
         say('you', 'Frame it.')
       ]),
-      ...(F('threatenedProctor') ? [say('vale', 'Proctor Sull has filed on you. I have delayed the filing. Paper moves slowly when I sit on it. I will not sit on it twice.')] : []),
+      ...(F('threatenedProctor') ? [say('vale', 'Tallyman Sull has filed on you. I have delayed the filing. Paper moves slowly when I sit on it. I will not sit on it twice.')] : []),
       ...(F('spareOn') ? [say('vale', 'And the spare breaker is warm.'), narr('He looks at it. He looks at you. He does not write.'), say('vale', 'A faulty panel. Forty years old. I shall note the age of the panel.')] : []),
-      say('vale', 'The High Auditor is coming down for First Fire. She lights it herself, some years. She asked whether "the loud one" still works Bank Seven.'),
+      say('vale', 'The High Auditor is coming down for First Fire. She has not lit it herself in eleven years. She asked whether "the loud one" still works Bank Seven.'),
       say('you', 'What did you tell her?'),
       say('vale', 'That you were quiet now.'),
       say('vale', 'Make me honest, Brennick. For one night. Carry your little lantern. Stand in your row. Go home.'),

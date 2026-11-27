@@ -126,7 +126,7 @@ const Menus = {
         if (key === 'theories') {
           html += '<div class="card ghost"><b>Theories form when clues connect.</b><p>Combining clues arrives in Act II.</p></div>';
           if (G.journal.includes('e_aux9') && G.journal.includes('e_crate')) html += G.journal.includes('e_riser') ? '<div class="card"><b>??? — Something up there is alive</b><p>The pressure goes up Riser 9. The greens go up Freight Three. The air that comes back down is warm and smells green. Whatever is above Tier 4 is not burning.</p></div>' : '<div class="card"><b>??? — Where does it all go?</b><p>The pressure goes up. The greens go up. Lift 0 goes... up? Something above Tier 4 is being fed.</p></div>';
-          if (G.journal.includes('e_chalk') && G.journal.includes('p_dace')) html += '<div class="card"><b>??? — What did Dace find?</b><p>D.M. chalked the AUX-9 line: STILL FLOWING. A Crew 3 glove in the rubble. Then Dace vanished from the roster.</p></div>';
+          if (G.journal.includes('e_chalk') && G.journal.includes('p_dace')) html += '<div class="card"><b>??? — What did Harl find?</b><p>H.M. chalked the AUX-9 line: STILL FLOWING. A Crew 3 glove in the rubble. Then Harl vanished from the roster.</p></div>';
         } else {
           const es = G.journal.filter(j => JOURNAL[j].tab === key);
           if (!es.length) html = '<div class="card ghost"><p>Nothing yet.</p></div>';
@@ -222,7 +222,7 @@ const Menus = {
         ['The Pairing · duel with Dorian Aldane', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. The first night.', 'pairing')],
         ['The Ford · single combat (3D)', ff('THE ASSAY', 'Four years after the furnace. Day nineteen.', 'ford')],
         ['The Ford · on the painted valley', ff('THE ASSAY', 'Four years after the furnace. Day nineteen.', 'ford2d')],
-        ['The Proctor · duel with Halden Voss', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day thirty-one.', 'proctor')],
+        ['The Assayer · duel with Halden Voss', ff('FOUR YEARS AFTER THE FURNACE', 'The Assay. Day thirty-one.', 'proctor')],
         ['The Keep · the whole way through: the blade breaks (end of Part One)', ff('MORNING', 'The Assay. The last day.', 'keepEnd')],
         ['The Fall · nine years after the furnace (boots, battle)', ff('NINE YEARS AFTER THE FURNACE', 'Above the weather.', 'fall')],
         ['The Drill · Brand (2D, training years)', ff('THE DRILL', 'Two years after the furnace. A sealed pump room.', 'drill')],
@@ -234,7 +234,7 @@ const Menus = {
         ['★ NEW · Night 28 · The Lamp (find the traitor; a 2D duel)', () => { fresh(); Mission.start('lamp'); }],
         ['★ NEW · Night 30 · The Dais (stealth; the grading book)', () => { fresh(); Mission.start('dais'); }],
         ['★ NEW · Night 49 · The Last Night (the camp; Lucan under truce)', () => { fresh(); Mission.start('eve'); }],
-        ['★ NEW · Fifty years before · Celestine\'s own Assay (stealth, then the wheel; played as her)', () => { fresh(); Mission.start('ember'); }],
+        ['★ NEW · Forty-four years before · Celestine\'s own Assay (stealth, then the wheel; played as her)', () => { fresh(); Mission.start('ember'); }],
         ['★ NEW · Part Two · The Count hall (stealth; lose the order)', () => { fresh(); Mission.start('count'); }],
         ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
@@ -260,7 +260,7 @@ const Menus = {
         ['After First Fire · the dream (what the Assay is, the Island, the Standard, the Lamp)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2(), () => Game.toTitle()); }],
         ['First Fire (42 days after) · morning', load('day2')],
         ['First Fire · lantern built, festival next', load('fest')],
-        ['First Fire · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
+        ['First Fire · Last Bell (the Tallyman, then the ceremony)', fest('startFestival')],
         ['First Fire · the lantern climb (stealth)', fest('startFestStealth')],
         ['First Fire (42 days after) · the Keep, then the ending', fest('onFestDone')]
       ]
@@ -286,9 +286,9 @@ const Menus = {
       ['Dream · the Gilding and the lesson', cs(DREAM1)], ['Dream · what the Assay is', cs(DREAM2)], ['Dream · the Sun Spire', cs(DREAM3)], ['Dream · the day he arrives', cs(DREAM4)],
       ['The Ledger (43 days after) · Lift Zero and Celestine, under the floor (no fight)', cs(DAY3)],
       ['The Way Out · the months, Mara, the way out, Ilse (no fights)', cs(DAY4)], ['Film · The Standard', film('twins')], ['Film · The Pinning', film('blade')], ['Film · The High Docks', film('docks')],
-      ['Film · The Valley', film('valley')], ['Film · The Pairing', film('pairing')], ['Film · The Ford', film('ford')], ['Film · The Proctor', film('proctor')], ['Film · The Keep', film('keep')], ['Film · The Fall', film('fall')]
+      ['Film · The Valley', film('valley')], ['Film · The Pairing', film('pairing')], ['Film · The Ford', film('ford')], ['Film · The Assayer', film('proctor')], ['Film · The Keep', film('keep')], ['Film · The Fall', film('fall')]
     ];
-    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years after the furnace. Brand.', 'brandstair')], ['★ NEW · Assay · On the Ground · Proctor Voss (2D)', ff('MORNING', 'The Assay. Day thirty-one.', 'voss2d')], ['★ NEW · Training · No Gloves · Brand (2D)', ff('TWO AND A HALF YEARS AFTER THE FURNACE', 'The pit. Brand. No gloves.', 'drill2')], ['Part Two · The Gallery · Severin Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years after the furnace.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years after the furnace.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years after the furnace.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years after the furnace. Brand.', 'brandstair')], ['★ NEW · Assay · On the Ground · Assayer Voss (2D)', ff('MORNING', 'The Assay. Day thirty-one.', 'voss2d')], ['★ NEW · Training · No Gloves · Brand (2D)', ff('TWO AND A HALF YEARS AFTER THE FURNACE', 'The pit. Brand. No gloves.', 'drill2')], ['Part Two · The Gallery · Severin Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years after the furnace.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years after the furnace.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years after the furnace.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
     for (let n = 1; n <= 5; n++) { S['Story beats'].push([`Part Two · ${n} · ${P2_TITLES[n]}`, () => playPart2(n)]); S['Cutscenes'].push([`Part Two · ${n} · ${P2_TITLES[n]} (no fights)`, cs(P2[n])]); }
     S['Cutscenes'].push(['Film · The Gallery', film('gallery')], ['Film · Riser Nine', film('riser')], ['Film · The Son', film('son')], ['Film · The Stair', film('stair')], ['Film · Little Ember', film('ember')]);
     // every entry says which version last changed its scene; a star marks this version's. Starting one remembers where it was started from
@@ -390,13 +390,13 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.85';
-const DEV_NEW = 'from the blind playtest: the way out of the home is marked; enemies cover up against button mashing; the last Keep fight says what ends it; the camp by day and the cloak are less crowded.';
+const GAME_VER = '0.86';
+const DEV_NEW = 'the story made to match the script rules: 55 line fixes, Kael\'s father in the ledger, Proctors become Assayers (the Assay) and Tallymen (below), Dace Morrow becomes Harl Morrow, the fallback fights agree with the comic-book levels';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
   [/camp by day|cloak|Keep/i, '0.85'], [/High Docks/i, '0.83'], [/Pairing|Ford/i, '0.82'], [/Scuffle/i, '0.80'], [/fever ward/i, '0.78'], [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
-  [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
+  [/Valley|Pinning|Assayer|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],
   [/Standard|Gallery|Fall|Little Ember|Drill|No Gloves|Under the Floor|Way Out|On the Ground|Ember Ring|Scuffle|Training/i, '0.66'],
   [/Count hall/i, '0.64'], [/Riser Nine|The Stair/i, '0.60'], [/Row K|ward/i, '0.61'], [/square/i, '0.59'], [/heist/i, '0.22'], [/Film/i, '0.62'], [/./, '0.56']
@@ -481,13 +481,13 @@ const DayEnd = {
     L.push(F('fireTheirs') ? 'You lit it from the First Fire. Her fire. They do not get to keep it.' : F('fireOwn') ? 'You lit it with your own striker. An unlicensed light.' : F('fireTavi') ? 'Tavi lit it. Fourth try.' : 'It burned for three candle-hours.');
     if (F('washerOn')) L.push('Her ring hung in the middle of the sun.');
     L.push(r >= 3 ? 'You hold the Ember Ring belt. Three notches. Two are hers.' : r > 0 ? `You won ${r} bout${r > 1 ? 's' : ''} in the Ember Ring. The belt is still on Hollis's shoulder.` : 'You never stepped into the chalk.');
-    if (F('beatSull')) L.push('You put a Proctor on the ground. Nothing was written down.');
+    if (F('beatSull')) L.push('You put a Tallyman on the ground. Nothing was written down.');
     else if (F('sullTip')) L.push('Sull complained to you about his knee. Then he guarded the wrong side of the square for an hour.');
     else if (F('sullWar')) L.push('Sull has your name spelled right, and your sibling\'s.');
     L.push(F('valeDebt') ? 'You owe Vale one silence.' : F('valeWhy') ? "Vale's sister was in the ninth cot. Nobody bled a line for her." : F('valeDefied') ? 'Vale struck his note. You told him you would do it again.' : 'Vale wrote: "Compliant."');
     if (F('spareOn')) L.push('The festival ran two amps bright. Faulty panel.');
-    if (F('lockerD')) L.push(F('tookBlood') ? "You took the fifty scrip from Dace's locker." : F('burnBlood') ? 'You burned an informant envelope in their own fire. Marrow and Hollis saw.' : 'You left the envelope sealed, the way Dace left it.');
-    if (F('daceNote')) L.push('Dace is alive, under the floor, and waiting for you.');
+    if (F('lockerD')) L.push(F('tookBlood') ? "You took the fifty scrip from Harl's locker." : F('burnBlood') ? 'You burned an informant envelope in their own fire. Marrow and Hollis saw.' : 'You left the envelope sealed, the way Harl left it.');
+    if (F('daceNote')) L.push('Harl is alive, under the floor, and waiting for you.');
     L.push('"It is rather more yellow than—" She has seen the sun.');
     const fu = G.flags.fury || 0; L.push(fu >= 8 ? 'The ember in Kael is white-hot. He has stopped trying to bank it.' : fu >= 4 ? 'The ember in Kael is burning steady. He is learning where to aim it.' : 'Kael is still keeping count. The list is longer.');
     Object.assign(G.flags, { day2Done: 1 }); G.day = 3; G.trust0 = { ...G.trust }; addJ('e_leaf', true); addJ('e_slip', true); G.newJ = 0;
@@ -499,7 +499,7 @@ const DayEnd = {
   outro2() { World.gilded = 0;
     UI.push(modal({ clear: true, onBack: null, build(b) {
       b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
-      b.innerHTML = `<p>By first bell the Proctors have taken the lantern down. It does not matter. Four hundred people saw a sun, and you cannot scrub a thing like that off stone.</p>
+      b.innerHTML = `<p>By first bell the Tallymen have taken the lantern down. It does not matter. Four hundred people saw a sun, and you cannot scrub a thing like that off stone.</p>
         <p>In Row K, a child sleeps with a leaf pressed in a worksheet. In Fuse Room C, one bus hums at nineteen, exactly. And at the gate of Lift Zero, a grey Inspector waits with a ledger, to see who comes to carry it up.</p>
         <p><i>"Be too much for them."</i></p>
         <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;

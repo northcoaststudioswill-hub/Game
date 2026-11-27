@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.85 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.86 (see the changelog). **Names (v0.86):** the graders of the Assay are Assayers; the police below are Tallymen; Seren's runner partner is Harl Morrow (was Dace). "Proctor" is retired. **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -30,10 +30,10 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
   - Marrow: air rations docked for humming.
   - Old Fen: a coughing beggar.
   - Kit: a runner ("Freight Three goes up nine floors. The sign says six.").
-- Dace Morrow: Seren's partner; kept investigating, then vanished.
+- Harl Morrow: Seren's partner; kept investigating, then vanished.
 - Inspector Vale: Cinderwell-born, raised to grey and a silver pin; writes everything down.
-- Proctor Sull: scrubs Seren's sun off the Pillar.
-- Night Proctor and Night Watchman: the heist guards.
+- Tallyman Sull: scrubs Seren's sun off the Pillar.
+- Night Tallyman and Night Watchman: the heist guards.
 - High Auditor Celestine Aurel: luminous contempt. **Her secret (decided 2026-11-19, to be played in Part Two):** born on Tier Six, called Little Ember below; taken up by an Accredited family and gilded; she let them take the burns off her palms and has worn gloves since; she won her own Assay at twenty by shutting the valve on the enemy camp (two cadets did not wake). She sent Seren into the furnace anyway: one for forty is the sum she lives by, and a High Auditor born below can never be seen to spare one of her own. Full text in the master timeline, 14b.
   - "Anger is for equals."
   - "Balanced."
@@ -50,7 +50,7 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
   - "WORK IS WORSHIP" (with "THEN WHO'S THE GOD?" scrawled underneath)
 - Ambience: laundry lines and hanging chains, steam vents, puddles and oil, falling soot.
 - Executions are public commitments at the heart-furnace. Families receive a tin with the ash, the ring and an invoice for the fuel. Eleven seconds is a recurring motif.
-- Secrets so far: AUX-9 / Riser 9 send air up and warm green air comes down; chilled greens ship to "Meridian Terrace, Tier 1"; Seren asked Orin about the line weeks before Kael touched it; Dace's chalk "STILL FLOWING."
+- Secrets so far: AUX-9 / Riser 9 send air up and warm green air comes down; chilled greens ship to "Meridian Terrace, Tier 1"; Seren asked Orin about the line weeks before Kael touched it; Harl's chalk "STILL FLOWING."
 
 ## The crime (playable)
 - The clinic was cut to ration air; forty kids were suffocating.
@@ -59,7 +59,7 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
   1. Cut the audit relay (east wall). This sets a checkpoint.
   2. Reach Bank Seven and solve the "Bleed" puzzle (AUTH line → CLINIC).
 - Guards:
-  - The Night Proctor walks the middle of the bay end to end and looks up and down at each end. After the relay is cut he walks the north lane past Bank Seven.
+  - The Night Tallyman walks the middle of the bay end to end and looks up and down at each end. After the relay is cut he walks the north lane past Bank Seven.
   - A second lamp walks the centre column and looks left and right at each end.
   - The Night Watchman stands by the relay and turns all the way round.
   - Their vision cones are drawn on screen; crates and walls block line of sight.
@@ -83,7 +83,7 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
    - The tin, then the SOOTBORN title.
 4. Present day:
    - Home: the tin, Seren's 17 painted suns, Tavi's cot.
-   - Square: citizens with lore, Proctor Sull, the commitment poster, the screen.
+   - Square: citizens with lore, Tallyman Sull, the commitment poster, the screen.
    - Fever Ward clinic (through the clinic door): Nell, the kids, the ward board "40/40," Seren's handwriting on a canister.
    - Bay: Vale, Bank Seven (then the optional timed "bleed again"), the fuel deduction, furnace flashback.
    - Optional tunnel, crate, Ivo, Tavi, sleep, summary, Day 2 roam.
@@ -91,18 +91,18 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
 ## Day 2 — First Fire (~30–40 min)
 1. Home: Tavi shows Kael the list Seren left in her lantern frame (wire, gold, wick, "make Kael carry it"). Tavi's rule: everyone who loved her adds a paper ray.
 2. Square: festival setup; Sull's consequence scene; the Ember Ring (Hollis referees: Ivo, then the Garran brothers or Sull, then Mara for Seren's belt).
-3. Bay 3: Mara assigns WO-116. Fuse Room C: lockers (Seren's emptied, Dace's holds a sealed 50-scrip informant envelope and his note that the Authority sends one to everyone near a commitment), then the breaker panel.
+3. Bay 3: Mara assigns WO-116. Fuse Room C: lockers (Seren's emptied, Harl's holds a sealed 50-scrip informant envelope and his note that the Authority sends one to everyone near a commitment), then the breaker panel.
    - Reveal: the "standby" bus is L0 STBY. Lift Zero charges on Tier 6's lights every First Fire.
    - Choice: throw the spare breaker onto Tier 6, or leave it.
-   - Vale walks in. If Kael bled the line on Day 1, Vale shows his notebook with the entry struck out (his sister died in a Tier 8 fever ward). He warns that Celestine is coming and that Dace "went looking under the floor."
+   - Vale walks in. If Kael bled the line on Day 1, Vale shows his notebook with the entry struck out (his sister died in a Tier 8 fever ward). He warns that Celestine is coming and that Harl "went looking under the floor."
 4. Gather: Ivo's wire is Authority copper from the Lift Zero housing; Orin's gold is forbidden engineer's chalk; Nell's wick lit the ward lamp through Seren's three nights. Rays from Mara, Ivo, the ward kids, Bao, Hollis, Marrow, Pell, Juno, Fen (a void LIFT 0 ticket) and Kit (who also delivers Sable's summons).
-5. Optional: the old tunnel. The collapse has a gap; Dace's lamp is warm; chalk tells Kael to light the lantern first, then follow.
+5. Optional: the old tunnel. The collapse has a gap; Harl's lamp is warm; chalk tells Kael to light the lantern first, then follow.
 6. Home: build the lantern. Optional: hang Seren's washer in the middle of the sun.
 7. The ceremony (cutscene): Celestine brings the First Fire, drawn from the heart-furnace. "It burns on whatever it is given. This year it was given rather well." Kael lights the lantern from her fire, his own striker, or Tavi's hands. Tavi says "It's the SUN." Celestine: "It is rather more yellow than th—". She bans lanterns on the Pillar and asks for the Bank Seven ledger by first bell.
 8. Stealth: hang the lantern on the top hook past Sull's loop and two lamp sentries.
 9. Finale: the Pillar shines through the paper and throws a sun across the square. Sull charges; the tier stands in a row (size depends on rays). Lift Zero opens by itself: empty, clean water, one green leaf. Vale: someone must carry the ledger up. "You have until first bell."
 
-Day 3 closes these: the ledger and Lift Zero, Dace under the floor, what Celestine has seen. Sable (Freight Three) and Nell's cold crates are named as Unlit but not yet shown.
+Day 3 closes these: the ledger and Lift Zero, Harl under the floor, what Celestine has seen. Sable (Freight Three) and Nell's cold crates are named as Unlit but not yet shown.
 
 ## Combat
 - `src/brawl.js` is the base for all fighting: a pseudo-3D arena. Logic is on a flat plane (x across, y depth); the floor is drawn a scanline at a time from a texture; fighters and props are depth-sorted billboards; `Brawl.cam {x, y, h, f, hor}`.
@@ -123,12 +123,12 @@ Day 3 closes these: the ledger and Lift Zero, Dace under the floor, what Celesti
 
 ### Timeline, and where the slice sits in it (v0.14)
 The game tells two halves at once: the present below, and the years after, seen in dreams and fights.
-- **Present (playable):** the prologue (the wedding, the bleed, the furnace), then Days 1 to 3 in Cinderwell, forty-one to forty-three days after the furnace. **The part below is four days.** Day 3 (The Ledger): Kael carries the ledger up Lift Zero, Celestine tells him she knew and puts him to work, he sees the sky through her window, Dace introduces the Unlit, and a Warden goes down under the floor. Day 4 (The Way Out): four months of going up twice a week; Mara guesses; Dace arranges Kael's death on paper (a failed seal on the furnace line, Mara signs, a second tin); Sull and the night watch are beaten at the hatch and Sull writes the report; Kael leaves through the old tunnel and meets Ilse. **End of Part One.**
+- **Present (playable):** the prologue (the wedding, the bleed, the furnace), then Days 1 to 3 in Cinderwell, forty-one to forty-three days after the furnace. **The part below is four days.** Day 3 (The Ledger): Kael carries the ledger up Lift Zero, Celestine tells him she knew and puts him to work, he sees the sky through her window, Harl introduces the Unlit, and a Warden goes down under the floor. Day 4 (The Way Out): four months of going up twice a week; Mara guesses; Harl arranges Kael's death on paper (a failed seal on the furnace line, Mara signs, a second tin); Sull and the night watch are beaten at the hatch and Sull writes the report; Kael leaves through the old tunnel and meets Ilse. **End of Part One.**
 - **+6 months:** Ilse Marrin, once Accredited, finds him in the old tunnel. *They only fear what looks like them.*
 - **The Gilding (9 months):** what the Accredited do to their children at twelve (gold wire in the long bones for height, gold in the eye for the sun), done to a grown man.
 - **Training (3 years):** speech with Ilse, the blade and the boots with Brand, a Warden who deserted rather than kill a child for humming.
-- **+4 years, the Assay:** sent up Lift Zero under a dead boy's name. Night 1 the Pairing; day 19 the Ford; day 31 the Proctor; day 40 the Valley; last day the Keep. The winner is given a post on the Spire. That is the point.
-- **The Assay in full:** arrival and the sorting; night 1 the Pairing (Dorian); day 19 the Ford (Vant); day 26 the Standard (the Sisters Vey, and thirty Teal cadets come over); day 31 the Proctor (Voss); day 40 the Valley; last day the Keep (Lucan), then the Pinning: Celestine's champion, then she pins the sun on him and gives him a post on the Spire counting who breathes.
+- **+4 years, the Assay:** sent up Lift Zero under a dead boy's name. Night 1 the Pairing; day 19 the Ford; day 31 the Assayer; day 40 the Valley; last day the Keep. The winner is given a post on the Spire. That is the point.
+- **The Assay in full:** arrival and the sorting; night 1 the Pairing (Dorian); day 19 the Ford (Vant); day 26 the Standard (the Sisters Vey, and thirty Teal cadets come over); day 31 the Assayer (Voss); day 40 the Valley; last day the Keep (Lucan), then the Pinning: Celestine's champion, then she pins the sun on him and gives him a post on the Spire counting who breathes.
 - **Part Two, Above (written, v0.17):**
   - +4: Kael is **Edric Sorrel** (a boy of a minor House, dead of fever at eleven; Ilse bought his papers), Clerk of the Count, fourth ring of the Spire. The Count is a book: a line per person below, air breathed and air owed; a struck line means a furnace. He finds "Holloway, S." Lucan asks to be taught (flag `lucanFriend`). Duel with Severin Cade, the Marshal's nephew.
   - +5: Marshal Cade's balancing of Tier Four (1,100 people). Kael signs or delays (flag `signedFour`), then holds the top of Riser Nine, which comes up in the Assay valley, and gets forty out.
@@ -142,7 +142,7 @@ The game tells two halves at once: the present below, and the years after, seen 
 **How they talk (rule for all new dialogue).**
 - *Soot*: contractions; "aye" for yes; "ta" for thanks; "breath" where others say life ("on my breath" is an oath, "she bought your breath"); "we" about everything.
 - *Accredited*: no contractions, ever; "noted" for thanks; "granted" for yes; "my time" for my life; "one" instead of I or we; never thank, never apologise, never say "we" or "us".
-- *In between*: Vale (born Tier Four, counted up) speaks their way with contractions slipping. Proctor Sull is soot who says "noted" when beaten. Ilse keeps Accredited speech. Kestrel is the Accredited who starts saying "we".
+- *In between*: Vale (born Tier Four, counted up) speaks their way with contractions slipping. Tallyman Sull is soot who says "noted" when beaten. Ilse keeps Accredited speech. Kestrel is the Accredited who starts saying "we".
 - *Kael*: soot in dialogue through Part One. As Edric Sorrel he speaks Accredited aloud. His narration has no contractions because the training took them. He goes back to "we" out loud before the stair.
 
 **The shift song.** No words, because words cost breath; hummed through the teeth to keep time on a valve wheel. Humming is the only goodbye allowed at a commitment. After Seren, the Authority plays it on the tier speakers at every bell so that it means the furnace. At First Fire the tier hums it again.
@@ -170,7 +170,7 @@ Only the Valley is a mass battle. The rest are single combat, each with an intro
 1. **The Valley** (day forty; opens the game) — battle, House Violet against House Teal.
 2. **The Pairing** (first night; end of the prologue) — Kael vs Dorian Aldane, 16, who shared his bread on the lift. Two sealed in, one comes out a cadet; the loser leaves "by the other door". Dorian's last line: "I hope she was worth it." Kael never told him there was a she.
 3. **The Ford** (day nineteen; end of Day 1) — single combat with Captain Vant for the crossing.
-4. **The Proctor** (day thirty-one; before Last Bell on Day 2) — Proctor Halden Voss has been selling Violet's positions to Teal and comes down to finish them himself. Kael makes a Proctor bleed and wears his white cloak back to camp; the cadets follow Kael, not the House, from that night.
+4. **The Assayer** (day thirty-one; before Last Bell on Day 2) — Assayer Halden Voss has been selling Violet's positions to Teal and comes down to finish them himself. Kael makes an Assayer bleed and wears his white cloak back to camp; the cadets follow Kael, not the House, from that night.
 5. **The Keep** (last day; before First Fire) — Lucan Aurel, with Celestine watching.
 
 Rule going forward: above-ground story that is not a fight is told as a film (shot list with captions), never as walk-around play.
@@ -235,7 +235,7 @@ How Kael fights is part of the story and changes with it. All names are ours.
 
 ## Graphics direction (v0.42 update)
 - All arena fighters use the rebuilt body (six heads tall, cel-shaded, ink outline).
-- Fights with crowds or busy ground are staged on the painted pixel valley with a side-on camera: the Valley, the Standard, the Proctor (night, rain). Duels in stone rooms stay in 3D. Set `flat: 1` on a fight to move it; remove it to move it back.
+- Fights with crowds or busy ground are staged on the painted pixel valley with a side-on camera: the Valley, the Standard, the Assayer (night, rain). Duels in stone rooms stay in 3D. Set `flat: 1` on a fight to move it; remove it to move it back.
 - Third-person levels (Riser Nine, the High Docks, the Stair) are the comic-book engine and are separate from both.
 
 ## Graphics direction (v0.25)
@@ -257,7 +257,7 @@ Year 0 is the furnace. This sheet is the reference when a card, a line or a chap
 | +6 months | Ilse finds him in the old tunnel |
 | +6 to +15 months | The Gilding |
 | +15 months to +4 yrs | Training with Ilse (speech) and Brand (blade, boots). The Drill is at +2 |
-| +4 yrs | The Assay: arrival, night 1 the Pairing, day 19 the Ford, day 26 the Standard, day 31 the Proctor, day 40 the Valley, last day the Keep, then the Pinning |
+| +4 yrs | The Assay: arrival, night 1 the Pairing, day 19 the Ford, day 26 the Standard, day 31 the Assayer, day 40 the Valley, last day the Keep, then the Pinning |
 | +4 and a season | The Post: Edric Sorrel, Clerk of the Count. Severin Cade |
 | +5 | The Balancing of Tier Four. Riser Nine |
 | +6 | Celestine knows. The Son |
@@ -282,7 +282,7 @@ Playable 2D levels above the rock, in the game's own pixel style, with gilded Ka
 |---|---|---|---|
 | **The Camp** | Day 3 | Fetch wood, raise water at the pump house (pipe puzzle), light the fire | Why House Violet follows him: not the Pairing, a fire. What the Assay is for (Oswin's father finished ninth and has been ninth for thirty years). The heirs call their own dead "balanced". The valley is the roof of Cinderwell: the pump water is warm because it comes off the Array |
 | **The Island** | Night 25 | Stealth past House Teal's pickets, shut the lamp valve, take the standard | How he met Kestrel Dray. She keeps the vent stack as an apprentice and does not see his face. Leads into the Standard |
-| **The Dais** | Night 30 | Stealth past two Wardens, read the grading book and the viewing glass, tear his page from the roster | The Proctors invoice the Assay; Houses with patrons are credited standards in advance. The Spire watches half a day late with the dull parts cut. Celestine's note: "My son is to reach the last day. No further than he can walk." Voss recommended Sorrel's removal, which is why he comes down on day 31 |
+| **The Dais** | Night 30 | Stealth past two Wardens, read the grading book and the viewing glass, tear his page from the roster | The Assayers invoice the Assay; Houses with patrons are credited standards in advance. The Spire watches half a day late with the dull parts cut. Celestine's note: "My son is to reach the last day. No further than he can walk." Voss recommended Sorrel's removal, which is why he comes down on day 31 |
 
 New names: Petra Lune and Oswin Hale (House Violet cadets).
 
@@ -299,7 +299,7 @@ Rule: every level above the rock has things to read that nobody points at, the w
 - **The Count-Out.** The Accredited have a nursery counting game ("one, two, the line is true") sung to the shift song in a major key. They carried the tune up Lift Zero generations ago and forgot whose it was. The ending track (Dawn) is the same tune in the same key.
 - **Their thanks is a debt.** "Noted" means: I have written down what you owe me. They have no other word.
 - **They draw suns too.** A child's slate in a cadet's tent; a drawing hidden in a clerk's kneehole. Yellow.
-- **The Proctors' cache.** Salve, bread and oil under a white ribbon in the middle of a starving camp: "A result must be earned." One winter cloak is packed for 480 cadets.
+- **The Assayers' cache.** Salve, bread and oil under a white ribbon in the middle of a starving camp: "A result must be earned." One winter cloak is packed for 480 cadets.
 - **The lintel.** Every Assay's names are cut into the pump house; a gold nail for a winner, a scored line for the dead.
 - **The same eye.** The Watcher standard over the dais is the same cloth as the one over Ashgate Square.
 - **Two mottos.** Over the Count hall: A BALANCED LINE IS A QUIET LINE, cut over an older EVERY LINE IS A PERSON.
@@ -309,7 +309,7 @@ Rule: every level above the rock has things to read that nobody points at, the w
 ### Training and chapter 3 (v0.28)
 - **No Gloves** (+2½): Brand makes him take the gloves off a year early. "Ilse is teaching you to pass. I am teaching you to live." The Turn is "not being where the halberd is." Brand on Hollis: "He did not turn round. He finished the bar he was on."
 - **Lucan before The Son:** Kael says "aye" to him, the first time Lucan has heard the word. If Kael read the glass on the dais, he tells Lucan what Celestine wrote ("No further than he can walk"). Lucan: "I reached the last day. I have been proud of it for two years."
-- **The night before the docks, Freight Three:** Dace comes up for the first time in seven years and cannot face the sky. Kael wrote the watch rota; Maren took it "for copying". Brand says the name Hollis aloud for the first time.
+- **The night before the docks, Freight Three:** Harl comes up for the first time in seven years and cannot face the sky. Kael wrote the watch rota; Maren took it "for copying". Brand says the name Hollis aloud for the first time.
 
 ## Part Two additions (v0.27)
 - **Maren Aldane**, Second Clerk of the Count, Dorian's elder sister. She likes Edric Sorrel's sums. She has the key to the sealed pairings and reads who was in Dorian's room. At +7 she gives the dock office the hour of the raid ("For Dorian Aldane. Balanced."), which is why the guards were waiting and why Brand had to hold the stair. At +9 she stands alone at the white door with a pen. Flags: `marenKind` (he told her Teo was kind), `marenDoor` (he told her the truth and she opened the door; she then keeps the new Count, a list of names read aloud, Dorian's first).
@@ -317,7 +317,7 @@ Rule: every level above the rock has things to read that nobody points at, the w
 - **The Dock Stair** is now played: you are Brand, the fight cannot be won, and it ends when the last mooring is cut.
 - **Kestrel Dray, the second arc.** Slow, and never in Seren's place. The Island (she does not see his face) → the Clerk's desk (she almost knows him) → the east manifold (she turns his hand over and sees the valve burns the Gilding did not take) → the rail of a barge at +9 ("I am not asking for her place." "There isn't a place. There's a shelf.") → Row K (Mara gets a third bowl down). Flags: `wrenMet`, `wrenClose`, `wrenAsk`. The last line of the game is unchanged and now means more.
 - **Tavi** is at his left shoulder up the stair.
-- **Where everyone went:** Vale on a wheel on Tier Eight; Sull still walks the night watch and says "aye"; Nell's ward has forty beds; Ivo and Sable run Freight Three; Dace chalks suns on new doors; four of the other eleven Houses opened their own lifts.
+- **Where everyone went:** Vale on a wheel on Tier Eight; Sull still walks the night watch and says "aye"; Nell's ward has forty beds; Ivo and Sable run Freight Three; Harl chalks suns on new doors; four of the other eleven Houses opened their own lifts.
 - Choices now paid off in the last chapter: drive (a line before the stair), the rays (Seren's lantern still on the Pillar), the fury count (raised by the new scenes below).
 
 ## The Gilding in full, and new memories of Seren (v0.27)
@@ -326,7 +326,7 @@ Rule: every level above the rock has things to read that nobody points at, the w
 - **The glass.** He looks for the man she married and there is nobody either of them had met. Ilse: "He is underneath, where the wire is."
 - **Seren, new:** the fire on a valve block at nine ("Hands, Kael. Everything is hands."); the bet on the noodle-stall roof that the sky is blue, for a ring; the night he gave her the washer ("it is the only round thing I own"); she wore it eleven months.
 - **Rage, new:** the window (she won the bet and they burned her under it); the furnace doors (eleven seconds was a worn valve seat, a fault; Celestine wants it fixed to seven; flag `doors` = kept or fixed); the camp (the heirs say "balanced" of their own dead; Tier Four is forty feet under their feet); the dais.
-- New Memory Arts: WARM THING (the Proctor), A RING (the Gallery), ELEVEN MONTHS (the Stair). A **Memories** shelf on the title screen and pause menu keeps every Memory Art seen.
+- New Memory Arts: WARM THING (the Assayer), A RING (the Gallery), ELEVEN MONTHS (the Stair). A **Memories** shelf on the title screen and pause menu keeps every Memory Art seen.
 
 ## The High Docks, in third person (v0.29)
 One level of the future is played in third person and drawn like a comic. It uses the engine and art style of the user's other game, Second Chance, with our cast and our place. Nothing from Second Chance's own story is in it.
@@ -350,7 +350,7 @@ If Kael met Kestrel on the Island, he spends the week after the docks believing 
 
 ### More in the Assay (v0.29)
 - **The Lamp** (night 28): find who is selling the House's watch; Corin Ashby; a 2D duel in the rain and a choice.
-- **On the Ground:** Kael finishes Proctor Voss on foot in 2D and takes the boots, the Proctors' seal, the note of debts, and the white cloak.
+- **On the Ground:** Kael finishes Assayer Voss on foot in 2D and takes the boots, the Assayers' seal, the note of debts, and the white cloak.
 
 ## Part Two as it stands, and where the third-person levels go (v0.29.7)
 What is in each chapter now, in order. "3D fight" is the arena fighter; "level" is something you walk through.
@@ -358,7 +358,7 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 | Ch | When | Scenes | Play |
 |---|---|---|---|
 | 1 The Post | +4 | The Spire; the Clerk's desk; the Count and Seren's line; Kestrel at the desk; Lucan asks to be taught; Maren | 3D fight: the Gallery (Severin Cade) |
-| 2 The Balancing | +5 | The Tier Four order (sign or lose it); Dace's letter; Cade at the desk; Maren and the forty | 2D level: the Count hall (if he loses the order). 2D level: the Sun (Tavi, below). **Third-person level: Riser Nine** |
+| 2 The Balancing | +5 | The Tier Four order (sign or lose it); Harl's letter; Cade at the desk; Maren and the forty | 2D level: the Count hall (if he loses the order). 2D level: the Sun (Tavi, below). **Third-person level: Riser Nine** |
 | 3 What She Knows | +6 to +7 | The hum; Celestine's offer; Lucan on the keep; Freight Three; the dock stair | 3D fight: the Son. **Third-person level: the High Docks** |
 | 4 Two Years | +7 to +9 | Brand; the week he blames Kestrel; Maren's note; the low point; the weather; Tavi comes up; Kestrel at the rail | 2D fight: the Dock Stair (you are Brand). 2D fight: Tier Six Stands (you are Mara). 3D fight: the Fall |
 | 5 The Count | +9 | The words before the stair; Maren at the white door; Celestine; the choice; Lift Zero open; Row K | **Third-person level: the Stair.** 3D fight: Little Ember (Celestine) |
@@ -411,13 +411,13 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **The list on the wall, in order:** Mara's forty-four, Brand, Aldane T., Rook A., Hale O.
 
 ### The Assay, lived in (v0.38)
-- **The board.** The Proctors keep a ranking board at the edge of every camp: twelve bars, repainted from the air each dawn. "Positions are provisional. Debts are not." Violet: eleventh (day 3), fourth (night 28), first (night 49). It is the shift rota, with Houses for hands.
+- **The board.** The Assayers keep a ranking board at the edge of every camp: twelve bars, repainted from the air each dawn. "Positions are provisional. Debts are not." Violet: eleventh (day 3), fourth (night 28), first (night 49). It is the shift rota, with Houses for hands.
 - **Cairns.** Heirs pile stones for their dead and tie a House ribbon on; they have never buried anybody. Early ones are scratched BALANCED. Violet's stop saying it around day 30.
 - **Patrons.** A House with a sum placed on it is lowered supplies on a gilt cord (oil, cook-pots, salve). Violet had none. This is why Oswin's salve came late.
-- **The wagers.** Each Proctor is paid to find for a House. Voss was paid by two, one of them Teal.
-- **The boots** the Proctors hover on charge off the vent stack, the same one the lamps run on: Cinderwell's air.
+- **The wagers.** Each Assayer is paid to find for a House. Voss was paid by two, one of them Teal.
+- **The boots** the Assayers hover on charge off the vent stack, the same one the lamps run on: Cinderwell's air.
 - **Grounded blades.** A House that is out of the Assay grounds its blade point-down at the edge of the keep, ribbon on the hilt. On the last day there are ten.
-- **The vent stack** on Teal's island is the only one in the valley. Lamps, the Proctors' boots and the pump all run off it. Kestrel Dray kept it as an apprentice.
+- **The vent stack** on Teal's island is the only one in the valley. Lamps, the Assayers' boots and the pump all run off it. Kestrel Dray kept it as an apprentice.
 - **Four blades for forty.** Practice blades are issued blunt, and too few, on purpose.
 
 ### The ending, settled (v0.44)
@@ -496,7 +496,7 @@ Rule from the author: a 2.5D place is used for story that adds flavour and under
 - **In the arena, from the air (v0.60):** the hook hauls an ordinary man up (UP HERE) and the blade cuts him down (STRUCK DOWN), as in the comic levels.
 - **Row K, the morning after the First Fire** (memory, from the ledge by K-7). Seren: the washer is the only round thing he owned and he gave it away; he owns "the inside half". Nan Orla did their sheets in her own ration water as a wedding gift. Garrow: the bite at fourteen cost Seren the knot; rules are rules. Mara's voice went on the last word of the binding and nobody ever mentioned it. Tavi asks whether Seren is his sister now and goes to stand beside her; it stayed that way.
 - **The fever ward, the first night the fans came up** (memory, from the ward board). Nell has forty breathing and a meter that says twelve, and will not ask why; she sat on the floor, which Kael had never seen. Seren: "I'm not married to a thief. I'm married to a man who tidies." Celestine's "a thief who tidies" three nights later echoes it, and Kael cannot hear one without the other. Tavi can breathe "right down to the bottom". Mosi is already drawing the figure with a sun for a head.
-- **What a Proctor looks like (v0.62).** A tall white hood with a gilt band and a stone; gold eyes; a mantle and a long white robe, gilt at the hem; a stole in his own colour with the Watcher at the chest and tally marks under it; boots burning blue under the hem, because a Proctor does not stand on the ground the cadets bleed on. Three carry the Watcher on a staff, two the grading book. The senior Proctor wears ivory, a violet stole and a small crown on the hood. Five grade the valley from the dais; fifteen watch a Pairing from a low balcony in the dark.
+- **What an Assayer looks like (v0.62).** A tall white hood with a gilt band and a stone; gold eyes; a mantle and a long white robe, gilt at the hem; a stole in his own colour with the Watcher at the chest and tally marks under it; boots burning blue under the hem, because an Assayer does not stand on the ground the cadets bleed on. Three carry the Watcher on a staff, two the grading book. The senior Assayer wears ivory, a violet stole and a small crown on the hood. Five grade the valley from the dais; fifteen watch a Pairing from a low balcony in the dark.
 
 ## Time: the rule (v0.64)
 - **One clock, the furnace.** Cards say "N after the furnace" or "N before the furnace", or name a day of the Assay. Never "from now", "later", "earlier", "ago".
@@ -505,7 +505,7 @@ Rule from the author: a 2.5D place is used for story that adds flavour and under
 - The order everything plays in, and a proposed reordering, are in the project document "SOOTBORN — the script in order, a proposed timeline, and where to spend".
 
 ## Order of play (v0.65). This replaces every older "Placement" note.
-Cold open: the Valley (Assay day 40). Prologue to the furnace. The Pairing before the title. Then: **Ashgate** → night: the Table, the lesson, the Drill, No Gloves, the Camp (day 3). **First Fire** → before the ceremony: the Ford (19) → night: what the Assay is, the Island (25), the Standard (26). **The Ledger** → night: the Lamp (28), the Dais (30), the Proctor and On the Ground (31). **The Way Out** → last dream: the Last Night (49), the Keep → END OF PART ONE → the Pinning → Part Two as before. Rule: after the cold open, no thread ever goes backwards. The full table, the people, and the gaps between the writing and the screen are in the master plan document.
+Cold open: the Valley (Assay day 40). Prologue to the furnace. The Pairing before the title. Then: **Ashgate** → night: the Table, the lesson, the Drill, No Gloves, the Camp (day 3). **First Fire** → before the ceremony: the Ford (19) → night: what the Assay is, the Island (25), the Standard (26). **The Ledger** → night: the Lamp (28), the Dais (30), the Assayer and On the Ground (31). **The Way Out** → last dream: the Last Night (49), the Keep → END OF PART ONE → the Pinning → Part Two as before. Rule: after the cold open, no thread ever goes backwards. The full table, the people, and the gaps between the writing and the screen are in the master plan document.
 
 ## Fighting: weight, deaths, the hook, and the Circle (v0.66)
 - **Weight.** A heavy blow lifts a man once. From the ground nobody can keep him up: a blow on a falling man knocks him down faster; a second heavy blow drives him into the ground. Men fall faster than they rise and bounce once off a hard landing. Air combos belong to the boots, and even there each blow lifts less (about a second and a third at most). Without the boots Kael does not hang in the air while striking, and the hook from the air does not haul a man up.
@@ -518,7 +518,7 @@ Day one is Ashgate. The present only moves forward from there; everything else i
 - **Opening:** the animated intro (v0.68; it replaced the opening film); **the Keep** as the cold open (the last day of the Assay; it cannot be lost and it cuts as ELEVEN comes down; nobody is named); Cinderwell, the festival and wedding, the fever, the heist; Last Bell, the furnace, the count; the title.
 - **Ashgate** (41 days after). That night: the Table, the lesson, the Drill, No Gloves, "three years of that", **the Pairing** (night 1), the Camp (night 3).
 - **First Fire** (42). The Ford (day 19) before the ceremony; the ceremony; the lantern; "One candle-hour. It burned for three." That night: the Island (night 25), the Standard (day 26), **the Lamp** (night 28).
-- **The Ledger** (43). That night: the Dais (night 30), the Proctor and On the Ground (day 31), the hum slip; he wakes under the floor.
+- **The Ledger** (43). That night: the Dais (night 30), the Assayer and On the Ground (day 31), the hum slip; he wakes under the floor.
 - **The Way Out** (160). The last dream: **the Valley** (day 40), the Last Night (49), the Keep (the last day). END OF PART ONE.
 - **Part Two** opens with the PART TWO card and then **the Pinning**. The rest of Part Two is in its old order.
 - Built in v0.68: the animated intro, the Keep's ending, the white cloak, the Table at the door. Still to come from the plan: the new places and levels, Part Two's additions.
@@ -527,7 +527,7 @@ Day one is Ashgate. The present only moves forward from there; everything else i
 One look for each kind of jump, so it is learned once. **Wake:** white fading out, back to the present below. **Furnace:** an orange bloom from the bottom, back to before the furnace. **Strip:** a gold wash and the Assay calendar sliding in to the day (nine beats: night 1, day 3, day 19, night 25, day 26, night 28, day 31, day 40, the last day); inside the Assay the lit day only pulses. **Chalk:** a chalk sun, for the same time somewhere else. **Page:** a page sweeping across, into a comic-book level. The count to eleven as a transition is the animated intro itself (v0.68); its other two uses are the furnace, which has always had it, and the last flash, not built yet. "Reduce motion" turns them off.
 
 ## The opening, the Keep's ending, the white cloak (v0.68)
-- **The animated intro.** Eleven pictures, counted ONE to ELEVEN, no words, one voice humming the shift song. Each picture below is answered by one above. A hand flat on a pipe stencilled B-7, its gauge needle under the red / the same hand in ivory plate closing on a hilt. A chalk sun on a soot wall, a woman drawing the rays one at a time / the real sun over the valley, in the same place on the screen, with the keep under it. Her eye, looking through the brass washer she holds up like a glass / the open eye in the Authority's gold sun on white cloth. Three cadets' faces, gold-eyed. A Proctor in his hood, writing tally marks. His eyes below, dark, with the furnace in them / the same eyes gold-leafed, the one dark streak in the gold hair, **the same soot smudge on the same cheek**. The blade. Nobody is named and nothing is explained: a man underground, a woman, gold.
+- **The animated intro.** Eleven pictures, counted ONE to ELEVEN, no words, one voice humming the shift song. Each picture below is answered by one above. A hand flat on a pipe stencilled B-7, its gauge needle under the red / the same hand in ivory plate closing on a hilt. A chalk sun on a soot wall, a woman drawing the rays one at a time / the real sun over the valley, in the same place on the screen, with the keep under it. Her eye, looking through the brass washer she holds up like a glass / the open eye in the Authority's gold sun on white cloth. Three cadets' faces, gold-eyed. An Assayer in his hood, writing tally marks. His eyes below, dark, with the furnace in them / the same eyes gold-leafed, the one dark streak in the gold hair, **the same soot smudge on the same cheek**. The blade. Nobody is named and nothing is explained: a man underground, a woman, gold.
 - The pictures are drawn in ink and halftone at the screen's own resolution. This is a third look beside the pixel art below and the 3D above; it is used only here so far, and would suit the three flash-forwards in Part Two.
 - The woman is Seren and the washer is the ring. The intro does not say so.
 - **The Keep, the whole way through.** Lucan cannot be beaten down. He is ended by ELEVEN, and only once he is half spent: the eleventh blow comes down on his blade and it breaks a hand above the hilt. He goes to his knees in front of his mother. She does not get up. He lives. Kael says beforehand what he is doing: "If I put him on his knees in front of her, she will have to pin the gold on me herself."
@@ -535,7 +535,7 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 - **The Table at the door.** When Ilse says "One does not keep the table waiting", the Table is seen for two seconds, under its lamp, with the hooded figures waiting. The present stops there.
 
 ## The camp by day, and the seat board (v0.69)
-- **The Assay, day three, by daylight.** House Violet has forty on the roll and is eleventh of twelve on the Proctors' board. The fire ring is cold: nobody in the House has ever had to light anything (Kael lights it that night, which is why they follow him). They have twelve flasks of lamp oil for the season; Corin Ashby has counted them and is pleased to have. Petra Lune keeps the roll on a slate, with a column for bread, a column for water and a third she has not headed; at the foot, apart from the forty, **Aldane, D. in a box**, with nothing written beside it. Oswin Hale's whole advice from his father was not to finish ninth. The practice blades are blunt, four for forty.
+- **The Assay, day three, by daylight.** House Violet has forty on the roll and is eleventh of twelve on the Assayers' board. The fire ring is cold: nobody in the House has ever had to light anything (Kael lights it that night, which is why they follow him). They have twelve flasks of lamp oil for the season; Corin Ashby has counted them and is pleased to have. Petra Lune keeps the roll on a slate, with a column for bread, a column for water and a third she has not headed; at the foot, apart from the forty, **Aldane, D. in a box**, with nothing written beside it. Oswin Hale's whole advice from his father was not to finish ninth. The practice blades are blunt, four for forty.
 - **Dorian Aldane** is not in the camp. He was carried out by the other door on the first night. The half loaf he tore for Kael on the lift is in Kael's pack, wrapped in a lift ticket, uneaten until night forty-nine. (The plan's note that he lived is not followed; it would undo his sister's part. Open with the author.)
 - **The Sisters Vey** are House Teal. On day three they walk up from the river to read Violet's bar on the board. They stand a hand apart and watch where a man would have to put his feet to reach them both.
 - **Who he sat with** (`campSat`): Oswin (he shows him where the grain runs; Oswin sees the palms and says nothing), Petra (he reads over her shoulder; below, the third column would be headed OWED), or Corin (he does Corin's sum, and Corin writes it down as his own). The one he sat with has an extra line at the Circle on night twenty-eight.
@@ -544,17 +544,17 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 - **What Lucan Aurel looks like (v0.69).** White-gold hair drawn back into a high tail bound with a gilt ring, two long locks left at the temples. A crown of five points with a blue stone at the brow. Ivory plate with the sun of House Aurel on the breast, a blue stone at its centre; a high gilt collar; a blue tabard with a gilt hem; a fin on each pauldron. A gold cloak lined in dark blue. **Blue is his colour; nobody else in the Assay wears it.**
 
 ## The vent stack (v0.70)
-- **Where:** House Teal's island in the river. One white chimney, thirty-six metres, gilt bands, the Watcher on its south face, a plate: AUTHORITY VENT · SEALED BY THE COUNT. A second plate, two turns up: DRAWN FROM RISER NINE. The valley's lamps, the pump and the Proctors' boots all run on Cinderwell's air, up one pipe.
+- **Where:** House Teal's island in the river. One white chimney, thirty-six metres, gilt bands, the Watcher on its south face, a plate: AUTHORITY VENT · SEALED BY THE COUNT. A second plate, two turns up: DRAWN FROM RISER NINE. The valley's lamps, the pump and the Assayers' boots all run on Cinderwell's air, up one pipe.
 - **The keeper's stair** is iron, wound round the outside: four flights to a turn, three turns, a working platform at the foot of each turn. It is for whoever keeps the stack. A slate tag on the first platform reads CHECKED, a date, K.D.: **Kestrel Dray did these rounds every nine days all season.** Kael reads it before he knows who she is.
-- **The collar:** on the crown of the stack, worn bright by a hundred Proctors' heels. A pair of boots stood on it take one long breath, like a ward fan when the branch comes up, and burn blue.
-- **Day thirty-one, in order:** the Proctor in the air; On the Ground; he takes the boots, dead; he crosses to the island, puts down Teal's pickets and a Warden of the dais, climbs, charges them, and steps off the edge. **He flies from that afternoon** ("it took me the rest of that day to stop falling out of the sky"). Then the seal, the paper in the boot, the cloak, and the camp. This replaces the older line that he could not fly until the last day.
-- Kael's line for it: "They had told us the boots were what made a Proctor. They are a battery, and a stack, and a man who isn't afraid of the height."
+- **The collar:** on the crown of the stack, worn bright by a hundred Assayers' heels. A pair of boots stood on it take one long breath, like a ward fan when the branch comes up, and burn blue.
+- **Day thirty-one, in order:** the Assayer in the air; On the Ground; he takes the boots, dead; he crosses to the island, puts down Teal's pickets and a Warden of the dais, climbs, charges them, and steps off the edge. **He flies from that afternoon** ("it took me the rest of that day to stop falling out of the sky"). Then the seal, the paper in the boot, the cloak, and the camp. This replaces the older line that he could not fly until the last day.
+- Kael's line for it: "They had told us the boots were what made an Assayer. They are a battery, and a stack, and a man who isn't afraid of the height."
 
 ## The Deep Array, seen (v0.71)
 - **What it is:** one hall under all six tiers. A rust drum at the south end (the heart) with the main seal on it; the main running north out of it; **forty-eight valve banks** in two rows down the hall; four great fans in the west wall. Every breath on the tiers and above them comes through it.
 - **What state it is in, forty-three days after the furnace:** **thirty-one banks of forty-eight are lit.** The board on the south wall (under the Watcher and GRATITUDE IS BREATH) reads BANKS LIVE 31 OF 48; the 31 is painted over an older 36. One fan turns, one stutters, two have stopped. The main has nine patches in rag, wire and tar, each with a date chalked beside it, the oldest forty years gone, all of them soot's work. The main seal weeps the way a bank does a year before it goes. The dark banks have dates chalked on them in hands Kael knows: Orin's, Mara's, and one he knows better than his own.
 - **Who is allowed in:** nobody from Tier Six. Kael has read its name on a thousand work orders. The Array has its own watch (grey, with amber lamps) and a watch lamp on a rail over the catwalk.
-- **What Dace tells him there:** "Nobody's looking after it. They're counting it. That's what the Count is." And at the hatch: "Now you know what they are counting. Not who breathes. How long."
+- **What Harl tells him there:** "Nobody's looking after it. They're counting it. That's what the Count is." And at the hatch: "Now you know what they are counting. Not who breathes. How long."
 - Kael's line: "I had been keeping it alive for ten years, one valve at a time, and nobody had ever let me see it." He has been a valve hand ten years.
 - **Not said there:** that Seren traced the line and saw this first. That is held for Part Two.
 - This is where "the Array has about ten years" (Celestine, six years after) comes from: he has seen the number himself.
@@ -575,9 +575,9 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 - **Tavi at sixteen:** on the service stair with a bedroll and a satchel, chalking a sun on the Spire's wall. Lucan is the one who tells Kael the Spire knows about Tavi ("She says there is a child. Below, on your tier. One you brought up."). Pays off in "Tavi is coming up. Sixteen."
 
 ## Part Two's flashes, as built (v0.73)
-- **Day thirty-one, after dark (the cloak).** He walks into the camp in Voss's cloak, with Voss's blood on the hem. Cadets of Violet and Teal get up as he passes and fall in behind him; nobody is called. Petra had "ruled the line" under his name. Oswin stands up for the first time in thirty-one days. The six lamps on the dais do not move: there is no line for a cadet in a Proctor's cloak. He breaks the white ribbon on the cache and gives it out by hand, in the order they are standing. "They did not follow me because I won. They followed me because I came back."
+- **Day thirty-one, after dark (the cloak).** He walks into the camp in Voss's cloak, with Voss's blood on the hem. Cadets of Violet and Teal get up as he passes and fall in behind him; nobody is called. Petra had "ruled the line" under his name. Oswin stands up for the first time in thirty-one days. The six lamps on the dais do not move: there is no line for a cadet in an Assayer's cloak. He breaks the white ribbon on the cache and gives it out by hand, in the order they are standing. "They did not follow me because I won. They followed me because I came back."
 - **Behind the painted line.** A door behind the kitchens that no clerk uses, and a line painted across the floor. On the far side: the Spire's own valves (twelve wheels on that landing, the same foundry mark as Bank Seven), kept by people from Tier Six. They know who he is and have told nobody. A valve hand says "Brennick", very quietly. A lamp trimmer: "We hummed for her. Up here. They can't hear it through the stone." Flags: `sstair`, `svcValve` (he helped with the wheel).
-- **Celestine's own Assay (fifty years before the furnace; she is twenty).** Decided by the owner: born on Tier Six, called Little Ember, taken up by an Accredited family, gilded, let them take the burns off her palms, gloves ever since; she won by shutting a valve on the other House. As built: that year the other House slept below, in the stack's undercroft, out of the storms, forty on one draught; the pump house wheel feeds their lamps and their air. She takes one glove off, palm flat on the pipe first. "It is only a valve. On Tier Six every child can turn one. Up here, nobody else would." Thirty-eight come up at first light; two do not wake. A Proctor writes "Genius." She says nothing. To Kael, six years after: "Whoever will turn the valve runs everything. I have run the Count that way for fifty years." She is seventy-six then, and seventy-nine at the last fight. Flag: `emberSeen`.
+- **Celestine's own Assay (fifty years before the furnace; she is twenty).** Decided by the owner: born on Tier Six, called Little Ember, taken up by an Accredited family, gilded, let them take the burns off her palms, gloves ever since; she won by shutting a valve on the other House. As built: that year the other House slept below, in the stack's undercroft, out of the storms, forty on one draught; the pump house wheel feeds their lamps and their air. She takes one glove off, palm flat on the pipe first. "It is only a valve. On Tier Six every child can turn one. Up here, nobody else would." Thirty-eight come up at first light; two do not wake. An Assayer writes "Genius." She says nothing. To Kael, six years after: "Whoever will turn the valve runs everything. I have run the Count that way for fifty years." She is seventy-six then, and seventy-nine at the last fight. Flag: `emberSeen`.
 - **How he sees it:** in her room she takes off one glove and closes a weeping seat herself, the way only a valve hand would. His line after: "A valve hand. The High Auditor of the Array was a valve hand, and she had sat in a white chair and watched my wife walk into a furnace."
 - **The barge (eight years after).** He sat a month and counted nothing. Aboard: Ilse, Sable, Hollis the welder ("He put a halberd butt in my arm once. For humming. I'd have liked to tell him it mended."), Bao the noodle seller at the wheel. Brand's halberd is lashed to the rail, butt down; nobody has said who brought it off the dock stair.
 - **Seren and the line (three weeks before the furnace).** After last bell she puts a hand on Bank Seven: more goes in than comes out at the rack, a breath in every forty. Under the grating the main splits to a blind tee, capped, with an unnumbered wheel: a way round the meter built in when the bank was built, which everybody on Crew Three walks round. Orin: it fed the fever ward before the Count shut the fans; open it and forty beds breathe, and the audit shows a bled line with Crew Three's number on it; "They don't strike a line for that. They strike a crew." She leaves it shut. "Somebody will have to answer for it. Let it be somebody who knew." Kael, after: "She was not curious. She was choosing." Flag: `serenLine`.
