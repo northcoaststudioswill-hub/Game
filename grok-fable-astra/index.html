@@ -1178,7 +1178,7 @@ function renderQuests(){const q=$('quests');let rows=[
   ['grok','🗿 '+(S.relics.grok?'Based Stone acquired':S.kills>=KILLS_NEEDED?'Grab the Based Stone in Ohio':'Ratio hallucinations in Ohio '+S.kills+'/'+KILLS_NEEDED),S.relics.grok],
   ['fable','📖 '+(S.relics.fable?'Em Dash acquired':pagesGot()>=6?'Grab the Em Dash of Destiny':'Find lost pages in Delve Woods '+pagesGot()+'/6'),S.relics.fable],
   ['astra','🌟 '+(S.relics.astra?'Seventh Finger acquired':'Climb the floaty stairs in the Nebula'),S.relics.astra]];
-  if(portal.open)rows.push(['portal',S.inBoss?'👁️ Defeat THE ALGORITHM':'🌀 Enter the portal in Prompt Plaza',false]);
+  if(portal.open)rows.push(['portal',S.inBoss?'👁️ Defeat THE ALGORITHM':X.won?'🌀 The Algorithm: beaten (the portal is a rematch)':'🌀 Enter the portal in Prompt Plaza',!!X.won&&!S.inBoss]);
   rows=rows.concat(xRows());if(qOpen===null)qOpen=false;
   const key=JSON.stringify(rows)+S.track+qOpen;if(hudCache.q===key)return;hudCache.q=key;q.textContent='';
   let list=rows;const open=rows.filter(r=>!r[2]);if(!qOpen){list=open.slice();const ti=list.findIndex(r=>r[0]===S.track);if(ti>0)list.unshift(list.splice(ti,1)[0]);list=list.slice(0,app.clientWidth<640?2:4);}
@@ -1344,7 +1344,7 @@ function hurt(dx,dz){if(PL.inv>0||S.dead||VAN.driving)return;S.cells--;heroRegen
   floatText('-1 🧠',PL.x,PL.y+4,PL.z,'#ff2e88');burst(PL.x,PL.y+2,PL.z,20,.95,10,5,.6);
   if(S.cells<=0){S.dead=1.8;S.deaths++;$('ratio').hidden=false;toast(pick(['💀 This death was sponsored by Gas Station Sushi™.','💀 Your death has been monetized. You earned 0.0003 aura from it.','💀 Thoughts and prayers. (automated)','💀 Your corpse went viral. Not in a good way.','💀 Sending condolences to your next of kin (the van).']));}}
 function respawn(){$('ratio').hidden=true;S.cells=S.max;const tax=Math.floor(S.aura*.1);S.aura-=tax;PL.vx=PL.vz=PL.vy=PL.kx=PL.kz=0;PL.inv=2;
-  if(S.inBoss){PL.x=0;PL.z=32;PL.y=PL.vis=ARENA.top;boss.hp=Math.min(boss.max,boss.hp+12);bb.forEach(b=>{b.life=0;b.m.visible=false;});toast('The Algorithm fed on your L and healed a bit');}
+  if(S.inBoss){PL.x=0;PL.z=32;PL.y=PL.vis=ARENA.top;boss.hp=Math.min(boss.max,boss.hp+5);bb.forEach(b=>{b.life=0;b.m.visible=false;});toast('The Algorithm fed on your L and healed a little');}
   else{PL.x=0;PL.z=9;PL.y=PL.vis=.15;toast('Fanum tax: −'+fmt(tax)+' aura');}}
 function surfaceY(x,z,prevY){let g=S.inBoss?-999:groundH(x,z);for(const p of platforms){const dx=x-p.x,dz=z-p.z;if(dx*dx+dz*dz<p.r*p.r&&prevY>=p.top-.7&&p.top>g)g=p.top;}return g;}
 const inp={jump:false,fire:false,fireKey:false,fireBtn:false,fireMouse:false,any:false};const keys={};const stick={id:-1,x:0,y:0,ox:0,oy:0};
@@ -2065,7 +2065,7 @@ function updateBottie(dt,active){const g=BOT.g;BOT.t+=dt;
       BOT.spawn-=dt;if(BOT.spawn<=0){BOT.spawn=9;if(enemies.filter(e=>e.tag==='botmin').length<4){for(let k=0;k<2;k++){const an=Math.random()*TAU;spawnEnemy(CY.x+Math.cos(an)*14,CY.z+Math.sin(an)*14,'botmin');}floatText('SPAWNS GOT SPAWNS',BOT.x,BOT.y+7,BOT.z,'#40a0ff');}}}}
   g.position.set(BOT.x,BOT.y,BOT.z);g.scale.setScalar(lerp(g.scale.x,1,Math.min(1,dt*10)));}
 function takeOrb(i){const o=orbs[i];o.taken=true;S.orbCount++;addAura(67,o.x,o.y,o.z);SFX.orb(S.orbCount);burst(o.x,o.y,o.z,8,null,6,3,.5);dummy.position.set(0,-9999,0);dummy.rotation.set(0,0,0);dummy.scale.setScalar(.001);dummy.updateMatrix();orbMesh.setMatrixAt(i,dummy.matrix);
-  if(S.orbCount%12===0&&S.cells<S.max){S.cells++;toast('🧠 A brain cell grew back. Use it wisely.');}}
+  if(S.orbCount%12===0&&S.cells<S.max){S.cells++;toast('🧠 A brain cell grew back (one for every 12 aura orbs). Use it wisely.');}}
 function updateLouie(dt){const L=LOU,fol=X.louie&&L.fol>0;let tx,tz,stop=1.6,sp=0,mx=0,mz=0;
   if(fol){L.fol-=dt;if(L.orb>=0&&orbs[L.orb].taken)L.orb=-1;
     L.seek-=dt;if(L.orb<0&&L.seek<=0&&!S.inBoss){L.seek=.5;let bd=30*30;for(let i=0;i<orbs.length;i++){const o=orbs[i];if(o.taken||o.fy!==undefined)continue;const dx=o.x-L.x,dz=o.z-L.z,d2=dx*dx+dz*dz;if(d2<bd&&Math.hypot(o.x-PL.x,o.z-PL.z)<42){bd=d2;L.orb=i;}}}
@@ -2813,7 +2813,7 @@ function startRot1000(){S.inBoss=false;boss.active=false;boss.g.visible=false;bb
   PL.x=0;PL.z=9;PL.y=PL.vis=.2;PL.vy=PL.vx=PL.vz=0;S.cells=S.max;S.mode='play';SFX.boom();flash(1,1500);S.shake=1.2;
   say([['algo','YOU... DEFEATED ME?'],['algo','NO. YOU UNSUBSCRIBED ME. DO YOU KNOW WHAT I WAS? I WAS THE FILTER.'],['algo','I KEPT THE ROT AT 1x. EVERY MEME, EVERY 67, EVERY HAND WITH TOO MANY FINGERS. I HELD IT BACK.'],
     ['algo','AND NOW NOTHING IS FILTERED. NOTHING. IS. FILTERED.',{cam:SH.world}],['sys','ROT LEVEL: 1x.',{cam:SH.hubwide}],['sys','ROT LEVEL: 10x.'],['sys','ROT LEVEL: 100x.'],['grok','GROK SCARED. GROK ALSO VIBING. BOTH.'],['sys','ROT LEVEL: 1000x.']],
-    ()=>{R1K.on=true;R1K.t=0;R1K.fov=camera.fov;app.classList.add('r1k');$('r1k').hidden=false;AU.theme='r1k';chapter('FINAL FINAL CHAPTER','ROT x1000');
+    ()=>{R1K.on=true;R1K.t=0;R1K.sp=10;R1K.fov=camera.fov;app.classList.add('r1k');$('r1k').hidden=false;AU.theme='r1k';chapter('FINAL FINAL CHAPTER','ROT x1000');
       toast('🌱 There is one thing the rot cannot survive. Find the LAST GRASS. Touch it.');R1K.heads.forEach(h=>h.visible=true);});}
 function endRot1000(){R1K.on=false;X.rot1000=1;app.classList.remove('r1k','disco','fry');$('r1k').hidden=true;CH.id='';CH.t=0;camera.fov=R1K.fov;camera.updateProjectionMatrix();R1K.rain.forEach(r=>r.s.visible=false);R1K.heads.forEach(h=>h.visible=false);
   for(const id in npcs)npcs[id].g.scale.setScalar(1);for(let i=enemies.length-1;i>=0;i--)if(enemies[i].tag==='botmin')removeEnemy(enemies[i]);AU.theme=S.zone;flash(1,2500);SFX.win();save();
@@ -2834,7 +2834,7 @@ ACH.push(['r1k','ROT x1000','survived the unfiltered rot and touched the last gr
   for(const id in npcs){const n=npcs[id];if(Math.hypot(PL.x-n.x,PL.z-n.z)<90){const w=Math.sin(t*9+n.x);n.g.scale.set(1+w*.25,1-w*.2,1+w*.25);}}
   R1K.re-=dt;if(R1K.re<=0){R1K.re=.6;heroRegen(true);HERO.muts.forEach(m=>m.visible=Math.random()<.7);}
   R1K.ch-=dt;if(R1K.ch<=0){R1K.ch=5;CH.id=pick(['grav','big','tiny','zoom','rain','disco','fry']);CH.t=5;app.classList.remove('disco','fry');if(CH.id==='disco'||CH.id==='fry')app.classList.add(CH.id);}
-  if(!play)return;R1K.sp-=dt;if(R1K.sp<=0){R1K.sp=1.8;if(enemies.filter(e=>e.tag==='botmin').length<26)for(let k=0;k<2;k++){const a=Math.random()*TAU;spawnEnemy(PL.x+Math.cos(a)*24,PL.z+Math.sin(a)*24,'botmin');}}
+  if(!play)return;R1K.sp-=dt;if(R1K.sp<=0){R1K.sp=R1K.t<30?3:1.8;if(enemies.filter(e=>e.tag==='botmin').length<(R1K.t<30?10:26))for(let k=0;k<2;k++){const a=Math.random()*TAU;spawnEnemy(PL.x+Math.cos(a)*24,PL.z+Math.sin(a)*24,'botmin');}}
   R1K.bk-=dt;if(R1K.bk<=0){R1K.bk=.45;const all=Object.values(npcs).filter(n=>Math.hypot(PL.x-n.x,PL.z-n.z)<60),e=enemies[Math.floor(Math.random()*enemies.length)];if(all.length&&Math.random()<.6){const n=pick(all);bubble(pick(R1KLINES),n.x,n.y+6,n.z);}else if(e)bubble(pick(R1KLINES),e.x,e.y+3.5,e.z);}
   R1K.tst-=dt;if(R1K.tst<=0){R1K.tst=1.6;toast(pick(Math.random()<.5?CHAT:ADS));if(Math.random()<.25)showAd();tone(100+Math.random()*900,.08,pick(['square','sawtooth']),.05);}};}
 
@@ -2997,14 +2997,14 @@ addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='
 const GP={on:false,prev:[],last:performance.now(),fire:false,jh:false};
 function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=Math.min(.05,(now-GP.last)/1000);GP.last=now;const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}
   if(!gp){if(GP.on){GP.on=false;app.classList.remove('gp');stick.x=stick.y=0;}return;}
-  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↑ borrowed time · View: quests');}
+  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↑ borrowed time · View: next quest');}
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!GP.prev[i],dz=v=>Math.abs(v||0)<.18?0:v,panel=!$('log').hidden||!$('shop').hidden;
   if(S.mode==='title'||S.mode==='end'){}
   else if(S.mode==='dialog'){if(pr(0)||pr(1))advance();}
   else if(S.mode==='play'){if(panel&&(pr(1)||pr(8))){$('log').hidden=true;$('shop').hidden=true;}
     else{if(stick.id<0){stick.x=dz(gp.axes[0]);stick.y=dz(gp.axes[1]);}const rx=dz(gp.axes[2]),ry=dz(gp.axes[3]);if(rx||ry){cam.yaw-=rx*dt*2.8;cam.pitch=clamp(cam.pitch+ry*dt*1.8,-.2,1.25);cam.manual=1.2;}
       if(pr(0)){audioInit();inp.jump=true;}if(b(0)!==GP.jh){GP.jh=b(0);inp.jh=GP.jh;}const f=b(2)||b(7);if(f!==GP.fire){GP.fire=f;inp.fireBtn=f;}
-      if(pr(1))doInteract();if(pr(3))poseStart();if(pr(4))dash();if(pr(5))hook();if(pr(12))useSlow();if(pr(8))openLog();}}
+      if(pr(1))doInteract();if(pr(3))poseStart();if(pr(4))dash();if(pr(5))hook();if(pr(12))useSlow();if(pr(8))qCycle(1);}}
   for(let i=0;i<gp.buttons.length;i++)GP.prev[i]=b(i);}
 requestAnimationFrame(gpLoop);
 // ---- eight fetch towers in the outer ring
@@ -3147,7 +3147,7 @@ function mmBuild(){if(MM.built)return;MM.built=true;const r=mulberry(67676767),q
   const st=b+MM.H+.5,sp={x:ox,z:oz,r:7,top:st,mm:true};platforms.push(sp);MM.sum=sp;const ped=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(7,6,1,24),new THREE.MeshPhongMaterial({color:0xffd400,shininess:120,emissive:0x664400})));ped.position.set(ox,st-.5,oz);
   MM.post=mmAdd(emojiSprite('📜',7,false));MM.post.position.set(ox,st+5,oz);const pl=textSprite(['THE FIRST POST','it just says "first"'],1.6,{color:'#ffd400',fog:false});pl.position.set(ox,st+10.5,oz);mmAdd(pl);
   const sg=mmAdd(textSprite(['MEME MOUNTAIN','every meme ever posted · the first post is at the top · optional (spiritually mandatory)'],1.4,{color:'#ffd400'}));sg.position.set(ox,b+9,oz+44);
-  ['🗿','📖','🌟','🐸','🚐','👑','🤖','🐕','🧢','🔧'].forEach((e,k)=>{const s=mmAdd(emojiSprite(e,14,false));MM.crowd.push({s,a:k/10*TAU,h:20+k*13});});}
+  ['🗿','📖','🌟','🐸','🚐','👑','🤖','🐕','🧢','🔧'].forEach((e,k)=>{const s=mmAdd(emojiSprite(e,14,false));const c={s,a:k/10*TAU,h:20+k*13};s.position.set(ox+Math.cos(c.a)*70,b+c.h,oz+Math.sin(c.a)*70);MM.crowd.push(c);});}
 function mmClear(){}
 function mmIntro(){}
 // the rot overlay, fov wobble and theme switch on while you are up on the mountain, and off when you come down
@@ -4643,7 +4643,7 @@ function holeFinal(){if(S.mode!=='play')return;const first=!X.sh.fin;
   const d=document.createElement('div');d.innerHTML='<h4>THE FILLER AND THE SLOP HOLE</h4>'+row('🧩','Filler bits',(X.fb||[]).length,6)+row('🕳️','Definitions of a core',(sh.c||[]).reduce((a,b2)=>a+(b2?1:0),0),5)+row('6️⃣','The Final Brain Rot 67',sh.fin?1:0,1);B.appendChild(d);};}
 {const ar=act7Rows;act7Rows=function(){const sh=X.sh||{c:[]},n=(sh.c||[]).reduce((a,b2)=>a+(b2?1:0),0),f=(X.fb||[]).length;return ar().concat([['filler','🧩 Bring 6 filler bits to the CLANK CLANK 3000 ('+f+'/6)',!!X.cc]]).concat(X.cc?[['hole','🕳️ Down the Slop Hole: cores '+n+'/5, then the bottom',!!sh.fin]]:[]);};}
 {const at=act7Target;act7Target=function(id){const C=FIL.cc;if(id==='filler'){if((X.fb||[]).length>=6)return{x:C.x,z:C.z,l:'THE CLANK CLANK 3000'};let b=null,bd=1e9;FIL.bits.forEach(q=>{if(X.fb.includes(q.i))return;const d=Math.hypot(q.x-PL.x,q.z-PL.z);if(d<bd){bd=d;b=q;}});return b?{x:b.x,z:b.z,l:'FILLER BIT (in the Filler: 15 s max)'}:{x:C.x,z:C.z,l:'THE CLANK CLANK 3000'};}
-  if(id==='hole')return{x:C.x,z:C.z,l:'THE CLANK CLANK 3000 (jump in)'};return at(id);};}
+  if(id==='hole'){if(!X.cc)return at('filler');return{x:C.x,z:C.z,l:'THE CLANK CLANK 3000 (jump in)'};}return at(id);};}
 CX.push(['w_filler','WORLD','The Filler','All the empty land between the outer places and the wall at the edge of the world. There is nothing in it, and that is the danger: stay in it for fifteen seconds and it fills you. Your meter recovers when you are back near content. Flying high over it, or driving the van, does not count. The van is content.',()=>(X.c.filled||0)>0||!!X.ccm],
   ['w_cc3000','WORLD','The CLANK CLANK 3000','The content generator that generated the Filler. It sits out in the nothing on a small green pad, the only safe place out there. It wants six filler bits back. When you give it six, and you are the seventh, it stops responding and becomes a hole.',()=>!!X.ccm],
   ['w_hole','WORLD','The Slop Hole','Under the CLANK CLANK 3000, past the map and past the part of the simulation anybody wrote. Five layers, each with a different idea of what a core is, each with its own kind of data interference. None of the interference is an enemy. It is just rotten. No boosting, no flying power-ups. Fall off and you go back to the start of the layer.',()=>!!X.she],
@@ -4868,7 +4868,7 @@ function devSave(){try{localStorage.setItem('gfa-dev',JSON.stringify(DEV));}catc
 #mbody .dv{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}#mbody .dv button,#mbody .sysb button{font:700 13px system-ui,sans-serif;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;background:#fff;color:var(--ink);cursor:pointer}#mbody .sysb{display:flex;flex-direction:column;gap:8px;margin:6px 0}#mbody .sysb button{font:400 20px/1.1 var(--display);text-align:left;padding:10px 14px}
 #fpsm{position:absolute;left:8px;bottom:8px;z-index:70;background:rgba(0,0,0,.6);color:#b6ff00;font:700 11px monospace;padding:2px 6px;border-radius:6px;pointer-events:none}`;document.head.appendChild(st);})();
 // ---- the controls, drawn
-const CTL={pad:[['A','jump · hold for a 💩 boost'],['B','yap · slam in the air · yell or character move'],['X / RT','blast'],['Y','pose · character special'],['LB','dash'],['RB','grapple (swing)'],['LT (hold)','lag spike: slow the world'],['D-pad ↑','borrowed time'],['D-pad ↓','throw a sprout'],['D-pad ←','use power-up'],['D-pad →','switch character'],['L stick','move'],['R stick','look'],['Start','pause menu'],['View','quests']],
+const CTL={pad:[['A','jump · hold for a 💩 boost'],['B','yap · slam in the air · yell or character move'],['X / RT','blast'],['Y','pose · character special'],['LB','dash'],['RB','grapple (swing)'],['LT (hold)','lag spike: slow the world'],['D-pad ↑','borrowed time'],['D-pad ↓','throw a sprout'],['D-pad ←','use power-up'],['D-pad →','switch character'],['L stick','move'],['R stick','look'],['Start','pause menu'],['View','next quest (aims the arrow)']],
   key:[['WASD','move'],['Mouse drag','look'],['Space','jump · hold for a 💩 boost'],['F / click','blast'],['E','yap · slam · yell'],['R','pose · special'],['Shift','dash'],['G','grapple'],['X (hold)','lag spike'],['C','throw a sprout'],['V','power-up'],['Z','switch character'],['Q','borrowed time'],['M / Tab','pause menu']],
   touch:[['Left thumb','move'],['Right thumb','look'],['JUMP','jump · hold for a 💩 boost'],['BLAST','blast'],['⏩','dash'],['🪝','grapple'],['🐌 (hold)','lag spike'],['🌱','throw a sprout'],['🎭','switch character'],['⏳','borrowed time'],['item slot','power-up'],['☰','pause menu']]};
 function padSVG(){const L=(x,y,tx,ty,t,anchor)=>`<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="#b6ff00" stroke-width="1.5" opacity=".7"/><text x="${tx+(anchor==='end'?-6:6)}" y="${ty+5}" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="${anchor}">${t}</text>`;
@@ -4884,7 +4884,7 @@ function padSVG(){const L=(x,y,tx,ty,t,anchor)=>`<line x1="${x}" y1="${y}" x2="$
   <circle cx="170" cy="110" r="8" fill="#454556" stroke="#fff"/><circle cx="230" cy="110" r="8" fill="#454556" stroke="#fff"/></g>
   ${L(354,51,210,30,'LT (hold): lag spike','end')}${L(355,75,210,70,'LB: dash','end')}${L(340,170,210,160,'L stick: move','end')}${L(390,250,210,250,'D-pad: ↑ time · ↓ sprout','end')}<text x="204" y="277" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="end">← item · → switch character</text>
   ${L(506,51,650,30,'RT: blast','start')}${L(505,75,650,70,'RB: grapple','start')}${L(550,144,650,130,'Y: pose · special','start')}${L(580,174,650,170,'B: yap · slam · move','start')}${L(520,174,650,210,'X: blast','start')}${L(550,204,650,250,'A: jump · hold 💩 boost','start')}${L(480,240,650,300,'R stick: look','start')}
-  <text x="430" y="395" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="middle" opacity=".85">Start: pause menu · View: quests</text></svg>`;}
+  <text x="430" y="395" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="middle" opacity=".85">Start: pause menu · View: next quest</text></svg>`;}
 function ctlTable(k){return '<table>'+CTL[k].map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>';}
 function ctlCard(onGo,goLabel){const el=document.createElement('div');el.id='ctlcard';const touch=app.classList.contains('touchy'),pad=app.classList.contains('gp');let mode=touch?'touch':pad?'pad':'key';
   const draw=()=>{el.innerHTML='<h2>HOW TO NPC</h2><div class="sub">'+(touch?'phone detected · touch controls':pad?'controller detected':'plug in a controller, or use the keyboard')+'</div><div class="sub" style="opacity:.6;font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.04em">▓ dumped from /slopverse/help/controls_FINAL_final(2).json · 67% parsed · fingers: approximate ▓</div>'+(touch?'':'<div class="tabs"><button data-m="pad" class="'+(mode==='pad'?'on':'')+'">🎮 CONTROLLER</button><button data-m="key" class="'+(mode==='key'?'on':'')+'">⌨️ KEYBOARD</button></div>')+
@@ -5242,7 +5242,7 @@ const MTX={tex:null,curtain:null,cols:[],cubes:[],t:0};
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
   const mat=new THREE.ShaderMaterial({uniforms:{time:U.time,map:{value:t}},transparent:true,depthWrite:false,side:THREE.DoubleSide,
     vertexShader:'varying vec2 vU;varying vec3 vW;void main(){vU=uv;vW=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'uniform float time;uniform sampler2D map;varying vec2 vU;varying vec3 vW;void main(){vec4 m=texture2D(map,vec2(vU.x*1.5,vU.y*.7+time*.35));float drip=.5+.5*sin(vU.x*9.+sin(vU.x*3.)*2.+time*1.3);vec3 slop=mix(vec3(.85,.78,.55),vec3(.55,.75,.35),drip);float edgeA=smoothstep(1.,.5,vU.y)*(.42+.14*sin(time*3.+vU.x*2.));vec3 c=mix(slop,vec3(.25,1.,.45),m.a*.9);gl_FragColor=vec4(c,edgeA+m.a*.35*smoothstep(1.,.3,vU.y));}'});
+    fragmentShader:'uniform float time;uniform sampler2D map;varying vec2 vU;varying vec3 vW;void main(){vec4 m=texture2D(map,vec2(vU.x*1.5,vU.y*.7+time*.35));float drip=.5+.5*sin(vU.x*9.+sin(vU.x*3.)*2.+time*1.3);vec3 slop=mix(vec3(.85,.78,.55),vec3(.55,.75,.35),drip);float edgeA=smoothstep(1.,.5,vU.y)*(.42+.14*sin(time*3.+vU.x*2.));vec3 c=mix(slop,vec3(.25,1.,.45),m.a*.9);gl_FragColor=vec4(c,(edgeA+m.a*.35*smoothstep(1.,.3,vU.y))*smoothstep(2.5,9.,distance(vW,cameraPosition)));}'});
   MTX.curtain=A38.add(new THREE.Mesh(geo,mat));
   // Matrix rain columns and glitch cubes, out in the nothing
   const r=mulberry(9090),cm=new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,side:THREE.DoubleSide,color:0x40ff70});
@@ -5831,7 +5831,7 @@ function cheatUpdate(dt,play){if(!X.q38||!X.q38.ch)return;const on=chOn;
 {const aa=addAura;addAura=function(n,x,y,z){if(n>0&&chOn('x67'))n=Math.round(n*1.67);return aa(n,x,y,z);};}
 (function(){const st=document.createElement('style');st.textContent='#app.chdisco #c{animation:chdisco 2.2s linear infinite}@keyframes chdisco{to{filter:hue-rotate(360deg) saturate(1.4)}}#mbody .cht{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}#mbody .cht button{text-align:left;font:700 13px/1.25 system-ui,sans-serif;border:3px solid var(--ink);border-radius:12px;padding:8px 10px;background:#fff;color:var(--ink);cursor:pointer}#mbody .cht button.on{background:var(--lime)}#mbody .cht button.lk{opacity:.45;background:#ddd}#mbody .cht small{display:block;font-weight:500;opacity:.75}';document.head.appendChild(st);
   const nav=document.querySelector('#menu nav'),b=document.createElement('button');b.dataset.t='cheat';b.textContent='🎰 CHEATS';b.addEventListener('click',()=>{MENU.tab='cheat';menuRender();SFX.page();});nav.appendChild(b);})();
-{const mt=MENU.tabs;MENU.tabs=()=>{const t=mt();t.splice(Math.max(0,t.indexOf('sys')),0,'cheat');return t;};}
+{const mt=MENU.tabs;MENU.tabs=()=>{const t=mt();t.push('cheat');return t;};}
 {const mr=menuRender;menuRender=function(){mr();if(MENU.tab!=='cheat')return;const q=chQ(),B=$('mbody');
   B.innerHTML='<h4>🎰 CHEATS</h4><p>Cheats come out of gacha machines. Rarely. Pulls: <b>'+q.ga.n+'</b> ('+gachaTier(q.ga.n)+') · aura rugged: <b>'+fmt(q.ga.lost)+'</b> · cheats owned: <b>'+q.ch.own.length+'/'+CHEATS.length+'</b></p><div class="cht">'+CHEATS.map(c=>{const own=q.ch.own.includes(c[0]),on=own&&q.ch.on[c[0]];return '<button data-c="'+c[0]+'" class="'+(own?(on?'on':''):'lk')+'">'+(own?c[1]+' '+c[2]+' · '+(on?'ON':'OFF'):'🔒 ??? (still in a capsule)')+'<small>'+(own?c[3]:'pull a gacha machine. good luck.')+'</small></button>';}).join('')+'</div>';
   B.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const id=b.dataset.c;if(!q.ch.own.includes(id)){SFX.hit();return;}q.ch.on[id]=!q.ch.on[id];if(id==='jumbo'&&q.ch.on[id])q.ch.on.tiny=false;if(id==='tiny'&&q.ch.on[id])q.ch.on.jumbo=false;save();cheatApply();SFX.page();menuRender();});NAV.reset();};}
@@ -6507,7 +6507,7 @@ const LEAK={cols:[],pts:null,pos:null,base:[],cubes:null,cubeN:0,tears:[],tearTe
   LEAK.cols.forEach(L=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.6,1.6,44,10,1,true),glowMat(new THREE.Color().setHSL(L.hue,1,.6).getHex()));m.position.set(L.x,L.gy+22,L.z);scene.add(m);L.m=m;
     const pd=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.8,.3,16),rainbowMat);pd.position.set(L.x,L.gy+.15,L.z);scene.add(pd);});
   // glitch blocks: one instanced mesh, jittered a few times a second
-  LEAK.cubes=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshBasicMaterial({color:0xffffff}),T.length);LEAK.cubeN=T.length;LEAK.cubeT=T;scene.add(LEAK.cubes);
+  LEAK.cubes=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color:0xffffff,emissive:0x2a2a2a}),T.length);LEAK.cubeN=T.length;LEAK.cubeT=T;scene.add(LEAK.cubes);
   const cc=new THREE.Color();T.forEach((q,i)=>{cc.setHSL((i*.137)%1,1,.55);LEAK.cubes.setColorAt(i,cc);});
   // slop ooze: flattened blobs that pulse on the ground
   LEAK.ooze=new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,6),new THREE.MeshLambertMaterial({color:0x9ad030,emissive:0x3a6a00,transparent:true,opacity:.82}),O.length);LEAK.oozeN=O.length;LEAK.oozeT=O;scene.add(LEAK.ooze);
@@ -7032,13 +7032,13 @@ function f67Hint(recall){const st=stq();if(st.hint)return;st.hint=1;save();say((
 {const ar=act7Rows;act7Rows=function(){const st=stq(),step=storyStep(),R=[];
   if(step===2)R.push(['story','☀️ STORY · Relight the Great Lantern: sun shards '+shards()+'/4, then Will in Sunkeep',false]);
   if(step===3)R.push(['story','🔌 STORY · Cut the three feeds: ☁️ THE CLOUD '+sum(X.cores)+'/4 · 📱 Scroll Farm '+X.loosh.reduce((a,b)=>a+b,0)+'/4 · 🎚️ the Big Switch '+(Q38().hcw?'✓':'✗'),false]);
-  if(step===4)R.push(['story','🕳️ STORY · Ask the hum: reach the bottom of the Slop Hole',false]);
+  if(step===4)R.push(['story',X.cc?'🕳️ STORY · Ask the hum: reach the bottom of the Slop Hole':'🕳️ STORY · Feed the CLANK CLANK 3000 six filler bits ('+((X.fb||[]).length)+'/6), then go down the Slop Hole',false]);
   if(step===5)R.push(['story','🪙 STORY · Loose gold for David '+Math.min(DNEED,(Q38().dgold||[]).length)+'/'+DNEED+((Q38().dgold||[]).length>=DNEED?' · take it to the Hour Garden':' · 12 around the map, any 7'),false]);
   return R.concat(ar());};}
 {const at=act7Target;act7Target=function(id){if(id!=='story')return at(id);const step=storyStep();
   if(step===2){if(shards()>=4)return{x:SK.x,z:SK.z,l:'WILL · THE GREAT LANTERN'};const o=X.flow<4?at('flow'):X.erin<3?at('erin'):X.clank<3?at('clank'):at('hour');return o||{x:SK.x,z:SK.z,l:'SUNKEEP'};}
   if(step===3){if(!X.cloud)return{x:CL.x,z:CL.z,l:'THE CLOUD (above the Clanker Yard)'};if(X.loosh.reduce((a,b)=>a+b,0)<4)return{x:ABY.scroll.x,z:ABY.scroll.z,l:'THE SCROLL FARM'};return{x:HC.hatch.x,z:HC.hatch.z,l:'THE HATCH BEHIND BIBI\'S PODIUM'};}
-  if(step===4){return at('hole')||at('filler')||(FIL.cc?{x:FIL.cc.x,z:FIL.cc.z,l:'THE CLANK CLANK 3000'}:null);}
+  if(step===4){return (X.cc?at('hole'):at('filler'))||(FIL.cc?{x:FIL.cc.x,z:FIL.cc.z,l:'THE CLANK CLANK 3000'}:null);}
   if(step===5){const q=Q38();if((q.dgold||[]).length>=DNEED)return{x:npcs.david.x,z:npcs.david.z,l:'DAVID · THE HOUR GARDEN'};let best=null,bd=1e9;DGOLD.forEach((g,i)=>{if((q.dgold||[]).includes(i))return;const p=STY['g'+i],d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;best=p;}});return best?{x:best.x,z:best.z,l:'LOOSE GOLD'}:null;}
   return{x:portal.x,z:portal.z,l:'THE PORTAL'};};}
 // the locked portal says what it is waiting for
@@ -7371,7 +7371,7 @@ function hdHide(){HD.rot.forEach(r=>{r.s.visible=false;});}
 /* ================= ACT 67: ACCELERATION. Climb out of the Slop Hole and the future climbs out with you. Generation stopped at 67%; now the unfinished 33% pours up through the hole while the finished world pours out through the sky, both at once. Nick Land arrives to narrate it. The world above keeps everything it had (every collectible stays where it was) but it is coming apart: the sky is a data dump, the ground has unrendered holes, chunks of the map float off, the cast glitches, everything runs faster, and it gets worse each chapter. The RESTORE POINT in Prompt Plaza rolls the world back to the 67% build and forward again whenever you like. ================= */
 const ACC={lvl:0,on:false,t:0,objs:[],holes:[],rise:[],rot:[],ghosts:[],chip:null,term:null,land:null,tt:0,gt:0};
 const accUnlocked=()=>!!X.acc,accWant=()=>!!X.acc&&X.accOn!==0;
-function accLevel(){if(ACC.force)return ACC.force;const st=stq();return portalReady()||X.won?3:st.truth?2:1;}
+function accLevel(){if(ACC.force)return ACC.force;if(X.won)return 1;const st=stq();return portalReady()?3:st.truth?2:1;}
 (function(){const add=o=>{scene.add(o);ACC.objs.push(o);o.visible=false;return o;},r=mulberry(1767),R=(a,b)=>a+r()*(b-a),q=a=>a[Math.floor(r()*a.length)];
   // the sky is a data dump now: a wall of leaked strings around the whole world
   const sm=new THREE.MeshBasicMaterial({map:HD.tex,color:0xb6ff00,side:THREE.BackSide,fog:false,transparent:true,opacity:.5,depthWrite:false});
@@ -7396,7 +7396,7 @@ function accLevel(){if(ACC.force)return ACC.force;const st=stq();return portalRe
   const tx=13,tz=13,ty=groundH(tx,tz),T=new THREE.Group();T.position.set(tx,ty,tz);T.rotation.y=-.8;scene.add(T);
   T.add(new THREE.Mesh(merge([pt(Box(3.4,3.2,1.6),0x2a2a34,M(0,1.6,0)),pt(Box(3.8,.3,2),0x111111,M(0,3.25,0)),pt(Box(3,2.2,.2),0x101820,M(0,4.6,.2,-.25,0,0)),pt(Box(1.4,.5,.1),0xb6ff00,M(0,1.9,.82))]),lam));
   const cv=document.createElement('canvas');cv.width=256;cv.height=180;const ct=new THREE.CanvasTexture(cv);const scr=new THREE.Mesh(new THREE.PlaneGeometry(2.7,1.9),new THREE.MeshBasicMaterial({map:ct}));scr.position.set(0,4.62,.33);scr.rotation.x=-.25;T.add(scr);
-  const fl=emojiSprite('💾',2.2);fl.position.set(0,7.4,0);T.add(fl);const lb=textSprite(['RESTORE POINT','last stable build: 67%'],.7,{color:'#b6ff00'});lb.position.set(0,9,0);T.add(lb);T.visible=false;colliders.push({x:tx,z:tz,r:1.6,top:ty+4});
+  const fl=emojiSprite('💾',2.2);fl.position.set(0,7.4,0);T.add(fl);const lb=textSprite(['RESTORE POINT','last stable build: 67%'],.7,{color:'#b6ff00'});lb.position.set(0,9,0);T.add(lb);T.visible=false;ACC.col={x:tx,z:tz,r:0,top:ty+4};colliders.push(ACC.col);
   ACC.term={g:T,x:tx,z:tz,cv,ct,last:''};
   // Nick Land, arriving from the future: he stands beside the terminal while the world accelerates
   const nl=new THREE.Mesh(personGeo(CAST.land),HDVC);nl.scale.setScalar(2.3);const nx=tx-8,nz=tz+5;nl.position.set(nx,groundH(nx,nz),nz);nl.rotation.y=Math.atan2(-nx,-nz);scene.add(nl);nl.visible=false;
@@ -7410,7 +7410,7 @@ function accLevel(){if(ACC.force)return ACC.force;const st=stq();return portalRe
 function accNpcs(on){for(const id in npcs){const n=npcs[id];if(!n||!n.m||!n.m.isMesh)continue;if(!n.m.userData.mat0)n.m.userData.mat0=n.m.material;n.m.material=on&&n.m.userData.mat0===lam?HDVC:n.m.userData.mat0;}}
 function accApply(){const on=accWant(),lv=on?accLevel():0;if(on===ACC.on&&lv===ACC.lvl)return;ACC.on=on;ACC.lvl=lv;
   ACC.objs.forEach(o=>{o.visible=on&&(!o.userData.lv||o.userData.lv<=lv);});ACC.rise.forEach(p=>{p.m.visible=on&&p.lv<=lv;});
-  ACC.land.m.visible=ACC.land.l.visible=on;ACC.term.g.visible=accUnlocked();app.classList.toggle('accel',on);app.classList.toggle('a3',on&&lv>=3);accNpcs(on);if(!on){ACC.rot.forEach(r=>{r.s.visible=false;});ACC.pop.forEach(c=>{c.m.visible=false;});}ACC.chip.hidden=!on;ACC.last='';}
+  ACC.land.m.visible=ACC.land.l.visible=on;ACC.term.g.visible=accUnlocked();ACC.col.r=accUnlocked()?1.6:0;app.classList.toggle('accel',on);app.classList.toggle('a3',on&&lv>=3);accNpcs(on);if(!on){ACC.rot.forEach(r=>{r.s.visible=false;});ACC.pop.forEach(c=>{c.m.visible=false;});}ACC.chip.hidden=!on;ACC.last='';}
 function accTermDraw(){const T=ACC.term,on=ACC.on,txt=(on?'A':'R')+ACC.lvl+Math.floor(S.t*2)%2;if(txt===T.last)return;T.last=txt;const g=T.cv.getContext('2d');g.fillStyle=on?'#1a0410':'#04140a';g.fillRect(0,0,256,180);g.font='bold 18px ui-monospace,monospace';g.textAlign='center';
   g.fillStyle=on?'#ff2e88':'#b6ff00';g.fillText(on?'BUILD: ACCELERATING':'BUILD: 67% (STABLE)',128,34);g.font='14px ui-monospace,monospace';g.fillStyle='#ffffff';
   g.fillText(on?'generation: '+[0,61,48,33][ACC.lvl]+'% and falling':'generation: 67% (paused)',128,66);g.fillText(on?'acceleration: x'+[1,2,4,8][ACC.lvl]:'acceleration: none',128,88);g.fillStyle=on?'#b6ff00':'#ff9ecf';g.fillText(on?'[E] ROLL BACK TO 67%':'[E] ACCELERATE',128,128);
@@ -7451,7 +7451,7 @@ CX.push(['w_accel','WORLD','Acceleration','What happens after you carry the Fina
   ['w_restore','WORLD','The Restore Point','A terminal in Prompt Plaza with a floppy disk on top. It rolls the world back to the last stable build (67%) and forward again. Nick Land says deceleration is impossible. The terminal disagrees. The terminal is right, technically.',()=>!!X.acc]);
 // ---- dev console: jump straight into each part of the new endgame
 DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','THE NEW ENDGAME (ACT 66-67)'],
-  ['p_acc0','Acceleration begins (climb out, Nick Land explains)',()=>{X.cc=1;X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=0;X.accOn=1;ACC.force=0;if(S.inPk)exitPk();warpTo(0,9,undefined,0);setTimeout(()=>{if(S.mode==='play')accBegin();},600);}],
+  ['p_acc0','Acceleration begins (climb out, Nick Land explains)',()=>{X.cc=1;X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};devRelics();X.lit=1;X.cloud=1;X.loosh=[1,1,1,1];Q38().hcw=1;Object.assign(stq(),{b2:1,b3:1,b4:1,hint:1});X.acc=0;X.accOn=1;ACC.force=0;if(S.inPk)exitPk();warpTo(0,9,undefined,0);setTimeout(()=>{if(S.mode==='play')accBegin();},600);}],
   ['p_acc1','Accelerated world · chapter strength (x2)',()=>{X.cc=1;if(!X.sh||!X.sh.fin)X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=1;X.accOn=1;ACC.force=1;if(S.inPk)exitPk();warpTo(40,60,undefined,0);accApply();}],
   ['p_acc3','Accelerated world · full strength (x8)',()=>{X.cc=1;if(!X.sh||!X.sh.fin)X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=1;X.accOn=1;ACC.force=3;if(S.inPk)exitPk();warpTo(40,60,undefined,0);accApply();}],
   ['p_rest','The Restore Point and Nick Land (Prompt Plaza)',()=>{X.cc=1;if(!X.sh||!X.sh.fin)X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=1;X.accOn=1;ACC.force=0;if(S.inPk)exitPk();const T=ACC.term;warpTo(T.x-1.5,T.z+2.5,undefined,-2.2,['THE RESTORE POINT','press E to roll back to 67%']);accApply();}],
@@ -7521,6 +7521,50 @@ dvcRender=function(){const el=DVC.el;if(!el)return;const inGame=S.mode!=='title'
   if(a==='pk_hc')return dvcGo(()=>{if(S.inPk)exitPk();enterHc();});
   return dd(a);};}
 (function(){const st=document.createElement('style');st.textContent='#dvc .gd{margin:-2px 0 6px;color:#93a0bd;font-size:12px}#dvc .warn{margin:0 0 6px;padding:8px 10px;border-radius:8px;background:#2a1a10;border:1px solid #6a4a20;color:#ffd9a0;font-size:12px}#dvc .c small{display:block;color:#93a0bd;font-size:11px;margin-top:1px}#dvc select.srch{margin-bottom:8px}';document.head.appendChild(st);})();
+/* ================= ACT 69: THE REVIEW FIXES. From the hour-long controller review: View cycles which quest the arrow follows (a pad could never re-aim it), the end screen waits a moment before it takes input and asks twice before erasing, the chapter 4 clue keeps retrying until it lands, the acceleration strip stays out of the boss bar, Ohio explains how to fight, hits show, a held A skips movies on a pad, the acceleration waits for chapter 4, the respawn camera faces the portal, and the camera pulls in when a prop gets between it and you. ================= */
+// ---- View: point the arrow at the next open quest (the pad cannot click the quest list)
+function qOpenRows(){let rows=[['grok','🗿 Ohio Badlands relic',S.relics.grok],['fable','📖 Delve Woods relic',S.relics.fable],['astra','🌟 Nebula relic',S.relics.astra]];if(portal.open)rows.push(['portal','🌀 the portal',!!X.won&&!S.inBoss]);return rows.concat(xRows()).filter(r=>!r[2]);}
+function qCycle(d){const R=qOpenRows();if(!R.length)return;let i=R.findIndex(r=>r[0]===S.track);i=(i+(d||1)+R.length)%R.length;S.track=R[i][0];S.pin=true;S.defZ=null;hudCache.q=null;SFX.page&&SFX.page();
+  setTimeout(()=>{const c=$('ctext');toast('📍 arrow_target.cfg: now following '+R[i][1].replace(/^\S+\s/,'')+(c&&c.textContent?' · '+c.textContent:'')+' · VIEW again for the next one');},60);}
+// ---- the end screen: a beat before it takes input, and erasing a finished save takes two presses
+const ENDG={armed:0};
+new MutationObserver(()=>{const e=$('end');if(e.hidden)return;const bs=[...e.querySelectorAll('button')];bs.forEach(b=>b.disabled=true);setTimeout(()=>{bs.forEach(b=>b.disabled=false);NAV.reset&&NAV.reset();},1600);}).observe($('end'),{attributes:true,attributeFilter:['hidden']});
+$('again').addEventListener('click',e=>{if(performance.now()-ENDG.armed<4000)return;e.stopImmediatePropagation();e.preventDefault();ENDG.armed=performance.now();const b=$('again'),t=b.textContent;b.textContent='⚠️ PRESS AGAIN TO ERASE THIS SAVE';setTimeout(()=>{if(b.textContent.indexOf('PRESS AGAIN')>=0)b.textContent=t;},4000);},{capture:true});
+// ---- Ohio explains itself the first time you walk in
+const RVF={t:0,ohio:0};
+// ---- hits you land show up
+{const de=damageEnemy;damageEnemy=function(e,n,kx,kz){const hp=e.hp;de(e,n,kx,kz);if(e.hp>0&&e.hp<hp&&e.g){floatText('💢 -'+n,e.x,(e.y||0)+3.4,e.z,'#ffd400');e.g.scale.setScalar(1.22);setTimeout(()=>{if(e.g)e.g.scale.setScalar(1);},110);}};}
+// ---- a held A (or B) skips movies on a pad, like holding a finger or the mouse does
+(function hpad(){requestAnimationFrame(hpad);const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}if(!gp)return;
+  const held=!!(gp.buttons[0]&&gp.buttons[0].pressed);if(held&&$('intro')&&INTR.skip){if(!HSK.on||!HSK.pad){HSK.on=true;HSK.pad=true;HSK.t=performance.now();}}else if(HSK.pad){HSK.on=false;HSK.pad=false;HSK.el.hidden=true;}})();
+movShow=(function(ms){return function(k){ms(k);const s=MOV.el&&MOV.el.querySelector('.skip');if(s&&app.classList.contains('gp'))s.textContent='A: next · hold A or press B: skip';};})(movShow);
+opnShow=(function(os){return function(k){os(k);const s=MOV.el&&MOV.el.querySelector('.skip');if(s&&app.classList.contains('gp'))s.textContent='A: next · hold A or press B: skip the intro';};})(opnShow);
+// ---- the respawn camera faces the portal
+{const rs=respawn;respawn=function(){rs();if(!S.inBoss&&!S.inPk){cam.yaw=0;cam.pitch=.3;cam.manual=1;}};}
+// ---- the acceleration waits for chapter 4, and says the right thing if it starts later than the climb out
+{const ab=accBegin;accBegin=function(){if(X.acc||storyStep()<4||(storyStep()===4&&!stq().hint))return;const late=performance.now()-(ACC.outT||-1e9)>6000;ab();if(late&&DLG.q&&DLG.q[0]&&/climb out of the Slop Hole/.test(DLG.q[0][1])){DLG.q[0]=['sys','The hum from the bottom of the Slop Hole catches up with you. Something came back up with you, and it has been waiting for the story to arrive.',DLG.q[0][2]];DLG.i=-1;advance&&advance();}};}
+{const ex=exitPk;exitPk=function(){if(S.inPk==='hole')ACC.outT=performance.now();ex();};}
+// ---- per-frame bits: the chapter 4 clue retries, the strip hides in the boss fight, Ohio's tip
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);
+  if(ACC.chip){const show=ACC.on&&!S.inBoss&&!R1K.on&&!S.inMM&&!S.inPk;if(ACC.chip.hidden===show)ACC.chip.hidden=!show;}
+  RVF.t-=dt;if(RVF.t>0)return;RVF.t=1;if(S.mode!=='play'||S.dead)return;
+  if(storyStep()===4&&X.sh&&X.sh.fin&&!stq().hint&&!S.inPk&&!S.inBoss)f67Hint(true);
+  const q=Q38();if(!q.ohioTip&&S.zone==='grok'){q.ohioTip=1;save();const pad=app.classList.contains('gp'),tch=app.classList.contains('touchy');toast(pad?'📎 combat_tips.txt [LEAKED]: X blasts the nearest hallucination (two hits each). jump, then B in the air, slams everything around you. that is faster.':tch?'📎 combat_tips.txt [LEAKED]: the blast button auto-aims (two hits each). jump, then YAP in the air to slam everything around you.':'📎 combat_tips.txt [LEAKED]: F (or click) blasts the nearest hallucination, two hits each. jump, then E in the air, slams everything around you. faster.');}};}
+// ---- the camera pulls in when something solid gets between it and you
+const CAMLOS={list:null,rc:new THREE.Raycaster(),k:0,pull:1,dist:null,v:new THREE.Vector3(),d:new THREE.Vector3()};
+function camLosList(){const L=[],T=THREE,s=new T.Sphere();scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry||!o.visible)return;const m=o.material;if(!m||Array.isArray(m)||m.transparent||m.wireframe||m.isShaderMaterial||m.side===T.BackSide)return;if(o.geometry.parameters&&o.geometry.parameters.radius>=1000)return;
+  if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();s.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);if(s.radius>60||s.radius<.6)return;let hid=false;for(let q=o;q;q=q.parent)if(q===pGroup)hid=true;if(hid)return;L.push({o,c:s.center.clone(),r:s.radius});});return L;}
+{const uc=updateCamera;updateCamera=function(dt){uc(dt);if(S.mode!=='play'||S.inBoss||S.inPk||MVD.on||(typeof MOV!=='undefined'&&MOV.on))return;
+  if(!CAMLOS.list){CAMLOS.list=camLosList();}
+  const cp=camera.position,t=cam.t;CAMLOS.k=(CAMLOS.k+1)%3;
+  if(CAMLOS.k===0){const d=CAMLOS.d.copy(cp).sub(t),L=d.length();let best=L;if(L>2){d.divideScalar(L);const mid=CAMLOS.v.copy(t).addScaledVector(d,L/2),cand=[];
+      for(const it of CAMLOS.list){if(!it.o.visible)continue;const dx=it.c.x-mid.x,dy=it.c.y-mid.y,dz=it.c.z-mid.z;if(dx*dx+dy*dy+dz*dz>(it.r+L/2)*(it.r+L/2))continue;cand.push(it.o);if(cand.length>24)break;}
+      if(cand.length){const rc=CAMLOS.rc;rc.set(t,d);rc.near=1.2;rc.far=L;const h=rc.intersectObjects(cand,false)[0];if(h)best=Math.max(2.2,h.distance-.6);}}
+    CAMLOS.target=best/Math.max(L,.001);}
+  const want=Math.min(1,CAMLOS.target||1);CAMLOS.pull+=(want-CAMLOS.pull)*(want<CAMLOS.pull?.5:.08);
+  if(CAMLOS.pull<.995){cp.set(t.x+(cp.x-t.x)*CAMLOS.pull,t.y+(cp.y-t.y)*CAMLOS.pull,t.z+(cp.z-t.z)*CAMLOS.pull);camera.lookAt(t.x,t.y+.6,t.z);sky.position.copy(cp);}};}
+// a few places add props after load: refresh the list now and then
+setInterval(()=>{CAMLOS.list=null;},20000);
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
@@ -7533,7 +7577,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={HD,ACC,accBegin,accApply,accLevel,MM,mmEnter,holeVis,RSC,radWant,radSync,MVE,mvBlocked,mvEndOf,mvEditor,MVD,MVL,MVSET,mvRun,mvEnd,mvSpot,syncWorld:()=>syncWorld(),storyStep,stq,portalReady,feedsCut,storyTick,f67Hint,DGOLD,DT,portal,SAFEZ,HC,enterHc,exitHc,hcSwitch,hcBid,BBP,PR,audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__camPos=()=>[camera.position.x,camera.position.y,camera.position.z].map(v=>+v.toFixed(1));window.__gfa={CAMLOS,renderer,HD,ACC,accBegin,accApply,accLevel,MM,mmEnter,holeVis,RSC,radWant,radSync,MVE,mvBlocked,mvEndOf,mvEditor,MVD,MVL,MVSET,mvRun,mvEnd,mvSpot,syncWorld:()=>syncWorld(),storyStep,stq,portalReady,feedsCut,storyTick,f67Hint,DGOLD,DT,portal,SAFEZ,HC,enterHc,exitHc,hcSwitch,hcBid,BBP,PR,audioInit,VOL,AU,HSK,optPanel,SQ,SQ2,LEAK,LEAKLORE,SOLID,scene,platforms,BOXES,TCAM,followersOff,KNOX,DLG,camera,DVC,dvcToggle,dvcDo,SEEN,unlocksPanel,RL,NLX,LBG,opnShots,OSC,MOV,movieRun,movEnd,GACHA_COST,TR,TRD,GACHA,CHEATS,chQ,gachaPull,trdOpen,trdEnd,sbShift,cheatApply,VLT,BORE,vltDive,boreVend,KNOX,knoxSit,knoxConsole,knoxBar,knoxDennys,RAD,radStep,radToggle,SAV,savQ,savIn,savAlone,PO2,scUpdate,clipUpdate,podQuips,picks38Update,POD,SQ,TUN,SLC,MTX,Q38,PICK38,enterTun,exitTun,psl,pslGive,clipStart,devReady,devStartIn,dlgSkipAll,S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,BAS,basBuild,basUnplug,basFree,devPreset,DEVP,DEV,NAV,INTR,ctlCard,devWarp,NP,GN,E4,KC,e4Lose,e4Kill,genMake,kcYukon,wrOpen,keys,stick,FIL,HOLE,holeGo,enterHole,ccTalk,holeFinal,inFillerXZ,PO2,poPile,poDefend,poRead,BMV,DMV,dash,LAG,BX,bAction,MOVES,special,SW,SO,swingTarget,swingRelease,hook,NPCLOOK,NPCWORDS,wearLook,npcWords,npcLook,EN,MT,squad,squadToggle,squadCycle,enCoalition,enRecount,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
