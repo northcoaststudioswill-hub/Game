@@ -12,7 +12,7 @@ await p.click('#titleBtns .btn'); await p.evaluate(() => window.__tick(5)); awai
 let r = await p.evaluate(() => { const T = __pit.ev('TRACKS'); return T.filter(t => t[2] === 'lil Bottie').map(t => t[0]); });
 ok(r.length === 3 && r.every(id => fs_ok(id)), `his tracks on the soundtrack: ${r.join(', ')}`); function fs_ok() { return true; }
 ok(r.every(id => fs.existsSync(path.resolve(dir, '..', 'music', id + '.mp3'))), 'and the files are in music/');
-await p.evaluate(() => { const P = __pit; P.uiClose(); P.enterWorld('hub', 3.6, -8.4, Math.PI); window.__tick(40); document.querySelectorAll('#emobar,#whud,#keys,#toasts,#prompt,#goal,#padhint,#panel').forEach(e => e.style.visibility = 'hidden'); });
+await p.evaluate(() => { const P = __pit; P.uiClose(); P.enterWorld('hub', 11.4, 2.9, Math.PI / 2); window.__tick(40); document.querySelectorAll('#emobar,#whud,#keys,#toasts,#prompt,#goal,#padhint,#panel').forEach(e => e.style.visibility = 'hidden'); });
 // play The Algorithm at a few lines (a stand-in for the audio element: the game only reads its clock)
 const CH = await p.evaluate(() => __pit.ev('BOTTIE_CHOREO')['bt-algorithm']);
 const at = [5, 8, 12, 20, 27, 36];
@@ -20,17 +20,19 @@ const shots = [];
 for (const i of at) {
   const t = CH[i][0] + 0.6;
   r = await p.evaluate((t) => { const P = __pit, O = P.ev('OST'), W = P.W; O.el = O.el || {}; O.__fake = { paused: false, currentTime: t, play: () => Promise.resolve(), pause() {}, addEventListener() {} }; O.el = O.__fake; O.ok = true; O.id = 'bt-algorithm';
-    const bt = W.cast.list.find(n => n.cast === 'bottie'); W.me.x = 3.6; W.me.z = -7.6; window.__tick(30); const bub = [...document.querySelectorAll('.bubble, .bub')].map(e => e.textContent).join(' | ');
-    P.ev(`(() => { const m = W.cast.list.find(n => n.cast === 'bottie'); camera.position.set(m.x + 0.6, 1.7, m.z + 2.9); camera.lookAt(m.x, 1.05, m.z); renderer.render(scene, camera); })()`);
+    const bt = W.cast.list.find(n => n.cast === 'bottie'); W.me.x = 11.9; W.me.z = 2.9; window.__tick(30); const bub = [...document.querySelectorAll('.bubble, .bub')].map(e => e.textContent).join(' | ');
+    P.ev(`(() => { const m = W.cast.list.find(n => n.cast === 'bottie'); camera.position.set(m.x - 2.9, 1.7, m.z + 0.6); camera.lookAt(m.x, 1.05, m.z); renderer.render(scene, camera); })()`);
     return { amb: bt.amb, perf: bt.perf, line: bt.btLine, face: +bt.face.toFixed(2) }; }, t);
   const want = await p.evaluate(([i]) => { const m = __pit.ev('BT_MAP'), c = __pit.ev('BOTTIE_CHOREO')['bt-algorithm'][i]; return [m[c[1]] || 'robot', c[1], c[2]]; }, [i]);
-  ok(r.perf && r.amb === want[0] && r.line === i, `line ${i + 1} at ${t.toFixed(1)} s: "${want[2].slice(0, 46)}" → pose ${want[1]} (${r.amb})`);
+  ok(r.perf && r.amb === want[0] && r.line === i, `line ${i + 1} at ${t.toFixed(1)} s: "${(want[2] || '(words kept out of the game)').slice(0, 46)}" → pose ${want[1]} (${r.amb})`);
   shots.push([`${want[1]}: ${want[2].slice(0, 30)}`, (await p.screenshot({ clip: { x: 170, y: 60, width: 300, height: 400 } })).toString('base64')]);
 }
 r = await p.evaluate(() => { const P = __pit, O = P.ev('OST'); O.el.paused = true; window.__tick(5); const bt = P.W.cast.list.find(n => n.cast === 'bottie'); return { perf: bt.perf, amb: bt.amb }; });
 ok(!r.perf && r.amb === 'film', 'song off: back to filming');
+r = await p.evaluate(() => { const C = __pit.ev('BOTTIE_CHOREO'), bad = /Nick Land|Roko|basilisk/i; return Object.values(C).flat().filter(l => bad.test(l[2])).length; });
+ok(r === 0, 'no lyric in the game names a real person');
 // the photo wall
-await p.evaluate(() => { const P = __pit; P.ev(`(() => { camera.position.set(2.4, 1.8, -7.2); camera.lookAt(1.5, 1.5, -11.7); renderer.render(scene, camera); })()`); });
+await p.evaluate(() => { const P = __pit; P.ev(`(() => { camera.position.set(9.6, 2.0, 3.6); camera.lookAt(15, 1.4, 2.9); renderer.render(scene, camera); })()`); });
 await p.screenshot({ path: path.join(dir, 'shots', 'bottie-wall.png') });
 // the emotes from his photos
 for (const em of ['thumbs', 'roof']) {

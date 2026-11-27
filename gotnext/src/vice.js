@@ -22,11 +22,21 @@ function botLook(R, skin, hr) {
     for (const ex of [38, 90]) { x.beginPath(); x.arc(ex, 40, 13, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); }      /* happy eyes */
     x.beginPath(); x.arc(64, 46, 26, Math.PI * 0.2, Math.PI * 0.8); x.stroke(); }));      /* the smile */
   M(geo('botFaceP', () => new THREE.PlaneGeometry(1, 1)), new THREE.MeshBasicMaterial({ map: ft }), 0, hr * 1.0, hr * 0.86 + 0.028, head).scale.set(hr * 1.52, hr * 1.3, 1); for (const sx of [-1, 1]) M(cyl(0.022, 0.022, 0.03, 8), dark, sx * hr * 0.93, hr * 1.1, 0, head).rotation.z = Math.PI / 2;
-  // the puffer: three fat rolls round the chest, a high collar, rolls on the upper arms
-  const pc = toon('#c8ccd4'), w = (R.shW || 0.36);      /* the silver puffer from the photos */
-  for (let k = 0; k < 3; k++) ink(M(sph(0.2, 10, 6), pc, 0, -0.08 - k * 0.13, 0, chest), 1.04).scale.set(1.05 + (k === 1 ? 0.06 : 0), 0.42, 0.78);
-  ink(M(cyl(0.085, 0.1, 0.09, 10, true), pc, 0, 0.05, 0, chest), 1.05);
-  for (const s of ['R', 'L']) { const sh = J['sh' + s]; if (!sh) continue; for (let k = 0; k < 2; k++) M(sph(0.075, 8, 6), pc, 0, -0.07 - k * 0.11, 0, sh).scale.set(1, 0.8, 1); }
+  // the puffer, as in the photos: a boxy silver jacket with quilted channels, open down the front over a black shirt, a tall
+  // collar, and full padded sleeves to the wrists with black cuffs
+  const pc = toon('#c8ccd4'), seam = toon('#8e949e'), blk = toon('#16181c');
+  const shell = ink(M(geo('botShell', () => { const g = new THREE.CylinderGeometry(0.205, 0.19, 0.44, 14); g.scale(1, 1, 0.74); return g; }), pc, 0, -0.22, 0, chest), 1.04);
+  ink(M(sph(0.215, 14, 8), pc, 0, -0.02, 0, chest), 1.04).scale.set(1.12, 0.42, 0.76);      /* the shoulders */
+  for (const y of [-0.1, -0.22, -0.34]) { const r = M(geo('botSeam', () => new THREE.TorusGeometry(0.2, 0.005, 4, 24)), seam, 0, y, 0, chest); r.rotation.x = Math.PI / 2; r.scale.set(1.03, 0.76, 1); }
+  M(box(0.075, 0.42, 0.02), blk, 0, -0.2, 0.152, chest);      /* the shirt, where it is open */
+  for (const sx of [-1, 1]) M(box(0.012, 0.42, 0.024), seam, sx * 0.042, -0.2, 0.153, chest);      /* the zip edges */
+  ink(M(cyl(0.095, 0.11, 0.1, 12, true), pc, 0, 0.05, 0, chest), 1.05).material.side = THREE.DoubleSide;
+  void shell;
+  for (const s of ['R', 'L']) { const sh = J['sh' + s], el = J['el' + s], wr = J['wr' + s]; if (!sh || !el) continue;
+    const up = Math.abs(el.position.y) + 0.03, fore = wr ? Math.abs(wr.position.y) + 0.045 : 0.25;
+    ink(M(capsule(0.066, up * 0.78), pc, 0, -up / 2 + 0.01, 0, sh), 1.05); M(geo('botSlvSeam', () => new THREE.TorusGeometry(0.066, 0.004, 4, 14)), seam, 0, -up * 0.5, 0, sh).rotation.x = Math.PI / 2;
+    ink(M(capsule(0.056, fore * 0.72), pc, 0, -fore / 2 + 0.035, 0, el), 1.05);
+    M(cyl(0.05, 0.05, 0.035, 10), blk, 0, -fore + 0.075, 0, el); }      /* the cuffs */
   // the chain
   const ch = M(geo('botChain', () => new THREE.TorusGeometry(0.1, 0.012, 5, 14)), flat(0xe8eef8), 0, -0.1, 0.13, chest); ch.rotation.x = 1.2;      /* the iced clover chain */
   const cl = M(geo('clover', () => { const sh = new THREE.Shape(); for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2; sh.absarc(Math.cos(a) * 0.022, Math.sin(a) * 0.022, 0.02, 0, Math.PI * 2, false); } return new THREE.ShapeGeometry(sh); }), flat(0xf4f8ff), 0, -0.21, 0.185, chest); cl.scale.setScalar(1.4); cl.rotation.x = -0.2;

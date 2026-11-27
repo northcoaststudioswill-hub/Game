@@ -141,8 +141,11 @@ function makeRig(spec, lowDetail) {
     M(box(0.085, upH * 0.78, 0.012), toon('#f4f1e8'), 0, upH * 0.56, fz, chestJ).rotation.x = -0.12;      /* the shirt */
     M(box(0.028, upH * 0.66, 0.012), toon(top.c2 || '#c8102e'), 0, upH * 0.52, fz + 0.006, chestJ).rotation.x = -0.12;      /* the tie */
     for (const sx of [-1, 1]) { const l = M(box(0.04, upH * 0.62, 0.014), toon(top.c), sx * 0.05, upH * 0.6, fz + 0.002, chestJ); l.rotation.z = sx * 0.28; l.rotation.x = -0.12; } }      /* lapels */
-  if (top.kind === 'puffer') { const pc = toon(top.c);
-    for (const [y, p, r] of [[loH * 0.25, spine, 0.128], [loH * 0.75, spine, 0.13], [upH * 0.25, chestJ, 0.14], [upH * 0.62, chestJ, 0.152]]) out(M(sph(r * wS, 12, 8), pc, 0, y, 0, p), 1.04).scale.set(1.18, 0.42, 0.72);
+  if (top.kind === 'puffer') { const pc = toon(top.c), sm = toon(top.c2 || '#16181c');      /* a padded jacket: a smooth shell over the torso, quilted channels, a zip */
+    out(M(geo('pufLo' + wS.toFixed(2) + loH.toFixed(3), () => { const g = new THREE.CylinderGeometry(0.138 * wS, 0.132 * wS, loH + 0.04, 12); g.scale(1, 1, 0.74); return g; }), pc, 0, loH / 2, 0, spine), 1.04);
+    out(M(geo('pufUp' + wS.toFixed(2) + upH.toFixed(3) + shW.toFixed(3), () => { const g = new THREE.CylinderGeometry(shW * 1.04, 0.14 * wS, upH + 0.03, 12); g.scale(1, 1, 0.66); return g; }), pc, 0, upH / 2, 0, chestJ), 1.04);
+    for (const [y, p, r] of [[loH * 0.45, spine, 0.14], [upH * 0.3, chestJ, shW * 0.84], [upH * 0.72, chestJ, shW * 0.98]]) { const q = M(geo('pufSeam' + r.toFixed(3), () => new THREE.TorusGeometry(r * (p === spine ? wS : 1), 0.004, 4, 22)), sm, 0, y, 0, p); q.rotation.x = Math.PI / 2; q.scale.set(1.02, 0.7, 1); }
+    if (!top.print) M(box(0.01, upH + loH * 0.9, 0.012), sm, 0, upH / 2 - loH * 0.4, 0.116 * wS + 0.012, chestJ);      /* the zip (a printed chest has none) */
     out(M(cyl(0.07, 0.09, 0.07, 10), toon(top.c2 || top.c), 0, upH + 0.01, 0, chestJ), 1.05).scale.z = 0.85; }      /* a standing collar */
   if (top.kind === 'pads') { const yk = out(M(box(shW * 2.25, 0.075, 0.27 * wS), toon(top.c), 0, upH * 0.96, 0, chestJ), 1.05); yk.rotation.x = 0.04;
     for (const sx of [-1, 1]) out(M(sph(0.085, 8, 6), toon(top.c), sx * shW * 0.95, upH * 0.92, 0, chestJ), 1.05).scale.set(1.2, 0.7, 1.4); }

@@ -122,7 +122,7 @@ function ambientStep(dt, cam, me) {
     AMB.talkT -= dt;
     if (AMB.talk) { const b = AMB.talk, n = b.n; b.t -= dt; const p = n.rig.root.position, [sx, sy] = project(p.x, p.y + (n.rig.H || 1.9) + 0.45, p.z); b.el.style.left = sx + 'px'; b.el.style.top = sy + 'px'; b.el.style.opacity = b.t > 0.3 ? 1 : Math.max(0, b.t / 0.3); _v.set(p.x, p.y + 2, p.z).project(camera); if (b.t <= 0 || _v.z > 1) { b.el.remove(); AMB.talk = null; } }
     else if (AMB.talkT <= 0) {
-      AMB.talkT = rnd(2.5, 5); const near = AMB.npcs.filter(n => n.rig && Math.hypot(n.x - me.x, n.z - me.z) < 10 && Math.hypot(n.x - me.x, n.z - me.z) > 1.2);
+      AMB.talkT = rnd(2.5, 5); const hush = typeof W !== 'undefined' && W && W.btLive && W.t - W.btLive < 1; const near = hush ? [] : AMB.npcs.filter(n => n.rig && Math.hypot(n.x - me.x, n.z - me.z) < 10 && Math.hypot(n.x - me.x, n.z - me.z) > 1.2);
       if (near.length) { const n = pick(near), ls = AMB.lines(n); if (ls && ls.length) { const el = document.createElement('div'); el.className = 'bub'; el.textContent = pick(ls); document.body.appendChild(el); AMB.talk = { el, n, t: 3.2 }; } }
     }
   }

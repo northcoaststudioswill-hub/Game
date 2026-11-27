@@ -44,12 +44,12 @@ function castInit() {
   const er = castNpc('AARON', 'general', { top: 't_sunkeep', bottom: 'b_sunkeep' }, 7.6, -11.25, 0, { cast: 'erin' }); er.amb = 'watch'; C.list.push(er);
   spot(7.6, -9.4, 1.8, "AARON'S STAND", () => uiErin());
   // BOTTIE: chrome, dreads, puffer; films the run for the feed
-  const bt = addNpc(bottieBuild(), 3.6, -10.9, Math.PI, 'idle', { still: true }); bt.cast = 'bottie';      /* his own body: chrome, dreads, puffer (vice.js) */ bt.amb = 'film'; C.list.push(bt);
-  spot(3.6, -9.8, 1.5, 'BOTTIE', () => uiDialog('BOTTIE', pick(CAST_LINES.bottie), [['Later']]));
-  // his wall: three prints from the archive and the album, on a board beside him
-  if (typeof BOTTIE_PHOTOS !== 'undefined' && typeof btPhotoFrame === 'function') { const g = grp(scene, 1.5, 0, -11.7); for (const sx of [-1.15, 1.15]) ink(M(box(0.08, 2.4, 0.08), toon('#2a2c33'), sx, 1.2, -0.05, g), 1.04);
-    ink(M(box(2.5, 1.5, 0.05), toon('#0a0a12'), 0, 1.55, -0.06, g), 1.02); [['p09', -0.75], ['p07', 0], ['p12', 0.75]].forEach(([id, x]) => { const s = grp(g, x, 0.25, 0); s.scale.setScalar(0.92); btPhotoFrame(s, id, 1.4, '#c8d0d8'); });
-    const sg = sign("LIL BOTTIE · CLANKIN' IN THE CLOUD", 2.4, 0.2, '#7de3ff', '#0a0a12', { border: false }); sg.position.set(0, 2.42, -0.03); g.add(sg); solid(0.25, 2.75, -11.85, -11.55); }
+  const bt = addNpc(bottieBuild(), 14.1, 2.9, -Math.PI / 2, 'idle', { still: true });      /* against the Tape Deck's wall, between KINGS STAY and the door: out of the way */ bt.cast = 'bottie';      /* his own body: chrome, dreads, puffer (vice.js) */ bt.amb = 'film'; C.list.push(bt);
+  spot(13.0, 2.9, 1.4, 'BOTTIE', () => uiDialog('BOTTIE', pick(CAST_LINES.bottie), [['Later']]));
+  // his wall: three prints from the archive hung on the Tape Deck's wall behind him, and the album name over them
+  if (typeof BOTTIE_PHOTOS !== 'undefined' && typeof btPhotoFrame === 'function') { const g = grp(scene, 15.02, 0, 2.92); g.rotation.y = -Math.PI / 2;
+    ink(M(box(2.5, 1.5, 0.04), toon('#0a0a12'), 0, 1.75, -0.03, g), 1.02); [['p09', -0.75], ['p07', 0], ['p12', 0.75]].forEach(([id, x]) => { const s = grp(g, x, 0.45, 0); s.scale.setScalar(0.92); btPhotoFrame(s, id, 1.4, '#c8d0d8'); });
+    const sg = sign("LIL BOTTIE · CLANKIN' IN THE CLOUD", 2.4, 0.2, '#7de3ff', '#0a0a12', { border: false }); sg.position.set(0, 2.62, -0.01); g.add(sg); }
   // BRENNICK (Kael, from Sootborn): the valve hand. First one out here, last to leave, counts every rep.
   { const kb = kaelBuild(); const n = addNpc(kb, -2.6, -6.6, Math.PI, 'idle', { still: true }); n.cast = 'kael'; n.amb = 'cross'; C.list.push(n); C.kael = n;
     spot(-2.6, -5.6, 1.7, 'BRENNICK', () => uiKael()); }
@@ -78,9 +78,10 @@ function bottiePerf(n, d) {
   if (ch) { let i = -1; for (let k = 0; k < ch.length; k++) if (ch[k][0] <= tm) i = k;
     if (i < 0) n.amb = 'bob';
     else { n.amb = BT_MAP[ch[i][1]] || 'robot';
-      if (i !== n.btLine) { n.btLine = i; if (d < 10) { const nx = ch[i + 1] ? ch[i + 1][0] - ch[i][0] : 4; bubble(n.rig.root, ch[i][2], Math.min(4.5, Math.max(1.5, nx - 0.2)), n.rig.H + 0.35); } } } }
+      if (i !== n.btLine) { n.btLine = i; if (d < 7 && ch[i][2] && i % 2 === 0) { const nx = ch[i + 1] ? ch[i + 1][0] - ch[i][0] : 4; bubble(n.rig.root, ch[i][2], Math.min(4.5, Math.max(1.5, nx - 0.2)), n.rig.H + 0.35); } } } }      /* every other line, only up close: he raps, he does not caption himself */
   else n.amb = BT_LOOP[Math.floor(tm / (beat * 8)) % BT_LOOP.length];
   n.face = lerpAng(n.face, Math.atan2(W.me.x - n.x, W.me.z - n.z), 0.05);      /* he performs to you */
+  W.btLive = d < 12 ? W.t : W.btLive;      /* the people near you hush while he is on (ambient.js) */
   return true;
 }
 function castStep(dt) {
@@ -93,7 +94,7 @@ function castStep(dt) {
     else { n.ambT = (n.ambT || 5) - dt; if (n.ambT <= 0) { n.amb = pick(n.cast === 'mark' ? ['cross', 'watch', 'talk', 'point'] : n.cast === 'erin' ? ['watch', 'clap', 'cross'] : ['watch', 'phone', 'cross']); n.ambT = rnd(4, 9); } }
     n.rig.root.position.set(n.x, 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, crowdPose(n.amb, W.t, { ph: n.ph, bt: n.perf ? n.bt : undefined }, n.rig.prof), dt);
     // a line now and then when you walk past
-    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 5 && n.sayT <= 0 && !n.perf && C.t - (C.lastSay || -9) > 5) { C.lastSay = C.t;      /* one of them at a time */ n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
+    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 5 && n.sayT <= 0 && !n.perf && !(n.cast === 'bottie' && C.t - (C.btSaid || -99) < 40) && C.t - (C.lastSay || -9) > 5) { C.lastSay = C.t; if (n.cast === 'bottie') C.btSaid = C.t;      /* one of them at a time; Bottie only now and then */ n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
   }
   // Mark has money on the run in the cage
   if (W.park && C.mark) { const s = W.park.score[0] + W.park.score[1]; if (C.lastPark !== undefined && s !== C.lastPark && Math.random() < 0.5) { bubble(C.mark.rig.root, pick(Math.random() < 0.6 ? CAST_LINES.markBet : CAST_LINES.mark), 3.5, C.mark.rig.H + 0.35); C.mark.amb = Math.random() < 0.5 ? 'ohh' : 'up'; C.mark.ambT = 1.8; } C.lastPark = s; }
