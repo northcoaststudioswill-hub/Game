@@ -35,3 +35,8 @@ Everything is drawn in code, so it is all editable in `src/knockout.js`:
 - `MV`, `MVO`, `MN` – shared normal moves, each fighter's tweaks to them, and their move names
 - `S1`, `S2`, `SUP` – the two specials per fighter (X, Y) and supers
 - `SONG` – the chiptune. Any track in `src/tracks.js` tagged `"use":["ko-menu"]` or `["ko-fight"]` plays instead.
+
+## Also in this repo: GODMODE.EXE
+
+A separate game, not a cartridge: a mobile-first 3D god game in one HTML file, in its own folder. Play
+[`godmode/index.html`](godmode/index.html); details and changelog in [`godmode/README.md`](godmode/README.md).
