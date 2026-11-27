@@ -73,6 +73,35 @@ citizens never start it themselves. **With a goal**: the objective chain below, 
 island keeps running as a sandbox. The pause menu switches between the two at any time (until the Spire is built).
 The bar under the zeitgeist shows the day, the generation and how many are alive.
 
+### The wider world
+
+The home island is one of 7 or 8 in an ocean, and everything nobody has seen yet is under fog. People clear the
+fog around themselves as they go about their lives (so the far side of the home island starts hidden too). Once the
+island has 20 Insight, a curious person standing on the shore may realise that **wood floats**. After that:
+
+- Every settlement of 4 or more (6 at home) stakes out a **dock** on its shore, and someone builds **boats** there
+  (8 wood each; one boat, or two once a settlement has 10 people).
+- Brave, curious adults take a boat out to **explore**, toward the darkest part of the map. They see far, sail around
+  any island they spot, and come home with stories (and a little Insight). The first to see an island **names it**.
+- When a settlement is big enough (9 at home in an endless world, 13 with the goal on, 12 in a colony) and an
+  island has been found that nobody lives on, a group may **leave for good** to found a settlement of their own.
+  At most 45% of a settlement goes, plus partners and small children:
+  - a **faith colony**: a faction outnumbered at home, or one that just lost a war, takes its faction with it;
+  - a **company town**: someone with 40+ coin takes their workers, who all work for the founder;
+  - a **war host**: the bravest and angriest, who go on to **raid** other settlements by boat for food and wood;
+  - a **free camp**: the unhappy, or just too many people for the island.
+- Each settlement has its own hearth, stockpile, huts, farms, dock, shrine or terminal, and its own factions and
+  leaders. People only meet, marry, argue and follow leaders on their own island, so the groups drift apart.
+- Settlements **trade** by boat (swapping their most plentiful goods, which eases bad blood), and war hosts, or anyone
+  with enough bad blood, **raid**. The defenders fight back.
+- Anyone stuck on an island that is not their settlement's joins whoever lives there, or lights a fire and starts
+  a camp. An island where you Create a person with nobody else there gets that person's camp. Intervene can carry
+  someone across the sea to another settlement.
+- The **&#9678;** button jumps the view between settlements, boats at sea, and the whole known world. The resource
+  bar shows the stockpile of whichever settlement you are looking at (Insight is shared by everyone). Tap a hearth
+  to read about its settlement: founder, kind, creed, people, stockpile and rivals.
+- The Spire can only be built on the home island.
+
 ### Looking into a life
 
 Tap someone with Observe, then **LIFE**. Time stops while the panel is open.
@@ -152,6 +181,8 @@ godmode/
     world.js          island height field, walkability, resource nodes   (no DOM, no THREE)
     sim.js            citizens, needs, beliefs, memetics, economy, powers, progression, save format (no DOM, no THREE)
     society.js        families, romance, opinions, gossip, leaders and factions, shops and coin, pastimes, fights, war
+    life.js           ageing, generations, memories, secrets, desires, the god's steering actions
+    voyage.js         fog, boats and docks, exploration, settlements founded by emigrants, raids and trade
     render.js         Three.js scene: terrain, instanced nodes, buildings, citizens, effects, camera
     audio.js          WebAudio effects and a sparse generative tune (no audio files)
     ui.js             HUD, inspector, palettes, tutorial, menus, dialogs
@@ -187,6 +218,47 @@ node godmode/tests/play_phone.js    # needs Playwright + Chromium; screenshots g
 ```
 
 ## Changelog
+
+### 0.6, Nov 27 2026: an archipelago in the fog, boats, and settlements that break away
+
+- **World** (`world.js`): `makeIsles()` adds 6 or 7 islands at 50 to 105 units from home, each with its own height
+  grid, shoreline, optional peak and pond, and a character (forest, stone or meadow) that sets its trees, rocks and
+  bushes. `groundY`, `walkable`, `clampWalk` and `heightRaw` work on any isle; the home isle is still `W` itself.
+  Sea level `SEA_Y`, fog grid 70x70 cells of 4 units (`fogIdx`, `fogKnown`).
+- **Voyages** (new `voyage.js`): settlements (`S.sets`, each with its own stockpile; home's is still `S.res`),
+  fog reveal and discovery and naming, the invention of boats, docks (`BUILD.dock`), shipwrights, boats (`S.boats`)
+  that steer around land, exploring crews, exodus to found faith colonies, company towns, war hosts and free camps,
+  raids, trade, a planner for each colony, and the rescue of anyone stranded. New states `shipwright embark aboard
+  ashore reboard`. Hunger runs at 40% at sea.
+- **Everything local**: gathering, eating, building, stockpiles, homes, farms, shrines, terminals, shops, customers,
+  theft, fights, dates, play and fishing now use the person's own settlement and island. Factions are per settlement
+  (`f.set`). Births need food in the couple's own settlement. People fish the sea for food when their island has
+  nothing to forage, and only try to gather what their island has (`isleHas`).
+- `POP_MAX` is 40, and `popCap` grows by 4 for each living colony.
+- **Render**: every isle gets terrain, a beach and a rocky skirt into the sea; an animated low-poly ocean; two lumpy
+  fog layers built only over unexplored cells, with soft edges; boats with sails in their settlement's creed colour;
+  dock piers. Isles stay hidden until found. Clouds are higher; the old grid now lies just under the sea. The camera
+  can zoom to 140 and pan as far as anyone has seen.
+- **UI**: the &#9678; jump button, the resource bar for the settlement in view, day/generation/settlements/isles in the
+  endless bar, hearth and dock inspectors, where someone lives on their LIFE page. Banners for boats, land,
+  exodus, new settlements and raids.
+- **Save v3**: adds `fog` (a string of 0s and 1s), `sets`, `boats`, `tech`, `found`, `isleNames`, `rival`, and the isle
+  of each node. A v2 save loads with its island fully explored and the new isles' resources generated.
+- Tests: the endless runs in `sim_balance.js` now also require boats, at least 2 islands found and at least 1
+  settlement founded. `play_phone.js` checks that the fog exists, that unseen islands are hidden, and that the jump
+  button moves the view.
+
+**Results by script (75 min endless, seeds 1 and 2):** boats invented and built (9 and 6 boats); 6 and 4 islands
+found; 6 and 4 settlements founded, of all four kinds across the seeds; raids and trade happened; at the end there
+were 39 to 40 people. A third seed (not in the test) ended with the First Village itself empty: everyone had left
+or died. **Starvation** still happens in some worlds: 8 deaths in seed 1 and 0 in seed 2 (down from 27 before the
+fixes). Goal runs: passive Singularity 15:14 and 17:43 (seeds 1, 2), assisted 11:31 to 11:38.
+**Tested:** both scripts pass; a v2 save loads and runs 30 more minutes; screenshots of the fogged start, the
+archipelago from above, a colony with a dock, a boat at sea and a colony's hearth.
+**Not tested / known:** on a phone. The software-rendered test browser now runs at about 31 to 48 fps
+(was about 50). The sea is redrawn every frame. The zeitgeist, the Ages, Insight and cycles are still shared by the
+whole world, not per settlement.
+
 
 ### 0.5, Nov 27 2026: endless play, generations, and a god's view of every life
 

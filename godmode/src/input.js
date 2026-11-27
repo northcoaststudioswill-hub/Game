@@ -12,9 +12,9 @@ function initControls(canvas) {
     const C = R.cam, k = C.dist * 0.0021;
     C.tx += (-Math.cos(C.yaw) * dx - Math.sin(C.yaw) * dy) * k;
     C.tz += (Math.sin(C.yaw) * dx - Math.cos(C.yaw) * dy) * k;
-    const r = hyp(C.tx, C.tz);
-    if (r > 19) { C.tx *= 19 / r; C.tz *= 19 / r; }
-    C.follow = 0; C.auto = false;
+    const r = hyp(C.tx, C.tz), lim = APP.S && APP.S.knownR ? APP.S.knownR : 19;
+    if (r > lim) { C.tx *= lim / r; C.tz *= lim / r; }
+    C.follow = 0; C.auto = false; UI.goBoat = 0;
   }
   function dragHeld(p) {
     const g = groundPoint(p.x, p.y);
@@ -69,7 +69,7 @@ function initControls(canvas) {
     } else if (pts.size === 2 && pinch) {
       const a = [...pts.values()];
       const d = hyp(a[0].x - a[1].x, a[0].y - a[1].y), mx = (a[0].x + a[1].x) / 2, my = (a[0].y + a[1].y) / 2;
-      if (d > 10 && pinch.d > 10) R.cam.dist = clamp(R.cam.dist * pinch.d / d, 8, 70);
+      if (d > 10 && pinch.d > 10) R.cam.dist = clamp(R.cam.dist * pinch.d / d, 8, 140);
       panBy(mx - pinch.mx, my - pinch.my);
       APP.camMoved += Math.abs(d - pinch.d) + Math.abs(mx - pinch.mx) + Math.abs(my - pinch.my);
       pinch.d = d; pinch.mx = mx; pinch.my = my;
@@ -93,7 +93,7 @@ function initControls(canvas) {
   canvas.addEventListener('wheel', e => {
     e.preventDefault();
     if (!playing()) return;
-    R.cam.dist = clamp(R.cam.dist * Math.exp(e.deltaY * 0.0012), 8, 70);
+    R.cam.dist = clamp(R.cam.dist * Math.exp(e.deltaY * 0.0012), 8, 140);
     R.cam.auto = false;
     APP.camMoved += 40;
   }, { passive: false });
@@ -126,8 +126,8 @@ function initControls(canvas) {
     else if (e.key === ' ') { e.preventDefault(); setSpeed(APP.speed === 1 ? 2 : APP.speed === 2 ? 4 : 1); }
     else if (e.key === 'ArrowLeft') R.cam.yaw -= 0.25;
     else if (e.key === 'ArrowRight') R.cam.yaw += 0.25;
-    else if (e.key === 'ArrowUp') R.cam.dist = clamp(R.cam.dist * 0.88, 8, 70);
-    else if (e.key === 'ArrowDown') R.cam.dist = clamp(R.cam.dist * 1.14, 8, 70);
+    else if (e.key === 'ArrowUp') R.cam.dist = clamp(R.cam.dist * 0.88, 8, 140);
+    else if (e.key === 'ArrowDown') R.cam.dist = clamp(R.cam.dist * 1.14, 8, 140);
   });
 }
 

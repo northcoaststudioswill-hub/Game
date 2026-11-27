@@ -38,6 +38,7 @@ function initUI() {
   $('btnSpeed').onclick = () => { sfx('click'); setSpeed(APP.speed === 1 ? 2 : APP.speed === 2 ? 4 : 1); };
   $('pw').querySelectorAll('button').forEach(b => { b.onclick = () => { auInit(); sfx('click'); setPower(b.dataset.p === APP.power && b.dataset.p !== 'observe' ? 'observe' : b.dataset.p); }; });
   $('inClose').onclick = () => { sfx('click'); selectCitizen(0); UI.inspectB = 0; };
+  $('btnGo').onclick = () => { sfx('click'); goNext(); };
   $('inLife').onclick = () => { sfx('click'); if (APP.S.selected) openLife(APP.S.selected); };
   $('lfClose').onclick = () => { sfx('click'); closeLife(); };
   $('lfTabs').querySelectorAll('button').forEach(b => { b.onclick = () => { sfx('click'); UI.lifeTab = b.dataset.t; UI.lifePick = ''; renderLife(); }; });
@@ -88,10 +89,11 @@ function updateUI(S, dt) {
   UI.tickT = 0.18;
 
   const pop = S.citizens.length;
-  $('rFood').textContent = S.res.food | 0; $('rWood').textContent = S.res.wood | 0;
-  $('rStone').textContent = S.res.stone | 0; $('rInsight').textContent = S.res.insight | 0;
+  const vt = viewedSet(S), vr = resOf(S, vt.id);
+  $('rFood').textContent = vr.food | 0; $('rWood').textContent = vr.wood | 0;
+  $('rStone').textContent = vr.stone | 0; $('rInsight').textContent = S.res.insight | 0;
   $('rPop').textContent = pop + '/' + popCap(S);
-  $('cFood').classList.toggle('low', S.res.food < pop * 0.5);
+  $('cFood').classList.toggle('low', vr.food < setPop(S, vt.id) * 0.5);
   setW($('cycFill'), S.cycles / S.cyclesMax);
   $('cycNum').textContent = S.freeCycles ? 'UNLIMITED' : (S.cycles | 0) + ' / ' + S.cyclesMax;
   for (let k = 0; k < 4; k++) $('z' + k).style.width = (pop ? S.counts[k] / pop * 100 : 0).toFixed(1) + '%';
@@ -101,7 +103,8 @@ function updateUI(S, dt) {
   if (!S.goal || S.sandbox) {
     $('qTitle').textContent = S.sandbox ? 'SANDBOX' : 'ENDLESS';
     const sp = firstB(S, 'spire');
-    $('qText').textContent = 'Day ' + dayOf(S) + ' \u00b7 generation ' + generation(S) +
+    const nsets = S.sets.filter(t => !t.empty && setPop(S, t.id)).length, nfound = S.found.filter(Boolean).length;
+    $('qText').textContent = 'Day ' + dayOf(S) + ' \u00b7 gen ' + generation(S) + (nsets > 1 ? ' \u00b7 ' + nsets + ' settlements' : '') + (nfound > 1 ? ' \u00b7 ' + nfound + '/' + S.found.length + ' isles' : '') +
       (S.sandbox ? '' : sp ? (sp.built ? '' : ' \u00b7 Spire ' + ((sp.progress * 100) | 0) + '%') : S.spireUnlocked ? ' \u00b7 the Spire is yours to build' : '');
     $('qProg').textContent = S.citizens.length + ' alive';
   } else {
@@ -139,7 +142,7 @@ function updateInspect(S) {
     $('inDot').style.background = dom >= 0 ? BELIEFS[dom].hex : '#06231a';
     $('inName').textContent = c.name + ', ' + ageYears(c) + ' / ' + (dom >= 0 ? BELIEFS[dom].who : 'Undecided');
     $('inThought').textContent = c.thought;
-    $('inNeeds').hidden = false; $('inBel').hidden = false; $('inFollow').hidden = false;
+    $('inNeeds').hidden = false; $('inBel').hidden = false; $('inFollow').hidden = false; $('inLife').hidden = false;
     setW($('nFed'), 1 - c.hunger); setW($('nJoy'), c.happy); setW($('nFear'), c.fear); setW($('nCur'), c.curio);
     $('nFed').style.background = c.hunger > 0.8 ? 'var(--bad)' : '';
     for (let k = 0; k < 4; k++) setW($('bl' + k), c.b[k]);
@@ -161,11 +164,40 @@ function updateInspect(S) {
       $('inName').textContent = (b.built ? shopName(S, b) : BIZ[b.biz].name + ' / blueprint ' + ((b.progress * 100) | 0) + '%');
       extra = BIZ[b.biz].desc + ' Owner: ' + (ow ? ow.name + ' (' + ow.coin + ' coin)' : 'nobody') + '. Staff: ' + (staff.join(', ') || 'none') + '. Takings so far: ' + (b.till || 0) + ' coin.' + (b.built ? '' : ' ' + extra.slice(def.desc.length));
     }
-    else if (b.type === 'fire') extra += ' Capacity ' + popCap(S) + ' minds.';
+    else if (b.type === 'fire') {
+      const t = setById(S, b.set || 1), r = resOf(S, t.id), f = getC(S, t.founder);
+      $('inName').textContent = t.name;
+      extra = 'The hearth of ' + t.name + ', a ' + SET_KINDS[t.kind].name + ' on ' + isleName(S, t.isle) + ', since day ' + t.day + '. ' + SET_KINDS[t.kind].desc +
+        (t.id !== 1 ? ' Founded by ' + (f ? f.name : nameOf(S, t.founder)) + '.' : '') + ' ' + setPop(S, t.id) + ' living here. Stockpile: ' + (r.food | 0) + ' food, ' + (r.wood | 0) + ' wood, ' + (r.stone | 0) + ' stone.' +
+        (t.k >= 0 ? ' Their creed: ' + BELIEFS[t.k].name + '.' : '');
+      const rv = S.sets.filter(o => o !== t && (S.rival[rivalKey(o.id, t.id)] || 0) >= 4).map(o => o.name);
+      if (rv.length) extra += ' Bad blood with ' + rv.join(', ') + '.';
+    }
+    else if (b.type === 'dock') { const bs = S.boats.filter(x => x.set === b.set); extra += ' Boats: ' + (bs.map(x => x.name + ' (' + (x.st === 'docked' ? 'moored' : 'at sea') + ')').join(', ') || 'none yet') + '.'; }
     $('inThought').textContent = extra;
-    $('inNeeds').hidden = true; $('inBel').hidden = true; $('inFollow').hidden = true;
+    $('inNeeds').hidden = true; $('inBel').hidden = true; $('inFollow').hidden = true; $('inLife').hidden = true;
     $('inFoot').textContent = '';
   }
+}
+
+/* the settlement nearest where the camera is looking */
+function viewedSet(S) {
+  let best = S.sets[0], bd = 1e9;
+  for (const t of S.sets) { if (t.empty) continue; const d = hyp(t.x - R.cam.tx, t.z - R.cam.tz); if (d < bd) { bd = d; best = t; } }
+  return best;
+}
+/* jump the camera: each settlement in turn, then any boat at sea */
+function goNext() {
+  const S = APP.S, spots = [];
+  for (const t of S.sets) if (!t.empty && setPop(S, t.id)) spots.push({ x: t.x, z: t.z, d: 30, text: t.name + ' on ' + isleName(S, t.isle) + ': ' + setPop(S, t.id) + ' souls, a ' + SET_KINDS[t.kind].name + '.' });
+  for (const b of S.boats) if (b.st === 'out' || b.st === 'back' || b.st === 'wait') spots.push({ x: b.x, z: b.z, d: 22, boat: b.id, text: b.name + ' at sea' + (b.m && b.m.kind === 'settle' ? ', carrying the founders of ' + b.m.name : b.m && b.m.kind === 'raid' ? ', full of raiders' : b.m && b.m.kind === 'trade' ? ', carrying traders' : ', exploring') + '.' });
+  spots.push({ x: 0, z: 0, d: Math.min(140, Math.max(40, S.knownR * 1.6)), text: 'Everything they have seen so far: ' + S.found.filter(Boolean).length + ' of the islands.' });
+  if (!spots.length) return;
+  UI.goI = ((UI.goI || 0) + 1) % spots.length;
+  const p = spots[UI.goI], C = R.cam;
+  C.follow = 0; C.auto = false; C.tx = p.x; C.tz = p.z; C.dist = p.d;
+  UI.goBoat = p.boat || 0;
+  ticker(p.text, '');
 }
 
 /* ------------------------------------------------------------ life panel
@@ -203,6 +235,7 @@ function renderLife() {
       'Generation ' + c.gen + (c.par.length ? ', child of ' + c.par.map(id => esc(nameOf(S, id))).join(' and ') : '') + '. ' +
       (c.dom >= 0 ? (/^[aeiou]/i.test(BELIEFS[c.dom].who) ? 'An ' : 'A ') + BELIEFS[c.dom].who.toLowerCase() + ' of ' + BELIEFS[c.dom].name : 'Believes nothing in particular') +
       (f ? (c.title === 'leader' ? ', and leads the ' : ', of the ') + esc(f.name) : '') + '. ' +
+      'Lives in ' + esc(setById(S, c.set).name) + ' on ' + esc(isleName(S, c.isle)) + (c.boat ? ', though right now they are at sea' : '') + '. ' +
       'Feeling ' + moodWord(c) + '. ' + c.coin + ' coin. ' + (c.grow < 1 ? '' : 'Expected to live to about ' + ageYears({ age: c.life, grow: 1 }) + '.') + '</div>';
     h += '<div class="dim">Thinking: &ldquo;' + esc(c.thought) + '&rdquo;</div>';
     h += '<h4>WHAT THEY WANT</h4>';

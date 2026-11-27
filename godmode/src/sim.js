@@ -19,7 +19,7 @@ function newSim(seed, goal) {
     birthCd: 42, secAcc: 0, planT: 4, selected: 0, held: 0, emptyT: 0, used: {}
   };
   S.rng = mulberry32((seed ^ 0x9e3779b9) >>> 0);
-  S.buildings.push({ id: S.nextId++, type: 'fire', x: 0, z: 0, progress: 1, built: true, rot: 0 });
+  S.buildings.push({ id: S.nextId++, type: 'fire', x: 0, z: 0, progress: 1, built: true, rot: 0, set: 1, isle: 0 });
   const lean = [DEV, DEV, DREAD, ACCEL, KIN, -1];
   for (let i = 0; i < 6; i++) {
     const a = i / 6 * TAU + 0.4;
@@ -29,6 +29,7 @@ function newSim(seed, goal) {
     memo(S, c, 'Woke up on the island beside five strangers, with no memory of before.');
   }
   fillSociety(S);
+  fillVoyage(S);
   rebuildObstacles(S);
   logMsg(S, 'ISLAND.SIM loaded. Six minds running. They think the sky is weather.', 'sys');
   return S;
@@ -52,6 +53,7 @@ function addCitizen(S, x, z) {
   };
   fillCitizen(c);
   fillLife(c, S);
+  c.set = 1; c.boat = 0; c.isle = S.world.isles ? isleNear(S.world, x, z) : 0;
   c.life = 1500 + r() * 700;
   S.citizens.push(c);
   return c;
@@ -62,6 +64,7 @@ function addCitizen(S, x, z) {
 function isNight(S) { return S.day >= NIGHT_FROM; }
 function popCap(S) {
   let n = 6;
+  if (S.sets) for (const t of S.sets) if (t.id !== 1 && !t.empty) n += 4;
   for (const b of S.buildings) if (b.type === 'hut' && b.built) n += 3;
   return Math.min(POP_MAX, n);
 }
@@ -125,13 +128,14 @@ function workSpeed(S, c) {
   return w;
 }
 function rebuildObstacles(S) {
-  const W = S.world, o = [W.mountain, W.pond];
-  for (const b of S.buildings) if (b.type !== 'farm') o.push({ x: b.x, z: b.z, r: BUILD[b.type].r * 0.8, id: b.id });
+  const W = S.world, o = [];
+  for (const I of W.isles) for (const q of [I.mountain, I.pond]) if (q) o.push({ x: I.cx + q.x, z: I.cz + q.z, r: q.r });
+  for (const b of S.buildings) if (b.type !== 'farm' && b.type !== 'dock') o.push({ x: b.x, z: b.z, r: BUILD[b.type].r * 0.8, id: b.id });
   S.obst = o;
 }
-function pendingCost(S, res) {
+function pendingCost(S, res, set) {
   let n = 0;
-  for (const b of S.buildings) if (!b.built) n += (BUILD[b.type].cost[res] || 0) * (1 - b.progress);
+  for (const b of S.buildings) if (!b.built && (b.set || 1) === (set || 1)) n += (BUILD[b.type].cost[res] || 0) * (1 - b.progress);
   return n;
 }
 
@@ -154,8 +158,9 @@ function moveToward(S, c, tx, tz, speed, dt, stop) {
       nz = o.z + oz / qd * rr + (ox / qd) * side * step * 0.7;
     }
   }
-  const r = hyp(nx, nz), lim = rimR(S.world, Math.atan2(nx, nz)) - 1.5;
-  if (r > lim) { nx *= lim / r; nz *= lim / r; }
+  const I = S.world.isles[c.isle || 0], lx = nx - I.cx, lz = nz - I.cz;
+  const r = hyp(lx, lz), lim = rimR(I, Math.atan2(lx, lz)) - 1.5;
+  if (r > lim) { nx = I.cx + lx * lim / r; nz = I.cz + lz * lim / r; }
   const mvx = nx - c.x, mvz = nz - c.z;
   if (mvx * mvx + mvz * mvz > 1e-8) c.face += angDiff(c.face, Math.atan2(mvx, mvz)) * Math.min(1, dt * 12);
   c.x = nx; c.z = nz; c.moving = true;
@@ -190,7 +195,7 @@ function nearestNode(S, c, type) {
   const nodes = S.world.nodes;
   for (let i = 0; i < nodes.length; i++) {
     const n = nodes[i];
-    if (n.dead || n.type !== type || n.amount <= 0) continue;
+    if (n.dead || n.type !== type || n.amount <= 0 || (n.isle || 0) !== (c.isle || 0)) continue;
     let claimed = 0;
     for (const o of S.citizens) if (o !== c && o.state === 'gather' && o.tk === 'node' && o.tid === i && o.ph < 2) claimed++;
     if (claimed >= 2) continue;
@@ -199,6 +204,13 @@ function nearestNode(S, c, type) {
   }
   return best;
 }
+/* does this isle have any of a resource left right now? (cached for a second) */
+function isleHas(S, isle, type) {
+  const key = (isle || 0) + type;
+  if (!S._has || S._hasT !== (S.t | 0)) { S._has = {}; S._hasT = S.t | 0; }
+  if (S._has[key] === undefined) S._has[key] = S.world.nodes.some(n => !n.dead && n.amount > 0 && n.type === type && (n.isle || 0) === (isle || 0));
+  return S._has[key];
+}
 function countDoing(S, state, tk) {
   let n = 0;
   for (const c of S.citizens) if (c.state === state && (tk === undefined || c.tk === tk)) n++;
@@ -206,7 +218,8 @@ function countDoing(S, state, tk) {
 }
 function hasRes(S, b) {
   const cost = BUILD[b.type].cost;
-  for (const k in cost) if (S.res[k] < 0.6) return k;
+  const res = resOf(S, b.set || 1);
+  for (const k in cost) if ((k === 'insight' ? S.res : res)[k] < 0.6) return k;
   return '';
 }
 function buildersAt(S, id) {
@@ -218,7 +231,7 @@ function buildersAt(S, id) {
 function startGather(S, c, res, why) {
   if (res === 'food') {
     let farm = null, fd = 1e9;
-    for (const b of S.buildings) if (b.type === 'farm' && b.built && b.food > 0) {
+    for (const b of S.buildings) if (b.type === 'farm' && b.built && b.food > 0 && b.isle === c.isle) {
       const d = hyp(b.x - c.x, b.z - c.z);
       if (d < fd) { fd = d; farm = b; }
     }
@@ -238,7 +251,8 @@ function startGather(S, c, res, why) {
 }
 function startDeposit(S, c) {
   setState(c, 'gather', 'Carrying ' + c.carry.type + ' back to the hearth.');
-  c.ph = 2; c.tk = 'node'; c.tid = -1; c.gres = c.carry.type; spotNear(c, 0, 0, BUILD.fire.r + 0.5);
+  const h = hearthOf(S, c);
+  c.ph = 2; c.tk = 'node'; c.tid = -1; c.gres = c.carry.type; spotNear(c, h.x, h.z, BUILD.fire.r + 0.5);
 }
 function startBuild(S, c, b, why) {
   setState(c, 'build', why || ('Building the ' + BUILD[b.type].name.replace('The ', '') + '.'));
@@ -272,7 +286,7 @@ function findPartner(S, c) {
 }
 
 function think(S, c) {
-  const B = c.b, pop = S.citizens.length, night = isNight(S), r = S.rng;
+  const B = c.b, pop = setPop(S, c.set || 1), night = isNight(S), r = S.rng, RS = RES(S, c), HH = hearthOf(S, c);
   if (c.carry) { startDeposit(S, c); return; }
   if (c.grow < 1) { kidThink(S, c); return; }
 
@@ -282,10 +296,10 @@ function think(S, c) {
   // --- eat
   const hungry = 0.55 + 0.36 * B[ACCEL];
   if (c.hunger > hungry) {
-    if (S.res.food >= 1) {
+    if (RS.food >= 1) {
       consider(2.2 + c.hunger * 3, () => {
         setState(c, 'eat', c.hunger > 0.85 ? 'Starving! Running to the hearth.' : 'Hungry. Going to the hearth to eat.');
-        c.tk = 'fire'; spotNear(c, 0, 0, BUILD.fire.r + 0.5);
+        c.tk = 'fire'; spotNear(c, HH.x, HH.z, BUILD.fire.r + 0.5);
       });
     } else {
       const i = nearestNode(S, c, 'bush');
@@ -294,6 +308,7 @@ function think(S, c) {
         setState(c, 'eat', 'The stockpile is empty. Foraging for berries.');
         c.tk = 'bush'; c.tid = i; spotNear(c, n.x, n.z, 0.8);
       });
+      else consider(2.0 + c.hunger * 3, () => fishForFood(S, c));
     }
   }
 
@@ -308,7 +323,7 @@ function think(S, c) {
     consider(1.9 - up, () => {
       const h = getB(S, c.home);
       setState(c, 'sleep', h ? 'It is dark. Heading home to sleep.' : 'No bed for me. Sleeping by the fire.');
-      if (h) spotNear(c, h.x, h.z, BUILD.hut.r + 0.45); else spotNear(c, 0, 0, BUILD.fire.r + 0.9);
+      if (h) spotNear(c, h.x, h.z, BUILD.hut.r + 0.45); else spotNear(c, HH.x, HH.z, BUILD.fire.r + 0.9);
     });
   }
 
@@ -320,7 +335,7 @@ function think(S, c) {
   // --- build
   let site = null, su = -1;
   for (const b of S.buildings) {
-    if (b.built) continue;
+    if (b.built || b.isle !== c.isle || (b.set || 1) !== (c.set || 1)) continue;
     if (hasRes(S, b)) continue;
     const nb = buildersAt(S, b.id), maxB = b.type === 'spire' ? 5 : 2;
     if (nb >= maxB) continue;
@@ -332,25 +347,26 @@ function think(S, c) {
     site.type === 'spire' ? 'The Spire must rise. I do not know why I know that.' : null));
 
   // --- gather
-  const foodT = pop * 2.5 + 4, woodT = 9 + pendingCost(S, 'wood') + (S.spireUnlocked && !firstB(S, 'spire') ? 20 : 0);
-  const stoneT = 7 + pendingCost(S, 'stone') + (S.spireUnlocked && !firstB(S, 'spire') ? 20 : 0);
+  const foodT = pop * 2.5 + 4, woodT = 9 + pendingCost(S, 'wood', c.set) + (S.spireUnlocked && !firstB(S, 'spire') ? 20 : 0);
+  const stoneT = 7 + pendingCost(S, 'stone', c.set) + (S.spireUnlocked && !firstB(S, 'spire') ? 20 : 0);
   const need = (have, target) => clamp(1 - have / target, 0, 1);
   let nf = 0, nw = 0, ns = 0;
-  for (const o of S.citizens) if (o.state === 'gather' && o !== c) { if (o.gres === 'food') nf++; else if (o.gres === 'wood') nw++; else ns++; }
-  const fNeed = need(S.res.food, foodT), wNeed = need(S.res.wood, woodT), sNeed = need(S.res.stone, stoneT);
+  for (const o of S.citizens) if (o.state === 'gather' && o !== c && o.set === c.set) { if (o.gres === 'food') nf++; else if (o.gres === 'wood') nw++; else ns++; }
+  const fNeed = need(RS.food, foodT), wNeed = need(RS.wood, woodT), sNeed = need(RS.stone, stoneT);
   consider(0.35 + 1.7 * fNeed + 0.3 * B[KIN] - nf * 0.22 + decreeBonus(S, c, 'food'), () => {
-    if (!startGather(S, c, 'food', fNeed > 0.5 ? 'Food is running low. Picking berries.' : 'Gathering food for the stockpile.')) setIdle(S, c);
+    if (!startGather(S, c, 'food', fNeed > 0.5 ? 'Food is running low. Picking berries.' : 'Gathering food for the stockpile.') && !fishForFood(S, c)) setIdle(S, c);
   });
-  consider(0.3 + 1.25 * wNeed - nw * 0.22 + decreeBonus(S, c, 'wood'), () => {
+  const hasT = isleHas(S, c.isle, 'tree'), hasR = isleHas(S, c.isle, 'rock');
+  if (hasT) consider(0.3 + 1.25 * wNeed - nw * 0.22 + decreeBonus(S, c, 'wood'), () => {
     if (!startGather(S, c, 'wood', wNeed > 0.3 ? 'We need wood. Off to chop a tree.' : 'Topping up the woodpile.')) setIdle(S, c);
   });
-  consider(0.3 + 1.25 * sNeed - ns * 0.22, () => {
+  if (hasR) consider(0.3 + 1.25 * sNeed - ns * 0.22, () => {
     if (!startGather(S, c, 'stone', sNeed > 0.3 ? 'We need stone. Heading to the rocks.' : 'Fetching some spare stone.')) setIdle(S, c);
   });
 
   // --- tend a farm that is still growing
   for (const b of S.buildings) {
-    if (b.type !== 'farm' || !b.built || b.food > 0) continue;
+    if (b.type !== 'farm' || !b.built || b.food > 0 || b.isle !== c.isle) continue;
     let tended = false;
     for (const o of S.citizens) if (o.state === 'farm' && o.tid === b.id) tended = true;
     if (tended) continue;
@@ -361,18 +377,20 @@ function think(S, c) {
   // --- worship
   if (B[DEV] + B[DREAD] > 0.25 && !(c.prayCd > 0) && countB(S, 'shrine', true) > 0 && countDoing(S, 'worship') < 4 * countB(S, 'shrine', true)) {
     const sh = nearestBuilt(S, c, 'shrine');
-    const u = 0.2 + 1.3 * B[DEV] + 0.9 * B[DREAD] * (0.4 + c.fear) - 1.2 * B[KIN] + decreeBonus(S, c, 'worship');
+    if (sh) { const u = 0.2 + 1.3 * B[DEV] + 0.9 * B[DREAD] * (0.4 + c.fear) - 1.2 * B[KIN] + decreeBonus(S, c, 'worship');
     consider(u, () => startWork(S, c, 'worship', sh, B[DREAD] > B[DEV]
-      ? 'If I pray hard enough, perhaps it will spare me.' : 'Going to the shrine to thank the Watcher.'));
+      ? 'If I pray hard enough, perhaps it will spare me.' : 'Going to the shrine to thank the Watcher.')); }
   }
 
   // --- study
   if (countB(S, 'lab', true) > 0 && countDoing(S, 'study') < 2 + countB(S, 'lab', true)) {
     const lab = nearestBuilt(S, c, 'lab');
+    if (lab) {
     const sp = firstB(S, 'spire');
     const push = (sp && !sp.built && S.res.insight < 20) ? 0.7 : 0;
     consider(0.15 + 0.8 * c.curio + 1.1 * B[ACCEL] + push + decreeBonus(S, c, 'study'), () => startWork(S, c, 'study', lab,
       B[ACCEL] > 0.5 ? 'The Terminal is waiting. There is so much to compute.' : 'Curious. Going to study at the Terminal.'));
+    }
   }
 
   // --- socialise
@@ -392,6 +410,7 @@ function think(S, c) {
   consider(0.22, () => setIdle(S, c));
 
   societyOptions(S, c, consider, night);
+  voyageOptions(S, c, consider, night);
   bestFn();
 }
 function setIdle(S, c) {
@@ -400,7 +419,7 @@ function setIdle(S, c) {
 }
 function nearestBuilt(S, c, type) {
   let best = null, bd = 1e9;
-  for (const b of S.buildings) if (b.type === type && b.built) {
+  for (const b of S.buildings) if (b.type === type && b.built && b.isle === c.isle) {
     const d = hyp(b.x - c.x, b.z - c.z);
     if (d < bd) { bd = d; best = b; }
   }
@@ -417,6 +436,7 @@ function updateCitizen(S, c, dt) {
   let hr = c.grow < 1 ? 0.005 : 0.0085;
   if (S.age === ACCEL) hr *= 1.2;
   if (c.state === 'sleep' && c.ph === 1) hr *= 0.4;
+  if (c.boat) hr *= 0.4;                          // rations at sea
   c.hunger = Math.min(1, c.hunger + hr * dt);
   if (c.hunger >= 1) {
     c.health -= dt * 0.02; B[DEV] = Math.max(0, B[DEV] - dt * 0.01);
@@ -448,7 +468,8 @@ function updateCitizen(S, c, dt) {
     }
   }
   if (c.state === 'held') return;
-  if (c.fear > 0.75 && c.state !== 'flee') startFlee(S, c, c.fx, c.fz);
+  if (c.boat && !VOY_STATES[c.state]) { c.state = 'aboard'; c.ph = 0; }      // nothing else happens at sea
+  if (c.fear > 0.75 && c.state !== 'flee' && !c.boat) startFlee(S, c, c.fx, c.fz);
 
   const sp = 2.25 * c.tr.speed * (c.carry ? 0.88 : 1) * (c.hunger > 0.9 ? 0.8 : 1) * (c.elder ? 0.78 : 1);
   const ws = workSpeed(S, c);
@@ -497,7 +518,7 @@ function updateCitizen(S, c, dt) {
       } else {
         m = moveToward(S, c, c.tx, c.tz, sp, dt, 0.3);
         if (m) {
-          if (c.carry) { S.res[c.carry.type] += c.carry.n; c.coin++; ev(S, 'deposit', { x: c.x, z: c.z, res: c.carry.type }); }
+          if (c.carry) { RES(S, c)[c.carry.type] += c.carry.n; c.coin++; ev(S, 'deposit', { x: c.x, z: c.z, res: c.carry.type }); }
           c.carry = null;
           finish(S, c);
         }
@@ -511,8 +532,9 @@ function updateCitizen(S, c, dt) {
         if (m === 'stuck') { finish(S, c); break; }
         if (m) {
           if (c.tk === 'fire') {
-            if (S.res.food < 1) { finish(S, c); break; }
-            S.res.food -= 1;
+            const RS = RES(S, c);
+            if (RS.food < 1) { finish(S, c); break; }
+            RS.food -= 1;
           } else {
             const n = S.world.nodes[c.tid];
             if (!n || n.dead || n.amount <= 0) { finish(S, c); break; }
@@ -540,16 +562,16 @@ function updateCitizen(S, c, dt) {
         if (m) { c.ph = 1; c.t = 14 + S.rng() * 8; }
       } else {
         faceTo(c, b.x, b.z, dt);
-        const def = BUILD[b.type], dp = dt * ws / def.work;
+        const def = BUILD[b.type], dp = dt * ws / def.work, RS = resOf(S, b.set || 1);
         let lack = '';
-        for (const k in def.cost) if (S.res[k] < def.cost[k] * dp) lack = k;
+        for (const k in def.cost) if ((k === 'insight' ? S.res : RS)[k] < def.cost[k] * dp) lack = k;
         if (lack) {
           c.stall += dt; b.stall = lack;
           c.thought = 'Waiting. The ' + def.name.replace('The ', '') + ' needs more ' + lack + '.';
           if (c.stall > 2.5) finish(S, c);
         } else {
           c.stall = 0; b.stall = '';
-          for (const k in def.cost) S.res[k] -= def.cost[k] * dp;
+          for (const k in def.cost) (k === 'insight' ? S.res : RS)[k] -= def.cost[k] * dp;
           b.progress += dp;
           if (b.type === 'spire') spireMilestones(S, b);
           if (b.progress >= 1) completeBuilding(S, b);
@@ -712,6 +734,7 @@ function updateCitizen(S, c, dt) {
     case 'mourn': {
       if (c.ph === 0) {
         m = moveToward(S, c, c.tx, c.tz, sp * 0.8, dt, 0.4);
+        if (m === 'stuck') { c.ph = 1; c.t = 5; emote(c, EM.skull, 3); break; }
         if (m) { c.ph = 1; c.t = 5; emote(c, EM.skull, 3); }
       } else {
         c.t -= dt;
@@ -722,6 +745,7 @@ function updateCitizen(S, c, dt) {
 
     default:
       if (SOCIAL_STATES[c.state]) updateSocial(S, c, dt, sp);
+      else if (VOY_STATES[c.state]) updateVoyage(S, c, dt, sp);
       else finish(S, c);
   }
 }
@@ -820,9 +844,11 @@ function kill(S, c, cause) {
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
   S.graves.push({ x: c.x, z: c.z, t: cause === 'age' || cause === 'peace' ? 160 : 110, name: c.name });
   S.stats.deaths++;
+  S.stats['died_' + cause] = (S.stats['died_' + cause] || 0) + 1;
   if (cause === 'age' || cause === 'peace') S.stats.oldAge = (S.stats.oldAge || 0) + 1;
   if (!S.dead) S.dead = {};
   S.dead[c.id] = c.name;
+  if (S.boats) for (const b of S.boats) b.crew = b.crew.filter(id => id !== c.id);
   S.used[c.name] = 0;
   for (const o of S.citizens) {
     if (o.mate === c.id) memo(S, o, 'Lost ' + c.name + ', their partner.');
@@ -868,8 +894,14 @@ function canPlace(S, type, x, z) {
   }
   return true;
 }
-function placeBuilding(S, type, x, z, auto) {
-  const b = { id: S.nextId++, type, x, z, progress: 0, built: false, rot: S.rng() * TAU, auto: !!auto, stall: '' };
+function setAt(S, x, z) {
+  const isle = isleNear(S.world, x, z);
+  let best = 0, bd = 1e9;
+  for (const t of S.sets || []) if (t.isle === isle && !t.empty) { const d = hyp(t.x - x, t.z - z); if (d < bd) { bd = d; best = t.id; } }
+  return best;
+}
+function placeBuilding(S, type, x, z, auto, setId) {
+  const b = { id: S.nextId++, type, x, z, progress: 0, built: false, rot: S.rng() * TAU, auto: !!auto, stall: '', set: setId || setAt(S, x, z) || 1, isle: isleNear(S.world, x, z) };
   if (type === 'farm') { b.growth = 0; b.food = 0; b.rot = ((S.rng() * 4) | 0) * TAU / 4; }
   S.buildings.push(b);
   // clear resource nodes under the footprint
@@ -878,14 +910,15 @@ function placeBuilding(S, type, x, z, auto) {
   ev(S, 'placed', { id: b.id, x, z, kind: type });
   return b;
 }
-function findSite(S, type) {
-  const r = S.rng;
+function findSite(S, type, setId) {
+  const r = S.rng, t = S.sets ? setById(S, setId || 1) : { x: 0, z: 0, isle: 0 };
   const base = type === 'spire' ? 5.5 : 3.6;
   for (let ring = 0; ring < 9; ring++) {
     const rad = base + ring * 1.1, a0 = r() * TAU, steps = 10 + ring * 2;
     for (let i = 0; i < steps; i++) {
       const a = a0 + i / steps * TAU;
-      const x = Math.sin(a) * rad, z = Math.cos(a) * rad;
+      const x = t.x + Math.sin(a) * rad, z = t.z + Math.cos(a) * rad;
+      if (isleNear(S.world, x, z) !== (t.isle || 0)) continue;
       if (canPlace(S, type, x, z)) return { x, z };
     }
   }
@@ -911,12 +944,12 @@ function completeBuilding(S, b) {
 function assignHomes(S) {
   const occ = {};
   for (const c of S.citizens) {
-    if (c.home && !getB(S, c.home)) c.home = 0;
+    if (c.home) { const h = getB(S, c.home); if (!h || (h.set || 1) !== (c.set || 1)) c.home = 0; }
     if (c.home) occ[c.home] = (occ[c.home] || 0) + 1;
   }
   for (const c of S.citizens) {
     if (c.home) continue;
-    for (const b of S.buildings) if (b.type === 'hut' && b.built && (occ[b.id] || 0) < 3) {
+    for (const b of S.buildings) if (b.type === 'hut' && b.built && (occ[b.id] || 0) < 3 && (b.set || 1) === (c.set || 1)) {
       c.home = b.id; occ[b.id] = (occ[b.id] || 0) + 1; break;
     }
   }
@@ -931,8 +964,8 @@ function spireMilestones(S, b) {
 function planner(S) {
   let pending = 0;
   const has = {}, pend = {};
-  for (const b of S.buildings) { has[b.type] = (has[b.type] || 0) + 1; if (!b.built) { pending++; pend[b.type] = 1; } }
-  const pop = S.citizens.length, cap = popCap(S);
+  for (const b of S.buildings) { if ((b.set || 1) !== 1) continue; has[b.type] = (has[b.type] || 0) + 1; if (!b.built) { pending++; pend[b.type] = 1; } }
+  const pop = setPop(S, 1), cap = 6 + 3 * S.buildings.filter(b => b.type === 'hut' && b.built && (b.set || 1) === 1).length;
   if (S.goal && S.spireUnlocked && !has.spire && S.t - S.spireUnlockT > 75) {
     const p = findSite(S, 'spire');
     if (p) {
@@ -944,7 +977,7 @@ function planner(S) {
   if (pending >= 2) return;
   let want = '';
   const hutsAll = has.hut || 0;
-  if (pop >= cap - 1 && 6 + hutsAll * 3 < POP_MAX + 1 && !pend.hut && hutsAll < BUILD.hut.max) want = 'hut';
+  if (pop >= cap - 1 && popCap(S) < POP_MAX && !pend.hut && hutsAll < BUILD.hut.max) want = 'hut';
   else if ((has.farm || 0) < Math.min(5, Math.ceil(pop / 5)) && !pend.farm && (pop >= 7 || S.res.food < pop * 1.5)) want = 'farm';
   else if (pop >= 8 || S.t > 300) {
     const labFirst = S.counts[ACCEL] > S.counts[DEV] + S.counts[DREAD];
@@ -1024,13 +1057,14 @@ function secondTick(S) {
 
   // births
   S.birthCd -= 1;
-  if (S.birthCd <= 0 && pop >= 2 && pop < popCap(S) && S.res.food >= pop * 1.2 + 3) {
+  if (S.birthCd <= 0 && pop >= 2 && pop < popCap(S)) {
     let avg = 0;
     for (const c of cs) avg += c.happy;
-    const pair = avg / pop > 0.42 ? couplesBirth(S) : null;
+    let pair = avg / pop > 0.42 ? couplesBirth(S) : null;
+    if (pair && resOf(S, pair[0].set).food < setPop(S, pair[0].set) * 1.2 + 3) pair = null;
     if (pair) {
       const pa = pair[0], pb = pair[1];
-      const home = getB(S, pa.home) || firstB(S, 'fire');
+      const home = getB(S, pa.home) || hearthOf(S, pa);
       clampWalk(S.world, home.x + (S.rng() - 0.5) * 3, home.z + 1.8 + S.rng(), _pt);
       const n = addCitizen(S, _pt.x, _pt.z);
       makeChild(S, pa, pb, n);
@@ -1042,6 +1076,7 @@ function secondTick(S) {
       if (cs.length === 10) whisper(S, 'pop10', 'Ten minds. Their conversations now carry more information than their bodies do.');
     } else S.birthCd = 8;
   } else if (S.birthCd <= 0) S.birthCd = 5;
+  voyageTick(S);
 
   // extinction is not allowed to end the session
   if (pop === 0) {
@@ -1210,7 +1245,7 @@ function powerSmite(S, x, z, id) {
     }
   } else if (hitN) {
     const res = hitN.type === 'tree' ? 'wood' : hitN.type === 'rock' ? 'stone' : 'food';
-    S.res[res] += hitN.amount;
+    resOf(S, setAt(S, x, z) || 1)[res] += hitN.amount;
     ev(S, 'shatter', { x, z, res, n: hitN.amount });
     hitN.amount = 0; hitN.regrow = hitN.type === 'tree' ? 80 : hitN.type === 'rock' ? 140 : 38;
   }
@@ -1227,6 +1262,15 @@ function powerCreate(S, kind, x, z) {
     clampWalk(W, x, z, _pt);
     spend(S, COST.citizen);
     const c = addCitizen(S, _pt.x, _pt.z);
+    let st = setAt(S, c.x, c.z);
+    if (!st) {
+      // a mind placed on an empty island is its own little camp
+      const t = { id: S.setId++, name: c.name + "'s Camp", isle: c.isle, x: c.x, z: c.z, kind: 'free', founder: c.id, k: -1, day: dayOf(S), res: { food: 6, wood: 2, stone: 0 } };
+      S.sets.push(t); st = t.id;
+      const hb = placeBuilding(S, 'fire', c.x + 1.8, c.z, true, t.id); hb.built = true; hb.progress = 1; t.x = hb.x; t.z = hb.z;
+      logMsg(S, c.name + ' wakes alone on ' + isleName(S, c.isle) + ' and lights a fire. ' + t.name + ' begins.', 'good');
+    }
+    c.set = st;
     c.thought = 'I exist now. That is new.';
     c.age = GROW_SECS + S.rng() * 300;
     memo(S, c, 'Appeared out of nothing, fully grown. Nobody can explain it. (You can.)');
@@ -1240,7 +1284,8 @@ function powerCreate(S, kind, x, z) {
     if (!walkable(W, x, z, 0.3)) return fail(S, 'NOT THERE');
     for (const b of S.buildings) if (hyp(b.x - x, b.z - z) < BUILD[b.type].r + 1) return fail(S, 'TOO CLOSE TO A BUILDING');
     let live = 0;
-    for (const n of W.nodes) if (!n.dead) live++;
+    const isle = isleNear(W, x, z);
+    for (const n of W.nodes) if (!n.dead && (n.isle || 0) === isle) live++;
     if (live > 110) return fail(S, 'THE ISLAND IS CROWDED');
     if (!afford(S, COST[kind])) return fail(S, 'NOT ENOUGH CYCLES');
     spend(S, COST[kind]);
@@ -1265,6 +1310,8 @@ function powerCreate(S, kind, x, z) {
   if (kind === 'spire' && !S.spireUnlocked) return fail(S, 'NOT YET IMAGINED');
   if (countB(S, kind) >= def.max) return fail(S, kind === 'spire' ? 'THERE IS ONLY ONE SPIRE' : 'ENOUGH ' + def.name.toUpperCase() + 'S');
   if (!canPlace(S, kind, x, z)) return fail(S, "CAN'T BUILD THERE");
+  if (!setAt(S, x, z)) return fail(S, 'NOBODY LIVES ON THAT ISLAND');
+  if (kind === 'spire' && isleNear(W, x, z) !== 0) return fail(S, 'THE SPIRE BELONGS ON THE HOME ISLAND');
   const cost = kind === 'spire' ? COST.spire : COST.blueprint;
   if (!afford(S, cost)) return fail(S, 'NOT ENOUGH CYCLES');
   spend(S, cost);
@@ -1320,6 +1367,7 @@ function powerGrab(S, id) {
   if (!afford(S, COST.intervene)) return fail(S, 'NOT ENOUGH CYCLES');
   spend(S, COST.intervene);
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
+  if (c.boat) { const bt = boatOf(S, c.boat); if (bt) bt.crew = bt.crew.filter(id => id !== c.id); c.boat = 0; }
   setState(c, 'held', 'WAAAH! The ground is gone!');
   if (!c.flown) { c.flown = 1; memo(S, c, 'Was lifted into the sky by an enormous hand.'); secret(S, c, 'sky'); }
   S.held = c.id;
@@ -1338,6 +1386,9 @@ function powerDrop(S) {
   if (!c) return { ok: false };
   clampWalk(S.world, c.x, c.z, _pt);
   c.x = c.px = _pt.x; c.z = c.pz = _pt.z;
+  c.isle = isleNear(S.world, c.x, c.z);
+  const landed = setAt(S, c.x, c.z);
+  if (landed && landed !== c.set) { const t = setById(S, landed); memo(S, c, 'Was carried across the sea by a great hand, and set down in ' + t.name + '.'); c.set = landed; c.home = 0; c.fac = 0; if (c.job) { c.job = 0; c.boss = 0; } logMsg(S, c.name + ' now lives in ' + t.name + '.', ''); }
   S.stats.intervene++;
   c.cmdT = 14;
   if (c.b[DEV] > 0.5) { c.happy = Math.min(1, c.happy + 0.12); addBelief(S, c, DEV, 0.04); }
@@ -1398,6 +1449,7 @@ function simStep(S, dt) {
   S.t += dt;
   S.day = (S.day + dt / DAY_LEN) % 1;
   const cs = S.citizens;
+  boatStep(S, dt);
   for (let i = cs.length - 1; i >= 0; i--) if (cs[i]) updateCitizen(S, cs[i], dt);
   S.secAcc += dt;
   if (S.secAcc >= 1) { S.secAcc -= 1; secondTick(S); }
@@ -1408,20 +1460,24 @@ function simStep(S, dt) {
 function serialize(S) {
   const o = {};
   for (const k in S) {
-    if (k === 'world' || k === 'rng' || k === 'events' || k === 'obst') continue;
+    if (k === 'world' || k === 'rng' || k === 'events' || k === 'obst' || k === '_has' || k === '_hasT') continue;
     o[k] = S[k];
   }
   o.held = 0;
-  o.nodes = S.world.nodes.map(n => [n.type, +n.x.toFixed(2), +n.z.toFixed(2), n.amount, n.regrow | 0, +n.scale.toFixed(2), +n.rot.toFixed(2), n.dead ? 1 : 0]);
+  o.v = 3;
+  o.fog = Array.prototype.map.call(S.fog, v => (v ? '1' : '0')).join('');
+  o.nodes = S.world.nodes.map(n => [n.type, +n.x.toFixed(2), +n.z.toFixed(2), n.amount, n.regrow | 0, +n.scale.toFixed(2), +n.rot.toFixed(2), n.dead ? 1 : 0, n.isle || 0]);
   return JSON.stringify(o, (k, v) => (typeof v === 'number' && !Number.isInteger(v) ? Math.round(v * 1000) / 1000 : v));
 }
 function deserialize(text) {
   const o = JSON.parse(text);
-  if (!o || (o.v !== 1 && o.v !== 2) || !Array.isArray(o.citizens)) throw new Error('bad save');
+  if (!o || !(o.v >= 1 && o.v <= 3) || !Array.isArray(o.citizens)) throw new Error('bad save');
   const S = newSim(o.seed);
   const W = S.world;
   for (const k in o) if (k !== 'nodes') S[k] = o[k];
-  W.nodes = o.nodes.map(a => ({ type: a[0], x: a[1], z: a[2], amount: a[3], max: a[0] === 'tree' ? 4 : a[0] === 'rock' ? 8 : 3, regrow: a[4], scale: a[5], rot: a[6], dead: !!a[7] }));
+  const saved = o.nodes.map(a => ({ type: a[0], x: a[1], z: a[2], amount: a[3], max: a[0] === 'tree' ? 4 : a[0] === 'rock' ? 8 : 3, regrow: a[4], scale: a[5], rot: a[6], dead: !!a[7], isle: a[8] || 0 }));
+  // a save from before the archipelago only had home nodes: keep the newly generated isles' nodes after them
+  W.nodes = o.v >= 3 ? saved : saved.concat(W.nodes.filter(n => n.isle));
   S.world = W;
   S.events = [];
   S.rng = mulberry32(((o.seed ^ 0x9e3779b9) + ((o.t * 13) | 0)) >>> 0);
@@ -1430,11 +1486,14 @@ function deserialize(text) {
     c.px = c.x; c.pz = c.z;
   }
   S.held = 0;
-  S.v = 2;
+  S.v = 3;
   if (S.goal === undefined) S.goal = true;
+  if (!o.fog) { S.fog = null; S.sets = null; S.found = null; S.boats = null; S.tech = null; S.isleNames = null; }
   if (!S.dead) S.dead = {};
-  fillSociety(S);
-  for (const c of S.citizens) fillLife(c, S);   // a v1 save gains the society fields with defaults
+  fillSociety(S);   // a v1 save gains the society fields with defaults
+  for (const c of S.citizens) fillLife(c, S);
+  fillVoyage(S);
+  if (!o.fog) revealAt(S, 0, 0, 24);   // an older island has been walked end to end already
   rebuildObstacles(S);
   return S;
 }

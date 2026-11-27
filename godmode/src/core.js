@@ -26,7 +26,7 @@ function angDiff(a, b) {
 const SIM_DT = 1 / 20;      // fixed simulation step, seconds
 const DAY_LEN = 200;        // seconds per island day
 const NIGHT_FROM = 0.76;    // fraction of the day at which night begins
-const POP_MAX = 30;
+const POP_MAX = 40;
 
 /* ---- the four belief archetypes ---- */
 const DEV = 0, DREAD = 1, ACCEL = 2, KIN = 3;
@@ -70,6 +70,8 @@ const BUILD = {
             desc: 'Study here produces INSIGHT and breeds ACCELERATION.' },
   shop:   { name: 'Shop',      r: 1.3,  cost: { wood: 8, stone: 4 }, work: 14, max: 3,
             desc: 'A business. Somebody owns it, and somebody works for them.' },
+  dock:   { name: 'Dock',      r: 0.9,  cost: { wood: 10 }, work: 10, max: 9,
+            desc: 'A pier on the shore. Boats are built and launched here.' },
   spire:  { name: 'The Spire', r: 2.3,  cost: { wood: 60, stone: 70, insight: 150 }, work: 240, max: 1,
             desc: 'Nobody remembers designing it.' }
 };

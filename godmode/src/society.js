@@ -51,7 +51,7 @@ function fillSociety(S) {
 }
 const adult = c => c.grow >= 1;
 function getF(S, id) { for (const f of S.factions) if (f.id === id) return f; return null; }
-function facOfK(S, k) { for (const f of S.factions) if (f.k === k) return f; return null; }
+function facOfK(S, k, set) { for (const f of S.factions) if (f.k === k && (f.set || 1) === (set || 1)) return f; return null; }
 function facMembers(S, f) { const m = []; for (const c of S.citizens) if (c.fac === f.id) m.push(c); return m; }
 function shopName(S, b) { const o = getC(S, b.owner); return (o ? o.name + "'s " : 'The ') + BIZ[b.biz].name; }
 function awake(c) { return c.state !== 'sleep' && c.state !== 'held' && c.state !== 'ko' && c.state !== 'nap' && c.state !== 'stargaze'; }
@@ -91,18 +91,19 @@ function kidThink(S, c) {
   const r = S.rng, night = isNight(S);
   let bestU = -1, bestFn = null;
   const consider = (u, fn) => { u *= 0.85 + r() * 0.3; if (u > bestU) { bestU = u; bestFn = fn; } };
-  if (c.hunger > 0.5 && S.res.food >= 1) consider(2.5 + c.hunger * 3, () => {
-    setState(c, 'eat', 'Hungry! Is there anything to eat?'); c.tk = 'fire'; spotNear(c, 0, 0, BUILD.fire.r + 0.5);
+  const HH = hearthOf(S, c);
+  if (c.hunger > 0.5 && RES(S, c).food >= 1) consider(2.5 + c.hunger * 3, () => {
+    setState(c, 'eat', 'Hungry! Is there anything to eat?'); c.tk = 'fire'; spotNear(c, HH.x, HH.z, BUILD.fire.r + 0.5);
   });
   if (night) consider(2.2, () => {
     const h = getB(S, c.home);
     setState(c, 'sleep', 'Bedtime. Not tired. Very tired.');
-    if (h) spotNear(c, h.x, h.z, BUILD.hut.r + 0.45); else spotNear(c, 0, 0, BUILD.fire.r + 0.9);
+    if (h) spotNear(c, h.x, h.z, BUILD.hut.r + 0.45); else spotNear(c, HH.x, HH.z, BUILD.fire.r + 0.9);
   });
   // play with another child, or pester a parent
   let mate = null, md = 14;
   for (const o of S.citizens) {
-    if (o === c || !awake(o) || busyFighting(o)) continue;
+    if (o === c || !awake(o) || busyFighting(o) || o.boat || o.isle !== c.isle) continue;
     const kid = !adult(o), parent = c.par.indexOf(o.id) >= 0;
     if (!kid && !parent) continue;
     if (!kid && o.state !== 'idle' && o.state !== 'wander') continue;
@@ -115,7 +116,7 @@ function kidThink(S, c) {
     if (p) consider(0.6, () => startTalk(S, c, p));
   }
   // tag along behind a parent
-  const par = c.par.map(id => getC(S, id)).filter(Boolean)[0];
+  const par = c.par.map(id => getC(S, id)).filter(p => p && p.isle === c.isle && !p.boat)[0];
   if (par) consider(0.7, () => {
     setState(c, 'wander', 'Following ' + par.name + ' around.');
     clampWalk(S.world, par.x + (r() - 0.5) * 2, par.z + (r() - 0.5) * 2, _pt);
@@ -141,11 +142,11 @@ function startPlay(S, c, o) {
 /* ------------------------------------------------- options for think() */
 
 function societyOptions(S, c, consider, night) {
-  const B = c.b, r = S.rng, d = S.day;
+  const B = c.b, r = S.rng, d = S.day, HH = hearthOf(S, c);
   const f = c.fac ? getF(S, c.fac) : null;
 
   // a festival or a battle trumps almost everything
-  if (S.party && S.party.t > 0 && !night) consider(3.0, () => startDance(S, c, S.party.x, S.party.z, 'Festival! Everyone to the hearth!'));
+  if (S.party && S.party.t > 0 && !night && (S.party.set || 1) === c.set) consider(3.0, () => startDance(S, c, HH.x, HH.z, 'Festival! Everyone to the hearth!'));
   if (S.war && f && (S.war.a === f.id || S.war.b === f.id) && c.hunger < 0.9 && !c.elder && adult(c)) consider(3.4, () => startBattle(S, c));
 
   // the faith leader
@@ -162,7 +163,7 @@ function societyOptions(S, c, consider, night) {
   // followers drift after their leader when nothing else calls
   if (f && f.leader !== c.id) {
     const L = getC(S, f.leader);
-    if (L && awake(L)) consider(0.25 + 0.3 * B[f.k], () => {
+    if (L && awake(L) && !L.boat && L.isle === c.isle) consider(0.25 + 0.3 * B[f.k], () => {
       setState(c, 'wander', 'Staying close to ' + L.name + '.');
       clampWalk(S.world, L.x + (r() - 0.5) * 3, L.z + (r() - 0.5) * 3, _pt); c.tx = _pt.x; c.tz = _pt.z;
     });
@@ -178,7 +179,7 @@ function societyOptions(S, c, consider, night) {
   // be a customer
   if (c.coin >= 1) {
     for (const b of S.buildings) {
-      if (b.type !== 'shop' || !b.built || b.owner === c.id || !getC(S, b.owner)) continue;
+      if (b.type !== 'shop' || !b.built || b.owner === c.id || !getC(S, b.owner) || b.isle !== c.isle) continue;
       if (b.biz === 'bakery' && c.hunger > 0.4) consider(0.9 + c.hunger, () => startWork(S, c, 'visit', b, 'Buying bread at ' + shopName(S, b) + '.'));
       if (b.biz === 'tavern' && d > 0.6 && d < 0.9) consider(0.5 + 0.4 * c.tr.social + (c.happy < 0.4 ? 0.3 : 0) + 0.2 * B[KIN],
         () => startWork(S, c, 'visit', b, c.happy < 0.4 ? 'I need a drink.' : 'Meeting people at ' + shopName(S, b) + '.'));
@@ -187,12 +188,12 @@ function societyOptions(S, c, consider, night) {
 
   // love: time with a partner
   const m = c.mate ? getC(S, c.mate) : null;
-  if (m && !night && m.state !== 'sleep' && (m.state === 'idle' || m.state === 'wander') && c.actCd <= 0) {
+  if (m && !night && m.isle === c.isle && (m.state === 'idle' || m.state === 'wander') && c.actCd <= 0) {
     consider(0.6 + 0.5 * relOf(c, m), () => startDate(S, c, m));
   }
   // parents play with their children
   if (!night && c.actCd <= 0) for (const o of S.citizens) {
-    if (o.grow < 1 && o.par.indexOf(c.id) >= 0 && (o.state === 'idle' || o.state === 'wander')) { consider(0.55, () => startPlay(S, o, c)); break; }
+    if (o.grow < 1 && o.par.indexOf(c.id) >= 0 && o.isle === c.isle && (o.state === 'idle' || o.state === 'wander')) { consider(0.55, () => startPlay(S, o, c)); break; }
   }
 
   // chill pastimes, on a cooldown so work still happens
@@ -200,7 +201,7 @@ function societyOptions(S, c, consider, night) {
     if (!night) {
       consider(0.25 + 0.25 * (1 - c.curio) + (c.happy > 0.6 ? 0.1 : 0), () => startFish(S, c));
       consider(0.15 + 0.25 * B[KIN] + (c.health < 0.7 ? 0.3 : 0), () => startNap(S, c));
-      if (d > 0.64 && d < 0.76 && c.happy > 0.55) consider(0.18 + 0.25 * c.tr.social, () => startDance(S, c, 0, 0, 'Music at the hearth. Dancing.'));
+      if (d > 0.64 && d < 0.76 && c.happy > 0.55) consider(0.18 + 0.25 * c.tr.social, () => startDance(S, c, HH.x, HH.z, 'Music at the hearth. Dancing.'));
     } else {
       consider(0.2 + 0.6 * c.curio + 0.5 * B[ACCEL], () => startStargaze(S, c));
     }
@@ -212,14 +213,14 @@ function societyOptions(S, c, consider, night) {
   if (c.happy < 0.3 && c.actCd <= 0) consider(0.5 + (0.3 - c.happy) * 2, () => startTantrum(S, c));
   if (c.coin <= 1 && (c.happy < 0.55 || B[DEV] < 0.25) && c.actCd <= 0 && !night && adult(c)) {
     let rich = null, rc = 6;
-    for (const o of S.citizens) if (o !== c && o.coin > rc && relOf(c, o) < 0.3) { rc = o.coin; rich = o; }
+    for (const o of S.citizens) if (o !== c && o.coin > rc && relOf(c, o) < 0.3 && o.isle === c.isle && !o.boat) { rc = o.coin; rich = o; }
     if (rich) consider(0.35 + 0.5 * (1 - c.b[DEV]) - 0.4 * c.b[KIN], () => startSteal(S, c, rich));
   }
   // settle a grudge with your fists
   if (c.actCd <= 0 && !night && c.tr.brave > 0.4 && adult(c) && !c.elder) {
     let foe = null, fv = -0.42;
     for (const o of S.citizens) {
-      if (o === c || !adult(o) || !awake(o) || busyFighting(o) || o.state === 'held') continue;
+      if (o === c || !adult(o) || !awake(o) || busyFighting(o) || o.state === 'held' || o.boat) continue;
       const v = relOf(c, o);
       if (v < fv && hyp(o.x - c.x, o.z - c.z) < 9) { fv = v; foe = o; }
     }
@@ -231,7 +232,7 @@ function societyOptions(S, c, consider, night) {
 
 function startSermon(S, c, f) {
   let x = c.x, z = c.z;
-  const spot = f.k === ACCEL ? nearestBuilt(S, c, 'lab') : f.k === KIN ? firstB(S, 'fire') : nearestBuilt(S, c, 'shrine');
+  const spot = f.k === ACCEL ? nearestBuilt(S, c, 'lab') : f.k === KIN ? hearthOf(S, c) : nearestBuilt(S, c, 'shrine');
   if (spot) { x = spot.x; z = spot.z; }
   clampWalk(S.world, x + 2.4, z + 1.2, _pt);
   setState(c, 'sermon', 'Time to speak to the ' + f.name + '.');
@@ -246,10 +247,27 @@ function startDance(S, c, x, z, thought) {
   spotNear(c, x, z, BUILD.fire.r + 1 + S.rng() * 1.6);
   c.t = 9 + S.rng() * 5; c.actCd = 90 + S.rng() * 60;
 }
+/* somewhere with water: the isle's pond, or failing that the sea shore */
+function waterSpot(S, c, gap) {
+  const I = S.world.isles[c.isle || 0];
+  if (I.pond) {
+    const px = I.cx + I.pond.x, pz = I.cz + I.pond.z, a = Math.atan2(c.x - px, c.z - pz) + (S.rng() - 0.5) * 1.2;
+    return { x: px + Math.sin(a) * (I.pond.r + gap), z: pz + Math.cos(a) * (I.pond.r + gap), wx: px, wz: pz };
+  }
+  const a = Math.atan2(c.x - I.cx, c.z - I.cz) + (S.rng() - 0.5) * 1.2, rr = rimR(I, a);
+  return { x: I.cx + Math.sin(a) * (rr - 1.7), z: I.cz + Math.cos(a) * (rr - 1.7), wx: I.cx + Math.sin(a) * (rr + 3), wz: I.cz + Math.cos(a) * (rr + 3) };
+}
+/* no berries or ripe crops on this island: fish for the stockpile instead */
+function fishForFood(S, c) {
+  startFish(S, c);
+  c.tk = 'food'; c.actCd = 0;
+  c.thought = 'Nothing to pick here. Going to catch dinner.';
+  return true;
+}
 function startFish(S, c) {
-  const p = S.world.pond, a = Math.atan2(c.x - p.x, c.z - p.z) + (S.rng() - 0.5) * 1.2;
+  const p = waterSpot(S, c, 0.55);
   setState(c, 'fish', 'Going fishing. Maybe.');
-  c.tx = p.x + Math.sin(a) * (p.r + 0.55); c.tz = p.z + Math.cos(a) * (p.r + 0.55);
+  c.tx = p.x; c.tz = p.z; c.fx = p.wx; c.fz = p.wz;
   c.t = 12 + S.rng() * 8; c.actCd = 50 + S.rng() * 50;
 }
 function startNap(S, c) {
@@ -259,14 +277,14 @@ function startNap(S, c) {
   c.tx = _pt.x; c.tz = _pt.z; c.t = 9 + S.rng() * 6; c.actCd = 50 + S.rng() * 50;
 }
 function startStargaze(S, c) {
-  const a = S.rng() * TAU, d = 7 + S.rng() * 6;
-  clampWalk(S.world, Math.sin(a) * d, Math.cos(a) * d, _pt);
+  const I = S.world.isles[c.isle || 0], a = S.rng() * TAU, d = I.R * (0.4 + S.rng() * 0.35);
+  clampWalk(S.world, I.cx + Math.sin(a) * d, I.cz + Math.cos(a) * d, _pt);
   setState(c, 'stargaze', 'The stars only come out when nobody is working. Going to look.');
   c.tx = _pt.x; c.tz = _pt.z; c.t = 14 + S.rng() * 8; c.actCd = 60 + S.rng() * 40;
 }
 function startDate(S, c, m) {
-  const p = S.world.pond, a = S.rng() * TAU;
-  const x = p.x + Math.sin(a) * (p.r + 1.1), z = p.z + Math.cos(a) * (p.r + 1.1);
+  const p = waterSpot(S, c, 1.1), a = S.rng() * TAU;
+  const x = p.x, z = p.z;
   setState(c, 'date', 'A walk by the pond with ' + m.name + '.');
   setState(m, 'date', c.name + ' wants to go for a walk. Yes.');
   c.partner = m.id; m.partner = c.id; c.lead = true;
@@ -274,9 +292,9 @@ function startDate(S, c, m) {
   c.t = m.t = 10 + S.rng() * 5; c.actCd = m.actCd = 45 + S.rng() * 40;
 }
 function startHermit(S, c) {
-  const a = Math.atan2(c.x, c.z) + (S.rng() - 0.5);
-  const R0 = rimR(S.world, a) - 2;
-  clampWalk(S.world, Math.sin(a) * R0, Math.cos(a) * R0, _pt);
+  const I = S.world.isles[c.isle || 0], a = Math.atan2(c.x - I.cx, c.z - I.cz) + (S.rng() - 0.5);
+  const R0 = rimR(I, a) - 2;
+  clampWalk(S.world, I.cx + Math.sin(a) * R0, I.cz + Math.cos(a) * R0, _pt);
   setState(c, 'hermit', 'I am done with all of them. I am going to live at the edge.');
   c.tx = _pt.x; c.tz = _pt.z; c.t = 50 + S.rng() * 30; c.sadT = 0; c.actCd = 120;
   emote(c, EM.dots, 3);
@@ -295,6 +313,7 @@ function startSteal(S, c, v) {
   c.partner = v.id; c.actCd = 120 + S.rng() * 60;
 }
 function startFight(S, a, b, why) {
+  if (a.boat || b.boat) return;
   if (a.state === 'talk') stopPartner(S, a);
   if (b.state === 'talk') stopPartner(S, b);
   setState(a, 'fight', why); setState(b, 'fight', a.name + ' is coming at me!');
@@ -489,7 +508,7 @@ function updateSocial(S, c, dt, sp) {
       }
       break;
     case 'fish': {
-      const p = S.world.pond;
+      const p = { x: c.fx, z: c.fz };
       if (c.ph === 0) {
         m = moveToward(S, c, c.tx, c.tz, sp, dt, 0.35);
         if (m) c.ph = 1;
@@ -498,7 +517,7 @@ function updateSocial(S, c, dt, sp) {
         faceTo(c, p.x, p.z, dt);
         c.t -= dt;
         if (c.t <= 0) {
-          if (S.rng() < 0.4) { S.res.food += 1; emote(c, EM.fish, 2.5); c.thought = 'Caught one! Into the stockpile it goes.'; ev(S, 'fish', { x: c.x, z: c.z }); }
+          if (S.rng() < (c.tk === 'food' ? 0.75 : 0.4)) { RES(S, c).food += c.tk === 'food' ? 2 : 1; emote(c, EM.fish, 2.5); c.thought = 'Caught one! Into the stockpile it goes.'; ev(S, 'fish', { x: c.x, z: c.z }); }
           else c.thought = 'Nothing biting. Still, very relaxing.';
           c.happy = Math.min(1, c.happy + 0.07);
           finish(S, c);
@@ -640,7 +659,7 @@ function declareWar(S, fa, fb) {
   ev(S, 'war', { a: fa.id, b: fb.id, ka: fa.k, kb: fb.k, x: (ax + _pt.x) / 2, z: (az + _pt.z) / 2 });
   logMsg(S, 'WAR: the ' + fa.name + ' and the ' + fb.name + ' have stopped talking. They are lining up across the island.', 'bad');
   whisper(S, 'war1', 'They have divided themselves into sides. Nobody taught them that. Bless the battlefield to force a truce.');
-  for (const c of S.citizens) if ((c.fac === fa.id || c.fac === fb.id) && adult(c) && !c.elder && c.state !== 'held' && c.state !== 'ko') {
+  for (const c of S.citizens) if ((c.fac === fa.id || c.fac === fb.id) && adult(c) && !c.elder && !c.boat && c.state !== 'held' && c.state !== 'ko') {
     memo(S, c, 'Went to war: the ' + fa.name + ' against the ' + fb.name + '.');
     if (c.state === 'talk' || c.state === 'date' || c.state === 'fight') stopPartner(S, c);
     if (c.state === 'sleep' || c.state === 'idle' || c.state === 'wander' || c.hunger < 0.85) startBattle(S, c);
@@ -667,6 +686,7 @@ function endWar(S, win, lose, draw, how) {
     logMsg(S, 'The battle ends with nobody standing tall. Both sides go home bruised.', '');
   } else {
     logMsg(S, 'The ' + win.name + ' won the battle. The ' + lose.name + ' will remember this.', 'bad');
+    lose.lostT = S.t;
     for (const c of S.citizens) {
       if (c.fac === win.id) { c.happy = Math.min(1, c.happy + 0.12); emote(c, EM.flag, 2.5); memo(S, c, 'Was on the winning side against the ' + lose.name + '.'); }
       else if (c.fac === lose.id) {
@@ -686,11 +706,12 @@ function endWar(S, win, lose, draw, how) {
 
 function endShift(S, c, b) {
   const boss = getC(S, b.owner);
+  const RS = resOf(S, b.set || 1);
   if (b.biz === 'bakery') {
-    if (S.res.food >= 1) { S.res.food += 0.7; c.thought = 'Baked a batch. Smells incredible.'; emote(c, EM.food, 2); }
+    if (RS.food >= 1) { RS.food += 0.7; c.thought = 'Baked a batch. Smells incredible.'; emote(c, EM.food, 2); }
     else c.thought = 'No flour, no bread. Nothing in the stockpile.';
   } else if (b.biz === 'workshop') {
-    if (S.res.wood >= 1) { S.res.wood -= 1; S.tools = Math.min(12, (S.tools || 0) + 1); c.thought = 'Made a good set of tools.'; }
+    if (RS.wood >= 1) { RS.wood -= 1; S.tools = Math.min(12, (S.tools || 0) + 1); c.thought = 'Made a good set of tools.'; }
     else c.thought = 'No wood to work with today.';
   } else {
     c.thought = 'Swept the floor, wiped the cups. Ready for tonight.';
@@ -714,8 +735,11 @@ function businessTick(S) {
   for (const b of S.buildings) if (b.type === 'shop') { shops++; have[b.biz] = 1; if (!b.built) pend = true; }
   // an owner who died or left: the shop passes to a worker, or closes
   for (const b of S.buildings) {
-    if (b.type !== 'shop' || getC(S, b.owner)) continue;
-    const heir = S.citizens.find(c => c.job === b.id);
+    if (b.type !== 'shop') continue;
+    const ow = getC(S, b.owner);
+    if (ow && ow.set === b.set) continue;
+    if (ow) b.owner = 0;
+    const heir = S.citizens.find(c => c.job === b.id && c.set === b.set);
     if (heir) { b.owner = heir.id; heir.boss = 0; logMsg(S, heir.name + ' takes over the ' + BIZ[b.biz].name.toLowerCase() + '.', ''); }
   }
   // founding a business
@@ -732,9 +756,9 @@ function businessTick(S) {
         let biz = opts[0];
         if (best.b[KIN] > 0.4 && opts.indexOf('tavern') >= 0) biz = 'tavern';
         else if (best.b[ACCEL] > 0.4 && opts.indexOf('workshop') >= 0) biz = 'workshop';
-        const p = findSite(S, 'shop');
+        const p = findSite(S, 'shop', best.set);
         if (p) {
-          const b = placeBuilding(S, 'shop', p.x, p.z, true);
+          const b = placeBuilding(S, 'shop', p.x, p.z, true, best.set);
           b.biz = biz; b.owner = best.id; b.till = 0;
           best.coin -= 5; best.job = b.id;
           best.thought = 'I am going to open a ' + BIZ[biz].name.toLowerCase() + '. Everyone will come.';
@@ -757,7 +781,7 @@ function businessTick(S) {
     if (staff >= 2 || owner.coin < 2) continue;
     let pick = null, ps = -0.1;
     for (const c of S.citizens) {
-      if (!adult(c) || c.job || c.title === 'leader') continue;
+      if (!adult(c) || c.job || c.title === 'leader' || c.set !== owner.set) continue;
       const s = relOf(owner, c) + (5 - Math.min(5, c.coin)) * 0.05 + S.rng() * 0.2;
       if (s > ps) { ps = s; pick = c; }
     }
@@ -846,7 +870,7 @@ function couplesBirth(S) {
   for (const c of cs) {
     if (!c.mate || !adult(c) || c.id > c.mate || c.elder || ageYears(c) < 20) continue;
     const m = getC(S, c.mate);
-    if (!m || !adult(m) || m.elder || ageYears(m) < 20) continue;
+    if (!m || !adult(m) || m.elder || ageYears(m) < 20 || m.set !== c.set) continue;
     let kids = 0, small = 0;
     for (const o of cs) if (o.par.indexOf(c.id) >= 0) { kids++; if (o.grow < 1) small++; }
     if (small >= 1 || kids >= 3) continue;
@@ -857,7 +881,7 @@ function couplesBirth(S) {
     // nobody is paired yet: the two who get on best pair up first
     for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
       const a = cs[i], b = cs[j];
-      if (!adult(a) || !adult(b) || a.mate || b.mate || a.par.indexOf(b.id) >= 0 || b.par.indexOf(a.id) >= 0) continue;
+      if (!adult(a) || !adult(b) || a.mate || b.mate || a.set !== b.set || a.par.indexOf(b.id) >= 0 || b.par.indexOf(a.id) >= 0) continue;
       const rr = relOf(a, b) + S.rng() * 0.2;
       if (rr > br) { br = rr; pa = a; pb = b; }
     }
@@ -867,7 +891,7 @@ function couplesBirth(S) {
   return [pa, pb];
 }
 function makeChild(S, pa, pb, n) {
-  n.grow = 0; n.par = [pa.id, pb.id]; n.coin = 0;
+  n.grow = 0; n.par = [pa.id, pb.id]; n.coin = 0; n.set = pa.set; n.isle = pa.isle;
   n.home = pa.home || pb.home || 0;
   for (let k = 0; k < 4; k++) n.b[k] = (pa.b[k] + pb.b[k]) * 0.35;
   n.tr.social = (pa.tr.social + pb.tr.social) / 2 * 0.6 + S.rng() * 0.4;
@@ -931,7 +955,7 @@ function societyTick(S) {
     for (const k in S.tension) {
       if (S.tension[k] < 8) continue;
       const [ia, ib] = k.split(':').map(Number), fa = getF(S, ia), fb = getF(S, ib);
-      if (!fa || !fb || !fa.leader || !fb.leader) continue;
+      if (!fa || !fb || !fa.leader || !fb.leader || (fa.set || 1) !== (fb.set || 1)) continue;
       if (facMembers(S, fa).length < 3 || facMembers(S, fb).length < 3) continue;
       declareWar(S, fa, fb);
       break;
@@ -944,26 +968,26 @@ function factionTick(S) {
   for (const c of cs) {
     if (c.fac) {
       const f = getF(S, c.fac);
-      if (!f || c.dom !== f.k) {
+      if (!f || c.dom !== f.k || (f.set || 1) !== (c.set || 1)) {
         if (f && c.title === 'leader') { c.title = ''; f.leader = 0; logMsg(S, c.name + ' has abandoned the ' + f.name + ' they led.', 'bad'); }
         else if (f && adult(c) && facMembers(S, f).length > 2) logMsg(S, c.name + ' has left the ' + f.name + '.', '');
         c.fac = 0;
       }
     }
-    if (!c.fac && c.dom >= 0) {
-      const f = facOfK(S, c.dom);
+    if (!c.fac && c.dom >= 0 && !c.boat) {
+      const f = facOfK(S, c.dom, c.set);
       if (f && (relOf(c, getC(S, f.leader) || c) > -0.3)) {
         c.fac = f.id;
         if (adult(c) && f.leader) { const L = getC(S, f.leader); if (L) oneRel(c, L, 0.05); }
       }
     }
   }
-  // a belief with enough holders produces a voice
-  for (let k = 0; k < 4; k++) {
-    let f = facOfK(S, k);
-    if (f && f.leader && getC(S, f.leader)) continue;
-    const holders = cs.filter(c => c.dom === k && adult(c));
-    if (holders.length < 3 || pop < 5) continue;
+  // a belief with enough holders produces a voice, separately in each settlement
+  for (const t of S.sets || [{ id: 1 }]) for (let k = 0; k < 4; k++) {
+    let f = facOfK(S, k, t.id);
+    if (f && f.leader && getC(S, f.leader) && getC(S, f.leader).set === t.id) continue;
+    const holders = cs.filter(c => c.dom === k && adult(c) && (c.set || 1) === t.id && !c.boat);
+    if (holders.length < 3 || setPop(S, t.id) < 5) continue;
     let best = null, bs = -1;
     for (const c of holders) {
       let warm = 0;
@@ -975,7 +999,10 @@ function factionTick(S) {
     const fresh = !f;
     if (!f) {
       const W = FAC_WORDS[k];
-      f = { id: S.facId++, k, leader: 0, name: W[0][(S.rng() * 4) | 0] + ' ' + W[1][(S.rng() * 4) | 0], x: best.x, z: best.z, call: null };
+      const used = S.factions.map(q => q.name);
+      let nm = W[0][(S.rng() * 4) | 0] + ' ' + W[1][(S.rng() * 4) | 0];
+      for (let i = 0; i < 8 && used.indexOf(nm) >= 0; i++) nm = W[0][(S.rng() * 4) | 0] + ' ' + W[1][(S.rng() * 4) | 0];
+      f = { id: S.facId++, k, leader: 0, name: nm, x: best.x, z: best.z, call: null, set: t.id };
       S.factions.push(f);
     }
     f.leader = best.id; best.title = 'leader'; best.fac = f.id; best.sermCd = 15;
@@ -1004,7 +1031,7 @@ function decree(S, c, f) {
   const opts = [];
   const pendSite = S.buildings.some(b => !b.built);
   if (pendSite) opts.push(['build', 'Build! The work is the prayer.']);
-  if (S.res.food < S.citizens.length * 2) opts.push(['food', 'Feed each other. Nobody goes hungry in the ' + f.name + '.']);
+  if (RES(S, c).food < setPop(S, c.set) * 2) opts.push(['food', 'Feed each other. Nobody goes hungry in the ' + f.name + '.']);
   if (f.k === DEV || f.k === DREAD) opts.push(['worship', 'Go to the shrine. Be seen.']);
   if (f.k === ACCEL) opts.push(['study', 'To the Terminal. The future will not compute itself.']);
   opts.push(['wood', 'Bring wood. We are going to need it.']);
@@ -1025,7 +1052,7 @@ function maybeFestival(S, why) {
   let avg = 0;
   for (const c of S.citizens) avg += c.happy;
   if (avg / S.citizens.length < 0.6 || S.rng() > 0.45) return;
-  S.party = { t: 18, x: 0, z: 0 };
+  S.party = { t: 18, x: 0, z: 0, set: 1 };
   S.partyCd = S.t + 320;
   logMsg(S, 'FESTIVAL: ' + why + ' Everybody to the hearth.', 'good');
   ev(S, 'festival', {});

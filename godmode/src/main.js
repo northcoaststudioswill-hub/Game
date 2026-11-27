@@ -139,6 +139,14 @@ function handleEvents(S) {
       case 'elder': break;
       case 'steer': fxRing(e.x, y, e.z, '#ff8ae6', 2.6, 0.9); fxSpark(e.x, y + 1.4, e.z, '#ff8ae6', 18, 1.4, 3, -2, 1); sfx('inspire'); break;
       case 'spireReady': banner('THE SPIRE', 'Yours to build whenever you choose. Or never.', '#ff8ae6'); sfx('stage'); break;
+      case 'invent': banner('BOATS', 'Someone has worked out that wood floats. Next: a dock.', '#7dd3ff'); sfx('stage'); break;
+      case 'boat': fxSpark(e.x, y + 1, e.z, '#ffffff', 16, 1.6, 3, -4, 0.8); sfx('built'); break;
+      case 'sail': fxRing(e.x, SEA_Y, e.z, '#ffffff', 3, 0.8); break;
+      case 'dock': fxRing(e.x, SEA_Y, e.z, '#7dd3ff', 2.5, 0.6); break;
+      case 'discover': banner('LAND', e.name, '#7dffc4'); fxBeam(e.x, 0, e.z, '#7dffc4'); sfx('stage'); break;
+      case 'exodus': banner('EXODUS', 'They are leaving to found ' + e.name + '.', '#ff8ae6'); sfx('age'); break;
+      case 'founded': banner('A NEW SETTLEMENT', e.name, '#ffd447'); fxBeam(e.x, y, e.z, '#ffd447'); fxRing(e.x, y, e.z, '#ffd447', 4, 1); sfx('stage'); break;
+      case 'raid': banner('RAID', 'From ' + e.from + ', against ' + e.to + '.', '#ff4f6e'); sfx('war'); break;
       case 'restore': banner('RESTORED FROM BACKUP', 'Six new minds. They do not remember.', '#ff8ae6'); break;
       case 'singularity': {
         R.singT = 0; R.singHex = e.k >= 0 ? BELIEFS[e.k].hex : '#ff5fd2';

@@ -202,12 +202,12 @@ function steer(S, c, act, whoId, key) {
     }
     case 'lead': {
       if (!adult(c) || c.dom < 0) return { ok: false, msg: 'THEY NEED A CREED TO LEAD' };
-      let f = facOfK(S, c.dom);
+      let f = facOfK(S, c.dom, c.set);
       if (!f) {
         const W = FAC_WORDS[c.dom];
-        f = { id: S.facId++, k: c.dom, leader: 0, name: W[0][(S.rng() * 4) | 0] + ' ' + W[1][(S.rng() * 4) | 0], x: c.x, z: c.z, call: null };
+        f = { id: S.facId++, k: c.dom, leader: 0, name: W[0][(S.rng() * 4) | 0] + ' ' + W[1][(S.rng() * 4) | 0], x: c.x, z: c.z, call: null, set: c.set };
         S.factions.push(f);
-        for (const p of S.citizens) if (p.dom === c.dom && !p.fac) p.fac = f.id;
+        for (const p of S.citizens) if (p.dom === c.dom && !p.fac && p.set === c.set) p.fac = f.id;
       }
       const old = getC(S, f.leader);
       if (old && old !== c) { old.title = ''; memo(S, old, 'Was pushed aside so ' + c.name + ' could lead.'); oneRel(old, c, -0.3); }
@@ -298,7 +298,7 @@ function grantDesire(S, c, d) {
     case 'child': {
       const m = getC(S, c.mate);
       if (!m || S.citizens.length >= POP_MAX) return '';
-      const home = getB(S, c.home) || firstB(S, 'fire');
+      const home = getB(S, c.home) || hearthOf(S, c);
       clampWalk(S.world, home.x + (S.rng() - 0.5) * 3, home.z + 1.8, _pt);
       const n = addCitizen(S, _pt.x, _pt.z);
       makeChild(S, c, m, n);
@@ -307,25 +307,25 @@ function grantDesire(S, c, d) {
       return c.name + ' and ' + m.name + ' welcome ' + n.name + '.';
     }
     case 'home': {
-      for (const b of S.buildings) if (b.type === 'hut' && b.built) {
+      for (const b of S.buildings) if (b.type === 'hut' && b.built && b.set === c.set) {
         let n = 0; for (const q of S.citizens) if (q.home === b.id) n++;
         if (n < 3) { c.home = b.id; memo(S, c, 'Finally has a roof of their own.'); return c.name + ' has a home now.'; }
       }
-      const p = findSite(S, 'hut');
-      if (!p || countB(S, 'hut') >= BUILD.hut.max) return '';
-      placeBuilding(S, 'hut', p.x, p.z, false);
+      const p = findSite(S, 'hut', c.set);
+      if (!p) return '';
+      placeBuilding(S, 'hut', p.x, p.z, false, c.set);
       return 'A hut is marked out for ' + c.name + '. The others will build it.';
     }
     case 'work': case 'business': {
       if (d.key === 'work') {
-        const b = S.buildings.find(b => b.type === 'shop' && b.built && getC(S, b.owner) && b.owner !== c.id);
+        const b = S.buildings.find(b => b.type === 'shop' && b.built && getC(S, b.owner) && b.owner !== c.id && b.set === c.set);
         if (b) { c.job = b.id; c.boss = b.owner; c.coin += 3; memo(S, c, 'Got work at ' + shopName(S, b) + '.'); return c.name + ' now works at ' + shopName(S, b) + '.'; }
       }
       const have = {}; for (const b of S.buildings) if (b.type === 'shop') have[b.biz] = 1;
       const biz = ['tavern', 'bakery', 'workshop'].find(k => !have[k]);
-      const p = biz && findSite(S, 'shop');
+      const p = biz && findSite(S, 'shop', c.set);
       if (!p) { c.coin += 8; return c.name + ' finds 8 coin. It will do for now.'; }
-      const b = placeBuilding(S, 'shop', p.x, p.z, true);
+      const b = placeBuilding(S, 'shop', p.x, p.z, true, c.set);
       b.biz = biz; b.owner = c.id; b.till = 0; c.job = b.id; c.boss = 0;
       memo(S, c, 'Opened a ' + BIZ[biz].name.toLowerCase() + ' of their own.');
       return c.name + ' is opening a ' + BIZ[biz].name.toLowerCase() + '.';
@@ -353,7 +353,7 @@ function grantDesire(S, c, d) {
 }
 function steerLead(S, c) {
   if (!adult(c) || c.dom < 0) return '';
-  const f = facOfK(S, c.dom);
+  const f = facOfK(S, c.dom, c.set);
   if (!f) return '';
   const old = getC(S, f.leader);
   if (old && old !== c) old.title = '';

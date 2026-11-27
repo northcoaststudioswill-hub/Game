@@ -293,8 +293,14 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
   check(await page.evaluate(() => APP.mode === 'play' && APP.S.goal === false && document.getElementById('qTitle').textContent === 'ENDLESS'), 'an endless world has no goal');
   await page.evaluate(() => { for (let i = 0; i < 20 * 60 * 12; i++) simStep(APP.S, SIM_DT); APP.S.events.length = 0; });
   await sleep(800);
-  check(await page.evaluate(() => !firstB(APP.S, 'spire') && APP.S.stage === 0 && /generation/.test(document.getElementById('qText').textContent)), 'after twelve minutes nobody has started a Spire; the bar shows day and generation');
+  check(await page.evaluate(() => !firstB(APP.S, 'spire') && APP.S.stage === 0 && /gen \d/.test(document.getElementById('qText').textContent)), 'after twelve minutes nobody has started a Spire; the bar shows day and generation');
   await page.screenshot({ path: path.join(out, '19-endless.png') });
+  check(await page.evaluate(() => R.fog.length === 2 && R.fog[0].geometry.attributes.position.count > 0 && R.isles.filter(g => g.visible).length === APP.S.found.filter(Boolean).length),
+    'the world beyond is fogged, and islands nobody has seen are hidden');
+  const cam0 = await page.evaluate(() => ({ x: R.cam.tx, z: R.cam.tz, d: R.cam.dist }));
+  await page.tap('#btnGo'); await sleep(300);
+  check(await page.evaluate(c => R.cam.dist !== c.d || R.cam.tx !== c.x || R.cam.tz !== c.z, cam0), 'the jump button moves the view around the world');
+  await page.tap('#btnGo'); await sleep(300);
   await page.evaluate(() => openMenu());
   await page.tap('#mGoal'); await sleep(200);
   check(await page.evaluate(() => APP.S.goal === true), 'the pause menu can turn the Spire goal back on');

@@ -1,7 +1,7 @@
 /* Headless balance run of the simulation core (no browser).
    node godmode/tests/sim_balance.js [seeds]                                  */
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const src = ['core.js', 'world.js', 'sim.js', 'society.js', 'life.js'].map(f => fs.readFileSync(path.join(__dirname, '../src', f), 'utf8')).join('\n');
+const src = ['core.js', 'world.js', 'sim.js', 'society.js', 'life.js', 'voyage.js'].map(f => fs.readFileSync(path.join(__dirname, '../src', f), 'utf8')).join('\n');
 const ctx = { console, Math, JSON };
 vm.createContext(ctx);
 vm.runInContext(src + '\nthis.API={newSim,simStep,serialize,deserialize,powerObserve,powerBless,powerSmite,powerCreate,powerInspire,powerGrab,powerDrag,powerDrop,popCap,countB,firstB,STAGES,BELIEFS,SIM_DT};', ctx);
@@ -74,9 +74,10 @@ for (const seed of (seeds.length ? seeds.slice(0, 2) : [1, 2])) {
     if (i % 200 === 0) { minPop = Math.min(minPop, S.citizens.length); for (const c of S.citizens) if (!isFinite(c.x) || !isFinite(c.age)) nan++; }
   }
   const gen = Math.max.apply(null, S.citizens.map(c => c.gen)), old = S.stats.oldAge || 0;
-  const ok = restores === 0 && gen >= 3 && old >= 4 && !A.firstB(S, 'spire') && nan === 0 && S.citizens.length >= 8;
+  const founded = S.setId - 2, isles = S.found.filter(Boolean).length - 1;
+  const ok = restores === 0 && gen >= 3 && old >= 4 && !A.firstB(S, 'spire') && nan === 0 && S.citizens.length >= 8 && S.tech.boats && isles >= 2 && founded >= 1;
   console.log(`seed ${seed} endless 75min pop ${S.citizens.length} (min ${minPop}) generation ${gen} old-age deaths ${old} other deaths ${S.stats.deaths - old} births ${S.stats.births} ` +
-    `restores ${restores} spire ${A.firstB(S, 'spire') ? 'yes' : 'no'} factions ${S.factions.length} memories ${S.citizens[0].mem.length} ${ok ? '' : ' <-- FAIL'}`);
+    `restores ${restores} boats ${S.boats.length} isles found ${isles} settlements founded ${founded} starved ${S.stats.died_starve || 0} spire ${A.firstB(S, 'spire') ? 'yes' : 'no'} factions ${S.factions.length} memories ${S.citizens[0].mem.length} ${ok ? '' : ' <-- FAIL'}`);
   if (!ok) bad++;
   const S2 = A.deserialize(A.serialize(S));
   if (S2.goal !== false || S2.citizens.length !== S.citizens.length) { console.log('  endless save round trip FAIL'); bad++; }

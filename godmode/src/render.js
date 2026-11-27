@@ -245,7 +245,7 @@ function buildSky() {
 
   // the grid under everything: this is a simulation and it does not hide it
   R.grid = new THREE.GridHelper(520, 52, 0x3fe8ff, 0x2a5fd0);
-  R.grid.position.y = -34;
+  R.grid.position.y = SEA_Y - 0.9;
   R.grid.material.transparent = true; R.grid.material.opacity = 0.32; R.grid.material.depthWrite = false;
   sc.add(R.grid);
 
@@ -265,7 +265,7 @@ function buildSky() {
     for (let k = 0; k < n; k++) parts.push(P(ico(1.6 + cr() * 1.6, 0), k % 2 ? '#ffffff' : '#e6f1ff', (k - n / 2) * 2.1, cr() * 0.8, cr() * 1.6 - 0.8, 1, 0.55, 1, 0, cr() * 3, 0));
     const m = new THREE.Mesh(merge(parts), R.mat);
     const a = i / 9 * TAU + cr() * 0.5, rad = 30 + cr() * 22;
-    m.position.set(Math.sin(a) * rad, -9 + cr() * 9, Math.cos(a) * rad);
+    m.position.set(Math.sin(a) * rad * 2.2, 22 + cr() * 8, Math.cos(a) * rad * 2.2);
     m.rotation.y = cr() * TAU; m.scale.setScalar(0.9 + cr() * 0.9);
     R.clouds.add(m);
   }
@@ -428,6 +428,7 @@ function resetRender(S) {
   if (R.world) { R.root.remove(R.world); disposeTree(R.world); }
   for (const k of ['cit', 'bld', 'grv']) if (R[k]) R[k].forEach(o => { R.root.remove(o.g); if (o.icon) R.root.remove(o.icon); });
   if (R.flags) R.flags.forEach(o => { R.root.remove(o.g); o.cloth.material.dispose(); });
+  if (R.boats) R.boats.forEach(g => R.root.remove(g));
   R.flags = new Map();
   R.cit = new Map(); R.bld = new Map(); R.grv = new Map();
   R.world = new THREE.Group(); R.root.add(R.world);
@@ -436,78 +437,22 @@ function resetRender(S) {
   R.singHex = S.sandbox && S.ending >= 0 ? BELIEFS[S.ending].hex : '#ff5fd2';
   R.flashL = 0;
 
-  // ---- terrain
-  const n1 = GRID_N + 1, cnt = n1 * n1;
-  const VX = new Float32Array(cnt), VY = new Float32Array(cnt), VZ = new Float32Array(cnt), IN = new Uint8Array(cnt);
-  for (let j = 0; j < n1; j++) for (let i = 0; i < n1; i++) {
-    const k = j * n1 + i, x = -GRID_HALF + i * GRID_CELL, z = -GRID_HALF + j * GRID_CELL;
-    const r = hyp(x, z), ang = Math.atan2(x, z), rim = rimR(W, ang);
-    if (r <= rim) { IN[k] = 1; VX[k] = x; VZ[k] = z; VY[k] = W.grid[k]; }
-    else { VX[k] = Math.sin(ang) * rim; VZ[k] = Math.cos(ang) * rim; VY[k] = heightRaw(W, VX[k] * 0.98, VZ[k] * 0.98) - 0.12; }
+  // ---- every isle in the archipelago (hidden until someone has seen it)
+  R.isles = []; R.terrains = [];
+  for (const I of W.isles) {
+    const g = buildIsle(W, I);
+    R.world.add(g); R.isles.push(g);
   }
-  const pos = [], col = [];
-  const cr = mulberry32(W.seed + 5);
-  const tri = (a, b, c) => {
-    if (!IN[a] && !IN[b] && !IN[c]) return;
-    pos.push(VX[a], VY[a], VZ[a], VX[b], VY[b], VZ[b], VX[c], VY[c], VZ[c]);
-    const cx = (VX[a] + VX[b] + VX[c]) / 3, cy = (VY[a] + VY[b] + VY[c]) / 3, cz = (VZ[a] + VZ[b] + VZ[c]) / 3;
-    terrainColor(W, cx, cy, cz, cr, _c3);
-    for (let q = 0; q < 3; q++) col.push(_c3.r, _c3.g, _c3.b);
-  };
-  for (let j = 0; j < GRID_N; j++) for (let i = 0; i < GRID_N; i++) {
-    const a = j * n1 + i, b = a + 1, c = a + n1, d = c + 1;
-    tri(a, c, b); tri(d, b, c);
-  }
-  const tg = new THREE.BufferGeometry();
-  tg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
-  tg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
-  tg.computeVertexNormals();
-  R.terrain = new THREE.Mesh(tg, R.mat);
-  R.world.add(R.terrain);
+  R.water = R.isles[0].userData.pond;
 
-  // ---- the rock the island hangs from
-  const M = 36, layers = [[0.99, 0.2, '#9a6a43'], [0.94, -1.3, '#8a5a4a'], [0.76, -3.8, '#6f5673'], [0.52, -6.8, '#5a4775'], [0.27, -9.8, '#453a68'], [0.09, -12.6, '#322a52']];
-  const up = [], uc = [];
-  const ring = (L, k) => {
-    const ang = k / M * TAU, lay = layers[L];
-    const jit = L === 0 ? 1 : 0.86 + 0.28 * W.noise(k * 0.9 + L * 7, L * 3.3);
-    const rr = rimR(W, ang) * lay[0] * jit;
-    return [Math.sin(ang) * rr, lay[1] + (L === 0 ? 0 : (W.noise(k * 1.3, L * 9.1) - 0.5) * 1.2), Math.cos(ang) * rr];
-  };
-  const push3 = (p, hex, shade) => { up.push(p[0], p[1], p[2]); _c3.set(hex).multiplyScalar(shade); uc.push(_c3.r, _c3.g, _c3.b); };
-  for (let k = 0; k < M; k++) {
-    const t0 = ring(0, k), t1 = ring(0, k + 1);
-    push3([0, 0.2, 0], '#8a6a4a', 1); push3(t0, '#8a6a4a', 1); push3(t1, '#8a6a4a', 1);
-    for (let L = 0; L < layers.length - 1; L++) {
-      const a = ring(L, k), b = ring(L, k + 1), c = ring(L + 1, k), d = ring(L + 1, k + 1);
-      const sh = 0.9 + cr() * 0.2, hex = layers[L + 1][2];
-      push3(a, hex, sh); push3(b, hex, sh); push3(c, hex, sh);
-      const sh2 = 0.9 + cr() * 0.2;
-      push3(b, hex, sh2); push3(d, hex, sh2); push3(c, hex, sh2);
-    }
-    const e = ring(layers.length - 1, k), f = ring(layers.length - 1, k + 1);
-    push3(e, '#2a2346', 1); push3(f, '#2a2346', 1); push3([0.3, -14.5, -0.2], '#2a2346', 1);
-  }
-  const ug = new THREE.BufferGeometry();
-  ug.setAttribute('position', new THREE.BufferAttribute(new Float32Array(up), 3));
-  ug.setAttribute('color', new THREE.BufferAttribute(new Float32Array(uc), 3));
-  ug.computeVertexNormals();
-  R.world.add(new THREE.Mesh(ug, R.mat));
-  const crys = [];
-  for (let i = 0; i < 7; i++) {
-    const a = cr() * TAU, rr = 3 + cr() * 9, y = -3.5 - (1 - rr / 14) * 7 - cr() * 1.5;
-    crys.push(P(octa(0.5 + cr() * 0.5), i % 2 ? '#3fe8ff' : '#ff5fd2', Math.sin(a) * rr, y, Math.cos(a) * rr, 0.55, 1.9, 0.55, cr() * 0.5, cr() * 3, cr() * 0.5));
-  }
-  R.world.add(new THREE.Mesh(merge(crys), R.matGlow));
-
-  // ---- pond
-  const wg = new THREE.CircleGeometry(W.pond.r + 1.5, 12); wg.rotateX(-Math.PI / 2);
-  R.water = new THREE.Mesh(wg, new THREE.MeshBasicMaterial({ color: '#3bb9ff', transparent: true, opacity: 0.84 }));
-  R.water.position.set(W.pond.x, W.waterY, W.pond.z);
-  R.world.add(R.water);
+  // ---- the sea, and the fog over everything nobody has seen
+  buildSea();
+  buildFog();
+  R.boats = new Map();
+  R.fogV = -1;
 
   // ---- instanced resource nodes
-  const CAP = 200;
+  const CAP = 700;
   const treeG = merge([P(cyl(0.12, 0.17, 0.7, 5), '#8a5a35', 0, 0.35, 0), P(cone(0.8, 1.15, 6), '#2f9e4f', 0, 1.15, 0),
     P(cone(0.6, 0.95, 6), '#3fb95a', 0, 1.75, 0, 1, 1, 1, 0, 0.5, 0), P(cone(0.38, 0.75, 6), '#62d672', 0, 2.3, 0)]);
   const rockG = merge([P(dode(0.6), '#9a9db3', 0, 0.3, 0, 1, 0.75, 1), P(dode(0.36), '#7f829a', 0.45, 0.2, 0.2, 1, 0.8, 1, 0.4, 0.8, 0)]);
@@ -520,18 +465,158 @@ function resetRender(S) {
   syncNodes(S, true);
 }
 
+/* one isle: terrain from its grid, a rocky skirt down into the sea, and its pond */
+function buildIsle(W, I) {
+  const G = new THREE.Group(), cx = I.cx || 0, cz = I.cz || 0;
+  const N = I.gn, n1 = N + 1, cnt = n1 * n1;
+  const VX = new Float32Array(cnt), VY = new Float32Array(cnt), VZ = new Float32Array(cnt), IN = new Uint8Array(cnt);
+  for (let j = 0; j < n1; j++) for (let i = 0; i < n1; i++) {
+    const k = j * n1 + i, x = -I.gh + i * I.gc, z = -I.gh + j * I.gc;
+    const r = hyp(x, z), ang = Math.atan2(x, z), rim = rimR(I, ang);
+    if (r <= rim) { IN[k] = 1; VX[k] = x; VZ[k] = z; VY[k] = I.grid[k]; }
+    else { VX[k] = Math.sin(ang) * rim; VZ[k] = Math.cos(ang) * rim; VY[k] = heightRaw(I, VX[k] * 0.98, VZ[k] * 0.98) - 0.12; }
+  }
+  const pos = [], col = [];
+  const cr = mulberry32(W.seed + 5 + I.id * 31);
+  const tri = (a, b, c) => {
+    if (!IN[a] && !IN[b] && !IN[c]) return;
+    pos.push(VX[a] + cx, VY[a], VZ[a] + cz, VX[b] + cx, VY[b], VZ[b] + cz, VX[c] + cx, VY[c], VZ[c] + cz);
+    terrainColor(I, (VX[a] + VX[b] + VX[c]) / 3, (VY[a] + VY[b] + VY[c]) / 3, (VZ[a] + VZ[b] + VZ[c]) / 3, cr, _c3);
+    for (let q = 0; q < 3; q++) col.push(_c3.r, _c3.g, _c3.b);
+  };
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const a = j * n1 + i, b = a + 1, c = a + n1, d = c + 1; tri(a, c, b); tri(d, b, c); }
+  const tg = new THREE.BufferGeometry();
+  tg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  tg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
+  tg.computeVertexNormals();
+  const terrain = new THREE.Mesh(tg, R.mat);
+  G.add(terrain); R.terrains.push(terrain);
+  if (!I.id) R.terrain = terrain;
+  // the rock underneath, going down into the sea
+  const M = 32, layers = [[0.99, 0.2, '#c9b07a'], [0.97, -0.6, '#9a7a55'], [0.86, -2.4, '#6f5673'], [0.6, -4.8, '#4a3d6a']];
+  const up = [], uc = [];
+  const ring = (L, k) => {
+    const ang = k / M * TAU, lay = layers[L];
+    const jit = L === 0 ? 1 : 0.9 + 0.2 * I.noise(k * 0.9 + L * 7, L * 3.3);
+    const rr = rimR(I, ang) * lay[0] * jit;
+    return [cx + Math.sin(ang) * rr, lay[1] + (L === 0 ? 0 : (I.noise(k * 1.3, L * 9.1) - 0.5) * 0.6), cz + Math.cos(ang) * rr];
+  };
+  const push3 = (p, hex, shade) => { up.push(p[0], p[1], p[2]); _c3.set(hex).multiplyScalar(shade); uc.push(_c3.r, _c3.g, _c3.b); };
+  for (let k = 0; k < M; k++) {
+    for (let L = 0; L < layers.length - 1; L++) {
+      const a = ring(L, k), b = ring(L, k + 1), c = ring(L + 1, k), d = ring(L + 1, k + 1);
+      const hex = layers[L + 1][2], sh = 0.9 + cr() * 0.2;
+      push3(a, hex, sh); push3(b, hex, sh); push3(c, hex, sh);
+      push3(b, hex, sh); push3(d, hex, sh); push3(c, hex, sh);
+    }
+  }
+  const ug = new THREE.BufferGeometry();
+  ug.setAttribute('position', new THREE.BufferAttribute(new Float32Array(up), 3));
+  ug.setAttribute('color', new THREE.BufferAttribute(new Float32Array(uc), 3));
+  ug.computeVertexNormals();
+  G.add(new THREE.Mesh(ug, R.mat));
+  if (I.pond) {
+    const wg = new THREE.CircleGeometry(I.pond.r + (I.id ? 1.1 : 1.5), 12); wg.rotateX(-Math.PI / 2);
+    const water = new THREE.Mesh(wg, new THREE.MeshBasicMaterial({ color: '#3bb9ff', transparent: true, opacity: 0.84 }));
+    water.position.set(cx + I.pond.x, I.waterY, cz + I.pond.z);
+    G.add(water); G.userData.pond = water;
+  }
+  return G;
+}
+function buildSea() {
+  if (R.sea) return;
+  const g = new THREE.PlaneGeometry(WORLD_HALF * 2 + 260, WORLD_HALF * 2 + 260, 56, 56); g.rotateX(-Math.PI / 2);
+  R.seaBase = Float32Array.from(g.attributes.position.array);
+  R.sea = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: '#2b86d6', transparent: true, opacity: 0.86, flatShading: true }));
+  R.sea.position.y = SEA_Y; R.sea.renderOrder = 1;
+  R.scene.add(R.sea);
+}
+function updateSea(dt) {
+  const a = R.sea.geometry.attributes.position, b = R.seaBase, t = R.time;
+  for (let i = 0; i < a.count; i++) {
+    const x = b[i * 3], z = b[i * 3 + 2];
+    a.array[i * 3 + 1] = Math.sin(x * 0.11 + t * 0.9) * 0.12 + Math.cos(z * 0.13 + t * 0.7) * 0.1;
+  }
+  a.needsUpdate = true;
+  R.sea.geometry.computeVertexNormals();
+  R.sea.material.color.set('#2b86d6').lerp(_ca.set('#0c1c4a'), (R.night || 0) * 0.7);
+}
+/* fog: a mesh that exists only over places nobody has seen, with soft edges
+   (vertex alpha) where it meets the known world. Two lumpy layers. */
+function buildFog() {
+  if (R.fog) return;
+  R.fogMat = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+  R.fog = [];
+}
+function paintFog(S) {
+  for (const m of R.fog) { R.scene.remove(m); m.geometry.dispose(); }
+  R.fog = [];
+  const N = FOG_N, n1 = N + 1, cell = FOG_CELL, H = WORLD_HALF;
+  const unk = (i, j) => (i < 0 || j < 0 || i >= N || j >= N) ? 1 : (S.fog[j * N + i] ? 0 : 1);
+  // corner opacity: how many of the four cells around a corner are unknown
+  const A = new Float32Array(n1 * n1);
+  for (let j = 0; j < n1; j++) for (let i = 0; i < n1; i++) A[j * n1 + i] = (unk(i - 1, j - 1) + unk(i, j - 1) + unk(i - 1, j) + unk(i, j)) / 4;
+  const rr = mulberry32(11);
+  const jitter = new Float32Array(n1 * n1).map(() => rr());
+  for (const [y0, amp, op] of [[2.4, 0.9, 0.96], [7.5, 1.6, 0.55]]) {
+    const pos = [], col = [];
+    const v = (i, j) => {
+      const k = j * n1 + i, a = A[k] * A[k] * (3 - 2 * A[k]);
+      pos.push(-H + i * cell, y0 + (jitter[k] - 0.5) * amp + a * 0.6, -H + j * cell);
+      const sh = 0.9 + jitter[k] * 0.1;
+      col.push(sh, sh, Math.min(1, sh + 0.04), a * op);
+    };
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      if (A[j * n1 + i] + A[j * n1 + i + 1] + A[(j + 1) * n1 + i] + A[(j + 1) * n1 + i + 1] === 0) continue;
+      v(i, j); v(i, j + 1); v(i + 1, j); v(i + 1, j); v(i, j + 1); v(i + 1, j + 1);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+    g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 4));
+    const m = new THREE.Mesh(g, R.fogMat);
+    m.renderOrder = 5 + R.fog.length; m.frustumCulled = false;
+    R.scene.add(m); R.fog.push(m);
+  }
+}
+
+/* boats: a hull, a mast and a sail in the colour of the settlement's creed */
+function makeBoatMesh() {
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(merge([P(box(1.2, 0.36, 2.6), '#8a5a35', 0, 0.12, 0), P(box(1.0, 0.1, 2.3), '#b98a52', 0, 0.32, 0), P(cone(0.6, 0.9, 4), '#7a4a2a', 0, 0.12, 1.6, 1, 0.4, 1, Math.PI / 2, Math.PI / 4, 0),
+    P(cyl(0.05, 0.06, 2.6, 4), '#d9d2c0', 0, 1.5, -0.1)]), R.mat));
+  const sail = new THREE.Mesh(merge([P(box(1.3, 1.5, 0.04), '#ffffff', 0, 1.75, -0.05)]), new THREE.MeshLambertMaterial({ color: '#f4efe0', side: THREE.DoubleSide }));
+  g.add(sail); g.userData.sail = sail;
+  return g;
+}
+function syncBoats(S, alpha, dt) {
+  const seen = new Set();
+  for (const b of S.boats || []) {
+    seen.add(b.id);
+    let g = R.boats.get(b.id);
+    if (!g) { g = makeBoatMesh(); R.root.add(g); R.boats.set(b.id, g); }
+    const x = lerp(b.px === undefined ? b.x : b.px, b.x, alpha), z = lerp(b.pz === undefined ? b.z : b.pz, b.z, alpha);
+    g.position.set(x, SEA_Y + Math.sin(R.time * 2 + b.id) * 0.07, z);
+    g.rotation.set(Math.sin(R.time * 1.6 + b.id) * 0.05, b.ang, Math.sin(R.time * 1.3 + b.id) * 0.06);
+    const t = setById(S, b.set), hex = t.k >= 0 ? BELIEFS[t.k].hex : '#f4efe0';
+    g.userData.sail.material.color.set(hex).lerp(_ca.set('#ffffff'), 0.45);
+    g.userData.sail.scale.set(1, b.st === 'docked' ? 0.35 : 1, 1);
+  }
+  R.boats.forEach((g, id) => { if (!seen.has(id)) { R.root.remove(g); R.boats.delete(id); } });
+}
+
 function terrainColor(W, x, y, z, rnd, out) {
-  const dm = hyp(x - W.mountain.x, z - W.mountain.z), dp = hyp(x - W.pond.x, z - W.pond.z), r = hyp(x, z);
+  const dm = W.mountain ? hyp(x - W.mountain.x, z - W.mountain.z) : 99, dp = W.pond ? hyp(x - W.pond.x, z - W.pond.z) : 99, r = hyp(x, z);
   const d = r / rimR(W, Math.atan2(x, z));
   let hex;
   if (y > 6.1) hex = rnd() < 0.5 ? '#f6f9ff' : '#dfe8ff';
-  else if (dm < W.mountain.r + 0.9 && y > 2.5) hex = rnd() < 0.5 ? '#8f91a8' : '#7c7e97';
-  else if (dp < W.pond.r + 1.2) hex = rnd() < 0.5 ? '#ecd9a0' : '#e2cc8c';
-  else if (r < 3.4) hex = rnd() < 0.5 ? '#d6b47c' : '#cba86e';
-  else if (d > 0.93) hex = rnd() < 0.5 ? '#b9e06a' : '#a6d65e';
+  else if (W.mountain && dm < W.mountain.r + 0.9 && y > 2.5) hex = rnd() < 0.5 ? '#8f91a8' : '#7c7e97';
+  else if (W.pond && dp < W.pond.r + 1.2) hex = rnd() < 0.5 ? '#ecd9a0' : '#e2cc8c';
+  else if (!W.id && r < 3.4) hex = rnd() < 0.5 ? '#d6b47c' : '#cba86e';
+  else if (d > 0.9) hex = rnd() < 0.5 ? '#f0dca0' : '#e6cf8c';
+  else if (d > 0.84) hex = rnd() < 0.5 ? '#b9e06a' : '#a6d65e';
   else {
     const n = W.noise(x * 0.22 + 20, z * 0.22 + 20);
-    hex = n < 0.38 ? '#4fc04f' : n < 0.62 ? '#63d35a' : '#86e267';
+    hex = W.kind === 'stone' ? (n < 0.5 ? '#8fa36a' : '#9aa080') : n < 0.38 ? '#4fc04f' : n < 0.62 ? '#63d35a' : '#86e267';
   }
   out.set(hex).multiplyScalar(0.93 + rnd() * 0.14);
   return out;
@@ -543,9 +628,9 @@ function syncNodes(S, force) {
   const I = R.inst;
   for (let i = 0; i < W.nodes.length; i++) {
     const n = W.nodes[i], k = idx[n.type]++;
-    if (k >= 200) continue;
+    if (k >= 700) continue;
     let s = 0;
-    if (!n.dead) {
+    if (!n.dead && (!S.found || S.found[n.isle || 0])) {
       if (n.type === 'tree') s = n.amount > 0 ? n.scale * (0.72 + 0.28 * n.amount / n.max) : n.scale * (0.18 + 0.4 * (1 - clamp(n.regrow / 80, 0, 1)));
       else if (n.type === 'rock') s = n.scale * (n.amount > 0 ? 0.5 + 0.5 * n.amount / n.max : 0.28);
       else s = n.scale * 0.95;
@@ -555,14 +640,14 @@ function syncNodes(S, force) {
     _dummy.updateMatrix();
     I[n.type].setMatrixAt(k, _dummy.matrix);
     if (n.type === 'bush') {
-      _dummy.scale.setScalar(n.dead || n.amount <= 0 ? 0 : n.scale * (0.6 + 0.4 * n.amount / n.max));
+      _dummy.scale.setScalar(n.dead || n.amount <= 0 || (S.found && !S.found[n.isle || 0]) ? 0 : n.scale * (0.6 + 0.4 * n.amount / n.max));
       _dummy.updateMatrix();
       I.berry.setMatrixAt(k, _dummy.matrix);
     }
   }
   for (const t of ['tree', 'rock', 'bush']) {
     if (I[t].count !== idx[t]) force = true;
-    I[t].count = Math.min(200, idx[t]); I[t].instanceMatrix.needsUpdate = true;
+    I[t].count = Math.min(700, idx[t]); I[t].instanceMatrix.needsUpdate = true;
     if (force) {
       for (let k = 0; k < I[t].count; k++) { _c3.setScalar(1).offsetHSL(0, 0, (((k * 37) % 10) - 5) * 0.012); I[t].setColorAt(k, _c3); }
       if (I[t].instanceColor) I[t].instanceColor.needsUpdate = true;
@@ -635,6 +720,14 @@ function makeBuilding(b) {
     add(merge(parts));
     o.parts.sign = add(merge([P(box(0.3, 0.3, 0.06), '#ffe98a', 0.45, 0.62, 0.76)]), R.matGlow);
     h = 2.0;
+  } else if (b.type === 'dock') {
+    // a pier reaching out over the water (local +z points out to sea)
+    const parts = [];
+    for (let i = 0; i < 6; i++) parts.push(P(box(1.5, 0.12, 0.5), i % 2 ? '#a8793f' : '#b98a52', 0, 0.2 - i * 0.04, 0.2 + i * 0.55));
+    for (const sx of [-0.7, 0.7]) for (const zz of [0.6, 1.9, 3.2]) parts.push(P(cyl(0.08, 0.08, 1.6, 4), '#6b4226', sx, -0.4 - zz * 0.08, zz));
+    parts.push(P(box(0.5, 0.4, 0.5), '#c79a62', -0.5, 0.35, -0.2), P(cyl(0.18, 0.18, 0.5, 6), '#8a5a35', 0.5, 0.35, -0.2));
+    add(merge(parts));
+    h = 0.8;
   } else if (b.type === 'spire') {
     add(merge([P(cyl(1.9, 2.25, 0.5, 8), '#4a4070', 0, 0.25, 0), P(cyl(1.35, 1.7, 0.6, 8), '#5a4f86', 0, 0.8, 0),
       P(cyl(0.55, 1.15, 4.2, 6), '#2a2550', 0, 3.2, 0), P(cyl(0.3, 0.55, 3.2, 6), '#3a3370', 0, 6.9, 0), P(cone(0.3, 1.4, 6), '#55499a', 0, 9.2, 0),
@@ -1044,9 +1137,13 @@ function updateCamera(S, dt) {
     const o = R.cit.get(C.follow);
     if (o) { C.tx = lerp(C.tx, o.x, Math.min(1, dt * 4)); C.tz = lerp(C.tz, o.z, Math.min(1, dt * 4)); C.ty = lerp(C.ty, o.g.position.y + 0.8, Math.min(1, dt * 4)); }
     else C.follow = 0;
+  } else if (typeof UI !== 'undefined' && UI.goBoat) {
+    const b = boatOf(S, UI.goBoat);
+    if (b && b.st !== 'docked') { C.tx = lerp(C.tx, b.x, Math.min(1, dt * 3)); C.tz = lerp(C.tz, b.z, Math.min(1, dt * 3)); C.ty = lerp(C.ty, SEA_Y + 0.6, Math.min(1, dt * 3)); }
+    else UI.goBoat = 0;
   } else C.ty = lerp(C.ty, groundY(S.world, C.tx, C.tz) + 0.6, Math.min(1, dt * 3));
   if (C.auto) C.yaw += dt * 0.12;
-  C.pitch = clamp(C.pitch, 0.28, 1.45); C.dist = clamp(C.dist, 8, 70);
+  C.pitch = clamp(C.pitch, 0.28, 1.45); C.dist = clamp(C.dist, 8, 140);
   const cp = Math.cos(C.pitch);
   let sx = 0, sy = 0;
   if (R.shake > 0) { R.shake = Math.max(0, R.shake - dt * 1.6); sx = (Math.random() - 0.5) * R.shake; sy = (Math.random() - 0.5) * R.shake; }
@@ -1070,7 +1167,7 @@ function screenRay(sx, sy) {
 }
 function groundPoint(sx, sy) {
   screenRay(sx, sy);
-  const hits = R.ray.intersectObject(R.terrain, false);
+  const hits = R.ray.intersectObjects(R.terrains.filter((m, i) => R.isles[i].visible), false);
   if (hits.length) return { x: hits[0].point.x, z: hits[0].point.z, on: true };
   if (R.ray.ray.intersectPlane(_plane, _hit)) return { x: _hit.x, z: _hit.z, on: false };
   return null;
@@ -1106,8 +1203,15 @@ function renderFrame(S, alpha, dt) {
   if (R.nodeT <= 0) { R.nodeT = 0.25; syncNodes(S, false); }
   syncBuildings(S, dt);
   syncCitizens(S, alpha, dt);
+  syncBoats(S, alpha, dt);
+  if (R.sea) updateSea(dt);
+  if (R.fog && S.fog) {
+    if (R.fogV !== S.fogV && (R.time - (R.fogPaintT || -9) > 0.8 || R.fogV < 0)) { R.fogV = S.fogV; R.fogPaintT = R.time; paintFog(S); }
+    R.fogMat.color.set('#ffffff').lerp(_cb.set('#3a4470'), (R.night || 0) * 0.8);
+  }
+  if (R.isles && S.found) for (let i = 0; i < R.isles.length; i++) R.isles[i].visible = !!S.found[i];
   updateFx(S, dt);
   updateCamera(S, dt);
-  R.water.position.y = S.world.waterY + Math.sin(R.time * 1.3) * 0.04;
+  if (R.water) R.water.position.y = S.world.waterY + Math.sin(R.time * 1.3) * 0.04;
   R.renderer.render(R.scene, R.camera);
 }
