@@ -7371,7 +7371,7 @@ function hdHide(){HD.rot.forEach(r=>{r.s.visible=false;});}
 /* ================= ACT 67: ACCELERATION. Climb out of the Slop Hole and the future climbs out with you. Generation stopped at 67%; now the unfinished 33% pours up through the hole while the finished world pours out through the sky, both at once. Nick Land arrives to narrate it. The world above keeps everything it had (every collectible stays where it was) but it is coming apart: the sky is a data dump, the ground has unrendered holes, chunks of the map float off, the cast glitches, everything runs faster, and it gets worse each chapter. The RESTORE POINT in Prompt Plaza rolls the world back to the 67% build and forward again whenever you like. ================= */
 const ACC={lvl:0,on:false,t:0,objs:[],holes:[],rise:[],rot:[],ghosts:[],chip:null,term:null,land:null,tt:0,gt:0};
 const accUnlocked=()=>!!X.acc,accWant=()=>!!X.acc&&X.accOn!==0;
-function accLevel(){const st=stq();return portalReady()||X.won?3:st.truth?2:1;}
+function accLevel(){if(ACC.force)return ACC.force;const st=stq();return portalReady()||X.won?3:st.truth?2:1;}
 (function(){const add=o=>{scene.add(o);ACC.objs.push(o);o.visible=false;return o;},r=mulberry(1767),R=(a,b)=>a+r()*(b-a),q=a=>a[Math.floor(r()*a.length)];
   // the sky is a data dump now: a wall of leaked strings around the whole world
   const sm=new THREE.MeshBasicMaterial({map:HD.tex,color:0xb6ff00,side:THREE.BackSide,fog:false,transparent:true,opacity:.5,depthWrite:false});
@@ -7449,6 +7449,14 @@ function accBegin(){if(X.acc)return;X.acc=1;X.accOn=1;save();accApply();
 {const ar=act7Reset;act7Reset=function(){ar();ACC.on=null;ACC.lvl=-1;};}
 CX.push(['w_accel','WORLD','Acceleration','What happens after you carry the Final Brain Rot 67 back up the Slop Hole. Generation had stopped at 67%; now the unfinished 33% pours up while the finished world pours out through the sky. Unrendered holes, chunks of the map floating off, the cast generated twice, everything running faster. It gets worse every chapter. Every collectible stays where it was. The RESTORE POINT in Prompt Plaza rolls the world back to the 67% build and forward again.',()=>!!X.acc],
   ['w_restore','WORLD','The Restore Point','A terminal in Prompt Plaza with a floppy disk on top. It rolls the world back to the last stable build (67%) and forward again. Nick Land says deceleration is impossible. The terminal disagrees. The terminal is right, technically.',()=>!!X.acc]);
+// ---- dev console: jump straight into each part of the new endgame
+DEVP.splice(DEVP.findIndex(p=>p[0]==='g'&&p[1]==='EVERYTHING'),0,['g','THE NEW ENDGAME (ACT 66-67)'],
+  ['p_acc0','Acceleration begins (climb out, Nick Land explains)',()=>{X.cc=1;X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=0;X.accOn=1;ACC.force=0;if(S.inPk)exitPk();warpTo(0,9,undefined,0);setTimeout(()=>{if(S.mode==='play')accBegin();},600);}],
+  ['p_acc1','Accelerated world · chapter strength (x2)',()=>{X.cc=1;if(!X.sh||!X.sh.fin)X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=1;X.accOn=1;ACC.force=1;if(S.inPk)exitPk();warpTo(40,60,undefined,0);accApply();}],
+  ['p_acc3','Accelerated world · full strength (x8)',()=>{X.cc=1;if(!X.sh||!X.sh.fin)X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=1;X.accOn=1;ACC.force=3;if(S.inPk)exitPk();warpTo(40,60,undefined,0);accApply();}],
+  ['p_rest','The Restore Point and Nick Land (Prompt Plaza)',()=>{X.cc=1;if(!X.sh||!X.sh.fin)X.sh={l:5,c:[1,1,1,1,1],fin:1,att:0};X.acc=1;X.accOn=1;ACC.force=0;if(S.inPk)exitPk();const T=ACC.term;warpTo(T.x-1.5,T.z+2.5,undefined,-2.2,['THE RESTORE POINT','press E to roll back to 67%']);accApply();}],
+  ['p_rot2','ROT x1000 (the ending: then touch the last grass)',()=>{devRelics();if(S.inPk)exitPk();X.rot1000=0;startRot1000();}],
+  ['p_mm2','Meme Mountain base (the optional climb)',()=>{if(S.inPk)exitPk();mmEnter();}]);
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
