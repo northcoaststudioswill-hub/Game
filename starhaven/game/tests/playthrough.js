@@ -124,6 +124,27 @@ const { chromium } = require('playwright'); const path = require('path'); const 
         else if (foe) { if (foe.kind === 'wyrm' && (foe.state === 'windup' || foe.state === 'charge') && Math.sign(foe.x - p.x) !== foe.dir && Math.abs(foe.x - p.x) < 120) { held = { jump: true }; if (p.grounded) press = ['jump']; } else fight(foe); }
         else jumpsAt([[47.3], [55.3], [63.4], [115]]);
       }
+      else if (id === 'library') {
+        const spies = w.things.filter(e => e.kind === 'spy' && !e.dead && e.active()), boss = G.boss, bow = () => (p.bowCd <= 0 && B.f % 6 === 0 ? ['bow'] : null);
+        held = {};
+        if (!G.flags.bow4) held = { right: true };
+        else if (boss && !boss.dead) {
+          const st = boss.state, dx = boss.x - p.x;
+          if (st === 'grounded' || st === 'fall') { if (Math.abs(dx) > 30) held[dx > 0 ? 'right' : 'left'] = true; else { p.facing = Math.sign(dx) || 1; if (!p.swing && B.f % 5 === 0) press = ['attack']; } }
+          else if (st === 'volley') held = { down: true };
+          else if (st === 'swoop') { if (Math.abs(dx) < 110 && p.grounded && Math.sign(boss.vx) === -Math.sign(dx)) { press = ['jump']; held = { jump: true }; } else if (!p.grounded) held = { jump: true }; }
+          else press = bow();
+          if (B.f % 600 === 0) want('boss fight');
+        } else {
+          const down = spies.find(e => e.state === 'down');
+          if (down) { const dx = down.x - p.x; if (Math.abs(dx) > 26) held[dx > 0 ? 'right' : 'left'] = true; else if (!p.swing && B.f % 5 === 0) press = ['attack']; }
+          else if (spies.length) { const sp = spies.sort((a, b2) => Math.abs(a.x - p.x) - Math.abs(b2.x - p.x))[0], dx = sp.x - p.x; if (sp.state === 'mark' || sp.state === 'dive') held = { down: true }; else if (Math.abs(dx) > 150) held[dx > 0 ? 'right' : 'left'] = true; else if (Math.abs(dx) < 40) held[dx > 0 ? 'left' : 'right'] = true; else press = bow(); if (B.f % 400 === 0) want('spies'); }
+          else held = { right: true };
+        }
+      }
+      // unstick: if she has not moved for two seconds while the bot wants to go right, jump forward
+      if (B.f % 120 === 0) { if (Math.abs(p.x - (K.sx || 0)) < 6 && p.grounded && !(G.boss && !G.boss.dead)) K.unstick = 40; K.sx = p.x; }
+      if (K.unstick > 0) { K.unstick--; held = { right: true, jump: true }; if (K.unstick === 39 || K.unstick === 20) press = ['jump']; }
       // progress watch
       if (B.f % 600 === 0) { want('every 10s of play'); if (Math.abs(p.x - B.lastX) < 30 && !(G.boss && !G.boss.dead)) { B.stuck++; L(`  ?? not moving for 10s at tile ${tx.toFixed(1)},${row} goal=${G.activeGoal} hearts=${p.hearts}`); } else B.stuck = 0; B.lastX = p.x; }
       one(held, press);

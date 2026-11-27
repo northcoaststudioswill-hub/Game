@@ -63,6 +63,20 @@ Wren and she refuses him (choose how). "Then I'll take you back. One way or anot
 - Goals: light the braziers; burn the thorns; hunt the beast.
 - Evening 3: Caelum on the rooftop ("you called it home") or Thane in the Library (forty-one questions).
 
+## Chapter 4: The Spy in the Library (the fae bow, winged spies, a boss)
+Three nights after the Old Wyrm, something with wings landed on the Library roof; by morning, every map of Starhaven
+and the Library's own floor plans had pages cut out. Thane gives Wren a **fae bow** that Bram strung in secret (his
+promise in Chapter 2). Two **winged spies** hang over the courtyard out of dagger reach: an arrow pins a wing, the spy
+falls, and the daggers finish it. Three more go for the oldest books, open on three **lecterns** in the stacks (galleries
+three rows apart): every page they carry off is lost, and remembered. In the reading hall, the **Spymaster's Shadow**
+(DESIGN.md's Chapter 4 boss): shoot it until its wings fail, cut it on the floor. It leaves a letter sealed with
+Spring's rose: "She will be at the Library at first light. Take the maps. Leave her to me." Rowan is trading
+Starhaven's doors to the Iron King for Wren. In the margin, in iron-grey ink: **Weaver**.
+- Goals: shoot the spies out of the courtyard sky; drive the spies out of the stacks before they carry off the pages;
+  bring down the Spymaster's Shadow. Optional: relight the four reading lamps.
+- Evening 4: Caelum on the rooftop ("Rowan wrote to the Iron King because of Rowan"), Thane mending the dome (the
+  Weaver), or Iris in her tower (the Weaver has the sisters' names on her wall).
+
 ## Evenings and bonds
 - **After Chapter 1:** a night on the rooftop with Caelum. Starlit wine. Show him your sketchbook (a gift he loves),
   toast to the bargain, or ask about his nightmares.
@@ -72,7 +86,7 @@ Wren and she refuses him (choose how). "Then I'll take you back. One way or anot
 - **Hearts:** 5 each. Heart 1 when you meet; then 40, 120, 240, 400 points. Every new heart plays a short scene.
 
 ## Then
-A last scene: three nights later, something with wings lands on the Library roof. Next: Chapter 4, The Spy in the Library.
+A last scene: a week after the Library, Thane circles one word on the pinned letter, and across the sea a loom stops. Next: Chapter 5, The Weaver's Cottage.
 
 ## How the player always knows what's going on
 - The **GOAL line** at the top always shows the chapter and the one thing to do now.

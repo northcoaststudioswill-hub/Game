@@ -92,7 +92,7 @@
       },
       onKnockout() { G.knockout(); },
       arrows: [],
-      spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
+      spawnArrow(x, y, dir, ang, fae) { const sp = fae ? 10.5 * (SH.xp.level() >= 7 ? 1.2 : 1) : 8; this.arrows.push(fae ? { x, y, vx: dir * Math.cos(ang) * sp, vy: -Math.sin(ang) * sp, life: 90, stuck: false, fae: true, g: 0.03 } : { x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
       fireballs: [], rocks: [], waves: [],
       spawnFireball(x, y, dir, big) { const F = SH.GIFTS.flame; this.fireballs.push({ x, y, vx: dir * (big ? F.waveSpeed : F.speed), life: F.life, dir, big: !!big, hit: new Set() }); },
       spawnWave(x, y, dir) { this.waves.push({ x, y, dir, life: 80, t: 0 }); },
@@ -100,14 +100,14 @@
       dropRocks(n, at) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 90; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); this.victoryT = 1; this.victoryAt = b ? { x: b.x, y: b.y - 30 } : null; this.rocks = []; this.waves = []; },
+      onBossDown() { const b = this.things.find(e => e.boss), d = (b && b.def) || {}; if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 90; SH.arts.finisher(d.slain || 'WYRMSLAYER', d.falls || 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); this.victoryT = 1; this.victoryAt = b ? { x: b.x, y: b.y - 30 } : null; this.victoryScript = d.after || 'mtn_peak'; this.victoryWords = d.quiet || 'THE HOLLOW IS QUIET'; this.rocks = []; this.waves = []; },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       // the Winter Woods
       onPickup(what) {
         if (what === 'plums') { G.queueScript('ring_plums'); return; }
         if (what === 'cat') { G.queueScript('ashes_cat_found'); return; }
         if (what === 'page') { G.queueScript('mtn_page'); return; }
-        if (what === 'lamp') { G.flags.n_lamps = (G.flags.n_lamps || 0) + 1; SH.xp.gain(5, true); SH.sfx.play('lantern'); fx.word(player.x, player.y - 50, 'Lamp ' + G.flags.n_lamps + '/4', '#ffd27a', 70); fx.ring(player.x, player.y - 30, '#ffd27a', 40, 20, 2); this.cityLightTarget = Math.min(1, (this.cityLightTarget || 0) + 0.08); if (G.flags.n_lamps === 4) { G.flags.lamps4 = true; G.queueScript('ashes_lamps'); } return; }
+        if (what === 'lamp') { G.flags.n_lamps = (G.flags.n_lamps || 0) + 1; SH.xp.gain(5, true); SH.sfx.play('lantern'); fx.word(player.x, player.y - 50, 'Lamp ' + G.flags.n_lamps + '/4', '#ffd27a', 70); fx.ring(player.x, player.y - 30, '#ffd27a', 40, 20, 2); this.cityLightTarget = Math.min(1, (this.cityLightTarget || 0) + 0.08); if (G.flags.n_lamps === 4) { G.flags.lamps4 = true; G.queueScript(def.lampScript || 'ashes_lamps'); } return; }
         if (what === 'pack' || what === 'tally') { G.progress.seen = G.progress.seen || {}; G.progress.seen['d_' + what] = 1; SH.xp.gain(8, true); G.queueScript('deep_' + what); return; }
         if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
         G.flags.n_wood = (G.flags.n_wood || 0) + 1;
@@ -167,7 +167,10 @@
     const w = G.world, p = w.player;
     const look = p.facing * 46 + p.vx * 8;
     let tx = p.x + look - w.viewW / 2;
-    let ty = p.y - SH.VIEW_H * 0.64;
+    if (G.boss && !G.boss.dead && G.boss.kind === 'shadow') {   // a flying boss: keep both of them in the picture, Wren never too near an edge
+      const midX = (p.x + G.boss.x) / 2 - w.viewW / 2; tx = Math.max(p.x - w.viewW * 0.76, Math.min(p.x - w.viewW * 0.24, midX));
+    }
+    let ty = p.y - SH.VIEW_H * (0.64 + (w.room.def.camLift || 0));   // a level with things in the air looks up a little more
     tx = Math.max(0, Math.min(w.room.pxW - w.viewW, tx));
     ty = Math.max(0, Math.min(w.room.pxH - SH.VIEW_H, ty));
     w.camT = { x: tx, y: ty };
@@ -229,6 +232,7 @@
       const n = g.counter ? (G.flags['n_' + g.counter] || 0) : G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
       text += ` (${n}/${g.count})`;
     }
+    if (g.id === 'stacks_done' && G.world && SH.ch4) { const tot = SH.ch4.pagesTotal(G.world); if (tot) text += ` \u00b7 pages safe ${tot - (G.flags.pagesLost || 0)}/${tot}`; }
     return text;
   };
 
@@ -261,7 +265,7 @@
         return;
       }
       if (st.if) {   // the story comes back to something Wren did
-        const yes = st.if[0] === '!' ? !G.recalls(st.if.slice(1)) : G.recalls(st.if);
+        const has = k => G.recalls(k) || !!G.flags[k], yes = st.if[0] === '!' ? !has(st.if.slice(1)) : has(st.if);
         sc.steps = sc.steps.slice(0, sc.i).concat(yes ? st.then || [] : st.else || [], sc.steps.slice(sc.i));
         continue;
       }
@@ -344,10 +348,12 @@
     G.save();
   };
   // Explain a system the first time it matters: a short card that holds the game until it is read. Once per save.
+  G.calm = () => { const w2 = G.world, p2 = w2.player; return p2.grounded && !(w2.wyrm && w2.wyrm.on) && !(G.boss && !G.boss.dead) && !w2.victoryT && !w2.koT
+      && !w2.things.some(e => (e.kind === 'thornSprite' || e.kind === 'wyrm' || e.kind === 'wolf' || (e.kind === 'spy' && e.active())) && !e.dead && !e.gone && Math.abs(e.x - p2.x) < 260 && Math.abs(e.y - p2.y) < 120); };
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play' || (G.explainWait || 0) > 0 || (G.world && ((G.world.wyrm && G.world.wyrm.on) || (G.boss && !G.boss.dead)))) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
+    if (G.state !== 'play' || (G.explainWait || 0) > 0 || !G.world || !G.calm()) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -382,6 +388,7 @@
     if (w.pts) return !!pr.bonds[w.pts[0]] && pr.bonds[w.pts[0]].pts >= w.pts[1];
     if (w.mem) return !!(pr.mem && pr.mem[w.mem]);
     if (w.seen) return !!(pr.seen && pr.seen[w.seen]);
+    if (w.flag) return !!G.flags[w.flag];
     return false;
   };
   G.loreCheck = function (quiet) {
@@ -435,9 +442,7 @@
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
     if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 3);   // and never the moment a conversation ends
     // a card only ever opens in a calm moment: feet on the ground, nothing chasing her, no boss, no enemy close
-    const calm = () => { const w2 = G.world, p2 = w2.player; return p2.grounded && !(w2.wyrm && w2.wyrm.on) && !(G.boss && !G.boss.dead) && !w2.victoryT && !w2.koT
-      && !w2.things.some(e => (e.kind === 'thornSprite' || e.kind === 'wyrm' || e.kind === 'wolf') && !e.dead && !e.gone && Math.abs(e.x - p2.x) < 260 && Math.abs(e.y - p2.y) < 120); };
-    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending && calm()) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending && G.calm()) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -477,13 +482,13 @@
     for (const a of w.arrows) {
       a.life--;
       if (a.stuck) continue;
-      a.vy += 0.05; a.x += a.vx; a.y += a.vy;
+      a.vy += a.g != null ? a.g : 0.05; a.x += a.vx; a.y += a.vy;
       const tile = w.room.get(Math.floor(a.x / TS), Math.floor(a.y / TS));
       if (tile === SH.T_SOLID) { a.stuck = true; a.life = Math.min(a.life, 60); continue; }
       for (const e of w.things) {
-        if (!e.arrowOnly || !e.hittable()) continue;
-        const hb = e.hurtBox();
-        if (a.x > hb.l && a.x < hb.r && a.y > hb.t && a.y < hb.b) { e.takeHit({ arrow: true, dir: Math.sign(a.vx) }, w); a.life = 0; break; }
+        if (!e.hittable() || (!e.arrowOnly && !a.fae) || (a.fae && (e.kind === 'bulb' || e.kind === 'brazier' || e.kind === 'lectern'))) continue;
+        const hb = e.hurtBox(), pad = a.fae ? 4 : 0;
+        if (a.x > hb.l - pad && a.x < hb.r + pad && a.y > hb.t - pad && a.y < hb.b + pad) { e.takeHit({ arrow: true, fae: a.fae, dmg: 2, kb: 1.5, dir: Math.sign(a.vx) || 1 }, w); a.life = 0; if (a.fae) { fx.spark(a.x, a.y, 0, true); if (e.kind === 'spy' && !G.flags.pinned1) G.flags.pinned1 = true; } break; }
       }
     }
     w.arrows = w.arrows.filter(a => a.life > 0);
@@ -601,7 +606,7 @@
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0) && (h.above == null || p.y <= h.above * TS) && (h.below == null || p.y > h.below * TS));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or dash straight through it ({DASH}): nothing can touch you mid-dash.', charge: 'CHARGING. Jump it, or dash through it ({DASH}). If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
+    const bossTell = G.boss && !G.boss.dead ? (G.boss.tell ? { now: G.boss.tell() } : { windup: 'It is about to CHARGE. Jump over it, or dash straight through it ({DASH}): nothing can touch you mid-dash.', charge: 'CHARGING. Jump it, or dash through it ({DASH}). If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.tell ? 'now' : G.boss.state] : null;
     { const text = bossTell ? input.fill(bossTell) : hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
       if (bossTell) { w.hintNow = text; w.hintHold = 0; G.hud.prompt(text); }
       else if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time
@@ -692,11 +697,11 @@
       fx.parts.push({ x: sx, y: sy, vx: (p.x - sx) / k, vy: (p.y - 26 - sy) / k, g: 0, drag: 1, life: k, max: k, size: 3, color: t % 2 ? '#ffd27a' : '#fff6d8', glow: true, shape: 'sq' });
     }
     if (t > 60 && t < 200 && t % 28 === 0) { fx.ring(p.x, p.y - 24, '#ffd27a', 30 + (t % 3) * 8, 22, 2); if (p.hearts < p.maxHearts) { p.hearts++; SH.sfx.play('heart'); } }
-    if (t === 120) { fx.word(p.x, p.y - 70, 'THE HOLLOW IS QUIET', '#fff6d8', 150); SH.arts.whisper('bossWon', true); }
+    if (t === 120) { fx.word(p.x, p.y - 70, w.victoryWords || 'THE HOLLOW IS QUIET', '#fff6d8', 150); SH.arts.whisper('bossWon', true); }
     if (t === 215) SH.xp.gain(40, true);
     if (t === 210) { SH.sfx.play('lantern'); fx.burst(p.x, p.y - 24, 40, { speed: 3.4, life: 50, gravity: -0.03, colors: ['#ffd27a', '#fff6d8', '#b9a8ff'], glow: true }); G.look(p.x, p.y - 30, 1.4, 90); }
     if (t > 270) w.fade = Math.min(1, (t - 270) / 40);
-    if (t >= 315) { w.victoryT = 0; G.queueScript('mtn_peak'); }
+    if (t >= 315) { w.victoryT = 0; G.queueScript(w.victoryScript || 'mtn_peak'); }
   };
 
   G.caught = function () {

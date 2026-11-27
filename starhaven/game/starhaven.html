@@ -274,7 +274,7 @@ body[data-input="touch"] #touch { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
-body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-up, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
+body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-up, body[data-mode] #b-bow, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
 body[data-mode="flight"] #b-jump, body[data-mode="mural"] #b-jump { display: none !important; }
 body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body.cutin #whisper, body.cutin #pause-btn, body.cutin #motes, body.cutin #pips, body.cutin #hearts, body.cutin #art { visibility: hidden; }
 /* ---- held upright: the picture on top, a control deck below (no need to turn the phone) */
@@ -573,6 +573,10 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
 body:has(.screen.show) #toast, body[data-state="card"] #toast, body[data-state="explain"] #toast { display: none !important; }
 body[data-mode] #effects { display: none !important; }
 html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom: auto !important; }
+
+/* ---- the fae bow's button (Chapter 4 on): above STRIKE, where the right thumb already is */
+#b-bow { display: none; width: 62px; height: 62px; right: calc(max(24px, env(safe-area-inset-right)) + 112px); bottom: 116px; font-size: 12px; letter-spacing: .08em; border-color: rgba(159,232,255,.7) !important; color: #dff6ff; }
+body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px); bottom: calc(12vh + 92px); }
 </style>
 </head>
 <body>
@@ -599,6 +603,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
   <div class="tbtn" id="b-art" data-act="art">BOND<br>ART</div>
   <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down in the air, guard on the ground">&#9660;</div>
   <div class="tbtn" id="b-up" data-act="upstrike" aria-label="Rising strike">&#9650;</div>
+  <div class="tbtn" id="b-bow" data-act="bow" aria-label="Bow">BOW</div>
   <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
   <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
@@ -631,7 +636,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.11 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.2.0 &middot; Prologue to Chapter 4</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -877,6 +882,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
     lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
     bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts. A new heart plays a scene, gives Wren something real in a fight, and writes new pages in her journal. The journal shows what each heart gives and where each bond is heading.' },
+    bow: { icon: '\u27B3', title: 'The fae bow', text: 'Wren has a bow again, on its own button: BOW on the screen, I on a keyboard, RB on a controller. It aims itself at the nearest thing in front of her; hold up as you shoot to aim high. An arrow through a spy\'s wing brings it down: finish it with your daggers before it rises.' },
     moves: { icon: '\u2694', title: 'Wren\'s blades', text: 'Strike three times for a combo. Up and strike is a rising strike (and cuts straight up in the air). Strike during a dash is a lunge, her hardest hit. Down and strike in the air bounces her off what is below. Hold down on the ground to guard: blows from the front stop, and a guard raised at the last moment is a parry that leaves the enemy open. She cannot guard a fall or what is behind her.' },
     remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Wren\'s journal, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
@@ -888,6 +894,8 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
   // Whispers down the mate bond: short lines that slide in during play and never stop it.
   // Each is said once per save, in order (the boss lines repeat). [who, text]
   S.WHISPERS = {
+    shadowDown: [['caelum', 'It\'s down. Now, Wren, before it remembers it can fly.'], ['caelum', 'Down again. Cut.']],
+    pageLost: [['thane', 'They have a page! Oh, that was a good page.']],
     ready: [['caelum', 'Now, Wren. Reach down the bond. I\'ll answer.'], ['caelum', 'The bond is singing. Use it.']],
     dodge: [['caelum', 'Beautiful. Did Bram teach you that, or were you born rude?'], ['caelum', 'I felt that one miss you. Do it again.']],
     low: [['caelum', 'You\'re hurt. I can feel it. Find a lantern.'], ['caelum', 'Wren. Breathe. Then a lantern.']],
@@ -985,6 +993,19 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       summary: 'Wren learned she carries the stolen powers the Thorn Queen hoarded, and Flame woke first. She burned the queen\'s last thorns off the mountain road and killed the Old Wyrm. On the peak, Rowan came for her, and she told him no.',
       done: 'Wren has her first court gift, and Rowan has his answer. Spring will not stop now. Neither will she.',
       after: 'evening3',
+    },
+    {
+      id: 'ch4', label: 'Chapter 4', name: 'The Spy in the Library', room: 'library',
+      abilities: { flame: true, fbow: true },
+      card: 'Three nights after the Old Wyrm, something with wings landed on the Library roof. By morning, pages were missing from books nobody had opened in a hundred years. Thane has a gift for Wren, and Bram has strung it himself.',
+      goals: [
+        { id: 'sky', text: 'Shoot the spies out of the courtyard sky', count: 2, counter: 'skyspies' },
+        { id: 'stacks_done', text: 'Drive the spies out of the stacks before they carry off the pages', count: 3, counter: 'stackspies' },
+        { id: 'shadow', text: 'Bring down the Spymaster\'s Shadow' },
+      ],
+      summary: 'The Iron King sent winged spies into the Library, led by a thing of shadow and iron. Wren shot them out of the air with a fae bow Bram strung for her. The Shadow carried a letter sealed with the rose of Spring.',
+      done: 'Rowan is writing to the Iron King. Whatever Spring has become, it is no longer only Starhaven\'s enemy. It is his ally.',
+      after: 'evening4',
     },
   ];
 
@@ -1781,13 +1802,156 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     ],
 
     // ---------------- The end of the concept: a look at Chapter 4
+    // ======================================================== Chapter 4: The Spy in the Library
+    lib4_start: [
+      { do: 'art', id: 'library', title: 'The Library, before dawn' },
+      ['narr', 'Three nights after the Old Wyrm, something with wings landed on the Library roof. By morning, pages were missing from books nobody had opened in a hundred years.'],
+      ['thane', 'Not torn. Cut. Clean, along the binding. Whoever did this knew exactly which pages they wanted.'],
+      ['caelum', 'Which pages?'],
+      ['thane', 'Every map of Starhaven we own. And the Library\'s own floor plans.'],
+      ['wren', 'Then they\'ll be back for the rest.'],
+      { do: 'art', id: null },
+      ['thane', 'Which is why I have this. Bram strung it last night, and then pretended he hadn\'t.'],
+      ['narr', 'A bow of dark ash, light as a held breath. The string hums when Wren touches it: a note she feels in her teeth.'],
+      ['wren', 'A fae bow.'],
+      ['thane', 'It shoots where you mean, not where you point. Mostly. I have a theory about the "mostly".'],
+      { if: 'rings', then: [['thane', 'Bram says you cut all three of his rings. He said, and I quote, "Give her the good one."']] },
+      { do: 'flag', name: 'bow4' },
+      ['caelum', 'Wren. The roof.'],
+      ['narr', 'Two shapes unfold from the Library\'s eaves: grey wings, iron masks, eyes like coals. They drop into the courtyard air and hang there, out of reach of any knife.'],
+      ['thane', 'The Iron King\'s spies. They fly where daggers can\'t follow. That is rather the point of the bow.'],
+      { do: 'explain', key: 'bow' },
+      { do: 'goal', id: 'sky' },
+    ],
+    lib4_sky_done: [
+      { do: 'flag', name: 'sky' },
+      ['thane', 'Two down! Oh, well shot. Well shot. I take back the "mostly".'],
+      ['caelum', 'Those were the lookouts. The thieves are already inside.'],
+      ['narr', 'From inside the Library comes the sound every librarian dreads: a book falling open, and a page tearing.'],
+      ['thane', 'The stacks! The oldest books in the city lie open on three lecterns up there. If they take those pages, they are gone for good.'],
+      { do: 'open', id: 'libdoor' },
+      { do: 'flag', name: 'stacks4' },
+      { do: 'bond', who: 'thane', pts: 10, why: 'She saved his courtyard, and then she let him have his moment.' },
+      { do: 'goal', id: 'stacks_done' },
+    ],
+    lib4_stacks_done: [
+      { do: 'flag', name: 'stacks_done' },
+      { if: 'pagesKeptAll', then: [
+        ['thane', 'Every page. Every single page. Wren, some of those books are older than Caelum.'],
+        ['caelum', 'Most things are.'],
+        { do: 'remember', key: 'pagesSaved', text: 'Kept every page in the Library from the Iron King\'s spies.', good: true },
+        { do: 'bond', who: 'thane', pts: 15, liked: true, why: 'Every page, kept. He will not forget it.' },
+      ], else: [
+        ['thane', 'They got some. A map of the river gates, I think, and the pages on the old wards.'],
+        ['wren', 'I\'m sorry.'],
+        ['thane', 'Don\'t be. They came for all of it and left with very little. I will copy what I remember. I remember a great deal.'],
+        { do: 'remember', key: 'pagesLost', text: 'Lost some of the Library\'s pages to the spies.', good: false },
+        { do: 'bond', who: 'thane', pts: 5, why: 'He forgave her before she had finished apologizing.' },
+      ] },
+      ['caelum', 'The reading hall. Something bigger went that way, and it hasn\'t come out.'],
+      { do: 'open', id: 'stackgate' },
+      { do: 'goal', id: 'shadow' },
+    ],
+    lib4_shadow: [
+      { do: 'flag', name: 'shadowmet' },
+      ['narr', 'The reading hall is a dome of glass and stars. Something hangs from the highest gallery like a folded coat. Then it opens.'],
+      ['caelum', 'That isn\'t a creature. It\'s a spymaster\'s shadow, cut loose and sent. The Iron King has always liked to work from far away.'],
+      ['wren', 'Can it be killed?'],
+      ['caelum', 'Shoot it until its wings give out. Then make sure it doesn\'t get up.'],
+      { do: 'close', id: 'stackgate' },
+      { do: 'boss' },
+    ],
+    lib4_lamps: [
+      ['narr', 'The fourth reading lamp catches, and the stacks are gold from the floor to the dome.'],
+      ['thane', 'Nobody has read in here at night since the war. I had forgotten what it looks like with the lamps lit. Thank you.'],
+      { do: 'remember', key: 'readlamps', text: 'Relit the reading lamps in the Library stacks.', good: true },
+      { do: 'bond', who: 'thane', pts: 10, liked: true, why: 'She gave him his Library back, one lamp at a time.' },
+    ],
+    lib4_end: [
+      { do: 'flag', name: 'shadow' },
+      { do: 'art', id: 'library', title: 'The reading hall' },
+      ['narr', 'The Shadow comes apart like smoke in a draft. Where it fell lies a folded letter, and a seal pressed in green wax: a rose.'],
+      ['wren', 'That is Spring\'s seal.'],
+      ['thane', '"She will be at the Library at first light. Take the maps. Leave her to me." No name. There doesn\'t need to be one.'],
+      ['caelum', 'Rowan is writing to the Iron King.'],
+      { choose: [
+        { text: '"He wouldn\'t. Not Rowan."', bond: { caelum: 5 }, why: 'He hopes she is right. He does not think she is.', remember: ['rowanDoubt', 'Would not believe Rowan was writing to the Iron King.', null], then: [
+          ['caelum', 'I hope you are right. I have never once seen him afraid, until this year. Afraid men write letters.'],
+        ] },
+        { text: '"Then he has made his choice."', bond: { caelum: 10 }, why: 'She said it, so he did not have to.', remember: ['rowanChoice', 'Decided that Rowan has chosen the Iron King.', false], then: [
+          ['caelum', 'He made it a long time ago, I think. He has only now signed it.'],
+        ] },
+        { text: '"He wants me back badly enough to do anything."', bond: { thane: 5, caelum: 5 }, why: 'The truest thing anyone said all day.', remember: ['rowanFear', 'Understood that Rowan would do anything to have her back.', null], then: [
+          ['thane', 'That is the most frightening sentence I have heard this year, and I keep the Library\'s nightmares.'],
+        ] },
+      ] },
+      ['thane', 'There is something else. In the margin, in another hand, in iron-grey ink. One word: Weaver.'],
+      ['caelum', '...Then we are going to need Iris.'],
+      { do: 'complete' },
+    ],
+    evening4: [
+      { do: 'art', id: 'city', title: 'Evening: Starhaven' },
+      ['narr', 'The Library\'s lamps burn all night. Half the city comes to look at the hole in the dome, and the other half comes to look at Wren.'],
+      { do: 'art', id: null },
+      { do: 'mode', name: 'city', title: 'THE LAMP SQUARE, EVENING', spots: [{ who: 'caelum', label: 'with Caelum, on the rooftop' }, { who: 'thane', label: 'with Thane, in the Library' }, { who: 'iris', label: 'with Iris, in her tower' }] },
+      { choose: [
+        { text: 'Caelum, on the rooftop', then: [{ do: 'goto', id: 'ev4_caelum' }] },
+        { text: 'Thane, in the Library', then: [{ do: 'goto', id: 'ev4_thane' }] },
+        { text: 'Iris, in her tower', then: [{ do: 'goto', id: 'ev4_iris' }] },
+      ] },
+    ],
+    ev4_caelum: [
+      { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
+      ['caelum', 'You shot a shadow out of my sky. I have wanted someone to do that for a very long time.'],
+      ['wren', 'Rowan wrote to the Iron King because of me.'],
+      ['caelum', 'Rowan wrote to the Iron King because of Rowan. Don\'t carry that one, Wren. It isn\'t yours.'],
+      { choose: [
+        { text: '"Teach me to winnow."', bond: { caelum: 10 }, why: 'She wants to be able to leave. He wants that for her too.', then: [
+          ['caelum', 'When you can feel all of the bond, and not only the edge of it. Soon, I think.'],
+        ] },
+        { text: '"Tell me about him. Before."', bond: { caelum: 10 }, why: 'She asked about his old friend, not his enemy.', then: [
+          ['caelum', 'He was the first High Lord who ever called me a friend and meant it. That is why this is going to hurt.'],
+        ] },
+      ] },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+    ],
+    ev4_thane: [
+      { do: 'art', id: 'library', title: 'Evening with Thane' },
+      ['thane', 'I am putting the dome back together. Metaphorically. Also literally: hand me that.'],
+      { if: 'pagesKeptAll', then: [['thane', 'You kept every page. I have walked past the lecterns all evening just to look at them.']],
+        else: [['thane', 'I have rewritten two of the stolen pages from memory. The third I only remember the margins of. The margins were better anyway.']] },
+      { choose: [
+        { text: '"What is the Weaver?"', bond: { thane: 10 }, why: 'She asked the question he has been dying to answer.', then: [
+          ['thane', 'Something older than the courts, in a cottage nobody finds twice. She weaves. Things go in. Things do not come out.'],
+        ] },
+        { text: 'Help him with the dome', bond: { thane: 10 }, why: 'She stayed and did the dull part with him.', then: [
+          ['narr', 'They work until the lamps gutter. He tells her the name of every book they pass. She remembers four of them.'],
+        ] },
+      ] },
+      { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
+    ],
+    ev4_iris: [
+      { do: 'art', id: 'observatory', title: 'Evening with Iris' },
+      ['iris', 'I saw the Shadow come. I did not see you stop it. That has never happened to me before. You are becoming very hard to see, Wren.'],
+      ['wren', 'Is that good?'],
+      ['iris', 'It is good for you. It is terrible for me. I like knowing things.'],
+      { choose: [
+        { text: '"What do you see about the Weaver?"', bond: { iris: 10 }, why: 'She trusted the seer with the hard question.', then: [
+          ['iris', 'A loom, and two threads I recognize. Your sisters, Wren. She has their names on her wall.'],
+        ] },
+        { text: '"Do you ever get to stop seeing?"', bond: { iris: 10 }, why: 'Nobody asks the seer how she is.', then: [
+          ['iris', 'When I sleep. So I sleep a great deal, and I am very cheerful about it.'],
+        ] },
+      ] },
+      { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
+    ],
     finale: [
-      { do: 'art', id: 'city', title: 'Next: Chapter 4, The Spy in the Library' },
-      ['narr', 'Three nights later, Starhaven sleeps under a sky full of stars.'],
-      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Deep. It is a street, with every lamp lit.']] },
-      { if: 'cat', then: [['narr', 'On Mirelle\'s step, a black cat watches the Library roof and does not blink.']] },
-      { if: 'nightmares', then: [['narr', 'Caelum is asleep. That is new.']] },
-      ['narr', 'On the Library roof, something with wings lands without a sound, folds itself into the shadows, and waits.'],
+      { do: 'art', id: 'city', title: 'Next: Chapter 5, The Weaver\'s Cottage' },
+      ['narr', 'A week later, Starhaven sleeps under a sky full of stars.'],
+      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Deep. It is the Library, with every lamp lit.']] },
+      { if: 'cat', then: [['narr', 'On Mirelle\'s step, a black cat watches the sky over the Library, and does not blink.']] },
+      ['narr', 'In the Library, Thane has pinned the letter to the wall and drawn a circle around one word: Weaver.'],
+      ['narr', 'Across the sea, in a cottage nobody finds twice, a loom stops. Something has noticed a thread it did not spin.'],
       { do: 'end' },
     ],
   };
@@ -1805,11 +1969,11 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     { id: 'thane', name: 'Thane', text: 'One of the Five. Scholar and keeper of the Library. Has a theory about everything, including Wren\'s fire.' },
   ];
   // Who you know about at the start of each chapter (the intro covers the first five).
-  S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'], ch3: ['thane'] };
+  S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'], ch3: ['thane'], ch4: ['iris'] };
 
   S.END = {
     title: 'End of the concept',
-    text: 'That was the Prologue through Chapter 3. Next in the design doc: Chapter 4, The Spy in the Library. Winged spies attack, the city itself becomes the battlefield, and Wren learns the bow.',
+    text: 'That was the Prologue through Chapter 4. Next in the design doc: Chapter 5, The Weaver\'s Cottage, where getting seen means running.',
   };
 })(window.SH = window.SH || {});
 
@@ -1891,6 +2055,13 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     L('sq_lamp', 1, 'The First Lamp', { seen: 'sq_lamp' }, 'Something to look at in the Lamp Square.', 'Lit the night the city was hidden, and never out since. The lamplighters are a guild older than the Five. When a child is born in Starhaven they are carried to it and their hand is pressed to the brass, so the city knows them in the dark.'),
     L('sq_names', 2, 'The Stone of Names', { seen: 'sq_names' }, 'Something to look at in the Lamp Square.', 'Fifty years under the Thorn Queen, and Starhaven was never found. It still paid. Everyone who left the city to fight her and did not come back is cut into the stone, small, so they all fit. Bram can find forty-one of them without looking. I counted.'),
     L('sq_well', 1, 'The Star Well', { seen: 'sq_well' }, 'Something to look at in the Lamp Square.', 'You say what you would give up, not what you want, and drop the coin. I stood there a long time. I said: being the one who has to be strong. The coin did not make a sound. I do not know what that means and I am not asking Iris.'),
+    L('fbow', 2, 'The fae bow', { ch: 5 }, 'Reach the Library.', 'Dark ash, light as a held breath, and a string that hums a note I feel in my teeth. Bram strung it the night after the Old Wyrm and told nobody. It shoots where I mean, not where I point. Father would have called that cheating. Father would have loved it.'),
+    L('spies', 2, 'The Iron King\'s spies', { ch: 5 }, 'Reach the Library.', 'Grey wings, iron masks, and nothing behind the masks that I could find. They do not want to fight. They want maps: the river gates, the wards, the Library\'s own floor plans. Somebody is planning to walk into this city, and wants to know where the doors are.'),
+    L('letter', 2, 'A letter, sealed with a rose', { mem: 'rowanChoice' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." Spring\'s seal, in green wax. Rowan is trading Starhaven\'s doors to the Iron King for me. He thinks he is rescuing me. I think the Iron King thinks so too, and is laughing.'),
+    L('letter2', 2, 'A letter, sealed with a rose', { mem: 'rowanDoubt' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." Spring\'s seal, in green wax. I said Rowan would never. I keep saying it, in my head, to see if it gets truer. It does not.'),
+    L('letter3', 2, 'A letter, sealed with a rose', { mem: 'rowanFear' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." Spring\'s seal, in green wax. He would hand the Iron King every door in this city to have me back behind his. That is not love. I am not sure what it is. I am sure it is not love.'),
+    L('weaver', 1, 'The Weaver', { flag: 'shadow' }, 'Something written in a margin.', 'One word in iron-grey ink, in a hand that is not Rowan\'s: Weaver. Thane went white. Iris says the Weaver lives in a cottage nobody finds twice, and that my sisters\' names are on her wall. I have stopped asking Iris questions I do not want answered.'),
+    L('c_readlamps', 4, 'The reading lamps', { mem: 'readlamps' }, 'Something to do in the Library stacks.', 'Four lamps on the high galleries, dark since the war. I lit them while the dust was still settling from the spies, and Thane stood in the middle of the stacks and turned round and round like a child at a festival.'),
     L('p_caelum1', 3, 'Caelum, as I found him', { met: 'caelum' }, 'Meet Lord Caelum.', 'High Lord of Dusk. He walked into the Deep wearing the Queen\'s favor like a coat he meant to burn. Everything he says in public is a blade pointed somewhere. I am learning to hear what he says when it is pointed nowhere.'),
     L('p_caelum2', 3, 'Caelum, on the rooftop', { pts: ['caelum', 40] }, 'Grow closer to Caelum (heart 2).', 'He told me he watched the last trial and could not move. Five hundred years old and useless, he said. He has ruled alone so long that he says "I" when he means the whole city. I do not think anyone has asked him how he is since before I was born.'),
     L('p_caelum3', 3, 'Caelum, what he keeps', { pts: ['caelum', 120] }, 'Grow closer to Caelum (heart 3).', 'He keeps every sketch I throw away. I found them flattened inside a book of border treaties, in order. He does not know that I know. I have started throwing away better ones.'),
@@ -2216,6 +2387,62 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     ],
   };
 
+  // ---------------------------------------------------------------- Chapter 4: The Spy in the Library (the fae bow, winged spies, the Spymaster's Shadow)
+  // Courtyard (outdoors), then the stacks (galleries three rows apart, a single jump each), then the reading hall (the boss).
+  SH.ROOMS.library = {
+    id: 'library', width: 156, height: 24, theme: 'library', music: 'city',
+    zones: [{ x: 0, theme: 'city' }, { x: 36, theme: 'library' }],
+    start: { x: 3, y: 20 },
+    shadowArena: [120, 154, 10, 20],
+    camLift: 0.2,
+    shapes: [
+      ['solid', 0, 2, 0, 24],
+      ['ground', 2, 156, 20],
+      ['solid', 35, 37, 0, 15],          // the Library's front wall, above its great door
+      ['solid', 37, 156, 0, 4],          // its roof
+      ['oneway', 12, 18, 16], ['oneway', 24, 30, 15],   // the courtyard's colonnade roofs: somewhere to shoot from
+      // the stacks
+      ['oneway', 40, 50, 17], ['oneway', 60, 72, 17], ['oneway', 84, 96, 17], ['oneway', 104, 114, 17],
+      ['oneway', 46, 56, 14], ['oneway', 66, 78, 14], ['oneway', 90, 102, 14],
+      ['oneway', 52, 62, 11], ['oneway', 74, 86, 11], ['oneway', 98, 108, 11],
+      ['oneway', 60, 70, 8], ['oneway', 82, 92, 8],
+      // the reading hall: two side galleries and a high one in the middle
+      ['oneway', 123, 129, 15], ['oneway', 145, 151, 15], ['oneway', 132, 142, 11],
+      ['solid', 154, 156, 0, 24],
+    ],
+    hints: [
+      { x0: 2, x1: 36, text: 'An arrow pins a spy\'s wing and it falls. Cut it with {ATTACK} while it is down, before it gets up.', flag: 'pinned1', until: 'sky' },
+      { x0: 2, x1: 36, text: 'Spies fly above your daggers. Shoot with {BOW}: it aims at the nearest flyer in front of you. Hold up as you shoot to aim high.', flag: 'bow4', until: 'sky' },
+      { x0: 37, x1: 118, text: 'The spies go for the open books on the lecterns. Shoot one off before it carries a page away. Climb the galleries for the high one.', flag: 'stacks4', until: 'stacks_done' },
+      { x0: 112, x1: 118, text: 'The reading hall is ahead, and there is no way back out. {LEFT} Starlight still behind you.', flag: 'stacks_done', until: 'shadowmet', motesLeft: true },
+      { x0: 37, x1: 112, text: 'The reading lamps are dark. Climb up and touch each one to light it: four in the stacks.', flag: 'stacks_done', until: 'lamps4' },
+    ],
+    triggers: [
+      { x: 4, script: 'lib4_start' },
+      { x: 122, script: 'lib4_shadow', flag: 'stacks_done' },
+    ],
+    gates: [{ id: 'libdoor', x: 36, top: 15 }, { id: 'stackgate', x: 118, top: 4 }],
+    lanterns: [{ x: 4, lit: true }, { x: 39, from: 18 }, { x: 120, from: 18 }],   // the last is inside the hall, so a knockout keeps you in the fight
+    npcs: [{ id: 'thane', x: 8 }, { id: 'caelum', x: 11 }],
+    lampScript: 'lib4_lamps',
+    props: [
+      { t: 'banner', x: 3.5 }, { t: 'banner', x: 33, c: '#7a2a4a' }, { t: 'barrel', x: 20 }, { t: 'crate', x: 31.5 }, { t: 'bush', x: 6 }, { t: 'bush', x: 22.5 },
+      { t: 'bookcase', x: 43, h: 2.4, from: 18 }, { t: 'table', x: 52, from: 18 }, { t: 'bookcase', x: 58, h: 2.4, from: 18 }, { t: 'globe', x: 64, from: 18 },
+      { t: 'bookcase', x: 70, h: 2.4, from: 18 }, { t: 'table', x: 79, from: 18 }, { t: 'bookcase', x: 88, h: 2.4, from: 18 }, { t: 'table', x: 96, from: 18 },
+      { t: 'bookcase', x: 109, h: 2.4, from: 18 }, { t: 'globe', x: 115, from: 18 },
+      { t: 'bookcase', x: 122.5, h: 6, w: 2, from: 18 }, { t: 'table', x: 137, from: 18 }, { t: 'bookcase', x: 152, h: 6, w: 2, from: 18 }, { t: 'banner', x: 130, from: 18 }, { t: 'banner', x: 144, c: '#7a2a4a', from: 18 },
+    ],
+    motes: [['line', 9, 16, 18.6], ['line', 13, 17, 14.6], ['line', 25, 29, 13.6], ['line', 41, 49, 15.6], ['line', 47, 55, 12.6], ['line', 53, 61, 9.6], ['line', 61, 69, 6.6],
+      ['line', 75, 85, 9.6], ['line', 83, 91, 6.6], ['line', 91, 101, 12.6], ['line', 99, 107, 9.6], ['line', 105, 113, 15.6], ['line', 124, 128, 13.6], ['line', 146, 150, 13.6]],
+    spawns: [
+      { kind: 'spy', wave: 1, x: 16, y: 15 }, { kind: 'spy', wave: 1, x: 27, y: 14 },
+      { kind: 'spy', wave: 2, x: 58, y: 14 }, { kind: 'spy', wave: 2, x: 88, y: 13 }, { kind: 'spy', wave: 2, x: 106, y: 14 },
+      { kind: 'lectern', x: 44, y: 17 }, { kind: 'lectern', x: 80, y: 11 }, { kind: 'lectern', x: 100, y: 20 },
+      { kind: 'pickup', what: 'lamp', x: 70, y: 14 }, { kind: 'pickup', what: 'lamp', x: 64, y: 8 }, { kind: 'pickup', what: 'lamp', x: 104, y: 11 }, { kind: 'pickup', what: 'lamp', x: 90, y: 8 },
+      { kind: 'shadow', x: 140, y: 10 },
+    ],
+  };
+
   // Tile codes
   SH.T_EMPTY = 0; SH.T_SOLID = 1; SH.T_ONEWAY = 2; SH.T_THORNS = 3;
 
@@ -2272,7 +2499,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
 // Starhaven — input. Keyboard, gamepad and touch all feed the same actions.
 // held[a]: is it down right now. pressed[a]: was it pressed since the last game frame.
 (function (SH) {
-  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause', 'downstrike', 'gift', 'art', 'upstrike'];
+  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause', 'downstrike', 'gift', 'art', 'upstrike', 'bow'];
   const KEYS = {
     ArrowLeft: 'left', KeyA: 'left',
     ArrowRight: 'right', KeyD: 'right',
@@ -2283,6 +2510,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     KeyR: 'art', KeyV: 'art',
     KeyF: 'gift', KeyQ: 'gift', KeyE: 'gift', KeyL: 'gift',
     ShiftLeft: 'dash', ShiftRight: 'dash', KeyC: 'dash', KeyK: 'dash',
+    KeyI: 'bow', KeyU: 'bow', KeyB: 'bow',
     Escape: 'pause', KeyP: 'pause', Enter: 'pause',
   };
 
@@ -2344,7 +2572,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
   // A Bluetooth or USB controller announces itself once any of its buttons is pressed.
   window.addEventListener('gamepadconnected', e => { input.source = 'pad'; if (input.onSourceChange) input.onSourceChange('pad'); if (input.onPad) input.onPad(e.gamepad.id); });
   // ---- gamepad (standard mapping: A jump, X attack, B dash, Y talk, Start pause)
-  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 4: 'gift', 6: 'gift', 5: 'dash', 7: 'art', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 4: 'gift', 6: 'gift', 5: 'bow', 7: 'art', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
   input.pollPad = function () {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     let pad = null;
@@ -2431,9 +2659,9 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S', CHOOSE: 'W (or J)' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down', CHOOSE: 'Y (or X)' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S', CHOOSE: 'W (or J)', BOW: 'I' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)', BOW: 'the BOW button' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down', CHOOSE: 'Y (or X)', BOW: 'RB (right bumper)' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;
@@ -2807,7 +3035,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, guard: 0, guardCd: 0, parryT: 0, upBuf: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, faeBuf: 0, aim: 0, guard: 0, guardCd: 0, parryT: 0, upBuf: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: SH.stars.maxHearts(), maxHearts: SH.stars.maxHearts(),
@@ -2837,6 +3065,28 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     if (inp.pressed.jump) this.jumpBuf = t.jumpBufferFrames; else if (this.jumpBuf > 0) this.jumpBuf--;
     if (inp.pressed.dash) this.dashBuf = 6; else if (this.dashBuf > 0) this.dashBuf--;
     if (inp.pressed.upstrike) this.upBuf = 8; else if (this.upBuf > 0) this.upBuf--;
+    if (inp.pressed.bow) this.faeBuf = 8; else if (this.faeBuf > 0) this.faeBuf--;
+    // the fae bow (Chapter 4 on): its own button; it aims itself at the nearest thing in front of her, or high if she holds up
+    if (this.faeBuf > 0 && SH.game.can('fbow') && this.bowCd <= 0 && !this.dead && this.stun <= 0 && !this.swing && this.dashT <= 0 && !this.guard) {
+      this.faeBuf = 0; this.bowCd = Math.round(20 * SH.xp.quick()); this.bowT = 14;
+      const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+      let ang = 0.06;
+      if (inp.held.up) ang = 1.05;
+      else {
+        let best = null, bd = 1e9;
+        for (const e of world.things) {
+          if (!e.hittable || !e.hittable() || e.kind === 'bulb' || e.kind === 'brazier' || e.kind === 'lectern' || e.kind === 'dummy' || (e.kind === 'target' && e.blade)) continue;
+          const hb = e.hurtBox(), ex = (hb.l + hb.r) / 2, ey = (hb.t + hb.b) / 2, dx = ex - this.x, dy = (this.y - 27) - ey;
+          if (Math.abs(dx) > 330 || dy < -90 || dy > 300) continue;
+          const front = Math.sign(dx) === this.facing || Math.abs(dx) < 10, score = Math.hypot(dx, dy) + (front ? 0 : 400);
+          if (score < bd) { bd = score; best = { dx, dy }; }
+        }
+        if (best) { if (Math.sign(best.dx) && Math.sign(best.dx) !== this.facing) this.facing = Math.sign(best.dx); ang = Math.max(-0.4, Math.min(1.35, Math.atan2(best.dy, Math.max(8, Math.abs(best.dx))))); }
+      }
+      this.aim = ang; if (this.grounded) this.vx *= 0.3;
+      world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing, ang, true);
+      SH.sfx.play('bow'); SH.fx.ring(this.x + this.facing * 14, this.y - 27, '#9fe8ff', 14, 10, 1);
+    }
     if (inp.pressed.attack || inp.pressed.upstrike || (inp.pressed.downstrike && !this.grounded)) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
     if (this.dashCd > 0) this.dashCd--;
     if (this.bowCd > 0) this.bowCd--;
@@ -3703,8 +3953,348 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     if (s.kind === 'target') return new Target(x, s.y * T, s.blade);
     if (s.kind === 'wolf') return new Wolf(x, y);
     if (s.kind === 'wyrmling' || s.kind === 'oldWyrm') return new Wyrm(x, y, s.kind);
+    if (SH.ch4) { const e = SH.ch4.spawn(s, x, y); if (e) return e; }
     throw new Error('unknown spawn ' + s.kind);
   };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/ch4.js
+// Starhaven — Chapter 4, The Spy in the Library: winged spies, the lecterns they rob, and the Spymaster's Shadow.
+// DESIGN.md: "Winged spy: flies out of dagger reach, dives. Teaches the bow." and "The Spymaster's Shadow: a winged
+// leader in the Library stacks. Shoot it down, then dagger it on the ground."
+(function (SH) {
+  'use strict';
+  const TS = () => SH.TILE;
+  const K = SH.ch4 = {};
+
+  SH.ENEMY_DEFS.spy = { name: 'Winged spy', hp: 6, damage: 1, sight: 230, diveSpeed: 5.2, mark: 34, down: 120 };
+  SH.ENEMY_DEFS.shadow = { name: 'The Spymaster\'s Shadow', hp: 30, damage: 1, slain: 'SPYBREAKER', falls: 'THE SHADOW IS UNMADE', quiet: 'THE STACKS ARE STILL', after: 'lib4_end' };
+
+  // ---------------------------------------------------------------- the lectern: an open book the spies come to rob
+  function Lectern(x, y) { Object.assign(this, { kind: 'lectern', x, y, pages: 2, max: 2, robbed: 0 }); }
+  Lectern.prototype.reset = function () { };
+  Lectern.prototype.hittable = () => false;
+  Lectern.prototype.update = function () { if (this.robbed > 0) this.robbed--; };
+
+  // ---------------------------------------------------------------- the winged spy
+  function Spy(x, y, wave) {
+    Object.assign(this, { kind: 'spy', def: SH.ENEMY_DEFS.spy, home: { x, y }, wave: wave || 1, w: 22, h: 18 });
+    this.reset();
+  }
+  Spy.prototype.reset = function () {
+    if (this.dead && this.counted) return;   // a spy that is down stays down, even after a knockout
+    Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, hp: this.def.hp, state: 'hover', t: 0, flash: 0, dead: false, deadT: 0,
+      dir: -1, cd: 50 + Math.random() * 60, flap: Math.random() * 6, steal: 0, aim: null, lect: null, grounded: false, drift: Math.random() * 6 });
+  };
+  Spy.prototype.active = function () { const f = SH.game.flags; return this.wave === 1 ? !!f.bow4 : !!f.stacks4; };
+  Spy.prototype.hittable = function () { return !this.dead && this.active(); };
+  Spy.prototype.hurtBox = function () { return { l: this.x - 15, r: this.x + 15, t: this.y - 22, b: this.y + 4 }; };
+  Spy.prototype.bodyBox = function () { return { l: this.x - 9, r: this.x + 9, t: this.y - 16, b: this.y }; };
+  const toward = (o, tx, ty, sp) => { const dx = tx - o.x, dy = ty - o.y, d = Math.hypot(dx, dy); if (d < sp) { o.x = tx; o.y = ty; return true; } o.x += dx / d * sp; o.y += dy / d * sp; if (Math.abs(dx) > 2) o.dir = dx > 0 ? 1 : -1; return false; };
+  Spy.prototype.pickLectern = function (world) {
+    const open = world.things.filter(e => e.kind === 'lectern' && e.pages > 0);
+    if (!open.length) return null;
+    open.sort((a, b) => Math.abs(a.x - this.x) + Math.abs(a.y - this.y) - Math.abs(b.x - this.x) - Math.abs(b.y - this.y));
+    return open[Math.random() < 0.7 ? 0 : open.length - 1];
+  };
+  Spy.prototype.update = function (world) {
+    const p = world.player, fx = SH.fx, d = this.def, T = TS();
+    if (this.dead) { this.deadT++; return; }
+    this.flap += this.state === 'dive' ? 0.5 : this.state === 'down' ? 0 : 0.3;
+    if (this.flash > 0) this.flash--;
+    if (!this.active()) { this.x = this.home.x + Math.sin(this.flap * 0.1) * 6; this.y = this.home.y + Math.sin(this.flap * 0.07) * 3; return; }   // waiting, wings folded, on a ledge
+    this.t++;
+    const dx = p.x - this.x, dy = (p.y - 18) - this.y, thief = this.wave === 2;
+    const canDive = () => { if (--this.cd > 0 || p.dead) return false; if (Math.abs(dx) < d.sight && dy > -20 && dy < 220) { this.state = 'mark'; this.t = 0; this.aim = { x: p.x, y: p.y - 18 }; this.dir = dx > 0 ? 1 : -1; fx.word(this.x, this.y - 30, '!', '#ff5a5a', 30); SH.sfx.play('rumble'); return true; } return false; };
+    switch (this.state) {
+      case 'hover': {
+        this.drift += 0.02;
+        if (thief) {
+          this.wait = (this.wait || 0) + 1;
+          if (this.wait < 150) { toward(this, this.home.x + Math.sin(this.drift) * 40, this.home.y, 1); break; }   // they circle a moment when the door opens: time to get inside
+          if (!this.lect || this.lect.pages <= 0) this.lect = this.pickLectern(world);
+          if (this.lect && toward(this, this.lect.x, this.lect.y - 34, 1.5)) { this.state = 'steal'; this.t = 0; }
+          else if (!this.lect) toward(this, this.home.x + Math.sin(this.drift) * 60, this.home.y + Math.sin(this.drift * 1.7) * 14, 1.2);
+          if (Math.abs(dx) < 140 && Math.abs(dy) < 90) canDive();
+        } else {
+          toward(this, this.home.x + Math.sin(this.drift) * 70, this.home.y + Math.sin(this.drift * 1.9) * 16, 1.3);
+          canDive();
+        }
+        break;
+      }
+      case 'steal':
+        this.steal++;
+        this.x = this.lect.x + Math.sin(this.t * 0.08) * 3; this.y = this.lect.y - 34 + Math.sin(this.t * 0.11) * 2;
+        if (this.steal % 40 === 0) fx.burst(this.lect.x, this.lect.y - 18, 3, { speed: 0.8, life: 22, gravity: -0.04, colors: ['#fff6d8', '#ffd27a'] });
+        if (this.steal >= 380) { this.steal = 0; this.lect.pages--; this.lect.robbed = 60; K.pageStolen(this.lect, this, world); this.lect = null; this.state = 'climb'; this.t = 0; }
+        else if (Math.abs(dx) < 120 && Math.abs(dy) < 80) canDive();
+        break;
+      case 'mark':   // a red glare and a shriek: it is about to dive along this line
+        this.x += Math.sin(this.t * 1.3) * 0.6;
+        if (this.t >= d.mark) { const ax = this.aim.x - this.x, ay = this.aim.y - this.y, n = Math.hypot(ax, ay) || 1; this.vx = ax / n * d.diveSpeed; this.vy = ay / n * d.diveSpeed; this.state = 'dive'; this.t = 0; SH.sfx.play('dash'); }
+        break;
+      case 'dive': {
+        this.x += this.vx; this.y += this.vy;
+        const gy = world.room.groundY(Math.floor(this.x / T), Math.max(0, Math.floor(this.y / T) + 1));
+        if (this.t > 60 || (gy != null && this.y > gy - 6) || this.y > world.room.pxH - T) { this.state = 'climb'; this.t = 0; this.cd = 90 + Math.random() * 80; }
+        if (SH.overlap(this.bodyBox(), p.box())) {
+          if (p.dashT > 0 && p.iframes > 0) { if (!this.dodged) { this.dodged = true; world.onPerfectDodge(this); } }
+          else if (p.hurt(this.x, d.damage, world) === false && p.guard > 0) { this.state = 'climb'; this.t = 0; this.vx *= -0.5; }   // it glances off her blades
+        }
+        break;
+      }
+      case 'climb': {
+        this.dodged = false;
+        const tx = thief && this.lect ? this.lect.x : this.home.x, ty = thief && this.lect ? this.lect.y - 34 : this.home.y;
+        if (toward(this, tx, ty, 2.2) || this.t > 160) { this.state = 'hover'; this.t = 0; if (this.cd < 60) this.cd = 60; }
+        break;
+      }
+      case 'falling': {   // an arrow through the wing: it drops
+        this.vy = Math.min(this.vy + 0.35, 7); const r = SH.moveBody(world.room, this); this.grounded = r.ground; this.vx *= 0.96;
+        if (this.grounded) { this.state = 'down'; this.t = 0; SH.fx.kick(2); fx.burst(this.x, this.y, 8, { speed: 1.6, life: 20, colors: ['#3a3450', '#1a1630'] }); }
+        break;
+      }
+      case 'down':   // on the ground, wings crumpled: the daggers' moment
+        this.vx *= 0.8;
+        if (this.t >= d.down) { this.state = 'climb'; this.t = 0; this.cd = 70; }
+        break;
+    }
+    this.x = Math.max(T * 2.5, Math.min(world.room.pxW - T * 2.5, this.x));
+    if (this.state !== 'falling' && this.state !== 'down') this.y = Math.max(T * 5.5, this.y);
+  };
+  Spy.prototype.takeHit = function (hit, world) {
+    if (!this.hittable()) return null;
+    const fx = SH.fx;
+    let dmg = hit.dmg || 1; if (this.state === 'down') dmg += 1;
+    this.hp -= dmg; this.flash = 8;
+    fx.burst(this.x, this.y - 10, 8, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.4, speed: 2.4, life: 18, colors: ['#3a3450', '#ff5a5a', '#c8c0e0'] });
+    if (this.hp <= 0) {
+      this.dead = true; this.deadT = 0; this.counted = true; this.steal = 0;
+      fx.burst(this.x, this.y - 10, 24, { speed: 3, life: 40, gravity: 0.06, size: 3, colors: ['#1a1630', '#3a3450', '#8a80b0', '#ff5a5a'] });
+      fx.ring(this.x, this.y - 10, '#c8c0e0', 30, 18, 2);
+      world.onKill(this); K.spyDown(this, world);
+      return { landed: true, killed: true };
+    }
+    if (hit.arrow && this.state !== 'down' && this.state !== 'falling') { this.state = 'falling'; this.vy = -1; this.vx = hit.dir * 1.2; this.t = 0; this.steal = 0; fx.word(this.x, this.y - 30, 'WING PINNED', '#ffd27a', 60); }
+    else if (this.state !== 'down' && this.state !== 'falling') { this.state = 'climb'; this.t = 0; this.steal = 0; this.y -= 6; }
+    return { landed: true, killed: false };
+  };
+
+  // ---------------------------------------------------------------- the Spymaster's Shadow
+  function Shadow(x, y) {
+    Object.assign(this, { kind: 'shadow', def: SH.ENEMY_DEFS.shadow, boss: true, home: { x, y }, w: 40, h: 40 });
+    this.reset();
+  }
+  Shadow.prototype.reset = function () {
+    Object.assign(this, { halfRose: false, x: this.home.x, y: this.home.y, vx: 0, vy: 0, hp: this.def.hp, state: 'idle', t: 0, flash: 0, dead: false, wing: 0, darts: [], cyc: 0, swoops: 0, flap: 0, dir: -1, lastPhase: 1 });
+  };
+  Shadow.prototype.wake = function () { if (this.state === 'idle') { this.state = 'circle'; this.t = 0; } };
+  Shadow.prototype.phase = function () { return this.hp > this.def.hp * 0.5 ? 1 : 2; };
+  Shadow.prototype.need = function () { return this.phase() === 1 ? 3 : 4; };
+  Shadow.prototype.hittable = function () { return !this.dead && this.state !== 'idle'; };
+  Shadow.prototype.hurtBox = function () { return { l: this.x - 24, r: this.x + 24, t: this.y - 36, b: this.y + 6 }; };
+  Shadow.prototype.bodyBox = function () { return { l: this.x - 16, r: this.x + 16, t: this.y - 28, b: this.y }; };
+  Shadow.prototype.arena = function (world) { const a = world.room.def.shadowArena; return { l: a[0] * TS(), r: a[1] * TS(), top: a[2] * TS(), floor: a[3] * TS() }; };
+  Shadow.prototype.tell = function () {
+    const s = this.state, n = this.need();
+    if (s === 'circle') return `Shoot it with {BOW}: ${this.wing} of ${n} hits and its wings fail. Daggers reach it only when it swoops low.`;
+    if (s === 'volley') return 'It is drawing SHADOW DARTS. Guard ({GUARD}) facing it, or get off their line.';
+    if (s === 'swoopWind') return 'It is going to SWOOP across the hall. Get up on a gallery, jump it, or dash through it ({DASH}).';
+    if (s === 'swoop') return 'SWOOPING. Get above it, jump it, or dash through it.';
+    if (s === 'fall' || s === 'grounded') return 'IT IS DOWN. Cut it with {ATTACK} before it rises.';
+    if (s === 'rise') return 'It is rising. Get ready to shoot it down again.';
+    return null;
+  };
+  Shadow.prototype.update = function (world) {
+    const p = world.player, fx = SH.fx, A = this.arena(world), ph = this.phase();
+    // shadow darts fly on, even if it falls
+    for (const d of this.darts) {
+      d.x += d.vx; d.y += d.vy; d.life--;
+      if (SH.isSolid(world.room.get(Math.floor(d.x / TS()), Math.floor(d.y / TS())))) d.life = 0;
+      if (d.life > 0 && Math.abs(d.x - p.x) < 10 && d.y > p.y - 40 && d.y < p.y) { const r = p.hurt(d.x, 1, world); if (r !== false || p.guard > 0) { d.life = 0; fx.burst(d.x, d.y, 6, { speed: 1.6, life: 14, colors: ['#8a5ad8', '#ff5a8a'] }); } }
+    }
+    this.darts = this.darts.filter(d => d.life > 0);
+    if (this.dead || this.state === 'idle') return;
+    this.t++; this.flap += this.state === 'swoop' ? 0.45 : this.state === 'grounded' ? 0 : 0.22;
+    if (this.flash > 0) this.flash--;
+    if (ph !== this.lastPhase) { this.lastPhase = ph; fx.word(this.x, this.y - 50, 'IT SCREAMS', '#ff5a8a', 70); SH.fx.kick(5); }
+    const mid = (A.l + A.r) / 2, half = (A.r - A.l) / 2 - 50;
+    switch (this.state) {
+      case 'circle': {
+        const sp = ph === 1 ? 1 : 1.35, cxm = Math.max(A.l + 200, Math.min(A.r - 200, (mid + p.x) / 2)), tx = cxm + Math.sin(this.t * 0.012 * sp + 1) * 190, ty = A.floor - 150 + Math.sin(this.t * 0.024 * sp) * 22;   // it circles where she can see it
+        this.x += (tx - this.x) * 0.05; this.y += (ty - this.y) * 0.05; this.dir = p.x > this.x ? 1 : -1;
+        if (this.t > (ph === 1 ? 170 : 130)) { this.cyc++; this.t = 0; this.state = this.cyc % 2 ? 'volley' : 'swoopWind'; this.swoops = ph === 2 ? 2 : 1; SH.sfx.play('rumble'); }
+        break;
+      }
+      case 'volley':
+        this.dir = p.x > this.x ? 1 : -1;
+        if (this.t === 46) {
+          const n = ph === 1 ? 3 : 5, base = Math.atan2(p.y - 20 - this.y, p.x - this.x);
+          for (let i = 0; i < n; i++) { const a = base + (i - (n - 1) / 2) * 0.2; this.darts.push({ x: this.x, y: this.y - 12, vx: Math.cos(a) * 3.3, vy: Math.sin(a) * 3.3, life: 200 }); }
+          SH.sfx.play('dash');
+        }
+        if (this.t > 70) { this.state = 'circle'; this.t = 0; }
+        break;
+      case 'swoopWind': {   // to the side away from her, high, with a shriek
+        if (this.side == null) this.side = (p.x < mid ? 1 : -1);
+        const side = Math.max(A.l + 30, Math.min(A.r - 30, p.x + this.side * 270));
+        this.x += (side - this.x) * 0.08; this.y += (A.floor - 170 - this.y) * 0.08; this.dir = side > p.x ? -1 : 1;
+        if (this.t > 56) { this.state = 'swoop'; this.t = 0; this.vx = this.dir * (ph === 1 ? 5.6 : 6.6); this.swoopTo = p.x + this.dir * 270; this.side = null; SH.sfx.play('dash'); }
+        break;
+      }
+      case 'swoop': {
+        const low = A.floor - 30;
+        this.x += this.vx; this.y += (low - this.y) * 0.12;
+        if (SH.overlap(this.bodyBox(), p.box())) { if (p.dashT > 0 && p.iframes > 0) { if (!this.dodged) { this.dodged = true; world.onPerfectDodge(this); } } else p.hurt(this.x, this.def.damage, world); }
+        if ((this.vx > 0 && (this.x > A.r - 30 || this.x > this.swoopTo)) || (this.vx < 0 && (this.x < A.l + 30 || this.x < this.swoopTo))) {
+          this.dodged = false;
+          if (--this.swoops > 0) { this.state = 'swoopWind'; this.t = 30; } else { this.state = 'circle'; this.t = 0; }
+        }
+        break;
+      }
+      case 'fall':
+        this.vy = Math.min(this.vy + 0.4, 8); this.y += this.vy;
+        if (this.y >= A.floor) { this.y = A.floor; this.state = 'grounded'; this.t = 0; SH.fx.kick(7); fx.burst(this.x, this.y, 26, { speed: 3, life: 30, colors: ['#1a1630', '#3a3450', '#8a5ad8'] }); SH.sfx.play('thud'); }
+        break;
+      case 'grounded':
+        if (this.t > (ph === 1 ? 170 : 140)) { this.state = 'rise'; this.t = 0; this.wing = 0; }
+        break;
+      case 'rise':
+        this.y -= 2.2; if (this.y < A.floor - 150) { this.state = 'circle'; this.t = 0; }
+        break;
+    }
+    this.x = Math.max(A.l + 20, Math.min(A.r - 20, this.x));
+  };
+  Shadow.prototype.takeHit = function (hit, world) {
+    if (!this.hittable()) return null;
+    const fx = SH.fx, grounded = this.state === 'grounded' || this.state === 'fall';
+    let dmg = hit.dmg || 1;
+    if (!grounded && hit.arrow) dmg = 1;
+    this.hp -= dmg; this.flash = 8;
+    fx.burst(this.x, this.y - 18, 9, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.5, speed: 2.6, life: 20, colors: ['#1a1630', '#8a5ad8', '#ff5a8a', '#ffffff'] });
+    if (this.hp <= 0) { this.dead = true; this.darts = []; world.onBossDown(); return { landed: true, killed: true }; }
+    if (grounded && this.hp <= this.def.hp * 0.5 && !this.halfRose) { this.halfRose = true; this.state = 'rise'; this.t = 0; this.wing = 0; fx.word(this.x, this.y - 50, 'IT TEARS FREE', '#ff5a8a', 80); SH.fx.kick(6); }
+    if (!grounded) {
+      this.wing++;
+      if (this.wing >= this.need() && this.state !== 'rise') { this.state = 'fall'; this.vy = 0; this.t = 0; fx.word(this.x, this.y - 50, 'ITS WINGS FAIL', '#ffd27a', 80); SH.arts.whisper('shadowDown'); }
+    }
+    return { landed: true, killed: false };
+  };
+
+  // ---------------------------------------------------------------- what the story hears
+  K.spyDown = function (e, world) {
+    const G = SH.game, key = e.wave === 1 ? 'skyspies' : 'stackspies';
+    G.flags['n_' + key] = (G.flags['n_' + key] || 0) + 1;
+    const all = world.things.filter(s => s.kind === 'spy' && s.wave === e.wave);
+    G.hud.goal(true);
+    if (all.every(s => s.dead)) { if (e.wave === 2) G.flags.pagesKeptAll = !(G.flags.pagesLost > 0); G.queueScript(e.wave === 1 ? 'lib4_sky_done' : 'lib4_stacks_done'); }
+  };
+  K.pageStolen = function (lect, spy, world) {
+    const G = SH.game; G.flags.pagesLost = (G.flags.pagesLost || 0) + 1;
+    SH.fx.word(lect.x, lect.y - 56, 'A PAGE IS TAKEN', '#ff7a8a', 90); SH.sfx.play('back'); SH.fx.kick(2);
+    G.hud.goal(true);
+    if (G.flags.pagesLost === 1) SH.arts.whisper('pageLost');
+  };
+  K.pagesTotal = world => world.things.filter(e => e.kind === 'lectern').reduce((a, l) => a + l.max, 0);
+
+  K.spawn = function (s, x, y) {
+    if (s.kind === 'spy') return new Spy(x, s.y * TS(), s.wave);
+    if (s.kind === 'lectern') return new Lectern(x, y);
+    if (s.kind === 'shadow') return new Shadow(x, s.y * TS());
+    return null;
+  };
+
+  // ---------------------------------------------------------------- drawing
+  K.draws = k => k === 'spy' || k === 'lectern' || k === 'shadow';
+  function wings(ctx, span, up, col, edge) {   // a bat-like wing pair, spread `span`, raised by `up` (-1..1)
+    for (const sd of [-1, 1]) {
+      ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, -4);
+      ctx.lineTo(sd * span * 0.45, -8 - up * span * 0.4); ctx.lineTo(sd * span, -4 - up * span * 0.55);
+      ctx.lineTo(sd * span * 0.8, 2 - up * span * 0.2); ctx.lineTo(sd * span * 0.6, 0); ctx.lineTo(sd * span * 0.45, 4); ctx.lineTo(sd * span * 0.25, 1); ctx.lineTo(0, 4); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = edge; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, -4); ctx.lineTo(sd * span * 0.45, -8 - up * span * 0.4); ctx.lineTo(sd * span, -4 - up * span * 0.55); ctx.stroke();
+    }
+  }
+  function drawSpy(ctx, e, t) {
+    if (e.dead) return;
+    const T = TS(), x = Math.round(e.x), y = Math.round(e.y), fl = e.flash > 0 && e.flash % 2;
+    ctx.save(); ctx.translate(x, y);
+    if (!e.active() && e.wave === 1) { ctx.fillStyle = '#0a0818'; ctx.fillRect(-6, -14, 12, 14); ctx.fillStyle = '#ff5a5a'; ctx.fillRect(-3, -11, 2, 1); ctx.fillRect(2, -11, 2, 1); ctx.restore(); return; }   // folded on a ledge, eyes open
+    if (e.state === 'down') {
+      ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(0, 1, 18, 4, 0, 0, 6.3); ctx.fill();
+      ctx.rotate(0.15 * e.dir); wings(ctx, 20, -0.6, fl ? '#ffffff' : '#241f3a', '#6a5a9a');
+      ctx.fillStyle = fl ? '#ffffff' : '#14102a'; ctx.fillRect(-6, -10, 12, 9); ctx.fillStyle = '#8a8aa0'; ctx.fillRect(-4, -14, 8, 5);
+      for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffd27a'; ctx.fillRect(Math.cos(a) * 10 - 1, -20 + Math.sin(a) * 3, 2, 2); }   // dazed
+      ctx.restore(); return;
+    }
+    const mark = e.state === 'mark', up = Math.sin(e.flap) * (e.state === 'dive' ? 0.3 : 0.9);
+    { const g = ctx.createRadialGradient(0, -10, 2, 0, -10, 34); g.addColorStop(0, 'rgba(185,168,255,0.32)'); g.addColorStop(1, 'rgba(185,168,255,0)'); ctx.fillStyle = g; ctx.fillRect(-34, -44, 68, 68); }   // a pale aura, so it reads against a night sky
+    if (mark) { const g = ctx.createRadialGradient(0, -10, 2, 0, -10, 30); g.addColorStop(0, 'rgba(255,60,60,0.5)'); g.addColorStop(1, 'rgba(255,60,60,0)'); ctx.fillStyle = g; ctx.fillRect(-30, -40, 60, 60); }
+    if (e.state === 'dive') ctx.rotate(Math.atan2(e.vy, e.vx * e.dir) * 0.6 * e.dir);
+    ctx.scale(e.dir, 1);
+    ctx.fillStyle = '#0a0818'; ctx.save(); ctx.translate(0, -8); wings(ctx, e.state === 'dive' ? 16 : 24, up, fl ? '#ffffff' : '#0a0818', '#0a0818'); ctx.restore();
+    ctx.save(); ctx.translate(0, -9); wings(ctx, e.state === 'dive' ? 14 : 22, up, fl ? '#ffffff' : '#3a3260', '#c8b8ff'); ctx.restore();
+    ctx.fillStyle = '#0a0818'; ctx.fillRect(-6, -19, 12, 15); ctx.fillStyle = fl ? '#ffffff' : '#1c1830'; ctx.fillRect(-5, -18, 10, 13);   // a hooded body
+    ctx.fillStyle = '#d8d8ea'; ctx.fillRect(-4, -18, 8, 6); ctx.fillStyle = '#8a8aa0'; ctx.fillRect(-4, -14, 8, 2);                    // the iron mask, catching the light
+    ctx.fillStyle = mark ? '#ffffff' : '#ff3a4a'; ctx.fillRect(1, -16, 2, 2); ctx.fillRect(-3, -16, 2, 2);
+    ctx.fillStyle = '#14102a'; ctx.fillRect(-3, -5, 2, 5); ctx.fillRect(1, -5, 2, 5); ctx.fillStyle = '#8a8aa0'; ctx.fillRect(-3, 0, 2, 2); ctx.fillRect(1, 0, 2, 2);   // talons
+    ctx.restore();
+    if (e.state === 'steal' && e.lect) {   // a page lifting off the book toward it, and how long until it is gone
+      const k = e.steal / 380, px = e.lect.x + Math.sin(t * 0.1) * 3, py = e.lect.y - 16 - k * 18;
+      ctx.fillStyle = '#fff6d8'; ctx.fillRect(Math.round(px) - 3, Math.round(py) - 4, 6, 8); ctx.fillStyle = '#c8b890'; ctx.fillRect(Math.round(px) - 2, Math.round(py) - 2, 4, 1);
+      ctx.fillStyle = '#0a0818'; ctx.fillRect(x - 13, y - 38, 26, 5); ctx.fillStyle = '#ff7a8a'; ctx.fillRect(x - 12, y - 37, Math.round(24 * k), 3);
+    }
+  }
+  function drawLectern(ctx, e, t) {
+    const x = Math.round(e.x), y = Math.round(e.y), R = (a, b, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x + a, y + b, w, h); };
+    R(-2, -22, 4, 22, '#0a0818'); R(-1, -22, 2, 22, '#6a4a2a'); R(-8, -2, 16, 2, '#0a0818'); R(-7, -2, 14, 1, '#8a6444');
+    ctx.fillStyle = '#0a0818'; ctx.beginPath(); ctx.moveTo(x - 12, y - 20); ctx.lineTo(x + 12, y - 26); ctx.lineTo(x + 12, y - 22); ctx.lineTo(x - 12, y - 16); ctx.fill();
+    if (e.pages > 0) {
+      const gl = ctx.createRadialGradient(x, y - 26, 1, x, y - 26, 26); gl.addColorStop(0, 'rgba(255,233,168,0.45)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(x - 26, y - 52, 52, 52);
+      ctx.fillStyle = '#f4ecd8'; ctx.beginPath(); ctx.moveTo(x - 11, y - 21); ctx.lineTo(x, y - 25); ctx.lineTo(x, y - 22); ctx.lineTo(x - 11, y - 18); ctx.fill(); ctx.beginPath(); ctx.moveTo(x, y - 25); ctx.lineTo(x + 11, y - 28); ctx.lineTo(x + 11, y - 24); ctx.lineTo(x, y - 22); ctx.fill();
+      ctx.fillStyle = '#8a7a5a'; for (let i = 0; i < 3; i++) { ctx.fillRect(x - 9 + i * 1, y - 21 + i * 1.5 - i * 0.4, 7, 1); ctx.fillRect(x + 2, y - 25 + i * 1.5, 7, 1); }
+    }
+    for (let i = 0; i < e.max; i++) R(-6 + i * 8, -36 + Math.round(Math.sin(t * 0.06 + i) * 1), 5, 6, i < e.pages ? '#fff6d8' : 'rgba(255,122,138,0.5)');   // the pages it still holds
+    if (e.robbed > 0) { ctx.globalAlpha = e.robbed / 60; R(-14, -44, 28, 2, '#ff7a8a'); ctx.globalAlpha = 1; }
+  }
+  function drawShadow(ctx, e, t) {
+    for (const d of e.darts) {
+      ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(Math.atan2(d.vy, d.vx));
+      const g = ctx.createRadialGradient(0, 0, 1, 0, 0, 18); g.addColorStop(0, 'rgba(255,120,170,0.85)'); g.addColorStop(1, 'rgba(138,90,216,0)'); ctx.fillStyle = g; ctx.fillRect(-18, -18, 36, 36);
+      ctx.fillStyle = 'rgba(200,160,255,0.5)'; ctx.fillRect(-22, -1, 14, 2);   // its trail
+      ctx.fillStyle = '#0a0818'; ctx.beginPath(); ctx.moveTo(11, 0); ctx.lineTo(-8, -5); ctx.lineTo(-4, 0); ctx.lineTo(-8, 5); ctx.fill(); ctx.fillStyle = '#ffd0e0'; ctx.fillRect(0, -1, 6, 2);
+      ctx.restore();
+    }
+    if (e.dead) return;
+    const x = Math.round(e.x), y = Math.round(e.y), fl = e.flash > 0 && e.flash % 2, down = e.state === 'grounded' || e.state === 'fall', idle = e.state === 'idle';
+    ctx.save(); ctx.translate(x, y);
+    // smoke trails off it always
+    for (let i = 0; i < 8; i++) { const k = ((t * 0.02 + i / 8) % 1); ctx.globalAlpha = 0.35 * (1 - k); ctx.fillStyle = '#1a1630'; ctx.beginPath(); ctx.arc(-e.dir * k * 30 + Math.sin(i * 2 + t * 0.05) * 6, -14 + k * 20, 4 + k * 8, 0, 6.3); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    if (down) {
+      ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath(); ctx.ellipse(0, 1, 40, 7, 0, 0, 6.3); ctx.fill();
+      ctx.save(); ctx.translate(0, -6); wings(ctx, 44, -0.7, fl ? '#ffffff' : '#1c1830', '#8a5ad8'); ctx.restore();
+    } else {
+      const up = idle ? -0.4 : Math.sin(e.flap) * 0.8;
+      { const g = ctx.createRadialGradient(0, -20, 4, 0, -20, 80); g.addColorStop(0, 'rgba(170,120,255,0.42)'); g.addColorStop(0.6, 'rgba(120,80,220,0.14)'); g.addColorStop(1, 'rgba(120,80,220,0)'); ctx.fillStyle = g; ctx.fillRect(-80, -100, 160, 160); }
+      ctx.save(); ctx.translate(0, -18); wings(ctx, e.state === 'swoop' ? 46 : 58, up, fl ? '#ffffff' : '#0a0818', '#0a0818'); ctx.restore();
+      ctx.save(); ctx.translate(0, -19); wings(ctx, e.state === 'swoop' ? 44 : 55, up, fl ? '#ffffff' : '#3a2a6a', '#e0c8ff'); ctx.restore();
+      ctx.globalAlpha = 0.5; ctx.save(); ctx.translate(0, -19); wings(ctx, e.state === 'swoop' ? 30 : 38, up, '#5a3aa0', '#5a3aa0'); ctx.restore(); ctx.globalAlpha = 1;
+      if (e.state === 'volley' || e.state === 'swoopWind') { const g = ctx.createRadialGradient(0, -20, 2, 0, -20, 44); g.addColorStop(0, 'rgba(255,90,138,0.45)'); g.addColorStop(1, 'rgba(255,90,138,0)'); ctx.fillStyle = g; ctx.fillRect(-44, -64, 88, 88); }
+    }
+    ctx.scale(e.dir, 1);
+    const by = down ? 6 : 0;
+    ctx.fillStyle = '#0a0818'; ctx.fillRect(-11, -36 + by, 22, 32 - by); ctx.fillStyle = fl ? '#ffffff' : '#14102a'; ctx.fillRect(-10, -35 + by, 20, 30 - by);
+    ctx.fillStyle = '#241f3a'; for (let i = 0; i < 5; i++) ctx.fillRect(-10 + i * 4, -8, 3, 6 + (i % 2) * 3);                 // a ragged cloak hem
+    ctx.fillStyle = '#e8e8f6'; ctx.fillRect(-7, -34 + by, 14, 11); ctx.fillStyle = '#7a7a90'; ctx.fillRect(-7, -27 + by, 14, 3); ctx.fillRect(-1, -34 + by, 2, 11);   // the iron mask, a seam down its face
+    ctx.fillStyle = '#ff2a5a'; ctx.fillRect(2, -31 + by, 3, 2); ctx.fillRect(-5, -31 + by, 3, 2);
+    for (let i = 0; i < 3; i++) { ctx.fillStyle = '#7a7a90'; ctx.fillRect(-6 + i * 5, -39 + by, 2, 5); }                       // a crown of iron spikes: the Iron King's
+    if (!down) for (let i = 0; i < e.wing; i++) { ctx.fillStyle = '#ffd27a'; ctx.fillRect(-10 + i * 6, -48, 4, 4); }           // arrows it has taken
+    ctx.restore();
+    if (down) for (let i = 0; i < 4; i++) { const a = t * 0.1 + i * 1.6; ctx.fillStyle = '#ffd27a'; ctx.fillRect(x + Math.cos(a) * 18 - 1, y - 46 + Math.sin(a) * 4, 2, 2); }
+  }
+  K.draw = function (ctx, e, t) { if (e.kind === 'spy') drawSpy(ctx, e, t); else if (e.kind === 'lectern') drawLectern(ctx, e, t); else drawShadow(ctx, e, t); };
 })(window.SH = window.SH || {});
 
 </script>
@@ -4310,13 +4900,14 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
 // Each level gives one fixed perk (the Constellation is where you choose; levels are what you earn by playing).
 (function (SH) {
   const X = {};
-  X.AT = [0, 30, 80, 150, 240, 350];                 // total XP needed for level 1, 2, 3...
+  X.AT = [0, 30, 80, 150, 240, 350, 480];                 // total XP needed for level 1, 2, 3...
   X.PERKS = [null, null,
     { name: 'Quick hands', text: 'Everything in Wren\'s hands is ready again sooner: the bow now, and whatever comes after it.' },
     { name: 'Light feet', text: 'Wren recovers her footing faster. When she learns to dash, it will be ready again sooner.' },
     { name: 'Hard to kill', text: 'One more heart.' },
     { name: 'Bonded', text: 'Every level starts with the bond bar a third full.' },
     { name: 'Hunter\'s patience', text: 'Starlight drifts to you from further away.' },
+    { name: 'Steady aim', text: 'Arrows from the fae bow fly a fifth faster.' },
   ];
   const prog = () => SH.game.progress;
   X.total = () => (prog() && prog().xp) || 0;
@@ -5931,6 +6522,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       if (!p.grounded && d.arc !== 'down' && d.arc !== 'thrust' && d.arc !== 'up') { pose.legF = [-0.9, 1.2]; pose.legB = [0.2, 0.9]; pose.crouch = 0; }
       return pose;
     }
+    if (name === 'bow') { const a = p.aim || 0; return Object.assign({}, POSES.bow, { armF: [-1.52 - a, 0], armB: [-1.0 - a * 0.85, -1.3], lean: -0.04 - a * 0.08 }); }
     return POSES[name] || BASE;
   }
 
@@ -6053,7 +6645,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     g.translate(OX, OY); g.scale(sx, sy);
     const bowMode = SH.game.can('bow') && !SH.game.can('daggers');
     const o = { face: true, blink: name === 'idle' && a.t % 230 < 7, blades: !bowMode && name !== 'cast' && name !== 'charge' };
-    if (bowMode) o.hand = bowHand(p.bowT > 8);
+    if (bowMode || (name === 'bow' && SH.game.can('fbow'))) o.hand = bowHand(p.bowT > 8);
     if (name === 'cast') o.hand = fireHand(5);
     if (name === 'charge') o.hand = fireHand(3 + Math.min(6, p.chargeT / 6));
     figure(g, p, S, o);
@@ -6178,6 +6770,12 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       ground: '#0a0b17', speck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66', side: '#20264d',
       motes: ['#cfe0ff', '#ffe9a8'],
     },
+    library: {   // Starhaven's Library: lamplight on old wood, shelves going up into the dark
+      sky: ['#0e0806', '#1e120c', '#2e1c12', '#3c2616'], stars: false, far: 'hall', mid: 'stacks',
+      farA: '#2a1a12', farB: '#20140d', midC: '#170e09', mist: 'rgba(255,190,120,0.10)', glow: 'rgba(255,190,110,0.22)',
+      ground: '#0b0705', speck: '#2e1d13', edgeLight: '#ffe2b0', edgeMid: '#a8784a', grass: '#c89a5a', grassDark: '#7a5a3a', side: '#2a1a12',
+      motes: ['#ffe9a8', '#fff6d8'],
+    },
   };
   SH.THEMES = THEMES;
 
@@ -6210,7 +6808,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     }
   };
   // How dark each place is away from a light: [colour, strength].
-  const DARK = { deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  const DARK = { library: ['#0a0503', 0.36], deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
@@ -6222,6 +6820,10 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     const hole = (x, y, r, al, glow) => { const X = x - cx, Y = y - cy; if (X < -r || X > vw + r) return; g.globalAlpha = al; g.drawImage(layers.hole, X - r, Y - r, r * 2, r * 2); if (glow) warm.push(X, Y, r * glow); };
     const p = w.player, fl = Math.sin(t * 0.13) * 3;
     hole(p.x, p.y - 22, 105, 0.85);
+    for (const e of w.things) {   // anything that flies at her carries a little light, so it can be seen coming
+      if (e.kind === 'spy' && !e.dead && e.active()) hole(e.x, e.y - 12, 56, 0.7);
+      else if (e.kind === 'shadow' && !e.dead && e.state !== 'idle') { hole(e.x, e.y - 20, 110, 0.85); for (const d of e.darts) hole(d.x, d.y, 34, 0.8); }
+    }
     if (p.charging) hole(p.x + p.facing * 12, p.y - 24, 40 + Math.min(40, p.chargeT), 0.9, 0.7);
     for (const l of w.lanterns) if (l.lit) hole(l.px, l.py - 40, 120 + fl, 1, 0.9);
     for (const n of w.npcs) if (!n.hidden) hole(n.x, n.y - 24, 70, 0.6);
@@ -6254,9 +6856,9 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     gr.addColorStop(0, T.sky[0]); gr.addColorStop(0.45, T.sky[1]); gr.addColorStop(0.78, T.sky[2]); gr.addColorStop(1, T.sky[3]);
     g.fillStyle = gr; g.fillRect(0, 0, 16, 360);
     out.sky = s;
-    out.far = T.far === 'cave' ? makeCave(T) : makeMountains(T);
+    out.far = T.far === 'cave' ? makeCave(T) : T.far === 'hall' ? makeHall(T) : makeMountains(T);
     out.near = makeNear(T, name);
-    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : T.mid === 'pines' ? makePines(T) : makeTrees(T);
+    out.mid = T.mid === 'stacks' ? makeStacks(T) : T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : T.mid === 'pines' ? makePines(T) : makeTrees(T);
     return out;
   }
   // The nearest background layer: things with real detail, just behind where Wren walks.
@@ -6266,7 +6868,13 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     const dark = SH.shade(T.midC, 0.75), lite = SH.shade(T.midC, 1.5);
     for (let i = 0; i < 9; i++) {
       const x = 50 + i * 122 + r() * 46;
-      if (name === 'deep') {   // pillars of rock with a lit edge, and roots hanging between them
+      if (name === 'library') {   // a reading-room column, and a tall ladder leaning on a case
+        const pw = 18, top = 20;
+        g.fillStyle = dark; g.fillRect(x, top, pw, h - top); g.fillRect(x - 5, top, pw + 10, 8); g.fillRect(x - 5, h - 14, pw + 10, 14);
+        g.fillStyle = lite; g.fillRect(x + 2, top + 8, 2, h - top - 22);
+        g.strokeStyle = dark; g.lineWidth = 3; g.beginPath(); g.moveTo(x + 50, h); g.lineTo(x + 78, 40); g.moveTo(x + 64, h); g.lineTo(x + 92, 40); g.stroke();
+        g.lineWidth = 2; for (let k = 0; k < 12; k++) { const yy = h - 18 - k * 20, xx = x + 50 + (h - yy) * 0.108; g.beginPath(); g.moveTo(xx, yy); g.lineTo(xx + 14, yy); g.stroke(); }
+      } else if (name === 'deep') {   // pillars of rock with a lit edge, and roots hanging between them
         const pw = 16 + r() * 14, top = 30 + r() * 60;
         g.fillStyle = dark; g.fillRect(x, top, pw, h - top); g.beginPath(); g.moveTo(x - 6, h); g.lineTo(x + 2, top + 30); g.lineTo(x + pw - 2, top + 30); g.lineTo(x + pw + 8, h); g.fill();
         g.fillStyle = lite; g.fillRect(x, top, 2, h - top); for (let k = 0; k < 6; k++) g.fillRect(x + 3 + r() * (pw - 6), top + 10 + r() * 200, 2, 1);
@@ -6357,6 +6965,32 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     for (let x = 0; x < w; x += 50) { const h = 40 + r() * 90; g.fillRect(x, 360 - h, 52, h); }
     return c;
   }
+  // the Library: tall arched windows full of night sky far behind, and the dark of the stacks between them
+  function makeHall(T) {
+    const w = 1400, c = canvas(w, 360), g = c.getContext('2d'), r = rng(41);
+    g.fillStyle = T.farA; g.fillRect(0, 0, w, 360);
+    for (let x = 60; x < w; x += 230) {
+      const ww = 70, top = 40, bot = 300;
+      const sg = g.createLinearGradient(0, top, 0, bot); sg.addColorStop(0, '#0c0e2e'); sg.addColorStop(1, '#2a2458'); g.fillStyle = sg;
+      g.beginPath(); g.moveTo(x, bot); g.lineTo(x, top + 35); g.quadraticCurveTo(x + ww / 2, top - 20, x + ww, top + 35); g.lineTo(x + ww, bot); g.fill();
+      for (let i = 0; i < 18; i++) { g.fillStyle = r() < 0.2 ? '#fff6d8' : '#a8a2d8'; g.fillRect(x + 4 + r() * (ww - 8), top + 20 + r() * 200, 1, 1); }
+      g.fillStyle = T.farB; g.fillRect(x + ww / 2 - 2, top, 4, bot - top); g.fillRect(x, top + 110, ww, 4); g.fillRect(x, top + 200, ww, 4);   // the leading
+      const mg = g.createLinearGradient(0, bot - 40, 0, 360); mg.addColorStop(0, 'rgba(160,170,255,0.16)'); mg.addColorStop(1, 'rgba(160,170,255,0)'); g.fillStyle = mg; g.fillRect(x - 20, bot - 40, ww + 40, 100);   // moonlight on the floor
+    }
+    return c;
+  }
+  function makeStacks(T) {   // bookcases, shelf over shelf, a few spines catching the lamplight
+    const w = 1200, c = canvas(w, 360), g = c.getContext('2d'), r = rng(17);
+    for (let x = 0; x < w; x += 150) {
+      const cw = 110 + r() * 20, top = 20 + r() * 60;
+      g.fillStyle = T.midC; g.fillRect(x, top, cw, 360 - top); g.fillRect(x - 6, top - 8, cw + 12, 10);
+      for (let sy = top + 14; sy < 360; sy += 34) {
+        g.fillStyle = SH.shade(T.midC, 0.6); g.fillRect(x + 4, sy + 26, cw - 8, 4);
+        for (let bx = x + 6; bx < x + cw - 8;) { const bw = 3 + r() * 5, bh = 16 + r() * 9, lit = r() < 0.18; g.fillStyle = lit ? ['#6a3a2a', '#3a4a6a', '#5a5a2a', '#4a2a4a'][(r() * 4) | 0] : SH.shade(T.midC, 1.3 + r() * 0.4); g.fillRect(bx, sy + 26 - bh, bw, bh); bx += bw + (r() < 0.1 ? 6 : 1); }
+      }
+    }
+    return c;
+  }
   function makeRoots(T) {
     const w = 1200, c = canvas(w, 360), g = c.getContext('2d'), r = rng(9);
     g.strokeStyle = T.midC; g.lineCap = 'round';
@@ -6374,12 +7008,13 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
   // railings and crates in the city. Sparse, so it frames the picture without hiding the ground Wren stands on.
   function makeForeground(name) {
     const w = 900, h = 64, c = canvas(w, h), g = c.getContext('2d'), r = rng(name.length * 7 + 3);
-    const col = { deep: '#020504', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
+    const col = { library: '#060302', deep: '#020504', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
     g.fillStyle = col;
     for (let x = 0; x < w; x += 2) { const gh = 3 + Math.sin(x * 0.05) * 2 + r() * 5; g.fillRect(x, h - gh, 2, gh); }   // a low uneven edge
     for (let i = 0; i < 7; i++) {
       const x = 40 + i * 128 + r() * 50;
-      if (name === 'deep') { const hh = 22 + r() * 30; g.beginPath(); g.moveTo(x - 16, h); g.lineTo(x - 3, h - hh); g.lineTo(x + 4, h - hh * 0.7); g.lineTo(x + 18, h); g.fill(); }
+      if (name === 'library') { for (let k = 0; k < 5; k++) { const bw = 26 - k * 3, bx = x - bw / 2 + (k % 2) * 3; g.fillRect(bx, h - 8 - k * 7, bw, 7); } }   // piles of books
+      else if (name === 'deep') { const hh = 22 + r() * 30; g.beginPath(); g.moveTo(x - 16, h); g.lineTo(x - 3, h - hh); g.lineTo(x + 4, h - hh * 0.7); g.lineTo(x + 18, h); g.fill(); }
       else if (name === 'city') { if (i % 2) { g.fillRect(x - 14, h - 26, 28, 26); g.fillRect(x - 17, h - 30, 34, 5); } else { for (let k = 0; k < 5; k++) g.fillRect(x - 40 + k * 20, h - 30, 3, 30); g.fillRect(x - 44, h - 30, 90, 4); } }
       else if (name === 'thornwood') { g.lineWidth = 4; g.strokeStyle = col; g.beginPath(); g.moveTo(x - 30, h); g.quadraticCurveTo(x - 10, h - 50, x + 26, h - 30); g.stroke(); for (let k = 0; k < 5; k++) { const tx = x - 22 + k * 11, ty = h - 20 - k * 6 + (k > 3 ? 8 : 0); g.beginPath(); g.moveTo(tx, ty); g.lineTo(tx + 3, ty - 9); g.lineTo(tx + 6, ty); g.fill(); } }
       else { for (let k = 0; k < 9; k++) { const bx = x - 26 + k * 6.5, bh = 14 + Math.sin(k * 0.8) * 10 + r() * 10; g.beginPath(); g.moveTo(bx - 4, h); g.lineTo(bx, h - bh); g.lineTo(bx + 4, h); g.fill(); }   // a tuft of tall grass, or a pine bough
@@ -6395,7 +7030,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     return c;
   }
 
-  THEMES.winter.gstyle = 'earth'; THEMES.dusk.gstyle = 'earth'; THEMES.thornwood.gstyle = 'earth'; THEMES.deep.gstyle = 'rock'; THEMES.mountain.gstyle = 'strata'; THEMES.city.gstyle = 'brick';
+  THEMES.winter.gstyle = 'earth'; THEMES.dusk.gstyle = 'earth'; THEMES.thornwood.gstyle = 'earth'; THEMES.deep.gstyle = 'rock'; THEMES.mountain.gstyle = 'strata'; THEMES.city.gstyle = 'brick'; THEMES.library.gstyle = 'brick';
   function groundTile(g, T, style, x, y, tx, ty, depth, TS) {
     const H = (a, b) => { let h = (tx * 73856093) ^ (ty * 19349663) ^ (a * 83492791) ^ ((b || 0) * 2654435761); h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
     const lift = [1.42, 1.24, 1.12, 1.05, 1][depth], base = SH.shade(T.speck, lift);   // the ground stays a step quieter than the people on it
@@ -6503,6 +7138,11 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
           g.fillStyle = '#2a1622'; for (let i = 0; i < 4; i++) g.fillRect(x + i * 6 + (hsh % 3), y + 3, 4, 1);
           g.fillStyle = '#3a2430'; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(x + 2 + i * 8, y + 7); g.lineTo(x + 5 + i * 8, y + 12 + (i + hsh) % 3); g.lineTo(x + 7 + i * 8, y + 7); g.fill(); }
           if (hsh === 0) { g.fillStyle = '#ff5a78'; g.fillRect(x + 10, y + 9, 2, 2); }
+        } else if (T === THEMES.library) {   // a wooden gallery with a rail and turned balusters
+          g.fillStyle = '#0a0604'; g.fillRect(x, y - 1, TS, 9); g.fillStyle = '#6a4228'; g.fillRect(x, y, TS, 6); g.fillStyle = '#9a6a3e'; g.fillRect(x, y, TS, 2); g.fillStyle = '#3a2416'; g.fillRect(x, y + 5, TS, 2);
+          g.fillStyle = '#4a2e1c'; g.fillRect(x, y - 13, TS, 2); for (let i = 0; i < 3; i++) { g.fillRect(x + 3 + i * 8, y - 12, 2, 12); }
+          g.fillStyle = '#c8a050'; if (endL) g.fillRect(x, y - 15, 3, 15); if (endR) g.fillRect(x + TS - 3, y - 15, 3, 15);
+          g.fillStyle = '#2a1a10'; g.beginPath(); g.moveTo(x + (endL ? 2 : 0), y + 7); g.lineTo(x + TS - (endR ? 2 : 0), y + 7); g.lineTo(x + TS - (endR ? 8 : 0), y + 11); g.lineTo(x + (endL ? 8 : 0), y + 11); g.fill();
         } else if (T === THEMES.deep) {
           g.fillStyle = '#0a0f0c'; g.fillRect(x, y - 1, TS, 10); g.fillStyle = '#34463c'; g.fillRect(x, y, TS, 8); g.fillStyle = '#56705e'; g.fillRect(x, y, TS, 2); g.fillStyle = '#243228'; g.fillRect(x, y + 6, TS, 2);
           g.fillStyle = '#1c2a22'; g.fillRect(x + 11 + hsh, y + 2, 1, 4); g.fillStyle = '#6f9a5c'; g.fillRect(x + (hsh * 4) % 18, y - 1, 5, 2);
@@ -6545,6 +7185,17 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
 
   // Each prop draws at (x, y) where y is the ground (or the ceiling, for hanging things).
   const PROPS = {
+    bookcase(g, x, y, p) {   // a tall case standing on the floor, h tiles high
+      const TS = SH.TILE, h = (p.h || 4) * TS, w = (p.w || 3) * TS, x0 = x - w / 2, r = rng(Math.floor(x));
+      g.fillStyle = '#0a0604'; g.fillRect(x0 - 2, y - h - 2, w + 4, h + 2); g.fillStyle = '#3a2416'; g.fillRect(x0, y - h, w, h); g.fillStyle = '#5a3a22'; g.fillRect(x0 - 3, y - h - 4, w + 6, 5);
+      for (let sy = y - h + 6; sy < y - 4; sy += 22) {
+        g.fillStyle = '#1e120a'; g.fillRect(x0 + 3, sy, w - 6, 18); g.fillStyle = '#6a4228'; g.fillRect(x0 + 2, sy + 18, w - 4, 3);
+        for (let bx = x0 + 4; bx < x0 + w - 6;) { const bw = 3 + ((r() * 4) | 0), bh = 11 + r() * 6; g.fillStyle = ['#7a2a2a', '#2a4a6a', '#5a5a2a', '#4a2a4a', '#6a4a2a', '#2a5a4a'][(r() * 6) | 0]; g.fillRect(bx, sy + 18 - bh, bw, bh); g.fillStyle = 'rgba(255,230,180,0.25)'; g.fillRect(bx, sy + 18 - bh + 2, bw, 1); bx += bw + (r() < 0.12 ? 5 : 0); }
+      }
+    },
+    table(g, x, y) { g.fillStyle = '#0a0604'; g.fillRect(x - 26, y - 16, 52, 4); g.fillStyle = '#6a4228'; g.fillRect(x - 25, y - 15, 50, 2); g.fillStyle = '#3a2416'; g.fillRect(x - 22, y - 12, 3, 12); g.fillRect(x + 19, y - 12, 3, 12);
+      g.fillStyle = '#e8dcc0'; g.fillRect(x - 14, y - 19, 10, 3); g.fillStyle = '#7a2a2a'; g.fillRect(x + 2, y - 22, 12, 6); g.fillStyle = '#ffd27a'; g.fillRect(x + 17, y - 24, 2, 8); },
+    globe(g, x, y) { g.fillStyle = '#3a2416'; g.fillRect(x - 1, y - 20, 2, 20); g.fillRect(x - 8, y - 2, 16, 2); g.fillStyle = '#0a0604'; g.beginPath(); g.arc(x, y - 28, 10, 0, 6.3); g.fill(); g.fillStyle = '#2a4a6a'; g.beginPath(); g.arc(x, y - 28, 9, 0, 6.3); g.fill(); g.fillStyle = '#5a7a4a'; g.fillRect(x - 5, y - 32, 6, 4); g.fillRect(x + 1, y - 26, 5, 4); g.strokeStyle = '#c8a050'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 28, 11, -2.2, 0.9); g.stroke(); },
     cage(g, x, y) {   // a cage of woven thorn, hung from the roof on a chain
       g.fillStyle = '#1a1c22'; g.fillRect(x - 1, y - 150, 2, 92); g.fillStyle = '#2a0e1a'; g.fillRect(x - 22, y - 60, 44, 4); g.fillRect(x - 22, y - 2, 44, 3);
       for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#3a1226' : '#4a1830'; g.fillRect(x - 21 + i * 8, y - 58, 2, 57); g.fillStyle = '#ff4a5a'; if (i % 2) g.fillRect(x - 21 + i * 8, y - 40 + i * 4, 2, 2); }
@@ -6614,7 +7265,8 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     }
     for (const n of w.npcs) (SH.people.has(n.id) ? SH.people.draw : SH.art.npc)(ctx, n, t);
     for (const e of w.things) {
-      if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
+      if (!e.boss && (e.x < cx - 80 || e.x > cx + vw + 80)) continue;
+      if (SH.ch4 && SH.ch4.draws(e.kind)) { SH.ch4.draw(ctx, e, t); continue; }
       if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
       else if (e.kind === 'dummy') drawDummy(ctx, e);
       else if (e.kind === 'bulb') drawBulb(ctx, e, t);
@@ -7280,7 +7932,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       },
       onKnockout() { G.knockout(); },
       arrows: [],
-      spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
+      spawnArrow(x, y, dir, ang, fae) { const sp = fae ? 10.5 * (SH.xp.level() >= 7 ? 1.2 : 1) : 8; this.arrows.push(fae ? { x, y, vx: dir * Math.cos(ang) * sp, vy: -Math.sin(ang) * sp, life: 90, stuck: false, fae: true, g: 0.03 } : { x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
       fireballs: [], rocks: [], waves: [],
       spawnFireball(x, y, dir, big) { const F = SH.GIFTS.flame; this.fireballs.push({ x, y, vx: dir * (big ? F.waveSpeed : F.speed), life: F.life, dir, big: !!big, hit: new Set() }); },
       spawnWave(x, y, dir) { this.waves.push({ x, y, dir, life: 80, t: 0 }); },
@@ -7288,14 +7940,14 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       dropRocks(n, at) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 90; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); this.victoryT = 1; this.victoryAt = b ? { x: b.x, y: b.y - 30 } : null; this.rocks = []; this.waves = []; },
+      onBossDown() { const b = this.things.find(e => e.boss), d = (b && b.def) || {}; if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 90; SH.arts.finisher(d.slain || 'WYRMSLAYER', d.falls || 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); this.victoryT = 1; this.victoryAt = b ? { x: b.x, y: b.y - 30 } : null; this.victoryScript = d.after || 'mtn_peak'; this.victoryWords = d.quiet || 'THE HOLLOW IS QUIET'; this.rocks = []; this.waves = []; },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       // the Winter Woods
       onPickup(what) {
         if (what === 'plums') { G.queueScript('ring_plums'); return; }
         if (what === 'cat') { G.queueScript('ashes_cat_found'); return; }
         if (what === 'page') { G.queueScript('mtn_page'); return; }
-        if (what === 'lamp') { G.flags.n_lamps = (G.flags.n_lamps || 0) + 1; SH.xp.gain(5, true); SH.sfx.play('lantern'); fx.word(player.x, player.y - 50, 'Lamp ' + G.flags.n_lamps + '/4', '#ffd27a', 70); fx.ring(player.x, player.y - 30, '#ffd27a', 40, 20, 2); this.cityLightTarget = Math.min(1, (this.cityLightTarget || 0) + 0.08); if (G.flags.n_lamps === 4) { G.flags.lamps4 = true; G.queueScript('ashes_lamps'); } return; }
+        if (what === 'lamp') { G.flags.n_lamps = (G.flags.n_lamps || 0) + 1; SH.xp.gain(5, true); SH.sfx.play('lantern'); fx.word(player.x, player.y - 50, 'Lamp ' + G.flags.n_lamps + '/4', '#ffd27a', 70); fx.ring(player.x, player.y - 30, '#ffd27a', 40, 20, 2); this.cityLightTarget = Math.min(1, (this.cityLightTarget || 0) + 0.08); if (G.flags.n_lamps === 4) { G.flags.lamps4 = true; G.queueScript(def.lampScript || 'ashes_lamps'); } return; }
         if (what === 'pack' || what === 'tally') { G.progress.seen = G.progress.seen || {}; G.progress.seen['d_' + what] = 1; SH.xp.gain(8, true); G.queueScript('deep_' + what); return; }
         if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
         G.flags.n_wood = (G.flags.n_wood || 0) + 1;
@@ -7355,7 +8007,10 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     const w = G.world, p = w.player;
     const look = p.facing * 46 + p.vx * 8;
     let tx = p.x + look - w.viewW / 2;
-    let ty = p.y - SH.VIEW_H * 0.64;
+    if (G.boss && !G.boss.dead && G.boss.kind === 'shadow') {   // a flying boss: keep both of them in the picture, Wren never too near an edge
+      const midX = (p.x + G.boss.x) / 2 - w.viewW / 2; tx = Math.max(p.x - w.viewW * 0.76, Math.min(p.x - w.viewW * 0.24, midX));
+    }
+    let ty = p.y - SH.VIEW_H * (0.64 + (w.room.def.camLift || 0));   // a level with things in the air looks up a little more
     tx = Math.max(0, Math.min(w.room.pxW - w.viewW, tx));
     ty = Math.max(0, Math.min(w.room.pxH - SH.VIEW_H, ty));
     w.camT = { x: tx, y: ty };
@@ -7417,6 +8072,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       const n = g.counter ? (G.flags['n_' + g.counter] || 0) : G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
       text += ` (${n}/${g.count})`;
     }
+    if (g.id === 'stacks_done' && G.world && SH.ch4) { const tot = SH.ch4.pagesTotal(G.world); if (tot) text += ` \u00b7 pages safe ${tot - (G.flags.pagesLost || 0)}/${tot}`; }
     return text;
   };
 
@@ -7449,7 +8105,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
         return;
       }
       if (st.if) {   // the story comes back to something Wren did
-        const yes = st.if[0] === '!' ? !G.recalls(st.if.slice(1)) : G.recalls(st.if);
+        const has = k => G.recalls(k) || !!G.flags[k], yes = st.if[0] === '!' ? !has(st.if.slice(1)) : has(st.if);
         sc.steps = sc.steps.slice(0, sc.i).concat(yes ? st.then || [] : st.else || [], sc.steps.slice(sc.i));
         continue;
       }
@@ -7532,10 +8188,12 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     G.save();
   };
   // Explain a system the first time it matters: a short card that holds the game until it is read. Once per save.
+  G.calm = () => { const w2 = G.world, p2 = w2.player; return p2.grounded && !(w2.wyrm && w2.wyrm.on) && !(G.boss && !G.boss.dead) && !w2.victoryT && !w2.koT
+      && !w2.things.some(e => (e.kind === 'thornSprite' || e.kind === 'wyrm' || e.kind === 'wolf' || (e.kind === 'spy' && e.active())) && !e.dead && !e.gone && Math.abs(e.x - p2.x) < 260 && Math.abs(e.y - p2.y) < 120); };
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play' || (G.explainWait || 0) > 0 || (G.world && ((G.world.wyrm && G.world.wyrm.on) || (G.boss && !G.boss.dead)))) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
+    if (G.state !== 'play' || (G.explainWait || 0) > 0 || !G.world || !G.calm()) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -7570,6 +8228,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     if (w.pts) return !!pr.bonds[w.pts[0]] && pr.bonds[w.pts[0]].pts >= w.pts[1];
     if (w.mem) return !!(pr.mem && pr.mem[w.mem]);
     if (w.seen) return !!(pr.seen && pr.seen[w.seen]);
+    if (w.flag) return !!G.flags[w.flag];
     return false;
   };
   G.loreCheck = function (quiet) {
@@ -7623,9 +8282,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
     if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 3);   // and never the moment a conversation ends
     // a card only ever opens in a calm moment: feet on the ground, nothing chasing her, no boss, no enemy close
-    const calm = () => { const w2 = G.world, p2 = w2.player; return p2.grounded && !(w2.wyrm && w2.wyrm.on) && !(G.boss && !G.boss.dead) && !w2.victoryT && !w2.koT
-      && !w2.things.some(e => (e.kind === 'thornSprite' || e.kind === 'wyrm' || e.kind === 'wolf') && !e.dead && !e.gone && Math.abs(e.x - p2.x) < 260 && Math.abs(e.y - p2.y) < 120); };
-    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending && calm()) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending && G.calm()) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -7665,13 +8322,13 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     for (const a of w.arrows) {
       a.life--;
       if (a.stuck) continue;
-      a.vy += 0.05; a.x += a.vx; a.y += a.vy;
+      a.vy += a.g != null ? a.g : 0.05; a.x += a.vx; a.y += a.vy;
       const tile = w.room.get(Math.floor(a.x / TS), Math.floor(a.y / TS));
       if (tile === SH.T_SOLID) { a.stuck = true; a.life = Math.min(a.life, 60); continue; }
       for (const e of w.things) {
-        if (!e.arrowOnly || !e.hittable()) continue;
-        const hb = e.hurtBox();
-        if (a.x > hb.l && a.x < hb.r && a.y > hb.t && a.y < hb.b) { e.takeHit({ arrow: true, dir: Math.sign(a.vx) }, w); a.life = 0; break; }
+        if (!e.hittable() || (!e.arrowOnly && !a.fae) || (a.fae && (e.kind === 'bulb' || e.kind === 'brazier' || e.kind === 'lectern'))) continue;
+        const hb = e.hurtBox(), pad = a.fae ? 4 : 0;
+        if (a.x > hb.l - pad && a.x < hb.r + pad && a.y > hb.t - pad && a.y < hb.b + pad) { e.takeHit({ arrow: true, fae: a.fae, dmg: 2, kb: 1.5, dir: Math.sign(a.vx) || 1 }, w); a.life = 0; if (a.fae) { fx.spark(a.x, a.y, 0, true); if (e.kind === 'spy' && !G.flags.pinned1) G.flags.pinned1 = true; } break; }
       }
     }
     w.arrows = w.arrows.filter(a => a.life > 0);
@@ -7789,7 +8446,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0) && (h.above == null || p.y <= h.above * TS) && (h.below == null || p.y > h.below * TS));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or dash straight through it ({DASH}): nothing can touch you mid-dash.', charge: 'CHARGING. Jump it, or dash through it ({DASH}). If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
+    const bossTell = G.boss && !G.boss.dead ? (G.boss.tell ? { now: G.boss.tell() } : { windup: 'It is about to CHARGE. Jump over it, or dash straight through it ({DASH}): nothing can touch you mid-dash.', charge: 'CHARGING. Jump it, or dash through it ({DASH}). If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.tell ? 'now' : G.boss.state] : null;
     { const text = bossTell ? input.fill(bossTell) : hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
       if (bossTell) { w.hintNow = text; w.hintHold = 0; G.hud.prompt(text); }
       else if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time
@@ -7880,11 +8537,11 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       fx.parts.push({ x: sx, y: sy, vx: (p.x - sx) / k, vy: (p.y - 26 - sy) / k, g: 0, drag: 1, life: k, max: k, size: 3, color: t % 2 ? '#ffd27a' : '#fff6d8', glow: true, shape: 'sq' });
     }
     if (t > 60 && t < 200 && t % 28 === 0) { fx.ring(p.x, p.y - 24, '#ffd27a', 30 + (t % 3) * 8, 22, 2); if (p.hearts < p.maxHearts) { p.hearts++; SH.sfx.play('heart'); } }
-    if (t === 120) { fx.word(p.x, p.y - 70, 'THE HOLLOW IS QUIET', '#fff6d8', 150); SH.arts.whisper('bossWon', true); }
+    if (t === 120) { fx.word(p.x, p.y - 70, w.victoryWords || 'THE HOLLOW IS QUIET', '#fff6d8', 150); SH.arts.whisper('bossWon', true); }
     if (t === 215) SH.xp.gain(40, true);
     if (t === 210) { SH.sfx.play('lantern'); fx.burst(p.x, p.y - 24, 40, { speed: 3.4, life: 50, gravity: -0.03, colors: ['#ffd27a', '#fff6d8', '#b9a8ff'], glow: true }); G.look(p.x, p.y - 30, 1.4, 90); }
     if (t > 270) w.fade = Math.min(1, (t - 270) / 40);
-    if (t >= 315) { w.victoryT = 0; G.queueScript('mtn_peak'); }
+    if (t >= 315) { w.victoryT = 0; G.queueScript(w.victoryScript || 'mtn_peak'); }
   };
 
   G.caught = function () {
@@ -8285,6 +8942,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
     $('b-dash').style.display = G.can('dash') ? '' : 'none';
     $('b-down').style.display = G.can('daggers') ? '' : 'none';
     $('b-up').style.display = G.can('daggers') ? '' : 'none';
+    $('b-bow').style.display = G.can('fbow') ? 'flex' : 'none';
     $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
     $('b-gift').style.display = G.can('flame') ? 'flex' : 'none';
     $('pips').style.display = G.can('flame') ? 'flex' : 'none';
@@ -8340,7 +8998,7 @@ html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom:
       html += '</ul><h3>What I am working toward</h3>';
       html += '<p>Keep Starhaven standing through a war between two courts, and be ready for the Iron King when he uses it. I cannot do that alone. Every heart someone gives me is a blade, a shield or a truth I will need before the end. The Bonds tab says exactly what each one gives.</p><ul class="goals road">';
       ST.CHAPTERS.forEach((c, i) => { html += `<li class="${i < G.chapter ? 'done' : i === G.chapter ? 'now' : ''}">${i < G.chapter ? '&#10003;' : i === G.chapter ? '&#9656;' : '&#9675;'} ${esc(c.label)}: ${esc(c.name)}</li>`; });
-      html += '<li>&#9675; Still ahead: the spy in the Library, Starfall, my sisters, the siege.</li></ul>';
+      html += '<li>&#9675; Still ahead: the Weaver, Starfall, my sisters, the siege.</li></ul>';
       html += '<h3>How I got here</h3>';
       html += `<p>${esc(ST.RECAP)}</p>`;
       for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;

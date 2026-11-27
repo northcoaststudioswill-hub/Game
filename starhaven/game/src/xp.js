@@ -2,13 +2,14 @@
 // Each level gives one fixed perk (the Constellation is where you choose; levels are what you earn by playing).
 (function (SH) {
   const X = {};
-  X.AT = [0, 30, 80, 150, 240, 350];                 // total XP needed for level 1, 2, 3...
+  X.AT = [0, 30, 80, 150, 240, 350, 480];                 // total XP needed for level 1, 2, 3...
   X.PERKS = [null, null,
     { name: 'Quick hands', text: 'Everything in Wren\'s hands is ready again sooner: the bow now, and whatever comes after it.' },
     { name: 'Light feet', text: 'Wren recovers her footing faster. When she learns to dash, it will be ready again sooner.' },
     { name: 'Hard to kill', text: 'One more heart.' },
     { name: 'Bonded', text: 'Every level starts with the bond bar a third full.' },
     { name: 'Hunter\'s patience', text: 'Starlight drifts to you from further away.' },
+    { name: 'Steady aim', text: 'Arrows from the fae bow fly a fifth faster.' },
   ];
   const prog = () => SH.game.progress;
   X.total = () => (prog() && prog().xp) || 0;

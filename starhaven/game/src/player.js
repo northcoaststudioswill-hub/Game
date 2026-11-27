@@ -10,7 +10,7 @@
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, guard: 0, guardCd: 0, parryT: 0, upBuf: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, faeBuf: 0, aim: 0, guard: 0, guardCd: 0, parryT: 0, upBuf: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: SH.stars.maxHearts(), maxHearts: SH.stars.maxHearts(),
@@ -40,6 +40,28 @@
     if (inp.pressed.jump) this.jumpBuf = t.jumpBufferFrames; else if (this.jumpBuf > 0) this.jumpBuf--;
     if (inp.pressed.dash) this.dashBuf = 6; else if (this.dashBuf > 0) this.dashBuf--;
     if (inp.pressed.upstrike) this.upBuf = 8; else if (this.upBuf > 0) this.upBuf--;
+    if (inp.pressed.bow) this.faeBuf = 8; else if (this.faeBuf > 0) this.faeBuf--;
+    // the fae bow (Chapter 4 on): its own button; it aims itself at the nearest thing in front of her, or high if she holds up
+    if (this.faeBuf > 0 && SH.game.can('fbow') && this.bowCd <= 0 && !this.dead && this.stun <= 0 && !this.swing && this.dashT <= 0 && !this.guard) {
+      this.faeBuf = 0; this.bowCd = Math.round(20 * SH.xp.quick()); this.bowT = 14;
+      const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+      let ang = 0.06;
+      if (inp.held.up) ang = 1.05;
+      else {
+        let best = null, bd = 1e9;
+        for (const e of world.things) {
+          if (!e.hittable || !e.hittable() || e.kind === 'bulb' || e.kind === 'brazier' || e.kind === 'lectern' || e.kind === 'dummy' || (e.kind === 'target' && e.blade)) continue;
+          const hb = e.hurtBox(), ex = (hb.l + hb.r) / 2, ey = (hb.t + hb.b) / 2, dx = ex - this.x, dy = (this.y - 27) - ey;
+          if (Math.abs(dx) > 330 || dy < -90 || dy > 300) continue;
+          const front = Math.sign(dx) === this.facing || Math.abs(dx) < 10, score = Math.hypot(dx, dy) + (front ? 0 : 400);
+          if (score < bd) { bd = score; best = { dx, dy }; }
+        }
+        if (best) { if (Math.sign(best.dx) && Math.sign(best.dx) !== this.facing) this.facing = Math.sign(best.dx); ang = Math.max(-0.4, Math.min(1.35, Math.atan2(best.dy, Math.max(8, Math.abs(best.dx))))); }
+      }
+      this.aim = ang; if (this.grounded) this.vx *= 0.3;
+      world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing, ang, true);
+      SH.sfx.play('bow'); SH.fx.ring(this.x + this.facing * 14, this.y - 27, '#9fe8ff', 14, 10, 1);
+    }
     if (inp.pressed.attack || inp.pressed.upstrike || (inp.pressed.downstrike && !this.grounded)) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
     if (this.dashCd > 0) this.dashCd--;
     if (this.bowCd > 0) this.bowCd--;

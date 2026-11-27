@@ -79,6 +79,7 @@
       if (!p.grounded && d.arc !== 'down' && d.arc !== 'thrust' && d.arc !== 'up') { pose.legF = [-0.9, 1.2]; pose.legB = [0.2, 0.9]; pose.crouch = 0; }
       return pose;
     }
+    if (name === 'bow') { const a = p.aim || 0; return Object.assign({}, POSES.bow, { armF: [-1.52 - a, 0], armB: [-1.0 - a * 0.85, -1.3], lean: -0.04 - a * 0.08 }); }
     return POSES[name] || BASE;
   }
 
@@ -201,7 +202,7 @@
     g.translate(OX, OY); g.scale(sx, sy);
     const bowMode = SH.game.can('bow') && !SH.game.can('daggers');
     const o = { face: true, blink: name === 'idle' && a.t % 230 < 7, blades: !bowMode && name !== 'cast' && name !== 'charge' };
-    if (bowMode) o.hand = bowHand(p.bowT > 8);
+    if (bowMode || (name === 'bow' && SH.game.can('fbow'))) o.hand = bowHand(p.bowT > 8);
     if (name === 'cast') o.hand = fireHand(5);
     if (name === 'charge') o.hand = fireHand(3 + Math.min(6, p.chargeT / 6));
     figure(g, p, S, o);

@@ -51,6 +51,12 @@
       ground: '#0a0b17', speck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66', side: '#20264d',
       motes: ['#cfe0ff', '#ffe9a8'],
     },
+    library: {   // Starhaven's Library: lamplight on old wood, shelves going up into the dark
+      sky: ['#0e0806', '#1e120c', '#2e1c12', '#3c2616'], stars: false, far: 'hall', mid: 'stacks',
+      farA: '#2a1a12', farB: '#20140d', midC: '#170e09', mist: 'rgba(255,190,120,0.10)', glow: 'rgba(255,190,110,0.22)',
+      ground: '#0b0705', speck: '#2e1d13', edgeLight: '#ffe2b0', edgeMid: '#a8784a', grass: '#c89a5a', grassDark: '#7a5a3a', side: '#2a1a12',
+      motes: ['#ffe9a8', '#fff6d8'],
+    },
   };
   SH.THEMES = THEMES;
 
@@ -83,7 +89,7 @@
     }
   };
   // How dark each place is away from a light: [colour, strength].
-  const DARK = { deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  const DARK = { library: ['#0a0503', 0.36], deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
@@ -95,6 +101,10 @@
     const hole = (x, y, r, al, glow) => { const X = x - cx, Y = y - cy; if (X < -r || X > vw + r) return; g.globalAlpha = al; g.drawImage(layers.hole, X - r, Y - r, r * 2, r * 2); if (glow) warm.push(X, Y, r * glow); };
     const p = w.player, fl = Math.sin(t * 0.13) * 3;
     hole(p.x, p.y - 22, 105, 0.85);
+    for (const e of w.things) {   // anything that flies at her carries a little light, so it can be seen coming
+      if (e.kind === 'spy' && !e.dead && e.active()) hole(e.x, e.y - 12, 56, 0.7);
+      else if (e.kind === 'shadow' && !e.dead && e.state !== 'idle') { hole(e.x, e.y - 20, 110, 0.85); for (const d of e.darts) hole(d.x, d.y, 34, 0.8); }
+    }
     if (p.charging) hole(p.x + p.facing * 12, p.y - 24, 40 + Math.min(40, p.chargeT), 0.9, 0.7);
     for (const l of w.lanterns) if (l.lit) hole(l.px, l.py - 40, 120 + fl, 1, 0.9);
     for (const n of w.npcs) if (!n.hidden) hole(n.x, n.y - 24, 70, 0.6);
@@ -127,9 +137,9 @@
     gr.addColorStop(0, T.sky[0]); gr.addColorStop(0.45, T.sky[1]); gr.addColorStop(0.78, T.sky[2]); gr.addColorStop(1, T.sky[3]);
     g.fillStyle = gr; g.fillRect(0, 0, 16, 360);
     out.sky = s;
-    out.far = T.far === 'cave' ? makeCave(T) : makeMountains(T);
+    out.far = T.far === 'cave' ? makeCave(T) : T.far === 'hall' ? makeHall(T) : makeMountains(T);
     out.near = makeNear(T, name);
-    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : T.mid === 'pines' ? makePines(T) : makeTrees(T);
+    out.mid = T.mid === 'stacks' ? makeStacks(T) : T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : T.mid === 'pines' ? makePines(T) : makeTrees(T);
     return out;
   }
   // The nearest background layer: things with real detail, just behind where Wren walks.
@@ -139,7 +149,13 @@
     const dark = SH.shade(T.midC, 0.75), lite = SH.shade(T.midC, 1.5);
     for (let i = 0; i < 9; i++) {
       const x = 50 + i * 122 + r() * 46;
-      if (name === 'deep') {   // pillars of rock with a lit edge, and roots hanging between them
+      if (name === 'library') {   // a reading-room column, and a tall ladder leaning on a case
+        const pw = 18, top = 20;
+        g.fillStyle = dark; g.fillRect(x, top, pw, h - top); g.fillRect(x - 5, top, pw + 10, 8); g.fillRect(x - 5, h - 14, pw + 10, 14);
+        g.fillStyle = lite; g.fillRect(x + 2, top + 8, 2, h - top - 22);
+        g.strokeStyle = dark; g.lineWidth = 3; g.beginPath(); g.moveTo(x + 50, h); g.lineTo(x + 78, 40); g.moveTo(x + 64, h); g.lineTo(x + 92, 40); g.stroke();
+        g.lineWidth = 2; for (let k = 0; k < 12; k++) { const yy = h - 18 - k * 20, xx = x + 50 + (h - yy) * 0.108; g.beginPath(); g.moveTo(xx, yy); g.lineTo(xx + 14, yy); g.stroke(); }
+      } else if (name === 'deep') {   // pillars of rock with a lit edge, and roots hanging between them
         const pw = 16 + r() * 14, top = 30 + r() * 60;
         g.fillStyle = dark; g.fillRect(x, top, pw, h - top); g.beginPath(); g.moveTo(x - 6, h); g.lineTo(x + 2, top + 30); g.lineTo(x + pw - 2, top + 30); g.lineTo(x + pw + 8, h); g.fill();
         g.fillStyle = lite; g.fillRect(x, top, 2, h - top); for (let k = 0; k < 6; k++) g.fillRect(x + 3 + r() * (pw - 6), top + 10 + r() * 200, 2, 1);
@@ -230,6 +246,32 @@
     for (let x = 0; x < w; x += 50) { const h = 40 + r() * 90; g.fillRect(x, 360 - h, 52, h); }
     return c;
   }
+  // the Library: tall arched windows full of night sky far behind, and the dark of the stacks between them
+  function makeHall(T) {
+    const w = 1400, c = canvas(w, 360), g = c.getContext('2d'), r = rng(41);
+    g.fillStyle = T.farA; g.fillRect(0, 0, w, 360);
+    for (let x = 60; x < w; x += 230) {
+      const ww = 70, top = 40, bot = 300;
+      const sg = g.createLinearGradient(0, top, 0, bot); sg.addColorStop(0, '#0c0e2e'); sg.addColorStop(1, '#2a2458'); g.fillStyle = sg;
+      g.beginPath(); g.moveTo(x, bot); g.lineTo(x, top + 35); g.quadraticCurveTo(x + ww / 2, top - 20, x + ww, top + 35); g.lineTo(x + ww, bot); g.fill();
+      for (let i = 0; i < 18; i++) { g.fillStyle = r() < 0.2 ? '#fff6d8' : '#a8a2d8'; g.fillRect(x + 4 + r() * (ww - 8), top + 20 + r() * 200, 1, 1); }
+      g.fillStyle = T.farB; g.fillRect(x + ww / 2 - 2, top, 4, bot - top); g.fillRect(x, top + 110, ww, 4); g.fillRect(x, top + 200, ww, 4);   // the leading
+      const mg = g.createLinearGradient(0, bot - 40, 0, 360); mg.addColorStop(0, 'rgba(160,170,255,0.16)'); mg.addColorStop(1, 'rgba(160,170,255,0)'); g.fillStyle = mg; g.fillRect(x - 20, bot - 40, ww + 40, 100);   // moonlight on the floor
+    }
+    return c;
+  }
+  function makeStacks(T) {   // bookcases, shelf over shelf, a few spines catching the lamplight
+    const w = 1200, c = canvas(w, 360), g = c.getContext('2d'), r = rng(17);
+    for (let x = 0; x < w; x += 150) {
+      const cw = 110 + r() * 20, top = 20 + r() * 60;
+      g.fillStyle = T.midC; g.fillRect(x, top, cw, 360 - top); g.fillRect(x - 6, top - 8, cw + 12, 10);
+      for (let sy = top + 14; sy < 360; sy += 34) {
+        g.fillStyle = SH.shade(T.midC, 0.6); g.fillRect(x + 4, sy + 26, cw - 8, 4);
+        for (let bx = x + 6; bx < x + cw - 8;) { const bw = 3 + r() * 5, bh = 16 + r() * 9, lit = r() < 0.18; g.fillStyle = lit ? ['#6a3a2a', '#3a4a6a', '#5a5a2a', '#4a2a4a'][(r() * 4) | 0] : SH.shade(T.midC, 1.3 + r() * 0.4); g.fillRect(bx, sy + 26 - bh, bw, bh); bx += bw + (r() < 0.1 ? 6 : 1); }
+      }
+    }
+    return c;
+  }
   function makeRoots(T) {
     const w = 1200, c = canvas(w, 360), g = c.getContext('2d'), r = rng(9);
     g.strokeStyle = T.midC; g.lineCap = 'round';
@@ -247,12 +289,13 @@
   // railings and crates in the city. Sparse, so it frames the picture without hiding the ground Wren stands on.
   function makeForeground(name) {
     const w = 900, h = 64, c = canvas(w, h), g = c.getContext('2d'), r = rng(name.length * 7 + 3);
-    const col = { deep: '#020504', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
+    const col = { library: '#060302', deep: '#020504', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
     g.fillStyle = col;
     for (let x = 0; x < w; x += 2) { const gh = 3 + Math.sin(x * 0.05) * 2 + r() * 5; g.fillRect(x, h - gh, 2, gh); }   // a low uneven edge
     for (let i = 0; i < 7; i++) {
       const x = 40 + i * 128 + r() * 50;
-      if (name === 'deep') { const hh = 22 + r() * 30; g.beginPath(); g.moveTo(x - 16, h); g.lineTo(x - 3, h - hh); g.lineTo(x + 4, h - hh * 0.7); g.lineTo(x + 18, h); g.fill(); }
+      if (name === 'library') { for (let k = 0; k < 5; k++) { const bw = 26 - k * 3, bx = x - bw / 2 + (k % 2) * 3; g.fillRect(bx, h - 8 - k * 7, bw, 7); } }   // piles of books
+      else if (name === 'deep') { const hh = 22 + r() * 30; g.beginPath(); g.moveTo(x - 16, h); g.lineTo(x - 3, h - hh); g.lineTo(x + 4, h - hh * 0.7); g.lineTo(x + 18, h); g.fill(); }
       else if (name === 'city') { if (i % 2) { g.fillRect(x - 14, h - 26, 28, 26); g.fillRect(x - 17, h - 30, 34, 5); } else { for (let k = 0; k < 5; k++) g.fillRect(x - 40 + k * 20, h - 30, 3, 30); g.fillRect(x - 44, h - 30, 90, 4); } }
       else if (name === 'thornwood') { g.lineWidth = 4; g.strokeStyle = col; g.beginPath(); g.moveTo(x - 30, h); g.quadraticCurveTo(x - 10, h - 50, x + 26, h - 30); g.stroke(); for (let k = 0; k < 5; k++) { const tx = x - 22 + k * 11, ty = h - 20 - k * 6 + (k > 3 ? 8 : 0); g.beginPath(); g.moveTo(tx, ty); g.lineTo(tx + 3, ty - 9); g.lineTo(tx + 6, ty); g.fill(); } }
       else { for (let k = 0; k < 9; k++) { const bx = x - 26 + k * 6.5, bh = 14 + Math.sin(k * 0.8) * 10 + r() * 10; g.beginPath(); g.moveTo(bx - 4, h); g.lineTo(bx, h - bh); g.lineTo(bx + 4, h); g.fill(); }   // a tuft of tall grass, or a pine bough
@@ -268,7 +311,7 @@
     return c;
   }
 
-  THEMES.winter.gstyle = 'earth'; THEMES.dusk.gstyle = 'earth'; THEMES.thornwood.gstyle = 'earth'; THEMES.deep.gstyle = 'rock'; THEMES.mountain.gstyle = 'strata'; THEMES.city.gstyle = 'brick';
+  THEMES.winter.gstyle = 'earth'; THEMES.dusk.gstyle = 'earth'; THEMES.thornwood.gstyle = 'earth'; THEMES.deep.gstyle = 'rock'; THEMES.mountain.gstyle = 'strata'; THEMES.city.gstyle = 'brick'; THEMES.library.gstyle = 'brick';
   function groundTile(g, T, style, x, y, tx, ty, depth, TS) {
     const H = (a, b) => { let h = (tx * 73856093) ^ (ty * 19349663) ^ (a * 83492791) ^ ((b || 0) * 2654435761); h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
     const lift = [1.42, 1.24, 1.12, 1.05, 1][depth], base = SH.shade(T.speck, lift);   // the ground stays a step quieter than the people on it
@@ -376,6 +419,11 @@
           g.fillStyle = '#2a1622'; for (let i = 0; i < 4; i++) g.fillRect(x + i * 6 + (hsh % 3), y + 3, 4, 1);
           g.fillStyle = '#3a2430'; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(x + 2 + i * 8, y + 7); g.lineTo(x + 5 + i * 8, y + 12 + (i + hsh) % 3); g.lineTo(x + 7 + i * 8, y + 7); g.fill(); }
           if (hsh === 0) { g.fillStyle = '#ff5a78'; g.fillRect(x + 10, y + 9, 2, 2); }
+        } else if (T === THEMES.library) {   // a wooden gallery with a rail and turned balusters
+          g.fillStyle = '#0a0604'; g.fillRect(x, y - 1, TS, 9); g.fillStyle = '#6a4228'; g.fillRect(x, y, TS, 6); g.fillStyle = '#9a6a3e'; g.fillRect(x, y, TS, 2); g.fillStyle = '#3a2416'; g.fillRect(x, y + 5, TS, 2);
+          g.fillStyle = '#4a2e1c'; g.fillRect(x, y - 13, TS, 2); for (let i = 0; i < 3; i++) { g.fillRect(x + 3 + i * 8, y - 12, 2, 12); }
+          g.fillStyle = '#c8a050'; if (endL) g.fillRect(x, y - 15, 3, 15); if (endR) g.fillRect(x + TS - 3, y - 15, 3, 15);
+          g.fillStyle = '#2a1a10'; g.beginPath(); g.moveTo(x + (endL ? 2 : 0), y + 7); g.lineTo(x + TS - (endR ? 2 : 0), y + 7); g.lineTo(x + TS - (endR ? 8 : 0), y + 11); g.lineTo(x + (endL ? 8 : 0), y + 11); g.fill();
         } else if (T === THEMES.deep) {
           g.fillStyle = '#0a0f0c'; g.fillRect(x, y - 1, TS, 10); g.fillStyle = '#34463c'; g.fillRect(x, y, TS, 8); g.fillStyle = '#56705e'; g.fillRect(x, y, TS, 2); g.fillStyle = '#243228'; g.fillRect(x, y + 6, TS, 2);
           g.fillStyle = '#1c2a22'; g.fillRect(x + 11 + hsh, y + 2, 1, 4); g.fillStyle = '#6f9a5c'; g.fillRect(x + (hsh * 4) % 18, y - 1, 5, 2);
@@ -418,6 +466,17 @@
 
   // Each prop draws at (x, y) where y is the ground (or the ceiling, for hanging things).
   const PROPS = {
+    bookcase(g, x, y, p) {   // a tall case standing on the floor, h tiles high
+      const TS = SH.TILE, h = (p.h || 4) * TS, w = (p.w || 3) * TS, x0 = x - w / 2, r = rng(Math.floor(x));
+      g.fillStyle = '#0a0604'; g.fillRect(x0 - 2, y - h - 2, w + 4, h + 2); g.fillStyle = '#3a2416'; g.fillRect(x0, y - h, w, h); g.fillStyle = '#5a3a22'; g.fillRect(x0 - 3, y - h - 4, w + 6, 5);
+      for (let sy = y - h + 6; sy < y - 4; sy += 22) {
+        g.fillStyle = '#1e120a'; g.fillRect(x0 + 3, sy, w - 6, 18); g.fillStyle = '#6a4228'; g.fillRect(x0 + 2, sy + 18, w - 4, 3);
+        for (let bx = x0 + 4; bx < x0 + w - 6;) { const bw = 3 + ((r() * 4) | 0), bh = 11 + r() * 6; g.fillStyle = ['#7a2a2a', '#2a4a6a', '#5a5a2a', '#4a2a4a', '#6a4a2a', '#2a5a4a'][(r() * 6) | 0]; g.fillRect(bx, sy + 18 - bh, bw, bh); g.fillStyle = 'rgba(255,230,180,0.25)'; g.fillRect(bx, sy + 18 - bh + 2, bw, 1); bx += bw + (r() < 0.12 ? 5 : 0); }
+      }
+    },
+    table(g, x, y) { g.fillStyle = '#0a0604'; g.fillRect(x - 26, y - 16, 52, 4); g.fillStyle = '#6a4228'; g.fillRect(x - 25, y - 15, 50, 2); g.fillStyle = '#3a2416'; g.fillRect(x - 22, y - 12, 3, 12); g.fillRect(x + 19, y - 12, 3, 12);
+      g.fillStyle = '#e8dcc0'; g.fillRect(x - 14, y - 19, 10, 3); g.fillStyle = '#7a2a2a'; g.fillRect(x + 2, y - 22, 12, 6); g.fillStyle = '#ffd27a'; g.fillRect(x + 17, y - 24, 2, 8); },
+    globe(g, x, y) { g.fillStyle = '#3a2416'; g.fillRect(x - 1, y - 20, 2, 20); g.fillRect(x - 8, y - 2, 16, 2); g.fillStyle = '#0a0604'; g.beginPath(); g.arc(x, y - 28, 10, 0, 6.3); g.fill(); g.fillStyle = '#2a4a6a'; g.beginPath(); g.arc(x, y - 28, 9, 0, 6.3); g.fill(); g.fillStyle = '#5a7a4a'; g.fillRect(x - 5, y - 32, 6, 4); g.fillRect(x + 1, y - 26, 5, 4); g.strokeStyle = '#c8a050'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 28, 11, -2.2, 0.9); g.stroke(); },
     cage(g, x, y) {   // a cage of woven thorn, hung from the roof on a chain
       g.fillStyle = '#1a1c22'; g.fillRect(x - 1, y - 150, 2, 92); g.fillStyle = '#2a0e1a'; g.fillRect(x - 22, y - 60, 44, 4); g.fillRect(x - 22, y - 2, 44, 3);
       for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#3a1226' : '#4a1830'; g.fillRect(x - 21 + i * 8, y - 58, 2, 57); g.fillStyle = '#ff4a5a'; if (i % 2) g.fillRect(x - 21 + i * 8, y - 40 + i * 4, 2, 2); }
@@ -487,7 +546,8 @@
     }
     for (const n of w.npcs) (SH.people.has(n.id) ? SH.people.draw : SH.art.npc)(ctx, n, t);
     for (const e of w.things) {
-      if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
+      if (!e.boss && (e.x < cx - 80 || e.x > cx + vw + 80)) continue;
+      if (SH.ch4 && SH.ch4.draws(e.kind)) { SH.ch4.draw(ctx, e, t); continue; }
       if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
       else if (e.kind === 'dummy') drawDummy(ctx, e);
       else if (e.kind === 'bulb') drawBulb(ctx, e, t);

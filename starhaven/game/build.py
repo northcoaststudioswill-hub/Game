@@ -19,7 +19,8 @@ ORDER = [
     'physics.js',    # tile collision
     'fx.js',         # particles, hit-stop, shake
     'player.js',     # Wren
-    'enemies.js',    # thorn sprite, dummy, thorn buds
+    'enemies.js',
+    'ch4.js',        # Chapter 4: winged spies, lecterns, the Spymaster's Shadow    # thorn sprite, dummy, thorn buds
     'art.js',        # portraits, intro panels, people
     'cine.js',       # animated cinematics
     'xp.js',         # experience, levels and their perks

@@ -31,6 +31,7 @@
     starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
     lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
     bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts. A new heart plays a scene, gives Wren something real in a fight, and writes new pages in her journal. The journal shows what each heart gives and where each bond is heading.' },
+    bow: { icon: '\u27B3', title: 'The fae bow', text: 'Wren has a bow again, on its own button: BOW on the screen, I on a keyboard, RB on a controller. It aims itself at the nearest thing in front of her; hold up as you shoot to aim high. An arrow through a spy\'s wing brings it down: finish it with your daggers before it rises.' },
     moves: { icon: '\u2694', title: 'Wren\'s blades', text: 'Strike three times for a combo. Up and strike is a rising strike (and cuts straight up in the air). Strike during a dash is a lunge, her hardest hit. Down and strike in the air bounces her off what is below. Hold down on the ground to guard: blows from the front stop, and a guard raised at the last moment is a parry that leaves the enemy open. She cannot guard a fall or what is behind her.' },
     remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Wren\'s journal, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
@@ -42,6 +43,8 @@
   // Whispers down the mate bond: short lines that slide in during play and never stop it.
   // Each is said once per save, in order (the boss lines repeat). [who, text]
   S.WHISPERS = {
+    shadowDown: [['caelum', 'It\'s down. Now, Wren, before it remembers it can fly.'], ['caelum', 'Down again. Cut.']],
+    pageLost: [['thane', 'They have a page! Oh, that was a good page.']],
     ready: [['caelum', 'Now, Wren. Reach down the bond. I\'ll answer.'], ['caelum', 'The bond is singing. Use it.']],
     dodge: [['caelum', 'Beautiful. Did Bram teach you that, or were you born rude?'], ['caelum', 'I felt that one miss you. Do it again.']],
     low: [['caelum', 'You\'re hurt. I can feel it. Find a lantern.'], ['caelum', 'Wren. Breathe. Then a lantern.']],
@@ -139,6 +142,19 @@
       summary: 'Wren learned she carries the stolen powers the Thorn Queen hoarded, and Flame woke first. She burned the queen\'s last thorns off the mountain road and killed the Old Wyrm. On the peak, Rowan came for her, and she told him no.',
       done: 'Wren has her first court gift, and Rowan has his answer. Spring will not stop now. Neither will she.',
       after: 'evening3',
+    },
+    {
+      id: 'ch4', label: 'Chapter 4', name: 'The Spy in the Library', room: 'library',
+      abilities: { flame: true, fbow: true },
+      card: 'Three nights after the Old Wyrm, something with wings landed on the Library roof. By morning, pages were missing from books nobody had opened in a hundred years. Thane has a gift for Wren, and Bram has strung it himself.',
+      goals: [
+        { id: 'sky', text: 'Shoot the spies out of the courtyard sky', count: 2, counter: 'skyspies' },
+        { id: 'stacks_done', text: 'Drive the spies out of the stacks before they carry off the pages', count: 3, counter: 'stackspies' },
+        { id: 'shadow', text: 'Bring down the Spymaster\'s Shadow' },
+      ],
+      summary: 'The Iron King sent winged spies into the Library, led by a thing of shadow and iron. Wren shot them out of the air with a fae bow Bram strung for her. The Shadow carried a letter sealed with the rose of Spring.',
+      done: 'Rowan is writing to the Iron King. Whatever Spring has become, it is no longer only Starhaven\'s enemy. It is his ally.',
+      after: 'evening4',
     },
   ];
 
@@ -935,13 +951,156 @@
     ],
 
     // ---------------- The end of the concept: a look at Chapter 4
+    // ======================================================== Chapter 4: The Spy in the Library
+    lib4_start: [
+      { do: 'art', id: 'library', title: 'The Library, before dawn' },
+      ['narr', 'Three nights after the Old Wyrm, something with wings landed on the Library roof. By morning, pages were missing from books nobody had opened in a hundred years.'],
+      ['thane', 'Not torn. Cut. Clean, along the binding. Whoever did this knew exactly which pages they wanted.'],
+      ['caelum', 'Which pages?'],
+      ['thane', 'Every map of Starhaven we own. And the Library\'s own floor plans.'],
+      ['wren', 'Then they\'ll be back for the rest.'],
+      { do: 'art', id: null },
+      ['thane', 'Which is why I have this. Bram strung it last night, and then pretended he hadn\'t.'],
+      ['narr', 'A bow of dark ash, light as a held breath. The string hums when Wren touches it: a note she feels in her teeth.'],
+      ['wren', 'A fae bow.'],
+      ['thane', 'It shoots where you mean, not where you point. Mostly. I have a theory about the "mostly".'],
+      { if: 'rings', then: [['thane', 'Bram says you cut all three of his rings. He said, and I quote, "Give her the good one."']] },
+      { do: 'flag', name: 'bow4' },
+      ['caelum', 'Wren. The roof.'],
+      ['narr', 'Two shapes unfold from the Library\'s eaves: grey wings, iron masks, eyes like coals. They drop into the courtyard air and hang there, out of reach of any knife.'],
+      ['thane', 'The Iron King\'s spies. They fly where daggers can\'t follow. That is rather the point of the bow.'],
+      { do: 'explain', key: 'bow' },
+      { do: 'goal', id: 'sky' },
+    ],
+    lib4_sky_done: [
+      { do: 'flag', name: 'sky' },
+      ['thane', 'Two down! Oh, well shot. Well shot. I take back the "mostly".'],
+      ['caelum', 'Those were the lookouts. The thieves are already inside.'],
+      ['narr', 'From inside the Library comes the sound every librarian dreads: a book falling open, and a page tearing.'],
+      ['thane', 'The stacks! The oldest books in the city lie open on three lecterns up there. If they take those pages, they are gone for good.'],
+      { do: 'open', id: 'libdoor' },
+      { do: 'flag', name: 'stacks4' },
+      { do: 'bond', who: 'thane', pts: 10, why: 'She saved his courtyard, and then she let him have his moment.' },
+      { do: 'goal', id: 'stacks_done' },
+    ],
+    lib4_stacks_done: [
+      { do: 'flag', name: 'stacks_done' },
+      { if: 'pagesKeptAll', then: [
+        ['thane', 'Every page. Every single page. Wren, some of those books are older than Caelum.'],
+        ['caelum', 'Most things are.'],
+        { do: 'remember', key: 'pagesSaved', text: 'Kept every page in the Library from the Iron King\'s spies.', good: true },
+        { do: 'bond', who: 'thane', pts: 15, liked: true, why: 'Every page, kept. He will not forget it.' },
+      ], else: [
+        ['thane', 'They got some. A map of the river gates, I think, and the pages on the old wards.'],
+        ['wren', 'I\'m sorry.'],
+        ['thane', 'Don\'t be. They came for all of it and left with very little. I will copy what I remember. I remember a great deal.'],
+        { do: 'remember', key: 'pagesLost', text: 'Lost some of the Library\'s pages to the spies.', good: false },
+        { do: 'bond', who: 'thane', pts: 5, why: 'He forgave her before she had finished apologizing.' },
+      ] },
+      ['caelum', 'The reading hall. Something bigger went that way, and it hasn\'t come out.'],
+      { do: 'open', id: 'stackgate' },
+      { do: 'goal', id: 'shadow' },
+    ],
+    lib4_shadow: [
+      { do: 'flag', name: 'shadowmet' },
+      ['narr', 'The reading hall is a dome of glass and stars. Something hangs from the highest gallery like a folded coat. Then it opens.'],
+      ['caelum', 'That isn\'t a creature. It\'s a spymaster\'s shadow, cut loose and sent. The Iron King has always liked to work from far away.'],
+      ['wren', 'Can it be killed?'],
+      ['caelum', 'Shoot it until its wings give out. Then make sure it doesn\'t get up.'],
+      { do: 'close', id: 'stackgate' },
+      { do: 'boss' },
+    ],
+    lib4_lamps: [
+      ['narr', 'The fourth reading lamp catches, and the stacks are gold from the floor to the dome.'],
+      ['thane', 'Nobody has read in here at night since the war. I had forgotten what it looks like with the lamps lit. Thank you.'],
+      { do: 'remember', key: 'readlamps', text: 'Relit the reading lamps in the Library stacks.', good: true },
+      { do: 'bond', who: 'thane', pts: 10, liked: true, why: 'She gave him his Library back, one lamp at a time.' },
+    ],
+    lib4_end: [
+      { do: 'flag', name: 'shadow' },
+      { do: 'art', id: 'library', title: 'The reading hall' },
+      ['narr', 'The Shadow comes apart like smoke in a draft. Where it fell lies a folded letter, and a seal pressed in green wax: a rose.'],
+      ['wren', 'That is Spring\'s seal.'],
+      ['thane', '"She will be at the Library at first light. Take the maps. Leave her to me." No name. There doesn\'t need to be one.'],
+      ['caelum', 'Rowan is writing to the Iron King.'],
+      { choose: [
+        { text: '"He wouldn\'t. Not Rowan."', bond: { caelum: 5 }, why: 'He hopes she is right. He does not think she is.', remember: ['rowanDoubt', 'Would not believe Rowan was writing to the Iron King.', null], then: [
+          ['caelum', 'I hope you are right. I have never once seen him afraid, until this year. Afraid men write letters.'],
+        ] },
+        { text: '"Then he has made his choice."', bond: { caelum: 10 }, why: 'She said it, so he did not have to.', remember: ['rowanChoice', 'Decided that Rowan has chosen the Iron King.', false], then: [
+          ['caelum', 'He made it a long time ago, I think. He has only now signed it.'],
+        ] },
+        { text: '"He wants me back badly enough to do anything."', bond: { thane: 5, caelum: 5 }, why: 'The truest thing anyone said all day.', remember: ['rowanFear', 'Understood that Rowan would do anything to have her back.', null], then: [
+          ['thane', 'That is the most frightening sentence I have heard this year, and I keep the Library\'s nightmares.'],
+        ] },
+      ] },
+      ['thane', 'There is something else. In the margin, in another hand, in iron-grey ink. One word: Weaver.'],
+      ['caelum', '...Then we are going to need Iris.'],
+      { do: 'complete' },
+    ],
+    evening4: [
+      { do: 'art', id: 'city', title: 'Evening: Starhaven' },
+      ['narr', 'The Library\'s lamps burn all night. Half the city comes to look at the hole in the dome, and the other half comes to look at Wren.'],
+      { do: 'art', id: null },
+      { do: 'mode', name: 'city', title: 'THE LAMP SQUARE, EVENING', spots: [{ who: 'caelum', label: 'with Caelum, on the rooftop' }, { who: 'thane', label: 'with Thane, in the Library' }, { who: 'iris', label: 'with Iris, in her tower' }] },
+      { choose: [
+        { text: 'Caelum, on the rooftop', then: [{ do: 'goto', id: 'ev4_caelum' }] },
+        { text: 'Thane, in the Library', then: [{ do: 'goto', id: 'ev4_thane' }] },
+        { text: 'Iris, in her tower', then: [{ do: 'goto', id: 'ev4_iris' }] },
+      ] },
+    ],
+    ev4_caelum: [
+      { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
+      ['caelum', 'You shot a shadow out of my sky. I have wanted someone to do that for a very long time.'],
+      ['wren', 'Rowan wrote to the Iron King because of me.'],
+      ['caelum', 'Rowan wrote to the Iron King because of Rowan. Don\'t carry that one, Wren. It isn\'t yours.'],
+      { choose: [
+        { text: '"Teach me to winnow."', bond: { caelum: 10 }, why: 'She wants to be able to leave. He wants that for her too.', then: [
+          ['caelum', 'When you can feel all of the bond, and not only the edge of it. Soon, I think.'],
+        ] },
+        { text: '"Tell me about him. Before."', bond: { caelum: 10 }, why: 'She asked about his old friend, not his enemy.', then: [
+          ['caelum', 'He was the first High Lord who ever called me a friend and meant it. That is why this is going to hurt.'],
+        ] },
+      ] },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+    ],
+    ev4_thane: [
+      { do: 'art', id: 'library', title: 'Evening with Thane' },
+      ['thane', 'I am putting the dome back together. Metaphorically. Also literally: hand me that.'],
+      { if: 'pagesKeptAll', then: [['thane', 'You kept every page. I have walked past the lecterns all evening just to look at them.']],
+        else: [['thane', 'I have rewritten two of the stolen pages from memory. The third I only remember the margins of. The margins were better anyway.']] },
+      { choose: [
+        { text: '"What is the Weaver?"', bond: { thane: 10 }, why: 'She asked the question he has been dying to answer.', then: [
+          ['thane', 'Something older than the courts, in a cottage nobody finds twice. She weaves. Things go in. Things do not come out.'],
+        ] },
+        { text: 'Help him with the dome', bond: { thane: 10 }, why: 'She stayed and did the dull part with him.', then: [
+          ['narr', 'They work until the lamps gutter. He tells her the name of every book they pass. She remembers four of them.'],
+        ] },
+      ] },
+      { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
+    ],
+    ev4_iris: [
+      { do: 'art', id: 'observatory', title: 'Evening with Iris' },
+      ['iris', 'I saw the Shadow come. I did not see you stop it. That has never happened to me before. You are becoming very hard to see, Wren.'],
+      ['wren', 'Is that good?'],
+      ['iris', 'It is good for you. It is terrible for me. I like knowing things.'],
+      { choose: [
+        { text: '"What do you see about the Weaver?"', bond: { iris: 10 }, why: 'She trusted the seer with the hard question.', then: [
+          ['iris', 'A loom, and two threads I recognize. Your sisters, Wren. She has their names on her wall.'],
+        ] },
+        { text: '"Do you ever get to stop seeing?"', bond: { iris: 10 }, why: 'Nobody asks the seer how she is.', then: [
+          ['iris', 'When I sleep. So I sleep a great deal, and I am very cheerful about it.'],
+        ] },
+      ] },
+      { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
+    ],
     finale: [
-      { do: 'art', id: 'city', title: 'Next: Chapter 4, The Spy in the Library' },
-      ['narr', 'Three nights later, Starhaven sleeps under a sky full of stars.'],
-      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Deep. It is a street, with every lamp lit.']] },
-      { if: 'cat', then: [['narr', 'On Mirelle\'s step, a black cat watches the Library roof and does not blink.']] },
-      { if: 'nightmares', then: [['narr', 'Caelum is asleep. That is new.']] },
-      ['narr', 'On the Library roof, something with wings lands without a sound, folds itself into the shadows, and waits.'],
+      { do: 'art', id: 'city', title: 'Next: Chapter 5, The Weaver\'s Cottage' },
+      ['narr', 'A week later, Starhaven sleeps under a sky full of stars.'],
+      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Deep. It is the Library, with every lamp lit.']] },
+      { if: 'cat', then: [['narr', 'On Mirelle\'s step, a black cat watches the sky over the Library, and does not blink.']] },
+      ['narr', 'In the Library, Thane has pinned the letter to the wall and drawn a circle around one word: Weaver.'],
+      ['narr', 'Across the sea, in a cottage nobody finds twice, a loom stops. Something has noticed a thread it did not spin.'],
       { do: 'end' },
     ],
   };
@@ -959,10 +1118,10 @@
     { id: 'thane', name: 'Thane', text: 'One of the Five. Scholar and keeper of the Library. Has a theory about everything, including Wren\'s fire.' },
   ];
   // Who you know about at the start of each chapter (the intro covers the first five).
-  S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'], ch3: ['thane'] };
+  S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'], ch3: ['thane'], ch4: ['iris'] };
 
   S.END = {
     title: 'End of the concept',
-    text: 'That was the Prologue through Chapter 3. Next in the design doc: Chapter 4, The Spy in the Library. Winged spies attack, the city itself becomes the battlefield, and Wren learns the bow.',
+    text: 'That was the Prologue through Chapter 4. Next in the design doc: Chapter 5, The Weaver\'s Cottage, where getting seen means running.',
   };
 })(window.SH = window.SH || {});

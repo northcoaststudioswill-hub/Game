@@ -1,7 +1,7 @@
 // Starhaven — input. Keyboard, gamepad and touch all feed the same actions.
 // held[a]: is it down right now. pressed[a]: was it pressed since the last game frame.
 (function (SH) {
-  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause', 'downstrike', 'gift', 'art', 'upstrike'];
+  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause', 'downstrike', 'gift', 'art', 'upstrike', 'bow'];
   const KEYS = {
     ArrowLeft: 'left', KeyA: 'left',
     ArrowRight: 'right', KeyD: 'right',
@@ -12,6 +12,7 @@
     KeyR: 'art', KeyV: 'art',
     KeyF: 'gift', KeyQ: 'gift', KeyE: 'gift', KeyL: 'gift',
     ShiftLeft: 'dash', ShiftRight: 'dash', KeyC: 'dash', KeyK: 'dash',
+    KeyI: 'bow', KeyU: 'bow', KeyB: 'bow',
     Escape: 'pause', KeyP: 'pause', Enter: 'pause',
   };
 
@@ -73,7 +74,7 @@
   // A Bluetooth or USB controller announces itself once any of its buttons is pressed.
   window.addEventListener('gamepadconnected', e => { input.source = 'pad'; if (input.onSourceChange) input.onSourceChange('pad'); if (input.onPad) input.onPad(e.gamepad.id); });
   // ---- gamepad (standard mapping: A jump, X attack, B dash, Y talk, Start pause)
-  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 4: 'gift', 6: 'gift', 5: 'dash', 7: 'art', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 4: 'gift', 6: 'gift', 5: 'bow', 7: 'art', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
   input.pollPad = function () {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     let pad = null;
@@ -160,9 +161,9 @@
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S', CHOOSE: 'W (or J)' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down', CHOOSE: 'Y (or X)' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S', CHOOSE: 'W (or J)', BOW: 'I' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)', BOW: 'the BOW button' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down', CHOOSE: 'Y (or X)', BOW: 'RB (right bumper)' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;

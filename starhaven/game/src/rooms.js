@@ -291,6 +291,62 @@
     ],
   };
 
+  // ---------------------------------------------------------------- Chapter 4: The Spy in the Library (the fae bow, winged spies, the Spymaster's Shadow)
+  // Courtyard (outdoors), then the stacks (galleries three rows apart, a single jump each), then the reading hall (the boss).
+  SH.ROOMS.library = {
+    id: 'library', width: 156, height: 24, theme: 'library', music: 'city',
+    zones: [{ x: 0, theme: 'city' }, { x: 36, theme: 'library' }],
+    start: { x: 3, y: 20 },
+    shadowArena: [120, 154, 10, 20],
+    camLift: 0.2,
+    shapes: [
+      ['solid', 0, 2, 0, 24],
+      ['ground', 2, 156, 20],
+      ['solid', 35, 37, 0, 15],          // the Library's front wall, above its great door
+      ['solid', 37, 156, 0, 4],          // its roof
+      ['oneway', 12, 18, 16], ['oneway', 24, 30, 15],   // the courtyard's colonnade roofs: somewhere to shoot from
+      // the stacks
+      ['oneway', 40, 50, 17], ['oneway', 60, 72, 17], ['oneway', 84, 96, 17], ['oneway', 104, 114, 17],
+      ['oneway', 46, 56, 14], ['oneway', 66, 78, 14], ['oneway', 90, 102, 14],
+      ['oneway', 52, 62, 11], ['oneway', 74, 86, 11], ['oneway', 98, 108, 11],
+      ['oneway', 60, 70, 8], ['oneway', 82, 92, 8],
+      // the reading hall: two side galleries and a high one in the middle
+      ['oneway', 123, 129, 15], ['oneway', 145, 151, 15], ['oneway', 132, 142, 11],
+      ['solid', 154, 156, 0, 24],
+    ],
+    hints: [
+      { x0: 2, x1: 36, text: 'An arrow pins a spy\'s wing and it falls. Cut it with {ATTACK} while it is down, before it gets up.', flag: 'pinned1', until: 'sky' },
+      { x0: 2, x1: 36, text: 'Spies fly above your daggers. Shoot with {BOW}: it aims at the nearest flyer in front of you. Hold up as you shoot to aim high.', flag: 'bow4', until: 'sky' },
+      { x0: 37, x1: 118, text: 'The spies go for the open books on the lecterns. Shoot one off before it carries a page away. Climb the galleries for the high one.', flag: 'stacks4', until: 'stacks_done' },
+      { x0: 112, x1: 118, text: 'The reading hall is ahead, and there is no way back out. {LEFT} Starlight still behind you.', flag: 'stacks_done', until: 'shadowmet', motesLeft: true },
+      { x0: 37, x1: 112, text: 'The reading lamps are dark. Climb up and touch each one to light it: four in the stacks.', flag: 'stacks_done', until: 'lamps4' },
+    ],
+    triggers: [
+      { x: 4, script: 'lib4_start' },
+      { x: 122, script: 'lib4_shadow', flag: 'stacks_done' },
+    ],
+    gates: [{ id: 'libdoor', x: 36, top: 15 }, { id: 'stackgate', x: 118, top: 4 }],
+    lanterns: [{ x: 4, lit: true }, { x: 39, from: 18 }, { x: 120, from: 18 }],   // the last is inside the hall, so a knockout keeps you in the fight
+    npcs: [{ id: 'thane', x: 8 }, { id: 'caelum', x: 11 }],
+    lampScript: 'lib4_lamps',
+    props: [
+      { t: 'banner', x: 3.5 }, { t: 'banner', x: 33, c: '#7a2a4a' }, { t: 'barrel', x: 20 }, { t: 'crate', x: 31.5 }, { t: 'bush', x: 6 }, { t: 'bush', x: 22.5 },
+      { t: 'bookcase', x: 43, h: 2.4, from: 18 }, { t: 'table', x: 52, from: 18 }, { t: 'bookcase', x: 58, h: 2.4, from: 18 }, { t: 'globe', x: 64, from: 18 },
+      { t: 'bookcase', x: 70, h: 2.4, from: 18 }, { t: 'table', x: 79, from: 18 }, { t: 'bookcase', x: 88, h: 2.4, from: 18 }, { t: 'table', x: 96, from: 18 },
+      { t: 'bookcase', x: 109, h: 2.4, from: 18 }, { t: 'globe', x: 115, from: 18 },
+      { t: 'bookcase', x: 122.5, h: 6, w: 2, from: 18 }, { t: 'table', x: 137, from: 18 }, { t: 'bookcase', x: 152, h: 6, w: 2, from: 18 }, { t: 'banner', x: 130, from: 18 }, { t: 'banner', x: 144, c: '#7a2a4a', from: 18 },
+    ],
+    motes: [['line', 9, 16, 18.6], ['line', 13, 17, 14.6], ['line', 25, 29, 13.6], ['line', 41, 49, 15.6], ['line', 47, 55, 12.6], ['line', 53, 61, 9.6], ['line', 61, 69, 6.6],
+      ['line', 75, 85, 9.6], ['line', 83, 91, 6.6], ['line', 91, 101, 12.6], ['line', 99, 107, 9.6], ['line', 105, 113, 15.6], ['line', 124, 128, 13.6], ['line', 146, 150, 13.6]],
+    spawns: [
+      { kind: 'spy', wave: 1, x: 16, y: 15 }, { kind: 'spy', wave: 1, x: 27, y: 14 },
+      { kind: 'spy', wave: 2, x: 58, y: 14 }, { kind: 'spy', wave: 2, x: 88, y: 13 }, { kind: 'spy', wave: 2, x: 106, y: 14 },
+      { kind: 'lectern', x: 44, y: 17 }, { kind: 'lectern', x: 80, y: 11 }, { kind: 'lectern', x: 100, y: 20 },
+      { kind: 'pickup', what: 'lamp', x: 70, y: 14 }, { kind: 'pickup', what: 'lamp', x: 64, y: 8 }, { kind: 'pickup', what: 'lamp', x: 104, y: 11 }, { kind: 'pickup', what: 'lamp', x: 90, y: 8 },
+      { kind: 'shadow', x: 140, y: 10 },
+    ],
+  };
+
   // Tile codes
   SH.T_EMPTY = 0; SH.T_SOLID = 1; SH.T_ONEWAY = 2; SH.T_THORNS = 3;
 

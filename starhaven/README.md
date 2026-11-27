@@ -31,9 +31,13 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.1.11 (Nov 18, 2026)
+## Playtest build: v0.2.0 (Nov 27, 2026)
 
-The newest build: [`releases/v0.1.11/`](releases/v0.1.11/RELEASE-NOTES.md), with `starhaven-v0.1.11-share.zip` to send.
+The newest build: [`releases/v0.2.0/`](releases/v0.2.0/RELEASE-NOTES.md), with `starhaven-v0.2.0-share.zip` to send.
+**Chapter 4, The Spy in the Library**, is playable: the fae bow, winged spies, pages to defend in the Library
+stacks, and the Spymaster's Shadow. The game now runs from the Prologue to Chapter 4.
+
+Before it, v0.1.11 ([notes](releases/v0.1.11/RELEASE-NOTES.md)):
 The result of one continuous bot playthrough from New Game to the ending: story and lore contradictions fixed,
 explanation cards that only open in calm moments, a reason on every bond change, and pop-ups kept off panels.
 

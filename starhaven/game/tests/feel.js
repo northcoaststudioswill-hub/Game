@@ -458,12 +458,47 @@ const path = require('path');
         if (before - boss.hp >= 8) waveHits++;
       }
       const won = boss.dead;
-      for (let i = 0; i < 4000 && G.state !== 'end'; i++) talk({}, null);
+      for (let i = 0; i < 4000 && G.chapter !== 5; i++) talk({}, null);
       const allMoves = ['charge', 'leap', 'inhale', 'roar', 'stun', 'slamrest'].every(m => moves.has(m));   // the breath itself may be choked off every time by this bot
       check('Old Wyrm (32 health): three phases; it charges, leaps (shockwaves), breathes frost and roars; fire chokes it mid-breath', hp0 === 32 && phases.size === 3 && allMoves && wavesSeen && choked,
         { hp: hp0, phases: [...phases], moves: [...moves], wavesSeen, choked, flameWaveHits: waveHits });
-      check('Old Wyrm: the hollow seals, rocks fall when it hits the cliff, it can be beaten; peak, evening and finale follow', gateClosed && won && rocksSeen > 0 && seen.has('mtn_peak') && seen.has('evening3') && seen.has('finale') && G.state === 'end',
+      check('Old Wyrm: the hollow seals, rocks fall when it hits the cliff, it can be beaten; the peak and the evening follow, then Chapter 4', gateClosed && won && rocksSeen > 0 && seen.has('mtn_peak') && seen.has('evening3') && G.chapter === 5,
         { gateClosed, won, rocksSeen: rocksSeen > 0, fightSeconds: +(f / 60).toFixed(1), peak: seen.has('mtn_peak'), evening: seen.has('evening3'), state: G.state });
+    })();
+
+    // Chapter 4: the fae bow, the spies in the courtyard and the stacks, the Spymaster's Shadow, the letter, the evening, the finale
+    (function () {
+      SH.test.load(5); const p = P(), w = G.world; G.progress.bonds = {}; SH.test.choice = 0;
+      let f = 0, shots = 0, pinned = false, bossSeen = false, bossSecs = 0, hurt0 = p.stats.hurt; const seen4 = new Set();
+      const bow = () => { if (p.bowCd <= 0 && f % 6 === 0) { shots++; return ['bow']; } return null; };
+      while (f++ < 60 * 300 && G.chapter === 5 && G.state !== 'end') {
+        if (G.script) seen4.add(G.script.id);
+        let held = {}, press = null;
+        const tx = p.x / T, spies = w.things.filter(e => e.kind === 'spy' && !e.dead && e.active()), boss = G.boss;
+        if (G.state === 'play') {
+          if (!G.flags.bow4) held = { right: true };
+          else if (boss && !boss.dead) {
+            bossSeen = true; bossSecs++;
+            const st = boss.state, dx = boss.x - p.x;
+            if (st === 'grounded' || st === 'fall') { if (Math.abs(dx) > 30) held[dx > 0 ? 'right' : 'left'] = true; else { p.facing = Math.sign(dx) || 1; if (!p.swing && f % 5 === 0) press = ['attack']; } }
+            else if (st === 'volley') { p.facing = Math.sign(dx) || 1; held = { down: true }; }
+            else if (st === 'swoop') { if (Math.abs(dx) < 110 && p.grounded && Math.sign(boss.vx) === -Math.sign(dx)) { press = ['jump']; held = { jump: true }; } else if (!p.grounded) held = { jump: true }; }
+            else { p.facing = Math.sign(dx) || 1; press = bow(); }
+          }
+          else {
+            const down = spies.find(e => e.state === 'down');
+            if (down) { const dx = down.x - p.x; if (Math.abs(dx) > 26) held[dx > 0 ? 'right' : 'left'] = true; else { p.facing = Math.sign(dx) || 1; if (!p.swing && f % 5 === 0) press = ['attack']; } }
+            else if (spies.length) { const sp = spies.sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0], dx = sp.x - p.x; if (sp.state === 'mark' || sp.state === 'dive') { p.facing = Math.sign(dx) || 1; held = { down: true }; } else { if (Math.abs(dx) > 150) held[dx > 0 ? 'right' : 'left'] = true; else if (Math.abs(dx) < 40) held[dx > 0 ? 'left' : 'right'] = true; else { p.facing = Math.sign(dx) || 1; press = bow(); } } }
+            else held = { right: true };
+          }
+        }
+        if (w.things.some(e => e.kind === 'spy' && e.state === 'falling')) pinned = true;
+        talk(held, press);
+      }
+      const lost = G.flags.pagesLost || 0;
+      check('Chapter 4: the fae bow brings spies down from the courtyard sky, the stacks are cleared, and the Spymaster\'s Shadow is shot down and cut on the floor',
+        pinned && seen4.has('lib4_sky_done') && seen4.has('lib4_stacks_done') && bossSeen && seen4.has('lib4_end'), { pinned, shots, pagesLost: lost, bossSeconds: +(bossSecs / 60).toFixed(1), hurt: p.stats.hurt - hurt0, scripts: [...seen4].filter(x => /lib4|ev4|evening4|finale/.test(x)), seconds: +(f / 60).toFixed(1), state: G.state });
+      check('Chapter 4 ends: the letter with Spring\'s seal, an evening, and the finale points to the Weaver', seen4.has('evening4') && seen4.has('finale') && G.state === 'end' && SH.STORY.END.text.includes('Chapter 5'), { evening: seen4.has('evening4'), finale: seen4.has('finale'), state: G.state });
     })();
 
     // Bonds give something real, and the journal fills with pages
@@ -727,7 +762,7 @@ const path = require('path');
       G.explainClose(); const closed = G.state === 'play';
       const m2 = G.world.motes[1]; P().x = m2.x; P().y = m2.y + 20; step({}, null); step({}, null);
       const list = Object.keys(SH.STORY.EXPLAIN).length;
-      check('Explained once, and not at once: the first Starlight opens a card after a pause, it holds the game; the second does not; nine systems are listed', notYet && waited > 300 && shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 9, { shown, title, held, closed, again: G.state, listed: list });
+      check('Explained once, and not at once: the first Starlight opens a card after a pause, it holds the game; the second does not; ten systems are listed', notYet && waited > 300 && shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 10, { shown, title, held, closed, again: G.state, listed: list });
       G.noExplain = true;
     })();
 

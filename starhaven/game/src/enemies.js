@@ -490,6 +490,7 @@
     if (s.kind === 'target') return new Target(x, s.y * T, s.blade);
     if (s.kind === 'wolf') return new Wolf(x, y);
     if (s.kind === 'wyrmling' || s.kind === 'oldWyrm') return new Wyrm(x, y, s.kind);
+    if (SH.ch4) { const e = SH.ch4.spawn(s, x, y); if (e) return e; }
     throw new Error('unknown spawn ' + s.kind);
   };
 })(window.SH = window.SH || {});
