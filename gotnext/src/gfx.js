@@ -288,7 +288,7 @@ function runPose(p, o) {
   const ps = ((o.psi || 0) % 1 + 1) % 1, d = o.duty || 0.38, k = o.k || 0, ah = o.hipA === undefined ? 1 : o.hipA, th = o.thigh || 0.48, sh = o.shin || 0.48, full = th + sh;
   const warp = u => u < d ? u / d * 0.38 : 0.38 + (u - d) / (1 - d) * 0.62;       // stance and swing re-timed for this speed
   const leg = u => { const w = warp(((u % 1) + 1) % 1), st = w < 0.38; const sw = st ? 0 : (w - 0.38) / 0.62, land = clamp((sw - 0.8) / 0.2, 0, 1), c0 = 3 + 20 * ah;       /* the swing ends where the stance begins: no snap at foot strike */
-    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; const lg = RUN_LEGS[o.rs], hs = !st && lg ? Math.sin(Math.PI * sw) * (0.6 + 0.4 * k) : 0; return { hip: hip + hs * (lg ? lg[0] : 0), kn: kn + hs * (lg ? lg[1] : 0), an, reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
+    const hipS = gcurve(RUN_HIP, w) * (1 + 0.32 * k), hip = (st ? 3 + (gcurve(RUN_HIP, w) - 8) * ah : lerp(hipS, c0, land * land)) * D2R, kn = gcurve(RUN_KNEE, w) * (st ? 1 : 1 + 0.32 * k) * D2R, an = gcurve(RUN_ANKLE, w) * (st && w < 0.1 ? 0.4 : 1) * D2R; const lg = RUN_LEGS[o.rs], hs = !st && lg ? Math.sin(Math.PI * sw) * (0.6 + 0.4 * k) : 0, tb = !st ? Math.sin(Math.PI * sw) * (o.turbo || 0) : 0; return { hip: hip + hs * (lg ? lg[0] : 0) + tb * 0.22, kn: kn + hs * (lg ? lg[1] : 0) + tb * 0.28, an,      /* turbo drives the knee through higher */ reach: th * Math.cos(hip) + sh * Math.cos(-hip + kn) }; };
   let low = 0, stance = false;
   for (const [side, off] of [['R', 0], ['L', 0.5]]) {
     const u = ((ps + off) % 1 + 1) % 1, L = leg(u);
@@ -302,14 +302,14 @@ function runPose(p, o) {
   }
   p.y *= 0.72;          /* a runner's joints soak up some of the rise and fall: a glide, not a pogo */
   // trunk leans into the run; pelvis and shoulders counter-rotate; the head stays level
-  const c = Math.cos(2 * Math.PI * ps), lean = 0.05 + 0.2 * k, py = (0.06 + 0.04 * k) * c, pz = -0.05 * Math.sin(2 * Math.PI * ps);
+  const tbo = o.turbo || 0, c = Math.cos(2 * Math.PI * ps), lean = 0.05 + 0.2 * k + 0.12 * tbo, py = (0.06 + 0.04 * k) * c, pz = -0.05 * Math.sin(2 * Math.PI * ps);
   S_('hips', lean * 0.35, py, pz); for (const s of ['R', 'L']) { const h = p['hp' + s]; h[0] += lean * 0.35; h[1] -= py; h[2] -= pz; }
   S_('spine', lean * 0.4, -0.05 * c, 0); S_('chest', lean * 0.25, -0.13 * c, 0); S_('neck', -lean * 0.8, 0.12 * c, 0); S_('head', -0.03);
   // arms: elbows near a right angle, driven from the shoulder, opposite the legs; the hand comes up toward the chin
   for (const [side, off] of [['R', 0.5], ['L', 0]]) {
     // the upper arm swings mostly BEHIND the body (about 40 degrees back, 15-20 forward); the elbow closes as the hand
     // comes up in front and opens as it passes the hip going back
-    const f = Math.cos(2 * Math.PI * (ps - off) + 0.5), fl = (-11 + (19 + 34 * k) * f) * D2R;      /* a jog swings the arms loosely; a sprint pumps them */
+    const f = Math.cos(2 * Math.PI * (ps - off) + 0.5), fl = (-11 + (19 + 34 * k) * f) * D2R * (0.82 + 0.18 * k + 0.4 * tbo);      /* a plain run swings loose; turbo pumps */      /* a jog swings the arms loosely; a sprint pumps them */
     S_('sh' + side, -fl, 0, side === 'R' ? -0.07 : 0.07); S_('el' + side, -(1.3 + (0.25 + 0.3 * k) * Math.max(0, f) - (0.2 + 0.2 * k) * Math.max(0, -f)) * (0.85 + 0.15 * k)); S_('wr' + side, -0.05);
   }
   // run styles (the player's profile): the legs stay the measured stride, the trunk, head and arms carry the character
@@ -784,6 +784,12 @@ function poseOf(anim, t, o) {
   if (o.point !== undefined && o.pointW > 0) { const a = Math.atan2(Math.sin(o.point), Math.cos(o.point)), sd = a > 0 ? 'L' : 'R', sg = sd === 'L' ? 1 : -1, k = clamp(Math.abs(a) / 1.57, 0, 1), w = clamp(o.pointW, 0, 1);
     const tg = [-1.75 * (1 - k) - 0.55, 0, sg * 1.25 * k], v = p['sh' + sd] || (p['sh' + sd] = [0, 0, 0]); for (let i = 0; i < 3; i++) v[i] = lerp(v[i], tg[i], w); const e = p['el' + sd] || (p['el' + sd] = [0, 0, 0]); e[0] = lerp(e[0], -0.05, w); const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(a, -1, 1) * 0.4 * w; }
   // dribbling body language: the burst out of a slow dribble, the shoulder into the defender, sitting low when he is close, tall when probing
+  if (anim === 'dribble' && (o.yank || o.callW)) { const off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1;
+    if (o.yank) { const w = o.yank, s = o.yankS || 1, ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x * w; v[1] += y * w; v[2] += z * w; }; ad('chest', 0.05, -0.45 * s, 0); ad('spine', 0.1, -0.2 * s, -0.08 * s); ad('neck', 0, 0.35 * s, 0); ad('knR', 0.15, 0, 0); ad('knL', 0.15, 0, 0);
+      const v = p['sh' + off] || (p['sh' + off] = [0, 0, 0]), e = p['el' + off] || (p['el' + off] = [0, 0, 0]); v[0] = lerp(v[0], -1.15, w); v[2] = lerp(v[2], sg * 0.45, w); e[0] = lerp(e[0], -1.6, w); }      /* turn the shoulder into him, the free forearm up as a bar */
+    if (o.callW) { const w = clamp(o.callW, 0, 1), a = Math.atan2(Math.sin(o.callPt), Math.cos(o.callPt)), k = clamp(Math.abs(a) / 1.57, 0, 1), sd = (a > 0) === (off === 'L') ? 1 : 0.4;      /* the free hand points (across the body if it has to) */
+      const tg = [-1.6 * (1 - k) - 0.5, 0, sg * 1.1 * k * sd], v = p['sh' + off] || (p['sh' + off] = [0, 0, 0]); for (let i = 0; i < 3; i++) v[i] = lerp(v[i], tg[i], w); const e = p['el' + off] || (p['el' + off] = [0, 0, 0]); e[0] = lerp(e[0], -0.12, w); const n = p.neck || (p.neck = [0, 0, 0]); n[1] += clamp(a, -1, 1) * 0.35 * w; }
+    p.rate = Math.max(p.rate || 16, 22); }
   if (anim === 'dribble' && (o.burst || o.dip || o.atk || o.probe)) { const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     if (o.burst) { const w = o.burst; ad('spine', 0.28 * w); ad('chest', 0.1 * w); ad('neck', -0.3 * w); ad('knR', 0.22 * w); ad('knL', 0.22 * w); ad('hpR', -0.16 * w); ad('hpL', -0.16 * w); p.y = (p.y || 0) - 0.06 * w; }
     if (o.dip) { const w = o.dip, s = o.dipS || 1, off = o.hand === 'L' ? 'R' : 'L', sg = off === 'R' ? -1 : 1; ad('spine', 0.14 * w, 0, -0.16 * s * w); ad('chest', 0.06 * w, 0.18 * s * w, -0.1 * s * w); ad('neck', -0.1 * w, -0.15 * s * w, 0.12 * s * w); p.y = (p.y || 0) - 0.03 * w;

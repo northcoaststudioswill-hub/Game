@@ -1273,7 +1273,7 @@ function newDrib(p, from) { return { ph: 'up', t: 0, T: 0.16, hand: p.hand || 'R
 function dribFloor(p, D, kind, tAhead, vx, vz) {
   if (vx === undefined) { vx = p.avx || 0; vz = p.avz || 0; }
   const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = fz, rz = -fx, sgn = D.hand === 'R' ? -1 : 1, v = Math.hypot(vx, vz);
-  let side = 0.34, fwd = 0.3 + Math.min(0.45, v * 0.06);      /* outside the foot, clear of the knee on the way up */                 // ordinary dribble: outside the foot, ahead more at speed
+  let side = 0.34, fwd = 0.3 + Math.min(0.45, v * 0.06) + (p.sprinting ? 0.15 : 0);      /* outside the foot, clear of the knee on the way up */                 // ordinary dribble: outside the foot, ahead more at speed
   if (kind === 'cross' || kind === 'killer') { side = 0.02; fwd = kind === 'killer' ? 0.3 : 0.45; }
   else if (kind === 'tween') { side = 0.0; fwd = 0.04; }
   else if (kind === 'behind') { side = 0.0; fwd = -0.32; }
@@ -1449,6 +1449,8 @@ function animPlayer(p, dt) {
     if (od0 && odd < 1.5 && sp > 3) { const fx = Math.sin(p.face), fz = Math.cos(p.face), rx = od0.x - p.x, rz = od0.z - p.z, fw = rx * fx + rz * fz, lat = rx * fz - rz * fx; if (fw > -0.4) { p.dipW = lerp(p.dipW || 0, 1, 1 - Math.exp(-10 * dt)); p.dipS = lat > 0 ? -1 : 1; } else p.dipW = lerp(p.dipW || 0, 0, 1 - Math.exp(-8 * dt)); }
     else p.dipW = lerp(p.dipW || 0, 0, 1 - Math.exp(-8 * dt)); if (p.dipW > 0.05) { o.dip = p.dipW; o.dipS = p.dipS; }      /* turning the corner on him: lead shoulder dropped into his chest, the off arm up (LeBron) */
     const atk = odd < 2.2 && !p.swag ? clamp((2.2 - odd) / 1.2, 0, 1) : 0, probe = !p.user && odd > 2.3 && sp > 0.4 && sp < 3.4 && !p.sprinting ? 1 : 0;
+    { const rk = p.reachBy && M_.time - (p.reachAt || -9) < 0.45 ? 1 - (M_.time - p.reachAt) / 0.45 : 0; if (rk > 0) { o.yank = rk; const r = p.reachBy; o.yankS = ((r.x - p.x) * Math.cos(p.face) - (r.z - p.z) * Math.sin(p.face)) >= 0 ? 1 : -1; } }      /* a hand comes in: rip it away, shoulder into him */
+    if (sp < 0.7 && odd > 1.5 && M_.phase === 'live') { const cyc = (M_.time + p.i * 2.3) % 6.5; if (cyc < 1.1) { const mates = M_.P.filter(q => q.team === p.team && q !== p); if (mates.length) { const q = mates[Math.floor((M_.time + p.i * 2.3) / 6.5) % mates.length]; o.callPt = Math.atan2(q.x - p.x, q.z - p.z) - p.face; o.callW = Math.min(1, cyc / 0.2, (1.1 - cyc) / 0.2); o.swag = null; } } }      /* standing with room: a point to a teammate, calling it */
     p.atkW = lerp(p.atkW || 0, atk, 1 - Math.exp(-6 * dt)); p.probeW = lerp(p.probeW || 0, probe, 1 - Math.exp(-4 * dt)); if (p.atkW > 0.05) o.atk = p.atkW; if (p.probeW > 0.05) o.probe = p.probeW;      /* tight: sit lower and dribble harder; room: taller, eyes up, a lazy bounce (first gear) */
   }
   const asp = Math.hypot(p.avx, p.avz);
@@ -1469,10 +1471,10 @@ function animPlayer(p, dt) {
     if (w > 0.02) {
       // the same stride clock as walking around the Block: walking gait curves up to a brisk walk, running curves above
       const k = clamp((asp - 2.6) / 3.6, 0, 1), cad = 2.7 + 1.1 * k, wWalk = 1 - clamp((asp - 2.2) / 0.9, 0, 1); duty = 0.4 - 0.14 * k;
-      const stepW = R.legLen * 0.74 * clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), step = lerp(Math.max(asp, 0.5) / cad, stepW, wWalk); p.psi = ((p.psi || 0) + asp * dt / (2 * step)) % 1; p.stridePer = 2 * step / Math.max(asp, 0.5);
+      const stepW = R.legLen * 0.74 * clamp(Math.sqrt(asp / 1.35), 0.45, 1.3) * (1 + 0.12 * (p.turboW || 0)), step = lerp(Math.max(asp, 0.5) / cad, stepW, wWalk); p.psi = ((p.psi || 0) + asp * dt / (2 * step)) % 1; p.stridePer = 2 * step / Math.max(asp, 0.5);
       let Pr = null;
       if (wWalk < 1) { let lo = 0.3, hi = 2.2; const need = asp * duty * 2 / cad - 0.1; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (R.legLen * 0.92 * (Math.sin((3 + 20 * m) * D2R) + Math.sin((20 * m - 3) * D2R)) < need) lo = m; else hi = m; }
-        Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin, rs: R.prof && R.prof.run }); }
+        Pr = poseOf('sprint', 0, { psi: p.psi, duty, k, hipA: Math.min(lo, 1.5), flight: (0.5 - duty) * 2 / cad, thigh: R.thigh, shin: R.shin, rs: R.prof && R.prof.run, turbo: p.turboW = lerp(p.turboW || 0, p.sprinting ? 1 : 0, 1 - Math.exp(-6 * dt)) }); }
       if (wWalk > 0) { let lo = 0.2, hi = 2.4; const need = 1.2 * stepW - 0.12; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (R.legLen * (Math.sin((11 + 19 * m) * D2R) + Math.sin((20 * m - 11) * D2R)) < need) lo = m; else hi = m; }
         const amp = clamp(Math.sqrt(asp / 1.35), 0.45, 1.3), Pw = poseOf('gait', 0, { psi: p.psi, amp, hipA: Math.min(lo, 1.6), swag: R.prof ? 0.2 + R.prof.swag * 0.4 : 0.3, thigh: R.thigh, shin: R.shin, leg: R.legLen });
         Pr = Pr ? blendPose(Pr, Pw, wWalk) : Pw; }
