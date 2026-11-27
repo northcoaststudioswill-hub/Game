@@ -106,10 +106,12 @@ Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Knockout and the Fable passes),
 
 ## 3. Rootdeep
 
-Source: [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md). Finished and handed off; do not resume without Will asking.
+Source: [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), and since Nov 27 the Rootdeep section of [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
+Resumed on Nov 27 at Will's request (10-minute playtest, fixes, foe lessons); otherwise handed off.
 
 **Known issues**
-- The Mothshade caused every death in the bot playtest. Its blink-behind may feel unfair.
+- The Mothshade's warning sparkle shows for 0.3 s and it chases the moment it lands, which is why it feels unfair.
+  Lengthening the warning would change difficulty, so it waits for Will. Scout now explains it after it gets you.
 - Rooms are short (4 to 10 seconds). Difficulty is untouched on purpose until Will has played more.
 - The "three little auto balls" Will dislikes are still unidentified.
 - Not confirmed on an iPhone: text placement, touch feel, frame rate.

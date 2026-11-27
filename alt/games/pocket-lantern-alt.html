@@ -6461,7 +6461,7 @@ function rdNextChamber(){if(RUN.chamber>0&&!RUN.noDrop){RUN.surfN=0;rdSurfaceQue
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
  RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);rdCkpt();rdSavedMark()}
 function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;
- if(!RUN.podDropped){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:W/2+R(-16,16),y:H/2});RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
+ if(!RUN.podDropped){RUN.pods.push(rdPodAt(PODW[RUN.biome][(Math.random()*6)|0],W/2+R(-16,16),H/2));RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
  if(RD.keepEq){const who=(KEEPS.find(k=>k.id===RD.keepEq)||{}).who;if(who)RD.keepXp[who]=(RD.keepXp[who]||0)+1}
  const s=rdStats();let heal=mir('mend')*3+(RUN.boons.pass.find(p=>p.id==='rain')?rdBoonVal(RUN.boons.pass.find(p=>p.id==='rain')):0);
  if(heal)rdHeal(heal);
@@ -6498,7 +6498,7 @@ function genShop(){const all=[
  {n:'PETAL PURSE',d:'+90 petals, somehow profit',p:50,act:()=>{RUN.petals+=90;say2('+90 PETALS',2)}}];
  const out=[];while(out.length<3){const it=all.splice((Math.random()*all.length)|0,1)[0];if(it)out.push(it)}return out;}
 function rdDie(){RUN.dieT=0;RUN.inv=99;RUN.atkA=null;RUN.rush=null;RUN.cutT=0;state='g3dying';snd(196,.5,49,'sawtooth',.08);later(()=>snd(147,.6,49,'triangle',.05),400)}
-function rdDieFinish(){const R0=RUN;{const k=ks(R0.char);k.deaths++;k.best=Math.max(k.best,R0.chamber)}RD.ckpt=null;RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds(),sub:rdDeathLine(R0)};RD.lastRun.msgs=rdMilestones(R0,false);RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='g3over';}
+function rdDieFinish(){const R0=RUN;{const k=ks(R0.char);k.deaths++;k.best=Math.max(k.best,R0.chamber)}RD.ckpt=null;RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds(),sub:rdDeathLine(R0),hit:R0.lastHit||''};RD.lastRun.msgs=rdMilestones(R0,false);RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='g3over';}
 function rdEscape(){RD.ckpt=null;RD.stats.escapes++;try{meta.ltix=(meta.ltix||0)+1;persist(true)}catch(x){}const R0=RUN;{const k=ks(R0.char);k.esc++;k.best=12}RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.lastRun.msgs=rdMilestones(R0,true);RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
  RUN=null;rdSave();overT=0;if(!RD.flags.cine_escape)startCine('win','escape');else state='g3win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
@@ -6609,8 +6609,24 @@ const RDAPPR=[
   "Spare sprouts trade at the bed too. That's the Exchange. Up here, sprouts buy almost everything."]},
  {id:'r_escape',who:'RANGER',when:()=>RD.stats.escapes>=1,lines:["You came out the bottom and back up. Not many have.","The gate by the wall is open now. The Pact of Roots.","Sign it and the deep gets meaner. Meaner deep, better rewards. Your call, keeper."]},
  {id:'m_caps',who:'MARCUS',when:()=>RD.stats.runs>=1&&(typeof meta!=='undefined')&&(meta.ltix||0)>0,lines:["Bro. BRO. You've got capsule tickets and you're just... holding them?",
-  "Press START, hit CAPSULES. One ticket, one capsule. Keepers, lanterns, Sprouts styles. One machine for everything.","Bosses down here pay tickets. Sprouts pays them. Even the Lantern achievements on the shelf pay them, J.","Don't thank me. Actually, thank me."]}];
+  "Press START, hit CAPSULES. One Lantern ticket, one capsule. Keepers, lanterns, weapons.","Bosses pay them. Escapes pay them. Erin's stand pays them. Even the Lantern achievements on the shelf pay them, J.","Don't thank me. Actually, thank me."]}];
+/* after a fall, whoever knows that foe best walks over and says how it works (once per foe, the first time it gets you).
+   The game teaches through its people instead of a manual; nothing about the foes themselves changes. */
+const RDLESSON={
+ grub:{who:'MARCUS',lines:["Bro. Grublets. GRUBLETS got you. The little ones.","They just run straight at you, J. Swing first, keep moving. Your sprouts eat them for breakfast. Let them."]},
+ spitter:{who:'SCOUT',lines:["Spore Spitters keep their distance. Fascinating. Also rude.","Walk right at them. They back away, so pin them against a wall. When one flashes red, it's about to spit. Step aside."]},
+ beetle:{who:'RANGER',lines:["Root Beetles shake before they charge. Every time.","When one shakes, step aside. It can't turn once it's going. Then hit it from behind."]},
+ shade:{who:'SCOUT',lines:["Mothshades blink right up next to you. I've timed it. Twice.","Watch for a little sparkle near your feet. That's where it's about to land. Dash the moment you see it."]},
+ crab:{who:'RANGER',lines:["That crab spends most of its time in its shell. Hitting the shell barely scratches it.","Wait for it to come out, then hit hard. Fire burns straight through the shell, if an Ember boon offers."]},
+ wisp:{who:'ERIN',lines:["Those little fire wisps got you? They circle around and throw sparks.","Don't chase the circle, Will. Step right through it and swat them. They pop easy."]},
+ boom:{who:'MARCUS',lines:["You blew yourself up. With a boom bulb. Bro.","Hit it, then MOVE. It fizzes first. The foes stand next to it, J. Not you."]},
+ boss0:{who:'ERIN',lines:["The Grub Mother calls her children when she's hurt. I could hear them from up here.","When she wiggles, she's about to charge, so step aside. Clear the little ones so they can't crowd you."]},
+ boss1:{who:'SCOUT',lines:["The Drowned King leaps to wherever you were standing. Did you see the red ring?","When the ring shows, move. He lands on the ring, not on you. Probably. Science says move."]},
+ boss2:{who:'RANGER',lines:["The Hollow Keeper wears your face. It charges in a straight line.","When the deep shouts DASH, dash. Then hit it while it turns around."]}};
+RDAPPR.splice(2,0,...Object.keys(RDLESSON).map(k=>({id:'lesson_'+k,who:RDLESSON[k].who,lines:RDLESSON[k].lines,when:()=>!!(RD.lastRun&&RD.lastRun.hit===k)})));
 let rdAppr=null,rdApprWait=0,rdApprTalk=false;
+/* the walk-up waiting for this person, if any (talking to them first plays it, so nothing is missed) */
+function rdApprPending(who){RD.heard=RD.heard||{};for(const a of RDAPPR){if(a.who!==who||(a.flag?RD.flags[a.id]:RD.heard[a.id]))continue;let ok=false;try{ok=a.when()}catch(e){}if(ok)return a}return null}
 function rdApprCheck(){RD.heard=RD.heard||{};for(const a of RDAPPR){const done=a.flag?RD.flags[a.id]:RD.heard[a.id];if(done)continue;let ok=false;try{ok=a.when()}catch(e){}if(ok&&HUBNPC[a.who]){rdApproach(a);return true}}return false}
 function rdApproach(a){if(a.flag)RD.flags[a.id]=1;else RD.heard[a.id]=1;if(a.who==='ERIN')RD.flags.met_ERIN=1;rdSave();
  const n=HUBNPC[a.who];n.wait=0;rdAppr={a,t:0};hubMsg='';hubBark=null;P3.vx=P3.vy=0;state='g3appr';snd(392,.2,523,'triangle',.04)}
@@ -6650,6 +6666,7 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();eject();return}
  if(t&&pressed('a')){snd(520,.05);
   if(t.kind==='descend'){if(CHARS.filter(c=>charUnlocked(c.id)).length<=1){RD.char='WILL';rdGoDown();return}uiSel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.char||'WILL')));state='g3chars';return}
   if(t.kind==='sprouts'){sprPage=0;uiSel=0;state='g3sprouts';return}
+  if(t.kind==='npc'){const ap=rdApprPending(t.who);if(ap){if(ap.flag)RD.flags[ap.id]=1;else RD.heard[ap.id]=1;if(ap.who==='ERIN')RD.flags.met_ERIN=1;rdSave();rdTalkL=ap.lines;talkNPC=t.who;uiSel=0;talkStart=0;talkLine=0;talkTxt=rdLn(ap.lines[0]);rdApprTalk=true;state='g3talk';return}}
   if(t.kind==='npc'&&t.who==='ERIN'&&!RD.flags.met_ERIN){rdTalkL=RDINTRO;talkNPC='ERIN';uiSel=0;talkStart=0;talkLine=0;talkTxt=RDINTRO[0];RD.flags.met_ERIN=1;rdSave();state='g3talk';return}
   if(t.kind==='npc'){const tp=rdTopic(t.who);if(tp){rdTalkL=tp.lines;RD.heard[tp.id]=1;talkNPC=t.who;uiSel=0;talkStart=0;talkLine=0;talkTxt=rdLn(tp.lines[0]);rdSave();state='g3talk';return}}
   if(t.kind==='npc'){rdTalkL=null;talkNPC=t.who;uiSel=0;
@@ -6663,7 +6680,7 @@ function talkUpdate(){if(pressed('b')){state='g3hub';if(rdApprTalk){rdApprTalk=f
   RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
   else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}rdSave();return}
  if(pressed('a')){const L=rdTalkL||LINES[talkNPC];talkLine++;
-  if(talkStart+talkLine>=L.length){state='g3hub';if(rdApprTalk){rdApprTalk=false;rdApprWait=1.4}if(L===RDINTRO){hubBark={who:'MARCUS',txt:"door's RIGHT there, bro",t:3.5};hubBarkT=6}}else{talkTxt=rdLn(L[talkStart+talkLine]);snd(520,.04)}return}}
+  if(talkStart+talkLine>=(rdTalkL?L.length:Math.min(L.length,talkStart+1))){state='g3hub';if(rdApprTalk){rdApprTalk=false;rdApprWait=1.4}if(L===RDINTRO){hubBark={who:'MARCUS',txt:"door's RIGHT there, bro",t:3.5};hubBarkT=6}}else{talkTxt=rdLn(L[talkStart+talkLine]);snd(520,.04)}return}}
 function mirrorUpdate(){uiSel=nav(uiSel,MIRROR.length);
  if(pressed('a')){const m=MIRROR[uiSel],rank=mir(m.id);
   if(rank>=m.max){snd(140,.08)}else{const c=m.cost[rank];if(RD.dew>=c){RD.dew-=c;RD.mirror[m.id]=rank+1;rdSave();snd(784,.1);later(()=>snd(1175,.2),100)}else snd(140,.08)}}
@@ -6959,6 +6976,9 @@ function drawSprouts(){const M=RD;
 /* ---------------- combat ---------------- */
 function burst(x,y,c,n=6,sp=36){for(let i=0;i<n;i++)RUN.parts.push({x,y,vx:R(-sp,sp),vy:R(-sp,sp),life:R(.25,.55),c});}
 function ftext(x,y,txt,c){RUN.texts.push({x,y,txt,c:c||'#fff',t:.8});}
+/* a sprout pod is never left inside a rock or stump, or outside the room: it's nudged clear so you can walk over it */
+function rdPodAt(type,x,y){const p={type,x,y};for(const o of RUN.obst||[]){if(p.x>=o.x&&p.x<=o.x+o.w&&p.y>=o.y&&p.y<=o.y+o.h){const l=p.x-o.x,r2=o.x+o.w-p.x,t=p.y-o.y,b=o.y+o.h-p.y,m=Math.min(l,r2,t,b);
+ if(m===l)p.x=o.x-1;else if(m===r2)p.x=o.x+o.w+1;else if(m===t)p.y=o.y-1;else p.y=o.y+o.h+1}}collide(p,9);return p}
 function collide(e,rr){e.x=Math.max(RDA.side+rr,Math.min(W-RDA.side-rr,e.x));e.y=Math.max(RDA.top+rr,Math.min(H-RDA.bot-rr,e.y));
  for(const o of RUN.obst){const nx=Math.max(o.x,Math.min(e.x,o.x+o.w)),ny=Math.max(o.y,Math.min(e.y,o.y+o.h));
   const dx=e.x-nx,dy=e.y-ny,d=Math.hypot(dx,dy);if(d<rr&&d>0){e.x=nx+dx/d*rr;e.y=ny+dy/d*rr}}}
@@ -6991,7 +7011,7 @@ function hitEnemy(e,dmg,src,kx,ky){if(e.hp<=0)return;const s=rdStats();let crit=
  if(e.hp<=0)killEnemy(e);}
 function killEnemy(e){e.hp=0;RD.stats.kills++;ks(RUN.char).kills++;RUN.kills++;burst(e.x,e.y,'#e8e4f5',10,44);snd(240,.12,90,'triangle',.06);
  if(e.kind==='boss'){for(const o of RUN.enemies)if(o!==e)o.hp=Math.min(o.hp,0),o.dead=true;RUN.enemies=RUN.enemies.filter(o=>o===e||!o.dead);RUN.enemies.splice(RUN.enemies.indexOf(e),1);
-  RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:e.x-6,y:e.y},{type:PODW[RUN.biome][(Math.random()*6)|0],x:e.x+6,y:e.y});RUN.podDropped=true;ftext(e.x,e.y-14,'SPROUT PODS!','#a8f080');return}
+  RUN.pods.push(rdPodAt(PODW[RUN.biome][(Math.random()*6)|0],e.x-6,e.y),rdPodAt(PODW[RUN.biome][(Math.random()*6)|0],e.x+6,e.y));RUN.podDropped=true;ftext(e.x,e.y-14,'SPROUT PODS!','#a8f080');return}
  RUN.enemies.splice(RUN.enemies.indexOf(e),1);
  const fortune=RUN.boons.pass.find(p=>p.id==='fortune')?1+rdBoonVal(RUN.boons.pass.find(p=>p.id==='fortune'))/100:1;
  const np=Math.round((2+Math.random()*3)*(e.elite?4:1)*fortune)+Math.min(3,budCount(4));
@@ -7000,7 +7020,7 @@ function killEnemy(e){e.hp=0;RD.stats.kills++;ks(RUN.char).kills++;RUN.kills++;b
  if(Math.random()<.06)RUN.pickups.push({kind:'heart',val:10,x:e.x,y:e.y,vx:0,vy:0});
  if(Math.random()<.02)RUN.pickups.push({kind:'honey',val:1,x:e.x,y:e.y,vx:0,vy:0});
  if(hasDuo('clover')&&Math.random()<.16)RUN.pickups.push({kind:'heart',val:8,x:e.x+R(-8,8),y:e.y+R(-6,6),vx:0,vy:0});
- if(e.elite||Math.random()<.25){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:e.x,y:e.y});RUN.podDropped=true;ftext(e.x,e.y-12,'SPROUT POD!','#a8f080');snd(1046,.07,1568)}}
+ if(e.elite||Math.random()<.25){RUN.pods.push(rdPodAt(PODW[RUN.biome][(Math.random()*6)|0],e.x,e.y));RUN.podDropped=true;ftext(e.x,e.y-12,'SPROUT POD!','#a8f080');snd(1046,.07,1568)}}
 function damagePlayer(n){if(!RUN||RUN.inv>0||RUN.dashT>0)return;const s=rdStats();
  const peb=RUN.buds&&RUN.buds.find(b=>b.type===1&&b.cd<=0);
  if(peb){peb.cd=15;RUN.inv=.55;ftext(P3.x,P3.y-16,'PEB BLOCKED!','#dce2ea');burst(P3.x,P3.y,'#dce2ea',6,30);snd(520,.08,760);return}
@@ -7465,11 +7485,16 @@ const RDTALK=(()=>{const S=()=>RD.stats,F=()=>RD.flags,K=ksR,U=id=>charUnlocked(
  {id:'l_unlock',who:'LOUIE',when:()=>U('LOUIE'),lines:["WOOF WOOF! (He's packed his own stick. He's coming down with you now.)"]},
  {id:'l_dived',who:'LOUIE',when:()=>K('LOUIE').runs>=1,lines:["ZOOM. (He did a Zoom Zoom Zoom down there. He'd like to talk about it. He can't.)"]},
  {id:'l_escape',who:'LOUIE',when:()=>S().escapes>=1,lines:["AWOOO! (Victory howl. The whole Hearth heard it.)"]}]})();
-function rdTopic(who){RD.heard=RD.heard||{};for(const t of RDTALK)if(t.who===who&&!RD.heard[t.id]){let ok=false;try{ok=t.when()}catch(e){}if(ok)return t}return null}
+/* when newer news makes an older topic stale (the Grub Mother dead, not just found), the older one is skipped */
+const RDSTALE={e_ch4:'e_mother',m_ch4:'m_mother'};
+function rdTopic(who){RD.heard=RD.heard||{};for(const t of RDTALK)if(t.who===who&&!RD.heard[t.id]){let ok=false;try{ok=t.when()}catch(e){}if(!ok)continue;
+  const nw=RDSTALE[t.id]&&RDTALK.find(q=>q.id===RDSTALE[t.id]);let newer=false;try{newer=!!(nw&&!RD.heard[nw.id]&&nw.when())}catch(e){}if(newer){RD.heard[t.id]=1;continue}return t}return null}
 
 /* ---------------- first-run tips, one at a time, when they matter ---------------- */
 function rdTips(dt){if(RUN.tip){RUN.tip.t-=dt;if(RUN.tip.t<=0)RUN.tip=null;return}
  const F=RD.flags,show=(id,txt)=>{if(F[id])return false;F[id]=1;RUN.tip={txt,t:4.2};rdSave();return true};
+ /* a tip for something you've already done is no use: felling foes means you know A attacks */
+ if(RUN.kills>=2&&!F.tip_atk)F.tip_atk=1;
  if(RUN.chamber===1&&RUN.time>.6&&show('tip_move','MOVE WITH THE D-PAD'))return;
  if(RUN.enemies.some(e=>Math.hypot(e.x-P3.x,e.y-P3.y)<75)&&show('tip_atk','A: ATTACK. IT AIMS ITSELF'))return;
  if(RUN.hurtOnce&&show('tip_dash','DOUBLE-TAP A DIRECTION: DASH'))return;
@@ -7568,7 +7593,7 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
   const ls=wrapPx(talkTxt,222,1),nl=Math.max(2,Math.min(4,ls.length)),bh=nl*11+26,by=H-4-bh;r('#181020',4,by,W-8,bh);r('#f8f0d8',5,by+1,W-10,bh-2);
   const nw=tw(talkNPC,2)+10;r('#181020',8,by-7,nw+2,14);r(RDCPLATE[talkNPC]||'#b8304a',9,by-6,nw,12);text(talkNPC,14,by-4,2,'#ffffff',null);
   ls.slice(0,4).forEach((l,i)=>text(l,10,by+10+i*11,1,'#281c30',null));r('#e0d4b8',10,H-20,W-20,1);
-  const more=talkNPC&&talkStart+talkLine<(rdTalkL||LINES[talkNPC]).length-1;
+  const more=talkNPC&&!!rdTalkL&&talkStart+talkLine<rdTalkL.length-1;
   text((more?'A: MORE ▼':'A: BYE')+' · B: BYE'+(RD.honey>0?' · START: GIFT ('+RD.honey+')':''),10,H-16,1,'#7a6a8a',null);}}
 function rowsPlain(items,y,step){items.forEach((s,i)=>text(s,10,y+i*step,1,'#c8c0d8',null));}
 function rowsDraw2(items,sel,desc){const step=items.length>6?15:17,y0=items.length>6?40:44;
@@ -7828,7 +7853,8 @@ function drawOver(win){r(win?'#141a10':'#180a10',0,0,W,H);const L=RD.lastRun||{c
  if(S0){const S=RSTG.base(S0);
   if(win){S.sky('dawn');S.hills('dawn');S.lantern(150,1,4);S.keeper(kp,96,2,1);[70,118].forEach((x,i)=>S.bud(x,i+2,1,3));S.dog(178,1,true,-1)}
   else{S.cave();const lx=W/2+26,rope=Math.round((S.GY-30)*Math.min(1,overT/2.5));
-   g.save();g.translate(W/2-4,S.GY-2);g.rotate(-Math.PI/2);const sp=kp==='KING'?RDKING.ol:kp==='WILL'||!CH[kp]?SP.pd:CH[kp];g.drawImage(sp,-sp.width,-sp.height,sp.width*2,sp.height*2);g.restore();
+   if(kp==='LOUIE'){/* Louie lies belly-up, paws in the air */const sp=LOU.l[0];g.save();g.translate(W/2-4,S.GY-2);g.scale(2,-2);g.drawImage(sp,-(sp.width>>1),0);g.restore()}
+   else{g.save();g.translate(W/2-4,S.GY-2);g.rotate(-Math.PI/2);const sp=kp==='KING'?RDKING.ol:kp==='WILL'||!CH[kp]?SP.pd:CH[kp];g.drawImage(sp,-sp.width,-sp.height,sp.width*2,sp.height*2);g.restore()}
    const fl=.35+.15*Math.sin(time*7);g.save();g.globalAlpha=fl;g.fillStyle='#ffd94d';g.beginPath();g.arc(W/2-34,S.GY-6,10,0,7);g.fill();g.restore();r('#3a2c1c',W/2-37,S.GY-10,7,9);r('#806030',W/2-35,S.GY-8,3,5);
    r('#c8a878',lx,0,1,rope);if(rope>4){g.save();g.globalAlpha=.4;g.fillStyle='#ffd27a';g.beginPath();g.arc(lx,rope,9,0,7);g.fill();g.restore();r('#ffd94d',lx-2,rope-2,5,5)}}
   r(win?'#141a10':'#180a10',0,S0,W,H-S0);r(win?'#a8f080':'#ff9a8a',0,S0,W,1)}
@@ -7844,8 +7870,8 @@ function drawOver(win){r(win?'#141a10':'#180a10',0,0,W,H);const L=RD.lastRun||{c
  ctext('SPEND IT AT THE DIGS. GO AGAIN.',H-30,1,'#a8f080',null);
  if(overT>.8&&((time*2)|0)%2)ctext('A: THE HEARTH',H-16,2,'#ffffff');}
 /* ---------------- the capsule machine, from Rootdeep's own menu ----------------
-   The same machine as Sprouts' CAPSULES: one shared pool (Sprouts styles + Rootdeep unlocks), the same
-   tickets and petals (Sprouts' wallet), the same odds, no duplicates. */
+   Since the rewards split (Nov 18) it holds only Rootdeep's unlocks and takes Lantern tickets (meta.ltix).
+   Sprouts has its own machine and tickets. */
 let capR={ph:'idle',t:0,it:null,msg:'',msgT:0};
 const CAPTUT=()=>["This is the Lantern's capsule machine. It holds Rootdeep's unlocks.","One Lantern ticket opens one capsule. Never the same thing twice. Sprouts has a machine and tickets of its own, in its menu.","LEFT and RIGHT show what's inside, and how to earn Lantern tickets."];
 const CAPPG=['SPROUTS','ROOTDEEP','KNOCKOUT','TICKETS'];
@@ -7970,11 +7996,11 @@ function ppSV(){const out={day:0,stars:0,served:0,earned:0,crew:0,friends:0};
   const st=Object.values(s.stars||{}).reduce((a,b)=>a+(+b||0),0),fr=Object.values(s.friend||{}).reduce((a,b)=>a+[4,12,24,40].filter(t=>(+b||0)>=t).length,0); /* hearts, same thresholds as Patch & Plate's HEARTS */
   if(st>out.stars||(st===out.stars&&(s.day||0)>out.day)){out.day=s.day||0;out.stars=st;out.served=s.served||0;out.earned=s.earned||0;out.crew=(s.crew||[]).length;out.friends=fr}}catch(e){}}
  return out}
-const lanPlayedN=()=>[0,1,2,3].filter(i=>LAN.played[i]).length;
+const lanPlayedN=()=>[0,1,2,3,4,5,6].filter(i=>LAN.played[i]).length;
 const sprAch=n=>{try{const i=ACH.findIndex(a=>a[0]===n);return i>=0&&!!meta.ach[i]}catch(e){return false}};
 const LACH=[
  ['TRIPLE THREAT','PLAY THREE CARTRIDGES',2,()=>lanPlayedN()>=3],
- ['FULL SHELF','PLAY ALL FOUR CARTRIDGES',2,()=>lanPlayedN()>=4],
+ ['FULL SHELF','PLAY ALL SEVEN CARTRIDGES',2,()=>lanPlayedN()>=7],
  ['LIGHT ABOVE AND BELOW','RELIGHT THE GREAT LANTERN IN SPROUTS AND ESCAPE ROOTDEEP',2,()=>sprAch('LANTERN KEEPER')&&RD.stats.escapes>=1],
  ['SEE ONE, SEND ONE','OPEN MARCUS WATERWORKS IN SPROUTS AND DIVE AS MARCUS',2,()=>rdWaterworks()&&ksR('MARCUS').runs>=1],
  ['GOOD BOY TRILOGY','PET LOUIE 10 TIMES, CLEAR KNOCKOUT ARCADE AS LOUIE, DIVE AS LOUIE',2,()=>sprAch('GOOD BOY')&&koSV().clear.louie&&ksR('LOUIE').runs>=1],
@@ -8023,19 +8049,22 @@ function lanDraw(){r('#0c0a12',0,0,W,H);
  const top=state==='lan'?Math.round(H*.12):0;
  if(state==='lan'){for(let i=0;i<30;i++)r(i%5?'#3a3350':'#8d84a8',(i*53+17)%240,(i*29+11)%H,1,1);lanDrawLamp(W/2,top+8);
   ctext('POCKET LANTERN',top+34,3,'#ffd94d','#403010');ctext('THE CONSOLE',top+52,1,'#a89ec2',null);
-  const done=LACH.filter(a=>LAN.ach[a[0]]).length;ctext('LANTERN TICKETS '+(meta.ltix||0)+'   ·   ACHIEVEMENTS '+done+'/'+LACH.length,top+70,1,'#c8c0d8',null);
+  const done=LACH.filter(a=>LAN.ach[a[0]]).length;ctext('TICKETS '+(meta.ltix||0)+'  ·  ACHIEVEMENTS '+done+'/'+LACH.length,top+70,1,'#c8c0d8',null);
   const st=20,y0=Math.round(H*.5);r('rgba(8,5,14,.8)',W/2-74,y0-10,148,LANITEMS.length*st+12);r('#ffd94d',W/2-74,y0-10,148,1);drawList(LANITEMS,lanSel,y0,st);
-  ctext(lanMsgT>0?lanMsg:['ONE MACHINE FOR EVERY CARTRIDGE','NUMBERS FROM ALL FOUR GAMES','GOALS THAT SPAN THE GAMES','PICK A CARTRIDGE'][lanSel],H-16,1,lanMsgT>0?'#ffd94d':'#8d84a8',null);return}
+  ctext(lanMsgT>0?lanMsg:['ROOTDEEP UNLOCKS FOR LANTERN TICKETS','NUMBERS FROM THE GAMES','GOALS THAT SPAN THE GAMES','PICK A CARTRIDGE'][lanSel],H-16,1,lanMsgT>0?'#ffd94d':'#8d84a8',null);return}
  if(state==='lanstats'){const P=['ALL GAMES','SPROUTS','KNOCKOUT','ROOTDEEP','PATCH & PLATE'][lanPage];screenShell('STATS','◀ '+P+' ▶');let rows=[];
-  if(lanPage===0){const done=LACH.filter(a=>LAN.ach[a[0]]).length;rows=[['CARTRIDGES PLAYED',lanPlayedN()+' / 4'],['LANTERN ACHIEVEMENTS',done+' / '+LACH.length],['CAPSULES OPENED',meta.life.pulls],['CAPSULE ITEMS OWNED',pulledCount()],['LANTERN TICKETS ON HAND',meta.ltix||0],['TICKETS FROM THE LANTERN',LAN.tixEarned]]}
+  if(lanPage===0){const done=LACH.filter(a=>LAN.ach[a[0]]).length;rows=[['CARTRIDGES PLAYED',lanPlayedN()+' / 7'],['LANTERN ACHIEVEMENTS',done+' / '+LACH.length],['CAPSULES OPENED',meta.life.pulls],['CAPSULE ITEMS OWNED',pulledCount()],['LANTERN TICKETS ON HAND',meta.ltix||0],['TICKETS FROM THE LANTERN',LAN.tixEarned]]}
   else if(lanPage===1){const L=meta.life;rows=[['KEEPER RANK',rankOf(meta.xp)[0]],['PETALS EARNED',meta.xp],['ACHIEVEMENTS',Object.keys(meta.ach).length+' / '+ACH.length],['MISSIONS',L.missions],['BERRIES BROUGHT HOME',L.berries],['BUGS CAUGHT',L.bugs],['FLOWERS HARVESTED',L.flowers],['LOUIE PETS',L.pets]]}
   else if(lanPage===2){const k=koSV(),c=Object.keys(k.clear);rows=[['WINS',k.w],['LOSSES',k.l],['ARCADE CLEARS',c.length+' / 8'],['CLEARED WITH',c.length?c.map(x=>x.toUpperCase()).slice(0,3).join(', ')+(c.length>3?'...':''):'NOBODY YET'],['BEST SURVIVAL STREAK',k.surv||0],['TRIAL STARS',koStars()+' / 32']]}
   else if(lanPage===4){const q=ppSV();rows=[['DAYS OPEN',Math.min(12,q.day+1)+' / 12'],['STARS',q.stars+' / 36'],['DISHES SERVED',q.served],['COINS EARNED',q.earned],['SPROUT CREW',q.crew+' / 6'],['FRIEND HEARTS',q.friends+' / 20']]}
   else if(lanPage===3){const S=RD.stats;rows=[['RUNS',S.runs],['ESCAPES',S.escapes],['DEEPEST CHAMBER',(S.best||0)+' / 12'],['FOES FELLED',S.kills],['BOSSES FELLED',S.bosses],['SPROUTS FOUND',S.sproutsFound||0],['FALLS',S.deaths],['KEEPERS UNLOCKED',CHARS.filter(c=>charUnlocked(c.id)).length+' / '+CHARS.length]]}
   rows.forEach(([a,b],i)=>{const y=48+i*17;r(i%2?'#181024':'#1d1530',8,y-3,W-16,15);text(a,14,y+1,1,'#c8c0d8',null);rtext(String(b),W-14,y+1,1,'#ffd94d',null)});
   ctext('◀ ▶ PAGES    B: BACK',H-13,1,'#8d84a8',null);return}
- if(state==='lanach'){const done=LACH.filter(a=>LAN.ach[a[0]]).length;screenShell('ACHIEVEMENTS',done+' / '+LACH.length+' · PAID IN CAPSULE TICKETS');
-  rowsDraw2(LACH.map(a=>({a:(LAN.ach[a[0]]?'★ ':'○ ')+a[0],b:LAN.ach[a[0]]?'DONE':'+'+a[2]+' TIX'})),uiSel,LACH[uiSel][1]);
+ if(state==='lanach'){const done=LACH.filter(a=>LAN.ach[a[0]]).length;screenShell('ACHIEVEMENTS',done+' / '+LACH.length+' · PAID IN LANTERN TICKETS');
+  /* more achievements than fit: the list scrolls with the cursor, and the description stays clear below it */
+  const fit=Math.max(7,Math.floor((H-44-40-6)/15)),off=Math.max(0,Math.min(LACH.length-fit,uiSel-(fit>>1)));
+  rowsDraw2(LACH.slice(off,off+fit).map(a=>({a:(LAN.ach[a[0]]?'★ ':'○ ')+a[0],b:LAN.ach[a[0]]?'DONE':'+'+a[2]+' TIX'})),uiSel-off,LACH[uiSel][1]);
+  if(off>0)rtext('▲',W-4,30,1,'#8d84a8',null);if(off+fit<LACH.length)rtext('▼',W-4,40+fit*15-4,1,'#8d84a8',null);
   ctext('B: BACK',H-13,1,'#8d84a8',null);return}}
 
 /* ---------------- dispatch ---------------- */

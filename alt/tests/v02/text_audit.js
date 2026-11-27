@@ -101,7 +101,7 @@ const D = require('path').join(__dirname, 'out', 'text_audit') + '/'; require('f
   await E(`RUN=null;hubEnter();hpSel=0;hpArm=0;state='g3hpause'`); await check('hpause');
   for (const a of [1,2]) { await E(`hpSel=4;hpArm=${a}`); await check('hpause_arm' + a); }
   await E(`state='g3hub';rdSavedT=1`); await check('hub_saved');
-  for (const a of ['met_ERIN','e_fall','e_ledger','r_escape','m_caps','l_unlock']) { await E(`hubEnter();rdApproach(RDAPPR.find(x=>x.id==='${a}'));rdAppr.t=9`); await page.waitForTimeout(80); for (let i = 0; i < 5; i++) { await check('appr_' + a + '_' + i); await E(`if(state==='g3talk'){talkLine++;const L=rdTalkL;if(talkStart+talkLine<L.length)talkTxt=rdLn(L[talkLine])}`); } }
+  for (const a of ['met_ERIN','e_fall','e_ledger','r_escape','m_caps','l_unlock','lesson_grub','lesson_spitter','lesson_beetle','lesson_shade','lesson_crab','lesson_wisp','lesson_boom','lesson_boss0','lesson_boss1','lesson_boss2']) { await E(`hubEnter();rdApproach(RDAPPR.find(x=>x.id==='${a}'));rdAppr.t=9`); await page.waitForTimeout(80); for (let i = 0; i < 5; i++) { await check('appr_' + a + '_' + i); await E(`if(state==='g3talk'){talkLine++;const L=rdTalkL;if(talkStart+talkLine<L.length)talkTxt=rdLn(L[talkLine])}`); } }
   console.log('screens checked:', n);
   for (const [nm, out] of issues) { console.log('\n## ' + nm); for (const o of [...new Set(out)]) console.log('   ' + o); }
   console.log('\nERRORS:', errs.length ? '\n  ' + errs.join('\n  ') : 'none');

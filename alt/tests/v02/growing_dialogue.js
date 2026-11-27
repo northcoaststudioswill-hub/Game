@@ -25,7 +25,7 @@ const D = require('path').join(__dirname, 'out', 'growing_dialogue') + '/'; requ
   const tips = []; for (let i = 0; i < 60; i++) { await page.waitForTimeout(100); const t = await E('RUN&&RUN.tip?RUN.tip.txt:null'); if (t && !tips.includes(t)) { tips.push(t); if (tips.length === 2) await shot('tip'); } if (i % 3 === 0) await hit('KeyZ', 30); }
   ok(tips.length >= 2, 'tips arrive one at a time: ' + JSON.stringify(tips));
   ok((await E('ks("WILL").runs')) === 1, "Will's log counts the run");
-  await E(`RD.heard.e_fall=1;RD.heard.e_ledger=1;RD.heard.m_caps=1;RUN.lastHit='grub';window.__g.RDF().hurt(9999)`); await E(`if(state==='g3dying')rdDieFinish()`); await page.waitForTimeout(900); await hit('KeyZ', 300);
+  await E(`RD.heard.e_fall=1;RD.heard.e_ledger=1;RD.heard.m_caps=1;RD.heard.lesson_grub=1;RUN.lastHit='grub';window.__g.RDF().hurt(9999)`); await E(`if(state==='g3dying')rdDieFinish()`); await page.waitForTimeout(900); await hit('KeyZ', 300);
   ok((await E('state')) === 'g3hub', 'after the fall, back in the Hearth'); await page.waitForTimeout(400); await shot('marks');
   const pend = JSON.parse(await E(`JSON.stringify(NPCS.filter(w=>rdTopic(w)))`)); ok(pend.length >= 4, 'new things to say after the first fall: ' + JSON.stringify(pend));
   await E(`P3.x=HUBNPC.MARCUS.x;P3.y=HUBNPC.MARCUS.y+6`); await hit('KeyZ', 200); const t1 = await E('talkTxt'); await shot('topic');
@@ -34,7 +34,7 @@ const D = require('path').join(__dirname, 'out', 'growing_dialogue') + '/'; requ
   await E(`P3.x=HUBNPC.MARCUS.x;P3.y=HUBNPC.MARCUS.y+6`); await hit('KeyZ', 200); const t2 = await E('talkTxt');
   ok(!/timed it/.test(t2), 'next time, his usual lines: "' + t2.slice(0, 50) + '..."'); await hit('KeyX', 120);
   // keeper unlocks drive dialogue too
-  await E(`RD.gift.ERIN=3`); ok((await E(`rdTopic('ERIN')&&rdTopic('ERIN').id`)) === 'e_fall' || true, 'unlock topics queue up');
+  await E(`rdApprWait=99;RD.gift.ERIN=3`); ok((await E(`rdTopic('ERIN')&&rdTopic('ERIN').id`)) === 'e_fall' || true, 'unlock topics queue up');
   await E(`RD.heard.e_fall=1;RD.heard.e_ch4=1`); ok((await E(`rdTopic('ERIN').id`)) === 'e_unlock', "unlocking Erin gives her a new topic");
   await E(`codexPage=3;state='g3codex'`); await shot('codex_keepers');
   console.log('ERRORS:', errs.length ? '\n  ' + errs.join('\n  ') : 'none'); await browser.close();

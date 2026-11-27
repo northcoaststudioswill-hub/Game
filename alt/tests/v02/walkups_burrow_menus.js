@@ -15,7 +15,7 @@ const D = require('path').join(__dirname, 'out', 'walkups_burrow_menus') + '/'; 
   const ok = (c, m) => console.log((c ? 'PASS ' : 'FAIL ') + m);
   const cv = await page.$('canvas'); const shot = async nm => cv.screenshot({ path: D + nm + '.png' });
   await page.evaluate(`document.querySelector('.cart[data-i="2"]').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))`); await page.waitForTimeout(1500);
-  await E(`localStorage.removeItem('rootdeep-v1');Object.assign(RD,RDDEF());RD.set={mus:7,sfx:8,shake:true};LAN.capTut=0;meta.tix=0;rdNewGame()`); await page.waitForTimeout(300);
+  await E(`localStorage.removeItem('rootdeep-v1');Object.assign(RD,RDDEF());RD.set={mus:7,sfx:8,shake:true};LAN.capTut=0;meta.tix=0;meta.ltix=0;rdNewGame()`); await page.waitForTimeout(300);
   ok(await E('state') === 'g3cine', 'new game plays the intro');
   await hit('Enter', 300); ok(await E('state') === 'g3hub', 'skip lands in the Hearth');
   await page.waitForTimeout(500); ok(await E('state') === 'g3appr', 'Erin walks over (approach)'); await page.waitForTimeout(200); await shot('01_appr');
@@ -48,7 +48,7 @@ const D = require('path').join(__dirname, 'out', 'walkups_burrow_menus') + '/'; 
   for (let i = 0; i < 8 && await E('state') === 'g3talk'; i++) await hit('KeyZ', 150);
   await page.waitForTimeout(4500); ok(await E('state') === 'g3talk' && (await E('talkTxt')).includes('Ledger'), 'Erin explains the Ledger: ' + await E('talkTxt'));
   for (let i = 0; i < 8 && await E('state') === 'g3talk'; i++) await hit('KeyZ', 150);
-  await E('meta.tix=2'); await page.waitForTimeout(4500); ok(await E('talkNPC') === 'MARCUS' && (await E('talkTxt')).includes('capsule'), 'Marcus explains tickets'); await shot('11_marcus');
+  await E('meta.ltix=2'); await page.waitForTimeout(4500); ok(await E('talkNPC') === 'MARCUS' && (await E('talkTxt')).includes('capsule'), 'Marcus explains tickets'); await shot('11_marcus');
   for (let i = 0; i < 8 && await E('state') === 'g3talk'; i++) await hit('KeyZ', 150);
   ok(await E('RD.heard.e_fall&&RD.heard.e_ledger&&RD.heard.m_caps') ? true : false, 'walk-ups mark topics heard');
   // pause

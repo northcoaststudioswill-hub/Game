@@ -18,9 +18,11 @@ const BUILD = require('path').resolve(process.argv[2] || require('path').join(__
   const pre = JSON.parse(await all());
   ok(!(await E('rdWaterworks()')) && !pre.some(l => /waterworks|lazy river/i.test(l)), 'before Waterworks: Marcus never mentions it (' + pre.length + ' lines checked)');
   // page through every line in the real talk screen
-  await E(`talkNPC='MARCUS';talkStart=0;talkLine=0;talkTxt=rdLn(LINES.MARCUS[0]);state='g3talk'`); const seen = [await E('talkTxt')];
-  for (let k = 0; k < 16; k++) { await page.keyboard.down('KeyZ'); await page.waitForTimeout(60); await page.keyboard.up('KeyZ'); await page.waitForTimeout(80); if ((await E('state')) !== 'g3talk') break; seen.push(await E('talkTxt')); }
-  ok(seen.length === 15 && !seen.some(l => /waterworks|lazy river/i.test(l)), 'paging all ' + seen.length + ' lines in the talk box: clean');
+  // small talk is one line per chat, so open one chat per line and close it with A
+  const seen = []; const nL = await E('LINES.MARCUS.length');
+  for (let k = 0; k < nL; k++) { await E(`rdTalkL=null;talkNPC='MARCUS';talkStart=${k};talkLine=0;talkTxt=rdLn(LINES.MARCUS[${k}]);state='g3talk'`); seen.push(await E('talkTxt'));
+    await page.keyboard.down('KeyZ'); await page.waitForTimeout(60); await page.keyboard.up('KeyZ'); await page.waitForTimeout(80); if ((await E('state')) === 'g3talk') { seen.push('DID NOT CLOSE'); break } }
+  ok(seen.length === nL && !seen.some(l => /waterworks|lazy river/i.test(l)), 'paging all ' + seen.length + ' lines in the talk box: clean');
   await E(`meta.ach[${i}]=1`);
   const post = JSON.parse(await all());
   ok(await E('rdWaterworks()') && post.filter(l => /waterworks/i.test(l)).length === 3, 'after MAKING WAVES: Waterworks comes up (' + post.filter(l => /waterworks/i.test(l)).length + ' lines)');

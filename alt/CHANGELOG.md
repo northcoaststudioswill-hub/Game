@@ -3,6 +3,57 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Rootdeep: a 10-minute playtest, fixes, and foe lessons (Nov 27 2026)
+
+Will: have a game tester play this for 10 minutes, then fix bugs and keep building the game.
+
+**How it was played.** New script `tests/v02/tester_10min.js` plays Rootdeep on this build for 10 real minutes with key
+presses, the way a player would: it watches the intro and every new scene, reads every walk-up and talk topic, spends
+Moondew at the Sprout Digs, takes sprouts from the Ledger, buys weapons and keepsakes, uses the Hearth menu and the run
+pause menu, saves and quits mid-run and continues, switches keepers as they unlock, fights, takes doors and shops. It
+logs page errors, stalls, foes outside the room, a cleared room that does not open, bad numbers and slow frames.
+Three sessions: the first stalled (below), the second ran a clean 10 minutes (8 runs with Will, Louie and the Sprout
+King, one escape, 69 lines of dialogue, no page errors, a steady 60 fps), the third checked the finished build.
+
+**Fixed:**
+- **Sprout pods could drop inside a rock.** A foe killed against a rock or stump left its pod inside it, where you
+  can't reach it; the first session's keeper pushed against one for nine minutes. Pods are now nudged clear of props
+  and kept inside the room (`rdPodAt`), for all four places pods drop.
+- **Louie's death screen showed Will.** The keeper sprite on THE DEEP KEEPS YOU had no case for Louie. He now lies
+  belly-up, paws in the air.
+- **The attack tip came far too late** ("A: ATTACK. IT AIMS ITSELF" in chamber 5). Tips show one at a time and the
+  attack tip needs a foe nearby, so quick rooms kept skipping it. Felling two foes now counts as having learned it.
+- **Talking to someone before their walk-up started skipped it.** After the first fall, pressing A on Erin right away
+  played her old topic and marked it heard, so the walk-up that explains the Sprout Digs never played. Talking to
+  someone with a walk-up waiting now plays the walk-up (`rdApprPending`).
+- **Small talk played every remaining line at once** (nine lines from Louie in one go). It is now one line per chat,
+  a new one each time.
+- **Stale news.** After a run that reached the Grub Mother and killed her, Erin and Marcus said "you reached her nest"
+  and then "she's gone quiet". The older topic is now skipped when the newer one applies (`RDSTALE`).
+- **Marcus's capsule walk-up was out of date** after the rewards split: it said the machine holds Sprouts styles and
+  that Sprouts pays tickets. Now: one Lantern ticket, one capsule (keepers, lanterns, weapons); bosses, escapes,
+  Erin's stand and Lantern achievements pay them.
+- **The Lantern menu on the seven-cartridge shelf:** CARTRIDGES PLAYED counts all seven (was "/ 4"), FULL SHELF asks
+  for all seven, the captions no longer say "one machine for every cartridge" or "capsule tickets", the header line
+  is no longer squashed, and the 17 achievements scroll so the description doesn't cover the last rows.
+
+**New: foe lessons.** The first time a foe or boss takes you down, whoever knows it best walks over in the Hearth and
+says how it works, in their own voice (`RDLESSON`, once per foe). Scout: Spore Spitters, Mothshades, the Drowned King.
+The Ranger: Root Beetles, Bubble Crabs, the Hollow Keeper. Erin: Ember Wisps, the Grub Mother. Marcus: Grublets and
+your own boom bulb ("You blew yourself up. With a boom bulb. Bro."). Each lesson names the warning the game already
+shows (the beetle's shake, the shade's sparkle, the King's red ring, the spitter's red flash). Nothing about the foes
+changed: difficulty is untouched, as Will asked.
+
+Pictures: `playtest/rootdeep/2026-11-27_foe_lesson_scout.png`, `playtest/rootdeep/2026-11-27_louie_death_screen.png`.
+
+**Checked:** every Rootdeep suite in `tests/v02/` passes on this build; the text audit covers 307 screens (now with
+every foe lesson) and flags only the logo's drop shadow. Tests updated where they expected the old behaviour (Lantern
+tickets, one-line small talk, the grub lesson, Erin's unlock walk-up). Not played on a phone.
+
+**Still open (Rootdeep):** the Mothshade's warning is 0.3 s and it chases the moment it lands; that is why it felt
+unfair, but lengthening it changes difficulty, so it waits for Will. The "three little auto balls" are still
+unidentified. Rootdeep's music is still the placeholder loop.
+
 ## Sprouts: a full story run, and what it turned up (Nov 18 2026)
 
 Will: do a playthrough and lore check, make sure the story adds up and is in order. The arrow pointed at Erin the
