@@ -26,7 +26,8 @@ function effAttrs(b, mine) {
 function sfxM(n) { sfx(n); if (MT && MT.net === 'host' && n !== 'bounce' && n !== 'step' && n !== 'whoosh' && n !== 'whistle') netEv({ k: 's', s2: n }); }
 function fb(p, txt, col) { if (p.remote) netEv({ k: 'fb', t: txt, c: col, to: p.peer }); else if (p.user) hudFb(txt, col); }
 function startMatch(cfg) {
-  disposeScene(scene); scene = new THREE.Scene();
+  const keepBlock = cfg.block && typeof W !== 'undefined' && W && W.kind === 'hub' ? scene : null;      /* the back lot: the Block stays up around you */
+  if (!keepBlock) disposeScene(scene); scene = new THREE.Scene();
   const arcade = cfg.mode.arcade;
   MT = { cfg, arcade, P: [], score: [0, 0], phase: 'check', pt: 0, off: cfg.firstOff || 0, needClear: false, clock: 14, time: 0, slow: 0, shake: 0, parts: [], boosts: cfg.boosts || [], practice: cfg.practice || null, rackT: 40, rackScore: 0, over: false, paused: false, callQ: [], looseT: 0, lastScorer: null, hotTeam: -1, net: cfg.net || null };
   // --- set ---
@@ -36,9 +37,10 @@ function startMatch(cfg) {
   baseLights(scene, arcade ? 0xc8a8ff : 0xdde8ff, arcade ? 0x301850 : 0x404858, arcade ? 0xffd0ff : 0xfff0d8, arcade ? 1.7 : 1.5);
   const g = M(new THREE.PlaneGeometry(300, 300), toon(arcade ? '#0c0618' : '#20242c'), 0, -0.02, 0, scene); g.rotation.x = -Math.PI / 2;
   MT.hoop = dressCourt(scene, cfg, style);      /* courts.js: tier-painted park courts, the RUCKUS arcade, power-ups */
+  if (keepBlock) blockBackdrop(keepBlock);
   const lot = style === 'backlot';      /* the back lot on the Block (courts.js): its own walls, no fence, no stock billboards */
   if (!lot) addFence(scene, -8.6, 8.6, -2.6, 13.6, 4.2, arcade ? 0xff8ff0 : 0xffffff);
-  skyline(scene, 34, 60, arcade ? ['#ff4fd8', '#33e0ff', '#ffc531'] : ['#ffc531', '#ffe9a8', '#33e0ff'], 30);
+  if (!keepBlock) skyline(scene, 34, 60, arcade ? ['#ff4fd8', '#33e0ff', '#ffc531'] : ['#ffc531', '#ffe9a8', '#33e0ff'], 30);
   if (!lot) billboard(scene, ADS[(MT.cfg.seed || 0) % ADS.length], -13, 7, -6, 0.5, 9, 5);
   if (!lot) billboard(scene, ADS[((MT.cfg.seed || 0) + 3) % ADS.length], 13, 7.5, -7, -0.5, 9, 5);
   if (!lot) billboard(scene, arcade ? 'RUCKUS\nNO RULES\nNO REFUNDS' : (cfg.practice ? (cfg.practice === 'drill' ? (cfg.court === 'street' ? 'THE BLOCK\nPRACTICE' : 'HOME COURT\nPRACTICE') : cfg.practice === 'rack' ? 'MONEY RACK' : 'HOME COURT') : (cfg.mode.id === '1v1' ? 'THE LADDER\nONES' : 'THE CAGES\n' + cfg.tier.n)), 0, 9.5, -9, 0, 12, 4.5, arcade ? '#ff4fd8' : '#ffc531');
@@ -259,9 +261,12 @@ function releaseShot(p) {
   let w = shotWin(p, c, n);
   const e = Math.abs(err); let green = e <= w, prob;
   if (green && !p.user && Math.random() >= 0.5) green = false;      /* the AI lands in the window half as often as its timing says (it used to keep the sure make anyway) */
+  // hop jumpers and floaters (a tap of the stick up) time themselves: a good look, rarely a green. This has to come before
+  // the odds are set: it used to come after, so the shot kept the green's sure make without showing green (a tap up went in
+  // nearly every time). Off the window it is the plain odds for the look, never better than a fair release.
+  const autoT = p.user && s.auto; if (autoT) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');
   // perfect timing beats an open look every time; a hand in the face still costs a good release (smothered, about two in three)
   if (green) prob = (c < 0.12 ? 1 : Math.max(0.18, 1 - (c - 0.12) * 1.6)) * (d > 7.6 ? Math.max(0.3, 1 - (d - 7.6) * 0.12) : 1); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.82) * (e < w * 2.2 ? 1.12 : 1);
-  if (p.user && s.auto) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');      /* hop jumpers and floaters time themselves: a good look, rarely a green (was every time) */
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
@@ -275,6 +280,7 @@ function releaseShot(p) {
     if (Math.random() < fch) { B.foulBy = o; break; }
   }
   { const u = MT.me; if (u && u.team !== p.team && !p.user && c >= 0.4 && dist(u, p) < 2.2 && (u.st === 'jump' || u.handsUp)) floatTxt(u, c >= 0.6 ? 'SMOTHERED' : 'GOOD CONTEST', c >= 0.6 ? '#33e0ff' : '#9fe6ff'); }      /* your defense, said out loud */
+  if (autoT && !green) prob = Math.min(prob, base);
   const make = Math.random() < prob; p.stats.fga++;
   if (typeof vipShot === 'function') vipShot(p, { kind, c, make, green, step: !!p.stepJ, fade: !!s.fade, flo: !!s.floater, cs: p.catchT !== undefined && MT.time - p.catchT < 1.2 });      /* Sharpie's book (vip.js) */
   const pts = MT.arcade ? (kind === 'three' ? 3 : 2) : (kind === 'three' ? 2 : 1);
@@ -963,7 +969,7 @@ function matchStep(dtReal) {
   if (M_.net === 'guest') return netGuestStep(dtReal);
   if (M_.cfg.lot && IN[0].aP && !M_.over && M_.me) { M_.cfg.lot.at = [M_.me.x, M_.me.z, M_.me.face]; M_.over = true; quitMatch(); return; }      /* the back lot: A puts the ball down, you are back on the Block where you stand */
   let dt = dtReal; if (M_.slow > 0) { M_.slow -= dtReal; dt *= 0.35; }
-  M_.time += dt; const B = M_.B; hlStep(dtReal); bubStep(dtReal); if (M_.me && typeof vipTick === 'function') vipTick(M_.me);
+  M_.time += dt; const B = M_.B; hlStep(dtReal); bubStep(dtReal); if (M_.me && typeof vipTick === 'function') vipTick(M_.me); if (M_.block) blockBackdropStep(dt);
   // phases
   if (M_.phase === 'check') { M_.pt -= dt; if (M_.pt <= 0) { M_.phase = 'live'; sfxM('whistle'); } }
   if (!M_.introDone && M_.phase === 'check' && M_.pt < 1.5 && !M_.practice && !M_.drill) { M_.introDone = true; for (const q of M_.P) if (q.team !== M_.me.team) floatTxt(q, (q === M_.me.man ? 'YOUR MAN · ' : '') + 'OVR ' + ovrOf(q.A) + (q.pers && q.pers[0] ? ' · ' + q.pers[0].n : ''), q === M_.me.man ? '#f2c14e' : '#ece9e2'); }      /* who you are up against */
@@ -1572,3 +1578,18 @@ function endMatch() {
   netHostEnd(res); MT = null; cfg.onEnd(res);
 }
 function quitMatch() { if (!MT) return; hlEnd(); bubClear(); const cfg = MT.cfg, pr = MT.practice; hudShow(false); if (MT.net) netLeave(NET.game); MT = null; cfg.onEnd(pr ? { practice: pr, quit: true, rack: 0 } : { quit: true }); }
+
+// the back lot: the Block you walked off stays standing around the court. Its buildings, signs, lights, the cast and
+// the people on it are moved, as they are, into the court's frame (the lot's rim at the origin, facing +z); their
+// lights are left out (the court has its own) and the lot's own hoop is the court's. The people keep their loops.
+function blockBackdrop(old) {
+  const g = new THREE.Group(); g.rotation.y = Math.PI; g.position.set(LOT.hx, 0, LOT.hz);
+  const me = W.me && W.me.rig && W.me.rig.root;
+  for (const c of old.children.slice()) { if (c.isLight || c === me || (c.userData && c.userData.lotOnly)) continue; g.add(c); }
+  g.traverse(o => { if (o.isLight) o.visible = false; });
+  scene.add(g); MT.block = { g, npcs: (W.npcs || []).filter(n => n.rig && n.rig.root.parent === g).map(n => ({ rig: n.rig, an: n.anim === 'ball' ? 'dribble' : n.anim, ph: n.ph || 0, ball: n.ball })), t: 0 };
+}
+function blockBackdropStep(dt) {
+  const B_ = MT.block; B_.t += dt; if ((B_.k = (B_.k || 0) + 1) % 2) return;      /* every other step is plenty for people in the background */
+  for (const n of B_.npcs) { const o = { ph: n.ph, leg: n.rig.legLen, sp: 0, dr: Math.abs(Math.sin(B_.t * 7 + n.ph)) }; applyPose(n.rig, poseOf(n.an, B_.t, n.an === 'idle' ? Object.assign({ prof: n.rig.prof }, o) : o), dt * 2); }
+}

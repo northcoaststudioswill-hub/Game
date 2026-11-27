@@ -239,7 +239,7 @@ function buildHub() {
   // THE BACK LOT: the street behind the tracks is a half court now, the hoop against the RUN IT BACK wall (courts.js
   // LOT). Pick up a ball off the crate and you are on it with every move in the game; Ⓐ puts it down. Sharpie keeps
   // the book on you from the sideline: Money Rack, H-O-R-S-E, and what you do in every game you play.
-  lotCourtMesh(scene, true); { const h2 = hoopMesh(1, 'street'); h2.position.set(LOT.hx, 0, LOT.hz); h2.rotation.y = Math.PI; scene.add(h2); solid(LOT.hx - 0.4, LOT.hx + 0.4, LOT.hz + 0.9, LOT.hz + 1.6); }
+  lotCourtMesh(scene, true); { const h2 = hoopMesh(1, 'street'); h2.position.set(LOT.hx, 0, LOT.hz); h2.rotation.y = Math.PI; h2.userData.lotOnly = true; scene.add(h2); solid(LOT.hx - 0.4, LOT.hx + 0.4, LOT.hz + 0.9, LOT.hz + 1.6); }
   ink(M(box(1.3, 0.9, 0.5), toon('#8a8378'), -3.8, 0.45, 18.3, scene), 1.04); for (let i = 0; i < 4; i++) { const b = makeBall(['bl_std', 'bl_rwb', 'bl_neon', 'bl_gold'][i]); b.position.set(-4.25 + i * 0.3, 1.03, 18.3); scene.add(b); } solid(-4.5, -3.1, 18.0, 18.6);
   spot(-3.6, 17.2, 1.8, 'THE BACK LOT · pick up a ball', () => startPractice('lot'));
   const hb = aiBuild(75, 'sniper'); hb.name = 'Sharpie'; addNpc(hb, 9.6, 14.2, -1.9, 'idle'); spot(9.0, 13.6, 2.0, "SHARPIE (your book · Money Rack · H-O-R-S-E)", () => uiRack());
@@ -472,9 +472,9 @@ function worldStep(dt) {
 function startPractice(kind) {
   const fl = cribTier('floor'), lot = kind === 'lot', back = lot ? 'lot' : W.kind, from = lot && W ? [W.me.x, W.me.z, W.me.face] : null;
   uiClose(); document.body.dataset.state = 'match';
-  startMatch({ mode: { n: lot ? 'THE BACK LOT' : kind === 'rack' ? 'MONEY RACK' : 'SHOOT AROUND', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: lot ? 'free' : kind, court: lot ? 'backlot' : kind === 'rack' ? 'street' : ['drive', 'black', 'show', 'wood'][fl], hoopTier: lot || kind === 'rack' ? 1 : cribTier('hoop'), ball: S.worn.ball, lot: lot ? {} : null,
+  startMatch({ mode: { n: lot ? 'THE BACK LOT' : kind === 'rack' ? 'MONEY RACK' : 'SHOOT AROUND', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: lot ? 'free' : kind, court: lot ? 'backlot' : kind === 'rack' ? 'street' : ['drive', 'black', 'show', 'wood'][fl], hoopTier: lot || kind === 'rack' ? 1 : cribTier('hoop'), ball: S.worn.ball, lot: lot ? {} : null, block: lot,
     teams: [[{ b: myBuild(), ctrl: 0, mine: true }], []], onEnd: res => afterPractice(res, back, lot ? MT_lastLot : null) });
-  if (lot && MT && MT.me && from) { const [x, z] = lotToMatch(from[0], from[1]), me = MT.me; me.x = clamp(x, COURT.x0 - 0.8, COURT.x1 + 0.8); me.z = clamp(z, COURT.z0 - 0.5, COURT.z1 + 0.8); me.face = from[2] + Math.PI; MT.phase = 'live'; MT.needClear = false; give(me); MT_lastLot = MT.cfg.lot; }
+  if (lot && MT && MT.me && from) { const [x, z] = lotToMatch(from[0], from[1]), me = MT.me; me.x = clamp(x, COURT.x0 - 0.8, COURT.x1 + 0.8); me.z = clamp(z, COURT.z0 - 0.5, COURT.z1 + 0.8); me.face = from[2] + Math.PI; { const [cx, cz] = lotToMatch(-3.8, 18.3); if (Math.hypot(me.x - cx, me.z - cz) < 1.4) { me.z = cz + 1.6; me.face = Math.atan2(-me.x, -me.z) + Math.PI; } }      /* not on top of the crate: a step out onto the court */ MT.phase = 'live'; MT.needClear = false; give(me); MT_lastLot = MT.cfg.lot; }
 }
 let MT_lastLot = null;
 

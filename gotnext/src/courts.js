@@ -318,8 +318,9 @@ function lotCourtMesh(sc, onBlock) {
 // crossing, brick on both sides, lights strung over it. Everything placed where it stands on the Block.
 function backlotDressing(sc, cfg) {
   const P = (x, z) => lotToMatch(x, z);
-  lotCourtMesh(sc, false);
   const h = hoopMesh(cfg.hoopTier === undefined ? 1 : cfg.hoopTier, 'street'); sc.add(h);
+  if (cfg.block) return h;      /* the Block itself stands around the court (blockBackdrop, ball.js): only the hoop is ours */
+  lotCourtMesh(sc, false);
   { const [wx, wz] = P(0, 19.4); ink(M(box(40, 6, 0.6), brickMat('#55413a', 40, 6), wx, 3, wz, sc), 1.01); }
   for (const [t, x, cols] of [['BALL\nIS LIFE', -10, ['#1a1030', '#ff2d78', '#7de3ff', '#fff3b0', '#ffffff']], ['RUN IT\nBACK', 1, ['#0e2a2a', '#f2c14e', '#ff6a3d', '#ffffff', '#08080a']], ['WHO GOT\nNEXT', 12, ['#141418', '#ff2d78', '#a78bff', '#ece9e2', '#08080a']]]) { const [mx, mz] = P(x, 19.05); mural(t, 8.5, 4.4, cols, mx, 3.1, mz, 0); }
   for (const [cx, cz, cc] of [[-12, 15.6, '#ff2d78'], [12.6, 16.0, '#ece9e2']]) { const [x, z] = P(cx, cz), c = grp(sc, x, 0.75, z); c.rotation.y = Math.PI; ink(M(box(4.4, 0.8, 1.9), toon(cc), 0, 0, 0, c), 1.04); ink(M(box(2.3, 0.6, 1.7), toon('#16181c'), -0.2, 0.65, 0, c), 1.04); M(box(4.0, 0.1, 1.7), flat(0x7de3ff), 0, -0.5, 0, c); for (const sx of [-1.4, 1.4]) for (const sz of [-0.95, 0.95]) M(cyl(0.34, 0.34, 0.25, 10), toon('#16181c'), sx, -0.42, sz, c).rotation.x = Math.PI / 2; }
