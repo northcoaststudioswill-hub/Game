@@ -365,7 +365,7 @@ function goalStep(me) {
   const g = $('goal'); if (!g) return; let G = null;
   if (W.kind === 'hub' && !W.visit && !MT) {
     const drilled = Object.values(S.drills || {}).some(d => (d.medal || 0) >= 1), games = (S.life && S.life.games) || 0;
-    if (!drilled && games < 3) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
+    if (!drilled && !S.coachMet && games < 3) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
     else if (games < 1) G = { t: 'Call next at THE CAGES', s: 'walk up to a court gate and press ' + (I.hasPad && I.padAt >= (window.__kbAt || 0) ? 'A' : 'E'), x: 0, z: -10.3 };
   }
   if (!G) { if (g.style.display !== 'none') g.style.display = 'none'; return; }
@@ -380,7 +380,7 @@ function worldStep(dt) {
   if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
-  if (!busy) W.yaw -= (I.rx * 2.4 + mx * (I.analog ? 0.9 : 0.45) * Math.min(1, Math.abs(my) + 0.4)) * dt;      /* on keys A/D mostly strafe; the camera follows less */
+  if (!busy) W.yaw -= (I.rx * 2.4 + mx * (I.analog ? 0.4 : 0.45) * Math.min(1, Math.abs(my) + 0.4)) * dt;      /* on keys A/D mostly strafe; the camera follows less */
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
   // speed off the court: keys walk (Shift runs). A stick or thumb sets it by how far you push: a walk up to about 80%,
@@ -428,7 +428,7 @@ function worldStep(dt) {
   ambientStep(dt, camera, me); homeAnimStep(dt);
   if (W.flag) { const pa = W.flag.geometry.attributes.position; for (let i = 0; i < pa.count; i++) pa.setZ(i, Math.sin(pa.getX(i) * 1.2 + W.t * 3) * 0.25 * (pa.getX(i) / 3 + 1)); pa.needsUpdate = true; }
   // nearest interactable
-  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d < s.r && d + (s.low ? 1.2 : 0) < nd) { nd = d + (s.low ? 1.2 : 0); near = s; } }      /* a wandering beggar never takes the prompt off somebody you came to see */
+  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d >= s.r) continue; const fc = d > 0.2 ? ((s.x - me.x) * Math.sin(me.face) + (s.z - me.z) * Math.cos(me.face)) / d : 1, sc = d + (s.low ? 1.2 : 0) - fc * 0.9; if (sc < nd) { nd = sc; near = s; } }      /* the one you face wins over one passing behind you */      /* a wandering beggar never takes the prompt off somebody you came to see */
   if (near !== W.near) { W.near = near; const p = $('prompt'); if (near) { p.textContent = near.label; p.style.display = 'block'; } else p.style.display = 'none'; }
   if (busy) $('prompt').style.display = 'none'; else if (W.near) $('prompt').style.display = 'block';
   goalStep(me);

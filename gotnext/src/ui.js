@@ -56,7 +56,7 @@ function padHint() {
   else if (W) t = (W.kind === 'crib' || W.kind === 'room') && !W.visit ? 'Ⓨ BUILD' : '';      /* the controls strip (#keys) shows the rest with real buttons; two bars overlapped */
   else if ($('title').style.display === 'flex') t = 'Ⓐ SELECT · D-PAD MOVE';
   if (el._t !== t) { el._t = t; el.innerHTML = t; } el.style.display = t ? 'block' : 'none';
-  document.body.classList.toggle('phint', !!t && !!UI.cur);      /* the menu keeps its bottom buttons clear of this bar */
+  const top = !!t && !!UI.cur; if (el._top !== top) { el._top = top; el.style.bottom = '26px'; el.style.top = 'auto'; el.style.left = top ? 'auto' : '10px'; el.style.right = top ? '10px' : 'auto'; }      /* in a menu it sits bottom-right, clear of RUN IT / RUN IT BACK (bottom-left) and of the title */
 }
 function uiStep(dt) {
   UI.stepN = (UI.stepN || 0) + 1;
@@ -74,6 +74,7 @@ function uiStep(dt) {
   if (I.aP && UI.cur && performance.now() - (UI.openT || 0) < (UI.lockMs || 450)) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results) */
   if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') { if (e.dataset.padkb && I_PAD()) e.dispatchEvent(new CustomEvent('padkb', { bubbles: true })); else e.focus(); } else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
   if (I.back && UI.cur) { uiBack(); I.back = false; }
+  else if (I.start && UI.cur && $('panel').querySelector('.kbdone')) { $('panel').querySelector('.kbdone').click(); I.start = false; }      /* typing a name: START is done */
   else if (I.start && UI.cur && UI.cur.startCloses && (UI.stepN || 0) - (UI.openN || 0) > 6) { uiBack(); I.start = false; }      /* START opened it, START closes it (on a pad only B did) */
 }
 
@@ -179,7 +180,7 @@ function uiBuilder(opts) {
     h += `<div class="cat">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}" data-padkb="1">`;
     if (T.kb) {      // a controller has no keys: letters on the screen, picked with the stick and A
       const add = c => () => { if ((T.name || '').length < 12) T.name = (T.name || '') + c; sfx('ui'); rerender(); };
-      h += `<div class="card padkb" style="display:flex;flex-wrap:wrap;gap:4px">` + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => Btn(c, add(c), 'sm alt')).join('') + Btn('SPACE', add(' '), 'sm alt') + Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt') + Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt') + Btn('DONE ✓', () => { T.kb = false; rerender(); }, 'sm') + `</div>`; }
+      h += `<div class="card padkb" style="display:flex;flex-wrap:wrap;gap:4px">` + Btn('DONE ✓ (START)', () => { T.kb = false; rerender(); }, 'sm kbdone') + Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt') + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => Btn(c, add(c), 'sm alt')).join('') + Btn('SPACE', add(' '), 'sm alt') + ((T.name || '').trim() ? '' : Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt')) + `</div>`; }      /* DONE and DELETE first (easy to reach), RANDOM only while the name is empty (it overwrote a typed one) */
     h += `<div class="cat">PLAYSTYLE <span class="mu" style="text-transform:none;letter-spacing:.02em">— sets what you can become</span></div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === T.build.style ? 'sel' : ''}" data-k="${on(() => { T.build.style = s.id; sfx('ui'); rig(); rerender(); })}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">ORIGIN <span class="mu" style="text-transform:none;letter-spacing:.02em">— where 2145 America grew you</span></div><div class="grid">` + ORIGINS.map(o => `<div class="card ${o.id === T.build.origin ? 'sel' : ''}" data-k="${on(() => { T.build.origin = o.id; sfx('ui'); rerender(); })}"><h3>${o.n}</h3><p>${o.d}</p><p class="buff">${o.perk}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. You can wear three; more at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
@@ -421,8 +422,8 @@ function uiBum(n) {
       let extra = '';
       if (!S.owned.includes('hd_crown') && Math.random() < 0.22) { S.owned.push('hd_crown'); extra = ' He hands you a CARDBOARD CROWN.'; toast('NEW DRIP: Cardboard Crown', 'EPIC · +1 Passing', 'ach'); sfx('unlock'); }
       save(); checkAch(); uiDialog(n.name, pick(BUM_THANKS) + extra, [['+3 Respect. Worth it.', null]]);
-    }, '', S.vc < amt],
-    ['Nah', () => uiDialog(n.name, pick(BUM_NO), [['...', null]]), 'alt'],
+    }, 'alt', S.vc < amt],
+    ['Nah', () => uiDialog(n.name, pick(BUM_NO), [['...', null]])],
   ]);
 }
 function uiRack() {

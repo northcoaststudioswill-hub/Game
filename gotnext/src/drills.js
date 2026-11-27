@@ -215,6 +215,7 @@ function drillEnd(res, back) {
 
 // ---------- the drills board ----------
 function uiDrills(back, tab0) {
+  if (back === 'hub' && !S.coachMet) { S.coachMet = 1; save(); }      /* you found him: the first-day goal moves on */
   daily(); let tab = tab0 || 'drills';
   openPanel(() => {
     const ev = todayEvent();

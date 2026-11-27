@@ -209,7 +209,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 <div id="keys"></div>
 <div id="hud">
   <div id="bars"><div class="bar" id="stam"><i></i><span>STAMINA</span></div><div class="bar" id="brav"><i></i><span>BRAVADO</span></div></div>
-  <div id="sb"><div class="lbl" id="n0">YOU</div><div class="t0" id="s0">0</div><div id="clock">14</div><div class="t1" id="s1">0</div><div class="lbl" id="n1">THEM</div></div>
+  <div id="sb"><div class="lbl" id="n0">YOU</div><div class="t0" id="s0">0</div><div id="clock">14</div><div id="clockL" style="position:absolute;left:50%;transform:translateX(-50%);bottom:-11px;font:700 8px var(--m);letter-spacing:.12em;color:#b9b3a8">SHOT CLOCK</div><div class="t1" id="s1">0</div><div class="lbl" id="n1">THEM</div></div>
   <div id="modeTag"></div><div id="clear">TAKE IT BACK ↓ PAST THE ARC</div><div id="rackHud"></div>
   <div id="hl"><i class="lb t"></i><i class="lb b"></i><div class="hb"><small>CAGE MAG · HIGHLIGHT</small><b></b><span class="who"></span></div><div class="fit"></div><div class="clip">● CLIPPED FOR THE COVER</div><i class="fl"></i></div><div id="call"><b></b><small></small></div><div id="fb"></div>
   <div id="mstam"><i></i></div><div id="meter"><div id="meterZone"></div><div id="meterFill"></div></div><div id="flts"></div>
@@ -3875,7 +3875,7 @@ function animPlayer(p, dt) {
     const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.man || p.guard || (guest ? near() : null));      /* your matchup from the opening check, not whoever you happen to be near */ p.ptr.visible = !!tg && dist(tg, p) > 0.5;
     if (p.ptr.visible) { p.ptr.position.y = 0.03 - p.y; p.ptr.rotation.y = Math.atan2(tg.x - p.x, tg.z - p.z) - R.root.rotation.y; p.ptr.children[0].material.opacity = 0.6 + 0.3 * Math.sin(M_.time * 6); } }
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
-  if (p.arrow) { p.arrow.position.y = p.H + 0.36 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }
+  if (p.arrow) { p.arrow.visible = !M_.hl; p.arrow.position.y = p.H + 0.36 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }      /* hidden in a highlight: zoomed in it was a giant white triangle */
   if (p.tag) p.tag.position.set(p.x, 0.04, p.z + 0.62);      /* just in front of the feet, toward the camera */
   // ring colours: your matchup glows when you are on defence
   if (!p._puRing) { const marked = !p.user && M_.me && M_.me.def && (M_.me.man || M_.me.guard) === p && M_.phase === 'live'; p.ring.material.color.setHex(p.teamCol); p.ring.scale.setScalar(marked ? 1.2 + 0.08 * Math.sin(M_.time * 6) : 1); }      /* your matchup's ring pulses */
@@ -4737,7 +4737,7 @@ function goalStep(me) {
   const g = $('goal'); if (!g) return; let G = null;
   if (W.kind === 'hub' && !W.visit && !MT) {
     const drilled = Object.values(S.drills || {}).some(d => (d.medal || 0) >= 1), games = (S.life && S.life.games) || 0;
-    if (!drilled && games < 3) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
+    if (!drilled && !S.coachMet && games < 3) G = { t: 'Talk to Coach Overtime', s: 'by the DRILLS board · drills pay you to learn', x: -3.4, z: 4.0 };
     else if (games < 1) G = { t: 'Call next at THE CAGES', s: 'walk up to a court gate and press ' + (I.hasPad && I.padAt >= (window.__kbAt || 0) ? 'A' : 'E'), x: 0, z: -10.3 };
   }
   if (!G) { if (g.style.display !== 'none') g.style.display = 'none'; return; }
@@ -4752,7 +4752,7 @@ function worldStep(dt) {
   if (me.emote && (Math.hypot(mx, my) > 0.3 || building)) me.emote = null;
   if (me.sit && (Math.hypot(mx, my) > 0.3 || building)) { me.sit = null; me.x += Math.sin(me.face) * 0.9; me.z += Math.cos(me.face) * 0.9; }
   if (W.cursor && !building) W.cursor.visible = false; if (W.hoverBox && !building) { scene.remove(W.hoverBox); W.hoverBox = null; }
-  if (!busy) W.yaw -= (I.rx * 2.4 + mx * (I.analog ? 0.9 : 0.45) * Math.min(1, Math.abs(my) + 0.4)) * dt;      /* on keys A/D mostly strafe; the camera follows less */
+  if (!busy) W.yaw -= (I.rx * 2.4 + mx * (I.analog ? 0.4 : 0.45) * Math.min(1, Math.abs(my) + 0.4)) * dt;      /* on keys A/D mostly strafe; the camera follows less */
   // camera looks along (sin yaw, cos yaw)
   const fx = Math.sin(W.yaw), fz = Math.cos(W.yaw), rx = -fz, rz = fx;
   // speed off the court: keys walk (Shift runs). A stick or thumb sets it by how far you push: a walk up to about 80%,
@@ -4800,7 +4800,7 @@ function worldStep(dt) {
   ambientStep(dt, camera, me); homeAnimStep(dt);
   if (W.flag) { const pa = W.flag.geometry.attributes.position; for (let i = 0; i < pa.count; i++) pa.setZ(i, Math.sin(pa.getX(i) * 1.2 + W.t * 3) * 0.25 * (pa.getX(i) / 3 + 1)); pa.needsUpdate = true; }
   // nearest interactable
-  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d < s.r && d + (s.low ? 1.2 : 0) < nd) { nd = d + (s.low ? 1.2 : 0); near = s; } }      /* a wandering beggar never takes the prompt off somebody you came to see */
+  let near = null, nd = 99; for (const s of W.spots) { const d = Math.hypot(s.x - me.x, s.z - me.z); if (d >= s.r) continue; const fc = d > 0.2 ? ((s.x - me.x) * Math.sin(me.face) + (s.z - me.z) * Math.cos(me.face)) / d : 1, sc = d + (s.low ? 1.2 : 0) - fc * 0.9; if (sc < nd) { nd = sc; near = s; } }      /* the one you face wins over one passing behind you */      /* a wandering beggar never takes the prompt off somebody you came to see */
   if (near !== W.near) { W.near = near; const p = $('prompt'); if (near) { p.textContent = near.label; p.style.display = 'block'; } else p.style.display = 'none'; }
   if (busy) $('prompt').style.display = 'none'; else if (W.near) $('prompt').style.display = 'block';
   goalStep(me);
@@ -6392,7 +6392,7 @@ function padHint() {
   else if (W) t = (W.kind === 'crib' || W.kind === 'room') && !W.visit ? 'Ⓨ BUILD' : '';      /* the controls strip (#keys) shows the rest with real buttons; two bars overlapped */
   else if ($('title').style.display === 'flex') t = 'Ⓐ SELECT · D-PAD MOVE';
   if (el._t !== t) { el._t = t; el.innerHTML = t; } el.style.display = t ? 'block' : 'none';
-  document.body.classList.toggle('phint', !!t && !!UI.cur);      /* the menu keeps its bottom buttons clear of this bar */
+  const top = !!t && !!UI.cur; if (el._top !== top) { el._top = top; el.style.bottom = '26px'; el.style.top = 'auto'; el.style.left = top ? 'auto' : '10px'; el.style.right = top ? '10px' : 'auto'; }      /* in a menu it sits bottom-right, clear of RUN IT / RUN IT BACK (bottom-left) and of the title */
 }
 function uiStep(dt) {
   UI.stepN = (UI.stepN || 0) + 1;
@@ -6410,6 +6410,7 @@ function uiStep(dt) {
   if (I.aP && UI.cur && performance.now() - (UI.openT || 0) < (UI.lockMs || 450)) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results) */
   if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') { if (e.dataset.padkb && I_PAD()) e.dispatchEvent(new CustomEvent('padkb', { bubbles: true })); else e.focus(); } else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
   if (I.back && UI.cur) { uiBack(); I.back = false; }
+  else if (I.start && UI.cur && $('panel').querySelector('.kbdone')) { $('panel').querySelector('.kbdone').click(); I.start = false; }      /* typing a name: START is done */
   else if (I.start && UI.cur && UI.cur.startCloses && (UI.stepN || 0) - (UI.openN || 0) > 6) { uiBack(); I.start = false; }      /* START opened it, START closes it (on a pad only B did) */
 }
 
@@ -6515,7 +6516,7 @@ function uiBuilder(opts) {
     h += `<div class="cat">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}" data-padkb="1">`;
     if (T.kb) {      // a controller has no keys: letters on the screen, picked with the stick and A
       const add = c => () => { if ((T.name || '').length < 12) T.name = (T.name || '') + c; sfx('ui'); rerender(); };
-      h += `<div class="card padkb" style="display:flex;flex-wrap:wrap;gap:4px">` + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => Btn(c, add(c), 'sm alt')).join('') + Btn('SPACE', add(' '), 'sm alt') + Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt') + Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt') + Btn('DONE ✓', () => { T.kb = false; rerender(); }, 'sm') + `</div>`; }
+      h += `<div class="card padkb" style="display:flex;flex-wrap:wrap;gap:4px">` + Btn('DONE ✓ (START)', () => { T.kb = false; rerender(); }, 'sm kbdone') + Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt') + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => Btn(c, add(c), 'sm alt')).join('') + Btn('SPACE', add(' '), 'sm alt') + ((T.name || '').trim() ? '' : Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt')) + `</div>`; }      /* DONE and DELETE first (easy to reach), RANDOM only while the name is empty (it overwrote a typed one) */
     h += `<div class="cat">PLAYSTYLE <span class="mu" style="text-transform:none;letter-spacing:.02em">— sets what you can become</span></div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === T.build.style ? 'sel' : ''}" data-k="${on(() => { T.build.style = s.id; sfx('ui'); rig(); rerender(); })}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">ORIGIN <span class="mu" style="text-transform:none;letter-spacing:.02em">— where 2145 America grew you</span></div><div class="grid">` + ORIGINS.map(o => `<div class="card ${o.id === T.build.origin ? 'sel' : ''}" data-k="${on(() => { T.build.origin = o.id; sfx('ui'); rerender(); })}"><h3>${o.n}</h3><p>${o.d}</p><p class="buff">${o.perk}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. You can wear three; more at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
@@ -6757,8 +6758,8 @@ function uiBum(n) {
       let extra = '';
       if (!S.owned.includes('hd_crown') && Math.random() < 0.22) { S.owned.push('hd_crown'); extra = ' He hands you a CARDBOARD CROWN.'; toast('NEW DRIP: Cardboard Crown', 'EPIC · +1 Passing', 'ach'); sfx('unlock'); }
       save(); checkAch(); uiDialog(n.name, pick(BUM_THANKS) + extra, [['+3 Respect. Worth it.', null]]);
-    }, '', S.vc < amt],
-    ['Nah', () => uiDialog(n.name, pick(BUM_NO), [['...', null]]), 'alt'],
+    }, 'alt', S.vc < amt],
+    ['Nah', () => uiDialog(n.name, pick(BUM_NO), [['...', null]])],
   ]);
 }
 function uiRack() {
@@ -7350,6 +7351,7 @@ function drillEnd(res, back) {
 
 // ---------- the drills board ----------
 function uiDrills(back, tab0) {
+  if (back === 'hub' && !S.coachMet) { S.coachMet = 1; save(); }      /* you found him: the first-day goal moves on */
   daily(); let tab = tab0 || 'drills';
   openPanel(() => {
     const ev = todayEvent();

@@ -1492,7 +1492,7 @@ function animPlayer(p, dt) {
     const tg = (guest ? M_.off !== p.team : p.def) && M_.phase === 'live' && (p.man || p.guard || (guest ? near() : null));      /* your matchup from the opening check, not whoever you happen to be near */ p.ptr.visible = !!tg && dist(tg, p) > 0.5;
     if (p.ptr.visible) { p.ptr.position.y = 0.03 - p.y; p.ptr.rotation.y = Math.atan2(tg.x - p.x, tg.z - p.z) - R.root.rotation.y; p.ptr.children[0].material.opacity = 0.6 + 0.3 * Math.sin(M_.time * 6); } }
   R.capeSwing = lerp(R.capeSwing || 0, spN * 0.9 + (p.y > 0.2 ? 0.5 : 0), 0.1);
-  if (p.arrow) { p.arrow.position.y = p.H + 0.36 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }
+  if (p.arrow) { p.arrow.visible = !M_.hl; p.arrow.position.y = p.H + 0.36 + Math.sin(M_.time * 5) * 0.04; p.arrow.rotation.y += dt * 3; }      /* hidden in a highlight: zoomed in it was a giant white triangle */
   if (p.tag) p.tag.position.set(p.x, 0.04, p.z + 0.62);      /* just in front of the feet, toward the camera */
   // ring colours: your matchup glows when you are on defence
   if (!p._puRing) { const marked = !p.user && M_.me && M_.me.def && (M_.me.man || M_.me.guard) === p && M_.phase === 'live'; p.ring.material.color.setHex(p.teamCol); p.ring.scale.setScalar(marked ? 1.2 + 0.08 * Math.sin(M_.time * 6) : 1); }      /* your matchup's ring pulses */
