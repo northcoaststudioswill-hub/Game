@@ -165,7 +165,7 @@ FF.twins = () => ({ flat: 1,
 // after the Keep: the last thing she asks of him
 FF.blade = () => ({
   era: 4, boots: 1, title: 'THE PINNING', sub: 'THE AUDITOR\'S BLADE - HER OWN CHAMPION', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'PIN IT ON HIM',
-  newMove: 'THE BOOTS: HOLD JUMP TO FLY. HE HAS THEM TOO.', fin: { name: 'IRON SKY', l1: 'SHE WANTED TO SEE WHAT I WAS', l2: 'I SHOWED HER MOST OF IT', rgb: '140,220,255', mode: 'sky' },
+  newMove: 'THE BOOTS: HOLD JUMP TO FLY. HE HAS THEM TOO.', fin: { name: 'ELEVEN', /* the full bar is ELEVEN everywhere it is prompted (was IRON SKY) */  l1: 'SHE WANTED TO SEE WHAT I WAS', l2: 'I SHOWED HER MOST OF IT', rgb: '140,220,255', mode: 'sky' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50, cape: CLOAK }, taunt: { 0: ['YOU WERE NOT RAISED TO THIS.', 'I CAN SMELL THE EFFORT.', 'WHO TAUGHT YOU THAT?'] },
   foes: [{ id: 'voss', name: 'The Auditor\'s Blade', kind: 'duelist', hp: 150, sc: 1.22, k2: { slam: 1 } }],
   voice: { at: [[1, 'I PUT HER SON ON HIS KNEES. SHE SMILED, AND SENT HER OWN CHAMPION DOWN THE STEPS. ONE MORE, SHE SAID. FOR MY CURIOSITY.'], [13, 'HE HAS KILLED FOR HER FOR THIRTY YEARS. HE DOES IT THE WAY I USED TO CHANGE A SEAL.'], [27, 'SHE IS LEANING FORWARD. I HAVE SEEN THAT LOOK. SHE HAD IT AT THE FURNACE.']],

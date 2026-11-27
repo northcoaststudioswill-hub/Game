@@ -609,12 +609,12 @@ const Prelude = (() => {
     on: false, el: null, g: null, t: 0, done: null, last: '', n: -1, D, LEAD,
     total() { return LEAD + D.reduce((a, b) => a + b, 0); },
     run(done) {
-      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; pats = {};
+      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; this.armed = 0; this.skipT = 0; this.skipShow = 0; pats = {};
       const c = this.el = document.createElement('canvas'); c.id = 'prelude'; c.style.cssText = 'position:fixed;background:#050305;image-rendering:auto';
       document.body.insertBefore(c, $('#ui')); this.g = c.getContext('2d'); this.place();
       /* a press on the picture: turns a page, picks a line. Mapped into the 1600 by 900 page when a page is fitted */
       c.addEventListener('pointerdown', e => { const r = c.getBoundingClientRect(), f = this.fit, px = (e.clientX - r.left) / r.width * c.width, py = (e.clientY - r.top) / r.height * c.height; this.click = f ? { x: (px - f.ox) / f.S, y: (py - f.oy) / f.S } : { x: px, y: py }; this.down = 1; e.preventDefault(); }); const up = () => { this.down = 0; }; c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up); c.addEventListener('pointerleave', up); this.fit = null;
-      try { document.body.classList.remove('ingame', 'fight'); $('#cskip').classList.remove('hidden'); } catch (e) { /* no button */ }
+      try { document.body.classList.remove('ingame', 'fight'); this.isIntro = null; $('#cskip').classList.remove('hidden'); } catch (e) { /* no button */ }
       Sound.music('hum'); Input.consume();
     },
     place() {
@@ -623,9 +623,11 @@ const Prelude = (() => {
       const s = Math.min(dpr, 1920 / Math.max(1, r.w)); this.el.width = Math.max(2, Math.round(r.w * s)); this.el.height = Math.max(2, Math.round(r.h * s)); pats = {};
     },
     tick(dt) {
-      if (!this.on) return; this.place(); this.t += dt;
+      if (!this.on) return; this.place(); this.t += dt; const intro = !(this.pl || this.pg || this.gm); if (intro !== this.isIntro) { this.isIntro = intro; document.body.classList.toggle('prel', intro); }
       if (this.gm) return this.tickLedger(dt); if (this.pg) return this.tickPages(dt);
-      if (this.t > .5 && !(this.pl && this.pl.hold) && (Input.p('A') || Input.p('B') || Input.p('START'))) return this.finish();
+      if (this.pl) { if (this.t > .5 && !this.pl.hold && (Input.p('A') || Input.p('B') || Input.p('START'))) return this.finish(); }
+      /* the intro is skipped only on purpose: a fresh key held for a second, with a bar that fills. The press that started New Game does not count (it has to be let go first) */
+      else { const k = Input.h('A') || Input.h('B') || Input.h('START'); if (!k) this.armed = 1; if (this.armed && (Input.p('A') || Input.p('B') || Input.p('START'))) this.skipShow = 2.5; if (k && this.armed) { this.skipT += dt; this.skipShow = 2.5; if (this.skipT >= 1) return this.finish(); } else { this.skipT = Math.max(0, this.skipT - dt * 2); this.skipShow = Math.max(0, this.skipShow - dt); } }
       if (this.pl) { if (this.pl.count) { const n = Math.min(11, 1 + Math.floor(this.t / Math.max(1, this.pl.secs - 3) * 11)); if (n !== this.pl.n) { this.pl.n = n; Sound.play(n === 11 ? 'pillar' : 'heart'); } } if (this.t >= this.pl.secs) return this.finish(); return this.drawPlate(); }
       const at = this.at(this.t);
       if (at.n !== this.n) { this.n = at.n; if (at.n >= 0) { Sound.play(at.n === 10 ? 'pillar' : 'heart'); if (at.n === 10) Sound.play('slash'); } }
@@ -658,6 +660,15 @@ const Prelude = (() => {
         if (!red) { const fl = Math.max(0, 1 - at.T / .13); if (fl > 0) { g.fillStyle = `rgba(255,248,230,${fl * (at.n === 10 ? 1 : .55)})`; g.fillRect(0, 0, cw, ch); } }
         if (at.n === 10 && at.u > .72) { g.fillStyle = `rgba(255,252,240,${cl((at.u - .72) / .22, 0, 1)})`; g.fillRect(0, 0, cw, ch); }
       }
+      this.drawSkip();
+    },
+    // HOLD TO SKIP, with its bar, in the bottom band: only once a key has been pressed during the intro
+    drawSkip() {
+      if (!(this.skipShow > 0) || this.pl) return; const g = this.g, cw = this.el.width, ch = this.el.height, U = ch / 900, a = cl(this.skipShow / .4, 0, 1);
+      const w = 300 * U, h = 10 * U, x = (cw - w) / 2, y = ch - 14 * U;
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = a; g.font = `700 ${Math.max(11, Math.round(26 * U))}px 'Pixelify Sans', monospace`; g.textBaseline = 'alphabetic'; g.textAlign = 'center';
+      g.fillStyle = '#ffe9b0'; g.fillText('HOLD ' + Input.label('A') + ' TO SKIP', cw / 2, y - 16 * U); g.textAlign = 'left';
+      g.fillStyle = 'rgba(255,233,176,.25)'; g.fillRect(x, y - h, w, h); g.fillStyle = '#e2b84a'; g.fillRect(x, y - h, w * cl(this.skipT, 0, 1), h); g.globalAlpha = 1;
     },
     drawPlate() {
       const g = this.g, cw = this.el.width, ch = this.el.height, red = Settings.d.reduce, P = PLATES[this.pl.name], C = P[1], u = cl(this.t / this.pl.secs, 0, 1), e = red ? .5 : ez(u);
@@ -672,7 +683,7 @@ const Prelude = (() => {
     },
     finish() {
       if (!this.on) return; this.on = false; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; const el = this.el, cb = this.done; this.el = this.g = this.done = null; pats = {};
-      try { $('#cskip').classList.add('hidden'); } catch (e) { /* gone */ }
+      try { $('#cskip').classList.add('hidden'); document.body.classList.remove('prel'); } catch (e) { /* gone */ }
       Fade.a = 1; Fade.dir = 0; Fade.busy = false; Input.consume();
       if (cb) cb(); setTimeout(() => { if (el) el.remove(); }, 120);
     },

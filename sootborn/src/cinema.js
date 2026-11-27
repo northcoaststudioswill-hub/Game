@@ -30,6 +30,7 @@ const Cutscene = {
     el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}${tr === 'years' ? yearCal(t) : assayCal(sub)}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
     el.classList.remove('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   },
+  walkTip(b) { const d = Input.device, mv = d === 'kb' ? 'WASD or the arrows' : d === 'pad' ? 'the stick' : 'the pad'; HUD.toast((b.tip || 'Walk') + ' · ' + mv); HUD.tt = 4.4; },
   hideCard() { const el = $('#card'); el.classList.add('hidden'); el.classList.remove('on'); },
   run(s) {
     const T = (x, y) => ({ x: x * 16 + 8, y: y * 16 + 12 });
@@ -45,8 +46,11 @@ const Cutscene = {
     if (s.face) { const a = this.actor(s.face); if (a) a.dir = s.dir; return false; }
     if (s.kneel) { for (const a of this.actors) if (s.kneel === 'all' ? !a.sheet.glow && !(s.but || []).includes(a.id) : [].concat(s.kneel).includes(a.id)) a.kneel = s.v === undefined ? 1 : s.v; return false; }
     if (s.emote) { const a = this.actor(s.emote); if (a) { a.emote = { t: s.t || '!', life: s.life || 1.5 }; a.hop = 0.3; Sound.play(s.t === 'heart' ? 'coin' : 'blip'); } return false; }
+    /* a beat the player walks: the actor goes where the keys say until he reaches the mark (after a while he walks there himself) */
+    if (s.walk) { const a = this.actor(s.walk), p = T(s.to[0], s.to[1]); if (!a) return false; a.tx = undefined; this.block = { type: 'walk', a, p, r: s.r || 12, t: 0, tip: s.tip, box: s.box ? { x0: s.box[0] * 16, y0: s.box[1] * 16, x1: s.box[2] * 16 + 16, y1: s.box[3] * 16 + 16 } : null, auto: s.auto || 14 }; this.walkTip(this.block); HUD.dirty = true; return true; }
     if (s.move) { const a = this.actor(s.move), p = T(s.to[0], s.to[1]); a.tx = p.x; a.ty = p.y; a.spd = s.spd || 30; if (s.wait) { this.block = { type: 'move', a }; return true; } return false; }
-    if (s.say || s.narr || s.choice) {
+    if (s.say || s.narr || s.choice) { this.helpN = (this.helpN || 0) + 1;   /* the first lines of the game say how to move them on */
+      try { $('#dlg').dataset.hint = this.helpN <= 8 && !s.choice ? Input.label('A') + ': NEXT   ' + Input.label('START') + ': SKIP SCENE' : ''; } catch (e) { /* no box */ }
       const st = s.choice ? [{ choice: s.choice }] : s.narr ? [narr(s.narr)] : [say(s.say, s.t)];
       this.block = { type: 'dlg' }; Dialogue.start(st, () => { if (this.active) this.next(); }); return true;
     }
@@ -95,6 +99,12 @@ const Cutscene = {
     if (b.type === 'card') { b.t += dt; if ((b.t > b.min && (Input.p('A') || this.tapped)) || b.t > b.max) { this.tapped = false; this.next(); } this.tapped = false; }
     else if (b.type === 'wait') { b.t -= dt; if (b.t <= 0) this.next(); }
     else if (b.type === 'move') { if (b.a.tx === undefined) this.next(); }
+    else if (b.type === 'walk') { const a = b.a; b.t += dt; if (b.t > 4.5 && Math.floor((b.t - dt) / 4.5) !== Math.floor(b.t / 4.5)) this.walkTip(b);
+      let vx = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), vy = (Input.h('down') ? 1 : 0) - (Input.h('up') ? 1 : 0); if (vx && vy) { vx *= .7071; vy *= .7071; }
+      if (b.t > b.auto && a.tx === undefined) { a.tx = b.p.x; a.ty = b.p.y; a.spd = 30; }
+      if ((vx || vy) && a.tx === undefined) { a.x += vx * 46 * dt; a.y += vy * 46 * dt; if (b.box) { a.x = clamp(a.x, b.box.x0, b.box.x1); a.y = clamp(a.y, b.box.y0, b.box.y1); } a.moving = true; a.anim += dt; a.dir = Math.abs(vx) > Math.abs(vy) ? (vx < 0 ? 2 : 3) : (vy < 0 ? 1 : 0); }
+      else if (a.tx === undefined) a.moving = false;
+      if (Math.hypot(a.x - b.p.x, a.y - b.p.y) < b.r) { a.tx = undefined; a.moving = false; $('#toast').classList.remove('on'); HUD.tt = 0; HUD.dirty = true; this.next(); } }
     if (Input.p('START')) this.skip();
   },
   skip(force) {
@@ -167,7 +177,8 @@ const PROLOGUE_A = [
   { add: [['seren', 12, 9, 1], ['kael', 7, 9, 3], ['c1', 6, 5, 0, 'c1'], ['c2', 18, 6, 2, 'c2'], ['ivo', 16, 11, 2], ['juno', 9, 12, 1]] },
   { fade: 'in' }, { wait: 0.6 },
   { narr: 'Once a year, Cinderwell lights paper lanterns and pretends the Lumen Pillar is the sun. It is the only night anyone stays out past last bell.' },
-  { move: 'kael', to: [11, 9], spd: 26, wait: true },
+  { emote: 'seren', t: '...', life: 3 },
+  { walk: 'kael', to: [11, 9], r: 14, tip: 'Walk over to Seren', box: [5, 6, 18, 12] },
   { emote: 'seren', t: '!' }, { face: 'seren', dir: 2 },
   { say: 'seren', t: "Don't look. It's not finished." },
   { face: 'seren', dir: 1 },
@@ -197,7 +208,8 @@ const PROLOGUE_A = [
   { scene: 'apt', cam: [4, 4], dark: 'rgba(4,3,12,.55)', zoom: 1.8 },
   { add: [['tavi', 1.5, 2.4, 0], ['kael', 3, 3, 2], ['nell', 4.4, 3, 2], ['seren', 5.6, 3.6, 2]] },
   { fade: 'in' }, { wait: 0.8 }, { sfx: 'cough' }, { wait: 0.9 }, { sfx: 'cough' },
-  { emote: 'tavi', t: '...' },
+  { emote: 'tavi', t: '...', life: 3 },
+  { walk: 'kael', to: [2.3, 2.8], r: 9, tip: 'Go to Tavi', box: [1, 2, 6, 4] },
   { say: 'tavi', t: '...Kael? Is it morning? It feels like breathing through a sock.' },
   { say: 'kael', t: "Not morning yet, Tav. Sleep. That's an order from your favorite person." },
   { say: 'tavi', t: "Seren's my favorite person." },
@@ -234,7 +246,7 @@ const PROLOGUE_A = [
   { say: 'kael', t: "And if he sees both of us?" },
   { say: 'seren', t: "Then we're newlyweds looking for somewhere private. Try to look embarrassed. Shouldn't be hard." },
   { fade: 'out' },
-  { card: 'Bay Three · Second bell', sub: 'Cross the bay to the audit relay on the far (east) wall and hold the work button (E, or Ⓐ on a pad) to cut it. Then reach Valve Bank Seven on the north wall. A marker points the way. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
+  { card: 'Bay Three · Second bell', get sub() { const d = Input.device, a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return `Stay out of the lamplight. Cut the relay (east wall, hold ${a}), then reach Bank Seven. Follow the marker.`; }, min: 1, max: 4 }
 ];
 
 // ================= PROLOGUE B: the audit, the sentence, the furnace =================

@@ -426,6 +426,30 @@ const HOTN = { fire: 'THE FIRE', wood: 'WOODPILE', pump: 'PUMP HOUSE', vstd: 'VI
   kwash: 'WASH-HOUSE', kdoor5: 'K-5', kdoorM: "K-9 · MARA'S", kdoor11: 'K-11', kdoor13: 'K-13 · SEALED', ksuns: 'THE LEDGE', kwall: "MARA'S WALL", ktap: 'RATION TAP', kbarrel: 'BARRELS', kpost: 'THE POST', khop: 'THE SQUARES', ktub: 'WASH TUB', kbench: 'THE BENCH' };
 
 /* ---------- places you walk in depth: flat figures, a camp round you. They add to the story and change none of it. ---------- */
+/* A way out that asks first. While somebody or something here has not been gone to yet, a marker that ends the walk asks
+   "Leave?" with the names still waiting, and Stay is the first answer (a held E does not walk him out by accident).
+   Also: nothing here can be picked out, and no marker label shows, while the place's title card is still up. */
+function walkGuard(d) {
+  const w = d && d.walk; if (!w) return d;
+  const keyOf = n => n.key || n.id, waiting = k => { const seen = {}, out = [];
+    for (const n of (w.npcs || []).concat(w.spots || [])) { if (!n.talk || !n.name || n.exit) continue; const id = keyOf(n); if (seen[id]) continue; seen[id] = 1; if (!k.said[id]) out.push(n.name); }
+    return out; };
+  for (const s of w.spots || []) {
+    const r0 = s.reach || 30; Object.defineProperty(s, 'reach', { configurable: true, enumerable: true, get: () => (d.title && Brawl.active && Brawl.def && Brawl.def.walk === w && Brawl.t < 3.2 ? -1 : r0)   /* -1, not 0: a reach of 0 would fall back to the default */, set: v => { /* fixed */ } });
+    if (!s.exit || w.guard === false) continue;
+    const ex = s.exit, tk = s.talk, isOut = k => (typeof ex === 'function' ? ex(k) : ex);
+    s.exit = k => k._ask === s ? false : isOut(k);
+    s.talk = k => { k._ask = null; const left = isOut(k) ? waiting(k) : [];
+      if (!left.length) return tk(k);
+      k._ask = s; const id = keyOf(s); if (!k.said[id]) { k.said[id] = 1; k._unsay = id; }
+      const names = left.length > 3 ? left.slice(0, 2).join(', ') + ' AND ' + (left.length - 2) + ' MORE' : left.join(', ');
+      return [{ s: 'narr', t: 'LEAVE NOW? NOT SEEN YET: ' + names + '.' }, { choice: [
+        { t: 'Not yet. Stay a while.' },
+        { t: 'Leave now (' + String(s.verb || 'go').toLowerCase() + ').', fx: () => { k._ask = null; Dialogue.stack.push({ a: tk(k) || [], i: 0 }); Dialogue.onEnd = () => Brawl.end(true); } }] }]; };
+  }
+  const t0 = w.tick; w.tick = function (k, dt, B) { if (k._unsay) { delete k.said[k._unsay]; k._unsay = null; } if (k._ask && k.near !== k._ask) k._ask = null; return t0 ? t0.call(this, k, dt, B) : null; };
+  return d;
+}
 function walkCircle(atFire) {
   const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
   return { era: 3, d2: 1, title: 'THE CIRCLE', sub: 'THE ASSAY. NIGHT TWENTY-EIGHT', bg: 'storm', arena: { kind: 'ring', rx: 190, ry: 72 }, music: 'mystery', hero: { id: 'kael2', hp: 9, pow: 2, blade: 0, fury0: 0 },
@@ -670,7 +694,7 @@ function walkRing(n) {
       kneel(0), narr('They got up. Nobody had looked at anybody. Everybody knew exactly who had done what.')]
     : null;
   return { era: 5, d2: 1, title: 'THE FOURTH RING', sub, bg: 'keep', bg2: 'ring4', arena: { kind: 'rect', w: 448, h: 60 }, music: 'spire', hero: { id: 'kaelc', hp: 10, pow: 1, blade: 0, fury0: 0 },
-    walk: { id: 'ring' + n, spawn: [-206, 6], keep: () => false, props, npcs, spots,
+    walk: { id: 'ring' + n, spawn: [-206, 6], keep: () => false, props, npcs, spots, guard: n !== 3,
       open: () => n === 1 ? [narr('Up here nobody looks at anybody. I had to learn that before I learned anything else.'), narr('The fourth ring, at night. Eleven doors, a lamp between each, and a line painted on the floor that I am not supposed to see.')]
         : n === 2 ? [narr('The fourth ring. A year of it. I can walk it now without counting the doors.'), narr('That is the danger. The ones they catch are never caught in their first month.')]
         : [narr('The fourth ring was colder that season. Nobody had said anything. That was how I knew.')],
@@ -732,7 +756,7 @@ function walkServiceStair() {
   const N = (id, x, y, name, talk, o) => Object.assign({ id, x, y, name, talk }, o || {}); let turn = 0, heard = 0;
   const wall = ['plain', 'lamp', 'plain', 'plain', 'door', 'lamp', 'valve', 'valve', 'plain', 'lamp', 'arch', 'plain', 'lamp', 'plain', 'plain'], W0 = 7;
   return { era: 5, d2: 1, title: 'THE SERVICE STAIR', sub: 'THE SUN SPIRE. THE PAINTED LINE', bg: 'keep', bg2: 'sstair', arena: { kind: 'rect', w: 300, h: 60 }, music: 'mystery', hero: { id: 'kaelc', hp: 10, pow: 1, blade: 0, fury0: 0 },
-    walk: { id: 'sstair', spawn: [-138, 6], keep: () => false,
+    walk: { id: 'sstair', spawn: [-44, 26], keep: () => false,   /* he starts just over the line, by the wheel; the door back is behind him, past the woman with plates */
       props: wall.map((v, j) => ({ t: 'swall', v, x: (j - W0) * 40, y: -40, k: j, turn: () => turn })),
       open: () => [narr('Behind the kitchens there is a door no clerk uses, and behind the door a line painted across the floor. I had looked at it every morning for a season.'), narr('That night I stepped over it.')],
       obj: k => heard ? 'GO BACK OVER THE LINE BEFORE YOU ARE MISSED.' : k.n ? 'THEY ARE WORKING. SO COULD YOU.' : 'THE SERVICE SIDE. NOBODY HERE IS LOOKING AT THE FLOOR.',
@@ -820,13 +844,20 @@ function walkBarge() {
 }
 // ---- three weeks before the furnace: Seren, alone in Bay Three after last bell, tracing the line under Bank Seven. Played as her; told from outside
 function walkSerenLine() {
-  let step = 0; const need = (n, lines, other) => () => { if (step < n) return other; if (step === n) step = n + 1; return lines; };
+  let step = 0, drawn = -1; const OBJ = ['BANK SEVEN IS TELLING HER SOMETHING. PUT A HAND ON IT.', 'FOLLOW THE LINE UNDER THE GRATING.', 'OLD ORIN IS STILL HERE. ASK HIM.', 'BACK TO THE TEE.'];
+  /* each marker says plainly when it is not the one yet, and which one is; the one that is ready has a ring of lamplight on the floor */
+  const notYet = () => ({ s: 'narr', t: 'NOT YET. FIRST: ' + OBJ[Math.min(3, step)] });
+  const need = (n, lines, other) => () => { if (step < n) return other.concat([notYet()]); if (step === n) step = n + 1; return lines; };
+  const AT = [[-30, -34], [-68, -8], [30, 14], [-100, 22]], verb = (n, v) => () => step >= n ? v : 'LOOK';
   return { era: 0, title: 'BAY THREE', sub: 'THREE WEEKS BEFORE THE FURNACE. AFTER LAST BELL', bg: 'furnace', arena: { kind: 'rect', w: 230, h: 84 }, music: 'hum', hero: { id: 'seren', hp: 6, pow: 1, blade: 0, fury0: 0 },
-    walk: { id: 'serenline', spawn: [-86, 22], keep: () => false,
+    walk: { id: 'serenline', spawn: [-86, 22], keep: () => false, guard: false,
       props: [{ t: 'kboard', x: 58, y: -44, own: () => 1, k: 1 }, { t: 'vbank', x: -30, y: -46, n: 7, k: 1 }, { t: 'vbank', x: -96, y: -46, n: 6, k: 2 }, ...[-150, 0, 120].map((x, i) => ({ t: 'lamp', x, y: -52, k: i }))],
       floor(g) { const X = x => 256 + x, Y = y => 256 + y; g.fillStyle = 'rgba(20,12,10,.55)'; g.fillRect(X(-78), Y(-14), 22, 14); g.strokeStyle = 'rgba(160,150,140,.7)'; g.lineWidth = 1; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(X(-78) + i * 4 + .5, Y(-14)); g.lineTo(X(-78) + i * 4 + .5, Y(0)); g.stroke(); } g.strokeRect(X(-78) + .5, Y(-14) + .5, 22, 14);
         g.fillStyle = 'rgba(40,24,18,.5)'; g.fillRect(X(-34), Y(-40), 5, 30); g.fillRect(X(-66), Y(-12), 36, 5); g.fillRect(X(-100), Y(-2), 5, 24); g.fillRect(X(-100), Y(-2), 26, 5);
-        g.fillStyle = 'rgba(20,12,10,.7)'; g.beginPath(); g.arc(X(-98), Y(24), 6, 0, 6.3); g.fill(); g.strokeStyle = 'rgba(170,60,40,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(X(-98), Y(24), 4, 0, 6.3); g.stroke(); },
+        g.fillStyle = 'rgba(20,12,10,.7)'; g.beginPath(); g.arc(X(-98), Y(24), 6, 0, 6.3); g.fill(); g.strokeStyle = 'rgba(170,60,40,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(X(-98), Y(24), 4, 0, 6.3); g.stroke();
+        { const a = AT[Math.min(3, step)], cx = X(a[0]), cy = Y(a[1] + (step === 0 || step === 2 ? 8 : 0)); const gr = g.createRadialGradient(cx, cy, 2, cx, cy, 26); gr.addColorStop(0, 'rgba(255,200,110,.75)'); gr.addColorStop(1, 'rgba(255,170,80,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(cx, cy, 26, 13, 0, 0, 6.3); g.fill();
+          g.strokeStyle = '#ffe08a'; g.lineWidth = 3; g.beginPath(); g.ellipse(cx, cy, 15, 7.5, 0, 0, 6.3); g.stroke(); g.lineWidth = 2; g.strokeStyle = 'rgba(255,224,138,.6)'; g.beginPath(); g.ellipse(cx, cy, 20, 10, 0, 0, 6.3); g.stroke(); } },
+      tick(k, dt, B) { const n = Math.min(3, step); if (n !== drawn) { drawn = n; if (B._wtex) { delete B.tex[B._wtex]; delete B.pat[B._wtex]; } } return null; },
       open: () => [narr('Last bell is an hour gone and the bay is hers. She has told Kael she is checking a gauge. It is nearly true.')],
       obj: () => ['BANK SEVEN IS TELLING HER SOMETHING. PUT A HAND ON IT.', 'FOLLOW THE LINE UNDER THE GRATING.', 'OLD ORIN IS STILL HERE. ASK HIM.', 'BACK TO THE TEE.'][Math.min(3, step)],
       npcs: [{ id: 'orin', x: 30, y: 14, name: 'OLD ORIN', talk: need(2, [
@@ -838,16 +869,16 @@ function walkSerenLine() {
         narr('He does not look at her while he says it. He looks at the board, and the hooks.')],
         [say('orin', 'The pipes are talking tonight. Hm.'), narr('He talks to pipes. She has always thought he was the only one on the tier who listened to the answers.')]) }],
       spots: [
-        { id: 'bank', x: -30, y: -34, r: 8, reach: 26, ph: 50, name: 'BANK SEVEN', verb: 'PUT A HAND ON IT', talk: need(0, [
+        { id: 'bank', x: -30, y: -34, r: 8, reach: 26, ph: 50, name: 'BANK SEVEN', get verb() { return verb(0, 'PUT A HAND ON IT')(); }, talk: need(0, [
           narr('Her palm flat on the pipe, first. Then her ear. It is telling her something it has never told the gauge.'),
           narr('There is more going into this bank than comes out of it at the rack. Not much. A breath in every forty.')],
           [narr('Bank Seven. Four beats, and four beats. It keeps time better than the bell.')]) },
-        { id: 'grate', x: -68, y: -8, r: 6, reach: 22, ph: 6, name: 'THE GRATING', verb: 'TRACE THE LINE', talk: need(1, [
+        { id: 'grate', x: -68, y: -8, r: 6, reach: 22, ph: 6, name: 'THE GRATING', get verb() { return verb(1, 'TRACE THE LINE')(); }, talk: need(1, [
           narr('She follows it with her hand, under the grating, to where the main splits. A blind tee, capped, with a wheel nobody has painted a number on.'),
           narr('Somebody built a way round the meter into Bank Seven when the bank was built. Nobody on Crew Three has ever said so. Everybody on Crew Three walks round this grating.')],
           [narr('A grating like the others. Everybody walks round it. She had never asked herself why.')]) },
         { id: 'board', x: 58, y: -36, r: 9, reach: 26, ph: 62, name: 'THE SEAT BOARD', verb: 'LOOK', talk: () => [narr('Her knife is on its hook. Three hundred and six. His is on the next one along.'), narr('She touches his with one finger, so that it swings, and stops it again.')] },
-        { id: 'tee', x: -100, y: 22, r: 5, reach: 20, ph: 6, name: 'THE CAPPED TEE', verb: 'LEAVE IT SHUT', exit: () => step >= 3, talk: () => step < 3 ? [narr('Not yet. She does not know yet what it is.')] : [
+        { id: 'tee', x: -100, y: 22, r: 5, reach: 20, ph: 6, name: 'THE CAPPED TEE', get verb() { return verb(3, 'LEAVE IT SHUT')(); }, exit: () => step >= 3, talk: () => step < 3 ? [narr('She does not know yet what it is.'), notYet()] : [
           narr('She does not open it. There is nobody in the ward tonight.'),
           narr('But she knows where it is now, and what it costs. And that on the day somebody opens it, there will have to be a name.'),
           fx(() => Sound.play('heart')), say('seren', 'Somebody will have to answer for it. Let it be somebody who knew.'), fx(() => { G.flags.serenLine = 1; })] }] } };
@@ -855,3 +886,9 @@ function walkSerenLine() {
 FF.barge = walkBarge; FF.serenline = walkSerenLine;
 FF.ring = walkRing; FF.ring1 = () => walkRing(1); FF.ring2 = () => walkRing(2); FF.ring3 = () => walkRing(3);
 FF.campday = walkCampDay; FF.lastbell = walkLastBell;
+/* every walk place asks before it lets him out early (see walkGuard). Reassigned here so that direct calls (part2, story, rowk) get it too */
+{ const G0 = f => function () { return walkGuard(f.apply(this, arguments)); };
+  walkCircle = G0(walkCircle); walkSquare = G0(walkSquare); walkRowMorning = G0(walkRowMorning); walkWard = G0(walkWard); walkCampDay = G0(walkCampDay); walkLastBell = G0(walkLastBell);
+  walkRing = G0(walkRing); walkCampNight = G0(walkCampNight); walkServiceStair = G0(walkServiceStair); walkBarge = G0(walkBarge); walkSerenLine = G0(walkSerenLine);
+  FF.circle = walkCircle; FF.square = walkSquare; FF.rowmorn = walkRowMorning; FF.ward = walkWard; FF.campnight = walkCampNight; FF.sstair = walkServiceStair; FF.barge = walkBarge; FF.serenline = walkSerenLine;
+  FF.ring = walkRing; FF.ring1 = () => walkRing(1); FF.ring2 = () => walkRing(2); FF.ring3 = () => walkRing(3); FF.campday = walkCampDay; FF.lastbell = walkLastBell; }

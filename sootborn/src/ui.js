@@ -1,10 +1,13 @@
 // ============================================================
 // ui/ — HUD, modal menus (touch + keyboard + controller), title, intro, day end
 // ============================================================
+/* mission text is written with the touch letters (A to work, B to throw); say the key or button for the device in use */
+function keyWords(t) { const d = Input.device; if (!t || d === 'touch') return t; const a = d === 'kb' ? 'E' : 'Ⓐ', b = d === 'kb' ? 'X' : 'Ⓑ';
+  return String(t).replace(/(^|· )B: /g, '$1' + b + ': ').replace(/\b([Hh])old A\b/g, '$1old ' + a); }
 const HUD = {
   dirty: true, tt: 0,
   objective() {
-    if (G.heist === 3) return Mission.obj();
+    if (G.heist === 3) return keyWords(Mission.obj());
     if (G.heist === 2) return D2OBJ();
     if (G.heist) return G.flags.relayCut ? 'Reach Valve Bank 7 (north wall) unseen' : 'Cut the audit relay (east wall) unseen';
     if (F('day1Done')) return D2OBJ();
@@ -21,7 +24,7 @@ const HUD = {
   hint() {
     const d = Input.device;
     if (G.mode !== 'world' || Dialogue.active || Puzzle.active || Brawl.active || UI.stack.length) return '';
-    if (G.heist === 3) return Mission.def.hint || '';
+    if (G.heist === 3) return keyWords(Mission.def.hint || '');
     if (G.heist) { const b = d === 'touch' ? 'B' : d === 'pad' ? 'Ⓑ' : 'X', a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return document.body.classList.contains('portrait') ? `${b}: bolt · hold ${a}: work` : `${b}: throw a bolt · hold ${a} to work · watch the lamps turn`; }
     if (P.moved < 40 && !F('talkedTavi')) return d === 'touch' ? 'Drag the pad to move' : d === 'pad' ? 'Left stick or D-pad to move' : 'WASD or arrow keys to move';
     if (World.target && !F('interacted')) return d === 'touch' ? 'Tap A to interact' : d === 'pad' ? 'Press Ⓐ to interact' : 'Press E or Enter to interact';
@@ -37,12 +40,14 @@ const HUD = {
     s.textContent = G.heist === 3 ? (Mission.def.where || 'The Assay · four years after the furnace') : G.heist === 1 ? `Four days before · ${G.scrip} scrip` : `${whenS(G.day).replace(' the furnace', '')} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
-    document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
+    document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine) || (Cutscene.active && !!Cutscene.block && Cutscene.block.type === 'walk')); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
     document.body.classList.toggle('inpuzzle', Puzzle.active);
     document.body.classList.toggle('inpanel', Cutscene.active && !!Cutscene.panel);
-    if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on'); }
+    if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on', 'big'); }
   },
-  toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); this.tt = 2.4; }
+  toast(t) { const e = $('#toast'); e.textContent = t; e.classList.remove('big'); e.classList.add('on'); this.tt = 2.4; },
+  // a first-time instruction, big and in the middle of the screen
+  big(t, secs) { this.toast(t); $('#toast').classList.add('big'); this.tt = secs || 3.4; }
 };
 
 // ---------- modal stack

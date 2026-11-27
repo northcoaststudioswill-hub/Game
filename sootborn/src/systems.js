@@ -60,7 +60,7 @@ const Dialogue = {
     }
     this.end();
   },
-  end() { this.active = false; $('#dlg').classList.add('hidden'); Input.consume(); const cb = this.onEnd; this.onEnd = null; HUD.dirty = true; cb && cb(); },
+  end() { this.active = false; $('#dlg').classList.add('hidden'); $('#dlg').dataset.hint = ''; Input.consume(); const cb = this.onEnd; this.onEnd = null; HUD.dirty = true; cb && cb(); },
   speaker(id) { if (id === 'you') id = 'kael'; if (id === 'narr') return null; const c = CAST[id]; return { name: id === 'kael' ? 'Kael' : c.name, bust: World.bustFor(id), acc: !!c.look().accredited }; },
   showLine(st) {
     const sp = this.speaker(st.s), box = $('#dlg'), cv = box.querySelector('canvas');
@@ -363,7 +363,10 @@ const World = {
     if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 3) { const s = Mission.respawn(); P.x = s.x; P.y = s.y; P.dir = s.dir; } else if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 6 * 16 + 4; P.dir = 2; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
     this.dynLights = this.npcs.filter(n => n.patrol).map(n => { const a = n.ang === undefined ? DIRA[n.dir] : n.ang; return { x: n.x + Math.cos(a) * 14, y: n.y - 6 + Math.sin(a) * 14, r: 46, c: '#ffd070' }; });
     let seen = 0, by = null; if (this.grace > 0) this.grace -= dt;
+    /* the first lamp: one plain instruction, the first time a guard comes near, and again the first time one sees him */
+    if (G.heist === 1 && !this.lampTip) for (const n of this.npcs) if (n.patrol && Math.hypot(P.x - n.x, P.y - n.y) < 92) { this.lampTip = 1; HUD.big('STAY OUT OF THE LAMPLIGHT'); break; }
     for (const n of this.npcs) if (n.patrol && !(this.grace > 0) && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
+    if (seen && G.heist === 1 && !this.seenTip) { this.seenTip = 1; this.lampTip = 1; HUD.big('HE SEES YOU: GET OUT OF HIS LIGHT', 2.6); }
     if (seen) { this.alert = Math.min(1, (this.alert || 0) + seen * (G.flags.heistEase ? .6 : 1) * dt); this.alertPeak = Math.max(this.alertPeak || 0, this.alert); this.seenBy = by; this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = 0.32; } }
     else if (this.alert > 0) { this.alert = Math.max(0, this.alert - dt * 0.9); if (this.alert === 0) { if (this.alertPeak > 0.4) { G.flags.closeCalls = (G.flags.closeCalls | 0) + 1; HUD.toast(G.heist === 1 ? ['Seren: "Close. Too close."', 'Seren: "Breathe. He didn\'t see."', 'Seren: "Stop showing off."'][G.flags.closeCalls % 3] : G.heist === 3 ? ['Close.', 'Breathe. He did not see.', 'Too close.'][G.flags.closeCalls % 3] : ['Ivo: "I felt that from here."', 'Tavi: "...Kael!"', 'Close call'][G.flags.closeCalls % 3]); Sound.play('back'); } this.alertPeak = 0; this.seenBy = null; } }
     for (const n of this.npcs) if (n === by && this.alert >= 1) {

@@ -22,6 +22,7 @@ body.g3on #game{background:transparent}
 #hint span{background:rgba(20,12,16,.85);padding:4px 10px;border-radius:12px;border:1px solid #5e3a2c}
 #toast{left:50%;transform:translateX(-50%);top:calc(var(--cy) + 40px);background:#2a1a14;border:2px solid var(--amber);padding:6px 12px;border-radius:4px;font-size:calc(12px*var(--ts));opacity:0;white-space:nowrap}
 #toast.on{opacity:1}
+#toast.big{top:calc(var(--cy) + var(--ch)*.3);font-family:'Pixelify Sans',monospace;font-size:calc(17px*var(--ts));padding:8px 16px;color:#ffe9b0;letter-spacing:.1em}
 .hidden{display:none!important}
 /* dialogue */
 #dlg{position:absolute;pointer-events:auto;background:rgba(18,11,14,.95);border:2px solid var(--rust);box-shadow:0 0 0 2px var(--ink),0 6px 18px rgba(0,0,0,.5);padding:10px 12px;border-radius:4px;display:flex;gap:10px;
@@ -66,8 +67,9 @@ textarea{height:110px;font-size:12px}
 .logo{font-family:'Pixelify Sans',monospace;font-weight:700;font-size:clamp(34px,8vw,64px);letter-spacing:.06em;color:var(--amber);text-shadow:0 3px 0 #6a2a14,0 0 24px rgba(255,140,60,.45);margin:0;text-align:center;line-height:1}
 .sub{font-size:calc(12px*var(--ts));opacity:.75;letter-spacing:.3em;text-transform:uppercase;margin:8px 0 14px;text-align:center}
 #title .menu{width:min(300px,86vw)}
-.press{font-family:'Pixelify Sans',monospace;font-size:18px;animation:blink 1.2s steps(2) infinite;margin-top:24px}
+.press{font-family:'Pixelify Sans',monospace;font-size:clamp(18px,3.4vw,26px);letter-spacing:.08em;color:#ffe9b0;text-shadow:0 0 14px rgba(255,170,80,.55),0 2px 0 #3a1a0c;animation:pulse 1.8s ease-in-out infinite;margin-top:24px}
 @keyframes blink{50%{opacity:.25}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.62;transform:scale(.97)}}
 .cine{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:auto;text-align:center;padding:24px}
 .cine p{max-width:560px;font-size:calc(16px*var(--ts));line-height:1.6;transition:opacity .8s;margin:0}
 .skip{position:absolute;left:calc(var(--sal) + 12px);top:calc(var(--sat) + 12px);min-height:44px;padding:6px 14px;background:rgba(36,23,26,.8);border:2px solid #3a2620;color:var(--cream);font:inherit;border-radius:4px}
@@ -146,10 +148,14 @@ table.ctl{width:100%;border-collapse:collapse;margin:8px 0;font-size:.92em}table
 #card .bigt{font-family:'Pixelify Sans',monospace;font-weight:700;font-size:clamp(24px,min(11vw,19vh),104px);letter-spacing:.1em;max-width:94vw;text-align:center;line-height:1.02;overflow-wrap:break-word;text-wrap:balance;padding-left:.1em;box-sizing:border-box;color:var(--amber);text-shadow:0 4px 0 #5a1a08,0 0 40px rgba(255,120,40,.5)}
 #card .acal{display:flex;gap:0;margin-top:26px;width:min(92vw,520px);max-width:92vw}#card .acal span{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;flex:1 1 0;text-align:center;overflow-wrap:anywhere;font-size:min(calc(9px*var(--ts)),2.5vw);letter-spacing:.08em;color:#6a5a50;border-top:2px solid #3a2a24;padding-top:0}#card .acal i{width:8px;height:8px;margin-top:-5px;background:#3a2a24;border-radius:50%}#card .acal .on{color:var(--amber)}#card .acal .on i{background:var(--amber);box-shadow:0 0 10px rgba(255,150,60,.9)}
 #card .bigs{margin-top:10px;font-size:calc(13px*var(--ts));letter-spacing:.25em;text-transform:uppercase;opacity:.75}
-#cskip{position:absolute;right:calc(var(--sar) + 10px);bottom:calc(var(--sab) + 10px);min-height:44px;padding:6px 14px;background:rgba(36,23,26,.85);border:2px solid #3a2620;color:var(--cream);font:inherit;border-radius:4px;pointer-events:auto;z-index:5}
+/* top right, clear of the dialogue box and the caption strip along the bottom; in the animated intro it sits in the bottom band instead (the tally is up top) */
+#cskip{position:absolute;right:calc(var(--sar) + 6px);top:calc(var(--sat) + 4px);min-height:26px;opacity:.8;padding:2px 10px;background:rgba(36,23,26,.85);border:2px solid #3a2620;color:var(--cream);font:inherit;font-size:12px;border-radius:4px;pointer-events:auto;z-index:5}
+body.touch #cskip{min-height:40px;padding:6px 14px}
 #devback{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--sat, 0px) + 4px);min-height:30px;padding:3px 12px;background:rgba(36,23,26,.72);border:1px solid #6a4a2a;color:var(--cream);font:inherit;font-size:12px;border-radius:4px;pointer-events:auto;z-index:8;opacity:.75}
 #devback:hover,#devback:focus{opacity:1;border-color:#e8c25a}
 #dbg{position:absolute;left:4px;bottom:4px;font-size:10px;background:rgba(0,0,0,.7);padding:4px;white-space:pre;pointer-events:none;z-index:9}
+#dlg[data-hint]:not([data-hint=""])::after{content:attr(data-hint);position:absolute;right:8px;top:-17px;font-family:'Pixelify Sans',monospace;font-size:11px;letter-spacing:.06em;color:var(--amber);background:rgba(18,11,14,.92);padding:1px 6px;border-radius:2px;white-space:pre}
+body.prel #cskip{top:auto;bottom:calc(var(--sab) + 4px);min-height:32px;padding:3px 10px}
 @media (prefers-reduced-motion:reduce){.press,#dlg .more{animation:none}}
 
 /* art pass: panels framed like engraved brass plates */
@@ -161,9 +167,9 @@ table.ctl{width:100%;border-collapse:collapse;margin:8px 0;font-size:.92em}table
 .panel h2::before{content:'\25C6\00a0';color:var(--gold);font-size:.7em;vertical-align:middle}
 #dlg canvas{border:2px solid var(--gold);box-shadow:0 0 0 1px #0c0808}
 #obj{border:1px solid var(--goldD);border-left:3px solid var(--gold);background:rgba(22,14,16,.9)}
-#obj{font-size:1.2em;line-height:1.3;padding:5px 10px}
-@media (max-height:520px){#obj{font-size:1em;line-height:1.25;padding:4px 8px}}
-body.portrait #obj{font-size:1em;line-height:1.25;padding:4px 8px}
+#obj{font-size:1.3em;line-height:1.3;padding:5px 10px}
+@media (max-height:520px){#obj{font-size:1.1em;line-height:1.25;padding:3px 8px;max-width:calc(var(--cw)*.6)}}
+body.portrait #obj{font-size:1.1em;line-height:1.25;padding:4px 8px}
 #stat{border:1px solid var(--goldD);background:rgba(22,14,16,.9)}
 #toast{border:2px solid var(--gold);box-shadow:0 0 0 1px #0c0808,0 0 0 3px var(--goldD);background:#1e1512;border-radius:2px;letter-spacing:.06em}
 .mi{border:1px solid #4a3626;border-left:3px solid #4a3626;background:linear-gradient(#281a1c,#201417);border-radius:2px}
@@ -1685,7 +1691,7 @@ const Dialogue = {
     }
     this.end();
   },
-  end() { this.active = false; $('#dlg').classList.add('hidden'); Input.consume(); const cb = this.onEnd; this.onEnd = null; HUD.dirty = true; cb && cb(); },
+  end() { this.active = false; $('#dlg').classList.add('hidden'); $('#dlg').dataset.hint = ''; Input.consume(); const cb = this.onEnd; this.onEnd = null; HUD.dirty = true; cb && cb(); },
   speaker(id) { if (id === 'you') id = 'kael'; if (id === 'narr') return null; const c = CAST[id]; return { name: id === 'kael' ? 'Kael' : c.name, bust: World.bustFor(id), acc: !!c.look().accredited }; },
   showLine(st) {
     const sp = this.speaker(st.s), box = $('#dlg'), cv = box.querySelector('canvas');
@@ -1988,7 +1994,10 @@ const World = {
     if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 3) { const s = Mission.respawn(); P.x = s.x; P.y = s.y; P.dir = s.dir; } else if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 6 * 16 + 4; P.dir = 2; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
     this.dynLights = this.npcs.filter(n => n.patrol).map(n => { const a = n.ang === undefined ? DIRA[n.dir] : n.ang; return { x: n.x + Math.cos(a) * 14, y: n.y - 6 + Math.sin(a) * 14, r: 46, c: '#ffd070' }; });
     let seen = 0, by = null; if (this.grace > 0) this.grace -= dt;
+    /* the first lamp: one plain instruction, the first time a guard comes near, and again the first time one sees him */
+    if (G.heist === 1 && !this.lampTip) for (const n of this.npcs) if (n.patrol && Math.hypot(P.x - n.x, P.y - n.y) < 92) { this.lampTip = 1; HUD.big('STAY OUT OF THE LAMPLIGHT'); break; }
     for (const n of this.npcs) if (n.patrol && !(this.grace > 0) && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
+    if (seen && G.heist === 1 && !this.seenTip) { this.seenTip = 1; this.lampTip = 1; HUD.big('HE SEES YOU: GET OUT OF HIS LIGHT', 2.6); }
     if (seen) { this.alert = Math.min(1, (this.alert || 0) + seen * (G.flags.heistEase ? .6 : 1) * dt); this.alertPeak = Math.max(this.alertPeak || 0, this.alert); this.seenBy = by; this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = 0.32; } }
     else if (this.alert > 0) { this.alert = Math.max(0, this.alert - dt * 0.9); if (this.alert === 0) { if (this.alertPeak > 0.4) { G.flags.closeCalls = (G.flags.closeCalls | 0) + 1; HUD.toast(G.heist === 1 ? ['Seren: "Close. Too close."', 'Seren: "Breathe. He didn\'t see."', 'Seren: "Stop showing off."'][G.flags.closeCalls % 3] : G.heist === 3 ? ['Close.', 'Breathe. He did not see.', 'Too close.'][G.flags.closeCalls % 3] : ['Ivo: "I felt that from here."', 'Tavi: "...Kael!"', 'Close call'][G.flags.closeCalls % 3]); Sound.play('back'); } this.alertPeak = 0; this.seenBy = null; } }
     for (const n of this.npcs) if (n === by && this.alert >= 1) {
@@ -2195,6 +2204,7 @@ const Cutscene = {
     el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}${tr === 'years' ? yearCal(t) : assayCal(sub)}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
     el.classList.remove('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   },
+  walkTip(b) { const d = Input.device, mv = d === 'kb' ? 'WASD or the arrows' : d === 'pad' ? 'the stick' : 'the pad'; HUD.toast((b.tip || 'Walk') + ' · ' + mv); HUD.tt = 4.4; },
   hideCard() { const el = $('#card'); el.classList.add('hidden'); el.classList.remove('on'); },
   run(s) {
     const T = (x, y) => ({ x: x * 16 + 8, y: y * 16 + 12 });
@@ -2210,8 +2220,11 @@ const Cutscene = {
     if (s.face) { const a = this.actor(s.face); if (a) a.dir = s.dir; return false; }
     if (s.kneel) { for (const a of this.actors) if (s.kneel === 'all' ? !a.sheet.glow && !(s.but || []).includes(a.id) : [].concat(s.kneel).includes(a.id)) a.kneel = s.v === undefined ? 1 : s.v; return false; }
     if (s.emote) { const a = this.actor(s.emote); if (a) { a.emote = { t: s.t || '!', life: s.life || 1.5 }; a.hop = 0.3; Sound.play(s.t === 'heart' ? 'coin' : 'blip'); } return false; }
+    /* a beat the player walks: the actor goes where the keys say until he reaches the mark (after a while he walks there himself) */
+    if (s.walk) { const a = this.actor(s.walk), p = T(s.to[0], s.to[1]); if (!a) return false; a.tx = undefined; this.block = { type: 'walk', a, p, r: s.r || 12, t: 0, tip: s.tip, box: s.box ? { x0: s.box[0] * 16, y0: s.box[1] * 16, x1: s.box[2] * 16 + 16, y1: s.box[3] * 16 + 16 } : null, auto: s.auto || 14 }; this.walkTip(this.block); HUD.dirty = true; return true; }
     if (s.move) { const a = this.actor(s.move), p = T(s.to[0], s.to[1]); a.tx = p.x; a.ty = p.y; a.spd = s.spd || 30; if (s.wait) { this.block = { type: 'move', a }; return true; } return false; }
-    if (s.say || s.narr || s.choice) {
+    if (s.say || s.narr || s.choice) { this.helpN = (this.helpN || 0) + 1;   /* the first lines of the game say how to move them on */
+      try { $('#dlg').dataset.hint = this.helpN <= 8 && !s.choice ? Input.label('A') + ': NEXT   ' + Input.label('START') + ': SKIP SCENE' : ''; } catch (e) { /* no box */ }
       const st = s.choice ? [{ choice: s.choice }] : s.narr ? [narr(s.narr)] : [say(s.say, s.t)];
       this.block = { type: 'dlg' }; Dialogue.start(st, () => { if (this.active) this.next(); }); return true;
     }
@@ -2260,6 +2273,12 @@ const Cutscene = {
     if (b.type === 'card') { b.t += dt; if ((b.t > b.min && (Input.p('A') || this.tapped)) || b.t > b.max) { this.tapped = false; this.next(); } this.tapped = false; }
     else if (b.type === 'wait') { b.t -= dt; if (b.t <= 0) this.next(); }
     else if (b.type === 'move') { if (b.a.tx === undefined) this.next(); }
+    else if (b.type === 'walk') { const a = b.a; b.t += dt; if (b.t > 4.5 && Math.floor((b.t - dt) / 4.5) !== Math.floor(b.t / 4.5)) this.walkTip(b);
+      let vx = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), vy = (Input.h('down') ? 1 : 0) - (Input.h('up') ? 1 : 0); if (vx && vy) { vx *= .7071; vy *= .7071; }
+      if (b.t > b.auto && a.tx === undefined) { a.tx = b.p.x; a.ty = b.p.y; a.spd = 30; }
+      if ((vx || vy) && a.tx === undefined) { a.x += vx * 46 * dt; a.y += vy * 46 * dt; if (b.box) { a.x = clamp(a.x, b.box.x0, b.box.x1); a.y = clamp(a.y, b.box.y0, b.box.y1); } a.moving = true; a.anim += dt; a.dir = Math.abs(vx) > Math.abs(vy) ? (vx < 0 ? 2 : 3) : (vy < 0 ? 1 : 0); }
+      else if (a.tx === undefined) a.moving = false;
+      if (Math.hypot(a.x - b.p.x, a.y - b.p.y) < b.r) { a.tx = undefined; a.moving = false; $('#toast').classList.remove('on'); HUD.tt = 0; HUD.dirty = true; this.next(); } }
     if (Input.p('START')) this.skip();
   },
   skip(force) {
@@ -2332,7 +2351,8 @@ const PROLOGUE_A = [
   { add: [['seren', 12, 9, 1], ['kael', 7, 9, 3], ['c1', 6, 5, 0, 'c1'], ['c2', 18, 6, 2, 'c2'], ['ivo', 16, 11, 2], ['juno', 9, 12, 1]] },
   { fade: 'in' }, { wait: 0.6 },
   { narr: 'Once a year, Cinderwell lights paper lanterns and pretends the Lumen Pillar is the sun. It is the only night anyone stays out past last bell.' },
-  { move: 'kael', to: [11, 9], spd: 26, wait: true },
+  { emote: 'seren', t: '...', life: 3 },
+  { walk: 'kael', to: [11, 9], r: 14, tip: 'Walk over to Seren', box: [5, 6, 18, 12] },
   { emote: 'seren', t: '!' }, { face: 'seren', dir: 2 },
   { say: 'seren', t: "Don't look. It's not finished." },
   { face: 'seren', dir: 1 },
@@ -2362,7 +2382,8 @@ const PROLOGUE_A = [
   { scene: 'apt', cam: [4, 4], dark: 'rgba(4,3,12,.55)', zoom: 1.8 },
   { add: [['tavi', 1.5, 2.4, 0], ['kael', 3, 3, 2], ['nell', 4.4, 3, 2], ['seren', 5.6, 3.6, 2]] },
   { fade: 'in' }, { wait: 0.8 }, { sfx: 'cough' }, { wait: 0.9 }, { sfx: 'cough' },
-  { emote: 'tavi', t: '...' },
+  { emote: 'tavi', t: '...', life: 3 },
+  { walk: 'kael', to: [2.3, 2.8], r: 9, tip: 'Go to Tavi', box: [1, 2, 6, 4] },
   { say: 'tavi', t: '...Kael? Is it morning? It feels like breathing through a sock.' },
   { say: 'kael', t: "Not morning yet, Tav. Sleep. That's an order from your favorite person." },
   { say: 'tavi', t: "Seren's my favorite person." },
@@ -2399,7 +2420,7 @@ const PROLOGUE_A = [
   { say: 'kael', t: "And if he sees both of us?" },
   { say: 'seren', t: "Then we're newlyweds looking for somewhere private. Try to look embarrassed. Shouldn't be hard." },
   { fade: 'out' },
-  { card: 'Bay Three · Second bell', sub: 'Cross the bay to the audit relay on the far (east) wall and hold the work button (E, or Ⓐ on a pad) to cut it. Then reach Valve Bank Seven on the north wall. A marker points the way. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
+  { card: 'Bay Three · Second bell', get sub() { const d = Input.device, a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return `Stay out of the lamplight. Cut the relay (east wall, hold ${a}), then reach Bank Seven. Follow the marker.`; }, min: 1, max: 4 }
 ];
 
 // ================= PROLOGUE B: the audit, the sentence, the furnace =================
@@ -5590,7 +5611,7 @@ FF.twins = () => ({ flat: 1,
 // after the Keep: the last thing she asks of him
 FF.blade = () => ({
   era: 4, boots: 1, title: 'THE PINNING', sub: 'THE AUDITOR\'S BLADE - HER OWN CHAMPION', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'PIN IT ON HIM',
-  newMove: 'THE BOOTS: HOLD JUMP TO FLY. HE HAS THEM TOO.', fin: { name: 'IRON SKY', l1: 'SHE WANTED TO SEE WHAT I WAS', l2: 'I SHOWED HER MOST OF IT', rgb: '140,220,255', mode: 'sky' },
+  newMove: 'THE BOOTS: HOLD JUMP TO FLY. HE HAS THEM TOO.', fin: { name: 'ELEVEN', /* the full bar is ELEVEN everywhere it is prompted (was IRON SKY) */  l1: 'SHE WANTED TO SEE WHAT I WAS', l2: 'I SHOWED HER MOST OF IT', rgb: '140,220,255', mode: 'sky' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50, cape: CLOAK }, taunt: { 0: ['YOU WERE NOT RAISED TO THIS.', 'I CAN SMELL THE EFFORT.', 'WHO TAUGHT YOU THAT?'] },
   foes: [{ id: 'voss', name: 'The Auditor\'s Blade', kind: 'duelist', hp: 150, sc: 1.22, k2: { slam: 1 } }],
   voice: { at: [[1, 'I PUT HER SON ON HIS KNEES. SHE SMILED, AND SENT HER OWN CHAMPION DOWN THE STEPS. ONE MORE, SHE SAID. FOR MY CURIOSITY.'], [13, 'HE HAS KILLED FOR HER FOR THIRTY YEARS. HE DOES IT THE WAY I USED TO CHANGE A SEAL.'], [27, 'SHE IS LEANING FORWARD. I HAVE SEEN THAT LOOK. SHE HAD IT AT THE FURNACE.']],
@@ -6984,6 +7005,30 @@ const HOTN = { fire: 'THE FIRE', wood: 'WOODPILE', pump: 'PUMP HOUSE', vstd: 'VI
   kwash: 'WASH-HOUSE', kdoor5: 'K-5', kdoorM: "K-9 · MARA'S", kdoor11: 'K-11', kdoor13: 'K-13 · SEALED', ksuns: 'THE LEDGE', kwall: "MARA'S WALL", ktap: 'RATION TAP', kbarrel: 'BARRELS', kpost: 'THE POST', khop: 'THE SQUARES', ktub: 'WASH TUB', kbench: 'THE BENCH' };
 
 /* ---------- places you walk in depth: flat figures, a camp round you. They add to the story and change none of it. ---------- */
+/* A way out that asks first. While somebody or something here has not been gone to yet, a marker that ends the walk asks
+   "Leave?" with the names still waiting, and Stay is the first answer (a held E does not walk him out by accident).
+   Also: nothing here can be picked out, and no marker label shows, while the place's title card is still up. */
+function walkGuard(d) {
+  const w = d && d.walk; if (!w) return d;
+  const keyOf = n => n.key || n.id, waiting = k => { const seen = {}, out = [];
+    for (const n of (w.npcs || []).concat(w.spots || [])) { if (!n.talk || !n.name || n.exit) continue; const id = keyOf(n); if (seen[id]) continue; seen[id] = 1; if (!k.said[id]) out.push(n.name); }
+    return out; };
+  for (const s of w.spots || []) {
+    const r0 = s.reach || 30; Object.defineProperty(s, 'reach', { configurable: true, enumerable: true, get: () => (d.title && Brawl.active && Brawl.def && Brawl.def.walk === w && Brawl.t < 3.2 ? -1 : r0)   /* -1, not 0: a reach of 0 would fall back to the default */, set: v => { /* fixed */ } });
+    if (!s.exit || w.guard === false) continue;
+    const ex = s.exit, tk = s.talk, isOut = k => (typeof ex === 'function' ? ex(k) : ex);
+    s.exit = k => k._ask === s ? false : isOut(k);
+    s.talk = k => { k._ask = null; const left = isOut(k) ? waiting(k) : [];
+      if (!left.length) return tk(k);
+      k._ask = s; const id = keyOf(s); if (!k.said[id]) { k.said[id] = 1; k._unsay = id; }
+      const names = left.length > 3 ? left.slice(0, 2).join(', ') + ' AND ' + (left.length - 2) + ' MORE' : left.join(', ');
+      return [{ s: 'narr', t: 'LEAVE NOW? NOT SEEN YET: ' + names + '.' }, { choice: [
+        { t: 'Not yet. Stay a while.' },
+        { t: 'Leave now (' + String(s.verb || 'go').toLowerCase() + ').', fx: () => { k._ask = null; Dialogue.stack.push({ a: tk(k) || [], i: 0 }); Dialogue.onEnd = () => Brawl.end(true); } }] }]; };
+  }
+  const t0 = w.tick; w.tick = function (k, dt, B) { if (k._unsay) { delete k.said[k._unsay]; k._unsay = null; } if (k._ask && k.near !== k._ask) k._ask = null; return t0 ? t0.call(this, k, dt, B) : null; };
+  return d;
+}
 function walkCircle(atFire) {
   const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
   return { era: 3, d2: 1, title: 'THE CIRCLE', sub: 'THE ASSAY. NIGHT TWENTY-EIGHT', bg: 'storm', arena: { kind: 'ring', rx: 190, ry: 72 }, music: 'mystery', hero: { id: 'kael2', hp: 9, pow: 2, blade: 0, fury0: 0 },
@@ -7228,7 +7273,7 @@ function walkRing(n) {
       kneel(0), narr('They got up. Nobody had looked at anybody. Everybody knew exactly who had done what.')]
     : null;
   return { era: 5, d2: 1, title: 'THE FOURTH RING', sub, bg: 'keep', bg2: 'ring4', arena: { kind: 'rect', w: 448, h: 60 }, music: 'spire', hero: { id: 'kaelc', hp: 10, pow: 1, blade: 0, fury0: 0 },
-    walk: { id: 'ring' + n, spawn: [-206, 6], keep: () => false, props, npcs, spots,
+    walk: { id: 'ring' + n, spawn: [-206, 6], keep: () => false, props, npcs, spots, guard: n !== 3,
       open: () => n === 1 ? [narr('Up here nobody looks at anybody. I had to learn that before I learned anything else.'), narr('The fourth ring, at night. Eleven doors, a lamp between each, and a line painted on the floor that I am not supposed to see.')]
         : n === 2 ? [narr('The fourth ring. A year of it. I can walk it now without counting the doors.'), narr('That is the danger. The ones they catch are never caught in their first month.')]
         : [narr('The fourth ring was colder that season. Nobody had said anything. That was how I knew.')],
@@ -7290,7 +7335,7 @@ function walkServiceStair() {
   const N = (id, x, y, name, talk, o) => Object.assign({ id, x, y, name, talk }, o || {}); let turn = 0, heard = 0;
   const wall = ['plain', 'lamp', 'plain', 'plain', 'door', 'lamp', 'valve', 'valve', 'plain', 'lamp', 'arch', 'plain', 'lamp', 'plain', 'plain'], W0 = 7;
   return { era: 5, d2: 1, title: 'THE SERVICE STAIR', sub: 'THE SUN SPIRE. THE PAINTED LINE', bg: 'keep', bg2: 'sstair', arena: { kind: 'rect', w: 300, h: 60 }, music: 'mystery', hero: { id: 'kaelc', hp: 10, pow: 1, blade: 0, fury0: 0 },
-    walk: { id: 'sstair', spawn: [-138, 6], keep: () => false,
+    walk: { id: 'sstair', spawn: [-44, 26], keep: () => false,   /* he starts just over the line, by the wheel; the door back is behind him, past the woman with plates */
       props: wall.map((v, j) => ({ t: 'swall', v, x: (j - W0) * 40, y: -40, k: j, turn: () => turn })),
       open: () => [narr('Behind the kitchens there is a door no clerk uses, and behind the door a line painted across the floor. I had looked at it every morning for a season.'), narr('That night I stepped over it.')],
       obj: k => heard ? 'GO BACK OVER THE LINE BEFORE YOU ARE MISSED.' : k.n ? 'THEY ARE WORKING. SO COULD YOU.' : 'THE SERVICE SIDE. NOBODY HERE IS LOOKING AT THE FLOOR.',
@@ -7378,13 +7423,20 @@ function walkBarge() {
 }
 // ---- three weeks before the furnace: Seren, alone in Bay Three after last bell, tracing the line under Bank Seven. Played as her; told from outside
 function walkSerenLine() {
-  let step = 0; const need = (n, lines, other) => () => { if (step < n) return other; if (step === n) step = n + 1; return lines; };
+  let step = 0, drawn = -1; const OBJ = ['BANK SEVEN IS TELLING HER SOMETHING. PUT A HAND ON IT.', 'FOLLOW THE LINE UNDER THE GRATING.', 'OLD ORIN IS STILL HERE. ASK HIM.', 'BACK TO THE TEE.'];
+  /* each marker says plainly when it is not the one yet, and which one is; the one that is ready has a ring of lamplight on the floor */
+  const notYet = () => ({ s: 'narr', t: 'NOT YET. FIRST: ' + OBJ[Math.min(3, step)] });
+  const need = (n, lines, other) => () => { if (step < n) return other.concat([notYet()]); if (step === n) step = n + 1; return lines; };
+  const AT = [[-30, -34], [-68, -8], [30, 14], [-100, 22]], verb = (n, v) => () => step >= n ? v : 'LOOK';
   return { era: 0, title: 'BAY THREE', sub: 'THREE WEEKS BEFORE THE FURNACE. AFTER LAST BELL', bg: 'furnace', arena: { kind: 'rect', w: 230, h: 84 }, music: 'hum', hero: { id: 'seren', hp: 6, pow: 1, blade: 0, fury0: 0 },
-    walk: { id: 'serenline', spawn: [-86, 22], keep: () => false,
+    walk: { id: 'serenline', spawn: [-86, 22], keep: () => false, guard: false,
       props: [{ t: 'kboard', x: 58, y: -44, own: () => 1, k: 1 }, { t: 'vbank', x: -30, y: -46, n: 7, k: 1 }, { t: 'vbank', x: -96, y: -46, n: 6, k: 2 }, ...[-150, 0, 120].map((x, i) => ({ t: 'lamp', x, y: -52, k: i }))],
       floor(g) { const X = x => 256 + x, Y = y => 256 + y; g.fillStyle = 'rgba(20,12,10,.55)'; g.fillRect(X(-78), Y(-14), 22, 14); g.strokeStyle = 'rgba(160,150,140,.7)'; g.lineWidth = 1; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(X(-78) + i * 4 + .5, Y(-14)); g.lineTo(X(-78) + i * 4 + .5, Y(0)); g.stroke(); } g.strokeRect(X(-78) + .5, Y(-14) + .5, 22, 14);
         g.fillStyle = 'rgba(40,24,18,.5)'; g.fillRect(X(-34), Y(-40), 5, 30); g.fillRect(X(-66), Y(-12), 36, 5); g.fillRect(X(-100), Y(-2), 5, 24); g.fillRect(X(-100), Y(-2), 26, 5);
-        g.fillStyle = 'rgba(20,12,10,.7)'; g.beginPath(); g.arc(X(-98), Y(24), 6, 0, 6.3); g.fill(); g.strokeStyle = 'rgba(170,60,40,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(X(-98), Y(24), 4, 0, 6.3); g.stroke(); },
+        g.fillStyle = 'rgba(20,12,10,.7)'; g.beginPath(); g.arc(X(-98), Y(24), 6, 0, 6.3); g.fill(); g.strokeStyle = 'rgba(170,60,40,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(X(-98), Y(24), 4, 0, 6.3); g.stroke();
+        { const a = AT[Math.min(3, step)], cx = X(a[0]), cy = Y(a[1] + (step === 0 || step === 2 ? 8 : 0)); const gr = g.createRadialGradient(cx, cy, 2, cx, cy, 26); gr.addColorStop(0, 'rgba(255,200,110,.75)'); gr.addColorStop(1, 'rgba(255,170,80,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(cx, cy, 26, 13, 0, 0, 6.3); g.fill();
+          g.strokeStyle = '#ffe08a'; g.lineWidth = 3; g.beginPath(); g.ellipse(cx, cy, 15, 7.5, 0, 0, 6.3); g.stroke(); g.lineWidth = 2; g.strokeStyle = 'rgba(255,224,138,.6)'; g.beginPath(); g.ellipse(cx, cy, 20, 10, 0, 0, 6.3); g.stroke(); } },
+      tick(k, dt, B) { const n = Math.min(3, step); if (n !== drawn) { drawn = n; if (B._wtex) { delete B.tex[B._wtex]; delete B.pat[B._wtex]; } } return null; },
       open: () => [narr('Last bell is an hour gone and the bay is hers. She has told Kael she is checking a gauge. It is nearly true.')],
       obj: () => ['BANK SEVEN IS TELLING HER SOMETHING. PUT A HAND ON IT.', 'FOLLOW THE LINE UNDER THE GRATING.', 'OLD ORIN IS STILL HERE. ASK HIM.', 'BACK TO THE TEE.'][Math.min(3, step)],
       npcs: [{ id: 'orin', x: 30, y: 14, name: 'OLD ORIN', talk: need(2, [
@@ -7396,16 +7448,16 @@ function walkSerenLine() {
         narr('He does not look at her while he says it. He looks at the board, and the hooks.')],
         [say('orin', 'The pipes are talking tonight. Hm.'), narr('He talks to pipes. She has always thought he was the only one on the tier who listened to the answers.')]) }],
       spots: [
-        { id: 'bank', x: -30, y: -34, r: 8, reach: 26, ph: 50, name: 'BANK SEVEN', verb: 'PUT A HAND ON IT', talk: need(0, [
+        { id: 'bank', x: -30, y: -34, r: 8, reach: 26, ph: 50, name: 'BANK SEVEN', get verb() { return verb(0, 'PUT A HAND ON IT')(); }, talk: need(0, [
           narr('Her palm flat on the pipe, first. Then her ear. It is telling her something it has never told the gauge.'),
           narr('There is more going into this bank than comes out of it at the rack. Not much. A breath in every forty.')],
           [narr('Bank Seven. Four beats, and four beats. It keeps time better than the bell.')]) },
-        { id: 'grate', x: -68, y: -8, r: 6, reach: 22, ph: 6, name: 'THE GRATING', verb: 'TRACE THE LINE', talk: need(1, [
+        { id: 'grate', x: -68, y: -8, r: 6, reach: 22, ph: 6, name: 'THE GRATING', get verb() { return verb(1, 'TRACE THE LINE')(); }, talk: need(1, [
           narr('She follows it with her hand, under the grating, to where the main splits. A blind tee, capped, with a wheel nobody has painted a number on.'),
           narr('Somebody built a way round the meter into Bank Seven when the bank was built. Nobody on Crew Three has ever said so. Everybody on Crew Three walks round this grating.')],
           [narr('A grating like the others. Everybody walks round it. She had never asked herself why.')]) },
         { id: 'board', x: 58, y: -36, r: 9, reach: 26, ph: 62, name: 'THE SEAT BOARD', verb: 'LOOK', talk: () => [narr('Her knife is on its hook. Three hundred and six. His is on the next one along.'), narr('She touches his with one finger, so that it swings, and stops it again.')] },
-        { id: 'tee', x: -100, y: 22, r: 5, reach: 20, ph: 6, name: 'THE CAPPED TEE', verb: 'LEAVE IT SHUT', exit: () => step >= 3, talk: () => step < 3 ? [narr('Not yet. She does not know yet what it is.')] : [
+        { id: 'tee', x: -100, y: 22, r: 5, reach: 20, ph: 6, name: 'THE CAPPED TEE', get verb() { return verb(3, 'LEAVE IT SHUT')(); }, exit: () => step >= 3, talk: () => step < 3 ? [narr('She does not know yet what it is.'), notYet()] : [
           narr('She does not open it. There is nobody in the ward tonight.'),
           narr('But she knows where it is now, and what it costs. And that on the day somebody opens it, there will have to be a name.'),
           fx(() => Sound.play('heart')), say('seren', 'Somebody will have to answer for it. Let it be somebody who knew.'), fx(() => { G.flags.serenLine = 1; })] }] } };
@@ -7413,6 +7465,12 @@ function walkSerenLine() {
 FF.barge = walkBarge; FF.serenline = walkSerenLine;
 FF.ring = walkRing; FF.ring1 = () => walkRing(1); FF.ring2 = () => walkRing(2); FF.ring3 = () => walkRing(3);
 FF.campday = walkCampDay; FF.lastbell = walkLastBell;
+/* every walk place asks before it lets him out early (see walkGuard). Reassigned here so that direct calls (part2, story, rowk) get it too */
+{ const G0 = f => function () { return walkGuard(f.apply(this, arguments)); };
+  walkCircle = G0(walkCircle); walkSquare = G0(walkSquare); walkRowMorning = G0(walkRowMorning); walkWard = G0(walkWard); walkCampDay = G0(walkCampDay); walkLastBell = G0(walkLastBell);
+  walkRing = G0(walkRing); walkCampNight = G0(walkCampNight); walkServiceStair = G0(walkServiceStair); walkBarge = G0(walkBarge); walkSerenLine = G0(walkSerenLine);
+  FF.circle = walkCircle; FF.square = walkSquare; FF.rowmorn = walkRowMorning; FF.ward = walkWard; FF.campnight = walkCampNight; FF.sstair = walkServiceStair; FF.barge = walkBarge; FF.serenline = walkSerenLine;
+  FF.ring = walkRing; FF.ring1 = () => walkRing(1); FF.ring2 = () => walkRing(2); FF.ring3 = () => walkRing(3); FF.campday = walkCampDay; FF.lastbell = walkLastBell; }
 
 // ---- src/issue.js
 // ============================================================
@@ -8100,12 +8158,12 @@ const Prelude = (() => {
     on: false, el: null, g: null, t: 0, done: null, last: '', n: -1, D, LEAD,
     total() { return LEAD + D.reduce((a, b) => a + b, 0); },
     run(done) {
-      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; pats = {};
+      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; this.armed = 0; this.skipT = 0; this.skipShow = 0; pats = {};
       const c = this.el = document.createElement('canvas'); c.id = 'prelude'; c.style.cssText = 'position:fixed;background:#050305;image-rendering:auto';
       document.body.insertBefore(c, $('#ui')); this.g = c.getContext('2d'); this.place();
       /* a press on the picture: turns a page, picks a line. Mapped into the 1600 by 900 page when a page is fitted */
       c.addEventListener('pointerdown', e => { const r = c.getBoundingClientRect(), f = this.fit, px = (e.clientX - r.left) / r.width * c.width, py = (e.clientY - r.top) / r.height * c.height; this.click = f ? { x: (px - f.ox) / f.S, y: (py - f.oy) / f.S } : { x: px, y: py }; this.down = 1; e.preventDefault(); }); const up = () => { this.down = 0; }; c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up); c.addEventListener('pointerleave', up); this.fit = null;
-      try { document.body.classList.remove('ingame', 'fight'); $('#cskip').classList.remove('hidden'); } catch (e) { /* no button */ }
+      try { document.body.classList.remove('ingame', 'fight'); this.isIntro = null; $('#cskip').classList.remove('hidden'); } catch (e) { /* no button */ }
       Sound.music('hum'); Input.consume();
     },
     place() {
@@ -8114,9 +8172,11 @@ const Prelude = (() => {
       const s = Math.min(dpr, 1920 / Math.max(1, r.w)); this.el.width = Math.max(2, Math.round(r.w * s)); this.el.height = Math.max(2, Math.round(r.h * s)); pats = {};
     },
     tick(dt) {
-      if (!this.on) return; this.place(); this.t += dt;
+      if (!this.on) return; this.place(); this.t += dt; const intro = !(this.pl || this.pg || this.gm); if (intro !== this.isIntro) { this.isIntro = intro; document.body.classList.toggle('prel', intro); }
       if (this.gm) return this.tickLedger(dt); if (this.pg) return this.tickPages(dt);
-      if (this.t > .5 && !(this.pl && this.pl.hold) && (Input.p('A') || Input.p('B') || Input.p('START'))) return this.finish();
+      if (this.pl) { if (this.t > .5 && !this.pl.hold && (Input.p('A') || Input.p('B') || Input.p('START'))) return this.finish(); }
+      /* the intro is skipped only on purpose: a fresh key held for a second, with a bar that fills. The press that started New Game does not count (it has to be let go first) */
+      else { const k = Input.h('A') || Input.h('B') || Input.h('START'); if (!k) this.armed = 1; if (this.armed && (Input.p('A') || Input.p('B') || Input.p('START'))) this.skipShow = 2.5; if (k && this.armed) { this.skipT += dt; this.skipShow = 2.5; if (this.skipT >= 1) return this.finish(); } else { this.skipT = Math.max(0, this.skipT - dt * 2); this.skipShow = Math.max(0, this.skipShow - dt); } }
       if (this.pl) { if (this.pl.count) { const n = Math.min(11, 1 + Math.floor(this.t / Math.max(1, this.pl.secs - 3) * 11)); if (n !== this.pl.n) { this.pl.n = n; Sound.play(n === 11 ? 'pillar' : 'heart'); } } if (this.t >= this.pl.secs) return this.finish(); return this.drawPlate(); }
       const at = this.at(this.t);
       if (at.n !== this.n) { this.n = at.n; if (at.n >= 0) { Sound.play(at.n === 10 ? 'pillar' : 'heart'); if (at.n === 10) Sound.play('slash'); } }
@@ -8149,6 +8209,15 @@ const Prelude = (() => {
         if (!red) { const fl = Math.max(0, 1 - at.T / .13); if (fl > 0) { g.fillStyle = `rgba(255,248,230,${fl * (at.n === 10 ? 1 : .55)})`; g.fillRect(0, 0, cw, ch); } }
         if (at.n === 10 && at.u > .72) { g.fillStyle = `rgba(255,252,240,${cl((at.u - .72) / .22, 0, 1)})`; g.fillRect(0, 0, cw, ch); }
       }
+      this.drawSkip();
+    },
+    // HOLD TO SKIP, with its bar, in the bottom band: only once a key has been pressed during the intro
+    drawSkip() {
+      if (!(this.skipShow > 0) || this.pl) return; const g = this.g, cw = this.el.width, ch = this.el.height, U = ch / 900, a = cl(this.skipShow / .4, 0, 1);
+      const w = 300 * U, h = 10 * U, x = (cw - w) / 2, y = ch - 14 * U;
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = a; g.font = `700 ${Math.max(11, Math.round(26 * U))}px 'Pixelify Sans', monospace`; g.textBaseline = 'alphabetic'; g.textAlign = 'center';
+      g.fillStyle = '#ffe9b0'; g.fillText('HOLD ' + Input.label('A') + ' TO SKIP', cw / 2, y - 16 * U); g.textAlign = 'left';
+      g.fillStyle = 'rgba(255,233,176,.25)'; g.fillRect(x, y - h, w, h); g.fillStyle = '#e2b84a'; g.fillRect(x, y - h, w * cl(this.skipT, 0, 1), h); g.globalAlpha = 1;
     },
     drawPlate() {
       const g = this.g, cw = this.el.width, ch = this.el.height, red = Settings.d.reduce, P = PLATES[this.pl.name], C = P[1], u = cl(this.t / this.pl.secs, 0, 1), e = red ? .5 : ez(u);
@@ -8163,7 +8232,7 @@ const Prelude = (() => {
     },
     finish() {
       if (!this.on) return; this.on = false; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; const el = this.el, cb = this.done; this.el = this.g = this.done = null; pats = {};
-      try { $('#cskip').classList.add('hidden'); } catch (e) { /* gone */ }
+      try { $('#cskip').classList.add('hidden'); document.body.classList.remove('prel'); } catch (e) { /* gone */ }
       Fade.a = 1; Fade.dir = 0; Fade.busy = false; Input.consume();
       if (cb) cb(); setTimeout(() => { if (el) el.remove(); }, 120);
     },
@@ -8248,10 +8317,13 @@ const CHECKPOINTS = {"day2":{"v":2,"t":0,"name":"Kael","look":0,"tendency":"care
 // ============================================================
 // ui/ — HUD, modal menus (touch + keyboard + controller), title, intro, day end
 // ============================================================
+/* mission text is written with the touch letters (A to work, B to throw); say the key or button for the device in use */
+function keyWords(t) { const d = Input.device; if (!t || d === 'touch') return t; const a = d === 'kb' ? 'E' : 'Ⓐ', b = d === 'kb' ? 'X' : 'Ⓑ';
+  return String(t).replace(/(^|· )B: /g, '$1' + b + ': ').replace(/\b([Hh])old A\b/g, '$1old ' + a); }
 const HUD = {
   dirty: true, tt: 0,
   objective() {
-    if (G.heist === 3) return Mission.obj();
+    if (G.heist === 3) return keyWords(Mission.obj());
     if (G.heist === 2) return D2OBJ();
     if (G.heist) return G.flags.relayCut ? 'Reach Valve Bank 7 (north wall) unseen' : 'Cut the audit relay (east wall) unseen';
     if (F('day1Done')) return D2OBJ();
@@ -8268,7 +8340,7 @@ const HUD = {
   hint() {
     const d = Input.device;
     if (G.mode !== 'world' || Dialogue.active || Puzzle.active || Brawl.active || UI.stack.length) return '';
-    if (G.heist === 3) return Mission.def.hint || '';
+    if (G.heist === 3) return keyWords(Mission.def.hint || '');
     if (G.heist) { const b = d === 'touch' ? 'B' : d === 'pad' ? 'Ⓑ' : 'X', a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return document.body.classList.contains('portrait') ? `${b}: bolt · hold ${a}: work` : `${b}: throw a bolt · hold ${a} to work · watch the lamps turn`; }
     if (P.moved < 40 && !F('talkedTavi')) return d === 'touch' ? 'Drag the pad to move' : d === 'pad' ? 'Left stick or D-pad to move' : 'WASD or arrow keys to move';
     if (World.target && !F('interacted')) return d === 'touch' ? 'Tap A to interact' : d === 'pad' ? 'Press Ⓐ to interact' : 'Press E or Enter to interact';
@@ -8284,12 +8356,14 @@ const HUD = {
     s.textContent = G.heist === 3 ? (Mission.def.where || 'The Assay · four years after the furnace') : G.heist === 1 ? `Four days before · ${G.scrip} scrip` : `${whenS(G.day).replace(' the furnace', '')} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
-    document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
+    document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine) || (Cutscene.active && !!Cutscene.block && Cutscene.block.type === 'walk')); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
     document.body.classList.toggle('inpuzzle', Puzzle.active);
     document.body.classList.toggle('inpanel', Cutscene.active && !!Cutscene.panel);
-    if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on'); }
+    if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on', 'big'); }
   },
-  toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); this.tt = 2.4; }
+  toast(t) { const e = $('#toast'); e.textContent = t; e.classList.remove('big'); e.classList.add('on'); this.tt = 2.4; },
+  // a first-time instruction, big and in the middle of the screen
+  big(t, secs) { this.toast(t); $('#toast').classList.add('big'); this.tt = secs || 3.4; }
 };
 
 // ---------- modal stack
