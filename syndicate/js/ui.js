@@ -123,7 +123,7 @@
     G.scene = 'hub'; W().enter('hub', G.hubPos); ui.topbar();
     if (first) show('<div class="card small letter"><h2>Notice of Debt</h2><p><i>To the bearer, ' + esc(G.state.hero.name) + ':</i></p><p>You owe the Deep Guild a debt, and the only currency we respect is blood on the pit floor.</p>' +
       '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your rank in the Guild. Coin buys gear, and turns the damp cave we have lent you into a home.</p><div class="sigrow"><span class="seal"></span><p class="sig">Signed and sealed, the Ledger-Keeper</p></div>' +
-      '<p class="dim">' + (G.input.usingPad ? 'Walk with the left stick. Press A' : G.input.touch ? 'Drag your thumb to walk, or tap where you want to go. Tap' : 'Walk with WASD, or click where you want to go. Press E') + ' at the Pit gate, the Fence, the Guildmaster or your Hideout door.</p><div class="row end"><button class="big" id="ok">Make my mark</button></div></div>');
+      '<p class="dim">' + (G.input.usingPad ? 'Walk with the left stick. Press A' : G.input.touch ? 'Drag your thumb to walk, or tap where you want to go. Tap' : 'Walk with WASD, or click where you want to go. Press E') + ' at the Pit gate when you are ready: your first fight is waiting there. The rest of the market can wait until you have won it.</p><div class="row end"><button class="big" id="ok">Make my mark</button></div></div>');
     on('#ok', () => ui.close());
     if (!first) ui.afterFight();
   };

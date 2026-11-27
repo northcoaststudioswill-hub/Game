@@ -47,23 +47,28 @@
   let pip = null;
   const placePip = (x, z, fx, fz) => { const hub = W.get('hub'); if (!pip) pip = G.makeChar(pipLook); if (pip.root.parent !== hub.scene) hub.scene.add(pip.root); pip.root.visible = true; pip.root.position.set(x, 0, z); pip.root.rotation.y = Math.atan2(fx - x, fz - z); pip.pose({ t: 1, act: 'idle' }); };
   const STOPS = st => { const me = st.hero.name; return [
-    { npc: [12.6, 4.6], you: [14.2, 5.6], lines: [S('npc', PIP, 'Oi. Fresh meat. Keeper pays me a penny a head to walk the new ones round, so do not get lost before I collect.', 'npc'), S('you', me, 'Where do I start?', 'you'), S('npc', PIP, 'This is the Lamp Market. Everything you need is under that lamp or along these walls. The yellow line at the top of your eye tells you what is worth doing next. Read it. Most do not, and most are dead.', 'low')] },
-    { npc: [6.3, 2.2], you: [4.6, 3.2], lines: [S('npc', PIP, 'The Blood Pit. You do not get a named fighter just for turning up: win your undercard bouts first and the Keeper writes you in against the next name.', 'npc'), S('npc', PIP, 'Lose in there and you are dead. Proper dead. Your purse goes with you. So do not carry what you cannot lose.', 'low'), S('npc', PIP, 'And do not just swing. They block a flurry now and hit you while you are still flapping. Hold your strike for a heavy blow, hold parry to block, sidestep the red marks.', 'npc')] },
-    { npc: [16.9, 3.0], you: [15.4, 3.6], lines: [S('npc', PIP, 'The Fence. Potions, better steel, better armour. Later the Armoury, the Tailor and the Outfitter are through the back, once you have a name.', 'npc'), S('npc', PIP, 'Next door, the Guildmaster keeps your page: your three techniques, your feats, your finishers. Learn more than three moves and you choose which you carry, right there.', 'low')] },
+    { npc: [12.6, 4.6], you: [14.2, 5.6], lines: [S('npc', PIP, 'Oi. Fresh meat. Keeper pays me a penny a head to walk the new ones round, so do not get lost before I collect.', 'npc'), S('you', me, 'Where do I start?', 'you'), S('npc', PIP, 'This is the Lamp Market. Everything you need is under that lamp or along these walls. The yellow line at the top tells you what is worth doing next. Right now it says the pit. Read it. Most do not, and most are dead.', 'low')] },
+    { npc: [6.3, 2.2], you: [4.6, 3.2], lines: [S('npc', PIP, 'The Blood Pit. You do not get a named fighter just for turning up: win your undercard bouts first and the Keeper writes you in against the next name.', 'npc'), S('npc', PIP, 'Lose in there and you are dead. Proper dead. Your purse goes with you. Your first bout is the exception: the Keeper lets a beginner get back up. After that, do not carry what you cannot lose.', 'low'), S('npc', PIP, 'And do not just swing. They block a flurry now and hit you while you are still flapping. Hold your strike for a heavy blow, hold parry to block, sidestep the red marks.', 'npc'), S('npc', PIP, 'Go on, then. Your first fight is waiting. Find me after and I will show you where the coin goes.', 'low')] },
+    { npc: [16.9, 3.0], you: [15.4, 3.6], lines: [S('npc', PIP, 'Not dead. Good start. Now the coin. The Fence: potions, better steel, better armour. Later the Armoury, the Tailor and the Outfitter are through the back, once you have a name.', 'npc')] },
+    { npc: [21.9, 3.0], you: [20.4, 3.6], lines: [S('npc', PIP, 'The Guildmaster keeps your page: your three techniques, your feats, your finishers. Learn more than three moves and you choose which you carry, right here. Level up and come back to him.', 'npc')] },
     { npc: [0.6, 19.0], you: [2.0, 20.3], lines: [S('npc', PIP, 'Your hideout. Guild housing. Looks like nothing. But furniture in there WORKS: a bed gives you more from your next bout, a strongbox keeps coin safe when you die, a dummy sharpens your weapon hand.', 'npc'), S('npc', PIP, 'Tap the Comfort sign inside and it lists what every piece is doing for you.', 'low')] },
     { npc: [12.6, 8.0], you: [14.4, 8.6], lines: [S('npc', PIP, 'Now. See all these shut stalls? They open as you earn RESPECT. Win a bout: the Notice Board and Big Hobb. Make Scrapper: the Low Lamp and the Apothecary. Bloodied: Marc’s table, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper.', 'npc'), S('you', me, 'And until then?', 'you'), S('npc', PIP, 'Until then, fight, and talk to people. The old miner by the lamp, the sergeant, the deep trader. I am usually by the pit gate. That is the tour. Try not to die before Thursday.', 'low')] }
   ]; };
-  function tour(i) { const st = G.state, stops = STOPS(st); if (i >= stops.length) { if (pip) pip.root.visible = false; st.toured = 1; G.save(); ui.toast('Tour over. Pip is by the pit gate if you want it again.'); return; }
-    const sp = stops[i]; if (i === 0 && G.scene === 'hub') { const w = W.walker, live = pip && pip.root.visible, qx = live ? pip.root.position.x - w.x : -0.8, qz = live ? pip.root.position.z - w.z : -0.6, qd = Math.hypot(qx, qz) || 1; sp.you = [w.x, w.z]; sp.npc = [w.x + qx / qd * 2.4, w.z + qz / qd * 2.4]; } placePip(sp.npc[0], sp.npc[1], sp.you[0], sp.you[1]); G.playScene({ place: 'hub', npc: sp.npc, you: sp.you, npcH: 1.24, lines: sp.lines, done: skipped => { if (skipped) { if (pip) pip.root.visible = false; st.toured = 1; G.save(); return; } tour(i + 1); } }); }
+  const HALF = { pre: [0, 1], post: [2, 3, 4, 5], all: [0, 1, 2, 3, 4, 5] };       // before the first fight: the market and the pit; after it: the Fence, the Guildmaster, home and the shut stalls
+  function tour(i, half) { half = half || 'all'; const st = G.state, all = STOPS(st), stops = HALF[half].map(j => all[j]); if (i >= stops.length) { if (pip) pip.root.visible = false; if (half === 'post') { st.toured2 = 1; G.save(); ui.toast('Tour over. Pip is by the pit gate if you want it again.'); } else { st.toured = 1; G.save(); if (half === 'pre') ui.toast('Follow the light to the pit gate.'); else ui.toast('Tour over. Pip is by the pit gate if you want it again.'); } return; }
+    const sp = stops[i]; if (i === 0 && G.scene === 'hub') { const w = W.walker, live = pip && pip.root.visible, qx = live ? pip.root.position.x - w.x : -0.8, qz = live ? pip.root.position.z - w.z : -0.6, qd = Math.hypot(qx, qz) || 1; sp.you = [w.x, w.z]; sp.npc = [w.x + qx / qd * 2.4, w.z + qz / qd * 2.4]; } placePip(sp.npc[0], sp.npc[1], sp.you[0], sp.you[1]); G.playScene({ place: 'hub', npc: sp.npc, you: sp.you, npcH: 1.24, lines: sp.lines, done: skipped => { if (skipped) { if (pip) pip.root.visible = false; if (half === 'post') st.toured2 = 1; else st.toured = 1; G.save(); return; } tour(i + 1, half); } }); }
   G.tour = () => { ui.close(); coming = null; tour(0); };
   // he sees a new face and comes straight over
   let coming = null, lastT = 0;
   const stepPip = t => { const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t; if (!coming || !pip) return; if (G.talk || ui.isOpen() || G.scene !== 'hub' || G.dicing) return;
     const w = W.walker, dx = w.x - pip.root.position.x, dz = w.z - pip.root.position.z, d = Math.hypot(dx, dz);
-    if (!coming.said) { coming.said = 1; ui.toast(coming.fetch ? '“Oi! ' + G.state.hero.name + '! Something has opened!” Pip is running over.' : '“Oi! Fresh meat! Hold up!” Somebody is running over.'); G.sfx('ui'); }
+    if (!coming.said) { coming.said = 1; ui.toast(coming.fetch ? '“Oi! ' + G.state.hero.name + '! Something has opened!” Pip is running over.' : coming.after ? '“Oi! ' + G.state.hero.name + '! Still breathing! Come here!” Pip is running over.' : '“Oi! Fresh meat! Hold up!” Somebody is running over.'); G.sfx('ui'); }
     if (d > 2.3) { const v = 4.2 * dt; pip.root.position.x += dx / d * v; pip.root.position.z += dz / d * v; pip.root.rotation.y = Math.atan2(dx, dz); coming.walk = (coming.walk || 0) + dt * 9; pip.pose({ t, act: 'idle', moving: 1, walk: coming.walk }); }
-    else { const fl = coming.fetch; coming = null; if (fl) usher(fl); else tour(0); } };
+    else { const fl = coming.fetch, after = coming.after; coming = null; if (fl) usher(fl); else tour(0, after ? 'post' : (G.state.tourV === 2 ? 'pre' : 'all')); } };
   G.pipComing = () => !!coming || !!leading;
+  // after the first win Pip comes back for the Fence and the Guildmaster, as soon as nothing else is happening
+  function afterFirst() { const st = G.state; if (!st || !st.hero || st.tourV !== 2 || st.toured2 || bouts(st) < 1 || coming || leading || G.talk || ui.isOpen() || G.scene !== 'hub' || G.dicing) return;
+    const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0, after: 1 }; st.toured2 = -1; G.save(); }
   // ------------------------------------------------------------ when something new opens, Pip comes to fetch you, walks you to it and says what it is for
   const PLACE = [
     [/Notice Board/, 'the Notice Board', 'Paper nailed over paper. Somebody always wants something done in the pit: win without a potion, finish it fast, that sort of thing.', 'Take one contract down, do it in your next bouts, come back for the coin and the respect. One at a time.'],
@@ -99,8 +104,8 @@
   ui.hub = function (first) { const r = hub0.apply(this, arguments), st = G.state; if (!st || !st.hero) return r;
     if (!st.casterKit && !bouts(st) && (st.hero.cls === 'sorcerer' || st.hero.cls === 'warlock')) { st.casterKit = 1; st.potions = Math.max(st.potions || 0, 2); G.save(); }      // casters start with a second potion: their first bouts are the hardest
     { const hub = W.get('hub'), open = openNow(hub); if (!st.shownPlaces) { st.shownPlaces = {}; if (bouts(st) > 1) open.forEach(sp => { st.shownPlaces[placeOf(sp)[1]] = 1; }); }
-      const fresh = open.filter(sp => !st.shownPlaces[placeOf(sp)[1]]); if (fresh.length && st.toured && !coming && !leading && !G.talk && G.scene === 'hub') { const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0, fetch: fresh }; } }
-    if (!st.tourAsked && !bouts(st) && !(st.deaths > 0)) { st.tourAsked = 1; G.save(); const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0 }; }
+      const fresh = open.filter(sp => !st.shownPlaces[placeOf(sp)[1]]); if (fresh.length && st.toured && (st.tourV !== 2 || st.toured2 === 1) && !coming && !leading && !G.talk && G.scene === 'hub') { const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0, fetch: fresh }; } }
+    if (!st.tourAsked && !bouts(st) && !(st.deaths > 0)) { st.tourAsked = 1; st.tourV = 2; G.save(); const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0 }; }
     return r; };
 
   // ------------------------------------------------------------ the market calls out to you: whoever has something new says so
@@ -163,7 +168,7 @@
   W.buildHub = function () { const h = bh0.apply(this, arguments), folk = [];
     Object.keys(FOLK).forEach(id => { const f = FOLK[id]; let x = f.at[0], z = f.at[1]; for (let k = 0; k < 12 && h.blocked(x, z); k++) { x += 0.5; z += k % 2 ? 0.4 : -0.3; } const c = G.makeChar(f.look); c.root.position.set(x, 0, z); c.root.rotation.y = Math.atan2(14 - x, 9 - z); h.scene.add(c.root); folk.push(c);
       const sp = { x, z: z + 0.9, r: 1.3, y: 2.6, label: f.name.split(' of ')[0], act: 'Talk', go: () => ui.talkTo(id) }; if (id === 'pip') { pipFolk = c; sp.isLocked = () => !G.state.toured || !!(pip && pip.root.visible); } h.spots.push(sp); });
-    const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); folk.forEach((c, i) => c.pose({ t: t + i * 1.7, act: 'idle' })); if (pipFolk) pipFolk.root.visible = !!G.state.toured && !(pip && pip.root.visible); if (coming) stepPip(t); else if (leading) stepLead(t); else if (pip && pip.root.visible) pip.pose({ t, act: 'idle' }); };
+    const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); folk.forEach((c, i) => c.pose({ t: t + i * 1.7, act: 'idle' })); if (pipFolk) pipFolk.root.visible = !!G.state.toured && !(pip && pip.root.visible); afterFirst(); if (coming) stepPip(t); else if (leading) stepLead(t); else if (pip && pip.root.visible) pip.pose({ t, act: 'idle' }); };
     pip = null; return h; };
 
   // ------------------------------------------------------------ and David, who will talk for as long as you will listen
@@ -194,10 +199,7 @@
   const legend = () => { const lg = document.getElementById('ablegend'); if (!lg) return; const pad = G.input.usingPad; lg.innerHTML = pad ? '<kbd>X</kbd>/<kbd>RT</kbd> strike · hold for a heavy blow &nbsp; <kbd>▼</kbd> taunt &nbsp; <kbd>R-stick</kbd> aim' : '<kbd>Click</kbd> strike · hold for a heavy blow &nbsp; <kbd>G</kbd> taunt &nbsp; <kbd>Mouse</kbd> aim'; lg.className = G.input.touch ? 'hidden' : ''; };
   const rk0 = ui.refreshKeys; ui.refreshKeys = function () { const r = rk0.apply(this, arguments); legend(); return r; };
   // ------------------------------------------------------------ first steps: a lit path from the first stall to the pit gate
-  const FP = [
-    { re: /^The Fence/, name: 'the Fence', say: 'Steel, potions, armour: that is me. Now the Guildmaster, next door. He keeps your page.' },
-    { re: /^Guildmaster/, name: 'the Guildmaster', say: 'Your page is written. Only one place to go from here: the pit gate. Follow the light.' },
-    { re: /^The Blood Pit/, name: 'the pit gate', say: null }];
+  const FP = [{ re: /^The Blood Pit/, name: 'the pit gate', say: null }];       // first steps: straight to the pit. The Fence and the Guildmaster come after the first fight, with Pip
   const fpOn = st => st && st.hero && st.firstPath !== 9 && !bouts(st) && !(st.deaths > 0) && (st.toured || st.tourAsked);
   let beam = null;
   const mkBeam = sc => { const T3 = THREE, c = document.createElement('canvas'); c.width = 4; c.height = 128; const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 128); g.addColorStop(0, 'rgba(255,214,140,0)'); g.addColorStop(0.55, 'rgba(255,214,140,0.28)'); g.addColorStop(1, 'rgba(255,230,170,0.75)'); x.fillStyle = g; x.fillRect(0, 0, 4, 128);
@@ -209,13 +211,13 @@
     const up1 = h.update; h.update = function (t) { up1.apply(this, arguments); const st = G.state, on = fpOn(st) && G.scene === 'hub' && !coming && !leading;
       if (!on) { beam.grp.visible = false; if (beam.L) beam.L.intensity = 0; return; }
       if (!beam.L) { beam.L = new THREE.PointLight(0xffd08a, 0, 10, 1.3); beam.sc.add(beam.L); }
-      const k = st.firstPath || 0, sp = h.spots.find(q => FP[k].re.test(q.label)); if (!sp) return;
+      const k = Math.min(FP.length - 1, st.firstPath || 0), sp = h.spots.find(q => FP[k].re.test(q.label)); if (!sp) return;
       if (ui.isOpen() && st.fpSeen !== k) { const w = W.walker; if (Math.hypot(w.x - sp.x, w.z - sp.z) < (sp.r || 1.3) + 1.6) st.fpSeen = k; }
       beam.grp.visible = !G.talk; beam.grp.position.set(sp.x, 0, sp.z); beam.L.position.set(sp.x, 3, sp.z); const pu = 0.5 + 0.5 * Math.sin(t * 2.4); beam.L.intensity = G.talk ? 0 : 22 + pu * 10; beam.col.material.opacity = 0.75 + pu * 0.25; beam.ring.scale.setScalar(1 + pu * 0.15);
       if (st.fpSeen === k && !ui.isOpen() && !G.talk) { st.fpSeen = null; if (FP[k].say) { G.gfx.floatText(sp.x, (sp.y || 2.6) + 0.6, sp.z - 0.4, '“' + FP[k].say + '”', '#ffe9a0', false); ui.toast(FP[k].say); G.sfx('page'); } st.firstPath = Math.min(FP.length - 1, k + 1); G.save(); } };
     return h; };
   const ob1 = G.objective;
-  G.objective = function () { const s0 = ob1.apply(this, arguments), st = G.state; if (G.scene !== 'hub' || !fpOn(st) || coming || leading) return s0; const k = st.firstPath || 0; return 'First steps · follow the light to ' + FP[k].name + (k < FP.length - 1 ? ', then the pit' : ': your first bout'); };
+  G.objective = function () { const s0 = ob1.apply(this, arguments), st = G.state; if (G.scene !== 'hub' || !fpOn(st) || coming || leading) return s0; const k = Math.min(FP.length - 1, st.firstPath || 0); return 'First steps · follow the light to ' + FP[k].name + (k < FP.length - 1 ? ', then the pit' : ': your first bout'); };
   const fs0 = G.fight.start;
-  G.fight.start = function (o) { const st = G.state; if (st && st.firstPath !== 9 && !(o && o.spar) && !G.fight.ex) { st.firstPath = 9; } return fs0.apply(this, arguments); };
+  G.fight.start = function (o) { const st = G.state; if (st && st.firstPath !== 9 && !(o && o.spar) && !G.fight.ex && !(G.fight.firstFight && G.fight.firstFight(o))) { st.firstPath = 9; } return fs0.apply(this, arguments); };       // the light stays on until the first fight is won
 })();

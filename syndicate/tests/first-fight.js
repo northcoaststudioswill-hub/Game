@@ -1,0 +1,38 @@
+// a new fighter goes straight to the pit; the first fight is easier, and losing it costs nothing, gives tips and a retry, and
+// never reaches David; after the first win Pip walks you to the Fence and the Guildmaster; from the second bout the usual rules apply;
+// closing the page after the foe has fallen does not count as walking out
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = []; const R = {};
+  const ctx = await b.newContext({ viewport: { width: 1000, height: 650 } }); let p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
+  await p.addInitScript(() => { window.requestAnimationFrame = () => 0; });
+  const boot = async () => { await p.goto('http://localhost:8765/index.html'); for (let i = 0; i < 20; i++) { await p.waitForTimeout(300); if (await p.evaluate(() => { if (window.G) { G.bootSkip && G.bootSkip(); G.bootSkip && G.bootSkip(); G.muted = true; } return !!document.getElementById('bNew'); })) break; } };
+  await boot(); await p.click('#bNew'); await p.click('.c-skip'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(200);
+  const hubTick = n => p.evaluate(n => { const h = G.world.get('hub'); for (let i = 0; i < n; i++) { window._T = (window._T || 10) + 1 / 30; G.world.updateWalk(1 / 30, window._T, G.ui.isOpen() || !!G.talk); h.update(window._T, 1 / 30); } }, n);
+  // the letter, then Pip: what he says before the first fight
+  R.letter = await p.evaluate(() => { G.ui.hub(true); return (document.querySelector('#panel .card.letter') || {}).innerText || ''; });
+  await p.evaluate(() => { const ok = document.querySelector('#panel #ok'); ok && ok.click(); G.ui.close(); });
+  const said = []; for (let k = 0; k < 40; k++) { await hubTick(15); const t = await p.evaluate(() => { if (!G.talk) return null; const tx = (document.querySelector('.tk-text') || {}).textContent || ''; G.talkApi.next(); return tx; }); if (t) said.push(t); if (k > 10 && !t && (await p.evaluate(() => !!G.state.toured))) break; }
+  R.preTour = said.join(' | ').slice(0, 3000); R.objective = await p.evaluate(() => G.objective());
+  // the first fight: easier, and losing it is a lesson
+  const startFirst = () => p.evaluate(() => { G.ui.close(); G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } const E = G.fight.E; return { dmg: +E.d.dmgMul.toFixed(3), hp: E.maxHp, react: +E.ai.react.toFixed(2), first: !!E.firstFight, name: E.name }; });
+  const lose = () => p.evaluate(() => { const F = G.fight, st = G.state; const coin0 = st.coin; for (let i = 0; i < 60; i++) F.update(1 / 60); F.P.hp = 1; F.koEntity ? F.koEntity(F.P) : (F.P.hp = 0); let t = 0; while (F.active && t++ < 900) F.update(1 / 30); return { card: (document.querySelector('#panel h2') || {}).textContent, deaths: st.deaths || 0, coin: st.coin, coin0, tries: st.firstTries, open: !!st.boutOpen, talk: !!G.talk, scene: G.scene, garden: !!(G.garden && G.garden.run) }; });
+  R.first1 = await startFirst(); R.lose1 = await lose();
+  R.retry = await p.evaluate(() => { const b = document.querySelector('#panel #pa'); if (!b) return 'no retry button'; b.click(); const E = G.fight.E; return { active: G.fight.active, dmg: +E.d.dmgMul.toFixed(3), hp: E.maxHp }; });
+  R.lose2 = await lose();
+  // close the page mid-way through the first fight: still nothing lost
+  await p.evaluate(() => { document.querySelector('#panel #pa').click(); for (let i = 0; i < 60; i++) G.fight.update(1 / 60); }); await p.close(); p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await boot();
+  R.walkOutFirst = await p.evaluate(() => { document.getElementById('bCont').click(); return { deaths: G.state.deaths || 0, open: !!G.state.boutOpen }; });
+  // win it: the foe falls, close the page during the finisher: the win is not a death
+  R.wonClose = await p.evaluate(() => { G.ui.close(); G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } const F = G.fight; for (let i = 0; i < 60; i++) F.update(1 / 60); F.E.hp = 1; F.koEntity(F.E); return !!(G.state.boutOpen && G.state.boutOpen.won); });
+  await p.close(); p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await boot();
+  R.afterWonClose = await p.evaluate(() => { document.getElementById('bCont').click(); return { deaths: G.state.deaths || 0, open: !!G.state.boutOpen }; });
+  // win the first fight properly; Pip comes back for the Fence and the Guildmaster
+  R.win = await p.evaluate(() => { G.ui.close(); G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } const F = G.fight; for (let i = 0; i < 60; i++) F.update(1 / 60); F.E.hp = 1; F.koEntity(F.E); let t = 0; while (F.active && t++ < 1500) F.update(1 / 30); return { card: (document.querySelector('#panel h1, #panel h2') || {}).textContent, wins: Object.values(G.state.wins || {}).reduce((a, b) => a + b, 0) }; });
+  await p.evaluate(() => { for (let k = 0; k < 6 && G.ui.isOpen(); k++) { const c = document.querySelector('#panel #ok, #panel .big, #panel #x'); c ? c.click() : G.ui.close(); } G.ui.close(); G.ui.hub(); G.ui.close(); });
+  const said2 = []; for (let k = 0; k < 50; k++) { await hubTick(15); const t = await p.evaluate(() => { if (G.ui.isOpen()) G.ui.close(); if (!G.talk) return null; const tx = (document.querySelector('.tk-text') || {}).textContent || ''; G.talkApi.next(); return tx; }); if (t) said2.push(t); if (k > 10 && !t && (await p.evaluate(() => G.state.toured2 === 1))) break; }
+  R.postTour = said2.join(' | ').slice(0, 3000); R.toured2 = await p.evaluate(() => G.state.toured2);
+  // the second bout: the usual rules
+  R.second = await p.evaluate(() => { G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } const F = G.fight; const first = !!F.E.firstFight; for (let i = 0; i < 60; i++) F.update(1 / 60); F.P.hp = 1; F.koEntity(F.P); let t = 0; while (F.active && t++ < 900) F.update(1 / 30); return { easier: first, deaths: G.state.deaths || 0, practiceCard: /Back on your feet/.test((document.querySelector('#panel') || {}).innerText || '') }; });
+  console.log(JSON.stringify(R, null, 1));
+  const ok = /first fight is waiting/.test(R.letter) && /first bout is the exception/.test(R.preTour) && !/The Fence/.test(R.preTour) && /pit gate/.test(R.objective) && R.first1.first && R.first1.dmg < 0.9 && /Back on your feet/.test(R.lose1.card) && R.lose1.deaths === 0 && R.lose1.coin === R.lose1.coin0 && R.lose1.tries === 1 && !R.lose1.talk && !R.lose1.garden && R.retry.active && R.retry.dmg < R.first1.dmg && R.lose2.deaths === 0 && R.lose2.tries === 2 && R.walkOutFirst.deaths === 0 && R.wonClose && R.afterWonClose.deaths === 0 && R.win.wins === 1 && /Fence/.test(R.postTour) && /Guildmaster/.test(R.postTour) && R.toured2 === 1 && !R.second.easier && R.second.deaths === 1 && !R.second.practiceCard;
+  console.log(ok ? 'PASS' : 'FAIL', 'ERRORS', errs.length, errs.slice(0, 3).join(' | ')); await b.close(); process.exit(ok && !errs.length ? 0 : 1); })();

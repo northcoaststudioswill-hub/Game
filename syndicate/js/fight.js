@@ -31,9 +31,13 @@
     return e;
   }
 
+  // the very first fight is a lesson: an easier opponent, and losing it costs nothing and sends nobody to David (see practice() below)
+  const boutsOf = st => Object.keys(st.wins || {}).reduce((n, k) => n + (st.wins[k] || 0), 0) + (st.losses || 0);
+  const firstFight = (st, o) => !!(st && st.hero && o && !o.spar && !o.garden && !o.ex && !o.ascent && !o.grudge && !G.guest && !G.spectating && boutsOf(st) === 0 && !(st.deaths > 0));
+  F.firstFight = o => firstFight(G.state, o);
   F.start = function (o) { if (G.clearPreview) G.clearPreview(); if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false); hazT = 0; haz.length = 0; { const ar = G.world.get('arena'); if (ar.remains) ar.remains(o && (o.spar || o.garden) ? 0 : Math.random() < 0.7 ? 2 + Math.floor(Math.random() * 6) : 0); }
     opp = o; const st = G.state, h = st.hero;
-    if (!o.spar && !o.garden && !G.guest) { st.boutOpen = { id: o.id, name: o.name }; G.save(); }       // a bout in progress is written down, so closing the page mid-fight cannot undo it
+    if (!o.spar && !o.garden && !G.guest) { st.boutOpen = { id: o.id, name: o.name, first: firstFight(st, o) ? 1 : 0 }; G.save(); }       // a bout in progress is written down, so closing the page mid-fight cannot undo it
     arena = G.world.get('arena'); sc = arena.scene; gfx.setScene(sc);
     if (F.P) [F.P, F.E].forEach(e => { if (e.vis) { sc.remove(e.vis.g); if (e.vis.tele) sc.remove(e.vis.tele); } });
     (fx || []).forEach(killFx); (projs || []).forEach(p => p.m && sc.remove(p.m)); (zones || []).forEach(z => z.m && sc.remove(z.m));
@@ -52,6 +56,7 @@
     if (o.id && !o.gen && !eLook.id) eLook.id = 'fighter:' + o.id;       // a named fighter is built with any approved Workshop edit (fit as well as colours)
     E = makeEntity(eh, ed, eLook, false); E.gearTier = foeGear;
     E.ai = Object.assign({ react: 0.5, aggro: 0.5, dodge: 0.1, guard: Math.min(0.6, 0.14 + o.level * 0.09), parry: Math.min(0.26, 0.02 + o.level * 0.045) }, o.ai); E.boss = o.boss;
+    if (firstFight(st, o)) { const tries = st.firstTries || 0, k = Math.max(0.55, 0.78 - tries * 0.07); E.d.dmgMul *= k; E.hp = E.maxHp = Math.round(E.maxHp * Math.max(0.65, 0.85 - tries * 0.06)); E.ai.react = Math.max(E.ai.react, 0.62 + tries * 0.06); E.ai.aggro *= 0.7; E.ai.guard *= 0.5; E.ai.parry *= 0.4; E.ai.dodge *= 0.6; E.firstFight = 1; }
     G.fightTrack = o.boss ? 'boss' : 'fight';
     P.foe = E; E.foe = P;
     [P, E].forEach(makeVis);
@@ -958,7 +963,8 @@
       const f = e.foe, a = Math.atan2(f.y - e.y, f.x - e.x); f.kx = Math.cos(a) * 300; f.ky = Math.sin(a) * 300; f.st.stun = { t: 0.8 }; interrupt(f);
       G.state.soulDebt = (G.state.soulDebt || 0) + 1; G.save(); return;
     }
-    e.hp = 0; if (!e.isPlayer && !F.ex && !opp.spar && phase === 'fight') return startMortal(e);
+    e.hp = 0; if (!e.isPlayer && G.state && G.state.boutOpen) { G.state.boutOpen.won = 1; G.save(); }
+    if (!e.isPlayer && !F.ex && !opp.spar && phase === 'fight') return startMortal(e);
     e.state = 'ko'; e.koT = 0; e.st = {}; e.buffs = {}; e.act = null; e.z = 0;
     phase = 'ko'; phaseT = 2.4; shake = 16; hitstop = 0.18;
     result = { win: !e.isPlayer };
@@ -1499,7 +1505,7 @@
   F.edgeApi = { text, heal, setBuff: (e, k, t, a) => setBuff(e, k, t, a), knockdown: (e, t) => knockdown(e, t), spark, S, fx: o => fx.push(o) };
   F.koEntity = e => ko(e); F.inFight = () => phase === 'fight';
   // a save that comes back with a bout still open means the fighter walked out of the pit mid-fight: the same as Forfeit
-  function walkedOut(st) { const b = st.boutOpen; delete st.boutOpen; if (!b || !st.hero) return;
+  function walkedOut(st) { const b = st.boutOpen; delete st.boutOpen; if (!b || !st.hero) return; if (b.won || b.first) { G.save(); return; }       // a bout already won, or the first fight (a lesson), costs nothing
     const lost = Math.round((st.coin || 0) * (G.owned && G.owned(st).strongbox ? 0.15 : 0.5)); st.coin -= lost; st.deaths = (st.deaths || 0) + 1; st.soulDebt = (st.soulDebt || 0) + 1; st.losses = (st.losses || 0) + 1;
     const floor = G.RANKS[G.rankOf(st.respect)].at; st.respect = Math.max(floor, st.respect - Math.max(3, Math.round((st.respect - floor) * 0.12)));
     G.save(); G.walkedOutMsg = 'You left the pit against ' + (b.name || 'your opponent') + ' before it was settled. The Ledger counts it as a death' + (lost ? ', and the Guild took ' + lost + ' coin.' : '.');
@@ -1507,12 +1513,31 @@
   { const ld = G.load; G.load = function () { const ok = ld.apply(this, arguments); if (ok && G.state && G.state.boutOpen && !F.active) walkedOut(G.state); return ok; }; }
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
+  function practice(st) {
+    delete st.boutOpen; st.firstTries = (st.firstTries || 0) + 1; st.potions = Math.max(st.potions || 0, P.startPotions || 0); G.save();
+    gfx.cam.shake = 0; gfx.clearFloats(); gfx.cine = null; document.getElementById('foeArrow').className = 'hidden'; G.ui.banner(null);
+    const pad = G.input && G.input.usingPad, touch = G.input && G.input.touch, n = st.firstTries, cls = P.cls;
+    const K = pad ? { strike: 'X', heavy: 'hold X', dodge: 'A', block: 'hold LT', pot: 'the potion button' } : touch ? { strike: 'the strike button', heavy: 'hold strike', dodge: 'dodge', block: 'hold parry', pot: 'the potion button' } : { strike: 'click', heavy: 'hold the click', dodge: 'Space', block: 'hold Shift or the right mouse button', pot: 'C' };
+    const TIPS = [
+      'Do not just swing. Three quick hits and they block the rest. Hit, then step back and let them come to you.',
+      'When they glow and wind up, that is a big hit coming. ' + K.dodge[0].toUpperCase() + K.dodge.slice(1) + ' sideways, or ' + K.block + ' to block it.',
+      'Watch the yellow bar under your health. Swinging and dodging use it. When it is empty you are slow and open: back off and let it fill.',
+      'Low on health? Drink a potion with ' + K.pot + '. They are free to carry into your first fights.',
+      K.heavy[0].toUpperCase() + K.heavy.slice(1) + ' for a heavy blow. It is slow, but it breaks a block and knocks them back.',
+      'Use your techniques. They are the buttons along the bottom, and they hit harder than your plain strike.'];
+    const CT = { fighter: 'Shield Bash stuns them for a moment. Use it, then hit them while they reel.', rogue: 'You are quick but thin. Hit and move: two cuts, then step away before they answer.', sorcerer: 'Keep your distance. Every step they take towards you is a bolt you can throw.', warlock: 'Stay back and blast. If they get close, move first and shoot second.', cleric: 'You heal. When you are hurt, step back and use it, then go back in.', druid: 'Your beast shapes hit hard. Use one when they are close.' };
+    const pick = [TIPS[(n - 1) % TIPS.length], CT[cls] || TIPS[(n + 2) % TIPS.length]];
+    G.ui._show('<div class="card small"><small class="over">Your first fight</small><h2>Back on your feet</h2><p class="quote">“First time on the sand? The Keeper lets a beginner get back up. Once you win your first, the Ledger counts every fall.”</p><p class="dim">Nothing lost: no coin, no death, and your potions are back.</p><h3>Pip’s advice</h3><ul class="perks">' + pick.map(t => '<li>' + t + '</li>').join('') + '</ul>' + (n >= 2 ? '<p class="dim">' + G.esc(opp.name) + ' is tiring. They will be a little easier this time.</p>' : '') + '<div class="row end"><button id="pm">Back to the market</button><button class="big" id="pa">Try again</button></div></div>');
+    const o = opp; G.ui._on('#pa', () => { G.ui.close(); G.scene = 'fight'; G.ui.topbar(); G.fight.start(o); }); G.ui._on('#pm', () => { G.ui.hub(); });
+  }
   function finish() {
     if (opp.spar || opp.garden) {                // friendly duel, or a bout that is settled somewhere else: nothing at stake here but pride (and whatever was wagered)
       G.save(); gfx.cam.shake = 0; gfx.clearFloats(); gfx.cine = null; document.getElementById('foeArrow').className = 'hidden';
       const cb = opp.onDone; opp.onDone = null; return cb ? cb(result.win && !result.forfeit) : G.ui.hub();
     }
-    const st = G.state, win = result.win, first = !st.wins[opp.id]; delete st.boutOpen;
+    const st = G.state, win = result.win, first = !st.wins[opp.id];
+    if (!win && st.boutOpen && st.boutOpen.first && !result.forfeit) return practice(st);
+    delete st.boutOpen;
     const hy = Math.round(hype), base = win ? (first ? 1 : 0.6) : 0.25;
     const r = {
       win, opp, first, hype: hy, forfeit: result.forfeit,
