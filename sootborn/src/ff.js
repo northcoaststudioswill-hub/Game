@@ -142,7 +142,7 @@ const FF = {
   }),
   // the dream of the training years: fought below, the old way
   drill: () => ({
-    era: 1, newMove: 'NEW: THE RAM (HOOK BUTTON, UP CLOSE) AND WIDE CUT (GUARD + STRIKE)', fin: { name: 'BANKED', l1: 'BRAND SAYS: DO NOT SPEND IT ALL', l2: 'I KEEP SOME BACK', rgb: '255,170,70', mode: 'bank' }, title: 'THE DRILL', sub: 'BRAND - THREE YEARS OF THIS', bg: 'pit', arena: { kind: 'ring', rx: 96, ry: 44 }, music: 'work', legend: 1, skip: 1, winText: 'AGAIN TOMORROW',
+    era: 1, newMove: 'NEW: THE RAM: HOOK BUTTON, UP CLOSE. WIDE CUT: GUARD + STRIKE', fin: { name: 'BANKED', l1: 'BRAND SAYS: DO NOT SPEND IT ALL', l2: 'I KEEP SOME BACK', rgb: '255,170,70', mode: 'bank' }, title: 'THE DRILL', sub: 'BRAND - THREE YEARS OF THIS', bg: 'pit', arena: { kind: 'ring', rx: 96, ry: 44 }, music: 'work', legend: 1, skip: 1, winText: 'AGAIN TOMORROW',
     hero: { id: 'kael2', hp: 9, pow: 1, blade: 1, fury0: 20 }, taunt: { 0: ['AGAIN.', 'YOU FIGHT LIKE SOOT.', 'THEY WILL NOT WAIT FOR YOU.', 'STAND UP TALLER.'] },
     foes: [{ id: 'brand', name: 'Brand', kind: 'baton', hp: 44 }],
     voice: { at: [[1, 'BRAND WAS A WARDEN UNTIL THEY ORDERED HIM TO PUT A HALBERD THROUGH A CHILD FOR HUMMING.'], [12, 'HE KNOWS HOW THEY FIGHT BECAUSE HE WAS PAID TO DO IT TO US.'], [24, 'THE NEW LEGS ARE TOO LONG. EVERY STEP LANDS A HAND FURTHER THAN I MEAN IT TO.']],

@@ -48,7 +48,7 @@ const Brawl = {
   // ---------------------------------------------------------- setup
   start(def, onEnd) {
     const hero = def.hero || {}, A = def.arena || { kind: 'ring', rx: 118, ry: 64 };
-    Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 24, hitsN: 0, hitsT: 0, clang: 0, slashes: [], marks: [], rN: 0, wbSaid: 0, fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {}, qi: {}, qT: -9, memo: null, memoDone: {}, broke: 0, lbUsed: 0, _aw: 0, coldCut: 0, coldT: 0, snap: 0, snapT: 0, supWas: 0, coldT: 0 });
+    Object.assign(this, { def, onEnd, active: true, t: 0, cutT: -9, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 24, hitsN: 0, hitsT: 0, clang: 0, slashes: [], marks: [], rN: 0, wbSaid: 0, fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {}, qi: {}, qT: -9, memo: null, memoDone: {}, broke: 0, lbUsed: 0, _aw: 0, coldCut: 0, coldT: 0, snap: 0, snapT: 0, supWas: 0, coldT: 0 });
     const hw = A.kind === 'ring' ? A.rx : A.w / 2;
     this.p = { boots: def.boots ? 1 : 0, fu: 1, kn: 0, xh: 0, z: 0, vz: 0, gd: 3, gdT: 0, hcd: 0, airN: 0, x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet || makeChar(playerLook()), st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
       fury: DEV.fury ? 100 : hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
@@ -307,10 +307,10 @@ const Brawl = {
       if (!p.hit) for (const f of this.foes) if (f.st !== 'down' && !f.enter && Math.hypot(f.x - p.x, f.y - p.y) < 20) { p.hit = true; if (f.guardT > 0) f.guardT = 0; this.hitFoe(f, 2 * p.pow, p.ax, p.ay, true); Sound.play('hit'); this.say('DIVE KICK'); p.vz = 200; p.z = Math.max(p.z, 6); p.st = 'idle'; p.airN = 0; p.kx = -p.ax * 60; p.ky = -p.ay * 60; break; } }
     else if (p.st === 'hook') { p.t += dt; if (!p.hit && p.t > .13) { p.hit = true; this.hookLand(); } if (p.t > .36) p.st = 'idle'; else if (p.t > .24 && this.bp('L') && p.pcd <= 0) this.ram(); }
     else if (p.st === 'guard') { p.gt += dt; const f = this.nearest(p); if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y) || 1; p.fx = (f.x - p.x) / d; p.fy = (f.y - p.y) / d; }
-      if (!Input.h('R')) p.st = 'idle'; else if (this.special()) { } else if (this.bp('A')) this.strike(); else if (this.bp('X')) this.kick(); else if (this.bp('Y')) this.jump(); else if (this.bp('B') && p.dcd <= 0) this.dodge(vx, vy); }
+      if (!Input.h('R')) p.st = 'idle'; else if (this.special()) { } else if (this.bp('A')) this.strike(); else if (this.bp('X')) this.kick(); else if (this.bp('Y')) this.jump(); else if (p.dcd <= 0 && this.bp('B')) this.dodge(vx, vy); }
     else if (p.st === 'kick') { p.t += dt; if (p.t < .1) { const v = p.fly ? 240 : 70 + (p.gap || 0) * 12; p.x += p.ax * v * dt; p.y += p.ay * v * dt; }
       if (!p.hit && p.t >= .09) { p.hit = true; this.kickLand(); }
-      if (!p.fly && p.t > .2 && p.xh > .28) this.skick(); else if (p.t > (p.fly || p.kn === 3 ? .38 : .27)) p.st = 'idle'; else if (p.t > .14 && this.bp('X') && !p.fly && p.kn < 3) this.kick(); else if (p.t > .17 && this.bp('A')) this.strike(); else if (p.t > .15 && this.bp('L') && p.pcd <= 0) this.ram(); else if (p.t > .17 && this.bp('Y')) this.jump(); else if (p.t > .14 && this.bp('B') && p.dcd <= 0) this.dodge(vx, vy); }
+      if (!p.fly && p.t > .2 && p.xh > .28) this.skick(); else if (p.t > (p.fly || p.kn === 3 ? .38 : .27)) p.st = 'idle'; else if (p.t > .14 && this.bp('X') && !p.fly && p.kn < 3) this.kick(); else if (p.t > .17 && this.bp('A')) this.strike(); else if (p.t > .15 && this.bp('L') && p.pcd <= 0) this.ram(); else if (p.t > .17 && this.bp('Y')) this.jump(); else if (p.t > .14 && p.dcd <= 0 && this.bp('B')) this.dodge(vx, vy); }
     else if (p.st === 'dodge') { p.t += dt; p.x += p.dx * 215 * dt; p.y += p.dy * 215 * dt; if (Math.floor(p.t * 40) % 2 === 0) p.trail.push({ x: p.x, y: p.y, life: .22 }); if (p.t > 0.3) p.st = 'idle'; else if (p.t > .09 && this.bp('X')) this.kick(true); else if (p.t > .09 && this.bp('A')) { const tg = this.nearest(p); if (tg) { const d = Math.hypot(tg.x - p.x, tg.y - p.y) || 1; p.fx = (tg.x - p.x) / d; p.fy = (tg.y - p.y) / d; } p.combo = 0; this.strike(); p.gap = Math.max(p.gap || 0, 30); p.dash = 1; Sound.play('move'); this.spark(p.x, p.y, '#c8b8ff', 6, 6); } }
     else if (p.st === 'atk') {
       p.t += dt; const dur = p.combo === 3 ? 0.36 : 0.24; if (p.t < 0.1) { const v = 100 + (p.gap || 0) * 14; p.x += p.ax * v * dt; p.y += p.ay * v * dt; }
@@ -318,16 +318,17 @@ const Brawl = {
         for (const f of this.foes) if (f.st !== 'down') { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > (p.blade ? -0.1 : 0.2))) { any = true; this.hitFoe(f, ((big ? 2 : 1) + (p.open > 0 ? 1 : 0) + (p.fury >= 100 ? 1 : 0) + (p.dash ? 1 : 0) + (p.heavy ? 2 : 0)) * p.pow, dx / (d || 1), dy / (d || 1), (big && !air) || p.open > 0 || !!p.dash); } } p.dash = 0; if (p.heavy && any) { this.scars.push({ x: p.x + p.ax * 22, y: p.y + p.ay * 22, r: 13, life: 30 }); this.shake = .5; } p.heavy = 0;
         if (air && any && p.boots) p.vz = Math.max(p.vz, 70); }
       if (p.t > dur) p.st = 'idle'; else if (p.t > 0.14 && this.bp('A') && (p.combo < 3 || (air && p.boots)) && (!air || p.boots || p.airN < 3)) { if (air) p.airN++; if (p.combo >= 3) p.combo = 0; this.strike(); }
-      else if (p.t > .12 && this.bp('L') && p.pcd <= 0 && !air) this.ram();
+      else if (p.t > .12 && !air && p.pcd <= 0 && this.bp('L')) this.ram();
+      else if (p.t > .12 && air && p.hcd <= 0 && this.bp('L')) this.hook();
       else if (p.t > .12 && this.bp('X')) { if (air) this.dive(); else this.kick(); }
       else if (p.t > .12 && this.bp('Y')) { if (!air) this.jump(); else this.airY(); }
       else if (air && p.boots && this.bp('R')) this.slam();
-      if (this.bp('B') && p.t > 0.1) { if (air) this.airB(vx, vy); else if (p.dcd <= 0) this.dodge(vx, vy); }
+      if (p.t > 0.1 && this.bp('B')) { if (air) this.airB(vx, vy); else if (p.dcd <= 0) this.dodge(vx, vy); }
     } else {
       if (vx || vy) { p.x += vx * 88 * dt; p.y += vy * 88 * dt; p.anim += dt; p.fx = vx; p.fy = vy; p.st = air ? 'idle' : 'move'; } else { p.st = 'idle'; p.anim = 0; const f = this.nearest(p); if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y) || 1; p.fx = (f.x - p.x) / d; p.fy = (f.y - p.y) / d; } }
-      if (air) { if (this.bp('Y')) this.airY(); else if (p.boots && this.bp('R')) this.slam(); else if (this.bp('A') && (p.boots || p.airN < 3)) { p.airN++; this.strike(); if (p.boots) p.vz = Math.max(p.vz, 50); } else if (this.bp('X')) this.dive(); else if (this.bp('B')) this.airB(vx, vy); }
+      if (air) { if (this.bp('Y')) this.airY(); else if (p.boots && this.bp('R')) this.slam(); else if (this.bp('A') && (p.boots || p.airN < 3)) { p.airN++; this.strike(); if (p.boots) p.vz = Math.max(p.vz, 50); } else if (this.bp('X')) this.dive(); else if (p.hcd <= 0 && this.bp('L')) this.hook(); else if (this.bp('B')) this.airB(vx, vy); }
       else if (Input.h('R') && this.special()) { } else if (this.bp('Y')) this.jump(); else if (this.bp('A')) this.strike(); else if (this.bp('X')) this.kick(); else if (this.bp('L')) { const f = this.nearest(p); if (f && Math.hypot(f.x - p.x, f.y - p.y) < 34 && p.pcd <= 0) this.ram(); else if (p.hcd <= 0) this.hook(); }
-      else if (this.bp('B') && p.dcd <= 0) this.dodge(vx, vy); else if (Input.h('R') && p.gd > 0) { p.st = 'guard'; p.gt = this.bp('R') ? 0 : .5; }
+      else if (p.dcd <= 0 && this.bp('B')) this.dodge(vx, vy); else if (Input.h('R') && p.gd > 0) { p.st = 'guard'; p.gt = this.bp('R') ? 0 : .5; }
     }
     for (const q of p.trail) q.life -= dt; p.trail = p.trail.filter(q => q.life > 0);
     this.clampA(p);

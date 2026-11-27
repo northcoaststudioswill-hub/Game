@@ -1,4 +1,18 @@
-# SOOTBORN — changelog (latest v0.87 · 2026-11-27)
+# SOOTBORN — changelog (latest v0.88 · 2026-11-27)
+
+## v0.88 · 2026-11-27 — fixes from three playtest bots
+Three bots played the v0.87 build: a first-timer on keyboard (every fight and walk place, and New Game cold), a skilled controller player (every fight, Hard and Brutal), and two players through all six comic-book levels. These are the fixes for what blocked a player outright.
+
+- **Story is the default difficulty.** It was Hard, and a first-timer could not win the Ford, the Ford in 2D or the Assayer (on Story the same bot won both in under a minute). A legend fight lost twice on Hard or Brutal now says Story is easier, in Settings.
+- **The heist** shows "Four days before" on the HUD (it said 41 days after), and its card and first toast name the keys for the device in use (they said A and B on a keyboard).
+- **Vent stack and Deep Array:** a second death now gives the DOWN screen, with their own lines ("The stack is still breathing. So are you." / "Harl is still down here. So is the air."); before, he lay there for good. ON MY BREATH says what it is. I AM STUCK works in both.
+- **Riser Nine:** dying to the Warden Captain no longer leaves the level empty; the boss (or the next wave) comes back.
+- **High Docks:** the roof door opens while the roof guards are still at their posts (a guard who has not seen him is not a fight, so the prompt shows). The locked-gate prompt does not show while quay guards are close.
+- **Fights:** the hook in the air works ("UP HERE", as the boots tip says); a dodge pressed in the first tenth of a second of a strike is kept, not thrown away; Memory Arts appear in the next fight and in retries (the cut-in timer was not reset); the Drill tip no longer prints "?" for brackets.
+
+**Checked:** the comic team reran each soft-lock on the fixed build: all four pass, and the newcomer finished the High Docks in 400 s. Air hook and early dodge with real key presses (early dodge 4–5 of 5, was 1–2). The whole-story bot.
+
+**Not fixed:** the playtest list in OPEN_LIST.md.
 
 ## v0.87 · 2026-11-27 — a full continuity pass
 After v0.86 put the fix list in, every on-screen line was read again, in four parts (Part One below, the Assay, Part Two, the comic-book levels), against the Script Rules sheet, the canon dates, the story bible and the book and film chapters. 88 changes.

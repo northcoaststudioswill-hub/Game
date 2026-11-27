@@ -1,7 +1,11 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.87 (2026-11-27).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.88 (2026-11-27).
 
-## Built in v0.87 (continuity pass; four answers wanted)
+## Built in v0.88 (three playtest bots; the rest is to decide)
+- Fixed what blocked a player outright: Story is the default difficulty, the heist date and keys, death screen and I AM STUCK in the vent stack and Deep Array, the Riser boss after a death, the High Docks roof door, the air hook, early dodges, Memory Arts after the first fight.
+- **To decide:** the open findings in `docs/PLAYTEST_v0.87.md` (teaching in the first five minutes, Hard too easy for a skilled player and too hard for a new one, the flying-duel camera, the comic-level marker through floors, button letters).
+
+## Built in v0.87 (continuity pass; four answers decided)
 - 88 changes so the whole game agrees with the rules sheet and the chapters. Read the changelog list.
 - **Decided (2026-11-27, owner asked Claude to choose):** Celestine says "fifty-three years" (she keeps the Count; she would be exact). Riser Nine stays nine floors: the three "forty feet" lines now say nine floors. The pump-house sign reads TWELVE HOUSES. ONE STANDING. The two Houses on day forty wear their own look (cadets with a dark red sash, `cado1`/`cado2`), not Teal's.
 
