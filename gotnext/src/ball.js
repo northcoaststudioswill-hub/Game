@@ -778,6 +778,7 @@ function aiThink(p, dt) {
   if (MT.phase !== 'live') { p.in.dx = p.in.dz = 0; return; }
   if (p.st === 'shoot' && !p.shot.released) { if (p.t >= p.shot.aiRel) releaseShot(p); return; }
   if (p.st !== 'free') return;
+  { const h = B.holder; if (h && h.team !== p.team && h.st === 'finish' && h.finish && !h.finish.done && h.t > h.finish.dur * 0.25 && dist(h, p) < 2.0 && a.rimFor !== h.finish && !MT.arcade) { a.rimFor = h.finish; if (Math.random() < 0.3 + L * 0.5) { startJump(p); return; } } }      /* a finish at the rim: decided the moment it is in reach, once (it used to wait for a think tick and lose to any earlier reaction, so the man at the rim often just watched) */
   a.tick -= dt;
   const hasBall = B.holder === p;
   if (B.state === 'loose' || (B.state === 'shot' && B.t > B.T * 0.5)) {
@@ -913,7 +914,7 @@ function aiThink(p, dt) {
     if (h && h.team !== p.team) {
       const dh = dist(h, p);
       if (dh < 2.3) p.handsUp = h.st === 'shoot' || h.st === 'fake' || (onBall && h.live !== 'drib' && dHoop(h) < 7.5);      /* a hand goes up at a shooter or a man who picked up his dribble; on a dribbler it is the low, wide stance (it used to flip a coin every frame) */
-      if ((h.st === 'shoot' && !h.shot.released && h.t > h.shot.rel * (0.75 - L * 0.3) && dh < 1.7) || (h.st === 'finish' && !h.finish.done && h.t > h.finish.dur * 0.3 && dh < 2.0)) {
+      if ((h.st === 'shoot' && !h.shot.released && h.t > h.shot.rel * (0.75 - L * 0.3) && dh < 1.7)) {
         if (a.react <= 0) { a.react = 0.8; if (Math.random() < 0.3 + L * 0.5) startJump(p); }
       }
       if (onBall && dh < 1.5 && p.cool <= 0 && h.st === 'free' && Math.random() < (0.32 + L * 0.42) * (h.sprinting ? 1 - L * 0.75 : 1) * dt * (0.5 + nAtt(p, 'steal')) * (1 + px(p, 'steal') * 6)) startSteal(p);      /* thieves by nature reach more */

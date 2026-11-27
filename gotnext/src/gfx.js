@@ -418,7 +418,10 @@ function poseOf(anim, t, o) {
         legs(-0.35, 0.75, -0.35, 0.75, 0.1); S_('anR', 0.7); S_('anL', 0.7); S_('spine', 0.04); S_('chest', -0.12); S_('neck', -0.3); S_('shR', -2.85, 0, 0.18); S_('shL', -2.85, 0, -0.18); S_('elR', -0.35); S_('elL', -0.35); S_('wrR', rel ? -0.7 : 0.5); S_('wrL', rel ? -0.7 : 0.5); p.rate = 20;
       }
       // contested: the off arm comes up and out to keep the defender off the ball (one-handed finishes only)
-      if (o.cont && (k === 'lay' || k === 'finger' || k === 'euro' || k === 'reverse') && u > 0.15) { S_('shL', -1.3, 0, 0.75); S_('elL', -1.7); S_('wrL', 0.2); }
+      if (o.cont && k !== 'scoop' && k !== 'hang' && k !== 'switch' && u > 0.15) {      // in traffic (the photos at the rim): the off forearm comes up as a shield, the body leans away, the ball goes up on the far side
+        const w = clamp((u - 0.15) / 0.15, 0, 1), to = (k2, v3) => { const v = p[k2] || (p[k2] = [0, 0, 0]); for (let i = 0; i < 3; i++) v[i] = lerp(v[i], v3[i], w); };
+        to('shL', [-1.35, 0, 0.75]); to('elL', [-1.75, 0, 0]); to('wrL', [0.2, 0, 0]); const sp = p.spine || (p.spine = [0, 0, 0]); sp[2] += 0.1 * w; const ch = p.chest || (p.chest = [0, 0, 0]); ch[1] -= 0.18 * w;
+        if (k === 'power' || k === 'over' || k === 'quick' || k === 'under' || k === 'spin') { const r = p.shR || (p.shR = [0, 0, 0]); r[0] = Math.min(r[0], -2.7 * w + r[0] * (1 - w)); r[2] += 0.12 * w; const e = p.elR || (p.elR = [0, 0, 0]); e[0] = lerp(e[0], -0.25, w); } }      /* two hands on the way up, but at the top it is one arm, long, away from him */
       if (o.blocked) { S_('shR', -1.5, 0, -0.55); S_('elR', -0.5); S_('wrR', 0.6); S_('spine', -0.2); S_('chest', -0.25); S_('neck', 0.15); p.rate = 30; }
       break;
     }
