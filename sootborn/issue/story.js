@@ -848,3 +848,254 @@
       const s = up ? best.a : best.b, e = up ? best.b : best.a;
       return at(s, 1.2) ? P3(e) : P3(s);
     };
+//@@COMBAT
+  /* ================= v0.90 COMBAT team: how the guard fights, as people and as a group. Injected into the enemies
+     section of the engine (it sees E, pl, combat, W, T, FX, G, P, fwd, alert). Every level uses it. ================= */
+  // Settings > Fight difficulty reaches the level from the game (src/issue.js sends it with the memories); alone, ?diff=0|1|2
+  { const q = /[?&#]diff=(\d)/.exec(location.search + location.hash); if (q) SC.diff = +q[1]; }
+  const DIFFS = [
+    { dmg: 0.75, tok: 2, gap: 0.85, cool: 1.12, wind: 1.12, hp: 1, brk: 3, bhp: 0.92, par: 0.26 },    // Story
+    { dmg: 1.12, tok: 2, gap: 0.55, cool: 0.95, wind: 1, hp: 1.3, brk: 2, bhp: 1.08, par: 0.2 },   // Hard
+    { dmg: 1.4, tok: 3, gap: 0.32, cool: 0.8, wind: 0.9, hp: 1.5, brk: 2, bhp: 1.2, par: 0.16 }    // Brutal
+  ];
+  SC.D = () => DIFFS[SC.diff | 0] || DIFFS[0];
+  const ISS = SC.issue, DRY = ISS === 'array', CADET = ISS === 'stack';
+  // who they are, level by level. The slot names are the engine's.
+  //   docks, stair: Dock Guard (bill), Stair Blade (two sheaths, fencer), Warden (halberd, steel and red)
+  //   riser: the valley's guard and the Wardens off the hill road; stack: House Teal's picket cadets and a Warden of the dais;
+  //   array: the Array's own watch, grey, with amber lamps and batons
+  if (CADET) Object.assign(KINDS.hollow, { hp: 82, speed: 4.1, range: 1.9, wind: 0.5, rec: 0.7, dmg: 10, cool: [0.9, 1.9] });
+  if (DRY) Object.assign(KINDS.hollow, { hp: 80, speed: 3.4, wind: 0.6, rec: 0.85, dmg: 10, cool: [1.1, 2.2] });
+  const BARK = {
+    hollow: CADET ? ['FOR TEAL!', 'VIOLET IS ELEVENTH.', 'NOTED.'] : DRY ? ['BACK, SOOT.', 'NO ENTRY.', 'COUNTED.'] : ISS === 'riser' ? ['OFF THE HATCH!', 'STRUCK.', 'DOWN THE HILL!'] : ['OFF THE QUAY!', 'HOLD THERE!', 'STRUCK.'],
+    knifer: ['NOTED.', 'BALANCED.', 'STRUCK.'], bruiser: ['KNEEL.', 'BALANCED.', 'STRUCK THROUGH.'],
+    boss: ISS === 'riser' ? ['BALANCE IT.', 'KNEEL.'] : ISS === 'stair' ? ['NOTED.', 'COLLECTED.'] : ['NOTED.', 'BALANCED.', 'SHORT, CLERK.']
+  };
+  const BREAK = { hollow: CADET ? 'FOR TEAL!' : DRY ? 'BACK!' : 'ENOUGH!', knifer: 'NOTED.', bruiser: 'KNEEL.', boss: 'NO.' };
+  SC.barks = e => (e && BARK[e.kind]) || ['NOTED.', 'BALANCED.', 'KNEEL.', 'STRUCK.'];
+  SC.av = e => e.kind === 'hollow' ? SC.pick(CADET ? ['jab', 'swing', 'jab'] : DRY ? ['swing', 'slam', 'swing'] : ['swing', 'swing', 'slam', 'jab']) : e.kind === 'bruiser' ? SC.pick(['slam', 'slam', 'swing']) : e.kind === 'knifer' ? SC.pick(['lunge', 'lunge', 'jab']) : null;
+  SC.tokW = e => e.kind === 'bruiser' ? 2 : 1;      // a Warden's swing takes the whole floor: nobody else comes in with it
+
+  // every man is his own copy of his kind, set to the difficulty
+  SC.dress = function (e) {
+    const D = SC.D(), K = e.K; e.K = Object.assign({}, K, { wind: K.wind * D.wind, cool: [K.cool[0] * D.cool, K.cool[1] * D.cool] });
+    e.maxHp = e.hp = Math.round(K.hp * (e.kind === 'boss' ? D.bhp : D.hp));
+    if (CADET && e.kind === 'bruiser' && e.enc && e.enc.id === 'l2') { e.mini = 1; e.maxHp = e.hp = Math.round(e.hp * 1.7); SC.after(0.6, () => { if (!e.gone && e.state !== 'dead') SC.ui.boss(e, 'A WARDEN OF THE DAIS'); }); }
+    return e;
+  };
+  SC.on('kill', e => { if (SC.ui.bossE === e && e.kind !== 'boss') SC.ui.boss(null); });
+
+  // can he see the man he is about to swing at? (no more cuts through a wall or a stack of crates)
+  SC.los = function (e, d, now) {
+    if (!now && e.losT > 0) return e.losOK;
+    const dx = pl.pos.x - e.pos.x, dz = pl.pos.z - e.pos.z, L = Math.hypot(dx, dz) || 0.01; e.losT = 0.25;
+    if (L < 0.95) return (e.losOK = true);
+    const oy = e.pos.y + 1.2, ux = dx / L, uz = dz / L; let blk = false;      // a level ray through walls a man could not swing through (not the level's invisible edges)
+    for (const s of W.solids) { if (!s.on || s.inv || s.co || s.ramp || s.y0 > oy || s.y1 < oy || (s.x1 - s.x0 < 0.35 && s.z1 - s.z0 < 0.35)) continue;
+      let t0 = 0.3, t1 = L - 0.4, a, b;
+      if (Math.abs(ux) < 1e-6) { if (e.pos.x < s.x0 || e.pos.x > s.x1) continue; } else { a = (s.x0 - e.pos.x) / ux; b = (s.x1 - e.pos.x) / ux; if (a > b) { const q = a; a = b; b = q; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) continue; }
+      if (Math.abs(uz) < 1e-6) { if (e.pos.z < s.z0 || e.pos.z > s.z1) continue; } else { a = (s.z0 - e.pos.z) / uz; b = (s.z1 - e.pos.z) / uz; if (a > b) { const q = a; a = b; b = q; } t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) continue; }
+      blk = true; break; }
+    e.losOK = !blk; if (e.losOK) e.noLos = 0; else if ((e.noLos = (e.noLos || 0) + 0.25) > 4) e.losOK = true;   // never a man who can stand there for ever
+    return e.losOK;
+  };
+  // whose turn it is: a token for each man swinging (a Warden takes two), and a beat between one man starting and the next
+  SC.canAtk = function (e, d) { const D = SC.D(), w = SC.tokW(e); return combat.tokens + w <= Math.max(D.tok, w) && (combat.gapT || 0) <= 0 && SC.los(e, d); };
+  SC.takeTok = function (e) { const D = SC.D(); e.token = true; e.tokW = SC.tokW(e); combat.tokens += e.tokW; combat.gapT = D.gap * SC.rand(0.8, 1.3); };
+
+  // the tell. Yellow, closing on him: it can be turned aside. Red: it cannot; get out from under it
+  SC.tell = function (e, red, at, r) {
+    red = red || e.K.atk === 'slam'; e.red = !!red; const w = e.K.wind;
+    FX.spawn({ tex: G.tex.ring, pos: _a.set(e.pos.x, e.pos.y + 0.07, e.pos.z), ground: true, size: red ? 3.4 : 2.6, grow: 0.9, life: Math.max(0.3, w * 0.95), color: red ? 0xff3b30 : 0xffd23a, hold: 0.75 });
+    if (red && e.K.atk === 'slam' && !at) { const f = fwd(e.yaw, _b); at = _c.copy(e.pos).addScaledVector(f, 1.5); r = 2.6; }
+    if (at) FX.spawn({ tex: G.tex.ring, pos: _a.set(at.x, e.pos.y + 0.08, at.z), ground: true, size: r * 2, grow: r * 2.04, life: Math.max(0.35, w), color: 0xff3b30, alpha: 0.85, hold: 0.85 });
+    if (!red && !SC._taught && SC.state === 'play' && Math.hypot(e.pos.x - pl.pos.x, e.pos.z - pl.pos.z) < 5) { SC._taught = 1; SC.after(0.9, () => SC.ui.toast('A *YELLOW* RING CLOSING ON HIM: *' + SC.btn('dodge') + '* WITH NO DIRECTION, AS IT CLOSES, TURNS THE BLOW ASIDE. *RED*: GET CLEAR.', 5)); }
+  };
+
+  // the parry: a step back with no direction, square to a yellow blow, in its last instant. He stands his ground, takes it on the
+  // hook and turns it (Ilse: never give ground; turn it), and the man's line is open
+  SC.tryParry = function () {
+    const D = SC.D(); let a = null, best = 9;
+    for (const e of E) {
+      if (e.gone || e.red || !e.hittable() || Math.abs(e.pos.y - pl.pos.y) > 1.4) continue;
+      const left = e.state === 'windup' ? e.K.wind - e.st : e.state === 'strike' ? -e.st : e.state === 'move' && e.mv && (e.mv.id === 'fleche' || e.mv.id === 'gaff') && e.mv.step < 2 ? (e.mv.step === 0 ? e.K.wind * (e.mv.id === 'gaff' ? 1.3 : 1.1) - e.st : -e.st) : 9;
+      if (left > D.par || left < -0.13) continue;
+      const dx = e.pos.x - pl.pos.x, dz = e.pos.z - pl.pos.z, d = Math.hypot(dx, dz) || 1, reach = (e.K.atk === 'lunge' || (e.mv && e.mv.id === 'fleche') ? 6 : e.mv && e.mv.id === 'gaff' ? 10 : e.K.range + 1.1);
+      if (d > reach || (dx * Math.sin(pl.yaw) + dz * Math.cos(pl.yaw)) / d < -0.2) continue;
+      if (left < best) { best = left; a = e; }
+    }
+    if (!a) return false;
+    const dx = a.pos.x - pl.pos.x, dz = a.pos.z - pl.pos.z, d = Math.hypot(dx, dz) || 1;
+    pl.perfected = true; pl.inv = Math.max(pl.inv, 0.45); pl.gain(16); pl.stats.perfect++; pl.riposte = 1.5; pl.dodgeCd = 0.2;
+    pl.yaw = Math.atan2(dx, dz); pl.setState('idle'); pl.vel.set(0, 0, 0);
+    a.release(); a.state = 'hurt'; a.st = a.kind === 'boss' ? -0.35 : -0.9; a.opened = a.kind === 'boss' ? 1.0 : 1.5; a.flN = 0; a.vel.set(dx / d * 5, 0, dz / d * 5); a.sub = 0; a.chain = 0; a.mv = null; if (a.kind === 'boss') a.armorT = 0;
+    _a.set((pl.pos.x + a.pos.x) / 2, pl.pos.y + 1.35, (pl.pos.z + a.pos.z) / 2); FX.burst(_a, 0xffd23a, 2.2); FX.burst(_a, 0xffffff, 1.4); FX.slash(_a, pl.yaw + 1.2, 0xffd23a, 3, 1.3);
+    _a.y += 0.9; FX.word(DRY ? 'KNOCKED ASIDE!' : 'TURNED ASIDE!', _a, '#ffd23a', 1.3); _a.copy(a.head); FX.word('OPEN', _a, '#ffffff', 0.8);
+    SC.time.hitstop = 0.16; SC.cam.shake(0.45); SC.audio.sfx('chain'); SC.audio.sfx('perfect'); SC.emit('speedlines', 0.4); SC.emit('parry', a);
+    if (!SC._parried) { SC._parried = 1; SC.after(0.5, () => SC.ui.toast('TURNED. *HIS LINE IS OPEN*: THE NEXT CUT LANDS DOUBLE.', 3)); }
+    return true;
+  };
+  { const hit0 = SC.hitPlayer; SC.hitPlayer = function (dmg, fx, fz, heavy) { SC._atkW = SC._atk || null; SC._atk = null; const r = hit0(dmg * SC.D().dmg, fx, fz, heavy); SC._atkW = null; return r; }; }
+
+  // a man who has been cut four times running stops flinching and shoves back through the next one (no more stun-lock by mashing)
+  SC.breakout = function (e, dx, dz, dmg) {
+    SC.emit('breakout', e); e.flN = 0; e.flT = 0; e.hp -= dmg * 0.5; e.vy = 0; e.onGround = true; e.flash = 0.06; e.blkT = 0.3; e.release();
+    _a.copy(e.pos); _a.y += e.h * 0.75; FX.burst(_a, 0xffffff, 1.4); SC.audio.sfx('chain'); _a.y += 0.8; FX.word(BREAK[e.kind] || 'ENOUGH!', _a, '#dfe6ff', 1.0);
+    const px = pl.pos.x - e.pos.x, pz = pl.pos.z - e.pos.z, pd = Math.hypot(px, pz) || 1; if (pd < 2.4) { pl.vel.x += px / pd * 5; pl.vel.z += pz / pd * 5; }
+    e.yaw = Math.atan2(px, pz); e.token = true; e.tokW = SC.tokW(e); combat.tokens += e.tokW; e.state = 'windup'; e.st = e.K.wind * 0.3; e.sub = 0; e.struck = false; e.sw = false; e.av = e.kind === 'hollow' ? 'jab' : SC.av(e); e.hyper = 1; alert(e); SC.tell(e);
+  };
+  { const hit1 = Ep.hit; Ep.hit = function (dmg, dx, dz, o) {
+    o = o || {}; const e = this; if (!e.hittable()) return hit1.call(e, dmg, dx, dz, o);
+    const s0 = e.state, st0 = e.st, light = !o.heavy && !o.power && !o.quiet;
+    if (e.opened > 0) dmg *= 1.5;
+    // his edge against the guard: the fury bar made every cut half as heavy again, and three cuts put a man down. Forty-three days
+    // after the furnace it is a valve wrench in a valve hand's grip, and no training at all
+    if (!o.power && e.kind !== 'boss') dmg *= DRY ? 0.62 : 0.8;
+    if (!o.power && !o.quiet && e.kind !== 'boss' && !e.K.armor && !(e.opened > 0) && s0 !== 'dazed' && s0 !== 'bound' && s0 !== 'windup' && (e.flN || 0) >= SC.D().brk && e.hp > dmg) { SC.breakout(e, dx, dz, dmg); return; }
+    // shoving back through it: nothing short of ELEVEN stops the answer once it has started
+    if ((e.hyper || (e.K.armor && e.kind !== 'boss' && e.st > 0.15)) && (s0 === 'windup' || s0 === 'strike') && !o.power && e.hp > dmg) { e.hp -= dmg; e.flash = 0.12; _a.copy(e.pos); _a.y += e.h * 0.68; FX.burst(_a, 0xffffff, 1.3); FX.burst(_a, 0xff5a1f, 0.8); SC.audio.sfx('hit', 0); return; }
+    // a man already swinging does not stop for a light cut once he is committed (he still bleeds for it)
+    if (s0 === 'windup' && light && e.kind !== 'boss' && !e.K.armor && e.st > 0.1 && e.st <= e.K.wind * 0.5) { e.st = e.K.wind * 0.52; hit1.call(e, dmg, dx, dz, o); if (e.state === 'windup') e.st = Math.min(st0, e.st); return; }
+    // a boss does not stand and take a whole flurry: he throws the man off and answers at once
+    if (e.kind === 'boss' && !o.power && !o.quiet && (s0 === 'chase' || s0 === 'recover' || s0 === 'hurt')) { e.bhN = (e.bhT > 0 ? e.bhN || 0 : 0) + 1; e.bhT = 2.4;
+      if (e.bhN >= SC.D().brk + 3 && !(e.opened > 0)) { e.bhN = 0; hit1.call(e, dmg * 0.5, dx, dz, { quiet: true }); if (e.state === 'dead' || e.state === 'dazed' || e.hp <= 0) return;
+        SC.emit('breakout', e); const px = pl.pos.x - e.pos.x, pz = pl.pos.z - e.pos.z, pd = Math.hypot(px, pz) || 1; _a.copy(e.pos); _a.y += e.h * 0.8; FX.ring(e.pos, 0xff3b30, 0.5, 2.6, 0.3); FX.word(BREAK.boss, _a, '#ff3b30', 1.3); SC.cam.shake(0.5); SC.audio.sfx('slam');
+        if (pd < 3 && pl.state !== 'dodge' && !(pl.inv > 0)) { pl.vel.set(px / pd * 11, 0, pz / pd * 11); pl.setState('hurt'); pl.hurtSide = 1; }
+        e.release(); e.yaw = Math.atan2(px, pz); e.mv = null; string(e, 2); e.st = e.K.wind * 0.15; e.armorT = 1.2; return; } }
+    hit1.call(e, dmg, dx, dz, o);
+    if ((e.state === 'hurt' || e.state === 'down') && !o.power && !o.quiet) { e.flN = (e.flN || 0) + 1; e.flT = 2.2; }
+    if (s0 === 'hurt' && st0 < 0 && e.state === 'hurt') e.st = st0;      // a parried man stays open: a cut does not shorten it
+  }; }
+
+  // the pass before every man thinks: tokens counted fresh, places round him shared out, so they come from the sides and the back
+  SC.aiPass = function (dt) {
+    const D = SC.D(); combat.maxTokens = D.tok; combat.gapT = (combat.gapT || 0) - dt;
+    let tk = 0; const ch = [], ob = [];
+    for (const e of E) {
+      if (e.bhT > 0) e.bhT -= dt; if (e.token) tk += e.tokW || 1; if (e.hyper && e.state !== 'windup' && e.state !== 'strike') e.hyper = 0; if (e.losT > 0) e.losT -= dt; if (e.opened > 0) e.opened -= dt; if (e.flT > 0 && (e.flT -= dt) <= 0) e.flN = 0;
+      if (e.gone || e.state === 'dead' || e.state === 'wait' || Math.abs(e.pos.y - pl.pos.y) > 2) { e.inCh = 0; continue; }
+      const a = Math.atan2(e.pos.x - pl.pos.x, e.pos.z - pl.pos.z);
+      if (e.kind !== 'boss' && e.state === 'chase' && Math.hypot(e.pos.x - pl.pos.x, e.pos.z - pl.pos.z) < 16) { if (!e.inCh || e.slotA === undefined) e.slotA = a; e.inCh = 1; ch.push(e); }
+      else { e.inCh = 0; ob.push(a); }
+    }
+    combat.tokens = tk;
+    const sep = ch.length > 4 ? 0.95 : 1.2;
+    for (const e of ch) {
+      let push = 0; const k = n => { const df = SC.angDiff(e.slotA, n); if (Math.abs(df) < sep) push -= (df >= 0 ? 1 : -1) * (sep - Math.abs(df)); };
+      for (const o of ch) if (o !== e) k(o.slotA); for (const a of ob) k(a);
+      if (e.kind === 'knifer') push += SC.angDiff(e.slotA, pl.yaw + Math.PI) * 0.45;   // a Stair Blade works round to the back of him
+      e.slotA += SC.clamp(push, -1.4, 1.4) * dt * 2.4;
+    }
+  };
+
+  // a place on the ring he can actually stand in: not inside a wall, not past the edge of the causeway, not over a drop
+  SC.slotAt = function (e, a, r) {
+    const x = pl.pos.x + Math.sin(a) * r, z = pl.pos.z + Math.cos(a) * r, y = e.pos.y;
+    if (e.slotC && e.slotC.t > 0 && Math.abs(SC.angDiff(e.slotC.a, a)) < 0.25) { e.slotC.t -= 1 / 30; return e.slotC.ok; }
+    let ok = Math.abs(W.ground(x, z, y + 0.3) - y) <= T.step + 0.45;
+    if (ok) for (const s of W.solids) { if (!s.on || s.co || x < s.x0 - e.r || x > s.x1 + e.r || z < s.z0 - e.r || z > s.z1 + e.r) continue; if (W.topAt(s, x, z) > y + T.step + 0.05 && s.y0 < y + 1.4) { ok = false; break; } }
+    if (ok && e.enc && e.enc.arena) { const A = e.enc.arena; ok = x > A[0] && x < A[2] && z > A[1] && z < A[3]; }
+    e.slotC = { a, ok, t: 0.3 }; if (!ok) e.slotA = Math.atan2(e.pos.x - pl.pos.x, e.pos.z - pl.pos.z);    // he takes the place he is in instead
+    return ok;
+  };
+  // edges: a man does not walk off a landing or a roof after him. He goes along it instead
+  SC.edge = function (e, vx, vz) {
+    const sp = Math.hypot(vx, vz); if (sp < 0.3 || !e.onGround) return null;
+    if (e.enc && e.enc.floor !== undefined && e.pos.y > e.enc.floor + 0.6) return null;   // up on something in his own fight: he may come down off it
+    if ((e.edgeN || 0) > 60) { if (e.edgeN++ > 90) e.edgeN = 0; return null; }               // held at an edge two seconds with no way along it: he jumps
+    const ok = (x, z) => { const s = Math.hypot(x, z) || 1, lx = e.pos.x + x / s * (e.r + 0.45), lz = e.pos.z + z / s * (e.r + 0.45); return e.pos.y - W.ground(lx, lz, e.pos.y + 0.3) <= T.step + 0.45; };
+    if (ok(vx, vz)) { e.edgeN = 0; return null; } if (Math.abs(vx) > 0.2 && ok(vx, 0)) return [vx, 0]; if (Math.abs(vz) > 0.2 && ok(0, vz)) return [0, vz]; e.edgeN = (e.edgeN || 0) + 1; return [0, 0];
+  };
+
+  /* ---------- the bosses: each one a pattern to learn, a change halfway, and a tell that is fair ---------- */
+  const lineTell = (e, len, red) => { const f = fwd(e.yaw, _b); for (let i = 1; i <= 5; i++) FX.spawn({ tex: G.tex.ring, pos: _a.set(e.pos.x + f.x * len * i / 5, e.pos.y + 0.08, e.pos.z + f.z * len * i / 5), ground: true, size: 0.7, grow: 0.5, life: 0.65, color: red ? 0xff3b30 : 0xffd23a, hold: 0.8 }); };
+  const startMove = (e, id, o) => { e.state = 'move'; e.st = 0; e.mv = Object.assign({ id, step: 0 }, o || {}); e.vel.set(0, 0, 0); alert(e); };
+  const string = (e, n) => { e.state = 'windup'; e.st = 0; e.sub = 1; e.chain = Math.max(0, n - 2); e.token = true; combat.tokens++; alert(e); SC.tell(e); };
+  SC.bossAI = function (e, d, toYaw, dt) {
+    if (ISS !== 'docks' && ISS !== 'riser' && ISS !== 'stair') return false;
+    if (e.cool > 0) return true;
+    const r = Math.random(), p2 = e.phase > 1, los = SC.los(e, d), osw = ISS === 'stair' && SC.story.stage2;
+    if (ISS === 'docks') {        // Rook: a measured count, then the gaff from range; from halfway, the leap as well
+      if (d > 6.5 && p2 && r < 0.45) { e.state = 'leap'; e.st = 0; e.lp = { step: 0, tx: pl.pos.x, tz: pl.pos.z }; alert(e); }
+      else if (d > 3.4 && d < 10 && los && r < (p2 ? 0.7 : 0.5)) startMove(e, 'gaff');
+      else if (d < e.K.range + 0.6) string(e, p2 ? 3 : 2);
+    } else if (ISS === 'riser') { // the Warden Captain: chop, sweep, the swing; from halfway he charges the length of the hatch
+      if (d > 5.5 && p2 && los && r < 0.6) startMove(e, 'charge');
+      else if (d > 7.5 && r < 0.4) { e.state = 'leap'; e.st = 0; e.lp = { step: 0, tx: pl.pos.x, tz: pl.pos.z }; alert(e); }
+      else if (d < 3.3 && r < (p2 ? 0.4 : 0.28)) startMove(e, 'sweep');
+      else if (d < 3.3 && r < 0.62) startMove(e, 'chop');
+      else if (d < e.K.range + 0.6) string(e, 2);
+    } else {                      // the Blade does not jump: the leg does not bend. He comes along the ground, and through the ink
+      if (d > 4.2 && d < 11 && los && r < (osw ? 0.6 : 0.45)) startMove(e, 'fleche');
+      else if (d > 3 && p2 && !osw && r < 0.75) { e.state = 'blink'; e.st = 0; e.lp = { step: 0 }; alert(e); _a.copy(e.head); FX.word('NOTED.', _a, '#dfe6ff', 0.9); }
+      else if (d < e.K.range + 0.6) string(e, osw ? 3 : 2);
+    }
+    return true;
+  };
+  SC.miniAI = function (e, d, dt) {      // the Warden of the dais: a Warden, with a sweep, and from halfway he does not wait for room to leap
+    if (e.hp < e.maxHp * 0.5 && !e.mad) { e.mad = 1; _a.copy(e.head); FX.word('KNEEL.', _a, '#ff3b30', 1.9); SC.cam.shake(0.6); SC.audio.sfx('roar'); e.armorT = 1.5; e.leapCd = 0; }
+    if (e.cool > 0 || !SC.canAtk(e, d)) return false;
+    const r = Math.random();
+    if (d < 3.1 && r < (e.mad ? 0.45 : 0.3)) { SC.takeTok(e); startMove(e, 'sweep'); return true; }
+    if (e.mad && d > 4.5 && d < 13 && (e.leapCd || 0) <= 0 && r < 0.5) { e.state = 'leap'; e.st = 0; e.lp = { step: 0, tx: pl.pos.x, tz: pl.pos.z }; e.leapCd = 4; alert(e); return true; }
+    return false;
+  };
+  SC.bossMove = function (e, dt, d, toYaw) {
+    const m = e.mv, K = e.K, f = fwd(e.yaw, _b), done = c => { e.release(); e.state = 'chase'; e.st = 0; e.cool = c === undefined ? SC.rand(K.cool[0], K.cool[1]) : c; e.mv = null; };
+    if (!m) { done(0.4); return; }
+    const W1 = K.wind * (m.id === 'charge' ? 1.6 : m.id === 'sweep' ? 1.8 : m.id === 'gaff' ? 1.3 : m.id === 'chop' ? 1.5 : 1.1);
+    e.vel.multiplyScalar(Math.exp(-10 * dt));
+    if (m.step === 0) {                                         // the wind-up, the same every time
+      if (e.st < W1 * 0.7) e.yaw = SC.dampAng(e.yaw, toYaw, 8, dt);
+      if (!m.told) { m.told = 1;
+        if (m.id === 'sweep') SC.tell(e, true, e.pos, 3.4);
+        else if (m.id === 'chop') { m.at = { x: e.pos.x + f.x * 1.7, z: e.pos.z + f.z * 1.7 }; SC.tell(e, true, m.at, 2.3); }
+        else if (m.id === 'charge') { SC.tell(e, true); lineTell(e, 9, true); _a.copy(e.head); FX.word('ON THE HATCH!', _a, '#ff3b30', 1.2); }
+        else if (m.id === 'gaff') { SC.tell(e); lineTell(e, Math.min(9.5, d), false); }
+        else if (m.id === 'fleche') { SC.tell(e); lineTell(e, Math.min(8, d), false); } }
+      if (m.id === 'chop' && m.at) { m.at.x = e.pos.x + f.x * 1.7; m.at.z = e.pos.z + f.z * 1.7; }
+      const k = SC.clamp(e.st / W1, 0, 1);
+      e.pose = m.id === 'sweep' ? SC.mixPose(P.guard(e.t), P.swing(-0.05), k) : m.id === 'chop' ? P.slam(-(1 - k)) : m.id === 'charge' ? SC.mixPose(P.guard(e.t), P.lunge(-0.05), k) : m.id === 'gaff' ? P.uppercutW : P.lunge(-(1 - k));
+      if (e.st >= W1) { m.step = 1; e.st = 0; m.x0 = e.pos.x; m.z0 = e.pos.z; SC.audio.sfx(m.id === 'charge' || m.id === 'fleche' ? 'leap' : 'whoosh', 1); }
+      return;
+    }
+    if (m.id === 'sweep') {                                     // the halberd all the way round: dodge clear of it, or jump it
+      e.pose = P.swing(e.st / 0.18); e.yaw += dt * 16;
+      if (!m.hit) { m.hit = 1; FX.ring(e.pos, 0xff3b30, 0.6, 3.6, 0.35); _a.copy(e.pos); _a.y += 1.1; FX.slash(_a, e.yaw, 0xff3b30, 4.6, 0.1); FX.slash(_a, e.yaw + Math.PI, 0xffffff, 4, -0.1); SC.cam.shake(0.5); SC.audio.sfx('slam');
+        if (d < 3.6 + pl.r && Math.abs(pl.pos.y - e.pos.y) < 1.2 && pl.lift < 0.75) SC.hitPlayer(e.kind === 'boss' ? 22 : 18, e.pos.x, e.pos.z, true); }
+      if (e.st > 0.35) { e.yaw = toYaw; done(); e.state = 'recover'; e.st = 0; } return;
+    }
+    if (m.id === 'chop') {                                      // overhead, all the weight in it: it cannot be turned
+      e.pose = P.slam(e.st / 0.16);
+      if (!m.hit) { m.hit = 1; FX.ring(_a.set(m.at.x, e.pos.y, m.at.z), 0xff3b30, 0.4, 2.4, 0.4); FX.puff(_a, 5, 1.2); _a.y += 1.6; FX.word('KNEEL!', _a, '#ff3b30', 1.5); SC.cam.shake(0.7); SC.audio.sfx('slam');
+        if (Math.hypot(pl.pos.x - m.at.x, pl.pos.z - m.at.z) < 2.3 + pl.r && Math.abs(pl.pos.y - e.pos.y) < 1.2) SC.hitPlayer(26, e.pos.x, e.pos.z, true); }
+      if (e.st > 0.3) { done(); e.state = 'recover'; e.st = -0.35; } return;   // the halberd is in the stone: a long recovery
+    }
+    if (m.id === 'charge' || m.id === 'fleche') {               // straight along the line he showed you
+      const run = m.id === 'charge', spd = run ? 14 : 17, T1 = run ? 0.8 : 0.45;
+      e.pose = run ? P.run(e.t * 14, 1.4) : P.lunge(0.2); if (!run && SC.limp) e.pose = SC.limp(e, Object.assign({}, e.pose));
+      const ox = e.pos.x, oz = e.pos.z; e.vel.set(f.x * spd, 0, f.z * spd);
+      e.pos.x += f.x * spd * dt; e.pos.z += f.z * spd * dt; W.collide(e.pos, e.r, e.pos.y, e.h); e.vel.set(0, 0, 0);
+      const moved = Math.hypot(e.pos.x - ox, e.pos.z - oz), edge = SC.edge(e, f.x, f.z);
+      if (((e.t * 30) | 0) % 2 === 0) FX.puff(e.pos, 1, 0.7);
+      if (!m.hit && d < 1.4 && Math.abs(pl.pos.y - e.pos.y) < 1.3) { m.hit = 1; SC._atk = run ? null : e; SC.hitPlayer(run ? 24 : 20, ox, oz, run); if (!run) { done(); e.state = 'recover'; e.st = 0; return; } }
+      if (edge || moved < spd * dt * 0.4) { e.pos.x = ox; e.pos.z = oz; if (run) { m.id = 'winded'; m.step = 2; e.st = 0; _a.copy(e.head); FX.word('WINDED!', _a, '#ffffff', 1.3); SC.cam.shake(0.6); SC.audio.sfx('slam'); FX.burst(_a, 0xffe14a, 1.4); return; } done(); e.state = 'recover'; e.st = 0; return; }
+      if (e.st > T1) { done(); e.state = 'recover'; e.st = run ? -0.3 : 0; } return;
+    }
+    if (m.id === 'winded') {                                    // he hit the wall: free cuts while he gets his breath back
+      e.pose = P.stunned(e.t); if ((e.t * 2 | 0) !== ((e.t - dt) * 2 | 0)) { _a.copy(e.head); FX.spawn({ tex: G.tex.burst, pos: _a, size: 0.5, grow: 0.9, life: 0.45, color: 0xffe14a, spin: 4 }); }
+      if (e.st > 1.7) done(0.3); return;
+    }
+    if (m.id === 'gaff') {                                      // the mooring gaff on its line: caught, he is hauled in to the next cut. Dodge it and Rook is off the line
+      if (m.step === 1) { e.pose = P.lunge(0.3);
+        const L = Math.min(9.5, Math.max(1, d)), k = Math.min(1, e.st / 0.16); for (let i = 1; i < 6; i++) { if (i / 6 > k) break; _a.set(e.pos.x + f.x * L * i / 6, e.pos.y + 1.3, e.pos.z + f.z * L * i / 6); FX.burst(_a, 0xe8c25a, 0.35); }
+        if (e.st >= 0.16) { const dx = pl.pos.x - e.pos.x, dz = pl.pos.z - e.pos.z, cos = (dx * f.x + dz * f.z) / (d || 1);
+          if (d < 10 && cos > 0.9 && Math.abs(pl.pos.y - e.pos.y) < 1.5 && SC.los(e, d, 1) && SC.hitPlayer(6, e.pos.x, e.pos.z, false)) { m.step = 2; e.st = 0; m.px = pl.pos.x; m.pz = pl.pos.z; _a.copy(pl.pos); _a.y += 2.4; FX.word('HAULED IN.', _a, '#e8c25a', 1.1); SC.audio.sfx('chainYank'); SC.cam.shake(0.4); }
+          else { m.step = 3; e.st = 0; _a.copy(e.head); FX.word('OFF THE LINE!', _a, '#ffffff', 1.1); SC.audio.sfx('deny'); } } return; }
+      if (m.step === 2) { e.pose = P.castYank || P.lunge(0.3); const q = SC.smooth(SC.clamp(e.st / 0.28, 0, 1)), gx = e.pos.x + f.x * 1.7, gz = e.pos.z + f.z * 1.7;
+        pl.pos.x = SC.lerp(m.px, gx, q); pl.pos.z = SC.lerp(m.pz, gz, q); W.collide(pl.pos, pl.r, pl.pos.y, pl.h); pl.vel.set(0, 0, 0);
+        if (e.st >= 0.28) { e.release(); e.state = 'windup'; e.st = 0; e.sub = 0; e.chain = 0; e.token = true; combat.tokens++; e.mv = null; SC.tell(e); } return; }
+      e.pose = P.stunned(e.t); if (e.st > 1.0) done(0.2); return;   // missed: the line is out and he is open
+    }
+    done();
+  };

@@ -23,12 +23,16 @@
   }
   if (SC.issue === 'stack') {   // House Teal's pickets hold the island; their blades wear teal, not violet
     Object.assign(SPECS.knifer.pal, { top: 0x1f6f6a, wrap: 0x1f6f6a });
+    // v0.90 COMBAT: the pickets are cadets of House Teal, not Dock Guards: bare gilt heads, the House's teal and a cadet's sword, a sash over the shoulder
+    SPECS.hollow = { h: 0.96, b: 0.96, face: 'cadet', hair: 'tavi', weapon: 'blade', sash: true, tabard: true, kit: { light: 1, noSh: 1, plate: 0xefe8d4, trim: 0xe8c25a, belt: 0x14141d, hands: 0xefe8d4 },
+      pal: { skin: 0xecd3a8, top: 0x1f6f6a, trim: 0xe8c25a, shirt: 0xefe8d4, tie: 0xe8c25a, pants: 0x23302f, boots: 0x14141d, hair: 0xe9cf7a, glove: 0xefe8d4, wrap: 0x1f6f6a } };
+    SPECS.bruiser.kit = Object.assign({}, SPECS.bruiser.kit, { officer: 1 });   // a Warden of the dais: the Assayers' own, with the gilt on him
   }
   if (SC.issue === 'array') {   // forty-three days after the furnace: a valve hand with a wrench, Dace in his hood, and the Array's own watch
     Object.assign(SPECS.hero, { h: 1.0, b: 1.0, face: 'kael0', hair: 'kael', armor: false, cape: false, pauldron: false, glowHand: false, weapon: 'wrench' });
     Object.assign(SPECS.hero.pal, { skin: 0xc8946a, hair: 0x6a2e18, streak: 0x6a2e18, top: 0x3d5a6a, trim: 0x2a3440, shirt: 0x3d5a6a, tie: 0xb8682a, pants: 0x2a3440, boots: 0x1e1418, glove: 0xc8946a, wrap: 0x3d5a6a, band: 0xb8682a });
     SPECS.clerk = { h: 1.03, b: 1.02, face: 'cloth', hood: true, kit: { light: 1, noSh: 1, soot: 1, plate: 0x2a2634, trim: 0x4a4030, belt: 0x1c1a24, hands: 0xb98a66, lamp: 0xffd98a }, pal: { skin: 0xb98a66, top: 0x2a2634, trim: 0x1c1a24, shirt: 0x2a2634, tie: 0x1c1a24, pants: 0x1c1a24, boots: 0x0c0c12, hair: 0x2a2634, glove: 0x4a4030, wrap: 0x2a2634 } };
-    Object.assign(SPECS.hollow.pal, { top: 0x4a5068, wrap: 0x4a5068 }); if (SPECS.hollow.kit) SPECS.hollow.kit.lamp = 0xffb060;
+    Object.assign(SPECS.hollow.pal, { top: 0x4a5068, wrap: 0x4a5068, hair: 0x7a7e8c, shirt: 0x5a6078, trim: 0xb8682a, glove: 0x7a7e8c }); if (SPECS.hollow.kit) Object.assign(SPECS.hollow.kit, { lamp: 0xffb060, plate: 0x8a8e9c, trim: 0xb8682a, hands: 0x7a7e8c });   // v0.90 COMBAT: grey all over, not the Dock Guard's white enamel
   }
   if (SC.issue === 'docks') {   // seven years after: he is still Clerk Sorrel that night. A coat, not plate; gloves over the palms
     Object.assign(SPECS.hero, { armor: false, pauldron: false, coat: true, cape: false });
@@ -113,6 +117,15 @@
       }
       if (mid) { stroke([18, 92, 30, 104, 44, 112], 2.4, '#8a1f24'); stroke([22, 96, 26, 92], 1.6, '#8a1f24'); stroke([30, 106, 34, 102], 1.6, '#8a1f24'); stroke([38, 111, 41, 106], 1.6, '#8a1f24'); }   // the seam along the jaw, new, with its stitches
       stroke([66, 58, 61, 80, 68, 84], 3); mouth(101); stroke([58, 113, 72, 113], 2);
+    } else if (kind === 'cadet') {
+      // v0.90 COMBAT: an heir of House Teal at sixteen, on picket. Gilded since the cradle: gold in the eye, the seam along the jaw
+      g.fillStyle = '#ecd3a8'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#d2b386'; g.beginPath(); g.moveTo(0, 30); g.lineTo(28, 58); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
+      const e = EX[expr] || EX.neutral;
+      eye(42, 60, 10, e[0], '#e2a81c', e[1]); eye(86, 60, 10, e[0], '#e2a81c', e[1]);
+      stroke([27, 46 + e[3] - e[2] * 0.3, 54, 48 + e[3] + e[2]], 5, '#b8923a'); stroke([101, 46 + e[3] - e[2] * 0.3, 74, 48 + e[3] + e[2]], 5, '#b8923a');
+      stroke([66, 58, 62, 80, 69, 83], 2.5); stroke([18, 92, 30, 104, 44, 112], 2, '#c9a24a');
+      mouth(100);
     } else if (kind === 'ilse') {
       // Accredited once: the height, the gold in the eye, and forty years on the seam they gave her at twelve
       g.fillStyle = '#e6c79a'; g.fillRect(0, 0, S, S);
