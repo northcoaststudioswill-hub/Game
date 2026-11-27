@@ -67,7 +67,7 @@ rep("voss: { name: 'DEACON VOSS', kind: 'boss', bg: 0x8a1f24, cls: 'dark' }", "v
 rep(`'<div style="text-align:center"><div class="tag">ISSUE #1 &middot; DEAD ON ARRIVAL</div><div class="logo"><span>SECOND</span>CHANCE</div>'`, `'<div style="text-align:center"><div class="tag">SOOTBORN &middot; SEVEN YEARS AFTER THE FURNACE</div><div class="logo"><span>THE HIGH</span>DOCKS</div>'`);
 rep(`(head || 'HOW WILL YOU COLLECT?')`, `(head || 'ELEVEN SECONDS. HOW DO YOU FIGHT?')`);
 rep(`<div class="mbtn s" data-go="c">BACK TO LAST CROSSING</div></div></div>', {`, `<div class="mbtn s" data-go="c">BACK TO THE LAST SUN</div>' + (SC.hosted ? '<div class="mbtn s" data-go="x">SKIP THIS LEVEL</div>' : '') + '</div></div>', {\n      x: () => { closeMenu(); U.paused = false; SC.story.wipe(); SC.host('done', { skipped: 1 }); U.freeze = true; },`);
-rep(`'<div class="card"><h2>DEAD. AGAIN.</h2><p>No third chances. Mr. Tally closes the book.</p><div class="mbtn y" data-go="r">BACK TO THE LAST CROSSING</div></div>'`, `'<div class="card"><h2>DOWN.</h2><p>' + (SC.issue === 'riser' ? 'Forty people on a ladder behind you.' : SC.issue === 'stair' ? 'The stair is full behind you, and nobody on it is kneeling.' : 'The second bell has not finished ringing.') + ' Eleven seconds. Get up.</p><div class="mbtn y" data-go="r">BACK TO THE LAST SUN</div></div>'`);
+rep(`'<div class="card"><h2>DEAD. AGAIN.</h2><p>No third chances. Mr. Tally closes the book.</p><div class="mbtn y" data-go="r">BACK TO THE LAST CROSSING</div></div>'`, `'<div class="card"><h2>DOWN.</h2><p>' + (SC.issue === 'riser' ? 'Forty people on a ladder behind you.' : SC.issue === 'stair' ? 'The stair is full behind you, and nobody on it is kneeling.' : SC.issue === 'stack' ? 'The stack is still breathing. So are you.' : SC.issue === 'array' ? 'Harl is still down here. So is the air.' : 'The second bell has not finished ringing.') + ' Eleven seconds. Get up.</p><div class="mbtn y" data-go="r">BACK TO THE LAST SUN</div></div>'`);
 rep(`<div class="tag">END OF ISSUE #1</div><h2 style="margin-top:8px">TO BE CONTINUED</h2><p>Deacon Voss paid in full. Mother Mercy still owes.</p>`, `<div class="tag">THE HIGH DOCKS</div><h2 style="margin-top:8px">FOUR HUNDRED HULLS</h2><p>The last pair is on the wind. The stair is full of light.</p>`);
 rep(`<tr><td>PATH</td><td>' + st.path + '</td></tr>`, ``); rep(`<td>HOLLOWS PUT DOWN</td>`, `<td>GUARD PUT DOWN</td>`); rep(`<td>CLUES</td>`, `<td>THINGS COUNTED</td>`); rep(`<td>SECOND CHANCES USED</td>`, `<td>LAST BREATHS USED</td>`);
 rep(`<div class="mbtn y" data-go="a">PLAY AGAIN</div>`, `<div class="mbtn y" data-go="a">' + (SC.hosted ? 'CONTINUE' : 'PLAY AGAIN') + '</div>`);
@@ -644,5 +644,11 @@ if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Mer
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));
 }
+// after a death or a restart, nothing scheduled is still waiting: the timers are cleared, so the riser's next wave must not be thought already on its way
+rep("S.time = d.time || 0; S.enc = null; timers.length = 0;", "S.time = d.time || 0; S.enc = null; S.pending = false; timers.length = 0;");
+rep("SC.clearEnemies(); timers.length = 0; S.done = false;", "SC.clearEnemies(); timers.length = 0; S.pending = false; S.done = false;");
+// a guard still standing at his post is not a fight: with him counted, the High Docks roof door could never be opened, and E swung at the air
+rep("for (const e of E) if (e.state !== 'dead' && SC.dist2(e.pos.x, e.pos.z, pl.pos.x, pl.pos.z) < 20", "for (const e of E) if (e.state !== 'dead' && e.state !== 'wait' && SC.dist2(e.pos.x, e.pos.z, pl.pos.x, pl.pos.z) < 20");
+
 writeFileSync(dir + 'issue.html', s);
 console.log('issue.html', (s.length / 1024).toFixed(1) + ' KB,', n, 'patches');

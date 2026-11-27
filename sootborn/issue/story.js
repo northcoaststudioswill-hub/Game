@@ -525,6 +525,10 @@
     const done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
     Object.assign(CROSS, { alley: { x: -6.5, y: 0, z: 17.5, yaw: Math.PI }, yard: { x: -9.6, y: 12, z: 9.6, yaw: Math.PI / 2 }, roof: { x: -9.6, y: 24, z: 9.6, yaw: Math.PI / 2 } });
+    /* death, the second chance and I AM STUCK: the stack and the array had none of the three, so a second death left him lying there for good */
+    S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
+    SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
+    SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     Object.assign(ENC, {
       alley: { arena: [-16, 9.2, 16, 23.6], floor: 0, waves: [[['hollow', -2, 11], ['hollow', 4, 12], ['hollow', -8, 12]]] },
       l1: { arena: [-13.6, 5.4, -5.4, 13.6], floor: 12, waves: [[['hollow', -12, 12], ['knifer', -7, 12.4]]] },
@@ -607,6 +611,10 @@
     const done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
     Object.assign(CROSS, { alley: { x: -14, y: 12, z: 23.5, yaw: Math.PI }, yard: { x: 16.3, y: 8, z: 2, yaw: Math.PI }, roof: { x: 9, y: 0, z: -11, yaw: -Math.PI / 2 } });
+    /* death, the second chance and I AM STUCK: the stack and the array had none of the three, so a second death left him lying there for good */
+    S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
+    SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
+    SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     Object.assign(ENC, {
       w1: { arena: [-13.6, 0.3, 14, 3.7], floor: 8, waves: [[['hollow', 12, 2], ['hollow', -12.6, 2]]] },
       l1: { arena: [-13, -27, 13, -5.6], floor: 0, waves: [[['hollow', 11, -8], ['hollow', -11, -9]], [['hollow', 10, -24], ['hollow', -10, -24], ['hollow', 0, -7]]] }
