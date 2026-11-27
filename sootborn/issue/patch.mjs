@@ -700,7 +700,46 @@ rep("  function steer(e, tx, tz, speed, dt) {", `  SC.detour = function (e, d, d
   function steer(e, tx, tz, speed, dt) {`);
 
 /* ---- v0.90 COMBAT team patches (enemies, moves) go here ---- */
-
+// the group: tokens counted fresh each frame, a beat between one man starting and the next, places round him shared out (ST.COMBAT, in story.js)
+rep("  SC.updateEnemies = function (dt) {\n", ST.COMBAT + "  SC.updateEnemies = function (dt) {\n    SC.aiPass(dt);\n");
+rep("SC.spawnEnemy = (kind, x, y, z, enc) => new Enemy(kind, x, y, z, enc);", "SC.spawnEnemy = (kind, x, y, z, enc) => SC.dress(new Enemy(kind, x, y, z, enc));");
+rep("Ep.release = function () { if (this.token) { this.token = false; combat.tokens = Math.max(0, combat.tokens - 1); } };", "Ep.release = function () { if (this.token) { this.token = false; combat.tokens = Math.max(0, combat.tokens - (this.tokW || 1)); this.tokW = 0; } };");
+// whose turn: a man swings only with a token free, the beat passed, and a clear line to him. Each faction has its own blows; each blow its tell
+rep("else if (playerOK && e.cool <= 0 && combat.tokens < combat.maxTokens && d < K.range + 0.4) {\n          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e); e.av = e.kind === 'hollow' ? SC.pick(['swing', 'swing', 'slam', 'jab']) : e.kind === 'bruiser' ? SC.pick(['slam', 'slam', 'swing']) : e.kind === 'knifer' ? SC.pick(['lunge', 'lunge', 'jab']) : null;",
+  "else if (e.mini && playerOK && SC.miniAI(e, d, dt)) { /* the Warden of the dais */ }\n        else if (playerOK && e.cool <= 0 && d < K.range + 0.4 && SC.canAtk(e, d)) {\n          SC.takeTok(e); e.state = 'windup'; e.st = 0; alert(e); e.av = SC.av(e);");
+rep("? 1 : 0;      // a second blow straight after the first\n        }", "? 1 : 0;      // a second blow straight after the first\n          SC.tell(e);\n        }");
+// waiting men hold their place on the ring (the Stair Blades work round behind him); an approach comes in on that place, not in a queue
+rep("if (d < want + 0.5) { const a = Math.atan2(-dx, -dz) + e.strafe * 0.5; tx = pl.pos.x + Math.sin(a) * want; tz = pl.pos.z + Math.cos(a) * want; sp *= 0.6; if (Math.random() < dt * 0.25) e.strafe *= -1; }",
+  "const sl = e.slotA !== undefined && e.kind !== 'boss' && !(e.cool <= 0.6 && combat.tokens < combat.maxTokens) && SC.slotAt(e, e.slotA, want); if (d < want + 0.5 || (sl && d < want + 7)) { const a = sl ? e.slotA + Math.sin(e.t * 0.7) * 0.12 : Math.atan2(-dx, -dz) + e.strafe * 0.5; tx = pl.pos.x + Math.sin(a) * want; tz = pl.pos.z + Math.cos(a) * want; if (d < want + 0.5) sp *= 0.6; if (Math.random() < dt * 0.25) e.strafe *= -1; }");
+// steering: round him, not through him; and never off an edge
+rep("    const k = 1 - Math.exp(-8 * dt); e.vel.x += (vx - e.vel.x) * k; e.vel.z += (vz - e.vel.z) * k;", "    { const px = e.pos.x - pl.pos.x, pz = e.pos.z - pl.pos.z, pd = Math.hypot(px, pz); if (pd < 1.35 && pd > 0.01 && Math.hypot(tx - pl.pos.x, tz - pl.pos.z) > 0.6) { vx += px / pd * (1.35 - pd) * 5; vz += pz / pd * (1.35 - pd) * 5; } }\n    { const q = SC.edge(e, vx, vz); if (q) { vx = q[0]; vz = q[1]; } }\n    const k = 1 - Math.exp(-8 * dt); e.vel.x += (vx - e.vel.x) * k; e.vel.z += (vz - e.vel.z) * k;");
+// a blow lands only where he could see you, and the game knows whose blow it was (for the parry, and for what he says)
+rep("> 0.25)) SC.hitPlayer(", "> 0.25) && SC.los(e, d, 1) && (SC._atk = e)) SC.hitPlayer(");
+rep("if (!e.struck && d < 1.25 && Math.abs(pl.pos.y - e.pos.y) < 1.5) { e.struck = true; SC.hitPlayer(", "if (!e.struck && d < 1.25 && Math.abs(pl.pos.y - e.pos.y) < 1.5 && (SC._atk = e)) { e.struck = true; SC.hitPlayer(");
+rep("FX.word(SC.pick(['NOTED.', 'BALANCED.', 'KNEEL.', 'STRUCK.']), _c, '#dfe6ff', 0.95);", "FX.word(SC.pick(SC.barks(SC._atkW)), _c, '#dfe6ff', 0.95);");
+// a boss's string can run longer than two
+rep("if (e.sub === 1) { e.sub = 2;", "if (e.sub === 1 || (e.chain > 0 && e.chain--)) { e.sub = 2;");
+rep("e.st = K.wind * (e.kind === 'boss' ? 0.45 : 0.35); e.struck = false; e.sw = false; alert(e); }", "e.st = K.wind * (e.kind === 'boss' ? 0.45 : 0.35); e.struck = false; e.sw = false; alert(e); SC.tell(e, e.kind === 'boss' && !(e.chain > 0)); }");
+// the Blade out of the ink: his blow from behind is a red one (dodge it, do not try to turn it)
+rep("e.state = 'windup'; e.st = e.K.wind * 0.3; e.sub = 2; e.token = true; combat.tokens++; alert(e); } }", "e.state = 'windup'; e.st = e.K.wind * 0.3; e.sub = 2; e.token = true; combat.tokens++; alert(e); SC.tell(e, true); } }");
+// the parry is a step back with no direction in the last instant of a yellow blow (SC.tryParry)
+rep("    pl.dodgeBack = mag <= 0.3;\n", "    pl.dodgeBack = mag <= 0.3;\n    if (pl.dodgeBack && SC.tryParry && SC.tryParry()) return;\n");
+// the bosses: Rook, the Warden Captain and the Blade each think their own way (SC.bossAI, SC.bossMove)
+rep("SC.emit('bossPhase', e); return; }\n    if (e.cool > 0) return;", "SC.emit('bossPhase', e); return; }\n    if (SC.bossAI(e, d, toYaw, dt)) return;\n    if (e.cool > 0) return;");
+rep("      case 'leap': bossLeap(e, dt); pose = e.pose; rate = 30; break;", "      case 'move': SC.bossMove(e, dt, d, toYaw); pose = e.pose; rate = 30; break;\n      case 'leap': bossLeap(e, dt); pose = e.pose; rate = 30; break;");
+// the difficulty the player chose in Settings reaches the level
+rep("if (d.sootborn === 'assets') { SC.assets = d.panels || {}; SC.showFps = !!d.fps; }", "if (d.sootborn === 'assets') { SC.assets = d.panels || {}; SC.showFps = !!d.fps; if (d.diff !== undefined) SC.diff = SC.clamp(+d.diff || 0, 0, 2); }");
+// moves: a dodge cancels a cut at any point (a tell that starts while he is swinging can still be answered)
+rep("    if (free || (pl.state === 'attack' && pl.st > 0.1)) {", "    if (free || (pl.state === 'attack' && (pl.st > 0.1 || (wantDodge && pl.dodgeCd <= 0 && SC.time.hitstop <= 0)))) {");
+// forty-three days after the furnace he has not met Ilse: a slip, not THE TURN; and no ram on his arm yet
+rep("FX.word('THE TURN!', _a, '#ffffff', 1.5);", "FX.word(SC.issue === 'array' ? 'SLIPPED IT!' : 'THE TURN!', _a, '#ffffff', 1.5);");
+rep("SC.ui.cut('THE TURN', 'NEVER GIVE GROUND');", "if (SC.issue === 'array') SC.ui.cut('UNDER IT', 'TEN YEARS OF DUCKING HOT PIPE'); else SC.ui.cut('THE TURN', 'NEVER GIVE GROUND');");
+rep("FX.word(i === 2 ? 'THE RAM!' : 'THE BOOT!'", "FX.word(i === 2 ? (SC.issue === 'array' ? 'THE SHOULDER!' : 'THE RAM!') : 'THE BOOT!'");
+// with the boots dead (the Array; the stack before the collar) a jump has no hover and no blue in it, and the blow off it is his own weight
+rep("pl.setState('air'); pl.jv = 9; pl.airFuel = 3.4; pl.diving = 0; FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3);", "pl.setState('air'); { const dead = SC.story.noBoots && SC.story.noBoots(); pl.jv = 9; pl.airFuel = dead ? 0 : 3.4; pl.diving = 0; if (!dead) FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3); }");
+rep("FX.word('LIFT ZERO!', _a, '#7ad9ff', 1.3)", "FX.word(SC.story.noBoots && SC.story.noBoots() ? 'DOWN ON HIM!' : 'LIFT ZERO!', _a, SC.story.noBoots && SC.story.noBoots() ? '#ffe14a' : '#7ad9ff', 1.3)", true);
+// the pad legend: the still dodge is the parry; the lunge is the boots, and is not shown while they are dead
+rep(`<b class="b">B</b>DODGE<b>RB</b>LUNGE<br>'`, `<b class="b">B</b>DODGE &middot; STILL: TURN ASIDE' + (dead ? '' : '<b>RB</b>LUNGE') + '<br>'`);
 /* ---- end COMBAT ---- */
 
 /* ---- v0.90 WORLD-A team patches (rendering, docks, riser, gild) go here ---- */
