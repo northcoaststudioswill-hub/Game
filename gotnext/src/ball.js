@@ -1506,16 +1506,18 @@ function matchCam(dt) {
   // lean the frame toward the ball so passes and boards stay on screen
   if (M_.spectate) { fx = B.pos.x * 0.7; fz = clamp(B.pos.z, 2, 8) * 0.6 + 2; }
   fx = lerp(fx, B.pos.x, 0.25); fz = lerp(fz, B.pos.z, 0.2);
-  const back = portrait ? 8.6 : 7.4, up = portrait ? 4.9 : 4.3;
+  const back = portrait ? 8.3 : 7.0, up = portrait ? 5.8 : 5.2;      /* a steeper look down: a defender in front of you no longer hides you and the ball */
   _v.set(fx * 0.62, up + fz * 0.1, fz + back + (hs.length > 1 ? 2 : 0));
   (M_.camB || (M_.camB = camera.position.clone())).lerp(_v, 1 - Math.exp(-4 * dt)); camera.position.copy(M_.camB);
   const hz = hlZoom(), fovT = (portrait ? 74 : 52) - (M_.slow > 0 ? 7 : 0) - hz * (portrait ? 26 : 16); if (Math.abs(camera.fov - fovT) > 0.05) { camera.fov += (fovT - camera.fov) * (1 - Math.exp(-9 * dt)); camera.updateProjectionMatrix(); }
   if (M_.shake > 0) { M_.shake -= dt; camera.position.x += rnd(-1, 1) * M_.shake * 0.25; camera.position.y += rnd(-1, 1) * M_.shake * 0.25; }
-  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2)); M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt));
+  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, Math.max(fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2), Math.max(...hs.map(h => h.z)) - (portrait ? 3.6 : 3.0)));      /* out at the top of the key you stay in the frame, not cut off at the bottom */ M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt));
   if (hz > 0) {      // highlight: push in on the man who did it, from where the camera already is
     const q = M_.hl.p, cy = q.H * 0.62 + q.y * 0.9; _v.set(q.x, cy, q.z); const dx = camera.position.x - q.x, dz = camera.position.z - q.z, l = Math.hypot(dx, dz) || 1, r = portrait ? 5.6 : 4.8;
     _v2.set(q.x + dx / l * r + (q.x > 0 ? -0.9 : 0.9), cy + 0.5, q.z + dz / l * r); camera.position.lerp(_v2, hz); _v2.copy(M_.look).lerp(_v, hz); camera.lookAt(_v2);
   } else camera.lookAt(M_.look);
+  { const pts = []; for (const p of M_.P) if (p.tag) { _v.copy(p.tag.position).project(camera); pts.push([p, _v.x, _v.y, camera.position.distanceTo(p.tag.position)]); }
+    for (const [p, x, y, dd] of pts) { const crowd = !p.user && pts.some(([q, x2, y2, d2]) => q !== p && Math.abs(x2 - x) < 0.13 && Math.abs(y2 - y) < 0.07 && (q.user || d2 < dd)); const want = crowd ? 0.15 : (p.mine ? 1 : 0.9); p.tag.material.opacity += (want - p.tag.material.opacity) * Math.min(1, dt * 10); } }      /* a pile-up at the rim: your tag and the nearest stay, the rest step back */
 }
 
 function endMatch() {

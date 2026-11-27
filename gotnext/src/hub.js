@@ -35,7 +35,7 @@ function npcSpace() {
     if (!moved) break; }
   for (const n of N) { if (n.x !== n.ox || n.z !== n.oz) { n.hx = n.tx = n.x; n.hz = n.tz = n.z; n.rig.root.position.set(n.x, n.yFix || 0, n.z); if (n.spot) { n.spot.x = n.x; n.spot.z = n.z; } } }
 }
-function spot(x, z, r, label, fn) { W.spots.push({ x, z, r, label, fn }); }
+function spot(x, z, r, label, fn) { W.spots.push({ x, z, r: r + 0.45, label, fn }); }      /* a step further out: walking past a shop should offer it */
 function solid(x0, x1, z0, z1) { W.solids.push([x0, x1, z0, z1]); }
 function building(x, z, w, d, h, col, label, labelCol, face) {
   ink(M(box(w, h, d), brickMat(col, Math.max(w, d), h), x, h / 2, z, scene), 1.015); solid(x - w / 2 - 0.4, x + w / 2 + 0.4, z - d / 2 - 0.4, z + d / 2 + 0.4);
@@ -440,8 +440,8 @@ function worldStep(dt) {
   const portrait = innerWidth < innerHeight, back = portrait ? 7.5 : 6.2, up = portrait ? 3.8 : 3.1;
   let cx = me.x - fx * back, cz = me.z - fz * back, lift = 0;
   // keep the camera inside the place and the player in sight: pull it in (and up) until the line to them is clear
-  const cb = W.camBox, blocked = (x, z) => (cb && (x < cb[0] || x > cb[1] || z < cb[2] || z > cb[3])) || W.solids.some(s => x > s[0] + 0.25 && x < s[1] - 0.25 && z > s[2] + 0.25 && z < s[3] - 0.25);
-  for (let b = back; b > 0.9; b -= 0.4) { cx = me.x - fx * b; cz = me.z - fz * b; lift = (back - b) * 0.42; let ok = true; for (let t = 1.0; t <= b; t += 0.6) if (blocked(me.x - fx * t, me.z - fz * t)) { ok = false; break; } if (ok && !blocked(cx, cz)) break; }
+  const cb = W.camBox, blocked = (x, z) => (cb && (x < cb[0] || x > cb[1] || z < cb[2] || z > cb[3])) || W.solids.some(s => x > s[0] + 0.06 && x < s[1] - 0.06 && z > s[2] + 0.06 && z < s[3] - 0.06) || (W.rounds || []).some(([rx, rz, rr]) => Math.hypot(x - rx, z - rz) < rr - 0.05);      /* the statue is round now; it blocked the view because only boxes counted */
+  for (let b = back; b > 0.9; b -= 0.4) { cx = me.x - fx * b; cz = me.z - fz * b; lift = -Math.min(up - 2.0, (back - b) * 0.3);      /* pushed in close it drops toward shoulder height, a third-person camera, not a bird looking straight down */ let ok = true; for (let t = 1.0; t <= b; t += 0.6) if (blocked(me.x - fx * t, me.z - fz * t)) { ok = false; break; } if (ok && !blocked(cx, cz)) break; }
   if (W.kind === 'crib') { cx = clamp(cx, W.bounds[0] - 6, W.bounds[1] + 6); cz = clamp(cz, W.bounds[2] - 1, W.bounds[3] + 6); }
   if (W.camO) { camera.position.lerp(W.camO.p, 1 - Math.exp(-5 * dt)); camera.lookAt(W.camO.l); return; }      /* watching the bones */
   if (W.look) {   // shop / closet: swing round to look at your drip
@@ -451,7 +451,7 @@ function worldStep(dt) {
     return;
   }
   _v.set(cx, up + lift, cz); if (!W.camInit) { camera.position.copy(_v); W.camInit = true; } else camera.position.lerp(_v, 1 - Math.exp(-7 * dt));
-  camera.lookAt(me.x + fx * 2, 1.7, me.z + fz * 2);
+  { const k = clamp(-lift / 1.1, 0, 1) * 0.6; camera.lookAt(me.x + fx * 2 * (1 - k), 1.7 - 0.6 * k, me.z + fz * 2 * (1 - k)); }      /* pulled in close past something: look at him, not over his head */
 }
 
 function startPractice(kind) {
