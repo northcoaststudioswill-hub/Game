@@ -57,7 +57,105 @@ const POSES = [
   ['sulk', 'Sulk', 'Celebrate', t => ['sulk', t, {}, {}]],
   ['stagger', 'Ankles broken', 'Reaction', t => ['stagger', 0.5, { fall: true }, {}]],
   ['wobble', 'Stumble', 'Reaction', t => ['stagger', t, { fall: false }, {}]],
+  ['ly_under', 'Layup: Up and under', 'Finish', t => ['layup', 0, { u: (t * 0.7) % 1, kind: 'under' }, { ball: 'shot', y: 0.5 }]],
+  ['ly_over', 'Layup: Over the top', 'Finish', t => ['layup', 0, { u: (t * 0.7) % 1, kind: 'over' }, { ball: 'shot', y: 0.5 }]],
+  ['ly_spin', 'Layup: 360', 'Finish', t => ['layup', 0, { u: (t * 0.7) % 1, kind: 'spin' }, { ball: 'shot', y: 0.5 }]],
+  ['ly_quick', 'Layup: Wrong foot', 'Finish', t => ['layup', 0, { u: (t * 0.7) % 1, kind: 'quick' }, { ball: 'shot', y: 0.5 }]],
+  ['dk_onehand', 'Dunk: One hand', 'Finish', t => { const u = (t * 0.7) % 1; return ['dunk', 0, { u, style: 'onehand' }, { ball: 'shot', y: Math.sin(Math.min(1, u / 0.75) * Math.PI / 2) * 0.75 }]; }],
+  ['dk_cock', 'Dunk: Cocked back', 'Finish', t => { const u = (t * 0.7) % 1; return ['dunk', 0, { u, style: 'cock' }, { ball: 'shot', y: Math.sin(Math.min(1, u / 0.75) * Math.PI / 2) * 0.75 }]; }],
+  ['dk_hammer', 'Dunk: Hammer', 'Finish', t => { const u = (t * 0.7) % 1; return ['dunk', 0, { u, style: 'hammer' }, { ball: 'shot', y: Math.sin(Math.min(1, u / 0.75) * Math.PI / 2) * 0.75 }]; }],
+  ['dk_lean', 'Dunk: Leaner', 'Finish', t => { const u = (t * 0.7) % 1; return ['dunk', 0, { u, style: 'lean' }, { ball: 'shot', y: Math.sin(Math.min(1, u / 0.75) * Math.PI / 2) * 0.75 }]; }],
+  ['dk_hangtwo', 'Dunk: Two hands and hang', 'Finish', t => { const u = (t * 0.7) % 1; return ['dunk', 0, { u, style: 'hangtwo' }, { ball: 'shot', y: Math.sin(Math.min(1, u / 0.75) * Math.PI / 2) * 0.75 }]; }],
+  ['dk_tip', 'Dunk: Tip slam', 'Finish', t => { const u = (t * 0.7) % 1; return ['dunk', 0, { u, style: 'tip' }, { ball: 'shot', y: Math.sin(Math.min(1, u / 0.75) * Math.PI / 2) * 0.75 }]; }],
+  ['sw_rock', 'Swag: Rock', 'Handle', t => { const d = Math.abs(Math.sin(t * 3.5)); return ['dribble', t, { sp: 0, ph: t * 7, dr: 0.8, hand: 'R', swag: 'rock', swT: t }, { ball: 'drib', d }]; }],
+  ['sw_tween', 'Swag: Through the legs', 'Handle', t => { const d = Math.abs(Math.sin(t * 3.5)); return ['dribble', t, { sp: 0, ph: t * 7, dr: 0.8, hand: 'R', swag: 'tween', swT: t }, { ball: 'drib', d }]; }],
+  ['sw_behind', 'Swag: Behind the back', 'Handle', t => { const d = Math.abs(Math.sin(t * 3.5)); return ['dribble', t, { sp: 0, ph: t * 7, dr: 0.8, hand: 'R', swag: 'behind', swT: t }, { ball: 'drib', d }]; }],
+  ['sw_yoyo', 'Swag: Yo-yo', 'Handle', t => { const d = Math.abs(Math.sin(t * 3.5)); return ['dribble', t, { sp: 0, ph: t * 7, dr: 0.8, hand: 'R', swag: 'yoyo', swT: t }, { ball: 'drib', d }]; }],
+  ['sw_sizeup', 'Swag: Size-up', 'Handle', t => { const d = Math.abs(Math.sin(t * 3.5)); return ['dribble', t, { sp: 0, ph: t * 7, dr: 0.8, hand: 'R', swag: 'sizeup', swT: t }, { ball: 'drib', d }]; }],
+  ['sw_wave', 'Swag: Wave him up', 'Handle', t => { const d = Math.abs(Math.sin(t * 3.5)); return ['dribble', t, { sp: 0, ph: t * 7, dr: 0.8, hand: 'R', swag: 'wave', swT: t }, { ball: 'drib', d }]; }],
+  ['post', 'Post up (LT)', 'Handle', t => ['dribble', t, { sp: 0, ph: t * 7, dr: 0.45, hand: 'R', post: 1, postPh: (t * 0.8) % 1 }, { ball: 'drib', d: Math.abs(Math.sin(t * 3.5)) }]],
+  ['scoop', 'Scoop it up', 'Loose ball', t => ['idle', t, { grab: { u: (t * 1.5) % 1, h: 0.1, side: 1 } }, { ball: 'chest' }]],
+  ['board', 'Board to the chin', 'Loose ball', t => { const u = (t * 1.5) % 1; return ['idle', t, { grab: { u, h: 1.2, side: 1 } }, { ball: 'high', y: 0.4 * Math.sin(Math.PI * u) }]; }],
+  ['grabc', 'Catch it loose', 'Loose ball', t => ['idle', t, { grab: { u: (t * 1.5) % 1, h: 0.6, side: 1 } }, { ball: 'chest' }]],
+  ['reach', 'Reach for it', 'Loose ball', t => ['idle', t, { reachL: { k: 1, side: 1, low: 0.5 + 0.5 * Math.sin(t * 2) } }, {}]],
+  ['dive', 'Dive on it', 'Loose ball', t => ['idle', t, { dive: 1 }, {}]],
+  ['bodyup', 'Body up (LT)', 'Defense', t => ['slide', 0, { ph: t * 6, bodyUp: 1 }, {}]],
+  ['knees', 'Gassed', 'Reaction', t => ['knees', t, {}, {}]],
+  ['punch', 'Haymaker', 'RUCKUS', t => ['punch', (t % 0.9) * 0.6, {}, {}]],
+  ['shove', 'Shove', 'RUCKUS', t => ['shove', t, {}, {}]],
+  ['clothes', 'Clothesline', 'RUCKUS', t => ['clothes', t, { sp: 1, ph: t * 9 }, {}]],
+  ['fall_face', 'Fall: Face first', 'Reaction', t => ['stagger', t % 2.7, { fall: true, dur: 2.2, side: 1, kind: 'face', hit: { tw: 0.5, fb: 0.6, pw: 1, s1: 0.3, s2: 0.6 } }, {}]],
+  ['fall_flat', 'Fall: Laid out', 'Reaction', t => ['stagger', t % 2.7, { fall: true, dur: 2.2, side: 1, kind: 'flat', hit: { tw: 0.5, fb: 0.6, pw: 1, s1: 0.3, s2: 0.6 } }, {}]],
+  ['fall_spin', 'Fall: Spun round', 'Reaction', t => ['stagger', t % 2.7, { fall: true, dur: 2.2, side: 1, kind: 'spin', hit: { tw: 0.5, fb: 0.6, pw: 1, s1: 0.3, s2: 0.6 } }, {}]],
+  ['fall_knee', 'Fall: To a knee', 'Reaction', t => ['stagger', t % 2.7, { fall: true, dur: 2.2, side: 1, kind: 'knee', hit: { tw: 0.5, fb: 0.6, pw: 1, s1: 0.3, s2: 0.6 } }, {}]],
+  ['c_flexdown', 'Crab flex', 'Celebrate', t => ['celeb', t, { style: 'flexdown' }, {}]],
+  ['c_toosmall', 'Too small', 'Celebrate', t => ['celeb', t, { style: 'toosmall' }, {}]],
+  ['c_stare', 'Stare down', 'Celebrate', t => ['celeb', t, { style: 'stare' }, {}]],
+  ['c_pout', 'Pout', 'Celebrate', t => ['celeb', t, { style: 'pout' }, {}]],
+  ['c_shh', 'Shh', 'Celebrate', t => ['celeb', t, { style: 'shh' }, {}]],
+  ['c_rock', 'Rock the baby', 'Celebrate', t => ['celeb', t, { style: 'rock' }, {}]],
+  ['c_nightnight', 'Night night', 'Celebrate', t => ['celeb', t, { style: 'nightnight' }, {}]],
+  ['c_pound', 'Chest pound', 'Celebrate', t => ['celeb', t, { style: 'pound' }, {}]],
+  ['c_shrug', 'Shrug', 'Celebrate', t => ['celeb', t, { style: 'shrug' }, {}]],
+  ['c_floor', 'Slap the floor', 'Celebrate', t => ['celeb', t, { style: 'floor' }, {}]],
+  ['c_wag', 'Finger wag', 'Celebrate', t => ['celeb', t, { style: 'wag' }, {}]],
+  ['c_airflex', 'Air flex', 'Celebrate', t => ['celeb', t, { style: 'airflex' }, { y: 0.6 }]],
+  ['c_greenbean', 'Green bean', 'Celebrate', t => ['celeb', t, { style: 'greenbean' }, {}]],
+  ['c_greengiant', 'Green giant', 'Celebrate', t => ['celeb', t, { style: 'greengiant' }, {}]],
+  ['c_iceveins', 'Ice in my veins', 'Celebrate', t => ['celeb', t, { style: 'iceveins' }, {}]],
+  ['c_fentlean', 'Fent lean', 'Celebrate', t => ['celeb', t, { style: 'fentlean' }, {}]],
+  ['c_goggles', 'Three goggles', 'Celebrate', t => ['celeb', t, { style: 'goggles' }, {}]],
+  ['c_bow', 'Take a bow', 'Celebrate', t => ['celeb', t, { style: 'bow' }, {}]],
+  ['c_callme', 'Call me', 'Celebrate', t => ['celeb', t, { style: 'callme' }, {}]],
+  ['c_pour40', 'Pour out the 40', 'Celebrate', t => ['celeb', t, { style: 'pour40' }, {}]],
+  ['c_beg', 'Beg', 'Celebrate', t => ['celeb', t, { style: 'beg' }, {}]],
+  ['c_warm', 'Warm up', 'Celebrate', t => ['celeb', t, { style: 'warm' }, {}]],
+  ['c_cheer', 'Hype', 'Celebrate', t => ['celeb', t, { style: 'cheer' }, {}]],
+  ['e_sit', 'Sit', 'Emote', t => ['sit', t, { leg: 0.9 }, {}]],
+  ['e_cheer', 'Hype', 'Emote', t => ['cheer', t, {}, {}]],
+  ['e_thumbs', '3:14 AM', 'Emote', t => ['fan:thumbs', t, {}, {}]],
+  ['e_roof', 'On the roof', 'Emote', t => ['fan:armsout', t, {}, {}]],
+  ['bt_scroll', 'Scroll', 'lil Bottie', t => ['fan:scroll', t, {}, {}]],
+  ['bt_loser', 'Loser', 'lil Bottie', t => ['fan:loser', t, {}, {}]],
+  ['bt_think', 'Think', 'lil Bottie', t => ['fan:think', t, {}, {}]],
+  ['bt_me', 'Me', 'lil Bottie', t => ['fan:me', t, {}, {}]],
+  ['bt_robot', 'Robot', 'lil Bottie', t => ['fan:robot', t, {}, {}]],
+  ['bt_point2', 'Point', 'lil Bottie', t => ['fan:point2', t, {}, {}]],
+  ['bt_npc', 'NPC', 'lil Bottie', t => ['fan:npc', t, {}, {}]],
+  ['bt_eat', 'Eat', 'lil Bottie', t => ['fan:eat', t, {}, {}]],
+  ['bt_prison', 'Prison', 'lil Bottie', t => ['fan:prison', t, {}, {}]],
+  ['bt_shake', 'Shake', 'lil Bottie', t => ['fan:shake', t, {}, {}]],
+  ['bt_nope', 'Nope', 'lil Bottie', t => ['fan:nope', t, {}, {}]],
+  ['bt_one', 'One', 'lil Bottie', t => ['fan:one', t, {}, {}]],
+  ['bt_watch2', 'Watch', 'lil Bottie', t => ['fan:watch2', t, {}, {}]],
+  ['bt_flex', 'Flex', 'lil Bottie', t => ['fan:flex', t, {}, {}]],
+  ['bt_money', 'Money', 'lil Bottie', t => ['fan:money', t, {}, {}]],
+  ['bt_pray', 'Pray', 'lil Bottie', t => ['fan:pray', t, {}, {}]],
+  ['bt_stop', 'Stop', 'lil Bottie', t => ['fan:stop', t, {}, {}]],
+  ['bt_runin', 'Run in', 'lil Bottie', t => ['fan:runin', t, {}, {}]],
+  ['bt_shrug', 'Shrug', 'lil Bottie', t => ['fan:shrug', t, {}, {}]],
+  ['fan_up', 'Arms up', 'Crowd', t => ['fan:up', t, {}, {}]],
+  ['fan_jump', 'Jump', 'Crowd', t => ['fan:jump', t, {}, {}]],
+  ['fan_ohh', 'OHHH', 'Crowd', t => ['fan:ohh', t, {}, {}]],
+  ['fan_point', 'Point and laugh', 'Crowd', t => ['fan:point', t, {}, {}]],
+  ['fan_cover', 'Hand over mouth', 'Crowd', t => ['fan:cover', t, {}, {}]],
+  ['fan_boo', 'Boo', 'Crowd', t => ['fan:boo', t, {}, {}]],
+  ['fan_count', 'Three', 'Crowd', t => ['fan:count', t, {}, {}]],
+  ['fan_wave', 'Towel', 'Crowd', t => ['fan:wave', t, {}, {}]],
+  ['fan_clap', 'Clap', 'Crowd', t => ['fan:clap', t, {}, {}]],
+  ['fan_phone', 'Phone', 'Crowd', t => ['fan:phone', t, {}, {}]],
+  ['fan_film', 'Filming', 'Crowd', t => ['fan:film', t, {}, {}]],
+  ['fan_talk', 'Talking', 'Crowd', t => ['fan:talk', t, {}, {}]],
+  ['fan_bob', 'Bobbing', 'Crowd', t => ['fan:bob', t, {}, {}]],
+  ['fan_cross', 'Arms crossed', 'Crowd', t => ['fan:cross', t, {}, {}]],
+  ['fan_ankles', 'Ankles!', 'Crowd', t => ['fan:ankles', t, {}, {}]],
+  ['fan_block', 'Get that out', 'Crowd', t => ['fan:block', t, {}, {}]],
+  ['fan_dunk', 'Dunk reaction', 'Crowd', t => ['fan:dunk', t, {}, {}]],
+  ['fan_ko', 'KO', 'Crowd', t => ['fan:ko', t, {}, {}]],
+  ['fan_win', 'Win', 'Crowd', t => ['fan:win', t, {}, {}]],
+  ['fan_watch', 'Watching', 'Crowd', t => ['fan:watch', t, {}, {}]],
 ];
+{ const order = []; for (const p of POSES) if (!order.includes(p[2])) order.push(p[2]); POSES.sort((a, b) => order.indexOf(a[2]) - order.indexOf(b[2])); }
 const POSE_BY = {}; POSES.forEach(p => POSE_BY[p.id = p[0]] = p);
 const SHEET_POSES = ['idle', 'dribble', 'cross', 'set', 'tomahawk', 'slide'];
 const STYLE_H = { sniper: 77, slasher: 78, general: 74, lockdown: 78, glass: 83, showman: 76 };
@@ -67,6 +165,8 @@ const L = Object.assign({ view: 'turn', lineup: 'styles', pose: 'idle', play: tr
   build: { style: 'slasher', origin: 'rustbelt', body: { h: 78, w: 0, s: 0.3 }, skin: 2 },
   worn: { hair: 'h_braids', head: 'hd_band', face: 'f_none', top: 't_jersey', arm: 'a_sleeve', bottom: 'b_orange', socks: 's_high', shoes: 'k_red', back: 'bk_none', ball: 'bl_std' }, prop: {} }, (() => { try { return JSON.parse(localStorage.getItem(LS)) || {}; } catch (e) { return {}; } })());
 Object.assign(PROP, PROP_DEFAULT, L.prop || {});
+if (L.animEd && Object.keys(L.animEd).length) ANIM_ED.map = L.animEd;
+else try { const g = JSON.parse(localStorage.getItem(SAVE_KEY)); if (g && g.animEd) ANIM_ED.map = g.animEd; } catch (e) { }      /* opened next to the game: its ANIM LAB edits show here too */
 const persist = () => { L.prop = Object.assign({}, PROP); try { localStorage.setItem(LS, JSON.stringify(L)); } catch (e) { } };
 
 // ---------- scene ----------
@@ -117,7 +217,7 @@ function draw(dt) {
   const seg = [], pts = [];
   for (const f of lab.figs) {
     const id = f.pose || L.pose, [an, tt, o, ex] = POSE_BY[id][3](L.t);
-    const R = f.R; o.leg = R.legLen; applyPose(R, poseOf(an, tt, o), dt);
+    const R = f.R; o.leg = R.legLen; applyPose(R, an.startsWith('fan:') ? crowdPose(an.slice(4), tt, { ph: 0 }, R.prof) : poseOf(an, tt, o), dt);
     R.extraYaw = ex.yaw || 0; R.root.position.y = ex.y || 0; R.root.rotation.y = f.yaw + L.yaw + R.extraYaw; R.shadow.position.y = 0.015 - (ex.y || 0);
     R.root.updateMatrixWorld(true);
     // the ball, where a hand would have it
@@ -183,7 +283,9 @@ function rail() {
     slider('Wingspan', -1, 1, 0.05, L.build.body.s, v => (v > 0 ? '+' : '') + v.toFixed(2), v => L.build.body.s = v),
     h('div', { style: 'margin-top:6px' }, SKINS.map((c, i) => h('span', { class: 'sw', role: 'button', tabindex: 0, 'aria-label': 'Skin ' + (i + 1), 'aria-pressed': String(i === L.build.skin), style: 'background:' + c, on: { click: () => { L.build.skin = i; changed(true); } } })))]);
   const slots = SLOTS.map(([k, n]) => { const s = h('select', { 'aria-label': n, on: { change: e => { L.worn[k] = e.target.value; changed(false); } } }); DRIP.filter(d => d.slot === k).forEach(d => s.appendChild(h('option', { value: d.id, text: d.n + (d.r ? ' · ' + RAR[d.r][0] : '') }))); s.value = L.worn[k]; return h('div', { class: 'slot' }, [h('span', { text: n }), s]); });
-  sec('Drip', slots.concat([h('div', { class: 'row', style: 'margin-top:6px' }, [
+  const fs = h('select', { 'aria-label': 'Whole fit', on: { change: e => { const F = FITS.find(f => f.id === e.target.value); if (!F) return; for (const id of F.items) { const d = DRIP.find(q => q.id === id); if (d) L.worn[d.slot] = id; } changed(true); } } });
+  fs.appendChild(h('option', { value: '', text: 'Wear a whole fit… (' + FITS.length + ')' })); { let g = null; for (const F of FITS) { if (!g || g.label !== F.g) { g = h('optgroup', { label: F.g }); fs.appendChild(g); } g.appendChild(h('option', { value: F.id, text: F.n })); } }
+  sec('Drip', [fs, h('p', { class: 'note', text: DRIP.length + ' pieces in the catalog, every one wearable here.' })].concat(slots).concat([h('div', { class: 'row', style: 'margin-top:6px' }, [
     h('button', { class: 'btn', on: { click: () => { const w = randomWorn(4); for (const k in w) if (w[k]) L.worn[k] = w[k]; changed(true); } } }, 'Random fit'),
     h('button', { class: 'btn', on: { click: () => { for (const [k] of SLOTS) L.worn[k] = DRIP.find(d => d.slot === k && d.src === 'start').id; changed(true); } } }, 'Starter fit')])]));
   sec('Proportions', Object.keys(PROP_RANGE).map(k => slider(PROP_RANGE[k][2], PROP_RANGE[k][0], PROP_RANGE[k][1], 0.01, PROP[k], v => v.toFixed(2), v => PROP[k] = v)).concat([
@@ -193,6 +295,10 @@ function rail() {
   const chk = (label, key) => { const i = h('input', { type: 'checkbox' }); i.checked = !!L[key]; i.addEventListener('change', () => { L[key] = i.checked; changed(false); }); return h('label', { class: 'chk' }, [i, label]); };
   sec('Display', [chk('Ink outline', 'outline'), chk('Skeleton (17 joints)', 'skel'), chk('Ball', 'ball'), chk('Height lines (feet)', 'ruler'),
     seg([['sheet', 'Sheet'], ['dark', 'Dark']], L.bg, v => L.bg = v)]);
+  const nEd = Object.keys(ANIM_ED.map).length;
+  sec('Animation edits', [h('p', { class: 'note', text: nEd ? nEd + ' edited action' + (nEd === 1 ? '' : 's') + ' from the game\'s ANIM LAB are playing here.' : 'Edit animations in the game (Dev Room → ANIM LAB → EDIT ANIMATIONS), COPY EDITS, and paste the code here to see them on this sheet.' }),
+    h('div', { class: 'row' }, [h('button', { class: 'btn', on: { click: () => { const c = prompt('Paste an edits code (GNANIM1:...)'); if (!c) return; const m = edFromCode(c); if (!m) { toast('That code did not read'); return; } ANIM_ED.map = m; L.animEd = m; persist(); rail(); toast('Edits loaded'); } } }, 'Paste edits'),
+      h('button', { class: 'btn', on: { click: () => { ANIM_ED.map = {}; L.animEd = {}; persist(); rail(); } } }, 'Clear')])]);
   sec('Take it into the game', [h('div', { class: 'row' }, [h('button', { class: 'btn', on: { click: () => { const s = spec(); s.attrs = startAttrs(s.build); s.badges = {}; s.moves = { side: 'cross', back: 'stepback', diag: 'spin', jumper: 'textbook', dunk: 'tomahawk', celeb: 'flex' }; copyText(encodeBuild(s), 'Build code'); } } }, 'Copy build code')]),
     h('p', { class: 'note', text: 'Paste it at The Link in The Cages and this look runs with you as a homie.' })]);
   r.scrollTop = st;

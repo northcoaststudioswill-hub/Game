@@ -391,7 +391,7 @@ function runPose(p, o) {
   p.rate = 40;
 }
 function blendPose(A, B, t) { const o = { y: lerp(A.y || 0, B.y || 0, t), rate: Math.max(A.rate || 16, B.rate || 16) }; const z = POSE.zero; for (const k of new Set([...Object.keys(A), ...Object.keys(B)])) { if (k === 'y' || k === 'rate') continue; const a = A[k] || z, b = B[k] || z; o[k] = [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; } return o; }
-function poseOf(anim, t, o) {
+function poseOfRaw(anim, t, o) {
   const p = { y: 0, rate: 16 }; o = o || {};
   const S_ = (k, x, y, z) => { p[k] = [x || 0, y || 0, z || 0]; };
   const armsDown = () => { S_('shR', 0.05, 0, -0.1); S_('shL', 0.05, 0, 0.1); S_('elR', -0.25); S_('elL', -0.25); S_('wrR', -0.1); S_('wrL', -0.1); };

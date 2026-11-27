@@ -231,7 +231,7 @@ function transRate(from, to) { return TRANS[from + '>' + to] || TRANS['*>' + to]
 // any profile). Ambient habits: watch, phone, film, talk, clap, bob, arms crossed. Reactions: up (arms up), jump,
 // ohh (hands on head), point (pointing and laughing), cover (hand over mouth), boo, count (three fingers), wave.
 const CROWD_AMBIENT = ['watch', 'watch', 'watch', 'phone', 'film', 'talk', 'clap', 'bob', 'cross'];
-function crowdPose(kind, t, o, prof) {
+function crowdPoseRaw(kind, t, o, prof) {
   o = o || {}; const ph = o.ph || 0, P = idlePose(prof, t, { ph, alert: o.alert || 0 }), S_ = (k, x, y, z) => { P[k] = [x || 0, y || 0, z || 0]; };
   const add = (k, x, y, z) => { const v = P[k] || (P[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
   const u = o.u === undefined ? 1 : o.u, s = Math.sin(t * 7 + ph), s2 = Math.sin(t * 3.1 + ph), jumpY = (a) => Math.max(0, Math.sin(t * 9 + ph)) * a;
@@ -293,3 +293,49 @@ function crowdReaction(play, mine) {
     default: return r < 0.6 ? 'clap' : 'up';
   }
 }
+
+// ---------------- 8. hand edits (the ANIM LAB's EDIT tab) ----------------
+// Anyone can bend the game's animations by hand: per action, joint offsets at keyframes along the action's phase,
+// eased in between. They sit on top of everything above (styles, profiles, overlays) and are cosmetic only.
+// The edits live in the save (S.animEd) and travel as a code (COPY EDITS) so they can be baked into the poses for good.
+const ANIM_ED = { map: {}, skip: false, rec: false, last: null, d: 0 };
+const ED_LOOP = { idle: 2, walk: 0, run: 0, dribble: 0, slide: 0, loco: 0, gait: 0, sprint: 0, celeb: 2, dance: 2, cheer: 2, sit: 2, knees: 2, hold: 2, boxout: 2, call: 2, sulk: 2, warm: 2, catch: 2 };
+const ED_DUR = { pass: 0.6, steal: 0.45, punch: 0.45, shove: 0.4, jump: 0.8, swat: 0.8, stagger: 2.2, floater: 0.9, fake: 0.7, clothes: 0.6 };
+function edMap() { return (typeof S !== 'undefined' && S && S.animEd) || ANIM_ED.map; }
+// an overlay on top of the base action (a grab, a dive, the post-up...) is what you see, so it is what you edit
+function edOver(o) { if (!o) return null; if (o.dive) return 'dive'; if (o.grab) return 'grab:' + (o.grab.h < 0.38 ? 'scoop' : o.grab.h > 0.95 ? 'board' : 'catch'); if (o.reachL) return 'reach'; if (o.post) return 'post'; if (o.bodyUp) return 'bodyup'; if (o.box) return 'boxout'; return null; }
+function edKey(anim, o) { const ov = edOver(o); if (ov) return ov; const v = o && (o.style || o.kind || o.pk || o.swag); return anim + (v && typeof v === 'string' ? ':' + v : ''); }
+// where in the action we are, 0..1: the action's own progress if it has one, the stride or bounce for loops, else time
+function edPhase(anim, t, o) {
+  o = o || {}; const fr = x => ((x % 1) + 1) % 1;
+  if (o.grab) return { u: clamp(o.grab.u, 0, 1), loop: false }; if (o.post) return { u: fr(o.postPh || 0), loop: true };
+  if (o.u !== undefined && anim !== 'idle') return { u: clamp(o.u, 0, 1), loop: false };
+  if (o.psi !== undefined) return { u: fr(o.psi), loop: true };
+  if (anim === 'shoot') return { u: clamp(t / ((o.rel || 0.6) * 1.6), 0, 1), loop: false };
+  if (o.ph !== undefined && ED_LOOP[anim] === 0) return { u: fr(o.ph / (Math.PI * 2)), loop: true };
+  if (ED_DUR[anim]) return { u: clamp(t / ED_DUR[anim], 0, 1), loop: false };
+  return { u: fr((t || 0) / (ED_LOOP[anim] || 2)), loop: true };
+}
+// the offsets an edit gives at phase u: one key holds all the way through; more keys ease from one to the next
+function edSample(E, u, loop) {
+  const K = E.keys; if (!K || !K.length) return null; if (K.length === 1) return K[0];
+  let a = K[K.length - 1], b = K[0], w = 0;
+  for (let i = 0; i < K.length; i++) if (K[i].u > u) { b = K[i]; a = K[i - 1] || null; break; } else if (i === K.length - 1) { a = K[i]; b = null; }
+  if (!a) { if (!loop) return b; a = K[K.length - 1]; const span = b.u + 1 - a.u; w = span > 0 ? (u + 1 - a.u) / span : 0; }
+  else if (!b) { if (!loop) return a; b = K[0]; const span = b.u + 1 - a.u; w = span > 0 ? (u - a.u) / span : 0; }
+  else w = (u - a.u) / Math.max(1e-6, b.u - a.u);
+  w = w * w * (3 - 2 * w); const out = { j: {}, y: lerp(a.y || 0, b.y || 0, w) };
+  for (const k of new Set(Object.keys(a.j).concat(Object.keys(b.j)))) { const x = a.j[k] || POSE.zero, y = b.j[k] || POSE.zero; out.j[k] = [lerp(x[0], y[0], w), lerp(x[1], y[1], w), lerp(x[2], y[2], w)]; }
+  return out;
+}
+function edApply(key, ph, p) {
+  if (ANIM_ED.rec && ANIM_ED.d === 1) ANIM_ED.last = { key, u: ph.u, loop: ph.loop };
+  if (ANIM_ED.skip) return p; const E = edMap()[key]; if (!E || E.off) return p; const s = edSample(E, ph.u, ph.loop); if (!s) return p;
+  for (const k in s.j) { const v = p[k] || (p[k] = [0, 0, 0]), d = s.j[k]; p[k] = [v[0] + d[0], v[1] + d[1], v[2] + d[2]]; }
+  if (s.y) p.y = (p.y || 0) + s.y; return p;
+}
+function edEmpty() { for (const k in edMap()) return false; return true; }
+function poseOf(anim, t, o) { if (!ANIM_ED.rec && edEmpty()) return poseOfRaw(anim, t, o); ANIM_ED.d++; try { const p = poseOfRaw(anim, t, o); return edApply(edKey(anim, o), edPhase(anim, t, o), p); } finally { ANIM_ED.d--; } }
+function crowdPose(kind, t, o, prof) { if (!ANIM_ED.rec && edEmpty()) return crowdPoseRaw(kind, t, o, prof); ANIM_ED.d++; try { const p = crowdPoseRaw(kind, t, o, prof); return edApply('fan:' + kind, { u: (((t || 0) / 2) % 1 + 1) % 1, loop: true }, p); } finally { ANIM_ED.d--; } }
+function edCode(map) { return 'GNANIM1:' + btoa(unescape(encodeURIComponent(JSON.stringify(map || edMap())))); }
+function edFromCode(code) { try { const j = JSON.parse(decodeURIComponent(escape(atob(String(code).trim().replace(/^GNANIM1:/, ''))))); return j && typeof j === 'object' ? j : null; } catch (e) { return null; } }
