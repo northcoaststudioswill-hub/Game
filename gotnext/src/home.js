@@ -43,6 +43,7 @@ const HOME_SETS = [
   { id: 'rackroom', n: "BOTTIE'S RACK ROOM", items: ['bt_rack', 'bt_bsod', 'bt_plush', 'bt_neon'], d: '+3 Speed w/ Ball in games.', k: 'a_swb', v: 3 },
   { id: 'gameday', n: 'GAME DAY (ON TWO)', items: ['o2_sled', 'o2_post', 'o2_ball', 'o2_pennant'], d: '+3 Strength in games.', k: 'a_str', v: 3 },
   { id: 'champs', n: 'CAGES CHAMPIONS', items: ['gn_trophy', 'gn_winners', 'gnneon', 'cageflag'], d: '+5% Respect from games.', k: 'rep', v: 0.05 },
+  { id: 'archive', n: 'THE ARCHIVE (lil Bottie)', items: ['bt_tracklist', 'bt_triptych', 'bt_ph_p09', 'bottiespeaker'], d: '+5% HC from games.', k: 'vc', v: 0.05 },
   { id: 'hoops', n: 'HOOP HEAVEN', items: ['rack', 'minihoop', 'shotclock', 'cones'], d: '+10% Shooting smarts XP.', k: 'bxS', v: 0.10 },
 ];
 // ---------- the catalog ----------
@@ -182,6 +183,14 @@ hitem('o2_sled', 'gym', 'Blocking Sled (ON TWO)', 1800, 2, 1.8, 1.0, { hoops: 3,
 hitem('o2_post', 'yard', 'Backyard Goalpost (ON TWO)', 2600, 3, 2.4, 0.6, { hoops: 4, drip: 3 }, g => { _C(g, 0.06, 0.07, 1.6, '#f2c14e', 0, 0.8, 0, 8); _B(g, 2.0, 0.08, 0.08, '#f2c14e', 0, 1.62); for (const sx of [-1, 1]) _C(g, 0.04, 0.04, 1.6, '#f2c14e', sx * 0.96, 2.42, 0, 8); M(box(0.06, 0.4, 0.01), toon('#ff7a1a'), 0.96, 3.0, 0, g); });
 hitem('o2_ball', 'show', 'The Ball, On Its Tee (ON TWO)', 2400, 3, 0.6, 0.6, { drip: 5, hoops: 2 }, g => { _B(g, 0.5, 0.5, 0.5, '#2a2450'); _C(g, 0.08, 0.12, 0.08, '#ff7a1a', 0, 0.54); const b = ink(M(sph(0.16, 12, 8), toon('#f2c14e'), 0, 0.74, 0, g), 1.05); b.scale.set(0.7, 1.2, 0.7); for (let i = 0; i < 4; i++) M(box(0.06, 0.012, 0.012), toon('#f4f1e8'), 0, 0.68 + i * 0.04, 0.11, g); });
 hitem('o2_pennant', 'wall', 'ON TWO Pennant', 450, 0, 1.2, 0.2, { drip: 2, party: 1 }, g => { _B(g, 1.2, 0.05, 0.05, '#2a2450', 0, 1.9); const p = M(geo('pennant', () => { const s = new THREE.Shape(); s.moveTo(0, 0.25); s.lineTo(1.1, 0); s.lineTo(0, -0.25); return new THREE.ShapeGeometry(s); }), toon('#2448c8'), -0.55, 1.6, 0, g); p.material.side = THREE.DoubleSide; _S(g, 'ON TWO', 0.5, 0.16, '#f2c14e', '#2448c8', -0.2, 1.6, 0.01); });
+// ---- lil Bottie's archive: his photos, framed, and the album's tracklist ----
+function btPhotoTex(id) { const p = BOTTIE_PHOTOS.find(x => x.id === id); return geoTex('btp' + id, () => { const t = new THREE.TextureLoader().load(p.src); return t; }); }
+function btPhotoFrame(g, id, y, frame) { ink(M(box(0.66, 1.12, 0.05), toon(frame || '#16181c'), 0, y, 0, g), 1.02); M(geo('btpPlane', () => new THREE.PlaneGeometry(0.56, 1.0)), new THREE.MeshBasicMaterial({ map: btPhotoTex(id) }), 0, y, 0.03, g); }
+for (const [i, p] of (typeof BOTTIE_PHOTOS !== 'undefined' ? BOTTIE_PHOTOS : []).entries())
+  hitem('bt_ph_' + p.id, 'wall', 'lil Bottie Print: ' + p.n, 700 + (i % 4) * 250, i < 6 ? 1 : 2, 0.8, 0.2, { drip: 3, party: 1 }, g => { btPhotoFrame(g, p.id, 1.5, i % 3 === 2 ? '#c8d0d8' : '#16181c'); });
+hitem('bt_tracklist', 'wall', "lil Bottie: The Tracklist", 1100, 1, 1.1, 0.2, { drip: 3, party: 2 }, g => { const t = geoTex('btTrack', () => canvasTex(256, 384, (x, w, h) => { x.fillStyle = '#0a0a12'; x.fillRect(0, 0, w, h); x.fillStyle = '#7de3ff'; x.font = '900 26px Archivo, Impact, sans-serif'; x.textAlign = 'center'; x.fillText('LIL BOTTIE', w / 2, 38); x.fillStyle = '#ffd23a'; x.font = '700 13px Archivo, sans-serif'; x.fillText("CLANKIN' IN THE CLOUD", w / 2, 58); x.textAlign = 'left'; x.font = '700 15px Archivo, sans-serif'; (typeof BOTTIE_ALBUM !== 'undefined' ? BOTTIE_ALBUM : []).forEach((n, i) => { x.fillStyle = i % 2 ? '#c8d0d8' : '#f4f4f4'; x.fillText(String(i + 1).padStart(2, '0') + '  ' + n.toUpperCase(), 22, 92 + i * 21); }); }));
+  ink(M(box(0.9, 1.3, 0.04), toon('#16181c'), 0, 1.5, 0, g), 1.02); M(geo('trkPlane', () => new THREE.PlaneGeometry(0.82, 1.22)), new THREE.MeshBasicMaterial({ map: t }), 0, 1.5, 0.025, g); });
+hitem('bt_triptych', 'wall', 'The Burning Roof (three prints)', 3200, 3, 2.2, 0.2, { drip: 8, party: 2 }, g => { [-0.72, 0, 0.72].forEach((x, k) => { const s = grp(g, x, 0, 0); btPhotoFrame(s, ['p06', 'p07', 'p08'][k], 1.5, '#2a2c33'); }); });
 const HOME_ITEM = {}; HOME_ITEMS.forEach(i => HOME_ITEM[i.id] = i);
 const RARES = HOME_ITEMS.filter(i => i.rare);
 function rareToday() { return RARES[dayHash(dayKey(), 31) % RARES.length]; }

@@ -168,7 +168,7 @@ function netWorldStep(dt) {
     g.x += (tx - g.x) * k; g.z += (tz - g.z) * k; g.f = lerpAng(g.f, +pr.f || 0, k);
     const v = Math.hypot(g.x - ox, g.z - oz) / Math.max(dt, 0.001); g.ph += dt * (4 + v * 1.6);
     const em = typeof pr.em === 'string' && EMOTES[pr.em] ? EMOTES[pr.em] : null;
-    if (em && v < 0.3) { g.rig.root.position.set(g.x, em.y || 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, poseOf(em.an, W.t, Object.assign({ leg: g.rig.legLen, style: 'flex', ph: 0 }, em.o || {})), dt); g.rig.gait = null; }
+    if (em && v < 0.3) { g.rig.root.position.set(g.x, em.y || 0, g.z); g.rig.root.rotation.y = g.f; applyPose(g.rig, emotePose(em, g.rig, W.t, 'flex'), dt); g.rig.gait = null; }
     else locoAnim(g.rig, g.x, g.z, g.f, dt);
     if (pr.say && typeof pr.say.t === 'string' && pr.say.i !== g.sayI) { bubble(g.rig.root, pr.say.t.replace(/[<>]/g, '').slice(0, 60), 5, g.rig.H + 0.45, 'net'); g.sayI = pr.say.i; }
   }

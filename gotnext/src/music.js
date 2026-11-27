@@ -2,7 +2,8 @@
 // a soft reverb whose size changes with the place (wide street, chain-link cage, your yard, a game court), a gentle
 // top-end roll-off that smooths compressed audio, and the synth loop only as a fallback if no track can load.
 'use strict';
-const TRACKS = [['afraid', 'Afraid'], ['down', 'Down'], ['hard-to-pretend', 'Hard to Pretend'], ['city-deep', 'City Deep'], ['i-am-somebody', 'I Am Somebody'], ['parody-3', 'Parody 3'], ['no-love', 'No Love'], ['insanity', 'Insanity'], ['going-out-sad', 'Going Out Sad'], ['believe', 'Believe'], ['bbb', 'BBB']];
+const TRACKS = [['afraid', 'Afraid'], ['down', 'Down'], ['hard-to-pretend', 'Hard to Pretend'], ['city-deep', 'City Deep'], ['i-am-somebody', 'I Am Somebody'], ['parody-3', 'Parody 3'], ['no-love', 'No Love'], ['insanity', 'Insanity'], ['going-out-sad', 'Going Out Sad'], ['believe', 'Believe'], ['bbb', 'BBB'],
+  ['bt-overclocked', 'Overclocked', 'lil Bottie'], ['bt-algorithm', 'The Algorithm', 'lil Bottie'], ['bt-nuke', 'Nuke the Data Center', 'lil Bottie']];      /* his tracks: near him on the Block, he performs them (cast.js) */
 // per place: reverb mix (wet), dry level, how bright the top end stays, overall level
 const ROOMS = { menu: { wet: 0.06, dry: 1, hi: 14000, lvl: 0.66 }, hub: { wet: 0.2, dry: 0.92, hi: 10500, lvl: 0.64 }, pit: { wet: 0.16, dry: 0.94, hi: 11500, lvl: 0.64 }, crib: { wet: 0.12, dry: 0.96, hi: 12500, lvl: 0.6 }, room: { wet: 0.2, dry: 0.93, hi: 8500, lvl: 0.62 }, game: { wet: 0.13, dry: 0.92, hi: 11000, lvl: 0.44 } };   /* released tracks are mastered loud: they sit under the game's sounds */
 const OST = { el: null, ok: false, order: [], i: -1, fails: 0, room: 'menu', graph: null };
@@ -29,8 +30,8 @@ function ostImpulse(secs, decay) {
 }
 function ostNext() {
   if (!OST.el) return; OST.i = (OST.i + 1) % TRACKS.length; const t = TRACKS[OST.order[OST.i]];
-  OST.el.src = 'music/' + t[0] + '.mp3'; OST.cur = t[1];
-  if (S && S.set.music) OST.el.play().then(() => { if (typeof toast === 'function' && document.body.dataset.state !== 'match' && !(typeof UI !== 'undefined' && UI.cur)) toast('♪ ' + t[1], 'GOT NEXT soundtrack' + (IN[0] && IN[0].hasPad && (IN[0].padAt || 0) >= (window.__kbAt || 0) || (typeof IS_TOUCH !== 'undefined' && IS_TOUCH) ? '' : ' · N skips')); }).catch(() => { });
+  OST.el.src = 'music/' + t[0] + '.mp3'; OST.cur = t[1]; OST.id = t[0];
+  if (S && S.set.music) OST.el.play().then(() => { if (typeof toast === 'function' && document.body.dataset.state !== 'match' && !(typeof UI !== 'undefined' && UI.cur)) toast('♪ ' + t[1], (t[2] ? t[2] + (OST.id === 'bt-algorithm' || OST.id === 'bt-overclocked' || OST.id === 'bt-nuke' ? ' · live on the Block' : '') : 'GOT NEXT soundtrack') + (IN[0] && IN[0].hasPad && (IN[0].padAt || 0) >= (window.__kbAt || 0) || (typeof IS_TOUCH !== 'undefined' && IS_TOUCH) ? '' : ' · N skips')); }).catch(() => { });
 }
 // glide the room settings when you change places
 function ostRoom(k) {

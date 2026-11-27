@@ -521,6 +521,23 @@ drip('head', 'hd_lumen', 'Lumen Charter Hard Hat', 'helm', '#f2c14e', '#2f4a5a',
 drip('head', 'hd_ghostcap', 'Vesper City Cap', 'cap', '#15131f', '#ff3cac', 1, 450, 1, null, 'shop', { print: 'V07' });
 drip('back', 'bk_gutshield', 'Syndicate Buckler (Guttercrown)', 'shield', '#26204a', '#f0c95a', 2, 2200, 2, { steal: 1 });
 drip('back', 'bk_ledgerchain', "The Ledger's Pocket Chain", 'chain', '#c8a24a', '#b3401a', 3, 3800, 3, { iq: 1 }, 'shop', { print: '$' });
+// lil Bottie, as he is in the photos, and a shirt for every track on the album
+drip('top', 't_bt_silver', 'The Silver Puffer (from the photos)', 'puffer', '#c8ccd4', '#16181c', 4, 9500, 5, { swb: 1, handle: 1, stam: 1 });
+drip('bottom', 'b_bt_black', 'Black Cargos (from the photos)', 'pants', '#16181c', 0, 1, 800, 1);
+drip('arm', 'a_bt_watch', 'Iced Watch', 'wrist', '#e8eef8', 0, 3, 3800, 3, { iq: 1 });
+drip('shoes', 'k_bt_blk', 'Blackout Runners', 'low', '#16181c', '#16181c', 1, 600, 0);
+drip('top', 't_bt_boot', 'BOOT UP Tee', 'tee', '#16181c', '#33ff88', 1, 600, 0, null, 'shop', { print: 'BOOT\nUP', back: 'TRACK 01' });
+drip('top', 't_bt_born', 'BORN IN THE SERVER Tee', 'tee', '#c8102e', '#f4f4f4', 1, 650, 0, null, 'shop', { print: 'BORN IN\nTHE SERVER' });
+drip('top', 't_bt_algo', 'THE ALGORITHM Tee', 'tee', '#0a0a12', '#7de3ff', 2, 1100, 1, { iq: 1 }, 'shop', { print: 'THE\nALGORITHM', back: 'KEEP\nSCROLLIN' });
+drip('top', 't_bt_terms', 'TERMS AND CONDITIONS Longsleeve', 'longsleeve', '#f4f4f4', '#16181c', 1, 900, 1, null, 'shop', { print: 'I HAVE READ\nAND AGREE', back: '(HE DID NOT)' });
+drip('top', 't_bt_root', 'ROOT ACCESS Hoodie', 'hoodie', '#0a0a0e', '#33ff88', 2, 1600, 2, { handle: 1 }, 'shop', { print: 'ROOT\nACCESS', back: 'sudo' });
+drip('top', 't_bt_wifi', 'NO WI-FI, STILL ONLINE Tee', 'tee', '#2440a8', '#f4f4f4', 1, 650, 0, null, 'shop', { print: 'NO WI-FI\nSTILL ONLINE' });
+drip('top', 't_bt_aura', 'AURA FARMING Tee', 'tee', '#a78bff', '#16181c', 2, 1200, 1, { swb: 1 }, 'shop', { print: 'AURA\nFARMING', back: 'x8' });
+drip('top', 't_bt_rate', 'RATE LIMIT Tank', 'tank', '#ffd23a', '#16181c', 1, 550, 0, null, 'shop', { print: 'RATE\nLIMIT' });
+drip('top', 't_bt_bank', 'RUN THE BANK Tee', 'tee', '#1f6a3a', '#f2c14e', 2, 1300, 2, { pass: 1 }, 'shop', { print: 'RUN THE\nBANK' });
+drip('top', 't_bt_nuke', 'NUKE THE DATA CENTER Tee', 'tee', '#16181c', '#ff7a1a', 2, 1400, 2, { dunk: 1 }, 'shop', { print: 'NUKE THE\nDATA CENTER', back: '03:14 AM' });
+drip('top', 't_bt_szn', 'CLANKA SZN Jersey', 'jersey', '#c8d0d8', '#16181c', 3, 3200, 3, { handle: 1, swb: 1 }, 'shop', { print: 'CLANKA\nSZN', back: 'BOTTIE' });
+drip('top', 't_bt_tracks', 'Clankin\' Tour Tee (the tracklist)', 'tee', '#0a0a12', '#ffd23a', 2, 1500, 2, null, 'shop', { print: "CLANKIN'\nIN THE CLOUD", back: 'BOOT UP · THE ALGORITHM\nNUKE THE DATA CENTER' });
 FITS.push(
   { id: 'gn', n: 'GOT NEXT Day One', g: 'GOT NEXT', items: ['t_gn_logo', 'hd_gn_cap', 'b_gn_mesh', 's_gn', 'k_gn', 'bl_gn'] },
   { id: 'gnbone', n: 'Bone And Pink', g: 'GOT NEXT', items: ['t_gn_bone', 'hd_gn_capbone', 'b_gn_bone', 's_gn', 'k_gn_bone'] },
@@ -533,6 +550,8 @@ FITS.push(
   { id: 'btover', n: 'Overclocked Tour', g: 'lil Bottie', items: ['t_bt_tour', 'f_bt_heat', 'hd_bt_cap', 'b_bt_shorts', 'k_bt', 'bk_bt_chain'] },
   { id: 'btbsod', n: 'Blue Screen', g: 'lil Bottie', items: ['t_bt_bsod', 'f_bt_led', 'b_bt_rack', 'k_bt_chrome', 'bl_bt_bsod'] },
   { id: 'btclover', n: 'Iced Clover', g: 'lil Bottie', items: ['t_bt_clover', 'hd_bt_skully', 'b_bt_rack', 's_bt', 'k_bt', 'bk_bt_clover'] },
+  { id: 'btphotos', n: 'Exactly Like The Photos', g: 'lil Bottie', items: ['t_bt_silver', 'b_bt_black', 'a_bt_watch', 'bk_bt_clover', 'k_bt_blk'] },
+  { id: 'btnuke', n: '03:14 AM, On The Highway', g: 'lil Bottie', items: ['t_bt_nuke', 'b_bt_black', 'k_bt_blk', 'bk_bt_clover', 'a_bt_watch'] },
   { id: 'btgold', n: 'Battery Gold', g: 'lil Bottie', items: ['t_bt_gold', 'hd_bt_aura', 'a_bt_cable', 'b_bt_rack', 'k_bt', 'bk_bt_chain'] },
 );
 // NEXX SUPPLY: only Nexx sells these (cast.js)

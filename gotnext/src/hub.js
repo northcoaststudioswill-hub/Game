@@ -349,7 +349,8 @@ function buildPit() {
 }
 
 // emotes: show the block how you feel (keys 1-5, or the buttons). Online friends nearby see them too.
-const EMOTES = { wave: { an: 'call', n: 'WAVE', k: '1' }, dance: { an: 'dance', n: 'DANCE', k: '2' }, sit: { an: 'sit', n: 'SIT', k: '3', y: -0.4 }, cheer: { an: 'cheer', n: 'HYPE', k: '4' }, celeb: { an: 'celeb', n: 'CELEBRATE', k: '5' } };
+const EMOTES = { wave: { an: 'call', n: 'WAVE', k: '1' }, dance: { an: 'dance', n: 'DANCE', k: '2' }, sit: { an: 'sit', n: 'SIT', k: '3', y: -0.4 }, cheer: { an: 'cheer', n: 'HYPE', k: '4' }, celeb: { an: 'celeb', n: 'CELEBRATE', k: '5' }, thumbs: { an: 'thumbs', n: '3:14 AM', k: '6', crowd: true }, roof: { an: 'armsout', n: 'ON THE ROOF', k: '7', crowd: true } };      /* the last two are lil Bottie's, from his photos */
+const emotePose = (e, rig, t, style) => e.crowd ? crowdPose(e.an, t, { ph: 0 }, rig.prof) : poseOf(e.an, t, Object.assign({ leg: rig.legLen, style, ph: 0 }, e.o || {}));
 function emote(k) { if (!W || W.build || !EMOTES[k]) return; W.me.emote = W.me.emote === k ? null : k; W.me.sit = null; NET.em = W.me.emote; sfx('ui'); }
 // chat: T (or the chat button), type, Enter. A bubble over your head; online friends in the same place see it.
 function chatOpen() {
@@ -405,7 +406,7 @@ function worldStep(dt) {
   me.ph += dt * (4 + v * 1.6);
   const R = me.rig;
   if (me.sit) { const st = me.sit; me.x = st.x; me.z = st.z; me.face = st.face; R.root.position.set(st.x, st.y, st.z); R.root.rotation.y = st.face; applyPose(R, poseOf('sit', W.t, { leg: R.legLen }), dt); R.gait = null; }
-  else if (me.emote && v < 0.3) { const e = EMOTES[me.emote]; R.root.position.set(me.x, e.y || 0, me.z); R.root.rotation.y = me.face; applyPose(R, poseOf(e.an, W.t, Object.assign({ leg: R.legLen, style: S.moves.celeb, ph: 0 }, e.o || {})), dt); R.gait = null; }
+  else if (me.emote && v < 0.3) { const e = EMOTES[me.emote]; R.root.position.set(me.x, e.y || 0, me.z); R.root.rotation.y = me.face; applyPose(R, emotePose(e, R, W.t, S.moves.celeb), dt); R.gait = null; }
   else locoAnim(R, me.x, me.z, me.face, dt, me.vx, me.vz); R.capeSwing = v / 8;
   // npcs
   for (const n of W.npcs) {

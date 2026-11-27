@@ -14,19 +14,24 @@ function botLook(R, skin, hr) {
   const head = J.head, chest = J.chest;
   // dreads: thick ropes off the crown, hanging to the shoulders, in two tones
   for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2, back = Math.cos(a) < 0.55, len = back ? 0.2 + (i % 3) * 0.04 : 0.11; if (!back && Math.abs(Math.sin(a)) < 0.5) continue;
-    const d = M(cyl(0.018, 0.014, len, 5), toon(i % 3 ? '#16181c' : '#33e0ff'), Math.sin(a) * hr * 0.9, hr * 1.55 - len / 2, Math.cos(a) * hr * 0.85, head); d.rotation.z = -Math.sin(a) * 0.22; d.rotation.x = Math.cos(a) * 0.22; }
+    const d = M(cyl(0.018, 0.014, len, 5), toon(i % 3 ? '#16181c' : '#24262c'), Math.sin(a) * hr * 0.9, hr * 1.55 - len / 2, Math.cos(a) * hr * 0.85, head); d.rotation.z = -Math.sin(a) * 0.22; d.rotation.x = Math.cos(a) * 0.22; }
   M(sph(hr * 0.98, 10, 6), toon('#16181c'), 0, hr * 1.5, -0.01, head).scale.set(1, 0.55, 1);
-  // a visor strip that glows, an antenna, bolts at the temples
-  M(box(hr * 1.7, hr * 0.42, 0.03), flat(0x33e0ff), 0, hr * 1.14, hr * 0.92, head); for (const sx of [-1, 1]) M(cyl(0.022, 0.022, 0.03, 8), dark, sx * hr * 0.93, hr * 1.1, 0, head).rotation.z = Math.PI / 2;
+  // his face is a screen: a dark panel with the blue smile from the photos (happy eyes, a grin), and bolts at the temples
+  ink(M(box(hr * 1.7, hr * 1.5, 0.05), toon('#0c0d12'), 0, hr * 1.0, hr * 0.86, head), 1.04);
+  const ft = geoTex('botFace', () => canvasTex(128, 96, (x, w, h) => { x.fillStyle = '#05060a'; x.fillRect(0, 0, w, h); x.strokeStyle = '#3d8bff'; x.shadowColor = '#3d8bff'; x.shadowBlur = 10; x.lineWidth = 7; x.lineCap = 'round';
+    for (const ex of [38, 90]) { x.beginPath(); x.arc(ex, 40, 13, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); }      /* happy eyes */
+    x.beginPath(); x.arc(64, 46, 26, Math.PI * 0.2, Math.PI * 0.8); x.stroke(); }));      /* the smile */
+  M(geo('botFaceP', () => new THREE.PlaneGeometry(1, 1)), new THREE.MeshBasicMaterial({ map: ft }), 0, hr * 1.0, hr * 0.86 + 0.028, head).scale.set(hr * 1.52, hr * 1.3, 1); for (const sx of [-1, 1]) M(cyl(0.022, 0.022, 0.03, 8), dark, sx * hr * 0.93, hr * 1.1, 0, head).rotation.z = Math.PI / 2;
   // the puffer: three fat rolls round the chest, a high collar, rolls on the upper arms
-  const pc = toon('#ff2d78'), w = (R.shW || 0.36);
+  const pc = toon('#c8ccd4'), w = (R.shW || 0.36);      /* the silver puffer from the photos */
   for (let k = 0; k < 3; k++) ink(M(sph(0.2, 10, 6), pc, 0, -0.08 - k * 0.13, 0, chest), 1.04).scale.set(1.05 + (k === 1 ? 0.06 : 0), 0.42, 0.78);
   ink(M(cyl(0.085, 0.1, 0.09, 10, true), pc, 0, 0.05, 0, chest), 1.05);
   for (const s of ['R', 'L']) { const sh = J['sh' + s]; if (!sh) continue; for (let k = 0; k < 2; k++) M(sph(0.075, 8, 6), pc, 0, -0.07 - k * 0.11, 0, sh).scale.set(1, 0.8, 1); }
   // the chain
-  const ch = M(geo('botChain', () => new THREE.TorusGeometry(0.1, 0.012, 5, 14)), toon('#f2c14e'), 0, -0.1, 0.13, chest); ch.rotation.x = 1.2; M(box(0.05, 0.05, 0.015), toon('#f2c14e'), 0, -0.2, 0.17, chest);
+  const ch = M(geo('botChain', () => new THREE.TorusGeometry(0.1, 0.012, 5, 14)), flat(0xe8eef8), 0, -0.1, 0.13, chest); ch.rotation.x = 1.2;      /* the iced clover chain */
+  const cl = M(geo('clover', () => { const sh = new THREE.Shape(); for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2; sh.absarc(Math.cos(a) * 0.022, Math.sin(a) * 0.022, 0.02, 0, Math.PI * 2, false); } return new THREE.ShapeGeometry(sh); }), flat(0xf4f8ff), 0, -0.21, 0.185, chest); cl.scale.setScalar(1.4); cl.rotation.x = -0.2;
 }
-function bottieBuild() { const b = withSeed(4242, () => aiBuild(84, 'showman')); b.name = 'BOTTIE'; b.bot = true; b.build.body = { h: 75, w: -0.2, s: 0.3 }; b.worn = Object.assign(randomWorn(1), { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tank', bottom: 'b_basic', shoes: 'k_white', back: 'bk_none' }); return b; }
+function bottieBuild() { const b = withSeed(4242, () => aiBuild(84, 'showman')); b.name = 'BOTTIE'; b.bot = true; b.build.body = { h: 75, w: -0.2, s: 0.3 }; b.worn = Object.assign(randomWorn(1), { hair: 'h_buzz', head: 'hd_none', face: 'f_none', top: 't_tankblk', bottom: 'b_bt_black', shoes: 'k_bt_blk', back: 'bk_none' }); return b; }
 
 // ---------------- holodice ----------------
 // the grey ones: a pillar on a pale foot, a brown cap, a black dome, and the number hanging in the light above it

@@ -46,6 +46,10 @@ function castInit() {
   // BOTTIE: chrome, dreads, puffer; films the run for the feed
   const bt = addNpc(bottieBuild(), 3.6, -10.9, Math.PI, 'idle', { still: true }); bt.cast = 'bottie';      /* his own body: chrome, dreads, puffer (vice.js) */ bt.amb = 'film'; C.list.push(bt);
   spot(3.6, -9.8, 1.5, 'BOTTIE', () => uiDialog('BOTTIE', pick(CAST_LINES.bottie), [['Later']]));
+  // his wall: three prints from the archive and the album, on a board beside him
+  if (typeof BOTTIE_PHOTOS !== 'undefined' && typeof btPhotoFrame === 'function') { const g = grp(scene, 1.5, 0, -11.7); for (const sx of [-1.15, 1.15]) ink(M(box(0.08, 2.4, 0.08), toon('#2a2c33'), sx, 1.2, -0.05, g), 1.04);
+    ink(M(box(2.5, 1.5, 0.05), toon('#0a0a12'), 0, 1.55, -0.06, g), 1.02); [['p09', -0.75], ['p07', 0], ['p12', 0.75]].forEach(([id, x]) => { const s = grp(g, x, 0.25, 0); s.scale.setScalar(0.92); btPhotoFrame(s, id, 1.4, '#c8d0d8'); });
+    const sg = sign("LIL BOTTIE · CLANKIN' IN THE CLOUD", 2.4, 0.2, '#7de3ff', '#0a0a12', { border: false }); sg.position.set(0, 2.42, -0.03); g.add(sg); solid(0.25, 2.75, -11.85, -11.55); }
   // BRENNICK (Kael, from Sootborn): the valve hand. First one out here, last to leave, counts every rep.
   { const kb = kaelBuild(); const n = addNpc(kb, -2.6, -6.6, Math.PI, 'idle', { still: true }); n.cast = 'kael'; n.amb = 'cross'; C.list.push(n); C.kael = n;
     spot(-2.6, -5.6, 1.7, 'BRENNICK', () => uiKael()); }
@@ -62,17 +66,34 @@ function louieInit(x, z) {
   const legs = []; for (const [lx, lz] of [[-0.08, 0.2], [0.08, 0.2], [-0.08, -0.2], [0.08, -0.2]]) { const l = grp(g, lx, 0.24, lz); M(box(0.06, 0.24, 0.06), fur, 0, -0.12, 0, l); legs.push(l); }
   return { g, head, tail, legs, x, z, face: 0, tx: x, tz: z, wt: 2, zoom: 0, ph: 0, v: 0, hx: x, hz: z };
 }
+// lil Bottie performs his own songs: when one of his tracks is on and you are near him, he does the choreography Will
+// tapped in for it (a pose for every lyric line, and the line in his bubble), or his moves on the beat for the others
+const BT_MAP = { scroll: 'scroll', loser: 'loser', think: 'think', me: 'me', dance: 'robot', point: 'point2', thumbs: 'thumbs', npc: 'npc', phone: 'scroll', eat: 'eat', prison: 'prison', shake: 'shake', nope: 'nope', one: 'one', boss: 'cross', watch: 'watch2', flex: 'flex', write: 'scroll', harvest: 'money', money: 'money', pray: 'pray', stop: 'stop', run: 'runin', arms: 'armsout', lead: 'point2', mad: 'ohh', shrug: 'shrug', wave: 'wave' };
+const BT_LOOP = ['robot', 'robot', 'thumbs', 'robot', 'point2', 'me', 'robot', 'flex', 'armsout', 'robot', 'one', 'shrug', 'robot', 'money'];
+function bottieSong() { return typeof OST !== 'undefined' && OST.el && !OST.el.paused && OST.ok && /^bt-/.test(OST.id || '') ? OST : null; }
+function bottiePerf(n, d) {
+  const O = bottieSong(); if (!O || d > 16) { n.btLine = -1; return false; }
+  const tm = O.el.currentTime, beat = 0.4372; n.bt = (tm / beat) % 1;
+  const ch = typeof BOTTIE_CHOREO !== 'undefined' && BOTTIE_CHOREO[O.id];
+  if (ch) { let i = -1; for (let k = 0; k < ch.length; k++) if (ch[k][0] <= tm) i = k;
+    if (i < 0) n.amb = 'bob';
+    else { n.amb = BT_MAP[ch[i][1]] || 'robot';
+      if (i !== n.btLine) { n.btLine = i; if (d < 10) { const nx = ch[i + 1] ? ch[i + 1][0] - ch[i][0] : 4; bubble(n.rig.root, ch[i][2], Math.min(4.5, Math.max(1.5, nx - 0.2)), n.rig.H + 0.35); } } } }
+  else n.amb = BT_LOOP[Math.floor(tm / (beat * 8)) % BT_LOOP.length];
+  n.face = lerpAng(n.face, Math.atan2(W.me.x - n.x, W.me.z - n.z), 0.05);      /* he performs to you */
+  return true;
+}
 function castStep(dt) {
   const C = W.cast; if (!C) return; C.t += dt; const me = W.me;
   for (const n of C.list) {
     const d = Math.hypot(me.x - n.x, me.z - n.z);
     if (n.cast === 'nexx') { if (d < 4.5) { n.amb = 'film'; n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.08); } else { n.ambT = (n.ambT || 4) - dt; if (n.ambT <= 0 || n.amb === 'film') { n.amb = pick(['phone', 'phone', 'talk', 'bob', 'cross']); n.ambT = rnd(4, 9); } n.face = lerpAng(n.face, 0.6, 0.03); } }
-    else if (n.cast === 'bottie') n.amb = 'film';
+    else if (n.cast === 'bottie') { n.perf = bottiePerf(n, d); if (!n.perf) n.amb = 'film'; }
     else if (n.cast === 'kael') { n.ambT = (n.ambT || 5) - dt; if (n.ambT <= 0) { n.amb = pick(['cross', 'watch', 'bob', 'watch']); n.ambT = rnd(5, 10); n.count = ((n.count || 0) % 11) + 1; if (d < 7 && Math.random() < 0.4) bubble(n.rig.root, n.count === 11 ? 'Eleven.' : '...' + ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][n.count - 1] + '.', 2.2, n.rig.H + 0.35); } if (d < 4) n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.05); }
     else { n.ambT = (n.ambT || 5) - dt; if (n.ambT <= 0) { n.amb = pick(n.cast === 'mark' ? ['cross', 'watch', 'talk', 'point'] : n.cast === 'erin' ? ['watch', 'clap', 'cross'] : ['watch', 'phone', 'cross']); n.ambT = rnd(4, 9); } }
-    n.rig.root.position.set(n.x, 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, crowdPose(n.amb, W.t, { ph: n.ph }, n.rig.prof), dt);
+    n.rig.root.position.set(n.x, 0, n.z); n.rig.root.rotation.y = n.face; applyPose(n.rig, crowdPose(n.amb, W.t, { ph: n.ph, bt: n.perf ? n.bt : undefined }, n.rig.prof), dt);
     // a line now and then when you walk past
-    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 5 && n.sayT <= 0 && C.t - (C.lastSay || -9) > 5) { C.lastSay = C.t;      /* one of them at a time */ n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
+    n.sayT = (n.sayT || rnd(2, 6)) - dt; if (d < 5 && n.sayT <= 0 && !n.perf && C.t - (C.lastSay || -9) > 5) { C.lastSay = C.t;      /* one of them at a time */ n.sayT = rnd(9, 16); const L = n.cast === 'nexx' ? NEXX_LINES : CAST_LINES[n.cast]; if (L) bubble(n.rig.root, pick(L), 4, n.rig.H + 0.35); }
   }
   // Mark has money on the run in the cage
   if (W.park && C.mark) { const s = W.park.score[0] + W.park.score[1]; if (C.lastPark !== undefined && s !== C.lastPark && Math.random() < 0.5) { bubble(C.mark.rig.root, pick(Math.random() < 0.6 ? CAST_LINES.markBet : CAST_LINES.mark), 3.5, C.mark.rig.H + 0.35); C.mark.amb = Math.random() < 0.5 ? 'ohh' : 'up'; C.mark.ambT = 1.8; } C.lastPark = s; }
