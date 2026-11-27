@@ -793,6 +793,20 @@ function poseOf(anim, t, o) {
     if (o.jab && anim === 'hold') { const j = Math.abs(o.jab), sd = o.jab > 0 ? 'R' : 'L', sg = o.jab > 0 ? 1 : -1, hv = p['hp' + sd] || (p['hp' + sd] = [0, 0, 0]), kv = p['kn' + sd] || (p['kn' + sd] = [0, 0, 0]);      // triple threat: a jab step, alternating feet
       hv[0] -= 0.55 * j; kv[0] += 0.35 * j; const sp2 = p.spine || (p.spine = [0, 0, 0]); sp2[0] += 0.12 * j; const ch = p.chest || (p.chest = [0, 0, 0]); ch[1] -= 0.2 * sg * j; p.y = (p.y || 0) - 0.04 * j; }
   }
+  // getting a hand on a loose ball. reachL: closing on it, down and reaching with the hand on its side. grab: the moment
+  // he has it: a scoop off the floor (knees, both hands down, then up to the chest), a two-hand catch, or a board up high
+  // pulled down to the chin
+  if (o.reachL && !o.dive) { const k = o.reachL.k, sd = o.reachL.side > 0 ? 'R' : 'L', ad = (k2, x, y, z) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] += (x || 0) * k; v[1] += (y || 0) * k; v[2] += (z || 0) * k; };
+    ad('spine', 0.3 + 0.2 * o.reachL.low); ad('chest', 0.1); ad('neck', -0.25); ad('knR', 0.3 * o.reachL.low); ad('knL', 0.3 * o.reachL.low); p.y = (p.y || 0) - 0.08 * k * o.reachL.low;
+    const v = p['sh' + sd] || (p['sh' + sd] = [0, 0, 0]); v[0] = lerp(v[0], -1.15 + 0.35 * o.reachL.low, k); v[2] = lerp(v[2], (sd === 'R' ? -0.25 : 0.25), k); const e = p['el' + sd] || (p['el' + sd] = [0, 0, 0]); e[0] = lerp(e[0], -0.15, k); }
+  if (o.grab) { const u = o.grab.u, h = o.grab.h, set = (k2, x, y, z, w) => { const v = p[k2] || (p[k2] = [0, 0, 0]); v[0] = lerp(v[0], x, w); v[1] = lerp(v[1], y, w); v[2] = lerp(v[2], z, w); };
+    if (h < 0.38) { const w = 1 - u * u, sg = o.grab.side;      /* the scoop */
+      set('spine', 0.75, 0, 0, w); set('chest', 0.2, 0.15 * sg, 0, w); set('neck', -0.5, 0, 0, w); set('hpR', -0.9, 0, -0.1, w); set('hpL', -0.9, 0, 0.1, w); set('knR', 1.3, 0, 0, w); set('knL', 1.3, 0, 0, w); p.y = lerp(p.y || 0, -0.3, w);
+      set('shR', -0.95 + 0.6 * u, 0, 0.35, w * 1); set('shL', -0.95 + 0.6 * u, 0, -0.35, w); set('elR', -0.2 - 1.3 * u, 0, 0, Math.max(w, 0.5)); set('elL', -0.2 - 1.3 * u, 0, 0, Math.max(w, 0.5)); }
+    else if (h > 0.95) { const w = 1 - Math.max(0, u - 0.7) / 0.3;      /* the board: both hands up, then down to the chin */
+      set('shR', lerp(-2.85, -1.0, u), 0, 0.3, w); set('shL', lerp(-2.85, -1.0, u), 0, -0.3, w); set('elR', lerp(-0.25, -2.1, u), 0, 0, w); set('elL', lerp(-0.25, -2.1, u), 0, 0, w); set('neck', lerp(-0.35, 0.1, u), 0, 0, w); set('spine', lerp(-0.1, 0.18, u), 0, 0, w); }
+    else { const w = 1 - u;      /* a catch at the chest */
+      set('shR', -1.25, 0, 0.25, w); set('shL', -1.25, 0, -0.25, w); set('elR', -1.1, 0, 0, w); set('elL', -1.1, 0, 0, w); set('wrR', 0.5, 0, 0, w); set('wrL', 0.5, 0, 0, w); set('spine', 0.18, 0, 0, w); } }
   if (o.dive) {      // on the floor after a loose ball: laid out, both arms reaching
     const ad = (k, x, y, z) => { const v = p[k] || (p[k] = [0, 0, 0]); v[0] += x || 0; v[1] += y || 0; v[2] += z || 0; };
     p.hips = [1.15, 0, 0]; p.spine = [0.15, 0, 0]; p.neck = [-0.6, 0, 0]; p.shR = [-2.7, 0, 0.2]; p.shL = [-2.7, 0, -0.2]; p.elR = [-0.2, 0, 0]; p.elL = [-0.2, 0, 0]; p.hpR = [0.25, 0, -0.1]; p.hpL = [0.1, 0, 0.1]; p.knR = [0.3, 0, 0]; p.knL = [0.7, 0, 0]; p.y = -0.55; p.rate = 30; void ad; }

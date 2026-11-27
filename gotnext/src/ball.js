@@ -453,7 +453,13 @@ function startMove(p, slot, dx, dz) {
   if (mv.keep) { dx *= 0.45; dz = -0.9; }            /* in-and-out: the fake goes sideways, the burst goes forward */ const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
   const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
   if (typeof vipMove === 'function') vipMove(p, mv.id);
-  p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) p.hand = dx > 0.2 ? 'L' : dx < -0.2 ? 'R' : p.hand; dribMove(p, mv);
+  p.dblX = null;
+  p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) {      // a crossover: the ball goes to the hand on the side you go, as seen looking at the rim (it had them backwards:
+      // a cross to the left put the ball in the right hand, so half the time it never left the hand it was in)
+      const dh = dHoop(p) || 1, hx = -p.x / dh, hz = -p.z / dh, lat = dx * -hz + dz * hx, go = lat > 0.2 ? 'R' : lat < -0.2 ? 'L' : null;
+      if (go && go !== p.hand) p.hand = go;
+      else if (go) { p.hand = go === 'R' ? 'L' : 'R'; p.dblX = { at: MT.time + mv.dur * 0.42, hand: go }; } }      /* it is already on that side: across and back (a double cross), so the ball always crosses */
+    dribMove(p, mv);
   p.combo = MT.time - p.comboT < 1.4 ? Math.min(3, p.combo + 1) : 0; p.comboT = MT.time; sfxM('whoosh'); sfx('squeak');
   // the same move the same way, again and again, gets read; mixing them up builds a combo
   const sig = slot + (dx > 0.2 ? 'R' : dx < -0.2 ? 'L' : 'C'), H = p.mvHist || (p.mvHist = []), rep = H.filter(h => h.s === sig && MT.time - h.t < 6).length, fresh = H.length && H[H.length - 1].s !== sig && MT.time - H[H.length - 1].t < 1.4; H.push({ s: sig, t: MT.time }); if (H.length > 4) H.shift();
@@ -1018,7 +1024,7 @@ function matchStep(dtReal) {
   }
   puStep(dt); stepBall(dt);
   for (const p of M_.P) animPlayer(p, dt); repRec(dtReal);
-  if (B.state === 'held' && B.holder) ballHeld(B.holder, dt); ballMesh();
+  if (B.state === 'held' && B.holder) { ballHeld(B.holder, dt); const g = B.holder.grab; if (g && g.t < g.dur) { const u = g.t / g.dur, e = u * u * (3 - 2 * u); B.pos.set(lerp(g.fx, B.pos.x, e), lerp(g.fy, B.pos.y, e), lerp(g.fz, B.pos.z, e)); } } ballMesh();
   matchFx(dt); matchCam(dtReal); hudMatch(); if (M_.net === 'host') netHostStep(dtReal);
 }
 function matchFx(dt) {
@@ -1076,7 +1082,7 @@ function stepPlayer(p, dt) {
       if (u >= 1) { p.st = 'free'; p.y = 0; const o2 = Object.assign({ hopped: 1 }, h.opt || {}), ok = h.next === 'shot' ? startShot(p, h.src || 'btn', false, o2) : startFinish(p, 0, false, 0, o2); if (!ok) p.st = 'free'; }
       break;
     }
-    case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; const k = m.v * (m.slot === 'side' ? (u < 0.3 ? 0.12 + 0.3 * (u / 0.3) * (u / 0.3) : 1.2 * (1 - (u - 0.3) / 0.7 * 0.55)) : 1 - u * 0.6), st = 2.4 * Math.min(1, u * 1.6);      /* side moves: set the defender up first, then explode */ p.vx = m.dx * k + p.in.dx * st; p.vz = m.dz * k + p.in.dz * st; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; p.lastMv = { id: m.mv.id, slot: m.slot, at: MT.time }; } break; }
+    case 'move': { const m = p.mv, u = p.t / m.mv.dur; lock = 0; if (p.dblX && MT.time >= p.dblX.at) { p.hand = p.dblX.hand; p.dblX = null; dribMove(p, m.mv); } const k = m.v * (m.slot === 'side' ? (u < 0.3 ? 0.12 + 0.3 * (u / 0.3) * (u / 0.3) : 1.2 * (1 - (u - 0.3) / 0.7 * 0.55)) : 1 - u * 0.6), st = 2.4 * Math.min(1, u * 1.6);      /* side moves: set the defender up first, then explode */ p.vx = m.dx * k + p.in.dx * st; p.vz = m.dz * k + p.in.dz * st; if (u >= 1) { p.st = 'free'; p.rig.extraYaw = 0; p.lastMv = { id: m.mv.id, slot: m.slot, at: MT.time }; } break; }
     case 'stagger': { lock = 0; const g = p.stg; if (g.dir && p.t < 0.28) { const k = (g.push || 1.5) * (1 - p.t / 0.28); p.vx = g.dir[0] * k; p.vz = g.dir[1] * k; } else { p.vx *= 0.85; p.vz *= 0.85; } if (p.t >= g.dur) p.st = 'free'; break; }      /* the first steps go where he bit, then he is stuck there */
     case 'fake': lock = 0.25; if (p.t > 0.27) p.st = 'free'; break;
     case 'jump': { lock = 0.35; if (p.lunge && p.t < p.lunge[2]) { lock = 0; p.vx = p.lunge[0]; p.vz = p.lunge[1]; } const u = p.t / 0.62; p.y = p.jumpH * Math.sin(Math.PI * Math.min(1, u)); if (u >= 1) { p.st = 'free'; p.y = 0; } break; }
@@ -1236,7 +1242,8 @@ function stepBall(dt) {
     const inNet = !B.rattle && B.pos.y < HOOP_Y + 0.1 && B.pos.y > HOOP_Y - 0.55;
     if (inNet) { const k = 1 - Math.exp(-18 * dt), r = Math.hypot(B.pos.x, B.pos.z), rmax = lerp(0.11, 0.03, clamp((HOOP_Y - B.pos.y) / 0.42, 0, 1)); B.pos.x *= 1 - k * 0.5; B.pos.z *= 1 - k * 0.5; if (r > rmax && r > 0) { B.pos.x *= rmax / r; B.pos.z *= rmax / r; } B.vel.x *= 1 - k; B.vel.z *= 1 - k; if (B.vel.y < -3.4) B.vel.y = lerp(B.vel.y, -3.4, k); }      /* the net slows it and keeps it in the middle on the way through */
     M_.netY = inNet ? B.pos.y : null; if (B.pos.y < 0.125) { B.pos.y = 0.125; B.vel.y *= -0.5; B.vel.x = rnd(-0.5, 0.5); B.vel.z = rnd(0.3, 1); if (Math.abs(B.vel.y) > 1) sfxM('bounce'); }
-    if (M_.practice && !M_.drill && B.t > 0.45) give(M_.me);
+    if (M_.practice && !M_.drill && M_.practice !== 'free' && B.t > 0.45) give(M_.me);
+    else if (M_.practice === 'free' && B.t > 0.55) { B.state = 'loose'; B.rebound = false; M_.looseT = 0; B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.4, 1.2); }      /* free practice: through the net and away, you go get it */
   } else if (B.state === 'pass') {
     const to = B.target; _v.set(to.x, 1.2 + to.y, to.z).sub(B.pos); const l = _v.length(), stepL = B.speed * dt;
     if (l <= Math.max(0.45, stepL)) { const from = B.from, wasTouch = !!B.touch; give(to); to.catchT = M_.time; to.catchFrom = from; B.assist = from; B.touch = false; if (wasTouch) to.touchT = M_.time; if (to.st === 'free') to.ai.tick = 0.25;
@@ -1281,12 +1288,13 @@ function stepBall(dt) {
         const wasOff = M_.off === best.team;
         if (B.rebound) { best.rebT = 0.9; best.stats.reb++; if (best.box) best.stats.box = (best.stats.box || 0) + 1; addBrav(best, 0.05); if (best.user) floatTxt(best, wasOff ? 'OFFENSIVE BOARD' : best.box ? 'BOXED OUT · BOARD' : 'BOARD', '#fff'); if (wasOff) { best.putT = 2; M_.clock = 14; } }
         const wasReb = B.rebound, air = best.st === 'jump';
+        { const fx = Math.sin(best.face), fz = Math.cos(best.face), lat = (B.pos.x - best.x) * -fz + (B.pos.z - best.z) * fx; best.grab = { t: 0, dur: best.diveT > 0 ? 0.42 : 0.32, fx: B.pos.x, fy: B.pos.y, fz: B.pos.z, h: B.pos.y - best.y, side: lat > 0.08 ? 1 : lat < -0.08 ? -1 : 0 }; }      /* he has to get his hands on it: a scoop off the floor, a catch, a board pulled down */
         give(best); changePoss(best.team); B.rebound = false; B.assist = null; best.ai.hold = 0; best.ai.tick = 0.3;
         if (wasReb && wasOff && air && !M_.practice && dHoop(best) < 2.0 && (M_.arcade || att(best, 'dunk') >= 68) && Math.random() < (M_.arcade ? 0.8 : 0.3 + 0.15 * bt(best, 'putback'))) { if (startFinish(best, 0, true, best.y)) { best.finish.put = true; best.finish.dur = 0.5; } }
         if (M_.practice) M_.needClear = false;
       }
     }
-    if (M_.practice && !M_.drill && M_.looseT > 1.1) { give(M_.me); }
+    if (M_.practice && !M_.drill && M_.looseT > (M_.practice === 'free' ? 9 : 1.1)) { give(M_.me); }      /* the rack and the drills hand it back; free practice only if it has rolled off for good */
   }
   if (M_.practice === 'rack' && (B.state === 'shot' || B.state === 'through') && B.t > 0.3 && M_.me.st === 'free' && !M_.rackBall) { /* a second ball appears in hand so the rack keeps moving */ }
 }
@@ -1498,7 +1506,8 @@ function animPlayer(p, dt) {
   // running forward at speed (with or without the ball): the legs follow real running curves on a stride clock that
   // advances with distance (knee drive, heel recovery, a flight phase); arms stay with the ball when dribbling.
   // Sideways, backwards, slow or defensive movement keeps the planted-feet stepping.
-  if (p.jolt && p.st !== 'stagger') o.jolt = p.jolt; if (p.diveT > 0 && p.st === 'free') o.dive = 1; if (p.screen) o.screen = p.ai.scr && p.ai.scr.kind === 'hard' ? 2 : p.ai.scr && p.ai.scr.kind === 'soft' ? 3 : 1; if (p.box && p.st === 'free') o.box = 1; if (p.scrR && p.st === 'free') o.scrR = p.scrR.k;
+  if (p.jolt && p.st !== 'stagger') o.jolt = p.jolt; if (p.diveT > 0 && p.st === 'free') o.dive = 1; if (p.grab) { p.grab.t += dt; if (p.grab.t >= p.grab.dur) p.grab = null; else o.grab = { u: p.grab.t / p.grab.dur, h: p.grab.h / (p.rig.H || 1.9), side: p.grab.side }; }
+  if (!o.grab && !o.dive && B.state === 'loose' && B.holder !== p && p.st === 'free' && !p.box) { const dx = B.pos.x - p.x, dz = B.pos.z - p.z, dd = Math.hypot(dx, dz); if (dd < 1.7 && dd > 0.2 && B.pos.y < 1.3) { const fx = Math.sin(p.face), fz = Math.cos(p.face), fw = (dx * fx + dz * fz) / dd; if (fw > 0.3) o.reachL = { k: clamp((1.7 - dd) / 1.2, 0, 1) * fw, low: B.pos.y < 0.7 ? 1 : 0, side: (dx * -fz + dz * fx) > 0 ? 1 : -1 }; } }      /* closing on a loose ball: down and reaching for it */ if (p.screen) o.screen = p.ai.scr && p.ai.scr.kind === 'hard' ? 2 : p.ai.scr && p.ai.scr.kind === 'soft' ? 3 : 1; if (p.box && p.st === 'free') o.box = 1; if (p.scrR && p.st === 'free') o.scrR = p.scrR.k;
   let P = poseOf(an, t, o), duty = 0.38; if (p.st === 'finish' && p.finish.lh && p.finish.type === 'layup') P = mirrorPose(P);
   { const yawR = p.face + (R.extraYaw || 0); let da = Math.atan2(p.avx, p.avz) - yawR; da = Math.atan2(Math.sin(da), Math.cos(da));
     const fwd = (an === 'run' || an === 'dribble') && p.st === 'free' && p.y < 0.01 && asp > 1.2 && Math.abs(da) < 0.7 && !p.protect;      /* jogging counts too (was 3 m/s: a half-pushed stick fell back to the old stepping, the "stomp") */
