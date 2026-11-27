@@ -699,5 +699,17 @@ rep("  function steer(e, tx, tz, speed, dt) {", `  SC.detour = function (e, d, d
   };
   function steer(e, tx, tz, speed, dt) {`);
 
+/* ---- v0.90 COMBAT team patches (enemies, moves) go here ---- */
+
+/* ---- end COMBAT ---- */
+
+/* ---- v0.90 WORLD-A team patches (rendering, docks, riser, gild) go here ---- */
+
+/* ---- end WORLD-A ---- */
+
+/* ---- v0.90 WORLD-B team patches (stair, stack, array) go here ---- */
+
+/* ---- end WORLD-B ---- */
+
 writeFileSync(dir + 'issue.html', s);
 console.log('issue.html', (s.length / 1024).toFixed(1) + ' KB,', n, 'patches');
