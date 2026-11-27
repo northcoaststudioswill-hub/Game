@@ -1,5 +1,9 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.89 (2026-11-27).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.90 (2026-11-27).
+
+## Built in v0.90 (comic-book levels from the story; needs your hands)
+- Enemies, bosses, moves, look and world for all six. Play them: are the yellow/red rings readable, is the parry fair, is Rook's gaff and the Captain's charge readable, do the levels look like the places in the book?
+- Next, from the teams: teach the gaff/sweep/charge counters with first-time toasts; tune Riser waves on Story; decide the Riser foot guards' canon look; more life on the docks (a crew on the Sable); sound for the stack's hum and thunder; a lower-quality path for phones (fewer particles); the docks newcomer still gets lost on the roofs.
 
 ## Built in v0.89 (every playtest finding; needs your hands)
 - All of `docs/PLAYTEST_v0.87.md` built. Play Hard: each late boss now has one pattern to learn; tell me if any is unfair or unreadable.

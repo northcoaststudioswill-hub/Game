@@ -1,4 +1,37 @@
-# SOOTBORN — changelog (latest v0.89 · 2026-11-27)
+# SOOTBORN — changelog (latest v0.90 · 2026-11-27)
+
+## v0.90 · 2026-11-27 — the comic-book levels, from the story
+Three teams on the six comic-book levels, working from the story bible, the timeline and the chapters: combat (all levels), the look plus the High Docks, Riser Nine and the Table, and the Stair, the vent stack and the Deep Array.
+
+**Enemies and moves (all levels)**
+- **They take turns:** two attackers at most on Story and Hard, three on Brutal, with a beat between them; a Warden's swing is his alone. The rest spread round Kael; Stair Blades work behind him. Nobody swings through a wall or walks off a ledge.
+- **Tells:** a yellow ring closing on a man's feet is a blow you can turn aside; red is one you must dodge (slams and chops mark the ground). A first-time toast says so.
+- **Mashing costs now:** after a few hits in a row an ordinary man shoves through and answers; a boss hit six times in a breath throws Kael off ("NO."). Light cuts no longer stop a committed swing.
+- **Parry:** dodge with the stick still in the last moment of a yellow blow. He holds his ground, the man is open, the next cut lands double.
+- **Who they are:** Teal picket cadets at the vent stack (bible: Teal's pickets and a Warden of the dais), the Warden of the dais in officer's gilt, the Array watch grey with amber lamps. Their lines when they hit him: "OFF THE QUAY!", "VIOLET IS ELEVENTH.", "BACK, SOOT.", "KNEEL.", "NOTED."
+- **Bosses:** Rook throws the mooring gaff on its line (caught, he hauls you in; dodged, he is open) and from halfway strikes three times. The Warden Captain chops, sweeps, and from halfway charges the length of the hatch, winding himself on a wall. The Auditor's Blade never leaps (the leg does not bend), lunges along the ground and comes out of the ink behind you; as Oswin he presses harder (less so on Story). The Warden of the dais is a mini-boss who roars "KNEEL." at half.
+- **Kael at that point in the story:** in the Deep Array (before Ilse) the perfect dodge is "SLIPPED IT!", not THE TURN; dead boots have no blue ring and the slam is "DOWN ON HIM!".
+- **Settings difficulty now reaches the comic-book levels** (enemy health, damage, how many swing at once).
+
+**The look (all levels)**
+- Light and fog for each place; soft shadows under every fighter (jumps read); one particle system for steam, mist, rain splashes, dust and sparks; the sky fleet merged into fewer draw calls.
+- The High Docks has wind, not rain: the docks are above the weather.
+
+**High Docks, Riser Nine, the Table**
+- Docks: about fourteen hooded Unlit on the barges cutting the lashings; winch-house steam; lanterns along the gangways; the mast's signal lamp seen from anywhere. Lamp posts, the watch board and a bench are solid now.
+- Riser: the unseen walls sit at the face of the bushes, not a metre inside; you no longer walk through pine boughs or end up with the camera inside one; warm steam from the hatch, smoke from the fire.
+- The Table: the room's light and dust in the lamp cone.
+
+**The Stair, the vent stack, the Deep Array**
+- Stair: the Spire wall no longer stands inside the landings; lamp columns, loads, standards and the Auditor's table are solid; STEP 900 at the top; the Accredited lift stopped halfway up the Spire; the white door glows; OFF THE LINE · ONE DAY OF AIR; Tavi on his left.
+- Vent stack: no walking on the river; the valley round it (the ford, the dais and its white banner, the Violet camp's fire a coal, reeds, a storm); a chain at the crown's edge until the boots are live; I AM STUCK returns you to the last platform you won.
+- Deep Array: the main no longer splits the floor (it humps over a painted crossing); feed pipes overhead; nine dated patches on the main, wheels on every bank, a spike of work orders, ARRAY AUTHORITY · BOARD AND WATCH ONLY; the seal weeps; lamps at the stairs.
+
+**Small:** the line at the Stair's second chance has no contraction.
+
+**Checked:** each team's own bot runs (newcomer and pad) on its levels, before and after screenshots, draw calls. Then the merged build: a pad bot through all seven (the Table, the cold open, docks 359 s, riser 297 s, stair, stack 161 s, array 122 s), no soft-locks, no errors. The first merged stair run died six times to Oswin; after easing him on Story: 0 deaths, one second chance, 351 s. The whole-story bot: THE END, no errors.
+
+**Not checked:** a human hand; real phones (draw calls are flat or down, particles are one system, not measured on a device); touch; Hard and Brutal in the comic levels by a bot; the newcomer still gets lost on the docks roofs and at Mooring One (navigation, as before).
 
 ## v0.89 · 2026-11-27 — every playtest finding
 The open list from the v0.87 playtest (docs/PLAYTEST_v0.87.md), all of it, by three teams working apart: fights, story flow, comic-book levels.
