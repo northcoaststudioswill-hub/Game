@@ -124,16 +124,7 @@ function updateInspect(S) {
     setW($('nFed'), 1 - c.hunger); setW($('nJoy'), c.happy); setW($('nFear'), c.fear); setW($('nCur'), c.curio);
     $('nFed').style.background = c.hunger > 0.8 ? 'var(--bad)' : '';
     for (let k = 0; k < 4; k++) setW($('bl' + k), c.b[k]);
-    let friend = null, rival = null, fv = 0.25, rv = -0.12;
-    for (const o of S.citizens) {
-      const v = c.rel[o.id] || 0;
-      if (v > fv) { fv = v; friend = o; }
-      if (v < rv) { rv = v; rival = o; }
-    }
-    const home = c.home ? 'has a hut' : 'homeless';
-    $('inFoot').innerHTML = 'friend <b>' + (friend ? friend.name : 'none yet') + '</b>' +
-      (rival ? ' rival <b>' + rival.name + '</b>' : '') + ' <span>' + home + '</span>' +
-      (c.inspired ? ' <b style="color:' + BELIEFS[c.inspired.k].hex + '">PREACHING ' + Math.ceil(c.inspired.t) + 's</b>' : '');
+    $('inFoot').innerHTML = citizenFoot(S, c);
     $('inFollow').classList.toggle('on', R.cam.follow === c.id);
   } else {
     const def = BUILD[b.type];
@@ -145,12 +136,46 @@ function updateInspect(S) {
       for (const k in def.cost) parts.push(Math.ceil(def.cost[k] * (1 - b.progress)) + ' ' + k);
       extra += ' Still needs: ' + parts.join(', ') + '.' + (b.stall ? ' Waiting for ' + b.stall + '.' : '');
     } else if (b.type === 'farm') extra += b.food > 0 ? ' Ripe: ' + b.food + ' food to harvest.' : ' Growing: ' + ((b.growth * 100) | 0) + '%.';
-    else if (b.type === 'hut') { let n = 0; for (const o of S.citizens) if (o.home === b.id) n++; extra += ' Residents: ' + n + '/3.'; }
+    else if (b.type === 'hut') { const rs = S.citizens.filter(o => o.home === b.id).map(o => o.name); extra += ' Residents (' + rs.length + '/3): ' + (rs.join(', ') || 'nobody') + '.'; }
+    else if (b.type === 'shop') {
+      const ow = getC(S, b.owner), staff = S.citizens.filter(o => o.job === b.id && o.id !== b.owner).map(o => o.name);
+      $('inName').textContent = (b.built ? shopName(S, b) : BIZ[b.biz].name + ' / blueprint ' + ((b.progress * 100) | 0) + '%');
+      extra = BIZ[b.biz].desc + ' Owner: ' + (ow ? ow.name + ' (' + ow.coin + ' coin)' : 'nobody') + '. Staff: ' + (staff.join(', ') || 'none') + '. Takings so far: ' + (b.till || 0) + ' coin.' + (b.built ? '' : ' ' + extra.slice(def.desc.length));
+    }
     else if (b.type === 'fire') extra += ' Capacity ' + popCap(S) + ' minds.';
     $('inThought').textContent = extra;
     $('inNeeds').hidden = true; $('inBel').hidden = true; $('inFollow').hidden = true;
     $('inFoot').textContent = '';
   }
+}
+
+/* who this citizen is to everyone else: role, money, family and opinions */
+const REL_ORDER = ['partner', 'parent', 'child', 'best friend', 'enemy', 'friend', 'rival'];
+function citizenFoot(S, c) {
+  const parts = [];
+  const f = c.fac ? getF(S, c.fac) : null;
+  if (c.grow < 1) parts.push('<span>child, grown in ' + Math.ceil((1 - c.grow) * GROW_SECS) + 's</span>');
+  if (f) parts.push('<b style="color:' + BELIEFS[f.k].hex + '">' + (c.title === 'leader' ? 'LEADS ' : '') + 'THE ' + f.name.toUpperCase() + '</b>' +
+    (c.title === 'leader' ? ' <span>(' + facMembers(S, f).length + ')</span>' : ''));
+  const job = c.job ? getB(S, c.job) : null;
+  if (job) parts.push(job.owner === c.id ? 'owns <b>' + (job.built ? shopName(S, job) : 'a ' + BIZ[job.biz].name.toLowerCase() + ' (being built)') + '</b>'
+    : 'works for <b>' + ((getC(S, job.owner) || {}).name || '?') + '</b>');
+  parts.push('<span>' + c.coin + ' coin, ' + (c.home ? 'has a hut' : 'homeless') + '</span>');
+  if (c.state === 'hermit') parts.push('<b style="color:var(--bad)">LIVING ALONE</b>');
+  if (c.inspired) parts.push('<b style="color:' + BELIEFS[c.inspired.k].hex + '">PREACHING ' + Math.ceil(c.inspired.t) + 's</b>');
+  // people: the closest bonds first, then the strongest opinions
+  const ppl = [];
+  for (const o of S.citizens) {
+    if (o === c) continue;
+    const lab = relLabel(c, o);
+    if (lab) ppl.push({ lab, o, v: Math.abs(c.rel[o.id] || 0) });
+  }
+  ppl.sort((a, b) => REL_ORDER.indexOf(a.lab) - REL_ORDER.indexOf(b.lab) || b.v - a.v);
+  const ppHtml = ppl.slice(0, 5).map(p => {
+    const bad = p.lab === 'enemy' || p.lab === 'rival';
+    return '<span>' + p.lab + '</span> <b' + (bad ? ' style="color:var(--bad)"' : '') + '>' + p.o.name + '</b>';
+  }).join(' &middot; ');
+  return parts.join(' &middot; ') + '<br>' + (ppHtml || '<span>no strong feelings about anyone yet</span>');
 }
 
 /* ------------------------------------------------------- powers and hints */

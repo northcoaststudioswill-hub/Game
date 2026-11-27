@@ -59,6 +59,10 @@ function sfx(name) {
     case 'argue': tone(140, 0.08, 'sawtooth', 0.07); tone(170, 0.08, 'sawtooth', 0.07, 0.09); break;
     case 'stage': [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, 0.22, 'square', 0.09, i * 0.08)); break;
     case 'age': tone(196, 0.9, 'triangle', 0.12); tone(294, 0.9, 'triangle', 0.1, 0.05); tone(392, 0.9, 'triangle', 0.08, 0.1); break;
+    case 'love': tone(784, 0.18, 'sine', 0.1); tone(988, 0.18, 'sine', 0.09, 0.12); tone(1175, 0.3, 'sine', 0.08, 0.24); break;
+    case 'punch': noise(0.07, 0.18, 0, 900); tone(110, 0.08, 'square', 0.08, 0, 60); break;
+    case 'coin': tone(1319, 0.05, 'square', 0.05); tone(1760, 0.1, 'square', 0.05, 0.05); break;
+    case 'war': tone(98, 0.6, 'sawtooth', 0.13); tone(98, 0.6, 'sawtooth', 0.13, 0.7); tone(147, 0.9, 'sawtooth', 0.13, 1.4); noise(0.3, 0.2, 0, 400); break;
     case 'thunder': noise(1.6, 0.16, 0.05, 260); tone(48, 1.4, 'triangle', 0.1, 0.05, 30); break;
     case 'sing':
       tone(55, 6, 'sawtooth', 0.16, 0, 110); tone(110, 6, 'triangle', 0.14, 0, 220);

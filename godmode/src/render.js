@@ -81,7 +81,15 @@ const ICON_ART = [
   /* anger */ ['r......r', '.r....r.', '..rr.r..', '...rr...', '..r.rr..', '.r....r.', 'r......r', '........'],
   /* halo  */ ['........', '.yyyyyy.', 'yy....yy', 'yy....yy', '.yyyyyy.', '........', '........', '........'],
   /* chip  */ ['.c.cc.c.', 'cccccccc', '.cc..cc.', 'ccc..ccc', '.cc..cc.', 'cccccccc', '.c.cc.c.', '........'],
-  /* leaf  */ ['.....gg.', '...gggg.', '..ggggg.', '.ggggg..', '.gggg...', '.gg.....', 'g.......', '........']
+  /* leaf  */ ['.....gg.', '...gggg.', '..ggggg.', '.ggggg..', '.gggg...', '.gg.....', 'g.......', '........'],
+  /* coin  */ ['..yyyy..', '.yoooyy.', 'yoyyyoyy', 'yoyyyyyy', 'yoyyyoyy', '.yoooyy.', '..yyyy..', '........'],
+  /* fist  */ ['........', '.oooooo.', 'oowowowo', 'oooooooo', 'oooooooo', '.oooooo.', '..oooo..', '........'],
+  /* baby  */ ['...pp...', '..pwwp..', '..pkkp..', '..pwwp..', '.pppppp.', 'pwwwwwwp', '.pppppp.', '........'],
+  /* crown */ ['........', 'y..y..y.', 'yy.yy.yy', 'yyyyyyyy', 'yryycyyy', 'yyyyyyyy', '........', '........'],
+  /* fish  */ ['........', '.....bb.', 'b..bbbbb', 'bbbbbwkb', 'b..bbbbb', '.....bb.', '........', '........'],
+  /* dizzy */ ['.y....y.', 'yyy..yyy', '.y....y.', '...y....', '..yyy...', '...y....', '........', '........'],
+  /* cup   */ ['.wwwww..', '.yyyyyo.', '.yyyyy.o', '.yyyyy.o', '.yyyyyo.', '.yyyyy..', '..yyy...', '........'],
+  /* flag  */ ['.krrrr..', '.krrrrr.', '.krrrr..', '.k......', '.k......', '.k......', '.k......', '........']
 ];
 
 function makeFaceAtlas() {
@@ -102,10 +110,10 @@ function makeFaceAtlas() {
   return t;
 }
 function makeIconAtlas() {
-  const cv = document.createElement('canvas'); cv.width = 64; cv.height = 64;
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64;
   const g = cv.getContext('2d');
   ICON_ART.forEach((art, i) => {
-    const ox = (i % 4) * 16, oy = ((i / 4) | 0) * 16;
+    const ox = (i % 8) * 16, oy = ((i / 8) | 0) * 16;
     // speech bubble
     g.fillStyle = '#1a1830'; g.fillRect(ox + 1, oy, 14, 14); g.fillRect(ox, oy + 1, 16, 12); g.fillRect(ox + 6, oy + 14, 4, 1); g.fillRect(ox + 7, oy + 15, 2, 1);
     g.fillStyle = '#ffffff'; g.fillRect(ox + 2, oy + 1, 12, 12); g.fillRect(ox + 1, oy + 2, 14, 10); g.fillRect(ox + 7, oy + 13, 2, 1);
@@ -180,6 +188,10 @@ function initRender(canvas) {
     merge([P(cyl(0.025, 0.025, 0.16, 4), '#3f9d4a', 0, 0.38, 0), P(octa(0.14), '#8dff7a', 0.12, 0.5, 0, 1, 0.3, 0.6, 0, 0, 0.5), P(octa(0.14), '#5fe060', -0.12, 0.5, 0, 1, 0.3, 0.6, 0, 0, -0.5)])
   ];
   R.hatMat = [R.matGlow, R.mat, R.matGlow, R.mat];
+  G.crown = merge([P(cyl(0.2, 0.17, 0.12, 6), '#ffd447', 0, 0, 0), P(cone(0.05, 0.14, 4), '#ffd447', 0.16, 0.12, 0), P(cone(0.05, 0.14, 4), '#ffd447', -0.16, 0.12, 0),
+    P(cone(0.05, 0.14, 4), '#ffd447', 0, 0.12, 0.16), P(cone(0.05, 0.14, 4), '#ffd447', 0, 0.12, -0.16), P(octa(0.05), '#ff4f6e', 0, 0.02, 0.19)]);
+  G.pole = merge([P(cyl(0.05, 0.06, 3.2, 5), '#d9d2c0', 0, 1.6, 0), P(octa(0.1), '#ffffff', 0, 3.25, 0)]);
+  G.cloth = merge([P(box(1.1, 0.7, 0.04), '#ffffff', 0.58, 2.75, 0)]);
   G.grave = merge([P(box(0.34, 0.5, 0.12), '#b9bccf', 0, 0.25, 0), P(box(0.5, 0.1, 0.4), '#8e91a8', 0, 0.05, 0)]);
   G.ring = new THREE.RingGeometry(0.82, 1, 20); G.ring.rotateX(-Math.PI / 2);
 
@@ -414,6 +426,8 @@ function resetRender(S) {
   const W = S.world;
   if (R.world) { R.root.remove(R.world); disposeTree(R.world); }
   for (const k of ['cit', 'bld', 'grv']) if (R[k]) R[k].forEach(o => { R.root.remove(o.g); if (o.icon) R.root.remove(o.icon); });
+  if (R.flags) R.flags.forEach(o => { R.root.remove(o.g); o.cloth.material.dispose(); });
+  R.flags = new Map();
   R.cit = new Map(); R.bld = new Map(); R.grv = new Map();
   R.world = new THREE.Group(); R.root.add(R.world);
   R.singT = S.sandbox ? 30 : -1;
@@ -606,6 +620,20 @@ function makeBuilding(b) {
       P(box(0.5, 0.75, 0.1), '#2a3a52', 0.55, 0.38, 0.81)]));
     o.parts.screen = add(merge([P(box(0.8, 0.55, 0.06), '#3fe8ff', -0.4, 0.75, 0.82), P(octa(0.09), '#ff5fd2', 0.65, 2.92, -0.3)]), R.matGlow);
     h = 2.9;
+  } else if (b.type === 'shop') {
+    const biz = b.biz || 'bakery';
+    const awn = biz === 'bakery' ? ['#ff6a6a', '#fff2e0'] : biz === 'tavern' ? ['#8a4fd6', '#ffd447'] : ['#3f7fd6', '#d8e2f0'];
+    const parts = [P(box(1.9, 1.05, 1.5), biz === 'tavern' ? '#a8703f' : '#f0e0c0', 0, 0.52, 0), P(box(2.1, 0.14, 1.7), '#6b4226', 0, 1.1, 0),
+      P(cone(1.35, 0.7, 4), biz === 'tavern' ? '#5a3a24' : '#c9b48a', 0, 1.5, 0, 1, 1, 0.8, 0, Math.PI / 4, 0), P(box(0.42, 0.65, 0.08), '#5a3a24', -0.45, 0.33, 0.76)];
+    for (let i = 0; i < 5; i++) parts.push(P(box(0.4, 0.08, 0.6), awn[i % 2], -0.8 + i * 0.4, 0.98, 1.0, 1, 1, 1, 0.45, 0, 0));
+    if (biz === 'bakery') parts.push(P(box(0.36, 0.16, 0.2), '#d9933f', 0.45, 0.62, 0.86), P(box(0.3, 0.14, 0.18), '#e8a84f', 0.62, 0.78, 0.84), P(cyl(0.12, 0.14, 0.6, 5), '#b9bccf', 0.6, 1.85, -0.35));
+    else if (biz === 'tavern') parts.push(P(cyl(0.22, 0.22, 0.42, 6), '#8a5a35', 1.15, 0.21, 0.5), P(cyl(0.22, 0.22, 0.42, 6), '#7a4a2a', 1.15, 0.21, -0.05),
+      P(cyl(0.025, 0.025, 1.4, 4), '#d9d2c0', 1.05, 0.7, 0.85), P(box(0.5, 0.36, 0.05), '#ffd447', 1.05, 1.25, 0.85));
+    else parts.push(P(box(0.5, 0.18, 0.3), '#5f6378', 0.6, 0.36, 1.0), P(box(0.2, 0.3, 0.2), '#4a4d60', 0.6, 0.15, 1.0),
+      P(new THREE.TorusGeometry(0.22, 0.07, 4, 8), '#9aa0b8', 0.75, 1.9, 0, 1, 1, 1, 0, 0, 0));
+    add(merge(parts));
+    o.parts.sign = add(merge([P(box(0.3, 0.3, 0.06), '#ffe98a', 0.45, 0.62, 0.76)]), R.matGlow);
+    h = 2.0;
   } else if (b.type === 'spire') {
     add(merge([P(cyl(1.9, 2.25, 0.5, 8), '#4a4070', 0, 0.25, 0), P(cyl(1.35, 1.7, 0.6, 8), '#5a4f86', 0, 0.8, 0),
       P(cyl(0.55, 1.15, 4.2, 6), '#2a2550', 0, 3.2, 0), P(cyl(0.3, 0.55, 3.2, 6), '#3a3370', 0, 6.9, 0), P(cone(0.3, 1.4, 6), '#55499a', 0, 9.2, 0),
@@ -655,6 +683,7 @@ function syncBuildings(S, dt) {
     const q = o.parts;
     if (q.flame) { const f = 1 + Math.sin(t * 13) * 0.12 + Math.sin(t * 7.3) * 0.1; q.flame.scale.set(f, 1 + Math.sin(t * 9) * 0.22, f); q.flame.rotation.y = t * 2; }
     if (q.window) q.window.visible = b.built && R.night > 0.3;
+    if (q.sign) q.sign.visible = b.built && (R.night > 0.2 || b.biz === 'tavern');
     if (q.crops) {
       const gr = b.built ? clamp(b.food > 0 ? 1 : b.growth, 0, 1) : 0;
       q.crops.scale.set(1, 0.15 + gr * 0.85, 1); q.crops.visible = b.built;
@@ -693,6 +722,7 @@ function makeCitizen(c) {
   o.faceM = new THREE.Mesh(o.faceGeo, R.matFace); o.faceM.position.set(0, -0.02, 0.325); o.head.add(o.faceM);
   o.hatM = mk(G.hat[0], R.matGlow, 0, 0, 0); o.hatM.visible = false; o.head.add(o.hatM);
   o.carry = mk(G.carry, R.matCarry.wood, 0, 1.58, 0); o.carry.visible = false; o.rig.add(o.carry);
+  o.crown = mk(G.crown, R.matGlow, 0, 0.5, 0); o.crown.visible = false; o.head.add(o.crown);
   o.shadow = mk(G.shadow, R.matShadow, 0, 0.04, 0); g.add(o.shadow);
   o.iconGeo = new THREE.PlaneGeometry(1, 1);
   o.icon = new THREE.Mesh(o.iconGeo, R.matIcon); o.icon.visible = false; o.icon.renderOrder = 20;
@@ -742,7 +772,24 @@ function syncCitizens(S, alpha, dt) {
       else if (st === 'cheer') { yOff = Math.abs(Math.sin(t * 9 + p)) * 0.4; aL = aR = -2.9; az = 0.45; expr = 1; }
       else if (st === 'mourn' && working) { hx = 0.5; expr = 2; }
       else if (st === 'idle' && c.happy < 0.2) { hx = 0.45; expr = 2; }
+      else if ((st === 'fight' || st === 'battle') && !c.moving) {
+        const k = Math.sin(t * 14 + p);
+        aL = -1.5 + Math.max(0, k) * -0.2; aR = -1.5 + Math.max(0, -k) * -0.2; az = 0.05; lean = 0.18 + Math.abs(k) * 0.12; expr = 6;
+        legL = 0.3; legR = -0.3; yOff = Math.abs(Math.sin(t * 7 + p)) * 0.08;
+      }
+      else if (st === 'ko') { lie = 1; expr = 3; }
+      else if (st === 'dance' && working) { yOff = Math.abs(Math.sin(t * 7 + p)) * 0.25; aL = -2.6 + Math.sin(t * 7 + p) * 0.6; aR = -2.6 - Math.sin(t * 7 + p) * 0.6; az = 0.4; roll = Math.sin(t * 3.5 + p) * 0.2; expr = 1; }
+      else if (st === 'fish' && working) { yOff = -0.22; legL = legR = -1.4; aR = -1.1 + Math.sin(t * 1.2 + p) * 0.08; aL = -0.9; expr = (t + p) % 6 < 3 ? 0 : 4; }
+      else if ((st === 'nap' || st === 'stargaze') && working) { lie = 1; expr = st === 'nap' ? 4 : 7; }
+      else if (st === 'date' && working) { yOff = -0.22; legL = legR = -1.4; hz = 0.25; expr = 1; }
+      else if (st === 'assemble' && working) { aL = aR = Math.sin(t * 2 + p) > 0.7 ? -2.8 : -0.2; expr = 7; }
+      else if (st === 'sermon' && working) { aL = -2.9 + Math.sin(t * 5) * 0.3; aR = -1.4 + Math.sin(t * 3) * 0.5; az = 0.4; yOff = 0.1; expr = 5; }
+      else if (st === 'tantrum') { yOff = Math.abs(Math.sin(t * 16)) * 0.2; aL = -2.9 + Math.sin(t * 18) * 0.6; aR = -2.9 - Math.sin(t * 18) * 0.6; legL = Math.sin(t * 16) * 0.6; expr = 6; }
+      else if (st === 'visit' && working) { aR = -1.9 + Math.sin(t * 2 + p) * 0.3; expr = 1; }
+      else if (st === 'shift' && working) { aR = -1.3 + Math.sin(t * 8 + p) * 0.8; aL = -1.0 + Math.sin(t * 8 + p + 1) * 0.5; lean = 0.15; }
+      else if (st === 'hermit' && working) { hx = 0.35; expr = 0; }
     }
+    if (st === 'play' && c.moving) { aL = aR = -2.6; az = 0.4; expr = 1; }
     if (st === 'flee') { aL = -2.8 + Math.sin(t * 20) * 0.4; aR = -2.8 - Math.sin(t * 20) * 0.4; az = 0.4; expr = 3; }
     if (st === 'preach' && c.moving) { aL = aR = -2.9; az = 0.5; expr = 7; }
     if (held) {
@@ -753,8 +800,10 @@ function syncCitizens(S, alpha, dt) {
 
     const rig = o.rig;
     o.g.position.set(x, gy, z);
-    o.g.rotation.y = o.face;
-    const sc = 0.3 + 0.7 * o.born + Math.sin(o.born * Math.PI) * 0.25;
+    o.g.rotation.y = o.face + (st === 'dance' && working ? Math.sin(t * 2 + p) * 1.2 : 0);
+    const kid = c.grow < 1 ? 0.55 + 0.45 * c.grow : 1;
+    const sc = (0.3 + 0.7 * o.born + Math.sin(o.born * Math.PI) * 0.25) * kid;
+    if (kid < 1) o.head.scale.setScalar(1.25 - 0.25 * c.grow); else if (o.head.scale.x !== 1) o.head.scale.setScalar(1);
     o.g.scale.setScalar(sc);
     rig.position.y = yOff + (lie ? 0.22 : 0);
     rig.rotation.set(lie ? -Math.PI / 2 : lean, 0, roll);
@@ -768,6 +817,9 @@ function syncCitizens(S, alpha, dt) {
       if (c.dom >= 0) { o.hatM.geometry = R.geo.hat[c.dom]; o.hatM.material = R.hatMat[c.dom]; }
     }
     if (c.dom === DEV) o.hatM.position.y = Math.sin(t * 3 + p) * 0.03;
+    // a faith leader wears a crown above the creed's hat
+    o.crown.visible = c.title === 'leader';
+    if (o.crown.visible) { o.crown.position.y = (c.dom >= 0 ? 0.78 : 0.42) + Math.sin(t * 2.5 + p) * 0.04; o.crown.rotation.y = t * 0.8; }
     o.carry.visible = !!c.carry;
     if (c.carry) o.carry.material = R.matCarry[c.carry.type] || R.matCarry.wood;
     // prophet aura
@@ -777,7 +829,7 @@ function syncCitizens(S, alpha, dt) {
     } else o.aura.visible = false;
     // emote bubble
     if (c.emoteT > 0 && c.emote >= 0) {
-      if (o.iconIdx !== c.emote) { o.iconIdx = c.emote; setCellUV(o.iconGeo, c.emote, 4, 4); }
+      if (o.iconIdx !== c.emote) { o.iconIdx = c.emote; setCellUV(o.iconGeo, c.emote, 8, 4); }
       const k = clamp(camDist * 0.034, 0.6, 1.9), pop = Math.min(1, c.emoteT * 4);
       o.icon.visible = true;
       o.icon.position.set(x, gy + yOff + 1.55 * sc + k * 0.55, z);
@@ -788,6 +840,30 @@ function syncCitizens(S, alpha, dt) {
   R.cit.forEach((o, id) => {
     if (!seen.has(id)) { R.root.remove(o.g); R.root.remove(o.icon); o.faceGeo.dispose(); o.iconGeo.dispose(); o.aura.material.dispose(); R.cit.delete(id); }
   });
+
+  // faction banners: each faction flies its colour where it last gathered, and on the battle line in a war
+  if (!R.flags) R.flags = new Map();
+  const fseen = new Set();
+  for (const f of S.factions || []) {
+    fseen.add(f.id);
+    let o = R.flags.get(f.id);
+    if (!o) {
+      const g = new THREE.Group();
+      const pole = new THREE.Mesh(R.geo.pole, R.mat); pole.userData.shared = true;
+      const cloth = new THREE.Mesh(R.geo.cloth, new THREE.MeshBasicMaterial({ color: BELIEFS[f.k].hex, side: THREE.DoubleSide }));
+      cloth.userData.shared = true;
+      g.add(pole, cloth); R.root.add(g);
+      o = { g, cloth, x: f.x, z: f.z };
+      R.flags.set(f.id, o);
+    }
+    let fx = f.x, fz = f.z;
+    if (S.war && S.war.a === f.id) { fx = S.war.ax; fz = S.war.az; } else if (S.war && S.war.b === f.id) { fx = S.war.bx; fz = S.war.bz; }
+    o.x = lerp(o.x, fx, Math.min(1, dt * 2)); o.z = lerp(o.z, fz, Math.min(1, dt * 2));
+    o.g.position.set(o.x, groundY(W, o.x, o.z), o.z);
+    o.cloth.rotation.y = Math.sin(t * 2.4 + f.id) * 0.35;
+    o.cloth.scale.set(1, 1 + Math.sin(t * 5 + f.id) * 0.06, 1);
+  }
+  R.flags.forEach((o, id) => { if (!fseen.has(id)) { R.root.remove(o.g); o.cloth.material.dispose(); R.flags.delete(id); } });
 
   // graves
   const live = new Set(S.graves);

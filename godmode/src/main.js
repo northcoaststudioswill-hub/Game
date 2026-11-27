@@ -117,6 +117,25 @@ function handleEvents(S) {
         if (e.stage === 5) banner('THE SPIRE', 'A design has arrived. Create > Spire, or wait and see.', '#ff8ae6');
         else if (e.stage < 6) banner('OBJECTIVE COMPLETE', 'Next: ' + STAGES[e.stage].text, '#ffc857');
         sfx('stage'); break;
+      case 'love': fxSpark(e.x, y + 1.6, e.z, '#ff8ad8', 16, 1.2, 2.6, -1, 1.2); fxRing(e.x, y, e.z, '#ff8ad8', 2.2, 0.8); sfx('love'); break;
+      case 'breakup': sfx('argue'); break;
+      case 'leader':
+        fxBeam(e.x, y, e.z, BELIEFS[e.k].hex); fxRing(e.x, y, e.z, BELIEFS[e.k].hex, 3.4, 1);
+        if (e.fresh) banner('A VOICE FOR ' + BELIEFS[e.k].name, getC(S, e.id) ? getC(S, e.id).name + ' leads the ' + e.name : e.name, BELIEFS[e.k].hex);
+        sfx('age'); break;
+      case 'fight': fxSpark(e.x, y + 1.2, e.z, '#ff9d3c', 12, 1.4, 2.6, -4, 0.6); sfx('argue'); break;
+      case 'punch': fxSpark(e.x, y + 1.0, e.z, '#ffffff', 3, 0.6, 1.4, -4, 0.3); if (Math.random() < 0.35) sfx('punch'); break;
+      case 'ko': fxSpark(e.x, y + 0.6, e.z, '#ffd447', 10, 1, 2, -3, 0.8); break;
+      case 'war':
+        banner('WAR', 'The ' + (getF(S, e.a) || {}).name + ' against the ' + (getF(S, e.b) || {}).name + '. Bless the battlefield for a truce.', '#ff4f6e');
+        fxRing(e.x, y, e.z, '#ff4f6e', 7, 1.4); R.shake = Math.max(R.shake, 0.3); sfx('war'); break;
+      case 'peace': fxRing(e.x, y, e.z, '#ffffff', 6, 1.2); sfx('stage'); break;
+      case 'steal': if (e.caught) { fxSpark(e.x, y + 1.4, e.z, '#ff4f6e', 8, 1, 2, -2, 0.6); sfx('deny'); } break;
+      case 'coin': fxSpark(e.x, y + 1.3, e.z, '#ffd447', 3, 0.5, 1.8, -5, 0.5); if (Math.random() < 0.5) sfx('coin'); break;
+      case 'shop': fxRing(e.x, y, e.z, '#ffd447', 2.4, 0.8); break;
+      case 'festival': banner('FESTIVAL', 'Everyone to the hearth.', '#ffd447'); sfx('stage'); break;
+      case 'grownup': fxSpark(e.x, y + 1.2, e.z, '#7dffc4', 12, 1, 2.4, -2, 1); break;
+      case 'fish': fxSpark(e.x, y + 0.4, e.z, '#9fd8ff', 10, 1, 2.6, -8, 0.7); break;
       case 'restore': banner('RESTORED FROM BACKUP', 'Six new minds. They do not remember.', '#ff8ae6'); break;
       case 'singularity': {
         R.singT = 0; R.singHex = e.k >= 0 ? BELIEFS[e.k].hex : '#ff5fd2';

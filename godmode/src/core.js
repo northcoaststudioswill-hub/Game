@@ -68,6 +68,8 @@ const BUILD = {
             desc: 'Prayer here refills your CYCLES and deepens DEVOTION.' },
   lab:    { name: 'Terminal',  r: 1.5,  cost: { wood: 12, stone: 16 }, work: 26, max: 3,
             desc: 'Study here produces INSIGHT and breeds ACCELERATION.' },
+  shop:   { name: 'Shop',      r: 1.3,  cost: { wood: 8, stone: 4 }, work: 14, max: 3,
+            desc: 'A business. Somebody owns it, and somebody works for them.' },
   spire:  { name: 'The Spire', r: 2.3,  cost: { wood: 60, stone: 70, insight: 150 }, work: 240, max: 1,
             desc: 'Nobody remembers designing it.' }
 };
@@ -84,5 +86,6 @@ const NAMES = ['Bip', 'Momo', 'Tavi', 'Zuzu', 'Pem', 'Kiko', 'Olo', 'Nim', 'Rue'
 
 /* emote icon indices (atlas order in render.js) */
 const EM = { heart: 0, bang: 1, what: 2, zzz: 3, food: 4, bolt: 5, eye: 6, spark: 7,
-  note: 8, skull: 9, dots: 10, bulb: 11, anger: 12, halo: 13, chip: 14, leaf: 15 };
+  note: 8, skull: 9, dots: 10, bulb: 11, anger: 12, halo: 13, chip: 14, leaf: 15,
+  coin: 16, fist: 17, baby: 18, crown: 19, fish: 20, dizzy: 21, cup: 22, flag: 23 };
 const BELIEF_EMOTE = [EM.halo, EM.bolt, EM.chip, EM.leaf];

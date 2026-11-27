@@ -7,7 +7,7 @@
 
 function newSim(seed) {
   const S = {
-    v: 1, seed, world: makeWorld(seed), t: 0, day: 0.08,
+    v: 2, seed, world: makeWorld(seed), t: 0, day: 0.08,
     res: { food: 12, wood: 4, stone: 0, insight: 0 },
     cycles: 70, cyclesMax: 100,
     citizens: [], buildings: [], graves: [], nextId: 1,
@@ -26,6 +26,7 @@ function newSim(seed) {
     const c = addCitizen(S, Math.sin(a) * 2.8, Math.cos(a) * 2.8);
     if (lean[i] >= 0) c.b[lean[i]] = 0.3;
   }
+  fillSociety(S);
   rebuildObstacles(S);
   logMsg(S, 'ISLAND.SIM loaded. Six minds running. They think the sky is weather.', 'sys');
   return S;
@@ -46,6 +47,7 @@ function addCitizen(S, x, z) {
     emote: -1, emoteT: 0, inspired: null, cmdT: 0, talkCd: 4 + r() * 10, obsT: 0, age: 0,
     hue: r(), skin: (r() * 4) | 0, moving: false, prayCd: 0, stuckT: 0, lastD: 0, fx: 0, fz: 0, pulseT: 0, stall: 0
   };
+  fillCitizen(c);
   S.citizens.push(c);
   return c;
 }
@@ -104,6 +106,7 @@ function refreshDom(S, c) {
 function addBelief(S, c, k, d) {
   if (d <= 0) return;
   if (c.inspired && c.inspired.k !== k) return;      // a prophet cannot be talked out of it
+  if (c.title === 'leader' && c.dom !== k) d *= 0.35;  // nor, easily, can a faith leader
   c.b[k] = clamp(c.b[k] + d, 0, 1);
   for (let j = 0; j < 4; j++) if (j !== k) c.b[j] *= (1 - Math.min(0.9, d * 0.7));
   refreshDom(S, c);
@@ -112,6 +115,7 @@ function workSpeed(S, c) {
   let w = 1 + 0.4 * c.b[DREAD] - 0.1 * c.b[DEV];
   if (c.happy < 0.25) w *= 0.7;
   if (S.age === DREAD) w *= 1.25;
+  w *= 1 + Math.min(0.2, (S.tools || 0) * 0.02);
   return w;
 }
 function rebuildObstacles(S) {
@@ -264,6 +268,7 @@ function findPartner(S, c) {
 function think(S, c) {
   const B = c.b, pop = S.citizens.length, night = isNight(S), r = S.rng;
   if (c.carry) { startDeposit(S, c); return; }
+  if (c.grow < 1) { kidThink(S, c); return; }
 
   let bestU = -1, bestFn = null;
   const consider = (u, fn) => { u *= 0.85 + r() * 0.3; if (u > bestU) { bestU = u; bestFn = fn; } };
@@ -313,7 +318,7 @@ function think(S, c) {
     if (hasRes(S, b)) continue;
     const nb = buildersAt(S, b.id), maxB = b.type === 'spire' ? 5 : 2;
     if (nb >= maxB) continue;
-    let u = 1.25 + 0.5 * B[DREAD] - nb * 0.2 - hyp(b.x - c.x, b.z - c.z) * 0.01;
+    let u = 1.25 + 0.5 * B[DREAD] - nb * 0.2 - hyp(b.x - c.x, b.z - c.z) * 0.01 + decreeBonus(S, c, 'build');
     if (b.type === 'spire') u += 0.5 * B[ACCEL] + 0.35 * B[DREAD] - 0.45 * B[KIN] + 0.1;
     if (u > su) { su = u; site = b; }
   }
@@ -327,10 +332,10 @@ function think(S, c) {
   let nf = 0, nw = 0, ns = 0;
   for (const o of S.citizens) if (o.state === 'gather' && o !== c) { if (o.gres === 'food') nf++; else if (o.gres === 'wood') nw++; else ns++; }
   const fNeed = need(S.res.food, foodT), wNeed = need(S.res.wood, woodT), sNeed = need(S.res.stone, stoneT);
-  consider(0.35 + 1.7 * fNeed + 0.3 * B[KIN] - nf * 0.22, () => {
+  consider(0.35 + 1.7 * fNeed + 0.3 * B[KIN] - nf * 0.22 + decreeBonus(S, c, 'food'), () => {
     if (!startGather(S, c, 'food', fNeed > 0.5 ? 'Food is running low. Picking berries.' : 'Gathering food for the stockpile.')) setIdle(S, c);
   });
-  consider(0.3 + 1.25 * wNeed - nw * 0.22, () => {
+  consider(0.3 + 1.25 * wNeed - nw * 0.22 + decreeBonus(S, c, 'wood'), () => {
     if (!startGather(S, c, 'wood', wNeed > 0.3 ? 'We need wood. Off to chop a tree.' : 'Topping up the woodpile.')) setIdle(S, c);
   });
   consider(0.3 + 1.25 * sNeed - ns * 0.22, () => {
@@ -350,7 +355,7 @@ function think(S, c) {
   // --- worship
   if (B[DEV] + B[DREAD] > 0.25 && !(c.prayCd > 0) && countB(S, 'shrine', true) > 0 && countDoing(S, 'worship') < 4 * countB(S, 'shrine', true)) {
     const sh = nearestBuilt(S, c, 'shrine');
-    const u = 0.2 + 1.3 * B[DEV] + 0.9 * B[DREAD] * (0.4 + c.fear) - 1.2 * B[KIN];
+    const u = 0.2 + 1.3 * B[DEV] + 0.9 * B[DREAD] * (0.4 + c.fear) - 1.2 * B[KIN] + decreeBonus(S, c, 'worship');
     consider(u, () => startWork(S, c, 'worship', sh, B[DREAD] > B[DEV]
       ? 'If I pray hard enough, perhaps it will spare me.' : 'Going to the shrine to thank the Watcher.'));
   }
@@ -360,7 +365,7 @@ function think(S, c) {
     const lab = nearestBuilt(S, c, 'lab');
     const sp = firstB(S, 'spire');
     const push = (sp && !sp.built && S.res.insight < 20) ? 0.7 : 0;
-    consider(0.15 + 0.8 * c.curio + 1.1 * B[ACCEL] + push, () => startWork(S, c, 'study', lab,
+    consider(0.15 + 0.8 * c.curio + 1.1 * B[ACCEL] + push + decreeBonus(S, c, 'study'), () => startWork(S, c, 'study', lab,
       B[ACCEL] > 0.5 ? 'The Terminal is waiting. There is so much to compute.' : 'Curious. Going to study at the Terminal.'));
   }
 
@@ -380,6 +385,7 @@ function think(S, c) {
   });
   consider(0.22, () => setIdle(S, c));
 
+  societyOptions(S, c, consider, night);
   bestFn();
 }
 function setIdle(S, c) {
@@ -402,7 +408,7 @@ function updateCitizen(S, c, dt) {
   const B = c.b;
 
   // needs
-  let hr = 0.0085;
+  let hr = c.grow < 1 ? 0.005 : 0.0085;
   if (S.age === ACCEL) hr *= 1.2;
   if (c.state === 'sleep' && c.ph === 1) hr *= 0.4;
   c.hunger = Math.min(1, c.hunger + hr * dt);
@@ -485,7 +491,7 @@ function updateCitizen(S, c, dt) {
       } else {
         m = moveToward(S, c, c.tx, c.tz, sp, dt, 0.3);
         if (m) {
-          if (c.carry) { S.res[c.carry.type] += c.carry.n; ev(S, 'deposit', { x: c.x, z: c.z, res: c.carry.type }); }
+          if (c.carry) { S.res[c.carry.type] += c.carry.n; c.coin++; ev(S, 'deposit', { x: c.x, z: c.z, res: c.carry.type }); }
           c.carry = null;
           finish(S, c);
         }
@@ -542,7 +548,7 @@ function updateCitizen(S, c, dt) {
           if (b.type === 'spire') spireMilestones(S, b);
           if (b.progress >= 1) completeBuilding(S, b);
           c.t -= dt;
-          if (c.t <= 0) finish(S, c);
+          if (c.t <= 0) { c.coin++; finish(S, c); }
         }
       }
       break;
@@ -707,6 +713,10 @@ function updateCitizen(S, c, dt) {
       }
       break;
     }
+
+    default:
+      if (SOCIAL_STATES[c.state]) updateSocial(S, c, dt, sp);
+      else finish(S, c);
   }
 }
 
@@ -776,19 +786,22 @@ function converse(S, a, b) {
     b.thought = 'Argued with ' + a.name + ' about ' + BELIEFS[a.dom].name + '. Fools.';
     ev(S, 'argue', { a: a.id, b: b.id, x: (a.x + b.x) / 2, z: (a.z + b.z) / 2 });
     whisper(S, 'argue1', a.name + ' and ' + b.name + ' are shouting. Two ideas are competing for the same hosts.');
+    addTension(S, a.fac, b.fac, 1);
+    if (relOf(a, b) < -0.4 && a.tr.brave > 0.55 && S.rng() < 0.35) { a.talkCd = b.talkCd = 12; startFight(S, a, b, b.name + ' insulted ' + BELIEFS[a.dom].name + '.'); return; }
   } else {
     const ka = transmit(S, a, b, 0.24), kb = transmit(S, b, a, 0.18);
     if (ka >= 0) ev(S, 'meme', { from: a.id, to: b.id, k: ka });
     if (kb >= 0) ev(S, 'meme', { from: b.id, to: a.id, k: kb });
     let sim = 0;
     for (let k = 0; k < 4; k++) sim += a.b[k] * b.b[k];
-    addRel(a, b, 0.09 + 0.08 * sim + 0.05 * (a.b[KIN] + b.b[KIN]));
+    addRel(a, b, 0.09 + 0.08 * sim + 0.05 * (a.b[KIN] + b.b[KIN]) + 0.14 * chem(a, b) - 0.02);
     a.happy = Math.min(1, a.happy + 0.06); b.happy = Math.min(1, b.happy + 0.06);
     a.b[KIN] = Math.min(1, a.b[KIN] + 0.012 * a.happy); b.b[KIN] = Math.min(1, b.b[KIN] + 0.012 * b.happy);
     a.curio = Math.max(0, a.curio - 0.15); b.curio = Math.max(0, b.curio - 0.15);
     S.res.insight += 0.5;
     a.thought = 'Good talk with ' + b.name + '.'; b.thought = 'Good talk with ' + a.name + '.';
     if (relOf(a, b) > 0.5 && S.rng() < 0.5) { emote(a, EM.heart, 2); emote(b, EM.heart, 2); }
+    socialTalk(S, a, b);
   }
   a.talkCd = 10 + S.rng() * 12 - 5 * a.b[KIN];
   b.talkCd = 10 + S.rng() * 12 - 5 * b.b[KIN];
@@ -806,7 +819,10 @@ function kill(S, c, cause) {
   ev(S, 'death', { id: c.id, x: c.x, z: c.z, cause });
   if (cause === 'starve') {
     logMsg(S, c.name + ' has starved. The simulation does not consider this an error.', 'bad');
+  } else if (cause === 'war') {
+    logMsg(S, c.name + ' did not get up. The battle has its first grave.', 'bad');
   }
+  onDeath(S, c);
   // friends grieve and turn to one another
   for (const o of S.citizens) {
     const aff = o.rel[c.id] || 0;
@@ -872,6 +888,8 @@ function completeBuilding(S, b) {
   if (b.type === 'shrine') whisper(S, 'shrine1', 'The Shrine is finished. They have built an input device for you.');
   if (b.type === 'lab') whisper(S, 'lab1', 'The Terminal is on. Someone typed: WHO IS RUNNING THIS? Nothing answered. Not yet.');
   if (b.type === 'hut') assignHomes(S);
+  if (b.type === 'shop') { const o = getC(S, b.owner); logMsg(S, shopName(S, b) + ' is open for business.', 'good'); if (o) { o.happy = Math.min(1, o.happy + 0.2); emote(o, EM.coin, 3); } }
+  if (b.type === 'shrine' || b.type === 'lab' || b.type === 'shop') maybeFestival(S, 'the new ' + (b.type === 'shop' ? BIZ[b.biz].name : def.name) + ' is finished.');
   if (b.type === 'spire') singularity(S, b);
 }
 function assignHomes(S) {
@@ -938,7 +956,13 @@ function secondTick(S) {
     const dx = a.x - b.x, dz = a.z - b.z;
     if (dx * dx + dz * dz > 6.5) continue;
     if (a.state === 'sleep' || b.state === 'sleep') continue;
-    addRel(a, b, 0.003);
+    addRel(a, b, 0.003 + 0.004 * chem(a, b));
+    // rival camps sour on each other; the poor resent the rich they stand next to
+    if (a.fac && b.fac && a.fac !== b.fac) {
+      const fa = getF(S, a.fac), fb = getF(S, b.fac);
+      if (fa && fb && opposed(fa.k, fb.k)) { addRel(a, b, -0.008); addTension(S, a.fac, b.fac, 0.006); }
+    }
+    if (a.coin > b.coin + 12) oneRel(b, a, -0.004); else if (b.coin > a.coin + 12) oneRel(a, b, -0.004);
     transmit(S, a, b, 0.012); transmit(S, b, a, 0.012);
   }
 
@@ -952,7 +976,7 @@ function secondTick(S) {
   if (age !== S.age) {
     S.age = age;
     ev(S, 'age', { k: age });
-    if (age >= 0) logMsg(S, 'ZEITGEIST: the AGE OF ' + BELIEFS[age].name + ' begins. Effect: ' + AGE_FX[age] + '.', 'b' + age);
+    if (age >= 0) { logMsg(S, 'ZEITGEIST: the AGE OF ' + BELIEFS[age].name + ' begins. Effect: ' + AGE_FX[age] + '.', 'b' + age); maybeFestival(S, 'the Age of ' + BELIEFS[age].name + ' has begun.'); }
     else logMsg(S, 'ZEITGEIST: no idea holds the majority now.', '');
   }
 
@@ -987,18 +1011,14 @@ function secondTick(S) {
   if (S.birthCd <= 0 && pop >= 2 && pop < popCap(S) && S.res.food >= pop * 1.2 + 3) {
     let avg = 0;
     for (const c of cs) avg += c.happy;
-    if (avg / pop > 0.42) {
-      let pa = null, pb = null, br = -2;
-      for (let i = 0; i < pop; i++) for (let j = i + 1; j < pop; j++) {
-        const rr = relOf(cs[i], cs[j]) + S.rng() * 0.2;
-        if (rr > br) { br = rr; pa = cs[i]; pb = cs[j]; }
-      }
+    const pair = avg / pop > 0.42 ? couplesBirth(S) : null;
+    if (pair) {
+      const pa = pair[0], pb = pair[1];
       const home = getB(S, pa.home) || firstB(S, 'fire');
       clampWalk(S.world, home.x + (S.rng() - 0.5) * 3, home.z + 1.8 + S.rng(), _pt);
       const n = addCitizen(S, _pt.x, _pt.z);
-      for (let k = 0; k < 4; k++) n.b[k] = (pa.b[k] + pb.b[k]) * 0.3;
+      makeChild(S, pa, pb, n);
       n.hunger = 0.1;
-      addRel(n, pa, 0.5); addRel(n, pb, 0.5);
       S.stats.births++;
       S.birthCd = S.age === KIN ? 20 : 42;
       ev(S, 'birth', { id: n.id, x: n.x, z: n.z });
@@ -1019,6 +1039,7 @@ function secondTick(S) {
     }
   }
 
+  societyTick(S);
   objectives(S);
   if (S.t > 25) whisper(S, 'intro2', 'You have root access. Six powers are mounted below. CYCLES pay for them.');
   if (S.res.insight >= 30) whisper(S, 'ins30', 'A citizen has worked out that the island is finite and the sky only renders when looked at.');
@@ -1096,9 +1117,11 @@ function powerBless(S, x, z) {
     emote(c, EM.heart, 2.5);
     if (c.state !== 'held' && c.state !== 'preach' && !(c.state === 'gather' && c.ph === 2)) {
       if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
+      if (c.state === 'fight') { const p = getC(S, c.partner); if (p) { addRel(c, p, 0.25); if (p.state === 'fight') { setState(p, 'cheer', 'The fight just... went out of me.'); p.t = 1.6; } } logMsg(S, 'A light fell between ' + c.name + ' and ' + (p ? p.name : 'their rival') + '. The fight is over.', 'good'); }
       setState(c, 'cheer', 'A warm light! I feel wonderful. Someone up there likes me.'); c.t = 1.6;
     }
   }
+  if (S.war && hyp((S.war.ax + S.war.bx) / 2 - x, (S.war.az + S.war.bz) / 2 - z) < 8) endWar(S, getF(S, S.war.a), getF(S, S.war.b), true, 'miracle');
   for (const nd of S.world.nodes) if (!nd.dead && hyp(nd.x - x, nd.z - z) <= 5) { nd.amount = nd.max; nd.regrow = 0; }
   for (const b of S.buildings) {
     if (hyp(b.x - x, b.z - z) > 5) continue;
@@ -1248,6 +1271,13 @@ function powerInspire(S, id, k) {
   emote(c, EM.bulb, 3);
   ev(S, 'inspire', { id: c.id, x: c.x, z: c.z, k });
   logMsg(S, c.name + ' is seized by ' + BELIEFS[k].name + ' and goes to preach it.', 'b' + k);
+  if (c.title === 'leader') {
+    const f = getF(S, c.fac);
+    if (f) {
+      for (const o of S.citizens) if (o !== c && o.fac === f.id) addBelief(S, o, k, k === f.k ? 0.1 : 0.22);
+      logMsg(S, 'The whole ' + f.name + ' hears it from ' + c.name + '.', 'b' + k);
+    }
+  }
   whisper(S, 'insp1', 'You did not persuade it. You edited it. From the inside, it feels like a good idea.');
   return { ok: true };
 }
@@ -1355,7 +1385,7 @@ function serialize(S) {
 }
 function deserialize(text) {
   const o = JSON.parse(text);
-  if (!o || o.v !== 1 || !Array.isArray(o.citizens)) throw new Error('bad save');
+  if (!o || (o.v !== 1 && o.v !== 2) || !Array.isArray(o.citizens)) throw new Error('bad save');
   const S = newSim(o.seed);
   const W = S.world;
   for (const k in o) if (k !== 'nodes') S[k] = o[k];
@@ -1368,6 +1398,8 @@ function deserialize(text) {
     c.px = c.x; c.pz = c.z;
   }
   S.held = 0;
+  S.v = 2;
+  fillSociety(S);   // a v1 save gains the society fields with defaults
   rebuildObstacles(S);
   return S;
 }

@@ -64,11 +64,45 @@ a bright scrolling grid below, and quick square-wave arpeggios. Kinship: a soft 
 (brighter at night), and two voices answering each other. The edges of the screen take the Age's colour. After the
 Singularity the island keeps the look of its ending for good; after THE COMPROMISE it shows all four, faintly.
 
+### Their lives
+
+The citizens have lives of their own, and you can read all of it in the inspector (tap someone with Observe).
+
+- **Opinions.** Everyone has a private opinion of everyone else. Talking, working and dancing together raise it;
+  arguments, theft, fights and jealousy lower it. Every pair also has a fixed chemistry, so some people just click and
+  some just grate. Gossip passes opinions on ("Bip says Momo cannot be trusted"). The poor resent the rich they stand
+  next to. The inspector lists partner, parents, children, best friends, friends, rivals and enemies.
+- **Love and families.** Good friends can become a couple, move in together, go for walks by the pond, and have
+  children. Babies are born to couples only; a couple has at most one small child at a time and three in all.
+  Children are small, play tag, follow their parents around and learn their beliefs, and grow up after
+  about 160 seconds. Couples who stop liking each other split up. Losing a partner hits hard.
+- **Faith leaders and factions.** When three or more adults share an idea, the most devoted and charismatic one becomes
+  its voice (a gold crown). The believers form a named faction (the Golden Choir, the Red Order, the Bright Signal,
+  the Green Table, and so on) and fly its flag. The leader calls sermons, and followers gather round. Afterwards
+  the leader sets a decree (build, feed each other, pray, study, bring wood) that the whole faction leans toward.
+  Followers trail their leader around. Leaders are hard to convert. Kill one and the faithful call it martyrdom.
+  Inspire a leader and the whole faction hears it.
+- **Money and business.** Hauling to the stockpile and building earn a coin. Once the Shrine and Terminal stand,
+  an enterprising citizen can open a **Bakery**, a **Tavern** or a **Workshop**. They own it, hire up to two people,
+  and pay them per shift. Bread costs a coin. A drink costs a coin. Tools from the workshop make everyone work
+  faster for a while. Unpaid workers quit. If an owner dies, a worker inherits the shop.
+- **Chill.** Fishing at the pond (sometimes a fish for the stockpile), naps in the sun, stargazing at night (a little
+  Insight), evening dancing at the hearth, nights at the tavern, and a **festival** when something good happens and
+  the island is happy.
+- **Extreme.** Tantrums. Theft from the rich, which ends in a fight if someone sees. Fistfights over grudges,
+  insults, jealousy, or one drink too many: the loser is knocked out for a few seconds. A citizen who is miserable
+  for long enough walks off to live alone at the edge of the island for a while. When two **opposed factions**
+  build up enough grudges (arguments, fights, thefts, standing too close), they go to **war**: both sides line up
+  under their flags and charge. Most fighters are only knocked out, but the badly hurt can die. The winners gloat,
+  some of the losers change sides, and a beaten leader may be thrown out. A truce holds for a while afterwards.
+- **Your hand in it.** Bless a fistfight to stop it (and the two like each other more for it). Bless the battlefield to
+  force a truce by miracle. Smite still scatters everyone, and is remembered.
+
 ### Objectives
 
 Wake (observe a citizen) → Nurture (8 citizens) → Seed an idea (4 share a belief) → Infrastructure (a Shrine and a
 Terminal) → Compile (80 Insight) → The Spire → Sandbox. Left entirely alone the citizens get there in roughly
-10 to 15 minutes at 1x; an engaged player in about 8 or 9. If you do not place the Spire, they start it without you.
+13 to 17 minutes at 1x; an engaged player in about 10 to 12 (they have lives to lead now). If you do not place the Spire, they start it without you.
 
 ## How it is put together
 
@@ -81,6 +115,7 @@ godmode/
     core.js           constants: beliefs, buildings, costs
     world.js          island height field, walkability, resource nodes   (no DOM, no THREE)
     sim.js            citizens, needs, beliefs, memetics, economy, powers, progression, save format (no DOM, no THREE)
+    society.js        families, romance, opinions, gossip, leaders and factions, shops and coin, pastimes, fights, war
     render.js         Three.js scene: terrain, instanced nodes, buildings, citizens, effects, camera
     audio.js          WebAudio effects and a sparse generative tune (no audio files)
     ui.js             HUD, inspector, palettes, tutorial, menus, dialogs
@@ -116,6 +151,39 @@ node godmode/tests/play_phone.js    # needs Playwright + Chromium; screenshots g
 ```
 
 ## Changelog
+
+### 0.4, Nov 27 2026: the citizens have lives
+
+- New `src/society.js` (pure sim, included after `sim.js`): everything under "Their lives" above. It joins `sim.js`
+  through four hooks: `kidThink()` and `societyOptions()` from `think()`, `updateSocial()` for 16 new states
+  (`sermon assemble shift visit steal fight ko battle dance fish nap stargaze date play hermit tantrum`), and
+  `societyTick()` once a second. `converse()` now ends with gossip, romance and jealousy (`socialTalk`), and a hot
+  argument can turn into a fistfight. Births go through `couplesBirth()` and `makeChild()`. Deaths call `onDeath()`.
+- New building type `shop` (bakery, tavern or workshop; `b.biz`, `b.owner`, `b.till`), placed by citizens, not the
+  player. `S.tools` gives up to +20% work speed.
+- **Save format v2.** New citizen fields `grow mate par coin boss job title fac actCd sermCd unpaid sadT` and new state
+  `factions war party partyCd tools tension truceT facId`. `deserialize` accepts v1 and fills in defaults
+  (`fillSociety`); checked by loading a v1 save made with the previous code and running 8 more minutes on it.
+- Render: children are smaller with bigger heads, leaders wear a spinning crown, each faction flies a flag in its
+  colour (which moves to the battle line in a war), shop models with awnings, and poses for fighting, knocked out,
+  dancing, fishing, napping, stargazing, dates, sermons, tantrums and shop work. Eight new emotes (coin, fist, baby,
+  crown, fish, dizzy stars, cup, flag); the icon atlas is now 8x4.
+- Events, banners and sounds for love, leaders, fights, war, peace, theft, coins and festivals. Sounds `love`, `punch`,
+  `coin` and `war` are new.
+- The inspector now shows faction and role, employer or shop, coin, home, and up to five relationships. The building
+  inspector shows hut residents by name, and a shop's owner, staff and takings.
+- Balance: the society costs time. Seeds 1 to 12: passive Singularity 13:20 to 16:33 (was 10:26 to 14:38), assisted
+  10:01 to 12:03 (was 7:56 to 9:32). Across the 12 passive runs, every one formed couples, a faith leader and a
+  shop. Left alone: 10 of 12 had a war (12 wars in all), 9 had fistfights (61 in all, unevenly: one run had 17),
+4 had thefts, and nobody died. With the scripted player, who keeps inspiring one idea, the island stays more united:
+3 runs had a war and 2 had fights. No deaths in any of the 24 runs this time; an earlier tuning pass had one war death.
+- Tests: `sim_balance.js` prints a society line per run and fails a passive run with no couple, leader or shop.
+  `play_phone.js` checks faction flags, leader crowns, child size, and the relationships in the inspector.
+
+**Tested:** `sim_balance.js` seeds 1 to 12 OK; `play_phone.js` ALL OK; v1 save loads; screenshots of a war, a
+leader's inspector and a shop. **Not tested:** on a phone; the new sounds have not been listened to. Whether this much
+going on is fun or just busy needs a person to play it. Fights and wars are tuned by script.
+
 
 ### 0.3, Nov 27 2026: the Ages look and sound different
 

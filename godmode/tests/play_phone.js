@@ -160,6 +160,14 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
   await sleep(1500);
   await page.screenshot({ path: path.join(out, '11-village.png') });
   check(await page.evaluate(() => APP.S.citizens.length >= 8 && APP.S.buildings.length >= 3), 'village has grown after six minutes');
+  // society shows on screen: one flag per faction, a crown on each leader, small children, relationships in the inspector
+  check(await page.evaluate(() => {
+    const S = APP.S;
+    const leaders = S.citizens.filter(c => c.title === 'leader');
+    const kidsOk = S.citizens.filter(c => c.grow < 1).every(c => R.cit.get(c.id).g.scale.x < 0.98);
+    return S.factions.length > 0 && R.flags.size === S.factions.length && leaders.every(c => R.cit.get(c.id).crown.visible) && kidsOk;
+  }), 'factions fly flags, leaders wear crowns, children are small');
+  check(await page.evaluate(() => { const c = APP.S.citizens.find(c => c.mate) || APP.S.citizens[0]; selectCitizen(c.id); updateInspect(APP.S); const t = document.getElementById('inFoot').textContent; selectCitizen(0); return /coin/.test(t) && (!c.mate || /partner/.test(t)); }), 'the inspector lists money and relationships');
 
   // save, reload, continue
   // snapshot in the same task as the save, so no sim step can slip in between
