@@ -2,7 +2,7 @@
 
 Generated 2026-11-27 by `tools/make_registry.js` from the running game. Every asset, its id, and the file and line that define it. The machine-readable copy is `registry.json` beside this file.
 
-**Characters** are built in code from a look (frame, people, colours, cosmetics, size), not from model files. Change one in the game's **Workshop** (title screen, owner only): edits are saved to the published game and apply for everyone. To make an edit permanent in the code, use **Copy for Claude** and paste the result to Claude, or change the look at the line given here.
+**Characters** are built in code from a look (frame, people, colours, cosmetics, size), not from model files. Change one in the **Workshop**, a separate private artifact (`workshop.html`; the game players open never contains it): edits are saved there, then Claude writes approved ones into `js/look_edits.js`, which the game applies. You can also change a look at the line given here.
 
 Colour keys: `cloth`, `armor`, `armor2` (dark armour), `trim`, `legs`, `hair`, `skin`. A dye in `cos.dye` repaints cloth, armour, trim and legs. Cosmetic slots: `head`, `back`, `dye`, `aura`, `weapon` (ids in Cosmetics below).
 

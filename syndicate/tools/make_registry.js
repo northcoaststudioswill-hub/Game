@@ -9,7 +9,7 @@ const where = (id, prefer) => { const pats = ["id: '" + id + "'", "'" + id + "':
 (async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const p = await b.newPage();
   await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(1500);
   const D = await p.evaluate(() => { const hx = v => typeof v === 'number' ? '#' + v.toString(16).padStart(6, '0') : v; const fix = o => JSON.parse(JSON.stringify(o, (k, v) => typeof v === 'number' && /^(cloth|armor|armor2|trim|legs|hair|skin|weapon)$/.test(k) ? hx(v) : v));
-    const chars = G.registry().map(r => ({ id: r.id, name: r.name, group: r.group, file: r.file, look: fix(G.workshop.base(r) || {}) }));
+    const chars = G.registry().map(r => ({ id: r.id, name: r.name, group: r.group, file: r.file, look: fix(G.looks.base(r) || {}) }));
     const list = (o, f) => Object.keys(o || {}).map(k => Object.assign({ id: k }, f(o[k], k)));
     return {
       characters: chars,
@@ -38,7 +38,7 @@ const where = (id, prefer) => { const pats = ["id: '" + id + "'", "'" + id + "':
   const look = l => { const t = l.tint || {}, cos = l.cos || {}; return [l.cls, l.race, l.scale && l.scale !== 1 ? '×' + l.scale : '', Object.keys(t).map(k => k + ' ' + t[k]).join(', '), Object.keys(cos).filter(k => cos[k]).map(k => k + ': ' + cos[k]).join(', ')].filter(Boolean).join(' · '); };
   const table = (title, rows, cols) => '\n## ' + title + ' (' + rows.length + ')\n\n| ' + cols.map(c => c[0]).join(' | ') + ' |\n|' + cols.map(() => '---').join('|') + '|\n' + rows.map(r => '| ' + cols.map(c => esc(c[1](r))).join(' | ') + ' |').join('\n') + '\n';
   let md = '# Guttercrown asset registry\n\nGenerated ' + D.generated + ' by `tools/make_registry.js` from the running game. Every asset, its id, and the file and line that define it. The machine-readable copy is `registry.json` beside this file.\n\n' +
-    '**Characters** are built in code from a look (frame, people, colours, cosmetics, size), not from model files. Change one in the game\'s **Workshop** (title screen, owner only): edits are saved to the published game and apply for everyone. To make an edit permanent in the code, use **Copy for Claude** and paste the result to Claude, or change the look at the line given here.\n' +
+    '**Characters** are built in code from a look (frame, people, colours, cosmetics, size), not from model files. Change one in the **Workshop**, a separate private artifact (`workshop.html`; the game players open never contains it): edits are saved there, then Claude writes approved ones into `js/look_edits.js`, which the game applies. You can also change a look at the line given here.\n' +
     '\nColour keys: `cloth`, `armor`, `armor2` (dark armour), `trim`, `legs`, `hair`, `skin`. A dye in `cos.dye` repaints cloth, armour, trim and legs. Cosmetic slots: `head`, `back`, `dye`, `aura`, `weapon` (ids in Cosmetics below).\n';
   const groups = [...new Set(D.characters.map(c => c.group))];
   groups.forEach(g => { md += table('Characters: ' + g, D.characters.filter(c => c.group === g), [['id', c => '`' + c.id + '`'], ['Name', c => c.name], ['Look', c => look(c.look)], ['Defined in', c => c.defined]]); });

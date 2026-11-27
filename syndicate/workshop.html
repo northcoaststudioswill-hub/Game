@@ -1,0 +1,144 @@
+<!-- The Workshop: the character editor, separate from the game. Generated from index.html (same scripts, plus js/workshop.js). -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Guttercrown Workshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Crimson+Pro:wght@400;600&family=Grenze+Gotisch:wght@600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="grade"></div>
+<div id="ui">
+  <div id="floaters"></div>
+  <div id="tags"></div>
+  <div id="topbar" class="hidden"></div>
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="hud-side" id="hudP">
+        <div class="hud-name"></div>
+        <div class="bar hp"><i></i><b></b><span></span></div>
+        <div class="bar res"><i></i></div>
+        <div class="hud-status"></div>
+      </div>
+      <div class="hud-side right" id="hudE">
+        <div class="hud-name"></div>
+        <div class="bar hp"><i></i><b></b><span></span></div>
+        <div class="bar res"><i></i></div>
+        <div class="hud-status"></div>
+      </div>
+    </div>
+    <div class="hud-mid">
+      <div class="hype-label">CROWD</div>
+      <div class="bar hype"><i></i></div>
+      <button id="pauseBtn" class="mini">Pause</button>
+    </div>
+    <div id="abar"></div>
+  </div>
+  <div id="foeArrow" class="hidden"></div>
+  <div id="hitfx"></div>
+  <div id="banner" class="hidden"><b></b><small></small></div>
+  <div id="touch" class="hidden">
+    <div id="stickZone"><div id="stickBase"><div id="stickNub"></div></div></div>
+    <button id="tAtk" class="tbtn">ATK</button>
+    <button id="tDodge" class="tbtn">DODGE</button>
+    <button id="tParry" class="tbtn">PARRY</button>
+    <button id="tTaunt" class="tbtn">TAUNT</button>
+  </div>
+  <button id="prompt" class="big hidden"></button>
+  <button id="decorBtn" class="hidden">Decorate</button>
+  <div id="roomchip" class="hidden"></div>
+  <div id="objective" class="hidden"></div>
+  <div id="placebar" class="hidden"><span></span><div class="row"><button id="plStore">Store</button><button id="plRot">Rotate</button><button id="plCancel">Cancel</button><button id="plOk" class="big">Place here</button></div></div>
+  <div id="toast"></div>
+  <div id="panel" class="hidden"></div>
+</div>
+<script>window.WORKSHOP_ONLY = 1;</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/data.js"></script>
+<script src="js/lore.js"></script>
+<script src="js/music.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/gfx.js"></script>
+<script src="js/models.js"></script>
+<script src="js/world.js"></script>
+<script src="js/places.js"></script>
+<script src="js/life.js"></script>
+<script src="js/fight.js"></script>
+<script src="js/cine.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/crew.js"></script>
+<script src="js/mark.js"></script>
+<script src="js/mark2.js"></script>
+<script src="js/mark3.js"></script>
+<script src="js/meet.js"></script>
+<script src="js/room.js"></script>
+<script src="js/deeds.js"></script>
+<script src="js/arms.js"></script>
+<script src="js/realm.js"></script>
+<script src="js/board.js"></script>
+<script src="js/kits.js"></script>
+<script src="js/story.js"></script>
+<script src="js/home.js"></script>
+<script src="js/market.js"></script>
+<script src="js/ledger.js"></script>
+<script src="js/oracle.js"></script>
+<script src="js/cellar.js"></script>
+<script src="js/climb.js"></script>
+<script src="js/raid.js"></script>
+<script src="js/gear.js"></script>
+<script src="js/home2.js"></script>
+<script src="js/prep.js"></script>
+<script src="js/classes.js"></script>
+<script src="js/crowd.js"></script>
+<script src="js/tune.js"></script>
+<script src="js/ascent.js"></script>
+<script src="js/flavor.js"></script>
+<script src="js/flavor2.js"></script>
+<script src="js/flavor3.js"></script>
+<script src="js/guide.js"></script>
+<script src="js/armsrace.js"></script>
+<script src="js/tune2.js"></script>
+<script src="js/moves.js"></script>
+<script src="js/ladder.js"></script>
+<script src="js/pause.js"></script>
+<script src="js/garden.js"></script>
+<script src="js/debts.js"></script>
+<script src="js/loans.js"></script>
+<script src="js/roster.js"></script>
+<script src="js/tidy.js"></script>
+<script src="js/builder.js"></script>
+<script src="js/knuckle.js"></script>
+<script src="js/knives.js"></script>
+<script src="js/traits.js"></script>
+<script src="js/finale.js"></script>
+<script src="js/events2.js"></script>
+<script src="js/moves2.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/rings.js"></script>
+<script src="js/dice.js"></script>
+<script src="js/moves3.js"></script>
+<script src="js/tune3.js"></script>
+<script src="js/menus2.js"></script>
+<script src="js/stance.js"></script>
+<script src="js/saves.js"></script>
+<script src="js/eggs.js"></script>
+<script src="js/perf.js"></script>
+<script src="js/finish2.js"></script>
+<script src="js/edge.js"></script>
+<script src="js/depth.js"></script>
+<script src="js/arms2.js"></script>
+<script src="js/crowd2.js"></script>
+<script src="js/tune4.js"></script>
+<script src="js/lights.js"></script>
+<script src="js/cloud.js"></script>
+<script src="js/look_edits.js"></script>
+<script src="js/looks.js"></script>
+<script src="js/workshop.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

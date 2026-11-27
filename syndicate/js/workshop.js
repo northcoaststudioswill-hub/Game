@@ -1,102 +1,31 @@
-// Guttercrown — the character registry and the Workshop.
-// Every character the game builds carries an id (see assets/REGISTRY.md). The Workshop, open only to the artifact's
-// owner (or anyone running the game from disk), edits a character's frame, people, size, colours and cosmetics on a
-// turning preview. Saving asks for confirmation, then writes the change to the published page's store (edits/looks),
-// which every player reads when the game opens: the character changes in the game for everyone, no republish needed.
-// "Copy for Claude" gives the same change as JSON, to be written into the code for good.
+// Guttercrown Workshop — the character editor. Built only into workshop.html, a separate private artifact; the game
+// players open never contains it. It uses the game's own model code, so the preview is exactly what the game draws.
+// Saving asks for confirmation, then keeps the edit in the Workshop's own store (edits/looks, owner-only writes).
+// Claude reads that store and writes approved edits into js/look_edits.js, which the game applies.
 (function () {
   'use strict';
-  const G = window.G, T = THREE;
-  G.LOOKDEF = G.LOOKDEF || {};
-  const EDITS = G.LOOK_EDITS = {};
-  const SEEN = {}, BUILT = {};                     // SEEN: each id's own look as the code wrote it; BUILT: models in the world, to rebuild after a save
-  const clone = o => JSON.parse(JSON.stringify(o || {}));
-  // the colour a body part really shows: its class's base, then the look's own colours, then any dye on top
-  const colourOf = (look, k) => { if (k === 'skin') return look.skin || (G.RACES[look.race] || {}).skin; const D = look.cos && look.cos.dye && G.DYES && G.DYES[look.cos.dye]; if (D && D[k] != null) return D[k]; return (look.tint || {})[k] != null ? look.tint[k] : (G.MODEL_BASE[look.cls] || {})[k]; };
-  const hexs = v => typeof v === 'number' ? '#' + v.toString(16).padStart(6, '0') : (v || '#888888');
-  const COLS = [['cloth', 'Cloth'], ['armor', 'Armour'], ['armor2', 'Armour, dark'], ['trim', 'Trim'], ['legs', 'Legs'], ['hair', 'Hair'], ['skin', 'Skin']];
-  const SLOTS = [['head', 'Hat'], ['back', 'Back'], ['dye', 'Dye'], ['aura', 'Aura'], ['weapon', 'Weapon skin']];
-  const FRAMES = ['fighter', 'rogue', 'sorcerer', 'warlock', 'cleric', 'druid'];
-
-  function merge(look, e) {
-    if (!e) return look; const o = Object.assign({}, look);
-    ['cls', 'race', 'scale', 'skin'].forEach(k => { if (e[k] != null && e[k] !== '') o[k] = e[k]; });
-    if (e.tint) o.tint = Object.assign({}, look.tint || {}, e.tint);
-    if (e.cos) { o.cos = Object.assign({}, look.cos || {}); Object.keys(e.cos).forEach(k => { if (e.cos[k] === 'none') delete o.cos[k]; else if (e.cos[k]) o.cos[k] = e.cos[k]; }); }
-    const D = o.cos && o.cos.dye && G.DYES && G.DYES[o.cos.dye];       // a dye repaints cloth, armour, trim and legs after the colours: when one of those is edited, write the dye out as colours and let the edit win
-    if (D && e.tint && Object.keys(e.tint).some(k => D[k] != null)) { const dt = {}; Object.keys(D).forEach(k => dt[k] = hexs(D[k])); o.tint = Object.assign({}, look.tint || {}, dt, e.tint); o.cos = Object.assign({}, o.cos); delete o.cos.dye; }
-    return o;
-  }
-
-  // ---------------------------------------------------------------- every model with an id is built with its edit, and remembered
-  const mk0 = G.makeChar;
-  G.makeChar = function (look) {
-    if (!look || !look.id) return mk0.apply(this, arguments);
-    if (!SEEN[look.id]) SEEN[look.id] = clone(look);
-    const c = mk0.call(this, merge(look, EDITS[look.id]));
-    (BUILT[look.id] = BUILT[look.id] || []).push({ c, look }); if (BUILT[look.id].length > 12) BUILT[look.id] = BUILT[look.id].filter(b => b.c.root && b.c.root.parent);
-    return c;
-  };
-  function rebuild(id) {
-    (BUILT[id] || []).forEach(b => { const old = b.c.root, par = old && old.parent; if (!par) return;
-      const n = mk0(merge(b.look, EDITS[id])); n.root.position.copy(old.position); n.root.rotation.copy(old.rotation); n.root.scale.copy(old.scale); n.root.visible = old.visible;
-      par.add(n.root); par.remove(old); Object.assign(b.c, n); });
-  }
-
-  // ---------------------------------------------------------------- the named fighters keep their colours on their own records (portraits read them too)
-  const ORIG = {};
-  const fighters = () => [].concat(G.OPPONENTS || [], (G.ascent && G.ascent.FOES) || []).filter(o => o && o.id && !o.gen);
-  function applyFighter(o) {
-    if (!ORIG[o.id]) ORIG[o.id] = { tint: clone(o.tint), scale: o.scale, cos: clone(o.cos) };
-    const e = EDITS['fighter:' + o.id] || {}, b = ORIG[o.id];
-    o.tint = Object.assign({}, b.tint, e.tint || {}); o.scale = e.scale || b.scale;
-    if (o.look) { o.look.tint = o.tint; if (o.scale) o.look.scale = o.scale; if (e.cos) o.look.cos = merge({ cos: o.look.cos }, { cos: e.cos }).cos; }
-  }
-  const applyAll = () => fighters().forEach(applyFighter);
-
-  // ---------------------------------------------------------------- the registry: who exists, what they look like by default, where the code keeps them
-  const NPC = [
-    ['The market', [['marc', 'Marc dé Fleuprau', 'js/mark.js'], ['pip', 'Pip Tallow', 'js/guide.js'], ['fence', 'The Fence', 'js/places.js'], ['guildmaster', 'The Guildmaster', 'js/places.js'], ['dedrick', 'Sir Dedrick III', 'js/dice.js'], ['tibb', 'Old Marrow Tibb', 'js/guide.js'], ['carr', 'Sergeant Ysolde Carr', 'js/guide.js'], ['ilva', 'Ilvaren of the Hanging Markets', 'js/guide.js'], ['david', 'David Roseinbeirg', 'js/oracle.js']]],
-    ['The pit', [['ledger-keeper', 'The Ledger-Keeper, in the Guild box', 'js/life.js'], ['box-guard-west', 'Guild box guard, west', 'js/life.js'], ['box-guard-east', 'Guild box guard, east', 'js/life.js'], ['pit-guard-west', 'Pit gate guard, west', 'js/life.js'], ['pit-guard-east', 'Pit gate guard, east', 'js/life.js']]],
-    ['The Long Stair and the throne', [['stair-warden-elf', 'Seal-Warden at the Stair (elf)', 'js/life.js'], ['stair-warden-human', 'Seal-Warden at the Stair (human)', 'js/life.js'], ['throne-king', 'King Vilhelm van Koheneim IV', 'js/cine.js'], ['throne-queen', 'Queen Eerin Koheneim', 'js/cine.js']]],
-    ['Townsfolk', [['marcs-punter', 'Marc’s punter', 'js/places.js'], ['wisp-gambler', 'Gambler at the Wisp Table', 'js/life.js'], ['odds-arguer-human', 'Arguing about the odds (human)', 'js/life.js'], ['odds-arguer-dwarf', 'Arguing about the odds (dwarf)', 'js/life.js'], ['busker', 'The busker', 'js/life.js'],
-      ['stallkeeper-dwarf', 'Stall-keeper (dwarf)', 'js/places.js'], ['stallkeeper-halforc', 'Stall-keeper (half-orc)', 'js/places.js'], ['stallkeeper-human', 'Stall-keeper (human)', 'js/places.js'], ['stallkeeper-tiefling', 'Stall-keeper (tiefling)', 'js/places.js'],
-      ['corner-sitter-dwarf', 'Sitting in the corner (dwarf)', 'js/places.js'], ['corner-sitter-human', 'Sitting in the corner (human)', 'js/places.js'],
-      ['tallow-neighbour-dwarf', 'Tallow Row neighbour (dwarf)', 'js/places.js'], ['tallow-neighbour-child', 'Tallow Row neighbour (child)', 'js/places.js'], ['tallow-neighbour-halforc', 'Tallow Row neighbour (half-orc)', 'js/places.js'],
-      ['passer-by-1', 'Passer-by 1', 'js/places.js'], ['passer-by-2', 'Passer-by 2', 'js/places.js'], ['passer-by-3', 'Passer-by 3', 'js/places.js'],
-      ['knife-kid', 'The knife-throwing kid', 'js/knives.js'], ['knuckle-fighter', 'The knuckle fighter', 'js/knuckle.js']]]
-  ];
-  function warm() { try { G.world.get('hub'); G.world.get('arena'); } catch (e) { } }       // building the market and the pit records every look in them
-  G.registry = function () {
-    warm(); const out = [];
-    const led = (G.OPPONENTS || []).filter(o => o.id && !o.gen), stair = ((G.ascent && G.ascent.FOES) || []);
-    led.forEach(o => out.push({ id: 'fighter:' + o.id, name: o.name + (o.title ? ' ' + o.title : ''), group: 'Fighters on the Ledger', file: 'js/data.js', fighter: o }));
-    stair.forEach(o => out.push({ id: 'fighter:' + o.id, name: o.name + (o.title ? ', ' + o.title : ''), group: 'The Long Stair', file: 'js/ascent.js', fighter: o }));
-    NPC.forEach(([grp, list]) => list.forEach(([id, name, file]) => out.push({ id, name, group: grp, file })));
-    return out;
-  };
-  const baseOf = r => r.fighter ? { cls: r.fighter.cls, race: r.fighter.race, tint: clone((ORIG[r.fighter.id] || r.fighter).tint), scale: (ORIG[r.fighter.id] || r.fighter).scale || 1, cos: clone(r.fighter.look ? (ORIG[r.fighter.id] || {}).cos || r.fighter.look.cos : null) }
-    : clone(SEEN[r.id] || G.LOOKDEF[r.id] || (r.id === 'marc' && G.mark && G.mark.look) || (r.id === 'david' && G.oracle && G.oracle.look && G.oracle.look()) || null);
-
-  // ---------------------------------------------------------------- reading and writing the saved edits
+  const G = window.G, T = THREE, L = G.looks; if (!window.WORKSHOP_ONLY || !L) return;
+  const { merge, colourOf, hexs, COLS, SLOTS, FRAMES, mk0, clone } = L;
+  const EDITS = {};                                                     // what the Workshop has saved (may be ahead of the game)
+  const BAKED = G.BAKED_LOOKS || {};
+  const baseOf = r => L.base(r);
+  const same = (a, b) => JSON.stringify(a || null) === JSON.stringify(b || null);
+  const pending = () => [...new Set(Object.keys(EDITS).concat(Object.keys(BAKED)))].filter(id => !same(EDITS[id], BAKED[id]));
+  // ---------------------------------------------------------------- the Workshop's own store: starts from what the game already has, then whatever was saved here since
   let db = null, owner = false;
+  Object.assign(EDITS, clone(BAKED));
   G.workshopReady = (async () => {
     if (!window.claude || !window.claude.use) return;
     try { const [d, u] = await Promise.all([window.claude.use('db'), window.claude.use('user')]); db = d; owner = !!(u && (await u.isOwner())); } catch (e) { return; }
     if (!db) return;
-    try { const s = await db.doc('edits/looks').get(); const looks = s.exists && s.data().looks; if (looks) { Object.assign(EDITS, clone(looks)); applyAll(); Object.keys(EDITS).forEach(rebuild); } } catch (e) { }
-    if (owner && G.scene === 'title' && G.ui && G.ui.title) addButton();
+    try { const s = await db.doc('edits/looks').get(); const looks = s.exists && s.data().looks; if (looks) { Object.keys(EDITS).forEach(k => delete EDITS[k]); Object.assign(EDITS, clone(looks)); } } catch (e) { }
+    if (el && cur) { choose(cur); drawList && drawList(''); }
   })();
-  const local = location.protocol === 'file:';       // running from disk: the developer's own copy
-  G.workshopAllowed = () => owner || local;
-
-  // ---------------------------------------------------------------- the title screen gets a Workshop button for the owner
-  function addButton() { const m = document.querySelector('#panel .title-wrap .menu, #panel .t-btns'); if (!m || m.querySelector('#bShop')) return;
-    const b = document.createElement('button'); b.id = 'bShop'; b.textContent = 'Workshop'; b.onclick = () => { G.audioInit && G.audioInit(); G.sfx && G.sfx('ui'); open(); }; m.appendChild(b); }
-  const title0 = G.ui.title; G.ui.title = function () { const r = title0.apply(this, arguments); if (G.workshopAllowed()) addButton(); return r; };
+  // the game boots underneath (the model code needs it), but nothing of it is drawn or heard: the Workshop is the whole page
+  const boot = setInterval(() => { if (!G.ui || !G.gfx || !document.getElementById('panel')) return; clearInterval(boot); G.muted = true; try { G.bootSkip && G.bootSkip(); G.bootSkip && G.bootSkip(); } catch (e) { } G.gfx.render = () => {}; open(); }, 200);
 
   // ---------------------------------------------------------------- the editor
-  let el = null, rend = null, scn = null, cam = null, cur = null, live = null, edit = {}, pose = 'idle', spin = 0.5, raf = 0, t0 = 0, drag = null;
+  let drawList = null, el = null, rend = null, scn = null, cam = null, cur = null, live = null, edit = {}, pose = 'idle', spin = 0.5, raf = 0, t0 = 0, drag = null;
   const css = `#workshop{position:fixed;inset:0;z-index:90;display:grid;grid-template-columns:minmax(200px,260px) 1fr minmax(240px,300px);background:#100d12;color:#e8dcc0;font:14px/1.35 var(--body,Georgia,serif)}
 #workshop *{box-sizing:border-box}#workshop h2{font-family:var(--title,Georgia,serif);color:#f6dc8a;margin:0 0 6px;font-size:1.5rem}
 #workshop .ws-list{overflow:auto;border-right:1px solid #3a2f2a;padding:calc(10px + env(safe-area-inset-top,0px)) 10px 10px max(10px,env(safe-area-inset-left,0px))}
@@ -123,18 +52,17 @@
 #workshop .sw{display:inline-block;width:18px;height:14px;border:1px solid #000;border-radius:2px;vertical-align:middle}
 @media (max-width:760px){#workshop .ws-pick{display:block;width:100%;margin:0 0 4px}#workshop .ws-list input[type=search]{display:none}#workshop{grid-template-columns:1fr;grid-template-rows:auto 42vh 1fr}#workshop .ws-list{max-height:none;border-right:0;border-bottom:1px solid #3a2f2a;padding-bottom:6px}#workshop .ws-list .ws-all{display:none}#workshop .ws-ctl{border-left:0}}`;
   function open() {
-    if (!G.workshopAllowed()) return; G.ui.close && G.ui.close(); applyAll();
+    if (el) return; G.ui.close && G.ui.close();
     if (!document.getElementById('wscss')) { const s = document.createElement('style'); s.id = 'wscss'; s.textContent = css; document.head.appendChild(s); }
     el = document.createElement('div'); el.id = 'workshop';
-    el.innerHTML = '<div class="ws-list"><h2>Workshop</h2><select class="ws-pick" aria-label="Character"></select><input type="search" placeholder="Find a character" aria-label="Find a character"><div class="ws-all"></div></div>' +
-      '<div class="ws-view"><canvas></canvas><div class="ws-top"><div class="ws-name"><b></b><small></small></div><button class="ws-close">Close</button></div><div class="ws-poses"></div></div><div class="ws-ctl"></div>';
+    el.innerHTML = '<div class="ws-list"><h2>Workshop</h2><div class="ws-wait"></div><select class="ws-pick" aria-label="Character"></select><input type="search" placeholder="Find a character" aria-label="Find a character"><div class="ws-all"></div></div>' +
+      '<div class="ws-view"><canvas></canvas><div class="ws-top"><div class="ws-name"><b></b><small></small></div></div><div class="ws-poses"></div></div><div class="ws-ctl"></div>';
     document.body.appendChild(el); G.workshopOpen = true;
     const reg = G.registry(), list = el.querySelector('.ws-all'), pick = el.querySelector('.ws-pick');
-    const drawList = q => { list.innerHTML = ''; let g = ''; reg.filter(r => !q || r.name.toLowerCase().includes(q)).forEach(r => { if (r.group !== g) { g = r.group; const h = document.createElement('div'); h.className = 'ws-g'; h.textContent = g; list.appendChild(h); }
+    drawList = q => { status(); list.innerHTML = ''; let g = ''; reg.filter(r => !q || r.name.toLowerCase().includes(q)).forEach(r => { if (r.group !== g) { g = r.group; const h = document.createElement('div'); h.className = 'ws-g'; h.textContent = g; list.appendChild(h); }
       const b = document.createElement('button'); b.className = 'ws-i' + (cur && cur.id === r.id ? ' on' : ''); b.textContent = r.name; if (EDITS[r.id]) { const d = document.createElement('span'); d.className = 'dot'; d.title = 'Edited'; b.appendChild(d); } b.onclick = () => choose(r); list.appendChild(b); }); };
     pick.innerHTML = reg.map((r, i) => '<option value="' + i + '">' + G.esc(r.group + ' · ' + r.name) + (EDITS[r.id] ? ' •' : '') + '</option>').join(''); pick.onchange = () => choose(reg[+pick.value]);
     el.querySelector('input[type=search]').oninput = e => drawList(e.target.value.trim().toLowerCase());
-    el.querySelector('.ws-close').onclick = close;
     el.querySelector('.ws-poses').innerHTML = [['idle', 'Stand'], ['walk', 'Walk'], ['swing', 'Swing'], ['cast', 'Cast'], ['guard', 'Guard'], ['cheer', 'Cheer'], ['ko', 'Down']].map(p => '<button data-pose="' + p[0] + '"' + (p[0] === pose ? ' class="on"' : '') + '>' + p[1] + '</button>').join('');
     el.querySelectorAll('[data-pose]').forEach(b => b.onclick = () => { pose = b.dataset.pose; el.querySelectorAll('[data-pose]').forEach(x => x.classList.toggle('on', x === b)); });
     const cv = el.querySelector('canvas');
@@ -145,6 +73,10 @@
     cv.onpointerdown = e => { drag = { x: e.clientX, s: spin }; cv.setPointerCapture(e.pointerId); }; cv.onpointermove = e => { if (drag) spin = drag.s + (e.clientX - drag.x) * 0.012; }; cv.onpointerup = cv.onpointercancel = () => { drag = null; };
     drawList(''); choose(reg.find(r => r.id === 'marc') || reg[0]); t0 = performance.now(); loop();
   }
+  // which saved changes are not in the game yet, and a way to hand them all to Claude
+  function status() { const w = el && el.querySelector('.ws-wait'); if (!w) return; const p = pending(), reg = G.registry(), nm = id => (reg.find(r => r.id === id) || { name: id }).name;
+    w.innerHTML = p.length ? '<p class="ws-note"><b>' + p.length + ' waiting to go into the game:</b> ' + p.map(id => G.esc(nm(id))).join(', ') + '. Tell Claude “apply the workshop edits”.</p><button class="ws-all-copy">Copy all for Claude</button>' : '<p class="ws-note">Everything saved here is in the game.</p>';
+    const b = w.querySelector('.ws-all-copy'); if (b) b.onclick = () => { const txt = JSON.stringify({ workshop: 'Guttercrown', changes: pending().map(id => ({ id, name: nm(id), change: EDITS[id] || 'back to original' })) }, null, 1); try { navigator.clipboard.writeText(txt).then(() => note('Copied. Paste it to Claude.'), () => note(txt)); } catch (e) { note(txt); } }; }
   function close() { cancelAnimationFrame(raf); raf = 0; if (rend) { rend.dispose(); rend = null; } if (el) el.remove(); el = null; G.workshopOpen = false; G.ui.title && G.scene === 'title' && G.ui.title(); }
   function loop() { raf = requestAnimationFrame(loop); if (!el || !rend) return; const cv = rend.domElement, w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.floor(w * rend.getPixelRatio()) || cv.height !== Math.floor(h * rend.getPixelRatio())) { rend.setSize(w, h, false); cam.aspect = w / Math.max(1, h); cam.updateProjectionMatrix(); }
     const t = (performance.now() - t0) / 1000; if (live) { if (!drag) spin += 0.004; live.root.rotation.y = spin; const k = (t * 0.9) % 1, p = pose;
@@ -172,7 +104,7 @@
     h += '<div class="ws-h">Cosmetics</div>' + SLOTS.map(s => '<label>' + s[1] + '<select data-s="' + s[0] + '">' + opt((e.cos || {})[s[0]] || 'none', cosOf(s[0])) + '</select><button class="ws-x" data-rs="' + s[0] + '"' + ((edit.cos || {})[s[0]] ? '' : ' disabled') + '>reset</button></label>').join('');
     if (fighter) h += '<p class="ws-note">A fighter’s frame and people decide how they fight, so only their looks are edited here.</p>';
     h += '<div class="ws-btns"><button class="big ws-save"' + (db && owner ? '' : ' disabled') + '>Save…</button><button class="ws-revert"' + (EDITS[cur.id] || Object.keys(edit).length ? '' : ' disabled') + '>Back to original</button><button class="ws-copy">Copy for Claude</button></div>';
-    h += '<p class="ws-note">' + (db && owner ? 'Saving changes this character in the game for everyone who plays it.' : 'Saving needs the published game, opened by its owner. You can still copy the change for Claude to put in the code.') + '</p>';
+    h += '<p class="ws-note">' + (db && owner ? 'Saving keeps the change here in the Workshop. It reaches the game when Claude applies the workshop edits, after a check.' : 'Saving needs the published Workshop, opened by its owner. You can still copy the change for Claude.') + '</p>';
     c.innerHTML = h;
     const upd = () => { show(); controls(); };
     c.querySelectorAll('[data-k]').forEach(i => i.oninput = i.onchange = () => { const v = i.dataset.k === 'scale' ? +i.value : i.value; edit[i.dataset.k] = v; if (i.dataset.k === 'scale') show(); else upd(); });
@@ -200,17 +132,16 @@
     const was = merge(cur.base, EDITS[cur.id]), will = revert ? cur.base : effective(), rows = diffRows(was, will);
     if (!rows.length) { note(revert ? cur.name + ' already looks the way the code made them.' : 'Nothing has changed yet.'); return; }
     const m = document.createElement('div'); m.className = 'ws-modal';
-    m.innerHTML = '<div class="ws-card"><h2>' + (revert ? 'Put ' : 'Save ') + G.esc(cur.name) + (revert ? ' back?' : '?') + '</h2><p class="ws-note">' + (revert ? 'This removes your saved changes.' : 'Check the changes.') + ' Everyone who plays will see it the next time the game opens.</p><ul class="ws-diff">' + rows.map(r => '<li><b style="min-width:7em">' + r[0] + '</b>' + r[1] + ' → ' + r[2] + '</li>').join('') + '</ul><div class="ws-btns"><button class="big ws-yes">' + (revert ? 'Put back' : 'Save') + '</button><button class="ws-no">Keep editing</button></div></div>';
+    m.innerHTML = '<div class="ws-card"><h2>' + (revert ? 'Put ' : 'Save ') + G.esc(cur.name) + (revert ? ' back?' : '?') + '</h2><p class="ws-note">' + (revert ? 'This removes your saved changes.' : 'Check the changes.') + ' Saved here first; it goes into the game when Claude applies the workshop edits.</p><ul class="ws-diff">' + rows.map(r => '<li><b style="min-width:7em">' + r[0] + '</b>' + r[1] + ' → ' + r[2] + '</li>').join('') + '</ul><div class="ws-btns"><button class="big ws-yes">' + (revert ? 'Put back' : 'Save') + '</button><button class="ws-no">Keep editing</button></div></div>';
     el.appendChild(m); m.querySelector('.ws-no').onclick = () => m.remove();
     m.querySelector('.ws-yes').onclick = async () => { const btn = m.querySelector('.ws-yes'); btn.disabled = true; btn.textContent = 'Saving…';
       const next = clone(EDITS); if (revert) delete next[cur.id]; else next[cur.id] = tidy(edit);
       try { await db.doc('edits/looks').set({ looks: next, at: Date.now() }); }
       catch (er) { m.remove(); note('Not saved: ' + (er && er.code === 'invalid_argument' ? 'only the game’s owner can save changes.' : er && er.code === 'quota_exceeded' ? 'the game’s store is full.' : 'the store could not be reached. Try again in a moment.')); return; }
-      Object.keys(EDITS).forEach(k => delete EDITS[k]); Object.assign(EDITS, next); if (revert) edit = {}; applyAll(); rebuild(cur.id); m.remove();
-      const r = cur; open2(r); note(revert ? r.name + ' is back to the original.' : 'Saved. ' + r.name + ' is updated in the game.'); };
+      Object.keys(EDITS).forEach(k => delete EDITS[k]); Object.assign(EDITS, next); if (revert) edit = {}; m.remove();
+      const r = cur; open2(r); note(revert ? r.name + ' is back to the original here. Tell Claude “apply the workshop edits” to put it back in the game.' : 'Saved in the Workshop. Tell Claude “apply the workshop edits” to put ' + r.name + ' into the game.'); };
   }
   function open2(r) { const keep = r.id; choose(G.registry().find(q => q.id === keep) || r); const s = el.querySelector('input[type=search]'); s.dispatchEvent(new Event('input')); }
-  G.ui.workshop = open; G.workshop = { open, close, merge, edits: EDITS, seen: SEEN, base: r => baseOf(r) };
-  window.addEventListener('keydown', e => { if (el && e.code === 'Escape') { const m = el.querySelector('.ws-modal'); if (m) m.remove(); else close(); e.stopPropagation(); } }, true);
-  if (location.hash === '#workshop') setTimeout(() => G.workshopAllowed() && open(), 1500);
+  G.workshop = { open, edits: EDITS, pending };
+  window.addEventListener('keydown', e => { if (el && e.code === 'Escape') { const m = el.querySelector('.ws-modal'); if (m) m.remove(); e.stopPropagation(); } }, true);
 })();
