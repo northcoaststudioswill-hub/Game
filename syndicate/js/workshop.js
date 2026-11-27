@@ -25,7 +25,7 @@
   const boot = setInterval(() => { if (!G.ui || !G.gfx || !document.getElementById('panel')) return; clearInterval(boot); G.muted = true; try { G.bootSkip && G.bootSkip(); G.bootSkip && G.bootSkip(); } catch (e) { } G.gfx.render = () => {}; open(); }, 200);
 
   // ---------------------------------------------------------------- the editor
-  let drawList = null, el = null, rend = null, scn = null, cam = null, cur = null, live = null, edit = {}, pose = 'idle', spin = 0.5, raf = 0, t0 = 0, drag = null;
+  let zoom = false, drawList = null, el = null, rend = null, scn = null, cam = null, cur = null, live = null, edit = {}, pose = 'idle', spin = 0.5, raf = 0, t0 = 0, drag = null;
   const css = `#workshop{position:fixed;inset:0;z-index:90;display:grid;grid-template-columns:minmax(200px,260px) 1fr minmax(240px,300px);background:#100d12;color:#e8dcc0;font:14px/1.35 var(--body,Georgia,serif)}
 #workshop *{box-sizing:border-box}#workshop h2{font-family:var(--title,Georgia,serif);color:#f6dc8a;margin:0 0 6px;font-size:1.5rem}
 #workshop .ws-list{overflow:auto;border-right:1px solid #3a2f2a;padding:calc(10px + env(safe-area-inset-top,0px)) 10px 10px max(10px,env(safe-area-inset-left,0px))}
@@ -45,6 +45,7 @@
 #workshop input[type=color]{width:100%;height:28px;border:1px solid #3a2f2a;border-radius:4px;background:#1d1720;padding:1px}
 #workshop .ws-x{background:none;border:0;box-shadow:none;color:#b9a986;font-size:.75rem;padding:2px 4px;text-transform:none;letter-spacing:0}
 #workshop .ws-x[disabled]{visibility:hidden}#workshop .ws-h{font-family:var(--display,Georgia,serif);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#b9a986;border-bottom:1px solid #3a2f2a;padding-bottom:3px}
+#workshop .ws-sub{font-size:.8rem;color:#f0dca0;margin-top:4px}#workshop .ws-tick input{justify-self:start;width:18px;height:18px}#workshop .ws-h .ws-zoom{float:right;text-transform:none;letter-spacing:0;font-size:.75rem;color:#e0b04a}
 #workshop .ws-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}#workshop .ws-note{font-size:.8rem;color:#b9a986}
 #workshop .ws-modal{position:absolute;inset:0;background:rgba(5,4,8,.72);display:grid;place-items:center;padding:16px;z-index:2}
 #workshop .ws-card{background:#1d1720;border:1px solid #8a6a34;border-radius:6px;padding:18px;max-width:440px;width:100%;max-height:90%;overflow:auto}
@@ -69,17 +70,18 @@
     rend = new T.WebGLRenderer({ canvas: cv, antialias: true }); rend.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); rend.outputColorSpace = T.SRGBColorSpace;
     scn = new T.Scene(); scn.background = new T.Color(0x16121a); scn.add(new T.AmbientLight(0xfff0e0, 1.1)); scn.add(new T.HemisphereLight(0xfff2dc, 0x3a3040, 2.2)); const key = new T.DirectionalLight(0xffe2c0, 3.2); key.position.set(3, 5, 4); scn.add(key); const rim = new T.DirectionalLight(0x9fb8ff, 1.6); rim.position.set(-4, 3, -3); scn.add(rim);
     const fl = new T.Mesh(new T.CircleGeometry(1.6, 40), new T.MeshLambertMaterial({ color: 0x3a2c22 })); fl.rotation.x = -Math.PI / 2; scn.add(fl);
-    cam = new T.PerspectiveCamera(30, 1, 0.1, 50); cam.position.set(0, 1.3, 6.6); cam.lookAt(0, 0.95, 0);
+    cam = new T.PerspectiveCamera(30, 1, 0.1, 50); aim();
     cv.onpointerdown = e => { drag = { x: e.clientX, s: spin }; cv.setPointerCapture(e.pointerId); }; cv.onpointermove = e => { if (drag) spin = drag.s + (e.clientX - drag.x) * 0.012; }; cv.onpointerup = cv.onpointercancel = () => { drag = null; };
     drawList(''); choose(reg.find(r => r.id === 'marc') || reg[0]); t0 = performance.now(); loop();
   }
+  function aim() { if (!cam) return; const s = (effective && cur ? (effective().scale || 1) * ((G.RACES[effective().race] || {}).scale || 1) : 1); if (zoom) { cam.position.set(0, 1.6 * s, 3.1); cam.lookAt(0, 1.45 * s, 0); } else { cam.position.set(0, 1.3, 6.6); cam.lookAt(0, 0.95, 0); } }
   // which saved changes are not in the game yet, and a way to hand them all to Claude
   function status() { const w = el && el.querySelector('.ws-wait'); if (!w) return; const p = pending(), reg = G.registry(), nm = id => (reg.find(r => r.id === id) || { name: id }).name;
     w.innerHTML = p.length ? '<p class="ws-note"><b>' + p.length + ' waiting to go into the game:</b> ' + p.map(id => G.esc(nm(id))).join(', ') + '. Tell Claude “apply the workshop edits”.</p><button class="ws-all-copy">Copy all for Claude</button>' : '<p class="ws-note">Everything saved here is in the game.</p>';
     const b = w.querySelector('.ws-all-copy'); if (b) b.onclick = () => { const txt = JSON.stringify({ workshop: 'Guttercrown', changes: pending().map(id => ({ id, name: nm(id), change: EDITS[id] || 'back to original' })) }, null, 1); try { navigator.clipboard.writeText(txt).then(() => note('Copied. Paste it to Claude.'), () => note(txt)); } catch (e) { note(txt); } }; }
   function close() { cancelAnimationFrame(raf); raf = 0; if (rend) { rend.dispose(); rend = null; } if (el) el.remove(); el = null; G.workshopOpen = false; G.ui.title && G.scene === 'title' && G.ui.title(); }
   function loop() { raf = requestAnimationFrame(loop); if (!el || !rend) return; const cv = rend.domElement, w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.floor(w * rend.getPixelRatio()) || cv.height !== Math.floor(h * rend.getPixelRatio())) { rend.setSize(w, h, false); cam.aspect = w / Math.max(1, h); cam.updateProjectionMatrix(); }
-    const t = (performance.now() - t0) / 1000; if (live) { if (!drag) spin += 0.004; live.root.rotation.y = spin; const k = (t * 0.9) % 1, p = pose;
+    const t = (performance.now() - t0) / 1000; if (live) { if (!drag) { if (zoom) spin += (Math.atan2(Math.sin(-spin), Math.cos(-spin))) * 0.08; else spin += 0.004; } live.root.rotation.y = spin; const k = (t * 0.9) % 1, p = pose;
       live.pose(p === 'walk' ? { t, act: 'idle', moving: true, walk: t * 9 } : p === 'swing' ? { t, act: 'swing', prog: k, step: Math.floor(t * 0.9) % 3 } : p === 'cast' ? { t, act: 'cast', prog: Math.min(1, k * 1.4) } : p === 'guard' ? { t, act: 'idle', guard: true, ready: 1 } : p === 'ko' ? { t, act: 'ko' } : p === 'cheer' ? { t, act: 'cheer', prog: k } : { t, act: 'idle', ready: 1 }); }
     rend.render(scn, cam); }
   const effective = () => merge(cur.base, edit);
@@ -89,7 +91,7 @@
     el.querySelector('.ws-name b').textContent = r.name; el.querySelector('.ws-name small').textContent = r.group + ' · ' + r.file + ' · id ' + r.id;
     el.querySelectorAll('.ws-i').forEach(b => b.classList.toggle('on', b.firstChild && b.firstChild.textContent === r.name));
     const reg = G.registry(), pk = el.querySelector('.ws-pick'); pk.value = String(reg.findIndex(q => q.id === r.id));
-    controls(); show();
+    controls(); show(); aim();
   }
   function controls() {
     const c = el.querySelector('.ws-ctl'), e = effective(), fighter = !!cur.fighter, base = G.MODEL_BASE[e.cls] || {}, race = G.RACES[e.race] || {};
@@ -102,6 +104,16 @@
     h += '<label>Size<input type="range" min="0.6" max="1.4" step="0.02" data-k="scale" value="' + (e.scale || 1) + '"><button class="ws-x" data-r="scale"' + (edit.scale ? '' : ' disabled') + '>reset</button></label>';
     h += '<div class="ws-h">Colours</div>' + COLS.filter(k => !(fighter && k[0] === 'skin')).map(k => '<label>' + k[1] + '<input type="color" data-c="' + k[0] + '" value="' + colOf(k[0]).slice(0, 7) + '"><button class="ws-x" data-rc="' + k[0] + '"' + ((k[0] === 'skin' ? edit.skin : (edit.tint || {})[k[0]]) ? '' : ' disabled') + '>reset</button></label>').join('');
     h += '<div class="ws-h">Cosmetics</div>' + SLOTS.map(s => '<label>' + s[1] + '<select data-s="' + s[0] + '">' + opt((e.cos || {})[s[0]] || 'none', cosOf(s[0])) + '</select><button class="ws-x" data-rs="' + s[0] + '"' + ((edit.cos || {})[s[0]] ? '' : ' disabled') + '>reset</button></label>').join('');
+    const A = e.adj || {}, EA = edit.adj || {}, has = (g, k) => EA[g] && EA[g][k] != null;
+    const slider = (g, k, label, min, max, step, def) => { const v = (A[g] && A[g][k] != null) ? A[g][k] : def; return '<label>' + label + '<input type="range" min="' + min + '" max="' + max + '" step="' + step + '" data-a="' + g + '.' + k + '" value="' + v + '"><button class="ws-x" data-ra="' + g + '.' + k + '"' + (has(g, k) ? '' : ' disabled') + '>reset</button></label>'; };
+    const tick = (g, label) => '<label class="ws-tick">' + label + '<input type="checkbox" data-hide="' + g + '"' + (A[g] && A[g].hide ? ' checked' : '') + '><button class="ws-x" data-ra="' + g + '.hide"' + (has(g, 'hide') ? '' : ' disabled') + '>reset</button></label>';
+    const part = (g, title, hideLabel) => '<div class="ws-sub">' + title + '</div>' + slider(g, 'y', 'Up / down', -0.3, 0.3, 0.01, 0) + slider(g, 'z', 'Back / forward', -0.25, 0.25, 0.01, 0) + slider(g, 's', 'Size', 0.5, 1.6, 0.02, 1) + slider(g, 't', 'Tilt', -0.9, 0.9, 0.02, 0) + (hideLabel ? tick(g, hideLabel) : '');
+    h += '<div class="ws-h">Fit <button class="ws-x ws-zoom">' + (zoom ? 'whole body' : 'close-up on the head') + '</button></div>';
+    h += '<div class="ws-sub">Head</div>' + slider('head', 's', 'Size', 0.7, 1.4, 0.02, 1);
+    h += '<div class="ws-sub">Face and eyes</div>' + slider('face', 'y', 'Up / down', -0.12, 0.12, 0.005, 0) + slider('face', 'z', 'Back / forward', -0.06, 0.14, 0.005, 0) + slider('face', 's', 'Size', 0.7, 1.4, 0.02, 1);
+    h += part('gear', e.cls === 'fighter' ? 'Helmet' : e.cls === 'rogue' || e.cls === 'cleric' || e.cls === 'druid' || e.cls === 'warlock' ? 'Hood' : 'Hair', 'Hide it');
+    if ((e.cos || {}).head) h += part('hat', 'Hat', 'Hide the hat');
+    if ((e.cos || {}).back) h += part('back', 'Back item', 'Hide it');
     if (fighter) h += '<p class="ws-note">A fighter’s frame and people decide how they fight, so only their looks are edited here.</p>';
     h += '<div class="ws-btns"><button class="big ws-save"' + (db && owner ? '' : ' disabled') + '>Save…</button><button class="ws-revert"' + (EDITS[cur.id] || Object.keys(edit).length ? '' : ' disabled') + '>Back to original</button><button class="ws-copy">Copy for Claude</button></div>';
     h += '<p class="ws-note">' + (db && owner ? 'Saving keeps the change here in the Workshop. It reaches the game when Claude applies the workshop edits, after a check.' : 'Saving needs the published Workshop, opened by its owner. You can still copy the change for Claude.') + '</p>';
@@ -114,11 +126,16 @@
     c.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { delete edit[b.dataset.r]; upd(); });
     c.querySelectorAll('[data-rc]').forEach(b => b.onclick = () => { const k = b.dataset.rc; if (k === 'skin') delete edit.skin; else if (edit.tint) delete edit.tint[k]; upd(); });
     c.querySelectorAll('[data-rs]').forEach(b => b.onclick = () => { if (edit.cos) delete edit.cos[b.dataset.rs]; upd(); });
+    const setA = (g, k, v) => { edit.adj = edit.adj || {}; edit.adj[g] = edit.adj[g] || {}; edit.adj[g][k] = v; };
+    c.querySelectorAll('[data-a]').forEach(i => { const [g, k] = i.dataset.a.split('.'); i.oninput = () => { setA(g, k, +i.value); show(); }; i.onchange = upd; });
+    c.querySelectorAll('[data-hide]').forEach(i => i.onchange = () => { setA(i.dataset.hide, 'hide', i.checked); upd(); });
+    c.querySelectorAll('[data-ra]').forEach(b => b.onclick = () => { const [g, k] = b.dataset.ra.split('.'); if (edit.adj && edit.adj[g]) { delete edit.adj[g][k]; if (!Object.keys(edit.adj[g]).length) delete edit.adj[g]; } upd(); });
+    const zb = c.querySelector('.ws-zoom'); if (zb) zb.onclick = () => { zoom = !zoom; aim(); controls(); };
     c.querySelector('.ws-revert').onclick = () => confirmSave(true);
     c.querySelector('.ws-save').onclick = () => confirmSave(false);
     c.querySelector('.ws-copy').onclick = () => { const txt = JSON.stringify({ id: cur.id, name: cur.name, file: cur.file, change: tidy(edit) }, null, 1); const done = ok => note(ok ? 'Copied. Paste it to Claude to make the change permanent in the code.' : txt); try { navigator.clipboard.writeText(txt).then(() => done(true), () => done(false)); } catch (er) { done(false); } };
   }
-  function tidy(e) { const o = clone(e); if (o.tint && !Object.keys(o.tint).length) delete o.tint; if (o.cos && !Object.keys(o.cos).length) delete o.cos; return o; }
+  function tidy(e) { const o = clone(e); if (o.adj) { Object.keys(o.adj).forEach(g => { if (!Object.keys(o.adj[g]).length) delete o.adj[g]; }); if (!Object.keys(o.adj).length) delete o.adj; } if (o.tint && !Object.keys(o.tint).length) delete o.tint; if (o.cos && !Object.keys(o.cos).length) delete o.cos; return o; }
   function note(msg) { const m = document.createElement('div'); m.className = 'ws-modal'; m.innerHTML = '<div class="ws-card"><p style="white-space:pre-wrap;user-select:text;-webkit-user-select:text"></p><button class="big">OK</button></div>'; m.querySelector('p').textContent = msg; m.querySelector('button').onclick = () => m.remove(); el.appendChild(m); }
   function diffRows(before, after) {
     const rows = [], sw = v => '<span class="sw" style="background:' + G.esc(hexs(v)) + '"></span>';
@@ -126,6 +143,8 @@
     COLS.forEach(([k, n]) => { const a = colourOf(before, k), b = colourOf(after, k); if (hexs(a).toLowerCase() !== hexs(b).toLowerCase()) rows.push([n, sw(a) + ' ' + G.esc(hexs(a)), sw(b) + ' ' + G.esc(hexs(b))]); });
     const cn = id => id ? ((G.COSMETICS || []).find(x => x.id === id) || { name: id }).name : 'None';
     SLOTS.forEach(([k, n]) => { const a = (before.cos || {})[k], b = (after.cos || {})[k]; if ((a || '') !== (b || '')) rows.push([n, G.esc(cn(a)), G.esc(cn(b))]); });
+    const AN = { head: 'Head', face: 'Face', gear: 'Hood or helmet', hat: 'Hat', back: 'Back item' }, KN = { y: 'up/down', z: 'back/forward', s: 'size', t: 'tilt', hide: 'hidden' };
+    Object.keys(AN).forEach(g => ['y', 'z', 's', 't', 'hide'].forEach(k => { const a = ((before.adj || {})[g] || {})[k], b = ((after.adj || {})[g] || {})[k], d = k === 's' ? 1 : k === 'hide' ? false : 0; const av = a == null ? d : a, bv = b == null ? d : b; if (String(av) !== String(bv)) rows.push([AN[g] + ' ' + KN[k], G.esc(String(av)), G.esc(String(bv))]); }));
     return rows;
   }
   function confirmSave(revert) {

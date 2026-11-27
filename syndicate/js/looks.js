@@ -21,6 +21,7 @@
     ['cls', 'race', 'scale', 'skin'].forEach(k => { if (e[k] != null && e[k] !== '') o[k] = e[k]; });
     if (e.tint) o.tint = Object.assign({}, look.tint || {}, e.tint);
     if (e.cos) { o.cos = Object.assign({}, look.cos || {}); Object.keys(e.cos).forEach(k => { if (e.cos[k] === 'none') delete o.cos[k]; else if (e.cos[k]) o.cos[k] = e.cos[k]; }); }
+    if (e.adj) { o.adj = clone(look.adj || {}); Object.keys(e.adj).forEach(g => { o.adj[g] = Object.assign({}, o.adj[g] || {}, e.adj[g]); }); }       // fit: face, headgear, hat, back item, head
     const D = o.cos && o.cos.dye && G.DYES && G.DYES[o.cos.dye];       // a dye repaints cloth, armour, trim and legs after the colours: when one of those is edited, write the dye out as colours and let the edit win
     if (D && e.tint && Object.keys(e.tint).some(k => D[k] != null)) { const dt = {}; Object.keys(D).forEach(k => dt[k] = hexs(D[k])); o.tint = Object.assign({}, look.tint || {}, dt, e.tint); o.cos = Object.assign({}, o.cos); delete o.cos.dye; }
     return o;

@@ -100,6 +100,8 @@
     // head
     const head = new T.Group(); head.position.set(0, 0.92, 0); torso.add(head);
     mesh(new T.SphereGeometry(0.26, 9, 7), m.skin, 0, 0, 0, head);
+    const gather = (par, n, name) => { const g = new T.Group(); g.name = name; const kids = par.children.slice(n); kids.forEach(k => g.add(k)); par.add(g); return g; };       // parts added since n become one group, so the Workshop can move a whole face, hood or hat
+    const _f0 = head.children.length;
     { const white = new T.MeshLambertMaterial({ color: 0xe9e4d8 }), eyeC = { elf: 0x3aa06a, tiefling: 0xffb020, halforc: 0x8a2a1a, dwarf: 0x4a3a2a, drow: 0xff3a4a }[look.race] || 0x2a3a5a, iris = new T.MeshBasicMaterial({ color: look.race === 'tiefling' || look.race === 'drow' ? eyeC : 0x15131a });
       [-1, 1].forEach(sd => { box(0.085, 0.062, 0.03, white, sd * 0.1, 0.035, 0.232, head).castShadow = false; box(0.042, 0.052, 0.02, iris, sd * 0.095, 0.033, 0.25, head).castShadow = false;
         const br = box(0.11, 0.028, 0.04, m.hair, sd * 0.1, 0.09, 0.238, head); br.rotation.z = -sd * 0.16; br.castShadow = false;
@@ -107,7 +109,9 @@
       box(0.05, 0.075, 0.06, m.skin, 0, -0.025, 0.262, head).castShadow = false;                                                      // nose
       box(0.1, 0.016, 0.02, m.dark, 0, -0.105, 0.24, head).castShadow = false;                                                        // mouth
       box(0.2, 0.1, 0.16, m.skin, 0, -0.19, 0.11, head).castShadow = false; }                                                         // jaw
+    const faceG = gather(head, _f0, 'face');
     const cap = (mat, r) => mesh(new T.SphereGeometry(r || 0.3, 9, 5, 0, Math.PI * 2, 0, Math.PI * 0.55), mat, 0, 0.01, 0, head);
+    const _g0 = head.children.length;
     if (civ) { if (civ.hair !== 'none') cap(m.hair, 0.29); if (civ.hair === 'long') { box(0.44, 0.6, 0.13, m.hair, 0, -0.22, -0.2, head); [-1, 1].forEach(sd => box(0.08, 0.4, 0.2, m.hair, sd * 0.25, -0.16, -0.06, head)); } else if (civ.hair === 'short') box(0.42, 0.2, 0.1, m.hair, 0, -0.04, -0.22, head); }
     if (gc === 'fighter') { cap(m.armor, 0.31); box(0.06, 0.26, 0.06, m.armor, 0, 0, 0.28, head); box(0.07, 0.24, 0.36, m.cloth, 0, 0.38, -0.04, head); }
     if (gc === 'rogue') { cap(m.cloth, 0.31); box(0.46, 0.44, 0.14, m.cloth, 0, -0.08, -0.22, head); box(0.4, 0.15, 0.1, m.armor2, 0, -0.12, 0.2, head); const tip = mesh(new T.ConeGeometry(0.12, 0.3, 5), m.cloth, 0, 0.3, -0.12, head); tip.rotation.x = -0.9; }
@@ -121,6 +125,7 @@
       glows.push(gfx.glow(0xffc860, 1.1, 0, 0.48, 0, head, 0.45));
       }
     }
+    const gearG = gather(head, _g0, 'gear');
     if (look.race === 'elf' || look.race === 'drow') [-1, 1].forEach(sd => { const e = mesh(new T.ConeGeometry(0.06, 0.26, 4), m.skin, sd * 0.27, 0.06, -0.02, head); e.rotation.z = -sd * 0.9; });
     if (look.race === 'tiefling') [-1, 1].forEach(sd => { const e = mesh(new T.ConeGeometry(0.07, 0.38, 5), m.dark, sd * 0.17, 0.3, 0.06, head); e.rotation.x = -0.6; e.rotation.z = -sd * 0.35; });
     if (look.race === 'halforc') [-1, 1].forEach(sd => mesh(new T.ConeGeometry(0.035, 0.12, 4), new T.MeshLambertMaterial({ color: 0xf2ead8 }), sd * 0.09, -0.12, 0.23, head));
@@ -189,6 +194,7 @@
     if (g.weapon >= 2) { const gm = new T.Mesh(new T.OctahedronGeometry(0.075), new T.MeshBasicMaterial({ color: 0x6ad0ff })); gm.position.set(0, 0.03, cls === 'cleric' ? 0.56 : 0.1); hR.add(gm); glows.push(gfx.glow(0x6ad0ff, 0.45, 0, 0.03, cls === 'cleric' ? 0.56 : 0.1, hR, 0.7)); }
     // ---- cosmetics bought from the Tailor
     const bone = () => M(0xe8dfc8), gold = () => M(0xf0c95a, true, 0x4a3406);
+    const _h0 = head.children.length, _t0 = torso.children.length;
     if (cos.head === 'horned') [-1, 1].forEach(sd => { const a = mesh(new T.ConeGeometry(0.09, 0.42, 5), bone(), sd * 0.3, 0.2, 0, head); a.rotation.z = -sd * 1.0; const b = mesh(new T.ConeGeometry(0.06, 0.34, 5), bone(), sd * 0.5, 0.42, 0, head); b.rotation.z = -sd * 0.25; });
     if (cos.head === 'plague') { const bk = mesh(new T.ConeGeometry(0.11, 0.5, 5), M(0x2a2420), 0, -0.06, 0.42, head); bk.rotation.x = Math.PI / 2; [-1, 1].forEach(sd => { const e = new T.Mesh(new T.SphereGeometry(0.065, 8, 6), new T.MeshBasicMaterial({ color: 0x9fe8ff })); e.position.set(sd * 0.11, 0.05, 0.23); head.add(e); }); mesh(new T.CylinderGeometry(0.36, 0.36, 0.04, 10), M(0x1c1814), 0, 0.2, 0, head); mesh(new T.CylinderGeometry(0.2, 0.22, 0.2, 8), M(0x1c1814), 0, 0.3, 0, head); }
     if (cos.head === 'skull') { const sk = mesh(new T.SphereGeometry(0.29, 9, 7, 0, Math.PI), bone(), 0, 0.02, 0.02, head); box(0.09, 0.09, 0.05, m.dark, 0.1, 0.05, 0.27, head); box(0.09, 0.09, 0.05, m.dark, -0.1, 0.05, 0.27, head); for (let i = -2; i <= 2; i++) box(0.035, 0.07, 0.03, bone(), i * 0.05, -0.2, 0.24, head); }
@@ -216,11 +222,16 @@
     if (cos.back === 'quiver') { const qv = new T.Group(); qv.position.set(0.1, 0.45, -0.3); qv.rotation.z = -0.45; torso.add(qv); mesh(new T.CylinderGeometry(0.11, 0.09, 0.7, 6), M(0x4a2e1a), 0, 0, 0, qv); mesh(new T.CylinderGeometry(0.115, 0.115, 0.05, 6), m.trim, 0, 0.3, 0, qv); [-0.05, 0.02, 0.06].forEach((x, i) => { mesh(new T.CylinderGeometry(0.015, 0.015, 0.7, 4), M(0x8a6a4a), x, 0.55, (i - 1) * 0.04, qv); mesh(new T.ConeGeometry(0.035, 0.12, 4), M(0xcfd8e0, true), x, 0.95, (i - 1) * 0.04, qv); }); }
     if (cos.back === 'ratcage') { const cg = new T.Group(); cg.position.set(0, 0.5, -0.38); torso.add(cg); const ir = M(0x1c1a20, true); box(0.36, 0.03, 0.26, ir, 0, 0.17, 0, cg); box(0.36, 0.03, 0.26, ir, 0, -0.17, 0, cg); for (let i = 0; i < 5; i++) { mesh(new T.CylinderGeometry(0.012, 0.012, 0.34, 4), ir, -0.17 + i * 0.085, 0, -0.12, cg); if (i % 4 === 0) mesh(new T.CylinderGeometry(0.012, 0.012, 0.34, 4), ir, -0.17 + i * 0.085, 0, 0.12, cg); } const rt = mesh(new T.SphereGeometry(0.07, 6, 4), M(0x5a5052), 0, -0.1, 0, cg); rt.scale.set(1.5, 0.9, 1); mesh(new T.SphereGeometry(0.04, 5, 4), M(0x5a5052), 0.11, -0.08, 0, cg); box(0.14, 0.012, 0.012, M(0xc08a8a), -0.16, -0.12, 0, cg); }
     if (cos.back === 'moneybag') { const sk = mesh(new T.SphereGeometry(0.3, 8, 6), M(0x6a5236), 0, 0.42, -0.4, torso); sk.scale.set(1, 1.15, 0.85); mesh(new T.CylinderGeometry(0.1, 0.16, 0.14, 7), M(0x6a5236), 0, 0.78, -0.4, torso); mesh(new T.TorusGeometry(0.11, 0.02, 4, 8), m.trim, 0, 0.74, -0.4, torso).rotation.x = Math.PI / 2; [[-0.06, 0.88, -0.38], [0.05, 0.86, -0.42], [0.0, 0.9, -0.44], [0.2, 0.3, -0.62]].forEach(q => mesh(new T.CylinderGeometry(0.05, 0.05, 0.02, 7), M(0xf0c95a, true, 0x6a4a08), q[0], q[1], q[2], torso).rotation.x = q[0] * 6); }
+    const hatG = gather(head, _h0, 'hat'), backG = gather(torso, _t0, 'back');
     let auraM = null;
     if (cos.aura) { const ac = (G.COSMETICS.find(x => x.id === cos.aura) || {}).color || 0xffffff; glows.push(gfx.glow(ac, 2.4, 0, 0.15, 0, root, 0.3)); auraM = [0, 1, 2, 3].map(() => { const s = gfx.glow(ac, 0.3, 0, 0.5, 0, root, 0.9); glows.push(s); return s; }); }
     // what you wear changes your outline, not only your colours
+    const _k0 = head.children.length;
     if (G.kitModel && look.kit) G.kitModel(look.kit, { torso, head, armL, armR, foreL, foreR, legL, legR, m, w, cls, box, mesh, M, robed });
+    if (head.children.length > _k0) head.children.slice(_k0).forEach(k => gearG.add(k));       // an armour set's helmet moves with the class headgear
     if (look.race === 'tiefling' && look.kit !== 'ashcloak') { let par = torso, y = 0.02, z = -0.22; for (let i = 0; i < 5; i++) { const sg = new T.Group(); sg.position.set(0, y, z); sg.rotation.x = i ? 0.42 : 0.9; par.add(sg); box(0.09 - i * 0.012, 0.09 - i * 0.012, 0.24, m.skin, 0, 0, -0.1, sg); par = sg; y = 0; z = -0.22; } mesh(new T.ConeGeometry(0.07, 0.16, 4), m.dark, 0, 0, -0.26, par).rotation.x = -Math.PI / 2; }
+    if (look.adj) { const A = look.adj, fit = (g, a) => { if (!g || !a) return; g.position.y += a.y || 0; g.position.z += a.z || 0; if (a.s) g.scale.multiplyScalar(a.s); if (a.t) g.rotation.x += a.t; if (a.hide) g.visible = false; };
+      fit(faceG, A.face); fit(gearG, A.gear); fit(hatG, A.hat); fit(backG, A.back); if (A.head && A.head.s) head.scale.multiplyScalar(A.head.s); }       // the Workshop's fit sliders
     const sc = (look.scale || 1) * race.scale, wide = { dwarf: 1.16, halforc: 1.09, elf: 0.93, drow: 0.94 }[look.race] || 1;
     root.scale.set(sc * wide, sc, sc * (look.race === 'elf' ? 0.96 : wide));
     root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
