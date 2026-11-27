@@ -35,6 +35,6 @@ for (const [id, n] of F) {
     const buf = await p.screenshot({ clip: { x: 200, y: 40, width: 240, height: 400 } }); (side ? back : front).push([n, buf.toString('base64')]);
   }
 }
-const sheet = async (arr, file) => { const q = await ctx.newPage(); await q.setViewportSize({ width: 7 * 180, height: 2 * 290 }); await q.setContent('<body style="margin:0;background:#111;display:flex;flex-wrap:wrap">' + arr.map(([n, s]) => `<div style="width:180px;color:#ddd;font:11px sans-serif;text-align:center"><img style="width:180px;height:270px;object-fit:cover" src="data:image/png;base64,${s}"><br>${n}</div>`).join('') + '</body>'); await q.screenshot({ path: path.join(dir, 'shots', file) }); await q.close(); };
+const sheet = async (arr, file) => { const q = await ctx.newPage(); await q.setViewportSize({ width: 7 * 180, height: Math.ceil(arr.length / 7) * 290 }); await q.setContent('<body style="margin:0;background:#111;display:flex;flex-wrap:wrap">' + arr.map(([n, s]) => `<div style="width:180px;color:#ddd;font:11px sans-serif;text-align:center"><img style="width:180px;height:270px;object-fit:cover" src="data:image/png;base64,${s}"><br>${n}</div>`).join('') + '</body>'); await q.screenshot({ path: path.join(dir, 'shots', file) }); await q.close(); };
 await sheet(front, 'fits-front.png'); await sheet(back, 'fits-back.png');
 console.log(errs.length ? errs.join(' | ') : 'no page errors', fails ? `· ${fails} FAILED` : '· ALL PASS'); await b.close(); process.exit(fails ? 1 : 0);

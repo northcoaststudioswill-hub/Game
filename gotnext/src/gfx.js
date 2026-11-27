@@ -66,6 +66,16 @@ function sign(text, w, h, fg, bg, opts) {
   return m;
 }
 
+// printed graphics on drip: a wordmark on a chest or a cap. Two lines with \n. Fitted to the width, cached per text and colour.
+function printTex(text, fg, wide) {
+  return geoTex('prt' + text + fg + (wide ? 'w' : ''), () => canvasTex(wide ? 256 : 128, 128, (x, w, h) => { x.clearRect(0, 0, w, h); const lines = String(text).split('\n'); let fs = lines.length > 1 ? 54 : 92;
+    x.font = `900 ${fs}px Archivo, "Arial Black", Impact, sans-serif`; let mw = 0; for (const l of lines) mw = Math.max(mw, x.measureText(l).width); if (mw > w - 14) fs *= (w - 14) / mw;
+    x.font = `900 ${fs}px Archivo, "Arial Black", Impact, sans-serif`; x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
+    lines.forEach((l, i) => x.fillText(l, w / 2, h / 2 + (i - (lines.length - 1) / 2) * fs * 1.02)); }));
+}
+const _prtGeo = () => geo('numPlane', () => new THREE.PlaneGeometry(1, 1));
+function printOn(parent, text, fg, x, y, z, sw, sh, back) { const m = M(_prtGeo(), new THREE.MeshBasicMaterial({ map: printTex(text, fg, sw / sh > 1.5), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), x, y, z, parent); m.scale.set(sw, sh, 1); if (back) m.rotation.y = Math.PI; return m; }
+
 // Body proportions, all 1 (or the default share) in the game. The model lab edits these live; numbers that look right
 // there get copied back here. leg/torso/arm scale lengths; thighShare/upperArm split a limb between its two bones.
 const PROP_DEFAULT = { leg: 1, thighShare: 0.5, torso: 1, arm: 1, upperArm: 0.5, shoulder: 1, hips: 1, head: 1, neck: 1, limb: 1, hand: 1, foot: 1 };
@@ -100,8 +110,12 @@ function makeRig(spec, lowDetail) {
     const tex = geoTex('num' + num + ink0, () => canvasTex(128, 128, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = ink0; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = '900 96px Archivo, "Arial Black", Impact, sans-serif'; x.fillText(num, w / 2, h / 2 + 6); }));
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
     const back = M(geo('numPlane', () => new THREE.PlaneGeometry(1, 1)), mat, 0, upH * 0.5, -(0.118 * wS + 0.012), chestJ); back.rotation.y = Math.PI; back.scale.set(shW * 1.05, shW * 1.05, 1);
-    const front = M(geo('numPlane', () => new THREE.PlaneGeometry(1, 1)), mat, shW * 0.38, upH * 0.66, 0.106 * wS + 0.012, chestJ); front.scale.set(shW * 0.42, shW * 0.42, 1); front.rotation.x = -0.1;
+    if (!top.print) { const front = M(geo('numPlane', () => new THREE.PlaneGeometry(1, 1)), mat, shW * 0.38, upH * 0.66, 0.106 * wS + 0.012, chestJ); front.scale.set(shW * 0.42, shW * 0.42, 1); front.rotation.x = -0.1; }
+    else back.position.y = upH * (top.kind === 'pads' ? 0.38 : 0.42);
   }
+  if (!lowDetail && top.print) { const pc = top.pc || (top.c2 && top.c2 !== top.c ? top.c2 : '#f4f1ea'), fz = 0.106 * wS + (top.kind === 'puffer' ? 0.05 : top.kind === 'pads' ? 0.03 : 0.016);
+    const two = top.print.includes('\n'); printOn(chestJ, top.print, pc, 0, upH * (two ? 0.52 : 0.56), fz, shW * (two ? 1.35 : 1.55), shW * (two ? 0.68 : 0.78)).rotation.x = -0.1;
+    if (top.back) { const numbered = top.kind === 'jersey' || top.kind === 'tee' || top.kind === 'tank' || top.kind === 'pads'; printOn(chestJ, top.back, pc, 0, upH * (top.kind === 'pads' ? 0.74 : numbered ? 0.86 : 0.55), -(0.118 * wS + (top.kind === 'puffer' ? 0.05 : 0.016)), shW * 1.2, shW * (numbered ? 0.26 : 0.5), true); } }
   // a human back instead of two stacked cans: rounded shoulder blades, the slope of the traps into the neck, a chest,
   // the small of the back and a seat. With the rest curve below (R.rest) the spine reads as an S from the side.
   { const tc = toon(top.c), bc = toon(bot.c);
@@ -127,6 +141,9 @@ function makeRig(spec, lowDetail) {
     M(box(0.085, upH * 0.78, 0.012), toon('#f4f1e8'), 0, upH * 0.56, fz, chestJ).rotation.x = -0.12;      /* the shirt */
     M(box(0.028, upH * 0.66, 0.012), toon(top.c2 || '#c8102e'), 0, upH * 0.52, fz + 0.006, chestJ).rotation.x = -0.12;      /* the tie */
     for (const sx of [-1, 1]) { const l = M(box(0.04, upH * 0.62, 0.014), toon(top.c), sx * 0.05, upH * 0.6, fz + 0.002, chestJ); l.rotation.z = sx * 0.28; l.rotation.x = -0.12; } }      /* lapels */
+  if (top.kind === 'puffer') { const pc = toon(top.c);
+    for (const [y, p, r] of [[loH * 0.25, spine, 0.128], [loH * 0.75, spine, 0.13], [upH * 0.25, chestJ, 0.14], [upH * 0.62, chestJ, 0.152]]) out(M(sph(r * wS, 12, 8), pc, 0, y, 0, p), 1.04).scale.set(1.18, 0.42, 0.72);
+    out(M(cyl(0.07, 0.09, 0.07, 10), toon(top.c2 || top.c), 0, upH + 0.01, 0, chestJ), 1.05).scale.z = 0.85; }      /* a standing collar */
   if (top.kind === 'pads') { const yk = out(M(box(shW * 2.25, 0.075, 0.27 * wS), toon(top.c), 0, upH * 0.96, 0, chestJ), 1.05); yk.rotation.x = 0.04;
     for (const sx of [-1, 1]) out(M(sph(0.085, 8, 6), toon(top.c), sx * shW * 0.95, upH * 0.92, 0, chestJ), 1.05).scale.set(1.2, 0.7, 1.4); }
   R.rest = { spine: -0.07, chest: 0.13, neck: -0.09, head: 0.03 };      /* lumbar curve in, upper back out, head carried over the shoulders */
@@ -175,6 +192,11 @@ function makeRig(spec, lowDetail) {
         M(cyl(hr * 1.17, hr * 1.17, 0.03, 12), c2, 0, hy + 0.015, -0.005, head);      /* the brow band */
         M(box(0.024, 0.1, 0.022), c, 0, hr * 0.98, hr * 1.06, head);      /* the nose guard */
         for (const sx of [-1, 1]) { const ck = M(box(0.05, 0.09, 0.02), c, sx * hr * 0.72, hr * 0.85, hr * 0.78, head); ck.rotation.y = sx * 0.7; } break; }      /* cheek guards */
+      case 'lid': { const m = out(M(geo('lid', () => new THREE.SphereGeometry(hr * 1.24, 14, 9, 0, 6.3, 0, 1.95)), c, 0, hy - 0.005, -0.012, head), 1.05); m.scale.set(1, 1.06, 1.08);
+        M(box(0.045, 0.012, hr * 2.2), c2, 0, hy + hr * 1.29, -0.02, head).rotation.x = 0.06;      /* the stripe */
+        const fm = toon(hd.c3 || '#d8dce2'); for (const yy of [0.62, 0.86]) M(box(hr * 1.5, 0.014, 0.014), fm, 0, hr * yy, hr * 1.2, head);      /* the facemask */
+        for (const sx of [-1, 0, 1]) M(box(0.014, hr * 0.42, 0.014), fm, sx * hr * 0.32, hr * 0.74, hr * 1.2 - Math.abs(sx) * 0.02, head);
+        for (const sx of [-1, 1]) M(cyl(0.028, 0.028, 0.01, 8), toon(hd.c2), sx * hr * 1.2, hr * 1.0, 0, head).rotation.z = Math.PI / 2; break; }      /* ear holes */
       case 'hood': { const m = out(M(geo('hood', () => new THREE.SphereGeometry(hr * 1.3, 12, 9, Math.PI / 2 + 0.75, Math.PI * 2 - 1.5, 0, 2.2)), c, 0, hy - 0.01, -0.03, head), 1.04); m.material.side = THREE.DoubleSide; m.scale.set(1, 1.1, 1.05); break; }
       case 'captain': { M(cyl(hr * 1.55, hr * 1.55, 0.02, 3), c, 0, hy + 0.1, -0.01, head).rotation.y = Math.PI / 6; out(M(cyl(hr * 0.88, hr * 0.98, 0.1, 10), c, 0, hy + 0.15, -0.01, head), 1.05); M(cyl(hr * 0.99, hr * 0.99, 0.022, 10), c2, 0, hy + 0.115, -0.01, head); break; }      /* a tricorn: the brim is a triangle */
       case 'beanie': { const m = out(M(geo('beanie', () => new THREE.SphereGeometry(hr * 1.1, 12, 8, 0, 6.3, 0, 1.45)), c, 0, hy + 0.035, -0.005, head), 1.05); m.scale.set(0.96, 1.18, 1.02); M(cyl(hr * 1.07, hr * 1.07, 0.04, 12), c2, 0, hy + 0.05, -0.005, head); out(M(sph(0.032, 7, 6), c2, 0, hy + hr * 1.35, -0.01, head)); break; }
@@ -182,6 +204,7 @@ function makeRig(spec, lowDetail) {
       case 'eagle': { out(M(sph(hr * 1.22, 12, 10), c, 0, hy + 0.03, -0.01, head), 1.05); const bk = M(geo('beak', () => new THREE.ConeGeometry(0.045, 0.14, 6)), c2, 0, hy + 0.0, hr + 0.07, head); bk.rotation.x = Math.PI / 2 + 0.25; for (const sx of [-1, 1]) M(sph(0.02), flat(0x101014), sx * 0.06, hy + 0.07, hr * 1.02, head); break; }
     }
   }
+  if (!lowDetail && hd && hd.print && (hd.kind === 'cap' || hd.kind === 'beanie')) printOn(head, hd.print, hd.pc || hd.c2 || '#f4f1ea', 0, hy + (hd.kind === 'cap' ? 0.08 : 0.06), hr * (hd.kind === 'cap' ? 1.1 : 1.09), 0.12, 0.06).rotation.x = -0.25;
   const fc = D('face');
   if (fc && fc.kind !== 'none' && !(hd && hd.kind === 'eagle')) {
     const ey = hr * 1.12, fz = hr + 0.008;
@@ -189,6 +212,7 @@ function makeRig(spec, lowDetail) {
       case 'shades': for (const sx of [-1, 1]) M(box(0.058, 0.036, 0.016), toon(fc.c), sx * 0.042, ey, fz, head); M(box(0.03, 0.008, 0.012), toon(fc.c), 0, ey + 0.008, fz, head); break;
       case 'visor': M(box(0.17, 0.04, 0.03), flat(fc.c, { transparent: true, opacity: 0.85 }), 0, ey, fz - 0.004, head); break;
       case 'mask': M(box(0.13, 0.065, 0.045), toon(fc.c), 0, ey - 0.065, fz - 0.018, head); break;
+      case 'eyeblack': for (const sx of [-1, 1]) M(box(0.04, 0.014, 0.01), toon(fc.c), sx * 0.045, ey - 0.035, fz - 0.006, head); break;
       case 'patch': M(cyl(0.032, 0.032, 0.012, 10), toon(fc.c), 0.042, ey, fz + 0.002, head).rotation.x = Math.PI / 2; M(geo('band', () => new THREE.TorusGeometry(hr * 0.97, 0.008, 6, 16)), toon(fc.c), 0, ey + 0.01, 0.005, head).rotation.set(Math.PI / 2 - 0.2, 0.25, 0); break;
       case 'goggles': for (const sx of [-1, 1]) M(cyl(0.03, 0.03, 0.02, 10), toon(fc.c), sx * 0.042, ey, fz, head).rotation.x = Math.PI / 2; M(box(0.2, 0.014, 0.19), toon(fc.c2 || fc.c), 0, ey, 0, head); break;
     }
@@ -204,8 +228,8 @@ function makeRig(spec, lowDetail) {
     out(M(capsule(0.043 * lW, up), skin, 0, -up / 2 + 0.004, 0, sh), 1.12);
     M(sph(0.05 * lW), top.kind === 'tank' ? skin : toon(top.c), 0, -0.004, 0, sh).scale.set(1, 0.92, 0.9);
     if (top.kind === 'tee' || top.kind === 'jersey' || top.kind === 'pads') M(capsule(0.052 * lW, up * (top.kind === 'tee' ? 0.55 : 0.3)), toon(top.c), 0, -up * 0.16, 0, sh);
-    const longS = top.kind === 'suit' || top.kind === 'longsleeve';
-    if (longS) out(M(capsule(0.05 * lW, up * 0.9), toon(top.c), 0, -up / 2 + 0.01, 0, sh), 1.06);
+    const longS = top.kind === 'suit' || top.kind === 'longsleeve' || top.kind === 'puffer';
+    if (longS) out(M(capsule((top.kind === 'puffer' ? 0.064 : 0.05) * lW, up * 0.9), toon(top.c), 0, -up / 2 + 0.01, 0, sh), 1.06);
     if (top.kind === 'armor') { for (let i = 0; i < 2; i++) { const pd = out(M(geo('pauld', () => new THREE.SphereGeometry(0.08, 10, 6, 0, 6.3, 0, 1.5)), toon(i ? top.c2 || top.c : top.c), sx * 0.012, 0.035 - i * 0.045, 0, sh), 1.07); pd.scale.set(1.35 * lW - i * 0.08, 0.8, 1.3 * lW - i * 0.08); pd.rotation.z = sx * 0.2; } }      /* layered shoulder plates sitting on top of the shoulder */
     const el = grp(sh, 0, -up + 0.03, 0);
     out(M(capsule(0.036 * lW, fore), skin, 0, -fore / 2 + 0.02, 0, el), 1.13);
@@ -252,6 +276,9 @@ function makeRig(spec, lowDetail) {
     switch (bk.kind) {
       case 'towel': M(box(0.09, 0.2, 0.03), c, -0.07, -0.13, 0.11, hips).rotation.z = 0.1; break;
       case 'cape': { const g = grp(chest, 0, -0.02, -0.09); const m = M(box(shW * 1.9, torso * 1.6, 0.012), c, 0, -torso * 0.8, 0, g); M(box(shW * 1.9, 0.08, 0.016), c2, 0, -0.06, 0, g); g.rotation.x = 0.12; R.cape = g; m.material.side = THREE.DoubleSide; break; }
+      case 'chain': { const g = grp(chest, 0, 0.0, 0.0); const ch = M(geo('chainT', () => new THREE.TorusGeometry(0.095, 0.009, 5, 22)), flat(bk.c), 0, -0.02, 0.025, g); ch.rotation.x = Math.PI / 2 - 0.55; ch.scale.set(1.05, 1.25, 1);
+        const pd = M(bk.pend === 'clover' ? geo('clover', () => { const sh = new THREE.Shape(); for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2; sh.absarc(Math.cos(a) * 0.022, Math.sin(a) * 0.022, 0.02, 0, Math.PI * 2, false); } return new THREE.ShapeGeometry(sh); }) : box(0.05, 0.06, 0.015), flat(bk.c2 || bk.c), 0, -0.115, 0.12 * wS, g); pd.rotation.x = -0.15;
+        if (bk.print) printOn(g, bk.print, bk.pc || '#16181c', 0, -0.115, 0.12 * wS + 0.009, 0.045, 0.045).rotation.x = -0.15; break; }      /* a chain with a pendant on the chest */
       case 'sword': { const g = grp(chest, 0, -0.14, -0.13); g.rotation.z = 0.7; M(box(0.035, 0.62, 0.012), flat(bk.c), 0, 0.05, 0, g); M(box(0.05, 0.62, 0.03), c2, 0, 0.0, -0.012, g); M(box(0.16, 0.025, 0.035), c2, 0, 0.36, 0, g); M(cyl(0.014, 0.014, 0.13, 6), toon('#3a2a1c'), 0, 0.44, 0, g); M(sph(0.022, 6, 5), c2, 0, 0.51, 0, g); break; }      /* a sheathed blade across the back, the hilt over the right shoulder */
       case 'shield': { const g = grp(chest, 0, -0.17, -0.15); const d = out(M(cyl(0.2, 0.2, 0.035, 14), c, 0, 0, 0, g), 1.05); d.rotation.x = Math.PI / 2; M(geo('shRim', () => new THREE.TorusGeometry(0.2, 0.014, 5, 18)), c2, 0, 0, -0.019, g); M(sph(0.045, 8, 6), c2, 0, 0, -0.03, g); break; }
       case 'pack': out(M(box(0.2, 0.26, 0.09), c, 0, -0.16, -0.14, chest), 1.06); for (const sx of [-1, 1]) { M(cyl(0.035, 0.045, 0.12, 8), c2, sx * 0.06, -0.33, -0.14, chest); } break;

@@ -207,7 +207,7 @@ const RAR = [['GR', '#8d8d99'], ['LIMITED', '#5aa9ff'], ['EXCLUSIVE', '#a78bff']
 const SLOTS = [['hair', 'Hair'], ['head', 'Headwear'], ['face', 'Face'], ['top', 'Top'], ['arm', 'Arms'], ['bottom', 'Bottoms'], ['socks', 'Socks'], ['shoes', 'Kicks'], ['back', 'Back'], ['ball', 'Ball']];
 // each item: id, slot, n(ame), kind (shape), c (main colour), c2 (accent), r(arity), cost, rank, buff {attr:+n}, src: 'shop'|'ach'|'bum'|'start'
 const DRIP = [];
-function drip(slot, id, n, kind, c, c2, r, cost, rank, buff, src) { DRIP.push({ id, slot, n, kind, c, c2, r, cost, rank: rank || 0, buff: buff || null, src: src || 'shop' }); }
+function drip(slot, id, n, kind, c, c2, r, cost, rank, buff, src, x) { DRIP.push(Object.assign({ id, slot, n, kind, c, c2, r, cost, rank: rank || 0, buff: buff || null, src: src || 'shop' }, x || {})); }      /* x: print (a wordmark, \n for two lines), back (the back print), pc (print colour), pend (a chain's pendant) */
 // hair
 drip('hair', 'h_buzz', 'Regulation Buzz', 'buzz', '#1a1410', 0, 0, 0, 0, null, 'start');
 drip('hair', 'h_fro', 'Liberty Fro', 'fro', '#1a1410', 0, 0, 0, 0, null, 'start');
@@ -337,8 +337,8 @@ drip('bottom', 'b_fo_slacks', 'Front Office Slacks', 'pants', '#1f2a3a', 0, 2, 1
 drip('shoes', 'k_fo_oxfords', 'Draft Day Oxfords', 'low', '#3a2416', '#16181c', 2, 1600, 2, { iq: 1 });
 // ON TWO (street football; GRIDLOCK is the only football game anybody knows, FOREVER TEAM its dead mode)
 drip('top', 't_ontwo', 'ON TWO Hot Pink Pads', 'pads', '#16181c', '#ff2d78', 3, 3800, 3, { pass: 2, str: 1 });
-drip('top', 't_gridlock', "GRIDLOCK '45 Launch Tee", 'tee', '#2a2a2a', '#9be15d', 1, 600, 0);
-drip('top', 't_forever', 'FOREVER TEAM (Servers Offline) Tee', 'tee', '#e8e2d0', '#c8102e', 1, 650, 0, { stam: 1 });
+drip('top', 't_gridlock', "GRIDLOCK '45 Launch Tee", 'tee', '#2a2a2a', '#9be15d', 1, 600, 0, null, 'shop', { print: "GRIDLOCK\n'45" });
+drip('top', 't_forever', 'FOREVER TEAM (Servers Offline) Tee', 'tee', '#e8e2d0', '#c8102e', 1, 650, 0, { stam: 1 }, 'shop', { print: 'FOREVER\nTEAM', back: 'SERVERS\nOFFLINE' });
 drip('head', 'hd_ontwo', 'Quarterback Beanie', 'beanie', '#ff2d78', '#16181c', 1, 450, 0);
 drip('arm', 'a_ontwo', 'Playcard Wristbands', 'wrist', '#f4f1e8', 0, 1, 550, 1, { pass: 1 });
 // ERIN AND THE HIDDEN KINGDOM (sailing, islands, the Pale Elf)
@@ -376,8 +376,8 @@ drip('arm', 'a_ember', 'Ember Wraps', 'sleeves', '#ff6a2a', '#ffd23a', 2, 1600, 
 drip('top', 't_soot', 'Undercity Scrap Plate', 'armor', '#2b2b30', '#b8682a', 2, 2600, 2, { str: 1 });
 drip('head', 'hd_soot', 'Soot Beanie', 'beanie', '#3d5a6a', '#b8682a', 0, 250, 0);
 // LIL BOTTIE
-drip('top', 't_bottie', "lil Bottie: Clankin' in the Cloud Tee", 'tee', '#7de3ff', '#16181c', 1, 750, 0, { swb: 1 });
-drip('top', 't_bottiehood', 'Spawns Got Spawns Hoodie', 'hoodie', '#ffd23a', '#16181c', 2, 1700, 1, { handle: 1 });
+drip('top', 't_bottie', "lil Bottie: Clankin' in the Cloud Tee", 'tee', '#7de3ff', '#16181c', 1, 750, 0, { swb: 1 }, 'shop', { print: 'LIL\nBOTTIE', back: "CLANKIN' IN\nTHE CLOUD" });
+drip('top', 't_bottiehood', 'Spawns Got Spawns Hoodie', 'hoodie', '#ffd23a', '#16181c', 2, 1700, 1, { handle: 1 }, 'shop', { print: 'SPAWNS GOT\nSPAWNS' });
 drip('head', 'hd_bottie', 'Bottie Antenna', 'antenna', '#c8d0d8', '#7de3ff', 1, 600, 0);
 drip('ball', 'bl_bottie', 'Bottie Battery Ball', 'ball', '#ffd23a', '#16181c', 2, 1400, 1);
 // NORTH COAST OVERDRIVE (the kart racer)
@@ -419,6 +419,122 @@ const FITS = [
   { id: 'bottie', n: 'Clankin\' in the Cloud', g: 'lil Bottie', items: ['t_bottie', 'hd_bottie', 'bl_bottie', 'k_volt'] },
   { id: 'warmup', n: 'Cages Warm-Up', g: 'GOT NEXT', items: ['t_gnwarm', 'b_gnwarm', 'hd_gnbeanie', 'k_red'] },
 ];
+// BRANDED: GOT NEXT and ON TWO (the crew's two street-sport games), and a full lil Bottie merch drop. Prints read on
+// the chest and the back; caps and beanies carry a logo.
+// GOT NEXT (black, bone, hot pink)
+drip('top', 't_gn_logo', 'GOT NEXT Logo Tee', 'tee', '#16181c', '#ff2d78', 1, 650, 0, null, 'shop', { print: 'GOT NEXT', back: 'WINNERS STAY' });
+drip('top', 't_gn_bone', 'Bone Stacked Logo Tee', 'tee', '#ece9e2', '#16181c', 1, 650, 0, null, 'shop', { print: 'GOT\nNEXT', pc: '#ff2d78' });
+drip('top', 't_gn_hood', 'GOT NEXT Studio Hoodie', 'hoodie', '#16181c', '#ff2d78', 2, 1600, 1, { handle: 1 }, 'shop', { print: 'GOT NEXT', back: 'CALL\nYOUR OWN' });
+drip('top', 't_gn_cages', 'THE CAGES Jersey', 'jersey', '#16181c', '#ff2d78', 2, 1800, 2, { mid: 1 }, 'shop', { print: 'CAGES', back: 'THE CAGES' });
+drip('top', 't_gn_winners', 'WINNERS STAY Tank', 'tank', '#ff2d78', '#16181c', 1, 500, 0, null, 'shop', { print: 'WINNERS\nSTAY' });
+drip('top', 't_gn_call', 'CALL YOUR OWN Tee', 'tee', '#7de3ff', '#16181c', 1, 600, 0, null, 'shop', { print: 'CALL\nYOUR OWN' });
+drip('top', 't_gn_ruckus', 'RUCKUS Longsleeve', 'longsleeve', '#16181c', '#33e0ff', 2, 1500, 2, { str: 1 }, 'shop', { print: 'RUCKUS', back: 'NO FOULS\nNO MANNERS', pc: '#ff4fd8' });
+drip('top', 't_gn_trey', "TREY'S BONES Tee", 'tee', '#1f6a3a', '#ffb347', 1, 700, 1, null, 'shop', { print: "TREY'S\nBONES" });
+drip('top', 't_gn_book', "MARK'S BOOK Tee", 'tee', '#f4f1e8', '#1f6a3a', 1, 700, 1, null, 'shop', { print: "MARK'S\nBOOK", back: 'THE HOUSE\nALWAYS WINS' });
+drip('top', 't_gn_lastcall', 'LAST CALL Staff Tee', 'tee', '#2a2c33', '#ffd23a', 1, 550, 0, { stam: 1 }, 'shop', { print: 'LAST\nCALL', back: 'NO REFUNDS' });
+drip('top', 't_gn_2145', 'THE BLOCK 2145 Jersey', 'jersey', '#ffc531', '#16181c', 3, 4000, 4, { three: 1, pass: 1 }, 'shop', { print: '2145', back: 'THE BLOCK' });
+drip('top', 't_gn_puffer', 'GOT NEXT Night Puffer', 'puffer', '#16181c', '#ff2d78', 3, 3600, 3, { stam: 1, str: 1 }, 'shop', { print: 'GOT NEXT', back: 'GOT NEXT' });
+drip('head', 'hd_gn_cap', 'GOT NEXT Snapback', 'cap', '#16181c', '#ff2d78', 1, 400, 0, null, 'shop', { print: 'GN' });
+drip('head', 'hd_gn_capbone', 'Bone GN Snapback', 'cap', '#ece9e2', '#ff2d78', 1, 400, 0, null, 'shop', { print: 'GN' });
+drip('head', 'hd_gn_cages', 'Cages Dad Hat', 'cap', '#ff2d78', '#16181c', 1, 450, 1, null, 'shop', { print: 'CAGES' });
+drip('head', 'hd_gn_skully', 'GOT NEXT Skully', 'beanie', '#16181c', '#ff2d78', 1, 350, 0, null, 'shop', { print: 'GN' });
+drip('arm', 'a_gn', 'GOT NEXT Shooter Sleeve', 'sleeve', '#ff2d78', '#16181c', 2, 1200, 2, { three: 1 });
+drip('bottom', 'b_gn_mesh', 'GOT NEXT Mesh Shorts', 'shorts', '#ff2d78', '#16181c', 1, 500, 0);
+drip('bottom', 'b_gn_bone', 'Bone Mesh Shorts', 'shorts', '#ece9e2', '#ff2d78', 1, 500, 0);
+drip('socks', 's_gn', 'GN Crew Socks', 'high', '#ece9e2', '#ff2d78', 1, 300, 0);
+drip('shoes', 'k_gn', 'GOT NEXT 1s', 'high', '#16181c', '#ff2d78', 2, 2200, 2, { accel: 1, speed: 1 });
+drip('shoes', 'k_gn_bone', 'Bone NEXTs', 'low', '#ece9e2', '#ff2d78', 1, 1000, 1, { speed: 1 });
+drip('back', 'bk_gn_bag', 'Cages Duffel', 'pack', '#16181c', '#ff2d78', 1, 700, 1, { stam: 1 });
+drip('back', 'bk_gn_chain', 'GOT NEXT Chain', 'chain', '#f2c14e', '#ff2d78', 3, 3800, 3, { swb: 1 }, 'shop', { print: 'GN', pc: '#f4f1ea' });
+drip('ball', 'bl_gn', 'GOT NEXT Official', 'ball', '#16181c', '#ff2d78', 2, 1500, 1);
+// ON TWO (dusk indigo, chalk, pylon orange, royal blue, goalpost gold, turf green)
+drip('top', 't_o2_logo', 'ON TWO Logo Tee', 'tee', '#2a2450', '#ff7a1a', 1, 650, 0, null, 'shop', { print: 'ON TWO', back: 'YOU CALL IT\nYOU THROW IT' });
+drip('top', 't_o2_home', 'ON TWO Royal Home Pads', 'pads', '#2448c8', '#ece8dc', 2, 2400, 2, { pass: 1, str: 1 }, 'shop', { print: 'ON TWO', back: 'HOME' });
+drip('top', 't_o2_away', 'ON TWO Pylon Away Pads', 'pads', '#ff7a1a', '#2a2450', 2, 2400, 2, { pass: 1, speed: 1 }, 'shop', { print: 'ON TWO', back: 'AWAY' });
+drip('top', 't_o2_lot', 'THE LOT Hoodie', 'hoodie', '#2f8a3c', '#ece8dc', 2, 1500, 1, { stam: 1 }, 'shop', { print: 'THE LOT', back: '3 · 5 · 7' });
+drip('top', 't_o2_field', 'FIELD HOUSE Longsleeve', 'longsleeve', '#ece8dc', '#2a2450', 1, 900, 1, { str: 1 }, 'shop', { print: 'FIELD\nHOUSE' });
+drip('top', 't_o2_stash', 'THE STASH Tee', 'tee', '#f2c14e', '#2a2450', 1, 600, 0, null, 'shop', { print: 'THE\nSTASH' });
+drip('top', 't_o2_hut', 'HUT HUT Tank', 'tank', '#ff7a1a', '#2a2450', 1, 500, 0, null, 'shop', { print: 'HUT\nHUT' });
+drip('top', 't_o2_7', '7 ON 7 Jersey', 'jersey', '#f2c14e', '#2a2450', 2, 1700, 2, { pass: 1 }, 'shop', { print: '7 ON 7', back: 'ON TWO' });
+drip('top', 't_o2_corner', 'THE CORNER Puffer', 'puffer', '#2a2450', '#ff7a1a', 3, 3600, 3, { str: 1, stam: 1 }, 'shop', { print: 'ON TWO', back: 'THE CORNER' });
+drip('head', 'hd_o2_lid', 'ON TWO Royal Lid', 'lid', '#2448c8', '#ece8dc', 3, 3200, 3, { str: 1, intd: 1 });
+drip('head', 'hd_o2_lidaway', 'ON TWO Pylon Lid', 'lid', '#ff7a1a', '#2a2450', 3, 3200, 3, { str: 1, perd: 1 });
+drip('head', 'hd_o2_cap', 'ON TWO Snapback', 'cap', '#2448c8', '#f2c14e', 1, 400, 0, null, 'shop', { print: 'ON 2' });
+drip('head', 'hd_o2_skull', 'ON TWO Skull Cap', 'beanie', '#2a2450', '#ff7a1a', 1, 350, 0, null, 'shop', { print: 'O2' });
+drip('face', 'f_o2_eyeblack', 'Eye Black', 'eyeblack', '#101014', 0, 0, 150, 0, { perd: 1 });
+drip('arm', 'a_o2_tape', 'Wrist Tape', 'wrist', '#ece8dc', 0, 0, 150, 0);
+drip('arm', 'a_o2_gloves', 'Receiver Gloves', 'sleeves', '#2448c8', '#f2c14e', 2, 1300, 2, { handle: 1 });
+drip('bottom', 'b_o2_pants', 'ON TWO Football Pants', 'pants', '#ece8dc', '#2448c8', 2, 1300, 2, { str: 1 });
+drip('bottom', 'b_o2_turf', 'Turf Shorts', 'shorts', '#2f8a3c', '#ece8dc', 1, 450, 0);
+drip('socks', 's_o2', 'Pylon Socks', 'high', '#ff7a1a', '#2a2450', 1, 350, 0);
+drip('shoes', 'k_o2', 'ON TWO Turf Cleats', 'low', '#2448c8', '#f2c14e', 2, 1900, 2, { accel: 1, speed: 1 });
+drip('shoes', 'k_o2_pylon', 'Pylon Hi-Tops', 'high', '#ff7a1a', '#ece8dc', 2, 2100, 2, { vert: 1, accel: 1 });
+drip('back', 'bk_o2_towel', 'Royal Hand Towel', 'towel', '#2448c8', 0, 0, 200, 0);
+drip('ball', 'bl_o2', 'The Ball (gold, off its tee)', 'ball', '#f2c14e', '#2a2450', 3, 3000, 3);
+// LIL BOTTIE: the merch drop (ice blue, robot chrome, battery gold)
+drip('top', 't_bt_ctrl', 'CTRL ALT DELETE Tee', 'tee', '#16181c', '#7de3ff', 1, 700, 0, null, 'shop', { print: 'CTRL\nALT DEL', back: 'LIL BOTTIE' });
+drip('top', 't_bt_bsod', 'BLUE SCREEN Longsleeve', 'longsleeve', '#1f4fd8', '#f4f4f4', 2, 1500, 1, { handle: 1 }, 'shop', { print: ':(', back: 'YOUR PC RAN\nINTO A PROBLEM' });
+drip('top', 't_bt_tour', 'OVERCLOCKED Tour Tee', 'tee', '#ff3c3c', '#16181c', 2, 1200, 1, { speed: 1 }, 'shop', { print: 'OVER\nCLOCKED', back: 'BOOT UP\nOVERCLOCKED' });
+drip('top', 't_bt_fork', 'FORK BOMB Jersey', 'jersey', '#16181c', '#ffd23a', 2, 1800, 2, { pass: 1 }, 'shop', { print: 'FORK BOMB', back: 'BOTTIE' });
+drip('top', 't_bt_rmrf', 'rm -rf Tank', 'tank', '#0a0a0e', '#33ff88', 1, 600, 0, null, 'shop', { print: 'rm -rf /' });
+drip('top', 't_bt_captcha', 'I AM NOT A ROBOT Tee', 'tee', '#f4f4f4', '#2440a8', 1, 650, 0, null, 'shop', { print: 'I AM NOT\nA ROBOT', back: '(HE IS)' });
+drip('top', 't_bt_spawns', 'SPAWNS GOT SPAWNS Tee', 'tee', '#ffd23a', '#16181c', 1, 700, 0, null, 'shop', { print: 'SPAWNS GOT\nSPAWNS' });
+drip('top', 't_bt_clover', 'Iced Clover Puffer', 'puffer', '#c8f0ff', '#33ff88', 3, 4200, 3, { swb: 1, stam: 1 }, 'shop', { print: 'BOTTIE', pc: '#1f6a8a' });
+drip('top', 't_bt_gold', 'Battery Gold Puffer', 'puffer', '#ffd23a', '#16181c', 4, 8800, 5, { swb: 1, handle: 1, speed: 1 }, 'shop', { print: 'CLANK', pc: '#16181c', back: 'CLANKIN\' IN\nTHE CLOUD' });
+drip('top', 't_bt_heat', 'THERMAL THROTTLED Hoodie', 'hoodie', '#ff6a2a', '#16181c', 2, 1600, 2, { stam: 1 }, 'shop', { print: 'TOO HOT', back: '100°' });
+drip('head', 'hd_bt_cap', 'Bottie Clank Cap', 'cap', '#7de3ff', '#16181c', 1, 450, 0, null, 'shop', { print: 'CLANK' });
+drip('head', 'hd_bt_skully', 'Spawn Skully', 'beanie', '#ffd23a', '#7de3ff', 1, 400, 0, null, 'shop', { print: 'SPAWN' });
+drip('head', 'hd_bt_aura', 'The Aura (x8)', 'halo', '#7de3ff', 0, 3, 4800, 4, { swb: 1, handle: 1 });
+drip('face', 'f_bt_heat', 'Thermal Throttle Shades', 'shades', '#ff3c3c', 0, 1, 600, 1);
+drip('face', 'f_bt_led', 'LED Eyes', 'visor', '#7de3ff', 0, 2, 1400, 2, { iq: 1 });
+drip('arm', 'a_bt_cable', 'Cable-Wrap Sleeves', 'sleeves', '#16181c', '#7de3ff', 2, 1200, 2, { handle: 1 });
+drip('bottom', 'b_bt_rack', 'Server Rack Cargos', 'pants', '#2a2c33', '#7de3ff', 2, 1300, 2, { speed: 1 });
+drip('bottom', 'b_bt_shorts', 'Clank Mesh Shorts', 'shorts', '#7de3ff', '#16181c', 1, 450, 0);
+drip('socks', 's_bt', 'Iced Clover Socks', 'high', '#c8f0ff', '#33ff88', 1, 450, 1);
+drip('shoes', 'k_bt', 'Fiber Port 1s', 'high', '#7de3ff', '#16181c', 3, 3400, 3, { speed: 1, swb: 1 });
+drip('shoes', 'k_bt_chrome', 'Chrome Bottie Lows', 'low', '#c8d0d8', '#7de3ff', 2, 1800, 2, { accel: 1 });
+drip('back', 'bk_bt_pack', 'Spawn Backpack', 'pack', '#c8d0d8', '#7de3ff', 2, 1500, 2, { stam: 1 });
+drip('back', 'bk_bt_clover', 'Iced Clover Chain', 'chain', '#e8eef8', '#33ff88', 3, 4400, 3, { three: 1 }, 'shop', { pend: 'clover' });
+drip('back', 'bk_bt_chain', 'Bottie Pendant Chain', 'chain', '#ffd23a', '#7de3ff', 3, 3600, 3, { swb: 1 }, 'shop', { print: 'B' });
+drip('ball', 'bl_bt_bsod', 'Blue Screen Ball', 'ball', '#1f4fd8', '#f4f4f4', 2, 1400, 1);
+// MORE FROM THE CREW'S GAMES: merch tees and a few pieces
+drip('top', 't_pl_tee', 'POCKET LANTERN Console Tee', 'tee', '#1c2440', '#ffd76a', 1, 650, 0, null, 'shop', { print: 'POCKET\nLANTERN', back: 'SEVEN\nCARTRIDGES' });
+drip('top', 't_root', 'ROOTDEEP Tee', 'tee', '#3a2a1c', '#7ac74f', 1, 600, 0, null, 'shop', { print: 'ROOT\nDEEP' });
+drip('top', 't_swarm', 'LIGHTSWARM Longsleeve', 'longsleeve', '#101018', '#ffd76a', 2, 1300, 1, { speed: 1 }, 'shop', { print: 'LIGHT\nSWARM' });
+drip('top', 't_clank', 'CLANKAWATCH Tee', 'tee', '#5a6a3a', '#f2c14e', 1, 600, 0, null, 'shop', { print: 'CLANKA\nWATCH' });
+drip('top', 't_slop', 'SLOP FM Station Tee', 'tee', '#ff4fd8', '#16181c', 1, 650, 0, null, 'shop', { print: 'SLOP FM', back: 'ALL SLOP\nALL DAY' });
+drip('top', 't_smite', 'SMITE Tee (GODMODE.EXE)', 'tee', '#f4f1e8', '#c8102e', 1, 650, 0, null, 'shop', { print: 'SMITE' });
+drip('top', 't_1147', '11:47 PM Tee (Second Chance)', 'tee', '#101014', '#e8742a', 1, 700, 1, null, 'shop', { print: '11:47', back: 'HALLORAN\nALLEY' });
+drip('top', 't_clock', 'ON THE CLOCK Hoodie (Front Office)', 'hoodie', '#0f3d2e', '#f2c14e', 2, 1500, 2, { iq: 1 }, 'shop', { print: 'ON THE\nCLOCK', back: 'DRAFT DAY' });
+drip('top', 't_ghosttee', 'GHOST SIGNAL Tee (KIRA)', 'tee', '#15131f', '#ff3cac', 1, 700, 1, null, 'shop', { print: 'GHOST\nSIGNAL', back: 'VESPER CITY' });
+drip('top', 't_crew', 'Hidden Kingdom Crew Tee', 'tee', '#2a5ea8', '#f4f1e8', 1, 650, 0, null, 'shop', { print: 'HIDDEN\nKINGDOM', back: 'CREW' });
+drip('top', 't_starfae', 'STARHAVEN Court Tee', 'tee', '#3a2a6a', '#e9cf7a', 1, 700, 1, null, 'shop', { print: 'STAR\nHAVEN' });
+drip('top', 't_overjersey', 'OVERDRIVE Race Jersey', 'jersey', '#e02828', '#f4f1e8', 2, 1600, 2, { speed: 1 }, 'shop', { print: 'OVERDRIVE', back: 'NORTH COAST' });
+drip('top', 't_lumen', 'LUMEN CHARTER Staff Longsleeve', 'longsleeve', '#2f4a5a', '#f2c14e', 2, 1300, 2, { iq: 1 }, 'shop', { print: 'LUMEN\nCHARTER', back: 'LOOK AWAY' });
+drip('top', 't_league', 'LANTERN LEAGUE Pilot Jersey', 'jersey', '#1c2440', '#ffd76a', 2, 1600, 2, { vert: 1 }, 'shop', { print: 'LANTERN\nLEAGUE', back: 'PILOT' });
+drip('top', 't_oz1880', '1880 EXPO Tee (oz)', 'tee', '#d8d0b8', '#c8102e', 1, 600, 0, null, 'shop', { print: '1880\nEXPO' });
+drip('top', 't_bank7', 'Bank Seven Coveralls (Sootborn)', 'longsleeve', '#5a3a22', '#b8682a', 2, 1400, 2, { str: 1 }, 'shop', { print: 'BANK\nSEVEN' });
+drip('top', 't_rogue', 'Guttercrown ROGUE Tee', 'tee', '#26204a', '#f0c95a', 1, 700, 1, null, 'shop', { print: 'ROGUE', back: 'THE PIT' });
+drip('top', 't_sprouts', 'SPROUTS Tee', 'tee', '#7ac74f', '#2a3440', 1, 550, 0, null, 'shop', { print: 'SPROUTS' });
+drip('head', 'hd_slop', 'SLOP FM Dad Hat', 'cap', '#ff4fd8', '#16181c', 1, 400, 0, null, 'shop', { print: 'SLOP' });
+drip('head', 'hd_lumen', 'Lumen Charter Hard Hat', 'helm', '#f2c14e', '#2f4a5a', 2, 1400, 2, { str: 1 });
+drip('head', 'hd_ghostcap', 'Vesper City Cap', 'cap', '#15131f', '#ff3cac', 1, 450, 1, null, 'shop', { print: 'V07' });
+drip('back', 'bk_gutshield', 'Syndicate Buckler (Guttercrown)', 'shield', '#26204a', '#f0c95a', 2, 2200, 2, { steal: 1 });
+drip('back', 'bk_ledgerchain', "The Ledger's Pocket Chain", 'chain', '#c8a24a', '#b3401a', 3, 3800, 3, { iq: 1 }, 'shop', { print: '$' });
+FITS.push(
+  { id: 'gn', n: 'GOT NEXT Day One', g: 'GOT NEXT', items: ['t_gn_logo', 'hd_gn_cap', 'b_gn_mesh', 's_gn', 'k_gn', 'bl_gn'] },
+  { id: 'gnbone', n: 'Bone And Pink', g: 'GOT NEXT', items: ['t_gn_bone', 'hd_gn_capbone', 'b_gn_bone', 's_gn', 'k_gn_bone'] },
+  { id: 'gnnight', n: 'The Cages At Night', g: 'GOT NEXT', items: ['t_gn_puffer', 'hd_gn_skully', 'b_gnwarm', 'k_gn', 'bk_gn_chain'] },
+  { id: 'block', n: 'THE BLOCK 2145', g: 'GOT NEXT', items: ['t_gn_2145', 'hd_gn_cages', 'b_gold', 'k_gold', 'bk_gn_chain'] },
+  { id: 'o2home', n: 'ON TWO Home (Royal)', g: 'ON TWO', items: ['hd_o2_lid', 't_o2_home', 'b_o2_pants', 's_o2', 'k_o2', 'f_o2_eyeblack', 'bl_o2'] },
+  { id: 'o2away', n: 'ON TWO Away (Pylon)', g: 'ON TWO', items: ['hd_o2_lidaway', 't_o2_away', 'b_o2_pants', 's_o2', 'k_o2_pylon', 'f_o2_eyeblack'] },
+  { id: 'o2lot', n: 'After Practice at The Lot', g: 'ON TWO', items: ['t_o2_lot', 'hd_o2_skull', 'b_o2_turf', 'k_o2', 'bk_o2_towel'] },
+  { id: 'o2corner', n: 'The Corner, Golden Hour', g: 'ON TWO', items: ['t_o2_corner', 'hd_o2_cap', 'b_o2_pants', 'k_o2_pylon', 'a_o2_gloves'] },
+  { id: 'btover', n: 'Overclocked Tour', g: 'lil Bottie', items: ['t_bt_tour', 'f_bt_heat', 'hd_bt_cap', 'b_bt_shorts', 'k_bt', 'bk_bt_chain'] },
+  { id: 'btbsod', n: 'Blue Screen', g: 'lil Bottie', items: ['t_bt_bsod', 'f_bt_led', 'b_bt_rack', 'k_bt_chrome', 'bl_bt_bsod'] },
+  { id: 'btclover', n: 'Iced Clover', g: 'lil Bottie', items: ['t_bt_clover', 'hd_bt_skully', 'b_bt_rack', 's_bt', 'k_bt', 'bk_bt_clover'] },
+  { id: 'btgold', n: 'Battery Gold', g: 'lil Bottie', items: ['t_bt_gold', 'hd_bt_aura', 'a_bt_cable', 'b_bt_rack', 'k_bt', 'bk_bt_chain'] },
+);
 // NEXX SUPPLY: only Nexx sells these (cast.js)
 drip('top', 't_nexx', 'NEXX Studio Hoodie', 'hoodie', '#111216', '#7de3ff', 2, 1200, 0, { handle: 1, swb: 1 }, 'nexx');
 drip('head', 'hd_nexx', 'NEXX Snapback', 'cap', '#7de3ff', '#111216', 1, 450, 0, null, 'nexx');
