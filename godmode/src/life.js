@@ -13,7 +13,9 @@ function fillLife(c, S) {
   if (c.gen === undefined) c.gen = 1;
   if (c.elder === undefined) c.elder = false;
 }
-function dayOf(S) { return Math.floor(S.t / DAY_LEN) + 1; }
+/* the island's year: the same 25 seconds a year that people age by (a day and night is 8 years) */
+const YEAR_SECS = 25;
+function dayOf(S) { return Math.floor(S.t / YEAR_SECS) + 1; }
 /* their age in years: childhood (160 s) is 18 years, after that about 25 seconds a year */
 function ageYears(c) { return Math.floor(c.age < GROW_SECS ? c.age / GROW_SECS * 18 : 18 + (c.age - GROW_SECS) * 0.04); }
 function memo(S, c, text) {
@@ -73,7 +75,7 @@ function lifeSecrets(S, c) {
   const mate = c.mate ? getC(S, c.mate) : null;
   let crush = null, cv = 0.5;
   for (const o of S.citizens) {
-    if (o === c || o.id === c.mate || !adult(o) || !adult(c) || o.par.indexOf(c.id) >= 0 || c.par.indexOf(o.id) >= 0) continue;
+    if (o === c || o.id === c.mate || !adult(o) || !adult(c) || kin(c, o) || o.set !== c.set) continue;
     const v = c.rel[o.id] || 0;
     if (v > cv && (!mate || v > (c.rel[mate.id] || 0))) { cv = v; crush = o; }
   }
@@ -147,7 +149,7 @@ function lifeTraits(c) {
 
 const STEER = {
   desire:  { name: 'Grant their deepest wish',  cost: 20 },
-  love:    { name: 'Kindle love for...',        cost: 15, who: 1 },
+  love:    { name: 'Kindle love for...',        cost: 15, who: 1, adultsOnly: 1 },
   grudge:  { name: 'Sow a grudge against...',   cost: 12, who: 1 },
   peace:   { name: 'Make peace with...',        cost: 10, who: 1 },
   reveal:  { name: 'Reveal their secret',       cost: 10 },
@@ -167,6 +169,7 @@ function steer(S, c, act, whoId, key) {
   if (!afford(S, def.cost)) return { ok: false, msg: 'NOT ENOUGH CYCLES' };
   const o = whoId && def.who ? getC(S, whoId) : null;
   if (def.who && (!o || o === c)) return { ok: false, msg: 'CHOOSE SOMEONE ELSE' };
+  if (act === 'love' && (!adult(c) || !adult(o) || kin(c, o))) return { ok: false, msg: 'NOT BETWEEN CHILDREN OR FAMILY' };
   let msg = '';
   switch (act) {
     case 'desire': {
@@ -180,7 +183,7 @@ function steer(S, c, act, whoId, key) {
       addRel(c, o, 0.4); oneRel(o, c, 0.1);
       emote(c, EM.heart, 3);
       memo(S, c, 'Could not stop thinking about ' + o.name + '. It came out of nowhere.');
-      if (adult(c) && adult(o) && !c.mate && !o.mate && relOf(c, o) > 0.45 && relOf(o, c) > 0.4 && c.par.indexOf(o.id) < 0 && o.par.indexOf(c.id) < 0) pairUp(S, c, o);
+      if (adult(c) && adult(o) && !c.mate && !o.mate && o.set === c.set && !o.boat && !c.boat && relOf(c, o) > 0.45 && relOf(o, c) > 0.4 && c.par.indexOf(o.id) < 0 && o.par.indexOf(c.id) < 0) pairUp(S, c, o);
       msg = c.name + ' has fallen for ' + o.name + (c.mate === o.id ? ', and they are together now.' : '.');
       break;
     case 'grudge':
@@ -201,6 +204,7 @@ function steer(S, c, act, whoId, key) {
       break;
     }
     case 'lead': {
+      if (c.boat) return { ok: false, msg: 'NOT WHILE THEY ARE AT SEA' };
       if (!adult(c) || c.dom < 0) return { ok: false, msg: 'THEY NEED A CREED TO LEAD' };
       let f = facOfK(S, c.dom, c.set);
       if (!f) {
@@ -289,7 +293,7 @@ function grantDesire(S, c, d) {
     case 'play': c.happy = 1; return c.name + ' has the best afternoon of their life.';
     case 'love': {
       let p = o;
-      if (!p || p.mate) { let best = -2; for (const q of S.citizens) { if (q === c || q.mate || !adult(q) || q.par.indexOf(c.id) >= 0 || c.par.indexOf(q.id) >= 0) continue; const v = relOf(c, q) + relOf(q, c); if (v > best) { best = v; p = q; } } }
+      if (!p || p.mate || p.set !== c.set || p.boat) { p = null; let best = -2; for (const q of S.citizens) { if (q === c || q.mate || !adult(q) || q.set !== c.set || q.boat || kin(q, c) || q.par.indexOf(c.id) >= 0 || c.par.indexOf(q.id) >= 0) continue; const v = relOf(c, q) + relOf(q, c); if (v > best) { best = v; p = q; } } }
       if (!p || p.mate) return '';
       c.rel[p.id] = Math.max(0.6, c.rel[p.id] || 0); p.rel[c.id] = Math.max(0.6, p.rel[c.id] || 0);
       pairUp(S, c, p);
@@ -379,7 +383,7 @@ function revealSecret(S, c, key, who) {
       return 'Everyone now knows ' + c.name + ' stole from ' + nameOf(S, s.who) + '.';
     case 'crush':
       if (!o) return '';
-      if ((o.rel[c.id] || 0) > 0.35 && !o.mate && !c.mate) { pairUp(S, c, o); return 'The secret is out: ' + c.name + ' loves ' + o.name + ', and ' + o.name + ' loves them back.'; }
+      if ((o.rel[c.id] || 0) > 0.35 && !o.mate && !c.mate && o.set === c.set && !o.boat && !c.boat) { pairUp(S, c, o); return 'The secret is out: ' + c.name + ' loves ' + o.name + ', and ' + o.name + ' loves them back.'; }
       if (c.mate) { const m = getC(S, c.mate); if (m) { addRel(m, c, -0.45); oneRel(m, o, -0.4); memo(S, m, 'Found out ' + c.name + ' is in love with ' + o.name + '.'); } }
       oneRel(o, c, (o.rel[c.id] || 0) > 0 ? 0.05 : -0.1);
       memo(S, c, 'Everyone found out how they feel about ' + o.name + '. Mortifying.');

@@ -38,8 +38,9 @@ function newSim(seed, goal) {
 function addCitizen(S, x, z) {
   const r = S.rng;
   let name = NAMES[(r() * NAMES.length) | 0];
-  for (let i = 0; i < 60 && S.used[name]; i++) name = NAMES[(r() * NAMES.length) | 0];
-  if (S.used[name]) { const free = NAMES.filter(n => !S.used[n]); if (free.length) name = free[(r() * free.length) | 0]; }
+  const taken = n => S.used[n] || (S.nameCd && S.nameCd[n] > S.t);
+  for (let i = 0; i < 60 && taken(name); i++) name = NAMES[(r() * NAMES.length) | 0];
+  if (taken(name)) { const free = NAMES.filter(n => !taken(n)); if (free.length) name = free[(r() * free.length) | 0]; }
   S.used[name] = 1;
   const c = {
     id: S.nextId++, name, x, z, px: x, pz: z, face: r() * TAU,
@@ -99,14 +100,16 @@ function addRel(a, b, d) {
 function refreshDom(S, c) {
   let k = 0;
   for (let i = 1; i < 4; i++) if (c.b[i] > c.b[k]) k = i;
-  const dom = c.b[k] >= 0.4 ? k : -1;
+  let dom = c.b[k] >= 0.4 ? k : -1;
+  if (c.dom >= 0 && dom !== c.dom && c.b[c.dom] >= 0.34 && c.b[k] < c.b[c.dom] + 0.08) dom = c.dom;   // hysteresis
   if (dom !== c.dom) {
     const was = c.dom;
     c.dom = dom;
     if (dom >= 0) {
       emote(c, BELIEF_EMOTE[dom], 3);
       ev(S, 'convert', { id: c.id, k: dom, x: c.x, z: c.z });
-      logMsg(S, c.name + (was >= 0 ? ' abandons ' + BELIEFS[was].name + ' for ' : ' now holds to ') + BELIEFS[dom].name + '.', 'b' + dom);
+      if (!(c.convT > S.t - 60)) logMsg(S, c.name + (was >= 0 ? ' abandons ' + BELIEFS[was].name + ' for ' : ' now holds to ') + BELIEFS[dom].name + '.', 'b' + dom);
+      c.convT = S.t;
       memo(S, c, was >= 0 ? 'Gave up ' + BELIEFS[was].name + ' for ' + BELIEFS[dom].name + '.' : 'Came to believe: "' + BELIEFS[dom].creed + '"');
       if (!c.inspired) whisper(S, 'meme1', 'MEMETICS: an idea has just copied itself into a mind. Ideas use them to reproduce.');
     }
@@ -167,7 +170,7 @@ function moveToward(S, c, tx, tz, speed, dt, stop) {
   // give up on unreachable targets
   c.stuckT += dt;
   if (c.stuckT > 4) {
-    if (d > c.lastD - 0.4) { c.stuckT = 0; c.lastD = 1e9; return 'stuck'; }
+    if (d > c.lastD - 0.4) { c.stuckT = 0; c.lastD = 1e9; return d < 2.5 ? true : 'stuck'; }   // close enough counts as there
     c.stuckT = 0; c.lastD = d;
   }
   return false;
@@ -403,7 +406,8 @@ function think(S, c) {
   consider(0.28 + 0.55 * c.curio, () => {
     const far = c.curio > 0.6;
     const a = r() * TAU, d = far ? 6 + r() * 9 : 1.5 + r() * 4;
-    clampWalk(S.world, (far ? 0 : c.x) + Math.sin(a) * d, (far ? 0 : c.z) + Math.cos(a) * d, _pt);
+    const I = S.world.isles[c.isle || 0], fd = far ? Math.min(d, I.R * 0.8) : d;
+    clampWalk(S.world, (far ? I.cx : c.x) + Math.sin(a) * fd, (far ? I.cz : c.z) + Math.cos(a) * fd, _pt);
     setState(c, 'wander', far ? 'What is over there? Going to look.' : 'Stretching my legs.');
     c.tx = _pt.x; c.tz = _pt.z; c.tk = far ? 'explore' : '';
   });
@@ -850,6 +854,8 @@ function kill(S, c, cause) {
   S.dead[c.id] = c.name;
   if (S.boats) for (const b of S.boats) b.crew = b.crew.filter(id => id !== c.id);
   S.used[c.name] = 0;
+  if (!S.nameCd) S.nameCd = {};
+  S.nameCd[c.name] = S.t + 900;   // fifteen minutes before a new baby gets the same name
   for (const o of S.citizens) {
     if (o.mate === c.id) memo(S, o, 'Lost ' + c.name + ', their partner.');
     else if (o.par.indexOf(c.id) >= 0) memo(S, o, 'Lost their parent, ' + c.name + '.');
@@ -873,7 +879,7 @@ function kill(S, c, cause) {
       o.happy = Math.max(0, o.happy - 0.3 * aff - 0.1);
       addBelief(S, o, KIN, 0.1 * aff);
       if (cause === 'smite') o.b[DEV] *= 0.75;
-      if (o.state !== 'flee' && o.state !== 'held' && o.fear < 0.7 && S.rng() < 0.7) {
+      if (o.state !== 'flee' && o.state !== 'held' && !o.boat && !VOY_STATES[o.state] && o.isle === isleNear(S.world, c.x, c.z) && o.fear < 0.7 && S.rng() < 0.7) {
         setState(o, 'mourn', c.name + ' is gone. I should have said more.');
         o.tx = c.x + (S.rng() - 0.5) * 1.6; o.tz = c.z + (S.rng() - 0.5) * 1.6;
       }
@@ -938,7 +944,7 @@ function completeBuilding(S, b) {
   if (b.type === 'lab') whisper(S, 'lab1', 'The Terminal is on. Someone typed: WHO IS RUNNING THIS? Nothing answered. Not yet.');
   if (b.type === 'hut') assignHomes(S);
   if (b.type === 'shop') { const o = getC(S, b.owner); logMsg(S, shopName(S, b) + ' is open for business.', 'good'); if (o) { o.happy = Math.min(1, o.happy + 0.2); emote(o, EM.coin, 3); } }
-  if (b.type === 'shrine' || b.type === 'lab' || b.type === 'shop') maybeFestival(S, 'the new ' + (b.type === 'shop' ? BIZ[b.biz].name : def.name) + ' is finished.');
+  if (b.type === 'shrine' || b.type === 'lab' || b.type === 'shop') maybeFestival(S, 'the new ' + (b.type === 'shop' ? BIZ[b.biz].name : def.name) + ' is finished.', b.set || 1);
   if (b.type === 'spire') singularity(S, b);
 }
 function assignHomes(S) {
@@ -1108,6 +1114,13 @@ const STAGES = [
   { title: 'THE SPIRE', text: 'Complete the Spire', prog: S => { const b = firstB(S, 'spire'); return b ? ((b.progress * 100) | 0) + '%' : 'CREATE > SPIRE'; }, done: S => { const b = firstB(S, 'spire'); return !!(b && b.built); } },
   { title: 'SANDBOX', text: 'The island is yours. Or you are its.', prog: () => '', done: () => false }
 ];
+function setGoal(S, on) {
+  S.goal = !!on;
+  if (!on) {
+    const sp = firstB(S, 'spire');
+    if (sp && !sp.built && sp.auto && sp.progress < 0.05) { S.buildings.splice(S.buildings.indexOf(sp), 1); rebuildObstacles(S); logMsg(S, 'The Spire they had staked out is abandoned. Nobody remembers why it mattered.', 'sys'); }
+  }
+}
 function objectives(S) {
   if (!S.goal) {
     // endless: no chain of objectives, and the Spire waits until you want it
@@ -1267,7 +1280,8 @@ function powerCreate(S, kind, x, z) {
       // a mind placed on an empty island is its own little camp
       const t = { id: S.setId++, name: c.name + "'s Camp", isle: c.isle, x: c.x, z: c.z, kind: 'free', founder: c.id, k: -1, day: dayOf(S), res: { food: 6, wood: 2, stone: 0 } };
       S.sets.push(t); st = t.id;
-      const hb = placeBuilding(S, 'fire', c.x + 1.8, c.z, true, t.id); hb.built = true; hb.progress = 1; t.x = hb.x; t.z = hb.z;
+      clampWalk(W, c.x + 1.8, c.z, _pt);
+      const hb = placeBuilding(S, 'fire', _pt.x, _pt.z, true, t.id); hb.built = true; hb.progress = 1; t.x = hb.x; t.z = hb.z;
       logMsg(S, c.name + ' wakes alone on ' + isleName(S, c.isle) + ' and lights a fire. ' + t.name + ' begins.', 'good');
     }
     c.set = st;
@@ -1293,7 +1307,7 @@ function powerCreate(S, kind, x, z) {
     const put = (type, px, pz) => {
       if (!walkable(W, px, pz, 0.2)) return;
       for (const b of S.buildings) if (hyp(b.x - px, b.z - pz) < BUILD[b.type].r + 0.6) return;
-      made.push(addNode(W, type, px, pz, S.rng));
+      const nd = addNode(W, type, px, pz, S.rng); nd.isle = isle; made.push(nd);
     };
     if (kind === 'rock') { put('rock', x, z); put('rock', x + 1.1, z + 0.5); }
     else {
@@ -1308,8 +1322,18 @@ function powerCreate(S, kind, x, z) {
   const def = BUILD[kind];
   if (!def || kind === 'fire') return fail(S, 'UNKNOWN');
   if (kind === 'spire' && !S.spireUnlocked) return fail(S, 'NOT YET IMAGINED');
-  if (countB(S, kind) >= def.max) return fail(S, kind === 'spire' ? 'THERE IS ONLY ONE SPIRE' : 'ENOUGH ' + def.name.toUpperCase() + 'S');
-  if (!canPlace(S, kind, x, z)) return fail(S, "CAN'T BUILD THERE");
+  const here = setAt(S, x, z);
+  if (S.buildings.filter(b => b.type === kind && (kind === 'spire' || (b.set || 1) === here)).length >= def.max) return fail(S, kind === 'spire' ? 'THERE IS ONLY ONE SPIRE' : 'ENOUGH ' + def.name.toUpperCase() + 'S');
+  if (!canPlace(S, kind, x, z)) {
+    let best = null, bd = 1e9;
+    for (let ring = 1; ring <= 10 && !best; ring++) for (let k = 0; k < 8 + ring * 2; k++) {
+      const a = k / (8 + ring * 2) * TAU, px = x + Math.sin(a) * ring * 0.6, pz = z + Math.cos(a) * ring * 0.6;
+      if (isleNear(W, px, pz) !== isleNear(W, x, z) || !canPlace(S, kind, px, pz)) continue;
+      const d = hyp(px - x, pz - z); if (d < bd) { bd = d; best = { x: px, z: pz }; }
+    }
+    if (!best) return fail(S, kind === 'spire' ? 'NOT ENOUGH FLAT GROUND HERE FOR THE SPIRE' : 'NO ROOM HERE: TOO STEEP OR TOO CLOSE TO SOMETHING');
+    x = best.x; z = best.z;
+  }
   if (!setAt(S, x, z)) return fail(S, 'NOBODY LIVES ON THAT ISLAND');
   if (kind === 'spire' && isleNear(W, x, z) !== 0) return fail(S, 'THE SPIRE BELONGS ON THE HOME ISLAND');
   const cost = kind === 'spire' ? COST.spire : COST.blueprint;
@@ -1388,7 +1412,7 @@ function powerDrop(S) {
   c.x = c.px = _pt.x; c.z = c.pz = _pt.z;
   c.isle = isleNear(S.world, c.x, c.z);
   const landed = setAt(S, c.x, c.z);
-  if (landed && landed !== c.set) { const t = setById(S, landed); memo(S, c, 'Was carried across the sea by a great hand, and set down in ' + t.name + '.'); c.set = landed; c.home = 0; c.fac = 0; if (c.job) { c.job = 0; c.boss = 0; } logMsg(S, c.name + ' now lives in ' + t.name + '.', ''); }
+  if (landed && landed !== c.set) { const t = setById(S, landed); memo(S, c, 'Was carried across the sea by a great hand, and set down in ' + t.name + '.'); leaveSettlement(S, c, landed); logMsg(S, c.name + ' now lives in ' + t.name + '.', ''); }
   S.stats.intervene++;
   c.cmdT = 14;
   if (c.b[DEV] > 0.5) { c.happy = Math.min(1, c.happy + 0.12); addBelief(S, c, DEV, 0.04); }
@@ -1482,7 +1506,7 @@ function deserialize(text) {
   S.events = [];
   S.rng = mulberry32(((o.seed ^ 0x9e3779b9) + ((o.t * 13) | 0)) >>> 0);
   for (const c of S.citizens) {
-    if (c.state === 'held') setState(c, 'idle');
+    if (c.state === 'held') { setState(c, 'idle'); clampWalk(W, c.x, c.z, _pt); c.x = _pt.x; c.z = _pt.z; c.isle = isleNear(W, c.x, c.z); }
     c.px = c.x; c.pz = c.z;
   }
   S.held = 0;

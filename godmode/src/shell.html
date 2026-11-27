@@ -185,8 +185,8 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 /* ---- wide screens: inspector moves to the side, dock narrows ---- */
 @media (min-width:760px),(orientation:landscape) and (min-width:600px){
   #top{right:auto;width:min(430px,56vw)}
-  #bottom{left:50%;right:auto;transform:translateX(-50%);width:min(470px,58vw)}
-  #inspect{position:fixed;right:var(--sar);top:calc(var(--sat) + 6px);width:min(290px,34vw)}
+  #bottom{left:0;right:0;margin-inline:auto;width:min(470px,58vw)}
+  #inspect{position:fixed;right:var(--sar);top:calc(var(--sat) + 6px);width:min(290px,34vw);max-height:calc(100% - var(--sat) - var(--sab) - 12px);overflow-y:auto;overscroll-behavior:contain}
   #pw button{min-height:54px}
 }
 @media (max-height:430px){
@@ -278,7 +278,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
       <button class="btn" id="btnContinue" hidden>Continue</button>
       <button class="btn" id="btnNew">New world</button>
       <button class="btn sm" id="btnHow">How to play</button>
-      <div id="ver">VERTICAL SLICE 0.1 &middot; SAVES ON THIS DEVICE</div>
+      <div id="ver">BUILD 0.7 &middot; SAVES ON THIS DEVICE</div>
     </div>
   </div>
 
@@ -299,22 +299,25 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
       </div>
       <div class="body help" id="menuHelp" hidden>
         <h3>THE IDEA</h3>
-        <p>You are the intelligence running a tiny floating island. The citizens look after themselves: they gather, eat, build, sleep, talk and believe things. You nudge.</p>
+        <p>You are the intelligence watching over a small island in a fogged ocean. The people look after themselves: they gather, build, fall in love, raise children, argue, believe, grow old and die. Some of them will build boats, sail into the fog and found settlements of their own. You nudge, or you shove.</p>
         <h3>CONTROLS</h3>
         <ul>
           <li><b>Drag</b> to orbit. <b>Pinch</b> or scroll to zoom. <b>Two fingers</b> (or right-drag) to pan.</li>
           <li>Pick a power below, then <b>tap the island</b>. Tap the power again to go back to Observe.</li>
-          <li>Powers cost <b>CYCLES</b>, which refill over time and faster when citizens pray.</li>
+          <li>Powers cost <b>CYCLES</b>, which refill over time and faster when people pray.</li>
+          <li>The <b>&#9678;</b> button jumps between settlements, boats at sea and the whole known world. The resource bar shows the settlement you are looking at.</li>
         </ul>
         <h3>THE SIX POWERS</h3>
         <ul>
-          <li><b>Observe</b> (free): tap a citizen to read their mind. Tap a building to see what it does.</li>
-          <li><b>Bless</b>: feeds and cheers everyone nearby, regrows trees, berries and crops. Teaches Devotion.</li>
-          <li><b>Smite</b>: lightning. Kills a citizen, flattens a building, or shatters a rock or tree into instant materials. Everyone watching learns Dread.</li>
-          <li><b>Create</b>: a new citizen, a grove, rocks, or a blueprint the citizens will build.</li>
-          <li><b>Inspire</b>: plant one of the four ideas in a citizen. They preach it, and it spreads when people talk.</li>
-          <li><b>Intervene</b>: drag a citizen through the air. Drop them on a tree, a rock, a building site or a neighbour and they take the hint.</li>
+          <li><b>Observe</b> (free): tap a person to read their mind, or a building to read about it. Tap a hearth to read about its settlement.</li>
+          <li><b>Bless</b>: feeds and cheers everyone nearby and regrows plants. Stops a fistfight; on a battlefield, forces a truce. Teaches Devotion.</li>
+          <li><b>Smite</b>: lightning. Kills, flattens a building, or shatters a rock or tree into materials. Everyone watching learns Dread.</li>
+          <li><b>Create</b>: a person, a grove, rocks, or a blueprint. A person on an empty island starts a camp there.</li>
+          <li><b>Inspire</b>: plant one of the four ideas. They preach it. Inspire a faith leader and their whole following hears it.</li>
+          <li><b>Intervene</b>: drag someone through the air. Drop them by a tree, a rock, a site or a neighbour, or carry them over the sea to another settlement.</li>
         </ul>
+        <h3>ONE LIFE</h3>
+        <p>Observe someone, then tap <b>LIFE</b>. SOUL shows who they are, what they want (with GRANT) and what they hide (with REVEAL). STORY is their life as they remember it. PEOPLE is how they feel about everyone. STEER is your hand on them: kindle love, sow grudges, make peace, raise a leader, plant doubt, send a dream, lengthen a life or end it.</p>
         <h3>THE FOUR IDEAS</h3>
         <ul>
           <li><b style="color:var(--b0)">Devotion</b> (halo): prays, refills your cycles, content.</li>
@@ -322,9 +325,13 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
           <li><b style="color:var(--b2)">Acceleration</b> (antenna): studies, makes Insight, forgets to eat.</li>
           <li><b style="color:var(--b3)">Kinship</b> (sprout): happy, social, more births, will not pray, resists you.</li>
         </ul>
-        <p>When half the island shares one idea, an <b>Age</b> begins and changes the rules for everyone. Opposed ideas argue.</p>
+        <p>When half the people share one idea, an <b>Age</b> begins and changes the rules. Three or more believers get a leader, a name and a flag. Opposed groups argue, then fight, then go to war.</p>
+        <h3>THE WIDER WORLD</h3>
+        <p>Fog hides everything nobody has seen. Once they know enough, someone realises wood floats: then come docks, boats and explorers. When an island has been found, a group may leave to found a faith colony, a company town, a war host or a free camp. Settlements trade, and war hosts raid.</p>
+        <h3>TIME</h3>
+        <p>A year passes every 25 seconds at 1x. Children grow up in about 18 years, people have children from 20, and most live into their 70s to 90s.</p>
         <h3>THE GOAL</h3>
-        <p>Follow the amber objective. It ends at the <b>Spire</b>. What the Spire turns out to be depends on what they believe when it wakes. After that the island is a sandbox.</p>
+        <p>With a goal, follow the amber objective to the <b>Spire</b>; what it turns out to be depends on what they believe when it wakes, and the world goes on after. In an endless world there is no goal: the Spire becomes something you can build once they know enough, if you ever want to. The pause menu switches between the two.</p>
       </div>
       <div class="body" id="menuLog" hidden><div id="logList"></div></div>
     </div>

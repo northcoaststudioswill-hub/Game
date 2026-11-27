@@ -79,6 +79,12 @@ function chem(a, b) {
   const x = Math.sin(lo * 12.9898 + hi * 78.233) * 43758.5453;
   return (x - Math.floor(x)) * 2 - 1;
 }
+/* close family: parent, child, or sharing a parent (siblings and half-siblings) */
+function kin(a, b) {
+  if (a.par.indexOf(b.id) >= 0 || b.par.indexOf(a.id) >= 0) return true;
+  for (const p of a.par) if (b.par.indexOf(p) >= 0) return true;
+  return false;
+}
 function oneRel(a, b, d) { a.rel[b.id] = clamp((a.rel[b.id] || 0) + d, -1, 1); }
 function stopPartner(S, c) {
   const p = c.partner ? getC(S, c.partner) : null;
@@ -650,10 +656,12 @@ function declareWar(S, fa, fb) {
   const La = getC(S, fa.leader), Lb = getC(S, fb.leader);
   if (!La || !Lb) return;
   // the two sides line up across from each other near the middle of the island
-  const mx = (La.x + Lb.x) / 2, mz = (La.z + Lb.z) / 2;
+  if (La.isle !== Lb.isle || La.boat || Lb.boat) return;
+  const I = S.world.isles[La.isle || 0];
+  const mx = I.cx + ((La.x + Lb.x) / 2 - I.cx) * 0.5, mz = I.cz + ((La.z + Lb.z) / 2 - I.cz) * 0.5;
   let dx = La.x - Lb.x, dz = La.z - Lb.z; const d = hyp(dx, dz) || 1; dx /= d; dz /= d;
-  clampWalk(S.world, mx * 0.5 + dx * 3.2, mz * 0.5 + dz * 3.2, _pt); const ax = _pt.x, az = _pt.z;
-  clampWalk(S.world, mx * 0.5 - dx * 3.2, mz * 0.5 - dz * 3.2, _pt);
+  clampWalk(S.world, mx + dx * 3.2, mz + dz * 3.2, _pt); const ax = _pt.x, az = _pt.z;
+  clampWalk(S.world, mx - dx * 3.2, mz - dz * 3.2, _pt);
   S.war = { a: fa.id, b: fb.id, ax, az, bx: _pt.x, bz: _pt.z, t: 40, dur: 40 };
   delete S.tension[tensionKey(fa.id, fb.id)];
   ev(S, 'war', { a: fa.id, b: fb.id, ka: fa.k, kb: fb.k, x: (ax + _pt.x) / 2, z: (az + _pt.z) / 2 });
@@ -817,12 +825,12 @@ function socialTalk(S, a, b) {
     b.thought = a.name + (v > 0 ? ' says ' + t.name + ' is wonderful.' : ' says ' + t.name + ' cannot be trusted.');
   }
   // romance
-  if (adult(a) && adult(b) && !a.mate && !b.mate && a.par.indexOf(b.id) < 0 && b.par.indexOf(a.id) < 0 &&
+  if (adult(a) && adult(b) && !a.mate && !b.mate && !kin(a, b) && a.set === b.set &&
       relOf(a, b) > 0.45 && relOf(b, a) > 0.45 && S.rng() < 0.3) pairUp(S, a, b);
   // jealousy: talking a little too warmly with someone else's partner
   for (const x of [a, b]) {
     const y = x === a ? b : a;
-    if (!x.mate || x.mate === y.id || relOf(x, y) < 0.55) continue;
+    if (!x.mate || x.mate === y.id || relOf(x, y) < 0.55 || kin(x, y)) continue;
     const m = getC(S, x.mate);
     if (m && hyp(m.x - x.x, m.z - x.z) < 7 && S.rng() < 0.35) {
       oneRel(m, y, -0.25); oneRel(m, x, -0.08);
@@ -834,6 +842,7 @@ function socialTalk(S, a, b) {
   }
 }
 function pairUp(S, a, b) {
+  if (kin(a, b) || !adult(a) || !adult(b)) return;
   a.mate = b.id; b.mate = a.id;
   addRel(a, b, 0.15);
   emote(a, EM.heart, 3); emote(b, EM.heart, 3);
@@ -868,9 +877,9 @@ function couplesBirth(S) {
   const cs = S.citizens;
   let pa = null, pb = null, br = -9;
   for (const c of cs) {
-    if (!c.mate || !adult(c) || c.id > c.mate || c.elder || ageYears(c) < 20) continue;
+    if (!c.mate || !adult(c) || c.id > c.mate || c.elder || c.boat || ageYears(c) < 20) continue;
     const m = getC(S, c.mate);
-    if (!m || !adult(m) || m.elder || ageYears(m) < 20 || m.set !== c.set) continue;
+    if (!m || !adult(m) || m.elder || m.boat || ageYears(m) < 20 || m.set !== c.set) continue;
     let kids = 0, small = 0;
     for (const o of cs) if (o.par.indexOf(c.id) >= 0) { kids++; if (o.grow < 1) small++; }
     if (small >= 1 || kids >= 3) continue;
@@ -881,7 +890,7 @@ function couplesBirth(S) {
     // nobody is paired yet: the two who get on best pair up first
     for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
       const a = cs[i], b = cs[j];
-      if (!adult(a) || !adult(b) || a.mate || b.mate || a.set !== b.set || a.par.indexOf(b.id) >= 0 || b.par.indexOf(a.id) >= 0) continue;
+      if (!adult(a) || !adult(b) || a.mate || b.mate || a.set !== b.set || kin(a, b) || a.boat || b.boat) continue;
       const rr = relOf(a, b) + S.rng() * 0.2;
       if (rr > br) { br = rr; pa = a; pb = b; }
     }
@@ -1047,12 +1056,16 @@ function decreeBonus(S, c, what) {
   return 0.35 + 0.3 * c.b[f.k];
 }
 /* when the island is happy and something good happens, a leader calls a festival */
-function maybeFestival(S, why) {
-  if (S.party || S.war || isNight(S) || S.citizens.length < 6 || S.t < (S.partyCd || 0)) return;
+function maybeFestival(S, why, setId) {
+  setId = setId || 1;
+  const ppl = S.citizens.filter(c => (c.set || 1) === setId);
+  if (S.party || S.war || isNight(S) || ppl.length < 5 || S.t < (S.partyCd || 0)) return;
   let avg = 0;
-  for (const c of S.citizens) avg += c.happy;
-  if (avg / S.citizens.length < 0.6 || S.rng() > 0.45) return;
-  S.party = { t: 18, x: 0, z: 0, set: 1 };
+  for (const c of ppl) avg += c.happy;
+  if (avg / ppl.length < 0.6 || S.rng() > 0.45) return;
+  const t = S.sets ? setById(S, setId) : { x: 0, z: 0, name: '' };
+  S.party = { t: 18, x: t.x, z: t.z, set: setId };
+  if (setId !== 1) why = t.name + ': ' + why;
   S.partyCd = S.t + 320;
   logMsg(S, 'FESTIVAL: ' + why + ' Everybody to the hearth.', 'good');
   ev(S, 'festival', {});

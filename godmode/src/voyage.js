@@ -40,6 +40,15 @@ function fillVoyage(S) {
   for (const b of S.buildings) { if (!b.set) b.set = 1; if (b.isle === undefined) b.isle = isleNear(S.world, b.x, b.z); }
   for (const f of S.factions || []) if (!f.set) f.set = 1;
 }
+/* someone changes settlement: they lose their place in its faction, job, home and (if their partner stays) marriage */
+function leaveSettlement(S, c, st) {
+  if (c.fac) { const f = getF(S, c.fac); if (f && f.leader === c.id) f.leader = 0; }
+  c.title = ''; c.fac = 0; c.home = 0;
+  if (c.job) { const b = getB(S, c.job); if (b && b.owner === c.id) b.owner = 0; c.job = 0; }
+  c.boss = 0;
+  c.set = st;
+  if (c.mate) { const m = getC(S, c.mate); if (m && m.set !== st && !(m.boat && boatOf(S, m.boat) && boatOf(S, m.boat).m && boatOf(S, m.boat).m.kind === 'settle')) { memo(S, c, 'Lost ' + m.name + ' to the sea between them.'); memo(S, m, 'Lost ' + c.name + ' to the sea between them.'); m.mate = 0; c.mate = 0; } }
+}
 function setById(S, id) { for (const t of S.sets) if (t.id === id) return t; return S.sets[0]; }
 function resOf(S, id) { const t = setById(S, id); return t.id === 1 || !t.res ? S.res : t.res; }
 function RES(S, c) { return resOf(S, c.set || 1); }
@@ -122,7 +131,10 @@ function makeBoat(S, t, dock) {
   const bt = { id: S.boatId++, set: t.id, x: p.bx, z: p.bz, px: p.bx, pz: p.bz, ang: (dock ? dock.ang : 0), ix: p.ix, iz: p.iz, hx: p.bx, hz: p.bz,
     st: 'docked', crew: [], m: null, t: 0, loot: null, name: '' };
   const NAMES_B = ['Dawn', 'Gull', 'Brave Idea', 'Second Chance', 'Little Fish', 'Far Hope', 'Salt', 'Wanderer', 'Promise', 'Kettle'];
+  const usedB = S.boats.map(o => o.name);
   bt.name = 'the ' + NAMES_B[(bt.id * 7) % NAMES_B.length];
+  for (let i = 0; i < NAMES_B.length && usedB.indexOf(bt.name) >= 0; i++) bt.name = 'the ' + NAMES_B[(bt.id * 7 + i + 1) % NAMES_B.length];
+  if (usedB.indexOf(bt.name) >= 0) bt.name += ' ' + ['II', 'III', 'IV', 'V', 'VI'][bt.id % 5];
   S.boats.push(bt);
   return bt;
 }
@@ -152,7 +164,7 @@ function voyageOptions(S, c, consider, night) {
   }
   // set out to explore
   const bt = freeBoat(S, t.id);
-  if (bt && S.voyCd <= 0 && c.tr.brave > 0.4 && c.curio > 0.4 && c.title !== 'leader' && S.fogLeft !== 0) {
+  if (bt && S.voyCd <= 0 && c.tr.brave > 0.4 && c.curio > 0.4 && c.title !== 'leader' && S.fogLeft !== 0 && c.hunger < 0.5) {
     consider(0.45 + 0.8 * c.curio + 0.3 * c.tr.brave + 0.2 * c.b[ACCEL], () => {
       bt.st = 'boarding'; bt.t = 10; bt.m = { kind: 'explore', by: c.id }; bt.coming = 0; bt.crew = [];
       S.voyCd = 110;
@@ -205,6 +217,7 @@ function updateVoyage(S, c, dt, sp) {
       if (m === 'stuck' || m) {
         b.coming = Math.max(0, (b.coming || 1) - 1);
         b.crew.push(c.id); c.boat = b.id; c.state = 'aboard'; c.ph = 0;
+        const RS = RES(S, c); if (c.hunger > 0.3 && RS.food >= 1) { RS.food -= 1; c.hunger = 0; }   // provisions for the trip
         c.thought = b.m.kind === 'explore' ? 'On board. Nervous. Excited.' : b.m.kind === 'settle' ? 'Leaving everything behind.' : b.m.kind === 'raid' ? 'We go to take what we need.' : 'Setting sail.';
       }
       break;
@@ -274,10 +287,13 @@ function boatStep(S, dt) {
     } else if (b.st === 'wait') {
       // moored at someone else's shore while the crew is ashore
       b.t -= dt;
-      const ashore = S.citizens.filter(c => (c.state === 'ashore' || c.state === 'reboard') && c.tid === b.id).length;
+      const party = (b.m.party || []).map(id => getC(S, id)).filter(c => c && !c.boat && c.isle === S.world.isles[b.m.isleT !== undefined ? b.m.isleT : isleNear(S.world, b.m.lx, b.m.lz)].id);
+      const ashore = party.filter(c => c.state === 'ashore' || c.state === 'reboard').length;
       if (!ashore || b.t <= 0) {
-        for (const c of S.citizens) if ((c.state === 'ashore' || c.state === 'reboard') && c.tid === b.id) {
-          c.boat = b.id; c.state = 'aboard'; c.x = c.px = b.m.lx; c.z = c.pz = b.m.lz; if (b.crew.indexOf(c.id) < 0) b.crew.push(c.id);
+        // everyone who came is taken home, whatever they are doing (fighting, mourning, knocked out)
+        for (const c of party) {
+          if (c.state === 'fight') { const o = getC(S, c.partner); if (o && o.partner === c.id) finish(S, o); }
+          setState(c, 'aboard'); c.boat = b.id; c.x = c.px = b.m.lx; c.z = c.pz = b.m.lz; if (b.crew.indexOf(c.id) < 0) b.crew.push(c.id);
         }
         goHome(S, b);
       }
@@ -286,7 +302,7 @@ function boatStep(S, dt) {
     b.crew.forEach((id, i) => {
       const c = getC(S, id);
       if (!c) return;
-      const sx = ((i % 3) - 1) * 0.42, sz = (Math.floor(i / 3) - 0.6) * 0.55;
+      const rows = Math.ceil(b.crew.length / 2), sx = b.crew.length === 1 ? 0 : (i % 2 ? 0.3 : -0.3), sz = (Math.floor(i / 2) - (rows - 1) / 2) * 0.62 - 0.2;
       const ca = Math.cos(b.ang), sa = Math.sin(b.ang);
       c.px = c.x; c.pz = c.z;
       c.x = b.x + sx * ca + sz * sa; c.z = b.z - sx * sa + sz * ca;
@@ -308,7 +324,7 @@ function launch(S, b) {
         if (Math.abs(x) > WORLD_HALF - 4 || Math.abs(z) > WORLD_HALF - 4) break;
         if (!fogKnown(S, x, z)) { unknown++; if (!first) first = d; }
       }
-      const s = unknown + S.rng() * 3;
+      const s = unknown ? unknown + S.rng() * 3 : 0;
       if (s > bs) { bs = s; best = { a, d: Math.min(110, (first || 40) + 28) }; }
     }
     if (bs <= 0) S.fogLeft = 0;
@@ -338,13 +354,17 @@ function sail(S, b, dt) {
     const ox = b.x - I.cx, oz = b.z - I.cz, od = hyp(ox, oz), rr = rimR(I, Math.atan2(ox, oz)) + 3.2;
     if (od < rr + 3) {
       const push = clamp((rr + 3 - od) / 3, 0, 1);
-      const side = (ox * vz - oz * vx) >= 0 ? 1 : -1;
+      // slide round the island in the direction of travel; keep the side once chosen so it cannot dither
+      if (!b.sides) b.sides = {};
+      if (b.sides[I.id] === undefined) b.sides[I.id] = (ox * vz - oz * vx) >= 0 ? -1 : 1;
+      const side = b.sides[I.id];
       vx += (ox / od) * push * 1.4 + (oz / od) * side * push * 0.9;
       vz += (oz / od) * push * 1.4 - (ox / od) * side * push * 0.9;
     }
   }
   const vn = hyp(vx, vz) || 1;
   b.x += vx / vn * sp * dt; b.z += vz / vn * sp * dt;
+  for (const k in b.sides || {}) { const I = W.isles[k]; if (hyp(b.x - I.cx, b.z - I.cz) > I.R + 12) delete b.sides[k]; }
   b.x = clamp(b.x, -WORLD_HALF + 2, WORLD_HALF - 2); b.z = clamp(b.z, -WORLD_HALF + 2, WORLD_HALF - 2);
   b.ang += angDiff(b.ang, Math.atan2(vx, vz)) * Math.min(1, dt * 3);
   if (b.m.circling && d < 6) { b.m.circling = 0; b.m.tx = b.x + Math.sin(b.ang) * 30; b.m.tz = b.z + Math.cos(b.ang) * 30; b.t = Math.max(b.t, 50); }
@@ -383,6 +403,7 @@ function arrive(S, b) {
   if (m.kind === 'raid' || m.kind === 'trade') {
     // moor and go ashore
     b.st = 'wait'; b.t = 40;
+    b.m.party = b.crew.slice();
     for (const id of b.crew) {
       const c = getC(S, id);
       if (!c) continue;
@@ -400,6 +421,7 @@ function arrive(S, b) {
 
 function foundSettlement(S, b) {
   const m = b.m, I = S.world.isles[m.isle];
+  if (!b.crew.some(id => getC(S, id))) { goHome(S, b); return; }
   const from = setById(S, b.set);
   // the hearth goes on open ground near the middle
   let hx = I.cx, hz = I.cz, ok = false;
@@ -416,7 +438,10 @@ function foundSettlement(S, b) {
   for (const id of b.crew) {
     const c = getC(S, id);
     if (!c) continue;
+    const wasLeader = c.title === 'leader' && m.fac && c.fac === m.fac;
+    if (!wasLeader) { if (c.fac) { const f0 = getF(S, c.fac); if (f0 && f0.leader === c.id && f0.id !== m.fac) { f0.leader = 0; c.title = ''; } } }
     c.boat = 0; c.set = t.id; c.home = 0;
+    if (c.mate) { const mt = getC(S, c.mate); if (mt && b.crew.indexOf(mt.id) < 0) { memo(S, c, 'Left ' + mt.name + ' behind, and that was the end of it.'); memo(S, mt, c.name + ' sailed away to ' + t.name + ' without them.'); mt.mate = 0; c.mate = 0; } }
     c.x = c.px = m.lx + (S.rng() - 0.5) * 1.5; c.z = c.pz = m.lz + (S.rng() - 0.5) * 1.5; c.isle = I.id;
     if (c.job) { const sh = getB(S, c.job); if (sh && sh.set !== t.id) { if (sh.owner === c.id) sh.owner = 0; c.job = 0; } }
     if (t.kind === 'company' && c.id !== m.by) c.boss = m.by; else if (c.boss && !(t.kind === 'company')) c.boss = 0;
@@ -442,13 +467,13 @@ function foundSettlement(S, b) {
 /* group up, pick a destination, and go */
 function planExodus(S) {
   if (!S.tech.boats || S.settleCd > 0 || S.boats.some(b => b.m && b.m.kind === 'settle')) return;
-  const free = S.world.isles.filter(I => I.id && S.found[I.id] && !S.sets.some(t => t.isle === I.id));
+  const free = S.world.isles.filter(I => I.id && S.found[I.id] && !S.sets.some(t => t.isle === I.id && !t.empty));
   if (!free.length) return;
   for (const t of S.sets.slice().sort(() => S.rng() - 0.5)) {
     const bt = freeBoat(S, t.id);
     if (!bt) continue;
     const pop = setPop(S, t.id);
-    if (pop < (t.id !== 1 ? 12 : S.goal && !S.sandbox ? 13 : 9)) continue;
+    if (pop < (t.id !== 1 ? 12 : 14)) continue;
     const able = S.citizens.filter(c => c.set === t.id && adult(c) && !c.elder && c.state !== 'held' && !c.boat);
     const plans = [];
     // a faith that is outnumbered at home
@@ -493,7 +518,8 @@ function planExodus(S) {
     let pick = S.rng() * tot, plan = plans[0];
     for (const q of plans) { pick -= q.s; if (pick <= 0) { plan = q; break; } }
     // who goes: the founder, up to five others, and their partners and small children
-    const most = Math.max(3, Math.floor(pop * 0.45));
+    const most = Math.min(Math.max(3, Math.floor(pop * 0.45)), t.id === 1 ? pop - 9 : pop);
+    if (most < 3) continue;
     const go = new Set([plan.by.id]);
     for (const c of plan.who) { if (go.size >= Math.min(6, most)) break; go.add(c.id); }
     for (const id of Array.from(go)) {
@@ -527,13 +553,13 @@ function planContact(S) {
   if (!S.tech.boats || S.sets.length < 2) return;
   for (const t of S.sets) {
     if (t.empty) continue;
-    t.raidCd = (t.raidCd || 120) - 10;
+    t.raidCd = (t.raidCd === undefined ? 120 : t.raidCd) - 10;
     if (t.raidCd > 0) continue;
     const bt = freeBoat(S, t.id);
     if (!bt) continue;
     const others = S.sets.filter(o => o !== t && !o.empty && o.isle !== t.isle && setPop(S, o.id) > 0 && S.found[o.isle]);
     if (!others.length) continue;
-    const able = S.citizens.filter(c => c.set === t.id && adult(c) && !c.elder && !c.boat && c.state !== 'held');
+    const able = S.citizens.filter(c => c.set === t.id && adult(c) && !c.elder && !c.boat && c.state !== 'held' && c.hunger < 0.5 && c.title !== 'leader' && !VOY_STATES[c.state]);
     // raid: war hosts always want to; others only against bitter rivals
     let tgt = null, kind = '';
     for (const o of others) {
@@ -628,8 +654,9 @@ function voyageTick(S) {
     for (const c of S.citizens) {
       if (!adult(c) || c.curio < 0.45 || c.boat) continue;
       const I = S.world.isles[c.isle || 0], lx = c.x - I.cx, lz = c.z - I.cz;
-      if (hyp(lx, lz) < rimR(I, Math.atan2(lx, lz)) - 3.2) continue;
-      if (S.rng() > 0.04) continue;
+      const byWater = hyp(lx, lz) > rimR(I, Math.atan2(lx, lz)) - 6 || c.state === 'fish' || (c.state === 'wander' && c.tk === 'explore');
+      if (!byWater && S.t < 900) continue;
+      if (S.rng() > (byWater ? 0.04 : 0.004)) continue;
       S.tech.boats = true;
       memo(S, c, 'Watched a log drift out to sea and understood: a boat.');
       c.thought = 'If wood floats, and I sit on the wood...'; emote(c, EM.bulb, 3);
@@ -640,24 +667,29 @@ function voyageTick(S) {
   }
   // anyone stuck on an island that is not their settlement's joins whoever lives there, or makes camp
   for (const c of S.citizens) {
-    if (c.boat || VOY_STATES[c.state] || c.state === 'held') { c.strandT = 0; continue; }
+    if (c.boat || VOY_STATES[c.state] || c.state === 'held' || S.boats.some(b => b.st === 'wait' && b.m && (b.m.party || []).indexOf(c.id) >= 0)) { c.strandT = 0; continue; }
     const h = hearthOf(S, c);
     if (h.isle === c.isle && !h.empty) { c.strandT = 0; continue; }
     c.strandT = (c.strandT || 0) + 1;
     if (c.strandT < 20) continue;
     c.strandT = 0;
     let st = setAt(S, c.x, c.z);
+    if (!st && !adult(c)) { const p = c.par.map(id => getC(S, id)).find(p => p && p.isle === c.isle); if (p) st = p.set; }
     if (!st) {
       const t = { id: S.setId++, name: c.name + "'s Camp", isle: c.isle, x: c.x, z: c.z, kind: 'free', founder: c.id, k: c.dom, day: dayOf(S), res: { food: 4, wood: 0, stone: 0 } };
+      const I = S.world.isles[c.isle];
       clampWalk(S.world, c.x + 1.8, c.z, _pt);
+      for (let ring = 0, ok = false; ring < 8 && !ok; ring++) for (let k = 0; k < 10 && !ok; k++) {
+        const a = k / 10 * TAU + ring, r = ring * 1.4, x = I.cx + Math.sin(a) * r, z = I.cz + Math.cos(a) * r;
+        if (canPlace(S, 'fire', x, z)) { _pt.x = x; _pt.z = z; ok = true; }
+      }
       S.sets.push(t);
       const hb = placeBuilding(S, 'fire', _pt.x, _pt.z, true, t.id); hb.built = true; hb.progress = 1; t.x = hb.x; t.z = hb.z;
       logMsg(S, c.name + ' is stranded on ' + isleName(S, c.isle) + ', and lights a fire. ' + t.name + ' begins.', '');
       st = t.id;
     } else logMsg(S, c.name + ' has stayed on in ' + setById(S, st).name + '.', '');
     memo(S, c, 'Ended up on ' + isleName(S, c.isle) + ', far from home, and made a life there.');
-    c.set = st; c.home = 0; c.fac = 0; c.job = 0; c.boss = 0;
-    if (c.title === 'leader') c.title = '';
+    leaveSettlement(S, c, st);
     rebuildObstacles(S);
   }
   // settlements that are empty are abandoned

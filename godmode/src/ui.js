@@ -23,14 +23,16 @@ const HINTS = {
   intervene: 'Intervene: drag a citizen and drop them'
 };
 const TUT = [
-  { t: 'LOOK AROUND', h: '<b>Drag</b> to orbit the island. <b>Pinch</b> (or scroll) to zoom. Two fingers pan.', done: () => APP.camMoved > 130 },
-  { t: 'OBSERVE', h: 'Those are your citizens. <b>Tap one</b> to read its mind: needs, beliefs, and what it is doing and why.', done: S => S.stats.observe > 0 },
+  { t: 'LOOK AROUND', h: '<b>Drag</b> to orbit the island. <b>Pinch</b> (or scroll) to zoom. Two fingers pan.', done: S => APP.camMoved > 130 || S.stats.observe > 0 || S.stats.bless > 0 },
+  { t: 'OBSERVE', h: 'Those are your people. <b>Tap one</b> to read their mind: needs, beliefs, and what they are doing and why.', done: S => S.stats.observe > 0 },
+  { t: 'ONE LIFE', h: 'With someone selected, tap <b>LIFE</b>: what they want, what they hide, their story, how they feel about everyone, and your hand on all of it. Time stops while you look.', done: () => !!UI.lifeUsed },
   { t: 'BLESS', h: 'Pick <b>BLESS</b> below, then tap near some citizens. Fed, happy, and a little more devout.', done: S => S.stats.bless > 0 },
   { t: 'INTERVENE', h: 'Pick <b>INTERVENE</b>, then <b>drag a citizen</b> into the air. Drop them on a tree, a rock or a friend and they take the hint.', done: S => S.stats.intervene > 0 },
   { t: 'CREATE', h: 'Pick <b>CREATE</b>, choose something, tap the ground. Blueprints get built once the citizens have materials.', done: S => S.stats.create > 0 },
   { t: 'INSPIRE', h: 'Pick <b>INSPIRE</b>, choose an idea, tap a citizen. They will preach it, and ideas spread whenever citizens talk. Watch the hats.', done: S => S.stats.inspire > 0 },
   { t: 'SMITE', h: '<b>SMITE</b> is lightning. It kills, flattens, and shatters rocks into instant stone. Witnesses learn Dread. Entirely optional.', done: S => S.stats.smite > 0, soft: true },
-  { t: 'YOUR JOB', h: 'Powers cost <b>CYCLES</b> (the bar above the powers). The coloured strip up top shows what the island believes. Follow the <b>amber objective</b>. Good luck, GODMODE.', done: () => false, last: true }
+  { t: 'YOUR JOB', h: S => 'Powers cost <b>CYCLES</b> (the bar above the powers). The coloured strip up top shows what people believe. When they take to boats, <b>&#9678;</b> jumps around the world. ' +
+      (S.goal ? 'Follow the <b>amber objective</b>.' : 'There is <b>no goal</b>: take them wherever you like.') + ' Good luck, GODMODE.', done: () => false, last: true }
 ];
 
 function initUI() {
@@ -44,7 +46,7 @@ function initUI() {
   $('lfTabs').querySelectorAll('button').forEach(b => { b.onclick = () => { sfx('click'); UI.lifeTab = b.dataset.t; UI.lifePick = ''; renderLife(); }; });
   $('mGoal').onclick = () => {
     const S = APP.S; if (!S || S.sandbox) return;
-    S.goal = !S.goal; sfx('click'); refreshMenu();
+    setGoal(S, !S.goal); sfx('click'); refreshMenu();
     logMsg(S, S.goal ? 'GOAL SET: the path to the Spire is back on.' : 'GOAL CLEARED: no objectives. The island simply goes on.', 'sys');
   };
   $('inFollow').onclick = () => { sfx('click'); R.cam.follow = R.cam.follow ? 0 : APP.S.selected; };
@@ -99,13 +101,13 @@ function updateUI(S, dt) {
   for (let k = 0; k < 4; k++) $('z' + k).style.width = (pop ? S.counts[k] / pop * 100 : 0).toFixed(1) + '%';
   const zl = $('zlabel');
   if (S.age >= 0) { zl.textContent = 'AGE OF ' + BELIEFS[S.age].name; zl.style.color = BELIEFS[S.age].hex; $('zeit').style.borderColor = BELIEFS[S.age].hex; }
-  else { zl.textContent = 'NO CREED RULES'; zl.style.color = ''; $('zeit').style.borderColor = ''; }
+  else { zl.textContent = 'NO MAJORITY CREED'; zl.style.color = ''; $('zeit').style.borderColor = ''; }
   if (!S.goal || S.sandbox) {
     $('qTitle').textContent = S.sandbox ? 'SANDBOX' : 'ENDLESS';
     const sp = firstB(S, 'spire');
     const nsets = S.sets.filter(t => !t.empty && setPop(S, t.id)).length, nfound = S.found.filter(Boolean).length;
-    $('qText').textContent = 'Day ' + dayOf(S) + ' \u00b7 gen ' + generation(S) + (nsets > 1 ? ' \u00b7 ' + nsets + ' settlements' : '') + (nfound > 1 ? ' \u00b7 ' + nfound + '/' + S.found.length + ' isles' : '') +
-      (S.sandbox ? '' : sp ? (sp.built ? '' : ' \u00b7 Spire ' + ((sp.progress * 100) | 0) + '%') : S.spireUnlocked ? ' \u00b7 the Spire is yours to build' : '');
+    $('qText').textContent = 'Year ' + dayOf(S) + ' \u00b7 gen ' + generation(S) + (nsets > 1 ? ' \u00b7 ' + nsets + ' towns' : '') + (nfound > 1 ? ' \u00b7 ' + nfound + '/' + S.found.length + ' isles' : '') +
+      (S.sandbox ? '' : sp ? (sp.built ? '' : ' \u00b7 Spire ' + ((sp.progress * 100) | 0) + '%') : S.spireUnlocked ? ' \u00b7 Spire ready' : '');
     $('qProg').textContent = S.citizens.length + ' alive';
   } else {
     const st = STAGES[S.stage];
@@ -167,13 +169,13 @@ function updateInspect(S) {
     else if (b.type === 'fire') {
       const t = setById(S, b.set || 1), r = resOf(S, t.id), f = getC(S, t.founder);
       $('inName').textContent = t.name;
-      extra = 'The hearth of ' + t.name + ', a ' + SET_KINDS[t.kind].name + ' on ' + isleName(S, t.isle) + ', since day ' + t.day + '. ' + SET_KINDS[t.kind].desc +
+      extra = 'The hearth of ' + t.name + ', a ' + SET_KINDS[t.kind].name + ' on ' + isleName(S, t.isle) + ', since year ' + t.day + '. ' + SET_KINDS[t.kind].desc +
         (t.id !== 1 ? ' Founded by ' + (f ? f.name : nameOf(S, t.founder)) + '.' : '') + ' ' + setPop(S, t.id) + ' living here. Stockpile: ' + (r.food | 0) + ' food, ' + (r.wood | 0) + ' wood, ' + (r.stone | 0) + ' stone.' +
         (t.k >= 0 ? ' Their creed: ' + BELIEFS[t.k].name + '.' : '');
       const rv = S.sets.filter(o => o !== t && (S.rival[rivalKey(o.id, t.id)] || 0) >= 4).map(o => o.name);
       if (rv.length) extra += ' Bad blood with ' + rv.join(', ') + '.';
     }
-    else if (b.type === 'dock') { const bs = S.boats.filter(x => x.set === b.set); extra += ' Boats: ' + (bs.map(x => x.name + ' (' + (x.st === 'docked' ? 'moored' : 'at sea') + ')').join(', ') || 'none yet') + '.'; }
+    else if (b.type === 'dock') { $('inName').textContent = 'Dock of ' + setById(S, b.set || 1).name; const bs = S.boats.filter(x => x.set === b.set); extra += ' Boats: ' + (bs.map(x => x.name + ' (' + (x.st === 'docked' ? 'moored' : 'at sea') + ')').join(', ') || 'none yet') + '.'; }
     $('inThought').textContent = extra;
     $('inNeeds').hidden = true; $('inBel').hidden = true; $('inFollow').hidden = true; $('inLife').hidden = true;
     $('inFoot').textContent = '';
@@ -189,15 +191,16 @@ function viewedSet(S) {
 /* jump the camera: each settlement in turn, then any boat at sea */
 function goNext() {
   const S = APP.S, spots = [];
-  for (const t of S.sets) if (!t.empty && setPop(S, t.id)) spots.push({ x: t.x, z: t.z, d: 30, text: t.name + ' on ' + isleName(S, t.isle) + ': ' + setPop(S, t.id) + ' souls, a ' + SET_KINDS[t.kind].name + '.' });
-  for (const b of S.boats) if (b.st === 'out' || b.st === 'back' || b.st === 'wait') spots.push({ x: b.x, z: b.z, d: 22, boat: b.id, text: b.name + ' at sea' + (b.m && b.m.kind === 'settle' ? ', carrying the founders of ' + b.m.name : b.m && b.m.kind === 'raid' ? ', full of raiders' : b.m && b.m.kind === 'trade' ? ', carrying traders' : ', exploring') + '.' });
-  spots.push({ x: 0, z: 0, d: Math.min(140, Math.max(40, S.knownR * 1.6)), text: 'Everything they have seen so far: ' + S.found.filter(Boolean).length + ' of the islands.' });
+  for (const t of S.sets) if (!t.empty && setPop(S, t.id)) spots.push({ x: t.x, z: t.z, d: 30, title: t.name.toUpperCase(), text: t.name + ' on ' + isleName(S, t.isle) + ': ' + setPop(S, t.id) + ' souls, a ' + SET_KINDS[t.kind].name + '.' });
+  for (const b of S.boats) if (b.st === 'out' || b.st === 'back' || b.st === 'wait') spots.push({ x: b.x, z: b.z, d: 22, boat: b.id, title: b.name.toUpperCase(), text: b.name + ' at sea' + (b.m && b.m.kind === 'settle' ? ', carrying the founders of ' + b.m.name : b.m && b.m.kind === 'raid' ? ', full of raiders' : b.m && b.m.kind === 'trade' ? ', carrying traders' : ', exploring') + '.' });
+  spots.push({ x: 0, z: 0, d: Math.min(140, Math.max(40, S.knownR * 1.6)), title: 'THE KNOWN WORLD', text: 'Everything they have seen so far: ' + S.found.filter(Boolean).length + ' of the islands.' });
   if (!spots.length) return;
-  UI.goI = ((UI.goI || 0) + 1) % spots.length;
+  if (UI.goI === undefined) { const v = viewedSet(S); UI.goI = Math.max(0, spots.findIndex(p => hyp(p.x - v.x, p.z - v.z) < 1)); }
+  UI.goI = (UI.goI + 1) % spots.length;
   const p = spots[UI.goI], C = R.cam;
   C.follow = 0; C.auto = false; C.tx = p.x; C.tz = p.z; C.dist = p.d;
   UI.goBoat = p.boat || 0;
-  ticker(p.text, '');
+  banner(p.title || 'VIEW', p.text, '#7dd3ff');
 }
 
 /* ------------------------------------------------------------ life panel
@@ -206,13 +209,14 @@ function goNext() {
    while it is open. */
 function openLife(id) {
   UI.lifeId = id; UI.lifeTab = UI.lifeTab || 'soul'; UI.lifePick = '';
-  APP.lifeOpen = true;
+  APP.lifeOpen = true; UI.lifeUsed = true;
   $('life').hidden = false; $('app').classList.add('modal');
   renderLife();
 }
 function closeLife() { APP.lifeOpen = false; $('life').hidden = true; $('app').classList.remove('modal'); }
 const esc = t => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 function moodWord(c) {
+  if (c.hunger > 0.8) return 'starving';
   if (c.fear > 0.5) return 'terrified';
   if (c.state === 'fight' || c.state === 'tantrum') return 'furious';
   if (c.happy > 0.8) return 'happy';
@@ -248,8 +252,8 @@ function renderLife() {
     for (const x of ss) h += '<div class="it sec"><span>' + esc(x.text) + '</span><button data-reveal="' + x.k + '" data-who="' + (x.who || 0) + '">REVEAL ' + STEER.reveal.cost + '</button></div>';
     h += '<h4>WHAT THEY BELIEVE</h4><div>' + BELIEFS.map((bf, k) => '<span style="color:' + bf.hex + '">' + bf.name + ' ' + Math.round(c.b[k] * 100) + '%</span>').join(' &middot; ') + '</div>';
   } else if (UI.lifeTab === 'story') {
-    h += '<div class="dim">Day ' + dayOf(S) + ' now. Newest first.</div>';
-    for (let i = c.mem.length - 1; i >= 0; i--) h += '<div class="mem"><time>Day ' + c.mem[i].d + '</time><span>' + esc(c.mem[i].text) + '</span></div>';
+    h += '<div class="dim">Year ' + dayOf(S) + ' now. Newest first.</div>';
+    for (let i = c.mem.length - 1; i >= 0; i--) h += '<div class="mem"><time>Year ' + c.mem[i].d + '</time><span>' + esc(c.mem[i].text) + '</span></div>';
   } else if (UI.lifeTab === 'people') {
     const rows = S.citizens.filter(o => o !== c).map(o => ({ o, mine: c.rel[o.id] || 0, theirs: o.rel[c.id] || 0, lab: relLabel(c, o) }));
     rows.sort((a, b) => (b.lab ? 1 : 0) - (a.lab ? 1 : 0) || Math.abs(b.mine) - Math.abs(a.mine));
@@ -261,7 +265,8 @@ function renderLife() {
   } else {
     if (UI.lifePick) {
       h += '<div>' + STEER[UI.lifePick].name.replace('...', '') + ' whom?</div>';
-      const rows = S.citizens.filter(o => o !== c).sort((a, b) => Math.abs(c.rel[b.id] || 0) - Math.abs(c.rel[a.id] || 0));
+      const def = STEER[UI.lifePick];
+      const rows = S.citizens.filter(o => o !== c && (!def.adultsOnly || (adult(o) && adult(c) && !kin(o, c) && o.set === c.set))).sort((a, b) => Math.abs(c.rel[b.id] || 0) - Math.abs(c.rel[a.id] || 0));
       for (const o of rows) h += '<button class="act" data-who="' + o.id + '"><span>' + esc(o.name) + ' <span class="dim">' + (relLabel(c, o) || '') + '</span></span><small>' + STEER[UI.lifePick].cost + '</small></button>';
       h += '<button class="act" data-back="1"><span>Back</span></button>';
     } else {
@@ -402,11 +407,14 @@ function updateTutorial(S) {
   if (!show) { if (!el.hidden) el.hidden = true; UI.tutShown = -2; return; }
   const step = TUT[APP.tut];
   if (step.done(S)) { tutAdvance(); return; }
+  // the card steps aside while someone is being inspected, so the screen is not all panels
+  const busy = !$('inspect').hidden && !step.last && APP.tut !== 2;
+  if (busy) { if (!el.hidden) el.hidden = true; UI.tutShown = -2; return; }
   if (UI.tutShown === APP.tut) return;
   UI.tutShown = APP.tut;
   el.hidden = false;
   $('tutStep').textContent = (APP.tut + 1) + '/' + TUT.length + ' ' + step.t;
-  $('tutText').innerHTML = step.h;
+  $('tutText').innerHTML = typeof step.h === 'function' ? step.h(S) : step.h;
   $('tutNext').textContent = step.last ? 'DONE' : 'NEXT';
 }
 function tutAdvance() {

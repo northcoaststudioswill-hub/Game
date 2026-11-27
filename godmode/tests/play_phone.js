@@ -252,6 +252,14 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
   await page.setViewportSize({ width: 844, height: 390 }); await sleep(700);
   check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'landscape phone fits');
   await page.screenshot({ path: path.join(out, '16-landscape.png') });
+  // the inspector sits at the top right in landscape, inside the screen, and LIFE can be tapped
+  await page.evaluate(() => { const c = APP.S.citizens.find(c => !c.boat); selectCitizen(c.id); });
+  await sleep(500);
+  check(await page.evaluate(() => { const r = document.getElementById('inspect').getBoundingClientRect(), d = document.getElementById('bottom').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight + 1 && (r.bottom <= d.top || r.left >= d.right || r.right <= d.left); }), 'landscape: the citizen panel stays on screen and clear of the powers');
+  await page.screenshot({ path: path.join(out, '16b-landscape-inspector.png') });
+  await page.tap('#inLife'); await sleep(300);
+  check(await page.evaluate(() => APP.lifeOpen && document.getElementById('lfName').getBoundingClientRect().top >= 0), 'landscape: LIFE opens and its header is visible');
+  await page.tap('#lfClose'); await page.evaluate(() => selectCitizen(0)); await sleep(200);
   await page.setViewportSize({ width: 1280, height: 800 }); await sleep(700);
   const cc = await page.evaluate(() => { const c = APP.S.citizens[0]; const o = R.cit.get(c.id); const p = toScreen(o.x, o.g.position.y + 0.75, o.z, { x: 0, y: 0 }); return { x: p.x, y: p.y }; });
   await page.mouse.click(cc.x, cc.y); await sleep(500);

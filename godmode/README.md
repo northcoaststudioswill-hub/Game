@@ -219,6 +219,58 @@ node godmode/tests/play_phone.js    # needs Playwright + Chromium; screenshots g
 
 ## Changelog
 
+### 0.7, Nov 27 2026: review and bug-hunt fixes
+
+A games reviewer played a build-0.6 phone session (an endless world to 120 minutes, a goal world through the
+Singularity, landscape). Separately, a code audit ran long headless worlds with invariant checks. Fixed:
+
+- **Boats got stuck behind islands** (the push around land had the wrong sign), so voyages took up to 110 s a leg and
+  crews starved at sea. That was nearly all of the starvation. Boats now slide round the island the way they are going
+  and keep that side. Crews are picked only when fed, and eat from the stockpile as they board.
+- **Raiders and traders were left behind** when a fight or a funeral pulled them out of their landing state, and then
+  joined the place they raided. The landing party is now remembered and always taken home. Mourning is only for
+  deaths on your own island, and never at sea or abroad.
+- **Colonists starved next to a full stockpile.** A camp's hearth could sit where the spot people aimed for was
+  unreachable, so "go and eat" failed again and again. Arriving within 2.5 units now counts, and camps place their
+  hearth on open ground.
+- **Boats were never invented in about half of worlds** (nobody stood on the shore). The idea now also comes to someone
+  fishing, exploring or within 6 units of the shore, and after 15 minutes, rarely, to anyone.
+- **Siblings paired up and had children.** No romance, pairing or "kindle love" between parents, children, siblings or
+  half-siblings; "kindle love" lists only adults from the same settlement.
+- **Couples split across the sea** stayed married forever. Moving away now ends it, with a memory on both sides.
+  Steering can no longer pair people across settlements or make a leader of someone at sea.
+- **Leadership leaks:** a leader who was stranded, carried away by Intervene or left on a voyage kept their title or
+  their faction kept them as leader. `leaveSettlement()` now clears title, faction, job, home and marriage together.
+- **Colony wars were fought on the home island** (the battle line was halved toward the world origin). It is now on
+  the leaders' own island, and only when both are there.
+- Far "explore" wanders headed for the home island; groves and rocks created on other islands counted as home
+  resources; blueprint limits counted every settlement; festivals were home-only; once every found island had held a
+  settlement, no exodus could happen again; a save taken mid-drag could reload someone in the sea.
+- **Beliefs flickered** (one person changed faith three times in 4.5 s): a creed now has to be overtaken by 0.08 to
+  change, and each person's conversion is logged at most once a minute.
+- **The home village emptied out.** Groups leave it only when it has 14 or more people, and leave at least 9.
+- **Landscape:** the citizen panel was positioned relative to the transformed power dock and ran off the screen; LIFE
+  could not be tapped. Fixed, and the panel scrolls if it is taller than the screen.
+- **Tutorial:** a new step for LIFE, steps you have already done are skipped, the card hides while you inspect someone,
+  and the last step speaks to endless players. How to Play is rewritten for 0.7; the title says build 0.7.
+- **Time** reads in years everywhere (the island calendar uses the same 25 seconds a year people age by), not days.
+- Blueprints placed on bad ground move to the nearest good spot nearby instead of failing ("CAN'T BUILD THERE" on
+  open grass for the Spire). Turning the goal off cancels a Spire the citizens staked out but never started.
+- Smaller: unique boat names, names of the dead not reused for 15 minutes, boat crews seated two abreast in a boat
+  that stretches to fit, the ◎ caption shows as a banner, the dock panel names its settlement, the endless bar is
+  shorter, "starving" shows as a mood, "NO MAJORITY CREED".
+- Tests: endless runs fail on any couple who are family or split across settlements; the phone test checks the
+  landscape panel and LIFE in landscape.
+
+**Results:** 90-minute endless worlds, seeds 1, 3, 5, 7: 2, 0, 0, 0 starvation deaths (before: 11, 0, 12 in the same
+build's runs and 24 in an audit seed). The home village kept 6 to 12 people in three of four. In seed 7 two war hosts
+raided it nine times and it ended empty. Boats were invented in every seed tried after the fix. Goal runs: passive
+Singularity 14:42 to 17:36, assisted 10:34 to 12:12.
+**Not changed:** Insight still piles up far past what anything costs, cycles are scarce early and full later, raids
+only happen where a war host forms (1 of 4 worlds above), and memories written before 0.7 keep their old day numbers
+(now shown as years). Still not played on a phone.
+
+
 ### 0.6, Nov 27 2026: an archipelago in the fog, boats, and settlements that break away
 
 - **World** (`world.js`): `makeIsles()` adds 6 or 7 islands at 50 to 105 units from home, each with its own height

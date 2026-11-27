@@ -600,6 +600,8 @@ function syncBoats(S, alpha, dt) {
     const t = setById(S, b.set), hex = t.k >= 0 ? BELIEFS[t.k].hex : '#f4efe0';
     g.userData.sail.material.color.set(hex).lerp(_ca.set('#ffffff'), 0.45);
     g.userData.sail.scale.set(1, b.st === 'docked' ? 0.35 : 1, 1);
+    const rows = Math.ceil((b.crew ? b.crew.length : 0) / 2);
+    g.scale.set(1, 1, Math.max(1, rows * 0.62 / 2.0 + 0.35));
   }
   R.boats.forEach((g, id) => { if (!seen.has(id)) { R.root.remove(g); R.boats.delete(id); } });
 }
