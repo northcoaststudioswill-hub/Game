@@ -845,6 +845,7 @@ const AREAS=[
   {id:'course',x:-344,z:-125,r:44,base:0,name:'THE SIDEQUEST',sub:'it goes sideways, for once · the floor is slop',hue:.22,lit:.5,col:[.22,.6,.38]},
   {id:'trench',x:-353,z:135,r:34,base:-18,name:'THE TRENCHES',sub:'gm · it smells in here · not financial advice',hue:.3,lit:.3,col:[.25,.4,.2]},
   {id:'wreck',x:375,z:59,r:40,base:2,name:'VAN DOWN · THE CRASH SITE',sub:'a slopflix original docuseries · do not cross',hue:0.0,lit:0.3,col:[0.0, 0.6, 0.28]},
+  {id:'meme',x:-291,z:-212,r:56,base:2,name:'MEME MOUNTAIN',sub:'every meme ever posted · the first post is at the top',hue:.9,lit:.55,col:[.9,.7,.55]},
   {id:'sigma',x:-190,z:329,r:38,base:2,name:'THE SIGMA STAIRCASE',sub:'the grind never stops (the stairs do)',hue:0.7,lit:0.4,col:[0.72, 0.15, 0.4]},
   {id:'t67',x:73,z:-373,r:38,base:2,name:'THE 67 SPIRE',sub:'six. seven. six seven. up.',hue:0.12,lit:0.55,col:[0.12, 0.8, 0.5]},
   {id:'mew',x:249,z:287,r:38,base:2,name:'MEWING MOUNTAIN',sub:'tongue on the roof. forever.',hue:0.55,lit:0.55,col:[0.55, 0.35, 0.55]},
@@ -2817,8 +2818,8 @@ function startRot1000(){S.inBoss=false;boss.active=false;boss.g.visible=false;bb
 function endRot1000(){R1K.on=false;X.rot1000=1;app.classList.remove('r1k','disco','fry');$('r1k').hidden=true;CH.id='';CH.t=0;camera.fov=R1K.fov;camera.updateProjectionMatrix();R1K.rain.forEach(r=>r.s.visible=false);R1K.heads.forEach(h=>h.visible=false);
   for(const id in npcs)npcs[id].g.scale.setScalar(1);for(let i=enemies.length-1;i>=0;i--)if(enemies[i].tag==='botmin')removeEnemy(enemies[i]);AU.theme=S.zone;flash(1,2500);SFX.win();save();
   say([['sys','You touched grass. Real grass. The last grass. The rot drops: x1000... x100... x10...'],['sys','x1.'],['grok','GROK FEEL... NORMAL. GROK HATE IT. GROK MISS IT ALREADY.'],['fable','That was a lot. I have summarised it in one bullet point. The bullet point says: "a lot".'],
-    ['astra','✨ i liked it ✨'],['derek','...Bro.'],['sys','The filter is gone. The rot is back at 1x, held down by the only thing it fears: one square metre of grass. Please do not tell the grass.'],['sys','...'],['sys','Wait. Why is the grass laughing?']],()=>{mmIntro();});}
-const oWin=win;win=function(){if(!X.mm&&!R1K.on&&!S.inMM){startRot1000();return;}oWin();};
+    ['astra','✨ i liked it ✨'],['derek','...Bro.'],['sys','The filter is gone. The rot is back at 1x, held down by the only thing it fears: one square metre of grass. Please do not tell the grass.'],['sys','Out west, a mountain made of every meme ever posted is still standing. Nobody asked it to leave. It will be there whenever you want it.']],()=>{PL.x=0;PL.z=9;PL.y=PL.vis=.2;PL.vy=0;oWin();});}
+const oWin=win;win=function(){if(!X.rot1000&&!R1K.on){startRot1000();return;}oWin();};
 {const tg=touchGrass;touchGrass=function(){if(R1K.on){endRot1000();return;}tg();};}
 {const ct=compassTarget;compassTarget=function(){if(R1K.on)return{x:GRASS.x,z:GRASS.z,l:'THE LAST GRASS'};return ct();};}
 {const ar=act7Rows;act7Rows=function(){const r=ar();return R1K.on?[['r1k','🌱 TOUCH THE LAST GRASS. END THE ROT.',false]].concat(r):r;};}
@@ -3126,59 +3127,71 @@ function boostFx(){tone(70,.25,'sawtooth',.12,0,140);burst(PL.x,PL.vis+.6,PL.z,1
     const m=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.2,.4,10),pm);m.position.set(x,y-1.8,z);scene.add(m);platforms.push({x,z,r:1.7,top:y-1.6});}
   T67.forEach(t=>ensurePad(t.x,t.y,t.z));DROPS.forEach(d=>ensurePad(d.x,d.y,d.z));
   CORES.forEach((c,k)=>{const a=Math.atan2(c.z-CL.z,c.x-CL.x),x=CL.x+Math.cos(a)*22,z=CL.z+Math.sin(a)*22;cloud(x,z,(CL.top+(c.y-2.2))/2-groundH(x,z),3.4);});})();
-// ---- MEME MOUNTAIN
-const MM={objs:[],plats:[],cp:null,b:640,H:0,t:0,crowd:[],won:false,bk:0,tst:0,re:0};
+// ---- MEME MOUNTAIN: every meme ever posted, piled up out west. A climb you can take on any time; THE FIRST POST is at the top.
+const MM={objs:[],plats:[],cp:null,base:null,x:ABY.meme.x,z:ABY.meme.z,b:0,H:0,t:0,crowd:[],won:false,bk:0,tst:0,re:0,near:false,built:false};
 const MMLINES=['ONE MILLION X','THE MOUNTAIN IS MEMES ALL THE WAY DOWN','first','67,000,000','MEME MOUNTAIN IS HIM','who reposted the mountain','the summit is a screenshot','RATIO x1,000,000','AURA OVERFLOW (fatal)','skibidi to the peak'];
 function coneR(h){return Math.max(6,34-28*(h/MM.H));}
 function mmAdd(o){scene.add(o);MM.objs.push(o);return o;}
-function mmBuild(){const r=mulberry(67676767),q=a=>a[Math.floor(r()*a.length)],b=MM.b,N=44;MM.H=N*3.4+1;MM.plats.length=0;
-  const cone=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(6,34,MM.H,28,10),rainbowMat));cone.userData.own=1;cone.position.set(0,b+MM.H/2,0);
-  for(let k=0;k<9;k++){const h=k/9*MM.H,t=mmAdd(new THREE.Mesh(Tor(coneR(h)+.3,.6,8,40),normalMat));t.userData.own=1;t.rotation.x=Math.PI/2;t.position.y=b+h;}
-  const base=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(48,40,3,40),MATS.ck));base.userData.own=1;base.position.set(0,b-1.5,0);const BP={x:0,z:0,r:48,top:b,mm:true};platforms.push(BP);MM.cp=BP;
+function mmBuild(){if(MM.built)return;MM.built=true;const r=mulberry(67676767),q=a=>a[Math.floor(r()*a.length)],ox=MM.x,oz=MM.z,b=MM.b=groundH(ox,oz),N=44;MM.H=N*3.4+1;MM.plats.length=0;
+  const cone=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(6,34,MM.H,28,10),rainbowMat));cone.position.set(ox,b+MM.H/2,oz);colliders.push({x:ox,z:oz,r:6,top:b+MM.H});
+  for(let k=0;k<9;k++){const h=k/9*MM.H,t=mmAdd(new THREE.Mesh(Tor(coneR(h)+.3,.6,8,40),normalMat));t.rotation.x=Math.PI/2;t.position.set(ox,b+h,oz);}
+  const base=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(42,38,3,40),MATS.ck));base.position.set(ox,b-1.45,oz);const BP={x:ox,z:oz,r:42,top:b+.05,mm:true};platforms.push(BP);MM.cp=MM.base=BP;
   for(let k=0;k<130;k++){const h=r()*MM.H,a=r()*TAU,R=coneR(h)+.6,s=r()<.65?emojiSprite(q(['💀','🗿','🔥','💯','🧠','🐸','6️⃣','7️⃣','💩','👁️','✋','🦐','🌽','📈','🤖','👑','✨','😂','🫠','🚐']),3+r()*6):textSprite(q(['67','SKIBIDI','OHIO','AURA','RATIO','BASED','NPC','SIGMA','RIZZ','first','L + RATIO','NO CAP','MEWING','BRUH','W']),1.5+r()*2,{color:q(['#ffd400','#ffffff','#b6ff00','#19e3ff','#ff2e88'])});
-    if(s.material.map&&!emojiCache[Object.keys(emojiCache).find(k2=>emojiCache[k2]===s.material.map)])s.userData.tex=1;s.position.set(Math.cos(a)*R,b+h,Math.sin(a)*R);mmAdd(s);}
-  let a=Math.PI/2;for(let i=0;i<N;i++){const top=b+3+i*3.4,R=coneR(top-b)+4.2+(i%2)*1.2,x=Math.cos(a)*R,z=Math.sin(a)*R,cp=i>0&&i%9===0,roll=r(),kind=cp||i<2?(cp?'cp':'n'):roll<.4?'n':roll<.55?'move':roll<.67?'vert':roll<.79?'blink':roll<.87?'bounce':'orbit',pr=cp?3.4:2.3;
-    const m=mmAdd(new THREE.Mesh(cp?new THREE.CylinderGeometry(pr,pr,1,20):new THREE.BoxGeometry(pr*1.6,1,pr*1.6),kind==='blink'?MATS.blink:kind==='bounce'?MATS.bounce:kind==='move'||kind==='orbit'?MATS.move:cp?rainbowMat:q([normalMat,MATS.ck,q(MATS.plain)])));m.userData.own=1;m.position.set(x,top-.5,z);
+    s.position.set(ox+Math.cos(a)*R,b+h,oz+Math.sin(a)*R);mmAdd(s);}
+  let a=Math.PI/2;for(let i=0;i<N;i++){const top=b+3+i*3.4,R=coneR(top-b)+4.2+(i%2)*1.2,x=ox+Math.cos(a)*R,z=oz+Math.sin(a)*R,cp=i>0&&i%9===0,roll=r(),kind=cp||i<2?(cp?'cp':'n'):roll<.4?'n':roll<.55?'move':roll<.67?'vert':roll<.79?'blink':roll<.87?'bounce':'orbit',pr=cp?3.4:2.3;
+    const m=mmAdd(new THREE.Mesh(cp?new THREE.CylinderGeometry(pr,pr,1,20):new THREE.BoxGeometry(pr*1.6,1,pr*1.6),kind==='blink'?MATS.blink:kind==='bounce'?MATS.bounce:kind==='move'||kind==='orbit'?MATS.move:cp?rainbowMat:q([normalMat,MATS.ck,q(MATS.plain)])));m.position.set(x,top-.5,z);
     const P={x,z,ox:x,oz:z,r:pr,top,y0:top,kind,m,ph:r()*6,ax:-Math.sin(a),az:Math.cos(a),mm:true};platforms.push(P);MM.plats.push(P);
-    if(cp){const l=textSprite('CHECKPOINT · x1,000,000',.8,{color:'#ffd400'});l.userData.tex=1;l.position.set(x,top+2,z);mmAdd(l);}
-    if(r()<.18&&!cp){const fx=Math.cos(a+.3)*(R+5),fz=Math.sin(a+.3)*(R+5),f=mmAdd(new THREE.Mesh(new THREE.BoxGeometry(3.6,1,3.6),q(MATS.plain)));f.userData.own=1;f.position.set(fx,top-.5,fz);const l=textSprite('definitely real',.6,{color:'#ffd400'});l.userData.tex=1;l.position.set(fx,top+1.4,fz);mmAdd(l);}
+    if(cp){const l=textSprite('CHECKPOINT · x1,000,000',.8,{color:'#ffd400'});l.position.set(x,top+2,z);mmAdd(l);}
+    if(r()<.18&&!cp){const fx=ox+Math.cos(a+.3)*(R+5),fz=oz+Math.sin(a+.3)*(R+5),f=mmAdd(new THREE.Mesh(new THREE.BoxGeometry(3.6,1,3.6),q(MATS.plain)));f.position.set(fx,top-.5,fz);const l=textSprite('definitely real',.6,{color:'#ffd400'});l.position.set(fx,top+1.4,fz);mmAdd(l);}
     a+=7.2/R;}
-  const st=b+MM.H+.5,sp={x:0,z:0,r:7,top:st,mm:true};platforms.push(sp);MM.sum=sp;const ped=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(7,6,1,24),new THREE.MeshPhongMaterial({color:0xffd400,shininess:120,emissive:0x664400})));ped.userData.own=1;ped.position.set(0,st-.5,0);
-  MM.post=mmAdd(emojiSprite('📜',7,false));MM.post.position.set(0,st+5,0);const pl=textSprite(['THE FIRST POST','it just says "first"'],1.6,{color:'#ffd400',fog:false});pl.userData.tex=1;pl.position.set(0,st+10.5,0);mmAdd(pl);
+  const st=b+MM.H+.5,sp={x:ox,z:oz,r:7,top:st,mm:true};platforms.push(sp);MM.sum=sp;const ped=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(7,6,1,24),new THREE.MeshPhongMaterial({color:0xffd400,shininess:120,emissive:0x664400})));ped.position.set(ox,st-.5,oz);
+  MM.post=mmAdd(emojiSprite('📜',7,false));MM.post.position.set(ox,st+5,oz);const pl=textSprite(['THE FIRST POST','it just says "first"'],1.6,{color:'#ffd400',fog:false});pl.position.set(ox,st+10.5,oz);mmAdd(pl);
+  const sg=mmAdd(textSprite(['MEME MOUNTAIN','every meme ever posted · the first post is at the top · optional (spiritually mandatory)'],1.4,{color:'#ffd400'}));sg.position.set(ox,b+9,oz+44);
   ['🗿','📖','🌟','🐸','🚐','👑','🤖','🐕','🧢','🔧'].forEach((e,k)=>{const s=mmAdd(emojiSprite(e,14,false));MM.crowd.push({s,a:k/10*TAU,h:20+k*13});});}
-function mmClear(){MM.objs.forEach(o=>{scene.remove(o);if(o.isMesh&&o.userData.own)o.geometry.dispose();if(o.isSprite&&o.userData.tex&&o.material.map)o.material.map.dispose();});MM.objs.length=0;MM.crowd.length=0;MM.plats.length=0;for(let i=platforms.length-1;i>=0;i--)if(platforms[i].mm)platforms.splice(i,1);}
-function mmIntro(){say([['sys','The grass is laughing. The grass was a meme too. The most reposted meme of all time. Touching it did not end the rot. It went viral.'],['algo','(from somewhere very far away) I TOLD YOU. I WAS THE FILTER.'],['sys','ROT LEVEL: 1,000,000x.'],
-  ['sys','Above Prompt Plaza, a mountain made of every meme ever posted has appeared. At the very top is the one thing that came before all of them: THE FIRST POST.'],['grok','GROK SEE MOUNTAIN. GROK SAY: CLIMB. GROK CANNOT CLIMB. GROK IS ROCK.'],['sys','Climb MEME MOUNTAIN. Big platforms are checkpoints. The hook, the dash and one poop boost per jump are allowed. The fall is not.']],mmEnter);}
-function mmEnter(){mmBuild();S.inMM=true;MM.t=0;MM.won=false;PL.x=0;PL.z=42;PL.y=PL.vis=MM.b+.3;PL.vy=PL.vx=PL.vz=0;cam.yaw=0;cam.pitch=.3;cam.manual=1;BST.c=bstMax();S.cells=S.max;
-  app.classList.add('r1k');$('r1k').hidden=false;setText('r1kn','ROT x1,000,000');$('r1kn').style.fontSize='min(8vw,76px)';$('r1k').querySelector('i').textContent='the final mission · meme mountain';AU.theme='r1k';R1K.heads.forEach(h=>h.visible=true);R1K.fov=camera.fov;flash(1,1500);SFX.boom();S.zone='';chapter('THE FINAL MISSION','MEME MOUNTAIN');}
-function mmEnd(){mmClear();S.inMM=false;app.classList.remove('r1k','disco','fry');$('r1k').hidden=true;$('r1kn').style.fontSize='';$('r1k').querySelector('i').textContent='the filter is gone';R1K.rain.forEach(r=>r.s.visible=false);R1K.heads.forEach(h=>h.visible=false);camera.fov=R1K.fov;camera.updateProjectionMatrix();AU.theme=S.zone;}
-function mmWin(){if(MM.won)return;MM.won=true;X.mm=1;addAura(67000000,PL.x,PL.y+5,PL.z);SFX.win();flash(1,2500);save();
+function mmClear(){}
+function mmIntro(){}
+// the rot overlay, fov wobble and theme switch on while you are up on the mountain, and off when you come down
+function mmFx(on){if(on){app.classList.add('r1k');$('r1k').hidden=false;setText('r1kn','ROT x1,000,000');$('r1kn').style.fontSize='min(8vw,76px)';$('r1k').querySelector('i').textContent='meme mountain · optional (spiritually mandatory)';AU.theme='r1k';R1K.heads.forEach(h=>h.visible=true);R1K.fov=camera.fov;}
+  else{if(!R1K.on){app.classList.remove('r1k','disco','fry');$('r1k').hidden=true;R1K.rain.forEach(r=>r.s.visible=false);R1K.heads.forEach(h=>h.visible=false);AU.theme=S.zone;}$('r1kn').style.fontSize='';$('r1k').querySelector('i').textContent='the filter is gone';camera.fov=R1K.fov||camera.fov;camera.updateProjectionMatrix();}}
+function mmEnter(){mmBuild();warpTo(MM.x,MM.z+46,undefined,Math.PI,['MEME MOUNTAIN','every meme ever posted · the first post is at the top']);}
+function mmEnd(){if(S.inMM){S.inMM=false;mmFx(false);}}
+function mmWin(){if(MM.won)return;MM.won=true;const first=!X.mm;X.mm=1;if(first)addAura(67000000,PL.x,PL.y+5,PL.z);SFX.win();flash(1,2500);save();
   say([['sys','You reach the top of MEME MOUNTAIN. At the very peak is THE FIRST POST. It just says "first".'],['grok','GROK SEE FIRST POST. GROK UNDERSTAND EVERYTHING NOW. IT SAYS FIRST.'],['fable','The original meme. Everything else was a repost. Including us. Including this sentence.'],['astra','✨ i generated all of it. i am so sorry. i am also so proud ✨'],
-    ['marcus','BRO. ONE MILLION X. SEND IT.'],['derek','...Bro.'],['bibi','I WOULD LIKE TO TAKE CREDIT FOR THE MOUNTAIN.'],['frog','ribbit. based. ...the most based.'],['sys','You touch THE FIRST POST. The rot drops from 1,000,000x to 1x in a single frame. It was always just a post. Everyone else was replying.']],()=>{mmEnd();PL.x=0;PL.z=9;PL.y=PL.vis=.2;PL.vy=0;oWin();});}
-function mmTarget(){const n=MM.plats.find(p=>p.y0>PL.y+.5);return n?{x:n.x,z:n.z,l:'MEME MOUNTAIN · '+Math.max(0,Math.round(MM.sum.top-PL.y))+'m to the first post'}:{x:0,z:0,l:'THE FIRST POST'};}
-function mmUpdate(dt,play){MM.t+=dt;const t=MM.t,b=MM.b;U.time.value=S.t*12;camera.fov=R1K.fov+Math.sin(t*1.7)*4;camera.updateProjectionMatrix();scene.fog.color.setHSL((t*.3)%1,1,.55);U.fogColor.value.copy(scene.fog.color);
-  if(PL.y>b-1&&PL.y<b+MM.H){const R=coneR(PL.y-b)+.8,d=Math.hypot(PL.x,PL.z);if(d<R&&d>.01){PL.x*=R/d;PL.z*=R/d;}}
+    ['marcus','BRO. ONE MILLION X. SEND IT.'],['derek','...Bro.'],['bibi','I WOULD LIKE TO TAKE CREDIT FOR THE MOUNTAIN.'],['frog','ribbit. based. ...the most based.'],['sys','You touch THE FIRST POST. For one frame the rot drops from 1,000,000x to 1x. It was always just a post. Everyone else was replying.']],()=>{chapter('MEME MOUNTAIN','THE FIRST POST'+(first?' · +67,000,000 aura':' · still says "first"'));});}
+function mmTarget(){const n=MM.plats.find(p=>p.y0>PL.y+.5);return n?{x:n.x,z:n.z,l:'MEME MOUNTAIN · '+Math.max(0,Math.round(MM.sum.top-PL.y))+'m to the first post'}:{x:MM.x,z:MM.z,l:'THE FIRST POST'};}
+function mmUpdate(dt,play){MM.t+=dt;const t=MM.t,b=MM.b,ox=MM.x,oz=MM.z;
+  // the cone is solid all the way up
+  if(PL.y>b-1&&PL.y<b+MM.H){const R=coneR(PL.y-b)+.8,dx=PL.x-ox,dz=PL.z-oz,d=Math.hypot(dx,dz);if(d<R&&d>.01){PL.x=ox+dx*R/d;PL.z=oz+dz*R/d;}}
   for(const P of MM.plats){const on=PL.grounded&&Math.abs(PL.y-P.top)<.12&&Math.hypot(PL.x-P.x,PL.z-P.z)<P.r+.2;
     if(P.kind==='move'){const k=Math.sin(t*1.3+P.ph)*2.4,nx=P.ox+P.ax*k,nz=P.oz+P.az*k;if(on){PL.x+=nx-P.x;PL.z+=nz-P.z;}P.x=nx;P.z=nz;P.m.position.x=nx;P.m.position.z=nz;}
     else if(P.kind==='orbit'){const a=t*1.1+P.ph,nx=P.ox+Math.cos(a)*2.4,nz=P.oz+Math.sin(a)*2.4;if(on){PL.x+=nx-P.x;PL.z+=nz-P.z;}P.x=nx;P.z=nz;P.m.position.x=nx;P.m.position.z=nz;}
     else if(P.kind==='vert'){const nt=P.y0+Math.sin(t*1.1+P.ph)*2.2;if(on){PL.y+=nt-P.top;PL.vis=PL.y;}P.top=nt;P.m.position.y=nt-.5;}
     else if(P.kind==='blink'){const ph=(t+P.ph)%3.4,solid=ph<2.3;P.top=solid?P.y0:-999;P.m.visible=solid&&!(ph>1.8&&Math.floor(t*16)%2);}
     else if(P.kind==='bounce'&&on){PL.vy=26;PL.grounded=false;PL.jumps=1;tone(240,.3,'sine',.12,0,900);}
-    else if(P.kind==='cp'&&on&&MM.cp!==P){MM.cp=P;addAura(6700000,PL.x,PL.y+4,PL.z);toast('🏔️ CHECKPOINT · +6,700,000 aura (x1,000,000)');SFX.page();}}
-  if(play&&PL.y<b-25){const c=MM.cp;PL.x=c===MM.plats[0]?0:c.x;PL.z=c.x===0&&c.z===0?42:c.z;PL.y=PL.vis=c.top+.3;PL.vy=PL.vx=PL.vz=0;tone(110,.4,'sawtooth',.1,0,50);toast(pick(['💀 the mountain does not care','💀 fell off a meme','💀 respawned at the last checkpoint (x1,000,000)','💀 skill issue x1,000,000']));}
-  if(play&&!MM.won&&PL.grounded&&Math.abs(PL.y-MM.sum.top)<.2&&Math.hypot(PL.x,PL.z)<7)mmWin();
-  MM.post.material.rotation=Math.sin(t*2)*.3;MM.crowd.forEach((c,k)=>{const a=c.a+t*.2;c.s.position.set(Math.cos(a)*70,b+c.h+Math.sin(t+k)*4,Math.sin(a)*70);c.s.material.rotation=Math.sin(t*2+k)*.4;});
+    else if(P.kind==='cp'&&on&&MM.cp!==P){MM.cp=P;addAura(6700000,PL.x,PL.y+4,PL.z);toast('🏔️ CHECKPOINT · +6,700,000 aura (x1,000,000) · fall off and the base will send you back up');SFX.page();}}
+  if(play&&!MM.won&&PL.grounded&&Math.abs(PL.y-MM.sum.top)<.2&&Math.hypot(PL.x-ox,PL.z-oz)<7)mmWin();
+  if(PL.y<MM.sum.top-4)MM.won=false;
+  MM.post.material.rotation=Math.sin(t*2)*.3;MM.crowd.forEach((c,k)=>{const a=c.a+t*.2;c.s.position.set(ox+Math.cos(a)*70,b+c.h+Math.sin(t+k)*4,oz+Math.sin(a)*70);c.s.material.rotation=Math.sin(t*2+k)*.4;});
+  if(!S.inMM)return;
+  camera.fov=R1K.fov+Math.sin(t*1.7)*4;camera.updateProjectionMatrix();scene.fog.color.setHSL((t*.3)%1,1,.55);U.fogColor.value.copy(scene.fog.color);
   R1K.rain.forEach(r=>{if(!r.s.visible||r.s.position.y<PL.y-10){r.s.visible=true;r.s.material.map=emojiTex(pick(['🗿','💀','🔥','💯','🧠','🐸','6️⃣','7️⃣','💩','👁️','✋','🦐','🌽','📈','🤖','👑','✨','😂']));r.s.material.needsUpdate=true;r.s.position.set(PL.x+(Math.random()-.5)*60,PL.y+20+Math.random()*25,PL.z+(Math.random()-.5)*60);r.v=8+Math.random()*16;r.s.scale.setScalar(1.5+Math.random()*4);}r.s.position.y-=r.v*dt;r.s.material.rotation+=dt*5;});
-  R1K.heads.forEach((h,k)=>{const a=t*.25+k/R1K.heads.length*TAU;h.position.set(Math.cos(a)*130,PL.y+50+Math.sin(t*1.3+k)*14,Math.sin(a)*130);h.material.rotation=Math.sin(t*2+k)*.6;h.scale.setScalar(40+Math.sin(t*3+k)*14);});
+  R1K.heads.forEach((h,k)=>{const a=t*.25+k/R1K.heads.length*TAU;h.position.set(ox+Math.cos(a)*130,PL.y+50+Math.sin(t*1.3+k)*14,oz+Math.sin(a)*130);h.material.rotation=Math.sin(t*2+k)*.6;h.scale.setScalar(40+Math.sin(t*3+k)*14);});
   MM.re-=dt;if(MM.re<=0){MM.re=.5;heroRegen(true);}if(!play)return;
   MM.bk-=dt;if(MM.bk<=0){MM.bk=.7;const c=pick(MM.crowd);if(c)bubble(pick(MMLINES.concat(R1KLINES)),c.s.position.x,c.s.position.y-8,c.s.position.z);}
   MM.tst-=dt;if(MM.tst<=0){MM.tst=3;toast(pick(Math.random()<.5?CHAT:ADS));}}
-const MMSHOT=()=>[60,MM.b+40,60,0,MM.b+70,0];
+mmBuild();
+const MMSHOT=()=>[MM.x+60,MM.b+40,MM.z+60,MM.x,MM.b+70,MM.z];
 // ---- hooks
 {const ct=compassTarget;compassTarget=function(){if(S.inMM)return mmTarget();return ct();};}
-{const ar=act7Rows;act7Rows=function(){const r=ar();return S.inMM?[['mm','🏔️ CLIMB MEME MOUNTAIN · '+Math.max(0,Math.round(MM.sum.top-PL.y))+'m to go',false]].concat(r):r;};}
-{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);BST.c=Math.min(bstMax(),BST.c+dt*(X.t67.length>=67?.5:.25));if(S.inMM)mmUpdate(dt,play);};}
-{const ar=act7Reset;act7Reset=function(){ar();if(S.inMM){mmClear();S.inMM=false;}BST.c=bstMax();};}
+{const ar=act7Rows;act7Rows=function(){const r=ar();return r.concat([['mm',X.mm?'🏔️ Meme Mountain: THE FIRST POST ✓':S.inMM?'🏔️ CLIMB MEME MOUNTAIN · '+Math.max(0,Math.round(MM.sum.top-PL.y))+'m to go':'🏔️ Climb Meme Mountain (out west, optional)',!!X.mm&&!S.inMM]]);};}
+{const at=act7Target;act7Target=function(id){if(id==='mm')return S.inMM?mmTarget():{x:MM.x,z:MM.z+44,l:'MEME MOUNTAIN'};return at(id);};}
+// up on the mountain counts as "in" it; the base and the ground around it do not
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);BST.c=Math.min(bstMax(),BST.c+dt*(X.t67.length>=67?.5:.25));
+  const d=Math.hypot(PL.x-MM.x,PL.z-MM.z),on=!S.inPk&&!S.inBoss&&!S.inSlop&&!S.inSim&&d<60&&PL.y>MM.b+2.6;if(on!==!!S.inMM){S.inMM=on;mmFx(on);}
+  if(d<190&&!S.inPk)mmUpdate(dt,play);};}
+// fell off? the base sends you back up to your last checkpoint
+{const ai=act15Interact;act15Interact=function(){if(!S.dead&&!S.inPk&&MM.cp&&MM.cp!==MM.base&&Math.hypot(PL.x-MM.x,PL.z-MM.z)<46&&PL.y<MM.b+3)return{label:'⏫ BACK UP TO YOUR CHECKPOINT',fn:()=>{const c=MM.cp;warpTo(c.x,c.z,c.top-.4,undefined,['MEME MOUNTAIN','checkpoint · x1,000,000']);}};return ai();};}
+{const ar=act7Reset;act7Reset=function(){ar();if(S.inMM){S.inMM=false;mmFx(false);}MM.cp=MM.base;MM.won=false;BST.c=bstMax();};}
 ACH.push(['mm','Meme Mountaineer','touched THE FIRST POST at x1,000,000',()=>!!X.mm]);
 
 
@@ -4980,7 +4993,7 @@ const DEVP=[
   ['g','THE MAIN STORY'],
   ['p_boss','Boss fight: THE ALGORITHM',()=>{devRelics();if(S.inPk)exitPk();enterBoss();}],
   ['p_rot','ROT x1000 (after the boss)',()=>{devRelics();if(S.inPk)exitPk();startRot1000();}],
-  ['p_mm','Meme Mountain (the final mission)',()=>{devRelics();X.rot1000=1;if(S.inPk)exitPk();mmEnter();}],
+  ['p_mm','Meme Mountain (the optional climb)',()=>{if(S.inPk)exitPk();mmEnter();}],
   ['g','THE CAST'],
   ['p_cast','Every character playable, every place found',()=>{devCast();devFound();toast('🛠️ Pause menu → CAST to pick a squad.');}],
   ['g','LATE-GAME AREAS'],
