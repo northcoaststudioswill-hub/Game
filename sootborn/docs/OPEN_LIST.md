@@ -1,5 +1,12 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.86 (2026-11-27).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.87 (2026-11-27).
+
+## Built in v0.87 (continuity pass; four answers wanted)
+- 88 changes so the whole game agrees with the rules sheet and the chapters. Read the changelog list.
+- **Your call:** Celestine says "fifty years" at nine years (the dates make it fifty-three). Keep it as a round number, or change it?
+- **Your call:** Riser Nine is "nine floors of ladder" and also "forty feet under this grass". Which goes?
+- **Your call:** the pump-house sign says NINE HOUSES; the Assay has twelve. A typo, or nine fallen?
+- **To build:** the Valley on day forty is against two Houses, but those cadets still wear Teal's colours. They need another House's look.
 
 ## Built in v0.86 (the story fix list; needs your eye)
 - The script audit's fix list is in: 55 line fixes, Kael's father in the ledger, Proctor becomes Assayer (the Assay) or Tallyman (below), Dace becomes Harl. Read a few of the new lines in place.

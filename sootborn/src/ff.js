@@ -33,7 +33,7 @@ const FF = {
       { d: 1.3, cam: [0, 250, 44, 150], to: [0, 170, 40, 160], speed: 1, shake: .5, flash: 1, acts: [{ id: 'kael2', a: [0, 120], b: [0, 30], fy: -1, blade: 1, aura: 2 }].concat(ffRow(V, 6, -75, 30, 135, { fy: -1 }, 46)), big: 'GOOD.' }
     ],
     outro: [
-      { d: 2.4, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 3 }], cap: 'THE GOLD ON ME SHINES. WHAT IS UNDER IT DOES NOT.' },
+      { d: 2.4, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 3 }], cap: 'THE GILDING ON ME SHINES. WHAT IS UNDER IT DOES NOT.' },
       { d: 2.6, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THEY CHANT A NAME I BOUGHT. NOT THE ONE I WAS BORN WITH.' },
       { d: 2.8, cam: [0, 215, 110, 150, .32], to: [0, 240, 120, 150, .9], acts: [], cap: 'BEFORE THE GILDING, I WAS SOOT.', tint: 'rgba(255,240,200,.08)' },
       { d: 2.2, cam: [0, 240, 120, 150, .9], to: [0, 240, 120, 150, 1.25], acts: [], big: 'BEFORE THE FURNACE', cap: 'SIX TIERS DOWN.', tint: 'rgba(255,250,230,.35)' }
@@ -43,7 +43,7 @@ const FF = {
     era: 2, fin: { name: 'THE CROSSING', l1: 'ELEVEN STEPS ACROSS A RIVER', l2: 'I NEVER LEARNED TO SWIM', rgb: '120,200,255' }, title: 'THE FORD', sub: 'SINGLE COMBAT FOR THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 45 }, taunt: { 0: ['WHO TRAINED YOU?', 'YOU FIGHT LIKE A MINER!', 'YIELD, BOY!'] },
     voice: { at: [[1, 'VANT IS THE BEST BLADE IN HOUSE TEAL. HE HAS NEVER ONCE BEEN HUNGRY.'], [11, 'MARA USED TO SAY: AIM IT UP, NOT SIDEWAYS. I AM AIMING, MARA.'], [26, 'EVERY NIGHT I WASH THE ACCREDITED OFF MY HANDS AND CHECK THAT THE SOOT IS STILL THERE.']],
-      hurt: 'HE HITS LIKE A TALLYMAN. I HAVE BEEN HIT BY TALLYMEN.', fury: 'I DO NOT GET ANGRY UP HERE. I WAS ALREADY ANGRY WHEN I ARRIVED.', eleven: 'ONE FOR EVERY SECOND.', half: 'HE IS AFRAID NOW. NOBODY EVER TAUGHT THEM WHAT TO DO WITH THAT.' },
+      hurt: 'HE HITS LIKE A TALLYMAN. I HAVE BEEN HIT BY TALLYMEN.', fury: 'I DO NOT SPEND IT UP HERE. I BROUGHT IT UP THE LIFT WITH ME, AND I BANK IT.', eleven: 'ONE FOR EVERY SECOND.', half: 'HE IS AFRAID NOW. NOBODY EVER TAUGHT THEM WHAT TO DO WITH THAT.' },
     arts: [{ at: .7, name: 'RATION AIR', line: 'WE BLED THEIR AIR INTO A FEVER WARD. THAT WAS THE WHOLE CRIME.', panel: 'ward', stage: 1, kind: 'storm', rgb: '120,220,200', hex: '#78dcc8' }, { at: .36, name: 'LITTLE EMBER', line: 'THEY CALLED HER LITTLE EMBER. THEN THEY LIT THE FURNACE.', panel: 'furnace', kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }],
     foes: [{ id: 'vant', name: 'Captain Vant', kind: 'captain', hp: 120, sc: 1.12 }],
     intro: [
@@ -104,7 +104,7 @@ const FF = {
     foes: [{ id: 'voss', name: 'Assayer Voss', kind: 'warden', hp: 130, sc: 1.28, k2: { slam: 1 } }],
     voice: { at: [[1, 'THE ASSAYERS ARE MEANT TO WATCH. THIS ONE HAS BEEN SELLING OUR POSITIONS TO HOUSE TEAL.'], [14, 'HE FIGHTS LIKE A MAN WHO HAS ONLY EVER HIT PEOPLE WHO WERE NOT ALLOWED TO HIT BACK.'], [30, 'I KNOW THAT KIND OF MAN. I GREW UP UNDER THEIR BOOTS.']],
       hurt: 'A HALBERD. OF COURSE IT IS A HALBERD.', fury: 'ANGER IS FOR EQUALS, SHE TOLD ME. THEN LET US BE EQUALS.', half: 'HE LOOKS AT HIS OWN BLOOD AS IF IT WERE A CLERICAL ERROR.', eleven: 'ONE FOR EVERY SECOND. I HAVE PLENTY TO SPARE.' },
-    arts: [{ at: .54, name: 'WARM THING', line: 'SHE LIT A FIRE ON A VALVE BLOCK WHEN WE WERE NINE. HANDS, KAEL. EVERYTHING IS HANDS.', panel: 'hands', kind: 'rise', rgb: '255,190,90', hex: '#ffbe5a' }, { at: .72, name: 'THE AUDIT', line: 'THEY CAME DOWN IN LIGHT TO COUNT US. TONIGHT I DO THE COUNTING.', panel: 'lift', kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { at: .36, name: 'BALANCED', line: 'SHE SAID "BALANCED" WHEN THE DOORS CLOSED. I HAVE CARRIED THE REMAINDER EVER SINCE.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.82)' }],
+    arts: [{ at: .54, name: 'WARM THING', line: 'SHE LIT A FIRE ON A VALVE BLOCK WHEN WE WERE NINE. HANDS, KAEL. EVERYTHING IS HANDS.', panel: 'hands', kind: 'rise', rgb: '255,190,90', hex: '#ffbe5a' }, { at: .72, name: 'THE AUDIT', line: 'THEY CAME DOWN IN LIGHT TO COUNT US. TODAY I DO THE COUNTING.', panel: 'lift', kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { at: .36, name: 'BALANCED', line: 'SHE SAID "BALANCED" WHEN THE DOORS CLOSED. I HAVE CARRIED THE REMAINDER EVER SINCE.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.82)' }],
     intro: [
       { d: 3.0, cam: [-60, 250, 150, 150, .18], to: [0, 150, 62, 150, .32], acts: [{ id: 'voss', a: [34, -8], blade: 2, sc: 1.28, fx: -1, fy: .3 }, { id: 'cadv1', a: [-6, 14], pose: 'kneel', fx: 1, fy: -.3 }, { id: 'cadv2', a: [8, -30], pose: 'kneel', fx: 1, fy: .4 }, { id: 'kael2', a: [-70, 6], b: [-44, 4], fx: 1, fy: 0, blade: 1 }], big: 'THE ASSAYER', cap: 'THE ASSAY. DAY THIRTY-ONE. A STORM OVER THE VALLEY.' },
       { d: 2.6, ...cu(34, -8, 1.5, 2.0, 18), acts: [{ id: 'voss', a: [34, -8], blade: 2, sc: 1.28 }], cap: 'ASSAYER VOSS CAME DOWN FROM THE DAIS TO FINISH HOUSE VIOLET HIMSELF.' },
@@ -200,15 +200,15 @@ FF.keepEnd = () => { const d = FF.keep(); d.breaks = 1; delete d.endAt; d.winTex
   d.voice = Object.assign({}, d.voice, { at: [[1, 'THE LAST DAY. HER SON HOLDS THE KEEP.'], [8, 'IF I PUT HIM ON HIS KNEES IN FRONT OF HER, SHE WILL HAVE TO PIN THE SUN ON ME HERSELF.'], [17, 'LUCAN AUREL. HER CHIN, HER HANDS, HER WAY OF LOOKING PAST YOU.'], [27, 'SHE IS WATCHING FROM THE DAIS. SHE DOES NOT KNOW MY FACE. SHE MADE IT.'], [39, 'SHE CALLED SEREN LITTLE EMBER. I WONDER WHAT SHE CALLS HIM.']] });
   d.outro = [
     { d: 2.4, ...cu(26, -6, 1.7, 2.4, 14), flash: 1, sfx: 'steel', shake: .6, acts: [{ id: 'lucan', a: [26, -6], fx: -1, fy: .2, guard: 1, blade: 1, sc: 1.08 }, { id: 'kael2', a: [4, -3], blade: 1, fx: 1, fy: -.2, aura: 3, hold: 3 }], cap: 'THE ELEVENTH COMES DOWN ON HIS BLADE. IT BREAKS A HAND ABOVE THE HILT.' },
-    { d: 3.0, cam: [40, 170, 64, 160], to: [14, 132, 56, 180], acts: [{ id: 'celestine', a: [30, -64], fx: -.3, fy: 1 }, { id: 'lucan', a: [26, -6], pose: 'kneel', fx: -1, fy: .2, sc: 1.08 }, { id: 'kael2', a: [-6, 0], blade: 1, fx: 1, fy: -.2, aura: 2 }], cap: 'HE GOES TO HIS KNEES IN FRONT OF HIS MOTHER. SHE DOES NOT GET UP.' }
+    { d: 3.0, cam: [40, 170, 64, 160], to: [14, 132, 56, 180], acts: [{ id: 'celestine', a: [30, -64], fx: -.3, fy: 1 }, { id: 'lucan', a: [26, -6], pose: 'kneel', fx: -1, fy: .2, sc: 1.08 }, { id: 'kael2', a: [-6, 0], blade: 1, fx: 1, fy: -.2, aura: 2 }], cap: 'HE GOES TO HIS KNEES IN FRONT OF HIS MOTHER. SHE RISES, AND LEANS FORWARD.' }
   ].concat(d.outro); return d; };
 // the Valley, day forty: it used to open the game and explain everything. In the last dream it needs none of that
-FF.valley40 = () => { const d = FF.valley(); d.skip = 1; d.boots = 1; d.era = Math.max(d.era || 0, 4); d.hero = Object.assign({}, d.hero, { cape: CLOAK }); if (d.intro && d.intro.length > 2) { d.intro = [d.intro[0], d.intro[d.intro.length - 1]]; d.intro[0] = Object.assign({}, d.intro[0], { cap: 'DAY FORTY. TWO HOUSES HAVE COME FOR THE VALLEY.' }); d.intro[1] = Object.assign({}, d.intro[1], { cap: 'FORTY CADETS BEHIND ME. NOT ONE OF THEM KNOWS WHAT I AM.' }); } return d; };
+FF.valley40 = () => { const d = FF.valley(); d.skip = 1; d.boots = 1; d.era = Math.max(d.era || 0, 4); d.hero = Object.assign({}, d.hero, { cape: CLOAK }); if (d.intro && d.intro.length > 2) { d.intro = [d.intro[0], d.intro[d.intro.length - 1]]; d.intro[0] = Object.assign({}, d.intro[0], { cap: 'DAY FORTY. TWO HOUSES HAVE COME FOR THE VALLEY.' }); d.intro[1] = Object.assign({}, d.intro[1], { cap: 'SEVENTY CADETS BEHIND ME. NOT ONE OF THEM KNOWS WHAT I AM.' }); } d.foeName = 'Two Houses'; d.waves = d.waves.map(w => w.map(e => Object.assign({}, e, { name: 'Cadet' }))); if (d.outro && d.outro.length > 1 && d.outro[d.outro.length - 1].big === 'BEFORE THE FURNACE') d.outro = d.outro.slice(0, -1); return d; };
 // ---- the dreams: what happens between the fights, told below, the old way
 const DREAM1 = () => [
   { music: 'mystery' }, { card: 'THAT NIGHT', sub: 'Kael does not dream of the furnace. For once it runs forward.', min: 1.6, max: 5 },
   { panel: 'gild' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
-  { narr: 'Half a year after the furnace a woman finds me in the old tunnel. She was Accredited once. She still has the height, and the gold in her eyes, and nothing else they gave her.' },
+  { narr: 'A hundred and sixty days after the furnace a woman finds me in the old tunnel. She was Accredited once. She still has the height, and the gold in her eyes, and nothing else they gave her.' },
   { say: 'ilse', t: 'They do not fear soot. They fear nothing that kneels. They only fear what looks like them.' },
   { say: 'ilse', t: 'So I am going to make you look like them. It will hurt more than anything that has happened to you. Except one thing.' },
   { say: 'kael', t: 'Why would one of them do this for one of us?' },
@@ -276,7 +276,7 @@ const DREAM1 = () => [
   { say: 'brand', t: 'When you get up there, boy, do not let them teach you it was ever a fair fight. It was never a fight. That is what the halberds are for.' },
   { fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; } },
   { fade: 'out' }, { panel: null },
-  { card: 'Three years of that.', sub: 'Then they sent him up Lift Zero under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
+  { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'Lift Zero. Up under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
   // then the lift opens on grass: the first days of the Assay
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'Four years after the furnace the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },

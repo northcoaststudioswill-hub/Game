@@ -1,4 +1,24 @@
-# SOOTBORN — changelog (latest v0.86 · 2026-11-27)
+# SOOTBORN — changelog (latest v0.87 · 2026-11-27)
+
+## v0.87 · 2026-11-27 — a full continuity pass
+After v0.86 put the fix list in, every on-screen line was read again, in four parts (Part One below, the Assay, Part Two, the comic-book levels), against the Script Rules sheet, the canon dates, the story bible and the book and film chapters. 88 changes.
+
+- **Tavi is he everywhere** (C1): "drown in his own bed", his tongue out when he concentrates, "your brother's", Harl's letter, the Count hall window ("a boy of twelve with chalk on his fingers"), Lucan's "you have a brother".
+- **Ages and spans** (T6, D3): Celestine is seventy at six years ("what the Gilding is for"); her own Assay is forty-four years before the furnace; Dorian's bread is fifty days old; Ilse finds him a hundred and sixty days after the furnace; the High Docks card counts from the furnace; the Balancing is in his first year at the Post; the docks memory and her room are dated from the furnace.
+- **The Accredited never say we** (S2): Ilse on the barge, Lucan, Oswin, Petra, Merrow, the Teal cadets, Rook.
+- **The Assay in order:** the Standard follows the Island (Teal comes for the standard he took); seventy cadets behind him on day forty, against two Houses, not Teal; the Valley no longer ends on the old "BEFORE THE FURNACE" shot; at the Keep Celestine rises and leans forward, as in the chapter; Brand struck Hollis in the arm.
+- **Celestine** (C5, C6): she has not forgotten Ashgate; the doors stood open eleven seconds on a worn seat, not for show; she had the burns once and let them be taken.
+- **Kael** (S4, S6): no contractions in his narration; he never says he is angry (the Ember Ring choice, the Ford, the Scuffle).
+- **Motifs:** seventeen suns on the bunk wall, the last one half finished (the choice is now "Finish the seventeenth"); the shift song is five pitches; Kael hummed it himself at six years.
+- **The fallback fights** (F3) now agree with the comic-book levels: Rook is the boss on the docks and the lamps are already lit; Tavi is on his left on the Stair; the Riser order "came to my desk" whatever you chose.
+- **Small:** Harl's name in his locker scene; Kestrel was a junior on the Array board; Old Orin, not Hollis, stands in Bay Three at eight years; Tier Four's names list says one thousand and sixty; no tap prompt on the splash; the boots from day thirty-one in About; dev-menu Ford and Pinning cards in the standard form.
+
+**Checked:** each fix matched exactly once before it was made. The whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. The Valley's enemies on day forty still wear Teal's colours (only their names changed); they need another House's look. Left for you: Celestine's "fifty years" at nine years (fifty-three by the dates); Riser Nine is "nine floors of ladder" but also "forty feet under this grass"; the pump-house sign says NINE HOUSES.
+
 
 ## v0.86 · 2026-11-27 — the story made to match the script rules
 The fix list from the script audit (`muse/sootborn-script-audit/FIX-LIST.md`, written against v0.84 on another branch) is now in the game. The voiced Chapter One films were made from the fixed story; the game now tells the same one.

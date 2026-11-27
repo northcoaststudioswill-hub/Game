@@ -26,7 +26,7 @@ FF.voss2d = () => ({ era: 3, d2: 1, title: 'ON THE GROUND', sub: 'HALDEN VOSS - 
   hero: { id: 'kael2', hp: 9, pow: 2, blade: 1, fury0: 80 }, taunt: { 0: ['THERE IS NO COLUMN FOR THIS.', 'YOU WILL BE STRUCK FROM EVERY BOOK.', 'I AM AN ASSAYER.'] },
   foes: [{ id: 'voss', name: 'Assayer Voss', kind: 'baton', hp: 60, sc: 1.1, k2: { triple: 1 } }],
   voice: { at: [[1, 'HE IS ON THE GROUND WITH THE REST OF US. THE STRAPS ARE CUT. HE DOES NOT KNOW HOW TO STAND IN MUD.'], [9, 'THIRTY DAYS HE HOVERED UP THERE AND WROTE. NOW HE HAS TO LOOK UP TO SEE ME.'], [18, 'HE SWINGS LIKE BRAND. OF COURSE HE DOES. BRAND WAS TAUGHT BY MEN LIKE THIS.']], hurt: 'A HALBERD BUTT. BETWEEN THE SHOULDERS. THE SAME PLACE. EVERY TIME.', fury: 'RECOMMEND REMOVAL. HE WROTE THAT. ABOUT ME.', half: 'HE HAS STOPPED SAYING ASSAYER. HE IS SAYING PLEASE. THEY DO HAVE THE WORD.', eleven: 'ELEVEN. ONE FOR EVERY SECOND HE WOULD HAVE GIVEN ME.' },
-  arts: [{ at: .6, name: 'THE PAGE', line: 'ORIGIN UNVERIFIED. FIGHTS LIKE A LABOURER. LIT A FIRE ON THE THIRD DAY. HE HAD IT ALL, AND COULD NOT READ IT.', panel: 'kael', kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { at: .25, name: 'HOLLIS', line: 'A HALBERD IN THE BACK FOR HUMMING. HE FINISHED THE BAR HE WAS ON. THIS IS THE BAR.', panel: 'pipe', kind: 'rise', rgb: '255,120,60', hex: '#ff783c' }] });
+  arts: [{ at: .6, name: 'THE PAGE', line: 'ORIGIN UNVERIFIED. FIGHTS LIKE A LABOURER. LIT A FIRE ON THE THIRD DAY. HE HAD IT ALL, AND COULD NOT READ IT.', panel: 'kael', kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { at: .25, name: 'HOLLIS', line: 'A HALBERD IN THE ARM FOR HUMMING. HE FINISHED THE BAR HE WAS ON. THIS IS THE BAR.', panel: 'pipe', kind: 'rise', rgb: '255,120,60', hex: '#ff783c' }] });
 
 
 MAPS.vcamp = buildMap({
@@ -78,13 +78,13 @@ const MISSIONS = {
       if (t.id === 'petra') return Dialogue.start(MF('petra') ? [say('petra', 'One is watching you do it. One is not too proud to watch.')] : [
         say('petra', 'Sorrel. You are the one who walked out of the Pairing with bread in your pack. Aldane\'s bread.'),
         say('kael', 'One has not eaten it.'),
-        say('petra', 'No. Nobody could. ...There are forty of us and a valley full of deer and not one of us has ever lit a fire. At home one rings.'),
+        say('petra', 'No. Nobody could. ...There are forty in this House and a valley full of deer, and not one has ever lit a fire. At home one rings.'),
         say('petra', 'The Assayers will not come down. They hover up there on their boots and write. A House that cannot feed itself is a result, to them. They note it and price it.'),
         narr('Forty heirs of the people who ration my tier\'s air, and they are three days from starving beside a river. I ought to enjoy it more than I do.'),
         fx(() => MSET('petra'))]);
       if (t.id === 'oswin') return Dialogue.start(MF('oswin') ? [say('oswin', 'If you get that pump to draw, I shall carry the water myself. Do not tell my mother.')] : [
         say('oswin', 'You know what this is for? The Assay. My father told me the night before the lift.'),
-        say('oswin', 'Twelve Houses send their heirs the year they come of age. One wins. The winner is given a post on the Spire. The rest of us go home and are told for the rest of our time exactly where we finished.'),
+        say('oswin', 'Twelve Houses send their heirs the year they come of age. One wins. The winner is given a post on the Spire. The rest go home and are told for the rest of their time exactly where they finished.'),
         say('oswin', 'He finished ninth. He has been ninth for thirty years. He signs things a man who finished eighth hands him.'),
         say('kael', 'And the ones who do not walk out of the Pairing?'),
         say('oswin', '...One does not ask. Their lines are closed. There is a word for it. Balanced.'),
@@ -259,7 +259,7 @@ Object.assign(MISSIONS, {
       : [say('warden', ['CLERK. THE HALL IS CLOSED.', 'YOUR DESK, CLERK.', 'NOTED.'][k % 3]), narr('A clerk out of his chair after the bell is not a crime up here. It is a note. I let him walk me back to my desk, and wait for his lamp to turn.')],
     use(t) {
       if (t.id === 'motto') return Dialogue.start([narr('Cut into the stone over the first row, and gilded: A BALANCED LINE IS A QUIET LINE.'), narr('Under it, smaller, older, half polished away: EVERY LINE IS A PERSON. Somebody had the first one cut over it. Somebody else, once, had cut the second.')]);
-      if (t.id === 'win') return Dialogue.start([narr('A window. Night, and the weather under it like a floor. Under that, rock. Under that, a square with a Pillar in it, and a girl of twelve with chalk on her fingers.')]);
+      if (t.id === 'win') return Dialogue.start([narr('A window. Night, and the weather under it like a floor. Under that, rock. Under that, a square with a Pillar in it, and a boy of twelve with chalk on his fingers.')]);
       if (t.id === 'deskA') return Dialogue.start([narr('Clerk Third\'s desk. A dish of surface greens, half eaten, going soft. Nell skims four crates in forty for a ward of forty children. He has left more than that on the plate.'), fx(() => { if (!MF('greens')) rage(1); MSET('greens'); })]);
       if (t.id === 'deskB') return Dialogue.start([narr('A child\'s drawing, pinned inside the kneehole where no auditor would look. A house. A tall person. A small person. A yellow circle.'), narr('So they draw it yellow as well.')]);
       if (t.id === 'mydesk') return Dialogue.start([narr('My desk. Fourth ring, third row. Eleven hundred lines waiting in the morning tray, and a pen I have worn a groove in.')]);
@@ -284,7 +284,7 @@ Object.assign(MISSIONS, {
       if (t.id === 'fen') return Dialogue.start([say('fen', "Go on, little one. I'm only coughing. Coughing's not a report.")]);
       if (t.id === 'kit') return Dialogue.start([say('kit', "Freight Three goes up nine floors. Sign still says six. Tell your brother, if he's anywhere.")]);
       if (t.id === 'lift5') return Dialogue.start([narr("Lift Zero. It came down empty once, with a leaf in it. I've still got the leaf. It's gone brown and I've still got it.")]);
-      if (t.id === 'notice5') return Dialogue.start([narr('"COMMITTED: K. BRENNICK. FAILED SEAL, FURNACE LINE. LET THE ACCOUNT BALANCE." Five years old and they have never taken it down.'), narr("Mara says there's nothing in his tin. She says it like it's good news and won't say why.")]);
+      if (t.id === 'notice5') return Dialogue.start([narr('"COMMITTED: K. BRENNICK. FAILED SEAL, FURNACE LINE. LET THE ACCOUNT BALANCE." Near five years old and they have never taken it down.'), narr("Mara says there's nothing in his tin. She says it like it's good news and won't say why.")]);
       if (t.id === 'pillarSun') return Dialogue.start([
         narr("Orin's chalk. Engineer's gold. You're not supposed to have it, which is how you know it's the right colour."),
         narr("Round first. Then the rays. She did seventeen. I counted them on our wall every night till Kael went, and then I counted them for him."),
@@ -329,10 +329,10 @@ Object.assign(MISSIONS, {
         say('oswin', '...Noted, Sorrel. That is the word, is it not. I have said it all my time. I do not think I ever meant it before.'),
         narr('It is their only word for thanks, and it means: I have written down what you owe me. He meant the other thing. He did not have a word for it. None of them do.'), fx(() => { MSET('e_oswin'); rage(1); })]);
       if (t.id === 'cadt1') return Dialogue.start([
-        say('cadt1', 'You are wondering why thirty of Teal sleep under a Violet standard. Our House was bought before the first day. Three standards credited. Our captain told us so, to hearten us.'),
+        say('cadt1', 'You are wondering why thirty of Teal sleep under a Violet standard. One\'s House was bought before the first day. Three standards credited. The captain said so, to hearten one.'),
         say('cadt1', 'One found one did not want to win something already paid for. Yours was only hungry. Hungry is at least one\'s own.'),
         narr('He has no idea how close that is to something Mara would say. I do not tell him. He would have to be told who Mara is, and then what a tier is, and then why.'), fx(() => MSET('e_teal'))]);
-      if (t.id === 'cadv1' || t.id === 'cadv2') return Dialogue.start([narr(t.id === 'cadv1' ? 'She is oiling a blade she will use tomorrow on somebody she sat beside at lessons. She is humming. I know it. It is the shift song, in a bright key, with a turn on the end I have never heard. She says it is the Count-Out, a nursery game. One, two, the line is true. Her nurse sang it, and her nurse before. They took it up the lift with them when they left us down there, and forgot whose it was.' : 'He is writing a letter by the fire. The Assayers read them all. He knows. He is writing it anyway.')]);
+      if (t.id === 'cadv1' || t.id === 'cadv2') return Dialogue.start([narr(t.id === 'cadv1' ? 'He is oiling a blade she will use tomorrow on somebody she sat beside at lessons. She is humming. I know it. It is the shift song, in a bright key, with a turn on the end I have never heard. She says it is the Count-Out, a nursery game. One, two, the line is true. Her nurse sang it, and her nurse before. They took it up the lift with them when they left us down there, and forgot whose it was.' : 'He is writing a letter by the fire. The Assayers read them all. He knows. He is writing it anyway.')]);
       if (t.id === 'cairns') return Dialogue.start([narr('Nine of ours now, and the row has been started again behind it for the thirty who came over from Teal. They build them properly. Petra showed them; I showed Petra.'), narr('Not one has BALANCED on it. I did not ask for that. They stopped by themselves around day thirty.')]);
       if (t.id === 'board2') return Dialogue.start([narr('The board. Violet is first. It has been repainted so many times the wood has swollen.'), narr('POSITIONS ARE PROVISIONAL. After tomorrow they are not. Oswin\'s father has looked at a board like this one for thirty years.')]);
       if (t.id === 'wnote') return Dialogue.start([narr('Tucked under the top log, where only somebody who builds the fire would look: a strip of gauge paper, in an engineer\'s square hand.'), narr('"Stack pressure, two. It has held twenty-four days. Whoever you are: why did you care whether it would? K.D."'), narr('I put it in my collar with the page and the washer. It is getting crowded in there.')]);
@@ -341,7 +341,7 @@ Object.assign(MISSIONS, {
         narr('He is standing on the far bank under a white cloth, alone, with his blade left on the stones behind him. Lucan Aurel. The High Auditor\'s son.'),
         say('lucan', 'I asked for the truce. The Assayers are annoyed. They cannot grade a conversation.'),
         say('lucan', 'Tomorrow I hold the keep and you come up the ridge, and my mother watches. I should like, once, to have spoken to you where it does not count.'),
-        say('lucan', 'You fight as if you hate the ground you are standing on. Nobody taught us that. Where does one learn it?'),
+        say('lucan', 'You fight as if you hate the ground you are standing on. Nobody taught one that. Where does one learn it?'),
         { choice: [
           { t: 'One learns it by being under it.', fx: () => { rage(1); }, then: [say('lucan', '...I do not understand that.'), say('kael', 'No.'), say('lucan', 'I should like to. I think that is the difference between us, and I think it is not to my credit.'), narr('He is eighteen and he meant it. It is the most dangerous thing anybody said to me in fifty days. It is very hard to hate somebody who would like to understand.')] },
           { t: 'One had a good teacher.', then: [say('lucan', 'Mine told me the first cut is a question and the second is the answer. Yours seems to have skipped the question.'), narr('He smiled. He has his mother\'s mouth, and none of what she does with it.')] }] },
@@ -350,7 +350,7 @@ Object.assign(MISSIONS, {
         return Dialogue.start([
           narr('I sit down. The pack is under my knees. I know what is at the bottom of it.'),
           fx(() => Sound.play('heart')),
-          narr('Dorian Aldane\'s bread. Half a heel, forty days old. He broke it on the lift and gave me the larger piece, and said: one ought to go up on something.'),
+          narr('Dorian Aldane\'s bread. Half a heel, fifty days old. He broke it on the lift and gave me the larger piece, and said: one ought to go up on something.'),
           narr('It is a stone. I eat it. All of it. It takes most of an hour, and it is the worst thing I have ever done slowly.'),
           narr('Tomorrow I take the keep, and they pin the sun on me, and I go to work for the woman who burned my wife. That was always the plan. Tonight it is only a fire, and I am the one who knows how.'),
           narr('Hands, Kael. Everything is hands.')], () => Mission.finish()); }
@@ -375,8 +375,8 @@ Object.assign(MISSIONS, {
         say('petra', 'I stood the ford with Merrow from dusk until the second watch. He will say so. One dislikes needing a Teal to say so.'),
         narr('Four people. Petra, Oswin, Corin who keeps the stores, and me. And thirty of House Teal under our standard, who were told nothing and hear everything.'), L('petra')]);
       if (t.id === 'merrow') return Dialogue.start([
-        say('merrow', 'You will want it to be one of us. Thirty of Teal asleep under a Violet standard. Who else? One would think it too.'),
-        say('merrow', 'I stood the ford with Lune from dusk to the second watch. Ask her. Then ask yourself who gains if Violet turns on its Teal the week before the keep.'),
+        say('merrow', 'You will want it to be one of the Teal. Thirty of them asleep under a Violet standard. Who else? One would think it too.'),
+        say('merrow', 'I stood the ford with Lune from dusk to the second watch. Ask her. Then ask yourself who gains if Violet turns on its Teal three weeks before the keep.'),
         narr('He is right, and he knows I know it. That is the cleverest part of the whole thing. Whoever lit that lamp lit it knowing where everybody would look.'), L('merrow')]);
       if (t.id === 'oswin') return Dialogue.start([
         say('oswin', 'If you are looking at prints, it is not my leg you want. The Vey girl opened the right one, two days ago. I have been dragging the right ever since, and I should be obliged if you did not stare.'),
@@ -439,10 +439,10 @@ function walkCircle(atFire) {
         ...[[150, 4], [164, -14], [170, 22], [182, 2], [156, 36], [144, -30]].map(([x, y], i) => ({ t: 'crowd', x, y, s: World.sheetFor(i % 2 ? 'cadt2' : 'cadt1'), k: i + 20 }))],
       npcs: [
         ...Array.from({ length: 13 }, (_, i) => { const a = (-30 + i * 20) * Math.PI / 180, j = (i * 7) % 5 - 2; return { id: i % 3 === 2 ? 'cadv2' : 'cadv1', x: Math.cos(a) * (92 + j * 3), y: -Math.sin(a) * (46 + j * 2), r: 9 }; }),
-        N('petra', -50, -16, 'PETRA LUNE', [...(G.flags.campSat === 'petra' ? [narr('She shifts her slate so that I can read it over her shoulder. She has not done that for anybody else in twenty-five days.')] : []), say('petra', 'Forty of us, and nobody has sat down. One has seen that once before: the morning they read the pairings.'), narr('She has her slate under her arm. She is the only one here who looked at the fire before she looked at me.')]),
+        N('petra', -50, -16, 'PETRA LUNE', [...(G.flags.campSat === 'petra' ? [narr('She shifts her slate so that I can read it over her shoulder. She has not done that for anybody else in twenty-five days.')] : []), say('petra', 'Forty of Violet, and nobody has sat down. One has seen that once before: the morning they read the pairings.'), narr('She has her slate under her arm. She is the only one here who looked at the fire before she looked at me.')]),
         N('oswin', 52, -14, 'OSWIN HALE', [...(G.flags.campSat === 'oswin' ? [narr('He gives me the smallest nod there is. I showed him where the grain runs, on day three.')] : []), say('oswin', 'One brought the water up before anybody asked. It seemed the night for it.'), narr('He is standing on the leg. He will not let any of them see him favour it.')]),
         N('corin', -58, 10, 'CORIN ASHBY', [...(G.flags.campSat === 'corin' ? [narr('He does not quite look at me. On day three I did his sum for him and he wrote it down as his own.')] : []), say('corin', 'One has the tally here, should it be wanted. Eleven flasks.'), narr('Eleven. He says it the way a man says his own name.')]),
-        N('merrow', 128, 12, 'MERROW', [say('merrow', 'Thirty of us at the edge of your light, Sorrel. Notice that nobody has asked us to come nearer.'), narr('Nobody has. That is mine to mend, and it will not be mended tonight.')]),
+        N('merrow', 128, 12, 'MERROW', [say('merrow', 'Thirty of Teal at the edge of your light, Sorrel. Notice that nobody has asked us to come nearer.'), narr('Nobody has. That is mine to mend, and it will not be mended tonight.')]),
         N('cadv1', 34, 28, 'A CADET IN A BORROWED CLOAK', [say('cadv1', 'Is it true that below the rock they burn their dead? One heard it from a porter. One did not believe it.'), narr('They burn more than their dead. I told her I had heard the same.')])],
       spots: [
         atFire ? { id: 'fire', x: 0, y: 2, r: 15, reach: 34, ph: 30, name: 'THE FIRE', verb: 'SAY THE NAME', talk: () => atFire } : { id: 'fire', x: 0, y: 2, r: 15, reach: 34, ph: 30, name: 'THE FIRE', verb: 'SAY THE NAME', exit: 1, talk: () => [] },
@@ -517,7 +517,7 @@ function walkCampDay() {
       spots: [
         { id: 'pack', x: -170, y: 6, r: 7, reach: 26, ph: 14, name: 'MY PACK', verb: 'LOOK', talk: () => [narr('Half a loaf, wrapped in a lift ticket. He tore it down the middle on the way up and held this half out before I had said a word to him.'), narr('Dorian Aldane. Sixteen. I have not eaten it. I am not going to think about why.')] },
         { id: 'rank', x: 170, y: -30, r: 8, reach: 26, ph: 60, name: "THE ASSAYERS' BOARD", verb: 'READ', talk: () => [narr('Twelve bars, repainted from the air each dawn. Violet is eleventh. Under the bars, in small clean letters: POSITIONS ARE PROVISIONAL. DEBTS ARE NOT.'), narr('It is the shift rota. I would know it anywhere. They have only put Houses where we put hands.')] },
-        { id: 'ring', x: 0, y: 2, r: 12, reach: 32, ph: 16, name: 'THE COLD FIRE RING', verb: 'SIT DOWN', exit: 1, talk: () => [narr('Nine stones and three days of ash. Nobody here has ever had to light anything.'), { choice: [
+        { id: 'ring', x: 0, y: 2, r: 12, reach: 32, ph: 16, name: 'THE COLD FIRE RING', verb: 'SIT DOWN', exit: 1, talk: () => [narr('Nine stones and no ash. Nobody here has ever had to light anything.'), { choice: [
           sit('Sit by Oswin and the wet wood.', ['oswin', say('oswin', 'One had rather hoped nobody would.'), narr('We do not talk. I take the blunt blade off him and show him where the grain runs. Below, a child knows that. He watches my hands and not the wood, and says nothing about what he sees on them.')]),
           sit('Sit by Petra and her slate.', ['petra', say('petra', 'You may sit. You may not read over one\'s shoulder.'), narr('I read over her shoulder. Forty names, a column for bread, a column for water, and a third she has not headed yet. Below we would have headed it OWED.')]),
           sit('Sit by Corin and his count.', ['corin', say('corin', 'Sit, then. Tell one whether twelve is enough.'), narr('It is not enough. A flask every four days is twelve, and the season is fifty. I say so. He writes it down as if it had been his.')])] }] }] } };
@@ -617,7 +617,7 @@ function walkRing(n) {
       say('sable', "Thin tonight. Tier Four's crates didn't come up. Don't ask me why. I only read the chalk."),
       narr('She was asking me why. I am the Count. If a tier stops sending crates up, it is because somebody on my floor has stopped sending air down.'),
       { choice: [
-        pick('"I\'ll find out."', 1, [say('you', "I'll find out."), say('sable', 'Clerk will want the kale, then.'), narr('Loudly. I had said I, and not one. A year of practice, and it fell out of my mouth over a crate of kale.')]),
+        pick('"I\'ll find out."', 1, [say('you', "I'll find out."), say('sable', 'Clerk will want the kale, then.'), narr('Loudly. I had said I, and not one. Four years of practice, and it fell out of my mouth over a crate of kale.')]),
         pick('"One will take what there is."', -1, [say('you', 'One will take what there is.'), say('sable', 'Noted.'), narr('She put a stalk of something in with it that I had not paid for. It is the nearest she comes to saying anything.')])] }],
       [say('sable', 'Come back when there are crates, Clerk.')])
     : one('sable', [
@@ -693,7 +693,7 @@ function walkCampNight() {
   const npcs = [
     N('petra', -70, -12, 'PETRA LUNE', [say('petra', 'One had you down as lost. One had ruled the line and everything.'), narr('She rubbed something off her slate with her thumb. Then she put the slate under her arm and fell in a pace behind me, without being asked.')]),
     N('oswin', 6, 8, 'OSWIN HALE', [say('oswin', 'Is that... one is not permitted to touch them. It is the only rule they have.'), say('you', 'One added a line.'), narr('He looked at the hem, and at the blood on it, and then he got up off his log. He had not stood up for anybody in thirty-one days. I do not think he knew he had done it.')]),
-    N('cadt1', 104, 8, 'A CADET OF HOUSE TEAL', [say('cadt1', 'You are on our side of the fire, Violet.'), narr('Then she saw the white, and the rest of it went out of her mouth unfinished. She had been told since she could walk what to do when that colour came toward her. Nobody had told her what to do about who was inside it.')]),
+    N('cadt1', 104, 8, 'A CADET OF HOUSE TEAL', [say('cadt1', 'You are on Teal\'s side of the fire, Violet.'), narr('Then she saw the white, and the rest of it went out of her mouth unfinished. She had been told since she could walk what to do when that colour came toward her. Nobody had told her what to do about who was inside it.')]),
     ...spots0.map(([x, y, c], i) => ({ id: ['cadv1', 'cadv2', 'cadt1', 'cadt2'][c], x, y, r: 8, crew: 1, key: 'c' + i }))];
   return { era: 4, d2: 1, title: 'THE CLOAK', sub: 'THE ASSAY. DAY THIRTY-ONE, AFTER DARK', bg: 'storm', arena: { kind: 'ring', rx: 196, ry: 72 }, music: 'mystery', hero: { id: 'kael3', hp: 9, pow: 2, blade: 0, fury0: 0 },
     walk: { id: 'campnight', spawn: [-176, 30], clear: 220, npcs,
@@ -765,7 +765,7 @@ Object.assign(CAST, {
 });
 Object.assign(MOUTH, { cel20: 'flat', proc50: 'flat' });
 MISSIONS.ember = {
-  map: 'raid', sheet: 'cel20', grey: 1, where: 'An Assay · fifty years before the furnace', spawn: [2, 7, 3], toast: 'The pump house is north. Nobody is to see her.', hint: 'B: throw a pebble · hold A to work · watch the lamps turn',
+  map: 'raid', sheet: 'cel20', grey: 1, where: 'An Assay · forty-four years before the furnace', spawn: [2, 7, 3], toast: 'The pump house is north. Nobody is to see her.', hint: 'B: throw a pebble · hold A to work · watch the lamps turn',
   npcs: () => MF('shut') ? [] : [
     mG('proc50', 12, 8, 3, [[19, 8, 3, 1.4], [19, 13, 0, 1.6], [13, 13, 2, 1.4], [13, 8, 1, 1.6]]),
     mG('proc50', 22, 4, 0, [[22, 4, 2, 2], [22, 4, 0, 1.6], [22, 11, 0, 1.5], [22, 11, 2, 2], [22, 4, 1, 1.4]]),

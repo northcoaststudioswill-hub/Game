@@ -18,13 +18,13 @@ FF.riser = () => ({
   waves: [[{ id: 'warden', name: 'Warden', kind: 'warden', hp: 26, sc: 1.1 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }],
     [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 30, sc: 1.15 }, { id: 'warden', name: 'Warden', kind: 'warden', hp: 30, sc: 1.15 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }]],
   onWave: (w, B) => { B.p.fury = 100; B.say('FURY', true); },
-  voice: { at: [[1, 'MARSHAL CADE CALLED IT A BALANCING. TIER FOUR USED MORE AIR THAN IT WAS OWED. SO TIER FOUR WAS TO BE MADE SMALLER.'], [12, 'I HAD THE ORDER ON MY DESK THIS MORNING. TONIGHT I HOLD THE TOP OF RISER NINE IN A MASK. BRAND WAITS AT THE LADDER. THE STAIR IS FULL OF CHILDREN.'], [24, 'THE FIRST WARDEN I EVER HIT DID NOT MOVE. THE SECOND FELL. THESE ARE THE NINTH AND TENTH.']],
+  voice: { at: [[1, 'MARSHAL CADE CALLED IT A BALANCING. TIER FOUR USED MORE AIR THAN IT WAS OWED. SO TIER FOUR WAS TO BE MADE SMALLER.'], [12, 'I HAD THE ORDER ON MY DESK THIS MORNING. TONIGHT I HOLD THE TOP OF RISER NINE IN A MASK. BRAND WAITS AT THE LADDER. THE LADDER IS FULL OF PEOPLE.'], [24, 'THE FIRST WARDEN I EVER HIT DID NOT MOVE. THE SECOND FELL. THESE ARE THE NINTH AND TENTH.']],
     hurt: 'I FELT THAT ONE. GOOD. I HAVE BEEN BEHIND A DESK TOO LONG.', fury: 'I DID NOT SPEND IT IN THE GALLERY. I KEPT IT FOR THIS.', wave: 'TWO MORE. THE STAIR IS NOT EMPTY YET.', half: 'FORTY PEOPLE. I COUNTED THEM PAST ME. I AM STILL A CLERK.', eleven: 'ELEVEN. ONE OF THEM IS FOR TIER FOUR.' },
   arts: [{ on: 'start', after: 5, name: 'THE ORDER', line: 'IT CAME ACROSS MY DESK FOR A SIGNATURE. A WHOLE TIER, IN ONE LINE, WITH A COLUMN FOR THE AIR IT WOULD SAVE.', panel: 'ledger', stage: 1, kind: 'storm', rgb: '255,90,50', hex: '#ff5a32', dark: 'rgba(26,4,2,.8)' }, { on: 'wave', name: 'FEVER WARD', line: 'I STOLE AIR FOR FORTY BEDS ONCE AND IT COST ME EVERYTHING. TONIGHT IT IS FORTY PEOPLE AND I AM NOT ASKING.', panel: 'ward', stage: 1, kind: 'rise', rgb: '160,220,255', hex: '#a0dcff' }],
   intro: [
     { d: 2.8, black: 1, big: 'RISER NINE', cap: 'FIVE YEARS AFTER THE FURNACE. THE NIGHT THEY BALANCED TIER FOUR.' },
     { d: 3.0, cam: [-60, 250, 150, 150, .18], to: [0, 150, 62, 150, .32], acts: [{ id: 'warden', a: [34, -8], blade: 2, sc: 1.1, fx: -1, fy: .3 }, { id: 'sg1', a: [54, 14], blade: 1, fx: -1, fy: 0 }, { id: 'kael2', a: [-70, 6], b: [-44, 4], fx: 1, fy: 0, blade: 1 }], cap: 'THE RISER COMES UP IN THE VALLEY WHERE THE ASSAY IS HELD. NOBODY BELOW KNOWS THAT. NOBODY ABOVE THINKS ABOUT IT.' },
-    { d: 2.4, ...cu(-44, 4, 1.9, 2.8, -14), flash: 1, bolt: 1, sfx: 'roar', acts: [{ id: 'kael2', a: [-44, 4], blade: 1, aura: 3 }], cap: 'I SIGNED THE ORDER THIS MORNING. THEN I CAME DOWN HERE TO BREAK IT.' }
+    { d: 2.4, ...cu(-44, 4, 1.9, 2.8, -14), flash: 1, bolt: 1, sfx: 'roar', acts: [{ id: 'kael2', a: [-44, 4], blade: 1, aura: 3 }], cap: 'THE ORDER CAME TO MY DESK THIS MORNING. TONIGHT I CAME DOWN HERE TO BREAK IT.' }
   ],
   outro: [
     { d: 3.0, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 3 }], cap: 'FORTY OUT. TIER FOUR HAD ELEVEN HUNDRED PEOPLE ON IT.' },
@@ -42,7 +42,7 @@ FF.son = () => { const friend = !!P2F('lucanFriend'); return {
   intro: DUEL_IN('lucan', '', 'THE SON', 'THE KEEP IN THE VALLEY, WHERE WE FIRST DID THIS. HE CHOSE THE PLACE.', friend ? 'HE SAID: MOTHER TOLD ME WHAT YOU ARE. I SAID: DID SHE TELL YOU WHAT SHE IS.' : 'HE SAID: MOTHER TOLD ME WHAT YOU ARE. HE SOUNDED RELIEVED TO HAVE A REASON.', 'I DID NOT COME UP HERE FOR HIM. HE IS STANDING IN THE DOOR ALL THE SAME.', 1.1),
   outro: friend ? [
     { d: 3.2, cam: [30, 150, 56, 170], to: [6, 124, 54, 190], acts: [{ id: 'lucan', a: [22, -2], pose: 'kneel', fx: -1, fy: .2, sc: 1.1 }, { id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1, aura: 1 }], cap: 'HE LOWERED IT. HE SAID: I LOOKED IN THE LEDGER AFTER SHE TOLD ME. I FOUND HER NAME. HOLLOWAY.' },
-    { d: 3.2, ...cu(22, -2, 1.7, 2.4, 14), acts: [{ id: 'lucan', a: [22, -2], pose: 'kneel', sc: 1.1 }], cap: 'HE SAID: I DID NOT KNOW WE DID THAT. I SAID: THAT IS HOW IT WORKS. NONE OF YOU EVER HAS TO KNOW.' },
+    { d: 3.2, ...cu(22, -2, 1.7, 2.4, 14), acts: [{ id: 'lucan', a: [22, -2], pose: 'kneel', sc: 1.1 }], cap: 'HE SAID: I DID NOT KNOW ONE DID THAT. I SAID: THAT IS HOW IT WORKS. NONE OF YOU EVER HAS TO KNOW.' },
     { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1 }, { id: 'lucan', a: [14, 2], blade: 1, sc: 1.1, fx: -1, fy: 0 }], cap: 'HE GAVE ME HIS KEY TO THE HIGH DOCKS. HE SAID HE WOULD TELL HER I HAD GONE OVER THE WALL.' }
   ] : [
     { d: 3.2, cam: [30, 150, 56, 170], to: [6, 124, 54, 190], acts: [{ id: 'lucan', a: [22, -2], pose: 'kneel', fx: -1, fy: .2, sc: 1.1 }, { id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1, aura: 2 }], cap: 'HE WENT BACKWARDS OVER THE PARAPET RATHER THAN YIELD TO SOOT. HIS BOOTS CAUGHT HIM, A LONG WAY DOWN.' },
@@ -57,7 +57,7 @@ FF.stair = () => ({
     [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 30, sc: 1.15 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 10 }, { id: 'warden', name: 'Warden', kind: 'warden', hp: 30, sc: 1.15 }],
     [{ id: 'voss', name: 'The Auditor\'s Blade', kind: 'duelist', hp: 120, sc: 1.22 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 10 }]],
   onWave: (w, B) => { B.p.fury = 100; B.say('FURY', true); },
-  voice: { at: [[1, 'THE BARGE CAME DOWN ON THE LOWER TERRACE. HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.'], [12, 'NINE HUNDRED STEPS. FOR THREE YEARS I RODE THE LIFT PAST THEM WITH A SUN ON MY COLLAR.'], [24, 'TAVI IS SOMEWHERE BEHIND ME. SIXTEEN. MARA SAID SHE COULD NOT STOP HIM, AND THAT I OF ALL PEOPLE WAS NOT TO TRY.']],
+  voice: { at: [[1, 'THE BARGE CAME DOWN ON THE LOWER TERRACE. HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.'], [12, 'NINE HUNDRED STEPS. FOR THREE YEARS I RODE THE LIFT PAST THEM WITH A SUN ON MY COLLAR.'], [24, 'TAVI IS ON MY LEFT. SIXTEEN. MARA SAID SHE COULD NOT STOP HIM, AND THAT I OF ALL PEOPLE WAS NOT TO TRY.']],
     hurt: 'KEEP CLIMBING.', fury: 'IT HAS BEEN NINE YEARS. IT HAS NOT COOLED AT ALL.', wave: 'ANOTHER LANDING. THERE IS ALWAYS ANOTHER LANDING.', half: 'OSWIN HALE. HOUSE VIOLET. HE FINISHED SECOND, BEHIND ME. NOW HE IS HER BLADE.', eleven: 'ELEVEN. TOP OF THE STAIR.' },
   arts: [{ on: 'wave', name: 'ELEVEN MONTHS', line: 'SHE WORE IT ELEVEN MONTHS. I HAVE WORN IT NINE YEARS. TODAY IT GOES HOME.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }, { on: 'start', after: 6, name: 'BRAND', line: 'BRAND HELD THE DOCK STAIR FOR ELEVEN MINUTES, ALONE. SOMEBODY TIMED IT. I ASKED THEM TO.', panel: 'gild', stage: 2, kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { on: 'wave', name: 'TOO MUCH', line: 'BE TOO MUCH FOR THEM. SHE ASKED IT OF ONE MAN. I BROUGHT FOUR HUNDRED BARGES.', panel: 'furnace', stage: 0, kind: 'rise', rgb: '255,120,40', hex: '#ff7828', dark: 'rgba(26,4,2,.8)' }],
   intro: [
@@ -71,14 +71,14 @@ FF.stair = () => ({
   ]
 });
 FF.ember = () => ({
-  breakAt: .45, breakMemo: { panel: 'kael', stage: 0, line: 'SHE BROKE THE BLADE THEY GAVE ME. I HAD HANDS BEFORE I HAD ANY OF THIS.', rgb: '255,170,80' }, breakLine: 'BANK HANDS. HERS WERE NEVER DIRTY ENOUGH TO KNOW WHAT THAT MEANS.',
+  breakAt: .45, breakMemo: { panel: 'kael', stage: 0, line: 'SHE BROKE THE BLADE THEY GAVE ME. I HAD HANDS BEFORE I HAD ANY OF THIS.', rgb: '255,170,80' }, breakLine: 'BANK HANDS. SHE HAD THEM ONCE. SHE LET THEM TAKE THE BURNS.',
   era: 6, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'final', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, taunt: { 0: ['THERE YOU ARE, TECHNICIAN.', 'I KEPT THE COUNT. SOMEBODY HAD TO.', 'SHE WAS QUICKER THAN YOU.', 'AND WHO WILL RATION IT WHEN I AM GONE?'] },
   foes: [{ id: 'celf', name: 'Celestine Aurel', kind: 'duelist', hp: 230, sc: 1.18, k2: { line: 1, slam: 1, triple: 1 } }],
   newMove: 'SHE STRIKES A LINE ACROSS THE FLOOR: JUMP IT. SHE DROPS FROM ABOVE: MOVE.',
   voice: { at: [[1, 'SHE IS SEVENTY-THREE. SHE HAS WORN THE BOOTS SINCE SHE WAS TWELVE. NOBODY TOLD ME SHE COULD FIGHT. NOBODY WHO KNEW WAS STILL ALIVE.'], [14, 'SHE IS NOT ANGRY. THAT IS THE WORST OF IT. SHE HAS NEVER ONCE BEEN ANGRY AT US. WE WERE A COLUMN THAT HAD TO ADD UP.'], [28, 'THE WINDOW IS BEHIND HER. THE REAL SKY. SHE KEPT IT IN ONE ROOM FOR FIFTY YEARS.'], [42, 'SEREN. I AM NEARLY DONE.']],
     hurt: 'SHE CUTS LIKE SHE SIGNS. ONCE, AND NEATLY.', fury: 'THIS IS WHAT YOU LIT. LOOK AT IT.', half: 'SHE HAS STOPPED CALLING ME TECHNICIAN.', eleven: 'ONE FOR EVERY SECOND THE DOORS STOOD OPEN. I HAVE CARRIED THEM NINE YEARS. THEY ARE YOURS.' },
-  arts: [{ at: .82, name: 'THE WASHER', line: 'SHE WORE A WASHER FOR A WEDDING RING. THREE WEEKS OF MY LUNCH BREAKS. IT IS UNDER THIS ARMOUR NOW.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }, { at: .6, name: 'RATION AIR', line: 'WE BLED YOUR AIR INTO A FEVER WARD. FORTY CHILDREN BREATHED. THAT WAS THE WHOLE CRIME.', panel: 'ward', stage: 1, kind: 'storm', rgb: '160,220,255', hex: '#a0dcff' }, { at: .38, name: 'THE SHIFT SONG', line: 'YOU PUT OUR SONG ON YOUR SPEAKERS SO IT WOULD MEAN THE FURNACE. LISTEN. THEY ARE HUMMING IT ON YOUR STAIR.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { at: .18, name: 'ELEVEN SECONDS', line: 'YOU HELD THE DOORS OPEN FOR ELEVEN SECONDS SO THE WHOLE TIER COULD WATCH HER WALK. I COUNTED. I HAVE NEVER STOPPED.', panel: 'furnace', stage: 2, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.85)' }],
+  arts: [{ at: .82, name: 'THE WASHER', line: 'SHE WORE A WASHER FOR A WEDDING RING. THREE WEEKS OF MY LUNCH BREAKS. IT IS UNDER THIS ARMOUR NOW.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }, { at: .6, name: 'RATION AIR', line: 'WE BLED YOUR AIR INTO A FEVER WARD. FORTY CHILDREN BREATHED. THAT WAS THE WHOLE CRIME.', panel: 'ward', stage: 1, kind: 'storm', rgb: '160,220,255', hex: '#a0dcff' }, { at: .38, name: 'THE SHIFT SONG', line: 'YOU PUT OUR SONG ON YOUR SPEAKERS SO IT WOULD MEAN THE FURNACE. LISTEN. THEY ARE HUMMING IT ON YOUR STAIR.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { at: .18, name: 'ELEVEN SECONDS', line: 'YOUR DOORS STOOD OPEN ELEVEN SECONDS ON A WORN SEAT NOBODY UP HERE WOULD PAY TO MEND. THE WHOLE TIER WATCHED HER WALK. I COUNTED. I HAVE NEVER STOPPED.', panel: 'furnace', stage: 2, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.85)' }],
   intro: [
     { d: 3.2, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-46, 6], fx: 1, fy: 0, blade: 1, aura: 2 }, { id: 'celf', a: [44, 0], fx: -1, fy: 0, blade: 1, sc: 1.18 }], big: 'LITTLE EMBER', cap: 'THE TOP OF THE SPIRE. THE SUN IS GOING DOWN IN THE WINDOW SHE ONCE OPENED TO TEACH ME MY PLACE.' },
     { d: 3.0, ...cu(44, 0, 1.6, 2.2, 16), acts: [{ id: 'celf', a: [44, 0], blade: 1, sc: 1.18 }], cap: 'SHE SAID: I WONDERED WHICH OF YOU IT WOULD BE. I HOPED IT WOULD BE YOU. YOU AT LEAST CAN COUNT.' },
@@ -93,7 +93,7 @@ FF.ember = () => ({
 });
 // the Fall, when it is no longer a dream
 FF.fall2 = () => { const d = FF.fall(); d.era = 6; d.intro = d.intro.slice(); d.intro[0] = { d: 2.8, black: 1, big: 'THE FALL', cap: 'NINE YEARS. FOUR HUNDRED BARGES. ONE MORNING.' }; d.intro[1] = Object.assign({}, d.intro[1], { big: '' });
-  d.outro = d.outro.slice(0, 2).concat([{ d: 3.0, black: 1, big: 'WE HIT.', cap: 'HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.' }]); d.voice = Object.assign({}, d.voice, { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'CADE SIGNED TIER FOUR AWAY WITH ONE LINE. I HAVE THE PEN HE USED. I TOOK IT FROM MY OWN DESK.'], [32, 'MARA SENT A LIST UP WITH TAVI. FORTY-FOUR NAMES. READ THEM OUT WHEN IT IS DONE, SHE SAID.']] }); return d; };
+  d.outro = d.outro.slice(0, 2).concat([{ d: 3.0, black: 1, big: 'WE HIT.', cap: 'HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.' }]); d.voice = Object.assign({}, d.voice, { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'CADE ORDERED TIER FOUR AWAY WITH ONE LINE. I HAVE THE PEN HE USED. I TOOK IT FROM MY OWN DESK.'], [32, 'MARA SENT A LIST UP WITH TAVI. FORTY-FOUR NAMES. READ THEM OUT WHEN IT IS DONE, SHE SAID.']] }); return d; };
 // a room to practise in: Brand does not go down, and neither do you
 FF.training = () => ({
   barks: ['AGAIN.', 'SLOW.', 'YOUR FEET, BOY.', 'GUARD UP.'],
@@ -114,7 +114,7 @@ FF.brandstair = () => ({
 FF.stand = () => ({
   era: 0, hum: 1, title: 'TIER SIX STANDS', sub: 'MARA VENN - A COMMITMENT AT BAY THREE', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'work', legend: 1, skip: 1, foeName: 'Warden', winText: 'NOBODY KNEELS',
   fin: { name: 'TWO TINS', l1: 'ONE FOR SEREN. ONE FOR KAEL.', l2: 'THERE WILL NOT BE A THIRD', rgb: '255,120,40' },
-  hero: { id: 'mara', name: 'MARA', hp: 11, pow: 2, fury0: 60 }, allies: ['hollis', 'ivo'], shouts: ['UP! ALL OF YOU, UP!', 'WITH MARA!', 'HUM IT!'], taunt: { 0: ['KNEEL.', 'GRATITUDE IS BREATH.', 'YOU ARE OWED TO THE FURNACE.'] },
+  hero: { id: 'mara', name: 'MARA', hp: 11, pow: 2, fury0: 60 }, allies: ['orin', 'ivo'], shouts: ['UP! ALL OF YOU, UP!', 'WITH MARA!', 'HUM IT!'], taunt: { 0: ['KNEEL.', 'GRATITUDE IS BREATH.', 'YOU ARE OWED TO THE FURNACE.'] },
   waves: [[{ id: 'warden', name: 'Warden', kind: 'baton', hp: 22, sc: 1.1 }, { id: 'watchman', name: 'Night Watch', kind: 'quick', hp: 9 }], [{ id: 'warden', name: 'Warden', kind: 'baton', hp: 26, sc: 1.1 }, { id: 'warden', name: 'Warden', kind: 'heavy', hp: 30, sc: 1.15 }, { id: 'proctor', name: 'Tallyman Sull', kind: 'quick', hp: 14 }]],
   onWave: (w, B) => { B.p.fury = 100; B.say('THE WHOLE ROW IS STANDING', true); },
   voice: { at: [[1, 'I AM SIXTY-ONE. I HAVE KNELT AT FORTY-FOUR COMMITMENTS. I COUNTED. HE GETS THAT FROM ME.'], [11, 'THEY WERE GOING TO PUT A BOY OF NINE THROUGH THAT DOOR FOR HIS MOTHER\'S DEBT.'], [22, 'I HAVE TWO TINS ON MY SHELF AND ONE OF THEM IS EMPTY. I AM NOT STARTING A THIRD.']],
@@ -209,7 +209,7 @@ const P2 = {
     { music: 'spire' }, { card: 'THE BALANCING', sub: 'Five years after the furnace.', big: 1, min: 1.6, max: 5 },
     { card: 'THE FOURTH RING', sub: 'Five years after the furnace.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkRing(2) }, { music: 'spire' },
     { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
-    { narr: 'In my second year the order for Tier Four came across my desk. Eleven hundred lines, to be struck at once. Marshal Cade called it a balancing.' },
+    { narr: 'In my first year the order for Tier Four came across my desk. Eleven hundred lines, to be struck at once. Marshal Cade called it a balancing.' },
     { pstage: 1 }, { sfx: 'heart' }, { wait: 1 },
     { narr: 'It needed the Clerk\'s signature. Mine.' },
     { choice: [
@@ -220,7 +220,7 @@ const P2 = {
     { when: () => !G.flags.signedFour, panel: 'desk' }, { when: () => !G.flags.signedFour, pstage: 1 }, { when: () => !G.flags.signedFour, fade: 'in', spd: 0.8 },
     { pstage: 2 }, { wait: 1.4 }, { fade: 'out' }, { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'A letter came up through Sable the same week, in Harl\'s chalk-fingered hand.' },
-    { say: 'dace', t: 'Tavi is on the wheel now. Twelve. He hums while he turns it and nobody has the heart to stop her. Mara says to tell you the shelf is holding.' },
+    { say: 'dace', t: 'Tavi is on the wheel now. Twelve. He hums while he turns it and nobody has the heart to stop him. Mara says to tell you the shelf is holding.' },
     { say: 'dace', t: 'He puts the sun back on the Pillar every rest day. Sull scrubs it. He puts it back. I have stopped telling him not to.' },
     { fade: 'out' }, { panel: null }, { card: 'MEANWHILE', sub: 'Cinderwell. Five years after the furnace. Tavi.', tr: 'chalk', big: 1, min: 1.5, max: 4.5 }, { mission: 'sun' },
     { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
@@ -260,7 +260,7 @@ const P2 = {
     { say: 'wren', t: 'The east manifold is weeping again. Nobody on the board will touch it. They say it is not done to touch it.' },
     { say: 'kael', t: 'Put a palm flat on it. If it is warm past the second joint, it is the seal and not the line.' },
     { say: 'wren', t: 'You say that like someone who burned the palm finding out.' },
-    { narr: 'She turned my hand over on the desk and looked at it. The Gilding takes a great deal. It does not take scars. She did not say anything. She set it down again as carefully as a reading.' },
+    { narr: 'She turned my hand over on the desk and looked at it. The Gilding takes a great deal. It does not take scars unless you let it. She did not say anything. She set it down again as carefully as a reading.' },
     { choice: [
       { t: '(Leave your hand where it is.)', fx: () => { G.flags.wrenClose = 1; }, then: [narr('It was the first time in five years anybody had touched me who was not trying to kill me or measure me.'), narr('I counted to eleven anyway. The washer was under my collar. It did not get any heavier. I had thought it would.')] },
       { t: 'One has columns to finish.', fx: () => { G.flags.wrenClose = 0; }, then: [say('wren', 'Noted.'), narr('She left the readings. She came back the next evening with more.')] }
@@ -305,7 +305,7 @@ const P2 = {
     { say: 'celestine', t: 'Little ember had a husband. I remember now. A valve technician. I had him brought up here to teach my engineers, and then he fell in a furnace, and I was briefly annoyed.' },
     { sfx: 'heart' }, { narr: 'One. Two. Three.' }, { sfx: 'heart' }, { narr: 'Six years of counting, and it had never once been this hard to stop at eleven.' },
     { music: 'spire' }, { say: 'celestine', t: 'Sit down, Brennick. If I meant to call the Wardens I should not have sent them out of the room first.' },
-    { say: 'celestine', t: 'I am seventy-six. The Accredited bear late and live long; it is most of what the gold is for. The Array has perhaps ten years. My son is kind, which is the same as useless. I need somebody to keep the Count after me who knows what a valve is and what a furnace is for.' },
+    { say: 'celestine', t: 'I am seventy. The Accredited bear late and live long; it is most of what the Gilding is for. The Array has perhaps ten years. My son is kind, which is the same as useless. I need somebody to keep the Count after me who knows what a valve is and what a furnace is for.' },
     /* 14b: her own Assay. She takes off one glove and closes the seat he came to mend */
     { narr: 'The seat I had come to mend was still weeping. She got up, and took off one glove, and closed it herself.' },
     { narr: 'Palm flat on the pipe first. Then the wheel, a quarter back, and home. Nobody up here does that. Below, we are shown it before we can read.' },
@@ -330,7 +330,7 @@ const P2 = {
     { say: 'kael', t: 'There was a note pinned to the Assayers\' glass, at the Assay. Her hand. "My son is to reach the last day. No further than he can walk."' },
     { sfx: 'heart' }, { say: 'lucan', t: '...She wrote that.' },
     { say: 'lucan', t: 'Of course she wrote that. I reached the last day. I have been proud of it for two years.' },
-    { say: 'lucan', t: 'She says there is a child. Below, on your tier. One you brought up. She has the name written down.' },
+    { say: 'lucan', t: 'She says you have a brother. Below, on your tier. She has the name written down.' },
     { fade: 'out' }, { panel: null },
     { card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 },
     { music: 'duel' }, { panel: 'ante' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
@@ -416,14 +416,14 @@ const P2 = {
     { brawl: () => FF.stand() },
     { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'She stood up, and the whole row stood up behind her, and the Wardens found they did not have enough halberds. The boy is on the wheel with Tavi now.' },
-    { say: 'dace', t: 'Tavi is coming up. Sixteen. Don\'t give me that look, I am only the messenger. Mara says you were younger when you married.' },
+    { say: 'dace', t: 'Tavi is coming up. Sixteen. Don\'t give me that look, I am only the messenger. Mara says you would have gone at his age.' },
     { fade: 'out' }, { panel: 'weather' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'tavi', t: 'You got tall.' },
     { say: 'kael', t: 'You got old.' },
     { say: 'tavi', t: 'You said I\'d be the first to know. If it was yellow.' },
     { say: 'kael', t: 'Look up, Tav.' },
     { narr: 'My own voice. "Tav." I had not used it in nine years. It came out rusty, like a wheel nobody had turned.' },
-    { narr: 'Nine years late. Tavi looked for a long time and then said: she was right. And then: she\'d be unbearable about it.' },
+    { narr: 'Nine years late. Tavi looked for a long time and then said: she was right. And then: she would be unbearable about it.' },
     { say: 'wren', t: 'Clerk... no. Brennick. I have brought eleven engineers and the Array schematics. One touches the pipe. I worked out why it works. It is because somebody has to care whether it does.' },
     { say: 'wren', t: 'We. I am practising. We touch the pipe. ...Aye?' },
     ...(P2F('wrenMet') ? [
@@ -449,7 +449,7 @@ const P2 = {
     { say: 'ilse', t: 'When you stand in front of her, soot, you will want to use the words I taught you. Do not. Use your own. That is the only thing she has never heard.' },
     { say: 'kael', t: 'Noted.' },
     { say: 'ilse', t: '...That was a joke. You have made a joke. Nine years and I finally get one.' },
-    { say: 'ilse', t: 'One thing more, since we are being honest. The leaf in Lift Zero, the night of your festival. That was mine. I sent the car down empty to see who on that tier would look inside it instead of at the floor.' },
+    { say: 'ilse', t: 'One thing more, since one is being honest. The leaf in Lift Zero, the night of your festival. That was mine. I sent the car down empty to see who on that tier would look inside it instead of at the floor.' },
     { say: 'kael', t: 'And?' },
     { say: 'ilse', t: 'One man with a lantern, and a child who kept the leaf. It was enough to be going on with.' },
     { fade: 'out' }, { panel: 'weather' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },

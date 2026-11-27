@@ -55,7 +55,7 @@ const RING = [
       { choice: [{ t: "I don't want to hit you, Mara.", then: [say('mara', 'Liar. Hands up.')] }, { t: 'Aye. I have.', fx: () => setF('ringHonest'), then: [say('mara', 'Good. Honest. Hands up.')] }] }],
     def: { title: 'FINAL BOUT', sub: "MARA VENN - FOREWOMAN'S PRIVILEGE", winText: 'THE BELT IS YOURS', foes: [{ id: 'mara', name: 'Mara', kind: 'boss', hp: 39 }], taunt: { 0: ['I HELD YOU DOWN. HIT ME!', 'SHE BOUGHT YOUR LIFE!', 'THERE HE IS.'] } },
     win: [narr('Mara sits down hard in the chalk. And laughs. A real one, rusty from forty-two days of not being used.'), say('mara', "There he is. There's the one she married."), say('mara', '...She had a better left.'),
-      { choice: [{ t: '(Help her up.)', fx: () => { trust('mara', 1); setF('ringMercy'); }, then: [say('mara', "I'm sorry, Kael. I'd do it again, and I'm sorry. Both. Every day.")] }, { t: "I'm still angry.", fx: () => fury(1), then: [say('mara', "Good. Aim it up, not sideways. I'll hold the bag until you can reach them.")] }] },
+      { choice: [{ t: '(Help her up.)', fx: () => { trust('mara', 1); setF('ringMercy'); }, then: [say('mara', "I'm sorry, Kael. I'd do it again, and I'm sorry. Both. Every day.")] }, { t: "My hands aren't done with it.", fx: () => fury(1), then: [say('mara', "Good. Aim it up, not sideways. I'll hold the bag until you can reach them.")] }] },
       narr('Hollis lifts the belt off his good shoulder: a strip of conveyor belting with two notches cut in it. He cuts a third.'), say('hollis', "Brennick. Belt-holder. She'd have been unbearable about it."), fx(() => { setF('ringChamp'); addJ('e_belt'); Sound.play('clue'); })] })
 ];
 function ringBout() {
@@ -279,16 +279,16 @@ const D2H = {
       ] },
       { choice: [
         { t: 'Paint the last ray yourself.', then: [narr('Your hand is steadier than you expected. It has had forty-two days of practice at the Pillar.')] },
-        { t: 'Give Tavi the brush.', fx: () => trust('tavi', 1), then: [narr('Tavi sticks their tongue out when they concentrate. Seren used to do that. You had forgotten that, and now you have it back.')] }
+        { t: 'Give Tavi the brush.', fx: () => trust('tavi', 1), then: [narr('Tavi sticks his tongue out when he concentrates. Seren used to do that. You had forgotten that, and now you have it back.')] }
       ] },
       narr('For a second, in the lamplight, it looks exactly like the one she drew on your wrist.'),
       fx(() => { setF('lanternBuilt'); Sound.play('solved'); HUD.toast("Seren's lantern is finished"); Game.autosave(); })
     ];
   },
   suns() {
-    if (F('sun18')) return [narr('Eighteen suns. The last one is a little crooked. It is the best one.')];
-    return [narr('Seventeen suns and a half. She added one every time something good happened.'),
-      { choice: [{ t: 'Finish the eighteenth.', fx: () => setF('sun18'), then: [narr("You use the last of Orin's gold on your thumb. It comes out crooked."), say('you', 'Something good happened, Seren. I got out of bed.')] }, { t: 'Not yet.' }] }];
+    if (F('sun18')) return [narr('Seventeen suns. The last one is a little crooked. It is the best one.')];
+    return [narr('Seventeen suns, the last one half finished. She added one every time something good happened.'),
+      { choice: [{ t: 'Finish the seventeenth.', fx: () => setF('sun18'), then: [narr("You use the last of Orin's gold on your thumb. It comes out crooked."), say('you', 'Something good happened, Seren. I got out of bed.')] }, { t: 'Not yet.' }] }];
   },
   radio: () => [narr("Cinder Radio: '...the High Auditor will attend the Festival of the First Fire. Lanterns are licensed for one candle-hour. The hanging of lanterns at the Lumen Pillar is suspended, for reasons of gratitude.'")],
   worksheet: () => [narr("Tavi's worksheet: 'FIVE THINGS I AM GRATEFUL FOR.'"), narr('1. Air.  2. Kael.  3. Noodles.  4. Seren —'), narr("Number four has been crossed out in the teacher's red: COMMITTED PERSONS ARE NOT LISTED. Tavi has written her back in. Twice.")],
@@ -322,7 +322,7 @@ const D2H = {
           narr('Four seconds. Seren could do it in two.'),
           narr("A grease rag. A festival lantern, flat-packed, never opened, with a tag: FOR S. — I'LL CARRY IT."),
           narr('And a sealed Authority envelope. Heavy. Stamped: INFORMANT REMITTANCE — 50 SCRIP — WITH GRATITUDE.'),
-          say('you', '...Dace.'),
+          say('you', '...Harl.'),
           narr('Under it, a page torn from a logbook, in his cramped hand:'),
           narr('"It came the morning after. I never said a word to anyone. Mara got one. Hollis got one. THEY SEND IT TO EVERYONE NEAR. So we all wonder. So we never stand in a row again."'),
           narr('"I didn\'t open it. Tell Kael I didn\'t open it. — Fuse C feeds the lift. I am going down to see what the lift feeds."'),
@@ -418,7 +418,7 @@ function festA() {
     { add: [['celestine', 13, 1, 0], ['wl', 12, 1, 0, 'warden'], ['wr', 14, 1, 0, 'warden']] },
     { pan: [12, 4], dur: 1.6, hold: false },
     { move: 'wl', to: [12, 4], spd: 14 }, { move: 'wr', to: [14, 4], spd: 14 }, { move: 'celestine', to: [13, 4], spd: 14, wait: true },
-    { narr: 'She comes down in light, the way she did forty-two days ago. The same white. The same unhurried gold. In her hands, a brass cup on a chain. In the cup, a flame.' },
+    { narr: 'She comes down in light, the way she did forty-two days ago. The same white. The same unhurried light. In her hands, a brass cup on a chain. In the cup, a flame.' },
     { say: 'vale', t: 'Kneel for High Auditor Celestine Aurel. Kneel for the First Fire.' },
     { kneel: 'all', but: ['vale', 'kael', 'proctor', 'watchman'] }, { sfx: 'step' },
     { choice: [

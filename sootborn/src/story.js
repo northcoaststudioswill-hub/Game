@@ -417,7 +417,7 @@ const HOT = {
 
 // ---- valve puzzles: authored solutions (N E S W letters), scrambled at runtime
 const PUZZLES = [
-  { name: 'BANK 7-A', tip: 'Tap a coupling to turn it. Feed every pipe from the pump. Leave no open ends.', cols: 4, rows: 3, cells: [
+  { name: 'BANK 7-A', tip: 'Turn each coupling. Feed every pipe from the pump. Leave no open ends.', cols: 4, rows: 3, cells: [
     ['', 'ES', 'SW', ''],
     ['SRC:E', 'NW', 'NS', 'OUT:S:RES'],
     ['', '', 'NE', 'NW']] },

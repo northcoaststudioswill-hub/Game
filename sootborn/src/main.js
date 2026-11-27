@@ -213,7 +213,7 @@ function boot() {
   });
   // press-to-start (also unlocks audio as a user gesture)
   const el = document.createElement('div'); el.className = 'splash'; el.style.background = '#07090d';
-  el.innerHTML = '<div class="press">▶ Tap or press any key</div>'; $('#layer').appendChild(el);
+  el.innerHTML = '<div class="press">▶ Press any key</div>'; $('#layer').appendChild(el);
   const go = () => { if (booted) return; booted = true; Sound.unlock(); el.remove(); Input.consume(); window.removeEventListener('keydown', go); G.mode = 'splash'; Splash.run(() => { if (!P.sheet) World.resetSheets(); Game.toTitle(); }); };
   el.addEventListener('pointerdown', go); window.addEventListener('keydown', go);
   Boot.go = go;

@@ -73,7 +73,7 @@ function DAY3() {
     { say: 'celestine', t: 'Now you know what I have seen. You will not say it below. Nobody would believe you, and I should have to burn whoever did.' },
     { say: 'celestine', t: 'You may go. And when I dismiss you, the word is "granted." You will learn. Your kind always does, eventually.' },
     { fade: 'out' }, { panel: null },
-    { card: 'He came down at second bell', sub: 'with a pass stamped in gold, and four hundred people watching the light to see if he would.', min: 1.8, max: 6 },
+    { card: 'THAT EVENING', sub: 'Cinderwell. Second bell. Four hundred people watching the light to see if he would come down.', min: 1.8, max: 6 },
     { panel: 'row' }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'tavi', t: 'Was it yellow? Kael. Was she right?' },
     { choice: [
@@ -115,10 +115,10 @@ function DAY3() {
   return [
     { music: 'home' }, { card: 'THE LEDGER', sub: 'Forty-three days after the furnace.', big: 1, tr: 'wake', min: 1.6, max: 5 },
     { panel: 'kael' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
-    { narr: 'I did not sleep much. Vale\'s offer sat on my chest all night. Carry the Bank Seven ledger up Lift Zero. Nobody from Cinderwell has ever gone up.' },
+    { narr: 'I did not sleep much. Vale\'s offer sat on my chest all night. Carry the Bank Seven ledger up Lift Zero. Nobody from Cinderwell has ever gone up Lift Zero and come back down.' },
     { fade: 'out' }, { panel: 'row' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'mara', t: 'It\'s a leash. They put it on the clever ones first. Your father thought he was being promoted, too.' },
-    { say: 'ivo', t: 'It\'s a door, Mara. Nobody from here has ever seen the other side of that lift. He\'d be the first to know what we\'re even kneeling to.' },
+    { say: 'ivo', t: 'It\'s a door, Mara. Nobody from here has ever come back down that lift to tell us. He\'d be the first to know what we\'re even kneeling to.' },
     { say: 'tavi', t: 'Will you see the sun? The real one? Seren said it was yellow. Will you tell me if she was right?' },
     { say: 'kael', t: 'If I see it, Tav, you\'ll be the first to know. On my breath.' },
     { narr: 'I did not know yet that this was a promise I would not be allowed to keep.' },
@@ -152,15 +152,15 @@ FF.twins = () => ({ flat: 1,
   fin: { name: 'TWO FOR ONE', l1: 'THEY FIGHT AS ONE PERSON', l2: 'SO I ONLY COUNT ONCE', rgb: '120,220,210' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, taunt: { 0: ['HE IS SLOW ON THE LEFT.', 'I HAVE HIM.', 'TOGETHER.', 'NOW.'] },
   foes: [{ id: 'cadt1', name: 'Ansa Vey', kind: 'duelist', hp: 56, sc: 1.05 }, { id: 'cadt2', name: 'Oria Vey', kind: 'duelist', hp: 56, sc: 1.05 }],
-  voice: { at: [[1, 'TAKE A HOUSE\'S STANDARD AND ITS CADETS ARE YOURS. TEAL KEEPS THEIRS BETWEEN TWO SISTERS WHO HAVE NEVER LOST A BOUT.'], [12, 'THEY DO NOT TALK TO EACH OTHER. THEY DO NOT NEED TO. I HAD THAT ONCE, WITH ONE PERSON.'], [26, 'CREW THREE TURNED A WHEEL THE SAME WAY. FORTY HANDS, ONE COUNT. THESE TWO WOULD HAVE MADE GOOD VALVE TECHS.']],
+  voice: { at: [[1, 'TAKE A HOUSE\'S STANDARD AND ITS CADETS ARE YOURS. TEAL HAS SENT TWO SISTERS WHO HAVE NEVER LOST A BOUT TO TAKE THEIRS BACK.'], [12, 'THEY DO NOT TALK TO EACH OTHER. THEY DO NOT NEED TO. I HAD THAT ONCE, WITH ONE PERSON.'], [26, 'CREW THREE TURNED A WHEEL THE SAME WAY. FORTY HANDS, ONE COUNT. THESE TWO WOULD HAVE MADE GOOD VALVE TECHS.']],
     hurt: 'ONE CUTS WHILE THE OTHER ONE IS STILL SMILING.', fury: 'I DO NOT HAVE A SECOND PAIR OF HANDS. I HAVE THIS.', half: 'THE YOUNGER ONE LOOKED AT HER SISTER BEFORE SHE LOOKED AT ME. THAT IS THE GAP.', eleven: 'ELEVEN. SPLIT TWO WAYS.' },
   arts: [{ at: .7, name: 'FORTY BEDS', line: 'THE FEVER WARD HAD FORTY BEDS. I COUNTED THEM EVERY NIGHT. I HAVE NOT STOPPED COUNTING THINGS SINCE.', panel: 'ward', kind: 'storm', rgb: '160,220,255', hex: '#a0dcff' }, { at: .3, name: 'ONE COUNT', line: 'FORTY PEOPLE ON ONE WHEEL, HUMMING TO KEEP TIME. NOBODY UP HERE HAS EVER PULLED ON ANYTHING TOGETHER.', panel: 'pipe', kind: 'rise', rgb: '255,170,70', hex: '#ffaa46' }],
   intro: [
-    { d: 3.0, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-50, 4], fx: 1, fy: 0, blade: 1, aura: 1 }, { id: 'cadt1', a: [36, -12], fx: -1, fy: 0, blade: 1 }, { id: 'cadt2', a: [36, 18], fx: -1, fy: 0, blade: 1 }], big: 'THE STANDARD', cap: 'THE ASSAY. DAY TWENTY-SIX. HOUSE TEAL\'S STANDARD STANDS ON AN ISLAND IN THE RIVER.' },
+    { d: 3.0, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-50, 4], fx: 1, fy: 0, blade: 1, aura: 1 }, { id: 'cadt1', a: [36, -12], fx: -1, fy: 0, blade: 1 }, { id: 'cadt2', a: [36, 18], fx: -1, fy: 0, blade: 1 }], big: 'THE STANDARD', cap: 'THE ASSAY. DAY TWENTY-SIX. THE SISTERS VEY HAVE COME ACROSS THE RIVER FOR TEAL\'S STANDARD.' },
     { d: 2.6, ...cu(36, 2, 1.6, 2.2, 18), acts: [{ id: 'cadt1', a: [30, -10], blade: 1 }, { id: 'cadt2', a: [42, 14], blade: 1 }], cap: 'ANSA AND ORIA VEY. THEY MOVE LIKE ONE PERSON WHO HAPPENS TO HAVE FOUR ARMS.' },
-    { d: 2.2, ...cu(-50, 4, 1.9, 2.7, -14), flash: 1, sfx: 'heart', acts: [{ id: 'kael2', a: [-50, 4], blade: 1, aura: 2 }], cap: 'I CAME ALONE. I DID NOT WANT ANYBODY BEHIND ME WHO COULD BE USED.' }
+    { d: 2.2, ...cu(-50, 4, 1.9, 2.7, -14), flash: 1, sfx: 'heart', acts: [{ id: 'kael2', a: [-50, 4], blade: 1, aura: 2 }], cap: 'I MET THEM ALONE. I DID NOT WANT ANYBODY BEHIND ME WHO COULD BE USED.' }
   ],
-  outro: DUEL_OUT('cadt2', 'THE YOUNGER ONE PUT HER BLADE DOWN FIRST. THE OLDER ONE DID IT A BREATH LATER, AND NOT FOR ME.', 'TEAL\'S STANDARD CAME BACK ACROSS THE RIVER ON MY SHOULDER. THIRTY CADETS CAME WITH IT.', 'I HAD AN ARMY NOW. I HAD NOT ASKED WHAT I WOULD OWE IT.')
+  outro: DUEL_OUT('cadt2', 'THE YOUNGER ONE PUT HER BLADE DOWN FIRST. THE OLDER ONE DID IT A BREATH LATER, AND NOT FOR ME.', 'TEAL\'S STANDARD STAYED IN OUR CAMP. THIRTY CADETS CAME ACROSS THE RIVER AFTER IT.', 'I HAD AN ARMY NOW. I HAD NOT ASKED WHAT I WOULD OWE IT.')
 });
 // after the Keep: the last thing she asks of him
 FF.blade = () => ({
@@ -186,15 +186,15 @@ FF.docks = () => ({
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 50 }, allies: V, shouts: ['CUT IT!', 'NEXT LINE!', 'FOR TIER SIX!'], taunt: { 0: ['HE WEARS THE SUN!', 'TRAITOR!', 'HOLD THE MOORINGS!'] },
   waves: [[{ id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 9 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 9 }],
     [{ id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 10 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 10 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 10 }],
-    [{ id: 'vant', name: 'Dockmaster Vant', kind: 'captain', hp: 130, sc: 1.2 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 10 }]],
+    [{ id: 'vant', name: 'Stair Captain Rook', kind: 'captain', hp: 130, sc: 1.2 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 10 }]],
   onWave: (w, B) => { B.p.fury = Math.max(B.p.fury, 70); B.voice('wave'); },
   voice: { at: [[1, 'THREE YEARS ON THE SPIRE, COUNTING WHO BREATHES. I COUNTED OTHER THINGS AS WELL. BARGES. GUARDS. WHO OWED WHOM.'], [12, 'TONIGHT I AM STILL WEARING THEIR SUN ON MY COLLAR. IT GOT ME THROUGH THE GATE. IT COMES OFF AFTER THIS.'], [24, 'ILSE IS ON THE MOORING WINCH. BRAND HAS THE STAIR. HARL CAME UP FROM BELOW. HE SAYS THE TIERS ARE READY.']],
-    hurt: 'THREE YEARS BEHIND A DESK. I AM SLOWER. I AM NOT KINDER.', fury: 'I HAVE BEEN POLITE FOR THREE YEARS. NOTED. GRANTED. ONE DOES NOT. NO MORE.', wave: 'VANT. HE LOST A RIVER TO ME ONCE. THEY GAVE HIM A DOCK TO MAKE UP FOR IT.', half: 'HE KNOWS MY FOOTWORK. HE HAS HAD THREE YEARS TO THINK ABOUT IT.', eleven: 'ELEVEN. I STOPPED SAYING THEM OUT LOUD ON THE SPIRE. I NEVER STOPPED COUNTING.' },
+    hurt: 'THREE YEARS BEHIND A DESK. I AM SLOWER. I AM NOT KINDER.', fury: 'I HAVE BEEN POLITE FOR THREE YEARS. NOTED. GRANTED. ONE DOES NOT. NO MORE.', wave: 'ROOK. HE WALKED ME THE LENGTH OF THIS QUAY ONCE, WITH A LAMP.', half: 'HE KNOWS EVERY CLEAT BY NUMBER. HE NEVER ASKED WHAT I WAS.', eleven: 'ELEVEN. I STOPPED SAYING THEM OUT LOUD ON THE SPIRE. I NEVER STOPPED COUNTING.' },
   arts: [{ on: 'start', after: 6, name: 'THE COUNT', line: 'THEY GAVE ME THE LEDGER OF WHO BREATHES. I READ ALL OF IT. EVERY NAME THEY EVER STRUCK OUT.', panel: 'world', stage: 3, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { on: 'wave', name: 'UNLIT', line: 'WE ARE WHAT IS LEFT IN THE LANTERN WHEN THEY PUT IT OUT. THERE ARE A GREAT MANY OF US.', panel: 'under', stage: 1, kind: 'rise', rgb: '255,170,80', hex: '#ffaa50' }],
   intro: [
-    { d: 2.8, black: 1, big: 'SEVEN YEARS AFTER THE FURNACE', cap: 'THREE YEARS AFTER THE PINNING. I HAVE A POST, A SUN ON MY COLLAR, AND A KEY TO THE HIGH DOCKS.' },
+    { d: 2.8, black: 1, big: 'SEVEN YEARS AFTER THE FURNACE', cap: 'SEVEN YEARS AFTER THE FURNACE. I HAVE A POST, A SUN ON MY COLLAR, AND A KEY TO THE HIGH DOCKS.' },
     { d: 3.2, cam: [0, 330, 170, 150, .3], to: [0, 240, 110, 150, .3], acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 1, fy: -1 }].concat(ffRow(V, 5, -60, 30, 44, { fy: -1 })), big: 'THE HIGH DOCKS', cap: 'THE LIFT-BARGES MOOR HERE, ABOVE THE WEATHER. FOUR HUNDRED OF THEM. WE NEED EVERY ONE.' },
-    { d: 2.6, cam: [70, 60, 50, 150], to: [-70, 60, 50, 150], lin: 1, sfx: 'roar', acts: ffRow(['sg1', 'sg2'], 7, -90, 30, -80, { fy: 1 }, -10), cap: 'I WALKED IN THROUGH THE FRONT GATE. THE GUARD SALUTED. THEN HE SAW WHO WAS BEHIND ME.' },
+    { d: 2.6, cam: [70, 60, 50, 150], to: [-70, 60, 50, 150], lin: 1, sfx: 'roar', acts: ffRow(['sg1', 'sg2'], 7, -90, 30, -80, { fy: 1 }, -10), cap: 'THE LAMPS ON THE STAIR WERE ALREADY LIT. SOMEBODY HAD TOLD THEM THE HOUR.' },
     { d: 1.6, ...cu(0, 20, 1.9, 2.9, -14), flash: 1, acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 3 }], big: 'CUT THEM LOOSE.' }
   ],
   outro: [

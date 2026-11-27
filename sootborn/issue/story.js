@@ -70,7 +70,7 @@
     shoe: [{ k: 'ward0', cap: 'THE FEVER WARD. TIER SIX.', cap2: 'FORTY BEDS. FORTY CHILDREN BREATHING BECAUSE OF HER. *THE NUMBER FOLLOWS ME ABOUT.*' }],
     plates: [{ k: 'row0', cap: 'ROW K.', cap2: 'MARA KNELT AT FORTY-FOUR COMMITMENTS AND COUNTED EVERY ONE. *SHE STOOD UP AT THE FORTY-FIFTH.*' }],
     halberd: [{ k: 'dockstair0', cap: 'SEVEN YEARS AFTER THE FURNACE. THE DOCK STAIR.', cap2: 'ELEVEN MINUTES. SOMEBODY TIMED IT. *I ASKED THEM TO.*' }],
-    loft: [{ k: 'lift0', cap: 'LAST YEAR. HER ROOM.', cap2: 'I HUMMED THE SHIFT SONG AT HER VALVE AND DID NOT HEAR MYSELF. *SHE HAS KNOWN SINCE.*' }, { k: 'hands0', cap2: 'THE WASHER IS UNDER MY COLLAR. IT HAS NOT GOT ANY HEAVIER.' }]
+    loft: [{ k: 'lift0', cap: 'SIX YEARS AFTER THE FURNACE. HER ROOM.', cap2: 'I HUMMED THE SHIFT SONG AT HER VALVE AND DID NOT HEAR MYSELF. *SHE HAS KNOWN SINCE.*' }, { k: 'hands0', cap2: 'THE WASHER IS UNDER MY COLLAR. IT HAS NOT GOT ANY HEAVIER.' }]
   };
   function pagesOf(list, done) {
     const m = (list || []).filter(p => A_(p.k)); if (!m.length) { done(); return; }
@@ -83,19 +83,19 @@
   const SUN = {
     docks: {
       yard: { fury: 1, toast: 'THE WASHER. *FURY.*', p: [
-        { k: 'desk3', cap: 'THE EAST MANIFOLD. LAST YEAR.', cap2: 'KESTREL DRAY TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
+        { k: 'desk3', cap: 'MY DESK. FIVE YEARS AFTER THE FURNACE.', cap2: 'KESTREL DRAY TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
         { k: 'hands0', cap2: 'THE WASHER WAS UNDER MY COLLAR. I WAITED FOR IT TO GET HEAVIER. *IT DID NOT, AND I HAVE NOT FORGIVEN IT.*' }] },
       roof: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
         { k: 'assay0', cap: 'THE ASSAY. FOUR YEARS AFTER THE FURNACE.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. DORIAN ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
         { k: 'ward0', cap: 'TIER SIX. THE FEVER WARD.', cap2: 'THE NIGHT THE FEVER BROKE, TAVI ASKED FOR BREAD. I NEVER TOLD DORIAN THERE WAS A SHE. *THERE WERE FORTY BEDS, AND A SHE.*' }] } },
     riser: {
       yard: { fury: 1, toast: 'HANDS. *FURY.*', p: [
-        { k: 'island0', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'AN APPRENTICE KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
+        { k: 'island0', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'A JUNIOR ON THE ARRAY BOARD KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
         { k: 'furnace2', cap2: 'SEREN TAUGHT ME THAT. HANDS, KAEL. EVERYTHING IS HANDS. *I HAD NOT KNOWN ANYONE ABOVE THE ROCK COULD LEARN IT.*' }] } },
     stair: {
       yard: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
         { k: 'assay0', cap: 'THE LAST DAY OF THE ASSAY.', cap2: 'I TOOK A KEEP FROM THE HIGH AUDITOR\'S SON WHILE SHE WATCHED. SHE PINNED A SUN ON ME FOR IT. *SHE SAID I REMINDED HER OF SOMEONE.*' },
-        { k: 'lift0', cap: 'ASHGATE SQUARE. THE MORNING OF THE FURNACE.', cap2: 'THE FIRST TIME SHE LOOKED AT ME I WAS KNEELING WITH EVERYONE I KNEW. "A THIEF WHO TIDIES." *SHE HAS FORGOTTEN IT. I HAVE NOT.*' }] },
+        { k: 'lift0', cap: 'ASHGATE SQUARE. THE MORNING OF THE FURNACE.', cap2: 'THE FIRST TIME I HEARD HER VOICE I WAS KNEELING WITH EVERYONE I KNEW. "A THIEF WHO TIDIES." *SHE HAS NOT FORGOTTEN IT EITHER.*' }] },
       roof: { fury: 1, toast: 'A SHELF CAN BE MADE LONGER. *FURY.*', p: [
         { k: 'weather2', cap: 'THE RAIL OF A BARGE. THIS YEAR.', cap2: '"I AM NOT ASKING FOR HER PLACE." "THERE IS NOT A PLACE. THERE IS A SHELF."' },
         { k: 'tin0', cap2: 'SEREN WOULD HAVE HECKLED. THEN SHE WOULD HAVE MOVED UP. *EVERY BREATH IS STILL HERS. THERE TURNED OUT TO BE A GREAT MANY OF THEM.*' }] } }
@@ -176,7 +176,7 @@
   function ending(e) {
     S.enc = null; U.boss(null); SC.clearEnemies(); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 5;
     run([0.5, n => U.say([
-        { who: 'voss', text: 'It does not... balance. You were *one of us*. One sat at table with you.' },
+        { who: 'voss', text: 'It does not... balance. You wore *the sun*. One sat at table with you.' },
         { who: 'hero', face: 'angry', text: 'I was never one of you. I only learned to count like you.' }
       ], n),
       n => { pl.setState('idle'); pl.control = true; setFlag('boss'); U.toast('THE GAFF IS ON THE CLEAT. *CUT THE LAST MOORING.*', 4); n(); }]);
@@ -568,7 +568,7 @@
       U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
         { img: a, area: '1 / 1 / 3 / 2', cap: 'THIRTY-SIX METRES. THE WHOLE VALLEY UNDER MY HEELS.', cap2: 'THEY HAD TOLD US THE BOOTS WERE WHAT MADE AN ASSAYER.', fx: 'LIVE' },
         { img: b, area: '1 / 2 / 2 / 3', cap2: 'THEY ARE A BATTERY, AND A STACK,' },
-        { img: c, area: '2 / 2 / 3 / 3', cap2: "*AND A MAN WHO ISN'T AFRAID OF THE HEIGHT.*" }
+        { img: c, area: '2 / 2 / 3 / 3', cap2: "*AND A MAN WHO IS NOT AFRAID OF THE HEIGHT.*" }
       ] }, () => done());
     };
     S.init = function () {
@@ -679,7 +679,7 @@
         { who: 'cap', text: 'The heart of the Array. Every breath on six tiers comes through this drum, and every breath above them. The main seal was weeping under my palm, the way a bank does a year before it goes.' },
         { who: 'clerk', text: 'Forty-eight banks. Count the lamps.' },
         { who: 'cap', text: 'Thirty-one lit. The dark ones had dates chalked on them, in hands I knew. Orin. Mara. One in a hand I knew better than my own.' },
-        { who: 'hero', face: 'hurt', text: "Ten years I've kept my seven valves turning. I thought the rest of it was up here being looked after." },
+        { who: 'hero', face: 'hurt', text: "Ten years I've kept my seven valves turning. I thought the rest of it was down here being looked after." },
         { who: 'clerk', text: "Nobody's looking after it. They're counting it. *That's what the Count is, Kael.* Lamps on the gantry. Move." }], () => { brandOnStair(); startEnc('l1'); }) });
       W.addInteract({ id: 'patch', x: 2.2, y: 0, z: -6.2, fx: 0.9, fz: -6.2, r: 1.6, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => F.down && !F.clue_patch, act: clue('patch', [
         { who: 'cap', text: 'A split in the main, bound in rag and wire and tar. A date chalked beside it, forty years gone. Then another beside that. Nine patches on one pipe, and every one of them ours.' },

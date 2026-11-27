@@ -479,7 +479,7 @@ const Prelude = (() => {
   function eNames(g, u, T, o) {   // the new Count: no columns. A list of names, read aloud
     g.fillStyle = '#1a1210'; g.fillRect(-300, -200, 2200, 1300); glow(g, 800, 380, 1000, '255,236,190', .5);
     poly(g, [260, 60, 1340, 60, 1420, 1040, 180, 1040]); fs(g, '#f8eed2'); st(g, 9);
-    const names = ['Holloway, S.', 'Marrow, J.', 'Aldane, D.', 'Hale, O.', 'Rook, A.', 'Brand', o === 'struck' ? 'Aurel, C.' : '', 'Tier Four, eleven hundred, by name'];
+    const names = ['Holloway, S.', 'Marrow, J.', 'Aldane, D.', 'Hale, O.', 'Rook, A.', 'Brand', o === 'struck' ? 'Aurel, C.' : '', 'Tier Four, one thousand and sixty, by name'];
     g.textBaseline = 'alphabetic'; for (let i = 0; i < 8; i++) { const y = 190 + i * 104, a = cl(u * 9 - i * .9, 0, 1); g.beginPath(); g.moveTo(300 - i * 8, y + 22); g.lineTo(1300 + i * 8, y + 22); st(g, 2, '#c9bb98'); g.globalAlpha = a; g.font = `700 ${names[i].length > 14 ? 44 : 58}px 'Pixelify Sans', monospace`; g.fillStyle = i === 0 ? '#b3261c' : '#2a1c18'; g.fillText(names[i], 330 - i * 6, y + 6); g.globalAlpha = 1; }
     g.save(); g.translate(1180, 880 + Math.sin(T * 1.2) * 4); ell(g, 0, 0, 120, 84, -.3); fs(g, '#e6c79a'); st(g, 8); capsule(g, -70, -40, -150, -150, 22); fs(g, '#e6c79a'); st(g, 7); poly(g, [-176, -190, -160, -202, -60, -60, -84, -40]); fs(g, '#1a1016'); st(g, 5); g.restore();
   }
