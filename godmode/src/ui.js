@@ -38,14 +38,25 @@ function initUI() {
   $('btnSpeed').onclick = () => { sfx('click'); setSpeed(APP.speed === 1 ? 2 : APP.speed === 2 ? 4 : 1); };
   $('pw').querySelectorAll('button').forEach(b => { b.onclick = () => { auInit(); sfx('click'); setPower(b.dataset.p === APP.power && b.dataset.p !== 'observe' ? 'observe' : b.dataset.p); }; });
   $('inClose').onclick = () => { sfx('click'); selectCitizen(0); UI.inspectB = 0; };
+  $('inLife').onclick = () => { sfx('click'); if (APP.S.selected) openLife(APP.S.selected); };
+  $('lfClose').onclick = () => { sfx('click'); closeLife(); };
+  $('lfTabs').querySelectorAll('button').forEach(b => { b.onclick = () => { sfx('click'); UI.lifeTab = b.dataset.t; UI.lifePick = ''; renderLife(); }; });
+  $('mGoal').onclick = () => {
+    const S = APP.S; if (!S || S.sandbox) return;
+    S.goal = !S.goal; sfx('click'); refreshMenu();
+    logMsg(S, S.goal ? 'GOAL SET: the path to the Spire is back on.' : 'GOAL CLEARED: no objectives. The island simply goes on.', 'sys');
+  };
   $('inFollow').onclick = () => { sfx('click'); R.cam.follow = R.cam.follow ? 0 : APP.S.selected; };
   $('tutNext').onclick = () => { sfx('click'); tutAdvance(); };
   $('tutSkip').onclick = () => { sfx('click'); APP.tut = -1; saveSettings(); };
 
   $('btnNew').onclick = () => {
     auInit(); sfx('click');
-    if (APP.hasSave) confirmDlg('NEW WORLD', 'This erases the saved island and starts again with six new minds.', 'Erase and start', () => startGame(true));
-    else startGame(true);
+    const pick = () => showDlg('WHAT KIND OF WORLD?',
+      '<span class="big">ENDLESS</span>No goal. The island runs forever: people grow old, die, and their children carry on. The Spire becomes something you can build when they know enough, if you ever want to.\n\n<span class="big">WITH A GOAL</span>A path of objectives that ends in the Spire and the Singularity. After that the island keeps running.\n\n<span class="sys">You can switch between them any time from the pause menu.</span>',
+      [{ label: 'Endless', fn: () => startGame(true, false) }, { label: 'With a goal', fn: () => startGame(true, true) }]);
+    if (APP.hasSave) confirmDlg('NEW WORLD', 'This erases the saved island and starts again with six new minds.', 'Erase and start', pick);
+    else pick();
   };
   $('btnContinue').onclick = () => { auInit(); sfx('click'); startGame(false); };
   $('btnHow').onclick = () => { auInit(); sfx('click'); openMenu('help'); };
@@ -87,8 +98,16 @@ function updateUI(S, dt) {
   const zl = $('zlabel');
   if (S.age >= 0) { zl.textContent = 'AGE OF ' + BELIEFS[S.age].name; zl.style.color = BELIEFS[S.age].hex; $('zeit').style.borderColor = BELIEFS[S.age].hex; }
   else { zl.textContent = 'NO CREED RULES'; zl.style.color = ''; $('zeit').style.borderColor = ''; }
-  const st = STAGES[S.stage];
-  $('qTitle').textContent = st.title; $('qText').textContent = st.text; $('qProg').textContent = st.prog(S);
+  if (!S.goal || S.sandbox) {
+    $('qTitle').textContent = S.sandbox ? 'SANDBOX' : 'ENDLESS';
+    const sp = firstB(S, 'spire');
+    $('qText').textContent = 'Day ' + dayOf(S) + ' \u00b7 generation ' + generation(S) +
+      (S.sandbox ? '' : sp ? (sp.built ? '' : ' \u00b7 Spire ' + ((sp.progress * 100) | 0) + '%') : S.spireUnlocked ? ' \u00b7 the Spire is yours to build' : '');
+    $('qProg').textContent = S.citizens.length + ' alive';
+  } else {
+    const st = STAGES[S.stage];
+    $('qTitle').textContent = st.title; $('qText').textContent = st.text; $('qProg').textContent = st.prog(S);
+  }
 
   // power affordability
   $('pw').querySelectorAll('button').forEach(b => {
@@ -118,7 +137,7 @@ function updateInspect(S) {
   if (c) {
     const dom = c.dom;
     $('inDot').style.background = dom >= 0 ? BELIEFS[dom].hex : '#06231a';
-    $('inName').textContent = c.name + ' / ' + (dom >= 0 ? BELIEFS[dom].who : 'Undecided');
+    $('inName').textContent = c.name + ', ' + ageYears(c) + ' / ' + (dom >= 0 ? BELIEFS[dom].who : 'Undecided');
     $('inThought').textContent = c.thought;
     $('inNeeds').hidden = false; $('inBel').hidden = false; $('inFollow').hidden = false;
     setW($('nFed'), 1 - c.hunger); setW($('nJoy'), c.happy); setW($('nFear'), c.fear); setW($('nCur'), c.curio);
@@ -147,6 +166,92 @@ function updateInspect(S) {
     $('inNeeds').hidden = true; $('inBel').hidden = true; $('inFollow').hidden = true;
     $('inFoot').textContent = '';
   }
+}
+
+/* ------------------------------------------------------------ life panel
+   Everything about one person: who they are, what they want, what they hide, what has
+   happened to them, how they feel about everyone, and the god's hand. Time stands still
+   while it is open. */
+function openLife(id) {
+  UI.lifeId = id; UI.lifeTab = UI.lifeTab || 'soul'; UI.lifePick = '';
+  APP.lifeOpen = true;
+  $('life').hidden = false; $('app').classList.add('modal');
+  renderLife();
+}
+function closeLife() { APP.lifeOpen = false; $('life').hidden = true; $('app').classList.remove('modal'); }
+const esc = t => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+function moodWord(c) {
+  if (c.fear > 0.5) return 'terrified';
+  if (c.state === 'fight' || c.state === 'tantrum') return 'furious';
+  if (c.happy > 0.8) return 'happy';
+  if (c.happy > 0.55) return 'content';
+  if (c.happy > 0.3) return 'low';
+  return 'miserable';
+}
+function renderLife() {
+  const S = APP.S, c = getC(S, UI.lifeId);
+  if (!c) { closeLife(); return; }
+  $('lfTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === UI.lifeTab));
+  $('lfDot').style.background = c.dom >= 0 ? BELIEFS[c.dom].hex : '#06231a';
+  $('lfName').textContent = c.name + ', ' + ageYears(c) + (c.elder ? ' (old)' : c.grow < 1 ? ' (child)' : '');
+  $('lfFoot').textContent = 'CYCLES ' + (S.freeCycles ? 'UNLIMITED' : (S.cycles | 0) + ' / ' + S.cyclesMax) + '  \u00b7  time stands still while you look';
+  const B = $('lfBody'); let h = '';
+  const f = c.fac ? getF(S, c.fac) : null;
+  if (UI.lifeTab === 'soul') {
+    const tr = lifeTraits(c);
+    h += '<div><b class="who">' + esc(c.name) + '</b> is ' + tr.slice(0, 3).join(', ') + ' and ' + tr[3] + '. ' +
+      'Generation ' + c.gen + (c.par.length ? ', child of ' + c.par.map(id => esc(nameOf(S, id))).join(' and ') : '') + '. ' +
+      (c.dom >= 0 ? (/^[aeiou]/i.test(BELIEFS[c.dom].who) ? 'An ' : 'A ') + BELIEFS[c.dom].who.toLowerCase() + ' of ' + BELIEFS[c.dom].name : 'Believes nothing in particular') +
+      (f ? (c.title === 'leader' ? ', and leads the ' : ', of the ') + esc(f.name) : '') + '. ' +
+      'Feeling ' + moodWord(c) + '. ' + c.coin + ' coin. ' + (c.grow < 1 ? '' : 'Expected to live to about ' + ageYears({ age: c.life, grow: 1 }) + '.') + '</div>';
+    h += '<div class="dim">Thinking: &ldquo;' + esc(c.thought) + '&rdquo;</div>';
+    h += '<h4>WHAT THEY WANT</h4>';
+    const ds = lifeDesires(S, c).slice(0, 6);
+    if (!ds.length) h += '<div class="dim">Nothing, for once.</div>';
+    for (const d of ds) h += '<div class="it"><span>' + esc(d.text) + '</span><button data-grant="' + d.key + '">GRANT ' + STEER.desire.cost + '</button></div>';
+    h += '<h4>WHAT THEY HIDE</h4>';
+    const ss = lifeSecrets(S, c);
+    if (!ss.length) h += '<div class="dim">No secrets. An open book.</div>';
+    for (const x of ss) h += '<div class="it sec"><span>' + esc(x.text) + '</span><button data-reveal="' + x.k + '" data-who="' + (x.who || 0) + '">REVEAL ' + STEER.reveal.cost + '</button></div>';
+    h += '<h4>WHAT THEY BELIEVE</h4><div>' + BELIEFS.map((bf, k) => '<span style="color:' + bf.hex + '">' + bf.name + ' ' + Math.round(c.b[k] * 100) + '%</span>').join(' &middot; ') + '</div>';
+  } else if (UI.lifeTab === 'story') {
+    h += '<div class="dim">Day ' + dayOf(S) + ' now. Newest first.</div>';
+    for (let i = c.mem.length - 1; i >= 0; i--) h += '<div class="mem"><time>Day ' + c.mem[i].d + '</time><span>' + esc(c.mem[i].text) + '</span></div>';
+  } else if (UI.lifeTab === 'people') {
+    const rows = S.citizens.filter(o => o !== c).map(o => ({ o, mine: c.rel[o.id] || 0, theirs: o.rel[c.id] || 0, lab: relLabel(c, o) }));
+    rows.sort((a, b) => (b.lab ? 1 : 0) - (a.lab ? 1 : 0) || Math.abs(b.mine) - Math.abs(a.mine));
+    h += '<div class="dim">How ' + esc(c.name) + ' feels about each person, and how they feel back. Tap a name to look into them.</div>';
+    h += '<div class="ppl"><span class="dim">PERSON</span><span class="dim">THEY FEEL</span><span class="dim">FEEL BACK</span>';
+    const bar = v => '<div class="op"><b style="left:' + (v < 0 ? 50 + v * 50 : 50) + '%;width:' + Math.abs(v) * 50 + '%;background:' + (v < 0 ? 'var(--bad)' : 'var(--line)') + '"></b></div>';
+    for (const r of rows) h += '<button data-goto="' + r.o.id + '">' + esc(r.o.name) + (r.lab ? ' <i>' + r.lab + '</i>' : '') + '</button>' + bar(r.mine) + bar(r.theirs);
+    h += '</div>';
+  } else {
+    if (UI.lifePick) {
+      h += '<div>' + STEER[UI.lifePick].name.replace('...', '') + ' whom?</div>';
+      const rows = S.citizens.filter(o => o !== c).sort((a, b) => Math.abs(c.rel[b.id] || 0) - Math.abs(c.rel[a.id] || 0));
+      for (const o of rows) h += '<button class="act" data-who="' + o.id + '"><span>' + esc(o.name) + ' <span class="dim">' + (relLabel(c, o) || '') + '</span></span><small>' + STEER[UI.lifePick].cost + '</small></button>';
+      h += '<button class="act" data-back="1"><span>Back</span></button>';
+    } else {
+      h += '<div class="dim">Your hand on ' + esc(c.name) + '\'s life. Each costs CYCLES.</div>';
+      for (const k in STEER) h += '<button class="act" data-act="' + k + '"><span>' + STEER[k].name + '</span><small>' + STEER[k].cost + '</small></button>';
+    }
+  }
+  if (UI.lifeMsg) { h = '<div class="it sec"><span>' + esc(UI.lifeMsg) + '</span></div>' + h; UI.lifeMsg = ''; }
+  B.innerHTML = h;
+  const run = (act, who, key) => {
+    const r = steer(S, c, act, who, key);
+    if (!r.ok) { flashHint(r.msg); sfx('deny'); }
+    else { sfx('inspire'); UI.lifeMsg = r.msg; handleEvents(S); }
+    UI.lifePick = '';
+    if (!getC(S, UI.lifeId)) { closeLife(); return; }
+    renderLife();
+  };
+  B.querySelectorAll('[data-grant]').forEach(b => { b.onclick = () => run('desire', 0, b.dataset.grant); });
+  B.querySelectorAll('[data-reveal]').forEach(b => { b.onclick = () => run('reveal', +b.dataset.who, b.dataset.reveal); });
+  B.querySelectorAll('[data-goto]').forEach(b => { b.onclick = () => { sfx('click'); const id = +b.dataset.goto; selectCitizen(id); UI.lifeId = id; renderLife(); B.scrollTop = 0; }; });
+  B.querySelectorAll('[data-act]').forEach(b => { b.onclick = () => { const k = b.dataset.act; if (STEER[k].who) { sfx('click'); UI.lifePick = k; renderLife(); B.scrollTop = 0; } else run(k); }; });
+  B.querySelectorAll('[data-who]:not([data-reveal])').forEach(b => { b.onclick = () => run(UI.lifePick, +b.dataset.who); });
+  B.querySelectorAll('[data-back]').forEach(b => { b.onclick = () => { sfx('click'); UI.lifePick = ''; renderLife(); }; });
 }
 
 /* who this citizen is to everyone else: role, money, family and opinions */
@@ -303,6 +408,8 @@ function refreshMenu() {
   $('mSpeed').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.s === APP.speed));
   const S = APP.S;
   $('mFree').hidden = !(S && S.sandbox);
+  $('mGoal').hidden = !S || S.sandbox || APP.mode !== 'play';
+  if (S) $('mGoal').textContent = S.goal ? 'Goal: the Spire (tap for endless)' : 'Goal: none, endless (tap to aim for the Spire)';
   if (S) $('mFree').textContent = 'Unlimited cycles: ' + (S.freeCycles ? 'on' : 'off');
   $('mSave').textContent = 'Save now';
 }

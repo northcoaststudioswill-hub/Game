@@ -26,7 +26,7 @@ function angDiff(a, b) {
 const SIM_DT = 1 / 20;      // fixed simulation step, seconds
 const DAY_LEN = 200;        // seconds per island day
 const NIGHT_FROM = 0.76;    // fraction of the day at which night begins
-const POP_MAX = 20;
+const POP_MAX = 30;
 
 /* ---- the four belief archetypes ---- */
 const DEV = 0, DREAD = 1, ACCEL = 2, KIN = 3;
@@ -60,9 +60,9 @@ function opposed(a, b) {
 const BUILD = {
   fire:   { name: 'Hearth',    r: 1.5,  cost: {}, work: 1, max: 1,
             desc: 'The stockpile and the heart of the village. It does not go out.' },
-  hut:    { name: 'Hut',       r: 1.35, cost: { wood: 10 }, work: 14, max: 6,
+  hut:    { name: 'Hut',       r: 1.35, cost: { wood: 10 }, work: 14, max: 8,
             desc: 'Houses three citizens. More huts, more minds.' },
-  farm:   { name: 'Farm',      r: 1.7,  cost: { wood: 8, stone: 3 }, work: 12, max: 4,
+  farm:   { name: 'Farm',      r: 1.7,  cost: { wood: 8, stone: 3 }, work: 12, max: 6,
             desc: 'Grows food on a loop. Tending speeds it up.' },
   shrine: { name: 'Shrine',    r: 1.4,  cost: { wood: 8, stone: 12 }, work: 20, max: 3,
             desc: 'Prayer here refills your CYCLES and deepens DEVOTION.' },

@@ -64,6 +64,42 @@ a bright scrolling grid below, and quick square-wave arpeggios. Kinship: a soft 
 (brighter at night), and two voices answering each other. The edges of the screen take the Age's colour. After the
 Singularity the island keeps the look of its ending for good; after THE COMPROMISE it shows all four, faintly.
 
+### Two ways to play
+
+**New world** asks which you want. **Endless**: no objectives at all. The island runs for as long as you like, people
+grow old and die, and their children and grandchildren carry on. The Spire only becomes possible once they have a
+Shrine, a Terminal and 80 Insight, and then it sits in your Create menu until you decide to build it, if ever. The
+citizens never start it themselves. **With a goal**: the objective chain below, ending in the Spire. After that the
+island keeps running as a sandbox. The pause menu switches between the two at any time (until the Spire is built).
+The bar under the zeitgeist shows the day, the generation and how many are alive.
+
+### Looking into a life
+
+Tap someone with Observe, then **LIFE**. Time stops while the panel is open.
+
+- **SOUL**: their temperament, parents and generation, creed and faction, mood, money, how long they are likely
+  to live, and what they are thinking. **What they want**: their desires, strongest first, such as someone to love
+  (or a particular person), a child, a home, steady work, a business of their own, to lead their faction, revenge on an
+  enemy, to be remembered, or to be noticed by the Watcher. Each has a **GRANT** button. **What they hide**: unseen
+  thefts, secret love (and whether it is returned), a grudge against someone who thinks they are friends, doubts about
+  their faith, a leader who does not believe, resentment of a boss, hidden coin, the certainty that something in the sky
+  is watching. Each has a **REVEAL** button, and revealing has consequences: thieves are shunned, crushes are
+  answered or end in heartbreak, doubting leaders are thrown out.
+- **STORY**: their life as they remember it, day by day: where they came from, love, children, fights, conversions,
+  jobs, wars, losses, and every time you touched them.
+- **PEOPLE**: how they feel about every other person, and how each feels back. Tap a name to look into that life.
+- **STEER**: your hand on this one life, for CYCLES: grant their deepest wish, kindle love for someone, sow a grudge,
+  make peace, reveal their secret, raise them up as a leader, shower them with coin, calm them, fill them with rage,
+  plant doubt in their faith, send a prophetic dream, grant a longer life, or let them go, peacefully.
+
+### Generations
+
+A life is about 25 to 37 minutes at 1x (shown in years: childhood takes 160 seconds and counts as 18 years, then about
+25 seconds a year, so most live into their 70s to 90s). Past about three quarters of it they grow old: grey hair, a
+stoop, slower steps. They no longer fight or go to war, and they tell the children stories, which earns a little
+Insight. Then they die in their sleep, and the log says what they leave behind. Their name is freed for a future
+child. Only couples aged 20 or more, and not old, have children. The island holds up to 30 people (8 huts).
+
 ### Their lives
 
 The citizens have lives of their own, and you can read all of it in the inspector (tap someone with Observe).
@@ -151,6 +187,36 @@ node godmode/tests/play_phone.js    # needs Playwright + Chromium; screenshots g
 ```
 
 ## Changelog
+
+### 0.5, Nov 27 2026: endless play, generations, and a god's view of every life
+
+- **Endless or with a goal.** `newSim(seed, goal)`; `S.goal`. With no goal, `objectives()` only unlocks the Spire (once
+  there is a Shrine, a Terminal and 80 Insight) and the planner never places it. The title screen asks, and the pause
+  menu has a goal switch (`mGoal`). The quest bar shows ENDLESS or SANDBOX with day, generation and population.
+- **Generations.** New `src/life.js`. Every citizen has a lifespan (`c.life`, 1500 to 2200 s of age), grows old at
+  78% of it (`c.elder`), and dies of old age (`kill(S, c, 'age')`, counted in `S.stats.oldAge`). Founders start
+  18 to 34 years old. `c.gen` counts generations. Names are freed on death; `S.dead` remembers them for memories.
+  `POP_MAX` is 30 (huts max 8, farms max 6, the planner wants up to 5 farms).
+- **Memories** (`c.mem`, the last 40, always keeping the first): written at every life event in sim.js and society.js.
+- **Secrets**: stored (`c.sec`: unseen theft, jealousy, having seen the sky) plus derived ones (secret love, hidden
+  grudge, doubt, a faithless leader, resenting the boss, hoarding) from `lifeSecrets()`.
+- **Desires** from `lifeDesires()`, and **steering** from `steer(S, c, act, who, key)`: 13 acts, 6 to 25 cycles each,
+  including granting a specific desire and revealing a specific secret.
+- **Life panel** (`#life`, `openLife()` and `renderLife()` in ui.js) with SOUL, STORY, PEOPLE and STEER tabs; LIFE
+  button in the inspector, which now also shows age. Elders render with grey hair and a stoop.
+- Saves stay at v2: the new fields are filled in on load (`fillLife`), and an old save gets `goal: true`.
+- Tests: `sim_balance.js` adds two 75-minute endless runs (seeds 1, 2): no extinction, at least 3 generations, at
+  least 4 old-age deaths, no Spire, and a save round trip. Passive runs now count only deaths that are not old age.
+  `play_phone.js` chooses a mode on a new world, opens LIFE (soul, story, people), checks time stops, steers two
+  acts through taps, and starts an endless world, checking that nobody starts a Spire in 12 minutes and the goal
+  switch works.
+
+**Results:** endless, 75 minutes: about 30 alive at the end, generation 11, 49 to 54 old-age deaths, 75 to 78 births,
+0 to 3 other deaths, never extinct. Goal runs (seeds 1 to 4): passive Singularity 13:46 to 16:54, assisted 10:38
+to 11:53. **Tested:** both scripts pass, and screenshots of the mode choice, the three LIFE tabs and an endless island.
+**Not tested:** on a phone; how the life panel reads after an hour of play; whether generations turning over every few
+minutes feels too fast (a child can be a parent about five minutes after being born).
+
 
 ### 0.4, Nov 27 2026: the citizens have lives
 

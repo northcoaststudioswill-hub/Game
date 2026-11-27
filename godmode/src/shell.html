@@ -135,7 +135,32 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 #titleBox{width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px;margin-bottom:3vh}
 #boot{font-size:11.5px;color:var(--line);min-height:4.2em;white-space:pre-wrap;text-shadow:1px 1px 0 #000;margin:0}
 #ver{font-size:10px;color:var(--dim);text-align:center;letter-spacing:.1em}
-#menu,#dlg{background:rgba(4,6,16,.72)}
+#menu,#dlg,#life{background:rgba(4,6,16,.72)}
+#life .win{width:100%;max-width:420px;height:100%;max-height:720px;display:flex;flex-direction:column}
+#lfTabs{display:flex;border-bottom:2px solid var(--line)}
+#lfTabs button{flex:1;min-height:40px;font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--dim);border-right:1px solid rgba(125,255,196,.25)}
+#lfTabs button:last-child{border-right:0}
+#lfTabs button.on{background:var(--line);color:#06231a}
+#lfBody{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;font-size:12.5px}
+#lfBody h4{margin:6px 0 0;font-size:11px;letter-spacing:.14em;color:var(--amber)}
+#lfBody .who{color:var(--fg)}
+#lfBody .dim{color:var(--dim)}
+#lfBody .it{display:flex;align-items:center;gap:8px;border-left:3px solid var(--line);padding:3px 0 3px 7px;min-height:30px}
+#lfBody .it.sec{border-color:var(--sys)}
+#lfBody .it.bad{border-color:var(--bad)}
+#lfBody .it span{flex:1;min-width:0}
+#lfBody .it button,#lfBody .act{border:2px solid var(--line);background:var(--panel2);font-weight:700;font-size:11px;padding:5px 8px;min-height:34px;white-space:nowrap}
+#lfBody .it button:active,#lfBody .act:active{background:var(--line);color:#06231a}
+#lfBody .act{display:flex;justify-content:space-between;width:100%;text-align:left;font-size:12px}
+#lfBody .act small{color:var(--amber)}
+#lfBody .mem{display:flex;gap:8px;border-left:2px solid rgba(125,255,196,.35);padding-left:7px}
+#lfBody .mem time{color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+#lfBody .ppl{display:grid;grid-template-columns:1fr 54px 54px;gap:4px 8px;align-items:center}
+#lfBody .ppl button{text-align:left;color:var(--fg);min-height:30px;font-size:12.5px}
+#lfBody .ppl button i{font-style:normal;color:var(--dim);font-size:11px}
+#lfBody .op{height:8px;background:#1c2340;position:relative}
+#lfBody .op b{position:absolute;top:0;bottom:0}
+#lfFoot{padding:6px 10px;font-size:11px;color:var(--dim);border-top:1px solid rgba(125,255,196,.25)}
 #menu .win,#dlg .win{width:100%;max-width:380px;max-height:100%;display:flex;flex-direction:column}
 #menu .body,#dlg .body{padding:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
 .lab{font-size:10.5px;letter-spacing:.12em;color:var(--dim);margin:2px 0 -4px;text-transform:uppercase}
@@ -211,7 +236,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
     <div id="bottom">
       <div id="ticker"></div>
       <div id="inspect" class="win" hidden>
-        <div class="bar"><span class="dot" id="inDot"></span><span class="grow" id="inName">CITIZEN</span><button id="inFollow">FOLLOW</button><button id="inClose" aria-label="Close">X</button></div>
+        <div class="bar"><span class="dot" id="inDot"></span><span class="grow" id="inName">CITIZEN</span><button id="inLife">LIFE</button><button id="inFollow">FOLLOW</button><button id="inClose" aria-label="Close">X</button></div>
         <div class="body">
           <div id="inThought"></div>
           <div class="bars" id="inNeeds">
@@ -266,6 +291,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
         <div class="lab">Options</div>
         <div class="row"><button class="btn sm" id="mSound">Sound: on</button><button class="btn sm" id="mGfx">Pixels: retro</button></div>
         <button class="btn sm" id="mFree" hidden>Unlimited cycles: off</button>
+        <button class="btn sm" id="mGoal">Goal: the Spire</button>
         <div class="row"><button class="btn sm" id="mHelp">How to play</button><button class="btn sm" id="mLog">Event log</button></div>
         <div class="row"><button class="btn sm" id="mSave">Save now</button><button class="btn sm" id="mTitle">Title screen</button></div>
         <button class="btn sm warn" id="mReset">Erase and restart</button>
@@ -303,6 +329,15 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
     </div>
   </div>
 
+  <div id="life" class="screen" hidden>
+    <div class="win">
+      <div class="bar"><span class="dot" id="lfDot"></span><span class="grow" id="lfName">LIFE</span><button id="lfClose" aria-label="Close">X</button></div>
+      <div id="lfTabs"><button data-t="soul" class="on">SOUL</button><button data-t="story">STORY</button><button data-t="people">PEOPLE</button><button data-t="steer">STEER</button></div>
+      <div class="body" id="lfBody"></div>
+      <div id="lfFoot"></div>
+    </div>
+  </div>
+
   <div id="dlg" class="screen" hidden>
     <div class="win">
       <div class="bar"><span class="grow" id="dlgTitle">SYSTEM</span></div>
@@ -316,6 +351,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 /*@include world.js*/
 /*@include sim.js*/
 /*@include society.js*/
+/*@include life.js*/
 /*@include render.js*/
 /*@include audio.js*/
 /*@include ui.js*/

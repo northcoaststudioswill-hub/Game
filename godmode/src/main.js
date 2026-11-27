@@ -49,10 +49,10 @@ function showTitle() {
   R.viewShiftT = 0;
   bootText();
 }
-function startGame(fresh) {
+function startGame(fresh, goal) {
   if (fresh) {
     lsDel(SAVE_KEY); APP.hasSave = false;
-    setSim(newSim((Math.random() * 1e9) | 0));
+    setSim(newSim((Math.random() * 1e9) | 0, goal !== false));
     APP.tut = 0; APP.camMoved = 0;
     saveSettings();
   } else if (!APP.S) setSim(newSim(1));
@@ -136,6 +136,9 @@ function handleEvents(S) {
       case 'festival': banner('FESTIVAL', 'Everyone to the hearth.', '#ffd447'); sfx('stage'); break;
       case 'grownup': fxSpark(e.x, y + 1.2, e.z, '#7dffc4', 12, 1, 2.4, -2, 1); break;
       case 'fish': fxSpark(e.x, y + 0.4, e.z, '#9fd8ff', 10, 1, 2.6, -8, 0.7); break;
+      case 'elder': break;
+      case 'steer': fxRing(e.x, y, e.z, '#ff8ae6', 2.6, 0.9); fxSpark(e.x, y + 1.4, e.z, '#ff8ae6', 18, 1.4, 3, -2, 1); sfx('inspire'); break;
+      case 'spireReady': banner('THE SPIRE', 'Yours to build whenever you choose. Or never.', '#ff8ae6'); sfx('stage'); break;
       case 'restore': banner('RESTORED FROM BACKUP', 'Six new minds. They do not remember.', '#ff8ae6'); break;
       case 'singularity': {
         R.singT = 0; R.singHex = e.k >= 0 ? BELIEFS[e.k].hex : '#ff5fd2';
@@ -161,7 +164,7 @@ function frame(now) {
   APP.last = now;
   if (!(dt > 0) || dt > 0.25) dt = 0.016;        // tab was asleep: do not fast-forward
   const S = APP.S;
-  const running = APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen && !APP.hidden;
+  const running = APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen && !APP.lifeOpen && !APP.hidden;
   if (running) {
     APP.acc += dt * APP.speed;
     let n = 0;

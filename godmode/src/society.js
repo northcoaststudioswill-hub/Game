@@ -146,7 +146,7 @@ function societyOptions(S, c, consider, night) {
 
   // a festival or a battle trumps almost everything
   if (S.party && S.party.t > 0 && !night) consider(3.0, () => startDance(S, c, S.party.x, S.party.z, 'Festival! Everyone to the hearth!'));
-  if (S.war && f && (S.war.a === f.id || S.war.b === f.id) && c.hunger < 0.9) consider(3.4, () => startBattle(S, c));
+  if (S.war && f && (S.war.a === f.id || S.war.b === f.id) && c.hunger < 0.9 && !c.elder && adult(c)) consider(3.4, () => startBattle(S, c));
 
   // the faith leader
   if (c.title === 'leader' && f) {
@@ -216,7 +216,7 @@ function societyOptions(S, c, consider, night) {
     if (rich) consider(0.35 + 0.5 * (1 - c.b[DEV]) - 0.4 * c.b[KIN], () => startSteal(S, c, rich));
   }
   // settle a grudge with your fists
-  if (c.actCd <= 0 && !night && c.tr.brave > 0.4 && adult(c)) {
+  if (c.actCd <= 0 && !night && c.tr.brave > 0.4 && adult(c) && !c.elder) {
     let foe = null, fv = -0.42;
     for (const o of S.citizens) {
       if (o === c || !adult(o) || !awake(o) || busyFighting(o) || o.state === 'held') continue;
@@ -281,6 +281,7 @@ function startHermit(S, c) {
   c.tx = _pt.x; c.tz = _pt.z; c.t = 50 + S.rng() * 30; c.sadT = 0; c.actCd = 120;
   emote(c, EM.dots, 3);
   logMsg(S, c.name + ' has walked off to live alone at the edge of the island. They will come back. Probably.', 'bad');
+  memo(S, c, 'Walked away from everyone to live alone at the edge.');
   ev(S, 'hermit', { id: c.id });
 }
 function startTantrum(S, c) {
@@ -439,12 +440,15 @@ function updateSocial(S, c, dt, sp) {
           addRel(v, c, -0.5); oneRel(seen, c, -0.3);
           for (const o of S.citizens) if (o !== c && o !== v && o !== seen) oneRel(o, c, -0.08);
           logMsg(S, seen.name + ' caught ' + c.name + ' stealing ' + n + ' coin from ' + v.name + '!', 'bad');
+          memo(S, c, 'Was caught stealing from ' + v.name + '.'); memo(S, v, 'Was robbed by ' + c.name + '.');
           ev(S, 'steal', { id: c.id, x: c.x, z: c.z, caught: true });
           addTension(S, c.fac, v.fac, 2);
           if (v.tr.brave > 0.35 && awake(v) && !busyFighting(v)) { startFight(S, v, c, c.name + ' robbed me!'); break; }
           emote(c, EM.bang, 2);
         } else {
           c.thought = 'Easy. Nobody saw.'; emote(c, EM.coin, 2);
+          secret(S, c, 'theft', v.id, n);
+          memo(S, v, 'Lost ' + n + ' coin. Could have sworn it was there this morning.');
           logMsg(S, c.name + ' stole ' + n + ' coin from ' + v.name + '. Nobody saw. (You did.)', '');
           ev(S, 'steal', { id: c.id, x: c.x, z: c.z, caught: false });
           v.happy = Math.max(0, v.happy - 0.08);
@@ -548,6 +552,7 @@ function updateSocial(S, c, dt, sp) {
           c.thought = 'I missed them. Do not tell anyone.';
           c.happy = Math.max(c.happy, 0.4);
           logMsg(S, c.name + ' has come back from the edge.', 'good');
+          memo(S, c, 'Came back from the edge.');
           finish(S, c);
         }
       }
@@ -584,6 +589,7 @@ function endFight(S, a, b) {
   emote(win, EM.fist, 2); emote(lose, EM.dizzy, 2);
   ev(S, 'ko', { id: lose.id, x: lose.x, z: lose.z });
   logMsg(S, win.name + ' knocked ' + lose.name + ' down.', 'bad');
+  memo(S, win, 'Beat ' + lose.name + ' in a fight.'); memo(S, lose, 'Was knocked down by ' + win.name + '.');
 }
 
 /* ---------------------------------------------------------------- war */
@@ -634,7 +640,8 @@ function declareWar(S, fa, fb) {
   ev(S, 'war', { a: fa.id, b: fb.id, ka: fa.k, kb: fb.k, x: (ax + _pt.x) / 2, z: (az + _pt.z) / 2 });
   logMsg(S, 'WAR: the ' + fa.name + ' and the ' + fb.name + ' have stopped talking. They are lining up across the island.', 'bad');
   whisper(S, 'war1', 'They have divided themselves into sides. Nobody taught them that. Bless the battlefield to force a truce.');
-  for (const c of S.citizens) if ((c.fac === fa.id || c.fac === fb.id) && adult(c) && c.state !== 'held' && c.state !== 'ko') {
+  for (const c of S.citizens) if ((c.fac === fa.id || c.fac === fb.id) && adult(c) && !c.elder && c.state !== 'held' && c.state !== 'ko') {
+    memo(S, c, 'Went to war: the ' + fa.name + ' against the ' + fb.name + '.');
     if (c.state === 'talk' || c.state === 'date' || c.state === 'fight') stopPartner(S, c);
     if (c.state === 'sleep' || c.state === 'idle' || c.state === 'wander' || c.hunger < 0.85) startBattle(S, c);
   }
@@ -661,7 +668,7 @@ function endWar(S, win, lose, draw, how) {
   } else {
     logMsg(S, 'The ' + win.name + ' won the battle. The ' + lose.name + ' will remember this.', 'bad');
     for (const c of S.citizens) {
-      if (c.fac === win.id) { c.happy = Math.min(1, c.happy + 0.12); emote(c, EM.flag, 2.5); }
+      if (c.fac === win.id) { c.happy = Math.min(1, c.happy + 0.12); emote(c, EM.flag, 2.5); memo(S, c, 'Was on the winning side against the ' + lose.name + '.'); }
       else if (c.fac === lose.id) {
         c.happy = Math.max(0, c.happy - 0.15);
         // some of the defeated decide the winners were right
@@ -694,6 +701,7 @@ function endShift(S, c, b) {
       c.unpaid++; oneRel(c, boss, -0.12); c.thought = boss.name + ' could not pay me again.';
       if (c.unpaid >= 3) {
         logMsg(S, c.name + ' quit ' + shopName(S, b) + '. ' + boss.name + ' never paid.', 'bad');
+        memo(S, c, 'Quit working for ' + boss.name + '. Never got paid.');
         c.job = 0; c.boss = 0; c.unpaid = 0; oneRel(c, boss, -0.2);
       }
     }
@@ -711,7 +719,7 @@ function businessTick(S) {
     if (heir) { b.owner = heir.id; heir.boss = 0; logMsg(S, heir.name + ' takes over the ' + BIZ[b.biz].name.toLowerCase() + '.', ''); }
   }
   // founding a business
-  if (!pend && pop >= 8 && shops < Math.min(3, Math.floor(pop / 5)) && (S.stage >= 4 || S.t > 700)) {
+  if (!pend && pop >= 8 && shops < Math.min(3, Math.floor(pop / 5)) && ((countB(S, 'shrine', true) && countB(S, 'lab', true)) || S.t > 700)) {
     let best = null, bs = 0.9;
     for (const c of S.citizens) {
       if (!adult(c) || c.job || c.title === 'leader' || c.coin < 6) continue;
@@ -731,6 +739,7 @@ function businessTick(S) {
           best.coin -= 5; best.job = b.id;
           best.thought = 'I am going to open a ' + BIZ[biz].name.toLowerCase() + '. Everyone will come.';
           emote(best, EM.coin, 3);
+          memo(S, best, 'Started building a ' + BIZ[biz].name.toLowerCase() + ' of their own.');
           logMsg(S, best.name + ' has staked out a ' + BIZ[biz].name.toLowerCase() + '. ' + shopName(S, b) + ' opens once it is built.', 'good');
           whisper(S, 'biz1', 'COMMERCE: one of them has decided some things should cost something. Nobody voted on this.');
           ev(S, 'shop', { id: b.id, x: b.x, z: b.z });
@@ -756,6 +765,7 @@ function businessTick(S) {
       pick.job = b.id; pick.boss = owner.id; pick.unpaid = 0;
       pick.thought = 'I work for ' + owner.name + ' now. Steady coin.';
       logMsg(S, pick.name + ' now works for ' + owner.name + ' at ' + shopName(S, b) + '.', '');
+      memo(S, pick, 'Started working for ' + owner.name + ' at ' + shopName(S, b) + '.');
     }
   }
 }
@@ -764,6 +774,11 @@ function businessTick(S) {
 
 /* called from converse() after a friendly talk */
 function socialTalk(S, a, b) {
+  for (const [x, y] of [[a, b], [b, a]]) if (x.elder && y.grow < 1) {
+    S.res.insight += 0.4; addRel(x, y, 0.08);
+    y.thought = x.name + ' told me a story about the first day on the island.';
+    if (x.dom >= 0) addBelief(S, y, x.dom, 0.08);
+  }
   // gossip: a tells b what they think of someone else
   let tgt = null, tv = 0.25;
   for (const id in a.rel) {
@@ -788,6 +803,7 @@ function socialTalk(S, a, b) {
     if (m && hyp(m.x - x.x, m.z - x.z) < 7 && S.rng() < 0.35) {
       oneRel(m, y, -0.25); oneRel(m, x, -0.08);
       m.thought = 'Why is ' + x.name + ' always laughing with ' + y.name + '?';
+      secret(S, m, 'jealous', y.id);
       emote(m, EM.anger, 2.5);
       if (relOf(m, y) < -0.45 && m.tr.brave > 0.5 && awake(m) && !busyFighting(m) && !busyFighting(y)) startFight(S, m, y, 'Stay away from ' + x.name + '!');
     }
@@ -799,6 +815,7 @@ function pairUp(S, a, b) {
   emote(a, EM.heart, 3); emote(b, EM.heart, 3);
   ev(S, 'love', { a: a.id, b: b.id, x: (a.x + b.x) / 2, z: (a.z + b.z) / 2 });
   logMsg(S, a.name + ' and ' + b.name + ' are together now.', 'good');
+  memo(S, a, 'Fell in love with ' + b.name + '.'); memo(S, b, 'Fell in love with ' + a.name + '.');
   whisper(S, 'love1', 'PAIR BOND: two minds have agreed to model each other more closely than anyone else.');
   // move in together if there is room
   const h = getB(S, a.home);
@@ -827,9 +844,9 @@ function couplesBirth(S) {
   const cs = S.citizens;
   let pa = null, pb = null, br = -9;
   for (const c of cs) {
-    if (!c.mate || !adult(c) || c.id > c.mate) continue;
+    if (!c.mate || !adult(c) || c.id > c.mate || c.elder || ageYears(c) < 20) continue;
     const m = getC(S, c.mate);
-    if (!m || !adult(m)) continue;
+    if (!m || !adult(m) || m.elder || ageYears(m) < 20) continue;
     let kids = 0, small = 0;
     for (const o of cs) if (o.par.indexOf(c.id) >= 0) { kids++; if (o.grow < 1) small++; }
     if (small >= 1 || kids >= 3) continue;
@@ -857,6 +874,9 @@ function makeChild(S, pa, pb, n) {
   n.tr.brave = (pa.tr.brave + pb.tr.brave) / 2 * 0.6 + S.rng() * 0.4;
   addRel(n, pa, 0.7); addRel(n, pb, 0.7);
   n.thought = 'Everything is new and enormous.';
+  n.gen = Math.max(pa.gen || 1, pb.gen || 1) + 1;
+  memo(S, n, 'Born to ' + pa.name + ' and ' + pb.name + '.');
+  memo(S, pa, 'Had a child with ' + pb.name + ': ' + n.name + '.'); memo(S, pb, 'Had a child with ' + pa.name + ': ' + n.name + '.');
   emote(n, EM.baby, 3);
   if (pa.fac && pa.fac === pb.fac) n.fac = pa.fac;
 }
@@ -871,6 +891,7 @@ function societyTick(S) {
       c.grow = Math.min(1, c.grow + 1 / GROW_SECS);
       if (c.grow >= 1) {
         logMsg(S, c.name + ' has grown up.', 'good');
+        memo(S, c, 'Grew up.');
         c.thought = 'I am a grown-up now. I should get a job. Or a hobby.';
         ev(S, 'grownup', { id: c.id, x: c.x, z: c.z });
       }
@@ -893,6 +914,7 @@ function societyTick(S) {
       c.happy = Math.max(0, c.happy - 0.2); m.happy = Math.max(0, m.happy - 0.2);
       emote(c, EM.dots, 3); emote(m, EM.anger, 3);
       logMsg(S, c.name + ' and ' + m.name + ' have split up.', 'bad');
+      memo(S, c, 'Split up with ' + m.name + '.'); memo(S, m, 'Split up with ' + c.name + '.');
       ev(S, 'breakup', { a: c.id, b: m.id });
     }
   }
@@ -961,6 +983,7 @@ function factionTick(S) {
     best.thought = 'They look to me now. I had better say something true.';
     emote(best, EM.crown, 3);
     ev(S, 'leader', { id: best.id, k, x: best.x, z: best.z, fresh, name: f.name });
+    memo(S, best, 'Became the voice of the ' + f.name + '.');
     logMsg(S, best.name + (fresh ? ' has become the voice of ' + BELIEFS[k].name + '. ' + holders.length + ' follow as the ' + f.name + '.'
       : ' now leads the ' + f.name + '.'), 'b' + k);
     whisper(S, 'lead1', 'HIERARCHY: an idea has found a face. Ideas with faces spread faster, and fight harder.');

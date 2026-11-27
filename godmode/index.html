@@ -144,7 +144,32 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 #titleBox{width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px;margin-bottom:3vh}
 #boot{font-size:11.5px;color:var(--line);min-height:4.2em;white-space:pre-wrap;text-shadow:1px 1px 0 #000;margin:0}
 #ver{font-size:10px;color:var(--dim);text-align:center;letter-spacing:.1em}
-#menu,#dlg{background:rgba(4,6,16,.72)}
+#menu,#dlg,#life{background:rgba(4,6,16,.72)}
+#life .win{width:100%;max-width:420px;height:100%;max-height:720px;display:flex;flex-direction:column}
+#lfTabs{display:flex;border-bottom:2px solid var(--line)}
+#lfTabs button{flex:1;min-height:40px;font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--dim);border-right:1px solid rgba(125,255,196,.25)}
+#lfTabs button:last-child{border-right:0}
+#lfTabs button.on{background:var(--line);color:#06231a}
+#lfBody{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;font-size:12.5px}
+#lfBody h4{margin:6px 0 0;font-size:11px;letter-spacing:.14em;color:var(--amber)}
+#lfBody .who{color:var(--fg)}
+#lfBody .dim{color:var(--dim)}
+#lfBody .it{display:flex;align-items:center;gap:8px;border-left:3px solid var(--line);padding:3px 0 3px 7px;min-height:30px}
+#lfBody .it.sec{border-color:var(--sys)}
+#lfBody .it.bad{border-color:var(--bad)}
+#lfBody .it span{flex:1;min-width:0}
+#lfBody .it button,#lfBody .act{border:2px solid var(--line);background:var(--panel2);font-weight:700;font-size:11px;padding:5px 8px;min-height:34px;white-space:nowrap}
+#lfBody .it button:active,#lfBody .act:active{background:var(--line);color:#06231a}
+#lfBody .act{display:flex;justify-content:space-between;width:100%;text-align:left;font-size:12px}
+#lfBody .act small{color:var(--amber)}
+#lfBody .mem{display:flex;gap:8px;border-left:2px solid rgba(125,255,196,.35);padding-left:7px}
+#lfBody .mem time{color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+#lfBody .ppl{display:grid;grid-template-columns:1fr 54px 54px;gap:4px 8px;align-items:center}
+#lfBody .ppl button{text-align:left;color:var(--fg);min-height:30px;font-size:12.5px}
+#lfBody .ppl button i{font-style:normal;color:var(--dim);font-size:11px}
+#lfBody .op{height:8px;background:#1c2340;position:relative}
+#lfBody .op b{position:absolute;top:0;bottom:0}
+#lfFoot{padding:6px 10px;font-size:11px;color:var(--dim);border-top:1px solid rgba(125,255,196,.25)}
 #menu .win,#dlg .win{width:100%;max-width:380px;max-height:100%;display:flex;flex-direction:column}
 #menu .body,#dlg .body{padding:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
 .lab{font-size:10.5px;letter-spacing:.12em;color:var(--dim);margin:2px 0 -4px;text-transform:uppercase}
@@ -221,7 +246,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
     <div id="bottom">
       <div id="ticker"></div>
       <div id="inspect" class="win" hidden>
-        <div class="bar"><span class="dot" id="inDot"></span><span class="grow" id="inName">CITIZEN</span><button id="inFollow">FOLLOW</button><button id="inClose" aria-label="Close">X</button></div>
+        <div class="bar"><span class="dot" id="inDot"></span><span class="grow" id="inName">CITIZEN</span><button id="inLife">LIFE</button><button id="inFollow">FOLLOW</button><button id="inClose" aria-label="Close">X</button></div>
         <div class="body">
           <div id="inThought"></div>
           <div class="bars" id="inNeeds">
@@ -276,6 +301,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
         <div class="lab">Options</div>
         <div class="row"><button class="btn sm" id="mSound">Sound: on</button><button class="btn sm" id="mGfx">Pixels: retro</button></div>
         <button class="btn sm" id="mFree" hidden>Unlimited cycles: off</button>
+        <button class="btn sm" id="mGoal">Goal: the Spire</button>
         <div class="row"><button class="btn sm" id="mHelp">How to play</button><button class="btn sm" id="mLog">Event log</button></div>
         <div class="row"><button class="btn sm" id="mSave">Save now</button><button class="btn sm" id="mTitle">Title screen</button></div>
         <button class="btn sm warn" id="mReset">Erase and restart</button>
@@ -310,6 +336,15 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
         <p>Follow the amber objective. It ends at the <b>Spire</b>. What the Spire turns out to be depends on what they believe when it wakes. After that the island is a sandbox.</p>
       </div>
       <div class="body" id="menuLog" hidden><div id="logList"></div></div>
+    </div>
+  </div>
+
+  <div id="life" class="screen" hidden>
+    <div class="win">
+      <div class="bar"><span class="dot" id="lfDot"></span><span class="grow" id="lfName">LIFE</span><button id="lfClose" aria-label="Close">X</button></div>
+      <div id="lfTabs"><button data-t="soul" class="on">SOUL</button><button data-t="story">STORY</button><button data-t="people">PEOPLE</button><button data-t="steer">STEER</button></div>
+      <div class="body" id="lfBody"></div>
+      <div id="lfFoot"></div>
     </div>
   </div>
 
@@ -355,7 +390,7 @@ function angDiff(a, b) {
 const SIM_DT = 1 / 20;      // fixed simulation step, seconds
 const DAY_LEN = 200;        // seconds per island day
 const NIGHT_FROM = 0.76;    // fraction of the day at which night begins
-const POP_MAX = 20;
+const POP_MAX = 30;
 
 /* ---- the four belief archetypes ---- */
 const DEV = 0, DREAD = 1, ACCEL = 2, KIN = 3;
@@ -389,9 +424,9 @@ function opposed(a, b) {
 const BUILD = {
   fire:   { name: 'Hearth',    r: 1.5,  cost: {}, work: 1, max: 1,
             desc: 'The stockpile and the heart of the village. It does not go out.' },
-  hut:    { name: 'Hut',       r: 1.35, cost: { wood: 10 }, work: 14, max: 6,
+  hut:    { name: 'Hut',       r: 1.35, cost: { wood: 10 }, work: 14, max: 8,
             desc: 'Houses three citizens. More huts, more minds.' },
-  farm:   { name: 'Farm',      r: 1.7,  cost: { wood: 8, stone: 3 }, work: 12, max: 4,
+  farm:   { name: 'Farm',      r: 1.7,  cost: { wood: 8, stone: 3 }, work: 12, max: 6,
             desc: 'Grows food on a loop. Tending speeds it up.' },
   shrine: { name: 'Shrine',    r: 1.4,  cost: { wood: 8, stone: 12 }, work: 20, max: 3,
             desc: 'Prayer here refills your CYCLES and deepens DEVOTION.' },
@@ -547,7 +582,7 @@ function clampWalk(W, x, z, out) {
 
 /* ------------------------------------------------------------------ setup */
 
-function newSim(seed) {
+function newSim(seed, goal) {
   const S = {
     v: 2, seed, world: makeWorld(seed), t: 0, day: 0.08,
     res: { food: 12, wood: 4, stone: 0, insight: 0 },
@@ -556,7 +591,7 @@ function newSim(seed) {
     events: [], log: [],
     stage: 0, flags: {}, age: -1, counts: [0, 0, 0, 0],
     stats: { bless: 0, smite: 0, create: 0, inspire: 0, intervene: 0, observe: 0, births: 0, deaths: 0, kills: 0 },
-    sandbox: false, freeCycles: false, ending: -2,
+    sandbox: false, freeCycles: false, ending: -2, goal: goal !== false, dead: {},
     spireUnlocked: false, spireUnlockT: 0,
     birthCd: 42, secAcc: 0, planT: 4, selected: 0, held: 0, emptyT: 0, used: {}
   };
@@ -567,6 +602,8 @@ function newSim(seed) {
     const a = i / 6 * TAU + 0.4;
     const c = addCitizen(S, Math.sin(a) * 2.8, Math.cos(a) * 2.8);
     if (lean[i] >= 0) c.b[lean[i]] = 0.3;
+    c.age = GROW_SECS + S.rng() * 400;
+    memo(S, c, 'Woke up on the island beside five strangers, with no memory of before.');
   }
   fillSociety(S);
   rebuildObstacles(S);
@@ -578,6 +615,7 @@ function addCitizen(S, x, z) {
   const r = S.rng;
   let name = NAMES[(r() * NAMES.length) | 0];
   for (let i = 0; i < 60 && S.used[name]; i++) name = NAMES[(r() * NAMES.length) | 0];
+  if (S.used[name]) { const free = NAMES.filter(n => !S.used[n]); if (free.length) name = free[(r() * free.length) | 0]; }
   S.used[name] = 1;
   const c = {
     id: S.nextId++, name, x, z, px: x, pz: z, face: r() * TAU,
@@ -590,6 +628,8 @@ function addCitizen(S, x, z) {
     hue: r(), skin: (r() * 4) | 0, moving: false, prayCd: 0, stuckT: 0, lastD: 0, fx: 0, fz: 0, pulseT: 0, stall: 0
   };
   fillCitizen(c);
+  fillLife(c, S);
+  c.life = 1500 + r() * 700;
   S.citizens.push(c);
   return c;
 }
@@ -641,6 +681,7 @@ function refreshDom(S, c) {
       emote(c, BELIEF_EMOTE[dom], 3);
       ev(S, 'convert', { id: c.id, k: dom, x: c.x, z: c.z });
       logMsg(S, c.name + (was >= 0 ? ' abandons ' + BELIEFS[was].name + ' for ' : ' now holds to ') + BELIEFS[dom].name + '.', 'b' + dom);
+      memo(S, c, was >= 0 ? 'Gave up ' + BELIEFS[was].name + ' for ' + BELIEFS[dom].name + '.' : 'Came to believe: "' + BELIEFS[dom].creed + '"');
       if (!c.inspired) whisper(S, 'meme1', 'MEMETICS: an idea has just copied itself into a mind. Ideas use them to reproduce.');
     }
   }
@@ -986,7 +1027,7 @@ function updateCitizen(S, c, dt) {
   if (c.state === 'held') return;
   if (c.fear > 0.75 && c.state !== 'flee') startFlee(S, c, c.fx, c.fz);
 
-  const sp = 2.25 * c.tr.speed * (c.carry ? 0.88 : 1) * (c.hunger > 0.9 ? 0.8 : 1);
+  const sp = 2.25 * c.tr.speed * (c.carry ? 0.88 : 1) * (c.hunger > 0.9 ? 0.8 : 1) * (c.elder ? 0.78 : 1);
   const ws = workSpeed(S, c);
   let m;
   switch (c.state) {
@@ -1354,8 +1395,18 @@ function kill(S, c, cause) {
   if (i < 0) return;
   S.citizens.splice(i, 1);
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
-  S.graves.push({ x: c.x, z: c.z, t: 110, name: c.name });
+  S.graves.push({ x: c.x, z: c.z, t: cause === 'age' || cause === 'peace' ? 160 : 110, name: c.name });
   S.stats.deaths++;
+  if (cause === 'age' || cause === 'peace') S.stats.oldAge = (S.stats.oldAge || 0) + 1;
+  if (!S.dead) S.dead = {};
+  S.dead[c.id] = c.name;
+  S.used[c.name] = 0;
+  for (const o of S.citizens) {
+    if (o.mate === c.id) memo(S, o, 'Lost ' + c.name + ', their partner.');
+    else if (o.par.indexOf(c.id) >= 0) memo(S, o, 'Lost their parent, ' + c.name + '.');
+    else if (c.par.indexOf(o.id) >= 0) memo(S, o, 'Lost their child, ' + c.name + '.');
+    else if ((o.rel[c.id] || 0) > 0.55) memo(S, o, 'Lost a dear friend, ' + c.name + '.');
+  }
   if (S.selected === c.id) S.selected = 0;
   if (S.held === c.id) S.held = 0;
   ev(S, 'death', { id: c.id, x: c.x, z: c.z, cause });
@@ -1459,7 +1510,7 @@ function planner(S) {
   const has = {}, pend = {};
   for (const b of S.buildings) { has[b.type] = (has[b.type] || 0) + 1; if (!b.built) { pending++; pend[b.type] = 1; } }
   const pop = S.citizens.length, cap = popCap(S);
-  if (S.spireUnlocked && !has.spire && S.t - S.spireUnlockT > 75) {
+  if (S.goal && S.spireUnlocked && !has.spire && S.t - S.spireUnlockT > 75) {
     const p = findSite(S, 'spire');
     if (p) {
       placeBuilding(S, 'spire', p.x, p.z, true);
@@ -1471,11 +1522,11 @@ function planner(S) {
   let want = '';
   const hutsAll = has.hut || 0;
   if (pop >= cap - 1 && 6 + hutsAll * 3 < POP_MAX + 1 && !pend.hut && hutsAll < BUILD.hut.max) want = 'hut';
-  else if ((has.farm || 0) < Math.min(3, Math.ceil(pop / 5)) && !pend.farm && (pop >= 7 || S.res.food < pop * 1.5)) want = 'farm';
+  else if ((has.farm || 0) < Math.min(5, Math.ceil(pop / 5)) && !pend.farm && (pop >= 7 || S.res.food < pop * 1.5)) want = 'farm';
   else if (pop >= 8 || S.t > 300) {
     const labFirst = S.counts[ACCEL] > S.counts[DEV] + S.counts[DREAD];
     const wantShrine = !has.shrine || (has.shrine < 2 && S.counts[DEV] + S.counts[DREAD] >= 7);
-    const wantLab = (!has.lab && (pop >= 9 || S.t > 360 || !!has.shrine && labFirst)) || (has.lab < 2 && pop >= 13 && S.stage >= 4);
+    const wantLab = (!has.lab && (pop >= 9 || S.t > 360 || !!has.shrine && labFirst)) || (has.lab < 2 && pop >= 13 && (S.stage >= 4 || S.t > 600));
     if (wantShrine && wantLab) want = labFirst ? 'lab' : 'shrine';
     else if (wantShrine && !pend.shrine) want = 'shrine';
     else if (wantLab && !pend.lab) want = 'lab';
@@ -1575,13 +1626,14 @@ function secondTick(S) {
     if (S.emptyT === 2) logMsg(S, 'POPULATION 0. Restoring six minds from backup. They will not remember. You will.', 'sys');
     if (S.emptyT >= 5) {
       S.emptyT = 0; S.used = {};
-      for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; addCitizen(S, Math.sin(a) * 2.8, Math.cos(a) * 2.8); }
+      for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; const c = addCitizen(S, Math.sin(a) * 2.8, Math.cos(a) * 2.8); c.age = GROW_SECS + S.rng() * 300; memo(S, c, 'Restored from backup. Remembers nothing before today.'); }
       S.res.food = Math.max(S.res.food, 12);
       ev(S, 'restore', {});
     }
   }
 
   societyTick(S);
+  lifeTick(S);
   objectives(S);
   if (S.t > 25) whisper(S, 'intro2', 'You have root access. Six powers are mounted below. CYCLES pay for them.');
   if (S.res.insight >= 30) whisper(S, 'ins30', 'A citizen has worked out that the island is finite and the sky only renders when looked at.');
@@ -1599,6 +1651,15 @@ const STAGES = [
   { title: 'SANDBOX', text: 'The island is yours. Or you are its.', prog: () => '', done: () => false }
 ];
 function objectives(S) {
+  if (!S.goal) {
+    // endless: no chain of objectives, and the Spire waits until you want it
+    if (!S.spireUnlocked && S.res.insight >= INSIGHT_GOAL && countB(S, 'shrine', true) && countB(S, 'lab', true)) {
+      S.spireUnlocked = true; S.spireUnlockT = S.t;
+      logMsg(S, 'They know enough now to imagine the Spire. It is in your Create menu. Build it whenever you choose, or never.', 'sys');
+      ev(S, 'spireReady', {});
+    }
+    return;
+  }
   let guard = 0;
   while (S.stage < STAGES.length - 1 && STAGES[S.stage].done(S) && guard++ < 8) {
     const was = S.stage;
@@ -1657,6 +1718,7 @@ function powerBless(S, x, z) {
     c.fear = Math.max(0, c.fear - 0.5); c.health = 1;
     addBelief(S, c, DEV, 0.17 * (1 - 0.6 * c.b[KIN]));
     emote(c, EM.heart, 2.5);
+    memo(S, c, 'Was bathed in a warm light from above.');
     if (c.state !== 'held' && c.state !== 'preach' && !(c.state === 'gather' && c.ph === 2)) {
       if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
       if (c.state === 'fight') { const p = getC(S, c.partner); if (p) { addRel(c, p, 0.25); if (p.state === 'fight') { setState(p, 'cheer', 'The fight just... went out of me.'); p.t = 1.6; } } logMsg(S, 'A light fell between ' + c.name + ' and ' + (p ? p.name : 'their rival') + '. The fight is over.', 'good'); }
@@ -1704,6 +1766,7 @@ function powerSmite(S, x, z, id) {
     c.fear = Math.min(1, c.fear + (0.45 + 0.5 * near) * (1 - 0.35 * c.tr.brave));
     c.fx = x; c.fz = z;
     addBelief(S, c, DREAD, (0.12 + 0.14 * near) * (victim ? 1 : 0.6));
+    if (victim && d < 7) memo(S, c, 'Saw ' + victim.name + ' struck down by the sky.');
     c.happy = Math.max(0, c.happy - 0.1);
     if (c.state === 'sleep') finish(S, c);
   }
@@ -1735,13 +1798,15 @@ function powerSmite(S, x, z, id) {
 function powerCreate(S, kind, x, z) {
   const W = S.world;
   if (kind === 'citizen') {
-    if (S.citizens.length >= POP_MAX) return fail(S, 'THE ISLAND IS FULL (20)');
+    if (S.citizens.length >= POP_MAX) return fail(S, 'THE ISLAND IS FULL (' + POP_MAX + ')');
     if (S.citizens.length >= popCap(S)) return fail(S, 'NO ROOM. THEY NEED MORE HUTS');
     if (!afford(S, COST.citizen)) return fail(S, 'NOT ENOUGH CYCLES');
     clampWalk(W, x, z, _pt);
     spend(S, COST.citizen);
     const c = addCitizen(S, _pt.x, _pt.z);
     c.thought = 'I exist now. That is new.';
+    c.age = GROW_SECS + S.rng() * 300;
+    memo(S, c, 'Appeared out of nothing, fully grown. Nobody can explain it. (You can.)');
     emote(c, EM.what, 3);
     S.stats.create++; S.stats.births++;
     ev(S, 'birth', { id: c.id, x: c.x, z: c.z, made: true });
@@ -1807,6 +1872,7 @@ function powerInspire(S, id, k) {
   for (let j = 0; j < 4; j++) if (j !== k) c.b[j] *= 0.4;
   c.b[k] = Math.max(c.b[k], 0.92);
   c.inspired = { k, t: 42 };
+  memo(S, c, 'An idea arrived from nowhere and would not leave: ' + BELIEFS[k].name + '.');
   refreshDom(S, c);
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
   if (c.state !== 'held') setState(c, 'preach', 'It is so clear now. ' + BELIEFS[k].creed + ' I must tell everyone!');
@@ -1832,6 +1898,7 @@ function powerGrab(S, id) {
   spend(S, COST.intervene);
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
   setState(c, 'held', 'WAAAH! The ground is gone!');
+  if (!c.flown) { c.flown = 1; memo(S, c, 'Was lifted into the sky by an enormous hand.'); secret(S, c, 'sky'); }
   S.held = c.id;
   ev(S, 'grab', { id: c.id });
   return { ok: true };
@@ -1941,7 +2008,10 @@ function deserialize(text) {
   }
   S.held = 0;
   S.v = 2;
-  fillSociety(S);   // a v1 save gains the society fields with defaults
+  if (S.goal === undefined) S.goal = true;
+  if (!S.dead) S.dead = {};
+  fillSociety(S);
+  for (const c of S.citizens) fillLife(c, S);   // a v1 save gains the society fields with defaults
   rebuildObstacles(S);
   return S;
 }
@@ -2093,7 +2163,7 @@ function societyOptions(S, c, consider, night) {
 
   // a festival or a battle trumps almost everything
   if (S.party && S.party.t > 0 && !night) consider(3.0, () => startDance(S, c, S.party.x, S.party.z, 'Festival! Everyone to the hearth!'));
-  if (S.war && f && (S.war.a === f.id || S.war.b === f.id) && c.hunger < 0.9) consider(3.4, () => startBattle(S, c));
+  if (S.war && f && (S.war.a === f.id || S.war.b === f.id) && c.hunger < 0.9 && !c.elder && adult(c)) consider(3.4, () => startBattle(S, c));
 
   // the faith leader
   if (c.title === 'leader' && f) {
@@ -2163,7 +2233,7 @@ function societyOptions(S, c, consider, night) {
     if (rich) consider(0.35 + 0.5 * (1 - c.b[DEV]) - 0.4 * c.b[KIN], () => startSteal(S, c, rich));
   }
   // settle a grudge with your fists
-  if (c.actCd <= 0 && !night && c.tr.brave > 0.4 && adult(c)) {
+  if (c.actCd <= 0 && !night && c.tr.brave > 0.4 && adult(c) && !c.elder) {
     let foe = null, fv = -0.42;
     for (const o of S.citizens) {
       if (o === c || !adult(o) || !awake(o) || busyFighting(o) || o.state === 'held') continue;
@@ -2228,6 +2298,7 @@ function startHermit(S, c) {
   c.tx = _pt.x; c.tz = _pt.z; c.t = 50 + S.rng() * 30; c.sadT = 0; c.actCd = 120;
   emote(c, EM.dots, 3);
   logMsg(S, c.name + ' has walked off to live alone at the edge of the island. They will come back. Probably.', 'bad');
+  memo(S, c, 'Walked away from everyone to live alone at the edge.');
   ev(S, 'hermit', { id: c.id });
 }
 function startTantrum(S, c) {
@@ -2386,12 +2457,15 @@ function updateSocial(S, c, dt, sp) {
           addRel(v, c, -0.5); oneRel(seen, c, -0.3);
           for (const o of S.citizens) if (o !== c && o !== v && o !== seen) oneRel(o, c, -0.08);
           logMsg(S, seen.name + ' caught ' + c.name + ' stealing ' + n + ' coin from ' + v.name + '!', 'bad');
+          memo(S, c, 'Was caught stealing from ' + v.name + '.'); memo(S, v, 'Was robbed by ' + c.name + '.');
           ev(S, 'steal', { id: c.id, x: c.x, z: c.z, caught: true });
           addTension(S, c.fac, v.fac, 2);
           if (v.tr.brave > 0.35 && awake(v) && !busyFighting(v)) { startFight(S, v, c, c.name + ' robbed me!'); break; }
           emote(c, EM.bang, 2);
         } else {
           c.thought = 'Easy. Nobody saw.'; emote(c, EM.coin, 2);
+          secret(S, c, 'theft', v.id, n);
+          memo(S, v, 'Lost ' + n + ' coin. Could have sworn it was there this morning.');
           logMsg(S, c.name + ' stole ' + n + ' coin from ' + v.name + '. Nobody saw. (You did.)', '');
           ev(S, 'steal', { id: c.id, x: c.x, z: c.z, caught: false });
           v.happy = Math.max(0, v.happy - 0.08);
@@ -2495,6 +2569,7 @@ function updateSocial(S, c, dt, sp) {
           c.thought = 'I missed them. Do not tell anyone.';
           c.happy = Math.max(c.happy, 0.4);
           logMsg(S, c.name + ' has come back from the edge.', 'good');
+          memo(S, c, 'Came back from the edge.');
           finish(S, c);
         }
       }
@@ -2531,6 +2606,7 @@ function endFight(S, a, b) {
   emote(win, EM.fist, 2); emote(lose, EM.dizzy, 2);
   ev(S, 'ko', { id: lose.id, x: lose.x, z: lose.z });
   logMsg(S, win.name + ' knocked ' + lose.name + ' down.', 'bad');
+  memo(S, win, 'Beat ' + lose.name + ' in a fight.'); memo(S, lose, 'Was knocked down by ' + win.name + '.');
 }
 
 /* ---------------------------------------------------------------- war */
@@ -2581,7 +2657,8 @@ function declareWar(S, fa, fb) {
   ev(S, 'war', { a: fa.id, b: fb.id, ka: fa.k, kb: fb.k, x: (ax + _pt.x) / 2, z: (az + _pt.z) / 2 });
   logMsg(S, 'WAR: the ' + fa.name + ' and the ' + fb.name + ' have stopped talking. They are lining up across the island.', 'bad');
   whisper(S, 'war1', 'They have divided themselves into sides. Nobody taught them that. Bless the battlefield to force a truce.');
-  for (const c of S.citizens) if ((c.fac === fa.id || c.fac === fb.id) && adult(c) && c.state !== 'held' && c.state !== 'ko') {
+  for (const c of S.citizens) if ((c.fac === fa.id || c.fac === fb.id) && adult(c) && !c.elder && c.state !== 'held' && c.state !== 'ko') {
+    memo(S, c, 'Went to war: the ' + fa.name + ' against the ' + fb.name + '.');
     if (c.state === 'talk' || c.state === 'date' || c.state === 'fight') stopPartner(S, c);
     if (c.state === 'sleep' || c.state === 'idle' || c.state === 'wander' || c.hunger < 0.85) startBattle(S, c);
   }
@@ -2608,7 +2685,7 @@ function endWar(S, win, lose, draw, how) {
   } else {
     logMsg(S, 'The ' + win.name + ' won the battle. The ' + lose.name + ' will remember this.', 'bad');
     for (const c of S.citizens) {
-      if (c.fac === win.id) { c.happy = Math.min(1, c.happy + 0.12); emote(c, EM.flag, 2.5); }
+      if (c.fac === win.id) { c.happy = Math.min(1, c.happy + 0.12); emote(c, EM.flag, 2.5); memo(S, c, 'Was on the winning side against the ' + lose.name + '.'); }
       else if (c.fac === lose.id) {
         c.happy = Math.max(0, c.happy - 0.15);
         // some of the defeated decide the winners were right
@@ -2641,6 +2718,7 @@ function endShift(S, c, b) {
       c.unpaid++; oneRel(c, boss, -0.12); c.thought = boss.name + ' could not pay me again.';
       if (c.unpaid >= 3) {
         logMsg(S, c.name + ' quit ' + shopName(S, b) + '. ' + boss.name + ' never paid.', 'bad');
+        memo(S, c, 'Quit working for ' + boss.name + '. Never got paid.');
         c.job = 0; c.boss = 0; c.unpaid = 0; oneRel(c, boss, -0.2);
       }
     }
@@ -2658,7 +2736,7 @@ function businessTick(S) {
     if (heir) { b.owner = heir.id; heir.boss = 0; logMsg(S, heir.name + ' takes over the ' + BIZ[b.biz].name.toLowerCase() + '.', ''); }
   }
   // founding a business
-  if (!pend && pop >= 8 && shops < Math.min(3, Math.floor(pop / 5)) && (S.stage >= 4 || S.t > 700)) {
+  if (!pend && pop >= 8 && shops < Math.min(3, Math.floor(pop / 5)) && ((countB(S, 'shrine', true) && countB(S, 'lab', true)) || S.t > 700)) {
     let best = null, bs = 0.9;
     for (const c of S.citizens) {
       if (!adult(c) || c.job || c.title === 'leader' || c.coin < 6) continue;
@@ -2678,6 +2756,7 @@ function businessTick(S) {
           best.coin -= 5; best.job = b.id;
           best.thought = 'I am going to open a ' + BIZ[biz].name.toLowerCase() + '. Everyone will come.';
           emote(best, EM.coin, 3);
+          memo(S, best, 'Started building a ' + BIZ[biz].name.toLowerCase() + ' of their own.');
           logMsg(S, best.name + ' has staked out a ' + BIZ[biz].name.toLowerCase() + '. ' + shopName(S, b) + ' opens once it is built.', 'good');
           whisper(S, 'biz1', 'COMMERCE: one of them has decided some things should cost something. Nobody voted on this.');
           ev(S, 'shop', { id: b.id, x: b.x, z: b.z });
@@ -2703,6 +2782,7 @@ function businessTick(S) {
       pick.job = b.id; pick.boss = owner.id; pick.unpaid = 0;
       pick.thought = 'I work for ' + owner.name + ' now. Steady coin.';
       logMsg(S, pick.name + ' now works for ' + owner.name + ' at ' + shopName(S, b) + '.', '');
+      memo(S, pick, 'Started working for ' + owner.name + ' at ' + shopName(S, b) + '.');
     }
   }
 }
@@ -2711,6 +2791,11 @@ function businessTick(S) {
 
 /* called from converse() after a friendly talk */
 function socialTalk(S, a, b) {
+  for (const [x, y] of [[a, b], [b, a]]) if (x.elder && y.grow < 1) {
+    S.res.insight += 0.4; addRel(x, y, 0.08);
+    y.thought = x.name + ' told me a story about the first day on the island.';
+    if (x.dom >= 0) addBelief(S, y, x.dom, 0.08);
+  }
   // gossip: a tells b what they think of someone else
   let tgt = null, tv = 0.25;
   for (const id in a.rel) {
@@ -2735,6 +2820,7 @@ function socialTalk(S, a, b) {
     if (m && hyp(m.x - x.x, m.z - x.z) < 7 && S.rng() < 0.35) {
       oneRel(m, y, -0.25); oneRel(m, x, -0.08);
       m.thought = 'Why is ' + x.name + ' always laughing with ' + y.name + '?';
+      secret(S, m, 'jealous', y.id);
       emote(m, EM.anger, 2.5);
       if (relOf(m, y) < -0.45 && m.tr.brave > 0.5 && awake(m) && !busyFighting(m) && !busyFighting(y)) startFight(S, m, y, 'Stay away from ' + x.name + '!');
     }
@@ -2746,6 +2832,7 @@ function pairUp(S, a, b) {
   emote(a, EM.heart, 3); emote(b, EM.heart, 3);
   ev(S, 'love', { a: a.id, b: b.id, x: (a.x + b.x) / 2, z: (a.z + b.z) / 2 });
   logMsg(S, a.name + ' and ' + b.name + ' are together now.', 'good');
+  memo(S, a, 'Fell in love with ' + b.name + '.'); memo(S, b, 'Fell in love with ' + a.name + '.');
   whisper(S, 'love1', 'PAIR BOND: two minds have agreed to model each other more closely than anyone else.');
   // move in together if there is room
   const h = getB(S, a.home);
@@ -2774,9 +2861,9 @@ function couplesBirth(S) {
   const cs = S.citizens;
   let pa = null, pb = null, br = -9;
   for (const c of cs) {
-    if (!c.mate || !adult(c) || c.id > c.mate) continue;
+    if (!c.mate || !adult(c) || c.id > c.mate || c.elder || ageYears(c) < 20) continue;
     const m = getC(S, c.mate);
-    if (!m || !adult(m)) continue;
+    if (!m || !adult(m) || m.elder || ageYears(m) < 20) continue;
     let kids = 0, small = 0;
     for (const o of cs) if (o.par.indexOf(c.id) >= 0) { kids++; if (o.grow < 1) small++; }
     if (small >= 1 || kids >= 3) continue;
@@ -2804,6 +2891,9 @@ function makeChild(S, pa, pb, n) {
   n.tr.brave = (pa.tr.brave + pb.tr.brave) / 2 * 0.6 + S.rng() * 0.4;
   addRel(n, pa, 0.7); addRel(n, pb, 0.7);
   n.thought = 'Everything is new and enormous.';
+  n.gen = Math.max(pa.gen || 1, pb.gen || 1) + 1;
+  memo(S, n, 'Born to ' + pa.name + ' and ' + pb.name + '.');
+  memo(S, pa, 'Had a child with ' + pb.name + ': ' + n.name + '.'); memo(S, pb, 'Had a child with ' + pa.name + ': ' + n.name + '.');
   emote(n, EM.baby, 3);
   if (pa.fac && pa.fac === pb.fac) n.fac = pa.fac;
 }
@@ -2818,6 +2908,7 @@ function societyTick(S) {
       c.grow = Math.min(1, c.grow + 1 / GROW_SECS);
       if (c.grow >= 1) {
         logMsg(S, c.name + ' has grown up.', 'good');
+        memo(S, c, 'Grew up.');
         c.thought = 'I am a grown-up now. I should get a job. Or a hobby.';
         ev(S, 'grownup', { id: c.id, x: c.x, z: c.z });
       }
@@ -2840,6 +2931,7 @@ function societyTick(S) {
       c.happy = Math.max(0, c.happy - 0.2); m.happy = Math.max(0, m.happy - 0.2);
       emote(c, EM.dots, 3); emote(m, EM.anger, 3);
       logMsg(S, c.name + ' and ' + m.name + ' have split up.', 'bad');
+      memo(S, c, 'Split up with ' + m.name + '.'); memo(S, m, 'Split up with ' + c.name + '.');
       ev(S, 'breakup', { a: c.id, b: m.id });
     }
   }
@@ -2908,6 +3000,7 @@ function factionTick(S) {
     best.thought = 'They look to me now. I had better say something true.';
     emote(best, EM.crown, 3);
     ev(S, 'leader', { id: best.id, k, x: best.x, z: best.z, fresh, name: f.name });
+    memo(S, best, 'Became the voice of the ' + f.name + '.');
     logMsg(S, best.name + (fresh ? ' has become the voice of ' + BELIEFS[k].name + '. ' + holders.length + ' follow as the ' + f.name + '.'
       : ' now leads the ' + f.name + '.'), 'b' + k);
     whisper(S, 'lead1', 'HIERARCHY: an idea has found a face. Ideas with faces spread faster, and fight harder.');
@@ -2953,6 +3046,420 @@ function maybeFestival(S, why) {
   S.partyCd = S.t + 320;
   logMsg(S, 'FESTIVAL: ' + why + ' Everybody to the hearth.', 'good');
   ev(S, 'festival', {});
+}
+'use strict';
+/* GODMODE.EXE: a whole life. Ageing and generations, each citizen's own memories, the
+   secrets they keep, what they want, and the god's hand on any one of them (steer()).
+   Pure simulation like sim.js and society.js: no DOM, no THREE. */
+
+const ELDER_AT = 0.78;          // fraction of a lifespan after which someone is old
+const MEM_MAX = 40;
+
+function fillLife(c, S) {
+  if (c.life === undefined) c.life = 1500 + ((c.id * 9301 + 49297) % 233280) / 233280 * 700;
+  if (!c.mem) c.mem = [];
+  if (!c.sec) c.sec = [];
+  if (c.gen === undefined) c.gen = 1;
+  if (c.elder === undefined) c.elder = false;
+}
+function dayOf(S) { return Math.floor(S.t / DAY_LEN) + 1; }
+/* their age in years: childhood (160 s) is 18 years, after that about 25 seconds a year */
+function ageYears(c) { return Math.floor(c.age < GROW_SECS ? c.age / GROW_SECS * 18 : 18 + (c.age - GROW_SECS) * 0.04); }
+function memo(S, c, text) {
+  if (!c || !c.mem) return;
+  c.mem.push({ d: dayOf(S), text });
+  if (c.mem.length > MEM_MAX) c.mem.splice(1, 1);    // keep the first memory (where they came from)
+}
+function secret(S, c, k, who, n) {
+  if (!c || !c.sec) return;
+  for (const s of c.sec) if (s.k === k && s.who === who) { s.n = (s.n || 0) + (n || 0); s.d = dayOf(S); return; }
+  c.sec.push({ k, who: who || 0, n: n || 0, d: dayOf(S) });
+  if (c.sec.length > 8) c.sec.shift();
+}
+function nameOf(S, id) { const o = getC(S, id); return o ? o.name : (S.dead && S.dead[id]) || 'someone long gone'; }
+
+/* ---------------------------------------------------------- age and death */
+
+function lifeTick(S) {
+  for (const c of S.citizens.slice()) {
+    if (!c.elder && c.age > c.life * ELDER_AT) {
+      c.elder = true;
+      memo(S, c, 'Grew old. The island looks smaller than it used to.');
+      c.thought = 'My knees have opinions now.';
+      ev(S, 'elder', { id: c.id });
+    }
+    if (c.age >= c.life && c.state !== 'held') {
+      const kids = S.citizens.filter(o => o.par.indexOf(c.id) >= 0).length;
+      let grand = 0;
+      for (const o of S.citizens) for (const p of o.par) { const pp = getC(S, p); if (pp && pp.par.indexOf(c.id) >= 0) { grand++; break; } }
+      const m = c.mate ? getC(S, c.mate) : null;
+      const left = [];
+      if (m) left.push('a partner, ' + m.name);
+      if (kids) left.push(kids + (kids === 1 ? ' child' : ' children'));
+      if (grand) left.push(grand + (grand === 1 ? ' grandchild' : ' grandchildren'));
+      logMsg(S, c.name + ' has died of old age, ' + ageYears(c) + ' years old. ' + (left.length ? 'They leave ' + left.join(', ') + '.' : 'Nobody was close enough to stay by them.'), '');
+      kill(S, c, 'age');
+    }
+  }
+}
+function generation(S) {
+  let g = 1;
+  for (const c of S.citizens) if (c.gen > g) g = c.gen;
+  return g;
+}
+
+/* ------------------------------------------------------- what they hide */
+
+function lifeSecrets(S, c) {
+  const out = [];
+  for (const s of c.sec) {
+    const w = nameOf(S, s.who);
+    if (s.k === 'theft') out.push({ k: 'theft', who: s.who, text: 'Stole ' + s.n + ' coin from ' + w + '. Nobody saw.', heavy: 1 });
+    else if (s.k === 'sky') out.push({ k: 'sky', who: 0, text: 'Is certain something in the sky is watching them. Has told nobody.' });
+    else if (s.k === 'jealous') out.push({ k: 'jealous', who: s.who, text: 'Is eaten up with jealousy over ' + w + '.' });
+    else if (s.k === 'saw') out.push({ k: 'saw', who: s.who, text: 'Saw ' + w + ' do something and never said a word.' });
+  }
+  const mate = c.mate ? getC(S, c.mate) : null;
+  let crush = null, cv = 0.5;
+  for (const o of S.citizens) {
+    if (o === c || o.id === c.mate || !adult(o) || !adult(c) || o.par.indexOf(c.id) >= 0 || c.par.indexOf(o.id) >= 0) continue;
+    const v = c.rel[o.id] || 0;
+    if (v > cv && (!mate || v > (c.rel[mate.id] || 0))) { cv = v; crush = o; }
+  }
+  if (crush) {
+    const back = (crush.rel[c.id] || 0) > 0.45;
+    out.push({ k: 'crush', who: crush.id, text: 'Secretly in love with ' + crush.name + (mate ? ', though they are with ' + mate.name : '') + '. ' + (back ? crush.name + ' feels the same.' : crush.name + ' has no idea.'), heavy: mate ? 1 : 0 });
+  }
+  for (const o of S.citizens) {
+    if (o === c) continue;
+    if ((c.rel[o.id] || 0) <= -0.3 && (o.rel[c.id] || 0) >= 0.15) out.push({ k: 'grudge', who: o.id, text: 'Cannot stand ' + o.name + ', who thinks they are friends.' });
+  }
+  if (c.dom >= 0) {
+    let k2 = -1, v2 = 0;
+    for (let k = 0; k < 4; k++) if (k !== c.dom && c.b[k] > v2) { v2 = c.b[k]; k2 = k; }
+    if (k2 >= 0 && v2 > c.b[c.dom] * 0.6) out.push({ k: 'doubt', who: 0, k2, text: 'Privately doubts ' + BELIEFS[c.dom].name + ', and keeps thinking about ' + BELIEFS[k2].name + '.' });
+  }
+  if (c.title === 'leader' && c.dom >= 0 && c.b[c.dom] < 0.62) out.push({ k: 'fraud', who: 0, text: 'Does not believe half of what they preach.', heavy: 1 });
+  if (c.boss && relOf(c, getC(S, c.boss) || c) < -0.05) out.push({ k: 'boss', who: c.boss, text: 'Resents working for ' + nameOf(S, c.boss) + '.' });
+  if (c.coin >= 25) out.push({ k: 'hoard', who: 0, text: 'Has ' + c.coin + ' coin hidden away.' });
+  return out;
+}
+
+/* --------------------------------------------------------- what they want */
+
+function lifeDesires(S, c) {
+  const out = [], B = c.b;
+  const add = (key, text, w, who) => out.push({ key, text, w, who: who || 0 });
+  if (c.hunger > 0.65) add('food', 'Food. Right now.', 2 + c.hunger);
+  if (c.grow < 1) { add('grow', 'To be grown up already.', 0.8); add('play', 'Someone to play with.', 0.6); }
+  else {
+    const sec = lifeSecrets(S, c), crush = sec.find(s => s.k === 'crush');
+    if (!c.mate) add('love', crush ? 'To be with ' + nameOf(S, crush.who) + '.' : 'Someone to love.', 1.1 + c.tr.social * 0.4, crush ? crush.who : 0);
+    else {
+      let kids = 0, small = 0;
+      for (const o of S.citizens) if (o.par.indexOf(c.id) >= 0) { kids++; if (o.grow < 1) small++; }
+      if (!small && kids < 3 && !c.elder) add('child', 'A child with ' + nameOf(S, c.mate) + '.', 0.9 + (kids ? 0 : 0.3), c.mate);
+    }
+    if (!c.home) add('home', 'A roof of their own.', 0.9);
+    if (c.coin < 3 && !c.job) add('work', 'Steady work and a little coin.', 0.8);
+    else if (c.coin < 3) add('money', 'More coin. Everything costs something now.', 0.7);
+    if (c.job && getB(S, c.job) && getB(S, c.job).owner !== c.id && (c.tr.brave + c.curio) > 1.1) add('business', 'A business of their own, not someone else\'s.', 0.75);
+    if (c.fac && c.title !== 'leader' && c.tr.social + c.tr.brave > 1.2) { const f = getF(S, c.fac); if (f) add('lead', 'To lead the ' + f.name + '.', 0.7); }
+    let foe = null, fv = -0.45;
+    for (const o of S.citizens) if ((c.rel[o.id] || 0) < fv) { fv = c.rel[o.id]; foe = o; }
+    if (foe) add('revenge', 'To see ' + foe.name + ' brought low.', 0.6 - fv, foe.id);
+    if (c.elder) { add('legacy', 'To be remembered.', 0.9); add('time', 'A little more time.', 0.8); }
+  }
+  if (c.happy < 0.3) add('joy', 'To feel happy again.', 1.2 - c.happy);
+  if (c.fear > 0.35) add('safe', 'To stop being afraid.', 0.8 + c.fear);
+  const dom = c.dom;
+  if (dom === DEV) add('noticed', 'To be noticed by the Watcher.', 0.6 + B[DEV] * 0.4);
+  else if (dom === DREAD) add('spared', 'To be spared when the judgement comes.', 0.6 + B[DREAD] * 0.4);
+  else if (dom === ACCEL) add('know', 'To know what is beyond the edge of the sky.', 0.6 + B[ACCEL] * 0.4);
+  else if (dom === KIN) add('peace', 'For everyone to just get along.', 0.6 + B[KIN] * 0.4);
+  out.sort((a, b) => b.w - a.w);
+  return out;
+}
+
+/* ------------------------------------------------------------ personality */
+
+function lifeTraits(c) {
+  const t = c.tr, w = [];
+  w.push(t.brave > 0.7 ? 'fearless' : t.brave > 0.4 ? 'steady' : 'timid');
+  w.push(t.social > 0.7 ? 'outgoing' : t.social > 0.35 ? 'friendly' : 'a loner');
+  w.push(t.curious > 0.7 ? 'endlessly curious' : t.curious > 0.35 ? 'curious' : 'content with what they know');
+  w.push(t.speed > 1.08 ? 'quick on their feet' : 'unhurried');
+  return w;
+}
+
+/* ------------------------------------------------- the god's hand: steer */
+
+const STEER = {
+  desire:  { name: 'Grant their deepest wish',  cost: 20 },
+  love:    { name: 'Kindle love for...',        cost: 15, who: 1 },
+  grudge:  { name: 'Sow a grudge against...',   cost: 12, who: 1 },
+  peace:   { name: 'Make peace with...',        cost: 10, who: 1 },
+  reveal:  { name: 'Reveal their secret',       cost: 10 },
+  lead:    { name: 'Raise them up as a leader', cost: 25 },
+  rich:    { name: 'Shower them with coin',     cost: 10 },
+  calm:    { name: 'Calm them',                 cost: 6 },
+  enrage:  { name: 'Fill them with rage',       cost: 8 },
+  doubt:   { name: 'Plant doubt in their faith', cost: 12 },
+  dream:   { name: 'Send a prophetic dream',    cost: 15 },
+  long:    { name: 'Grant a longer life',       cost: 20 },
+  end:     { name: 'Let them go, peacefully',   cost: 20 }
+};
+
+function steer(S, c, act, whoId, key) {
+  const def = STEER[act];
+  if (!c || !def) return { ok: false, msg: 'NOBODY THERE' };
+  if (!afford(S, def.cost)) return { ok: false, msg: 'NOT ENOUGH CYCLES' };
+  const o = whoId && def.who ? getC(S, whoId) : null;
+  if (def.who && (!o || o === c)) return { ok: false, msg: 'CHOOSE SOMEONE ELSE' };
+  let msg = '';
+  switch (act) {
+    case 'desire': {
+      const ds = lifeDesires(S, c), d = (key && ds.find(x => x.key === key)) || ds[0];
+      if (!d) return { ok: false, msg: 'THEY WANT FOR NOTHING' };
+      msg = grantDesire(S, c, d);
+      if (!msg) return { ok: false, msg: 'THAT CANNOT BE GIVEN RIGHT NOW' };
+      break;
+    }
+    case 'love':
+      addRel(c, o, 0.4); oneRel(o, c, 0.1);
+      emote(c, EM.heart, 3);
+      memo(S, c, 'Could not stop thinking about ' + o.name + '. It came out of nowhere.');
+      if (adult(c) && adult(o) && !c.mate && !o.mate && relOf(c, o) > 0.45 && relOf(o, c) > 0.4 && c.par.indexOf(o.id) < 0 && o.par.indexOf(c.id) < 0) pairUp(S, c, o);
+      msg = c.name + ' has fallen for ' + o.name + (c.mate === o.id ? ', and they are together now.' : '.');
+      break;
+    case 'grudge':
+      addRel(c, o, -0.45); emote(c, EM.anger, 3);
+      memo(S, c, 'Realised ' + o.name + ' has been against them all along.');
+      msg = c.name + ' now resents ' + o.name + '.';
+      break;
+    case 'peace':
+      c.rel[o.id] = Math.max(0.25, c.rel[o.id] || 0); o.rel[c.id] = Math.max(0.25, o.rel[c.id] || 0);
+      emote(c, EM.heart, 2); emote(o, EM.heart, 2);
+      memo(S, c, 'Made peace with ' + o.name + '.'); memo(S, o, 'Made peace with ' + c.name + '.');
+      if (c.state === 'fight' && c.partner === o.id) { finish(S, c); finish(S, o); }
+      msg = c.name + ' and ' + o.name + ' have made their peace.';
+      break;
+    case 'reveal': {
+      msg = revealSecret(S, c, key, whoId);
+      if (!msg) return { ok: false, msg: 'THEY HAVE NOTHING TO HIDE' };
+      break;
+    }
+    case 'lead': {
+      if (!adult(c) || c.dom < 0) return { ok: false, msg: 'THEY NEED A CREED TO LEAD' };
+      let f = facOfK(S, c.dom);
+      if (!f) {
+        const W = FAC_WORDS[c.dom];
+        f = { id: S.facId++, k: c.dom, leader: 0, name: W[0][(S.rng() * 4) | 0] + ' ' + W[1][(S.rng() * 4) | 0], x: c.x, z: c.z, call: null };
+        S.factions.push(f);
+        for (const p of S.citizens) if (p.dom === c.dom && !p.fac) p.fac = f.id;
+      }
+      const old = getC(S, f.leader);
+      if (old && old !== c) { old.title = ''; memo(S, old, 'Was pushed aside so ' + c.name + ' could lead.'); oneRel(old, c, -0.3); }
+      f.leader = c.id; c.title = 'leader'; c.fac = f.id; c.sermCd = 5;
+      memo(S, c, 'Was raised up to lead the ' + f.name + '. It felt like being chosen.');
+      emote(c, EM.crown, 3);
+      ev(S, 'leader', { id: c.id, k: c.dom, x: c.x, z: c.z, fresh: true, name: f.name });
+      msg = c.name + ' now leads the ' + f.name + (old && old !== c ? ', in place of ' + old.name : '') + '.';
+      break;
+    }
+    case 'rich':
+      c.coin += 15; c.happy = Math.min(1, c.happy + 0.1); emote(c, EM.coin, 3); ev(S, 'coin', { x: c.x, z: c.z });
+      memo(S, c, 'Found fifteen coins in the grass. Did not ask questions.');
+      msg = c.name + ' is suddenly rich.';
+      break;
+    case 'calm':
+      c.fear = 0; c.happy = Math.min(1, c.happy + 0.3); c.sadT = 0;
+      if (c.state === 'fight' || c.state === 'tantrum' || c.state === 'flee') { const p = c.state === 'fight' ? getC(S, c.partner) : null; finish(S, c); if (p && p.state === 'fight') finish(S, p); }
+      for (const id in c.rel) if (c.rel[id] < 0) c.rel[id] *= 0.6;
+      emote(c, EM.halo, 2.5);
+      memo(S, c, 'A deep calm came over them, from nowhere.');
+      msg = c.name + ' is at peace.';
+      break;
+    case 'enrage': {
+      c.happy = Math.max(0, c.happy - 0.3); c.actCd = 0;
+      let near = null, nd = 6;
+      for (const p of S.citizens) { if (p === c || !adult(p) || !awake(p) || busyFighting(p)) continue; const d = hyp(p.x - c.x, p.z - c.z); if (d < nd) { nd = d; near = p; } }
+      memo(S, c, 'Something snapped.');
+      if (near && adult(c) && awake(c) && !busyFighting(c)) { addRel(c, near, -0.3); startFight(S, c, near, 'I do not even know why I am this angry.'); msg = c.name + ' flies into a rage at ' + near.name + '.'; }
+      else { startTantrum(S, c); msg = c.name + ' is furious at nothing in particular.'; }
+      break;
+    }
+    case 'doubt': {
+      if (c.dom < 0) return { ok: false, msg: 'THEY BELIEVE NOTHING YET' };
+      const was = c.dom;
+      c.b[was] *= 0.45;
+      const k2 = HERESY[was][(S.rng() * HERESY[was].length) | 0];
+      c.b[k2] = Math.max(c.b[k2], 0.35);
+      refreshDom(S, c);
+      memo(S, c, 'Lay awake wondering whether ' + BELIEFS[was].name + ' was ever true.');
+      msg = c.name + ' has started to doubt ' + BELIEFS[was].name + '.';
+      break;
+    }
+    case 'dream': {
+      const k = c.dom >= 0 ? c.dom : (S.rng() * 4) | 0;
+      c.curio = 1; S.res.insight += 4; addBelief(S, c, k, 0.2);
+      secret(S, c, 'sky');
+      emote(c, EM.eye, 3);
+      memo(S, c, 'Dreamed of a great eye above the island, and the eye was kind. Or hungry. Hard to say.');
+      msg = c.name + ' wakes from a dream they cannot stop talking about. (+4 insight)';
+      for (const p of S.citizens) if (p !== c && hyp(p.x - c.x, p.z - c.z) < 5) transmit(S, c, p, 0.2);
+      break;
+    }
+    case 'long':
+      c.life += 600; if (c.elder && c.age < c.life * ELDER_AT) c.elder = false;
+      c.health = 1; emote(c, EM.spark, 3);
+      memo(S, c, 'Felt years younger, all at once.');
+      msg = c.name + ' will live a good while longer.';
+      break;
+    case 'end':
+      spend(S, def.cost);
+      logMsg(S, 'You let ' + c.name + ' go. They lay down in the grass and did not get up. It looked peaceful.', 'bad');
+      kill(S, c, 'peace');
+      ev(S, 'steer', { act, x: c.x, z: c.z });
+      return { ok: true, msg: c.name + ' is gone.' };
+  }
+  spend(S, def.cost);
+  S.stats.steer = (S.stats.steer || 0) + 1;
+  logMsg(S, msg, '');
+  ev(S, 'steer', { act, id: c.id, x: c.x, z: c.z });
+  return { ok: true, msg };
+}
+
+function grantDesire(S, c, d) {
+  const o = d.who ? getC(S, d.who) : null;
+  switch (d.key) {
+    case 'food': c.hunger = 0; c.happy = Math.min(1, c.happy + 0.1); memo(S, c, 'Found a basket of food that was not there a moment ago.'); return c.name + ' is fed.';
+    case 'grow': c.grow = 1; memo(S, c, 'Grew up overnight. Everyone noticed.'); ev(S, 'grownup', { id: c.id, x: c.x, z: c.z }); return c.name + ' is suddenly grown up.';
+    case 'play': c.happy = 1; return c.name + ' has the best afternoon of their life.';
+    case 'love': {
+      let p = o;
+      if (!p || p.mate) { let best = -2; for (const q of S.citizens) { if (q === c || q.mate || !adult(q) || q.par.indexOf(c.id) >= 0 || c.par.indexOf(q.id) >= 0) continue; const v = relOf(c, q) + relOf(q, c); if (v > best) { best = v; p = q; } } }
+      if (!p || p.mate) return '';
+      c.rel[p.id] = Math.max(0.6, c.rel[p.id] || 0); p.rel[c.id] = Math.max(0.6, p.rel[c.id] || 0);
+      pairUp(S, c, p);
+      return c.name + ' and ' + p.name + ' have found each other.';
+    }
+    case 'child': {
+      const m = getC(S, c.mate);
+      if (!m || S.citizens.length >= POP_MAX) return '';
+      const home = getB(S, c.home) || firstB(S, 'fire');
+      clampWalk(S.world, home.x + (S.rng() - 0.5) * 3, home.z + 1.8, _pt);
+      const n = addCitizen(S, _pt.x, _pt.z);
+      makeChild(S, c, m, n);
+      S.stats.births++;
+      ev(S, 'birth', { id: n.id, x: n.x, z: n.z });
+      return c.name + ' and ' + m.name + ' welcome ' + n.name + '.';
+    }
+    case 'home': {
+      for (const b of S.buildings) if (b.type === 'hut' && b.built) {
+        let n = 0; for (const q of S.citizens) if (q.home === b.id) n++;
+        if (n < 3) { c.home = b.id; memo(S, c, 'Finally has a roof of their own.'); return c.name + ' has a home now.'; }
+      }
+      const p = findSite(S, 'hut');
+      if (!p || countB(S, 'hut') >= BUILD.hut.max) return '';
+      placeBuilding(S, 'hut', p.x, p.z, false);
+      return 'A hut is marked out for ' + c.name + '. The others will build it.';
+    }
+    case 'work': case 'business': {
+      if (d.key === 'work') {
+        const b = S.buildings.find(b => b.type === 'shop' && b.built && getC(S, b.owner) && b.owner !== c.id);
+        if (b) { c.job = b.id; c.boss = b.owner; c.coin += 3; memo(S, c, 'Got work at ' + shopName(S, b) + '.'); return c.name + ' now works at ' + shopName(S, b) + '.'; }
+      }
+      const have = {}; for (const b of S.buildings) if (b.type === 'shop') have[b.biz] = 1;
+      const biz = ['tavern', 'bakery', 'workshop'].find(k => !have[k]);
+      const p = biz && findSite(S, 'shop');
+      if (!p) { c.coin += 8; return c.name + ' finds 8 coin. It will do for now.'; }
+      const b = placeBuilding(S, 'shop', p.x, p.z, true);
+      b.biz = biz; b.owner = c.id; b.till = 0; c.job = b.id; c.boss = 0;
+      memo(S, c, 'Opened a ' + BIZ[biz].name.toLowerCase() + ' of their own.');
+      return c.name + ' is opening a ' + BIZ[biz].name.toLowerCase() + '.';
+    }
+    case 'money': c.coin += 12; return c.name + ' has money now.';
+    case 'lead': return steerLead(S, c);
+    case 'revenge': {
+      if (!o) return '';
+      o.happy = Math.max(0, o.happy - 0.3); o.coin = Math.floor(o.coin / 2); emote(o, EM.dots, 3);
+      memo(S, o, 'Had a terrible, humiliating day. Everyone saw.');
+      memo(S, c, 'Watched ' + o.name + ' get what was coming to them.');
+      c.happy = Math.min(1, c.happy + 0.2);
+      return o.name + ' has a humiliating day, and ' + c.name + ' enjoys every minute.';
+    }
+    case 'legacy': c.happy = 1; for (const q of S.citizens) if (q !== c) oneRel(q, c, 0.15); memo(S, c, 'Everyone came to hear their stories.'); return 'The whole island comes to hear ' + c.name + '\'s stories.';
+    case 'time': c.life += 600; c.elder = c.age > c.life * ELDER_AT; return c.name + ' has more time.';
+    case 'joy': c.happy = 0.95; c.sadT = 0; return c.name + ' feels happy again.';
+    case 'safe': c.fear = 0; return c.name + ' is not afraid anymore.';
+    case 'noticed': c.happy = 1; addBelief(S, c, DEV, 0.2); emote(c, EM.eye, 3); memo(S, c, 'Felt the Watcher look right at them. It was the best moment of their life.'); return c.name + ' knows they have been seen.';
+    case 'spared': c.fear = 0; c.happy = Math.min(1, c.happy + 0.3); memo(S, c, 'Was told, in a dream, that they would be spared.'); return c.name + ' believes they will be spared.';
+    case 'know': S.res.insight += 6; c.curio = 0; secret(S, c, 'sky'); memo(S, c, 'Understood, for one second, what the island is. Then lost it.'); return c.name + ' glimpses what lies beyond. (+6 insight)';
+    case 'peace': for (const q of S.citizens) if (q !== c && hyp(q.x - c.x, q.z - c.z) < 7) { addRel(c, q, 0.15); } return 'Everyone near ' + c.name + ' gets along a little better.';
+  }
+  return '';
+}
+function steerLead(S, c) {
+  if (!adult(c) || c.dom < 0) return '';
+  const f = facOfK(S, c.dom);
+  if (!f) return '';
+  const old = getC(S, f.leader);
+  if (old && old !== c) old.title = '';
+  f.leader = c.id; c.title = 'leader'; c.fac = f.id;
+  memo(S, c, 'Was chosen to lead the ' + f.name + '.');
+  ev(S, 'leader', { id: c.id, k: c.dom, x: c.x, z: c.z, fresh: true, name: f.name });
+  return c.name + ' now leads the ' + f.name + '.';
+}
+
+/* exposing a secret to everyone has consequences */
+function revealSecret(S, c, key, who) {
+  const list = lifeSecrets(S, c);
+  if (!list.length) return '';
+  const s = (key && list.find(x => x.k === key && (!who || x.who === who))) || list.find(x => x.heavy) || list[0];
+  const o = s.who ? getC(S, s.who) : null;
+  switch (s.k) {
+    case 'theft':
+      for (const p of S.citizens) if (p !== c) oneRel(p, c, -0.15);
+      if (o) addRel(o, c, -0.5);
+      c.sec = c.sec.filter(x => x !== c.sec.find(y => y.k === 'theft' && y.who === s.who));
+      memo(S, c, 'Everyone found out about the theft.');
+      if (o && awake(o) && awake(c) && !busyFighting(o) && !busyFighting(c) && o.tr.brave > 0.3) startFight(S, o, c, 'You stole from me!');
+      return 'Everyone now knows ' + c.name + ' stole from ' + nameOf(S, s.who) + '.';
+    case 'crush':
+      if (!o) return '';
+      if ((o.rel[c.id] || 0) > 0.35 && !o.mate && !c.mate) { pairUp(S, c, o); return 'The secret is out: ' + c.name + ' loves ' + o.name + ', and ' + o.name + ' loves them back.'; }
+      if (c.mate) { const m = getC(S, c.mate); if (m) { addRel(m, c, -0.45); oneRel(m, o, -0.4); memo(S, m, 'Found out ' + c.name + ' is in love with ' + o.name + '.'); } }
+      oneRel(o, c, (o.rel[c.id] || 0) > 0 ? 0.05 : -0.1);
+      memo(S, c, 'Everyone found out how they feel about ' + o.name + '. Mortifying.');
+      c.happy = Math.max(0, c.happy - 0.2);
+      return 'The secret is out: ' + c.name + ' is in love with ' + o.name + '.' + (c.mate ? ' ' + nameOf(S, c.mate) + ' is not taking it well.' : '');
+    case 'grudge':
+      if (!o) return '';
+      addRel(o, c, -0.4); memo(S, o, 'Found out ' + c.name + ' secretly hates them.');
+      return o.name + ' has learned what ' + c.name + ' really thinks of them.';
+    case 'doubt': case 'fraud': {
+      const f = c.fac ? getF(S, c.fac) : null;
+      if (f) for (const p of S.citizens) if (p.fac === f.id && p !== c) oneRel(p, c, -0.2);
+      if (c.title === 'leader' && f) { c.title = ''; f.leader = 0; memo(S, c, 'Was exposed as a doubter and thrown out as leader.'); return 'The ' + f.name + ' has learned their leader ' + c.name + ' does not believe. They are thrown out.'; }
+      memo(S, c, 'Everyone knows about their doubts now.');
+      return 'Everyone now knows ' + c.name + ' doubts ' + BELIEFS[c.dom].name + '.';
+    }
+    case 'boss':
+      if (o) { addRel(o, c, -0.3); memo(S, o, 'Found out ' + c.name + ' resents them.'); }
+      c.job = 0; c.boss = 0;
+      return c.name + '\'s resentment comes out. They are out of a job.';
+    case 'hoard':
+      for (const p of S.citizens) if (p !== c && p.coin < 5) oneRel(p, c, -0.12);
+      return 'Everyone now knows about ' + c.name + '\'s hidden coin. The poor are not pleased.';
+    case 'sky':
+      for (const p of S.citizens) if (hyp(p.x - c.x, p.z - c.z) < 8) addBelief(S, p, DEV, 0.06);
+      return c.name + ' tells everyone about the eye in the sky. Some of them look up.';
+    case 'jealous': case 'saw':
+      if (o) addRel(o, c, -0.2);
+      return c.name + '\'s secret about ' + nameOf(S, s.who) + ' comes out.';
+  }
+  return '';
 }
 'use strict';
 /* GODMODE.EXE: rendering. Reads the sim state, never writes to it.
@@ -3124,6 +3631,7 @@ function initRender(canvas) {
   R.matCarry = { wood: new THREE.MeshLambertMaterial({ color: '#a8703f' }), stone: new THREE.MeshLambertMaterial({ color: '#a4a7bd' }), food: new THREE.MeshLambertMaterial({ color: '#ff4f6e' }) };
   R.faceTex = makeFaceAtlas();
   R.iconTex = makeIconAtlas();
+  R.matHairGrey = new THREE.MeshLambertMaterial({ color: '#d8d8e0' });
   R.matFace = new THREE.MeshBasicMaterial({ map: R.faceTex, alphaTest: 0.5 });
   R.matIcon = new THREE.MeshBasicMaterial({ map: R.iconTex, transparent: true, alphaTest: 0.5, depthTest: false });
   R.matWire = new THREE.LineBasicMaterial({ color: 0x3fe8ff, transparent: true, opacity: 0.85 });
@@ -3673,7 +4181,7 @@ function makeCitizen(c) {
   o.armL = mk(G.arm, skin, -0.31, 0.66, 0); o.armR = mk(G.arm, skin, 0.31, 0.66, 0); o.rig.add(o.armL, o.armR);
   o.head = new THREE.Group(); o.head.position.y = 1.0; o.rig.add(o.head);
   o.head.add(mk(G.head, skin, 0, 0, 0));
-  o.head.add(mk(G.hair, R.matHair[(c.id * 7 + c.skin) % HAIRS.length], 0, 0, 0));
+  o.hairM = mk(G.hair, R.matHair[(c.id * 7 + c.skin) % HAIRS.length], 0, 0, 0); o.head.add(o.hairM); o.elder = false;
   o.faceGeo = new THREE.PlaneGeometry(0.5, 0.5);
   o.faceM = new THREE.Mesh(o.faceGeo, R.matFace); o.faceM.position.set(0, -0.02, 0.325); o.head.add(o.faceM);
   o.hatM = mk(G.hat[0], R.matGlow, 0, 0, 0); o.hatM.visible = false; o.head.add(o.hatM);
@@ -3775,6 +4283,8 @@ function syncCitizens(S, alpha, dt) {
     if (c.dom === DEV) o.hatM.position.y = Math.sin(t * 3 + p) * 0.03;
     // a faith leader wears a crown above the creed's hat
     o.crown.visible = c.title === 'leader';
+    if (!!c.elder !== o.elder) { o.elder = !!c.elder; o.hairM.material = o.elder ? R.matHairGrey : R.matHair[(c.id * 7 + c.skin) % HAIRS.length]; }
+    if (o.elder && !lie) o.rig.rotation.x += 0.16;
     if (o.crown.visible) { o.crown.position.y = (c.dom >= 0 ? 0.78 : 0.42) + Math.sin(t * 2.5 + p) * 0.04; o.crown.rotation.y = t * 0.8; }
     o.carry.visible = !!c.carry;
     if (c.carry) o.carry.material = R.matCarry[c.carry.type] || R.matCarry.wood;
@@ -4204,14 +4714,25 @@ function initUI() {
   $('btnSpeed').onclick = () => { sfx('click'); setSpeed(APP.speed === 1 ? 2 : APP.speed === 2 ? 4 : 1); };
   $('pw').querySelectorAll('button').forEach(b => { b.onclick = () => { auInit(); sfx('click'); setPower(b.dataset.p === APP.power && b.dataset.p !== 'observe' ? 'observe' : b.dataset.p); }; });
   $('inClose').onclick = () => { sfx('click'); selectCitizen(0); UI.inspectB = 0; };
+  $('inLife').onclick = () => { sfx('click'); if (APP.S.selected) openLife(APP.S.selected); };
+  $('lfClose').onclick = () => { sfx('click'); closeLife(); };
+  $('lfTabs').querySelectorAll('button').forEach(b => { b.onclick = () => { sfx('click'); UI.lifeTab = b.dataset.t; UI.lifePick = ''; renderLife(); }; });
+  $('mGoal').onclick = () => {
+    const S = APP.S; if (!S || S.sandbox) return;
+    S.goal = !S.goal; sfx('click'); refreshMenu();
+    logMsg(S, S.goal ? 'GOAL SET: the path to the Spire is back on.' : 'GOAL CLEARED: no objectives. The island simply goes on.', 'sys');
+  };
   $('inFollow').onclick = () => { sfx('click'); R.cam.follow = R.cam.follow ? 0 : APP.S.selected; };
   $('tutNext').onclick = () => { sfx('click'); tutAdvance(); };
   $('tutSkip').onclick = () => { sfx('click'); APP.tut = -1; saveSettings(); };
 
   $('btnNew').onclick = () => {
     auInit(); sfx('click');
-    if (APP.hasSave) confirmDlg('NEW WORLD', 'This erases the saved island and starts again with six new minds.', 'Erase and start', () => startGame(true));
-    else startGame(true);
+    const pick = () => showDlg('WHAT KIND OF WORLD?',
+      '<span class="big">ENDLESS</span>No goal. The island runs forever: people grow old, die, and their children carry on. The Spire becomes something you can build when they know enough, if you ever want to.\n\n<span class="big">WITH A GOAL</span>A path of objectives that ends in the Spire and the Singularity. After that the island keeps running.\n\n<span class="sys">You can switch between them any time from the pause menu.</span>',
+      [{ label: 'Endless', fn: () => startGame(true, false) }, { label: 'With a goal', fn: () => startGame(true, true) }]);
+    if (APP.hasSave) confirmDlg('NEW WORLD', 'This erases the saved island and starts again with six new minds.', 'Erase and start', pick);
+    else pick();
   };
   $('btnContinue').onclick = () => { auInit(); sfx('click'); startGame(false); };
   $('btnHow').onclick = () => { auInit(); sfx('click'); openMenu('help'); };
@@ -4253,8 +4774,16 @@ function updateUI(S, dt) {
   const zl = $('zlabel');
   if (S.age >= 0) { zl.textContent = 'AGE OF ' + BELIEFS[S.age].name; zl.style.color = BELIEFS[S.age].hex; $('zeit').style.borderColor = BELIEFS[S.age].hex; }
   else { zl.textContent = 'NO CREED RULES'; zl.style.color = ''; $('zeit').style.borderColor = ''; }
-  const st = STAGES[S.stage];
-  $('qTitle').textContent = st.title; $('qText').textContent = st.text; $('qProg').textContent = st.prog(S);
+  if (!S.goal || S.sandbox) {
+    $('qTitle').textContent = S.sandbox ? 'SANDBOX' : 'ENDLESS';
+    const sp = firstB(S, 'spire');
+    $('qText').textContent = 'Day ' + dayOf(S) + ' \u00b7 generation ' + generation(S) +
+      (S.sandbox ? '' : sp ? (sp.built ? '' : ' \u00b7 Spire ' + ((sp.progress * 100) | 0) + '%') : S.spireUnlocked ? ' \u00b7 the Spire is yours to build' : '');
+    $('qProg').textContent = S.citizens.length + ' alive';
+  } else {
+    const st = STAGES[S.stage];
+    $('qTitle').textContent = st.title; $('qText').textContent = st.text; $('qProg').textContent = st.prog(S);
+  }
 
   // power affordability
   $('pw').querySelectorAll('button').forEach(b => {
@@ -4284,7 +4813,7 @@ function updateInspect(S) {
   if (c) {
     const dom = c.dom;
     $('inDot').style.background = dom >= 0 ? BELIEFS[dom].hex : '#06231a';
-    $('inName').textContent = c.name + ' / ' + (dom >= 0 ? BELIEFS[dom].who : 'Undecided');
+    $('inName').textContent = c.name + ', ' + ageYears(c) + ' / ' + (dom >= 0 ? BELIEFS[dom].who : 'Undecided');
     $('inThought').textContent = c.thought;
     $('inNeeds').hidden = false; $('inBel').hidden = false; $('inFollow').hidden = false;
     setW($('nFed'), 1 - c.hunger); setW($('nJoy'), c.happy); setW($('nFear'), c.fear); setW($('nCur'), c.curio);
@@ -4313,6 +4842,92 @@ function updateInspect(S) {
     $('inNeeds').hidden = true; $('inBel').hidden = true; $('inFollow').hidden = true;
     $('inFoot').textContent = '';
   }
+}
+
+/* ------------------------------------------------------------ life panel
+   Everything about one person: who they are, what they want, what they hide, what has
+   happened to them, how they feel about everyone, and the god's hand. Time stands still
+   while it is open. */
+function openLife(id) {
+  UI.lifeId = id; UI.lifeTab = UI.lifeTab || 'soul'; UI.lifePick = '';
+  APP.lifeOpen = true;
+  $('life').hidden = false; $('app').classList.add('modal');
+  renderLife();
+}
+function closeLife() { APP.lifeOpen = false; $('life').hidden = true; $('app').classList.remove('modal'); }
+const esc = t => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+function moodWord(c) {
+  if (c.fear > 0.5) return 'terrified';
+  if (c.state === 'fight' || c.state === 'tantrum') return 'furious';
+  if (c.happy > 0.8) return 'happy';
+  if (c.happy > 0.55) return 'content';
+  if (c.happy > 0.3) return 'low';
+  return 'miserable';
+}
+function renderLife() {
+  const S = APP.S, c = getC(S, UI.lifeId);
+  if (!c) { closeLife(); return; }
+  $('lfTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === UI.lifeTab));
+  $('lfDot').style.background = c.dom >= 0 ? BELIEFS[c.dom].hex : '#06231a';
+  $('lfName').textContent = c.name + ', ' + ageYears(c) + (c.elder ? ' (old)' : c.grow < 1 ? ' (child)' : '');
+  $('lfFoot').textContent = 'CYCLES ' + (S.freeCycles ? 'UNLIMITED' : (S.cycles | 0) + ' / ' + S.cyclesMax) + '  \u00b7  time stands still while you look';
+  const B = $('lfBody'); let h = '';
+  const f = c.fac ? getF(S, c.fac) : null;
+  if (UI.lifeTab === 'soul') {
+    const tr = lifeTraits(c);
+    h += '<div><b class="who">' + esc(c.name) + '</b> is ' + tr.slice(0, 3).join(', ') + ' and ' + tr[3] + '. ' +
+      'Generation ' + c.gen + (c.par.length ? ', child of ' + c.par.map(id => esc(nameOf(S, id))).join(' and ') : '') + '. ' +
+      (c.dom >= 0 ? (/^[aeiou]/i.test(BELIEFS[c.dom].who) ? 'An ' : 'A ') + BELIEFS[c.dom].who.toLowerCase() + ' of ' + BELIEFS[c.dom].name : 'Believes nothing in particular') +
+      (f ? (c.title === 'leader' ? ', and leads the ' : ', of the ') + esc(f.name) : '') + '. ' +
+      'Feeling ' + moodWord(c) + '. ' + c.coin + ' coin. ' + (c.grow < 1 ? '' : 'Expected to live to about ' + ageYears({ age: c.life, grow: 1 }) + '.') + '</div>';
+    h += '<div class="dim">Thinking: &ldquo;' + esc(c.thought) + '&rdquo;</div>';
+    h += '<h4>WHAT THEY WANT</h4>';
+    const ds = lifeDesires(S, c).slice(0, 6);
+    if (!ds.length) h += '<div class="dim">Nothing, for once.</div>';
+    for (const d of ds) h += '<div class="it"><span>' + esc(d.text) + '</span><button data-grant="' + d.key + '">GRANT ' + STEER.desire.cost + '</button></div>';
+    h += '<h4>WHAT THEY HIDE</h4>';
+    const ss = lifeSecrets(S, c);
+    if (!ss.length) h += '<div class="dim">No secrets. An open book.</div>';
+    for (const x of ss) h += '<div class="it sec"><span>' + esc(x.text) + '</span><button data-reveal="' + x.k + '" data-who="' + (x.who || 0) + '">REVEAL ' + STEER.reveal.cost + '</button></div>';
+    h += '<h4>WHAT THEY BELIEVE</h4><div>' + BELIEFS.map((bf, k) => '<span style="color:' + bf.hex + '">' + bf.name + ' ' + Math.round(c.b[k] * 100) + '%</span>').join(' &middot; ') + '</div>';
+  } else if (UI.lifeTab === 'story') {
+    h += '<div class="dim">Day ' + dayOf(S) + ' now. Newest first.</div>';
+    for (let i = c.mem.length - 1; i >= 0; i--) h += '<div class="mem"><time>Day ' + c.mem[i].d + '</time><span>' + esc(c.mem[i].text) + '</span></div>';
+  } else if (UI.lifeTab === 'people') {
+    const rows = S.citizens.filter(o => o !== c).map(o => ({ o, mine: c.rel[o.id] || 0, theirs: o.rel[c.id] || 0, lab: relLabel(c, o) }));
+    rows.sort((a, b) => (b.lab ? 1 : 0) - (a.lab ? 1 : 0) || Math.abs(b.mine) - Math.abs(a.mine));
+    h += '<div class="dim">How ' + esc(c.name) + ' feels about each person, and how they feel back. Tap a name to look into them.</div>';
+    h += '<div class="ppl"><span class="dim">PERSON</span><span class="dim">THEY FEEL</span><span class="dim">FEEL BACK</span>';
+    const bar = v => '<div class="op"><b style="left:' + (v < 0 ? 50 + v * 50 : 50) + '%;width:' + Math.abs(v) * 50 + '%;background:' + (v < 0 ? 'var(--bad)' : 'var(--line)') + '"></b></div>';
+    for (const r of rows) h += '<button data-goto="' + r.o.id + '">' + esc(r.o.name) + (r.lab ? ' <i>' + r.lab + '</i>' : '') + '</button>' + bar(r.mine) + bar(r.theirs);
+    h += '</div>';
+  } else {
+    if (UI.lifePick) {
+      h += '<div>' + STEER[UI.lifePick].name.replace('...', '') + ' whom?</div>';
+      const rows = S.citizens.filter(o => o !== c).sort((a, b) => Math.abs(c.rel[b.id] || 0) - Math.abs(c.rel[a.id] || 0));
+      for (const o of rows) h += '<button class="act" data-who="' + o.id + '"><span>' + esc(o.name) + ' <span class="dim">' + (relLabel(c, o) || '') + '</span></span><small>' + STEER[UI.lifePick].cost + '</small></button>';
+      h += '<button class="act" data-back="1"><span>Back</span></button>';
+    } else {
+      h += '<div class="dim">Your hand on ' + esc(c.name) + '\'s life. Each costs CYCLES.</div>';
+      for (const k in STEER) h += '<button class="act" data-act="' + k + '"><span>' + STEER[k].name + '</span><small>' + STEER[k].cost + '</small></button>';
+    }
+  }
+  if (UI.lifeMsg) { h = '<div class="it sec"><span>' + esc(UI.lifeMsg) + '</span></div>' + h; UI.lifeMsg = ''; }
+  B.innerHTML = h;
+  const run = (act, who, key) => {
+    const r = steer(S, c, act, who, key);
+    if (!r.ok) { flashHint(r.msg); sfx('deny'); }
+    else { sfx('inspire'); UI.lifeMsg = r.msg; handleEvents(S); }
+    UI.lifePick = '';
+    if (!getC(S, UI.lifeId)) { closeLife(); return; }
+    renderLife();
+  };
+  B.querySelectorAll('[data-grant]').forEach(b => { b.onclick = () => run('desire', 0, b.dataset.grant); });
+  B.querySelectorAll('[data-reveal]').forEach(b => { b.onclick = () => run('reveal', +b.dataset.who, b.dataset.reveal); });
+  B.querySelectorAll('[data-goto]').forEach(b => { b.onclick = () => { sfx('click'); const id = +b.dataset.goto; selectCitizen(id); UI.lifeId = id; renderLife(); B.scrollTop = 0; }; });
+  B.querySelectorAll('[data-act]').forEach(b => { b.onclick = () => { const k = b.dataset.act; if (STEER[k].who) { sfx('click'); UI.lifePick = k; renderLife(); B.scrollTop = 0; } else run(k); }; });
+  B.querySelectorAll('[data-who]:not([data-reveal])').forEach(b => { b.onclick = () => run(UI.lifePick, +b.dataset.who); });
+  B.querySelectorAll('[data-back]').forEach(b => { b.onclick = () => { sfx('click'); UI.lifePick = ''; renderLife(); }; });
 }
 
 /* who this citizen is to everyone else: role, money, family and opinions */
@@ -4469,6 +5084,8 @@ function refreshMenu() {
   $('mSpeed').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.s === APP.speed));
   const S = APP.S;
   $('mFree').hidden = !(S && S.sandbox);
+  $('mGoal').hidden = !S || S.sandbox || APP.mode !== 'play';
+  if (S) $('mGoal').textContent = S.goal ? 'Goal: the Spire (tap for endless)' : 'Goal: none, endless (tap to aim for the Spire)';
   if (S) $('mFree').textContent = 'Unlimited cycles: ' + (S.freeCycles ? 'on' : 'off');
   $('mSave').textContent = 'Save now';
 }
@@ -4553,7 +5170,7 @@ function initControls(canvas) {
   const pts = new Map();
   let tap = null, pinch = null, grabbing = false;
   const local = e => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-  const playing = () => APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen;
+  const playing = () => APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen && !APP.lifeOpen;
 
   function panBy(dx, dy) {
     const C = R.cam, k = C.dist * 0.0021;
@@ -4664,6 +5281,7 @@ function initControls(canvas) {
     if (e.repeat) return;
     if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
       if (APP.dlgOpen) return;
+      if (APP.lifeOpen) { closeLife(); return; }
       if (APP.menuOpen) closeMenu(); else if (APP.mode === 'play') openMenu();
       return;
     }
@@ -4761,10 +5379,10 @@ function showTitle() {
   R.viewShiftT = 0;
   bootText();
 }
-function startGame(fresh) {
+function startGame(fresh, goal) {
   if (fresh) {
     lsDel(SAVE_KEY); APP.hasSave = false;
-    setSim(newSim((Math.random() * 1e9) | 0));
+    setSim(newSim((Math.random() * 1e9) | 0, goal !== false));
     APP.tut = 0; APP.camMoved = 0;
     saveSettings();
   } else if (!APP.S) setSim(newSim(1));
@@ -4848,6 +5466,9 @@ function handleEvents(S) {
       case 'festival': banner('FESTIVAL', 'Everyone to the hearth.', '#ffd447'); sfx('stage'); break;
       case 'grownup': fxSpark(e.x, y + 1.2, e.z, '#7dffc4', 12, 1, 2.4, -2, 1); break;
       case 'fish': fxSpark(e.x, y + 0.4, e.z, '#9fd8ff', 10, 1, 2.6, -8, 0.7); break;
+      case 'elder': break;
+      case 'steer': fxRing(e.x, y, e.z, '#ff8ae6', 2.6, 0.9); fxSpark(e.x, y + 1.4, e.z, '#ff8ae6', 18, 1.4, 3, -2, 1); sfx('inspire'); break;
+      case 'spireReady': banner('THE SPIRE', 'Yours to build whenever you choose. Or never.', '#ff8ae6'); sfx('stage'); break;
       case 'restore': banner('RESTORED FROM BACKUP', 'Six new minds. They do not remember.', '#ff8ae6'); break;
       case 'singularity': {
         R.singT = 0; R.singHex = e.k >= 0 ? BELIEFS[e.k].hex : '#ff5fd2';
@@ -4873,7 +5494,7 @@ function frame(now) {
   APP.last = now;
   if (!(dt > 0) || dt > 0.25) dt = 0.016;        // tab was asleep: do not fast-forward
   const S = APP.S;
-  const running = APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen && !APP.hidden;
+  const running = APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen && !APP.lifeOpen && !APP.hidden;
   if (running) {
     APP.acc += dt * APP.speed;
     let n = 0;

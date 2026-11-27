@@ -22,8 +22,12 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
   await page.screenshot({ path: path.join(out, '01-title.png') });
   check(await page.evaluate(() => !document.getElementById('title').hidden), 'title screen shows');
   await page.tap('#btnNew');
+  await sleep(400);
+  check(await page.evaluate(() => APP.dlgOpen && /ENDLESS/.test(document.getElementById('dlgText').textContent)), 'a new world asks: endless or with a goal');
+  await page.screenshot({ path: path.join(out, '01b-mode.png') });
+  await page.tap('#dlgBtns button:nth-child(2)');
   await sleep(1200);
-  check(await page.evaluate(() => APP.mode === 'play' && APP.S.citizens.length === 6), 'new world starts with six citizens');
+  check(await page.evaluate(() => APP.mode === 'play' && APP.S.citizens.length === 6 && APP.S.goal === true), 'new world starts with six citizens, aiming for the Spire');
   check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth && document.documentElement.scrollHeight <= innerHeight), 'page does not scroll');
   await page.screenshot({ path: path.join(out, '02-start.png') });
 
@@ -169,6 +173,35 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
   }), 'factions fly flags, leaders wear crowns, children are small');
   check(await page.evaluate(() => { const c = APP.S.citizens.find(c => c.mate) || APP.S.citizens[0]; selectCitizen(c.id); updateInspect(APP.S); const t = document.getElementById('inFoot').textContent; selectCitizen(0); return /coin/.test(t) && (!c.mate || /partner/.test(t)); }), 'the inspector lists money and relationships');
 
+  // the life panel: everything about one person, and the god's hand on them
+  const who = await page.evaluate(() => { const c = APP.S.citizens.find(c => c.mate && c.grow >= 1) || APP.S.citizens[0]; selectCitizen(c.id); R.cam.tx = c.x; R.cam.tz = c.z; return c.id; });
+  await sleep(500);
+  await page.tap('#inLife'); await sleep(300);
+  const lt0 = await page.evaluate(() => APP.S.t);
+  await sleep(600);
+  check(await page.evaluate(t0 => !document.getElementById('life').hidden && APP.S.t === t0 && /WHAT THEY WANT/.test(document.getElementById('lfBody').textContent) && /WHAT THEY HIDE/.test(document.getElementById('lfBody').textContent), lt0),
+    'LIFE opens their soul (wants, secrets) and time stands still');
+  await page.screenshot({ path: path.join(out, '11b-life-soul.png') });
+  await page.tap('#lfTabs button[data-t=story]'); await sleep(200);
+  check(await page.evaluate(() => document.querySelectorAll('#lfBody .mem').length >= 2), 'their life story is written down');
+  await page.screenshot({ path: path.join(out, '11c-life-story.png') });
+  await page.tap('#lfTabs button[data-t=people]'); await sleep(200);
+  check(await page.evaluate(() => document.querySelectorAll('#lfBody .ppl button').length === APP.S.citizens.length - 1), 'they have a feeling about every other person');
+  await page.tap('#lfTabs button[data-t=steer]'); await sleep(200);
+  await page.evaluate(() => { APP.S.cycles = 100; });
+  const coin0 = await page.evaluate(id => getC(APP.S, id).coin, who);
+  await page.tap('#lfBody [data-act=rich]'); await sleep(200);
+  check(await page.evaluate(([id, c0]) => getC(APP.S, id).coin === c0 + 15 && /fifteen coins/.test(getC(APP.S, id).mem.slice(-1)[0].text), [who, coin0]), 'steer: shower with coin, and they remember it');
+  await page.tap('#lfBody [data-act=grudge]'); await sleep(200);
+  const tgt = await page.evaluate(() => +document.querySelector('#lfBody [data-who]').dataset.who);
+  const r0 = await page.evaluate(([a, b]) => getC(APP.S, a).rel[b] || 0, [who, tgt]);
+  await page.tap('#lfBody [data-who]'); await sleep(200);
+  check(await page.evaluate(([a, b, r0]) => (getC(APP.S, a).rel[b] || 0) < r0 - 0.3, [who, tgt, r0]), 'steer: sow a grudge against a chosen person');
+  await page.screenshot({ path: path.join(out, '11d-life-steer.png') });
+  await page.tap('#lfClose'); await sleep(200);
+  check(await page.evaluate(() => document.getElementById('life').hidden && !APP.lifeOpen), 'and closes back to the island');
+  await page.evaluate(() => selectCitizen(0));
+
   // save, reload, continue
   // snapshot in the same task as the save, so no sim step can slip in between
   const snap = await page.evaluate(() => { saveGame(); return { n: APP.S.citizens.length, b: APP.S.buildings.length, t: APP.S.t | 0 }; });
@@ -250,6 +283,23 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
   check(await page.evaluate(() => APP.S.citizens.length >= 6 && APP.S.citizens.length <= 8), 'an emptied island is restored from backup');
   await page.setViewportSize({ width: 390, height: 844 }); await sleep(500);
   await page.screenshot({ path: path.join(out, '18-after-soak.png') });
+
+  // endless mode from the title screen, and switching goals from the pause menu
+  await page.evaluate(() => { closeDlg(); openMenu(); });
+  await page.tap('#mTitle'); await sleep(500);
+  await page.tap('#btnNew'); await sleep(300);
+  await page.tap('#dlgBtns button:nth-child(2)'); await sleep(300);     // confirm erase
+  await page.tap('#dlgBtns button:nth-child(1)'); await sleep(1200);    // endless
+  check(await page.evaluate(() => APP.mode === 'play' && APP.S.goal === false && document.getElementById('qTitle').textContent === 'ENDLESS'), 'an endless world has no goal');
+  await page.evaluate(() => { for (let i = 0; i < 20 * 60 * 12; i++) simStep(APP.S, SIM_DT); APP.S.events.length = 0; });
+  await sleep(800);
+  check(await page.evaluate(() => !firstB(APP.S, 'spire') && APP.S.stage === 0 && /generation/.test(document.getElementById('qText').textContent)), 'after twelve minutes nobody has started a Spire; the bar shows day and generation');
+  await page.screenshot({ path: path.join(out, '19-endless.png') });
+  await page.evaluate(() => openMenu());
+  await page.tap('#mGoal'); await sleep(200);
+  check(await page.evaluate(() => APP.S.goal === true), 'the pause menu can turn the Spire goal back on');
+  await page.tap('#mGoal'); await sleep(200);
+  await page.evaluate(() => closeMenu());
 
   const fps = await page.evaluate(() => new Promise(res => { let n = 0; const t = performance.now(); const f = () => { n++; if (performance.now() - t > 2000) res(n / 2); else requestAnimationFrame(f); }; requestAnimationFrame(f); }));
   console.log('frames per second in this software-rendered test browser:', fps.toFixed(0));

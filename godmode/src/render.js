@@ -168,6 +168,7 @@ function initRender(canvas) {
   R.matCarry = { wood: new THREE.MeshLambertMaterial({ color: '#a8703f' }), stone: new THREE.MeshLambertMaterial({ color: '#a4a7bd' }), food: new THREE.MeshLambertMaterial({ color: '#ff4f6e' }) };
   R.faceTex = makeFaceAtlas();
   R.iconTex = makeIconAtlas();
+  R.matHairGrey = new THREE.MeshLambertMaterial({ color: '#d8d8e0' });
   R.matFace = new THREE.MeshBasicMaterial({ map: R.faceTex, alphaTest: 0.5 });
   R.matIcon = new THREE.MeshBasicMaterial({ map: R.iconTex, transparent: true, alphaTest: 0.5, depthTest: false });
   R.matWire = new THREE.LineBasicMaterial({ color: 0x3fe8ff, transparent: true, opacity: 0.85 });
@@ -717,7 +718,7 @@ function makeCitizen(c) {
   o.armL = mk(G.arm, skin, -0.31, 0.66, 0); o.armR = mk(G.arm, skin, 0.31, 0.66, 0); o.rig.add(o.armL, o.armR);
   o.head = new THREE.Group(); o.head.position.y = 1.0; o.rig.add(o.head);
   o.head.add(mk(G.head, skin, 0, 0, 0));
-  o.head.add(mk(G.hair, R.matHair[(c.id * 7 + c.skin) % HAIRS.length], 0, 0, 0));
+  o.hairM = mk(G.hair, R.matHair[(c.id * 7 + c.skin) % HAIRS.length], 0, 0, 0); o.head.add(o.hairM); o.elder = false;
   o.faceGeo = new THREE.PlaneGeometry(0.5, 0.5);
   o.faceM = new THREE.Mesh(o.faceGeo, R.matFace); o.faceM.position.set(0, -0.02, 0.325); o.head.add(o.faceM);
   o.hatM = mk(G.hat[0], R.matGlow, 0, 0, 0); o.hatM.visible = false; o.head.add(o.hatM);
@@ -819,6 +820,8 @@ function syncCitizens(S, alpha, dt) {
     if (c.dom === DEV) o.hatM.position.y = Math.sin(t * 3 + p) * 0.03;
     // a faith leader wears a crown above the creed's hat
     o.crown.visible = c.title === 'leader';
+    if (!!c.elder !== o.elder) { o.elder = !!c.elder; o.hairM.material = o.elder ? R.matHairGrey : R.matHair[(c.id * 7 + c.skin) % HAIRS.length]; }
+    if (o.elder && !lie) o.rig.rotation.x += 0.16;
     if (o.crown.visible) { o.crown.position.y = (c.dom >= 0 ? 0.78 : 0.42) + Math.sin(t * 2.5 + p) * 0.04; o.crown.rotation.y = t * 0.8; }
     o.carry.visible = !!c.carry;
     if (c.carry) o.carry.material = R.matCarry[c.carry.type] || R.matCarry.wood;

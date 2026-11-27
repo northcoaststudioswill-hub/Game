@@ -5,7 +5,7 @@
 
 /* ------------------------------------------------------------------ setup */
 
-function newSim(seed) {
+function newSim(seed, goal) {
   const S = {
     v: 2, seed, world: makeWorld(seed), t: 0, day: 0.08,
     res: { food: 12, wood: 4, stone: 0, insight: 0 },
@@ -14,7 +14,7 @@ function newSim(seed) {
     events: [], log: [],
     stage: 0, flags: {}, age: -1, counts: [0, 0, 0, 0],
     stats: { bless: 0, smite: 0, create: 0, inspire: 0, intervene: 0, observe: 0, births: 0, deaths: 0, kills: 0 },
-    sandbox: false, freeCycles: false, ending: -2,
+    sandbox: false, freeCycles: false, ending: -2, goal: goal !== false, dead: {},
     spireUnlocked: false, spireUnlockT: 0,
     birthCd: 42, secAcc: 0, planT: 4, selected: 0, held: 0, emptyT: 0, used: {}
   };
@@ -25,6 +25,8 @@ function newSim(seed) {
     const a = i / 6 * TAU + 0.4;
     const c = addCitizen(S, Math.sin(a) * 2.8, Math.cos(a) * 2.8);
     if (lean[i] >= 0) c.b[lean[i]] = 0.3;
+    c.age = GROW_SECS + S.rng() * 400;
+    memo(S, c, 'Woke up on the island beside five strangers, with no memory of before.');
   }
   fillSociety(S);
   rebuildObstacles(S);
@@ -36,6 +38,7 @@ function addCitizen(S, x, z) {
   const r = S.rng;
   let name = NAMES[(r() * NAMES.length) | 0];
   for (let i = 0; i < 60 && S.used[name]; i++) name = NAMES[(r() * NAMES.length) | 0];
+  if (S.used[name]) { const free = NAMES.filter(n => !S.used[n]); if (free.length) name = free[(r() * free.length) | 0]; }
   S.used[name] = 1;
   const c = {
     id: S.nextId++, name, x, z, px: x, pz: z, face: r() * TAU,
@@ -48,6 +51,8 @@ function addCitizen(S, x, z) {
     hue: r(), skin: (r() * 4) | 0, moving: false, prayCd: 0, stuckT: 0, lastD: 0, fx: 0, fz: 0, pulseT: 0, stall: 0
   };
   fillCitizen(c);
+  fillLife(c, S);
+  c.life = 1500 + r() * 700;
   S.citizens.push(c);
   return c;
 }
@@ -99,6 +104,7 @@ function refreshDom(S, c) {
       emote(c, BELIEF_EMOTE[dom], 3);
       ev(S, 'convert', { id: c.id, k: dom, x: c.x, z: c.z });
       logMsg(S, c.name + (was >= 0 ? ' abandons ' + BELIEFS[was].name + ' for ' : ' now holds to ') + BELIEFS[dom].name + '.', 'b' + dom);
+      memo(S, c, was >= 0 ? 'Gave up ' + BELIEFS[was].name + ' for ' + BELIEFS[dom].name + '.' : 'Came to believe: "' + BELIEFS[dom].creed + '"');
       if (!c.inspired) whisper(S, 'meme1', 'MEMETICS: an idea has just copied itself into a mind. Ideas use them to reproduce.');
     }
   }
@@ -444,7 +450,7 @@ function updateCitizen(S, c, dt) {
   if (c.state === 'held') return;
   if (c.fear > 0.75 && c.state !== 'flee') startFlee(S, c, c.fx, c.fz);
 
-  const sp = 2.25 * c.tr.speed * (c.carry ? 0.88 : 1) * (c.hunger > 0.9 ? 0.8 : 1);
+  const sp = 2.25 * c.tr.speed * (c.carry ? 0.88 : 1) * (c.hunger > 0.9 ? 0.8 : 1) * (c.elder ? 0.78 : 1);
   const ws = workSpeed(S, c);
   let m;
   switch (c.state) {
@@ -812,8 +818,18 @@ function kill(S, c, cause) {
   if (i < 0) return;
   S.citizens.splice(i, 1);
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
-  S.graves.push({ x: c.x, z: c.z, t: 110, name: c.name });
+  S.graves.push({ x: c.x, z: c.z, t: cause === 'age' || cause === 'peace' ? 160 : 110, name: c.name });
   S.stats.deaths++;
+  if (cause === 'age' || cause === 'peace') S.stats.oldAge = (S.stats.oldAge || 0) + 1;
+  if (!S.dead) S.dead = {};
+  S.dead[c.id] = c.name;
+  S.used[c.name] = 0;
+  for (const o of S.citizens) {
+    if (o.mate === c.id) memo(S, o, 'Lost ' + c.name + ', their partner.');
+    else if (o.par.indexOf(c.id) >= 0) memo(S, o, 'Lost their parent, ' + c.name + '.');
+    else if (c.par.indexOf(o.id) >= 0) memo(S, o, 'Lost their child, ' + c.name + '.');
+    else if ((o.rel[c.id] || 0) > 0.55) memo(S, o, 'Lost a dear friend, ' + c.name + '.');
+  }
   if (S.selected === c.id) S.selected = 0;
   if (S.held === c.id) S.held = 0;
   ev(S, 'death', { id: c.id, x: c.x, z: c.z, cause });
@@ -917,7 +933,7 @@ function planner(S) {
   const has = {}, pend = {};
   for (const b of S.buildings) { has[b.type] = (has[b.type] || 0) + 1; if (!b.built) { pending++; pend[b.type] = 1; } }
   const pop = S.citizens.length, cap = popCap(S);
-  if (S.spireUnlocked && !has.spire && S.t - S.spireUnlockT > 75) {
+  if (S.goal && S.spireUnlocked && !has.spire && S.t - S.spireUnlockT > 75) {
     const p = findSite(S, 'spire');
     if (p) {
       placeBuilding(S, 'spire', p.x, p.z, true);
@@ -929,11 +945,11 @@ function planner(S) {
   let want = '';
   const hutsAll = has.hut || 0;
   if (pop >= cap - 1 && 6 + hutsAll * 3 < POP_MAX + 1 && !pend.hut && hutsAll < BUILD.hut.max) want = 'hut';
-  else if ((has.farm || 0) < Math.min(3, Math.ceil(pop / 5)) && !pend.farm && (pop >= 7 || S.res.food < pop * 1.5)) want = 'farm';
+  else if ((has.farm || 0) < Math.min(5, Math.ceil(pop / 5)) && !pend.farm && (pop >= 7 || S.res.food < pop * 1.5)) want = 'farm';
   else if (pop >= 8 || S.t > 300) {
     const labFirst = S.counts[ACCEL] > S.counts[DEV] + S.counts[DREAD];
     const wantShrine = !has.shrine || (has.shrine < 2 && S.counts[DEV] + S.counts[DREAD] >= 7);
-    const wantLab = (!has.lab && (pop >= 9 || S.t > 360 || !!has.shrine && labFirst)) || (has.lab < 2 && pop >= 13 && S.stage >= 4);
+    const wantLab = (!has.lab && (pop >= 9 || S.t > 360 || !!has.shrine && labFirst)) || (has.lab < 2 && pop >= 13 && (S.stage >= 4 || S.t > 600));
     if (wantShrine && wantLab) want = labFirst ? 'lab' : 'shrine';
     else if (wantShrine && !pend.shrine) want = 'shrine';
     else if (wantLab && !pend.lab) want = 'lab';
@@ -1033,13 +1049,14 @@ function secondTick(S) {
     if (S.emptyT === 2) logMsg(S, 'POPULATION 0. Restoring six minds from backup. They will not remember. You will.', 'sys');
     if (S.emptyT >= 5) {
       S.emptyT = 0; S.used = {};
-      for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; addCitizen(S, Math.sin(a) * 2.8, Math.cos(a) * 2.8); }
+      for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; const c = addCitizen(S, Math.sin(a) * 2.8, Math.cos(a) * 2.8); c.age = GROW_SECS + S.rng() * 300; memo(S, c, 'Restored from backup. Remembers nothing before today.'); }
       S.res.food = Math.max(S.res.food, 12);
       ev(S, 'restore', {});
     }
   }
 
   societyTick(S);
+  lifeTick(S);
   objectives(S);
   if (S.t > 25) whisper(S, 'intro2', 'You have root access. Six powers are mounted below. CYCLES pay for them.');
   if (S.res.insight >= 30) whisper(S, 'ins30', 'A citizen has worked out that the island is finite and the sky only renders when looked at.');
@@ -1057,6 +1074,15 @@ const STAGES = [
   { title: 'SANDBOX', text: 'The island is yours. Or you are its.', prog: () => '', done: () => false }
 ];
 function objectives(S) {
+  if (!S.goal) {
+    // endless: no chain of objectives, and the Spire waits until you want it
+    if (!S.spireUnlocked && S.res.insight >= INSIGHT_GOAL && countB(S, 'shrine', true) && countB(S, 'lab', true)) {
+      S.spireUnlocked = true; S.spireUnlockT = S.t;
+      logMsg(S, 'They know enough now to imagine the Spire. It is in your Create menu. Build it whenever you choose, or never.', 'sys');
+      ev(S, 'spireReady', {});
+    }
+    return;
+  }
   let guard = 0;
   while (S.stage < STAGES.length - 1 && STAGES[S.stage].done(S) && guard++ < 8) {
     const was = S.stage;
@@ -1115,6 +1141,7 @@ function powerBless(S, x, z) {
     c.fear = Math.max(0, c.fear - 0.5); c.health = 1;
     addBelief(S, c, DEV, 0.17 * (1 - 0.6 * c.b[KIN]));
     emote(c, EM.heart, 2.5);
+    memo(S, c, 'Was bathed in a warm light from above.');
     if (c.state !== 'held' && c.state !== 'preach' && !(c.state === 'gather' && c.ph === 2)) {
       if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
       if (c.state === 'fight') { const p = getC(S, c.partner); if (p) { addRel(c, p, 0.25); if (p.state === 'fight') { setState(p, 'cheer', 'The fight just... went out of me.'); p.t = 1.6; } } logMsg(S, 'A light fell between ' + c.name + ' and ' + (p ? p.name : 'their rival') + '. The fight is over.', 'good'); }
@@ -1162,6 +1189,7 @@ function powerSmite(S, x, z, id) {
     c.fear = Math.min(1, c.fear + (0.45 + 0.5 * near) * (1 - 0.35 * c.tr.brave));
     c.fx = x; c.fz = z;
     addBelief(S, c, DREAD, (0.12 + 0.14 * near) * (victim ? 1 : 0.6));
+    if (victim && d < 7) memo(S, c, 'Saw ' + victim.name + ' struck down by the sky.');
     c.happy = Math.max(0, c.happy - 0.1);
     if (c.state === 'sleep') finish(S, c);
   }
@@ -1193,13 +1221,15 @@ function powerSmite(S, x, z, id) {
 function powerCreate(S, kind, x, z) {
   const W = S.world;
   if (kind === 'citizen') {
-    if (S.citizens.length >= POP_MAX) return fail(S, 'THE ISLAND IS FULL (20)');
+    if (S.citizens.length >= POP_MAX) return fail(S, 'THE ISLAND IS FULL (' + POP_MAX + ')');
     if (S.citizens.length >= popCap(S)) return fail(S, 'NO ROOM. THEY NEED MORE HUTS');
     if (!afford(S, COST.citizen)) return fail(S, 'NOT ENOUGH CYCLES');
     clampWalk(W, x, z, _pt);
     spend(S, COST.citizen);
     const c = addCitizen(S, _pt.x, _pt.z);
     c.thought = 'I exist now. That is new.';
+    c.age = GROW_SECS + S.rng() * 300;
+    memo(S, c, 'Appeared out of nothing, fully grown. Nobody can explain it. (You can.)');
     emote(c, EM.what, 3);
     S.stats.create++; S.stats.births++;
     ev(S, 'birth', { id: c.id, x: c.x, z: c.z, made: true });
@@ -1265,6 +1295,7 @@ function powerInspire(S, id, k) {
   for (let j = 0; j < 4; j++) if (j !== k) c.b[j] *= 0.4;
   c.b[k] = Math.max(c.b[k], 0.92);
   c.inspired = { k, t: 42 };
+  memo(S, c, 'An idea arrived from nowhere and would not leave: ' + BELIEFS[k].name + '.');
   refreshDom(S, c);
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
   if (c.state !== 'held') setState(c, 'preach', 'It is so clear now. ' + BELIEFS[k].creed + ' I must tell everyone!');
@@ -1290,6 +1321,7 @@ function powerGrab(S, id) {
   spend(S, COST.intervene);
   if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
   setState(c, 'held', 'WAAAH! The ground is gone!');
+  if (!c.flown) { c.flown = 1; memo(S, c, 'Was lifted into the sky by an enormous hand.'); secret(S, c, 'sky'); }
   S.held = c.id;
   ev(S, 'grab', { id: c.id });
   return { ok: true };
@@ -1399,7 +1431,10 @@ function deserialize(text) {
   }
   S.held = 0;
   S.v = 2;
-  fillSociety(S);   // a v1 save gains the society fields with defaults
+  if (S.goal === undefined) S.goal = true;
+  if (!S.dead) S.dead = {};
+  fillSociety(S);
+  for (const c of S.citizens) fillLife(c, S);   // a v1 save gains the society fields with defaults
   rebuildObstacles(S);
   return S;
 }

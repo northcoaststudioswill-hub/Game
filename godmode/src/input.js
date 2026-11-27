@@ -6,7 +6,7 @@ function initControls(canvas) {
   const pts = new Map();
   let tap = null, pinch = null, grabbing = false;
   const local = e => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-  const playing = () => APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen;
+  const playing = () => APP.mode === 'play' && !APP.menuOpen && !APP.dlgOpen && !APP.lifeOpen;
 
   function panBy(dx, dy) {
     const C = R.cam, k = C.dist * 0.0021;
@@ -117,6 +117,7 @@ function initControls(canvas) {
     if (e.repeat) return;
     if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
       if (APP.dlgOpen) return;
+      if (APP.lifeOpen) { closeLife(); return; }
       if (APP.menuOpen) closeMenu(); else if (APP.mode === 'play') openMenu();
       return;
     }

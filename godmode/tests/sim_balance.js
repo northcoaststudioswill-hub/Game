@@ -1,7 +1,7 @@
 /* Headless balance run of the simulation core (no browser).
    node godmode/tests/sim_balance.js [seeds]                                  */
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const src = ['core.js', 'world.js', 'sim.js', 'society.js'].map(f => fs.readFileSync(path.join(__dirname, '../src', f), 'utf8')).join('\n');
+const src = ['core.js', 'world.js', 'sim.js', 'society.js', 'life.js'].map(f => fs.readFileSync(path.join(__dirname, '../src', f), 'utf8')).join('\n');
 const ctx = { console, Math, JSON };
 vm.createContext(ctx);
 vm.runInContext(src + '\nthis.API={newSim,simStep,serialize,deserialize,powerObserve,powerBless,powerSmite,powerCreate,powerInspire,powerGrab,powerDrag,powerDrop,popCap,countB,firstB,STAGES,BELIEFS,SIM_DT};', ctx);
@@ -55,12 +55,31 @@ for (const seed of (seeds.length ? seeds : [1, 2, 3, 4])) {
   for (const mode of ['passive', 'active', 'cruel']) {
     const { S, stageAt, mono, soc } = run(seed, mode, 40);
     if (mode !== 'cruel' && !stageAt[6]) bad++;
-    if (mode === 'passive' && S.stats.deaths > 2) bad++;
+    if (mode === 'passive' && S.stats.deaths - (S.stats.oldAge || 0) > 2) bad++;
     // left alone, the island should not sit at 90%+ one belief for most of the run
     if (mode === 'passive' && mono > 0.5) { console.log('  ^ monoculture'); bad++; }
     // left alone, the island should still grow a society: couples, a faith leader, a business
     if (mode === 'passive' && !(soc.couples && soc.leaders && soc.shops)) { console.log('  ^ no society'); bad++; }
   }
+}
+
+// endless: no goal, left alone for 75 minutes. Generations must turn over without the island dying out.
+for (const seed of (seeds.length ? seeds.slice(0, 2) : [1, 2])) {
+  const S = A.newSim(seed, false);
+  let minPop = 99, restores = 0, nan = 0;
+  for (let i = 0; i < 75 * 60 / A.SIM_DT; i++) {
+    A.simStep(S, A.SIM_DT);
+    for (const e of S.events) if (e.type === 'restore') restores++;
+    S.events.length = 0;
+    if (i % 200 === 0) { minPop = Math.min(minPop, S.citizens.length); for (const c of S.citizens) if (!isFinite(c.x) || !isFinite(c.age)) nan++; }
+  }
+  const gen = Math.max.apply(null, S.citizens.map(c => c.gen)), old = S.stats.oldAge || 0;
+  const ok = restores === 0 && gen >= 3 && old >= 4 && !A.firstB(S, 'spire') && nan === 0 && S.citizens.length >= 8;
+  console.log(`seed ${seed} endless 75min pop ${S.citizens.length} (min ${minPop}) generation ${gen} old-age deaths ${old} other deaths ${S.stats.deaths - old} births ${S.stats.births} ` +
+    `restores ${restores} spire ${A.firstB(S, 'spire') ? 'yes' : 'no'} factions ${S.factions.length} memories ${S.citizens[0].mem.length} ${ok ? '' : ' <-- FAIL'}`);
+  if (!ok) bad++;
+  const S2 = A.deserialize(A.serialize(S));
+  if (S2.goal !== false || S2.citizens.length !== S.citizens.length) { console.log('  endless save round trip FAIL'); bad++; }
 }
 console.log(bad ? 'FAIL ' + bad : 'OK');
 process.exit(bad ? 1 : 0);
