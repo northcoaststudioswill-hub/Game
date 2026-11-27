@@ -197,6 +197,10 @@ const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!o
   await page.screenshot({ path: path.join(out, '13-singularity.png') });
   for (let i = 0; i < 3; i++) { await page.tap('#dlgBtns button'); await sleep(300); }
   check(await page.evaluate(() => !APP.dlgOpen && APP.S.stage === 6), 'sandbox continues after the ending');
+  // the island keeps the look of the idea it was built for
+  for (let i = 0; i < 20 && !(await page.evaluate(() => { const k = APP.S.ending; return k >= 0 ? R.ageW[k] > 0.8 : R.ageW.every(w => w > 0.3); })); i++) await sleep(500);
+  check(await page.evaluate(() => { const k = APP.S.ending, t = +document.getElementById('ageTint').style.opacity;
+    return (k >= 0 ? R.ageW[k] > 0.8 && R.atm[k].m.visible : R.ageW.every(w => w > 0.3)) && t > 0.1; }), 'the ending\'s atmosphere settles over the sandbox');
   await sleep(800);
   await page.screenshot({ path: path.join(out, '14-sandbox.png') });
   await page.evaluate(() => { APP.S.day = 0.86; });

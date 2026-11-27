@@ -270,7 +270,20 @@ function updateSky(S, dt) {
   R.sun.color.copy(_ca.set(a.sun)).lerp(_cb.set(b.sun), f);
   R.sun.intensity = lerp(a.si, b.si, f) + R.flashL * 6;
   R.hemi.intensity = lerp(a.hi, b.hi, f) + R.flashL * 3;
+  // the ruling idea colours the whole world
+  for (let k = 0; k < 4; k++) {
+    const w = R.ageW[k], T = AGE_LOOK[k];
+    if (w < 0.002) continue;
+    const day = 1 - 0.6 * smooth(0.74, 0.8, d) * (1 - smooth(0.96, 1, d));
+    R.skyU.top.value.lerp(_ca.set(T.top), w * T.mix * day);
+    R.skyU.bot.value.lerp(_ca.set(T.bot), w * T.mix * day);
+    R.sun.color.lerp(_ca.set(T.sun), w * 0.85);
+    R.sun.intensity *= 1 + w * T.light;
+    R.hemi.intensity *= 1 + w * T.light * 0.6;
+  }
   R.hemi.color.copy(R.skyU.bot.value).lerp(_ca.set('#ffffff'), 0.5);
+  R.hemi.groundColor.set('#6a5a8a');
+  for (let k = 0; k < 4; k++) if (R.ageW[k] > 0.002) R.hemi.groundColor.lerp(_ca.set(AGE_LOOK[k].top), R.ageW[k] * 0.6);
   const night = smooth(0.74, 0.8, d) * (1 - smooth(0.96, 1, d));
   R.night = night;
   R.stars.material.opacity = night * 0.9;
@@ -279,7 +292,10 @@ function updateSky(S, dt) {
   if (d < NIGHT_FROM) R.sun.position.set(Math.cos(sa) * 30, 14 + Math.sin(sa) * 30, 18);
   else R.sun.position.set(-12, 30, -16);
   R.clouds.rotation.y += dt * 0.012;
-  R.grid.material.opacity = 0.22 + night * 0.3 + (R.singT >= 0 ? 0.3 : 0);
+  R.grid.material.opacity = 0.22 + night * 0.3 + (R.singT >= 0 ? 0.3 : 0) + R.ageW[ACCEL] * (0.25 + 0.2 * Math.sin(R.time * 3));
+  R.grid.position.z = (R.grid.position.z + dt * 6 * R.ageW[ACCEL]) % 10;
+  R.stars.material.opacity = Math.max(R.stars.material.opacity, R.ageW[ACCEL] * 0.35);
+  for (const m of R.clouds.children) m.material = R.ageW[DREAD] > 0.5 ? R.matCloudDark : R.mat;
   // after the singularity the sky keeps a faint tint of whatever they built it for
   if (R.singT >= 0) {
     R.singT += dt;
@@ -287,6 +303,105 @@ function updateSky(S, dt) {
     R.skyU.glow.value.set(R.singHex || '#ff5fd2').multiplyScalar(0.5 * k);
   } else R.skyU.glow.value.setScalar(0);
   R.flashL = Math.max(0, R.flashL - dt * 4);
+}
+
+/* ------------------------------------------------------------ atmosphere
+   Each Age has its own look: a sky tint, a light level, a particle field and one
+   signature event. Weights fade in and out over a few seconds. After the Singularity
+   the island keeps the look of the idea it was built for (all four, faintly, for the
+   Compromise). Render only: nothing here touches the sim. */
+const AGE_LOOK = [
+  { top: '#c48a2a', bot: '#fff0b8', sun: '#ffe2a0', mix: 0.5, light: 0.12, col: '#ffd447', n: 90 },   // devotion: gold, rising motes
+  { top: '#3a0614', bot: '#d8452e', sun: '#ff7a5c', mix: 0.5, light: -0.28, col: '#ff5a3c', n: 110 },  // dread: blood sky, falling embers, lightning
+  { top: '#03384e', bot: '#7ff6ff', sun: '#bff8ff', mix: 0.42, light: 0.05, col: '#3fe8ff', n: 130 },  // acceleration: data rain upward, live grid
+  { top: '#2f7f4a', bot: '#eaffc8', sun: '#fff3c8', mix: 0.3, light: 0.08, col: '#b6ff6a', n: 70 }    // kinship: fireflies
+];
+function initAtmos() {
+  R.ageW = [0, 0, 0, 0];
+  R.boltT = 6;
+  R.matCloudDark = new THREE.MeshLambertMaterial({ vertexColors: true, color: '#5a4650' });
+  R.atm = AGE_LOOK.map((L, k) => {
+    const pos = new Float32Array(L.n * 3), g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const m = new THREE.Points(g, new THREE.PointsMaterial({ color: L.col, size: [0.5, 0.42, 0.34, 0.55][k], transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, depthWrite: false }));
+    m.frustumCulled = false; m.visible = false;
+    R.scene.add(m);
+    const P = []; const rr = mulberry32(31 + k);
+    for (let i = 0; i < L.n; i++) P.push({ x: 0, y: 0, z: 0, h: 0, ph: rr() * TAU, sp: 0.6 + rr() * 0.8, live: false });
+    return { m, pos, P, rr };
+  });
+}
+function atmSpawn(S, k, p, fresh) {
+  const r = Math.sqrt(Math.random()) * 15, a = Math.random() * TAU;
+  p.x = Math.sin(a) * r; p.z = Math.cos(a) * r;
+  const gy = groundY(S.world, p.x, p.z);
+  p.h = gy;
+  if (k === DEV) p.y = gy + (fresh ? Math.random() * 7 : 0);
+  else if (k === DREAD) p.y = gy + (fresh ? Math.random() * 12 : 12 + Math.random() * 3);
+  else if (k === ACCEL) p.y = gy + (fresh ? Math.random() * 14 : 0);
+  else p.y = gy + 0.4 + Math.random() * 1.6;
+  p.live = true;
+}
+function updateAtmos(S, dt) {
+  if (!R.atm) initAtmos();
+  for (let k = 0; k < 4; k++) {
+    let tgt;
+    if (S.sandbox) tgt = S.ending >= 0 ? (S.ending === k ? 1 : 0) : 0.4;
+    else tgt = S.age === k ? 1 : 0;
+    R.ageW[k] += (tgt - R.ageW[k]) * Math.min(1, dt * 0.45);
+    const A = R.atm[k], w = R.ageW[k];
+    A.m.visible = w > 0.01;
+    if (!A.m.visible) { for (const p of A.P) p.live = false; continue; }
+    const night = R.night || 0;
+    A.m.material.opacity = w * (k === KIN ? 0.35 + 0.65 * night : k === DEV ? 0.8 : 0.9);
+    const T = R.time;
+    for (let i = 0; i < A.P.length; i++) {
+      const p = A.P[i];
+      if (!p.live) atmSpawn(S, k, p, true);
+      if (k === DEV) {            // motes drift up and sway, like dust in a cathedral
+        p.y += dt * 0.55 * p.sp; p.x += Math.sin(T * 0.8 + p.ph) * dt * 0.25;
+        if (p.y > p.h + 8) atmSpawn(S, k, p, false);
+      } else if (k === DREAD) {   // embers fall, slanting in a hot wind
+        p.y -= dt * 0.9 * p.sp; p.x += dt * 0.7; p.z += Math.sin(T + p.ph) * dt * 0.3;
+        if (p.y < p.h) atmSpawn(S, k, p, false);
+      } else if (k === ACCEL) {   // the island uploads itself: straight fast streams
+        p.y += dt * 3.2 * p.sp;
+        if (p.y > p.h + 16) atmSpawn(S, k, p, false);
+      } else {                    // fireflies wander and blink
+        p.x += Math.sin(T * 0.6 * p.sp + p.ph) * dt * 0.5; p.z += Math.cos(T * 0.5 * p.sp + p.ph * 1.7) * dt * 0.5;
+        p.y = p.h + 0.9 + Math.sin(T * 0.9 + p.ph) * 0.6;
+      }
+      // a firefly that is between blinks sits far below the world
+      const off = k === KIN && Math.sin(T * 2.2 * p.sp + p.ph * 5) < -0.3 ? -999 : 0;
+      A.pos[i * 3] = p.x; A.pos[i * 3 + 1] = p.y + off; A.pos[i * 3 + 2] = p.z;
+    }
+    A.m.geometry.attributes.position.needsUpdate = true;
+  }
+  // the edges of the view take the colour of the ruling idea
+  if (!R.tintEl) R.tintEl = document.getElementById('ageTint');
+  if (R.tintEl) {
+    let best = -1, bw = 0;
+    for (let k = 0; k < 4; k++) if (R.ageW[k] > bw) { bw = R.ageW[k]; best = k; }
+    const key = best < 0 || bw < 0.02 ? -1 : best;
+    if (key !== R.tintK) {
+      R.tintK = key;
+      if (key >= 0) R.tintEl.style.background = 'radial-gradient(ellipse at center, transparent 40%, ' + AGE_LOOK[key].col + ' 135%)';
+    }
+    // only touch the DOM when the value moves a visible step
+    const op = key < 0 ? 0 : Math.round(bw * (key === DREAD ? 0.55 : 0.4) * 50) / 50;
+    if (op !== R.tintOp) { R.tintOp = op; R.tintEl.style.opacity = op; R.tintEl.hidden = op === 0; }
+  }
+  // dread's signature: dry lightning over the island
+  if (R.ageW[DREAD] > 0.6) {
+    R.boltT -= dt;
+    if (R.boltT <= 0) {
+      R.boltT = 9 + Math.random() * 12;
+      R.flashL = Math.max(R.flashL, 0.55);
+      { const a = Math.random() * TAU, r = 26 + Math.random() * 14; fxBeam(Math.sin(a) * r, -14, Math.cos(a) * r, '#ffd0c0'); }
+      if (typeof sfx === 'function') sfx('thunder');
+    }
+  }
 }
 
 /* ----------------------------------------------------------------- world */
@@ -302,6 +417,7 @@ function resetRender(S) {
   R.cit = new Map(); R.bld = new Map(); R.grv = new Map();
   R.world = new THREE.Group(); R.root.add(R.world);
   R.singT = S.sandbox ? 30 : -1;
+  if (R.ageW) R.ageW.fill(0);   // a new or loaded island starts from a neutral sky and fades into its idea
   R.singHex = S.sandbox && S.ending >= 0 ? BELIEFS[S.ending].hex : '#ff5fd2';
   R.flashL = 0;
 
@@ -905,6 +1021,7 @@ function pickBuilding(S, x, z) {
 
 function renderFrame(S, alpha, dt) {
   R.time += dt;
+  updateAtmos(S, dt);
   updateSky(S, dt);
   R.nodeT -= dt;
   if (R.nodeT <= 0) { R.nodeT = 0.25; syncNodes(S, false); }

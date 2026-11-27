@@ -85,8 +85,8 @@ function updateUI(S, dt) {
   $('cycNum').textContent = S.freeCycles ? 'UNLIMITED' : (S.cycles | 0) + ' / ' + S.cyclesMax;
   for (let k = 0; k < 4; k++) $('z' + k).style.width = (pop ? S.counts[k] / pop * 100 : 0).toFixed(1) + '%';
   const zl = $('zlabel');
-  if (S.age >= 0) { zl.textContent = 'AGE OF ' + BELIEFS[S.age].name; zl.style.color = BELIEFS[S.age].hex; }
-  else { zl.textContent = 'NO CREED RULES'; zl.style.color = ''; }
+  if (S.age >= 0) { zl.textContent = 'AGE OF ' + BELIEFS[S.age].name; zl.style.color = BELIEFS[S.age].hex; $('zeit').style.borderColor = BELIEFS[S.age].hex; }
+  else { zl.textContent = 'NO CREED RULES'; zl.style.color = ''; $('zeit').style.borderColor = ''; }
   const st = STAGES[S.stage];
   $('qTitle').textContent = st.title; $('qText').textContent = st.text; $('qProg').textContent = st.prog(S);
 

@@ -59,6 +59,7 @@ function sfx(name) {
     case 'argue': tone(140, 0.08, 'sawtooth', 0.07); tone(170, 0.08, 'sawtooth', 0.07, 0.09); break;
     case 'stage': [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, 0.22, 'square', 0.09, i * 0.08)); break;
     case 'age': tone(196, 0.9, 'triangle', 0.12); tone(294, 0.9, 'triangle', 0.1, 0.05); tone(392, 0.9, 'triangle', 0.08, 0.1); break;
+    case 'thunder': noise(1.6, 0.16, 0.05, 260); tone(48, 1.4, 'triangle', 0.1, 0.05, 30); break;
     case 'sing':
       tone(55, 6, 'sawtooth', 0.16, 0, 110); tone(110, 6, 'triangle', 0.14, 0, 220);
       [262, 330, 392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 1.2, 'sine', 0.09, 0.8 + i * 0.35));
@@ -73,9 +74,23 @@ function auAmbient(S, dt) {
   AU.nextNote -= dt;
   if (AU.nextNote > 0) return;
   const night = isNight(S);
+  const age = S.sandbox ? S.ending : S.age;
   AU.nextNote = (night ? 2.6 : 1.5) + Math.random() * 2.2;
   const i = (Math.random() * (night ? 5 : SCALE.length)) | 0;
-  const f = SCALE[i] * (S.age === DREAD ? 0.5 : 1);
-  tone(f, 2.4, 'sine', 0.035);
-  if (Math.random() < 0.35) tone(f * 1.5, 2.0, 'sine', 0.02, 0.25);
+  const f = SCALE[i];
+  if (age === DEV) {            // a slow organ chord: root, third, fifth
+    tone(f, 3.2, 'triangle', 0.028); tone(f * 1.26, 3.0, 'triangle', 0.018, 0.08); tone(f * 1.5, 2.8, 'sine', 0.018, 0.16);
+    AU.nextNote += 1.2;
+  } else if (age === DREAD) {   // low, minor, with a sour second voice
+    tone(f * 0.5, 2.8, 'sawtooth', 0.016); if (Math.random() < 0.5) tone(f * 0.5 * 1.06, 2.4, 'sine', 0.02, 0.3);
+    AU.nextNote += 0.8;
+  } else if (age === ACCEL) {   // quick square arpeggios, like a machine thinking
+    for (let n = 0; n < 4; n++) tone(SCALE[(i + n * 2) % SCALE.length] * 2, 0.12, 'square', 0.012, n * 0.11);
+    AU.nextNote *= 0.55;
+  } else if (age === KIN) {     // two voices answering each other
+    tone(f, 2.2, 'sine', 0.035); tone(SCALE[(i + 2) % SCALE.length] * 2, 1.6, 'sine', 0.022, 0.6);
+  } else {
+    tone(f, 2.4, 'sine', 0.035);
+    if (Math.random() < 0.35) tone(f * 1.5, 2.0, 'sine', 0.02, 0.25);
+  }
 }

@@ -57,6 +57,13 @@ island, holders of a small minority idea resist conversion harder, and once one 
 curious citizens start to break from it (a **schism**) toward a rival idea. Preaching is not weakened.
 The ending text of the Singularity depends on the Age at the moment the Spire wakes.
 
+Each Age also changes how the island looks and sounds. Devotion: a gold sky, motes of light rising, and the ambient
+tune becomes slow organ chords. Dread: a blood-red sky, dark clouds, falling embers, dry lightning out over the
+clouds, and a low, sour drone. Acceleration: a cyan sky, streams of data rising off the island, faint daytime stars,
+a bright scrolling grid below, and quick square-wave arpeggios. Kinship: a soft green light, fireflies that blink
+(brighter at night), and two voices answering each other. The edges of the screen take the Age's colour. After the
+Singularity the island keeps the look of its ending for good; after THE COMPROMISE it shows all four, faintly.
+
 ### Objectives
 
 Wake (observe a citizen) → Nurture (8 citizens) → Seed an idea (4 share a belief) → Infrastructure (a Shrine and a
@@ -109,6 +116,23 @@ node godmode/tests/play_phone.js    # needs Playwright + Chromium; screenshots g
 ```
 
 ## Changelog
+
+### 0.3, Nov 27 2026: the Ages look and sound different
+
+- `src/render.js` atmosphere: per-Age sky tint (also tints the sun and the ground bounce light), a particle field
+  (gold motes, embers, data streams, fireflies), and one signature for Dread (lightning beams off the island
+  every 9 to 21 s, with a thunder sound) and Acceleration (live grid, daytime stars). Weights fade over a few
+  seconds when the Age changes. A new `#ageTint` layer tints the screen edges. Render only; the sim is unchanged.
+- Endings: in the sandbox the atmosphere locks to the ending's idea; THE COMPROMISE shows all four at 40%.
+- `src/audio.js`: the ambient tune has a voicing per Age (and per ending in the sandbox); new `thunder` sound.
+- The zeitgeist panel's border takes the Age's colour.
+- `play_phone.js` checks that the ending's atmosphere settles over the sandbox.
+
+**Tested:** `play_phone.js` ALL OK, `sim_balance.js` OK; screenshots of all four Ages by day and night in headless
+Chromium. **Cost:** in the software-rendered test browser the full ending look costs a few fps (about 61 to 52 at
+the end of the test run; in a separate run, roughly 41 to 49 with versus without the edge tint, but those numbers
+swing by about 4). Not measured on a phone. **Not tested:** the new sounds have not been listened to.
+
 
 ### 0.2, Nov 27 2026: counter-pressure against one-idea islands, pinch test
 
