@@ -153,7 +153,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #r1k b{display:block;font-weight:400;font-size:clamp(40px,11vw,110px);line-height:.9;color:var(--lime);-webkit-text-stroke:3px var(--ink);text-shadow:5px 0 0 var(--hot),-5px 0 0 var(--cyan);animation:r1kg .18s steps(2) infinite}
 #r1k i{font-style:normal;font-family:var(--body);font-size:14px;background:var(--ink);padding:2px 10px;border-radius:6px}
 @keyframes r1kg{0%{translate:2px -1px;rotate:-1.5deg}50%{translate:-3px 2px;rotate:1.5deg}}
-#app.r1k #c{animation:r1kc 1.6s linear infinite}@keyframes r1kc{0%{filter:hue-rotate(0) saturate(2.2) contrast(1.2)}50%{filter:hue-rotate(180deg) saturate(3) contrast(1.4)}100%{filter:hue-rotate(360deg) saturate(2.2) contrast(1.2)}}
+#app.r1k #c{animation:r1kc 1.6s linear infinite}@keyframes r1kc{0%{filter:hue-rotate(0) saturate(1.5) contrast(1.08)}50%{filter:hue-rotate(180deg) saturate(1.9) contrast(1.15)}100%{filter:hue-rotate(360deg) saturate(1.5) contrast(1.08)}}
 @media (prefers-reduced-motion:reduce){#r1k b,#app.r1k #c{animation:none}}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 
@@ -218,7 +218,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <div id="ad" hidden><span id="adt"></span><button id="adx" aria-label="Close ad">✕</button></div>
     <button id="bSlow" hidden aria-label="Borrowed Time">⏳</button>
     <div id="ratio" hidden>YOU GOT<br>RATIOED</div>
-    <div id="dialog" hidden><div id="dport">🗿</div><div id="dbody"><b id="dname"></b><p id="dtext"></p><small>tap / E ▶</small><button id="dskip" hidden>skip ⏭</button></div></div>
+    <div id="dialog" hidden><div id="dport">🗿</div><div id="dbody"><b id="dname"></b><p id="dtext"></p><small><span class="kbo">tap / E ▶</span><span class="gpo">A ▶ · hold B: skip all</span></small><button id="dskip" hidden>skip ⏭</button></div></div>
   </div>
 
   <div id="title" class="screen">
@@ -1061,7 +1061,7 @@ const TOP={x:0,z:0,y:0};
   const ob=[];scatter(46,0,0,34,WORLD_R-6,(x,z)=>inArea(x,z)||ob.push({x,y:groundH(x,z)+1,z,ry:R()*TAU,s:rr(.6,1.6),sy:rr(3,11)}));inst(new THREE.ConeGeometry(1,2,4),normalMat,ob);
   const balls=[];scatter(34,0,0,30,WORLD_R-6,(x,z)=>{if(inArea(x,z))return;const s=rr(.8,3.4);balls.push({x,y:groundH(x,z)+s*.7,z,s});});inst(Sph(1,16,12),normalSmooth,balls);
   const flock=new THREE.Group();['💀','🗿','🔥','💯','🧠','📉','📈','🚽','👁️','🍕','🦈','☕','🤖','🥶','🤑','🧢','👑','💅','🫠','🐸'].forEach((e,i)=>{for(let k=0;k<2;k++){const s=emojiSprite(e,rr(10,26),false);const a=R()*TAU,r=rr(120,420);s.position.set(Math.cos(a)*r,rr(70,230),Math.sin(a)*r);flock.add(s);}});scene.add(flock);spin.push({o:flock,y:.02});
-  sign(-52,-30,['TOUCH GRASS →','(there is no grass)'],.9);sign(54,-26,['LIVE LAUGH DELVE'],-.9,'#ff9ecf');sign(8,62,['HANDS ARE HARD','please be patient'],3.1,'#b6ff00');
+  sign(-52,-30,['TOUCH GRASS →','(there is no grass)','(it heals you)'],.9);sign(54,-26,['LIVE LAUGH DELVE'],-.9,'#ff9ecf');sign(8,62,['HANDS ARE HARD','please be patient'],3.1,'#b6ff00');
   sign(-70,60,['THIS SIGN WAS','GENERATED'],2);sign(84,58,['6 7'],-2.2,'#19e3ff');sign(-30,96,['YOU ARE HERE','(we think)'],2.6,'#ff9ecf');})();
 
 // ---- throne of aura (the golden toilet)
@@ -1164,7 +1164,10 @@ $('mute').addEventListener('click',()=>{audioInit();setMute(!AU.muted);});setMut
 
 /* ================= HUD helpers ================= */
 const toastBox=$('toasts'),floats=$('floats');
-function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;toastBox.appendChild(d);while(toastBox.children.length>3)toastBox.firstChild.remove();setTimeout(()=>d.remove(),4200);}
+const TOASTSEEN=new Map();
+function toastLow(t){return typeof TOASTS!=='undefined'&&TOASTS.includes(t)||/NEW COIN JUST DROPPED|GOT RUG PULLED|exactly 67 seconds|Your ratio is trending| was ratioed$|Ad closed/.test(t);}
+function toast(t){t=String(t);const low=toastLow(t);if(low){const now=performance.now(),k=TOASTSEEN.get(t);if(k&&now-k<180000)return;if(typeof toastBusy==='function'&&toastBusy()&&!/Your ratio is trending/.test(t))return;TOASTSEEN.set(t,now);}
+  const d=document.createElement('div');d.className='toast';d.textContent=t;if(low)d.dataset.low=1;toastBox.appendChild(d);while(toastBox.children.length>3){const lo=[...toastBox.children].find(c=>c.dataset.low&&c!==d);(lo||toastBox.firstChild).remove();}setTimeout(()=>d.remove(),4200);}
 const _v=new THREE.Vector3();
 function floatText(t,x,y,z,color){if(floats.children.length>14)floats.firstChild.remove();_v.set(x,y,z).project(camera);if(_v.z>1)return;const d=document.createElement('div');d.className='ft';d.textContent=t;if(color)d.style.color=color;
   d.style.left=((_v.x*.5+.5)*app.clientWidth)+'px';d.style.top=((-_v.y*.5+.5)*app.clientHeight)+'px';floats.appendChild(d);setTimeout(()=>d.remove(),950);}
@@ -1191,7 +1194,7 @@ const DLG={q:[],i:0,chars:0,done:null,text:'',who:null};
 function say(lines,done){$('dskip').hidden=lines.length<3;DLG.shot=null;DLG.q=lines;DLG.i=0;DLG.done=done||null;S.mode='dialog';$('dialog').hidden=false;$('bTalk').hidden=true;showLine();}
 function showLine(){const l=DLG.q[DLG.i];DLG.who=SPEAK[l[0]];DLG.text=l[1];DLG.chars=0;$('dport').textContent=DLG.who.face;$('dname').textContent=DLG.who.name;$('dtext').textContent='';const o=l[2];if(o){if('cam' in o)DLG.shot=o.cam;if(o.fn)o.fn();}app.classList.toggle('cine',!!DLG.shot);}
 function advance(){if(S.mode!=='dialog')return;if(DLG.chars<DLG.text.length){DLG.chars=DLG.text.length;$('dtext').textContent=DLG.text;return;}
-  DLG.i++;if(DLG.i>=DLG.q.length){$('dialog').hidden=true;S.mode='play';DLG.endT=performance.now();PL.inv=Math.max(PL.inv||0,1.2);DLG.shot=null;app.classList.remove('cine');if(!boss.active)boss.g.visible=false;const d=DLG.done;DLG.done=null;if(d)d();}else showLine();}
+  DLG.i++;if(DLG.i>=DLG.q.length){$('dialog').hidden=true;S.mode='play';DLG.endT=performance.now();PL.inv=Math.max(PL.inv||0,2.5);enemyPushback(10,20,1.6);DLG.shot=null;app.classList.remove('cine');if(!boss.active)boss.g.visible=false;const d=DLG.done;DLG.done=null;if(d)d();}else showLine();}
 function updateDialog(dt){if(DLG.chars<DLG.text.length){const before=Math.floor(DLG.chars);DLG.chars=Math.min(DLG.text.length,DLG.chars+dt*52);const now=Math.floor(DLG.chars);if(now!==before){$('dtext').textContent=DLG.text.slice(0,now);if(DLG.text[now-1]==='█'){if(now%2===0)tone(1000,.08,'sine',.12);}else if(now%3===0)SFX.blip(DLG.who.pitch,DLG.who.wave);}}}
 $('dialog').addEventListener('click',advance);
 $('dskip').addEventListener('click',e=>{e.stopPropagation();if(S.mode!=='dialog')return;DLG.i=DLG.q.length-1;showLine();DLG.chars=DLG.text.length;$('dtext').textContent=DLG.text;advance();});
@@ -1247,7 +1250,7 @@ function syncWorld(){ // make meshes match state
     if(S.relics[id]){r.g.scale.setScalar(.55);}else{r.g.scale.setScalar(1);r.g.position.set(r.hx,r.hy,r.hz);}
     $('relics').children[i].classList.toggle('got',S.relics[id]);});
   portal.open=allRelics();portal.lock.visible=!portal.open;portal.beam.visible=portal.open;portalU.on.value=portal.open?1:0;hudCache.q=null;}
-function takeRelic(id){S.relics[id]=true;S.cells=S.max;addAura(6700,PL.x,PL.y+3,PL.z);SFX.relic();flash(.7,700);burst(PL.x,PL.y+2,PL.z,80,null,18,10,1.4);S.shake=.6;syncWorld();save();
+function takeRelic(id){S.relics[id]=true;S.cells=S.max;for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.tag!=='boss'&&Math.hypot(e.x-PL.x,e.z-PL.z)<40){burst(e.x,e.y,e.z,24,null,12,6,.8);if(e.tag!=='grok')respawns.push({t:30,x:e.hx,z:e.hz,tag:e.tag});removeEnemy(e);}}addAura(6700,PL.x,PL.y+3,PL.z);SFX.relic();flash(.7,700);burst(PL.x,PL.y+2,PL.z,80,null,18,10,1.4);S.shake=.6;syncWorld();save();
   const lines=RELIC_SAY[id].concat(allRelics()?ALL_SAY:[]);say(lines,()=>{toast('💾 Saved to the cloud (the cloud is your browser)');if(allRelics())S.track='portal';storyBeat();});}
 
 /* ================= enemies ================= */
@@ -1260,7 +1263,7 @@ const enemies=[];
 function spawnEnemy(x,z,tag){const ck=tag==='clank'||tag==='botmin'||tag==='cloud'||tag==='dog',a=pick(ANIM),o=pick(OBJ),name=tag==='dog'?'UNIT '+Math.floor(100+Math.random()*899):ck?'CLANKER v0.'+Math.floor(10+Math.random()*89):a[1]+pick(SUF)+' '+o[1]+pick(SUF);const g=new THREE.Group();
   const body=new THREE.Mesh(tag==='dog'?dogBotGeo:ck?clankGeo:pick(eGeos),ck?lam:normalMat);g.add(body);if(!ck){const f=emojiSprite(a[0],2.6);f.position.y=1.9;g.add(f);const h=emojiSprite(o[0],1.5);h.position.set(.9,3.2,0);g.add(h);}
   const l=textSprite(name,1.15,{color:'#fff',size:48});l.position.y=4.7;g.add(l);scene.add(g);
-  const e={g,body,label:l,x,z,y:0,hx:x,hz:z,hp:tag==='boss'?1:ck?3:2,ck,tag,name,spd:tag==='boss'?9:6.5+Math.random()*2.5,aggro:34,t:Math.random()*9,wt:0,wx:x,wz:z,kx:0,kz:0,hit:0,rad:1.9};
+  const e={g,body,label:l,x,z,y:0,hx:x,hz:z,hp:tag==='boss'?1:ck?3:2,ck,tag,name,spd:tag==='boss'?9:6.5+Math.random()*2.5,aggro:34,t:Math.random()*9,wt:0,wx:x,wz:z,kx:0,kz:0,hit:0,rad:1.9,rec:0,wind:0};
   e.y=(tag==='boss'?ARENA.top:groundH(x,z))+1.6;if(tag==='cloud'){e.fly=true;e.fh=e.hy=CLOUDY+3;e.y=e.fh;e.hp=2;e.aggro=46;}g.position.set(x,e.y,z);enemies.push(e);burst(x,e.y,z,14,.85,8,4,.6);return e;}
 function removeEnemy(e){scene.remove(e.g);e.label.material.map.dispose();e.label.material.dispose();const i=enemies.indexOf(e);if(i>=0)enemies.splice(i,1);}
 const respawns=[];
@@ -1274,15 +1277,19 @@ function spawnWorldEnemies(){while(enemies.length)removeEnemy(enemies[0]);respaw
   [[-60,70],[70,60],[-10,-90],[90,-42]].forEach(p=>spawnEnemy(p[0],p[1],'wild'));
   for(let i=0;i<5;i++){const a=i/5*TAU+.5;spawnEnemy(ABY.clank.x+Math.cos(a)*16,ABY.clank.z+Math.sin(a)*16,'clank');}
   for(let i=0;i<4;i++){const a=i/4*TAU;spawnEnemy(CL.x+Math.cos(a)*12,CL.z+Math.sin(a)*12,'cloud');}}
-function updateEnemies(dt,active){for(let i=respawns.length-1;i>=0;i--){const r=respawns[i];r.t-=dt;if(r.t<=0&&!S.inBoss){if(Math.hypot(PL.x-r.x,PL.z-r.z)>24){spawnEnemy(r.x,r.z,r.tag);respawns.splice(i,1);}else r.t=2;}}
+function updateEnemies(dt,active){for(let i=respawns.length-1;i>=0;i--){const r=respawns[i];if(r.tag==='grok'&&S.relics.grok){respawns.splice(i,1);continue;}r.t-=dt;if(r.t<=0&&!S.inBoss){if(Math.hypot(PL.x-r.x,PL.z-r.z)>40){spawnEnemy(r.x,r.z,r.tag);respawns.splice(i,1);}else r.t=2;}}
   for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(e.meme>0||e.stun>0){memeTick(e,dt);continue;}e.t+=dt;const dx=PL.x-e.x,dz=PL.z-e.z,d=Math.hypot(dx,dz)||1;let tx=0,tz=0,sp=0;
-    if(active&&d<e.aggro&&!S.dead&&(e.tag==='boss')===S.inBoss){tx=dx/d;tz=dz/d;sp=e.spd;}
+    if(e.home>0)e.home-=dt;else if(e.tag!=='boss'&&Math.hypot(e.x-e.hx,e.z-e.hz)>(e.tag==='dog'?60:85))e.home=5;
+    if(e.rec>0){e.rec-=dt;sp=0;}
+    else if(active&&d<e.aggro&&!S.dead&&!(e.home>0)&&(e.tag==='boss')===S.inBoss){tx=dx/d;tz=dz/d;sp=d>1.8?e.spd:0;}
     else{e.wt-=dt;if(e.wt<=0){e.wt=2+Math.random()*3;const a=Math.random()*TAU;e.wx=e.hx+Math.cos(a)*10;e.wz=e.hz+Math.sin(a)*10;}const wx=e.wx-e.x,wz=e.wz-e.z,wd=Math.hypot(wx,wz)||1;tx=wx/wd;tz=wz/wd;sp=wd>1?e.spd*.35:0;}
     const k=Math.exp(-dt*5);e.kx*=k;e.kz*=k;e.x+=(tx*sp+e.kx)*dt;e.z+=(tz*sp+e.kz)*dt;
     let gy;if(e.tag==='boss'){const r=Math.hypot(e.x,e.z);if(r>ARENA.r-2){e.x*=(ARENA.r-2)/r;e.z*=(ARENA.r-2)/r;}gy=ARENA.top;}else gy=groundH(e.x,e.z);
     if(e.fly){e.fh=lerp(e.fh,d<e.aggro&&active?PL.y+1.8:e.hy,Math.min(1,dt*1.6));e.y=e.fh+Math.sin(e.t*4)*.3;}else e.y=gy+1.6+Math.sin(e.t*4)*.3;e.g.position.set(e.x,e.y,e.z);if(e.ck)e.body.rotation.y=Math.atan2(tx,tz);else{e.body.rotation.y+=dt*2;e.body.rotation.x+=dt*1.3;}
     const gl=Math.random()<.04?1.35:1;e.g.scale.set(gl,e.hit>0?1.3:1/gl,gl);if(e.hit>0)e.hit-=dt;
-    if(active&&!S.dead&&d<2.4&&Math.abs(PL.y+1.4-e.y)<2.6)hurt(dx,dz);}}
+    if(active&&!S.dead&&!safeIn&&e.rec<=0&&d<2.4&&Math.abs(PL.y+1.4-e.y)<2.6){e.wind=(e.wind||0)+dt;e.g.scale.multiplyScalar(1+e.wind*.6);if(e.wind>=.4){e.wind=0;hurt(dx,dz);}}else e.wind=0;}
+  // keep them from stacking into one blob on top of you
+  for(let i=0;i<enemies.length;i++){const a=enemies[i];if(a.tag==='boss')continue;for(let j=i+1;j<enemies.length;j++){const b=enemies[j];const sx=b.x-a.x,sz=b.z-a.z,q=sx*sx+sz*sz;if(q<6.25&&q>1e-4){const sd=Math.sqrt(q),p=(2.5-sd)*.5/sd;a.x-=sx*p;a.z-=sz*p;b.x+=sx*p;b.z+=sz*p;}}}}
 
 /* ================= bullets ================= */
 const bullets=[];
@@ -1340,10 +1347,12 @@ function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$(
   $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;X.won=(X.won||0)+1;save();}
 
 /* ================= player ================= */
-function hurt(dx,dz){if(PL.inv>0||S.dead||VAN.driving)return;S.cells--;heroRegen();PL.inv=1.4;const d=Math.hypot(dx,dz)||1;PL.kx=dx/d*22;PL.kz=dz/d*22;PL.vy=9;PL.grounded=false;S.shake=.6;SFX.boom();flash(.35,250);
+let HURTT=-1e9;
+function enemyPushback(r,f,t){for(const e of enemies){if(e.tag==='boss')continue;const ex=e.x-PL.x,ez=e.z-PL.z,q=Math.hypot(ex,ez)||.01;if(q<r){e.kx=ex/q*f;e.kz=ez/q*f;e.rec=Math.max(e.rec||0,t);e.wind=0;}}}
+function hurt(dx,dz){if(PL.inv>0||S.dead||VAN.driving)return;S.cells--;heroRegen();PL.inv=1.4;const d=Math.hypot(dx,dz)||1;PL.kx=dx/d*22;PL.kz=dz/d*22;enemyPushback(6,14,.9);HURTT=performance.now();hurtDir(dx,dz);PL.vy=9;PL.grounded=false;S.shake=.6;SFX.boom();flash(.35,250);
   floatText('-1 🧠',PL.x,PL.y+4,PL.z,'#ff2e88');burst(PL.x,PL.y+2,PL.z,20,.95,10,5,.6);
   if(S.cells<=0){S.dead=1.8;S.deaths++;$('ratio').hidden=false;toast(pick(['💀 This death was sponsored by Gas Station Sushi™.','💀 Your death has been monetized. You earned 0.0003 aura from it.','💀 Thoughts and prayers. (automated)','💀 Your corpse went viral. Not in a good way.','💀 Sending condolences to your next of kin (the van).']));}}
-function respawn(){$('ratio').hidden=true;S.cells=S.max;const tax=Math.floor(S.aura*.1);S.aura-=tax;PL.vx=PL.vz=PL.vy=PL.kx=PL.kz=0;PL.inv=2;
+function respawn(){$('ratio').hidden=true;S.cells=S.max;const tax=Math.floor(S.aura*.1);S.aura-=tax;PL.vx=PL.vz=PL.vy=PL.kx=PL.kz=0;PL.inv=3;
   if(S.inBoss){PL.x=0;PL.z=32;PL.y=PL.vis=ARENA.top;boss.hp=Math.min(boss.max,boss.hp+5);bb.forEach(b=>{b.life=0;b.m.visible=false;});toast('The Algorithm fed on your L and healed a little');}
   else{PL.x=0;PL.z=9;PL.y=PL.vis=.15;toast('Fanum tax: −'+fmt(tax)+' aura');}}
 function surfaceY(x,z,prevY){let g=S.inBoss?-999:groundH(x,z);for(const p of platforms){const dx=x-p.x,dz=z-p.z;if(dx*dx+dz*dz<p.r*p.r&&prevY>=p.top-.7&&p.top>g)g=p.top;}return g;}
@@ -1354,10 +1363,10 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   if(active){if(keys.KeyA||keys.ArrowLeft)ix-=1;if(keys.KeyD||keys.ArrowRight)ix+=1;if(keys.KeyW||keys.ArrowUp)iy+=1;if(keys.KeyS||keys.ArrowDown)iy-=1;ix+=stick.x;iy-=stick.y;}
   const len=Math.hypot(ix,iy);if(len>1){ix/=len;iy/=len;}
   const fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw),rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw),mx=fx*iy+rx*ix,mz=fz*iy+rz*ix,SP=16*(S.snack>0?1.5:1)*(CH.id==='zoom'?2.2:1)*FRM().sp;
-  const acc=Math.min(1,dt*(PL.grounded?12:PL.flying?9:5));PL.vx=lerp(PL.vx,mx*SP,acc);PL.vz=lerp(PL.vz,mz*SP,acc);const k=Math.exp(-dt*4);PL.kx*=k;PL.kz*=k;
+  const acc=Math.min(1,dt*(PL.grounded?12:PL.flying?9:5));PL.vx=lerp(PL.vx,mx*SP,acc);PL.vz=lerp(PL.vz,mz*SP,acc);const k=Math.exp(-dt*4);PL.kx*=k;PL.kz*=k;if(!PL.grounded&&!PL.flying&&len<.1){const ad=Math.exp(-dt*2.6);PL.vx*=ad;PL.vz*=ad;}
   const prevY=PL.y;let nx=PL.x+(PL.vx+PL.kx)*dt,nz=PL.z+(PL.vz+PL.kz)*dt;
   if(!S.inBoss){const d=Math.hypot(nx,nz);if(d>WORLD_R-4){nx*=(WORLD_R-4)/d;nz*=(WORLD_R-4)/d;if(S.t-edgeT>8){edgeT=S.t;toast('The world ends here. The AI ran out of tokens.');}}}
-  if(!S.inBoss)for(const c of colliders){if(PL.y>c.top-.7||(c.top>900&&PL.y<c.top-90))continue;const dx=nx-c.x,dz=nz-c.z,rr2=c.r+.8,d2=dx*dx+dz*dz;if(d2<rr2*rr2){const d=Math.sqrt(d2)||.01;nx=c.x+dx/d*rr2;nz=c.z+dz/d*rr2;}}
+  if(!S.inBoss)for(const c of colliders){if(PL.y>c.top-.7||(c.top>900&&PL.y<c.top-90))continue;const dx=nx-c.x,dz=nz-c.z,rr2=c.r+.8,d2=dx*dx+dz*dz;if(d2<rr2*rr2){const d=Math.sqrt(d2)||.01,ux=dx/d,uz=dz/d;nx=c.x+ux*rr2;nz=c.z+uz*rr2;const ml=Math.hypot(mx,mz);if(ml>.3&&-(mx*ux+mz*uz)/ml>.85){const sd=(mx*uz-mz*ux)>=0?1:-1;nx+=-uz*sd*SP*dt*.7;nz+=ux*sd*SP*dt*.7;}}}
   if(S.inBoss&&boss.active){const d=Math.hypot(nx,nz)||.01;if(d<11.5){nx*=11.5/d;nz*=11.5/d;}}
   if(!S.inBoss){let dx=nx-VAN.x,dz=nz-VAN.z,d=Math.hypot(dx,dz)||.01;if(d<4.6&&PL.y<VAN.y+4.2){nx=VAN.x+dx/d*4.6;nz=VAN.z+dz/d*4.6;}
     if(BOT.state==='shield'){dx=nx-BOT.x;dz=nz-BOT.z;d=Math.hypot(dx,dz)||.01;if(d<10.8){nx=BOT.x+dx/d*10.8;nz=BOT.z+dz/d*10.8;}}}
@@ -1377,9 +1386,9 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   PL.vis=PL.grounded&&PL.y>PL.vis?lerp(PL.vis,PL.y,Math.min(1,dt*16)):PL.y;PL.squash=lerp(PL.squash,0,Math.min(1,dt*9));
   pGroup.position.set(PL.x,PL.vis,PL.z);pGroup.rotation.y=PL.face;const sq=1+PL.squash;pGroup.scale.set(1/Math.sqrt(sq),sq,1/Math.sqrt(sq)).multiplyScalar(CH.id==='big'?2.3:CH.id==='tiny'?.42:1);
   const sw=Math.sin(PL.walk)*(len>.1&&PL.grounded?.55:0);PL.l1.position.z=sw;PL.l2.position.z=-sw;PL.l1.position.y=.3+Math.max(0,sw)*.3;PL.l2.position.y=.3+Math.max(0,-sw)*.3;
-  pGroup.visible=!(PL.inv>0&&Math.floor(S.t*18)%2)&&!S.dead;PL.shadow.visible=PL.grounded;
+  pGroup.visible=!(PL.inv>0&&Math.floor(S.t*18)%2)&&!S.dead;{const h=PL.grounded?0:Math.max(0,PL.vis-surfaceY(PL.x,PL.z,PL.y+.1));PL.shadow.visible=h<70;PL.shadow.position.y=-h/(pGroup.scale.y||1)+.06;const ss=Math.max(.45,1-h*.022);PL.shadow.scale.set(ss,ss,1);PL.shadow.material.opacity=PL.grounded?.3:.45;}
   // camera auto-follow
-  cam.manual-=dt;if(len>.3&&cam.manual<=0&&cam.id<0){const want=PL.face+Math.PI,toward=mx*Math.sin(cam.yaw)+mz*Math.cos(cam.yaw);if(toward<.5)cam.yaw+=angDiff(want,cam.yaw)*dt*1.1;}
+  cam.manual-=dt;if(len>.3&&cam.manual<=-1&&cam.id<0&&Math.abs(ix)<.45){const want=PL.face+Math.PI,toward=mx*Math.sin(cam.yaw)+mz*Math.cos(cam.yaw);if(toward<.5)cam.yaw+=angDiff(want,cam.yaw)*dt*.6;}
   return len;}
 const CAM_S=[.25,.5,.75,.9];
 function updateCamera(dt){if(S.mode==='dialog'&&DLG.shot){const q=DLG.shot,k2=1-Math.exp(-dt*2.4),cp=camera.position;cp.set(lerp(cp.x,q[0],k2),lerp(cp.y,q[1],k2),lerp(cp.z,q[2],k2));cam.lk.set(lerp(cam.lk.x,q[3],k2),lerp(cam.lk.y,q[4],k2),lerp(cam.lk.z,q[5],k2));camera.lookAt(cam.lk);sky.position.copy(cp);return;}
@@ -1400,7 +1409,7 @@ function updateCamera(dt){if(S.mode==='dialog'&&DLG.shot){const q=DLG.shot,k2=1-
 /* ================= pickups, zones, interaction ================= */
 let interact=null;
 function updatePickups(){pages.forEach((p,i)=>{if(S.pages[i])return;p.m.rotation.y=S.t*2+i;p.m.position.y=p.y+Math.sin(S.t*2+i)*.3;
-    if(Math.hypot(PL.x-p.x,PL.z-p.z)<2.6&&Math.abs(PL.y-p.y)<5){S.pages[i]=1;SFX.page();addAura(690,p.x,p.y+1,p.z);burst(p.x,p.y,p.z,30,.78,10,6,.8);
+    if(Math.hypot(PL.x-p.x,PL.z-p.z)<3.4&&Math.abs(PL.y-p.y)<5){S.pages[i]=1;SFX.page();addAura(690,p.x,p.y+1,p.z);burst(p.x,p.y,p.z,30,.78,10,6,.8);
       const n=pagesGot();toast(n>=6?'📖 THE EM DASH OF DESTINY has materialized in the woods':'📖 Lost page '+n+'/6 — it says "'+pick(['delve','in conclusion','as an AI','tapestry','it depends','moreover'])+'"');syncWorld();save();}});
   ['grok','fable','astra'].forEach((id,i)=>{const r=relics[id];if(S.relics[id]){const a=S.t*.9+i*TAU/3;r.g.position.set(portal.x+Math.cos(a)*7.5,6+Math.sin(S.t*2+i)*1,portal.z+Math.sin(a)*2);r.g.rotation.y=S.t*2;return;}
     if(!relicAvailable(id))return;r.g.rotation.y=S.t*1.5;r.g.position.y=r.hy+Math.sin(S.t*2)*.4;r.ring.rotation.z=S.t*3;
@@ -1432,7 +1441,7 @@ function compassTarget(){if(S.inSlop)return slopTarget();if(S.inBoss)return boss
   return{x:Z.x,z:Z.z,l:Z.name};}
 function updateHUD(){setText('aura',fmt(S.aura)+(app.clientWidth<640?' ✨':' AURA'));setText('cells',app.clientWidth<640?'🧠×'+Math.max(0,S.cells):'🧠'.repeat(Math.max(0,S.cells))+'💀'.repeat(Math.max(0,S.max-S.cells)));renderQuests();
   const t=compassTarget(),ar=$('arrow');if(t){const dx=t.x-PL.x,dz=t.z-PL.z,d=Math.hypot(dx,dz),fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw),rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw);
-    const rel=Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz);ar.style.transform='rotate('+rel.toFixed(2)+'rad)';setText('ctext',t.l+' · '+Math.round(d)+'m · '+(Math.abs(rel)<.45?'ahead':Math.abs(rel)>2.7?'behind you':rel>0?(Math.abs(rel)>1.9?'behind, right':'to the right'):(Math.abs(rel)>1.9?'behind, left':'to the left')));ar.style.visibility='visible';}else{ar.style.visibility='hidden';setText('ctext','');}
+    const rel=Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz);ar._a=ar._a===undefined?rel:ar._a+angDiff(rel,ar._a);ar.style.transform='rotate('+ar._a.toFixed(2)+'rad)';setText('ctext',t.l+' · '+Math.round(d)+'m · '+(Math.abs(rel)<.45?'ahead':Math.abs(rel)>2.7?'behind you':rel>0?(Math.abs(rel)>1.9?'behind, right':'to the right'):(Math.abs(rel)>1.9?'behind, left':'to the left')));ar.style.visibility='visible';}else{ar.style.visibility='hidden';setText('ctext','');}
   if(boss.active)$('bossfill').style.width=(clamp(boss.hp/boss.max)*100)+'%';}
 
 /* ================= world animation + sky ================= */
@@ -1991,7 +2000,7 @@ function big(t){if(hudCache.big!==t){hudCache.big=t;$('bigmsg').textContent=t;}}
 
 /* ---- the van ---- */
 function enterVan(){VAN.driving=true;VAN.sp=0;pGroup.visible=false;SFX.page();if(!VAN.rode){VAN.rode=true;toast('DEREK: "...You\'re driving. That was my whole part."');}
-  toast(app.classList.contains('touchy')?'🚐 stick up = gas · sideways = steer · JUMP = hop · BLAST = honk':'🚐 W gas · A/D steer · S reverse · SPACE hop · F honk · E get out');}
+  toast(app.classList.contains('touchy')?'🚐 stick up = gas · sideways = steer · JUMP = hop · BLAST = honk':app.classList.contains('gp')?'🚐 left stick: gas and steer · A hop · X honk · B get out':'🚐 W gas · A/D steer · S reverse · SPACE hop · F honk · E get out');}
 function exitVan(){VAN.driving=false;VAN.sp=0;PL.x=VAN.x-Math.cos(VAN.h)*5.4;PL.z=VAN.z+Math.sin(VAN.h)*5.4;PL.y=PL.vis=Math.max(VAN.y,groundH(PL.x,PL.z))+.3;PL.vx=PL.vy=PL.vz=0;PL.grounded=false;pGroup.visible=true;SFX.land();}
 function updateVan(dt,active){const v=VAN;
   if(v.driving){let ix=0,iy=0;if(active){if(keys.KeyA||keys.ArrowLeft)ix-=1;if(keys.KeyD||keys.ArrowRight)ix+=1;if(keys.KeyW||keys.ArrowUp)iy+=1;if(keys.KeyS||keys.ArrowDown)iy-=1;ix+=stick.x;iy-=stick.y;ix=clamp(ix,-1,1);iy=clamp(iy,-1,1);}
@@ -2190,7 +2199,7 @@ function gangAssist(){const ok=ASSIST.filter(a=>a[1]());const a=ok[assistN++%ok.
 const STREAK=['','','DOUBLE RATIO','TRIPLE SIGMA','QUAD CAP (NO CAP)','OHIO RAMPAGE','UNSPEAKABLE AURA','PLEASE TOUCH GRASS'];
 function rotKill(e){ROT.ks=S.t-ROT.kt<3.5?ROT.ks+1:1;ROT.kt=S.t;if(ROT.ks>=2){const n=Math.min(ROT.ks,STREAK.length-1);floatText(STREAK[n],e.x,e.y+7,e.z,'#ffd400');addAura(ROT.ks*150);tone(300+n*120,.2,'square',.1);}}
 const ADS=['🔥 HOT SINGLE GPUs IN YOUR AREA','📞 Your van\'s extended warranty is about to expire','🧠 Doctors HATE this one brain cell','📈 Local user gains 67 aura with this one weird trick','💧 FLOW PROS: we have a guy. Call the guy.','👑 VOTE BIBI. You already did. Thank you.','⏳ Is your clock late? David says yes.','🤖 lil Bottie\'s new single is out. It is 11 seconds.','🌽 You may be entitled to corn','📱 You have (1) new notification: this one'];
-function showAd(){const a=$('ad');$('adt').textContent=pick(ADS);a.style.left=(12+Math.random()*30)+'%';a.style.top=(26+Math.random()*22)+'%';a.hidden=false;ROT.adT=9;}
+function showAd(){const a=$('ad');$('adt').textContent=pick(ADS);a.style.left=(2+Math.random()*8)+'%';a.style.top=(58+Math.random()*10)+'%';a.hidden=false;ROT.adT=6;}
 $('adx').addEventListener('click',e=>{e.stopPropagation();$('ad').hidden=true;addAura(670);toast('Ad closed. +670 aura. Elite ball knowledge.');SFX.orb(5);});
 function rotUpdate(dt,play){if(S.snack>0)S.snack-=dt;if(ROT.btn>0)ROT.btn-=dt;
   if(CH.t>0){CH.t-=dt;if(CH.id==='rain'&&play&&Math.random()<dt*7){const x=PL.x+(Math.random()-.5)*14,z=PL.z+(Math.random()-.5)*14;floatText(pick(['💎','💯','🔥','👑','🧠','🗿']),x,PL.y+6,z);addAura(67);}if(CH.t<=0)chaosEnd();}
@@ -2588,7 +2597,7 @@ function act7Moments(){const near=(a,r)=>Math.hypot(PL.x-a.x,PL.z-a.z)<r;
   else if(near(CHR,22))moment('chr',[['doc','AH. A PATIENT. Welcome to Chrome Alley. I am Dr. Chromewell, MD.',{cam:shot(npcs.doc.x-(CHR.x-npcs.doc.x)*6,npcs.doc.z-(CHR.z-npcs.doc.z)*6,4,npcs.doc.x,npcs.doc.z,3)}],
     ['doc','The MD stands for Model Doctor. I am not licensed. I am, however, extremely confident.'],['doc','I install upgrades. You pay in data. Side effects include chrome, wifi, and saying "synergy" out loud.']]);
   else if(near(AF,20))moment('af',[['sys','THE AURA FARM. Aura grows here. You can pick it. Or you can stand on the stage and strike a pose, and get paid for being looked at.',{cam:shot(STG.x+9,STG.z-14,6,STG.x,STG.z,2)}],
-    ['sys','Everyone watching counts as a witness: hallucinations, buddies, chatbots, plumbers. More witnesses, more aura. This is the economy now.'],['sys',app.classList.contains('touchy')?'Tap the 😎 button to pose.':'Press R to pose.']]);}
+    ['sys','Everyone watching counts as a witness: hallucinations, buddies, chatbots, plumbers. More witnesses, more aura. This is the economy now.'],['sys',app.classList.contains('touchy')?'Tap the 😎 button to pose.':app.classList.contains('gp')?'Press Y to pose.':'Press R to pose.']]);}
 function act7Sync(){mdSync();cybSync();}
 function act7Reset(){if(S.inSlop){slopClear();S.inSlop=false;$('slopx').hidden=true;}S.pose=0;S.poseCd=0;POSE.sun.visible=POSE.ring.visible=false;$('shop').hidden=true;DATA.list.forEach(c=>c.on=false);
   SC.forEach(c=>scene.remove(c.g));SC.length=0;X.slops.forEach(s=>birthSlop(s,false));MACH.t=0;OUT.t=0;OUT.next=150;CROPS.forEach(c=>c.t=0);cam.dist=13;
@@ -2750,8 +2759,8 @@ function rateBy(who){const n=clamp(Math.round(X.rate+(Math.random()*2-1)*1.3+(X.
 {const bc=buyCourse;buyCourse=function(){const a=S.aura;bc();if(S.aura<a)rateShift(-.4,'everyone saw you buy the course');};}
 {const pl=petLouie;petLouie=function(){pl();rateShift(.05);};}
 {const ps=poseStart;poseStart=function(){const c=X.c.pose;ps();if(X.c.pose>c&&X.c.wit>=3)rateShift(.12);};}
-{const h=hurt;hurt=function(a,b){const d=S.dead;h(a,b);if(!d&&S.dead){rateShift(-.3);let n=0;for(const id in npcs){const q=npcs[id];if(Math.hypot(PL.x-q.x,PL.z-q.z)<45){n++;bubble('📱 *filming*',q.x,q.y+6,q.z);}}
-  for(const e of enemies)if(Math.hypot(PL.x-e.x,PL.z-e.z)<30&&Math.random()<.6)bubble('📱',e.x,e.y+3.5,e.z);toast('📹 Your ratio is trending. '+fmt(1000+Math.floor(Math.random()*2e6))+' views · #'+pick(['HeroFalls','SkillIssue','RIPBozo','NPCMoment','CaughtIn4K','BrainCellsGone']));}};}
+{const h=hurt;hurt=function(a,b){const d=S.dead;h(a,b);if(!d&&S.dead){rateShift(-.1);let n=0;for(const id in npcs){const q=npcs[id];if(Math.hypot(PL.x-q.x,PL.z-q.z)<45){n++;bubble('📱 *filming*',q.x,q.y+6,q.z);}}
+  for(const e of enemies)if(Math.hypot(PL.x-e.x,PL.z-e.z)<30&&Math.random()<.6)bubble('📱',e.x,e.y+3.5,e.z);toast('📹 Your ratio is trending. '+fmt(1000+Math.floor(Math.random()*2e6))+' views · #'+pick(['HeroFalls','SkillIssue','RIPBozo','NPCMoment','CaughtIn4K','BrainCellsGone'])+' · rating −0.1 ★');}};}
 // ---- the smart home, the black mirror, and YOU (BACKUP)
 const COOK={x:MR.x+2,z:MR.z+1,pause:{x:MR.x+5.5,z:MR.z+1},up:{x:MR.x-1.5,z:MR.z+1},mir:{x:MR.x+10,z:MR.z-7},trail:[],cd:0,bark:4};
 (function(){const y=MRY,W=0xf4f4f6,G=0x0a0a0e,dl=Math.hypot(MR.x,MR.z),dx=-MR.x/dl,dz=-MR.z/dl,ry=Math.atan2(dx,dz);
@@ -2789,7 +2798,7 @@ ACH.push(['prime','Prime Tier','reached a 4.5 star rating',()=>X.rate>=4.5],['pa
   if(d(COOK)<2.6)return{label:'🥚 TALK TO YOU (BACKUP)',fn:cookTalk};if(d(COOK.pause)<1.8)return{label:'⏸ PAUSE THE BACKUP FOR 6 MONTHS',fn:cookPause};if(d(COOK.up)<1.8)return{label:'⬆ UPLOAD THE BACKUP INTO THE WORLD',fn:cookUpload};
   if(d(COOK.mir)<4)return{label:'🪞 LOOK INTO THE BLACK MIRROR',fn:mirrorLook};return null;};}
 {const ar=act7Reset;act7Reset=function(){ar();COOK.trail.length=0;COOK.egg.visible=COOK.ring.visible=X.cookie!==2;COOK.egg.material.color.setHex(X.cookie===1?0xff3030:0xffffff);COOK.ring.material.color.setHex(X.cookie===1?0xe01020:0x19e3ff);
-  for(let k=0;k<3;k++){const a=k/3*TAU+.4,e=spawnEnemy(MR.x+Math.cos(a)*22,MR.z+Math.sin(a)*22,'dog');e.spd=12.5;e.aggro=40;e.hp=6;}};}
+  for(let k=0;k<3;k++){const a=k/3*TAU+.4,e=spawnEnemy(MR.x+Math.cos(a)*22,MR.z+Math.sin(a)*22,'dog');e.spd=10;e.aggro=30;e.hp=4;}};}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);const rs='★ '+X.rate.toFixed(1);
   if(rs!==RATE.last){RATE.last=rs;const t=textTex(rs,{size:40,color:X.rate>=4.5?'#ffd400':X.rate<2?'#ff4040':'#ffffff',stroke:'#12021f'});if(RATE.spr.material.map)RATE.spr.material.map.dispose();RATE.spr.material.map=t;RATE.spr.material.needsUpdate=true;RATE.spr.scale.set(.75*t.userData.aspect,.75,1);
     const c=$('rate');c.textContent=rs+(X.rate>=4.5?' PRIME':X.rate<2?' LOW':'');c.style.color=X.rate>=4.5?'#ffd400':X.rate<2?'#ff6060':'';}
@@ -2826,7 +2835,7 @@ const oWin=win;win=function(){if(!X.rot1000&&!R1K.on){startRot1000();return;}oWi
 ACH.push(['r1k','ROT x1000','survived the unfiltered rot and touched the last grass',()=>!!X.rot1000]);
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(!R1K.on)return;R1K.t+=dt;const t=R1K.t;
   R1K.lvl=Math.min(1000,Math.floor(Math.pow(10,Math.min(3,t/6))));setText('r1kn','ROT x'+fmt(R1K.lvl));U.time.value=S.t*7;
-  camera.fov=R1K.fov+Math.sin(t*2.7)*14+Math.sin(t*11)*3;camera.updateProjectionMatrix();S.shake=Math.max(S.shake,.18);
+  camera.fov=R1K.fov+Math.sin(t*2.7)*6+Math.sin(t*11)*1.5;camera.updateProjectionMatrix();S.shake=Math.max(S.shake,.08);
   const sky=new THREE.Color().setHSL((t*.37)%1,1,.55);scene.fog.color.copy(sky);U.fogColor.value.copy(sky);
   R1K.rain.forEach((r,k)=>{if(!r.s.visible||r.s.position.y<PL.y-6){r.s.visible=true;r.s.material.map=emojiTex(pick(['🗿','💀','🔥','💯','🧠','🐸','6️⃣','7️⃣','💩','👁️','✋','🦐','🌽','📉','📈','🤖','👑','✨']));r.s.material.needsUpdate=true;
       r.s.position.set(PL.x+(Math.random()-.5)*50,PL.y+18+Math.random()*20,PL.z+(Math.random()-.5)*50);r.v=8+Math.random()*14;r.s.scale.setScalar(1.5+Math.random()*3);}r.s.position.y-=r.v*dt;r.s.material.rotation+=dt*4;});
@@ -2919,7 +2928,7 @@ function simEnter(){if(S.inSim)return;S.inSim=true;SIM.t=0;SIM.ch=6;SIM.eaten=0;
   for(let k=0;k<6;k++){const s=simAdd(textSprite(pick(['IT IS EATING YOU','colour: deleted','fingers: deleted','meaning: deleted','GENERATE','only slop survives']),2,{color:'#c8c6d8'}));s.userData.tex=1;s.position.set(cx+(Math.random()-.5)*80,b+Math.random()*90,cz+(Math.random()-.5)*80);}
   SIM.vy=b-14;SIM.void.visible=true;PL.x=cx;PL.z=cz;PL.y=PL.vis=b+.3;PL.vy=PL.vx=PL.vz=0;scene.fog.near=18;scene.fog.far=150;app.classList.add('sim');$('simhud').hidden=false;flash(1,1500);SFX.portal();S.zone='';
   say([['sys','THE SIMULATION SPACE. It is eating you from the inside out. Colour goes first. Then fingers. Then the rest.'],['grok','GROK FOUND TRUTH. TRUTH IS SLOP. GROK ALWAYS KNEW. (GROK DID NOT KNOW.)'],['fable','To escape a simulation made of content, you must out-produce it. I have a forty-step plan. Step one: generate.'],
-    ['astra','✨ make platforms. bad ones. the worse they are the harder they are to digest ✨'],['sys',(app.classList.contains('touchy')?'Tap BLAST':'Press F or click')+' to generate a slop platform ahead of you. Generate while falling and it appears under you. Climb to THE WAY OUT before the void catches up.']]);}
+    ['astra','✨ make platforms. bad ones. the worse they are the harder they are to digest ✨'],['sys',(app.classList.contains('touchy')?'Tap BLAST':app.classList.contains('gp')?'Press X':'Press F or click')+' to generate a slop platform ahead of you. Generate while falling and it appears under you. Climb to THE WAY OUT before the void catches up.']]);}
 function simClear(){SIM.objs.forEach(o=>{scene.remove(o);if(o.isMesh&&o.userData.own)o.geometry.dispose();if(o.isSprite&&o.userData.tex)o.material.map.dispose();});SIM.objs.length=0;SIM.gen.length=0;for(let i=platforms.length-1;i>=0;i--)if(platforms[i].sim)platforms.splice(i,1);
   SIM.void.visible=false;scene.fog.near=70;scene.fog.far=340;app.classList.remove('sim');$('simhud').hidden=true;}
 function simExit(won){if(!S.inSim)return;simClear();S.inSim=false;PL.x=ISC.x+2;PL.z=ISC.z+3;PL.y=PL.vis=ISL.y+.3;PL.vy=PL.vx=PL.vz=0;S.cells=S.max;flash(1,1500);SFX.portal();
@@ -2997,13 +3006,13 @@ addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='
 const GP={on:false,prev:[],last:performance.now(),fire:false,jh:false};
 function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=Math.min(.05,(now-GP.last)/1000);GP.last=now;const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}
   if(!gp){if(GP.on){GP.on=false;app.classList.remove('gp');stick.x=stick.y=0;}return;}
-  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↑ borrowed time · View: next quest');}
+  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (twice: double jump · hold: boost) · X/RT blast · B yap (in the air: slam) · Y pose · LB dash · RB grapple · hold LT: lag spike · D-pad ↑ borrowed time · View: next quest');}
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!GP.prev[i],dz=v=>Math.abs(v||0)<.18?0:v,panel=!$('log').hidden||!$('shop').hidden;
   if(S.mode==='title'||S.mode==='end'){}
   else if(S.mode==='dialog'){if(pr(0)||pr(1))advance();}
   else if(S.mode==='play'){if(panel&&(pr(1)||pr(8))){$('log').hidden=true;$('shop').hidden=true;}
-    else{if(stick.id<0){stick.x=dz(gp.axes[0]);stick.y=dz(gp.axes[1]);}const rx=dz(gp.axes[2]),ry=dz(gp.axes[3]);if(rx||ry){cam.yaw-=rx*dt*2.8;cam.pitch=clamp(cam.pitch+ry*dt*1.8,-.2,1.25);cam.manual=1.2;}
-      if(pr(0)){audioInit();inp.jump=true;}if(b(0)!==GP.jh){GP.jh=b(0);inp.jh=GP.jh;}const f=b(2)||b(7);if(f!==GP.fire){GP.fire=f;inp.fireBtn=f;}
+    else{if(stick.id<0){stick.x=dz(gp.axes[0]);stick.y=dz(gp.axes[1]);}const rx=dz(gp.axes[2]),ry=dz(gp.axes[3]);if(rx||ry){cam.yaw-=rx*dt*2.8;cam.pitch=clamp(cam.pitch+ry*dt*1.8,-.2,1.05);cam.manual=1.2;}
+      if(pr(0)){audioInit();inp.jump=true;}if(b(0)!==GP.jh){GP.jh=b(0);inp.jh=GP.jh;}const f=b(2)||b(7);if(f!==GP.fire){GP.fire=f;inp.fireBtn=f;}if(pr(2)||pr(7))inp.fireTap=true;
       if(pr(1))doInteract();if(pr(3))poseStart();if(pr(4))dash();if(pr(5))hook();if(pr(12))useSlow();if(pr(8))qCycle(1);}}
   for(let i=0;i<gp.buttons.length;i++)GP.prev[i]=b(i);}
 requestAnimationFrame(gpLoop);
@@ -3031,7 +3040,7 @@ COURSES.forEach((c,ci)=>{const th=c[4]*Math.PI/180,cx=Math.cos(th)*262,cz=Math.s
   const tp=C.plats[22];C.top=tp;C.spr=emojiSprite(c[2],2.6);C.spr.position.set(tp.x,tp.top+2.2,tp.z);scene.add(C.spr);C.il=textSprite(c[3],.8,{color:'#ffd400'});C.il.position.set(tp.x,tp.top+4,tp.z);scene.add(C.il);
   const s1=textSprite(c[1]+' →',1.3,{color:'#ffd400'}),sx=Math.cos(th)*200,sz=Math.sin(th)*200;s1.position.set(sx,groundH(sx,sz)+4,sz);scene.add(s1);CRS.list.push(C);});
 const OWN={marcus:()=>npcs.marcus,erin:()=>npcs.erin,david:()=>npcs.david,kael:()=>npcs.kael,bibi:()=>npcs.bibi,bottie:()=>BOT,louie:()=>LOU,derek:()=>VAN};
-const READY={marcus:()=>X.flow>=1,erin:()=>X.erin>=1,kael:()=>X.clank>=1,david:()=>X.hour>=1,louie:()=>!!X.louie,bottie:()=>BOT.state!=='fight',bibi:()=>X.erin!==2,derek:()=>true};
+const READY={marcus:()=>X.flow>=4,erin:()=>X.erin>=3,kael:()=>X.clank>=3,david:()=>X.hour>=2,louie:()=>!!X.louie,bottie:()=>BOT.state!=='fight',bibi:()=>X.erin!==2,derek:()=>X.flow>=4};
 function crsSync(){CRS.list.forEach(C=>{const s=X.fx[C.id]||0;C.spr.visible=C.il.visible=s===0;});}
 function fetchAsk(C){X.fq[C.id]=1;save();hudCache.q=null;const sp=C.id==='louie'?'louie':C.id==='bottie'?'bottie':C.id;say([[sp,C.ask]],()=>{S.track='fetch';});}
 function fetchGive(C){X.fx[C.id]=2;X.c.fetch=(X.c.fetch||0)+1;addAura(6700,PL.x,PL.y+4,PL.z);X.data+=40;rateShift(.3);SFX.relic();burst(PL.x,PL.y+2,PL.z,50,null,14,8,1);save();hudCache.q=null;crsSync();
@@ -3543,7 +3552,7 @@ function menuClose(){if(!MENU.open)return;MENU.open=false;$('menu').hidden=true;
 function menuRender(){const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));document.querySelectorAll('#menu nav button').forEach(x=>x.classList.toggle('on',x.dataset.t===MENU.tab));let h='';
   const row=(ic,name,a,b2,sub)=>'<div class="row"><span>'+ic+'</span><span>'+esc(name)+(sub?'<br><small>'+esc(sub)+'</small>':'')+'</span><span class="n">'+a+' / '+b2+'</span><div class="bar"><i style="width:'+Math.round(100*Math.min(1,a/Math.max(1,b2)))+'%"></i></div></div>';
   if(MENU.tab==='col'){const rel=['grok','fable','astra'].filter(k=>S.relics[k]).length,fxn=COURSES.filter(c=>X.fx[c[0]]).length;
-    h+='<h4>THE BIG ONES</h4>'+row('🗿','Sacred relics',rel,3)+row('☀️','Sun shards',shards(),4)+row('6️⃣','Sixty-seven 67s',X.t67.length,67,'a sprout can fetch a floating one for you')+row('🏆','Checklist',X.ach.length,ACH.length)+row('📚','Codex entries',cxCount(),cxList().length+CAST_CX.length);
+    h+='<h4>THE BIG ONES</h4>'+row('🗿','Sacred relics',rel,3)+row('☀️','Sun shards',shards(),4)+row('6️⃣','Sixty-seven 67s',X.t67.length,67,'floating ones: a jump pad, a boost, or a sprout can get them')+row('🏆','Checklist',X.ach.length,ACH.length)+row('📚','Codex entries',cxCount(),cxList().length+CAST_CX.length);
     h+='<h4>FINDING THINGS</h4>'+row('📜','Prompt fragments',X.frag.length,FRAGS.length)+row('🔴','Cue-Anon drops',X.drops.length,DROPS.length)+row('🗂️','Secret files',X.files.length,ISL.files.length)+row('🖥️','Server cores',sum(X.cores),4)+row('🌱','Wild sprouts found',X.spt.length,SPOTS.length)+row('🏁','Fetch tower items',fxn,COURSES.length);
     h+='<div class="grid">'+COURSES.map(c=>'<span class="chip'+(X.fx[c[0]]?'':' no')+'">'+c[2]+' '+esc(X.fx[c[0]]?c[3]:'???')+'</span>').join('')+'</div>';
     h+='<h4>NEW PLACES</h4>'+row('🌰','Golden seeds (Sprout Patch)',X.gseed.length,4)+row('💎','Aura shards (Aura Maze)',X.mz.length,8,X.mzt?'best core time '+X.mzt.toFixed(1)+'s':'')+row('⚔️','Lamp Market Pit gates',X.pit,9)+row('❄️','Data Center racks cooled',X.cool.reduce((a,b)=>a+b,0),5)+row('🔦','The North Light',X.nl?1:0,1);
@@ -3554,7 +3563,7 @@ function menuRender(){const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({
   else if(MENU.tab==='who'){h+='<h4>THE CAST · talk to them to fill these in</h4><div class="cast">'+CAST_CX.map(c=>{const u=c[4]?c[4]():X.met.includes(c[0]);return u?'<div class="ent"><span>'+c[1]+'</span><b>'+esc(c[2])+'</b>'+esc(c[3])+'</div>':'<div class="ent lock"><span>❔</span><b>???</b>not met yet</div>';}).join('')+'</div>';}
   else{const f=folText();h+='<div class="fol"><b>FOLLOWER:</b> '+esc(f||'nobody. Pet Louie, catch or pick a buddy, or pluck sprouts at the Sprout Patch.')+'<br><small>One follower at a time. A new one sends the old one home. Patch sprouts go back to the patch and have to be plucked again.</small></div>';
     h+='<h4>PC</h4><p><kbd>WASD</kbd> move · drag to look · <kbd>Space</kbd> jump (hold in the air: 💩 boost) · <kbd>F</kbd>/click blast · <kbd>E</kbd> yap (nobody there: slam in the air, yell on the ground) · <kbd>X</kbd> hold: lag spike · <kbd>R</kbd> pose (or your character’s special) · <kbd>Shift</kbd> dash · <kbd>G</kbd> grapple (swing on 🪝 points and rings) · <kbd>C</kbd> throw a sprout · <kbd>V</kbd> use your power-up · <kbd>Z</kbd> switch character · <kbd>Q</kbd> borrowed time · <kbd>M</kbd>/<kbd>Tab</kbd> this menu</p>';
-    h+='<h4>CONTROLLER</h4><p>A jump (hold: boost) · X/RT blast · B yap · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↓ throw a sprout · D-pad ← power-up · D-pad → switch character · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
+    h+='<h4>CONTROLLER</h4><p>A jump (again in the air: double jump · hold: boost) · X/RT blast · B yap · Y pose · LB dash · RB grapple · hold LT: lag spike · B yap (or slam / yell) · D-pad ↓ throw a sprout · D-pad ← power-up · D-pad → switch character · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
     h+='<h4>PHONE</h4><p>Left thumb moves, right thumb looks. JUMP, BLAST, ⏩ dash, 🪝 grapple, 🌱 throw (when sprouts follow you), the item slot (tap to use a power-up), 😎 pose, ☰ this menu. Touch a rainbow ❓ box to roll a power-up.</p>';
     h+='<h4>WARPS</h4><p>The Warp Ring is just outside Prompt Plaza'+(WR.c?' (follow the compass to it from the quest list)':'')+'. Every warp destination has a 🌀 pad that brings you back.</p>';}
   B.innerHTML=h;}
@@ -3598,7 +3607,7 @@ function act15Interact(){if(S.dead)return null;
 {const ar=act7Reset;act7Reset=function(){ar();if(PIT.bout)boutEnd(false);S.inPk=null;FOL.cur=null;FOL.budId=null;psHome(false);MENU.open&&menuClose();};}
 {const ct=compassTarget;compassTarget=function(){if(S.inPk==='maze'){const s=MZ.shards.filter(q=>!X.mz.includes(q.i));if(!s.length)return{x:0,z:0,l:'THE AURA CORE'};return{x:0,z:0,l:'AURA MAZE · '+X.mz.length+'/8 💎 · the core is in the middle'};}
   if(S.inPk==='patch'){const s=PS.seeds.find(q=>!X.gseed.includes(q.i));return s?{x:s.x,z:s.z,l:'GOLDEN SEED · throw a sprout at it'}:{x:5,z:20,l:'BACK TO THE WARP RING'};}return ct();};}
-{const ar=act7Rows;act7Rows=function(){return ar().concat([['warp','🌀 Find the Warp Ring outside Prompt Plaza',(X.c.warp||0)>0],['nl','🔦 Relight the North Light',!!X.nl],['pit','⚔️ Lamp Market Pit: gate '+X.pit+'/9',X.pit>=9],['dc','❄️ Cool the Data Center racks '+X.cool.reduce((a,b)=>a+b,0)+'/5',X.cool.reduce((a,b)=>a+b,0)>=5],
+{const ar=act7Rows;act7Rows=function(){return ar().concat([['warp','🌀 Find the Warp Ring outside Prompt Plaza',(X.c.warp||0)>0||!!X.wrSeen],['nl','🔦 Relight the North Light',!!X.nl],['pit','⚔️ Lamp Market Pit: gate '+X.pit+'/9',X.pit>=9],['dc','❄️ Cool the Data Center racks '+X.cool.reduce((a,b)=>a+b,0)+'/5',X.cool.reduce((a,b)=>a+b,0)>=5],
   ['patch','🌰 Golden seeds '+X.gseed.length+'/4 (Sprout Patch)',X.gseed.length>=4],['maze','💎 Aura Maze shards '+X.mz.length+'/8',!!X.mzc]]);};}
 {const at=act7Target;act7Target=function(id){const W=WR.c;if(id==='warp'||id==='patch'||id==='maze')return W?{x:W.x,z:W.z,l:'THE WARP RING'}:null;if(id==='nl')return{x:NL.x,z:NL.z,l:'THE NORTH LIGHT'};if(id==='pit')return{x:PIT.x,z:PIT.z,l:'THE LAMP MARKET PIT'};if(id==='dc')return{x:DC.x,z:DC.z,l:'THE DATA CENTER'};return at(id);};}
 ACH.push(['nl','Lighthouse Keeper (Unpaid)','relit the North Light',()=>!!X.nl],['pit9','It Is Brass','took the brass crown at gate nine',()=>X.pit>=9],['dc','Thermal Throttling','cooled all five Data Center racks',()=>X.cool.reduce((a,b)=>a+b,0)>=5],
@@ -3838,7 +3847,7 @@ function puUpdate(dt,play){if(PU.roll>0){PU.roll-=dt;if(Math.floor(PU.roll*14)!=
   const a=PU.act;if(a){PU.t-=dt;const fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw);
     if(a.id==='boots'){if(inp.jh){PL.vy=Math.min(14,PL.vy+70*dt);PL.grounded=false;if(Math.random()<.5)burst(PL.x,PL.vis+.2,PL.z,3,.08,4,-6,.4);}else if(!PL.grounded)PL.vy=Math.max(PL.vy,-4);}
     else if(a.id==='wings'){if(inp.jh){PL.vy=Math.max(PL.vy,7);PL.grounded=false;}else if(!PL.grounded)PL.vy=Math.max(PL.vy,-2.2);PU.wings.children.forEach((s,i)=>s.material.rotation=(i?-1:1)*Math.sin(S.t*14)*.4);}
-    else if(a.id==='plane'){PL.x+=fx*30*dt;PL.z+=fz*30*dt;PL.face=Math.atan2(fx,fz);PL.vy=inp.jh?9:Math.max(PL.vy,-1.6);PL.grounded=false;const gy=groundH(PL.x,PL.z);if(PL.y<gy+.5){PL.y=PL.vis=gy+.5;}
+    else if(a.id==='plane'){const brk=keys.KeyS||keys.ArrowDown||stick.y>.5?.25:1;PL.x+=fx*30*brk*dt;PL.z+=fz*30*brk*dt;PL.face=Math.atan2(fx,fz);PL.vy=inp.jh?9:Math.max(PL.vy,-1.6);PL.grounded=false;const gy=groundH(PL.x,PL.z);if(PL.y<gy+.5){PL.y=PL.vis=gy+.5;}
       const P=PU.plane;P.position.set(PL.x,PL.vis-2.4,PL.z);P.rotation.set(-PL.vy*.02,PL.face,Math.sin(S.t*2)*.08);if(Math.random()<.3)burst(PL.x-fx*3,PL.vis-1,PL.z-fz*3,2,.08,3,0,.5);}
     else if(a.id==='midnight'){if(PL.cd>.07)PL.cd=.07;}
     else if(a.id==='wisp'){const t=PU.wispT,w=PU.wisp;if(!t||!t.s.visible){puEnd(true);toast('🏮 Found it. The wisp goes home to the lake.');}else{const k=Math.min(1,dt*1.2);w.position.x=lerp(w.position.x,t.x,k);w.position.y=lerp(w.position.y,t.y+2,k);w.position.z=lerp(w.position.z,t.z,k);}}
@@ -4350,13 +4359,14 @@ function lagUpdate(dt,play){let gpHeld=false;const gs=navigator.getGamepads?navi
   const bar=$('lagbar'),show=LAG.on||LAG.m<LAG.max-.01;if(bar.hidden===show)bar.hidden=!show;if(show)bar.firstChild.style.transform='scaleX('+(LAG.m/LAG.max)+')';
   const bl=$('bLag'),sb=app.classList.contains('touchy')&&S.mode==='play';if(bl.hidden===sb)bl.hidden=!sb;}
 // ---- B (or E) with nobody to yap with: slam in the air, yell on the ground
-const BX={cd:0,slam:false,sy:0};
-function bAction(){if(S.mode!=='play'||S.dead||VAN.driving||BX.cd>0)return;
-  if(!PL.grounded&&!SW.on&&PL.y-surfaceY(PL.x,PL.z,PL.y)>1.6){BX.slam=true;BX.sy=PL.y;PL.vy=-48;PL.kx=PL.kz=0;tone(160,.25,'sawtooth',.08,0,60);floatText('⬇ SLAM',PL.x,PL.y+3,PL.z,'#ff9ecf');BX.cd=.35;return;}
-  BX.cd=1.4;const W=typeof npcWords==='function'?npcWords():[];const id=PCH.id;const line=id&&BARK[id]?pick(BARK[id]):W.length?pick(W).toUpperCase()+'!':'...!';bubble(line,PL.x,PL.y+4.6,PL.z);tone(300,.18,'square',.08,0,520);
+const BX={cd:0,scd:0,slam:false,sy:0};
+function bAir(){return !PL.grounded&&!SW.on&&!BX.slam&&PL.y-surfaceY(PL.x,PL.z,PL.y)>1.6;}
+function bAction(){if(S.mode!=='play'||S.dead||VAN.driving)return;
+  if(bAir()){if(BX.scd>0)return;BX.scd=.35;BX.slam=true;BX.sy=PL.y;PL.vy=-48;PL.kx=PL.kz=0;tone(160,.25,'sawtooth',.08,0,60);floatText('⬇ SLAM',PL.x,PL.y+3,PL.z,'#ff9ecf');return;}
+  if(BX.cd>0)return;BX.cd=1.4;const W=typeof npcWords==='function'?npcWords():[];const id=PCH.id;const line=id&&BARK[id]?pick(BARK[id]):W.length?pick(W).toUpperCase()+'!':'...!';bubble(line,PL.x,PL.y+4.6,PL.z);tone(300,.18,'square',.08,0,520);
   let n=0;FRONT(9,.9).forEach(e=>{e.stun=Math.max(e.stun||0,1.2);floatText('😵',e.x,e.y+3.5,e.z);n++;});if(n)X.c.yell=(X.c.yell||0)+n;burst(PL.x+Math.sin(PL.face)*2,PL.y+2,PL.z+Math.cos(PL.face)*2,12,.85,7,2,.3);}
-{const di=doInteract;doInteract=function(){if(S.mode==='play'&&!S.dead&&!interact){bAction();return;}return di.apply(this,arguments);};}
-function bUpdate(dt,play){if(BX.cd>0)BX.cd-=dt;if(BX.slam){if(!PL.grounded&&PL.vy>-48)PL.vy=-48;if(PL.grounded||SW.on){BX.slam=false;if(SW.on)return;const h=BX.sy-PL.y;S.shake=Math.max(S.shake,Math.min(1,.3+h*.03));SFX.land();burst(PL.x,PL.y+.3,PL.z,30,.05,12,4,.6);
+{const di=doInteract;doInteract=function(){if(S.mode==='play'&&!S.dead&&(!interact||(bAir()&&/💬|YAP|TALK/.test(interact.label||'')))){bAction();return;}return di.apply(this,arguments);};}
+function bUpdate(dt,play){if(BX.cd>0)BX.cd-=dt;if(BX.scd>0)BX.scd-=dt;if(BX.slam){if(!PL.grounded&&PL.vy>-48)PL.vy=-48;if(PL.grounded||SW.on){BX.slam=false;if(SW.on)return;const h=BX.sy-PL.y;S.shake=Math.max(S.shake,Math.min(1,.3+h*.03));SFX.land();burst(PL.x,PL.y+.3,PL.z,30,.05,12,4,.6);
     ENR(6+Math.min(6,h*.2)).forEach(e=>{damageEnemy(e,h>8?3:2,(e.x-PL.x)*4,(e.z-PL.z)*4);e.stun=Math.max(e.stun||0,1.5);});floatText(h>15?'MEGA SLAM':'SLAM',PL.x,PL.y+3,PL.z,'#ff2e88');X.c.slam=(X.c.slam||0)+1;
     for(const q of PADS){if(Math.abs(PL.y-q.y)<.9&&Math.hypot(PL.x-q.x,PL.z-q.z)<2.4){PL.vy=(q.v||46)*1.25;PL.grounded=false;PL.jumps=1;floatText('SLAM BOUNCE',q.x,q.y+3,q.z,'#ffd400');break;}}}}}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);lagUpdate(dt,play);bUpdate(dt,play);};}
@@ -4493,7 +4503,7 @@ function fillerDie(){if(S.dead)return;S.cells=0;heroRegen();S.dead=1.8;S.deaths+
   toast(pick(['💀 You were filled. The Filler had no content, so it used yours.','💀 Cause of death: nothing. Literally nothing. You stood in it too long.','💀 Padded to death. Runtime +15 seconds.','💀 The Filler thanks you for your content.']));}
 function fillerUpdate(dt,play){const can=play&&!S.dead&&!S.inPk&&!S.inBoss&&!S.inSlop&&!S.inSim&&!S.inMM&&!VAN.driving;
   const inF=can&&PL.y-groundH(PL.x,PL.z)<30&&inFillerXZ(PL.x,PL.z);
-  if(inF){if(!FIL.on){FIL.on=true;if(S.t-FIL.card>25){FIL.card=S.t;zoneCard('THE FILLER','there is nothing here · that is what kills you · '+FIL.max+' seconds');}}FIL.e+=dt;
+  if(inF){if(!FIL.on){FIL.on=true;if(S.t-(FIL.warn||-99)>6){FIL.warn=S.t;toast('⚠️ filler_warning.log: you are in THE FILLER. get out within '+FIL.max+' seconds or it fills you.');}if(S.t-FIL.card>25){FIL.card=S.t;zoneCard('THE FILLER','there is nothing here · that is what kills you · '+FIL.max+' seconds');}}FIL.e+=dt;
     const left=FIL.max-FIL.e;if(left<5&&Math.ceil(left)!==FIL.beep){FIL.beep=Math.ceil(left);tone(220+FIL.beep*40,.12,'square',.07,0,180);if(FIL.beep===4)toast('⚠️ The Filler is padding you out. Get to some content.');}
     if(FIL.e>=FIL.max){FIL.e=0;fillerDie();}}
   else{if(FIL.on)FIL.leftT=S.t;FIL.on=false;if(!S.dead)FIL.e=Math.max(0,FIL.e-dt*2.5);}
@@ -4657,8 +4667,8 @@ CAST_CX.push(['cc3000','🎰','THE CLANK CLANK 3000','Generated the Filler. Did 
 ACH.push(['filled','Filled','died in the Filler',()=>(X.c.filled||0)>0],['fbits','Content Creator','brought six filler bits to the CLANK CLANK 3000',()=>!!X.cc],['shole','Down The Slop Hole','jumped into the CLANK CLANK 3000',()=>!!X.she],
   ['cores5','Five Definitions','collected all five cores in the Slop Hole',()=>!!(X.sh&&X.sh.c.every(Boolean))],['f67','The Final Brain Rot','reached the 67 at the bottom of the Slop Hole',()=>!!(X.sh&&X.sh.fin)],['overfit','Overfit','touched your own training data 10 times',()=>(X.c.overfit||0)>=10]);
 
-/* ================= ACT 32: the Warp Ring only goes places you have found ================= */
-const WRLOCK={'AURA MAZE':'pk_maze','SPROUT PATCH':'pk_patch','THE NORTH LIGHT':'north','LAMP MARKET PIT':'pit','DATA CENTER':'dc','THE SCROLL FARM':'scroll','BOBBY SCREWDRIVER':'audit','THE IDIOT DEBATE':'debate','NPC LIVESTREAM':'npcls','ELECTION NIGHT':'elect','MOUNT SKILL ISSUE':'mtn','SWING-O-RAMA':'swing','THE PILE-ON':'pile','THE SLOP HOLE':'pk_hole'};
+/* ================= ACT 32: the Warp Ring only goes places you have found (the Aura Maze and the Sprout Patch are pockets, so the ring is their only door and they stay open) ================= */
+const WRLOCK={'THE NORTH LIGHT':'north','LAMP MARKET PIT':'pit','DATA CENTER':'dc','THE SCROLL FARM':'scroll','BOBBY SCREWDRIVER':'audit','THE IDIOT DEBATE':'debate','NPC LIVESTREAM':'npcls','ELECTION NIGHT':'elect','MOUNT SKILL ISSUE':'mtn','SWING-O-RAMA':'swing','THE PILE-ON':'pile','THE SLOP HOLE':'pk_hole'};
 // a pad for the Slop Hole, in the first free spot on the ring
 (function(){const W=WR.c;for(let k=0;k<24;k++){const a=k/24*TAU,x=W.x+Math.cos(a)*11,z=W.z+Math.sin(a)*11;if(WR.pads.some(p=>Math.hypot(p.x-x,p.z-z)<5))continue;warpPad(x,z,groundH(x,z)+.15,'🕳️','THE SLOP HOLE',0x101014,()=>{if(S.inPk)exitPk();enterHole();});break;}})();
 function wrFound(id){return X.vis.includes(id);}
@@ -4836,8 +4846,8 @@ function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.
   PL.x=0;PL.z=9;PL.y=PL.vis=.15;PL.vx=PL.vy=PL.vz=PL.kx=PL.kz=0;PL.face=Math.PI;PL.inv=0;cam.yaw=0;cam.pitch=.3;cam.t.set(0,3,9);
   resetOrbs();spawnWorldEnemies();syncWorld();xReset();hudCache={};$('bossbar').hidden=true;$('hud').classList.remove('boss');$('ratio').hidden=true;$('dialog').hidden=true;}
 function begin(d){audioInit();$('title').hidden=true;$('end').hidden=true;$('hud').hidden=false;resetGame(d);S.mode='play';flash(.9,700);
-  const h=$('hint');h.textContent='[help.leak] '+(app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap (or slam / yell) · R pose · hold X: lag spike · SHIFT dash · G hook')+' · [end of dump]';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
-  if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else{S.defZ='grok';say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('📎 tooltip_final_v3.txt [LEAKED]: arrow up top = OHIO. tap any quest to re-aim it. do not show this to the user');});}}
+  const h=$('hint');h.textContent='[help.leak] '+(app.classList.contains('gp')?'L stick move · R stick look · A jump (again in the air: double jump · hold: 💩 boost) · X blast · B yap / slam in the air · Y pose · LB dash · RB hook · View: next quest':app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap (or slam / yell) · R pose · hold X: lag spike · SHIFT dash · G hook')+' · [end of dump]';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
+  if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else{S.defZ='grok';say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('📎 tooltip_final_v3.txt [LEAKED]: arrow up top = OHIO. '+(app.classList.contains('gp')?'press VIEW':'tap any quest')+' to re-aim it. do not show this to the user');});}}
 $('play').addEventListener('click',()=>{clearSave();begin(null);});
 const sv=loadSave();if(sv){$('cont').hidden=false;$('cont').addEventListener('click',()=>begin(loadSave()));}
 $('again').addEventListener('click',()=>begin(null));
@@ -4868,9 +4878,9 @@ function devSave(){try{localStorage.setItem('gfa-dev',JSON.stringify(DEV));}catc
 #mbody .dv{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}#mbody .dv button,#mbody .sysb button{font:700 13px system-ui,sans-serif;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;background:#fff;color:var(--ink);cursor:pointer}#mbody .sysb{display:flex;flex-direction:column;gap:8px;margin:6px 0}#mbody .sysb button{font:400 20px/1.1 var(--display);text-align:left;padding:10px 14px}
 #fpsm{position:absolute;left:8px;bottom:8px;z-index:70;background:rgba(0,0,0,.6);color:#b6ff00;font:700 11px monospace;padding:2px 6px;border-radius:6px;pointer-events:none}`;document.head.appendChild(st);})();
 // ---- the controls, drawn
-const CTL={pad:[['A','jump · hold for a 💩 boost'],['B','yap · slam in the air · yell or character move'],['X / RT','blast'],['Y','pose · character special'],['LB','dash'],['RB','grapple (swing)'],['LT (hold)','lag spike: slow the world'],['D-pad ↑','borrowed time'],['D-pad ↓','throw a sprout'],['D-pad ←','use power-up'],['D-pad →','switch character'],['L stick','move'],['R stick','look'],['Start','pause menu'],['View','next quest (aims the arrow)']],
-  key:[['WASD','move'],['Mouse drag','look'],['Space','jump · hold for a 💩 boost'],['F / click','blast'],['E','yap · slam · yell'],['R','pose · special'],['Shift','dash'],['G','grapple'],['X (hold)','lag spike'],['C','throw a sprout'],['V','power-up'],['Z','switch character'],['Q','borrowed time'],['M / Tab','pause menu']],
-  touch:[['Left thumb','move'],['Right thumb','look'],['JUMP','jump · hold for a 💩 boost'],['BLAST','blast'],['⏩','dash'],['🪝','grapple'],['🐌 (hold)','lag spike'],['🌱','throw a sprout'],['🎭','switch character'],['⏳','borrowed time'],['item slot','power-up'],['☰','pause menu']]};
+const CTL={pad:[['A','jump · again in the air: double jump · hold for a 💩 boost'],['B','yap · slam in the air · yell or character move'],['X / RT','blast'],['Y','pose · character special'],['LB','dash'],['RB','grapple (swing)'],['LT (hold)','lag spike: slow the world'],['D-pad ↑','borrowed time'],['D-pad ↓','throw a sprout'],['D-pad ←','use power-up'],['D-pad →','switch character'],['L stick','move'],['R stick','look'],['Start','pause menu'],['View','next quest (aims the arrow)'],['B (hold, in a chat)','skip the whole conversation']],
+  key:[['WASD','move'],['Mouse drag','look'],['Space','jump · again in the air: double jump · hold for a 💩 boost'],['F / click','blast'],['E','yap · slam · yell'],['R','pose · special'],['Shift','dash'],['G','grapple'],['X (hold)','lag spike'],['C','throw a sprout'],['V','power-up'],['Z','switch character'],['Q','borrowed time'],['M / Tab','pause menu']],
+  touch:[['Left thumb','move'],['Right thumb','look'],['JUMP','jump · again in the air: double jump · hold for a 💩 boost'],['BLAST','blast'],['⏩','dash'],['🪝','grapple'],['🐌 (hold)','lag spike'],['🌱','throw a sprout'],['🎭','switch character'],['⏳','borrowed time'],['item slot','power-up'],['☰','pause menu']]};
 function padSVG(){const L=(x,y,tx,ty,t,anchor)=>`<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="#b6ff00" stroke-width="1.5" opacity=".7"/><text x="${tx+(anchor==='end'?-6:6)}" y="${ty+5}" fill="#fff" font-size="14" font-family="system-ui,sans-serif" font-weight="700" text-anchor="${anchor}">${t}</text>`;
   return `<svg viewBox="0 0 860 420" role="img" aria-label="Controller layout"><g transform="translate(230,40)">
   <rect x="70" y="24" width="110" height="22" rx="10" fill="#3a3a48" stroke="#fff" stroke-width="2"/><rect x="220" y="24" width="110" height="22" rx="10" fill="#3a3a48" stroke="#fff" stroke-width="2"/>
@@ -5970,7 +5980,7 @@ addEventListener('keydown',e=>{if(!$('trade'))return;if(TRD.ph==='live'&&(e.code
 {const dr=devReady;devReady=function(){return !$('trade')&&dr();};}
 {const dr=devReset;devReset=function(){if($('trade')){if(TRD.ph==='live')trdEnd(false);TRD.ph='';trdClose();}dr();};}
 // ---- wiring
-{const ai=act15Interact;act15Interact=function(){if(S.dead||S.inPk)return ai();for(const m of GACHA.m)if(Math.hypot(PL.x-m.x,PL.z-m.z)<4&&Math.abs(PL.y-m.y)<4)return{label:'🎰 PULL THE GACHA (only 67,420 aura)',fn:()=>gachaPull(m)};
+{const ai=act15Interact;act15Interact=function(){if(S.dead||S.inPk)return ai();for(const m of GACHA.m)if(Math.hypot(PL.x-m.x,PL.z-m.z)<5.6&&Math.abs(PL.y-m.y)<4)return{label:'🎰 PULL THE GACHA (67,420 aura'+(S.aura<67420?' · you need '+fmt(67420-S.aura)+' more':'')+')',fn:()=>gachaPull(m)};
   if(TR.A&&Math.hypot(PL.x-TR.A.x,PL.z-TR.A.z)<TR.A.r){if(Math.hypot(PL.x-TR.term.x,PL.z-TR.term.z)<3.6&&Math.abs(PL.y-TR.term.y)<4)return{label:'💻 TRADE MEME COINS',fn:trdOpen};if(Math.hypot(PL.x-TR.sb.x,PL.z-TR.sb.z)<3&&Math.abs(PL.y-TR.sb.y)<4)return{label:'🍔 CLOCK IN AT SLOPBURGER',fn:sbShift};}return ai();};}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);gachaTaunt(dt,play);if(GACHA.cd>0)GACHA.cd-=dt;GACHA.m.forEach(m=>{if(m.shake>0){m.shake-=dt;m.g.rotation.z=Math.sin(S.t*60)*.08*m.shake;}});trUpdate(dt,play);cheatUpdate(dt,play);};}
 {const ar=act7Rows;act7Rows=function(){const q=chQ(),R=[];if(q.ga.n)R.push(['gacha','🎰 Gacha cheats '+q.ch.own.length+'/'+CHEATS.length+' · rugged '+fmt(q.ga.lost)+' aura',q.ch.own.length>=CHEATS.length]);if(X.vis.includes('trench'))R.push(['trench','📉 The Trenches: lifetime '+(q.trd.pnl<0?'':'+')+fmt(Math.round(q.trd.pnl))+' · 🪦 '+(q.deadc||[]).length+'/15 · climb the chart'+(q.ath?' ✓':''),!!q.ath&&(q.deadc||[]).length>=15&&q.trd.n>=10]);return ar().concat(R);};}
@@ -7043,7 +7053,7 @@ function f67Hint(recall){const st=stq();if(st.hint)return;st.hint=1;save();say((
   return{x:portal.x,z:portal.z,l:'THE PORTAL'};};}
 // the locked portal says what it is waiting for
 {const ai=act15Interact;act15Interact=function(){if(!S.dead&&!S.inPk&&storyStep()===5&&npcs.david&&Math.hypot(PL.x-npcs.david.x,PL.z-npcs.david.z)<5.5)return{label:(Q38().dgold||[]).length>=DNEED?'🪙 GIVE DAVID THE GOLD':'💬 ASK DAVID FOR THE TRUTH',fn:TALK.david};const r=ai();if(r)return r;if(!S.dead&&!S.inPk&&!portal.open&&Math.hypot(PL.x-portal.x,PL.z-portal.z)<6){const step=storyStep(),w=['','all 3 relics','the Great Lantern lit','the Algorithm\'s three feeds cut','an answer from the bottom of the Slop Hole','the truth from David'][step]||'something';
-  return{label:'🔒 THE PORTAL WANTS '+w.toUpperCase(),fn:()=>{toast(step===1?'🔒 portal_lock.dump: needs relic ×3 (the first three lines of your quests). [this string was not supposed to render]':'🔒 portal_lock.dump: still waiting on '+w+'. tap the STORY line in your quests to aim the arrow. [internal · do not ship]');SFX.hit();}};}return null;};}
+  return{label:'🔒 THE PORTAL WANTS '+w.toUpperCase(),fn:()=>{toast(step===1?'🔒 portal_lock.dump: needs relic ×3 (the first three lines of your quests). [this string was not supposed to render]':'🔒 portal_lock.dump: still waiting on '+w+'. '+(app.classList.contains('gp')?'press VIEW until the arrow says STORY':'tap the STORY line in your quests to aim the arrow')+'. [internal · do not ship]');SFX.hit();}};}return null;};}
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);STY.t-=dt;if(STY.t<=0){STY.t=1;if(play){storyBeat();storyTick();}DGOLD.forEach((g,i)=>{const p=STY['g'+i];p.nug.visible=!!stq().hint&&!(Q38().dgold||[]).includes(i);});if(stq().truth&&!DT.made)tunnelGoldRush();}};}
 // ---- the ending keeps your save, and you can keep playing
 (function(){const b=document.createElement('button');b.className='big alt';b.id='keepgo';b.textContent='▶ KEEP PLAYING';const a=$('again');a.parentNode.insertBefore(b,a);a.textContent='↻ NEW GAME (ERASES THIS ONE)';
@@ -7528,7 +7538,7 @@ function qCycle(d){const R=qOpenRows();if(!R.length)return;let i=R.findIndex(r=>
   setTimeout(()=>{const c=$('ctext');toast('📍 arrow_target.cfg: now following '+R[i][1].replace(/^\S+\s/,'')+(c&&c.textContent?' · '+c.textContent:'')+' · VIEW again for the next one');},60);}
 // ---- the end screen: a beat before it takes input, and erasing a finished save takes two presses
 const ENDG={armed:0};
-new MutationObserver(()=>{const e=$('end');if(e.hidden)return;const bs=[...e.querySelectorAll('button')];bs.forEach(b=>b.disabled=true);setTimeout(()=>{bs.forEach(b=>b.disabled=false);NAV.reset&&NAV.reset();},1600);}).observe($('end'),{attributes:true,attributeFilter:['hidden']});
+new MutationObserver(()=>{const e=$('end');if(e.hidden)return;const bs=[...e.querySelectorAll('button')];bs.forEach(b=>b.disabled=true);setTimeout(()=>{bs.forEach(b=>b.disabled=false);NAV.reset&&NAV.reset();},3200);}).observe($('end'),{attributes:true,attributeFilter:['hidden']});
 $('again').addEventListener('click',e=>{if(performance.now()-ENDG.armed<4000)return;e.stopImmediatePropagation();e.preventDefault();ENDG.armed=performance.now();const b=$('again'),t=b.textContent;b.textContent='⚠️ PRESS AGAIN TO ERASE THIS SAVE';setTimeout(()=>{if(b.textContent.indexOf('PRESS AGAIN')>=0)b.textContent=t;},4000);},{capture:true});
 // ---- Ohio explains itself the first time you walk in
 const RVF={t:0,ohio:0};
@@ -7552,19 +7562,83 @@ opnShow=(function(os){return function(k){os(k);const s=MOV.el&&MOV.el.querySelec
   const q=Q38();if(!q.ohioTip&&S.zone==='grok'){q.ohioTip=1;save();const pad=app.classList.contains('gp'),tch=app.classList.contains('touchy');toast(pad?'📎 combat_tips.txt [LEAKED]: X blasts the nearest hallucination (two hits each). jump, then B in the air, slams everything around you. that is faster.':tch?'📎 combat_tips.txt [LEAKED]: the blast button auto-aims (two hits each). jump, then YAP in the air to slam everything around you.':'📎 combat_tips.txt [LEAKED]: F (or click) blasts the nearest hallucination, two hits each. jump, then E in the air, slams everything around you. faster.');}};}
 // ---- the camera pulls in when something solid gets between it and you
 const CAMLOS={list:null,rc:new THREE.Raycaster(),k:0,pull:1,dist:null,v:new THREE.Vector3(),d:new THREE.Vector3()};
-function camLosList(){const L=[],T=THREE,s=new T.Sphere();scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry||!o.visible)return;const m=o.material;if(!m||Array.isArray(m)||m.transparent||m.wireframe||m.isShaderMaterial||m.side===T.BackSide)return;if(o.geometry.parameters&&o.geometry.parameters.radius>=1000)return;
-  if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();s.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);if(s.radius>60||s.radius<.6)return;let hid=false;for(let q=o;q;q=q.parent)if(q===pGroup)hid=true;if(hid)return;L.push({o,c:s.center.clone(),r:s.radius});});return L;}
+function camLosList(){const L=[],T=THREE,s=new T.Sphere(),PM=new Set(platforms.map(p=>p.m)),im=new T.Matrix4();scene.traverse(o=>{if(!o.isMesh||!o.geometry||!o.visible||PM.has(o))return;const m=o.material;if(!m||Array.isArray(m)||m.transparent||m.wireframe||m.isShaderMaterial||m.side===T.BackSide)return;if(o.geometry.parameters&&o.geometry.parameters.radius>=1000)return;
+  if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();
+  if(o.isInstancedMesh){for(let k=0;k<o.count;k++){o.getMatrixAt(k,im);im.premultiply(o.matrixWorld);s.copy(o.geometry.boundingSphere).applyMatrix4(im);if(s.radius>60||s.radius<.6)continue;L.push({o,c:s.center.clone(),r:s.radius});}return;}
+  s.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);if(s.radius>60||s.radius<.6)return;let hid=false;for(let q=o;q;q=q.parent)if(q===pGroup)hid=true;if(hid)return;L.push({o,c:s.center.clone(),r:s.radius});});return L;}
 {const uc=updateCamera;updateCamera=function(dt){uc(dt);if(S.mode!=='play'||S.inBoss||S.inPk||MVD.on||(typeof MOV!=='undefined'&&MOV.on))return;
   if(!CAMLOS.list){CAMLOS.list=camLosList();}
   const cp=camera.position,t=cam.t;CAMLOS.k=(CAMLOS.k+1)%3;
   if(CAMLOS.k===0){const d=CAMLOS.d.copy(cp).sub(t),L=d.length();let best=L;if(L>2){d.divideScalar(L);const mid=CAMLOS.v.copy(t).addScaledVector(d,L/2),cand=[];
-      for(const it of CAMLOS.list){if(!it.o.visible)continue;const dx=it.c.x-mid.x,dy=it.c.y-mid.y,dz=it.c.z-mid.z;if(dx*dx+dy*dy+dz*dz>(it.r+L/2)*(it.r+L/2))continue;cand.push(it.o);if(cand.length>24)break;}
+      for(const it of CAMLOS.list){if(!it.o.visible)continue;const dx=it.c.x-mid.x,dy=it.c.y-mid.y,dz=it.c.z-mid.z;if(dx*dx+dy*dy+dz*dz>(it.r+L/2)*(it.r+L/2))continue;if(!cand.includes(it.o))cand.push(it.o);if(cand.length>24)break;}
       if(cand.length){const rc=CAMLOS.rc;rc.set(t,d);rc.near=1.2;rc.far=L;const h=rc.intersectObjects(cand,false)[0];if(h)best=Math.max(2.2,h.distance-.6);}}
+    // only pull in for something that keeps blocking, not a post the camera sweeps past
+    if(best<L){CAMLOS.hits=(CAMLOS.hits||0)+1;if(CAMLOS.hits<2)best=L;}else CAMLOS.hits=0;
     CAMLOS.target=best/Math.max(L,.001);}
-  const want=Math.min(1,CAMLOS.target||1);CAMLOS.pull+=(want-CAMLOS.pull)*(want<CAMLOS.pull?.5:.08);
+  const want=Math.min(1,CAMLOS.target||1);CAMLOS.pull+=(want-CAMLOS.pull)*(want<CAMLOS.pull?.3:.08);
   if(CAMLOS.pull<.995){cp.set(t.x+(cp.x-t.x)*CAMLOS.pull,t.y+(cp.y-t.y)*CAMLOS.pull,t.z+(cp.z-t.z)*CAMLOS.pull);camera.lookAt(t.x,t.y+.6,t.z);sky.position.copy(cp);}};}
 // a few places add props after load: refresh the list now and then
 setInterval(()=>{CAMLOS.list=null;},20000);
+/* ================= ACT 70: THE REVIEW CREW FIXES. Four blind reviewers, an hour each on a controller. Hits show where they came from and enemies off screen get a marker, brain cells grow back when nothing is chasing you, dying in a zone puts you back at that zone's edge, stars recover and explain themselves, the double jump gets taught at the first Nebula stair, the page beams and the Last Grass beam are back, holding B skips a whole conversation, View only cycles real quests, moments wait until the fight is over, the Last Grass always wins B during ROT x1000, bullets no longer pass through close enemies, and toasts back off during fights. ================= */
+(function(){const st=document.createElement('style');st.textContent='.gpo{display:none}#app.gp .gpo{display:inline}#app.gp .kbo{display:none}'
+  +'#hdir,.thr{position:absolute;left:0;top:0;pointer-events:none;z-index:4;will-change:transform,opacity}'
+  +'#hdir{width:170px;height:46px;margin:-23px 0 0 -85px;border-radius:50% 50% 0 0/100% 100% 0 0;background:radial-gradient(ellipse at 50% 100%,rgba(255,30,70,.9),rgba(255,30,70,.35) 45%,rgba(255,30,70,0) 72%);opacity:0;transition:opacity .7s ease-out}'
+  +'.thr{width:0;height:0;margin:-11px 0 0 -11px;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:20px solid #ff2e55;filter:drop-shadow(0 0 3px #000);opacity:.9}';
+  document.head.appendChild(st);})();
+const HDIR=document.createElement('div');HDIR.id='hdir';app.appendChild(HDIR);
+const THR=[0,1,2,3].map(()=>{const d=document.createElement('div');d.className='thr';d.hidden=true;app.appendChild(d);return d;});
+function camRel(x,z){const dx=x-PL.x,dz=z-PL.z,fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw),rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw);return Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz);}
+function edgeAt(a,k){const W=app.clientWidth,H=app.clientHeight;return[W/2+Math.sin(a)*W*k,H/2-Math.cos(a)*H*k];}
+function hurtDir(dx,dz){if(!dx&&!dz)return;const a=camRel(PL.x-dx,PL.z-dz),p=edgeAt(a,.36);HDIR.style.transition='none';HDIR.style.opacity='1';HDIR.style.transform='translate('+p[0]+'px,'+p[1]+'px) rotate('+a+'rad)';void HDIR.offsetWidth;HDIR.style.transition='';HDIR.style.opacity='0';}
+function threatNear(r){for(const e of enemies){if(e.tag==='boss'||!(e.aggro>0)||e.home>0)continue;if(Math.hypot(e.x-PL.x,e.z-PL.z)<Math.min(r,e.aggro))return true;}return false;}
+function toastBusy(){return S.mode!=='play'||threatNear(22);}
+// ---- checkpoints: dying in a zone puts you back at the edge you walked in from
+const CP={zone:null,x:0,z:0,yaw:0,last:null,deathZone:null,wasDead:false};
+function cpZone(z){if(!z||z==='glitch'||z==='meme')return null;if(ZBY[z]&&ZONES.some(Z=>Z.id===z))return{x:ZBY[z].x,z:ZBY[z].z,r:ZR*.95,name:ZBY[z].name};const a=AREAS.find(q=>q.id===z);return a?{x:a.x,z:a.z,r:a.r*1.05,name:a.name}:null;}
+{const rs=respawn;respawn=function(){const dz=CP.deathZone;CP.deathZone=null;rs();if(S.inBoss||S.inPk||!CP.zone||dz!==CP.zone)return;
+  PL.x=CP.x;PL.z=CP.z;PL.y=PL.vis=groundH(CP.x,CP.z)+.15;PL.vx=PL.vz=PL.vy=0;cam.yaw=CP.yaw;cam.pitch=.3;cam.manual=1;enemyPushback(16,24,2.5);
+  const c=cpZone(CP.zone);setTimeout(()=>toast('📍 checkpoint.tmp restored: the edge of '+(c?c.name:'the zone')+'. (fanum tax still applies)'),300);};}
+// ---- double jump, taught where it's needed
+const DJ={};
+// ---- the beams Fable promises are back (lost pages and the Last Grass)
+(function(){const pts=pages.map(p=>[p.x,p.z]).concat([[GRASS.x,GRASS.z]]);scene.traverse(o=>{if(!o.isMesh||!o.geometry||o.geometry.type!=='CylinderGeometry'||o.geometry.parameters.height!==320)return;if(pts.some(k=>Math.hypot(o.position.x-k[0],o.position.z-k[1])<1)){o.material=o.material.clone();o.material.visible=true;}});})();
+// ---- holding B (or E) in a conversation skips the whole thing
+const HB={t0:0,lock:false};
+(function hb(){requestAnimationFrame(hb);let held=!!keys.KeyE;const gs=navigator.getGamepads?navigator.getGamepads():[];for(const g of gs)if(g&&g.connected&&g.buttons[1]&&g.buttons[1].pressed){held=true;break;}
+  if(!held){HB.t0=0;HB.lock=false;return;}if(S.mode!=='dialog'||HB.lock)return;const now=performance.now();if(!HB.t0)HB.t0=now;else if(now-HB.t0>600){HB.lock=true;HB.t0=0;dlgSkipAll();}})();
+// ---- View only cycles real quests, not collectible counters
+{const qo=qOpenRows;const MAIN=['story','grok','fable','astra','portal','mission','flow','erin','clank','hour','lantern','cloud','fetch','r1k','hole','rest'];qOpenRows=function(){return qo().filter(r=>MAIN.includes(r[0])||r[0]===S.track);};}
+// ---- one-off moments wait until nothing is chasing you
+{const mo=moment;moment=function(id,lines,after){if(threatNear(26))return;return mo(id,lines,after);};}
+// ---- during ROT x1000 the Last Grass always wins B
+{const xi=xInteract;xInteract=function(){if(R1K.on&&!VAN.driving&&Math.hypot(PL.x-GRASS.x,PL.z-GRASS.z)<4)return{label:'🌱 TOUCH THE LAST GRASS. END THE ROT.',fn:touchGrass};return xi();};}
+// ---- bullets move in small steps, so they can't skip past an enemy right in front of you
+{const ub=updateBullets;updateBullets=function(dt){const n=Math.min(4,Math.max(1,Math.ceil(dt/.011)));for(let i=0;i<n;i++)ub(dt/n);};}
+// ---- per frame
+const RGN={t:0,tick:0,star:0};
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);
+  if(S.dead&&!CP.wasDead)CP.deathZone=S.zone;CP.wasDead=!!S.dead;
+  // threat markers for enemies chasing you from off screen
+  let k=0;if(play&&S.mode==='play'&&!S.dead&&!MVD.on){const v=CAMLOS.v;for(const e of enemies){if(k>=THR.length)break;if(e.tag==='boss'||!(e.aggro>0)||e.home>0||e.rec>0)continue;const d=Math.hypot(e.x-PL.x,e.z-PL.z);if(d>Math.min(22,e.aggro))continue;
+      v.set(e.x,e.y,e.z).project(camera);if(v.z<1&&Math.abs(v.x)<.95&&Math.abs(v.y)<.95)continue;const a=camRel(e.x,e.z),p=edgeAt(a,.43),el=THR[k++];el.hidden=false;el.style.transform='translate('+p[0]+'px,'+p[1]+'px) rotate('+a+'rad) scale('+(1.5-d/30)+')';}}
+  for(;k<THR.length;k++)if(!THR[k].hidden)THR[k].hidden=true;
+  if(!play||S.mode!=='play'||S.dead)return;
+  // brain cells grow back slowly when nothing is chasing you
+  if(!S.inBoss&&!R1K.on&&S.cells<S.max&&performance.now()-HURTT>7000&&!threatNear(22)){RGN.t+=dt;if(RGN.t>=5){RGN.t=0;S.cells++;floatText('+1 🧠',PL.x,PL.y+4,PL.z,'#b6ff00');
+      const q=Q38();if(!q.rgnTip){q.rgnTip=1;save();toast('🧠 regen.log [LEAKED]: brain cells grow back slowly when nothing is chasing you. the Last Grass (Prompt Plaza) refills them all.');}}}else RGN.t=0;
+  RGN.tick-=dt;if(RGN.tick>0)return;RGN.tick=.5;const q=Q38();
+  // checkpoint: the point just inside the edge you walked in from
+  if(S.zone!==CP.last){CP.last=S.zone;const c=cpZone(S.zone);if(c&&!S.inPk&&!S.inBoss){const ux=PL.x-c.x,uz=PL.z-c.z,u=Math.hypot(ux,uz)||1,r=Math.max(4,Math.min(u,c.r-5));CP.zone=S.zone;CP.x=c.x+ux/u*r;CP.z=c.z+uz/u*r;CP.yaw=Math.atan2(ux/u,uz/u);}}
+  // stars recover over time and explain themselves once
+  if(X.rate<3){RGN.star+=.5;if(RGN.star>=90){RGN.star=0;rateShift(.1,'people forgot about it');}}else RGN.star=0;
+  if(X.rate<3.5&&!q.starTip){q.starTip=1;save();toast('⭐ rating.csv [LEAKED]: the stars are how much the world likes you. deaths and buying courses drop them, touching grass and fetch quests raise them, and they creep back up on their own. under 2 ★ the doctor will not see you.');}
+  // double jump: taught at the first Nebula stair
+  const s0=TOP.st&&TOP.st[0];if(s0&&!q.djTip&&!S.inPk&&Math.hypot(PL.x-s0.x,PL.z-s0.z)<12&&PL.y<s0.top-1){q.djTip=1;save();const pad=app.classList.contains('gp'),tch=app.classList.contains('touchy');toast('🦘 double_jump.md [LEAKED]: this stair is too high for one jump. '+(pad?'press A again in the air':tch?'tap JUMP again in the air':'press SPACE again in the air')+'. the second jump is free.');}
+  // touch grass explains itself the first time you get close
+  if(!q.grassTip&&Math.hypot(PL.x-GRASS.x,PL.z-GRASS.z)<12){q.grassTip=1;save();toast('🌱 grass_heal.txt [LEAKED]: touching the LAST GRASS refills every brain cell. it needs 30 seconds between touches.');}
+  // the Warp Ring counts as found once you reach it
+  if(!X.wrSeen&&WR.c&&Math.hypot(PL.x-WR.c.x,PL.z-WR.c.z)<16){X.wrSeen=1;save();hudCache.q=null;}};}
+if(location.hash==='#test')window.__gfaEval=src=>eval(src);
 /* ================= main loop ================= */
 let last=performance.now(),saveT=20;
 function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;S.t+=dt;U.time.value=S.t;
