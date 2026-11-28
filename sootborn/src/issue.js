@@ -1,6 +1,6 @@
 // ============================================================
-// content/issue — a level played in third person, drawn like a comic.
-// It is the cel-shaded engine from "Second Chance" (halftone, ink outlines, drawn faces), re-cast with our people
+// content/issue — the 3D levels, played in third person.
+// It is the engine from "Second Chance" (since v0.91 without its comic filter: no halftone or ink outlines), re-cast with our people
 // and re-dressed as our places by issue/patch.mjs. It runs in its own frame so nothing of it leaks into the 2D game:
 // when it posts "done" the frame is thrown away and the cutscene carries on. If it cannot start, the story falls
 // back to the 2D fight that used to stand in this place.

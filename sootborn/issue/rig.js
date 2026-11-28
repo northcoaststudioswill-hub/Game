@@ -17,8 +17,9 @@
       pal: { skin: 0xb98a66, top: 0x4a4650, trim: 0x2a2630, shirt: 0x6e6a78, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0x9a9aa6, glove: 0x2a2630, wrap: 0x4a4650 } }
   };
   if (SC.issue === 'riser') {   // a clerk cannot be seen to fight: black cloth over the face, no cape, nothing gilt
-    Object.assign(SPECS.hero, { face: 'cloth', cape: false, hood: true, pauldron: false, hair: null });
-    Object.assign(SPECS.hero.pal, { top: 0x2a2630, trim: 0x4a4650, shirt: 0x2a2630, tie: 0x4a4650, band: 0x2a2630 });
+    Object.assign(SPECS.hero, { face: 'cloth', cape: false, hood: true, pauldron: false, hair: null, nogilt: true });
+    // v0.92: plain black, not House violet, and the plate's gilt fittings (knuckles, scabbard, boot cuffs, the ear ring, the hilt) in dull iron
+    Object.assign(SPECS.hero.pal, { top: 0x262628, trim: 0x45454b, shirt: 0x262628, tie: 0x45454b, band: 0x262628, pants: 0x222225, wrap: 0x222225, glove: 0x222225 });
     SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, officer: 1, plate: 0xd6cfba, trim: 0xc9a245, belt: 0x7c2022, hands: 0x23232e }, pal: { skin: 0xb8b9c0, top: 0xd6cfba, trim: 0xc9a245, shirt: 0x7c2022, tie: 0xc9a245, pants: 0x23232e, boots: 0x14141d, hair: 0xd6cfba, glove: 0x23232e, wrap: 0xd6cfba } };
   }
   if (SC.issue === 'stack') {   // House Teal's pickets hold the island; their blades wear teal, not violet
@@ -30,7 +31,7 @@
   }
   if (SC.issue === 'array') {   // forty-three days after the furnace: a valve hand with a wrench, Dace in his hood, and the Array's own watch
     Object.assign(SPECS.hero, { h: 1.0, b: 1.0, face: 'kael0', hair: 'kael', armor: false, cape: false, pauldron: false, glowHand: false, weapon: 'wrench' });
-    Object.assign(SPECS.hero.pal, { skin: 0xc8946a, hair: 0x6a2e18, streak: 0x6a2e18, top: 0x384c56, trim: 0x2a3440, shirt: 0x384c56, tie: 0xb8682a, pants: 0x2a3440, boots: 0x1e1418, glove: 0xc8946a, wrap: 0x384c56, band: 0xb8682a });
+    Object.assign(SPECS.hero.pal, { skin: 0xc8946a, hair: 0x6a2e18, streak: 0x6a2e18, top: 0x384c56, trim: 0x2a3440, shirt: 0x384c56, tie: 0xb8682a, pants: 0x2a3440, boots: 0x2a2018, glove: 0xc8946a, wrap: 0x384c56, band: 0xb8682a });   // v0.92: brown work boots (they read violet)
     SPECS.clerk = { h: 1.03, b: 1.02, face: 'cloth', hood: true, kit: { light: 1, noSh: 1, soot: 1, plate: 0x2a2634, trim: 0x4a4030, belt: 0x1c1a24, hands: 0xb98a66, lamp: 0xffd98a }, pal: { skin: 0xb98a66, top: 0x2a2634, trim: 0x1c1a24, shirt: 0x2a2634, tie: 0x1c1a24, pants: 0x1c1a24, boots: 0x0c0c12, hair: 0x2a2634, glove: 0x4a4030, wrap: 0x2a2634 } };
     Object.assign(SPECS.hollow.pal, { top: 0x4a5068, wrap: 0x4a5068, hair: 0x7a7e8c, shirt: 0x5a6078, trim: 0xb8682a, glove: 0x7a7e8c }); if (SPECS.hollow.kit) Object.assign(SPECS.hollow.kit, { lamp: 0xffb060, plate: 0x8a8e9c, trim: 0xb8682a, hands: 0x7a7e8c });   // v0.90 COMBAT: grey all over, not the Dock Guard's white enamel
   }
@@ -303,7 +304,7 @@
       });
     }
 //@@WEAPONS
-    const steel = G.toon({ color: 0xaeb2b8 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xc9a245 });
+    const steel = G.toon({ color: 0xaeb2b8 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: sp.nogilt ? 0x4a4a50 : 0xc9a245 });
     if (sp.armor) {
       // ears, and hands that are hands: a thumb and a row of fingers closed on the hilt, and open on the off side
       { const sk = G.toon({ color: sp.pal.skin || 0xe6c79a }), kn = G.toon({ color: 0xd6cfba }); model.mats.push(sk, kn);
@@ -311,7 +312,7 @@
         add('haR', tbox(0.095, 0.045, 0.06, 1, 0.85), kn, 0, -0.118, 0.03, 0.01); add('haR', tbox(0.03, 0.06, 0.045), kn, 0.052, -0.07, 0.03, 0.008);
         [-0.03, -0.01, 0.01, 0.03].forEach((x, i) => add('haL', tbox(0.018, 0.06 - Math.abs(i - 1.5) * 0.008, 0.03, 0.7, 1), kn, x, -0.135, 0.01, 0.006)); add('haL', tbox(0.022, 0.05, 0.03, 0.7, 1), kn, 0.055, -0.09, 0.015, 0.006).rotation.z = 0.5; }
       // what the plate carries on it: gauntlet knuckles, a scabbard on the hip, the cord the washer hangs from, boot cuffs
-      const dk = G.toon({ color: 0x2a2630 }), gl = G.toon({ color: 0xc9a245 }), iv = G.toon({ color: 0xd6cfba }); model.mats.push(dk, gl, iv);
+      const dk = G.toon({ color: sp.nogilt ? 0x232326 : 0x2a2630 }), gl = G.toon({ color: sp.nogilt ? 0x4a4a50 : 0xc9a245 }), iv = G.toon({ color: sp.nogilt ? 0x55555c : 0xd6cfba }); model.mats.push(dk, gl, iv);
       add('haR', tbox(0.1, 0.05, 0.11), gl, 0, -0.02, 0, 0.01); add('haR', tbox(0.1, 0.04, 0.03), iv, 0, -0.09, 0.05, 0.008);
       add('hips', tbox(0.05, 0.6, 0.07, 1, 0.6), dk, 0.21, -0.22, -0.06, 0.012).rotation.x = 0.35; add('hips', tbox(0.06, 0.06, 0.08), gl, 0.21, 0.04, -0.01, 0.008);
       add('hips', tbox(0.1, 0.11, 0.06), dk, -0.19, -0.02, 0.1, 0.01);                                              // the pouch the tin's invoice lives in

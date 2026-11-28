@@ -92,10 +92,11 @@
     gild: ['THE TABLE', 'HALF A YEAR AFTER THE FURNACE', 'NINE MONTHS', 'Half a year after the furnace, to fifteen months after. Pump Room Seven, under Tier Six.', '<span>THE</span>TABLE']
   })[SC.issue] || ['THE HIGH DOCKS', 'SEVEN YEARS AFTER THE FURNACE', 'FOUR HUNDRED HULLS', 'The last pair is on the wind. The stair is full of light.', '<span>THE HIGH</span>DOCKS'];
   SC.lvClues = { docks: 5, riser: 2, stair: 2, stack: 2, array: 2 }[SC.issue] || 5;
-  /* v0.91 LORE: things to read that nobody points at. Not counted, nothing depends on them: a notice, a board, a mark. o.pages: memory panels after the lines */
+  /* v0.91 LORE: things to read that nobody points at. Nothing depends on them: a notice, a board, a mark. o.pages: memory panels after the lines.
+     v0.92: each one read goes into the Codex as lore_<id> (CODEX_FINDS in src/rowk.js) */
   function lore(id, x, y, z, o, lines) { o = o || {};
     W.addInteract({ id: 'l_' + id, x, y, z, fx: o.fx, fz: o.fz, r: o.r || 1.5, label: o.label || 'READ', marker: 'clue', mh: o.mh || 1.5, when: () => !F['lore_' + id] && !S.enc && !SC.cold && (!o.when || o.when()),
-      act: () => { F['lore_' + id] = 1; save(); SC.audio.sfx('clue'); pl.setState('interact'); pl.control = false; U.say(lines, () => pagesOf(o.pages, () => { pl.setState('idle'); pl.control = true; })); } }); }
+      act: () => { F['lore_' + id] = 1; save(); SC.audio.sfx('clue'); SC.host('find', { id: 'lore_' + id }); pl.setState('interact'); pl.control = false; U.say(lines, () => pagesOf(o.pages, () => { pl.setState('idle'); pl.control = true; if (SC.hosted) U.toast('INTO THE *CODEX*.', 2); objective(); })); } }); }
   /* what the people with him say, or the people going past, between fights: one line at a time, each once, never over another line */
   function murmur(list) { let i = 0, t = 10; W.dyn.push((tt, dt) => { if (!dt || i >= list.length || SC.state !== 'play' || !pl.control || S.enc || SC.cold || U.dlg || U.pg || U.mem || U.menuOpen || !F.intro) return; t -= dt; if (t > 0) return;
     const m = list[i]; if (m.when && !m.when()) { if (m.skip && m.skip()) i++; t = 1; return; } const el = document.getElementById('toast'); if (el && el.classList.contains('on')) { t = 2.5; return; } i++; t = 18; U.toast(m.t, 4.5); }); }
@@ -284,7 +285,7 @@
       W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); } });
     W.addInteract({ id: 'moor', x: MOOR.x, y: 11, z: MOOR.z, r: 2.4, label: 'CUT THE LINE', marker: 'act', mh: 2.4, when: () => F.boss && !F.cut, act: finale });
     // three things off the path, for the Codex (v0.81). Nothing depends on them
-    { const find = (id, x, y, z, fx, fz, lines) => W.addInteract({ id, x, y, z, fx, fz, r: 1.5, label: 'LOOK', marker: 'clue', mh: 1.5, when: () => !F['find_' + id], act: () => { setFlag('find_' + id); SC.audio.sfx('clue'); SC.host('find', { id }); U.say(lines); } });
+    { const find = (id, x, y, z, fx, fz, lines) => W.addInteract({ id, x, y, z, fx, fz, r: 1.5, label: 'LOOK', marker: 'clue', mh: 1.5, when: () => !F['find_' + id], act: () => { setFlag('find_' + id); SC.audio.sfx('clue'); SC.host('find', { id }); U.say(lines, () => { if (SC.hosted) U.toast('INTO THE *CODEX*.', 2); }); } });
       find('f_tally', -10.05, 0, 15.4, -10.05, 16.3, [{ who: 'cap', text: 'The tally booth. A stroke for every sled, in ink. And beside it a second column, in pencil, very faint.' }, { who: 'hero', text: "Sable's hand. What went *down* the stair, in the same crates. Nobody up here reads pencil." }]);
       find('f_bench', -27, 0, 8.6, -27, 7, [{ who: 'cap', text: 'The watch shelter. Under the bench, where a man sits out a long watch, names cut with a seat knife.' }, { who: 'hero', face: 'hurt', text: 'Four of them. I know one. *BRAND.* And under it a tally of nights, and it stops.' }]);
       find('f_signal', -13.5, 9, -41.9, -13.5, -43.6, [{ who: 'cap', text: 'A line locker on the signal roof, and in it the signal book. Two lamps: a House barge. One lamp: freight.' }, { who: 'hero', text: 'Nothing in it for a barge that does not answer. They have *never needed the page*.' }]); }
@@ -710,6 +711,10 @@
       lore('dais', -7.8, 24, 11.2, { fx: -4, fz: 13, r: 1.3, mh: 1.8, label: 'LOOK', when: () => F.e_l2 }, [
         { who: 'cap', text: 'From this turn the dais shows across the river: a white banner and six lamps. Under it is the Assayers\' cache. Salve, bread and oil under a white ribbon, in a valley of hungry cadets.' },
         { who: 'hero', face: 'angry', text: 'A result must be earned. One winter cloak, packed for four hundred and eighty.' }]);
+      // v0.92: the island talks while he climbs. Teal's pickets below, his own House across the ford, and the pipe
+      murmur([{ t: 'A TEAL PICKET, DOWN ON THE ISLAND: *"VOSS SAID THE VIOLETS WOULD BE ASLEEP. VOSS IS NOT ANSWERING."*', when: () => F.e_alley && !F.e_l1, skip: () => F.e_l1 },
+        { t: 'ACROSS THE FORD, OUR FIRE. SOMEBODY HAS BANKED IT HIGH. *THEY CAN SEE THE STACK FROM THERE.*', when: () => F.e_l1 && !F.e_l2, skip: () => F.e_l2 },
+        { t: 'THE STACK HUMS UNDER MY PALM, THE SAME NOTE AS A RISER BELOW. *DAY THIRTY-ONE, AND I KNOW THIS PIPE.*', when: () => F.e_l2 && !F.charged, skip: () => F.charged }]);
     };
     S.update = function (dt, rdt) {
       for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
@@ -792,6 +797,10 @@
           if (dt > 0 && SC.state === 'play' && !S.enc && pl.control && !(S.runT > 0) && d > 0.7 && d < 45) { const sp = Math.min(6.4, 1.2 + d * 2), k = Math.min(1, sp * dt / d); g.x += dx * k; g.z += dz * k; g.y = SC.damp(g.y, W.ground(g.x, g.z, g.y + 0.7), 16, dt); clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(dx, dz), 9, dt); ph += sp * dt * 1.7; clerk.anim.apply(P.run ? P.run(ph) : P.idle(t), 12, dt); }
           else { if (dt > 0) clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(pl.pos.x - g.x, pl.pos.z - g.z), 3, dt); clerk.anim.apply(P.idle(t), 6, 0.016); } }); }
       pl.model.setGlow(0xffd98a, '#ffd98a');
+      // v0.92: the ladder end of the hall was the darkest place in the game. A lamp's worth of warm light on the gantry, the ladder and the west stair,
+      // so Kael, the rungs and the way up read on a small screen; the hall beyond keeps its dark
+      { const lt = new THREE.PointLight(0xffc078, 16, 22, 1.4); lt.position.set(-14.6, 15.2, 22.4); G.scene.add(lt);
+        const l2 = new THREE.PointLight(0xffb060, 12, 18, 1.5); l2.position.set(-15.4, 10.8, 9.5); G.scene.add(l2); }
       try { const st = document.createElement('style'); st.textContent = '#tagPw,#tagEc{display:none!important}'; document.head.appendChild(st); } catch (e) { /* the chips stay */ }   // no ELEVEN and no Count on a man who has not learned them
       { const t0 = U.toast; U.toast = function (m, d) { if (typeof m === 'string' && /FURY BAR|FURY FULL|HOLD THE CUT|ELEVEN\*/.test(m)) return; return t0.call(U, m, d); }; }
       Object.keys(CROSS).forEach(id => { const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.07, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
@@ -986,6 +995,31 @@
       const s = up ? best.a : best.b, e = up ? best.b : best.a;
       return at(s, 1.2) ? P3(e) : P3(s);
     };
+    /* v0.92 LEVELS: on the docks' ground floor the quay, the yard, the bond house and the lane behind it are walled from
+       one another; the marker goes by the gate, the shutter and the lane's end instead of through the walls (a man who
+       has gone back to read the quay, or has fallen into the service cut, is shown the way back onto the route) */
+    if (SC.issue === 'docks' && !SC.way0) { SC.way0 = SC.way;
+      const reg = q => (q.y || 0) > 7.4 ? (q.z > -20.3 ? 'R1' : q.z < -21.6 && q.x < -9.9 ? 'R2' : '') : (q.y || 0) > 2.2 ? '' : q.z > 6 ? 'Q' : q.z < -19.7 ? 'N' : q.x > 5.8 ? 'Y' : q.x > -31.6 ? 'B' : '';
+      const P = (x, z, y) => ({ x, y: y || 0, z, way: 1 });
+      SC.way = function (g, p, depth) { const w = SC.way0(g, p, depth); if (depth || !w) return w;
+        const R = reg(p), T = reg(w); if (!R || !T || R === T) return w;
+        // each opening: walk to this side of it, and once in its mouth, through to the far side (no turning back on the sill)
+        const gx = Math.abs(p.x - 18) < 2, sz = Math.abs(p.z + 6.5) < 2.2, lx = Math.abs(p.x - 12.5) < 2.2;
+        const gate = R === 'Q' ? (gx && p.z < 9.4 ? P(18, 4) : P(18, 7.6)) : (gx && p.z > 2.2 ? P(18, 7.6) : P(18, 4)),
+          shut = R === 'B' ? (sz && p.x > 1.8 ? P(8, -6.5) : P(3.6, -6.5)) : (sz && p.x < 9.8 ? P(3.6, -6.5) : p.z < -10.5 ? P(12.5, -9.5) : P(8, -6.5)),   // round the violet container, not behind it
+          lane = R === 'N' ? (lx && p.z > -22.8 ? P(12.5, -17) : P(12.5, -21)) : (lx && p.z < -15.2 ? P(12.5, -21) : P(12.5, -17));
+        // the bond-house roof and the signal roof: over the plank, not through the parapet
+        if (R === 'R2') return Math.abs(p.x + 26) < 1.6 && p.z > -24 ? P(-26, -18.4, 8.4) : P(-26, -23.4, 9);
+        if (R === 'R1') { const H = 8.4;
+          if (p.x > -20.2 && p.x < -12.4 && p.z > -19.6 && p.z < -16.9) return P(-11.4, -18.1, H);   // in the stair head: out by the roof door
+          if (p.x >= -12.4 && p.z < -16.3) return P(-11.4, -15.6, H);                                 // round the stair head, not into it
+          if (p.x > -21.4 && p.z >= -16.3) return P(-21.8, -15.9, H);
+          return Math.abs(p.x + 26) < 1.6 && p.z < -18 ? P(-26, -23.4, 9) : P(-26, -18.4, H); }
+        if (R === 'Q') return gate;
+        if (R === 'B') return shut;
+        if (R === 'N') return lane;
+        return T === 'Q' ? gate : T === 'B' ? shut : lane; };
+    }
 //@@COMBAT
   /* ================= v0.90 COMBAT team: how the guard fights, as people and as a group. Injected into the enemies
      section of the engine (it sees E, pl, combat, W, T, FX, G, P, fwd, alert). Every level uses it. ================= */
@@ -1178,6 +1212,13 @@
     if (e.mad && d > 4.5 && d < 13 && (e.leapCd || 0) <= 0 && r < 0.5) { e.state = 'leap'; e.st = 0; e.lp = { step: 0, tx: pl.pos.x, tz: pl.pos.z }; e.leapCd = 4; alert(e); return true; }
     return false;
   };
+  /* v0.92 LEVELS: the first time a boss shows one of his v0.90 moves, one line on what beats it, with this device's buttons. Once per player, not per play */
+  SC.bossTip = function (id) {
+    const k = 'sootborn-tip-' + id, B = SC.btn('dodge'), J = SC.btn('jump'); try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (er) { if (SC['tip_' + id]) return; SC['tip_' + id] = 1; }
+    const t = { gaff: 'THE GAFF GOES DOWN THE LINE HE SHOWS. *' + B + ': DODGE OFF IT*, AND HE IS OPEN.',
+      sweep: 'THE HALBERD GOES ALL THE WAY ROUND. *' + B + ': DODGE CLEAR*, OR ' + J + ' OVER IT.',
+      charge: 'HE CHARGES DOWN THE LINE. *' + B + ': DODGE SIDEWAYS.* LET HIM FIND THE WALL. HE WINDS HIMSELF ON IT.' }[id];
+    if (t) SC.ui.toast(t, 4.2); };
   SC.bossMove = function (e, dt, d, toYaw) {
     const m = e.mv, K = e.K, f = fwd(e.yaw, _b), done = c => { e.release(); e.state = 'chase'; e.st = 0; e.cool = c === undefined ? SC.rand(K.cool[0], K.cool[1]) : c; e.mv = null; };
     if (!m) { done(0.4); return; }
@@ -1185,7 +1226,7 @@
     e.vel.multiplyScalar(Math.exp(-10 * dt));
     if (m.step === 0) {                                         // the wind-up, the same every time
       if (e.st < W1 * 0.7) e.yaw = SC.dampAng(e.yaw, toYaw, 8, dt);
-      if (!m.told) { m.told = 1;
+      if (!m.told) { m.told = 1; if (e.kind === 'boss') SC.bossTip(m.id);
         if (m.id === 'sweep') SC.tell(e, true, e.pos, 3.4);
         else if (m.id === 'chop') { m.at = { x: e.pos.x + f.x * 1.7, z: e.pos.z + f.z * 1.7 }; SC.tell(e, true, m.at, 2.3); }
         else if (m.id === 'charge') { SC.tell(e, true); lineTell(e, 9, true); _a.copy(e.head); FX.word('ON THE HATCH.', _a, '#ff3b30', 1.2); }

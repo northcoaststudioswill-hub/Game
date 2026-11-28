@@ -1239,5 +1239,12 @@ rep("mm[i].emissive.setRGB(0.2 * k, 0.14 * k, 0.03 * k)", "mm[i].emissive.setRGB
 
 /* ---- end LORE ---- */
 
+/* ---- v0.92 LEVELS polish ---- */
+// the first crossing on the docks told a keyboard player to "press ELEVEN": there is no such key here; it is the strike, held
+rep("U.toast(SC.hosted ? 'WHEN THE FURY BAR IS FULL, PRESS *ELEVEN*.'", "U.toast(SC.hosted ? 'WHEN THE FURY BAR IS FULL, *HOLD ' + SC.btn('use') + '*: ELEVEN.'");
+// FURY FULL came up every time the bar filled (six times in one riser run): the first time, then not again for a minute and a half
+rep("if (!(SC.story.plain && SC.story.plain())) U.toast('FURY FULL. *HOLD ' + SC.btn('use') + ': ELEVEN.*', 2.6);", "if (!(SC.story.plain && SC.story.plain()) && !(SC._furyT && SC.story.time - SC._furyT < 90)) { SC._furyT = SC.story.time || 0.01; U.toast('FURY FULL. *HOLD ' + SC.btn('use') + ': ELEVEN.*', 2.6); }");
+/* ---- end LEVELS ---- */
+
 writeFileSync(dir + 'issue.html', s);
 console.log('issue.html', (s.length / 1024).toFixed(1) + ' KB,', n, 'patches');

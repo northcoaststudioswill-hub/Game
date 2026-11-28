@@ -296,6 +296,7 @@
     ramp('wood', -27, -22.3, -25, -19.7, 8.2, 9, 8.4, 'z', 0xb98a55);
     parapet(-32, -46, -10, -22, 9, [{ side: 's', a: -27.2, b: -24.8 }, { side: 'e', a: -35.8, b: -32.7 }], STONE2);
     ramp('wood', -10.3, -35.5, -1.7, -33, 8.6, 9, 11, 'x', 0xb98a55);                                                               // the gangway up to Mooring One
+    wall(-10.3, -35.9, -1.7, -35.5, 8.4, 14); wall(-10.3, -33, -1.7, -32.6, 8.4, 14);   // v0.92: the gangway's lantern rails hold a man on it; walking off the side dropped him into the service cut
     [[-8, -35.6], [-4, -35.6], [-8, -32.9], [-4, -32.9]].forEach(p => D('flat', p[0], 4.8, p[1], 0.14, 10, 0.14, IRON, { outline: 0.03 }));
     D('flat', -6, 5, -35.6, 5.8, 0.1, 0.1, IRON, { rz: 0.7, outline: 0.02 }); D('flat', -6, 5, -32.9, 5.8, 0.1, 0.1, IRON, { rz: -0.7, outline: 0.02 });
     line(-10.2, 10.1, -35.5, -1.8, 12.1, -35.5, 0.035, GILT); line(-10.2, 10.1, -33, -1.8, 12.1, -33, 0.035, GILT);
