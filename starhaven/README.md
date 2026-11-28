@@ -31,9 +31,13 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.2.0 (Nov 27, 2026)
+## Playtest build: v0.3.0 (Nov 28, 2026)
 
-The newest build: [`releases/v0.2.0/`](releases/v0.2.0/RELEASE-NOTES.md), with `starhaven-v0.2.0-share.zip` to send.
+The newest build: [`releases/v0.3.0/`](releases/v0.3.0/RELEASE-NOTES.md), with `starhaven-v0.3.0-share.zip` to send.
+**The Fallen Sky**: the whole game rewritten into a new world of star Houses (see `WORLD.md`), keeping the plot's
+shape: the low star, the Eclipse and the Umbra, the Weighing, Caelum's light, and the Tether.
+
+Before it, v0.2.0 ([notes](releases/v0.2.0/RELEASE-NOTES.md)):
 **Chapter 4, The Spy in the Library**, is playable: the fae bow, winged spies, pages to defend in the Library
 stacks, and the Spymaster's Shadow. The game now runs from the Prologue to Chapter 4.
 

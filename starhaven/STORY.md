@@ -1,94 +1,69 @@
-# Starhaven — the story in this concept build
+# Starhaven — the story in this build
 
-> **The world has changed (Nov 28, 2026):** this file describes the story as it is in the game today, in the old fae-court setting. The new world, *The Fallen Sky*, is in `WORLD.md`; the game will be rewritten to it.
-
-This is what the player sees and does, in order. It follows `DESIGN.md` ("Story outline" and "Chapter goals"):
-the first playable is the Prologue through Chapter 2. Every line of dialogue lives in `game/src/story.js`.
+This is what the player sees and does, in order, in the world of `WORLD.md` (*The Fallen Sky*, from Nov 28, 2026).
+Every line of dialogue lives in `game/src/story.js`; the journal's pages are in `game/src/lore.js`.
 
 ## Who's who
-- **Wren** (you): a mortal huntress who feeds her sisters through a starving winter. Painter at heart. Later, fae.
-- **Nessa and Lissa:** Wren's sisters. Nessa is sharp and proud and won't eat until Wren does; Lissa is gentle and saves seeds.
-- **Lord Rowan:** High Lord of the Spring Court. Takes Wren across the Wall for killing his sacred stag. Kind, careful, possessive.
-- **The Thorn Queen:** the fae tyrant who seized the courts from Under the Mountain.
-- **Lord Caelum:** High Lord of the Court of Dusk, ruler of Starhaven. Wren's mate: he felt the bond from the first day.
-- **The Iron King:** across the sea, building an army, using the war between Spring and Dusk.
-- **Bram**, **Iris** and **Thane:** three of the Five, Caelum's inner circle (general, seer, scholar).
+- **Wren** (you): a mortal huntress who feeds her sisters through a starving winter. Painter at heart. Later, Lit.
+- **Nessa and Lissa:** Wren's sisters, Below. Nessa is sharp and proud and won't eat until Wren does; Lissa saves seeds.
+- **Lord Rowan** of the Dawn House: takes Wren up the Stair for putting out his House's heir-star. Kind, careful, possessive.
+- **Vael, the Eclipse:** the tyrant who swallowed the Houses' light and held their Lords in the Umbra.
+- **Lord Caelum** of the Dusk House, ruler of Starhaven. Gave dead Wren half of his own star, tethering her to him without asking.
+- **The Iron King:** Below, across the sea. Mines fallen stars, wakes the Eclipse's glass, uses the war between Dawn and Dusk.
+- **Bram**, **Iris** and **Thane:** three of the Five, Caelum's sworn circle (general, star-reader, keeper of the Library).
 
-## Prologue, part 1: The Winter Woods (playable; Wren is mortal: one jump, no dash, a bow)
-Starts at the sisters' cottage. Nessa and Lissa (both can be talked to) send Wren out hunting. Glittering tracks lead to a
-clearing and a **white stag**. Get too close and it bolts; stop back and shoot.
-- **Cinematic:** the arrow, the stag falling, gold light pouring out of it (it was fae).
-- **Cinematic:** that night, meat in the pot, then the door bursts in. **Lord Rowan:** "Who killed the white stag?"
-  (choose how Wren answers). The Treaty: a life for a life. Nessa offers herself; Wren goes instead.
-- **Cinematic:** the Wall, a curtain of light; on the other side it is spring.
-- Goals: hunt in the woods; shoot the white stag.
+## Prologue, part 1: The Winter Woods (Wren is mortal: one jump, no dash, a bow)
+Firewood, three snares, Father's targets, wintergreen for Lissa, a starving wolf (spare it or not), a rabbit (choose).
+In the clearing, a **low star** drifts over the snow. Shoot it and it falls and goes out: it was the Dawn House's heir.
+- That night: bread bought with a jar of starlight, then **Lord Rowan** at the door: "Who put out the star in the
+  clearing?" The **Accord of the Horizon**: a light for a light. Nessa offers herself; Wren goes instead.
+- **The ride**: on Rowan's mare of morning, into the screen, through the pines to the **Horizon**, which opens at dawn.
 
-## Beyond the Wall (cinematic montage)
-The Spring Court garden: Rowan gives Wren paints, but never a door out. The Thorn Queen's blight spreads; she takes the
-High Lords Under the Mountain, and Wren goes after Rowan. In a cell in the Deep, feverish and dying, **Caelum** appears
-out of the dark and offers a bargain: he heals her, she gives him one week of every month (choose how she answers).
-The queen announces three trials.
+## Above the Horizon (scenes)
+The **Dawnhold**: always early morning, paints from three Houses, never a door out. **The Eclipse** swallows the Houses
+one by one and drags the Seven Lords into the **Umbra**. Wren goes after Rowan. In a cell, cut by black glass and
+fading, **Caelum** lends her some of his light (a **debt**, carried as a ring of stars on her wrist). Three trials.
 
-## Prologue, part 2: Under the Mountain (playable: the three trials)
-1. **The riddle:** "What is buried in the dark, and grows anyway?" Wrong answers and the queen asks again. ("A seed":
-   Lissa's seeds.)
-2. **The maze:** the platforming course. Caelum speaks to her in her head through the bargain and lends her his speed:
-   the double jump and the dash.
-3. **The beast:** the Deep Wyrm wakes and chases her to the light.
-- **Cinematic:** she wins, the queen frees the High Lords, then kills Wren with her last thorn.
-- **Cinematic:** Caelum gives her his blood. She wakes fae, and for the first time feels the thread of light between
-  them: the mating bond he always felt and she, as a mortal, couldn't. Rowan carries her home to Spring.
-- Goals: answer the riddle; get through the maze; outrun the Wyrm.
+## Prologue, part 2: The Umbra (the three trials)
+1. **The Weighing:** three altars, three memories: Father's voice, the first time she painted, Nessa laughing. She lays
+   one down and the dark keeps it. There is no right answer; the story remembers which (Bram's rings, her first mural).
+2. **The Climb:** the platforming road, with Caelum in her head lending her the double jump and the dash. Gaps drop into
+   the cells below (a hunter's pack, a tally, glasslings); Caelum and a caged Rowan can be spoken to.
+3. **The Dark:** the Swallowing Dark chases her to the light.
+- The Eclipse keeps her word, then kills Wren with a shard of black glass. **Caelum gives her half of his own star.**
+  She wakes **Lit**, her freckles glowing, pulled toward him like gravity. Rowan carries her home to the Dawnhold.
 
-## Chapter 1: Ashes (walk, talk, paint, no enemies)
-Three months later. Rowan has locked the windows and doubled the guards; the thread in Wren's chest pulls toward Dusk.
-Midnight: Caelum appears at her window, calls in the bargain, and **steals her** out of the Spring Court. He walks her up the road
-(winnowing ahead in starlight each time), shows her Starhaven glowing in the distance, and explains the city has gone
-dark from the war. At the gate he asks her to paint. She paints the first mural and the whole street lights up.
-On the roof of his house he tells her the truth: **they are mates** (choose how she takes it). In Spring, Rowan finds
-her bed empty, calls it theft, and **declares war on the Court of Dusk**.
-- Goals: walk with Caelum to Starhaven; paint the first mural; meet Caelum on his rooftop.
+## Chapter 1: Ashes (walk, talk, paint, light the street)
+Three months later. Caelum appears at her window to collect his debt, which can only be repaid in his city, and they
+fall upward as a comet (the flight). He walks her up the road, falling ahead like a star. She paints the first mural (a
+constellation) and lights Mirelle's four lamps. On his roof he tells her the truth: **the Tether**. He tied his light to
+hers while she was dead, without asking. Be angry (he respects it), ask if it can be undone (he'll help), or take his
+hand (it costs him: he wants her to be angry first). Rowan calls it theft and marches the Dawn on Dusk.
 
-## Chapter 2: The Five (daggers, pogo, first enemies)
-Bram tests Wren at the Training Ring: a 3-hit combo on the dummy, then his thorn pit (bounce on the buds with a
-downward strike). Iris says hello (optional). Bram sends her through the north gate to clear three thorn sprites,
-the Iron King's creatures. Caelum arrives, then **Iris's vision**: threads over the sea, an iron crown pulling on two
-mortal girls. The Iron King knows Wren's name, and he is reaching for her sisters.
-- Goals: show Bram your daggers; cross the thorn pit; clear the thorn sprites (count shown).
+## Chapter 2: The Five (daggers, guard, the glass pit, first enemies)
+Bram teaches the combo, rising strike, dash strike and guard, then his **glass pit**. Iris reads the stars. Three
+**glasslings** (the Eclipse's glass, woken by the Iron King) over the north wall. Iris's vision: the iron is reaching for
+Wren's sisters.
 
 ## Chapter 3: First Light (Flame, wyrmlings, a boss)
-Wren dreams of fire and wakes with her palm glowing. **Thane**, keeper of the Library, explains: the Thorn Queen drained
-the power of all seven courts for fifty years; when she fell it broke loose, and some of it went into Wren's stopped
-heart. Flame woke first. Light three braziers; burn the queen's last thorns off the mountain road; hunt the **Old Wyrm**
-that is killing shepherds (two wyrmlings on the way: jump the charge, hit from behind). On the peak, **Rowan** comes for
-Wren and she refuses him (choose how). "Then I'll take you back. One way or another."
-- Goals: light the braziers; burn the thorns; hunt the beast.
-- Evening 3: Caelum on the rooftop ("you called it home") or Thane in the Library (forty-one questions).
+The Ember House's swallowed spark wakes in Wren's palm. Thane: the Eclipse swallowed a piece of every House's star, and
+some of it fell into the only star that had just been lit. Light three braziers, **melt the eclipse glass** off the
+mountain road, hunt the **Old Wyrm**, a star-eater. On the peak, Rowan, gold as morning: come home. She refuses.
 
-## Chapter 4: The Spy in the Library (the fae bow, winged spies, a boss)
-Three nights after the Old Wyrm, something with wings landed on the Library roof; by morning, every map of Starhaven
-and the Library's own floor plans had pages cut out. Thane gives Wren a **fae bow** that Bram strung in secret (his
-promise in Chapter 2). Two **winged spies** hang over the courtyard out of dagger reach: an arrow pins a wing, the spy
-falls, and the daggers finish it. Three more go for the oldest books, open on three **lecterns** in the stacks (galleries
-three rows apart): every page they carry off is lost, and remembered. In the reading hall, the **Spymaster's Shadow**
-(DESIGN.md's Chapter 4 boss): shoot it until its wings fail, cut it on the floor. It leaves a letter sealed with
-Spring's rose: "She will be at the Library at first light. Take the maps. Leave her to me." Rowan is trading
-Starhaven's doors to the Iron King for Wren. In the margin, in iron-grey ink: **Weaver**.
-- Goals: shoot the spies out of the courtyard sky; drive the spies out of the stacks before they carry off the pages;
-  bring down the Spymaster's Shadow. Optional: relight the four reading lamps.
-- Evening 4: Caelum on the rooftop ("Rowan wrote to the Iron King because of Rowan"), Thane mending the dome (the
-  Weaver), or Iris in her tower (the Weaver has the sisters' names on her wall).
+## Chapter 4: The Spy in the Library (the starbow, winged spies, a boss)
+Bram strung her a **starbow**. Shoot the Iron King's winged spies out of the courtyard, keep them from the lecterns'
+pages in the stacks, and bring down the **Spymaster's Shadow**. It leaves a letter sealed with the **Dawn House's
+sunburst**: "She will be at the Library at first light. Take the maps. Leave her to me." In the margin: **Cartographer**.
 
 ## Evenings and bonds
-- **After Chapter 1:** a night on the rooftop with Caelum. Starlit wine. Show him your sketchbook (a gift he loves),
-  toast to the bargain, or ask about his nightmares.
-- **After Chapter 2:** choose who to spend the evening with. **Caelum** (the Iron King asked about Wren by name; he
-  releases her from the bargain and she stays anyway), **Bram** (spiced bread or sparring by the fire; his brother lost on
-  the north wall), or **Iris** (sugared plums in her tower; her secret about Caelum's thread).
-- **Hearts:** 5 each. Heart 1 when you meet; then 40, 120, 240, 400 points. Every new heart plays a short scene.
+- After Chapter 1: the rooftop with Caelum (sketchbook, a toast to the debt, his nightmares).
+- After Chapters 2, 3 and 4: the Lamp Square, choosing who to spend the evening with.
+- Hearts: 5 each; heart 1 on meeting, then 40, 120, 240, 400 points. Every heart plays a scene, gives a boon in a
+  fight, and writes journal pages.
 
 ## Then
-A last scene: a week after the Library, Thane circles one word on the pinned letter, and across the sea a loom stops. Next: Chapter 5, The Weaver's Cottage.
+A week after the Library, Thane circles one word on the pinned letter, and across the sea a pen stops. Next: Chapter 5,
+The Cartographer's House.
 
 ## How the player always knows what's going on
 - The **GOAL line** at the top always shows the chapter and the one thing to do now.

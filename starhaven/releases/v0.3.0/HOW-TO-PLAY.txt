@@ -1,0 +1,22 @@
+STARHAVEN v0.3.0
+Open starhaven-v0.3.0.html in any browser. On a phone, hold it either way up.
+
+Touch: slide a thumb on the left half to move. Buttons on the right: JUMP, STRIKE (or SHOOT), DASH, the down arrow,
+FLAME, BOND ART when it appears, TALK when someone has something to say.
+Controller: A jump, X strike, B dash, Y talk, left bumper flame, right trigger Bond Art, Start pause.
+Keyboard: A/D or arrows move, Space jump, J strike, Shift dash, W talk, F flame, R Bond Art, Esc pause.
+
+The pause menu has "How it works" (every system explained) and Wren's journal.
+Saves stay on this device, in this browser.
+
+Old Wyrm: hit its back, not its head. Jump or dash through its charge. When it crouches, leave the shadow on the
+ground. Throw fire while it breathes in. A down strike onto its back bounces you clear.
+
+Wren's journal (pause menu) has four tabs. Bonds shows what each heart gives and where each bond is heading.
+Pages fills with lore as you play.
+
+New: the up-arrow button is a rising strike. Hold the down-arrow button on the ground to guard; raise it at the
+last moment to parry. Strike during a dash for a lunge. (Keys: hold W + J, hold S. Controller: up + X, hold down.)
+
+Chapter 4: the fae bow is on its own button. BOW on the screen, I on a keyboard, RB on a controller. It aims itself;
+hold up to aim high. An arrow drops a spy to the floor: finish it with your daggers.

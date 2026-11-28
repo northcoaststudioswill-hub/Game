@@ -29,11 +29,11 @@ The characters, places and story are our own, with their own names and designs. 
 | In the books | In our game (working name) | Role in the game |
 | --- | --- | --- |
 | Feyre | **Wren**, a huntress and painter | You. She fights with a bow and daggers, and paints murals to bring the city back to life |
-| Rhysand / the Night Court | **Lord Caelum**, High Lord of the Court of Dusk | Main romance and mentor, and the ruler you co-lead with |
+| Rhysand / the Night Court | **Lord Caelum**, Lord of the Dusk House (see WORLD.md) | Main romance and mentor, and the ruler you co-lead with |
 | Velaris | **Starhaven**, the hidden city | The home base you rebuild |
 | The inner circle | **The Five**: a warrior, a spymaster, a seer, a cousin who's a diplomat, and a scholar | Companions with their own bond stories and abilities |
-| Hybern's king | **The Iron King** from across the sea | The main villain, mostly unseen until the finale |
-| Amarantha / Under the Mountain | **The Thorn Queen** and **the Deep** | The prologue and Wren's nightmares |
+| Hybern's king | **The Iron King**, Below, across the sea, who mines fallen stars | The main villain, mostly unseen until the finale |
+| Amarantha / Under the Mountain | **Vael, the Eclipse** and **the Umbra** | The prologue and Wren's nightmares |
 
 Wren's sisters stay in the story too. Rescuing and protecting them is the emotional core of the middle chapters, just as it is in the books.
 
