@@ -8,19 +8,26 @@ got 4 to 20 minutes each, mostly menus and drills, so games themselves are still
 
 ## Open
 
-| # | Severity | Area | Bug | Where | Seen by |
-|---|---|---|---|---|---|
-| B1 | minor | Drills / camera | Finishing drills use a side-on camera, so "stick up" no longer points at the rim. | drill camera setup | FullCourt Press |
-| B2 | minor | Results | TEAMMATE GRADE shows a letter (often F for beginners) with no reason given. | main.js:104 | Couch Co-Op |
-| B3 | minor | Onboarding | "PERFECT RELEASE · TOO MUCH HAND" and "TAKE IT BACK PAST THE ARC" are never explained. | ball.js:291 | Couch Co-Op, Pixel Press |
-| B4 | minor | Check-up | From the camera behind you, the on-ball defender (about 0.85 m away) hides your player, so it looks like he is standing inside you. | camera / check-up spacing | Pixel Press |
-| B5 | polish | Hub | "Nobody" next to the HC reads like a missing name; it is the rank. | data.js:193, HUD | Pixel Press |
-| B6 | polish | Builder | Nepo Baby's starting total (600 + 400) is never shown. | core.js:16, data.js:62 | Couch Co-Op |
-| B7 | polish | HOW IT WORKS | Lists keyboard, pad and phone buttons in one sentence. | guide.js HOWTO | Couch Co-Op |
+Nothing open from the four blind reviews. Add new real bugs here.
 
 Design questions from the same reviews (not bugs, waiting on a decision): the 7'3" slasher keeps 99 Dunk and the dunk
-threshold also drops with height; OVR counts only the best 12 of 19 ratings; games to 11 take a beginner 5+ minutes;
-the path from the builder to a first real game is long.
+threshold also drops with height; OVR counts only the best 12 of 19 ratings; the path from the builder to a first real
+game is long. (Game length is decided: lucky 7, win by 2.)
+
+## Fixed (0.19.36)
+
+| # | Bug | Fix | Test |
+|---|---|---|---|
+| B1 | Finishing drills: "stick up" did not point at the rim from a cone, and up out of range is a jumper | Layup Lines and the Mikan drill draw your finishing range on the floor; it lights green with the ball inside it ("IN RANGE · SKILL STICK ↑") | tests/lucky7.mjs |
+| B2 | TEAMMATE GRADE gave a letter with no reason | The two biggest pluses and the biggest minus print with it; the bar scales with game length | tests/lucky7.mjs |
+| B3 | "Too much hand" and "take it back" never explained | A one-time plain-words tip the first time each happens (S.tips) | tests/lucky7.mjs |
+| B4 | Check-up: you and your man lined up with the camera, so he vanished behind you ("standing inside me") | The check is taken a step off the middle (x 1.1), so the camera sees both | tests/smoke.mjs |
+| B5 | "Nobody" next to the HC read like a missing name | The chip reads RANK · Nobody | tests/lucky7.mjs |
+| B6 | Nepo Baby's starting total never shown | The builder footer says YOU START WITH 1,000 HC (600 + 400 from Nepo Baby) | tests/lucky7.mjs |
+| B7 | HOW IT WORKS listed keyboard, pad and phone buttons together | It names only the device you are using | tests/lucky7.mjs |
+
+Also 0.19.36: every game is LUCKY 7, WIN BY 2 (STREET, RUCKUS, Ones, Brennick, the ladder, the book's simulated games);
+7-6 plays on. Game point is called when one bucket can win it.
 
 ## Fixed (0.19.35)
 

@@ -99,7 +99,7 @@ function devRender() {
     const os = DEV.opp === 'max' ? `a maxed-out ${STYLE[DEV.oppStyle].n}` : `a ${DEV.oppOvr} OVR`;
     h += `<div class="card"><h3>OPPONENT</h3><p>Next games are against ${os}.</p><div>${Btn('MAXED OUT', () => { DEV.opp = 'max'; rerender(); }, 'sm ' + (DEV.opp === 'max' ? '' : 'alt'))} ${Btn('BY OVR', () => { DEV.opp = 'ovr'; rerender(); }, 'sm ' + (DEV.opp === 'ovr' ? '' : 'alt'))}</div>`;
     h += DEV.opp === 'max' ? `<div style="margin-top:6px">${STYLES.map(s => Btn(s.n, () => { DEV.oppStyle = s.id; rerender(); }, 'sm ' + (DEV.oppStyle === s.id ? '' : 'alt'))).join(' ')}</div>` : `<label class="sl">OVR <b id="dov">${DEV.oppOvr}</b></label><input type="range" min="50" max="99" step="1" value="${DEV.oppOvr}" data-k="${on(el => { DEV.oppOvr = +el.value; $('dov').textContent = el.value; })}">`;
-    h += `</div><div class="card"><h3>GAMES</h3><div>${Btn('1 v 1 · to 11', () => devPlay('1v1'), 'sm')} ${Btn('STREET 3v3', () => devPlay('s3'), 'sm')} ${Btn('RUCKUS 2v2', () => devPlay('j2'), 'sm')} ${Btn('RUCKUS 3v3', () => devPlay('j3'), 'sm')}</div></div>`;
+    h += `</div><div class="card"><h3>GAMES</h3><div>${Btn('1 v 1 · lucky 7', () => devPlay('1v1'), 'sm')} ${Btn('STREET 3v3', () => devPlay('s3'), 'sm')} ${Btn('RUCKUS 2v2', () => devPlay('j2'), 'sm')} ${Btn('RUCKUS 3v3', () => devPlay('j3'), 'sm')}</div></div>`;
   } else if (t === 'reel') {
     h += `<p class="mu">Plays every animation in the group with your current build, on a court, through the same code as a game. It loops; pause to leave.</p>`;
     for (const k in REELS) h += `<div class="card"><h3>${REELS[k].n}</h3><p>${REELS[k].list().map(e => e.n).join(' · ')}</p>${Btn('PLAY REEL', () => devReel(k), 'sm')}</div>`;
@@ -118,7 +118,7 @@ function devPlay(kind) {
     startMatch({ mode: { id: 'dev', n: 'DEV ROOM', size: 1, arcade: false, to: 999 }, tier: TIERS_COURT[0], practice: 'dev', court: 'street', hoopTier: 2, ball: S.worn.ball, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], kind === 'reel' ? [{ b: rimGuard(), ctrl: -1, ai: 1 }] : []], onEnd: back });
     return;
   }
-  const m = kind === '1v1' ? { id: '1v1', n: 'DEV 1V1', size: 1, arcade: false, to: 11 } : MODES.find(x => x.id === kind);
+  const m = kind === '1v1' ? { id: '1v1', n: 'DEV 1V1', size: 1, arcade: false, to: 7 } : MODES.find(x => x.id === kind);
   const lvl = DEV.opp === 'max' ? 1 : clamp((DEV.oppOvr - 50) / 45, 0.3, 1);
   const team = (mine) => { const t = []; for (let i = 0; i < m.size; i++) t.push(mine && i === 0 ? { b: myBuild(), ctrl: 0, mine: true } : { b: devOpp(), ctrl: -1, ai: lvl }); return t; };
   const used = new Set([S.name]); const tm = [team(true), team(false)]; for (const t of tm) for (const sp of t) if (!sp.mine) { let n = sp.b.name; while (used.has(n)) n = pick(NPC_NAMES); used.add(n); sp.b.name = n; }

@@ -101,8 +101,14 @@ function finishGame(res, m, tier, st, cfg) {
   if (evOn('bucket')) { vc *= 1.25; notes.push('BUCKET BONANZA +25% HC'); }
   if (cfg.bonus) { const bo = cfg.bonus(res); if (bo) { vc += bo.vc; rep += bo.rep || 0; notes.push(bo.note); } }
   { // teammate grade: the things that do not show up as points
-    const g = (s.ast || 0) * 2 + (s.scr || 0) * 1.5 + (s.chg || 0) * 3 + (s.dive || 0) * 2 + (s.touch || 0) * 1.5 + (s.box || 0) + (s.stl || 0) + (s.blk || 0) + (s.reb || 0) * 0.5 - (s.fouls || 0) * 1.5 - Math.max(0, (s.fga || 0) - (s.fgm || 0) - 3) * 0.6;
-    const gr = g >= 10 ? ['A', 60] : g >= 6 ? ['B', 35] : g >= 3 ? ['C', 15] : g >= 1 ? ['D', 0] : ['F', 0]; res.grade = gr[0]; if (m.size > 1) { vc += gr[1]; notes.push(`TEAMMATE GRADE ${gr[0]}` + (gr[1] ? ` · +${gr[1]} HC` : '')); } }
+    const miss = Math.max(0, (s.fga || 0) - (s.fgm || 0) - 2), parts = [[s.ast, 2, 'assist'], [s.scr, 1.5, 'screen'], [s.chg, 3, 'charge taken'], [s.dive, 2, 'floor dive'], [s.touch, 1.5, 'quick touch'], [s.box, 1, 'box out'], [s.stl, 1, 'steal'], [s.blk, 1, 'block'], [s.reb, 0.5, 'board'], [s.fouls, -1.5, 'foul'], [miss, -0.6, 'missed shot past two']]
+      .map(([n, w, l]) => [n || 0, (n || 0) * w, l]).filter(x => x[0] > 0);
+    const g = parts.reduce((t, x) => t + x[1], 0), k = clamp((m.to || 11) / 11, 0.5, 1);      /* the bar scales with the length of the game (lucky 7 is shorter than 11) */
+    const gr = g >= 10 * k ? ['A', 60] : g >= 6 * k ? ['B', 35] : g >= 3 * k ? ['C', 15] : g >= 1 * k ? ['D', 0] : ['F', 0]; res.grade = gr[0];
+    // say why: the two biggest pluses and the biggest minus (an F with no reason read like an insult)
+    const pl = n => (n === 1 ? '' : 's'), say = x => x[0] + ' ' + x[2] + pl(x[0]), up = parts.filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 2), dn = parts.filter(x => x[1] < 0).sort((a, b) => a[1] - b[1])[0];
+    const why = (up.length ? '+ ' + up.map(say).join(', ') : 'no assists, screens or boards') + (dn ? ' · − ' + say(dn) : '');
+    res.gradeWhy = why; if (m.size > 1) { vc += gr[1]; notes.push(`TEAMMATE GRADE ${gr[0]}` + (gr[1] ? ` · +${gr[1]} HC` : '') + ` (${why})`); } }
   { const nx = nexxCheck(res); if (nx) { vc += nx.vc; rep += nx.rep; notes.push(nx.note); } }      /* Nexx filmed it */
   vc = Math.round(vc); rep = Math.round(rep);
   const bx = { F: 12 + s.dunks * 20 + (s.fgm - s.threes) * 7, S: 12 + s.greens * 12 + s.threes * 14, P: 12 + s.ast * 22 + s.ankles * 24, D: 12 + s.stl * 24 + s.blk * 24 + s.reb * 9 };

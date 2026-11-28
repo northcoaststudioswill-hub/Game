@@ -318,7 +318,7 @@ function buildPit() {
     for (const sx of [-1, 1]) ink(M(box(0.22, 4.6, 0.22), toon('#1c1d22'), x + sx * 1.5, 2.3, PIT_DOOR_Z - 0.4, scene), 1.08);
     M(box(3.2, 0.12, 0.26), flat(cols[i]), x, 3.5, PIT_DOOR_Z - 0.4, scene); M(box(0.08, 3.5, 0.1), flat(cols[i]), x - 1.36, 1.75, PIT_DOOR_Z - 0.3, scene); M(box(0.08, 3.5, 0.1), flat(cols[i]), x + 1.36, 1.75, PIT_DOOR_Z - 0.3, scene);
     const s = sign(m.n.replace(' ', '\n'), 3.0, 1.35, cols[i], '#0a0a0e'); s.position.set(x, 4.4, PIT_DOOR_Z - 0.3); scene.add(s);
-    const ic = sign(m.arcade ? 'TO 21 · NO RULES' : 'TO 11 · ONES & TWOS', 2.6, 0.34, cols[i], '#0a0a0e', { border: false }); ic.position.set(x, 3.2, PIT_DOOR_Z - 0.26); scene.add(ic);
+    const ic = sign(m.arcade ? 'LUCKY 7 · NO RULES' : 'LUCKY 7 · WIN BY 2', 2.6, 0.34, cols[i], '#0a0a0e', { border: false }); ic.position.set(x, 3.2, PIT_DOOR_Z - 0.26); scene.add(ic);
     // the court behind this gate
     const ct = new THREE.Mesh(new THREE.PlaneGeometry(4.3, 9), new THREE.MeshBasicMaterial({ color: m.arcade ? 0x2a1450 : 0x3b4252 })); ct.rotation.x = -Math.PI / 2; ct.position.set(x, 0.01, PIT_DOOR_Z - 5.4); scene.add(ct);
     M(box(4.3, 0.02, 0.1), flat(cols[i]), x, 0.03, PIT_DOOR_Z - 1.0, scene);

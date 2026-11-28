@@ -89,13 +89,13 @@ function uiStep(dt) {
 }
 
 // ---------- toasts ----------
-function toast(big, small, cls) { const t = document.createElement('div'); t.className = 'toast ' + (cls || ''); t.innerHTML = esc(big) + (small ? `<small>${esc(small)}</small>` : ''); $('toasts').appendChild(t); setTimeout(() => t.remove(), 3500); while ($('toasts').children.length > 3) $('toasts').firstChild.remove(); }
+function toast(big, small, cls) { const t = document.createElement('div'); t.className = 'toast ' + (cls || ''); t.innerHTML = esc(big) + (small ? `<small>${esc(small)}</small>` : ''); $('toasts').appendChild(t); setTimeout(() => t.remove(), cls === 'tip' ? 7500 : 3500); while ($('toasts').children.length > 3) $('toasts').firstChild.remove(); }
 
 // ---------- HUD ----------
 function project(x, y, z) { _v.set(x, y, z).project(camera); return [(_v.x * 0.5 + 0.5) * innerWidth, (-_v.y * 0.5 + 0.5) * innerHeight]; }
 function hudShow(on) {
   $('hud').style.display = on ? 'block' : 'none'; if (!on || !MT) return;
-  $('modeTag').textContent = MT.cfg.mode.n + (MT.practice ? '' : ' · ' + MT.cfg.tier.n + ' · FIRST TO ' + MT.cfg.mode.to);
+  $('modeTag').textContent = MT.cfg.mode.n + (MT.practice ? '' : ' · ' + MT.cfg.tier.n + ' · ' + toLabel(MT.cfg.mode));
   $('sb').style.display = MT.practice ? 'none' : 'flex'; $('rackHud').style.display = MT.practice === 'rack' || MT.practice === 'drill' ? 'block' : 'none'; $('brav').style.display = MT.practice ? 'none' : 'block';
   $('n0').textContent = (S.name || 'YOU').slice(0, 10); $('flts').innerHTML = ''; $('call').className = '';
 }
@@ -129,7 +129,7 @@ function hudMatch() {
   }
 }
 function uiHud() {
-  if (!S) return; $('wvc').textContent = S.vc.toLocaleString(); const r = rankOf(S.rep); $('wrank').textContent = RANKS[r].n;
+  if (!S) return; $('wvc').textContent = S.vc.toLocaleString(); const r = rankOf(S.rep); $('wrank').textContent = 'RANK · ' + RANKS[r].n;
   const nx = RANKS[r + 1]; $('repbar').firstElementChild.style.width = (nx ? (S.rep - RANKS[r].rep) / (nx.rep - RANKS[r].rep) * 100 : 100) + '%';
   $('tA').textContent = 'GO'; $('hintR').textContent = 'LOOK';
   const on = NET.room && NET.connected ? netOthers().length : -1, oc = $('wonline'); oc.style.display = on >= 0 ? '' : 'none'; if (on >= 0) oc.innerHTML = (on ? `<b>${on}</b> online with you` : 'online · nobody else here') + (NET.crew ? ` · crew of <b>${NET.crew.m.length + 1}</b>` : NET.inCrew ? ' · in a crew' : '');
@@ -203,7 +203,7 @@ function uiBuilder(opts) {
     h += `<label class="sl">WINGSPAN <b id="ls">${fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5))}</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.s * 10)}" data-k="${on(el => { T.build.body.s = el.value / 10; upd(); })}"></div>`;
     h += `<div class="cat">LOOK</div><div class="card">` + SKINS.map((c, i) => `<span class="sw ${i === T.build.skin ? 'sel' : ''}" style="background:${c}" data-k="${on(() => { T.build.skin = i; rig(); rerender(); })}"></span>`).join('') + `<div style="margin-top:8px">` + DRIP.filter(d => d.slot === 'hair' && d.src === 'start').map(d => Btn(d.n, () => { T.hair = d.id; rig(); rerender(); }, 'sm ' + (T.hair === d.id ? '' : 'alt'))).join(' ') + `</div></div>`;
     h += `<div class="cat">ATTRIBUTE CAPS <span class="mu" style="text-transform:none;letter-spacing:.02em">— ${st.n}, max potential</span></div><div class="card" id="capbox">${capBars(T.build)}</div>`;
-    h += `</div><div class="pf" data-start="1">${Btn('HIT THE BLOCK <small style="opacity:.7">(START)</small>', () => {
+    h += `</div><div class="pf" data-start="1">${S.created ? '' : `<span class="mu" style="display:block;margin-bottom:4px;font-size:11px">YOU START WITH <b class="ye">${(S.vc + (ORIGIN[T.build.origin].k === 'vc' ? 400 : 0)).toLocaleString()} HC</b>${ORIGIN[T.build.origin].k === 'vc' ? ' (600 + 400 from ' + esc(ORIGIN[T.build.origin].n) + ')' : ''}</span>`}${Btn('HIT THE BLOCK <small style="opacity:.7">(START)</small>', () => {
       if (!(($('bname').value || T.name || '').trim()) && !T.warned && I_PAD()) { T.warned = true; T.kb = true; toast('NAME YOUR PLAYER', 'Or press HIT THE BLOCK again to go as ROOKIE.'); rerender(); if (!T.kb) $('bname').focus(); return; }      /* no more accidental "Nobody" */
       const nm = (($('bname').value || T.name || '')).trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();

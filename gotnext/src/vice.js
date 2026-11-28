@@ -167,7 +167,7 @@ function bkTeam(name, ovr, size, seed) { const ps = []; for (let i = 0; i < size
 // a quick model of a game: possessions until someone gets to the target. Used for the lines and for SIM.
 function bkSim(g) {
   const to = g.to, sc = [0, 0], pts = [g.t[0].ps.map(() => 0), g.t[1].ps.map(() => 0)]; let off = Math.random() < 0.5 ? 0 : 1, guard = 0;
-  while (sc[0] < to && sc[1] < to && guard++ < 400) { const o = g.t[off], d = g.t[1 - off], q = clamp(0.44 + (o.ovr - d.ovr) * 0.007, 0.2, 0.7);
+  while (!((sc[0] >= to || sc[1] >= to) && Math.abs(sc[0] - sc[1]) >= 2) && guard++ < 400) { const o = g.t[off], d = g.t[1 - off], q = clamp(0.44 + (o.ovr - d.ovr) * 0.007, 0.2, 0.7);
     if (Math.random() < q) { const w = o.ps.map(p => Math.pow(p.ovr / 80, 4)), tot = w.reduce((a, b) => a + b, 0); let r = Math.random() * tot, k = 0; while (k < w.length - 1 && r > w[k]) { r -= w[k]; k++; } const v = Math.random() < 0.22 ? 2 : 1; sc[off] += v; pts[off][k] += v; off = 1 - off; }
     else if (Math.random() > 0.28) off = 1 - off; }
   return { sc, pts };
@@ -210,7 +210,7 @@ function uiBook() {
   openPanel(() => {
     const SL = B.slate, sl = SL.slip, V = vice(); let h = `<div class="ph"><h2>TREY'S BOOK</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb"><p class="mu">"BRO. I'VE GOT A GUY. THE GUY IS ME." Pick winners, spreads and points. One pick is a single; more is a parlay: every one has to hit. Then watch the games, or let them run.</p>`;
     for (const g of SL.games) { const a = g.t[0], b = g.t[1], open = !sl && !g.res, sel = (k, s, o) => { const L = has(g.id, k); return L && L.s === s && L.o === o ? '' : 'alt'; };
-      h += `<div class="card"><h3>${esc(a.n)} <span class="mu">${a.ovr}</span> vs ${esc(b.n)} <span class="mu">${b.ovr}</span></h3><p class="mu">${g.n} · first to ${g.to}${g.res ? ` · <b class="cy">FINAL ${g.res.sc[0]} — ${g.res.sc[1]}</b>${g.res.sim ? ' (sim)' : ''}` : ''}</p>`;
+      h += `<div class="card"><h3>${esc(a.n)} <span class="mu">${a.ovr}</span> vs ${esc(b.n)} <span class="mu">${b.ovr}</span></h3><p class="mu">${g.n} · lucky ${g.to}, win by 2${g.res ? ` · <b class="cy">FINAL ${g.res.sc[0]} — ${g.res.sc[1]}</b>${g.res.sim ? ' (sim)' : ''}` : ''}</p>`;
       if (open) { h += `<div style="margin-top:6px"><span class="mono" style="font-size:10px">WINNER</span> ${Btn(`${esc(a.n)} ${g.ml[0]}`, () => tog(g.id, 'ml', 0), 'sm ' + sel('ml', 0))} ${Btn(`${esc(b.n)} ${g.ml[1]}`, () => tog(g.id, 'ml', 1), 'sm ' + sel('ml', 1))}</div>`;
         h += `<div style="margin-top:4px"><span class="mono" style="font-size:10px">SPREAD</span> ${Btn(`${esc(g.t[g.fav].n)} -${g.sp}`, () => tog(g.id, 'sp', g.fav), 'sm ' + sel('sp', g.fav))} ${Btn(`${esc(g.t[1 - g.fav].n)} +${g.sp}`, () => tog(g.id, 'sp', 1 - g.fav), 'sm ' + sel('sp', 1 - g.fav))} <span class="mu">1.87</span></div>`;
         for (const s of [0, 1]) h += `<div style="margin-top:4px"><span class="mono" style="font-size:10px">${esc(g.t[s].ps[0].n.toUpperCase())} PTS</span> ${Btn('OVER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 1), 'sm ' + sel('pr' + s, s, 1))} ${Btn('UNDER ' + g.pr[s], () => tog(g.id, 'pr' + s, s, 0), 'sm ' + sel('pr' + s, s, 0))} <span class="mu">1.87</span></div>`; }

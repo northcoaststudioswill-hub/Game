@@ -651,10 +651,10 @@ const BOOSTS = [
 
 // ---------- game modes (doors in the Cages) ----------
 const MODES = [
-  { id: 's2', n: 'STREET 2v2', size: 2, arcade: false, to: 11, d: 'Half court. 1s and 2s. First to 11. Call your own nothing.' },
-  { id: 's3', n: 'STREET 3v3', size: 3, arcade: false, to: 11, d: 'Half court threes. Spacing is a rumor.' },
-  { id: 'j2', n: 'RUCKUS 2v2', size: 2, arcade: true, to: 21, d: 'Arcade rules, no fouls, no manners: shove, haymaker, clothesline. Power-ups on the floor. Dunk from the logo. Catch fire.' },
-  { id: 'j3', n: 'RUCKUS 3v3', size: 3, arcade: true, to: 21, d: 'Arcade chaos with six people and no adults.' },
+  { id: 's2', n: 'STREET 2v2', size: 2, arcade: false, to: 7, d: 'Half court. 1s and 2s. Lucky 7, win by 2. Call your own nothing.' },
+  { id: 's3', n: 'STREET 3v3', size: 3, arcade: false, to: 7, d: 'Half court threes. Spacing is a rumor.' },
+  { id: 'j2', n: 'RUCKUS 2v2', size: 2, arcade: true, to: 7, d: 'Arcade rules, no fouls, no manners: shove, haymaker, clothesline. Power-ups on the floor. Dunk from the logo. Catch fire.' },
+  { id: 'j3', n: 'RUCKUS 3v3', size: 3, arcade: true, to: 7, d: 'Arcade chaos with six people and no adults.' },
 ];
 const TIERS_COURT = [
   { n: 'SIDE COURT', rank: 0, ai: 0.42, ovr: 58, mult: 1 },

@@ -89,17 +89,24 @@ function dPlace(x, z, ball) {
   else if (ball === false) { B.state = 'dead'; B.holder = null; B.pos.set(8.6, 0.125, 13.2); }
   else { B.pos.set(x, 1, z); give(me); }
 }
+// finishing range on the floor: inside the ring, the skill stick up is a layup or a dunk; outside it, up is a jumper.
+// It lights up when you are in it (the drill camera looks up the court, so "up" is not always at the rim from a cone).
+function dRange(D) { const r = finishRange(MT.me) + 0.6, m = M(new THREE.RingGeometry(r - 0.07, r, 64), new THREE.MeshBasicMaterial({ color: 0x3dffa0, transparent: true, opacity: 0.35, depthWrite: false }), 0, 0.022, 0, scene); m.rotation.x = -Math.PI / 2; D.marks.push(m); D.data.ring = m; D.data.ringR = r; }
+function dRangeStep(D) { const g = D.data.ring; if (!g) return; const inR = dHoop(MT.me) <= D.data.ringR, has = MT.B.holder === MT.me; g.material.opacity = inR && has ? 0.6 + 0.3 * Math.sin(MT.time * 12) : 0.3; g.material.color.setHex(inR ? 0x3dffa0 : 0xf2c14e);
+  if (inR && has && !D.data.ringSaid) { D.data.ringSaid = 1; floatTxt(MT.me, 'IN RANGE · SKILL STICK ↑', '#3dffa0'); } }
 const dMark1 = (D, x, z) => { if (!D.cur) D.cur = dMark(x, z, 0x3dffa0); D.cur.position.set(x, 0.025, z); };
 const greenX = () => evOn('green') ? 2 : 1;
 
 // each drill: begin (once), rep (set up the next attempt), make / miss, step (every frame), and whether it is done
 const DRILL_RUN = {
   layups: {
-    begin(D) { dCone(-4.2, 6.4); dCone(4.2, 6.4); },
+    begin(D) { dCone(-4.2, 6.4); dCone(4.2, 6.4); dRange(D); },
+    step(D) { dRangeStep(D); },
     rep(D) { const s = D.rep % 2 ? 1 : -1; dPlace(4.2 * s, 6.0, true); },
     make(D, e) { const v = e.how === 'dunk' ? 2 : 1; D.score += v; D.makes++; return '+' + v; },
   },
   mikan: {
+    begin(D) { dRange(D); }, step(D) { dRangeStep(D); },
     rep(D) { const s = D.rep % 2 ? 1 : -1; dPlace(1.05 * s, 0.75, true); dMark1(D, 1.05 * s, 0.75); },
     make(D) { D.score++; D.makes++; return '+1'; },
   },
@@ -295,7 +302,7 @@ const LADDER = [
   { name: 'Static', style: 'lockdown', ovr: 86, line: 'You will not score. I have it in writing.', worn: { hair: 'h_buzz', head: 'hd_antenna', face: 'f_goggles', top: 't_tankblk', arm: 'a_sleevered', bottom: 'b_long', socks: 's_neon', shoes: 'k_moon', back: 'bk_none', ball: 'bl_neon' } },
   { name: 'The Commissioner', style: 'showman', ovr: 92, line: 'I do not play people. I review them.', worn: { hair: 'h_flame', head: 'hd_capflag', face: 'f_gold', top: 't_gold', arm: 'a_chrome', bottom: 'b_gold', socks: 's_flag', shoes: 'k_gold', back: 'bk_cape', ball: 'bl_gold' } },
 ];
-const ONES = { id: '1v1', n: 'ONES', size: 1, arcade: false, to: 7, d: 'One on one to 7. Ones and twos. Winners stay.' };
+const ONES = { id: '1v1', n: 'ONES', size: 1, arcade: false, to: 7, d: 'One on one. Lucky 7, win by 2. Ones and twos. Winners stay.' };
 function ladderBuild(i) { const L = LADDER[i]; const b = withSeed(1000 + i, () => aiBuild(L.ovr, L.style)); b.name = L.name; b.keepLook = true; b.worn = Object.assign({}, L.worn); return b; }
 function uiLadder(i) {
   const L = LADDER[i], beaten = (S.ladder || 0) > i, open = (S.ladder || 0) >= i, pay = Math.round(ladderPay(i) * (beaten ? 0.3 : 1));

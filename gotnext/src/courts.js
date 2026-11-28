@@ -117,7 +117,7 @@ function drawJumbo(S, M_) {
   const g = x.createLinearGradient(0, 0, 512, 0); g.addColorStop(0, '#2a0f4a'); g.addColorStop(1, '#0d1a3a'); x.fillStyle = g; x.fillRect(0, 0, 512, 192);
   x.strokeStyle = '#ff4fd8'; x.lineWidth = 6; x.strokeRect(4, 4, 504, 184); x.textAlign = 'center';
   x.font = '900 104px Archivo, Impact, sans-serif'; x.fillStyle = '#33e0ff'; x.fillText(String(sc[t0]), 120, 128); x.fillStyle = '#ff4fd8'; x.fillText(String(sc[1 - t0]), 392, 128);
-  x.font = '900 34px Archivo, Impact, sans-serif'; x.fillStyle = '#ffc531'; x.fillText(M_.hotTeam >= 0 ? 'ON FIRE' : 'RUCKUS', 256, 92); x.font = '700 18px Archivo, sans-serif'; x.fillStyle = '#fff'; x.fillText('FIRST TO ' + M_.cfg.mode.to, 256, 128);
+  x.font = '900 34px Archivo, Impact, sans-serif'; x.fillStyle = '#ffc531'; x.fillText(M_.hotTeam >= 0 ? 'ON FIRE' : 'RUCKUS', 256, 92); x.font = '700 18px Archivo, sans-serif'; x.fillStyle = '#fff'; x.fillText(toLabel(M_.cfg.mode), 256, 128);
   x.font = '700 20px Archivo, sans-serif'; x.fillStyle = '#bff6ff'; x.fillText('US', 120, 168); x.fillText('THEM', 392, 168);
   j.tex.needsUpdate = true;
 }

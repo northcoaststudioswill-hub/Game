@@ -98,18 +98,25 @@ function startMatch(cfg) {
 }
 
 // ---------- flow ----------
+// first time something happens that needs explaining: say it once, in plain words, and never again
+function firstTip(k, big, small) { if (!S || (S.tips || (S.tips = {}))[k]) return; S.tips[k] = 1; toast(big, small, 'tip'); }
+// LUCKY 7, WIN BY 2: the target, and you have to be two clear when you get there (7-6 plays on to 8-6)
+const WIN_BY = 2;
+function toLabel(m) { return m.to >= 99 ? '' : 'LUCKY ' + m.to + ' · WIN BY ' + WIN_BY; }
+function gameWon(M_, t) { const to = M_.cfg.mode.to; return M_.score[t] >= to && M_.score[t] - M_.score[1 - t] >= WIN_BY; }
+function gamePtFor(M_, t) { const to = M_.cfg.mode.to, a = M_.score[t], b = M_.score[1 - t]; return a + 2 >= Math.max(to, b + WIN_BY); }      /* one bucket (a 2 at most) from winning */
 function setCheck(team, first) {
   const M_ = MT; M_.pp = 0; M_.phase = 'check'; M_.pt = first ? 2.2 : 1.15; M_.off = team; M_.needClear = false; M_.clock = 14; M_.looseT = 0;
   for (const q of M_.P) if (q.stam !== undefined) { q.stam = Math.min(100, q.stam + 16); q.gassed = false; }      /* a check-up is a breather */
   const offs = M_.P.filter(p => p.team === team), defs = M_.P.filter(p => p.team !== team);
   // the human takes the check when it is their ball
   offs.sort((a, b) => (b.user ? 1 : 0) - (a.user ? 1 : 0) || a.k - b.k);
-  const oSpots = [[0, 9.3], [-5.4, 5.6], [5.4, 5.6]];
+  const oSpots = [[1.1, 9.2], [-5.4, 5.6], [5.4, 5.6]];      /* the check is a step off the middle: dead centre, the camera, you and your man were one line and he vanished behind you */
   offs.forEach((p, i) => { p.x = oSpots[i][0]; p.z = oSpots[i][1]; });
   { const taken = new Set(); defs.forEach(p => { let m = p.man && p.man.team === team && !taken.has(p.man) ? p.man : offs.find(o => !taken.has(o)) || offs[0]; taken.add(m); p.man = m; const d = Math.hypot(m.x, m.z) || 1; p.x = m.x - m.x / d * 1.5; p.z = m.z - m.z / d * 1.5; }); }      /* one man each: two defenders on the same man were dropped on the same spot, one inside the other */
   for (const p of M_.P) { p.vx = p.vz = 0; p.y = 0; p.st = 'free'; p.t = 0; p.ai.mode = ''; p.ai.hold = 0; p.ai.spot = null; p.slowT = 0; p.callT = 0; p.ai.tx = p.x; p.ai.tz = p.z; }
   give(offs[0]); M_.B.assist = null;
-  if (!M_.practice) call(first ? 'CHECK UP' : 'CHECK', first ? `${M_.cfg.mode.n} · first to ${M_.cfg.mode.to}` : '', '#fff', 1.2);
+  if (!M_.practice) call(first ? 'CHECK UP' : 'CHECK', first ? `${M_.cfg.mode.n} · ${toLabel(M_.cfg.mode)}` : '', '#fff', 1.2);
 }
 // p.live: 'hold' (ball held, dribble still available), 'drib' (dribbling), 'dead' (picked up: pass, shoot, fake or pivot)
 function dribRules(p) { return p.user && !p.afk && !MT.reel; }
@@ -133,7 +140,7 @@ function foul(d, o, kind, keep) {
 const COURT = { x0: -8, x1: 8, z0: -1.6, z1: 13 };      /* the painted lines */
 function andOne(p, d) {
   const M_ = MT; if (M_.phase === 'over') return; M_.score[p.team] += 1; p.stats.pts += 1; call('AND ONE', p.b.name + ' +1 · ' + d.b.name + ' fouled', '#ffc531', 1.4);
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); say(p, 'end', 1); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
+  if (gameWon(M_, p.team)) { crowdReact('win', p.team); highlight('winner', p); say(p, 'end', 1); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function scorePts(p, pts, how) {
   const M_ = MT; if (p.pu && p.pu.id === 'double' && !M_.practice) { pts *= 2; p.pu = null; p.puA = null; if (M_.net === 'host') netEv({ k: 'pu', a: 'x', i: p.i }); call('DOUBLE UP', p.b.name + ' · that one counts ' + pts, '#ff4fd8', 1.2); }
@@ -159,7 +166,7 @@ function scorePts(p, pts, how) {
   { const eq = p.b.moves.celeb, vic = how === 'dunk' && p.finish ? p.finish.hit : null;      // what he does about it: his own celebration, or one that fits the play
     p.celebStyle = how === 'dunk' ? (vic ? pick(['stare', 'toosmall', 'flexdown', 'flexdown', 'rock']) : pick([eq, 'flexdown', 'pound', 'floor', 'nightnight', 'pout', 'greengiant', 'pour40', 'fentlean'])) : pts >= 2 ? pick([eq, eq, 'goggles', 'goggles', 'shh', 'shrug', 'nightnight', 'pout', 'iceveins', 'greenbean', 'callme']) : pick([eq, eq, eq, 'shrug', 'pound', 'bow', 'callme']);
     p.celebAt = vic || null; if (M_.net === 'host') netEv({ k: 'cs', i: p.i, s: p.celebStyle }); }
-  if (M_.score[p.team] >= M_.cfg.mode.to) { crowdReact('win', p.team); highlight('winner', p); say(p, 'end', 1); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
+  if (gameWon(M_, p.team)) { crowdReact('win', p.team); highlight('winner', p); say(p, 'end', 1); M_.phase = 'over'; M_.pt = 2.6; sfxM('buzz'); call(p.team === 0 ? 'BALL GAME!' : 'GAME OVER', `${M_.score[0]} — ${M_.score[1]}`, p.team === 0 ? '#33ff88' : '#ff4040', 2.5); }  gamePoint(p);
 }
 function floatTxt(p, txt, col) { hudFloat(p, txt, col); if (MT && MT.net === 'host') netEv({ k: 'f', i: p.i, t: txt, c: col || '#fff' }); }
 // a little dust off the court: landings, hard cuts, bodies hitting the floor
@@ -190,7 +197,7 @@ function gest(p) { const l = dHoop(p) || 1, dx = p.in.dx || 0, dz = p.in.dz || 0
 const HOP_T = 0.34;
 // hop step: a two-foot hop and gather, then a strong finish (or a jumper). Gets the ball past a reaching defender.
 function startHop(p, next, src, opt) {
-  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
+  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); if (p.user) firstTip('back', 'TAKE IT BACK', 'Street rule: after a miss, a block or a steal, the new team has to take the ball out past the three-point arc before it can score. Dribble or pass it out, then attack.'); return false; }
   const sp = Math.hypot(p.vx, p.vz), d = dHoop(p) || 1; let ux = sp > 1 ? p.vx / sp : -p.x / d, uz = sp > 1 ? p.vz / sp : -p.z / d;
   const len = next === 'finish' ? clamp(d - 1.1, 0.3, 1.15) : 0.9;
   // a hop step past a man who is leaning: he is frozen for a beat (Handles against his Perimeter D). Straight into a set body, it goes nowhere
@@ -201,7 +208,7 @@ function startHop(p, next, src, opt) {
   if (p.user) floatTxt(p, 'HOP STEP', '#f2c14e'); sfxM('step'); return true;
 }
 function startShot(p, src, floater, opt) {
-  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
+  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); if (p.user) firstTip('back', 'TAKE IT BACK', 'Street rule: after a miss, a block or a steal, the new team has to take the ball out past the three-point arc before it can score. Dribble or pass it out, then attack.'); return false; }
   opt = opt || {}; const d = dHoop(p), sp0 = Math.hypot(p.vx, p.vz);
   if (!floater && !opt.fade && p.user && ((p.lastMv && /stepback|moonwalk|snatch/.test(p.lastMv.id) && MT.time - p.lastMv.at < 0.45) || (p.mv && /stepback|moonwalk|snatch/.test(p.mv.mv.id) && MT.time - (p.comboT || -9) < 0.9))) { opt = Object.assign({}, opt, { fade: true, jumper: true }); p.stepJ = true; } else p.stepJ = false;      /* off a step-back: the step-back jumper (leaning away from the room you made) */
   if (!floater && !opt.hopped && !opt.fade && !opt.side && !opt.jumper && (d < 2.0 || (d < finishRange(p) && sp0 > 2.2 && (p.vx * -p.x + p.vz * -p.z) > 0 && src !== 'ai'))) return startFinish(p, p.user ? euroOf(p) : 0);
@@ -291,6 +298,7 @@ function releaseShot(p) {
   if (p.user && !s.auto) {
     const lbl = green && make ? (c < 0.4 ? 'GREEN' : 'GREEN · THROUGH A HAND') : green ? 'Perfect release · too much hand' : e < w * 2.2 ? (err < 0 ? 'Slightly early' : 'Slightly late') : err < 0 ? (e > 0.45 ? 'Very early' : 'Early') : (e > 0.45 ? 'Very late' : 'Late');
     fb(p, lbl + (c > 0.06 ? ` · ${Math.round(c * 100)}% contested` : ' · wide open'), green && make ? '#33ff88' : '#fff');
+    if (green && !make && p.user) firstTip('hand', 'PERFECT TIMING · TOO MUCH HAND', 'Your release was perfect, but a defender had a hand up (the % contested). Perfect timing beats a hand most of the time, not always. Find space, or take him off the dribble.');
     if (green && make) { p.stats.greens++; sfxM('green'); addBrav(p, 0.05); }
   }
   sfxM('whoosh');
@@ -342,7 +350,7 @@ function rimThreat(p) {
 }
 // opt: hopped (after a hop step), rev (reverse), layup (no dunk), kind (a layup from FINISHES), style (a dunk), euro
 function startFinish(p, euro, forceDunk, y0, opt) {
-  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); return false; }
+  if (MT.needClear && MT.off === p.team) { fb(p, 'TAKE IT BACK past the arc!', '#ff8a1f'); if (p.user) firstTip('back', 'TAKE IT BACK', 'Street rule: after a miss, a block or a steal, the new team has to take the ball out past the three-point arc before it can score. Dribble or pass it out, then attack.'); return false; }
   opt = opt || {};
   const d = dHoop(p), sp = Math.hypot(p.vx, p.vz), canDunk = (MT.arcade || att(p, 'dunk') >= 55) && d <= finishRange(p) && (MT.arcade || att(p, 'dunk') + att(p, 'vert') * 0.4 > 78 + (2.0 - p.H) * 40 || att(p, 'dunk') >= 75)
     || (!MT.arcade && att(p, 'dunk') >= 45 && sp > 3.3 && d <= finishRange(p) && att(p, 'dunk') + att(p, 'vert') * 0.4 > 60 + (2.0 - p.H) * 40 && !(rimThreat(p) && rimThreat(p).s > 0.35));      /* the base package: with a clear run at it, a starter can get up for a basic dunk */
@@ -811,7 +819,7 @@ function poolNext(p, key, n) { const P = p.pools || (p.pools = {}); let v = Math
 function dropStep(p, side) { const P_ = pk(p, 'postpk'), L = P_.drop || ['power'], kind = L[poolNext(p, 'drop' + L.length, L.length)]; if (!startFinish(p, side, false, 0, { layup: 1, kind })) return false; p.finish.postFin = P_.fin || 0; if (kind === 'spin') { p.finish.spin = 1; p.finish.dur += 0.1; } if (kind === 'under') p.finish.dur += 0.12; if (p.user) floatTxt(p, kind === 'under' ? 'UP AND UNDER' : kind === 'spin' ? 'SPIN OFF' : 'DROP STEP', '#f2c14e'); return true; }
 // one bucket from the win: everybody tightens up
 function gamePoint(p) {
-  const M_ = MT; if (M_.practice || M_.drill || M_.phase === 'over' || M_.score[p.team] < M_.cfg.mode.to - 2 || (M_.gpSaid || (M_.gpSaid = [0, 0]))[p.team]) return;
+  const M_ = MT; if (M_.practice || M_.drill || M_.phase === 'over' || M_.score[p.team] < M_.cfg.mode.to - 2 || !gamePtFor(M_, p.team) || (M_.gpSaid || (M_.gpSaid = [0, 0]))[p.team]) return;
   M_.gpSaid[p.team] = 1; M_.gamePt = true; M_.gpCall = 1.5; M_.gpTeam = p.team; if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1.2);
 }
 function aiGo(p, x, z, sprint) { p.ai.tx = x; p.ai.tz = z; p.ai.spr = !!sprint; }
