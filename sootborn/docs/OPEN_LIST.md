@@ -1,5 +1,10 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.90 (2026-11-27).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.91 (2026-11-28).
+
+## Built in v0.91 (3D levels: comic filter off, lore in; needs your eyes)
+- Look at each level: is it the same world as the 2D game now? Too dark anywhere (the Array ladder is the darkest)?
+- **To decide:** the four invented details (CHANGELOG v0.91).
+- Next: put the 23 finds in the Codex; ambient lines for the vent stack; rename "comic-book levels" in code and docs; Kael's riser hood is still violet with gilt; the docks newcomer route at Mooring One.
 
 ## Built in v0.90 (comic-book levels from the story; needs your hands)
 - Enemies, bosses, moves, look and world for all six. Play them: are the yellow/red rings readable, is the parry fair, is Rook's gaff and the Captain's charge readable, do the levels look like the places in the book?

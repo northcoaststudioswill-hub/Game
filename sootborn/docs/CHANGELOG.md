@@ -1,4 +1,24 @@
-# SOOTBORN — changelog (latest v0.90 · 2026-11-27)
+# SOOTBORN — changelog (latest v0.91 · 2026-11-28)
+
+## v0.91 · 2026-11-28 — the 3D levels, in the grit of the rest of the game
+Owner's note: the comic-book levels should carry the grittiness of the rest of the game; not a rebuild, a shift in tone; drop the comic filter, let the lore seep in. Two teams. Layouts, fights and routes are unchanged.
+
+**The look**
+- **Comic filter off:** no halftone, no ink outlines (world, props or people), no starburst words, no speed lines, no sunburst cut-ins. Smooth shading; people get a thin rim of the place's light instead of an outline.
+- **Palette:** every painted colour is greyed and darkened on the way in; House sashes and banners, gilt and furnace doors keep more of themselves; glow materials are untouched (use `glow` or a MeshBasicMaterial for anything that must stay bright). Cyan lamps are gas-mantle green. Textures are sooted at load.
+- **Per level** (`GRIT` table after `G.waMood`): docks cold moon and tallow; riser wet night; gild one lamp; stair a low red sun through smoke; stack a grey wet day; array tallow on rust.
+- **HUD, dialogue, pause, death and end cards, story pages, memory cut-ins:** the game's own type and colours (Pixelify Sans, IBM Plex Mono, amber on soot); dialogue in sentence case. Floating words are small plain lines, and barks are limited to one per 0.7 s.
+- **Attack rings** keep yellow and red, drawn as chalk rings with a burning edge.
+- Draw calls and triangles went down about a third (docks opening 402 → 244 calls).
+
+**The lore**
+- **23 things to find** (READ / LOOK, optional, not counted toward the clue rank, not yet in the Codex): docks 4, riser 5, stair 5, stack 5, array 4. Each cites the bible or additions; see the team table in the session notes. One new prop: the Assayers' board on the stack island.
+- **Ambient lines:** docks guards, riser passers-by, Tavi on the Stair, Harl in the Array.
+- **Voice:** the last quips, smirks and exclamation marks are out (the ONE to ELEVEN count stays shouted). Rook's intro now turns on who gave the hour (Marshal Cade's initial). "VIOLET IS ELEVENTH." was wrong for day 31; now "VIOLET HAS NO PATRON."
+- **Dates:** every opening, memory caption and end card counts from the furnace; each level has its own title and end card and its own clue total.
+- **Invented, to approve or cut:** the Array watch's book (BANK NINETEEN. DARK.); Harl's "to spare these"; the struck-board slips being Kael's own strikes; Violet's standard stood at the hatch meadow on day 26.
+
+**Known:** the docks newcomer bot stalls at Mooring One's last pair, as it did in v0.90. The Array ladder scene is very dark.
 
 ## v0.90 · 2026-11-27 — the comic-book levels, from the story
 Three teams on the six comic-book levels, working from the story bible, the timeline and the chapters: combat (all levels), the look plus the High Docks, Riser Nine and the Table, and the Stair, the vent stack and the Deep Array.

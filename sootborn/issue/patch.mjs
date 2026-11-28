@@ -1214,6 +1214,28 @@ rep("mm[i].emissive.setRGB(0.2 * k, 0.14 * k, 0.03 * k)", "mm[i].emissive.setRGB
 /* ---- end LOOK ---- */
 
 /* ---- v0.91 LORE team patches go here ---- */
+{ // engine-side lines, in the story's voice. Tolerant on purpose: the LOOK team restyles the same engine in parallel, so a line it has
+  // already removed or rewritten is skipped with a note here and never fails the build
+  const lr = (x, y) => { if (!s.includes(x)) { console.log('LORE: skipped (not found): ' + x.slice(0, 70)); return; } s = s.split(x).join(y); n++; };
+  // the story is quiet. Nothing over a fight is shouted except the count itself (script rule S6: ONE! to ELEVEN! stay)
+  ['RIPOSTE', 'WIDE CUT', 'UP THE SHAFT', 'THE HAUL', 'LAST BELL', 'THE SHOULDER', 'THE RAM', 'THE BOOT', 'LINE STRUCK', 'HOOK LINE', 'DOWN ON HIM', 'LIFT ZERO', 'SLIPPED IT', 'THE TURN', 'STRUCK THROUGH',
+    'ON MY BREATH', 'HIS LINE IS OPEN', 'KNEEL', 'TO ME', 'BALANCED', 'LOOSE', 'EVERY BREATH', 'TURNED', 'HAUL'].forEach(w => lr("'" + w + "!'", "'" + w + ".'"));
+  lr("label = 'FINISH!'", "label = 'FINISH'");
+  lr("FX.word(p.name + '!', h,", "FX.word(p.name + '.', h,");
+  // the death screen, in his own voice (his narration is first person; "Get up" stays: it is a soot word)
+  lr("'Forty people on a ladder behind you.'", "'Forty people on a ladder behind me.'");
+  lr("'The stair is full behind you, and nobody on it is kneeling.'", "'The stair is full behind me, and nobody on it is kneeling.'");
+  lr("'The stack is still breathing. So are you.'", "'The stack is still breathing. So am I.'");
+  // each level's own title and end card, dated from the furnace (SC.lvCard is in story.js; the hosted game shows its own title card)
+  lr('SOOTBORN &middot; SEVEN YEARS AFTER THE FURNACE</div>', "SOOTBORN &middot; ' + (SC.lvCard ? SC.lvCard()[1] : 'SEVEN YEARS AFTER THE FURNACE') + '</div>");
+  lr('<span>THE HIGH</span>DOCKS</div>', "' + (SC.lvCard ? SC.lvCard()[4] : '<span>THE HIGH</span>DOCKS') + '</div>");
+  lr('<div class="tag">THE HIGH DOCKS</div>', "<div class=\"tag\">' + (SC.lvCard ? SC.lvCard()[0] : 'THE HIGH DOCKS') + '</div>");
+  lr('FOUR HUNDRED HULLS</h2>', "' + (SC.lvCard ? SC.lvCard()[2] : 'FOUR HUNDRED HULLS') + '</h2>");
+  lr('<p>The last pair is on the wind. The stair is full of light.</p>', "<p>' + (SC.lvCard ? SC.lvCard()[3] : 'The last pair is on the wind. The stair is full of light.') + '</p>");
+  // "COUNTED 2/5" on a level with two things to count: each level's own number
+  lr("'COUNTED ' + p.echoes + '/5'", "'COUNTED ' + p.echoes + '/' + (SC.lvClues || 5)");
+  lr("st.clues + ' of 5</td>", "st.clues + ' of ' + (SC.lvClues || 5) + '</td>");
+}
 
 /* ---- end LORE ---- */
 
