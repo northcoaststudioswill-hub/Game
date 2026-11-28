@@ -1,0 +1,111 @@
+<title>Player Four: Rootdeep 64</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Mo&#x27;s couch co-op review of Rootdeep 64">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Barlow:ital,wght@0,400;0,600;0,800;1,400&family=Barlow+Condensed:wght@600;800&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+img{display:block;max-width:100%;height:auto}
+.shot{margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance}
+:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+
+:root{--bg:#fff3e2;--ink:#1d1430;--p1:#f2b400;--p2:#1e9be0;--p3:#e8418f;--p4:#45b649;--card:#ffffff;--mute:#6b5f7d;--line:#ead9c0;color-scheme:light}
+body{background:var(--bg);color:var(--ink);font:17px/1.6 "Barlow",system-ui,sans-serif}
+.mast{background:var(--ink);color:#fff}
+.mast .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 18px;padding-block:12px}
+.logo{font:400 clamp(28px,5.6vw,50px)/1 "Bungee",sans-serif;letter-spacing:.02em}
+.logo i{font-style:normal;display:inline-block;padding:0 .14em;margin-left:.1em;background:var(--p3);transform:rotate(-4deg)}
+.dots{display:flex;gap:6px}.dots span{width:16px;height:16px;border-radius:50%}
+.stripe{height:10px;background:linear-gradient(90deg,var(--p1) 0 25%,var(--p2) 25% 50%,var(--p3) 50% 75%,var(--p4) 75%)}
+.hero{padding-block:30px 6px}
+.col-tag{font:800 14px "Barlow Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--p3)}
+.hero h1{font:400 clamp(48px,10vw,116px)/.92 "Bungee",sans-serif;margin:6px 0 8px}
+.hero h2{font:800 clamp(22px,3.4vw,34px)/1.15 "Barlow Condensed",sans-serif;margin:0 0 10px;text-transform:uppercase;letter-spacing:.02em}
+.hero .dk{font-size:19px;font-style:italic;color:var(--mute);max-width:62ch;margin:0}
+.info{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.info span{font:800 13px "Barlow Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;background:var(--card);border:2px solid var(--ink);padding:4px 10px;border-radius:999px}
+.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:22px 0 4px}
+.cast div{background:var(--card);border:3px solid var(--ink);border-radius:12px;padding:10px 12px;border-top-width:10px}
+.cast b{display:block;font:400 17px "Bungee",sans-serif}.cast span{font-size:14px;color:var(--mute);line-height:1.35;display:block}
+.cast div:nth-child(1){border-top-color:var(--p1)}.cast div:nth-child(2){border-top-color:var(--p2)}.cast div:nth-child(3){border-top-color:var(--p3)}.cast div:nth-child(4){border-top-color:var(--p4)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:40px;align-items:start;padding-block:26px 44px}
+.body p{margin:0 0 1em;max-width:66ch}
+.shot{margin:24px 0;background:var(--ink);border-radius:14px;overflow:hidden}
+.shot figcaption{color:#fff;font:600 15px/1.4 "Barlow Condensed",sans-serif;padding:10px 14px;letter-spacing:.02em}
+.shot:nth-of-type(4n+1){box-shadow:8px 8px 0 var(--p1)}.shot:nth-of-type(4n+2){box-shadow:8px 8px 0 var(--p2)}.shot:nth-of-type(4n+3){box-shadow:8px 8px 0 var(--p3)}.shot:nth-of-type(4n){box-shadow:8px 8px 0 var(--p4)}
+.side{display:flex;flex-direction:column;gap:22px;position:sticky;top:16px}
+.dials{background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:14px}
+.dials h3{margin:0 0 10px;font:400 20px "Bungee",sans-serif}
+.dl{display:grid;grid-template-columns:64px 1fr;gap:2px 12px;align-items:center;padding:8px 0;border-top:2px solid var(--line)}
+.dl b{font:800 16px "Barlow Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.dl p{grid-column:2;margin:0;font-size:13.5px;color:var(--mute);line-height:1.35}
+.ring{grid-row:span 2;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--p3) calc(var(--p)*1%),var(--line) 0)}
+.ring span{width:48px;height:48px;border-radius:50%;background:var(--card);display:grid;place-items:center;font:800 17px "Barlow Condensed",sans-serif}
+.ring.na{background:var(--line)}
+.dl.big{grid-template-columns:86px 1fr}.dl.big .ring{width:86px;height:86px;background:conic-gradient(var(--ink) calc(var(--p)*1%),var(--line) 0)}.dl.big .ring span{width:66px;height:66px;font:400 22px "Bungee",sans-serif}
+.says{background:var(--ink);color:#fff;border-radius:16px;padding:18px 20px;position:relative}
+.says h3{margin:0 0 8px;font:400 20px "Bungee",sans-serif;color:var(--p1)}
+.says p{margin:0 0 .6em;font-size:15.5px}
+.says .sc{font:400 28px "Bungee",sans-serif;color:var(--p1)}
+.pc{background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:14px 16px}
+.pc h4{margin:0 0 6px;font:400 16px "Bungee",sans-serif}.pc h4.p{color:var(--p4)}.pc h4.c{color:var(--p3)}
+.pc ul{margin:0 0 12px;padding-left:18px;font-size:14.5px;line-height:1.45}.pc li{margin-bottom:5px}
+.pull{margin:30px 0;font:400 clamp(26px,4vw,40px)/1.12 "Bungee",sans-serif;padding:20px 22px;border-radius:18px;background:var(--p1);border:3px solid var(--ink)}
+.errata{border:3px dashed var(--mute);border-radius:14px;padding:12px 16px;font-size:14.5px;background:var(--card)}
+.errata h4{margin:0 0 4px;font:400 16px "Bungee",sans-serif}.errata .eh{margin:0 0 6px;color:var(--mute)}.errata ul{margin:0;padding-left:18px}
+footer{background:var(--ink);color:#d9d0e8;font-size:13px}footer .wrap{padding-block:16px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.side{position:static}.cast{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.cast{grid-template-columns:1fr}}
+
+</style>
+<header class="mast"><div class="wrap"><span class="logo">PLAYER<i>FOUR</i></span><span class="dots" aria-hidden="true"><span style="background:var(--p1)"></span><span style="background:var(--p2)"></span><span style="background:var(--p3)"></span><span style="background:var(--p4)"></span></span></div></header>
+<div class="stripe" aria-hidden="true"></div>
+<main class="wrap">
+<section class="hero"><span class="col-tag">Mo's Multiplayer Mayhem</span>
+<h1>Rootdeep 64</h1><h2>Four Keepers, One Face, Zero Bosses Beaten</h2>
+<p class="dk">A cozy voxel dungeon-crawler that says "1-4 KEEPERS" on the title screen and means it — right up until your friends want to tell themselves apart, leave, or arrive late.</p>
+<div class="info"><span>Co-op roguelite</span><span>1-4 simultaneous</span><span>Pad · keyboard (two can share) · touch</span><span>Tested: one game night, ~50 min, 8 party wipes</span></div>
+<div class="cast" aria-label="Game night line-up"><div><b>Keys</b><span>Mo, on keyboard. Carries.</span></div><div><b>Dee</b><span>On pad. Solid.</span></div><div><b>Gramps</b><span>Thinks the shoulder buttons are decorative.</span></div><div><b>Latecomer</b><span>Shows up when the pizza's half gone.</span></div></div></section>
+<div class="grid"><article class="body">
+<p>Game night at Mo's has a cast. <strong>Keys</strong> (that's me, on keyboard) carries. <strong>Dee</strong> on pad is solid. <strong>Gramps</strong> thinks the shoulder buttons are decorative. And <strong>the Latecomer</strong> always shows up when the pizza's half gone. ROOTDEEP 64 says on the box it's built for exactly this crowd, so I went in hopeful.</p>
+
+<figure class="shot "><img src="img/146-4p.jpg" alt="Four players, four identical Wills. Only the floating P-tags and floor rings tell them apart." loading="lazy"><figcaption>Four players, four identical Wills. Only the floating P-tags and floor rings tell them apart.</figcaption></figure>
+<p>The good news comes first. Joining is <em>instant</em>. First device to press a button is Player 1, every other pad presses A and a big "PLAYER 2 JOINED" banner pops up, and the game even lets <strong>two people share one keyboard</strong> (arrows plus comma for one, WASD plus Z for the other). Three pads hitting A on the same frame? All three got in. The hub, the Hearth, is a warm little voxel living room full of chatty NPCs, and when several of you crowd around the stations, each interact prompt stacks at the bottom <strong>in that player's colour</strong>: "A: ARMORY" in Dee's blue, "Z: ERIN" in my yellow. That's smart couch design. Every new room lines all four of you up in a neat row too, so nobody spawns lost.</p>
+
+<figure class="shot "><img src="img/198-dee-to-p1.jpg" alt="The revive ring: &quot;STAND HERE.&quot; The best thing in the game, and it reads perfectly." loading="lazy"><figcaption>The revive ring: "STAND HERE." The best thing in the game, and it reads perfectly.</figcaption></figure>
+<p>Reviving is the best thing here. Go down and the screen yells <strong>"P3 IS DOWN — STAND OVER THEM!"</strong>, a big green <strong>STAND HERE</strong> ring appears on the body, and a second or two later you get <strong>"P3 IS BACK UP!"</strong> Gramps went down in Chapter 3, Dee stood on him and got chewed up doing it, and then Gramps (who was just standing around anyway) revived <em>her</em>. The couch cheered. Shared rewards help the weak player too: Heart doors, fountains and boons apply to the whole party, so Gramps never fell hopelessly behind.</p>
+
+<figure class="shot "><img src="img/429-mirror-buys.jpg" alt="The Mirror of Dew. Any controller can buy here, including Gramps." loading="lazy"><figcaption>The Mirror of Dew. Any controller can buy here, including Gramps.</figcaption></figure>
+<p>Then the night started going sideways.</p>
+
+<figure class="shot "><img src="img/482-select-erin.jpg" alt="Choosing keepers together. Erin is locked: &quot;Give Erin honey at the Hearth: 0/3&quot;." loading="lazy"><figcaption>Choosing keepers together. Erin is locked: "Give Erin honey at the Hearth: 0/3".</figcaption></figure>
+<p><strong>Everybody is the same kid.</strong> Four teal-shirted, orange-haired Wills, told apart only by a floating "P2" tag and a coloured ring at their feet. The other three keepers are locked behind unlock goals that none of us could work out how to meet in an hour (we had four honey, and Erin still said 0/3). Move as a pack and the four Wills stack into <strong>one sprite with one tag</strong>. Wander into a corner and you vanish under somebody else's HUD panel. In one shot, green P4 is standing under pink P3's health bar while P3 stands under P4's. Walk behind the dark foreground walls and you're simply gone. "Where am I?" got asked more than "what does this boon do?"</p>
+
+<figure class="shot "><img src="img/182-4supers.jpg" alt="Four players pressed super on the same frame. Only P1&#x27;s BIKE LANE went off." loading="lazy"><figcaption>Four players pressed super on the same frame. Only P1's BIKE LANE went off.</figcaption></figure>
+<p><strong>Every controller drives every menu.</strong> I opened the Mirror (the permanent-upgrade shop), and Gramps pressed A on his pad and <strong>spent the party's Moondew</strong> before I'd finished reading. Pause, boon pick, shop: all one cursor, all four players fighting over it, and nothing on screen says who did what. The button hints follow whoever is Player 1, so pad players get told "Z: BUY" and keyboard players get told "A: READY". And when two of us pressed interact at two different stations on the same frame, <strong>neither one opened</strong>.</p>
+
+<p><strong>Doors go to whoever touches first.</strong> No vote, no "gather here". Twice someone's drifting stick decided our route before we'd agreed. You can also walk your downed friend through a door, and they just pop back up in the next room, which is kind of forgiving and kind of makes the revive drama pointless.</p>
+
+<p><strong>Late arrivals and early exits.</strong> The Latecomer pressed A, then Start, mid-run. Nothing happened, and nothing told him why. He sat out the whole run. Wanting to leave is worse. The only drop-out I found is pressing B on the keeper-select screen, and when you do, <strong>everyone's player number and colour shuffles</strong>. By the end of the night even I, the guy holding all four controllers, had to stop and work out which pad was P3.</p>
+
+<p><strong>The camera picks favourites.</strong> When someone goes down, the camera often frames only the living players, so the body (the thing you need to stand on) is off-screen with no arrow pointing to it. When three of us went down, the camera zoomed in tight on the last survivor, who was standing behind a wall at the time. Supers do a flashy letterbox zoom on whoever cast them. Fun the first time, but with four players that's a lot of screen taken away from the other three. And when all four of us fired a super on the same frame, only mine went off.</p>
+
+<p>Four players also felt <em>harder</em> than three. We never beat the first boss, the Grub Mother, in eight tries.</p>
+
+<p>The combat underneath is snappy. Hits, casts, dashes, heavies and specials all work, and the writing is genuinely charming ("THE DEEP SENDS YOU HOME. IT IS BEING POLITE."). This could be a great party game. Right now it's a good solo game that lets your friends watch from inside it.</p>
+<blockquote class="pull">"ROOTDEEP treats four people like one person with four controllers."</blockquote>
+</article>
+<aside class="side">
+<div class="dials"><h3>The scores</h3>
+<div class="dl"><div class="ring" style="--p:80"><span>80%</span></div><b>Graphics</b><p>Lovely chunky voxel rooms and clean bold UI. Four identical heroes is a real problem.</p></div>
+<div class="dl"><div class="ring" style="--p:64"><span>64%</span></div><b>Play control</b><p>Combat feels tight, but menus with several controllers are chaos and hints only follow P1's device.</p></div>
+<div class="dl"><div class="ring na"><span>N/A</span></div><b>Music &amp; sound</b><p>Our test rig was silent. I'm not going to make it up.</p></div>
+<div class="dl"><div class="ring" style="--p:72"><span>72%</span></div><b>Originality</b><p>Hades-style runs on a cozy couch; the stand-to-revive ring and per-colour prompts are fresh.</p></div>
+<div class="dl big"><div class="ring" style="--p:66"><span>66%</span></div><b>Overall</b></div></div>
+<div class="says"><h3>Mo says</h3><p>I wanted to love it, and for about ten minutes I did. The revive ring is genius and dropping in at the Hearth takes one button. But game night is about <em>people</em>, and ROOTDEEP treats four people like one person with four controllers: one face, one cursor, one wallet, one door picked by whoever's thumb slipped.</p><p>Give each keeper a colour or a hat, give each player their own cursor in menus, let my late friend in at the next door, and let Gramps go to bed without renumbering the couch. Do that and this jumps to 85. Today it's a rental for two, not a party for four.</p><span class="sc">66%</span></div>
+<div class="pc"><h4 class="p">Pros</h4><ul><li>Instant drop-in at the hub from any pad, and two players can share one keyboard</li><li>"STAND HERE" revive ring and big DOWN/BACK UP banners are crystal clear</li><li>Interact prompts stack in each player's colour, and keeper select shows the right buttons for each device</li><li>Shared boons, hearts and fountains keep a weak player in the run</li><li>Sharp, funny writing, and combat with real snap</li></ul><h4 class="c">Cons</h4><ul><li>All four players are the same character, with no way any of us found to unlock the others</li><li>Any controller can drive, confirm or spend in any menu, and the hints only ever show P1's device</li><li>No joining mid-run and no real way to leave; dropping out renumbers everyone</li><li>Players hide under the corner HUD panels and behind walls, and downed friends end up off-camera</li><li>First touch picks the door, simultaneous supers and simultaneous interacts get swallowed, and 4P is harder than 3P</li></ul></div>
+<aside class="errata"><h4>Errata</h4><p class="eh">Mo read the game's code after filing this review. These claims did not hold up:</p><ul><li>BIG HEAL does heal every standing player. Gramps' partner missed it because they were down.</li><li>Four players isn't harder by the numbers: foes per player go down as the party grows.</li><li>The revive radius matches the ring. Slow revives came from enemy knockback pushing the helper out.</li><li>Escape doesn't close the pause menu; it was the X press that resumed.</li></ul></aside>
+</aside></div></main>
+<footer><div class="wrap">Player Four is a made-up magazine for this playtest. Mo is a reviewer persona who played the real build, blind, for about 50 minutes, driving up to four simulated controllers and a keyboard. Sound wasn't heard.</div></footer>

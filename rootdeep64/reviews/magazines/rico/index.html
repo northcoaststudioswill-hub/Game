@@ -1,0 +1,120 @@
+<title>Button Bash: Rootdeep 64</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Rico&#x27;s controller review of Rootdeep 64">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,600;0,800;1,400&family=Archivo+Narrow:wght@500;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+img{display:block;max-width:100%;height:auto}
+.shot{margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance}
+:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+
+:root{--bg:#f3f1ec;--ink:#141317;--red:#d7261e;--yel:#ffd400;--gray:#8a8691;--rule:#d8d4cc;--card:#ffffff;color-scheme:light}
+body{background:var(--bg);color:var(--ink);font:16.5px/1.6 "Archivo",system-ui,sans-serif}
+.mast{background:var(--ink);color:#fff}
+.mast .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 20px;padding-block:12px}
+.logo{font:400 clamp(30px,6vw,56px)/1 "Anton",Impact,sans-serif;letter-spacing:.02em;text-transform:uppercase}
+.logo span{color:var(--red)}
+.mast nav{font:700 13px "Archivo Narrow",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--yel)}
+.spec{border-bottom:4px solid var(--ink);background:var(--yel)}
+.spec .wrap{display:flex;flex-wrap:wrap;gap:4px 22px;padding-block:8px;font:700 13px "Archivo Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.squad{display:grid;grid-template-columns:1fr;gap:0;border:4px solid var(--ink);background:var(--card);margin:28px 0}
+.squad h2{grid-column:1/-1;margin:0;background:var(--red);color:#fff;font:400 26px/1 "Anton",sans-serif;letter-spacing:.05em;padding:12px 16px 10px;text-transform:uppercase;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.squad h2 small{font:700 13px "Archivo Narrow",sans-serif;letter-spacing:.1em;align-self:center}
+.mem{padding:16px;border-right:2px solid var(--rule);min-width:0}
+.mem:last-child{border-right:0}
+.mem .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;border-bottom:3px solid var(--ink);padding-bottom:8px;margin-bottom:10px}
+.mem .nm{font:400 26px/1 "Anton",sans-serif;text-transform:uppercase}
+.mem .nm small{display:block;font:500 12px/1.3 "Archivo Narrow",sans-serif;color:var(--gray);letter-spacing:.06em;margin-top:4px}
+.mem .sc{font:400 46px/1 "Anton",sans-serif;color:var(--red)}
+.mem p{margin:0 0 .8em;font-size:15.5px;max-width:80ch}
+.mem.empty{display:grid;place-items:center;text-align:center;color:var(--gray);font:600 13px/1.4 "Archivo Narrow",sans-serif;letter-spacing:.06em;text-transform:uppercase;background:repeating-linear-gradient(135deg,transparent 0 10px,#00000008 10px 20px)}
+.mem.lead{grid-column:1/-1}
+.best{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.best div{font-size:13.5px;padding:8px 10px;background:var(--bg);border-left:4px solid var(--ink)}
+.best b{display:block;font:700 12px "Archivo Narrow",sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.feat{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:40px;align-items:start;padding-bottom:40px}
+.feat header h1{font:400 clamp(52px,10vw,120px)/1 "Anton",sans-serif;text-transform:uppercase;margin:6px 0 10px;letter-spacing:-.005em}
+.feat header h1 span{background:var(--yel);padding:0 .08em;display:inline-block;line-height:1}
+.feat header .dk{font:italic 400 20px/1.4 "Archivo",sans-serif;max-width:58ch;margin:0 0 6px}
+.feat header .by{font:700 13px "Archivo Narrow",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin:0 0 20px}
+.col{columns:2 300px;column-gap:32px;column-rule:1px solid var(--rule)}
+.col p{margin:0 0 1em}.col ul{margin:0 0 1em;padding-left:18px}.col li{margin-bottom:.5em}
+.col .shot{break-inside:avoid;margin:4px 0 18px;background:var(--ink);padding:6px 6px 0}
+.col .shot figcaption{color:#fff;font:600 13px/1.35 "Archivo Narrow",sans-serif;padding:8px 4px 10px}
+.run{font:400 18px "Anton",sans-serif;letter-spacing:.04em;color:var(--red)}
+.side{display:flex;flex-direction:column;gap:20px;position:sticky;top:16px}
+.scores{border:4px solid var(--ink);background:var(--card)}
+.scores h3{margin:0;background:var(--ink);color:var(--yel);font:400 22px "Anton",sans-serif;letter-spacing:.06em;padding:10px 14px 8px;text-transform:uppercase}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-top:2px solid var(--rule)}
+.sr b{font:700 14px "Archivo Narrow",sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.sr .bar{flex:1;height:10px;background:var(--rule);margin:0 8px;position:relative}.sr .bar i{position:absolute;inset:0 auto 0 0;background:var(--red)}
+.sr span{font:400 28px "Anton",sans-serif;min-width:2ch;text-align:right}
+.sr.na span{font-size:16px;color:var(--gray)}
+.pl{border:4px solid var(--ink);background:var(--card);padding:14px 16px}
+.pl h4{margin:0 0 6px;font:400 20px "Anton",sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.pl ul{margin:0 0 12px;padding-left:18px;font-size:14px;line-height:1.45}.pl li{margin-bottom:5px}
+.pl h4.c{color:var(--red)}
+.pull{border-block:6px solid var(--ink);padding:18px 4px;font:400 clamp(26px,3.6vw,38px)/1.08 "Anton",sans-serif;text-transform:uppercase;margin:26px 0}
+.pull em{font-style:normal;color:var(--red)}
+.bottom{background:var(--red);color:#fff;padding:18px 20px;font:700 19px/1.35 "Archivo",sans-serif;margin:0 0 28px}
+.bottom b{font:400 22px "Anton",sans-serif;letter-spacing:.06em;margin-right:8px}
+.errata{border:2px dashed var(--gray);padding:12px 16px;font-size:14px;background:var(--card)}
+.errata h4{margin:0 0 4px;font:400 18px "Anton",sans-serif;letter-spacing:.06em;text-transform:uppercase}.errata .eh{margin:0 0 6px;color:var(--gray)}.errata ul{margin:0;padding-left:18px}
+footer{background:var(--ink);color:#c9c5cf;font-size:13px}footer .wrap{padding-block:16px}
+@media (max-width:900px){.feat{grid-template-columns:1fr}.side{position:static}.squad{grid-template-columns:1fr 1fr}.mem.lead{grid-column:1/-1}.mem{border-right:0;border-top:2px solid var(--rule)}}
+@media (max-width:460px){.squad{grid-template-columns:1fr}.best{grid-template-columns:1fr}}
+
+</style>
+<header class="mast"><div class="wrap"><span class="logo">Button<span>Bash</span> Monthly</span><nav>Reviews · Previews · Codes</nav></div></header>
+<div class="spec"><div class="wrap"><span>Rootdeep 64</span><span>Publisher: TBA</span><span>Players: 1-4 simultaneous</span><span>Action roguelite</span><span>Browser · pad / keys</span></div></div>
+<main class="wrap">
+<section class="squad" aria-label="Review squad"><h2>The Bash Squad <small>Rico's crew score</small></h2>
+<div class="mem lead"><div class="hd"><div class="nm">Rico<small>Zelda, Diablo, Smash kid. Some Hades, never finished it.</small></div><div class="sc">7.0</div></div>
+<p>Somebody at this studio has played a <em>lot</em> of Hades, and I mean that mostly as a compliment. ROOTDEEP 64 is a chunky, N64-flavored dungeon dive where you go down through twelve chambers under a garden, pick god-style boons from talking sprouts, die, and spend Moondew at a hub full of NPCs who have something new to say every time you come back. The loop hooked me right away. The first time a sprout-spitter kited me around a pillar I swore at it. The first time I learned to <strong>dash-strike</strong> it ("STAGE DIVE!"), I grinned. The Grub Mother boss went down on my second try, and the Drowned King's "HE LEAPS!" telegraph with a red ring under your feet is as fair and readable as anything in the genre.</p>
+<p>Then the cracks show. Your hero vanishes from the screen, <em>constantly</em>, under grubs, under bats, under his own super, under hit-flicker. Enemy shots are pale pink blobs that look exactly like pickups. I died three times without seeing the hit that killed me, and twice my attack button skipped right through the death screen before I could read it. A pillar sat in front of a reward door so I couldn't get to it. And the game drops you into a boss at 10% health with no "boss ahead" warning, over and over.</p>
+<p>There's a great game under the dirt. Couch co-op with a revive ring is a blast, the writing is genuinely funny ("HE ONLY SAT ON YOU FOR A MOMENT"), and every run teaches you something. It just needs another pass on readability before it's a must-buy.</p>
+<p hidden><em>Best part:</em> dodging the Drowned King's leap. <em>Worst part:</em> not finding my own guy on the screen.</p>
+<div class="best"><div><b>Best part</b>Dodging the Drowned King's leap.</div><div><b>Worst part</b>Not finding my own guy on the screen.</div></div></div>
+</section>
+<div class="feat"><article>
+<header><p class="by" style="margin:0">Feature review</p><h1>Dig deep, <span>die often</span></h1>
+<p class="dk">ROOTDEEP 64 wears its Hades influence on its sleeve, and mostly earns it. But you'll have to squint.</p><p class="by">By Rico</p></header>
+<div class="col"><p>I booted ROOTDEEP 64 knowing nothing. Fifty minutes, seven runs, one couch co-op wipe and two Drowned King deaths later, I can tell you this: it's the most "one more run" thing I've played in a while. It's also the most "wait, where am I?" thing I've played in a while.</p>
+
+<figure class="shot "><img src="img/159.jpg" alt="Chamber 4: the Grub Mother arrives. No warning on the doors before it." loading="lazy"><figcaption>Chamber 4: the Grub Mother arrives. No warning on the doors before it.</figcaption></figure>
+<p><span class="run">THE SETUP.</span> You're Will (Erin and Louie the dog unlock later), a keeper of the Great Lantern, digging down through The Burrows and The Flooded Vault to feed whatever's hungry underneath. Every chamber ends with two doors, and each door shows its reward up front: a boon from one of the sprout spirits (Ember, Zip, Peb, Dew), a Fountain heal, a shop, Honey, Petals. Boons stack and combine. My Firebloom cast plus a Storm Edge attack offered me a "Wildfire Storm" duo boon by chamber 8. Elites guard chambers 3 and 7 and bosses guard 4 and 8. Die and you're back at the Hearth, spending Moondew at the Mirror and keys at the Armory.</p>
+
+<figure class="shot "><img src="img/750.jpg" alt="The DEW door, behind a pillar. Rico couldn&#x27;t get to it from any side." loading="lazy"><figcaption>The DEW door, behind a pillar. Rico couldn't get to it from any side.</figcaption></figure>
+<p><span class="run">THE FIGHTING.</span> The Petal Blade's three-hit combo is snappy, with chunky damage numbers and a "SELFIE!" finisher that made me laugh. B casts (charges recharge slowly, shown as tiny squares under your HP), RB dashes, Y fires a super when the bar's full. Will's super is literally a red bicycle tearing across the screen ("BIKE LANE!") for 90-117 damage, and it never stopped being funny. The Root Maul hits like a truck (32 a swing, big knockback) but roots you in place, and armadillos make you pay for that. The Thornbow is a mistake: tiny green slivers for 8 damage while enemies stroll right through the stream. I went from 120 to 1 HP in the <em>first room</em> with it.</p>
+
+<figure class="shot "><img src="img/388.jpg" alt="Firebloom + Storm Edge = a Wildfire Storm duo offer by chamber 8." loading="lazy"><figcaption>Firebloom + Storm Edge = a Wildfire Storm duo offer by chamber 8.</figcaption></figure>
+<p>The game's real secret is the <strong>dash strike</strong>: dash, then attack out of it. It's the only good answer to the sprout-spitters, which backpedal at your walk speed and made me whiff combo after combo. The game <em>does</em> tell you, but only in the pause menu. The room-1 hint line (which never goes away in chapter 1 and sits right over the fight) doesn't mention it. I worked it out by accident around minute 25.</p>
+
+<figure class="shot "><img src="img/525.jpg" alt="The Flooded Vault. Blue crabs, blue shots, blue floor." loading="lazy"><figcaption>The Flooded Vault. Blue crabs, blue shots, blue floor.</figcaption></figure>
+<p><span class="run">THE PROBLEMS.</span> Readability is this game's boss, and it's winning:</p>
+
+<ul><li><strong>You disappear.</strong> Get hit and Will flickers out for so long that only his yellow ring is left. Fire your super and he's gone. Get two grubs on top of you and he's gone. Cast Boulderfall and a white dust cloud wipes out you <em>and</em> the boss for a full second. In co-op, both supers at once means both players vanish.</li><li><strong>Projectiles look like loot.</strong> Spitter shots are glowing pink orbs on a pink floor. I walked into one thinking it was health. In the Flooded Vault, crabs and their shots are blue-on-blue.</li><li><strong>Deaths you don't see coming.</strong> Three of my deaths happened mid-combo with no hit I could pick out. The Drowned King's leap is beautifully telegraphed; touching his body, which costs 20+ HP, isn't telegraphed at all. And mashing attack as you die can skip the whole death screen, stats included.</li><li><strong>Health economy.</strong> Three runs in a row, the doors before a boss were boons or petals, never a Fountain. With no warning that the boss is next, I walked into it at 5-20% health every time.</li><li><strong>Bugs.</strong> A pillar blocked a Dew door so I couldn't reach it. Missions ("TELL LOUIE") complete on frame one of a run. Kindled Heart says +25 HP and gives +36. A dash boon called "Sixth Sense" reads "Cast +14%. Dash power 14," which means nothing to a player. Pressing Y as the last enemy dies opens the echo lore card instead of firing your super.</li></ul>
+
+<p><span class="run">THE HUB AND THE HEART.</span> The Hearth is lovely: potted sprouts pile up as you bank them, NPCs react to your last death (Erin wants to hear about the Grub Mother), and gifting Honey unlocks Keepsakes. The UI around it is rough, though. Stations need pixel-perfect standing to show a prompt. NPCs and Louie the dog body-block you. Keeper Select prints its description on top of its own flavor text. The hub hint reads "PRESS A ON ANOTHER PAD ( , ON KEYS)" with the keyboard key missing (it's Enter, I found out by hitting it).</p>
+
+<p><span class="run">CO-OP.</span> Plug in a second pad, press A, and Player 2 is in. Revive is "stand over them" with a green ring, a smart and simple idea. Only Player 1 picks boons ("the whole party shares it"), and co-op doesn't feel any easier. We wiped at the first boss.</p>
+
+<p><span class="run">SOUND.</span> I played on a silent preview build (headless, no audio out), so I can't rate it. No score.</p></div>
+<blockquote class="pull">"The first time a sprout-spitter kited me around a pillar I swore at it. <em>The first time I learned to dash-strike it, I grinned.</em>"</blockquote>
+<p class="bottom"><b>BOTTOM LINE</b>A great loop with real heart that's tripping over its own visuals. Fix the readability and it's a 9.</p>
+</article>
+<aside class="side">
+<div class="scores"><h3>Scores</h3>
+<div class="sr"><b>Graphics</b><span class="bar"><i style="width:80%"></i></span><span>8</span></div>
+<div class="sr na"><b>Sound</b><span class="bar"></span><span>N/A</span></div>
+<div class="sr"><b>Control</b><span class="bar"><i style="width:60%"></i></span><span>6</span></div>
+<div class="sr"><b>Fun factor</b><span class="bar"><i style="width:70%"></i></span><span>7</span></div>
+<div class="sr"><b>Crew score</b><span class="bar"><i style="width:70%"></i></span><span>7.0</span></div></div>
+<figure class="shot" style="background:var(--ink);padding:6px 6px 0"><img src="img/829.jpg" alt="The death screen: THE DEEP KEEPS YOU" loading="lazy"><figcaption style="color:#fff;font:600 13px/1.35 Archivo Narrow,sans-serif;padding:8px 4px 10px">Rico died in the Flooded Vault. The death screen shows the Burrows.</figcaption></figure>
+<div class="pl"><h4>Pros</h4><ul><li>Tight 3-hit combo, great dash strike, big funny supers</li><li>Door-reward previews give real choices; boons stack into duos</li><li>Drowned King's leap telegraph is textbook-fair</li><li>Charming writing: boss lines, death quips, NPCs who remember</li><li>Drop-in co-op with a smart revive ring; keyboard works too</li><li>Death Defiance, Peb's blocks and Fountains give you some mercy</li></ul><h4 class="c">Cons</h4><ul><li>Player character disappears constantly (hit-flicker, supers, overlap, dust)</li><li>Enemy shots look like pickups; blue-on-blue in the Vault</li><li>Body-contact damage is huge and has no telegraph</li><li>No "boss next" warning, and pre-boss doors often have no heal</li><li>Attack button can skip the death screen</li><li>Thornbow is underpowered; Root Maul can't be cancelled</li><li>A pillar blocking a reward door, missions that finish instantly, boon text that doesn't match its effect</li><li>Overlapping UI text in Keeper Select, boon screens and banners</li></ul></div>
+<aside class="errata"><h4>Errata</h4><p class="eh">Rico read the game's code after filing this review. These claims did not hold up:</p><ul><li>The "( , ON KEYS)" hint isn't missing a key. Comma is how a second keyboard player joins.</li><li>Bolt Step doesn't pull your dash toward enemies; it only zaps the nearest one.</li><li>The Root Maul doesn't lock you in place. Holding attack to charge a heavy slows you to 55%.</li><li>Spitters are slower than you. Most of the whiffs came from aim, not their speed.</li></ul></aside>
+</aside></div></main>
+<footer><div class="wrap">Button Bash Monthly is a made-up magazine for this playtest. Rico is a reviewer persona who played the real build, blind, for about 50 minutes on a simulated controller and keyboard. Sound wasn't heard.</div></footer>
