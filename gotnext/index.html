@@ -2902,7 +2902,7 @@ function setCheck(team, first) {
   const offs = M_.P.filter(p => p.team === team), defs = M_.P.filter(p => p.team !== team);
   // the human takes the check when it is their ball
   offs.sort((a, b) => (b.user ? 1 : 0) - (a.user ? 1 : 0) || a.k - b.k);
-  const oSpots = [[0, 9.3], [-5.4, 5.6], [5.4, 5.6]];
+  const oSpots = [[1.1, 9.2], [-5.4, 5.6], [5.4, 5.6]];      /* the check is a step off the middle: dead centre, the camera, you and your man were one line and he vanished behind you */
   offs.forEach((p, i) => { p.x = oSpots[i][0]; p.z = oSpots[i][1]; });
   { const taken = new Set(); defs.forEach(p => { let m = p.man && p.man.team === team && !taken.has(p.man) ? p.man : offs.find(o => !taken.has(o)) || offs[0]; taken.add(m); p.man = m; const d = Math.hypot(m.x, m.z) || 1; p.x = m.x - m.x / d * 1.5; p.z = m.z - m.z / d * 1.5; }); }      /* one man each: two defenders on the same man were dropped on the same spot, one inside the other */
   for (const p of M_.P) { p.vx = p.vz = 0; p.y = 0; p.st = 'free'; p.t = 0; p.ai.mode = ''; p.ai.hold = 0; p.ai.spot = null; p.slowT = 0; p.callT = 0; p.ai.tx = p.x; p.ai.tz = p.z; }
