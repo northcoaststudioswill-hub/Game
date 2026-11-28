@@ -51,13 +51,13 @@ function rdLoad(){try{let s=JSON.parse(localStorage.getItem(SAVEKEY)||'null');
   if(s)RD=Object.assign(RDDEF(),s)}catch(e){}
  RD.mirror=RD.mirror||{};RD.weapons=RD.weapons||['blade'];RD.keeps=RD.keeps||{};RD.keepXp=RD.keepXp||{};RD.bank=RD.bank||{};RD.party=RD.party||[];
  RD.pact=RD.pact||{};RD.bounty=RD.bounty||{};RD.gift=RD.gift||{};RD.seen=RD.seen||{};RD.boonSeen=RD.boonSeen||{};RD.lineIx=RD.lineIx||{};RD.flags=RD.flags||{};
- RD.chars=RD.chars||['WILL','WILL','WILL','WILL'];if(!RD.set)RD.set={mus:7,sfx:8,shake:true};
+ RD.chars=RD.chars||['WILL','WILL','WILL','WILL'];for(const k of['msn','echo','bossK','killK','diedTo','charEsc','charRun','seenN','godMet'])RD[k]=RD[k]||{};if(!RD.set)RD.set={mus:7,sfx:8,shake:true};
  RD.stats=Object.assign({runs:0,deaths:0,escapes:0,kills:0,bosses:0,chambers:0},RD.stats)}
 rdLoad();
 function rdSave(){try{localStorage.setItem(SAVEKEY,JSON.stringify(RD))}catch(e){}}
 let RUN=null;
 let uiSel=0,talkNPC=null,talkTxt='',talkStart=0,talkLine=0,boonOffer=[],shopItems=[],pauseSel=0,pausePage=0,codexPage=0,heatSel=0;
-let overT=0,joinMsg='',joinT=0,diveT=0;
+let overT=0,joinMsg='',joinT=0,diveT=0,talkEv=null,talkWho='',boonQuote='',boardSel=0,echoSel=0;
 const heatTotal=()=>PACT.reduce((a,p)=>a+(RD.pact[p.id]||0),0);
 const keepLv=who=>{const xp=RD.keepXp[who]||0;return xp>=50?3:xp>=25?2:1};
 const hasKeep=id=>RD.keepEq===id;
@@ -98,7 +98,7 @@ function mkBoon(god,kind,slotOrId){const rar=rollRar();RD.boonSeen[slotOrId+':'+
  const p=PASSES.find(x=>x.id===slotOrId);const ex=RUN.boons.pass.find(x=>x.id===slotOrId);
  if(ex)return{kind:'passup',god:p.god,id:p.id,level:ex.level+1,rar:1,rarN:'LEVEL UP'};
  return{kind:'pass',god:p.god,id:p.id,level:1,rar:RARS[rar][1],rarN:RARS[rar][0]};}
-function genOffer(god){god=god||GODIDS[(Math.random()*GODIDS.length)|0];const out=[],used=new Set();
+function genOffer(god){god=god||GODIDS[(Math.random()*GODIDS.length)|0];boonQuote=godLine(god);const out=[],used=new Set();
  const slots=['atk','cast','dash'].filter(s=>!(RUN.boons[s]&&RUN.boons[s].god===god));
  for(const d of DUOS)if(!hasDuo(d.id)&&d.gods.every(g=>hasGod(g))){out.push(mkBoon(god,'duo',d.id));break}
  while(out.length<3){const roll=Math.random();
@@ -106,7 +106,7 @@ function genOffer(god){god=god||GODIDS[(Math.random()*GODIDS.length)|0];const ou
   else{const pool=PASSES.filter(p=>p.god===god&&!used.has(p.id));if(!pool.length&&slots.length){const s=slots.splice(0,1)[0];out.push(mkBoon(god,'core',s));continue}
    if(!pool.length)break;const p=pool[(Math.random()*pool.length)|0];used.add(p.id);out.push(mkBoon(god,'pass',p.id))}}
  return out.slice(0,3);}
-function takeBoon(b){if(b.kind==='core'){RUN.boons[b.slot]=b}
+function takeBoon(b){RD.stats.boons=(RD.stats.boons||0)+1;if(b.kind==='core'){RUN.boons[b.slot]=b}
  else if(b.kind==='pass'){RUN.boons.pass.push(b)}
  else if(b.kind==='duo'){RUN.boons.pass.push(b)}
  else if(b.kind==='passup'){const ex=RUN.boons.pass.find(x=>x.id===b.id);if(ex)ex.level=Math.min(5,ex.level+1)}
@@ -122,10 +122,10 @@ function plRunInit(p){const s=rdStats(p);Object.assign(p,{hp:s.maxHp,down:false,
 function rdStartRun(){
  RUN={petals:20+mir('gold')*20,dew:0,keys:0,honey:0,chamber:0,wave2:null,sigShown:0,heat:heatTotal(),
   boons:{atk:null,cast:null,dash:null,pass:[]},enemies:[],projs:[],eprojs:[],pickups:[],parts:[],texts:[],doors:[],zones:[],hazards:[],buds:[],pods:[],dewT:0,podDropped:false,
-  obst:[],acts:[],rings:[],bolts:[],freeze:0,flash:0,banner:null,phase:'fight',shake:0,boss:null,elite:false,revives:mir('defy'),collarUsed:false,phoenixUsed:false,time:0,zoneT:0,kills:0};
+  obst:[],sub:null,subQ:[],echo:null,mwT:0,acts:[],rings:[],bolts:[],freeze:0,flash:0,banner:null,phase:'fight',shake:0,boss:null,elite:false,revives:mir('defy'),collarUsed:false,phoenixUsed:false,time:0,zoneT:0,kills:0};
  for(const p of PL){plRunInit(p);movesReset(p,true)}
  let k=0;for(const ty of RD.party){if((RD.bank[ty]||0)>0){RD.bank[ty]--;const o=PL[k++%PL.length];RUN.buds.push({type:ty,x:o.x,y:o.y,a:Math.random()*6,cd:0,z:0,own:o.ix})}}
- RD.party=[];RD.stats.runs++;rdSave();rdNextChamber();}
+ RD.party=[];RD.stats.runs++;if(PL.length>1)RD.stats.coopRuns=(RD.stats.coopRuns||0)+1;for(const p of PL)RD.charRun[p.char]=1;rdSave();rdNextChamber();}
 function rdArena(biome){RUN.obst=[];const n=2+((Math.random()*3)|0)+(PL.length>2?1:0);
  for(let i=0;i<n;i++){const w=14+((Math.random()*22)|0),h=10+((Math.random()*10)|0),x=22+Math.random()*(W-44-w),y=38+Math.random()*(H-70-h);
   if(Math.hypot(x+w/2-W/2,y+h/2-H/2)>34&&y+h<H-44)RUN.obst.push({x,y,w,h,biome,s:Math.random()});}
@@ -139,11 +139,12 @@ function spawnFoe(kind,x,y,elite){const d=FOES[kind],sc=foeScale();
 function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale(),co=1+.75*(PL.length-1);
  const e={kind:'boss',bossIx:ix,x:W/2,y:52,hp:d.hp*(1+.12*RUN.heat)*co,max:d.hp*(1+.12*RUN.heat)*co,sp:d.sp,dmg:d.dmg*sc.dmg,r:d.r,
   elite:false,t:0,cd:2,hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,bt:3,phase:1,state:0,tx:W/2,ty:52,born:.8,yaw:0};
- RUN.enemies.push(e);RUN.boss=e;RD.seen[d.id]=1;snd(110,.6,55,'sawtooth',.09);return e;}
+ RUN.enemies.push(e);RUN.boss=e;RD.seen[d.id]=1;RD.seenN[d.id]=(RD.seenN[d.id]||0)+1;bossSay(e,'intro');snd(110,.6,55,'sawtooth',.09);return e;}
 let say2T=0,say2Txt='';
 function say2(s,t=3){say2Txt=s;say2T=t;}
 function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=[];RUN.eprojs=[];RUN.pickups=[];RUN.pods=[];RUN.zones=[];RUN.hazards=[];RUN.acts=[];RUN.podDropped=false;for(const p of PL)movesReset(p,false);
- const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);
+ const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);RUN.echo=null;RD.stats.maxCh=Math.max(RD.stats.maxCh||0,ch);for(const p of PL)p.lowSaid=false;
+ if(ch===5)chatter('vault',true);else if(ch===9)chatter('core',true);else if(ch!==4&&ch!==8&&ch!==12)chatter('start');
  if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;return}
  /* the cartridge's budget (4 + chamber), plus a share for every extra keeper */
  const pool=BIOMES[biome].pool,budget=4+ch+((RD.pact.swarm||0)*2)+Math.round((PL.length-1)*(2+ch*.5)),eliteCh=ch===3||ch===7||ch===10;
@@ -154,7 +155,7 @@ function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=
  wlist.slice(0,cut).forEach(s2=>spawnFoe(s2.k,26+Math.random()*(W-52),36+Math.random()*(H*.45),s2.elite));
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
  RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);}
-function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;for(const p of PL)if(!p.down)p.cheer=1.1;
+function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
  if(!RUN.podDropped){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:W/2+R(-16,16),y:H/2});RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
  if(RD.keepEq){const who=(KEEPS.find(k=>k.id===RD.keepEq)||{}).who;if(who)RD.keepXp[who]=(RD.keepXp[who]||0)+1}
  let heal=mir('mend')*3+(RUN.boons.pass.find(p=>p.id==='rain')?rdBoonVal(RUN.boons.pass.find(p=>p.id==='rain')):0);
@@ -167,7 +168,7 @@ function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;for(const p of P
  if(ch===3||ch===7||ch===11)a='boon';
  RUN.doors=[{kind:a,x:W/2-38,y:26},{kind:b,x:W/2+38,y:26}].map(d=>({...d,god:GODIDS[(Math.random()*GODIDS.length)|0],hold:0}));
  rdSave();}
-function bossDown(e){RD.stats.bosses++;RUN.keys++;const heat=RUN.heat,paid=RD.bounty[BOSSES[e.bossIx].id]||0,L=lead();
+function bossDown(e){RD.stats.bosses++;RUN.keys++;if(PL.length>1)RD.stats.coopBoss=(RD.stats.coopBoss||0)+1;const heat=RUN.heat,paid=RD.bounty[BOSSES[e.bossIx].id]||0,L=lead();
  let bonus=0;if(heat>paid){bonus=25*(heat-paid);RD.bounty[BOSSES[e.bossIx].id]=heat}
  RUN.dew+=40+bonus;say2(BOSSES[e.bossIx].s+' FALLEN!',3.2);
  ftext(L.x,L.y-16,'+1 KEY','#f8d030');if(bonus)ftext(L.x,L.y-26,'+'+bonus+' BOUNTY DEW','#7fd0e8');
@@ -191,18 +192,19 @@ function genShop(){const all=[
  {n:'OLD KEY',d:'Unlocks weapons & doors above',p:120,act:()=>{RUN.keys++;say2('+1 KEY',2)}},
  {n:'PETAL PURSE',d:'+90 petals, somehow profit',p:50,act:()=>{RUN.petals+=90;say2('+90 PETALS',2)}}];
  const out=[];while(out.length<3){const it=all.splice((Math.random()*all.length)|0,1)[0];if(it)out.push(it)}return out;}
-function rdDie(){RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
-function rdEscape(){RD.stats.escapes++;RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
+function runTally(){RD.stats.honeyFound=(RD.stats.honeyFound||0)+RUN.honey;RD.stats.maxBank=Math.max(RD.stats.maxBank||0,RUN.buds.length)}
+function rdDie(){runTally();const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
+function rdEscape(){runTally();RD.stats.heatEsc=Math.max(RD.stats.heatEsc||0,RUN.heat);for(const p of PL)RD.charEsc[p.char]=(RD.charEsc[p.char]||0)+1;RD.stats.escapes++;RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
  RUN=null;rdSave();overT=0;state='win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
-function rdAbandon(){if(RUN){bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();state='hub';}
+function rdAbandon(){if(RUN){runTally();bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();state='hub';}
 
 /* ---------------- the Hearth (hub) ---------------- */
 const STATIONS=[{id:'mirror',n:'MIRROR OF DEW',l:'MIRROR',x:28*HK},{id:'arm',n:'ARMORY',l:'ARMORY',x:71*HK},{id:'keep',n:'KEEPSAKE SHELF',l:'SHELF',x:114*HK},{id:'codex',n:'CODEX',l:'CODEX',x:157*HK},{id:'heat',n:'HEAT GATE',l:'HEAT',x:200*HK}];
 const NPCPOS={ERIN:[88,-100],LOUIE:[120,-46],RANGER:[188,-54],MARCUS:[206,-106],SCOUT:[34,-50]};
 const HUBNPC={};
 const NPCSPD={ERIN:32,LOUIE:46,RANGER:36,MARCUS:27,SCOUT:38};
-const BED={x:41*HK,y:H-84},DOOR={x:W/2,y:H-13};
+const BED={x:41*HK,y:H-84},DOOR={x:W/2,y:H-13},BOARD={x:W/2+58,y:H-20};
 function charUnlocked(id){if(id==='WILL')return true;if(id==='ERIN')return(RD.gift.ERIN||0)>=3;
  if(id==='LOUIE')return(RD.stats.budsBanked||0)>=20;if(id==='MARCUS')return(RD.stats.deaths||0)>=8;return false}
 function charLockTxt(id){if(id==='ERIN')return 'GIVE ERIN HONEY AT THE HEARTH: '+(RD.gift.ERIN||0)+'/3';
@@ -239,6 +241,7 @@ function hubTarget(p){let best=null,bd=17*17;
  for(const s of STATIONS){const d=(p.x-s.x)**2+(p.y-38)**2;if(d<bd){bd=d;best={kind:'station',id:s.id,n:s.n,x:s.x,y:38}}}
  for(const who of NPCS){const n2=HUBNPC[who],x=n2.x,y=n2.y;const d=(p.x-x)**2+(p.y-y)**2;if(d<bd){bd=d;best={kind:'npc',who,n:who,x,y}}}
  const db2=(p.x-BED.x)**2+(p.y-BED.y)**2;if(db2<bd){bd=db2;best={kind:'sprouts',n:'SPROUT LEDGER',x:BED.x,y:BED.y}}
+ const dq=(p.x-BOARD.x)**2+(p.y-BOARD.y)**2;if(dq<bd){bd=dq;best={kind:'board',n:"KEEPER'S BOARD",x:BOARD.x,y:BOARD.y}}
  const d=(p.x-DOOR.x)**2+(p.y-DOOR.y)**2;if(d<bd)best={kind:'descend',n:'THE ROOT DOOR — DESCEND',x:DOOR.x,y:DOOR.y};
  return best;}
 function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return}
@@ -261,13 +264,19 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return
   if(t&&p.dev.pr.a){snd(520,.05);
    if(t.kind==='descend'){charsEnter();return}
    if(t.kind==='sprouts'){sprPage=0;uiSel=0;state='sprouts';return}
-   if(t.kind==='npc'){talkNPC=t.who;uiSel=0;
+   if(t.kind==='board'){boardSel=0;state='board';return}
+   if(t.kind==='npc'){talkNPC=t.who;uiSel=0;const n0=HUBNPC[t.who];if(n0)n0.yaw=Math.atan2(p.x-n0.x,p.y-n0.y);
+    talkEv=storyNext(t.who);if(talkEv){talkLine=0;talkWho=talkEv.lines[0][0];talkTxt=talkEv.lines[0][1];RD.flags['met_'+t.who]=1;state='talk';return}talkWho=t.who;
     talkStart=RD.flags['met_'+t.who]?(RD.lineIx[t.who]||1)%LINES[t.who].length:0;
     RD.flags['met_'+t.who]=1;talkLine=0;talkTxt=LINES[t.who][talkStart];RD.lineIx[t.who]=talkStart+1;rdSave();
     const n=HUBNPC[t.who];if(n)n.yaw=Math.atan2(p.x-n.x,p.y-n.y);
     state='talk';return}
    uiSel=0;codexPage=0;heatSel=0;state=t.id;return}}}
-function talkUpdate(){if(pressed('b')){state='hub';snd(330,.05);return}
+function talkUpdate(){
+ /* a story beat: A pages, B skips to the end (and still pays out) */
+ if(talkEv){if(pressed('b')){storyFinish(talkEv);talkEv=null;state='hub';snd(330,.05);return}
+  if(pressed('a')){talkLine++;if(talkLine>=talkEv.lines.length){storyFinish(talkEv);talkEv=null;state='hub'}else{talkWho=talkEv.lines[talkLine][0];talkTxt=talkEv.lines[talkLine][1];snd(520,.04)}}return}
+ if(pressed('b')){state='hub';snd(330,.05);return}
  if(pressed('start')&&RD.honey>0&&talkNPC){const who=talkNPC,k=KEEPS.find(k=>k.who===who);
   RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
   else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}rdSave();return}
@@ -286,8 +295,10 @@ function keepUpdate(){uiSel=nav(uiSel,KEEPS.length);
  if(pressed('a')){const k=KEEPS[uiSel];
   if(RD.keeps[k.id]){RD.keepEq=RD.keepEq===k.id?'':k.id;rdSave();snd(660,.08,990)}else snd(140,.08)}
  if(pressed('b')||pressed('start'))state='hub';}
-function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);snd(520,.04)}if(pressed('right')){codexPage=Math.min(2,codexPage+1);snd(520,.04)}
+function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);snd(520,.04)}if(pressed('right')){codexPage=Math.min(3,codexPage+1);echoSel=0;snd(520,.04)}
+ if(codexPage===3){const found=ECHOES.filter(e=>RD.echo[e.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=found[echoSel];echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(pressed('b')||pressed('a')||pressed('start'))state='hub';}
+function boardUpdate(){const L=openMissions();if(L.length)boardSel=nav(boardSel,L.length);if(pressed('b')||pressed('a')||pressed('start'))state='hub'}
 function heatUpdate(){if(RD.stats.escapes<1){if(pressed('a')||pressed('b')||pressed('start'))state='hub';return}
  heatSel=nav(heatSel,PACT.length);const p=PACT[heatSel],cur=RD.pact[p.id]||0;
  if(pressed('right')&&cur<p.max){RD.pact[p.id]=cur+1;rdSave();snd(660,.06,880)}
@@ -367,7 +378,8 @@ function hitEnemy(e,dmg,src,kx,ky,p){if(e.hp<=0)return;p=p||lead();const s=rdSta
   if(g==='LEAF'&&Math.random()<.2)rdHeal(1,p);
   if(g==='PEB'){e.x+= (kx||0)*1.6;e.y+=(ky||0)*1.6;collide(e,e.r)}}
  if(e.hp<=0)killEnemy(e);}
-function killEnemy(e){if(e.dead)return;e.dead=true;e.hp=0;RD.stats.kills++;RUN.kills++;burst(e.x,e.y,'#e8e4f5',10,44);snd(240,.12,90,'triangle',.06);
+function killEnemy(e){if(e.dead)return;e.dead=true;e.hp=0;RD.stats.kills++;RUN.kills++;
+ if(e.kind==='boss'){const id=BOSSES[e.bossIx].id;RD.bossK[id]=(RD.bossK[id]||0)+1;bossSay(e,'down')}else{RD.killK[e.kind]=(RD.killK[e.kind]||0)+1;if(e.elite)RD.stats.elites=(RD.stats.elites||0)+1}burst(e.x,e.y,'#e8e4f5',10,44);snd(240,.12,90,'triangle',.06);
  if(e.kind==='boss'){for(const o of RUN.enemies)if(o!==e)o.hp=Math.min(o.hp,0),o.dead=true;RUN.enemies=RUN.enemies.filter(o=>o===e||!o.dead);RUN.enemies.splice(RUN.enemies.indexOf(e),1);
   RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:e.x-6,y:e.y},{type:PODW[RUN.biome][(Math.random()*6)|0],x:e.x+6,y:e.y});RUN.podDropped=true;ftext(e.x,e.y-14,'SPROUT PODS!','#a8f080');RUN.shake=5;return}
  const ix=RUN.enemies.indexOf(e);if(ix>=0)RUN.enemies.splice(ix,1);
@@ -383,7 +395,7 @@ function damagePlayer(p,n){if(!RUN||p.down||p.inv>0||p.dashT>0)return;const s=rd
  const peb=RUN.buds&&(RUN.buds.find(b=>b.type===1&&b.cd<=0&&b.own===p.ix)||RUN.buds.find(b=>b.type===1&&b.cd<=0));
  if(peb){peb.cd=15;p.inv=.55;ftext(p.x,p.y-16,'PEB BLOCKED!','#dce2ea');burst(p.x,p.y,'#dce2ea',6,30);snd(520,.08,760);return}
  let d=n*(1-s.armor)*(p.armT>0?.5:1);
- p.hp-=d;p.inv=.55;p.hurt=.25;p.charging=false;meterGain(p,d*.9);RUN.shake=Math.min(5,2.5);burst(p.x,p.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
+ p.hp-=d;p.inv=.55;p.hurt=.25;if(p.hp>0&&p.hp<s.maxHp*.3&&!p.lowSaid&&CHATTER[p.char]){p.lowSaid=true;sub(p.char,CHATTER[p.char].low[0],2.6,PCOL[p.ix])}p.charging=false;meterGain(p,d*.9);RUN.shake=Math.min(5,2.5);burst(p.x,p.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
  if(RUN.buds&&RUN.buds.length&&Math.random()<.3){let i=RUN.buds.length-1;for(let j=i;j>=0;j--)if(RUN.buds[j].own===p.ix){i=j;break}const lb=RUN.buds.splice(i,1)[0];ftext(p.x,p.y-20,TYPES[lb.type].n+' SCATTERED!','#f8a0c8');snd(340,.1,180)}
  if(hasKeep('charm')){for(const e of RUN.enemies.slice())if(Math.hypot(e.x-p.x,e.y-p.y)<e.r+9)hitEnemy(e,9,'reflect',0,0,p)}
  if(p.hp<=0){
@@ -470,7 +482,7 @@ function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv
 function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.bt-=dt;
  if(e.burn>0){e.burn-=dt;e.hp-=e.burnDps*dt;if(e.hp<=0){killEnemy(e);return}}
  if(e.chill>0)e.chill-=dt;if(e.root>0){e.root-=dt;return}
- const frac=e.hp/e.max;e.phase=frac>.66?1:frac>.33?2:3;
+ const frac=e.hp/e.max;e.phase=frac>.66?1:frac>.33?2:3;if(e.phase>(e.phSaid||1)){e.phSaid=e.phase;bossSay(e,'p'+e.phase)}
  const T=tgt(e);
  const radial=n=>{for(let i=0;i<n;i++){const a=i/n*6.283+e.t;RUN.eprojs.push({x:e.x,y:e.y,vx:Math.cos(a)*95,vy:Math.sin(a)*95,dmg:e.dmg*.8,r:3})}snd(180,.15,90,'sawtooth',.06)};
  const aimed=(n,sp)=>{const base=Math.atan2(T.y-e.y,T.x-e.x);for(let i=0;i<n;i++){const a=base+(i-(n-1)/2)*.22;RUN.eprojs.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,dmg:e.dmg*.85,r:3})}};
@@ -502,6 +514,9 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=
 function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  for(const p of PL)if(p.dev.pr.start){pauseSel=0;pausePage=0;state='pause';rdSave();return}
  if(RUN.shake>0)RUN.shake*=Math.max(0,1-dt*7);if(RUN.flash>0)RUN.flash-=dt;if(RUN.banner){RUN.banner.t-=dt;if(RUN.banner.t<=0)RUN.banner=null}
+ if(RUN.sub){RUN.sub.t-=dt;if(RUN.sub.t<=0)RUN.sub=null}for(const q of RUN.subQ)q.d-=dt;{const q=RUN.subQ.find(q=>q.d<=0);if(q){RUN.subQ.splice(RUN.subQ.indexOf(q),1);sub(q.who,q.txt,q.t,q.c)}}
+ RUN.mwT-=dt;if(RUN.mwT<=0){RUN.mwT=1;missionWatch()}
+ if(RUN.echo)for(const p of PL)if(!p.down&&Math.hypot(p.x-RUN.echo.x,p.y-RUN.echo.y)<12){echoTake();return}
  /* a super stops the room for a beat before it lands */
  if(RUN.freeze>0){RUN.freeze-=dt;for(const p of PL)if(p.supA>0)p.supA-=dt*.5;if(RUN.freeze<=0&&RUN.freezeP){const fp=RUN.freezeP;RUN.freezeP=null;superFire(fp)}return}
  const zipSp=1+.07*budCount(3);
@@ -509,7 +524,7 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  for(const p of PL){
   if(p.swing>0)p.swing-=dt;if(p.hurt>0)p.hurt-=dt;if(p.castA>0)p.castA-=dt;if(p.selfie>0)p.selfie-=dt;if(p.selfieA>0)p.selfieA-=dt;if(p.cheer>0)p.cheer-=dt;if(p.land>0)p.land-=dt;
   if(p.down){p.vx=p.vy=0;let near=false;for(const q of PL)if(q!==p&&!q.down&&Math.hypot(q.x-p.x,q.y-p.y)<20)near=true;
-   if(near){p.revT+=dt;if(p.revT>=2.2){p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1.5;burst(p.x,p.y,'#a8f080',14,46);say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS BACK UP!',1.6);snd(523,.1);later(()=>snd(784,.2),110)}}
+   if(near){p.revT+=dt;if(p.revT>=2.2){RD.stats.revives=(RD.stats.revives||0)+1;chatter('rev',true);p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1.5;burst(p.x,p.y,'#a8f080',14,46);say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS BACK UP!',1.6);snd(523,.1);later(()=>snd(784,.2),110)}}
    else p.revT=Math.max(0,p.revT-dt*.6);
    continue}
   const s=rdStats(p);
@@ -630,6 +645,8 @@ function gameUpdate(dt){time+=dt;
  case 'keep':keepUpdate();return;
  case 'codex':codexUpdate();return;
  case 'heat':heatUpdate();return;
+ case 'board':boardUpdate();return;
+ case 'echo':echoUpdate(dt);return;
  case 'boon':boonUpdate(dt);return;
  case 'shop':if(!RUN){state='hub';return}shopUpdate();return;
  case 'pause':if(!RUN){hubEnter();return}pauseUpdate();return;

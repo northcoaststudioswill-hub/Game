@@ -26,6 +26,7 @@ const RDF={
  forceShop:()=>{if(RUN){shopItems=genShop();uiSel=0;state='shop'}},
  giveRun:(k,n)=>{if(RUN)RUN[k]=(RUN[k]||0)+n},
  pod:t2=>{if(RUN)RUN.pods.push({type:t2,x:PL[0].x,y:PL[0].y})},
+ story:who=>{const e=storyNext(who);return e?e.id:null},
  meter:i=>{const p=PL[i||0];if(p)p.meter=100},
  goto:ch=>{if(RUN){RUN.enemies=[];RUN.wave2=null;RUN.boss=null;RUN.chamber=ch-1;rdNextChamber()}},
  finale:()=>{if(RUN){RUN.enemies=[];RUN.wave2=null;RUN.boss=null;RUN.chamber=11;rdNextChamber()}},

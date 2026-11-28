@@ -32,7 +32,7 @@ function movesReset(p,newRun){Object.assign(p,{spCd:0,spA:0,supA:0,heavyA:0,dive
 
 /* ---------------- specials ---------------- */
 function doSpecial(p){if(p.spCd>0||p.down||p.dive>0||p.zoom)return;const M=mv(p),[ax,ay]=aimVec(p),mul=moveMul(p);
- p.spCd=M.spCd/rdStats(p).castRegen;p.spA=.55;ftext(p.x,p.y-26,M.sp+'!','#f8a0c8');
+ RD.stats.specials=(RD.stats.specials||0)+1;p.spCd=M.spCd/rdStats(p).castRegen;p.spA=.55;ftext(p.x,p.y-26,M.sp+'!','#f8a0c8');
  if(p.char==='ERIN'){ /* LEASH LASSO: rope the nearest foe ahead and haul it in */
   let best=null,bs=1e9;for(const e of RUN.enemies){const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;if(d>135||e.born>0)continue;const dot=(dx*ax+dy*ay)/d,sc=d-(dot>.2?60:0);if(sc<bs){bs=sc;best=e}}
   RUN.acts.push({k:'leash',o:p,e:best,x2:p.x+ax*90,y2:p.y+ay*90,t:.3,t0:.3,mul});noise(.06,.3,4000);snd(700,.12,1500,'triangle',.05);return}
@@ -47,7 +47,7 @@ function doSpecial(p){if(p.spCd>0||p.down||p.dive>0||p.zoom)return;const M=mv(p)
 
 /* ---------------- supers ---------------- */
 function doSuper(p){if((p.meter||0)<SUPER_MAX||p.down||RUN.freeze>0)return;const M=mv(p);
- p.meter=0;p.supA=1.05;p.inv=Math.max(p.inv,1.4);p.dive=0;p.zoom=null;p.charging=false;
+ RD.stats.supers=(RD.stats.supers||0)+1;RD.flags['sup_'+p.char]=1;p.meter=0;p.supA=1.05;p.inv=Math.max(p.inv,1.4);p.dive=0;p.zoom=null;p.charging=false;
  RUN.freeze=.6;RUN.freezeP=p;RUN.banner={txt:M.sup,who:(PL.length>1?'P'+(p.ix+1)+'  ':'')+p.char,c:PCOL[p.ix],t:1.3};
  snd(220,.5,880,'sawtooth',.07);snd(330,.5,1320,'square',.04);RUN.shake=3}
 function superFire(p){const[ax,ay]=aimVec(p),mul=moveMul(p);
@@ -69,15 +69,16 @@ function superFire(p){const[ax,ay]=aimVec(p),mul=moveMul(p);
 /* ---------------- heavy & dash strike ---------------- */
 function doHeavy(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=aimVec(p),isLou=p.char==='LOUIE';
  const base=Math.max(...w.dmg)*2.4*s.dmgMul*s.atkMul*(isLou?.85:1);
- p.atkCd=w.rate*1.25;p.heavyA=.42;p.swing=0;ftext(p.x,p.y-26,mv(p).heavy+'!','#ffd94d');noise(.07,.22,1500);snd(160,.14,70,'sawtooth',.07);
+ RD.stats.heavies=(RD.stats.heavies||0)+1;p.atkCd=w.rate*1.25;p.heavyA=.42;p.swing=0;ftext(p.x,p.y-26,mv(p).heavy+'!','#ffd94d');noise(.07,.22,1500);snd(160,.14,70,'sawtooth',.07);
  let hit=false;for(const e of RUN.enemies.slice()){const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);
   if(d<32+e.r){const dot=(dx/(d||1))*ax+(dy/(d||1))*ay;if(dot>.45||d<13){e.root=Math.max(e.root,.45);hitEnemy(e,base,'heavy',(dx/(d||1))*15,(dy/(d||1))*15,p);hit=true}}}
  if(hit){RUN.shake=Math.max(RUN.shake,2.5);burst(p.x+ax*18,p.y+ay*18,'#fff3b0',10,46)}}
 function doDive(p){const w=WEAPONS[RD.weapon];p.atkCd=w.rate;p.dive=.3;p.dashGrace=0;p.inv=Math.max(p.inv,.4);p.swing=0;
  ftext(p.x,p.y-26,mv(p).dive+'!','#7fd0e8');snd(300,.2,900,'triangle',.06)}
 function diveLand(p){const w=WEAPONS[RD.weapon],s=rdStats(p),isLou=p.char==='LOUIE';
- const base=Math.max(...w.dmg)*1.6*s.dmgMul*s.atkMul*(isLou?.85:1);p.diveL=.3;
- for(const e of RUN.enemies.slice()){const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);if(d<27+e.r)hitEnemy(e,base,'atk',(dx/(d||1))*9,(dy/(d||1))*9,p)}
+ const base=Math.max(...w.dmg)*1.6*s.dmgMul*s.atkMul*(isLou?.85:1);p.diveL=.3;let any=false;
+ for(const e of RUN.enemies.slice()){const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);if(d<27+e.r){any=true;hitEnemy(e,base,'atk',(dx/(d||1))*9,(dy/(d||1))*9,p)}}
+ if(any)RD.stats.dives=(RD.stats.dives||0)+1;
  RUN.rings.push({x:p.x,y:p.y,r:27,t:.3,c:'#fff3b0'});burst(p.x,p.y,'#c8b8a8',12,50);RUN.shake=Math.max(RUN.shake,2.2);snd(120,.16,55,'sawtooth',.08);noise(.1,.25,700,'lowpass')}
 
 /* one keeper's attack-side input for this frame (replaces the bare "A = attack" line) */

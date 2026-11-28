@@ -92,6 +92,29 @@ is the fighter's own (`src/knockout.js`); what each does here is this port's rea
 - All of this is new power the cartridge never had, and foes were not buffed to match — expect runs to be
   easier until it is tuned.
 
+## Story
+
+`src/story.js` adds a story layer. **Almost all of its text is new writing, not canon handed over** — it is
+built only on what the cartridge already says (the Lantern cracked downward, the gods are the sprouts grown
+old, the Grub Mother is Thornback's mother, the Hollow Keeper wears and collects faces, keepers before came
+back changed, "one day the roots will bloom instead of bite"). The cartridge's own lines are untouched and
+still play as everyday chatter. Scout and Ranger only get errands and reactions, since they are placeholders.
+Nothing from the Pocket Lantern story notes is used. It is all data: cut or rewrite freely.
+
+- **22 missions** in chains from each NPC (Erin's is the main thread). An NPC with something new shows a
+  yellow `!`; one with a finished errand shows a green `?`. The Keeper's Board by the Root Door lists them.
+  Rewards are Moondew, keys, honey and a few sprouts.
+- **37 conversations** that each play once, when the thing they are about has actually happened: first death,
+  each boss met / lost to / beaten, reaching each biome, escapes, unlocking and playing as each keeper, first
+  super, weapons, keepsakes, co-op, revives, the Pact, echoes. Other characters cut in.
+- **18 echoes**: notes left by the keepers before, in three threads (one per biome), found as glowing pages
+  after chambers and kept in a new Codex page. Read in order they explain what is at the bottom.
+- **In the deep:** bosses speak on arrival, at each phase and on defeat, and what they say changes with how
+  often you have met them; each god has lines that move on each time you take their boon; Erin, Marcus and
+  Louie comment as playable keepers (Will stays silent, as in the intro); death and escape screens vary.
+- **The Hearth changes:** the Lantern glows brighter with each escape, and finishing Erin's chain makes the
+  floor flower.
+
 ## Open questions for Will
 
 - **Louie's signature is still THE BOOF**, lil Bottie's placeholder. The fighter in this repo
@@ -108,6 +131,7 @@ is the fighter's own (`src/knockout.js`); what each does here is this port's rea
 - `src/data.js` – the cartridge's tables, verbatim
 - `src/game.js` – the loop
 - `src/moves.js` – specials, supers, heavies, dash strikes
+- `src/story.js` – missions, conversations, echoes, boss / god / keeper lines
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes
 - `src/anim.js` – character animation: jointed rigs, spring-driven poses, every action and NPC habit
 - `src/ui.js` – HUD and every menu screen
@@ -126,6 +150,8 @@ Need Node + Playwright with Chromium.
   Hearth NPCs, close up, into `test/shots/anim-*.png`.
 - `node test/moves.js` – fires every keeper's special, super, heavy and dash strike with real key presses and
   checks they cost, land and clean up; saves a frame of each.
+- `node test/story.js` – missions asked and turned in, conversations firing off real progress, echoes, boss and
+  god lines, the ending; also checks every line of text fits its box.
 - `node test/phone.js` – iPhone-sized touch viewports, portrait and landscape.
 
 **Not yet verified:** a physical controller (no hardware here — the mapping follows the standard

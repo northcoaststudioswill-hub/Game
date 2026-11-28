@@ -58,8 +58,11 @@ function drawList(items,sel,y,step){items.forEach((s,i)=>{const on=i===sel;if(on
 /* ---------------- HUD: the Hearth ---------------- */
 function hudHub(){
  for(const s of STATIONS){const q=project(s.x,25,29);if(q){const locked=s.id==='heat'&&RD.stats.escapes<1;ctext(s.l,Math.max(23,q.y-10),1,locked?'#6a6284':'#e8e0f8','#120a18',q.x)}}
- for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;const q=project(n.x,who==='LOUIE'?15:26,n.y);if(q)ctext(who,q.y-11,1,'#c8c0d8','#120a18',q.x)}
+ for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;const q=project(n.x,who==='LOUIE'?15:26,n.y);
+  if(q&&state==='hub'){const ev=storyNext(who);if(ev){const turnin=!!ev.mission,by2=q.y-28+Math.sin(time*5)*2;r('#120a18',q.x-6,by2-1,12,15);r(turnin?'#58c048':'#ffd94d',q.x-5,by2,10,13);ctext(turnin?'?':'!',by2+1,1,'#120a18',null,q.x)}}
+  if(q)ctext(who,q.y-11,1,'#c8c0d8','#120a18',q.x)}
  {const q=project(DOOR.x,6,DOOR.y+4);if(q)ctext('DESCEND',q.y,1,'#f8c070','#120a18',q.x)}
+ {const q=project(BOARD.x,20,BOARD.y+7);if(q)ctext('BOARD',q.y-10,1,'#e8e0f8','#120a18',q.x)}
  if(PL.length>1)for(const p of PL){const q=project(p.x,27,p.y);if(q)ctext('P'+(p.ix+1),q.y-12,1,PCOL[p.ix],'#120a18',q.x)}
  /* top bar */
  r('rgba(10,6,16,.82)',0,0,VW,19);r('#c8a04a',0,19,VW,1);
@@ -69,12 +72,15 @@ function hudHub(){
    r('rgba(10,6,16,.88)',VW/2-w/2,y-3,w,18);r(PCOL[p.ix],VW/2-w/2,y-3,3,18);ctext(m,y,2,'#ffd94d');shown++}
   if(PL.length<4)text('MORE KEEPERS: PRESS A ON ANOTHER PAD'+(PL.length===1?' ( , ON KEYS)':''),8,VH-14,1,'rgba(200,192,216,.55)',null);
   rtext(PL.length+' / 4 KEEPERS',VW-8,VH-14,1,'rgba(200,192,216,.7)',null)}
- if(joinT>0)ctext(joinMsg,32,2,'#a8f080');
+ if(joinT>0)ctext(joinMsg,32,tw(joinMsg,2)>VW-20?1:2,'#a8f080');
  if(state==='talk'&&talkNPC){const bx=Math.max(8,VW/2-170),bw=Math.min(340,VW-16),by=VH-84;
   panel(bx,by,bw,76,'#f8f0d8','#181020');
-  const nw=tw(talkNPC,2)+14;r('#181020',bx+6,by-9,nw,17);r(RDCPLATE[talkNPC]||'#b8304a',bx+7,by-8,nw-2,15);text(talkNPC,bx+13,by-6,2,'#ffffff',null);
+  const sp=talkEv?talkWho:talkNPC,nw=tw(sp,2)+14;r('#181020',bx+6,by-9,nw,17);r(RDCPLATE[sp]||'#b8304a',bx+7,by-8,nw-2,15);text(sp,bx+13,by-6,2,'#ffffff',null);
   wrapPx(talkTxt,bw-24,1).slice(0,3).forEach((l,i)=>text(l,bx+12,by+14+i*13,1,'#281c30',null));
-  const more=talkStart+talkLine<LINES[talkNPC].length-1,d=lead0();
+  const d=lead0();if(talkEv){const last=talkLine>=talkEv.lines.length-1,rw=talkEv.rew?rewTxt(talkEv.rew):'';
+   text(btnName(d,'a')+(last?': DONE':': MORE')+'  ·  '+btnName(d,'b')+': SKIP'+(last&&rw?'      '+rw:''),bx+12,by+60,1,last&&rw?'#3a7a28':'#7a6a8a',null);
+   rtext((talkLine+1)+' / '+talkEv.lines.length,bx+bw-10,by+60,1,'#a89a8a',null);return}
+  const more=talkStart+talkLine<LINES[talkNPC].length-1;
   text((more?btnName(d,'a')+': MORE':btnName(d,'a')+': BYE')+'  ·  '+btnName(d,'b')+': BYE'+(RD.honey>0?'  ·  '+btnName(d,'start')+': GIFT HONEY ('+RD.honey+')':''),bx+12,by+60,1,'#7a6a8a',null)}}
 
 /* ---------------- HUD: the run ---------------- */
@@ -115,6 +121,10 @@ function hudRun(){const B=BIOMES[RUN.biome];
   ctext(BOSSES[RUN.boss.bossIx].n,by+11,1,'#ffb0a0','#120a18')}
  if(RUN.zoneT>0)logoText(B.n,VW/2,VH*.28,22);
  if(say2T>0&&!RUN.banner)ctext(say2Txt,VH*.44,2,'#ffd94d');
+ if(RUN.echo){const q=project(RUN.echo.x,22,RUN.echo.y);if(q)ctext('AN ECHO',q.y-8,1,'#ffe9a0','#120a18',q.x)}
+ /* who is talking down here */
+ if(RUN.sub&&!RUN.banner){const s2=RUN.sub,L=wrapPx(s2.txt,Math.min(330,VW-130),1).slice(0,2),bw=Math.max(...L.map(l=>tw(l,1)),tw(s2.who,1))+22,bx=(VW-bw)/2,by=VH-50-L.length*12,al=clamp(s2.t/.3,0,1);
+  hx.globalAlpha=al;r('rgba(8,5,14,.84)',bx,by,bw,L.length*12+17);r(s2.c,bx,by,3,L.length*12+17);text(s2.who,bx+10,by+3,1,s2.c,null);L.forEach((l,i)=>text(l,bx+10,by+15+i*12,1,'#f4ead2',null));hx.globalAlpha=1}
  if(RUN.flash>0)r('rgba(255,255,255,'+clamp(RUN.flash/.3,0,1)*.85+')',0,0,VW,VH);
  /* super call-out: letterbox, name, whose it is */
  if(RUN.banner){const b=RUN.banner,inn=clamp((1.3-b.t)/.12,0,1),out=clamp(b.t/.25,0,1),k=inn*out,by=VH*.13;r('rgba(6,4,12,'+.8*k+')',0,by,VW,52);r(b.c,0,by,VW*k,2);r(b.c,VW*(1-k),by+50,VW*k,2);
@@ -136,18 +146,39 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
  if(state==='keep'){screenShell('KEEPSAKE SHELF','ONE AT A TIME  ·  LEVELS BY USE');
   rowsDraw2(KEEPS.map(k=>{const own=M.keeps[k.id];return{a:(M.keepEq===k.id?'* ':'')+k.n,b:own?'Lv'+keepLv(k.who)+'  ·  '+(M.keepXp[k.who]||0)+'/50':'GIFT '+k.who}}),uiSel,KEEPS[uiSel].d);
   footer(A+': EQUIP / REMOVE    '+Bk+': BACK');return}
- if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+Bk+': BACK');
+ if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 4  ·  '+Bk+': BACK');
   if(codexPage===0)rowsPlain(['RUNS '+M.stats.runs+'   DEATHS '+M.stats.deaths,'ESCAPES '+M.stats.escapes+'   CHAMBERS '+M.stats.chambers,'FOES FELLED '+M.stats.kills+'   BOSSES '+M.stats.bosses,'HEAT NOW '+heatTotal(),'WEAPON: '+WEAPONS[M.weapon].n,'KEEPSAKE: '+(M.keepEq?((KEEPS.find(k=>k.id===M.keepEq)||{}).n):'NONE')],60,17);
   else if(codexPage===1){const seen=Object.keys(FOES).filter(k=>M.seen[k]);const boss=Object.keys(BOSSES).filter(i=>M.seen[BOSSES[i].id]);
    rowsPlain(['FOES MET '+seen.length+' / '+Object.keys(FOES).length].concat(seen.map(k=>FOES[k].n)).concat(['BOSSES MET '+boss.length+' / 3']).concat(boss.map(i=>BOSSES[i].n)),60,15)}
-  else rowsPlain(['BOONS DISCOVERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
+  else if(codexPage===2)rowsPlain(['BOONS DISCOVERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
+  else{const found=ECHOES.filter(e=>M.echo[e.id]);text('ECHOES FOUND  '+found.length+' / '+ECHOES.length,PX+14,54,1,'#ffd94d',null);
+   if(!found.length)wrapPx('Nothing yet. The keepers before you left notes in the deep. Clear chambers and look for a page that glows.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
+   const top=clamp(echoSel-6,0,Math.max(0,found.length-13));found.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
+    text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(ECHOTH[e.th],PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
+   if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
   return}
+ if(state==='board'){const L=openMissions(),done=MISSIONS.filter(m=>M.msn[m.id]).length;screenShell("KEEPER'S BOARD",'ERRANDS DONE  '+done+' / '+MISSIONS.length);
+  if(!L.length){ctext('NOTHING PINNED UP. EVERY ERRAND IS DONE.',110,1,'#a8f080',null);footer(Bk+': BACK');return}
+  const top=clamp(boardSel-4,0,Math.max(0,L.length-8));
+  L.slice(top,top+8).forEach((m,i)=>{const on=top+i===boardSel,yy=56+i*19,told=M.flags['mt_'+m.id],q=m.p(),fin=q[0]>=q[1];
+   if(on){r('#f8e060',PX+8,yy-4,284,17);r('#281c30',PX+9,yy-3,282,15)}
+   r(RDCPLATE[m.who]||'#444',PX+12,yy-1,4,11);text(told?m.n:'? ? ?',PX+21,yy,1,on?'#ffffff':'#c8c0d8',null);
+   rtext(!told?'ASK '+m.who:fin?'TELL '+m.who:q[0]+' / '+q[1],PX+286,yy,1,fin&&told?'#a8f080':on?'#ffd94d':'#8d84a8',null)});
+  const m=L[boardSel]||L[0],told=M.flags['mt_'+m.id];
+  wrapPx(told?m.d+'  ('+m.who+')   '+rewTxt(m.rew):m.who+' has something to ask you. Go and talk to them.',270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null));
+  footer(Bk+': BACK');return}
+ if(state==='echo'&&echoRead){r('rgba(8,5,12,.82)',0,0,VW,VH);const bw=Math.min(330,VW-20),bx=(VW-bw)/2,by=VH*.2;
+  panel(bx,by,bw,150,'#efe2bc','#3a2c18');r('rgba(120,90,40,.18)',bx,by,bw,20);
+  ctext(ECHOTH[echoRead.th],by+5,1,'#7a5a28',null);ctext(echoRead.n,by+26,2,'#3a2414',null);
+  wrapPx(echoRead.x,bw-34,1).slice(0,7).forEach((l,i)=>text(l,bx+17,by+50+i*13,1,'#3a2c24',null));
+  rtext((ECHOES.filter(e=>M.echo[e.id]).length)+' / '+ECHOES.length,bx+bw-10,by+134,1,'#9a7a48',null);
+  if(echoT>.5&&((time*2)|0)%2)ctext(A+': KEEP IT',by+160,1,'#ffd94d','#120a18');return}
  if(state==='heat'){screenShell('THE PACT OF ROOTS','TOTAL HEAT: '+heatTotal());
   if(RD.stats.escapes<1){ctext('SEALED. ESCAPE ONCE TO OPEN.',110,2,'#8d84a8');ctext(A+': BACK',140,1,'#8d84a8',null);return}
   rowsDraw2(PACT.map(px=>({a:px.n,pip:[RD.pact[px.id]||0,px.max],b:''})),heatSel,PACT[heatSel].d+' Bosses pay Dew bounties at new heat.');
   footer('< > ADJUST    '+Bk+': BACK');return}
  if(state==='boon'){r('rgba(10,6,18,.84)',0,0,VW,VH);PX=(VW-300)/2;const god=boonOffer[0]?boonOffer[0].god:'EMBER';
-  ctext(GODS[god].n+' SPEAKS',12,3,GODS[god].l,'#181020');ctext('"'+GODS[god].t+' OFFERS:"',33,1,'#a89ec2',null);
+  ctext(GODS[god].n+' SPEAKS',12,3,GODS[god].l,'#181020');wrapPx('"'+(boonQuote||GODS[god].t+' OFFERS:')+'"',Math.min(VW-20,420),1).slice(0,2).forEach((l,i,a)=>ctext(l,(a.length>1?29:33)+i*11,1,'#a89ec2',null));
   boonOffer.forEach((b,i)=>{const y=52+i*70,on=i===uiSel,gc=GODS[b.god]||GODS.EMBER;
    panel(PX,y,300,62,on?'#fff3b0':'#2e2450',on?'#f8e060':'#0c0814');r(gc.c,PX,y,5,62);
    text(boonName(b),PX+13,y+6,2,on?'#281c30':'#e8e4f5',null);
@@ -225,7 +256,7 @@ function hudCine(){const sc=RDCINE[rdCineIx];r('#000000',0,0,VW,20);r('#000000',
  rtext(btnName(lead0(),'start')+': SKIP',VW-8,VH-14,1,'#8d84a8',null)}
 function hudOver(win){r(win?'rgba(16,24,12,.84)':'rgba(24,8,14,.84)',0,0,VW,VH);const L=RD.lastRun||{chamber:0,kills:0,dew:0,petals:0,heat:0};
  ctext(win?'YOU ESCAPED THE DEEP':'THE DEEP KEEPS YOU',34,4,win?'#ffd94d':'#ff9a8a','#181020');
- ctext(win?'DAWN, AND YOUR FACE IS STILL YOURS':'ERIN WILL COME DIGGING. SHE ALWAYS DOES',66,1,'#c8c0d8',null);
+ ctext(win?escapeLine():deathLine(),66,1,'#c8c0d8',null);
  ctext('CHAMBERS REACHED  '+(win?12:L.chamber),100,2,'#ffffff');
  ctext('FOES FELLED  '+L.kills,122,2,'#ffffff');
  ctext('MOONDEW BANKED  +'+L.dew,144,2,'#7fd0e8');
@@ -241,6 +272,7 @@ function drawHud(){hx.setTransform(hudS,0,0,hudS,0,0);hx.clearRect(0,0,VW,VH);
  case 'chars':hudChars();return;
  case 'run':hudRun();return;
  case 'pause':case 'boon':case 'shop':if(RUN)hudRun();drawUI();return;
+ case 'echo':drawUI();return;
  case 'set':if(setReturn!=='pause')hudTitle();drawUI();return;
  case 'over':hudOver(false);return;
  case 'win':hudOver(true);return;

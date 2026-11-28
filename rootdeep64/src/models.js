@@ -212,6 +212,9 @@ function buildProps(){let b;
  b=new MB();b.cyl(0,0,0,2.8,3.6,5,6,'#8a4420','#b86a38');b.sph(0,8.6,0,4.6,4,4.6,7,5,'#2c7028','#68d050');b.sph(2.4,11.4,.6,2.6,2.2,2.6,6,4,'#3c8840','#78e060');PROP.plant=b.done();
  b=new MB();b.box(0,3.4,0,9,6.8,8,'#6a4428','#9a6838');b.box(0,3.4,0,9.4,1.2,8.4,'#4a2c18');b.box(0,6.9,0,9.4,.6,8.4,'#4a2c18');PROP.crate=b.done();
  b=new MB();b.box(0,6.4,0,17,1.2,9,'#6a4028','#8a5a38');for(const[x,z]of[[-7,-3.4],[7,-3.4],[-7,3.4],[7,3.4]])b.box(x,3,z,1.3,6,1.3,'#5a3a20');b.cyl(3,7,0,.7,.7,2.6,5,'#f8f0d8');PROP.table=b.done();
+ b=new MB();b.box(-7,7,0,1.4,14,1.4,'#5a3418','#7a4a28');b.box(7,7,0,1.4,14,1.4,'#5a3418','#7a4a28');b.box(0,10,0,16,9,1,'#6a4428','#9a6838');b.box(-4,11,.7,4.4,5,.3,'#f8f0d8');b.box(2,9.6,.7,4,4.4,.3,'#f4e2b0');b.box(4.6,12.4,.7,3,2.6,.3,'#f8a0c8');b.box(-4,13.2,.9,.8,.8,.3,'#e84a5f');b.box(2,11.6,.9,.8,.8,.3,'#58c048');PROP.board=b.done();
+ b=new MB();b.box(0,0,0,6,8,.5,'#e8dcb8','#fff8dc');b.box(0,1.6,.3,4,.5,.2,'#6a5a48');b.box(0,0,.3,4,.5,.2,'#6a5a48');b.box(-.5,-1.6,.3,3,.5,.2,'#6a5a48');PROP.page=b.done();
+ b=new MB();b.cyl(0,0,0,.4,.3,5,4,'#2c6030');for(let i=0;i<5;i++){const a=i/5*6.2832;b.sph(Math.cos(a)*1.7,5.4,Math.sin(a)*1.7,1.4,.6,1.4,5,3,'#f070a8','#ffd0e4')}b.sph(0,5.7,0,1,.7,1,5,3,'#ffd94d');b.sph(1.6,2.2,0,1.6,.4,.9,5,3,'#58c048');PROP.flower=b.done();
  b=new MB();b.box(0,5,0,1.8,10,1.8,'#3a2c22','#5a4030');b.cyl(0,10,0,1.6,2.6,2,5,'#2c2028');PROP.torch=b.done();
  /* the Great Lantern */
  b=new MB();b.box(0,5,0,7.4,8,7.4,'#f8c050','#fff2b0');PROP.lampGlass=b.done();
@@ -281,7 +284,12 @@ function sceneHub(dt){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#
   if(s.id==='heat'&&!locked){const fl=Math.sin(time*10);sprite(s.x,15+fl*.5,29,9+fl,hex('#f8d030'),.95,true);sprite(s.x,16,29,30,hex('#f07830'),.3,true)}
   if(s.id==='mirror')sprite(s.x,12,31,22,hex('#a8d8e8'),.14+.05*Math.sin(time*2),true)}
  lantern(W/2,50,H*.42,1.5);
+ /* every escape carries a little of it home */
+ {const e=Math.min(4,RD.stats.escapes||0);if(e)sprite(W/2,56,H*.42,60+e*26,hex('#ffe9a0'),.1+e*.07,true)}
  torch(12,40);torch(W-12,40);torch(12,H*.62);torch(W-12,H*.62);
+ prop(PROP.board,BOARD.x,0,BOARD.y+7,-.3,1.1);shadow(BOARD.x,BOARD.y+6,8);
+ /* ...and one day the roots bloom instead of bite */
+ if(RD.flags.bloom)for(let i=0;i<22;i++){const fx=20+(i*83)%(W-40),fz=50+(i*47)%(H-80);prop(PROP.flower,fx,0,fz,i,.9+(i%3)*.25+Math.sin(time*1.5+i)*.04)}
  /* sprout bed with everything you have banked */
  prop(PROP.bed,BED.x,0,BED.y-6,0,1.08);
  {const flat=[];for(let ty=0;ty<6;ty++)for(let i=0;i<(RD.bank[ty]||0);i++)flat.push(ty);
@@ -325,6 +333,7 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
   sprite(d.x,13,29,40,gc,.26+.1*Math.sin(time*4+d.x),true);
   mPush();mT(d.x,.45,d.y+9);mS(12);drawT(MESH.ring,{c:gc,a:.7,unlit:true});mPop();
   if(d.hold>0){mPush();mT(d.x,.5,d.y+9);mS(12*clamp(d.hold/.6,0,1));drawT(MESH.disc,{c:gc,a:.4,unlit:true});mPop()}}
+ if(RUN.echo){const q=RUN.echo,bob=Math.sin(time*2.4)*1.5;shadow(q.x,q.y,3.5);prop(PROP.page,q.x,10+bob,q.y,time*1.3,1.1,{unlit:true,add:.1});sprite(q.x,10+bob,q.y,30+bob*2,hex('#ffe9a0'),.4,true);const t=(time*.7)%1;sprite(q.x,10+t*22,q.y,2.4,hex('#fff3b0'),1-t,true)}
  for(const pd of RUN.pods){const bob=Math.sin(time*3+pd.x);prop(PODM[pd.type],pd.x,0,pd.y,time*.6,1.25);sprite(pd.x,5,pd.y,24+bob*3,hex('#a8f080'),.3+.1*bob,true)}
  for(const p of RUN.pickups){const bob=Math.sin(time*5+p.x)*1.2;shadow(p.x,p.y,2.6);
   prop(PROP[p.kind]||PROP.petal,p.x,(p.kind==='petal'?3.2:5)+bob,p.y,time*3+p.x,p.kind==='petal'?.75:1,p.kind==='dew'?{add:.12}:null);
@@ -397,10 +406,10 @@ function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
   prop(PROP.bigDoor,cx,0,46,0,.8);sprite(cx,34,56,110,hex('#a8f080'),.25+.1*Math.sin(time*3),true);
   const wz=Math.max(70,H-10-tt*22);shadow(cx,wz,6);drawCast('WILL',cx,wz,3.14159,{id:'cD',weapon:'blade'})}
  frameEnd()}
-function drawScene(dt){ADT=(state==='pause'||state==='boon'||state==='shop'||(state==='set'&&setReturn==='pause'))?0:dt;
+function drawScene(dt){ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
  if(state==='chars')return sceneChars(dt);
- if(RUN&&(state==='run'||state==='pause'||state==='boon'||state==='shop'||state==='set'))return sceneRun(dt);
+ if(RUN&&(state==='run'||state==='pause'||state==='boon'||state==='shop'||state==='set'||state==='echo'))return sceneRun(dt);
  if(state==='over'||state==='win')return sceneTitle(dt);
  return sceneHub(dt)}
