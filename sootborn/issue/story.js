@@ -3,7 +3,7 @@
     let t = '', g = null;
     // the bond house stair up to the gallery, the back stair up to the roof door, the gangway to Mooring One
     S.links = S.links || [{ a: [-12.6, 0, 3.7], b: [-23.3, 4, 3.7], w: 1.3 }, { a: [-23.3, 4, -18.2], b: [-13.3, 8.4, -18.2], w: 1.2 }, { a: [-11.3, 9, -34.25], b: [-0.8, 11, -34.25], w: 1.25 }];
-    if (S.enc) t = S.enc.id === 'boss' ? 'CAPTAIN ROOK HOLDS MOORING ONE. TAKE IT.' : 'PUT THE DOCK GUARD DOWN';
+    if (S.enc) t = S.enc.id === 'boss' ? 'STAIR CAPTAIN ROOK HAS MOORING ONE' : 'PUT THE DOCK GUARD DOWN';
     else if (!F.path) { t = 'ONTO THE CAUSEWAY'; g = CROSS.alley; }
     else if (!F.e_alley) t = 'PUT THE DOCK GUARD DOWN';
     else if (!F.e_street) { t = 'OUT ONTO THE QUAY'; g = { x: 0, y: 0, z: 12 }; }
@@ -60,18 +60,18 @@
   const FIN = {
     count: { k: 'furnace2', name: 'ELEVEN', line: 'ONE. TWO. THREE. I COUNT THE SECONDS THE DOORS STOOD OPEN. THEN I GO TO WORK.' },
     warden: { k: 'furnace0', name: 'FOR HUMMING', line: 'A WARDEN STRUCK A WELDER DOWN FOR HUMMING HER GOODBYE. I WAS HELD ON THE FLOOR FOR IT.' },
-    boss: { k: 'kael0', name: 'STRUCK THROUGH', line: 'I LEARNED TO COUNT THE WAY THEY DO. NOW I DO THE STRIKING.' }
+    boss: { k: 'kael0', name: 'STRUCK THROUGH', line: 'A LINE IS STRUCK AT A DESK, WITHOUT LOOKING. I HAVE STRUCK FOUR HUNDRED THAT WAY. I LOOK AT THIS ONE.' }
   };
   const art = a => ({ img: A_(a.k), name: a.name, line: a.line });
   /* the question marks: what he sees, then what it makes him remember */
   const MEM = {
     casings: [{ k: 'desk5', cap: 'THAT AFTERNOON. THE COUNT.', cap2: 'I WROTE THE ROTA AT MY DESK. MAREN ALDANE TOOK IT FOR COPYING. *SHE HAD NEVER OFFERED TO COPY ANYTHING BEFORE.*' }],
     bike: [{ k: 'freight0', cap: 'LAST NIGHT. FREIGHT THREE.', cap2: '"IF THE NINE MINUTES ARE NOT THERE, THE STAIR WILL WANT HOLDING. *I HOLD IT.*"' }, { k: 'dockstair0', cap2: 'BRAND SAID IT LIKE A MAN READING OUT A LINE THAT WAS ALREADY WRITTEN.' }],
-    masks: [{ k: 'furnace0', cap: 'YEAR NOUGHT. THE HEART-FURNACE.', cap2: 'A WARDEN PUT A HALBERD BUTT INTO HOLLIS FOR HUMMING. *THAT WARDEN IS HOLDING THE STAIR BEHIND ME.*' }],
+    masks: [{ k: 'furnace0', cap: 'THE DAY OF THE FURNACE. BAY THREE.', cap2: 'A WARDEN PUT A HALBERD BUTT INTO HOLLIS FOR HUMMING. *THAT WARDEN IS HOLDING THE STAIR BEHIND ME.*' }],
     ledger: [{ k: 'desk4', cap: 'FIVE YEARS AFTER THE FURNACE. THE MORNING AFTER RISER NINE.', cap2: '"SOMEONE WHO HAD DONE IT BEFORE," CADE SAID. HE LOOKED AT ME FOR AS LONG AS IT TAKES TO COUNT TO ELEVEN.' }, { k: 'ledger2', cap2: 'FOUR HUNDRED AND SIX LINES I HAVE STRUCK MYSELF. *I LEARNED EVERY ONE.*' }],
-    lintel: [{ k: 'under0', cap: 'THE YEAR OF THE FURNACE. THE OLD TUNNEL.', cap2: 'HARL CHALKED TWO WORDS WHERE THE AUTHORITY WOULD NEVER LOOK. *STILL FLOWING.* THE AIR WENT UP. IT HAS ALWAYS GONE UP.' }],
-    shoe: [{ k: 'ward0', cap: 'THE FEVER WARD. TIER SIX.', cap2: 'FORTY BEDS. FORTY CHILDREN BREATHING BECAUSE OF HER. *THE NUMBER FOLLOWS ME ABOUT.*' }],
-    plates: [{ k: 'row0', cap: 'ROW K.', cap2: 'MARA KNELT AT FORTY-FOUR COMMITMENTS AND COUNTED EVERY ONE. *SHE STOOD UP AT THE FORTY-FIFTH.*' }],
+    lintel: [{ k: 'under0', cap: 'THE YEAR OF THE FURNACE. THE AUX-9 LINE.', cap2: 'HARL CHALKED TWO WORDS WHERE THE AUTHORITY WOULD NEVER LOOK. *STILL FLOWING.* THE AIR WENT UP. IT HAS ALWAYS GONE UP.' }],
+    shoe: [{ k: 'ward0', cap: 'THE FEVER WARD. TIER SIX.', cap2: 'FORTY BEDS, BREATHING BECAUSE OF HER. PIP ASKED ME THERE IF THE SKY WAS BLUE. *I DID NOT KNOW.*' }],
+    plates: [{ k: 'row0', cap: 'EIGHT YEARS AFTER THE FURNACE. TIER SIX.', cap2: 'MARA KNELT AT FORTY-FOUR COMMITMENTS AND COUNTED EVERY ONE. *SHE STOOD UP AT THE FORTY-FIFTH.*' }],
     halberd: [{ k: 'dockstair0', cap: 'SEVEN YEARS AFTER THE FURNACE. THE DOCK STAIR.', cap2: 'ELEVEN MINUTES. SOMEBODY TIMED IT. *I ASKED THEM TO.*' }],
     loft: [{ k: 'lift0', cap: 'SIX YEARS AFTER THE FURNACE. HER ROOM.', cap2: 'I HUMMED THE SHIFT SONG AT HER VALVE AND DID NOT HEAR MYSELF. *SHE HAS KNOWN SINCE.*' }, { k: 'hands0', cap2: 'THE WASHER IS UNDER MY COLLAR. IT HAS NOT GOT ANY HEAVIER.' }]
   };
@@ -82,6 +82,23 @@
       panels: m.map((p, i) => ({ img: A_(p.k), cls: 'px', area: wide ? '1 / ' + (i + 1) + ' / 2 / ' + (i + 2) : (i + 1) + ' / 1 / ' + (i + 2) + ' / 2', cap: p.cap, cap2: p.cap2 })) }, done);
   }
   function sayThenMemory(id, lines, done) { U.say(lines, () => pagesOf(MEM[id], done)); }
+  /* v0.91 LORE: where each level sits in the story: [name, date, end title, end line, title logo]. Used by the level's own title and end card (patch.mjs, LORE block) */
+  SC.lvCard = () => ({
+    docks: ['THE HIGH DOCKS', 'SEVEN YEARS AFTER THE FURNACE', 'FOUR HUNDRED HULLS', 'Seven years after the furnace. The second bell. The last pair is on the wind, and the stair is full of light.', '<span>THE HIGH</span>DOCKS'],
+    riser: ['RISER NINE', 'FIVE YEARS AFTER THE FURNACE', 'FORTY OF ELEVEN HUNDRED', 'Five years after the furnace. The night they balanced Tier Four. Forty went into the pines with their lamps hooded.', '<span>RISER</span>NINE'],
+    stair: ['THE STAIR', 'NINE YEARS AFTER THE FURNACE', 'NINE HUNDRED STEPS', 'Nine years after the furnace. Sunset. There is one door left, and it is white.', '<span>THE</span>STAIR'],
+    stack: ['THE VENT STACK', 'FOUR YEARS AFTER THE FURNACE &middot; THE ASSAY, DAY THIRTY-ONE', 'THEIR BOOTS, OUR AIR', 'The Assay. Day thirty-one. The island. The boots burn blue.', '<span>THE VENT</span>STACK'],
+    array: ['THE DEEP ARRAY', 'FORTY-THREE DAYS AFTER THE FURNACE', 'THIRTY-ONE OF FORTY-EIGHT', 'Forty-three days after the furnace. Under the floor, with Harl. Not who breathes. How long.', '<span>THE DEEP</span>ARRAY'],
+    gild: ['THE TABLE', 'HALF A YEAR AFTER THE FURNACE', 'NINE MONTHS', 'Half a year after the furnace, to fifteen months after. Pump Room Seven, under Tier Six.', '<span>THE</span>TABLE']
+  })[SC.issue] || ['THE HIGH DOCKS', 'SEVEN YEARS AFTER THE FURNACE', 'FOUR HUNDRED HULLS', 'The last pair is on the wind. The stair is full of light.', '<span>THE HIGH</span>DOCKS'];
+  SC.lvClues = { docks: 5, riser: 2, stair: 2, stack: 2, array: 2 }[SC.issue] || 5;
+  /* v0.91 LORE: things to read that nobody points at. Not counted, nothing depends on them: a notice, a board, a mark. o.pages: memory panels after the lines */
+  function lore(id, x, y, z, o, lines) { o = o || {};
+    W.addInteract({ id: 'l_' + id, x, y, z, fx: o.fx, fz: o.fz, r: o.r || 1.5, label: o.label || 'READ', marker: 'clue', mh: o.mh || 1.5, when: () => !F['lore_' + id] && !S.enc && !SC.cold && (!o.when || o.when()),
+      act: () => { F['lore_' + id] = 1; save(); SC.audio.sfx('clue'); pl.setState('interact'); pl.control = false; U.say(lines, () => pagesOf(o.pages, () => { pl.setState('idle'); pl.control = true; })); } }); }
+  /* what the people with him say, or the people going past, between fights: one line at a time, each once, never over another line */
+  function murmur(list) { let i = 0, t = 10; W.dyn.push((tt, dt) => { if (!dt || i >= list.length || SC.state !== 'play' || !pl.control || S.enc || SC.cold || U.dlg || U.pg || U.mem || U.menuOpen || !F.intro) return; t -= dt; if (t > 0) return;
+    const m = list[i]; if (m.when && !m.when()) { if (m.skip && m.skip()) i++; t = 1; return; } const el = document.getElementById('toast'); if (el && el.classList.contains('on')) { t = 2.5; return; } i++; t = 18; U.toast(m.t, 4.5); }); }
   /* every chalked sun is a different thing he cannot put down: below, the Assay, and the two women */
   const SUN = {
     docks: {
@@ -89,18 +106,18 @@
         { k: 'desk3', cap: 'MY DESK. FIVE YEARS AFTER THE FURNACE.', cap2: 'KESTREL DRAY TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
         { k: 'hands0', cap2: 'THE WASHER WAS UNDER MY COLLAR. I WAITED FOR IT TO GET HEAVIER. *IT DID NOT, AND I HAVE NOT FORGIVEN IT.*' }] },
       roof: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
-        { k: 'assay0', cap: 'THE ASSAY. FOUR YEARS AFTER THE FURNACE.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. DORIAN ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
-        { k: 'ward0', cap: 'TIER SIX. THE FEVER WARD.', cap2: 'THE NIGHT THE FEVER BROKE, TAVI ASKED FOR BREAD. I NEVER TOLD DORIAN THERE WAS A SHE. *THERE WERE FORTY BEDS, AND A SHE.*' }] } },
+        { k: 'assay0', cap: 'FOUR YEARS AFTER THE FURNACE. THE ASSAY. THE FIRST NIGHT.', cap2: 'THE ONES NOBODY PAID FOR ARE SEALED IN BY TWOS. ONE COMES OUT A CADET. DORIAN ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
+        { k: 'ward0', cap: 'THE NIGHT BEFORE THE FURNACE. THE FEVER WARD.', cap2: 'THE NIGHT THE FEVER BROKE, TAVI ASKED FOR BREAD. I NEVER TOLD DORIAN THERE WAS A SHE. *THERE WERE FORTY BEDS, AND A SHE.*' }] } },
     riser: {
       yard: { fury: 1, toast: 'HANDS. *FURY.*', p: [
-        { k: 'island0', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'A JUNIOR ON THE ARRAY BOARD KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
+        { k: 'island0', cap: 'FOUR YEARS AFTER THE FURNACE. THE ASSAY. NIGHT TWENTY-FIVE.', cap2: 'A JUNIOR ON THE ARRAY BOARD KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
         { k: 'furnace2', cap2: 'SEREN TAUGHT ME THAT. HANDS, KAEL. EVERYTHING IS HANDS. *I HAD NOT KNOWN ANYONE ABOVE THE ROCK COULD LEARN IT.*' }] } },
     stair: {
       yard: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
-        { k: 'assay0', cap: 'THE LAST DAY OF THE ASSAY.', cap2: 'I TOOK A KEEP FROM THE HIGH AUDITOR\'S SON WHILE SHE WATCHED. SHE PINNED A SUN ON ME FOR IT. *SHE SAID I REMINDED HER OF SOMEONE.*' },
-        { k: 'lift0', cap: 'ASHGATE SQUARE. THE MORNING OF THE FURNACE.', cap2: 'THE FIRST TIME I HEARD HER VOICE I WAS KNEELING WITH EVERYONE I KNEW. "A THIEF WHO TIDIES." *SHE HAS NOT FORGOTTEN IT EITHER.*' }] },
+        { k: 'assay0', cap: 'FOUR YEARS AFTER THE FURNACE. THE ASSAY. THE LAST DAY.', cap2: 'I TOOK A KEEP FROM THE HIGH AUDITOR\'S SON WHILE SHE WATCHED. SHE PINNED A SUN ON ME FOR IT. *SHE SAID I REMINDED HER OF SOMEONE.*' },
+        { k: 'lift0', cap: 'THE MORNING OF THE FURNACE. ASHGATE SQUARE.', cap2: 'THE FIRST TIME I HEARD HER VOICE I WAS KNEELING WITH EVERYONE I KNEW. "A THIEF WHO TIDIES." *SHE HAS NOT FORGOTTEN IT EITHER.*' }] },
       roof: { fury: 1, toast: 'A SHELF CAN BE MADE LONGER. *FURY.*', p: [
-        { k: 'weather2', cap: 'THE RAIL OF A BARGE. THIS YEAR.', cap2: '"I AM NOT ASKING FOR HER PLACE." "THERE IS NOT A PLACE. THERE IS A SHELF."' },
+        { k: 'weather2', cap: 'NINE YEARS AFTER THE FURNACE. THE RAIL OF A BARGE.', cap2: '"I AM NOT ASKING FOR HER PLACE." "THERE IS NOT A PLACE. THERE IS A SHELF."' },
         { k: 'tin0', cap2: 'SEREN WOULD HAVE HECKLED. THEN SHE WOULD HAVE MOVED UP. *EVERY BREATH IS STILL HERS. THERE TURNED OUT TO BE A GREAT MANY OF THEM.*' }] } }
   };
   /* a chalked sun: he counts eleven. The first time, the count is what starts him. */
@@ -156,7 +173,7 @@
     run([0.5, n => { pl.yaw = Math.PI * 0.95; U.say([
         { who: 'clerk', text: 'Lamps, Brennick. Trimmed and lit. They were told the hour, and your nine minutes are *no minutes*. I hold the stair. You cut the moorings. *Mooring One* is the last pair, on the far roof.' },
         { who: 'hero', face: 'angry', text: 'Brand.' },
-        { who: 'clerk', text: 'You do not argue, and you do not come back for me. Count your eleven, decide how you mean to fight, and *go*.' }
+        { who: 'clerk', text: 'You do not argue, and you do not come back for me. Count your eleven, and *go*.' }
       ], n); },
       n => { brandOnStair(); SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.snapBehind(Math.PI); cam.endCine(0.9); U.showHud(true); setFlag('intro');
         U.toast(SC.hosted && SC.dev() === 'touch' ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS AND USES; HELD, THREE HEAVY BLOWS. *B* DODGES.' : SC.hosted && SC.dev() === 'pad' ? 'DRAG THE PICTURE TO LOOK ROUND.' : SC.hosted ? 'DRAG THE MOUSE TO LOOK ROUND. *E* CUTS AND USES; HELD, THREE HEAVY BLOWS. *X* DODGES.' : SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
@@ -166,11 +183,11 @@
     const e = SC.spawnEnemy('boss', 22, 11, -34, ENC.boss); e.state = 'wait'; e.model.group.scale.set(1, 1, 1); e.yaw = -Math.PI / 2; S.bossE = e;
     pl.yaw = Math.PI / 2;
     cam.move(v3(26.5, 12.1, -31.5), v3(22, 12.9, -34), v3(18.6, 11.9, -32.2), v3(22, 12.6, -34), 4.5, 40);
-    const lines = again ? [{ who: 'voss', text: 'The clerk again. One had you marked down as *struck*.' }, { who: 'hero', face: 'angry', text: 'Check your figures, Captain.' }] : [
+    const lines = again ? [{ who: 'voss', text: 'The clerk again. One had you marked down as *struck*.' }, { who: 'hero', face: 'angry', text: 'Not yet.' }] : [
       { who: 'voss', text: 'Clerk Sorrel. One was told a clerk would come to the moorings at the second bell. One did not believe it.' },
-      { who: 'hero', face: 'angry', text: 'Count your guard again, Captain. You are short.' },
-      { who: 'voss', text: 'Four hundred hulls and one clerk. It is *noted*. Marshal Cade will have your hands for it.' },
-      { who: 'hero', face: 'smirk', text: 'He can come up the stair and ask for them.' }];
+      { who: 'hero', face: 'angry', text: 'Who gave you the hour, Captain.' },
+      { who: 'voss', text: 'It is not a Stair Captain\'s place to ask. The order carried Marshal Cade\'s initial. Four hundred hulls and one clerk. It is *noted*. He will have your hands for it.' },
+      { who: 'hero', face: 'angry', text: 'Stand off the cleat.' }];
     run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2; cam.lock = e;
       S.enc = ENC.boss; ENC.boss.wave = 0; ENC.boss.wait = 0; U.boss(e, 'STAIR CAPTAIN ANSEL ROOK'); objective(); n(); }]);
   }
@@ -189,7 +206,7 @@
     const p = v3(MOOR.x, 11, MOOR.z); FX.burst(v3(p.x, 12, p.z + 1), 0xffd23a, 1.6); FX.word('THE LINE GOES.', v3(p.x, 13.2, p.z + 1), '#f3e3c3', 1.8); cam.shake(0.6); SC.audio.sfx('door');
     cam.move(v3(p.x - 4.2, 12.3, p.z - 5.2), v3(p.x + 1, 15, p.z + 8), v3(p.x - 5.4, 13, p.z - 6.6), v3(p.x + 6, 21, p.z + 16), 11, 46);
     run([1.6, n => U.say([
-        { who: 'cap', text: 'The last pair went out on the wind like the rest. Four hundred hulls, and not one lamp on any of them.' },
+        { who: 'cap', text: 'Seven years after the furnace, at the second bell, the last pair went out on the wind like the rest. Four hundred hulls, and not one lamp on any of them.' },
         { who: 'cap', text: 'Below me the dock stair was full of light. It should have been dark. I had written the hour myself.' },
         { who: 'hero', face: 'shock', text: 'Brand.' },
         { who: 'cap', text: 'Then a halberd butt struck stone at the foot of the stair. Once. Brand was counting them.' }
@@ -271,14 +288,28 @@
       find('f_tally', -10.05, 0, 15.4, -10.05, 16.3, [{ who: 'cap', text: 'The tally booth. A stroke for every sled, in ink. And beside it a second column, in pencil, very faint.' }, { who: 'hero', text: "Sable's hand. What went *down* the stair, in the same crates. Nobody up here reads pencil." }]);
       find('f_bench', -27, 0, 8.6, -27, 7, [{ who: 'cap', text: 'The watch shelter. Under the bench, where a man sits out a long watch, names cut with a seat knife.' }, { who: 'hero', face: 'hurt', text: 'Four of them. I know one. *BRAND.* And under it a tally of nights, and it stops.' }]);
       find('f_signal', -13.5, 9, -41.9, -13.5, -43.6, [{ who: 'cap', text: 'A line locker on the signal roof, and in it the signal book. Two lamps: a House barge. One lamp: freight.' }, { who: 'hero', text: 'Nothing in it for a barge that does not answer. They have *never needed the page*.' }]); }
+    // v0.91 LORE: what the Accredited post on their docks, read by a man who keeps a column of the Count
+    const quay = () => F.e_alley && pl.pos.z > 6.4 && pl.pos.y < 2;   // all four are on the quay wall and its deck: offered to a man standing on the quay, not through the wall from the yard
+    lore('struck', -16, 0, 7.7, { fx: -16, fz: 6.2, mh: 2.9, when: quay }, [
+      { who: 'cap', text: 'STRUCK THIS QUARTER. Fifteen slips, a name and a tier on each. Porters and line hands. Somebody has left lamps under the board, and chalked a small sun low on the wall.' },
+      { who: 'hero', face: 'hurt', text: 'I struck some of these at my desk. I learned every one. ...The sun is the mark of the Unlit. Somebody who kneels on these docks is ours.' }]);
+    lore('tap', -22, 0, 7.8, { fx: -22, fz: 6.3, mh: 2.4, when: quay }, [
+      { who: 'cap', text: 'The porters\' tap. PORTERS. ONE CUP. NOTED. The cups are on chains. Nine hundred steps under a load, one cup a shift, and a stroke on the slate for it.' },
+      { who: 'hero', text: 'Noted. Up here that is not thanks. It means: one has written down what you owe.' }]);
+    lore('meter', 16.2, 0, 8.3, { fx: 16.9, fz: 6.6, r: 1.3, mh: 2.9, when: () => F.gate && quay() }, [
+      { who: 'cap', text: 'The breath meter at the yard gate. Every porter passes it going in. AIR OWED.' },
+      { who: 'hero', face: 'angry', text: 'The figures come to the fourth ring each quarter. A line for every person below. Air breathed, air owed. A struck line is a furnace. I keep a column of it.' }]);
+    lore('kneel', -37.6, 0, 15.6, { fx: -39.7, fz: 15.6, mh: 2.4, when: quay }, [
+      { who: 'cap', text: 'KNEEL AT THE BELL. Brass plates in the deck, and loads put down beside them. One bell for a clerk. Two for a House. Three for a Marshal. The service kneels at any of them.' },
+      { who: 'hero', face: 'hurt', text: 'They have knelt on these to me for three years. Get up is a soot word. I have not once been able to say it.' }]);
     // the watch is already on its posts, talking. It knows him when he walks up to it.
     { const POST = ['street', 'yard', 'wh', 'roof'], PRE = { street: () => F.e_alley, yard: () => F.gate, wh: () => F.breaker, roof: () => F.hatch && !F.bossIntro },
-        TALK = ['SECOND BELL SOON.', 'ROOK SAYS HOLD.', 'ONE CLERK. ONE.', 'FORTY HALBERDS FOR A CLERK.', 'THE STAIR IS NOT OURS TO WATCH.', 'IT WAS QUIET AT THE FIRST BELL.', 'WHO CHALKED OVER THE ROTA?', 'CADE SIGNED FOR IT.', 'MIND THE EDGE.', 'LAMPS LIT. EYES OPEN.', 'HE KEPT THE COUNT, THEY SAY.', 'A CLERK DOES NOT FIGHT.'];
+        TALK = ['SECOND BELL SOON.', 'ROOK SAYS HOLD.', 'THE DOCKMASTER DINES WITH THE MARSHAL.', 'QUARTER ENDS TONIGHT. THE BOARD GOES UP.', 'FORTY HALBERDS FOR ONE CLERK.', 'THE STAIR IS NOT OURS TO WATCH.', 'IT WAS QUIET AT THE FIRST BELL.', 'WHO CHALKED OVER THE ROTA.', 'CADE INITIALLED IT.', 'A PORTER LOST A DAY OF AIR FOR A SECOND CUP.', 'DOUBLE WATCH. THE SAME RATION.', 'HE KEEPS A COLUMN OF THE COUNT, THEY SAY.', 'A CLERK DOES NOT FIGHT.', 'FIFTEEN ON THE BOARD THIS QUARTER.', 'NOBODY ASKS WHO IS STRUCK. IT IS ON THE BOARD.'];
       let seen = -1, talkT = 3, talkN = 0; const _pv = v3(), stuck = {}, inT = {};
       const post = () => { for (const id of POST) { const e = ENC[id]; e.posted = 0; if (F['e_' + id] || F.boss || S.bossDown || !e.waves || !e.waves[0]) continue; e.posted = 1; e.wave = 0; e.wait = 0;
           e.waves[0].forEach((w, i) => { const m = SC.spawnEnemy(w[0], w[1], e.floor, w[2], e); m.state = 'wait'; m.st = 0; m.drop = 0; m.model.group.scale.set(1, 1, 1); m.postI = i; }); } };
       const wake = (e, who) => { e.posted = 2; S.enc = e; e.wave = 0; e.wait = 0; for (const m of SC.enemies) if (m.enc === e && m.state === 'wait') { m.state = 'chase'; m.st = 0; m.cool = 0.9 + Math.random() * 0.9; }
-        _pv.copy(who.pos); _pv.y += who.h + 0.5; FX.word(SC.pick(['THERE. THE CLERK!', 'IT IS HIM. TO ME!', 'SORREL! HOLD HIM!']), _pv, '#ff3b30', 1.4); SC.audio.sfx('alert'); objective(); };
+        _pv.copy(who.pos); _pv.y += who.h + 0.5; FX.word(SC.pick(['THERE. THE CLERK.', 'IT IS HIM.', 'SORREL. HOLD THERE.']), _pv, '#ff3b30', 1.4); SC.audio.sfx('alert'); objective(); };
       W.dyn.push((t, dt) => { if (SC.state !== 'play') return;
         if (seen !== (SC.cleared || 0)) { if (!pl.control) return; seen = SC.cleared || 0; post(); }
         if (F.e_street && !F.key) { F.key = 1; save(); objective(); U.toast('THE STAIR BLADE CARRIED A *YARD KEY*. HIGH DOCKS FREIGHT.', 4); }   // mends a save made by v0.49: the quay cleared, the key never handed over, so the level came back empty and locked every time
@@ -305,11 +336,11 @@
     SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
     SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
     SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted || !SC.input.touch ? 'WIDE OPEN. GET CLOSE AND PRESS *' + SC.btn('use') + '* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-    SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I HAVE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
+    SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'MY LINE IS NOT STRUCK YET. THE LAST PAIR IS STILL ON ITS CLEAT.'], riser: ['FORTY BEHIND ME', 'FORTY PEOPLE ON A LADDER. I GET UP.'], stair: ['BORN DOWN HERE', 'I HAVE BEEN HELD ON A FLOOR BEFORE. MARA AND IVO HELD ME. I GOT UP FROM THAT.'] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I AM STILL BREATHING.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
     SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
-    SC.on('bossPhase', e => { SC.spawnEnemy('hollow', e.pos.x + 3, 11, e.pos.z + 3, ENC.boss); SC.spawnEnemy('knifer', e.pos.x - 3, 11, e.pos.z - 3, ENC.boss); U.toast('"TO THE MOORINGS! HE IS ONE CLERK!"', 2.6); });
+    SC.on('bossPhase', e => { SC.spawnEnemy('hollow', e.pos.x + 3, 11, e.pos.z + 3, ENC.boss); SC.spawnEnemy('knifer', e.pos.x - 3, 11, e.pos.z - 3, ENC.boss); U.toast('"TO THE MOORINGS. HE IS ONE CLERK."', 2.6); });
   };
 
 //@@ALT
@@ -409,11 +440,11 @@
         { who: 'voss', text: 'You. In the mask. Stand off that hatch. That is an Authority riser, and those are *lines to be struck*.' },
         { who: 'hero', face: 'angry', text: 'They are forty people. Count them again.' },
         { who: 'voss', text: 'It is not a Warden\'s work to count. It is a Warden\'s work to *balance*.' },
-        { who: 'hero', face: 'angry', text: 'Then come and do your work.' }] : [
+        { who: 'hero', face: 'angry', text: 'There are forty. I am staying on the hatch.' }] : [
         { who: 'voss', text: 'Clerk. One is the Auditor\'s Blade. One had another name. She took it when she gave one the post.' },
         { who: 'hero', face: 'angry', text: "We've got names for everybody. Mara has a list. We'll find you one." },
         { who: 'voss', text: 'One does not kneel, and one is not sorry. *Come up.*' },
-        { who: 'hero', face: 'smirk', text: "That's all right. I've done enough of both for two." }];
+        { who: 'hero', face: 'hurt', text: "That's all right. I've done enough of both for two." }];
       run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2; cam.lock = e;
         S.enc = ENC.boss; ENC.boss.wave = 0; ENC.boss.wait = 0; U.boss(e, RIS ? 'THE WARDEN CAPTAIN' : osw ? 'OSWIN HALE · HOUSE VIOLET' : "THE AUDITOR'S BLADE"); if (osw) oswinUp(e); objective(); n(); }]);
     };
@@ -422,10 +453,11 @@
       run([0.6, n => U.say(RIS ? [
           { who: 'cap', text: 'The last of them went into the pines with their lamps hooded. I counted forty past me. Then I pulled the hatch down and stood on it until my legs stopped.' },
           { who: 'hero', face: 'hurt', text: 'Forty.' },
-          { who: 'cap', text: 'The order said eleven hundred. I was back at my desk before the bell, and I wrote "clerical" beside the difference.' }
+          { who: 'cap', text: 'The order said eleven hundred. I was back at my desk before the bell, and I wrote "clerical" beside the difference.' },
+          { who: 'cap', text: 'That was the Balancing of Tier Four, five years after the furnace. Eleven hundred lines. Forty of them came up Riser Nine.' }
         ] : [
           { who: 'cap', text: 'He went down on the eye they had inlaid in their own floor. I put his name on Mara\'s list myself. Hale, O. It was a good name. He should have kept it.' },
-          { who: 'cap', text: 'Behind me the stair was full, flight on flight, and nobody on it was kneeling.' },
+          { who: 'cap', text: 'Nine years after the furnace, at sunset, the stair was full behind me, flight on flight, and nobody on it was kneeling.' },
           { who: 'clerk', text: "That's nine hundred. I counted. You count everything else." },
           { who: 'hero', face: 'smirk', text: 'Aye.' },
           { who: 'cap', text: 'There was one door left. It was white, and there was somebody standing in front of it with a pen.' }
@@ -449,10 +481,11 @@
         const eyeOff = () => { eye.intensity = 0; eyeM.material.color.set(0x1c1c26); beam.visible = false; }; if (F.pylon) eyeOff();
         W.addInteract({ id: 'pump', x: -9.9, y: 0, z: -7.3, fx: -11, fz: -7.9, r: 1.9, label: 'RAISE THE PRESSURE', marker: 'act', mh: 2.4, when: () => F.e_alley && !F.pump && !S.enc, act: said('pump', [
           { who: 'cap', text: 'The hatch had lifted a hand\'s width and stuck. The riser\'s own pump had not been run in thirty years. It still drew. Everything they forget down here still draws.' },
-          { who: 'hero', face: 'angry', text: 'Up. One at a time. Lamps hooded.' }], () => { S.walk = 0.001; U.toast('*TEN* UP THE RISER. LAMPS ON THE HILL ROAD: *THEIRS.*', 3.4); }) });
+          { who: 'hero', face: 'angry', text: 'Up. One at a time. Lamps hooded.' },
+          { who: 'cap', text: 'The first hand on the top rung was a welder\'s, from Ashgate. Brand was at the ladder head with his own hand out. Hollis looked at it a long time, and then he took it.' }], () => { S.walk = 0.001; U.toast('*TEN* UP THE RISER. LAMPS ON THE HILL ROAD: *THEIRS.*', 3.4); }) });
         W.addInteract({ id: 'pylon', x: 0, y: 0, z: -19.2, fx: 0, fz: -21, r: 2, label: 'PUT OUT THE EYE', marker: 'act', mh: 3, when: () => F.e_w2 && !F.pylon && !S.enc, act: said('pylon', [
           { who: 'cap', text: 'The Authority puts an eye on every hill. This one lit the whole valley floor for anyone coming down the road.' },
-          { who: 'hero', face: 'smirk', text: 'Then they can come down it in the dark. Like us.' }], () => { eyeOff(); FX.burst(v3(0, 8.9, -19.9), 0xffe9a0, 1.6); SC.audio.sfx('crate'); U.toast('THE VALLEY IS DARK. *THEY ARE COMING ANYWAY.*', 3); }) });
+          { who: 'hero', face: 'angry', text: 'Let them come down it in the dark. We came up it that way.' }], () => { eyeOff(); FX.burst(v3(0, 8.9, -19.9), 0xffe9a0, 1.6); SC.audio.sfx('crate'); U.toast('THE VALLEY IS DARK. *THEY ARE COMING ANYWAY.*', 3); }) });
         W.addInteract({ id: 'pull', x: 0, y: 0, z: 12.7, fx: 0, fz: 15, r: 1.9, label: 'REACH DOWN', marker: 'act', mh: 1.6, when: () => F.e_w3 && !F.pull && !S.enc, act: said('pull', [
           { who: 'cap', text: 'The last of them had stopped on the ladder. A girl, with a smaller girl on her back, and no hand free.' },
           { who: 'hero', face: 'hurt', text: 'Give her to me. ...Now you.' },
@@ -463,6 +496,25 @@
         W.addInteract({ id: 'shoe', x: 2.5, y: 0, z: 12.2, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.e_alley && !F.clue_shoe, act: clue('shoe', [
           { who: 'cap', text: 'A child\'s shoe by the hatch. Somebody went into the pines with one foot bare and did not come back for it.' },
           { who: 'hero', face: 'hurt', text: 'Good. Do not come back.' }]) });
+        // v0.91 LORE: what the Authority posts here, and what the Assay left in the grass a year ago
+        const lull = () => F.e_alley && !S.pending;   // not in the breath between his pulling a lever and the next of them coming down the road
+        lore('notice', 1.5, 0, -18.6, { fx: 0, fz: -19.8, r: 1.3, mh: 3.2, when: () => lull() && (!F.e_w2 || F.pylon) }, [
+          { who: 'cap', text: 'The notice on the pylon. AUTHORITY RISER. SEALED BY THE COUNT. Under it a column of figures, kept up to this quarter: the air that goes up this pipe.' },
+          { who: 'hero', face: 'angry', text: 'Below, they told us there were six floors. I have walked all nine. The air goes up this pipe, and it is still flowing.' }]);
+        lore('standard', -12.4, 0, 12.2, { mh: 1.2, label: 'LOOK', when: lull }, [
+          { who: 'cap', text: 'A House standard, down in the grass. Violet. I stood it here on day twenty-six, the morning thirty of Teal came over to it. Nobody was sent to take it down. It fell.' },
+          { who: 'hero', text: 'They came over because their own House had been bought. They said so. Nobody up here thought it was a strange thing to say.' }]);
+        lore('cairn', -23.4, 0, 1, { fx: -25, fz: 1, mh: 1.4, label: 'LOOK', when: lull }, [
+          { who: 'cap', text: 'A cairn at the edge of the wood, a House ribbon rotted on the top stone. The heirs pile stones for their dead. They have never buried anybody.' },
+          { who: 'hero', face: 'hurt', text: 'BALANCED, scratched on it. They say it of their own dead. Tonight they are saying it of Tier Four.' }]);
+        lore('blade', -17.2, 0, 9.4, { mh: 1.1, label: 'LOOK', when: lull }, [
+          { who: 'cap', text: 'A wooden practice blade by a Violet tent. Blunt. They issued four of these to forty cadets, on purpose, and painted a board each dawn to say which House was last.' },
+          { who: 'hero', text: 'It is the shift rota. Too few of everything, and Houses for hands.' }]);
+        lore('tin', 16.2, 0, 13.6, { mh: 1.1, label: 'LOOK', when: lull }, [
+          { who: 'cap', text: 'A ration tin with a House seal, gone to rust. A House with a sum placed on it was lowered oil and salve on a gilt cord. Violet had no cord.' },
+          { who: 'hero', face: 'hurt', text: "Oswin's salve came eleven days late. The leg set crooked." }]);
+        murmur([{ t: 'ONE OF THEM, GOING PAST WITH HIS LAMP HOODED: *"TA."* NOBODY ABOVE THE ROCK SAYS THAT.', when: () => F.e_w2 && !F.pylon, skip: () => F.pylon },
+          { t: 'A CHILD, GOING EAST INTO THE PINES, HUMMING THROUGH HER TEETH. *THE SHIFT SONG.*', when: () => F.e_w3 && !F.pull, skip: () => F.pull }]);
       } else {
         // the kneeling bell on the first landing: it comes down
         { const bo = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.42, 0.62, 10), G.toon({ color: 0xe8c25a })); bo.position.set(-5.3, 8.55, 15.6); G.scene.add(bo); if (F.bell) { bo.position.y = 6.3; bo.rotation.z = 1.3; }
@@ -481,6 +533,29 @@
         W.addInteract({ id: 'halberd', x: 2.4, y: 12, z: -12.6, fx: 3.2, fz: -12, r: 1.45, label: 'LOOK', marker: 'clue', mh: 2.9, when: () => F.e_l2 && !F.clue_halberd, act: clue('halberd', [
           { who: 'cap', text: 'Brand\'s halberd, stood upright in a crack in the stone. Somebody carried it up nine hundred steps and did not tell me.' },
           { who: 'hero', face: 'hurt', text: 'Hollis. ...He is still finishing the bar he was on.' }]) });
+        // v0.91 LORE: the stair the porters count, read on the way up it
+        lore('wreck', 5.6, 0, 38.6, { fx: 6.6, fz: 37.6, mh: 1.6, label: 'LOOK', when: () => F.e_alley }, [
+          { who: 'cap', text: 'A hull, down on the terrace with a spar through the rail. We hid four hundred of them in the weather for two years. The Unlit came up Riser Nine in ones and twos and learned to fly them.' },
+          { who: 'hero', text: 'Valve techs. Welders. Bao, who sold noodles on Ashgate, had a wheel.' }]);
+        lore('step', 5.8, 6, 18.3, { fx: 5.8, fz: 17.1, r: 1.3, mh: 2.6, when: () => F.e_l1 }, [
+          { who: 'cap', text: 'STEP 852, cut into the lamp column. The porters count this stair under their loads, because nobody else will, and chalk a sun where they stop for breath.' },
+          { who: 'hero', face: 'hurt', text: 'Brand held the foot of it for eleven minutes. Step one.' }]);
+        { const lx = -5.8, lz = -2, ly = W.ground(lx, lz, 13);
+          lore('lift', lx, ly, lz, { fx: -8.6, fz: -2, r: 1.7, mh: 2.4, label: 'LOOK', when: () => F.e_l1 && F.bell }, [
+            { who: 'cap', text: 'The lift, stopped on the face of the Spire where the bell stopped it. A gilt cage. One red chair, for one.' },
+            { who: 'hero', face: 'angry', text: 'They ride that past nine hundred steps. Nobody who has sat in it has ever set foot on the stair.' }]); }
+        lore('line', -5.4, 12, -18.6, { fx: -6.6, fz: -19, mh: 2.4, when: () => F.e_l2 }, [
+          { who: 'cap', text: 'OFF THE LINE. ONE DAY OF AIR. A painted line a hand wide, from the stair to every door and nowhere else. The service walks on it. A porter who steps off it loses a day.' },
+          { who: 'hero', face: 'angry', text: 'They repaint it themselves on their rest days. They buy the paint.' },
+          { who: 'clerk', text: "Not after today, they don't." }]);
+        { const sy = W.ground(5.8, -34.5, 19);
+          lore('last', 5.8, sy, -34.5, { fx: 5.8, fz: -35.2, r: 1.3, mh: 2.2, when: () => F.e_l2 && !F.bossIntro }, [
+            { who: 'cap', text: 'STEP 900. The last one. Past it is the first ring, and the white door. On the wall beside the door a list has been started in chalk, because nobody had paper.' },
+            { who: 'hero', face: 'hurt', text: "Mara's forty-four. Then Brand. Then Aldane, D. Then Rook, A." },
+            { who: 'clerk', text: "She knelt at every one of the forty-four. She can say them in order. I've heard her." }]); }
+        murmur([{ t: 'TAVI: *"I CHALKED ONE ON THEIR WALL COMING UP. YELLOW."*', when: () => F.e_alley && !F.e_l1, skip: () => F.e_l1 },
+          { t: 'TAVI: *"SULL LEFT ONE RAY ON THE PILLAR. EVERY TIME HE SCRUBBED IT. I COUNTED."*', when: () => F.e_l1 && F.bell && !F.e_l2, skip: () => F.e_l2 },
+          { t: 'TAVI: *"THEY ARE HUMMING BEHIND US. ALL THE WAY DOWN THE STAIR."*', when: () => F.e_l2 && !F.bossIntro, skip: () => F.bossIntro }]);
       }
       SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
       SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
@@ -505,11 +580,11 @@
       });
       S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[RIS ? S.cp : F.e_l2 ? 'roof' : F.e_l1 ? 'yard' : S.cp] || CROSS.alley;   /* v0.90 WORLD-B: on the Stair, to the landing of the last fight won, not a flight down if he walked past its sun */ if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
       SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted || !SC.input.touch ? 'WIDE OPEN. GET CLOSE AND PRESS *' + SC.btn('use') + '* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-      SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I HAVE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
+      SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'MY LINE IS NOT STRUCK YET. THE LAST PAIR IS STILL ON ITS CLEAT.'], riser: ['FORTY BEHIND ME', 'FORTY PEOPLE ON A LADDER. I GET UP.'], stair: ['BORN DOWN HERE', 'I HAVE BEEN HELD ON A FLOOR BEFORE. MARA AND IVO HELD ME. I GOT UP FROM THAT.'] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I AM STILL BREATHING.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
       SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
       SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
       SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
-      SC.on('bossPhase', e => { SC.spawnEnemy('hollow', e.pos.x + 3, BY, e.pos.z + 3, ENC.boss); SC.spawnEnemy(RIS ? 'hollow' : 'knifer', e.pos.x - 3, BY, e.pos.z + 3, ENC.boss); U.toast(RIS ? '"ON THE HATCH! BALANCE IT!"' : '"TO THE DOOR!"', 2.6); });
+      SC.on('bossPhase', e => { SC.spawnEnemy('hollow', e.pos.x + 3, BY, e.pos.z + 3, ENC.boss); SC.spawnEnemy(RIS ? 'hollow' : 'knifer', e.pos.x - 3, BY, e.pos.z + 3, ENC.boss); U.toast(RIS ? '"ON THE HATCH. BALANCE IT."' : '"TO THE DOOR."', 2.6); });
     };
     S.update = function (dt, rdt) {
       for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
@@ -571,7 +646,7 @@
       SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
       pl.place(-6.5, 0, 21.5, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true);
       const pg = [
-        { img: shot(-24, 7, 30, 0, 17, 0, 50, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE VENT STACK. THE ASSAY, DAY THIRTY-ONE.', cap2: 'THE ONLY ONE IN THE VALLEY. THE LAMPS RUN OFF IT, AND THE PUMP, AND THE BOOTS THE ASSAYERS STAND ON.', fx: 'COLD' },
+        { img: shot(-24, 7, 30, 0, 17, 0, 50, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE VENT STACK. FOUR YEARS AFTER THE FURNACE. THE ASSAY, DAY THIRTY-ONE.', cap2: 'THE ONLY ONE IN THE VALLEY. THE LAMPS RUN OFF IT, AND THE PUMP, AND THE BOOTS THE ASSAYERS STAND ON.', fx: 'COLD' },
         { img: shot(-5.2, 1.6, 19.2, -6.5, 1.5, 21.5, 30), area: '1 / 2 / 2 / 3', cap2: "I HAD VOSS'S BOOTS AND THEY WERE DEAD IN MY HANDS. *AN ASSAYER CHARGES THEM AT THE TOP.*" },
         { img: shot(-8, 2.4, 26, 0, 3, 11, 46), area: '2 / 2 / 3 / 3', cap: 'HOUSE TEAL HOLDS THE ISLAND.', cap2: 'THE STAIR IS FOR WHOEVER KEEPS THE STACK. BELOW, THAT IS US.' }
       ];
@@ -587,7 +662,7 @@
       U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
         { img: a, area: '1 / 1 / 3 / 2', cap: 'THIRTY-SIX METRES. THE WHOLE VALLEY UNDER MY HEELS.', cap2: 'THEY HAD TOLD US THE BOOTS WERE WHAT MADE AN ASSAYER.', fx: 'LIVE' },
         { img: b, area: '1 / 2 / 2 / 3', cap2: 'THEY ARE A BATTERY, AND A STACK,' },
-        { img: c, area: '2 / 2 / 3 / 3', cap2: "*AND A MAN WHO IS NOT AFRAID OF THE HEIGHT.*" }
+        { img: c, area: '2 / 2 / 3 / 3', cap: 'THE ASSAY. DAY THIRTY-ONE. I FLEW FROM THAT AFTERNOON.', cap2: "*AND A MAN WHO IS NOT AFRAID OF THE HEIGHT.*" }
       ] }, () => done());
     };
     S.init = function () {
@@ -612,13 +687,29 @@
       W.addInteract({ id: 'collar', x: 0, y: 36, z: 3.6, fx: 0, fz: 0, r: 1.9, label: 'STAND THE BOOTS ON IT', marker: 'act', mh: 1.4, when: () => F.e_l2 && !F.charged && !S.enc, act: () => { setFlag('charged'); pl.control = false; SC.audio.sfx('clue'); U.say([
         { who: 'cap', text: 'A collar on the crown of the stack, worn bright where a hundred Assayers have stood their heels. I put the dead boots on it, and my own weight on them.' },
         { who: 'cap', text: 'They took one long breath, the way a ward fan does when the branch comes up. Then they burned blue.' },
-        { who: 'hero', face: 'smirk', text: 'It is our air. They have been flying on our air.' }], () => { pl.control = true; FX.burst(v3(0, 36.3, 3.6), 0x5fd0ff, 1.8); SC.cam.shake(0.4); U.toast('THE BOOTS ARE *LIVE*. THE EDGE.', 3.4); objective(); }); } });
+        { who: 'hero', face: 'angry', text: 'It is our air. They have been flying on our air.' }], () => { pl.control = true; FX.burst(v3(0, 36.3, 3.6), 0x5fd0ff, 1.8); SC.cam.shake(0.4); U.toast('THE BOOTS ARE *LIVE*. THE EDGE.', 3.4); objective(); }); } });
       W.addInteract({ id: 'tag', x: -13.2, y: 12, z: 9.6, fx: -14, fz: 9.6, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_l1 && !F.clue_tag, act: clue('tag', [
         { who: 'cap', text: 'A slate tag wired to the rail. CHECKED, a date, two initials. K.D. The same hand has checked this stack every nine days all season.' },
-        { who: 'hero', face: 'smirk', text: 'Somebody up here does the rounds. Somebody up here knows what a seal is.' }]) });
+        { who: 'hero', text: 'Somebody up here does the rounds. Somebody up here knows what a seal is.' }]) });
       W.addInteract({ id: 'plate', x: -6.4, y: 24, z: 6.4, fx: -5, fz: 3.4, r: 1.6, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => F.e_l2 && !F.clue_plate, act: clue('plate', [
         { who: 'cap', text: 'A gilt plate riveted to the stack. DRAWN FROM RISER NINE. The lamps, the pump, the boots: all of it comes up one pipe from under the floor.' },
         { who: 'hero', face: 'angry', text: 'Nine floors under this grass somebody is turning a wheel so that an Assayer need not touch the ground.' }]) });
+      // v0.91 LORE: the island, read by a man with a dead pair of boots in his hands
+      lore('watcher', 0, 0, 8.9, { fx: 0, fz: 5.1, r: 1.4, mh: 2.6, when: () => F.e_alley }, [
+        { who: 'cap', text: 'AUTHORITY VENT. SEALED BY THE COUNT. Over the plate, the Watcher: a gold sun with an open eye.' },
+        { who: 'hero', face: 'angry', text: 'It is the same cloth that hangs over Ashgate Square. I have knelt under it with everyone I knew.' }]);
+      lore('wheel', 9, 0, 6.9, { fx: 9, fz: 5.5, r: 1.4, mh: 2.2, label: 'LOOK', when: () => F.e_alley }, [
+        { who: 'cap', text: 'The pipe from the pump house goes in at the foot of the stack. One wheel on it. It feeds the lamps on this island, and the undercroft below, where a House can sleep out of the storms.' },
+        { who: 'hero', text: 'One wheel. Whoever shut it would have the island by morning. On Tier Six any child could do it. Up here they would send for somebody.' }]);
+      lore('board', 5.6, 0, 22.1, { fx: 5.6, fz: 23.6, r: 1.5, mh: 2.6, when: () => F.e_alley }, [
+        { who: 'cap', text: 'The Assayers\' board, at the edge of Teal\'s camp. Twelve bars, one to a House, repainted from the air each dawn. POSITIONS ARE PROVISIONAL. DEBTS ARE NOT.' },
+        { who: 'hero', text: 'Violet was eleventh on day three, and fourth three nights ago. It is the shift rota. They have put Houses where we have hands.' }]);
+      lore('camp', -12.7, 12, 6.5, { fx: -14, fz: 5, r: 1.3, mh: 1.8, label: 'LOOK', when: () => F.e_l1 }, [
+        { who: 'cap', text: 'West, across the ford, our own fire. A coal. Forty of Violet round it, and the thirty of Teal who came over on day twenty-six.' },
+        { who: 'hero', face: 'angry', text: 'Voss had been selling them our positions. An Assayer is paid to find for a House. He was paid by two.' }]);
+      lore('dais', -7.8, 24, 11.2, { fx: -4, fz: 13, r: 1.3, mh: 1.8, label: 'LOOK', when: () => F.e_l2 }, [
+        { who: 'cap', text: 'From this turn the dais shows across the river: a white banner and six lamps. Under it is the Assayers\' cache. Salve, bread and oil under a white ribbon, in a valley of hungry cadets.' },
+        { who: 'hero', face: 'angry', text: 'A result must be earned. One winter cloak, packed for four hundred and eighty.' }]);
     };
     S.update = function (dt, rdt) {
       for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
@@ -692,7 +783,7 @@
       U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
         { img: a, area: '1 / 1 / 3 / 2', cap: 'I CAME UP THROUGH THE FLOOR WITH TAR ON MY HANDS.', cap2: 'I HAD BEEN KEEPING IT ALIVE FOR TEN YEARS, ONE VALVE AT A TIME, AND NOBODY HAD EVER LET ME SEE IT.', fx: 'OURS' },
         { img: b, area: '1 / 2 / 2 / 3', cap2: '"NOW YOU KNOW WHAT THEY ARE COUNTING," HARL SAID.' },
-        { img: c, area: '2 / 2 / 3 / 3', cap2: '*NOT WHO BREATHES. HOW LONG.*' }
+        { img: c, area: '2 / 2 / 3 / 3', cap: 'FORTY-THREE DAYS AFTER THE FURNACE. THIRTY-ONE BANKS OF FORTY-EIGHT.', cap2: '*NOT WHO BREATHES. HOW LONG.*' }
       ] }, () => done());
     };
     S.init = function () {
@@ -733,6 +824,22 @@
       W.addInteract({ id: 'board', x: 0, y: 0, z: -26.4, fx: 0, fz: -28, r: 1.9, label: 'LOOK', marker: 'clue', mh: 3, when: () => F.down && !F.clue_board, act: clue('board', [
         { who: 'cap', text: 'BANKS LIVE: 31 OF 48. Somebody has painted the 31 over an older number. Under the paint you can still read 36.' },
         { who: 'hero', face: 'hurt', text: 'Five banks since anybody last troubled to repaint it.' }]) });
+      // v0.91 LORE: what a valve hand reads on his first night under the floor. All of it before the heart; after it there is no time
+      lore('sign', -11.6, 12, 26.6, { fx: -11.6, fz: 27.9, r: 1.3, mh: 2.6, when: () => F.path && !F.heart }, [
+        { who: 'cap', text: 'ARRAY AUTHORITY. BOARD AND WATCH ONLY. This morning the High Auditor put me to teaching her forty engineers how a valve is seated. The board is theirs. The watch is theirs.' },
+        { who: 'clerk', text: "And tonight you've come in by the ladder. Mind the lamp." }]);
+      lore('fans', -15.4, 12, 21.4, { fx: -17.9, fz: 14, r: 1.3, mh: 2.4, label: 'LOOK', when: () => F.path && !F.heart }, [
+        { who: 'cap', text: 'Four fans in the west wall, each as wide as a lift shaft. One turns. One is trying to. Two have stopped.' },
+        { who: 'clerk', text: "The Count shut the ward fans on Six to spare these. Didn't spare them." },
+        { who: 'hero', face: 'hurt', text: 'Ada asked me if she was coming back to fix the fan.' }]);
+      lore('book', 6.7, 0, -24.5, { fx: 6.7, fz: -26.1, r: 1.4, mh: 2.0, when: () => F.down && !F.heart }, [
+        { who: 'cap', text: 'The watch\'s desk. A spike of work orders, and a book open under the lamp. Not names. BANK NINETEEN. DARK. A date. BANK FORTY. DARK. A date. They write down the hour each one stops.' },
+        { who: 'hero', face: 'angry', text: 'There is no column for what was done about it.' }]);
+      lore('lamp', 14.6, 0, -23.2, { fx: 16.3, fz: -23.6, r: 1.3, mh: 1.6, label: 'LOOK', when: () => F.down && !F.heart }, [
+        { who: 'cap', text: 'A lamp at the foot of the stair, trimmed and filled. Low on the iron beside it somebody has chalked a small sun.' },
+        { who: 'clerk', text: "Ours. There's more of us than chalk. We're what's left in the lantern when they put it out. Somebody has to carry the tar down." }]);
+      murmur([{ t: 'HARL: *"THE WATCH CHANGES AT THE BELL. TILL THEN IT\'S TWO MEN AND A LAMP."*', when: () => F.path && !F.across, skip: () => F.across },
+        { t: 'HARL: *"HAND FLAT ON IT FIRST. SHE WOULD HAVE."*', when: () => F.down && !F.heart, skip: () => F.heart }]);
     };
     S.update = function (dt, rdt) {
       for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
@@ -805,7 +912,7 @@
     const PAGES = [
       () => { const out = [];
         hideAll(); stand('k0', 0.25, 2.0, Math.PI, { head: [0.18, 0, 0] }, 'neutral'); stand('ilse', 1.0, -0.45, 0.45, SHOW, 'neutral'); stand('u1', -1.35, -0.2, HP, BACK); stand('u2', -1.15, 1.35, HP * 1.3, BACK);
-        out.push({ img: sh(4.3, 2.5, 4.3, -0.2, 1.0, -0.5, 46), cap: 'PUMP ROOM SEVEN. UNDER TIER SIX. SEALED FOR THIRTY YEARS.', cap2: 'SHE HAD CARRIED IT DOWN A PIECE AT A TIME. A TABLE. A LAMP. *EVERYTHING THEY USE ON THEIR OWN CHILDREN.*' });
+        out.push({ img: sh(4.3, 2.5, 4.3, -0.2, 1.0, -0.5, 46), cap: 'HALF A YEAR AFTER THE FURNACE. PUMP ROOM SEVEN, UNDER TIER SIX. SEALED BY THE COUNT FOR THIRTY YEARS.', cap2: 'SHE HAD CARRIED IT DOWN A PIECE AT A TIME. A TABLE. A LAMP. *EVERYTHING THEY USE ON THEIR OWN CHILDREN AT TWELVE.*' });
         hideAll(); PR.feed.span(v3(1.4, 1.1, -0.22), v3(0.7, 1.75, 0.3));
         out.push({ img: sh(2.2, 1.5, -1.3, 1.3, 0.98, -0.45, 32), cap2: 'GOLD WIRE, FINER THAN PACKING THREAD. *THAT SPOOL WOULD BUY TIER SIX ITS AIR FOR A YEAR.* SHE HAD STOLEN IT FOR MY SHINS.' });
         hideAll(); lie('k0', LIE, 'neutral'); straps(true); stand('u2', -0.82, 0.45, HP, BEND); stand('ilse', 0.35, -1.85, 0.1, BACK, 'neutral');
@@ -846,7 +953,7 @@
         PR.bare.visible = true; PR.bare.position.copy(bw(il, 'haR')).add(v3(-0.05, 0.02, 0)); PR.bareL.position.copy(PR.bare.position); PR.bareL.intensity = 26; W.gildLamp.intensity = 30;
         out.push({ img: sh(1.7, 1.86, -1.75, 0.82, 1.7, 0.1, 34), cap: 'WHEN THE WRAPPINGS CAME OFF SHE WAS HOLDING A BARE LAMP A HAND FROM MY FACE.', cap2: 'IT DID NOT HURT. NOTHING BRIGHT HAS HURT SINCE. *I HAVE NEVER FORGIVEN HOW EASY THAT WAS TO GIVE US.*' });
         hideAll(); PR.bareL.intensity = 0; PR.gauze.visible = true; stand('k2', 1.15, 1.75, HP * 0.5, UNSURE, 'hurt'); stand('u2', 0.55, 2.05, HP * 0.6, STEADY); stand('ilse', 2.6, 0.9, HP * 0.2, BACK, 'neutral');
-        out.push({ img: sh(4.2, 1.15, 4.4, 1.2, 1.15, 1.2, 40), cap: 'NINE MONTHS.', cap2: 'THE FLOOR WAS FURTHER AWAY THAN I HAD LEFT IT. MY OWN BOOTS WERE UNDER THE COT. *THEY WOULD NEVER FIT AGAIN.*' });
+        out.push({ img: sh(4.2, 1.15, 4.4, 1.2, 1.15, 1.2, 40), cap: 'NINE MONTHS. FIFTEEN MONTHS AFTER THE FURNACE, I STOOD UP.', cap2: 'THE FLOOR WAS FURTHER AWAY THAN I HAD LEFT IT. THE WIRE HAD TAKEN YEARS OFF ME, THE WAY IT KEEPS THEM YOUNG. *MY OWN BOOTS WERE UNDER THE COT. THEY WOULD NEVER FIT AGAIN.*' });
         return Object.assign({ panels: out.map((p, i) => Object.assign(p, { area: a2[i] })) }, TWO); }
     ];
     intro = function () {
@@ -898,11 +1005,11 @@
   if (CADET) Object.assign(KINDS.hollow, { hp: 82, speed: 4.1, range: 1.9, wind: 0.5, rec: 0.7, dmg: 10, cool: [0.9, 1.9] });
   if (DRY) Object.assign(KINDS.hollow, { hp: 80, speed: 3.4, wind: 0.6, rec: 0.85, dmg: 10, cool: [1.1, 2.2] });
   const BARK = {
-    hollow: CADET ? ['FOR TEAL!', 'VIOLET IS ELEVENTH.', 'NOTED.'] : DRY ? ['BACK, SOOT.', 'NO ENTRY.', 'COUNTED.'] : ISS === 'riser' ? ['OFF THE HATCH!', 'STRUCK.', 'DOWN THE HILL!'] : ['OFF THE QUAY!', 'HOLD THERE!', 'STRUCK.'],
+    hollow: CADET ? ['FOR TEAL.', 'VIOLET HAS NO PATRON.', 'NOTED.'] : DRY ? ['BACK, SOOT.', 'BOARD AND WATCH ONLY.', 'COUNTED.'] : ISS === 'riser' ? ['OFF THE HATCH.', 'UNLOGGED PERSONS.', 'OWED TO THE FURNACE.'] : ['OFF THE QUAY.', 'HOLD THERE.', 'STRUCK.'],
     knifer: ['NOTED.', 'BALANCED.', 'STRUCK.'], bruiser: ['KNEEL.', 'BALANCED.', 'STRUCK THROUGH.'],
     boss: ISS === 'riser' ? ['BALANCE IT.', 'KNEEL.'] : ISS === 'stair' ? ['NOTED.', 'COLLECTED.'] : ['NOTED.', 'BALANCED.', 'SHORT, CLERK.']
   };
-  const BREAK = { hollow: CADET ? 'FOR TEAL!' : DRY ? 'BACK!' : 'ENOUGH!', knifer: 'NOTED.', bruiser: 'KNEEL.', boss: 'NO.' };
+  const BREAK = { hollow: CADET ? 'FOR TEAL.' : DRY ? 'BACK.' : 'ENOUGH.', knifer: 'NOTED.', bruiser: 'KNEEL.', boss: 'NO.' };
   SC.barks = e => (e && BARK[e.kind]) || ['NOTED.', 'BALANCED.', 'KNEEL.', 'STRUCK.'];
   SC.av = e => e.kind === 'hollow' ? SC.pick(CADET ? ['jab', 'swing', 'jab'] : DRY ? ['swing', 'slam', 'swing'] : ['swing', 'swing', 'slam', 'jab']) : e.kind === 'bruiser' ? SC.pick(['slam', 'slam', 'swing']) : e.kind === 'knifer' ? SC.pick(['lunge', 'lunge', 'jab']) : null;
   SC.tokW = e => e.kind === 'bruiser' ? 2 : 1;      // a Warden's swing takes the whole floor: nobody else comes in with it
@@ -961,7 +1068,7 @@
     pl.yaw = Math.atan2(dx, dz); pl.setState('idle'); pl.vel.set(0, 0, 0);
     a.release(); a.state = 'hurt'; a.st = a.kind === 'boss' ? -0.35 : -0.9; a.opened = a.kind === 'boss' ? 1.0 : 1.5; a.flN = 0; a.vel.set(dx / d * 5, 0, dz / d * 5); a.sub = 0; a.chain = 0; a.mv = null; if (a.kind === 'boss') a.armorT = 0;
     _a.set((pl.pos.x + a.pos.x) / 2, pl.pos.y + 1.35, (pl.pos.z + a.pos.z) / 2); FX.burst(_a, 0xffd23a, 2.2); FX.burst(_a, 0xffffff, 1.4); FX.slash(_a, pl.yaw + 1.2, 0xffd23a, 3, 1.3);
-    _a.y += 0.9; FX.word(DRY ? 'KNOCKED ASIDE!' : 'TURNED ASIDE!', _a, '#ffd23a', 1.3); _a.copy(a.head); FX.word('OPEN', _a, '#ffffff', 0.8);
+    _a.y += 0.9; FX.word(DRY ? 'KNOCKED ASIDE.' : 'TURNED ASIDE.', _a, '#ffd23a', 1.3); _a.copy(a.head); FX.word('OPEN', _a, '#ffffff', 0.8);
     SC.time.hitstop = 0.16; SC.cam.shake(0.45); SC.audio.sfx('chain'); SC.audio.sfx('perfect'); SC.emit('speedlines', 0.4); SC.emit('parry', a);
     if (!SC._parried) { SC._parried = 1; SC.after(0.5, () => SC.ui.toast('TURNED. *HIS LINE IS OPEN*: THE NEXT CUT LANDS DOUBLE.', 3)); }
     return true;
@@ -971,7 +1078,7 @@
   // a man who has been cut four times running stops flinching and shoves back through the next one (no more stun-lock by mashing)
   SC.breakout = function (e, dx, dz, dmg) {
     SC.emit('breakout', e); e.flN = 0; e.flT = 0; e.hp -= dmg * 0.5; e.vy = 0; e.onGround = true; e.flash = 0.06; e.blkT = 0.3; e.release();
-    _a.copy(e.pos); _a.y += e.h * 0.75; FX.burst(_a, 0xffffff, 1.4); SC.audio.sfx('chain'); _a.y += 0.8; FX.word(BREAK[e.kind] || 'ENOUGH!', _a, '#dfe6ff', 1.0);
+    _a.copy(e.pos); _a.y += e.h * 0.75; FX.burst(_a, 0xffffff, 1.4); SC.audio.sfx('chain'); _a.y += 0.8; FX.word(BREAK[e.kind] || 'ENOUGH.', _a, '#dfe6ff', 1.0);
     const px = pl.pos.x - e.pos.x, pz = pl.pos.z - e.pos.z, pd = Math.hypot(px, pz) || 1; if (pd < 2.4) { pl.vel.x += px / pd * 5; pl.vel.z += pz / pd * 5; }
     e.yaw = Math.atan2(px, pz); e.token = true; e.tokW = SC.tokW(e); combat.tokens += e.tokW; e.state = 'windup'; e.st = e.K.wind * 0.3; e.sub = 0; e.struck = false; e.sw = false; e.av = e.kind === 'hollow' ? 'jab' : SC.av(e); e.hyper = 1; alert(e); SC.tell(e);
   };
@@ -1081,7 +1188,7 @@
       if (!m.told) { m.told = 1;
         if (m.id === 'sweep') SC.tell(e, true, e.pos, 3.4);
         else if (m.id === 'chop') { m.at = { x: e.pos.x + f.x * 1.7, z: e.pos.z + f.z * 1.7 }; SC.tell(e, true, m.at, 2.3); }
-        else if (m.id === 'charge') { SC.tell(e, true); lineTell(e, 9, true); _a.copy(e.head); FX.word('ON THE HATCH!', _a, '#ff3b30', 1.2); }
+        else if (m.id === 'charge') { SC.tell(e, true); lineTell(e, 9, true); _a.copy(e.head); FX.word('ON THE HATCH.', _a, '#ff3b30', 1.2); }
         else if (m.id === 'gaff') { SC.tell(e); lineTell(e, Math.min(9.5, d), false); }
         else if (m.id === 'fleche') { SC.tell(e); lineTell(e, Math.min(8, d), false); } }
       if (m.id === 'chop' && m.at) { m.at.x = e.pos.x + f.x * 1.7; m.at.z = e.pos.z + f.z * 1.7; }
@@ -1098,7 +1205,7 @@
     }
     if (m.id === 'chop') {                                      // overhead, all the weight in it: it cannot be turned
       e.pose = P.slam(e.st / 0.16);
-      if (!m.hit) { m.hit = 1; FX.ring(_a.set(m.at.x, e.pos.y, m.at.z), 0xff3b30, 0.4, 2.4, 0.4); FX.puff(_a, 5, 1.2); _a.y += 1.6; FX.word('KNEEL!', _a, '#ff3b30', 1.5); SC.cam.shake(0.7); SC.audio.sfx('slam');
+      if (!m.hit) { m.hit = 1; FX.ring(_a.set(m.at.x, e.pos.y, m.at.z), 0xff3b30, 0.4, 2.4, 0.4); FX.puff(_a, 5, 1.2); _a.y += 1.6; FX.word('KNEEL.', _a, '#ff3b30', 1.5); SC.cam.shake(0.7); SC.audio.sfx('slam');
         if (Math.hypot(pl.pos.x - m.at.x, pl.pos.z - m.at.z) < 2.3 + pl.r && Math.abs(pl.pos.y - e.pos.y) < 1.2) SC.hitPlayer(26, e.pos.x, e.pos.z, true); }
       if (e.st > 0.3) { done(); e.state = 'recover'; e.st = -0.35; } return;   // the halberd is in the stone: a long recovery
     }
@@ -1110,7 +1217,7 @@
       const moved = Math.hypot(e.pos.x - ox, e.pos.z - oz), edge = SC.edge(e, f.x, f.z);
       if (((e.t * 30) | 0) % 2 === 0) FX.puff(e.pos, 1, 0.7);
       if (!m.hit && d < 1.4 && Math.abs(pl.pos.y - e.pos.y) < 1.3) { m.hit = 1; SC._atk = run ? null : e; SC.hitPlayer(run ? 24 : 20, ox, oz, run); if (!run) { done(); e.state = 'recover'; e.st = 0; return; } }
-      if (edge || moved < spd * dt * 0.4) { e.pos.x = ox; e.pos.z = oz; if (run) { m.id = 'winded'; m.step = 2; e.st = 0; _a.copy(e.head); FX.word('WINDED!', _a, '#ffffff', 1.3); SC.cam.shake(0.6); SC.audio.sfx('slam'); FX.burst(_a, 0xffe14a, 1.4); return; } done(); e.state = 'recover'; e.st = 0; return; }
+      if (edge || moved < spd * dt * 0.4) { e.pos.x = ox; e.pos.z = oz; if (run) { m.id = 'winded'; m.step = 2; e.st = 0; _a.copy(e.head); FX.word('WINDED.', _a, '#ffffff', 1.3); SC.cam.shake(0.6); SC.audio.sfx('slam'); FX.burst(_a, 0xffe14a, 1.4); return; } done(); e.state = 'recover'; e.st = 0; return; }
       if (e.st > T1) { done(); e.state = 'recover'; e.st = run ? -0.3 : 0; } return;
     }
     if (m.id === 'winded') {                                    // he hit the wall: free cuts while he gets his breath back
@@ -1122,7 +1229,7 @@
         const L = Math.min(9.5, Math.max(1, d)), k = Math.min(1, e.st / 0.16); for (let i = 1; i < 6; i++) { if (i / 6 > k) break; _a.set(e.pos.x + f.x * L * i / 6, e.pos.y + 1.3, e.pos.z + f.z * L * i / 6); FX.burst(_a, 0xe8c25a, 0.35); }
         if (e.st >= 0.16) { const dx = pl.pos.x - e.pos.x, dz = pl.pos.z - e.pos.z, cos = (dx * f.x + dz * f.z) / (d || 1);
           if (d < 10 && cos > 0.9 && Math.abs(pl.pos.y - e.pos.y) < 1.5 && SC.los(e, d, 1) && SC.hitPlayer(6, e.pos.x, e.pos.z, false)) { m.step = 2; e.st = 0; m.px = pl.pos.x; m.pz = pl.pos.z; _a.copy(pl.pos); _a.y += 2.4; FX.word('HAULED IN.', _a, '#e8c25a', 1.1); SC.audio.sfx('chainYank'); SC.cam.shake(0.4); }
-          else { m.step = 3; e.st = 0; _a.copy(e.head); FX.word('OFF THE LINE!', _a, '#ffffff', 1.1); SC.audio.sfx('deny'); } } return; }
+          else { m.step = 3; e.st = 0; _a.copy(e.head); FX.word('OFF THE LINE.', _a, '#ffffff', 1.1); SC.audio.sfx('deny'); } } return; }
       if (m.step === 2) { e.pose = P.castYank || P.lunge(0.3); const q = SC.smooth(SC.clamp(e.st / 0.28, 0, 1)), gx = e.pos.x + f.x * 1.7, gz = e.pos.z + f.z * 1.7;
         pl.pos.x = SC.lerp(m.px, gx, q); pl.pos.z = SC.lerp(m.pz, gz, q); W.collide(pl.pos, pl.r, pl.pos.y, pl.h); pl.vel.set(0, 0, 0);
         if (e.st >= 0.28) { e.release(); e.state = 'windup'; e.st = 0; e.sub = 0; e.chain = 0; e.token = true; combat.tokens++; e.mv = null; SC.tell(e); } return; }
