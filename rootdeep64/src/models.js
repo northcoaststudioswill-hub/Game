@@ -80,7 +80,7 @@ function buildFoes(){let b;
  b=new MB();b.cyl(0,0,0,12,9,12,10,'#3f8a9a','#5fb8c8');b.sph(0,12,0,9,7,9,10,6,'#5fb8c8','#8adce8');b.sph(0,5,7.4,7,5,3.6,8,5,'#bdeffb','#e6fbff');
  b.box(-3.4,14,7.2,2.6,3.4,1,'#ffffff');b.box(3.4,14,7.2,2.6,3.4,1,'#ffffff');b.box(-3.4,13.6,7.8,1.2,1.6,.5,'#102028');b.box(3.4,13.6,7.8,1.2,1.6,.5,'#102028');
  b.cyl(0,17.6,0,6.2,6.6,2.2,10,'#c8a020','#f8d030');for(let i=0;i<5;i++){const a=i/5*6.2832+.3;b.cyl(Math.cos(a)*5.8,19.6,Math.sin(a)*5.8,1.3,0,4,4,'#f8d030','#fff3b0')}
- for(let i=0;i<6;i++){const a=i/6*6.2832;b.sph(Math.cos(a)*11.6,1.6,Math.sin(a)*11.6,2.6,1.8,2.6,5,3,'#3f8a9a','#5fb8c8')}FOE.king=b.done()}
+ for(let i=0;i<6;i++){const a=i/6*6.2832;b.sph(Math.cos(a)*11.6,1.6,Math.sin(a)*11.6,2.6,1.8,2.6,5,3,'#3f8a9a','#5fb8c8')}FOE.king=b.done();buildFoes2()}
 /* a foe reacting to the nearest keeper: who hit it, who it's about to bite */
 function nearKeeper(e){let b=null,bd=1e9;for(const p of PL){if(p.down)continue;const d=Math.hypot(p.x-e.x,p.y-e.y);if(d<bd){bd=d;b=p}}return[b,bd]}
 function drawFoe(e){if(e.dyT===undefined){if(e.flash>0&&!e._fl){const[p]=nearKeeper(e),dx=p?e.x-p.x:0,dz=p?e.y-p.y:1,l=Math.hypot(dx,dz)||1;e.hitT=.22;e.hdx=dx/l;e.hdz=dz/l;
@@ -90,7 +90,7 @@ function drawFoe(e){if(e.dyT===undefined){if(e.flash>0&&!e._fl){const[p]=nearKee
  const x=e.x,z=e.y,hov=Math.sin(time*3+e.x*.5);
  /* rising out of the ground */
  const sink=(1-rise);
- if(k==='boss'){drawBoss(e,o);return}
+ if(k==='boss'){if(RUN&&stratumOf().bossTint)o={add:o.add,c:stratumOf().bossTint};drawBoss(e,o);return}
  const sc=(e.elite?1.38:1)*1.15;
  const air=e.z||0,hk=e.hitT>0?Math.sin(clamp(e.hitT/.22,0,1)*3.14159):0,[nk,nd]=nearKeeper(e),close=nd<e.r+18;
  shadow(x,z,e.r*1.25*(1-Math.min(.6,air/40)));
@@ -106,6 +106,7 @@ function drawFoe(e){if(e.dyT===undefined){if(e.flash>0&&!e._fl){const[p]=nearKee
  else if(k==='crab'){mT(0,Math.abs(Math.sin(time*8+e.x))*.6,0);draw(FOE.crab,o);
   for(const s of[-1,1]){mPush();mT(s*6.4,4.2,3.2);mRY(s*-.5+(close?s*.55*Math.max(0,Math.sin(time*16)):Math.sin(time*5+s)*.2));if(close)mRX(-.4*Math.max(0,Math.sin(time*16+s)));draw(FOE.claw,o);mPop()}
   if(e.state===1){mT(0,4,0);mS(e.r+5.5);drawT(MESH.sph,{c:[.74,.94,1],a:.34+.08*Math.sin(time*6),unlit:true})}}
+ else if(dunDrawFoe(k,e,o,close,hov)){}
  else if(k==='wisp'){mT(0,7+hov*1.4,0);mRY(time*(e.wind?14:2));if(e.wind)mS(1.25);const fs=1+Math.sin(time*13+e.x)*.1;mS(fs,2-fs,fs);draw(FOE.wisp,{unlit:true,add:fl,c:o.c})}
  mPop();
  if(e.dyT!==undefined)return;
@@ -192,6 +193,10 @@ function buildProps(){let b;
  buildRoom('burrows','#312226','#423038','#241619',false,'#3a2430',2.7);
  buildRoom('vault','#1a2a3a','#263c52','#121e2a',false,'#1d3448',3.1);
  buildRoom('core','#33191c','#472523','#221013',false,'#48201c',2.9);
+ /* the variant strata get their own stone */
+ buildRoom('grotto','#14262a','#1c3a38','#0c1a1c',false,'#18302e',2.6);
+ buildRoom('glass','#3a4658','#56687e','#2a3444',false,'#4a5a70',2.4);
+ buildRoom('ossuary','#3a342c','#4c443a','#28221c',false,'#3e362e',2.5);
  buildRoom('garden','#1c3a16','#2a5220','#12280e',false,'#14230f',2.6,true);
  /* debris */
  b=new MB();b.sph(0,1.6,0,3.4,2.4,2.8,6,4,'#3a3048','#6a5e80');b.sph(2.6,1,1.4,1.8,1.3,1.6,5,3,'#3a3048','#55496b');PROP.rock=b.done();
@@ -340,21 +345,23 @@ function sceneHub(dt){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#
 const BKEY=['burrows','vault','core'];
 const BLIGHT=[[[.3,.9,.45],[.74,.6,.56],[.46,.4,.46],'#0e080e'],[[.25,.9,.4],[.5,.68,.86],[.34,.44,.56],'#060c14'],[[.3,.85,.45],[.95,.58,.4],[.5,.36,.34],'#120606']];
 const DEBBY=[['rock','tuft','stalag'],['rock','bone','shard'],['rock','ember','shard']];
-function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],420,800);
+function sceneRun(dt){dunProps();const B=RUN.biome,SD=stratumOf(),L=typeof SD.L==='number'?BLIGHT[SD.L]:SD.L;setLight(L[0],L[1],L[2]);setFog(L[3],420,800);
  camFollow(PL,PL.length<2,state==='run'?dt:0,RUN.freeze>0&&PL.length<2?.4:undefined);frameBegin();
- drawRoomMesh(BKEY[B]);
+ drawRoomMesh(SD.room,SD.tint);
  /* debris, seeded per chamber like the cartridge */
- for(let i=0;i<12;i++){const dx=(i*97+RUN.chamber*31)%(W-30)+15,dz=42+((i*57+RUN.chamber*19)%(H-66)),k=DEBBY[B][i%3];
+ for(let i=0;i<12;i++){const dx=(i*97+RUN.chamber*31)%(W-30)+15,dz=42+((i*57+RUN.chamber*19)%(H-66)),k=SD.deb[i%3];
+  if(k==='shroom'){prop(PROP.shroom,i%2?14+(i*7)%10:W-14-(i*5)%10,0,dz,i,1.1+(i%3)*.35,{add:.12+.06*Math.sin(time*2+i)});sprite(i%2?14+(i*7)%10:W-14-(i*5)%10,7,dz,16,hex('#5ad0b0'),.25,true);continue}
   if(k==='stalag'){prop(PROP.stalag,i%2?10+(i*7)%6:W-10-(i*5)%6,0,dz,i);continue}
   prop(PROP[k],dx,0,dz,i*1.7,k==='rock'?.8+(i%3)*.25:1,k==='ember'||k==='shard'?{unlit:k==='ember',add:k==='ember'?.1+.1*Math.sin(time*4+i):0}:null)}
  /* biome ambience */
  for(let i=0;i<9;i++){const px=(i*67+RUN.chamber*31)%(W-30)+15,pz=36+((i*41+RUN.chamber*17)%(H-52));
-  if(B===1){mPush();mT(px,.3,pz);mS(7+((i*5)%6),1,5+((i*3)%5));drawT(MESH.disc,{c:hex('#7fd0e8'),a:.16+.07*Math.sin(time*2+i),unlit:true});mPop()}
-  else if(B===2){mPush();mT(px,.3,pz);mRY(i*1.3);mS(9,1,1.6);drawT(MESH.disc,{c:hex('#f07830'),a:.5+.3*Math.sin(time*4+i*1.7),unlit:true,glow:true});mPop();
+  if(SD.amb==='puddles'){mPush();mT(px,.3,pz);mS(7+((i*5)%6),1,5+((i*3)%5));drawT(MESH.disc,{c:hex('#7fd0e8'),a:.16+.07*Math.sin(time*2+i),unlit:true});mPop()}
+  else if(SD.amb==='embers'){mPush();mT(px,.3,pz);mRY(i*1.3);mS(9,1,1.6);drawT(MESH.disc,{c:hex('#f07830'),a:.5+.3*Math.sin(time*4+i*1.7),unlit:true,glow:true});mPop();
    const t=(time*.4+i*.37)%1;sprite(px+Math.sin(time+i)*3,t*40,pz,2.2,hex('#f8a040'),(1-t)*.8,true)}
-  else if(i<5){const t=(time*.12+i*.23)%1;sprite(px,30-t*30,pz,1.4,hex('#c8b8d8'),.35*(1-t),true)}}
+  else if(i<5&&SD.amb==='motes'){const t=(time*.12+i*.23)%1;sprite(px,30-t*30,pz,1.4,hex('#c8b8d8'),.35*(1-t),true)}}
  torch(12,36);torch(W-12,36);
- for(const o of RUN.obst){const hh=8+o.s*6;mPush();mT(o.x+o.w/2,0,o.y+o.h/2);mS(o.w,hh,o.h);draw(PROP.block,{c:B===1?[.3,.5,.66]:B===2?[.5,.26,.26]:[.5,.38,.5]});mPop();shadow(o.x+o.w/2,o.y+o.h/2+2,Math.max(o.w,o.h)*.62)}
+ for(const o of RUN.obst){const hh=8+o.s*6;mPush();mT(o.x+o.w/2,0,o.y+o.h/2);mS(o.w,hh,o.h);draw(PROP.block,{c:SD.ob,add:SD.id==='glass'?.08:0});mPop();shadow(o.x+o.w/2,o.y+o.h/2+2,Math.max(o.w,o.h)*.62)}
+ dunAmbience(SD);dunDraw();
  for(const z of RUN.zones){mPush();mT(z.x,.4,z.y);mS(z.r);drawT(MESH.disc,{c:hex('#f07830'),a:.42+.12*Math.sin(time*9),unlit:true,glow:true});mPop();sprite(z.x+R(-4,4),5+R(0,5),z.y,8,hex('#f8a040'),.7,true)}
  for(const h of RUN.hazards){const c=hex(h.from==='player'?'#dce2ea':'#ff7a6b');mPush();mT(h.x,.5,h.y);mS(h.r);drawT(MESH.ring,{c,a:.55+.35*Math.sin(time*16),unlit:true});mPop();
   if(h.from==='player'&&!h.instant){const t=clamp(h.t/(h.t0||.45),0,1);mPush();mT(h.x,t*150+7,h.y);mRY(time*5);mS(9,8,9);draw(MESH.sph,{c:[.6,.63,.7]});mPop();shadow(h.x,h.y,4+(1-t)*10)}}
@@ -455,8 +462,8 @@ function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
   const wz=Math.max(70,H-10-tt*22);shadow(cx,wz,6);drawCast('WILL',cx,wz,3.14159,{id:'cD',weapon:'blade'})}
  frameEnd()}
 /* the death / escape screen shows the room you ended in, empty */
-function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],300,700);
- const a=time*.1;setCam([W/2+Math.sin(a)*60,90,H*.5+150],[W/2,0,H*.5],.75);frameBegin();drawRoomMesh(BKEY[B],[.7,.7,.75]);torch(12,36);torch(W-12,36);
+function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),SO=STRATA.find(s=>s.id===(RD.lastRun&&RD.lastRun.st))||STRATA[[0,2,4][B]],L=typeof SO.L==='number'?BLIGHT[SO.L]:SO.L;setLight(L[0],L[1],L[2]);setFog(L[3],300,700);
+ const a=time*.1;setCam([W/2+Math.sin(a)*60,90,H*.5+150],[W/2,0,H*.5],.75);frameBegin();drawRoomMesh(SO.room,[.7,.7,.75]);torch(12,36);torch(W-12,36);
  for(let i=0;i<10;i++){const k=DEBBY[B][i%3];if(k!=='stalag')prop(PROP[k],(i*97)%(W-30)+15,0,42+((i*57)%(H-66)),i*1.7)}frameEnd()}
 function drawScene(dt){if(HSTOP>0&&state==='run')dt=0;else if(SLOWT>0&&state==='run')dt*=SLOWK;ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||state==='online'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);

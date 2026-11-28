@@ -125,12 +125,12 @@ const KQUESTS={
 function loreInit(){for(const k of['relic','chSeen','kq','kqFound','kqDone'])RD[k]=RD[k]||{};RD.ghost=RD.ghost||0}
 const relicCount=()=>Object.keys(RD.relic||{}).length;
 function freeSpot(){let best=[W/2,H/2];for(let i=0;i<40;i++){const x=30+Math.random()*(W-60),y=56+Math.random()*(H-120);
-  if(RUN.obst.some(o=>x>o.x-18&&x<o.x+o.w+18&&y>o.y-18&&y<o.y+o.h+22))continue;if(x>W/2-70&&x<W/2+70&&y<84)continue;
+  if(RUN.obst.some(o=>x>o.x-18&&x<o.x+o.w+18&&y>o.y-18&&y<o.y+o.h+22))continue;if(inPit(x,y,-16))continue;if(RUN.well&&Math.hypot(x-RUN.well.x,y-RUN.well.y)<30)continue;if(x>W/2-70&&x<W/2+70&&y<84)continue;
   if(PL.some(p=>Math.hypot(p.x-x,p.y-y)<30))continue;return[x,y]}return best}
 /* a new chamber: its name the first time, maybe a relic, maybe something a keeper has been looking for */
 function chamberLore(ch){loreInit();RUN.relic=null;RUN.qitem=null;RUN.ghostNpc=null;RUN.engine=null;RUN.split=null;RUN.twins=null;
  const nm=CHNAMES[ch-1];RUN.firstVisit=false;
- if(nm&&!RD.chSeen[ch]){RD.chSeen[ch]=1;RUN.firstVisit=true;subLater(.25,nm.n,nm.w,3.4,'#c8b8e8')}
+ if(nm&&!RD.chSeen[ch]&&!stratumOf().variant){RD.chSeen[ch]=1;RUN.firstVisit=true;subLater(.25,nm.n,nm.w,3.4,'#c8b8e8')}
  const boss=ch===4||ch===8||ch===12;if(boss)return;engineRoll(ch);twinsRoll(ch);
  const pool=RELICS.filter(r=>r.th===RUN.biome),fresh=pool.filter(r=>!RD.relic[r.id]);
  if((fresh.length&&Math.random()<.6)||(!fresh.length&&Math.random()<.2)){const r=(fresh.length?fresh:pool)[(Math.random()*(fresh.length||pool.length))|0];const q=freeSpot();RUN.relic={id:r.id,x:q[0],y:q[1]}}

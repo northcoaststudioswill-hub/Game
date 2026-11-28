@@ -110,6 +110,33 @@ just before they fire. Online friends see all of it (rebuilt on their side from 
     show two jars with one label, and Erin's later visions see two lights at the gate. Online, it plays for everyone.
 - `node test/lore.js` checks it all, including that every line fits its box.
 
+## The dungeon: a track of stages, procedurally
+
+`src/dungeon.js`. Every run is a **track**: three depths, each a stratum of the deep with three stages and a guardian,
+then down into a different kind of place. It's shown on a card when you enter each depth, and along the bottom of
+the screen while you pick a door ("NEXT: THE PIT · DOWN INTO THE GLASS CAVERNS").
+
+- **Six strata.** Each depth rolls the cartridge's place or a new one (unseen ones are favoured):
+  | Depth | Cartridge | New | New foes | Guardian twist |
+  |---|---|---|---|---|
+  | 1 | The Burrows | **The Glowcap Grotto** | Puffcap: walks up and bursts in a spore cloud (and bursts when killed, after a beat) | The Grub Mother, Overgrown: calls puffcaps |
+  | 2 | The Flooded Vault | **The Glass Caverns** | Shardling: breaks into two fast Glass Mites | The Drowned King, Icebound |
+  | 3 | The Ember Core | **The Ossuary** | Bonehound: crouches, then lunges | The Hollow Keeper, Among the Bones: calls bonehounds |
+  Each has its own room, light, fog, debris, ambience (spores, falling glints, dust), chamber names and keeper chatter.
+- **Stage types:** BATTLE · THE PIT (chasms and holes: knock foes in with hits, heavies and launches, dash across;
+  walk in and you fall, take 12% and climb out) · THE SWARM (foes keep coming from the edges until the timer runs out)
+  · THE VENTS (floor vents glow, then burst in flame, hurting keepers and foes) · A QUIET CACHE (no fight, loot) ·
+  THE WELL (no fight; everyone heals 30% and downed keepers get up; at most one per run). Elites move around.
+- **Room layouts** from templates (scatter, pillars, walls, ring, diagonal, open, chasm, holes, vents). Every
+  generated room is checked: there is a walkable path from where you land to the doors, nothing in the door lane or
+  the middle, and at least 90% of the floor is reachable.
+- A save's first two runs use the cartridge's own track; after that it's generated. Online, the guest gets the
+  track, pits, vents and timers.
+- New story: three milestone episodes (the deep got a remodel, ten pit kills, all six places seen) and six death
+  scenes (fell in a hole, the floor did it, the swarm, spores, glass in your hair, the Ossuary).
+- `node test/dungeon.js`: 400 tracks, 1080 generated rooms, every stage type and new foe, pits, vents, the swarm,
+  guardians, online, with screenshots.
+
 ## Episodes, and your first keeper
 
 - **Pick anyone first.** On a new save, CHOOSE YOUR FIRST KEEPER lets you pick Will, Erin, Louie or Marcus. Whoever you
@@ -231,6 +258,7 @@ never renumber, you can drop in mid-run and leave from the Hearth or pause menu.
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes
 - `src/anim.js` – character animation: jointed rigs, spring-driven poses, every action and NPC habit
 - `src/ui.js` – HUD and every menu screen
+- `src/dungeon.js` – the track, strata, stage types, room layouts, new foes
 - `src/episodes.js` – the episodes: staging, cameras, triggers
 - `src/main.js` – boot, frame loop, `window.__rd` test hooks (same spirit as `__g.RDF()`)
 
@@ -249,6 +277,7 @@ Need Node + Playwright with Chromium.
   checks they cost, land and clean up; saves a frame of each.
 - `node test/story.js` – missions asked and turned in, conversations firing off real progress, echoes, boss and
   god lines, the ending; also checks every line of text fits its box.
+- `node test/dungeon.js` – the track, generated rooms (always a way through), every stage type, the new foes.
 - `node test/episodes.js` – the first-keeper choice, every episode beat drawn, text fit at phone width, triggers, unlocks, Codex replay.
 - `node test/fixes.js` – one check per playtest fix (menu ownership, seats, doors, spawns, revives, boon text...).
 - `node test/phone.js` – iPhone-sized touch viewports, portrait and landscape.

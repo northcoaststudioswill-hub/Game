@@ -143,6 +143,23 @@ const EPISODES=[
    {l:['RANGER',"Good. Stories that agree are usually lying together."],cam:'close'},
    {l:['ERIN',"Read the one about the jar again. Louie likes that one."],cam:'two',with:'LOUIE'},
    {l:['LOUIE',"Zzz. (He does.)"],act:{LOUIE:'down'},cam:'low',at:'LOUIE'}]},
+ {id:'remodel',n:'THE DEEP GOT A REMODEL',set:'hearth',when:()=>['grotto','glass','ossuary'].some(k=>RD.seenStrata&&RD.seenStrata[k]),
+  cast:{RANGER:[-10,-24,.4],SCOUT:[22,-20,-.6],'p:board':[6,-40],MARCUS:[-40,0,1.2]},
+  beats:[{l:['RANGER',()=>"The deep's grown somewhere new. "+({grotto:'Glowing caps, breathing floors.',glass:'Glass that sings when you step on it.',ossuary:'Shelves of bones, all stacked neat.'})[['grotto','glass','ossuary'].find(k=>RD.seenStrata[k])]],cam:'close'},
+   {l:['SCOUT',"New species! New rooms! I need a bigger book. I need a bigger HOUSE."],act:{SCOUT:'happy'},cam:'two',with:'RANGER'},
+   {l:['RANGER',"Bramble said the deep dreams when nobody's watching it. Somebody stopped watching."],cam:'close'},
+   {l:['MARCUS',"Bro. It's a remodel. The deep got a remodel and didn't invite us."],cam:'close'}]},
+ {id:'pits10',n:'HOUSEKEEPING',set:'hearth',when:()=>stn('pitKills')>=10,
+  cast:{MARCUS:[10,-6,-1],ERIN:[-20,0,1],LOUIE:[0,16]},
+  beats:[{l:['MARCUS',"Ten. You've knocked ten things into holes. That's not fighting, bro. That's housekeeping."],cam:'close'},
+   {l:['ERIN',"It's tidy. I like tidy."],cam:'two',with:'MARCUS'},
+   {l:['LOUIE',"WOOF. (He would like to see the holes. He would not like to see the inside of the holes.)"],act:{LOUIE:'happy'},cam:'low',at:'LOUIE'}]},
+ {id:'all6',n:'SIX PLACES',set:'garden',sky:'night',when:()=>Object.keys(RD.seenStrata||{}).length>=6,
+  cast:{ERIN:[-12,10,3.14],RANGER:[14,10,3.14]},
+  beats:[{d:3,cam:'sky'},
+   {l:['RANGER',"Six places down there now. The Burrows, the Vault, the Core... and three that weren't there when I was young."],cam:'two',with:'ERIN'},
+   {l:['ERIN',"The kingdom I keep seeing is growing too. Every time the deep grows a room, I see one more tower."],cam:'close'},
+   {l:['RANGER',"...Then maybe they're the same thing. Growing toward each other."],cam:'sky'}]},
  {id:'supers',n:'SHOW-OFFS',set:'garden',when:()=>stn('supers')>=25,
   cast:{MARCUS:[-16,0,.8],ERIN:[20,-4,-.8],LOUIE:[4,16]},
   beats:[{l:['MARCUS',"Watch. Watch this. Hydro jet. Ffffssssh."],act:{MARCUS:'sup'},cam:'low',at:'MARCUS'},
@@ -253,7 +270,7 @@ function hudEp(){if(!EPI)return;const B=EPI.beats[EPI.b],t=EPI.t,E=EPI.E;r('#000
    repeats until several others have played. Codex page 7 keeps them too.
    ===================================================================== */
 const LR=()=>RD.lastRun||{};
-const KNAME=k=>(FOES[k]&&FOES[k].n.toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase()))||({mother:'the Grub Mother',king:'the Drowned King',hollow:'the Hollow Keeper',hazard:'the floor, somehow'})[k]||'the deep';
+const KNAME=k=>(FOES[k]&&FOES[k].n.toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase()))||({mother:'the Grub Mother',king:'the Drowned King',hollow:'the Hollow Keeper',hazard:'the floor, somehow',pit:'a hole',vent:'a vent'})[k]||'the deep';
 const killedBy=k=>LR().killer===k;
 const DEATHEPS=[
  {id:'r_lobby',n:'THE LOBBY',set:'hearth',wt:()=>LR().chamber<=1?4:0,
@@ -385,6 +402,34 @@ const DEATHEPS=[
    {l:['LOUIE',"(He doesn't say anything. He sits next to you. That's the whole thing.)"],act:{LOUIE:'down'},cam:'two',with:'@'}]}];
 /* everyday life at home: these can follow any fall */
 DEATHEPS.push(
+ {id:'r_pit',n:'A PLACE MADE OF HOLES',set:'hearth',wt:()=>killedBy('pit')?5:0,
+  cast:{ERIN:[-14,-2,1],MARCUS:[18,-4,-1],'@':[0,16,3.14]},
+  beats:[{l:['ERIN',"You fell in a hole. In a place that is mostly holes."],cam:'close'},
+   {l:['MARCUS',"Idea: don't."],cam:'close'},
+   {l:['ERIN',"...That's actually good advice."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"They usually are. That's my curse."],cam:'close'}]},
+ {id:'r_vent',n:'THE FLOOR DID IT',set:'hearth',wt:()=>killedBy('vent')?5:0,
+  cast:{MARCUS:[0,-6,0],SCOUT:[-30,4,1]},
+  beats:[{l:['MARCUS',"The floor got you? The FLOOR? Bro, the floor is the one thing that's supposed to be on our side."],cam:'close'},
+   {l:['SCOUT',"Technically the vents are a feature of the floor. They glow first. That's the warning."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"That's not a warning, that's the floor showing off."],cam:'close'}]},
+ {id:'r_swarm',n:'COUNT SLOWLY',set:'hearth',wt:()=>LR().stage==='swarm'?4:0,
+  cast:{RANGER:[0,-6,0],'@':[0,14,3.14]},
+  beats:[{l:['RANGER',"You can't win against a swarm. You outlast it."],cam:'close'},
+   {l:['RANGER',"Keep moving. Count to twenty-five. Slowly. Then it breaks, every time."],cam:'low',at:'RANGER'}]},
+ {id:'r_puff',n:'SPORES',set:'garden',wt:()=>killedBy('puffcap')?5:0,
+  cast:{ERIN:[-10,0,1],'@':[12,2,-1],LOUIE:[0,22]},
+  beats:[{l:['ERIN',"You're covered in spores. Stand still. Don't breathe on the tomatoes."],cam:'two',with:'@'},
+   {l:['LOUIE',"AH-CHOO. (He breathed on the tomatoes.)"],act:{LOUIE:'happy'},cam:'low',at:'LOUIE'}]},
+ {id:'r_glassy',n:'PICKING GLASS',set:'hearth',wt:()=>LR().st==='glass'?3:0,
+  cast:{ERIN:[-6,0,1.3],'@':[10,2,-1.6]},
+  beats:[{l:['ERIN',"There's glass in your hair. It's humming. Why is it humming?"],cam:'two',with:'@'},
+   {l:['ERIN',"...I'm putting it in a jar. Next to the honey. Don't tell Marcus."],cam:'close'}]},
+ {id:'r_bones',n:'A CLOSET WITH OPINIONS',set:'hearth',wt:()=>LR().st==='ossuary'||killedBy('bonehound')?3:0,
+  cast:{MARCUS:[0,-6,0],LOUIE:[24,10],'@':[-20,12,1]},
+  beats:[{l:['MARCUS',"The Ossuary? It's a closet. A big closet. With opinions."],cam:'close'},
+   {l:['LOUIE',"WOOF. (He brought one bone back. Just one. As a treat. For later.)"],act:{LOUIE:'happy'},cam:'low',at:'LOUIE'},
+   {l:['MARCUS',"Louie. Bro. Put it back."],cam:'close'}]},
  {id:'r_laundry',n:'LAUNDRY DAY',set:'garden',wt:()=>1,
   cast:{ERIN:[-12,-6,1],MARCUS:[18,4,-1.2]},
   beats:[{l:['MARCUS',"Why is my shirt on the line? I was wearing that."],cam:'two',with:'ERIN'},

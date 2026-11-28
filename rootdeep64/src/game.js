@@ -127,11 +127,13 @@ function applyFruit(){const owned=[RUN.boons.atk,RUN.boons.cast,RUN.boons.dash,.
 /* ---------------- runs & chambers ---------------- */
 function plRunInit(p){const s=rdStats(p);Object.assign(p,{hp:s.maxHp,down:false,revT:0,atkCd:0,combo:0,dtap:{},castAmmo:1+(hasKeep('stone')?1:0),castCd:0,castRegenT:0,
  dashT:0,dashRegen:0,dashCharges:s.dashCharges,inv:0,armT:0,slashT:0,swing:0,trail:[],vx:0,vy:0})}
-function rdStartRun(){
+function rdStartRun(opt){
  RUN={petals:20+mir('gold')*20,dew:0,keys:0,honey:0,chamber:0,wave2:null,sigShown:0,heat:heatTotal(),
   boons:{atk:null,cast:null,dash:null,pass:[]},enemies:[],projs:[],eprojs:[],pickups:[],parts:[],texts:[],doors:[],zones:[],hazards:[],buds:[],pods:[],dewT:0,podDropped:false,
   obst:[],sub:null,subQ:[],echo:null,mwT:0,acts:[],rings:[],bolts:[],freeze:0,flash:0,banner:null,phase:'fight',shake:0,boss:null,elite:false,revives:mir('defy'),collarUsed:false,phoenixUsed:false,time:0,zoneT:0,kills:0};
  for(const p of PL){plRunInit(p);movesReset(p,true)}
+ /* the track for this run: the cartridge's own for a save's first two runs, then generated */
+ RUN.track=genTrack(opt&&opt.classic!==undefined?opt.classic:(RD.stats.runs||0)<2);
  let k=0;for(const ty of RD.party){if((RD.bank[ty]||0)>0){RD.bank[ty]--;const o=PL[k++%PL.length];RUN.buds.push({type:ty,x:o.x,y:o.y,a:Math.random()*6,cd:0,z:0,own:o.ix})}}
  if(RD.set.grace)RUN.revives++;
  RD.party=[];RD.stats.runs++;if(PL.length>1)RD.stats.coopRuns=(RD.stats.coopRuns||0)+1;for(const p of PL)RD.charRun[p.char]=1;rdSave();rdNextChamber();}
@@ -147,7 +149,7 @@ function spawnFoe(kind,x,y,elite){const d=FOES[kind],sc=foeScale();
   elite:!!elite,t:Math.random()*2,cd:1+Math.random(),hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,state:0,sx:x,sy:y,bt:0,born:.9,yaw:0};
  RUN.enemies.push(e);RD.seen[kind]=1;return e;}
 /* somewhere in the top half of the room, well clear of every keeper */
-function spawnSpot(){let best=null,bd=-1;for(let i=0;i<24;i++){const x=26+Math.random()*(W-52),y=36+Math.random()*(H*.45);let m=1e9;for(const p of PL)if(!p.down)m=Math.min(m,Math.hypot(p.x-x,p.y-y));if(m>80)return[x,y];if(m>bd){bd=m;best=[x,y]}}return best}
+function spawnSpot(){let best=null,bd=-1;for(let i=0;i<24;i++){const x=26+Math.random()*(W-52),y=36+Math.random()*(H*.45);if(inPit(x,y,-9))continue;let m=1e9;for(const p of PL)if(!p.down)m=Math.min(m,Math.hypot(p.x-x,p.y-y));if(m>80)return[x,y];if(m>bd){bd=m;best=[x,y]}}return best}
 function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale(),co=1+.75*(PL.length-1);
  const e={kind:'boss',bossIx:ix,x:W/2,y:52,hp:d.hp*(1+.12*RUN.heat)*co,max:d.hp*(1+.12*RUN.heat)*co,sp:d.sp,dmg:d.dmg*sc.dmg,r:d.r,
   elite:false,t:0,cd:2,hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,bt:3,phase:1,state:0,tx:W/2,ty:52,born:.8,yaw:0};
@@ -155,18 +157,19 @@ function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale(),co=1+.75*(PL.length-1);
 let say2T=0,say2Txt='';
 function say2(s,t=3){say2Txt=s;say2T=t;}
 function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=[];RUN.eprojs=[];RUN.pickups=[];RUN.pods=[];RUN.zones=[];RUN.hazards=[];RUN.acts=[];RUN.podDropped=false;for(const p of PL)movesReset(p,false);
- const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);RUN.echo=null;chamberLore(ch);RD.stats.maxCh=Math.max(RD.stats.maxCh||0,ch);for(const p of PL)p.lowSaid=false;
- if(ch===5)chatter('vault',true);else if(ch===9)chatter('core',true);else if(ch!==4&&ch!==8&&ch!==12)chatter('start');
+ const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);dunLayout(ch);RUN.echo=null;chamberLore(ch);RD.stats.maxCh=Math.max(RD.stats.maxCh||0,ch);for(const p of PL)p.lowSaid=false;
+ dunChatter(ch);
  if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;return}
+ if(dunQuiet(ch))return;
  /* the cartridge's budget (4 + chamber), plus a share for every extra keeper */
- const pool=BIOMES[biome].pool,budget=4+ch+((RD.pact.swarm||0)*2)+Math.round((PL.length-1)*(2+ch*.5)),eliteCh=ch===3||ch===7||ch===10;
+ const pool=stratumOf().pool,budget=4+ch+((RD.pact.swarm||0)*2)+Math.round((PL.length-1)*(2+ch*.5)),eliteCh=dunElite(ch);
  let spent=0,guard=0;const wlist=[];
- while(spent<budget&&guard++<60){const k=pool[(Math.random()*pool.length)|0],cost=k==='grub'?1:k==='wisp'||k==='shade'?2:3;
+ while(spent<budget&&guard++<60){const k=pool[(Math.random()*pool.length)|0],cost=FOECOST[k]||3;
   if(spent+cost>budget+1)continue;spent+=cost;wlist.push({k,elite:eliteCh&&spent>=budget-1});}
  const cut=Math.max(1,Math.ceil(wlist.length*.55));
  wlist.slice(0,cut).forEach(s2=>{const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)});
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
- RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);}
+ RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);dunFight(ch);}
 function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;ghostRoll(RUN.chamber);if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
  if(!RUN.podDropped){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:W/2+R(-16,16),y:H/2});RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
  if(RD.keepEq){const who=(KEEPS.find(k=>k.id===RD.keepEq)||{}).who;if(who)RD.keepXp[who]=(RD.keepXp[who]||0)+1}
@@ -206,7 +209,7 @@ function genShop(){const all=[
  {n:'PETAL PURSE',d:'+90 petals, somehow profit',p:50,act:()=>{RUN.petals+=90;say2('+90 PETALS',2)}}];
  const out=[];while(out.length<3){const it=all.splice((Math.random()*all.length)|0,1)[0];if(it)out.push(it)}return out;}
 function runTally(){RD.stats.honeyFound=(RD.stats.honeyFound||0)+RUN.honey;RD.stats.maxBank=Math.max(RD.stats.maxBank||0,RUN.buds.length)}
-function rdDie(){runTally();const cb=2*Math.max(0,RUN.chamber-1);RUN.dew+=cb;RUN.chBonus=cb;const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={biome:RUN.biome,bonus:RUN.chBonus||0,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,killer:RUN.hitBy||by,time:Math.round(RUN.time||0),spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
+function rdDie(){runTally();const cb=2*Math.max(0,RUN.chamber-1);RUN.dew+=cb;RUN.chBonus=cb;const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={biome:RUN.biome,bonus:RUN.chBonus||0,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,killer:RUN.hitBy||by,stage:stageOf(),st:stratumOf().id,time:Math.round(RUN.time||0),spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
 function rdEscape(){runTally();RD.stats.heatEsc=Math.max(RD.stats.heatEsc||0,RUN.heat);for(const p of PL)RD.charEsc[p.char]=(RD.charEsc[p.char]||0)+1;RD.stats.escapes++;RD.lastRun={biome:2,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
  RUN=null;rdSave();overT=0;state='win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
@@ -403,7 +406,7 @@ function burst(x,y,c,n=6,sp=36){if(!RUN)return;for(let i=0;i<n;i++)RUN.parts.pus
 function ftext(x,y,txt,c){if(RUN)RUN.texts.push({x,y,txt,c:c||'#fff',t:.8});}
 function collide(e,rr){e.x=Math.max(11+rr,Math.min(W-11-rr,e.x));e.y=Math.max(30+rr,Math.min(H-9-rr,e.y));
  for(const o of RUN.obst){const nx=Math.max(o.x,Math.min(e.x,o.x+o.w)),ny=Math.max(o.y,Math.min(e.y,o.y+o.h));
-  const dx=e.x-nx,dy=e.y-ny,d=Math.hypot(dx,dy);if(d<rr&&d>0){e.x=nx+dx/d*rr;e.y=ny+dy/d*rr}}}
+  const dx=e.x-nx,dy=e.y-ny,d=Math.hypot(dx,dy);if(d<rr&&d>0){e.x=nx+dx/d*rr;e.y=ny+dy/d*rr}}dunCollidePits(e,rr)}
 function aimVec(p){let ax=p.ax||0,ay=p.ay===undefined?1:p.ay;const mx=p.dev.mx,my=p.dev.my,l=Math.hypot(mx,my);
  if(l>0){ax=mx/l;ay=my/l;p.ax=ax;p.ay=ay}return[ax,ay];}
 /* nearest standing keeper: who a foe hunts */
@@ -420,7 +423,7 @@ function hitEnemy(e,dmg,src,kx,ky,p){if(e.hp<=0)return;p=p||lead();const s=rdSta
  /* heavies, finishers and supers knock small foes into the air (a short stun while they're up) */
  if(e.kind!=='boss'&&(src==='heavy'||src==='super'||(src==='atk'&&p&&p.combo===2&&WEAPONS[RD.weapon].dmg.length>2)))e.vz=Math.max(e.vz||0,src==='super'?150:118);
  if(p&&src!=='bud'&&src!=='reflect'&&src!=='burn'){p.cmb=p.cmbT>0?(p.cmb||0)+1:1;p.cmbT=1.8;if(p.cmb>(p.cmbBest||0))p.cmbBest=p.cmb}if(src!=='super'&&src!=='reflect')meterGain(p,dmg*.22);
- if(kx){e.x+=kx;e.y+=ky;collide(e,e.r)}
+ if(kx){e.x+=kx;e.y+=ky;e.knock=1;collide(e,e.r);e.knock=0;dunKnocked(e,p);if(e.dead)return}
  ftext(e.x+R(-4,4),e.y-e.r-4,Math.round(dmg)+(crit?'!':''),crit?'#ffd94d':src==='cast'||src==='special'?'#b0e0f8':src==='super'?'#ffb040':'#ffffff');
  burst(e.x,e.y,FOES[e.kind]?FOES[e.kind].c:'#fff',crit?7:4,30);snd(crit?900:520+Math.random()*80,.03);
  if(src==='atk'&&RUN.boons.atk){const g=RUN.boons.atk.god;
@@ -431,7 +434,7 @@ function hitEnemy(e,dmg,src,kx,ky,p){if(e.hp<=0)return;p=p||lead();const s=rdSta
   if(g==='LEAF'&&Math.random()<.2)rdHeal(1,p);
   if(g==='PEB'){e.x+= (kx||0)*1.6;e.y+=(ky||0)*1.6;collide(e,e.r)}}
  if(e.hp<=0){if(p&&!e.dead)p.kills=(p.kills||0)+1;killEnemy(e)}}
-function killEnemy(e){if(e.dead)return;e.dead=true;e.hp=0;RD.stats.kills++;RUN.kills++;
+function killEnemy(e){if(e.dead)return;e.dead=true;e.hp=0;dunOnKill(e);RD.stats.kills++;RUN.kills++;
  if(e.kind==='boss'){const id=BOSSES[e.bossIx].id;RD.bossK[id]=(RD.bossK[id]||0)+1;bossSay(e,'down')}else{RD.killK[e.kind]=(RD.killK[e.kind]||0)+1;if(e.elite)RD.stats.elites=(RD.stats.elites||0)+1}burst(e.x,e.y,'#e8e4f5',10,44);snd(240,.12,90,'triangle',.06);
  if(e.kind==='boss'){bigFx(e.x,e.y,BOSSES[e.bossIx].c);slowMo(1.1);CAM.punch=.1;for(const o of RUN.enemies)if(o!==e)o.hp=Math.min(o.hp,0),o.dead=true;RUN.enemies=RUN.enemies.filter(o=>o===e||!o.dead);RUN.enemies.splice(RUN.enemies.indexOf(e),1);
   RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:e.x-6,y:e.y},{type:PODW[RUN.biome][(Math.random()*6)|0],x:e.x+6,y:e.y});RUN.podDropped=true;ftext(e.x,e.y-14,'SPROUT PODS!','#a8f080');RUN.shake=5;return}
@@ -526,6 +529,7 @@ function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.b
   if(e.hp<=0){killEnemy(e);return}}
  if(e.chill>0)e.chill-=dt;if(e.root>0){e.root-=dt;return}
  const T=tgt(e),d=Math.hypot(T.x-e.x,T.y-e.y),B=FOES[e.kind].b;
+ if(dunFoe(e,dt,T,d,B)){if(!e.dead&&RUN)touchHit(e,e.dmg);return}
  if(B==='chase')foeMove(e,dt,T.x,T.y,e.sp);
  else if(B==='shoot'){if(d>105)foeMove(e,dt,T.x,T.y,e.sp);else if(d<70)foeMove(e,dt,e.x+(e.x-T.x),e.y+(e.y-T.y),e.sp);
   e.yaw=Math.atan2(T.x-e.x,T.y-e.y);
@@ -553,7 +557,7 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.bo
   else if(e.state===2){e.t-=dt;e.x+=e.sx*165*dt;e.y+=e.sy*165*dt;e.mv=1;collide(e,e.r);if(e.t<=0)e.state=0}
   else{foeMove(e,dt,T.x,T.y,e.sp);
    if(e.bt<=0){e.bt=e.phase===1?7:5;const adds=RUN.enemies.length-1;
-    if(Math.random()<.5&&adds<4){for(let i=0;i<2;i++)spawnFoe('grub',e.x+R(-14,14),e.y+R(-10,10),false);say2('SHE CALLS HER CHILDREN',1.6)}
+    if(Math.random()<.5&&adds<4){for(let i=0;i<2;i++)spawnFoe(stratumOf().minion||'grub',e.x+R(-14,14),e.y+R(-10,10),false);say2('SHE CALLS HER CHILDREN',1.6)}
     else if(e.phase>=2)radial(10);else{e.state=1;e.t=.5}}}}
  else if(e.bossIx===1){ /* Drowned King */
   if(e.state===1){e.t-=dt;if(e.t<=0){e.x=e.tx;e.y=e.ty;e.state=0;RUN.shake=4;RUN.hazards.push({x:e.x,y:e.y,t:.05,t0:.05,r:26,dmg:e.dmg,from:'foe',instant:true});burst(e.x,e.y,'#7fd0e8',12,44);snd(120,.25,60,'sawtooth',.08)}}
@@ -570,7 +574,7 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.bo
    if(e.bt<=0){e.bt=e.phase===3?2.6:3.6;const roll=Math.random();
     if(roll<.4){e.state=1;e.t=.42;say2('IT WEARS YOUR FACE — DASH!',1.2)}
     else if(roll<.7)aimed(e.phase>=2?5:3,135);
-    else if(e.phase>=2&&RUN.enemies.length<3){spawnFoe('shade',e.x+R(-16,16),e.y+R(-12,12),false)}
+    else if(e.phase>=2&&RUN.enemies.length<3){spawnFoe(stratumOf().minion||'shade',e.x+R(-16,16),e.y+R(-12,12),false)}
     else radial(9)}}}
  if(RUN)touchHit(e,e.dmg);}
 function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
@@ -638,7 +642,7 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  for(const h of RUN.hazards){h.t-=dt;if(h.t<=0&&!h.done){h.done=true;burst(h.x,h.y,h.from==='player'?'#98a0b0':'#7fd0e8',12,44);snd(130,.2,60,'sawtooth',.07);RUN.shake=Math.max(RUN.shake,2.5);
   RUN.rings=RUN.rings||[];RUN.rings.push({x:h.x,y:h.y,r:h.r,t:.3,c:h.from==='player'?'#dce2ea':'#7fd0e8'});
   if(h.from==='player'){for(const e of RUN.enemies.slice())if(Math.hypot(e.x-h.x,e.y-h.y)<h.r+e.r)hitEnemy(e,h.dmg,'cast',0,0,h.o)}
-  else for(const p of PL){if(!p.down&&Math.hypot(p.x-h.x,p.y-h.y)<h.r+6&&p.inv<=0&&p.dashT<=0){RUN.hitBy=RUN.boss?BOSSES[RUN.boss.bossIx].id:'hazard';damagePlayer(p,h.dmg);if(!RUN)return}}}}
+  else for(const p of PL){if(!p.down&&Math.hypot(p.x-h.x,p.y-h.y)<h.r+6&&p.inv<=0&&p.dashT<=0){RUN.hitBy=h.by||(RUN.boss?BOSSES[RUN.boss.bossIx].id:'hazard');damagePlayer(p,h.dmg);if(!RUN)return}}}}
  RUN.hazards=RUN.hazards.filter(h=>!h.done);
  updateActs(dt);
  /* foes */
@@ -663,7 +667,8 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
    else if(p.kind==='honey'){RUN.honey+=p.val;say2(RD.stats.honeyFound?'+1 HONEY':'+1 HONEY - A GIFT FOR SOMEONE AT THE HEARTH',2.4)}}}
  RUN.pickups=RUN.pickups.filter(p=>!p.got);
  /* doors / clear */
- if(RUN.phase==='fight'&&RUN.enemies.length===0){
+ dunUpdate(dt);if(!RUN)return;
+ if(RUN.phase==='fight'&&RUN.enemies.length===0&&!dunHold()){
   if(RUN.wave2&&RUN.wave2.length){const w2=RUN.wave2;RUN.wave2=null;
    for(const s2 of w2){const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)}
    say2('THE DEEP STIRS - MORE RISE',1.6);snd(160,.25,70,'sawtooth',.06)}

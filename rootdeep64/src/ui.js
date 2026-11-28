@@ -110,7 +110,7 @@ function hudPlayer(p,x,y,right){const s=rdStats(p),w=104,full=(p.meter||0)>=SUPE
  /* combo counter under the panel: pops on every hit, grades as it climbs */
  if((p.cmb||0)>=3){const n=p.cmb,g=n>=30?'SAVAGE':n>=20?'BRUTAL':n>=10?'GREAT':n>=5?'NICE':'',pop=1+clamp((p.cmbT-1.6)/.2,0,1)*.35,top=y<VH/2,cy=top?y+42:y-26;
   hx.save();hx.translate(right?x+w-8:x+8,cy);hx.scale(pop,pop);text(n+' HITS',0,0,3,PCOL[p.ix],'#120a18',right?'right':'left');if(g)text(g,0,15,1,'#ffffff','#120a18',right?'right':'left');hx.restore()}}
-function hudRun(){const B=BIOMES[RUN.biome];
+function hudRun(){const B={n:stratumOf().n};
  /* world-anchored labels */
  if(RUN.phase==='doors')for(const d of RUN.doors){const q=project(d.x,36,27);if(!q)continue;const lbl=d.kind==='boon'?GODS[d.god].n+' BOON':DOORLBL[d.kind]||d.kind.toUpperCase(),c=d.kind==='boon'?GODS[d.god].l:DOORCOL[d.kind];
   const qy=Math.max(46,q.y);icon(d.kind,q.x,qy-8,7,c);ctext(lbl,qy+2,1,'#ffffff','#120a18',q.x);
@@ -130,7 +130,7 @@ function hudRun(){const B=BIOMES[RUN.biome];
  const rt='PETALS '+RUN.petals+'   MOONDEW '+RUN.dew+(RUN.keys?'   KEYS '+RUN.keys:'')+(RUN.heat?'   HEAT '+RUN.heat:'');
  text(rt,rx,7,1,'#f8c8e0','#120a18',al);
  if(RUN.buds.length)text('BUDS '+RUN.buds.length+'/6',rx,19,1,'#a8f080','#120a18',al);
- ctext('CH '+RUN.chamber+'/12  ·  '+B.n+(RUN.phase==='fight'?'  ·  FOES '+RUN.enemies.length+(RUN.wave2&&RUN.wave2.length?' + MORE':''):''),VH-(PL.length>2?13:14),1,'#a89ec2','#120a18');
+ ctext('CH '+RUN.chamber+'/12  ·  '+B.n+(stageOf()!=='fight'&&stageOf()!=='boss'?'  ·  '+STAGES[stageOf()].n:'')+(RUN.phase==='fight'&&!RUN.swarm?'  ·  FOES '+RUN.enemies.length+(RUN.wave2&&RUN.wave2.length?' + MORE':''):''),VH-(PL.length>2?13:14),1,'#a89ec2','#120a18');
  if(RUN.phase==='fight'&&RUN.enemies.length&&RUN.enemies.length<=3&&!RUN.wave2)for(const e of RUN.enemies){const q=project(e.x,8,e.y);if(!q)continue;const m=24;if(q.x>m&&q.x<VW-m&&q.y>m+20&&q.y<VH-m-20)continue;
   const ex=clamp(q.x,m,VW-m),ey=clamp(q.y,m+20,VH-m-20),a=Math.atan2(q.y-VH/2,q.x-VW/2);hx.save();hx.translate(ex,ey);hx.rotate(a);hx.fillStyle='#ff6a5a';hx.strokeStyle='#120a18';hx.lineWidth=2;hx.beginPath();hx.moveTo(9,0);hx.lineTo(-6,-7);hx.lineTo(-6,7);hx.closePath();hx.stroke();hx.fill();hx.restore()}
  if(RUN.chamber===1&&RUN.time<9&&RD.stats.runs<=3&&!RUN.banner){const d=lead0();const tch=d&&d.id==='touch';
@@ -139,9 +139,10 @@ function hudRun(){const B=BIOMES[RUN.biome];
   const mw=Math.min(380,VW-20),lines=[];let cur='';for(const x of L){const t=cur?cur+'  ·  '+x:x;if(cur&&tw(t,1)>mw-16){lines.push(cur);cur=x}else cur=t}lines.push(cur);
   const hy=VH-(PL.length>2?62:46)-lines.length*13;r('rgba(8,5,14,.7)',VW/2-mw/2,hy-4,mw,lines.length*13+7);lines.forEach((l,i)=>ctext(l,hy+i*13,1,'rgba(255,255,255,.88)',null))}
  if(RUN.boss&&RUN.boss.hp>0){const bw=Math.min(200,VW-240),bx=(VW-bw)/2,by=PL.length>1?34:22;r('#ffb0a0',bx-1,by-1,bw+2,10);r('#181020',bx,by,bw,8);r('#c22e4a',bx+1,by+1,Math.round((bw-2)*clamp(RUN.boss.hp/RUN.boss.max,0,1)),6);
-  ctext(BOSSES[RUN.boss.bossIx].n,by+11,1,'#ffb0a0','#120a18')}
- if(RUN.zoneT>0){const cn=(CHNAMES[RUN.chamber-1]||{n:B.n}).n;logoText(cn,VW/2,VH*.25,tw(cn,4)>VW-30?16:22);ctext(B.n+'  ·  CHAMBER '+RUN.chamber,VH*.25+26,1,'#c8b8e8','#120a18')}
+  ctext(bossTitle(RUN.boss),by+11,1,'#ffb0a0','#120a18')}
+ if(RUN.zoneT>0){const cn=chamberTitle();logoText(cn,VW/2,VH*.25,tw(cn,4)>VW-30?16:22);ctext(B.n+'  ·  CHAMBER '+RUN.chamber,VH*.25+26,1,'#c8b8e8','#120a18')}
  if(say2T>0&&!RUN.banner)ctext(say2Txt,RUN.zoneT>0?VH*.42:VH*.34,tw(say2Txt,2)>VW-16?1:2,'#ffd94d');
+ dunHud();
  /* getting hurt: the screen edge flashes in your colour (solo: red) */
  for(const p of PL)if(p.hurt>0){const a=clamp(p.hurt/.25,0,1)*.55,c=PL.length>1?PCOL[p.ix]:'#e8304a',g=hx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.7);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,c);hx.globalAlpha=a;hx.fillStyle=g;hx.fillRect(0,0,VW,VH);hx.globalAlpha=1}
  /* what the room holds: a relic to read, a keeper's lost thing, the ghost */
@@ -234,7 +235,7 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
    rowsPlain(bs.length?bs.map(b=>boonName(b)+'  ·  '+(b.kind==='core'?b.slot.toUpperCase():b.kind==='duo'?'DUO':'PASS')+' Lv'+b.level+' '+b.rarN):['NO BOONS YET. THE GODS WATCH.'],50,15);
    const s=rdStats(PL.find(q=>q.dev===menuDev)||PL[0]);ctext('ATTACK x'+(s.dmgMul*s.atkMul).toFixed(2)+'   CAST x'+(s.dmgMul*s.castMul).toFixed(2)+'   CRIT '+Math.round(s.crit*100)+'%   ARMOR '+Math.round(s.armor*100)+'%',VH-44,1,'#a8f080',null);
    ctext(Bk+': BACK',VH-26,1,'#8d84a8',null);return}
-  const pp=PL.find(q=>q.dev===menuDev);ctext(PL.length>1&&pp?'P'+(pp.ix+1)+' PAUSED':'PAUSED',22,4,pp&&PL.length>1?PCOL[pp.ix]:'#ffd94d');ctext('CHAMBER '+RUN.chamber+'  ·  '+BIOMES[RUN.biome].n,54,1,'#a89ec2',null);
+  const pp=PL.find(q=>q.dev===menuDev);ctext(PL.length>1&&pp?'P'+(pp.ix+1)+' PAUSED':'PAUSED',22,4,pp&&PL.length>1?PCOL[pp.ix]:'#ffd94d');ctext('CHAMBER '+RUN.chamber+'  ·  '+stratumOf().n,54,1,'#a89ec2',null);
   const L=pauseItems();drawList(L.map((s,i)=>i===pauseConfirm?'SURE? '+A+' AGAIN':s),pauseSel,80,22);
   ctext('PETALS '+RUN.petals+'  ·  MOONDEW '+RUN.dew+'  ·  KEYS THIS RUN '+RUN.keys,VH-58,1,'#c8c0d8',null);
   const dv=lead0(),tch=dv&&dv.id==='touch';

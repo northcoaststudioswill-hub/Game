@@ -18,7 +18,7 @@ function boot(){layout();
 const RDF={
  join:id=>{const d=DEV[id]||(DEV[id]=mkDev(id,id.toUpperCase()));return joinPlayer(d)},
  start:()=>{if(!PL.length)joinPlayer(DEV.kb1);hubEnter()},
- depart:()=>{if(!PL.length)joinPlayer(DEV.kb1);for(const p of PL){p.char=RD.chars[p.ix]||'WILL'}rdStartRun();state='run'},
+ depart:(opt)=>{if(!PL.length)joinPlayer(DEV.kb1);for(const p of PL){p.char=RD.chars[p.ix]||'WILL'}rdStartRun(opt||{classic:true});state='run'},
  talk:who=>{talkNPC=who;talkStart=0;talkLine=0;talkTxt=LINES[who]?LINES[who][0]:'';state='talk'},open:id=>{uiSel=0;state=id},
  clearRoom:()=>{if(RUN){RUN.wave2=null;for(const e of RUN.enemies.slice())killEnemy(e)}},
  hurt:(n,i)=>{const p=PL[i||0];if(RUN&&p){p.inv=0;p.dashT=0;damagePlayer(p,n)}},
