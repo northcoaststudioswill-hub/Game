@@ -4,14 +4,15 @@
    overlay are "devices". A device that presses A joins as the next
    player (up to 4). Menus listen to every device at once.
 
-   Pad:   stick / d-pad move · A attack · B or X cast · any shoulder or
-          trigger dash · START pause · double-tap the d-pad also dashes
-   Keys1: WASD or arrows · Z/J/Space attack · X/K cast · Shift/L dash ·
-          Enter pause  (arrows + , . / become player 2 once they join)
-   Touch: left thumb stick · A · B · DASH · START
+   Pad:   stick / d-pad move · A attack (hold: heavy) · B cast · X special ·
+          Y super · any shoulder or trigger dash · START pause
+   Keys1: WASD or arrows · Z/J/Space attack · X/K cast · C/I special ·
+          V/O super · Shift/L dash · Enter pause
+   Keys2: arrows · , attack · . cast · M special · N super · / dash
+   Touch: left thumb stick · A · B · SP · SUPER · DASH · START
    ===================================================================== */
 'use strict';
-const BTN=['a','b','dash','start','sel','left','right','up','down'];
+const BTN=['a','b','sp','sup','dash','start','sel','left','right','up','down'];
 function mkDev(id,label){const d={id,label,mx:0,my:0,cur:{},prev:{},pr:{},live:true,rep:0,repDir:''};for(const b of BTN){d.cur[b]=false;d.prev[b]=false;d.pr[b]=false}return d}
 const DEV={kb1:mkDev('kb1','KEYS'),kb2:mkDev('kb2','KEYS 2'),touch:mkDev('touch','TOUCH')};
 const KEYS={};let kb2On=false,touchSeen=false,anyInput=false;
@@ -40,15 +41,15 @@ function pollInput(dt){
  /* keyboard 1 (owns the arrows too until a second keyboard player joins) */
  let l=K.KeyA||(!two&&K.ArrowLeft),r=K.KeyD||(!two&&K.ArrowRight),u=K.KeyW||(!two&&K.ArrowUp),d=K.KeyS||(!two&&K.ArrowDown);
  k1.mx=(r?1:0)-(l?1:0);k1.my=(d?1:0)-(u?1:0);
- k1.cur={a:!!(K.KeyZ||K.KeyJ||K.Space),b:!!(K.KeyX||K.KeyK),dash:!!(K.ShiftLeft||K.KeyL||K.KeyC||(!two&&K.ShiftRight)),start:!!(K.Enter||K.KeyP),sel:!!(K.KeyQ||K.Escape),left:!!l,right:!!r,up:!!u,down:!!d};
+ k1.cur={a:!!(K.KeyZ||K.KeyJ||K.Space),b:!!(K.KeyX||K.KeyK),sp:!!(K.KeyC||K.KeyI),sup:!!(K.KeyV||K.KeyO),dash:!!(K.ShiftLeft||K.KeyL||(!two&&K.ShiftRight)),start:!!(K.Enter||K.KeyP),sel:!!(K.KeyQ||K.Escape),left:!!l,right:!!r,up:!!u,down:!!d};
  /* keyboard 2 */
  l=K.ArrowLeft;r=K.ArrowRight;u=K.ArrowUp;d=K.ArrowDown;
  k2.mx=two?(r?1:0)-(l?1:0):0;k2.my=two?(d?1:0)-(u?1:0):0;
- k2.cur={a:!!K.Comma,b:!!(two&&K.Period),dash:!!(two&&(K.Slash||K.ShiftRight)),start:!!(two&&K.Backspace),sel:false,left:!!(two&&l),right:!!(two&&r),up:!!(two&&u),down:!!(two&&d)};
+ k2.cur={a:!!K.Comma,b:!!(two&&K.Period),sp:!!(two&&K.KeyM),sup:!!(two&&K.KeyN),dash:!!(two&&(K.Slash||K.ShiftRight)),start:!!(two&&K.Backspace),sel:false,left:!!(two&&l),right:!!(two&&r),up:!!(two&&u),down:!!(two&&d)};
  /* touch */
  const t=DEV.touch;t.mx=axis(TS.x);t.my=axis(TS.y);
  const L=TS.latch;/* a tap shorter than one frame still counts */
- t.cur={a:!!(TS.btn.a||L.a),b:!!(TS.btn.b||L.b),dash:!!(TS.btn.dash||L.dash),start:!!(TS.btn.start||L.start),sel:false,left:TS.x<-.5,right:TS.x>.5,up:TS.y<-.5,down:TS.y>.5};
+ t.cur={a:!!(TS.btn.a||L.a),b:!!(TS.btn.b||L.b),sp:!!(TS.btn.sp||L.sp),sup:!!(TS.btn.sup||L.sup),dash:!!(TS.btn.dash||L.dash),start:!!(TS.btn.start||L.start),sel:false,left:TS.x<-.5,right:TS.x>.5,up:TS.y<-.5,down:TS.y>.5};
  TS.latch={};
  /* gamepads */
  const pads=navigator.getGamepads?navigator.getGamepads():[];
@@ -57,7 +58,7 @@ function pollInput(dt){
   let mx=axis(p.axes[0]||0),my=axis(p.axes[1]||0);const dl=B(14),dr=B(15),du=B(12),dd=B(13);
   if(dl||dr)mx=(dr?1:0)-(dl?1:0);if(du||dd)my=(dd?1:0)-(du?1:0);
   dv.mx=mx;dv.my=my;dv.dpad=dl||dr||du||dd;
-  dv.cur={a:B(0),b:B(1)||B(2),dash:B(4)||B(5)||B(6)||B(7)||B(3),start:B(9),sel:B(8),left:mx<-.5,right:mx>.5,up:my<-.5,down:my>.5};
+  dv.cur={a:B(0),b:B(1),sp:B(2),sup:B(3),dash:B(4)||B(5)||B(6)||B(7),start:B(9),sel:B(8),left:mx<-.5,right:mx>.5,up:my<-.5,down:my>.5};
   if(B(0)||B(9))anyInput=true}
  for(const id in DEV){const dv=DEV[id];for(const b of BTN){dv.pr[b]=dv.cur[b]&&!dv.prev[b];dv.prev[b]=dv.cur[b]}
   /* menu auto-repeat on held directions */

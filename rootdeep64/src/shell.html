@@ -31,19 +31,21 @@ body.touch #pad{display:block}
 .tb.on{opacity:1;transform:scale(.93)}
 .tb[data-b=a]{right:22px;bottom:34px;width:86px;height:86px;background:#58a8f8;font-size:26px}
 .tb[data-b=b]{right:118px;bottom:22px;width:66px;height:66px;background:#58d078;font-size:21px}
-.tb[data-b=dash]{right:34px;bottom:132px;width:66px;height:66px;background:#ffd94d;font-size:13px}
+.tb[data-b=dash]{right:28px;bottom:130px;width:62px;height:62px;background:#e8e4f5;font-size:12px}
+.tb[data-b=sp]{right:122px;bottom:96px;width:58px;height:58px;background:#f878a8;font-size:15px}
+.tb[data-b=sup]{right:100px;bottom:164px;width:60px;height:60px;background:#ffd94d;font-size:11px}
 .tb[data-b=start]{left:50%;margin-left:-32px;top:8px;width:64px;height:26px;border-radius:13px;background:#e84a5f;color:#fff;font-size:10px;opacity:.55}
 /* portrait: the picture sits on top and the controls get their own deck below, like a handheld */
 body.portrait #pad{top:auto}
 body.portrait #stickzone{width:50%;height:38%}
-body.portrait .tb[data-b=start]{top:auto;bottom:240px;left:auto;right:24px;margin:0}
+body.portrait .tb[data-b=start]{top:auto;bottom:250px;left:auto;right:24px;margin:0}
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="gl"></canvas><canvas id="hud"></canvas><div id="nogl" hidden>ROOTDEEP 64 needs WebGL, and this browser has it switched off.</div></div>
 <div id="pad">
  <div id="stickzone"><div id="stickbase"><div id="nub"></div></div></div>
- <div class="tb" data-b="dash">DASH</div><div class="tb" data-b="b">B</div><div class="tb" data-b="a">A</div><div class="tb" data-b="start">START</div>
+ <div class="tb" data-b="sup">SUPER</div><div class="tb" data-b="sp">SP</div><div class="tb" data-b="dash">DASH</div><div class="tb" data-b="b">B</div><div class="tb" data-b="a">A</div><div class="tb" data-b="start">START</div>
 </div>
 <script>
 'use strict';
@@ -51,6 +53,7 @@ body.portrait .tb[data-b=start]{top:auto;bottom:240px;left:auto;right:24px;margi
 /*@include input.js*/
 /*@include data.js*/
 /*@include game.js*/
+/*@include moves.js*/
 /*@include models.js*/
 /*@include anim.js*/
 /*@include ui.js*/

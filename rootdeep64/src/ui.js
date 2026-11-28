@@ -35,8 +35,8 @@ function icon(kind,x,y,s,c){hx.save();hx.translate(x,y);hx.fillStyle=c||'#ffd94d
 const DOORCOL={boon:'#ffd94d',petals:'#f8a0c8',dew:'#7fd0e8',fruit:'#ffb040',heart:'#f85888',shop:'#e8c888',fountain:'#7fd0e8',honey:'#f8b840'};
 /* what a device calls its buttons */
 function btnName(dev,b){const id=dev?dev.id:'gp';
- if(id==='kb1')return{a:'Z',b:'X',dash:'SHIFT',start:'ENTER'}[b];if(id==='kb2')return{a:',',b:'.',dash:'/',start:'BKSP'}[b];
- return{a:'A',b:'B',dash:id==='touch'?'DASH':'R',start:'START'}[b]}
+ if(id==='kb1')return{a:'Z',b:'X',sp:'C',sup:'V',dash:'SHIFT',start:'ENTER'}[b];if(id==='kb2')return{a:',',b:'.',sp:'M',sup:'N',dash:'/',start:'BKSP'}[b];
+ return{a:'A',b:'B',sp:id==='touch'?'SP':'X',sup:id==='touch'?'SUPER':'Y',dash:id==='touch'?'DASH':'R',start:'START'}[b]}
 const lead0=()=>PL[0]?PL[0].dev:null;
 
 /* ---------------- shared menu furniture ---------------- */
@@ -78,14 +78,19 @@ function hudHub(){
   text((more?btnName(d,'a')+': MORE':btnName(d,'a')+': BYE')+'  ·  '+btnName(d,'b')+': BYE'+(RD.honey>0?'  ·  '+btnName(d,'start')+': GIFT HONEY ('+RD.honey+')':''),bx+12,by+60,1,'#7a6a8a',null)}}
 
 /* ---------------- HUD: the run ---------------- */
-function hudPlayer(p,x,y,right){const s=rdStats(p),w=104;
- panel(x,y,w,31,'rgba(14,9,22,.86)');r(PCOL[p.ix],right?x+w-3:x,y,3,31);
+function hudPlayer(p,x,y,right){const s=rdStats(p),w=104,full=(p.meter||0)>=SUPER_MAX;
+ panel(x,y,w,37,'rgba(14,9,22,.86)');r(PCOL[p.ix],right?x+w-3:x,y,3,37);
  const tx=x+(right?4:8);
  text('P'+(p.ix+1),tx,y+2,1,PCOL[p.ix],null);text(p.char,tx+17,y+2,1,'#e8e4f5',null);
- if(p.down){rtext(((time*3)|0)%2?'DOWN':'',x+w-8,y+2,1,'#ff7a6b',null)}else rtext(Math.ceil(p.hp)+'/'+s.maxHp,x+w-(right?8:5),y+2,1,'#ffffff',null);
+ if(p.down){rtext(((time*3)|0)%2?'DOWN':'',x+w-8,y+2,1,'#ff7a6b',null)}else rtext(p.char.length>5?''+Math.ceil(p.hp):Math.ceil(p.hp)+'/'+s.maxHp,x+w-(right?8:5),y+2,1,'#ffffff',null);
  const bw=w-13;r('#3a1420',tx,y+13,bw,6);r(p.hp/s.maxHp<.3?'#e84a5f':'#58c048',tx,y+13,Math.round(bw*clamp(p.hp/s.maxHp,0,1)),6);
  for(let i=1;i<10;i++)r('rgba(10,6,16,.5)',tx+Math.round(i*bw/10),y+13,1,6);
- let px=tx;px=pips(p.castAmmo||0,1+(hasKeep('stone')?1:0),px,y+21,'#7fd0e8')+5;pips(p.dashCharges||0,s.dashCharges,px,y+21,'#ffd94d')}
+ /* cast · dash · special */
+ let px=tx;px=pips(p.castAmmo||0,1+(hasKeep('stone')?1:0),px,y+21,'#7fd0e8')+4;px=pips(p.dashCharges||0,s.dashCharges,px,y+21,'#ffd94d')+4;
+ const cd=clamp(1-(p.spCd||0)/(mv(p).spCd||6),0,1);r('#0d0a14',px,y+21,22,7);r(cd>=1?'#f878a8':'#6a3a52',px+1,y+22,Math.round(20*cd),5);
+ /* super meter */
+ r('#241a08',tx,y+30,bw,4);r(full?(((time*8)|0)%2?'#ffffff':'#ffd94d'):'#c88a18',tx,y+30,Math.round(bw*clamp((p.meter||0)/SUPER_MAX,0,1)),4);
+ if(full)text('SUPER',x+(right?-34:w+4),y+27,1,((time*6)|0)%2?'#ffd94d':'#ffffff','#120a18')}
 function hudRun(){const B=BIOMES[RUN.biome];
  /* world-anchored labels */
  if(RUN.phase==='doors')for(const d of RUN.doors){const q=project(d.x,36,27);if(!q)continue;const lbl=d.kind==='boon'?GODS[d.god].n:d.kind.toUpperCase(),c=d.kind==='boon'?GODS[d.god].l:DOORCOL[d.kind];
@@ -96,7 +101,7 @@ function hudRun(){const B=BIOMES[RUN.biome];
   if(p.down)ctext('STAND HERE',q.y-12,1,'#a8f080','#120a18',q.x);else if(PL.length>1)ctext('P'+(p.ix+1),q.y-12,1,PCOL[p.ix],'#120a18',q.x)}
  for(const t of RUN.texts){const q=project(t.x,16+(.8-t.t)*10,t.y);if(q)ctext(t.txt,q.y-6,t.txt.length>6?1:2,t.c,'#120a18',q.x)}
  /* keeper panels in the four corners, like a 4-player cartridge */
- const slots=[[6,6,0],[VW-110,6,1],[6,VH-37,0],[VW-110,VH-37,1]];
+ const slots=[[6,6,0],[VW-110,6,1],[6,VH-43,0],[VW-110,VH-43,1]];
  PL.forEach((p,i)=>hudPlayer(p,slots[i][0],slots[i][1],slots[i][2]));
  /* the shared purse */
  const solo=PL.length<2,rx=solo?VW-8:VW/2,al=solo?'right':'center';
@@ -104,11 +109,16 @@ function hudRun(){const B=BIOMES[RUN.biome];
  text(rt,rx,7,1,'#f8c8e0','#120a18',al);
  if(RUN.buds.length)text('BUDS '+RUN.buds.length+'/6',rx,19,1,'#a8f080','#120a18',al);
  ctext('CH '+RUN.chamber+'/12  ·  '+B.n,VH-(PL.length>2?13:14),1,'#a89ec2','#120a18');
- if(RUN.chamber===1&&RUN.time<7){const d=lead0();ctext(btnName(d,'a')+' HIT  ·  '+btnName(d,'b')+' CAST  ·  '+(d&&d.id==='kb1'?'SHIFT / DOUBLE-TAP':btnName(d,'dash'))+': DASH',VH*.2,1,'rgba(255,255,255,.85)','#120a18')}
+ if(RUN.chamber===1&&RUN.time<7&&!RUN.banner){const d=lead0();const tch=d&&d.id==='touch';ctext(btnName(d,'a')+' HIT  ·  '+btnName(d,'b')+' CAST  ·  '+(tch?'DASH':(d&&d.id==='kb1'?'SHIFT / DOUBLE-TAP':btnName(d,'dash'))+': DASH'),VH*.2,1,'rgba(255,255,255,.85)','#120a18');
+  ctext('HOLD '+btnName(d,'a')+': HEAVY  ·  '+(tch?'SP: SPECIAL  ·  SUPER WHEN FULL':btnName(d,'sp')+' SPECIAL  ·  '+btnName(d,'sup')+' SUPER WHEN FULL'),VH*.2+12,1,'rgba(255,255,255,.7)','#120a18')}
  if(RUN.boss&&RUN.boss.hp>0){const bw=Math.min(200,VW-240),bx=(VW-bw)/2,by=PL.length>1?34:22;r('#ffb0a0',bx-1,by-1,bw+2,10);r('#181020',bx,by,bw,8);r('#c22e4a',bx+1,by+1,Math.round((bw-2)*clamp(RUN.boss.hp/RUN.boss.max,0,1)),6);
   ctext(BOSSES[RUN.boss.bossIx].n,by+11,1,'#ffb0a0','#120a18')}
  if(RUN.zoneT>0)logoText(B.n,VW/2,VH*.28,22);
- if(say2T>0)ctext(say2Txt,VH*.44,2,'#ffd94d')}
+ if(say2T>0&&!RUN.banner)ctext(say2Txt,VH*.44,2,'#ffd94d');
+ if(RUN.flash>0)r('rgba(255,255,255,'+clamp(RUN.flash/.3,0,1)*.85+')',0,0,VW,VH);
+ /* super call-out: letterbox, name, whose it is */
+ if(RUN.banner){const b=RUN.banner,inn=clamp((1.3-b.t)/.12,0,1),out=clamp(b.t/.25,0,1),k=inn*out,by=VH*.13;r('rgba(6,4,12,'+.8*k+')',0,by,VW,52);r(b.c,0,by,VW*k,2);r(b.c,VW*(1-k),by+50,VW*k,2);
+  if(k>.5){ctext(b.who,by+6,1,b.c,'#120a18');logoText(b.txt,VW/2+(1-inn)*80,by+17,b.txt.length>15?21:27)}}}
 
 /* ---------------- screens ---------------- */
 function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
@@ -156,7 +166,8 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
   ctext('PAUSED',22,4,'#ffd94d');ctext('CHAMBER '+RUN.chamber+'  ·  '+BIOMES[RUN.biome].n,54,1,'#a89ec2',null);
   drawList(['RESUME','BUILD','SETTINGS','ABANDON RUN','QUIT TO TITLE'],pauseSel,84,24);
   ctext('PETALS '+RUN.petals+'  ·  DEW '+RUN.dew+'  ·  KEYS '+RUN.keys,VH-58,1,'#c8c0d8',null);
-  ctext('PAD: STICK MOVE · A HIT · B CAST · R DASH      KEYS: Z · X · SHIFT',VH-28,1,'#6a6284',null);return}}
+  ctext('PAD: A HIT (HOLD: HEAVY) · B CAST · X SPECIAL · Y SUPER · R DASH',VH-34,1,'#6a6284',null);
+  ctext('KEYS: Z · X · C · V · SHIFT        ATTACK OUT OF A DASH: DASH STRIKE',VH-22,1,'#6a6284',null);return}}
 function drawSprouts(){const M=RD,A=btnName(lead0(),'a'),Bk=btnName(lead0(),'b');
  if(sprPage===0){screenShell('SPROUT LEDGER','< > EXCHANGE  ·  BANK: '+bankTotal());
   for(let ty=0;ty<6;ty++){const yy=56+ty*22,on=ty===uiSel,T=TYPES[ty];

@@ -46,6 +46,11 @@ function buildCast(){let b;
  b=new MB();b.box(0,0,5.6,.9,2.2,9.8,'#f8b8d4','#ffffff');b.box(0,0,.6,3.4,1.2,1,'#ffd94d');b.box(0,0,-.6,1,1,2.2,BOOT);MESH.blade=b.done();
  b=new MB();b.box(0,0,3,1.2,1.2,10,'#7a4a28');b.box(0,0,8.2,5.4,5.4,4.8,'#5a4030','#8a6a48');b.box(0,0,8.2,5.8,2,5,'#3a2c22');MESH.maul=b.done();
  b=new MB();b.box(0,3.4,1.6,.9,4,.9,'#6e8a3a');b.box(0,-3.4,1.6,.9,4,.9,'#6e8a3a');b.box(0,0,2.6,1.1,3.6,1,'#8aa850');b.box(0,0,.6,.3,10.4,.3,'#e8e0d0');MESH.bow=b.done();
+ b=new MB();b.box(0,0,0,2.2,3.6,.5,'#181420');MESH.phone=b.done();b=new MB();b.box(0,0,0,1.8,3,.3,'#bfe8ff','#ffffff');MESH.phoneLit=b.done();
+ /* BIKE LANE's bike */
+ b=new MB();for(const z of[-8,8]){b.xf(0,5,z,0,0,1.5708).cyl(0,-.7,0,5,5,1.4,10,'#18141c','#3a3442').cyl(0,-.9,0,2,2,1.8,6,'#c8c8d0').rst()}
+ b.xf(0,7.5,0,.5,0,0).box(0,0,0,1.2,1.2,15,'#d83030','#f86050').rst();b.box(0,9.5,-3,1.2,7,1.2,'#d83030');b.box(0,13,-3.4,3.4,1.2,5,'#28222c');
+ b.xf(0,10,7,-.3,0,0).box(0,0,0,1.1,9,1.1,'#c8c8d0').rst();b.box(0,14.4,5.6,9,1,1,'#28222c');b.box(0,12,9.4,5,3.4,3,'#c8a060','#e8c888');MESH.bike=b.done();
  /* shadow crown for the Hollow Keeper */
  b=new MB();for(let i=0;i<5;i++){const a=i/5*6.2832;b.cyl(Math.cos(a)*3.4,0,Math.sin(a)*3.4,1,0,4,4,'#0c0a12','#e8e4f5')}MESH.crown=b.done()}
 /* ---------- foes & bosses ---------- */
@@ -223,6 +228,7 @@ function buildProps(){let b;
 /* ---------- camera ---------- */
 const CAM={x:W/2,z:H/2,d:1,init:false};
 function camFollow(pts,solo,dt,fill){ /* frame the room; lean toward the keepers */
+ if(RUN&&RUN.freeze>0&&RUN.freezeP){pts=[RUN.freezeP];fill=.4;dt=Math.max(dt,.03)*2.4}
  let cx=W/2,cz=H*.5,sp=0;if(pts.length){cx=0;cz=0;for(const p of pts){cx+=p.x;cz+=p.y}cx/=pts.length;cz/=pts.length;for(const p of pts)sp=Math.max(sp,Math.abs(p.x-cx)/(W*.5),Math.abs(p.y-cz)/(H*.5))}
  const f=fill!==undefined?fill:clamp((solo?.56:.66)+sp*.5,.56,.98);
  const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.46,cz,clamp(1.06-f,0,.6)*1.5);
@@ -245,7 +251,9 @@ function keeperOpts(p,run){const isL=p.char==='LOUIE';
  return{id:'p'+p.ix,weapon:run&&!isL?RD.weapon:null,combo:p.combo,nosit:run,
   atk:run&&p.swing>0?1-p.swing/(p.swingD||.3):-1,cast:run&&p.castA>0?1-p.castA/.45:-1,selfie:run&&p.selfieA>0?1-p.selfieA/.6:-1,
   hurt:run&&p.hurt>0?1-p.hurt/.25:-1,dash:run&&p.dashT>0,down:run&&p.down,cheer:run&&p.cheer>0?1-p.cheer/1.1:-1,land:run&&p.land>0?Math.max(0,1-p.land/.62):-1,help,
-  add:p.hurt>0?.6:0,c:p.armT>0?[.8,.85,1]:null}}
+  charge:run&&p.charging&&p.chg>.15?clamp(p.chg/CHARGE_T,0,1):-1,heavy:run&&p.heavyA>0?1-p.heavyA/.42:-1,dive:run&&p.dive>0?1-p.dive/.3:-1,diveL:run&&p.diveL>0?1-p.diveL/.3:-1,
+  sp:run&&p.spA>0&&!isL?1-p.spA/.55:-1,sup:run&&p.supA>0?clamp(1-p.supA/1.05,0,1):-1,phone:run&&p.char==='WILL'&&(p.spA>0||p.selfieA>0),
+  add:p.hurt>0?.6:(run&&p.charging&&p.chg>=CHARGE_T?.22+.12*Math.sin(time*30):0),c:p.armT>0?[.8,.85,1]:null}}
 function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay);
  shadow(p.x,p.y,p.char==='LOUIE'?7:6.2);
  /* player ring, in their colour: the 4-player couch needs to know who is who */
@@ -259,6 +267,9 @@ function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay)
   mPush();mT(p.x,.55,p.y);mS(20);drawT(MESH.ring,{c:hex('#a8f080'),a:.5+.3*Math.sin(time*6),unlit:true});mPop()}
  if(run&&p.slashT>0&&!WEAPONS[RD.weapon].proj){const w=WEAPONS[RD.weapon],rg=p.char==='LOUIE'?Math.max(18,w.range-6):w.range;
   mPush();mT(p.x,9,p.y);mRY(yaw);mS(rg,1,rg);mRY((w.arc-2)*.0);drawT(MESH.arc,{c:hex(RUN.boons.atk?GODS[RUN.boons.atk.god].l:'#eaffea'),a:.85*p.slashT/.12,unlit:true,glow:true,nocull:true});mPop()}
+ if(run&&!p.down&&(p.meter||0)>=SUPER_MAX){mPush();mT(p.x,.55,p.y);mS(11+Math.sin(time*8)*1.5);drawT(MESH.ring,{c:hex('#ffd94d'),a:.9,unlit:true,glow:true});mPop();const t=(time*1.4+p.ix*.3)%1;sprite(p.x+Math.sin(time*5+p.ix)*6,t*30,p.y+Math.cos(time*4)*5,3.2,hex('#ffd94d'),1-t,true)}
+ if(run&&p.charging&&p.chg>.15){const c=clamp(p.chg/CHARGE_T,0,1);sprite(p.x,12,p.y,10+c*22,hex(c>=1?'#fff3b0':'#f8a040'),.25+.35*c,true)}
+ if(run&&p.supA>.45)sprite(p.x,13,p.y,60+Math.sin(time*40)*8,hex(PCOL[p.ix]),.45,true);
  if(run&&p.selfie>0)sprite(p.x,16,p.y,90*(p.selfie/.18),[1,1,1],.8*p.selfie/.18,true)}
 function drawCastGhost(p,tr,a){sprite(tr.x,10,tr.y,15,hex(PCOL[p.ix]),.3*a,true)}
 function sceneHub(dt){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#120a12',430,820);
@@ -290,7 +301,7 @@ const BKEY=['burrows','vault','core'];
 const BLIGHT=[[[.3,.9,.45],[.74,.6,.56],[.46,.4,.46],'#0e080e'],[[.25,.9,.4],[.5,.68,.86],[.34,.44,.56],'#060c14'],[[.3,.85,.45],[.95,.58,.4],[.5,.36,.34],'#120606']];
 const DEBBY=[['rock','tuft','stalag'],['rock','bone','shard'],['rock','ember','shard']];
 function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],420,800);
- camFollow(alive(),PL.length<2,state==='run'?dt:0);frameBegin();
+ camFollow(alive(),PL.length<2,state==='run'?dt:0,RUN.freeze>0?.4:undefined);frameBegin();
  drawRoomMesh(BKEY[B]);
  /* debris, seeded per chamber like the cartridge */
  for(let i=0;i<12;i++){const dx=(i*97+RUN.chamber*31)%(W-30)+15,dz=42+((i*57+RUN.chamber*19)%(H-66)),k=DEBBY[B][i%3];
@@ -318,7 +329,24 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
  for(const p of RUN.pickups){const bob=Math.sin(time*5+p.x)*1.2;shadow(p.x,p.y,2.6);
   prop(PROP[p.kind]||PROP.petal,p.x,(p.kind==='petal'?3.2:5)+bob,p.y,time*3+p.x,p.kind==='petal'?.75:1,p.kind==='dew'?{add:.12}:null);
   if(p.kind==='dew')sprite(p.x,5+bob,p.y,13,hex('#7fd0e8'),.3,true)}
- for(const e of RUN.enemies)drawFoe(e);
+ for(const e of RUN.enemies){drawFoe(e);if(e.dazed>0)for(let i=0;i<3;i++){const a=time*7+i*2.094;sprite(e.x+Math.cos(a)*(e.r+2),(e.kind==='boss'?30:17)+Math.sin(time*9+i),e.y+Math.sin(a)*(e.r+2),3.4,hex('#ffd94d'),1,true)}}
+ /* what specials and supers leave in the room */
+ for(const a of RUN.acts){if(a.delay>0&&a.k!=='geyser')continue;
+  if(a.k==='bike'){const yw=Math.atan2(a.vx,a.vy);shadow(a.x,a.y,9);mPush();mT(a.x,Math.abs(Math.sin(time*30))*.6,a.y);mRY(yw);mRZ(Math.sin(time*9)*.08);mS(1.25);draw(MESH.bike);mPop();
+   sprite(a.x-a.vx*.05,9,a.y-a.vy*.05,22,hex('#ffd94d'),.3,true);sprite(a.x-a.vx*.1,8,a.y-a.vy*.1,16,hex('#f86050'),.25,true)}
+  else if(a.k==='sprout'){shadow(a.x,a.y,5);drawBud(a.type%6,a.x,a.y,Math.atan2(a.vx,a.vy),Math.abs(Math.sin(time*16+a.type*1.3))*5,1.75);sprite(a.x-a.vx*.05,7,a.y-a.vy*.05,13,hex(TYPES[a.type%6].l),.35,true)}
+  else if(a.k==='judge'){const pu=.6+.4*Math.sin(time*40),warn=a.t<.3;
+   mPush();mT(a.x,.5,a.y);mS(26);drawT(MESH.ring,{c:hex('#ffd94d'),a:.9,unlit:true,glow:true});mPop();
+   if(warn){mPush();mT(a.x,.45,a.y);mS(26*a.t/.3);drawT(MESH.disc,{c:hex('#ffd94d'),a:.3,unlit:true});mPop()}
+   else{mPush();mT(a.x,90,a.y);mS(30+pu*8,180,30+pu*8);drawT(MESH.cyl,{c:hex('#ffe9a0'),a:.2+.12*pu,unlit:true,glow:true,nocull:true});mPop();
+    mPush();mT(a.x,0,a.y);mS(7+pu*3,180,7+pu*3);drawT(MESH.cyl,{c:[1,1,1],a:.4,unlit:true,glow:true,nocull:true});mPop();sprite(a.x,6,a.y,70,hex('#ffd94d'),.45*pu,true)}}
+  else if(a.k==='geyser'){if(a.delay>0){mPush();mT(a.x,.5,a.y);mS(17*(1-clamp(a.delay/.8,0,1))+3);drawT(MESH.ring,{c:hex('#7fd0e8'),a:.8,unlit:true});mPop();continue}
+   const t=1-a.life/.5,hgt=Math.sin(clamp(t*1.25,0,1)*3.14159)*62+4;mPush();mT(a.x,0,a.y);mS(9,hgt,9);drawT(MESH.cyl,{c:hex('#7fd0e8'),a:.6,unlit:true,nocull:true});mPop();
+   mPush();mT(a.x,0,a.y);mS(4.5,hgt*1.06,4.5);drawT(MESH.cyl,{c:[1,1,1],a:.7,unlit:true,glow:true,nocull:true});mPop();sprite(a.x,hgt,a.y,26,hex('#bdeffb'),.6,true)}
+  else if(a.k==='cloud'){const fd=clamp(a.life/.5,0,1);for(let i=0;i<6;i++){const an=a.s+i*1.05+time*.7,rr=i?12:0;mPush();mT(a.x+Math.cos(an)*rr,9+Math.sin(time*2+i)*2+(i%2)*4,a.y+Math.sin(an)*rr*.8);mS(10+(i%3)*2.5);drawT(MESH.sph,{c:hex(i%2?'#cfe8b8':'#e8f4dc'),a:.34*fd,unlit:true});mPop()}}
+  else if(a.k==='leash'){const p=a.o,t=1-a.t/a.t0,tx=a.e?a.e.x:a.x2,tz=a.e?a.e.y:a.y2,ex=lerp(p.x,tx,eOut(t)),ez=lerp(p.y,tz,eOut(t)),dx=ex-p.x,dz=ez-p.y,len=Math.hypot(dx,dz)||1;
+   mPush();mT((p.x+ex)/2,12,(p.y+ez)/2);mRY(Math.atan2(dx,dz));mS(1.1,1.1,len);draw(MESH.cube,{c:hex('#e84a5f'),unlit:true});mPop();
+   mPush();mT(ex,12,ez);mRY(time*20);mS(7,1,7);drawT(MESH.ring,{c:hex('#e84a5f'),a:1,unlit:true,nocull:true});mPop()}}
  for(const b of RUN.buds){shadow(b.x,b.y,3);drawBud(b.type,b.x,b.y,b.yaw||0,(b.mv?Math.abs(Math.sin(time*10+b.a*3))*1.8:0)+(b.hop>0?Math.sin(b.hop/.2*3.14)*4:0),b.cd>0&&b.type===1?.8:1)}
  for(const p of PL)drawKeeper(p,true);
  /* projectiles */

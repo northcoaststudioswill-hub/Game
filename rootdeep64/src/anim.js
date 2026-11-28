@@ -94,6 +94,32 @@ function humanPose(kind,S,o){const P=zeroPose(),t=S.t,sd=S.seed,br=Math.sin(t*2.
   else{ /* MAZEL TOV LASER (and god casts): gather at the chest, drive both palms out, ride the recoil */
    ov(P,W,{lsx:lerp(.95,1.52,fire),rsx:lerp(.95,1.52,fire),le:lerp(1.95,.04,fire),re:lerp(1.95,.04,fire),lsz:lerp(.12,-.34,fire),rsz:lerp(.12,-.34,fire),
     rp:lerp(.12,-.27,fire),cx:lerp(.22,-.14,fire),cy:0,lhx:.46,rhx:-.46,lk:.32,rk:.26,hx:.12,hy:0,sq:.07*fire,wx:.5})}}
+ if(o.charge>=0){const c=o.charge; /* coiling up for the heavy */
+  ov(P,c,squat({rsx:-.9,re:.9,rsy:.5,cy:.55,pt:.2,cx:.26,lsx:.7,le:1.2,hx:-.1,cz:Math.sin(t*52)*.025*c,wx:-.8},.5))}
+ if(o.heavy>=0){const a=o.heavy,hit=ss(.04,.24,a),W=1-ss(.6,1,a);
+  if(kind==='MARCUS'){const sw=lerp(1.5,-1.45,eOut(hit)); /* PIPE WRENCH: both hands, everything he has */
+   ov(P,W,{rsx:1.4,rsy:sw,re:.1,rsz:0,lsx:1.3,lsy:sw*.6,lsz:-.4,le:.5,cy:sw*.75,pt:sw*.3,rp:.2*hit,cx:.1,hy:-sw*.3,lhx:.62*hit,lk:.5*hit,rhx:-.5*hit,rk:.25,wx:.1})}
+  else{const k=eOut(hit); /* SNEAKER KICK / GARDEN KICK: chamber the knee, snap it out, lean away to balance */
+   ov(P,W,{rhx:lerp(-.5,1.68,k),rk:lerp(1.7,.04,hit),rhz:.1,lhx:-.12,lk:.26,rp:-.3*hit,cx:-.16,cy:-.42*hit,pt:-.5*hit,lsx:-.6,lsz:.82,le:.4,rsx:.7,rsz:.5,re:1,hx:.12,hy:.2*hit,wx:-.7})}}
+ if(o.sp>=0){const a=o.sp;
+  if(kind==='ERIN'){const W=1-ss(.85,1,a),thr=ss(.4,.52,a),yank=ss(.56,.68,a); /* LEASH LASSO: twirl, throw, haul */
+   ov(P,W*(1-thr),{rsx:2.75,re:.3,rsy:Math.sin(t*26)*.6,rsz:.2+Math.cos(t*26)*.32,cy:.2,lsx:.4,le:.8,hx:-.1});
+   ov(P,W*thr*(1-yank),{rsx:1.45,re:0,rsy:0,cy:-.35,rp:.18,lsx:-.5,lhx:.5,rhx:-.4,lk:.3});
+   ov(P,W*yank,{rsx:.9,re:1.65,lsx:.9,le:1.65,lsz:-.25,rsz:-.25,rp:-.32,cx:-.26,lhx:.52,rhx:-.42,lk:.35,rk:.2,hx:.1})}
+  else if(kind==='MARCUS'){const W=ss(0,.12,a)*(1-ss(.75,1,a)); /* DAB CLOUD: he dabs. Of course he dabs. */
+   ov(P,W,{lsx:1.95,le:2.05,lsz:-.78,rsx:2.2,rsz:1.02,re:0,rsy:0,hx:.46,hy:.56,cz:-.2,cy:.26,lhz:.2,rhz:.2,rp:.05,wx:.9})}
+  else{const W=ss(0,.14,a)*(1-ss(.75,1,a)); /* SELFIE FLASH: phone up, chin out, foot pop */
+   ov(P,W,{lsx:2.35,le:.35,lsz:.26,lsy:.26,rsx:.3,re:1.9,rsz:.92,hz:-.28,hy:.3,cz:.12,cy:.2,rp:-.13,rk:1.15,rhx:-.08,cx:-.1})}}
+ if(o.sup>=0){const a=o.sup,gather=1-ss(.36,.5,a),burst2=ss(.4,.52,a)*(1-ss(.82,1,a)),hop=Math.sin(clamp((a-.4)/.4,0,1)*3.14159);
+  /* super: pull everything in, then let it go */
+  ov(P,gather*ss(0,.1,a),squat({lsx:.9,rsx:.9,le:2,re:2,lsz:-.4,rsz:-.4,cx:.42,hx:.3,cz:Math.sin(t*58)*.03,sq:-.1,wx:-.5},.72));
+  if(kind==='ERIN')ov(P,burst2,{rsx:1.5,re:0,rsz:0,lsx:1.9,le:2.3,lsz:-.3,cx:-.1,hx:-.2,ry:2.4*hop,lhx:.4,rhx:-.3,lk:.3,sq:.08});       /* whistle, and point */
+  else if(kind==='WILL')ov(P,burst2,{rsx:1.5,re:0,rsy:lerp(1.1,-.6,ss(.4,.7,a)),lsx:.3,le:1.8,lsz:.9,cy:lerp(.5,-.3,ss(.4,.7,a)),hx:-.1,ry:2.4*hop,lhz:.25,rhz:.25,sq:.08,wx:.2}); /* wave it through */
+  else ov(P,burst2,{lsx:2.8,rsx:2.8,lsz:.8,rsz:.8,le:0,re:0,cx:-.36,hx:-.46,ry:3.4*hop,sq:.16,lhz:.2,rhz:.2,wx:-.4})}
+ if(o.dive>=0){const a=o.dive,h=Math.sin(a*3.14159);P.ry+=13*h;
+  if(kind==='MARCUS')ov(P,1,{lhx:1.7,rhx:1.7,lk:2.3,rk:2.3,lsx:1.3,rsx:1.3,le:1.6,re:1.6,cx:.6,hx:.4,rp:a*5.6,wx:.5}); /* CANNONBALL, BRO */
+  else ov(P,1,{rp:1.28*ss(.08,.55,a),lsz:1.32,rsz:1.32,lsx:.3,rsx:.3,le:0,re:0,lhx:-.3,rhx:-.3,lk:.2,rk:.2,hx:-.62,sq:.1,wx:.4})} /* STAGE DIVE / FLYING FLOP */
+ if(o.diveL>=0){const W=1-ss(.3,1,o.diveL);ov(P,W,Object.assign(squat({},.9),{sq:-.3,cx:.42,lsz:.9,rsz:.9,lsx:.2,rsx:.2,hx:.2,rp:.1}))}
  if(o.selfie>=0){const W=1-ss(.72,1,o.selfie),pop=ss(0,.18,o.selfie); /* SELFIE FLASH: arm up, head tilt, foot pop */
   ov(P,W*pop,{lsx:2.55,le:.55,lsz:.36,lsy:.3,hz:-.3,hy:.36,hx:-.12,cz:.13,cy:.3,rk:1.25,rhx:-.1,rsx:.2,re:.9,rsz:.5,rp:-.05})}
  if(o.hurt>=0){const W=1-ss(.35,1,o.hurt);ov(P,W,Object.assign(squat({},.4),{cx:-.56,hx:-.46,lsz:1.02,rsz:1.02,lsx:-.42,rsx:-.42,le:.5,re:.5,rp:-.3,sq:-.14,hy:.2}))}
@@ -119,6 +145,7 @@ function drawHuman(M,S,o,dr){const c=S.cur,sq=clamp(c.sq,-.5,.6),sy=1+sq,sx=1/Ma
  for(const s of[-1,1]){const L=s<0,ax=L?c.lsx:c.rsx,ay=L?c.lsy:c.rsy,az=L?c.lsz:c.rsz,el=L?c.le:c.re;
   mPush();mT(s*5.6,4.2,0);mRZ(s*az);mRY(ay);mRX(-ax);draw(M.uarm,dr);mT(0,-3,0);mRX(-Math.max(0,el));draw(M.farm,dr);
   if(!L&&o.weapon){mT(0,-2.9,0);mRX(o.weapon==='bow'?1.2+c.wx:.2+c.wx);draw(MESH[o.weapon],dr)}
+  if(L&&o.phone){mT(0,-3.6,.6);draw(MESH.phone);mT(0,0,.5);draw(MESH.phoneLit,{unlit:true,add:.3})}
   mPop()}
  mT(0,5,0);mRY(c.hy);mRX(c.hx);mRZ(c.hz);draw(M.head,dr);
  if(o.crown){mT(0,9.4,0);draw(MESH.crown,{unlit:true})}}
@@ -142,6 +169,13 @@ function louiePose(S,o){const P=zeroPose(),t=S.t,sd=S.seed,w=clamp(S.sp/30,0,1),
   ov(P,W,{rz:6.5*lunge,hx:lerp(-.6,.38,snap),fl:.95*lunge,fr:.8*lunge,bl:-.65*lunge,br:-.55*lunge,sq:.2*lunge,ry:1.6*lunge,rp:-.1*lunge,tx:-.6,hy:0,hz:0})}
  if(o.cast>=0){const a=o.cast,cr=ss(0,.14,a)*(1-ss(.14,.26,a)),bark=ss(.14,.26,a)*(1-ss(.62,1,a)); /* THE BOOF: play-bow, then the whole dog goes into it */
   ov(P,Math.max(cr,bark),{rp:.42*cr-.32*bark,fl:.6*cr-.3*bark,fr:.6*cr-.3*bark,bl:-.2*bark,br:-.2*bark,hx:.3*cr-.95*bark,sq:-.16*cr+.22*bark,ry:2.4*bark,tx:-.7,hy:0,hz:0})}
+ if(o.charge>=0)ov(P,o.charge,{rp:.36,fl:.6,fr:.6,bl:.3,br:.3,ry:-1.2,hx:-.3,tz:Math.sin(t*26)*.6,sq:-.1});
+ if(o.heavy>=0){const a=o.heavy,lunge=ss(0,.16,a)*(1-ss(.36,1,a)),snap=ss(.08,.24,a),W=1-ss(.6,1,a); /* CHOMP */
+  ov(P,W,{rz:9.5*lunge,hx:lerp(-.95,.55,snap),fl:1.1*lunge,fr:1*lunge,bl:-.8*lunge,br:-.7*lunge,sq:.26*lunge,ry:3.2*lunge,rp:-.16*lunge,tx:-.8,hy:0,hz:0})}
+ if(o.sup>=0){const a=o.sup,W=ss(0,.12,a)*(1-ss(.84,1,a)); /* JUDGEMENT: he sits, and he howls */
+  ov(P,W,{rp:-.56,ry:-1.9,bl:1.25,br:1.25,fl:-.56,fr:-.56,hx:-.72+Math.sin(t*30)*.04,hy:0,hz:0,sq:.08*Math.sin(t*20),tz:Math.sin(t*22)*.8,tx:.6})}
+ if(o.dive>=0){const h=Math.sin(o.dive*3.14159);ov(P,1,{fl:1.3,fr:1.2,bl:-1.3,br:-1.2,ry:11*h,sq:.22,hx:lerp(-.5,.4,o.dive),rp:lerp(-.3,.4,o.dive),tx:-1,hy:0,hz:0})} /* ZOOM POUNCE */
+ if(o.diveL>=0){const W=1-ss(.3,1,o.diveL);ov(P,W,{sq:-.3,ry:-1.6,fl:.5,fr:.5,bl:.5,br:.5,hx:.3})}
  if(o.hurt>=0){const W=1-ss(.35,1,o.hurt);ov(P,W,{ry:3,rp:-.3,hx:-.5,fl:.6,fr:.6,bl:-.6,br:-.6,sq:-.12,tx:.9})}
  if(o.help)ov(P,1,{hx:.5+Math.sin(t*10)*.22,rp:.2,tz:Math.sin(t*18)*.8});
  if(o.cheer>=0){const a=o.cheer,W=1-ss(.86,1,a),h=Math.abs(Math.sin(a*3.14159*2));ov(P,W,{ry:6.5*h,tw:ss(0,.86,a)*12.566,fl:.7*h,fr:.7*h,bl:-.5*h,br:-.5*h,sq:.12*h-.14*(1-h),hx:-.3});P.tz=Math.sin(t*20)*.8}
@@ -158,8 +192,8 @@ function drawLouie(M,S,o,dr){const c=S.cur,sq=clamp(c.sq,-.5,.6),sz=1+sq,sx=1/Ma
 
 /* ---------------- one entry point ---------------- */
 function drawCast(kind,x,z,yaw,o){o=o||{};const dt=o.frozen?0:ADT,id=o.id||(kind+'@'+Math.round(x)+','+Math.round(z));
- const fast=o.atk>=0||o.cast>=0||o.hurt>=0||o.land>=0||!!o.dash,S=aState(id,x,z,yaw);
- aStep(S,x,z,yaw,dt,o.atk>=0||o.cast>=0||!!o.dash);
+ const fast=o.atk>=0||o.cast>=0||o.hurt>=0||o.land>=0||o.heavy>=0||o.sp>=0||o.sup>=0||o.dive>=0||o.diveL>=0||!!o.dash,S=aState(id,x,z,yaw);
+ aStep(S,x,z,yaw,dt,o.atk>=0||o.cast>=0||o.heavy>=0||o.sp>=0||o.dive>=0||!!o.dash);
  const lou=kind==='LOUIE',P=lou?louiePose(S,o):humanPose(kind,S,o);
  aSpring(S,P,dt,fast?1100:260,fast?44:21);
  if(o.hide)return S;

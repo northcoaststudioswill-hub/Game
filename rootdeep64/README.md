@@ -8,12 +8,14 @@ After editing anything in `src/`, rebuild it with `python3 build.py`.
 
 ## Controls
 
-| | Move | Attack | Cast | Dash | Pause |
-| --- | --- | --- | --- | --- | --- |
-| Controller | stick / d-pad | A | B or X | any shoulder / trigger (or Y) | Start |
-| Keyboard 1 | WASD or arrows | Z / J / Space | X / K | Shift / L (or double-tap a direction) | Enter |
-| Keyboard 2 | arrows | `,` | `.` | `/` | Backspace |
-| Touch | left thumb (floating stick) | A | B | DASH | START |
+| | Move | Attack | Cast | Special | Super | Dash | Pause |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Controller | stick / d-pad | A | B | X | Y | any shoulder / trigger | Start |
+| Keyboard 1 | WASD or arrows | Z / J / Space | X / K | C / I | V / O | Shift / L (or double-tap a direction) | Enter |
+| Keyboard 2 | arrows | `,` | `.` | M | N | `/` | Backspace |
+| Touch | left thumb (floating stick) | A | B | SP | SUPER | DASH | START |
+
+Hold attack and release for a **Heavy**. Attack out of a dash for a **Dash Strike**.
 
 The first device to press A/Start is player 1. Anyone else joins by pressing A on another pad
 (`,` for a second keyboard player) in the Hearth or on CHOOSE YOUR KEEPER. In the Hearth, A talks /
@@ -69,6 +71,27 @@ are planted from the leg pose. It only reads game state — no rule or timing th
   whoever walks up and gestures while talking.
 - The Hollow Keeper uses Will's rig: crouched wind-up, lunge, flinch.
 
+## Moves
+
+On top of the cartridge's attack / cast / dash, every keeper has four more verbs (`src/moves.js`). Every name
+is the fighter's own (`src/knockout.js`); what each does here is this port's reading of it.
+
+| | Special (cooldown) | Super (meter) | Heavy (hold attack) | Dash Strike |
+| --- | --- | --- | --- | --- |
+| WILL | **SELFIE FLASH** – stuns the room around him, wipes nearby shots | **BIKE LANE** – a bike tears across the room along his aim | SNEAKER KICK | STAGE DIVE |
+| ERIN | **LEASH LASSO** – ropes a foe and hauls it to her, rooted | **SPROUT STAMPEDE** – six sprouts charge across the room | GARDEN KICK | FLYING FLOP |
+| LOUIE | **ZOOM ZOOM ZOOM** – three snap-dashes through the pack | **JUDGEMENT** – a pillar lands four times on the biggest threat | CHOMP | ZOOM POUNCE |
+| MARCUS | **DAB CLOUD** – a drifting cloud that dazes and chips | **BRO, I GOT AN IDEA** – six geysers march out in a line | PIPE WRENCH | CANNONBALL, BRO |
+
+- The super meter fills from damage dealt and taken, is per keeper, and carries between chambers. Firing one
+  freezes the room for a beat, pushes the camera in and calls the move out.
+- Heavies ignore a Bubble Crab's shield and stagger. Specials and supers scale with cast boons and the Mirror.
+- Marcus's fighter super is named HYDRO JET, which the cartridge already used for his cast, so the super goes
+  by its fighter callout. Still unused from the fighter: Louie's TURBO ZOOM, Marcus's DOUBLE OR NOTHING, and
+  everyone's launcher / sweep / throw.
+- All of this is new power the cartridge never had, and foes were not buffed to match — expect runs to be
+  easier until it is tuned.
+
 ## Open questions for Will
 
 - **Louie's signature is still THE BOOF**, lil Bottie's placeholder. The fighter in this repo
@@ -84,6 +107,7 @@ are planted from the leg pose. It only reads game state — no rule or timing th
 - `src/input.js` – pads, two keyboard layouts, touch; join / drop
 - `src/data.js` – the cartridge's tables, verbatim
 - `src/game.js` – the loop
+- `src/moves.js` – specials, supers, heavies, dash strikes
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes
 - `src/anim.js` – character animation: jointed rigs, spring-driven poses, every action and NPC habit
 - `src/ui.js` – HUD and every menu screen
@@ -100,6 +124,8 @@ Need Node + Playwright with Chromium.
   visual change done.
 - `node test/anim.js` – animation contact sheet: holds each action at a few moments for all four keepers and the
   Hearth NPCs, close up, into `test/shots/anim-*.png`.
+- `node test/moves.js` – fires every keeper's special, super, heavy and dash strike with real key presses and
+  checks they cost, land and clean up; saves a frame of each.
 - `node test/phone.js` – iPhone-sized touch viewports, portrait and landscape.
 
 **Not yet verified:** a physical controller (no hardware here — the mapping follows the standard
