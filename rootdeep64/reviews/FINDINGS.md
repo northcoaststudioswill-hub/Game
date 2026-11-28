@@ -172,3 +172,92 @@ Sound was not judged: the test browser had no audio.
 - The Drowned King's leap warning; boon and door previews (R V).
 - The Hearth visibly changing as you progress (R).
 - No console errors in about four hours of combined play.
+
+---
+
+# Fix log
+
+Numbers match the list above. "Changes the cartridge" marks fixes that alter Rootdeep v2.9's own rules or numbers.
+Checked by `node test/fixes.js` (29 checks) plus the existing play, moves and story suites, and by screenshots.
+
+## Fixed
+| # | What changed |
+| --- | --- |
+| 1, 9, 68 | Every menu belongs to the player who opened it (station, NPC, door, echo, pause). Devices that haven't joined can't touch menus. In co-op the screen says "P2 IS CHOOSING" / "P2 PAUSED", and button names follow that player's device. |
+| 2 | Honey can be gifted in every conversation, story beats included. START asks first, START again gives (also fixes 53). |
+| 3, 80 | Obstacles never spawn in front of the reward doors (checked over 300 rooms); echoes never land behind one. |
+| 4 | A door takes a short stand in the doorway (0.28 s solo, 0.6 s co-op) with a fill bar in the chooser's colour. *Changes the cartridge.* |
+| 5 | Portrait: the picture is taller, the title scales to fit, hints and banners wrap. |
+| 6 | Death and escape screens hold 1.3 s; the A prompt appears when they're ready. |
+| 7 | Sprout Ledger can send two or three of the same sprout. |
+| 8 | An unplugged controller lets go of every input; in the Hearth its seat is freed. |
+| 10, 62 | A super pressed during another super, or mid dash strike, fires right after. Pressing it early shows "SUPER 40%". |
+| 11 | Foes spawn at least ~80 units from every keeper (both waves) and take 0.9 s to rise before acting. *Changes the cartridge.* |
+| 12 | A contact hit buys 0.85 s of safety; boss bodies hit for 70%. *Changes the cartridge.* |
+| 13 | A death banks +2 Moondew per chamber cleared, shown on the death screen. *Changes the cartridge.* |
+| 14 | New setting KEEPER'S GRACE: half damage taken, one extra revive per run. Off by default. |
+| 15 | Chamber 1 always offers a boon door. *Changes the cartridge.* |
+| 16 | Before each boss (chambers 3, 7, 11) the doors are a boon and a Fountain, both marked BOSS AHEAD. *Changes the cartridge.* |
+| 18 | Heavy damage ×2.4 → ×1.8 of the best light hit, recovery ×1.25 → ×1.9. |
+| 19 | Selfie Flash: radius 82 → 66, stun 1.9 → 1.1 s (bosses 0.5), cooldown 7 → 9 s. |
+| 20, 75 | Each time a keeper goes down in a run, getting back up takes longer (1.8 s, +0.9 s per fall). Two helpers revive faster, progress drains slower when you step off, helpers barely get knocked back, and doors stay shut while anyone is down ("REVIVE YOUR FRIENDS FIRST"). |
+| 21 | Super meter from damage taken 0.9 → 0.4 per point. |
+| 22 | Death Defiance, Phoenix Bloom and Old Collar now save any keeper who would go down, not only the last one standing. |
+| 23 | A bud knocked loose runs off as a pod nearby you can grab again, instead of being lost ("PEB RAN OFF - GRAB IT!"). *Changes the cartridge.* |
+| 27 | Ranger's errand renamed THREE, SEVEN, TEN (his own line about elite doors is the cartridge's and stays). |
+| 28 | Keepers no longer blink out when invulnerable; they pulse with a light flash instead. |
+| 29 | A ghost in the player's colour shows wherever a wall, block, foe or effect covers a keeper. Obstacles are also lower (8–14 instead of 13–22). |
+| 30 | Enemy shots are dark spiked red shells with a red glow and trail; nothing like the pink pickups. |
+| 31 | Damage taken shows as a red number on the keeper, and the screen edge flashes (red solo, the player's colour in co-op). |
+| 32 | Floating numbers stack instead of overprinting; boss and keeper lines moved to the top, under the boss bar; banners move clear of the area title. |
+| 33, 39 | The first-room control card sits low, shows on your first three runs, wraps to the screen, and teaches the heavy and the dash strike. |
+| 34 | Hitting a shielded crab says "SHIELDED - HOLD ATTACK" (heavies break through). |
+| 35 | The chamber line counts foes left ("FOES 3 + MORE"), and when three or fewer remain, arrows point to any off screen. |
+| 36 | Solo camera shows more of the room; with 3–4 players it keeps clear of the corner panels. |
+| 38 | The death screen shows the room you fell in. |
+| 40 | Boon cards show the real numbers (rarity and level included); dash boons say what they do instead of "Cast +14%. Dash power 14"; a boon that would replace one you have says so; the god's name in the header is the door's god; the Build page shows attack and cast multipliers. |
+| 41 | Doors read DEW BOON / MOONDEW / SUNFRUIT / +25 MAX HP / HEAL 35% / SHOP / HONEY / PETALS; the currency is MOONDEW everywhere. |
+| 42 | The boon screen's lock is 0.25 s and its prompt only appears when it can be pressed; echoes 0.3 s with the prompt shown when ready. |
+| 43 | Codex "CHAMBERS CLEARED", death screen "REACHED CHAMBER", "DIFFERENT BOONS OFFERED", pause "KEYS THIS RUN". |
+| 44 | Picking up Honey the first time says it's a gift for someone at the Hearth; boon doors say BOON. |
+| 46 | "A ROOT-TOOTH'S STALL"; "talk to him / to ERIN"; Erin no longer counts "three"; talk prompts no longer say BYE twice or offer SKIP on the last page; Mirror text punctuation. |
+| 48 | Keeper select keeps each keeper's text in their own column, stops above the footer, and the solo camera sits back so the name shows. |
+| 49 | Hearth messages sit over the floor, wrap to fit, and no longer cover the station names; the join line moved to the top right. |
+| 50 | Downed keepers show "P2 - STAND HERE" in their colour. |
+| 51 | Menus can be tapped: tap a row to pick it, tap again to choose; tapping talk, notes, intro and end screens moves on. |
+| 52 | START moved to the right edge under the purse; on touch, START in the Hearth opens the menu. |
+| 54 | Pause, Hearth and keeper-select hints match the device (touch, pad, keyboard 1 or 2). |
+| 55 | A menu that opens while a direction is held doesn't scroll until you let go. |
+| 56 | On-screen buttons are slightly smaller and more see-through. |
+| 57 | The A prompt prefers what you face and stations over people; Louie only counts when you're on top of him; reach is a little longer. |
+| 58 | NPCs step around keepers. |
+| 59 | Mirror purchases ask once ("Z AGAIN: BUY FOR 22 MOONDEW"); the sealed Heat gate just says how to open it. |
+| 60 | A fresh save only has Erin waiting; the others have errands after your first trip down. |
+| 61 | New setting AIM HELP (on by default): attacks and casts lean toward a foe near where you aim; Boulderfall and Sky Judgement prefer foes in front of you. |
+| 63 | Double-tap dash is keyboard only (pads and touch have a dash button). |
+| 66 | Players can drop in mid-run; they land beside the party. |
+| 67 | Seats are fixed: leaving no longer renumbers, recolours or moves anyone. Leave by holding B in the Hearth, B on keeper select, or LEAVE THE PARTY on the pause menu; anyone can leave as long as one player stays. |
+| 69 | The camera frames every keeper, downed ones included. |
+| 70 | Keepers push apart instead of merging. |
+| 71 | One player talking to an NPC doesn't freeze the others. |
+| 72 | A keyboard-2 player is told their keys when they join; the Hearth explains `,` for a second keyboard. |
+| 73 | Several devices can join on the same frame; a fifth is told PARTY FULL. |
+| 74 | Heart pickups mend whichever standing keeper is hurt worst. |
+| 76 | The door fill bar shows who is choosing. |
+| 77 | Supers don't zoom the camera in co-op (the banner still plays). |
+| 78 | The wipe screen lists each player's kills and falls; late joiners land beside the party. |
+| 79 | Test hooks only exist in automated browsers. |
+| 81 | Foes don't count down their attack while still rising. |
+
+## Not changed (and why)
+| # | Why |
+| --- | --- |
+| 17 | Late-game scaling needs real tuning with human play; the early wall (the bigger problem) is addressed above. |
+| 24 | New elite behaviours are new design, not a fix. |
+| 25 | Abandoning a run isn't a death; counting it would change Marcus's unlock. |
+| 26 | The remaining small balance notes are the cartridge's numbers (Open Hand, Fortune Edge, burn stacking, duos from any door, Petal Purse, Honey's value, Thornbow, per-god dash values). Only the silent boon overwrite was fixed (40). |
+| 37 | Sprout buds that shoot keep their look; changing them is an art decision. |
+| 45 | SELFIE FLASH is canon for both Will's combo finisher (cartridge) and his special (the fighter); both names stay. |
+| 47 | Two settings added (14, 61); no key rebinding yet. |
+| 64, 65 | The dash-strike window and charge slowdown play as intended in testing. |
+| — | All four shoulders/triggers still dash on a pad (no other use for them yet). Max health doesn't scale with party size. |

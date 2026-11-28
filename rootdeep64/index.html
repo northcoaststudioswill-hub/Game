@@ -27,14 +27,14 @@ body.touch #pad{display:block}
 #stickbase:not(.on){top:auto !important;left:92px !important;margin:0 0 0 -52px;bottom:40px}
 #nub{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:rgba(255,217,77,.55);border:2px solid rgba(20,12,24,.6)}
 .tb{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;
- color:#1a1020;border:2px solid rgba(20,12,24,.65);opacity:.72}
+ color:#1a1020;border:2px solid rgba(20,12,24,.65);opacity:.6}
 .tb.on{opacity:1;transform:scale(.93)}
-.tb[data-b=a]{right:22px;bottom:34px;width:86px;height:86px;background:#58a8f8;font-size:26px}
+.tb[data-b=a]{right:22px;bottom:30px;width:80px;height:80px;background:#58a8f8;font-size:26px}
 .tb[data-b=b]{right:118px;bottom:22px;width:66px;height:66px;background:#58d078;font-size:21px}
 .tb[data-b=dash]{right:28px;bottom:130px;width:62px;height:62px;background:#e8e4f5;font-size:12px}
 .tb[data-b=sp]{right:122px;bottom:96px;width:58px;height:58px;background:#f878a8;font-size:15px}
 .tb[data-b=sup]{right:100px;bottom:164px;width:60px;height:60px;background:#ffd94d;font-size:11px}
-.tb[data-b=start]{left:50%;margin-left:-32px;top:8px;width:64px;height:26px;border-radius:13px;background:#e84a5f;color:#fff;font-size:10px;opacity:.55}
+.tb[data-b=start]{right:calc(14px + env(safe-area-inset-right,0px));top:calc(50px + env(safe-area-inset-top,0px));width:64px;height:28px;border-radius:14px;background:#e84a5f;color:#fff;font-size:10px;opacity:.6}
 /* portrait: the picture sits on top and the controls get their own deck below, like a handheld */
 body.portrait #pad{top:auto}
 body.portrait #stickzone{width:50%;height:38%}
@@ -185,12 +185,14 @@ function _issue(mesh,M,o){
  const tx=o&&o.tex||texWhite;if(curTex!==tx){gl.bindTexture(gl.TEXTURE_2D,tx);curTex=tx}
  gl.drawArrays(gl.TRIANGLES,0,mesh.n)}
 /* opaque: drawn now with the current matrix */
-function draw(mesh,o){_issue(mesh,RN.m,o)}
+/* XRAY: while set, solid draws are queued as a flat silhouette that shows only where something stands in front */
+let XRAY=null;
+function draw(mesh,o){if(XRAY){RN.tq.push({mesh,M:new Float32Array(RN.m),o:XRAY});return}_issue(mesh,RN.m,o)}
 /* translucent / additive: queued, drawn after everything solid */
 function drawT(mesh,o){RN.tq.push({mesh,M:new Float32Array(RN.m),o:o||{}})}
 function frameEnd(){gl.enable(gl.BLEND);gl.depthMask(false);
  for(const q of RN.tq){if(q.o.glow){gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.uniform3f(U.uFogC,0,0,0)}else{gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.uniform3fv(U.uFogC,RN.fogC)}
-  if(q.o.nocull)gl.disable(gl.CULL_FACE);_issue(q.mesh,q.M,q.o);if(q.o.nocull)gl.enable(gl.CULL_FACE)}
+  if(q.o.behind)gl.depthFunc(gl.GREATER);if(q.o.nocull)gl.disable(gl.CULL_FACE);_issue(q.mesh,q.M,q.o);if(q.o.nocull)gl.enable(gl.CULL_FACE);if(q.o.behind)gl.depthFunc(gl.LESS)}
  gl.depthMask(true);gl.disable(gl.BLEND);gl.uniform3fv(U.uFogC,RN.fogC)}
 /* camera-facing sprite quad (needs MESH.quad from models.js) */
 const _bb=m4();
@@ -205,7 +207,7 @@ function project(x,y,z){const m=RN.vp,w=m[3]*x+m[7]*y+m[11]*z+m[15];if(w<=0.01)r
 let VW=400,VH=300,hudS=1,portrait=false;
 const IRES=240; /* internal vertical resolution, like a 240p console */
 function layout(){const bw=window.innerWidth,bh=window.innerHeight;portrait=bh>bw*1.15;
- let w=bw,h=bh;if(portrait){h=Math.min(bw,Math.round(bh*.56));}
+ let w=bw,h=bh;if(portrait){h=Math.min(Math.round(bw*1.25),bh-290);}
  stage.style.width=w+'px';stage.style.height=h+'px';
  document.body.classList.toggle('portrait',portrait);
  RN.asp=w/h;RN.h=IRES;RN.w=Math.min(520,Math.round(IRES*RN.asp));cv.width=RN.w;cv.height=RN.h;
@@ -246,6 +248,12 @@ function touchInit(){const zone=document.getElementById('stickzone'),nub=documen
  for(const el of document.querySelectorAll('[data-b]')){const b=el.dataset.b;
   const on=e=>{woke();TS.btn[b]=true;TS.latch[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
   el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false})}
+ /* taps on menus: a row picks / chooses, and on talk, notes, intro and end screens any tap goes on */
+ const TAPANY=new Set(['title','cine','talk','echo','over','win']),TAPMENU=new Set(['menu','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
+ document.addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('.tb'))return;const t=e.changedTouches[0];if(!t)return;
+  if(TAPANY.has(state)){woke();TS.latch.a=true;e.preventDefault();e.stopPropagation();return}
+  if(!TAPMENU.has(state))return;const rc=stage.getBoundingClientRect(),vx=(t.clientX-rc.left)/rc.width*VW,vy=(t.clientY-rc.top)/rc.height*VH;
+  const h=HIT.find(h=>vx>=h.x&&vx<=h.x+h.w&&vy>=h.y&&vy<=h.y+h.h);if(!h)return;woke();if(h.sel)TS.latch.a=true;else{h.set();snd(520,.04)}e.preventDefault();e.stopPropagation()},{capture:true,passive:false});
  if('ontouchstart' in window||navigator.maxTouchPoints>0)document.body.classList.add('touch')}
 
 function axis(v){return Math.abs(v)<.22?0:v}
@@ -266,7 +274,9 @@ function pollInput(dt){
  TS.latch={};
  /* gamepads */
  const pads=navigator.getGamepads?navigator.getGamepads():[];
- for(let i=0;i<pads.length&&i<8;i++){const p=pads[i],id='gp'+i;if(!p){if(DEV[id])DEV[id].live=false;continue}
+ for(let i=0;i<pads.length&&i<8;i++){const p=pads[i],id='gp'+i;
+  /* an unplugged pad lets go of everything, so its keeper doesn't walk off on a stuck stick */
+  if(!p||!p.connected){const g=DEV[id];if(g){g.live=false;g.mx=g.my=0;for(const b of BTN)g.cur[b]=false}continue}
   const dv=DEV[id]||(DEV[id]=mkDev(id,'PAD '+(i+1)));dv.live=true;const B=n=>!!(p.buttons[n]&&(p.buttons[n].pressed||p.buttons[n].value>.5));
   let mx=axis(p.axes[0]||0),my=axis(p.axes[1]||0);const dl=B(14),dr=B(15),du=B(12),dd=B(13);
   if(dl||dr)mx=(dr?1:0)-(dl?1:0);if(du||dd)my=(dd?1:0)-(du?1:0);
@@ -276,24 +286,39 @@ function pollInput(dt){
  for(const id in DEV){const dv=DEV[id];for(const b of BTN){dv.pr[b]=dv.cur[b]&&!dv.prev[b];dv.prev[b]=dv.cur[b]}
   /* menu auto-repeat on held directions */
   const dir=dv.cur.up?'up':dv.cur.down?'down':dv.cur.left?'left':dv.cur.right?'right':'';
+  if(dv.repLock&&dir!==dv.repLock)dv.repLock='';
+  if(dv.repLock&&dir===dv.repLock){dv.rp='';if(dv.pr[dir]&&state!=='run')dv.pr[dir]=false;continue}
   if(dir&&dir===dv.repDir){dv.rep-=dt;if(dv.rep<=0){dv.rep=.13;dv.rp=dir}else dv.rp=''}else{dv.repDir=dir;dv.rep=.38;dv.rp=''}}}
-/* merged menu input: any device */
-function pressed(b){for(const id in DEV){const d=DEV[id];if(d.pr[b])return true;if(d.rp===b&&(b==='up'||b==='down'))return true}return false}
+/* menu input. A menu belongs to whoever opened it (menuDev); otherwise any joined device;
+   before anyone has joined (title screen), any device at all. */
+let menuDev=null;
+function menuDevs(){if(menuDev)return[menuDev];if(PL.length)return PL.map(p=>p.dev);return Object.values(DEV)}
+function pressed(b){for(const d of menuDevs()){if(d.pr[b])return true;if(d.rp===b&&(b==='up'||b==='down'))return true}return false}
+/* a menu that opens while a direction is held must not start scrolling on its own */
+function holdRepeat(){for(const id in DEV){const d=DEV[id];d.rep=.38;d.rp='';d.repLock=d.repDir}}
 function pressedBy(b){for(const id in DEV)if(DEV[id].pr[b])return DEV[id];return null}
 function nav(i,n){if(pressed('down')){snd(520,.04);return(i+1)%n}if(pressed('up')){snd(520,.04);return(i+n-1)%n}return i}
 
 /* ---- players ---- */
-const PL=[];const PCOL=['#ffd94d','#58c8f8','#f878a8','#8ae060'];
+/* p.ix is the player's SEAT (0-3): colour, P-number, HUD corner and saved keeper. It never changes while
+   they play, so somebody leaving doesn't reshuffle the couch. PL stays sorted by seat. */
+const PL=[];const PCOL=['#ffd94d','#58c8f8','#f878a8','#8ae060'];let fullT=0;
 function devPlayer(dev){return PL.find(p=>p.dev===dev)}
 function joinPlayer(dev){if(PL.length>=4||devPlayer(dev))return null;if(dev.id==='kb2')kb2On=true;
- const p={ix:PL.length,dev,char:'WILL',x:W/2,y:H/2,vx:0,vy:0,fx:1,fy:0,ax:0,ay:1,anim:0,ready:false,csel:0,hp:100,down:false,inv:0,dashT:0,swing:0};
- PL.push(p);return p}
-function dropPlayer(p){const i=PL.indexOf(p);if(i<=0)return;PL.splice(i,1);PL.forEach((q,j)=>q.ix=j);if(p.dev.id==='kb2')kb2On=false}
-/* a device nobody is using yet pressed A: let it in */
-function pollJoin(){for(const id in DEV){const d=DEV[id];if(!d.live)continue;
-  if(id==='kb2'){if(KEYS.Comma&&!DEV.kb2.prev._j&&!devPlayer(d)&&PL.length&&PL.length<4){DEV.kb2.prev._j=true;return joinPlayer(d)}DEV.kb2.prev._j=!!KEYS.Comma;continue}
-  if((d.pr.a||d.pr.start)&&!devPlayer(d)&&PL.length<4){d.pr.a=false;d.pr.start=false;return joinPlayer(d)}}
- return null}
+ let seat=0;while(PL.some(q=>q.ix===seat))seat++;
+ const p={ix:seat,dev,char:'WILL',x:W/2,y:H/2,vx:0,vy:0,fx:1,fy:0,ax:0,ay:1,anim:0,ready:false,csel:0,hp:100,down:false,inv:0,dashT:0,swing:0};
+ PL.push(p);PL.sort((a,b)=>a.ix-b.ix);return p}
+function dropPlayer(p){const i=PL.indexOf(p);if(i<0||PL.length<2)return false;PL.splice(i,1);if(p.dev.id==='kb2')kb2On=false;if(menuDev===p.dev)menuDev=null;
+ if(RUN&&RUN.buds){const L=PL.find(q=>!q.down)||PL[0];for(const b of RUN.buds)if(b.own===p.ix)b.own=L.ix}return true}
+/* devices nobody is using yet pressed A: let them in (all of them, even on the same frame) */
+function pollJoin(){const out=[];if(fullT>0)fullT-=1/60;
+ for(const id in DEV){const d=DEV[id];if(!d.live||devPlayer(d))continue;
+  const hit=id==='kb2'?(KEYS.Comma&&!d.prev._j):(d.pr.a||d.pr.start);if(id==='kb2')d.prev._j=!!KEYS.Comma;
+  if(!hit||!PL.length)continue;
+  if(PL.length>=4){if(fullT<=0){joinMsg='PARTY FULL - 4 KEEPERS MAX';joinT=2;fullT=2}continue}
+  d.pr.a=false;d.pr.start=false;const p=joinPlayer(d);if(p)out.push(p)}
+ return out}
+function joinNote(p){if(p.dev.id==='kb2')return 'PLAYER '+(p.ix+1)+' JOINED: ARROWS · , HIT · . CAST · M SP · N SUPER · / DASH';return 'PLAYER '+(p.ix+1)+' JOINED'}
 /* =====================================================================
    ROOTDEEP 64 — data
    Every table below is Rootdeep v2.9's own, copied verbatim from the
@@ -495,8 +520,13 @@ function boonName(b){if(!b)return '';if(b.kind==='duo')return DUOS.find(d=>d.id=
 function boonDesc(b){if(!b)return '';
  if(b.kind==='duo')return DUOS.find(d=>d.id===b.id).d;
  const v=rdBoonVal(b);
- if(b.kind==='core'){const base=CORES[b.slot].d[b.god];return (b.slot==='atk'?'Attack +'+v+'%. ':'Cast +'+v+'%. ')+(b.slot==='dash'?'Dash power '+v+'. ':'')+base}
- const p=PASSES.find(p=>p.id===b.id);return p.d;}
+ /* the numbers shown are the numbers used, rarity and level included */
+ if(b.kind==='core'){const base=CORES[b.slot].d[b.god],cur=RUN&&RUN.boons[b.slot],rep=cur&&cur.god!==b.god?'Replaces '+boonName(cur)+'. ':'';
+  if(b.slot==='atk')return rep+'Attack +'+v+'%. '+base;if(b.slot==='cast')return rep+'Cast +'+v+'%. '+base;
+  const dd={EMBER:'Dash leaves a flame trail ('+Math.round(v*1.6)+' burn a second)',ZIP:'Dash zaps the nearest foe for '+Math.round(v*1.4),LEAF:'Dash heals '+Math.round(2+v*.12)};
+  return rep+(dd[b.god]||base)}
+ const p=PASSES.find(p=>p.id===b.id);if(b.kind==='passup')return 'Level up: '+p.d.replace(/\d+/,v);
+ return p.id==='wind'||p.id==='synth'?p.d:p.d.replace(/\d+/,v);}
 /* heal one keeper, or (no keeper given) everyone still standing */
 function rdHeal(n,p){if(!RUN)return;for(const q of(p?[p]:alive())){const s=rdStats(q);q.hp=Math.min(s.maxHp,q.hp+n*s.healMul)}}
 function hasDuo(id){return RUN&&RUN.boons.pass.some(p=>p.kind==='duo'&&p.id===id);}
@@ -510,7 +540,8 @@ function mkBoon(god,kind,slotOrId){const rar=rollRar();RD.boonSeen[slotOrId+':'+
  const p=PASSES.find(x=>x.id===slotOrId);const ex=RUN.boons.pass.find(x=>x.id===slotOrId);
  if(ex)return{kind:'passup',god:p.god,id:p.id,level:ex.level+1,rar:1,rarN:'LEVEL UP'};
  return{kind:'pass',god:p.god,id:p.id,level:1,rar:RARS[rar][1],rarN:RARS[rar][0]};}
-function genOffer(god){god=god||GODIDS[(Math.random()*GODIDS.length)|0];boonQuote=godLine(god);const out=[],used=new Set();
+let offerGod='EMBER';
+function genOffer(god){god=god||GODIDS[(Math.random()*GODIDS.length)|0];offerGod=god;boonQuote=godLine(god);const out=[],used=new Set();
  const slots=['atk','cast','dash'].filter(s=>!(RUN.boons[s]&&RUN.boons[s].god===god));
  for(const d of DUOS)if(!hasDuo(d.id)&&d.gods.every(g=>hasGod(g))){out.push(mkBoon(god,'duo',d.id));break}
  while(out.length<3){const roll=Math.random();
@@ -537,17 +568,21 @@ function rdStartRun(){
   obst:[],sub:null,subQ:[],echo:null,mwT:0,acts:[],rings:[],bolts:[],freeze:0,flash:0,banner:null,phase:'fight',shake:0,boss:null,elite:false,revives:mir('defy'),collarUsed:false,phoenixUsed:false,time:0,zoneT:0,kills:0};
  for(const p of PL){plRunInit(p);movesReset(p,true)}
  let k=0;for(const ty of RD.party){if((RD.bank[ty]||0)>0){RD.bank[ty]--;const o=PL[k++%PL.length];RUN.buds.push({type:ty,x:o.x,y:o.y,a:Math.random()*6,cd:0,z:0,own:o.ix})}}
+ if(RD.set.grace)RUN.revives++;
  RD.party=[];RD.stats.runs++;if(PL.length>1)RD.stats.coopRuns=(RD.stats.coopRuns||0)+1;for(const p of PL)RD.charRun[p.char]=1;rdSave();rdNextChamber();}
 function rdArena(biome){RUN.obst=[];const n=2+((Math.random()*3)|0)+(PL.length>2?1:0);
  for(let i=0;i<n;i++){const w=14+((Math.random()*22)|0),h=10+((Math.random()*10)|0),x=22+Math.random()*(W-44-w),y=38+Math.random()*(H-70-h);
-  if(Math.hypot(x+w/2-W/2,y+h/2-H/2)>34&&y+h<H-44)RUN.obst.push({x,y,w,h,biome,s:Math.random()});}
+  const door=x<W/2+64&&x+w>W/2-64&&y<80; /* the two reward doors and the lane in front of them */
+  if(Math.hypot(x+w/2-W/2,y+h/2-H/2)>34&&y+h<H-44&&!door)RUN.obst.push({x,y,w,h,biome,s:Math.random()});}
  PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*18;p.y=H-26;p.vx=p.vy=0;p.ax=0;p.ay=-1;p.land=.62+i*.08;p.cheer=0;p.swing=0;p.castA=0;p.selfieA=0;
   if(p.down){p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1}})}
 function foeScale(){const ch=RUN.chamber;return{hp:1+.30*(ch-1)+.2*(RD.pact.hide||0),dmg:1+.09*(ch-1)+.15*(RD.pact.thorns||0),sp:1+.12*(RD.pact.rush||0)};}
 function spawnFoe(kind,x,y,elite){const d=FOES[kind],sc=foeScale();
  const e={kind,x,y,hp:d.hp*sc.hp*(elite?2.6:1),max:d.hp*sc.hp*(elite?2.6:1),sp:d.sp*sc.sp*(0.9+Math.random()*.2),dmg:d.dmg*sc.dmg,r:d.r*(elite?1.35:1),
-  elite:!!elite,t:Math.random()*2,cd:1+Math.random(),hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,state:0,sx:x,sy:y,bt:0,born:.5,yaw:0};
+  elite:!!elite,t:Math.random()*2,cd:1+Math.random(),hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,state:0,sx:x,sy:y,bt:0,born:.9,yaw:0};
  RUN.enemies.push(e);RD.seen[kind]=1;return e;}
+/* somewhere in the top half of the room, well clear of every keeper */
+function spawnSpot(){let best=null,bd=-1;for(let i=0;i<24;i++){const x=26+Math.random()*(W-52),y=36+Math.random()*(H*.45);let m=1e9;for(const p of PL)if(!p.down)m=Math.min(m,Math.hypot(p.x-x,p.y-y));if(m>80)return[x,y];if(m>bd){bd=m;best=[x,y]}}return best}
 function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale(),co=1+.75*(PL.length-1);
  const e={kind:'boss',bossIx:ix,x:W/2,y:52,hp:d.hp*(1+.12*RUN.heat)*co,max:d.hp*(1+.12*RUN.heat)*co,sp:d.sp,dmg:d.dmg*sc.dmg,r:d.r,
   elite:false,t:0,cd:2,hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,bt:3,phase:1,state:0,tx:W/2,ty:52,born:.8,yaw:0};
@@ -564,7 +599,7 @@ function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=
  while(spent<budget&&guard++<60){const k=pool[(Math.random()*pool.length)|0],cost=k==='grub'?1:k==='wisp'||k==='shade'?2:3;
   if(spent+cost>budget+1)continue;spent+=cost;wlist.push({k,elite:eliteCh&&spent>=budget-1});}
  const cut=Math.max(1,Math.ceil(wlist.length*.55));
- wlist.slice(0,cut).forEach(s2=>spawnFoe(s2.k,26+Math.random()*(W-52),36+Math.random()*(H*.45),s2.elite));
+ wlist.slice(0,cut).forEach(s2=>{const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)});
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
  RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);}
 function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
@@ -577,8 +612,9 @@ function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;if(RUN.chamber<1
  if(ch>=12){rdEscape();return}
  const kinds=['boon','boon','petals','dew','fruit','heart','shop','fountain','honey'];
  const pick=()=>kinds[(Math.random()*kinds.length)|0];let a=pick(),b=pick();if(b===a)b=pick();
- if(ch===3||ch===7||ch===11)a='boon';
- RUN.doors=[{kind:a,x:W/2-38,y:26},{kind:b,x:W/2+38,y:26}].map(d=>({...d,god:GODIDS[(Math.random()*GODIDS.length)|0],hold:0}));
+ if(ch===1)a='boon';
+ if(ch===3||ch===7||ch===11){a='boon';b='fountain'}
+ RUN.doors=[{kind:a,x:W/2-38,y:26},{kind:b,x:W/2+38,y:26}].map(d=>({...d,god:GODIDS[(Math.random()*GODIDS.length)|0],hold:0,boss:ch===3||ch===7||ch===11}));
  rdSave();}
 function bossDown(e){RD.stats.bosses++;RUN.keys++;if(PL.length>1)RD.stats.coopBoss=(RD.stats.coopBoss||0)+1;const heat=RUN.heat,paid=RD.bounty[BOSSES[e.bossIx].id]||0,L=lead();
  let bonus=0;if(heat>paid){bonus=25*(heat-paid);RD.bounty[BOSSES[e.bossIx].id]=heat}
@@ -605,8 +641,8 @@ function genShop(){const all=[
  {n:'PETAL PURSE',d:'+90 petals, somehow profit',p:50,act:()=>{RUN.petals+=90;say2('+90 PETALS',2)}}];
  const out=[];while(out.length<3){const it=all.splice((Math.random()*all.length)|0,1)[0];if(it)out.push(it)}return out;}
 function runTally(){RD.stats.honeyFound=(RD.stats.honeyFound||0)+RUN.honey;RD.stats.maxBank=Math.max(RD.stats.maxBank||0,RUN.buds.length)}
-function rdDie(){runTally();const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
-function rdEscape(){runTally();RD.stats.heatEsc=Math.max(RD.stats.heatEsc||0,RUN.heat);for(const p of PL)RD.charEsc[p.char]=(RD.charEsc[p.char]||0)+1;RD.stats.escapes++;RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
+function rdDie(){runTally();const cb=2*Math.max(0,RUN.chamber-1);RUN.dew+=cb;RUN.chBonus=cb;const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={biome:RUN.biome,bonus:RUN.chBonus||0,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
+function rdEscape(){runTally();RD.stats.heatEsc=Math.max(RD.stats.heatEsc||0,RUN.heat);for(const p of PL)RD.charEsc[p.char]=(RD.charEsc[p.char]||0)+1;RD.stats.escapes++;RD.lastRun={biome:2,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
  RUN=null;rdSave();overT=0;state='win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
 function rdAbandon(){if(RUN){runTally();bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();state='hub';}
@@ -624,11 +660,12 @@ function charLockTxt(id){if(id==='ERIN')return 'GIVE ERIN HONEY AT THE HEARTH: '
  if(id==='MARCUS')return 'HE TAKES OVER AFTER 8 DEATHS: '+(RD.stats.deaths||0)+'/8';return ''}
 /* CHOOSE YOUR KEEPER — every joined keeper picks at once; dive when all are ready */
 function charsEnter(){for(const p of PL){p.csel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.chars[p.ix]||'WILL')));if(!charUnlocked(CHARS[p.csel].id))p.csel=0;p.ready=false}diveT=0;state='chars'}
-function charsUpdate(dt){const np=pollJoin();if(np){np.csel=0;np.ready=false;snd(784,.08,1175);joinMsg='PLAYER '+(np.ix+1)+' JOINED';joinT=2}
+function charsUpdate(dt){for(const np of pollJoin()){np.csel=Math.max(0,CHARS.findIndex(c=>c.id===RD.chars[np.ix]));if(!charUnlocked(CHARS[np.csel].id))np.csel=0;np.ready=false;snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
  for(const p of PL.slice()){const d=p.dev;
   if(!p.ready){if(d.pr.down||d.pr.right||d.rp==='down'){p.csel=(p.csel+1)%CHARS.length;snd(520,.04)}if(d.pr.up||d.pr.left||d.rp==='up'){p.csel=(p.csel+CHARS.length-1)%CHARS.length;snd(520,.04)}
    if(d.pr.a){const c=CHARS[p.csel];if(charUnlocked(c.id)){p.char=c.id;RD.chars[p.ix]=c.id;p.ready=true;snd(784,.1);later(()=>snd(1175,.2),90)}else snd(140,.09)}
-   else if(d.pr.b||d.pr.start&&PL.length===1&&false){if(p.ix===0){state='hub';return}dropPlayer(p);snd(330,.06)}}
+   /* B: the first seat backs out to the Hearth; anyone else leaves the party */
+   else if(d.pr.b){if(p===PL[0]){state='hub';return}dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.06)}}
   else if(d.pr.b){p.ready=false;diveT=0;snd(330,.05)}}
  if(PL.length&&PL.every(p=>p.ready)){diveT+=dt;if(diveT>(PL.length>1?.7:.05)){rdSave();rdStartRun();state='run'}}else diveT=0}
 const NPCROUTE={
@@ -649,16 +686,25 @@ function movePlayer(p,dt,spd){let mx=p.dev.mx,my=p.dev.my;const l=Math.hypot(mx,
  p.x=Math.max(13,Math.min(W-13,p.x));p.y=Math.max(32,Math.min(H-11,p.y));
  if(RUN)for(const o of RUN.obst){const nx=Math.max(o.x,Math.min(p.x,o.x+o.w)),ny=Math.max(o.y,Math.min(p.y,o.y+o.h));
   const dx=p.x-nx,dy=p.y-ny,d=Math.hypot(dx,dy);if(d<7&&d>0){p.x=nx+dx/d*7;p.y=ny+dy/d*7}else if(d===0){p.y=o.y-7}}}
-function hubTarget(p){let best=null,bd=17*17;
- for(const s of STATIONS){const d=(p.x-s.x)**2+(p.y-38)**2;if(d<bd){bd=d;best={kind:'station',id:s.id,n:s.n,x:s.x,y:38}}}
- for(const who of NPCS){const n2=HUBNPC[who],x=n2.x,y=n2.y;const d=(p.x-x)**2+(p.y-y)**2;if(d<bd){bd=d;best={kind:'npc',who,n:who,x,y}}}
- const db2=(p.x-BED.x)**2+(p.y-BED.y)**2;if(db2<bd){bd=db2;best={kind:'sprouts',n:'SPROUT LEDGER',x:BED.x,y:BED.y}}
- const dq=(p.x-BOARD.x)**2+(p.y-BOARD.y)**2;if(dq<bd){bd=dq;best={kind:'board',n:"KEEPER'S BOARD",x:BOARD.x,y:BOARD.y}}
- const d=(p.x-DOOR.x)**2+(p.y-DOOR.y)**2;if(d<bd)best={kind:'descend',n:'THE ROOT DOOR — DESCEND',x:DOOR.x,y:DOOR.y};
+/* what the A prompt points at: stations and doors win over people walking past, things you face win over things
+   behind you, and Louie (who follows you about) only counts when you're right on top of him */
+function hubTarget(p){let best=null,bs=1e9;const fx=p.ax||0,fy=p.ay===undefined?1:p.ay;
+ const consider=(t,reach,bias)=>{const dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy);if(d>reach)return;const facing=d>2?(dx*fx+dy*fy)/d:1;
+  const sc=d-facing*6+bias;if(sc<bs){bs=sc;best=t}};
+ for(const s of STATIONS)consider({kind:'station',id:s.id,n:s.id==='heat'&&RD.stats.escapes<1?'HEAT GATE (SEALED)':s.n,x:s.x,y:38},24,-4);
+ for(const who of NPCS){const n2=HUBNPC[who];const follow=who==='LOUIE'&&n2.route[n2.ri]==='P3';consider({kind:'npc',who,n:who,x:n2.x,y:n2.y},follow?11:19,follow?8:2)}
+ consider({kind:'sprouts',n:'SPROUT LEDGER',x:BED.x,y:BED.y},22,-4);
+ consider({kind:'board',n:"KEEPER'S BOARD",x:BOARD.x,y:BOARD.y},20,-4);
+ consider({kind:'descend',n:'THE ROOT DOOR — DESCEND',x:DOOR.x,y:DOOR.y},20,-6);
  return best;}
-function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return}
- const np=pollJoin();if(np){np.x=W/2+R(-20,20);np.y=H/2+30;np.char=RD.chars[np.ix]||'WILL';if(!charUnlocked(np.char))np.char='WILL';snd(784,.08,1175);joinMsg='PLAYER '+(np.ix+1)+' JOINED';joinT=2.5}
+function hubUpdate(dt){if(pressed('sel')||pressed('start')){rdSave();menuSel=0;state='menu';return}
+ for(const np of pollJoin()){const L=PL[0];np.x=clamp(L.x+R(-16,16),20,W-20);np.y=clamp(L.y+14,50,H-20);np.char=RD.chars[np.ix]||'WILL';if(!charUnlocked(np.char))np.char='WILL';snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
+ /* hold B for a second to leave the party (any seat, as long as someone stays) */
+ for(const p of PL.slice()){if(p.dev.cur.b&&PL.length>1){p.leaveT=(p.leaveT||0)+dt;if(p.leaveT>1.1){dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.08,160)}}else p.leaveT=0}
+ /* a controller that was unplugged leaves the party here */
+ for(const p of PL.slice())if(!p.dev.live&&PL.length>1){dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' DISCONNECTED';joinT=2}
  for(const p of PL){movePlayer(p,dt,84);aimVec(p)}
+ separate(PL,12)
  for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;
   if(n.act>0)n.act-=dt;n.mv=0;
   if(n.wait>0){n.wait-=dt;continue}
@@ -671,9 +717,10 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return
   else{const sp=NPCSPD[who]||32;n.x+=dx/d*sp*dt;n.y+=dy/d*sp*dt;n.yaw=Math.atan2(dx,dy);n.mv=1}}
  for(let i=0;i<NPCS.length;i++)for(let j=i+1;j<NPCS.length;j++){const a=HUBNPC[NPCS[i]],c=HUBNPC[NPCS[j]];if(!a||!c)continue;
   const dx=c.x-a.x,dy=c.y-a.y,d=Math.hypot(dx,dy);if(d>0&&d<22){const push=(22-d)/2,ux=dx/d,uy=dy/d;a.x-=ux*push;a.y-=uy*push;c.x+=ux*push;c.y+=uy*push}}
+ for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;for(const p of PL){const dx=n.x-p.x,dy=n.y-p.y,d=Math.hypot(dx,dy);if(d>.01&&d<13){n.x+=dx/d*(13-d);n.y+=dy/d*(13-d)}}}
  for(const who of NPCS){const n=HUBNPC[who];if(n){if(n.y>H-36)n.y=H-36;if(n.y<46)n.y=46;n.x=Math.max(12,Math.min(W-12,n.x))}}
  for(const p of PL){const t=hubTarget(p);p.hubT=t;
-  if(t&&p.dev.pr.a){snd(520,.05);
+  if(t&&p.dev.pr.a){snd(520,.05);menuDev=p.dev;
    if(t.kind==='descend'){charsEnter();return}
    if(t.kind==='sprouts'){sprPage=0;uiSel=0;state='sprouts';return}
    if(t.kind==='board'){boardSel=0;state='board';return}
@@ -683,20 +730,26 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return
     RD.flags['met_'+t.who]=1;talkLine=0;talkTxt=LINES[t.who][talkStart];RD.lineIx[t.who]=talkStart+1;rdSave();
     const n=HUBNPC[t.who];if(n)n.yaw=Math.atan2(p.x-n.x,p.y-n.y);
     state='talk';return}
-   uiSel=0;codexPage=0;heatSel=0;state=t.id;return}}}
+   if(t.id==='heat'&&RD.stats.escapes<1){joinMsg='ESCAPE THE DEEP ONCE TO OPEN THE PACT';joinT=2.2;menuDev=null;return}
+   buyAsk=-1;uiSel=0;codexPage=0;heatSel=0;state=t.id;return}}}
+let giftAsk=false;
+function giftHoney(){const who=talkNPC,k=KEEPS.find(k=>k.who===who);giftAsk=false;
+ RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;talkEv=null;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
+ else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}talkWho=who;talkLine=99;rdSave()}
 function talkUpdate(){
+ /* START offers Honey; START again gives it. Works in every conversation. */
+ if(pressed('start')&&RD.honey>0&&talkNPC){if(giftAsk)giftHoney();else{giftAsk=true;snd(660,.05)}return}
+ if(giftAsk&&(pressed('a')||pressed('b'))){giftAsk=false;return}
  /* a story beat: A pages, B skips to the end (and still pays out) */
  if(talkEv){if(pressed('b')){storyFinish(talkEv);talkEv=null;state='hub';snd(330,.05);return}
   if(pressed('a')){talkLine++;if(talkLine>=talkEv.lines.length){storyFinish(talkEv);talkEv=null;state='hub'}else{talkWho=talkEv.lines[talkLine][0];talkTxt=talkEv.lines[talkLine][1];snd(520,.04)}}return}
  if(pressed('b')){state='hub';snd(330,.05);return}
- if(pressed('start')&&RD.honey>0&&talkNPC){const who=talkNPC,k=KEEPS.find(k=>k.who===who);
-  RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
-  else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}rdSave();return}
  if(pressed('a')){const L=LINES[talkNPC];talkLine++;
   if(talkStart+talkLine>=L.length){state='hub'}else{talkTxt=L[talkStart+talkLine];snd(520,.04)}return}}
-function mirrorUpdate(){uiSel=nav(uiSel,MIRROR.length);
+let buyAsk=-1;
+function mirrorUpdate(){const was=uiSel;uiSel=nav(uiSel,MIRROR.length);if(was!==uiSel)buyAsk=-1;
  if(pressed('a')){const m=MIRROR[uiSel],rank=mir(m.id);
-  if(rank>=m.max){snd(140,.08)}else{const c=m.cost[rank];if(RD.dew>=c){RD.dew-=c;RD.mirror[m.id]=rank+1;rdSave();snd(784,.1);later(()=>snd(1175,.2),100)}else snd(140,.08)}}
+  if(rank>=m.max){snd(140,.08)}else{const c=m.cost[rank];if(RD.dew>=c&&buyAsk!==uiSel){buyAsk=uiSel;snd(660,.05)}else if(RD.dew>=c){buyAsk=-1;RD.dew-=c;RD.mirror[m.id]=rank+1;rdSave();snd(784,.1);later(()=>snd(1175,.2),100)}else snd(140,.08)}}
  if(pressed('b')||pressed('start'))state='hub';}
 function armUpdate(){const ids=Object.keys(WEAPONS);uiSel=nav(uiSel,ids.length);
  if(pressed('a')){const id=ids[uiSel],w=WEAPONS[id];
@@ -718,19 +771,26 @@ function heatUpdate(){if(RD.stats.escapes<1){if(pressed('a')||pressed('b')||pres
  if(pressed('b')||pressed('start'))state='hub';}
 let boonT=0;
 function boonUpdate(dt){boonT+=dt;uiSel=nav(uiSel,boonOffer.length);
- if(pressed('a')&&boonOffer.length&&boonT>.35){const b=boonOffer[uiSel];takeBoon(b);boonOffer=[];boonT=0;boonReturn();}}
+ if(pressed('a')&&boonOffer.length&&boonT>.25){const b=boonOffer[uiSel];takeBoon(b);boonOffer=[];boonT=0;boonReturn();}}
 function shopUpdate(){uiSel=nav(uiSel,shopItems.length+1);
  if(pressed('a')){if(uiSel===shopItems.length){rdNextChamber();state='run';return}
   const it=shopItems[uiSel];
   if(it.sold){snd(140,.08)}else if(RUN.petals>=it.p){RUN.petals-=it.p;it.sold=true;snd(700,.08,1100);it.act()}else snd(140,.08)}
  else if(pressed('b')){rdNextChamber();state='run'}}
-function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else state='run';return}
+let pauseConfirm=-1;
+function pauseItems(){const L=['RESUME','BUILD','SETTINGS','ABANDON RUN','QUIT TO TITLE'];if(PL.length>1)L.push('LEAVE THE PARTY');return L}
+/* the run-ending rows ask twice */
+function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else if(pauseConfirm>=0)pauseConfirm=-1;else state='run';return}
  if(pausePage===1){if(pressed('a')||pressed('start'))pausePage=0;return}
- pauseSel=nav(pauseSel,5);
+ const L=pauseItems(),was=pauseSel;pauseSel=nav(pauseSel,L.length);if(pauseSel!==was)pauseConfirm=-1;
  if(pressed('start')){state='run';return}
- if(pressed('a')){if(pauseSel===0)state='run';else if(pauseSel===1)pausePage=1;
-  else if(pauseSel===2){setReturn='pause';uiSel=0;state='set'}
-  else if(pauseSel===3){rdAbandon();hubEnter()}else{rdAbandon();menuSel=0;state='title'}}}
+ if(pressed('a')){const it=L[pauseSel];
+  if(it==='RESUME')state='run';else if(it==='BUILD')pausePage=1;
+  else if(it==='SETTINGS'){setReturn='pause';uiSel=0;state='set'}
+  else if(pauseConfirm!==pauseSel){pauseConfirm=pauseSel;snd(330,.06)}
+  else if(it==='ABANDON RUN'){rdAbandon();hubEnter()}
+  else if(it==='LEAVE THE PARTY'){const p=PL.find(q=>q.dev===menuDev);if(p&&dropPlayer(p)){joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2}state='run'}
+  else{rdAbandon();PL.length=0;kb2On=false;menuSel=0;state='title'}}}
 
 /* ---------------- intro cinematic ---------------- */
 let rdCineT=0,rdCineIx=0,rdCineDest='hub';
@@ -753,8 +813,8 @@ function sproutsUpdate(){const rows=sprPage===0?6:TRADES.length+SELLS.length;
  uiSel=nav(uiSel,rows);
  if(pressed('a')){if(sprPage===0){const ty=uiSel;
    const inP=RD.party.filter(x=>x===ty).length;
-   if(inP>0&&(RD.party.length<=inP||inP>=(RD.bank[ty]||0))){RD.party.splice(RD.party.lastIndexOf(ty),1);snd(440,.05)}
-   else if(RD.party.length<3&&(RD.bank[ty]||0)>inP){RD.party.push(ty);snd(784,.06)}
+   if(RD.party.length<3&&(RD.bank[ty]||0)>inP){RD.party.push(ty);snd(784,.06)}
+   else if(inP>0){RD.party=RD.party.filter(x=>x!==ty);snd(440,.05)}
    else snd(160,.08,0,'sawtooth',.05);rdSave()}
   else if(uiSel<TRADES.length){const tr=TRADES[uiSel];
    if((RD.bank[tr.g[0]]||0)>=tr.g[1]){RD.bank[tr.g[0]]-=tr.g[1];RD.bank[tr.t[0]]=(RD.bank[tr.t[0]]||0)+tr.t[1];snd(784,.08);later(()=>snd(1175,.15),90)}
@@ -773,9 +833,12 @@ function collide(e,rr){e.x=Math.max(11+rr,Math.min(W-11-rr,e.x));e.y=Math.max(30
 function aimVec(p){let ax=p.ax||0,ay=p.ay===undefined?1:p.ay;const mx=p.dev.mx,my=p.dev.my,l=Math.hypot(mx,my);
  if(l>0){ax=mx/l;ay=my/l;p.ax=ax;p.ay=ay}return[ax,ay];}
 /* nearest standing keeper: who a foe hunts */
+/* keepers don't stand inside each other */
+function separate(list,r){for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],c=list[j];if(a.down||c.down)continue;
+ const dx=c.x-a.x,dy=c.y-a.y,d=Math.hypot(dx,dy);if(d>.01&&d<r){const k=(r-d)/2/d;a.x-=dx*k;a.y-=dy*k;c.x+=dx*k;c.y+=dy*k}else if(d<=.01){a.x-=1;c.x+=1}}}
 function tgt(e){let best=null,bd=1e12;for(const p of PL){if(p.down)continue;const d=(p.x-e.x)**2+(p.y-e.y)**2;if(d<bd){bd=d;best=p}}return best||PL[0]}
 function hitEnemy(e,dmg,src,kx,ky,p){if(e.hp<=0)return;p=p||lead();const s=rdStats(p);let crit=Math.random()<s.crit;
- if(e.kind==='crab'&&e.state===1&&src!=='burn'&&src!=='heavy'&&src!=='super')dmg*=.35;
+ if(e.kind==='crab'&&e.state===1&&src!=='burn'&&src!=='heavy'&&src!=='super'){dmg*=.35;if(!(e.shT>time)){e.shT=time+.7;ftext(e.x,e.y-e.r-12,'SHIELDED - HOLD ATTACK','#8ad0ff')}}
  if(src==='atk'&&e.kind==='boss'&&RUN.boons.pass.find(p=>p.id==='heavy'))dmg*=1+rdBoonVal(RUN.boons.pass.find(p=>p.id==='heavy'))/100;
  if(hasDuo('mudslide')&&e.chill>0)dmg*=1.3;
  dmg*=crit?2:1;e.hp-=dmg;e.flash=.12;if(src!=='super'&&src!=='reflect')meterGain(p,dmg*.22);
@@ -789,7 +852,7 @@ function hitEnemy(e,dmg,src,kx,ky,p){if(e.hp<=0)return;p=p||lead();const s=rdSta
    if(best){best.hp-=dmg*.45;best.flash=.12;ftext(best.x,best.y-10,Math.round(dmg*.45),'#fff8a0');burst(best.x,best.y,'#f0d020',4,26);RUN.bolts=RUN.bolts||[];RUN.bolts.push({x:e.x,y:e.y,x2:best.x,y2:best.y,t:.14});if(best.hp<=0)killEnemy(best)}}
   if(g==='LEAF'&&Math.random()<.2)rdHeal(1,p);
   if(g==='PEB'){e.x+= (kx||0)*1.6;e.y+=(ky||0)*1.6;collide(e,e.r)}}
- if(e.hp<=0)killEnemy(e);}
+ if(e.hp<=0){if(p&&!e.dead)p.kills=(p.kills||0)+1;killEnemy(e)}}
 function killEnemy(e){if(e.dead)return;e.dead=true;e.hp=0;RD.stats.kills++;RUN.kills++;
  if(e.kind==='boss'){const id=BOSSES[e.bossIx].id;RD.bossK[id]=(RD.bossK[id]||0)+1;bossSay(e,'down')}else{RD.killK[e.kind]=(RD.killK[e.kind]||0)+1;if(e.elite)RD.stats.elites=(RD.stats.elites||0)+1}burst(e.x,e.y,'#e8e4f5',10,44);snd(240,.12,90,'triangle',.06);
  if(e.kind==='boss'){for(const o of RUN.enemies)if(o!==e)o.hp=Math.min(o.hp,0),o.dead=true;RUN.enemies=RUN.enemies.filter(o=>o===e||!o.dead);RUN.enemies.splice(RUN.enemies.indexOf(e),1);
@@ -807,17 +870,25 @@ function damagePlayer(p,n){if(!RUN||p.down||p.inv>0||p.dashT>0)return;const s=rd
  const peb=RUN.buds&&(RUN.buds.find(b=>b.type===1&&b.cd<=0&&b.own===p.ix)||RUN.buds.find(b=>b.type===1&&b.cd<=0));
  if(peb){peb.cd=15;p.inv=.55;ftext(p.x,p.y-16,'PEB BLOCKED!','#dce2ea');burst(p.x,p.y,'#dce2ea',6,30);snd(520,.08,760);return}
  let d=n*(1-s.armor)*(p.armT>0?.5:1);
- p.hp-=d;p.inv=.55;p.hurt=.25;if(p.hp>0&&p.hp<s.maxHp*.3&&!p.lowSaid&&CHATTER[p.char]){p.lowSaid=true;sub(p.char,CHATTER[p.char].low[0],2.6,PCOL[p.ix])}p.charging=false;meterGain(p,d*.9);RUN.shake=Math.min(5,2.5);burst(p.x,p.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
- if(RUN.buds&&RUN.buds.length&&Math.random()<.3){let i=RUN.buds.length-1;for(let j=i;j>=0;j--)if(RUN.buds[j].own===p.ix){i=j;break}const lb=RUN.buds.splice(i,1)[0];ftext(p.x,p.y-20,TYPES[lb.type].n+' SCATTERED!','#f8a0c8');snd(340,.1,180)}
+ if(RD.set.grace)d*=.5;
+ p.hp-=d;p.inv=.55;p.hurt=.25;ftext(p.x,p.y-22,'-'+Math.max(1,Math.round(d)),'#ff6a5a');p.hits=(p.hits||0)+1;if(p.hp>0&&p.hp<s.maxHp*.3&&!p.lowSaid&&CHATTER[p.char]){p.lowSaid=true;sub(p.char,CHATTER[p.char].low[0],2.6,PCOL[p.ix])}p.charging=false;meterGain(p,d*.4);RUN.shake=Math.min(5,2.5);burst(p.x,p.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
+ if(RUN.buds&&RUN.buds.length&&Math.random()<.3){let i=RUN.buds.length-1;for(let j=i;j>=0;j--)if(RUN.buds[j].own===p.ix){i=j;break}const lb=RUN.buds.splice(i,1)[0];const a=Math.random()*6.28;RUN.pods.push({type:lb.type,x:clamp(p.x+Math.cos(a)*34,20,W-20),y:clamp(p.y+Math.sin(a)*30,40,H-14)});ftext(p.x,p.y-20,TYPES[lb.type].n+' RAN OFF - GRAB IT!','#f8a0c8');snd(340,.1,180)}
  if(hasKeep('charm')){for(const e of RUN.enemies.slice())if(Math.hypot(e.x-p.x,e.y-p.y)<e.r+9)hitEnemy(e,9,'reflect',0,0,p)}
  if(p.hp<=0){
-  /* co-op: a teammate still standing means you are only down, not out */
-  if(PL.some(q=>q!==p&&!q.down)){p.hp=0;p.down=true;p.revT=0;p.dashT=0;p.zoom=null;p.dive=0;p.spA=0;p.supA=0;say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS DOWN - STAND OVER THEM!',2.4);snd(196,.3,98,'sawtooth',.06);return}
   if(RUN.revives>0){RUN.revives--;p.hp=s.maxHp*.5;p.inv=2;say2('DEATH DEFIED!',3);burst(p.x,p.y,'#ffd94d',16,50);snd(784,.2);later(()=>snd(1175,.4),140)}
   else if(hasDuo('phoenix')&&!RUN.phoenixUsed){RUN.phoenixUsed=true;p.hp=s.maxHp*.4;p.inv=2;say2('PHOENIX BLOOM!',3);burst(p.x,p.y,'#f07830',16,50)}
   else if(hasKeep('collar')&&!RUN.collarUsed){RUN.collarUsed=true;p.hp=s.maxHp*.2;p.inv=2;say2('LOUIE HAULS YOU BACK!',3);burst(p.x,p.y,'#f8a0c8',14,46)}
+  /* co-op: a teammate still standing means you are only down, not out. Each fall takes longer to get up from. */
+  else if(PL.some(q=>q!==p&&!q.down)){p.hp=0;p.down=true;p.revT=0;p.downs=(p.downs||0)+1;p.dashT=0;p.zoom=null;p.dive=0;p.spA=0;p.supA=0;say2('P'+(p.ix+1)+' IS DOWN - STAND OVER THEM!',2.4);snd(196,.3,98,'sawtooth',.06)}
   else rdDie();}}
-function doAttack(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=aimVec(p),isLou=p.char==='LOUIE';p.atkCd=w.rate*(isLou?.72:1);
+const doorHold=()=>PL.length>1?.6:.28;
+const reviveTime=p=>1.8+.9*Math.max(0,(p.downs||1)-1);
+/* aim help: lean toward the foe closest to where you're pointing (within ~40 degrees), if there is one */
+function assist(p,v,range){if(RD.set.assist===false||!RUN)return v;let best=null,bs=-1;for(const e of RUN.enemies){if(e.born>0)continue;const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);if(d<1||d>range)continue;
+ const c=(dx*v[0]+dy*v[1])/d;if(c<.76)continue;const sc=c-d/range*.3;if(sc>bs){bs=sc;best=[dx/d,dy/d]}}if(!best)return v;p.ax=best[0];p.ay=best[1];return best}
+/* a target preference for auto-aimed casts: near, and in front */
+const aimScore=(p,e,ax,ay)=>{const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;return d-((dx*ax+dy*ay)/d)*60};
+function doAttack(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=assist(p,aimVec(p),w.proj?170:w.range+22),isLou=p.char==='LOUIE';p.atkCd=w.rate*(isLou?.72:1);
  noise(.045,.14,2400);p.combo=(p.combo+1)%(w.dmg.length);
  const base=w.dmg[p.combo]*s.dmgMul*s.atkMul*(isLou?.85:1);p.swing=Math.max(.3,w.rate*1.1);p.swingD=p.swing;
  if(w.proj){RUN.projs.push({x:p.x+ax*8,y:p.y+ay*8,vx:ax*w.proj,vy:ay*w.proj,dmg:base,kind:'arrow',r:2,life:1.1,o:p});snd(740,.05,1200);return}
@@ -838,7 +909,7 @@ function doDash(p){if(p.dashCharges<=0||p.dashT>0)return;const[ax,ay]=aimVec(p);
  if(g==='PEB')p.armT=1.2;
  if(g==='LEAF')rdHeal(2+v*.12,p);
  if(g==='LUCKY'&&Math.random()<.35){p.dashCharges++;p.dashRegen=0}}
-function doCast(p){const s=rdStats(p);if(p.castAmmo<=0||p.castCd>0)return;const[ax,ay]=aimVec(p);
+function doCast(p){const s=rdStats(p);if(p.castAmmo<=0||p.castCd>0)return;const[ax,ay]=assist(p,aimVec(p),200);
  p.castAmmo--;p.castCd=.35;p.castRegenT=3.2/s.castRegen;snd(880,.07,1320,'triangle',.06);p.castA=.45;
  const god=RUN.boons.cast?RUN.boons.cast.god:'',mul=s.castMul;
  if(!god){const ch=p.char||'WILL';
@@ -848,8 +919,8 @@ function doCast(p){const s=rdStats(p);if(p.castAmmo<=0||p.castCd>0)return;const[
   else if(ch==='LOUIE'){for(const e of RUN.enemies.slice())if(Math.hypot(e.x-p.x,e.y-p.y)<37){hitEnemy(e,10*mul,'sig',0,0,p);const dd=Math.hypot(e.x-p.x,e.y-p.y)||1;e.x+=(e.x-p.x)/dd*16;e.y+=(e.y-p.y)/dd*16;collide(e,e.r)}burst(p.x,p.y,'#f8a0c8',14,42);snd(180,.16,90,'sawtooth',.09);RUN.rings=RUN.rings||[];RUN.rings.push({x:p.x,y:p.y,r:37,t:.3,c:'#f8a0c8'})}
   else{RUN.projs.push({x:p.x+ax*8,y:p.y+ay*8,vx:ax*265,vy:ay*265,dmg:13*mul,kind:'jet',r:4,life:.9,o:p});snd(300,.1,700,'sawtooth',.04)}
   return}
- const nearest=(rad)=>{let best=null,bd=rad*rad;for(const e of RUN.enemies){const d=(e.x-p.x)**2+(e.y-p.y)**2;if(d<bd){bd=d;best=e}}return best};
- if(god==='ZIP'){const sorted=RUN.enemies.slice().sort((a,b)=>((a.x-p.x)**2+(a.y-p.y)**2)-((b.x-p.x)**2+(b.y-p.y)**2)).slice(0,3);
+ const nearest=(rad)=>{let best=null,bd=1e9;for(const e of RUN.enemies){if(Math.hypot(e.x-p.x,e.y-p.y)>rad)continue;const d=aimScore(p,e,ax,ay);if(d<bd){bd=d;best=e}}return best};
+ if(god==='ZIP'){const sorted=RUN.enemies.slice().sort((a,b)=>aimScore(p,a,ax,ay)-aimScore(p,b,ax,ay)).slice(0,3);
   for(const e of sorted){e.hp-=26*mul;e.flash=.15;ftext(e.x,e.y-12,Math.round(26*mul),'#fff8a0');burst(e.x,e.y,'#f0d020',7,34);RUN.bolts=RUN.bolts||[];RUN.bolts.push({x:e.x,y:e.y,sky:1,t:.18});if(e.hp<=0)killEnemy(e)}if(!sorted.length)snd(200,.08);return}
  if(god==='PEB'){const t=nearest(140);const x=t?t.x:p.x+ax*62,y=t?t.y:p.y+ay*62;
   RUN.hazards.push({x,y,t:.45,t0:.45,r:27,dmg:30*mul,from:'player',o:p});return}
@@ -870,8 +941,8 @@ function projHit(p,e){const o=p.o||lead();
 function foeMove(e,dt,tx,ty,sp){const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy)||1;
  const step=Math.min(d,sp*dt*(e.chill>0?.55:1));e.x+=dx/d*step;e.y+=dy/d*step;e.face=dx>0?1:-1;if(d>1)e.yaw=Math.atan2(dx,dy);e.mv=1;collide(e,e.r);return d;}
 function touchHit(e,dmg){for(const p of PL){if(p.down)continue;const d=Math.hypot(p.x-e.x,p.y-e.y);
-  if(d<e.r+7&&e.hitCd<=0&&p.inv<=0&&p.dashT<=0){e.hitCd=.85;const kx=(p.x-e.x)/(d||1)*90,ky=(p.y-e.y)/(d||1)*90;p.vx+=kx;p.vy+=ky;damagePlayer(p,dmg);if(!RUN)return}}}
-function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}
+  if(d<e.r+7&&e.hitCd<=0&&p.inv<=0&&p.dashT<=0){e.hitCd=.85;const kb=p.reviving?20:90,kx=(p.x-e.x)/(d||1)*kb,ky=(p.y-e.y)/(d||1)*kb;p.vx+=kx;p.vy+=ky;damagePlayer(p,e.kind==='boss'?dmg*.7:dmg);if(!RUN)return;if(p.inv>0)p.inv=Math.max(p.inv,.85)}}}
+function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.cd-=dt;
  if(e.burn>0){e.burn-=dt;e.hp-=e.burnDps*dt;if(Math.random()<dt*6)RUN.parts.push({x:e.x+R(-4,4),y:e.y,vx:0,vy:0,z:10,vz:22,life:.35,c:'#f07830',ng:1});
   if(e.hp<=0){killEnemy(e);return}}
  if(e.chill>0)e.chill-=dt;if(e.root>0){e.root-=dt;return}
@@ -891,7 +962,7 @@ function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv
   if(st===2){e.t-=dt;e.x+=e.sx*175*dt;e.y+=e.sy*175*dt;e.mv=1;collide(e,e.r);if(e.t<=0){e.state=0;e.cd=1.3}}}
  /* touch damage */
  touchHit(e,e.dmg);}
-function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.bt-=dt;
+function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.cd-=dt;e.bt-=dt;
  if(e.burn>0){e.burn-=dt;e.hp-=e.burnDps*dt;if(e.hp<=0){killEnemy(e);return}}
  if(e.chill>0)e.chill-=dt;if(e.root>0){e.root-=dt;return}
  const frac=e.hp/e.max;e.phase=frac>.66?1:frac>.33?2:3;if(e.phase>(e.phSaid||1)){e.phSaid=e.phase;bossSay(e,'p'+e.phase)}
@@ -924,20 +995,23 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=
     else radial(9)}}}
  if(RUN)touchHit(e,e.dmg);}
 function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
- for(const p of PL)if(p.dev.pr.start){pauseSel=0;pausePage=0;state='pause';rdSave();return}
+ for(const p of PL)if(p.dev.pr.start){pauseSel=0;pausePage=0;pauseConfirm=-1;state='pause';menuDev=p.dev;rdSave();return}
+ /* drop in mid-run: new keepers land beside the party */
+ for(const np of pollJoin()){const L=lead();np.char=RD.chars[np.ix]&&charUnlocked(RD.chars[np.ix])?RD.chars[np.ix]:'WILL';plRunInit(np);movesReset(np,true);
+  np.x=clamp(L.x+R(-18,18),20,W-20);np.y=clamp(L.y+R(-10,10),40,H-16);np.land=.62;np.inv=1.5;joinMsg=joinNote(np);joinT=3;say2('P'+(np.ix+1)+' DROPS IN!',1.6);snd(784,.08,1175)}
  if(RUN.shake>0)RUN.shake*=Math.max(0,1-dt*7);if(RUN.flash>0)RUN.flash-=dt;if(RUN.banner){RUN.banner.t-=dt;if(RUN.banner.t<=0)RUN.banner=null}
  if(RUN.sub){RUN.sub.t-=dt;if(RUN.sub.t<=0)RUN.sub=null}for(const q of RUN.subQ)q.d-=dt;{const q=RUN.subQ.find(q=>q.d<=0);if(q){RUN.subQ.splice(RUN.subQ.indexOf(q),1);sub(q.who,q.txt,q.t,q.c)}}
  RUN.mwT-=dt;if(RUN.mwT<=0){RUN.mwT=1;missionWatch()}
- if(RUN.echo)for(const p of PL)if(!p.down&&Math.hypot(p.x-RUN.echo.x,p.y-RUN.echo.y)<12){echoTake();return}
+ if(RUN.echo)for(const p of PL)if(!p.down&&Math.hypot(p.x-RUN.echo.x,p.y-RUN.echo.y)<12){menuDev=p.dev;echoTake();return}
  /* a super stops the room for a beat before it lands */
- if(RUN.freeze>0){RUN.freeze-=dt;for(const p of PL)if(p.supA>0)p.supA-=dt*.5;if(RUN.freeze<=0&&RUN.freezeP){const fp=RUN.freezeP;RUN.freezeP=null;superFire(fp)}return}
+ if(RUN.freeze>0){for(const p of PL)if(p!==RUN.freezeP&&p.dev.pr.sup&&(p.meter||0)>=SUPER_MAX)p.supQ=true;RUN.freeze-=dt;for(const p of PL)if(p.supA>0)p.supA-=dt*.5;if(RUN.freeze<=0&&RUN.freezeP){const fp=RUN.freezeP;RUN.freezeP=null;superFire(fp)}return}
  const zipSp=1+.07*budCount(3);
  /* keepers */
  for(const p of PL){
-  if(p.swing>0)p.swing-=dt;if(p.hurt>0)p.hurt-=dt;if(p.castA>0)p.castA-=dt;if(p.selfie>0)p.selfie-=dt;if(p.selfieA>0)p.selfieA-=dt;if(p.cheer>0)p.cheer-=dt;if(p.land>0)p.land-=dt;
-  if(p.down){p.vx=p.vy=0;let near=false;for(const q of PL)if(q!==p&&!q.down&&Math.hypot(q.x-p.x,q.y-p.y)<20)near=true;
-   if(near){p.revT+=dt;if(p.revT>=2.2){RD.stats.revives=(RD.stats.revives||0)+1;chatter('rev',true);p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1.5;burst(p.x,p.y,'#a8f080',14,46);say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS BACK UP!',1.6);snd(523,.1);later(()=>snd(784,.2),110)}}
-   else p.revT=Math.max(0,p.revT-dt*.6);
+  if(p.reviving>0)p.reviving-=dt;if(p.swing>0)p.swing-=dt;if(p.hurt>0)p.hurt-=dt;if(p.castA>0)p.castA-=dt;if(p.selfie>0)p.selfie-=dt;if(p.selfieA>0)p.selfieA-=dt;if(p.cheer>0)p.cheer-=dt;if(p.land>0)p.land-=dt;
+  if(p.down){p.vx=p.vy=0;let near=0;for(const q of PL)if(q!==p&&!q.down&&Math.hypot(q.x-p.x,q.y-p.y)<20){near++;q.reviving=.2}
+   if(near){p.revT+=dt*(1+.5*(near-1));if(p.revT>=reviveTime(p)){RD.stats.revives=(RD.stats.revives||0)+1;chatter('rev',true);p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1.5;burst(p.x,p.y,'#a8f080',14,46);say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS BACK UP!',1.6);snd(523,.1);later(()=>snd(784,.2),110)}}
+   else p.revT=Math.max(0,p.revT-dt*.25);
    continue}
   const s=rdStats(p);
   if(p.atkCd>0)p.atkCd-=dt;if(p.castCd>0)p.castCd-=dt;if(p.inv>0)p.inv-=dt;
@@ -950,13 +1024,14 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
   const synth=RUN.boons.pass.find(q=>q.id==='synth');if(synth)p.hp=Math.min(s.maxHp,p.hp+rdBoonVal(synth)*.2*dt);
   /* dash: the dedicated button, or the cartridge's double-tap on a digital direction */
   const dv=p.dev;if(dv.pr.dash)doDash(p);
-  if(dv.id.slice(0,2)!=='gp'||dv.dpad)for(const d of['left','right','up','down'])if(dv.pr[d]){if(p.dtap[d]!==undefined&&RUN.time-p.dtap[d]<.27&&dv.id!=='touch')doDash(p);p.dtap[d]=RUN.time}
+  if(dv.id==='kb1'||dv.id==='kb2')for(const d of['left','right','up','down'])if(dv.pr[d]){if(p.dtap[d]!==undefined&&RUN.time-p.dtap[d]<.27)doDash(p);p.dtap[d]=RUN.time}
   movesInput(p,dt,dv);
   if(dv.pr.b&&!(p.dive>0)&&!p.zoom)doCast(p);
   for(const tr of p.trail)tr.t-=dt;p.trail=p.trail.filter(tr=>tr.t>0)}
+ separate(PL,10);
  /* sprout buddies: each bud trails the keeper who picked it up */
  const chainIx={};
- for(let i=0;i<RUN.buds.length;i++){const b=RUN.buds[i];let ow=PL[b.own];if(!ow||ow.down){ow=lead();b.own=ow.ix}
+ for(let i=0;i<RUN.buds.length;i++){const b=RUN.buds[i];let ow=PL.find(q=>q.ix===b.own);if(!ow||ow.down){ow=lead();b.own=ow.ix}
   const ci=chainIx[b.own]||0;chainIx[b.own]=ci+1;let an=ow;if(ci>0){for(let j=i-1;j>=0;j--)if(RUN.buds[j].own===b.own){an=RUN.buds[j];break}}
   const bx=-(ow.ax||0)*10,by=-(ow.ay===undefined?1:ow.ay)*10;
   const tx2=an.x+(ci===0?bx:Math.cos(i*2.4)*9),ty2=an.y+(ci===0?by:Math.sin(i*2.4)*7+4),dd=Math.hypot(tx2-b.x,ty2-b.y);
@@ -1002,18 +1077,19 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
   p.vx*=Math.max(0,1-dt*4);p.vy*=Math.max(0,1-dt*4);p.x+=p.vx*dt;p.y+=p.vy*dt;
   if(d<10){p.got=true;if(p.kind==='petal'){RUN.petals+=p.val;if(Math.random()<.3)snd(1200,.03,1600,'square',.02)}
    else if(p.kind==='dew'){RUN.dew+=p.val;say2('+'+p.val+' MOONDEW',1.2);snd(980,.06,1470)}
-   else if(p.kind==='heart'){rdHeal(p.val,q);ftext(q.x,q.y-12,'+'+p.val,'#a8f080')}
-   else if(p.kind==='honey'){RUN.honey+=p.val;say2('+1 HONEY',1.5)}}}
+   else if(p.kind==='heart'){let w=q,wr=2;for(const o of alive()){const r2=o.hp/rdStats(o).maxHp;if(r2<wr){wr=r2;w=o}}rdHeal(p.val,w);ftext(w.x,w.y-12,'+'+p.val,'#a8f080')}
+   else if(p.kind==='honey'){RUN.honey+=p.val;say2(RD.stats.honeyFound?'+1 HONEY':'+1 HONEY - A GIFT FOR SOMEONE AT THE HEARTH',2.4)}}}
  RUN.pickups=RUN.pickups.filter(p=>!p.got);
  /* doors / clear */
  if(RUN.phase==='fight'&&RUN.enemies.length===0){
   if(RUN.wave2&&RUN.wave2.length){const w2=RUN.wave2;RUN.wave2=null;
-   for(const s2 of w2)spawnFoe(s2.k,26+Math.random()*(W-52),36+Math.random()*(H*.45),s2.elite);
+   for(const s2 of w2){const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)}
    say2('THE DEEP STIRS - MORE RISE',1.6);snd(160,.25,70,'sawtooth',.06)}
   else{chamberCleared();if(!RUN)return}}
- else if(RUN.phase==='doors'){for(const d of RUN.doors){let on=false;for(const p of PL)if(!p.down&&Math.hypot(p.x-d.x,p.y-(d.y+8))<13)on=true;
-   /* solo: step in, like the cartridge. Co-op: hold the doorway a beat so nobody picks by accident */
-   if(on){d.hold+=dt;if(PL.length===1||d.hold>.6){doorReward(d);return}}else d.hold=Math.max(0,d.hold-dt*2)}}
+ else if(RUN.phase==='doors'){for(const d of RUN.doors){let on=null;for(const p of PL)if(!p.down&&Math.hypot(p.x-d.x,p.y-(d.y+8))<13)on=p;d.by=on;if(on)menuDev=on.dev;
+   /* stand in the doorway a beat (longer in co-op) so a brush in a fight doesn't pick for you */
+   if(on&&PL.some(q=>q.down)){if(!(say2T>0))say2('REVIVE YOUR FRIENDS FIRST',1.4);d.hold=0}
+   else if(on){d.hold+=dt;if(d.hold>doorHold()){doorReward(d);return}}else d.hold=Math.max(0,d.hold-dt*2)}}
  /* fx */
  for(const q of RUN.parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.z=Math.max(0,(q.z||0)+(q.vz||0)*dt);if(!q.ng)q.vz=(q.vz||0)-140*dt;q.life-=dt}RUN.parts=RUN.parts.filter(q=>q.life>0);
  if(RUN.parts.length>260)RUN.parts.splice(0,RUN.parts.length-260);
@@ -1029,11 +1105,11 @@ function menuUpdate(){menuSel=nav(menuSel,3);
   else if(menuSel===1)startCine('menu');
   else{setReturn='menu';uiSel=0;state='set'}}
  else if(pressed('b'))state='title'}
-function setUpdate(){uiSel=nav(uiSel,3);const lr=(pressed('right')?1:0)-(pressed('left')?1:0);
+function setUpdate(){uiSel=nav(uiSel,5);const lr=(pressed('right')?1:0)-(pressed('left')?1:0);
  if(lr||pressed('a')){let touched=true;
   if(uiSel===0)RD.set.mus=lr?Math.max(0,Math.min(10,RD.set.mus+lr)):(RD.set.mus>=10?0:RD.set.mus+1);
   else if(uiSel===1)RD.set.sfx=lr?Math.max(0,Math.min(10,RD.set.sfx+lr)):(RD.set.sfx>=10?0:RD.set.sfx+1);
-  else if(pressed('a'))RD.set.shake=!RD.set.shake;else touched=false;
+  else if(uiSel===2&&(pressed('a')||lr))RD.set.shake=!RD.set.shake;else if(uiSel===3&&(pressed('a')||lr))RD.set.grace=!RD.set.grace;else if(uiSel===4&&(pressed('a')||lr))RD.set.assist=RD.set.assist===false;else touched=false;
   if(touched){rdSave();snd(660,.05,880)}}
  if(pressed('b')||pressed('start')){snd(440,.05);state=setReturn}}
 function titleUpdate(){const d=pressedBy('a')||pressedBy('start');
@@ -1041,7 +1117,12 @@ function titleUpdate(){const d=pressedBy('a')||pressedBy('start');
   /* whoever presses first holds the lantern: they are player 1 */
   if(!PL.length)joinPlayer(d);
   if(!RD.flags.cineSeen)startCine('hub');else{menuSel=0;state='menu'}}}
-function gameUpdate(dt){time+=dt;
+/* menus that belong to one player; every other state is open to all joined players */
+const OWNED=new Set(['mirror','arm','keep','codex','heat','board','sprouts','talk','boon','shop','pause','echo','set']);
+let stateT=0;
+function gameUpdate(dt){const was=state;stateT+=dt;gameStep(dt);
+ if(state!==was){stateT=0;holdRepeat();if(!OWNED.has(state)||(state==='set'&&setReturn!=='pause'))menuDev=null}}
+function gameStep(dt){time+=dt;
  if(say2T>0)say2T-=dt;if(joinT>0)joinT-=dt;
  switch(state){
  case 'title':titleUpdate();return;
@@ -1050,7 +1131,7 @@ function gameUpdate(dt){time+=dt;
  case 'sprouts':sproutsUpdate();return;
  case 'cine':cineUpdate(dt);return;
  case 'hub':hubUpdate(dt);return;
- case 'talk':talkUpdate();return;
+ case 'talk':talkUpdate();for(const p of PL)if(p.dev!==menuDev){movePlayer(p,dt,84);aimVec(p)}return;
  case 'chars':charsUpdate(dt);return;
  case 'mirror':mirrorUpdate();return;
  case 'arm':armUpdate();return;
@@ -1063,7 +1144,8 @@ function gameUpdate(dt){time+=dt;
  case 'shop':if(!RUN){state='hub';return}shopUpdate();return;
  case 'pause':if(!RUN){hubEnter();return}pauseUpdate();return;
  case 'run':if(!RUN){hubEnter();return}runUpdate(dt);return;
- case 'over':case 'win':overT+=dt;if(overT>.8&&(pressed('a')||pressed('start')))hubEnter();return;
+ /* a short lock so mashing attack through a death doesn't skip the summary; the prompt appears when it lifts */
+ case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start')))hubEnter();return;
  }}
 /* =====================================================================
    ROOTDEEP 64 — moves
@@ -1085,7 +1167,7 @@ function gameUpdate(dt){time+=dt;
    LAUNCHER / SWEEP / THROW.
    ===================================================================== */
 const MOVES={
- WILL:  {sp:'SELFIE FLASH',  sup:'BIKE LANE',          heavy:'SNEAKER KICK',dive:'STAGE DIVE',     spCd:7},
+ WILL:  {sp:'SELFIE FLASH',  sup:'BIKE LANE',          heavy:'SNEAKER KICK',dive:'STAGE DIVE',     spCd:9},
  ERIN:  {sp:'LEASH LASSO',   sup:'SPROUT STAMPEDE',    heavy:'GARDEN KICK', dive:'FLYING FLOP',    spCd:5},
  LOUIE: {sp:'ZOOM ZOOM ZOOM',sup:'JUDGEMENT',          heavy:'CHOMP',       dive:'ZOOM POUNCE',    spCd:6},
  MARCUS:{sp:'DAB CLOUD',     sup:'BRO, I GOT AN IDEA', heavy:'PIPE WRENCH', dive:'CANNONBALL, BRO',spCd:7}};
@@ -1107,12 +1189,13 @@ function doSpecial(p){if(p.spCd>0||p.down||p.dive>0||p.zoom)return;const M=mv(p)
   RUN.acts.push({k:'cloud',x:p.x+ax*14,y:p.y+ay*14,vx:ax*40,vy:ay*40,life:3.2,tick:0,o:p,mul,s:Math.random()*9});noise(.5,.2,900,'lowpass');return}
  /* SELFIE FLASH: the phone goes up, the whole room goes white */
  p.selfie=.22;RUN.flash=.3;snd(1400,.06,2000,'square',.05);later(()=>noise(.08,.3,6000),40);
- for(const e of RUN.enemies.slice()){const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<82&&!(e.born>0)){e.root=Math.max(e.root,e.kind==='boss'?.7:1.9);e.dazed=e.kind==='boss'?.7:1.9;hitEnemy(e,8*mul,'special',0,0,p)}}
- RUN.eprojs=RUN.eprojs.filter(q=>Math.hypot(q.x-p.x,q.y-p.y)>82);
- RUN.rings.push({x:p.x,y:p.y,r:82,t:.3,c:'#ffffff'})}
+ for(const e of RUN.enemies.slice()){const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<66&&!(e.born>0)){e.root=Math.max(e.root,e.kind==='boss'?.5:1.1);e.dazed=e.kind==='boss'?.5:1.1;hitEnemy(e,8*mul,'special',0,0,p)}}
+ RUN.eprojs=RUN.eprojs.filter(q=>Math.hypot(q.x-p.x,q.y-p.y)>66);
+ RUN.rings.push({x:p.x,y:p.y,r:66,t:.3,c:'#ffffff'})}
 
 /* ---------------- supers ---------------- */
-function doSuper(p){if((p.meter||0)<SUPER_MAX||p.down||RUN.freeze>0)return;const M=mv(p);
+function doSuper(p){if(p.down)return;if((p.meter||0)<SUPER_MAX){if(!(p.noSupT>time)){p.noSupT=time+1;ftext(p.x,p.y-30,'SUPER '+Math.floor(p.meter||0)+'%','#c88a18');snd(140,.06)}return}
+ if(RUN.freeze>0||p.dive>0||p.zoom){p.supQ=true;return}p.supQ=false;const M=mv(p);
  RD.stats.supers=(RD.stats.supers||0)+1;RD.flags['sup_'+p.char]=1;p.meter=0;p.supA=1.05;p.inv=Math.max(p.inv,1.4);p.dive=0;p.zoom=null;p.charging=false;
  RUN.freeze=.6;RUN.freezeP=p;RUN.banner={txt:M.sup,who:(PL.length>1?'P'+(p.ix+1)+'  ':'')+p.char,c:PCOL[p.ix],t:1.3};
  snd(220,.5,880,'sawtooth',.07);snd(330,.5,1320,'square',.04);RUN.shake=3}
@@ -1134,8 +1217,8 @@ function superFire(p){const[ax,ay]=aimVec(p),mul=moveMul(p);
 
 /* ---------------- heavy & dash strike ---------------- */
 function doHeavy(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=aimVec(p),isLou=p.char==='LOUIE';
- const base=Math.max(...w.dmg)*2.4*s.dmgMul*s.atkMul*(isLou?.85:1);
- RD.stats.heavies=(RD.stats.heavies||0)+1;p.atkCd=w.rate*1.25;p.heavyA=.42;p.swing=0;ftext(p.x,p.y-26,mv(p).heavy+'!','#ffd94d');noise(.07,.22,1500);snd(160,.14,70,'sawtooth',.07);
+ const base=Math.max(...w.dmg)*1.8*s.dmgMul*s.atkMul*(isLou?.85:1);
+ RD.stats.heavies=(RD.stats.heavies||0)+1;p.atkCd=w.rate*1.9;p.heavyA=.42;p.swing=0;ftext(p.x,p.y-26,mv(p).heavy+'!','#ffd94d');noise(.07,.22,1500);snd(160,.14,70,'sawtooth',.07);
  let hit=false;for(const e of RUN.enemies.slice()){const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);
   if(d<32+e.r){const dot=(dx/(d||1))*ax+(dy/(d||1))*ay;if(dot>.45||d<13){e.root=Math.max(e.root,.45);hitEnemy(e,base,'heavy',(dx/(d||1))*15,(dy/(d||1))*15,p);hit=true}}}
  if(hit){RUN.shake=Math.max(RUN.shake,2.5);burst(p.x+ax*18,p.y+ay*18,'#fff3b0',10,46)}}
@@ -1161,7 +1244,7 @@ function movesInput(p,dt,dv){
    for(const e of RUN.enemies.slice()){const t=clamp((e.x-p.x)*ax+(e.y-p.y)*ay,0,len);if(Math.hypot(e.x-(p.x+ax*t),e.y-(p.y+ay*t))<e.r+10)hitEnemy(e,11*z.mul,'special',ax*5,ay*5,p)}
    p.vx=ax*len/.12;p.vy=ay*len/.12;p.dashT=.12;snd(520,.08,300,'sawtooth',.07);burst(p.x,p.y,'#f8c070',5,24)}
   return}
- if(dv.pr.sup)doSuper(p);
+ if(dv.pr.sup||p.supQ)doSuper(p);
  if(dv.pr.sp)doSpecial(p);
  if(dv.pr.a&&p.atkCd<=.02){if(p.dashGrace>0)doDive(p);else doAttack(p);p.chg=0;p.charging=true}
  if(p.charging){if(dv.cur.a){const was=p.chg;p.chg+=dt;if(was<CHARGE_T&&p.chg>=CHARGE_T)snd(990,.06,1480,'square',.03)}
@@ -1267,7 +1350,7 @@ const MISSIONS=[
   ask:[['LOUIE',"WHINE? (He would simply like to go down too.)"],['ERIN',"...Twenty sprouts home safe, and he walks them every one. If he's earned the door, Louie, I can't keep telling you no."]],
   done:[['LOUIE',"WOOF. (He went all the way down. It did not wear his face. It did not know how. He thinks it tried to and got confused and sat.)"],['ERIN',"It sat?"],['LOUIE',"BOOF. (It sat. He told it it was good. Somebody should.)"]]},
  /* Ranger and Scout: errands only */
- {id:'r1',who:'RANGER',n:'TAKE THE ELITE DOORS',d:'Fell 3 elites.',p:()=>[Math.min(3,stn('elites')),3],rew:{keys:1},
+ {id:'r1',who:'RANGER',n:'THREE, SEVEN, TEN',d:'Fell 3 elites.',p:()=>[Math.min(3,stn('elites')),3],rew:{keys:1},
   ask:[['RANGER',"Chambers three, seven and ten. Something bigger than the rest stands guard in each. Three of those and you've earned a key off my ring."]],
   done:[['RANGER',"Three guards down. Common graves are for cowards. Here's your key."]]},
  {id:'r2',who:'RANGER',n:'MARK YOUR TURNS',need:'r1',d:'Clear 30 chambers.',p:()=>[Math.min(30,stn('chambers')),30],rew:{dew:30},
@@ -1289,7 +1372,7 @@ const MISSIONS=[
   ask:[['SCOUT',"One keeper is an anecdote. Two is a study! Take a friend down and bring me a boss. I'll hold the door. From here. Up here."]],
   done:[['SCOUT',"Two keepers, one boss, zero fatalities worth footnoting. That's publishable! Honey for the both of you. Share. I'm watching."]]}];
 const missionById=id=>MISSIONS.find(m=>m.id===id);
-const missionOpen=m=>!RD.msn[m.id]&&(!m.need||RD.msn[m.need]);
+const missionOpen=m=>!RD.msn[m.id]&&(!m.need||RD.msn[m.need])&&(m.who==='ERIN'||stn('runs')>=1);
 const missionDone=m=>{const q=m.p();return q[0]>=q[1]};
 function openMissions(){return MISSIONS.filter(missionOpen)}
 
@@ -1298,7 +1381,7 @@ const EVENTS=[
  /* first time back */
  {id:'death1',who:'ERIN',when:()=>stn('deaths')>=1,lines:[['ERIN',"There you are. I dug you out of the potato bed. You come up wherever the roots are softest, it turns out."],['ERIN',"Nobody stays down there, keeper. That's the one mercy. It doesn't want you. It only wants what you're carrying."]]},
  {id:'death1m',who:'MARCUS',when:()=>stn('deaths')>=1,lines:[['MARCUS',"Oh, you're alive. I already told everyone you weren't. This is embarrassing for me."]]},
- {id:'death3',who:'ERIN',when:()=>stn('deaths')>=3,lines:[['ERIN',"Three times I've pulled you out of the dirt now. I'm not complaining. The potatoes are complaining."],['ERIN',"Spend what you bring back. The Mirror isn't vanity. It's the only thing down here that remembers you between tries."]]},
+ {id:'death3',who:'ERIN',when:()=>stn('deaths')>=3,lines:[['ERIN',"That's a few times now I've pulled you out of the dirt. I'm not complaining. The potatoes are complaining."],['ERIN',"Spend what you bring back. The Mirror isn't vanity. It's the only thing down here that remembers you between tries."]]},
  {id:'death15',who:'MARCUS',when:()=>stn('deaths')>=15,lines:[['MARCUS',"Fifteen. I've started a second notebook."],['MARCUS',"I'm not worried. I just think it's weird that you're not worried. One of us should be and it's not gonna be me."]]},
  /* the Burrows and the Mother */
  {id:'mother_seen',who:'RANGER',when:()=>RD.seen.mother&&!bk('mother'),lines:[['RANGER',"You saw her, then. Thornback's mother. I've only ever seen the tunnels she leaves."],['RANGER',"She charges in a straight line and she can't turn. Stand still until she's committed. Then don't be there."]]},
@@ -1380,10 +1463,11 @@ const ECHOES=[
  {id:'c6',th:2,n:'TO WHOEVER IS NEXT',x:"I'm too tall now to remember much. So, you: be kind to it. Then hit it, hard, and climb. And then go back. It's so lonely. It lights up when you walk in. (a small lantern is drawn here)"}];
 function nextEcho(th){return ECHOES.find(e=>e.th===th&&!RD.echo[e.id])||null}
 /* a chamber gives one up now and then; a boss always does, the first time through its thread */
-function echoRoll(boss){if(!RUN)return;const e=nextEcho(RUN.biome);if(!e)return;if(boss||RUN.elite||Math.random()<.2)RUN.echo={e,x:W/2+R(-30,30),y:H/2+30}}
+function echoRoll(boss){if(!RUN)return;const e=nextEcho(RUN.biome);if(!e)return;if(!(boss||RUN.elite||Math.random()<.2))return;let x=W/2,y=H/2+30;
+ for(let i=0;i<30;i++){x=W/2+R(-60,60);y=H/2+R(0,50);if(!RUN.obst.some(o=>x>o.x-12&&x<o.x+o.w+12&&y>o.y-12&&y<o.y+o.h+16))break}RUN.echo={e,x,y}}
 let echoRead=null,echoT=0;
 function echoTake(){echoRead=RUN.echo.e;RD.echo[echoRead.id]=1;RUN.echo=null;echoT=0;rdSave();snd(660,.2,990,'triangle',.05);state='echo'}
-function echoUpdate(dt){echoT+=dt;if(echoT>.5&&(pressed('a')||pressed('b')||pressed('start'))){state=RUN?'run':'codex';snd(520,.05)}}
+function echoUpdate(dt){echoT+=dt;if(echoT>.3&&(pressed('a')||pressed('b')||pressed('start'))){state=RUN?'run':'codex';snd(520,.05)}}
 
 /* ---------------- things said in the deep ---------------- */
 const GODSAY={
@@ -1647,12 +1731,12 @@ function buildProps(){let b;
 /* ---------- camera ---------- */
 const CAM={x:W/2,z:H/2,d:1,init:false};
 function camFollow(pts,solo,dt,fill){ /* frame the room; lean toward the keepers */
- if(RUN&&RUN.freeze>0&&RUN.freezeP){pts=[RUN.freezeP];fill=.4;dt=Math.max(dt,.03)*2.4}
+ if(RUN&&RUN.freeze>0&&RUN.freezeP&&PL.length<2){pts=[RUN.freezeP];fill=.4;dt=Math.max(dt,.03)*2.4}
  let cx=W/2,cz=H*.5,sp=0;if(pts.length){cx=0;cz=0;for(const p of pts){cx+=p.x;cz+=p.y}cx/=pts.length;cz/=pts.length;for(const p of pts)sp=Math.max(sp,Math.abs(p.x-cx)/(W*.5),Math.abs(p.y-cz)/(H*.5))}
- const f=fill!==undefined?fill:clamp((solo?.56:.66)+sp*.5,.56,.98);
+ const f=fill!==undefined?fill:clamp((solo?.7:.74)+sp*.5,.7,1.04);
  const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.46,cz,clamp(1.06-f,0,.6)*1.5);
  const k=CAM.init?clamp(dt*3.2,0,1):1;CAM.x=lerp(CAM.x,tx,k);CAM.z=lerp(CAM.z,tz,k);CAM.d=lerp(CAM.d,f,k);CAM.init=true;
- const fov=.72,pitch=.8,halfW=(W*.5+16)*CAM.d,halfH=(H*.5+26)*CAM.d;
+ const fov=.72,pitch=.8,cm=PL.length>2?1.12:1.04,halfW=(W*.5+16)*CAM.d*cm,halfH=(H*.5+26)*CAM.d*cm;
  /* distance that fits the framed width and depth at this aspect */
  const dW=halfW/(Math.tan(fov/2)*RN.asp),dH=halfH*Math.sin(pitch)/Math.tan(fov/2)*1.16;const D=Math.max(dW,dH)+30;
  let sx=0,sy=0;if(RUN&&RD.set.shake&&RUN.shake>.05){sx=R(-RUN.shake,RUN.shake)*.6;sy=R(-RUN.shake,RUN.shake)*.6}
@@ -1676,10 +1760,13 @@ function keeperOpts(p,run){const isL=p.char==='LOUIE';
 function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay);
  shadow(p.x,p.y,p.char==='LOUIE'?7:6.2);
  /* player ring, in their colour: the 4-player couch needs to know who is who */
- if(PL.length>1||run){mPush();mT(p.x,.5,p.y);mS(8.6);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.down?.35:.85,unlit:true});mPop()}
+ {mPush();mT(p.x,.5,p.y);mS(8.6);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.down?.35:.85,unlit:true});mPop()}
  if(run)for(const tr of p.trail){const a=tr.t/.22;drawCastGhost(p,tr,a)}
- const ko=keeperOpts(p,run);if(run&&p.inv>0&&p.dashT<=0&&!p.down&&!(p.land>0)&&((time*14)|0)%2)ko.hide=true;
+ const ko=keeperOpts(p,run);if(run&&p.inv>0&&p.dashT<=0&&!p.down&&!(p.land>0)&&!(p.hurt>0))ko.add=Math.max(ko.add||0,.18+.14*Math.sin(time*26));
  const S=drawCast(p.char,p.x,p.y,yaw,ko);
+ /* seen through walls, crates, foes and effects: a ghost in the player's colour. It is a little wider than the
+    keeper, so it only shows where something else stands in front of them, never over their own body. */
+ mPush();mT(p.x,p.down?.5:0,p.y);mS(p.char==='LOUIE'?11:9.6,p.down?8:22,p.char==='LOUIE'?11:9.6);drawT(MESH.cyl,{c:hex(PCOL[p.ix]),a:.5,unlit:true,behind:true});mPop();
  /* a puff of dust each time a foot comes down at a run */
  if(run&&state==='run'&&S.sp>60&&!p.down){const st=Math.floor(S.ph/3.14159);if(st!==S.step){S.step=st;RUN.parts.push({x:p.x-(p.ax||0)*3,y:p.y-(p.ay||0)*3,vx:R(-7,7),vy:R(-7,7),z:1.5,vz:9,life:.28,c:'#6a5c6c',ng:1})}}
  if(run&&p.down){mPush();mT(p.x,.6,p.y);mS(20*clamp(p.revT/2.2,0.02,1));drawT(MESH.disc,{c:hex('#a8f080'),a:.3,unlit:true});mPop();
@@ -1725,7 +1812,7 @@ const BKEY=['burrows','vault','core'];
 const BLIGHT=[[[.3,.9,.45],[.74,.6,.56],[.46,.4,.46],'#0e080e'],[[.25,.9,.4],[.5,.68,.86],[.34,.44,.56],'#060c14'],[[.3,.85,.45],[.95,.58,.4],[.5,.36,.34],'#120606']];
 const DEBBY=[['rock','tuft','stalag'],['rock','bone','shard'],['rock','ember','shard']];
 function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],420,800);
- camFollow(alive(),PL.length<2,state==='run'?dt:0,RUN.freeze>0?.4:undefined);frameBegin();
+ camFollow(PL,PL.length<2,state==='run'?dt:0,RUN.freeze>0&&PL.length<2?.4:undefined);frameBegin();
  drawRoomMesh(BKEY[B]);
  /* debris, seeded per chamber like the cartridge */
  for(let i=0;i<12;i++){const dx=(i*97+RUN.chamber*31)%(W-30)+15,dz=42+((i*57+RUN.chamber*19)%(H-66)),k=DEBBY[B][i%3];
@@ -1738,7 +1825,7 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
    const t=(time*.4+i*.37)%1;sprite(px+Math.sin(time+i)*3,t*40,pz,2.2,hex('#f8a040'),(1-t)*.8,true)}
   else if(i<5){const t=(time*.12+i*.23)%1;sprite(px,30-t*30,pz,1.4,hex('#c8b8d8'),.35*(1-t),true)}}
  torch(12,36);torch(W-12,36);
- for(const o of RUN.obst){const hh=13+o.s*9;mPush();mT(o.x+o.w/2,0,o.y+o.h/2);mS(o.w,hh,o.h);draw(PROP.block,{c:B===1?[.3,.5,.66]:B===2?[.5,.26,.26]:[.5,.38,.5]});mPop();shadow(o.x+o.w/2,o.y+o.h/2+2,Math.max(o.w,o.h)*.62)}
+ for(const o of RUN.obst){const hh=8+o.s*6;mPush();mT(o.x+o.w/2,0,o.y+o.h/2);mS(o.w,hh,o.h);draw(PROP.block,{c:B===1?[.3,.5,.66]:B===2?[.5,.26,.26]:[.5,.38,.5]});mPop();shadow(o.x+o.w/2,o.y+o.h/2+2,Math.max(o.w,o.h)*.62)}
  for(const z of RUN.zones){mPush();mT(z.x,.4,z.y);mS(z.r);drawT(MESH.disc,{c:hex('#f07830'),a:.42+.12*Math.sin(time*9),unlit:true,glow:true});mPop();sprite(z.x+R(-4,4),5+R(0,5),z.y,8,hex('#f8a040'),.7,true)}
  for(const h of RUN.hazards){const c=hex(h.from==='player'?'#dce2ea':'#ff7a6b');mPush();mT(h.x,.5,h.y);mS(h.r);drawT(MESH.ring,{c,a:.55+.35*Math.sin(time*16),unlit:true});mPop();
   if(h.from==='player'&&!h.instant){const t=clamp(h.t/(h.t0||.45),0,1);mPush();mT(h.x,t*150+7,h.y);mRY(time*5);mS(9,8,9);draw(MESH.sph,{c:[.6,.63,.7]});mPop();shadow(h.x,h.y,4+(1-t)*10)}}
@@ -1784,7 +1871,8 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
   else if(p.kind==='fire'){sprite(p.x,y,p.y,p.small?7:13,c,.95,true);sprite(p.x,y,p.y,p.small?3:6,hex('#f8d030'),1,true)}
   else if(p.kind==='arrow'||p.kind==='thorn'||p.kind==='vine'){mPush();mT(p.x,y,p.y);mRY(yaw);mS(1.3,1.3,10);draw(MESH.cube,{c,unlit:true});mPop()}
   else{sprite(p.x,y,p.y,p.small?5:10,c,.95,true);if(!p.small)sprite(p.x,y,p.y,20,c,.3,true)}}
- for(const p of RUN.eprojs){mPush();mT(p.x,8,p.y);mS(3.2);draw(MESH.sph,{c:[1,.48,.42],unlit:true,add:.15});mPop();sprite(p.x,8,p.y,15,hex('#ff7a6b'),.4,true);shadow(p.x,p.y,2.4)}
+ for(const p of RUN.eprojs){const yw=Math.atan2(p.vx,p.vy),sp=time*14+p.x;mPush();mT(p.x,8,p.y);mRY(yw);mPush();mRZ(sp);mS(4.6,4.6,4.6);draw(MESH.cone,{c:[.16,.04,.08],unlit:true});mRZ(3.14159);draw(MESH.cone,{c:[.16,.04,.08],unlit:true});mPop();mS(2.5);draw(MESH.sph,{c:[1,.16,.1],unlit:true,add:.25});mPop();
+  sprite(p.x-p.vx*.05,8,p.y-p.vy*.05,9,hex('#ff2a1a'),.5,true);sprite(p.x,8,p.y,13,hex('#ff2a1a'),.35,true);shadow(p.x,p.y,3)}
  if(RUN.bolts)for(const b of RUN.bolts){const n=5;let x0=b.x,z0=b.y,y0=b.sky?150:10;const x1=b.sky?b.x:b.x2,z1=b.sky?b.y:b.y2,y1=10;
   for(let i=1;i<=n;i++){const t=i/n,x=lerp(x0,x1,t)+(i<n?R(-5,5):0),y=lerp(b.sky?150:10,y1,t),z=lerp(z0,z1,t)+(i<n?R(-5,5):0);sprite((x+x0)/2,(y+y0)/2,(z+z0)/2,b.sky?7:5,hex('#fff8a0'),1,true,b.sky?34:5);sprite(x,y,z,6,hex('#fff8a0'),1,true);x0=x;z0=z;y0=y}}
  for(const q of RUN.parts)sprite(q.x,(q.z||6),q.y,2.6,hex(q.c),clamp(q.life*3,0,1),true);
@@ -1822,12 +1910,16 @@ function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
   prop(PROP.bigDoor,cx,0,46,0,.8);sprite(cx,34,56,110,hex('#a8f080'),.25+.1*Math.sin(time*3),true);
   const wz=Math.max(70,H-10-tt*22);shadow(cx,wz,6);drawCast('WILL',cx,wz,3.14159,{id:'cD',weapon:'blade'})}
  frameEnd()}
+/* the death / escape screen shows the room you ended in, empty */
+function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],300,700);
+ const a=time*.1;setCam([W/2+Math.sin(a)*60,90,H*.5+150],[W/2,0,H*.5],.75);frameBegin();drawRoomMesh(BKEY[B],[.7,.7,.75]);torch(12,36);torch(W-12,36);
+ for(let i=0;i<10;i++){const k=DEBBY[B][i%3];if(k!=='stalag')prop(PROP[k],(i*97)%(W-30)+15,0,42+((i*57)%(H-66)),i*1.7)}frameEnd()}
 function drawScene(dt){ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
  if(state==='chars')return sceneChars(dt);
  if(RUN&&(state==='run'||state==='pause'||state==='boon'||state==='shop'||state==='set'||state==='echo'))return sceneRun(dt);
- if(state==='over'||state==='win')return sceneTitle(dt);
+ if(state==='over'||state==='win')return sceneOver(dt);
  return sceneHub(dt)}
 /* =====================================================================
    ROOTDEEP 64 — character animation
@@ -2058,6 +2150,9 @@ function ctext(s,y,sz,col,ol,cx){text(s,cx===undefined?VW/2:cx,y,sz,col,ol,'cent
 function rtext(s,x,y,sz,col,ol){text(s,x,y,sz,col,ol,'right')}
 function r(c,x,y,w,h){hx.fillStyle=c;hx.fillRect(x,y,w,h)}
 function wrapPx(s,maxW,sz){const out=[];let l='';for(const w of String(s).split(' ')){const t=l?l+' '+w:w;if(l&&tw(t,sz)>maxW){out.push(l);l=w}else l=t}if(l)out.push(l);return out}
+/* a short message on a dark strip, wrapped to fit any screen */
+function banner(msg,y){const big=tw(msg,2)<=VW-24,sz=big?2:1,L=big?[msg]:wrapPx(msg,VW-28,1).slice(0,3),lh=big?18:12,w=Math.max(...L.map(l=>tw(l,sz)))+20;
+ r('rgba(10,6,16,.82)',VW/2-w/2,y-4,w,L.length*lh+6);L.forEach((l,i)=>ctext(l,y+i*lh,sz,'#a8f080',null))}
 function panel(x,y,w,h,c,edge){r('rgba(6,4,12,.55)',x+2,y+3,w,h);r(edge||'#0c0814',x-1,y-1,w+2,h+2);r(c||'#1d1530',x,y,w,h);r('rgba(255,255,255,.07)',x,y,w,1)}
 function pips(n,mx,x,y,c){for(let i=0;i<mx;i++){r('#0d0a14',x+i*8,y,7,7);r(i<n?c:'#3a3350',x+i*8+1,y+1,5,5)}return x+mx*8}
 /* gold cartridge-label lettering */
@@ -2075,19 +2170,24 @@ function icon(kind,x,y,s,c){hx.save();hx.translate(x,y);hx.fillStyle=c||'#ffd94d
  else if(kind==='fountain'){for(let j=-1;j<=1;j++){hx.moveTo(-s,j*s*.6);hx.quadraticCurveTo(-s*.5,j*s*.6-s*.5,0,j*s*.6);hx.quadraticCurveTo(s*.5,j*s*.6+s*.5,s,j*s*.6)}hx.lineWidth=2.6;hx.strokeStyle=c||'#7fd0e8';hx.stroke();hx.restore();return}
  else{for(let i=0;i<6;i++){const a=i/6*6.2832+.5236;hx.lineTo(Math.cos(a)*s,Math.sin(a)*s)}hx.closePath()}
  hx.stroke();hx.fill();hx.restore()}
+const DOORLBL={dew:'MOONDEW',fruit:'SUNFRUIT',heart:'+25 MAX HP',fountain:'HEAL 35%',honey:'HONEY',shop:'SHOP',petals:'PETALS'};
 const DOORCOL={boon:'#ffd94d',petals:'#f8a0c8',dew:'#7fd0e8',fruit:'#ffb040',heart:'#f85888',shop:'#e8c888',fountain:'#7fd0e8',honey:'#f8b840'};
 /* what a device calls its buttons */
 function btnName(dev,b){const id=dev?dev.id:'gp';
  if(id==='kb1')return{a:'Z',b:'X',sp:'C',sup:'V',dash:'SHIFT',start:'ENTER'}[b];if(id==='kb2')return{a:',',b:'.',sp:'M',sup:'N',dash:'/',start:'BKSP'}[b];
  return{a:'A',b:'B',sp:id==='touch'?'SP':'X',sup:id==='touch'?'SUPER':'Y',dash:id==='touch'?'DASH':'R',start:'START'}[b]}
-const lead0=()=>PL[0]?PL[0].dev:null;
+/* button names follow whoever owns the open menu, else seat 1 */
+const lead0=()=>menuDev||(PL[0]?PL[0].dev:null);
 
 /* ---------------- shared menu furniture ---------------- */
 let PX=0; /* left edge of the 300-wide menu column */
 function screenShell(title,sub){r('rgba(10,6,18,.86)',0,0,VW,VH);PX=(VW-300)/2;panel(PX,8,300,VH-16,'#120c1c','#ffd94d');
  ctext(title,16,3,'#ffd94d','#403010');if(sub)ctext(sub,37,1,'#a89ec2',null)}
 function rowsPlain(items,y,step){items.forEach((s,i)=>text(s,PX+14,y+i*step,1,'#c8c0d8',null))}
-function rowsDraw2(items,sel,desc){const step=items.length>6?19:22,y0=56;
+/* tap targets for touch: rebuilt every frame from what is drawn. Tap a row to pick it, tap it again to choose. */
+let HIT=[];
+function hitbox(x,y,w,h,sel,set){HIT.push({x,y,w,h,sel,set})}
+function rowsDraw2(items,sel,desc){const step=items.length>6?19:22,y0=56;items.forEach((it,i)=>hitbox(PX+8,y0+i*step-4,284,step-2,i===sel,()=>{if(state==='heat')heatSel=i;else uiSel=i}));
  items.forEach((it,i)=>{const yy=y0+i*step,on=i===sel;
   if(on){r('#f8e060',PX+8,yy-4,284,step-2);r('#281c30',PX+9,yy-3,282,step-4)}
   if(it.pip){text(it.a,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);pips(it.pip[0],it.pip[1],PX+14+tw(it.a,1)+8,yy+2,'#ffd94d')}
@@ -2095,7 +2195,7 @@ function rowsDraw2(items,sel,desc){const step=items.length>6?19:22,y0=56;
   if(it.b)rtext(it.b,PX+286,yy,1,on?'#ffd94d':'#8d84a8',null)});
  if(desc)wrapPx(desc,270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null))}
 function footer(s){ctext(s,VH-25,1,'#8d84a8',null)}
-function drawList(items,sel,y,step){items.forEach((s,i)=>{const on=i===sel;if(on){const w=tw(s,2)+26;r('#f8e060',VW/2-w/2,y+i*step-3,w,step-3);r('#281c30',VW/2-w/2+1,y+i*step-2,w-2,step-5)}
+function drawList(items,sel,y,step){items.forEach((s,i)=>{const on=i===sel;hitbox(VW/2-110,y+i*step-3,220,step-3,on,()=>{if(state==='menu')menuSel=i;else{if(pauseSel!==i)pauseConfirm=-1;pauseSel=i}});if(on){const w=tw(s,2)+26;r('#f8e060',VW/2-w/2,y+i*step-3,w,step-3);r('#281c30',VW/2-w/2+1,y+i*step-2,w-2,step-5)}
   ctext(s,y+i*step,2,on?'#ffd94d':'#c8c0d8',on?null:'#120a18')})}
 
 /* ---------------- HUD: the Hearth ---------------- */
@@ -2109,22 +2209,24 @@ function hudHub(){
  if(PL.length>1)for(const p of PL){const q=project(p.x,27,p.y);if(q)ctext('P'+(p.ix+1),q.y-12,1,PCOL[p.ix],'#120a18',q.x)}
  /* top bar */
  r('rgba(10,6,16,.82)',0,0,VW,19);r('#c8a04a',0,19,VW,1);
- text('DEW '+RD.dew,8,4,1,'#7fd0e8',null);text('KEYS '+RD.keys,78,4,1,'#f8d030',null);text('HONEY '+RD.honey,138,4,1,'#f8a0c8',null);
+ text('MOONDEW '+RD.dew,8,4,1,'#7fd0e8',null);text('KEYS '+RD.keys,98,4,1,'#f8d030',null);text('HONEY '+RD.honey,158,4,1,'#f8a0c8',null);
  if(RD.stats.escapes)rtext('ESCAPES '+RD.stats.escapes,VW-8,4,1,'#f8c070',null);
  if(state==='hub'){let shown=0;for(const p of PL){const t=p.hubT;if(!t)continue;const m=btnName(p.dev,'a')+': '+t.n,w=tw(m,2)+16,y=VH-44-shown*20;
    r('rgba(10,6,16,.88)',VW/2-w/2,y-3,w,18);r(PCOL[p.ix],VW/2-w/2,y-3,3,18);ctext(m,y,2,'#ffd94d');shown++}
-  if(PL.length<4)text('MORE KEEPERS: PRESS A ON ANOTHER PAD'+(PL.length===1?' ( , ON KEYS)':''),8,VH-14,1,'rgba(200,192,216,.55)',null);
-  rtext(PL.length+' / 4 KEEPERS',VW-8,VH-14,1,'rgba(200,192,216,.7)',null)}
- if(joinT>0)ctext(joinMsg,32,tw(joinMsg,2)>VW-20?1:2,'#a8f080');
+  /* who's here and how to join or leave, up out of the way of the Root Door */
+  const d0=PL[0]&&PL[0].dev,tch=d0&&d0.id==='touch';
+  const join=PL.length>=4?'':tch?'MORE KEEPERS: PRESS A ON A CONTROLLER':'MORE KEEPERS: A ON ANOTHER PAD, OR , FOR A 2ND KEYBOARD';
+  rtext(PL.length+' / 4 KEEPERS'+(PL.length>1?'  ·  HOLD B TO LEAVE':''),VW-8,24,1,'rgba(200,192,216,.75)',null);if(join)rtext(join,VW-8,36,1,'rgba(200,192,216,.55)',null)}
+ if(joinT>0)banner(joinMsg,VH*.5);
  if(state==='talk'&&talkNPC){const bx=Math.max(8,VW/2-170),bw=Math.min(340,VW-16),by=VH-84;
   panel(bx,by,bw,76,'#f8f0d8','#181020');
   const sp=talkEv?talkWho:talkNPC,nw=tw(sp,2)+14;r('#181020',bx+6,by-9,nw,17);r(RDCPLATE[sp]||'#b8304a',bx+7,by-8,nw-2,15);text(sp,bx+13,by-6,2,'#ffffff',null);
   wrapPx(talkTxt,bw-24,1).slice(0,3).forEach((l,i)=>text(l,bx+12,by+14+i*13,1,'#281c30',null));
   const d=lead0();if(talkEv){const last=talkLine>=talkEv.lines.length-1,rw=talkEv.rew?rewTxt(talkEv.rew):'';
-   text(btnName(d,'a')+(last?': DONE':': MORE')+'  ·  '+btnName(d,'b')+': SKIP'+(last&&rw?'      '+rw:''),bx+12,by+60,1,last&&rw?'#3a7a28':'#7a6a8a',null);
+   text(btnName(d,'a')+(last?': DONE':': MORE  ·  '+btnName(d,'b')+': SKIP')+(last&&rw?'      '+rw:''),bx+12,by+60,1,last&&rw?'#3a7a28':'#7a6a8a',null);
    rtext((talkLine+1)+' / '+talkEv.lines.length,bx+bw-10,by+60,1,'#a89a8a',null);return}
   const more=talkStart+talkLine<LINES[talkNPC].length-1;
-  text((more?btnName(d,'a')+': MORE':btnName(d,'a')+': BYE')+'  ·  '+btnName(d,'b')+': BYE'+(RD.honey>0?'  ·  '+btnName(d,'start')+': GIFT HONEY ('+RD.honey+')':''),bx+12,by+60,1,'#7a6a8a',null)}}
+  text((more?btnName(d,'a')+': MORE  ·  '+btnName(d,'b')+': BYE':btnName(d,'a')+': BYE')+(RD.honey>0?'  ·  '+btnName(d,'start')+': GIFT HONEY ('+RD.honey+')':''),bx+12,by+60,1,'#7a6a8a',null)}}
 
 /* ---------------- HUD: the run ---------------- */
 function hudPlayer(p,x,y,right){const s=rdStats(p),w=104,full=(p.meter||0)>=SUPER_MAX;
@@ -2142,31 +2244,41 @@ function hudPlayer(p,x,y,right){const s=rdStats(p),w=104,full=(p.meter||0)>=SUPE
  if(full)text('SUPER',x+(right?-34:w+4),y+27,1,((time*6)|0)%2?'#ffd94d':'#ffffff','#120a18')}
 function hudRun(){const B=BIOMES[RUN.biome];
  /* world-anchored labels */
- if(RUN.phase==='doors')for(const d of RUN.doors){const q=project(d.x,36,27);if(!q)continue;const lbl=d.kind==='boon'?GODS[d.god].n:d.kind.toUpperCase(),c=d.kind==='boon'?GODS[d.god].l:DOORCOL[d.kind];
-  const qy=Math.max(46,q.y);icon(d.kind,q.x,qy-8,7,c);ctext(lbl,qy+2,1,'#ffffff','#120a18',q.x)}
+ if(RUN.phase==='doors')for(const d of RUN.doors){const q=project(d.x,36,27);if(!q)continue;const lbl=d.kind==='boon'?GODS[d.god].n+' BOON':DOORLBL[d.kind]||d.kind.toUpperCase(),c=d.kind==='boon'?GODS[d.god].l:DOORCOL[d.kind];
+  const qy=Math.max(46,q.y);icon(d.kind,q.x,qy-8,7,c);ctext(lbl,qy+2,1,'#ffffff','#120a18',q.x);
+  if(d.boss)ctext('BOSS AHEAD',qy+13,1,'#ff9a8a','#120a18',q.x);
+  if(d.hold>0){const k=clamp(d.hold/doorHold(),0,1),y2=qy+(d.boss?25:14);r('#120a18',q.x-21,y2,42,5);r(d.by?PCOL[d.by.ix]:'#fff',q.x-20,y2+1,Math.round(40*k),3)}}
  for(const e of RUN.enemies){if(e.kind==='boss'||e.hp>=e.max)continue;const q=project(e.x,(e.kind==='shade'||e.kind==='wisp'?24:17)*(e.elite?1.4:1.1),e.y);if(!q)continue;
   r('#120a18',q.x-11,q.y-2,22,4);r('#e84a5f',q.x-10,q.y-1,Math.round(20*clamp(e.hp/e.max,0,1)),2)}
  for(const p of PL){const q=project(p.x,p.down?12:27,p.y);if(!q)continue;
-  if(p.down)ctext('STAND HERE',q.y-12,1,'#a8f080','#120a18',q.x);else if(PL.length>1)ctext('P'+(p.ix+1),q.y-12,1,PCOL[p.ix],'#120a18',q.x)}
- for(const t of RUN.texts){const q=project(t.x,16+(.8-t.t)*10,t.y);if(q)ctext(t.txt,q.y-6,t.txt.length>6?1:2,t.c,'#120a18',q.x)}
+  if(p.down)ctext('P'+(p.ix+1)+' - STAND HERE',q.y-12,1,PCOL[p.ix],'#120a18',q.x);else if(PL.length>1)ctext('P'+(p.ix+1),q.y-12,1,PCOL[p.ix],'#120a18',q.x)}
+ {const placed=[];for(const t of RUN.texts.slice(-28)){const q=project(t.x,16+(.8-t.t)*10,t.y);if(!q)continue;let y=q.y-6;const sz=t.txt.length>6?1:2,w=tw(t.txt,sz)/2+2;
+  for(let k=0;k<6;k++){const hit=placed.find(o=>Math.abs(o.x-q.x)<o.w+w&&Math.abs(o.y-y)<12);if(!hit)break;y=hit.y-13}placed.push({x:q.x,y,w});ctext(t.txt,y,sz,t.c,'#120a18',q.x)}}
  /* keeper panels in the four corners, like a 4-player cartridge */
  const slots=[[6,6,0],[VW-110,6,1],[6,VH-43,0],[VW-110,VH-43,1]];
- PL.forEach((p,i)=>hudPlayer(p,slots[i][0],slots[i][1],slots[i][2]));
+ PL.forEach(p=>hudPlayer(p,slots[p.ix][0],slots[p.ix][1],slots[p.ix][2]));
  /* the shared purse */
  const solo=PL.length<2,rx=solo?VW-8:VW/2,al=solo?'right':'center';
- const rt='PETALS '+RUN.petals+'   DEW '+RUN.dew+(RUN.keys?'   KEYS '+RUN.keys:'')+(RUN.heat?'   HEAT '+RUN.heat:'');
+ const rt='PETALS '+RUN.petals+'   MOONDEW '+RUN.dew+(RUN.keys?'   KEYS '+RUN.keys:'')+(RUN.heat?'   HEAT '+RUN.heat:'');
  text(rt,rx,7,1,'#f8c8e0','#120a18',al);
  if(RUN.buds.length)text('BUDS '+RUN.buds.length+'/6',rx,19,1,'#a8f080','#120a18',al);
- ctext('CH '+RUN.chamber+'/12  ·  '+B.n,VH-(PL.length>2?13:14),1,'#a89ec2','#120a18');
- if(RUN.chamber===1&&RUN.time<7&&!RUN.banner){const d=lead0();const tch=d&&d.id==='touch';ctext(btnName(d,'a')+' HIT  ·  '+btnName(d,'b')+' CAST  ·  '+(tch?'DASH':(d&&d.id==='kb1'?'SHIFT / DOUBLE-TAP':btnName(d,'dash'))+': DASH'),VH*.2,1,'rgba(255,255,255,.85)','#120a18');
-  ctext('HOLD '+btnName(d,'a')+': HEAVY  ·  '+(tch?'SP: SPECIAL  ·  SUPER WHEN FULL':btnName(d,'sp')+' SPECIAL  ·  '+btnName(d,'sup')+' SUPER WHEN FULL'),VH*.2+12,1,'rgba(255,255,255,.7)','#120a18')}
+ ctext('CH '+RUN.chamber+'/12  ·  '+B.n+(RUN.phase==='fight'?'  ·  FOES '+RUN.enemies.length+(RUN.wave2&&RUN.wave2.length?' + MORE':''):''),VH-(PL.length>2?13:14),1,'#a89ec2','#120a18');
+ if(RUN.phase==='fight'&&RUN.enemies.length&&RUN.enemies.length<=3&&!RUN.wave2)for(const e of RUN.enemies){const q=project(e.x,8,e.y);if(!q)continue;const m=24;if(q.x>m&&q.x<VW-m&&q.y>m+20&&q.y<VH-m-20)continue;
+  const ex=clamp(q.x,m,VW-m),ey=clamp(q.y,m+20,VH-m-20),a=Math.atan2(q.y-VH/2,q.x-VW/2);hx.save();hx.translate(ex,ey);hx.rotate(a);hx.fillStyle='#ff6a5a';hx.strokeStyle='#120a18';hx.lineWidth=2;hx.beginPath();hx.moveTo(9,0);hx.lineTo(-6,-7);hx.lineTo(-6,7);hx.closePath();hx.stroke();hx.fill();hx.restore()}
+ if(RUN.chamber===1&&RUN.time<9&&RD.stats.runs<=3&&!RUN.banner){const d=lead0();const tch=d&&d.id==='touch';
+  const L=[btnName(d,'a')+' HIT','HOLD '+btnName(d,'a')+': HEAVY',btnName(d,'b')+' CAST',(tch?'DASH':(d&&d.id==='kb1'?'SHIFT / DOUBLE-TAP':btnName(d,'dash'))+': DASH'),'HIT DURING A DASH: DASH STRIKE',(tch?'SP':btnName(d,'sp'))+': SPECIAL',(tch?'SUPER':btnName(d,'sup'))+': SUPER WHEN FULL'];
+  /* pack the hints into as many lines as the screen needs */
+  const mw=Math.min(380,VW-20),lines=[];let cur='';for(const x of L){const t=cur?cur+'  ·  '+x:x;if(cur&&tw(t,1)>mw-16){lines.push(cur);cur=x}else cur=t}lines.push(cur);
+  const hy=VH-(PL.length>2?62:46)-lines.length*13;r('rgba(8,5,14,.7)',VW/2-mw/2,hy-4,mw,lines.length*13+7);lines.forEach((l,i)=>ctext(l,hy+i*13,1,'rgba(255,255,255,.88)',null))}
  if(RUN.boss&&RUN.boss.hp>0){const bw=Math.min(200,VW-240),bx=(VW-bw)/2,by=PL.length>1?34:22;r('#ffb0a0',bx-1,by-1,bw+2,10);r('#181020',bx,by,bw,8);r('#c22e4a',bx+1,by+1,Math.round((bw-2)*clamp(RUN.boss.hp/RUN.boss.max,0,1)),6);
   ctext(BOSSES[RUN.boss.bossIx].n,by+11,1,'#ffb0a0','#120a18')}
  if(RUN.zoneT>0)logoText(B.n,VW/2,VH*.28,22);
- if(say2T>0&&!RUN.banner)ctext(say2Txt,VH*.44,2,'#ffd94d');
+ if(say2T>0&&!RUN.banner)ctext(say2Txt,RUN.zoneT>0?VH*.42:VH*.34,tw(say2Txt,2)>VW-16?1:2,'#ffd94d');
+ /* getting hurt: the screen edge flashes in your colour (solo: red) */
+ for(const p of PL)if(p.hurt>0){const a=clamp(p.hurt/.25,0,1)*.55,c=PL.length>1?PCOL[p.ix]:'#e8304a',g=hx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.7);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,c);hx.globalAlpha=a;hx.fillStyle=g;hx.fillRect(0,0,VW,VH);hx.globalAlpha=1}
  if(RUN.echo){const q=project(RUN.echo.x,22,RUN.echo.y);if(q)ctext('AN ECHO',q.y-8,1,'#ffe9a0','#120a18',q.x)}
  /* who is talking down here */
- if(RUN.sub&&!RUN.banner){const s2=RUN.sub,L=wrapPx(s2.txt,Math.min(330,VW-130),1).slice(0,2),bw=Math.max(...L.map(l=>tw(l,1)),tw(s2.who,1))+22,bx=(VW-bw)/2,by=VH-50-L.length*12,al=clamp(s2.t/.3,0,1);
+ if(RUN.sub&&!RUN.banner){const s2=RUN.sub,L=wrapPx(s2.txt,Math.min(330,VW-240),1).slice(0,2),bw=Math.max(...L.map(l=>tw(l,1)),tw(s2.who,1))+22,bx=(VW-bw)/2,by=RUN.boss?(PL.length>1?60:48):34,al=clamp(s2.t/.3,0,1);
   hx.globalAlpha=al;r('rgba(8,5,14,.84)',bx,by,bw,L.length*12+17);r(s2.c,bx,by,3,L.length*12+17);text(s2.who,bx+10,by+3,1,s2.c,null);L.forEach((l,i)=>text(l,bx+10,by+15+i*12,1,'#f4ead2',null));hx.globalAlpha=1}
  if(RUN.flash>0)r('rgba(255,255,255,'+clamp(RUN.flash/.3,0,1)*.85+')',0,0,VW,VH);
  /* super call-out: letterbox, name, whose it is */
@@ -2176,12 +2288,12 @@ function hudRun(){const B=BIOMES[RUN.biome];
 /* ---------------- screens ---------------- */
 function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
  if(state==='set'){screenShell('SETTINGS','SOUND AND FEEL');
-  rowsDraw2([{a:'MUSIC VOL',pip:[M.set.mus,10],b:M.set.mus+' / 10'},{a:'SFX VOL',pip:[M.set.sfx,10],b:M.set.sfx+' / 10'},{a:'SCREEN SHAKE',b:M.set.shake?'ON':'OFF'}],uiSel,['The lantern hum, low under everything.','Every slash, beep and bloom.','The screen kicks when you take a hit.'][uiSel]);
+  rowsDraw2([{a:'MUSIC VOL',pip:[M.set.mus,10],b:M.set.mus+' / 10'},{a:'SFX VOL',pip:[M.set.sfx,10],b:M.set.sfx+' / 10'},{a:'SCREEN SHAKE',b:M.set.shake?'ON':'OFF'},{a:"KEEPER'S GRACE",b:M.set.grace?'ON':'OFF'},{a:'AIM HELP',b:M.set.assist!==false?'ON':'OFF'}],uiSel,['The lantern hum, low under everything.','Every slash, beep and bloom.','The screen kicks when you take a hit.',"An easier descent: you take half damage, and every run starts with one extra revive.",'Attacks and casts lean toward a foe close to where you aim.'][uiSel]);
   footer('< > ADJUST  ·  '+A+': CYCLE    '+Bk+': BACK');return}
  if(state==='sprouts'){drawSprouts();return}
  if(state==='mirror'){screenShell('MIRROR OF DEW','MOONDEW: '+M.dew);
-  rowsDraw2(MIRROR.map(m=>{const rank=mir(m.id);return{a:m.n,pip:[rank,m.max],b:rank>=m.max?'MAX':m.cost[rank]+' DEW'}}),uiSel,MIRROR[uiSel].d+' Bought with Moondew, kept forever.');
-  footer(A+': BUY RANK    '+Bk+': BACK');return}
+  rowsDraw2(MIRROR.map(m=>{const rank=mir(m.id);return{a:m.n,pip:[rank,m.max],b:rank>=m.max?'MAX':m.cost[rank]+' DEW'}}),uiSel,MIRROR[uiSel].d+'. Bought with Moondew, kept forever.');
+  footer(buyAsk===uiSel?A+' AGAIN: BUY FOR '+MIRROR[uiSel].cost[mir(MIRROR[uiSel].id)]+' MOONDEW    '+Bk+': BACK':A+': BUY RANK    '+Bk+': BACK');return}
  if(state==='arm'){screenShell('THE ARMORY','KEYS: '+M.keys);
   rowsDraw2(Object.keys(WEAPONS).map(id=>{const w=WEAPONS[id],own=M.weapons.includes(id);
    return{a:(M.weapon===id?'* ':'')+w.n,b:own?'OWNED':w.cost+' KEYS'}}),uiSel,WEAPONS[Object.keys(WEAPONS)[uiSel]].d+(PL.length>1?' Every keeper carries it.':''));
@@ -2190,61 +2302,64 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
   rowsDraw2(KEEPS.map(k=>{const own=M.keeps[k.id];return{a:(M.keepEq===k.id?'* ':'')+k.n,b:own?'Lv'+keepLv(k.who)+'  ·  '+(M.keepXp[k.who]||0)+'/50':'GIFT '+k.who}}),uiSel,KEEPS[uiSel].d);
   footer(A+': EQUIP / REMOVE    '+Bk+': BACK');return}
  if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 4  ·  '+Bk+': BACK');
-  if(codexPage===0)rowsPlain(['RUNS '+M.stats.runs+'   DEATHS '+M.stats.deaths,'ESCAPES '+M.stats.escapes+'   CHAMBERS '+M.stats.chambers,'FOES FELLED '+M.stats.kills+'   BOSSES '+M.stats.bosses,'HEAT NOW '+heatTotal(),'WEAPON: '+WEAPONS[M.weapon].n,'KEEPSAKE: '+(M.keepEq?((KEEPS.find(k=>k.id===M.keepEq)||{}).n):'NONE')],60,17);
+  if(codexPage===0)rowsPlain(['RUNS '+M.stats.runs+'   DEATHS '+M.stats.deaths,'ESCAPES '+M.stats.escapes+'   CHAMBERS CLEARED '+M.stats.chambers,'FOES FELLED '+M.stats.kills+'   BOSSES '+M.stats.bosses,'HEAT NOW '+heatTotal(),'WEAPON: '+WEAPONS[M.weapon].n,'KEEPSAKE: '+(M.keepEq?((KEEPS.find(k=>k.id===M.keepEq)||{}).n):'NONE')],60,17);
   else if(codexPage===1){const seen=Object.keys(FOES).filter(k=>M.seen[k]);const boss=Object.keys(BOSSES).filter(i=>M.seen[BOSSES[i].id]);
    rowsPlain(['FOES MET '+seen.length+' / '+Object.keys(FOES).length].concat(seen.map(k=>FOES[k].n)).concat(['BOSSES MET '+boss.length+' / 3']).concat(boss.map(i=>BOSSES[i].n)),60,15)}
-  else if(codexPage===2)rowsPlain(['BOONS DISCOVERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
+  else if(codexPage===2)rowsPlain(['DIFFERENT BOONS OFFERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
   else{const found=ECHOES.filter(e=>M.echo[e.id]);text('ECHOES FOUND  '+found.length+' / '+ECHOES.length,PX+14,54,1,'#ffd94d',null);
    if(!found.length)wrapPx('Nothing yet. The keepers before you left notes in the deep. Clear chambers and look for a page that glows.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
-   const top=clamp(echoSel-6,0,Math.max(0,found.length-13));found.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
+   const top=clamp(echoSel-6,0,Math.max(0,found.length-13));found.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
     text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(ECHOTH[e.th],PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
    if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
   return}
  if(state==='board'){const L=openMissions(),done=MISSIONS.filter(m=>M.msn[m.id]).length;screenShell("KEEPER'S BOARD",'ERRANDS DONE  '+done+' / '+MISSIONS.length);
   if(!L.length){ctext('NOTHING PINNED UP. EVERY ERRAND IS DONE.',110,1,'#a8f080',null);footer(Bk+': BACK');return}
   const top=clamp(boardSel-4,0,Math.max(0,L.length-8));
-  L.slice(top,top+8).forEach((m,i)=>{const on=top+i===boardSel,yy=56+i*19,told=M.flags['mt_'+m.id],q=m.p(),fin=q[0]>=q[1];
+  L.slice(top,top+8).forEach((m,i)=>{const on=top+i===boardSel,yy=56+i*19;hitbox(PX+8,yy-4,284,17,false,()=>boardSel=top+i);const told=M.flags['mt_'+m.id],q=m.p(),fin=q[0]>=q[1];
    if(on){r('#f8e060',PX+8,yy-4,284,17);r('#281c30',PX+9,yy-3,282,15)}
    r(RDCPLATE[m.who]||'#444',PX+12,yy-1,4,11);text(told?m.n:'? ? ?',PX+21,yy,1,on?'#ffffff':'#c8c0d8',null);
    rtext(!told?'ASK '+m.who:fin?'TELL '+m.who:q[0]+' / '+q[1],PX+286,yy,1,fin&&told?'#a8f080':on?'#ffd94d':'#8d84a8',null)});
   const m=L[boardSel]||L[0],told=M.flags['mt_'+m.id];
-  wrapPx(told?m.d+'  ('+m.who+')   '+rewTxt(m.rew):m.who+' has something to ask you. Go and talk to them.',270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null));
+  wrapPx(told?m.d+'  ('+m.who+')   '+rewTxt(m.rew):m.who+' has something to ask you. Go and talk to '+(m.who==='LOUIE'?'him':m.who)+'.',270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null));
   footer(Bk+': BACK');return}
  if(state==='echo'&&echoRead){r('rgba(8,5,12,.82)',0,0,VW,VH);const bw=Math.min(330,VW-20),bx=(VW-bw)/2,by=VH*.2;
   panel(bx,by,bw,150,'#efe2bc','#3a2c18');r('rgba(120,90,40,.18)',bx,by,bw,20);
   ctext(ECHOTH[echoRead.th],by+5,1,'#7a5a28',null);ctext(echoRead.n,by+26,2,'#3a2414',null);
   wrapPx(echoRead.x,bw-34,1).slice(0,7).forEach((l,i)=>text(l,bx+17,by+50+i*13,1,'#3a2c24',null));
   rtext((ECHOES.filter(e=>M.echo[e.id]).length)+' / '+ECHOES.length,bx+bw-10,by+134,1,'#9a7a48',null);
-  if(echoT>.5&&((time*2)|0)%2)ctext(A+': KEEP IT',by+160,1,'#ffd94d','#120a18');return}
+  if(echoT>.3)ctext(A+': KEEP IT',by+160,1,((time*2)|0)%2?'#ffd94d':'#fff3b0','#120a18');return}
  if(state==='heat'){screenShell('THE PACT OF ROOTS','TOTAL HEAT: '+heatTotal());
   if(RD.stats.escapes<1){ctext('SEALED. ESCAPE ONCE TO OPEN.',110,2,'#8d84a8');ctext(A+': BACK',140,1,'#8d84a8',null);return}
   rowsDraw2(PACT.map(px=>({a:px.n,pip:[RD.pact[px.id]||0,px.max],b:''})),heatSel,PACT[heatSel].d+' Bosses pay Dew bounties at new heat.');
   footer('< > ADJUST    '+Bk+': BACK');return}
- if(state==='boon'){r('rgba(10,6,18,.84)',0,0,VW,VH);PX=(VW-300)/2;const god=boonOffer[0]?boonOffer[0].god:'EMBER';
+ if(state==='boon'){r('rgba(10,6,18,.84)',0,0,VW,VH);PX=(VW-300)/2;const god=offerGod||'EMBER';
   ctext(GODS[god].n+' SPEAKS',12,3,GODS[god].l,'#181020');wrapPx('"'+(boonQuote||GODS[god].t+' OFFERS:')+'"',Math.min(VW-20,420),1).slice(0,2).forEach((l,i,a)=>ctext(l,(a.length>1?29:33)+i*11,1,'#a89ec2',null));
-  boonOffer.forEach((b,i)=>{const y=52+i*70,on=i===uiSel,gc=GODS[b.god]||GODS.EMBER;
+  boonOffer.forEach((b,i)=>{const y=52+i*70,on=i===uiSel,gc=GODS[b.god]||GODS.EMBER;hitbox(PX,y,300,62,on,()=>uiSel=i);
    panel(PX,y,300,62,on?'#fff3b0':'#2e2450',on?'#f8e060':'#0c0814');r(gc.c,PX,y,5,62);
    text(boonName(b),PX+13,y+6,2,on?'#281c30':'#e8e4f5',null);
    text((b.kind==='core'?b.slot.toUpperCase()+' BOON':b.kind==='duo'?'DUO BOON':'PASSIVE')+'  ·  '+b.rarN+'  ·  Lv'+b.level,PX+13,y+23,1,on?'#5a4a28':'#a89ec2',null);
    wrapPx(boonDesc(b),278,1).slice(0,2).forEach((l,j)=>text(l,PX+13,y+36+j*12,1,on?'#281c30':'#c8c0d8',null))});
-  ctext(A+': ACCEPT'+(PL.length>1?'  ·  THE WHOLE PARTY SHARES IT':''),VH-22,1,'#8d84a8',null);return}
- if(state==='shop'){screenShell('A ROOT-TOOTHS STALL','PETALS: '+RUN.petals);
+  ctext(stateT<.25?' ':A+': ACCEPT'+(PL.length>1?'  ·  THE WHOLE PARTY SHARES IT':''),VH-22,1,'#8d84a8',null);ownerTag();return}
+ if(state==='shop'){screenShell("A ROOT-TOOTH'S STALL",'PETALS: '+RUN.petals);ownerTag();
   rowsDraw2(shopItems.map(it=>({a:it.n,b:it.sold?'SOLD':it.p+'p'})).concat([{a:'LEAVE — ONWARD',b:''}]),uiSel,uiSel<shopItems.length?shopItems[uiSel].d:'Back below. The dark is waiting.');
   footer(A+': BUY    '+Bk+': LEAVE');return}
  if(state==='pause'){r('rgba(8,5,14,.86)',0,0,VW,VH);PX=(VW-300)/2;
   if(pausePage===1){ctext('YOUR BUILD',16,3,'#ffd94d');
    const bs=[RUN.boons.atk,RUN.boons.cast,RUN.boons.dash,...RUN.boons.pass].filter(Boolean);
    rowsPlain(bs.length?bs.map(b=>boonName(b)+'  ·  '+(b.kind==='core'?b.slot.toUpperCase():b.kind==='duo'?'DUO':'PASS')+' Lv'+b.level+' '+b.rarN):['NO BOONS YET. THE GODS WATCH.'],50,15);
-   const s=rdStats(PL[0]);ctext('DMG x'+s.dmgMul.toFixed(2)+'   CRIT '+Math.round(s.crit*100)+'%   ARMOR '+Math.round(s.armor*100)+'%',VH-44,1,'#a8f080',null);
+   const s=rdStats(PL.find(q=>q.dev===menuDev)||PL[0]);ctext('ATTACK x'+(s.dmgMul*s.atkMul).toFixed(2)+'   CAST x'+(s.dmgMul*s.castMul).toFixed(2)+'   CRIT '+Math.round(s.crit*100)+'%   ARMOR '+Math.round(s.armor*100)+'%',VH-44,1,'#a8f080',null);
    ctext(Bk+': BACK',VH-26,1,'#8d84a8',null);return}
-  ctext('PAUSED',22,4,'#ffd94d');ctext('CHAMBER '+RUN.chamber+'  ·  '+BIOMES[RUN.biome].n,54,1,'#a89ec2',null);
-  drawList(['RESUME','BUILD','SETTINGS','ABANDON RUN','QUIT TO TITLE'],pauseSel,84,24);
-  ctext('PETALS '+RUN.petals+'  ·  DEW '+RUN.dew+'  ·  KEYS '+RUN.keys,VH-58,1,'#c8c0d8',null);
-  ctext('PAD: A HIT (HOLD: HEAVY) · B CAST · X SPECIAL · Y SUPER · R DASH',VH-34,1,'#6a6284',null);
-  ctext('KEYS: Z · X · C · V · SHIFT        ATTACK OUT OF A DASH: DASH STRIKE',VH-22,1,'#6a6284',null);return}}
+  const pp=PL.find(q=>q.dev===menuDev);ctext(PL.length>1&&pp?'P'+(pp.ix+1)+' PAUSED':'PAUSED',22,4,pp&&PL.length>1?PCOL[pp.ix]:'#ffd94d');ctext('CHAMBER '+RUN.chamber+'  ·  '+BIOMES[RUN.biome].n,54,1,'#a89ec2',null);
+  const L=pauseItems();drawList(L.map((s,i)=>i===pauseConfirm?'SURE? '+A+' AGAIN':s),pauseSel,80,22);
+  ctext('PETALS '+RUN.petals+'  ·  MOONDEW '+RUN.dew+'  ·  KEYS THIS RUN '+RUN.keys,VH-58,1,'#c8c0d8',null);
+  const dv=lead0(),tch=dv&&dv.id==='touch';
+  ctext(tch?'A HIT (HOLD: HEAVY) · B CAST · SP SPECIAL · SUPER · DASH':dv&&dv.id.slice(0,2)==='kb'?'KEYS: '+btnName(dv,'a')+' HIT (HOLD: HEAVY) · '+btnName(dv,'b')+' CAST · '+btnName(dv,'sp')+' SPECIAL · '+btnName(dv,'sup')+' SUPER · '+btnName(dv,'dash')+' DASH':'PAD: A HIT (HOLD: HEAVY) · B CAST · X SPECIAL · Y SUPER · R DASH',VH-34,1,'#6a6284',null);
+  ctext('ATTACK OUT OF A DASH: DASH STRIKE',VH-22,1,'#6a6284',null);return}}
+/* in co-op, say whose menu this is */
+function ownerTag(){if(PL.length<2||!menuDev)return;const p=PL.find(q=>q.dev===menuDev);if(!p)return;const t='P'+(p.ix+1)+' IS CHOOSING';const w=tw(t,1)+16;r(PCOL[p.ix],VW-w-8,8,w,16);text(t,VW-w,11,1,'#120a18',null)}
 function drawSprouts(){const M=RD,A=btnName(lead0(),'a'),Bk=btnName(lead0(),'b');
  if(sprPage===0){screenShell('SPROUT LEDGER','< > EXCHANGE  ·  BANK: '+bankTotal());
-  for(let ty=0;ty<6;ty++){const yy=56+ty*22,on=ty===uiSel,T=TYPES[ty];
+  for(let ty=0;ty<6;ty++){const yy=56+ty*22,on=ty===uiSel,T=TYPES[ty];hitbox(PX+8,yy-4,284,20,on,()=>uiSel=ty);
    if(on){r('#f8e060',PX+8,yy-4,284,20);r('#281c30',PX+9,yy-3,282,18)}
    r(T.d,PX+14,yy-1,12,12);r(T.c,PX+15,yy,10,10);r(T.l,PX+16,yy+1,4,2);r('#181020',PX+17,yy+5,2,3);r('#181020',PX+22,yy+5,2,3);
    text(T.n+'  x'+(M.bank[ty]||0),PX+34,yy,1,on?'#ffffff':'#c8c0d8',null);
@@ -2260,30 +2375,28 @@ function drawSprouts(){const M=RD,A=btnName(lead0(),'a'),Bk=btnName(lead0(),'b')
 /* CHOOSE YOUR KEEPER: the models stand in the Hearth; this is their lettering */
 const CSLOT=i=>({x:W/2+(i-(PL.length-1)/2)*(PL.length>3?52:PL.length>2?62:78),y:H-52});
 function sceneChars(dt){setLight([.3,.9,.6],[.85,.72,.6],[.52,.44,.48]);setFog('#120a12',430,820);
- const span=PL.length>2?1:.74;setCam([W/2,34,H+46+PL.length*14],[W/2,15,H-56],.62*span+.1);frameBegin();drawRoomMesh('hub');
+ const span=PL.length>2?1:.74;setCam([W/2,36,H+(PL.length<2?86:46+PL.length*14)],[W/2,15,H-56],.62*span+.1);frameBegin();drawRoomMesh('hub');
  for(const s of STATIONS)prop(PROP[s.id],s.x,0,29,0,1.15);lantern(W/2,50,H*.42,1.5);torch(12,40);torch(W-12,40);
  PL.forEach((p,i)=>{const c=CHARS[p.csel],un=charUnlocked(c.id),q=CSLOT(i);shadow(q.x,q.y,7);
-  mPush();mT(q.x,.5,q.y);mS(11);drawT(MESH.ring,{c:hex(PCOL[i]),a:p.ready?1:.55,unlit:true,glow:p.ready});mPop();
+  mPush();mT(q.x,.5,q.y);mS(11);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.ready?1:.55,unlit:true,glow:p.ready});mPop();
   drawCast(c.id,q.x,q.y,p.ready?0:Math.sin(time*1.1+i)*.45,{id:'cs'+i,nosit:p.ready,scale:1.5,c:un?null:[.16,.14,.22],weapon:un&&c.id!=='LOUIE'?RD.weapon:null,cheer:p.ready?((time*.85+i*.3)%1)*.84:-1,npc:un?null:'MARCUS'})});
  frameEnd()}
 function hudChars(){const n=PL.length,d0=lead0();r('rgba(10,6,16,.82)',0,0,VW,26);ctext('CHOOSE YOUR KEEPER',5,3,'#ffd94d','#403010');
  const colW=Math.min(150,(VW-12)/Math.max(n,1));
  PL.forEach((p,i)=>{const c=CHARS[p.csel],un=charUnlocked(c.id),q=CSLOT(i),top=project(q.x,40,q.y),ft=project(q.x,-3,q.y);if(!top||!ft)return;const x=top.x;
-  ctext('P'+(i+1)+'  ·  '+p.dev.label,top.y-16,1,PCOL[i],'#120a18',x);
+  ctext('P'+(p.ix+1)+'  ·  '+(p.dev.id.slice(0,2)==='gp'?'PAD':p.dev.label),top.y-16,1,PCOL[p.ix],'#120a18',x);
   ctext('< '+c.id+' >',top.y-4,3,un?'#ffffff':'#8d84a8','#120a18',x);
-  let y=ft.y+2;const say=(s,col)=>{wrapPx(s,colW-8,1).slice(0,3).forEach(l=>{ctext(l,y,1,col,'#120a18',x);y+=11})};
-  if(un){say(c.tag,'#ffd94d');say(SIG[c.id].n,'#7fd0e8');if(n<3)say(c.stats,'#c8c0d8')}else{say('LOCKED','#ff9a8a');say(charLockTxt(c.id),'#c8c0d8')}
+  const cw=n===1?Math.min(360,VW-24):colW-8,stop=VH-34;let y=Math.min(ft.y+2,VH-104);const say=(s,col)=>{for(const l of wrapPx(s,cw,1).slice(0,3)){if(y>stop-24)return;ctext(l,y,1,col,'#120a18',x);y+=11}};
+  if(un){say(c.tag+'  ·  '+SIG[c.id].n,'#ffd94d');if(n<3)say(c.stats,'#c8c0d8');if(n===1)say(c.d+' '+SIG[c.id].d,'#c8c0d8')}else{say('LOCKED','#ff9a8a');say(charLockTxt(c.id),'#c8c0d8')}
   if(p.ready)ctext('READY!',y+2,2,'#a8f080','#120a18',x);else ctext(un?btnName(p.dev,'a')+': READY':'',y+2,1,'#ffd94d','#120a18',x)});
- if(n===1){const c=CHARS[PL[0].csel],un=charUnlocked(c.id);const bw=Math.min(340,VW-16);
-  wrapPx(c.d+' '+(un?SIG[c.id].d:'Unlock to descend as '+c.id+'.'),bw,1).slice(0,2).forEach((l,j)=>ctext(l,VH-40+j*12,1,'#c8c0d8','#120a18'))}
- ctext((n<4?'MORE KEEPERS: PRESS A ON ANOTHER PAD   ·   ':'')+btnName(d0,'b')+': BACK',VH-13,1,'#8d84a8','#120a18');
+ ctext((n<4?(d0&&d0.id==='touch'?'MORE KEEPERS: A ON A CONTROLLER   ·   ':'MORE KEEPERS: PRESS A ON ANOTHER PAD   ·   '):'')+btnName(d0,'b')+': BACK',VH-13,1,'#8d84a8','#120a18');
  if(n>1&&PL.every(p=>p.ready))ctext('DESCENDING TOGETHER...',VH*.36,2,'#a8f080');
- if(joinT>0)ctext(joinMsg,30,2,'#a8f080')}
+ if(joinT>0)banner(joinMsg,VH-44)}
 
 /* ---------------- title / intro / death / escape ---------------- */
 function hudTitle(){const g=hx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'rgba(6,4,12,.55)');g.addColorStop(.5,'rgba(6,4,12,0)');g.addColorStop(1,'rgba(6,4,12,.75)');hx.fillStyle=g;hx.fillRect(0,0,VW,VH);
- logoText('ROOTDEEP',VW/2-22,VH*.12,50);
- hx.save();hx.translate(VW/2+146,VH*.12+30);hx.rotate(-.16);logoText('64',0,-22,44);hx.restore();
+ const lk=Math.min(1,VW/400);logoText('ROOTDEEP',VW/2-22*lk,VH*.12,50*lk);
+ hx.save();hx.translate(VW/2+146*lk,VH*.12+30*lk);hx.rotate(-.16);logoText('64',0,-22*lk,44*lk);hx.restore();
  ctext('A  SPROUTS  ROGUELITE  ·  1-4  KEEPERS',VH*.12+62,1,'#c8b8e8','#120a18');
  if(state==='menu'){panel(VW/2-84,VH-128,168,92,'rgba(8,5,14,.82)','#ffd94d');drawList(['TO THE HEARTH','INTRO','SETTINGS'],menuSel,VH-116,26);return}
  if(state!=='title')return;
@@ -2300,14 +2413,16 @@ function hudCine(){const sc=RDCINE[rdCineIx];r('#000000',0,0,VW,20);r('#000000',
 function hudOver(win){r(win?'rgba(16,24,12,.84)':'rgba(24,8,14,.84)',0,0,VW,VH);const L=RD.lastRun||{chamber:0,kills:0,dew:0,petals:0,heat:0};
  ctext(win?'YOU ESCAPED THE DEEP':'THE DEEP KEEPS YOU',34,4,win?'#ffd94d':'#ff9a8a','#181020');
  ctext(win?escapeLine():deathLine(),66,1,'#c8c0d8',null);
- ctext('CHAMBERS REACHED  '+(win?12:L.chamber),100,2,'#ffffff');
+ ctext('REACHED CHAMBER  '+(win?12:L.chamber),100,2,'#ffffff');
  ctext('FOES FELLED  '+L.kills,122,2,'#ffffff');
- ctext('MOONDEW BANKED  +'+L.dew,144,2,'#7fd0e8');
+ ctext('MOONDEW BANKED  +'+L.dew+(L.bonus?'  (+'+L.bonus+' FOR CHAMBERS CLEARED)':''),144,L.bonus?1:2,'#7fd0e8');
+ /* co-op: who did what */
+ if(L.co&&L.co.length>1)L.co.forEach((c,i)=>ctext('P'+(c.ix+1)+' '+c.char+'   FELLED '+c.kills+'   WENT DOWN '+c.downs,194+i*12,1,PCOL[c.ix]||'#fff','#120a18'));
  if(L.heat)ctext('HEAT '+L.heat,166,1,'#f8a060',null);
  if(L.spr)ctext('SPROUTS BANKED  +'+L.spr,180,1,'#a8f080',null);
  ctext('SPEND IT AT THE MIRROR. GO AGAIN.',VH-52,1,'#a8f080',null);
- if(overT>.8&&((time*2)|0)%2)ctext(btnName(lead0(),'a')+': THE HEARTH',VH-34,2,'#ffffff')}
-function drawHud(){hx.setTransform(hudS,0,0,hudS,0,0);hx.clearRect(0,0,VW,VH);
+ if(overT>1.3)ctext(btnName(lead0(),'a')+': THE HEARTH',VH-34,2,((time*2)|0)%2?'#ffffff':'#ffd94d')}
+function drawHud(){HIT=[];hx.setTransform(hudS,0,0,hudS,0,0);hx.clearRect(0,0,VW,VH);
  switch(state){
  case 'title':case 'menu':hudTitle();return;
  case 'cine':hudCine();return;
@@ -2356,7 +2471,7 @@ const RDF={
   run:RUN?{chamber:RUN.chamber,petals:RUN.petals,dew:RUN.dew,enemies:RUN.enemies.length,phase:RUN.phase,buds:RUN.buds.map(b=>b.type),doors:RUN.doors.map(d=>d.kind+(d.kind==='boon'?':'+d.god:'')),
    boons:[RUN.boons.atk,RUN.boons.cast,RUN.boons.dash,...RUN.boons.pass].filter(Boolean).map(boonName)}:null,
   meta:{dew:RD.dew,keys:RD.keys,honey:RD.honey,escapes:RD.stats.escapes,deaths:RD.stats.deaths,weapon:RD.weapon,keeps:Object.keys(RD.keeps),heat:heatTotal(),bank:RD.bank}})};
-window.__rd={RDF,RD:()=>RD,RUN:()=>RUN,PL,DEV,KEYS,step:(dt,n)=>{for(let i=0;i<(n||1);i++){pollInput(dt);gameUpdate(dt)}},set:(k,v)=>{if(k==='state')state=v}};
+if(navigator.webdriver)window.__rd={RDF,RD:()=>RD,RUN:()=>RUN,PL,DEV,KEYS,step:(dt,n)=>{for(let i=0;i<(n||1);i++){pollInput(dt);gameUpdate(dt)}},set:(k,v)=>{if(k==='state')state=v}};
 boot();
 </script>
 </body>

@@ -231,12 +231,12 @@ function buildProps(){let b;
 /* ---------- camera ---------- */
 const CAM={x:W/2,z:H/2,d:1,init:false};
 function camFollow(pts,solo,dt,fill){ /* frame the room; lean toward the keepers */
- if(RUN&&RUN.freeze>0&&RUN.freezeP){pts=[RUN.freezeP];fill=.4;dt=Math.max(dt,.03)*2.4}
+ if(RUN&&RUN.freeze>0&&RUN.freezeP&&PL.length<2){pts=[RUN.freezeP];fill=.4;dt=Math.max(dt,.03)*2.4}
  let cx=W/2,cz=H*.5,sp=0;if(pts.length){cx=0;cz=0;for(const p of pts){cx+=p.x;cz+=p.y}cx/=pts.length;cz/=pts.length;for(const p of pts)sp=Math.max(sp,Math.abs(p.x-cx)/(W*.5),Math.abs(p.y-cz)/(H*.5))}
- const f=fill!==undefined?fill:clamp((solo?.56:.66)+sp*.5,.56,.98);
+ const f=fill!==undefined?fill:clamp((solo?.7:.74)+sp*.5,.7,1.04);
  const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.46,cz,clamp(1.06-f,0,.6)*1.5);
  const k=CAM.init?clamp(dt*3.2,0,1):1;CAM.x=lerp(CAM.x,tx,k);CAM.z=lerp(CAM.z,tz,k);CAM.d=lerp(CAM.d,f,k);CAM.init=true;
- const fov=.72,pitch=.8,halfW=(W*.5+16)*CAM.d,halfH=(H*.5+26)*CAM.d;
+ const fov=.72,pitch=.8,cm=PL.length>2?1.12:1.04,halfW=(W*.5+16)*CAM.d*cm,halfH=(H*.5+26)*CAM.d*cm;
  /* distance that fits the framed width and depth at this aspect */
  const dW=halfW/(Math.tan(fov/2)*RN.asp),dH=halfH*Math.sin(pitch)/Math.tan(fov/2)*1.16;const D=Math.max(dW,dH)+30;
  let sx=0,sy=0;if(RUN&&RD.set.shake&&RUN.shake>.05){sx=R(-RUN.shake,RUN.shake)*.6;sy=R(-RUN.shake,RUN.shake)*.6}
@@ -260,10 +260,13 @@ function keeperOpts(p,run){const isL=p.char==='LOUIE';
 function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay);
  shadow(p.x,p.y,p.char==='LOUIE'?7:6.2);
  /* player ring, in their colour: the 4-player couch needs to know who is who */
- if(PL.length>1||run){mPush();mT(p.x,.5,p.y);mS(8.6);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.down?.35:.85,unlit:true});mPop()}
+ {mPush();mT(p.x,.5,p.y);mS(8.6);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.down?.35:.85,unlit:true});mPop()}
  if(run)for(const tr of p.trail){const a=tr.t/.22;drawCastGhost(p,tr,a)}
- const ko=keeperOpts(p,run);if(run&&p.inv>0&&p.dashT<=0&&!p.down&&!(p.land>0)&&((time*14)|0)%2)ko.hide=true;
+ const ko=keeperOpts(p,run);if(run&&p.inv>0&&p.dashT<=0&&!p.down&&!(p.land>0)&&!(p.hurt>0))ko.add=Math.max(ko.add||0,.18+.14*Math.sin(time*26));
  const S=drawCast(p.char,p.x,p.y,yaw,ko);
+ /* seen through walls, crates, foes and effects: a ghost in the player's colour. It is a little wider than the
+    keeper, so it only shows where something else stands in front of them, never over their own body. */
+ mPush();mT(p.x,p.down?.5:0,p.y);mS(p.char==='LOUIE'?11:9.6,p.down?8:22,p.char==='LOUIE'?11:9.6);drawT(MESH.cyl,{c:hex(PCOL[p.ix]),a:.5,unlit:true,behind:true});mPop();
  /* a puff of dust each time a foot comes down at a run */
  if(run&&state==='run'&&S.sp>60&&!p.down){const st=Math.floor(S.ph/3.14159);if(st!==S.step){S.step=st;RUN.parts.push({x:p.x-(p.ax||0)*3,y:p.y-(p.ay||0)*3,vx:R(-7,7),vy:R(-7,7),z:1.5,vz:9,life:.28,c:'#6a5c6c',ng:1})}}
  if(run&&p.down){mPush();mT(p.x,.6,p.y);mS(20*clamp(p.revT/2.2,0.02,1));drawT(MESH.disc,{c:hex('#a8f080'),a:.3,unlit:true});mPop();
@@ -309,7 +312,7 @@ const BKEY=['burrows','vault','core'];
 const BLIGHT=[[[.3,.9,.45],[.74,.6,.56],[.46,.4,.46],'#0e080e'],[[.25,.9,.4],[.5,.68,.86],[.34,.44,.56],'#060c14'],[[.3,.85,.45],[.95,.58,.4],[.5,.36,.34],'#120606']];
 const DEBBY=[['rock','tuft','stalag'],['rock','bone','shard'],['rock','ember','shard']];
 function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],420,800);
- camFollow(alive(),PL.length<2,state==='run'?dt:0,RUN.freeze>0?.4:undefined);frameBegin();
+ camFollow(PL,PL.length<2,state==='run'?dt:0,RUN.freeze>0&&PL.length<2?.4:undefined);frameBegin();
  drawRoomMesh(BKEY[B]);
  /* debris, seeded per chamber like the cartridge */
  for(let i=0;i<12;i++){const dx=(i*97+RUN.chamber*31)%(W-30)+15,dz=42+((i*57+RUN.chamber*19)%(H-66)),k=DEBBY[B][i%3];
@@ -322,7 +325,7 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
    const t=(time*.4+i*.37)%1;sprite(px+Math.sin(time+i)*3,t*40,pz,2.2,hex('#f8a040'),(1-t)*.8,true)}
   else if(i<5){const t=(time*.12+i*.23)%1;sprite(px,30-t*30,pz,1.4,hex('#c8b8d8'),.35*(1-t),true)}}
  torch(12,36);torch(W-12,36);
- for(const o of RUN.obst){const hh=13+o.s*9;mPush();mT(o.x+o.w/2,0,o.y+o.h/2);mS(o.w,hh,o.h);draw(PROP.block,{c:B===1?[.3,.5,.66]:B===2?[.5,.26,.26]:[.5,.38,.5]});mPop();shadow(o.x+o.w/2,o.y+o.h/2+2,Math.max(o.w,o.h)*.62)}
+ for(const o of RUN.obst){const hh=8+o.s*6;mPush();mT(o.x+o.w/2,0,o.y+o.h/2);mS(o.w,hh,o.h);draw(PROP.block,{c:B===1?[.3,.5,.66]:B===2?[.5,.26,.26]:[.5,.38,.5]});mPop();shadow(o.x+o.w/2,o.y+o.h/2+2,Math.max(o.w,o.h)*.62)}
  for(const z of RUN.zones){mPush();mT(z.x,.4,z.y);mS(z.r);drawT(MESH.disc,{c:hex('#f07830'),a:.42+.12*Math.sin(time*9),unlit:true,glow:true});mPop();sprite(z.x+R(-4,4),5+R(0,5),z.y,8,hex('#f8a040'),.7,true)}
  for(const h of RUN.hazards){const c=hex(h.from==='player'?'#dce2ea':'#ff7a6b');mPush();mT(h.x,.5,h.y);mS(h.r);drawT(MESH.ring,{c,a:.55+.35*Math.sin(time*16),unlit:true});mPop();
   if(h.from==='player'&&!h.instant){const t=clamp(h.t/(h.t0||.45),0,1);mPush();mT(h.x,t*150+7,h.y);mRY(time*5);mS(9,8,9);draw(MESH.sph,{c:[.6,.63,.7]});mPop();shadow(h.x,h.y,4+(1-t)*10)}}
@@ -368,7 +371,8 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
   else if(p.kind==='fire'){sprite(p.x,y,p.y,p.small?7:13,c,.95,true);sprite(p.x,y,p.y,p.small?3:6,hex('#f8d030'),1,true)}
   else if(p.kind==='arrow'||p.kind==='thorn'||p.kind==='vine'){mPush();mT(p.x,y,p.y);mRY(yaw);mS(1.3,1.3,10);draw(MESH.cube,{c,unlit:true});mPop()}
   else{sprite(p.x,y,p.y,p.small?5:10,c,.95,true);if(!p.small)sprite(p.x,y,p.y,20,c,.3,true)}}
- for(const p of RUN.eprojs){mPush();mT(p.x,8,p.y);mS(3.2);draw(MESH.sph,{c:[1,.48,.42],unlit:true,add:.15});mPop();sprite(p.x,8,p.y,15,hex('#ff7a6b'),.4,true);shadow(p.x,p.y,2.4)}
+ for(const p of RUN.eprojs){const yw=Math.atan2(p.vx,p.vy),sp=time*14+p.x;mPush();mT(p.x,8,p.y);mRY(yw);mPush();mRZ(sp);mS(4.6,4.6,4.6);draw(MESH.cone,{c:[.16,.04,.08],unlit:true});mRZ(3.14159);draw(MESH.cone,{c:[.16,.04,.08],unlit:true});mPop();mS(2.5);draw(MESH.sph,{c:[1,.16,.1],unlit:true,add:.25});mPop();
+  sprite(p.x-p.vx*.05,8,p.y-p.vy*.05,9,hex('#ff2a1a'),.5,true);sprite(p.x,8,p.y,13,hex('#ff2a1a'),.35,true);shadow(p.x,p.y,3)}
  if(RUN.bolts)for(const b of RUN.bolts){const n=5;let x0=b.x,z0=b.y,y0=b.sky?150:10;const x1=b.sky?b.x:b.x2,z1=b.sky?b.y:b.y2,y1=10;
   for(let i=1;i<=n;i++){const t=i/n,x=lerp(x0,x1,t)+(i<n?R(-5,5):0),y=lerp(b.sky?150:10,y1,t),z=lerp(z0,z1,t)+(i<n?R(-5,5):0);sprite((x+x0)/2,(y+y0)/2,(z+z0)/2,b.sky?7:5,hex('#fff8a0'),1,true,b.sky?34:5);sprite(x,y,z,6,hex('#fff8a0'),1,true);x0=x;z0=z;y0=y}}
  for(const q of RUN.parts)sprite(q.x,(q.z||6),q.y,2.6,hex(q.c),clamp(q.life*3,0,1),true);
@@ -406,10 +410,14 @@ function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
   prop(PROP.bigDoor,cx,0,46,0,.8);sprite(cx,34,56,110,hex('#a8f080'),.25+.1*Math.sin(time*3),true);
   const wz=Math.max(70,H-10-tt*22);shadow(cx,wz,6);drawCast('WILL',cx,wz,3.14159,{id:'cD',weapon:'blade'})}
  frameEnd()}
+/* the death / escape screen shows the room you ended in, empty */
+function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],300,700);
+ const a=time*.1;setCam([W/2+Math.sin(a)*60,90,H*.5+150],[W/2,0,H*.5],.75);frameBegin();drawRoomMesh(BKEY[B],[.7,.7,.75]);torch(12,36);torch(W-12,36);
+ for(let i=0;i<10;i++){const k=DEBBY[B][i%3];if(k!=='stalag')prop(PROP[k],(i*97)%(W-30)+15,0,42+((i*57)%(H-66)),i*1.7)}frameEnd()}
 function drawScene(dt){ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
  if(state==='chars')return sceneChars(dt);
  if(RUN&&(state==='run'||state==='pause'||state==='boon'||state==='shop'||state==='set'||state==='echo'))return sceneRun(dt);
- if(state==='over'||state==='win')return sceneTitle(dt);
+ if(state==='over'||state==='win')return sceneOver(dt);
  return sceneHub(dt)}

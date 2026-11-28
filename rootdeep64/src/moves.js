@@ -19,7 +19,7 @@
    ===================================================================== */
 'use strict';
 const MOVES={
- WILL:  {sp:'SELFIE FLASH',  sup:'BIKE LANE',          heavy:'SNEAKER KICK',dive:'STAGE DIVE',     spCd:7},
+ WILL:  {sp:'SELFIE FLASH',  sup:'BIKE LANE',          heavy:'SNEAKER KICK',dive:'STAGE DIVE',     spCd:9},
  ERIN:  {sp:'LEASH LASSO',   sup:'SPROUT STAMPEDE',    heavy:'GARDEN KICK', dive:'FLYING FLOP',    spCd:5},
  LOUIE: {sp:'ZOOM ZOOM ZOOM',sup:'JUDGEMENT',          heavy:'CHOMP',       dive:'ZOOM POUNCE',    spCd:6},
  MARCUS:{sp:'DAB CLOUD',     sup:'BRO, I GOT AN IDEA', heavy:'PIPE WRENCH', dive:'CANNONBALL, BRO',spCd:7}};
@@ -41,12 +41,13 @@ function doSpecial(p){if(p.spCd>0||p.down||p.dive>0||p.zoom)return;const M=mv(p)
   RUN.acts.push({k:'cloud',x:p.x+ax*14,y:p.y+ay*14,vx:ax*40,vy:ay*40,life:3.2,tick:0,o:p,mul,s:Math.random()*9});noise(.5,.2,900,'lowpass');return}
  /* SELFIE FLASH: the phone goes up, the whole room goes white */
  p.selfie=.22;RUN.flash=.3;snd(1400,.06,2000,'square',.05);later(()=>noise(.08,.3,6000),40);
- for(const e of RUN.enemies.slice()){const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<82&&!(e.born>0)){e.root=Math.max(e.root,e.kind==='boss'?.7:1.9);e.dazed=e.kind==='boss'?.7:1.9;hitEnemy(e,8*mul,'special',0,0,p)}}
- RUN.eprojs=RUN.eprojs.filter(q=>Math.hypot(q.x-p.x,q.y-p.y)>82);
- RUN.rings.push({x:p.x,y:p.y,r:82,t:.3,c:'#ffffff'})}
+ for(const e of RUN.enemies.slice()){const d=Math.hypot(e.x-p.x,e.y-p.y);if(d<66&&!(e.born>0)){e.root=Math.max(e.root,e.kind==='boss'?.5:1.1);e.dazed=e.kind==='boss'?.5:1.1;hitEnemy(e,8*mul,'special',0,0,p)}}
+ RUN.eprojs=RUN.eprojs.filter(q=>Math.hypot(q.x-p.x,q.y-p.y)>66);
+ RUN.rings.push({x:p.x,y:p.y,r:66,t:.3,c:'#ffffff'})}
 
 /* ---------------- supers ---------------- */
-function doSuper(p){if((p.meter||0)<SUPER_MAX||p.down||RUN.freeze>0)return;const M=mv(p);
+function doSuper(p){if(p.down)return;if((p.meter||0)<SUPER_MAX){if(!(p.noSupT>time)){p.noSupT=time+1;ftext(p.x,p.y-30,'SUPER '+Math.floor(p.meter||0)+'%','#c88a18');snd(140,.06)}return}
+ if(RUN.freeze>0||p.dive>0||p.zoom){p.supQ=true;return}p.supQ=false;const M=mv(p);
  RD.stats.supers=(RD.stats.supers||0)+1;RD.flags['sup_'+p.char]=1;p.meter=0;p.supA=1.05;p.inv=Math.max(p.inv,1.4);p.dive=0;p.zoom=null;p.charging=false;
  RUN.freeze=.6;RUN.freezeP=p;RUN.banner={txt:M.sup,who:(PL.length>1?'P'+(p.ix+1)+'  ':'')+p.char,c:PCOL[p.ix],t:1.3};
  snd(220,.5,880,'sawtooth',.07);snd(330,.5,1320,'square',.04);RUN.shake=3}
@@ -68,8 +69,8 @@ function superFire(p){const[ax,ay]=aimVec(p),mul=moveMul(p);
 
 /* ---------------- heavy & dash strike ---------------- */
 function doHeavy(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=aimVec(p),isLou=p.char==='LOUIE';
- const base=Math.max(...w.dmg)*2.4*s.dmgMul*s.atkMul*(isLou?.85:1);
- RD.stats.heavies=(RD.stats.heavies||0)+1;p.atkCd=w.rate*1.25;p.heavyA=.42;p.swing=0;ftext(p.x,p.y-26,mv(p).heavy+'!','#ffd94d');noise(.07,.22,1500);snd(160,.14,70,'sawtooth',.07);
+ const base=Math.max(...w.dmg)*1.8*s.dmgMul*s.atkMul*(isLou?.85:1);
+ RD.stats.heavies=(RD.stats.heavies||0)+1;p.atkCd=w.rate*1.9;p.heavyA=.42;p.swing=0;ftext(p.x,p.y-26,mv(p).heavy+'!','#ffd94d');noise(.07,.22,1500);snd(160,.14,70,'sawtooth',.07);
  let hit=false;for(const e of RUN.enemies.slice()){const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);
   if(d<32+e.r){const dot=(dx/(d||1))*ax+(dy/(d||1))*ay;if(dot>.45||d<13){e.root=Math.max(e.root,.45);hitEnemy(e,base,'heavy',(dx/(d||1))*15,(dy/(d||1))*15,p);hit=true}}}
  if(hit){RUN.shake=Math.max(RUN.shake,2.5);burst(p.x+ax*18,p.y+ay*18,'#fff3b0',10,46)}}
@@ -95,7 +96,7 @@ function movesInput(p,dt,dv){
    for(const e of RUN.enemies.slice()){const t=clamp((e.x-p.x)*ax+(e.y-p.y)*ay,0,len);if(Math.hypot(e.x-(p.x+ax*t),e.y-(p.y+ay*t))<e.r+10)hitEnemy(e,11*z.mul,'special',ax*5,ay*5,p)}
    p.vx=ax*len/.12;p.vy=ay*len/.12;p.dashT=.12;snd(520,.08,300,'sawtooth',.07);burst(p.x,p.y,'#f8c070',5,24)}
   return}
- if(dv.pr.sup)doSuper(p);
+ if(dv.pr.sup||p.supQ)doSuper(p);
  if(dv.pr.sp)doSpecial(p);
  if(dv.pr.a&&p.atkCd<=.02){if(p.dashGrace>0)doDive(p);else doAttack(p);p.chg=0;p.charging=true}
  if(p.charging){if(dv.cur.a){const was=p.chg;p.chg+=dt;if(was<CHARGE_T&&p.chg>=CHARGE_T)snd(990,.06,1480,'square',.03)}

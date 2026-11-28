@@ -27,14 +27,14 @@ body.touch #pad{display:block}
 #stickbase:not(.on){top:auto !important;left:92px !important;margin:0 0 0 -52px;bottom:40px}
 #nub{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:rgba(255,217,77,.55);border:2px solid rgba(20,12,24,.6)}
 .tb{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;
- color:#1a1020;border:2px solid rgba(20,12,24,.65);opacity:.72}
+ color:#1a1020;border:2px solid rgba(20,12,24,.65);opacity:.6}
 .tb.on{opacity:1;transform:scale(.93)}
-.tb[data-b=a]{right:22px;bottom:34px;width:86px;height:86px;background:#58a8f8;font-size:26px}
+.tb[data-b=a]{right:22px;bottom:30px;width:80px;height:80px;background:#58a8f8;font-size:26px}
 .tb[data-b=b]{right:118px;bottom:22px;width:66px;height:66px;background:#58d078;font-size:21px}
 .tb[data-b=dash]{right:28px;bottom:130px;width:62px;height:62px;background:#e8e4f5;font-size:12px}
 .tb[data-b=sp]{right:122px;bottom:96px;width:58px;height:58px;background:#f878a8;font-size:15px}
 .tb[data-b=sup]{right:100px;bottom:164px;width:60px;height:60px;background:#ffd94d;font-size:11px}
-.tb[data-b=start]{left:50%;margin-left:-32px;top:8px;width:64px;height:26px;border-radius:13px;background:#e84a5f;color:#fff;font-size:10px;opacity:.55}
+.tb[data-b=start]{right:calc(14px + env(safe-area-inset-right,0px));top:calc(50px + env(safe-area-inset-top,0px));width:64px;height:28px;border-radius:14px;background:#e84a5f;color:#fff;font-size:10px;opacity:.6}
 /* portrait: the picture sits on top and the controls get their own deck below, like a handheld */
 body.portrait #pad{top:auto}
 body.portrait #stickzone{width:50%;height:38%}

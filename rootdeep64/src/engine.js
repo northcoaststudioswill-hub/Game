@@ -135,12 +135,14 @@ function _issue(mesh,M,o){
  const tx=o&&o.tex||texWhite;if(curTex!==tx){gl.bindTexture(gl.TEXTURE_2D,tx);curTex=tx}
  gl.drawArrays(gl.TRIANGLES,0,mesh.n)}
 /* opaque: drawn now with the current matrix */
-function draw(mesh,o){_issue(mesh,RN.m,o)}
+/* XRAY: while set, solid draws are queued as a flat silhouette that shows only where something stands in front */
+let XRAY=null;
+function draw(mesh,o){if(XRAY){RN.tq.push({mesh,M:new Float32Array(RN.m),o:XRAY});return}_issue(mesh,RN.m,o)}
 /* translucent / additive: queued, drawn after everything solid */
 function drawT(mesh,o){RN.tq.push({mesh,M:new Float32Array(RN.m),o:o||{}})}
 function frameEnd(){gl.enable(gl.BLEND);gl.depthMask(false);
  for(const q of RN.tq){if(q.o.glow){gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.uniform3f(U.uFogC,0,0,0)}else{gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.uniform3fv(U.uFogC,RN.fogC)}
-  if(q.o.nocull)gl.disable(gl.CULL_FACE);_issue(q.mesh,q.M,q.o);if(q.o.nocull)gl.enable(gl.CULL_FACE)}
+  if(q.o.behind)gl.depthFunc(gl.GREATER);if(q.o.nocull)gl.disable(gl.CULL_FACE);_issue(q.mesh,q.M,q.o);if(q.o.nocull)gl.enable(gl.CULL_FACE);if(q.o.behind)gl.depthFunc(gl.LESS)}
  gl.depthMask(true);gl.disable(gl.BLEND);gl.uniform3fv(U.uFogC,RN.fogC)}
 /* camera-facing sprite quad (needs MESH.quad from models.js) */
 const _bb=m4();
@@ -155,7 +157,7 @@ function project(x,y,z){const m=RN.vp,w=m[3]*x+m[7]*y+m[11]*z+m[15];if(w<=0.01)r
 let VW=400,VH=300,hudS=1,portrait=false;
 const IRES=240; /* internal vertical resolution, like a 240p console */
 function layout(){const bw=window.innerWidth,bh=window.innerHeight;portrait=bh>bw*1.15;
- let w=bw,h=bh;if(portrait){h=Math.min(bw,Math.round(bh*.56));}
+ let w=bw,h=bh;if(portrait){h=Math.min(Math.round(bw*1.25),bh-290);}
  stage.style.width=w+'px';stage.style.height=h+'px';
  document.body.classList.toggle('portrait',portrait);
  RN.asp=w/h;RN.h=IRES;RN.w=Math.min(520,Math.round(IRES*RN.asp));cv.width=RN.w;cv.height=RN.h;

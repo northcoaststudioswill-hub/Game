@@ -35,5 +35,5 @@ const RDF={
   run:RUN?{chamber:RUN.chamber,petals:RUN.petals,dew:RUN.dew,enemies:RUN.enemies.length,phase:RUN.phase,buds:RUN.buds.map(b=>b.type),doors:RUN.doors.map(d=>d.kind+(d.kind==='boon'?':'+d.god:'')),
    boons:[RUN.boons.atk,RUN.boons.cast,RUN.boons.dash,...RUN.boons.pass].filter(Boolean).map(boonName)}:null,
   meta:{dew:RD.dew,keys:RD.keys,honey:RD.honey,escapes:RD.stats.escapes,deaths:RD.stats.deaths,weapon:RD.weapon,keeps:Object.keys(RD.keeps),heat:heatTotal(),bank:RD.bank}})};
-window.__rd={RDF,RD:()=>RD,RUN:()=>RUN,PL,DEV,KEYS,step:(dt,n)=>{for(let i=0;i<(n||1);i++){pollInput(dt);gameUpdate(dt)}},set:(k,v)=>{if(k==='state')state=v}};
+if(navigator.webdriver)window.__rd={RDF,RD:()=>RD,RUN:()=>RUN,PL,DEV,KEYS,step:(dt,n)=>{for(let i=0;i<(n||1);i++){pollInput(dt);gameUpdate(dt)}},set:(k,v)=>{if(k==='state')state=v}};
 boot();

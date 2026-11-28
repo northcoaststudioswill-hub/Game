@@ -115,6 +115,16 @@ Nothing from the Pocket Lantern story notes is used. It is all data: cut or rewr
 - **The Hearth changes:** the Lantern glows brighter with each escape, and finishing Erin's chain makes the
   floor flower.
 
+## Playtest fixes
+
+Four blind reviewers played it (`reviews/`); `reviews/FINDINGS.md` lists their 81 findings and the fix log.
+Things that now play differently from the cartridge, all because of that playtest: a boon door in chamber 1;
+a boon + Fountain (marked BOSS AHEAD) before every boss; foes spawn away from you and take a beat to rise;
+a contact hit buys a little more safety and boss bodies hit softer; deaths bank +2 Moondew per chamber cleared;
+doors need a short stand in the doorway; a knocked-loose bud runs off as a pod you can catch. Settings gained
+KEEPER'S GRACE (half damage, an extra revive) and AIM HELP. Co-op: menus belong to whoever opened them, seats
+never renumber, you can drop in mid-run and leave from the Hearth or pause menu.
+
 ## Open questions for Will
 
 - **Louie's signature is still THE BOOF**, lil Bottie's placeholder. The fighter in this repo
@@ -152,6 +162,7 @@ Need Node + Playwright with Chromium.
   checks they cost, land and clean up; saves a frame of each.
 - `node test/story.js` – missions asked and turned in, conversations firing off real progress, echoes, boss and
   god lines, the ending; also checks every line of text fits its box.
+- `node test/fixes.js` – one check per playtest fix (menu ownership, seats, doors, spawns, revives, boon text...).
 - `node test/phone.js` – iPhone-sized touch viewports, portrait and landscape.
 
 **Not yet verified:** a physical controller (no hardware here — the mapping follows the standard

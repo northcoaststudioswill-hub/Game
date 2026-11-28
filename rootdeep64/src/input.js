@@ -33,6 +33,12 @@ function touchInit(){const zone=document.getElementById('stickzone'),nub=documen
  for(const el of document.querySelectorAll('[data-b]')){const b=el.dataset.b;
   const on=e=>{woke();TS.btn[b]=true;TS.latch[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
   el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false})}
+ /* taps on menus: a row picks / chooses, and on talk, notes, intro and end screens any tap goes on */
+ const TAPANY=new Set(['title','cine','talk','echo','over','win']),TAPMENU=new Set(['menu','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
+ document.addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('.tb'))return;const t=e.changedTouches[0];if(!t)return;
+  if(TAPANY.has(state)){woke();TS.latch.a=true;e.preventDefault();e.stopPropagation();return}
+  if(!TAPMENU.has(state))return;const rc=stage.getBoundingClientRect(),vx=(t.clientX-rc.left)/rc.width*VW,vy=(t.clientY-rc.top)/rc.height*VH;
+  const h=HIT.find(h=>vx>=h.x&&vx<=h.x+h.w&&vy>=h.y&&vy<=h.y+h.h);if(!h)return;woke();if(h.sel)TS.latch.a=true;else{h.set();snd(520,.04)}e.preventDefault();e.stopPropagation()},{capture:true,passive:false});
  if('ontouchstart' in window||navigator.maxTouchPoints>0)document.body.classList.add('touch')}
 
 function axis(v){return Math.abs(v)<.22?0:v}
@@ -53,7 +59,9 @@ function pollInput(dt){
  TS.latch={};
  /* gamepads */
  const pads=navigator.getGamepads?navigator.getGamepads():[];
- for(let i=0;i<pads.length&&i<8;i++){const p=pads[i],id='gp'+i;if(!p){if(DEV[id])DEV[id].live=false;continue}
+ for(let i=0;i<pads.length&&i<8;i++){const p=pads[i],id='gp'+i;
+  /* an unplugged pad lets go of everything, so its keeper doesn't walk off on a stuck stick */
+  if(!p||!p.connected){const g=DEV[id];if(g){g.live=false;g.mx=g.my=0;for(const b of BTN)g.cur[b]=false}continue}
   const dv=DEV[id]||(DEV[id]=mkDev(id,'PAD '+(i+1)));dv.live=true;const B=n=>!!(p.buttons[n]&&(p.buttons[n].pressed||p.buttons[n].value>.5));
   let mx=axis(p.axes[0]||0),my=axis(p.axes[1]||0);const dl=B(14),dr=B(15),du=B(12),dd=B(13);
   if(dl||dr)mx=(dr?1:0)-(dl?1:0);if(du||dd)my=(dd?1:0)-(du?1:0);
@@ -63,21 +71,36 @@ function pollInput(dt){
  for(const id in DEV){const dv=DEV[id];for(const b of BTN){dv.pr[b]=dv.cur[b]&&!dv.prev[b];dv.prev[b]=dv.cur[b]}
   /* menu auto-repeat on held directions */
   const dir=dv.cur.up?'up':dv.cur.down?'down':dv.cur.left?'left':dv.cur.right?'right':'';
+  if(dv.repLock&&dir!==dv.repLock)dv.repLock='';
+  if(dv.repLock&&dir===dv.repLock){dv.rp='';if(dv.pr[dir]&&state!=='run')dv.pr[dir]=false;continue}
   if(dir&&dir===dv.repDir){dv.rep-=dt;if(dv.rep<=0){dv.rep=.13;dv.rp=dir}else dv.rp=''}else{dv.repDir=dir;dv.rep=.38;dv.rp=''}}}
-/* merged menu input: any device */
-function pressed(b){for(const id in DEV){const d=DEV[id];if(d.pr[b])return true;if(d.rp===b&&(b==='up'||b==='down'))return true}return false}
+/* menu input. A menu belongs to whoever opened it (menuDev); otherwise any joined device;
+   before anyone has joined (title screen), any device at all. */
+let menuDev=null;
+function menuDevs(){if(menuDev)return[menuDev];if(PL.length)return PL.map(p=>p.dev);return Object.values(DEV)}
+function pressed(b){for(const d of menuDevs()){if(d.pr[b])return true;if(d.rp===b&&(b==='up'||b==='down'))return true}return false}
+/* a menu that opens while a direction is held must not start scrolling on its own */
+function holdRepeat(){for(const id in DEV){const d=DEV[id];d.rep=.38;d.rp='';d.repLock=d.repDir}}
 function pressedBy(b){for(const id in DEV)if(DEV[id].pr[b])return DEV[id];return null}
 function nav(i,n){if(pressed('down')){snd(520,.04);return(i+1)%n}if(pressed('up')){snd(520,.04);return(i+n-1)%n}return i}
 
 /* ---- players ---- */
-const PL=[];const PCOL=['#ffd94d','#58c8f8','#f878a8','#8ae060'];
+/* p.ix is the player's SEAT (0-3): colour, P-number, HUD corner and saved keeper. It never changes while
+   they play, so somebody leaving doesn't reshuffle the couch. PL stays sorted by seat. */
+const PL=[];const PCOL=['#ffd94d','#58c8f8','#f878a8','#8ae060'];let fullT=0;
 function devPlayer(dev){return PL.find(p=>p.dev===dev)}
 function joinPlayer(dev){if(PL.length>=4||devPlayer(dev))return null;if(dev.id==='kb2')kb2On=true;
- const p={ix:PL.length,dev,char:'WILL',x:W/2,y:H/2,vx:0,vy:0,fx:1,fy:0,ax:0,ay:1,anim:0,ready:false,csel:0,hp:100,down:false,inv:0,dashT:0,swing:0};
- PL.push(p);return p}
-function dropPlayer(p){const i=PL.indexOf(p);if(i<=0)return;PL.splice(i,1);PL.forEach((q,j)=>q.ix=j);if(p.dev.id==='kb2')kb2On=false}
-/* a device nobody is using yet pressed A: let it in */
-function pollJoin(){for(const id in DEV){const d=DEV[id];if(!d.live)continue;
-  if(id==='kb2'){if(KEYS.Comma&&!DEV.kb2.prev._j&&!devPlayer(d)&&PL.length&&PL.length<4){DEV.kb2.prev._j=true;return joinPlayer(d)}DEV.kb2.prev._j=!!KEYS.Comma;continue}
-  if((d.pr.a||d.pr.start)&&!devPlayer(d)&&PL.length<4){d.pr.a=false;d.pr.start=false;return joinPlayer(d)}}
- return null}
+ let seat=0;while(PL.some(q=>q.ix===seat))seat++;
+ const p={ix:seat,dev,char:'WILL',x:W/2,y:H/2,vx:0,vy:0,fx:1,fy:0,ax:0,ay:1,anim:0,ready:false,csel:0,hp:100,down:false,inv:0,dashT:0,swing:0};
+ PL.push(p);PL.sort((a,b)=>a.ix-b.ix);return p}
+function dropPlayer(p){const i=PL.indexOf(p);if(i<0||PL.length<2)return false;PL.splice(i,1);if(p.dev.id==='kb2')kb2On=false;if(menuDev===p.dev)menuDev=null;
+ if(RUN&&RUN.buds){const L=PL.find(q=>!q.down)||PL[0];for(const b of RUN.buds)if(b.own===p.ix)b.own=L.ix}return true}
+/* devices nobody is using yet pressed A: let them in (all of them, even on the same frame) */
+function pollJoin(){const out=[];if(fullT>0)fullT-=1/60;
+ for(const id in DEV){const d=DEV[id];if(!d.live||devPlayer(d))continue;
+  const hit=id==='kb2'?(KEYS.Comma&&!d.prev._j):(d.pr.a||d.pr.start);if(id==='kb2')d.prev._j=!!KEYS.Comma;
+  if(!hit||!PL.length)continue;
+  if(PL.length>=4){if(fullT<=0){joinMsg='PARTY FULL - 4 KEEPERS MAX';joinT=2;fullT=2}continue}
+  d.pr.a=false;d.pr.start=false;const p=joinPlayer(d);if(p)out.push(p)}
+ return out}
+function joinNote(p){if(p.dev.id==='kb2')return 'PLAYER '+(p.ix+1)+' JOINED: ARROWS · , HIT · . CAST · M SP · N SUPER · / DASH';return 'PLAYER '+(p.ix+1)+' JOINED'}

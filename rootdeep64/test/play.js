@@ -39,12 +39,12 @@ const {chromium}=require('playwright');const path=require('path');
  await tap('Enter');s=await st();ok(s.state==='pause','START pauses');await tap('Enter');s=await st();ok(s.state==='run','START resumes');
  /* boss, co-op down + revive, death banking */
  await ev(()=>{__rd.RDF.join('gp9');plRunInit(PL[1]);__rd.RDF.goto(4)});s=await st();ok(s.run.enemies===1&&s.players.length===2,'chamber 4 is the Grub Mother, 2 keepers');
- await ev(()=>{__rd.RDF.hurt(999,1)});s=await st();ok(s.players[1].down&&s.state==='run','P2 falls: down, run continues');
+ await ev(()=>{RUN.buds=[];__rd.RDF.hurt(999,1)});s=await st();ok(s.players[1].down&&s.state==='run','P2 falls: down, run continues '+JSON.stringify(s.players)+' rev '+(await ev(()=>RUN&&RUN.revives)));
  await ev(()=>{RUN.enemies[0].x=40;RUN.enemies[0].y=40;RUN.enemies[0].sp=0;RUN.eprojs=[];PL[0].x=PL[1].x+6;PL[0].y=PL[1].y;PL[0].inv=5});await pg.waitForTimeout(2800);s=await st();ok(!s.players[1].down&&s.players[1].hp>0,'standing over P2 revives them ('+s.players[1].hp+' hp)');
  await ev(()=>{__rd.RDF.clearRoom()});await pg.waitForTimeout(300);s=await st();ok(s.run.phase==='doors'&&(await ev(()=>RUN.keys))===1,'boss down: key + doors');
- const dewBefore=s.meta.dew,runDew=s.run.dew;await ev(()=>{__rd.RDF.hurt(999,0);__rd.RDF.hurt(999,1)});s=await st();
+ const dewBefore=s.meta.dew,runDew=s.run.dew+2*(s.run.chamber-1);await ev(()=>{__rd.RDF.hurt(999,0);__rd.RDF.hurt(999,1)});s=await st();
  ok(s.state==='over'&&s.meta.dew===dewBefore+runDew&&s.meta.keys===2,'party wipe: THE DEEP KEEPS YOU, Moondew + key banked ('+s.meta.dew+' dew)');
- await pg.waitForTimeout(1000);await tap('KeyZ');s=await st();ok(s.state==='hub','A returns to the Hearth');
+ await pg.waitForTimeout(1600);await tap('KeyZ');s=await st();ok(s.state==='hub','A returns to the Hearth');
  /* escape */
  await ev(()=>{__rd.RDF.depart();__rd.RDF.finale()});await ev(()=>{__rd.RDF.clearRoom()});await pg.waitForTimeout(300);s=await st();ok(s.state==='win'&&s.meta.escapes===1,'chamber 12 cleared: YOU ESCAPED THE DEEP');
  console.log(errs.length?'CONSOLE ERRORS:\n'+[...new Set(errs)].join('\n'):'no console errors');console.log(fails?fails+' FAILED':'ALL GREEN');await br.close();process.exit(fails||errs.length?1:0)})();

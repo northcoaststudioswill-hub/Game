@@ -83,8 +83,13 @@ function boonName(b){if(!b)return '';if(b.kind==='duo')return DUOS.find(d=>d.id=
 function boonDesc(b){if(!b)return '';
  if(b.kind==='duo')return DUOS.find(d=>d.id===b.id).d;
  const v=rdBoonVal(b);
- if(b.kind==='core'){const base=CORES[b.slot].d[b.god];return (b.slot==='atk'?'Attack +'+v+'%. ':'Cast +'+v+'%. ')+(b.slot==='dash'?'Dash power '+v+'. ':'')+base}
- const p=PASSES.find(p=>p.id===b.id);return p.d;}
+ /* the numbers shown are the numbers used, rarity and level included */
+ if(b.kind==='core'){const base=CORES[b.slot].d[b.god],cur=RUN&&RUN.boons[b.slot],rep=cur&&cur.god!==b.god?'Replaces '+boonName(cur)+'. ':'';
+  if(b.slot==='atk')return rep+'Attack +'+v+'%. '+base;if(b.slot==='cast')return rep+'Cast +'+v+'%. '+base;
+  const dd={EMBER:'Dash leaves a flame trail ('+Math.round(v*1.6)+' burn a second)',ZIP:'Dash zaps the nearest foe for '+Math.round(v*1.4),LEAF:'Dash heals '+Math.round(2+v*.12)};
+  return rep+(dd[b.god]||base)}
+ const p=PASSES.find(p=>p.id===b.id);if(b.kind==='passup')return 'Level up: '+p.d.replace(/\d+/,v);
+ return p.id==='wind'||p.id==='synth'?p.d:p.d.replace(/\d+/,v);}
 /* heal one keeper, or (no keeper given) everyone still standing */
 function rdHeal(n,p){if(!RUN)return;for(const q of(p?[p]:alive())){const s=rdStats(q);q.hp=Math.min(s.maxHp,q.hp+n*s.healMul)}}
 function hasDuo(id){return RUN&&RUN.boons.pass.some(p=>p.kind==='duo'&&p.id===id);}
@@ -98,7 +103,8 @@ function mkBoon(god,kind,slotOrId){const rar=rollRar();RD.boonSeen[slotOrId+':'+
  const p=PASSES.find(x=>x.id===slotOrId);const ex=RUN.boons.pass.find(x=>x.id===slotOrId);
  if(ex)return{kind:'passup',god:p.god,id:p.id,level:ex.level+1,rar:1,rarN:'LEVEL UP'};
  return{kind:'pass',god:p.god,id:p.id,level:1,rar:RARS[rar][1],rarN:RARS[rar][0]};}
-function genOffer(god){god=god||GODIDS[(Math.random()*GODIDS.length)|0];boonQuote=godLine(god);const out=[],used=new Set();
+let offerGod='EMBER';
+function genOffer(god){god=god||GODIDS[(Math.random()*GODIDS.length)|0];offerGod=god;boonQuote=godLine(god);const out=[],used=new Set();
  const slots=['atk','cast','dash'].filter(s=>!(RUN.boons[s]&&RUN.boons[s].god===god));
  for(const d of DUOS)if(!hasDuo(d.id)&&d.gods.every(g=>hasGod(g))){out.push(mkBoon(god,'duo',d.id));break}
  while(out.length<3){const roll=Math.random();
@@ -125,17 +131,21 @@ function rdStartRun(){
   obst:[],sub:null,subQ:[],echo:null,mwT:0,acts:[],rings:[],bolts:[],freeze:0,flash:0,banner:null,phase:'fight',shake:0,boss:null,elite:false,revives:mir('defy'),collarUsed:false,phoenixUsed:false,time:0,zoneT:0,kills:0};
  for(const p of PL){plRunInit(p);movesReset(p,true)}
  let k=0;for(const ty of RD.party){if((RD.bank[ty]||0)>0){RD.bank[ty]--;const o=PL[k++%PL.length];RUN.buds.push({type:ty,x:o.x,y:o.y,a:Math.random()*6,cd:0,z:0,own:o.ix})}}
+ if(RD.set.grace)RUN.revives++;
  RD.party=[];RD.stats.runs++;if(PL.length>1)RD.stats.coopRuns=(RD.stats.coopRuns||0)+1;for(const p of PL)RD.charRun[p.char]=1;rdSave();rdNextChamber();}
 function rdArena(biome){RUN.obst=[];const n=2+((Math.random()*3)|0)+(PL.length>2?1:0);
  for(let i=0;i<n;i++){const w=14+((Math.random()*22)|0),h=10+((Math.random()*10)|0),x=22+Math.random()*(W-44-w),y=38+Math.random()*(H-70-h);
-  if(Math.hypot(x+w/2-W/2,y+h/2-H/2)>34&&y+h<H-44)RUN.obst.push({x,y,w,h,biome,s:Math.random()});}
+  const door=x<W/2+64&&x+w>W/2-64&&y<80; /* the two reward doors and the lane in front of them */
+  if(Math.hypot(x+w/2-W/2,y+h/2-H/2)>34&&y+h<H-44&&!door)RUN.obst.push({x,y,w,h,biome,s:Math.random()});}
  PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*18;p.y=H-26;p.vx=p.vy=0;p.ax=0;p.ay=-1;p.land=.62+i*.08;p.cheer=0;p.swing=0;p.castA=0;p.selfieA=0;
   if(p.down){p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1}})}
 function foeScale(){const ch=RUN.chamber;return{hp:1+.30*(ch-1)+.2*(RD.pact.hide||0),dmg:1+.09*(ch-1)+.15*(RD.pact.thorns||0),sp:1+.12*(RD.pact.rush||0)};}
 function spawnFoe(kind,x,y,elite){const d=FOES[kind],sc=foeScale();
  const e={kind,x,y,hp:d.hp*sc.hp*(elite?2.6:1),max:d.hp*sc.hp*(elite?2.6:1),sp:d.sp*sc.sp*(0.9+Math.random()*.2),dmg:d.dmg*sc.dmg,r:d.r*(elite?1.35:1),
-  elite:!!elite,t:Math.random()*2,cd:1+Math.random(),hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,state:0,sx:x,sy:y,bt:0,born:.5,yaw:0};
+  elite:!!elite,t:Math.random()*2,cd:1+Math.random(),hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,state:0,sx:x,sy:y,bt:0,born:.9,yaw:0};
  RUN.enemies.push(e);RD.seen[kind]=1;return e;}
+/* somewhere in the top half of the room, well clear of every keeper */
+function spawnSpot(){let best=null,bd=-1;for(let i=0;i<24;i++){const x=26+Math.random()*(W-52),y=36+Math.random()*(H*.45);let m=1e9;for(const p of PL)if(!p.down)m=Math.min(m,Math.hypot(p.x-x,p.y-y));if(m>80)return[x,y];if(m>bd){bd=m;best=[x,y]}}return best}
 function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale(),co=1+.75*(PL.length-1);
  const e={kind:'boss',bossIx:ix,x:W/2,y:52,hp:d.hp*(1+.12*RUN.heat)*co,max:d.hp*(1+.12*RUN.heat)*co,sp:d.sp,dmg:d.dmg*sc.dmg,r:d.r,
   elite:false,t:0,cd:2,hitCd:0,burn:0,burnDps:0,chill:0,root:0,face:1,flash:0,bt:3,phase:1,state:0,tx:W/2,ty:52,born:.8,yaw:0};
@@ -152,7 +162,7 @@ function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=
  while(spent<budget&&guard++<60){const k=pool[(Math.random()*pool.length)|0],cost=k==='grub'?1:k==='wisp'||k==='shade'?2:3;
   if(spent+cost>budget+1)continue;spent+=cost;wlist.push({k,elite:eliteCh&&spent>=budget-1});}
  const cut=Math.max(1,Math.ceil(wlist.length*.55));
- wlist.slice(0,cut).forEach(s2=>spawnFoe(s2.k,26+Math.random()*(W-52),36+Math.random()*(H*.45),s2.elite));
+ wlist.slice(0,cut).forEach(s2=>{const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)});
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
  RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);}
 function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
@@ -165,8 +175,9 @@ function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;if(RUN.chamber<1
  if(ch>=12){rdEscape();return}
  const kinds=['boon','boon','petals','dew','fruit','heart','shop','fountain','honey'];
  const pick=()=>kinds[(Math.random()*kinds.length)|0];let a=pick(),b=pick();if(b===a)b=pick();
- if(ch===3||ch===7||ch===11)a='boon';
- RUN.doors=[{kind:a,x:W/2-38,y:26},{kind:b,x:W/2+38,y:26}].map(d=>({...d,god:GODIDS[(Math.random()*GODIDS.length)|0],hold:0}));
+ if(ch===1)a='boon';
+ if(ch===3||ch===7||ch===11){a='boon';b='fountain'}
+ RUN.doors=[{kind:a,x:W/2-38,y:26},{kind:b,x:W/2+38,y:26}].map(d=>({...d,god:GODIDS[(Math.random()*GODIDS.length)|0],hold:0,boss:ch===3||ch===7||ch===11}));
  rdSave();}
 function bossDown(e){RD.stats.bosses++;RUN.keys++;if(PL.length>1)RD.stats.coopBoss=(RD.stats.coopBoss||0)+1;const heat=RUN.heat,paid=RD.bounty[BOSSES[e.bossIx].id]||0,L=lead();
  let bonus=0;if(heat>paid){bonus=25*(heat-paid);RD.bounty[BOSSES[e.bossIx].id]=heat}
@@ -193,8 +204,8 @@ function genShop(){const all=[
  {n:'PETAL PURSE',d:'+90 petals, somehow profit',p:50,act:()=>{RUN.petals+=90;say2('+90 PETALS',2)}}];
  const out=[];while(out.length<3){const it=all.splice((Math.random()*all.length)|0,1)[0];if(it)out.push(it)}return out;}
 function runTally(){RD.stats.honeyFound=(RD.stats.honeyFound||0)+RUN.honey;RD.stats.maxBank=Math.max(RD.stats.maxBank||0,RUN.buds.length)}
-function rdDie(){runTally();const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
-function rdEscape(){runTally();RD.stats.heatEsc=Math.max(RD.stats.heatEsc||0,RUN.heat);for(const p of PL)RD.charEsc[p.char]=(RD.charEsc[p.char]||0)+1;RD.stats.escapes++;RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
+function rdDie(){runTally();const cb=2*Math.max(0,RUN.chamber-1);RUN.dew+=cb;RUN.chBonus=cb;const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={biome:RUN.biome,bonus:RUN.chBonus||0,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
+function rdEscape(){runTally();RD.stats.heatEsc=Math.max(RD.stats.heatEsc||0,RUN.heat);for(const p of PL)RD.charEsc[p.char]=(RD.charEsc[p.char]||0)+1;RD.stats.escapes++;RD.lastRun={biome:2,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
  RUN=null;rdSave();overT=0;state='win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
 function rdAbandon(){if(RUN){runTally();bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();state='hub';}
@@ -212,11 +223,12 @@ function charLockTxt(id){if(id==='ERIN')return 'GIVE ERIN HONEY AT THE HEARTH: '
  if(id==='MARCUS')return 'HE TAKES OVER AFTER 8 DEATHS: '+(RD.stats.deaths||0)+'/8';return ''}
 /* CHOOSE YOUR KEEPER — every joined keeper picks at once; dive when all are ready */
 function charsEnter(){for(const p of PL){p.csel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.chars[p.ix]||'WILL')));if(!charUnlocked(CHARS[p.csel].id))p.csel=0;p.ready=false}diveT=0;state='chars'}
-function charsUpdate(dt){const np=pollJoin();if(np){np.csel=0;np.ready=false;snd(784,.08,1175);joinMsg='PLAYER '+(np.ix+1)+' JOINED';joinT=2}
+function charsUpdate(dt){for(const np of pollJoin()){np.csel=Math.max(0,CHARS.findIndex(c=>c.id===RD.chars[np.ix]));if(!charUnlocked(CHARS[np.csel].id))np.csel=0;np.ready=false;snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
  for(const p of PL.slice()){const d=p.dev;
   if(!p.ready){if(d.pr.down||d.pr.right||d.rp==='down'){p.csel=(p.csel+1)%CHARS.length;snd(520,.04)}if(d.pr.up||d.pr.left||d.rp==='up'){p.csel=(p.csel+CHARS.length-1)%CHARS.length;snd(520,.04)}
    if(d.pr.a){const c=CHARS[p.csel];if(charUnlocked(c.id)){p.char=c.id;RD.chars[p.ix]=c.id;p.ready=true;snd(784,.1);later(()=>snd(1175,.2),90)}else snd(140,.09)}
-   else if(d.pr.b||d.pr.start&&PL.length===1&&false){if(p.ix===0){state='hub';return}dropPlayer(p);snd(330,.06)}}
+   /* B: the first seat backs out to the Hearth; anyone else leaves the party */
+   else if(d.pr.b){if(p===PL[0]){state='hub';return}dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.06)}}
   else if(d.pr.b){p.ready=false;diveT=0;snd(330,.05)}}
  if(PL.length&&PL.every(p=>p.ready)){diveT+=dt;if(diveT>(PL.length>1?.7:.05)){rdSave();rdStartRun();state='run'}}else diveT=0}
 const NPCROUTE={
@@ -237,16 +249,25 @@ function movePlayer(p,dt,spd){let mx=p.dev.mx,my=p.dev.my;const l=Math.hypot(mx,
  p.x=Math.max(13,Math.min(W-13,p.x));p.y=Math.max(32,Math.min(H-11,p.y));
  if(RUN)for(const o of RUN.obst){const nx=Math.max(o.x,Math.min(p.x,o.x+o.w)),ny=Math.max(o.y,Math.min(p.y,o.y+o.h));
   const dx=p.x-nx,dy=p.y-ny,d=Math.hypot(dx,dy);if(d<7&&d>0){p.x=nx+dx/d*7;p.y=ny+dy/d*7}else if(d===0){p.y=o.y-7}}}
-function hubTarget(p){let best=null,bd=17*17;
- for(const s of STATIONS){const d=(p.x-s.x)**2+(p.y-38)**2;if(d<bd){bd=d;best={kind:'station',id:s.id,n:s.n,x:s.x,y:38}}}
- for(const who of NPCS){const n2=HUBNPC[who],x=n2.x,y=n2.y;const d=(p.x-x)**2+(p.y-y)**2;if(d<bd){bd=d;best={kind:'npc',who,n:who,x,y}}}
- const db2=(p.x-BED.x)**2+(p.y-BED.y)**2;if(db2<bd){bd=db2;best={kind:'sprouts',n:'SPROUT LEDGER',x:BED.x,y:BED.y}}
- const dq=(p.x-BOARD.x)**2+(p.y-BOARD.y)**2;if(dq<bd){bd=dq;best={kind:'board',n:"KEEPER'S BOARD",x:BOARD.x,y:BOARD.y}}
- const d=(p.x-DOOR.x)**2+(p.y-DOOR.y)**2;if(d<bd)best={kind:'descend',n:'THE ROOT DOOR — DESCEND',x:DOOR.x,y:DOOR.y};
+/* what the A prompt points at: stations and doors win over people walking past, things you face win over things
+   behind you, and Louie (who follows you about) only counts when you're right on top of him */
+function hubTarget(p){let best=null,bs=1e9;const fx=p.ax||0,fy=p.ay===undefined?1:p.ay;
+ const consider=(t,reach,bias)=>{const dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy);if(d>reach)return;const facing=d>2?(dx*fx+dy*fy)/d:1;
+  const sc=d-facing*6+bias;if(sc<bs){bs=sc;best=t}};
+ for(const s of STATIONS)consider({kind:'station',id:s.id,n:s.id==='heat'&&RD.stats.escapes<1?'HEAT GATE (SEALED)':s.n,x:s.x,y:38},24,-4);
+ for(const who of NPCS){const n2=HUBNPC[who];const follow=who==='LOUIE'&&n2.route[n2.ri]==='P3';consider({kind:'npc',who,n:who,x:n2.x,y:n2.y},follow?11:19,follow?8:2)}
+ consider({kind:'sprouts',n:'SPROUT LEDGER',x:BED.x,y:BED.y},22,-4);
+ consider({kind:'board',n:"KEEPER'S BOARD",x:BOARD.x,y:BOARD.y},20,-4);
+ consider({kind:'descend',n:'THE ROOT DOOR — DESCEND',x:DOOR.x,y:DOOR.y},20,-6);
  return best;}
-function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return}
- const np=pollJoin();if(np){np.x=W/2+R(-20,20);np.y=H/2+30;np.char=RD.chars[np.ix]||'WILL';if(!charUnlocked(np.char))np.char='WILL';snd(784,.08,1175);joinMsg='PLAYER '+(np.ix+1)+' JOINED';joinT=2.5}
+function hubUpdate(dt){if(pressed('sel')||pressed('start')){rdSave();menuSel=0;state='menu';return}
+ for(const np of pollJoin()){const L=PL[0];np.x=clamp(L.x+R(-16,16),20,W-20);np.y=clamp(L.y+14,50,H-20);np.char=RD.chars[np.ix]||'WILL';if(!charUnlocked(np.char))np.char='WILL';snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
+ /* hold B for a second to leave the party (any seat, as long as someone stays) */
+ for(const p of PL.slice()){if(p.dev.cur.b&&PL.length>1){p.leaveT=(p.leaveT||0)+dt;if(p.leaveT>1.1){dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.08,160)}}else p.leaveT=0}
+ /* a controller that was unplugged leaves the party here */
+ for(const p of PL.slice())if(!p.dev.live&&PL.length>1){dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' DISCONNECTED';joinT=2}
  for(const p of PL){movePlayer(p,dt,84);aimVec(p)}
+ separate(PL,12)
  for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;
   if(n.act>0)n.act-=dt;n.mv=0;
   if(n.wait>0){n.wait-=dt;continue}
@@ -259,9 +280,10 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return
   else{const sp=NPCSPD[who]||32;n.x+=dx/d*sp*dt;n.y+=dy/d*sp*dt;n.yaw=Math.atan2(dx,dy);n.mv=1}}
  for(let i=0;i<NPCS.length;i++)for(let j=i+1;j<NPCS.length;j++){const a=HUBNPC[NPCS[i]],c=HUBNPC[NPCS[j]];if(!a||!c)continue;
   const dx=c.x-a.x,dy=c.y-a.y,d=Math.hypot(dx,dy);if(d>0&&d<22){const push=(22-d)/2,ux=dx/d,uy=dy/d;a.x-=ux*push;a.y-=uy*push;c.x+=ux*push;c.y+=uy*push}}
+ for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;for(const p of PL){const dx=n.x-p.x,dy=n.y-p.y,d=Math.hypot(dx,dy);if(d>.01&&d<13){n.x+=dx/d*(13-d);n.y+=dy/d*(13-d)}}}
  for(const who of NPCS){const n=HUBNPC[who];if(n){if(n.y>H-36)n.y=H-36;if(n.y<46)n.y=46;n.x=Math.max(12,Math.min(W-12,n.x))}}
  for(const p of PL){const t=hubTarget(p);p.hubT=t;
-  if(t&&p.dev.pr.a){snd(520,.05);
+  if(t&&p.dev.pr.a){snd(520,.05);menuDev=p.dev;
    if(t.kind==='descend'){charsEnter();return}
    if(t.kind==='sprouts'){sprPage=0;uiSel=0;state='sprouts';return}
    if(t.kind==='board'){boardSel=0;state='board';return}
@@ -271,20 +293,26 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();menuSel=0;state='menu';return
     RD.flags['met_'+t.who]=1;talkLine=0;talkTxt=LINES[t.who][talkStart];RD.lineIx[t.who]=talkStart+1;rdSave();
     const n=HUBNPC[t.who];if(n)n.yaw=Math.atan2(p.x-n.x,p.y-n.y);
     state='talk';return}
-   uiSel=0;codexPage=0;heatSel=0;state=t.id;return}}}
+   if(t.id==='heat'&&RD.stats.escapes<1){joinMsg='ESCAPE THE DEEP ONCE TO OPEN THE PACT';joinT=2.2;menuDev=null;return}
+   buyAsk=-1;uiSel=0;codexPage=0;heatSel=0;state=t.id;return}}}
+let giftAsk=false;
+function giftHoney(){const who=talkNPC,k=KEEPS.find(k=>k.who===who);giftAsk=false;
+ RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;talkEv=null;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
+ else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}talkWho=who;talkLine=99;rdSave()}
 function talkUpdate(){
+ /* START offers Honey; START again gives it. Works in every conversation. */
+ if(pressed('start')&&RD.honey>0&&talkNPC){if(giftAsk)giftHoney();else{giftAsk=true;snd(660,.05)}return}
+ if(giftAsk&&(pressed('a')||pressed('b'))){giftAsk=false;return}
  /* a story beat: A pages, B skips to the end (and still pays out) */
  if(talkEv){if(pressed('b')){storyFinish(talkEv);talkEv=null;state='hub';snd(330,.05);return}
   if(pressed('a')){talkLine++;if(talkLine>=talkEv.lines.length){storyFinish(talkEv);talkEv=null;state='hub'}else{talkWho=talkEv.lines[talkLine][0];talkTxt=talkEv.lines[talkLine][1];snd(520,.04)}}return}
  if(pressed('b')){state='hub';snd(330,.05);return}
- if(pressed('start')&&RD.honey>0&&talkNPC){const who=talkNPC,k=KEEPS.find(k=>k.who===who);
-  RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
-  else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}rdSave();return}
  if(pressed('a')){const L=LINES[talkNPC];talkLine++;
   if(talkStart+talkLine>=L.length){state='hub'}else{talkTxt=L[talkStart+talkLine];snd(520,.04)}return}}
-function mirrorUpdate(){uiSel=nav(uiSel,MIRROR.length);
+let buyAsk=-1;
+function mirrorUpdate(){const was=uiSel;uiSel=nav(uiSel,MIRROR.length);if(was!==uiSel)buyAsk=-1;
  if(pressed('a')){const m=MIRROR[uiSel],rank=mir(m.id);
-  if(rank>=m.max){snd(140,.08)}else{const c=m.cost[rank];if(RD.dew>=c){RD.dew-=c;RD.mirror[m.id]=rank+1;rdSave();snd(784,.1);later(()=>snd(1175,.2),100)}else snd(140,.08)}}
+  if(rank>=m.max){snd(140,.08)}else{const c=m.cost[rank];if(RD.dew>=c&&buyAsk!==uiSel){buyAsk=uiSel;snd(660,.05)}else if(RD.dew>=c){buyAsk=-1;RD.dew-=c;RD.mirror[m.id]=rank+1;rdSave();snd(784,.1);later(()=>snd(1175,.2),100)}else snd(140,.08)}}
  if(pressed('b')||pressed('start'))state='hub';}
 function armUpdate(){const ids=Object.keys(WEAPONS);uiSel=nav(uiSel,ids.length);
  if(pressed('a')){const id=ids[uiSel],w=WEAPONS[id];
@@ -306,19 +334,26 @@ function heatUpdate(){if(RD.stats.escapes<1){if(pressed('a')||pressed('b')||pres
  if(pressed('b')||pressed('start'))state='hub';}
 let boonT=0;
 function boonUpdate(dt){boonT+=dt;uiSel=nav(uiSel,boonOffer.length);
- if(pressed('a')&&boonOffer.length&&boonT>.35){const b=boonOffer[uiSel];takeBoon(b);boonOffer=[];boonT=0;boonReturn();}}
+ if(pressed('a')&&boonOffer.length&&boonT>.25){const b=boonOffer[uiSel];takeBoon(b);boonOffer=[];boonT=0;boonReturn();}}
 function shopUpdate(){uiSel=nav(uiSel,shopItems.length+1);
  if(pressed('a')){if(uiSel===shopItems.length){rdNextChamber();state='run';return}
   const it=shopItems[uiSel];
   if(it.sold){snd(140,.08)}else if(RUN.petals>=it.p){RUN.petals-=it.p;it.sold=true;snd(700,.08,1100);it.act()}else snd(140,.08)}
  else if(pressed('b')){rdNextChamber();state='run'}}
-function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else state='run';return}
+let pauseConfirm=-1;
+function pauseItems(){const L=['RESUME','BUILD','SETTINGS','ABANDON RUN','QUIT TO TITLE'];if(PL.length>1)L.push('LEAVE THE PARTY');return L}
+/* the run-ending rows ask twice */
+function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else if(pauseConfirm>=0)pauseConfirm=-1;else state='run';return}
  if(pausePage===1){if(pressed('a')||pressed('start'))pausePage=0;return}
- pauseSel=nav(pauseSel,5);
+ const L=pauseItems(),was=pauseSel;pauseSel=nav(pauseSel,L.length);if(pauseSel!==was)pauseConfirm=-1;
  if(pressed('start')){state='run';return}
- if(pressed('a')){if(pauseSel===0)state='run';else if(pauseSel===1)pausePage=1;
-  else if(pauseSel===2){setReturn='pause';uiSel=0;state='set'}
-  else if(pauseSel===3){rdAbandon();hubEnter()}else{rdAbandon();menuSel=0;state='title'}}}
+ if(pressed('a')){const it=L[pauseSel];
+  if(it==='RESUME')state='run';else if(it==='BUILD')pausePage=1;
+  else if(it==='SETTINGS'){setReturn='pause';uiSel=0;state='set'}
+  else if(pauseConfirm!==pauseSel){pauseConfirm=pauseSel;snd(330,.06)}
+  else if(it==='ABANDON RUN'){rdAbandon();hubEnter()}
+  else if(it==='LEAVE THE PARTY'){const p=PL.find(q=>q.dev===menuDev);if(p&&dropPlayer(p)){joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2}state='run'}
+  else{rdAbandon();PL.length=0;kb2On=false;menuSel=0;state='title'}}}
 
 /* ---------------- intro cinematic ---------------- */
 let rdCineT=0,rdCineIx=0,rdCineDest='hub';
@@ -341,8 +376,8 @@ function sproutsUpdate(){const rows=sprPage===0?6:TRADES.length+SELLS.length;
  uiSel=nav(uiSel,rows);
  if(pressed('a')){if(sprPage===0){const ty=uiSel;
    const inP=RD.party.filter(x=>x===ty).length;
-   if(inP>0&&(RD.party.length<=inP||inP>=(RD.bank[ty]||0))){RD.party.splice(RD.party.lastIndexOf(ty),1);snd(440,.05)}
-   else if(RD.party.length<3&&(RD.bank[ty]||0)>inP){RD.party.push(ty);snd(784,.06)}
+   if(RD.party.length<3&&(RD.bank[ty]||0)>inP){RD.party.push(ty);snd(784,.06)}
+   else if(inP>0){RD.party=RD.party.filter(x=>x!==ty);snd(440,.05)}
    else snd(160,.08,0,'sawtooth',.05);rdSave()}
   else if(uiSel<TRADES.length){const tr=TRADES[uiSel];
    if((RD.bank[tr.g[0]]||0)>=tr.g[1]){RD.bank[tr.g[0]]-=tr.g[1];RD.bank[tr.t[0]]=(RD.bank[tr.t[0]]||0)+tr.t[1];snd(784,.08);later(()=>snd(1175,.15),90)}
@@ -361,9 +396,12 @@ function collide(e,rr){e.x=Math.max(11+rr,Math.min(W-11-rr,e.x));e.y=Math.max(30
 function aimVec(p){let ax=p.ax||0,ay=p.ay===undefined?1:p.ay;const mx=p.dev.mx,my=p.dev.my,l=Math.hypot(mx,my);
  if(l>0){ax=mx/l;ay=my/l;p.ax=ax;p.ay=ay}return[ax,ay];}
 /* nearest standing keeper: who a foe hunts */
+/* keepers don't stand inside each other */
+function separate(list,r){for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],c=list[j];if(a.down||c.down)continue;
+ const dx=c.x-a.x,dy=c.y-a.y,d=Math.hypot(dx,dy);if(d>.01&&d<r){const k=(r-d)/2/d;a.x-=dx*k;a.y-=dy*k;c.x+=dx*k;c.y+=dy*k}else if(d<=.01){a.x-=1;c.x+=1}}}
 function tgt(e){let best=null,bd=1e12;for(const p of PL){if(p.down)continue;const d=(p.x-e.x)**2+(p.y-e.y)**2;if(d<bd){bd=d;best=p}}return best||PL[0]}
 function hitEnemy(e,dmg,src,kx,ky,p){if(e.hp<=0)return;p=p||lead();const s=rdStats(p);let crit=Math.random()<s.crit;
- if(e.kind==='crab'&&e.state===1&&src!=='burn'&&src!=='heavy'&&src!=='super')dmg*=.35;
+ if(e.kind==='crab'&&e.state===1&&src!=='burn'&&src!=='heavy'&&src!=='super'){dmg*=.35;if(!(e.shT>time)){e.shT=time+.7;ftext(e.x,e.y-e.r-12,'SHIELDED - HOLD ATTACK','#8ad0ff')}}
  if(src==='atk'&&e.kind==='boss'&&RUN.boons.pass.find(p=>p.id==='heavy'))dmg*=1+rdBoonVal(RUN.boons.pass.find(p=>p.id==='heavy'))/100;
  if(hasDuo('mudslide')&&e.chill>0)dmg*=1.3;
  dmg*=crit?2:1;e.hp-=dmg;e.flash=.12;if(src!=='super'&&src!=='reflect')meterGain(p,dmg*.22);
@@ -377,7 +415,7 @@ function hitEnemy(e,dmg,src,kx,ky,p){if(e.hp<=0)return;p=p||lead();const s=rdSta
    if(best){best.hp-=dmg*.45;best.flash=.12;ftext(best.x,best.y-10,Math.round(dmg*.45),'#fff8a0');burst(best.x,best.y,'#f0d020',4,26);RUN.bolts=RUN.bolts||[];RUN.bolts.push({x:e.x,y:e.y,x2:best.x,y2:best.y,t:.14});if(best.hp<=0)killEnemy(best)}}
   if(g==='LEAF'&&Math.random()<.2)rdHeal(1,p);
   if(g==='PEB'){e.x+= (kx||0)*1.6;e.y+=(ky||0)*1.6;collide(e,e.r)}}
- if(e.hp<=0)killEnemy(e);}
+ if(e.hp<=0){if(p&&!e.dead)p.kills=(p.kills||0)+1;killEnemy(e)}}
 function killEnemy(e){if(e.dead)return;e.dead=true;e.hp=0;RD.stats.kills++;RUN.kills++;
  if(e.kind==='boss'){const id=BOSSES[e.bossIx].id;RD.bossK[id]=(RD.bossK[id]||0)+1;bossSay(e,'down')}else{RD.killK[e.kind]=(RD.killK[e.kind]||0)+1;if(e.elite)RD.stats.elites=(RD.stats.elites||0)+1}burst(e.x,e.y,'#e8e4f5',10,44);snd(240,.12,90,'triangle',.06);
  if(e.kind==='boss'){for(const o of RUN.enemies)if(o!==e)o.hp=Math.min(o.hp,0),o.dead=true;RUN.enemies=RUN.enemies.filter(o=>o===e||!o.dead);RUN.enemies.splice(RUN.enemies.indexOf(e),1);
@@ -395,17 +433,25 @@ function damagePlayer(p,n){if(!RUN||p.down||p.inv>0||p.dashT>0)return;const s=rd
  const peb=RUN.buds&&(RUN.buds.find(b=>b.type===1&&b.cd<=0&&b.own===p.ix)||RUN.buds.find(b=>b.type===1&&b.cd<=0));
  if(peb){peb.cd=15;p.inv=.55;ftext(p.x,p.y-16,'PEB BLOCKED!','#dce2ea');burst(p.x,p.y,'#dce2ea',6,30);snd(520,.08,760);return}
  let d=n*(1-s.armor)*(p.armT>0?.5:1);
- p.hp-=d;p.inv=.55;p.hurt=.25;if(p.hp>0&&p.hp<s.maxHp*.3&&!p.lowSaid&&CHATTER[p.char]){p.lowSaid=true;sub(p.char,CHATTER[p.char].low[0],2.6,PCOL[p.ix])}p.charging=false;meterGain(p,d*.9);RUN.shake=Math.min(5,2.5);burst(p.x,p.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
- if(RUN.buds&&RUN.buds.length&&Math.random()<.3){let i=RUN.buds.length-1;for(let j=i;j>=0;j--)if(RUN.buds[j].own===p.ix){i=j;break}const lb=RUN.buds.splice(i,1)[0];ftext(p.x,p.y-20,TYPES[lb.type].n+' SCATTERED!','#f8a0c8');snd(340,.1,180)}
+ if(RD.set.grace)d*=.5;
+ p.hp-=d;p.inv=.55;p.hurt=.25;ftext(p.x,p.y-22,'-'+Math.max(1,Math.round(d)),'#ff6a5a');p.hits=(p.hits||0)+1;if(p.hp>0&&p.hp<s.maxHp*.3&&!p.lowSaid&&CHATTER[p.char]){p.lowSaid=true;sub(p.char,CHATTER[p.char].low[0],2.6,PCOL[p.ix])}p.charging=false;meterGain(p,d*.4);RUN.shake=Math.min(5,2.5);burst(p.x,p.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
+ if(RUN.buds&&RUN.buds.length&&Math.random()<.3){let i=RUN.buds.length-1;for(let j=i;j>=0;j--)if(RUN.buds[j].own===p.ix){i=j;break}const lb=RUN.buds.splice(i,1)[0];const a=Math.random()*6.28;RUN.pods.push({type:lb.type,x:clamp(p.x+Math.cos(a)*34,20,W-20),y:clamp(p.y+Math.sin(a)*30,40,H-14)});ftext(p.x,p.y-20,TYPES[lb.type].n+' RAN OFF - GRAB IT!','#f8a0c8');snd(340,.1,180)}
  if(hasKeep('charm')){for(const e of RUN.enemies.slice())if(Math.hypot(e.x-p.x,e.y-p.y)<e.r+9)hitEnemy(e,9,'reflect',0,0,p)}
  if(p.hp<=0){
-  /* co-op: a teammate still standing means you are only down, not out */
-  if(PL.some(q=>q!==p&&!q.down)){p.hp=0;p.down=true;p.revT=0;p.dashT=0;p.zoom=null;p.dive=0;p.spA=0;p.supA=0;say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS DOWN - STAND OVER THEM!',2.4);snd(196,.3,98,'sawtooth',.06);return}
   if(RUN.revives>0){RUN.revives--;p.hp=s.maxHp*.5;p.inv=2;say2('DEATH DEFIED!',3);burst(p.x,p.y,'#ffd94d',16,50);snd(784,.2);later(()=>snd(1175,.4),140)}
   else if(hasDuo('phoenix')&&!RUN.phoenixUsed){RUN.phoenixUsed=true;p.hp=s.maxHp*.4;p.inv=2;say2('PHOENIX BLOOM!',3);burst(p.x,p.y,'#f07830',16,50)}
   else if(hasKeep('collar')&&!RUN.collarUsed){RUN.collarUsed=true;p.hp=s.maxHp*.2;p.inv=2;say2('LOUIE HAULS YOU BACK!',3);burst(p.x,p.y,'#f8a0c8',14,46)}
+  /* co-op: a teammate still standing means you are only down, not out. Each fall takes longer to get up from. */
+  else if(PL.some(q=>q!==p&&!q.down)){p.hp=0;p.down=true;p.revT=0;p.downs=(p.downs||0)+1;p.dashT=0;p.zoom=null;p.dive=0;p.spA=0;p.supA=0;say2('P'+(p.ix+1)+' IS DOWN - STAND OVER THEM!',2.4);snd(196,.3,98,'sawtooth',.06)}
   else rdDie();}}
-function doAttack(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=aimVec(p),isLou=p.char==='LOUIE';p.atkCd=w.rate*(isLou?.72:1);
+const doorHold=()=>PL.length>1?.6:.28;
+const reviveTime=p=>1.8+.9*Math.max(0,(p.downs||1)-1);
+/* aim help: lean toward the foe closest to where you're pointing (within ~40 degrees), if there is one */
+function assist(p,v,range){if(RD.set.assist===false||!RUN)return v;let best=null,bs=-1;for(const e of RUN.enemies){if(e.born>0)continue;const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);if(d<1||d>range)continue;
+ const c=(dx*v[0]+dy*v[1])/d;if(c<.76)continue;const sc=c-d/range*.3;if(sc>bs){bs=sc;best=[dx/d,dy/d]}}if(!best)return v;p.ax=best[0];p.ay=best[1];return best}
+/* a target preference for auto-aimed casts: near, and in front */
+const aimScore=(p,e,ax,ay)=>{const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;return d-((dx*ax+dy*ay)/d)*60};
+function doAttack(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=assist(p,aimVec(p),w.proj?170:w.range+22),isLou=p.char==='LOUIE';p.atkCd=w.rate*(isLou?.72:1);
  noise(.045,.14,2400);p.combo=(p.combo+1)%(w.dmg.length);
  const base=w.dmg[p.combo]*s.dmgMul*s.atkMul*(isLou?.85:1);p.swing=Math.max(.3,w.rate*1.1);p.swingD=p.swing;
  if(w.proj){RUN.projs.push({x:p.x+ax*8,y:p.y+ay*8,vx:ax*w.proj,vy:ay*w.proj,dmg:base,kind:'arrow',r:2,life:1.1,o:p});snd(740,.05,1200);return}
@@ -426,7 +472,7 @@ function doDash(p){if(p.dashCharges<=0||p.dashT>0)return;const[ax,ay]=aimVec(p);
  if(g==='PEB')p.armT=1.2;
  if(g==='LEAF')rdHeal(2+v*.12,p);
  if(g==='LUCKY'&&Math.random()<.35){p.dashCharges++;p.dashRegen=0}}
-function doCast(p){const s=rdStats(p);if(p.castAmmo<=0||p.castCd>0)return;const[ax,ay]=aimVec(p);
+function doCast(p){const s=rdStats(p);if(p.castAmmo<=0||p.castCd>0)return;const[ax,ay]=assist(p,aimVec(p),200);
  p.castAmmo--;p.castCd=.35;p.castRegenT=3.2/s.castRegen;snd(880,.07,1320,'triangle',.06);p.castA=.45;
  const god=RUN.boons.cast?RUN.boons.cast.god:'',mul=s.castMul;
  if(!god){const ch=p.char||'WILL';
@@ -436,8 +482,8 @@ function doCast(p){const s=rdStats(p);if(p.castAmmo<=0||p.castCd>0)return;const[
   else if(ch==='LOUIE'){for(const e of RUN.enemies.slice())if(Math.hypot(e.x-p.x,e.y-p.y)<37){hitEnemy(e,10*mul,'sig',0,0,p);const dd=Math.hypot(e.x-p.x,e.y-p.y)||1;e.x+=(e.x-p.x)/dd*16;e.y+=(e.y-p.y)/dd*16;collide(e,e.r)}burst(p.x,p.y,'#f8a0c8',14,42);snd(180,.16,90,'sawtooth',.09);RUN.rings=RUN.rings||[];RUN.rings.push({x:p.x,y:p.y,r:37,t:.3,c:'#f8a0c8'})}
   else{RUN.projs.push({x:p.x+ax*8,y:p.y+ay*8,vx:ax*265,vy:ay*265,dmg:13*mul,kind:'jet',r:4,life:.9,o:p});snd(300,.1,700,'sawtooth',.04)}
   return}
- const nearest=(rad)=>{let best=null,bd=rad*rad;for(const e of RUN.enemies){const d=(e.x-p.x)**2+(e.y-p.y)**2;if(d<bd){bd=d;best=e}}return best};
- if(god==='ZIP'){const sorted=RUN.enemies.slice().sort((a,b)=>((a.x-p.x)**2+(a.y-p.y)**2)-((b.x-p.x)**2+(b.y-p.y)**2)).slice(0,3);
+ const nearest=(rad)=>{let best=null,bd=1e9;for(const e of RUN.enemies){if(Math.hypot(e.x-p.x,e.y-p.y)>rad)continue;const d=aimScore(p,e,ax,ay);if(d<bd){bd=d;best=e}}return best};
+ if(god==='ZIP'){const sorted=RUN.enemies.slice().sort((a,b)=>aimScore(p,a,ax,ay)-aimScore(p,b,ax,ay)).slice(0,3);
   for(const e of sorted){e.hp-=26*mul;e.flash=.15;ftext(e.x,e.y-12,Math.round(26*mul),'#fff8a0');burst(e.x,e.y,'#f0d020',7,34);RUN.bolts=RUN.bolts||[];RUN.bolts.push({x:e.x,y:e.y,sky:1,t:.18});if(e.hp<=0)killEnemy(e)}if(!sorted.length)snd(200,.08);return}
  if(god==='PEB'){const t=nearest(140);const x=t?t.x:p.x+ax*62,y=t?t.y:p.y+ay*62;
   RUN.hazards.push({x,y,t:.45,t0:.45,r:27,dmg:30*mul,from:'player',o:p});return}
@@ -458,8 +504,8 @@ function projHit(p,e){const o=p.o||lead();
 function foeMove(e,dt,tx,ty,sp){const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy)||1;
  const step=Math.min(d,sp*dt*(e.chill>0?.55:1));e.x+=dx/d*step;e.y+=dy/d*step;e.face=dx>0?1:-1;if(d>1)e.yaw=Math.atan2(dx,dy);e.mv=1;collide(e,e.r);return d;}
 function touchHit(e,dmg){for(const p of PL){if(p.down)continue;const d=Math.hypot(p.x-e.x,p.y-e.y);
-  if(d<e.r+7&&e.hitCd<=0&&p.inv<=0&&p.dashT<=0){e.hitCd=.85;const kx=(p.x-e.x)/(d||1)*90,ky=(p.y-e.y)/(d||1)*90;p.vx+=kx;p.vy+=ky;damagePlayer(p,dmg);if(!RUN)return}}}
-function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}
+  if(d<e.r+7&&e.hitCd<=0&&p.inv<=0&&p.dashT<=0){e.hitCd=.85;const kb=p.reviving?20:90,kx=(p.x-e.x)/(d||1)*kb,ky=(p.y-e.y)/(d||1)*kb;p.vx+=kx;p.vy+=ky;damagePlayer(p,e.kind==='boss'?dmg*.7:dmg);if(!RUN)return;if(p.inv>0)p.inv=Math.max(p.inv,.85)}}}
+function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.cd-=dt;
  if(e.burn>0){e.burn-=dt;e.hp-=e.burnDps*dt;if(Math.random()<dt*6)RUN.parts.push({x:e.x+R(-4,4),y:e.y,vx:0,vy:0,z:10,vz:22,life:.35,c:'#f07830',ng:1});
   if(e.hp<=0){killEnemy(e);return}}
  if(e.chill>0)e.chill-=dt;if(e.root>0){e.root-=dt;return}
@@ -479,7 +525,7 @@ function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv
   if(st===2){e.t-=dt;e.x+=e.sx*175*dt;e.y+=e.sy*175*dt;e.mv=1;collide(e,e.r);if(e.t<=0){e.state=0;e.cd=1.3}}}
  /* touch damage */
  touchHit(e,e.dmg);}
-function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.bt-=dt;
+function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.cd-=dt;e.bt-=dt;
  if(e.burn>0){e.burn-=dt;e.hp-=e.burnDps*dt;if(e.hp<=0){killEnemy(e);return}}
  if(e.chill>0)e.chill-=dt;if(e.root>0){e.root-=dt;return}
  const frac=e.hp/e.max;e.phase=frac>.66?1:frac>.33?2:3;if(e.phase>(e.phSaid||1)){e.phSaid=e.phase;bossSay(e,'p'+e.phase)}
@@ -512,20 +558,23 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.mv=
     else radial(9)}}}
  if(RUN)touchHit(e,e.dmg);}
 function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
- for(const p of PL)if(p.dev.pr.start){pauseSel=0;pausePage=0;state='pause';rdSave();return}
+ for(const p of PL)if(p.dev.pr.start){pauseSel=0;pausePage=0;pauseConfirm=-1;state='pause';menuDev=p.dev;rdSave();return}
+ /* drop in mid-run: new keepers land beside the party */
+ for(const np of pollJoin()){const L=lead();np.char=RD.chars[np.ix]&&charUnlocked(RD.chars[np.ix])?RD.chars[np.ix]:'WILL';plRunInit(np);movesReset(np,true);
+  np.x=clamp(L.x+R(-18,18),20,W-20);np.y=clamp(L.y+R(-10,10),40,H-16);np.land=.62;np.inv=1.5;joinMsg=joinNote(np);joinT=3;say2('P'+(np.ix+1)+' DROPS IN!',1.6);snd(784,.08,1175)}
  if(RUN.shake>0)RUN.shake*=Math.max(0,1-dt*7);if(RUN.flash>0)RUN.flash-=dt;if(RUN.banner){RUN.banner.t-=dt;if(RUN.banner.t<=0)RUN.banner=null}
  if(RUN.sub){RUN.sub.t-=dt;if(RUN.sub.t<=0)RUN.sub=null}for(const q of RUN.subQ)q.d-=dt;{const q=RUN.subQ.find(q=>q.d<=0);if(q){RUN.subQ.splice(RUN.subQ.indexOf(q),1);sub(q.who,q.txt,q.t,q.c)}}
  RUN.mwT-=dt;if(RUN.mwT<=0){RUN.mwT=1;missionWatch()}
- if(RUN.echo)for(const p of PL)if(!p.down&&Math.hypot(p.x-RUN.echo.x,p.y-RUN.echo.y)<12){echoTake();return}
+ if(RUN.echo)for(const p of PL)if(!p.down&&Math.hypot(p.x-RUN.echo.x,p.y-RUN.echo.y)<12){menuDev=p.dev;echoTake();return}
  /* a super stops the room for a beat before it lands */
- if(RUN.freeze>0){RUN.freeze-=dt;for(const p of PL)if(p.supA>0)p.supA-=dt*.5;if(RUN.freeze<=0&&RUN.freezeP){const fp=RUN.freezeP;RUN.freezeP=null;superFire(fp)}return}
+ if(RUN.freeze>0){for(const p of PL)if(p!==RUN.freezeP&&p.dev.pr.sup&&(p.meter||0)>=SUPER_MAX)p.supQ=true;RUN.freeze-=dt;for(const p of PL)if(p.supA>0)p.supA-=dt*.5;if(RUN.freeze<=0&&RUN.freezeP){const fp=RUN.freezeP;RUN.freezeP=null;superFire(fp)}return}
  const zipSp=1+.07*budCount(3);
  /* keepers */
  for(const p of PL){
-  if(p.swing>0)p.swing-=dt;if(p.hurt>0)p.hurt-=dt;if(p.castA>0)p.castA-=dt;if(p.selfie>0)p.selfie-=dt;if(p.selfieA>0)p.selfieA-=dt;if(p.cheer>0)p.cheer-=dt;if(p.land>0)p.land-=dt;
-  if(p.down){p.vx=p.vy=0;let near=false;for(const q of PL)if(q!==p&&!q.down&&Math.hypot(q.x-p.x,q.y-p.y)<20)near=true;
-   if(near){p.revT+=dt;if(p.revT>=2.2){RD.stats.revives=(RD.stats.revives||0)+1;chatter('rev',true);p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1.5;burst(p.x,p.y,'#a8f080',14,46);say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS BACK UP!',1.6);snd(523,.1);later(()=>snd(784,.2),110)}}
-   else p.revT=Math.max(0,p.revT-dt*.6);
+  if(p.reviving>0)p.reviving-=dt;if(p.swing>0)p.swing-=dt;if(p.hurt>0)p.hurt-=dt;if(p.castA>0)p.castA-=dt;if(p.selfie>0)p.selfie-=dt;if(p.selfieA>0)p.selfieA-=dt;if(p.cheer>0)p.cheer-=dt;if(p.land>0)p.land-=dt;
+  if(p.down){p.vx=p.vy=0;let near=0;for(const q of PL)if(q!==p&&!q.down&&Math.hypot(q.x-p.x,q.y-p.y)<20){near++;q.reviving=.2}
+   if(near){p.revT+=dt*(1+.5*(near-1));if(p.revT>=reviveTime(p)){RD.stats.revives=(RD.stats.revives||0)+1;chatter('rev',true);p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1.5;burst(p.x,p.y,'#a8f080',14,46);say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS BACK UP!',1.6);snd(523,.1);later(()=>snd(784,.2),110)}}
+   else p.revT=Math.max(0,p.revT-dt*.25);
    continue}
   const s=rdStats(p);
   if(p.atkCd>0)p.atkCd-=dt;if(p.castCd>0)p.castCd-=dt;if(p.inv>0)p.inv-=dt;
@@ -538,13 +587,14 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
   const synth=RUN.boons.pass.find(q=>q.id==='synth');if(synth)p.hp=Math.min(s.maxHp,p.hp+rdBoonVal(synth)*.2*dt);
   /* dash: the dedicated button, or the cartridge's double-tap on a digital direction */
   const dv=p.dev;if(dv.pr.dash)doDash(p);
-  if(dv.id.slice(0,2)!=='gp'||dv.dpad)for(const d of['left','right','up','down'])if(dv.pr[d]){if(p.dtap[d]!==undefined&&RUN.time-p.dtap[d]<.27&&dv.id!=='touch')doDash(p);p.dtap[d]=RUN.time}
+  if(dv.id==='kb1'||dv.id==='kb2')for(const d of['left','right','up','down'])if(dv.pr[d]){if(p.dtap[d]!==undefined&&RUN.time-p.dtap[d]<.27)doDash(p);p.dtap[d]=RUN.time}
   movesInput(p,dt,dv);
   if(dv.pr.b&&!(p.dive>0)&&!p.zoom)doCast(p);
   for(const tr of p.trail)tr.t-=dt;p.trail=p.trail.filter(tr=>tr.t>0)}
+ separate(PL,10);
  /* sprout buddies: each bud trails the keeper who picked it up */
  const chainIx={};
- for(let i=0;i<RUN.buds.length;i++){const b=RUN.buds[i];let ow=PL[b.own];if(!ow||ow.down){ow=lead();b.own=ow.ix}
+ for(let i=0;i<RUN.buds.length;i++){const b=RUN.buds[i];let ow=PL.find(q=>q.ix===b.own);if(!ow||ow.down){ow=lead();b.own=ow.ix}
   const ci=chainIx[b.own]||0;chainIx[b.own]=ci+1;let an=ow;if(ci>0){for(let j=i-1;j>=0;j--)if(RUN.buds[j].own===b.own){an=RUN.buds[j];break}}
   const bx=-(ow.ax||0)*10,by=-(ow.ay===undefined?1:ow.ay)*10;
   const tx2=an.x+(ci===0?bx:Math.cos(i*2.4)*9),ty2=an.y+(ci===0?by:Math.sin(i*2.4)*7+4),dd=Math.hypot(tx2-b.x,ty2-b.y);
@@ -590,18 +640,19 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
   p.vx*=Math.max(0,1-dt*4);p.vy*=Math.max(0,1-dt*4);p.x+=p.vx*dt;p.y+=p.vy*dt;
   if(d<10){p.got=true;if(p.kind==='petal'){RUN.petals+=p.val;if(Math.random()<.3)snd(1200,.03,1600,'square',.02)}
    else if(p.kind==='dew'){RUN.dew+=p.val;say2('+'+p.val+' MOONDEW',1.2);snd(980,.06,1470)}
-   else if(p.kind==='heart'){rdHeal(p.val,q);ftext(q.x,q.y-12,'+'+p.val,'#a8f080')}
-   else if(p.kind==='honey'){RUN.honey+=p.val;say2('+1 HONEY',1.5)}}}
+   else if(p.kind==='heart'){let w=q,wr=2;for(const o of alive()){const r2=o.hp/rdStats(o).maxHp;if(r2<wr){wr=r2;w=o}}rdHeal(p.val,w);ftext(w.x,w.y-12,'+'+p.val,'#a8f080')}
+   else if(p.kind==='honey'){RUN.honey+=p.val;say2(RD.stats.honeyFound?'+1 HONEY':'+1 HONEY - A GIFT FOR SOMEONE AT THE HEARTH',2.4)}}}
  RUN.pickups=RUN.pickups.filter(p=>!p.got);
  /* doors / clear */
  if(RUN.phase==='fight'&&RUN.enemies.length===0){
   if(RUN.wave2&&RUN.wave2.length){const w2=RUN.wave2;RUN.wave2=null;
-   for(const s2 of w2)spawnFoe(s2.k,26+Math.random()*(W-52),36+Math.random()*(H*.45),s2.elite);
+   for(const s2 of w2){const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)}
    say2('THE DEEP STIRS - MORE RISE',1.6);snd(160,.25,70,'sawtooth',.06)}
   else{chamberCleared();if(!RUN)return}}
- else if(RUN.phase==='doors'){for(const d of RUN.doors){let on=false;for(const p of PL)if(!p.down&&Math.hypot(p.x-d.x,p.y-(d.y+8))<13)on=true;
-   /* solo: step in, like the cartridge. Co-op: hold the doorway a beat so nobody picks by accident */
-   if(on){d.hold+=dt;if(PL.length===1||d.hold>.6){doorReward(d);return}}else d.hold=Math.max(0,d.hold-dt*2)}}
+ else if(RUN.phase==='doors'){for(const d of RUN.doors){let on=null;for(const p of PL)if(!p.down&&Math.hypot(p.x-d.x,p.y-(d.y+8))<13)on=p;d.by=on;if(on)menuDev=on.dev;
+   /* stand in the doorway a beat (longer in co-op) so a brush in a fight doesn't pick for you */
+   if(on&&PL.some(q=>q.down)){if(!(say2T>0))say2('REVIVE YOUR FRIENDS FIRST',1.4);d.hold=0}
+   else if(on){d.hold+=dt;if(d.hold>doorHold()){doorReward(d);return}}else d.hold=Math.max(0,d.hold-dt*2)}}
  /* fx */
  for(const q of RUN.parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.z=Math.max(0,(q.z||0)+(q.vz||0)*dt);if(!q.ng)q.vz=(q.vz||0)-140*dt;q.life-=dt}RUN.parts=RUN.parts.filter(q=>q.life>0);
  if(RUN.parts.length>260)RUN.parts.splice(0,RUN.parts.length-260);
@@ -617,11 +668,11 @@ function menuUpdate(){menuSel=nav(menuSel,3);
   else if(menuSel===1)startCine('menu');
   else{setReturn='menu';uiSel=0;state='set'}}
  else if(pressed('b'))state='title'}
-function setUpdate(){uiSel=nav(uiSel,3);const lr=(pressed('right')?1:0)-(pressed('left')?1:0);
+function setUpdate(){uiSel=nav(uiSel,5);const lr=(pressed('right')?1:0)-(pressed('left')?1:0);
  if(lr||pressed('a')){let touched=true;
   if(uiSel===0)RD.set.mus=lr?Math.max(0,Math.min(10,RD.set.mus+lr)):(RD.set.mus>=10?0:RD.set.mus+1);
   else if(uiSel===1)RD.set.sfx=lr?Math.max(0,Math.min(10,RD.set.sfx+lr)):(RD.set.sfx>=10?0:RD.set.sfx+1);
-  else if(pressed('a'))RD.set.shake=!RD.set.shake;else touched=false;
+  else if(uiSel===2&&(pressed('a')||lr))RD.set.shake=!RD.set.shake;else if(uiSel===3&&(pressed('a')||lr))RD.set.grace=!RD.set.grace;else if(uiSel===4&&(pressed('a')||lr))RD.set.assist=RD.set.assist===false;else touched=false;
   if(touched){rdSave();snd(660,.05,880)}}
  if(pressed('b')||pressed('start')){snd(440,.05);state=setReturn}}
 function titleUpdate(){const d=pressedBy('a')||pressedBy('start');
@@ -629,7 +680,12 @@ function titleUpdate(){const d=pressedBy('a')||pressedBy('start');
   /* whoever presses first holds the lantern: they are player 1 */
   if(!PL.length)joinPlayer(d);
   if(!RD.flags.cineSeen)startCine('hub');else{menuSel=0;state='menu'}}}
-function gameUpdate(dt){time+=dt;
+/* menus that belong to one player; every other state is open to all joined players */
+const OWNED=new Set(['mirror','arm','keep','codex','heat','board','sprouts','talk','boon','shop','pause','echo','set']);
+let stateT=0;
+function gameUpdate(dt){const was=state;stateT+=dt;gameStep(dt);
+ if(state!==was){stateT=0;holdRepeat();if(!OWNED.has(state)||(state==='set'&&setReturn!=='pause'))menuDev=null}}
+function gameStep(dt){time+=dt;
  if(say2T>0)say2T-=dt;if(joinT>0)joinT-=dt;
  switch(state){
  case 'title':titleUpdate();return;
@@ -638,7 +694,7 @@ function gameUpdate(dt){time+=dt;
  case 'sprouts':sproutsUpdate();return;
  case 'cine':cineUpdate(dt);return;
  case 'hub':hubUpdate(dt);return;
- case 'talk':talkUpdate();return;
+ case 'talk':talkUpdate();for(const p of PL)if(p.dev!==menuDev){movePlayer(p,dt,84);aimVec(p)}return;
  case 'chars':charsUpdate(dt);return;
  case 'mirror':mirrorUpdate();return;
  case 'arm':armUpdate();return;
@@ -651,5 +707,6 @@ function gameUpdate(dt){time+=dt;
  case 'shop':if(!RUN){state='hub';return}shopUpdate();return;
  case 'pause':if(!RUN){hubEnter();return}pauseUpdate();return;
  case 'run':if(!RUN){hubEnter();return}runUpdate(dt);return;
- case 'over':case 'win':overT+=dt;if(overT>.8&&(pressed('a')||pressed('start')))hubEnter();return;
+ /* a short lock so mashing attack through a death doesn't skip the summary; the prompt appears when it lifts */
+ case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start')))hubEnter();return;
  }}

@@ -77,7 +77,7 @@ const MISSIONS=[
   ask:[['LOUIE',"WHINE? (He would simply like to go down too.)"],['ERIN',"...Twenty sprouts home safe, and he walks them every one. If he's earned the door, Louie, I can't keep telling you no."]],
   done:[['LOUIE',"WOOF. (He went all the way down. It did not wear his face. It did not know how. He thinks it tried to and got confused and sat.)"],['ERIN',"It sat?"],['LOUIE',"BOOF. (It sat. He told it it was good. Somebody should.)"]]},
  /* Ranger and Scout: errands only */
- {id:'r1',who:'RANGER',n:'TAKE THE ELITE DOORS',d:'Fell 3 elites.',p:()=>[Math.min(3,stn('elites')),3],rew:{keys:1},
+ {id:'r1',who:'RANGER',n:'THREE, SEVEN, TEN',d:'Fell 3 elites.',p:()=>[Math.min(3,stn('elites')),3],rew:{keys:1},
   ask:[['RANGER',"Chambers three, seven and ten. Something bigger than the rest stands guard in each. Three of those and you've earned a key off my ring."]],
   done:[['RANGER',"Three guards down. Common graves are for cowards. Here's your key."]]},
  {id:'r2',who:'RANGER',n:'MARK YOUR TURNS',need:'r1',d:'Clear 30 chambers.',p:()=>[Math.min(30,stn('chambers')),30],rew:{dew:30},
@@ -99,7 +99,7 @@ const MISSIONS=[
   ask:[['SCOUT',"One keeper is an anecdote. Two is a study! Take a friend down and bring me a boss. I'll hold the door. From here. Up here."]],
   done:[['SCOUT',"Two keepers, one boss, zero fatalities worth footnoting. That's publishable! Honey for the both of you. Share. I'm watching."]]}];
 const missionById=id=>MISSIONS.find(m=>m.id===id);
-const missionOpen=m=>!RD.msn[m.id]&&(!m.need||RD.msn[m.need]);
+const missionOpen=m=>!RD.msn[m.id]&&(!m.need||RD.msn[m.need])&&(m.who==='ERIN'||stn('runs')>=1);
 const missionDone=m=>{const q=m.p();return q[0]>=q[1]};
 function openMissions(){return MISSIONS.filter(missionOpen)}
 
@@ -108,7 +108,7 @@ const EVENTS=[
  /* first time back */
  {id:'death1',who:'ERIN',when:()=>stn('deaths')>=1,lines:[['ERIN',"There you are. I dug you out of the potato bed. You come up wherever the roots are softest, it turns out."],['ERIN',"Nobody stays down there, keeper. That's the one mercy. It doesn't want you. It only wants what you're carrying."]]},
  {id:'death1m',who:'MARCUS',when:()=>stn('deaths')>=1,lines:[['MARCUS',"Oh, you're alive. I already told everyone you weren't. This is embarrassing for me."]]},
- {id:'death3',who:'ERIN',when:()=>stn('deaths')>=3,lines:[['ERIN',"Three times I've pulled you out of the dirt now. I'm not complaining. The potatoes are complaining."],['ERIN',"Spend what you bring back. The Mirror isn't vanity. It's the only thing down here that remembers you between tries."]]},
+ {id:'death3',who:'ERIN',when:()=>stn('deaths')>=3,lines:[['ERIN',"That's a few times now I've pulled you out of the dirt. I'm not complaining. The potatoes are complaining."],['ERIN',"Spend what you bring back. The Mirror isn't vanity. It's the only thing down here that remembers you between tries."]]},
  {id:'death15',who:'MARCUS',when:()=>stn('deaths')>=15,lines:[['MARCUS',"Fifteen. I've started a second notebook."],['MARCUS',"I'm not worried. I just think it's weird that you're not worried. One of us should be and it's not gonna be me."]]},
  /* the Burrows and the Mother */
  {id:'mother_seen',who:'RANGER',when:()=>RD.seen.mother&&!bk('mother'),lines:[['RANGER',"You saw her, then. Thornback's mother. I've only ever seen the tunnels she leaves."],['RANGER',"She charges in a straight line and she can't turn. Stand still until she's committed. Then don't be there."]]},
@@ -190,10 +190,11 @@ const ECHOES=[
  {id:'c6',th:2,n:'TO WHOEVER IS NEXT',x:"I'm too tall now to remember much. So, you: be kind to it. Then hit it, hard, and climb. And then go back. It's so lonely. It lights up when you walk in. (a small lantern is drawn here)"}];
 function nextEcho(th){return ECHOES.find(e=>e.th===th&&!RD.echo[e.id])||null}
 /* a chamber gives one up now and then; a boss always does, the first time through its thread */
-function echoRoll(boss){if(!RUN)return;const e=nextEcho(RUN.biome);if(!e)return;if(boss||RUN.elite||Math.random()<.2)RUN.echo={e,x:W/2+R(-30,30),y:H/2+30}}
+function echoRoll(boss){if(!RUN)return;const e=nextEcho(RUN.biome);if(!e)return;if(!(boss||RUN.elite||Math.random()<.2))return;let x=W/2,y=H/2+30;
+ for(let i=0;i<30;i++){x=W/2+R(-60,60);y=H/2+R(0,50);if(!RUN.obst.some(o=>x>o.x-12&&x<o.x+o.w+12&&y>o.y-12&&y<o.y+o.h+16))break}RUN.echo={e,x,y}}
 let echoRead=null,echoT=0;
 function echoTake(){echoRead=RUN.echo.e;RD.echo[echoRead.id]=1;RUN.echo=null;echoT=0;rdSave();snd(660,.2,990,'triangle',.05);state='echo'}
-function echoUpdate(dt){echoT+=dt;if(echoT>.5&&(pressed('a')||pressed('b')||pressed('start'))){state=RUN?'run':'codex';snd(520,.05)}}
+function echoUpdate(dt){echoT+=dt;if(echoT>.3&&(pressed('a')||pressed('b')||pressed('start'))){state=RUN?'run':'codex';snd(520,.05)}}
 
 /* ---------------- things said in the deep ---------------- */
 const GODSAY={
