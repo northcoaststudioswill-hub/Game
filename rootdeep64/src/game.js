@@ -26,8 +26,8 @@ let state='title',time=0;
 /* ---------------- sound (the console's own two voices) ---------------- */
 let ac=null;
 function audioWake(){try{if(!ac){const AC=window.AudioContext||window.webkitAudioContext;if(AC)ac=new AC()}if(ac&&ac.state==='suspended')ac.resume()}catch(e){}}
-function snd(f,d=.08,f2=0,type='square',vol=.045){if(!ac||!RD.set.sfx)return;vol*=Math.pow(RD.set.sfx/10,1.5)*1.4;try{const o=ac.createOscillator(),ga=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);ga.gain.setValueAtTime(vol,t);ga.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(ga);ga.connect(ac.destination);o.start(t);o.stop(t+d+.02);}catch(e){}}
-function noise(d=.05,vol=.2,freq=2000,type='highpass'){if(!ac||!RD.set.sfx)return;try{const n=Math.ceil(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),ch=b.getChannelData(0);for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
+function snd(f,d=.08,f2=0,type='square',vol=.045){if(NET.host)cue('s',[f,d,f2,type,vol]);if(!ac||!RD.set.sfx)return;vol*=Math.pow(RD.set.sfx/10,1.5)*1.4;try{const o=ac.createOscillator(),ga=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);ga.gain.setValueAtTime(vol,t);ga.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(ga);ga.connect(ac.destination);o.start(t);o.stop(t+d+.02);}catch(e){}}
+function noise(d=.05,vol=.2,freq=2000,type='highpass'){if(NET.host)cue('n',[d,vol,freq,type]);if(!ac||!RD.set.sfx)return;try{const n=Math.ceil(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),ch=b.getChannelData(0);for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
  const s=ac.createBufferSource(),fl=ac.createBiquadFilter(),ga=ac.createGain();s.buffer=b;fl.type=type;fl.frequency.value=freq;ga.gain.value=vol*Math.pow(RD.set.sfx/10,1.5)*.5;s.connect(fl);fl.connect(ga);ga.connect(ac.destination);s.start()}catch(e){}}
 function later(fn,ms){setTimeout(fn,ms)}
 let musT=null;
@@ -54,7 +54,7 @@ function rdLoad(){try{let s=JSON.parse(localStorage.getItem(SAVEKEY)||'null');
  RD.chars=RD.chars||['WILL','WILL','WILL','WILL'];for(const k of['msn','echo','bossK','killK','diedTo','charEsc','charRun','seenN','godMet'])RD[k]=RD[k]||{};if(!RD.set)RD.set={mus:7,sfx:8,shake:true};
  RD.stats=Object.assign({runs:0,deaths:0,escapes:0,kills:0,bosses:0,chambers:0},RD.stats)}
 rdLoad();
-function rdSave(){try{localStorage.setItem(SAVEKEY,JSON.stringify(RD))}catch(e){}}
+function rdSave(){if(NET.client)return;try{localStorage.setItem(SAVEKEY,JSON.stringify(RD))}catch(e){}}
 let RUN=null;
 let uiSel=0,talkNPC=null,talkTxt='',talkStart=0,talkLine=0,boonOffer=[],shopItems=[],pauseSel=0,pausePage=0,codexPage=0,heatSel=0;
 let overT=0,joinMsg='',joinT=0,diveT=0,talkEv=null,talkWho='',boonQuote='',boardSel=0,echoSel=0;
@@ -65,7 +65,7 @@ const mir=id=>RD.mirror[id]||0;
 const alive=()=>PL.filter(p=>!p.down);
 const lead=()=>PL.find(p=>!p.down)||PL[0];
 /* derived stats for one keeper in the current RUN (or hub preview) */
-function rdStats(p){p=p||PL[0];const ch=p?p.char:'WILL';const b=RUN?RUN.boons:{atk:null,cast:null,dash:null,pass:[]};
+function rdStats(p){p=p||PL[0];if(NET.client&&p&&p.ns)return p.ns;const ch=p?p.char:'WILL';const b=RUN?RUN.boons:{atk:null,cast:null,dash:null,pass:[]};
  const pass=id=>b.pass.find(p=>p.id===id);
  const erin=hasKeep('flower');
  return{maxHp:100+mir('vit')*10+(pass('heart')?rdBoonVal(pass('heart')):0)+(erin?20:0)+(RUN&&RUN.bonusMax?RUN.bonusMax:0)+((ch==='LOUIE')?-20:(ch==='MARCUS')?25:0),
@@ -341,7 +341,8 @@ function shopUpdate(){uiSel=nav(uiSel,shopItems.length+1);
   if(it.sold){snd(140,.08)}else if(RUN.petals>=it.p){RUN.petals-=it.p;it.sold=true;snd(700,.08,1100);it.act()}else snd(140,.08)}
  else if(pressed('b')){rdNextChamber();state='run'}}
 let pauseConfirm=-1;
-function pauseItems(){const L=['RESUME','BUILD','SETTINGS','ABANDON RUN','QUIT TO TITLE'];if(PL.length>1)L.push('LEAVE THE PARTY');return L}
+/* an online friend's pause can't end the host's run or change the host's settings */
+function pauseItems(){if(menuDev&&menuDev.net)return['RESUME','BUILD','LEAVE THE PARTY'];const L=['RESUME','BUILD','SETTINGS','ABANDON RUN','QUIT TO TITLE'];if(PL.length>1)L.push('LEAVE THE PARTY');return L}
 /* the run-ending rows ask twice */
 function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else if(pauseConfirm>=0)pauseConfirm=-1;else state='run';return}
  if(pausePage===1){if(pressed('a')||pressed('start'))pausePage=0;return}
@@ -353,7 +354,7 @@ function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else if(pa
   else if(pauseConfirm!==pauseSel){pauseConfirm=pauseSel;snd(330,.06)}
   else if(it==='ABANDON RUN'){rdAbandon();hubEnter()}
   else if(it==='LEAVE THE PARTY'){const p=PL.find(q=>q.dev===menuDev);if(p&&dropPlayer(p)){joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2}state='run'}
-  else{rdAbandon();PL.length=0;kb2On=false;menuSel=0;state='title'}}}
+  else{rdAbandon();if(NET.host)netLeave();PL.length=0;kb2On=false;menuSel=0;state='title'}}}
 
 /* ---------------- intro cinematic ---------------- */
 let rdCineT=0,rdCineIx=0,rdCineDest='hub';
@@ -662,10 +663,11 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
 
 /* ---------------- title / menu / settings ---------------- */
 let menuSel=0,setReturn='title';
-function menuUpdate(){menuSel=nav(menuSel,3);
+function menuUpdate(){menuSel=nav(menuSel,4);
  if(pressed('a')||pressed('start')){snd(660,.06,990);
   if(menuSel===0)hubEnter();
-  else if(menuSel===1)startCine('menu');
+  else if(menuSel===1){if(NET.host){netLeave();joinMsg='STOPPED HOSTING';joinT=2}else{onSel=0;state='online';netInit()}}
+  else if(menuSel===2)startCine('menu');
   else{setReturn='menu';uiSel=0;state='set'}}
  else if(pressed('b'))state='title'}
 function setUpdate(){uiSel=nav(uiSel,5);const lr=(pressed('right')?1:0)-(pressed('left')?1:0);
@@ -690,6 +692,7 @@ function gameStep(dt){time+=dt;
  switch(state){
  case 'title':titleUpdate();return;
  case 'menu':menuUpdate();return;
+ case 'online':onlineUpdate();return;
  case 'set':setUpdate();return;
  case 'sprouts':sproutsUpdate();return;
  case 'cine':cineUpdate(dt);return;

@@ -67,7 +67,7 @@ function drawList(items,sel,y,step){items.forEach((s,i)=>{const on=i===sel;hitbo
 function hudHub(){
  for(const s of STATIONS){const q=project(s.x,25,29);if(q){const locked=s.id==='heat'&&RD.stats.escapes<1;ctext(s.l,Math.max(23,q.y-10),1,locked?'#6a6284':'#e8e0f8','#120a18',q.x)}}
  for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;const q=project(n.x,who==='LOUIE'?15:26,n.y);
-  if(q&&state==='hub'){const ev=storyNext(who);if(ev){const turnin=!!ev.mission,by2=q.y-28+Math.sin(time*5)*2;r('#120a18',q.x-6,by2-1,12,15);r(turnin?'#58c048':'#ffd94d',q.x-5,by2,10,13);ctext(turnin?'?':'!',by2+1,1,'#120a18',null,q.x)}}
+  if(q&&state==='hub'){const ev=NET.client?(NET.mk[who]?{mission:NET.mk[who]==='?'}:null):storyNext(who);if(ev){const turnin=!!ev.mission,by2=q.y-28+Math.sin(time*5)*2;r('#120a18',q.x-6,by2-1,12,15);r(turnin?'#58c048':'#ffd94d',q.x-5,by2,10,13);ctext(turnin?'?':'!',by2+1,1,'#120a18',null,q.x)}}
   if(q)ctext(who,q.y-11,1,'#c8c0d8','#120a18',q.x)}
  {const q=project(DOOR.x,6,DOOR.y+4);if(q)ctext('DESCEND',q.y,1,'#f8c070','#120a18',q.x)}
  {const q=project(BOARD.x,20,BOARD.y+7);if(q)ctext('BOARD',q.y-10,1,'#e8e0f8','#120a18',q.x)}
@@ -263,7 +263,7 @@ function hudTitle(){const g=hx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'
  const lk=Math.min(1,VW/400);logoText('ROOTDEEP',VW/2-22*lk,VH*.12,50*lk);
  hx.save();hx.translate(VW/2+146*lk,VH*.12+30*lk);hx.rotate(-.16);logoText('64',0,-22*lk,44*lk);hx.restore();
  ctext('A  SPROUTS  ROGUELITE  ·  1-4  KEEPERS',VH*.12+62,1,'#c8b8e8','#120a18');
- if(state==='menu'){panel(VW/2-84,VH-128,168,92,'rgba(8,5,14,.82)','#ffd94d');drawList(['TO THE HEARTH','INTRO','SETTINGS'],menuSel,VH-116,26);return}
+ if(state==='menu'){panel(VW/2-94,VH-150,188,116,'rgba(8,5,14,.82)','#ffd94d');drawList(['TO THE HEARTH',NET.host?'STOP HOSTING':'PLAY ONLINE','INTRO','SETTINGS'],menuSel,VH-138,26);if(joinT>0)banner(joinMsg,VH*.5);return}
  if(state!=='title')return;
  if(RD.stats.runs)ctext('RUNS '+RD.stats.runs+'  ·  ESCAPES '+RD.stats.escapes,VH-66,1,'#8d84a8','#120a18');
  if(((time*2)|0)%2)ctext(touchSeen?'TAP  A  TO  START':'PRESS  START',VH-50,3,'#ffffff');
@@ -287,9 +287,11 @@ function hudOver(win){r(win?'rgba(16,24,12,.84)':'rgba(24,8,14,.84)',0,0,VW,VH);
  if(L.spr)ctext('SPROUTS BANKED  +'+L.spr,180,1,'#a8f080',null);
  ctext('SPEND IT AT THE MIRROR. GO AGAIN.',VH-52,1,'#a8f080',null);
  if(overT>1.3)ctext(btnName(lead0(),'a')+': THE HEARTH',VH-34,2,((time*2)|0)%2?'#ffffff':'#ffd94d')}
-function drawHud(){HIT=[];hx.setTransform(hudS,0,0,hudS,0,0);hx.clearRect(0,0,VW,VH);
+function drawHud(){HIT=[];hx.setTransform(hudS,0,0,hudS,0,0);hx.clearRect(0,0,VW,VH);drawHudInner();hudNet()}
+function drawHudInner(){
  switch(state){
  case 'title':case 'menu':hudTitle();return;
+ case 'online':hudTitle();drawOnline();return;
  case 'cine':hudCine();return;
  case 'hub':case 'talk':hudHub();return;
  case 'chars':hudChars();return;

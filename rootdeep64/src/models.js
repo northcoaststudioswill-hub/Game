@@ -415,7 +415,7 @@ function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),L=BL
  const a=time*.1;setCam([W/2+Math.sin(a)*60,90,H*.5+150],[W/2,0,H*.5],.75);frameBegin();drawRoomMesh(BKEY[B],[.7,.7,.75]);torch(12,36);torch(W-12,36);
  for(let i=0;i<10;i++){const k=DEBBY[B][i%3];if(k!=='stalag')prop(PROP[k],(i*97)%(W-30)+15,0,42+((i*57)%(H-66)),i*1.7)}frameEnd()}
 function drawScene(dt){ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
- if(state==='title'||state==='menu'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
+ if(state==='title'||state==='menu'||state==='online'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
  if(state==='chars')return sceneChars(dt);
  if(RUN&&(state==='run'||state==='pause'||state==='boon'||state==='shop'||state==='set'||state==='echo'))return sceneRun(dt);

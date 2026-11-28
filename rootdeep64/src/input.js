@@ -34,11 +34,11 @@ function touchInit(){const zone=document.getElementById('stickzone'),nub=documen
   const on=e=>{woke();TS.btn[b]=true;TS.latch[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
   el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false})}
  /* taps on menus: a row picks / chooses, and on talk, notes, intro and end screens any tap goes on */
- const TAPANY=new Set(['title','cine','talk','echo','over','win']),TAPMENU=new Set(['menu','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
+ const TAPANY=new Set(['title','cine','talk','echo','over','win']),TAPMENU=new Set(['menu','online','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
  document.addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('.tb'))return;const t=e.changedTouches[0];if(!t)return;
   if(TAPANY.has(state)){woke();TS.latch.a=true;e.preventDefault();e.stopPropagation();return}
   if(!TAPMENU.has(state))return;const rc=stage.getBoundingClientRect(),vx=(t.clientX-rc.left)/rc.width*VW,vy=(t.clientY-rc.top)/rc.height*VH;
-  const h=HIT.find(h=>vx>=h.x&&vx<=h.x+h.w&&vy>=h.y&&vy<=h.y+h.h);if(!h)return;woke();if(h.sel)TS.latch.a=true;else{h.set();snd(520,.04)}e.preventDefault();e.stopPropagation()},{capture:true,passive:false});
+  const h=HIT.find(h=>vx>=h.x&&vx<=h.x+h.w&&vy>=h.y&&vy<=h.y+h.h);if(!h)return;woke();if(h.sel)TS.latch.a=true;else if(!NET.client){h.set();snd(520,.04)}e.preventDefault();e.stopPropagation()},{capture:true,passive:false});
  if('ontouchstart' in window||navigator.maxTouchPoints>0)document.body.classList.add('touch')}
 
 function axis(v){return Math.abs(v)<.22?0:v}
@@ -68,6 +68,7 @@ function pollInput(dt){
   dv.mx=mx;dv.my=my;dv.dpad=dl||dr||du||dd;
   dv.cur={a:B(0),b:B(1),sp:B(2),sup:B(3),dash:B(4)||B(5)||B(6)||B(7),start:B(9),sel:B(8),left:mx<-.5,right:mx>.5,up:my<-.5,down:my>.5};
   if(B(0)||B(9))anyInput=true}
+ netPoll();
  for(const id in DEV){const dv=DEV[id];for(const b of BTN){dv.pr[b]=dv.cur[b]&&!dv.prev[b];dv.prev[b]=dv.cur[b]}
   /* menu auto-repeat on held directions */
   const dir=dv.cur.up?'up':dv.cur.down?'down':dv.cur.left?'left':dv.cur.right?'right':'';
@@ -89,11 +90,11 @@ function nav(i,n){if(pressed('down')){snd(520,.04);return(i+1)%n}if(pressed('up'
    they play, so somebody leaving doesn't reshuffle the couch. PL stays sorted by seat. */
 const PL=[];const PCOL=['#ffd94d','#58c8f8','#f878a8','#8ae060'];let fullT=0;
 function devPlayer(dev){return PL.find(p=>p.dev===dev)}
-function joinPlayer(dev){if(PL.length>=4||devPlayer(dev))return null;if(dev.id==='kb2')kb2On=true;
+function joinPlayer(dev){if(PL.length>=4||devPlayer(dev))return null;if(dev.id==='kb2'&&!dev.net)kb2On=true;
  let seat=0;while(PL.some(q=>q.ix===seat))seat++;
  const p={ix:seat,dev,char:'WILL',x:W/2,y:H/2,vx:0,vy:0,fx:1,fy:0,ax:0,ay:1,anim:0,ready:false,csel:0,hp:100,down:false,inv:0,dashT:0,swing:0};
  PL.push(p);PL.sort((a,b)=>a.ix-b.ix);return p}
-function dropPlayer(p){const i=PL.indexOf(p);if(i<0||PL.length<2)return false;PL.splice(i,1);if(p.dev.id==='kb2')kb2On=false;if(menuDev===p.dev)menuDev=null;
+function dropPlayer(p){const i=PL.indexOf(p);if(i<0||PL.length<2)return false;PL.splice(i,1);if(p.dev.id==='kb2'&&!p.dev.net)kb2On=false;if(menuDev===p.dev)menuDev=null;
  if(RUN&&RUN.buds){const L=PL.find(q=>!q.down)||PL[0];for(const b of RUN.buds)if(b.own===p.ix)b.own=L.ix}return true}
 /* devices nobody is using yet pressed A: let them in (all of them, even on the same frame) */
 function pollJoin(){const out=[];if(fullT>0)fullT-=1/60;

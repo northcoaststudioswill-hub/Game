@@ -115,6 +115,23 @@ Nothing from the Pocket Lantern story notes is used. It is all data: cut or rewr
 - **The Hearth changes:** the Lantern glows brighter with each escape, and finishing Erin's chain makes the
   floor flower.
 
+## Online play
+
+Title menu → PLAY ONLINE. One player picks HOST A GAME and goes to the Hearth as normal; anyone else with the
+game page open sees "JOIN <NAME>'S GAME" in the same list, joins, and presses A to step into the party. Up to four
+keepers total, any mix of couch and online, each on their own controller, keyboard or phone.
+
+- It runs on the artifact page's `room` capability (`src/net.js`): no server, nothing to install. Friends must be
+  signed in to claude.ai with the game shared to them (Share menu); outside claude.ai the menu says it's unavailable.
+- The host's copy runs the game. Friends send their input and draw a snapshot the host streams ~15 times a second.
+  Each friend's own keeper walks and dashes on their own screen immediately and the host takes that position, so
+  movement isn't laggy; hits, enemies and menus arrive with a short delay.
+- Runs count on the host's save. A friend's own save is untouched (it's set aside while they play online).
+- A friend's pause menu only offers RESUME / BUILD / LEAVE THE PARTY. Friends leave by holding Select (Q / Esc),
+  or holding START on a phone. The host stops from the title menu (STOP HOSTING) or QUIT TO TITLE.
+- `node test/online.js` runs two real copies of the game through a stand-in for the room (with network delay;
+  `NET_DELAY=160` for a slower link).
+
 ## Playtest fixes
 
 Four blind reviewers played it (`reviews/`); `reviews/FINDINGS.md` lists their 81 findings and the fix log.
@@ -141,6 +158,7 @@ never renumber, you can drop in mid-run and leave from the Hearth or pause menu.
 - `src/data.js` – the cartridge's tables, verbatim
 - `src/game.js` – the loop
 - `src/moves.js` – specials, supers, heavies, dash strikes
+- `src/net.js` – online play (host / join, input and snapshots over the page's room)
 - `src/story.js` – missions, conversations, echoes, boss / god / keeper lines
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes
 - `src/anim.js` – character animation: jointed rigs, spring-driven poses, every action and NPC habit

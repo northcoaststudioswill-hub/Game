@@ -4,7 +4,10 @@
 'use strict';
 let lastT=0,booted=false;
 function frame(ts){const dt=Math.min(.05,Math.max(0,(ts-lastT)/1000)||0);lastT=ts;
- pollInput(dt);if(!window.__hold)gameUpdate(dt); /* __hold: tests freeze the rules and let the animation settle */
+ pollInput(dt);
+ if(NET.client){netClientLeaveCheck(dt);netClientSend();netClientFrame(dt)}
+ else{if(!window.__hold)gameUpdate(dt); /* __hold: tests freeze the rules and let the animation settle */
+  netHostAfter(dt);netAdvertise(dt)}
  if(RN.ok)drawScene(dt);
  drawHud();
  requestAnimationFrame(frame)}
