@@ -66,6 +66,18 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 #quest span{flex:1;min-width:0}
 #quest em{font-style:normal;color:var(--amber);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 #tut{max-width:420px;align-self:flex-start}
+#story{max-width:440px;align-self:flex-start;border-color:#ff8ae6;box-shadow:4px 4px 0 rgba(0,0,0,.55)}
+#story>.bar{background:#ff8ae6;color:#2a0024}
+#story>.bar button{background:#2a0024;color:#ff8ae6}
+#story .body{padding:8px 10px 10px;font-size:13px;line-height:1.45;display:flex;flex-direction:column;gap:8px}
+#story .body b{color:#ffd0f4}
+#story .btn{border-color:#ff8ae6}
+#story.over{position:fixed;left:max(8px,var(--sal));right:max(8px,var(--sar));bottom:calc(var(--sab) + 8px);z-index:60;margin:0 auto;max-height:38%;overflow-y:auto}
+.hl{animation:hlp 1.1s ease-in-out infinite;position:relative;z-index:5}
+@keyframes hlp{0%,100%{box-shadow:0 0 0 2px #ff8ae6,0 0 0 0 rgba(255,138,230,.6)}50%{box-shadow:0 0 0 3px #fff,0 0 16px 6px rgba(255,138,230,.85)}}
+#dlg.story #dlgBtns{flex-direction:column}
+#dlg.story .win{border-color:#ff8ae6}
+#dlg.story .win>.bar{background:#ff8ae6;color:#2a0024}
 #tut .body{padding:6px 9px 7px;font-size:12.5px}
 #tut .body b{color:var(--amber)}
 
@@ -138,7 +150,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 #menu,#dlg,#life{background:rgba(4,6,16,.72)}
 #life .win{width:100%;max-width:420px;height:100%;max-height:720px;display:flex;flex-direction:column}
 #lfTabs{display:flex;border-bottom:2px solid var(--line)}
-#lfTabs button{flex:1;min-height:40px;font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--dim);border-right:1px solid rgba(125,255,196,.25)}
+#lfTabs button{flex:1;min-height:44px;font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--dim);border-right:1px solid rgba(125,255,196,.25)}
 #lfTabs button:last-child{border-right:0}
 #lfTabs button.on{background:var(--line);color:#06231a}
 #lfBody{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;font-size:12.5px}
@@ -149,14 +161,14 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 #lfBody .it.sec{border-color:var(--sys)}
 #lfBody .it.bad{border-color:var(--bad)}
 #lfBody .it span{flex:1;min-width:0}
-#lfBody .it button,#lfBody .act{border:2px solid var(--line);background:var(--panel2);font-weight:700;font-size:11px;padding:5px 8px;min-height:34px;white-space:nowrap}
+#lfBody .it button,#lfBody .act{border:2px solid var(--line);background:var(--panel2);font-weight:700;font-size:11px;padding:5px 10px;min-height:42px;min-width:64px;white-space:nowrap}
 #lfBody .it button:active,#lfBody .act:active{background:var(--line);color:#06231a}
 #lfBody .act{display:flex;justify-content:space-between;width:100%;text-align:left;font-size:12px}
 #lfBody .act small{color:var(--amber)}
 #lfBody .mem{display:flex;gap:8px;border-left:2px solid rgba(125,255,196,.35);padding-left:7px}
 #lfBody .mem time{color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
 #lfBody .ppl{display:grid;grid-template-columns:1fr 54px 54px;gap:4px 8px;align-items:center}
-#lfBody .ppl button{text-align:left;color:var(--fg);min-height:30px;font-size:12.5px}
+#lfBody .ppl button{text-align:left;color:var(--fg);min-height:40px;font-size:12.5px}
 #lfBody .ppl button i{font-style:normal;color:var(--dim);font-size:11px}
 #lfBody .op{height:8px;background:#1c2340;position:relative}
 #lfBody .op b{position:absolute;top:0;bottom:0}
@@ -226,6 +238,10 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
         <div id="zlabel">NO CREED</div>
       </div>
       <div id="quest"><b id="qTitle">WAKE</b><span id="qText"></span><em id="qProg"></em></div>
+      <div id="story" class="win" hidden>
+        <div class="bar"><span class="grow" id="storyStep">STORY</span><button id="storyShow">SHOW ME</button><button id="storyQuit" aria-label="Leave the story">X</button></div>
+        <div class="body"><div id="storyText"></div><button class="btn sm" id="storyGo">Continue</button></div>
+      </div>
       <div id="tut" class="win" hidden>
         <div class="bar"><span class="grow" id="tutStep">HELP.TXT</span><button id="tutNext">NEXT</button><button id="tutSkip" aria-label="Close the tutorial">X</button></div>
         <div class="body" id="tutText"></div>
@@ -276,6 +292,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
     <div id="titleBox">
       <pre id="boot"></pre>
       <button class="btn" id="btnContinue" hidden>Continue</button>
+      <button class="btn" id="btnStory">Story: four guided chapters</button>
       <button class="btn" id="btnNew">New world</button>
       <button class="btn sm" id="btnHow">How to play</button>
       <div id="ver">BUILD 0.7 &middot; SAVES ON THIS DEVICE</div>
@@ -291,6 +308,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
         <div class="row" id="mSpeed"><button class="btn sm" data-s="1">1x</button><button class="btn sm" data-s="2">2x</button><button class="btn sm" data-s="4">4x</button></div>
         <div class="lab">Options</div>
         <div class="row"><button class="btn sm" id="mSound">Sound: on</button><button class="btn sm" id="mGfx">Pixels: retro</button></div>
+        <div class="row"><button class="btn sm" id="mFx">Effects: auto</button><button class="btn sm" id="mBuzz">Vibration: on</button></div>
         <button class="btn sm" id="mFree" hidden>Unlimited cycles: off</button>
         <button class="btn sm" id="mGoal">Goal: the Spire</button>
         <div class="row"><button class="btn sm" id="mHelp">How to play</button><button class="btn sm" id="mLog">Event log</button></div>
@@ -364,6 +382,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 /*@include render.js*/
 /*@include audio.js*/
 /*@include ui.js*/
+/*@include story.js*/
 /*@include input.js*/
 /*@include main.js*/
 </script>

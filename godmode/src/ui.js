@@ -40,6 +40,7 @@ function initUI() {
   $('btnSpeed').onclick = () => { sfx('click'); setSpeed(APP.speed === 1 ? 2 : APP.speed === 2 ? 4 : 1); };
   $('pw').querySelectorAll('button').forEach(b => { b.onclick = () => { auInit(); sfx('click'); setPower(b.dataset.p === APP.power && b.dataset.p !== 'observe' ? 'observe' : b.dataset.p); }; });
   $('inClose').onclick = () => { sfx('click'); selectCitizen(0); UI.inspectB = 0; };
+  storyInit();
   $('btnGo').onclick = () => { sfx('click'); goNext(); };
   $('inLife').onclick = () => { sfx('click'); if (APP.S.selected) openLife(APP.S.selected); };
   $('lfClose').onclick = () => { sfx('click'); closeLife(); };
@@ -68,6 +69,8 @@ function initUI() {
   $('menuBack').onclick = () => { sfx('click'); if (APP.mode === 'title') closeMenu(); else menuView('main'); };
   $('mSpeed').querySelectorAll('button').forEach(b => { b.onclick = () => { sfx('click'); setSpeed(+b.dataset.s); }; });
   $('mSound').onclick = () => { APP.settings.sound = !APP.settings.sound; saveSettings(); refreshMenu(); sfx('click'); };
+  $('mFx').onclick = () => { const o = ['auto', 'full', 'light']; APP.settings.fx = o[(o.indexOf(APP.settings.fx || 'auto') + 1) % 3]; setLowFx(APP.settings.fx === 'light' || (APP.settings.fx === 'auto' && R.fps && R.fps < 26)); saveSettings(); refreshMenu(); sfx('click'); };
+  $('mBuzz').onclick = () => { APP.settings.buzz = !APP.settings.buzz; saveSettings(); refreshMenu(); sfx('click'); buzz(20); };
   $('mGfx').onclick = () => { APP.settings.retro = !APP.settings.retro; R.retro = APP.settings.retro; resizeRender(); saveSettings(); refreshMenu(); sfx('click'); };
   $('mFree').onclick = () => { APP.S.freeCycles = !APP.S.freeCycles; refreshMenu(); sfx('click'); };
   $('mHelp').onclick = () => { sfx('click'); menuView('help'); };
@@ -86,9 +89,11 @@ function updateUI(S, dt) {
   if (UI.tickerT > 0) { UI.tickerT -= dt; if (UI.tickerT <= 0) $('ticker').classList.remove('show'); }
   if (UI.bannerT > 0) { UI.bannerT -= dt; if (UI.bannerT <= 0) $('banner').classList.remove('show'); }
   if (UI.hintT > 0) { UI.hintT -= dt; if (UI.hintT <= 0) refreshHint(); }
+  UI.storyDt = (UI.storyDt || 0) + dt;
   UI.tickT -= dt;
   if (UI.tickT > 0) return;
   UI.tickT = 0.18;
+  storyTick(S, UI.storyDt); UI.storyDt = 0;
 
   const pop = S.citizens.length;
   const vt = viewedSet(S), vr = resOf(S, vt.id);
@@ -102,7 +107,11 @@ function updateUI(S, dt) {
   const zl = $('zlabel');
   if (S.age >= 0) { zl.textContent = 'AGE OF ' + BELIEFS[S.age].name; zl.style.color = BELIEFS[S.age].hex; $('zeit').style.borderColor = BELIEFS[S.age].hex; }
   else { zl.textContent = 'NO MAJORITY CREED'; zl.style.color = ''; $('zeit').style.borderColor = ''; }
-  if (!S.goal || S.sandbox) {
+  if (S.story) {
+    $('qTitle').textContent = 'STORY';
+    $('qText').textContent = 'Chapter ' + (S.story.ch + 1) + ': ' + CHAPTERS[S.story.ch].title;
+    $('qProg').textContent = (S.story.step + 1) + '/' + CHAPTERS[S.story.ch].steps.length;
+  } else if (!S.goal || S.sandbox) {
     $('qTitle').textContent = S.sandbox ? 'SANDBOX' : 'ENDLESS';
     const sp = firstB(S, 'spire');
     const nsets = S.sets.filter(t => !t.empty && setPop(S, t.id)).length, nfound = S.found.filter(Boolean).length;
@@ -335,7 +344,7 @@ function refreshSub(S) {
     for (const it of CREATE_ITEMS) {
       if (it.k === 'spire' && !S.spireUnlocked) continue;
       const b = document.createElement('button');
-      b.className = it.k === APP.createKind ? 'on' : '';
+      b.className = it.k === APP.createKind ? 'on' : ''; b.dataset.k = it.k;
       b.innerHTML = it.name + '<small>' + (it.cost ? it.cost : 'free') + '</small>';
       b.onclick = () => { sfx('click'); APP.createKind = it.k; UI.lastSub = ''; refreshSub(APP.S); };
       sub.appendChild(b);
@@ -343,7 +352,7 @@ function refreshSub(S) {
   } else {
     BELIEFS.forEach((bf, k) => {
       const b = document.createElement('button');
-      b.className = 'bel' + (k === APP.inspireK ? ' on' : '');
+      b.className = 'bel' + (k === APP.inspireK ? ' on' : ''); b.dataset.k = 'b' + k;
       b.style.setProperty('--bc', bf.hex);
       b.style.color = k === APP.inspireK ? '#06231a' : bf.hex;
       b.textContent = bf.name;
@@ -403,7 +412,7 @@ function banner(title, sub, hex) {
 
 function updateTutorial(S) {
   const el = $('tut');
-  const show = APP.tut >= 0 && APP.tut < TUT.length && APP.mode === 'play' && S.stage < 6;
+  const show = APP.tut >= 0 && APP.tut < TUT.length && APP.mode === 'play' && S.stage < 6 && !S.story;
   if (!show) { if (!el.hidden) el.hidden = true; UI.tutShown = -2; return; }
   const step = TUT[APP.tut];
   if (step.done(S)) { tutAdvance(); return; }
@@ -446,6 +455,8 @@ function menuView(v) {
 function refreshMenu() {
   $('mSound').textContent = 'Sound: ' + (APP.settings.sound ? 'on' : 'off');
   $('mGfx').textContent = 'Pixels: ' + (APP.settings.retro ? 'retro' : 'sharp');
+  $('mFx').textContent = 'Effects: ' + (APP.settings.fx || 'auto') + (APP.settings.fx === 'auto' || !APP.settings.fx ? (R.lowFx ? ' (light)' : ' (full)') : '');
+  $('mBuzz').textContent = 'Vibration: ' + (APP.settings.buzz ? 'on' : 'off');
   $('mSpeed').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.s === APP.speed));
   const S = APP.S;
   $('mFree').hidden = !(S && S.sandbox);

@@ -346,7 +346,7 @@ function sail(S, b, dt) {
   const W = S.world, tx = b.m.tx, tz = b.m.tz;
   const dx = tx - b.x, dz = tz - b.z, d = hyp(dx, dz);
   if (d < 1.2) { arrive(S, b); return; }
-  const sp = 5 * Math.min(1, d / 4 + 0.3);
+  const sp = ((S.rev || 0) >= 3 ? 6.5 : 5) * Math.min(1, d / 4 + 0.3);
   let vx = dx / d, vz = dz / d;
   // steer around land
   for (const I of W.isles) {
@@ -517,9 +517,14 @@ function planExodus(S) {
     let tot = 0; for (const q of plans) tot += q.s;
     let pick = S.rng() * tot, plan = plans[0];
     for (const q of plans) { pick -= q.s; if (pick <= 0) { plan = q; break; } }
-    // who goes: the founder, up to five others, and their partners and small children
+    if (launchExodus(S, t, plan, bt, free, pop)) return;
+  }
+}
+
+/* a group sets out for good: the founder, up to five others, and their partners and small children */
+function launchExodus(S, t, plan, bt, free, pop) {
     const most = Math.min(Math.max(3, Math.floor(pop * 0.45)), t.id === 1 ? pop - 9 : pop);
-    if (most < 3) continue;
+    if (most < 3) return false;
     const go = new Set([plan.by.id]);
     for (const c of plan.who) { if (go.size >= Math.min(6, most)) break; go.add(c.id); }
     for (const id of Array.from(go)) {
@@ -543,8 +548,33 @@ function planExodus(S) {
     ev(S, 'exodus', { x: bt.x, z: bt.z, name: plan.name, kind: plan.sk });
     // people left behind feel it
     for (const id of go) { const c = getC(S, id); for (const o of S.citizens) if (!go.has(o.id) && (o.rel[c.id] || 0) > 0.5) memo(S, o, 'Watched ' + c.name + ' leave for ' + isleName(S, isle.id) + '.'); }
-    return;
+  return true;
+}
+
+/* someone set down on a dock: a faith leader leads their faithful away, anyone else takes a boat out exploring */
+function dockDrop(S, c, dock) {
+  const t = hearthOf(S, c);
+  const bt = freeBoat(S, t.id);
+  if (!S.tech.boats) { c.thought = 'Water. Lots of water. If only there were some way across.'; return 'nothing'; }
+  if (!bt) { c.thought = 'No boat here. Someone needs to build one.'; emote(c, EM.dots, 2); return 'nothing'; }
+  const free = S.world.isles.filter(I => I.id && S.found[I.id] && !S.sets.some(q => q.isle === I.id && !q.empty));
+  const f = c.title === 'leader' && c.fac ? getF(S, c.fac) : null;
+  if (f && free.length && adult(c)) {
+    const mem = S.citizens.filter(o => o.fac === f.id && o.set === t.id && adult(o) && !o.elder && !o.boat && o !== c);
+    if (mem.length >= 2) {
+      const plan = { s: 9, sk: 'faith', by: c, k: f.k, fac: f.id, who: mem, name: f.name.split(' ')[0] + ' Haven' };
+      const pop = setPop(S, t.id);
+      // a leader set down by the hand of god takes up to half the settlement, whatever its size
+      if (launchExodus(S, t, plan, bt, free, Math.max(pop, 12))) { memo(S, c, 'Was set down on the dock by a great hand, and understood: leave.'); return 'exodus'; }
+    }
   }
+  if (!adult(c)) return 'nothing';
+  bt.st = 'boarding'; bt.t = 6; bt.m = { kind: 'explore', by: c.id }; bt.coming = 0; bt.crew = [];
+  S.voyCd = Math.max(S.voyCd, 60);
+  joinBoat(S, c, bt, 'Set down on the dock. I think I am meant to go and look.');
+  S.stats.voyages = (S.stats.voyages || 0) + 1;
+  logMsg(S, c.name + ' takes ' + bt.name + ' out into the fog.', '');
+  return 'explore';
 }
 
 /* ---------------------------------------------- raids and trade at sea */
@@ -647,7 +677,7 @@ function voyageTick(S) {
   for (const c of S.citizens) {
     if (!c.boat) { c.isle = isleNear(S.world, c.x, c.z); revealAt(S, c.x, c.z, 6); }
   }
-  for (const b of S.boats) if (b.st === 'out' || b.st === 'back') revealAt(S, b.x, b.z, 12);
+  for (const b of S.boats) if (b.st === 'out' || b.st === 'back') revealAt(S, b.x, b.z, (S.rev || 0) >= 3 ? 16 : 12);
   S.voyCd -= 1; S.settleCd -= 1;
   // the invention of the boat
   if (!S.tech.boats && S.t > 240 && S.res.insight >= 20) {

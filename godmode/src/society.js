@@ -688,6 +688,7 @@ function endWar(S, win, lose, draw, how) {
   S.truceT = 420;
   for (const c of S.citizens) if (c.state === 'battle') { c.thought = 'It is over.'; finish(S, c); }
   if (how === 'miracle') {
+    S.stats.truce = (S.stats.truce || 0) + 1;
     logMsg(S, 'A light fell on the battlefield and both sides put their fists down. A truce, by miracle.', 'good');
     for (const c of S.citizens) if (win && lose && (c.fac === win.id || c.fac === lose.id)) addBelief(S, c, DEV, 0.08);
   } else if (draw || !win || !lose) {

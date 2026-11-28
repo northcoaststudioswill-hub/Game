@@ -9,7 +9,7 @@ function newSim(seed, goal) {
   const S = {
     v: 2, seed, world: makeWorld(seed), t: 0, day: 0.08,
     res: { food: 12, wood: 4, stone: 0, insight: 0 },
-    cycles: 70, cyclesMax: 100,
+    cycles: 100, cyclesMax: 100, rev: 0,
     citizens: [], buildings: [], graves: [], nextId: 1,
     events: [], log: [],
     stage: 0, flags: {}, age: -1, counts: [0, 0, 0, 0],
@@ -128,6 +128,7 @@ function workSpeed(S, c) {
   if (c.happy < 0.25) w *= 0.7;
   if (S.age === DREAD) w *= 1.25;
   w *= 1 + Math.min(0.2, (S.tools || 0) * 0.02);
+  if ((S.rev || 0) >= 4) w *= 1.1;                       // engines
   return w;
 }
 function rebuildObstacles(S) {
@@ -759,7 +760,7 @@ function updateCitizen(S, c, dt) {
 function transmit(S, from, to, str) {
   let k = from.dom;
   if (k < 0) { k = 0; for (let i = 1; i < 4; i++) if (from.b[i] > from.b[k]) k = i; if (from.b[k] < 0.12) return -1; }
-  let pw = str * from.b[k] * (from.inspired ? 2.2 : 1) * (0.6 + 0.8 * Math.max(0, relOf(from, to))) * (0.7 + 0.6 * to.curio);
+  let pw = str * ((S.rev || 0) >= 1 ? 1.1 : 1) * from.b[k] * (from.inspired ? 2.2 : 1) * (0.6 + 0.8 * Math.max(0, relOf(from, to))) * (0.7 + 0.6 * to.curio);
   if (to.dom >= 0 && to.dom !== k) {
     // a believer resists other ideas; one who holds a minority idea closes ranks harder
     const pop = S.citizens.length, minority = pop >= 4 && S.counts[to.dom] / pop < 0.3;
@@ -1036,10 +1037,11 @@ function secondTick(S) {
   }
 
   // god energy
-  let regen = 0.9;
+  let regen = 0.9 + 0.15 * (S.rev || 0);
   if (S.age === DEV) regen *= 1.5; else if (S.age === KIN) regen *= 0.7;
   if (S.sandbox) regen *= 3;
   S.cycles = Math.min(S.cyclesMax, S.cycles + regen);
+  revelationTick(S);
 
   // nature
   for (const n of S.world.nodes) {
@@ -1074,6 +1076,7 @@ function secondTick(S) {
       clampWalk(S.world, home.x + (S.rng() - 0.5) * 3, home.z + 1.8 + S.rng(), _pt);
       const n = addCitizen(S, _pt.x, _pt.z);
       makeChild(S, pa, pb, n);
+      if ((S.rev || 0) >= 2) n.life *= 1.15;                // medicine
       n.hunger = 0.1;
       S.stats.births++;
       S.birthCd = S.age === KIN ? 20 : 42;
@@ -1192,7 +1195,7 @@ function powerBless(S, x, z) {
     memo(S, c, 'Was bathed in a warm light from above.');
     if (c.state !== 'held' && c.state !== 'preach' && !(c.state === 'gather' && c.ph === 2)) {
       if (c.state === 'talk') { const p = getC(S, c.partner); if (p) finish(S, p); }
-      if (c.state === 'fight') { const p = getC(S, c.partner); if (p) { addRel(c, p, 0.25); if (p.state === 'fight') { setState(p, 'cheer', 'The fight just... went out of me.'); p.t = 1.6; } } logMsg(S, 'A light fell between ' + c.name + ' and ' + (p ? p.name : 'their rival') + '. The fight is over.', 'good'); }
+      if (c.state === 'fight') { const p = getC(S, c.partner); if (p) { addRel(c, p, 0.25); if (p.state === 'fight') { setState(p, 'cheer', 'The fight just... went out of me.'); p.t = 1.6; } } logMsg(S, 'A light fell between ' + c.name + ' and ' + (p ? p.name : 'their rival') + '. The fight is over.', 'good'); S.stats.calmed = (S.stats.calmed || 0) + 1; }
       setState(c, 'cheer', 'A warm light! I feel wonderful. Someone up there likes me.'); c.t = 1.6;
     }
   }
@@ -1427,6 +1430,7 @@ function powerDrop(S) {
   }
   if (c.carry) c.carry = null;
   if (site && !site.built) { startBuild(S, c, site, 'I was set down here. I suppose I am meant to build this.'); did = 'build'; }
+  else if (site && site.type === 'dock') { did = dockDrop(S, c, site); if (did === 'nothing') { setState(c, 'idle', c.thought); c.t = 1.5; } }
   else if (site && site.type === 'shrine') { startWork(S, c, 'worship', site, 'I was carried to the shrine. I had better pray.'); did = 'pray'; }
   else if (site && site.type === 'lab') { startWork(S, c, 'study', site, 'I was carried to the Terminal. I had better think.'); did = 'study'; }
   else if (site && site.type === 'farm' && site.food <= 0) { startWork(S, c, 'farm', site, 'Set down in the field. Crops it is.'); did = 'farm'; }

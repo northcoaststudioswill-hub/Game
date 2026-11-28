@@ -207,7 +207,7 @@ function resizeRender() {
   if (!R.ready) return;
   const w = Math.max(1, R.canvas.clientWidth), h = Math.max(1, R.canvas.clientHeight);
   const dpr = window.devicePixelRatio || 1;
-  let pr = R.retro ? clamp(540 / Math.min(w, h), 0.5, Math.min(dpr, 2)) : Math.min(dpr, 2);
+  let pr = R.retro ? clamp((R.lowFx ? 420 : 540) / Math.min(w, h), 0.4, Math.min(dpr, 2)) : Math.min(dpr, R.lowFx ? 1.25 : 2);
   const maxPx = R.retro ? 1.1e6 : 2.6e6;
   if (w * h * pr * pr > maxPx) pr = Math.sqrt(maxPx / (w * h));
   R.renderer.setPixelRatio(pr);
@@ -390,6 +390,7 @@ function updateAtmos(S, dt) {
       A.pos[i * 3] = p.x; A.pos[i * 3 + 1] = p.y + off; A.pos[i * 3 + 2] = p.z;
     }
     A.m.geometry.attributes.position.needsUpdate = true;
+    A.m.geometry.setDrawRange(0, R.lowFx ? A.P.length >> 1 : A.P.length);
   }
   // the edges of the view take the colour of the ruling idea
   if (!R.tintEl) R.tintEl = document.getElementById('ageTint');
@@ -532,13 +533,14 @@ function buildSea() {
   R.scene.add(R.sea);
 }
 function updateSea(dt) {
+  R.seaSkip = (R.seaSkip || 0) + 1;
+  if (R.lowFx ? R.seaSkip % 4 : R.seaSkip % 2) return;    // waves are slow: every other frame is plenty
   const a = R.sea.geometry.attributes.position, b = R.seaBase, t = R.time;
   for (let i = 0; i < a.count; i++) {
     const x = b[i * 3], z = b[i * 3 + 2];
     a.array[i * 3 + 1] = Math.sin(x * 0.11 + t * 0.9) * 0.12 + Math.cos(z * 0.13 + t * 0.7) * 0.1;
   }
-  a.needsUpdate = true;
-  R.sea.geometry.computeVertexNormals();
+  a.needsUpdate = true;   // flat shading takes its normals from the faces, so none to recompute
   R.sea.material.color.set('#2b86d6').lerp(_ca.set('#0c1c4a'), (R.night || 0) * 0.7);
 }
 /* fog: a mesh that exists only over places nobody has seen, with soft edges
@@ -577,6 +579,23 @@ function paintFog(S) {
     m.renderOrder = 5 + R.fog.length; m.frustumCulled = false;
     R.scene.add(m); R.fog.push(m);
   }
+}
+
+/* the story's pointer: a pink chevron bobbing over a person or a place */
+function updateStoryMark(S) {
+  if (!R.mark) {
+    R.mark = new THREE.Mesh(merge([P(cone(0.42, 0.8, 4), '#ff8ae6', 0, 0, 0, 1, 1, 1, Math.PI, 0, 0)]), new THREE.MeshBasicMaterial({ vertexColors: true, depthTest: false, transparent: true }));
+    R.mark.renderOrder = 30; R.scene.add(R.mark);
+  }
+  const m = typeof UI !== 'undefined' ? UI.storyMark : null;
+  if (!m) { R.mark.visible = false; return; }
+  let x = m.x, z = m.z, y;
+  if (m.id) { const o = R.cit.get(m.id); if (!o) { R.mark.visible = false; return; } x = o.x; z = o.z; y = o.g.position.y + 2.3 * o.g.scale.y; }
+  else y = groundY(S.world, x, z) + 2.6;
+  R.mark.visible = true;
+  R.mark.position.set(x, y + Math.sin(R.time * 4) * 0.22, z);
+  R.mark.rotation.y = R.time * 2;
+  const k = clamp(R.cam.dist * 0.04, 0.8, 3); R.mark.scale.setScalar(k);
 }
 
 /* boats: a hull, a mast and a sail in the colour of the settlement's creed */
@@ -1197,8 +1216,23 @@ function pickBuilding(S, x, z) {
 
 /* ----------------------------------------------------------------- frame */
 
+/* frame-rate watch: below about 26 fps for five seconds, switch to light effects (unless the player chose) */
+function watchFps(dt) {
+  R.fpsT = (R.fpsT || 0) + dt; R.fpsN = (R.fpsN || 0) + 1;
+  if (R.fpsT < 5) return;
+  const fps = R.fpsN / R.fpsT; R.fps = fps; R.fpsT = 0; R.fpsN = 0;
+  const mode = typeof APP !== 'undefined' ? APP.settings.fx || 'auto' : 'auto';
+  const low = mode === 'light' || (mode === 'auto' && (R.lowFx ? fps < 40 : fps < 26));
+  if (low !== !!R.lowFx) setLowFx(low);
+}
+function setLowFx(on) {
+  R.lowFx = on;
+  if (R.fog && R.fog[1]) R.fog[1].visible = !on;
+  resizeRender();
+}
 function renderFrame(S, alpha, dt) {
   R.time += dt;
+  watchFps(dt);
   updateAtmos(S, dt);
   updateSky(S, dt);
   R.nodeT -= dt;
@@ -1206,9 +1240,10 @@ function renderFrame(S, alpha, dt) {
   syncBuildings(S, dt);
   syncCitizens(S, alpha, dt);
   syncBoats(S, alpha, dt);
+  updateStoryMark(S);
   if (R.sea) updateSea(dt);
   if (R.fog && S.fog) {
-    if (R.fogV !== S.fogV && (R.time - (R.fogPaintT || -9) > 0.8 || R.fogV < 0)) { R.fogV = S.fogV; R.fogPaintT = R.time; paintFog(S); }
+    if (R.fogV !== S.fogV && (R.time - (R.fogPaintT || -9) > (R.lowFx ? 2 : 0.8) || R.fogV < 0)) { R.fogV = S.fogV; R.fogPaintT = R.time; paintFog(S); if (R.lowFx && R.fog[1]) R.fog[1].visible = false; }
     R.fogMat.color.set('#ffffff').lerp(_cb.set('#3a4470'), (R.night || 0) * 0.8);
   }
   if (R.isles && S.found) for (let i = 0; i < R.isles.length; i++) R.isles[i].visible = !!S.found[i];

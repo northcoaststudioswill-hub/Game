@@ -416,3 +416,24 @@ function revealSecret(S, c, key, who) {
   }
   return '';
 }
+
+/* ---- revelations: what all that Insight is for. Each threshold is a leap in what the people know.
+   Every one raises your CYCLES capacity and refill, and changes something in their world. ---- */
+const REVELATIONS = [
+  { at: 60,   name: 'WRITING',   text: 'They have started writing things down. Ideas spread a little further when they talk.' },
+  { at: 180,  name: 'MEDICINE',  text: 'They have learned to treat each other. Children born from now on live longer.' },
+  { at: 450,  name: 'NAVIGATION', text: 'They can read the stars at sea. Boats sail faster and see further.' },
+  { at: 1000, name: 'ENGINES',   text: 'They have built their first machines. Everyone works faster.' },
+  { at: 2200, name: 'THE SIGNAL', text: 'They have noticed a pattern in the noise. It looks like you. You can do much more for them now.' }
+];
+function revLevel(S) { return S.rev || 0; }
+function revelationTick(S) {
+  const lv = revLevel(S);
+  if (lv >= REVELATIONS.length || S.res.insight < REVELATIONS[lv].at) return;
+  const R0 = REVELATIONS[lv];
+  S.rev = lv + 1;
+  S.cyclesMax += lv === 4 ? 100 : 25;
+  S.cycles = Math.min(S.cyclesMax, S.cycles + 25);
+  logMsg(S, 'REVELATION: ' + R0.name + '. ' + R0.text + ' Your CYCLES capacity is now ' + S.cyclesMax + '.', 'sys');
+  ev(S, 'revelation', { name: R0.name, text: R0.text });
+}

@@ -6,7 +6,7 @@ const SAVE_KEY = 'godmode.exe.save.v1', SET_KEY = 'godmode.exe.settings.v1';
 const APP = {
   S: null, mode: 'title', menuOpen: false, dlgOpen: false, speed: 1,
   power: 'observe', createKind: 'grove', inspireK: ACCEL, tut: 0, camMoved: 0,
-  settings: { sound: true, retro: true }, hasSave: false, acc: 0, last: 0, saveT: 0, hidden: false
+  settings: { sound: true, retro: true, fx: 'auto', buzz: true }, hasSave: false, acc: 0, last: 0, saveT: 0, hidden: false
 };
 
 /* ---- storage (may be unavailable: private tabs, sandboxed frames) ---- */
@@ -19,11 +19,11 @@ function saveGame() {
   if (ok) APP.hasSave = true;
   return ok;
 }
-function saveSettings() { lsSet(SET_KEY, JSON.stringify({ sound: APP.settings.sound, retro: APP.settings.retro, tut: APP.tut })); }
+function saveSettings() { lsSet(SET_KEY, JSON.stringify({ sound: APP.settings.sound, retro: APP.settings.retro, tut: APP.tut, storyDone: APP.settings.storyDone || {}, fx: APP.settings.fx, buzz: APP.settings.buzz })); }
 function loadSettings() {
   try {
     const o = JSON.parse(lsGet(SET_KEY) || 'null');
-    if (o) { APP.settings.sound = o.sound !== false; APP.settings.retro = o.retro !== false; if (typeof o.tut === 'number') APP.tut = o.tut; }
+    if (o) { APP.settings.sound = o.sound !== false; APP.settings.retro = o.retro !== false; if (typeof o.tut === 'number') APP.tut = o.tut; APP.settings.storyDone = o.storyDone || {}; APP.settings.fx = o.fx || 'auto'; APP.settings.buzz = o.buzz !== false; }
   } catch (e) { /* defaults */ }
 }
 function loadGame() {
@@ -68,6 +68,9 @@ function startGame(fresh, goal) {
   saveGame();
 }
 
+/* ---- a little vibration for the big moments, where the phone supports it ---- */
+function buzz(ms) { if (APP.settings.buzz && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* ignore */ } }
+
 /* ---- sim events -> feedback ---- */
 function handleEvents(S) {
   const W = S.world, evs = S.events;
@@ -85,7 +88,7 @@ function handleEvents(S) {
         fxBolt(e.x, y, e.z);
         $('flash').style.transition = 'none'; $('flash').style.opacity = '0.75';
         requestAnimationFrame(() => { $('flash').style.transition = 'opacity .45s'; $('flash').style.opacity = '0'; });
-        sfx('smite'); break;
+        sfx('smite'); buzz(40); break;
       case 'shatter':
         fxSpark(e.x, y + 0.5, e.z, e.res === 'stone' ? '#c9ccdc' : e.res === 'wood' ? '#c98a4a' : '#ff4f6e', 22, 4, 5, -10, 1);
         ticker('Shattered: +' + e.n + ' ' + e.res + ' straight to the stockpile.', '');
@@ -108,7 +111,7 @@ function handleEvents(S) {
       case 'pulse': fxRing(e.x, y, e.z, BELIEFS[e.k].hex, 4.6, 0.9); break;
       case 'argue': fxSpark(e.x, y + 1.6, e.z, '#ff4f6e', 10, 1.4, 2.5, -2, 0.6); sfx('argue'); break;
       case 'inspire': fxBeam(e.x, y, e.z, BELIEFS[e.k].hex); fxSpark(e.x, y + 1.4, e.z, BELIEFS[e.k].hex, 24, 2.2, 4, -2, 1.2); sfx('inspire'); break;
-      case 'grab': sfx('grab'); break;
+      case 'grab': sfx('grab'); buzz(12); break;
       case 'drop': fxRing(e.x, y, e.z, '#3fe8ff', 1.6, 0.4); sfx('drop'); break;
       case 'age':
         if (e.k >= 0) { banner('AGE OF ' + BELIEFS[e.k].name, AGE_FX[e.k], BELIEFS[e.k].hex); sfx('age'); }
@@ -147,6 +150,7 @@ function handleEvents(S) {
       case 'exodus': banner('EXODUS', 'They are leaving to found ' + e.name + '.', '#ff8ae6'); sfx('age'); break;
       case 'founded': banner('A NEW SETTLEMENT', e.name, '#ffd447'); fxBeam(e.x, y, e.z, '#ffd447'); fxRing(e.x, y, e.z, '#ffd447', 4, 1); sfx('stage'); break;
       case 'raid': banner('RAID', 'From ' + e.from + ', against ' + e.to + '.', '#ff4f6e'); sfx('war'); break;
+      case 'revelation': banner('REVELATION: ' + e.name, e.text, '#ff8ae6'); sfx('stage'); buzz([20, 40, 20]); break;
       case 'restore': banner('RESTORED FROM BACKUP', 'Six new minds. They do not remember.', '#ff8ae6'); break;
       case 'singularity': {
         R.singT = 0; R.singHex = e.k >= 0 ? BELIEFS[e.k].hex : '#ff5fd2';

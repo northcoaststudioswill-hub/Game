@@ -64,6 +64,24 @@ a bright scrolling grid below, and quick square-wave arpeggios. Kinship: a soft 
 (brighter at night), and two voices answering each other. The edges of the screen take the Age's colour. After the
 Singularity the island keeps the look of its ending for good; after THE COMPROMISE it shows all four, faintly.
 
+### Story: four guided chapters
+
+**Story** on the title screen opens four chapters. Each starts from a prepared world, tells you exactly what to do in a
+pink story card, makes the button you need pulse, hangs a pink marker over the person or place it means (**SHOW ME**
+swings the camera there), and quietly nudges the world along if you are slow. Each ends with its own outcome, and
+afterwards you can carry on in that world as an ordinary endless one. Together they teach the whole sandbox.
+
+1. **The First Fire**: look around, observe, bless the hungry, raise a hut, inspire Devotion, build a Shrine, and
+   reach the Age of Devotion.
+2. **A Life in Your Hands**: one person's LIFE panel; kindle love, wait for a child, read their story, fund a
+   neighbour's bakery, and Bless a fistfight to stop it.
+3. **Two Truths**: two faiths with two leaders. Fill one with rage, watch the grudges turn to war, then choose: Bless
+   the battlefield for **The Miracle**, or let it run for **The Victors**.
+4. **Beyond the Fog**: a dock and two boats. Drop an explorer on the dock to send them out, follow the boat until
+   it sights land, then drop a faith leader on the dock to lead their faithful away to found a colony.
+
+Finished chapters get a tick in the menu. The X on the story card leaves the story and keeps the world.
+
 ### Two ways to play
 
 **New world** asks which you want. **Endless**: no objectives at all. The island runs for as long as you like, people
@@ -94,6 +112,8 @@ island has 20 Insight, a curious person standing on the shore may realise that *
   leaders. People only meet, marry, argue and follow leaders on their own island, so the groups drift apart.
 - Settlements **trade** by boat (swapping their most plentiful goods, which eases bad blood), and war hosts, or anyone
   with enough bad blood, **raid**. The defenders fight back.
+- **Intervene on a dock**: set someone down on a dock and they take a boat out exploring. Set a faith leader down
+  there, once an empty island is known, and they lead their followers away to found a colony.
 - Anyone stuck on an island that is not their settlement's joins whoever lives there, or lights a fire and starts
   a camp. An island where you Create a person with nobody else there gets that person's camp. Intervene can carry
   someone across the sea to another settlement.
@@ -101,6 +121,22 @@ island has 20 Insight, a curious person standing on the shore may realise that *
   bar shows the stockpile of whichever settlement you are looking at (Insight is shared by everyone). Tap a hearth
   to read about its settlement: founder, kind, creed, people, stockpile and rivals.
 - The Spire can only be built on the home island.
+
+### Revelations
+
+Insight finally has a use. At 60, 180, 450, 1,000 and 2,200 Insight the people reach a **Revelation**: Writing (ideas
+spread a little further), Medicine (children live 15% longer), Navigation (boats sail faster and see further), Engines
+(everyone works 10% faster) and The Signal. Each raises your CYCLES capacity (by 25, and 100 for the last) and how fast
+cycles refill. You also start a world with full cycles now.
+
+### On a phone
+
+- **Effects** in the pause menu: *auto* (the default) switches to light effects when the frame rate stays under about
+  26 fps for five seconds, and back when it recovers; *full* and *light* force one or the other. Light effects render at
+  a lower resolution, drop the upper fog layer, halve the floating particles and animate the sea less often.
+- **Vibration** (on by default): short buzzes for lightning, picking someone up and Revelations, on phones that
+  support it (Android browsers; iPhones ignore it).
+- The LIFE panel's buttons are at least 42 px tall.
 
 ### Looking into a life
 
@@ -218,6 +254,25 @@ node godmode/tests/play_phone.js    # needs Playwright + Chromium; screenshots g
 ```
 
 ## Changelog
+
+### 0.8, Nov 28 2026: Story mode, Revelations, and phone work
+
+- **Story mode** (new `src/story.js`): four chapters (`CHAPTERS`), each a seeded world, a `setup()` that prepares it
+  (fast-forwarding, adding people, beliefs, leaders, buildings, a dock and boats), a list of steps
+  (`say`, `cont`, `ui`, `mark`, `enter`, `push`, `done`) and an `outcome()`. The engine (`storyTick`) runs on the UI
+  tick; the director's `push` runs once a sim second and pauses with the game. `S.story` is saved, so Continue resumes
+  a chapter. The story card (`#story`) floats over the LIFE panel when that is open. Highlights use the `.hl` class;
+  the marker is `updateStoryMark()` in render.js. Palette buttons now carry `data-k` so steps can point at them.
+- **Intervene on a dock** (`dockDrop()` in voyage.js): exploring, or a faith leader's exodus. The exodus code moved
+  into `launchExodus()`, shared by the planner and the dock. `S.stats.calmed` and `S.stats.truce` count fights stopped
+  and wars ended by a blessing.
+- **Revelations** (`REVELATIONS`, `revelationTick()` in life.js; `S.rev`). Worlds start with 100 cycles.
+- **Phone**: the sea no longer recomputes normals and animates every other frame (every fourth in light mode);
+  `watchFps()` and `setLowFx()`; Effects and Vibration settings; bigger LIFE buttons.
+- Tests: new `tests/play_story.js` plays all four chapters through real taps and drags at 390x844, fast-forwarding
+  with `storyFastForward()` while waiting, and checks every step, the ending of each chapter and that all four are
+  marked done.
+
 
 ### 0.7, Nov 27 2026: review and bug-hunt fixes
 
