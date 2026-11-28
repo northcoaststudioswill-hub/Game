@@ -2,7 +2,7 @@
 /* SECOND CHANCE - world: Halloran Alley, Ferry Street, the Pier 9 yard and warehouse, and the rooftops.
    Everything is boxes and ramps: one list of solids serves walking, walls, and the camera. */
 (function () {
-  const G = SC.gfx, W = SC.world = { solids: [], dyn: [], interacts: [], pickups: [], crates: [], lamps: [] };
+  const G = SC.gfx, W = SC.world = { solids: [], dyn: [], interacts: [], pickups: [], crates: [], lamps: [], ladders: {}, barrels: [], collect: [] };
   const STEP = SC.T.step;
   let batch;
 
@@ -375,14 +375,91 @@
     crate(30, -34, 1, 11, 'hp'); crate(0.6, -24, 1, 11, 'hp'); crate(30, -40, 1, 11, 'meter');
     crate(-12, -24, 1, 9, 'hp'); crate(-30.6, -36, 1, 9, 'meter');
 
+    // ----- v0.2: ladders, the tenement roofs and the plank between them -----
+    /* a ladder on a wall: (x, z) on the wall face, (nx, nz) the outward normal, climbing from y0 to top */
+    function ladder(id, x, z, nx, nz, y0, top, ex, ez) {
+      const tx = nz, tz = -nx, cx = x + nx * 0.07, cz = z + nz * 0.07, h = top - y0 + 1.1;
+      [-1, 1].forEach(sd => D('metal', cx + tx * 0.3 * sd, y0 + h / 2, cz + tz * 0.3 * sd, nx ? 0.08 : 0.08, h, nx ? 0.08 : 0.08, 0x23232e, { outline: 0.025 }));
+      for (let y = y0 + 0.35; y < top + 0.9; y += 0.38) D('flat', cx, y, cz, nx ? 0.06 : 0.62, 0.05, nx ? 0.62 : 0.06, 0x8d94ac, { outline: 0.015 });
+      W.ladders[id] = { id, x: x + nx * 0.42, z: z + nz * 0.42, nx, nz, y0, y1: top, ex, ez, yaw: Math.atan2(-nx, -nz) };
+    }
+    ladder('alleyW', -3.5, 37.8, 1, 0, 0, 11, -5.3, 37.8);
+    ladder('alleyE', 3.5, 20.8, -1, 0, 0, 9, 5.3, 20.8);
+    ladder('yard', 25.2, -0.35, 0, 1, 0, 5.2, 25.2, -1.7);
+    parapet(-46, 18, -3.5, 50, 11, [{ side: 'e', a: 37.0, b: 38.6 }, { side: 'e', a: 43.2, b: 44.8 }], 0x5c3c4e);
+    parapet(3.5, 18, 46, 50, 9, [{ side: 'w', a: 20.0, b: 21.6 }, { side: 'w', a: 43.2, b: 44.8 }], 0x2f3f62);
+    ramp('wood', -4.3, 43.3, 4.3, 44.7, 8.5, 11, 9, 'x', 0xb98a55);
+    [[-3.3, 43.25], [-3.3, 44.75], [3.3, 43.25], [3.3, 44.75]].forEach(p => D('flat', p[0], 6.5, p[1], 0.12, 13, 0.12, 0x23232e, { outline: 0.02 }));
+    // west roof: laundry, a stair hut, a water tower
+    waterTower(-32, 30, 11); acUnit(-11, 21.5, 11); acUnit(-24, 47.6, 11);
+    B('brick', -42, 40, -37, 45.5, 11, 13.6, 0x5c3c4e, { outline: 0.06 }); B('roof', -42.2, 39.8, -36.8, 45.7, 13.6, 13.8, 0x3a3f5c, { outline: 0.05 });
+    D('flat', -36.94, 12.2, 42.7, 0.06, 2.2, 1.2, 0x3f6b55, { outline: 0.03 });
+    [[-23, 35.4], [-11, 35.4], [-23, 41], [-11, 41]].forEach(p => { solid(p[0] - 0.1, p[1] - 0.1, p[0] + 0.1, p[1] + 0.1, 11, 13.2, { cam: false }); D('flat', p[0], 12.1, p[1], 0.1, 2.2, 0.1, 0x23232e, { outline: 0.02 }); });
+    [35.4, 41].forEach(z => D('flat', -17, 13.1, z, 12, 0.03, 0.03, 0xece6d6, { outline: 0.01 }));
+    const rnd = SC.seeded(77), cloth = [0xece6d6, 0x8a1f24, 0x6f8fb0, 0xffe14a, 0x3f6b55, 0xc9a063];
+    for (let x = -22; x < -11.5; x += 1.15) [35.4, 41].forEach(z => { if (rnd() < 0.78) { const w = 0.6 + rnd() * 0.4, h = 0.5 + rnd() * 0.6; D('flat', x, 13.05 - h / 2, z, w, h, 0.03, SC.pick(cloth), { outline: 0.02, rz: (rnd() - 0.5) * 0.1 }); } });
+    [[-28, 24], [-8, 46]].forEach(p => B('brick', p[0] - 0.6, p[1] - 0.6, p[0] + 0.6, p[1] + 0.6, 11, 12.8, 0x6e3a4e, { outline: 0.05 }));
+    // east roof: antennas, a chimney, a water tower
+    waterTower(36, 40, 9); acUnit(13, 31, 9); acUnit(27, 46.5, 9);
+    [[16, 24], [30, 28], [20, 40]].forEach(p => { D('flat', p[0], 10.4, p[1], 0.07, 2.8, 0.07, 0x23232e, { outline: 0.02 });
+      [0.9, 0.6, 0.35].forEach((w, i) => D('flat', p[0], 11 + i * 0.35, p[1], w * 1.6, 0.04, 0.04, 0x23232e, { outline: 0.015, ry: 0.3 })); });
+    B('brick', 10.5, 43, 11.7, 44.2, 9, 10.9, 0x3c5078, { outline: 0.05 });
+    // back of the warehouse office: a gap in the stacks where something was hidden
+    crateStatic(-31.2, 4.9, 0.7, 4, 0xd9a05f);
+
     W.statics = batch.build(G.scene); batch = null;
+    barrel(6.2, 9.4); barrel(-22, 15.8, 0.15); barrel(17, -12.5); barrel(24.6, -6.2); barrel(10.8, -4.4);
+    barrel(-6, -12.2); barrel(-17, -1.6); barrel(-20, -30, 9); barrel(6.5, -26, 11); barrel(26, -40.6, 11); barrel(16.5, -27, 11);
+  };
+
+  /* ---------- drums of lamp oil: hit one and step back ---------- */
+  let drumMat, bandMat;
+  function barrel(x, z, y) {
+    y = y || 0;
+    drumMat = drumMat || G.toon({ color: 0xc22a2a }); bandMat = bandMat || G.toon({ color: 0xffe14a });
+    const g = new THREE.CylinderGeometry(0.42, 0.42, 1.1, 10), m = G.inked(g, drumMat.clone(), 0.04);
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.435, 0.435, 0.18, 10), bandMat); band.position.y = 0.1; m.add(band);
+    const lbl = new THREE.Mesh(new THREE.CylinderGeometry(0.437, 0.437, 0.05, 10), G.outlineMat); lbl.position.y = 0.1; lbl.scale.set(1, 1, 1); m.add(lbl); lbl.position.y = 0.21;
+    m.position.set(x, y + 0.55, z); G.scene.add(m);
+    const b = { m, x, y, z, alive: true, fuse: 0, sol: solid(x - 0.42, z - 0.42, x + 0.42, z + 0.42, y, y + 1.1, { cam: false }) };
+    W.barrels.push(b); return b;
+  }
+  W.lightBarrel = function (b, t) { if (b.alive && !b.fuse) { b.fuse = t || 0.45; SC.audio && SC.audio.sfx('fuse'); } };
+  W.explode = function (b) {
+    if (!b.alive) return; b.alive = false; b.sol.on = false; G.scene.remove(b.m);
+    const FX = G.fx, p = new THREE.Vector3(b.x, b.y + 0.6, b.z), R = 3.4;
+    FX.ring(new THREE.Vector3(b.x, b.y, b.z), 0xff5a1f, 0.6, R, 0.5); FX.ring(new THREE.Vector3(b.x, b.y, b.z), 0xffe14a, 0.3, R * 0.7, 0.4);
+    FX.burst(p, 0xff7a1f, 3.2); FX.burst(p, 0xffffff, 2); FX.puff(p, 6, 1.4, 0x3a3f5c);
+    FX.spawn({ tex: G.tex.ink, pos: new THREE.Vector3(b.x, b.y + 0.05, b.z), ground: true, size: 3.6, life: 6, alpha: 0.8, rot: Math.random() * 6, hold: 0.8 });
+    p.y += 1.6; FX.word('KA-BOOM!', p, '#ff7a1f', 2.4); FX.light(p, 0xff7a1f, 160, 0.6);
+    SC.cam.shake(0.8); SC.time.hitstop = Math.max(SC.time.hitstop, 0.06); SC.audio && SC.audio.sfx('boom'); SC.emit('flash', '#ff7a1f');
+    for (const e of SC.enemies) { if (!e.hittable() || Math.abs(e.pos.y - b.y) > 2.5) continue; const dx = e.pos.x - b.x, dz = e.pos.z - b.z, d = Math.hypot(dx, dz) || 0.01;
+      if (d < R + e.r) { e.hit(d < 1.8 ? 46 : 32, dx / d, dz / d, { heavy: true, power: true, blast: true }); e.burn = 2.5; SC.player.stats.blasts = (SC.player.stats.blasts || 0) + 1; } }
+    const pl = SC.player, pd = SC.dist2(pl.pos.x, pl.pos.z, b.x, b.z);
+    if (pd < 2.6 && Math.abs(pl.pos.y - b.y) < 2) SC.hitPlayer(16, b.x, b.z, true);
+    for (const c of W.crates) if (c.alive && SC.dist2(c.x, c.z, b.x, b.z) < R && Math.abs(c.y - b.y) < 2) W.breakCrate(c);
+    for (const o of W.barrels) if (o !== b && SC.dist2(o.x, o.z, b.x, b.z) < R + 0.6 && Math.abs(o.y - b.y) < 2) W.lightBarrel(o, 0.2);
+  };
+
+  /* ---------- things worth finding: Tally's IOUs, Ruth's locket ---------- */
+  let noteMat, sealMat, goldMat;
+  W.addCollectible = function (o) {
+    noteMat = noteMat || new THREE.MeshBasicMaterial({ color: 0xf4f1e6, fog: false }); sealMat = sealMat || new THREE.MeshBasicMaterial({ color: 0xc22a2a, fog: false });
+    goldMat = goldMat || new THREE.MeshBasicMaterial({ color: 0xffc23a, fog: false });
+    let m;
+    if (o.kind === 'locket') { m = G.inked(new THREE.CylinderGeometry(0.2, 0.2, 0.06, 14), goldMat, 0.03); m.rotation.x = Math.PI / 2; const gem = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.08, 8), sealMat); m.add(gem); }
+    else { m = G.inked(new THREE.BoxGeometry(0.46, 0.04, 0.32), noteMat, 0.03); const seal = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.06, 8), sealMat); seal.position.set(0.1, 0.03, 0.06); m.add(seal); }
+    const hold = new THREE.Group(); hold.add(m); hold.position.set(o.x, o.y + 0.75, o.z); G.scene.add(hold);
+    const glint = new THREE.Sprite(new THREE.SpriteMaterial({ map: G.tex.burst, color: o.kind === 'locket' ? 0xffc23a : 0xffffff, transparent: true, depthWrite: false, fog: false }));
+    glint.scale.set(0.9, 0.9, 1); hold.add(glint);
+    const c = Object.assign({ hold, glint, t: Math.random() * 6 }, o); W.collect.push(c); return c;
   };
 
   /* ---------- interactables, pickups, crates ---------- */
   W.addInteract = function (o) {
     const it = Object.assign({ r: 2.1, on: true, y: 0, label: 'LOOK' }, o);
     if (it.marker) {
-      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: it.marker === 'clue' ? G.tex.mark : G.tex.alert, transparent: true, depthWrite: false, fog: false }));
+      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: it.marker === 'clue' ? G.tex.mark : it.marker === 'climb' ? G.tex.up : G.tex.alert, transparent: true, depthWrite: false, fog: false }));
       s.scale.set(0.9, 0.9, 1); s.position.set(it.x, it.y + (it.mh || 1.7), it.z); s.visible = false; G.scene.add(s); it.spr = s;
     }
     W.interacts.push(it); return it;
@@ -397,6 +474,15 @@
     return best;
   };
   const pickMat = {};
+  W.dropScrip = function (x, y, z, amount) {
+    const m = pickMat.scrip || (pickMat.scrip = new THREE.MeshBasicMaterial({ color: 0xffe14a, fog: false }));
+    const n = Math.min(amount, 4);
+    for (let i = 0; i < n; i++) {
+      const o = G.inked(new THREE.BoxGeometry(0.34, 0.03, 0.2), m, 0.025);
+      const px = x + SC.rand(-0.7, 0.7), pz = z + SC.rand(-0.7, 0.7); o.position.set(px, y + 0.7, pz); o.rotation.x = 0.5; G.scene.add(o);
+      W.pickups.push({ kind: 'scrip', val: Math.round(amount / n * (i + 1)) - Math.round(amount / n * i), o, x: px, y, z: pz, t: Math.random() * 6, delay: 0.5 });
+    }
+  };
   W.dropPickup = function (kind, x, y, z) {
     const col = kind === 'hp' ? 0xff3b6b : 0xffffff;
     const m = pickMat[kind] || (pickMat[kind] = new THREE.MeshBasicMaterial({ color: col, fog: false }));
@@ -409,12 +495,14 @@
     for (const k in W.doors) { const d = W.doors[k]; d.k = d.to = 0; d.sol.on = true; d.m.position.copy(d.from); }
     for (const c of W.crates) { if (!c.alive) { c.alive = true; c.sol.on = true; G.scene.add(c.m); } c.hp = 2; }
     while (W.pickups.length) G.scene.remove(W.pickups.pop().o);
+    for (const b of W.barrels) { if (!b.alive) { b.alive = true; b.sol.on = true; G.scene.add(b.m); } b.fuse = 0; b.m.material.emissive.setScalar(0); }
   };
   W.breakCrate = function (c) {
     if (!c.alive) return; c.alive = false; c.sol.on = false; G.scene.remove(c.m);
     const p = new THREE.Vector3(c.x, c.y + c.s / 2, c.z);
     G.fx.puff(p, 5, 1); G.fx.word(SC.pick(['KRAK!', 'SMASH!', 'KRUNCH!']), p, '#ffb52e', 1.2);
     if (c.loot) W.dropPickup(c.loot, c.x, c.y, c.z);
+    W.dropScrip(c.x, c.y, c.z, 2 + (Math.random() * 2 | 0));
     SC.audio && SC.audio.sfx('crate');
   };
   W.update = function (dt, t) {
@@ -424,18 +512,32 @@
     }
     for (let i = 0; i < W.dyn.length; i++) W.dyn[i](t, dt);
     for (const it of W.interacts) if (it.spr) {
-      const vis = !!(it.on && (!it.when || it.when())) && G.camera.position.distanceToSquared(it.spr.position) > 7; it.spr.visible = vis;
+      const vis = !!(it.on && (!it.when || it.when())) && SC.cam.mode === 'follow' && G.camera.position.distanceToSquared(it.spr.position) > 7; it.spr.visible = vis;
       if (vis) { it.spr.position.y = it.y + (it.mh || 1.7) + Math.sin(t * 3 + it.x) * 0.1; const k = 0.85 + Math.sin(t * 6 + it.z) * 0.06; it.spr.scale.set(k, k, 1); }
     }
     const pl = SC.player;
+    for (const b of W.barrels) if (b.alive && b.fuse > 0) {
+      b.fuse -= dt; b.m.material.emissive.setRGB((t * 16 | 0) % 2 ? 0.9 : 0.2, (t * 16 | 0) % 2 ? 0.7 : 0.1, 0);
+      if (b.fuse <= 0) W.explode(b);
+    }
+    for (const c of W.collect) {
+      const on = c.avail(); c.hold.visible = on; if (!on) continue;
+      c.t += dt; c.hold.position.y = c.y + 0.75 + Math.sin(c.t * 2.4) * 0.1; c.hold.children[0].rotation.y = c.t * 1.8;
+      const k = 0.6 + Math.max(0, Math.sin(c.t * 4)) * 0.6; c.glint.scale.set(k, k, 1); c.glint.material.rotation = c.t;
+      if (pl.control && SC.dist2(pl.pos.x, pl.pos.z, c.x, c.z) < 0.95 && Math.abs(pl.pos.y - c.y) < 1.6) {
+        G.fx.burst(c.hold.position, c.kind === 'locket' ? 0xffc23a : 0xffffff, 1.6); SC.audio && SC.audio.sfx('clue'); c.take(c);
+      }
+    }
     for (let i = W.pickups.length - 1; i >= 0; i--) {
       const p = W.pickups[i]; p.t += dt; p.o.position.y = p.y + 0.7 + Math.sin(p.t * 3) * 0.12; p.o.rotation.y = p.t * 2.5;
+      if (p.delay > 0) { p.delay -= dt; continue; }
       if (p.kind === 'meter') p.o.material.color.set(SC.PATHS[pl.path || 'ember'].color);
       const d = SC.dist2(pl.pos.x, pl.pos.z, p.x, p.z);
       if (d < 3.2 && Math.abs(pl.pos.y - p.y) < 2.4) { const k = Math.min(1, dt * 7 / Math.max(0.3, d)); p.x += (pl.pos.x - p.x) * k; p.z += (pl.pos.z - p.z) * k; p.o.position.x = p.x; p.o.position.z = p.z; }
       if (d < 0.8 && Math.abs(pl.pos.y - p.y) < 2.4) {
-        if (p.kind === 'hp') pl.heal(22); else pl.gain(30);
-        G.fx.burst(p.o.position, p.kind === 'hp' ? 0xff3b6b : SC.PATHS[pl.path || 'ember'].color, 1.2); SC.audio && SC.audio.sfx('pickup');
+        if (p.kind === 'scrip') { SC.story.addScrip(p.val); SC.audio && SC.audio.sfx('coin'); G.fx.burst(p.o.position, 0xffe14a, 0.6); }
+        else { if (p.kind === 'hp') pl.heal(22); else pl.gain(30);
+          G.fx.burst(p.o.position, p.kind === 'hp' ? 0xff3b6b : SC.PATHS[pl.path || 'ember'].color, 1.2); SC.audio && SC.audio.sfx('pickup'); }
         G.scene.remove(p.o); W.pickups.splice(i, 1);
       }
     }

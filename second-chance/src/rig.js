@@ -14,6 +14,12 @@
       pal: { skin: 0xe9e6da, top: 0x3f6b55, trim: 0x244234, shirt: 0xb9a57a, tie: 0xb9a57a, pants: 0x2a2c33, boots: 0x14141d, hair: 0xe9e6da, glove: 0xb9a57a, wrap: 0xe9e6da } },
     boss: { h: 1.14, b: 1.08, face: 'skull', hat: 'brim', coat: true, weapon: 'hook',
       pal: { skin: 0xd9c9b0, top: 0xefe9da, trim: 0x15151f, shirt: 0x15151f, tie: 0xb3202a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xb3202a, wrap: 0xefe9da } },
+    caller: { h: 0.97, b: 0.92, face: 'maskC', hood: true, weapon: 'lantern', coat: true,
+      pal: { skin: 0xe9e6da, top: 0x5b3f78, trim: 0x2f2244, shirt: 0x2f2244, tie: 0xffb52e, pants: 0x23202c, boots: 0x14141d, hair: 0x2f2244, glove: 0x14141d, wrap: 0x5b3f78 } },
+    mercy: { h: 1.2, b: 0.9, face: 'veil', veil: true, robe: true,
+      pal: { skin: 0xd9c9b0, top: 0x15151f, trim: 0xefe9da, shirt: 0xefe9da, tie: 0xb3202a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0x15151f, wrap: 0x15151f } },
+    ruth: { h: 0.93, b: 0.86, face: 'ruth', hair: 'bun', robe: true,
+      pal: { skin: 0xc99a74, top: 0x6f8fb0, trim: 0x3c5078, shirt: 0xece6d6, tie: 0x6f8fb0, pants: 0x3c5078, boots: 0x23232e, hair: 0x2a1e18, glove: 0xc99a74, wrap: 0x6f8fb0 } },
     clerk: { h: 1.06, b: 0.84, face: 'clerk', hat: 'bowler', hair: 'bald', book: true,
       pal: { skin: 0xc9cbd6, top: 0x6f7690, trim: 0x474c62, shirt: 0xe9e6da, tie: 0x15151f, pants: 0x474c62, boots: 0x101018, hair: 0x15151f, glove: 0xe9e6da, wrap: 0x6f7690 } }
   };
@@ -61,6 +67,31 @@
       [42, 86].forEach(x => { g.fillStyle = ink; g.beginPath(); g.arc(x, 60, 19, 0, 7); g.fill(); g.fillStyle = '#f4f6ff'; g.beginPath(); g.arc(x, 60, 14, 0, 7); g.fill(); g.fillStyle = '#b9c6ff'; g.beginPath(); g.moveTo(x - 10, 68); g.lineTo(x + 4, 48); g.lineTo(x + 10, 52); g.lineTo(x - 4, 72); g.fill(); });
       stroke([58, 58, 70, 58], 4); stroke([64, 70, 62, 84], 2.5);
       stroke([48, 96, 64, 92, 80, 96], 5); stroke([54, 104, 76, 104], 3);
+    } else if (kind === 'veil') {
+      g.fillStyle = '#d9c9b0'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#15151f'; g.fillRect(0, 0, S, 92);
+      g.strokeStyle = 'rgba(239,233,218,0.35)'; g.lineWidth = 1.2;
+      for (let i = -S; i < S; i += 9) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + 92, 92); g.stroke(); g.beginPath(); g.moveTo(i + 92, 0); g.lineTo(i, 92); g.stroke(); }
+      g.fillStyle = ink; g.fillRect(0, 88, S, 5);
+      for (let x = 4; x < S; x += 10) { g.beginPath(); g.arc(x, 92, 4, 0, Math.PI); g.fill(); }
+      [44, 84].forEach(x => { g.fillStyle = '#efe9da'; g.beginPath(); g.ellipse(x, 56, 7, expr === 'angry' ? 2 : 3, 0, 0, 7); g.fill(); });
+      g.fillStyle = '#b3202a'; g.beginPath(); g.moveTo(50, 108); g.quadraticCurveTo(64, 100, 78, 108); g.quadraticCurveTo(64, 116, 50, 108); g.fill();
+      stroke([50, 108, 78, 108], 1.5);
+      g.fillStyle = '#b09a7c'; g.fillRect(0, 118, S, 10);
+    } else if (kind === 'ruth') {
+      g.fillStyle = '#c99a74'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#9a6e4e'; g.beginPath(); g.moveTo(0, 50); g.lineTo(28, 66); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
+      g.fillStyle = '#2a1e18'; g.beginPath(); g.moveTo(0, 0); g.lineTo(S, 0); g.lineTo(S, 30); g.quadraticCurveTo(92, 44, 64, 34); g.quadraticCurveTo(36, 44, 0, 32); g.fill();
+      const sad = expr === 'hurt' || expr === 'dead', glad = expr === 'smirk';
+      [[42, -1], [86, 1]].forEach(a => {
+        g.fillStyle = ink; g.beginPath(); g.ellipse(a[0], 62, 11, glad ? 4 : 7, 0, 0, 7); g.fill();
+        if (!glad) { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(a[0], 63, 8, 5, 0, 0, 7); g.fill(); g.fillStyle = '#3b2a20'; g.beginPath(); g.arc(a[0], 63, 4, 0, 7); g.fill(); }
+        stroke([a[0] - 12 * a[1], 54, a[0] - 15 * a[1], 50], 2.5);
+        stroke([a[0] - 12, sad ? 46 + a[1] * 3 : 48, a[0] + 12, sad ? 46 - a[1] * 3 : 47], 4);
+      });
+      stroke([64, 64, 61, 82, 67, 84], 2.5);
+      if (glad) stroke([50, 98, 64, 106, 78, 98], 4); else if (sad) stroke([52, 104, 64, 99, 76, 104], 4); else stroke([54, 101, 74, 101], 4);
+      if (sad) { g.fillStyle = '#bfe9ff'; g.beginPath(); g.ellipse(36, 78, 2.5, 5, 0, 0, 7); g.fill(); }
     } else if (kind === 'skull') {
       g.fillStyle = '#d9c9b0'; g.fillRect(0, 0, S, S);
       g.fillStyle = '#efe9da'; g.fillRect(0, 0, S, 84); g.fillStyle = ink; g.fillRect(0, 82, S, 5);
@@ -78,7 +109,13 @@
         g.fillStyle = ink; g.beginPath(); g.moveTo(x - w, 52 + dir * 5); g.lineTo(x + w, 52 - dir * 5); g.lineTo(x + w * 0.8, 52 + h); g.lineTo(x - w * 0.8, 52 + h); g.fill();
         if (pupil) { g.fillStyle = pupil; g.beginPath(); g.arc(x, 52 + h * 0.55, expr === 'angry' ? 5 : 3.4, 0, 7); g.fill(); }
       };
-      if (kind === 'maskK') {
+      if (kind === 'maskC') {
+        stroke([28, 56, 54, 60], 7); stroke([74, 60, 100, 56], 7);
+        if (pupil) { g.fillStyle = '#ffb52e'; g.fillRect(36, 55, 8, 5); g.fillRect(84, 55, 8, 5); }
+        g.fillStyle = ink; g.beginPath(); g.ellipse(64, 98, 13, expr === 'angry' ? 17 : 13, 0, 0, 7); g.fill();
+        g.fillStyle = '#5b3f78'; g.beginPath(); g.ellipse(64, 101, 7, expr === 'angry' ? 10 : 7, 0, 0, 7); g.fill();
+        stroke([40, 66, 38, 86], 2.5, '#5b3f78'); stroke([88, 66, 90, 90], 2.5, '#5b3f78'); stroke([64, 8, 64, 32], 2);
+      } else if (kind === 'maskK') {
         hole(42, -1, 16, 10); hole(86, 1, 16, 10);
         stroke([52, 84, 76, 108], 6, '#9c2f3f'); stroke([76, 84, 52, 108], 6, '#9c2f3f');
         stroke([64, 10, 60, 30, 66, 40], 2.2);
@@ -117,8 +154,8 @@
   }
 
   /* ---------- the builder ---------- */
-  SC.makeHumanoid = function (kind) {
-    const sp = SPECS[kind], b = sp.b, pal = sp.pal;
+  SC.makeHumanoid = function (kind, opts) {
+    const sp = opts ? Object.assign({}, SPECS[kind], opts) : SPECS[kind], b = sp.b, pal = sp.pal;
     const defs = [
       ['root', null, 0, 0, 0], ['hips', 'root', 0, 0.96, 0], ['spine', 'hips', 0, 0.1, 0], ['chest', 'spine', 0, 0.2, 0], ['neck', 'chest', 0, 0.27, 0], ['head', 'neck', 0, 0.07, 0],
       ['shL', 'chest', 0.215 * b, 0.2, 0], ['elL', 'shL', 0, -0.29, 0], ['haL', 'elL', 0, -0.26, 0],
@@ -201,6 +238,24 @@
       part('head', tbox(0.075, 0.075, 0.2, 0.4, 1), 0.06, 0.28, 0.075, pal.streak, [0.42, -0.2, -0.1]);
       part('head', tbox(0.07, 0.06, 0.16, 0.3, 1), 0, 0.3, -0.06, pal.hair, [-0.5, 0, 0]);
     }
+    if (sp.hair === 'bun') {
+      part('head', tbox(0.25, 0.1, 0.26, 0.8, 1), 0, 0.235, -0.02, pal.hair, [-0.12, 0, 0]);
+      part('head', tbox(0.245, 0.18, 0.08, 1, 0.85), 0, 0.14, -0.11, pal.hair);
+      part('head', tbox(0.12, 0.12, 0.11), 0, 0.2, -0.16, pal.hair);
+    }
+    if (sp.robe) {
+      part('tailL', tbox(0.22 * b, 0.86, 0.05, 1, 1.35), 0.02, -0.42, 0.05, pal.top, [0, -0.5, 0]);
+      part('tailR', tbox(0.22 * b, 0.86, 0.05, 1, 1.35), -0.02, -0.42, 0.05, pal.top, [0, 0.5, 0]);
+      part('tailB', tbox(0.36 * b, 0.9, 0.05, 1, 1.35), 0, -0.44, 0, pal.top);
+      part('hips', tbox(0.34 * b, 0.82, 0.05, 1, 1.3), 0, -0.4, 0.12 * b, pal.top);
+      part('chest', tbox(0.2, 0.07, 0.27 * b), 0, 0.29, 0.005, pal.trim, null, 0.01);
+    }
+    if (sp.veil) {
+      part('head', tbox(0.3, 0.5, 0.31, 0.25, 1), 0, 0.38, -0.02, pal.top);
+      part('head', tbox(0.3, 0.3, 0.12, 1, 0.9), 0, 0.12, -0.13, pal.top);
+      part('head', tbox(0.05, 0.3, 0.24), 0.14, 0.12, -0.01, pal.top); part('head', tbox(0.05, 0.3, 0.24), -0.14, 0.12, -0.01, pal.top);
+      part('chest', tbox(0.5 * b, 0.12, 0.32 * b), 0, 0.27, -0.01, pal.top);
+    }
     if (sp.hood) {
       part('head', tbox(0.29, 0.16, 0.29, 0.72, 1), 0, 0.235, -0.025, pal.top);
       part('head', tbox(0.28, 0.26, 0.11, 1, 0.9), 0, 0.11, -0.115, pal.top);
@@ -214,7 +269,7 @@
       part('head', limb(0.11, 0.13, 0.15), 0, 0.31, 0, pal.hair); part('head', limb(0.27, 0.27, 0.025), 0, 0.24, 0, pal.hair);
       part('head', limb(0.132, 0.132, 0.035), 0, 0.26, 0, pal.tie, null, 0);
     }
-    if (!sp.hood) { part('head', tbox(0.03, 0.06, 0.04), 0.118, 0.13, 0, pal.skin, null, 0.008); part('head', tbox(0.03, 0.06, 0.04), -0.118, 0.13, 0, pal.skin, null, 0.008); }
+    if (!sp.hood && !sp.veil) { part('head', tbox(0.03, 0.06, 0.04), 0.118, 0.13, 0, pal.skin, null, 0.008); part('head', tbox(0.03, 0.06, 0.04), -0.118, 0.13, 0, pal.skin, null, 0.008); }
 
     const mkGeo = (S, full) => {
       const g = new THREE.BufferGeometry();
@@ -272,6 +327,12 @@
       add('haR', tbox(0.03, 0.05, 0.3), steel, 0, -1.1, 0.13, 0.014); add('haR', tbox(0.03, 0.18, 0.05, 0.3, 1), steel, 0, -1.0, 0.27, 0.014);
       model.mats.push(steel, dark);
     }
+    if (sp.weapon === 'gun') { add('haR', tbox(0.04, 0.24, 0.05), dark, 0, -0.16, 0.02, 0.014); add('haR', tbox(0.04, 0.09, 0.1), dark, 0, -0.05, -0.03, 0.012); model.mats.push(dark); }
+    if (sp.weapon === 'lantern') {
+      const lm = model.lampMat = new THREE.MeshBasicMaterial({ color: 0xffb52e, fog: false });
+      add('haL', limb(0.01, 0.01, 0.16), dark, 0, -0.1, 0, 0.008); add('haL', tbox(0.13, 0.17, 0.13), lm, 0, -0.26, 0, 0.022);
+      add('haL', tbox(0.16, 0.03, 0.16), dark, 0, -0.17, 0, 0.012); add('haL', tbox(0.16, 0.03, 0.16), dark, 0, -0.35, 0, 0.012); model.mats.push(dark);
+    }
     if (sp.book) { const bk = G.toon({ color: 0x8a1f24 }); add('haL', tbox(0.05, 0.3, 0.22), bk, 0.02, -0.06, 0.08, 0.014); model.mats.push(bk); }
 
     model.setGlow = function (colorHex, css) {
@@ -282,6 +343,17 @@
     };
     model.tint = function (k) { for (let i = 0; i < model.mats.length; i++) model.mats[i].emissive.setScalar(k); };
     model.height = 1.82 * sp.h;
+    /* the dead, and memories of the living: see-through, lit from inside, inked in a colour instead of black */
+    model.setGhost = function (col, opacity) {
+      const op = opacity === undefined ? 0.6 : opacity, ink = new THREE.MeshBasicMaterial({ color: col, side: THREE.BackSide, transparent: true, opacity: Math.min(1, op + 0.25), fog: false });
+      model.mats.forEach(m => { m.transparent = true; m.opacity = op; m.emissive.set(col); m.emissiveIntensity = 0.45; m.needsUpdate = true; });
+      if (model.glowMat) { model.glowMat.transparent = true; model.glowMat.opacity = op; }
+      if (model.lampMat) { model.lampMat.transparent = true; model.lampMat.opacity = op; }
+      model.ol.material = ink;
+      group.traverse(o => { if (o.isMesh) { o.castShadow = false; o.renderOrder = 8; if (o.material === G.outlineMat) o.material = ink; } });
+      model.ghostInk = ink; model.ghost = true; model.tint = function () {};
+    };
+    model.fade = function (k) { model.mats.forEach(m => { m.opacity = k * 0.6; }); if (model.ghostInk) model.ghostInk.opacity = Math.min(1, k * 0.85); };
     model.anim = new Anim(model);
     return model;
   };
@@ -359,9 +431,10 @@
     const g = P.guard(0);
     if (i === 0) return clip([[0, g], [0.06, A1w], [0.13, A1s], [0.24, A1s], [0.42, g]], t);
     if (i === 1) return clip([[0, g], [0.07, A2w], [0.15, A2s], [0.27, A2s], [0.46, g]], t);
-    return clip([[0, g], [0.12, A3w], [0.22, A3s], [0.38, A3s], [0.62, g]], t);
+    if (i === 2) return clip([[0, g], [0.12, A3w], [0.22, A3s], [0.38, A3s], [0.62, g]], t);
+    return clip([[0, g], [0.16, P.leap], [0.3, P.slamDown], [0.52, P.slamDown], [0.8, g]], t);
   };
-  P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, chain: 0.22 }, { dur: 0.62, hit: 0.2, chain: 0.5 }];
+  P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, chain: 0.22 }, { dur: 0.62, hit: 0.2, chain: 0.42 }, { dur: 0.82, hit: 0.3, chain: 9 }];
   P.roll = k => { const tuck = { hips: [k * Math.PI * 2, 0, 0], spine: [0.95, 0, 0], chest: [0.5, 0, 0], head: [0.5, 0, 0], shL: [-1.1, 0, 0.2], elL: [-2.0, 0, 0], shR: [-1.1, 0, -0.2], elR: [-2.0, 0, 0], thL: [-2.0, 0, 0.1], shnL: [2.2, 0, 0], thR: [-1.9, 0, -0.1], shnR: [2.2, 0, 0], tailB: [1.3, 0, 0], tailL: [1, 0, 0.5], tailR: [1, 0, -0.5], sc1: [-0.2, 0, 0], y: -0.52 }; return tuck; };
   P.dash = () => ({ spine: [0.75, 0, 0], chest: [0.2, 0, 0], head: [-0.75, 0, 0], shL: [1.1, 0, 0.35], elL: [-0.3, 0, 0], shR: [1.1, 0, -0.35], elR: [-0.3, 0, 0], thL: [-1.15, 0, 0], shnL: [1.2, 0, 0], thR: [0.75, 0, 0], shnR: [0.5, 0, 0], tailB: [1.4, 0, 0], tailL: [1.2, 0, 0.4], tailR: [1.2, 0, -0.4], sc1: [0.1, 0, 0], y: -0.3 });
   P.hurt = s => ({ spine: [-0.4, 0.3 * s, 0], chest: [-0.2, 0.3 * s, 0], head: [-0.45, 0, 0.2 * s], shL: [-0.5, 0, 1.0], elL: [-0.8, 0, 0], shR: [-0.5, 0, -1.0], elR: [-0.8, 0, 0], thL: [-0.35, 0, 0.1], shnL: [0.7, 0, 0], thR: [0.1, 0, -0.1], shnR: [0.5, 0, 0], sc1: [-0.6, 0, 0], y: -0.14 });
@@ -391,6 +464,27 @@
   P.uppercutW = { hips: [0, 0.5, 0], spine: [0.6, 0.2, 0], chest: [0.2, 0.3, 0], head: [-0.4, -0.7, 0], shL: [0.9, 0, 0.3], elL: [-1.6, 0, 0], shR: [-0.6, 0, -0.3], elR: [-1.8, 0, 0], thL: [-0.9, 0, 0.15], shnL: [1.4, 0, 0], thR: [-0.4, 0, -0.15], shnR: [1.3, 0, 0], y: -0.42 };
   P.uppercut = { hips: [0, -0.5, 0], spine: [-0.3, -0.2, 0], chest: [-0.2, -0.3, 0], head: [0.4, 0.7, 0], shL: [-2.95, 0, 0.1], elL: [-0.25, 0, 0], shR: [0.6, 0, -0.5], elR: [-1.4, 0, 0], thL: [-0.2, 0, 0.1], shnL: [0.15, 0, 0], thR: [-0.9, 0, -0.1], shnR: [1.5, 0, 0], tailB: [-0.3, 0, 0], sc1: [0.5, 0, 0], y: 0.12 };
   P.present = { spine: [-0.05, 0, 0], chest: [-0.05, 0, 0], head: [0.15, 0.2, 0], shL: [-1.35, 0, 0.3], elL: [-1.2, 0, 0], shR: [0.1, 0, -0.2], elR: [-0.3, 0, 0], thL: [-0.05, 0, 0.1], shnL: [0.08, 0, 0], thR: [0.05, 0, -0.1], shnR: [0.06, 0, 0], sc1: [-1.1, 0, 0], sc2: [-0.2, 0, 0], y: 0 };
+  P.climb = ph => { const a = Math.sin(ph), c = Math.cos(ph); return {
+    spine: [0.12, 0, 0], chest: [0.05, 0, 0], head: [-0.35, 0, 0],
+    shL: [-2.55 + 0.45 * a, 0, 0.32], elL: [-0.7 - 0.45 * Math.max(0, a), 0, 0], shR: [-2.55 - 0.45 * a, 0, -0.32], elR: [-0.7 - 0.45 * Math.max(0, -a), 0, 0],
+    thL: [-1.05 - 0.45 * a, 0, 0.12], shnL: [1.35 + 0.3 * c, 0, 0], thR: [-1.05 + 0.45 * a, 0, -0.12], shnR: [1.35 - 0.3 * c, 0, 0],
+    tailB: [0.25, 0, 0], tailL: [0.2, 0, 0.1], tailR: [0.2, 0, -0.1], sc1: [-0.5, 0.2 * a, 0], sc2: [-0.5, 0, 0], y: -0.06 }; };
+  P.mantle = { spine: [0.85, 0, 0], chest: [0.3, 0, 0], head: [-0.6, 0, 0], shL: [-0.6, 0, 0.5], elL: [-1.2, 0, 0], shR: [-0.6, 0, -0.5], elR: [-1.2, 0, 0],
+    thL: [-1.6, 0, 0.15], shnL: [1.9, 0, 0], thR: [-0.4, 0, -0.1], shnR: [0.9, 0, 0], tailB: [1.1, 0, 0], sc1: [-0.3, 0, 0], y: -0.4 };
+  P.aim = t => ({ hips: [0, -0.3, 0], spine: [0.02, -0.25, 0], chest: [0, -0.35, 0], head: [0, 0.6, 0],
+    shR: [-1.52, 0.25, -0.05], elR: [-0.05, 0, 0], shL: [0.1, 0, 0.12], elL: [-0.3, 0, 0],
+    thL: [-0.25, 0, 0.12], shnL: [0.25, 0, 0], thR: [0.25, 0, -0.12], shnR: [0.15, 0, 0], y: -0.03 + Math.sin(t * 2) * 0.005 });
+  P.recoil = { hips: [0, -0.3, 0], spine: [-0.12, -0.25, 0], chest: [-0.1, -0.35, 0], head: [-0.1, 0.6, 0], shR: [-2.0, 0.25, -0.05], elR: [-0.4, 0, 0], shL: [0.1, 0, 0.12], elL: [-0.3, 0, 0],
+    thL: [-0.25, 0, 0.12], shnL: [0.25, 0, 0], thR: [0.25, 0, -0.12], shnR: [0.15, 0, 0], y: -0.03 };
+  P.write = t => ({ spine: [0.38, 0, 0], chest: [0.12, 0, 0], head: [0.45, Math.sin(t * 0.7) * 0.06, 0],
+    shL: [-0.7, 0, 0.12], elL: [-1.25, 0, 0], shR: [-0.55 + Math.sin(t * 9) * 0.05, 0, -0.1], elR: [-1.35, 0, 0.2],
+    thL: [-0.08, 0, 0.06], shnL: [0.12, 0, 0], thR: [0.05, 0, -0.06], shnR: [0.1, 0, 0], y: -0.04 });
+  P.mercy = t => ({ spine: [-0.04, 0, 0], head: [0.12, Math.sin(t * 0.4) * 0.12, 0.1], shL: [-0.55, 0.3, 0.2], elL: [-1.45, 0, 0], shR: [-0.55, -0.3, -0.2], elR: [-1.45, 0, 0],
+    tailB: [0.03 + Math.sin(t * 1.1) * 0.03, 0, 0], tailL: [0, 0, 0.06], tailR: [0, 0, -0.06], y: 0.02 + Math.sin(t * 1.3) * 0.02 });
+  P.mercyTouch = { spine: [0.1, 0.25, 0], head: [0.3, 0.35, 0.1], shR: [-1.15, 0.3, -0.25], elR: [-0.35, 0, 0], shL: [-0.5, 0.3, 0.2], elL: [-1.45, 0, 0], y: 0 };
+  P.ruth = t => ({ spine: [0.04, 0, 0], head: [0.15 + Math.sin(t * 0.6) * 0.05, Math.sin(t * 0.45) * 0.15, 0.08], shL: [-0.75, 0.35, 0.15], elL: [-1.6, 0, 0], shR: [-0.75, -0.35, -0.15], elR: [-1.6, 0, 0],
+    tailB: [0.05 + Math.sin(t * 1.2) * 0.04, 0, 0], tailL: [0.02, 0, 0.06], tailR: [0.02, 0, -0.06], y: 0.12 + Math.sin(t * 1.5) * 0.05 });
+  P.lob = k => P.swing(k);
   P.clerk = t => ({ spine: [0.04, 0, 0], head: [0.1 + Math.sin(t * 0.8) * 0.04, Math.sin(t * 0.6) * 0.1, 0], shL: [-0.75, 0, 0.1], elL: [-1.5, 0, 0], shR: [-0.2, 0, -0.1], elR: [-1.7, 0, 0.3], thL: [0, 0, 0.03], thR: [0, 0, -0.03], y: Math.sin(t * 1.4) * 0.03 + 0.06 });
 
   /* A studio shot of one character, used for the speaker pictures in dialogue. */
@@ -399,9 +493,10 @@
     scene.add(new THREE.AmbientLight(new THREE.Color(0.27, 0.3, 0.5), Math.PI));
     const d = new THREE.DirectionalLight(new THREE.Color(0.8, 0.76, 0.56), Math.PI); d.position.set(2, 2.2, 3); scene.add(d);
     const m = SC.makeHumanoid(kind); if (glow) m.setGlow(glow[0], glow[1]); m.face(expr || 'neutral');
-    m.anim.apply(kind === 'clerk' ? P.clerk(0) : (kind === 'hero' ? P.idle(0) : P.lurk(1)), 999, 0.016);
+    m.anim.apply(kind === 'clerk' ? P.clerk(0) : (kind === 'hero' || kind === 'ruth' || kind === 'mercy' ? P.idle(0) : P.lurk(1)), 999, 0.016);
+    if (kind === 'ruth') m.setGhost(0x8fd8ff, 0.95);
     m.group.rotation.y = -0.35; scene.add(m.group);
-    const hy = 1.62 * m.spec.h, cam = new THREE.PerspectiveCamera(24, 1, 0.1, 20);
+    const hy = (kind === 'mercy' ? 1.74 : 1.62) * m.spec.h, cam = new THREE.PerspectiveCamera(kind === 'mercy' ? 27 : 24, 1, 0.1, 20);
     cam.position.set(0.25, hy + 0.05, 1.9 * m.spec.h); cam.lookAt(0, hy - 0.02, 0);
     const r = G.renderer, src = r.domElement, old = new THREE.Vector2(); r.getSize(old); const pr = r.getPixelRatio();
     r.setPixelRatio(1); r.setSize(192, 192, false); r.render(scene, cam);

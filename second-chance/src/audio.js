@@ -56,7 +56,16 @@
     door: () => { noise(1.1, { f: 180, to: 120, q: 4, gain: 0.5, att: 0.1 }); tone(70, 1, { type: 'sawtooth', gain: 0.1 }); },
     clue: () => { tone(523, 0.12, { type: 'triangle', gain: 0.2 }); tone(784, 0.3, { type: 'triangle', gain: 0.2, at: ctx.currentTime + 0.1 }); },
     path: () => { tone(196, 1.2, { type: 'sawtooth', to: 392, gain: 0.2, att: 0.3 }); tone(784, 1, { type: 'triangle', gain: 0.2, at: ctx.currentTime + 0.4 }); noise(1.1, { f: 300, to: 5000, gain: 0.25, att: 0.5 }); },
-    page: () => noise(0.12, { f: 2400, to: 900, q: 1, gain: 0.16 })
+    page: () => noise(0.12, { f: 2400, to: 900, q: 1, gain: 0.16 }),
+    fuse: () => noise(0.4, { f: 3000, to: 5000, q: 6, gain: 0.12 }),
+    boom: () => { noise(1.1, { f: 600, to: 50, type: 'lowpass', gain: 1 }); tone(55, 0.9, { type: 'sine', to: 25, gain: 0.9 }); noise(0.3, { f: 2500, to: 600, gain: 0.4 }); },
+    splat: () => { noise(0.18, { f: 900, to: 200, q: 2, gain: 0.6 }); tone(90, 0.2, { type: 'sine', to: 40, gain: 0.6 }); },
+    splash: () => { noise(0.35, { f: 2600, to: 400, q: 1.2, gain: 0.4 }); tone(800, 0.08, { type: 'triangle', to: 1600, gain: 0.1 }); },
+    coin: () => { tone(1320, 0.06, { type: 'square', gain: 0.08 }); tone(1760, 0.1, { type: 'square', gain: 0.08, at: ctx.currentTime + 0.05 }); },
+    climb: () => tone(220 + Math.random() * 40, 0.05, { type: 'square', gain: 0.08 }),
+    gunshot: () => { noise(0.25, { f: 3000, to: 300, gain: 0.9 }); tone(140, 0.2, { type: 'square', to: 50, gain: 0.4 }); },
+    echo: () => { tone(330, 1.6, { type: 'sine', to: 165, gain: 0.25, att: 0.4 }); tone(495, 1.6, { type: 'sine', to: 247, gain: 0.15, att: 0.6 }); noise(1.4, { f: 6000, to: 800, q: 4, gain: 0.08, att: 0.6 }); },
+    ascend: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.9, { type: 'sine', gain: 0.16, att: 0.1, at: ctx.currentTime + i * 0.18 })); }
   };
   A.sfx = function (name, v) { if (!ctx || !A.on || !S[name]) return; try { S[name](v); } catch (e) { /* audio is never worth a crash */ } };
 

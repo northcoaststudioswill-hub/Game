@@ -252,6 +252,10 @@
       g.lineJoin = 'round'; g.lineWidth = 16; g.strokeStyle = '#07070d'; g.strokeText('!', 64, 68);
       g.fillStyle = '#ff3b30'; g.fillText('!', 64, 68);
     });
+    TEX.up = canvasTex(128, 128, (g) => {
+      g.lineJoin = 'round'; g.lineCap = 'round';
+      [[34, 0], [70, 1]].forEach(r => { [['#07070d', 26], ['#8fd8ff', 12]].forEach(st => { g.strokeStyle = st[0]; g.lineWidth = st[1]; g.beginPath(); g.moveTo(26, r[0] + 30); g.lineTo(64, r[0]); g.lineTo(102, r[0] + 30); g.stroke(); }); });
+    });
     TEX.lock = canvasTex(128, 128, (g) => {
       g.translate(64, 64); g.lineCap = 'butt';
       [['#07070d', 13], ['#ffffff', 6]].forEach(s => {

@@ -62,6 +62,8 @@
       if (cam.lock) {
         const e = cam.lock, dx = e.pos.x - p.pos.x, dz = e.pos.z - p.pos.z; sep = Math.hypot(dx, dz);
         if (sep > 30) cam.lock = null; else { if (sep > 0.6) cam.yaw = SC.dampAng(cam.yaw, Math.atan2(dx, dz), 5.5, rdt); if (cam.sinceLook > 0.6) cam.pitch = SC.damp(cam.pitch, 0.36, 2.5, rdt); }
+      } else if (p.state === 'climb') {
+        cam.yaw = SC.dampAng(cam.yaw, p.yaw, cam.sinceLook > 0.6 ? 3 : 0, rdt); cam.pitch = SC.damp(cam.pitch, p.cl.phase === 'down' || p.cl.phase === 'over' ? 0.55 : 0.12, 2, rdt);
       } else if (p.control && cam.sinceLook > 1.0 && p.speed > 1.5) {
         const diff = SC.angDiff(cam.yaw, p.yaw);
         if (Math.abs(diff) < 2.5) cam.yaw += diff * (1 - Math.exp(-1.25 * (p.speed / T.playerSpeed) * rdt));

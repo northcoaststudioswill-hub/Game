@@ -1,6 +1,6 @@
 'use strict';
 /* SECOND CHANCE - core: namespace, maths, tunables. */
-const SC = window.SC = { V: '0.1.0' };
+const SC = window.SC = { V: '0.2.0' };
 
 SC.clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 SC.lerp = (a, b, t) => a + (b - a) * t;
@@ -48,6 +48,28 @@ SC.T = {                      // tunables
   step: 0.5, gravity: 30,
   camDist: 5.4, camDistCombat: 6.9, camPitch: 0.3, camMin: 1.9, camFov: 55
 };
+
+/* Tally's ledger: what scrip buys at a crossing. cost is per level. */
+SC.UPGRADES = [
+  { id: 'hp', name: 'HARD TO KILL', max: 2, cost: [20, 40], text: ['+25 health', '+25 more health'] },
+  { id: 'dmg', name: 'HEAVY HANDS', max: 2, cost: [20, 40], text: ['Fists and feet hit 20% harder', '40% harder'] },
+  { id: 'well', name: 'DEEP WELL', max: 2, cost: [25, 45], text: ['Your power costs less', 'Costs less again: four uses from a full bar'] },
+  { id: 'word', name: 'LAST WORD', max: 2, cost: [15, 30], text: ['Finishers give back 15 health', 'Finishers give back 30 health'] },
+  { id: 'due', name: 'PAST DUE', max: 1, cost: [35], text: ['A fourth hit: leap and slam the combo home'] }
+];
+SC.up = { hp: 0, dmg: 0, well: 0, word: 0, due: 0 };
+
+/* challenge: what hurts you, and how much the Hollows can take */
+SC.DIFF = {
+  story: { name: 'STORY', hurt: 0.55, hp: 0.8, tokens: 1 },
+  normal: { name: 'NORMAL', hurt: 1, hp: 1, tokens: 2 },
+  hard: { name: 'HARD', hurt: 1.4, hp: 1.25, tokens: 3 }
+};
+/* per-device settings, kept apart from the save so a new game does not reset them */
+SC.settings = { diff: 'normal', sound: true, sens: 1, quality: 0 };
+try { Object.assign(SC.settings, JSON.parse(localStorage.getItem('second-chance-settings') || '{}')); } catch (e) { /* defaults */ }
+SC.saveSettings = () => { try { localStorage.setItem('second-chance-settings', JSON.stringify(SC.settings)); } catch (e) { /* not saved */ } };
+SC.diff = () => SC.DIFF[SC.settings.diff] || SC.DIFF.normal;
 
 SC.flags = {};                 // story flags, saved
 SC.events = {};

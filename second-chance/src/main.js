@@ -9,6 +9,7 @@
     pl.init(); SC.cam.init(); SC.input.init(); SC.ui.init(); SC.story.init();
     window.addEventListener('resize', () => { G.resize(); SC.ui.resize(); });
     document.addEventListener('visibilitychange', () => { if (document.hidden && SC.state === 'play' && !SC.ui.blocking()) SC.ui.pause(); });
+    const st = SC.settings; SC.input.sens = st.sens || 1; if (!st.sound) SC.audio.toggle(); if (st.quality) { G.setQuality(st.quality); SC.ui.userQuality = true; }
     SC.story.title();
     requestAnimationFrame(frame);
   }

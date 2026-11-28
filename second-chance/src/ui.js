@@ -7,6 +7,8 @@
     hero: { name: 'DEZ', kind: 'hero', bg: 0x2a2a70, cls: '' },
     clerk: { name: 'MR. TALLY', kind: 'clerk', bg: 0x3a3f5c, cls: 'pale' },
     voss: { name: 'DEACON VOSS', kind: 'boss', bg: 0x8a1f24, cls: 'dark' },
+    mercy: { name: 'MOTHER MERCY', kind: 'mercy', bg: 0x2a0d1c, cls: 'dark' },
+    ruth: { name: 'RUTH OKAFOR', kind: 'ruth', bg: 0x1a2a4a, cls: 'pale' },
     cap: { cls: 'cap' }
   };
   const pics = {};
@@ -102,12 +104,35 @@
     '<tr><td>POWER</td><td>Button &middot; L or Q &middot; pad Y. Costs a third of the bar.</td></tr><tr><td>INTERACT</td><td>Button &middot; E &middot; pad A. Look, open, finish.</td></tr><tr><td>LOCK-ON</td><td>Button &middot; Tab &middot; pad RB</td></tr></table>';
   U.pause = function () {
     U.paused = true; U.freeze = true;
-    const draw = () => openMenu('<div class="card split"><h2>PAUSED</h2>' + CONTROLS +
-      '<div><div class="mbtn y" data-go="r">RESUME</div><div class="mbtn s" data-go="q">PICTURE: ' + (G.quality >= 1 ? 'SHARP' : 'FAST') + '</div><div class="mbtn s" data-go="s">SOUND: ' + (SC.audio.on ? 'ON' : 'OFF') + '</div>' +
+    const F = SC.flags, S = SC.story, found = S.IOUS ? S.IOUS.filter((q, j) => F['iou_' + j]).length : 0;
+    const side = F.ruth_done ? "RUTH'S LOCKET: RETURNED" : F.locket ? "RUTH'S LOCKET: TAKE IT BACK TO HER ROOF" : F.ruth_met ? "RUTH'S LOCKET: PIER 9, ON THE CONTAINERS" : '';
+    const keep = () => { SC.settings.sound = SC.audio.on; SC.settings.sens = SC.input.sens; SC.settings.quality = U.userQuality ? G.quality : 0; SC.saveSettings(); draw(); U.freeze = true; };
+    const draw = () => openMenu('<div class="card split"><h2>PAUSED</h2><div>' + CONTROLS +
+      '<p class="sub">IOUS FOUND ' + found + '/8 &middot; SCRIP ' + SC.player.scrip + (side ? '<br>SIDE: ' + side : '') + '</p></div>' +
+      '<div><div class="mbtn y" data-go="r">RESUME</div><div class="mbtn s" data-go="d">CHALLENGE: ' + SC.diff().name + '</div><div class="mbtn s" data-go="q">PICTURE: ' + (G.quality >= 1 ? 'SHARP' : 'FAST') + '</div><div class="mbtn s" data-go="s">SOUND: ' + (SC.audio.on ? 'ON' : 'OFF') + '</div>' +
       '<div class="mbtn s" data-go="v">CAMERA SPEED: ' + (SC.input.sens === 1 ? 'NORMAL' : SC.input.sens > 1 ? 'FAST' : 'SLOW') + '</div><div class="mbtn s" data-go="c">BACK TO LAST CROSSING</div></div></div>', {
-      r: () => { closeMenu(); U.paused = false; }, q: () => { G.setQuality(G.quality >= 1 ? 0.5 : 1); U.userQuality = true; draw(); U.freeze = true; }, s: () => { SC.audio.toggle(); draw(); U.freeze = true; },
-      v: () => { SC.input.sens = SC.input.sens === 1 ? 1.5 : SC.input.sens > 1 ? 0.65 : 1; draw(); U.freeze = true; }, c: () => { closeMenu(); U.paused = false; SC.story.load(); }
+      r: () => { closeMenu(); U.paused = false; }, q: () => { G.setQuality(G.quality >= 1 ? 0.5 : 1); U.userQuality = true; keep(); }, s: () => { SC.audio.toggle(); keep(); },
+      d: () => { const o = ['story', 'normal', 'hard']; SC.settings.diff = o[(o.indexOf(SC.settings.diff) + 1) % 3]; keep(); },
+      v: () => { SC.input.sens = SC.input.sens === 1 ? 1.5 : SC.input.sens > 1 ? 0.65 : 1; keep(); }, c: () => { closeMenu(); U.paused = false; SC.story.load(); }
     });
+    draw();
+  };
+  /* the crossing: saved, healed, and Tally's ledger open for business */
+  U.crossing = function (fns) {
+    const p = SC.player, draw = () => {
+      let rows = '';
+      SC.UPGRADES.forEach(u => {
+        const lv = SC.up[u.id], done = lv >= u.max, cost = done ? 0 : u.cost[lv], can = !done && p.scrip >= cost;
+        rows += '<div class="up' + (done ? ' done' : '') + '"><div><b>' + u.name + '</b> <i>' + '&#9670;'.repeat(lv) + '&#9671;'.repeat(u.max - lv) + '</i><small>' + (done ? 'Owned' : u.text[lv]) + '</small></div>' +
+          '<div class="mbtn s' + (can ? ' y' : ' off') + '" data-go="b_' + u.id + '">' + (done ? 'OWNED' : cost + ' SCRIP') + '</div></div>';
+      });
+      const go = { p: () => { closeMenu(); fns.path(); }, x: () => { closeMenu(); fns.leave(); } };
+      SC.UPGRADES.forEach(u => { go['b_' + u.id] = () => { fns.buy(u.id); draw(); U.freeze = true; }; });
+      openMenu('<div class="card ledger"><h2>THE CROSSING</h2><p>Saved. Healed. Second chance back. Mr. Tally has the ledger open.</p>' +
+        '<div class="purse">SCRIP <b>' + p.scrip + '</b></div><div class="ups">' + rows + '</div>' +
+        '<div class="row"><div class="mbtn s" data-go="p">CHANGE PATH</div><div class="mbtn y" data-go="x">GO ON</div></div></div>', go);
+      U.freeze = true;
+    };
     draw();
   };
   U.dead = function (onRetry) {
@@ -117,7 +142,8 @@
   U.end = function (st, onAgain) {
     openMenu('<div class="card"><div class="tag">END OF ISSUE #1</div><h2 style="margin-top:8px">TO BE CONTINUED</h2><p>Deacon Voss paid in full. Mother Mercy still owes.</p>' +
       '<table><tr><td>TIME</td><td>' + Math.floor(st.time / 60) + ' min ' + ('0' + Math.floor(st.time % 60)).slice(-2) + ' s</td></tr><tr><td>PATH</td><td>' + st.path + '</td></tr><tr><td>HOLLOWS PUT DOWN</td><td>' + st.kills + '</td></tr>' +
-      '<tr><td>FINISHERS</td><td>' + st.finishers + '</td></tr><tr><td>LATE DODGES</td><td>' + st.perfect + '</td></tr><tr><td>CLUES</td><td>' + st.clues + ' of 5</td></tr><tr><td>SECOND CHANCES USED</td><td>' + st.chances + '</td></tr></table>' +
+      '<tr><td>FINISHERS</td><td>' + st.finishers + '</td></tr><tr><td>LATE DODGES</td><td>' + st.perfect + ' (' + st.counters + ' countered)</td></tr><tr><td>CLUES</td><td>' + st.clues + ' of 5</td></tr>' +
+      '<tr><td>IOUS</td><td>' + st.ious + ' of 8</td></tr><tr><td>RUTH</td><td>' + (st.ruth ? 'At rest' : 'Still hanging the washing') + '</td></tr><tr><td>CHALLENGE</td><td>' + st.diff + '</td></tr><tr><td>SECOND CHANCES USED</td><td>' + st.chances + '</td></tr></table>' +
       '<div class="mbtn y" data-go="a">PLAY AGAIN</div></div>', { a: () => { closeMenu(); onAgain(); } });
     U.freeze = true;
   };
@@ -132,14 +158,16 @@
     const d = U.dlg;
     if (d && !d.full) { d.n += rdt * 62; const n = Math.floor(d.n); if (n >= d.text.length) { d.full = true; $('dlgTx').innerHTML = fmt(d.lines[d.i].text); } else { if (n % 3 === 0 && $('dlgTx').textContent.length !== n) SC.audio.sfx('blip'); $('dlgTx').textContent = d.text.slice(0, n); } }
     const p = SC.player, T = SC.T;
-    $('hpFill').style.transform = $('hpLag').style.transform = 'scaleX(' + Math.max(0, p.hp / T.hp) + ')';
+    $('hpFill').style.transform = $('hpLag').style.transform = 'scaleX(' + Math.max(0, p.hp / p.maxHp()) + ')';
+    $('hpBar').style.width = 'calc(clamp(120px,30vw,250px) * ' + (p.maxHp() / T.hp) + ')';
     $('mFill').style.transform = 'scaleX(' + (p.meter / T.meter) + ')';
     $('tagCh').classList.toggle('used', p.chance <= 0);
-    const path = p.path ? SC.PATHS[p.path] : null, ready = path && p.meter >= T.powerCost;
+    const path = p.path ? SC.PATHS[p.path] : null, ready = path && p.meter >= p.cost();
     $('tagPw').classList.toggle('hide', !path); if (path) $('tagPw').textContent = path.power + (p.rank > 1 ? ' II' : '');
     $('tagEc').classList.toggle('hide', !p.echoes); if (p.echoes) $('tagEc').textContent = 'CLUES ' + p.echoes + '/5';
+    if (U._sc !== p.scrip) { const el = $('tagSc'); el.classList.toggle('hide', !p.scrip); el.textContent = 'SCRIP ' + p.scrip; if (U._sc !== undefined && p.scrip > U._sc) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } U._sc = p.scrip; }
     $('bP').classList.toggle('low', !ready); $('bPl').innerHTML = (path ? path.btn : 'POWER') + (SC.input.touch ? '' : '<small>L</small>');
-    $('bPf').style.transform = 'scaleY(' + (path ? 1 - Math.min(1, p.meter / T.powerCost) : 1) + ')';
+    $('bPf').style.transform = 'scaleY(' + (path ? 1 - Math.min(1, p.meter / p.cost()) : 1) + ')';
     $('bL').classList.toggle('on', !!SC.cam.lock);
     if (U.bossE) { const k = Math.max(0, U.bossE.hp / U.bossE.maxHp); $('bossFill').style.transform = $('bossLag').style.transform = 'scaleX(' + k + ')'; }
     // what the Interact button would do right now

@@ -1,5 +1,42 @@
 # Second Chance: changelog
 
+## v0.2.0 (Nov 28 2026): echoes, rooftops, the ledger
+
+Built out from the v0.1 slice. Same block of the city, same camera rule (third person, always), more to do in it.
+
+**Investigation**
+- Echoes: two clues now replay the past with see-through ink figures on the real set, lights down, watched from
+  behind Dez. The alley shows his murder (a man in a white coat and wide hat, three shots, counted out loud). The
+  warehouse office shows who Voss answers to: Mother Mercy, seen for the first time.
+
+**Exploration**
+- Climbable ladders: both tenements over Halloran Alley and the container stack in the Pier 9 yard. Dez climbs
+  hand over hand and mantles over the top; Interact at the top climbs back down.
+- The two tenement roofs, joined by a plank across the alley: laundry lines, a stair hut, water towers, antennas.
+- Ruth Okafor, a ghost on the west roof, and a side quest for her locket. Returning it lets her go, with a reward.
+- Eight hidden IOUs from Mr. Tally around the block.
+
+**Combat**
+- Counter: Attack inside the late-dodge slowdown; Dez crosses the gap and lands a heavy blow.
+- Past Due, a fourth combo hit (bought): a leap and a slam with a ring of force.
+- The Caller: a new enemy who keeps its distance and lobs burning lamp oil at where you are heading. A red ring
+  shows where it lands.
+- Lamp-oil drums on the street, in the yard, in the warehouse and on the roofs. They chain into each other.
+- Wall splats when a Hollow is knocked hard into something solid.
+
+**Progression and settings**
+- Scrip, dropped by Hollows and crates, spent in Tally's ledger at crossings on five upgrades.
+- Challenge setting (Story, Normal, Hard) in the pause menu. Sound, camera speed, picture and challenge are kept on
+  the device.
+- The pause menu shows IOUs found and the side quest; the end card shows counters, IOUs, Ruth and the challenge.
+
+**Fixes**
+- Ladders and other things to use get their own marker, so the red "!" only ever means an attack is coming.
+- Markers hide during staged shots.
+
+**Tested and not tested:** see the README. Six full scripted runs pass (three paths, Hard, Story, no dodging).
+Still not played by a person or run on a real phone.
+
 ## v0.1.0 (Nov 19 2026): first vertical slice, third person
 
 Built clean from the camera and gameplay brief. Third-person 3D action-adventure; there is no first-person view.
