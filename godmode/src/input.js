@@ -134,7 +134,13 @@ function initControls(canvas) {
 /* a clean tap on the world: use the armed power there */
 function worldTap(sx, sy, touch) {
   const S = APP.S;
-  const id = pickCitizen(S, sx, sy, touch ? 44 : 28);
+  let id = pickCitizen(S, sx, sy, touch ? 44 : 28);
+  // in a story, a tap near the person the story points at means that person, even in a crowd
+  const mk = UI.storyMark;
+  if (mk && mk.id && (APP.power === 'observe' || APP.power === 'inspire' || APP.power === 'bless')) {
+    const o = R.cit.get(mk.id);
+    if (o) { const p = toScreen(o.x, o.g.position.y + 0.75 * o.g.scale.y, o.z, {}); if (hyp(p.x - sx, p.y - sy) < (touch ? 70 : 45)) id = mk.id; }
+  }
   const g = groundPoint(sx, sy);
   const c = id ? getC(S, id) : null;
   switch (APP.power) {
