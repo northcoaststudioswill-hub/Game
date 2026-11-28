@@ -305,7 +305,7 @@ button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
       <button class="btn" id="btnStory">Story: four guided chapters</button>
       <button class="btn" id="btnNew">New world</button>
       <button class="btn sm" id="btnHow">How to play</button>
-      <div id="ver">BUILD 0.7 &middot; SAVES ON THIS DEVICE</div>
+      <div id="ver">BUILD 0.8 &middot; SAVES ON THIS DEVICE</div>
     </div>
   </div>
 
@@ -6431,19 +6431,19 @@ const CHAPTERS = [
       { say: 'It is hard to wake up hungry. Choose <b>BLESS</b>, then tap near the people by the fire.', ui: '#pw [data-p=bless]', mark: () => ({ x: 0, z: 0 }),
         enter: (S, d) => { d.b0 = S.stats.bless; S.cycles = Math.max(S.cycles, 40); for (const c of S.citizens.slice(0, 3)) c.hunger = 0.8; selectCitizen(0); }, done: (S, d) => S.stats.bless > d.b0 },
       { say: 'Shelter next. Choose <b>CREATE</b>, pick <b>HUT</b>, then tap open grass near the fire. They will build it themselves.', ui: '#pw [data-p=create], #sub [data-k=hut]', mark: () => ({ x: 3.5, z: 2 }),
-        enter: S => { APP.createKind = 'hut'; UI.lastSub = ''; stTop(S, { wood: 14 }); }, done: S => S.buildings.some(b => b.type === 'hut') },
-      { say: 'Now watch them build it. Tap the <b>1x</b> button (top right) to speed time up.', ui: '#btnSpeed', mark: S => { const b = S.buildings.find(b => b.type === 'hut'); return b && { x: b.x, z: b.z }; },
-        push: (S, d, t) => { stTop(S, { wood: 12 }); const b = S.buildings.find(b => b.type === 'hut'); if (b && t > 40) b.progress = Math.min(0.99, b.progress + 0.02); },
-        done: S => S.buildings.some(b => b.type === 'hut' && b.built) },
+        enter: S => { APP.createKind = 'hut'; UI.lastSub = ''; stTop(S, { wood: 14 }); }, done: S => S.buildings.some(b => b.type === 'hut' && !b.auto) },
+      { say: 'Now watch them build it. Tap the <b>1x</b> button (top right) to speed time up.', ui: '#btnSpeed', mark: S => { const b = S.buildings.find(b => b.type === 'hut' && !b.auto); return b && { x: b.x, z: b.z }; },
+        push: (S, d, t) => { stTop(S, { wood: 12 }); const b = S.buildings.find(b => b.type === 'hut' && !b.auto); if (b && t > 40) b.progress = Math.min(0.99, b.progress + 0.02); },
+        done: S => S.buildings.some(b => b.type === 'hut' && !b.auto && b.built) },
       { say: 'Now give them an idea. Choose <b>INSPIRE</b>, choose <b>DEVOTION</b>, then tap anyone.', ui: '#pw [data-p=inspire], #sub [data-k=b0]', mark: S => (S.citizens[1] || {}).id,
         enter: S => { APP.inspireK = DEV; UI.lastSub = ''; S.cycles = Math.max(S.cycles, 30); setSpeed(1); }, done: S => S.citizens.some(c => c.inspired && c.inspired.k === DEV) || S.counts[DEV] >= 3 },
       { say: 'They preach it to anyone who will listen, and ideas spread when people talk. Wait until <b>four</b> of them believe. (Their hats turn into halos.)', ui: '#zeit',
         push: (S, d, t) => { if (t > 25 && t % 8 === 0) stNudge(S, DEV, 1); }, done: S => S.counts[DEV] >= 4 },
       { say: 'A faith needs a place. Choose <b>CREATE</b>, pick <b>SHRINE</b>, and tap open ground near the fire.', ui: '#pw [data-p=create], #sub [data-k=shrine]',
-        enter: S => { APP.createKind = 'shrine'; UI.lastSub = ''; stTop(S, { wood: 12, stone: 16 }); }, mark: () => ({ x: -3.5, z: 3 }), done: S => S.buildings.some(b => b.type === 'shrine') },
-      { say: 'Wait for the Shrine to rise. When they pray there, your <b>CYCLES</b> (the purple bar) refill faster.', ui: '#cyc', mark: S => { const b = S.buildings.find(b => b.type === 'shrine'); return b && { x: b.x, z: b.z }; },
-        push: (S, d, t) => { stTop(S, { wood: 10, stone: 14 }); const b = S.buildings.find(b => b.type === 'shrine'); if (b && t > 35) b.progress = Math.min(0.99, b.progress + 0.02); },
-        done: S => S.buildings.some(b => b.type === 'shrine' && b.built) },
+        enter: S => { APP.createKind = 'shrine'; UI.lastSub = ''; stTop(S, { wood: 12, stone: 16 }); }, mark: () => ({ x: -3.5, z: 3 }), done: S => S.buildings.some(b => b.type === 'shrine' && !b.auto) },
+      { say: 'Wait for the Shrine to rise. When they pray there, your <b>CYCLES</b> (the purple bar) refill faster.', ui: '#cyc', mark: S => { const b = S.buildings.find(b => b.type === 'shrine' && !b.auto); return b && { x: b.x, z: b.z }; },
+        push: (S, d, t) => { stTop(S, { wood: 10, stone: 14 }); const b = S.buildings.find(b => b.type === 'shrine' && !b.auto); if (b && t > 35) b.progress = Math.min(0.99, b.progress + 0.02); },
+        done: S => S.buildings.some(b => b.type === 'shrine' && !b.auto && b.built) },
       { say: 'When half of them share one idea, an <b>Age</b> begins and changes the rules for everyone. Wait for the <b>Age of Devotion</b>.', ui: '#zeit',
         push: (S, d, t) => { stMorning(S); if (t > 15 && t % 6 === 0) stNudge(S, DEV, 1); }, done: S => S.age === DEV }
     ],

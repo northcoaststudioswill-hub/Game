@@ -33,7 +33,7 @@ const T0 = Date.now(); const check = (ok, msg) => { console.log((ok ? 'ok   ' : 
     const a = await citizenScr(id), b = await scr(x, z);
     await page.mouse.move(a.x, a.y); await page.mouse.down(); await page.mouse.move(b.x, b.y, { steps: 8 }); await sleep(150); await page.mouse.up(); await sleep(400);
   };
-  const closeIns = async () => { if (await page.evaluate(() => !document.getElementById('inspect').hidden)) await closeIns(); await sleep(150); };
+  const closeIns = async () => { if (await page.evaluate(() => !document.getElementById('inspect').hidden)) await page.tap('#inClose'); await sleep(150); };
   // wait (in real time, letting the game run) for the story to reach a step
   const waitStep = async (n, ms) => { for (let i = 0; i < (ms || 3000) / 150; i++) { if ((await step()) >= n) return true; await sleep(150); } return (await step()) >= n; };
   let d, p, id, fp, w, t3, dk;
@@ -159,7 +159,9 @@ const T0 = Date.now(); const check = (ok, msg) => { console.log((ok ? 'ok   ' : 
   await ff(12);
   check((await step()) >= 3, 'ch4: dropping the explorer on the dock sends a boat out');
   await page.tap('#btnGo'); await sleep(300); await page.tap('#btnGo'); await sleep(300);
+  console.log('  ch4 step before waiting', await step(), await page.evaluate(() => JSON.stringify(APP.S.boats.map(b => b.st + ':' + (b.m ? b.m.kind : '')))));
   await until(3, 40); await until(4, 300);
+  console.log('  ch4 step after waiting', await step(), await page.evaluate(() => APP.S.found.filter(Boolean).length));
   check(await waitStep(5), 'ch4: land is sighted');
   await shot('s4-land');
   d = await data();
@@ -171,7 +173,7 @@ const T0 = Date.now(); const check = (ok, msg) => { console.log((ok ? 'ok   ' : 
   await shot('s4-end');
   await ended('ch4');
   }
-  check(await page.evaluate(() => Object.keys(APP.settings.storyDone).length >= TO - FROM + 1), 'all four chapters are marked complete');
+  check(await page.evaluate(n => Object.keys(APP.settings.storyDone).length >= n, TO - FROM + 1), 'all four chapters are marked complete');
   check(errors.length === 0, 'no console or page errors' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
   await browser.close();
   console.log(failures ? 'FAILED ' + failures : 'ALL OK');

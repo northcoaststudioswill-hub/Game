@@ -269,9 +269,18 @@ node godmode/tests/play_phone.js    # needs Playwright + Chromium; screenshots g
 - **Revelations** (`REVELATIONS`, `revelationTick()` in life.js; `S.rev`). Worlds start with 100 cycles.
 - **Phone**: the sea no longer recomputes normals and animates every other frame (every fourth in light mode);
   `watchFps()` and `setLowFx()`; Effects and Vibration settings; bigger LIFE buttons.
-- Tests: new `tests/play_story.js` plays all four chapters through real taps and drags at 390x844, fast-forwarding
-  with `storyFastForward()` while waiting, and checks every step, the ending of each chapter and that all four are
-  marked done.
+- In a story, a tap near the marked person selects them even in a crowd (Observe, Bless, Inspire). The "place a hut"
+  and "place a shrine" steps count only what the player places, not what the villagers stake out themselves.
+- Tests: new `tests/play_story.js [outDir] [fromChapter] [toChapter]` plays the chapters through real taps and drags
+  at 390x844, fast-forwarding with `storyFastForward()` while waiting, and checks every step, each chapter's ending
+  and that every chapter played is marked done. `play_phone.js`'s Inspire check now accepts a Kin shrugging it off.
+
+**Tested:** `play_story.js`, all four chapters in one run: 36 checks, ALL OK, no console errors (about 2 minutes in the
+software-rendered test browser; chapter 3 took the Bless route to The Miracle). `play_phone.js` ALL OK (two runs in a
+row; one earlier run failed the old, stricter Inspire check). `sim_balance.js` OK: endless 75-minute runs reached
+generation 12 with 6 settlements founded in each; Revelations arrived at about 7, 13, 23 and 38 minutes in seed 1.
+**Not tested:** on a phone, so the automatic light-effects switch and vibration have only been exercised in code, not
+felt; chapter 3's "let it run" ending (The Victors) is written but the test only plays the Miracle route.
 
 
 ### 0.7, Nov 27 2026: review and bug-hunt fixes
