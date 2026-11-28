@@ -4,39 +4,39 @@
      bruiser = Warden.  boss = Stair Captain Ansel Rook.  clerk = Brand. */
   const SPECS = SC.SPECS = {
     hero: { h: 1.1, b: 1.12, face: 'kael', hair: 'kael', armor: true, cape: true, glowHand: true, washer: true, weapon: 'kblade', pauldron: true,
-      pal: { skin: 0xe6c79a, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x5a3aa8, tie: 0xe8c25a, pants: 0x2e2a40, boots: 0x1a1620, hair: 0xe9cf7a, streak: 0x2a2630, glove: 0x2a2630, wrap: 0x2e2a40, band: 0x5a3aa8 } },
-    hollow: { h: 1.0, b: 1.05, face: 'visor', helm: 'guard', weapon: 'baton', tabard: true, kit: { plate: 0xe9e6dc, trim: 0xd8a83a, belt: 0x1f2233, lamp: 0x5ff2e2, hands: 0xe9e6dc },
-      pal: { skin: 0xefe8d4, top: 0x2f8f8a, trim: 0xe8c25a, shirt: 0xefe8d4, tie: 0xe8c25a, pants: 0x30344a, boots: 0x14141d, hair: 0xefe8d4, glove: 0xefe8d4, wrap: 0x2f8f8a } },
-    knifer: { h: 0.97, b: 0.9, face: 'halfmask', hood: true, weapon: 'blade', sash: true, kit: { light: 1, mantle: 0x432a86, plate: 0x33206a, trim: 0xe8c25a, belt: 0x14141d, hands: 0x14141d, sheath: 1 },
-      pal: { skin: 0xe6c79a, top: 0x5a3aa8, trim: 0x33206a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x23202c, boots: 0x14141d, hair: 0x5a3aa8, glove: 0x14141d, wrap: 0x5a3aa8 } },
-    bruiser: { h: 1.24, b: 1.5, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, plate: 0x8a8ea6, trim: 0xb02a2a, belt: 0x14141d, hands: 0x23232e },
-      pal: { skin: 0x9aa1b8, top: 0x3a3f5c, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0x9aa1b8, glove: 0x23232e, wrap: 0x3a3f5c } },
-    boss: { h: 1.14, b: 1.08, face: 'rook', hat: 'captain', coat: true, weapon: 'gaff', pauldron: true, kit: { light: 1, noSh: 1, officer: 1, plate: 0xf2efe6, trim: 0xe8c25a, belt: 0x8a1f24, hands: 0x8a1f24, sheath: 1 },
-      pal: { skin: 0xd9b48f, top: 0xf2efe6, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x0c0c12, hair: 0xb9bcc8, glove: 0x8a1f24, wrap: 0xf2efe6 } },
+      pal: { skin: 0xe6c79a, top: 0xd6cfba, trim: 0xc9a245, shirt: 0x4b3486, tie: 0xc9a245, pants: 0x2a2734, boots: 0x1a1620, hair: 0xd6bc6c, streak: 0x2a2630, glove: 0x2a2630, wrap: 0x2a2734, band: 0x4b3486 } },
+    hollow: { h: 1.0, b: 1.05, face: 'visor', helm: 'guard', weapon: 'baton', tabard: true, kit: { plate: 0xcfccc0, trim: 0xb88a30, belt: 0x1e2029, lamp: 0x9fd8c4, hands: 0xcfccc0 },
+      pal: { skin: 0xd6cfba, top: 0x2b7772, trim: 0xc9a245, shirt: 0xd6cfba, tie: 0xc9a245, pants: 0x2c2e3a, boots: 0x14141d, hair: 0xd6cfba, glove: 0xd6cfba, wrap: 0x2b7772 } },
+    knifer: { h: 0.97, b: 0.9, face: 'halfmask', hood: true, weapon: 'blade', sash: true, kit: { light: 1, mantle: 0x3a2870, plate: 0x2c1e58, trim: 0xc9a245, belt: 0x14141d, hands: 0x14141d, sheath: 1 },
+      pal: { skin: 0xe6c79a, top: 0x4b3486, trim: 0x2c1e58, shirt: 0xc9a245, tie: 0xc9a245, pants: 0x23202c, boots: 0x14141d, hair: 0x4b3486, glove: 0x14141d, wrap: 0x4b3486 } },
+    bruiser: { h: 1.24, b: 1.5, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, plate: 0x7c7e88, trim: 0x9a2a26, belt: 0x14141d, hands: 0x23232e },
+      pal: { skin: 0x8a8e9a, top: 0x34374a, trim: 0xc9a245, shirt: 0x7c2022, tie: 0xc9a245, pants: 0x23232e, boots: 0x14141d, hair: 0x8a8e9a, glove: 0x23232e, wrap: 0x34374a } },
+    boss: { h: 1.14, b: 1.08, face: 'rook', hat: 'captain', coat: true, weapon: 'gaff', pauldron: true, kit: { light: 1, noSh: 1, officer: 1, plate: 0xdcd6c4, trim: 0xc9a245, belt: 0x7c2022, hands: 0x7c2022, sheath: 1 },
+      pal: { skin: 0xd9b48f, top: 0xdcd6c4, trim: 0xc9a245, shirt: 0x7c2022, tie: 0xc9a245, pants: 0x23232e, boots: 0x0c0c12, hair: 0xb9bcc8, glove: 0x7c2022, wrap: 0xdcd6c4 } },
     clerk: { h: 1.12, b: 1.25, face: 'brand', hair: 'brand', coat: true, weapon: 'halberd2',
       pal: { skin: 0xb98a66, top: 0x4a4650, trim: 0x2a2630, shirt: 0x6e6a78, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0x9a9aa6, glove: 0x2a2630, wrap: 0x4a4650 } }
   };
   if (SC.issue === 'riser') {   // a clerk cannot be seen to fight: black cloth over the face, no cape, nothing gilt
     Object.assign(SPECS.hero, { face: 'cloth', cape: false, hood: true, pauldron: false, hair: null });
     Object.assign(SPECS.hero.pal, { top: 0x2a2630, trim: 0x4a4650, shirt: 0x2a2630, tie: 0x4a4650, band: 0x2a2630 });
-    SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, officer: 1, plate: 0xefe8d4, trim: 0xe8c25a, belt: 0x8a1f24, hands: 0x23232e }, pal: { skin: 0xc9cbd6, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0xefe8d4, glove: 0x23232e, wrap: 0xefe8d4 } };
+    SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, officer: 1, plate: 0xd6cfba, trim: 0xc9a245, belt: 0x7c2022, hands: 0x23232e }, pal: { skin: 0xb8b9c0, top: 0xd6cfba, trim: 0xc9a245, shirt: 0x7c2022, tie: 0xc9a245, pants: 0x23232e, boots: 0x14141d, hair: 0xd6cfba, glove: 0x23232e, wrap: 0xd6cfba } };
   }
   if (SC.issue === 'stack') {   // House Teal's pickets hold the island; their blades wear teal, not violet
-    Object.assign(SPECS.knifer.pal, { top: 0x1f6f6a, wrap: 0x1f6f6a });
+    Object.assign(SPECS.knifer.pal, { top: 0x1e615c, wrap: 0x1e615c });
     // v0.90 COMBAT: the pickets are cadets of House Teal, not Dock Guards: bare gilt heads, the House's teal and a cadet's sword, a sash over the shoulder
-    SPECS.hollow = { h: 0.96, b: 0.96, face: 'cadet', hair: 'tavi', weapon: 'blade', sash: true, tabard: true, kit: { light: 1, noSh: 1, plate: 0xefe8d4, trim: 0xe8c25a, belt: 0x14141d, hands: 0xefe8d4 },
-      pal: { skin: 0xecd3a8, top: 0x1f6f6a, trim: 0xe8c25a, shirt: 0xefe8d4, tie: 0xe8c25a, pants: 0x23302f, boots: 0x14141d, hair: 0xe9cf7a, glove: 0xefe8d4, wrap: 0x1f6f6a } };
+    SPECS.hollow = { h: 0.96, b: 0.96, face: 'cadet', hair: 'tavi', weapon: 'blade', sash: true, tabard: true, kit: { light: 1, noSh: 1, plate: 0xd6cfba, trim: 0xc9a245, belt: 0x14141d, hands: 0xd6cfba },
+      pal: { skin: 0xecd3a8, top: 0x1e615c, trim: 0xc9a245, shirt: 0xd6cfba, tie: 0xc9a245, pants: 0x23302f, boots: 0x14141d, hair: 0xd6bc6c, glove: 0xd6cfba, wrap: 0x1e615c } };
     SPECS.bruiser.kit = Object.assign({}, SPECS.bruiser.kit, { officer: 1 });   // a Warden of the dais: the Assayers' own, with the gilt on him
   }
   if (SC.issue === 'array') {   // forty-three days after the furnace: a valve hand with a wrench, Dace in his hood, and the Array's own watch
     Object.assign(SPECS.hero, { h: 1.0, b: 1.0, face: 'kael0', hair: 'kael', armor: false, cape: false, pauldron: false, glowHand: false, weapon: 'wrench' });
-    Object.assign(SPECS.hero.pal, { skin: 0xc8946a, hair: 0x6a2e18, streak: 0x6a2e18, top: 0x3d5a6a, trim: 0x2a3440, shirt: 0x3d5a6a, tie: 0xb8682a, pants: 0x2a3440, boots: 0x1e1418, glove: 0xc8946a, wrap: 0x3d5a6a, band: 0xb8682a });
+    Object.assign(SPECS.hero.pal, { skin: 0xc8946a, hair: 0x6a2e18, streak: 0x6a2e18, top: 0x384c56, trim: 0x2a3440, shirt: 0x384c56, tie: 0xb8682a, pants: 0x2a3440, boots: 0x1e1418, glove: 0xc8946a, wrap: 0x384c56, band: 0xb8682a });
     SPECS.clerk = { h: 1.03, b: 1.02, face: 'cloth', hood: true, kit: { light: 1, noSh: 1, soot: 1, plate: 0x2a2634, trim: 0x4a4030, belt: 0x1c1a24, hands: 0xb98a66, lamp: 0xffd98a }, pal: { skin: 0xb98a66, top: 0x2a2634, trim: 0x1c1a24, shirt: 0x2a2634, tie: 0x1c1a24, pants: 0x1c1a24, boots: 0x0c0c12, hair: 0x2a2634, glove: 0x4a4030, wrap: 0x2a2634 } };
     Object.assign(SPECS.hollow.pal, { top: 0x4a5068, wrap: 0x4a5068, hair: 0x7a7e8c, shirt: 0x5a6078, trim: 0xb8682a, glove: 0x7a7e8c }); if (SPECS.hollow.kit) Object.assign(SPECS.hollow.kit, { lamp: 0xffb060, plate: 0x8a8e9c, trim: 0xb8682a, hands: 0x7a7e8c });   // v0.90 COMBAT: grey all over, not the Dock Guard's white enamel
   }
   if (SC.issue === 'docks') {   // seven years after: he is still Clerk Sorrel that night. A coat, not plate; gloves over the palms
     Object.assign(SPECS.hero, { armor: false, pauldron: false, coat: true, cape: false });
-    Object.assign(SPECS.hero.pal, { top: 0xe6dcc4, wrap: 0xe6dcc4, glove: 0x6a5a44 });
+    Object.assign(SPECS.hero.pal, { top: 0xc9bfa6, wrap: 0xc9bfa6, glove: 0x6a5a44 });
   }
   // how each boss stands when he is not moving. Rook: upright, the gaff grounded like a staff, one hand behind his back.
   // The Warden-captain at the riser: low and square, the halberd across him. The Blade: both points down, the weight off the bad leg
@@ -47,15 +47,15 @@
   // Oswin Hale's leg was broken on night forty-nine and set badly. Nine years on he is the Auditor's Blade, and it still does not bend
   SC.limp = (e, o) => { if (e.kind !== 'boss' || SC.issue !== 'stair') return o; const a = Math.sin(e.runPh || 0); return Object.assign(o, { thL: [-0.32 * a - 0.04, 0, 0.14], shnL: [0.05, 0, 0], ftL: [0.1, 0, 0], hips: [0, o.hips ? o.hips[1] : 0, 0.08 * a], y: (o.y || 0) + 0.035 * Math.abs(a) }); };
   if (SC.issue === 'stair') {   // the Auditor's Blade, and Tavi at sixteen
-    SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, kit: { light: 1, officer: 1, mantle: 0x23232e, plate: 0x2a2a38, trim: 0xe8c25a, belt: 0xe8c25a, hands: 0x15151f }, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
+    SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, kit: { light: 1, officer: 1, mantle: 0x23232e, plate: 0x2a2a38, trim: 0xc9a245, belt: 0xc9a245, hands: 0x15151f }, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xc9a245, shirt: 0xc9a245, tie: 0xc9a245, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xc9a245, wrap: 0x15151f } };
     SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', kit: { light: 1, noSh: 1, soot: 1, plate: 0x6a4a34, trim: 0xd9a05f, belt: 0x2a1c14, hands: 0xc98a62, lamp: 0xffd98a }, pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
   }
   if (SC.issue === 'gild') {   // the table: the man who went onto it, the man on it, the man who came off, the woman who did it, and two of the Unlit to hold the lamp
     const shift = { top: 0x6a6672, trim: 0x4f4b57, shirt: 0x6a6672, tie: 0x4f4b57, pants: 0x4f4b57, wrap: 0x6a6672 };
     SPECS.k0 = { h: 1.0, b: 1.0, face: 'kael0', hair: 'kael', pal: Object.assign({ skin: 0xc8946a, hair: 0x2a2018, streak: 0x2a2018, band: 0x2a2018, boots: 0xc8946a, glove: 0xc8946a }, shift) };
     SPECS.k1 = { h: 1.05, b: 1.05, face: 'kaelm', pal: Object.assign({ skin: 0xd8b088, hair: 0x2a2018, boots: 0xd8b088, glove: 0xc8946a }, shift) }; SPECS.k1w = Object.assign({}, SPECS.k1, { h: 1.08, face: 'kaelw' });   // months in: longer, shaved, the eyes wrapped. The hands are still his
-    SPECS.k2 = { h: 1.1, b: 1.12, face: 'kael', hair: 'kael', pal: { skin: 0xe6c79a, hair: 0xe9cf7a, streak: 0x2a2630, band: 0xe9cf7a, top: 0xefe8d4, trim: 0xd8d0bc, shirt: 0xefe8d4, tie: 0xd8d0bc, pants: 0xd8d0bc, wrap: 0xefe8d4, boots: 0xe6c79a, glove: 0x2a2630 } };
-    SPECS.ilse = { h: 1.15, b: 0.94, face: 'ilse', hair: 'ilse', coat: true, pal: { skin: 0xe6c79a, top: 0x3f3a48, trim: 0x2a2630, shirt: 0x9a9488, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0xb9bcc8, glove: 0xefe8d4, wrap: 0x3f3a48 } };
+    SPECS.k2 = { h: 1.1, b: 1.12, face: 'kael', hair: 'kael', pal: { skin: 0xe6c79a, hair: 0xd6bc6c, streak: 0x2a2630, band: 0xd6bc6c, top: 0xd6cfba, trim: 0xc4bca8, shirt: 0xd6cfba, tie: 0xc4bca8, pants: 0xc4bca8, wrap: 0xd6cfba, boots: 0xe6c79a, glove: 0x2a2630 } };
+    SPECS.ilse = { h: 1.15, b: 0.94, face: 'ilse', hair: 'ilse', coat: true, pal: { skin: 0xe6c79a, top: 0x3f3a48, trim: 0x2a2630, shirt: 0x9a9488, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0xb9bcc8, glove: 0xd6cfba, wrap: 0x3f3a48 } };
     SPECS.unlit = { h: 1.0, b: 1.06, face: 'cloth', hood: true, pal: { skin: 0xc8946a, top: 0x2a2634, trim: 0x1c1a24, shirt: 0x2a2634, tie: 0x1c1a24, pants: 0x1c1a24, boots: 0x0c0c12, hair: 0x2a2634, glove: 0x4a4030, wrap: 0x2a2634 } };
   }
 //@@FACES
@@ -168,7 +168,7 @@
       g.fillStyle = '#e8c25a'; g.beginPath(); g.moveTo(0, 0); g.lineTo(S, 0); g.lineTo(S, 70); g.lineTo(78, 84); g.lineTo(64, 74); g.lineTo(50, 84); g.lineTo(0, 70); g.fill();
       g.strokeStyle = ink; g.lineWidth = 4; g.beginPath(); g.moveTo(0, 70); g.lineTo(50, 84); g.lineTo(64, 74); g.lineTo(78, 84); g.lineTo(S, 70); g.stroke();
       g.fillStyle = '#b8902e'; g.fillRect(0, 0, 26, 70);
-      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#19d3c5' : '#ffffff');
+      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#9fd8c4' : '#ffffff');
       [[42, -1], [86, 1]].forEach(a => { g.fillStyle = ink; g.beginPath(); g.moveTo(a[0] - 17, 50 + a[1] * 5); g.lineTo(a[0] + 17, 50 - a[1] * 5); g.lineTo(a[0] + 12, 64); g.lineTo(a[0] - 12, 64); g.fill();
         if (lit) { g.fillStyle = lit; g.beginPath(); g.arc(a[0], 58, expr === 'angry' ? 4.6 : 3.2, 0, 7); g.fill(); } });
       stroke([64, 6, 64, 40], 2.5, '#8a6a1e'); stroke([40, 20, 56, 30], 2, '#8a6a1e'); stroke([88, 20, 72, 30], 2, '#8a6a1e');
@@ -176,7 +176,7 @@
     } else if (kind === 'grille') {
       g.fillStyle = '#9aa1b8'; g.fillRect(0, 0, S, S);
       g.fillStyle = '#6f7690'; g.beginPath(); g.moveTo(0, 20); g.lineTo(28, 50); g.lineTo(24, 128); g.lineTo(0, 128); g.fill();
-      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#19d3c5' : '#ff3b30');
+      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#9fd8c4' : '#ff3b30');
       g.fillStyle = ink; g.fillRect(22, 46, 84, 18); g.fillRect(56, 46, 16, 62);          // the T
       if (lit) { g.fillStyle = lit; g.beginPath(); g.arc(42, 55, expr === 'angry' ? 5 : 3.6, 0, 7); g.fill(); g.beginPath(); g.arc(86, 55, expr === 'angry' ? 5 : 3.6, 0, 7); g.fill(); }
       for (let x = 34; x < 100; x += 11) if (x < 54 || x > 74) stroke([x, 78, x, 112], 4);
@@ -186,7 +186,7 @@
       // 'visor': the Dock Guard's helm. White enamel, one slit, somebody behind it.
       g.fillStyle = '#efe8d4'; g.fillRect(0, 0, S, S);
       g.fillStyle = '#c4bda8'; g.beginPath(); g.moveTo(0, 26); g.lineTo(28, 54); g.lineTo(22, 128); g.lineTo(0, 128); g.fill();
-      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#19d3c5' : '#5ff2e2');
+      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#9fd8c4' : '#9fd8c4');
       g.fillStyle = ink; g.beginPath(); g.moveTo(20, 48); g.lineTo(108, 48); g.lineTo(102, 68); g.lineTo(26, 68); g.fill();
       if (lit) { g.fillStyle = lit; g.beginPath(); g.arc(44, 58, expr === 'angry' ? 5 : 3.4, 0, 7); g.fill(); g.beginPath(); g.arc(84, 58, expr === 'angry' ? 5 : 3.4, 0, 7); g.fill(); }
       g.fillStyle = '#efe8d4'; g.fillRect(60, 44, 8, 30); g.strokeStyle = ink; g.lineWidth = 2.5; g.strokeRect(60, 44, 8, 30);
@@ -303,15 +303,15 @@
       });
     }
 //@@WEAPONS
-    const steel = G.toon({ color: 0xd9dde6 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xe8c25a });
+    const steel = G.toon({ color: 0xaeb2b8 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xc9a245 });
     if (sp.armor) {
       // ears, and hands that are hands: a thumb and a row of fingers closed on the hilt, and open on the off side
-      { const sk = G.toon({ color: sp.pal.skin || 0xe6c79a }), kn = G.toon({ color: 0xefe8d4 }); model.mats.push(sk, kn);
+      { const sk = G.toon({ color: sp.pal.skin || 0xe6c79a }), kn = G.toon({ color: 0xd6cfba }); model.mats.push(sk, kn);
         [-1, 1].forEach(k => add('head', tbox(0.03, 0.065, 0.045, 0.8, 0.7), sk, 0.119 * k, 0.135, -0.005, 0.008));
         add('haR', tbox(0.095, 0.045, 0.06, 1, 0.85), kn, 0, -0.118, 0.03, 0.01); add('haR', tbox(0.03, 0.06, 0.045), kn, 0.052, -0.07, 0.03, 0.008);
         [-0.03, -0.01, 0.01, 0.03].forEach((x, i) => add('haL', tbox(0.018, 0.06 - Math.abs(i - 1.5) * 0.008, 0.03, 0.7, 1), kn, x, -0.135, 0.01, 0.006)); add('haL', tbox(0.022, 0.05, 0.03, 0.7, 1), kn, 0.055, -0.09, 0.015, 0.006).rotation.z = 0.5; }
       // what the plate carries on it: gauntlet knuckles, a scabbard on the hip, the cord the washer hangs from, boot cuffs
-      const dk = G.toon({ color: 0x2a2630 }), gl = G.toon({ color: 0xe8c25a }), iv = G.toon({ color: 0xefe8d4 }); model.mats.push(dk, gl, iv);
+      const dk = G.toon({ color: 0x2a2630 }), gl = G.toon({ color: 0xc9a245 }), iv = G.toon({ color: 0xd6cfba }); model.mats.push(dk, gl, iv);
       add('haR', tbox(0.1, 0.05, 0.11), gl, 0, -0.02, 0, 0.01); add('haR', tbox(0.1, 0.04, 0.03), iv, 0, -0.09, 0.05, 0.008);
       add('hips', tbox(0.05, 0.6, 0.07, 1, 0.6), dk, 0.21, -0.22, -0.06, 0.012).rotation.x = 0.35; add('hips', tbox(0.06, 0.06, 0.08), gl, 0.21, 0.04, -0.01, 0.008);
       add('hips', tbox(0.1, 0.11, 0.06), dk, -0.19, -0.02, 0.1, 0.01);                                              // the pouch the tin's invoice lives in
@@ -322,7 +322,7 @@
     }
     if (sp.cape) {
       // House Violet's cape, cut short so it does not catch on a valve wheel
-      const cm = model.capeMat = G.toon({ color: SC.issue === 'stack' ? 0xf4efe2 : 0x5a3aa8 }), hem = G.toon({ color: 0xe8c25a }); model.mats.push(cm, hem);
+      const cm = model.capeMat = G.toon({ color: SC.issue === 'stack' ? 0xe6e0d0 : 0x4b3486 }), hem = G.toon({ color: 0xc9a245 }); model.mats.push(cm, hem);
       add('chest', tbox(0.5, 0.08, 0.12), cm, 0, 0.29, -0.1, 0.016);
       add('sc1', tbox(0.5, 0.03, 0.31), cm, 0, 0, -0.13, 0.016); add('sc2', tbox(0.56, 0.03, 0.31), cm, 0, 0, -0.13, 0.016); add('sc3', tbox(0.62, 0.03, 0.31), cm, 0, 0, -0.13, 0.016);
       add('sc3', tbox(0.63, 0.034, 0.045), hem, 0, 0, -0.275, 0.008);

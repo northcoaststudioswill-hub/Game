@@ -876,7 +876,341 @@ rep("    SC.world.build();\n    pl.init(); SC.cam.init();", "    if (G.waMood) G
 /* ---- end WORLD-B ---- */
 
 /* ---- v0.91 LOOK team patches (grit: rendering, HUD, pages) go here ---- */
+// v0.91 LOOK: the comic filter comes off. No halftone, no ink shells, no starbursts; soft dark shading, soot and lamp light,
+// and the HUD, pages and cut-ins in the game's own plain dress (Pixelify Sans, IBM Plex Mono, amber on soot: src/shell.html).
+// Everything is in three pieces: LOOK_CSS (the dress), LOOK_GFX (the picture: a module that sits after WORLD-A's and wraps it), and a few reps.
+const LOOK_CSS = String.raw`
+:root{--ink:#0b0709;--paper:#f3e3c3;--yel:#ffb35a;--red:#c8452e;--amber:#ffb35a;--cream:#f3e3c3;--rust:#8a5a3c;--panel:#1a1115;--edge:#3a2620;--edge2:#5e3a2c;
+  --sfx:'Pixelify Sans','IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;--hand:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace}
+html,body{background:#0b0709;font-family:var(--hand);color:var(--cream)}
+/* the air over the picture: a vignette and a little grain (no dots, no ink frame). The grain is dropped on the fast picture */
+#tone{background:radial-gradient(ellipse at center,transparent 44%,rgba(5,3,4,.6) 100%);box-shadow:none}
+#tone::after{content:"";position:absolute;inset:0;background-image:var(--grain,none);background-size:192px 192px;opacity:.55}
+body.lowq #tone::after{display:none}
+#lines{display:none}
+#bars i{background:#050304}
+#rage{box-shadow:inset 0 0 16vh 5vh rgba(140,22,12,.7)}
+/* ---------- HUD ---------- */
+#who{transform:none;gap:6px}
+#who .pic{border:1px solid var(--edge2);background:var(--panel);box-shadow:0 0 0 2px #140c10}
+.bar{height:clamp(7px,2.1vh,12px);width:clamp(120px,30vw,250px);background:#120a0e;border:1px solid var(--edge);transform:none;box-shadow:0 0 0 1px rgba(11,7,9,.7);margin-bottom:4px;border-radius:1px}
+.bar i{background:#c8452e}
+.bar i.lag{background:#f3e3c3;opacity:.45}
+.bar.m{width:clamp(96px,23vw,190px);height:clamp(5px,1.6vh,9px)}
+.bar.m i{background:#ffb35a}
+.bar.m b{width:1px;background:#120a0e}
+#tags{gap:5px;font:600 clamp(8px,2.1vh,11px)/1.6 var(--hand);font-style:normal;letter-spacing:.14em}
+#tags span,#tags .pw,#tags .ch{background:rgba(20,12,16,.82);color:var(--cream);padding:0 6px;transform:none;border-left:2px solid var(--edge2)}
+#tags .pw{color:var(--amber);border-left-color:var(--amber)}
+#tags .ch{border-left-color:var(--cream)}
+#tags .ch.used{background:rgba(20,12,16,.6);color:#6a5a52;border-left-color:var(--edge);text-decoration:line-through}
+#obj{background:rgba(20,12,16,.82)!important;color:var(--cream)!important;border:0;border-left:3px solid var(--amber);box-shadow:none!important;border-radius:2px;padding:4px 9px;font:400 clamp(9px,2.5vh,14px)/1.35 var(--hand);letter-spacing:.06em;transform:none}
+#obj.pop{animation:lkin .5s}
+@keyframes lkin{0%{opacity:0}100%{opacity:1}}
+#boss .nm{font:500 clamp(11px,3vh,17px) var(--sfx);font-style:normal;color:var(--amber);-webkit-text-stroke:0;letter-spacing:.14em;text-shadow:0 1px 0 #0b0709,0 0 6px #0b0709}
+#boss .bar{width:min(46vw,420px);height:clamp(6px,1.8vh,11px);margin:3px auto 0}
+#toast{font:400 clamp(9px,2.5vh,14px)/1.4 var(--hand);letter-spacing:.04em;background:rgba(20,12,16,.86);border-left:3px solid var(--rust);border-radius:2px;text-transform:uppercase}
+#toast b,#toast em,#toast i{color:var(--amber);font-weight:600;font-style:normal}
+#prompt{background:rgba(20,12,16,.88);color:var(--cream);padding:4px 12px;font:400 clamp(10px,2.9vh,15px) var(--hand);font-style:normal;letter-spacing:.1em;transform:none;border:1px solid var(--edge2);border-radius:14px;box-shadow:none}
+#prompt kbd{font:600 1em var(--hand);background:none;color:var(--amber);padding:0 7px 0 0;margin-right:7px;border-right:1px solid var(--edge2)}
+#goal i{left:-6px;top:-6px;width:12px;height:12px;background:var(--amber);border:1px solid #140c10;box-shadow:0 0 0 1px rgba(255,179,90,.35),0 0 8px rgba(255,150,60,.5)}
+#goal b{top:11px;font:600 10px var(--hand);font-style:normal;color:var(--cream);-webkit-text-stroke:0;text-shadow:0 1px 0 #0b0709,0 0 4px #0b0709;letter-spacing:.06em}
+#goal.near b{top:8px;font-size:9px}
+#pause{border:1px solid var(--edge2);background:rgba(20,12,16,.88);color:var(--cream);box-shadow:none;font:600 13px var(--hand);border-radius:4px}
+body #padleg{font:600 11px/20px var(--hand);letter-spacing:.06em;color:var(--cream);opacity:.82}
+body #padleg b{background:#24171a;color:var(--cream);border:1px solid var(--edge2);border-radius:9px;font-size:10px;height:18px;line-height:16px;min-width:18px}
+body #padleg .x{background:#24171a;border-color:#5a7fa8;color:#9ab8dc}body #padleg .y{background:#24171a;border-color:#c9a24a;color:#e8c25a}body #padleg .a{background:#24171a;border-color:#6a9a5a;color:#9ac88a}body #padleg .b{background:#24171a;border-color:#b8503a;color:#e08a70}
+/* ---------- touch controls (the standalone page only) ---------- */
+#stick{border:2px solid rgba(243,227,195,.25);background:rgba(11,7,9,.3)}
+#stick.on{border-color:rgba(243,227,195,.5)}
+#stick i{background:rgba(255,179,90,.8);border:2px solid #140c10;box-shadow:none}
+.btn{border:2px solid #140c10;box-shadow:0 3px 0 rgba(0,0,0,.45);font:600 clamp(9px,2.5vh,12px)/1.1 var(--hand);font-style:normal;letter-spacing:.08em;color:var(--cream);background:#4a3a48}
+.btn.dn{box-shadow:0 1px 0 rgba(0,0,0,.45)}
+.btn small{font:400 8px var(--hand)}
+#bA{background:#c8552e;font-size:clamp(11px,3vh,14px)}#bP{background:#8a5a2a}#bP.low{background:#3a2c34;color:#9a8a80}#bI{background:#3a6a8a}#bI.hot{background:#b8862e}#bL{background:#5a5a4a}#bL.on{background:#8a2a22;color:var(--cream)}
+#rotate{background:rgba(20,12,16,.9);color:var(--cream);border:1px solid var(--edge2);font:400 11px var(--hand);font-style:normal;box-shadow:none;border-radius:12px;letter-spacing:.08em}
+/* ---------- dialogue: the game's own box ---------- */
+#dlg{gap:8px}
+#dlg .pic{border:1px solid var(--edge2);box-shadow:0 0 0 2px #140c10;background:#2a1a1a;transform:none;border-radius:2px}
+#dlg .box,#dlg.pale .box,#dlg.dark .box{background:rgba(18,11,14,.95);color:var(--cream);border:2px solid var(--rust);box-shadow:0 0 0 2px #140c10,0 6px 18px rgba(0,0,0,.5);border-radius:4px;padding:8px 12px 10px}
+#dlg.dark .box{border-color:#7a3226}
+#dlg .nm{position:static;display:block;background:none;color:var(--amber);font:500 clamp(11px,3vh,17px) var(--sfx);font-style:normal;padding:0;transform:none;letter-spacing:.06em;margin-bottom:2px}
+#dlg .tx{font:400 clamp(11px,3.1vh,17px)/1.45 var(--hand);text-transform:none}
+#dlg .tx b,#dlg.dark .tx b,#dlg.cap .tx b{color:var(--amber);font-weight:600}
+#dlg .go{color:var(--amber);font:400 11px var(--hand);animation:blink 1s steps(2) infinite}
+#dlg.cap .box{background:rgba(18,11,14,.95);color:var(--cream);border:0;border-left:3px solid var(--amber);border-radius:2px;box-shadow:0 0 0 1px #140c10,0 6px 18px rgba(0,0,0,.5);transform:none}
+/* ---------- story pages: the pictures stay, the comic dress goes ---------- */
+#page{background:#0b0709;gap:8px}
+#page .pn{border:1px solid var(--edge);box-shadow:0 0 0 2px #140c10;background-color:#0b0709;scale:1;transition:opacity .5s;filter:saturate(.85) brightness(.95)}
+#page .pn.on{scale:1}
+#page .pn.px{filter:none}
+#page .pn::after{background:radial-gradient(ellipse at center,transparent 52%,rgba(5,3,4,.55) 100%)}
+#page .cp{left:8px;top:8px;max-width:74%;background:rgba(18,11,14,.9);color:var(--cream);border:0;border-left:3px solid var(--amber);box-shadow:none;border-radius:2px;padding:4px 9px;font:400 clamp(9px,2.6vh,15px)/1.4 var(--hand);letter-spacing:.05em}
+#page .cp.b{left:auto;top:auto}
+#page .cp.w{background:rgba(18,11,14,.9);color:var(--cream);border-radius:2px;border-left-color:var(--cream)}
+#page .cp b,#page .cp em,#page .cp i,#page .cp.w b,#page .cp.w em,#page .cp.w i{color:var(--amber);font-weight:600;font-style:normal}
+#page .fx{right:4%;top:7%;font:500 clamp(10px,3.4vh,19px) var(--sfx);font-style:normal;letter-spacing:.32em;color:var(--cream);-webkit-text-stroke:0;text-shadow:0 1px 0 #0b0709,0 0 8px #0b0709;transform:none;text-transform:uppercase;opacity:.92}
+#page .go{right:12px;bottom:8px;font:400 11px var(--hand);font-style:normal;background:none;color:var(--amber);padding:0}
+/* ---------- menus, the death card, the end card ---------- */
+#menu{background:rgba(8,5,7,.66)}
+#menu.clear{background:radial-gradient(ellipse at center,rgba(8,5,7,.72),rgba(8,5,7,.3) 72%)}
+.logo{font:700 clamp(30px,min(13vh,11vw),64px)/1 var(--sfx);font-style:normal;color:var(--amber);-webkit-text-stroke:0;transform:none;letter-spacing:.06em;filter:none;text-shadow:0 3px 0 #6a2a14,0 0 24px rgba(255,140,60,.45);margin-top:10px}
+.logo span{color:var(--amber)}
+.tag{background:none;color:var(--cream);border:0;font:400 clamp(9px,2.4vh,12px) var(--hand);font-style:normal;padding:0;transform:none;letter-spacing:.3em;box-shadow:none;opacity:.75;text-transform:uppercase}
+.mbtn{margin:6px auto 0;min-width:min(60vw,260px);background:#24171a;border:2px solid var(--edge);box-shadow:none;padding:7px 14px;font:400 clamp(11px,3.2vh,16px) var(--hand);font-style:normal;letter-spacing:.06em;transform:none;color:var(--cream);border-radius:4px;text-align:left}
+.mbtn.y{background:#33201a;border-color:var(--amber)}
+.mbtn:active{translate:none;box-shadow:none}
+.mbtn.s{font-size:clamp(10px,2.9vh,15px);min-width:min(60vw,260px);padding:4px 14px;margin-top:5px}
+.card{background:var(--panel);color:var(--cream);border:2px solid var(--rust);box-shadow:0 0 0 2px #140c10;padding:12px 16px 14px;transform:none;border-radius:6px;text-align:left;min-width:min(70vw,300px)}
+.card h2{margin:0 0 6px;font:700 clamp(16px,5vh,26px) var(--sfx);font-style:normal;letter-spacing:.04em;color:var(--amber);-webkit-text-stroke:0}
+.card p{margin:6px 0;font:400 clamp(10px,2.9vh,15px)/1.5 var(--hand);text-transform:none}
+.card table{margin:6px 0;width:100%;font:400 clamp(9px,2.7vh,14px) var(--hand);text-transform:none}
+.card td{padding:2px 8px 2px 0;border-bottom:1px solid var(--edge)}
+.card td:first-child{font:500 clamp(9px,2.7vh,14px) var(--sfx);font-style:normal;color:var(--amber);letter-spacing:.08em}
+.card .mbtn{margin-left:0;margin-right:0}
+.pcard{background:var(--panel);color:var(--cream);border:2px solid var(--edge);box-shadow:none;rotate:0deg!important;border-radius:4px}
+.pcard canvas{border:1px solid var(--edge2);filter:saturate(.55) brightness(.85)}
+.pcard h3{font:700 clamp(14px,4.4vh,20px) var(--sfx);font-style:normal;-webkit-text-stroke:0;color:var(--amber)!important;letter-spacing:.06em}
+.pcard em{font:400 clamp(8px,2.2vh,11px) var(--hand);font-style:normal;letter-spacing:.14em}
+.pcard p{font:400 clamp(9px,2.5vh,12px)/1.4 var(--hand);text-transform:none}
+.pcard u{background:#24171a;color:var(--amber);font:500 clamp(9px,2.5vh,12px) var(--sfx);font-style:normal}
+.phead{font:500 clamp(12px,3.8vh,18px) var(--sfx);font-style:normal;color:var(--cream);-webkit-text-stroke:0;letter-spacing:.12em}
+/* ---------- a memory cuts in: the picture, his eyes, its name, one line. No sunburst ---------- */
+#mem{background:#0b0709}
+#mem:before{inset:0;background:radial-gradient(ellipse at 34% 40%,rgba(130,48,20,.3) 0%,rgba(11,7,9,0) 64%);animation:none}
+#mem .mi{left:5%;top:8%;width:56%;height:62%;border:1px solid var(--edge2);box-shadow:0 0 0 2px #140c10;transform:none}
+#mem .me{right:5%;top:8%;width:31%;height:26%;background-color:var(--panel);border:1px solid var(--edge2);box-shadow:0 0 0 2px #140c10;transform:none;filter:saturate(.75)}
+#mem .mn{right:5%;top:40%;max-width:31%;font:700 clamp(14px,5.6vh,28px)/1.1 var(--sfx);font-style:normal;color:var(--amber);-webkit-text-stroke:0;transform:none;letter-spacing:.12em;text-shadow:0 2px 0 #6a2a14}
+#mem .ml{left:5%;right:5%;bottom:6%;background:rgba(18,11,14,.95);border:0;border-left:3px solid var(--amber);box-shadow:0 0 0 1px #140c10;padding:6px 12px;font:400 clamp(10px,3.1vh,15px)/1.45 var(--hand);color:var(--cream)}
+#mem .ml b{color:var(--amber);font-weight:600}
+/* ---------- the cut-in: a dark band and two thin rules ---------- */
+#cut{left:0;right:0;top:35%;height:21%;transform:none;opacity:0;background:linear-gradient(90deg,rgba(11,7,9,0),rgba(11,7,9,.9) 20%,rgba(11,7,9,.9) 80%,rgba(11,7,9,0));border-top:1px solid rgba(255,179,90,.5);border-bottom:1px solid rgba(255,179,90,.5);box-shadow:none}
+#cut.on{animation:lkcut .95s ease both}
+@keyframes lkcut{0%{opacity:0}14%{opacity:1}80%{opacity:1}100%{opacity:0}}
+#cut:before{display:none}
+#cut .ce{left:18%;width:24%;filter:saturate(.7) brightness(.9);-webkit-mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent)}
+#cut .cn{right:20%;top:42%;font:700 clamp(13px,6vh,28px)/1 var(--sfx);font-style:normal;color:var(--amber);-webkit-text-stroke:0;letter-spacing:.16em;text-shadow:0 2px 0 #6a2a14}
+#cut .cs{right:20%;bottom:14%;font:400 clamp(8px,2.5vh,12px)/1 var(--hand);color:var(--cream);letter-spacing:.2em;opacity:.85}
+/* ---------- the count, said small ---------- */
+#tally{right:5%;top:15%;font:700 clamp(13px,6.4vh,30px)/1 var(--sfx);font-style:normal;-webkit-text-stroke:0;transform:none;letter-spacing:.18em;color:var(--cream)!important;text-shadow:0 2px 0 #0b0709,0 0 10px #0b0709}
+#tally.on{animation:lkin .12s}
+#tally.big{left:50%;right:auto;top:17%;transform:translateX(-50%);font-size:clamp(18px,10vh,48px);color:var(--amber)!important;text-shadow:0 3px 0 #6a2a14,0 0 14px #0b0709}
+#tally.big.on{animation:lkin .25s}
+`;
+const LOOK_GFX = String.raw`'use strict';
+/* SOOTBORN v0.91 LOOK - grit. The comic filter comes off the picture: no halftone, no ink shells, no starbursts. Soft dark shading on the
+   same cheap toon material (a smooth ramp instead of three flat bands), every painted colour pulled down and greyed on its way in,
+   textures sooted, sky as smoke, and each place lit by what the story puts there: lamps, the moon, the low sun, the furnace.
+   No render targets and no extra passes: the vignette and grain are the #tone layer that was already there. */
+(function () {
+  const G = SC.gfx, FX = G.fx, KEY = SC.issue, LK = G.look = { rig: 0 };
+  /* ---------- the air of each place (applied after WORLD-A's mood; fog distances are left as they were, so the route stays in sight) ---------- */
+  const GRIT = {
+    // above the weather at night: a cold moon on soot-dark stone, tallow lamps on the quay, the fleet as black hulls
+    docks: { bg: 0x07080c, fog: 0x12151c, amb: [0.105, 0.115, 0.15], sun: [0.50, 0.57, 0.72], sky: 0x566078, gnd: 0x4a3c30, hemi: 0.44, rim: [0.20, 0.23, 0.30], dark: 0.78, sat: 0.40,
+      dome: ['#06070a', '#0a0c11', '#10131a', '#191c24', '#24262c', '#2e2a2a'] },
+    // the valley at night in rain
+    riser: { bg: 0x05070a, fog: 0x0c1218, amb: [0.095, 0.115, 0.14], sun: [0.36, 0.43, 0.54], sky: 0x4c5c70, gnd: 0x222c24, hemi: 0.52, rim: [0.18, 0.22, 0.27], dark: 0.74, sat: 0.42,
+      dome: ['#040609', '#070a0e', '#0b0f14', '#10151b', '#151b21', '#1a2026'] },
+    // a sealed pump room: one lamp, and the dark round it
+    gild: { bg: 0x060506, fog: 0x080607, amb: [0.10, 0.09, 0.095], sun: [0.30, 0.26, 0.20], sky: 0x2e2a30, gnd: 0x4a3622, hemi: 0.36, rim: [0.26, 0.20, 0.13], dark: 0.80, sat: 0.50,
+      dome: ['#040304', '#050405', '#060506', '#070607', '#080708', '#090809'] },
+    // sunset on the Spire's stair: the one level with a sun in it, and it is a low red one seen through the city's smoke
+    stair: { bg: 0x1e171a, fog: 0x5e4034, amb: [0.24, 0.185, 0.18], sun: [0.98, 0.62, 0.34], sky: 0xa87048, gnd: 0x46343a, hemi: 0.42, rim: [0.34, 0.22, 0.12], dark: 0.80, sat: 0.50,
+      dome: ['#15121a', '#2a1e24', '#4a2c28', '#7e4628', '#b86a34', '#d69650'] },
+    // the vent stack: a grey wet day going out, steam, cold iron
+    stack: { bg: 0x11151a, fog: 0x232a31, amb: [0.17, 0.19, 0.22], sun: [0.56, 0.60, 0.65], sky: 0x74808c, gnd: 0x34332f, hemi: 0.60, rim: [0.22, 0.25, 0.28], dark: 0.82, sat: 0.42,
+      dome: ['#0d1014', '#161a20', '#20262c', '#2e353b', '#40474c', '#555b5e'] },
+    // the Deep Array: under everything. Lamp tallow on verdigris and rust
+    array: { bg: 0x050505, fog: 0x0b0c0a, amb: [0.125, 0.12, 0.105], sun: [0.46, 0.40, 0.28], sky: 0x3c403a, gnd: 0x46341f, hemi: 0.50, rim: [0.26, 0.21, 0.14], dark: 0.82, sat: 0.34,
+      dome: ['#030404', '#050706', '#070a08', '#0a0d0b', '#0c100d', '#0f1310'] }
+  };
+  const L = LK.L = GRIT[KEY] || GRIT.docks;
+  G.uRim = { value: new THREE.Vector3(L.rim[0], L.rim[1], L.rim[2]) };
 
+  /* ---------- the grade: every painted colour is greyed and darkened on its way in. Strong colours (a House's sash and banners, gilt, a
+     furnace door) keep more of themselves than the stone round them, so colour is left where the story puts it ---------- */
+  const _h = { h: 0, s: 0, l: 0 }, _gc = new THREE.Color(), SRGB = THREE.SRGBColorSpace;
+  LK.grade = function (c) {
+    c.getHSL(_h, SRGB);
+    const strong = SC.clamp((_h.s - 0.5) / 0.25, 0, 1), s = _h.s * (L.sat + (0.70 - L.sat) * strong), l = Math.pow(_h.l, 1.18) * L.dark;
+    return c.setHSL(_h.h, s, l, SRGB);
+  };
+  /* lamps and windows glow as they did, but nothing glows neon: the cold cyan lamps go to a pale gas-mantle green */
+  LK.glow = function (c, k) { c.getHSL(_h, SRGB); if (_h.h > 0.42 && _h.h < 0.62 && _h.s > 0.5) c.setHSL(_h.h, _h.s * (k || 0.5), _h.l * 0.92, SRGB); return c; };
+
+  /* ---------- shading: one smooth ramp from shadow into light (it was three flat bands with dots printed on the middle one) ---------- */
+  LK.ramp = function () {
+    if (LK._ramp) return LK._ramp;
+    const n = 32, d = new Uint8Array(n * 4);
+    for (let i = 0; i < n; i++) { const x = (i + 0.5) / n * 2 - 1, t = SC.clamp((x + 0.18) / 0.95, 0, 1), v = t * t * (3 - 2 * t); d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = Math.round(v * 255); d[i * 4 + 3] = 255; }
+    const t = LK._ramp = new THREE.DataTexture(d, n, 1, THREE.RGBAFormat); t.minFilter = t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; t.needsUpdate = true; return t;
+  };
+  /* The material is still MeshToon (cheap). People get a rim of the place's light instead of an ink line, so they read against dark ground */
+  G.toon = function (opts) {
+    opts = Object.assign({ gradientMap: LK.ramp() }, opts);
+    if (opts.color !== undefined && !LK.rig) opts.color = LK.grade(new THREE.Color(opts.color));
+    const m = new THREE.MeshToonMaterial(opts);
+    if (LK.rig) m.userData.rim = 1;
+    m.onBeforeCompile = function (sh) {
+      if (!this.userData.rim) return;
+      sh.uniforms.uRim = G.uRim;
+      sh.fragmentShader = 'uniform vec3 uRim;\n' + sh.fragmentShader.replace('#include <opaque_fragment>',
+        '{ float sbR = 1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0); outgoingLight += uRim * (sbR * sbR * sbR) * (0.4 + 0.6 * clamp(normal.y + 0.5, 0.0, 1.0)); }\n#include <opaque_fragment>');
+    };
+    m.customProgramCacheKey = function () { return this.userData.rim ? 'sb91rim' : 'sb91'; };
+    return m;
+  };
+  /* no ink shells: not on the world (the batch's second mesh is simply not built: half the triangles), not on loose props, not on people */
+  const add0 = G.Batch.prototype.add;
+  G.Batch.prototype.add = function (matName, geo, matrix, color, outline) {
+    _gc.set(color === undefined ? 0xffffff : color); if (matName === 'glow') LK.glow(_gc); else LK.grade(_gc);
+    return add0.call(this, matName, geo, matrix, _gc, 0);
+  };
+  G.inked = function (geo, mat) { const m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true; geo.computeBoundingBox(); return m; };
+
+  /* ---------- textures: the ink lines are knocked back to worn joints, and every surface gets soot, stains and wear ---------- */
+  function lattice(n, seed) { const r = SC.seeded(seed), v = []; for (let i = 0; i < n * n; i++) v.push(r());
+    return (u, w) => { const x = ((u % 1) + 1) % 1 * n, y = ((w % 1) + 1) % 1 * n, x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0, x1 = (x0 + 1) % n, y1 = (y0 + 1) % n, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+      const a = v[y0 * n + x0], b = v[y0 * n + x1], c = v[y1 * n + x0], e = v[y1 * n + x1]; return (a + (b - a) * sx) * (1 - sy) + (c + (e - c) * sx) * sy; }; }
+  function grime(cv, kind, seed) {
+    const g = cv.getContext('2d'), w = cv.width, h = cv.height, im = g.getImageData(0, 0, w, h), d = im.data, big = lattice(5, seed), mid = lattice(13, seed + 1), fine = SC.seeded(seed + 2);
+    const wall = kind === 'brick' || kind === 'win' || kind === 'concrete' || kind === 'container' || kind === 'metal', lift = kind === 'win' ? 0.2 : 0.42;
+    for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i += 4) {
+      let r = d[i], gg = d[i + 1], b = d[i + 2];
+      if (kind === 'win' && b > r + 12) { const lm = (r + gg + b) / 3; r = lm * 0.5; gg = lm * 0.5; b = lm * 0.56; }                   // unlit panes: soot on glass, not comic blue
+      if (kind === 'win' && r > 200 && gg > 120 && b < 150) { r *= 0.9; gg *= 0.78; b *= 0.62; }                                       // lit panes: tallow
+      r += (255 - r) * lift; gg += (255 - gg) * lift; b += (255 - b) * lift;
+      let m = 0.70 + 0.30 * big(x / w, y / h); m *= 0.86 + 0.14 * mid(x / w, y / h); m *= 0.94 + 0.06 * fine();
+      if (wall) { const st = mid(x / w * 2.0, 0.37); if (st > 0.62) m *= 1 - (st - 0.62) * 0.9 * (0.35 + 0.65 * (y / h)); }             // soot runs down a wall
+      d[i] = r * m; d[i + 1] = gg * m * 0.985; d[i + 2] = b * m * 0.95;
+    }
+    g.putImageData(im, 0, 0);
+  }
+  function redraw(t, fn) { const cv = t.image, g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.save(); fn(g, cv.width, cv.height); g.restore(); t.needsUpdate = true; }
+  LK.tex = function () {
+    const T = G.tex;
+    ['brick', 'win', 'asphalt', 'concrete', 'crate', 'container', 'metal', 'roof', 'wood'].forEach((k, i) => { const t = T[k]; if (!t || !t.image || !t.image.getContext) return; grime(t.image, k, 910 + i * 7); t.needsUpdate = true; });
+    // the sky: smoke. A smooth fall from black to the horizon's colour, with banks of haze drifting in it
+    redraw(T.sky, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); L.dome.forEach((c, i) => gr.addColorStop(i / (L.dome.length - 1), c)); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      const n = lattice(6, 77), im = g.getImageData(0, 0, w, h), d = im.data; for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i += 4) { const k = 0.80 + 0.36 * n(x / w, y / h * 2.2) * (0.3 + 0.7 * y / h); d[i] *= k; d[i + 1] *= k; d[i + 2] *= k; } g.putImageData(im, 0, 0); });
+    redraw(T.skyline, (g, w, h) => { const rnd = SC.seeded(31); g.fillStyle = '#08080b'; g.fillRect(0, 0, w, h); for (let y = 6; y < h; y += 14) for (let x = 6; x < w; x += 12) if (rnd() < 0.16) { g.fillStyle = rnd() < 0.9 ? '#b98a3e' : '#8a8f86'; g.fillRect(x, y, 5, 7); } });
+    // a hit: a hot glint and a few sparks off it (it was a starburst with an ink edge)
+    redraw(T.burst, (g, w, h) => { const rnd = SC.seeded(41); g.translate(w / 2, h / 2); const gr = g.createRadialGradient(0, 0, 0, 0, 0, w * 0.34); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(0.22, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, w * 0.34, 0, 7); g.fill();
+      g.lineCap = 'round'; for (let i = 0; i < 8; i++) { const a = rnd() * 6.283, r0 = 16 + rnd() * 16, r1 = 46 + rnd() * 48; g.strokeStyle = 'rgba(255,255,255,' + (0.35 + rnd() * 0.4) + ')'; g.lineWidth = 1.2 + rnd() * 1.6; g.beginPath(); g.moveTo(Math.cos(a) * r0, Math.sin(a) * r0); g.lineTo(Math.cos(a) * r1, Math.sin(a) * r1); g.stroke(); } });
+    // dust and smoke: soft, no outline
+    redraw(T.puff, (g) => { [[64, 70, 38], [40, 76, 28], [88, 76, 30], [54, 50, 28], [78, 48, 26]].forEach(b => { const gr = g.createRadialGradient(b[0], b[1], 0, b[0], b[1], b[2]); gr.addColorStop(0, 'rgba(255,255,255,.62)'); gr.addColorStop(0.6, 'rgba(255,255,255,.3)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(b[0], b[1], b[2], 0, 7); g.fill(); }); });
+    redraw(T.ink, (g) => { const rnd = SC.seeded(43); for (let i = 0; i < 16; i++) { const a = rnd() * 6.283, r = rnd() * 34, x = 64 + Math.cos(a) * r, y = 64 + Math.sin(a) * r, s = 10 + rnd() * 20, gr = g.createRadialGradient(x, y, 0, x, y, s); gr.addColorStop(0, 'rgba(9,7,8,.85)'); gr.addColorStop(0.55, 'rgba(9,7,8,.5)'); gr.addColorStop(1, 'rgba(9,7,8,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, s, 0, 7); g.fill(); } });
+    // the tell on the ground: a ring chalked in a hurry and burning at the edge. Still a clear closed ring; the colour is the caller's (yellow turns aside, red does not)
+    redraw(T.ring, (g) => { const rnd = SC.seeded(47); g.translate(128, 128); g.lineCap = 'round';
+      { const gr = g.createRadialGradient(0, 0, 92, 0, 0, 127); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.5, 'rgba(255,255,255,.34)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 127, 0, 7); g.fill(); }
+      for (let pass = 0; pass < 3; pass++) { const n = 46; for (let i = 0; i < n; i++) { if (pass && rnd() < 0.22) continue; const a0 = i / n * 6.283 + rnd() * 0.03, a1 = a0 + 6.283 / n * (0.75 + rnd() * 0.5), r = 108 + (rnd() - 0.5) * (pass ? 7 : 2); g.strokeStyle = 'rgba(255,255,255,' + (pass ? 0.35 + rnd() * 0.4 : 0.95) + ')'; g.lineWidth = pass ? 3 + rnd() * 5 : 8; g.beginPath(); g.arc(0, 0, r, a0, a1); g.stroke(); } }
+      for (let i = 0; i < 26; i++) { const a = rnd() * 6.283, r = 116 + rnd() * 9; g.fillStyle = 'rgba(255,255,255,' + (0.5 + rnd() * 0.5) + ')'; g.beginPath(); g.arc(Math.cos(a) * r, Math.sin(a) * r, 0.8 + rnd() * 1.5, 0, 7); g.fill(); } });
+    redraw(T.slash, (g) => { const arc = (pad, fill) => { g.beginPath(); g.moveTo(6 - pad, 110); g.quadraticCurveTo(128, -40 - pad * 2, 250 + pad, 110); g.quadraticCurveTo(128, 34 + pad, 6 - pad, 110); g.closePath(); g.fillStyle = fill; g.fill(); }; arc(4, 'rgba(255,255,255,.22)'); arc(0, 'rgba(255,255,255,.8)'); });
+    redraw(T.disc, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 62); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.72, 'rgba(255,255,255,.92)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(64, 64, 62, 0, 7); g.fill(); });
+    // the marks over a thing to look at and a man who has seen him: the game's own lamp colours, a thin dark edge
+    const glyph = (t, ch, fill) => redraw(t, (g) => { g.font = '700 104px "Pixelify Sans", "IBM Plex Mono", ui-monospace, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.lineWidth = 9; g.strokeStyle = 'rgba(11,7,9,.9)'; g.strokeText(ch, 64, 68); g.fillStyle = fill; g.fillText(ch, 64, 68); });
+    const marks = () => { glyph(T.mark, '?', '#ffb35a'); glyph(T.alert, '!', '#d8492e'); }; marks();
+    // the marks and the words are in the game's type; if it arrives after the first of them was drawn, they are drawn again
+    try { document.fonts.addEventListener('loadingdone', () => { marks(); Object.keys(wordTex).forEach(k => { delete wordTex[k]; }); }); } catch (e) { /* no font events: the fallback type stays */ }
+    redraw(T.lock, (g) => { g.translate(64, 64); g.lineCap = 'butt'; [['rgba(11,7,9,.85)', 7], ['#f3e3c3', 3]].forEach(s => { g.strokeStyle = s[0]; g.lineWidth = s[1]; for (let i = 0; i < 4; i++) { g.beginPath(); g.arc(0, 0, 44, i * Math.PI / 2 + 0.35, i * Math.PI / 2 + 1.22); g.stroke(); } });
+      g.fillStyle = 'rgba(11,7,9,.85)'; g.beginPath(); g.moveTo(0, -21); g.lineTo(12, -38); g.lineTo(-12, -38); g.fill(); g.fillStyle = '#d8492e'; g.beginPath(); g.moveTo(0, -25); g.lineTo(8, -36); g.lineTo(-8, -36); g.fill(); });
+    redraw(T.chain, (g) => { g.strokeStyle = 'rgba(11,7,9,.9)'; g.lineWidth = 8; g.strokeRect(9, 8, 46, 16); g.strokeStyle = '#b9b2a2'; g.lineWidth = 3.5; g.strokeRect(9, 8, 46, 16); });
+  };
+
+  /* ---------- the words that came out of a hit. They were lettering in a starburst; now they are a line of small plain type that
+     rises and goes. The plain feedback of a fight (a blow turned, a man winded, the count) and the story's own words are always shown;
+     the rest are let through no more than one at a time ---------- */
+  const wordTex = {};
+  function wordTexture(text, fill) {
+    const key = text + fill; if (wordTex[key]) return wordTex[key];
+    return (wordTex[key] = G.canvasTex(512, 96, (g, w, h) => {
+      g.font = '700 50px "Pixelify Sans", "IBM Plex Mono", ui-monospace, Menlo, monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      try { g.letterSpacing = '3px'; } catch (e) { /* older canvas */ }
+      const tw = g.measureText(text).width, sc = Math.min(1, 484 / tw); g.translate(w / 2, h / 2 + 2); g.scale(sc, 1);
+      g.lineJoin = 'round'; g.lineWidth = 9; g.strokeStyle = 'rgba(11,7,9,.92)'; g.strokeText(text, 0, 0);
+      g.fillStyle = fill; g.fillText(text, 0, 0);
+    }));
+  }
+  const tone = fill => { _gc.set(fill || '#ffe14a').getHSL(_h, SRGB); return _h.s < 0.35 || (_h.h > 0.5 && _h.h < 0.75) ? '#f3e3c3' : _h.h < 0.075 || _h.h > 0.9 ? '#d8553a' : _h.h < 0.10 ? '#e88a4a' : '#ffb35a'; };
+  const ALWAYS = /^(KNEEL|OSWIN HALE|THE LINE GOES|TURNED|KNOCKED ASIDE|WINDED|OPEN$|HIS LINE IS OPEN|TOO HEAVY|LINE OUT|HOOK LINE|NOTED|UP HERE|ONE$|TWO$|THREE$|FOUR$|FIVE$|SIX$|SEVEN$|EIGHT$|NINE$|TEN$|ELEVEN|STRUCK|BROUGHT DOWN|HAULED IN|ON MY BREATH|SLIPPED IT|THE TURN)/;
+  const _fp = new THREE.Vector3(); let wordAt = -9;
+  FX.word = function (text, pos, fill, size) {
+    text = String(text); const now = performance.now() / 1000, keep = ALWAYS.test(text);
+    if (!keep && now - wordAt < 0.7) return null;
+    if (!keep) wordAt = now;
+    const s = SC.clamp(0.074 + 0.012 * (size || 1.6), 0.084, 0.108);
+    _fp.copy(pos); _fp.y += 0.35;
+    return FX.spawn({ tex: wordTexture(text, tone(fill)), pos: _fp, size: s, screen: true, aspect: 512 / 96, life: 0.95, depthTest: false, order: 31, vel: new THREE.Vector3(0, 0.45, 0), hold: 0.6, real: true });
+  };
+  /* dust is dust-coloured unless somebody says otherwise; the tell rings keep their two colours, a little less neon */
+  const puff0 = FX.puff; FX.puff = function (pos, n, size, color) { return puff0.call(this, pos, n, size, color === undefined || color === 0xffffff ? 0x8f887c : color); };
+  const spawn0 = FX.spawn; FX.spawn = function (o) { if (o.tex === G.tex.ring) { if (o.color === 0xffd23a) o.color = 0xf5c04a; else if (o.color === 0xff3b30) o.color = 0xe6452a; } const f = spawn0.call(this, o), mt = f && !f.ground && f.m.material; if (mt && mt.sizeAttenuation !== !o.screen) { mt.sizeAttenuation = !o.screen; mt.needsUpdate = true; } return f; };
+
+  /* ---------- grain for the #tone layer: one small tile, made once ---------- */
+  function grain() {
+    try { const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d'), im = g.createImageData(96, 96), d = im.data, r = SC.seeded(19);
+      for (let i = 0; i < d.length; i += 4) { const v = r(); d[i] = d[i + 1] = d[i + 2] = v < 0.5 ? 0 : 255; d[i + 3] = Math.round(Math.abs(v - 0.5) * 2 * (v < 0.5 ? 46 : 20)); }
+      g.putImageData(im, 0, 0); document.documentElement.style.setProperty('--grain', 'url(' + c.toDataURL('image/png') + ')'); } catch (e) { /* no grain, then */ }
+  }
+
+  /* ---------- the sky's furniture, before WORLD-A merges it: black hulls, dull bags, tallow riding lamps, a moon with no ink round it ---------- */
+  function sky() {
+    const s = G.sky; if (!s) return;
+    const MAP = { '1a1c44': 0x0b0b0f, '8f8aa8': 0x35353b, 'b7b0c4': 0x45454a, 'ffd98a': 0xc8923e };
+    s.traverse(o => { if (!o.isMesh || !o.material || !o.material.color) return; const k = o.material.color.getHexString(); if (MAP[k] !== undefined) o.material.color.setHex(MAP[k]);
+      if (o.geometry && o.geometry.type === 'CircleGeometry') { if (k === '07070d') o.visible = false; else if (k === 'fff2c4') o.material.color.setHex(KEY === 'stair' ? 0xd8a070 : 0xc9c8ba); else if (k === 'e8d49a') o.material.color.setHex(KEY === 'stair' ? 0xc08a5a : 0xaeada0); } });
+    if (s.bcm) s.bcm.forEach(m => { m.userData.sb91 = 1; });
+  }
+  /* ---------- the light and air, after WORLD-A's ---------- */
+  function air() {
+    const sc = G.scene; sc.background.set(L.bg); sc.fog.color.set(L.fog);
+    G.amb.color.setRGB(L.amb[0], L.amb[1], L.amb[2]); G.sun.color.setRGB(L.sun[0], L.sun[1], L.sun[2]);
+    const hm = G.wa && G.wa.hemi; if (hm) { hm.color.set(L.sky); hm.groundColor.set(L.gnd); hm.intensity = Math.PI * L.hemi; }
+    if (G.rainMesh) { G.rainMesh.material.color.set(0x8c98a8); G.rainMesh.material.opacity = 0.34; }
+    sc.children.forEach(o => { if (o.isLineSegments && o !== G.rainMesh) { o.material.color.set(0x9a9aa2); o.material.opacity = 0.13; } });   // the wind on the docks: barely there
+    if (G.wa && G.wa.blobs) G.wa.blobs.material.opacity = 0.5;
+    if (MATS.glass) MATS.glass.mat.color.set(0x56636a);
+  }
+  const MATS = G.mats;
+  const mood0 = G.waMood;
+  G.waMood = function (key) {
+    sky();
+    if (mood0) mood0.call(this, key);
+    air(); grain();
+    // people: no ink shell, a rim of light instead; portraits are taken on the game's dark panel, not a flat comic colour
+    const mk0 = SC.makeHumanoid;
+    SC.makeHumanoid = function () { LK.rig++; let m; try { m = mk0.apply(this, arguments); } finally { LK.rig--; } if (m && m.ol) m.ol.visible = false; return m; };
+    // once the place is built: nothing in it glows neon. The cold cyan lamps and their light go to a pale gas-mantle green
+    // (the story hangs its own lamps after the place is built, so this is done once on the first frame, and after that only for a lamp newly hung)
+    const up0 = G.update; let swept = false;
+    G.update = function () {
+      if (!swept) { swept = true; G.scene.traverse(o => { if (o.isPointLight) { if (!o.userData.sb91) { o.userData.sb91 = 1; LK.glow(o.color, 0.3); } return; } const m = o.material; if (!m || !m.isMeshBasicMaterial || m.userData.sb91 || !m.color || m.map) return; m.userData.sb91 = 1; LK.glow(m.color); }); }
+      else { const ch = G.scene.children; for (let i = ch.length - 1, n = 0; i >= 0 && n < 24; i--, n++) { const o = ch[i]; if (o.isPointLight && !o.userData.sb91) { o.userData.sb91 = 1; LK.glow(o.color, 0.3); } } }
+      return up0.apply(this, arguments);
+    };
+    const pt0 = SC.portrait;
+    SC.portrait = function (kind, expr, bg, glow) { return pt0.call(this, kind, expr, 0x1d1418, glow); };
+  };
+  const q0 = G.setQuality;
+  G.setQuality = function (q) { q0.apply(this, arguments); document.body.classList.toggle('lowq', q < 1); };
+})();
+`;
+rep('<div id="stage">', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Pixelify+Sans:wght@500;700&display=swap" media="print" onload="this.media=\'all\'">\n<style id="look91">' + LOOK_CSS + '</style>\n<div id="stage">');
+rep("\n'use strict';\n/* SECOND CHANCE - rig:", "\n" + LOOK_GFX + "\n'use strict';\n/* SECOND CHANCE - rig:");
+// textures are sooted as soon as they are drawn, before any material or the sky takes them
+rep("    buildTextures();\n    buildMaterials();", "    buildTextures(); if (G.look) G.look.tex();\n    buildMaterials();");
+// the whole-canvas colour boost of v0.90 is gone (one full-screen pass fewer); the grade is in the colours themselves now
+rep("G.renderer.domElement.style.filter = 'saturate(1.14) contrast(1.06)';", "void 0;");
+// what drifts in the air is ash, smoke and lamp dust, not lilac flecks
+rep("c: M.wind ? 0xd8d2e8 : 0x2a2630", "c: M.wind ? 0x77736c : 0x1c1a1c");
+rep("a: 0.16, life: rnd(7, 10), c: 0xb9b6e6", "a: 0.14, life: rnd(7, 10), c: 0x5e6068");
+rep("a: 0.11, life: rnd(6, 9), c: 0x9ab4cc", "a: 0.12, life: rnd(6, 9), c: 0x66727c");
+rep("a: 0.55, life: 0.18, c: 0xcfe0ff", "a: 0.4, life: 0.18, c: 0x98a4b0");
+rep("a: 0.75, life: rnd(5, 9), c: 0xffe6b0", "a: 0.6, life: rnd(5, 9), c: 0xd9b478");
+rep("up: 1.1, c: 0xe8ecf4, a: 0.42", "up: 1.1, c: 0x9c9c98, a: 0.36");
+// carrying fury warms him like a coal; it does not gild him (the old glow was set for a bright scene)
+rep("mm[i].emissive.setRGB(0.2 * k, 0.14 * k, 0.03 * k)", "mm[i].emissive.setRGB(0.07 * k, 0.036 * k, 0.01 * k)");
 /* ---- end LOOK ---- */
 
 /* ---- v0.91 LORE team patches go here ---- */
