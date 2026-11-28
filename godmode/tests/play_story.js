@@ -9,7 +9,7 @@ const FROM = +process.argv[3] || 1, TO = +process.argv[4] || 4;     // which cha
 fs.mkdirSync(out, { recursive: true });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let failures = 0;
-const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!ok) failures++; };
+const T0 = Date.now(); const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg + '  [' + ((Date.now() - T0) / 1000 | 0) + 's]'); if (!ok) failures++; };
 
 (async () => {
   const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
