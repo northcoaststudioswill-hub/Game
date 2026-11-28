@@ -1575,12 +1575,12 @@ function matchCam(dt) {
   // lean the frame toward the ball so passes and boards stay on screen
   if (M_.spectate) { fx = B.pos.x * 0.7; fz = clamp(B.pos.z, 2, 8) * 0.6 + 2; }
   fx = lerp(fx, B.pos.x, 0.25); fz = lerp(fz, B.pos.z, 0.2);
-  const back = portrait ? 8.6 : 7.4, up = portrait ? 4.9 : 4.3;      /* the original broadcast height (a steeper one was tried and the old one played better) */
+  const asp = innerWidth / innerHeight, tall = portrait ? clamp((1 - asp) / 0.45, 0, 1) : 0, back = portrait ? 8.6 + tall * (window.__camB ?? 2.6) : 7.4, up = portrait ? 4.9 + tall * (window.__camU ?? 1.5) : 4.3;      /* the taller and narrower the phone, the further back and higher: held upright it cut the wings off */      /* the original broadcast height (a steeper one was tried and the old one played better) */
   _v.set(fx * 0.62, up + fz * 0.1, fz + back + (hs.length > 1 ? 2 : 0));
   (M_.camB || (M_.camB = camera.position.clone())).lerp(_v, 1 - Math.exp(-4 * dt)); camera.position.copy(M_.camB);
   const hz = hlZoom(), fovT = (portrait ? 74 : 52) - (M_.slow > 0 ? 7 : 0) - hz * (portrait ? 26 : 16); if (Math.abs(camera.fov - fovT) > 0.05) { camera.fov += (fovT - camera.fov) * (1 - Math.exp(-9 * dt)); camera.updateProjectionMatrix(); }
   if (M_.shake > 0) { M_.shake -= dt; camera.position.x += rnd(-1, 1) * M_.shake * 0.25; camera.position.y += rnd(-1, 1) * M_.shake * 0.25; }
-  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, Math.max(fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2), Math.max(...hs.map(h => h.z)) - (portrait ? 3.0 : 2.3)));      /* room behind you, so the arc you are standing on stays in the picture */      /* out at the top of the key you stay in the frame, not cut off at the bottom */ M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt));
+  _v2.set(fx * 0.5, portrait ? 0.2 : 1.5, Math.max(fz * (portrait ? 0.7 : 0.45) - (portrait ? 0 : 1.2), Math.max(...hs.map(h => h.z)) - (portrait ? 3.0 : 2.3)) - tall * (window.__camL ?? 2.2));      /* upright phones aim a little further up the court: the pulled-back camera left the bottom quarter empty */      /* room behind you, so the arc you are standing on stays in the picture */      /* out at the top of the key you stay in the frame, not cut off at the bottom */ M_.look = (M_.look || _v2.clone()); M_.look.lerp(_v2, 1 - Math.exp(-5 * dt));
   if (hz > 0) {      // highlight: push in on the man who did it, from where the camera already is
     const q = M_.hl.p, cy = q.H * 0.62 + q.y * 0.9; _v.set(q.x, cy, q.z); const dx = camera.position.x - q.x, dz = camera.position.z - q.z, l = Math.hypot(dx, dz) || 1, r = portrait ? 5.6 : 4.8;
     _v2.set(q.x + dx / l * r + (q.x > 0 ? -0.9 : 0.9), cy + 0.5, q.z + dz / l * r); camera.position.lerp(_v2, hz); _v2.copy(M_.look).lerp(_v, hz); camera.lookAt(_v2);

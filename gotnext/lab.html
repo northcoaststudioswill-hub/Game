@@ -847,6 +847,12 @@ const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const lerp = (a, b, t) => a + (b - a) * t;
 const rnd = (a, b) => a + RNG() * (b - a);
 const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+// a phone that zoomed into a text field (or was pinched) snaps back to the whole game when you leave the field: the page
+// blocks pinching for the touch controls, so a zoom that stuck could not be undone by hand
+if (IS_TOUCH) { const vp = () => document.querySelector('meta[name=viewport]'), unzoom = () => { const m = vp(); if (!m) return; const c = m.content; m.content = c + ',minimum-scale=1'; setTimeout(() => { m.content = c; }, 60); };
+  addEventListener('focusout', e => { if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) setTimeout(unzoom, 50); }, true);
+  addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+  if (window.visualViewport) visualViewport.addEventListener('resize', () => { if (visualViewport.scale > 1.01 && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) unzoom(); }); }
 
 // ---------------- save ----------------
 const SAVE_KEY = 'gotnext_v1', OLD_SAVE_KEY = 'pitborn2145_v1';
