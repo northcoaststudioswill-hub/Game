@@ -442,9 +442,9 @@ body[data-court="mortal"] { --court: #c8d6f0; --court-deep: #2a3450; }
 .card h2 { margin: 2px 0 0; font-size: 20px; letter-spacing: .22em; color: #fff6d8; }
 .card h2::after { content: ''; display: block; height: 1px; margin: 8px 18% 8px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
 .motto { font: italic 400 14px 'IM Fell English', Georgia, serif; color: var(--court); margin: -4px 0 8px; }
-.motto::before { content: 'By the Court of Dusk, in Starhaven'; }
-body[data-court="thorn"] .motto::before { content: 'Under the Mountain, by the Thorn Queen\'s leave'; }
-body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south of the Wall'; }
+.motto::before { content: 'By the Dusk House, in Starhaven'; }
+body[data-court="thorn"] .motto::before { content: 'In the Umbra, by the Eclipse\'s leave'; }
+body[data-court="mortal"] .motto::before { content: 'Below, west of the Horizon'; }
 .pause-wm { display: none; }
 #menu .btn, #stars .btn, #howto .btn, #explain .btn, #tune .btn, #end .btn, #card .btn { font-family: var(--display); letter-spacing: .1em; font-size: 13px; border-radius: 2px; border: 1px solid color-mix(in srgb, var(--court) 55%, transparent);
   background: linear-gradient(180deg, color-mix(in srgb, var(--court-deep) 70%, #14112e), #14112e); box-shadow: 0 0 0 2px #0a0818, inset 0 1px 0 rgba(255,255,255,.1); color: #f2eeff; }
@@ -626,7 +626,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   <div id="film"><canvas id="film-art" width="960" height="450"></canvas><div id="film-credit"></div><div id="film-cap"></div><div id="film-skip">any button skips</div></div>
   <div id="f-logo">
     <h1>STARHAVEN</h1>
-    <div class="sub">A COURT OF DUSK AND STARLIGHT</div>
+    <div class="sub">THE FALLEN SKY</div>
   </div>
   <div id="f-press">Press any button<span class="small">or tap the screen</span><span class="small pad-note">Controller not responding? Tap the screen once, or open the game in Safari or Chrome.</span></div>
   <div id="f-menu-wrap">
@@ -866,7 +866,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   S.CAST = {
     wren: { name: 'Wren', color: '#ffd27a' },
     caelum: { name: 'Lord Caelum', color: '#b9a8ff' },
-    queen: { name: 'The Thorn Queen', color: '#ff7a8a' },
+    queen: { name: 'Vael, the Eclipse', color: '#c8a8ff' },
     bram: { name: 'Bram', color: '#f0a860' },
     iris: { name: 'Iris', color: '#9fe0ff' },
     nessa: { name: 'Nessa', color: '#c8d0e0' },
@@ -882,7 +882,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
     lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
     bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts. A new heart plays a scene, gives Wren something real in a fight, and writes new pages in her journal. The journal shows what each heart gives and where each bond is heading.' },
-    bow: { icon: '\u27B3', title: 'The fae bow', text: 'Wren has a bow again, on its own button: BOW on the screen, I on a keyboard, RB on a controller. It aims itself at the nearest thing in front of her; hold up as you shoot to aim high. An arrow through a spy\'s wing brings it down: finish it with your daggers before it rises.' },
+    bow: { icon: '\u27B3', title: 'The starbow', text: 'Wren has a bow again, on its own button: BOW on the screen, I on a keyboard, RB on a controller. It aims itself at the nearest thing in front of her; hold up as you shoot to aim high. An arrow through a spy\'s wing brings it down: finish it with your daggers before it rises.' },
     moves: { icon: '\u2694', title: 'Wren\'s blades', text: 'Strike three times for a combo. Up and strike is a rising strike (and cuts straight up in the air). Strike during a dash is a lunge, her hardest hit. Down and strike in the air bounces her off what is below. Hold down on the ground to guard: blows from the front stop, and a guard raised at the last moment is a parry that leaves the enemy open. She cannot guard a fall or what is behind her.' },
     remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Wren\'s journal, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
@@ -891,7 +891,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     opening: { icon: '\u2727', title: 'Perfect dodge', text: 'Dash through an attack at the last moment and time slows: an opening. For a moment every cut does more and gets past armor.' },
   };
 
-  // Whispers down the mate bond: short lines that slide in during play and never stop it.
+  // Whispers down the Tether: short lines that slide in during play and never stop it.
   // Each is said once per save, in order (the boss lines repeat). [who, text]
   S.WHISPERS = {
     shadowDown: [['caelum', 'It\'s down. Now, Wren, before it remembers it can fly.'], ['caelum', 'Down again. Cut.']],
@@ -908,6 +908,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     // Wren thinks out loud in a fight; it never stops the fight
     bossWon: [['caelum', 'I felt that from the city. Breathe, Wren. It\'s done.']],
     bossStart: [['wren', 'It is a wyrmling the size of a house. I know what to do with wyrmlings.']],
+    bossStart4: [['wren', 'It is only a shadow. Shadows can be shot.']],
     hurt: [['wren', 'That one was mine to dodge. Watch the shoulders, not the teeth.']],
     combo10: [['wren', 'Ten in a row. Nessa would say I am showing off. Nessa would be right.']],
     room_ashes: [['caelum', 'This was the Artists\' Quarter. It was loud, once.']],
@@ -927,57 +928,57 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   };
 
   // Short version of the story so far, for the journal.
-  S.RECAP = 'Wren was a mortal huntress feeding her two sisters through a starving winter. She killed a white stag sacred to the fae, and Lord Rowan of the Spring Court took her across the Wall as payment. When the Thorn Queen seized the courts, Wren went Under the Mountain after him, made a bargain with Lord Caelum of the Court of Dusk, and won the queen\'s three trials. The queen killed her anyway. Caelum brought her back with his blood, and as a fae she can finally feel what he always felt: they are mates.';
+  S.RECAP = 'Wren was a mortal huntress feeding her two sisters through a starving winter. She shot down a low star to sell its light, and it was the heir of the Dawn House. Lord Rowan took her up the Stair through the Horizon as payment: a light for a light. When Vael, the Eclipse, swallowed the Houses of the sky, Wren went into the Umbra after him, took a loan of light from Lord Caelum of the Dusk House, and won the Eclipse\'s three trials. The Eclipse killed her anyway. Caelum gave her half of his own star, and she woke up Lit, tethered to him.';
 
   S.CHAPTERS = [
     {
       id: 'woods', label: 'Prologue, part 1', name: 'The Winter Woods', room: 'woods', mortal: true,
       abilities: { double: false, dash: false, daggers: false, bow: true },
-      card: 'Before the Deep, before the fae. Wren is nineteen, mortal, and the only hunter in a family that is slowly starving.',
+      card: 'Before the Umbra, before the sky. Wren is nineteen, mortal, and the only hunter in a family that is slowly starving.',
       goals: [
         { id: 'hunt', text: 'Check your three snares', count: 3, counter: 'snares' },
-        { id: 'stag', text: 'Shoot the white stag in the clearing' },
+        { id: 'stag', text: 'Shoot the low star over the clearing' },
       ],
-      summary: 'Wren killed a white stag sacred to the Spring Court. That night Lord Rowan came for her and took her across the Wall: a life for a life.',
-      done: 'A life for a life. Wren crosses the Wall into the fae lands, and doesn\'t look back, because if she does she won\'t go.',
+      summary: 'Wren shot down a low star over the clearing. It was the heir of the Dawn House. That night Lord Rowan came for her and took her up the Stair: a light for a light.',
+      done: 'A light for a light. Wren goes up through the Horizon into the sky, and doesn\'t look back, because if she does she won\'t go.',
       after: 'beyond_wall',
     },
     {
-      id: 'prologue', label: 'Prologue, part 2', name: 'Under the Mountain', room: 'deep', mortal: true,
-      card: 'The Thorn Queen\'s three trials: a riddle, a maze, and a beast. Win them all and Rowan goes free. Lose one, and Wren stays in the Deep forever. The stars of Caelum\'s bargain glow on her wrist.',
+      id: 'prologue', label: 'Prologue, part 2', name: 'The Umbra', room: 'deep', mortal: true,
+      card: 'The Eclipse\'s three trials: the Weighing, the Climb and the Dark. Win them all and Rowan goes free. Lose one, and Wren stays in the Umbra forever. The stars of Caelum\'s loan glow on her wrist.',
       goals: [
-        { id: 'riddle', text: 'Trial 1: stand before the altar that answers her riddle' },
-        { id: 'maze', text: 'Trial 2: get through the maze (keep going right)' },
-        { id: 'beast', text: 'Trial 3: outrun the Wyrm to the light' },
+        { id: 'riddle', text: 'Trial 1, the Weighing: give the dark one memory at an altar' },
+        { id: 'maze', text: 'Trial 2, the Climb: cross the Umbra (keep going right)' },
+        { id: 'beast', text: 'Trial 3, the Dark: outrun it to the light' },
       ],
-      summary: 'Wren won the Thorn Queen\'s three trials and freed Rowan. The queen killed her anyway. Caelum brought her back with his blood, and she woke up fae, feeling a bond to him she had never felt before.',
-      done: 'Wren is fae now. Rowan carries her home to Spring. But a thread of light in her chest pulls the other way, toward the Court of Dusk.',
+      summary: 'Wren won the Eclipse\'s three trials and freed Rowan. The Eclipse killed her anyway. Caelum gave her half of his own star, and she woke up Lit, tethered to him by a pull she never agreed to.',
+      done: 'Wren is Lit now. Rowan carries her home to the Dawnhold. But a pull in her chest drags the other way, toward the Dusk House.',
     },
     {
       id: 'ch1', label: 'Chapter 1', name: 'Ashes', room: 'ashes',
-      card: 'Three months later. Rowan has locked the windows of the Spring Court and doubled the guards, terrified of losing Wren again. Every night, the thread in her chest pulls toward the Court of Dusk.',
+      card: 'Three months later. Rowan has locked the Dawnhold\'s windows and doubled the guards, terrified of losing Wren again. Every night, the pull in her chest drags toward the Dusk House.',
       goals: [
         { id: 'arrive', text: 'Walk with Caelum to Starhaven' },
         { id: 'mural', text: 'Paint the first mural on the dark street' },
         { id: 'rooftop', text: 'Meet Caelum on his rooftop, at the end of the street' },
       ],
-      summary: 'Caelum stole Wren out of the Spring Court and brought her to Starhaven. Her first mural woke up a street. On his rooftop he told her the truth: they are mates. Rowan called it theft and declared war.',
-      done: 'In the Spring Court, Rowan finds an empty bed and calls it theft. By morning, the armies of Spring are marching on the Court of Dusk.',
+      summary: 'Caelum called in his debt of light and took Wren out of the Dawnhold to Starhaven. Her first mural woke up a street. On his rooftop he told her the truth about the Tether. Rowan called it theft and declared war.',
+      done: 'In the Dawnhold, Rowan finds an empty bed and calls it theft. By morning, the Dawn House is marching on the Dusk House.',
       after: 'evening1',
     },
     {
       id: 'ch2', label: 'Chapter 2', name: 'The Five', room: 'ring',
-      card: 'Spring\'s army gathers on Dusk\'s southern border, and the Iron King\'s creatures are testing the north. Caelum\'s inner circle, the Five, want to see what the reborn huntress can do.',
+      card: 'The Dawn House\'s army gathers on Dusk\'s southern border, and the Iron King\'s glasslings are testing the north. Caelum\'s inner circle, the Five, want to see what the reborn huntress can do.',
       goals: [
         { id: 'combo', text: 'Three cuts in a row on the training dummy' },
         { id: 'rise', text: 'Land a rising strike on the dummy' },
         { id: 'lunge', text: 'Land a dash strike on the dummy' },
         { id: 'guard', text: 'Stand by the dummy and guard its swing' },
-        { id: 'pit', text: 'Cross Bram\'s thorn pit by bouncing on the buds' },
-        { id: 'sprites', text: 'Clear the thorn sprites past the north gate', count: 3 },
+        { id: 'pit', text: 'Cross Bram\'s glass pit by bouncing on the buds' },
+        { id: 'sprites', text: 'Clear the glasslings past the north gate', count: 3 },
         { id: 'report', text: 'Talk to Caelum when you are ready to leave' },
       ],
-      summary: 'Wren trained with Bram and cleared the Iron King\'s thorn sprites. Iris saw a vision: the Iron King knows Wren\'s name, and his iron is reaching for her sisters.',
+      summary: 'Wren trained with Bram and cleared the Iron King\'s glasslings. Iris saw a vision: the Iron King knows Wren\'s name, and his iron is reaching for her sisters.',
       done: 'The Iron King knows Wren\'s name. Across the water, Nessa and Lissa don\'t know they\'re in danger.',
       after: 'evening2',
     },
@@ -987,24 +988,24 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       card: 'Wren wakes with fire in her hand. Starhaven\'s scholar, Thane, thinks he knows why. And in the mountains above the city, something big is killing shepherds.',
       goals: [
         { id: 'flame', text: 'Light the three braziers with Flame' },
-        { id: 'wall', text: 'Burn the thorns off the mountain road' },
+        { id: 'wall', text: 'Melt the eclipse glass off the mountain road' },
         { id: 'hunt', text: 'Hunt the beast killing shepherds' },
       ],
-      summary: 'Wren learned she carries the stolen powers the Thorn Queen hoarded, and Flame woke first. She burned the queen\'s last thorns off the mountain road and killed the Old Wyrm. On the peak, Rowan came for her, and she told him no.',
-      done: 'Wren has her first court gift, and Rowan has his answer. Spring will not stop now. Neither will she.',
+      summary: 'Wren learned she carries sparks of every House\'s star, swallowed by the Eclipse and scattered when she fell, and Flame woke first. She melted the Eclipse\'s last glass off the mountain road and killed the Old Wyrm. On the peak, Rowan came for her, and she told him no.',
+      done: 'Wren has her first House gift, and Rowan has his answer. The Dawn will not stop now. Neither will she.',
       after: 'evening3',
     },
     {
       id: 'ch4', label: 'Chapter 4', name: 'The Spy in the Library', room: 'library',
       abilities: { flame: true, fbow: true },
-      card: 'Three nights after the Old Wyrm, something with wings landed on the Library roof. By morning, pages were missing from books nobody had opened in a hundred years. Thane has a gift for Wren, and Bram has strung it himself.',
+      card: 'Three nights after the Old Wyrm, something with wings landed on the Library roof. By morning, pages were missing from books nobody had opened in a hundred years. Thane has a starbow for Wren, and Bram has strung it himself.',
       goals: [
         { id: 'sky', text: 'Shoot the spies out of the courtyard sky', count: 2, counter: 'skyspies' },
         { id: 'stacks_done', text: 'Drive the spies out of the stacks before they carry off the pages', count: 3, counter: 'stackspies' },
         { id: 'shadow', text: 'Bring down the Spymaster\'s Shadow' },
       ],
-      summary: 'The Iron King sent winged spies into the Library, led by a thing of shadow and iron. Wren shot them out of the air with a fae bow Bram strung for her. The Shadow carried a letter sealed with the rose of Spring.',
-      done: 'Rowan is writing to the Iron King. Whatever Spring has become, it is no longer only Starhaven\'s enemy. It is his ally.',
+      summary: 'The Iron King sent winged spies into the Library, led by a thing of shadow and iron. Wren shot them out of the air with a starbow Bram strung for her. The Shadow carried a letter sealed with the Dawn House\'s sunburst.',
+      done: 'Rowan is writing to the Iron King. Whatever the Dawn House has become, it is no longer only Starhaven\'s enemy. It is his ally.',
       after: 'evening4',
     },
   ];
@@ -1017,7 +1018,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ['wren', 'There\'s always something. You just have to go farther than everyone else.'],
       ['lissa', 'Bring back anything green? I found seeds in Mother\'s old trunk. When the thaw comes, I want to be ready.'],
       ['wren', 'I\'ll bring back dinner. Seeds are your department.'],
-      ['nessa', 'Be back before dark. People have seen lights near the Wall again.'],
+      ['nessa', 'Be back before dark. People have seen low stars in the trees again. Don\'t go near them.'],
       { do: 'goal', id: 'hunt' },
     ],
     woods_lissa: [
@@ -1081,7 +1082,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     ],
     woods_wolf_spared: [
       { do: 'flag', name: 'wolfdone' },
-      ['narr', 'Wren lowers the bow. The wolf watches her a moment longer, then slinks away east, toward the Wall.'],
+      ['narr', 'Wren lowers the bow. The wolf watches her a moment longer, then slinks away east, toward the edge of the world.'],
       { do: 'remember', key: 'wolfSpared', text: 'Let the starving wolf go.', good: true },
       { do: 'bond', who: 'lissa', pts: 5, why: 'Lissa would have done the same, and she\'ll hear it in how you tell it.' },
     ],
@@ -1094,244 +1095,252 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ] },
     ],
     woods_tracks: [
-      ['wren', 'Tracks. Huge ones. Something this size would feed us for a month.'],
-      ['wren', '...They glitter. Tracks don\'t glitter.'],
-      { if: 'steady', then: [['wren', 'My hands are steady. Father\'s targets saw to that.']] },
+      ["wren", "Light, low between the trees. A low star. They only come down this far in the coldest winters."],
+      ["wren", "The lamp merchants pay a month of bread for a bright one."],
+      { if: "steady", then: [["wren", "My hands are steady. Father's targets saw to that."]] },
     ],
     woods_stag: [
-      { do: 'flag', name: 'stagseen' },
-      ['narr', 'In the clearing stands a white stag, taller than any deer Wren has ever seen, with antlers like silver branches.'],
-      ['wren', 'The old stories say white stags belong to the fae.'],
-      ['wren', 'The old stories don\'t feed anyone.'],
-      { do: 'goal', id: 'stag' },
+      { do: "flag", name: "stagseen" },
+      ["narr", "In the clearing, a star hangs low enough to touch: a ball of white light the size of a lamb, drifting over the snow, trailing light like a veil."],
+      ["wren", "The old stories say some of them are children. That they grow up into the sky."],
+      ["wren", "The old stories don't feed anyone."],
+      { do: "goal", id: "stag" },
     ],
     woods_kill: [
-      { do: 'flag', name: 'hunt' },
-      { do: 'art', id: 'hunt', title: 'The White Stag' },
-      { do: 'cue', name: 'shoot' },
-      ['narr', 'The arrow flies true.'],
-      ['narr', 'As the stag falls, light pours out of it, gold and warm, like a door opening onto summer.'],
-      ['wren', '...What did I just do?'],
-      { do: 'art', id: 'cottage', title: 'That night' },
-      ['narr', 'That night there is meat in the pot for the first time in weeks. Lissa laughs. Even Nessa smiles.'],
-      { if: 'green', then: [['lissa', 'You found green! In this! Wren, it\'s alive. I\'m putting it in the window.'], { do: 'bond', who: 'lissa', pts: 10, why: 'Her seeds have company now.' }] },
-      { if: 'wood', then: [['narr', 'The fire is high, and nobody has to look at the chairs.']] },
-      { if: 'wolfKilled', then: [['nessa', 'A wolf pelt. That\'s a winter coat for Lissa. Good.'], ['narr', 'Lissa does not look at it.']] },
-      { if: 'rabbitAte', then: [['nessa', 'There\'s fur on your sleeve. I\'m glad one of us ate today.'], { do: 'bond', who: 'nessa', pts: -5, why: 'She said she was glad. She wasn\'t only glad.' }] },
-      { do: 'cue', name: 'door' },
-      ['narr', 'Then the door bursts open, and winter comes in with him.'],
-      ['rowan', 'Who killed the white stag?'],
-      ['narr', 'He is tall and golden, with antlers rising from a crown of leaves, and eyes like a summer field on fire.'],
+      { do: "flag", name: "hunt" },
+      { do: "art", id: "hunt", title: "The Low Star" },
+      { do: "cue", name: "shoot" },
+      ["narr", "The arrow flies true."],
+      ["narr", "The star falls into the snow and goes out slowly, like a held breath. For one moment the whole wood is warm, as if it were morning."],
+      ["wren", "...What did I just do?"],
+      { do: "art", id: "cottage", title: "That night" },
+      ["narr", "That night there is bread and meat for the first time in weeks, bought with a jar of starlight. Lissa laughs. Even Nessa smiles."],
+      { if: "green", then: [["lissa", "You found green! In this! Wren, it's alive. I'm putting it in the window."], { do: "bond", who: "lissa", pts: 10, why: "Her seeds have company now." }] },
+      { if: "wood", then: [["narr", "The fire is high, and nobody has to look at the chairs."]] },
+      { if: "wolfKilled", then: [["nessa", "A wolf pelt. That's a winter coat for Lissa. Good."], ["narr", "Lissa does not look at it."]] },
+      { if: "rabbitAte", then: [["nessa", "There's fur on your sleeve. I'm glad one of us ate today."], { do: "bond", who: "nessa", pts: -5, why: "She said she was glad. She wasn't only glad." }] },
+      { do: "cue", name: "door" },
+      ["narr", "Then the door bursts open, and morning comes in with him, in the middle of the night."],
+      ["rowan", "Who put out the star in the clearing?"],
+      ["narr", "He is tall and golden, crowned with a ring of morning light, and the snow on the step melts where he stands."],
       { choose: [
-        { text: 'Step forward: "I did."', remember: ['rowanHonest', 'Told Lord Rowan the truth at the door.', true], then: [['rowan', 'Honest, at least. That will make this easier.']] },
-        { text: '"It was a deer. We were starving."', then: [['rowan', 'It was the sacred stag of the Spring Court, and its blood is on your hands.']] },
-        { text: 'Reach for your knife', remember: ['rowanKnife', 'Reached for a knife against a High Lord.', null], then: [['rowan', 'Put it down, huntress. Mortal steel won\'t touch me, and I didn\'t come here to hurt your family.']] },
+        { text: "Step forward: \"I did.\"", remember: ["rowanHonest", "Told Lord Rowan the truth at the door.", true], then: [["rowan", "Honest, at least. That will make this easier."]] },
+        { text: "\"It was a low star. We were starving.\"", then: [["rowan", "It was the heir of the Dawn House. In a hundred years it would have been a morning star. Now it is a jar of lamp oil."]] },
+        { text: "Reach for your knife", remember: ["rowanKnife", "Reached for a knife against a Lord of the sky.", null], then: [["rowan", "Put it down, huntress. Mortal steel won't touch me, and I didn't come here to hurt your family."]] },
       ] },
-      ['rowan', 'The Treaty between our peoples is old and simple. A fae life taken by a mortal is paid for with a mortal life.'],
-      ['nessa', 'Then take me instead.'],
-      { if: 'nessaHard', then: [['narr', 'An hour ago Wren told her she couldn\'t be carried forever. This is Nessa\'s answer.']] },
-      ['wren', 'No. Nessa, no.'],
-      ['rowan', 'There is another way. Come with me across the Wall and live the rest of your days in the Spring Court. Your sisters keep their lives, and you keep yours.'],
-      ['lissa', 'Wren...'],
-      ['wren', 'Look after each other. Lissa, plant your seeds. Nessa... eat something.'],
-      ['nessa', 'Come back.'],
-      ['wren', 'I will.'],
-      ['narr', 'He lifts her onto a white mare that was not there a moment ago. They ride east, into the oldest part of the wood.'],
-      { do: 'art', id: null },
-      { do: 'mode', name: 'flight', variant: 'wall' },
-      { do: 'art', id: 'wall', title: 'The Wall' },
-      ['narr', 'The night itself shimmers like a curtain: the Wall, the old line between the mortal lands and the fae. The mare does not slow.'],
-      ['rowan', 'Nobody will hurt you on the other side. You have my word.'],
-      ['wren', 'You just took me from my home.'],
-      ['rowan', '...Yes. I did.'],
-      ['narr', 'On the other side of the Wall, it is spring.'],
-      { do: 'flag', name: 'stag' },
-      { do: 'complete' },
+      ["rowan", "The Accord of the Horizon is old and simple. A light put out Below is paid for with a light. Yours."],
+      ["nessa", "Then take me instead."],
+      { if: "nessaHard", then: [["narr", "An hour ago Wren told her she couldn't be carried forever. This is Nessa's answer."]] },
+      ["wren", "No. Nessa, no."],
+      ["rowan", "There is another way. Come up the Stair with me, and keep the Dawn House's lamps in its place for the rest of your days. Your sisters keep their lives, and you keep yours."],
+      ["lissa", "Wren..."],
+      ["wren", "Look after each other. Lissa, plant your seeds. Nessa... eat something."],
+      ["nessa", "Come back."],
+      ["wren", "I will."],
+      ["narr", "He lifts her onto a white mare made of morning. They ride east, to the edge of the world, where the sky comes down to meet it."],
+      { do: "art", id: null },
+      { do: "mode", name: "flight", variant: "wall" },
+      { do: "art", id: "wall", title: "The Horizon" },
+      ["narr", "The night itself shimmers like a curtain: the Horizon, where the sky comes down to the ground. At dawn it opens, and the mare climbs the light like a stair."],
+      ["rowan", "Nobody will hurt you up there. You have my word."],
+      ["wren", "You just took me from my home."],
+      ["rowan", "...Yes. I did."],
+      ["narr", "Above the Horizon, it is always morning."],
+      { do: "flag", name: "stag" },
+      { do: "complete" },
     ],
 
-    // ---------------- Beyond the Wall: the Spring Court, the Thorn Queen, the bargain, the trials, the sparks
+    // ---------------- Above the Horizon: the Dawnhold, the Eclipse, the debt of light, the trials
     beyond_wall: [
-      { do: 'art', id: 'garden', title: 'The Spring Court' },
-      ['narr', 'The Spring Court is beautiful: flowers that never die, music that never stops, and a lord who is kind, in his careful way.'],
-      ['rowan', 'I had paints brought from three courts. You said once that you used to paint.'],
-      ['wren', 'I said that one time. At dinner. You remembered?'],
-      ['rowan', 'I remember everything you say. You say so little.'],
+      { do: "art", id: "garden", title: "The Dawnhold" },
+      ["narr", "The Dawnhold is beautiful: gardens where it is always early morning, music that never stops, and a Lord who is kind, in his careful way."],
+      ["rowan", "I had paints brought from three Houses. You said once that you used to paint."],
+      ["wren", "I said that one time. At dinner. You remembered?"],
+      ["rowan", "I remember everything you say. You say so little."],
       { choose: [
-        { text: '"Thank you, Rowan."', then: [['narr', 'Rowan smiles like the sun came out. For a while, Wren lets herself be happy here.']] },
-        { text: '"Paint won\'t make me forget my sisters."', then: [['rowan', 'I don\'t want you to forget them. I only want you to stay.']] },
+        { text: "\"Thank you, Rowan.\"", then: [["narr", "Rowan smiles like the sun came out. For a while, Wren lets herself be happy here."]] },
+        { text: "\"Paint won't make me forget my sisters.\"", then: [["rowan", "I don't want you to forget them. I only want you to stay."]] },
       ] },
-      ['narr', 'She paints for the first time in years. She is never allowed past the garden walls.'],
-      { do: 'art', id: 'thorns', title: 'The Blight' },
-      ['narr', 'Then the blight came. Thorns crept through the fae courts, and the flowers of Spring began to die.'],
-      ['queen', 'Every court will kneel to me. Every High Lord will bring me his crown. Starting with Spring.'],
-      ['narr', 'The Thorn Queen dragged the High Lords Under the Mountain, into her prison, the Deep. When her thorns took Rowan, Wren went after him.'],
-      ['wren', 'He took me from my home. But he never hurt me, and nobody else was going to save him.'],
-      { do: 'art', id: 'cell', title: 'Under the Mountain' },
-      ['narr', 'The Deep. A cell, a fever, and a wound from the queen\'s thorns that would not close.'],
-      { do: 'cue', name: 'caelum' },
-      ['caelum', 'So you\'re the mortal who walked in here on purpose. That was either very brave or very stupid.'],
-      ['wren', 'Who... are you?'],
-      ['caelum', 'Caelum. High Lord of the Court of Dusk, and the queen\'s favorite prisoner. I can close that wound, if you let me.'],
-      ['caelum', 'But nothing is free Under the Mountain. One week of every month, for the rest of your life, at my home. Say yes, huntress.'],
+      ["narr", "She paints for the first time in years. She is never allowed past the garden walls."],
+      { do: "art", id: "thorns", title: "The Eclipse" },
+      ["narr", "Then the Eclipse came. One by one the Houses of the sky went dark, and the Dawnhold's morning began to dim."],
+      ["queen", "Every House will go dark for me. Every Lord will bring me his light. Starting with the Dawn."],
+      ["narr", "Vael, the Eclipse, dragged the Seven Lords down into the Umbra, the dark between the stars. When she took Rowan, Wren went after him."],
+      ["wren", "He took me from my home. But he never hurt me, and nobody else was going to save him."],
+      { do: "art", id: "cell", title: "The Umbra" },
+      ["narr", "The Umbra. A cell, a fever, and a cut from a shard of her black glass that would not close."],
+      { do: "cue", name: "caelum" },
+      ["caelum", "So you're the mortal who walked in here on purpose. That was either very brave or very stupid."],
+      ["wren", "Who... are you?"],
+      ["caelum", "Caelum. Lord of the Dusk House, and the Eclipse's favorite prisoner. That cut will put your light out by morning. I can lend you some of mine."],
+      ["caelum", "A loan, not a gift. You'll carry it on your wrist, and one day I'll ask for it back, in my own city. Say yes, huntress."],
       { choose: [
-        { text: '"Why would you help me?"', bond: { caelum: 5 }, why: 'A fair question. He respects those.', then: [['caelum', 'Because you\'re the first person in fifty years to make the queen nervous. I\'d like you alive.']] },
-        { text: '"What do you really want?"', bond: { caelum: 10 }, why: 'Straight to it. He liked that more than he showed.', then: [['caelum', 'Someone on my side when this is over. Someone who doesn\'t kneel.']] },
-        { text: '"I don\'t make deals with fae."', bond: { caelum: 5 }, why: 'Half dead and still stubborn. He was impressed anyway.', then: [['caelum', 'Then you\'ll die of a fever before the first trial. Your choice.']] },
+        { text: "\"Why would you help me?\"", bond: { caelum: 5 }, why: "A fair question. He respects those.", then: [["caelum", "Because you're the first person in fifty years to make her nervous. I'd like you alive."]] },
+        { text: "\"What do you really want?\"", bond: { caelum: 10 }, why: "Straight to it. He liked that more than he showed.", then: [["caelum", "Someone on my side when this is over. Someone who doesn't kneel."]] },
+        { text: "\"I don't make deals with the Lit.\"", bond: { caelum: 5 }, why: "Half dead and still stubborn. He was impressed anyway.", then: [["caelum", "Then you'll be dark by morning, before the first trial. Your choice."]] },
       ] },
-      ['wren', '...Yes.'],
-      { do: 'meet', who: 'caelum' },
-      ['narr', 'A ring of tiny stars curls around Wren\'s wrist, glowing faintly. The bargain is struck.'],
-      { do: 'art', id: 'thorns', title: 'The Thorn Queen' },
-      ['queen', 'Three trials, little huntress. A riddle, a maze, and a beast. Win them all, and I free your Spring lord.'],
-      ['queen', 'Lose one, and you both stay in my Deep forever.'],
+      ["wren", "...Yes."],
+      { do: "meet", who: "caelum" },
+      ["narr", "A ring of tiny stars curls around Wren's wrist, glowing faintly. The debt is made."],
+      { do: "art", id: "thorns", title: "The Eclipse" },
+      ["queen", "Three trials, little huntress. The Weighing, the Climb, and the Dark. Win them all, and I let your Dawn lord go."],
+      ["queen", "Lose one, and you both stay in my Umbra forever."],
     ],
 
-    // ======================================================== Prologue part 2: Under the Mountain, the three trials
+    // ======================================================== Prologue part 2: the Umbra, the three trials
     deep_start: [
-      ['queen', 'The first trial, little huntress. Three altars. Three answers. Only one of them is true.'],
-      ['queen', 'What is buried in the dark, and grows anyway?'],
-      { do: 'flag', name: 'asked' },
-      ['narr', 'Something wakes above each altar: a locked box, a green shoot, a single tear.'],
-      ['wren', 'Buried in the dark, and grows anyway...'],
-      { do: 'goal', id: 'riddle' },
+      ["queen", "The first trial. The Weighing. Everything has a weight down here, little huntress, and you are carrying too much."],
+      ["queen", "Three altars. Lay one memory on one of them, and the dark will keep it. Any one. Choose."],
+      { do: "flag", name: "asked" },
+      ["narr", "Something wakes above each altar: a bowstring, a paintbrush, a girl's laugh caught in the light like a moth."],
+      ["wren", "Father's voice. The first time I painted. Nessa laughing. ...She wants me to choose which part of me to lose."],
+      { do: "goal", id: "riddle" },
     ],
-    deep_altar_secret: [
-      ['queen', 'A secret? Wrong. Secrets rot in the dark. They do not grow.'],
-      ['narr', 'Thorns burst through the altar and it cracks in two. The Queen is enjoying this.'],
+    deep_altar_voice: [
+      ["wren", "Father's voice. \"Breathe out, then let go.\" ...Take it."],
+      ["narr", "The bowstring goes dark. Wren reaches for the sound of him and finds his hands, his shape, the targets. Not his voice. Never his voice again."],
+      { do: "remember", key: "gaveVoice", text: "Gave the dark her father's voice.", good: null },
+      { do: "goto", id: "deep_weighed" },
     ],
-    deep_altar_grief: [
-      ['queen', 'Grief? Wrong. Grief does not grow. It only gets heavier.'],
-      ['narr', 'Thorns burst through the altar and it cracks in two.'],
-      ['wren', 'She would know.'],
+    deep_altar_paint: [
+      ["wren", "The first time I painted. I was six, and it was a bird. ...Take it."],
+      ["narr", "The brush goes dark. She knows she painted once, before the hunting. She cannot find the day."],
+      { do: "remember", key: "gavePaint", text: "Gave the dark the first time she painted.", good: null },
+      { do: "goto", id: "deep_weighed" },
     ],
-    deep_altar_seed: [
-      ['wren', '...A seed. Lissa\'s seeds, in Mother\'s trunk, waiting for spring. The answer is a seed.'],
-      ['queen', 'Correct. How very dull. Go on, then. My maze is waiting.'],
-      { do: 'flag', name: 'riddle' },
-      { do: 'open', id: 'riddlegate' },
-      { if: 'green', then: [['narr', 'In the window of a cottage far away, a sprig of wintergreen is still alive.']] },
-      ['caelum', 'Well done, huntress. Can you hear me? The bargain lets me speak to you. And lend you a little of what I have.'],
-      ['narr', 'The stars on Wren\'s wrist burn bright. Her legs feel lighter than they have ever felt.'],
-      { do: 'goal', id: 'maze' },
+    deep_altar_laugh: [
+      ["wren", "Nessa laughing. She hardly does it anyway. ...Take it."],
+      ["narr", "The light goes out of the moth. Wren knows her sister laughs. She can no longer hear it."],
+      { do: "remember", key: "gaveLaugh", text: "Gave the dark the sound of Nessa laughing.", good: false },
+      { do: "goto", id: "deep_weighed" },
+    ],
+    deep_weighed: [
+      ["queen", "Weighed, and found lighter. How very dull. Go on, then. Climb."],
+      { do: "flag", name: "riddle" },
+      { do: "open", id: "riddlegate" },
+      { if: "green", then: [["narr", "In the window of a cottage far Below, a sprig of wintergreen is still alive."]] },
+      ["caelum", "Well done, huntress. Can you hear me? The loan on your wrist lets me speak to you. And lend you a little more."],
+      ["narr", "The stars on Wren's wrist burn bright. Her legs feel lighter than they have ever felt."],
+      { do: "goal", id: "maze" },
     ],
     deep_wall: [
-      ['queen', 'A wall you can\'t climb. Mortals always hit a wall.'],
-      ['caelum', 'Jump, then jump again, off nothing at all. I\'ve got you.'],
+      ["queen", "A wall you can't climb. Mortals always hit a wall."],
+      ["caelum", "Jump, then jump again, off nothing at all. I've got you."],
     ],
     deep_dash: [
-      ['wren', 'Too far to jump.'],
-      ['caelum', 'Then don\'t jump. Move like a shadow does. Fast, and all at once.'],
+      ["wren", "Too far to jump."],
+      ["caelum", "Then don't jump. Move like light does. Fast, and all at once."],
     ],
     deep_thorns: [
-      ['queen', 'My thorns remember mortals. They remember how you bleed. And my gardeners are hungry.'],
-      ['caelum', 'They are only sprites. You have a knife and you have skinned worse. Cut them.'],
+      ["queen", "My glass remembers mortals. It remembers how you bleed. And my glasslings are hungry."],
+      ["caelum", "They are only glass, Wren. You have a knife and you have skinned worse. Break them."],
     ],
     deep_under: [
-      ['queen', 'You fell. Of course you fell. Look around, little huntress. This is where I keep the ones who lost.'],
-      ['caelum', 'There is a way back up at the far end, past the cells. And Wren: look at them. Somebody should.'],
+      ["queen", "You fell. Of course you fell. Look around, little huntress. This is where I keep the ones who lost."],
+      ["caelum", "There is a way back up at the far end, past the cells. And Wren: look at them. Somebody should."],
     ],
     deep_tally: [
-      ['narr', 'Scratches in the stone, in bundles of five. Wren stops counting at four hundred.'],
-      ['narr', 'Under them, in a different hand, cut deep: SHE KEEPS HER WORD. THAT IS THE TRAP.'],
-      ['wren', '...Noted.'],
+      ["narr", "Scratches in the black glass, in bundles of five. Wren stops counting at four hundred."],
+      ["narr", "Under them, in a different hand, cut deep: SHE KEEPS HER WORD. THAT IS THE TRAP."],
+      ["wren", "...Noted."],
     ],
     deep_pack: [
-      ['narr', 'A hunter\'s pack, the leather gone soft as cloth. Mortal-made. A bone-handled knife, and a ribbon a child might have tied on.'],
-      ['wren', 'Somebody else crossed the Wall. A long time ago. Nobody ever told a story about her.'],
-      ['narr', 'Wren takes the ribbon. It seems wrong to leave all of her down here.'],
+      ["narr", "A hunter's pack, the leather gone soft as cloth. Mortal-made. A bone-handled knife, and a ribbon a child might have tied on."],
+      ["wren", "Somebody else came up the Stair. A long time ago. Nobody ever told a story about her."],
+      ["narr", "Wren takes the ribbon. It seems wrong to leave all of her down here."],
     ],
     deep_caelum: [
-      { do: 'flag', name: 'd_caelum' },
-      ['caelum', 'Don\'t look straight at me. She watches who I look at.'],
-      ['wren', 'You wear her colors. You stand at her shoulder.'],
-      ['caelum', 'I am her favorite. It is the worst thing I have ever been, and the most useful.'],
+      { do: "flag", name: "d_caelum" },
+      ["caelum", "Don't look straight at me. She watches who I look at."],
+      ["wren", "You wear her colors. You stand at her shoulder."],
+      ["caelum", "I am her favorite. It is the worst thing I have ever been, and the most useful."],
       { choose: [
-        { text: '"Then why help me?"', bond: { caelum: 10 }, why: 'Nobody has asked him why in fifty years.', then: [
-          ['caelum', 'Because you walked in here on purpose. For someone else. I had forgotten people could do that.'],
+        { text: "\"Then why help me?\"", bond: { caelum: 10 }, why: "Nobody has asked him why in fifty years.", then: [
+          ["caelum", "Because you walked in here on purpose. For someone else. I had forgotten people could do that."],
         ] },
-        { text: '"I don\'t trust you."', bond: { caelum: 5 }, why: 'He would have thought less of her if she did.', then: [
-          ['caelum', 'Good. Don\'t. Trust the bargain on your wrist: it cannot lie, even when I do.'],
+        { text: "\"I don't trust you.\"", bond: { caelum: 5 }, why: "He would have thought less of her if she did.", then: [
+          ["caelum", "Good. Don't. Trust the stars on your wrist: they cannot lie, even when I do."],
         ] },
       ] },
-      ['caelum', 'Fifty years she has held seven courts in this hole. Every High Lord. She makes us watch each other kneel.'],
-      ['caelum', 'She keeps the letter of her word, Wren, and nothing else. Remember that when she smiles. Now go. The wall ahead is taller than it looks.'],
+      ["caelum", "Fifty years she has held the Seven Lords in this dark. She makes us watch each other kneel."],
+      ["caelum", "She keeps the letter of her word, Wren, and nothing else. Remember that when she smiles. Now go. The wall ahead is taller than it looks."],
     ],
     deep_rowan: [
-      { do: 'flag', name: 'd_rowan' },
-      ['rowan', 'Wren. No. You were supposed to stay behind my walls. I gave orders.'],
-      ['wren', 'You gave a great many orders. I climbed the wall.'],
-      ['narr', 'The cage is woven thorn. Where his hands have gripped it, they are bleeding.'],
+      { do: "flag", name: "d_rowan" },
+      ["rowan", "Wren. No. You were supposed to stay behind my walls. I gave orders."],
+      ["wren", "You gave a great many orders. I climbed the wall."],
+      ["narr", "The cage is black glass. Where his hands have gripped it, they are cut, and his light runs out of the cuts like water."],
       { choose: [
-        { text: '"I came to get you out."', remember: ['rowanCame', 'Told Rowan, through the bars, that she came for him.', true], then: [
-          ['rowan', 'Nobody comes for a High Lord. We are the ones who come.'],
-          ['wren', 'Then it was past time somebody did.'],
+        { text: "\"I came to get you out.\"", remember: ["rowanCame", "Told Rowan, through the bars, that she came for him.", true], then: [
+          ["rowan", "Nobody comes for a Lord of the sky. We are the ones who come."],
+          ["wren", "Then it was past time somebody did."],
         ] },
-        { text: '"A life for a life. That\'s your law. I\'m paying it."', remember: ['rowanDebt', 'Told Rowan she came to pay a debt, nothing more.', null], then: [
-          ['rowan', 'You owe me nothing. You never did. I only did not know how else to keep you.'],
+        { text: "\"A light for a light. That's your law. I'm paying it.\"", remember: ["rowanDebt", "Told Rowan she came to pay a debt, nothing more.", null], then: [
+          ["rowan", "You owe me nothing. You never did. I only did not know how else to keep you."],
         ] },
       ] },
-      ['rowan', 'Whatever she offers you at the end, do not take it. Run. Leave me.'],
-      ['wren', 'I am very bad at being told what to do. Ask my sisters.'],
+      ["rowan", "Whatever she offers you at the end, do not take it. Run. Leave me."],
+      ["wren", "I am very bad at being told what to do. Ask my sisters."],
     ],
     deep_chase: [
-      { do: 'flag', name: 'maze' },
-      ['queen', 'You got through my maze. Then the last trial is the beast. Wake up, my Wyrm. She\'s yours.'],
-      ['caelum', 'Wren. Run. Don\'t look back. Run for the light.'],
-      { do: 'goal', id: 'beast' },
-      { do: 'wyrm' },
+      { do: "flag", name: "maze" },
+      ["queen", "You climbed my dark. Then the last trial is the Dark itself. Wake up, my hunger. She's yours."],
+      ["caelum", "Wren. Run. Don't look back. Run for the light."],
+      { do: "goal", id: "beast" },
+      { do: "wyrm" },
     ],
     deep_end: [
-      { do: 'flag', name: 'beast' },
-      { do: 'art', id: 'trials', title: 'The Queen\'s Throne' },
-      { do: 'cue', name: 'end' },
-      ['queen', 'Three trials. A mortal won all three. That has never happened.'],
-      ['queen', 'I keep my promises. Your Spring lord is free. All the High Lords are free.'],
-      ['narr', 'Then, smiling, the Thorn Queen drove her last thorn into Wren\'s heart.'],
-      ['wren', 'Tell my sisters...'],
-      { do: 'art', id: 'rebirth', title: 'Caelum\'s Blood' },
-      ['narr', 'Her heart stopped. The queen fell. And Caelum, free at last, was already kneeling beside her.'],
-      ['caelum', 'No. Not like this. Not you.'],
-      ['narr', 'He cut his palm and let his blood fall onto her lips: the old magic of a High Lord, starlight and shadow.'],
-      { do: 'cue', name: 'rise' },
-      ['narr', 'It burned through her like a comet. Her heart started again. Her ears grew pointed, her senses sharpened, and her mortal body became fae.'],
-      ['narr', 'And for the first time, Wren felt it: a thread of light pulled tight in her chest, running straight to him. It had always been there. She had only been too mortal to feel it.'],
-      ['wren', '...Caelum? What is this?'],
-      ['caelum', '...You can feel it now.'],
-      ['narr', 'Before he could say anything more, Rowan pulled her into his arms, and carried her home to Spring.'],
-      { do: 'complete' },
+      { do: "flag", name: "beast" },
+      { do: "art", id: "trials", title: "The Eclipse's Throne" },
+      { do: "cue", name: "end" },
+      ["queen", "Three trials. A mortal won all three. That has never happened."],
+      ["queen", "I keep my word. Your Dawn lord is free. All the Lords are free."],
+      ["narr", "Then, smiling, the Eclipse drove a shard of black glass into Wren's heart."],
+      ["wren", "Tell my sisters..."],
+      { do: "art", id: "rebirth", title: "Caelum's Light" },
+      ["narr", "Her light went out. The Eclipse fell. And Caelum, free at last, was already kneeling beside her."],
+      ["caelum", "No. Not like this. Not you."],
+      ["narr", "He opened his hands, and the light of his own star came out of him, silver and violet. He gave her half of it."],
+      { do: "cue", name: "rise" },
+      ["narr", "It burned through her like a comet. Her heart started again. The freckles on her face began to glow, faintly, like stars at dusk. She was not mortal any more. She was Lit."],
+      ["narr", "And she felt it: a pull in her chest, steady as gravity, running straight to him. Two stars sharing one light fall into orbit."],
+      ["wren", "...Caelum? What did you do?"],
+      ["caelum", "...What I had to."],
+      ["narr", "Before he could say anything more, Rowan pulled her into his arms, and carried her home to the Dawnhold."],
+      { do: "complete" },
     ],
 
     // ======================================================== Chapter 1: Ashes
     ashes_start: [
-      { do: 'art', id: 'spring', title: 'The Spring Court, three months later' },
+      { do: 'art', id: 'spring', title: 'The Dawnhold, three months later' },
       ['narr', 'Three months later. Rowan has given Wren everything: silk, music, a garden, guards at every door.'],
-      ['narr', 'He has not given her a way out. And every night the thread in her chest pulls east, toward the Court of Dusk.'],
+      ['narr', 'He has not given her a way out. And every night the pull in her chest drags east, toward the Dusk House.'],
       ['wren', 'I can feel him. Even from here. What did he do to me?'],
-      { do: 'art', id: 'window', title: 'Midnight at the Spring Court' },
-      ['narr', 'Midnight. The Spring Court is asleep. Wren is not.'],
+      { do: 'art', id: 'window', title: 'Midnight at the Dawnhold' },
+      ['narr', 'Midnight. The Dawnhold is asleep. Wren is not.'],
       ['caelum', 'Good evening, Wren. You look like you haven\'t slept in three months.'],
-      ['wren', 'Caelum. You can\'t be here. If Rowan finds the High Lord of Dusk in his court...'],
-      ['caelum', 'They\'d be terribly rude about it. I\'m here for what I\'m owed: one week of every month, at my home. Our bargain from the Deep.'],
+      ['wren', 'Caelum. You can\'t be here. If Rowan finds the Lord of Dusk in his house...'],
+      ['caelum', 'They\'d be terribly rude about it. I\'m here for what I\'m owed: the light I lent you in the Umbra. It can only be paid back in my city.'],
       { do: 'meet', who: 'caelum' },
       { choose: [
         { text: '"Fine. Get me out of here."', bond: { caelum: 10 }, why: 'No hesitation. He had hoped, and not let himself expect it.', then: [
           ['caelum', 'Gladly. You\'ve been holding your breath for three months. Let\'s find you somewhere you can breathe.'],
         ] },
         { text: '"I don\'t belong to you."', bond: { caelum: 5 }, why: 'He agreed with her, which surprised them both.', then: [
-          ['caelum', 'No. You don\'t belong to anyone. That\'s rather the point. One week. Then you decide.'],
+          ['caelum', 'No. You don\'t belong to anyone. That\'s rather the point. Repay the debt, and then you decide.'],
         ] },
         { text: '"Why now?"', bond: { caelum: 10 }, why: 'She asked the question he came ready to answer.', then: [
           ['caelum', 'Because the Iron King is moving, and I need people I trust. You are one of very few.'],
         ] },
       ] },
-      ['wren', 'And this thread between us? Since the Deep, I can feel you. All the time. What did your blood do to me?'],
-      ['caelum', 'Nothing that wasn\'t already there. I\'ll tell you everything, I promise. Not here, with Rowan\'s guards outside the door.'],
+      ['wren', 'And this pull in my chest? Since the Umbra, I can feel you. All the time. What did you do to me?'],
+      ['caelum', 'I\'ll tell you everything, I promise. Not here, with Rowan\'s guards outside the door.'],
       ['caelum', 'Take my hand. And don\'t scream. It carries.'],
-      ['narr', 'He does not use the door. He opens the window, and then he opens his wings.'],
+      ['narr', 'He does not use the door. He opens the window, and then he becomes light: a streak of shadow and silver, with Wren held inside it, falling upward.'],
       { do: 'art', id: null },
       { do: 'mode', name: 'flight' },
       ['narr', 'They come down on a mountain road in the cold, with the smell of pine, and Wren\'s legs do not quite work.'],
-      ['caelum', 'The wards will not let me fly you in. From here we walk. Fae can winnow, step out of one place and into another: I\'ll meet you up the road.'],
+      ['caelum', 'The wards will not let me carry you in. From here we walk. The Lit can fall from one place to another, like a star: I\'ll meet you up the road.'],
       { do: 'goal', id: 'arrive' },
       { do: 'winnow', npc: 'caelum', to: 41 },
     ],
@@ -1367,14 +1376,14 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { do: 'starlight', n: 5, why: 'a page for the Library' },
     ],
     ashes_overlook: [
-      ['caelum', 'That glow ahead is Starhaven. Hidden from every other court for a thousand years.'],
+      ['caelum', 'That glow ahead is Starhaven. Hidden from every other House for a thousand years.'],
       ['wren', 'Why show it to me?'],
       ['caelum', 'Because the Iron King is coming, and my city has gone dark. It needs someone who can make it shine again.'],
       { do: 'winnow', npc: 'caelum', to: 57 },
     ],
     ashes_gate: [
       ['caelum', 'The war took our painters and our lamplighters. Half of Starhaven sits in the dark now.'],
-      ['caelum', 'You painted once, before the hunting. You told me, in the Deep.'],
+      ['caelum', 'You painted once, before the hunting. You told me, in the Umbra.'],
       ['wren', '...I remember. I haven\'t held a brush since.'],
       ['caelum', 'There\'s a bare wall halfway down this street. Paint something on it.'],
       { do: 'flag', name: 'arrive' },
@@ -1383,6 +1392,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     ],
     ashes_painted: [
       ['wren', 'I\'d forgotten how much I missed this.'],
+      { if: 'gavePaint', then: [['wren', 'I gave the dark the first time I painted. So this is the first time, then. I get to have it again.']] },
       { if: 'paintPromise', then: [['wren', 'I told Lissa "maybe in spring". It isn\'t spring. I painted anyway. She\'d say that counts.']] },
       { if: 'paintNo', then: [['wren', 'I told Lissa paint doesn\'t feed anyone. I was wrong about what it feeds.']] },
       ['caelum', 'Look. The street is waking up. Every mural you paint brings a little more of Starhaven back.'],
@@ -1401,27 +1411,27 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
           ['caelum', 'Fifty years. Since she took me, and my painters and lamplighters went to war without me. I came home three months ago and could not make myself look at it.'],
         ] },
         { text: '"Is that why you really brought me here?"', bond: { caelum: 10 }, why: 'She saw straight through him. He is not used to that.', then: [
-          ['caelum', 'Partly. And partly because I remember a girl in the Deep who didn\'t break. I wanted to see her again.'],
+          ['caelum', 'Partly. And partly because I remember a girl in the Umbra who didn\'t break. I wanted to see her again.'],
         ] },
-        { text: '"Don\'t get sentimental, High Lord."', bond: { caelum: 5 }, why: 'She teased him. Nobody teases him.', then: [
+        { text: '"Don\'t get sentimental, Lord of Dusk."', bond: { caelum: 5 }, why: 'She teased him. Nobody teases him.', then: [
           ['caelum', 'Too late. I\'m unbearable when I\'m sentimental. Ask anyone.'],
         ] },
       ] },
-      ['wren', 'You promised to tell me. The thread. What is it?'],
-      ['caelum', 'A mating bond. The rarest thing there is between two people. Fate\'s doing, not mine.'],
-      ['caelum', 'I felt it the first moment I saw you, Under the Mountain. You were mortal, so you couldn\'t. My blood didn\'t make the bond. It only let you feel what was already there.'],
+      ['wren', 'You promised to tell me. This pull. What is it?'],
+      ['caelum', 'A tether. When your light went out, I gave you half of mine. Two stars that share one light fall into orbit. You will feel me for the rest of your life, and I will feel you.'],
+      ['caelum', 'I did it while you were dead. There was no one to ask.'],
       { choose: [
-        { text: '"You should have told me."', bond: { caelum: 5 }, why: 'She was angry, and she stayed anyway.', then: [
-          ['caelum', 'Yes. And you\'d have thought it was a trick to keep you. I wanted you to choose for yourself, with all of it in front of you.'],
+        { text: '"You tied yourself to me without asking."', bond: { caelum: 5 }, why: 'She was angry, and said so to his face. He respects that more than he can say.', remember: ['tetherAngry', 'Told Caelum he had no right to tie her to him.', null], then: [
+          ['caelum', 'Yes. I would do it again, and I will not pretend to be sorry for that. I am sorry it was not yours to choose.'],
         ] },
-        { text: '"Is that why you saved me?"', bond: { caelum: 5 }, why: 'A hard question, asked to his face.', then: [
-          ['caelum', 'I saved you because you were dying. The bond is why I could never have lived with not trying.'],
+        { text: '"Can it be undone?"', bond: { caelum: 10 }, why: 'She asked the real question. He had been waiting for it, and dreading it.', remember: ['tetherAsk', 'Asked whether the Tether can be undone.', null], then: [
+          ['caelum', 'Thane thinks so. It would cost us both. If you ask me to, I will help you find out how.'],
         ] },
-        { text: 'Say nothing. Take his hand.', bond: { caelum: 10 }, why: 'No words. He will remember exactly how that felt.', then: [
-          ['narr', 'The thread between them hums like a plucked string. Neither of them lets go for a long time.'],
+        { text: 'Say nothing. Take his hand.', bond: { caelum: -5 }, why: 'He thinks she is being kind because he saved her. He wanted her to be angry first.', then: [
+          ['narr', 'He does not take it. "Not yet," he says. "Not because you think you owe me. Be angry first. Then decide."'],
         ] },
       ] },
-      ['caelum', 'It doesn\'t bind you to anything. You owe me nothing for it. Whatever you choose, it\'s yours to choose.'],
+      ['caelum', 'It doesn\'t bind you to anything but the pull. You owe me nothing for it. Whatever you choose, it\'s yours to choose.'],
       ['wren', 'Rowan will come for me.'],
       ['caelum', 'He\'ll come for me. Let him. Tomorrow you meet the Five, my inner circle. Try not to stab any of them.'],
       ['wren', 'No promises.'],
@@ -1435,19 +1445,19 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { do: 'art', id: 'rooftop', title: 'Evening: the Rooftop House' },
       ['narr', 'Wren\'s first night in Starhaven. Below her, one street glows. The rest of the city waits in the dark.'],
       ['caelum', 'Can\'t sleep either?'],
-      ['wren', 'I don\'t sleep much. The Deep follows me.'],
+      ['wren', 'I don\'t sleep much. The Umbra follows me.'],
       ['caelum', 'Mine too. Here. Starlit wine. It tastes like the first warm night of summer.'],
       { choose: [
-        { text: 'Show him your sketchbook', liked: 'caelum', bond: { caelum: 15 }, why: 'You let him see the worst thing you carry.', remember: ['sketchbook', 'Showed Caelum the sketchbook of the Deep.', true], then: [
-          ['caelum', '...These are the Deep. You drew it from memory?'],
+        { text: 'Show him your sketchbook', liked: 'caelum', bond: { caelum: 15 }, why: 'You let him see the worst thing you carry.', remember: ['sketchbook', 'Showed Caelum the sketchbook of the Umbra.', true], then: [
+          ['caelum', '...These are the Umbra. You drew it from memory?'],
           ['wren', 'So I could stop seeing it. It doesn\'t work.'],
-          ['caelum', 'It might, one day. Draw Starhaven next. Give the Deep some competition.'],
+          ['caelum', 'It might, one day. Draw Starhaven next. Give the Umbra some competition.'],
         ] },
-        { text: 'Toast to the bargain', bond: { caelum: 5 }, why: 'Easy company, and nothing risked.', then: [
-          ['caelum', 'To the bargain. The best one I ever made, and I\'ve made some very good ones.'],
+        { text: 'Toast to the debt, paid', bond: { caelum: 5 }, why: 'Easy company, and nothing risked.', then: [
+          ['caelum', 'To the debt. The best loan I ever made, and I\'ve made some very good ones.'],
         ] },
         { text: 'Ask what he sees in his nightmares', bond: { caelum: 10 }, why: 'Nobody asks him. You did.', remember: ['nightmares', 'Asked Caelum about his nightmares.', true], then: [
-          ['caelum', 'The Thorn Queen\'s court. Smiling at her while she held my people hostage.'],
+          ['caelum', 'The Eclipse\'s court. Smiling at her while she held my people hostage.'],
           ['caelum', 'I\'d do it again to keep them safe. I hate that I\'d do it again.'],
         ] },
       ] },
@@ -1459,9 +1469,9 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
 
     // ======================================================== Chapter 2: The Five
     ring_start: [
-      ['bram', 'So you\'re the huntress who walked out of the Deep. I\'m Bram. I run the Training Ring.'],
+      ['bram', 'So you\'re the huntress who walked out of the Umbra. I\'m Bram. I run the Training Ring.'],
       { do: 'meet', who: 'bram' },
-      ['bram', 'Half of Spring wants your head for running off with our High Lord. Or him running off with you. The songs disagree.'],
+      ['bram', 'Half the Dawn House wants your head for running off with our Lord. Or him running off with you. The songs disagree.'],
       ['bram', 'Either way, there\'s an army on our southern border with your name on its banners. Caelum says you can fight. I\'d like to see it.'],
       { choose: [
         { text: '"Point me at something."', bond: { bram: 10 }, why: 'A fighter\'s answer. Bram speaks that language.', then: [
@@ -1497,7 +1507,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { do: 'flag', name: 'guard' },
       { do: 'explain', key: 'moves' },
       ['bram', 'Good. You can\'t guard what\'s behind you, and you can\'t guard a fall. Everything else, you can.'],
-      ['bram', 'Now my thorn pit.'],
+      ['bram', 'Now my glass pit.'],
       ['bram', 'Jump toward the buds and strike down on them. Each bounce gives you your jumps back. Don\'t fall in.'],
       { do: 'flag', name: 'combo' },
       { do: 'goal', id: 'pit' },
@@ -1505,15 +1515,15 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     ],
     ring_pit: [
       ['bram', 'Ha! Clean. Now some real work.'],
-      ['bram', 'Thorn sprites, the Iron King\'s creatures, came over the north wall last night. Three of them. Clear them out.'],
+      ['bram', 'Glasslings. The Iron King has learned to wake the Eclipse\'s glass and send it walking. Three came over the north wall last night. Clear them out.'],
       ['bram', 'They glow orange right before they lunge. Dash through the lunge, then cut them down.'],
-      { do: 'bond', who: 'bram', pts: 10, why: 'Clean across his thorn pit.' },
+      { do: 'bond', who: 'bram', pts: 10, why: 'Clean across his glass pit.' },
       { do: 'flag', name: 'pit' },
       { do: 'goal', id: 'sprites' },
       { do: 'gate', id: 'northgate' },
     ],
     iris: [
-      ['iris', 'Oh! You\'re the new one. I\'m Iris. I see threads of fate.'],
+      ['iris', 'Oh! You\'re the new one. I\'m Iris. I read the stars: every life is a thread of light, and I can see where they cross.'],
       { do: 'meet', who: 'iris' },
       ['iris', 'Yours is very tangled and very shiny. Anyway, hi!'],
       { choose: [
@@ -1527,7 +1537,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ['iris', 'Go stab things. Bram likes that.'],
     ],
     ring_done: [
-      ['caelum', 'Three thorn sprites, on your first day. Bram owes me a drink.'],
+      ['caelum', 'Three glasslings, on your first day. Bram owes me a drink.'],
       ['bram', 'Bram owes nobody anything.'],
       ['caelum', 'The Iron King is testing our walls, Wren. Next time it won\'t be sprites.'],
       { do: 'winnow', npc: 'iris', near: 2 },
@@ -1538,7 +1548,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ['iris', 'Two mortal girls. Your thread is tied to theirs, Wren. And the iron is getting closer.'],
       ['wren', 'My sisters.'],
       ['caelum', 'Then the Iron King knows who you are. Those sprites weren\'t testing our walls. They were looking for you.'],
-      ['bram', 'Spring at our southern border, iron at our north. He wants us fighting Rowan while he walks in the back door.'],
+      ['bram', 'The Dawn at our southern border, iron at our north. He wants us fighting Rowan while he walks in the back door.'],
       { choose: [
         { text: '"If he touches them, I\'ll kill him."', bond: { bram: 10 }, why: 'Bram trusts people who know what they would kill for.', then: [
           ['bram', 'Get in line, huntress. But I\'ll hold your coat.'],
@@ -1570,7 +1580,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     ev2_caelum: [
       { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
       ['narr', 'The rooftop again. Caelum hasn\'t slept. Reports are stacked under a wine bottle.'],
-      ['caelum', 'Rowan sent a letter today. He says I stole you, and he will have you back, or have my court in ashes.'],
+      ['caelum', 'Rowan sent a letter today. He says I stole you, and he will have you back, or have my House in ashes.'],
       ['caelum', 'And my spies say the Iron King asked about you by name. My people are already watching your sisters\' village.'],
       { choose: [
         { text: '"Thank you."', bond: { caelum: 10 }, why: 'She let him help. That is new.', then: [
@@ -1584,7 +1594,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
           ['caelum', '...Our city. If you\'ll have it.'],
         ] },
       ] },
-      ['caelum', 'One more thing. The bargain. You don\'t owe me anything anymore. You can leave whenever you like.'],
+      ['caelum', 'One more thing. The debt. You don\'t owe me anything anymore. You can leave whenever you like.'],
       ['wren', '...I know. I\'m staying anyway.'],
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
     ],
@@ -1594,22 +1604,23 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { choose: [
         { text: '"Because nobody here has lied to me yet."', bond: { bram: 10 }, why: 'He respects a reason that small and that true.', remember: ['bramTruth', 'Told Bram she stays because nobody here has lied to her.', true], then: [['bram', 'Hm. Give it a week. But that\'s a soldier\'s answer. I\'ll take it.']] },
         { text: '"I\'m here to get strong enough to leave."', bond: { bram: 5 }, why: 'Honest. He\'d have said the same at your age.', remember: ['bramLeave', 'Told Bram she is here to get strong enough to leave.', null], then: [['bram', 'Then I\'ll train you well enough that leaving is your choice and not anyone else\'s.']] },
-        { text: '"That\'s between me and your High Lord."', bond: { bram: -5 }, why: 'He has buried people who kept things from him.', then: [['bram', 'Everything in this city is between you and the people who\'ll bleed next to you. Remember that.']] },
+        { text: '"That\'s between me and your Lord."', bond: { bram: -5 }, why: 'He has buried people who kept things from him.', then: [['bram', 'Everything in this city is between you and the people who\'ll bleed next to you. Remember that.']] },
       ] },
       ['bram', 'There are three rings hung past the dummy. Cut them all and I\'ll believe your feet as well as your mouth.'],
     ],
     ring_rings: [
       { do: 'flag', name: 'rings3' },
       ['bram', 'Low, rising, and one from the air. Who taught you to read a target?'],
-      ['wren', 'My father, on straw. I left the bow on the far side of the Wall. The eye came with me.'],
-      ['bram', 'Daggers for now. When you\'ve earned a fae bow, I\'ll string it myself.'],
+      ['wren', 'My father, on straw. I left the bow Below. The eye came with me.'],
+      { if: 'gaveVoice', then: [['wren', 'I can\'t remember his voice any more. I gave it away. I remember his hands on the bow.']] },
+      ['bram', 'Daggers for now. When you\'ve earned a starbow, I\'ll string it myself.'],
       { do: 'remember', key: 'rings', text: 'Cut all three of Bram\'s rings.', good: true },
       { do: 'bond', who: 'bram', pts: 10, liked: true, why: 'Three for three. He stopped pretending not to watch.' },
     ],
     ring_plums: [
-      ['narr', 'A market crate, burst open in the thornwood. Most of it is ruined. One paper twist of sugared plums is not.'],
+      ['narr', 'A market crate, burst open in the north wood. Most of it is ruined. One paper twist of sugared plums is not.'],
       ['wren', 'Somebody ran from here in a hurry. ...Iris said something about plums.'],
-      { do: 'remember', key: 'plums', text: 'Saved a twist of sugared plums from the thornwood.', good: true },
+      { do: 'remember', key: 'plums', text: 'Saved a twist of sugared plums from the north wood.', good: true },
     ],
     ev2_bram: [
       { do: 'art', id: 'fire', title: 'Evening with Bram' },
@@ -1638,7 +1649,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
       ['narr', 'A round tower above the Library, full of maps, candles and threads of starlight hanging in the air.'],
       ['iris', 'You came! Nobody visits the seer. They\'re afraid I\'ll tell them how they die.'],
-      { if: 'plums', then: [['wren', 'I found these in the thornwood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favorite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
+      { if: 'plums', then: [['wren', 'I found these in the north wood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favorite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
       { choose: [
         { text: 'Bring her sugared plums', liked: 'iris', bond: { iris: 15 }, then: [
           ['iris', 'Plums! Sugared! Oh, you\'re a good thread, Wren. A very good thread.'],
@@ -1650,7 +1661,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
           ['iris', 'Ha! No. But not soon. You have far too much painting to do.'],
         ] },
       ] },
-      ['iris', 'Can I tell you a secret? Caelum\'s thread tangled with yours the day you walked into the Deep. He pretends it didn\'t.'],
+      ['iris', 'Can I tell you a secret? Caelum\'s thread tangled with yours the day you walked into the Umbra. He pretends it didn\'t.'],
       ['wren', '...Does he.'],
       { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
     ],
@@ -1658,14 +1669,14 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     // ---------------- Heart scenes: play when a bond reaches a new heart
     heart_caelum_2: [
       { do: 'art', id: 'rooftop', title: 'Caelum: heart 2' },
-      ['caelum', 'Wren. In the Deep, when the queen\'s last trial broke you, I couldn\'t help. I could only watch.'],
+      ['caelum', 'Wren. In the Umbra, when her last trial broke you, I couldn\'t help. I could only watch.'],
       ['caelum', 'Five hundred years, and I\'ve never felt so useless. I didn\'t bring you here only because of a war.'],
       ['wren', '...Then why?'],
       ['caelum', 'Ask me again some other night.'],
     ],
     heart_caelum_3: [
       { do: 'art', id: 'rooftop', title: 'Caelum: heart 3' },
-      ['narr', 'Caelum spreads his wings, and before Wren can argue, they are over the city, and Starhaven is a sea of small gold lights.'],
+      ['narr', 'Caelum takes her hand and falls upward, a streak of light, and before Wren can argue they are over the city, and Starhaven is a sea of small gold lights.'],
       ['caelum', 'You did this. One street, and already my people are painting their doors again.'],
       ['wren', 'Our people.'],
       ['narr', 'Caelum doesn\'t say anything. He doesn\'t have to.'],
@@ -1684,15 +1695,15 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     // ======================================================== Chapter 3: First Light
     lib_start: [
       { do: 'art', id: 'spark', title: 'The morning after' },
-      ['narr', 'That night, for the first time since the Deep, Wren dreams of fire instead of thorns.'],
+      ['narr', 'That night, for the first time since the Umbra, Wren dreams of fire instead of black glass.'],
       ['narr', 'She wakes with her palm glowing, warm as an ember. It doesn\'t burn her. It feels like it has always been there.'],
       { do: 'art', id: 'library', title: 'The Library of Starhaven' },
       ['thane', 'Sit, sit. Don\'t touch the books with that hand. I\'m Thane. I keep the Library, and I have a theory about you.'],
       { do: 'meet', who: 'thane' },
-      ['thane', 'For fifty years the Thorn Queen drained the power of all seven courts and hoarded it Under the Mountain. Flame, frost, shadow, light, tide, thorn and wind.'],
-      ['thane', 'When she fell, all of it broke loose. Most of it went home. Some of it went into the only heart that had just stopped beating.'],
+      ['thane', 'For fifty years the Eclipse swallowed a piece of every House\'s star and hoarded it in the Umbra. Flame, frost, shadow, light, tide, thorn and wind.'],
+      ['thane', 'When she fell, all of it broke loose. Most of it went home. Some of it went into the only star that had just been lit.'],
       ['wren', 'Mine.'],
-      ['caelum', 'Seven courts\' power, sleeping in one woman. Every High Lord alive will want it back. Or want her.'],
+      ['caelum', 'Seven Houses\' light, sleeping in one woman. Every Lord in the sky will want it back. Or want her.'],
       { choose: [
         { text: '"They can try."', bond: { caelum: 5, thane: 5 }, why: 'Neither of them doubted it for a second.', then: [['caelum', 'That\'s my girl. Our girl. Starhaven\'s. I\'ll stop talking.']] },
         { text: '"Can it be taken out of me?"', bond: { thane: 10 }, why: 'The right question. Thane has waited for someone to ask it.', then: [['thane', 'Honestly? I don\'t know. Nobody has ever done this. I\'d rather learn what it does than what it costs to remove.']] },
@@ -1706,14 +1717,14 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     lib_braziers: [
       ['thane', 'All three! Fire answers you. Wonderful. Terrifying, but wonderful.'],
       ['caelum', 'Good, because I need it. Shepherds are dying on the mountain road. Something big has been taking their flocks, then them.'],
-      ['caelum', 'And the road is choked with the Thorn Queen\'s last thorns. Steel won\'t cut them. Fire might.'],
+      ['caelum', 'And the road is choked with the Eclipse\'s last glass. Steel won\'t cut it. Fire might.'],
       { do: 'flag', name: 'flame' },
       { do: 'goal', id: 'wall' },
       { do: 'winnow', npc: 'caelum', to: 44 },
     ],
     lib_wall: [
-      ['wren', 'They\'re burning. Fifty years of her thorns, burning.'],
-      ['narr', 'The smoke smells like the Deep. For a moment, Wren can\'t breathe. Then the wind takes it, and the road is open.'],
+      ['wren', 'It\'s melting. Fifty years of her glass, melting.'],
+      ['narr', 'The smoke smells like the Umbra. For a moment, Wren can\'t breathe. Then the wind takes it, and the road is open.'],
       { do: 'flag', name: 'wall' },
       { do: 'goal', id: 'hunt' },
     ],
@@ -1739,7 +1750,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { do: 'art', id: 'peak', title: 'The peak' },
       ['narr', 'The Old Wyrm falls. Below, the mountain road is clear for the first time in years, all the way down to the lights of Starhaven.'],
       ['caelum', 'You hunted it down like you were born for it. You were, I suppose.'],
-      ['narr', 'Then the air turns warm and sweet, like spring, and there are flowers growing out of the snow.'],
+      ['narr', 'Then the sky turns gold and rose, like morning, though it is past noon, and the snow begins to melt.'],
       ['rowan', 'Wren.'],
       ['wren', 'Rowan.'],
       { if: 'rowanHonest', then: [['rowan', 'You told me the truth the night I came for you. Tell it to me now. Are you his prisoner?'], ['wren', 'No.']] },
@@ -1788,7 +1799,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ['thane', 'Oh, good. I have forty-one questions about your hand. Sit down. Tea?'],
       { if: 'page', then: [['wren', 'First: this is yours. It was frozen to the mountain.'], ['thane', '...Wyrms sleep facing the wind. I wrote that at nineteen, and lost it the same afternoon. Forty years.'], { do: 'bond', who: 'thane', pts: 10, liked: true, why: 'You carried a scrap of paper down a mountain for him.' }] },
       { choose: [
-        { text: 'Bring him a rare book from the Night Market', liked: 'thane', bond: { thane: 15 }, then: [['thane', 'Is this... a first copy of the Tide Court star charts? Where did you... no, don\'t tell me. I\'ll cry on it.']] },
+        { text: 'Bring him a rare book from the Night Market', liked: 'thane', bond: { thane: 15 }, then: [['thane', 'Is this... a first copy of the Tide House star charts? Where did you... no, don\'t tell me. I\'ll cry on it.']] },
         { text: '"Ask your forty-one questions."', bond: { thane: 10 }, why: 'Nobody has ever let him get to forty-one.', then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
         { text: 'Ask about the other six powers', bond: { thane: 5 }, why: 'Curiosity is the way to Thane\'s heart.', then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
       ] },
@@ -1813,7 +1824,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { do: 'art', id: null },
       ['thane', 'Which is why I have this. Bram strung it last night, and then pretended he hadn\'t.'],
       ['narr', 'A bow of dark ash, light as a held breath. The string hums when Wren touches it: a note she feels in her teeth.'],
-      ['wren', 'A fae bow.'],
+      ['wren', 'A starbow.'],
       ['thane', 'It shoots where you mean, not where you point. Mostly. I have a theory about the "mostly".'],
       { if: 'rings', then: [['thane', 'Bram says you cut all three of his rings. He said, and I quote, "Give her the good one."']] },
       { do: 'flag', name: 'bow4' },
@@ -1870,8 +1881,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     lib4_end: [
       { do: 'flag', name: 'shadow' },
       { do: 'art', id: 'library', title: 'The reading hall' },
-      ['narr', 'The Shadow comes apart like smoke in a draft. Where it fell lies a folded letter, and a seal pressed in green wax: a rose.'],
-      ['wren', 'That is Spring\'s seal.'],
+      ['narr', 'The Shadow comes apart like smoke in a draft. Where it fell lies a folded letter, and a seal pressed in gold wax: a sunburst.'],
+      ['wren', 'That is the Dawn House\'s seal.'],
       ['thane', '"She will be at the Library at first light. Take the maps. Leave her to me." No name. There doesn\'t need to be one.'],
       ['caelum', 'Rowan is writing to the Iron King.'],
       { choose: [
@@ -1885,7 +1896,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
           ['thane', 'That is the most frightening sentence I have heard this year, and I keep the Library\'s nightmares.'],
         ] },
       ] },
-      ['thane', 'There is something else. In the margin, in another hand, in iron-grey ink. One word: Weaver.'],
+      ['thane', 'There is something else. In the margin, in another hand, in iron-grey ink. One word: Cartographer.'],
       ['caelum', '...Then we are going to need Iris.'],
       { do: 'complete' },
     ],
@@ -1906,11 +1917,11 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ['wren', 'Rowan wrote to the Iron King because of me.'],
       ['caelum', 'Rowan wrote to the Iron King because of Rowan. Don\'t carry that one, Wren. It isn\'t yours.'],
       { choose: [
-        { text: '"Teach me to winnow."', bond: { caelum: 10 }, why: 'She wants to be able to leave. He wants that for her too.', then: [
-          ['caelum', 'When you can feel all of the bond, and not only the edge of it. Soon, I think.'],
+        { text: '"Teach me to fall, the way you do."', bond: { caelum: 10 }, why: 'She wants to be able to leave. He wants that for her too.', then: [
+          ['caelum', 'When you can feel all of the Tether, and not only the pull. Soon, I think.'],
         ] },
         { text: '"Tell me about him. Before."', bond: { caelum: 10 }, why: 'She asked about his old friend, not his enemy.', then: [
-          ['caelum', 'He was the first High Lord who ever called me a friend and meant it. That is why this is going to hurt.'],
+          ['caelum', 'He was the first Lord of the sky who ever called me a friend and meant it. That is why this is going to hurt.'],
         ] },
       ] },
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
@@ -1921,8 +1932,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { if: 'pagesKeptAll', then: [['thane', 'You kept every page. I have walked past the lecterns all evening just to look at them.']],
         else: [['thane', 'I have rewritten two of the stolen pages from memory. The third I only remember the margins of. The margins were better anyway.']] },
       { choose: [
-        { text: '"What is the Weaver?"', bond: { thane: 10 }, why: 'She asked the question he has been dying to answer.', then: [
-          ['thane', 'Something older than the courts, in a cottage nobody finds twice. She weaves. Things go in. Things do not come out.'],
+        { text: '"What is the Cartographer?"', bond: { thane: 10 }, why: 'She asked the question he has been dying to answer.', then: [
+          ['thane', 'Something older than the Houses, in a house nobody finds twice. She draws the sky. Whatever she erases from her chart stops being there.'],
         ] },
         { text: 'Help him with the dome', bond: { thane: 10 }, why: 'She stayed and did the dull part with him.', then: [
           ['narr', 'They work until the lamps gutter. He tells her the name of every book they pass. She remembers four of them.'],
@@ -1936,8 +1947,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ['wren', 'Is that good?'],
       ['iris', 'It is good for you. It is terrible for me. I like knowing things.'],
       { choose: [
-        { text: '"What do you see about the Weaver?"', bond: { iris: 10 }, why: 'She trusted the seer with the hard question.', then: [
-          ['iris', 'A loom, and two threads I recognize. Your sisters, Wren. She has their names on her wall.'],
+        { text: '"What do you see about the Cartographer?"', bond: { iris: 10 }, why: 'She trusted the seer with the hard question.', then: [
+          ['iris', 'A chart, and two threads I recognize on it. Your sisters, Wren. She has drawn their names.'],
         ] },
         { text: '"Do you ever get to stop seeing?"', bond: { iris: 10 }, why: 'Nobody asks the seer how she is.', then: [
           ['iris', 'When I sleep. So I sleep a great deal, and I am very cheerful about it.'],
@@ -1946,34 +1957,34 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
     ],
     finale: [
-      { do: 'art', id: 'city', title: 'Next: Chapter 5, The Weaver\'s Cottage' },
+      { do: 'art', id: 'city', title: 'Next: Chapter 5, The Cartographer\'s House' },
       ['narr', 'A week later, Starhaven sleeps under a sky full of stars.'],
-      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Deep. It is the Library, with every lamp lit.']] },
+      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Umbra. It is the Library, with every lamp lit.']] },
       { if: 'cat', then: [['narr', 'On Mirelle\'s step, a black cat watches the sky over the Library, and does not blink.']] },
-      ['narr', 'In the Library, Thane has pinned the letter to the wall and drawn a circle around one word: Weaver.'],
-      ['narr', 'Across the sea, in a cottage nobody finds twice, a loom stops. Something has noticed a thread it did not spin.'],
+      ['narr', 'In the Library, Thane has pinned the letter to the wall and drawn a circle around one word: Cartographer.'],
+      ['narr', 'Across the sea, in a house nobody finds twice, a pen stops. Something has noticed a star it did not draw.'],
       { do: 'end' },
     ],
   };
 
   // The journal's "People" page. Unlocked as Wren meets or hears of them.
   S.PEOPLE = [
-    { id: 'wren', name: 'Wren', text: 'You. A mortal huntress who died in the Deep and woke up fae. Fights with daggers. Used to paint.' },
-    { id: 'sisters', name: 'Nessa and Lissa', text: 'Wren\'s sisters, still mortal, across the sea. Nessa is sharp-tongued and protective. Lissa is gentle and loves her garden.' },
-    { id: 'rowan', name: 'Lord Rowan', text: 'High Lord of the Spring Court. He took Wren across the Wall for killing his sacred stag, and she saved him Under the Mountain. Kind in his careful way, terrified of losing her, and now at war with the Court of Dusk.' },
-    { id: 'queen', name: 'The Thorn Queen', text: 'The fae tyrant who held Wren in the Deep. Gone now, but not from Wren\'s dreams.' },
-    { id: 'caelum', name: 'Lord Caelum', text: 'High Lord of the Court of Dusk and ruler of Starhaven. Charming in public, burdened in private. His blood made Wren fae, and he is her mate: he felt the bond from the first day; she only feels it now.' },
-    { id: 'ironking', name: 'The Iron King', text: 'A king across the sea, building an army. His creatures are already in the woods, and he knows Wren\'s name.' },
+    { id: 'wren', name: 'Wren', text: 'You. A mortal huntress who died in the Umbra and woke up Lit, with half of Caelum\'s star in her and freckles that glow. Fights with daggers. Used to paint.' },
+    { id: 'sisters', name: 'Nessa and Lissa', text: 'Wren\'s sisters, still mortal, Below. Nessa is sharp-tongued and protective. Lissa is gentle and loves her garden.' },
+    { id: 'rowan', name: 'Lord Rowan', text: 'Lord of the Dawn House. He took Wren up the Stair for putting out his House\'s heir-star, and she saved him in the Umbra. Kind in his careful way, terrified of losing her, and now at war with the Dusk House.' },
+    { id: 'queen', name: 'Vael, the Eclipse', text: 'The tyrant who swallowed the Houses\' light and held their Lords in the Umbra. Gone now, but her black glass is everywhere, and so is she, in Wren\'s dreams.' },
+    { id: 'caelum', name: 'Lord Caelum', text: 'Lord of the Dusk House and ruler of Starhaven. Charming in public, burdened in private. He gave Wren half of his own star when she died, and tethered her to him without asking. He is dimmer for it.' },
+    { id: 'ironking', name: 'The Iron King', text: 'A king Below, across the sea, who mines fallen stars for his furnaces. He has learned to wake the Eclipse\'s glass, and he knows Wren\'s name.' },
     { id: 'bram', name: 'Bram', text: 'One of the Five. A general and brawler who runs the Training Ring. The big brother of the group.' },
-    { id: 'iris', name: 'Iris', text: 'One of the Five. A seer who sees threads of fate. Oddly cheerful about it.' },
-    { id: 'thane', name: 'Thane', text: 'One of the Five. Scholar and keeper of the Library. Has a theory about everything, including Wren\'s fire.' },
+    { id: 'iris', name: 'Iris', text: 'One of the Five. She reads the stars: every life is a thread of light to her. Oddly cheerful about it.' },
+    { id: 'thane', name: 'Thane', text: 'One of the Five. Keeper of the Library and its star charts. Has a theory about everything, including Wren\'s fire.' },
   ];
   // Who you know about at the start of each chapter (the intro covers the first five).
   S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'], ch3: ['thane'], ch4: ['iris'] };
 
   S.END = {
     title: 'End of the concept',
-    text: 'That was the Prologue through Chapter 4. Next in the design doc: Chapter 5, The Weaver\'s Cottage, where getting seen means running.',
+    text: 'That was the Prologue through Chapter 4. Next: Chapter 5, The Cartographer\'s House, where getting seen means running.',
   };
 })(window.SH = window.SH || {});
 
@@ -1988,12 +1999,12 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
 
   // Each person: where the bond is heading, and what each heart gives. `now` steps work in this slice.
   S.BOND_PATH = {
-    caelum: { toward: 'The mate bond, said aloud. How much of himself he gives Wren decides how the two of them face the war: as allies, or as one.',
+    caelum: { toward: 'Whether Wren keeps the Tether he made without asking, or has it cut. How she decides changes how the two of them face the war, and how it ends.',
       steps: [
         { h: 2, name: 'Starlit', text: 'The Bond Art bar fills a quarter faster.', now: true },
         { h: 3, name: 'His shadow at your back', text: 'Once in each place, when Wren is down to her last heart, the Bond Art bar fills at once.', now: true },
-        { h: 4, name: 'Wings', text: 'He teaches her to fly beside him. (Chapters to come.)' },
-        { h: 5, name: 'The bond, spoken', text: 'Starfall. He says it, and the ending changes. (Chapters to come.)' },
+        { h: 4, name: 'Falling', text: 'He teaches her to fall from star to star beside him. (Chapters to come.)' },
+        { h: 5, name: 'Keep it, or cut it', text: 'Starfall. She decides about the Tether, and the ending changes. (Chapters to come.)' },
       ] },
     bram: { toward: 'A brother. At the siege of Starhaven, Bram holds whichever gate Wren asks him to, if he trusts her enough to be asked.',
       steps: [
@@ -2013,7 +2024,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       steps: [
         { h: 2, name: 'Well read', text: 'Wren learns faster: a fifth more experience from everything.', now: true },
         { h: 3, name: 'Margin notes', text: 'Flame costs less to cast. (Chapters to come.)' },
-        { h: 4, name: 'The second gift', text: 'He finds the way to wake the next court gift. (Chapters to come.)' },
+        { h: 4, name: 'The second gift', text: 'He finds the way to wake the next House gift. (Chapters to come.)' },
         { h: 5, name: 'The last question', text: 'He finds out whether the powers can ever be given back. (Chapters to come.)' },
       ] },
     nessa: { toward: 'Whether Nessa follows Wren when the Iron King comes for the sisters, or fights her the whole way.',
@@ -2031,46 +2042,46 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   // Journal pages. `when` is the first of: ch (chapter reached), met, pts [who, points], mem (a remembered choice).
   // `hint` is what a blank page says before it is written.
   const L = (id, part, title, when, hint, text) => ({ id, part, title, when, hint, text });
-  S.LORE_PARTS = ['The mortal lands', 'The courts', 'The war', 'People', 'Things I chose'];
+  S.LORE_PARTS = ['Below', 'The sky', 'The war', 'People', 'Things I chose'];
   S.LORE = [
-    L('wall', 0, 'The Wall', { ch: 0 }, '', 'North of the village the trees stop at a thing nobody has seen and everybody can point to. The fae are on the other side. The old treaty says they stay there and we stay here, and for five hundred years the only ones who tested it were hunters who had run out of everything else. Like me.'),
+    L('wall', 0, 'The Horizon', { ch: 0 }, '', 'East of the village the trees stop at the edge of the world, where the sky comes down to the ground like a curtain of light. The Lit live above it. The old Accord says they stay up there and we stay Below, and for five hundred years the only ones who tested it were hunters who had run out of everything else. Like me.'),
     L('winter', 0, 'This winter', { ch: 0 }, '', 'Three snares, checked at first light. A rabbit is two days. Nothing is two days of Nessa pretending she already ate. Father stopped hunting the year the money went; I learned the bow from a man who took a goat as payment and thought he had the better of it.'),
-    L('stag', 0, 'The white stag', { ch: 1 }, 'Finish the hunt in the Winter Woods.', 'It did not run. I have turned that over more than anything since. A white stag, bigger than a horse, standing in the clearing as if it had been told to wait. The fae do not keep deer. They keep promises, and that one was walking around on four legs.'),
-    L('lifeforlife', 0, 'A life for a life', { ch: 1 }, 'Finish the hunt in the Winter Woods.', 'That is the whole of their law, as far as Lord Rowan explained it at our door. I killed something of Spring\'s. Spring is owed a life. He could have taken it on the spot. He took me across the Wall instead, alive, and I have never decided whether that was mercy.'),
-    L('spring', 1, 'The Spring Court', { ch: 1 }, 'Cross the Wall.', 'Roses that do not die back. A lord who is kind the way a locked door is safe. Rowan gave me a room, a garden and no reason to leave, and I was grateful for all three long past the point I should have been.'),
-    L('queen', 1, 'The Thorn Queen', { ch: 1 }, 'Go Under the Mountain.', 'She took the courts one at a time and their lords with them. She did not want land. She wanted them to watch. She kept her court in the Deep, under the mountain, where nothing grows that she did not plant.'),
-    L('trials', 1, 'Three trials', { ch: 2 }, 'Survive the Deep.', 'A riddle, a maze, a beast. Win all three and Rowan went free; that was her bargain, and she never expected to pay. I answered her riddle. I walked her maze. The beast I beat, and it killed me anyway. I remember the floor being cold, and then I remember nothing.'),
-    L('blood', 1, 'What his blood did', { ch: 2 }, 'Survive the Deep.', 'Mortals do not come back. Caelum opened his wrist over me and I did, and what got up was not what lay down. Faster. Harder to kill. Ears I still catch on my hood. He has never once said I owe him for it, which is how I know he thinks about it.'),
-    L('dusk', 1, 'The Court of Dusk', { ch: 2 }, 'Leave the Spring Court.', 'The other courts call it the court of nightmares, and Caelum lets them. A realm everyone is afraid of is a realm nobody visits. What is actually inside it his court has kept hidden for a thousand years, and he has spent five hundred of them making sure it stays that way.'),
-    L('starhaven', 1, 'Starhaven', { ch: 2 }, 'Leave the Spring Court.', 'A city on a river under a sky with too many stars, with painted shutters and people who stay up late on purpose. No army has ever found it. It is the thing he is protecting when he plays the villain, and now I have seen it I would play one too.'),
-    L('winnow', 1, 'Winnowing', { met: 'caelum' }, 'Meet Lord Caelum.', 'The fae can fold themselves from one place to another: a step, a smell like rain on stone, and they are across the room or across the realm. Caelum does it without looking. He says it costs him nothing. He is lying about how much.'),
-    L('paint', 1, 'Painting the walls', { ch: 3 }, 'Paint in Starhaven.', 'I had not held a brush since the Deep. The street was dark and the wall was bare and my hands remembered before I did. Where I paint, the lamps come back. Nobody has explained that to me and I have stopped asking, in case it stops.'),
+    L('stag', 0, 'The low star', { ch: 1 }, 'Finish the hunt in the Winter Woods.', 'It did not run. I have turned that over more than anything since. A low star, drifting over the snow as if it had been told to wait. Low stars come down in the coldest winters and the lamp merchants pay well. Nobody told me some of them are children.'),
+    L('lifeforlife', 0, 'A light for a light', { ch: 1 }, 'Finish the hunt in the Winter Woods.', 'That is the whole of their law, as far as Lord Rowan explained it at our door. I put out a light of the Dawn House. The Dawn is owed a light. He could have taken mine on the spot. He took me up the Stair instead, alive, to keep his lamps, and I have never decided whether that was mercy.'),
+    L('spring', 1, 'The Dawnhold', { ch: 1 }, 'Go up through the Horizon.', 'A garden where it is always early morning. A Lord who is kind the way a locked door is safe. Rowan gave me a room, a garden and no reason to leave, and I was grateful for all three long past the point I should have been.'),
+    L('queen', 1, 'The Eclipse', { ch: 1 }, 'Go into the Umbra.', 'Vael. She swallowed the Houses one at a time and their Lords with them. She did not want their light for anything. She wanted them to watch it go. She kept her court in the Umbra, the dark between the stars, where nothing shines that she did not allow.'),
+    L('trials', 1, 'Three trials', { ch: 2 }, 'Survive the Umbra.', 'The Weighing, the Climb, the Dark. Win all three and Rowan went free; that was her word, and she never expected to keep it. I gave her a memory. I climbed her stair. The Dark I outran, and she killed me anyway. I remember the glass being cold, and then I remember nothing.'),
+    L('blood', 1, 'What his light did', { ch: 2 }, 'Survive the Umbra.', 'Mortals do not come back. Caelum opened his hands over me and gave me half of his own star, and I did, and what got up was not what lay down. Faster. Harder to kill. Freckles that glow when I am angry, which is often. He is dimmer now than he was. He has never once said so.'),
+    L('dusk', 1, 'The Dusk House', { ch: 2 }, 'Leave the Dawnhold.', 'The other Houses call it the House of nightmares, and Caelum lets them. A House everyone is afraid of is a House nobody visits. What is actually inside it has been hidden for a thousand years, and he has spent five hundred of them making sure it stays that way.'),
+    L('starhaven', 1, 'Starhaven', { ch: 2 }, 'Leave the Dawnhold.', 'A city on a river under a sky with too many stars, with painted shutters and people who stay up late on purpose. When the Eclipse swallowed the Houses, it was the one light she never found. It is the thing he is protecting when he plays the villain, and now I have seen it I would play one too.'),
+    L('winnow', 1, 'Falling', { met: 'caelum' }, 'Meet Lord Caelum.', 'The Lit can drop from one place to another like a falling star: a streak of light, a smell like rain on hot stone, and they are across the room or across the sky. Caelum does it without looking. He says it costs him nothing. He is lying about how much.'),
+    L('paint', 1, 'Painting the walls', { ch: 3 }, 'Paint in Starhaven.', 'I had not held a brush since the Umbra. The street was dark and the wall was bare and my hands remembered before I did. Where I paint, the lamps come back. Nobody has explained that to me and I have stopped asking, in case it stops.'),
     L('five', 1, 'The Five', { ch: 3 }, 'Come to the Training Ring.', 'Caelum\'s inner circle. Not a council; closer to a family that argues at dinner. A general, a seer and a scholar I have met. There are two more I have not, and the others change the subject when I count.'),
-    L('matebond', 1, 'The mate bond', { ch: 3 }, 'Come to the Training Ring.', 'Some fae are matched to one other person by something older than the courts. A thread, Iris calls it. He felt it the first day he saw me. A mortal cannot feel it at all. I can now. It is not a leash. It is more like knowing which way is north.'),
-    L('rowanwar', 2, 'Rowan\'s war', { ch: 3 }, 'Come to the Training Ring.', 'Caelum called in our bargain and took me out of Spring in front of Rowan\'s whole court. Rowan has called it theft and declared war on Dusk. He believes he is rescuing me. That is the worst of it: he truly does.'),
-    L('ironking', 2, 'The Iron King', { ch: 3 }, 'Come to the Training Ring.', 'A king across the sea who has been building an army since before my grandmother was born. Two courts at each other\'s throats is exactly what he was waiting for. His creatures are already in our woods, and one of them knew my name.'),
-    L('thornwood', 2, 'What the Queen left', { ch: 3 }, 'Come to the Training Ring.', 'She is dead and her thorns are not. They root wherever she walked, and the little sprites that tend them still think they have a mistress. Bram says cut them at the bud. He is right, and I hate that they look surprised.'),
-    L('flame', 2, 'Fire', { ch: 4 }, 'Climb the mountain.', 'It came out of my palm in my sleep. Thane says the Thorn Queen spent fifty years draining all seven courts and hoarding what she took Under the Mountain: flame, frost, shadow, light, tide, thorn, wind. When she fell it broke loose, and most of it went home. Some of it went into the only heart that had just stopped. Mine. Flame is the one that woke first. He says "first" very carefully.'),
-    L('wyrm', 2, 'The Old Wyrm', { ch: 4 }, 'Climb the mountain.', 'It has slept in the hollow under the peak since before the courts drew their borders. Its head is plate; its back is not. It hates fire down its throat. Something woke it, and it was not us.'),
+    L('matebond', 1, 'The Tether', { ch: 3 }, 'Come to the Training Ring.', 'Two stars that share one light fall into orbit. That is all it is, Thane says, as if that were small. Caelum gave me half his light while I was dead, and now I feel him the way you feel the ground under your feet. Nobody asked me. I am still deciding what I think about that.'),
+    L('rowanwar', 2, 'Rowan\'s war', { ch: 3 }, 'Come to the Training Ring.', 'Caelum called in his debt and took me out of the Dawnhold in front of Rowan\'s whole house. Rowan has called it theft and marched on the Dusk House. He believes he is rescuing me. That is the worst of it: he truly does.'),
+    L('ironking', 2, 'The Iron King', { ch: 3 }, 'Come to the Training Ring.', 'A king Below, across the sea, who mines fallen stars to feed his furnaces. Two Houses at each other\'s throats is exactly what he was waiting for. He has learned to wake the Eclipse\'s glass and send it walking, and one of his glasslings knew my name.'),
+    L('thornwood', 2, 'What the Eclipse left', { ch: 3 }, 'Come to the Training Ring.', 'She is gone and her glass is not. It grows wherever her dark touched, black and cold, and it remembers being part of her. Now the Iron King wakes it into glasslings. Bram says break them at the knees. He is right, and I hate the sound they make.'),
+    L('flame', 2, 'Fire', { ch: 4 }, 'Climb the mountain.', 'It came out of my palm in my sleep. Thane says the Eclipse spent fifty years swallowing a piece of every House\'s star, and when she fell the pieces scattered. Most went home. Some fell into the only star that had just been lit. Mine. The Ember House\'s spark woke first. He says "first" very carefully.'),
+    L('wyrm', 2, 'The Old Wyrm', { ch: 4 }, 'Climb the mountain.', 'It has slept in the hollow under the peak since before the Houses went up into the sky. It eats fallen stars, Thane says, and fifty years of the Eclipse left it starving. Its head is plate; its back is not. It hates fire down its throat. Something woke it, and it was not us.'),
     L('sq_lamp', 1, 'The First Lamp', { seen: 'sq_lamp' }, 'Something to look at in the Lamp Square.', 'Lit the night the city was hidden, and never out since. The lamplighters are a guild older than the Five. When a child is born in Starhaven they are carried to it and their hand is pressed to the brass, so the city knows them in the dark.'),
-    L('sq_names', 2, 'The Stone of Names', { seen: 'sq_names' }, 'Something to look at in the Lamp Square.', 'Fifty years under the Thorn Queen, and Starhaven was never found. It still paid. Everyone who left the city to fight her and did not come back is cut into the stone, small, so they all fit. Bram can find forty-one of them without looking. I counted.'),
+    L('sq_names', 2, 'The Stone of Names', { seen: 'sq_names' }, 'Something to look at in the Lamp Square.', 'Fifty years under the Eclipse, and Starhaven was never found. It still paid. Everyone who left the city to fight her and did not come back is cut into the stone, small, so they all fit. Bram can find forty-one of them without looking. I counted.'),
     L('sq_well', 1, 'The Star Well', { seen: 'sq_well' }, 'Something to look at in the Lamp Square.', 'You say what you would give up, not what you want, and drop the coin. I stood there a long time. I said: being the one who has to be strong. The coin did not make a sound. I do not know what that means and I am not asking Iris.'),
-    L('fbow', 2, 'The fae bow', { ch: 5 }, 'Reach the Library.', 'Dark ash, light as a held breath, and a string that hums a note I feel in my teeth. Bram strung it the night after the Old Wyrm and told nobody. It shoots where I mean, not where I point. Father would have called that cheating. Father would have loved it.'),
+    L('fbow', 2, 'The starbow', { ch: 5 }, 'Reach the Library.', 'Dark ash, light as a held breath, and a string that hums a note I feel in my teeth. Bram strung it the night after the Old Wyrm and told nobody. It shoots where I mean, not where I point. Father would have called that cheating. Father would have loved it.'),
     L('spies', 2, 'The Iron King\'s spies', { ch: 5 }, 'Reach the Library.', 'Grey wings, iron masks, and nothing behind the masks that I could find. They do not want to fight. They want maps: the river gates, the wards, the Library\'s own floor plans. Somebody is planning to walk into this city, and wants to know where the doors are.'),
-    L('letter', 2, 'A letter, sealed with a rose', { mem: 'rowanChoice' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." Spring\'s seal, in green wax. Rowan is trading Starhaven\'s doors to the Iron King for me. He thinks he is rescuing me. I think the Iron King thinks so too, and is laughing.'),
-    L('letter2', 2, 'A letter, sealed with a rose', { mem: 'rowanDoubt' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." Spring\'s seal, in green wax. I said Rowan would never. I keep saying it, in my head, to see if it gets truer. It does not.'),
-    L('letter3', 2, 'A letter, sealed with a rose', { mem: 'rowanFear' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." Spring\'s seal, in green wax. He would hand the Iron King every door in this city to have me back behind his. That is not love. I am not sure what it is. I am sure it is not love.'),
-    L('weaver', 1, 'The Weaver', { flag: 'shadow' }, 'Something written in a margin.', 'One word in iron-grey ink, in a hand that is not Rowan\'s: Weaver. Thane went white. Iris says the Weaver lives in a cottage nobody finds twice, and that my sisters\' names are on her wall. I have stopped asking Iris questions I do not want answered.'),
+    L('letter', 2, 'A letter, sealed with the sun', { mem: 'rowanChoice' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." The Dawn House\'s sunburst, in gold wax. Rowan is trading Starhaven\'s doors to the Iron King for me. He thinks he is rescuing me. I think the Iron King thinks so too, and is laughing.'),
+    L('letter2', 2, 'A letter, sealed with the sun', { mem: 'rowanDoubt' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." The Dawn House\'s sunburst, in gold wax. I said Rowan would never. I keep saying it, in my head, to see if it gets truer. It does not.'),
+    L('letter3', 2, 'A letter, sealed with the sun', { mem: 'rowanFear' }, 'Bring down the Spymaster\'s Shadow.', '"She will be at the Library at first light. Take the maps. Leave her to me." The Dawn House\'s sunburst, in gold wax. He would hand the Iron King every door in this city to have me back behind his. That is not love. I am not sure what it is. I am sure it is not love.'),
+    L('weaver', 1, 'The Cartographer', { flag: 'shadow' }, 'Something written in a margin.', 'One word in iron-grey ink, in a hand that is not Rowan\'s: Cartographer. Thane went white. Iris says the Cartographer draws the sky, and whatever she erases from her chart stops being there, and that my sisters\' names are on it. I have stopped asking Iris questions I do not want answered.'),
     L('c_readlamps', 4, 'The reading lamps', { mem: 'readlamps' }, 'Something to do in the Library stacks.', 'Four lamps on the high galleries, dark since the war. I lit them while the dust was still settling from the spies, and Thane stood in the middle of the stacks and turned round and round like a child at a festival.'),
-    L('p_caelum1', 3, 'Caelum, as I found him', { met: 'caelum' }, 'Meet Lord Caelum.', 'High Lord of Dusk. He walked into the Deep wearing the Queen\'s favor like a coat he meant to burn. Everything he says in public is a blade pointed somewhere. I am learning to hear what he says when it is pointed nowhere.'),
+    L('p_caelum1', 3, 'Caelum, as I found him', { met: 'caelum' }, 'Meet Lord Caelum.', 'Lord of the Dusk House. He stood in the Umbra wearing the Eclipse\'s favor like a coat he meant to burn. Everything he says in public is a blade pointed somewhere. I am learning to hear what he says when it is pointed nowhere.'),
     L('p_caelum2', 3, 'Caelum, on the rooftop', { pts: ['caelum', 40] }, 'Grow closer to Caelum (heart 2).', 'He told me he watched the last trial and could not move. Five hundred years old and useless, he said. He has ruled alone so long that he says "I" when he means the whole city. I do not think anyone has asked him how he is since before I was born.'),
-    L('p_caelum3', 3, 'Caelum, what he keeps', { pts: ['caelum', 120] }, 'Grow closer to Caelum (heart 3).', 'He keeps every sketch I throw away. I found them flattened inside a book of border treaties, in order. He does not know that I know. I have started throwing away better ones.'),
+    L('p_caelum3', 3, 'Caelum, what he keeps', { pts: ['caelum', 120] }, 'Grow closer to Caelum (heart 3).', 'He keeps every sketch I throw away. I found them flattened inside a book of old star charts, in order. He does not know that I know. I have started throwing away better ones.'),
     L('p_bram1', 3, 'Bram', { met: 'bram' }, 'Meet Bram.', 'General of Dusk\'s armies, and the one who makes the bread. He was born in a war camp and learned to fight before he learned to read, and is touchy about only one of those. He hits the practice dummy as if it owes him money.'),
     L('p_bram2', 3, 'Bram, by the fire', { pts: ['bram', 40] }, 'Grow closer to Bram (heart 2).', 'He welcomed me to the Five "properly", which I gather he has done for nobody in a century. He lost a company once, following an order he thought was wrong. He follows no order now without saying what he thinks of it first. Caelum calls this insubordination, fondly.'),
     L('p_iris1', 3, 'Iris', { met: 'iris' }, 'Meet Iris.', 'She sees threads: what might happen, tangled, all at once. She is cheerful about it the way people are cheerful in a storm. She collects old maps of places that have changed, and sugared plums, and she already knew my name.'),
     L('p_iris2', 3, 'Iris, what she will not say', { pts: ['iris', 40] }, 'Grow closer to Iris (heart 2).', 'I asked her how this ends. She laughed, and then she did not. She said some threads fray if you look at them too hard, and that mine is the only one in the city she cannot see past a certain night. She would not tell me which night.'),
     L('p_thane1', 3, 'Thane', { met: 'thane' }, 'Meet Thane.', 'Keeper of the Library. He has a theory about everything and tests them on whoever is nearest. Ink on both cuffs. He talks to the books, and I am not completely certain they do not answer.'),
-    L('p_thane2', 3, 'Thane, in the margins', { pts: ['thane', 40] }, 'Grow closer to Thane (heart 2).', 'He showed me a page with seven court sigils and a column beside each for what the Queen took. Six of the columns have a question mark, in his small exact hand, and my name. He has forty-one questions for me. He apologized for the number, and then asked the first one.'),
+    L('p_thane2', 3, 'Thane, in the margins', { pts: ['thane', 40] }, 'Grow closer to Thane (heart 2).', 'He showed me a page with seven House sigils and a column beside each for what the Eclipse swallowed. Six of the columns have a question mark, in his small exact hand, and my name. He has forty-one questions for me. He apologized for the number, and then asked the first one.'),
     L('p_nessa1', 3, 'Nessa', { pts: ['nessa', 10] }, 'Do right by Nessa.', 'My older sister by a year, and she has never let me forget which of us it is. She gives away her share and then lies about it badly. She has not forgiven Father, or the winter, or me for being the one who can shoot. Tell her the truth and she will carry anything.'),
     L('p_nessa2', 3, 'Nessa\'s letter, unsent', { pts: ['nessa', 40] }, 'Grow closer to Nessa (heart 2).', '"You went with him so we would eat. I know that. I am angry anyway, and I will be until you walk back through this door and I can be angry at your face." It was folded inside my coat. She must have put it there before I left.'),
     L('p_lissa1', 3, 'Lissa', { pts: ['lissa', 10] }, 'Be kind to Lissa.', 'The youngest. She keeps a window box alive in a winter that has killed everything else, by what I can only call stubbornness. She believes spring always comes. I used to think that was softness. It is the hardest thing in our house.'),
@@ -2078,15 +2089,15 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     L('c_wolfSpared', 4, 'The wolf I let go', { mem: 'wolfSpared' }, 'A choice in the Winter Woods.', 'It was as thin as we were. I lowered the bow and it looked at me a long moment before it went. I have been told since that nothing in those woods that winter was only a wolf.'),
     L('c_wolfKilled', 4, 'The wolf I killed', { mem: 'wolfKilled' }, 'A choice in the Winter Woods.', 'A pelt is a month of bread. I would do it again. I have been told since that nothing in those woods that winter was only a wolf, and I would still do it again.'),
     L('c_green', 4, 'Wintergreen', { mem: 'green' }, 'Something to find in the Winter Woods.', 'Growing under the snow where the big pine fell. Lissa cried, which she will deny. One green thing, in that winter.'),
-    L('c_paint', 4, 'A painting in spring', { mem: 'paintPromise' }, 'A promise in the Winter Woods.', 'I promised Lissa a painting when the thaw came. I was across the Wall before it did. I still owe it. I intend to pay.'),
-    L('c_rowan', 4, 'What I told Rowan', { mem: 'rowanHonest' }, 'A choice at our door.', 'He asked who killed the stag and I stepped forward and said I did. Nessa has not forgiven me for being quicker than her. He called it honest. I think it is the reason he trusts my word now, even across a war.'),
-    L('d_tally', 1, 'The tally in the cells', { seen: 'd_tally' }, 'Something to find under the Deep.', 'More than four hundred marks before I stopped counting, and under them a warning in another hand: she keeps her word, that is the trap. Whoever cut it understood her better than I did. I read it, I said "noted", and I walked upstairs and let her keep her word to me.'),
-    L('d_pack', 0, 'I was not the first', { seen: 'd_pack' }, 'Something to find under the Deep.', 'A mortal hunter\'s pack in the cells, older than my grandmother. A woman\'s, I think, by the knife. She crossed the Wall and went under the mountain and nobody at home ever knew why she did not come back. I took the ribbon off her pack. It is tied round my quiver strap now.'),
-    L('c_rowanCame', 4, 'Through the bars', { mem: 'rowanCame' }, 'A choice in the Deep.', 'I told him I came to get him out, and I watched it land. Nobody comes for a High Lord. I think that one sentence is why he cannot let me go now. I meant it as a kindness. It was one. It was also the first bar of a different cage.'),
-    L('c_rowanDebt', 4, 'A debt, paid', { mem: 'rowanDebt' }, 'A choice in the Deep.', 'I told him it was the law, a life for a life, and nothing more. He said I never owed him anything. It was the most honest thing he ever said to me, and he said it from inside a cage.'),
+    L('c_paint', 4, 'A painting in spring', { mem: 'paintPromise' }, 'A promise in the Winter Woods.', 'I promised Lissa a painting when the thaw came. I was up the Stair before it did. I still owe it. I intend to pay.'),
+    L('c_rowan', 4, 'What I told Rowan', { mem: 'rowanHonest' }, 'A choice at our door.', 'He asked who put out the star and I stepped forward and said I did. Nessa has not forgiven me for being quicker than her. He called it honest. I think it is the reason he trusts my word now, even across a war.'),
+    L('d_tally', 1, 'The tally in the cells', { seen: 'd_tally' }, 'Something to find under the Umbra\'s road.', 'More than four hundred marks before I stopped counting, and under them a warning in another hand: she keeps her word, that is the trap. Whoever cut it understood her better than I did. I read it, I said "noted", and I walked upstairs and let her keep her word to me.'),
+    L('d_pack', 0, 'I was not the first', { seen: 'd_pack' }, 'Something to find under the Umbra\'s road.', 'A mortal hunter\'s pack in the cells, older than my grandmother. A woman\'s, I think, by the knife. She went up the Stair and down into the Umbra and nobody at home ever knew why she did not come back. I took the ribbon off her pack. It is tied round my quiver strap now.'),
+    L('c_rowanCame', 4, 'Through the bars', { mem: 'rowanCame' }, 'A choice in the Umbra.', 'I told him I came to get him out, and I watched it land. Nobody comes for a Lord of the sky. I think that one sentence is why he cannot let me go now. I meant it as a kindness. It was one. It was also the first bar of a different cage.'),
+    L('c_rowanDebt', 4, 'A debt, paid', { mem: 'rowanDebt' }, 'A choice in the Umbra.', 'I told him it was the law, a light for a light, and nothing more. He said I never owed him anything. It was the most honest thing he ever said to me, and he said it from inside a cage.'),
     L('c_lamps', 4, 'Four lamps', { mem: 'lamps' }, 'Something to do on the street in Starhaven.', 'Mirelle was a lamplighter for forty years. When the Thorn Queen fell the guild was half gone and the lamps on her street stayed dark, because nobody had the heart to climb. I climbed. I did not know I was doing anything but climbing. She says that is the only way the First Lamp ever stays lit.'),
     L('c_cat', 4, 'Mirelle\'s cat', { mem: 'cat' }, 'Someone in Starhaven needs help.', 'On an awning, furious, perfectly able to get down. The first thing I did in this city that was not about a war. I think about that more than it deserves.'),
-    L('c_page', 4, 'The torn page', { mem: 'page' }, 'Something to find on the mountain.', 'Frozen to the rock on the mountain road, in Thane\'s hand: "wyrms sleep facing the wind". He lost it up there years ago, before the Queen, when he still went looking at things himself. He held it by the edges and said nothing for a while, which he never does.'),
+    L('c_page', 4, 'The torn page', { mem: 'page' }, 'Something to find on the mountain.', 'Frozen to the rock on the mountain road, in Thane\'s hand: "wyrms sleep facing the wind". He lost it up there years ago, before the Eclipse, when he still went looking at things himself. He held it by the edges and said nothing for a while, which he never does.'),
     L('c_bram', 4, 'What I told Bram', { mem: 'bramTruth' }, 'A choice at the Training Ring.', 'He asked why I stay. I said: because nobody here has lied to me yet. He said to give it a week. He also said it was a soldier\'s answer, and from Bram that is a medal.'),
   ];
 })(window.SH = window.SH || {});
@@ -2127,7 +2138,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { x0: 59, x1: 72, text: 'Father\'s old targets. Shoot with {SHOOT}: the high one needs a jump: shoot at the top of it.' },
       { x0: 90, x1: 100, text: 'A wolf. Shoot with {SHOOT} before it springs, or jump its lunge. What happens after the first arrow is up to you.', until: 'wolfdone' },
       { x0: 112, x1: 120, text: 'There are snares you have not checked behind you.', until: 'snares3' },
-      { x0: 124, x1: 139, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
+      { x0: 124, x1: 139, text: 'Shoot with {SHOOT}. Get too close and the low star will drift away.', flag: 'stagseen' },
     ],
     triggers: [
       { x: 10, script: 'woods_start' },
@@ -2185,16 +2196,16 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ['oneway', 71, 75, 21], ['oneway', 72, 75, 18],                 // four ledges, then the road again at x 76
     ],
     hints: [
-      { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
+      { x0: 2, x1: 66, text: 'The cells under the Umbra. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
       { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
-      { x0: 3, x1: 21, text: 'Stand at an altar and press {CHOOSE} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
+      { x0: 3, x1: 21, text: 'The Weighing: stand at an altar and press {CHOOSE} to give the dark that memory. Any one will do. Which one is yours to decide.', flag: 'asked', until: 'riddle', above: 20 },
       { x0: 21, x1: 31, text: 'Hold {JUMP} to jump higher; tap it for a small hop. Miss a jump here and you land in the cells below, unhurt.', above: 20 },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },
       { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum', above: 20 },
       { x0: 76, x1: 80, text: 'Rowan. {TALK} to him through the bars.', until: 'd_rowan' },
-      { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them. Her gardeners are waiting on the far side.' },
-      { x0: 86, x1: 92, text: 'The Queen\'s gardeners. Cut them with {ATTACK}. They glow before they lunge: step back, then cut.', until: 'maze' },
+      { x0: 80, x1: 85, text: 'Black glass cuts. Jump over it. Her glasslings are waiting on the far side.' },
+      { x0: 86, x1: 92, text: 'The Eclipse\'s glasslings. Break them with {ATTACK}. They glow before they lunge: step back, then cut.', until: 'maze' },
       { x0: 88, x1: 94, text: 'The last trial is just ahead, and there is no way back. {LEFT} Starlight still behind you.', until: 'maze', motesLeft: true },
       { x0: 94, x1: 104, text: 'RUN. Keep moving right and jump the gaps.' },
     ],
@@ -2223,10 +2234,10 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
     gates: [{ id: 'riddlegate', x: 21, top: 6 }],
-    spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 },
+    spawns: [{ kind: 'altar', what: 'voice', x: 9, y: 16 }, { kind: 'altar', what: 'paint', x: 13, y: 16 }, { kind: 'altar', what: 'laugh', x: 17, y: 16 },
       { kind: 'thornSprite', x: 89.6, y: 16, respawn: false }, { kind: 'thornSprite', x: 92.2, y: 16, respawn: false },
       { kind: 'thornSprite', x: 28, y: 30, respawn: false }, { kind: 'thornSprite', x: 50, y: 30, respawn: false }, { kind: 'thornSprite', x: 60, y: 30, respawn: false },
-      { kind: 'pickup', what: 'pack', x: 4.5, y: 30 }, { kind: 'pickup', what: 'tally', x: 19.5, y: 30 }],   // the Queen's gardeners: the first things Wren ever cuts
+      { kind: 'pickup', what: 'pack', x: 4.5, y: 30 }, { kind: 'pickup', what: 'tally', x: 19.5, y: 30 }],   // the Eclipse's glasslings: the first things Wren ever breaks
   };
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
@@ -2302,7 +2313,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       { x0: 26, x1: 36, text: 'Bram\'s rings are for your daggers (Wren has no bow here). Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (for a higher bounce, strike down as you land: {DOWNSTRIKE}). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
-      { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
+      { x0: 69, x1: 80, text: 'Glasslings glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [
       { x: 4, script: 'ring_start' },
@@ -2363,7 +2374,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     hints: [
       { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot', until: 'flame' },
       { x0: 6, x1: 27, text: 'Hold {GIFT} and let go for a flame wave: it costs two moons, hits twice as hard and burns through everything in its path.', flag: 'flame' },
-      { x0: 27, x1: 34, text: 'Thorns: steel won\'t cut them. Burn them with {GIFT}.', flag: 'flame' },
+      { x0: 27, x1: 34, text: 'Eclipse glass: steel won\'t cut it. Melt it with {GIFT}.', flag: 'flame' },
       { x0: 110, x1: 117, text: 'The Old Wyrm\'s hollow is ahead, and there is no way back out. {LEFT} Starlight still behind you.', flag: 'wall', until: 'bossmet', motesLeft: true },
       { x0: 66, x1: 82, text: 'Wyrmlings charge in a straight line, head armored. Jump over the charge, then strike from behind while it\'s dazed.', flag: 'wall' },
     ],
@@ -3653,7 +3664,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     // too close, and it bolts deeper into the clearing (twice at most)
     if (Math.abs(p.x - this.x) < 3.5 * T && this.spot < this.spots.length - 1) {
       this.spot++; this.state = 'flee';
-      SH.game.hud.toast('Too close. The stag bolted. Stop further back and shoot.');
+      SH.game.hud.toast('Too close. The low star drifted off. Stop further back and shoot.');
       SH.fx.burst(this.x, this.y, 10, { angle: Math.PI, spread: 1, speed: 2, life: 22, colors: ['#ffffff', '#dfe8ff'] });
     }
   };
@@ -4907,7 +4918,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     { name: 'Hard to kill', text: 'One more heart.' },
     { name: 'Bonded', text: 'Every level starts with the bond bar a third full.' },
     { name: 'Hunter\'s patience', text: 'Starlight drifts to you from further away.' },
-    { name: 'Steady aim', text: 'Arrows from the fae bow fly a fifth faster.' },
+    { name: 'Steady aim', text: 'Arrows from the starbow fly a fifth faster.' },
   ];
   const prog = () => SH.game.progress;
   X.total = () => (prog() && prog().xp) || 0;
@@ -6100,22 +6111,22 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     [70, 'caelum', 'Don\'t look down. Actually, do. It\'s the best part.'],
     [330, 'wren', 'You could have used a door.'],
     [560, 'caelum', 'Rowan\'s archers have seen us. Lean with me.'],
-    [930, 'wren', 'They\'re shooting at their own High Lord\'s guest!'],
+    [930, 'wren', 'They\'re shooting at their own Lord\'s guest!'],
     [1130, 'caelum', 'At me. You, they would like back.'],
     [1480, 'caelum', 'Storm over the border. Hold tight, and steer us through the gaps.'],
-    [1900, 'wren', 'The thread in my chest. It stopped pulling.'],
+    [1900, 'wren', 'The pull in my chest. It stopped.'],
     [2100, 'caelum', 'That is because you are finally going the right way.'],
     [2360, 'caelum', 'There. Do you see the lights? Starhaven.'],
   ];
-  // The same way of seeing, a different night: Rowan's horse through the winter pines, to the Wall. { variant: 'wall' }
+  // The same way of seeing, a different night: Rowan's mare through the winter pines, to the Horizon and up the Stair. { variant: 'wall' }
   const RD = { frames: 1700 };
   RD.lines = [
     [60, 'rowan', 'Hold on to the mane. She knows the way better than I do.'],
-    [300, 'wren', 'The stories say nobody crosses the Wall and comes back.'],
-    [520, 'rowan', 'The stories are five hundred years old. So is the Wall. We built it, your kind and mine, after the last war.'],
-    [800, 'rowan', 'Seven courts on the far side. Spring is mine. You will be safe in it.'],
+    [300, 'wren', 'The stories say nobody goes up the Stair and comes back down.'],
+    [520, 'rowan', 'The stories are five hundred years old. So is the Accord. Your kind and mine made it, after the last war, and drew the Horizon between us.'],
+    [800, 'rowan', 'Seven Houses in the sky. The Dawn is mine. You will be safe in it.'],
     [1040, 'wren', 'Safe. You keep using that word.'],
-    [1250, 'rowan', 'There. The light between the trees. Do not shut your eyes: it is only cold for a moment.'],
+    [1250, 'rowan', 'There. The Horizon. Do not shut your eyes: it is only cold for a moment, and then it is morning.'],
     [1500, 'wren', 'It\'s warm. Why is it warm?'],
   ];
   MODES.flight = {
@@ -6310,7 +6321,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   // everyone on it is drawn larger the nearer they stand. s.x runs 0..420 across; s.y runs 96 (far) to 300 (near).
   const SQ_LORE = [
     { id: 'sq_lamp', x: 210, y: 150, label: 'THE FIRST LAMP', text: 'The First Lamp. Lit the night the city was hidden, and never out since. Everyone who lives here has touched it once: the brass is worn gold at the height of a child\'s hand.' },
-    { id: 'sq_names', x: 112, y: 214, label: 'THE STONE OF NAMES', text: 'The Stone of Names. Everyone Starhaven lost to the Thorn Queen, cut small so they all fit. Someone leaves fresh bread at the foot of it every evening.' },
+    { id: 'sq_names', x: 112, y: 214, label: 'THE STONE OF NAMES', text: 'The Stone of Names. Everyone Starhaven lost to the Eclipse, cut small so they all fit. Someone leaves fresh bread at the foot of it every evening.' },
     { id: 'sq_well', x: 316, y: 214, label: 'THE STAR WELL', text: 'The Star Well. You drop a coin and say what you would give up, not what you want. Iris says it has never been wrong. Bram says it is a hole with water in it.' },
   ];
   MODES.city = {
@@ -7698,15 +7709,15 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   }
   function drawAltar(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
-    const col = { secret: '#b9a8ff', seed: '#8fd16b', grief: '#7ac8ff' }[e.what], asked = !!SH.game.flags.asked;
-    R(-13, -4, 26, 4, '#0a0818'); R(-12, -3, 24, 3, '#2a3a32'); R(-9, -22, 18, 19, '#0a0818'); R(-8, -21, 16, 18, '#1c2a22'); R(-8, -21, 16, 2, '#4f7a62'); R(-12, -25, 24, 4, '#0a0818'); R(-11, -24, 22, 3, '#2f4a3c');
-    if (e.broken) { R(-6, -24, 3, 14, '#0a0818'); R(2, -22, 2, 10, '#0a0818'); return; }
-    if (!asked) return;
+    const col = { voice: '#ffd27a', paint: '#b9a8ff', laugh: '#9fe8ff' }[e.what], asked = !!SH.game.flags.asked, done = !!SH.game.flags.riddle;
+    R(-13, -4, 26, 4, '#0a0818'); R(-12, -3, 24, 3, '#2a2438'); R(-9, -22, 18, 19, '#0a0818'); R(-8, -21, 16, 18, '#1a1626'); R(-8, -21, 16, 2, '#6a5aa8'); R(-12, -25, 24, 4, '#0a0818'); R(-11, -24, 22, 3, '#2c2444');   // black glass
+    if (e.broken) { R(-6, -24, 3, 14, '#0a0818'); R(2, -22, 2, 10, '#0a0818'); R(-1, -27, 2, 2, '#6a5aa8'); return; }
+    if (!asked || done) return;
     const by = -40 + Math.round(Math.sin(t * 0.07 + e.x) * 2), gl = ctx.createRadialGradient(e.x, e.y + by, 1, e.x, e.y + by, 26); gl.addColorStop(0, col + '88'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 26, e.y + by - 26, 52, 52);
-    if (e.what === 'seed') { R(-1, by - 2, 2, 9, '#4a8a3a'); R(-6, by - 4, 5, 3, col); R(1, by - 7, 5, 3, col); R(-3, by + 6, 6, 4, '#8a5a3a'); }
-    else if (e.what === 'secret') { R(-6, by - 1, 12, 9, col); R(-4, by - 6, 8, 6, '#0a0818'); R(-3, by - 5, 6, 5, col); R(-2, by - 4, 4, 4, '#1c2a22'); R(-1, by + 2, 2, 4, '#0a0818'); }
-    else { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(e.x, e.y + by - 8); ctx.quadraticCurveTo(e.x + 8, e.y + by + 4, e.x, e.y + by + 8); ctx.quadraticCurveTo(e.x - 8, e.y + by + 4, e.x, e.y + by - 8); ctx.fill(); R(-2, by + 1, 2, 2, '#ffffff'); }
-    if (e.near) { const nm = { secret: 'A SECRET', seed: 'A SEED', grief: 'GRIEF' }[e.what], tw = SH.ptextW(nm, 1) + 8; R(-tw / 2, by - 24, tw, 9, '#0a0818'); SH.ptext(ctx, nm, Math.round(e.x - tw / 2 + 4), Math.round(e.y + by - 22), col, 1); }
+    if (e.what === 'voice') { ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e.x - 4, e.y + by, 9, -1.2, 1.2); ctx.stroke(); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(e.x - 1, e.y + by - 8); ctx.lineTo(e.x - 1, e.y + by + 8); ctx.stroke(); }   // a bowstring
+    else if (e.what === 'paint') { R(-1, by - 9, 2, 12, '#8a6444'); R(-2, by + 3, 4, 3, '#c8a050'); R(-2, by + 6, 4, 4, col); R(-1, by + 10, 2, 1, col); }   // a brush
+    else { const fl = Math.sin(t * 0.3) * 3; ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(e.x - 4, e.y + by, 5, 3 + fl * 0.5, -0.4, 0, 6.3); ctx.ellipse(e.x + 4, e.y + by, 5, 3 - fl * 0.5, 0.4, 0, 6.3); ctx.fill(); R(-1, by - 3, 2, 7, '#fff6d8'); }   // a laugh, caught like a moth
+    if (e.near) { const nm = { voice: 'FATHER\'S VOICE', paint: 'THE FIRST PAINTING', laugh: 'NESSA LAUGHING' }[e.what], tw = SH.ptextW(nm, 1) + 8; R(-tw / 2, by - 24, tw, 9, '#0a0818'); SH.ptext(ctx, nm, Math.round(e.x - tw / 2 + 4), Math.round(e.y + by - 22), col, 1); }
   }
   function drawWoods(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
@@ -7954,7 +7965,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
         if (G.flags.n_wood === 3) G.queueScript('woods_wood');
       },
-      onAltar(a) { if (a.what !== 'seed') { a.broken = true; fx.kick(5); SH.sfx.play('thud'); fx.burst(a.x, a.y - 20, 24, { speed: 3, life: 40, colors: ['#5a1d3e', '#ff5a78', '#2a1024'] }); } G.queueScript('deep_altar_' + a.what); },
+      onAltar(a) { a.broken = true; fx.kick(5); SH.sfx.play('thud'); fx.burst(a.x, a.y - 40, 30, { speed: 2.4, life: 50, gravity: -0.03, colors: ['#1a1626', '#6a5aa8', '#c8b8ff'] }); G.queueScript('deep_altar_' + a.what); },   // the Weighing: whichever memory she lays down, the dark takes
       onSnare(n) { SH.xp.gain(3, true); G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
       onTarget(tg) { SH.xp.gain(4, true); if (tg && tg.blade) { G.flags.n_rings = (G.flags.n_rings || 0) + 1; if (G.flags.n_rings === 3) G.queueScript('ring_rings'); return; } G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
       onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },
@@ -8996,9 +9007,9 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
       }
       html += '</ul><h3>What I am working toward</h3>';
-      html += '<p>Keep Starhaven standing through a war between two courts, and be ready for the Iron King when he uses it. I cannot do that alone. Every heart someone gives me is a blade, a shield or a truth I will need before the end. The Bonds tab says exactly what each one gives.</p><ul class="goals road">';
+      html += '<p>Keep Starhaven standing through a war between two Houses, and be ready for the Iron King when he uses it. I cannot do that alone. Every heart someone gives me is a blade, a shield or a truth I will need before the end. The Bonds tab says exactly what each one gives.</p><ul class="goals road">';
       ST.CHAPTERS.forEach((c, i) => { html += `<li class="${i < G.chapter ? 'done' : i === G.chapter ? 'now' : ''}">${i < G.chapter ? '&#10003;' : i === G.chapter ? '&#9656;' : '&#9675;'} ${esc(c.label)}: ${esc(c.name)}</li>`; });
-      html += '<li>&#9675; Still ahead: the Weaver, Starfall, my sisters, the siege.</li></ul>';
+      html += '<li>&#9675; Still ahead: the Cartographer, Starfall, my sisters, the siege.</li></ul>';
       html += '<h3>How I got here</h3>';
       html += `<p>${esc(ST.RECAP)}</p>`;
       for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
@@ -9183,10 +9194,10 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   // (Sootborn opens this way; Starhaven used to go from the logos straight to a menu.)
   F.FILM = [
     { id: 'hunt', frames: 290, cue: ['shoot', 150], credit: 'NORTH COAST STUDIOS PRESENTS', cap: 'She was nineteen, mortal, and the only hunter in a starving house.' },
-    { id: 'wall', frames: 230, credit: 'IN ASSOCIATION WITH E CONCEPTS', cap: 'The stag belonged to the fae. After that, so did she.' },
-    { id: 'thorns', frames: 220, cap: 'Then a queen of thorns took every court at once.' },
+    { id: 'wall', frames: 230, credit: 'IN ASSOCIATION WITH E CONCEPTS', cap: 'The star she shot belonged to the sky. After that, so did she.' },
+    { id: 'thorns', frames: 220, cap: 'Then the Eclipse swallowed the sky, one House at a time.' },
     { id: 'trials', frames: 230, cap: 'Three trials to win them back. She died on the last.' },
-    { id: 'rebirth', frames: 300, cue: ['rise', 110], flash: true, cap: 'And woke with a High Lord\'s blood in her veins, and a bond she could finally feel.' },
+    { id: 'rebirth', frames: 300, cue: ['rise', 110], flash: true, cap: 'And woke with half of a Lord\'s star inside her, and a pull she never chose.' },
     { id: 'city', frames: 210, flash: true, cap: 'This is what came after.' },
   ];
   let film = null, filmTimer = 0;

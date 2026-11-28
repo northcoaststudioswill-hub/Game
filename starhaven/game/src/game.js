@@ -114,7 +114,7 @@
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
         if (G.flags.n_wood === 3) G.queueScript('woods_wood');
       },
-      onAltar(a) { if (a.what !== 'seed') { a.broken = true; fx.kick(5); SH.sfx.play('thud'); fx.burst(a.x, a.y - 20, 24, { speed: 3, life: 40, colors: ['#5a1d3e', '#ff5a78', '#2a1024'] }); } G.queueScript('deep_altar_' + a.what); },
+      onAltar(a) { a.broken = true; fx.kick(5); SH.sfx.play('thud'); fx.burst(a.x, a.y - 40, 30, { speed: 2.4, life: 50, gravity: -0.03, colors: ['#1a1626', '#6a5aa8', '#c8b8ff'] }); G.queueScript('deep_altar_' + a.what); },   // the Weighing: whichever memory she lays down, the dark takes
       onSnare(n) { SH.xp.gain(3, true); G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
       onTarget(tg) { SH.xp.gain(4, true); if (tg && tg.blade) { G.flags.n_rings = (G.flags.n_rings || 0) + 1; if (G.flags.n_rings === 3) G.queueScript('ring_rings'); return; } G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
       onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },

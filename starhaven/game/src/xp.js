@@ -9,7 +9,7 @@
     { name: 'Hard to kill', text: 'One more heart.' },
     { name: 'Bonded', text: 'Every level starts with the bond bar a third full.' },
     { name: 'Hunter\'s patience', text: 'Starlight drifts to you from further away.' },
-    { name: 'Steady aim', text: 'Arrows from the fae bow fly a fifth faster.' },
+    { name: 'Steady aim', text: 'Arrows from the starbow fly a fifth faster.' },
   ];
   const prog = () => SH.game.progress;
   X.total = () => (prog() && prog().xp) || 0;

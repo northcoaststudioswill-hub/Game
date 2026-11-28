@@ -46,10 +46,10 @@
   // (Sootborn opens this way; Starhaven used to go from the logos straight to a menu.)
   F.FILM = [
     { id: 'hunt', frames: 290, cue: ['shoot', 150], credit: 'NORTH COAST STUDIOS PRESENTS', cap: 'She was nineteen, mortal, and the only hunter in a starving house.' },
-    { id: 'wall', frames: 230, credit: 'IN ASSOCIATION WITH E CONCEPTS', cap: 'The stag belonged to the fae. After that, so did she.' },
-    { id: 'thorns', frames: 220, cap: 'Then a queen of thorns took every court at once.' },
+    { id: 'wall', frames: 230, credit: 'IN ASSOCIATION WITH E CONCEPTS', cap: 'The star she shot belonged to the sky. After that, so did she.' },
+    { id: 'thorns', frames: 220, cap: 'Then the Eclipse swallowed the sky, one House at a time.' },
     { id: 'trials', frames: 230, cap: 'Three trials to win them back. She died on the last.' },
-    { id: 'rebirth', frames: 300, cue: ['rise', 110], flash: true, cap: 'And woke with a High Lord\'s blood in her veins, and a bond she could finally feel.' },
+    { id: 'rebirth', frames: 300, cue: ['rise', 110], flash: true, cap: 'And woke with half of a Lord\'s star inside her, and a pull she never chose.' },
     { id: 'city', frames: 210, flash: true, cap: 'This is what came after.' },
   ];
   let film = null, filmTimer = 0;

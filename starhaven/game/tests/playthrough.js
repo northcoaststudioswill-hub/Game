@@ -77,8 +77,8 @@ const { chromium } = require('playwright'); const path = require('path'); const 
         else if (tx >= 132) { held = {}; if (B.f % 40 === 0) press = ['attack']; }
         else jumpsAt([[18.6], [28.6], [42.9], [53.6], [77.4], [80.2], [108.4]]);
       } else if (id === 'deep') {
-        const altar = w.things.find(e => e.kind === 'altar' && e.what === (K.wrong ? 'seed' : 'grief')), foe = near('thornSprite', 60, 30);
-        if (!G.flags.riddle) { if (altar.broken) { K.wrong = true; } const dx = altar.x - p.x; held = { right: dx > 6, left: dx < -6 }; if (Math.abs(dx) <= 10 && B.f % 10 === 0) press = ['up']; }
+        const altar = w.things.find(e => e.kind === 'altar' && e.what === 'voice'), foe = near('thornSprite', 60, 30);
+        if (!G.flags.riddle) { const dx = altar.x - p.x; held = { right: dx > 6, left: dx < -6 }; if (Math.abs(dx) <= 10 && B.f % 10 === 0) press = ['up']; }
         else if (row > 20) { held = { right: true, jump: true }; K.fell = true; if (foe) fight(foe); else if (tx >= 66) { const plan = { 30: [72, 72], 27: [70.6, 68], 24: [68.4, 72.5], 21: [73.5, 73.5], 18: [74.2, 76.6] }[row]; if (p.grounded && plan) { held = { right: tx < plan[0] - 0.2, left: tx > plan[0] + 0.2 }; if (!held.right && !held.left) { press = ['jump']; K.to = plan[1]; held = { jump: true }; } } else if (!p.grounded) held = { jump: p.vy < 0, right: tx < K.to - 0.2, left: tx > K.to + 0.3 }; } else if (p.grounded && tx > 20.6 && tx < 21.8) press = ['jump']; }
         else if (!G.flags.d_caelum && Math.abs(tx - 49.5) < 1.2 && p.grounded) { held = {}; if (B.f % 10 === 0) press = ['up']; }
         else if (!G.flags.d_rowan && Math.abs(tx - 78.4) < 1.2 && p.grounded) { held = {}; if (B.f % 10 === 0) press = ['up']; }

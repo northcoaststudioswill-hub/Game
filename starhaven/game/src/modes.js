@@ -66,22 +66,22 @@
     [70, 'caelum', 'Don\'t look down. Actually, do. It\'s the best part.'],
     [330, 'wren', 'You could have used a door.'],
     [560, 'caelum', 'Rowan\'s archers have seen us. Lean with me.'],
-    [930, 'wren', 'They\'re shooting at their own High Lord\'s guest!'],
+    [930, 'wren', 'They\'re shooting at their own Lord\'s guest!'],
     [1130, 'caelum', 'At me. You, they would like back.'],
     [1480, 'caelum', 'Storm over the border. Hold tight, and steer us through the gaps.'],
-    [1900, 'wren', 'The thread in my chest. It stopped pulling.'],
+    [1900, 'wren', 'The pull in my chest. It stopped.'],
     [2100, 'caelum', 'That is because you are finally going the right way.'],
     [2360, 'caelum', 'There. Do you see the lights? Starhaven.'],
   ];
-  // The same way of seeing, a different night: Rowan's horse through the winter pines, to the Wall. { variant: 'wall' }
+  // The same way of seeing, a different night: Rowan's mare through the winter pines, to the Horizon and up the Stair. { variant: 'wall' }
   const RD = { frames: 1700 };
   RD.lines = [
     [60, 'rowan', 'Hold on to the mane. She knows the way better than I do.'],
-    [300, 'wren', 'The stories say nobody crosses the Wall and comes back.'],
-    [520, 'rowan', 'The stories are five hundred years old. So is the Wall. We built it, your kind and mine, after the last war.'],
-    [800, 'rowan', 'Seven courts on the far side. Spring is mine. You will be safe in it.'],
+    [300, 'wren', 'The stories say nobody goes up the Stair and comes back down.'],
+    [520, 'rowan', 'The stories are five hundred years old. So is the Accord. Your kind and mine made it, after the last war, and drew the Horizon between us.'],
+    [800, 'rowan', 'Seven Houses in the sky. The Dawn is mine. You will be safe in it.'],
     [1040, 'wren', 'Safe. You keep using that word.'],
-    [1250, 'rowan', 'There. The light between the trees. Do not shut your eyes: it is only cold for a moment.'],
+    [1250, 'rowan', 'There. The Horizon. Do not shut your eyes: it is only cold for a moment, and then it is morning.'],
     [1500, 'wren', 'It\'s warm. Why is it warm?'],
   ];
   MODES.flight = {
@@ -276,7 +276,7 @@
   // everyone on it is drawn larger the nearer they stand. s.x runs 0..420 across; s.y runs 96 (far) to 300 (near).
   const SQ_LORE = [
     { id: 'sq_lamp', x: 210, y: 150, label: 'THE FIRST LAMP', text: 'The First Lamp. Lit the night the city was hidden, and never out since. Everyone who lives here has touched it once: the brass is worn gold at the height of a child\'s hand.' },
-    { id: 'sq_names', x: 112, y: 214, label: 'THE STONE OF NAMES', text: 'The Stone of Names. Everyone Starhaven lost to the Thorn Queen, cut small so they all fit. Someone leaves fresh bread at the foot of it every evening.' },
+    { id: 'sq_names', x: 112, y: 214, label: 'THE STONE OF NAMES', text: 'The Stone of Names. Everyone Starhaven lost to the Eclipse, cut small so they all fit. Someone leaves fresh bread at the foot of it every evening.' },
     { id: 'sq_well', x: 316, y: 214, label: 'THE STAR WELL', text: 'The Star Well. You drop a coin and say what you would give up, not what you want. Iris says it has never been wrong. Bram says it is a hole with water in it.' },
   ];
   MODES.city = {

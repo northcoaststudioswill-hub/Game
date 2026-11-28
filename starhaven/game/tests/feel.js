@@ -285,17 +285,17 @@ const path = require('path');
       check('Starlight: motes are collected by touch, and all five levels have them', got >= 3 && counts.every(n => n >= 10), { collected: got, perLevel: counts });
     })();
 
-    // The riddle: a wrong answer makes the queen ask again; the right one starts the maze
+    // The Weighing: three altars, three memories. Any one is a valid choice; the dark keeps it, the story remembers it
     (function () {
       SH.test.load(1);
       for (let i = 0; i < 900 && !(G.flags.asked && G.state === 'play'); i++) talk({}, null);
       const w = G.world, alt = k => w.things.find(e => e.kind === 'altar' && e.what === k), gate = w.gates.find(g => g.id === 'riddlegate');
       const useAltar = k => { const a = alt(k); SH.test.place(a.x / T - 0.5, 16); P().x = a.x; for (let i = 0; i < 4; i++) step({}, null); step({}, ['up']); for (let i = 0; i < 600 && (i < 5 || G.state !== 'play'); i++) talk({}, null); };
       const shutBefore = gate.closed;
-      useAltar('secret');                                   // wrong
-      const askedAgain = alt('secret').broken && !G.flags.riddle && gate.closed;
-      useAltar('seed');                                     // right
-      check('Riddle: three altars; the wrong one breaks and the way stays shut; the seed opens the gate to the maze', askedAgain && G.flags.riddle && G.activeGoal === 'maze' && !gate.closed, { wrongBreaks: askedAgain, riddle: !!G.flags.riddle, goal: G.activeGoal, gateOpen: !gate.closed });
+      useAltar('laugh');
+      const others = !alt('voice').near && !alt('paint').near;
+      check('The Weighing: give the dark one memory at an altar; it goes dark, the choice is remembered, and the gate to the Climb opens', shutBefore && alt('laugh').broken && G.recalls('gaveLaugh') && G.flags.riddle && G.activeGoal === 'maze' && !gate.closed && others,
+        { taken: alt('laugh').broken, remembered: G.recalls('gaveLaugh'), goal: G.activeGoal, gateOpen: !gate.closed });
     })();
 
     // Prologue part 2: the Deep, including the Wyrm chase
@@ -304,7 +304,7 @@ const path = require('path');
       SH.test.load(1); const p = P();
       const jumps = [[22.6], [30.7], [40.7], [52.6, 'jump'], [65.6, 'jump', 'dash'], [83.6], [102.8], [116.6], [125.6], [135.6]];
       let k = 0, moves = [], f = 0, sawWyrm = false;
-      const seedAltar = G.world.things.find(e => e.kind === 'altar' && e.what === 'seed');
+      const seedAltar = G.world.things.find(e => e.kind === 'altar' && e.what === 'paint');
       while (f++ < 60 * 120 && G.chapter === 1) {
         const tx = p.x / T; let press = null;
         if (G.state === 'play' && !G.flags.riddle) { const dx = seedAltar.x - p.x; talk({ right: dx > 6, left: dx < -6 }, Math.abs(dx) <= 10 && f % 8 === 0 ? ['up'] : null); continue; }

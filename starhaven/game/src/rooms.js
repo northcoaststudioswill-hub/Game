@@ -31,7 +31,7 @@
       { x0: 59, x1: 72, text: 'Father\'s old targets. Shoot with {SHOOT}: the high one needs a jump: shoot at the top of it.' },
       { x0: 90, x1: 100, text: 'A wolf. Shoot with {SHOOT} before it springs, or jump its lunge. What happens after the first arrow is up to you.', until: 'wolfdone' },
       { x0: 112, x1: 120, text: 'There are snares you have not checked behind you.', until: 'snares3' },
-      { x0: 124, x1: 139, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
+      { x0: 124, x1: 139, text: 'Shoot with {SHOOT}. Get too close and the low star will drift away.', flag: 'stagseen' },
     ],
     triggers: [
       { x: 10, script: 'woods_start' },
@@ -89,16 +89,16 @@
       ['oneway', 71, 75, 21], ['oneway', 72, 75, 18],                 // four ledges, then the road again at x 76
     ],
     hints: [
-      { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
+      { x0: 2, x1: 66, text: 'The cells under the Umbra. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
       { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
-      { x0: 3, x1: 21, text: 'Stand at an altar and press {CHOOSE} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
+      { x0: 3, x1: 21, text: 'The Weighing: stand at an altar and press {CHOOSE} to give the dark that memory. Any one will do. Which one is yours to decide.', flag: 'asked', until: 'riddle', above: 20 },
       { x0: 21, x1: 31, text: 'Hold {JUMP} to jump higher; tap it for a small hop. Miss a jump here and you land in the cells below, unhurt.', above: 20 },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },
       { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum', above: 20 },
       { x0: 76, x1: 80, text: 'Rowan. {TALK} to him through the bars.', until: 'd_rowan' },
-      { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them. Her gardeners are waiting on the far side.' },
-      { x0: 86, x1: 92, text: 'The Queen\'s gardeners. Cut them with {ATTACK}. They glow before they lunge: step back, then cut.', until: 'maze' },
+      { x0: 80, x1: 85, text: 'Black glass cuts. Jump over it. Her glasslings are waiting on the far side.' },
+      { x0: 86, x1: 92, text: 'The Eclipse\'s glasslings. Break them with {ATTACK}. They glow before they lunge: step back, then cut.', until: 'maze' },
       { x0: 88, x1: 94, text: 'The last trial is just ahead, and there is no way back. {LEFT} Starlight still behind you.', until: 'maze', motesLeft: true },
       { x0: 94, x1: 104, text: 'RUN. Keep moving right and jump the gaps.' },
     ],
@@ -127,10 +127,10 @@
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
     gates: [{ id: 'riddlegate', x: 21, top: 6 }],
-    spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 },
+    spawns: [{ kind: 'altar', what: 'voice', x: 9, y: 16 }, { kind: 'altar', what: 'paint', x: 13, y: 16 }, { kind: 'altar', what: 'laugh', x: 17, y: 16 },
       { kind: 'thornSprite', x: 89.6, y: 16, respawn: false }, { kind: 'thornSprite', x: 92.2, y: 16, respawn: false },
       { kind: 'thornSprite', x: 28, y: 30, respawn: false }, { kind: 'thornSprite', x: 50, y: 30, respawn: false }, { kind: 'thornSprite', x: 60, y: 30, respawn: false },
-      { kind: 'pickup', what: 'pack', x: 4.5, y: 30 }, { kind: 'pickup', what: 'tally', x: 19.5, y: 30 }],   // the Queen's gardeners: the first things Wren ever cuts
+      { kind: 'pickup', what: 'pack', x: 4.5, y: 30 }, { kind: 'pickup', what: 'tally', x: 19.5, y: 30 }],   // the Eclipse's glasslings: the first things Wren ever breaks
   };
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
@@ -206,7 +206,7 @@
       { x0: 26, x1: 36, text: 'Bram\'s rings are for your daggers (Wren has no bow here). Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (for a higher bounce, strike down as you land: {DOWNSTRIKE}). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
-      { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
+      { x0: 69, x1: 80, text: 'Glasslings glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [
       { x: 4, script: 'ring_start' },
@@ -267,7 +267,7 @@
     hints: [
       { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot', until: 'flame' },
       { x0: 6, x1: 27, text: 'Hold {GIFT} and let go for a flame wave: it costs two moons, hits twice as hard and burns through everything in its path.', flag: 'flame' },
-      { x0: 27, x1: 34, text: 'Thorns: steel won\'t cut them. Burn them with {GIFT}.', flag: 'flame' },
+      { x0: 27, x1: 34, text: 'Eclipse glass: steel won\'t cut it. Melt it with {GIFT}.', flag: 'flame' },
       { x0: 110, x1: 117, text: 'The Old Wyrm\'s hollow is ahead, and there is no way back out. {LEFT} Starlight still behind you.', flag: 'wall', until: 'bossmet', motesLeft: true },
       { x0: 66, x1: 82, text: 'Wyrmlings charge in a straight line, head armored. Jump over the charge, then strike from behind while it\'s dazed.', flag: 'wall' },
     ],

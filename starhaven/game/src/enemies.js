@@ -190,7 +190,7 @@
     // too close, and it bolts deeper into the clearing (twice at most)
     if (Math.abs(p.x - this.x) < 3.5 * T && this.spot < this.spots.length - 1) {
       this.spot++; this.state = 'flee';
-      SH.game.hud.toast('Too close. The stag bolted. Stop further back and shoot.');
+      SH.game.hud.toast('Too close. The low star drifted off. Stop further back and shoot.');
       SH.fx.burst(this.x, this.y, 10, { angle: Math.PI, spread: 1, speed: 2, life: 22, colors: ['#ffffff', '#dfe8ff'] });
     }
   };

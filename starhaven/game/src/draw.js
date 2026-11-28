@@ -979,15 +979,15 @@
   }
   function drawAltar(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
-    const col = { secret: '#b9a8ff', seed: '#8fd16b', grief: '#7ac8ff' }[e.what], asked = !!SH.game.flags.asked;
-    R(-13, -4, 26, 4, '#0a0818'); R(-12, -3, 24, 3, '#2a3a32'); R(-9, -22, 18, 19, '#0a0818'); R(-8, -21, 16, 18, '#1c2a22'); R(-8, -21, 16, 2, '#4f7a62'); R(-12, -25, 24, 4, '#0a0818'); R(-11, -24, 22, 3, '#2f4a3c');
-    if (e.broken) { R(-6, -24, 3, 14, '#0a0818'); R(2, -22, 2, 10, '#0a0818'); return; }
-    if (!asked) return;
+    const col = { voice: '#ffd27a', paint: '#b9a8ff', laugh: '#9fe8ff' }[e.what], asked = !!SH.game.flags.asked, done = !!SH.game.flags.riddle;
+    R(-13, -4, 26, 4, '#0a0818'); R(-12, -3, 24, 3, '#2a2438'); R(-9, -22, 18, 19, '#0a0818'); R(-8, -21, 16, 18, '#1a1626'); R(-8, -21, 16, 2, '#6a5aa8'); R(-12, -25, 24, 4, '#0a0818'); R(-11, -24, 22, 3, '#2c2444');   // black glass
+    if (e.broken) { R(-6, -24, 3, 14, '#0a0818'); R(2, -22, 2, 10, '#0a0818'); R(-1, -27, 2, 2, '#6a5aa8'); return; }
+    if (!asked || done) return;
     const by = -40 + Math.round(Math.sin(t * 0.07 + e.x) * 2), gl = ctx.createRadialGradient(e.x, e.y + by, 1, e.x, e.y + by, 26); gl.addColorStop(0, col + '88'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 26, e.y + by - 26, 52, 52);
-    if (e.what === 'seed') { R(-1, by - 2, 2, 9, '#4a8a3a'); R(-6, by - 4, 5, 3, col); R(1, by - 7, 5, 3, col); R(-3, by + 6, 6, 4, '#8a5a3a'); }
-    else if (e.what === 'secret') { R(-6, by - 1, 12, 9, col); R(-4, by - 6, 8, 6, '#0a0818'); R(-3, by - 5, 6, 5, col); R(-2, by - 4, 4, 4, '#1c2a22'); R(-1, by + 2, 2, 4, '#0a0818'); }
-    else { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(e.x, e.y + by - 8); ctx.quadraticCurveTo(e.x + 8, e.y + by + 4, e.x, e.y + by + 8); ctx.quadraticCurveTo(e.x - 8, e.y + by + 4, e.x, e.y + by - 8); ctx.fill(); R(-2, by + 1, 2, 2, '#ffffff'); }
-    if (e.near) { const nm = { secret: 'A SECRET', seed: 'A SEED', grief: 'GRIEF' }[e.what], tw = SH.ptextW(nm, 1) + 8; R(-tw / 2, by - 24, tw, 9, '#0a0818'); SH.ptext(ctx, nm, Math.round(e.x - tw / 2 + 4), Math.round(e.y + by - 22), col, 1); }
+    if (e.what === 'voice') { ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e.x - 4, e.y + by, 9, -1.2, 1.2); ctx.stroke(); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(e.x - 1, e.y + by - 8); ctx.lineTo(e.x - 1, e.y + by + 8); ctx.stroke(); }   // a bowstring
+    else if (e.what === 'paint') { R(-1, by - 9, 2, 12, '#8a6444'); R(-2, by + 3, 4, 3, '#c8a050'); R(-2, by + 6, 4, 4, col); R(-1, by + 10, 2, 1, col); }   // a brush
+    else { const fl = Math.sin(t * 0.3) * 3; ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(e.x - 4, e.y + by, 5, 3 + fl * 0.5, -0.4, 0, 6.3); ctx.ellipse(e.x + 4, e.y + by, 5, 3 - fl * 0.5, 0.4, 0, 6.3); ctx.fill(); R(-1, by - 3, 2, 7, '#fff6d8'); }   // a laugh, caught like a moth
+    if (e.near) { const nm = { voice: 'FATHER\'S VOICE', paint: 'THE FIRST PAINTING', laugh: 'NESSA LAUGHING' }[e.what], tw = SH.ptextW(nm, 1) + 8; R(-tw / 2, by - 24, tw, 9, '#0a0818'); SH.ptext(ctx, nm, Math.round(e.x - tw / 2 + 4), Math.round(e.y + by - 22), col, 1); }
   }
   function drawWoods(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
