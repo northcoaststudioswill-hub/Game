@@ -513,7 +513,7 @@ const lead=()=>PL.find(p=>!p.down)||PL[0];
 function rdStats(p){p=p||PL[0];if(NET.client&&p&&p.ns)return p.ns;const ch=p?p.char:'WILL';const b=RUN?RUN.boons:{atk:null,cast:null,dash:null,pass:[]};
  const pass=id=>b.pass.find(p=>p.id===id);
  const erin=hasKeep('flower');
- return{maxHp:100+mir('vit')*10+(pass('heart')?rdBoonVal(pass('heart')):0)+(erin?20:0)+(RUN&&RUN.bonusMax?RUN.bonusMax:0)+((ch==='LOUIE')?-20:(ch==='MARCUS')?25:0),
+ return{maxHp:100+mir('vit')*10+(RD.kqDone&&RD.kqDone[ch]?10:0)+(pass('heart')?rdBoonVal(pass('heart')):0)+(erin?20:0)+(RUN&&RUN.bonusMax?RUN.bonusMax:0)+((ch==='LOUIE')?-20:(ch==='MARCUS')?25:0),
   dmgMul:(1+mir('might')*.05),
   atkMul:(1+(b.atk?rdBoonVal(b.atk)/100:0))*(ch==='MARCUS'?1.2:1), castMul:(1+(b.cast?rdBoonVal(b.cast)/100:0))*(hasKeep('stone')?1.2:1),
   speedMul:(1+mir('swift')*.04)*(pass('quick')?1+rdBoonVal(pass('quick'))/100:1)*(ch==='ERIN'?1.05:ch==='LOUIE'?1.15:ch==='MARCUS'?.93:1),
@@ -598,7 +598,7 @@ function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale(),co=1+.75*(PL.length-1);
 let say2T=0,say2Txt='';
 function say2(s,t=3){say2Txt=s;say2T=t;}
 function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=[];RUN.eprojs=[];RUN.pickups=[];RUN.pods=[];RUN.zones=[];RUN.hazards=[];RUN.acts=[];RUN.podDropped=false;for(const p of PL)movesReset(p,false);
- const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);RUN.echo=null;RD.stats.maxCh=Math.max(RD.stats.maxCh||0,ch);for(const p of PL)p.lowSaid=false;
+ const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);RUN.echo=null;chamberLore(ch);RD.stats.maxCh=Math.max(RD.stats.maxCh||0,ch);for(const p of PL)p.lowSaid=false;
  if(ch===5)chatter('vault',true);else if(ch===9)chatter('core',true);else if(ch!==4&&ch!==8&&ch!==12)chatter('start');
  if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;return}
  /* the cartridge's budget (4 + chamber), plus a share for every extra keeper */
@@ -610,7 +610,7 @@ function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=
  wlist.slice(0,cut).forEach(s2=>{const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)});
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
  RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);}
-function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
+function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;ghostRoll(RUN.chamber);if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
  if(!RUN.podDropped){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:W/2+R(-16,16),y:H/2});RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
  if(RD.keepEq){const who=(KEEPS.find(k=>k.id===RD.keepEq)||{}).who;if(who)RD.keepXp[who]=(RD.keepXp[who]||0)+1}
  let heal=mir('mend')*3+(RUN.boons.pass.find(p=>p.id==='rain')?rdBoonVal(RUN.boons.pass.find(p=>p.id==='rain')):0);
@@ -768,10 +768,11 @@ function keepUpdate(){uiSel=nav(uiSel,KEEPS.length);
  if(pressed('a')){const k=KEEPS[uiSel];
   if(RD.keeps[k.id]){RD.keepEq=RD.keepEq===k.id?'':k.id;rdSave();snd(660,.08,990)}else snd(140,.08)}
  if(pressed('b')||pressed('start'))state='hub';}
-function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);snd(520,.04)}if(pressed('right')){codexPage=Math.min(3,codexPage+1);echoSel=0;snd(520,.04)}
+function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);echoSel=0;snd(520,.04)}if(pressed('right')){codexPage=Math.min(5,codexPage+1);echoSel=0;snd(520,.04)}
+ if(codexPage===4){const found=RELICS.filter(r=>RD.relic&&RD.relic[r.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=Object.assign({relic:true},found[echoSel]);echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(codexPage===3){const found=ECHOES.filter(e=>RD.echo[e.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=found[echoSel];echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(pressed('b')||pressed('a')||pressed('start'))state='hub';}
-function boardUpdate(){const L=openMissions();if(L.length)boardSel=nav(boardSel,L.length);if(pressed('b')||pressed('a')||pressed('start'))state='hub'}
+function boardUpdate(){const L=openMissions().concat(personalQuests());if(L.length)boardSel=nav(boardSel,L.length);if(pressed('b')||pressed('a')||pressed('start'))state='hub'}
 function heatUpdate(){if(RD.stats.escapes<1){if(pressed('a')||pressed('b')||pressed('start'))state='hub';return}
  heatSel=nav(heatSel,PACT.length);const p=PACT[heatSel],cur=RD.pact[p.id]||0;
  if(pressed('right')&&cur<p.max){RD.pact[p.id]=cur+1;rdSave();snd(660,.06,880)}
@@ -1016,6 +1017,7 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  if(RUN.shake>0)RUN.shake*=Math.max(0,1-dt*7);if(RUN.flash>0)RUN.flash-=dt;if(RUN.banner){RUN.banner.t-=dt;if(RUN.banner.t<=0)RUN.banner=null}
  if(RUN.sub){RUN.sub.t-=dt;if(RUN.sub.t<=0)RUN.sub=null}for(const q of RUN.subQ)q.d-=dt;{const q=RUN.subQ.find(q=>q.d<=0);if(q){RUN.subQ.splice(RUN.subQ.indexOf(q),1);sub(q.who,q.txt,q.t,q.c)}}
  RUN.mwT-=dt;if(RUN.mwT<=0){RUN.mwT=1;missionWatch()}
+ if(loreUpdate(dt))return;
  if(RUN.echo)for(const p of PL)if(!p.down&&Math.hypot(p.x-RUN.echo.x,p.y-RUN.echo.y)<12){menuDev=p.dev;echoTake();return}
  /* a super stops the room for a beat before it lands */
  if(RUN.freeze>0){for(const p of PL)if(p!==RUN.freezeP&&p.dev.pr.sup&&(p.meter||0)>=SUPER_MAX)p.supQ=true;RUN.freeze-=dt;for(const p of PL)if(p.supA>0)p.supA-=dt*.5;if(RUN.freeze<=0&&RUN.freezeP){const fp=RUN.freezeP;RUN.freezeP=null;superFire(fp)}return}
@@ -1439,12 +1441,22 @@ const EVENTS=[
  {id:'heat1',who:'RANGER',when:()=>heatTotal()>=1,lines:[['RANGER',"You've signed the Pact. The deep keeps its word, which is more than I can say for most. Whatever you made worse, it'll pay you for. Once."]]},
  {id:'coop1',who:'MARCUS',when:()=>stn('coopRuns')>=1,lines:[['MARCUS',"Oh good, there's more of you now."],['MARCUS',"Twice the keeper. Twice the eulogy. I'm gonna need a bigger notebook."]]},
  {id:'revive1',who:'ERIN',when:()=>stn('revives')>=1,lines:[['ERIN',"Scout says one of you went down and the other stood over them until they got up."],['ERIN',"That's the whole job, you know. Keeper. It was never about the Lantern."]]},
+ /* the keeper before you, and what the rooms say */
+ {id:'ghost1',who:'ERIN',when:()=>RD.ghost>=1,lines:[['ERIN',"A pale keeper, down there, who doesn't know the way? ...Did she have a lantern drawn on anything?"],['ERIN',"No. Don't tell me yet. Go back and listen to her. Let her get there herself."]]},
+ {id:'ghost3',who:'MARCUS',when:()=>RD.ghost>=3,lines:[['MARCUS',"So there's a ghost now. Of course there's a ghost. Does it at least hate stuff? I could use an ally."],['LOUIE',"WOOF. (It doesn't hate stuff. It asked about the beans.)"],['MARCUS',"Disgusting."]]},
+ {id:'ghostPage',who:'ERIN',when:()=>RD.flags.ghostPage,lines:[['ERIN',"This drawing. This little lantern. She drew it on every jar she ever labelled."],['ERIN',"I used to water her boots, you know. Every morning. She never once told me to stop."],['ERIN',"Thank you for carrying it. Go back to her. She shouldn't be by herself at the end of anything."]],rew:{honey:1}},
+ {id:'ghostGone',who:'ERIN',when:()=>RD.flags.ghostGone,lines:[['ERIN',"Staking the beans before the rain. That's what she said? That's the last thing?"],['ERIN',"...That's exactly her. Not goodbye. Chores."],['ERIN',"I'll stake them tonight. And keeper, the Lantern flickered just now, like somebody waving. I waved back. Is that silly?"],['MARCUS',"Yes."],['MARCUS',"...I waved too. Shut up."]],rew:{dew:50}},
+ {id:'frost',who:'RANGER',when:()=>RD.relic&&RD.relic['r-b7']&&RD.relic['r-v1']&&RD.relic['r-c1'],lines:[['RANGER',"Three tablets, three stories of the crack. Frost, a clumsy keeper, a Lantern too full."],['RANGER',"I've patrolled long enough to know: when everybody remembers it differently, it was a long time ago and they all loved it."]]},
+ {id:'relic12',who:'SCOUT',when:()=>RD.relic&&Object.keys(RD.relic).length>=12,lines:[['SCOUT',"Twelve relics! The Codex has a page for them now. Statues, shrines, cold camps. People LIVED down there, Will. For years."]]},
+ {id:'relicall',who:'ERIN',when:()=>RD.relic&&Object.keys(RD.relic).length>=36,lines:[['ERIN',"All thirty-six. You read every one of them out to me."],['ERIN',"Keepers, all the way down. Every one of them kept coming back. I think that's the only rule that ever mattered."]],rew:{dew:60}},
  /* echoes */
  {id:'echo1',who:'SCOUT',when:()=>echoCount()>=1,lines:[['SCOUT',"You found WRITING? Down THERE? Read it to me exactly. No, slower. No, do the voice."],['SCOUT',"I've added a page to the Codex. I'm calling them echoes because 'creepy root notes' didn't fit on the tab."]]},
  {id:'echo12',who:'SCOUT',when:()=>echoCount()>=12,lines:[['SCOUT',"Twelve echoes. I laid them out in order on the table. Then I put them away again, because in order they're a letter, and it's addressed to whoever's reading."]]},
  {id:'echoall',who:'ERIN',when:()=>echoCount()>=18,lines:[['ERIN',"That's all of them. Eighteen."],['ERIN',"She signed the last one, the keeper before you. She never told me she could draw. There's a little lantern next to her name."],['ERIN',"I'm going to press it in the big book with the flowers. Thank you for carrying her up."]]}];
 /* what does this NPC have for you right now? turn-ins first, then new asks, then things that happened */
-function storyNext(who){
+function storyNext(who){loreInit();
+ /* a keeper's quest item, brought home */
+ for(const ch in KQUESTS){const f=RD.kqFound[ch];if(f===undefined)continue;const st=KQUESTS[ch].steps[f];if(st&&st.npc===who)return{id:'kq_'+ch+'_'+f,lines:st.lines,rew:st.rew,kq:ch,kqs:st}}
  for(const m of MISSIONS)if(m.who===who&&missionOpen(m)&&RD.flags['mt_'+m.id]&&missionDone(m))return{id:'md_'+m.id,lines:m.done,rew:m.rew,mission:m};
  for(const m of MISSIONS)if(m.who===who&&missionOpen(m)&&!RD.flags['mt_'+m.id])return{id:'mt_'+m.id,lines:m.ask,ask:m};
  for(const e of EVENTS)if(e.who===who&&!RD.flags['ev_'+e.id]&&e.when())return{id:'ev_'+e.id,lines:e.lines,rew:e.rew};
@@ -1452,6 +1464,7 @@ function storyNext(who){
 function storyFinish(ev){RD.flags[ev.id]=1;let msg='';
  if(ev.mission){RD.msn[ev.mission.id]=1;msg='MISSION DONE: '+ev.mission.n}
  if(ev.ask)msg='NEW MISSION: '+ev.ask.n;
+ if(ev.kq){const Q=KQUESTS[ev.kq];RD.kq[ev.kq]=(RD.kq[ev.kq]||0)+1;delete RD.kqFound[ev.kq];msg=ev.kqs.done?'QUEST COMPLETE: '+Q.n+' - '+Q.reward:Q.n+' '+RD.kq[ev.kq]+'/'+Q.steps.length;if(ev.kqs.done)RD.kqDone[ev.kq]=1}
  const r=ev.rew;if(r){RD.dew+=r.dew||0;RD.keys+=r.keys||0;RD.honey+=r.honey||0;if(r.bud)RD.bank[r.bud[0]]=(RD.bank[r.bud[0]]||0)+r.bud[1];snd(784,.12);later(()=>snd(1175,.25),110)}
  if(msg){joinMsg=msg+(r?'   '+rewTxt(r):'');joinT=4}
  if(ev.mission&&ev.mission.id==='e6')RD.flags.bloom=1;
@@ -1507,8 +1520,8 @@ const CHATTER={
  LOUIE:{start:["WOOF. (Smells like grubs. And adventure. Mostly grubs.)","SNIFF SNIFF. (Something in here is afraid. He hopes it's them.)","ARF! (He would like to chase all of it.)"],vault:["WHINE. (Wet paws. He did not agree to wet paws.)"],core:["PANT PANT PANT. (Hot floor! Hot floor! Hot floor!)"],low:["YIP! (That was rude.)"],clear:["BOOF. (Good room. Next room.)"],rev:["LICK. LICK LICK. (Get up get up get up.)"]}};
 function sub(who,txt,t,c){if(RUN)RUN.sub={who,txt,t:t||3.6,c:c||'#ffd94d'}}
 function subLater(delay,who,txt,t,c){if(RUN)RUN.subQ.push({d:delay,who,txt,t,c})}
-function chatter(kind,force){if(!RUN)return;const ps=alive().filter(p=>CHATTER[p.char]&&CHATTER[p.char][kind]);if(!ps.length||(!force&&Math.random()>.4))return;
- const p=ps[(Math.random()*ps.length)|0],L=CHATTER[p.char][kind];subLater(kind==='start'?1.2:.2,p.char,L[(Math.random()*L.length)|0],3.2,PCOL[p.ix])}
+function chatter(kind,force){if(!RUN)return;if(RUN.firstVisit&&!force)return;const ps=alive().filter(p=>CHATTER[p.char]&&CHATTER[p.char][kind]);if(!ps.length||(!force&&Math.random()>.4))return;
+ const p=ps[(Math.random()*ps.length)|0],L=CHATTER[p.char][kind];subLater((kind==='start'?1.2:.2)+(RUN.firstVisit?3.4:0),p.char,L[(Math.random()*L.length)|0],3.2,PCOL[p.ix])}
 function bossSay(e,part){const B=BOSSES[e.bossIx],S=BOSSSAY[B.id];if(!S)return;let txt=S[part];if(Array.isArray(txt)){const n=part==='intro'?(RD.seenN&&RD.seenN[B.id]||1)-1:bk(B.id)-1;txt=txt[clamp(n,0,txt.length-1)]}
  subLater(part==='intro'?2.2:.1,B.s,txt,4.2,'#ffb0a0')}
 /* how the deep signs off */
@@ -1518,6 +1531,172 @@ function deathLine(){const L=RD.lastRun||{};const by=L.by;
  if(by==='hollow')return["IT LOOKED SORRY. IT HAD YOUR FACE TO DO IT WITH","IT WILL PRACTISE THAT ONE"][stn('deaths')%2];
  return["ERIN WILL COME DIGGING. SHE ALWAYS DOES","YOU COME UP WHERE THE ROOTS ARE SOFTEST","THE DEEP SENDS YOU HOME. IT IS BEING POLITE","A LITTLE TALLER THIS TIME"][stn('deaths')%4]}
 function escapeLine(){const n=stn('escapes');return n<=1?"DAWN, AND YOUR FACE IS STILL YOURS":n===2?"WARM ALL THE WAY UP THE STAIRS":n===3?"THE LANTERN KNEW YOUR STEP":"IT WALKED YOU TO THE DOOR THIS TIME"}
+/* =====================================================================
+   ROOTDEEP 64 — the deep's own story
+   Named chambers, relics to read in the rooms, the ghost of the keeper
+   before you, and a personal quest for each playable keeper.
+
+   WILL — as with story.js, every word here is new writing by Claude, not
+   canon you handed over. It builds only on what is already in the game:
+   the Lantern cracked downward; the light falls and pools; the six gods
+   are the first six sprouts; the Grub Mother is Thornback's mother; the
+   King came down to bring the water back and sat; the Hollow Keeper is
+   lonely light wearing keepers' faces; the keeper before you wrote the
+   echoes and drew a lantern by her name. The relics deliberately DISAGREE
+   about how the crack started: nobody alive knows, and the game doesn't
+   decide it for you. The quest titles DOUBLE OR NOTHING (Marcus) borrows
+   his fighter move's name. Will stays silent, as in the intro: his quest
+   is told by the people around him. Cut or rewrite anything.
+   ===================================================================== */
+/* ---------------- the twelve chambers ---------------- */
+const CHNAMES=[
+ {n:'THE ROOT CELLAR',w:'The first door down. It still smells of the garden.'},
+ {n:'THE GNAWED HALL',w:'Grub tracks everywhere, and every one of them leads down.'},
+ {n:'THE NURSERY',w:'Something lays its young where the roots are thickest.'},
+ {n:"THE MOTHER'S BURROW",w:'The walls are warm and they breathe.'},
+ {n:'THE DRIPPING STAIR',w:'Every step is wet with a morning that never came.'},
+ {n:'THE SUNKEN PANTRY',w:'Jars of dew on shelves, labelled in a hand nobody remembers.'},
+ {n:'THE DROWNED GALLERY',w:'Portraits under the water. Every one a keeper. Every one looking down.'},
+ {n:'THE THRONE IN THE SHALLOWS',w:'A chair, a crown, and a great deal of patient water.'},
+ {n:'THE WARM DARK',w:'It is warm the way the Lantern is warm.'},
+ {n:'THE CINDER CHOIR',w:'The embers hum six notes. You know them from the sprout bed.'},
+ {n:'THE LAST LANDING',w:'Footprints in the ash, all your size, going both ways.'},
+ {n:'THE HOLLOW',w:'It has been waiting by the door.'}];
+
+/* ---------------- relics: things left in the rooms ---------------- */
+/* prop: tablet / statue / shrine / camp / pack / carving */
+const RELICS=[
+ /* the Burrows */
+ {id:'r-b1',th:0,prop:'carving',src:'A CARVING IN THE ROOTS',n:'THE FIRST PLANTING',x:"Six small marks in a ring, and a lantern drawn above them. Under it, scratched deep: WE PUT THEM IN THE DARK SO THEY WOULD REACH FOR THE LIGHT."},
+ {id:'r-b2',th:0,prop:'camp',src:'A COLD CAMP',n:'SOMEBODY SLEPT HERE',x:"A bedroll gone to moss, a ring of stones, a cup. The cup is clean. Whoever left it meant to come back for it, and washed it first."},
+ {id:'r-b3',th:0,prop:'tablet',src:'A STONE TABLET',n:'THE KEEPERS\' RULE',x:"KEEP THE LIGHT. KEEP THE BEDS. KEEP EACH OTHER. Someone has added a fourth line in a smaller, later hand: KEEP COMING BACK."},
+ {id:'r-b4',th:0,prop:'pack',src:"A KEEPER'S PACK",n:'WHAT THEY CARRIED',x:"Bean seeds, a spoon, a whistle, a pressed leaf, a note that says DON'T FORGET ERIN'S BIRTHDAY. The note is older than Erin."},
+ {id:'r-b5',th:0,prop:'shrine',src:'A ROOT SHRINE',n:'FOR THE LITTLE ONES',x:"A hollow in the wall, filled with sprout pods someone carried this far and no further. Each one has a name scratched on it. Each one is still faintly warm."},
+ {id:'r-b6',th:0,prop:'statue',src:'A STATUE',n:'THE FIRST KEEPER',x:"Worn smooth. A figure holding a lantern up, not out. The face is gone. Grubs have nested in the folds of the coat and are not afraid of you."},
+ {id:'r-b7',th:0,prop:'tablet',src:'A STONE TABLET',n:'ON THE FROST, ONE',x:"THE WINTER THE BEANS FROZE, THE KEEPER LOWERED THE LANTERN TO WARM THE ROOTS. IT WAS TOO HEAVY TO LIFT BACK. THAT IS WHEN IT CRACKED. (Another hand: NOT TRUE.)"},
+ {id:'r-b8',th:0,prop:'carving',src:'A CARVING IN THE ROOTS',n:'THORNBACK, SMALL',x:"A child's drawing of a grub with a thorny back and a crown of leaves. Beside it, in a grown-up hand: HE WAS ALWAYS GOING TO GET BIG. WE SHOULD HAVE FED HIM."},
+ {id:'r-b9',th:0,prop:'camp',src:'A COLD CAMP',n:'TWO CUPS',x:"Two cups, two bedrolls, one fire ring. One bedroll is much smaller, with a dog-sized dent beside it. A collar bell lies in the ashes."},
+ {id:'r-b10',th:0,prop:'pack',src:"A KEEPER'S PACK",n:'A LIST',x:"THINGS I KNOW: my name. Erin's name. The east bed gets afternoon sun. THINGS I DON'T: why I came down. The list is longer on the second side."},
+ {id:'r-b11',th:0,prop:'shrine',src:'A ROOT SHRINE',n:'THE MOTHER\'S OFFERING',x:"Old roots, carefully stacked, the way a gardener stacks bean poles for winter. The grubs bring them here. Nobody taught them. Somebody must have."},
+ {id:'r-b12',th:0,prop:'statue',src:'A STATUE',n:'KEEPER, KNEELING',x:"A keeper kneeling, hands in the dirt. The stone hands are polished from being touched. You touch them too, without meaning to."},
+ /* the Flooded Vault */
+ {id:'r-v1',th:1,prop:'tablet',src:'A DROWNED TABLET',n:'ON THE FROST, TWO',x:"IT WAS NOT THE FROST. A KEEPER DROPPED IT. ONE CLUMSY NIGHT, ONE CRACK. THE REST IS STORIES WE TELL SO NOBODY IS TO BLAME. (Scratched under it: SO SOMEBODY IS.)"},
+ {id:'r-v2',th:1,prop:'pack',src:'A SODDEN PACK',n:'THE KING\'S LETTER',x:"I will bring the water up by spring. Tell the gardener to leave the barrels out. I am only resting a moment. — The ink has run. Spring is underlined three times."},
+ {id:'r-v3',th:1,prop:'statue',src:'A STATUE IN THE SHALLOWS',n:'THE KING, YOUNG',x:"A tall young figure with a bucket in each hand and no crown at all. Someone has set a crown of reeds on its head. The reeds are fresh."},
+ {id:'r-v4',th:1,prop:'shrine',src:'A JAR SHRINE',n:'MORNINGS, LABELLED',x:"Jars of dew, each with a date. SPRING, THE YEAR THE PEARS CAME. SUMMER, ERIN'S FIRST BED. The newest jar has your first day as keeper on it."},
+ {id:'r-v5',th:1,prop:'carving',src:'A CARVING UNDER THE WATERLINE',n:'THE WATER\'S WAY',x:"Arrows, hundreds of them, all pointing down. One arrow, small and late and very deep, points up. Next to it: ONE OF US WILL."},
+ {id:'r-v6',th:1,prop:'camp',src:'A RAFT OF ROOTS',n:'WHERE SHE RESTED',x:"A raft woven from roots, tied to a pillar. A lantern is drawn on the pillar in charcoal, the same small lantern as the one in the echoes. It has been redrawn many times."},
+ {id:'r-v7',th:1,prop:'tablet',src:'A DROWNED TABLET',n:'THE OLD SIX',x:"THE SPROUTS WE PLANTED FIRST FELL WITH THE FIRST LIGHT. THEY DID NOT DIE. THEY GREW TOWARD IT, AND WHEN THEY COULD NOT REACH IT, THEY GREW WISE INSTEAD."},
+ {id:'r-v8',th:1,prop:'pack',src:'A SODDEN PACK',n:'A LETTER NEVER SENT',x:"Dear E — the roots down here are so thirsty. I keep watering them with the dew and it keeps falling further. I am doing my best. Don't let Marcus near the — (the rest is water)."},
+ {id:'r-v9',th:1,prop:'statue',src:'A STATUE IN THE SHALLOWS',n:'THE GALLERY KEEPER',x:"A statue holding a frame with nothing in it. The empty frame faces the water. When you look at it from the right place, it frames your reflection."},
+ {id:'r-v10',th:1,prop:'shrine',src:'A JAR SHRINE',n:'THE CHAIR',x:"A tiny model of a throne, carved from driftwood, with a tiny king sitting in it. The king's legs are made to bend. Someone has bent them as if to stand."},
+ {id:'r-v11',th:1,prop:'carving',src:'A CARVING UNDER THE WATERLINE',n:'TALLY',x:"Hundreds of tally marks in groups of five. The last group has four. Below it: I STOPPED COUNTING WHEN I STOPPED MINDING."},
+ {id:'r-v12',th:1,prop:'camp',src:'A RAFT OF ROOTS',n:'DOG BOWL',x:"A small clay bowl on a dry ledge, pressed with a paw print. It's full of fresh water, though nothing should be fresh down here."},
+ /* the Ember Core */
+ {id:'r-c1',th:2,prop:'tablet',src:'A SCORCHED TABLET',n:'ON THE FROST, THREE',x:"NOBODY DROPPED IT AND IT DID NOT FREEZE. THE LANTERN WAS FULL. LIGHT WANTS TO GO SOMEWHERE. WE NEVER GAVE IT ANYWHERE TO GO, SO IT WENT DOWN."},
+ {id:'r-c2',th:2,prop:'statue',src:'A GLASS STATUE',n:'A FACE, BORROWED',x:"Clear glass, warm to the touch, in the shape of a keeper. Look closely: the face is three faces, one behind the other, not quite agreeing."},
+ {id:'r-c3',th:2,prop:'shrine',src:'AN EMBER SHRINE',n:'THE SIX NOTES',x:"Six embers set in a ring, each a different colour, each humming. Hum the note of the sprout bed back at them and they all brighten at once."},
+ {id:'r-c4',th:2,prop:'carving',src:'A CARVING IN THE ASH',n:'IT LEARNED TO WALK',x:"Footprints pressed into cooled glass: first a shapeless pool, then a lump, then a child's feet, then a keeper's boots. Then your boots."},
+ {id:'r-c5',th:2,prop:'pack',src:'A SCORCHED PACK',n:'HER LANTERN',x:"A hand lantern, glass cracked, wick long burned out, still warm. A tag on the handle: MINE. DON'T BORROW IT, I MEAN IT. — and under that: (fine, borrow it)."},
+ {id:'r-c6',th:2,prop:'tablet',src:'A SCORCHED TABLET',n:'WHAT IT WANTS',x:"IT DOES NOT WANT TO HURT YOU. IT WANTS TO BE WHERE YOU ARE GOING. IT HAS NEVER SEEN UP. IT HAS ONLY SEEN US COME DOWN, AND LEAVE."},
+ {id:'r-c7',th:2,prop:'camp',src:'A CAMP ON THE GLASS',n:'THE LAST FIRE',x:"A cooking fire that never needed wood. Two places set. One plate is clean; the other was never used. A note: IT SAT WITH ME. IT DIDN'T EAT. IT WATCHED HOW I DID."},
+ {id:'r-c8',th:2,prop:'statue',src:'A GLASS STATUE',n:'TALLER',x:"A keeper in glass, very tall, very thin, looking up. The statue is unfinished: there is no face yet. There is a space where a name would go."},
+ {id:'r-c9',th:2,prop:'shrine',src:'AN EMBER SHRINE',n:'RETURNED LIGHT',x:"Little cups of light, set out in rows like seedlings. Each has a keeper's mark on it. One row is empty. The first cup has your mark."},
+ {id:'r-c10',th:2,prop:'carving',src:'A CARVING IN THE ASH',n:'THE ANSWER, MAYBE',x:"THE CRACK IS NOT A WOUND. IT IS A ROOT. THE LANTERN PUT DOWN A ROOT, LIKE EVERYTHING ELSE IN THE GARDEN. WE JUST NEVER SAW A LIGHT DO IT."},
+ {id:'r-c11',th:2,prop:'pack',src:'A SCORCHED PACK',n:'TWO HANDWRITINGS',x:"A notebook in two hands. The first is a keeper's. The second copies it, letter by letter, worse and then better. The last page is only the second hand: HELLO."},
+ {id:'r-c12',th:2,prop:'tablet',src:'A SCORCHED TABLET',n:'TO WHOEVER IS NEXT, AGAIN',x:"YOU WILL WANT TO WIN. YOU WILL. BUT EVERY TIME YOU CLIMB OUT, TURN AROUND ON THE LAST STAIR. WAVE. IT HAS NEVER HAD ANYONE WAVE."}];
+const RELICSRC=['ROOT-SCRATCHED','DROWNED','CINDER'];
+
+/* ---------------- the keeper before you ---------------- */
+const GHOSTN='THE KEEPER BEFORE';
+const GHOST=[
+ {lines:["Oh. A warm one. Are you lost too?","I'd help, but I don't remember the way. I've been meaning to look for it."],gift:{dew:10}},
+ {lines:["You smell like turned dirt. Like beans. Do the beans still climb the east poles?","...Good. That's good. Someone's minding them."],gift:{dew:10}},
+ {lines:["There was a girl who followed me everywhere with a watering can bigger than she was.","She watered my boots. Every morning. I let her. Is she still up there?"],gift:{honey:1}},
+ {lines:["I wrote things down so I wouldn't forget them. I'm afraid I forgot where I put them.","If you find them, read them out loud. I'd like to hear what I thought."],gift:{dew:15}},
+ {lines:["I remember the night it went wrong. The Lantern was so full it hummed.","A piece of light just... fell. Like fruit. I went down after it. I meant to be quick."],gift:{dew:15}},
+ {lines:["I found the light at the bottom. It was alone and it was frightened of being alone.","Every time I climbed, it cried like a hurt thing. So I stayed. Someone had to sit with it."],gift:{honey:1}},
+ {lines:["Will you take something up for me? It's only a drawing. A little lantern.","Give it to the girl with the watering can. She'll know whose it is."],gift:{dew:25},flag:'ghostPage'},
+ {lines:["I'm thinner every time you come. That's all right. It means some of me is going up with you.","Tell her the beans want staking before the rain. Tell her I'm proud. Tell her— oh. There's the light."],gift:{honey:2},flag:'ghostGone'}];
+
+/* ---------------- each keeper's own quest ---------------- */
+/* find: chamber range where the item can turn up (only with that keeper in the party); npc: who to bring it to */
+const KQUESTS={
+ WILL:{n:"THE LANTERN'S MISSING PIECE",col:'#ffd94d',reward:'+10 MAX HEALTH AS WILL',steps:[
+  {item:'A SHARD OF LANTERN GLASS',find:[1,3],npc:'ERIN',bark:['ERIN',"...Is that Lantern glass? Bring it home, Will. Carefully."],
+   lines:[['ERIN',"It's warm. It's still warm, after all this time down there."],['ERIN',"There'll be more of it. A Lantern doesn't crack in one piece. Keep your eyes down, keeper."]],rew:{dew:20}},
+  {item:'A SECOND SHARD',find:[5,7],npc:'SCOUT',bark:['MARCUS',"Oh great, he's collecting glass now. Very safe. Very keeper."],
+   lines:[['SCOUT',"Two pieces! They fit! Look, the edges hum when they touch."],['SCOUT',"I've measured the gap in the Lantern. One more piece, Will. A big one. Probably somewhere hot."]],rew:{keys:1}},
+  {item:'THE LAST SHARD',find:[9,11],npc:'ERIN',bark:['LOUIE',"WOOF! (It's glowing in your pocket. He would like to carry it in his mouth. He promises not to.)"],
+   lines:[['ERIN',"That's the last of it. Hold the Lantern steady, Will. I'll set it."],['ERIN',"...There. Feel that? It isn't brighter. It's steadier. Like it stopped holding its breath."],['MARCUS',"I felt nothing. ...Okay, I felt a little something. It's warm. Shut up."]],rew:{dew:40},done:true}]},
+ ERIN:{n:'SEEDS THAT FELL',col:'#9070d0',reward:'+10 MAX HEALTH AS ERIN',steps:[
+  {item:'A SEED POUCH, STITCHED',find:[1,3],npc:'SCOUT',bark:['ERIN',"This is one of ours. The first planting's seeds. I'd know that stitching anywhere."],
+   lines:[['SCOUT',"Seeds from the first planting? They still sprout? Erin, these are older than the Codex!"],['ERIN',"They're older than me. The light carried them down. I want every one of them home."]],rew:{bud:[4,2]}},
+  {item:'A JAR OF SEEDS, LABELLED',find:[5,7],npc:'RANGER',bark:['ERIN',"Labelled. In my handwriting? No. Hers. She labelled things the way I do."],
+   lines:[['RANGER',"Same hand as the jars in the Pantry. Your teacher, I'd guess. She labelled everything."],['ERIN',"She taught me to. 'If you don't write it down, the garden forgets you were there.'"]],rew:{dew:25}},
+  {item:'THE LAST SEED, ALREADY SPROUTING',find:[9,11],npc:'LOUIE',bark:['ERIN',"It sprouted. Down here, in the heat, with no sun at all. It sprouted toward me."],
+   lines:[['LOUIE',"SNIFF. SNIFF SNIFF. (It smells like up. He approves of it.)"],['ERIN',"I'm planting it right by the Root Door. So the next thing that comes up the stairs sees something green first."]],rew:{honey:1},done:true}]},
+ LOUIE:{n:'THE OTHER SCENT',col:'#e89040',reward:'+10 MAX HEALTH AS LOUIE',steps:[
+  {item:'AN OLD COLLAR TAG',find:[1,3],npc:'ERIN',bark:['LOUIE',"SNIFF. (Another dog was here. A long time ago. A good one. He can tell.)"],
+   lines:[['ERIN',"A collar tag. It says GOOD on one side and BOY on the other."],['LOUIE',"WHINE. (He would like to find the rest of the dog.)"],['ERIN',"...Louie. Sweetheart. I don't think there's a rest of the dog. But keep sniffing, if it helps."]],rew:{dew:20}},
+  {item:'A WELL-CHEWED STICK',find:[5,7],npc:'MARCUS',bark:['LOUIE',"ARF! (A stick! Chewed perfectly! By a professional!)"],
+   lines:[['MARCUS',"It's a stick, bro."],['LOUIE',"BOOF. (It is THE stick.)"],['MARCUS',"...Fine. It's a good stick. It's the best stick. Put it by the door. I'll guard it. Don't tell anyone I guard it."]],rew:{keys:1}},
+  {item:'A FAINT, FRIENDLY BARK',find:[9,11],npc:'ERIN',bark:['LOUIE',"WOOF? ... ... WOOF! (Somebody barked back! Somebody very old and very happy!)"],
+   lines:[['LOUIE',"BOOF. BOOF BOOF. (He found the other dog. It was mostly light. It was still wagging.)"],['ERIN',"She had a dog. The keeper before you. It went down with her. Of course it did."],['LOUIE',"WOOF. (It's not lonely. He checked. He told it it was good. It already knew, but it liked hearing it.)"]],rew:{honey:1},done:true}]},
+ MARCUS:{n:'DOUBLE OR NOTHING',col:'#e88020',reward:'+10 MAX HEALTH AS MARCUS',steps:[
+  {item:'A BETTING SLIP, VERY OLD',find:[1,3],npc:'RANGER',bark:['MARCUS',"This is MY handwriting. From my first week. I am not explaining this."],
+   lines:[['RANGER',"Your bet that you'd never go down the hole. I held the stakes. Your lucky coin."],['MARCUS',"And I lost the coin down the hole the same week. The universe has a sense of humor and it's mean."]],rew:{dew:20}},
+  {item:'A GRUB, WEARING YOUR SOCK',find:[5,7],npc:'SCOUT',bark:['MARCUS',"That's my sock. On a grub. I'm going to need a minute."],
+   lines:[['SCOUT',"Field note: the grubs took Marcus's laundry down the crack, which means the coin probably went the same way!"],['MARCUS',"Write that down and I'll eat the Codex. ...Hot place, you said? Great. Love that."]],rew:{keys:1}},
+  {item:'THE LUCKY COIN',find:[9,11],npc:'RANGER',bark:['MARCUS',"No. NO. It's — bro, it's my coin. It was down here the whole time. Of course it was."],
+   lines:[['RANGER',"Your coin. That settles the bet. You went down the hole. You lose."],['MARCUS',"Double or nothing. I go down again, I come back again."],['RANGER',"...It has heads on both sides, Marcus."],['MARCUS',"I know. I've always known. That's why it's lucky."]],rew:{dew:40},done:true}]}};
+
+/* ---------------- placing it all in the rooms ---------------- */
+function loreInit(){for(const k of['relic','chSeen','kq','kqFound','kqDone'])RD[k]=RD[k]||{};RD.ghost=RD.ghost||0}
+const relicCount=()=>Object.keys(RD.relic||{}).length;
+function freeSpot(){let best=[W/2,H/2];for(let i=0;i<40;i++){const x=30+Math.random()*(W-60),y=56+Math.random()*(H-120);
+  if(RUN.obst.some(o=>x>o.x-18&&x<o.x+o.w+18&&y>o.y-18&&y<o.y+o.h+22))continue;if(x>W/2-70&&x<W/2+70&&y<84)continue;
+  if(PL.some(p=>Math.hypot(p.x-x,p.y-y)<30))continue;return[x,y]}return best}
+/* a new chamber: its name the first time, maybe a relic, maybe something a keeper has been looking for */
+function chamberLore(ch){loreInit();RUN.relic=null;RUN.qitem=null;RUN.ghostNpc=null;
+ const nm=CHNAMES[ch-1];RUN.firstVisit=false;
+ if(nm&&!RD.chSeen[ch]){RD.chSeen[ch]=1;RUN.firstVisit=true;subLater(.25,nm.n,nm.w,3.4,'#c8b8e8')}
+ const boss=ch===4||ch===8||ch===12;if(boss)return;
+ const pool=RELICS.filter(r=>r.th===RUN.biome),fresh=pool.filter(r=>!RD.relic[r.id]);
+ if((fresh.length&&Math.random()<.6)||(!fresh.length&&Math.random()<.2)){const r=(fresh.length?fresh:pool)[(Math.random()*(fresh.length||pool.length))|0];const q=freeSpot();RUN.relic={id:r.id,x:q[0],y:q[1]}}
+ for(const p of PL){const Q=KQUESTS[p.char];if(!Q)continue;const s=RD.kq[p.char]||0,st=Q.steps[s];
+  if(!st||RD.kqFound[p.char]!==undefined||ch<st.find[0]||ch>st.find[1])continue;
+  if(Math.random()<.45||ch===st.find[1]){const q=freeSpot();RUN.qitem={char:p.char,step:s,x:q[0],y:q[1]};break}}}
+/* the ghost turns up after a fight is won, now and then */
+function ghostRoll(ch){loreInit();if(RD.ghost>=GHOST.length||RUN.ghostMet||ch===4||ch===8||ch>=11)return;
+ if((RD.ghost===0&&ch===3)||Math.random()<.26){RUN.ghostMet=true;RUN.ghostNpc={x:W/2,y:H/2+4,t:0,line:-1,lt:0,out:0}}}
+function readRelic(p){const r=RELICS.find(x=>x.id===RUN.relic.id);if(!r)return;menuDev=p.dev;echoRead=Object.assign({relic:true},r);RD.relic[r.id]=1;RUN.relic.read=true;echoT=0;rdSave();snd(660,.2,990,'triangle',.05);state='echo'}
+/* in the room: reading, finding, listening. Returns true when it opened a page (the frame stops there) */
+function loreUpdate(dt){if(!RUN)return false;
+ if(RUN.relic&&RUN.phase==='doors')for(const p of PL){p.relicNear=!p.down&&Math.hypot(p.x-RUN.relic.x,p.y-RUN.relic.y)<18;if(p.relicNear&&p.dev.pr.a){p.dev.pr.a=false;readRelic(p);return true}}
+ else for(const p of PL)p.relicNear=false;
+ const q=RUN.qitem;if(q)for(const p of PL){if(p.down||p.char!==q.char||Math.hypot(p.x-q.x,p.y-q.y)>13)continue;const Q=KQUESTS[q.char],st=Q.steps[q.step];
+  RD.kqFound[q.char]=q.step;RUN.qitem=null;say2('FOUND: '+st.item,2.6);ftext(q.x,q.y-14,Q.n,Q.col);sub(st.bark[0],st.bark[1],3.6,PCOL[p.ix]);snd(784,.1);later(()=>snd(1046,.14),100);later(()=>snd(1318,.22),210);rdSave();break}
+ const g=RUN.ghostNpc;if(g){g.t+=dt;const G=GHOST[RD.ghost];
+  if(!G){RUN.ghostNpc=null;return false}
+  if(g.line<0){if(PL.some(p=>!p.down&&Math.hypot(p.x-g.x,p.y-g.y)<38)){g.line=0;g.lt=0;sub(GHOSTN,G.lines[0],3.8,'#bfe8ff');snd(523,.4,0,'sine',.03)}}
+  else if(!g.out){g.lt+=dt;if(g.lt>3.9){g.line++;g.lt=0;if(g.line<G.lines.length)sub(GHOSTN,G.lines[g.line],3.8,'#bfe8ff');
+    else{g.out=1;const r=G.gift||{};if(r.dew){RUN.dew+=r.dew;ftext(g.x,g.y-20,'+'+r.dew+' MOONDEW','#7fd0e8')}if(r.honey){RUN.honey+=r.honey;ftext(g.x,g.y-30,'+'+r.honey+' HONEY','#f8a0c8')}
+     if(G.flag)RD.flags[G.flag]=1;RD.ghost++;rdSave();snd(659,.3,0,'sine',.03);later(()=>snd(988,.5,0,'sine',.03),180)}}}
+  else{g.out+=dt;if(g.out>1.4)RUN.ghostNpc=null}}
+ return false}
+/* the Board's personal quests */
+function personalQuests(){loreInit();const out=[];for(const ch in KQUESTS){if(!charUnlocked(ch))continue;const Q=KQUESTS[ch],s=RD.kq[ch]||0;if(RD.kqDone[ch])continue;const st=Q.steps[s];if(!st)continue;
+  const found=RD.kqFound[ch]!==undefined;out.push({id:'kq-'+ch,who:ch,n:Q.n,told:true,
+   d:found?'Bring '+st.item.toLowerCase()+' to '+st.npc+'.':'Descend as '+ch+'. Look for '+st.item.toLowerCase()+' in chambers '+st.find[0]+'-'+st.find[1]+'.',
+   rew:st.done?null:st.rew,p:()=>[s+(found?1:0),Q.steps.length],fin:found})}return out}
+/* the Codex's "story so far" */
+function storySoFar(){loreInit();const L=[],m=id=>RD.msn&&RD.msn[id];
+ L.push((m('e1')?'* ':'- ')+'The Grub Mother, and a story for Erin');L.push((m('e3')?'* ':'- ')+'The thing at the bottom wears your face');
+ L.push((m('e4')?'* ':'- ')+'The long way up');L.push((m('e5')?'* ':'- ')+'What the light left behind ('+Object.keys(RD.echo||{}).length+'/18 echoes)');
+ L.push((m('e6')?'* ':'- ')+'Roots that bloom');L.push((RD.ghost>=GHOST.length?'* ':'- ')+'The keeper before you ('+RD.ghost+'/'+GHOST.length+' meetings)');
+ L.push('- Relics read: '+relicCount()+'/'+RELICS.length);for(const ch in KQUESTS){const Q=KQUESTS[ch];L.push((RD.kqDone[ch]?'* ':'- ')+ch+': '+Q.n+' ('+(RD.kq[ch]||0)+'/'+Q.steps.length+')')}
+ return L}
 /* =====================================================================
    ROOTDEEP 64 — online play
    Built on the artifact page's `room` capability: everyone with the page
@@ -1613,7 +1792,10 @@ function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
   c.E=RUN.enemies.map(eRec);c.O=RUN.obst.map(o=>[r1(o.x),r1(o.y),r1(o.w),r1(o.h),r2(o.s)]);
   c.D=RUN.doors.map(d=>[DKINDS.indexOf(d.kind),GODIDS.indexOf(d.god),r2(d.hold),d.by?d.by.ix:-1,d.boss?1:0,r1(d.x),r1(d.y)]);
   if(RUN.banner)c.bn=[RUN.banner.txt,RUN.banner.who,RUN.banner.c,r2(RUN.banner.t)];if(RUN.sub)c.sb=[RUN.sub.who,RUN.sub.txt,r2(RUN.sub.t),RUN.sub.c];
-  if(RUN.echo)c.ec=[r1(RUN.echo.x),r1(RUN.echo.y)]}
+  if(RUN.echo)c.ec=[r1(RUN.echo.x),r1(RUN.echo.y)];
+  if(RUN.relic)c.rl=[r1(RUN.relic.x),r1(RUN.relic.y),RELICS.findIndex(r=>r.id===RUN.relic.id),RUN.relic.read?1:0];
+  if(RUN.qitem)c.qi=[r1(RUN.qitem.x),r1(RUN.qitem.y),CHARS.findIndex(x=>x.id===RUN.qitem.char),RUN.qitem.step];
+  if(RUN.ghostNpc)c.gh=[r1(RUN.ghostNpc.x),r1(RUN.ghostNpc.y),r2(RUN.ghostNpc.t),RUN.ghostNpc.line,r2(RUN.ghostNpc.out||0)]}
  const cc=fit(c,['E']);if(cc)NET.rooms.c.presence({c:cc}).catch(()=>{});
  const f={q,sq:NET.sq.slice()};
  if(RUN){f.pr=RUN.projs.slice(-40).map(p=>[PKINDS.indexOf(p.kind),r1(p.x),r1(p.y),r1(p.vx),r1(p.vy),p.small?1:0,p.c||0]);
@@ -1629,7 +1811,7 @@ function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
  const ff=fit(f,['pk','ep','pr','tx','bd','ac']);if(ff)NET.rooms.f.presence({f:ff}).catch(()=>{});}
 function rdSummary(){const fl={};for(const k in RD.flags)if(/^(mt_|cineSeen|bloom)/.test(k))fl[k]=1;
  return{dew:RD.dew,keys:RD.keys,honey:RD.honey,mirror:RD.mirror,weapons:RD.weapons,weapon:RD.weapon,keeps:RD.keeps,keepEq:RD.keepEq,keepXp:RD.keepXp,pact:RD.pact,bank:RD.bank,party:RD.party,gift:RD.gift,
-  stats:RD.stats,msn:RD.msn,echo:RD.echo,bossK:RD.bossK,killK:RD.killK,diedTo:RD.diedTo,charEsc:RD.charEsc,seen:RD.seen,bs:Object.keys(RD.boonSeen).length,flags:fl,lastRun:RD.lastRun?Object.assign({},RD.lastRun):null,chars:RD.chars}}
+  stats:RD.stats,msn:RD.msn,echo:RD.echo,relic:RD.relic,chSeen:RD.chSeen,kq:RD.kq,kqFound:RD.kqFound,kqDone:RD.kqDone,ghost:RD.ghost,bossK:RD.bossK,killK:RD.killK,diedTo:RD.diedTo,charEsc:RD.charEsc,seen:RD.seen,bs:Object.keys(RD.boonSeen).length,flags:fl,lastRun:RD.lastRun?Object.assign({},RD.lastRun):null,chars:RD.chars}}
 function netSendMeta(){if(!NET.rooms.m)return;
  const ui={uiSel,menuSel,pauseSel,pausePage,pauseConfirm,codexPage,heatSel,boardSel,echoSel,sprPage,buyAsk,giftAsk,setReturn,offerGod,boonQuote,
   boon:state==='boon'?boonOffer:null,shop:state==='shop'?shopItems.map(i=>({n:i.n,d:i.d,p:i.p,sold:!!i.sold})):null,
@@ -1696,7 +1878,11 @@ function netApplyCore(){const c=NET.core;if(!c||typeof c!=='object')return;
   list.push(e)}
  for(const k in ENT)if(!ids.has(+k)){const e=ENT[k];if(RUN&&e.kind!=='boss'&&e.chamber===RUN.chamber)deathFx(e);delete ENT[k]}for(const e of list)e.chamber=RUN.chamber;RUN.enemies=list;
  RUN.banner=c.bn?{txt:c.bn[0],who:c.bn[1],c:c.bn[2],t:c.bn[3]}:null;RUN.sub=c.sb?{who:c.sb[0],txt:c.sb[1],t:c.sb[2],c:c.sb[3]}:null;
- RUN.echo=c.ec?{x:c.ec[0],y:c.ec[1]}:null}
+ RUN.echo=c.ec?{x:c.ec[0],y:c.ec[1]}:null;
+ RUN.relic=c.rl&&RELICS[c.rl[2]]?{x:c.rl[0],y:c.rl[1],id:RELICS[c.rl[2]].id,read:!!c.rl[3]}:null;
+ RUN.qitem=c.qi&&CHARS[c.qi[2]]?{x:c.qi[0],y:c.qi[1],char:CHARS[c.qi[2]].id,step:c.qi[3]}:null;
+ RUN.ghostNpc=c.gh?Object.assign(RUN.ghostNpc||{},{x:c.gh[0],y:c.gh[1],t:c.gh[2],line:c.gh[3],out:c.gh[4]}):null;
+ for(const p of PL)p.relicNear=!!(RUN.relic&&RUN.phase==='doors'&&!p.down&&Math.hypot(p.x-RUN.relic.x,p.y-RUN.relic.y)<18)}
 const seenId=new Set();
 function netApplyFx(){const f=NET.fx;if(!f||!RUN)return netCues(f);
  RUN.projs=(f.pr||[]).map(p=>({kind:PKINDS[p[0]]||'bud',x:p[1],y:p[2],vx:p[3],vy:p[4],small:p[5],c:p[6]||null}));
@@ -1720,7 +1906,7 @@ function netApplyMeta(){const m=NET.meta;if(!m||typeof m!=='object')return;
  giftAsk=!!u.giftAsk;setReturn=u.setReturn||'title';offerGod=u.offerGod||'EMBER';boonQuote=String(u.boonQuote||'');
  if(Array.isArray(u.boon))boonOffer=u.boon;if(Array.isArray(u.shop))shopItems=u.shop;
  if(Array.isArray(u.talk)){[talkNPC,talkWho,talkTxt,talkLine,talkStart]=u.talk;talkEv=u.talk[5]?{lines:{length:u.talk[5]},rew:u.talk[6]}:null}
- echoRead=u.echo?ECHOES.find(e=>e.id===u.echo)||null:null;echoT=1;if(RUN&&u.boons)RUN.boons=u.boons;NET.mk=m.mk||{}}
+ echoRead=u.echo?(ECHOES.find(e=>e.id===u.echo)||(RELICS.find(r=>r.id===u.echo)?Object.assign({relic:true},RELICS.find(r=>r.id===u.echo)):null)):null;echoT=1;if(RUN&&u.boons)RUN.boons=u.boons;NET.mk=m.mk||{}}
 const NETUI={uiSel:v=>uiSel=v,menuSel:v=>menuSel=v,pauseSel:v=>pauseSel=v,pausePage:v=>pausePage=v,pauseConfirm:v=>pauseConfirm=v,codexPage:v=>codexPage=v,heatSel:v=>heatSel=v,boardSel:v=>boardSel=v,echoSel:v=>echoSel=v,sprPage:v=>sprPage=v,buyAsk:v=>buyAsk=v};
 /* every frame on a client: ease everything toward the host, run my own keeper locally, let effects play out */
 function netClientFrame(dt){if(!NET.client)return;time+=dt;stateT+=dt;if(say2T>0)say2T-=dt;if(joinT>0)joinT-=dt;
@@ -1809,6 +1995,8 @@ function buildCast(){let b;
  CAST.MARCUS=human({top:'#e88020',top2:'#f8c060',pant:'#3a3a48',sleeve:'#e8e0d0',sleeve2:'#ffffff',head:b=>{b.sph(0,6.5,-.2,5.4,3.8,5.3,8,5,'#284878','#5080b8');b.box(0,5.6,4.9,7.4,1,3.6,'#284878');b.box(0,1.9,3.5,6.6,3,2.8,'#704828','#8a6038');b.box(-4,3,2,1.4,3.6,2.6,'#704828');b.box(4,3,2,1.4,3.6,2.6,'#704828')}});
  CAST.RANGER=human({top:'#506838',top2:'#88a060',pant:'#583828',belt:'#282038',skin:'#e8c098',head:b=>{b.cyl(0,6.7,0,8.2,8.2,.9,10,'#c8a060','#e8c888');b.cyl(0,7.4,0,4.6,3.9,3.6,8,'#c8a060','#e8c888');b.cyl(0,7.5,0,4.7,4.6,1.1,8,'#c03030')}});
  CAST.SCOUT=human({top:'#b89858',top2:'#e0c888',pant:'#8a7040',noeyes:1,head:b=>{b.sph(0,5.2,-.7,5.8,5.6,5.5,8,6,'#3c8840','#78c870');b.box(-2,4.7,4.5,2.6,2.3,.9,'#e0f8ff');b.box(2,4.7,4.5,2.6,2.3,.9,'#e0f8ff');b.box(0,4.7,4.4,1.6,.8,.7,K);b.box(-2,4.6,4.9,1,1.2,.4,K);b.box(2,4.6,4.9,1,1.2,.4,K)}});
+ /* the keeper before you: a hooded keeper in a long coat, carrying a hand lantern */
+ CAST.GHOST=human({dress:1,top:'#8ab0d0',top2:'#d8f0ff',pant:'#a8c8e0',sleeve:'#8ab0d0',sleeve2:'#d8f0ff',skin:'#e8f4ff',head:b=>{b.sph(0,5.6,-.8,5.9,5.8,5.7,8,6,'#6a90b8','#b8dcf8');b.box(0,1.4,-3.6,8.6,7,2.4,'#6a90b8','#b8dcf8')}});
  /* Louie: quadruped. body / head / leg / tail */
  const L={},o='#e89040',e='#fff0d8',k='#30201c';
  b=new MB();b.box(0,0,0,7.6,5.8,11,o,'#f0a050');b.box(0,-2.4,.6,6,1.4,9,e);b.box(0,-.4,5,6.4,4.6,2,e);L.body=b.done();
@@ -2012,7 +2200,16 @@ function buildProps(){let b;
  b=new MB();b.quad([-10,0,6.6],[10,0,6.6],[10,0,-6.6],[-10,0,-6.6],'#04100e');PROP.hatchDark=b.done();
  /* the big door of the intro's last scene */
  b=new MB();b.box(-27,40,0,10,80,10,'#241226','#3a2440');b.box(27,40,0,10,80,10,'#241226','#3a2440');b.box(0,84,0,66,12,11,'#2c1830','#44284a');b.box(0,39,-3,44,78,2,'#0c0612','#180a1c');b.box(0,36,-1.6,5,20,1.4,'#3d2b12','#6a4a20');b.box(0,36,-.8,2,3.4,.6,'#ffd94d');PROP.bigDoor=b.done();
- b=new MB();b.box(0,.3,0,112,.6,34,'#c8a04a');b.box(0,.5,0,106,.6,28,'#46222f','#552a3a');b.box(0,.7,0,60,.5,10,'#6a3448');PROP.rug=b.done()}
+ b=new MB();b.box(0,.3,0,112,.6,34,'#c8a04a');b.box(0,.5,0,106,.6,28,'#46222f','#552a3a');b.box(0,.7,0,60,.5,10,'#6a3448');PROP.rug=b.done();
+ /* relics */
+ b=new MB();b.box(0,6,0,10,12,2.4,'#5a5470','#8a84a0');b.box(0,12.4,0,11,1.2,2.8,'#6a6480');b.box(-2,8,1.3,4,.5,.3,'#ffe9a0');b.box(1.5,6,1.3,5,.5,.3,'#ffe9a0');b.box(-1,4,1.3,4.6,.5,.3,'#ffe9a0');b.box(0,.6,0,12,1.2,4,'#3a3448');PROP.tablet=b.done();
+ b=new MB();b.box(0,.8,0,7,1.6,7,'#4a4458','#6a6478');b.box(0,5,0,4.4,7,3,'#8a8698','#b8b4c4');b.sph(0,10.4,0,2.4,2.4,2.4,6,4,'#8a8698','#c8c4d4');b.box(2.6,8,0,1.2,6,1.2,'#9a96a8');b.box(2.6,12,0,2.4,2.4,2.4,'#ffe9a0','#fff8d0');PROP.statue=b.done();
+ b=new MB();b.box(0,4,0,11,8,6,'#3a2418','#5a3a22');b.box(0,4.6,1.6,7,5,3.4,'#140c10');for(let i=0;i<5;i++)b.sph(-2.6+i*1.3,3.4,2,.8,.8,.8,5,3,TYPES[i].d,TYPES[i].c);b.cyl(4.2,8,1,.6,.6,2,5,'#f8f0d8');PROP.shrine=b.done();
+ b=new MB();b.box(-3,.5,0,6,1,10,'#4a5a30','#6a7a48');for(let i=0;i<7;i++){const a=i/7*6.28;b.sph(5+Math.cos(a)*3,.6,Math.sin(a)*3,1,1,1,4,3,'#4a4250','#6a6270')}b.box(5,.4,0,3,.6,3,'#2a2024');b.cyl(1.6,0,4.4,1.1,1.3,2,6,'#c8c0b0');PROP.camp=b.done();
+ b=new MB();b.box(0,2.6,0,7,5.2,4.6,'#6a4428','#8a5a38');b.box(0,5.6,0,7.4,1,5,'#5a3418');b.box(0,3,2.4,3,2.4,.6,'#8a5a38');b.cyl(4.4,0,0,.5,.5,7,4,'#7a4a28');b.sph(-3.6,1.6,2,1.6,1.2,1.4,5,3,'#c8a060');PROP.pack=b.done();
+ b=new MB();b.box(0,9,0,18,18,1.6,'#3a2e3e','#5a4e5e');for(let i=0;i<6;i++){const a=i/6*6.28;b.box(Math.cos(a)*4.2,9+Math.sin(a)*4.2,.9,1.6,1.6,.4,TYPES[i].c)}b.box(0,15.6,.9,2,3,.4,'#ffe9a0');PROP.carving=b.done();
+ /* a lost thing a keeper is looking for */
+ b=new MB();b.sph(0,2,0,2.6,2,2.6,6,4,'#c8a060','#f8e0a0');b.cyl(0,3.4,0,.8,.3,2,4,'#8a5a38');b.sph(0,5.8,0,1.4,1.4,1.4,5,4,'#ffffff');PROP.qitem=b.done()}
 
 /* ---------- camera ---------- */
 const CAM={x:W/2,z:H/2,d:1,init:false};
@@ -2127,6 +2324,13 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
   sprite(d.x,13,29,40,gc,.26+.1*Math.sin(time*4+d.x),true);
   mPush();mT(d.x,.45,d.y+9);mS(12);drawT(MESH.ring,{c:gc,a:.7,unlit:true});mPop();
   if(d.hold>0){mPush();mT(d.x,.5,d.y+9);mS(12*clamp(d.hold/.6,0,1));drawT(MESH.disc,{c:gc,a:.4,unlit:true});mPop()}}
+ /* the room's relic: brighter while unread; a lost thing in its keeper's colour; the ghost */
+ if(RUN.relic){const R0=RELICS.find(r=>r.id===RUN.relic.id);if(R0){const fresh=!(RD.relic&&RD.relic[R0.id]),rx=RUN.relic.x,rz=RUN.relic.y;shadow(rx,rz,8);prop(PROP[R0.prop],rx,0,rz-(R0.prop==='carving'?2:0),R0.prop==='carving'?0:(rx*.07)%1.2-.6,1.05,fresh?{add:.08+.06*Math.sin(time*3)}:null);
+  if(fresh)sprite(rx,10,rz,34+4*Math.sin(time*2),hex('#ffe9a0'),RUN.phase==='doors'?.32:.16,true);if(fresh&&RUN.phase==='doors'){const t=(time*.6)%1;sprite(rx+Math.sin(time*3)*3,8+t*20,rz,2,hex('#fff3c0'),1-t,true)}}}
+ if(RUN.qitem){const q=RUN.qitem,Q=KQUESTS[q.char],bob=Math.sin(time*3)*1.5;shadow(q.x,q.y,4);prop(PROP.qitem,q.x,6+bob,q.y,time*1.5,1.2,{add:.15});sprite(q.x,9+bob,q.y,30,hex(Q.col),.4,true);const t=(time*.9)%1;sprite(q.x,6+t*24,q.y,2.4,hex(Q.col),1-t,true)}
+ if(RUN.ghostNpc){const g=RUN.ghostNpc,fade=clamp(g.t/1.2,0,1)*(1-clamp((g.out||0)/1.4,0,1)),fl=.75+.25*Math.sin(time*7);
+  XRAY={c:[.42,.68,1],a:.3*fade*fl,unlit:true,glow:true};drawCast('GHOST',g.x,g.y+Math.sin(time*1.3)*1.5,Math.atan2((lead()||{x:g.x}).x-g.x,((lead()||{y:g.y+1}).y)-g.y),{id:'ghost',npc:'RANGER',talk:g.line>=0&&!g.out});XRAY=null;
+  sprite(g.x+5,14,g.y+3,10,hex('#ffe9a0'),.8*fade,true);sprite(g.x,12,g.y,48,hex('#9ad8ff'),.18*fade,true);if(g.out){const t=clamp(g.out/1.4,0,1);for(let i=0;i<6;i++)sprite(g.x+Math.sin(i*2.1+time)*6,8+t*60+i*4,g.y,3,hex('#bfe8ff'),1-t,true)}}
  if(RUN.echo){const q=RUN.echo,bob=Math.sin(time*2.4)*1.5;shadow(q.x,q.y,3.5);prop(PROP.page,q.x,10+bob,q.y,time*1.3,1.1,{unlit:true,add:.1});sprite(q.x,10+bob,q.y,30+bob*2,hex('#ffe9a0'),.4,true);const t=(time*.7)%1;sprite(q.x,10+t*22,q.y,2.4,hex('#fff3b0'),1-t,true)}
  for(const pd of RUN.pods){const bob=Math.sin(time*3+pd.x);prop(PODM[pd.type],pd.x,0,pd.y,time*.6,1.25);sprite(pd.x,5,pd.y,24+bob*3,hex('#a8f080'),.3+.1*bob,true)}
  for(const p of RUN.pickups){const bob=Math.sin(time*5+p.x)*1.2;shadow(p.x,p.y,2.6);
@@ -2633,10 +2837,15 @@ function hudRun(){const B=BIOMES[RUN.biome];
   const hy=VH-(PL.length>2?62:46)-lines.length*13;r('rgba(8,5,14,.7)',VW/2-mw/2,hy-4,mw,lines.length*13+7);lines.forEach((l,i)=>ctext(l,hy+i*13,1,'rgba(255,255,255,.88)',null))}
  if(RUN.boss&&RUN.boss.hp>0){const bw=Math.min(200,VW-240),bx=(VW-bw)/2,by=PL.length>1?34:22;r('#ffb0a0',bx-1,by-1,bw+2,10);r('#181020',bx,by,bw,8);r('#c22e4a',bx+1,by+1,Math.round((bw-2)*clamp(RUN.boss.hp/RUN.boss.max,0,1)),6);
   ctext(BOSSES[RUN.boss.bossIx].n,by+11,1,'#ffb0a0','#120a18')}
- if(RUN.zoneT>0)logoText(B.n,VW/2,VH*.28,22);
+ if(RUN.zoneT>0){const cn=(CHNAMES[RUN.chamber-1]||{n:B.n}).n;logoText(cn,VW/2,VH*.25,tw(cn,4)>VW-30?16:22);ctext(B.n+'  ·  CHAMBER '+RUN.chamber,VH*.25+26,1,'#c8b8e8','#120a18')}
  if(say2T>0&&!RUN.banner)ctext(say2Txt,RUN.zoneT>0?VH*.42:VH*.34,tw(say2Txt,2)>VW-16?1:2,'#ffd94d');
  /* getting hurt: the screen edge flashes in your colour (solo: red) */
  for(const p of PL)if(p.hurt>0){const a=clamp(p.hurt/.25,0,1)*.55,c=PL.length>1?PCOL[p.ix]:'#e8304a',g=hx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.7);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,c);hx.globalAlpha=a;hx.fillStyle=g;hx.fillRect(0,0,VW,VH);hx.globalAlpha=1}
+ /* what the room holds: a relic to read, a keeper's lost thing, the ghost */
+ if(RUN.relic){const q=project(RUN.relic.x,22,RUN.relic.y),R0=RELICS.find(r=>r.id===RUN.relic.id);if(q&&R0){const quiet=RUN.phase==='doors',near=PL.find(p=>p.relicNear);
+  ctext(RUN.relic.read||(RD.relic&&RD.relic[R0.id])?R0.n:(quiet?R0.src:'?'),q.y-8,1,quiet?'#ffe9a0':'rgba(255,233,160,.5)','#120a18',q.x);if(near)ctext(btnName(near.dev,'a')+': READ',q.y+4,1,'#ffd94d','#120a18',q.x)}}
+ if(RUN.qitem){const q=project(RUN.qitem.x,18,RUN.qitem.y),Q=KQUESTS[RUN.qitem.char];if(q)ctext(Q.steps[RUN.qitem.step].item,q.y-8,1,Q.col,'#120a18',q.x)}
+ if(RUN.ghostNpc){const g=RUN.ghostNpc,q=project(g.x,30,g.y);if(q&&g.line<0)ctext(GHOSTN,q.y-8,1,'#bfe8ff','#120a18',q.x)}
  if(RUN.echo){const q=project(RUN.echo.x,22,RUN.echo.y);if(q)ctext('AN ECHO',q.y-8,1,'#ffe9a0','#120a18',q.x)}
  /* who is talking down here */
  if(RUN.sub&&!RUN.banner){const s2=RUN.sub,L=wrapPx(s2.txt,Math.min(330,VW-240),1).slice(0,2),bw=Math.max(...L.map(l=>tw(l,1)),tw(s2.who,1))+22,bx=(VW-bw)/2,by=RUN.boss?(PL.length>1?60:48):34,al=clamp(s2.t/.3,0,1);
@@ -2662,10 +2871,16 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
  if(state==='keep'){screenShell('KEEPSAKE SHELF','ONE AT A TIME  ·  LEVELS BY USE');
   rowsDraw2(KEEPS.map(k=>{const own=M.keeps[k.id];return{a:(M.keepEq===k.id?'* ':'')+k.n,b:own?'Lv'+keepLv(k.who)+'  ·  '+(M.keepXp[k.who]||0)+'/50':'GIFT '+k.who}}),uiSel,KEEPS[uiSel].d);
   footer(A+': EQUIP / REMOVE    '+Bk+': BACK');return}
- if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 4  ·  '+Bk+': BACK');
+ if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 6  ·  '+Bk+': BACK');
   if(codexPage===0)rowsPlain(['RUNS '+M.stats.runs+'   DEATHS '+M.stats.deaths,'ESCAPES '+M.stats.escapes+'   CHAMBERS CLEARED '+M.stats.chambers,'FOES FELLED '+M.stats.kills+'   BOSSES '+M.stats.bosses,'HEAT NOW '+heatTotal(),'WEAPON: '+WEAPONS[M.weapon].n,'KEEPSAKE: '+(M.keepEq?((KEEPS.find(k=>k.id===M.keepEq)||{}).n):'NONE')],60,17);
   else if(codexPage===1){const seen=Object.keys(FOES).filter(k=>M.seen[k]);const boss=Object.keys(BOSSES).filter(i=>M.seen[BOSSES[i].id]);
    rowsPlain(['FOES MET '+seen.length+' / '+Object.keys(FOES).length].concat(seen.map(k=>FOES[k].n)).concat(['BOSSES MET '+boss.length+' / 3']).concat(boss.map(i=>BOSSES[i].n)),60,15)}
+  else if(codexPage===4){const found=RELICS.filter(r=>M.relic&&M.relic[r.id]);text('RELICS READ  '+found.length+' / '+RELICS.length,PX+14,54,1,'#ffd94d',null);
+   if(!found.length)wrapPx('Nothing yet. When a room is quiet, look for something glowing: a tablet, a statue, a cold camp. Walk up to it and press '+A+'.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
+   const top=clamp(echoSel-6,0,Math.max(0,found.length-13));found.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
+    text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(BIOMES[e.th].n,PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
+   if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
+  else if(codexPage===5){text('THE STORY SO FAR',PX+14,54,1,'#ffd94d',null);storySoFar().forEach((l,i)=>text(l,PX+14,72+i*14,1,l[0]==='*'?'#a8f080':'#c8c0d8',null))}
   else if(codexPage===2)rowsPlain(['DIFFERENT BOONS OFFERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
   else{const found=ECHOES.filter(e=>M.echo[e.id]);text('ECHOES FOUND  '+found.length+' / '+ECHOES.length,PX+14,54,1,'#ffd94d',null);
    if(!found.length)wrapPx('Nothing yet. The keepers before you left notes in the deep. Clear chambers and look for a page that glows.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
@@ -2673,21 +2888,21 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
     text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(ECHOTH[e.th],PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
    if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
   return}
- if(state==='board'){const L=openMissions(),done=MISSIONS.filter(m=>M.msn[m.id]).length;screenShell("KEEPER'S BOARD",'ERRANDS DONE  '+done+' / '+MISSIONS.length);
+ if(state==='board'){const L=openMissions().concat(personalQuests()),done=MISSIONS.filter(m=>M.msn[m.id]).length;screenShell("KEEPER'S BOARD",'ERRANDS DONE  '+done+' / '+MISSIONS.length);
   if(!L.length){ctext('NOTHING PINNED UP. EVERY ERRAND IS DONE.',110,1,'#a8f080',null);footer(Bk+': BACK');return}
   const top=clamp(boardSel-4,0,Math.max(0,L.length-8));
-  L.slice(top,top+8).forEach((m,i)=>{const on=top+i===boardSel,yy=56+i*19;hitbox(PX+8,yy-4,284,17,false,()=>boardSel=top+i);const told=M.flags['mt_'+m.id],q=m.p(),fin=q[0]>=q[1];
+  L.slice(top,top+8).forEach((m,i)=>{const on=top+i===boardSel,yy=56+i*19;hitbox(PX+8,yy-4,284,17,false,()=>boardSel=top+i);const told=m.told||M.flags['mt_'+m.id],q=m.p(),fin=m.fin!==undefined?m.fin:q[0]>=q[1];
    if(on){r('#f8e060',PX+8,yy-4,284,17);r('#281c30',PX+9,yy-3,282,15)}
-   r(RDCPLATE[m.who]||'#444',PX+12,yy-1,4,11);text(told?m.n:'? ? ?',PX+21,yy,1,on?'#ffffff':'#c8c0d8',null);
-   rtext(!told?'ASK '+m.who:fin?'TELL '+m.who:q[0]+' / '+q[1],PX+286,yy,1,fin&&told?'#a8f080':on?'#ffd94d':'#8d84a8',null)});
-  const m=L[boardSel]||L[0],told=M.flags['mt_'+m.id];
-  wrapPx(told?m.d+'  ('+m.who+')   '+rewTxt(m.rew):m.who+' has something to ask you. Go and talk to '+(m.who==='LOUIE'?'him':m.who)+'.',270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null));
+   r(m.id.startsWith('kq-')?KQUESTS[m.who].col:RDCPLATE[m.who]||'#444',PX+12,yy-1,4,11);text(told?m.n:'? ? ?',PX+21,yy,1,on?'#ffffff':'#c8c0d8',null);
+   rtext(!told?'ASK '+m.who:fin?(m.id.startsWith('kq-')?'BRING IT HOME':'TELL '+m.who):q[0]+' / '+q[1],PX+286,yy,1,fin&&told?'#a8f080':on?'#ffd94d':'#8d84a8',null)});
+  const m=L[boardSel]||L[0],told=m.told||M.flags['mt_'+m.id];
+  wrapPx(told?m.d+(m.id.startsWith('kq-')?'  ('+m.who+"'S QUEST)":'  ('+m.who+')')+'   '+rewTxt(m.rew):m.who+' has something to ask you. Go and talk to '+(m.who==='LOUIE'?'him':m.who)+'.',270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null));
   footer(Bk+': BACK');return}
  if(state==='echo'&&echoRead){r('rgba(8,5,12,.82)',0,0,VW,VH);const bw=Math.min(330,VW-20),bx=(VW-bw)/2,by=VH*.2;
   panel(bx,by,bw,150,'#efe2bc','#3a2c18');r('rgba(120,90,40,.18)',bx,by,bw,20);
-  ctext(ECHOTH[echoRead.th],by+5,1,'#7a5a28',null);ctext(echoRead.n,by+26,2,'#3a2414',null);
+  ctext(echoRead.src||ECHOTH[echoRead.th],by+5,1,'#7a5a28',null);ctext(echoRead.n,by+26,2,'#3a2414',null);
   wrapPx(echoRead.x,bw-34,1).slice(0,7).forEach((l,i)=>text(l,bx+17,by+50+i*13,1,'#3a2c24',null));
-  rtext((ECHOES.filter(e=>M.echo[e.id]).length)+' / '+ECHOES.length,bx+bw-10,by+134,1,'#9a7a48',null);
+  rtext(echoRead.relic?relicCount()+' / '+RELICS.length:(ECHOES.filter(e=>M.echo[e.id]).length)+' / '+ECHOES.length,bx+bw-10,by+134,1,'#9a7a48',null);
   if(echoT>.3)ctext(A+': KEEP IT',by+160,1,((time*2)|0)%2?'#ffd94d':'#fff3b0','#120a18');return}
  if(state==='heat'){screenShell('THE PACT OF ROOTS','TOTAL HEAT: '+heatTotal());
   if(RD.stats.escapes<1){ctext('SEALED. ESCAPE ONCE TO OPEN.',110,2,'#8d84a8');ctext(A+': BACK',140,1,'#8d84a8',null);return}
@@ -2748,7 +2963,7 @@ function hudChars(){const n=PL.length,d0=lead0();r('rgba(10,6,16,.82)',0,0,VW,26
   ctext('P'+(p.ix+1)+'  ·  '+(p.dev.id.slice(0,2)==='gp'?'PAD':p.dev.label),top.y-16,1,PCOL[p.ix],'#120a18',x);
   ctext('< '+c.id+' >',top.y-4,3,un?'#ffffff':'#8d84a8','#120a18',x);
   const cw=n===1?Math.min(360,VW-24):colW-8,stop=VH-34;let y=Math.min(ft.y+2,VH-104);const say=(s,col)=>{for(const l of wrapPx(s,cw,1).slice(0,3)){if(y>stop-24)return;ctext(l,y,1,col,'#120a18',x);y+=11}};
-  if(un){say(c.tag+'  ·  '+SIG[c.id].n,'#ffd94d');if(n<3)say(c.stats,'#c8c0d8');if(n===1)say(c.d+' '+SIG[c.id].d,'#c8c0d8')}else{say('LOCKED','#ff9a8a');say(charLockTxt(c.id),'#c8c0d8')}
+  if(un){say(c.tag+'  ·  '+SIG[c.id].n,'#ffd94d');if(KQUESTS[c.id]){loreInit();const Q=KQUESTS[c.id];say(RD.kqDone[c.id]?'QUEST DONE: '+Q.n+' (+10 HP)':'QUEST: '+Q.n+' '+(RD.kq[c.id]||0)+'/'+Q.steps.length,Q.col)}if(n<3)say(c.stats,'#c8c0d8');if(n===1)say(c.d+' '+SIG[c.id].d,'#c8c0d8')}else{say('LOCKED','#ff9a8a');say(charLockTxt(c.id),'#c8c0d8')}
   if(p.ready)ctext('READY!',y+2,2,'#a8f080','#120a18',x);else ctext(un?btnName(p.dev,'a')+': READY':'',y+2,1,'#ffd94d','#120a18',x)});
  ctext((n<4?(d0&&d0.id==='touch'?'MORE KEEPERS: A ON A CONTROLLER   ·   ':'MORE KEEPERS: PRESS A ON ANOTHER PAD   ·   '):'')+btnName(d0,'b')+': BACK',VH-13,1,'#8d84a8','#120a18');
  if(n>1&&PL.every(p=>p.ready))ctext('DESCENDING TOGETHER...',VH*.36,2,'#a8f080');

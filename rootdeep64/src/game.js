@@ -68,7 +68,7 @@ const lead=()=>PL.find(p=>!p.down)||PL[0];
 function rdStats(p){p=p||PL[0];if(NET.client&&p&&p.ns)return p.ns;const ch=p?p.char:'WILL';const b=RUN?RUN.boons:{atk:null,cast:null,dash:null,pass:[]};
  const pass=id=>b.pass.find(p=>p.id===id);
  const erin=hasKeep('flower');
- return{maxHp:100+mir('vit')*10+(pass('heart')?rdBoonVal(pass('heart')):0)+(erin?20:0)+(RUN&&RUN.bonusMax?RUN.bonusMax:0)+((ch==='LOUIE')?-20:(ch==='MARCUS')?25:0),
+ return{maxHp:100+mir('vit')*10+(RD.kqDone&&RD.kqDone[ch]?10:0)+(pass('heart')?rdBoonVal(pass('heart')):0)+(erin?20:0)+(RUN&&RUN.bonusMax?RUN.bonusMax:0)+((ch==='LOUIE')?-20:(ch==='MARCUS')?25:0),
   dmgMul:(1+mir('might')*.05),
   atkMul:(1+(b.atk?rdBoonVal(b.atk)/100:0))*(ch==='MARCUS'?1.2:1), castMul:(1+(b.cast?rdBoonVal(b.cast)/100:0))*(hasKeep('stone')?1.2:1),
   speedMul:(1+mir('swift')*.04)*(pass('quick')?1+rdBoonVal(pass('quick'))/100:1)*(ch==='ERIN'?1.05:ch==='LOUIE'?1.15:ch==='MARCUS'?.93:1),
@@ -153,7 +153,7 @@ function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale(),co=1+.75*(PL.length-1);
 let say2T=0,say2Txt='';
 function say2(s,t=3){say2Txt=s;say2T=t;}
 function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=[];RUN.eprojs=[];RUN.pickups=[];RUN.pods=[];RUN.zones=[];RUN.hazards=[];RUN.acts=[];RUN.podDropped=false;for(const p of PL)movesReset(p,false);
- const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);RUN.echo=null;RD.stats.maxCh=Math.max(RD.stats.maxCh||0,ch);for(const p of PL)p.lowSaid=false;
+ const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);RUN.echo=null;chamberLore(ch);RD.stats.maxCh=Math.max(RD.stats.maxCh||0,ch);for(const p of PL)p.lowSaid=false;
  if(ch===5)chatter('vault',true);else if(ch===9)chatter('core',true);else if(ch!==4&&ch!==8&&ch!==12)chatter('start');
  if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;return}
  /* the cartridge's budget (4 + chamber), plus a share for every extra keeper */
@@ -165,7 +165,7 @@ function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=
  wlist.slice(0,cut).forEach(s2=>{const q=spawnSpot();spawnFoe(s2.k,q[0],q[1],s2.elite)});
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
  RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);}
-function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
+function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;ghostRoll(RUN.chamber);if(RUN.chamber<12)echoRoll(!!RUN.boss);if(!RUN.boss)chatter('clear');for(const p of PL)if(!p.down)p.cheer=1.1;
  if(!RUN.podDropped){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:W/2+R(-16,16),y:H/2});RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
  if(RD.keepEq){const who=(KEEPS.find(k=>k.id===RD.keepEq)||{}).who;if(who)RD.keepXp[who]=(RD.keepXp[who]||0)+1}
  let heal=mir('mend')*3+(RUN.boons.pass.find(p=>p.id==='rain')?rdBoonVal(RUN.boons.pass.find(p=>p.id==='rain')):0);
@@ -323,10 +323,11 @@ function keepUpdate(){uiSel=nav(uiSel,KEEPS.length);
  if(pressed('a')){const k=KEEPS[uiSel];
   if(RD.keeps[k.id]){RD.keepEq=RD.keepEq===k.id?'':k.id;rdSave();snd(660,.08,990)}else snd(140,.08)}
  if(pressed('b')||pressed('start'))state='hub';}
-function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);snd(520,.04)}if(pressed('right')){codexPage=Math.min(3,codexPage+1);echoSel=0;snd(520,.04)}
+function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);echoSel=0;snd(520,.04)}if(pressed('right')){codexPage=Math.min(5,codexPage+1);echoSel=0;snd(520,.04)}
+ if(codexPage===4){const found=RELICS.filter(r=>RD.relic&&RD.relic[r.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=Object.assign({relic:true},found[echoSel]);echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(codexPage===3){const found=ECHOES.filter(e=>RD.echo[e.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=found[echoSel];echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(pressed('b')||pressed('a')||pressed('start'))state='hub';}
-function boardUpdate(){const L=openMissions();if(L.length)boardSel=nav(boardSel,L.length);if(pressed('b')||pressed('a')||pressed('start'))state='hub'}
+function boardUpdate(){const L=openMissions().concat(personalQuests());if(L.length)boardSel=nav(boardSel,L.length);if(pressed('b')||pressed('a')||pressed('start'))state='hub'}
 function heatUpdate(){if(RD.stats.escapes<1){if(pressed('a')||pressed('b')||pressed('start'))state='hub';return}
  heatSel=nav(heatSel,PACT.length);const p=PACT[heatSel],cur=RD.pact[p.id]||0;
  if(pressed('right')&&cur<p.max){RD.pact[p.id]=cur+1;rdSave();snd(660,.06,880)}
@@ -571,6 +572,7 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  if(RUN.shake>0)RUN.shake*=Math.max(0,1-dt*7);if(RUN.flash>0)RUN.flash-=dt;if(RUN.banner){RUN.banner.t-=dt;if(RUN.banner.t<=0)RUN.banner=null}
  if(RUN.sub){RUN.sub.t-=dt;if(RUN.sub.t<=0)RUN.sub=null}for(const q of RUN.subQ)q.d-=dt;{const q=RUN.subQ.find(q=>q.d<=0);if(q){RUN.subQ.splice(RUN.subQ.indexOf(q),1);sub(q.who,q.txt,q.t,q.c)}}
  RUN.mwT-=dt;if(RUN.mwT<=0){RUN.mwT=1;missionWatch()}
+ if(loreUpdate(dt))return;
  if(RUN.echo)for(const p of PL)if(!p.down&&Math.hypot(p.x-RUN.echo.x,p.y-RUN.echo.y)<12){menuDev=p.dev;echoTake();return}
  /* a super stops the room for a beat before it lands */
  if(RUN.freeze>0){for(const p of PL)if(p!==RUN.freezeP&&p.dev.pr.sup&&(p.meter||0)>=SUPER_MAX)p.supQ=true;RUN.freeze-=dt;for(const p of PL)if(p.supA>0)p.supA-=dt*.5;if(RUN.freeze<=0&&RUN.freezeP){const fp=RUN.freezeP;RUN.freezeP=null;superFire(fp)}return}

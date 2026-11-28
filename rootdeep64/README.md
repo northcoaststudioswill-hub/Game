@@ -83,6 +83,23 @@ Foes telegraph: grubs rear up and lunge when close, crabs snap their claws, spit
 just before they fire. Online friends see all of it (rebuilt on their side from hits and deaths they receive).
 `node test/combat.js` freezes a fight at telling moments and saves close-ups.
 
+## The deep's own story
+
+`src/lore.js`, new writing on top of the existing lore (flagged in the file). It adds:
+
+- **Twelve named chambers** (THE ROOT CELLAR ... THE HOLLOW), each with a whisper on your first visit.
+- **36 relics** placed in rooms as 3D objects (tablets, statues, shrines, cold camps, packs, carvings), read when
+  the room is quiet. Three tablets tell three different stories of how the Lantern cracked; the game doesn't pick one.
+  Codex page 5 keeps them.
+- **The keeper before you**: a ghost who turns up after fights across eight visits, remembers a little more each time,
+  and finally goes up with you. Erin answers at the Hearth.
+- **A personal quest for each keeper** (Will: the Lantern's missing piece; Erin: seeds that fell; Louie: the other
+  scent; Marcus: Double or Nothing). Items only appear with that keeper in the party, in set chamber ranges; you
+  bring each one home to a particular NPC; finishing gives that keeper +10 max health. Listed on the Board and on
+  keeper select.
+- **The story so far** on Codex page 6.
+- `node test/lore.js` checks it all, including that every line fits its box.
+
 ## Moves
 
 On top of the cartridge's attack / cast / dash, every keeper has four more verbs (`src/moves.js`). Every name
@@ -171,6 +188,7 @@ never renumber, you can drop in mid-run and leave from the Hearth or pause menu.
 - `src/game.js` – the loop
 - `src/moves.js` – specials, supers, heavies, dash strikes
 - `src/fx.js` – combat effects: hit-stop, slow motion, trails, sparks, launches, death tumbles, combo counter
+- `src/lore.js` – named chambers, relics, the ghost, keeper quests
 - `src/net.js` – online play (host / join, input and snapshots over the page's room)
 - `src/story.js` – missions, conversations, echoes, boss / god / keeper lines
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes

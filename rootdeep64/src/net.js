@@ -94,7 +94,10 @@ function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
   c.E=RUN.enemies.map(eRec);c.O=RUN.obst.map(o=>[r1(o.x),r1(o.y),r1(o.w),r1(o.h),r2(o.s)]);
   c.D=RUN.doors.map(d=>[DKINDS.indexOf(d.kind),GODIDS.indexOf(d.god),r2(d.hold),d.by?d.by.ix:-1,d.boss?1:0,r1(d.x),r1(d.y)]);
   if(RUN.banner)c.bn=[RUN.banner.txt,RUN.banner.who,RUN.banner.c,r2(RUN.banner.t)];if(RUN.sub)c.sb=[RUN.sub.who,RUN.sub.txt,r2(RUN.sub.t),RUN.sub.c];
-  if(RUN.echo)c.ec=[r1(RUN.echo.x),r1(RUN.echo.y)]}
+  if(RUN.echo)c.ec=[r1(RUN.echo.x),r1(RUN.echo.y)];
+  if(RUN.relic)c.rl=[r1(RUN.relic.x),r1(RUN.relic.y),RELICS.findIndex(r=>r.id===RUN.relic.id),RUN.relic.read?1:0];
+  if(RUN.qitem)c.qi=[r1(RUN.qitem.x),r1(RUN.qitem.y),CHARS.findIndex(x=>x.id===RUN.qitem.char),RUN.qitem.step];
+  if(RUN.ghostNpc)c.gh=[r1(RUN.ghostNpc.x),r1(RUN.ghostNpc.y),r2(RUN.ghostNpc.t),RUN.ghostNpc.line,r2(RUN.ghostNpc.out||0)]}
  const cc=fit(c,['E']);if(cc)NET.rooms.c.presence({c:cc}).catch(()=>{});
  const f={q,sq:NET.sq.slice()};
  if(RUN){f.pr=RUN.projs.slice(-40).map(p=>[PKINDS.indexOf(p.kind),r1(p.x),r1(p.y),r1(p.vx),r1(p.vy),p.small?1:0,p.c||0]);
@@ -110,7 +113,7 @@ function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
  const ff=fit(f,['pk','ep','pr','tx','bd','ac']);if(ff)NET.rooms.f.presence({f:ff}).catch(()=>{});}
 function rdSummary(){const fl={};for(const k in RD.flags)if(/^(mt_|cineSeen|bloom)/.test(k))fl[k]=1;
  return{dew:RD.dew,keys:RD.keys,honey:RD.honey,mirror:RD.mirror,weapons:RD.weapons,weapon:RD.weapon,keeps:RD.keeps,keepEq:RD.keepEq,keepXp:RD.keepXp,pact:RD.pact,bank:RD.bank,party:RD.party,gift:RD.gift,
-  stats:RD.stats,msn:RD.msn,echo:RD.echo,bossK:RD.bossK,killK:RD.killK,diedTo:RD.diedTo,charEsc:RD.charEsc,seen:RD.seen,bs:Object.keys(RD.boonSeen).length,flags:fl,lastRun:RD.lastRun?Object.assign({},RD.lastRun):null,chars:RD.chars}}
+  stats:RD.stats,msn:RD.msn,echo:RD.echo,relic:RD.relic,chSeen:RD.chSeen,kq:RD.kq,kqFound:RD.kqFound,kqDone:RD.kqDone,ghost:RD.ghost,bossK:RD.bossK,killK:RD.killK,diedTo:RD.diedTo,charEsc:RD.charEsc,seen:RD.seen,bs:Object.keys(RD.boonSeen).length,flags:fl,lastRun:RD.lastRun?Object.assign({},RD.lastRun):null,chars:RD.chars}}
 function netSendMeta(){if(!NET.rooms.m)return;
  const ui={uiSel,menuSel,pauseSel,pausePage,pauseConfirm,codexPage,heatSel,boardSel,echoSel,sprPage,buyAsk,giftAsk,setReturn,offerGod,boonQuote,
   boon:state==='boon'?boonOffer:null,shop:state==='shop'?shopItems.map(i=>({n:i.n,d:i.d,p:i.p,sold:!!i.sold})):null,
@@ -177,7 +180,11 @@ function netApplyCore(){const c=NET.core;if(!c||typeof c!=='object')return;
   list.push(e)}
  for(const k in ENT)if(!ids.has(+k)){const e=ENT[k];if(RUN&&e.kind!=='boss'&&e.chamber===RUN.chamber)deathFx(e);delete ENT[k]}for(const e of list)e.chamber=RUN.chamber;RUN.enemies=list;
  RUN.banner=c.bn?{txt:c.bn[0],who:c.bn[1],c:c.bn[2],t:c.bn[3]}:null;RUN.sub=c.sb?{who:c.sb[0],txt:c.sb[1],t:c.sb[2],c:c.sb[3]}:null;
- RUN.echo=c.ec?{x:c.ec[0],y:c.ec[1]}:null}
+ RUN.echo=c.ec?{x:c.ec[0],y:c.ec[1]}:null;
+ RUN.relic=c.rl&&RELICS[c.rl[2]]?{x:c.rl[0],y:c.rl[1],id:RELICS[c.rl[2]].id,read:!!c.rl[3]}:null;
+ RUN.qitem=c.qi&&CHARS[c.qi[2]]?{x:c.qi[0],y:c.qi[1],char:CHARS[c.qi[2]].id,step:c.qi[3]}:null;
+ RUN.ghostNpc=c.gh?Object.assign(RUN.ghostNpc||{},{x:c.gh[0],y:c.gh[1],t:c.gh[2],line:c.gh[3],out:c.gh[4]}):null;
+ for(const p of PL)p.relicNear=!!(RUN.relic&&RUN.phase==='doors'&&!p.down&&Math.hypot(p.x-RUN.relic.x,p.y-RUN.relic.y)<18)}
 const seenId=new Set();
 function netApplyFx(){const f=NET.fx;if(!f||!RUN)return netCues(f);
  RUN.projs=(f.pr||[]).map(p=>({kind:PKINDS[p[0]]||'bud',x:p[1],y:p[2],vx:p[3],vy:p[4],small:p[5],c:p[6]||null}));
@@ -201,7 +208,7 @@ function netApplyMeta(){const m=NET.meta;if(!m||typeof m!=='object')return;
  giftAsk=!!u.giftAsk;setReturn=u.setReturn||'title';offerGod=u.offerGod||'EMBER';boonQuote=String(u.boonQuote||'');
  if(Array.isArray(u.boon))boonOffer=u.boon;if(Array.isArray(u.shop))shopItems=u.shop;
  if(Array.isArray(u.talk)){[talkNPC,talkWho,talkTxt,talkLine,talkStart]=u.talk;talkEv=u.talk[5]?{lines:{length:u.talk[5]},rew:u.talk[6]}:null}
- echoRead=u.echo?ECHOES.find(e=>e.id===u.echo)||null:null;echoT=1;if(RUN&&u.boons)RUN.boons=u.boons;NET.mk=m.mk||{}}
+ echoRead=u.echo?(ECHOES.find(e=>e.id===u.echo)||(RELICS.find(r=>r.id===u.echo)?Object.assign({relic:true},RELICS.find(r=>r.id===u.echo)):null)):null;echoT=1;if(RUN&&u.boons)RUN.boons=u.boons;NET.mk=m.mk||{}}
 const NETUI={uiSel:v=>uiSel=v,menuSel:v=>menuSel=v,pauseSel:v=>pauseSel=v,pausePage:v=>pausePage=v,pauseConfirm:v=>pauseConfirm=v,codexPage:v=>codexPage=v,heatSel:v=>heatSel=v,boardSel:v=>boardSel=v,echoSel:v=>echoSel=v,sprPage:v=>sprPage=v,buyAsk:v=>buyAsk=v};
 /* every frame on a client: ease everything toward the host, run my own keeper locally, let effects play out */
 function netClientFrame(dt){if(!NET.client)return;time+=dt;stateT+=dt;if(say2T>0)say2T-=dt;if(joinT>0)joinT-=dt;

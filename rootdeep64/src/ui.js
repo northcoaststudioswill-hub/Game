@@ -140,10 +140,15 @@ function hudRun(){const B=BIOMES[RUN.biome];
   const hy=VH-(PL.length>2?62:46)-lines.length*13;r('rgba(8,5,14,.7)',VW/2-mw/2,hy-4,mw,lines.length*13+7);lines.forEach((l,i)=>ctext(l,hy+i*13,1,'rgba(255,255,255,.88)',null))}
  if(RUN.boss&&RUN.boss.hp>0){const bw=Math.min(200,VW-240),bx=(VW-bw)/2,by=PL.length>1?34:22;r('#ffb0a0',bx-1,by-1,bw+2,10);r('#181020',bx,by,bw,8);r('#c22e4a',bx+1,by+1,Math.round((bw-2)*clamp(RUN.boss.hp/RUN.boss.max,0,1)),6);
   ctext(BOSSES[RUN.boss.bossIx].n,by+11,1,'#ffb0a0','#120a18')}
- if(RUN.zoneT>0)logoText(B.n,VW/2,VH*.28,22);
+ if(RUN.zoneT>0){const cn=(CHNAMES[RUN.chamber-1]||{n:B.n}).n;logoText(cn,VW/2,VH*.25,tw(cn,4)>VW-30?16:22);ctext(B.n+'  ·  CHAMBER '+RUN.chamber,VH*.25+26,1,'#c8b8e8','#120a18')}
  if(say2T>0&&!RUN.banner)ctext(say2Txt,RUN.zoneT>0?VH*.42:VH*.34,tw(say2Txt,2)>VW-16?1:2,'#ffd94d');
  /* getting hurt: the screen edge flashes in your colour (solo: red) */
  for(const p of PL)if(p.hurt>0){const a=clamp(p.hurt/.25,0,1)*.55,c=PL.length>1?PCOL[p.ix]:'#e8304a',g=hx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.7);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,c);hx.globalAlpha=a;hx.fillStyle=g;hx.fillRect(0,0,VW,VH);hx.globalAlpha=1}
+ /* what the room holds: a relic to read, a keeper's lost thing, the ghost */
+ if(RUN.relic){const q=project(RUN.relic.x,22,RUN.relic.y),R0=RELICS.find(r=>r.id===RUN.relic.id);if(q&&R0){const quiet=RUN.phase==='doors',near=PL.find(p=>p.relicNear);
+  ctext(RUN.relic.read||(RD.relic&&RD.relic[R0.id])?R0.n:(quiet?R0.src:'?'),q.y-8,1,quiet?'#ffe9a0':'rgba(255,233,160,.5)','#120a18',q.x);if(near)ctext(btnName(near.dev,'a')+': READ',q.y+4,1,'#ffd94d','#120a18',q.x)}}
+ if(RUN.qitem){const q=project(RUN.qitem.x,18,RUN.qitem.y),Q=KQUESTS[RUN.qitem.char];if(q)ctext(Q.steps[RUN.qitem.step].item,q.y-8,1,Q.col,'#120a18',q.x)}
+ if(RUN.ghostNpc){const g=RUN.ghostNpc,q=project(g.x,30,g.y);if(q&&g.line<0)ctext(GHOSTN,q.y-8,1,'#bfe8ff','#120a18',q.x)}
  if(RUN.echo){const q=project(RUN.echo.x,22,RUN.echo.y);if(q)ctext('AN ECHO',q.y-8,1,'#ffe9a0','#120a18',q.x)}
  /* who is talking down here */
  if(RUN.sub&&!RUN.banner){const s2=RUN.sub,L=wrapPx(s2.txt,Math.min(330,VW-240),1).slice(0,2),bw=Math.max(...L.map(l=>tw(l,1)),tw(s2.who,1))+22,bx=(VW-bw)/2,by=RUN.boss?(PL.length>1?60:48):34,al=clamp(s2.t/.3,0,1);
@@ -169,10 +174,16 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
  if(state==='keep'){screenShell('KEEPSAKE SHELF','ONE AT A TIME  ·  LEVELS BY USE');
   rowsDraw2(KEEPS.map(k=>{const own=M.keeps[k.id];return{a:(M.keepEq===k.id?'* ':'')+k.n,b:own?'Lv'+keepLv(k.who)+'  ·  '+(M.keepXp[k.who]||0)+'/50':'GIFT '+k.who}}),uiSel,KEEPS[uiSel].d);
   footer(A+': EQUIP / REMOVE    '+Bk+': BACK');return}
- if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 4  ·  '+Bk+': BACK');
+ if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 6  ·  '+Bk+': BACK');
   if(codexPage===0)rowsPlain(['RUNS '+M.stats.runs+'   DEATHS '+M.stats.deaths,'ESCAPES '+M.stats.escapes+'   CHAMBERS CLEARED '+M.stats.chambers,'FOES FELLED '+M.stats.kills+'   BOSSES '+M.stats.bosses,'HEAT NOW '+heatTotal(),'WEAPON: '+WEAPONS[M.weapon].n,'KEEPSAKE: '+(M.keepEq?((KEEPS.find(k=>k.id===M.keepEq)||{}).n):'NONE')],60,17);
   else if(codexPage===1){const seen=Object.keys(FOES).filter(k=>M.seen[k]);const boss=Object.keys(BOSSES).filter(i=>M.seen[BOSSES[i].id]);
    rowsPlain(['FOES MET '+seen.length+' / '+Object.keys(FOES).length].concat(seen.map(k=>FOES[k].n)).concat(['BOSSES MET '+boss.length+' / 3']).concat(boss.map(i=>BOSSES[i].n)),60,15)}
+  else if(codexPage===4){const found=RELICS.filter(r=>M.relic&&M.relic[r.id]);text('RELICS READ  '+found.length+' / '+RELICS.length,PX+14,54,1,'#ffd94d',null);
+   if(!found.length)wrapPx('Nothing yet. When a room is quiet, look for something glowing: a tablet, a statue, a cold camp. Walk up to it and press '+A+'.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
+   const top=clamp(echoSel-6,0,Math.max(0,found.length-13));found.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
+    text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(BIOMES[e.th].n,PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
+   if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
+  else if(codexPage===5){text('THE STORY SO FAR',PX+14,54,1,'#ffd94d',null);storySoFar().forEach((l,i)=>text(l,PX+14,72+i*14,1,l[0]==='*'?'#a8f080':'#c8c0d8',null))}
   else if(codexPage===2)rowsPlain(['DIFFERENT BOONS OFFERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
   else{const found=ECHOES.filter(e=>M.echo[e.id]);text('ECHOES FOUND  '+found.length+' / '+ECHOES.length,PX+14,54,1,'#ffd94d',null);
    if(!found.length)wrapPx('Nothing yet. The keepers before you left notes in the deep. Clear chambers and look for a page that glows.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
@@ -180,21 +191,21 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
     text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(ECHOTH[e.th],PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
    if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
   return}
- if(state==='board'){const L=openMissions(),done=MISSIONS.filter(m=>M.msn[m.id]).length;screenShell("KEEPER'S BOARD",'ERRANDS DONE  '+done+' / '+MISSIONS.length);
+ if(state==='board'){const L=openMissions().concat(personalQuests()),done=MISSIONS.filter(m=>M.msn[m.id]).length;screenShell("KEEPER'S BOARD",'ERRANDS DONE  '+done+' / '+MISSIONS.length);
   if(!L.length){ctext('NOTHING PINNED UP. EVERY ERRAND IS DONE.',110,1,'#a8f080',null);footer(Bk+': BACK');return}
   const top=clamp(boardSel-4,0,Math.max(0,L.length-8));
-  L.slice(top,top+8).forEach((m,i)=>{const on=top+i===boardSel,yy=56+i*19;hitbox(PX+8,yy-4,284,17,false,()=>boardSel=top+i);const told=M.flags['mt_'+m.id],q=m.p(),fin=q[0]>=q[1];
+  L.slice(top,top+8).forEach((m,i)=>{const on=top+i===boardSel,yy=56+i*19;hitbox(PX+8,yy-4,284,17,false,()=>boardSel=top+i);const told=m.told||M.flags['mt_'+m.id],q=m.p(),fin=m.fin!==undefined?m.fin:q[0]>=q[1];
    if(on){r('#f8e060',PX+8,yy-4,284,17);r('#281c30',PX+9,yy-3,282,15)}
-   r(RDCPLATE[m.who]||'#444',PX+12,yy-1,4,11);text(told?m.n:'? ? ?',PX+21,yy,1,on?'#ffffff':'#c8c0d8',null);
-   rtext(!told?'ASK '+m.who:fin?'TELL '+m.who:q[0]+' / '+q[1],PX+286,yy,1,fin&&told?'#a8f080':on?'#ffd94d':'#8d84a8',null)});
-  const m=L[boardSel]||L[0],told=M.flags['mt_'+m.id];
-  wrapPx(told?m.d+'  ('+m.who+')   '+rewTxt(m.rew):m.who+' has something to ask you. Go and talk to '+(m.who==='LOUIE'?'him':m.who)+'.',270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null));
+   r(m.id.startsWith('kq-')?KQUESTS[m.who].col:RDCPLATE[m.who]||'#444',PX+12,yy-1,4,11);text(told?m.n:'? ? ?',PX+21,yy,1,on?'#ffffff':'#c8c0d8',null);
+   rtext(!told?'ASK '+m.who:fin?(m.id.startsWith('kq-')?'BRING IT HOME':'TELL '+m.who):q[0]+' / '+q[1],PX+286,yy,1,fin&&told?'#a8f080':on?'#ffd94d':'#8d84a8',null)});
+  const m=L[boardSel]||L[0],told=m.told||M.flags['mt_'+m.id];
+  wrapPx(told?m.d+(m.id.startsWith('kq-')?'  ('+m.who+"'S QUEST)":'  ('+m.who+')')+'   '+rewTxt(m.rew):m.who+' has something to ask you. Go and talk to '+(m.who==='LOUIE'?'him':m.who)+'.',270,1).slice(0,2).forEach((l,i)=>ctext(l,VH-56+i*12,1,'#a89ec2',null));
   footer(Bk+': BACK');return}
  if(state==='echo'&&echoRead){r('rgba(8,5,12,.82)',0,0,VW,VH);const bw=Math.min(330,VW-20),bx=(VW-bw)/2,by=VH*.2;
   panel(bx,by,bw,150,'#efe2bc','#3a2c18');r('rgba(120,90,40,.18)',bx,by,bw,20);
-  ctext(ECHOTH[echoRead.th],by+5,1,'#7a5a28',null);ctext(echoRead.n,by+26,2,'#3a2414',null);
+  ctext(echoRead.src||ECHOTH[echoRead.th],by+5,1,'#7a5a28',null);ctext(echoRead.n,by+26,2,'#3a2414',null);
   wrapPx(echoRead.x,bw-34,1).slice(0,7).forEach((l,i)=>text(l,bx+17,by+50+i*13,1,'#3a2c24',null));
-  rtext((ECHOES.filter(e=>M.echo[e.id]).length)+' / '+ECHOES.length,bx+bw-10,by+134,1,'#9a7a48',null);
+  rtext(echoRead.relic?relicCount()+' / '+RELICS.length:(ECHOES.filter(e=>M.echo[e.id]).length)+' / '+ECHOES.length,bx+bw-10,by+134,1,'#9a7a48',null);
   if(echoT>.3)ctext(A+': KEEP IT',by+160,1,((time*2)|0)%2?'#ffd94d':'#fff3b0','#120a18');return}
  if(state==='heat'){screenShell('THE PACT OF ROOTS','TOTAL HEAT: '+heatTotal());
   if(RD.stats.escapes<1){ctext('SEALED. ESCAPE ONCE TO OPEN.',110,2,'#8d84a8');ctext(A+': BACK',140,1,'#8d84a8',null);return}
@@ -255,7 +266,7 @@ function hudChars(){const n=PL.length,d0=lead0();r('rgba(10,6,16,.82)',0,0,VW,26
   ctext('P'+(p.ix+1)+'  ·  '+(p.dev.id.slice(0,2)==='gp'?'PAD':p.dev.label),top.y-16,1,PCOL[p.ix],'#120a18',x);
   ctext('< '+c.id+' >',top.y-4,3,un?'#ffffff':'#8d84a8','#120a18',x);
   const cw=n===1?Math.min(360,VW-24):colW-8,stop=VH-34;let y=Math.min(ft.y+2,VH-104);const say=(s,col)=>{for(const l of wrapPx(s,cw,1).slice(0,3)){if(y>stop-24)return;ctext(l,y,1,col,'#120a18',x);y+=11}};
-  if(un){say(c.tag+'  ·  '+SIG[c.id].n,'#ffd94d');if(n<3)say(c.stats,'#c8c0d8');if(n===1)say(c.d+' '+SIG[c.id].d,'#c8c0d8')}else{say('LOCKED','#ff9a8a');say(charLockTxt(c.id),'#c8c0d8')}
+  if(un){say(c.tag+'  ·  '+SIG[c.id].n,'#ffd94d');if(KQUESTS[c.id]){loreInit();const Q=KQUESTS[c.id];say(RD.kqDone[c.id]?'QUEST DONE: '+Q.n+' (+10 HP)':'QUEST: '+Q.n+' '+(RD.kq[c.id]||0)+'/'+Q.steps.length,Q.col)}if(n<3)say(c.stats,'#c8c0d8');if(n===1)say(c.d+' '+SIG[c.id].d,'#c8c0d8')}else{say('LOCKED','#ff9a8a');say(charLockTxt(c.id),'#c8c0d8')}
   if(p.ready)ctext('READY!',y+2,2,'#a8f080','#120a18',x);else ctext(un?btnName(p.dev,'a')+': READY':'',y+2,1,'#ffd94d','#120a18',x)});
  ctext((n<4?(d0&&d0.id==='touch'?'MORE KEEPERS: A ON A CONTROLLER   ·   ':'MORE KEEPERS: PRESS A ON ANOTHER PAD   ·   '):'')+btnName(d0,'b')+': BACK',VH-13,1,'#8d84a8','#120a18');
  if(n>1&&PL.every(p=>p.ready))ctext('DESCENDING TOGETHER...',VH*.36,2,'#a8f080');

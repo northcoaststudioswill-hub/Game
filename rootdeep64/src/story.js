@@ -147,12 +147,22 @@ const EVENTS=[
  {id:'heat1',who:'RANGER',when:()=>heatTotal()>=1,lines:[['RANGER',"You've signed the Pact. The deep keeps its word, which is more than I can say for most. Whatever you made worse, it'll pay you for. Once."]]},
  {id:'coop1',who:'MARCUS',when:()=>stn('coopRuns')>=1,lines:[['MARCUS',"Oh good, there's more of you now."],['MARCUS',"Twice the keeper. Twice the eulogy. I'm gonna need a bigger notebook."]]},
  {id:'revive1',who:'ERIN',when:()=>stn('revives')>=1,lines:[['ERIN',"Scout says one of you went down and the other stood over them until they got up."],['ERIN',"That's the whole job, you know. Keeper. It was never about the Lantern."]]},
+ /* the keeper before you, and what the rooms say */
+ {id:'ghost1',who:'ERIN',when:()=>RD.ghost>=1,lines:[['ERIN',"A pale keeper, down there, who doesn't know the way? ...Did she have a lantern drawn on anything?"],['ERIN',"No. Don't tell me yet. Go back and listen to her. Let her get there herself."]]},
+ {id:'ghost3',who:'MARCUS',when:()=>RD.ghost>=3,lines:[['MARCUS',"So there's a ghost now. Of course there's a ghost. Does it at least hate stuff? I could use an ally."],['LOUIE',"WOOF. (It doesn't hate stuff. It asked about the beans.)"],['MARCUS',"Disgusting."]]},
+ {id:'ghostPage',who:'ERIN',when:()=>RD.flags.ghostPage,lines:[['ERIN',"This drawing. This little lantern. She drew it on every jar she ever labelled."],['ERIN',"I used to water her boots, you know. Every morning. She never once told me to stop."],['ERIN',"Thank you for carrying it. Go back to her. She shouldn't be by herself at the end of anything."]],rew:{honey:1}},
+ {id:'ghostGone',who:'ERIN',when:()=>RD.flags.ghostGone,lines:[['ERIN',"Staking the beans before the rain. That's what she said? That's the last thing?"],['ERIN',"...That's exactly her. Not goodbye. Chores."],['ERIN',"I'll stake them tonight. And keeper, the Lantern flickered just now, like somebody waving. I waved back. Is that silly?"],['MARCUS',"Yes."],['MARCUS',"...I waved too. Shut up."]],rew:{dew:50}},
+ {id:'frost',who:'RANGER',when:()=>RD.relic&&RD.relic['r-b7']&&RD.relic['r-v1']&&RD.relic['r-c1'],lines:[['RANGER',"Three tablets, three stories of the crack. Frost, a clumsy keeper, a Lantern too full."],['RANGER',"I've patrolled long enough to know: when everybody remembers it differently, it was a long time ago and they all loved it."]]},
+ {id:'relic12',who:'SCOUT',when:()=>RD.relic&&Object.keys(RD.relic).length>=12,lines:[['SCOUT',"Twelve relics! The Codex has a page for them now. Statues, shrines, cold camps. People LIVED down there, Will. For years."]]},
+ {id:'relicall',who:'ERIN',when:()=>RD.relic&&Object.keys(RD.relic).length>=36,lines:[['ERIN',"All thirty-six. You read every one of them out to me."],['ERIN',"Keepers, all the way down. Every one of them kept coming back. I think that's the only rule that ever mattered."]],rew:{dew:60}},
  /* echoes */
  {id:'echo1',who:'SCOUT',when:()=>echoCount()>=1,lines:[['SCOUT',"You found WRITING? Down THERE? Read it to me exactly. No, slower. No, do the voice."],['SCOUT',"I've added a page to the Codex. I'm calling them echoes because 'creepy root notes' didn't fit on the tab."]]},
  {id:'echo12',who:'SCOUT',when:()=>echoCount()>=12,lines:[['SCOUT',"Twelve echoes. I laid them out in order on the table. Then I put them away again, because in order they're a letter, and it's addressed to whoever's reading."]]},
  {id:'echoall',who:'ERIN',when:()=>echoCount()>=18,lines:[['ERIN',"That's all of them. Eighteen."],['ERIN',"She signed the last one, the keeper before you. She never told me she could draw. There's a little lantern next to her name."],['ERIN',"I'm going to press it in the big book with the flowers. Thank you for carrying her up."]]}];
 /* what does this NPC have for you right now? turn-ins first, then new asks, then things that happened */
-function storyNext(who){
+function storyNext(who){loreInit();
+ /* a keeper's quest item, brought home */
+ for(const ch in KQUESTS){const f=RD.kqFound[ch];if(f===undefined)continue;const st=KQUESTS[ch].steps[f];if(st&&st.npc===who)return{id:'kq_'+ch+'_'+f,lines:st.lines,rew:st.rew,kq:ch,kqs:st}}
  for(const m of MISSIONS)if(m.who===who&&missionOpen(m)&&RD.flags['mt_'+m.id]&&missionDone(m))return{id:'md_'+m.id,lines:m.done,rew:m.rew,mission:m};
  for(const m of MISSIONS)if(m.who===who&&missionOpen(m)&&!RD.flags['mt_'+m.id])return{id:'mt_'+m.id,lines:m.ask,ask:m};
  for(const e of EVENTS)if(e.who===who&&!RD.flags['ev_'+e.id]&&e.when())return{id:'ev_'+e.id,lines:e.lines,rew:e.rew};
@@ -160,6 +170,7 @@ function storyNext(who){
 function storyFinish(ev){RD.flags[ev.id]=1;let msg='';
  if(ev.mission){RD.msn[ev.mission.id]=1;msg='MISSION DONE: '+ev.mission.n}
  if(ev.ask)msg='NEW MISSION: '+ev.ask.n;
+ if(ev.kq){const Q=KQUESTS[ev.kq];RD.kq[ev.kq]=(RD.kq[ev.kq]||0)+1;delete RD.kqFound[ev.kq];msg=ev.kqs.done?'QUEST COMPLETE: '+Q.n+' - '+Q.reward:Q.n+' '+RD.kq[ev.kq]+'/'+Q.steps.length;if(ev.kqs.done)RD.kqDone[ev.kq]=1}
  const r=ev.rew;if(r){RD.dew+=r.dew||0;RD.keys+=r.keys||0;RD.honey+=r.honey||0;if(r.bud)RD.bank[r.bud[0]]=(RD.bank[r.bud[0]]||0)+r.bud[1];snd(784,.12);later(()=>snd(1175,.25),110)}
  if(msg){joinMsg=msg+(r?'   '+rewTxt(r):'');joinT=4}
  if(ev.mission&&ev.mission.id==='e6')RD.flags.bloom=1;
@@ -215,8 +226,8 @@ const CHATTER={
  LOUIE:{start:["WOOF. (Smells like grubs. And adventure. Mostly grubs.)","SNIFF SNIFF. (Something in here is afraid. He hopes it's them.)","ARF! (He would like to chase all of it.)"],vault:["WHINE. (Wet paws. He did not agree to wet paws.)"],core:["PANT PANT PANT. (Hot floor! Hot floor! Hot floor!)"],low:["YIP! (That was rude.)"],clear:["BOOF. (Good room. Next room.)"],rev:["LICK. LICK LICK. (Get up get up get up.)"]}};
 function sub(who,txt,t,c){if(RUN)RUN.sub={who,txt,t:t||3.6,c:c||'#ffd94d'}}
 function subLater(delay,who,txt,t,c){if(RUN)RUN.subQ.push({d:delay,who,txt,t,c})}
-function chatter(kind,force){if(!RUN)return;const ps=alive().filter(p=>CHATTER[p.char]&&CHATTER[p.char][kind]);if(!ps.length||(!force&&Math.random()>.4))return;
- const p=ps[(Math.random()*ps.length)|0],L=CHATTER[p.char][kind];subLater(kind==='start'?1.2:.2,p.char,L[(Math.random()*L.length)|0],3.2,PCOL[p.ix])}
+function chatter(kind,force){if(!RUN)return;if(RUN.firstVisit&&!force)return;const ps=alive().filter(p=>CHATTER[p.char]&&CHATTER[p.char][kind]);if(!ps.length||(!force&&Math.random()>.4))return;
+ const p=ps[(Math.random()*ps.length)|0],L=CHATTER[p.char][kind];subLater((kind==='start'?1.2:.2)+(RUN.firstVisit?3.4:0),p.char,L[(Math.random()*L.length)|0],3.2,PCOL[p.ix])}
 function bossSay(e,part){const B=BOSSES[e.bossIx],S=BOSSSAY[B.id];if(!S)return;let txt=S[part];if(Array.isArray(txt)){const n=part==='intro'?(RD.seenN&&RD.seenN[B.id]||1)-1:bk(B.id)-1;txt=txt[clamp(n,0,txt.length-1)]}
  subLater(part==='intro'?2.2:.1,B.s,txt,4.2,'#ffb0a0')}
 /* how the deep signs off */

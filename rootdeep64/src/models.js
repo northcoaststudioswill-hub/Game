@@ -33,6 +33,8 @@ function buildCast(){let b;
  CAST.MARCUS=human({top:'#e88020',top2:'#f8c060',pant:'#3a3a48',sleeve:'#e8e0d0',sleeve2:'#ffffff',head:b=>{b.sph(0,6.5,-.2,5.4,3.8,5.3,8,5,'#284878','#5080b8');b.box(0,5.6,4.9,7.4,1,3.6,'#284878');b.box(0,1.9,3.5,6.6,3,2.8,'#704828','#8a6038');b.box(-4,3,2,1.4,3.6,2.6,'#704828');b.box(4,3,2,1.4,3.6,2.6,'#704828')}});
  CAST.RANGER=human({top:'#506838',top2:'#88a060',pant:'#583828',belt:'#282038',skin:'#e8c098',head:b=>{b.cyl(0,6.7,0,8.2,8.2,.9,10,'#c8a060','#e8c888');b.cyl(0,7.4,0,4.6,3.9,3.6,8,'#c8a060','#e8c888');b.cyl(0,7.5,0,4.7,4.6,1.1,8,'#c03030')}});
  CAST.SCOUT=human({top:'#b89858',top2:'#e0c888',pant:'#8a7040',noeyes:1,head:b=>{b.sph(0,5.2,-.7,5.8,5.6,5.5,8,6,'#3c8840','#78c870');b.box(-2,4.7,4.5,2.6,2.3,.9,'#e0f8ff');b.box(2,4.7,4.5,2.6,2.3,.9,'#e0f8ff');b.box(0,4.7,4.4,1.6,.8,.7,K);b.box(-2,4.6,4.9,1,1.2,.4,K);b.box(2,4.6,4.9,1,1.2,.4,K)}});
+ /* the keeper before you: a hooded keeper in a long coat, carrying a hand lantern */
+ CAST.GHOST=human({dress:1,top:'#8ab0d0',top2:'#d8f0ff',pant:'#a8c8e0',sleeve:'#8ab0d0',sleeve2:'#d8f0ff',skin:'#e8f4ff',head:b=>{b.sph(0,5.6,-.8,5.9,5.8,5.7,8,6,'#6a90b8','#b8dcf8');b.box(0,1.4,-3.6,8.6,7,2.4,'#6a90b8','#b8dcf8')}});
  /* Louie: quadruped. body / head / leg / tail */
  const L={},o='#e89040',e='#fff0d8',k='#30201c';
  b=new MB();b.box(0,0,0,7.6,5.8,11,o,'#f0a050');b.box(0,-2.4,.6,6,1.4,9,e);b.box(0,-.4,5,6.4,4.6,2,e);L.body=b.done();
@@ -236,7 +238,16 @@ function buildProps(){let b;
  b=new MB();b.quad([-10,0,6.6],[10,0,6.6],[10,0,-6.6],[-10,0,-6.6],'#04100e');PROP.hatchDark=b.done();
  /* the big door of the intro's last scene */
  b=new MB();b.box(-27,40,0,10,80,10,'#241226','#3a2440');b.box(27,40,0,10,80,10,'#241226','#3a2440');b.box(0,84,0,66,12,11,'#2c1830','#44284a');b.box(0,39,-3,44,78,2,'#0c0612','#180a1c');b.box(0,36,-1.6,5,20,1.4,'#3d2b12','#6a4a20');b.box(0,36,-.8,2,3.4,.6,'#ffd94d');PROP.bigDoor=b.done();
- b=new MB();b.box(0,.3,0,112,.6,34,'#c8a04a');b.box(0,.5,0,106,.6,28,'#46222f','#552a3a');b.box(0,.7,0,60,.5,10,'#6a3448');PROP.rug=b.done()}
+ b=new MB();b.box(0,.3,0,112,.6,34,'#c8a04a');b.box(0,.5,0,106,.6,28,'#46222f','#552a3a');b.box(0,.7,0,60,.5,10,'#6a3448');PROP.rug=b.done();
+ /* relics */
+ b=new MB();b.box(0,6,0,10,12,2.4,'#5a5470','#8a84a0');b.box(0,12.4,0,11,1.2,2.8,'#6a6480');b.box(-2,8,1.3,4,.5,.3,'#ffe9a0');b.box(1.5,6,1.3,5,.5,.3,'#ffe9a0');b.box(-1,4,1.3,4.6,.5,.3,'#ffe9a0');b.box(0,.6,0,12,1.2,4,'#3a3448');PROP.tablet=b.done();
+ b=new MB();b.box(0,.8,0,7,1.6,7,'#4a4458','#6a6478');b.box(0,5,0,4.4,7,3,'#8a8698','#b8b4c4');b.sph(0,10.4,0,2.4,2.4,2.4,6,4,'#8a8698','#c8c4d4');b.box(2.6,8,0,1.2,6,1.2,'#9a96a8');b.box(2.6,12,0,2.4,2.4,2.4,'#ffe9a0','#fff8d0');PROP.statue=b.done();
+ b=new MB();b.box(0,4,0,11,8,6,'#3a2418','#5a3a22');b.box(0,4.6,1.6,7,5,3.4,'#140c10');for(let i=0;i<5;i++)b.sph(-2.6+i*1.3,3.4,2,.8,.8,.8,5,3,TYPES[i].d,TYPES[i].c);b.cyl(4.2,8,1,.6,.6,2,5,'#f8f0d8');PROP.shrine=b.done();
+ b=new MB();b.box(-3,.5,0,6,1,10,'#4a5a30','#6a7a48');for(let i=0;i<7;i++){const a=i/7*6.28;b.sph(5+Math.cos(a)*3,.6,Math.sin(a)*3,1,1,1,4,3,'#4a4250','#6a6270')}b.box(5,.4,0,3,.6,3,'#2a2024');b.cyl(1.6,0,4.4,1.1,1.3,2,6,'#c8c0b0');PROP.camp=b.done();
+ b=new MB();b.box(0,2.6,0,7,5.2,4.6,'#6a4428','#8a5a38');b.box(0,5.6,0,7.4,1,5,'#5a3418');b.box(0,3,2.4,3,2.4,.6,'#8a5a38');b.cyl(4.4,0,0,.5,.5,7,4,'#7a4a28');b.sph(-3.6,1.6,2,1.6,1.2,1.4,5,3,'#c8a060');PROP.pack=b.done();
+ b=new MB();b.box(0,9,0,18,18,1.6,'#3a2e3e','#5a4e5e');for(let i=0;i<6;i++){const a=i/6*6.28;b.box(Math.cos(a)*4.2,9+Math.sin(a)*4.2,.9,1.6,1.6,.4,TYPES[i].c)}b.box(0,15.6,.9,2,3,.4,'#ffe9a0');PROP.carving=b.done();
+ /* a lost thing a keeper is looking for */
+ b=new MB();b.sph(0,2,0,2.6,2,2.6,6,4,'#c8a060','#f8e0a0');b.cyl(0,3.4,0,.8,.3,2,4,'#8a5a38');b.sph(0,5.8,0,1.4,1.4,1.4,5,4,'#ffffff');PROP.qitem=b.done()}
 
 /* ---------- camera ---------- */
 const CAM={x:W/2,z:H/2,d:1,init:false};
@@ -351,6 +362,13 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
   sprite(d.x,13,29,40,gc,.26+.1*Math.sin(time*4+d.x),true);
   mPush();mT(d.x,.45,d.y+9);mS(12);drawT(MESH.ring,{c:gc,a:.7,unlit:true});mPop();
   if(d.hold>0){mPush();mT(d.x,.5,d.y+9);mS(12*clamp(d.hold/.6,0,1));drawT(MESH.disc,{c:gc,a:.4,unlit:true});mPop()}}
+ /* the room's relic: brighter while unread; a lost thing in its keeper's colour; the ghost */
+ if(RUN.relic){const R0=RELICS.find(r=>r.id===RUN.relic.id);if(R0){const fresh=!(RD.relic&&RD.relic[R0.id]),rx=RUN.relic.x,rz=RUN.relic.y;shadow(rx,rz,8);prop(PROP[R0.prop],rx,0,rz-(R0.prop==='carving'?2:0),R0.prop==='carving'?0:(rx*.07)%1.2-.6,1.05,fresh?{add:.08+.06*Math.sin(time*3)}:null);
+  if(fresh)sprite(rx,10,rz,34+4*Math.sin(time*2),hex('#ffe9a0'),RUN.phase==='doors'?.32:.16,true);if(fresh&&RUN.phase==='doors'){const t=(time*.6)%1;sprite(rx+Math.sin(time*3)*3,8+t*20,rz,2,hex('#fff3c0'),1-t,true)}}}
+ if(RUN.qitem){const q=RUN.qitem,Q=KQUESTS[q.char],bob=Math.sin(time*3)*1.5;shadow(q.x,q.y,4);prop(PROP.qitem,q.x,6+bob,q.y,time*1.5,1.2,{add:.15});sprite(q.x,9+bob,q.y,30,hex(Q.col),.4,true);const t=(time*.9)%1;sprite(q.x,6+t*24,q.y,2.4,hex(Q.col),1-t,true)}
+ if(RUN.ghostNpc){const g=RUN.ghostNpc,fade=clamp(g.t/1.2,0,1)*(1-clamp((g.out||0)/1.4,0,1)),fl=.75+.25*Math.sin(time*7);
+  XRAY={c:[.42,.68,1],a:.3*fade*fl,unlit:true,glow:true};drawCast('GHOST',g.x,g.y+Math.sin(time*1.3)*1.5,Math.atan2((lead()||{x:g.x}).x-g.x,((lead()||{y:g.y+1}).y)-g.y),{id:'ghost',npc:'RANGER',talk:g.line>=0&&!g.out});XRAY=null;
+  sprite(g.x+5,14,g.y+3,10,hex('#ffe9a0'),.8*fade,true);sprite(g.x,12,g.y,48,hex('#9ad8ff'),.18*fade,true);if(g.out){const t=clamp(g.out/1.4,0,1);for(let i=0;i<6;i++)sprite(g.x+Math.sin(i*2.1+time)*6,8+t*60+i*4,g.y,3,hex('#bfe8ff'),1-t,true)}}
  if(RUN.echo){const q=RUN.echo,bob=Math.sin(time*2.4)*1.5;shadow(q.x,q.y,3.5);prop(PROP.page,q.x,10+bob,q.y,time*1.3,1.1,{unlit:true,add:.1});sprite(q.x,10+bob,q.y,30+bob*2,hex('#ffe9a0'),.4,true);const t=(time*.7)%1;sprite(q.x,10+t*22,q.y,2.4,hex('#fff3b0'),1-t,true)}
  for(const pd of RUN.pods){const bob=Math.sin(time*3+pd.x);prop(PODM[pd.type],pd.x,0,pd.y,time*.6,1.25);sprite(pd.x,5,pd.y,24+bob*3,hex('#a8f080'),.3+.1*bob,true)}
  for(const p of RUN.pickups){const bob=Math.sin(time*5+p.x)*1.2;shadow(p.x,p.y,2.6);
