@@ -121,7 +121,14 @@ function setLight(dir,col,amb){const l=Math.hypot(dir[0],dir[1],dir[2]);lightDir
 function setFog(c,near,far){RN.fogC=hex(c);RN.fog=[near,far]}
 function setCam(eye,tgt,fov){const p=m4persp(fov,RN.asp,4,1400),v=m4look(eye,tgt,[0,1,0]);m4mul(p,v,RN.vp);RN.eye=eye;
  RN.right=[v[0],v[4],v[8]];RN.up=[v[1],v[5],v[9]];RN.fwd=[-v[2],-v[6],-v[10]]}
-function frameBegin(){gl.viewport(0,0,cv.width,cv.height);gl.clearColor(RN.fogC[0],RN.fogC[1],RN.fogC[2],1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+/* trails: double-sided additive ribbons, rebuilt every frame into one buffer */
+let ribBuf=null;
+function ribbon(a,b,c,d,ca,cb,cc,cd){const V=RN.rib,P=(q,col)=>V.push(q[0],q[1],q[2],0,1,0,col[0],col[1],col[2],0,0);P(a,ca);P(b,cb);P(c,cc);P(a,ca);P(c,cc);P(d,cd)}
+function drawRibbons(){if(!RN.rib.length)return;if(!ribBuf)ribBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,ribBuf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(RN.rib),gl.DYNAMIC_DRAW);
+ gl.vertexAttribPointer(0,3,gl.FLOAT,false,44,0);gl.vertexAttribPointer(1,3,gl.FLOAT,false,44,12);gl.vertexAttribPointer(2,3,gl.FLOAT,false,44,24);gl.vertexAttribPointer(3,2,gl.FLOAT,false,44,36);curMesh=null;
+ mId();gl.uniformMatrix4fv(U.uM,false,RN.m);gl.uniform3f(U.uTint,1,1,1);gl.uniform3f(U.uAdd,0,0,0);gl.uniform1f(U.uLit,0);gl.uniform1f(U.uA,1);if(curTex!==texWhite){gl.bindTexture(gl.TEXTURE_2D,texWhite);curTex=texWhite}
+ gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.uniform3f(U.uFogC,0,0,0);gl.disable(gl.CULL_FACE);gl.drawArrays(gl.TRIANGLES,0,RN.rib.length/11);gl.enable(gl.CULL_FACE)}
+function frameBegin(){RN.rib=[];gl.viewport(0,0,cv.width,cv.height);gl.clearColor(RN.fogC[0],RN.fogC[1],RN.fogC[2],1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
  gl.useProgram(prog);gl.uniformMatrix4fv(U.uVP,false,RN.vp);gl.uniform3fv(U.uL,lightDir);gl.uniform3fv(U.uAmb,ambCol);gl.uniform3fv(U.uLc,lightCol);
  gl.uniform3fv(U.uFogC,RN.fogC);gl.uniform2f(U.uFog,RN.fog[0],RN.fog[1]);gl.disable(gl.BLEND);gl.depthMask(true);RN.tq.length=0;mId();RN.stack.length=0;curMesh=null}
 let curMesh=null;
@@ -143,7 +150,7 @@ function drawT(mesh,o){RN.tq.push({mesh,M:new Float32Array(RN.m),o:o||{}})}
 function frameEnd(){gl.enable(gl.BLEND);gl.depthMask(false);
  for(const q of RN.tq){if(q.o.glow){gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.uniform3f(U.uFogC,0,0,0)}else{gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.uniform3fv(U.uFogC,RN.fogC)}
   if(q.o.behind)gl.depthFunc(gl.GREATER);if(q.o.nocull)gl.disable(gl.CULL_FACE);_issue(q.mesh,q.M,q.o);if(q.o.nocull)gl.enable(gl.CULL_FACE);if(q.o.behind)gl.depthFunc(gl.LESS)}
- gl.depthMask(true);gl.disable(gl.BLEND);gl.uniform3fv(U.uFogC,RN.fogC)}
+ drawRibbons();gl.depthMask(true);gl.disable(gl.BLEND);gl.uniform3fv(U.uFogC,RN.fogC)}
 /* camera-facing sprite quad (needs MESH.quad from models.js) */
 const _bb=m4();
 function sprite(x,y,z,s,c,a,glow,sy){const r=RN.right,u=RN.up,f=RN.fwd,h=sy||s;

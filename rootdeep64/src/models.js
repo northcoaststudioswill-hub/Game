@@ -79,25 +79,35 @@ function buildFoes(){let b;
  b.box(-3.4,14,7.2,2.6,3.4,1,'#ffffff');b.box(3.4,14,7.2,2.6,3.4,1,'#ffffff');b.box(-3.4,13.6,7.8,1.2,1.6,.5,'#102028');b.box(3.4,13.6,7.8,1.2,1.6,.5,'#102028');
  b.cyl(0,17.6,0,6.2,6.6,2.2,10,'#c8a020','#f8d030');for(let i=0;i<5;i++){const a=i/5*6.2832+.3;b.cyl(Math.cos(a)*5.8,19.6,Math.sin(a)*5.8,1.3,0,4,4,'#f8d030','#fff3b0')}
  for(let i=0;i<6;i++){const a=i/6*6.2832;b.sph(Math.cos(a)*11.6,1.6,Math.sin(a)*11.6,2.6,1.8,2.6,5,3,'#3f8a9a','#5fb8c8')}FOE.king=b.done()}
-function drawFoe(e){const k=e.kind,fl=e.flash>0?.75:0,rise=e.born>0?clamp(1-e.born/.5,0,1):1;
+/* a foe reacting to the nearest keeper: who hit it, who it's about to bite */
+function nearKeeper(e){let b=null,bd=1e9;for(const p of PL){if(p.down)continue;const d=Math.hypot(p.x-e.x,p.y-e.y);if(d<bd){bd=d;b=p}}return[b,bd]}
+function drawFoe(e){if(e.dyT===undefined){if(e.flash>0&&!e._fl){const[p]=nearKeeper(e),dx=p?e.x-p.x:0,dz=p?e.y-p.y:1,l=Math.hypot(dx,dz)||1;e.hitT=.22;e.hdx=dx/l;e.hdz=dz/l;
+  hitFx(e.x-e.hdx*e.r*.5,e.y-e.hdz*e.r*.5,(e.kind==='boss'?18:8)+(e.z||0),e.hdx,e.hdz,false,e.kind==='boss',(FOES[e.kind]||{}).c)}e._fl=e.flash>0;if(e.hitT>0)e.hitT-=ADT}
+ const k=e.kind,fl=e.flash>0?(e.flash>.08?.5:.22):0,rise=e.born>0?clamp(1-e.born/.5,0,1):1;
  let o={add:fl};if(e.chill>0)o={add:fl,c:[.62,.85,1.25]};
  const x=e.x,z=e.y,hov=Math.sin(time*3+e.x*.5);
  /* rising out of the ground */
  const sink=(1-rise);
  if(k==='boss'){drawBoss(e,o);return}
  const sc=(e.elite?1.38:1)*1.15;
- shadow(x,z,e.r*1.25);
- mPush();mT(x,-sink*12,z);mRY(e.yaw||0);mS(sc);
- if(k==='grub'){const sq=1+Math.sin(time*9+e.x)*.08*(e.mv?1:.3);mS(1/sq,sq,sq);draw(FOE.grub,o)}
- else if(k==='spitter'){draw(FOE.spitterBody,o);mT(0,8.6+hov*.4,.6);if(e.spit>0){e.spit-=.016;mS(1.25,.8,1.25)}mRX(-.15);draw(FOE.spitterHead,o)}
+ const air=e.z||0,hk=e.hitT>0?Math.sin(clamp(e.hitT/.22,0,1)*3.14159):0,[nk,nd]=nearKeeper(e),close=nd<e.r+18;
+ shadow(x,z,e.r*1.25*(1-Math.min(.6,air/40)));
+ mPush();mT(x+(e.hdx||0)*hk*3,-sink*12+air,z+(e.hdz||0)*hk*3);mRY(e.yaw||0);mS(sc);
+ /* struck: rock back and squash; airborne: tumble; dying: fly, spin, shrink */
+ if(hk){mRX(-.42*hk);mS(1+.12*hk,1-.16*hk,1+.12*hk)}if(air>1)mRX(air*.05);
+ if(e.dyT!==undefined){const u=e.dyT;mT(0,Math.sin(u*3.14159)*16,0);mRZ(u*7*(e.spin||1));mRX(u*4);mS(Math.max(.05,1-u*.85))}
+ if(k==='grub'){const sq=1+Math.sin(time*9+e.x)*.08*(e.mv?1:.3);if(close){const ln=.5+.5*Math.sin(time*14+e.x);mT(0,0,ln*2.5);mRX(-.35*ln)}mS(1/sq,sq,sq);draw(FOE.grub,o)}
+ else if(k==='spitter'){draw(FOE.spitterBody,o);mT(0,8.6+hov*.4,.6);if(e.wind){const w=1+.18*(.5+.5*Math.sin(time*30));mS(w,w,w);mRX(.25)}else if(e.spit>0){e.spit-=.016;mS(1.25,.8,1.25)}mRX(-.15);draw(FOE.spitterHead,e.wind?{add:(o.add||0)+.25,c:o.c}:o)}
  else if(k==='beetle'){if(e.state===1){mT(R(-.5,.5),0,-1.5);mRX(.18)}else if(e.state===2)mRX(-.12);draw(FOE.beetle,e.state===1?{add:fl+.25*(.5+.5*Math.sin(time*40)),c:o.c}:o)}
  else if(k==='shade'){mT(0,9+hov*1.2,0);draw(FOE.shade,o);const fp=Math.sin(time*16+e.x)*.7;
   mPush();mT(1.2,1,-.6);mRY(-.3);mRZ(fp*.6);draw(FOE.wing,o);mPop();mPush();mS(-1,1,1);gl.frontFace(gl.CW);mT(1.2,1,-.6);mRY(-.3);mRZ(fp*.6);draw(FOE.wing,o);gl.frontFace(gl.CCW);mPop()}
  else if(k==='crab'){mT(0,Math.abs(Math.sin(time*8+e.x))*.6,0);draw(FOE.crab,o);
-  for(const s of[-1,1]){mPush();mT(s*6.4,4.2,3.2);mRY(s*-.5+Math.sin(time*5+s)*.2);draw(FOE.claw,o);mPop()}
+  for(const s of[-1,1]){mPush();mT(s*6.4,4.2,3.2);mRY(s*-.5+(close?s*.55*Math.max(0,Math.sin(time*16)):Math.sin(time*5+s)*.2));if(close)mRX(-.4*Math.max(0,Math.sin(time*16+s)));draw(FOE.claw,o);mPop()}
   if(e.state===1){mT(0,4,0);mS(e.r+5.5);drawT(MESH.sph,{c:[.74,.94,1],a:.34+.08*Math.sin(time*6),unlit:true})}}
- else if(k==='wisp'){mT(0,7+hov*1.4,0);mRY(time*2);const fs=1+Math.sin(time*13+e.x)*.1;mS(fs,2-fs,fs);draw(FOE.wisp,{unlit:true,add:fl,c:o.c})}
+ else if(k==='wisp'){mT(0,7+hov*1.4,0);mRY(time*(e.wind?14:2));if(e.wind)mS(1.25);const fs=1+Math.sin(time*13+e.x)*.1;mS(fs,2-fs,fs);draw(FOE.wisp,{unlit:true,add:fl,c:o.c})}
  mPop();
+ if(e.dyT!==undefined)return;
+ if(e.wind)sprite(x,10,z,22+8*Math.sin(time*30),hex('#ff6040'),.45,true);
  if(k==='wisp')sprite(x,8.5+hov*1.4,z,26,hex('#f8a040'),.3,true);
  if(e.burn>0)sprite(x+R(-2,2),10*sc+R(0,4),z,7,hex('#f8a040'),.8,true);
  if(e.root>0){mPush();mT(x,.4,z);mS(e.r+3);drawT(MESH.ring,{c:hex('#58c048'),a:.8,unlit:true});mPop()}
@@ -233,7 +243,7 @@ const CAM={x:W/2,z:H/2,d:1,init:false};
 function camFollow(pts,solo,dt,fill){ /* frame the room; lean toward the keepers */
  if(RUN&&RUN.freeze>0&&RUN.freezeP&&PL.length<2){pts=[RUN.freezeP];fill=.4;dt=Math.max(dt,.03)*2.4}
  let cx=W/2,cz=H*.5,sp=0;if(pts.length){cx=0;cz=0;for(const p of pts){cx+=p.x;cz+=p.y}cx/=pts.length;cz/=pts.length;for(const p of pts)sp=Math.max(sp,Math.abs(p.x-cx)/(W*.5),Math.abs(p.y-cz)/(H*.5))}
- const f=fill!==undefined?fill:clamp((solo?.7:.74)+sp*.5,.7,1.04);
+ let f=fill!==undefined?fill:clamp((solo?.7:.74)+sp*.5,.7,1.04);if(CAM.punch>0){f-=CAM.punch;CAM.punch=Math.max(0,CAM.punch-dt*.25)}
  const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.46,cz,clamp(1.06-f,0,.6)*1.5);
  const k=CAM.init?clamp(dt*3.2,0,1):1;CAM.x=lerp(CAM.x,tx,k);CAM.z=lerp(CAM.z,tz,k);CAM.d=lerp(CAM.d,f,k);CAM.init=true;
  const fov=.72,pitch=.8,cm=PL.length>2?1.12:1.04,halfW=(W*.5+16)*CAM.d*cm,halfH=(H*.5+26)*CAM.d*cm;
@@ -256,12 +266,14 @@ function keeperOpts(p,run){const isL=p.char==='LOUIE';
   hurt:run&&p.hurt>0?1-p.hurt/.25:-1,dash:run&&p.dashT>0,down:run&&p.down,cheer:run&&p.cheer>0?1-p.cheer/1.1:-1,land:run&&p.land>0?Math.max(0,1-p.land/.62):-1,help,
   charge:run&&p.charging&&p.chg>.15?clamp(p.chg/CHARGE_T,0,1):-1,heavy:run&&p.heavyA>0?1-p.heavyA/.42:-1,dive:run&&p.dive>0?1-p.dive/.3:-1,diveL:run&&p.diveL>0?1-p.diveL/.3:-1,
   sp:run&&p.spA>0&&!isL?1-p.spA/.55:-1,sup:run&&p.supA>0?clamp(1-p.supA/1.05,0,1):-1,phone:run&&p.char==='WILL'&&(p.spA>0||p.selfieA>0),
+  trail:run&&(p.swing>0||p.heavyA>0||p.dive>0||p.supA>.4),trailC:RUN&&RUN.boons&&RUN.boons.atk?GODS[RUN.boons.atk.god].l:(p.char==='ERIN'?'#e8d8ff':p.char==='MARCUS'?'#ffd28a':'#f8f4ff'),
   add:p.hurt>0?.6:(run&&p.charging&&p.chg>=CHARGE_T?.22+.12*Math.sin(time*30):0),c:p.armT>0?[.8,.85,1]:null}}
 function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay);
  shadow(p.x,p.y,p.char==='LOUIE'?7:6.2);
  /* player ring, in their colour: the 4-player couch needs to know who is who */
  {mPush();mT(p.x,.5,p.y);mS(8.6);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.down?.35:.85,unlit:true});mPop()}
- if(run)for(const tr of p.trail){const a=tr.t/.22;drawCastGhost(p,tr,a)}
+ /* dash afterimages: copies of the keeper in their colour, fading along the path */
+ if(run&&p.trail.length){const pc=hex(PCOL[p.ix]);for(let i=p.trail.length-1;i>=0;i-=2){const tr=p.trail[i],a=tr.t/.22;XRAY={c:[pc[0]*.7+.3,pc[1]*.7+.3,pc[2]*.7+.3],a:.45*a,unlit:true,glow:true};drawCast(p.char,tr.x,tr.y,yaw,Object.assign(keeperOpts(p,run),{frozen:true,id:'p'+p.ix}));XRAY=null}}
  const ko=keeperOpts(p,run);if(run&&p.inv>0&&p.dashT<=0&&!p.down&&!(p.land>0)&&!(p.hurt>0))ko.add=Math.max(ko.add||0,.18+.14*Math.sin(time*26));
  const S=drawCast(p.char,p.x,p.y,yaw,ko);
  /* seen through walls, crates, foes and effects: a ghost in the player's colour. It is a little wider than the
@@ -272,7 +284,10 @@ function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay)
  if(run&&p.down){mPush();mT(p.x,.6,p.y);mS(20*clamp(p.revT/2.2,0.02,1));drawT(MESH.disc,{c:hex('#a8f080'),a:.3,unlit:true});mPop();
   mPush();mT(p.x,.55,p.y);mS(20);drawT(MESH.ring,{c:hex('#a8f080'),a:.5+.3*Math.sin(time*6),unlit:true});mPop()}
  if(run&&p.slashT>0&&!WEAPONS[RD.weapon].proj){const w=WEAPONS[RD.weapon],rg=p.char==='LOUIE'?Math.max(18,w.range-6):w.range;
-  mPush();mT(p.x,9,p.y);mRY(yaw);mS(rg,1,rg);mRY((w.arc-2)*.0);drawT(MESH.arc,{c:hex(RUN.boons.atk?GODS[RUN.boons.atk.god].l:'#eaffea'),a:.85*p.slashT/.12,unlit:true,glow:true,nocull:true});mPop()}
+  const sa=clamp(p.slashT/.12,0,1),sc2=hex(RUN.boons.atk?GODS[RUN.boons.atk.god].l:'#eaffea');
+  mPush();mT(p.x,9,p.y);mRY(yaw+(1-sa)*(p.combo===1?-.9:.9));mS(rg*1.08,1,rg*1.08);drawT(MESH.arc,{c:sc2,a:.9*sa,unlit:true,glow:true,nocull:true});mPop();
+  mPush();mT(p.x,9.4,p.y);mRY(yaw+(1-sa)*(p.combo===1?-.9:.9));mS(rg*.82,1,rg*.82);drawT(MESH.arc,{c:[1,1,1],a:.45*sa,unlit:true,glow:true,nocull:true});mPop();
+  if(p.combo===2){mPush();mT(p.x,.6,p.y);mS(rg*(1.6-sa*.8));drawT(MESH.ring,{c:sc2,a:.45*sa,unlit:true,glow:true});mPop()}}
  if(run&&!p.down&&(p.meter||0)>=SUPER_MAX){mPush();mT(p.x,.55,p.y);mS(11+Math.sin(time*8)*1.5);drawT(MESH.ring,{c:hex('#ffd94d'),a:.9,unlit:true,glow:true});mPop();const t=(time*1.4+p.ix*.3)%1;sprite(p.x+Math.sin(time*5+p.ix)*6,t*30,p.y+Math.cos(time*4)*5,3.2,hex('#ffd94d'),1-t,true)}
  if(run&&p.charging&&p.chg>.15){const c=clamp(p.chg/CHARGE_T,0,1);sprite(p.x,12,p.y,10+c*22,hex(c>=1?'#fff3b0':'#f8a040'),.25+.35*c,true)}
  if(run&&p.supA>.45)sprite(p.x,13,p.y,60+Math.sin(time*40)*8,hex(PCOL[p.ix]),.45,true);
@@ -376,6 +391,7 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
  if(RUN.bolts)for(const b of RUN.bolts){const n=5;let x0=b.x,z0=b.y,y0=b.sky?150:10;const x1=b.sky?b.x:b.x2,z1=b.sky?b.y:b.y2,y1=10;
   for(let i=1;i<=n;i++){const t=i/n,x=lerp(x0,x1,t)+(i<n?R(-5,5):0),y=lerp(b.sky?150:10,y1,t),z=lerp(z0,z1,t)+(i<n?R(-5,5):0);sprite((x+x0)/2,(y+y0)/2,(z+z0)/2,b.sky?7:5,hex('#fff8a0'),1,true,b.sky?34:5);sprite(x,y,z,6,hex('#fff8a0'),1,true);x0=x;z0=z;y0=y}}
  for(const q of RUN.parts)sprite(q.x,(q.z||6),q.y,2.6,hex(q.c),clamp(q.life*3,0,1),true);
+ fxDraw();
  frameEnd()}
 function sceneTitle(dt){setLight([.3,.9,.45],[.5,.44,.6],[.26,.22,.36]);setFog('#07050e',180,560);
  const a=time*.12,cx=W/2,cz=H*.6;setCam([cx+Math.sin(a)*120,74,cz+Math.cos(a)*150],[cx,30,cz-20],.8);frameBegin();
@@ -414,7 +430,7 @@ function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
 function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],300,700);
  const a=time*.1;setCam([W/2+Math.sin(a)*60,90,H*.5+150],[W/2,0,H*.5],.75);frameBegin();drawRoomMesh(BKEY[B],[.7,.7,.75]);torch(12,36);torch(W-12,36);
  for(let i=0;i<10;i++){const k=DEBBY[B][i%3];if(k!=='stalag')prop(PROP[k],(i*97)%(W-30)+15,0,42+((i*57)%(H-66)),i*1.7)}frameEnd()}
-function drawScene(dt){ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
+function drawScene(dt){if(HSTOP>0&&state==='run')dt=0;else if(SLOWT>0&&state==='run')dt*=SLOWK;ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||state==='online'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
  if(state==='chars')return sceneChars(dt);

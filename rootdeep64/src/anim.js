@@ -32,7 +32,7 @@ function aStep(S,x,z,yawT,dt,snap){
   if(S.sp>4)S.ph+=dt*(3.6+S.sp*.078);S.t+=dt;S.still=S.sp<4?S.still+dt:0;
   if(!S.init){S.yaw=yawT;S.yv=0}else{const df=wrapA(yawT-S.yaw),k=snap?900:300,dm=snap?52:30;S.yv+=(df*k-S.yv*dm)*dt;S.yaw+=S.yv*dt}
   S.init=true}
- S.x=x;S.z=z}
+ if(dt>0||!S.init){S.x=x;S.z=z}}
 function aSpring(S,P,dt,k,d){if(!S.posed){for(const key of PK){S.cur[key]=P[key];S.vel[key]=0}S.posed=true;return}
  if(dt<=0)return;const n=dt>.02?2:1,h=dt/n;
  for(let i=0;i<n;i++)for(const key of PK){const soft=key==='tx'||key==='tz'||key==='hz',kk=soft?110:k,dd=soft?9:d;
@@ -137,14 +137,17 @@ function drawHuman(M,S,o,dr){const c=S.cur,sq=clamp(c.sq,-.5,.6),sy=1+sq,sx=1/Ma
  /* plant the lower foot on the floor */
  const rl=THIGH*Math.cos(c.lhx)+SHIN*Math.cos(c.lhx-c.lk),rr=THIGH*Math.cos(c.rhx)+SHIN*Math.cos(c.rhx-c.rk);
  const flat=Math.abs(c.rp)>.75?0:1,gy=(Math.max(rl,rr)-(THIGH+SHIN))*flat;
- mT(0,c.ry+gy,0);mRY(c.tw);mRX(c.rp);mRZ(c.rr);mS(sx,sy,sx);
+ mT(0,c.ry+gy,0);mRY(c.tw);
+ /* the second cut of the blade combo is a full spinning backhand */
+ if(o.atk>=0&&o.combo===1&&o.weapon==='blade')mRY(-ss(.04,.42,o.atk)*6.2832);
+ mRX(c.rp);mRZ(c.rr);mS(sx,sy,sx);
  mT(0,HIP,0);mRY(c.pt);draw(M.pelvis,dr);
  for(const s of[-1,1]){const hx2=s<0?c.lhx:c.rhx,hz2=s<0?c.lhz:c.rhz,kn=s<0?c.lk:c.rk;
   mPush();mT(s*2.1,0,0);mRZ(s*hz2);mRX(-hx2);draw(M.thigh,dr);mT(0,-THIGH,0);mRX(Math.max(0,kn));draw(M.shin,dr);mPop()}
  mT(0,2.4,0);mRY(c.cy-c.pt);mRX(c.cx);mRZ(c.cz);draw(M.chest,dr);
  for(const s of[-1,1]){const L=s<0,ax=L?c.lsx:c.rsx,ay=L?c.lsy:c.rsy,az=L?c.lsz:c.rsz,el=L?c.le:c.re;
   mPush();mT(s*5.6,4.2,0);mRZ(s*az);mRY(ay);mRX(-ax);draw(M.uarm,dr);mT(0,-3,0);mRX(-Math.max(0,el));draw(M.farm,dr);
-  if(!L&&o.weapon){mT(0,-2.9,0);mRX(o.weapon==='bow'?1.2+c.wx:.2+c.wx);draw(MESH[o.weapon],dr)}
+  if(!L&&o.weapon){mT(0,-2.9,0);mRX(o.weapon==='bow'?1.2+c.wx:.2+c.wx);draw(MESH[o.weapon],dr);if(o.trail&&!XRAY&&o.weapon!=='bow')trailSample(S,o.weapon==='maul'?12:11)}
   if(L&&o.phone){mT(0,-3.6,.6);draw(MESH.phone);mT(0,0,.5);draw(MESH.phoneLit,{unlit:true,add:.3})}
   mPop()}
  mT(0,5,0);mRY(c.hy);mRX(c.hx);mRZ(c.hz);draw(M.head,dr);
@@ -200,7 +203,7 @@ function drawCast(kind,x,z,yaw,o){o=o||{};const dt=o.frozen?0:ADT,id=o.id||(kind
  const dr=(o.c||o.add)?{c:o.c,add:o.add}:null;
  mPush();mT(x,o.y||0,z);mRY(S.yaw);if(o.scale)mS(o.scale);
  if(lou)drawLouie(CAST.LOUIE,S,o,dr);else drawHuman(CAST[kind]||CAST.WILL,S,o,dr);
- mPop();return S}
+ mPop();if(!XRAY&&S.tips&&S.tips.length)trailDraw(S,o.trailC||'#ffffff');return S}
 /* jointed mesh set for a two-legged character */
 function human(o){const m={},sk=o.skin||SKIN,sl=o.sleeve||o.top,sl2=o.sleeve2||o.top2||o.top;let b;
  b=new MB();if(o.dress)b.cyl(0,-4.1,0,6,4.2,5.7,8,o.top,o.top2);else{b.box(0,1.2,0,8.2,2.6,5,o.pant);if(o.belt)b.box(0,2.2,0,8.6,1.1,5.4,o.belt)}m.pelvis=b.done();

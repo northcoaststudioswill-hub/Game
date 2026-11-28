@@ -106,7 +106,10 @@ function hudPlayer(p,x,y,right){const s=rdStats(p),w=104,full=(p.meter||0)>=SUPE
  const cd=clamp(1-(p.spCd||0)/(mv(p).spCd||6),0,1);r('#0d0a14',px,y+21,22,7);r(cd>=1?'#f878a8':'#6a3a52',px+1,y+22,Math.round(20*cd),5);
  /* super meter */
  r('#241a08',tx,y+30,bw,4);r(full?(((time*8)|0)%2?'#ffffff':'#ffd94d'):'#c88a18',tx,y+30,Math.round(bw*clamp((p.meter||0)/SUPER_MAX,0,1)),4);
- if(full)text('SUPER',x+(right?-34:w+4),y+27,1,((time*6)|0)%2?'#ffd94d':'#ffffff','#120a18')}
+ if(full)text('SUPER',x+(right?-34:w+4),y+27,1,((time*6)|0)%2?'#ffd94d':'#ffffff','#120a18');
+ /* combo counter under the panel: pops on every hit, grades as it climbs */
+ if((p.cmb||0)>=3){const n=p.cmb,g=n>=30?'SAVAGE':n>=20?'BRUTAL':n>=10?'GREAT':n>=5?'NICE':'',pop=1+clamp((p.cmbT-1.6)/.2,0,1)*.35,top=y<VH/2,cy=top?y+42:y-26;
+  hx.save();hx.translate(right?x+w-8:x+8,cy);hx.scale(pop,pop);text(n+' HITS',0,0,3,PCOL[p.ix],'#120a18',right?'right':'left');if(g)text(g,0,15,1,'#ffffff','#120a18',right?'right':'left');hx.restore()}}
 function hudRun(){const B=BIOMES[RUN.biome];
  /* world-anchored labels */
  if(RUN.phase==='doors')for(const d of RUN.doors){const q=project(d.x,36,27);if(!q)continue;const lbl=d.kind==='boon'?GODS[d.god].n+' BOON':DOORLBL[d.kind]||d.kind.toUpperCase(),c=d.kind==='boon'?GODS[d.god].l:DOORCOL[d.kind];

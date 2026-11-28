@@ -71,6 +71,18 @@ are planted from the leg pose. It only reads game state — no rule or timing th
   whoever walks up and gestures while talking.
 - The Hollow Keeper uses Will's rig: crouched wind-up, lunge, flinch.
 
+## Combat feel
+
+`src/fx.js`. Hit-stop on contact (longer for heavies, crits and kills); slow motion on the last kill of a room and
+on a boss going down, with a burst of rings and sparks; ribbon trails that follow the real blade tip through every
+swing; the second blade cut is a full spinning backhand; impact stars and spark sprays thrown away from the hitter;
+foes rock back and squash when struck, finishers / heavies / supers knock small foes into the air (a short stun
+while airborne), and dead foes tumble away spinning before popping; dash afterimages are copies of the keeper in
+the player's colour; a camera punch on big hits; a per-player combo counter (NICE / GREAT / BRUTAL / SAVAGE).
+Foes telegraph: grubs rear up and lunge when close, crabs snap their claws, spitters and wisps swell and glow red
+just before they fire. Online friends see all of it (rebuilt on their side from hits and deaths they receive).
+`node test/combat.js` freezes a fight at telling moments and saves close-ups.
+
 ## Moves
 
 On top of the cartridge's attack / cast / dash, every keeper has four more verbs (`src/moves.js`). Every name
@@ -158,6 +170,7 @@ never renumber, you can drop in mid-run and leave from the Hearth or pause menu.
 - `src/data.js` – the cartridge's tables, verbatim
 - `src/game.js` – the loop
 - `src/moves.js` – specials, supers, heavies, dash strikes
+- `src/fx.js` – combat effects: hit-stop, slow motion, trails, sparks, launches, death tumbles, combo counter
 - `src/net.js` – online play (host / join, input and snapshots over the page's room)
 - `src/story.js` – missions, conversations, echoes, boss / god / keeper lines
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes

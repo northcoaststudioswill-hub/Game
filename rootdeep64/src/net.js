@@ -81,10 +81,10 @@ function pRec(p){const s=rdStats(p),t=[p.swing,p.swingD,p.castA,p.selfie,p.selfi
  const fl=(p.down?1:0)|(p.charging?2:0)|(p.ready?4:0)|(p.dev.net?8:0);
  return[p.ix,CHARS.findIndex(c=>c.id===p.char),r1(p.x),r1(p.y),c100(p.ax),c100(p.ay===undefined?1:p.ay),r1(p.hp),r1(s.maxHp),fl,r1(p.meter||0),p.dashCharges||0,s.dashCharges,p.castAmmo||0,1+(hasKeep('stone')?1:0),
   Math.round(clamp(1-(p.spCd||0)/(mv(p).spCd||6),0,1)*100),p.combo||0,p.csel||0,p.downs||0,Math.round(((p.slashAng||0)*180/Math.PI)),Math.round(92*s.speedMul*(1+.07*budCount(3))),
-  p.dev.net?p.dev.peer+':'+p.dev.id:p.dev.id,p.hubT?String(p.hubT.n).slice(0,30):'',t]}
-function eRec(e){const fl=(e.elite?1:0)|(e.burn>0?2:0)|(e.chill>0?4:0)|(e.root>0?8:0)|(e.dazed>0?16:0)|(e.flash>0?32:0)|(e.mv?64:0)|(e.spit>0?128:0);
+  p.dev.net?p.dev.peer+':'+p.dev.id:p.dev.id,p.hubT?String(p.hubT.n).slice(0,30):'',t,p.cmb||0,c100(p.cmbT)]}
+function eRec(e){const fl=(e.elite?1:0)|(e.burn>0?2:0)|(e.chill>0?4:0)|(e.root>0?8:0)|(e.dazed>0?16:0)|(e.flash>0?32:0)|(e.mv?64:0)|(e.spit>0?128:0)|(e.wind?256:0);
  const r=[tag(e),KINDS.indexOf(e.kind),r1(e.x),r1(e.y),Math.round(e.hp/e.max*100),Math.round((e.yaw||0)*57.3),fl,c100(e.born),e.state|0,Math.round(e.r*10)];
- if(e.kind==='boss')r.push(e.bossIx,c100(e.t),r1(e.tx||0),r1(e.ty||0),r1(e.lx||0),r1(e.ly||0),r1(e.hp),r1(e.max));return r}
+ if(e.kind==='boss')r.push(e.bossIx,c100(e.t),r1(e.tx||0),r1(e.ty||0),r1(e.lx||0),r1(e.ly||0),r1(e.hp),r1(e.max));else r.push(r1(e.z||0));return r}
 function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
  const c={q,st:state,ow:(PL.find(p=>p.dev===menuDev)||{ix:-1}).ix,sT:r2(stateT),P:PL.map(pRec)};
  if(say2T>0)c.s2=[say2Txt,r2(say2T)];if(joinT>0)c.jm=[joinMsg,r2(joinT)];
@@ -155,7 +155,7 @@ function netApplyCore(){const c=NET.core;if(!c||typeof c!=='object')return;
   if(!p){p={ix,trail:[],x:r[2],y:r[3],anim:0};PL.push(p);PL.sort((a,b)=>a.ix-b.ix)}
   p.char=(CHARS[r[1]]||CHARS[0]).id;p.tx=r[2];p.ty=r[3];p.ax=r[4]/100;p.ay=r[5]/100;p.hp=r[6];p.ns={maxHp:r[7],dashCharges:r[11],speedMul:1,dmgMul:1,atkMul:1,castMul:1,crit:0,armor:0,castRegen:1,healMul:1};
   const fl=r[8];p.down=!!(fl&1);p.charging=!!(fl&2);p.ready=!!(fl&4);p.meter=r[9];p.dashCharges=r[10];p.castAmmo=r[12];p.spCd=(1-r[14]/100)*(mv(p).spCd||6);p.combo=r[15];p.csel=r[16];p.downs=r[17];p.slashAng=r[18]/57.3;p.spd=r[19];
-  p.dk=String(r[20]);p.dev=devFor(p.dk);p.hubT=r[21]?{n:r[21]}:null;
+  p.cmb=r[23]|0;p.cmbT=(r[24]|0)/100;p.dk=String(r[20]);p.dev=devFor(p.dk);p.hubT=r[21]?{n:r[21]}:null;
   const T=r[22]||[];['swing','swingD','castA','selfie','selfieA','hurt','cheer','land','chg','heavyA','dive','diveL','spA','supA','dashT','revT','inv','armT','slashT','reviving'].forEach((k,j)=>p[k]=(T[j]||0)/100);
   p.mine=p.dk.startsWith(NET.peer+':');
   if(p.mine&&!p.pred&&!p.down){p.x=p.tx;p.y=p.ty;p.pred=true}}
@@ -172,10 +172,10 @@ function netApplyCore(){const c=NET.core;if(!c||typeof c!=='object')return;
  RUN.doors=(c.D||[]).map(d=>({kind:DKINDS[d[0]]||'boon',god:GODIDS[d[1]]||'EMBER',hold:d[2],by:PL.find(p=>p.ix===d[3])||null,boss:!!d[4],x:d[5],y:d[6]}));
  const ids=new Set(),list=[];RUN.boss=null;
  for(const r of c.E||[]){const id=r[0];ids.add(id);let e=ENT[id];if(!e){e=ENT[id]={x:r[2],y:r[3]}}
-  Object.assign(e,{kind:KINDS[r[1]]||'grub',_x:r[2],_y:r[3],hp:r[4],max:100,yaw:r[5]/57.3,elite:!!(r[6]&1),burn:r[6]&2?1:0,chill:r[6]&4?1:0,root:r[6]&8?1:0,dazed:r[6]&16?1:0,flash:r[6]&32?.1:0,mv:r[6]&64?1:0,spit:r[6]&128?.2:0,born:r[7]/100,state:r[8],r:r[9]/10});
+  Object.assign(e,{kind:KINDS[r[1]]||'grub',_x:r[2],_y:r[3],hp:r[4],max:100,yaw:r[5]/57.3,elite:!!(r[6]&1),burn:r[6]&2?1:0,chill:r[6]&4?1:0,root:r[6]&8?1:0,dazed:r[6]&16?1:0,flash:r[6]&32?.1:0,mv:r[6]&64?1:0,spit:r[6]&128?.2:0,wind:!!(r[6]&256),z:r[1]===6?0:(r[10]||0),born:r[7]/100,state:r[8],r:r[9]/10});
   if(e.kind==='boss'){Object.assign(e,{bossIx:r[10],t:r[11]/100,tx:r[12],ty:r[13],lx:r[14],ly:r[15],hp:r[16],max:r[17]});RUN.boss=e}
   list.push(e)}
- for(const k in ENT)if(!ids.has(+k))delete ENT[k];RUN.enemies=list;
+ for(const k in ENT)if(!ids.has(+k)){const e=ENT[k];if(RUN&&e.kind!=='boss'&&e.chamber===RUN.chamber)deathFx(e);delete ENT[k]}for(const e of list)e.chamber=RUN.chamber;RUN.enemies=list;
  RUN.banner=c.bn?{txt:c.bn[0],who:c.bn[1],c:c.bn[2],t:c.bn[3]}:null;RUN.sub=c.sb?{who:c.sb[0],txt:c.sb[1],t:c.sb[2],c:c.sb[3]}:null;
  RUN.echo=c.ec?{x:c.ec[0],y:c.ec[1]}:null}
 const seenId=new Set();
@@ -206,6 +206,8 @@ const NETUI={uiSel:v=>uiSel=v,menuSel:v=>menuSel=v,pauseSel:v=>pauseSel=v,pauseP
 /* every frame on a client: ease everything toward the host, run my own keeper locally, let effects play out */
 function netClientFrame(dt){if(!NET.client)return;time+=dt;stateT+=dt;if(say2T>0)say2T-=dt;if(joinT>0)joinT-=dt;
  const k=Math.min(1,dt*14),run=!!RUN&&(state==='run');
+ for(const p of PL){p.trail=p.trail||[];if(run&&p.dashT>0)p.trail.push({x:p.x,y:p.y,t:.22});for(const tr of p.trail)tr.t-=dt;p.trail=p.trail.filter(tr=>tr.t>0);if(p.cmbT>0)p.cmbT-=dt}
+ if(run)fxUpdate(dt);
  for(const p of PL){for(const t of['swing','castA','selfie','selfieA','hurt','cheer','land','heavyA','diveL','spA','supA','dashT','inv','armT','slashT','reviving'])if(p[t]>0)p[t]-=dt;
   if(p.mine&&p.pred&&!p.down&&!(p.dive>0)&&(state==='hub'||state==='run'||state==='talk'))netPredict(p,dt);
   else{p.x+=(p.tx-p.x)*k;p.y+=(p.ty-p.y)*k}}

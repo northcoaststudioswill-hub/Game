@@ -6,7 +6,9 @@ const {chromium}=require('playwright');const path=require('path');
  pg.on('console',m=>{if(m.type()==='error')errs.push(m.text())});pg.on('pageerror',e=>errs.push('PAGEERROR '+e.message));
  await pg.goto('file://'+path.join(__dirname,'..','index.html'));await pg.waitForTimeout(500);
  await pg.evaluate(()=>{localStorage.clear();rdLoad()});
- const st=()=>pg.evaluate(()=>__rd.RDF.state());const ev=f=>pg.evaluate(f);
+ const st=()=>pg.evaluate(()=>__rd.RDF.state());
+ /* wait on what should happen, not on a clock: a software-rendered browser runs the game slowly */
+ const waitFor=async(f,ms)=>{const t0=Date.now();while(Date.now()-t0<(ms||8000)){if(await pg.evaluate(f))return true;await pg.waitForTimeout(100)}return false};const ev=f=>pg.evaluate(f);
  const ok=(c,m)=>{console.log((c?'  ok  ':'  FAIL ')+m);if(!c)fails++};
  const tap=async(k,ms=60)=>{await pg.keyboard.down(k);await pg.waitForTimeout(ms);await pg.keyboard.up(k);await pg.waitForTimeout(90)};
  const hold=async(k,ms)=>{await pg.keyboard.down(k);await pg.waitForTimeout(ms);await pg.keyboard.up(k)};
@@ -31,20 +33,20 @@ const {chromium}=require('playwright');const path=require('path');
  ok(cleared,'chamber 1 cleared by fighting (both waves)');ok(dashed,'dash button spends a charge');ok(casted,'cast spends ammo (MAZEL TOV LASER)');
  s=await st();ok(s.run.doors.length===2,'two reward doors: '+s.run.doors.join(' / '));ok(s.run.buds.length>=0&&(await ev(()=>RUN.podDropped)),'a sprout pod dropped (guarantee)');
  /* walk into a door */
- await ev(()=>{PL[0].x=RUN.doors[0].x;PL[0].y=40});await hold('KeyW',500);s=await st();
+ await ev(()=>{PL[0].x=RUN.doors[0].x;PL[0].y=40});await pg.keyboard.down('KeyW');await waitFor(()=>state!=='run'||RUN.chamber===2,6000);await pg.keyboard.up('KeyW');s=await st();
  ok(s.state==='boon'||s.state==='shop'||(s.state==='run'&&s.run.chamber===2),'walking into a door takes its reward ('+s.state+')');
  if(s.state==='boon'){await pg.waitForTimeout(450);await tap('KeyZ');s=await st();ok(s.run.boons.length===1&&s.run.chamber===2,'boon accepted -> chamber 2 with '+s.run.boons[0])}
  if(s.state==='shop'){await tap('KeyX');s=await st();ok(s.run.chamber===2,'left the shop -> chamber 2')}
  /* pause / build / resume */
- await tap('Enter');s=await st();ok(s.state==='pause','START pauses');await tap('Enter');s=await st();ok(s.state==='run','START resumes');
+ await tap('Enter');await waitFor(()=>state==='pause',3000);s=await st();ok(s.state==='pause','START pauses');await pg.waitForTimeout(300);await tap('Enter');await waitFor(()=>state==='run',3000);s=await st();ok(s.state==='run','START resumes');
  /* boss, co-op down + revive, death banking */
  await ev(()=>{__rd.RDF.join('gp9');plRunInit(PL[1]);__rd.RDF.goto(4)});s=await st();ok(s.run.enemies===1&&s.players.length===2,'chamber 4 is the Grub Mother, 2 keepers');
  await ev(()=>{RUN.buds=[];__rd.RDF.hurt(999,1)});s=await st();ok(s.players[1].down&&s.state==='run','P2 falls: down, run continues '+JSON.stringify(s.players)+' rev '+(await ev(()=>RUN&&RUN.revives)));
- await ev(()=>{RUN.enemies[0].x=40;RUN.enemies[0].y=40;RUN.enemies[0].sp=0;RUN.eprojs=[];PL[0].x=PL[1].x+6;PL[0].y=PL[1].y;PL[0].inv=5});await pg.waitForTimeout(2800);s=await st();ok(!s.players[1].down&&s.players[1].hp>0,'standing over P2 revives them ('+s.players[1].hp+' hp)');
- await ev(()=>{__rd.RDF.clearRoom()});await pg.waitForTimeout(300);s=await st();ok(s.run.phase==='doors'&&(await ev(()=>RUN.keys))===1,'boss down: key + doors');
+ await ev(()=>{RUN.enemies[0].x=40;RUN.enemies[0].y=40;RUN.enemies[0].sp=0;RUN.eprojs=[];PL[0].x=PL[1].x+6;PL[0].y=PL[1].y;PL[0].inv=5});await waitFor(()=>!PL[1].down,12000);s=await st();ok(!s.players[1].down&&s.players[1].hp>0,'standing over P2 revives them ('+s.players[1].hp+' hp)');
+ await ev(()=>{__rd.RDF.clearRoom()});await waitFor(()=>RUN&&RUN.phase==='doors',6000);s=await st();ok(s.run.phase==='doors'&&(await ev(()=>RUN.keys))===1,'boss down: key + doors');
  const dewBefore=s.meta.dew,runDew=s.run.dew+2*(s.run.chamber-1);await ev(()=>{__rd.RDF.hurt(999,0);__rd.RDF.hurt(999,1)});s=await st();
  ok(s.state==='over'&&s.meta.dew===dewBefore+runDew&&s.meta.keys===2,'party wipe: THE DEEP KEEPS YOU, Moondew + key banked ('+s.meta.dew+' dew)');
- await pg.waitForTimeout(1600);await tap('KeyZ');s=await st();ok(s.state==='hub','A returns to the Hearth');
+ await waitFor(()=>overT>1.4,8000);await tap('KeyZ');await waitFor(()=>state==='hub',3000);s=await st();ok(s.state==='hub','A returns to the Hearth');
  /* escape */
  await ev(()=>{__rd.RDF.depart();__rd.RDF.finale()});await ev(()=>{__rd.RDF.clearRoom()});await pg.waitForTimeout(300);s=await st();ok(s.state==='win'&&s.meta.escapes===1,'chamber 12 cleared: YOU ESCAPED THE DEEP');
  console.log(errs.length?'CONSOLE ERRORS:\n'+[...new Set(errs)].join('\n'):'no console errors');console.log(fails?fails+' FAILED':'ALL GREEN');await br.close();process.exit(fails||errs.length?1:0)})();
