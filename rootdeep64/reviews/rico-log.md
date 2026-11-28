@@ -1,0 +1,139 @@
+# Rico play log
+Start: 02:41 UTC
+- ~ Title screen (001) looks sharp. "Sprouts roguelite, 1-4 keepers". A on pad starts.
+- ~ Intro cutscene auto-advances ~3s/line, START: SKIP shown. Erin/Will, Great Lantern dimming, something under garden hungry. Cute N64-ish chunky look (002-009).
+- ~ Hub (010): stations MIRROR/ARMORY/SHELF/CODEX/HEAT/BOARD, NPCs with ! marks. Bottom-left hint "MORE KEEPERS: PRESS A ON ANOTHER PAD ( , ON KE..." overlaps DESCEND label and has odd "( ," text. Player hidden under "A: LOUIE" tag?
+- ~ Movement is FAST (600ms stick = crossed half the hub). Player model gets fully hidden behind the shelf/lantern prop when standing at it (013/014).
+- ~ Keepsake Shelf (015): Hades-style keepsakes, all "GIFT <NPC>" locked. Pressing A on a locked one does nothing - no sound cue visible, no "locked" text (020). Descriptions clear (+20 max HP, cheat death 20%, +1 cast charge, thorns, +35% Moondew).
+- ~ (wall clock - commands are quick) Talked to Scout (mission "Field Notes") and Erin ("A Story, Not Just Dew"). Gift Honey via START in dialogue -> got PRESSED FLOWER, equipped. Gift prompt only appears on the 2nd conversation (first one is "A: DONE 1/1"), easy to miss.
+- NPCs wander and cluster; with 5 NPCs + nameplates I lost my own character in the crowd (028). Interaction radius for stations is tight; standing between ARMORY and MIRROR shows no prompt (040).
+- Armory: Petal Blade owned ("3-hit blooming combo"), Root Maul 2 keys, Thornbow 3 keys. Mirror of Dew: 8 perma-upgrades. Bought Vitality, Might, Mending (30 dew). Desc text runs "/ rank Bought with..." missing period; wraps to 2 lines.
+- ~ NPCs body-block movement in hub; 900ms stick toward descend barely moved me because Erin/Louie were in the way (052).
+- KEEPER SELECT (055/062): text at the bottom overlaps itself badly at 960x540 - "ALL-ROUND - COMBO 3 ENDS IN A SELFIE FLASH" printed on top of the flavour line, "A: READY" half under the "MORE KEEPERS" line. Same on locked Erin ("HEARTH 1/3") and Louie ("0/30") (057/058). Will's special "MAZEL TOV LASER" - lol.
+- ~ RUN 1 as Will. Room 1 "CH 1/12 THE BURROWS". Control hint text sits mid-screen at top and stays during the whole fight, overlapping enemies/damage numbers (064-072).
+- Combat: A combo is snappy, numbers pop (14,14,20 "SELFIE!" finisher). Grubs die in ~3 hits. Took chip damage 130->85 without clearly seeing what hit me - grubs touch dmg + green sprout spitter. Cast (B) "MAZEL TOV LASER" beam looks good (070). Dash (RB) = "STAGE DIVE!" (073). Camera shakes/zooms a lot.
+- Hard to tell which way I'm facing; sprout spitter kited me and I whiffed several swings at what looked like close range (074-079).
+- Clear: "A SPROUT WAS HIDING HERE!" + two doors SHOP / DEW (080).
+- ~ Sprout pickup: walked over it, no pickup popup; HUD later shows "BUDS 1/6" and a little grey pot follows me (085). Fine but quiet.
+- Took SHOP door after room 1: "A ROOT-TOOTHS STALL" (no apostrophe) - Honey 80p, Boon 150p, Purse 50p; I have 37. Useless detour this early (087).
+- Ch2: Keyboard (WASD/arrows, J/Z/Space) does NOTHING while pad is P1 (089-091). Hub hint "PRESS A ON ANOTHER PAD ( , ON KEYS)" - the keyboard join key name is blank. Keyboard players apparently must join as separate keeper but I can't tell which key.
+- ~ Ch2: armadillo beetle + purple grub, then "THE DEEP STIRS - MORE RISE" second wave with spitter sprout. "PEB BLOCKED!" / "PEB SCATTERED!" - my bud companion Peb soaks hits and then the BUDS counter vanished from HUD (102). Unclear if I lost the bud.
+- Heavy (hold A 600ms) works, filled super. Y super = "BIKE LANE" banner (097), nice. During super/i-frames the player model disappears entirely - only the yellow ring is left (096, 099, 106). Hard to read where you are.
+- HP bled 88 -> 39 in this room. I mostly could not SEE what hit me - spitter shots are tiny/pale against pink floor, contact damage from grubs. Health bar turns red at low HP (107). No healing between rooms so far.
+- Spitter sprout tends to sit at max range; whiffed 3-hit combos twice even when it looked adjacent.
+- ~ Boon pick (ZIP, 112): Hades-style 3 cards, clean & readable. First A press on the boon screen did nothing (113) - needed a 2nd press (input lockout w/o any visual cue?).
+- Ch3 "AN ELITE GUARDS THIS CHAMBER" - banner sits over the arena for several seconds while enemies are already active (114-116). Cast w/ Sky Judgement does 38 to 3 foes, nice. Cast charge empties and recharges slowly (grey square).
+- HP to 15/130. Pink glowy blobs = spitter projectiles; they look like pickups (heart-pink) - I walked INTO one thinking it was health (128/129). Bad readability.
+- Rock pillars occlude both me and enemy, and attacks seem to lunge/overshoot when stick held (132-135); fought a block instead of the enemy.
+- Cleared: doors PEB / HEART, "AN ECHO" pickup and SPROUT POD (137).
+- ~ SPROUT POD only collected after pressing X near it (151) - walking over or A did nothing, and there was no prompt telling me X. Also X seems to cost some of the pink meter. Echo note "FIRST NOTCH 1/18" - nice lore, B shows "A: KEEP IT" prompt only after a press (146/147).
+- Companions: Ember (orange) + Leaf (green) follow me. BUDS 2/6.
+- 02:49 (REAL wall clock - earlier stamps were guesses, replaced with ~) Heading to HEART door.
+- 02:52 RUN 1 DEATH at CH4 boss THE GRUB MOTHER (came in with 43/155 after HEART door gave +25 max HP).
+  - Boss appears in chamber 4 of 12 - abrupt; previous room preview just said HEART, no "boss ahead" warning. I walked in at 1/3 HP.
+  - Her body-contact damage is huge (~16 per touch) and her segmented body sweeps around; combos up close cost me 16-17 HP each time (159, 166).
+  - Super BIKE LANE did 94 (163) - huge, satisfying. Cast charges ran dry - the only indicator is the tiny squares under HP.
+  - Death screen came INSTANTLY mid-combo (172) - no death animation/hitstop/"last hit" read; I don't know what killed me. Screen "THE DEEP KEEPS YOU / SHE HAS SO MANY CHILDREN TO FEED", stats, +6 dew, +2 sprouts banked. Nice tone.
+  - Boss subtitle box "(She calls. The walls answer.)" sits bottom-centre for ages, over the arena.
+- 02:53 Back in hub. Pressing ENTER on keyboard = "PLAYER 2 JOINED" (176) - so the hub hint's missing key name is ENTER. Keyboard P2 = WASD + J etc. The "PLAYER 2 JOINED" banner stayed up the whole time.
+- ESC in the hub dumps you straight to title, no "are you sure?" (178). Settings is thin: music/sfx/screen shake only. No control remap, no colour/readability options (179).
+- 02:56 RUN 2, keyboard only (reload, Enter on title -> keyboard becomes P1; prompts switch to "Z:"). Hub hint still reads "( , ON KEYS)" (183). Keeper select overlap even worse w/ keyboard text (184).
+- Start of CH1: a pink projectile was already flying at my spawn point, took 7 before I pressed anything (185/186).
+- Keyboard aim = last move direction. Tapped A to step then Z-combo'd -> swung at empty air while armadillo chewed me (192). No mouse aim. Fine once you know.
+- Room-clear banner "A SPROUT WAS HIDING HERE" and boon text print right ON TOP of the persistent control-hint lines - illegible (193/194). Control hints never go away in CH1.
+- Armadillo shows (4) in parens = armoured, chip dmg. Contact dmg 12.
+- ~ Correction: sprout buds join you by WALKING onto them + pressing special? Actually: Peb joined when I stood on it (200). SPROUT PODS are breakable - you HIT them (Z/A) and a bud pops out (222 "EMBER JOINED"). Earlier pad X "worked" only because the special hit it. Nothing on screen tells you pods must be hit; I stood on/pressed A next to one and nothing happened (150). Minor tutorialisation gap.
+- FOUNTAIN door = full heal (204) - great, that's the reward-preview system working. Keyboard combat is fine once facing is understood. Hit numbers stack on top of each other ("SELFIE! CKED!") and become unreadable (207).
+- Room 2 cleared at 110/130 - much better play this time; I'm learning to back off spitters.
+- ~ Took EMBER door -> Firebloom boon (cast +45% explode/burn). CH3 elite room again ("AN ELITE GUARDS THIS CHAMBER" overlay persists ~3s over the fight, 228-230).
+- Repeated: player model disappears for several frames after being hit (just the yellow ring visible, 245/246). It's a hit-flicker, but combined with the busy floor I lose my guy.
+- Buds: "LEAF SCATTERED!/PEB SCATTERED!" when I'm hit; BUDS counter drops to nothing and HUD line vanishes (249-251) then comes back as "EMBER JOINED" after the room clears. Confusing: do I lose them? Seems they re-join, but nothing explains this.
+- Melee whiffs at spitter sprouts happen when the sprout's sprite looks in range but isn't; once glued to it the 3-hit lands. Melee reach feels short for a sword.
+- Red "-14" over enemy reads like my damage taken? Actually it's a stale damage number floating next to the enemy hp bar (250). Mixed number colours (white dealt, blue "2"= chip/armour, red?) not explained.
+- ~ RUN 2: BEAT THE GRUB MOTHER (292) on keyboard at 62/130. "GRUB MOTHER FALLEN! +1 KEY", +40 dew, full heal, 2 sprout pods, an echo, doors ZIP/DEW. Super on keyboard is V (not shown anywhere I noticed besides hint line?). Hit-and-run (3-hit, dash out) + Firebloom casts from range is the pattern - that felt GOOD once learned. Peb BLOCKED a hit for me (273) - companions have a real role.
+- Boss: pink glowy orbs she spawns on the floor (281) are the "walls answer" adds? They look identical to spitter shots & to pickups - pure visual noise; never sure if they hurt.
+- Numbers overlapping into garbage ("?4)" / "8!0") (289-290).
+- Boss dialogue lines in brackets as subtitles - nice character, but box covers lower-middle of arena for whole fight.
+- ~ Boon screen after boss: picked STORM EDGE (rare, attack +51% + chain lightning). "Z: ACCEPT" prompt overlaps the CH label at bottom (298).
+- CH5 THE FLOODED VAULT - new biome, blue palette, looks great. But: the crab enemy and ice blue projectiles are blue-on-blue, nearly invisible (303-306). New area starts with an enemy shot already reaching me again (300 "PEB BLOCKED!" on frame 1).
+- Fast clear with Storm Edge. Doors FRUIT / HEART.
+- ~ CH6: chasing the green spitter sprout is a CHORE - it backpedals at about my walk speed; holding direction + mashing Z, my swings land where it was. ~6 combos whiffed (322-331). Ranged cast is the only reliable answer and charges recharge slowly. This is the least fun part of the game so far.
+- Orange flame wisp = stationary turret, fine.
+- ~ Dash then attack ("STAGE DIVE!") is the real answer to kiting spitters (332 - 51 dmg). Game never teaches it.
+- Meleeing the orange flame wisp cost 23 HP in one combo (57->34, 339) - no visible fire aura/telegraph other than its glow. Felt unfair. Dash overshot bat and dumped me behind a pillar where the camera hides me (336).
+- CH6 clear: FOUNTAIN / HONEY doors. Hidden sprout.
+- ~ CH7 elite (a big crab) melted to super (94) + combo. Then 2 extra waves. Flame wisps hurt a LOT while I stood near them casting (26->15, 376/377) - their small white orbs are nearly invisible on the pale floor. Ended at 19/130. Both doors are PEB (no choice really). 6/6 buds.
+- "DEW SCATTERED!" text when I take damage = losing a bud? unclear (368).
+- Floating pink orb remains in room after clear (382) - test if it hurts.
+- ~ Echo #4 "WATERLINE" - writing is genuinely good. BUG?: entered a door labelled PEB (Peb's star icon), screen says "EMBER SPEAKS" with Ember's duo/Peb-ish stone boons (388). Door label doesn't match the speaker.
+- Duo boon offered (Wildfire Storm = Firebloom + Storm Edge synergy). Hades-y but it's a nice moment.
+- ~ RUN 2 DEATH at CH8 boss THE DROWNED KING with 23/130. Went in at 21 HP (both pre-boss doors were PEB; no heal option offered) - my fault for the HP, but again: died DURING a 3-hit combo, no telegraph seen in 409 (King sitting still, no ring), death screen cut in instantly with zero death beat (410). 23 HP gone in < 0.4s. I think his body-contact/hop does 20+ - unreadable.
+  - King itself: "HE LEAPS!" banner + red ring on my position = clean, fair telegraph; dodged 2/2 with dash. Best fight design in the game. Boss lines are touching ("I was... going to return it").
+  - Death screen "HE ONLY SAT ON YOU FOR A MOMENT" - funny. +52 dew, +6 sprouts.
+- ~ Hub: bought ROOT MAUL (2 keys) and Vitality+Bark Skin x2 (45 dew). Station interaction radius is very tight: had to nudge 4 times to get the ARMORY and MIRROR prompts (415-425); Louie the dog parks on top of the player and hides him (424). New NPCs Marcus + Ranger appeared.
+- Mirror cost scaling shown inline (Bark Skin 12->26). Description wraps "kept / forever." near the button prompt (427).
+- ~ Talked to Ranger: "chambers 3,7,10 have something bigger... three of those and you've earned a key". Banner NEW MISSION: TAKE THE ELITE DOORS (overlaps station labels, 436). Descend prompt only appeared after a short wait - my first A press did nothing (437).
+- RUN 3 (pad, ROOT MAUL, 140 HP). BUG?: first frame of the run says "MISSION DONE - TELL RANGER" (439) - I haven't fought a single elite this run. Mission seems to count previous runs' elites or complete instantly.
+- Keeper select still says "Balanced" for Will even with Root Maul equipped; model does show the maul (438).
+- ~ Root Maul: 32/hit, slow, big knockback. Feels weighty and good vs armadillos, but each swing roots you and I ate ~30 dmg from contact while swinging in CH1 (442/443). Hold-A heavy with maul whiffed with no feedback (452). Pillars sit right between the spawn and the exit doors in many Burrows rooms; I keep snagging on them (447-449).
+- ~ CH3 elite (armored beetle) with maul. Super "BIKE LANE" = literal red bicycle prop rides across (459) - charming. Fight cost 126->67. Contact damage during my slow maul swings is the main source of damage; I can't cancel maul swings into dash it seems. Grub sprite fully covers the player when overlapping (465) - can't see myself at all.
+- Shield-type small grey enemy appeared ("2" chip numbers) - unclear.
+- ~ RUN 3: Grub Mother down again, pad + maul, 100/165 left. Much cleaner: cast/super from range, 3 maul swings, dash out. Boss's "walls answer" adds swarm in late; one small grub completely overlapped me (481). Boss lines change between runs ("more children than last time") - nice.
+- Fountain heal here only took me 67->125, not full (468) - earlier run seemed full. Inconsistent or %-based, not stated.
+- ~ LUCKY boon screen: "SIXTH SENSE - DASH BOON: Cast +14%. Dash power 14." - a dash boon that buffs CAST and has a raw "Dash power 14" stat with no meaning to a player (494). Looks like a generated-text bug. Also: Tide Edge replaced? I already had an ATK boon (Tide Edge) and Fortune Edge is offered as another ATK boon - does it replace? Not stated.
+- CH5 cleared at 182/190 - maul + super is strong. Unexplained "+10" green heal mid-fight (488).
+- ~ CH6 crab in a translucent bubble = shielded; my casts did nothing visible to it and there's no "SHIELDED"/"IMMUNE" feedback (498). Maul did 43 then "15" when bubble... Crab sprite gets totally hidden behind Will's model when adjacent (501).
+- "PEB BLOCKED!" popping constantly - Peb's block is generous; I like it.
+- ~ CH7 elite room (giant bat elite takes only "2" per hit - armour?) nearly killed me: 149 -> 20. Spawned INTO the fight - "ZIP SCATTERED!" on frame 1 (507). Flame wisp melee cost 22 again. Bats overlapping my model hide me completely (521).
+- Pressing Y (super) as the last enemy died popped the ECHO lore card open instead - the drop landed under me and Y/A interacted. Lost my super input to a modal (524).
+- Player model invisible right after clear, only the ring (525) - this keeps happening, seems like a post-hit flicker that lasts long.
+- Doors LUCKY / FRUIT, I'm at 23/215 - no heal option offered.
+- ~ RUN 3 DEATH at CH8 Drowned King again. Came in at 24/215 (no heal door offered after the CH7 elite; LUCKY/FRUIT only). Door picked FRUIT = "Sunfruit: Wild Seed Lv2" - fine.
+  - I had +1 HONEY in inventory and could NOT find a button to drink it: d-pad up, Select (8) did nothing (528/529). No HUD slot shows honey either. If honey is a heal item, it's undiscoverable mid-run.
+  - Took 23 dmg from the King just standing in front of him casting (530->531) - his idle body/hop contact. Then I dodged the leap fine (532) and died to a contact bump while meleeing (537). The leap telegraph is great; the body-contact damage isn't telegraphed at all.
+  - Death screen has no input lock issue; "A: THE HEARTH" appears after ~1s.
+- ~ DRIVER STOPPED (harness time limit on my end, not a game crash). Restarted -> fresh save. Will play a fresh new-player run with pad.
+- NOTE: I misjudged elapsed time in several entries above; those stamps are replaced with "~". Real wall clock: start 02:41; run 1 death ~02:50; run 2 death ~03:03; run 3 death ~03:10; driver restart ~03:11.
+- 03:13 (real) FRESH SAVE run 4 (pad, Petal Blade, 100 HP). Codex: 4 pages - stats, foes met 0/6, bosses 0/3, echoes 0/18 (556-559). Heat station unlabeled/greyed - no prompt (560). Fresh-save CH1 opens with a spitter shot already in the air (562).
+- 03:15 Run 4 CH3 elite room: 100 -> 9 HP. Fight was 2 elites + "THE DEEP STIRS - MORE RISE" waves of purple grubs. Two grubs stacked on top of me hid the player completely (595). Damage numbers merge ("4'9", "16 16" over "SPROUT POD!", 592/597).
+- PAUSE menu (Start) finally lists controls incl. "ATTACK OUT OF A DASH: DASH STRIKE" and keys Z X C V SHIFT (604). That should be in the room-1 hint. BUILD screen: Fortune Edge "Attack +51%" but stats read "DMG x1.00" (605) - contradictory.
+- HONEY: got "+1 HONEY" drop. Tried every pad button (LB/LT/RT/d-pad/Select) - no way to use it mid-run. LB/LT/RT all seem to dash too (600-603).
+- 03:17 Run 4: Grub Mother beaten on a fresh save at 23/125 (621). This time NO post-boss full heal (run 2 I'm fairly sure I was topped up to 130/130 after her - 292). Inconsistent, or that was a boon. Pillars at the arena top let her hide behind cover from my casts (613-617) - casts hit the pillar.
+- "AN ECHO" label at the very bottom overlaps the CH label and the boss's subtitle box (622). Boss subtitle sticks for the whole post-fight.
+- 03:21 RUN 4 DEATH CH6 Flooded Vault, first room after the HEART door. 39 -> 15 in about a second as a bat + grub stacked on me on spawn (639/640); dash barely got me clear, the grub followed. Super at 3 HP, then died during a dash-strike combo.
+  - MAJOR: I NEVER SAW THE DEATH SCREEN. My combo presses (A) went through the "THE DEEP KEEPS YOU / A: THE HEARTH" screen and dumped me straight in the hub (646/647). Mashing attack skips your death summary (run stats, dew earned) and you lose the moment entirely.
+  - Hub shows DEW 80 / KEYS 2 / HONEY 3 at the top. Honey stacks up across runs and I never found a use for it mid-run.
+- ~ CO-OP (2 pads, both Will): join is instant and clean ("PLAYER 2 JOINED", P1/P2 tags, colored rings, both HUDs in corners) (648-650). Keeper select side-by-side. Fun. But when the two keepers stack, their P1/P2 tags overlap into "PI P2" mush (656-660). Camera seems to frame both fine in one room.
+- FRUIT door with no boons yet: "NO BOON TO FEED. +60 PETALS" (661) - fair fallback, but the door preview promised fruit; first-room FRUIT door is a trap pick.
+- ~ CORRECTION: Shop description reveals HONEY = "For gifts at the Hearth" (668). It's an NPC gift currency, not a heal. My earlier "can't drink honey" note is wrong - but the game never told me until this description (the +1 HONEY pickup popup implies a consumable). Minor clarity issue, not a bug.
+- Co-op room 2 clean. Bud "LEAF SCATTERED!" with "+10" heal popup overlaps P2 tag.
+- ~ Co-op CH3 elite (armadillo elite + grubs): P1 100->19, P2 100->8. Co-op doesn't feel easier - enemies seem scaled up and two Wills share one screen of contact damage. When both supers fire, both player models vanish at once (675). The elite armadillo sits on top of P1 and hides him (683). Camera pans/tilts toward the edge when both players are at the left wall (678) - a bit disorienting.
+- Petal Purse 50p -> +90 petals ("somehow profit") is free money (669).
+- ~ Co-op boon screen: "A: ACCEPT · THE WHOLE PARTY SHARES IT" - neat, but only P1 gets to choose (P2 has no say) and the prompt overlaps the CH label (693). Echo card: the "A: KEEP IT" prompt appears ~0.5s late and the first A press is eaten (690/691).
+- Kindled Heart says "+25 max health" but max HP went 100 -> 136 for both (694). Number mismatch (maybe scaled, but the card should say so).
+- Boss room (Grub Mother) again right after an elite room with P1 19/136, P2 8/136. Third time I've walked into a boss at <20% with no warning the next room is the boss.
+- ~ CO-OP WIPE at Grub Mother. Only ONE super fired when both pressed Y on the same frame (695/696) - P2's had to be re-pressed. P2 downed -> "P2 IS DOWN - STAND OVER THEM!" + green STAND HERE ring - excellent co-op revive idea (700). But the downed body lay under the boss; P1 died within a second trying to revive. Death screen "TUCKED IN BY SOMEBODY'S MOTHER" (701). Co-op HP pools: 19 and 8 into a boss.
+- P2's HP number disappears from the HUD when downed (just "P2 WILL", 700) - ok but no revive timer shown.
+- ~ BOARD: Keeper's Board, 22 errands, each '???' + 'ASK <NPC>' (708). Clean. Sprouts banked now show as potted plants around the hub (704) - nice visible progress. Hub NPCs still body-block (706).
+- 03:22 Run 6 (bought DEATH DEFIANCE 60 dew + Vitality x2). Descend prompt still needs pixel-perfect standing (721: A on the edge of DESCEND does nothing, no prompt). CH1: the pillar layout again puts a pillar between spawn and enemies; player model invisible for long stretches while moving after a hit (725, 728) - only the ring shows. It's the hurt-flicker but it reads as "my guy vanished".
+- Camera seems to drift right/left following me, edge of room clips (730).
+- 03:23 CH2: BUG - the DEW exit door spawned INSIDE/behind a pillar block (748): door frame sticks out the top of the rock. Spitters in CH2 relocate (teleport-burrow?) every time I close in; chased 3 times (740-746). 101 -> 43 HP from chip.
+- Sprout bud wasn't collected when I stood right next to it (734); pickup radius is tiny.
+- 03:24 MAJOR BUG: CH2 DEW door is physically blocked by a pillar placed directly in front of it (750-756). Tried from the right, the front, and from the far left; slid off the pillar each time. Door is unreachable -> one of only two reward choices is fake. Took ZIP instead.
+- 03:24 CH3 elite room: elite armadillo hid inside grub pack; my casts went off into nowhere (760); 43 -> 5 HP. Y (super) pressed as the room cleared AGAIN opened the echo card instead of firing (765/766) - the echo drops under the player and the super/A button grabs it. Super bar stayed full. Repeatable.
+- Doors now PEB / PETALS - again no heal choice before the CH4 boss; I'm at 5/120.
+- 03:27 Run 6: GRUB MOTHER down with 11/120. DEATH DEFIANCE triggered at 5 HP ("DEATH DEFIED!" -> 60 HP, 777) - great save, clear feedback. BOULDERFALL cast (Peb epic) = huge white cloud of rock dust that completely whites out both me and the boss for ~1s each cast (781/782/787/792). Big damage (56/117) but a readability disaster in a boss fight.
+- No full heal post-boss this time either (11/120). Confirms run 2's heal was something else.
+- 03:29 CH5 Flooded Vault at 36/145 -> survived at 5/145. Two grubs ate 22 HP during a single 3-hit combo (801). Cast aimed up-right auto-targeted the crab on the far left instead (803) - aim assist overrides stick direction, unclear. First Y press after "SUPER READY!" didn't fire (804-805) - had to press again; super bar looked full both times.
+- Shielded crab (bubble) took "1" per hit from melee; super did 117 through it (806). Ok.
+- Doors: PETALS / FOUNTAIN. Finally a heal choice.
+- 03:29 CH6: fountain healed only +50 (5->55/145) "THE FOUNTAIN MENDS YOU" - so fountain is a flat/partial heal. Fine, but the door icon doesn't say how much. A sprout-spitter at the far side + flame wisp + crab: back to 12/145. Super firing again makes Will vanish entirely (ring only, 820). ZIP door glowing gold = rare? not explained.
+- 03:30 RUN 6 DEATH CH7 elite room (Flooded Vault). Came in at 12/145; super one-shot the bat elite (117) + "+10" heal. Then died at 11 HP while stepping away and casting - I did not see what hit me (829 shows the death screen, previous frame 828 shows flame wisp + crabs far away). Death screen "A LITTLE TALLER THIS TIME" - chambers 7, foes 26, +66 dew, +4 sprouts. Death screen background shows the Burrows' pink floor, not the Vault where I died (829).
+- Bolt Step "Dash strikes the nearest foe" - dash took me toward a spitter on its own (828) - auto-redirect of a defensive tool is dangerous.
+- 03:29 Run 7 with THORNBOW (3 keys): bow is miserable in room 1. Arrows are tiny green slivers, 8 dmg each, enemies walk right through the stream; armadillo rolled onto me repeatedly (847/850). 120 -> 1 HP in CH1 room 1 and Death Defiance fired (859). Holding A for "heavy" with the bow seems to do nothing distinct (852). At point-blank, arrows seemed not to register on the spitter (857/858).
+- Camera: when hugging the west wall, the room edge's black void covers ~1/3 of the screen (857-860).
+- "MISSION DONE - TELL LOUIE" fired on frame 1 of the run again (844) - Snacks mission completes instantly with HONEY already owned / previous stock.
+- 03:30 Paused note (~49 min of wall clock, 7 runs incl. 1 co-op; deepest CH8 Drowned King x2). Driver had one forced restart at ~03:11 (my harness limit), which wiped the save.
+- 03:31 RUN 7 DEATH CH2 (Thornbow). 120 -> 1 -> Death Defied 60 -> 8 -> dead. Thornbow arrows 8-11 dmg, the armadillo + spitter just walk through the arrow stream. Died while the super animation was playing (871: death screen) - my follow-up fire presses then skipped the death screen again and dumped me into an Erin story scene in the hub (872). "MOONDEW BANKED +0" after reaching CH2 - a short run banks nothing.
+- Erin's post-boss story line about the Grub Mother plays on return - nice reactive writing.
+- 03:31 END OF PLAY. ~50 min wall clock. 7 runs (5 solo pad/keyboard + 1 co-op + 1 bow), deepest = CH8 Drowned King (twice), Grub Mother killed 4x.
