@@ -1,4 +1,34 @@
-# SOOTBORN — changelog (latest v0.91 · 2026-11-28)
+# SOOTBORN — changelog (latest v0.92 · 2026-11-28)
+
+## v0.92 · 2026-11-28 — a polish round
+Owner: "Do a round of polish on the game." Three teams (3D levels; story scenes and places; fights, HUD and menus). No new features, no balance changes, no story changes.
+
+**Story scenes and places**
+- The final SOOTBORN card's subtitle ran together ("EVERYBREATHISHERS"); now "Every breath is hers". The menu after it no longer repeats THE END.
+- Part Two ch. 5: narration after THE BOOK played behind the card; the card clears first.
+- Cards that went by too fast stay longer (memory cards ONE to TEN 2.6 → 4.2 s; seven others +1 to +3 s). No one-word orphans in card subtitles.
+- Celestine was cut off at the head (last bell) and neck ("Grief is a luxury item"); the camera now frames her.
+- Drawn panels: four labels moved off other art or out from under the top bar; the Ledger's MORROW D → MORROW H.
+- Lucan's "between us" → "between you and me" (Accredited never say us); "Lift 0" → "Lift Zero"; "3 paper rays" in words.
+
+**Fights, HUD and menus**
+- Knocked-down men no longer slide out through the rope or wall.
+- One name per guard break (GUARD BREAK); GUARD BROKEN is only for Kael's guard.
+- ELEVEN and Memory Arts: hit counter and rank hide under the cut-in; the second line no longer sits on the screen edge. Speech boxes step clear of each other; damage numbers stay below the bars; names have a drop shadow.
+- Button letters: film prompts say "A: NEXT  START: SKIP" on a pad; X is STRIKE everywhere; About and Controls list each device's buttons; a phone switches to the controller as soon as one connects.
+- Menus: every setting row changes with left/right; Delete a save is greyed when there are none; long pages scroll with up/down; switching app mid-fight pauses the fight; touch Menu button no longer sits on the foe's portrait.
+- "vertical slice · thanks for playing" gone from the end-of-day screens; location toast no longer covers the objective at 640×360; walk-place titles have a dark band and clear the NOTICED meter; tighter dialogue box on short screens.
+- Player-visible "comic-book levels" → "3D levels".
+
+**3D levels**
+- The 23 finds are in the Codex (Found tab N of 38); the level says INTO THE CODEX.
+- Vent stack: three ambient lines.
+- First-time tips for Rook's gaff and the Warden Captain's sweep and charge, with the device's buttons.
+- Docks: the marker leads through openings, not walls; the gangway to Mooring One has rails (the newcomer bot now finishes).
+- Kael at the riser has no violet or gilt; the Array hero's boots are brown. Two lamps on the Array stair and ladder.
+- "PRESS ELEVEN" → "HOLD E: ELEVEN"; FURY FULL shows once, then not for 90 s.
+
+**Left, for the owner:** Celestine and Ilse say "I" often though the bible says the Accredited use "one" (a big rewrite; your call). "Marrow, J." on the ending names page and "SABLE'S STALL" on the fourth ring may not match canon. Rare foe overlap in THE STAND and the riser. Touch-only: the narration strip under GUARD/B buttons; Skip covers the end of "THE SURFACE – BURNS". No Quit to title in the fight pause.
 
 ## v0.91 · 2026-11-28 — the 3D levels, in the grit of the rest of the game
 Owner's note: the comic-book levels should carry the grittiness of the rest of the game; not a rebuild, a shift in tone; drop the comic filter, let the lore seep in. Two teams. Layouts, fights and routes are unchanged.
