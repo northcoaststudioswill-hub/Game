@@ -1,0 +1,1689 @@
+<title>Sootborn Dev Suite</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+:root{
+  --bg:#eceae4;--panel:#f8f7f3;--panel2:#e3e0d8;--line:#cbc6ba;--text:#1d1a17;--dim:#6a6358;--acc:#a3560f;--acc2:#0f7a74;--bad:#b3261e;--good:#2e7d32;--warn:#8a6100;
+  --sel:#f3d9b8;--chip:#ddd8cc;--view:#0b0a10;--shadow:0 1px 0 rgba(0,0,0,.06);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme=light]){
+    --bg:#121116;--panel:#1a1920;--panel2:#24222b;--line:#34313d;--text:#e9e5dc;--dim:#9a9488;--acc:#ffb35a;--acc2:#4fd6d0;--bad:#ff6b5e;--good:#7bd389;--warn:#e7c35a;
+    --sel:#3a2c1c;--chip:#2c2a33;--view:#07070b;--shadow:none;color-scheme:dark;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#121116;--panel:#1a1920;--panel2:#24222b;--line:#34313d;--text:#e9e5dc;--dim:#9a9488;--acc:#ffb35a;--acc2:#4fd6d0;--bad:#ff6b5e;--good:#7bd389;--warn:#e7c35a;
+  --sel:#3a2c1c;--chip:#2c2a33;--view:#07070b;--shadow:none;color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 var(--sans);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-bottom:env(safe-area-inset-bottom,0px);overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:3px 9px;cursor:pointer;min-height:26px;white-space:nowrap}
+button:hover{border-color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+button.on,button[aria-pressed=true]{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+button.pri{background:var(--acc2);color:var(--bg);border-color:var(--acc2)}
+button.danger{color:var(--bad)}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=number],input[type=search],select,textarea{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:3px 6px;min-height:26px;min-width:0}
+input[type=number]{width:74px;font-family:var(--mono);font-size:12px}
+input[type=color]{width:34px;height:24px;padding:0;border:1px solid var(--line);border-radius:4px;background:none;vertical-align:middle}
+input[type=range]{vertical-align:middle;accent-color:var(--acc)}
+input[type=checkbox]{accent-color:var(--acc);vertical-align:middle}
+textarea{width:100%;font-family:var(--mono);font-size:11.5px;min-height:90px;resize:vertical}
+label{white-space:nowrap}
+code,.mono{font-family:var(--mono);font-size:12px}
+h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:14px 0 6px;font-weight:600}
+h3:first-child{margin-top:4px}
+details>summary{cursor:pointer;padding:3px 0;font-weight:500;list-style-position:inside}
+details>summary .n{color:var(--dim);font-weight:400;font-family:var(--mono);font-size:11px}
+.dim{color:var(--dim)} .bad{color:var(--bad)} .good{color:var(--good)} .warn{color:var(--warn)}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}
+.row.tight{gap:4px}
+.grow{flex:1 1 auto;min-width:0}
+.sep{width:1px;align-self:stretch;background:var(--line);margin:0 2px}
+.chip{display:inline-block;background:var(--chip);border-radius:10px;padding:0 8px;font-size:11px;font-family:var(--mono);line-height:18px;white-space:nowrap}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-family:var(--mono);font-size:12px}
+.kv>:nth-child(odd){color:var(--dim)}
+.list{border:1px solid var(--line);border-radius:6px;background:var(--panel);max-height:320px;overflow:auto}
+.list .it{display:flex;gap:6px;align-items:center;padding:3px 7px;border-bottom:1px solid var(--line);cursor:pointer;min-height:26px}
+.list .it:last-child{border-bottom:0}
+.list .it:hover{background:var(--panel2)}
+.list .it.sel{background:var(--sel)}
+.list .it .t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list .it .m{color:var(--dim);font-family:var(--mono);font-size:11px;white-space:nowrap}
+.btnlist{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 8px}
+.btnlist button{white-space:normal;text-align:left;max-width:100%;font-size:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;box-shadow:var(--shadow)}
+.empty{color:var(--dim);font-style:italic;padding:6px 0}
+
+/* ---- header ---- */
+#top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0 6px;padding-top:max(8px, env(safe-area-inset-top,0px))}
+#top .brand{font-weight:600;letter-spacing:.02em;font-size:14px;white-space:nowrap}
+#top .brand b{color:var(--acc);font-weight:600}
+#sync{display:inline-flex;align-items:center;gap:6px}
+#sync i{width:8px;height:8px;border-radius:50%;background:var(--dim);display:inline-block}
+#sync.db i{background:var(--good)} #sync.local i{background:var(--warn)} #sync.err i{background:var(--bad)} #sync.loading i{background:var(--acc2)}
+#top .sp{flex:1 1 auto}
+
+/* ---- layout ---- */
+#app{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(360px,1fr);gap:12px;align-items:start}
+#viewCol{position:sticky;top:6px;min-width:0}
+#viewBar{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:6px}
+#viewBar .status{font-family:var(--mono);font-size:11.5px;color:var(--dim);flex:1 1 160px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#view{position:relative;background:var(--view);border-radius:8px;overflow:hidden;aspect-ratio:16/9;width:100%;max-height:calc(100vh - 140px);border:1px solid var(--line)}
+#view iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#07090d}
+#view .msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cfc8bb;font-family:var(--mono);font-size:12px;text-align:center;padding:16px;pointer-events:none}
+#view.pick{outline:2px solid var(--acc2);outline-offset:-2px}
+#viewHint{font-size:11.5px;color:var(--dim);margin-top:4px;min-height:16px}
+#panelCol{min-width:0}
+#tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;border-bottom:1px solid var(--line);margin-bottom:8px}
+#tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:6px 9px;color:var(--dim);font-weight:500}
+#tabs button[aria-selected=true]{color:var(--text);border-bottom-color:var(--acc)}
+#tabs button .b{display:inline-block;min-width:16px;border-radius:8px;background:var(--bad);color:#fff;font-size:10px;line-height:16px;margin-left:4px;padding:0 4px;font-family:var(--mono)}
+.panel{display:none}
+.panel.on{display:block}
+#ws{position:relative;background:var(--view);border-radius:8px;overflow:hidden;aspect-ratio:4/3;max-height:360px;width:100%;border:1px solid var(--line);margin-bottom:6px;display:none}
+#ws.on{display:block}
+#ws iframe,#ws canvas.c2d{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+#ws canvas.c2d{image-rendering:pixelated;background:#1a1416}
+#ws .msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cfc8bb;font-family:var(--mono);font-size:12px;pointer-events:none;text-align:center;padding:12px}
+#ws .tag{position:absolute;left:8px;top:6px;color:#e9e5dc;font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.45);padding:1px 6px;border-radius:4px;pointer-events:none}
+#wsBar{display:none;margin-bottom:6px}
+#wsBar.on{display:flex}
+
+/* fields */
+.fields{display:grid;grid-template-columns:minmax(80px,max-content) 1fr;gap:4px 10px;align-items:center}
+.fields>.l{color:var(--dim);font-family:var(--mono);font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+.fields>.l.ch{color:var(--acc);font-weight:600}
+.fields .v{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
+.fields .v .mono{color:var(--dim)}
+.log{font-family:var(--mono);font-size:11px;max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:2px 0}
+.log div{padding:1px 7px;white-space:pre-wrap;word-break:break-word;border-bottom:1px dotted var(--line)}
+.log div:last-child{border-bottom:0}
+.log .error{color:var(--bad)} .log .warn{color:var(--warn)} .log .ev{color:var(--acc2)}
+.log time{color:var(--dim);margin-right:6px}
+.tree{font-family:var(--mono);font-size:12px}
+.tree .it{padding-left:calc(7px + var(--d,0) * 14px)}
+.nudge{display:grid;grid-template-columns:repeat(6,auto);gap:3px;justify-content:start}
+.nudge button{min-width:40px;font-family:var(--mono);font-size:11px;padding:2px 4px}
+#mapWrap{position:relative;border:1px solid var(--line);border-radius:6px;overflow:auto;background:#0d0a0c;max-height:420px;touch-action:none}
+#mapWrap canvas{display:block;image-rendering:pixelated;touch-action:none}
+.confirm{display:inline-flex;gap:6px;align-items:center;background:var(--sel);border-radius:6px;padding:2px 6px}
+.note{border-left:3px solid var(--acc2);padding:4px 8px;margin:6px 0;background:var(--panel)}
+.note p{margin:0 0 2px;white-space:pre-wrap;word-break:break-word}
+.ovr{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:5px 8px;border-bottom:1px solid var(--line)}
+.ovr:last-child{border-bottom:0}
+.ovr .lb{font-weight:500;overflow:hidden;text-overflow:ellipsis}
+.ovr .meta{grid-column:1/2;color:var(--dim);font-family:var(--mono);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovr .act{grid-row:1/3;grid-column:2/3;align-self:center;display:flex;gap:4px}
+.ovr.stale .lb::after{content:' · not found in this build';color:var(--warn);font-weight:400;font-size:11px}
+.kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:0 3px;color:var(--dim)}
+
+@media (max-width: 899px){
+  #app{grid-template-columns:minmax(0,1fr)}
+  #viewCol{position:static}
+  #view{max-height:none}
+  #tabs{position:sticky;top:0;background:var(--bg);z-index:5}
+  .list{max-height:260px}
+}
+@media (max-width: 480px){
+  #top .brand{font-size:13px}
+  .fields{grid-template-columns:minmax(64px,max-content) 1fr}
+  input[type=number]{width:64px}
+}
+</style>
+
+<header id="top">
+  <span class="brand">SOOTBORN <b>Dev Suite</b></span>
+  <span class="chip" id="verChip" title="The game build loaded in this suite (GAME_VER)">game v…</span>
+  <span class="chip" id="sync" title="Where your changes go"><i></i><span id="syncText">Starting…</span></span>
+  <span class="sp"></span>
+  <button id="btnTheme" title="Theme: follow the system, light, or dark">Theme: auto</button>
+  <button id="btnReload" title="Reload the game build (keeps your overrides)">Reload game</button>
+</header>
+
+<div id="app">
+  <section id="viewCol" aria-label="Live game">
+    <div id="viewBar">
+      <span class="status" id="viewStatus">loading…</span>
+      <button id="btnPause" title="Pause the game (Alt+P)">Pause</button>
+      <button id="btnStep" title="Advance one frame while paused (Alt+.)">Step</button>
+      <select id="selSpeed" title="Time scale" aria-label="Time scale">
+        <option value="0.1">0.1×</option><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="4">4×</option>
+      </select>
+      <button id="btnGod" title="God mode: health stays full (Alt+G)">God</button>
+      <button id="btnTitle" title="Stop what is playing and go to the title">Title</button>
+    </div>
+    <div id="view"><iframe id="game" title="SOOTBORN game build" allow="autoplay; gamepad; fullscreen"></iframe><div class="msg" id="viewMsg">Loading game.html…</div></div>
+    <div id="viewHint">Click the game to give it the keyboard. Alt+1…7 switch panels.</div>
+  </section>
+
+  <section id="panelCol" aria-label="Tools">
+    <nav id="tabs" role="tablist">
+      <button role="tab" data-tab="play" aria-selected="true">Play</button>
+      <button role="tab" data-tab="chars">Characters</button>
+      <button role="tab" data-tab="anim">Animations</button>
+      <button role="tab" data-tab="bones">Bones</button>
+      <button role="tab" data-tab="areas">Areas</button>
+      <button role="tab" data-tab="insp">Inspector</button>
+      <button role="tab" data-tab="ovr">Overrides <span class="b" id="ovCount" hidden>0</span></button>
+    </nav>
+
+    <div id="wsBar" class="row tight">
+      <select id="wsSource" aria-label="Which characters">
+        <option value="rig">Comic rig (3D levels)</option>
+        <option value="cast">Cast (2D, 2.5D, 3D fights)</option>
+      </select>
+      <select id="wsLevel" aria-label="Comic level the rig is dressed for" title="The rig is dressed differently in each comic level"></select>
+      <select id="wsChar" class="grow" aria-label="Character"></select>
+      <button id="wsTurn" aria-pressed="true" title="Turntable">Turn</button>
+    </div>
+    <div id="ws"><span class="tag" id="wsTag"></span><div class="msg" id="wsMsg">The preview starts when the game has loaded.</div></div>
+
+    <div class="panel on" data-panel="play" role="tabpanel">
+      <h3>Jump</h3>
+      <div class="row"><input type="search" id="jumpFind" class="grow" placeholder="Filter fights, levels, scenes…  ( / )" aria-label="Filter"></div>
+      <div id="jumpLists"><div class="empty">Waiting for the game…</div></div>
+      <h3>Switches</h3>
+      <div class="row">
+        <label>Difficulty <select id="selDiff"><option value="0">Story</option><option value="1">Hard</option><option value="2">Brutal</option></select></label>
+        <label><input type="checkbox" id="chkQuick"> Skip fight intro films</label>
+        <label><input type="checkbox" id="chkFury"> Fights start at full fury</label>
+        <label><input type="checkbox" id="chkNoff"> Skip opening films (#noff, on reload)</label>
+      </div>
+      <h3>Event and error log</h3>
+      <div class="row">
+        <select id="logFilter" aria-label="Log filter"><option value="all">Everything</option><option value="ev">Events</option><option value="error">Errors and warnings</option></select>
+        <button id="logClear">Clear</button>
+        <span class="dim" id="logInfo"></span>
+      </div>
+      <div class="log" id="log" aria-live="polite"></div>
+    </div>
+
+    <div class="panel" data-panel="chars" role="tabpanel">
+      <div id="charInfo" class="dim"></div>
+      <div id="charFields"></div>
+    </div>
+
+    <div class="panel" data-panel="anim" role="tabpanel">
+      <div class="row">
+        <button id="anPlay" aria-pressed="true">Pause</button>
+        <button id="anBack" title="One frame back">◂ frame</button>
+        <button id="anFwd" title="One frame on">frame ▸</button>
+        <label>Speed <input type="range" id="anSpeed" min="0" max="3" step="0.05" value="1"> <span class="mono" id="anSpeedV">1.00×</span></label>
+      </div>
+      <div class="row"><label class="grow">Time <input type="range" id="anScrub" min="0" max="1" step="0.001" value="0" style="width:70%"></label><span class="mono" id="anTime">0.00 s</span></div>
+      <div class="row" id="anOpts"></div>
+      <div id="anLists"></div>
+    </div>
+
+    <div class="panel" data-panel="bones" role="tabpanel">
+      <div class="row"><label><input type="checkbox" id="bnShow" checked> Draw the skeleton on the preview</label><label><input type="checkbox" id="bnHand"> Pose by hand (stops the animation)</label></div>
+      <div id="bnBody"></div>
+    </div>
+
+    <div class="panel" data-panel="areas" role="tabpanel">
+      <div id="areasBody"></div>
+    </div>
+
+    <div class="panel" data-panel="insp" role="tabpanel">
+      <div id="inspBody"></div>
+    </div>
+
+    <div class="panel" data-panel="ovr" role="tabpanel">
+      <div id="ovrBody"></div>
+    </div>
+  </section>
+</div>
+<script>
+'use strict';
+/* =====================================================================================================
+   SOOTBORN Dev Suite.
+   The game build (game.html, a supporting file beside this page) runs in a same-origin srcdoc frame.
+   The suite reaches into it (and into the comic-book level frame the game makes) to jump, inspect and edit.
+   Every edit is an OVERRIDE: a small patch kept in the artifact's shared database (collection `overrides`),
+   re-applied to the running game live and on every load or level change, and baked into source by Claude.
+   See devsuite/README.md.
+   ===================================================================================================== */
+const SUITE_VER = '1.0';
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+function h(tag, p, ...kids) {
+  const e = document.createElement(tag);
+  if (p) for (const k in p) {
+    const v = p[k]; if (v === undefined || v === null || v === false) continue;
+    if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else if (k === 'style') e.style.cssText = v;
+    else if (k.slice(0, 2) === 'on' && typeof v === 'function') e.addEventListener(k.slice(2), v);
+    else if (k === 'value' || k === 'checked' || k === 'disabled' || k === 'selected') e[k] = v;
+    else e.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const c of kids.flat(3)) { if (c === null || c === undefined || c === false) continue; e.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c))); }
+  return e;
+}
+const clear = e => { while (e.firstChild) e.removeChild(e.firstChild); return e; };
+const fmt = (v, d) => (typeof v === 'number' && isFinite(v)) ? v.toFixed(d === undefined ? 2 : d) : String(v);
+const r3 = v => Math.round(v * 1000) / 1000;
+const deg = r => r * 180 / Math.PI, rad = d => d * Math.PI / 180;
+const hex6 = n => '#' + ('000000' + ((n >>> 0) & 0xffffff).toString(16)).slice(-6);
+const clone = o => o === undefined ? undefined : JSON.parse(JSON.stringify(o));
+const isObj = o => o && typeof o === 'object' && !Array.isArray(o);
+const ago = t => { if (!t) return ''; const s = Math.max(0, (Date.now() - t) / 1000); return s < 50 ? 'just now' : s < 3600 ? Math.round(s / 60) + ' min ago' : s < 86400 * 2 ? Math.round(s / 3600) + ' h ago' : Math.round(s / 86400) + ' days ago'; };
+const Pref = {   // conveniences only (tab, theme, toggles); every read and write may fail and that is fine
+  get(k, d) { try { const v = localStorage.getItem('sbds_' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('sbds_' + k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } }
+};
+// a db path segment: letters, digits and _ - . ~ : @ + only
+const seg = s => String(s).replace(/[^A-Za-z0-9_\-.~:@+]/g, '-').slice(0, 120) || '-';
+
+/* ------------------------------------------------------------------ log */
+const Log = {
+  items: [], max: 500, errors: 0, dirty: false,
+  add(src, level, msg) {
+    msg = String(msg === undefined ? '' : msg).slice(0, 700);
+    const last = this.items[this.items.length - 1];
+    if (last && last.msg === msg && last.src === src && last.level === level) { last.n = (last.n || 1) + 1; last.t = Date.now(); }
+    else { this.items.push({ t: Date.now(), src, level, msg }); if (this.items.length > this.max) this.items.shift(); }
+    if (level === 'error') this.errors++;
+    this.dirty = true;
+  },
+  render() {
+    if (!this.dirty) return; this.dirty = false;
+    const box = $('#log'), f = $('#logFilter').value, atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 8;
+    clear(box);
+    const list = this.items.filter(it => f === 'all' || (f === 'error' ? (it.level === 'error' || it.level === 'warn') : it.level === 'ev')).slice(-250);
+    for (const it of list) {
+      const d = new Date(it.t), ts = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2);
+      box.appendChild(h('div', { class: it.level }, h('time', { text: ts }), '[' + it.src + '] ' + it.msg + (it.n > 1 ? '  ×' + it.n : '')));
+    }
+    if (!list.length) box.appendChild(h('div', { class: 'dim', text: 'Nothing yet.' }));
+    if (atEnd) box.scrollTop = box.scrollHeight;
+    $('#logInfo').textContent = this.errors ? this.errors + ' error' + (this.errors > 1 ? 's' : '') + ' so far' : 'no errors';
+  }
+};
+window.__DEVLOG = (src, level, msg) => Log.add(src, level, msg);
+window.addEventListener('error', e => Log.add('suite', 'error', (e.message || 'error') + (e.lineno ? ' @' + e.lineno + ':' + e.colno : '')));
+window.addEventListener('unhandledrejection', e => Log.add('suite', 'error', 'unhandled: ' + ((e.reason && (e.reason.message || e.reason.code)) || e.reason)));
+
+/* ------------------------------------------------------------------ untrusted data from the db */
+// Overrides are written by viewers. Everything read back is checked: known kinds, plain JSON values, safe keys.
+const KEY_OK = /^[A-Za-z0-9_]{1,40}$/;
+function cleanVal(v, depth) {
+  if (v === null) return null;
+  if (typeof v === 'number') return isFinite(v) ? v : undefined;
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'string') return v.slice(0, 240);
+  if (Array.isArray(v)) return depth > 4 ? undefined : v.slice(0, 64).map(x => cleanVal(x, depth + 1)).filter(x => x !== undefined);
+  if (isObj(v)) { if (depth > 4) return undefined; const o = {}; let n = 0; for (const k of Object.keys(v)) { if (!KEY_OK.test(k) || ++n > 80) continue; const c = cleanVal(v[k], depth + 1); if (c !== undefined) o[k] = c; } return o; }
+  return undefined;
+}
+const KINDS = ['cast', 'spec', 'prop', 'map'];
+function cleanOverride(id, d) {
+  if (!isObj(d) || !KINDS.includes(d.kind)) return null;
+  const patch = cleanVal(d.patch, 0); if (!isObj(patch)) return null;
+  const s = v => typeof v === 'string' ? v.slice(0, 200) : '';
+  return { id, kind: d.kind, target: s(d.target), level: typeof d.level === 'string' ? d.level.slice(0, 40) : null, key: s(d.key), patch,
+    label: s(d.label), updatedAt: typeof d.updatedAt === 'number' ? d.updatedAt : 0, by: typeof d.by === 'string' ? d.by.slice(0, 120) : null,
+    ref: isObj(d.ref) ? cleanVal(d.ref, 1) : null };
+}
+function cleanNote(id, d) {
+  if (!isObj(d) || typeof d.text !== 'string') return null;
+  return { id, text: d.text.slice(0, 4000), at: typeof d.at === 'number' ? d.at : 0, by: typeof d.by === 'string' ? d.by.slice(0, 120) : null, done: !!d.done, game: typeof d.game === 'string' ? d.game.slice(0, 20) : '' };
+}
+
+/* ------------------------------------------------------------------ sync: the shared db, or this tab only */
+const Sync = {
+  db: null, user: null, uid: null, mode: 'init', canWrite: true, ov: new Map(), notes: [], meta: null, loadTimer: 0, err: '',
+  writing: new Map(), pending: new Map(),
+  async init() {
+    let db = null, user = null;
+    try { db = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('db') : null; } catch (e) { db = null; }
+    try { user = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('user') : null; } catch (e) { user = null; }
+    this.user = user;
+    if (user) { try { this.uid = await user.id(); } catch (e) { this.uid = null; } try { const c = await user.can('data.write'); if (c === false) this.canWrite = false; } catch (e) { /* null: let a write decide */ } }
+    if (!db) { this.mode = 'local'; this.status(); View.ovr(); return; }
+    this.db = db; this.mode = 'loading'; this.status();
+    this.loadTimer = setTimeout(() => { if (this.mode === 'loading') { this.mode = 'slow'; this.status(); } }, 10000);
+    const ok = () => { if (this.mode === 'loading' || this.mode === 'slow') { clearTimeout(this.loadTimer); this.mode = 'db'; this.status(); } };
+    const fail = (what, e) => { clearTimeout(this.loadTimer); const c = e && e.code; this.err = c || 'error'; this.mode = c === 'revoked' || c === 'not_granted' || c === 'capability_disabled' || c === 'capability_removed' ? 'local' : 'err'; Log.add('sync', 'warn', what + ' listener stopped: ' + (c || '') + ' ' + ((e && e.message) || '')); this.status(); };
+    try {
+      db.collection('overrides').onSnapshot(snap => { if (!snap.metadata.fromCache) ok(); this.onOverrides(snap.docs); }, e => fail('overrides', e));
+      db.collection('notes').onSnapshot(snap => { if (!snap.metadata.fromCache) ok(); this.notes = snap.docs.map(d => cleanNote(d.id, d.data())).filter(Boolean).sort((a, b) => b.at - a.at); View.ovr(); }, e => fail('notes', e));
+      db.doc('meta/suite').onSnapshot(s => { this.meta = s.exists ? cleanVal(s.data(), 0) : null; View.ovr(); }, () => { /* optional */ });
+    } catch (e) { fail('subscribe', e); }
+  },
+  status() {
+    const el = $('#sync'), t = $('#syncText');
+    el.className = 'chip ' + ({ db: 'db', local: 'local', loading: 'loading', slow: 'loading', err: 'err', init: '' }[this.mode] || '');
+    t.textContent = this.mode === 'db' ? (this.canWrite ? 'Syncing with the shared db' : 'Synced, read only') : this.mode === 'loading' ? 'Connecting to the shared db…' : this.mode === 'slow' ? 'The shared db cannot be reached yet' : this.mode === 'err' ? 'Sync stopped (' + this.err + ') — changes stay in this tab' : this.mode === 'local' ? 'Not syncing — changes stay in this tab' : 'Starting…';
+    el.title = this.mode === 'local' ? 'No shared database on this view (opened locally, signed out, or not granted). Use Overrides → Export to carry changes.' : 'Overrides and notes are stored in this artifact\'s shared database';
+  },
+  synced() { return !!this.db && (this.mode === 'db' || this.mode === 'loading' || this.mode === 'slow'); },
+  onOverrides(docs) {
+    const next = new Map();
+    for (const d of docs) { const o = cleanOverride(d.id, d.data()); if (o) next.set(d.id, o); }
+    for (const [id, o] of this.pending) { if (o === null) next.delete(id); else next.set(id, o); }   // our own writes still in flight win
+    const changed = [];
+    for (const [id, o] of next) { const p = this.ov.get(id); if (!p || JSON.stringify(p.patch) !== JSON.stringify(o.patch)) changed.push(o); else if (p.stale) o.stale = p.stale; }
+    for (const [id, p] of this.ov) if (!next.has(id)) changed.push(p);
+    this.ov = next;
+    for (const o of changed) Apply.route(o);
+    View.ovr();
+  },
+  get(id) { return this.ov.get(id) || null; },
+  list(prefix) { const out = []; for (const [id, o] of this.ov) if (!prefix || id.startsWith(prefix)) out.push(o); return out; },
+  // one write at a time per document; a burst collapses to its last value
+  set(id, doc) {
+    doc = Object.assign({}, doc, { updatedAt: Date.now(), by: this.uid || null });
+    const o = cleanOverride(id, doc); if (!o) { Log.add('sync', 'error', 'refused a malformed override ' + id); return; }
+    this.ov.set(id, o); Apply.route(o); View.ovr(); this.queue(id, doc);
+  },
+  remove(id) {
+    const p = this.ov.get(id); if (!p) return;
+    this.ov.delete(id); Apply.route(p); View.ovr(); this.queue(id, null);
+  },
+  queue(id, doc) {
+    if (!this.db || !this.canWrite) return;
+    this.pending.set(id, doc === null ? null : cleanOverride(id, doc)); this._next = this._next || new Map(); this._next.set(id, doc);
+    if (!this.writing.get(id)) this.flush(id);
+  },
+  async flush(id) {
+    this.writing.set(id, true);
+    try {
+      while (this._next.has(id)) {
+        const doc = this._next.get(id); this._next.delete(id);
+        const ref = this.db.collection('overrides').doc(id);
+        const go = () => doc === null ? ref.delete() : ref.set(doc);
+        try { await go(); }
+        catch (e) {
+          const c = e && e.code;
+          if (c === 'unavailable') { await new Promise(r => setTimeout(r, 400 + Math.random() * 900)); try { await go(); } catch (e2) { Log.add('sync', 'error', 'could not save ' + id + ': ' + (e2.code || e2.message)); } }
+          else if (c === 'invalid_argument') { this.canWrite = false; this.status(); Log.add('sync', 'warn', 'the shared db refused the write (read only for this visit): ' + id); }
+          else if (c === 'quota_exceeded') Log.add('sync', 'error', 'the shared db is full: revert some overrides, then try again');
+          else Log.add('sync', 'error', 'could not save ' + id + ': ' + (c || (e && e.message)));
+        }
+      }
+    } finally { this.writing.set(id, false); this.pending.delete(id); }
+  },
+  async addNote(text) {
+    const doc = { text: String(text).slice(0, 4000), at: Date.now(), by: this.uid || null, done: false, game: Game.ver || '' };
+    if (!this.db || !this.canWrite) { this.notes.unshift(cleanNote('local-' + Date.now(), doc)); View.ovr(); return; }
+    try { await this.db.collection('notes').add(doc); } catch (e) { Log.add('sync', 'error', 'could not save the note: ' + ((e && e.code) || e)); this.notes.unshift(cleanNote('local-' + Date.now(), doc)); View.ovr(); }
+  },
+  async delNote(id) {
+    if (!this.db || id.startsWith('local-')) { this.notes = this.notes.filter(n => n.id !== id); View.ovr(); return; }
+    try { await this.db.collection('notes').doc(id).delete(); } catch (e) { Log.add('sync', 'error', 'could not delete the note: ' + ((e && e.code) || e)); }
+  },
+  who(by) { return !by ? 'someone (no id)' : by === this.uid ? 'you' : 'another editor'; }
+};
+
+/* ------------------------------------------------------------------ the game frame */
+// Names the bridge hands the suite. Top-level consts in the game are not window properties, so a script
+// inside the game document reads them and passes them out (window.__DEVX).
+const GAME_NAMES = ['CAST', 'KAEL_LOOK', 'MAPS', 'NPCS', 'DEV', 'Issue', 'Settings', 'Mission', 'renderMapLayer', 'makeChar', 'makeAccredited', 'makeCadet', 'makeBust', 'ffScene',
+  'freshState', 'Store', 'GAME_VER', 'DEV_NEW', 'CHECKPOINTS', 'G3', 'PROPS', 'TALLP', 'Sound', 'Layout', 'Boot', 'Splash', 'Codex', 'Prelude', 'World', 'G', 'P', 'Brawl',
+  'Cutscene', 'UI', 'Menus', 'Game', 'FF', 'Fade', 'Save', 'HUD', 'Input', 'Dialogue', 'Puzzle', 'NOFF', 'portraitTo'];
+const EARLY = '<script>/* devsuite bridge (early): errors and warnings go to the suite log */(function(){var P=window.parent;window.__DEVLOG=function(s,l,m){try{P.__DEVLOG(s,l,m)}catch(e){}};' +
+  'var send=function(l,m){window.__DEVLOG("game",l,m)};addEventListener("error",function(e){send("error",(e.message||"error")+(e.lineno?" @"+e.lineno+":"+e.colno:""))});' +
+  'addEventListener("unhandledrejection",function(e){send("error","unhandled: "+((e.reason&&(e.reason.message||e.reason))||e.reason))});' +
+  '["error","warn"].forEach(function(k){var o=console[k];console[k]=function(){try{send(k,Array.prototype.map.call(arguments,function(a){return a&&a.message?a.message:String(a)}).join(" "))}catch(e){}return o.apply(console,arguments)}});' +
+  '__NOFF__})();</' + 'script>';
+const LATE = () => '<script>/* devsuite bridge (late): hand the game\'s top-level names to the suite */(function(){var X={};' +
+  GAME_NAMES.map(n => 'X.' + n + '=typeof ' + n + '!=="undefined"?' + n + ':null;').join('') +
+  'X.ISSUE_HTML=window.ISSUE_HTML||null;window.__DEVX=X;window.__DEVHOOK=function(w){try{return window.parent.__DEVISSUE(w)}catch(e){window.__DEVLOG("game","error","issue hook: "+e.message)}};' +
+  'try{window.parent.__DEVGAME(window,X)}catch(e){window.__DEVLOG("game","error","bridge: "+e.message)}})();</' + 'script>';
+
+const Game = {
+  frame: null, w: null, X: null, ver: '?', html: null, gen: 0, jump: null, booting: false,
+  async load() {
+    $('#viewMsg').textContent = 'Loading game.html…'; $('#viewMsg').hidden = false;
+    Engine.detach('game');
+    this.w = null; this.X = null; this.gen++;
+    if (!this.html) {
+      try { const r = await fetch('game.html', { cache: 'no-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); this.html = await r.text(); }
+      catch (e) { $('#viewMsg').textContent = 'Could not load game.html (' + e.message + '). The suite needs the game build published beside it.'; Log.add('suite', 'error', 'fetch game.html: ' + e.message); return; }
+    }
+    let t = this.html;
+    const early = EARLY.replace('__NOFF__', $('#chkNoff').checked ? 'try{history.replaceState(null,"","#noff")}catch(e){}' : '');
+    const hi = t.indexOf('<head>'); t = hi >= 0 ? t.slice(0, hi + 6) + early + t.slice(hi + 6) : early + t;
+    const bi = t.lastIndexOf('</body>'); t = bi >= 0 ? t.slice(0, bi) + LATE() + t.slice(bi) : t + LATE();
+    this.frame.srcdoc = t;
+  },
+  // called from inside the game document, once its script has run
+  onGame(w, X) {
+    this.w = w; this.X = X; this.ver = X.GAME_VER || '?';
+    $('#verChip').textContent = 'game v' + this.ver; $('#viewMsg').hidden = true;
+    Log.add('suite', 'ev', 'game v' + this.ver + ' loaded (' + (this.html.length / 1048576).toFixed(2) + ' MB)');
+    try { this.patchIssueHtml(); } catch (e) { Log.add('suite', 'error', 'could not instrument the comic level: ' + e.message); }
+    Time.installGame(w);
+    Apply.gameAll();
+    const gen = this.gen; this.booting = true;
+    // past "press any key" and the studio cards, to the title
+    setTimeout(() => { if (gen !== this.gen) return; try { X.Boot.go && X.Boot.go(); } catch (e) { /* not ready */ } }, 250);
+    let n = 0; const iv = setInterval(() => {
+      if (gen !== this.gen) return clearInterval(iv);
+      try { if (X.G.mode === 'splash' && X.Splash.padSkip) X.Splash.padSkip(); if (X.G.mode === 'boot' && X.Boot.go) X.Boot.go(); } catch (e) { /* later */ }
+      if ((X.G && X.G.mode === 'title') || ++n > 60) { clearInterval(iv); this.booting = false; Jump.harvest(); if (this.jump) { const j = this.jump; this.jump = null; Jump.run(j); } }
+    }, 300);
+    Watch.reset();
+  },
+  patchIssueHtml() {
+    const I = this.X.ISSUE_HTML; if (!I || !I.docks) { Log.add('suite', 'warn', 'this build has no comic-book levels'); return; }
+    if (I.docks.indexOf('devsuite-pre') < 0) { this.issueRaw = I.docks; I.docks = Engine.inject(I.docks, false); }
+  },
+  ok() { return !!(this.w && this.X && this.X.G); },
+  focus() { try { this.frame.focus(); this.w.focus(); } catch (e) { /* fine */ } }
+};
+window.__DEVGAME = (w, X) => Game.onGame(w, X);
+window.__DEVISSUE = w => Engine.attach(w, 'game');
+window.__DEVHOOK = w => Engine.attach(w, 'ws');
+
+/* ------------------------------------------------------------------ pause, step, time scale, god mode */
+const Time = {
+  paused: false, scale: 1, god: false, stepN: 0,
+  installGame(w) {
+    // `step` is the game's fixed-timestep update, a global function: wrapping it pauses or scales the 2D and 2.5D game and the arena fights
+    const orig = w.step; if (typeof orig !== 'function' || orig.__dev) return;
+    let acc = 0;
+    const f = function (dt) {
+      if (Time.god) Time.godGame();
+      if (Time.paused) { if (Time.stepN > 0) { Time.stepN--; return orig(dt); } return; }
+      acc += Time.scale; let k = 0; while (acc >= 1 && k < 8) { acc -= 1; k++; orig(dt); }
+    };
+    f.__dev = 1; f.orig = orig; w.step = f;
+  },
+  godGame() { const X = Game.X; try { const B = X.Brawl; if (B.active && B.p) { B.p.hp = Math.max(B.p.hp, B.p.max || B.p.hp); } } catch (e) { /* no fight */ } },
+  setPaused(v) { this.paused = v; $('#btnPause').textContent = v ? 'Resume' : 'Pause'; $('#btnPause').classList.toggle('on', v); for (const c of Engine.list()) if (c.role === 'game') Engine.applyTime(c); },
+  step() { if (!this.paused) this.setPaused(true); this.stepN++; for (const c of Engine.list()) if (c.role === 'game') { try { c.SC.tick(1 / 60); } catch (e) { /* not running */ } } },
+  setScale(v) { this.scale = v; for (const c of Engine.list()) if (c.role === 'game') Engine.applyTime(c); },
+  setGod(v) { this.god = v; $('#btnGod').classList.toggle('on', v); }
+};
+
+/* ------------------------------------------------------------------ jump: every fight, level and scene the build exposes */
+const Jump = {
+  cats: [],
+  harvest() {
+    const X = Game.X; if (!X) return;
+    const cats = [];
+    // the build's own Dev menu, read rather than copied, so new scenes show up here by themselves
+    try {
+      X.UI.clear(); X.Menus.checkpoints(); const top = X.UI.top(), root = top ? top.items.slice() : [];
+      for (const it of root) {
+        const lab = typeof it.label === 'function' ? it.label() : String(it.label);
+        if (!it.act || it.adj || it.value || /^back$/i.test(lab)) continue;
+        if (/training/i.test(lab)) { cats.push({ name: 'Training', items: [{ label: lab, act: it.act }] }); continue; }
+        const n = X.UI.stack.length, mode = X.G.mode; it.act();
+        if (X.UI.stack.length > n && X.G.mode === mode) { const sub = X.UI.top(); cats.push({ name: lab.replace(/\s*★\s*$/, ''), items: sub.items.filter(s => s.act && !/^back$/i.test(String(s.label))).map(s => ({ label: String(s.label), act: s.act })) }); X.UI.pop(); }
+      }
+      X.UI.clear(); if (X.DEV) X.DEV.from = null; X.Menus.title && X.Menus.title();
+    } catch (e) { Log.add('suite', 'warn', 'could not read the Dev menu: ' + e.message); try { X.UI.clear(); X.Menus.title(); } catch (e2) { /* leave it */ } }
+    // fights by their FF key, straight into Brawl
+    try {
+      const keys = Object.keys(X.FF).filter(k => typeof X.FF[k] === 'function').sort();
+      cats.unshift({ name: 'Fights by key (FF → Brawl.start)', items: keys.map(k => ({ label: k, mono: 1, act: () => this.fight(k) })) });
+    } catch (e) { /* no FF */ }
+    try {
+      const L = X.Issue.LEVELS || {};
+      cats.unshift({ name: 'Comic-book levels (3D)', items: Object.keys(L).map(k => ({ label: L[k] + '  · ' + k, act: () => this.level(k) })).concat(L.stair ? [{ label: 'The Stair, cold open · stair', act: () => this.level('stair', 1) }] : []) });
+    } catch (e) { /* none */ }
+    this.cats = cats; this.render();
+  },
+  fight(k) { const X = Game.X; X.Game.abort(); X.UI.clear(); X.Fade.a = 1; X.Fade.dir = 0; X.Fade.busy = false; X.Cutscene.play([{ brawl: () => X.FF[k]() }], () => X.Game.toTitle()); Log.add('suite', 'ev', 'jump: fight ' + k); },
+  level(k, cold) { const X = Game.X; X.Game.abort(); X.UI.clear(); X.freshState('Kael', 0); X.World.resetSheets(); X.World.showPlayer = true; X.G.mode = 'cut'; X.Issue.fresh = 1; X.Cutscene.play([{ issue: k, cold: cold ? 1 : undefined, or: [] }], () => X.Game.toTitle()); Log.add('suite', 'ev', 'jump: comic level ' + k + (cold ? ' (cold open)' : '')); },
+  run(fn) {
+    if (!Game.ok() || Game.booting) { Game.jump = fn; return; }
+    try { Game.X.Game.abort(); Game.X.UI.clear(); fn(); } catch (e) { Log.add('suite', 'error', 'jump failed: ' + e.message); }
+    if (Time.paused) Time.setPaused(false);
+    Game.focus();
+  },
+  render() {
+    const box = clear($('#jumpLists')), q = $('#jumpFind').value.trim().toLowerCase();
+    if (!this.cats.length) { box.appendChild(h('div', { class: 'empty', text: 'Waiting for the game…' })); return; }
+    for (const c of this.cats) {
+      const items = c.items.filter(it => !q || it.label.toLowerCase().includes(q) || c.name.toLowerCase().includes(q)); if (!items.length) continue;
+      const open = !!q || Pref.get('jopen_' + c.name, c.name.startsWith('Comic'));
+      const d = h('details', { open }, h('summary', null, c.name + ' ', h('span', { class: 'n', text: '(' + items.length + ')' })),
+        h('div', { class: 'btnlist' }, items.map(it => h('button', { class: it.mono ? 'mono' : '', text: it.label.replace(/^★\s*(NEW\s*·\s*)?/, ''), title: it.label, onclick: () => this.run(it.act) }))));
+      d.addEventListener('toggle', () => { if (!q) Pref.set('jopen_' + c.name, d.open); });
+      box.appendChild(d);
+    }
+    if (!box.firstChild) box.appendChild(h('div', { class: 'empty', text: 'Nothing matches.' }));
+  }
+};
+
+/* ------------------------------------------------------------------ watch the game: events into the log, the status line */
+const Watch = {
+  last: {}, reset() { this.last = {}; },
+  tick() {
+    const X = Game.X; if (!X || !X.G) return;
+    let st = '';
+    try {
+      const G = X.G, B = X.Brawl, I = X.Issue, C = X.Cutscene;
+      const s = { mode: G.mode, brawl: B.active ? (B.def && (B.def.title || B.def.bg) || 'fight') + ' · ' + B.phase : '', issue: I.on ? I.key + (I.ready ? '' : ' (loading)') : '', map: G.mode === 'world' && X.World.map ? G.mapId : '', card: C.active ? (($('#card', Game.w.document) || {}).textContent || '').trim().slice(0, 80) : '' };
+      for (const k in s) if (s[k] !== this.last[k] && (s[k] || this.last[k])) Log.add('game', 'ev', k + ': ' + (s[k] || '—'));
+      this.last = s;
+      st = 'mode ' + G.mode + (s.issue ? ' · comic ' + s.issue : '') + (s.brawl ? ' · ' + s.brawl : '') + (s.map ? ' · map ' + s.map : '') + (G.day ? ' · day ' + G.day : '');
+    } catch (e) { st = 'game not ready'; }
+    const v = $('#viewStatus'); if (v.textContent !== st) v.textContent = st;
+  }
+};
+
+/* ------------------------------------------------------------------ applying overrides to the game */
+function mergeLook(base, patch) { const o = Object.assign({}, base); if (patch) for (const k in patch) { if (patch[k] === null) delete o[k]; else o[k] = patch[k]; } return o; }
+function deepMerge(base, patch) {
+  const o = isObj(base) ? Object.assign({}, base) : {};
+  if (patch) for (const k in patch) { const v = patch[k]; if (v === null) delete o[k]; else if (isObj(v)) o[k] = deepMerge(o[k], v); else o[k] = Array.isArray(v) ? v.slice() : v; }
+  return o;
+}
+const Apply = {
+  origCast: new Map(), origKael: null, origMaps: {}, origNpcs: null,
+  route(o) {
+    if (!o) return;
+    try {
+      if (o.kind === 'cast') this.cast(o.target);
+      else if (o.kind === 'map') this.map(o.target);
+      else if (o.kind === 'spec') { for (const c of Engine.list()) if (c.level === o.level) Engine.applySpec(c, o.target, true); }
+      else if (o.kind === 'prop') { for (const c of Engine.list()) if (c.level === o.level && c.built) Engine.applyProp(c, o.key); }
+    } catch (e) { Log.add('suite', 'error', 'applying ' + o.id + ': ' + e.message); }
+    View.dirty();
+  },
+  gameAll() {
+    this.origCast = new Map(); this.origKael = null; this.origMaps = {}; this.origNpcs = null;
+    const maps = new Set();
+    for (const o of Sync.list()) { if (o.kind === 'cast') this.cast(o.target); if (o.kind === 'map') maps.add(o.target); }
+    for (const m of maps) this.map(m);
+  },
+  cast(id) {
+    const X = Game.X; if (!X || !X.CAST) return;
+    const o = Sync.get('cast__' + seg(id));
+    if (id === 'kael' && X.KAEL_LOOK) {
+      if (!this.origKael) this.origKael = Object.assign({}, X.KAEL_LOOK);
+      for (const k of Object.keys(X.KAEL_LOOK)) delete X.KAEL_LOOK[k];
+      Object.assign(X.KAEL_LOOK, mergeLook(this.origKael, o && o.patch));
+    } else {
+      const c = X.CAST[id]; if (!c) { if (o) o.stale = 1; return; }
+      if (!this.origCast.has(id)) this.origCast.set(id, c.look);
+      const f = this.origCast.get(id);
+      c.look = o ? function () { return mergeLook(f.apply(this, arguments), o.patch); } : f;
+    }
+    this.refreshSheets();
+  },
+  refreshSheets() {
+    const X = Game.X;
+    try {
+      X.World.resetSheets(); const B = X.Brawl;
+      if (B.active) { const sh = o => { if (o && o.id && X.CAST[o.id]) o.sheet = X.World.sheetFor(o.id); };
+        if (B.p) { const hid = B.def && B.def.hero && B.def.hero.id; B.p.sheet = hid ? X.World.sheetFor(hid) : X.P.sheet; if (hid) B.pb = X.World.bustFor(hid); }
+        (B.foes || []).forEach(sh); (B.allies || []).forEach(sh); }
+    } catch (e) { Log.add('suite', 'warn', 'sheet refresh: ' + e.message); }
+  },
+  mapOrig(id) {
+    const X = Game.X, m = X.MAPS[id]; if (!m) return null;
+    if (!this.origMaps[id]) this.origMaps[id] = { grid: m.grid.map(r => r.slice()), props: m.props.map(p => ({ x: p.x, y: p.y, block: p.block ? p.block.map(a => a.slice()) : null })), hot: (m.hot || []).map(q => q.tiles ? q.tiles.map(a => a.slice()) : null), lights: (m.lights || []).map(l => ({ x: l.x, y: l.y })) };
+    if (!this.origNpcs) this.origNpcs = X.NPCS.map(n => n.at ? n.at.slice() : null);
+    return this.origMaps[id];
+  },
+  map(id) {
+    const X = Game.X; if (!X || !X.MAPS || !X.MAPS[id]) return;
+    const m = X.MAPS[id], O = this.mapOrig(id), inside = (x, y) => x > 0 && y > 0 && x < m.w - 1 && y < m.h - 1;
+    m.props.forEach((p, i) => { const q = O.props[i]; p.x = q.x; p.y = q.y; if (q.block) p.block = q.block.map(a => a.slice()); });
+    (m.hot || []).forEach((q, i) => { if (O.hot[i]) q.tiles = O.hot[i].map(a => a.slice()); });
+    (m.lights || []).forEach((l, i) => { l.x = O.lights[i].x; l.y = O.lights[i].y; });
+    X.NPCS.forEach((n, j) => { if (n.map === id && this.origNpcs[j]) n.at = this.origNpcs[j].slice(); });
+    let ovs = Sync.list('map__' + seg(id) + '__'); const ownHot = new Set(), ex = typeof Map2D !== 'undefined' && Map2D.id === id ? Map2D.extra : null;
+    if (ex) { ovs = ovs.filter(o => o.key !== ex.key); ovs.push({ key: ex.key, patch: ex.patch }); }
+    for (const o of ovs) { const [t, s] = o.key.split('.'); if (t === 'hot') ownHot.add(+s); }
+    // the grid as it was, then each moved block: its old tiles go back to what is under them, its new tiles are blocked
+    const g = O.grid.map(r => r.slice()), base = (x, y) => { if (y < 2 || y === m.h - 1 || x === 0 || x === m.w - 1) return '#'; let c = '.'; for (const s of m.set || []) { const [sx, sy, w, hh, ch] = s.length === 3 ? [s[0], s[1], 1, 1, s[2]] : s; if (x >= sx && x < sx + w && y >= sy && y < sy + hh) c = ch; } return c; };
+    const freed = [], taken = [];
+    for (const o of ovs) {
+      const [t, s] = o.key.split('.'), i = +s, P = o.patch; o.stale = 0;
+      if (t === 'prop' && m.props[i]) {
+        const p = m.props[i], q = O.props[i]; if (typeof P.x === 'number') p.x = P.x; if (typeof P.y === 'number') p.y = P.y;
+        const dx = Math.round(p.x - q.x), dy = Math.round(p.y - q.y);
+        if (q.block && (dx || dy)) { p.block = q.block.map(a => [a[0] + dx, a[1] + dy]).filter(a => inside(a[0], a[1])); freed.push(...q.block); taken.push(...p.block);
+          const own = new Set(q.block.map(a => a + ''));
+          (m.hot || []).forEach((hh, k) => { if (!ownHot.has(k) && O.hot[k] && O.hot[k].length && O.hot[k].every(a => own.has(a + ''))) hh.tiles = O.hot[k].map(a => [a[0] + dx, a[1] + dy]); }); }
+      } else if (t === 'hot' && m.hot && m.hot[i] && O.hot[i]) { const dx = Math.round(P.dx || 0), dy = Math.round(P.dy || 0); m.hot[i].tiles = O.hot[i].map(a => [a[0] + dx, a[1] + dy]); }
+      else if (t === 'npc' && X.NPCS[i] && X.NPCS[i].map === id && Array.isArray(P.at) && P.at.length === 2) X.NPCS[i].at = [Math.round(P.at[0]), Math.round(P.at[1])];
+      else if (t === 'light' && m.lights && m.lights[i]) { if (typeof P.x === 'number') m.lights[i].x = P.x; if (typeof P.y === 'number') m.lights[i].y = P.y; }
+      else o.stale = 1;
+    }
+    for (const [x, y] of freed) if (g[y] && g[y][x] === 'x') g[y][x] = base(x, y);
+    for (const p of m.props) if (p.block) for (const [x, y] of p.block) if (g[y] && x >= 0 && x < m.w) g[y][x] = 'x';
+    for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) m.grid[y][x] = g[y][x];
+    if (X.World.map === m) { try { X.World.layer = X.renderMapLayer(m); if (X.G.mode === 'world') X.World.refreshNPCs(); } catch (e) { Log.add('suite', 'warn', 'map redraw: ' + e.message); } }
+    if (typeof Map2D !== 'undefined' && Map2D.id === id) Map2D.draw();
+  }
+};
+
+/* ------------------------------------------------------------------ the comic-book engine (issue frames) */
+// Every frame that runs the comic engine calls __DEVHOOK(window) from a script the suite adds after the engine
+// and before its boot. Here: spec overrides go in before any model is built, the level builder is watched so
+// each batched prop can be found again (and moved), and the frame's render is wrapped for overlays and the dev camera.
+const LEVEL_FN = /^(DOCKS_A|DOCKS_B|RISER|STAIR|GILD|STACK|ARRAY)$/;
+function parseStack(st) {
+  const out = [];
+  for (const ln of String(st || '').split('\n').slice(1)) {
+    let m = ln.match(/^\s*at (.*?) \((.*):(\d+):(\d+)\)\s*$/);
+    if (m) { out.push({ name: m[1], file: m[2], line: +m[3], col: +m[4] }); continue; }
+    m = ln.match(/^\s*at (.*):(\d+):(\d+)\s*$/);
+    if (m) { out.push({ name: '', file: m[1], line: +m[2], col: +m[3] }); continue; }
+    out.push({ name: ln.trim().replace(/^at /, ''), file: '', line: 0, col: 0 });
+  }
+  return out;
+}
+const Engine = {
+  ctxs: [], lines: null,
+  list() { return this.ctxs.filter(c => { try { return c.w && !c.w.closed && c.w.SC && c.frameEl && c.frameEl.isConnected; } catch (e) { return false; } }); },
+  game() { return this.list().find(c => c.role === 'game') || null; },
+  detach(role) { this.ctxs = this.ctxs.filter(c => c.role !== role); },
+  inject(html, ws) {
+    const PRE = '<script>/* devsuite-pre */' + (ws ? 'window.__DEV_WS=1;' : '') + '(function(){var P=window.parent,R="' + (ws ? 'workshop' : 'issue') + '";function send(l,m){try{P.__DEVLOG(R,l,m)}catch(e){}}' +
+      'addEventListener("error",function(e){send("error",(e.message||"error")+(e.lineno?" @"+e.lineno+":"+e.colno:""))});addEventListener("unhandledrejection",function(e){send("error","unhandled: "+((e.reason&&(e.reason.message||e.reason))||e.reason))});' +
+      '["error","warn"].forEach(function(k){var o=console[k];console[k]=function(){try{send(k,Array.prototype.map.call(arguments,function(a){return a&&a.message?a.message:String(a)}).join(" "))}catch(e){}return o.apply(console,arguments)}});' +
+      (ws ? 'var ael=document.addEventListener;document.addEventListener=function(t){if(t==="DOMContentLoaded")return;return ael.apply(this,arguments)};' : '') + '})();</' + 'script>';
+    const POST = '<script>/* devsuite-post */try{(window.parent.__DEVHOOK||function(){})(window)}catch(e){try{window.parent.__DEVLOG("issue","error","dev hook: "+(e&&e.message))}catch(e2){}}</' + 'script>';
+    const ANCH = "const S = SC.story = { goal: null, enc: null, time: 0, cp: 'alley' };";
+    let t = html;
+    const hi = t.indexOf('<head>'); t = hi >= 0 ? t.slice(0, hi + 6) + PRE + t.slice(hi + 6) : PRE + t;
+    if (t.indexOf(ANCH) >= 0) t = t.replace(ANCH, ANCH + " SC.__dev = { S: S, get CROSS() { return CROSS; }, get ENC() { return ENC; } };");
+    else Log.add('suite', 'warn', 'comic engine: story anchor not found; suns and encounters will not be shown');
+    const bi = t.lastIndexOf('</body>'); t = bi >= 0 ? t.slice(0, bi) + POST + t.slice(bi) : t + POST;
+    if (!ws) this.lines = t.split('\n');
+    return t;
+  },
+  attach(w, role) {
+    const SC = w.SC; if (!SC || !SC.gfx) { Log.add('suite', 'warn', 'a frame called the dev hook without the comic engine'); return; }
+    const frameEl = w.frameElement;
+    this.ctxs = this.ctxs.filter(c => c.role !== role || (c.w !== w && false));
+    const ctx = { w, role, SC, THREE: w.THREE, level: SC.issue, frameEl, built: false, props: [], objs: [], byMat: {}, meshByMat: {}, olMesh: null, orig: new Map(), specOrig: clone(SC.SPECS), t0: Date.now() };
+    this.ctxs.push(ctx);
+    for (const o of Sync.list('spec__' + seg(ctx.level) + '__')) this.applySpec(ctx, o.target, false);
+    this.watchBuild(ctx);
+    this.wrapRender(ctx);
+    try { const em = SC.emit; SC.emit = function (n, a) { if (!/^(hit|step|tick|frame)$/.test(n)) Log.add(role === 'ws' ? 'workshop' : 'issue', 'ev', 'SC.emit ' + n + (a && a.kind ? ' (' + a.kind + ')' : '')); return em.apply(this, arguments); }; } catch (e) { /* fine */ }
+    Log.add(role === 'ws' ? 'workshop' : 'issue', 'ev', 'comic engine attached: level ' + ctx.level);
+    if (role === 'ws') Workshop.onEngine(ctx); else { Areas.onEngine(ctx); View.dirty(); }
+  },
+  // ---- specs (the comic rig's people)
+  applySpec(ctx, kind, live, patchOver) {
+    const S = ctx.SC.SPECS, base = ctx.specOrig[kind], o = Sync.get('spec__' + seg(ctx.level) + '__' + seg(kind));
+    if (!base) { if (o) o.stale = 1; return; }
+    const merged = deepMerge(base, patchOver !== undefined ? patchOver : o && o.patch), cur = S[kind];
+    for (const k of Object.keys(cur)) delete cur[k];
+    Object.assign(cur, clone(merged));
+    if (live) this.rebuildModels(ctx, kind);
+  },
+  // swap the built models of one kind for new ones, so a spec change shows in a running level
+  rebuildModels(ctx, kind) {
+    const SC = ctx.SC, G = SC.gfx;
+    if (ctx.role === 'ws') { Workshop.rebuild(); return; }
+    if (!ctx.booted) return;
+    const swap = (holder) => {
+      const old = holder.model; if (!old) return;
+      const m = SC.makeHumanoid(kind); m.group.position.copy(old.group.position); m.group.rotation.copy(old.group.rotation); m.group.scale.copy(old.group.scale); m.group.visible = old.group.visible;
+      try { if (old.glow && m.setGlow) { const c = new ctx.THREE.Color(old.glow); m.setGlow(c.getHex(), old.glow); } } catch (e) { /* default glow */ }
+      try { m.face(old.expr || 'neutral'); } catch (e) { /* no face */ }
+      const par = old.group.parent || G.scene; par.add(m.group); par.remove(old.group); holder.model = m;
+    };
+    try { if (kind === 'hero' && SC.player && SC.player.model) swap(SC.player); for (const e of SC.enemies || []) if (e.kind === kind) swap(e); }
+    catch (e) { Log.add('suite', 'warn', 'could not swap the ' + kind + ' models live (' + e.message + '): reload the level to see it'); }
+  },
+  // ---- props: watch the level builder
+  watchBuild(ctx) {
+    const SC = ctx.SC, G = SC.gfx, W = SC.world, BP = G.Batch && G.Batch.prototype; if (!BP || !W || typeof W.build !== 'function') return;
+    const add0 = BP.add, build0 = BP.build, self = this;
+    let rec = null;
+    const site = () => {
+      const fr = parseStack(new Error().stack);
+      for (let k = 0; k < fr.length; k++) {
+        const nm = fr[k].name.replace(/^Object\./, '');
+        if (fr[k].file.indexOf('srcdoc') < 0) continue;
+        if (LEVEL_FN.test(nm) || /(^|\.)build$/.test(nm)) {
+          let helper = '';
+          for (let j = k - 1; j >= 0; j--) { const n = fr[j].name; if (!n || fr[j].file.indexOf('srcdoc') < 0 || /^Array\.|forEach|^new |(^|\.)(add|box|push)$|^solid$/.test(n)) continue; helper = n.replace(/^Object\./, ''); break; }
+          return { fn: LEVEL_FN.test(nm) ? nm : 'build', line: fr[k].line, col: fr[k].col, helper };
+        }
+      }
+      return { fn: 'build', line: 0, col: 0, helper: '' };
+    };
+    BP.add = function (mat) {
+      if (!rec) return add0.apply(this, arguments);
+      if (!rec.batch) rec.batch = this;
+      const g0 = this.groups[mat], v0 = g0 ? g0.pos.length / 3 : 0, o0 = this.ol.pos.length / 3;
+      const r = add0.apply(this, arguments);
+      if (this === rec.batch) {
+        const g = this.groups[mat], v1 = g.pos.length / 3, o1 = this.ol.pos.length / 3, P = g.pos;
+        let x0 = 1e9, y0 = 1e9, z0 = 1e9, x1 = -1e9, y1 = -1e9, z1 = -1e9;
+        for (let i = v0 * 3; i < v1 * 3; i += 3) { const x = P[i], y = P[i + 1], z = P[i + 2]; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; if (z < z0) z0 = z; if (z > z1) z1 = z; }
+        rec.ev.push({ t: 'p', mat, v0, v1, o0, o1, bb: [x0, y0, z0, x1, y1, z1], site: site() });
+      }
+      return r;
+    };
+    BP.build = function () {
+      const keys = Object.keys(this.groups), out = build0.apply(this, arguments);
+      if (rec && this === rec.batch) { keys.forEach((k, i) => { ctx.meshByMat[k] = out[i]; }); ctx.olMesh = out.length > keys.length ? out[keys.length] : null; }
+      return out;
+    };
+    const sol = W.solids, push0 = sol.push;
+    sol.push = function (s) { if (rec && s && typeof s.x0 === 'number') rec.ev.push({ t: 's', s, bb: [s.x0, s.y0, s.z0, s.x1, Math.max(s.y1, s.ramp ? Math.max(s.ramp.a, s.ramp.b) : s.y1), s.z1], site: site() }); return push0.apply(this, arguments); };
+    const wb = W.build;
+    W.build = function () {
+      const lim = [Error.stackTraceLimit, ctx.w.Error.stackTraceLimit]; Error.stackTraceLimit = 40; ctx.w.Error.stackTraceLimit = 40;
+      rec = { ev: [], batch: null }; const kids0 = G.scene ? G.scene.children.length : 0;
+      try { return wb.apply(this, arguments); }
+      finally {
+        Error.stackTraceLimit = lim[0]; ctx.w.Error.stackTraceLimit = lim[1];
+        const r = rec; rec = null;
+        try { self.finishBuild(ctx, r, kids0); } catch (e) { Log.add('suite', 'error', 'prop index: ' + e.message); }
+      }
+    };
+    // the frame has booted once the player exists; ws frames never boot the level
+    if (ctx.role === 'game') { const pi = SC.player && SC.player.init; if (pi) SC.player.init = function () { const r = pi.apply(this, arguments); ctx.booted = true; return r; }; }
+  },
+  finishBuild(ctx, rec, kids0) {
+    const SC = ctx.SC, G = SC.gfx, W = SC.world, lines = this.lines || [];
+    // group: one call statement in the level builder (its line:col) is one site; inside a site, pieces that touch are one prop
+    const sites = new Map();
+    rec.ev.forEach((e, i) => { e.i = i; const k = e.site.fn + ':' + e.site.line + ':' + e.site.col; let s = sites.get(k); if (!s) { s = { k, fn: e.site.fn, line: e.site.line, col: e.site.col, helper: e.site.helper, items: [] }; sites.set(k, s); } if (!s.helper && e.site.helper) s.helper = e.site.helper; s.items.push(e); });
+    const perFn = {}, props = [];
+    for (const s of sites.values()) {
+      const ord = perFn[s.fn] = (perFn[s.fn] === undefined ? 0 : perFn[s.fn] + 1), n = s.items.length, par = new Int32Array(n).map((_, i) => i);
+      const find = i => { while (par[i] !== i) { par[i] = par[par[i]]; i = par[i]; } return i; };
+      if (n <= 2500) { const E = 0.06; for (let a = 0; a < n; a++) { const A = s.items[a].bb; for (let b = a + 1; b < n; b++) { const B = s.items[b].bb; if (A[0] - E <= B[3] && B[0] - E <= A[3] && A[1] - E <= B[4] && B[1] - E <= A[4] && A[2] - E <= B[5] && B[2] - E <= A[5]) { const ra = find(a), rb = find(b); if (ra !== rb) par[Math.max(ra, rb)] = Math.min(ra, rb); } } } }
+      const groups = new Map(); for (let i = 0; i < n; i++) { const r = find(i); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(s.items[i]); }
+      let ci = 0;
+      for (const items of groups.values()) {
+        const bb = [1e9, 1e9, 1e9, -1e9, -1e9, -1e9]; for (const e of items) for (let q = 0; q < 3; q++) { bb[q] = Math.min(bb[q], e.bb[q]); bb[q + 3] = Math.max(bb[q + 3], e.bb[q + 3]); }
+        const pieces = items.filter(e => e.t === 'p'), solids = items.filter(e => e.t === 's').map(e => e.s);
+        const pivot = [(bb[0] + bb[3]) / 2, bb[1], (bb[2] + bb[5]) / 2], r1 = v => Math.round(v * 10) / 10;
+        const src = (lines[s.line - 1] || '').slice(Math.max(0, s.col - 1), s.col + 159).trim();
+        props.push({ kind: 'batch', key: s.fn + '.' + ord + '.' + ci, fn: s.fn, line: s.line, col: s.col, helper: s.helper || (pieces.length ? 'add' : 'solid'), pieces, solids, bb, pivot, first: items[0].i,
+          sig: (s.helper || 'add') + '@' + r1(pivot[0]) + ',' + r1(pivot[1]) + ',' + r1(pivot[2]) + '#' + pieces.length + '/' + solids.length, src, T: null });
+        ci++;
+      }
+    }
+    // loose objects the level made (signs, lamp cones, crates, doors)
+    const statics = new Set(Object.values(ctx.meshByMat).concat(ctx.olMesh ? [ctx.olMesh] : [])), kids = G.scene.children, objs = [], typeN = {};
+    for (let i = kids0; i < kids.length; i++) {
+      const o = kids[i]; if (statics.has(o) || o.isLight || o.isCamera) continue;
+      const ty = (o.geometry && o.geometry.type || o.type).replace(/Geometry$/, ''), n = typeN[ty] = (typeN[ty] || 0) + 1, r1 = v => Math.round(v * 10) / 10;
+      const crate = (W.crates || []).find(c => c.m === o), door = Object.values(W.doors || {}).find(d => d.m === o);
+      objs.push({ kind: 'obj', key: 'obj.' + ty + '.' + (n - 1), o, helper: crate ? 'crate' : door ? 'door ' + door.id : ty, crate, door, solids: crate ? [crate.sol] : door && door.sol ? [door.sol] : [],
+        pivot: [o.position.x, o.position.y, o.position.z], o0: { p: o.position.clone(), r: o.rotation.y, s: o.scale.clone(), v: o.visible, from: door ? door.from.clone() : null, cx: crate ? crate.x : 0, cz: crate ? crate.z : 0 },
+        sig: ty + '@' + r1(o.position.x) + ',' + r1(o.position.y) + ',' + r1(o.position.z), T: null });
+    }
+    { const objSol = new Set(); for (const o of objs) for (const so of o.solids) objSol.add(so); for (const p of props) p.solids = p.solids.filter(so => !objSol.has(so)); for (let i = props.length - 1; i >= 0; i--) if (!props[i].pieces.length && !props[i].solids.length) props.splice(i, 1); }
+    props.sort((a, b) => a.first - b.first);
+    ctx.props = props; ctx.propByKey = new Map(props.map(p => [p.key, p]));
+    for (const p of props) for (const pc of p.pieces) { (ctx.byMat[pc.mat] = ctx.byMat[pc.mat] || []).push({ v0: pc.v0, v1: pc.v1, o0: pc.o0, o1: pc.o1, prop: p }); }
+    for (const k in ctx.byMat) ctx.byMat[k].sort((a, b) => a.v0 - b.v0);
+    ctx.olList = []; for (const k in ctx.byMat) for (const e of ctx.byMat[k]) if (e.o1 > e.o0) ctx.olList.push(e); ctx.olList.sort((a, b) => a.o0 - b.o0);
+    const keep = m => { if (m && m.geometry && !ctx.orig.has(m)) { const g = m.geometry, n = g.attributes.normal; ctx.orig.set(m, { pos: g.attributes.position.array.slice(), nor: n ? n.array.slice() : null }); } };
+    for (const k in ctx.meshByMat) keep(ctx.meshByMat[k]); keep(ctx.olMesh);
+    ctx.objs = objs; for (const o of objs) ctx.propByKey.set(o.key, o);
+    ctx.built = true;
+    Log.add(ctx.role === 'ws' ? 'workshop' : 'issue', 'ev', 'level ' + ctx.level + ' built: ' + props.length + ' props from ' + sites.size + ' builder calls, ' + objs.length + ' loose objects, ' + W.solids.length + ' solids');
+    for (const o of Sync.list('prop__' + seg(ctx.level) + '__')) this.applyProp(ctx, o.key);
+    if (ctx.role === 'game') Areas.onBuilt(ctx);
+  },
+  // find a prop again: by key, and if the build moved under it, by its signature
+  findProp(ctx, key, ref) {
+    let p = ctx.propByKey && ctx.propByKey.get(key);
+    if (p && (!ref || !ref.sig || p.sig === ref.sig)) return p;
+    if (ref && ref.sig) { const all = ctx.props.concat(ctx.objs), c = all.filter(q => q.sig === ref.sig); if (c.length === 1) return c[0]; }
+    return p || null;
+  },
+  applyProp(ctx, key) {
+    const o = Sync.get('prop__' + seg(ctx.level) + '__' + seg(key)), p = this.findProp(ctx, key, o && o.ref);
+    if (!p) { if (o) o.stale = 1; return; }
+    if (o) o.stale = 0;
+    this.setT(ctx, p, o ? o.patch : null);
+  },
+  // move one prop: rewrite its vertices in the batched meshes (or move its object), and its collision with it
+  setT(ctx, p, T) {
+    const t = T ? { dx: +T.dx || 0, dy: +T.dy || 0, dz: +T.dz || 0, ry: +T.ry || 0, s: T.s === undefined || T.s === null ? 1 : Math.max(0.01, +T.s || 1), hidden: !!T.hidden, moveSolids: T.moveSolids !== false } : null;
+    p.T = t;
+    const piv = p.pivot, ry = t ? t.ry : 0, k = t ? (t.hidden ? 0 : t.s) : 1, dx = t ? t.dx : 0, dy = t ? t.dy : 0, dz = t ? t.dz : 0, c = Math.cos(ry), s = Math.sin(ry);
+    if (p.kind === 'batch') {
+      const touch = new Set();
+      const run = (mesh, a, b, nor) => {
+        if (!mesh || b <= a) return; const O = ctx.orig.get(mesh); if (!O) return;
+        const P = mesh.geometry.attributes.position.array, NA = nor && mesh.geometry.attributes.normal, N = NA ? NA.array : null;
+        for (let i = a; i < b; i++) { const j = i * 3, x = O.pos[j] - piv[0], y = O.pos[j + 1] - piv[1], z = O.pos[j + 2] - piv[2];
+          P[j] = piv[0] + (x * c + z * s) * k + dx; P[j + 1] = piv[1] + y * k + dy; P[j + 2] = piv[2] + (-x * s + z * c) * k + dz;
+          if (N && O.nor) { const nx = O.nor[j], nz = O.nor[j + 2]; N[j] = nx * c + nz * s; N[j + 1] = O.nor[j + 1]; N[j + 2] = -nx * s + nz * c; } }
+        touch.add(mesh);
+      };
+      for (const pc of p.pieces) { run(ctx.meshByMat[pc.mat], pc.v0, pc.v1, true); run(ctx.olMesh, pc.o0, pc.o1, false); }
+      for (const m of touch) { const g = m.geometry; g.attributes.position.needsUpdate = true; if (g.attributes.normal) g.attributes.normal.needsUpdate = true; g.computeBoundingSphere(); g.boundingBox = null; }
+    } else {
+      const o = p.o, O = p.o0;
+      o.position.set(O.p.x + dx, O.p.y + dy, O.p.z + dz); o.rotation.y = O.r + ry; o.scale.set(O.s.x * (t ? t.s : 1), O.s.y * (t ? t.s : 1), O.s.z * (t ? t.s : 1)); o.visible = t && t.hidden ? false : O.v;
+      if (p.crate) { p.crate.x = O.cx + dx; p.crate.z = O.cz + dz; }
+      if (p.door && O.from) { p.door.from.set(O.from.x + dx, O.from.y + dy, O.from.z + dz); if (!p.door.k) o.position.copy(p.door.from); }
+    }
+    const moveS = !t || t.moveSolids;
+    for (const so of p.solids) this.setSolid(so, piv, moveS ? t : null);
+    ctx.solidsDirty = true;
+  },
+  setSolid(so, piv, t) {
+    if (!so.__o) so.__o = { x0: so.x0, x1: so.x1, y0: so.y0, y1: so.y1, z0: so.z0, z1: so.z1, on: so.on, ramp: so.ramp ? { axis: so.ramp.axis, a: so.ramp.a, b: so.ramp.b } : null };
+    const O = so.__o;
+    if (!t) { so.x0 = O.x0; so.x1 = O.x1; so.y0 = O.y0; so.y1 = O.y1; so.z0 = O.z0; so.z1 = O.z1; so.on = O.on; if (O.ramp) Object.assign(so.ramp, O.ramp); return; }
+    const c = Math.cos(t.ry), s = Math.sin(t.ry), k = t.s;
+    let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+    for (const [x, z] of [[O.x0, O.z0], [O.x1, O.z0], [O.x0, O.z1], [O.x1, O.z1]]) { const ax = x - piv[0], az = z - piv[2], X = piv[0] + (ax * c + az * s) * k + t.dx, Z = piv[2] + (-ax * s + az * c) * k + t.dz; x0 = Math.min(x0, X); x1 = Math.max(x1, X); z0 = Math.min(z0, Z); z1 = Math.max(z1, Z); }
+    so.x0 = x0; so.x1 = x1; so.z0 = z0; so.z1 = z1;
+    const Y = y => piv[1] + (y - piv[1]) * k + t.dy; so.y0 = Y(O.y0); so.y1 = Y(O.y1);
+    so.on = t.hidden ? false : O.on;
+    if (O.ramp && so.ramp) { const q = ((Math.round(t.ry / (Math.PI / 2)) % 4) + 4) % 4; let axis = O.ramp.axis, a = Y(O.ramp.a), b = Y(O.ramp.b);
+      if (q === 1 || q === 3) axis = axis === 'x' ? 'z' : 'x';
+      // +90° about y sends +x to -z: the ramp then rises the other way along z
+      if ((q === 1 && O.ramp.axis === 'x') || (q === 3 && O.ramp.axis === 'z') || q === 2) { const tmp = a; a = b; b = tmp; }
+      so.ramp.axis = axis; so.ramp.a = a; so.ramp.b = b; }
+  },
+  // ---- render wrapper: time, god mode, overlays, dev camera
+  wrapRender(ctx) {
+    const G = ctx.SC.gfx, r0 = G.render;
+    if (typeof r0 !== 'function') return;
+    G.render = function () {
+      if (ctx.role === 'game') { try { Engine.frameHook(ctx); } catch (e) { if (!ctx.hookErr) { ctx.hookErr = 1; Log.add('suite', 'error', 'frame hook: ' + e.message); } } }
+      if (ctx.devCam && G.renderer && G.scene) { ctx.devCam.aspect = G.camera.aspect; ctx.devCam.updateProjectionMatrix(); return G.renderer.render(G.scene, ctx.devCam); }
+      return r0.apply(this, arguments);
+    };
+  },
+  frameHook(ctx) {
+    const SC = ctx.SC;
+    this.applyTime(ctx);
+    if (Time.god && SC.player) { const pl = SC.player; pl.hp = Math.max(pl.hp, SC.T.hp || 100); pl.chance = 1; }
+    Areas.frame(ctx);
+  },
+  applyTime(ctx) {
+    const SC = ctx.SC;
+    if (Time.paused) { if (!ctx.paused) { ctx.paused = true; ctx.manual0 = !!SC.manual; } SC.manual = true; }
+    else if (ctx.paused) { ctx.paused = false; SC.manual = ctx.manual0; }
+    if (Time.scale !== 1) { SC.time.slowT = 0.5; SC.time.slowK = Time.scale; ctx.scaled = true; }
+    else if (ctx.scaled) { ctx.scaled = false; SC.time.slowT = 0; SC.time.slowK = 1; }
+  }
+};
+
+/* ------------------------------------------------------------------ Areas: the comic levels in 3D */
+const OVL = [['solids', 'Collision solids', 0x4fd6d0], ['co', 'Camera-only boxes', 0xd05ad0], ['inv', 'Invisible walls', 0xe7c35a], ['inter', 'Interact spots', 0x7bd389], ['suns', 'Suns and checkpoints', 0xffd23a], ['enc', 'Encounter arenas and spawns', 0xff5a4a], ['links', 'Waypoint links', 0xff9a3a], ['paths', 'Enemy paths', 0xff7ad0]];
+const Areas = {
+  ctx: null, sel: null, pick: false, cam: 'off', ov: Object.assign({ solids: 1, co: 0, inv: 0, inter: 1, suns: 1, enc: 1, links: 1, paths: 1 }, Pref.get('ov', {})), any: false,
+  trails: new Map(), lastStatic: 0, step: 0.5, keys: new Set(), drag: null, panelBuilt: false,
+  onEngine(ctx) { this.ctx = ctx; this.sel = null; this.trails = new Map(); this.drag = null; ctx.devCam = null; this.installInput(ctx); if (this.cam !== 'off') setTimeout(() => this.setCam(this.cam), 0); this.render(); },
+  onBuilt(ctx) { if (ctx === this.ctx) { this.lastStatic = 0; this.render(); } },
+  live() { const c = this.ctx; return c && Engine.list().includes(c) ? c : null; },
+  name(ctx) { try { return (Game.X.Issue.LEVELS || {})[ctx.level] || ctx.level; } catch (e) { return ctx.level; } },
+  // ---- per frame, from inside the level's render
+  frame(ctx) {
+    if (ctx !== this.ctx) return;
+    const T = ctx.THREE, G = ctx.SC.gfx;
+    this.any = OVL.some(o => this.ov[o[0]]);
+    if (!ctx.ovRoot) { ctx.ovRoot = new T.Group(); ctx.ovRoot.name = 'devsuite overlays'; G.scene.add(ctx.ovRoot); ctx.ovStatic = new T.Group(); ctx.ovDyn = new T.Group(); ctx.ovSel = new T.Group(); ctx.ovRoot.add(ctx.ovStatic, ctx.ovDyn, ctx.ovSel); }
+    if (ctx.ovRoot.parent !== G.scene) G.scene.add(ctx.ovRoot);
+    const now = performance.now();
+    if (ctx.solidsDirty || now - this.lastStatic > 2500) { ctx.solidsDirty = false; this.lastStatic = now; this.buildStatic(ctx); }
+    this.buildDyn(ctx);
+    if (ctx.devCam) this.camStep(ctx);
+  },
+  lines(T, arr, color, op) {
+    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(arr, 3));
+    const l = new T.LineSegments(g, new T.LineBasicMaterial({ color, transparent: true, opacity: op || 0.85, depthTest: false, depthWrite: false, fog: false }));
+    l.renderOrder = 60; l.frustumCulled = false; return l;
+  },
+  box(a, x0, y0, z0, x1, y1, z1) { const P = [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], [x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]]; for (const [i, j] of [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]]) a.push(...P[i], ...P[j]); },
+  circle(a, x, y, z, r, n) { n = n || 20; for (let i = 0; i < n; i++) { const a0 = i / n * 6.2832, a1 = (i + 1) / n * 6.2832; a.push(x + Math.cos(a0) * r, y, z + Math.sin(a0) * r, x + Math.cos(a1) * r, y, z + Math.sin(a1) * r); } },
+  empty(g) { while (g.children.length) { const c = g.children.pop(); if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); } },
+  buildStatic(ctx) {
+    const T = ctx.THREE, SC = ctx.SC, W = SC.world, g = ctx.ovStatic, o = this.ov; this.empty(g);
+    const A = { solids: [], co: [], inv: [], inter: [], suns: [], enc: [], links: [] };
+    if (o.solids || o.co || o.inv) for (const s of W.solids) { if (!s.on) continue; const k = s.co ? 'co' : s.inv ? 'inv' : 'solids'; if (!o[k]) continue; const top = s.ramp ? Math.max(s.ramp.a, s.ramp.b) : s.y1;
+      if (s.ramp) { const a = A[k], ax = s.ramp.axis === 'x'; a.push(s.x0, ax ? s.ramp.a : s.ramp.a, s.z0, ax ? s.x1 : s.x0, s.ramp.b, ax ? s.z0 : s.z1, s.x0, s.ramp.a, s.z1, ax ? s.x1 : s.x1, s.ramp.b, s.z1); this.box(a, s.x0, s.y0, s.z0, s.x1, top, s.z1); } else this.box(A[k], s.x0, s.y0, s.z0, s.x1, top, s.z1); }
+    if (o.inter) for (const it of W.interacts || []) { this.circle(A.inter, it.x, it.y + 0.06, it.z, it.r || 2, 18); A.inter.push(it.x, it.y, it.z, it.x, it.y + 2.2, it.z); if (it.fx !== undefined) A.inter.push(it.x, it.y + 0.1, it.z, it.fx, it.y + 0.1, it.fz); }
+    const D = SC.__dev;
+    if (o.suns && D) { const C = D.CROSS || {}; for (const id in C) { const c = C[id]; this.circle(A.suns, c.x, c.y + 0.05, c.z, 1.3, 16); this.circle(A.suns, c.x, c.y + 0.05, c.z, 0.5, 10); A.suns.push(c.x, c.y, c.z, c.x, c.y + 3.2, c.z, c.x, c.y + 1, c.z, c.x + Math.sin(c.yaw || 0) * 1.6, c.y + 1, c.z + Math.cos(c.yaw || 0) * 1.6); } }
+    if (o.enc && D) { const E = D.ENC || {}; for (const id in E) { const e = E[id], y = (e.floor || 0) + 0.08; if (e.arena) { const [x0, z0, x1, z1] = e.arena; A.enc.push(x0, y, z0, x1, y, z0, x1, y, z0, x1, y, z1, x1, y, z1, x0, y, z1, x0, y, z1, x0, y, z0); }
+      for (const w of e.waves || []) for (const s of w) { if (!Array.isArray(s)) continue; const x = +s[1], z = +s[2]; if (!isFinite(x) || !isFinite(z)) continue; A.enc.push(x - 0.4, y, z - 0.4, x + 0.4, y, z + 0.4, x - 0.4, y, z + 0.4, x + 0.4, y, z - 0.4, x, y, z, x, y + 1.8, z); } } }
+    if (o.links) { const L = (D && D.S && D.S.links) || []; for (const l of L) { if (!l.a || !l.b) continue; const w = (l.w || 1) / 2, dx = l.b[0] - l.a[0], dz = l.b[2] - l.a[2], n = Math.hypot(dx, dz) || 1, px = -dz / n * w, pz = dx / n * w;
+      A.links.push(...l.a, ...l.b, l.a[0] + px, l.a[1] + 0.05, l.a[2] + pz, l.b[0] + px, l.b[1] + 0.05, l.b[2] + pz, l.a[0] - px, l.a[1] + 0.05, l.a[2] - pz, l.b[0] - px, l.b[1] + 0.05, l.b[2] - pz); } }
+    const col = {}; OVL.forEach(r => { col[r[0]] = r[2]; });
+    for (const k in A) if (A[k].length) g.add(this.lines(T, A[k], col[k], k === 'solids' ? 0.55 : 0.9));
+    this.buildSel(ctx);
+  },
+  buildDyn(ctx) {
+    const T = ctx.THREE, SC = ctx.SC, g = ctx.ovDyn; this.empty(g); if (!this.ov.paths) return;
+    const a = [], now = performance.now(), pl = SC.player;
+    for (const e of SC.enemies || []) {
+      let tr = this.trails.get(e); if (!tr) { tr = []; this.trails.set(e, tr); }
+      const last = tr[tr.length - 1]; if (!last || now - last.t > 120) { tr.push({ t: now, x: e.pos.x, y: e.pos.y + 0.1, z: e.pos.z }); if (tr.length > 80) tr.shift(); }
+      for (let i = 1; i < tr.length; i++) a.push(tr[i - 1].x, tr[i - 1].y, tr[i - 1].z, tr[i].x, tr[i].y, tr[i].z);
+      if (pl && e.token) a.push(e.pos.x, e.pos.y + 1.2, e.pos.z, pl.pos.x, pl.pos.y + 1.2, pl.pos.z);
+      this.circle(a, e.pos.x, e.pos.y + 0.08, e.pos.z, e.r || 0.5, 10);
+    }
+    for (const k of this.trails.keys()) if (!(SC.enemies || []).includes(k)) this.trails.delete(k);
+    if (a.length) g.add(this.lines(T, a, 0xff7ad0, 0.9));
+  },
+  // the selected prop: its box in white, its collision in yellow
+  propBox(ctx, p) {
+    if (p.kind === 'obj') { const b = new ctx.THREE.Box3().setFromObject(p.o); return b.isEmpty() ? null : [b.min.x, b.min.y, b.min.z, b.max.x, b.max.y, b.max.z]; }
+    const t = p.T || { dx: 0, dy: 0, dz: 0, ry: 0, s: 1 }, piv = p.pivot, c = Math.cos(t.ry || 0), s = Math.sin(t.ry || 0), k = t.hidden ? 0.02 : (t.s || 1), bb = p.bb, o = [1e9, 1e9, 1e9, -1e9, -1e9, -1e9];
+    for (const x of [bb[0], bb[3]]) for (const y of [bb[1], bb[4]]) for (const z of [bb[2], bb[5]]) { const ax = x - piv[0], az = z - piv[2], X = piv[0] + (ax * c + az * s) * k + t.dx, Y = piv[1] + (y - piv[1]) * k + t.dy, Z = piv[2] + (-ax * s + az * c) * k + t.dz; o[0] = Math.min(o[0], X); o[1] = Math.min(o[1], Y); o[2] = Math.min(o[2], Z); o[3] = Math.max(o[3], X); o[4] = Math.max(o[4], Y); o[5] = Math.max(o[5], Z); }
+    return o;
+  },
+  buildSel(ctx) {
+    const g = ctx.ovSel; if (!g) return; this.empty(g); const p = this.sel; if (!p || ctx !== this.ctx) return;
+    const a = [], b = this.propBox(ctx, p); if (b) this.box(a, ...b);
+    const piv = this.pivotNow(p); a.push(piv[0] - 0.6, piv[1], piv[2], piv[0] + 0.6, piv[1], piv[2], piv[0], piv[1], piv[2] - 0.6, piv[0], piv[1], piv[2] + 0.6, piv[0], piv[1], piv[2], piv[0], piv[1] + 1, piv[2]);
+    g.add(this.lines(ctx.THREE, a, 0xffffff, 1));
+    const s = []; for (const so of p.solids) if (so.on) this.box(s, so.x0, so.y0, so.z0, so.x1, so.ramp ? Math.max(so.ramp.a, so.ramp.b) : so.y1, so.z1);
+    if (s.length) g.add(this.lines(ctx.THREE, s, 0xffe14a, 1));
+  },
+  pivotNow(p) { const t = p.T || {}; return [p.pivot[0] + (t.dx || 0), p.pivot[1] + (t.dy || 0), p.pivot[2] + (t.dz || 0)]; },
+  // ---- picking and dragging in the live view
+  installInput(ctx) {
+    const w = ctx.w, opt = { capture: true, passive: false };
+    const cv = () => ctx.SC.gfx.renderer && ctx.SC.gfx.renderer.domElement;
+    const mine = e => (this.pick || ctx.devCam) && ctx === this.ctx && e.target === cv();
+    w.addEventListener('pointerdown', e => { if (!mine(e)) return; e.preventDefault(); e.stopImmediatePropagation(); try { e.target.setPointerCapture(e.pointerId); } catch (er) { /* fine */ } this.down(ctx, e); }, opt);
+    w.addEventListener('pointermove', e => { if (!this.drag || ctx !== this.ctx) return; e.preventDefault(); e.stopImmediatePropagation(); this.move(ctx, e); }, opt);
+    w.addEventListener('pointerup', e => { if (!this.drag || ctx !== this.ctx) return; e.preventDefault(); e.stopImmediatePropagation(); this.up(ctx, e); }, opt);
+    w.addEventListener('pointercancel', () => { this.drag = null; }, opt);
+    w.addEventListener('wheel', e => { if (!ctx.devCam || ctx !== this.ctx) return; e.preventDefault(); e.stopImmediatePropagation(); const C = ctx.camS; if (C.mode === 'orbit') C.dist = Math.max(1.5, Math.min(220, C.dist * (e.deltaY > 0 ? 1.12 : 0.89))); else C.speed = Math.max(1, Math.min(80, C.speed * (e.deltaY > 0 ? 0.85 : 1.18))); }, opt);
+    w.addEventListener('contextmenu', e => { if (mine(e)) e.preventDefault(); }, opt);
+    const key = (e, on) => { if (!ctx.devCam || ctx.camS.mode !== 'fly' || ctx !== this.ctx) return; const k = e.key.toLowerCase(); if ('wasdqe'.includes(k) || e.key === 'Shift') { if (on) this.keys.add(k); else this.keys.delete(k); e.preventDefault(); e.stopImmediatePropagation(); } };
+    w.addEventListener('keydown', e => key(e, true), true); w.addEventListener('keyup', e => key(e, false), true);
+  },
+  ray(ctx, e) {
+    const T = ctx.THREE, G = ctx.SC.gfx, r = G.renderer.domElement.getBoundingClientRect(), rc = new T.Raycaster();
+    rc.setFromCamera(new T.Vector2((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1), ctx.devCam || G.camera); return rc;
+  },
+  pickAt(ctx, e) {
+    const rc = this.ray(ctx, e), matOf = new Map(Object.entries(ctx.meshByMat).map(([k, m]) => [m, k]));
+    const objs = ctx.objs.filter(o => o.o.visible);
+    const targets = [...matOf.keys()].filter(m => m.material && !m.material.transparent).concat(objs.map(o => o.o));
+    const hits = rc.intersectObjects(targets, true);
+    for (const hit of hits) {
+      const mat = matOf.get(hit.object);
+      if (mat) { const L = ctx.byMat[mat], vi = hit.face ? hit.face.a : -1; let lo = 0, hi = L.length - 1, f = null; while (lo <= hi) { const m = (lo + hi) >> 1; if (L[m].v1 <= vi) lo = m + 1; else if (L[m].v0 > vi) hi = m - 1; else { f = L[m]; break; } }
+        if (!f) continue; const p = f.prop, big = Math.max(p.bb[3] - p.bb[0], p.bb[5] - p.bb[2]) > 45; if (big && !e.shiftKey) continue; return { prop: p, point: hit.point }; }
+      let o = hit.object; while (o) { const ob = objs.find(q => q.o === o); if (ob) return { prop: ob, point: hit.point }; o = o.parent; }
+    }
+    return null;
+  },
+  down(ctx, e) {
+    const camBtn = e.button === 2 || (!this.pick && ctx.devCam);
+    if (camBtn && ctx.devCam) { this.drag = { cam: 1, x: e.clientX, y: e.clientY, pan: e.button === 2 || e.shiftKey }; return; }
+    if (!this.pick) return;
+    const hit = this.pickAt(ctx, e);
+    if (!hit) { this.select(null); if (ctx.devCam) this.drag = { cam: 1, x: e.clientX, y: e.clientY, pan: e.shiftKey }; return; }
+    if (hit.prop !== this.sel) this.select(hit.prop);
+    const T = ctx.THREE, piv = this.pivotNow(hit.prop), plane = new T.Plane(new T.Vector3(0, 1, 0), -piv[1]), p0 = new T.Vector3();
+    if (!this.ray(ctx, e).ray.intersectPlane(plane, p0)) return;
+    this.drag = { prop: hit.prop, plane, p0, t0: Object.assign({ dx: 0, dy: 0, dz: 0, ry: 0, s: 1, hidden: false, moveSolids: true }, hit.prop.T || {}), x: e.clientX, y: e.clientY, moved: false };
+  },
+  move(ctx, e) {
+    const d = this.drag;
+    if (d.cam) { const C = ctx.camS, dx = e.clientX - d.x, dy = e.clientY - d.y; d.x = e.clientX; d.y = e.clientY;
+      if (d.pan && C.mode === 'orbit') { const s = C.dist * 0.0022, cy = Math.cos(C.yaw), sy = Math.sin(C.yaw); C.target.x -= (dx * cy) * s; C.target.z -= (-dx * sy) * s; C.target.y += dy * s; }
+      else { C.yaw -= dx * 0.006; C.pitch = Math.max(-1.45, Math.min(1.45, C.pitch + dy * 0.006)); } return; }
+    if (!d.prop) return;
+    if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 3) d.moved = true; if (!d.moved) return;
+    const p1 = new ctx.THREE.Vector3(); if (!this.ray(ctx, e).ray.intersectPlane(d.plane, p1)) return;
+    const st = e.altKey ? 0 : this.step, snap = v => st ? Math.round(v / st) * st : v;
+    const t = Object.assign({}, d.t0, { dx: r3(snap(d.t0.dx + p1.x - d.p0.x)), dz: r3(snap(d.t0.dz + p1.z - d.p0.z)) });
+    Engine.setT(ctx, d.prop, t); this.buildSel(ctx); this.fields();
+  },
+  up(ctx) { const d = this.drag; this.drag = null; if (d && d.prop && d.moved) this.commit(ctx, d.prop); },
+  select(p) { this.sel = p; const c = this.live(); if (c) this.buildSel(c); this.render(); },
+  commit(ctx, p) {
+    const T = p.T, id = 'prop__' + seg(ctx.level) + '__' + seg(p.key);
+    const ident = !T || (!T.dx && !T.dy && !T.dz && !T.ry && (T.s === 1 || T.s === undefined) && !T.hidden && T.moveSolids !== false);
+    if (ident) { Sync.remove(id); return; }
+    const piv = this.pivotNow(p);
+    Sync.set(id, { kind: 'prop', target: p.key, level: ctx.level, key: p.key, patch: { dx: r3(T.dx), dy: r3(T.dy), dz: r3(T.dz), ry: r3(T.ry), s: r3(T.s), hidden: !!T.hidden, moveSolids: T.moveSolids !== false },
+      label: this.name(ctx) + ': ' + p.helper + ' ' + p.key, ref: { sig: p.sig, src: (p.src || '').slice(0, 200), fn: p.fn || '', line: p.line || 0, pivot: p.pivot.map(r3), now: piv.map(r3), solids: p.solids.length, linked: p.solids.length ? 1 : 0 } });
+  },
+  setTsel(ch) {
+    const c = this.live(), p = this.sel; if (!c || !p) return;
+    const t = Object.assign({ dx: 0, dy: 0, dz: 0, ry: 0, s: 1, hidden: false, moveSolids: true }, p.T || {}, ch);
+    Engine.setT(c, p, t); this.buildSel(c); this.fields(); this.commit(c, p);
+  },
+  // ---- dev camera: orbit about a point, or fly
+  setCam(mode) {
+    this.cam = mode; Pref.set('cam', mode); const c = this.live(); if (!c) { this.render(); return; }
+    const T = c.THREE, G = c.SC.gfx;
+    if (mode === 'off') { c.devCam = null; this.keys.clear(); this.render(); return; }
+    if (!c.devCam) { c.devCam = new T.PerspectiveCamera(G.camera.fov || 55, G.camera.aspect || 1.7, 0.1, 900); c.devCam.position.copy(G.camera.position); c.devCam.quaternion.copy(G.camera.quaternion); }
+    const pl = c.SC.player, tgt = this.sel ? new T.Vector3(...this.pivotNow(this.sel)) : pl && pl.pos ? pl.pos.clone().add(new T.Vector3(0, 1, 0)) : new T.Vector3();
+    const off = c.devCam.position.clone().sub(tgt), dist = Math.max(3, off.length());
+    c.camS = { mode, target: tgt, dist: Math.min(dist, 40), yaw: Math.atan2(off.x, off.z), pitch: Math.asin(Math.max(-1, Math.min(1, off.y / dist))), speed: 8, pos: c.devCam.position.clone() };
+    if (mode === 'fly') { c.camS.yaw = Math.atan2(-off.x, -off.z); c.camS.pitch = -Math.asin(Math.max(-1, Math.min(1, off.y / dist))); }
+    this.render();
+  },
+  focus() { const c = this.live(); if (!c || !this.sel) return; if (this.cam === 'off') { this.setCam('orbit'); } const C = c.camS; if (!C) return; C.mode = 'orbit'; this.cam = 'orbit'; C.target.set(...this.pivotNow(this.sel)); const b = this.propBox(c, this.sel); C.dist = b ? Math.max(4, Math.min(60, Math.hypot(b[3] - b[0], b[4] - b[1], b[5] - b[2]) * 1.4)) : 8; this.render(); },
+  camStep(c) {
+    const C = c.camS, cam = c.devCam, T = c.THREE, now = performance.now(), dt = Math.min(0.1, (now - (C.t || now)) / 1000); C.t = now;
+    if (C.mode === 'orbit') { const cp = Math.cos(C.pitch); cam.position.set(C.target.x + Math.sin(C.yaw) * cp * C.dist, C.target.y + Math.sin(C.pitch) * C.dist, C.target.z + Math.cos(C.yaw) * cp * C.dist); cam.lookAt(C.target); }
+    else { const f = new T.Vector3(Math.sin(C.yaw) * Math.cos(C.pitch), Math.sin(C.pitch), Math.cos(C.yaw) * Math.cos(C.pitch)), r = new T.Vector3(-Math.cos(C.yaw), 0, Math.sin(C.yaw)), k = this.keys, sp = C.speed * (k.has('shift') ? 3 : 1) * dt;
+      if (k.has('w')) C.pos.addScaledVector(f, sp); if (k.has('s')) C.pos.addScaledVector(f, -sp); if (k.has('d')) C.pos.addScaledVector(r, -sp); if (k.has('a')) C.pos.addScaledVector(r, sp); if (k.has('e')) C.pos.y += sp; if (k.has('q')) C.pos.y -= sp;
+      cam.position.copy(C.pos); cam.lookAt(C.pos.clone().add(f)); }
+  },
+  // ---- the panel
+  render() {
+    const box = clear($('#areasBody')), c = this.live(); this.shownLive = !!c;
+    $('#view').classList.toggle('pick', !!(this.pick && c));
+    const hint = $('#viewHint');
+    hint.textContent = c && this.pick ? 'Pick and move: click a prop in the view, drag it along the ground (Alt drag: no snap; Shift click: the ground itself). ' + (c.devCam ? 'Right-drag moves the dev camera.' : '') : c && c.devCam ? (c.camS.mode === 'fly' ? 'Fly camera: click the view, then W A S D, Q E down and up, Shift faster; drag to look; wheel sets the speed.' : 'Orbit camera: drag to turn, Shift or right drag to pan, wheel to zoom.') : 'Click the game to give it the keyboard. Alt+1…7 switch panels.';
+    box.appendChild(h('h3', { text: 'Comic-book level (3D)' }));
+    if (!c) {
+      box.appendChild(h('p', { class: 'dim', text: 'No comic level is running. Start one to browse its scene, pick and move props, and see its collision.' }));
+      try { const L = Game.X.Issue.LEVELS; box.appendChild(h('div', { class: 'btnlist' }, Object.keys(L).map(k => h('button', { text: L[k], onclick: () => Jump.run(() => Jump.level(k)) })))); } catch (e) { /* not loaded */ }
+    } else {
+      const solids = c.SC.world.solids.length;
+      box.appendChild(h('div', { class: 'row' }, h('span', { class: 'chip', text: this.name(c) + ' · ' + c.level }), h('span', { class: 'dim mono', text: c.built ? c.props.length + ' props · ' + c.objs.length + ' objects · ' + solids + ' solids' : 'building…' })));
+      box.appendChild(h('div', { class: 'row' },
+        h('button', { 'aria-pressed': this.pick ? 'true' : 'false', text: 'Pick and move', title: 'Click props in the view; drag them on the ground', onclick: () => { this.pick = !this.pick; this.render(); } }),
+        h('label', null, 'Camera ', h('select', { onchange: e => this.setCam(e.target.value) }, ['off', 'orbit', 'fly'].map(m => h('option', { value: m, text: m === 'off' ? 'game' : m === 'orbit' ? 'dev: orbit' : 'dev: fly', selected: m === (c.devCam ? c.camS.mode : 'off') })))),
+        h('button', { text: 'Frame selected', disabled: !this.sel, onclick: () => this.focus() }),
+        h('label', null, 'Snap ', h('select', { onchange: e => { this.step = +e.target.value; } }, [0, 0.1, 0.25, 0.5, 1].map(v => h('option', { value: v, text: v ? v + ' m' : 'off', selected: v === this.step }))))));
+      box.appendChild(h('div', { class: 'row tight' }, OVL.map(([k, lab, col]) => h('label', { title: lab }, h('input', { type: 'checkbox', checked: !!this.ov[k], onchange: e => { this.ov[k] = e.target.checked ? 1 : 0; Pref.set('ov', this.ov); this.lastStatic = 0; } }), ' ', h('span', { style: 'display:inline-block;width:10px;height:10px;border-radius:2px;background:' + hex6(col) }), ' ' + lab))));
+      box.appendChild(h('div', { id: 'selBox' }));
+      this.fields();
+      this.browser(box, c);
+    }
+    box.appendChild(h('h3', { text: '2D maps (top-down)' }));
+    Map2D.render(box);
+  },
+  fields() {
+    const box = $('#selBox'); if (!box) return; const c = this.live(), p = this.sel;
+    if (!p || !c) { if (box.dataset.k !== '') { clear(box); box.dataset.k = ''; box.appendChild(h('p', { class: 'dim', text: 'Nothing selected. Turn on Pick and move and click a prop, or choose one below.' })); } return; }
+    const t = Object.assign({ dx: 0, dy: 0, dz: 0, ry: 0, s: 1, hidden: false, moveSolids: true }, p.T || {}), piv = this.pivotNow(p);
+    if (box.dataset.k === p.key && box.firstChild) { // update numbers in place while dragging
+      const set = (n, v) => { const i = box.querySelector('[data-f=' + n + ']'); if (i && document.activeElement !== i) i.value = v; };
+      set('x', fmt(piv[0])); set('y', fmt(piv[1])); set('z', fmt(piv[2])); set('ry', fmt(deg(t.ry), 1)); set('s', fmt(t.s)); return;
+    }
+    clear(box); box.dataset.k = p.key;
+    const num = (n, v, on) => h('input', { type: 'number', step: n === 'ry' ? 15 : n === 's' ? 0.05 : 0.1, value: v, 'data-f': n, onchange: e => { const x = parseFloat(e.target.value); if (isFinite(x)) on(x); } });
+    const N = (lab, ch) => h('button', { text: lab, onclick: () => { const st = this.step || 0.1, T2 = Object.assign({ dx: 0, dy: 0, dz: 0, ry: 0, s: 1 }, p.T || {}); this.setTsel(ch(T2, st)); } });
+    const lv = this.name(c);
+    box.appendChild(h('div', { class: 'card' },
+      h('div', { class: 'row' }, h('b', { text: p.helper }), h('span', { class: 'chip', text: p.key }), p.solids.length ? h('span', { class: 'chip', text: p.solids.length + ' solid' + (p.solids.length > 1 ? 's' : '') + ' tied to it' }) : h('span', { class: 'dim', text: 'no collision tied to it' })),
+      p.src ? h('div', { class: 'mono dim', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap', title: p.src, text: (p.fn ? p.fn + ' · ' : '') + p.src }) : null,
+      h('div', { class: 'fields', style: 'margin-top:6px' },
+        h('span', { class: 'l', text: 'position' }), h('div', { class: 'v' }, 'x', num('x', fmt(piv[0]), v => this.setTsel({ dx: r3(v - p.pivot[0]) })), 'y', num('y', fmt(piv[1]), v => this.setTsel({ dy: r3(v - p.pivot[1]) })), 'z', num('z', fmt(piv[2]), v => this.setTsel({ dz: r3(v - p.pivot[2]) }))),
+        h('span', { class: 'l', text: 'turn (°)' }), h('div', { class: 'v' }, num('ry', fmt(deg(t.ry), 1), v => this.setTsel({ ry: rad(v) })), h('span', { class: 'l', text: 'scale' }), num('s', fmt(t.s), v => this.setTsel({ s: Math.max(0.05, v) }))),
+        h('span', { class: 'l', text: 'nudge' }), h('div', { class: 'nudge' }, N('x−', (T, s) => ({ dx: r3(T.dx - s) })), N('x+', (T, s) => ({ dx: r3(T.dx + s) })), N('z−', (T, s) => ({ dz: r3(T.dz - s) })), N('z+', (T, s) => ({ dz: r3(T.dz + s) })), N('y−', (T, s) => ({ dy: r3(T.dy - s) })), N('y+', (T, s) => ({ dy: r3(T.dy + s) })),
+          N('⟲ 15°', T => ({ ry: T.ry + rad(15) })), N('⟳ 15°', T => ({ ry: T.ry - rad(15) })), N('⟲ 90°', T => ({ ry: T.ry + Math.PI / 2 })), N('×0.9', T => ({ s: r3((T.s || 1) * 0.9) })), N('×1.1', T => ({ s: r3((T.s || 1) * 1.1) })), N('reset', () => ({ dx: 0, dy: 0, dz: 0, ry: 0, s: 1 }))),
+        h('span', { class: 'l', text: 'shown' }), h('div', { class: 'v' }, h('label', null, h('input', { type: 'checkbox', checked: t.hidden, onchange: e => this.setTsel({ hidden: e.target.checked }) }), ' hidden'),
+          p.solids.length ? h('label', { title: 'The collision boxes built with this prop move, turn and scale with it' }, h('input', { type: 'checkbox', checked: t.moveSolids !== false, onchange: e => this.setTsel({ moveSolids: e.target.checked }) }), ' move its collision with it') : null)),
+      h('div', { class: 'row' }, h('button', { text: 'Revert this prop', onclick: () => { Engine.setT(c, p, null); this.buildSel(c); Sync.remove('prop__' + seg(c.level) + '__' + seg(p.key)); this.fields(); box.dataset.k = 'x'; this.fields(); } }), h('span', { class: 'dim', text: lv + ' · saved as prop__' + c.level + '__' + p.key }))));
+  },
+  browser(box, c) {
+    if (!c.built) return;
+    box.appendChild(h('h3', { text: 'Scene' }));
+    const q = h('input', { type: 'search', class: 'grow', placeholder: 'Find a prop: builder name, key, or source text', value: this.find || '', oninput: e => { this.find = e.target.value; list(); } });
+    box.appendChild(h('div', { class: 'row' }, q));
+    const out = h('div', { class: 'tree' }); box.appendChild(out);
+    const item = (p, d) => h('div', { class: 'it' + (p === this.sel ? ' sel' : ''), style: '--d:' + d, tabindex: 0, onclick: () => this.select(p), onkeydown: e => { if (e.key === 'Enter') this.select(p); } },
+      h('span', { class: 't', text: (p.T ? '● ' : '') + p.key + (p.src ? '  ' + p.src.slice(0, 60) : '') }), h('span', { class: 'm', text: fmt(p.pivot[0], 1) + ', ' + fmt(p.pivot[2], 1) + (p.solids.length ? ' ▣' + p.solids.length : '') }));
+    const list = () => {
+      clear(out); const f = (this.find || '').toLowerCase();
+      const all = c.props.concat(c.objs), m = f ? all.filter(p => (p.helper + ' ' + p.key + ' ' + (p.src || '')).toLowerCase().includes(f)) : all;
+      if (f) { const L = h('div', { class: 'list' }); m.slice(0, 300).forEach(p => L.appendChild(item(p, 0))); if (m.length > 300) L.appendChild(h('div', { class: 'it dim', text: (m.length - 300) + ' more: narrow the search' })); if (!m.length) L.appendChild(h('div', { class: 'it dim', text: 'Nothing matches.' })); out.appendChild(L); return; }
+      // level → builder function → helper → props
+      const by = new Map(); for (const p of all) { const g = p.kind === 'obj' ? 'Loose objects' : p.fn; if (!by.has(g)) by.set(g, new Map()); const hm = by.get(g); if (!hm.has(p.helper)) hm.set(p.helper, []); hm.get(p.helper).push(p); }
+      for (const [g, hm] of by) {
+        const n = [...hm.values()].reduce((a, b) => a + b.length, 0), d = h('details', { open: by.size === 1 }, h('summary', null, g + ' ', h('span', { class: 'n', text: '(' + n + ')' })));
+        const inner = h('div'); d.appendChild(inner);
+        d.addEventListener('toggle', () => { if (!d.open || inner.firstChild) return;
+          for (const [hn, ps] of [...hm.entries()].sort((a, b) => b[1].length - a[1].length)) { const dd = h('details', { style: 'margin-left:12px' }, h('summary', null, hn + ' ', h('span', { class: 'n', text: '(' + ps.length + ')' }))); const L = h('div', { class: 'list' }); dd.appendChild(L);
+            dd.addEventListener('toggle', () => { if (dd.open && !L.firstChild) { ps.slice(0, 400).forEach(p => L.appendChild(item(p, 0))); if (ps.length > 400) L.appendChild(h('div', { class: 'it dim', text: (ps.length - 400) + ' more: use the search' })); } }); inner.appendChild(dd); } });
+        out.appendChild(d); if (d.open) d.dispatchEvent(new Event('toggle'));
+      }
+    };
+    list();
+  }
+};
+
+/* ------------------------------------------------------------------ Areas: the 2D top-down maps */
+const Map2D = {
+  id: null, sc: 2, sel: null, drag: null, cv: null, extra: null,
+  render(box) {
+    const X = Game.X; if (!X || !X.MAPS) { box.appendChild(h('p', { class: 'dim', text: 'Waiting for the game…' })); return; }
+    const ids = Object.keys(X.MAPS); if (!this.id || !X.MAPS[this.id]) this.id = (X.G && X.MAPS[X.G.mapId]) ? X.G.mapId : ids[0];
+    if (!this.userSc) { const bw = box.clientWidth || 360; this.sc = Math.max(1, Math.min(4, Math.floor((bw - 4) / (X.MAPS[this.id].w * 16)))); }
+    box.appendChild(h('div', { class: 'row' },
+      h('select', { 'aria-label': 'Map', onchange: e => { this.id = e.target.value; this.sel = null; Areas.render(); } }, ids.map(k => h('option', { value: k, text: k + ' · ' + (X.MAPS[k].name || ''), selected: k === this.id }))),
+      h('label', null, 'Zoom ', h('select', { onchange: e => { this.sc = +e.target.value; this.userSc = true; this.draw(); } }, [1, 2, 3, 4].map(v => h('option', { value: v, text: v + '×', selected: v === this.sc })))),
+      h('button', { text: 'Go there', title: 'Load this map in the game (world mode)', onclick: () => Jump.run(() => { const W = X.World; X.G.mode = 'world'; W.showPlayer = true; W.load(this.id, { x: Math.floor(X.MAPS[this.id].w / 2) * 16 + 8, y: Math.floor(X.MAPS[this.id].h / 2) * 16 + 12, dir: 0 }); }) })));
+    box.appendChild(h('div', { class: 'dim', text: 'Drag props (amber), people (cyan), hotspots (green) and lights (yellow). Each drop is saved as an override. Moving a prop moves its blocked tiles and the hotspot on it.' }));
+    const wrap = h('div', { id: 'mapWrap' }); this.cv = h('canvas'); wrap.appendChild(this.cv); box.appendChild(wrap);
+    box.appendChild(h('div', { id: 'mapSel', class: 'card' }));
+    const tile = e => { const r = this.cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * this.cv.width / (16 * this.sc), (e.clientY - r.top) / r.height * this.cv.height / (16 * this.sc)]; };
+    this.cv.addEventListener('pointerdown', e => { const [tx, ty] = tile(e), o = this.hit(tx, ty); this.sel = o; if (o) { e.preventDefault(); this.cv.setPointerCapture(e.pointerId); this.drag = { o, tx, ty, x0: o.x, y0: o.y }; } this.draw(); this.info(); });
+    this.cv.addEventListener('pointermove', e => { const d = this.drag; if (!d) return; const [tx, ty] = tile(e), m = X.MAPS[this.id], sn = d.o.t === 'light' ? 0.25 : d.o.t === 'prop' && (d.x0 % 1) ? 0.5 : 1;
+      let nx = Math.round((d.x0 + tx - d.tx) / sn) * sn, ny = Math.round((d.y0 + ty - d.ty) / sn) * sn; nx = Math.max(0, Math.min(m.w - 1, nx)); ny = Math.max(0, Math.min(m.h - 1, ny));
+      if (nx === d.nx && ny === d.ny) return; d.nx = nx; d.ny = ny; this.extra = this.patchFor(d.o, nx, ny); Apply.map(this.id); });
+    const end = () => { const d = this.drag; this.drag = null; if (!d) return; const ex = this.extra; this.extra = null; if (ex && d.nx !== undefined && (d.nx !== d.x0 || d.ny !== d.y0)) this.save(d.o, ex); else Apply.map(this.id); this.info(); };
+    this.cv.addEventListener('pointerup', end); this.cv.addEventListener('pointercancel', end);
+    this.draw(); this.info();
+  },
+  objects() {
+    const X = Game.X, m = X.MAPS[this.id], out = []; if (!m) return out;
+    (m.hot || []).forEach((q, i) => { if (!q.tiles || !q.tiles.length) return; const xs = q.tiles.map(a => a[0]), ys = q.tiles.map(a => a[1]); out.push({ t: 'hot', i, x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs) + 1, h: Math.max(...ys) - Math.min(...ys) + 1, label: 'hotspot ' + q.id, col: '#7bd389' }); });
+    m.props.forEach((p, i) => out.push({ t: 'prop', i, x: p.x, y: p.y, w: p.w || 1, h: p.h || 1, label: 'prop ' + p.t + (p.block ? ' (blocks ' + p.block.length + ')' : ''), col: '#ffb35a' }));
+    (m.lights || []).forEach((l, i) => out.push({ t: 'light', i, x: l.x / 16 - 0.5, y: l.y / 16 - 0.5, w: 1, h: 1, label: 'light r' + l.r, col: '#ffe14a', l }));
+    X.NPCS.forEach((n, j) => { if (n.map !== this.id || !n.at) return; out.push({ t: 'npc', i: j, x: n.at[0], y: n.at[1], w: 1, h: 1, label: 'person ' + n.id + (n.when ? ' (sometimes)' : ''), col: '#4fd6d0', n }); });
+    return out;
+  },
+  hit(tx, ty) { const L = this.objects(), order = ['npc', 'light', 'prop', 'hot']; for (const t of order) for (let k = L.length - 1; k >= 0; k--) { const o = L[k]; if (o.t === t && tx >= o.x && tx < o.x + o.w && ty >= o.y - (t === 'npc' ? 0.6 : 0) && ty < o.y + o.h) return o; } return null; },
+  key(o) { return o.t + '.' + o.i; },
+  patchFor(o, nx, ny) {
+    const X = Game.X, O = Apply.mapOrig(this.id), k = this.key(o);
+    if (o.t === 'prop') return { key: k, patch: { x: nx, y: ny } };
+    if (o.t === 'npc') return { key: k, patch: { at: [nx, ny] } };
+    if (o.t === 'hot') { const t0 = O.hot[o.i][0], xs = O.hot[o.i].map(a => a[0]), ys = O.hot[o.i].map(a => a[1]); return { key: k, patch: { dx: nx - Math.min(...xs), dy: ny - Math.min(...ys) } }; }
+    if (o.t === 'light') return { key: k, patch: { x: Math.round((nx + 0.5) * 16), y: Math.round((ny + 0.5) * 16) } };
+    return null;
+  },
+  save(o, ex) {
+    const X = Game.X, m = X.MAPS[this.id], O = Apply.mapOrig(this.id), P = ex.patch;
+    const same = o.t === 'prop' ? P.x === O.props[o.i].x && P.y === O.props[o.i].y : o.t === 'npc' ? P.at[0] === Apply.origNpcs[o.i][0] && P.at[1] === Apply.origNpcs[o.i][1] : o.t === 'hot' ? !P.dx && !P.dy : P.x === O.lights[o.i].x && P.y === O.lights[o.i].y;
+    const id = 'map__' + seg(this.id) + '__' + seg(ex.key);
+    if (same) { Sync.remove(id); return; }
+    const what = o.t === 'prop' ? 'prop ' + m.props[o.i].t : o.t === 'npc' ? 'person ' + X.NPCS[o.i].id : o.t === 'hot' ? 'hotspot ' + m.hot[o.i].id : 'light ' + o.i;
+    Sync.set(id, { kind: 'map', target: this.id, key: ex.key, patch: P, label: (m.name || this.id) + ': ' + what, ref: { map: this.id, t: o.t, i: o.i, name: o.t === 'prop' ? m.props[o.i].t : o.t === 'npc' ? X.NPCS[o.i].id : o.t === 'hot' ? m.hot[o.i].id : 'light', from: o.t === 'prop' ? [O.props[o.i].x, O.props[o.i].y] : o.t === 'npc' ? Apply.origNpcs[o.i] : o.t === 'hot' ? O.hot[o.i][0] : [O.lights[o.i].x, O.lights[o.i].y] } });
+  },
+  draw() {
+    const X = Game.X, cv = this.cv; if (!X || !cv || !cv.isConnected) return; const m = X.MAPS[this.id]; if (!m) return;
+    let layer = null; try { layer = X.World.map === m && X.World.layer ? X.World.layer : X.renderMapLayer(m); } catch (e) { Log.add('suite', 'warn', 'map draw: ' + e.message); }
+    const s = this.sc; cv.width = m.w * 16 * s; cv.height = m.h * 16 * s; const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+    g.fillStyle = '#0d0a0c'; g.fillRect(0, 0, cv.width, cv.height); if (layer) g.drawImage(layer, 0, 0, layer.width * s, layer.height * s);
+    if (layer && layer.tall) for (const T of layer.tall) g.drawImage(T.cv, T.x * s, T.y * s, T.cv.width * s, T.cv.height * s);
+    const L = this.objects();
+    for (const o of L) {
+      const x = o.x * 16 * s, y = o.y * 16 * s, w = o.w * 16 * s, hh = o.h * 16 * s, sel = this.sel && this.sel.t === o.t && this.sel.i === o.i;
+      g.lineWidth = sel ? 3 : 1.5; g.strokeStyle = sel ? '#ffffff' : o.col; g.globalAlpha = 0.9;
+      if (o.t === 'npc') { try { const sh = X.World.sheetFor(o.n.id), fh = sh.fh || 20; g.drawImage(sh, 0, (o.n.dir || 0) * fh, 16, fh, x, y + 12 * s - fh * s, 16 * s, fh * s); } catch (e) { /* no sheet */ } g.strokeRect(x + 1, y - 6 * s, w - 2, hh + 6 * s); g.fillStyle = o.col; g.font = (9 * Math.max(1, s / 1.5)) + 'px monospace'; g.fillText(o.n.id, x, y - 7 * s); }
+      else if (o.t === 'light') { g.beginPath(); g.arc(o.l.x * s, o.l.y * s, Math.max(4, (o.l.r || 20) * s * 0.25), 0, 7); g.stroke(); g.beginPath(); g.arc(o.l.x * s, o.l.y * s, 3 * s, 0, 7); g.fillStyle = o.col; g.fill(); }
+      else { if (o.t === 'hot') { g.setLineDash([4, 3]); } g.strokeRect(x + 1, y + 1, w - 2, hh - 2); g.setLineDash([]); }
+      if (o.t === 'prop') { const p = m.props[o.i]; if (p.block) { g.fillStyle = 'rgba(255,90,74,.22)'; for (const [bx, by] of p.block) g.fillRect(bx * 16 * s, by * 16 * s, 16 * s, 16 * s); } }
+      g.globalAlpha = 1;
+    }
+    (m.exits || []).forEach(ex => { g.strokeStyle = '#d05ad0'; g.lineWidth = 1.5; for (const [x, y] of ex.tiles || []) g.strokeRect(x * 16 * s + 2, y * 16 * s + 2, 16 * s - 4, 16 * s - 4); });
+  },
+  info() {
+    const box = $('#mapSel'); if (!box) return; clear(box); const o = this.sel, X = Game.X;
+    if (!o) { box.appendChild(h('span', { class: 'dim', text: 'Click something on the map.' })); return; }
+    const id = 'map__' + seg(this.id) + '__' + seg(this.key(o)), ov = Sync.get(id), cur = this.objects().find(q => q.t === o.t && q.i === o.i) || o;
+    box.appendChild(h('div', { class: 'row' }, h('b', { text: o.label }), h('span', { class: 'chip', text: this.key(o) }), h('span', { class: 'mono dim', text: 'at ' + fmt(cur.x, 1) + ', ' + fmt(cur.y, 1) + ' (tiles)' }),
+      ov ? h('button', { text: 'Revert', onclick: () => { Sync.remove(id); this.info(); } }) : h('span', { class: 'dim', text: 'not moved' })));
+  }
+};
+
+/* ------------------------------------------------------------------ the character workshop (preview viewport) */
+// The comic rig is previewed in its own frame running the comic engine with its boot switched off: the suite
+// calls the engine's own G.init and SC.makeHumanoid and draws one person on a turntable. The 2D cast is drawn
+// with the game's own sprite makers.
+const EXPRS = ['neutral', 'angry', 'hurt', 'shock', 'smirk', 'shut', 'dead', 'bound'];
+const KIT_FLAGS = ['light', 'noSh', 'officer', 'sheath', 'soot'];
+const Workshop = {
+  frame: null, ctx: null, frameLevel: null, ready: false,
+  level: Pref.get('wsLevel', 'docks'), source: Pref.get('wsSrc', 'rig'), kind: Pref.get('wsKind', 'hero'), castId: Pref.get('wsCast', 'kael'),
+  model: null, scene: null, cam: null, orbit: { yaw: 0.55, pitch: 0.1, dist: 3.6, ty: 1.0 }, turn: true, last: 0, ovl: null, c2d: null,
+  anim: { name: 'idle', t: 0, speed: 1, playing: true, i: 0, expr: 'neutral', cyc: 'walk', dir: 0, fight: null },
+  bones: { sel: 'chest', show: true, hand: false, manual: {} },
+  visible() { return ['chars', 'anim', 'bones'].includes(View.tab); },
+  levels() { try { return Object.keys(Game.X.Issue.LEVELS); } catch (e) { return ['docks']; } },
+  // called whenever a workshop tab is shown or its choices change
+  ensure() {
+    $('#ws').classList.toggle('on', this.visible()); $('#wsBar').classList.toggle('on', this.visible());
+    if (!this.visible()) return;
+    $('#wsSource').value = this.source; $('#wsLevel').hidden = this.source !== 'rig'; $('#wsTurn').hidden = this.source !== 'rig';
+    if (this.source === 'cast') { this.showCast(); return; }
+    if (this.c2d) this.c2d.hidden = true; if (this.frame) this.frame.hidden = false;
+    if (!Game.ok() || !Game.issueRaw) { this.msg(Game.ok() ? 'This build has no comic-book levels.' : 'The preview starts when the game has loaded.'); return; }
+    if (!this.frame || this.frameLevel !== this.level) this.create();
+    else if (this.ready) { this.fillChars(); View.charPanel(); View.animPanel(); View.bonesPanel(); }
+  },
+  msg(t) { const m = $('#wsMsg'); m.textContent = t || ''; m.hidden = !t; },
+  create() {
+    if (this.frame) this.frame.remove(); this.ready = false; this.ctx = null; this.model = null;
+    const html = Engine.inject(Game.issueRaw, true).replace("issue: 'docks'", "issue: '" + this.level + "'");
+    this.frame = h('iframe', { title: 'Character preview', tabindex: '-1' }); $('#ws').insertBefore(this.frame, $('#wsTag'));
+    this.frameLevel = this.level; this.msg('Building the comic engine for ' + this.level + '…');
+    this.frame.srcdoc = html;
+  },
+  onEngine(ctx) {
+    if (!this.frame || ctx.w !== this.frame.contentWindow) return;
+    this.ctx = ctx;
+    const go = () => { try { this.init(ctx); } catch (e) { Log.add('workshop', 'error', 'preview: ' + e.message + ' ' + String(e.stack || '').split('\n')[1]); this.msg('The preview could not start: ' + e.message); } };
+    if (ctx.w.document.readyState === 'loading') ctx.w.addEventListener('DOMContentLoaded', () => setTimeout(go, 0)); else setTimeout(go, 0);
+  },
+  init(ctx) {
+    const w = ctx.w, d = w.document, SC = ctx.SC, T = ctx.THREE, G = SC.gfx;
+    const st = d.createElement('style'); st.textContent = 'body>*:not(#stage){display:none!important}#stage>*:not(#gl){display:none!important}#stage,#gl{touch-action:none}'; d.head.appendChild(st);
+    G.init(d.getElementById('gl')); G.renderer.setPixelRatio(1); G.renderer.shadowMap.enabled = false;
+    const sc = this.scene = new T.Scene(); sc.background = new T.Color(0x1b1d33);
+    sc.add(new T.AmbientLight(new T.Color(0.32, 0.34, 0.52), Math.PI));
+    const key = new T.DirectionalLight(new T.Color(0.85, 0.8, 0.62), Math.PI); key.position.set(2.2, 3, 2.6); sc.add(key);
+    const rim = new T.DirectionalLight(new T.Color(0.4, 0.5, 0.9), Math.PI * 0.5); rim.position.set(-2, 2, -3); sc.add(rim);
+    const disc = new T.Mesh(new T.CircleGeometry(1.1, 40), G.toon({ color: 0x3a3f5c })); disc.rotation.x = -Math.PI / 2; disc.position.y = -0.005; sc.add(disc);
+    const ring = new T.Mesh(new T.RingGeometry(1.1, 1.16, 40), new T.MeshBasicMaterial({ color: 0x07070d })); ring.rotation.x = -Math.PI / 2; ring.position.y = -0.004; sc.add(ring);
+    this.cam = new T.PerspectiveCamera(32, 1, 0.05, 60);
+    // bones overlay
+    this.ovl = new T.Group(); sc.add(this.ovl);
+    const lm = new T.LineBasicMaterial({ color: 0x4fd6d0, depthTest: false, transparent: true, opacity: 0.95 }), pm = new T.PointsMaterial({ color: 0xffb35a, size: 7, sizeAttenuation: false, depthTest: false, transparent: true });
+    this.bl = new T.LineSegments(new T.BufferGeometry(), lm); this.bp = new T.Points(new T.BufferGeometry(), pm); this.bs = new T.Points(new T.BufferGeometry(), new T.PointsMaterial({ color: 0xffffff, size: 13, sizeAttenuation: false, depthTest: false, transparent: true }));
+    for (const o of [this.bl, this.bp, this.bs]) { o.renderOrder = 80; o.frustumCulled = false; this.ovl.add(o); }
+    // orbit by dragging the preview
+    let drag = null;
+    w.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; this.turn = false; $('#wsTurn').setAttribute('aria-pressed', 'false'); try { e.target.setPointerCapture(e.pointerId); } catch (er) { /* fine */ } });
+    w.addEventListener('pointermove', e => { if (!drag) return; this.orbit.yaw -= (e.clientX - drag.x) * 0.01; this.orbit.pitch = Math.max(-0.6, Math.min(1.2, this.orbit.pitch + (e.clientY - drag.y) * 0.006)); drag.x = e.clientX; drag.y = e.clientY; });
+    w.addEventListener('pointerup', () => { drag = null; }); w.addEventListener('pointercancel', () => { drag = null; });
+    w.addEventListener('wheel', e => { e.preventDefault(); this.orbit.dist = Math.max(1.2, Math.min(9, this.orbit.dist * (e.deltaY > 0 ? 1.1 : 0.9))); this.userZoom = true; }, { passive: false });
+    this.ready = true; this.msg('');
+    const loop = () => { if (!this.frame || this.ctx !== ctx) return; w.requestAnimationFrame(loop); try { this.tick(ctx); } catch (e) { if (!this.tickErr) { this.tickErr = 1; Log.add('workshop', 'error', 'preview frame: ' + e.message); } } };
+    w.requestAnimationFrame(loop);
+    this.fillChars(); this.rebuild();
+    for (const f of ['charPanel', 'animPanel', 'bonesPanel']) { try { View[f](); } catch (e) { Log.add('suite', 'error', f + ': ' + e.message); } }
+  },
+  fillChars() {
+    const sel = $('#wsChar'); clear(sel);
+    if (this.source === 'rig') { const S = this.ctx ? Object.keys(this.ctx.SC.SPECS) : []; if (!S.includes(this.kind)) this.kind = S[0] || 'hero'; for (const k of S) sel.appendChild(h('option', { value: k, text: k + this.rigName(k), selected: k === this.kind })); }
+    else { const C = Game.X ? Object.keys(Game.X.CAST).sort() : []; if (!C.includes(this.castId)) this.castId = 'kael'; for (const k of C) sel.appendChild(h('option', { value: k, text: k + ' · ' + (Game.X.CAST[k].name || ''), selected: k === this.castId })); }
+    const lv = $('#wsLevel'); clear(lv); for (const k of this.levels()) lv.appendChild(h('option', { value: k, text: 'dressed for ' + k, selected: k === this.level }));
+  },
+  rigName(k) { const N = { hero: 'Kael', hollow: 'guard', knifer: 'blade', bruiser: 'warden', boss: 'boss', clerk: 'ally' }; return N[k] ? ' · ' + N[k] : ''; },
+  rebuild() {
+    const ctx = this.ctx; if (!ctx || !this.ready) return;
+    const SC = ctx.SC;
+    if (this.model) { this.scene.remove(this.model.group); }
+    try { this.model = SC.makeHumanoid(this.kind); } catch (e) { this.model = null; this.msg('Could not build ' + this.kind + ': ' + e.message); Log.add('workshop', 'error', 'makeHumanoid(' + this.kind + '): ' + e.message); return; }
+    this.scene.add(this.model.group); try { this.model.face(this.anim.expr); } catch (e) { /* no face */ }
+    const ht = this.model.height || 1.82 * (this.model.spec.h || 1); this.orbit.ty = ht * 0.5; if (!this.userZoom) this.orbit.dist = ht * 2.1 + 0.4;
+    $('#wsTag').textContent = this.kind + ' · ' + this.level;
+  },
+  poses() {
+    const ctx = this.ctx; if (!ctx) return [];
+    const P = ctx.SC.pose, out = [];
+    for (const k of Object.keys(P)) {
+      const v = P[k];
+      if (typeof v === 'function') {
+        const src = v.toString(), m = src.match(/^\s*(?:function\s*[\w$]*\s*)?\(?\s*([^)=]*?)\s*\)?\s*(?:=>|\{)/), args = m ? m[1].split(',').map(s => s.trim()).filter(Boolean) : [];
+        let kind = 'loop', len = 6;
+        if (!args.length) { kind = 'still'; len = 1; } else if (args[0] === 'ph') { kind = 'cycle'; len = 1.25; } else if (args[0] === 'i') { kind = 'combo'; len = 0.9; } else if (args[0] === 'k') { kind = src.indexOf('k < 0') >= 0 ? 'strike' : 'sweep'; len = kind === 'strike' ? 1.6 : 0.7; } else if (args[0] === 's') { kind = 'side'; len = 1; }
+        out.push({ name: k, fn: v, args, kind, len });
+      } else if (isObj(v)) out.push({ name: k, obj: v, args: [], kind: 'still', len: 1 });
+    }
+    return out;
+  },
+  evalPose(p, t) {
+    const P = this.ctx.SC.pose;
+    switch (p.kind) {
+      case 'still': return p.obj || p.fn();
+      case 'loop': return p.fn(t);
+      case 'cycle': return p.fn(t * 2 * Math.PI / p.len * 2, 1, t);
+      case 'combo': { const i = this.anim.i % 3, d = (P.ATTACK && P.ATTACK[i] && P.ATTACK[i].dur) || 0.5; return p.fn(i, Math.min(t, d)); }
+      case 'strike': return p.fn(t < 1 ? t - 1 : Math.min(1, (t - 1) / 0.6));
+      case 'sweep': return p.fn(Math.min(1, t / p.len));
+      case 'side': return p.fn(this.anim.i % 2 ? -1 : 1);
+    }
+    return {};
+  },
+  len() { const p = this.poses().find(q => q.name === this.anim.name); if (!p) return 1; if (p.kind === 'combo') { const P = this.ctx.SC.pose, d = (P.ATTACK && P.ATTACK[this.anim.i % 3] && P.ATTACK[this.anim.i % 3].dur) || 0.5; return d + 0.35; } return p.len; },
+  tick(ctx) {
+    if (!this.visible() || this.source !== 'rig' || document.hidden) return;
+    const now = performance.now(); if (now - this.last < 33) return; const dt = Math.min(0.1, (now - (this.last || now)) / 1000); this.last = now;
+    const G = ctx.SC.gfx, r = G.renderer, cv = r.domElement, W = cv.clientWidth | 0, H = cv.clientHeight | 0; if (!W || !H) return;
+    if (cv.width !== W || cv.height !== H) { r.setSize(W, H, false); }
+    this.cam.aspect = W / H; this.cam.updateProjectionMatrix();
+    if (this.turn) this.orbit.yaw += dt * 0.5;
+    const o = this.orbit, cp = Math.cos(o.pitch); this.cam.position.set(Math.sin(o.yaw) * cp * o.dist, o.ty + Math.sin(o.pitch) * o.dist, Math.cos(o.yaw) * cp * o.dist); this.cam.lookAt(0, o.ty, 0);
+    const m = this.model;
+    if (m) {
+      const A = this.anim, len = this.len();
+      if (A.playing && !this.bones.hand) { A.t += dt * A.speed; if (A.t > len) A.t = A.t % len; }
+      if (this.bones.hand) { const b = m.bones; for (const nm in b) { const mv = this.bones.manual[nm]; if (mv) b[nm].rotation.set(rad(mv[0]), rad(mv[1]), rad(mv[2])); } }
+      else { const p = this.poses().find(q => q.name === A.name); if (p) { try { m.anim.apply(this.evalPose(p, A.t), A.playing ? 18 : 999, dt); } catch (e) { /* a pose that needs more than we give it */ } } }
+      this.drawBones(ctx);
+      if (View.tab === 'anim') View.animTime();
+      if (View.tab === 'bones' && this.bones.sel) View.boneInfo();
+    }
+    r.render(this.scene, this.cam);
+  },
+  fight() { // pose the live arena fight's player in a chosen state (the game is held paused)
+    const f = this.anim.fight, X = Game.X; if (!f || !X || !X.Brawl.active || !X.Brawl.p) return;
+    const B = X.Brawl; B.p.st = f; B.p.t = this.anim.t; B.p.combo = (this.anim.i % 3) + 1; B.t += 1 / 30;
+  },
+  drawBones(ctx) {
+    const show = this.bones.show && (View.tab === 'bones' || View.tab === 'anim') && this.model; this.ovl.visible = !!show; if (!show) return;
+    const T = ctx.THREE, b = this.model.bones, L = [], P = [], S = [], v = new T.Vector3(), u = new T.Vector3();
+    this.model.group.updateMatrixWorld(true);
+    for (const nm in b) { const bn = b[nm]; bn.getWorldPosition(v); P.push(v.x, v.y, v.z); if (nm === this.bones.sel) S.push(v.x, v.y, v.z); if (bn.parent && bn.parent.isBone) { bn.parent.getWorldPosition(u); L.push(u.x, u.y, u.z, v.x, v.y, v.z); } }
+    const set = (o, a) => { o.geometry.setAttribute('position', new T.Float32BufferAttribute(a, 3)); o.geometry.computeBoundingSphere(); };
+    set(this.bl, L); set(this.bp, P); set(this.bs, S);
+  },
+  // ---- the 2D cast
+  showCast() {
+    if (this.frame) this.frame.hidden = true;
+    if (!this.c2d) { this.c2d = h('canvas', { class: 'c2d' }); $('#ws').insertBefore(this.c2d, $('#wsTag')); }
+    this.c2d.hidden = false; this.msg(Game.ok() ? '' : 'The preview starts when the game has loaded.');
+    if (!Game.ok()) return;
+    this.fillChars(); $('#wsTag').textContent = this.castId + ' · 2D sprite sheet';
+    View.charPanel(); View.animPanel(); View.bonesPanel();
+    if (!this.castLoop) { this.castLoop = true; const loop = () => { requestAnimationFrame(loop); this.drawCast(); }; requestAnimationFrame(loop); }
+  },
+  sheet() { const X = Game.X; try { X.World.sheets[this.castId] = undefined; return X.World.sheetFor(this.castId); } catch (e) { return null; } },
+  drawCast() {
+    if (!this.visible() || this.source !== 'cast' || !this.c2d || document.hidden || !Game.ok()) return;
+    const now = performance.now(); if (now - this.last < 40) return; const dt = Math.min(0.1, (now - (this.last || now)) / 1000); this.last = now;
+    const cv = this.c2d, W = cv.clientWidth | 0, H = cv.clientHeight | 0; if (!W || !H) return; if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+    if (!this.sh || this.shFor !== this.castId || this.shDirty) { this.sh = this.sheet(); this.shFor = this.castId; this.shDirty = false; try { this.bust = Game.X.World.bustFor(this.castId); } catch (e) { this.bust = null; } }
+    const g = cv.getContext('2d'); g.imageSmoothingEnabled = false; g.fillStyle = '#1a1416'; g.fillRect(0, 0, W, H);
+    const sh = this.sh; if (!sh) return; const fh = sh.fh || 20, nf = Math.max(1, Math.floor(sh.width / 16)), A = this.anim;
+    const cyc = this.cycle(nf); if (A.playing) { A.t += dt * A.speed; } const len = cyc.length / 6; if (A.t > len) A.t %= len;
+    const fr = cyc[Math.floor(A.t * 6) % cyc.length], k = Math.max(2, Math.floor(Math.min(W * 0.5 / 16, H * 0.78 / fh)));
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(W * 0.3 - 6 * k, H * 0.12 + fh * k - 2 * k, 12 * k, 3 * k);
+    g.drawImage(sh, fr * 16, (A.dir % 4) * fh, 16, fh, Math.round(W * 0.3 - 8 * k), Math.round(H * 0.12), 16 * k, fh * k);
+    const ks = Math.max(1, Math.floor(Math.min((W * 0.36) / sh.width, (H * 0.6) / sh.height))); g.drawImage(sh, Math.round(W * 0.6), 12, sh.width * ks, sh.height * ks);
+    g.strokeStyle = '#ffb35a'; g.lineWidth = 2; g.strokeRect(Math.round(W * 0.6) + fr * 16 * ks, 12 + (A.dir % 4) * fh * ks, 16 * ks, fh * ks);
+    if (this.bust) { const b = this.bust, kb = Math.max(1, Math.floor((H * 0.3) / b.height)); g.drawImage(b, Math.round(W * 0.6), H - b.height * kb - 10, b.width * kb, b.height * kb); }
+    g.fillStyle = '#cfc8bb'; g.font = '11px monospace'; g.fillText(A.cyc + ' · row ' + (A.dir % 4) + ' · frame ' + fr, 10, H - 10);
+    if (View.tab === 'anim') View.animTime();
+  },
+  cycle(nf) { const A = this.anim; if (A.cyc === 'stand') return [0]; if (A.cyc === 'blink') return nf > 3 ? [0, 0, 0, 0, 0, 3] : [0]; if (A.cyc === 'step') return [1]; return nf > 2 ? [1, 0, 2, 0] : [1, 0]; }
+};
+
+/* ------------------------------------------------------------------ the panels */
+function diffObj(a, o) {
+  const out = {};
+  for (const k of Object.keys(a)) { const av = a[k], ov = o ? o[k] : undefined; if (isObj(av) && isObj(ov)) { const d = diffObj(av, ov); if (Object.keys(d).length) out[k] = d; } else if (JSON.stringify(av) !== JSON.stringify(ov)) out[k] = clone(av); }
+  if (o) for (const k of Object.keys(o)) if (!(k in a)) out[k] = null;
+  return out;
+}
+const CAST_STYLE = ['spiky', 'short', 'long', 'bun', 'bald'], CAST_EXTRA = ['', 'apron', 'goggles', 'beard', 'coat', 'hat', 'pin'];
+const CAST_ADD = ['knife', 'kid', 'gloves', 'cape', 'band', 'scarf', 'smudge', 'helm', 'shield', 'crown', 'circlet', 'long', 'skirt', 'beard', 'trim', 'sash', 'robe', 'armor', 'extra', 'style', 'clean'];
+const View = {
+  tab: 'play', ovTimer: 0, inspT: 0,
+  init() {
+    const tabs = $$('#tabs button');
+    tabs.forEach(b => b.addEventListener('click', () => this.show(b.dataset.tab)));
+    $('#tabs').addEventListener('keydown', e => { const i = tabs.findIndex(b => b.dataset.tab === this.tab); if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; this.show(n.dataset.tab); n.focus(); e.preventDefault(); } });
+    document.addEventListener('keydown', e => {
+      if (e.altKey && e.key >= '1' && e.key <= '7') { this.show(tabs[+e.key - 1].dataset.tab); e.preventDefault(); return; }
+      if (e.altKey && (e.key === 'p' || e.key === 'π')) { Time.setPaused(!Time.paused); e.preventDefault(); return; }
+      if (e.altKey && (e.key === '.' || e.key === '≥')) { Time.step(); e.preventDefault(); return; }
+      if (e.altKey && (e.key === 'g' || e.key === '©')) { Time.setGod(!Time.god); e.preventDefault(); return; }
+      if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) { this.show('play'); $('#jumpFind').focus(); e.preventDefault(); }
+    });
+    $('#btnPause').onclick = () => Time.setPaused(!Time.paused);
+    $('#btnStep').onclick = () => Time.step();
+    $('#selSpeed').onchange = e => Time.setScale(+e.target.value);
+    $('#btnGod').onclick = () => Time.setGod(!Time.god);
+    $('#btnTitle').onclick = () => { if (!Game.ok()) return; try { Game.X.Game.abort(); Game.X.UI.clear(); Game.X.DEV.from = null; Game.X.Game.toTitle(); } catch (e) { Log.add('suite', 'error', e.message); } };
+    $('#btnReload').onclick = () => { Game.html = null; Game.load(); };
+    $('#jumpFind').oninput = () => Jump.render();
+    $('#logFilter').onchange = () => { Log.dirty = true; Log.render(); };
+    $('#logClear').onclick = () => { Log.items = []; Log.errors = 0; Log.dirty = true; Log.render(); };
+    $('#chkNoff').checked = Pref.get('noff', true); $('#chkNoff').onchange = e => Pref.set('noff', e.target.checked);
+    $('#selDiff').onchange = e => { try { Game.X.Settings.d.diff = +e.target.value; Game.X.Settings.save(); Log.add('suite', 'ev', 'difficulty ' + e.target.selectedOptions[0].text); } catch (er) { /* later */ } };
+    $('#chkQuick').onchange = e => { try { Game.X.DEV.quick = e.target.checked ? 1 : 0; } catch (er) { /* later */ } };
+    $('#chkFury').onchange = e => { try { Game.X.DEV.fury = e.target.checked ? 1 : 0; } catch (er) { /* later */ } };
+    const th = ['auto', 'light', 'dark']; let ti = Math.max(0, th.indexOf(Pref.get('theme', 'auto')));
+    const applyTheme = () => { const t = th[ti]; if (t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t; $('#btnTheme').textContent = 'Theme: ' + t; };
+    applyTheme(); $('#btnTheme').onclick = () => { ti = (ti + 1) % 3; Pref.set('theme', th[ti]); applyTheme(); };
+    // workshop bar
+    $('#wsSource').onchange = e => { Workshop.source = e.target.value; Pref.set('wsSrc', Workshop.source); Workshop.anim.name = Workshop.source === 'rig' ? 'idle' : Workshop.anim.name; Workshop.ensure(); };
+    $('#wsLevel').onchange = e => { Workshop.level = e.target.value; Pref.set('wsLevel', Workshop.level); Workshop.ensure(); };
+    $('#wsChar').onchange = e => { if (Workshop.source === 'rig') { Workshop.kind = e.target.value; Pref.set('wsKind', Workshop.kind); Workshop.rebuild(); } else { Workshop.castId = e.target.value; Pref.set('wsCast', Workshop.castId); Workshop.shDirty = true; $('#wsTag').textContent = Workshop.castId + ' · 2D sprite sheet'; } this.charPanel(); this.animPanel(); this.bonesPanel(); };
+    $('#wsTurn').onclick = e => { Workshop.turn = !Workshop.turn; e.target.setAttribute('aria-pressed', String(Workshop.turn)); };
+    // animation transport
+    $('#anPlay').onclick = () => { const A = Workshop.anim; A.playing = !A.playing; $('#anPlay').textContent = A.playing ? 'Pause' : 'Play'; $('#anPlay').setAttribute('aria-pressed', String(A.playing)); };
+    const stepT = d => { const A = Workshop.anim; A.playing = false; $('#anPlay').textContent = 'Play'; $('#anPlay').setAttribute('aria-pressed', 'false'); const f = Workshop.source === 'cast' ? 1 / 6 : 1 / 30, L = Workshop.source === 'cast' ? 1e9 : Workshop.len(); A.t = Math.max(0, A.t + d * f); if (A.t > L) A.t = 0; };
+    $('#anBack').onclick = () => stepT(-1); $('#anFwd').onclick = () => stepT(1);
+    $('#anSpeed').oninput = e => { Workshop.anim.speed = +e.target.value; $('#anSpeedV').textContent = (+e.target.value).toFixed(2) + '×'; };
+    $('#anScrub').oninput = e => { const A = Workshop.anim; A.playing = false; $('#anPlay').textContent = 'Play'; A.t = +e.target.value * (Workshop.source === 'cast' ? 1 : Workshop.len()); };
+    $('#bnShow').onchange = e => { Workshop.bones.show = e.target.checked; };
+    $('#bnHand').onchange = e => { Workshop.bones.hand = e.target.checked; if (e.target.checked && Workshop.model) { const b = Workshop.model.bones; for (const nm in b) Workshop.bones.manual[nm] = [deg(b[nm].rotation.x), deg(b[nm].rotation.y), deg(b[nm].rotation.z)]; } this.bonesPanel(); };
+    this.show(Pref.get('tab', 'play'));
+  },
+  show(tab) {
+    if (!$('[data-panel=' + tab + ']')) tab = 'play';
+    this.tab = tab; Pref.set('tab', tab);
+    $$('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+    $$('.panel').forEach(p => p.classList.toggle('on', p.dataset.panel === tab));
+    Workshop.ensure();
+    if (tab === 'areas') Areas.render(); if (tab === 'insp') this.insp(true); if (tab === 'ovr') this.ovr(true); if (tab === 'play') { Log.dirty = true; Log.render(); }
+  },
+  dirty() { this.badge(); clearTimeout(this.ovTimer); this.ovTimer = setTimeout(() => { if (this.tab === 'ovr') this.ovr(true); if (this.tab === 'areas') { Map2D.info(); } }, 150); },
+  badge() { const n = Sync.ov.size, b = $('#ovCount'); b.hidden = !n; b.textContent = n; },
+  // ---------------- Characters
+  charPanel() {
+    const box = clear($('#charFields')), info = $('#charInfo');
+    if (Workshop.source === 'cast') return this.castPanel(box, info);
+    const c = Workshop.ctx; if (!c || !Workshop.ready) { info.textContent = 'Building the preview…'; return; }
+    const kind = Workshop.kind, orig = c.specOrig[kind]; if (!orig) { info.textContent = 'No such character in this level.'; return; }
+    const id = 'spec__' + seg(Workshop.level) + '__' + seg(kind), ov = Sync.get(id), edit = clone(c.SC.SPECS[kind]);
+    clear(info).appendChild(h('span', null, 'The comic rig\'s ', h('code', { text: 'SC.SPECS.' + kind }), ' as dressed for ', h('b', { text: Workshop.level }), ' (issue/rig.js). Changes show on the preview, in the running level when it is this one, and are saved as ', h('code', { text: id }), '.'));
+    const src = (c.SC.makeHumanoid.toString() + '\n' + (c.SC.drawFace ? c.SC.drawFace.toString() : '')), opts = re => [...new Set([...src.matchAll(re)].map(m => m[1]))].sort();
+    const faces = new Set(opts(/kind === '([\w]+)'/g)); for (const k in c.specOrig) if (c.specOrig[k].face) faces.add(c.specOrig[k].face);
+    const O = { face: [...faces].sort(), hair: opts(/sp\.hair === '([\w]+)'/g), hat: opts(/sp\.hat === '([\w]+)'/g), helm: opts(/sp\.helm === '([\w]+)'/g), weapon: opts(/sp\.weapon === '([\w]+)'/g) };
+    const flagNames = [...new Set(opts(/sp\.([a-zA-Z]\w*)\b/g).filter(k => !['h', 'b', 'pal', 'kit', 'face', 'hair', 'hat', 'helm', 'weapon'].includes(k)).concat(Object.keys(edit).filter(k => edit[k] === true || edit[k] === 1 || edit[k] === false)))].filter(k => !isObj(edit[k]) && typeof edit[k] !== 'string' && typeof edit[k] !== 'number' || edit[k] === 1 || edit[k] === 0).sort();
+    let timer = 0;
+    const changed = (final) => {
+      const patch = diffObj(edit, orig);
+      if (!final) { Engine.applySpec(c, kind, true, patch); return; }
+      clearTimeout(timer); timer = setTimeout(() => { if (Object.keys(patch).length) Sync.set(id, { kind: 'spec', target: kind, level: Workshop.level, key: kind, patch, label: 'Comic rig: ' + kind + ' (' + Workshop.level + ')', ref: { file: 'issue/rig.js', level: Workshop.level } }); else Sync.remove(id); }, 120);
+      this.markChanged(box, patch);
+    };
+    const row = (lab, key, el) => [h('span', { class: 'l', 'data-k': key, text: lab }), h('div', { class: 'v' }, el)];
+    const rng = (key, lo, hi, st) => { const n = h('input', { type: 'number', step: st, min: lo, max: hi, value: fmt(edit[key] === undefined ? 1 : edit[key]) }), r = h('input', { type: 'range', min: lo, max: hi, step: st, value: edit[key] === undefined ? 1 : edit[key] });
+      r.oninput = () => { edit[key] = +r.value; n.value = fmt(+r.value); changed(false); }; r.onchange = () => changed(true); n.onchange = () => { edit[key] = +n.value; r.value = n.value; changed(false); changed(true); }; return [r, n]; };
+    const sel = (key, list) => h('select', { onchange: e => { if (e.target.value) edit[key] = e.target.value; else delete edit[key]; changed(false); changed(true); } }, [''].concat(list.includes(edit[key]) || !edit[key] ? list : list.concat([edit[key]])).map(v => h('option', { value: v, text: v || '(none)', selected: (edit[key] || '') === v })));
+    const col = (obj, key, path) => { const i = h('input', { type: 'color', value: hex6(obj[key]) }), t = h('span', { class: 'mono', text: path }); i.oninput = () => { obj[key] = parseInt(i.value.slice(1), 16); t.textContent = i.value; changed(false); }; i.onchange = () => changed(true); return [i, t]; };
+    const F = h('div', { class: 'fields' });
+    F.append(...row('height (h)', 'h', rng('h', 0.6, 1.7, 0.01)), ...row('build (b)', 'b', rng('b', 0.6, 1.8, 0.01)));
+    for (const k of ['face', 'hair', 'hat', 'helm', 'weapon']) F.append(...row(k, k, sel(k, O[k])));
+    F.append(...row('expression', '', h('select', { onchange: e => { Workshop.anim.expr = e.target.value; try { Workshop.model.face(e.target.value); } catch (er) { /* none */ } } }, EXPRS.map(x => h('option', { value: x, text: x + ' (preview only)', selected: x === Workshop.anim.expr })))));
+    F.append(...row('parts', '', h('div', { class: 'row tight' }, flagNames.map(k => h('label', { 'data-k': k }, h('input', { type: 'checkbox', checked: !!edit[k], onchange: e => { if (e.target.checked) edit[k] = true; else delete edit[k]; changed(false); changed(true); } }), ' ' + k)))));
+    box.appendChild(h('h3', { text: 'Shape' })); box.appendChild(F);
+    const P = h('div', { class: 'fields' }); for (const k of Object.keys(edit.pal || {})) if (typeof edit.pal[k] === 'number') P.append(...row(k, 'pal.' + k, col(edit.pal, k, hex6(edit.pal[k]))));
+    box.appendChild(h('h3', { text: 'Colours (pal)' })); box.appendChild(P);
+    if (isObj(edit.kit)) { const K = h('div', { class: 'fields' });
+      for (const k of Object.keys(edit.kit)) { if (KIT_FLAGS.includes(k) || typeof edit.kit[k] !== 'number') K.append(...row(k, 'kit.' + k, h('label', null, h('input', { type: 'checkbox', checked: !!edit.kit[k], onchange: e => { if (e.target.checked) edit.kit[k] = 1; else delete edit.kit[k]; changed(false); changed(true); } }), ' on'))); else K.append(...row(k, 'kit.' + k, col(edit.kit, k, hex6(edit.kit[k])))); }
+      box.appendChild(h('h3', { text: 'Kit (plate, trim, belt…)' })); box.appendChild(K); }
+    box.appendChild(h('div', { class: 'row', style: 'margin-top:10px' }, h('button', { text: 'Revert ' + kind, disabled: !ov, onclick: () => { Sync.remove(id); setTimeout(() => this.charPanel(), 0); } }), h('span', { class: 'dim', text: ov ? 'changed ' + ago(ov.updatedAt) + ' by ' + Sync.who(ov.by) : 'as built' })));
+    this.markChanged(box, ov ? ov.patch : {});
+  },
+  markChanged(box, patch) { const keys = new Set(); const walk = (o, p) => { for (const k in o) { if (isObj(o[k])) walk(o[k], p + k + '.'); keys.add(p + k); } }; walk(patch || {}, ''); $$('[data-k]', box).forEach(e => e.classList.toggle('ch', keys.has(e.dataset.k))); },
+  castPanel(box, info) {
+    const X = Game.X; if (!X) { info.textContent = 'Waiting for the game…'; return; }
+    const cid = Workshop.castId, C = X.CAST[cid]; if (!C) return;
+    const id = 'cast__' + seg(cid), ov = Sync.get(id);
+    const origF = cid === 'kael' ? null : (Apply.origCast.get(cid) || C.look), orig = cid === 'kael' ? Object.assign({}, Apply.origKael || X.KAEL_LOOK) : origF(), edit = cid === 'kael' ? Object.assign({}, X.KAEL_LOOK) : C.look();
+    clear(info).appendChild(h('span', null, h('b', { text: C.name || cid }), ' — ', h('code', { text: cid === 'kael' ? 'KAEL_LOOK' : 'CAST.' + cid + '.look()' }), ' (src/story.js and the files that add to CAST). The same look draws the 2D sprites, the 2.5D walks and the 3D arena fight model (src/g3.js). Saved as ', h('code', { text: id }), '.'));
+    const changed = () => { const patch = diffObj(edit, orig); if (Object.keys(patch).length) Sync.set(id, { kind: 'cast', target: cid, key: cid, patch, label: 'Cast: ' + (C.name || cid), ref: { file: cid === 'kael' ? 'src/story.js KAEL_LOOK' : 'CAST.' + cid } }); else Sync.remove(id); Workshop.shDirty = true; this.markChanged(box, patch); };
+    const F = h('div', { class: 'fields' });
+    const keys = Object.keys(edit).sort((a, b) => (typeof edit[a] === 'string' && edit[a][0] === '#' ? 0 : 1) - (typeof edit[b] === 'string' && edit[b][0] === '#' ? 0 : 1) || a.localeCompare(b));
+    for (const k of keys) {
+      const v = edit[k]; let el;
+      if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)) { const i = h('input', { type: 'color', value: v.toLowerCase() }), t = h('span', { class: 'mono', text: v }); i.oninput = () => { t.textContent = i.value; }; i.onchange = () => { edit[k] = i.value; t.textContent = i.value; changed(); }; el = [i, t]; }
+      else if (k === 'style' || k === 'extra') { const L = k === 'style' ? CAST_STYLE : CAST_EXTRA; el = h('select', { onchange: e => { if (e.target.value) edit[k] = e.target.value; else delete edit[k]; changed(); } }, (L.includes(v) ? L : L.concat([v])).map(o => h('option', { value: o, text: o || '(none)', selected: o === v }))); }
+      else if (v === 0 || v === 1 || v === true || v === false) el = h('label', null, h('input', { type: 'checkbox', checked: !!v, onchange: e => { edit[k] = e.target.checked ? 1 : 0; changed(); } }), ' on');
+      else { const i = h('input', { type: 'text', value: String(v) }); i.onchange = () => { edit[k] = isFinite(+i.value) && i.value !== '' ? +i.value : i.value; changed(); }; el = i; }
+      F.append(h('span', { class: 'l', 'data-k': k, text: k }), h('div', { class: 'v' }, el, h('button', { text: '×', title: 'Remove ' + k, onclick: () => { delete edit[k]; changed(); this.charPanel(); } })));
+    }
+    box.appendChild(h('h3', { text: 'Look' })); box.appendChild(F);
+    const add = h('select', null, CAST_ADD.filter(k => !(k in edit)).map(k => h('option', { value: k, text: k })));
+    box.appendChild(h('div', { class: 'row' }, 'Add ', add, h('button', { text: 'Add field', onclick: () => { const k = add.value; if (!k) return; edit[k] = ['gloves', 'cape', 'scarf', 'trim', 'sash', 'robe', 'armor'].includes(k) ? '#c8a050' : k === 'style' ? 'short' : k === 'extra' ? 'apron' : 1; changed(); this.charPanel(); } })));
+    box.appendChild(h('div', { class: 'row', style: 'margin-top:10px' },
+      h('button', { text: 'See it in a 3D arena fight', title: 'Starts the training room with this look as the player (uses FF.training)', onclick: () => Jump.run(() => { const d = X.FF.training(); d.hero = Object.assign({}, d.hero, { id: cid }); X.Fade.a = 1; X.Fade.dir = 0; X.Fade.busy = false; X.Cutscene.play([{ brawl: () => d }], () => X.Game.toTitle()); }) }),
+      h('button', { text: 'Revert ' + cid, disabled: !ov, onclick: () => { Sync.remove(id); Workshop.shDirty = true; setTimeout(() => this.charPanel(), 0); } }), h('span', { class: 'dim', text: ov ? 'changed ' + ago(ov.updatedAt) + ' by ' + Sync.who(ov.by) : 'as written' })));
+    this.markChanged(box, ov ? ov.patch : {});
+  },
+  // ---------------- Animations
+  animPanel() {
+    const box = clear($('#anLists')), opts = clear($('#anOpts')), A = Workshop.anim;
+    const fightStates = (() => { try { return [...new Set([...Game.X.G3.target.toString().matchAll(/st === '(\w+)'/g)].map(m => m[1]))].sort(); } catch (e) { return []; } })();
+    const fight = () => {
+      box.appendChild(h('h3', { text: '3D arena fight states (src/g3.js)' }));
+      const on = !!(Game.X && Game.X.Brawl.active);
+      box.appendChild(h('p', { class: 'dim', text: on ? 'Click a state to hold the live fight\'s player in it (the game pauses; the time slider drives the state clock).' : 'Start an arena fight (Play → Fights, or Characters → See it in a 3D arena fight), then pose its player here.' }));
+      box.appendChild(h('div', { class: 'btnlist' }, fightStates.map(s => h('button', { class: A.fight === s ? 'on mono' : 'mono', text: s, disabled: !on, onclick: () => { A.fight = s; A.t = 0; Time.setPaused(true); this.animPanel(); } })), A.fight ? h('button', { text: 'Stop posing', onclick: () => { A.fight = null; Time.setPaused(false); this.animPanel(); } }) : null));
+    };
+    if (Workshop.source === 'cast') {
+      const dirs = ['down', 'up', 'side', 'side, mirrored'];
+      opts.append(h('label', null, 'Row ', h('select', { onchange: e => { A.dir = +e.target.value; } }, dirs.map((d, i) => h('option', { value: i, text: i + ' · ' + d, selected: A.dir === i })))));
+      box.appendChild(h('h3', { text: '2D sprite cycles (' + Workshop.castId + ')' }));
+      box.appendChild(h('div', { class: 'btnlist' }, [['walk', 'walk: frames 1 0 2 0'], ['stand', 'stand: frame 0'], ['step', 'step: frame 1'], ['blink', 'blink: frame 3']].map(([k, t]) => h('button', { class: A.cyc === k ? 'on' : '', text: t, onclick: () => { A.cyc = k; A.t = 0; A.playing = true; this.animPanel(); } }))));
+      fight(); return;
+    }
+    if (!Workshop.ready) { box.appendChild(h('p', { class: 'dim', text: 'Building the preview…' })); return; }
+    opts.append(h('label', null, 'Expression ', h('select', { onchange: e => { A.expr = e.target.value; try { Workshop.model.face(A.expr); } catch (er) { /* none */ } } }, EXPRS.map(x => h('option', { value: x, text: x, selected: x === A.expr })))),
+      h('label', null, 'Variant ', h('select', { title: 'Which hit of a combo, or which side for a hurt', onchange: e => { A.i = +e.target.value; } }, [0, 1, 2].map(i => h('option', { value: i, text: ['1st / right', '2nd / left', '3rd'][i], selected: A.i === i })))));
+    const P = Workshop.poses(), groups = { 'Loops and cycles': P.filter(p => p.kind === 'loop' || p.kind === 'cycle'), 'Strikes and moves': P.filter(p => ['combo', 'strike', 'sweep', 'side'].includes(p.kind)), 'Held poses': P.filter(p => p.kind === 'still') };
+    box.appendChild(h('p', { class: 'dim' }, 'The comic engine\'s poses ', h('code', { text: 'SC.pose.*' }), ' (issue/base.html and issue/patch.mjs), played on the preview. ' + P.length + ' in this build.'));
+    for (const g in groups) { if (!groups[g].length) continue; box.appendChild(h('h3', { text: g })); box.appendChild(h('div', { class: 'btnlist' }, groups[g].map(p => h('button', { class: (A.name === p.name ? 'on ' : '') + 'mono', title: p.kind + (p.args.length ? ' (' + p.args.join(', ') + ')' : ''), text: p.name, onclick: () => { A.name = p.name; A.t = 0; A.playing = true; $('#anPlay').textContent = 'Pause'; this.animPanel(); } })))); }
+    fight();
+  },
+  animTime() { const A = Workshop.anim, L = Workshop.source === 'cast' ? Math.max(1 / 6, Workshop.cycle(4).length / 6) : Workshop.len(), s = $('#anScrub'); if (document.activeElement !== s) s.value = Math.min(1, A.t / L); $('#anTime').textContent = A.t.toFixed(2) + ' / ' + L.toFixed(2) + ' s'; },
+  // ---------------- Bones
+  bonesPanel() {
+    const box = clear($('#bnBody'));
+    if (Workshop.source === 'cast') {
+      box.appendChild(h('p', { class: 'dim', text: 'The 2D cast are 16-pixel sprites with no skeleton. The 3D arena fight model (src/g3.js) is posed by these joint angles, eased toward a target pose for each state:' }));
+      try { const P0 = Game.X.G3.POSE0, B = Game.X.Brawl, R = B.active && B.p ? Game.X.G3.rigs.get(B.p) : null, kv = h('div', { class: 'kv' }); for (const k in P0) kv.append(h('span', { text: k }), h('span', { text: fmt(P0[k]) + (R && R.p ? '  →  ' + fmt(R.p[k]) + ' now' : '') })); box.appendChild(kv); if (!R) box.appendChild(h('p', { class: 'dim', text: 'Start an arena fight to see the live values.' })); } catch (e) { box.appendChild(h('p', { class: 'dim', text: 'G3 is not available.' })); }
+      return;
+    }
+    const m = Workshop.model; if (!m) { box.appendChild(h('p', { class: 'dim', text: 'Building the preview…' })); return; }
+    box.appendChild(h('p', { class: 'dim' }, 'The procedural humanoid from ', h('code', { text: 'SC.makeHumanoid' }), ' (issue/base.html): ' + Object.keys(m.bones).length + ' bones, one skinned mesh. Click a joint to highlight it.'));
+    const tree = h('div', { class: 'list tree', style: 'max-height:300px' });
+    const walk = (bn, d) => { tree.appendChild(h('div', { class: 'it' + (bn.name === Workshop.bones.sel ? ' sel' : ''), style: '--d:' + d, tabindex: 0, onclick: () => { Workshop.bones.sel = bn.name; this.bonesPanel(); }, onkeydown: e => { if (e.key === 'Enter') { Workshop.bones.sel = bn.name; this.bonesPanel(); } } }, h('span', { class: 't', text: bn.name }), h('span', { class: 'm', text: bn.children.filter(c => c.isBone).length ? bn.children.filter(c => c.isBone).length + ' ▸' : '' }))); for (const c of bn.children) if (c.isBone) walk(c, d + 1); };
+    walk(m.bones.root, 0); box.appendChild(tree);
+    box.appendChild(h('div', { id: 'boneInfo', class: 'card' })); this.boneInfo(true);
+  },
+  boneInfo(force) {
+    const box = $('#boneInfo'); if (!box) return; const now = performance.now(); if (!force && now - (this.biT || 0) < 200) return; this.biT = now;
+    const m = Workshop.model, nm = Workshop.bones.sel, bn = m && m.bones[nm]; if (!bn) { clear(box).appendChild(h('span', { class: 'dim', text: 'Pick a joint.' })); return; }
+    const T = Workshop.ctx.THREE, wp = bn.getWorldPosition(new T.Vector3()), r = bn.rotation, hand = Workshop.bones.hand;
+    if (box.dataset.b !== nm + hand) { clear(box); box.dataset.b = nm + hand;
+      box.append(h('div', { class: 'row' }, h('b', { text: nm }), h('span', { class: 'dim', text: 'parent: ' + (bn.parent && bn.parent.isBone ? bn.parent.name : '(mesh)') })), h('div', { class: 'kv', id: 'bkv' }));
+      if (hand) { const mv = Workshop.bones.manual[nm] = Workshop.bones.manual[nm] || [0, 0, 0]; box.appendChild(h('div', { class: 'fields', style: 'margin-top:6px' }, ['x', 'y', 'z'].map((a, i) => [h('span', { class: 'l', text: 'rot ' + a + ' (°)' }), h('div', { class: 'v' }, h('input', { type: 'range', min: -180, max: 180, step: 1, value: mv[i], oninput: e => { mv[i] = +e.target.value; e.target.nextSibling.textContent = mv[i] + '°'; } }), h('span', { class: 'mono', text: Math.round(mv[i]) + '°' }))]))); }
+    }
+    const kv = clear($('#bkv'));
+    kv.append(h('span', { text: 'local pos' }), h('span', { text: [bn.position.x, bn.position.y, bn.position.z].map(v => fmt(v, 3)).join(', ') }), h('span', { text: 'local rot °' }), h('span', { text: [r.x, r.y, r.z].map(v => fmt(deg(v), 1)).join(', ') }), h('span', { text: 'world pos' }), h('span', { text: [wp.x, wp.y, wp.z].map(v => fmt(v, 3)).join(', ') }), h('span', { text: 'rest' }), h('span', { text: bn.userData.rest ? [bn.userData.rest.x, bn.userData.rest.y, bn.userData.rest.z].map(v => fmt(v, 3)).join(', ') : '' }));
+  },
+  // ---------------- Inspector
+  insp(force) {
+    const box = $('#inspBody'); if (!box) return;
+    if (!force && box.contains(document.activeElement) && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    clear(box); const X = Game.X; if (!X || !X.G) { box.appendChild(h('p', { class: 'dim', text: 'Waiting for the game…' })); return; }
+    const G = X.G, B = X.Brawl;
+    const val = v => typeof v === 'object' ? JSON.stringify(v) : String(v);
+    const parse = s => { try { return JSON.parse(s); } catch (e) { return s; } };
+    const flags = (title, obj, onSet) => {
+      box.appendChild(h('h3', { text: title + ' (' + Object.keys(obj || {}).length + ')' }));
+      const F = h('div', { class: 'fields' });
+      for (const k of Object.keys(obj || {}).sort()) F.append(h('span', { class: 'l', text: k, title: k }), h('div', { class: 'v' }, h('input', { type: 'text', value: val(obj[k]), class: 'grow', onchange: e => { obj[k] = parse(e.target.value); onSet && onSet(); } }), h('button', { text: '×', title: 'Delete ' + k, onclick: () => { delete obj[k]; onSet && onSet(); this.insp(true); } })));
+      box.appendChild(F);
+      const nk = h('input', { type: 'text', placeholder: 'new flag', style: 'width:120px' }), nv = h('input', { type: 'text', placeholder: 'value (1)', style: 'width:80px' });
+      box.appendChild(h('div', { class: 'row' }, nk, nv, h('button', { text: 'Add', onclick: () => { const k = nk.value.trim(); if (!k) return; obj[k] = nv.value === '' ? 1 : parse(nv.value); onSet && onSet(); this.insp(true); } })));
+    };
+    box.appendChild(h('h3', { text: 'Game (G)' }));
+    const num = (o, k) => h('input', { type: 'number', value: o[k], onchange: e => { o[k] = +e.target.value; } });
+    box.appendChild(h('div', { class: 'fields' },
+      h('span', { class: 'l', text: 'mode' }), h('div', { class: 'v' }, h('code', { text: G.mode })), h('span', { class: 'l', text: 'map' }), h('div', { class: 'v' }, h('code', { text: G.mapId + (X.MAPS[G.mapId] ? ' · ' + X.MAPS[G.mapId].name : '') })),
+      h('span', { class: 'l', text: 'day' }), h('div', { class: 'v' }, num(G, 'day')), h('span', { class: 'l', text: 'scrip' }), h('div', { class: 'v' }, num(G, 'scrip')),
+      h('span', { class: 'l', text: 'tendency' }), h('div', { class: 'v' }, h('code', { text: String(G.tendency) })), h('span', { class: 'l', text: 'journal' }), h('div', { class: 'v' }, h('code', { text: (G.journal || []).length + ' entries' }))));
+    flags('Story flags (G.flags)', G.flags);
+    if (B.active) {
+      box.appendChild(h('h3', { text: 'Fight (Brawl)' }));
+      const p = B.p || {};
+      box.appendChild(h('div', { class: 'fields' }, h('span', { class: 'l', text: 'fight' }), h('div', { class: 'v' }, h('code', { text: (B.def.title || '') + ' · bg ' + B.def.bg })), h('span', { class: 'l', text: 'phase' }), h('div', { class: 'v' }, h('code', { text: B.phase + ' · wave ' + B.wave + ' · t ' + fmt(B.t, 1) })),
+        h('span', { class: 'l', text: 'player hp' }), h('div', { class: 'v' }, num(p, 'hp'), ' / ' + p.max), h('span', { class: 'l', text: 'fury' }), h('div', { class: 'v' }, num(p, 'fury')), h('span', { class: 'l', text: 'state' }), h('div', { class: 'v' }, h('code', { text: p.st }))));
+      const L = h('div', { class: 'list' }); (B.foes || []).forEach((f, i) => L.appendChild(h('div', { class: 'it' }, h('span', { class: 't', text: (f.name || f.id || 'foe ' + i) + ' · ' + (f.st || '') }), h('span', { class: 'm', text: 'hp' }), num(f, 'hp'), h('span', { class: 'm', text: '/ ' + (f.max || '?') }))));
+      if (!(B.foes || []).length) L.appendChild(h('div', { class: 'it dim', text: 'No foes.' })); box.appendChild(L);
+    }
+    const c = Engine.game();
+    if (c && c.booted) {
+      const SC = c.SC, S = SC.story, pl = SC.player, D = SC.__dev;
+      box.appendChild(h('h3', { text: 'Comic level (' + c.level + ')' }));
+      const cps = D ? Object.keys(D.CROSS || {}) : [];
+      box.appendChild(h('div', { class: 'fields' },
+        h('span', { class: 'l', text: 'state' }), h('div', { class: 'v' }, h('code', { text: String(SC.state) })),
+        h('span', { class: 'l', text: 'checkpoint' }), h('div', { class: 'v' }, h('select', { onchange: e => { S.cp = e.target.value; } }, cps.map(k => h('option', { value: k, text: k, selected: k === S.cp }))), h('button', { text: 'Go there', onclick: () => { const C = D.CROSS[S.cp]; if (C) { pl.place(C.x, C.y, C.z + 0.01, C.yaw); try { SC.cam.snapBehind(C.yaw); } catch (e) { /* fine */ } } } })),
+        h('span', { class: 'l', text: 'encounter' }), h('div', { class: 'v' }, h('code', { text: S.enc ? S.enc.id + ' · wave ' + (S.enc.wave + 1) + '/' + (S.enc.waves || []).length : 'none' })),
+        h('span', { class: 'l', text: 'player' }), h('div', { class: 'v' }, 'hp', num(pl, 'hp'), 'meter', num(pl, 'meter'), h('code', { text: pl.state + ' · ' + [pl.pos.x, pl.pos.y, pl.pos.z].map(v => fmt(v, 1)).join(', ') }))));
+      const L = h('div', { class: 'list' }); (SC.enemies || []).forEach(e => L.appendChild(h('div', { class: 'it' }, h('span', { class: 't', text: e.kind + ' · ' + e.state + (e.enc ? ' · ' + e.enc.id : '') }), h('span', { class: 'm', text: Math.round(e.hp) + '/' + e.maxHp }), h('button', { text: 'Down', onclick: () => { try { e.hit(99999, 0, 0, { quiet: true }); } catch (er) { /* fine */ } this.insp(true); } }))));
+      if (!(SC.enemies || []).length) L.appendChild(h('div', { class: 'it dim', text: 'No enemies up.' })); box.appendChild(L);
+      flags('Level flags (F)', SC.flags, () => { try { S.objective(); } catch (e) { /* fine */ } });
+    }
+  },
+  // ---------------- Overrides and notes
+  ovr(force) {
+    this.badge(); if (this.tab !== 'ovr' && !force) return;
+    const box = $('#ovrBody'); if (!box) return; if (!force && box.contains(document.activeElement) && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    const keepIO = $('#ioBox') && $('#ioBox').value, keepNote = $('#noteIn') && $('#noteIn').value;
+    clear(box);
+    box.appendChild(h('div', { class: 'card' }, h('div', { class: 'row' }, h('b', { text: Sync.synced() ? 'Shared db' : 'This tab only' }), h('span', { class: 'dim', text: Sync.synced() ? 'Every override and note here is in the artifact\'s shared database; Claude reads it, bakes it into the source and clears it.' : 'Not syncing — changes stay in this tab. Export them below to carry them across.' })),
+      h('div', { class: 'row dim mono' }, 'game v' + Game.ver + ' · last baked: ' + (Sync.meta && Sync.meta.bakedVersion ? 'v' + Sync.meta.bakedVersion : 'never') + (Sync.meta && Sync.meta.bakedAt ? ' (' + ago(Sync.meta.bakedAt) + ')' : ''))));
+    const all = Sync.list().sort((a, b) => KINDS.indexOf(a.kind) - KINDS.indexOf(b.kind) || b.updatedAt - a.updatedAt);
+    const confirmAll = h('span');
+    box.appendChild(h('div', { class: 'row' }, h('h3', { style: 'margin:6px 0', text: 'Overrides (' + all.length + ')' }), h('span', { class: 'grow' }),
+      h('button', { text: 'Export', onclick: () => { const io = $('#ioBox'); io.value = JSON.stringify({ suite: SUITE_VER, game: Game.ver, exportedAt: new Date().toISOString(), overrides: Sync.list().map(o => ({ id: o.id, kind: o.kind, target: o.target, level: o.level, key: o.key, patch: o.patch, label: o.label, updatedAt: o.updatedAt, ref: o.ref })) }, null, 1); io.focus(); io.select(); this.ioMsg = $('#ioMsg').textContent = 'Copy this text (it is selected). Downloads are blocked in this frame.'; try { navigator.clipboard.writeText(io.value).then(() => { this.ioMsg = $('#ioMsg').textContent = 'Copied to the clipboard, and selected below.'; }, () => { /* selected instead */ }); } catch (e) { /* selected instead */ } } }),
+      h('button', { class: 'danger', text: 'Revert all', disabled: !all.length, onclick: () => { clear(confirmAll).appendChild(h('span', { class: 'confirm' }, 'Revert all ' + all.length + '?', h('button', { class: 'danger', text: 'Yes, revert all', onclick: () => { for (const o of Sync.list()) Sync.remove(o.id); this.ovr(true); } }), h('button', { text: 'Keep them', onclick: () => clear(confirmAll) }))); } }), confirmAll));
+    const L = h('div', { class: 'list', style: 'max-height:380px' });
+    const names = { cast: 'Cast', spec: 'Comic rig', prop: 'Prop (3D level)', map: '2D map' };
+    for (const o of all) {
+      L.appendChild(h('div', { class: 'ovr' + (o.stale ? ' stale' : '') }, h('div', { class: 'lb', text: o.label || o.id }),
+        h('div', { class: 'meta', title: JSON.stringify(o.patch), text: names[o.kind] + ' · ' + o.id + ' · ' + Sync.who(o.by) + ' · ' + ago(o.updatedAt) + ' · ' + JSON.stringify(o.patch).slice(0, 90) }),
+        h('div', { class: 'act' }, h('button', { text: 'Revert', onclick: () => Sync.remove(o.id) }))));
+    }
+    if (!all.length) L.appendChild(h('div', { class: 'it dim', text: 'No overrides. Edit a character, a prop or a map and it shows here.' }));
+    box.appendChild(L);
+    box.appendChild(h('h3', { text: 'Export / import (JSON)' }));
+    const io = h('textarea', { id: 'ioBox', placeholder: 'Export fills this box. To import, paste an export here and press Import.', spellcheck: 'false' }); if (keepIO) io.value = keepIO; box.appendChild(io);
+    box.appendChild(h('div', { class: 'row' }, h('button', { class: 'pri', text: 'Import', onclick: () => this.importJson($('#ioBox').value) }), h('span', { id: 'ioMsg', class: 'dim', text: this.ioMsg || '' })));
+    box.appendChild(h('h3', { text: 'Notes for Claude (' + Sync.notes.length + ')' }));
+    const ni = h('textarea', { id: 'noteIn', placeholder: 'e.g. Make Rook taller. The crates on the docks causeway block the route.', style: 'min-height:60px' }); if (keepNote) ni.value = keepNote; box.appendChild(ni);
+    box.appendChild(h('div', { class: 'row' }, h('button', { class: 'pri', text: 'Leave note', onclick: () => { const t = $('#noteIn').value.trim(); if (!t) return; $('#noteIn').value = ''; Sync.addNote(t).then(() => this.ovr(true)); } }), h('span', { class: 'dim', text: Sync.synced() ? 'Claude reads these from the shared db.' : 'Not syncing: notes stay in this tab.' })));
+    for (const n of Sync.notes) { const cf = h('span'); box.appendChild(h('div', { class: 'note' }, h('p', { text: n.text }), h('div', { class: 'row dim mono' }, Sync.who(n.by) + ' · ' + ago(n.at) + (n.game ? ' · game v' + n.game : '') + (n.done ? ' · done' : ''), h('span', { class: 'grow' }), h('button', { text: 'Delete', onclick: () => { clear(cf).appendChild(h('span', { class: 'confirm' }, 'Delete this note?', h('button', { class: 'danger', text: 'Delete', onclick: () => Sync.delNote(n.id) }), h('button', { text: 'Keep', onclick: () => clear(cf) }))); } }), cf))); }
+  },
+  importJson(txt) {
+    const msg = t => { this.ioMsg = t; const e = $('#ioMsg'); if (e) e.textContent = t; };
+    let d = null; try { d = JSON.parse(txt); } catch (e) { msg('That is not JSON.'); return; }
+    const list = Array.isArray(d) ? d : d && Array.isArray(d.overrides) ? d.overrides : null; if (!list) { msg('No "overrides" list in it.'); return; }
+    let n = 0, bad = 0;
+    for (const o of list) { if (!isObj(o) || typeof o.id !== 'string' || !/^(cast|spec|prop|map)__/.test(o.id)) { bad++; continue; } const id = o.id.split('/').map(seg).join('-'); const c = cleanOverride(id, o); if (!c) { bad++; continue; } Sync.set(id, { kind: c.kind, target: c.target, level: c.level, key: c.key, patch: c.patch, label: c.label, ref: c.ref }); n++; }
+    const t = 'Imported ' + n + ' override' + (n === 1 ? '' : 's') + (bad ? ', skipped ' + bad + ' that did not look right' : '') + '.';
+    msg(t); this.ovr(true);
+  }
+};
+
+/* ------------------------------------------------------------------ start */
+View.init();
+Game.frame = $('#game');
+Sync.status();
+Sync.init();
+Game.load();
+setInterval(() => {
+  Watch.tick();
+  if (View.tab === 'play') Log.render();
+  if (View.tab === 'insp' && performance.now() - View.inspT > 1000) { View.inspT = performance.now(); View.insp(false); }
+  if (View.tab === 'areas' && ((Areas.ctx && !Areas.live() && Areas.shownLive) || (Areas.live() && !Areas.shownLive))) { Areas.shownLive = !!Areas.live(); Areas.render(); }
+  if (View.tab === 'bones' && Workshop.source === 'cast' && Game.X && Game.X.Brawl.active) View.bonesPanel();
+  try { const X = Game.X; if (X) { $('#selDiff').value = String(X.Settings.d.diff || 0); $('#chkQuick').checked = !!X.DEV.quick; $('#chkFury').checked = !!X.DEV.fury; } } catch (e) { /* not yet */ }
+}, 250);
+(function fl() { requestAnimationFrame(fl); Workshop.fight(); })();
+</script>

@@ -13,3 +13,5 @@ if (existsSync('issue/patch.mjs')) {
 const html = readFileSync('src/shell.html', 'utf8').replace('/*__SCRIPT__*/', () => js);
 writeFileSync('index.html', html);
 console.log('index.html', (html.length / 1024).toFixed(1) + ' KB');
+// the Dev Suite carries its own copy of the build (devsuite/game.html); refresh it so the suite always plays this build
+if (existsSync('devsuite/build.mjs')) execFileSync('node', ['devsuite/build.mjs'], { stdio: 'inherit' });

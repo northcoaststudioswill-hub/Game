@@ -2,3 +2,4 @@ issue/issue.html
 issue/lv-*.html
 node_modules
 tests/shots/
+devsuite/game.html
