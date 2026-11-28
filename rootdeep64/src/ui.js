@@ -187,7 +187,7 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
   else if(codexPage===6){const L=EPISODES.filter(e=>RD.ep&&RD.ep[e.id]);text('EPISODES  '+L.length+' / '+EPISODES.length,PX+14,54,1,'#ffd94d',null);
    if(!L.length)wrapPx('Nothing yet. Things happen at home when you come back from the deep. Keep going down.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
    const top=clamp(echoSel-6,0,Math.max(0,L.length-13));L.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
-    text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext('EP '+(EPISODES.indexOf(e)+1),PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
+    text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(e.rnd?'AFTER A FALL':'EP '+(EPISODES.indexOf(e)+1),PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
    if(L.length)footer(A+': WATCH AGAIN    < > PAGES    '+Bk+': BACK')}
   else if(codexPage===5){text('THE STORY SO FAR',PX+14,54,1,'#ffd94d',null);storySoFar().forEach((l,i)=>text(l,PX+14,72+i*14,1,l[0]==='*'?'#a8f080':'#c8c0d8',null))}
   else if(codexPage===2)rowsPlain(['DIFFERENT BOONS OFFERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);

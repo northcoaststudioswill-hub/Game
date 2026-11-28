@@ -206,7 +206,7 @@ function genShop(){const all=[
  {n:'PETAL PURSE',d:'+90 petals, somehow profit',p:50,act:()=>{RUN.petals+=90;say2('+90 PETALS',2)}}];
  const out=[];while(out.length<3){const it=all.splice((Math.random()*all.length)|0,1)[0];if(it)out.push(it)}return out;}
 function runTally(){RD.stats.honeyFound=(RD.stats.honeyFound||0)+RUN.honey;RD.stats.maxBank=Math.max(RD.stats.maxBank||0,RUN.buds.length)}
-function rdDie(){runTally();const cb=2*Math.max(0,RUN.chamber-1);RUN.dew+=cb;RUN.chBonus=cb;const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={biome:RUN.biome,bonus:RUN.chBonus||0,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
+function rdDie(){runTally();const cb=2*Math.max(0,RUN.chamber-1);RUN.dew+=cb;RUN.chBonus=cb;const by=RUN.boss?BOSSES[RUN.boss.bossIx].id:'deep';RD.diedTo[by]=(RD.diedTo[by]||0)+1;RD.stats.deaths++;RD.lastRun={biome:RUN.biome,bonus:RUN.chBonus||0,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,by,killer:RUN.hitBy||by,time:Math.round(RUN.time||0),spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='over';snd(196,.5,49,'sawtooth',.08);}
 function rdEscape(){runTally();RD.stats.heatEsc=Math.max(RD.stats.heatEsc||0,RUN.heat);for(const p of PL)RD.charEsc[p.char]=(RD.charEsc[p.char]||0)+1;RD.stats.escapes++;RD.lastRun={biome:2,co:PL.map(p=>({ix:p.ix,char:p.char,kills:p.kills||0,downs:p.downs||0})),chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
  RUN=null;rdSave();overT=0;state='win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
@@ -520,7 +520,7 @@ function projHit(p,e){const o=p.o||lead();
 function foeMove(e,dt,tx,ty,sp){const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy)||1;
  const step=Math.min(d,sp*dt*(e.chill>0?.55:1));e.x+=dx/d*step;e.y+=dy/d*step;e.face=dx>0?1:-1;if(d>1)e.yaw=Math.atan2(dx,dy);e.mv=1;collide(e,e.r);return d;}
 function touchHit(e,dmg){for(const p of PL){if(p.down)continue;const d=Math.hypot(p.x-e.x,p.y-e.y);
-  if(d<e.r+7&&e.hitCd<=0&&p.inv<=0&&p.dashT<=0){e.hitCd=.85;const kb=p.reviving?20:90,kx=(p.x-e.x)/(d||1)*kb,ky=(p.y-e.y)/(d||1)*kb;p.vx+=kx;p.vy+=ky;damagePlayer(p,e.kind==='boss'?dmg*.7:dmg);if(!RUN)return;if(p.inv>0)p.inv=Math.max(p.inv,.85)}}}
+  if(d<e.r+7&&e.hitCd<=0&&p.inv<=0&&p.dashT<=0){e.hitCd=.85;const kb=p.reviving?20:90,kx=(p.x-e.x)/(d||1)*kb,ky=(p.y-e.y)/(d||1)*kb;p.vx+=kx;p.vy+=ky;RUN.hitBy=(e.kind==='boss'?BOSSES[e.bossIx].id:e.kind);damagePlayer(p,e.kind==='boss'?dmg*.7:dmg);if(!RUN)return;if(p.inv>0)p.inv=Math.max(p.inv,.85)}}}
 function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.born>0){e.born-=dt;return}e.cd-=dt;
  if(e.burn>0){e.burn-=dt;e.hp-=e.burnDps*dt;if(Math.random()<dt*6)RUN.parts.push({x:e.x+R(-4,4),y:e.y,vx:0,vy:0,z:10,vz:22,life:.35,c:'#f07830',ng:1});
   if(e.hp<=0){killEnemy(e);return}}
@@ -529,9 +529,9 @@ function rdUpdFoe(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.b
  if(B==='chase')foeMove(e,dt,T.x,T.y,e.sp);
  else if(B==='shoot'){if(d>105)foeMove(e,dt,T.x,T.y,e.sp);else if(d<70)foeMove(e,dt,e.x+(e.x-T.x),e.y+(e.y-T.y),e.sp);
   e.yaw=Math.atan2(T.x-e.x,T.y-e.y);
-  if(e.cd<=0&&d<125){e.cd=1.9;e.spit=.25;const a=Math.atan2(T.y-e.y,T.x-e.x);RUN.eprojs.push({x:e.x,y:e.y,vx:Math.cos(a)*118,vy:Math.sin(a)*118,dmg:e.dmg,r:3});snd(340,.05,220)}}
+  if(e.cd<=0&&d<125){e.cd=1.9;e.spit=.25;const a=Math.atan2(T.y-e.y,T.x-e.x);RUN.eprojs.push({x:e.x,y:e.y,vx:Math.cos(a)*118,vy:Math.sin(a)*118,dmg:e.dmg,r:3,by:e.kind});snd(340,.05,220)}}
  else if(B==='orbit'){const a=Math.atan2(e.y-T.y,e.x-T.x)+dt*.9,nx=T.x+Math.cos(a)*56,ny=T.y+Math.sin(a)*56;foeMove(e,dt,nx,ny,e.sp*1.4);
-  if(e.cd<=0){e.cd=2.4;const an=Math.atan2(T.y-e.y,T.x-e.x);RUN.eprojs.push({x:e.x,y:e.y,vx:Math.cos(an)*125,vy:Math.sin(an)*125,dmg:e.dmg,r:3})}}
+  if(e.cd<=0){e.cd=2.4;const an=Math.atan2(T.y-e.y,T.x-e.x);RUN.eprojs.push({x:e.x,y:e.y,vx:Math.cos(an)*125,vy:Math.sin(an)*125,dmg:e.dmg,r:3,by:e.kind})}}
  else if(B==='shield'){e.t+=dt;e.state=(e.t%3.4)<2.2?1:0;foeMove(e,dt,T.x,T.y,e.sp*(e.state?0.7:1.25))}
  else if(B==='blink'){foeMove(e,dt,T.x,T.y,e.sp);
   if(e.cd<=0&&d>26){e.cd=2.3;burst(e.x,e.y,'#6a5a96',6,24);const a=Math.atan2(e.y-T.y,e.x-T.x);e.x=T.x+Math.cos(a)*20;e.y=T.y+Math.sin(a)*20;collide(e,e.r);burst(e.x,e.y,'#6a5a96',6,24);snd(980,.07,340)}}
@@ -564,7 +564,7 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.bo
  else{ /* Hollow Keeper */
   if(e.state===1){e.t-=dt;e.yaw=Math.atan2(T.x-e.x,T.y-e.y);if(e.t<=0){e.state=2;e.t=.34;const a=Math.atan2(T.y-e.y,T.x-e.x);e.sx=Math.cos(a);e.sy=Math.sin(a);snd(140,.1,70,'sawtooth',.07)}}
   else if(e.state===2){e.t-=dt;e.x+=e.sx*265*dt;e.y+=e.sy*265*dt;e.mv=1;collide(e,e.r);
-   for(const p of PL){if(!p.down&&Math.hypot(p.x-e.x,p.y-e.y)<e.r+8&&p.inv<=0){damagePlayer(p,e.dmg*1.1);if(!RUN)return}}
+   for(const p of PL){if(!p.down&&Math.hypot(p.x-e.x,p.y-e.y)<e.r+8&&p.inv<=0){RUN.hitBy=(e.kind==='boss'?BOSSES[e.bossIx].id:e.kind);damagePlayer(p,e.dmg*1.1);if(!RUN)return}}
    if(e.t<=0)e.state=0}
   else{foeMove(e,dt,T.x,T.y,e.sp*(e.phase===3?1.3:1));
    if(e.bt<=0){e.bt=e.phase===3?2.6:3.6;const roll=Math.random();
@@ -638,7 +638,7 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  for(const h of RUN.hazards){h.t-=dt;if(h.t<=0&&!h.done){h.done=true;burst(h.x,h.y,h.from==='player'?'#98a0b0':'#7fd0e8',12,44);snd(130,.2,60,'sawtooth',.07);RUN.shake=Math.max(RUN.shake,2.5);
   RUN.rings=RUN.rings||[];RUN.rings.push({x:h.x,y:h.y,r:h.r,t:.3,c:h.from==='player'?'#dce2ea':'#7fd0e8'});
   if(h.from==='player'){for(const e of RUN.enemies.slice())if(Math.hypot(e.x-h.x,e.y-h.y)<h.r+e.r)hitEnemy(e,h.dmg,'cast',0,0,h.o)}
-  else for(const p of PL){if(!p.down&&Math.hypot(p.x-h.x,p.y-h.y)<h.r+6&&p.inv<=0&&p.dashT<=0){damagePlayer(p,h.dmg);if(!RUN)return}}}}
+  else for(const p of PL){if(!p.down&&Math.hypot(p.x-h.x,p.y-h.y)<h.r+6&&p.inv<=0&&p.dashT<=0){RUN.hitBy=RUN.boss?BOSSES[RUN.boss.bossIx].id:'hazard';damagePlayer(p,h.dmg);if(!RUN)return}}}}
  RUN.hazards=RUN.hazards.filter(h=>!h.done);
  updateActs(dt);
  /* foes */
@@ -650,7 +650,7 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
   for(const e of RUN.enemies.slice()){if(e.born>0)continue;if(Math.hypot(e.x-p.x,e.y-p.y)<e.r+p.r){if(projHit(p,e))p.life=0;break}}}
  RUN.projs=RUN.projs.filter(p=>p.life>0&&p.x>-8&&p.x<W+8&&p.y>20&&p.y<H+8);
  for(const p of RUN.eprojs){p.x+=p.vx*dt;p.y+=p.vy*dt;
-  for(const q of PL){if(q.down)continue;if(Math.hypot(q.x-p.x,q.y-p.y)<p.r+6&&q.inv<=0&&q.dashT<=0){p.life=0;damagePlayer(q,p.dmg);if(!RUN)return;break}}}
+  for(const q of PL){if(q.down)continue;if(Math.hypot(q.x-p.x,q.y-p.y)<p.r+6&&q.inv<=0&&q.dashT<=0){p.life=0;RUN.hitBy=p.by||(RUN.boss?BOSSES[RUN.boss.bossIx].id:'spitter');damagePlayer(q,p.dmg);if(!RUN)return;break}}}
  RUN.eprojs=RUN.eprojs.filter(p=>p.life!==0&&p.x>-8&&p.x<W+8&&p.y>20&&p.y<H+8);
  /* pickups drift to the nearest standing keeper */
  const mag=budCount(3)>0?88:48;
@@ -730,6 +730,6 @@ function gameStep(dt){time+=dt;
  /* hit-stop holds the fight still; slow motion stretches the last kill */
  case 'run':if(!RUN){hubEnter();return}if(HSTOP>0){HSTOP-=dt;return}if(SLOWT>0){SLOWT-=dt;dt*=SLOWK}runUpdate(dt);fxUpdate(dt);return;
  /* a short lock so mashing attack through a death doesn't skip the summary; the prompt appears when it lifts */
- case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start'))){hubEnter();epCheck()}return;
+ case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start'))){const died=state==='over';hubEnter();epCheck(died)}return;
  case 'ep':epUpdate(dt);return;
  }}

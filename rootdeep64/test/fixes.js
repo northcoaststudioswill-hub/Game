@@ -48,5 +48,5 @@ const {chromium}=require('playwright');const path=require('path');
  ok(!/Cast/.test(s[0])&&/Replaces/.test(s[0]),'dash boon text: "'+s[0]+'"');ok(/\+36 max health/.test(s[1]),'passive text uses the real number: "'+s[1]+'"');
  await ev(()=>{RD.set.grace=true;PL[0].inv=0;RUN.buds=[];RUN.revives=0;PL[0].hp=100;damagePlayer(PL[0],20)});s=await ev(()=>PL[0].hp);ok(Math.round(s)<=90&&Math.round(s)>=89,"Keeper's Grace halves damage (100 -> "+Math.round(s)+')');
  await ev(()=>{RD.set.grace=false;rdDie()});await step(30);await press('kb1','a');s=await ev(()=>state);ok(s==='over','the death screen holds a moment against mashing');
- await step(70);await ev(()=>{RD.ep=Object.fromEntries(EPISODES.map(e=>[e.id,1]))});await press('kb1','a');s=await ev(()=>state);ok(s==='hub','then A goes home');
+ await step(70);await ev(()=>{RD.ep=Object.fromEntries(EPISODES.map(e=>[e.id,1]));window.__rnd0=Math.random;Math.random=()=>.99});await press('kb1','a');s=await ev(()=>{Math.random=window.__rnd0;return state});ok(s==='hub','then A goes home');
  console.log(errs.length?'CONSOLE ERRORS:\n'+[...new Set(errs)].join('\n'):'no console errors');console.log(fails?fails+' FAILED':'ALL GREEN');await br.close();process.exit(fails||errs.length?1:0)})();

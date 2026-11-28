@@ -127,6 +127,13 @@ just before they fire. Online friends see all of it (rebuilt on their side from 
   - 8 Honey given, 8 Mirror ranks, 12 relics read, 25 supers, your first co-op run, and the split.
   Whoever you play stands in the scene as themself; if they're one of the cast, their other lines drop out.
   A: next line. START: skip. Codex page 7 replays any you've seen. Online, the guest watches the same shot.
+- **After a fall: 35 random scenes.** On most deaths (about 3 in 4), when no milestone episode is due, a short scene
+  plays as you wake up, picked to fit how you died. The game records what landed the killing blow, how deep you got,
+  how long the run took, your kills, Moondew, Heat and whether you had a friend. Killed by a crab? Scout upgrades
+  the crab in the catalogue. Died in chamber 1? Marcus: "You died in the LOBBY." The boss that got you has a quiet
+  moment down below. Zero kills, 40+ kills, under 90 seconds, chamber 10+, every tenth death (Louie brings that many
+  sticks)... plus everyday life at home that can follow any fall. None repeats until 8 others have played.
+  Titled "MEANWHILE, AT HOME..." or "...DOWN BELOW"; they're kept on Codex page 7 too.
 - `node test/episodes.js` checks the first pick, plays every beat of every episode, checks that every line fits a phone
   screen, and covers when they trigger, unlocking and replay.
 

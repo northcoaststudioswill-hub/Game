@@ -160,7 +160,7 @@ function epKeeper(){return PL[0]?PL[0].char:keeperDefault()}
 function epBuild(i,keeper){const E=EPISODES[i],z0=EPZ[E.set]||H*.5,K=keeper||epKeeper();const cast={};let drop=null;
  if(E.cast['@']&&E.cast[K]&&K!=='@')drop=K;
  for(const k in E.cast){if(k===drop)continue;const c=E.cast[k];cast[k]={x:W/2+c[0],z:z0+c[1],yaw:c[2]};}
- const beats=[{d:2.4,title:true,cam:E.beats[0].cam==='sky'?'sky':'wide'}];
+ const beats=[{d:E.rnd?1.6:2.4,title:true,cam:E.beats[0].cam==='sky'?'sky':'wide'}];
  for(const b of E.beats){if(b.l&&b.l[0]===drop)continue;beats.push(Object.assign({},b))}
  if(E.card)beats.push({d:2.8,card:E.card,cam:'wide'});
  /* walk each actor's marks through the beats */
@@ -170,9 +170,11 @@ function epBuild(i,keeper){const E=EPISODES[i],z0=EPZ[E.set]||H*.5,K=keeper||epK
  return{i,E,K,cast,beats,b:0,t:0,z0}}
 function epStart(i,back){EPI=epBuild(i);EPI.back=back||'hub';RD.ep=RD.ep||{};RD.ep[EPISODES[i].id]=1;rdSave();state='ep';snd(392,.25,523,'triangle',.05)}
 /* after a run, back home: the first episode whose moment has come */
-function epCheck(){if(NET.client||!RD.flags.cineSeen)return false;RD.ep=RD.ep||{};
- for(let i=0;i<EPISODES.length;i++){const E=EPISODES[i];if(RD.ep[E.id])continue;let ok=false;try{ok=E.when()}catch(e){}
-  if(ok){epStart(i,'hub');return true}}return false}
+function epCheck(died){if(NET.client||!RD.flags.cineSeen)return false;RD.ep=RD.ep||{};
+ for(let i=0;i<EPISODES.length;i++){const E=EPISODES[i];if(RD.ep[E.id]||E.rnd)continue;let ok=false;try{ok=E.when()}catch(e){}
+  if(ok){epStart(i,'hub');return true}}
+ /* nothing big happened: maybe something small did */
+ if(died){const i=epDeathPick();if(i>=0){RD.rndLast=[EPISODES[i].id].concat(RD.rndLast||[]).slice(0,8);epStart(i,'hub');return true}}return false}
 function epEnd(){const E=EPI&&EPI.E;if(E&&E.card){RD.open=RD.open||{};RD.open[E.card]=1;rdSave()}const back=EPI?EPI.back:'hub';EPI=null;state=back==='codex'?'codex':'hub'}
 function epUpdate(dt){if(!EPI){state='hub';return}const B=EPI.beats[EPI.b];EPI.t+=dt;
  if(pressed('start')||pressed('sel')){epEnd();return}
@@ -232,13 +234,203 @@ function sceneEp(dt){if(!EPI)return;const E=EPI.E,B=EPI.beats[EPI.b];const {A,sp
   shadow(a.x,a.z,6);drawCast(who,a.x,a.z,a.yaw,o)}
  frameEnd()}
 const EPPLATE={WILL:'#2a4a8a'};
-function epName(k){if(k==='@')return EPI.K;if(k.startsWith('f:'))return FOES[k.split(':')[1]].n;if(k.startsWith('b:'))return BOSSES[+k.slice(2)].n;return k}
+function epName(k){if(k==='@')return EPI.K;if(k==='???')return '???';if(k.startsWith('f:'))return FOES[k.split(':')[1]].n;if(k.startsWith('b:'))return BOSSES[+k.slice(2)].n;return k}
 function epPlate(k){if(k.startsWith('b:'))return '#4a2050';if(k.startsWith('f:'))return '#3a3040';const n=k==='@'?EPI.K:k;return RDCPLATE[n]||EPPLATE[n]||'#181020'}
 function hudEp(){if(!EPI)return;const B=EPI.beats[EPI.b],t=EPI.t,E=EPI.E;r('#000000',0,0,VW,22);r('#000000',0,VH-22,VW,22);
  if(EPI.b===0&&t<.5)r('rgba(0,0,0,'+(1-t/.5)+')',0,0,VW,VH);
- if(B.title){const a=clamp(Math.min(t/.4,(B.d-t)/.4),0,1);hx.globalAlpha=a;ctext('EPISODE '+(EPI.i+1),VH*.36,1,'#c8c0d8',null);logoText(E.n,VW/2,VH*.36+14,22);hx.globalAlpha=1}
+ if(B.title){const a=clamp(Math.min(t/.4,(B.d-t)/.4),0,1);hx.globalAlpha=a;ctext(E.rnd?(E.set.startsWith('deep')?'MEANWHILE, DOWN BELOW...':'MEANWHILE, AT HOME...'):'EPISODE '+(EPI.i+1),VH*.36,1,'#c8c0d8',null);logoText(E.n,VW/2,VH*.36+14,E.rnd?18:22);hx.globalAlpha=1}
  if(B.card){const a=clamp(t/.4,0,1);hx.globalAlpha=a;ctext('KEEPER UNLOCKED',VH*.34,1,'#a8f080','#120a18');logoText(B.card,VW/2,VH*.34+14,30);ctext('CHOOSE '+B.card+' WHEN YOU DESCEND',VH*.34+52,1,'#c8c0d8','#120a18');hx.globalAlpha=1}
  if(B.txt){const bw=Math.min(350,VW-16),bx=(VW-bw)/2,by=VH-84;panel(bx,by,bw,56,'#f4ead2','#281c30');const nm=epName(B.l[0]),pc=epPlate(B.l[0]),nw=tw(nm,2)+14;
   r('#181020',bx+6,by-10,nw,17);r(pc,bx+7,by-9,nw-2,15);text(nm,bx+13,by-7,2,'#ffffff',null);
   let left=Math.floor(t*60);wrapPx(B.txt,bw-22,1).slice(0,3).forEach((l,i)=>{if(left<=0)return;text(l.slice(0,left),bx+11,by+12+i*13,1,'#281c30',null);left-=l.length+1})}
  rtext(btnName(lead0(),'a')+': NEXT   '+btnName(lead0(),'start')+': SKIP',VW-8,VH-15,1,'#8d84a8',null)}
+
+/* =====================================================================
+   After a death: little scenes that might happen when you wake up.
+   Not milestones: a random one, picked to fit how you just died (what
+   landed the last hit, how deep you got, how long it took, who you
+   played, whether you were with a friend). Most deaths get one; none
+   repeats until several others have played. Codex page 7 keeps them too.
+   ===================================================================== */
+const LR=()=>RD.lastRun||{};
+const KNAME=k=>(FOES[k]&&FOES[k].n.toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase()))||({mother:'the Grub Mother',king:'the Drowned King',hollow:'the Hollow Keeper',hazard:'the floor, somehow'})[k]||'the deep';
+const killedBy=k=>LR().killer===k;
+const DEATHEPS=[
+ {id:'r_lobby',n:'THE LOBBY',set:'hearth',wt:()=>LR().chamber<=1?4:0,
+  cast:{MARCUS:[10,-6,-1],ERIN:[-30,0,1],'@':[-8,16,3.14]},
+  beats:[{l:['MARCUS',"Chamber one. Bro. You died in the LOBBY."],cam:'close'},
+   {l:['ERIN',"Everybody trips on the first step."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"Not everybody. I'm keeping a list. You're on it twice."],cam:'close'}]},
+ {id:'r_grub',n:'MOSTLY MOUTH',set:'hearth',wt:()=>killedBy('grub')?4:0,
+  cast:{SCOUT:[20,-10,-.8],'@':[-14,6,.8],LOUIE:[4,20]},
+  beats:[{l:['SCOUT',"A Grublet. You were taken out by a Grublet. They're mostly mouth and confidence."],cam:'close'},
+   {l:['@',KL("It had friends.","It was a very confident mouth.","GRRR. (He would like a rematch. Just him and the grub.)","Bro, it had like six friends. I counted. I had zero friends.")],cam:'close'},
+   {l:['LOUIE',"WOOF. (He has heard enough. He is going to go glare at the door.)"],act:{LOUIE:'happy'},mv:{LOUIE:[0,44]},cam:'wide'}]},
+ {id:'r_beetle',n:'STRAIGHT LINES',set:'hearth',wt:()=>killedBy('beetle')?4:0,
+  cast:{RANGER:[24,-8,-1],MARCUS:[-20,-4,1],'@':[0,14,3.14]},
+  beats:[{l:['RANGER',"Root beetles charge in straight lines. Step to the side. That's the whole lesson."],cam:'close'},
+   {l:['MARCUS',"Or stand there and let it hit you, so it's tired for the next guy. That's teamwork, bro."],cam:'two',with:'RANGER'},
+   {l:['RANGER',"...That is not the lesson."],cam:'close'}]},
+ {id:'r_crab',n:'THE CRAB DECIDED',set:'hearth',wt:()=>killedBy('crab')?4:0,
+  cast:{SCOUT:[0,-12,0],'p:board':[14,-30],ERIN:[-30,4,.8]},
+  beats:[{l:['SCOUT',"The crab got you? I wrote 'undecided' next to the crab. It decided."],act:{SCOUT:'atk'},cam:'close'},
+   {l:['ERIN',"Maybe cross it off, then."],cam:'two',with:'SCOUT'},
+   {l:['SCOUT',"I'm upgrading it to 'hostile, but with a nice shell'."],cam:'close'}]},
+ {id:'r_spit',n:'FROM ALL THE WAY OVER THERE',set:'deep0',wt:()=>killedBy('spitter')?4:0,
+  cast:{'f:spitter:1':[-12,0,1],'f:spitter:2':[12,0,-1]},
+  beats:[{l:['f:spitter:1',"(Did you see that? From all the way over here.)"],cam:'two',with:'f:spitter:2'},
+   {l:['f:spitter:2',"(Distance. Is. Everything.)"],cam:'close'},
+   {l:['f:spitter:1',"(It'll be back.)"],cam:'close'},
+   {l:['f:spitter:2',"(Then we'll be further away.)"],cam:'wide'}]},
+ {id:'r_shade',n:'IT WINKED',set:'hearth',wt:()=>killedBy('shade')?4:0,
+  cast:{ERIN:[-16,-4,1],MARCUS:[16,-4,-1],'@':[0,16,3.14]},
+  beats:[{l:['ERIN',"Mothshades blink behind you. When one winks, you dash. That's the rule."],cam:'close'},
+   {l:['MARCUS',"Or you wink back. Assert dominance."],cam:'close'},
+   {l:['ERIN',"Has that ever worked?"],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"Once. Different moth."],cam:'close'}]},
+ {id:'r_wisp',n:'ANGRY CANDLES',set:'hearth',wt:()=>killedBy('wisp')?4:0,
+  cast:{MARCUS:[0,-6,0],LOUIE:[20,12],'@':[-22,10,1]},
+  beats:[{l:['MARCUS',"An Ember Wisp? Those things are just angry candles, bro. You got beat by a candle."],cam:'close'},
+   {l:['LOUIE',"WHINE. (He was also once beaten by a candle. He understands.)"],cam:'low',at:'LOUIE'},
+   {l:['MARCUS',"Idea: next time, blow."],act:{MARCUS:'sup'},cam:'close'}]},
+ {id:'r_mother',n:'LIKE WEATHER',set:'deep0',wt:()=>killedBy('mother')?5:0,
+  cast:{'b:0':[0,-20,0],'f:grub:1':[-24,8],'f:grub:2':[24,10]},
+  beats:[{l:['b:0',"(Again it came. Again it went home. Like weather.)"],cam:'low'},
+   {l:['f:grub:2',"(Will it come back, Mother?)"],cam:'close'},
+   {l:['b:0',"(It always does. Eat your roots. You'll need your strength.)"],cam:'wide'}]},
+ {id:'r_king',n:'THE GOOD TOWEL',set:'deep1',wt:()=>killedBy('king')?5:0,
+  cast:{'b:1':[0,-20,0],'f:crab:1':[-26,4,.6]},
+  beats:[{l:['b:1',"(Another one. How tiresome. Fetch my good towel.)"],cam:'low'},
+   {l:['f:crab:1',"(We only have the one towel, Majesty.)"],cam:'close'},
+   {l:['b:1',"(Then it is my good towel.)"],cam:'close'}]},
+ {id:'r_hollow',n:'NOT YET',set:'deep2',wt:()=>killedBy('hollow')?5:0,fx:'lamp',
+  cast:{'b:2':[0,10,3.14]},
+  beats:[{l:['b:2',"(Not yet. You aren't ready to be me yet.)"],cam:'close'},
+   {l:['b:2',"(Go home. Eat something. Come back taller.)"],cam:'low'}]},
+ {id:'r_close',n:'SO CLOSE',set:'hearth',wt:()=>LR().chamber>=10&&LR().by==='deep'?4:0,
+  cast:{ERIN:[-10,0,.8],LOUIE:[12,10],'@':[10,-8,-2.4]},
+  beats:[{l:['ERIN',()=>"Chamber "+LR().chamber+". You were so close I can smell the smoke on you."],cam:'two',with:'@'},
+   {l:['LOUIE',"WHINE. (He sniffs you. Yes. Smoke. And victory, nearly.)"],act:{LOUIE:'happy'},cam:'low',at:'LOUIE'},
+   {l:['ERIN',"Nearly is a place too. You'll just pass through it next time."],cam:'close'}]},
+ {id:'r_trade',n:"THAT'S A TRADE",set:'hearth',wt:()=>(LR().kills||0)>=40?3:0,
+  cast:{MARCUS:[10,-4,-1],'@':[-12,8,1]},
+  beats:[{l:['MARCUS',()=>"You took "+LR().kills+" of them with you. That's not a loss, bro. That's a trade."],cam:'close'},
+   {l:['@',KL("A bad trade.","A trade I'd make again.","BOOF. (He would make it again. With more biting.)","I know. I invented trades. Idea from like last year.")],cam:'close'},
+   {l:['MARCUS',"See, that's the attitude. Terrible math. Great attitude."],cam:'two',with:'@'}]},
+ {id:'r_zero',n:'PACIFIST',set:'hearth',wt:()=>(LR().kills||0)===0?4:0,
+  cast:{MARCUS:[0,-8,0],ERIN:[-30,4,.8]},
+  beats:[{l:['MARCUS',"Zero. You killed zero things. Pacifist run? Respect. Weird. But respect."],cam:'close'},
+   {l:['ERIN',"Maybe they were just having a quiet day."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"Nobody has a quiet day down there, Erin. That's the whole brand."],cam:'close'}]},
+ {id:'r_quick',n:'NINETY SECONDS',set:'hearth',wt:()=>(LR().time||999)<90?3:0,
+  cast:{MARCUS:[6,-6,-1],SCOUT:[-24,0,1],'@':[0,16,3.14]},
+  beats:[{l:['MARCUS',()=>LR().time+" seconds. I didn't even finish my sandwich. Bro, I had ONE bite."],cam:'close'},
+   {l:['SCOUT',"Speedruns are a valid way to play!"],act:{SCOUT:'happy'},cam:'close'},
+   {l:['MARCUS',"Speedruns end at the END, Scout."],cam:'two',with:'SCOUT'}]},
+ {id:'r_long',n:'THE LONG WAY DOWN',set:'garden',sky:'night',wt:()=>(LR().time||0)>600?3:0,
+  cast:{ERIN:[-14,4,1],'@':[14,2,-1]},
+  beats:[{l:['ERIN',()=>"You were gone "+Math.round(LR().time/60)+" minutes. I watered everything twice. Then I watered the dog."],cam:'two',with:'@'},
+   {l:['@',KL("It felt longer.","Did he like it?","WOOF. (He did like it.)","Bro. Did he like it?")],cam:'close'},
+   {l:['ERIN',"He did not."],cam:'close'}]},
+ {id:'r_bed',n:'KEPT WARM',set:'hearth',wt:()=>1,
+  cast:{LOUIE:[-92,-10],'@':[-62,10,-2]},
+  beats:[{d:2.6,act:{LOUIE:'down'},cam:'close',at:'LOUIE'},
+   {l:['LOUIE',"Zzz... (He was keeping your bed warm. He would like credit for this.)"],act:{LOUIE:'down'},cam:'two',with:'@'},
+   {l:['LOUIE',"(He is not moving. You can have the other half.)"],act:{LOUIE:'happy'},cam:'wide'}]},
+ {id:'r_soup',n:'HONEY SOUP',set:'hearth',wt:()=>1,
+  cast:{MARCUS:[-50,-16,3.6],'p:table':[-52,-28],ERIN:[0,0,-1.4],'@':[-26,12,3.4]},
+  beats:[{l:['MARCUS',"I made soup. It's mostly honey. Don't tell Erin."],act:{MARCUS:'atk'},cam:'close'},
+   {l:['ERIN',"I can hear you."],cam:'close'},
+   {l:['MARCUS',"...It's mostly soup."],face:{MARCUS:'ERIN'},cam:'two',with:'ERIN'}]},
+ {id:'r_map',n:'THE MAP MOVED',set:'hearth',wt:()=>1,
+  cast:{RANGER:[-14,-12,.8],SCOUT:[14,-12,-.8],'p:board':[0,-34]},
+  beats:[{l:['RANGER',"The deep moved again. Every path I drew is wrong now."],cam:'two',with:'SCOUT'},
+   {l:['SCOUT',"It moved while the keeper was IN it. Rude of it, honestly."],cam:'close'},
+   {l:['RANGER',"Rude is how it stays alive. Draw it again."],cam:'close'}]},
+ {id:'r_idea',n:'ANOTHER IDEA',set:'hearth',wt:()=>1.5,
+  cast:{MARCUS:[0,-4,0],ERIN:[-28,6,1],'@':[24,8,-1]},
+  beats:[{l:['MARCUS',"Bro. I got an idea."],cam:'close'},
+   {l:['MARCUS',()=>marcusIdea(true)],cam:'close'},
+   {l:['ERIN',"That's backwards."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"It's forwards. You're facing the wrong way."],cam:'close'}]},
+ {id:'r_together',n:'TOGETHER, AT LEAST',set:'hearth',wt:()=>(LR().co||[]).length>1?4:0,
+  cast:{MARCUS:[0,-8,0],ERIN:[30,0,-.8],LOUIE:[-26,8]},
+  beats:[{l:['MARCUS',"You BOTH died? Together? That's cute. That's tragic. But cute."],cam:'close'},
+   {l:['ERIN',"Nobody goes down alone in this house. Not even dying."],cam:'two',with:'MARCUS'},
+   {l:['LOUIE',"WOOF. (He would also like to die together next time. He means it nicely.)"],act:{LOUIE:'happy'},cam:'low',at:'LOUIE'}]},
+ {id:'r_heat',n:'HARDER ON PURPOSE',set:'hearth',wt:()=>(LR().heat||0)>0?3:0,
+  cast:{RANGER:[0,-6,0],'@':[0,14,3.14]},
+  beats:[{l:['RANGER',"You made it harder on purpose. And then it was harder."],cam:'close'},
+   {l:['RANGER',"That's not bad luck. That's a promise the deep kept. Keep yours."],cam:'low',at:'RANGER'}]},
+ {id:'r_sticks',n:'ONE FOR EVERY TIME',set:'garden',wt:()=>stn('deaths')%10===0?6:0,
+  cast:{LOUIE:[0,6,0],'@':[0,-14,0],'p:shard':[10,10],'p:shard2':[-10,12],'p:shard3':[4,18]},
+  beats:[{l:['LOUIE',()=>"BOOF. (He has brought you "+stn('deaths')+" sticks. One for every time. He is running out of tree.)"],act:{LOUIE:'happy'},cam:'close'},
+   {l:['@',KL("Thank you, Louie.","Good boy. Best boy. Worst gardener.","AWOO. (He brings himself a stick too. It is only fair.)","Bro. These are just sticks. ...I'm keeping all of them.")],cam:'two',with:'LOUIE'}]},
+ {id:'r_dew',n:'THE DEEP PAYS',set:'hearth',wt:()=>(LR().dew||0)>=30?2:0,
+  cast:{ERIN:[0,-6,0],'@':[0,14,3.14]},
+  beats:[{l:['ERIN',()=>"You brought home "+LR().dew+" Moondew even dying. The deep pays its debts, at least."],cam:'close'},
+   {l:['ERIN',"Go spend it at the Mirror before Marcus finds out it exists."],cam:'close'}]},
+ {id:'r_gate',n:'DID YOU SEE A GATE',set:'hearth',wt:()=>RD.flags.ev_v1?1.5:0,
+  cast:{ERIN:[0,-10,0],'@':[10,10,-2.6]},fx:'none',
+  beats:[{l:['ERIN',"Down there. Did you see a gate? Old stone, slightly open?"],cam:'close'},
+   {l:['@',KL("No. Should I have?","No. Just roots. Lots of roots.","WOOF? (Was the gate made of food?)","Bro, I saw like nine gates. They were all doors.")],cam:'close'},
+   {l:['ERIN',"...Never mind. Eat something."],cam:'two',with:'@'}]},
+ {id:'r_twins',n:'TWO LIGHTS PASSING',set:'garden',sky:'night',fx:'twins',wt:()=>RD.flags.split?2:0,
+  cast:{'@':[0,40,3.14]},
+  beats:[{d:3.4,cam:'sky'},
+   {l:['???',"(Two lights cross the sky above the garden. One of them waves. You're almost sure.)"],cam:'sky'}]},
+ {id:'r_quiet',n:'SITTING WITH YOU',set:'garden',sky:'night',wt:()=>1,
+  cast:{'@':[-6,10,3.14],LOUIE:[-40,40]},
+  beats:[{d:3,mv:{LOUIE:[8,12]},mt:2.6,cam:'wide'},
+   {l:['LOUIE',"(He doesn't say anything. He sits next to you. That's the whole thing.)"],act:{LOUIE:'down'},cam:'two',with:'@'}]}];
+/* everyday life at home: these can follow any fall */
+DEATHEPS.push(
+ {id:'r_laundry',n:'LAUNDRY DAY',set:'garden',wt:()=>1,
+  cast:{ERIN:[-12,-6,1],MARCUS:[18,4,-1.2]},
+  beats:[{l:['MARCUS',"Why is my shirt on the line? I was wearing that."],cam:'two',with:'ERIN'},
+   {l:['ERIN',"You fell asleep in a puddle of grub. On purpose, you said."],cam:'close'},
+   {l:['MARCUS',"It was a strategy. Grubs don't attack grubs, bro."],cam:'close'}]},
+ {id:'r_game',n:'YOUR MOVE',set:'hearth',wt:()=>1,
+  cast:{SCOUT:[-12,-20,1.4],RANGER:[12,-20,-1.4],'p:table':[0,-24]},
+  beats:[{l:['SCOUT',"Your move."],cam:'two',with:'RANGER'},
+   {l:['RANGER',"I moved three turns ago."],cam:'close'},
+   {l:['SCOUT',"Oh. Then I've been losing for a while."],act:{SCOUT:'happy'},cam:'close'}]},
+ {id:'r_guard',n:'ON WATCH',set:'hearth',wt:()=>1,
+  cast:{LOUIE:[0,40,3.14],'@':[-30,10,1.6]},
+  beats:[{d:2.4,cam:'low',at:'LOUIE'},
+   {l:['LOUIE',"(He is guarding the hole. Nothing comes up on his watch. Except you. You're allowed.)"],cam:'close',at:'LOUIE'}]},
+ {id:'r_review',n:'TWO OUT OF TEN',set:'hearth',wt:()=>1,
+  cast:{MARCUS:[0,-6,0],'@':[0,16,3.14],LOUIE:[24,8]},
+  beats:[{l:['MARCUS',"Okay. Review of that run. Two out of ten. The two is for the outfit."],cam:'close'},
+   {l:['@',KL("What was wrong with the rest?","The outfit was a two?","WOOF. (He gives it a ten. He gives everything a ten.)","Bro, I'm reviewing ME? ...Two is harsh. Fair. But harsh.")],cam:'close'},
+   {l:['LOUIE',"BOOF! (Ten!)"],act:{LOUIE:'cheer'},cam:'wide'}]},
+ {id:'r_sketch',n:'HOLD STILL',set:'hearth',wt:()=>1,
+  cast:{SCOUT:[-16,4,1.2],'@':[16,0,-1.2],'p:board':[-30,-14]},
+  beats:[{l:['SCOUT',"Hold still! I'm drawing you for the catalogue."],act:{SCOUT:'atk'},cam:'two',with:'@'},
+   {l:['SCOUT',"Under 'things that keep coming back'. You're next to the grubs. It's a compliment."],cam:'close'}]},
+ {id:'r_bramble',n:'HOMEWORK',set:'hearth',wt:()=>1,
+  cast:{RANGER:[60,-30,-.6],'@':[30,-6,2.4]},
+  beats:[{l:['RANGER',"Bramble used to say the deep doesn't kill keepers. It sends them home with homework."],cam:'close'},
+   {l:['RANGER',"So. What did it teach you this time?"],cam:'two',with:'@'}]},
+ {id:'r_plants',n:'THEY COME BACK',set:'garden',wt:()=>1,
+  cast:{ERIN:[0,-12,3.14]},
+  beats:[{l:['ERIN',"Don't look at me like that. Everything that goes into the ground comes back."],cam:'close'},
+   {l:['ERIN',"Every spring. Every time. Same as the keeper."],cam:'wide'}]},
+ {id:'r_race',n:'THE RACE',set:'garden',wt:()=>1,
+  cast:{MARCUS:[-70,30,1.57],LOUIE:[-70,42,1.57]},
+  beats:[{l:['MARCUS',"Race you to the lantern. Three, two, one, GO."],cam:'two',with:'LOUIE'},
+   {d:2.4,mv:{MARCUS:[10,30],LOUIE:[50,40]},mt:1.6,cam:'pan'},
+   {l:['LOUIE',"AWOO! (He wins. He always wins. He is a dog.)"],act:{LOUIE:'cheer'},cam:'close',at:'LOUIE'},
+   {l:['MARCUS',"Best of nine hundred."],cam:'close'}]},
+ {id:'r_roots',n:'A WHOLE GARDEN',set:'hearth',wt:()=>LR().chamber>=5?2:0,
+  cast:{ERIN:[-6,0,1.3],'@':[10,2,-1.6]},
+  beats:[{l:['ERIN',"Hold still. You've got a root in your hair. Two roots. A whole little garden."],cam:'two',with:'@'},
+   {l:['ERIN',"...I'm keeping this one. It's got a bud on it."],act:{ERIN:'happy'},cam:'close'}]});
+for(const e of DEATHEPS){e.rnd=true;e.when=()=>false;EPISODES.push(e)}
+EPNAMES.length=0;EPNAMES.push(...EPISODES.map(e=>e.n));
+/* pick a scene for this death: weighted by fit, never one of the last few, and not every time */
+function epDeathPick(force){RD.rndLast=RD.rndLast||[];if(!force&&Math.random()>.75)return-1;const K=epKeeper(),C=[];let tot=0;
+ EPISODES.forEach((E,i)=>{if(!E.rnd||RD.rndLast.includes(E.id))return;let w=0;try{w=E.wt()}catch(e){}if(w<=0)return;
+  if(!epBuild(i,K).beats.some(b=>b.txt))return;C.push([i,w]);tot+=w});
+ if(!C.length&&RD.rndLast.length>2){const keep=RD.rndLast.slice(0,2);const saved=RD.rndLast;RD.rndLast=keep;const j=epDeathPick(true);RD.rndLast=saved;return j}
+ if(!C.length)return-1;let r=Math.random()*tot;for(const [i,w] of C){r-=w;if(r<=0)return i}return C[C.length-1][0]}
