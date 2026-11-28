@@ -1,5 +1,7 @@
 # Starhaven — the story in this concept build
 
+> **The world has changed (Nov 28, 2026):** this file describes the story as it is in the game today, in the old fae-court setting. The new world, *The Fallen Sky*, is in `WORLD.md`; the game will be rewritten to it.
+
 This is what the player sees and does, in order. It follows `DESIGN.md` ("Story outline" and "Chapter goals"):
 the first playable is the Prologue through Chapter 2. Every line of dialogue lives in `game/src/story.js`.
 

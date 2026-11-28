@@ -1,5 +1,7 @@
 # Romantasy Court Game — Design Outline
 
+> **The world has changed (Nov 28, 2026):** the fae-court setting is replaced by *The Fallen Sky*. See `WORLD.md`. Where this file describes fae, courts, the Wall, the Thorn Queen or mates, WORLD.md wins.
+
 Nov 16, 2026 · @William Cohen
 
 ## The pitch
