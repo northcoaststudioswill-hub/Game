@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Rootdeep 64</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{height:100%;margin:0;background:#07050e;overflow:hidden}
+body{font-family:"Arial Black","Avenir Next","Trebuchet MS",Arial,sans-serif;color:#e8e4f5;
+ -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;overscroll-behavior:none;
+ padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+#stage{position:absolute;left:0;top:0;overflow:hidden;background:#07050e}
+/* the 3D picture is rendered at 240 lines and stretched soft, like a cartridge on a tube */
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:auto}
+#hud{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+#nogl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:#ffd94d}
+/* touch controls: hidden until a finger shows up */
+#pad{position:absolute;inset:0;pointer-events:none;display:none}
+body.touch #pad{display:block}
+#stickzone{position:absolute;left:0;bottom:0;width:46%;height:70%;pointer-events:auto}
+#stickbase{position:absolute;left:92px;bottom:92px;top:auto;width:104px;height:104px;margin:-52px 0 0 -52px;border-radius:50%;
+ background:rgba(232,228,245,.10);border:2px solid rgba(232,228,245,.28)}
+#stickbase:not(.on){top:auto !important;left:92px !important;margin:0 0 0 -52px;bottom:40px}
+#nub{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:rgba(255,217,77,.55);border:2px solid rgba(20,12,24,.6)}
+.tb{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:15px;
+ color:#1a1020;border:2px solid rgba(20,12,24,.65);opacity:.72}
+.tb.on{opacity:1;transform:scale(.93)}
+.tb[data-b=a]{right:22px;bottom:34px;width:86px;height:86px;background:#58a8f8;font-size:26px}
+.tb[data-b=b]{right:118px;bottom:22px;width:66px;height:66px;background:#58d078;font-size:21px}
+.tb[data-b=dash]{right:34px;bottom:132px;width:66px;height:66px;background:#ffd94d;font-size:13px}
+.tb[data-b=start]{right:14px;top:10px;width:64px;height:28px;border-radius:14px;background:#e84a5f;color:#fff;font-size:10px;opacity:.6}
+/* portrait: the picture sits on top and the controls get their own deck below, like a handheld */
+body.portrait #pad{top:auto}
+body.portrait #stickzone{width:50%;height:38%}
+body.portrait .tb[data-b=start]{top:auto;bottom:calc(38% + 8px);right:14px}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="gl"></canvas><canvas id="hud"></canvas><div id="nogl" hidden>ROOTDEEP 64 needs WebGL, and this browser has it switched off.</div></div>
+<div id="pad">
+ <div id="stickzone"><div id="stickbase"><div id="nub"></div></div></div>
+ <div class="tb" data-b="dash">DASH</div><div class="tb" data-b="b">B</div><div class="tb" data-b="a">A</div><div class="tb" data-b="start">START</div>
+</div>
+<script>
+'use strict';
+/*@include engine.js*/
+/*@include input.js*/
+/*@include data.js*/
+/*@include game.js*/
+/*@include models.js*/
+/*@include ui.js*/
+/*@include main.js*/
+</script>
+</body>
+</html>

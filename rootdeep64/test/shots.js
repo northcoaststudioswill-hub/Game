@@ -1,0 +1,30 @@
+/* Screenshot rig: drives the real build in headless Chromium and saves frames.
+   usage: node test/shots.js [outdir]   (look at the frames before claiming a visual fix) */
+const {chromium}=require('playwright');const path=require('path');
+(async()=>{const out=process.argv[2]||path.join(__dirname,'shots');require('fs').mkdirSync(out,{recursive:true});
+ const br=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
+ const pg=await br.newPage({viewport:{width:960,height:540},deviceScaleFactor:1});const errs=[];
+ pg.on('console',m=>{if(m.type()==='error')errs.push(m.text())});pg.on('pageerror',e=>errs.push('PAGEERROR '+e.message));
+ await pg.goto('file://'+path.join(__dirname,'..','index.html'));await pg.waitForTimeout(600);
+ const shot=async n=>{await pg.waitForTimeout(350);await pg.screenshot({path:path.join(out,n+'.png')})};
+ const ev=f=>pg.evaluate(f);
+ await shot('01-title');
+ await ev(()=>{__rd.RDF.start()});await shot('02-hub');
+ await ev(()=>{__rd.RDF.talk('MARCUS')});await shot('03-talk');
+ await ev(()=>{__rd.RDF.open('mirror')});await shot('04-mirror');
+ await ev(()=>{__rd.RDF.open('sprouts')});await shot('05-ledger');
+ await ev(()=>{__rd.RDF.start();__rd.RDF.join('gp0');__rd.RDF.join('gp1');charsEnter()});await shot('06-chars');
+ await ev(()=>{__rd.RDF.depart();RUN.pods.push({type:2,x:100,y:120});for(let t=0;t<6;t++)RUN.buds.push({type:t,x:140,y:200,a:t,cd:0,z:0,own:t%3})});await pg.waitForTimeout(900);await shot('07-run-burrows');
+ await ev(()=>{__rd.RDF.clearRoom()});await pg.waitForTimeout(500);await shot('08-doors');
+ await ev(()=>{__rd.RDF.forceBoon('ZIP')});await shot('09-boon');
+ await ev(()=>{state='run';__rd.RDF.goto(4)});await pg.waitForTimeout(1500);await shot('10-boss-mother');
+ await ev(()=>{__rd.RDF.goto(6)});await pg.waitForTimeout(1200);await shot('11-vault');
+ await ev(()=>{__rd.RDF.goto(8)});await pg.waitForTimeout(1500);await shot('12-boss-king');
+ await ev(()=>{__rd.RDF.goto(10)});await pg.waitForTimeout(1200);await shot('13-core');
+ await ev(()=>{__rd.RDF.goto(12)});await pg.waitForTimeout(1500);await shot('14-boss-hollow');
+ await ev(()=>{pauseSel=0;pausePage=0;state='pause'});await shot('15-pause');
+ await ev(()=>{startCine('menu')});await shot('16-cine-garden');
+ await ev(()=>{rdCineIx=1;rdCineT=2.5});await shot('17-cine-crack');
+ await ev(()=>{rdCineIx=2;rdCineT=1});await shot('18-cine-hearth');
+ await ev(()=>{rdCineIx=3;rdCineT=2.6});await shot('19-cine-door');
+ console.log(errs.length?'ERRORS:\n'+[...new Set(errs)].slice(0,12).join('\n'):'no console errors');await br.close()})();
