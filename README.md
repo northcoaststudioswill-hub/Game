@@ -35,3 +35,7 @@ Everything is drawn in code, so it is all editable in `src/knockout.js`:
 - `MV`, `MVO`, `MN` – shared normal moves, each fighter's tweaks to them, and their move names
 - `S1`, `S2`, `SUP` – the two specials per fighter (X, Y) and supers
 - `SONG` – the chiptune. Any track in `src/tracks.js` tagged `"use":["ko-menu"]` or `["ko-fight"]` plays instead.
+
+## Rootdeep 64
+
+`rootdeep64/` is Rootdeep (the Muse-built cartridge in `muse/games/`) as a standalone 3D game for 1–4 players, controller first. See `rootdeep64/README.md`.

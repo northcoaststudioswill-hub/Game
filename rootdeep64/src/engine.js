@@ -155,7 +155,7 @@ function project(x,y,z){const m=RN.vp,w=m[3]*x+m[7]*y+m[11]*z+m[15];if(w<=0.01)r
 let VW=400,VH=300,hudS=1,portrait=false;
 const IRES=240; /* internal vertical resolution, like a 240p console */
 function layout(){const bw=window.innerWidth,bh=window.innerHeight;portrait=bh>bw*1.15;
- let w=bw,h=bh;if(portrait){h=Math.min(Math.round(bw*.86),Math.round(bh*.58));}
+ let w=bw,h=bh;if(portrait){h=Math.min(bw,Math.round(bh*.56));}
  stage.style.width=w+'px';stage.style.height=h+'px';
  document.body.classList.toggle('portrait',portrait);
  RN.asp=w/h;RN.h=IRES;RN.w=Math.min(520,Math.round(IRES*RN.asp));cv.width=RN.w;cv.height=RN.h;

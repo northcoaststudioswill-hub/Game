@@ -262,11 +262,11 @@ const CAM={x:W/2,z:H/2,d:1,init:false};
 function camFollow(pts,solo,dt,fill){ /* frame the room; lean toward the keepers */
  let cx=W/2,cz=H*.5,sp=0;if(pts.length){cx=0;cz=0;for(const p of pts){cx+=p.x;cz+=p.y}cx/=pts.length;cz/=pts.length;for(const p of pts)sp=Math.max(sp,Math.abs(p.x-cx)/(W*.5),Math.abs(p.y-cz)/(H*.5))}
  const f=fill!==undefined?fill:clamp((solo?.56:.66)+sp*.5,.56,.98);
- const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.52,cz,clamp(1.06-f,0,.6)*1.5);
+ const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.46,cz,clamp(1.06-f,0,.6)*1.5);
  const k=CAM.init?clamp(dt*3.2,0,1):1;CAM.x=lerp(CAM.x,tx,k);CAM.z=lerp(CAM.z,tz,k);CAM.d=lerp(CAM.d,f,k);CAM.init=true;
  const fov=.72,pitch=.8,halfW=(W*.5+16)*CAM.d,halfH=(H*.5+26)*CAM.d;
  /* distance that fits the framed width and depth at this aspect */
- const dW=halfW/(Math.tan(fov/2)*RN.asp),dH=halfH*Math.sin(pitch)/Math.tan(fov/2)*1.02;const D=Math.max(dW,dH)+30;
+ const dW=halfW/(Math.tan(fov/2)*RN.asp),dH=halfH*Math.sin(pitch)/Math.tan(fov/2)*1.16;const D=Math.max(dW,dH)+30;
  let sx=0,sy=0;if(RUN&&RD.set.shake&&RUN.shake>.05){sx=R(-RUN.shake,RUN.shake)*.6;sy=R(-RUN.shake,RUN.shake)*.6}
  setCam([CAM.x+sx,Math.sin(pitch)*D+sy,CAM.z+Math.cos(pitch)*D+8],[CAM.x+sx,4+sy,CAM.z+2],fov)}
 
@@ -293,7 +293,7 @@ function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay)
  if(run&&p.selfie>0)sprite(p.x,16,p.y,90*(p.selfie/.18),[1,1,1],.8*p.selfie/.18,true)}
 function drawCastGhost(p,tr,a){sprite(tr.x,10,tr.y,15,hex(PCOL[p.ix]),.3*a,true)}
 function sceneHub(dt){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#120a12',430,820);
- camFollow(PL,PL.length<2,dt,state==='hub'||state==='talk'?undefined:.9);frameBegin();
+ camFollow(PL,false,dt,PL.length<2?.8:.92);frameBegin();
  drawRoomMesh('hub');
  /* rug + stations along the back wall */
  prop(PROP.rug,W/2,0,H-44);
@@ -377,7 +377,7 @@ function sceneTitle(dt){setLight([.3,.9,.45],[.5,.44,.6],[.26,.22,.36]);setFog('
  for(let i=0;i<14;i++){const t=(time*.08+i*.19)%1;sprite((i*61)%W,90-t*90,(i*37)%H,1.6,hex('#c8b8d8'),.4*(1-t),true)}
  frameEnd()}
 function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
- if(sc.bg==='garden'||sc.bg==='crack'){setLight([.2,.9,.4],[.5,.6,.72],[.3,.4,.42]);setFog('#0a140c',260,640);
+ if(sc.bg==='garden'||sc.bg==='crack'){setLight([.2,.9,.4],[.62,.64,.6],[.58,.6,.56]);setFog('#0a140c',260,640);
   setCam([cx+Math.sin(tt*.2)*14,58,H*.5+150-tt*3],[cx,20,H*.5],.7);frameBegin();drawRoomMesh('garden');
   for(let i=0;i<46;i++)prop(PROP.tuft,(i*47)%(W+160)-80,0,(i*31)%(H+80)-10,i,1.2+(i%3)*.4);
   for(let i=0;i<5;i++)prop(PROP.plant,-30+(i*91)%(W+60),0,20+(i*53)%70,i,1.4);

@@ -32,11 +32,11 @@ body.touch #pad{display:block}
 .tb[data-b=a]{right:22px;bottom:34px;width:86px;height:86px;background:#58a8f8;font-size:26px}
 .tb[data-b=b]{right:118px;bottom:22px;width:66px;height:66px;background:#58d078;font-size:21px}
 .tb[data-b=dash]{right:34px;bottom:132px;width:66px;height:66px;background:#ffd94d;font-size:13px}
-.tb[data-b=start]{right:14px;top:10px;width:64px;height:28px;border-radius:14px;background:#e84a5f;color:#fff;font-size:10px;opacity:.6}
+.tb[data-b=start]{left:50%;margin-left:-32px;top:8px;width:64px;height:26px;border-radius:13px;background:#e84a5f;color:#fff;font-size:10px;opacity:.55}
 /* portrait: the picture sits on top and the controls get their own deck below, like a handheld */
 body.portrait #pad{top:auto}
 body.portrait #stickzone{width:50%;height:38%}
-body.portrait .tb[data-b=start]{top:auto;bottom:calc(38% + 8px);right:14px}
+body.portrait .tb[data-b=start]{top:auto;bottom:240px;left:auto;right:24px;margin:0}
 </style>
 </head>
 <body>
@@ -203,7 +203,7 @@ function project(x,y,z){const m=RN.vp,w=m[3]*x+m[7]*y+m[11]*z+m[15];if(w<=0.01)r
 let VW=400,VH=300,hudS=1,portrait=false;
 const IRES=240; /* internal vertical resolution, like a 240p console */
 function layout(){const bw=window.innerWidth,bh=window.innerHeight;portrait=bh>bw*1.15;
- let w=bw,h=bh;if(portrait){h=Math.min(Math.round(bw*.86),Math.round(bh*.58));}
+ let w=bw,h=bh;if(portrait){h=Math.min(bw,Math.round(bh*.56));}
  stage.style.width=w+'px';stage.style.height=h+'px';
  document.body.classList.toggle('portrait',portrait);
  RN.asp=w/h;RN.h=IRES;RN.w=Math.min(520,Math.round(IRES*RN.asp));cv.width=RN.w;cv.height=RN.h;
@@ -231,7 +231,7 @@ window.addEventListener('keyup',e=>{KEYS[e.code]=false});
 window.addEventListener('blur',()=>{for(const k in KEYS)KEYS[k]=false});
 
 /* ---- touch overlay ---- */
-const TS={id:-1,ox:0,oy:0,x:0,y:0,btn:{}};
+const TS={id:-1,ox:0,oy:0,x:0,y:0,btn:{},latch:{}};
 function touchInit(){const zone=document.getElementById('stickzone'),nub=document.getElementById('nub'),base=document.getElementById('stickbase');
  const woke=()=>{touchSeen=true;anyInput=true;document.body.classList.add('touch');audioWake()};
  const mv=t=>{let dx=t.clientX-TS.ox,dy=t.clientY-TS.oy;const l=Math.hypot(dx,dy),mx=44;if(l>mx){dx=dx/l*mx;dy=dy/l*mx}TS.x=dx/mx;TS.y=dy/mx;nub.style.transform='translate('+dx+'px,'+dy+'px)'};
@@ -241,7 +241,7 @@ function touchInit(){const zone=document.getElementById('stickzone'),nub=documen
  const end=e=>{for(const t of e.changedTouches)if(t.identifier===TS.id){TS.id=-1;TS.x=TS.y=0;nub.style.transform='';base.classList.remove('on');base.style.left='';base.style.top=''}e.preventDefault()};
  zone.addEventListener('touchstart',st,{passive:false});zone.addEventListener('touchmove',move,{passive:false});zone.addEventListener('touchend',end,{passive:false});zone.addEventListener('touchcancel',end,{passive:false});
  for(const el of document.querySelectorAll('[data-b]')){const b=el.dataset.b;
-  const on=e=>{woke();TS.btn[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
+  const on=e=>{woke();TS.btn[b]=true;TS.latch[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
   el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false})}
  if('ontouchstart' in window||navigator.maxTouchPoints>0)document.body.classList.add('touch')}
 
@@ -258,7 +258,9 @@ function pollInput(dt){
  k2.cur={a:!!K.Comma,b:!!(two&&K.Period),dash:!!(two&&(K.Slash||K.ShiftRight)),start:!!(two&&K.Backspace),sel:false,left:!!(two&&l),right:!!(two&&r),up:!!(two&&u),down:!!(two&&d)};
  /* touch */
  const t=DEV.touch;t.mx=axis(TS.x);t.my=axis(TS.y);
- t.cur={a:!!TS.btn.a,b:!!TS.btn.b,dash:!!TS.btn.dash,start:!!TS.btn.start,sel:false,left:TS.x<-.5,right:TS.x>.5,up:TS.y<-.5,down:TS.y>.5};
+ const L=TS.latch;/* a tap shorter than one frame still counts */
+ t.cur={a:!!(TS.btn.a||L.a),b:!!(TS.btn.b||L.b),dash:!!(TS.btn.dash||L.dash),start:!!(TS.btn.start||L.start),sel:false,left:TS.x<-.5,right:TS.x>.5,up:TS.y<-.5,down:TS.y>.5};
+ TS.latch={};
  /* gamepads */
  const pads=navigator.getGamepads?navigator.getGamepads():[];
  for(let i=0;i<pads.length&&i<8;i++){const p=pads[i],id='gp'+i;if(!p){if(DEV[id])DEV[id].live=false;continue}
@@ -1303,11 +1305,11 @@ const CAM={x:W/2,z:H/2,d:1,init:false};
 function camFollow(pts,solo,dt,fill){ /* frame the room; lean toward the keepers */
  let cx=W/2,cz=H*.5,sp=0;if(pts.length){cx=0;cz=0;for(const p of pts){cx+=p.x;cz+=p.y}cx/=pts.length;cz/=pts.length;for(const p of pts)sp=Math.max(sp,Math.abs(p.x-cx)/(W*.5),Math.abs(p.y-cz)/(H*.5))}
  const f=fill!==undefined?fill:clamp((solo?.56:.66)+sp*.5,.56,.98);
- const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.52,cz,clamp(1.06-f,0,.6)*1.5);
+ const tx=lerp(W/2,cx,clamp(1.06-f,0,.6)*1.6),tz=lerp(H*.46,cz,clamp(1.06-f,0,.6)*1.5);
  const k=CAM.init?clamp(dt*3.2,0,1):1;CAM.x=lerp(CAM.x,tx,k);CAM.z=lerp(CAM.z,tz,k);CAM.d=lerp(CAM.d,f,k);CAM.init=true;
  const fov=.72,pitch=.8,halfW=(W*.5+16)*CAM.d,halfH=(H*.5+26)*CAM.d;
  /* distance that fits the framed width and depth at this aspect */
- const dW=halfW/(Math.tan(fov/2)*RN.asp),dH=halfH*Math.sin(pitch)/Math.tan(fov/2)*1.02;const D=Math.max(dW,dH)+30;
+ const dW=halfW/(Math.tan(fov/2)*RN.asp),dH=halfH*Math.sin(pitch)/Math.tan(fov/2)*1.16;const D=Math.max(dW,dH)+30;
  let sx=0,sy=0;if(RUN&&RD.set.shake&&RUN.shake>.05){sx=R(-RUN.shake,RUN.shake)*.6;sy=R(-RUN.shake,RUN.shake)*.6}
  setCam([CAM.x+sx,Math.sin(pitch)*D+sy,CAM.z+Math.cos(pitch)*D+8],[CAM.x+sx,4+sy,CAM.z+2],fov)}
 
@@ -1334,7 +1336,7 @@ function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay)
  if(run&&p.selfie>0)sprite(p.x,16,p.y,90*(p.selfie/.18),[1,1,1],.8*p.selfie/.18,true)}
 function drawCastGhost(p,tr,a){sprite(tr.x,10,tr.y,15,hex(PCOL[p.ix]),.3*a,true)}
 function sceneHub(dt){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#120a12',430,820);
- camFollow(PL,PL.length<2,dt,state==='hub'||state==='talk'?undefined:.9);frameBegin();
+ camFollow(PL,false,dt,PL.length<2?.8:.92);frameBegin();
  drawRoomMesh('hub');
  /* rug + stations along the back wall */
  prop(PROP.rug,W/2,0,H-44);
@@ -1418,7 +1420,7 @@ function sceneTitle(dt){setLight([.3,.9,.45],[.5,.44,.6],[.26,.22,.36]);setFog('
  for(let i=0;i<14;i++){const t=(time*.08+i*.19)%1;sprite((i*61)%W,90-t*90,(i*37)%H,1.6,hex('#c8b8d8'),.4*(1-t),true)}
  frameEnd()}
 function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
- if(sc.bg==='garden'||sc.bg==='crack'){setLight([.2,.9,.4],[.5,.6,.72],[.3,.4,.42]);setFog('#0a140c',260,640);
+ if(sc.bg==='garden'||sc.bg==='crack'){setLight([.2,.9,.4],[.62,.64,.6],[.58,.6,.56]);setFog('#0a140c',260,640);
   setCam([cx+Math.sin(tt*.2)*14,58,H*.5+150-tt*3],[cx,20,H*.5],.7);frameBegin();drawRoomMesh('garden');
   for(let i=0;i<46;i++)prop(PROP.tuft,(i*47)%(W+160)-80,0,(i*31)%(H+80)-10,i,1.2+(i%3)*.4);
   for(let i=0;i<5;i++)prop(PROP.plant,-30+(i*91)%(W+60),0,20+(i*53)%70,i,1.4);
@@ -1537,7 +1539,7 @@ function hudPlayer(p,x,y,right){const s=rdStats(p),w=104;
 function hudRun(){const B=BIOMES[RUN.biome];
  /* world-anchored labels */
  if(RUN.phase==='doors')for(const d of RUN.doors){const q=project(d.x,36,27);if(!q)continue;const lbl=d.kind==='boon'?GODS[d.god].n:d.kind.toUpperCase(),c=d.kind==='boon'?GODS[d.god].l:DOORCOL[d.kind];
-  icon(d.kind,q.x,q.y-8,7,c);ctext(lbl,q.y+2,1,'#ffffff','#120a18',q.x)}
+  const qy=Math.max(46,q.y);icon(d.kind,q.x,qy-8,7,c);ctext(lbl,qy+2,1,'#ffffff','#120a18',q.x)}
  for(const e of RUN.enemies){if(e.kind==='boss'||e.hp>=e.max)continue;const q=project(e.x,(e.kind==='shade'||e.kind==='wisp'?24:17)*(e.elite?1.4:1.1),e.y);if(!q)continue;
   r('#120a18',q.x-11,q.y-2,22,4);r('#e84a5f',q.x-10,q.y-1,Math.round(20*clamp(e.hp/e.max,0,1)),2)}
  for(const p of PL){const q=project(p.x,p.down?12:27,p.y);if(!q)continue;
@@ -1709,8 +1711,8 @@ const RDF={
  forceShop:()=>{if(RUN){shopItems=genShop();uiSel=0;state='shop'}},
  giveRun:(k,n)=>{if(RUN)RUN[k]=(RUN[k]||0)+n},
  pod:t2=>{if(RUN)RUN.pods.push({type:t2,x:PL[0].x,y:PL[0].y})},
- goto:ch=>{if(RUN){RUN.chamber=ch-1;rdNextChamber()}},
- finale:()=>{if(RUN){RUN.chamber=11;rdNextChamber()}},
+ goto:ch=>{if(RUN){RUN.enemies=[];RUN.wave2=null;RUN.boss=null;RUN.chamber=ch-1;rdNextChamber()}},
+ finale:()=>{if(RUN){RUN.enemies=[];RUN.wave2=null;RUN.boss=null;RUN.chamber=11;rdNextChamber()}},
  unlocks:()=>CHARS.map(c=>c.id+':'+(charUnlocked(c.id)?'open':'locked')),
  state:()=>({state,players:PL.map(p=>({ix:p.ix,dev:p.dev.id,char:p.char,hp:Math.round(p.hp),down:!!p.down,x:Math.round(p.x),y:Math.round(p.y),chg:p.dashCharges,ammo:p.castAmmo})),
   run:RUN?{chamber:RUN.chamber,petals:RUN.petals,dew:RUN.dew,enemies:RUN.enemies.length,phase:RUN.phase,buds:RUN.buds.map(b=>b.type),doors:RUN.doors.map(d=>d.kind+(d.kind==='boon'?':'+d.god:'')),

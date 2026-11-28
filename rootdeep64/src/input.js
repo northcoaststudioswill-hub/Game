@@ -20,7 +20,7 @@ window.addEventListener('keyup',e=>{KEYS[e.code]=false});
 window.addEventListener('blur',()=>{for(const k in KEYS)KEYS[k]=false});
 
 /* ---- touch overlay ---- */
-const TS={id:-1,ox:0,oy:0,x:0,y:0,btn:{}};
+const TS={id:-1,ox:0,oy:0,x:0,y:0,btn:{},latch:{}};
 function touchInit(){const zone=document.getElementById('stickzone'),nub=document.getElementById('nub'),base=document.getElementById('stickbase');
  const woke=()=>{touchSeen=true;anyInput=true;document.body.classList.add('touch');audioWake()};
  const mv=t=>{let dx=t.clientX-TS.ox,dy=t.clientY-TS.oy;const l=Math.hypot(dx,dy),mx=44;if(l>mx){dx=dx/l*mx;dy=dy/l*mx}TS.x=dx/mx;TS.y=dy/mx;nub.style.transform='translate('+dx+'px,'+dy+'px)'};
@@ -30,7 +30,7 @@ function touchInit(){const zone=document.getElementById('stickzone'),nub=documen
  const end=e=>{for(const t of e.changedTouches)if(t.identifier===TS.id){TS.id=-1;TS.x=TS.y=0;nub.style.transform='';base.classList.remove('on');base.style.left='';base.style.top=''}e.preventDefault()};
  zone.addEventListener('touchstart',st,{passive:false});zone.addEventListener('touchmove',move,{passive:false});zone.addEventListener('touchend',end,{passive:false});zone.addEventListener('touchcancel',end,{passive:false});
  for(const el of document.querySelectorAll('[data-b]')){const b=el.dataset.b;
-  const on=e=>{woke();TS.btn[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
+  const on=e=>{woke();TS.btn[b]=true;TS.latch[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
   el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false})}
  if('ontouchstart' in window||navigator.maxTouchPoints>0)document.body.classList.add('touch')}
 
@@ -47,7 +47,9 @@ function pollInput(dt){
  k2.cur={a:!!K.Comma,b:!!(two&&K.Period),dash:!!(two&&(K.Slash||K.ShiftRight)),start:!!(two&&K.Backspace),sel:false,left:!!(two&&l),right:!!(two&&r),up:!!(two&&u),down:!!(two&&d)};
  /* touch */
  const t=DEV.touch;t.mx=axis(TS.x);t.my=axis(TS.y);
- t.cur={a:!!TS.btn.a,b:!!TS.btn.b,dash:!!TS.btn.dash,start:!!TS.btn.start,sel:false,left:TS.x<-.5,right:TS.x>.5,up:TS.y<-.5,down:TS.y>.5};
+ const L=TS.latch;/* a tap shorter than one frame still counts */
+ t.cur={a:!!(TS.btn.a||L.a),b:!!(TS.btn.b||L.b),dash:!!(TS.btn.dash||L.dash),start:!!(TS.btn.start||L.start),sel:false,left:TS.x<-.5,right:TS.x>.5,up:TS.y<-.5,down:TS.y>.5};
+ TS.latch={};
  /* gamepads */
  const pads=navigator.getGamepads?navigator.getGamepads():[];
  for(let i=0;i<pads.length&&i<8;i++){const p=pads[i],id='gp'+i;if(!p){if(DEV[id])DEV[id].live=false;continue}

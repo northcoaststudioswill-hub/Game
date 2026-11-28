@@ -89,7 +89,7 @@ function hudPlayer(p,x,y,right){const s=rdStats(p),w=104;
 function hudRun(){const B=BIOMES[RUN.biome];
  /* world-anchored labels */
  if(RUN.phase==='doors')for(const d of RUN.doors){const q=project(d.x,36,27);if(!q)continue;const lbl=d.kind==='boon'?GODS[d.god].n:d.kind.toUpperCase(),c=d.kind==='boon'?GODS[d.god].l:DOORCOL[d.kind];
-  icon(d.kind,q.x,q.y-8,7,c);ctext(lbl,q.y+2,1,'#ffffff','#120a18',q.x)}
+  const qy=Math.max(46,q.y);icon(d.kind,q.x,qy-8,7,c);ctext(lbl,qy+2,1,'#ffffff','#120a18',q.x)}
  for(const e of RUN.enemies){if(e.kind==='boss'||e.hp>=e.max)continue;const q=project(e.x,(e.kind==='shade'||e.kind==='wisp'?24:17)*(e.elite?1.4:1.1),e.y);if(!q)continue;
   r('#120a18',q.x-11,q.y-2,22,4);r('#e84a5f',q.x-10,q.y-1,Math.round(20*clamp(e.hp/e.max,0,1)),2)}
  for(const p of PL){const q=project(p.x,p.down?12:27,p.y);if(!q)continue;
