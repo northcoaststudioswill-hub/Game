@@ -20,6 +20,12 @@
       pal: { skin: 0xd9c9b0, top: 0x15151f, trim: 0xefe9da, shirt: 0xefe9da, tie: 0xb3202a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0x15151f, wrap: 0x15151f } },
     ruth: { h: 0.93, b: 0.86, face: 'ruth', hair: 'bun', robe: true,
       pal: { skin: 0xc99a74, top: 0x6f8fb0, trim: 0x3c5078, shirt: 0xece6d6, tie: 0x6f8fb0, pants: 0x3c5078, boots: 0x23232e, hair: 0x2a1e18, glove: 0xc99a74, wrap: 0x6f8fb0 } },
+    nell: { h: 0.94, b: 0.86, face: 'nell', hair: 'bob', headset: true,
+      pal: { skin: 0xe8b48a, top: 0x6f8f5a, trim: 0x3f5a34, shirt: 0xece6d6, tie: 0x6f8f5a, pants: 0x2a2c33, boots: 0x15151f, hair: 0xc2452e, glove: 0xe8b48a, wrap: 0x6f8f5a } },
+    otis: { h: 1.03, b: 1.18, face: 'otis', hair: 'bald', apron: true, bowtie: true,
+      pal: { skin: 0x8a5a3c, top: 0xece6d6, trim: 0x2f3f62, shirt: 0x2f3f62, tie: 0x8a1f24, pants: 0x23232e, boots: 0x15151f, hair: 0x15151f, glove: 0x8a5a3c, wrap: 0xece6d6 } },
+    josie: { h: 0.95, b: 0.86, face: 'josie', hair: 'long', coat: true,
+      pal: { skin: 0xe8b48a, top: 0x8a1f24, trim: 0x5c1a26, shirt: 0x15151f, tie: 0x15151f, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, streak: 0xf6f2e6, glove: 0x15151f, wrap: 0x8a1f24 } },
     clerk: { h: 1.06, b: 0.84, face: 'clerk', hat: 'bowler', hair: 'bald', book: true,
       pal: { skin: 0xc9cbd6, top: 0x6f7690, trim: 0x474c62, shirt: 0xe9e6da, tie: 0x15151f, pants: 0x474c62, boots: 0x101018, hair: 0x15151f, glove: 0xe9e6da, wrap: 0x6f7690 } }
   };
@@ -78,6 +84,39 @@
       g.fillStyle = '#b3202a'; g.beginPath(); g.moveTo(50, 108); g.quadraticCurveTo(64, 100, 78, 108); g.quadraticCurveTo(64, 116, 50, 108); g.fill();
       stroke([50, 108, 78, 108], 1.5);
       g.fillStyle = '#b09a7c'; g.fillRect(0, 118, S, 10);
+    } else if (kind === 'nell' || kind === 'josie') {
+      const nell = kind === 'nell';
+      g.fillStyle = nell ? '#e8b48a' : '#e3ad86'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#b97f5c'; g.beginPath(); g.moveTo(0, 48); g.lineTo(28, 66); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
+      g.fillStyle = nell ? '#c2452e' : '#15151f'; g.beginPath(); g.moveTo(0, 0); g.lineTo(S, 0); g.lineTo(S, 34); g.quadraticCurveTo(nell ? 70 : 96, nell ? 40 : 30, nell ? 30 : 62, 40); g.lineTo(0, 46); g.fill();
+      if (!nell) { g.fillStyle = '#f6f2e6'; g.beginPath(); g.moveTo(84, 0); g.lineTo(100, 0); g.lineTo(88, 34); g.lineTo(78, 34); g.fill(); }
+      const shut = expr === 'shut', glad = expr === 'smirk', sad = expr === 'hurt';
+      [[42, -1], [86, 1]].forEach(a => {
+        g.fillStyle = ink; g.beginPath(); g.ellipse(a[0], 63, 11, shut || glad ? 3 : 7, 0, 0, 7); g.fill();
+        if (!shut && !glad) { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(a[0], 64, 8, 5, 0, 0, 7); g.fill(); g.fillStyle = nell ? '#3f6b55' : '#3b2a20'; g.beginPath(); g.arc(a[0], 64, 4, 0, 7); g.fill(); }
+        stroke([a[0] - 13 * a[1], 56, a[0] - 17 * a[1], 51], 2.5);
+        stroke([a[0] - 12, sad ? 48 + a[1] * 3 : expr === 'angry' ? 50 - a[1] * 3 : 49, a[0] + 12, sad ? 48 - a[1] * 3 : expr === 'angry' ? 50 + a[1] * 3 : 47], 3.5);
+      });
+      if (nell) { g.strokeStyle = ink; g.lineWidth = 3.5; [[42], [86]].forEach(a => { g.beginPath(); g.moveTo(a[0] - 16, 58); g.lineTo(a[0] + 15, 57); g.lineTo(a[0] + 12, 70); g.lineTo(a[0] - 12, 70); g.closePath(); g.stroke(); }); stroke([57, 60, 71, 60], 3);
+        g.fillStyle = 'rgba(185,90,60,0.6)'; for (let i = 0; i < 14; i++) g.fillRect(34 + (i * 29 % 60), 74 + (i * 11 % 10), 2, 2); }
+      stroke([64, 66, 61, 84, 67, 86], 2.5);
+      g.fillStyle = '#a83a3a';
+      if (glad) { stroke([48, 98, 64, 106, 80, 96], 4); } else if (expr === 'shock') { g.fillStyle = ink; g.beginPath(); g.ellipse(64, 102, 6, 8, 0, 0, 7); g.fill(); }
+      else if (sad) stroke([52, 105, 64, 100, 76, 105], 4); else if (nell) stroke([50, 101, 70, 101, 80, 97], 4); else stroke([54, 101, 74, 101], 4);
+    } else if (kind === 'otis') {
+      g.fillStyle = '#8a5a3c'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#6a3f28'; g.beginPath(); g.moveTo(0, 30); g.lineTo(26, 60); g.lineTo(24, 128); g.lineTo(0, 128); g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.18)'; g.beginPath(); g.ellipse(80, 18, 26, 9, -0.2, 0, 7); g.fill();
+      [[42, -1], [86, 1]].forEach(a => {
+        const wink = expr === 'smirk' && a[1] > 0;
+        g.fillStyle = ink; g.beginPath(); g.ellipse(a[0], 60, 10, wink ? 2 : 6, 0, 0, 7); g.fill();
+        if (!wink) { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(a[0], 61, 7, 4, 0, 0, 7); g.fill(); g.fillStyle = '#2a1a10'; g.beginPath(); g.arc(a[0], 61, 3.5, 0, 7); g.fill(); }
+      });
+      const up = expr === 'angry' ? -4 : 0;
+      stroke([28, 48, 54, 52 + up], 7); stroke([74, expr === 'neutral' ? 44 : 50 + up, 100, expr === 'neutral' ? 46 : 48], 7);
+      stroke([64, 62, 58, 82, 68, 84], 3);
+      g.fillStyle = '#1a120c'; g.beginPath(); g.moveTo(36, 94); g.quadraticCurveTo(64, 82, 92, 94); g.quadraticCurveTo(96, 104, 86, 102); g.quadraticCurveTo(64, 94, 42, 102); g.quadraticCurveTo(32, 104, 36, 94); g.fill();
+      if (expr === 'smirk') stroke([52, 108, 66, 112, 78, 106], 3.5); else if (expr === 'shock') { g.fillStyle = ink; g.beginPath(); g.ellipse(64, 110, 6, 6, 0, 0, 7); g.fill(); } else stroke([54, 109, 74, 109], 3.5);
     } else if (kind === 'ruth') {
       g.fillStyle = '#c99a74'; g.fillRect(0, 0, S, S);
       g.fillStyle = '#9a6e4e'; g.beginPath(); g.moveTo(0, 50); g.lineTo(28, 66); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
@@ -250,6 +289,24 @@
       part('hips', tbox(0.34 * b, 0.82, 0.05, 1, 1.3), 0, -0.4, 0.12 * b, pal.top);
       part('chest', tbox(0.2, 0.07, 0.27 * b), 0, 0.29, 0.005, pal.trim, null, 0.01);
     }
+    if (sp.hair === 'bob') {
+      part('head', tbox(0.26, 0.11, 0.27, 0.8, 1), 0, 0.235, -0.02, pal.hair, [-0.12, 0, 0]);
+      part('head', tbox(0.26, 0.24, 0.1, 1, 1.05), 0, 0.1, -0.11, pal.hair);
+      part('head', tbox(0.05, 0.24, 0.2), 0.125, 0.1, -0.01, pal.hair, null, 0.01); part('head', tbox(0.05, 0.24, 0.2), -0.125, 0.1, -0.01, pal.hair, null, 0.01);
+      part('head', tbox(0.22, 0.06, 0.08), 0.02, 0.24, 0.09, pal.hair, [0.3, 0, -0.15]);
+    }
+    if (sp.hair === 'long') {
+      part('head', tbox(0.25, 0.11, 0.27, 0.8, 1), 0, 0.235, -0.02, pal.hair, [-0.12, 0, 0]);
+      part('head', tbox(0.25, 0.4, 0.1, 1, 1.1), 0, 0.02, -0.12, pal.hair);
+      part('head', tbox(0.05, 0.36, 0.18), 0.125, 0.04, -0.02, pal.hair, null, 0.01); part('head', tbox(0.05, 0.36, 0.18), -0.125, 0.04, -0.02, pal.hair, null, 0.01);
+      part('head', tbox(0.06, 0.08, 0.2, 0.4, 1), 0.07, 0.27, 0.06, pal.streak || pal.hair, [0.4, -0.2, -0.1]);
+    }
+    if (sp.headset) {
+      part('head', tbox(0.26, 0.03, 0.05), 0, 0.285, 0.0, 0x23232e, null, 0.008);
+      part('head', tbox(0.04, 0.09, 0.08), 0.14, 0.13, 0.0, 0x23232e, null, 0.01);
+      part('head', tbox(0.015, 0.015, 0.13), 0.13, 0.08, 0.08, 0x23232e, [0.3, -0.4, 0], 0.006);
+    }
+    if (sp.bowtie) { part('chest', tbox(0.11, 0.05, 0.03), 0, 0.27, 0.13 * b, pal.tie, null, 0.008); part('chest', tbox(0.27 * b, 0.26, 0.02, 1, 0.7), 0, 0.1, 0.122 * b, pal.trim, null, 0.006); }
     if (sp.veil) {
       part('head', tbox(0.3, 0.5, 0.31, 0.25, 1), 0, 0.38, -0.02, pal.top);
       part('head', tbox(0.3, 0.3, 0.12, 1, 0.9), 0, 0.12, -0.13, pal.top);
@@ -485,6 +542,9 @@
   P.ruth = t => ({ spine: [0.04, 0, 0], head: [0.15 + Math.sin(t * 0.6) * 0.05, Math.sin(t * 0.45) * 0.15, 0.08], shL: [-0.75, 0.35, 0.15], elL: [-1.6, 0, 0], shR: [-0.75, -0.35, -0.15], elR: [-1.6, 0, 0],
     tailB: [0.05 + Math.sin(t * 1.2) * 0.04, 0, 0], tailL: [0.02, 0, 0.06], tailR: [0.02, 0, -0.06], y: 0.12 + Math.sin(t * 1.5) * 0.05 });
   P.lob = k => P.swing(k);
+  P.barkeep = t => ({ spine: [0.05, 0, 0], head: [0.05, Math.sin(t * 0.5) * 0.2, 0], shL: [-0.9, 0.3, 0.2], elL: [-1.4, 0, 0], shR: [-0.8 + Math.sin(t * 5) * 0.08, -0.3, -0.2], elR: [-1.5, 0, 0.2 + Math.sin(t * 5) * 0.15],
+    thL: [-0.05, 0, 0.08], thR: [0.05, 0, -0.08], y: Math.sin(t * 1.6) * 0.008 });
+  P.radio = t => ({ spine: [0.1, 0, 0], head: [0.1, 0.25, 0.08], shR: [-0.6, 0, -0.5], elR: [-2.2, 0, 0], shL: [-0.35, 0, 0.15], elL: [-1.2, 0, 0], y: 0 });
   P.clerk = t => ({ spine: [0.04, 0, 0], head: [0.1 + Math.sin(t * 0.8) * 0.04, Math.sin(t * 0.6) * 0.1, 0], shL: [-0.75, 0, 0.1], elL: [-1.5, 0, 0], shR: [-0.2, 0, -0.1], elR: [-1.7, 0, 0.3], thL: [0, 0, 0.03], thR: [0, 0, -0.03], y: Math.sin(t * 1.4) * 0.03 + 0.06 });
 
   /* A studio shot of one character, used for the speaker pictures in dialogue. */
@@ -493,7 +553,7 @@
     scene.add(new THREE.AmbientLight(new THREE.Color(0.27, 0.3, 0.5), Math.PI));
     const d = new THREE.DirectionalLight(new THREE.Color(0.8, 0.76, 0.56), Math.PI); d.position.set(2, 2.2, 3); scene.add(d);
     const m = SC.makeHumanoid(kind); if (glow) m.setGlow(glow[0], glow[1]); m.face(expr || 'neutral');
-    m.anim.apply(kind === 'clerk' ? P.clerk(0) : (kind === 'hero' || kind === 'ruth' || kind === 'mercy' ? P.idle(0) : P.lurk(1)), 999, 0.016);
+    m.anim.apply(kind === 'clerk' ? P.clerk(0) : (['hero', 'ruth', 'mercy', 'nell', 'otis', 'josie'].indexOf(kind) >= 0 ? P.idle(0) : P.lurk(1)), 999, 0.016);
     if (kind === 'ruth') m.setGhost(0x8fd8ff, 0.95);
     m.group.rotation.y = -0.35; scene.add(m.group);
     const hy = (kind === 'mercy' ? 1.74 : 1.62) * m.spec.h, cam = new THREE.PerspectiveCamera(kind === 'mercy' ? 27 : 24, 1, 0.1, 20);

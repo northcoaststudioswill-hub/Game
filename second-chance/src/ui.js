@@ -9,6 +9,9 @@
     voss: { name: 'DEACON VOSS', kind: 'boss', bg: 0x8a1f24, cls: 'dark' },
     mercy: { name: 'MOTHER MERCY', kind: 'mercy', bg: 0x2a0d1c, cls: 'dark' },
     ruth: { name: 'RUTH OKAFOR', kind: 'ruth', bg: 0x1a2a4a, cls: 'pale' },
+    nell: { name: 'NELL &middot; DISPATCH', kind: 'nell', bg: 0x3f5a34, cls: '' },
+    otis: { name: 'OTIS GREER', kind: 'otis', bg: 0x4a2a1a, cls: '' },
+    josie: { name: 'JOSIE', kind: 'josie', bg: 0x2a0d1c, cls: 'dark' },
     cap: { cls: 'cap' }
   };
   const pics = {};
@@ -20,6 +23,9 @@
   const fmt = t => t.replace(/\*([^*]+)\*/g, '<b>$1</b>'), plain = t => t.replace(/\*/g, '');
 
   U.init = function () {
+    $('dlgCh').addEventListener('pointerdown', e => { const b = e.target.closest('.ch'); if (!b) return; e.stopPropagation(); SC.audio.unlock(); U.pick(+b.dataset.k); });
+    window.addEventListener('keydown', e => { const m = /^Digit([1-4])$/.exec(e.code); if (m && U.dlg && U.dlg.choosing) U.pick(+m[1] - 1); });
+    $('caseBtn').addEventListener('pointerdown', e => { e.stopPropagation(); SC.audio.unlock(); if (!U.blocking() && SC.state === 'play') SC.story.openBoard(); });
     $('whoPic').src = U.pic('hero', 'neutral');
     $('pause').addEventListener('pointerdown', e => { e.stopPropagation(); SC.audio.unlock(); if (!U.blocking()) U.pause(); });
     $('rotate').addEventListener('pointerdown', e => { e.stopPropagation(); $('rotate').classList.remove('want'); U.noRotate = true; });
@@ -49,13 +55,25 @@
     if (d.i >= d.lines.length) { $('dlg').classList.add('hide'); U.dlg = null; SC.input.reset(); if (d.done) d.done(); return; }
     const l = d.lines[d.i], s = SPEAK[l.who || 'cap'], el = $('dlg');
     el.className = s.cls; d.n = 0; d.full = false; d.text = plain(l.text);
-    if (s.kind) { $('dlgPic').src = U.pic(l.who, l.face); $('dlgNm').textContent = s.name; }
+    if (s.kind) { $('dlgPic').src = U.pic(l.who, l.face); $('dlgNm').innerHTML = s.name; }
     $('dlgTx').textContent = ''; if (l.fn) l.fn();
+    const ch = $('dlgCh'); ch.innerHTML = ''; ch.classList.add('hide'); d.choosing = false;
+    if (l.choices) {
+      d.choosing = true; d.full = true; $('dlgTx').innerHTML = fmt(l.text);
+      l.choices.forEach((c, k) => { const ok = !c.when || c.when(), b = document.createElement('div'); b.className = 'ch' + (ok ? '' : ' off'); b.innerHTML = '<kbd>' + (k + 1) + '</kbd>' + fmt(c.label); b.dataset.k = k; ch.appendChild(b); });
+      ch.classList.remove('hide');
+    }
   }
+  /* a reply picked in a conversation: its own lines go in next, then the talk carries on */
+  U.pick = function (k) {
+    const d = U.dlg; if (!d || !d.choosing) return false; const c = d.lines[d.i].choices[k]; if (!c || (c.when && !c.when())) { SC.audio.sfx('deny'); return false; }
+    d.choosing = false; $('dlgCh').classList.add('hide'); SC.audio.sfx('ui'); if (c.fn) c.fn();
+    d.lines.splice(d.i + 1, 0, ...(c.lines || [])); nextLine(); return true;
+  };
   U.tap = function () {
     if (U.menuOpen) return;
     if (U.pg) { pageNext(); return; }
-    const d = U.dlg; if (!d) return;
+    const d = U.dlg; if (!d || d.choosing) return;
     if (!d.full) { d.full = true; $('dlgTx').innerHTML = fmt(d.lines[d.i].text); } else { SC.audio.sfx('ui'); nextLine(); }
   };
   U.key = function (a) {
@@ -63,6 +81,57 @@
     if (U.blocking()) { if (a === 'interact' || a === 'attack' || a === 'dodge' || a === 'any') U.tap(); return true; }
     return false;
   };
+
+  /* ---------- the radio: Nell talks while you keep moving; nothing to tap ---------- */
+  const radioQ = [];
+  U.radio = function (lines) { lines.forEach(l => radioQ.push(l)); if (!U.rad) radioNext(); };
+  function radioNext() {
+    const el = $('radio'), l = radioQ.shift();
+    if (!l) { el.classList.remove('on'); U.rad = null; return; }
+    const sp = SPEAK[l.who];
+    $('radPic').src = U.pic(l.who, l.face); $('radNm').innerHTML = sp.name; $('radTx').innerHTML = fmt(l.text);
+    el.classList.toggle('me', l.who === 'hero'); el.classList.add('on'); SC.audio.sfx('static');
+    U.rad = { t: 1.6 + plain(l.text).length * 0.05 };
+  }
+  U.radioBusy = () => !!U.rad || radioQ.length > 0;
+  /* a one-liner in a speech balloon over Dez's head */
+  U.bark = function (text, dur) { const el = $('bark'); el.innerHTML = fmt(text); el.classList.add('on'); U.barkT = dur || 2.4; };
+  /* a chapter title, across the middle of the page for a moment */
+  U.chapter = function (n, title) {
+    const el = $('chapter'); el.innerHTML = '<small>CHAPTER ' + n + '</small>' + title; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); SC.audio.sfx('page');
+  };
+
+  /* ---------- the case board: pin two clues together and see if they make sense ---------- */
+  U.board = function (o) {
+    let pick = null, note = o.note || 'TAP TWO CLUES THAT BELONG TOGETHER.';
+    const draw = () => {
+      let cards = '';
+      o.cards.forEach(c => { cards += '<div class="cd' + (c.have ? '' : ' no') + (pick === c.id ? ' sel' : '') + '" data-go="c_' + c.id + '" data-id="' + c.id + '">' +
+        (c.have ? '<img src="' + c.img() + '" alt="">' : '<div class="q">?</div>') + '<span>' + (c.have ? c.title : '...') + '</span></div>'; });
+      let deds = '';
+      o.deds.forEach(d => { const done = d.done(); deds += '<li class="' + (done ? 'ok' : '') + (d.bonus ? ' bonus' : '') + '"><b>' + (done ? d.title : (d.bonus ? 'EXTRA: ???' : '???')) + '</b>' + (done ? '<small>' + d.text + '</small>' : '') + '</li>'; });
+      const go = { x: () => { closeMenu(); o.close(); } };
+      o.cards.forEach(c => { go['c_' + c.id] = () => {
+        if (!c.have) { SC.audio.sfx('deny'); return; }
+        if (!pick || pick === c.id) { pick = pick === c.id ? null : c.id; draw(); return; }
+        const r = o.tryPair(pick, c.id); note = r.text; pick = null; SC.audio.sfx(r.ok ? 'clue' : 'deny'); draw();
+        if (!r.ok) { const b = document.querySelector('.board .cork'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); }
+      }; });
+      openMenu('<div class="board"><div class="cork"><svg class="str"></svg>' + cards + '</div><div class="side"><h3>CASE: CALLOWAY, D.</h3><ul>' + deds + '</ul>' +
+        '<p class="note">' + fmt(note) + '</p><div class="mbtn y s" data-go="x">CLOSE THE BOARD</div></div></div>', go);
+      U.freeze = true;
+      requestAnimationFrame(() => strings(o));
+    };
+    draw();
+  };
+  function strings(o) {
+    const svg = document.querySelector('.board .str'); if (!svg) return; const box = svg.parentElement.getBoundingClientRect(); let h = '';
+    svg.setAttribute('viewBox', '0 0 ' + box.width + ' ' + box.height);
+    o.deds.forEach(d => { if (!d.done()) return; const a = document.querySelector('.board [data-id="' + d.a + '"]'), b = document.querySelector('.board [data-id="' + d.b + '"]'); if (!a || !b) return;
+      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      h += '<line x1="' + (ra.left + ra.width / 2 - box.left) + '" y1="' + (ra.top + 10 - box.top) + '" x2="' + (rb.left + rb.width / 2 - box.left) + '" y2="' + (rb.top + 10 - box.top) + '"/>'; });
+    svg.innerHTML = h;
+  }
 
   /* ---------- story pages: panels revealed one tap at a time ---------- */
   U.page = function (def, done) {
@@ -73,6 +142,7 @@
       el.appendChild(d);
     });
     const go = document.createElement('div'); go.className = 'go'; go.innerHTML = 'TAP &#9654;'; el.appendChild(go);
+    $('radio').classList.add('mute'); $('bark').classList.add('mute');
     el.classList.remove('hide'); U.pg = { n: 0, def, done, t: performance.now() }; U.freeze = true; pageNext(true);
   };
   function pageNext(first) {
@@ -82,7 +152,7 @@
   }
 
   /* ---------- menus ---------- */
-  function openMenu(html, fns, clear) { $('toast').classList.remove('on'); const m = $('menu'); m.innerHTML = html; m.classList.remove('hide'); m.classList.toggle('clear', !!clear); U.menuOpen = true; U.menuFns = fns; }
+  function openMenu(html, fns, clear) { $('toast').classList.remove('on'); $('radio').classList.add('mute'); $('bark').classList.add('mute'); const m = $('menu'); m.innerHTML = html; m.classList.remove('hide'); m.classList.toggle('clear', !!clear); U.menuOpen = true; U.menuFns = fns; }
   function closeMenu() { $('menu').classList.add('hide'); U.menuOpen = false; U.menuFns = null; U.freeze = false; SC.input.reset(); }
   U.closeMenu = closeMenu;
   U.title = function (hasSave, onNew, onCont) {
@@ -109,9 +179,10 @@
     const keep = () => { SC.settings.sound = SC.audio.on; SC.settings.sens = SC.input.sens; SC.settings.quality = U.userQuality ? G.quality : 0; SC.saveSettings(); draw(); U.freeze = true; };
     const draw = () => openMenu('<div class="card split"><h2>PAUSED</h2><div>' + CONTROLS +
       '<p class="sub">IOUS FOUND ' + found + '/8 &middot; SCRIP ' + SC.player.scrip + (side ? '<br>SIDE: ' + side : '') + '</p></div>' +
-      '<div><div class="mbtn y" data-go="r">RESUME</div><div class="mbtn s" data-go="d">CHALLENGE: ' + SC.diff().name + '</div><div class="mbtn s" data-go="q">PICTURE: ' + (G.quality >= 1 ? 'SHARP' : 'FAST') + '</div><div class="mbtn s" data-go="s">SOUND: ' + (SC.audio.on ? 'ON' : 'OFF') + '</div>' +
+      '<div><div class="mbtn y" data-go="r">RESUME</div><div class="mbtn s" data-go="b">CASE BOARD</div><div class="mbtn s" data-go="d">CHALLENGE: ' + SC.diff().name + '</div><div class="mbtn s" data-go="q">PICTURE: ' + (G.quality >= 1 ? 'SHARP' : 'FAST') + '</div><div class="mbtn s" data-go="s">SOUND: ' + (SC.audio.on ? 'ON' : 'OFF') + '</div>' +
       '<div class="mbtn s" data-go="v">CAMERA SPEED: ' + (SC.input.sens === 1 ? 'NORMAL' : SC.input.sens > 1 ? 'FAST' : 'SLOW') + '</div><div class="mbtn s" data-go="c">BACK TO LAST CROSSING</div></div></div>', {
       r: () => { closeMenu(); U.paused = false; }, q: () => { G.setQuality(G.quality >= 1 ? 0.5 : 1); U.userQuality = true; keep(); }, s: () => { SC.audio.toggle(); keep(); },
+      b: () => { closeMenu(); U.paused = false; SC.story.openBoard(); },
       d: () => { const o = ['story', 'normal', 'hard']; SC.settings.diff = o[(o.indexOf(SC.settings.diff) + 1) % 3]; keep(); },
       v: () => { SC.input.sens = SC.input.sens === 1 ? 1.5 : SC.input.sens > 1 ? 0.65 : 1; keep(); }, c: () => { closeMenu(); U.paused = false; SC.story.load(); }
     });
@@ -142,7 +213,7 @@
   U.end = function (st, onAgain) {
     openMenu('<div class="card"><div class="tag">END OF ISSUE #1</div><h2 style="margin-top:8px">TO BE CONTINUED</h2><p>Deacon Voss paid in full. Mother Mercy still owes.</p>' +
       '<table><tr><td>TIME</td><td>' + Math.floor(st.time / 60) + ' min ' + ('0' + Math.floor(st.time % 60)).slice(-2) + ' s</td></tr><tr><td>PATH</td><td>' + st.path + '</td></tr><tr><td>HOLLOWS PUT DOWN</td><td>' + st.kills + '</td></tr>' +
-      '<tr><td>FINISHERS</td><td>' + st.finishers + '</td></tr><tr><td>LATE DODGES</td><td>' + st.perfect + ' (' + st.counters + ' countered)</td></tr><tr><td>CLUES</td><td>' + st.clues + ' of 5</td></tr>' +
+      '<tr><td>FINISHERS</td><td>' + st.finishers + '</td></tr><tr><td>LATE DODGES</td><td>' + st.perfect + ' (' + st.counters + ' countered)</td></tr><tr><td>CLUES</td><td>' + st.clues + ' of 7 &middot; ' + st.deds + ' deductions</td></tr>' +
       '<tr><td>IOUS</td><td>' + st.ious + ' of 8</td></tr><tr><td>RUTH</td><td>' + (st.ruth ? 'At rest' : 'Still hanging the washing') + '</td></tr><tr><td>CHALLENGE</td><td>' + st.diff + '</td></tr><tr><td>SECOND CHANCES USED</td><td>' + st.chances + '</td></tr></table>' +
       '<div class="mbtn y" data-go="a">PLAY AGAIN</div></div>', { a: () => { closeMenu(); onAgain(); } });
     U.freeze = true;
@@ -155,6 +226,13 @@
   U.boss = function (e, name) { U.bossE = e; $('boss').classList.toggle('hide', !e); if (e) $('bossNm').textContent = name; };
   const _v = new THREE.Vector3(); let lastPrompt = '';
   U.hud = function (rdt) {
+    if (U.rad && !U.freeze) { U.rad.t -= rdt; if (U.rad.t <= 0) radioNext(); }
+    if (U.barkT > 0) {
+      U.barkT -= rdt; const el = $('bark'); if (U.barkT <= 0 || SC.cam.mode !== 'follow') { el.classList.remove('on'); U.barkT = 0; }
+      else { const p = SC.player; _v.set(p.pos.x, p.visY + 2.3, p.pos.z).project(G.camera); el.style.transform = 'translate(' + ((_v.x * 0.5 + 0.5) * window.innerWidth) + 'px,' + ((-_v.y * 0.5 + 0.5) * window.innerHeight) + 'px) translate(-50%,-100%)'; }
+    }
+    $('caseBtn').classList.toggle('hide', !SC.story.boardReady || !SC.story.boardReady());
+    const mute = !!(U.pg || U.menuOpen); $('radio').classList.toggle('mute', mute); $('bark').classList.toggle('mute', mute);
     const d = U.dlg;
     if (d && !d.full) { d.n += rdt * 62; const n = Math.floor(d.n); if (n >= d.text.length) { d.full = true; $('dlgTx').innerHTML = fmt(d.lines[d.i].text); } else { if (n % 3 === 0 && $('dlgTx').textContent.length !== n) SC.audio.sfx('blip'); $('dlgTx').textContent = d.text.slice(0, n); } }
     const p = SC.player, T = SC.T;
@@ -164,7 +242,7 @@
     $('tagCh').classList.toggle('used', p.chance <= 0);
     const path = p.path ? SC.PATHS[p.path] : null, ready = path && p.meter >= p.cost();
     $('tagPw').classList.toggle('hide', !path); if (path) $('tagPw').textContent = path.power + (p.rank > 1 ? ' II' : '');
-    $('tagEc').classList.toggle('hide', !p.echoes); if (p.echoes) $('tagEc').textContent = 'CLUES ' + p.echoes + '/5';
+    $('tagEc').classList.toggle('hide', !p.echoes); if (p.echoes) $('tagEc').textContent = 'CLUES ' + p.echoes + '/7';
     if (U._sc !== p.scrip) { const el = $('tagSc'); el.classList.toggle('hide', !p.scrip); el.textContent = 'SCRIP ' + p.scrip; if (U._sc !== undefined && p.scrip > U._sc) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } U._sc = p.scrip; }
     $('bP').classList.toggle('low', !ready); $('bPl').innerHTML = (path ? path.btn : 'POWER') + (SC.input.touch ? '' : '<small>L</small>');
     $('bPf').style.transform = 'scaleY(' + (path ? 1 - Math.min(1, p.meter / p.cost()) : 1) + ')';

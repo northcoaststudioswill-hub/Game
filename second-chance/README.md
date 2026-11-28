@@ -41,6 +41,16 @@ New in v0.2:
 |---|---|---|
 | ![Caller](playtest/22-caller.jpg) | ![Climb](playtest/23-climb.jpg) | ![Rooftops](playtest/17-rooftops-laundry.jpg) |
 
+New in v0.3, the mystery:
+
+| Otis at the Lethe | Nell on the radio | The case board |
+|---|---|---|
+| ![Otis](playtest/24-otis.jpg) | ![Nell](playtest/25-nell-radio.jpg) | ![Case board](playtest/27-case-board.jpg) |
+
+| A chapter card | The last page |
+|---|---|
+| ![Chapter](playtest/26-chapter.jpg) | ![Cliffhanger](playtest/28-cliffhanger.jpg) |
+
 ## The camera rule
 
 **Third person, always.** There is no first-person mode in the game, for aiming, powers or anything else.
@@ -108,6 +118,23 @@ Enemies: **Hollows** (swing), **Knifers** (lunge from range), **Callers** (keep 
 lamp oil; a red ring shows where it lands), **Bruisers** (armoured, ground slam, must be finished), **Deacon
 Voss** (combo, leap, and in phase two a blink behind you).
 
+### The mystery (v0.3)
+
+A crime story in the mould of modern mystery thrillers: a hero who jokes when things are worst, a friend on the
+other end of the line, a case that turns out to be about his own family.
+
+- **Nell Szabo**, night dispatcher at the courier firm, calls Dez on the radio at each turn of the case. Her calls
+  play while you keep moving; nothing to tap.
+- **Otis Greer**, bartender at the Lethe, stands in his side door once the alley is clear. Get the story out of him
+  with a joke, by leaning on him, or with 10 scrip. Each way gets a different answer and a different bonus.
+- **Josie.** Dez's sister walked out eleven years ago and never came back. A photograph of her, dated last
+  Thursday, is in the satchel Voss stole.
+- **The case board** (CASE, top right, or the pause menu): pin two clues together. Four deductions make the shape
+  of the case and a fifth is extra; each pays 10 scrip. Wrong pairs get a remark from Dez.
+- **Chapters**: four chapter cards mark the turns of the night. Dez has a line for finishers, close calls and
+  climbing.
+- **The last page**: find Josie's photo and the issue ends on one more page, somewhere you have already been.
+
 ### Off the main road (v0.2)
 
 - **Echoes.** Two clues replay what happened there as see-through ink figures, with the lights down: Dez's own
@@ -128,7 +155,8 @@ Voss** (combo, leap, and in phase two a blink behind you).
 - Build: `python3 second-chance/build.py` writes `second-chance/index.html` from `src/`.
 - `src/core.js` tunables and the path table. `gfx.js` renderer, toon material with halftone, drawn textures, static
   batching, effects. `rig.js` skinned low-poly people, drawn faces, poses. `world.js` the level and collision.
-  `camera.js` the third-person camera. `actors.js` player, powers, enemies. `echo.js` the ghost replays. `ui.js`,
+  `camera.js` the third-person camera. `actors.js` player, powers, enemies. `echo.js` the ghost replays. `ui.js` (HUD,
+  dialogue with choices, the radio, the case board),
   `story.js`, `audio.js`, `input.js`, `main.js`.
 - Everything visible is made in code: no image, model or sound files.
 - With six enemies on screen the frame is about 110 draw calls and 23,000 triangles.
@@ -142,23 +170,23 @@ From the `second-chance/` folder, after building (needs Node and Playwright):
 | `node tests/playthrough.js ember` (or `shade`, `tether`) | A bot plays the whole slice on a fixed clock and fails if anything blocks it, if there is a console error, if the camera ever comes within 1.2 m of Dez, or if Dez is out of frame for more than 1% of play |
 | `SKILL=0 node tests/playthrough.js ember` | The same bot, never dodging |
 | `DIFF=hard node tests/playthrough.js shade` | The same bot on Hard (or `story`) |
+| `node tests/shot.js <dir> 1280 640 tests/steps_v3.js` | Screenshots of Otis's choices, the radio, a chapter card, a one-liner, the case board and the last page |
 | `node tests/shot.js <dir> 1280 640 tests/steps_v2.js` | Checks the counter, a drum, a Caller's bottle, a wall splat, the fourth hit, the ledger and a climb, and prints what happened |
 | `node tests/shot.js <dir> 1280 640 tests/steps_fx.js` | Screenshots of the powers, finisher, dodge, lock-on, second chance, pause |
 
-## What was and was not tested (Nov 28 2026, v0.2)
+## What was and was not tested (Nov 28 2026, v0.3)
 
 Tested, by script, in headless Chromium:
 
-- The full slice completes on all three paths, on Hard, on Story, and with a bot that never dodges: six runs, all
-  pass, no console errors. Each run also climbs both tenements and the containers, finishes Ruth's quest, picks up
-  six of the eight IOUs and buys from the ledger twice.
-- Camera: closest approach to Dez was 1.67 m (on a ladder) and he was partly out of frame for under 0.2% of
-  frames.
-- Health: the never-dodging bot on Normal beat Voss with 73 of 150 health left (lowest point in the run: 58).
-  On Hard the dodging bot also finished with 73 left; on Story, 148. In v0.1, with no upgrades, the never-dodging
-  bot finished with 5, so the ledger makes the boss much easier.
-- The counter, drums, Callers' bottles, wall splats, the fourth hit, the ledger and ladders, each checked directly.
-- Layout at phone size, landscape (844x390) and portrait (390x844), including the ledger and the echoes.
+- Full playthroughs pass on all three paths, on Hard, on Story and never dodging. Every run now also talks to
+  Otis, finds Josie's photo, makes all five deductions on the case board through its real buttons, sees the last
+  page and reaches the end card, with no console errors.
+- Those runs found two real bugs, now fixed: Dez could get wedged behind Otis if he stood in the doorway as the
+  alley fight ended, and a hard knock in the boss fight could throw him off the scaffold bridge into the back
+  alley. Otis's space now runs to the wall, and all three bridges have handrails. Both have their own checks.
+- Camera: closest approach to Dez 1.68 m; out of frame for under 0.3% of frames.
+- Health at the end of the boss: 55 to 115 of 150 on Normal, 73 on Hard, 147 on Story.
+- Layout at phone size for the new screens (choices, radio, case board).
 
 Not tested:
 

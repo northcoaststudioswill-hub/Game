@@ -25,6 +25,59 @@ html,body{margin:0;height:100%;background:var(--ink);overflow:hidden;overscroll-
 #bars i:first-child{top:0}#bars i:last-child{bottom:0}
 #bars.on i{height:11vh}
 .hide{display:none!important}
+#caseBtn{position:absolute;right:calc(54px + var(--sr));top:calc(8px + var(--st));height:38px;padding:0 9px;border:3px solid var(--ink);background:#c9a063;box-shadow:3px 3px 0 var(--ink);
+  font:italic 900 14px/32px var(--sfx);letter-spacing:1px;pointer-events:auto;cursor:pointer}
+#obj{margin-right:112px!important}
+#radio{position:absolute;left:calc(10px + var(--sl));top:calc(clamp(64px,19vh,104px) + var(--st));translate:-115% 0;display:flex;gap:8px;align-items:center;max-width:min(54vw,460px);background:#dfe9d4;border:3px solid var(--ink);
+  box-shadow:4px 4px 0 var(--ink);padding:4px 10px 4px 4px;transition:translate .25s;pointer-events:none;z-index:5}
+#radio.on{translate:0 0}
+#radio.mute,#bark.mute{visibility:hidden}
+#radio.me{background:var(--paper)}
+#radio img{width:clamp(34px,10vh,52px);height:clamp(34px,10vh,52px);border:2px solid var(--ink);flex:none}
+#radio b{display:block;font:italic 900 clamp(9px,2.4vh,12px) var(--sfx);letter-spacing:1px;color:#3f5a34}
+#radio.me b{color:#c22a2a}
+#radio span{display:block;font:700 clamp(10px,2.8vh,14px)/1.25 var(--hand);text-transform:uppercase}
+#radio span b{display:inline;font:inherit;color:#c22a2a;letter-spacing:0}
+#bark{position:absolute;left:0;top:0;max-width:220px;background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:4px 10px;font:700 clamp(10px,2.8vh,14px)/1.2 var(--hand);
+  text-transform:uppercase;text-align:center;opacity:0;transition:opacity .15s;pointer-events:none;box-shadow:3px 3px 0 var(--ink);z-index:4}
+#bark::after{content:"";position:absolute;left:50%;bottom:-12px;margin-left:-8px;border:8px solid transparent;border-top:10px solid var(--ink);border-bottom:0}
+#bark.on{opacity:1}
+#chapter{position:absolute;left:0;right:0;top:34%;text-align:center;font:italic 900 clamp(26px,10vh,58px)/1 var(--sfx);color:var(--yel);-webkit-text-stroke:9px var(--ink);paint-order:stroke fill;
+  letter-spacing:1px;opacity:0;pointer-events:none;transform:rotate(-3deg);z-index:6}
+#chapter small{display:block;font-size:.38em;color:var(--paper);-webkit-text-stroke:5px var(--ink);margin-bottom:4px;letter-spacing:3px}
+#chapter.on{animation:chap 2.8s ease-out}
+@keyframes chap{0%{opacity:0;translate:-30vw 0}12%{opacity:1;translate:0 0}80%{opacity:1;translate:3vw 0}100%{opacity:0;translate:30vw 0}}
+#dlgCh{display:flex;flex-direction:column;gap:5px;margin-top:8px;pointer-events:auto}
+#dlgCh .ch{background:var(--yel);border:3px solid var(--ink);padding:3px 10px;font:700 clamp(11px,3vh,15px)/1.2 var(--hand);text-transform:uppercase;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+#dlgCh .ch:active{translate:2px 2px;box-shadow:1px 1px 0 var(--ink)}
+#dlgCh .ch.off{background:#c9cbd6;opacity:.6}
+#dlgCh kbd{font:italic 900 12px var(--sfx);background:var(--ink);color:var(--yel);padding:0 5px;margin-right:8px}
+#dlg{pointer-events:auto}
+#dlg.cap #dlgCh,#dlg .box{pointer-events:auto}
+.board{display:grid;grid-template-columns:1fr minmax(200px,32%);gap:12px;width:min(97vw,1000px);max-height:96vh}
+.board .cork{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(6px,1.6vh,12px);padding:clamp(8px,2vh,14px);background:#a87a4a radial-gradient(circle,rgba(60,35,15,.35) 1.4px,transparent 2px) 0 0/9px 9px;
+  border:5px solid #5c3c1e;box-shadow:6px 6px 0 var(--ink);align-content:center}
+.board .cork.shake{animation:shake .3s}
+.board .str{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.board .str line{stroke:#c22a2a;stroke-width:3.5;stroke-linecap:round}
+.board .cd{position:relative;background:var(--paper);padding:5px 5px 2px;box-shadow:3px 4px 0 rgba(7,7,13,.55);cursor:pointer;pointer-events:auto;text-align:center;transition:translate .1s}
+.board .cd:nth-child(odd){rotate:-2deg}.board .cd:nth-child(3n){rotate:2.5deg}
+.board .cd::before{content:"";position:absolute;left:50%;top:-5px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#c22a2a;border:2px solid var(--ink);z-index:3}
+.board .cd img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border:2px solid var(--ink)}
+.board .cd .q{aspect-ratio:16/10;display:grid;place-items:center;background:#d6d0bd;border:2px dashed rgba(7,7,13,.4);font:900 28px var(--sfx);color:rgba(7,7,13,.35)}
+.board .cd span{display:block;font:700 clamp(8px,2.3vh,12px)/1.15 var(--hand);text-transform:uppercase;padding:3px 0}
+.board .cd.no{opacity:.6;cursor:default}
+.board .cd.sel{translate:0 -6px;outline:4px solid var(--yel);outline-offset:2px}
+.board .side{background:var(--paper);border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:10px 12px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.board h3{margin:0;font:italic 900 clamp(14px,4vh,22px) var(--sfx);color:#c22a2a;letter-spacing:1px}
+.board ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.board li{border-bottom:2px dotted rgba(7,7,13,.3);padding-bottom:3px}
+.board li b{display:block;font:italic 900 clamp(10px,2.8vh,14px) var(--sfx);letter-spacing:.5px;color:rgba(7,7,13,.4)}
+.board li.ok b{color:var(--ink)}
+.board li small{display:block;font:700 clamp(9px,2.4vh,12px)/1.2 var(--hand);text-transform:uppercase}
+.board .note{margin:auto 0 0;background:var(--yel);border:3px solid var(--ink);padding:4px 8px;font:700 clamp(10px,2.7vh,13px)/1.25 var(--hand);text-transform:uppercase}
+.board .mbtn{margin:4px 0 0;min-width:0}
+@media (orientation:portrait){.board{grid-template-columns:1fr;max-height:none}.board .cork{grid-template-columns:repeat(2,1fr)}#radio{top:calc(96px + var(--st));max-width:86vw}#caseBtn{top:calc(52px + var(--st))}}
 #echoCap{position:absolute;left:calc(14px + var(--sl));top:calc(11vh + 10px);background:#bfe9ff;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:4px 12px;
   font:italic 900 clamp(12px,3.4vh,17px) var(--sfx);letter-spacing:1px;transform:rotate(-1.5deg);opacity:0;transition:opacity .4s;pointer-events:none}
 #echoCap.on{opacity:1}
@@ -196,6 +249,7 @@ html,body{margin:0;height:100%;background:var(--ink);overflow:hidden;overscroll-
     </div>
     <div id="obj"></div>
     <div id="pause" data-ui="pause">II</div>
+    <div id="caseBtn" class="hide" data-ui="case">CASE</div>
     <div id="boss" class="hide"><div class="nm" id="bossNm"></div><div class="bar"><i class="lag" id="bossLag"></i><i id="bossFill"></i></div></div>
     <div id="toast"></div>
     <div id="prompt" class="hide"></div>
@@ -209,7 +263,10 @@ html,body{margin:0;height:100%;background:var(--ink);overflow:hidden;overscroll-
     </div>
   </div>
   <div id="echoCap"></div>
-  <div id="dlg" class="hide"><div class="pic"><img id="dlgPic" alt=""></div><div class="box"><div class="nm" id="dlgNm"></div><div class="tx" id="dlgTx"></div><div class="go">&#9654;</div></div></div>
+  <div id="dlg" class="hide"><div class="pic"><img id="dlgPic" alt=""></div><div class="box"><div class="nm" id="dlgNm"></div><div class="tx" id="dlgTx"></div><div id="dlgCh" class="hide"></div><div class="go">&#9654;</div></div></div>
+  <div id="radio"><img id="radPic" alt=""><div><b id="radNm"></b><span id="radTx"></span></div></div>
+  <div id="bark"></div>
+  <div id="chapter"></div>
   <div id="page" class="hide"></div>
   <div id="menu" class="hide"></div>
   <div id="rotate">TURN YOUR PHONE SIDEWAYS &middot; TAP TO HIDE</div>
@@ -225,7 +282,7 @@ html,body{margin:0;height:100%;background:var(--ink);overflow:hidden;overscroll-
 <script>
 'use strict';
 /* SECOND CHANCE - core: namespace, maths, tunables. */
-const SC = window.SC = { V: '0.2.0' };
+const SC = window.SC = { V: '0.3.0' };
 
 SC.clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 SC.lerp = (a, b, t) => a + (b - a) * t;
@@ -882,6 +939,12 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
       pal: { skin: 0xd9c9b0, top: 0x15151f, trim: 0xefe9da, shirt: 0xefe9da, tie: 0xb3202a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0x15151f, wrap: 0x15151f } },
     ruth: { h: 0.93, b: 0.86, face: 'ruth', hair: 'bun', robe: true,
       pal: { skin: 0xc99a74, top: 0x6f8fb0, trim: 0x3c5078, shirt: 0xece6d6, tie: 0x6f8fb0, pants: 0x3c5078, boots: 0x23232e, hair: 0x2a1e18, glove: 0xc99a74, wrap: 0x6f8fb0 } },
+    nell: { h: 0.94, b: 0.86, face: 'nell', hair: 'bob', headset: true,
+      pal: { skin: 0xe8b48a, top: 0x6f8f5a, trim: 0x3f5a34, shirt: 0xece6d6, tie: 0x6f8f5a, pants: 0x2a2c33, boots: 0x15151f, hair: 0xc2452e, glove: 0xe8b48a, wrap: 0x6f8f5a } },
+    otis: { h: 1.03, b: 1.18, face: 'otis', hair: 'bald', apron: true, bowtie: true,
+      pal: { skin: 0x8a5a3c, top: 0xece6d6, trim: 0x2f3f62, shirt: 0x2f3f62, tie: 0x8a1f24, pants: 0x23232e, boots: 0x15151f, hair: 0x15151f, glove: 0x8a5a3c, wrap: 0xece6d6 } },
+    josie: { h: 0.95, b: 0.86, face: 'josie', hair: 'long', coat: true,
+      pal: { skin: 0xe8b48a, top: 0x8a1f24, trim: 0x5c1a26, shirt: 0x15151f, tie: 0x15151f, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, streak: 0xf6f2e6, glove: 0x15151f, wrap: 0x8a1f24 } },
     clerk: { h: 1.06, b: 0.84, face: 'clerk', hat: 'bowler', hair: 'bald', book: true,
       pal: { skin: 0xc9cbd6, top: 0x6f7690, trim: 0x474c62, shirt: 0xe9e6da, tie: 0x15151f, pants: 0x474c62, boots: 0x101018, hair: 0x15151f, glove: 0xe9e6da, wrap: 0x6f7690 } }
   };
@@ -940,6 +1003,39 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
       g.fillStyle = '#b3202a'; g.beginPath(); g.moveTo(50, 108); g.quadraticCurveTo(64, 100, 78, 108); g.quadraticCurveTo(64, 116, 50, 108); g.fill();
       stroke([50, 108, 78, 108], 1.5);
       g.fillStyle = '#b09a7c'; g.fillRect(0, 118, S, 10);
+    } else if (kind === 'nell' || kind === 'josie') {
+      const nell = kind === 'nell';
+      g.fillStyle = nell ? '#e8b48a' : '#e3ad86'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#b97f5c'; g.beginPath(); g.moveTo(0, 48); g.lineTo(28, 66); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
+      g.fillStyle = nell ? '#c2452e' : '#15151f'; g.beginPath(); g.moveTo(0, 0); g.lineTo(S, 0); g.lineTo(S, 34); g.quadraticCurveTo(nell ? 70 : 96, nell ? 40 : 30, nell ? 30 : 62, 40); g.lineTo(0, 46); g.fill();
+      if (!nell) { g.fillStyle = '#f6f2e6'; g.beginPath(); g.moveTo(84, 0); g.lineTo(100, 0); g.lineTo(88, 34); g.lineTo(78, 34); g.fill(); }
+      const shut = expr === 'shut', glad = expr === 'smirk', sad = expr === 'hurt';
+      [[42, -1], [86, 1]].forEach(a => {
+        g.fillStyle = ink; g.beginPath(); g.ellipse(a[0], 63, 11, shut || glad ? 3 : 7, 0, 0, 7); g.fill();
+        if (!shut && !glad) { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(a[0], 64, 8, 5, 0, 0, 7); g.fill(); g.fillStyle = nell ? '#3f6b55' : '#3b2a20'; g.beginPath(); g.arc(a[0], 64, 4, 0, 7); g.fill(); }
+        stroke([a[0] - 13 * a[1], 56, a[0] - 17 * a[1], 51], 2.5);
+        stroke([a[0] - 12, sad ? 48 + a[1] * 3 : expr === 'angry' ? 50 - a[1] * 3 : 49, a[0] + 12, sad ? 48 - a[1] * 3 : expr === 'angry' ? 50 + a[1] * 3 : 47], 3.5);
+      });
+      if (nell) { g.strokeStyle = ink; g.lineWidth = 3.5; [[42], [86]].forEach(a => { g.beginPath(); g.moveTo(a[0] - 16, 58); g.lineTo(a[0] + 15, 57); g.lineTo(a[0] + 12, 70); g.lineTo(a[0] - 12, 70); g.closePath(); g.stroke(); }); stroke([57, 60, 71, 60], 3);
+        g.fillStyle = 'rgba(185,90,60,0.6)'; for (let i = 0; i < 14; i++) g.fillRect(34 + (i * 29 % 60), 74 + (i * 11 % 10), 2, 2); }
+      stroke([64, 66, 61, 84, 67, 86], 2.5);
+      g.fillStyle = '#a83a3a';
+      if (glad) { stroke([48, 98, 64, 106, 80, 96], 4); } else if (expr === 'shock') { g.fillStyle = ink; g.beginPath(); g.ellipse(64, 102, 6, 8, 0, 0, 7); g.fill(); }
+      else if (sad) stroke([52, 105, 64, 100, 76, 105], 4); else if (nell) stroke([50, 101, 70, 101, 80, 97], 4); else stroke([54, 101, 74, 101], 4);
+    } else if (kind === 'otis') {
+      g.fillStyle = '#8a5a3c'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#6a3f28'; g.beginPath(); g.moveTo(0, 30); g.lineTo(26, 60); g.lineTo(24, 128); g.lineTo(0, 128); g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.18)'; g.beginPath(); g.ellipse(80, 18, 26, 9, -0.2, 0, 7); g.fill();
+      [[42, -1], [86, 1]].forEach(a => {
+        const wink = expr === 'smirk' && a[1] > 0;
+        g.fillStyle = ink; g.beginPath(); g.ellipse(a[0], 60, 10, wink ? 2 : 6, 0, 0, 7); g.fill();
+        if (!wink) { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(a[0], 61, 7, 4, 0, 0, 7); g.fill(); g.fillStyle = '#2a1a10'; g.beginPath(); g.arc(a[0], 61, 3.5, 0, 7); g.fill(); }
+      });
+      const up = expr === 'angry' ? -4 : 0;
+      stroke([28, 48, 54, 52 + up], 7); stroke([74, expr === 'neutral' ? 44 : 50 + up, 100, expr === 'neutral' ? 46 : 48], 7);
+      stroke([64, 62, 58, 82, 68, 84], 3);
+      g.fillStyle = '#1a120c'; g.beginPath(); g.moveTo(36, 94); g.quadraticCurveTo(64, 82, 92, 94); g.quadraticCurveTo(96, 104, 86, 102); g.quadraticCurveTo(64, 94, 42, 102); g.quadraticCurveTo(32, 104, 36, 94); g.fill();
+      if (expr === 'smirk') stroke([52, 108, 66, 112, 78, 106], 3.5); else if (expr === 'shock') { g.fillStyle = ink; g.beginPath(); g.ellipse(64, 110, 6, 6, 0, 0, 7); g.fill(); } else stroke([54, 109, 74, 109], 3.5);
     } else if (kind === 'ruth') {
       g.fillStyle = '#c99a74'; g.fillRect(0, 0, S, S);
       g.fillStyle = '#9a6e4e'; g.beginPath(); g.moveTo(0, 50); g.lineTo(28, 66); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
@@ -1112,6 +1208,24 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
       part('hips', tbox(0.34 * b, 0.82, 0.05, 1, 1.3), 0, -0.4, 0.12 * b, pal.top);
       part('chest', tbox(0.2, 0.07, 0.27 * b), 0, 0.29, 0.005, pal.trim, null, 0.01);
     }
+    if (sp.hair === 'bob') {
+      part('head', tbox(0.26, 0.11, 0.27, 0.8, 1), 0, 0.235, -0.02, pal.hair, [-0.12, 0, 0]);
+      part('head', tbox(0.26, 0.24, 0.1, 1, 1.05), 0, 0.1, -0.11, pal.hair);
+      part('head', tbox(0.05, 0.24, 0.2), 0.125, 0.1, -0.01, pal.hair, null, 0.01); part('head', tbox(0.05, 0.24, 0.2), -0.125, 0.1, -0.01, pal.hair, null, 0.01);
+      part('head', tbox(0.22, 0.06, 0.08), 0.02, 0.24, 0.09, pal.hair, [0.3, 0, -0.15]);
+    }
+    if (sp.hair === 'long') {
+      part('head', tbox(0.25, 0.11, 0.27, 0.8, 1), 0, 0.235, -0.02, pal.hair, [-0.12, 0, 0]);
+      part('head', tbox(0.25, 0.4, 0.1, 1, 1.1), 0, 0.02, -0.12, pal.hair);
+      part('head', tbox(0.05, 0.36, 0.18), 0.125, 0.04, -0.02, pal.hair, null, 0.01); part('head', tbox(0.05, 0.36, 0.18), -0.125, 0.04, -0.02, pal.hair, null, 0.01);
+      part('head', tbox(0.06, 0.08, 0.2, 0.4, 1), 0.07, 0.27, 0.06, pal.streak || pal.hair, [0.4, -0.2, -0.1]);
+    }
+    if (sp.headset) {
+      part('head', tbox(0.26, 0.03, 0.05), 0, 0.285, 0.0, 0x23232e, null, 0.008);
+      part('head', tbox(0.04, 0.09, 0.08), 0.14, 0.13, 0.0, 0x23232e, null, 0.01);
+      part('head', tbox(0.015, 0.015, 0.13), 0.13, 0.08, 0.08, 0x23232e, [0.3, -0.4, 0], 0.006);
+    }
+    if (sp.bowtie) { part('chest', tbox(0.11, 0.05, 0.03), 0, 0.27, 0.13 * b, pal.tie, null, 0.008); part('chest', tbox(0.27 * b, 0.26, 0.02, 1, 0.7), 0, 0.1, 0.122 * b, pal.trim, null, 0.006); }
     if (sp.veil) {
       part('head', tbox(0.3, 0.5, 0.31, 0.25, 1), 0, 0.38, -0.02, pal.top);
       part('head', tbox(0.3, 0.3, 0.12, 1, 0.9), 0, 0.12, -0.13, pal.top);
@@ -1347,6 +1461,9 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
   P.ruth = t => ({ spine: [0.04, 0, 0], head: [0.15 + Math.sin(t * 0.6) * 0.05, Math.sin(t * 0.45) * 0.15, 0.08], shL: [-0.75, 0.35, 0.15], elL: [-1.6, 0, 0], shR: [-0.75, -0.35, -0.15], elR: [-1.6, 0, 0],
     tailB: [0.05 + Math.sin(t * 1.2) * 0.04, 0, 0], tailL: [0.02, 0, 0.06], tailR: [0.02, 0, -0.06], y: 0.12 + Math.sin(t * 1.5) * 0.05 });
   P.lob = k => P.swing(k);
+  P.barkeep = t => ({ spine: [0.05, 0, 0], head: [0.05, Math.sin(t * 0.5) * 0.2, 0], shL: [-0.9, 0.3, 0.2], elL: [-1.4, 0, 0], shR: [-0.8 + Math.sin(t * 5) * 0.08, -0.3, -0.2], elR: [-1.5, 0, 0.2 + Math.sin(t * 5) * 0.15],
+    thL: [-0.05, 0, 0.08], thR: [0.05, 0, -0.08], y: Math.sin(t * 1.6) * 0.008 });
+  P.radio = t => ({ spine: [0.1, 0, 0], head: [0.1, 0.25, 0.08], shR: [-0.6, 0, -0.5], elR: [-2.2, 0, 0], shL: [-0.35, 0, 0.15], elL: [-1.2, 0, 0], y: 0 });
   P.clerk = t => ({ spine: [0.04, 0, 0], head: [0.1 + Math.sin(t * 0.8) * 0.04, Math.sin(t * 0.6) * 0.1, 0], shL: [-0.75, 0, 0.1], elL: [-1.5, 0, 0], shR: [-0.2, 0, -0.1], elR: [-1.7, 0, 0.3], thL: [0, 0, 0.03], thR: [0, 0, -0.03], y: Math.sin(t * 1.4) * 0.03 + 0.06 });
 
   /* A studio shot of one character, used for the speaker pictures in dialogue. */
@@ -1355,7 +1472,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     scene.add(new THREE.AmbientLight(new THREE.Color(0.27, 0.3, 0.5), Math.PI));
     const d = new THREE.DirectionalLight(new THREE.Color(0.8, 0.76, 0.56), Math.PI); d.position.set(2, 2.2, 3); scene.add(d);
     const m = SC.makeHumanoid(kind); if (glow) m.setGlow(glow[0], glow[1]); m.face(expr || 'neutral');
-    m.anim.apply(kind === 'clerk' ? P.clerk(0) : (kind === 'hero' || kind === 'ruth' || kind === 'mercy' ? P.idle(0) : P.lurk(1)), 999, 0.016);
+    m.anim.apply(kind === 'clerk' ? P.clerk(0) : (['hero', 'ruth', 'mercy', 'nell', 'otis', 'josie'].indexOf(kind) >= 0 ? P.idle(0) : P.lurk(1)), 999, 0.016);
     if (kind === 'ruth') m.setGhost(0x8fd8ff, 0.95);
     m.group.rotation.y = -0.35; scene.add(m.group);
     const hy = (kind === 'mercy' ? 1.74 : 1.62) * m.spec.h, cam = new THREE.PerspectiveCamera(kind === 'mercy' ? 27 : 24, 1, 0.1, 20);
@@ -1495,6 +1612,16 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
         if (axis === 'x') D('flat', x0 + len * t, y, cz, 0.08, 0.05, wid, 0x15151f, { rz: ang, outline: 0 });
         else D('flat', cx, y, z0 + len * t, wid, 0.05, 0.08, 0x15151f, { rx: -ang, outline: 0 }); }
     }
+  }
+  /* handrails along both long sides of a ramp, so nobody is knocked off a bridge */
+  function rails(x0, z0, x1, z1, a, b, axis) {
+    const len = axis === 'x' ? x1 - x0 : z1 - z0, ang = Math.atan2(b - a, len), L = Math.hypot(len, b - a), top = Math.max(a, b) + 1.2, lo = Math.min(a, b) - 0.6;
+    [axis === 'x' ? z0 : x0, axis === 'x' ? z1 : x1].forEach(e => {
+      if (axis === 'x') { solid(x0, e - 0.06, x1, e + 0.06, lo, top, { cam: false }); D('flat', (x0 + x1) / 2, (a + b) / 2 + 0.95, e, L, 0.07, 0.07, 0x8d94ac, { rz: ang, outline: 0.02 });
+        for (let i = 0; i <= 4; i++) { const t = i / 4; D('flat', x0 + len * t, SC.lerp(a, b, t) + 0.48, e, 0.06, 0.95, 0.06, 0x23232e, { outline: 0.015 }); } }
+      else { solid(e - 0.06, z0, e + 0.06, z1, lo, top, { cam: false }); D('flat', e, (a + b) / 2 + 0.95, (z0 + z1) / 2, 0.07, 0.07, L, 0x8d94ac, { rx: -ang, outline: 0.02 });
+        for (let i = 0; i <= 2; i++) { const t = i / 2; D('flat', e, SC.lerp(a, b, t) + 0.48, z0 + len * t, 0.06, 0.95, 0.06, 0x23232e, { outline: 0.015 }); } }
+    });
   }
   const signTex = {};
   function sign(text, x, y, z, ry, w, h, color, bg) {
@@ -1721,9 +1848,9 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     // ----- rooftops -----
     building(-32, -46, -10, -22, 9, 0x8a6048, 0x5c3c2c);                           // block C (9 m)
     building(-2, -46, 32, -22, 11, 0x5a6690, 0x3a4468);                             // the Meridian (11 m)
-    ramp('wood', -27, -22.3, -25, -19.7, 8.2, 9, 8.4, 'z', 0xb98a55);               // plank: warehouse -> C
+    ramp('wood', -27, -22.3, -25, -19.7, 8.2, 9, 8.4, 'z', 0xb98a55); rails(-27, -22.3, -25, -19.7, 9, 8.4, 'z'); // plank: warehouse -> C
     parapet(-32, -46, -10, -22, 9, [{ side: 's', a: -27.2, b: -24.8 }, { side: 'e', a: -35.8, b: -32.7 }]);
-    ramp('wood', -10.3, -35.5, -1.7, -33, 8.6, 9, 11, 'x', 0xb98a55);              // scaffold bridge: C -> Meridian
+    ramp('wood', -10.3, -35.5, -1.7, -33, 8.6, 9, 11, 'x', 0xb98a55); rails(-10.3, -35.5, -1.7, -33, 9, 11, 'x'); // scaffold bridge: C -> Meridian
     [[-8, -35.6], [-4, -35.6], [-8, -32.9], [-4, -32.9]].forEach(p => D('flat', p[0], 4.8, p[1], 0.14, 10, 0.14, 0x23232e, { outline: 0.03 }));
     D('flat', -6, 5, -35.6, 5.8, 0.1, 0.1, 0x23232e, { rz: 0.7, outline: 0.02 }); D('flat', -6, 5, -32.9, 5.8, 0.1, 0.1, 0x23232e, { rz: -0.7, outline: 0.02 });
     parapet(-2, -46, 32, -22, 11, [{ side: 'w', a: -35.8, b: -32.7 }]);
@@ -1757,7 +1884,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     ladder('yard', 25.2, -0.35, 0, 1, 0, 5.2, 25.2, -1.7);
     parapet(-46, 18, -3.5, 50, 11, [{ side: 'e', a: 37.0, b: 38.6 }, { side: 'e', a: 43.2, b: 44.8 }], 0x5c3c4e);
     parapet(3.5, 18, 46, 50, 9, [{ side: 'w', a: 20.0, b: 21.6 }, { side: 'w', a: 43.2, b: 44.8 }], 0x2f3f62);
-    ramp('wood', -4.3, 43.3, 4.3, 44.7, 8.5, 11, 9, 'x', 0xb98a55);
+    ramp('wood', -4.3, 43.3, 4.3, 44.7, 8.5, 11, 9, 'x', 0xb98a55); rails(-4.3, 43.3, 4.3, 44.7, 11, 9, 'x');
     [[-3.3, 43.25], [-3.3, 44.75], [3.3, 43.25], [3.3, 44.75]].forEach(p => D('flat', p[0], 6.5, p[1], 0.12, 13, 0.12, 0x23232e, { outline: 0.02 }));
     // west roof: laundry, a stair hut, a water tower
     waterTower(-32, 30, 11); acUnit(-11, 21.5, 11); acUnit(-24, 47.6, 11);
@@ -1773,6 +1900,11 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     [[16, 24], [30, 28], [20, 40]].forEach(p => { D('flat', p[0], 10.4, p[1], 0.07, 2.8, 0.07, 0x23232e, { outline: 0.02 });
       [0.9, 0.6, 0.35].forEach((w, i) => D('flat', p[0], 11 + i * 0.35, p[1], w * 1.6, 0.04, 0.04, 0x23232e, { outline: 0.015, ry: 0.3 })); });
     B('brick', 10.5, 43, 11.7, 44.2, 9, 10.9, 0x3c5078, { outline: 0.05 });
+    // the Lethe's side door, where Otis takes the air
+    D('flat', -3.46, 1.25, 26.0, 0.1, 2.5, 1.4, 0x1a120c, { outline: 0.03 }); D('glow', -3.4, 1.25, 26.0, 0.04, 2.2, 1.15, 0x6a3a1c, { outline: 0 });
+    D('glow', -3.38, 2.62, 26.0, 0.05, 0.12, 1.4, 0xffd76a, { outline: 0 }); D('flat', -3.2, 2.85, 26.0, 0.5, 0.06, 1.7, 0x23232e, { outline: 0.02 });
+    // where the satchel was dumped, at the foot of the office stairs
+    D('flat', -20.4, 1.48, 0.5, 0.55, 0.16, 0.4, 0x7a5a2c, { ry: 0.4, outline: 0.03 }); D('flat', -20.85, 1.43, 0.75, 0.32, 0.03, 0.22, 0xf4f1e6, { ry: -0.3, outline: 0.015 });
     // back of the warehouse office: a gap in the stacks where something was hidden
     crateStatic(-31.2, 4.9, 0.7, 4, 0xd9a05f);
 
@@ -1971,6 +2103,8 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     clue: () => { tone(523, 0.12, { type: 'triangle', gain: 0.2 }); tone(784, 0.3, { type: 'triangle', gain: 0.2, at: ctx.currentTime + 0.1 }); },
     path: () => { tone(196, 1.2, { type: 'sawtooth', to: 392, gain: 0.2, att: 0.3 }); tone(784, 1, { type: 'triangle', gain: 0.2, at: ctx.currentTime + 0.4 }); noise(1.1, { f: 300, to: 5000, gain: 0.25, att: 0.5 }); },
     page: () => noise(0.12, { f: 2400, to: 900, q: 1, gain: 0.16 }),
+    static: () => { noise(0.22, { f: 2200, to: 1800, q: 0.7, gain: 0.12 }); tone(1100, 0.05, { type: 'square', gain: 0.04 }); },
+    glass: () => { tone(2400, 0.25, { type: 'sine', gain: 0.08 }); tone(3100, 0.3, { type: 'sine', gain: 0.05, at: ctx.currentTime + 0.04 }); },
     fuse: () => noise(0.4, { f: 3000, to: 5000, q: 6, gain: 0.12 }),
     boom: () => { noise(1.1, { f: 600, to: 50, type: 'lowpass', gain: 1 }); tone(55, 0.9, { type: 'sine', to: 25, gain: 0.9 }); noise(0.3, { f: 2500, to: 600, gain: 0.4 }); },
     splat: () => { noise(0.18, { f: 900, to: 200, q: 2, gain: 0.6 }); tone(90, 0.2, { type: 'sine', to: 40, gain: 0.6 }); },
@@ -2925,6 +3059,9 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     voss: { name: 'DEACON VOSS', kind: 'boss', bg: 0x8a1f24, cls: 'dark' },
     mercy: { name: 'MOTHER MERCY', kind: 'mercy', bg: 0x2a0d1c, cls: 'dark' },
     ruth: { name: 'RUTH OKAFOR', kind: 'ruth', bg: 0x1a2a4a, cls: 'pale' },
+    nell: { name: 'NELL &middot; DISPATCH', kind: 'nell', bg: 0x3f5a34, cls: '' },
+    otis: { name: 'OTIS GREER', kind: 'otis', bg: 0x4a2a1a, cls: '' },
+    josie: { name: 'JOSIE', kind: 'josie', bg: 0x2a0d1c, cls: 'dark' },
     cap: { cls: 'cap' }
   };
   const pics = {};
@@ -2936,6 +3073,9 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
   const fmt = t => t.replace(/\*([^*]+)\*/g, '<b>$1</b>'), plain = t => t.replace(/\*/g, '');
 
   U.init = function () {
+    $('dlgCh').addEventListener('pointerdown', e => { const b = e.target.closest('.ch'); if (!b) return; e.stopPropagation(); SC.audio.unlock(); U.pick(+b.dataset.k); });
+    window.addEventListener('keydown', e => { const m = /^Digit([1-4])$/.exec(e.code); if (m && U.dlg && U.dlg.choosing) U.pick(+m[1] - 1); });
+    $('caseBtn').addEventListener('pointerdown', e => { e.stopPropagation(); SC.audio.unlock(); if (!U.blocking() && SC.state === 'play') SC.story.openBoard(); });
     $('whoPic').src = U.pic('hero', 'neutral');
     $('pause').addEventListener('pointerdown', e => { e.stopPropagation(); SC.audio.unlock(); if (!U.blocking()) U.pause(); });
     $('rotate').addEventListener('pointerdown', e => { e.stopPropagation(); $('rotate').classList.remove('want'); U.noRotate = true; });
@@ -2965,13 +3105,25 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     if (d.i >= d.lines.length) { $('dlg').classList.add('hide'); U.dlg = null; SC.input.reset(); if (d.done) d.done(); return; }
     const l = d.lines[d.i], s = SPEAK[l.who || 'cap'], el = $('dlg');
     el.className = s.cls; d.n = 0; d.full = false; d.text = plain(l.text);
-    if (s.kind) { $('dlgPic').src = U.pic(l.who, l.face); $('dlgNm').textContent = s.name; }
+    if (s.kind) { $('dlgPic').src = U.pic(l.who, l.face); $('dlgNm').innerHTML = s.name; }
     $('dlgTx').textContent = ''; if (l.fn) l.fn();
+    const ch = $('dlgCh'); ch.innerHTML = ''; ch.classList.add('hide'); d.choosing = false;
+    if (l.choices) {
+      d.choosing = true; d.full = true; $('dlgTx').innerHTML = fmt(l.text);
+      l.choices.forEach((c, k) => { const ok = !c.when || c.when(), b = document.createElement('div'); b.className = 'ch' + (ok ? '' : ' off'); b.innerHTML = '<kbd>' + (k + 1) + '</kbd>' + fmt(c.label); b.dataset.k = k; ch.appendChild(b); });
+      ch.classList.remove('hide');
+    }
   }
+  /* a reply picked in a conversation: its own lines go in next, then the talk carries on */
+  U.pick = function (k) {
+    const d = U.dlg; if (!d || !d.choosing) return false; const c = d.lines[d.i].choices[k]; if (!c || (c.when && !c.when())) { SC.audio.sfx('deny'); return false; }
+    d.choosing = false; $('dlgCh').classList.add('hide'); SC.audio.sfx('ui'); if (c.fn) c.fn();
+    d.lines.splice(d.i + 1, 0, ...(c.lines || [])); nextLine(); return true;
+  };
   U.tap = function () {
     if (U.menuOpen) return;
     if (U.pg) { pageNext(); return; }
-    const d = U.dlg; if (!d) return;
+    const d = U.dlg; if (!d || d.choosing) return;
     if (!d.full) { d.full = true; $('dlgTx').innerHTML = fmt(d.lines[d.i].text); } else { SC.audio.sfx('ui'); nextLine(); }
   };
   U.key = function (a) {
@@ -2979,6 +3131,57 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     if (U.blocking()) { if (a === 'interact' || a === 'attack' || a === 'dodge' || a === 'any') U.tap(); return true; }
     return false;
   };
+
+  /* ---------- the radio: Nell talks while you keep moving; nothing to tap ---------- */
+  const radioQ = [];
+  U.radio = function (lines) { lines.forEach(l => radioQ.push(l)); if (!U.rad) radioNext(); };
+  function radioNext() {
+    const el = $('radio'), l = radioQ.shift();
+    if (!l) { el.classList.remove('on'); U.rad = null; return; }
+    const sp = SPEAK[l.who];
+    $('radPic').src = U.pic(l.who, l.face); $('radNm').innerHTML = sp.name; $('radTx').innerHTML = fmt(l.text);
+    el.classList.toggle('me', l.who === 'hero'); el.classList.add('on'); SC.audio.sfx('static');
+    U.rad = { t: 1.6 + plain(l.text).length * 0.05 };
+  }
+  U.radioBusy = () => !!U.rad || radioQ.length > 0;
+  /* a one-liner in a speech balloon over Dez's head */
+  U.bark = function (text, dur) { const el = $('bark'); el.innerHTML = fmt(text); el.classList.add('on'); U.barkT = dur || 2.4; };
+  /* a chapter title, across the middle of the page for a moment */
+  U.chapter = function (n, title) {
+    const el = $('chapter'); el.innerHTML = '<small>CHAPTER ' + n + '</small>' + title; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); SC.audio.sfx('page');
+  };
+
+  /* ---------- the case board: pin two clues together and see if they make sense ---------- */
+  U.board = function (o) {
+    let pick = null, note = o.note || 'TAP TWO CLUES THAT BELONG TOGETHER.';
+    const draw = () => {
+      let cards = '';
+      o.cards.forEach(c => { cards += '<div class="cd' + (c.have ? '' : ' no') + (pick === c.id ? ' sel' : '') + '" data-go="c_' + c.id + '" data-id="' + c.id + '">' +
+        (c.have ? '<img src="' + c.img() + '" alt="">' : '<div class="q">?</div>') + '<span>' + (c.have ? c.title : '...') + '</span></div>'; });
+      let deds = '';
+      o.deds.forEach(d => { const done = d.done(); deds += '<li class="' + (done ? 'ok' : '') + (d.bonus ? ' bonus' : '') + '"><b>' + (done ? d.title : (d.bonus ? 'EXTRA: ???' : '???')) + '</b>' + (done ? '<small>' + d.text + '</small>' : '') + '</li>'; });
+      const go = { x: () => { closeMenu(); o.close(); } };
+      o.cards.forEach(c => { go['c_' + c.id] = () => {
+        if (!c.have) { SC.audio.sfx('deny'); return; }
+        if (!pick || pick === c.id) { pick = pick === c.id ? null : c.id; draw(); return; }
+        const r = o.tryPair(pick, c.id); note = r.text; pick = null; SC.audio.sfx(r.ok ? 'clue' : 'deny'); draw();
+        if (!r.ok) { const b = document.querySelector('.board .cork'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); }
+      }; });
+      openMenu('<div class="board"><div class="cork"><svg class="str"></svg>' + cards + '</div><div class="side"><h3>CASE: CALLOWAY, D.</h3><ul>' + deds + '</ul>' +
+        '<p class="note">' + fmt(note) + '</p><div class="mbtn y s" data-go="x">CLOSE THE BOARD</div></div></div>', go);
+      U.freeze = true;
+      requestAnimationFrame(() => strings(o));
+    };
+    draw();
+  };
+  function strings(o) {
+    const svg = document.querySelector('.board .str'); if (!svg) return; const box = svg.parentElement.getBoundingClientRect(); let h = '';
+    svg.setAttribute('viewBox', '0 0 ' + box.width + ' ' + box.height);
+    o.deds.forEach(d => { if (!d.done()) return; const a = document.querySelector('.board [data-id="' + d.a + '"]'), b = document.querySelector('.board [data-id="' + d.b + '"]'); if (!a || !b) return;
+      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      h += '<line x1="' + (ra.left + ra.width / 2 - box.left) + '" y1="' + (ra.top + 10 - box.top) + '" x2="' + (rb.left + rb.width / 2 - box.left) + '" y2="' + (rb.top + 10 - box.top) + '"/>'; });
+    svg.innerHTML = h;
+  }
 
   /* ---------- story pages: panels revealed one tap at a time ---------- */
   U.page = function (def, done) {
@@ -2989,6 +3192,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
       el.appendChild(d);
     });
     const go = document.createElement('div'); go.className = 'go'; go.innerHTML = 'TAP &#9654;'; el.appendChild(go);
+    $('radio').classList.add('mute'); $('bark').classList.add('mute');
     el.classList.remove('hide'); U.pg = { n: 0, def, done, t: performance.now() }; U.freeze = true; pageNext(true);
   };
   function pageNext(first) {
@@ -2998,7 +3202,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
   }
 
   /* ---------- menus ---------- */
-  function openMenu(html, fns, clear) { $('toast').classList.remove('on'); const m = $('menu'); m.innerHTML = html; m.classList.remove('hide'); m.classList.toggle('clear', !!clear); U.menuOpen = true; U.menuFns = fns; }
+  function openMenu(html, fns, clear) { $('toast').classList.remove('on'); $('radio').classList.add('mute'); $('bark').classList.add('mute'); const m = $('menu'); m.innerHTML = html; m.classList.remove('hide'); m.classList.toggle('clear', !!clear); U.menuOpen = true; U.menuFns = fns; }
   function closeMenu() { $('menu').classList.add('hide'); U.menuOpen = false; U.menuFns = null; U.freeze = false; SC.input.reset(); }
   U.closeMenu = closeMenu;
   U.title = function (hasSave, onNew, onCont) {
@@ -3025,9 +3229,10 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     const keep = () => { SC.settings.sound = SC.audio.on; SC.settings.sens = SC.input.sens; SC.settings.quality = U.userQuality ? G.quality : 0; SC.saveSettings(); draw(); U.freeze = true; };
     const draw = () => openMenu('<div class="card split"><h2>PAUSED</h2><div>' + CONTROLS +
       '<p class="sub">IOUS FOUND ' + found + '/8 &middot; SCRIP ' + SC.player.scrip + (side ? '<br>SIDE: ' + side : '') + '</p></div>' +
-      '<div><div class="mbtn y" data-go="r">RESUME</div><div class="mbtn s" data-go="d">CHALLENGE: ' + SC.diff().name + '</div><div class="mbtn s" data-go="q">PICTURE: ' + (G.quality >= 1 ? 'SHARP' : 'FAST') + '</div><div class="mbtn s" data-go="s">SOUND: ' + (SC.audio.on ? 'ON' : 'OFF') + '</div>' +
+      '<div><div class="mbtn y" data-go="r">RESUME</div><div class="mbtn s" data-go="b">CASE BOARD</div><div class="mbtn s" data-go="d">CHALLENGE: ' + SC.diff().name + '</div><div class="mbtn s" data-go="q">PICTURE: ' + (G.quality >= 1 ? 'SHARP' : 'FAST') + '</div><div class="mbtn s" data-go="s">SOUND: ' + (SC.audio.on ? 'ON' : 'OFF') + '</div>' +
       '<div class="mbtn s" data-go="v">CAMERA SPEED: ' + (SC.input.sens === 1 ? 'NORMAL' : SC.input.sens > 1 ? 'FAST' : 'SLOW') + '</div><div class="mbtn s" data-go="c">BACK TO LAST CROSSING</div></div></div>', {
       r: () => { closeMenu(); U.paused = false; }, q: () => { G.setQuality(G.quality >= 1 ? 0.5 : 1); U.userQuality = true; keep(); }, s: () => { SC.audio.toggle(); keep(); },
+      b: () => { closeMenu(); U.paused = false; SC.story.openBoard(); },
       d: () => { const o = ['story', 'normal', 'hard']; SC.settings.diff = o[(o.indexOf(SC.settings.diff) + 1) % 3]; keep(); },
       v: () => { SC.input.sens = SC.input.sens === 1 ? 1.5 : SC.input.sens > 1 ? 0.65 : 1; keep(); }, c: () => { closeMenu(); U.paused = false; SC.story.load(); }
     });
@@ -3058,7 +3263,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
   U.end = function (st, onAgain) {
     openMenu('<div class="card"><div class="tag">END OF ISSUE #1</div><h2 style="margin-top:8px">TO BE CONTINUED</h2><p>Deacon Voss paid in full. Mother Mercy still owes.</p>' +
       '<table><tr><td>TIME</td><td>' + Math.floor(st.time / 60) + ' min ' + ('0' + Math.floor(st.time % 60)).slice(-2) + ' s</td></tr><tr><td>PATH</td><td>' + st.path + '</td></tr><tr><td>HOLLOWS PUT DOWN</td><td>' + st.kills + '</td></tr>' +
-      '<tr><td>FINISHERS</td><td>' + st.finishers + '</td></tr><tr><td>LATE DODGES</td><td>' + st.perfect + ' (' + st.counters + ' countered)</td></tr><tr><td>CLUES</td><td>' + st.clues + ' of 5</td></tr>' +
+      '<tr><td>FINISHERS</td><td>' + st.finishers + '</td></tr><tr><td>LATE DODGES</td><td>' + st.perfect + ' (' + st.counters + ' countered)</td></tr><tr><td>CLUES</td><td>' + st.clues + ' of 7 &middot; ' + st.deds + ' deductions</td></tr>' +
       '<tr><td>IOUS</td><td>' + st.ious + ' of 8</td></tr><tr><td>RUTH</td><td>' + (st.ruth ? 'At rest' : 'Still hanging the washing') + '</td></tr><tr><td>CHALLENGE</td><td>' + st.diff + '</td></tr><tr><td>SECOND CHANCES USED</td><td>' + st.chances + '</td></tr></table>' +
       '<div class="mbtn y" data-go="a">PLAY AGAIN</div></div>', { a: () => { closeMenu(); onAgain(); } });
     U.freeze = true;
@@ -3071,6 +3276,13 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
   U.boss = function (e, name) { U.bossE = e; $('boss').classList.toggle('hide', !e); if (e) $('bossNm').textContent = name; };
   const _v = new THREE.Vector3(); let lastPrompt = '';
   U.hud = function (rdt) {
+    if (U.rad && !U.freeze) { U.rad.t -= rdt; if (U.rad.t <= 0) radioNext(); }
+    if (U.barkT > 0) {
+      U.barkT -= rdt; const el = $('bark'); if (U.barkT <= 0 || SC.cam.mode !== 'follow') { el.classList.remove('on'); U.barkT = 0; }
+      else { const p = SC.player; _v.set(p.pos.x, p.visY + 2.3, p.pos.z).project(G.camera); el.style.transform = 'translate(' + ((_v.x * 0.5 + 0.5) * window.innerWidth) + 'px,' + ((-_v.y * 0.5 + 0.5) * window.innerHeight) + 'px) translate(-50%,-100%)'; }
+    }
+    $('caseBtn').classList.toggle('hide', !SC.story.boardReady || !SC.story.boardReady());
+    const mute = !!(U.pg || U.menuOpen); $('radio').classList.toggle('mute', mute); $('bark').classList.toggle('mute', mute);
     const d = U.dlg;
     if (d && !d.full) { d.n += rdt * 62; const n = Math.floor(d.n); if (n >= d.text.length) { d.full = true; $('dlgTx').innerHTML = fmt(d.lines[d.i].text); } else { if (n % 3 === 0 && $('dlgTx').textContent.length !== n) SC.audio.sfx('blip'); $('dlgTx').textContent = d.text.slice(0, n); } }
     const p = SC.player, T = SC.T;
@@ -3080,7 +3292,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     $('tagCh').classList.toggle('used', p.chance <= 0);
     const path = p.path ? SC.PATHS[p.path] : null, ready = path && p.meter >= p.cost();
     $('tagPw').classList.toggle('hide', !path); if (path) $('tagPw').textContent = path.power + (p.rank > 1 ? ' II' : '');
-    $('tagEc').classList.toggle('hide', !p.echoes); if (p.echoes) $('tagEc').textContent = 'CLUES ' + p.echoes + '/5';
+    $('tagEc').classList.toggle('hide', !p.echoes); if (p.echoes) $('tagEc').textContent = 'CLUES ' + p.echoes + '/7';
     if (U._sc !== p.scrip) { const el = $('tagSc'); el.classList.toggle('hide', !p.scrip); el.textContent = 'SCRIP ' + p.scrip; if (U._sc !== undefined && p.scrip > U._sc) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } U._sc = p.scrip; }
     $('bP').classList.toggle('low', !ready); $('bPl').innerHTML = (path ? path.btn : 'POWER') + (SC.input.touch ? '' : '<small>L</small>');
     $('bPf').style.transform = 'scaleY(' + (path ? 1 - Math.min(1, p.meter / p.cost()) : 1) + ')';
@@ -3219,6 +3431,107 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     climb: 'UP ON THE ROOFS. WALK OFF AN EDGE, OR FIND THE LADDER TO CLIMB DOWN.',
     drum: 'LAMP OIL. HIT THE DRUM AND GET CLEAR.'
   };
+  /* Nell on the radio: each call plays once */
+  const CALLS = {
+    wake: [
+      { who: 'nell', text: 'Dez, it is Nell. You were due at the Parish drop forty minutes ago. Tell me you are in a ditch.' },
+      { who: 'hero', text: 'Close. Alley. I got shot.' },
+      { who: 'nell', text: 'Ha. Okay. ...Wait. Are you serious?' },
+      { who: 'hero', text: 'Three times. I am feeling much better.' },
+      { who: 'nell', face: 'angry', text: 'I am writing that down so I can be furious about it later. *Stay on the radio.*' }],
+    street: [
+      { who: 'nell', text: 'I looked up Pier 9 Freight. Owned by something called *Long Night Holdings*. No phone, no people, one post box.' },
+      { who: 'hero', text: 'Sounds friendly.' },
+      { who: 'nell', face: 'smirk', text: 'Sounds like a cult with an accountant.' }],
+    otis: [
+      { who: 'hero', text: 'Nell. Otis says a woman asked for me by name tonight.' },
+      { who: 'nell', text: 'Nobody asks for you by name, Dez. I have to *bribe* people to ask for you by name.' }],
+    masks: [
+      { who: 'nell', face: 'shock', text: 'Masks? In crates? Dez, I am calling the cops.' },
+      { who: 'hero', text: 'And telling them what? A dead courier found the Halloween stock?' },
+      { who: 'nell', text: '...Fine. But I am judging you, and I am doing it out loud.' }],
+    photo: [
+      { who: 'hero', face: 'hurt', text: 'Nell. There was a photo in the satchel. It is Josie. Dated *last Thursday*.' },
+      { who: 'nell', face: 'hurt', text: '...Dez. Do not do this to yourself again. Six years you looked.' },
+      { who: 'hero', face: 'angry', text: 'She was alive last Thursday.' },
+      { who: 'nell', text: 'Then find out who has her. *Then come home.* That part is not optional.' }],
+    bridge: [
+      { who: 'nell', text: 'Whatever is on that roof, you do not have to be clever. Just be alive at the end.' },
+      { who: 'hero', face: 'smirk', text: 'Bit late for that.' },
+      { who: 'nell', text: 'Then be *you* at the end. Same thing, mostly.' }]
+  };
+  S.call = function (id, delay) { if (F['call_' + id]) return; F['call_' + id] = 1; save(); SC.after(delay || 0, () => U.radio(CALLS[id])); };
+  const BARKS = {
+    finish: ['PAID IN FULL.', 'SIGN HERE. AND HERE.', 'CONSIDER THAT RETURNED TO SENDER.', 'NO TIP NECESSARY.'],
+    second: ['NOPE. NOT TONIGHT.'], climb: ['DEAD AN HOUR AND I AM DOING CARDIO.'], counter: ['TOO SLOW. STORY OF YOUR LIFE.'],
+    drum: ['I HAVE A FEW REGRETS. THAT IS NOT ONE.'], ruth: ['GOOD NIGHT, RUTH.']
+  };
+  S.bark = function (id, chance) { if (chance !== undefined && Math.random() > chance) return; const l = BARKS[id]; U.bark(l[(Math.random() * l.length) | 0]); };
+  const CHAPTERS = { 1: 'ELEVEN FORTY-SEVEN', 2: 'PIER 9', 3: 'THE LEDGER', 4: 'EVERYBODY PAYS' };
+  S.chapter = function (n, delay) { if (F['ch_' + n]) return; F['ch_' + n] = 1; save(); SC.after(delay || 0, () => U.chapter(n, CHAPTERS[n])); };
+
+  /* ---------- the case board ---------- */
+  const shots = {};
+  function snapCard(id, pos, look) {
+    if (shots[id]) return shots[id];
+    const c = G.camera, op = c.position.clone(), oq = c.quaternion.clone(), of = c.fov;
+    c.position.copy(pos); c.fov = 42; c.updateProjectionMatrix(); c.lookAt(look);
+    const was = S.ruth.group.visible; if (id === 'ruth') S.ruth.group.visible = true;
+    shots[id] = G.snap(320, 200); S.ruth.group.visible = was;
+    c.position.copy(op); c.quaternion.copy(oq); c.fov = of; c.updateProjectionMatrix();
+    return shots[id];
+  }
+  function drawPhoto() {
+    if (shots.photo) return shots.photo;
+    const c = document.createElement('canvas'); c.width = 320; c.height = 200; const g = c.getContext('2d');
+    g.fillStyle = '#e9e1c8'; g.fillRect(0, 0, 320, 200); g.fillStyle = '#2a3150'; g.fillRect(14, 12, 292, 160);
+    g.fillStyle = '#5a6a9a'; g.fillRect(70, 24, 180, 120); g.fillStyle = '#9fb0d8'; for (let i = 0; i < 40; i++) g.fillRect(74 + (i * 37 % 170), 96 + (i * 13 % 40), 4, 5);
+    g.fillStyle = '#15151f'; g.fillRect(156, 24, 8, 120); g.fillRect(70, 80, 180, 7); g.lineWidth = 8; g.strokeStyle = '#15151f'; g.strokeRect(70, 24, 180, 120);
+    g.fillStyle = '#8a1f24'; g.beginPath(); g.moveTo(112, 172); g.lineTo(122, 112); g.quadraticCurveTo(136, 100, 150, 112); g.lineTo(160, 172); g.fill();
+    g.fillStyle = '#15151f'; g.beginPath(); g.arc(136, 98, 15, 0, 7); g.fill(); g.fillRect(122, 98, 28, 34);
+    g.fillStyle = '#f6f2e6'; g.fillRect(138, 84, 4, 22);
+    g.font = '700 15px "Comic Sans MS", cursive'; g.fillStyle = '#3a2a1a'; g.fillText('Thurs. the 14th', 196, 192); g.save(); g.rotate(-0.04); g.restore();
+    return (shots.photo = c.toDataURL('image/jpeg', 0.85));
+  }
+  const CARDS = [
+    { id: 'casings', title: 'THREE CASINGS', flag: 'clue_casings', p: [2.8, 1.7, 36.6], l: [1.3, 0.1, 38.9] },
+    { id: 'bike', title: 'MY BIKE, PIER 9 TAG', flag: 'clue_bike', p: [7.6, 1.7, 12.6], l: [9.3, 0.3, 15] },
+    { id: 'otis', title: 'OTIS: SHE ASKED FOR ME', flag: 'clue_otis', p: [-0.4, 1.6, 27.4], l: [-2.8, 1.5, 26] },
+    { id: 'masks', title: 'CRATES OF MASKS', flag: 'clue_masks', p: [21, 2.6, -13.6], l: [21, 1, -18.4] },
+    { id: 'photo', title: 'JOSIE, LAST THURSDAY', flag: 'clue_photo', draw: drawPhoto },
+    { id: 'ledger', title: "VOSS'S LEDGER", flag: 'clue_ledger', p: [-26.4, 5.7, -7.4], l: [-29, 4.85, -8.8] },
+    { id: 'loft', title: 'FORTY BY SUNDAY', flag: 'clue_loft', p: [-25.4, 10.8, -24.6], l: [-29.7, 10, -26.7] },
+    { id: 'ruth', title: "RUTH'S STORY", flag: 'ruth_done', p: [-13.4, 12.2, 36.4], l: [-15.5, 12, 38.2] }
+  ];
+  const DEDS = [
+    { id: 'shooter', a: 'casings', b: 'ledger', title: 'VOSS PULLED THE TRIGGER', text: 'He shot me, then wrote me down like a delivery. "Collected, 11:47."' },
+    { id: 'factory', a: 'bike', b: 'masks', title: 'PIER 9 MAKES HOLLOWS', text: 'Not a warehouse. A factory. People go in, masks come out.' },
+    { id: 'quota', a: 'loft', b: 'ledger', title: 'MERCY NEEDS FORTY', text: 'Forty souls by Sunday, and every name gets ruled off in red.' },
+    { id: 'envelope', a: 'otis', b: 'photo', title: 'IT WAS NEVER THE MONEY', text: 'Someone made sure I carried Josie\'s picture tonight. Someone else wanted it back badly enough to kill me.' },
+    { id: 'stock', a: 'ruth', b: 'masks', bonus: true, title: 'RUTH WAS STOCK', text: 'Not a rent problem. Ruth was inventory, and so is half this street.' }
+  ];
+  const WRONG = ['BOTH TRUE. NEITHER HELPS.', 'NELL WOULD CALL THAT A STRETCH. NELL WOULD BE RIGHT.', 'THAT IS NOT A LEAD. THAT IS TWO THINGS NEXT TO EACH OTHER.', 'NO. AND I SAY THAT AS A MAN WHO WAS SHOT TODAY.'];
+  let wrongN = 0;
+  S.deduce = function (a, b) {
+    const d = DEDS.find(x => (x.a === a && x.b === b) || (x.a === b && x.b === a));
+    if (!d) return { ok: false, text: WRONG[wrongN++ % WRONG.length] };
+    if (F['ded_' + d.id]) return { ok: false, text: 'ALREADY PINNED. I AM DEAD, NOT FORGETFUL.' };
+    F['ded_' + d.id] = 1; pl.scrip += 10; save();
+    const n = DEDS.filter(x => !x.bonus && F['ded_' + x.id]).length;
+    return { ok: true, text: '*' + d.title + '.* +10 SCRIP' + (n === 4 && !d.bonus ? '. THAT IS THE WHOLE SHAPE OF IT.' : '') };
+  };
+  S.boardReady = () => CARDS.filter(c => F[c.flag]).length >= 2;
+  S.openBoard = function () {
+    pl.vel.set(0, 0, 0);
+    U.board({
+      cards: CARDS.map(c => ({ id: c.id, title: c.title, have: !!F[c.flag], img: () => c.draw ? c.draw() : snapCard(c.id, v3(c.p[0], c.p[1], c.p[2]), v3(c.l[0], c.l[1], c.l[2])) })),
+      deds: DEDS.map(d => ({ a: d.a, b: d.b, title: d.title, text: d.text, bonus: d.bonus, done: () => !!F['ded_' + d.id] })),
+      tryPair: S.deduce, close() { objective(); }
+    });
+  };
+  S.dedCount = () => DEDS.filter(x => F['ded_' + x.id]).length;
+  function boardTip() { if (F.tip_board) return; const can = DEDS.some(d => F[CARDS.find(c => c.id === d.a).flag] && F[CARDS.find(c => c.id === d.b).flag] && !F['ded_' + d.id]);
+    if (can) { F.tip_board = 1; SC.after(1.2, () => U.toast('TWO CLUES THAT FIT. OPEN THE *CASE* BOARD (TOP RIGHT) AND PIN THEM TOGETHER.', 5)); } }
   S.tip = function (id) { if (F['tip_' + id]) return; F['tip_' + id] = 1; SC.after(id === 'counter' ? 0 : 0.6, () => U.toast(TIPS[id], 4)); };
   function read() { try { const d = JSON.parse(localStorage.getItem(SAVE)); return d && d.v === 1 ? d : null; } catch (e) { return null; } }
   S.hasSave = () => !!read();
@@ -3262,7 +3575,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
   function encDone(id) {
     setFlag('e_' + id);
     if (id === 'alley') U.toast('HOLLOWS. EMPTY SUITS WITH SOMEBODY ELSE INSIDE.', 3.5);
-    if (id === 'street') { F.key = 1; save(); SC.audio.sfx('clue'); U.toast('THE ONE WITH THE KNIFE HAD A *YARD KEY*. PIER 9 FREIGHT.', 4); }
+    if (id === 'street') { F.key = 1; save(); SC.audio.sfx('clue'); U.toast('THE ONE WITH THE KNIFE HAD A *YARD KEY*. PIER 9 FREIGHT.', 4); S.call('street', 4.5); }
     if (id === 'yard') U.toast('THE SHUTTER IS DEAD. THERE MUST BE A *BREAKER*.', 3.5);
     if (id === 'wh') U.toast('QUIET. THERE IS AN *OFFICE* UP THE STAIRS.', 3.5);
     if (id === 'roof') U.toast('ONE ROOF LEFT. THE MERIDIAN.', 3);
@@ -3277,6 +3590,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
         if (!F['clue_' + id]) { pl.echoes++; setFlag('clue_' + id);
           if (pl.echoes >= 3 && pl.rank < 2) { pl.rank = 2; save(); SC.after(0.4, () => { U.toast('THREE CLUES. THE MARK BITES DEEPER: *' + (pl.path ? SC.PATHS[pl.path].power : 'YOUR POWER') + ' II*', 4); SC.audio.sfx('path'); }); } }
         if (after) after();
+        boardTip();
       };
       U.say(lines, echo ? () => echo.play(() => U.say(echo.post, () => { U.showHud(true); SC.emit('letterbox', false); cam.endCine(0.7); finish(); })) : finish);
     };
@@ -3394,7 +3708,8 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
         { who: 'clerk', text: 'On terms. Start with whoever killed you. And step into *the mark* when you have decided how you will collect.' }
       ], n); },
       n => { hideClerk(); SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.snapBehind(Math.PI); cam.endCine(0.9); U.showHud(true); setFlag('intro');
-        U.toast(SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
+        U.toast(SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5);
+        S.chapter(1, 0.3); S.call('wake', 6); n(); }]);
   }
   function bossIntro() {
     const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
@@ -3424,10 +3739,30 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
         { who: 'cap', text: 'It was 1:15 AM. Dawn was a long way off, and I had a debt to collect.' }
       ], n),
       n => { hideClerk(); n(); }, 0.8,
+      n => { if (F.clue_photo) cliffhanger(n); else n(); },
       n => { S.done = true;
         U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, counters: pl.stats.counters, chances: pl.stats.chances, clues: pl.echoes,
-          ious: S.IOUS.filter((q, j) => F['iou_' + j]).length, ruth: !!F.ruth_done, diff: SC.diff().name }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); n(); }]);
+          ious: S.IOUS.filter((q, j) => F['iou_' + j]).length, ruth: !!F.ruth_done, diff: SC.diff().name, deds: S.dedCount() }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); n(); }]);
   }
+
+  /* the last page: uptown, the same night */
+  function cliffhanger(done) {
+    const jo = SC.makeHumanoid('josie'), me = SC.makeHumanoid('mercy');
+    G.scene.add(jo.group); G.scene.add(me.group);
+    jo.group.position.set(40, 9, 30); jo.group.rotation.y = Math.PI / 2; jo.anim.apply(P.idle(0), 999, 0.016); jo.face('neutral');
+    me.group.position.set(38.7, 9, 30.9); me.group.rotation.y = 2.1; me.anim.apply(P.mercyTouch, 999, 0.016); me.face('neutral');
+    const sv = { amb: G.amb.intensity }; G.amb.intensity *= 0.6;
+    const a = shot(36.2, 10.9, 28.4, 46, 10.4, 31.8, 40, 768, 520);
+    jo.face('hurt'); jo.expr = null; jo.face('hurt');
+    const b = shot(41.6, 10.6, 31.6, 39.6, 10.6, 30.4, 34, 768, 520);
+    G.amb.intensity = sv.amb; G.scene.remove(jo.group); G.scene.remove(me.group);
+    U.page({ cols: '1fr 1fr', rows: '1fr', panels: [
+      { img: a, area: '1 / 1 / 2 / 2', cap: 'ACROSS THE ALLEY. THE SAME NIGHT.', cap2: '"YOUR BROTHER IS VERY HARD TO KILL, JOSEPHINE."', cap2Cls: 'w' },
+      { img: b, area: '1 / 2 / 2 / 3', cap: '"I KNOW."', capCls: 'w', cap2: '"I AM COUNTING ON IT."', cap2Cls: 'w', fx: '?!' }
+    ] }, done);
+  }
+
+  S.cliffhanger = cliffhanger;
 
   /* ---------- set up interactables and markers ---------- */
   S.init = function () {
@@ -3447,9 +3782,15 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     W.addInteract({ id: 'bike', x: 9.2, y: 0, z: 13.7, fx: 9.3, fz: 15, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_alley && !F.clue_bike, act: clue('bike', [
       { who: 'cap', text: 'My bike. My satchel, slit open and empty. The Parish payroll is gone.' },
       { who: 'hero', text: 'There is a freight tag in the spokes. *PIER 9.* They did not even bother to hide it.' }]) });
+    W.addInteract({ id: 'photo', x: -19.6, y: 0, z: 0.5, fx: -20.6, fz: 0.6, r: 1.9, label: 'LOOK', marker: 'clue', mh: 2.2, when: () => F.e_wh && !F.clue_photo, act: clue('photo', [
+      { who: 'cap', text: 'Dumped on a crate like trash: my satchel. Everything gone but one envelope, torn open.' },
+      { who: 'cap', text: 'Inside, a photograph. A woman at a window, looking out at the river. On the back, in pencil: a date. *Last Thursday.*' },
+      { who: 'hero', face: 'shock', text: '...Josie.' },
+      { who: 'hero', face: 'hurt', text: 'My little sister walked out of our house eleven years ago and never came back. The police wrote "runaway". I wrote a lot of things.' },
+      { who: 'hero', face: 'angry', text: 'Last Thursday. She was *alive* last Thursday.' }], () => S.call('photo', 1.5)) });
     W.addInteract({ id: 'masks', x: 21, y: 0, z: -16.3, fx: 21, fz: -18.4, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.6, when: () => F.e_yard && !F.clue_masks, act: clue('masks', [
       { who: 'cap', text: 'The container is full of crates. The crates are full of white masks, packed in straw like eggs.' },
-      { who: 'hero', face: 'shock', text: 'They are not hiring muscle. They are *hollowing people out* and wearing what is left.' }]) });
+      { who: 'hero', face: 'shock', text: 'They are not hiring muscle. They are *hollowing people out* and wearing what is left.' }], () => S.call('masks', 1.5)) });
     W.addInteract({ id: 'ledger', x: -27.2, y: 4, z: -8.7, fx: -29, fz: -8.7, r: 2.1, label: 'SEARCH', marker: 'clue', mh: 1.8, when: () => F.e_wh && !F.ledger, act: clue('ledger', [
       { who: 'cap', text: 'A ledger under the desk lamp. Columns of names, each one ruled out in red.' },
       { who: 'hero', face: 'angry', text: 'D. CALLOWAY. Last line. Signed off by *Deacon Voss*, "collected, 11:47".' },
@@ -3460,18 +3801,47 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
       { who: 'hero', text: '"Mercy wants forty by Sunday." Forty what? ...Forty *of us*.' }]) });
     W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 2.2, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
       if (!F.key) { U.toast('LOCKED. SOMEBODY ON THIS STREET HAS THE KEY.', 2.6); SC.audio.sfx('deny'); return; }
-      W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); U.toast('THE GATE ROLLS BACK.', 2); } });
+      W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); S.chapter(2, 0.6); } });
     W.addInteract({ id: 'breaker', x: 31.1, y: 0, z: -8, fx: 32, fz: -8, r: 2, label: 'BREAKER', marker: 'act', mh: 2.6, when: () => F.e_yard && !F.breaker, act: () => {
       setFlag('breaker'); W.openDoor('shutter'); SC.audio.sfx('door'); pl.control = false; U.showHud(false); SC.emit('letterbox', true);
       cam.move(v3(13.5, 2.2, -3.2), v3(5.7, 1.6, -6.5), v3(11.5, 1.7, -4.4), v3(5.7, 2.6, -6.5), 2.2, 44);
-      run([2.3, n => { SC.emit('letterbox', false); cam.endCine(0.6); U.showHud(true); pl.control = true; n(); }]); } });
+      run([2.3, n => { SC.emit('letterbox', false); cam.endCine(0.6); U.showHud(true); pl.control = true; S.chapter(3, 0.4); n(); }]); } });
     W.addInteract({ id: 'hatch', x: -13.5, y: 8.1, z: -18.2, fx: -12.5, fz: -18.2, r: 1.8, label: 'ROOF DOOR', marker: 'act', mh: 2.2, when: () => F.e_wh && !F.hatch, act: () => {
       if (!F.ledger) { U.toast('LOCKED. THE KEY WILL BE IN THAT *OFFICE*.', 2.6); SC.audio.sfx('deny'); return; }
-      W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); } });
+      W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); S.chapter(4, 1.6); } });
+    // Otis Greer, night bartender at the Lethe, out the side door for some air
+    const otis = S.otis = SC.makeHumanoid('otis'); G.scene.add(otis.group); otis.group.position.set(-2.75, 0, 26.0); otis.yaw = Math.PI / 2;
+    W.dyn.push((t, dt) => {
+      const on = !!F.e_alley; otis.group.visible = on; otisBox.on = on; if (!on) return;
+      const d = SC.dist2(pl.pos.x, pl.pos.z, -2.75, 26); if (d < 6 && pl.pos.y < 2) otis.yaw = SC.dampAng(otis.yaw, Math.atan2(pl.pos.x + 2.75, pl.pos.z - 26), 3, dt);
+      otis.group.rotation.y = otis.yaw; otis.anim.apply(P.barkeep(t), 6, Math.max(dt, 0.0001)); otis.face(S.otisFace || 'neutral');
+    });
+    const otisBox = W.solid(-3.5, 25.6, -2.3, 26.4, 0, 1.9, { cam: false }); // runs to the wall: no gap to get caught in
+    const tail = [
+      { who: 'otis', text: 'A woman. Came in at half past eleven, asked which courier runs the Parish job. Asked for you *by name*.' },
+      { who: 'otis', text: 'Left an envelope for you to carry. Did not drink. Paid anyway, which in this bar makes you a saint.' },
+      { who: 'hero', text: 'What did she look like?' },
+      { who: 'otis', face: 'shock', text: 'Dark hair. Older than she wanted to be. And Dez... *she had your eyes.*' }];
+    W.addInteract({ id: 'otis', x: -2.0, y: 0, z: 26.0, fx: -2.75, fz: 26, r: 2.1, label: 'TALK', marker: 'clue', mh: 2.4, when: () => F.e_alley && !F.clue_otis, act: clue('otis', [
+      { who: 'otis', text: 'Dez Calloway. Somebody said you got shot in my alley.' },
+      { who: 'hero', text: 'Somebody exaggerated. I got shot *near* your alley.' },
+      { who: 'otis', text: 'You look like hell.' },
+      { who: 'hero', face: 'smirk', text: 'I have been. It is overrated.' },
+      { who: 'hero', text: 'The Parish envelope, Otis. Who handed it off tonight?' },
+      { who: 'otis', face: 'angry', text: 'I pour drinks. I do not keep a guest book.', choices: [
+        { label: 'Joke: "You remember every tab since 1971. You remember her."', lines: [
+          { who: 'otis', face: 'smirk', text: '...Ha. Fine. Since you are dead and all. *Dead men drink free.*' }].concat(tail), fn: () => { S.otisFace = 'smirk'; pl.heal(40); SC.audio.sfx('glass'); } },
+        { label: 'Lean on him: "Two Hollows just tried to eat me outside your door. Talk."', lines: [
+          { who: 'otis', face: 'shock', text: 'Easy. Easy. I have got a family and a bad back.' }].concat(tail), fn: () => { S.otisFace = 'shock'; } },
+        { label: 'Pay him: slide over 10 scrip', when: () => pl.scrip >= 10, lines: [
+          { who: 'otis', text: 'Funny money. Spends fine, though.' }].concat(tail, [{ who: 'otis', text: 'One more thing, on the house. She walked toward Pier 9 when she left. Not away from it.' }]),
+          fn: () => { pl.scrip -= 10; S.otisFace = 'neutral'; pl.gain(40); } }] }], () => S.call('otis', 1)) });
+    W.addInteract({ id: 'otis2', x: -2.0, y: 0, z: 26.0, fx: -2.75, fz: 26, r: 2.1, label: 'TALK', when: () => F.clue_otis, act: () => {
+      U.say([{ who: 'otis', face: 'smirk', text: SC.pick(['Go find her, Dez. I will keep your stool warm.', 'You are still dead, right? Because you are still dripping on my step.', 'Tab is open. It is always open. That is the problem with you Calloways.']) }]); } });
     // ladders
     Object.keys(W.ladders).forEach(id => {
       const L = W.ladders[id], ok = id === 'yard' ? () => F.gate : () => F.intro;
-      W.addInteract({ id: 'lu_' + id, x: L.x, y: L.y0, z: L.z, r: 1.6, label: 'CLIMB', marker: 'climb', mh: 2.4, when: ok, act: () => { pl.startClimb(L, false); S.tip('climb'); } });
+      W.addInteract({ id: 'lu_' + id, x: L.x, y: L.y0, z: L.z, r: 1.6, label: 'CLIMB', marker: 'climb', mh: 2.4, when: ok, act: () => { pl.startClimb(L, false); if (!F.tip_climb) SC.after(1.5, () => S.bark('climb')); S.tip('climb'); } });
       W.addInteract({ id: 'ld_' + id, x: L.ex, y: L.y1, z: L.ez, r: 1.5, label: 'CLIMB DOWN', when: ok, act: () => pl.startClimb(L, true) });
     });
     // Tally's IOUs, left where the dead dropped them
@@ -3514,7 +3884,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
         if (giving) {
           F.ruth_done = 1; pl.scrip += 40; ruth.rising = true; ruth.up = 0;
           FX.ring(ruth.group.position, 0x8fd8ff, 0.5, 3, 0.8); FX.light(ruth.group.position, 0x8fd8ff, 80, 1.4); SC.audio.sfx('ascend');
-          U.toast("RUTH'S THANKS: *+40 SCRIP*", 3);
+          U.toast("RUTH'S THANKS: *+40 SCRIP*", 3); SC.after(2.2, () => S.bark('ruth')); boardTip();
         } else if (!F.tip_ruth) { F.tip_ruth = 1; U.toast("SIDE: *RUTH'S LOCKET*. PIER 9 YARD, ON TOP OF THE CONTAINERS.", 4.5); }
         save();
       });
@@ -3522,7 +3892,8 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     W.addCollectible({ id: 'locket', kind: 'locket', x: 27.4, y: 5.2, z: -1.6, avail: () => !F.locket, take() {
       F.locket = 1; save(); U.toast(F.ruth_met ? "*RUTH'S LOCKET*. TAKE IT BACK TO HER ROOF, OVER THE ALLEY." : "A GOLD LOCKET: 'TO RUTH, FROM EZRA'. SOMEBODY MISSES THIS.", 4); } });
     SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast('WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-    SC.on('secondchance', () => SC.after(1.4, () => U.toast('*SECOND CHANCE* SPENT. A CROSSING GIVES IT BACK.', 3.5)));
+    SC.on('secondchance', () => { SC.after(1.0, () => S.bark('second')); SC.after(1.4, () => U.toast('*SECOND CHANCE* SPENT. A CROSSING GIVES IT BACK.', 3.5)); });
+    SC.on('finisherEnd', e => { if (e.kind !== 'boss') S.bark('finish', 0.5); });
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
     SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
@@ -3569,7 +3940,8 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     else if (F.gate && !F.e_yard && x > 8 && x < 30.5 && z < 2.6 && z > -19 && y < 1) startEnc('yard');
     else if (F.breaker && !F.e_wh && W.inside(x, z) && x < 2.5 && y < 2) startEnc('wh');
     else if (F.hatch && !F.e_roof && !F.bossIntro && y > 8.7 && y < 10 && z < -23.6 && x < -11.5 && x > -31) startEnc('roof');
-    else if (!F.boss && !S.bossDown && y > 10.6 && x > 0.4 && x < 31 && z < -23 && z > -45) bossIntro();
+    if (!F.call_bridge && x > -10 && x < -2 && y > 8.4 && z < -32 && z > -36.5) S.call('bridge');
+    if (!F.boss && !S.bossDown && y > 10.6 && x > 0.4 && x < 31 && z < -23 && z > -45) bossIntro();
   };
 })();
 'use strict';

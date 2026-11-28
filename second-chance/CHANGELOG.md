@@ -1,5 +1,32 @@
 # Second Chance: changelog
 
+## v0.3.0 (Nov 28 2026): the case turns personal
+
+A mystery-thriller pass: a hero who jokes when it is worst, a friend on the radio, a witness to talk round, and a
+case that turns out to be about family. All characters are new to this game.
+
+**Story**
+- Josie: Dez's sister, gone eleven years. Her photograph, dated last Thursday, is in the satchel Voss stole. Found
+  in the warehouse.
+- A last page after the boss when the photo has been found: Josie and Mother Mercy, the same night.
+- Four chapter cards: Eleven Forty-Seven, Pier 9, The Ledger, Everybody Pays.
+
+**Characters**
+- Nell Szabo, night dispatcher, on the radio at six points in the night. Radio calls play while you keep moving.
+- Otis Greer, bartender at the Lethe, in his side door after the alley fight. A conversation with three replies
+  (joke, lean on him, pay him), each with its own answer and bonus.
+- Dez gets one-liners in a speech balloon: finishers, second chances, climbing, Ruth.
+
+**Investigation**
+- The case board: clue cards with pictures of where each was found. Pin two together; four deductions and one
+  extra, 10 scrip each. Opens from a CASE button or the pause menu.
+- Seven clues now (Otis's story and Josie's photo added); still three for the second rank of your power.
+
+**Fixes**
+- Handrails on all three bridges: a hard knock in the boss fight could throw Dez off the scaffold bridge.
+- Otis's space runs to the wall, so Dez cannot be wedged behind him.
+- The radio and speech balloons hide under menus and story pages.
+
 ## v0.2.0 (Nov 28 2026): echoes, rooftops, the ledger
 
 Built out from the v0.1 slice. Same block of the city, same camera rule (third person, always), more to do in it.

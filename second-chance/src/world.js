@@ -127,6 +127,16 @@
         else D('flat', cx, y, z0 + len * t, wid, 0.05, 0.08, 0x15151f, { rx: -ang, outline: 0 }); }
     }
   }
+  /* handrails along both long sides of a ramp, so nobody is knocked off a bridge */
+  function rails(x0, z0, x1, z1, a, b, axis) {
+    const len = axis === 'x' ? x1 - x0 : z1 - z0, ang = Math.atan2(b - a, len), L = Math.hypot(len, b - a), top = Math.max(a, b) + 1.2, lo = Math.min(a, b) - 0.6;
+    [axis === 'x' ? z0 : x0, axis === 'x' ? z1 : x1].forEach(e => {
+      if (axis === 'x') { solid(x0, e - 0.06, x1, e + 0.06, lo, top, { cam: false }); D('flat', (x0 + x1) / 2, (a + b) / 2 + 0.95, e, L, 0.07, 0.07, 0x8d94ac, { rz: ang, outline: 0.02 });
+        for (let i = 0; i <= 4; i++) { const t = i / 4; D('flat', x0 + len * t, SC.lerp(a, b, t) + 0.48, e, 0.06, 0.95, 0.06, 0x23232e, { outline: 0.015 }); } }
+      else { solid(e - 0.06, z0, e + 0.06, z1, lo, top, { cam: false }); D('flat', e, (a + b) / 2 + 0.95, (z0 + z1) / 2, 0.07, 0.07, L, 0x8d94ac, { rx: -ang, outline: 0.02 });
+        for (let i = 0; i <= 2; i++) { const t = i / 2; D('flat', e, SC.lerp(a, b, t) + 0.48, z0 + len * t, 0.06, 0.95, 0.06, 0x23232e, { outline: 0.015 }); } }
+    });
+  }
   const signTex = {};
   function sign(text, x, y, z, ry, w, h, color, bg) {
     const key = text + color + bg;
@@ -352,9 +362,9 @@
     // ----- rooftops -----
     building(-32, -46, -10, -22, 9, 0x8a6048, 0x5c3c2c);                           // block C (9 m)
     building(-2, -46, 32, -22, 11, 0x5a6690, 0x3a4468);                             // the Meridian (11 m)
-    ramp('wood', -27, -22.3, -25, -19.7, 8.2, 9, 8.4, 'z', 0xb98a55);               // plank: warehouse -> C
+    ramp('wood', -27, -22.3, -25, -19.7, 8.2, 9, 8.4, 'z', 0xb98a55); rails(-27, -22.3, -25, -19.7, 9, 8.4, 'z'); // plank: warehouse -> C
     parapet(-32, -46, -10, -22, 9, [{ side: 's', a: -27.2, b: -24.8 }, { side: 'e', a: -35.8, b: -32.7 }]);
-    ramp('wood', -10.3, -35.5, -1.7, -33, 8.6, 9, 11, 'x', 0xb98a55);              // scaffold bridge: C -> Meridian
+    ramp('wood', -10.3, -35.5, -1.7, -33, 8.6, 9, 11, 'x', 0xb98a55); rails(-10.3, -35.5, -1.7, -33, 9, 11, 'x'); // scaffold bridge: C -> Meridian
     [[-8, -35.6], [-4, -35.6], [-8, -32.9], [-4, -32.9]].forEach(p => D('flat', p[0], 4.8, p[1], 0.14, 10, 0.14, 0x23232e, { outline: 0.03 }));
     D('flat', -6, 5, -35.6, 5.8, 0.1, 0.1, 0x23232e, { rz: 0.7, outline: 0.02 }); D('flat', -6, 5, -32.9, 5.8, 0.1, 0.1, 0x23232e, { rz: -0.7, outline: 0.02 });
     parapet(-2, -46, 32, -22, 11, [{ side: 'w', a: -35.8, b: -32.7 }]);
@@ -388,7 +398,7 @@
     ladder('yard', 25.2, -0.35, 0, 1, 0, 5.2, 25.2, -1.7);
     parapet(-46, 18, -3.5, 50, 11, [{ side: 'e', a: 37.0, b: 38.6 }, { side: 'e', a: 43.2, b: 44.8 }], 0x5c3c4e);
     parapet(3.5, 18, 46, 50, 9, [{ side: 'w', a: 20.0, b: 21.6 }, { side: 'w', a: 43.2, b: 44.8 }], 0x2f3f62);
-    ramp('wood', -4.3, 43.3, 4.3, 44.7, 8.5, 11, 9, 'x', 0xb98a55);
+    ramp('wood', -4.3, 43.3, 4.3, 44.7, 8.5, 11, 9, 'x', 0xb98a55); rails(-4.3, 43.3, 4.3, 44.7, 11, 9, 'x');
     [[-3.3, 43.25], [-3.3, 44.75], [3.3, 43.25], [3.3, 44.75]].forEach(p => D('flat', p[0], 6.5, p[1], 0.12, 13, 0.12, 0x23232e, { outline: 0.02 }));
     // west roof: laundry, a stair hut, a water tower
     waterTower(-32, 30, 11); acUnit(-11, 21.5, 11); acUnit(-24, 47.6, 11);
@@ -404,6 +414,11 @@
     [[16, 24], [30, 28], [20, 40]].forEach(p => { D('flat', p[0], 10.4, p[1], 0.07, 2.8, 0.07, 0x23232e, { outline: 0.02 });
       [0.9, 0.6, 0.35].forEach((w, i) => D('flat', p[0], 11 + i * 0.35, p[1], w * 1.6, 0.04, 0.04, 0x23232e, { outline: 0.015, ry: 0.3 })); });
     B('brick', 10.5, 43, 11.7, 44.2, 9, 10.9, 0x3c5078, { outline: 0.05 });
+    // the Lethe's side door, where Otis takes the air
+    D('flat', -3.46, 1.25, 26.0, 0.1, 2.5, 1.4, 0x1a120c, { outline: 0.03 }); D('glow', -3.4, 1.25, 26.0, 0.04, 2.2, 1.15, 0x6a3a1c, { outline: 0 });
+    D('glow', -3.38, 2.62, 26.0, 0.05, 0.12, 1.4, 0xffd76a, { outline: 0 }); D('flat', -3.2, 2.85, 26.0, 0.5, 0.06, 1.7, 0x23232e, { outline: 0.02 });
+    // where the satchel was dumped, at the foot of the office stairs
+    D('flat', -20.4, 1.48, 0.5, 0.55, 0.16, 0.4, 0x7a5a2c, { ry: 0.4, outline: 0.03 }); D('flat', -20.85, 1.43, 0.75, 0.32, 0.03, 0.22, 0xf4f1e6, { ry: -0.3, outline: 0.015 });
     // back of the warehouse office: a gap in the stacks where something was hidden
     crateStatic(-31.2, 4.9, 0.7, 4, 0xd9a05f);
 

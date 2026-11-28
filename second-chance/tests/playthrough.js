@@ -65,7 +65,7 @@ const path = require('path');
     };
     B.use = function (flag) {
       I.press('interact'); B.step(3); let n = 0;
-      while (n++ < 3000) { if (U.menuOpen) break; if (U.blocking()) { U.tap(); B.step(8); continue; } if (pl.control && !SC.echo.on && pl.state !== 'climb' && pl.state !== 'interact') break; B.step(1); }
+      while (n++ < 3000) { if (U.menuOpen) break; if (U.dlg && U.dlg.choosing) { U.pick(B.choice || 0); B.step(2); continue; } if (U.blocking()) { U.tap(); B.step(8); continue; } if (pl.control && !SC.echo.on && pl.state !== 'climb' && pl.state !== 'interact') break; B.step(1); }
       B.step(3);
       if (flag && !SC.flags[flag]) B.log.push('USE did not set ' + flag + ' at ' + pl.pos.x.toFixed(1) + ',' + pl.pos.y.toFixed(1) + ',' + pl.pos.z.toFixed(1));
     };
@@ -73,6 +73,10 @@ const path = require('path');
     B.path = pts => pts.forEach(p => B.go(p[0], p[1]));
     B.cross = function (buys) { I.press('interact'); B.step(3); if (!U.menuOpen) { B.log.push('crossing did not open at ' + pl.pos.x.toFixed(1) + ',' + pl.pos.z.toFixed(1)); return; }
       (buys || []).forEach(id => { if (U.menuFns['b_' + id]) U.menuFns['b_' + id](); }); U.menuFns.x(); B.step(3); };
+    const page0 = U.page; B.pages = 0; U.page = function (d, done) { B.pages++; return page0(d, done); };
+    B.board = function (pairs) { SC.story.openBoard(); const out = [];
+      pairs.forEach(p => { U.menuFns['c_' + p[0]](); U.menuFns['c_' + p[1]](); out.push(document.querySelector('.board .note').textContent); });
+      const strings = document.querySelectorAll('.board .str line').length; U.menuFns.x(); B.step(2); return { out, strings }; };
     B.iou = () => SC.story.IOUS.filter((q, j) => SC.flags['iou_' + j]).length;
     B.mark = m => B.log.push('ok ' + m + ' t=' + (B.frames * DT).toFixed(0) + 's hp=' + Math.round(pl.hp) + ' chance=' + pl.chance);
   }, [process.env.SKILL === '0' ? 0 : 1, process.env.DIFF || '']);
@@ -89,7 +93,7 @@ const path = require('path');
     BOT.go(0, 34.3); SC.input.press('interact'); BOT.step(3); }); await snap('p06-paths');
   await ev(id => { SC.ui.menuFns[id](); BOT.wait(1.2); }, pathId); await snap('p07-bargain');
   await ev(() => { BOT.wait(2.2); BOT.mark('path'); BOT.step(40); }); await snap('p08-first-fight');
-  await ev(() => { BOT.fight(); BOT.mark('alley'); BOT.path([[0.3, 26], [0.3, 36]]); BOT.climb(-2.7, 37.8, 11); }); await snap('p09-roof-west');
+  await ev(() => { BOT.fight(); BOT.mark('alley'); BOT.choice = 0; BOT.go(-1.6, 26.2); BOT.use('clue_otis'); BOT.path([[0.3, 26], [0.3, 36]]); BOT.climb(-2.7, 37.8, 11); }); await snap('p09-roof-west');
   await ev(() => { BOT.go(-14, 38.0); BOT.use('ruth_met'); BOT.path([[-25, 30], [-40, 21.5]]); BOT.path([[-20, 44], [-6, 44], [-3.6, 44]]); }); await snap('p10-plank');
   await ev(() => { BOT.path([[5, 44], [20, 44.5], [36, 44.5], [40, 47], [20, 24], [6, 20.8]]); BOT.use(); if (SC.player.pos.y > 0.3) BOT.log.push('EAST LADDER did not bring us down');
     BOT.mark('rooftop detour iou=' + BOT.iou() + ' scrip=' + SC.player.scrip); BOT.go(0, 19); BOT.go(0, 14, { until: () => !!SC.story.enc }); BOT.step(45); }); await snap('p11-street');
@@ -99,25 +103,34 @@ const path = require('path');
     if (!SC.flags.locket) BOT.log.push('NO LOCKET'); BOT.go(21, -15.9); BOT.use('clue_masks'); BOT.go(26, -9); BOT.go(30.9, -8); BOT.use('breaker'); BOT.wait(3); }); await snap('p14-shutter');
   await ev(() => { BOT.path([[18, 3], [18, 8], [6, 12], [0, 17], [0, 33]]); BOT.climb(-2.7, 37.8, 11); BOT.go(-14, 38.0); BOT.use('ruth_done'); BOT.wait(1.2); }); await snap('p15-ruth');
   await ev(() => { BOT.go(-5.3, 37.8); BOT.use(); BOT.path([[0, 30], [0, 17], [18, 8], [18, 3], [10, -6.5]]); BOT.go(1, -6.5, { until: () => !!SC.story.enc }); BOT.step(60); }); await snap('p16-warehouse');
-  await ev(() => { BOT.fight(); BOT.mark('warehouse'); BOT.go(-12, -4); BOT.go(-12.6, 3.7); BOT.go(-23.5, 3.7); BOT.go(-30.6, 3.4); }); await snap('p17-mezzanine');
+  await ev(() => { BOT.fight(); BOT.mark('warehouse'); BOT.go(-15, -2); BOT.go(-18.9, 0.4); BOT.use('clue_photo'); BOT.go(-12, -4); BOT.go(-12.6, 3.7); BOT.go(-23.5, 3.7); BOT.go(-30.6, 3.4); }); await snap('p17-mezzanine');
   await ev(() => { BOT.go(-26.6, -8.7); SC.input.press('interact'); BOT.step(3); let n = 0; while (!SC.echo.on && n++ < 400) { if (SC.ui.blocking()) { SC.ui.tap(); BOT.step(8); } else BOT.step(1); } BOT.wait(2.5); }); await snap('p18-echo-office');
   await ev(() => { let n = 0; while (n++ < 3000 && (SC.ui.blocking() || SC.echo.on || !SC.player.control)) { if (SC.ui.blocking()) { SC.ui.tap(); BOT.step(8); } else BOT.step(1); } if (!SC.flags.ledger) BOT.log.push('LEDGER not set');
     BOT.go(-24, -18.2); BOT.go(-17, -18.2); BOT.go(-13.6, -18.2, { tol: 0.6 }); BOT.use('hatch'); BOT.wait(1.6); BOT.go(-10.5, -18.2); BOT.go(-6, -13.2); BOT.cross(['dmg', 'due', 'word', 'hp']); BOT.mark('roof crossing up=' + JSON.stringify(SC.up)); }); await snap('p19-roof');
   await ev(() => { BOT.go(-26, -17); BOT.go(-26, -21); BOT.go(-26, -25, { until: () => !!SC.story.enc }); BOT.step(50); }); await snap('p20-roof-fight');
-  await ev(() => { BOT.fight(); BOT.mark('rooftop fight'); BOT.go(-27.3, -26.7); BOT.use('clue_loft'); BOT.path([[-27.5, -30], [-31, -38], [-31, -45.1], [-31, -38], [-24, -32.5], [-12, -32.8], [-6, -34.2]]); }); await snap('p21-bridge');
+  await ev(() => { BOT.fight(); BOT.mark('rooftop fight'); BOT.go(-27.3, -26.7); BOT.use('clue_loft');
+    BOT.boardRes = BOT.board([['casings', 'ledger'], ['bike', 'masks'], ['loft', 'ledger'], ['otis', 'photo'], ['ruth', 'masks'], ['casings', 'bike']]); BOT.mark('board scrip=' + SC.player.scrip); BOT.path([[-27.5, -30], [-31, -38], [-31, -45.1], [-31, -38], [-24, -32.5], [-12, -32.8], [-6, -34.2]]); }); await snap('p21-bridge');
   await ev(() => { BOT.go(1.5, -34.2, { until: () => !SC.player.control }); BOT.wait(1.2); }); await snap('p22-boss-intro');
   await ev(() => { BOT.taps(); BOT.wait(1.5); let n = 0; while (SC.story.enc && n++ < 250) BOT.step(1); }); await snap('p23-boss');
+  await ev(() => { BOT.fight(400); BOT.mark('boss'); BOT.wait(2.5); BOT.taps(); BOT.wait(1.5); });
+  // story pages only take a tap every quarter second of real time, so page through them from out here
+  for (let i = 0; i < 40; i++) {
+    const busy = await ev(() => SC.ui.blocking() && !SC.ui.menuOpen);
+    if (!busy) { if (await ev(() => SC.ui.menuOpen)) break; await ev(() => BOT.wait(0.5)); continue; }
+    if (i === 3) await snap('p24-cliffhanger');
+    await ev(() => { SC.ui.tap(); BOT.step(6); }); await page.waitForTimeout(280);
+  }
   let res = await ev(() => {
-    BOT.fight(400); BOT.mark('boss'); BOT.wait(2.5); BOT.taps(); BOT.wait(2);
-    return { iou: BOT.iou(), scrip: SC.player.scrip, up: SC.up, ruth: !!SC.flags.ruth_done, log: BOT.log, minD: +BOT.minD.toFixed(2), minAt: BOT.minAt, offscreenFrames: BOT.off, offAt: BOT.offAt, followFrames: BOT.total, hpLow: Math.round(BOT.hpLow), flags: Object.keys(SC.flags).join(' '), ended: !!SC.story.done, menu: SC.ui.menuOpen, clock: Math.round(BOT.frames / 30), stats: SC.player.stats, rank: SC.player.rank };
+    BOT.wait(1);
+    return { board: BOT.boardRes, deds: Object.keys(SC.flags).filter(k => k.startsWith('ded_')).length, pages: BOT.pages, calls: Object.keys(SC.flags).filter(k => k.startsWith('call_')).join(' '), iou: BOT.iou(), scrip: SC.player.scrip, up: SC.up, ruth: !!SC.flags.ruth_done, log: BOT.log, minD: +BOT.minD.toFixed(2), minAt: BOT.minAt, offscreenFrames: BOT.off, offAt: BOT.offAt, followFrames: BOT.total, hpLow: Math.round(BOT.hpLow), flags: Object.keys(SC.flags).join(' '), ended: !!SC.story.done, menu: SC.ui.menuOpen, clock: Math.round(BOT.frames / 30), stats: SC.player.stats, rank: SC.player.rank };
   });
-  await snap('p24-end');
+  await snap('p25-end');
   // PLAY AGAIN must put the level back without reloading the page
   res.again = await ev(() => { if (!SC.ui.menuFns || !SC.ui.menuFns.a) return { page: false, note: 'no end menu' }; SC.ui.menuFns.a(); BOT.step(5); const W = SC.world;
     return { page: !!SC.ui.pg, flags: Object.keys(SC.flags).length, doorsShut: Object.keys(W.doors).every(k => W.doors[k].sol.on), cratesWhole: W.crates.every(c => c.alive), enemies: SC.enemies.length, path: SC.player.path }; });
   console.log(JSON.stringify(res, null, 1));
   console.log(errs.length ? 'ERRORS:\n' + errs.slice(0, 10).join('\n') : 'no console errors');
-  const pass = res.ended && res.again.page && res.again.doorsShut && res.again.cratesWhole && !res.again.path && !errs.length && res.minD >= 1.2 && res.offscreenFrames / Math.max(1, res.followFrames) < 0.01 && !res.log.some(l => !l.startsWith('ok'));
+  const pass = res.ended && res.deds === 5 && res.pages >= 2 && res.again.page && res.again.doorsShut && res.again.cratesWhole && !res.again.path && !errs.length && res.minD >= 1.2 && res.offscreenFrames / Math.max(1, res.followFrames) < 0.01 && !res.log.some(l => !l.startsWith('ok'));
   console.log(pass ? 'PASS' : 'FAIL');
   await browser.close(); process.exit(pass ? 0 : 1);
 })();

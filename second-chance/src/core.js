@@ -1,6 +1,6 @@
 'use strict';
 /* SECOND CHANCE - core: namespace, maths, tunables. */
-const SC = window.SC = { V: '0.2.0' };
+const SC = window.SC = { V: '0.3.0' };
 
 SC.clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 SC.lerp = (a, b, t) => a + (b - a) * t;

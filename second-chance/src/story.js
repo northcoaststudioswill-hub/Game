@@ -34,6 +34,107 @@
     climb: 'UP ON THE ROOFS. WALK OFF AN EDGE, OR FIND THE LADDER TO CLIMB DOWN.',
     drum: 'LAMP OIL. HIT THE DRUM AND GET CLEAR.'
   };
+  /* Nell on the radio: each call plays once */
+  const CALLS = {
+    wake: [
+      { who: 'nell', text: 'Dez, it is Nell. You were due at the Parish drop forty minutes ago. Tell me you are in a ditch.' },
+      { who: 'hero', text: 'Close. Alley. I got shot.' },
+      { who: 'nell', text: 'Ha. Okay. ...Wait. Are you serious?' },
+      { who: 'hero', text: 'Three times. I am feeling much better.' },
+      { who: 'nell', face: 'angry', text: 'I am writing that down so I can be furious about it later. *Stay on the radio.*' }],
+    street: [
+      { who: 'nell', text: 'I looked up Pier 9 Freight. Owned by something called *Long Night Holdings*. No phone, no people, one post box.' },
+      { who: 'hero', text: 'Sounds friendly.' },
+      { who: 'nell', face: 'smirk', text: 'Sounds like a cult with an accountant.' }],
+    otis: [
+      { who: 'hero', text: 'Nell. Otis says a woman asked for me by name tonight.' },
+      { who: 'nell', text: 'Nobody asks for you by name, Dez. I have to *bribe* people to ask for you by name.' }],
+    masks: [
+      { who: 'nell', face: 'shock', text: 'Masks? In crates? Dez, I am calling the cops.' },
+      { who: 'hero', text: 'And telling them what? A dead courier found the Halloween stock?' },
+      { who: 'nell', text: '...Fine. But I am judging you, and I am doing it out loud.' }],
+    photo: [
+      { who: 'hero', face: 'hurt', text: 'Nell. There was a photo in the satchel. It is Josie. Dated *last Thursday*.' },
+      { who: 'nell', face: 'hurt', text: '...Dez. Do not do this to yourself again. Six years you looked.' },
+      { who: 'hero', face: 'angry', text: 'She was alive last Thursday.' },
+      { who: 'nell', text: 'Then find out who has her. *Then come home.* That part is not optional.' }],
+    bridge: [
+      { who: 'nell', text: 'Whatever is on that roof, you do not have to be clever. Just be alive at the end.' },
+      { who: 'hero', face: 'smirk', text: 'Bit late for that.' },
+      { who: 'nell', text: 'Then be *you* at the end. Same thing, mostly.' }]
+  };
+  S.call = function (id, delay) { if (F['call_' + id]) return; F['call_' + id] = 1; save(); SC.after(delay || 0, () => U.radio(CALLS[id])); };
+  const BARKS = {
+    finish: ['PAID IN FULL.', 'SIGN HERE. AND HERE.', 'CONSIDER THAT RETURNED TO SENDER.', 'NO TIP NECESSARY.'],
+    second: ['NOPE. NOT TONIGHT.'], climb: ['DEAD AN HOUR AND I AM DOING CARDIO.'], counter: ['TOO SLOW. STORY OF YOUR LIFE.'],
+    drum: ['I HAVE A FEW REGRETS. THAT IS NOT ONE.'], ruth: ['GOOD NIGHT, RUTH.']
+  };
+  S.bark = function (id, chance) { if (chance !== undefined && Math.random() > chance) return; const l = BARKS[id]; U.bark(l[(Math.random() * l.length) | 0]); };
+  const CHAPTERS = { 1: 'ELEVEN FORTY-SEVEN', 2: 'PIER 9', 3: 'THE LEDGER', 4: 'EVERYBODY PAYS' };
+  S.chapter = function (n, delay) { if (F['ch_' + n]) return; F['ch_' + n] = 1; save(); SC.after(delay || 0, () => U.chapter(n, CHAPTERS[n])); };
+
+  /* ---------- the case board ---------- */
+  const shots = {};
+  function snapCard(id, pos, look) {
+    if (shots[id]) return shots[id];
+    const c = G.camera, op = c.position.clone(), oq = c.quaternion.clone(), of = c.fov;
+    c.position.copy(pos); c.fov = 42; c.updateProjectionMatrix(); c.lookAt(look);
+    const was = S.ruth.group.visible; if (id === 'ruth') S.ruth.group.visible = true;
+    shots[id] = G.snap(320, 200); S.ruth.group.visible = was;
+    c.position.copy(op); c.quaternion.copy(oq); c.fov = of; c.updateProjectionMatrix();
+    return shots[id];
+  }
+  function drawPhoto() {
+    if (shots.photo) return shots.photo;
+    const c = document.createElement('canvas'); c.width = 320; c.height = 200; const g = c.getContext('2d');
+    g.fillStyle = '#e9e1c8'; g.fillRect(0, 0, 320, 200); g.fillStyle = '#2a3150'; g.fillRect(14, 12, 292, 160);
+    g.fillStyle = '#5a6a9a'; g.fillRect(70, 24, 180, 120); g.fillStyle = '#9fb0d8'; for (let i = 0; i < 40; i++) g.fillRect(74 + (i * 37 % 170), 96 + (i * 13 % 40), 4, 5);
+    g.fillStyle = '#15151f'; g.fillRect(156, 24, 8, 120); g.fillRect(70, 80, 180, 7); g.lineWidth = 8; g.strokeStyle = '#15151f'; g.strokeRect(70, 24, 180, 120);
+    g.fillStyle = '#8a1f24'; g.beginPath(); g.moveTo(112, 172); g.lineTo(122, 112); g.quadraticCurveTo(136, 100, 150, 112); g.lineTo(160, 172); g.fill();
+    g.fillStyle = '#15151f'; g.beginPath(); g.arc(136, 98, 15, 0, 7); g.fill(); g.fillRect(122, 98, 28, 34);
+    g.fillStyle = '#f6f2e6'; g.fillRect(138, 84, 4, 22);
+    g.font = '700 15px "Comic Sans MS", cursive'; g.fillStyle = '#3a2a1a'; g.fillText('Thurs. the 14th', 196, 192); g.save(); g.rotate(-0.04); g.restore();
+    return (shots.photo = c.toDataURL('image/jpeg', 0.85));
+  }
+  const CARDS = [
+    { id: 'casings', title: 'THREE CASINGS', flag: 'clue_casings', p: [2.8, 1.7, 36.6], l: [1.3, 0.1, 38.9] },
+    { id: 'bike', title: 'MY BIKE, PIER 9 TAG', flag: 'clue_bike', p: [7.6, 1.7, 12.6], l: [9.3, 0.3, 15] },
+    { id: 'otis', title: 'OTIS: SHE ASKED FOR ME', flag: 'clue_otis', p: [-0.4, 1.6, 27.4], l: [-2.8, 1.5, 26] },
+    { id: 'masks', title: 'CRATES OF MASKS', flag: 'clue_masks', p: [21, 2.6, -13.6], l: [21, 1, -18.4] },
+    { id: 'photo', title: 'JOSIE, LAST THURSDAY', flag: 'clue_photo', draw: drawPhoto },
+    { id: 'ledger', title: "VOSS'S LEDGER", flag: 'clue_ledger', p: [-26.4, 5.7, -7.4], l: [-29, 4.85, -8.8] },
+    { id: 'loft', title: 'FORTY BY SUNDAY', flag: 'clue_loft', p: [-25.4, 10.8, -24.6], l: [-29.7, 10, -26.7] },
+    { id: 'ruth', title: "RUTH'S STORY", flag: 'ruth_done', p: [-13.4, 12.2, 36.4], l: [-15.5, 12, 38.2] }
+  ];
+  const DEDS = [
+    { id: 'shooter', a: 'casings', b: 'ledger', title: 'VOSS PULLED THE TRIGGER', text: 'He shot me, then wrote me down like a delivery. "Collected, 11:47."' },
+    { id: 'factory', a: 'bike', b: 'masks', title: 'PIER 9 MAKES HOLLOWS', text: 'Not a warehouse. A factory. People go in, masks come out.' },
+    { id: 'quota', a: 'loft', b: 'ledger', title: 'MERCY NEEDS FORTY', text: 'Forty souls by Sunday, and every name gets ruled off in red.' },
+    { id: 'envelope', a: 'otis', b: 'photo', title: 'IT WAS NEVER THE MONEY', text: 'Someone made sure I carried Josie\'s picture tonight. Someone else wanted it back badly enough to kill me.' },
+    { id: 'stock', a: 'ruth', b: 'masks', bonus: true, title: 'RUTH WAS STOCK', text: 'Not a rent problem. Ruth was inventory, and so is half this street.' }
+  ];
+  const WRONG = ['BOTH TRUE. NEITHER HELPS.', 'NELL WOULD CALL THAT A STRETCH. NELL WOULD BE RIGHT.', 'THAT IS NOT A LEAD. THAT IS TWO THINGS NEXT TO EACH OTHER.', 'NO. AND I SAY THAT AS A MAN WHO WAS SHOT TODAY.'];
+  let wrongN = 0;
+  S.deduce = function (a, b) {
+    const d = DEDS.find(x => (x.a === a && x.b === b) || (x.a === b && x.b === a));
+    if (!d) return { ok: false, text: WRONG[wrongN++ % WRONG.length] };
+    if (F['ded_' + d.id]) return { ok: false, text: 'ALREADY PINNED. I AM DEAD, NOT FORGETFUL.' };
+    F['ded_' + d.id] = 1; pl.scrip += 10; save();
+    const n = DEDS.filter(x => !x.bonus && F['ded_' + x.id]).length;
+    return { ok: true, text: '*' + d.title + '.* +10 SCRIP' + (n === 4 && !d.bonus ? '. THAT IS THE WHOLE SHAPE OF IT.' : '') };
+  };
+  S.boardReady = () => CARDS.filter(c => F[c.flag]).length >= 2;
+  S.openBoard = function () {
+    pl.vel.set(0, 0, 0);
+    U.board({
+      cards: CARDS.map(c => ({ id: c.id, title: c.title, have: !!F[c.flag], img: () => c.draw ? c.draw() : snapCard(c.id, v3(c.p[0], c.p[1], c.p[2]), v3(c.l[0], c.l[1], c.l[2])) })),
+      deds: DEDS.map(d => ({ a: d.a, b: d.b, title: d.title, text: d.text, bonus: d.bonus, done: () => !!F['ded_' + d.id] })),
+      tryPair: S.deduce, close() { objective(); }
+    });
+  };
+  S.dedCount = () => DEDS.filter(x => F['ded_' + x.id]).length;
+  function boardTip() { if (F.tip_board) return; const can = DEDS.some(d => F[CARDS.find(c => c.id === d.a).flag] && F[CARDS.find(c => c.id === d.b).flag] && !F['ded_' + d.id]);
+    if (can) { F.tip_board = 1; SC.after(1.2, () => U.toast('TWO CLUES THAT FIT. OPEN THE *CASE* BOARD (TOP RIGHT) AND PIN THEM TOGETHER.', 5)); } }
   S.tip = function (id) { if (F['tip_' + id]) return; F['tip_' + id] = 1; SC.after(id === 'counter' ? 0 : 0.6, () => U.toast(TIPS[id], 4)); };
   function read() { try { const d = JSON.parse(localStorage.getItem(SAVE)); return d && d.v === 1 ? d : null; } catch (e) { return null; } }
   S.hasSave = () => !!read();
@@ -77,7 +178,7 @@
   function encDone(id) {
     setFlag('e_' + id);
     if (id === 'alley') U.toast('HOLLOWS. EMPTY SUITS WITH SOMEBODY ELSE INSIDE.', 3.5);
-    if (id === 'street') { F.key = 1; save(); SC.audio.sfx('clue'); U.toast('THE ONE WITH THE KNIFE HAD A *YARD KEY*. PIER 9 FREIGHT.', 4); }
+    if (id === 'street') { F.key = 1; save(); SC.audio.sfx('clue'); U.toast('THE ONE WITH THE KNIFE HAD A *YARD KEY*. PIER 9 FREIGHT.', 4); S.call('street', 4.5); }
     if (id === 'yard') U.toast('THE SHUTTER IS DEAD. THERE MUST BE A *BREAKER*.', 3.5);
     if (id === 'wh') U.toast('QUIET. THERE IS AN *OFFICE* UP THE STAIRS.', 3.5);
     if (id === 'roof') U.toast('ONE ROOF LEFT. THE MERIDIAN.', 3);
@@ -92,6 +193,7 @@
         if (!F['clue_' + id]) { pl.echoes++; setFlag('clue_' + id);
           if (pl.echoes >= 3 && pl.rank < 2) { pl.rank = 2; save(); SC.after(0.4, () => { U.toast('THREE CLUES. THE MARK BITES DEEPER: *' + (pl.path ? SC.PATHS[pl.path].power : 'YOUR POWER') + ' II*', 4); SC.audio.sfx('path'); }); } }
         if (after) after();
+        boardTip();
       };
       U.say(lines, echo ? () => echo.play(() => U.say(echo.post, () => { U.showHud(true); SC.emit('letterbox', false); cam.endCine(0.7); finish(); })) : finish);
     };
@@ -209,7 +311,8 @@
         { who: 'clerk', text: 'On terms. Start with whoever killed you. And step into *the mark* when you have decided how you will collect.' }
       ], n); },
       n => { hideClerk(); SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.snapBehind(Math.PI); cam.endCine(0.9); U.showHud(true); setFlag('intro');
-        U.toast(SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
+        U.toast(SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5);
+        S.chapter(1, 0.3); S.call('wake', 6); n(); }]);
   }
   function bossIntro() {
     const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
@@ -239,10 +342,30 @@
         { who: 'cap', text: 'It was 1:15 AM. Dawn was a long way off, and I had a debt to collect.' }
       ], n),
       n => { hideClerk(); n(); }, 0.8,
+      n => { if (F.clue_photo) cliffhanger(n); else n(); },
       n => { S.done = true;
         U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, counters: pl.stats.counters, chances: pl.stats.chances, clues: pl.echoes,
-          ious: S.IOUS.filter((q, j) => F['iou_' + j]).length, ruth: !!F.ruth_done, diff: SC.diff().name }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); n(); }]);
+          ious: S.IOUS.filter((q, j) => F['iou_' + j]).length, ruth: !!F.ruth_done, diff: SC.diff().name, deds: S.dedCount() }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); n(); }]);
   }
+
+  /* the last page: uptown, the same night */
+  function cliffhanger(done) {
+    const jo = SC.makeHumanoid('josie'), me = SC.makeHumanoid('mercy');
+    G.scene.add(jo.group); G.scene.add(me.group);
+    jo.group.position.set(40, 9, 30); jo.group.rotation.y = Math.PI / 2; jo.anim.apply(P.idle(0), 999, 0.016); jo.face('neutral');
+    me.group.position.set(38.7, 9, 30.9); me.group.rotation.y = 2.1; me.anim.apply(P.mercyTouch, 999, 0.016); me.face('neutral');
+    const sv = { amb: G.amb.intensity }; G.amb.intensity *= 0.6;
+    const a = shot(36.2, 10.9, 28.4, 46, 10.4, 31.8, 40, 768, 520);
+    jo.face('hurt'); jo.expr = null; jo.face('hurt');
+    const b = shot(41.6, 10.6, 31.6, 39.6, 10.6, 30.4, 34, 768, 520);
+    G.amb.intensity = sv.amb; G.scene.remove(jo.group); G.scene.remove(me.group);
+    U.page({ cols: '1fr 1fr', rows: '1fr', panels: [
+      { img: a, area: '1 / 1 / 2 / 2', cap: 'ACROSS THE ALLEY. THE SAME NIGHT.', cap2: '"YOUR BROTHER IS VERY HARD TO KILL, JOSEPHINE."', cap2Cls: 'w' },
+      { img: b, area: '1 / 2 / 2 / 3', cap: '"I KNOW."', capCls: 'w', cap2: '"I AM COUNTING ON IT."', cap2Cls: 'w', fx: '?!' }
+    ] }, done);
+  }
+
+  S.cliffhanger = cliffhanger;
 
   /* ---------- set up interactables and markers ---------- */
   S.init = function () {
@@ -262,9 +385,15 @@
     W.addInteract({ id: 'bike', x: 9.2, y: 0, z: 13.7, fx: 9.3, fz: 15, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_alley && !F.clue_bike, act: clue('bike', [
       { who: 'cap', text: 'My bike. My satchel, slit open and empty. The Parish payroll is gone.' },
       { who: 'hero', text: 'There is a freight tag in the spokes. *PIER 9.* They did not even bother to hide it.' }]) });
+    W.addInteract({ id: 'photo', x: -19.6, y: 0, z: 0.5, fx: -20.6, fz: 0.6, r: 1.9, label: 'LOOK', marker: 'clue', mh: 2.2, when: () => F.e_wh && !F.clue_photo, act: clue('photo', [
+      { who: 'cap', text: 'Dumped on a crate like trash: my satchel. Everything gone but one envelope, torn open.' },
+      { who: 'cap', text: 'Inside, a photograph. A woman at a window, looking out at the river. On the back, in pencil: a date. *Last Thursday.*' },
+      { who: 'hero', face: 'shock', text: '...Josie.' },
+      { who: 'hero', face: 'hurt', text: 'My little sister walked out of our house eleven years ago and never came back. The police wrote "runaway". I wrote a lot of things.' },
+      { who: 'hero', face: 'angry', text: 'Last Thursday. She was *alive* last Thursday.' }], () => S.call('photo', 1.5)) });
     W.addInteract({ id: 'masks', x: 21, y: 0, z: -16.3, fx: 21, fz: -18.4, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.6, when: () => F.e_yard && !F.clue_masks, act: clue('masks', [
       { who: 'cap', text: 'The container is full of crates. The crates are full of white masks, packed in straw like eggs.' },
-      { who: 'hero', face: 'shock', text: 'They are not hiring muscle. They are *hollowing people out* and wearing what is left.' }]) });
+      { who: 'hero', face: 'shock', text: 'They are not hiring muscle. They are *hollowing people out* and wearing what is left.' }], () => S.call('masks', 1.5)) });
     W.addInteract({ id: 'ledger', x: -27.2, y: 4, z: -8.7, fx: -29, fz: -8.7, r: 2.1, label: 'SEARCH', marker: 'clue', mh: 1.8, when: () => F.e_wh && !F.ledger, act: clue('ledger', [
       { who: 'cap', text: 'A ledger under the desk lamp. Columns of names, each one ruled out in red.' },
       { who: 'hero', face: 'angry', text: 'D. CALLOWAY. Last line. Signed off by *Deacon Voss*, "collected, 11:47".' },
@@ -275,18 +404,47 @@
       { who: 'hero', text: '"Mercy wants forty by Sunday." Forty what? ...Forty *of us*.' }]) });
     W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 2.2, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
       if (!F.key) { U.toast('LOCKED. SOMEBODY ON THIS STREET HAS THE KEY.', 2.6); SC.audio.sfx('deny'); return; }
-      W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); U.toast('THE GATE ROLLS BACK.', 2); } });
+      W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); S.chapter(2, 0.6); } });
     W.addInteract({ id: 'breaker', x: 31.1, y: 0, z: -8, fx: 32, fz: -8, r: 2, label: 'BREAKER', marker: 'act', mh: 2.6, when: () => F.e_yard && !F.breaker, act: () => {
       setFlag('breaker'); W.openDoor('shutter'); SC.audio.sfx('door'); pl.control = false; U.showHud(false); SC.emit('letterbox', true);
       cam.move(v3(13.5, 2.2, -3.2), v3(5.7, 1.6, -6.5), v3(11.5, 1.7, -4.4), v3(5.7, 2.6, -6.5), 2.2, 44);
-      run([2.3, n => { SC.emit('letterbox', false); cam.endCine(0.6); U.showHud(true); pl.control = true; n(); }]); } });
+      run([2.3, n => { SC.emit('letterbox', false); cam.endCine(0.6); U.showHud(true); pl.control = true; S.chapter(3, 0.4); n(); }]); } });
     W.addInteract({ id: 'hatch', x: -13.5, y: 8.1, z: -18.2, fx: -12.5, fz: -18.2, r: 1.8, label: 'ROOF DOOR', marker: 'act', mh: 2.2, when: () => F.e_wh && !F.hatch, act: () => {
       if (!F.ledger) { U.toast('LOCKED. THE KEY WILL BE IN THAT *OFFICE*.', 2.6); SC.audio.sfx('deny'); return; }
-      W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); } });
+      W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); S.chapter(4, 1.6); } });
+    // Otis Greer, night bartender at the Lethe, out the side door for some air
+    const otis = S.otis = SC.makeHumanoid('otis'); G.scene.add(otis.group); otis.group.position.set(-2.75, 0, 26.0); otis.yaw = Math.PI / 2;
+    W.dyn.push((t, dt) => {
+      const on = !!F.e_alley; otis.group.visible = on; otisBox.on = on; if (!on) return;
+      const d = SC.dist2(pl.pos.x, pl.pos.z, -2.75, 26); if (d < 6 && pl.pos.y < 2) otis.yaw = SC.dampAng(otis.yaw, Math.atan2(pl.pos.x + 2.75, pl.pos.z - 26), 3, dt);
+      otis.group.rotation.y = otis.yaw; otis.anim.apply(P.barkeep(t), 6, Math.max(dt, 0.0001)); otis.face(S.otisFace || 'neutral');
+    });
+    const otisBox = W.solid(-3.5, 25.6, -2.3, 26.4, 0, 1.9, { cam: false }); // runs to the wall: no gap to get caught in
+    const tail = [
+      { who: 'otis', text: 'A woman. Came in at half past eleven, asked which courier runs the Parish job. Asked for you *by name*.' },
+      { who: 'otis', text: 'Left an envelope for you to carry. Did not drink. Paid anyway, which in this bar makes you a saint.' },
+      { who: 'hero', text: 'What did she look like?' },
+      { who: 'otis', face: 'shock', text: 'Dark hair. Older than she wanted to be. And Dez... *she had your eyes.*' }];
+    W.addInteract({ id: 'otis', x: -2.0, y: 0, z: 26.0, fx: -2.75, fz: 26, r: 2.1, label: 'TALK', marker: 'clue', mh: 2.4, when: () => F.e_alley && !F.clue_otis, act: clue('otis', [
+      { who: 'otis', text: 'Dez Calloway. Somebody said you got shot in my alley.' },
+      { who: 'hero', text: 'Somebody exaggerated. I got shot *near* your alley.' },
+      { who: 'otis', text: 'You look like hell.' },
+      { who: 'hero', face: 'smirk', text: 'I have been. It is overrated.' },
+      { who: 'hero', text: 'The Parish envelope, Otis. Who handed it off tonight?' },
+      { who: 'otis', face: 'angry', text: 'I pour drinks. I do not keep a guest book.', choices: [
+        { label: 'Joke: "You remember every tab since 1971. You remember her."', lines: [
+          { who: 'otis', face: 'smirk', text: '...Ha. Fine. Since you are dead and all. *Dead men drink free.*' }].concat(tail), fn: () => { S.otisFace = 'smirk'; pl.heal(40); SC.audio.sfx('glass'); } },
+        { label: 'Lean on him: "Two Hollows just tried to eat me outside your door. Talk."', lines: [
+          { who: 'otis', face: 'shock', text: 'Easy. Easy. I have got a family and a bad back.' }].concat(tail), fn: () => { S.otisFace = 'shock'; } },
+        { label: 'Pay him: slide over 10 scrip', when: () => pl.scrip >= 10, lines: [
+          { who: 'otis', text: 'Funny money. Spends fine, though.' }].concat(tail, [{ who: 'otis', text: 'One more thing, on the house. She walked toward Pier 9 when she left. Not away from it.' }]),
+          fn: () => { pl.scrip -= 10; S.otisFace = 'neutral'; pl.gain(40); } }] }], () => S.call('otis', 1)) });
+    W.addInteract({ id: 'otis2', x: -2.0, y: 0, z: 26.0, fx: -2.75, fz: 26, r: 2.1, label: 'TALK', when: () => F.clue_otis, act: () => {
+      U.say([{ who: 'otis', face: 'smirk', text: SC.pick(['Go find her, Dez. I will keep your stool warm.', 'You are still dead, right? Because you are still dripping on my step.', 'Tab is open. It is always open. That is the problem with you Calloways.']) }]); } });
     // ladders
     Object.keys(W.ladders).forEach(id => {
       const L = W.ladders[id], ok = id === 'yard' ? () => F.gate : () => F.intro;
-      W.addInteract({ id: 'lu_' + id, x: L.x, y: L.y0, z: L.z, r: 1.6, label: 'CLIMB', marker: 'climb', mh: 2.4, when: ok, act: () => { pl.startClimb(L, false); S.tip('climb'); } });
+      W.addInteract({ id: 'lu_' + id, x: L.x, y: L.y0, z: L.z, r: 1.6, label: 'CLIMB', marker: 'climb', mh: 2.4, when: ok, act: () => { pl.startClimb(L, false); if (!F.tip_climb) SC.after(1.5, () => S.bark('climb')); S.tip('climb'); } });
       W.addInteract({ id: 'ld_' + id, x: L.ex, y: L.y1, z: L.ez, r: 1.5, label: 'CLIMB DOWN', when: ok, act: () => pl.startClimb(L, true) });
     });
     // Tally's IOUs, left where the dead dropped them
@@ -329,7 +487,7 @@
         if (giving) {
           F.ruth_done = 1; pl.scrip += 40; ruth.rising = true; ruth.up = 0;
           FX.ring(ruth.group.position, 0x8fd8ff, 0.5, 3, 0.8); FX.light(ruth.group.position, 0x8fd8ff, 80, 1.4); SC.audio.sfx('ascend');
-          U.toast("RUTH'S THANKS: *+40 SCRIP*", 3);
+          U.toast("RUTH'S THANKS: *+40 SCRIP*", 3); SC.after(2.2, () => S.bark('ruth')); boardTip();
         } else if (!F.tip_ruth) { F.tip_ruth = 1; U.toast("SIDE: *RUTH'S LOCKET*. PIER 9 YARD, ON TOP OF THE CONTAINERS.", 4.5); }
         save();
       });
@@ -337,7 +495,8 @@
     W.addCollectible({ id: 'locket', kind: 'locket', x: 27.4, y: 5.2, z: -1.6, avail: () => !F.locket, take() {
       F.locket = 1; save(); U.toast(F.ruth_met ? "*RUTH'S LOCKET*. TAKE IT BACK TO HER ROOF, OVER THE ALLEY." : "A GOLD LOCKET: 'TO RUTH, FROM EZRA'. SOMEBODY MISSES THIS.", 4); } });
     SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast('WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-    SC.on('secondchance', () => SC.after(1.4, () => U.toast('*SECOND CHANCE* SPENT. A CROSSING GIVES IT BACK.', 3.5)));
+    SC.on('secondchance', () => { SC.after(1.0, () => S.bark('second')); SC.after(1.4, () => U.toast('*SECOND CHANCE* SPENT. A CROSSING GIVES IT BACK.', 3.5)); });
+    SC.on('finisherEnd', e => { if (e.kind !== 'boss') S.bark('finish', 0.5); });
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
     SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
@@ -384,6 +543,7 @@
     else if (F.gate && !F.e_yard && x > 8 && x < 30.5 && z < 2.6 && z > -19 && y < 1) startEnc('yard');
     else if (F.breaker && !F.e_wh && W.inside(x, z) && x < 2.5 && y < 2) startEnc('wh');
     else if (F.hatch && !F.e_roof && !F.bossIntro && y > 8.7 && y < 10 && z < -23.6 && x < -11.5 && x > -31) startEnc('roof');
-    else if (!F.boss && !S.bossDown && y > 10.6 && x > 0.4 && x < 31 && z < -23 && z > -45) bossIntro();
+    if (!F.call_bridge && x > -10 && x < -2 && y > 8.4 && z < -32 && z > -36.5) S.call('bridge');
+    if (!F.boss && !S.bossDown && y > 10.6 && x > 0.4 && x < 31 && z < -23 && z > -45) bossIntro();
   };
 })();

@@ -57,6 +57,8 @@
     clue: () => { tone(523, 0.12, { type: 'triangle', gain: 0.2 }); tone(784, 0.3, { type: 'triangle', gain: 0.2, at: ctx.currentTime + 0.1 }); },
     path: () => { tone(196, 1.2, { type: 'sawtooth', to: 392, gain: 0.2, att: 0.3 }); tone(784, 1, { type: 'triangle', gain: 0.2, at: ctx.currentTime + 0.4 }); noise(1.1, { f: 300, to: 5000, gain: 0.25, att: 0.5 }); },
     page: () => noise(0.12, { f: 2400, to: 900, q: 1, gain: 0.16 }),
+    static: () => { noise(0.22, { f: 2200, to: 1800, q: 0.7, gain: 0.12 }); tone(1100, 0.05, { type: 'square', gain: 0.04 }); },
+    glass: () => { tone(2400, 0.25, { type: 'sine', gain: 0.08 }); tone(3100, 0.3, { type: 'sine', gain: 0.05, at: ctx.currentTime + 0.04 }); },
     fuse: () => noise(0.4, { f: 3000, to: 5000, q: 6, gain: 0.12 }),
     boom: () => { noise(1.1, { f: 600, to: 50, type: 'lowpass', gain: 1 }); tone(55, 0.9, { type: 'sine', to: 25, gain: 0.9 }); noise(0.3, { f: 2500, to: 600, gain: 0.4 }); },
     splat: () => { noise(0.18, { f: 900, to: 200, q: 2, gain: 0.6 }); tone(90, 0.2, { type: 'sine', to: 40, gain: 0.6 }); },
