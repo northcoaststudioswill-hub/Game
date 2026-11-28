@@ -180,7 +180,7 @@ const OPENING = [
 const Opening = { run(done) { if (NOFF) return done(); G.mode = 'opening'; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => { Fade.a = 1; Fade.dir = -1; Fade.sp = 1.2; Fade.busy = true; done(); }); } };
 
 // ---- weave them into the story
-if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The last day.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.keepCold() }, { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
+if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The last day.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.keepCold() }, { card: 'BEFORE THE FURNACE', sub: 'Cinderwell. Six tiers under the rock. Before any of\u00a0it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
 // the furnace: if he runs for her, he gets his three steps
 { const i = PROLOGUE_B.findIndex(s => s.choice && s.choice.some(c => /BREAK FREE/.test(c.t))), ch = PROLOGUE_B[i].choice.find(c => /BREAK FREE/.test(c.t)), was = ch.then;
   ch.then = [narr("You tear out of Mara's arms. Three steps. A Warden turns, unhurried, and lowers a halberd the length of a pipe.")];
@@ -191,7 +191,7 @@ if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.d
   { narr: 'So that whenever we heard our own song, we would see the doors close. Hardly anybody on Tier Six has dared to hum it since.' });
   const j = PROLOGUE_B.findIndex(s => s.narr && /starts to hum the shift song/.test(s.narr)); if (j >= 0) PROLOGUE_B.splice(j + 1, 0, { narr: 'It is the only goodbye we are allowed. Speaking at a commitment is forbidden. Nobody ever wrote a rule about humming.' }); }
 // the Pairing used to play here, before the title. It is in the first dream now (DREAM1), so the present comes straight after the furnace.
-{ const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'ASHGATE'; c.sub = 'Forty-one days after the furnace. Kael still fixes valves.'; c.big = 1; c.tr = 'wake'; } }
+{ const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'ASHGATE'; c.sub = 'Forty-one days after the furnace. Kael still fixes\u00a0valves.'; c.big = 1; c.tr = 'wake'; } }
 // the cold open: the last day of the Assay, one duel, nobody named. It cannot be lost, and it cuts as ELEVEN comes down. The whole fight is played at the end of Part One.
 FF.keepCold = () => { const d = FF.keep(); delete d.skip; delete d.newMove; delete d.outro; d.cold = 1; d.arts = []; d.sub = 'THE ASSAY - THE LAST DAY'; d.hero = Object.assign({}, d.hero, { fury0: 55 }); d.taunt = { 0: ['WHAT ARE YOU?', 'WHO WAS SHE?', 'YOU ARE ANGRY AT SOMEONE.'] }; d.voice = { at: [[1, 'THE LAST DAY. HER SON HOLDS THE KEEP.']] }; d.foes = d.foes.map(f => Object.assign({}, f, { name: 'Her son' })); if (d.intro) d.intro = d.intro.filter(x => x.big || /LAST DAY/.test(x.cap || '')); return d; };
 // the Keep at the end of Part One: the cold open again, the whole way through. He cannot be put down until ELEVEN has gone through him;

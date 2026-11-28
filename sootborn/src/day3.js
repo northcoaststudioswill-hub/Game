@@ -73,7 +73,7 @@ function DAY3() {
     { say: 'celestine', t: 'Now you know what I have seen. You will not say it below. Nobody would believe you, and I should have to burn whoever did.' },
     { say: 'celestine', t: 'You may go. And when I dismiss you, the word is "granted." You will learn. Your kind always does, eventually.' },
     { fade: 'out' }, { panel: null },
-    { card: 'THAT EVENING', sub: 'Cinderwell. Second bell. Four hundred people watching the light to see if he would come down.', min: 1.8, max: 6 },
+    { card: 'THAT EVENING', sub: 'Cinderwell. Second bell. Four hundred people watching the light to see if he would come down.', min: 1.8, max: 7 },
     { panel: 'row' }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'tavi', t: 'Was it yellow? Kael. Was she right?' },
     { choice: [

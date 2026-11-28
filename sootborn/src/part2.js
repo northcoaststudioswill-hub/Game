@@ -487,6 +487,7 @@ const P2 = {
     { music: 'mystery' }, { card: 'THE COUNT', sub: 'Nine years after the furnace. The Sun Spire.', big: 1, min: 1.6, max: 5 },
     /* 16a: the Count, as a thing to do */
     { card: 'THE BOOK', sub: 'Nine years after the furnace. The Count.', big: 1, tr: 'years', min: 1.5, max: 4.5 },
+    { panel: null },   /* clears the card, so the lines below are read on black and not hidden behind it */
     { narr: 'The night before the stair, Kestrel put a book on the table in front of me. Not the Count. The Array board\'s own copy of it, that her engineers set the banks from. It had never occurred to anybody up there that the two ought to be kept apart.' },
     { narr: 'Every tier, the Spire, and a column of days. I had carried days across that page for years, where nobody looked. I did it once more, for all of them at once.' },
     { ledger: 1 },
@@ -571,7 +572,7 @@ const P2 = {
     { pic: 'sun' },
     { narr: 'I went down on the first car. Past the square, past Bay Three, into the old tunnel, to a chalk sun that somebody had been keeping fresh for nine years.' },
     { narr: 'I am told I stood there a long time. I was counting. I got to eleven, and for the first time, I did not have to start again.' },
-    ...((G.flags.rays | 0) > 0 ? [{ narr: 'Seren\'s lantern was still on the Pillar, with ' + (G.flags.rays | 0) + ' paper rays on it. Nobody had been allowed to take it down, and then nobody had wanted to.' }] : []),
+    ...((G.flags.rays | 0) > 0 ? [{ narr: 'Seren\'s lantern was still on the Pillar, with ' + (['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][(G.flags.rays | 0) - 1] || G.flags.rays | 0) + ((G.flags.rays | 0) === 1 ? ' paper ray on it.' : ' paper rays on it.') + ' Nobody had been allowed to take it down, and then nobody had wanted to.' }] : []),
     { pic: 'names' },
     { narr: 'Vale handed in his ledger the first morning the light came down. He asked for a wheel on Tier Eight, where his sister\'s ward had been. He is not good at it yet.' },
     { narr: 'Petra Lune kept her column. It is the same book and a different sum. On the first day of every quarter she reads the names aloud in a very even voice. She stops at Hale, O., every time, and then she goes on.' },
@@ -597,7 +598,7 @@ const P2 = {
     { narr: 'Every breath I take is hers. There turned out to be enough of them for everyone.' },
     ]), music: 'dawn' },
     { fade: 'out' }, { panel: null },
-    { card: 'SOOTBORN', sub: 'E V E R Y   B R E A T H   I S   H E R S', big: 1, sfx: 'splash', min: 3, max: 9 },
+    { card: 'SOOTBORN', sub: 'Every breath is hers', big: 1, sfx: 'splash', min: 3, max: 9 },
     { card: 'THE END', sub: 'North Coast Studios  x  E Concepts', min: 2.4, max: 8 }
   ]
 };

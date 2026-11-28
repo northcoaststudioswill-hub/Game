@@ -480,7 +480,7 @@ function festA() {
     F('beatSull') ? { say: 'ivo', t: "And he's limping. I wonder why. I wonder who could possibly have done that, in a chalk ring, where nothing gets written down." } : null,
     { say: 'tavi', t: "Make them look at her, Kael." },
     { fade: 'out' },
-    { card: 'Ashgate Square · after last bell', sub: "Hang her lantern on the Pillar. Stay out of the Tallymen's lamplight. Throw a bolt to pull them away.", min: 1.2, max: 5 }
+    { card: 'Ashgate Square · after last bell', sub: "Hang her lantern on the Pillar. Stay out of the Tallymen's lamplight. Throw a bolt to pull them away.", min: 1.2, max: 8 }
   ].filter(Boolean);
 }
 

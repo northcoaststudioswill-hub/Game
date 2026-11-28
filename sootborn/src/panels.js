@@ -60,7 +60,7 @@ const PANELS = {
         ptext(g, nx ? 'T' + (tier + 4) : 'TIER ' + (tier + 4), nx ? 60 : 6, y - (nx ? 9 : 2), tier === 2 ? '#ffb35a' : '#8a7a70'); g.globalAlpha = 1; }
       if (a >= 1) plate(g, 'THE DEEP ARRAY', 160, 34);
     }
-    if (st >= 2) { plate(g, nx ? 'TIER 6 - HOME' : 'TIER 6 - ASHGATE - HOME', nx ? 222 : 250, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; const bx = nx ? 240 : 292; R(g, bx, y - 4, 22, 5, '#0c0808'); R(g, bx + 1, y - 3, 20, 3, '#3a2a24'); R(g, bx + 1, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', nx ? 239 : 291, 40, '#8a7a60'); }
+    if (st >= 2) { plate(g, nx ? 'TIER 6 - HOME' : 'TIER 6 - ASHGATE - HOME', nx ? 208 : 240, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; const bx = nx ? 240 : 292; R(g, bx, y - 4, 22, 5, '#0c0808'); R(g, bx + 1, y - 3, 20, 3, '#3a2a24'); R(g, bx + 1, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', nx ? 239 : 291, 40, '#8a7a60'); }
     if (st >= 3) { R(g, 108, 28, 5, 58, '#0a0608'); R(g, 109, 28, 3, 58, '#e8e4dc'); const y = 30 + (Math.sin(s * .9 - 1.2) * .5 + .5) * 50; R(g, 107, y, 7, 5, '#ffffff'); glow(g, 110, y + 2, 26, '255,246,214', .7);
       R(g, 96, 12, 28, 18, '#e8e4dc'); R(g, 100, 6, 20, 6, '#f4f2ec'); R(g, 107, 1, 6, 5, '#f4f2ec'); R(g, 96, 28, 28, 2, '#e8c25a'); glow(g, 110, 14, 40, '255,246,214', .35); plate(g, 'LIFT 0', nx ? 88 : 84, 40); }
   },
@@ -114,7 +114,7 @@ const PANELS = {
     const gauge = (cx, cy, v, lab) => { g.fillStyle = '#120a0c'; g.beginPath(); g.arc(cx, cy, 19, 0, 6.3); g.fill(); g.fillStyle = '#c8a050'; g.beginPath(); g.arc(cx, cy, 17, 0, 6.3); g.fill(); g.fillStyle = '#f0e8d0'; g.beginPath(); g.arc(cx, cy, 14, 0, 6.3); g.fill(); for (let i = 0; i <= 6; i++) { const a = Math.PI * (1 + i / 6); R(g, cx + Math.cos(a) * 11 - 1, cy + Math.sin(a) * 11 - 1, 2, 2, i < 2 ? '#c8452e' : '#3a2a20'); }
       const a = Math.PI * (1 + v) + Math.sin(t * 11) * .03; g.strokeStyle = '#c8452e'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(a) * 12, cy + Math.sin(a) * 12); g.stroke(); R(g, cx - 2, cy - 2, 4, 4, '#2a1a14'); ptext(g, lab, cx - ptextW(lab) / 2, cy + 5, '#3a2a20'); };
     const gx = Panels.narrow ? 232 : 262; gauge(gx, 58, st >= 1 ? .96 - Math.min(.11, s * .06) : .96, st >= 1 ? '-11' : 'FULL'); gauge(gx, 132, st >= 1 ? .08 + Math.min(.62, s * .3) : .08 + Math.sin(t * 5) * .02, st >= 1 ? 'AIR' : 'LOW');
-    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', Panels.narrow ? 160 : 230, 100); } }
+    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', Panels.narrow ? 160 : 230, 89); } }
     else { R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); R(g, 64, 78, 8, 10, '#2a2a32'); }
   },
   // ---- Lift Zero opens: light, and three shapes in it, and a tier on its knees
@@ -181,7 +181,7 @@ const PANELS = {
   // ---- Freight Three: where things arrive that are on no manifest (0: Sable · 1: the cold crate open)
   freight(g, t, st, s) {
     const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#0c0e12'); PX.plates(g, '#1c2028'); R(g, 0, 132, 320, 48, '#14181e'); R(g, 0, 132, 320, 1, '#2e3640');
-    R(g, 90, 20, 140, 112, '#2a3038'); for (let y = 24; y < 130; y += 8) { R(g, 94, y, 132, 6, '#3a424c'); R(g, 94, y, 132, 1, '#4e5864'); } R(g, 86, 16, 148, 5, '#e8b23a'); for (let x = 90; x < 230; x += 16) R(g, x, 16, 8, 5, '#1a1c20'); plate(g, 'FREIGHT 3', 160, 10);
+    R(g, 90, 20, 140, 112, '#2a3038'); for (let y = 24; y < 130; y += 8) { R(g, 94, y, 132, 6, '#3a424c'); R(g, 94, y, 132, 1, '#4e5864'); } R(g, 86, 16, 148, 5, '#e8b23a'); for (let x = 90; x < 230; x += 16) R(g, x, 16, 8, 5, '#1a1c20'); plate(g, 'FREIGHT 3', 160, 15);
     for (const [x, y, w, h, c] of [[22, 100, 34, 32, '#5a4a30'], [44, 76, 30, 26, '#4a3e2a'], [250, 104, 40, 28, '#5a4a30'], [262, 82, 30, 24, '#4a3e2a']]) { R(g, x, y, w, h, c); R(g, x, y, w, 2, '#7a6644'); R(g, x + 3, y + h / 2 - 1, w - 6, 2, '#3a3020'); }
     R(g, 140, 136, 44, 22, '#0a0c10'); for (let x = 142; x < 184; x += 6) R(g, x, 136, 2, 22, '#2e3640'); glow(g, 162, 150, 30, '255,170,80', .25 + Math.sin(t * 3) * .05);
     R(g, 196, 108, 36, 24, '#8aa4b4'); R(g, 196, 108, 36, 3, '#b8d0dc'); R(g, 200, 114, 28, 1, '#5a7484'); for (let i = 0; i < 8; i++) { const ph = (t * .3 + i * .125) % 1; R(g, 198 + hash(i, 5) * 32 + Math.sin(t + i) * 2, 106 - ph * 26, 2, 1, `rgba(200,230,255,${.5 * (1 - ph)})`); }
@@ -263,7 +263,7 @@ const PANELS = {
       if (st === 2) { R(g, 128, 150, 9, 12, '#e8c25a'); R(g, 126, 160, 13, 4, '#fff0b0'); R(g, 152, 150, 9, 12, '#e8c25a'); R(g, 150, 160, 13, 4, '#fff0b0'); glow(g, 144, 164, 22, '255,220,140', .5 + .2 * Math.sin(t * 6)); for (let i = 0; i < 6; i++) R(g, 126 + i * 6, 168 + ((t * 30 + i * 5) % 10), 1, 2, '#ffd65a'); }
       if (st >= 3) { g.fillStyle = '#f4f2ec'; g.beginPath(); g.moveTo(128, 102); g.lineTo(156, 102); g.lineTo(166 + Math.sin(t * 2) * 3, 160); g.lineTo(118 + Math.sin(t * 2 + 1) * 3, 160); g.fill(); R(g, 119, 157, 46, 3, '#e8c25a'); R(g, 150, 120, 8, 14, 'rgba(150,20,20,.7)'); PX.spr(g, World.sheetFor('kael2'), 0, 140, 160, 3.2); g.globalAlpha = .82; g.fillStyle = '#f4f2ec'; g.fillRect(126, 104, 6, 50); g.fillRect(152, 104, 6, 50); g.globalAlpha = 1; glow(g, 142, 120, 46, '255,245,220', .22); } }
     g.fillStyle = 'rgba(190,205,235,.35)'; for (let i = 0; i < 90; i++) { const x = (hash(i, 2) * 360 + t * 60) % 340 - 10, y = (hash(i, 7) * 200 + t * (240 + (i % 5) * 30)) % 190; g.fillRect(x | 0, y | 0, 1, 5); }
-    if (st === 0) plate(g, 'DAY THIRTY-ONE', 160, 12);
+    if (st === 0) plate(g, 'DAY THIRTY-ONE', 160, 15);
   },
   // ---- Part Two: the Clerk's desk (0: the order · 1: the pen · 2: done)
   desk(g, t, st, s) {
@@ -282,7 +282,7 @@ const PANELS = {
     const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#14110e'); glow(g, 160, 60, 150, '255,200,120', .12 + Math.sin(t * 5) * .01); R(g, 0, 150, 320, 30, '#2a1e14'); R(g, 0, 150, 320, 2, '#4a3624');
     R(g, 30, 22, 260, 132, '#3a2a1c'); R(g, 34, 26, 124, 124, '#efe6d0'); R(g, 162, 26, 124, 124, '#e8dec6'); R(g, 158, 26, 4, 124, '#b8a888'); R(g, 34, 26, 252, 1, '#fff8e8');
     for (const x0 of [40, 168]) { R(g, x0, 32, 112, 1, '#b8943a'); R(g, x0 + 70, 32, 1, 112, '#d8c8a0'); R(g, x0 + 92, 32, 1, 112, '#d8c8a0'); ptext(g, 'NAME', x0 + 2, 34, '#8a6a2a'); ptext(g, 'AIR', x0 + 73, 34, '#8a6a2a'); ptext(g, 'DUE', x0 + 95, 34, '#8a6a2a'); }
-    const N = ['MORROW D', 'VENN M', 'HOLLIS', 'FEN', 'MARROW', 'TAVI B', 'ORIN', 'NELL', 'BAO', 'PELL', 'JUNO', 'KIT', 'SABLE', 'ADA', 'MOSI', 'PIP'], struck = [0, 3, 6, 9, 12, 14];
+    const N = ['MORROW H', 'VENN M', 'HOLLIS', 'FEN', 'MARROW', 'TAVI B', 'ORIN', 'NELL', 'BAO', 'PELL', 'JUNO', 'KIT', 'SABLE', 'ADA', 'MOSI', 'PIP'], struck = [0, 3, 6, 9, 12, 14];
     for (let i = 0; i < 16; i++) { const x0 = i < 8 ? 40 : 168, y = 44 + (i % 8) * 12, hit = st >= 1 && struck.includes(i), a = hit ? Math.min(1, Math.max(0, s * 2 - struck.indexOf(i) * .5)) : 0; ptext(g, N[i], x0 + 2, y, '#3a2e22'); R(g, x0 + 73, y + 1, 14 - (i * 5) % 8, 3, '#6a8aa0'); ptext(g, String(3 + (i * 7) % 9), x0 + 96, y, '#8a2a1a'); if (a > 0) { R(g, x0, y + 2, Math.round(68 * a), 1, '#a02a1a'); if (a >= 1 && st < 2) ptext(g, 'BALANCED', x0 + 30, y + 6, '#a02a1a'); } }
     if (st >= 2) { const a = Math.min(1, s / 1.4); g.globalAlpha = a; R(g, 60, 70, 200, 44, '#efe6d0'); R(g, 60, 70, 200, 1, '#b8943a'); R(g, 60, 113, 200, 1, '#b8943a'); ptext(g, 'HOLLOWAY S', 72, 78, '#3a2e22', 2); R(g, 70, 84, Math.round(128 * a), 2, '#a02a1a'); ptext(g, 'COMMITTED - TIER 6 - BALANCED', 72, 98, '#a02a1a'); g.globalAlpha = 1; glow(g, 160, 92, 90, '255,120,60', .12 * a); }
     R(g, 250, 120, 3, 34, '#e8e0cc'); R(g, 251, 114 + Math.round(Math.sin(t * 8)), 1, 6, '#ffd26e'); glow(g, 251, 116, 12, '255,200,110', .7); if (st === 0) plate(g, 'THE COUNT', 160, 168);
