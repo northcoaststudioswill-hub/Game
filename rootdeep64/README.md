@@ -50,6 +50,25 @@ no explainer screens, no gameplay verb on Select, sprouts earned not given.
 - **No cartridge shelf.** "Swap cartridge" became "Quit to title". Save key is `rootdeep64-v1`; on a
   first boot it copies a `rootdeep-v1` cartridge save if one is on the same origin and never writes back.
 
+## Animation
+
+The models are simple on purpose; the motion is not. Each character is a jointed rig (waist, chest, head,
+shoulders, elbows, hips, knees, weapon wrist). `src/anim.js` builds a target pose from what the character is
+doing and every joint chases it on a slightly under-damped spring, so moves wind up, overshoot, settle and
+blend without popping. Run cycles are driven by real ground speed, turns bank, starts and stops lean, feet
+are planted from the leg pose. It only reads game state — no rule or timing that affects play was changed
+(the swing, cast and selfie *visual* timers are longer; cooldowns and damage are untouched).
+
+- Keepers: walk-to-run cycle, three-hit combo (cut, back-cut, leaping overhead finisher), maul and bow
+  variants, MAZEL TOV LASER, SELFIE FLASH, TOWEL WHIP, HYDRO JET, dash lunge, flinch, fall, kneel to
+  revive, drop-in landing at each chamber, cheer on a clear, foot dust.
+- Louie: trot into gallop, pounce-bite, THE BOOF play-bow bark, wagging, panting, head tilts, sits when
+  he waits, spins when he cheers.
+- Hearth: Marcus arms crossed and tapping a foot, Erin hands clasped and kneeling to tend the bed, Scout
+  scribbling notes and glancing up, Ranger hand on hip scanning the room. Everyone turns their head to
+  whoever walks up and gestures while talking.
+- The Hollow Keeper uses Will's rig: crouched wind-up, lunge, flinch.
+
 ## Open questions for Will
 
 - **Louie's signature is still THE BOOF**, lil Bottie's placeholder. The fighter in this repo
@@ -66,6 +85,7 @@ no explainer screens, no gameplay verb on Select, sprouts earned not given.
 - `src/data.js` – the cartridge's tables, verbatim
 - `src/game.js` – the loop
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes
+- `src/anim.js` – character animation: jointed rigs, spring-driven poses, every action and NPC habit
 - `src/ui.js` – HUD and every menu screen
 - `src/main.js` – boot, frame loop, `window.__rd` test hooks (same spirit as `__g.RDF()`)
 
@@ -78,6 +98,8 @@ Need Node + Playwright with Chromium.
   boss → co-op down and revive → wipe banks currency → escape. Its bot is slow on purpose.
 - `node test/shots.js` – saves frames of every scene to `test/shots/`. Look at them before calling a
   visual change done.
+- `node test/anim.js` – animation contact sheet: holds each action at a few moments for all four keepers and the
+  Hearth NPCs, close up, into `test/shots/anim-*.png`.
 - `node test/phone.js` – iPhone-sized touch viewports, portrait and landscape.
 
 **Not yet verified:** a physical controller (no hardware here — the mapping follows the standard

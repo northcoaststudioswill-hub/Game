@@ -129,7 +129,7 @@ function rdStartRun(){
 function rdArena(biome){RUN.obst=[];const n=2+((Math.random()*3)|0)+(PL.length>2?1:0);
  for(let i=0;i<n;i++){const w=14+((Math.random()*22)|0),h=10+((Math.random()*10)|0),x=22+Math.random()*(W-44-w),y=38+Math.random()*(H-70-h);
   if(Math.hypot(x+w/2-W/2,y+h/2-H/2)>34&&y+h<H-44)RUN.obst.push({x,y,w,h,biome,s:Math.random()});}
- PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*18;p.y=H-26;p.vx=p.vy=0;p.ax=0;p.ay=-1;
+ PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*18;p.y=H-26;p.vx=p.vy=0;p.ax=0;p.ay=-1;p.land=.62+i*.08;p.cheer=0;p.swing=0;p.castA=0;p.selfieA=0;
   if(p.down){p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1}})}
 function foeScale(){const ch=RUN.chamber;return{hp:1+.30*(ch-1)+.2*(RD.pact.hide||0),dmg:1+.09*(ch-1)+.15*(RD.pact.thorns||0),sp:1+.12*(RD.pact.rush||0)};}
 function spawnFoe(kind,x,y,elite){const d=FOES[kind],sc=foeScale();
@@ -154,7 +154,7 @@ function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=
  wlist.slice(0,cut).forEach(s2=>spawnFoe(s2.k,26+Math.random()*(W-52),36+Math.random()*(H*.45),s2.elite));
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
  RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);}
-function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;
+function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;for(const p of PL)if(!p.down)p.cheer=1.1;
  if(!RUN.podDropped){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:W/2+R(-16,16),y:H/2});RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
  if(RD.keepEq){const who=(KEEPS.find(k=>k.id===RD.keepEq)||{}).who;if(who)RD.keepXp[who]=(RD.keepXp[who]||0)+1}
  let heal=mir('mend')*3+(RUN.boons.pass.find(p=>p.id==='rain')?rdBoonVal(RUN.boons.pass.find(p=>p.id==='rain')):0);
@@ -395,12 +395,12 @@ function damagePlayer(p,n){if(!RUN||p.down||p.inv>0||p.dashT>0)return;const s=rd
   else rdDie();}}
 function doAttack(p){const w=WEAPONS[RD.weapon],s=rdStats(p),[ax,ay]=aimVec(p),isLou=p.char==='LOUIE';p.atkCd=w.rate*(isLou?.72:1);
  noise(.045,.14,2400);p.combo=(p.combo+1)%(w.dmg.length);
- const base=w.dmg[p.combo]*s.dmgMul*s.atkMul*(isLou?.85:1);p.swing=Math.max(.18,w.rate*.7);p.swingD=p.swing;
+ const base=w.dmg[p.combo]*s.dmgMul*s.atkMul*(isLou?.85:1);p.swing=Math.max(.3,w.rate*1.1);p.swingD=p.swing;
  if(w.proj){RUN.projs.push({x:p.x+ax*8,y:p.y+ay*8,vx:ax*w.proj,vy:ay*w.proj,dmg:base,kind:'arrow',r:2,life:1.1,o:p});snd(740,.05,1200);return}
  let hit=false;for(const e of RUN.enemies.slice()){const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy);
   if(d<(isLou?Math.max(18,w.range-6):w.range)+e.r){const dot=(dx/(d||1))*ax+(dy/(d||1))*ay;if(dot>Math.cos(w.arc/2)||d<12){hitEnemy(e,base,'atk',(dx/(d||1))*(w.kb||40)*.06,(dy/(d||1))*(w.kb||40)*.06,p);hit=true}}}
  if(hit)snd(300,.05,180);
- if(hit&&p.char==='WILL'&&p.combo===2){burst(p.x,p.y-8,'#ffffff',10,34);ftext(p.x,p.y-24,'SELFIE!','#fff3b0');snd(1400,.06,2000,'square',.04);p.selfie=.18;
+ if(hit&&p.char==='WILL'&&p.combo===2){burst(p.x,p.y-8,'#ffffff',10,34);ftext(p.x,p.y-24,'SELFIE!','#fff3b0');snd(1400,.06,2000,'square',.04);p.selfie=.18;p.selfieA=.6;
   for(const e of RUN.enemies.slice())if(Math.hypot(e.x-p.x,e.y-p.y)<34){e.root=Math.max(e.root,.5);hitEnemy(e,4,'sig',0,0,p)}}
  p.slashT=.12;p.slashAng=Math.atan2(ay,ax);}
 function doDash(p){if(p.dashCharges<=0||p.dashT>0)return;const[ax,ay]=aimVec(p);
@@ -415,7 +415,7 @@ function doDash(p){if(p.dashCharges<=0||p.dashT>0)return;const[ax,ay]=aimVec(p);
  if(g==='LEAF')rdHeal(2+v*.12,p);
  if(g==='LUCKY'&&Math.random()<.35){p.dashCharges++;p.dashRegen=0}}
 function doCast(p){const s=rdStats(p);if(p.castAmmo<=0||p.castCd>0)return;const[ax,ay]=aimVec(p);
- p.castAmmo--;p.castCd=.35;p.castRegenT=3.2/s.castRegen;snd(880,.07,1320,'triangle',.06);p.castA=.25;
+ p.castAmmo--;p.castCd=.35;p.castRegenT=3.2/s.castRegen;snd(880,.07,1320,'triangle',.06);p.castA=.45;
  const god=RUN.boons.cast?RUN.boons.cast.god:'',mul=s.castMul;
  if(!god){const ch=p.char||'WILL';
   if(!RUN.sigShown){RUN.sigShown=1;say2(SIG[ch].n+'!',1.3)}
@@ -505,7 +505,7 @@ function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  const zipSp=1+.07*budCount(3);
  /* keepers */
  for(const p of PL){
-  if(p.swing>0)p.swing-=dt;if(p.hurt>0)p.hurt-=dt;if(p.castA>0)p.castA-=dt;if(p.selfie>0)p.selfie-=dt;
+  if(p.swing>0)p.swing-=dt;if(p.hurt>0)p.hurt-=dt;if(p.castA>0)p.castA-=dt;if(p.selfie>0)p.selfie-=dt;if(p.selfieA>0)p.selfieA-=dt;if(p.cheer>0)p.cheer-=dt;if(p.land>0)p.land-=dt;
   if(p.down){p.vx=p.vy=0;let near=false;for(const q of PL)if(q!==p&&!q.down&&Math.hypot(q.x-p.x,q.y-p.y)<20)near=true;
    if(near){p.revT+=dt;if(p.revT>=2.2){p.down=false;p.revT=0;p.hp=rdStats(p).maxHp*.3;p.inv=1.5;burst(p.x,p.y,'#a8f080',14,46);say2((PL.length>1?'P'+(p.ix+1)+' ':'')+'IS BACK UP!',1.6);snd(523,.1);later(()=>snd(784,.2),110)}}
    else p.revT=Math.max(0,p.revT-dt*.6);

@@ -4,7 +4,7 @@
 'use strict';
 let lastT=0,booted=false;
 function frame(ts){const dt=Math.min(.05,Math.max(0,(ts-lastT)/1000)||0);lastT=ts;
- pollInput(dt);gameUpdate(dt);
+ pollInput(dt);if(!window.__hold)gameUpdate(dt); /* __hold: tests freeze the rules and let the animation settle */
  if(RN.ok)drawScene(dt);
  drawHud();
  requestAnimationFrame(frame)}

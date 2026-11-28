@@ -27,15 +27,6 @@ function buildMeshes(){let b;
 
 /* ---------- the cast ---------- */
 const CAST={};
-function human(o){const m={};let b;
- b=new MB();b.box(0,-2.9,0,3,5.8,3.3,o.pant,o.pant2||o.pant);b.box(0,-5.3,.5,3.3,1.7,4.3,o.boot||BOOT);m.leg=b.done();
- b=new MB();if(o.dress){b.cyl(0,-3.6,0,6,4.3,5.2,8,o.top,o.top2);b.cyl(0,1.4,0,4.4,3.9,5.8,8,o.top,o.top2)}
- else{b.box(0,3.6,0,8.4,7.2,5.2,o.top,o.top2);if(o.belt)b.box(0,.7,0,8.6,1.3,5.4,o.belt)}
- if(o.chest)o.chest(b);m.body=b.done();
- b=new MB();b.box(0,-2.5,0,2.6,5.2,2.7,o.sleeve||o.top,o.sleeve2||o.top2||o.top);b.sph(0,-5.7,0,1.6,1.6,1.6,6,4,o.skin||SKIN);m.arm=b.done();
- b=new MB();b.sph(0,4.6,0,5,4.8,4.8,8,6,shade(o.skin||SKIN,.86),o.skin||SKIN);
- if(!o.noeyes){b.box(-1.9,4.5,4.5,1.2,1.8,.7,K);b.box(1.9,4.5,4.5,1.2,1.8,.7,K)}
- o.head(b);m.head=b.done();return m}
 function buildCast(){let b;
  CAST.WILL=human({top:'#30a898',top2:'#78e0c8',pant:'#2a8a7c',belt:'#583828',head:b=>{b.sph(0,6.4,-.2,5.5,3.9,5.4,8,5,'#9a5a2c','#c88848');b.box(0,5.5,4.7,7.2,1,3.2,'#9a5a2c','#c88848');b.sph(0,10,0,.9,.9,.9,5,3,'#c88848')}});
  CAST.ERIN=human({dress:1,top:'#9070d0',top2:'#c0a8f0',pant:SKIN,sleeve:'#9070d0',sleeve2:'#c0a8f0',head:b=>{b.sph(0,5.6,-1.1,5.7,5.4,5.3,8,6,'#b84828','#e87848');b.box(0,1.2,-3.8,8.4,7.6,2.6,'#b84828','#e87848');b.box(-4.6,3,1,1.5,5.5,3,'#b84828','#e87848');b.box(4.6,3,1,1.5,5.5,3,'#b84828','#e87848')}});
@@ -57,34 +48,6 @@ function buildCast(){let b;
  b=new MB();b.box(0,3.4,1.6,.9,4,.9,'#6e8a3a');b.box(0,-3.4,1.6,.9,4,.9,'#6e8a3a');b.box(0,0,2.6,1.1,3.6,1,'#8aa850');b.box(0,0,.6,.3,10.4,.3,'#e8e0d0');MESH.bow=b.done();
  /* shadow crown for the Hollow Keeper */
  b=new MB();for(let i=0;i<5;i++){const a=i/5*6.2832;b.cyl(Math.cos(a)*3.4,0,Math.sin(a)*3.4,1,0,4,4,'#0c0a12','#e8e4f5')}MESH.crown=b.done()}
-/* draw a keeper or NPC. o: anim, mv, swing(0..1 progress), down, lean, c, add, scale, weapon, cast */
-function drawCast(kind,x,z,yaw,o){o=o||{};const dr=(o.c||o.add)?{c:o.c,add:o.add}:null;
- mPush();mT(x,o.y||0,z);mRY(yaw);if(o.scale)mS(o.scale);
- if(kind==='LOUIE'){const M=CAST.LOUIE,sw=o.mv?Math.sin(o.anim*1.6)*.75:0,bob=o.mv?Math.abs(Math.sin(o.anim*1.6))*.9:0;
-  if(o.down){mT(0,-3.2,0);mRZ(1.45)}
-  mT(0,6.6+bob,0);if(o.lean)mRX(o.lean);
-  draw(M.body,dr);
-  mPush();mT(0,2.4,6.4);if(o.swing>0)mRX(-.5+o.swing*1.1);else mRX(Math.sin(time*2)*.05);draw(M.head,dr);mPop();
-  mPush();mT(0,1.6,-6.4);mRX(Math.sin(time*9)*.25);mRZ(Math.sin(time*11)*.4);draw(M.tail,dr);mPop();
-  for(const[lx,lz,ph]of[[-2.2,4.6,1],[2.2,4.6,-1],[-2.2,-4.6,-1],[2.2,-4.6,1]]){mPush();mT(lx,-2.2,lz);mRX(sw*ph);draw(M.leg,dr);mPop()}
-  mPop();return}
- const M=CAST[kind]||CAST.WILL,sw=o.mv?Math.sin(o.anim)*.85:0,bob=o.mv?Math.abs(Math.sin(o.anim))*.9:Math.sin(time*2.2+x)*.18;
- if(o.down){mT(0,3,0);mRX(-1.5)}
- mT(0,bob,0);if(o.lean)mRX(o.lean);
- mPush();mT(-2.1,6,0);mRX(sw);draw(M.leg,dr);mPop();
- mPush();mT(2.1,6,0);mRX(-sw);draw(M.leg,dr);mPop();
- mPush();mT(0,6,0);draw(M.body,dr);mPop();
- mPush();mT(-5.6,12.6,0);mRZ(-.12);mRX(-sw*.8+(o.cast>0?-1.9:0));draw(M.arm,dr);mPop();
- mPush();mT(5.6,12.6,0);mRZ(.12);
- if(o.swing>0){const t=1-o.swing;mRY(-.5+t*1.1);mRX(-2.7+t*2.3)}else mRX(sw*.8-(o.weapon?.35:0));
- draw(M.arm,dr);
- if(o.weapon){mT(0,-5.8,0);mRX(o.weapon==='bow'?1.2:.2);draw(MESH[o.weapon],dr)}
- mPop();
- mPush();mT(0,13.2,0);if(!o.mv&&!o.down)mRY(Math.sin(time*.9+x*.3)*.12);draw(M.head,dr);
- if(o.crown){mT(0,9.4,0);draw(MESH.crown,{unlit:true})}
- mPop();
- mPop()}
-
 /* ---------- foes & bosses ---------- */
 const FOE={};
 function buildFoes(){let b;
@@ -151,7 +114,7 @@ function drawBoss(e,o){const x=e.x,z=e.y,ix=e.bossIx,rise=e.born>0?clamp(1-e.bor
  shadow(x,z,9);
  if(e.state===1){mPush();mT(x,.5,z);mS(12+8*Math.sin(time*30));drawT(MESH.ring,{c:hex('#e8e4f5'),a:.7,unlit:true});mPop()}
  const gh=e.state===2;
- drawCast('WILL',x,z,e.yaw||0,{anim:time*12,mv:e.mv,scale:1.55,c:e.chill>0?[.4,.5,.9]:[.3,.27,.42],add:(o.add||0)+(e.state===1?.25:.04),crown:1,weapon:'blade',lean:gh?.5:0,y:-(1-rise)*30});
+ drawCast('WILL',x,z,e.yaw||0,{id:'hollow',scale:1.55,c:e.chill>0?[.4,.5,.9]:[.3,.27,.42],add:(o.add||0)+(e.state===1?.25:.04),crown:1,weapon:'blade',dash:gh,wind:e.state===1,hurt:e.flash>0?1-e.flash/.12:-1,y:-(1-rise)*30});
  sprite(x-2.6,27,z+7,3,[1,1,1],.9,true);sprite(x+2.6,27,z+7,3,[1,1,1],.9,true)}
 
 /* ---------- sprouts ---------- */
@@ -268,6 +231,7 @@ function camFollow(pts,solo,dt,fill){ /* frame the room; lean toward the keepers
  /* distance that fits the framed width and depth at this aspect */
  const dW=halfW/(Math.tan(fov/2)*RN.asp),dH=halfH*Math.sin(pitch)/Math.tan(fov/2)*1.16;const D=Math.max(dW,dH)+30;
  let sx=0,sy=0;if(RUN&&RD.set.shake&&RUN.shake>.05){sx=R(-RUN.shake,RUN.shake)*.6;sy=R(-RUN.shake,RUN.shake)*.6}
+ if(window.__cam){setCam(window.__cam[0],window.__cam[1],.5);return}
  setCam([CAM.x+sx,Math.sin(pitch)*D+sy,CAM.z+Math.cos(pitch)*D+8],[CAM.x+sx,4+sy,CAM.z+2],fov)}
 
 /* ---------- scenes ---------- */
@@ -277,15 +241,20 @@ function torch(x,z){prop(PROP.torch,x,0,z);const fl=Math.sin(time*9+x);sprite(x,
 function lantern(x,y,z,s){mPush();mT(x,y,z);mS(s||1);draw(PROP.lampFrame);draw(PROP.lampGlass,{unlit:true,add:.12+.06*Math.sin(time*7)});mPop();
  sprite(x,y+5*(s||1),z,46*(s||1),hex('#ffd94d'),.26+.05*Math.sin(time*2),true)}
 function keeperOpts(p,run){const isL=p.char==='LOUIE';
- return{anim:p.anim||0,mv:p.mv||p.dashT>0,down:p.down,lean:p.dashT>0?.55:0,swing:p.swing>0?clamp(p.swing/(p.swingD||.2),0,1):0,cast:p.castA>0?1:0,
-  weapon:run&&!isL?RD.weapon:null,add:p.hurt>0?.6:0,c:p.armT>0?[.8,.85,1]:null}}
+ let help=false;if(run&&!p.down)for(const q of PL)if(q!==p&&q.down&&Math.hypot(q.x-p.x,q.y-p.y)<20)help=true;
+ return{id:'p'+p.ix,weapon:run&&!isL?RD.weapon:null,combo:p.combo,nosit:run,
+  atk:run&&p.swing>0?1-p.swing/(p.swingD||.3):-1,cast:run&&p.castA>0?1-p.castA/.45:-1,selfie:run&&p.selfieA>0?1-p.selfieA/.6:-1,
+  hurt:run&&p.hurt>0?1-p.hurt/.25:-1,dash:run&&p.dashT>0,down:run&&p.down,cheer:run&&p.cheer>0?1-p.cheer/1.1:-1,land:run&&p.land>0?Math.max(0,1-p.land/.62):-1,help,
+  add:p.hurt>0?.6:0,c:p.armT>0?[.8,.85,1]:null}}
 function drawKeeper(p,run){const yaw=Math.atan2(p.ax||0,p.ay===undefined?1:p.ay);
- if(run&&p.inv>0&&p.dashT<=0&&!p.down&&((time*14)|0)%2)return shadow(p.x,p.y,6);
  shadow(p.x,p.y,p.char==='LOUIE'?7:6.2);
  /* player ring, in their colour: the 4-player couch needs to know who is who */
  if(PL.length>1||run){mPush();mT(p.x,.5,p.y);mS(8.6);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.down?.35:.85,unlit:true});mPop()}
  if(run)for(const tr of p.trail){const a=tr.t/.22;drawCastGhost(p,tr,a)}
- drawCast(p.char,p.x,p.y,yaw,keeperOpts(p,run));
+ const ko=keeperOpts(p,run);if(run&&p.inv>0&&p.dashT<=0&&!p.down&&!(p.land>0)&&((time*14)|0)%2)ko.hide=true;
+ const S=drawCast(p.char,p.x,p.y,yaw,ko);
+ /* a puff of dust each time a foot comes down at a run */
+ if(run&&state==='run'&&S.sp>60&&!p.down){const st=Math.floor(S.ph/3.14159);if(st!==S.step){S.step=st;RUN.parts.push({x:p.x-(p.ax||0)*3,y:p.y-(p.ay||0)*3,vx:R(-7,7),vy:R(-7,7),z:1.5,vz:9,life:.28,c:'#6a5c6c',ng:1})}}
  if(run&&p.down){mPush();mT(p.x,.6,p.y);mS(20*clamp(p.revT/2.2,0.02,1));drawT(MESH.disc,{c:hex('#a8f080'),a:.3,unlit:true});mPop();
   mPush();mT(p.x,.55,p.y);mS(20);drawT(MESH.ring,{c:hex('#a8f080'),a:.5+.3*Math.sin(time*6),unlit:true});mPop()}
  if(run&&p.slashT>0&&!WEAPONS[RD.weapon].proj){const w=WEAPONS[RD.weapon],rg=p.char==='LOUIE'?Math.max(18,w.range-6):w.range;
@@ -312,7 +281,8 @@ function sceneHub(dt){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#
  prop(PROP.hatch,DOOR.x,0,DOOR.y);mPush();mT(DOOR.x,-8.5,DOOR.y);draw(PROP.hatchDark,{unlit:true});mPop();
  sprite(DOOR.x,2,DOOR.y,44,hex('#58f0c0'),.3+.1*Math.sin(time*3),true);
  for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;shadow(n.x,n.y,who==='LOUIE'?7:6);
-  drawCast(who,n.x,n.y,n.yaw||0,{anim:time*(who==='LOUIE'?9:7)+n.hx,mv:n.mv});
+  let lk=null,nd=70;for(const p of PL){const d=Math.hypot(p.x-n.x,p.y-n.y);if(d<nd){nd=d;lk=Math.atan2(p.x-n.x,p.y-n.y)}}
+  drawCast(who,n.x,n.y,n.yaw||0,{id:'n'+who,npc:who,act:n.act>0,talk:state==='talk'&&talkNPC===who,look:lk,happy:nd<44});
   if(n.act>0)sprite(n.x,27+Math.sin(time*8)*1,n.y,4,hex('#fff3b0'),1,true)}
  for(const p of PL)drawKeeper(p,false);
  frameEnd()}
@@ -372,7 +342,7 @@ function sceneTitle(dt){setLight([.3,.9,.45],[.5,.44,.6],[.26,.22,.36]);setFog('
  prop(PROP.bigDoor,cx,0,40,0,.8);sprite(cx,30,48,90,hex('#58f0c0'),.2+.06*Math.sin(time*3),true);
  lantern(cx,70,cz-20,1.6);
  for(let i=0;i<10;i++)prop(i%3?PROP.rock:PROP.stalag,(i*83)%(W-40)+20,0,60+(i*47)%(H-80),i,1+(i%3)*.4);
- shadow(cx,cz,6);drawCast('WILL',cx,cz,3.14159,{anim:0,mv:false,weapon:'blade'});
+ shadow(cx,cz,6);drawCast('WILL',cx,cz,3.14159,{id:'title',weapon:'blade'});
  for(let i=0;i<3;i++){const t=TYPES.length?(i*2)%6:0;drawBud(t,cx-12+i*12,cz+14+(i%2)*4,3.14,Math.abs(Math.sin(time*3+i))*1.4)}
  for(let i=0;i<14;i++){const t=(time*.08+i*.19)%1;sprite((i*61)%W,90-t*90,(i*37)%H,1.6,hex('#c8b8d8'),.4*(1-t),true)}
  frameEnd()}
@@ -385,21 +355,21 @@ function sceneCine(dt){const sc=RDCINE[rdCineIx],tt=rdCineT,cx=W/2;
   sprite(W+40,150,-120,26,[.91,.9,.96],.9,false);
   if(sc.bg==='crack'){const n=Math.min(11,2+Math.floor(tt*3));for(let k=0;k<n;k++){mPush();mT(cx-3+((k*7)%5)*2-4,.4,H*.5-16+k*7);mRY(k*.9);mS(5,1,4);drawT(MESH.disc,{c:[.01,.02,.03],a:1,unlit:true});mPop()}
    if(tt>1){mPush();mT(cx,-30,H*.5-10);mS(3,60,3);drawT(MESH.cube,{c:hex('#ffd94d'),a:.3+.1*Math.sin(time*5),unlit:true,glow:true});mPop()}}
-  shadow(cx-36,H*.5+20,6);drawCast('WILL',cx-36,H*.5+20,.6,{anim:0});shadow(cx+30,H*.5+22,6);drawCast('ERIN',cx+30,H*.5+22,-.5,{anim:0});
-  shadow(cx-4,H*.5+34,7);drawCast('LOUIE',cx-4,H*.5+34,sc.bg==='crack'?3.4:.3,{anim:time*9,mv:sc.bg==='crack'&&tt<1.2})}
+  shadow(cx-36,H*.5+20,6);drawCast('WILL',cx-36,H*.5+20,.6,{id:'cW',look:sc.bg==='crack'?3.3:1.3});shadow(cx+30,H*.5+22,6);drawCast('ERIN',cx+30,H*.5+22,-.5,{id:'cE',npc:'ERIN',talk:sc.bg==='crack'&&tt>3,look:-1.4});
+  shadow(cx-4,H*.5+34,7);drawCast('LOUIE',cx-4+(sc.bg==='crack'?Math.sin(Math.min(tt,1.4)*9)*3:0),H*.5+34,sc.bg==='crack'?3.4:.3,{id:'cL',happy:sc.bg!=='crack',nosit:sc.bg==='crack',talk:sc.bg==='crack'&&tt<3})}
  else if(sc.bg==='hearth'){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#120a12',430,820);
   setCam([cx+Math.sin(tt*.25)*20,70,H+60],[cx,12,H-60],.62);frameBegin();drawRoomMesh('hub');
   for(const s of STATIONS)prop(PROP[s.id],s.x,0,29,0,1.15);lantern(cx,50,H*.42,1.5);torch(12,40);torch(W-12,40);
   prop(PROP.hatch,DOOR.x,0,DOOR.y);mPush();mT(DOOR.x,-8.5,DOOR.y);draw(PROP.hatchDark,{unlit:true});mPop();sprite(DOOR.x,2,DOOR.y,44,hex('#58f0c0'),.3+.1*Math.sin(time*3),true);
-  [['ERIN',36],['LOUIE',80],['MARCUS',124],['SCOUT',168],['RANGER',206]].forEach(q=>{shadow(q[1]*HK,H-58,6);drawCast(q[0],q[1]*HK,H-58,(cx-q[1]*HK)*.004,{anim:time*9,mv:false})});
-  shadow(cx,H-34,6);drawCast('WILL',cx,H-34,3.14159,{anim:0})}
+  [['ERIN',36],['LOUIE',80],['MARCUS',124],['SCOUT',168],['RANGER',206]].forEach(q=>{shadow(q[1]*HK,H-58,6);drawCast(q[0],q[1]*HK,H-58,(cx-q[1]*HK)*.004,{id:'h'+q[0],npc:q[0],look:Math.atan2(cx-q[1]*HK,24),talk:sc.lines[Math.min(sc.lines.length-1,Math.floor(tt/(sc.d/sc.lines.length)))][0]===q[0]})});
+  shadow(cx,H-34,6);drawCast('WILL',cx,H-34,3.14159,{id:'hW'})}
  else{setLight([.3,.9,.45],[.5,.44,.6],[.26,.22,.36]);setFog('#05030a',200,520);
   setCam([cx+40,46,H+40],[cx,34,60],.7);frameBegin();drawRoomMesh('burrows',[.6,.56,.8]);
   for(let i=0;i<12;i++)prop(PROP.rock,(i*53)%W,0,40+(i*37)%(H-50),i,1.2);
   prop(PROP.bigDoor,cx,0,46,0,.8);sprite(cx,34,56,110,hex('#a8f080'),.25+.1*Math.sin(time*3),true);
-  const wz=Math.max(70,H-10-tt*22);shadow(cx,wz,6);drawCast('WILL',cx,wz,3.14159,{anim:time*9,mv:wz>70,weapon:'blade'})}
+  const wz=Math.max(70,H-10-tt*22);shadow(cx,wz,6);drawCast('WILL',cx,wz,3.14159,{id:'cD',weapon:'blade'})}
  frameEnd()}
-function drawScene(dt){
+function drawScene(dt){ADT=(state==='pause'||state==='boon'||state==='shop'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
  if(state==='chars')return sceneChars(dt);
