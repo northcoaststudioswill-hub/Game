@@ -85,7 +85,8 @@ function modal(opts) {
     update() {
       if (G.time - m.born < 0.3) return;
       if (opts.tabs) { if (Input.p('L')) opts.tabs(-1); if (Input.p('R')) opts.tabs(1); }
-      if (Input.rep('up')) m.move(-1); if (Input.rep('down')) m.move(1);
+      if (m.items.length <= 1 && m.panel.scrollHeight > m.panel.clientHeight + 2) { const sc = d => { m.panel.scrollTop += d * Math.round(m.panel.clientHeight * .45); Sound.play('move'); }; if (Input.rep('up')) sc(-1); if (Input.rep('down')) sc(1); }   /* Controls, About, the Codex: one Back button under a long page; up and down jumped straight to the bottom */
+      else { if (Input.rep('up')) m.move(-1); if (Input.rep('down')) m.move(1); }
       const it = m.items[m.sel];
       if (it && it.adj) { if (Input.rep('left')) { it.adj(-1); Sound.play('move'); m.refresh(); } if (Input.rep('right')) { it.adj(1); Sound.play('move'); m.refresh(); } }
       else if (opts.tabs) { if (Input.p('left')) opts.tabs(-1); if (Input.p('right')) opts.tabs(1); }
@@ -183,9 +184,9 @@ const Menus = {
     const S = Settings.d, upd = () => { Settings.save(); Settings.apply(); };
     const cyc = (k, n) => d => { S[k] = (S[k] + d + n) % n; upd(); };
     UI.push(modal({ title: 'Settings', build(b) { b.innerHTML = `<p style="opacity:.7">Saves: ${Store.ok ? 'kept in this browser' : 'this session only (storage blocked) — export from Save data'}. Keyboard: WASD/arrows, E/Enter, Esc, M menu, Q/R tabs, H hint. Controller supported.</p>`; }, items: [
-      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 0 : S.diff], act: () => { S.diff = ((S.diff === undefined ? 0 : S.diff) + 1) % 3; upd(); } },
-      { label: 'Graphics (3D fights)', value: () => ['Low', 'Medium', 'High'][S.gfx === undefined ? 2 : S.gfx], act: () => { S.gfx = ((S.gfx === undefined ? 2 : S.gfx) + 1) % 3; upd(); } },
-      { label: 'Show frame time', value: () => S.fps ? 'On' : 'Off', act: () => { S.fps = S.fps ? 0 : 1; upd(); } },
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 0 : S.diff], adj: d => { S.diff = ((S.diff === undefined ? 0 : S.diff) + d + 3) % 3; upd(); } },   /* left and right turn these too, as they do every other row */
+      { label: 'Graphics (3D fights)', value: () => ['Low', 'Medium', 'High'][S.gfx === undefined ? 2 : S.gfx], adj: d => { S.gfx = ((S.gfx === undefined ? 2 : S.gfx) + d + 3) % 3; upd(); } },
+      { label: 'Show frame time', value: () => S.fps ? 'On' : 'Off', adj: () => { S.fps = S.fps ? 0 : 1; upd(); } },
       { label: 'Sound test', value: () => !Sound.ctx ? 'audio off' : Sound.ctx.state === 'running' ? 'tap to hear' : 'blocked: tap again', act: () => { Sound.unlock(); setTimeout(() => { Sound.play('horn'); Sound.play('win'); }, 60); } },
       { label: 'Music', value: () => S.music * 10 + '%', adj: d => { S.music = clamp(S.music + d, 0, 10); upd(); } },
       { label: 'Sound effects', value: () => S.sfx * 10 + '%', adj: d => { S.sfx = clamp(S.sfx + d, 0, 10); upd(); Sound.play('blip'); } },
@@ -210,7 +211,7 @@ const Menus = {
           if (s) UI.push(modal({ title: `Overwrite ${nm}?`, build(b) { b.innerHTML = `<p>${esc(Save.describe(s))}</p>`; }, items: [{ label: 'Overwrite', act: () => { UI.pop(); go(); } }, { label: 'Cancel', act: () => UI.pop() }] })); else go(); }
         else if (mode === 'delete') { Save.del(k); Sound.play('deny'); UI.pop(); UI.pop(); Menus.slots('load'); }
         else { UI.clear(); Game.loadSave(s); } } }); }
-    if (mode === 'load') { items.push({ label: 'Delete a save', act: () => Menus.slots('delete') }); items.push({ label: 'Export / import save text', act: () => Menus.saveData() }); }
+    if (mode === 'load') { items.push({ label: 'Delete a save', disabled: () => !Save.SLOTS.some(([k]) => Save.read(k)), act: () => Menus.slots('delete') });   /* with nothing saved the menu opened on this */ items.push({ label: 'Export / import save text', act: () => Menus.saveData() }); }
     items.push({ label: 'Back', act: () => UI.pop() });
     UI.push(modal({ title: mode === 'save' ? 'Save game' : mode === 'delete' ? 'Delete which save?' : 'Load game', build(b) { b.innerHTML = Store.ok ? '<p>The game autosaves at every story beat. Slots are yours.</p>' : '<p>This view cannot keep saves after you close it. Use <b>Export</b> on the Load screen to copy your save text somewhere safe.</p>'; }, items }));
   },
@@ -243,7 +244,7 @@ const Menus = {
         ['★ NEW · Part Two · The Count hall (stealth; lose the order)', () => { fresh(); Mission.start('count'); }],
         ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
-      'Levels in 3D (comic)': [
+      'Levels in 3D': [
         ['★ NEW · +7 · The High Docks (third person; Captain Rook)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Issue.start('docks', ok => { if (!ok) HUD.toast('Could not start the 3D level on this device.'); Game.toTitle(); }); }],
         ['★ NEW · +5 · Riser Nine (third person; hold the hatch, in a mask)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'riser', or: [{ brawl: () => FF.riser() }] }], () => Game.toTitle()); }],
         ['★ NEW · +9 · The Stair (third person; three flights to the white door)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'stair', or: [{ brawl: () => FF.stair() }] }], () => Game.toTitle()); }],
@@ -303,7 +304,7 @@ const Menus = {
     const onoff = v => v ? 'On' : 'Off';
     UI.push(modal({ title: 'Dev menu', build(b) { b.innerHTML = '<p>Version ' + GAME_VER + '. Jump straight to any fight or story beat. Your save slots are not touched until the game autosaves.</p><p><b>New in ' + GAME_VER + ':</b> ' + DEV_NEW + '</p>'; }, items: [
       { label: 'Training room (all moves, nobody loses)', act: () => { const q = DEV.quick; DEV._tq = q; UI.clear(); DEV.quick = 1; DEV.from = 'main'; $('#devback').classList.remove('hidden'); ffScene('TRAINING', 'A sealed pump room.', () => FF.training(), () => { DEV.quick = q; Game.toTitle(); }); } },
-      { label: 'Fights', act: sub('Fights') }, { label: 'Assay missions (2D) ★', act: sub('Assay missions (2D)') }, { label: 'Levels in 3D (comic) ★', act: sub('Levels in 3D (comic)') }, { label: 'Story beats', act: sub('Story beats') }, { label: 'Cutscenes', act: sub('Cutscenes') },
+      { label: 'Fights', act: sub('Fights') }, { label: 'Assay missions (2D) ★', act: sub('Assay missions (2D)') }, { label: 'Levels in 3D ★', act: sub('Levels in 3D') }, { label: 'Story beats', act: sub('Story beats') }, { label: 'Cutscenes', act: sub('Cutscenes') },
       { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][Settings.d.diff === undefined ? 0 : Settings.d.diff], adj: () => { Settings.d.diff = ((Settings.d.diff === undefined ? 0 : Settings.d.diff) + 1) % 3; Settings.save(); } },
       { label: 'Start fights at full fury', value: () => onoff(DEV.fury), adj: () => { DEV.fury = DEV.fury ? 0 : 1; } },
       { label: 'Skip fight intro films', value: () => onoff(DEV.quick), adj: () => { DEV.quick = DEV.quick ? 0 : 1; } },
@@ -347,7 +348,7 @@ const Menus = {
   training(back) { const q = DEV.quick; DEV._tq = q; UI.clear(); DEV.quick = 1; ffScene('TRAINING', 'A sealed pump room. All moves. Nobody loses.', () => FF.training(), () => { DEV.quick = q; if (back && Save.latest()) Game.loadSave(Save.latest()); else Game.toTitle(); }); },
   chapters() { const go = f => () => { UI.clear(); f(); }; UI.push(modal({ title: 'Chapter select', build(b) { b.innerHTML = '<p>Replay any chapter. Your save slots are not touched until the game autosaves.</p>'; }, items: [{ label: 'Part One · from the beginning', act: () => Menus.newGame() }, ...[1, 2, 3, 4, 5].map(n => ({ label: `Part Two · ${n} · ${P2_TITLES[n]}`, act: go(() => playPart2(n)) })), { label: 'Back', act: () => UI.pop() }] })); },
   memories() { let L = []; try { L = JSON.parse(Store.get('sootborn_mem') || '[]'); } catch (e) { } UI.push(modal({ title: 'Memories', build(b) { b.innerHTML = '<p style="opacity:.7">Mara keeps them on the shelf, beside the tins. ' + L.length + ' kept so far.</p>' + (L.map(m => `<div class="card"><b>${esc(m[0])}</b><p>${esc(m[1])}</p><p style="opacity:.55">${esc(m[2] || '')}</p></div>`).join('') || '<p>None yet. They come back to him in fights.</p>'); }, items: [{ label: 'Back', act: () => UI.pop() }] })); },
-  // one card for every kind of play: the same button does the same thing below, in the arena and in the comic-book levels
+  // one card for every kind of play: the same button does the same thing below, in the arena and in the 3D levels
   controls() {
     const rows = [
       ['Move', 'W A S D or arrows', 'Left stick or D-pad', 'The pad'],
@@ -357,17 +358,17 @@ const Menus = {
       ['Kick', 'C', 'Y', 'KICK'],
       ['Jump (hold: the boots)', 'F', 'A', 'JUMP'],
       ['Hook line', 'Q', 'LB', 'HOOK'],
-      ['Guard · in the comic-book levels, the lunge', 'V', 'RB', 'GUARD / LUNGE'],
-      ['ELEVEN', 'Hold strike when the fury is full', 'Hold strike', 'Hold A'],
-      ['Look round (comic-book levels)', 'Arrow keys, or drag with the mouse', 'Right stick; click it to lock on', 'Drag the picture'],
+      ['Guard · in the 3D levels, the lunge', 'V', 'RB', 'GUARD / LUNGE'],
+      ['ELEVEN', 'Hold E when the fury is full', 'Hold X', 'Hold A'],
+      ['Look round (3D levels)', 'Arrow keys, or drag with the mouse', 'Right stick; click it to lock on', 'Drag the picture'],
       ['Menu, pause', 'M (or Tab, P)', 'Start', '☰']];
-    UI.push(modal({ title: 'Controls', build(b) { b.innerHTML = `<p>The same button does the same thing everywhere: below, in the arena fights, and in the comic-book levels.</p><table class="ctl"><tr><th></th><th>Keyboard</th><th>Controller</th><th>Touch</th></tr>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table><p><b>In a fight.</b> Three strikes chain; hold strike for a heavy blow. A kick breaks a guard. Dodge through a red swing and he is open. Tap guard as he swings to parry. Walking over a chalked sun in a comic-book level saves and heals.</p><p>Controller letters are an Xbox pad's. On another pad, go by where the button sits.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
+    UI.push(modal({ title: 'Controls', build(b) { b.innerHTML = `<p>The same button does the same thing everywhere: below, in the arena fights, and in the 3D levels.</p><table class="ctl"><tr><th></th><th>Keyboard</th><th>Controller</th><th>Touch</th></tr>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table><p><b>In a fight.</b> Three strikes chain; hold strike for a heavy blow. A kick breaks a guard. Dodge through a red swing and he is open. Tap guard as he swings to parry. Walking over a chalked sun in a 3D level saves and heals.</p><p>Controller letters are an Xbox pad's. On another pad, go by where the button sits.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
   },
   about() {
     UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version ${GAME_VER}. The whole story plays from the animated intro to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (from day thirty-one of the Assay): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
-      <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
-      <p><b>The comic-book levels</b> use the same buttons as the fights (see Controls): tap strike for light cuts; keep it held for three heavy blows; at full fury a held strike is ELEVEN. Kick twice for the Wide Cut. Jump held hovers, and strike in the air dives. The guard button is the lunge. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
+      <p><b>Fights:</b> strike is E on a keyboard, X on a controller, A on touch; dodge is X, B and B (the full list is under Controls). Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
+      <p><b>The 3D levels</b> use the same buttons as the fights (see Controls): tap strike for light cuts; keep it held for three heavy blows; at full fury a held strike is ELEVEN. Kick twice for the Wide Cut. Jump held hovers, and strike in the air dives. The guard button is the lunge. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
   },
   newGame() {
@@ -508,7 +509,7 @@ const DayEnd = {
       b.innerHTML = `<p>By first bell the Tallymen have taken the lantern down. It does not matter. Four hundred people saw a sun, and you cannot scrub a thing like that off stone.</p>
         <p>In Row K, a child sleeps with a leaf pressed in a worksheet. In Fuse Room C, one bus hums at nineteen, exactly. And at the gate of Lift Zero, a grey Inspector waits with a ledger, to see who comes to carry it up.</p>
         <p><i>"Be too much for them."</i></p>
-        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers</p>`;
     }, items: [
       { label: 'Wake up: The Ledger, 43 days after the furnace', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => { sv.flags = Object.assign(sv.flags || {}, { day3Done: 1, ledgerUp: G.flags.ledgerUp, toldHer: G.flags.toldHer, toldDace: G.flags.toldDace, fury: G.flags.fury }); afterDay(3, sv); }); } },
       { label: 'Keep exploring instead', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
@@ -521,7 +522,7 @@ const DayEnd = {
       b.innerHTML = `<p>Far above Cinderwell — above the rock, above the warnings — a crate of cold greens arrives somewhere that doesn't exist.</p>
         <p>Below, Kael Brennick dreams of ${F('sawRiser') ? 'warm air falling from a pipe with no destination' : 'a lift light, green for eleven seconds'} — and of Seren, laughing at him for being right.</p>
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
-        <h2 style="margin-top:16px">ASHGATE · 41 DAYS AFTER THE FURNACE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">ASHGATE · 41 DAYS AFTER THE FURNACE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers</p>`;
     }, items: [
       { label: 'Wake up: First Fire, 42 days after the furnace', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1().concat([{ card: 'FIRST FIRE', sub: 'Forty-two days after the furnace.', big: 1, tr: 'wake', min: 1.6, max: 5 }]), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }

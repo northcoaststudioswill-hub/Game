@@ -208,7 +208,7 @@ function boot() {
   Store.init(); Settings.load(); Input.init(); Settings.apply(); Layout.update();
   addEventListener('resize', () => Layout.update()); addEventListener('orientationchange', () => setTimeout(() => Layout.update(), 200));
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { if (G.mode === 'world' && !UI.stack.length && !Dialogue.active && !Brawl.active) { if (Puzzle.active) Puzzle.close(); Menus.pause(); } Sound.suspend(); }
+    if (document.hidden) { if (G.mode === 'world' && !UI.stack.length && !Dialogue.active && !Brawl.active) { if (Puzzle.active) Puzzle.close(); Menus.pause(); } else if (Brawl.active && !Brawl.cine && Brawl.phase === 'fight' && !Brawl.def.walk && !UI.stack.length && !Dialogue.active) Brawl.pauseMenu();   /* back from another app mid-fight: the fight waits for you instead of carrying on mid-swing */ Sound.suspend(); }
     else Sound.resume();
   });
   // press-to-start (also unlocks audio as a user gesture)

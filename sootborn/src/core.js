@@ -47,6 +47,7 @@ const Input = {
     });
     addEventListener('keyup', e => { const a = this.keymap[e.code]; if (a) this.kb[a] = false; });
     addEventListener('blur', () => { this.kb = {}; this.touch = {}; });
+    addEventListener('gamepadconnected', () => this.setDevice('pad'));   // a phone player who tapped New Game and then picked up a controller was still told to drag the picture
     addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { this.touchSeen = true; this.setDevice('touch'); } Sound.unlock(); }, true);
     for (const ev of ['pointerup', 'touchend', 'click', 'keydown']) addEventListener(ev, () => Sound.unlock(), true);
     // touch buttons
@@ -91,6 +92,7 @@ const Input = {
   },
   update(dt) {
     const fi = (Brawl.active && !Brawl.cine && Brawl.phase === 'fight' && !Brawl.art && !Brawl.sup && !UI.stack.length) || (typeof Issue !== 'undefined' && Issue.on); if (fi !== this.fight) { this.fight = fi; document.body.classList.toggle('fight', fi); }
+    { const br = Brawl.active && !!Brawl.def && !Brawl.def.walk && !(typeof Issue !== 'undefined' && Issue.on); if (br !== this.brawl) { this.brawl = br; document.body.classList.toggle('brawl', br); } }   // the touch Menu button moves off the foe's portrait in a fight
     this.pollPad();
     const n = {};
     for (const a of ACTIONS) n[a] = !!(this.kb[a] || this.touch[a] || this.pad[a]);

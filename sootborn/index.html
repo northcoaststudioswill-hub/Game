@@ -116,6 +116,7 @@ body.portrait #bA{right:20px;bottom:calc(var(--sab) + 90px);width:78px;height:78
 body.portrait #bB{right:110px;bottom:calc(var(--sab) + 34px);width:78px;height:78px}
 body.portrait #bM{right:auto;left:50%;transform:translateX(-50%);top:auto;bottom:calc(var(--sab) + 214px)}
 body.ctlfade #controls{opacity:calc(var(--op)*.5)}
+body.brawl:not(.portrait) #bM{right:auto;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 4px);min-height:34px;padding:2px 10px}
 body.portrait #obj{top:calc(var(--cy) + var(--ch) + 8px);left:10px;max-width:calc(100vw - 190px);right:auto}
 body.portrait #stat{top:calc(var(--cy) + var(--ch) + 8px);right:10px}
 body.portrait.inpuzzle #obj{right:150px}
@@ -123,6 +124,7 @@ body.portrait #pbar{top:calc(var(--cy) + var(--ch) + 8px);right:10px}
 body.portrait #hint{bottom:auto;top:calc(var(--cy) + var(--ch) + 64px)}
 #card{position:absolute;inset:0;background:#030204;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:auto;opacity:0;transition:opacity .9s}
 #card.on{opacity:1}
+#card>*{position:relative}/* the words sit over the transition overlays (the chalk sun covered MEANWHILE) */
 #card::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:0}
 #card.tr-wake::before{background:#f6f1e4;animation:trFade 1.6s ease-out both}
 #card.tr-eleven::before{background:repeating-linear-gradient(90deg,rgba(255,233,176,.0) 0,rgba(255,233,176,.0) calc(9.09% - 6px),rgba(255,233,176,.85) calc(9.09% - 6px),rgba(255,233,176,.85) 9.09%);animation:trEleven 1.5s steps(11,end) both}
@@ -147,7 +149,7 @@ table.ctl{width:100%;border-collapse:collapse;margin:8px 0;font-size:.92em}table
 #card p.s{opacity:.7;font-size:calc(14px*var(--ts))}
 #card .bigt{font-family:'Pixelify Sans',monospace;font-weight:700;font-size:clamp(24px,min(11vw,19vh),104px);letter-spacing:.1em;max-width:94vw;text-align:center;line-height:1.02;overflow-wrap:break-word;text-wrap:balance;padding-left:.1em;box-sizing:border-box;color:var(--amber);text-shadow:0 4px 0 #5a1a08,0 0 40px rgba(255,120,40,.5)}
 #card .acal{display:flex;gap:0;margin-top:26px;width:min(92vw,520px);max-width:92vw}#card .acal span{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;flex:1 1 0;text-align:center;overflow-wrap:anywhere;font-size:min(calc(9px*var(--ts)),2.5vw);letter-spacing:.08em;color:#6a5a50;border-top:2px solid #3a2a24;padding-top:0}#card .acal i{width:8px;height:8px;margin-top:-5px;background:#3a2a24;border-radius:50%}#card .acal .on{color:var(--amber)}#card .acal .on i{background:var(--amber);box-shadow:0 0 10px rgba(255,150,60,.9)}
-#card .bigs{margin-top:10px;font-size:calc(13px*var(--ts));letter-spacing:.25em;text-transform:uppercase;opacity:.75}
+#card .bigs{text-wrap:balance;margin-top:10px;font-size:calc(13px*var(--ts));letter-spacing:.25em;text-transform:uppercase;opacity:.75}
 /* top right, clear of the dialogue box and the caption strip along the bottom; in the animated intro it sits in the bottom band instead (the tally is up top) */
 #cskip{position:absolute;right:calc(var(--sar) + 6px);top:calc(var(--sat) + 4px);min-height:26px;opacity:.8;padding:2px 10px;background:rgba(36,23,26,.85);border:2px solid #3a2620;color:var(--cream);font:inherit;font-size:12px;border-radius:4px;pointer-events:auto;z-index:5}
 body.touch #cskip{min-height:40px;padding:6px 14px}
@@ -156,6 +158,7 @@ body.touch #cskip{min-height:40px;padding:6px 14px}
 #dbg{position:absolute;left:4px;bottom:4px;font-size:10px;background:rgba(0,0,0,.7);padding:4px;white-space:pre;pointer-events:none;z-index:9}
 #dlg[data-hint]:not([data-hint=""])::after{content:attr(data-hint);position:absolute;right:8px;top:-17px;font-family:'Pixelify Sans',monospace;font-size:11px;letter-spacing:.06em;color:var(--amber);background:rgba(18,11,14,.92);padding:1px 6px;border-radius:2px;white-space:pre}
 body.prel #cskip{top:auto;bottom:calc(var(--sab) + 4px);min-height:32px;padding:3px 10px}
+@media (max-height:400px) and (orientation:landscape){#dlg{padding:6px 9px;gap:8px;bottom:calc(var(--by) + 6px)}#dlg canvas{width:52px;height:52px}#dlg .nm{font-size:calc(13px*var(--ts));margin-bottom:0}#dlg .tx{font-size:calc(12.5px*var(--ts));line-height:1.4;min-height:2.6em}.choices button{min-height:32px;padding:4px 9px;margin-top:4px;font-size:calc(12px*var(--ts))}}/* a short screen: a long line or a three-way choice took two thirds of it */
 @media (prefers-reduced-motion:reduce){.press,#dlg .more{animation:none}}
 
 /* art pass: panels framed like engraved brass plates */
@@ -168,7 +171,7 @@ body.prel #cskip{top:auto;bottom:calc(var(--sab) + 4px);min-height:32px;padding:
 #dlg canvas{border:2px solid var(--gold);box-shadow:0 0 0 1px #0c0808}
 #obj{border:1px solid var(--goldD);border-left:3px solid var(--gold);background:rgba(22,14,16,.9)}
 #obj{font-size:1.3em;line-height:1.3;padding:5px 10px}
-@media (max-height:520px){#obj{font-size:1.1em;line-height:1.25;padding:3px 8px;max-width:calc(var(--cw)*.6)}}
+@media (max-height:520px){#toast{top:calc(var(--cy) + 78px);white-space:normal;max-width:min(80vw,520px);text-align:center}#obj{font-size:1.1em;line-height:1.25;padding:3px 8px;max-width:calc(var(--cw)*.6)}}
 body.portrait #obj{font-size:1.1em;line-height:1.25;padding:4px 8px}
 #stat{border:1px solid var(--goldD);background:rgba(22,14,16,.9)}
 #toast{border:2px solid var(--gold);box-shadow:0 0 0 1px #0c0808,0 0 0 3px var(--goldD);background:#1e1512;border-radius:2px;letter-spacing:.06em}
@@ -262,6 +265,7 @@ const Input = {
     });
     addEventListener('keyup', e => { const a = this.keymap[e.code]; if (a) this.kb[a] = false; });
     addEventListener('blur', () => { this.kb = {}; this.touch = {}; });
+    addEventListener('gamepadconnected', () => this.setDevice('pad'));   // a phone player who tapped New Game and then picked up a controller was still told to drag the picture
     addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { this.touchSeen = true; this.setDevice('touch'); } Sound.unlock(); }, true);
     for (const ev of ['pointerup', 'touchend', 'click', 'keydown']) addEventListener(ev, () => Sound.unlock(), true);
     // touch buttons
@@ -306,6 +310,7 @@ const Input = {
   },
   update(dt) {
     const fi = (Brawl.active && !Brawl.cine && Brawl.phase === 'fight' && !Brawl.art && !Brawl.sup && !UI.stack.length) || (typeof Issue !== 'undefined' && Issue.on); if (fi !== this.fight) { this.fight = fi; document.body.classList.toggle('fight', fi); }
+    { const br = Brawl.active && !!Brawl.def && !Brawl.def.walk && !(typeof Issue !== 'undefined' && Issue.on); if (br !== this.brawl) { this.brawl = br; document.body.classList.toggle('brawl', br); } }   // the touch Menu button moves off the foe's portrait in a fight
     this.pollPad();
     const n = {};
     for (const a of ACTIONS) n[a] = !!(this.kb[a] || this.touch[a] || this.pad[a]);
@@ -3100,7 +3105,7 @@ const Brawl = {
     if (best && Input.p('A')) { Input.consume(); p.st = 'idle'; p.anim = 0; const d = Math.hypot(best.x - p.x, best.y - p.y) || 1; p.fx = (best.x - p.x) / d; p.fy = (best.y - p.y) / d; const steps = best.talk(k) || []; if (typeof best.exit === 'function' ? best.exit(k) : best.exit) { Dialogue.start(steps, () => this.end(true)); return; } const id = best.key || best.id; if (!k.said[id]) { k.said[id] = 1; k.n++; } Dialogue.start(steps); return; }
     this.stepParts(dt); { const c = this.cam, q = Math.min(1, dt * 4); c.x += (p.x * .85 - c.x) * q; c.y += (p.y + 185 - c.y) * q; c.h += (104 - c.h) * q; c.roll = 0; } },
   hudWalk(g) { const w = this.def.walk, k = this.wk, n = k.near, o = typeof w.obj === 'function' ? w.obj(k) : w.obj;
-    if (this.t < 3.2 && this.def.title) { const tw = ptextW(this.def.title, 2); g.globalAlpha = clamp(3.2 - this.t, 0, 1); if (this.def.bg2 === 'ring4' || this.def.bg2 === 'sstair' || this.def.bg2 === 'barge') { const sw = this.def.sub ? ptextW(this.def.sub) : 0, bw = Math.max(tw, sw) + 16; g.fillStyle = 'rgba(10,6,8,.7)'; g.fillRect(Math.round((W - bw) / 2), 25, bw, 34); } ptext(g, this.def.title, Math.round((W - tw) / 2), 30, '#ffe08a', 2); if (this.def.sub) { const sw = ptextW(this.def.sub); ptext(g, this.def.sub, Math.round((W - sw) / 2), 46, '#e8dcc0'); } g.globalAlpha = 1; }
+    if (this.t < 3.2 && this.def.title) { const tw = ptextW(this.def.title, 2); g.globalAlpha = clamp(3.2 - this.t, 0, 1); { const sw = this.def.sub ? ptextW(this.def.sub) : 0, bw = Math.max(tw, sw) + 16; g.fillStyle = 'rgba(10,6,8,.7)'; g.fillRect(Math.round((W - bw) / 2), 30, bw, 34); }   /* a dark band under every walk title (cream on the furnace glow was unreadable), set below the meter in the top right */ ptext(g, this.def.title, Math.round((W - tw) / 2), 35, '#ffe08a', 2); if (this.def.sub) { const sw = ptextW(this.def.sub); ptext(g, this.def.sub, Math.round((W - sw) / 2), 51, '#e8dcc0'); } g.globalAlpha = 1; }
     if (o) { const tw = ptextW(o); g.fillStyle = 'rgba(10,6,8,.78)'; g.fillRect(3, 3, tw + 8, 11); ptext(g, o, 7, 5, '#e8dcc0'); }
     if (w.meter) { const m = w.meter(k), lw = ptextW(m.label), n = m.max, x0 = W - (lw + n * 7 + 12), hot = m.v >= n - 1; k.mv = k.mv === undefined ? m.v : k.mv; if (m.v !== k.mv) { k.mf = 1; k.mup = m.v > k.mv; k.mv = m.v; } k.mf = Math.max(0, (k.mf || 0) - 1 / 60); g.fillStyle = 'rgba(10,6,8,.78)'; g.fillRect(x0 - 4, 16, lw + n * 7 + 13, 11); ptext(g, m.label, x0, 18, k.mf > 0 ? (k.mup ? '#ff8a6a' : '#9ad8c0') : '#e8dcc0'); for (let i = 0; i < n; i++) { g.fillStyle = '#2a2026'; g.fillRect(x0 + lw + 5 + i * 7, 18, 5, 7); if (i < m.v) { g.fillStyle = hot ? '#e8452e' : i >= n - 3 ? '#e8a23a' : '#e8dcc0'; g.fillRect(x0 + lw + 6 + i * 7, 19, 3, 5); } } }
     { const pp = this.proj(this.p.x, this.p.y, 46), x = Math.round(pp.x), y = Math.round(pp.y); g.fillStyle = '#120a0e'; g.fillRect(x - 3, y - 1, 7, 4); g.fillStyle = '#ffe08a'; g.fillRect(x - 2, y, 5, 1); g.fillRect(x - 1, y + 1, 3, 1); g.fillRect(x, y + 2, 1, 1); }
@@ -3175,6 +3180,8 @@ const Brawl = {
     } },
   renderMemo(g) { const keep = this.art, m = this.memo.m; this.art = { a: { panel: m.panel, stage: m.stage, line: m.line, rgb: m.rgb, name: '' }, t: this.memo.t, C: 99 }; this.renderArt(g); this.art = keep; },
   say(t, big) { this.msg = t; this.msgT = big ? 1.6 : 1.1; },
+  // two men shouting at once: the second speech box steps up (or down) clear of the first instead of printing over it
+  _bk: [], _bkd: [], bkPlace(x, y, w) { const L = this._bk; for (let n = 0; n < 4; n++) { const o = L.find(r => x < r.x + r.w + 2 && x + w + 2 > r.x && Math.abs(y - r.y) < 12); if (!o) break; y = o.y - 12 >= 44 ? o.y - 12 : o.y + 12; } L.push({ x, y, w }); return y; },
   // a button by its name on the device in use (the pixel font has no brackets)
   key(k) { const d = Input.device; return (d === 'pad' ? { A: 'X', X: 'Y', Y: 'A', B: 'B', R: 'RB', L: 'LB', START: 'START' } : d === 'kb' ? { A: 'E', X: 'C', Y: 'F', B: 'X', R: 'V', L: 'Q', START: 'M' } : { A: 'STRIKE', X: 'KICK', Y: 'JUMP', B: 'DODGE', R: 'GUARD', L: 'HOOK', START: 'MENU' })[k] || k; },
   // a big prompt the first time something needs explaining, once per save
@@ -3184,7 +3191,7 @@ const Brawl = {
     if (this.mashN < this.D.mash) return; const f = this.nearest(p); if (!f || Math.hypot(f.x - p.x, f.y - p.y) > 60 || f.st === 'floor' || f.snapped) return; this.mashN = 0; this.mashFired = (this.mashFired || 0) + 1;
     f.guardT = Math.max(f.guardT || 0, .9); f.blk = 0; f.bark = { t: 'I SEE IT.', life: .8 }; Sound.play('steel');
     if (this.D.pat > 0 && !f.K.soft && f.st !== 'wind' && f.st !== 'charge' && f.st !== 'down') { f.st = 'wind'; f.t = 0; f.mode = 'strike'; f.second = f.third = true; f.feinted = 1; f.wx = .34 - f.K.wind; const d = Math.hypot(p.x - f.x, p.y - f.y) || 1; f.ax = (p.x - f.x) / d; f.ay = (p.y - f.y) / d; if (!this.token.includes(f)) this.token.push(f); }   /* on Hard he answers it as well */
-    if (!this.teach('mash', 'HE READ THE RHYTHM', 'A ' + this.key('X') + ' KICK, A DODGE OR A PAUSE BREAKS IT')) this.say('HE READ IT'); },
+    if (!this.teach('mash', 'HE READ THE RHYTHM', 'KICK WITH ' + this.key('X') + ', DODGE, OR PAUSE: IT BREAKS')) this.say('HE READ IT'); },
   mashReset() { this.mashN = 0; },
   clampA(o) { const A = this.arena, S = this.def.stage; if (S && S.block) for (const b of S.block) { const dx = o.x - b.x, dy = (o.y - b.y) * 1.4, d = Math.hypot(dx, dy); if (d < b.r) { if (d > .01) { o.x = b.x + dx / d * b.r; o.y = b.y + dy / d * b.r / 1.4; } else o.x = b.x + b.r; } }
     if (A.kind === 'ring') { const dx = o.x / (A.rx - 6), dy = o.y / (A.ry - 4), d = Math.hypot(dx, dy); if (d > 1) { o.x = dx / d * (A.rx - 6); o.y = dy / d * (A.ry - 4); } } else { o.x = clamp(o.x, -A.w / 2, A.w / 2); o.y = clamp(o.y, -A.h / 2, A.h / 2); } },
@@ -3417,7 +3424,7 @@ const Brawl = {
     for (const f of this.foes.slice()) if (f.st !== 'down' && !f.enter) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (!(d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > .1))) continue; any = true;
       const g = f.guardT > 0, wind = f.st === 'wind' && f.mode !== 'charge' && !f.K.poise, rh = p.kn === 3; if (g) { f.guardT = 0; f.blk = 0; }
       this.hitFoe(f, (p.fly || rh ? 2 : 1) * p.pow, p.ax, p.ay, !!p.fly || p.kc >= 2 || g || rh); if (rh && !g) this.say('ROUNDHOUSE');
-      if (f.hp > 0 && f.st !== 'down') { if (g) { f.st = 'hurt'; f.t = -.55; f.bark = { t: 'GUARD BROKEN', life: .8 }; p.open = Math.max(p.open, 1); this.say('GUARD BREAK'); this.token = this.token.filter(o => o !== f); } else if (wind) { f.st = 'hurt'; f.t = -.2; this.token = this.token.filter(o => o !== f); } f.kx = p.ax * 260; f.ky = p.ay * 260; } }
+      if (f.hp > 0 && f.st !== 'down') { if (g) { f.st = 'hurt'; f.t = -.55; p.open = Math.max(p.open, 1); this.say('GUARD BREAK');   /* once: a speech box over him also said GUARD BROKEN, the words the game uses when Kael's own guard breaks */ this.token = this.token.filter(o => o !== f); } else if (wind) { f.st = 'hurt'; f.t = -.2; this.token = this.token.filter(o => o !== f); } f.kx = p.ax * 260; f.ky = p.ay * 260; } }
     if (any) { Sound.play('hit'); this.shake = Math.max(this.shake, .25); } },
   hook() { this.mashReset(); const p = this.p, f = this.nearest(p); if (!f || Math.hypot(f.x - p.x, f.y - p.y) > 190) { this.say('TOO FAR'); return; } const d = Math.hypot(f.x - p.x, f.y - p.y) || 1; p.fx = p.ax = (f.x - p.x) / d; p.fy = p.ay = (f.y - p.y) / d; p.st = 'hook'; p.t = 0; p.hit = false; p.hk = f; p.hcd = 2.6; Sound.play('swing'); },
   hookLand() { const p = this.p, f = p.hk; if (!f || f.st === 'down') return; const d = Math.hypot(f.x - p.x, f.y - p.y) || 1, ux = (f.x - p.x) / d, uy = (f.y - p.y) / d; Sound.play('steel'); Sound.play('clash'); this.spark(f.x, f.y, '#e8c25a', 14); this.ring(f.x, f.y, '#e8c25a', 30); this.gain(6); this.punch = Math.max(this.punch, .16); this.shake = Math.max(this.shake, .14); p.bite = this.t;   // the hook bites: a flash, and the line goes taut
@@ -3508,7 +3515,7 @@ const Brawl = {
     if (f.pull) { const q = f.pull, k = Math.min(1, dt * 18); q.t -= dt; f.x += (q.x - f.x) * k; f.y += (q.y - f.y) * k; if (q.t <= 0) f.pull = null; }
     if (f.thrown > 0) { f.thrown -= dt; for (const o of this.foes) if (o !== f && o.st !== 'down' && !o.enter && Math.hypot(o.x - f.x, o.y - f.y) < 20) { const m = Math.hypot(f.kx, f.ky) || 1; f.thrown = 0; this.hitFoe(o, 2 * p.pow, f.kx / m, f.ky / m, true); this.spark(o.x, o.y, '#fff', 10); break; } }
     if (f.broken > 0) f.broken -= dt; if (f.stg > 0 && this.t - (f.stgT || 0) > 4) f.stg = Math.max(0, f.stg - dt * .07);
-    if (f.st === 'down') { f.t += dt; return; }
+    if (f.st === 'down') { f.t += dt; if (!f.enter) this.clampA(f); return; }   /* a body knocked down at the edge used to slide on through the rope and out of the picture */
     if (f.enter) { f.y += 80 * dt; f.anim += dt; f.fx = 0; f.fy = 1; const A = this.arena, hh = A.kind === 'ring' ? A.ry : A.h / 2; if (f.y > -hh + 10) f.enter = false; return; }
     // who to go for: Kael mostly, but allies pull some of them off him
     if (!f.tg || f.tgT <= 0) { let best = p, bd = Math.hypot(p.x - f.x, p.y - f.y) * (this.allies.length ? .75 : 0); for (const a of this.allies) { const d = Math.hypot(a.x - f.x, a.y - f.y); if (d < bd) { bd = d; best = a; } } f.tg = best; f.tgT = 2 + Math.random() * 2; } f.tgT -= dt;
@@ -3720,7 +3727,7 @@ const Brawl = {
       G3.char(o, opt); if (o.st === 'down') return; const hp = this.proj(o.x, o.y, 76 + (o.z || 0) * 1.2); if (hp.dz < 10) return; const cx = hp.x, top = Math.round(hp.y);
       if (opt.foe && o.st === 'wind') this.bang(g, o, Math.round(cx), top - 10); if (opt.foe && o.glint > 0 && !Settings.d.reduce) G3.glow(o.x + (o.fx || 0) * 10, 58 * G3.HK, o.y + (o.fy || 0) * 10, 7 + o.glint * 30, [1, 1, .86], Math.min(1, o.glint * 4));
       if (opt.foe && !opt.boss && o.hp < o.max) { const bw = clamp(Math.round(30 * hp.s), 14, 34), hx = Math.round(cx - bw / 2); g.fillStyle = '#120a0e'; g.fillRect(hx - 1, top - 5, bw + 2, 4); g.fillStyle = '#c8452e'; g.fillRect(hx, top - 4, Math.max(0, Math.round(bw * o.hp / o.max)), 2); }
-      if (o.bark) { const tw = ptextW(o.bark.t), bx = clamp(Math.round(cx - tw / 2 - 3), 2, W - tw - 8), by = clamp(top - 20, 44, H - 66); g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 1, tw + 8, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx, by, tw + 6, 9); ptext(g, o.bark.t, bx + 3, by + 2, '#2a1408'); }
+      if (o.bark) { const tw = ptextW(o.bark.t), bx = clamp(Math.round(cx - tw / 2 - 3), 2, W - tw - 8), by = this.bkPlace(bx, clamp(top - 20, 44, H - 66), tw + 8), bt = o.bark.t; this._bkd.push(() => { g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 1, tw + 8, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx, by, tw + 6, 9); ptext(g, bt, bx + 3, by + 2, '#2a1408'); }); }   /* drawn after everyone, so the next man along does not stand in front of the words */
       return; }
     const pr = this.proj(o.x, o.y), sh = o.sheet, fh = sh.fh || 16, sc = this.K * pr.s * (o.sc || 1), w = 16 * sc, hgt = fh * sc, t = this.t, rm = Settings.d.reduce;
     if (pr.dz < 24 || pr.x < -60 || pr.x > W + 60) return;
@@ -3805,7 +3812,7 @@ const Brawl = {
     if (o.guardT > 0 && o.st !== 'wind') { g.strokeStyle = '#c8d0dc'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, hgt * .5, -2.5, -.6); g.stroke(); }
     if (opt.foe && o.st === 'wind') this.bang(g, o, Math.round(cx), Math.round(pr.y - hgt) - 10); if (opt.foe && o.glint > 0 && !Settings.d.reduce) { const gx = Math.round(cx + (o.fx || 0) * 6), gy = Math.round(pr.y - hgt * .7), r = Math.round(3 + o.glint * 18); g.fillStyle = `rgba(255,250,220,${Math.min(1, o.glint * 4)})`; g.fillRect(gx - r, gy, r * 2 + 1, 1); g.fillRect(gx, gy - r, 1, r * 2 + 1); g.fillRect(gx - 1, gy - 1, 3, 3); }
     if (opt.foe && !opt.boss && o.hp < o.max) { const bw = Math.max(14, w * .8), hx = Math.round(cx - bw / 2), hy = Math.round(pr.y - hgt) - 4; g.fillStyle = '#120a0e'; g.fillRect(hx - 1, hy - 1, bw + 2, 4); g.fillStyle = '#c8452e'; g.fillRect(hx, hy, Math.max(0, Math.round(bw * o.hp / o.max)), 2); }
-    if (o.bark) { const tw = ptextW(o.bark.t), bx = clamp(Math.round(cx - tw / 2 - 3), 2, W - tw - 8), by = clamp(Math.round(pr.y - hgt) - 20, 44, H - 66); g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 1, tw + 8, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx, by, tw + 6, 9); ptext(g, o.bark.t, bx + 3, by + 2, '#2a1408'); }
+    if (o.bark) { const tw = ptextW(o.bark.t), bx = clamp(Math.round(cx - tw / 2 - 3), 2, W - tw - 8), by = this.bkPlace(bx, clamp(Math.round(pr.y - hgt) - 20, 44, H - 66), tw + 8), bt = o.bark.t; this._bkd.push(() => { g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 1, tw + 8, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx, by, tw + 6, 9); ptext(g, bt, bx + 3, by + 2, '#2a1408'); }); }   /* drawn after everyone, so the next man along does not stand in front of the words */
   },
   prop(g, q) {
     const pr = this.proj(q.x, q.y), s = pr.s, t = this.t, R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(pr.x + x * s), Math.round(pr.y + y * s), Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s))); };
@@ -3912,7 +3919,7 @@ const Brawl = {
   },
   render(g) {
     const def = this.def, p = this.p, t = this.t, rm = Settings.d.reduce;
-    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); this._bk.length = 0; this._bkd.length = 0;
     if (this.cine) return this.renderCine(g);
     const ex = [];
     // ground marks first (far depth in the sorted list, so fighters sit on top)
@@ -3928,7 +3935,7 @@ const Brawl = {
     for (const a of this.allies) ex.push({ y: a.y, d: () => { if (a.kn || a.kneel) { a.kneel = (a.kneel || 0) + clamp((a.kn || 0) - (a.kneel || 0), -.05, .05); if (a.kn) { a.fx = 0; a.fy = 1; } } if (a.palm && !this.g3) { /* a palm laid flat on the pipe beside them */ const pr = this.proj(a.x, a.y), sc = this.K * pr.s, fh = a.sheet.fh || 16, sk = (CAST[a.id] && (CAST[a.id].look().gloves || CAST[a.id].look().skin)) || '#c48a64'; g.fillStyle = '#120a0e'; g.fillRect(Math.round(pr.x + (a.palm > 0 ? 4 : -11) * sc), Math.round(pr.y - fh * sc * .56), Math.round(7 * sc), Math.round(3 * sc)); g.fillStyle = sk; g.fillRect(Math.round(pr.x + (a.palm > 0 ? 5 : -10) * sc), Math.round(pr.y - fh * sc * .56 + sc * .5), Math.round(5 * sc), Math.round(2 * sc)); } this.fighter(g, a, { blade: p.blade ? 1 : 0, id: a.id, win: this.phase === 'win' && this.pt > .4 ? 2 : 0 }); } });
     const furyA = p.fury >= 100 || this.sup ? 2 + p.rage : p.rage > 0 ? p.rage * .6 + p.fury / 100 : p.fury > 60 ? .6 : 0;
     ex.push({ y: p.y + .1, d: () => { if (!this.g3 && this.sup && this.sup.t < SUPT && this.sup.t > .15) { const q = this.proj(p.x, p.y), c = this.K * q.s, hx = Math.round(q.x), hy = Math.round(q.y - 9.5 * c - (p.z || 0) * q.s), u = Math.max(1, Math.round(c)); this._wash = [hx, hy, u]; } else this._wash = null; this.fighter(g, p, { blade: p.blade, aura: furyA, chg: p.fury < 100 && p.hold > .16 && (p.st === 'idle' || p.st === 'move') ? p.hold : 0, rage: p.fury / 100, win: this.phase === 'win' && this.pt > .5 ? 1 : 0, id: (this.def.hero && this.def.hero.id) || 'kael', pose: this.sup && this.sup.t < SUPT && this.sup.t > .15 ? 'washer' : undefined, cape: this.def.hero && this.def.hero.id === 'kael2' ? this.def.hero.cape || '#5a3aa8' : null }); if (this._wash) { const [hx, hy, u] = this._wash; g.fillStyle = '#120a0e'; g.fillRect(hx - u * 2, hy - u, u * 4, u * 3); g.fillStyle = '#e8b890'; g.fillRect(hx - u, hy, u * 2, u); g.fillStyle = '#fff2c0'; g.fillRect(hx, hy - u, u, u); } } });
-    this.scene(g, ex);
+    this.scene(g, ex); for (const d of this._bkd) d(); this._bkd.length = 0;
     // screen FX
     if (this.impact > 0 && !rm) { g.fillStyle = `rgba(255,255,255,${Math.min(this.g3 ? .16 : .85, this.impact * (this.g3 ? (this.impact > .2 ? .5 : 1) : 5))})`; g.fillRect(0, 0, W, H);   /* in 3D a big blow tints the screen; it does not white it out */ const pr = this.proj(p.x, p.y, 20); if (this.impact > .12 || !this.g3) { g.strokeStyle = 'rgba(20,10,10,.55)'; g.lineWidth = 1; for (let i = 0; i < 22; i++) { const a = i / 22 * 6.283 + t, r0 = 40 + (i % 3) * 14; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * 320, pr.y + Math.sin(a) * 320 * .7); g.stroke(); } } }
     if (this.slow > 0) { g.fillStyle = 'rgba(255,224,138,.10)'; g.fillRect(0, 0, W, H); }
@@ -3939,7 +3946,7 @@ const Brawl = {
       if (full) { g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 16; i++) { const side = i % 2, ph = (t * (.5 + (i % 5) * .13) + i * .31) % 1, x = side ? W - 2 - (i * 7 % 22) : 2 + (i * 7 % 22), y = H - ph * H; g.fillStyle = `rgba(255,${110 + (i % 3) * 40},40,${.5 * (1 - ph)})`; g.fillRect(x, y, 2, 3 + (i % 3)); } g.globalCompositeOperation = 'source-over'; } }
     if (def.doomed) { g.fillStyle = `rgba(0,0,0,${clamp(this.t / (def.doomed + 1.6), 0, 1) * .35})`; g.fillRect(0, 0, W, H); }
     if (this.g3 && this.phase === 'fight' && !this.sup && !this.art) { const pr = this.proj(p.x, p.y, 86 + (p.z || 0)), x = Math.round(pr.x), y = Math.round(pr.y + Math.sin(t * 5) * 1.5); g.fillStyle = '#120a0e'; for (let i = 0; i < 5; i++) g.fillRect(x - 4 + i - 1, y + i - 1, 9 - i * 2 + 2, 2); g.fillStyle = '#ffd65a'; for (let i = 0; i < 4; i++) g.fillRect(x - 3 + i, y + i, 7 - i * 2, 1); if (this.foes.length + this.allies.length > 2) { const nm = (this.def.hero && this.def.hero.name) || 'KAEL', tx = x - Math.floor(ptextW(nm) / 2); g.fillStyle = '#120a0e'; g.fillRect(tx - 2, y - 9, ptextW(nm) + 3, 8); ptext(g, nm, tx, y - 8, '#ffd65a'); } }
-    for (const q of this.nums) { const pr = this.proj(q.x, q.y, q.h); if (pr.dz < 10) continue; const s = String(q.v), sc = q.big ? 2 : 1, x = Math.round(pr.x - ptextW(s, sc) / 2), y = Math.round(pr.y); g.globalAlpha = Math.min(1, q.life * 3); ptext(g, s, x + 1, y + 1, '#120a0e', sc); ptext(g, s, x, y, q.big ? '#ffb040' : '#fff6dc', sc); g.globalAlpha = 1; }
+    for (const q of this.nums) { const pr = this.proj(q.x, q.y, q.h); if (pr.dz < 10) continue; const s = String(q.v), sc = q.big ? 2 : 1, x = clamp(Math.round(pr.x - ptextW(s, sc) / 2), 2, W - 2 - ptextW(s, sc)), y = Math.max(30, Math.round(pr.y)); g.globalAlpha = Math.min(1, q.life * 3);   /* a close camera floated the numbers up into the health bars */ ptext(g, s, x + 1, y + 1, '#120a0e', sc); ptext(g, s, x, y, q.big ? '#ffb040' : '#fff6dc', sc); g.globalAlpha = 1; }
     this.hud(g);
     if (this.sup) this.renderSuper(g);
     if (this.art && this.art.t < this.art.C) this.renderArt(g); else this.renderArtWords(g);
@@ -3957,7 +3964,7 @@ const Brawl = {
     const p = this.p, t = this.t, bw = Math.min(104, Math.floor(W / 2) - 30), live = this.foes.filter(f => f.st !== 'down');
     const bar = (x, y, w, v, c1, c2, flip) => { g.fillStyle = '#0c0808'; g.fillRect(x - 1, y - 1, w + 2, 7); g.fillStyle = '#3a2a24'; g.fillRect(x, y, w, 5); const vw = Math.round(w * clamp(v, 0, 1)); g.fillStyle = c1; g.fillRect(flip ? x + w - vw : x, y, vw, 5); g.fillStyle = c2; g.fillRect(flip ? x + w - vw : x, y, vw, 1); g.fillStyle = '#c8a050'; g.fillRect(x - 1, y + 6, w + 2, 1); };
     g.fillStyle = '#0c0808'; g.fillRect(2, 2, 22, 22); g.drawImage(this.pb, 4, 4, 24, 24, 3, 3, 20, 20); g.strokeStyle = '#c8a050'; g.lineWidth = 1; g.strokeRect(2.5, 2.5, 21, 21);
-    bar(27, 4, bw, p.hp / p.max, p.hp / p.max < .34 ? '#c8452e' : '#ffb35a', '#ffe0a0'); ptext(g, (this.def.hero && this.def.hero.name) || 'KAEL', 27, 14, PAL.cream);
+    bar(27, 4, bw, p.hp / p.max, p.hp / p.max < .34 ? '#c8452e' : '#ffb35a', '#ffe0a0'); { const hn = (this.def.hero && this.def.hero.name) || 'KAEL'; ptext(g, hn, 28, 15, '#120a0e'); ptext(g, hn, 27, 14, PAL.cream); }   /* names get the same dark drop as the rest of the HUD: on a bright 3D sky they washed out */
     const full = p.fury >= 100; bar(27 + 22, 14, bw - 22, p.fury / 100, full ? (Math.floor(t * 8) % 2 ? '#ff5a2a' : '#ffb040') : '#a83a1e', '#ffb080');
     { const fk = this.phase === 'fight' && !this.sup && !this.art && p.st !== 'down' ? this.finKind(p.z > 0) : null; if (fk) { const s = 'HOLD ' + this.key('A') + ': ' + (fk === 'three' ? FINS.three[this.band()].name : 'ELEVEN');   /* the full bar is always called ELEVEN here; a named one (IRON SKY, THE RECKONING) is only the title of its cut-in */ ptext(g, s, 28, 25, '#120a0e'); ptext(g, s, 27, 24, fk === 'three' ? (Math.floor(t * 6) % 2 ? '#ff5a4a' : '#ffd0c0') : Math.floor(t * 6) % 2 ? '#ffb040' : '#fff0b0'); } }
     for (let i = 0; i < 3; i++) { g.fillStyle = i < p.gd ? '#9ac0ff' : '#2a2630'; g.fillRect(27 + 22 + i * 6, 20, 5, 2); }
@@ -3965,13 +3972,13 @@ const Brawl = {
     const def = this.def, boss = this.foes.length === 1 ? this.foes[0] : null, tot = this.foes.reduce((a, f) => a + Math.max(0, f.hp), 0) / Math.max(1, this.foes.reduce((a, f) => a + f.max, 0));
     const nm = (boss ? boss.name : live.length ? (this.def.foeName || live[0].name) + (live.length > 1 ? ' x' + live.length : '') : '').toUpperCase();
     if (boss) { if (!boss.bust) boss.bust = World.bustFor(boss.id); g.fillStyle = '#0c0808'; g.fillRect(W - 24, 2, 22, 22); g.drawImage(boss.bust, 4, 4, 24, 24, W - 23, 3, 20, 20); g.strokeStyle = '#c8a050'; g.strokeRect(W - 23.5, 2.5, 21, 21); }
-    const rx = boss ? W - 27 - bw : W - 4 - bw; bar(rx, 4, bw, boss ? boss.hp / boss.max : tot, '#c8452e', '#f08a70', true); ptext(g, nm, rx + bw - ptextW(nm), 14, '#ff9a7a');
+    const rx = boss ? W - 27 - bw : W - 4 - bw; bar(rx, 4, bw, boss ? boss.hp / boss.max : tot, '#c8452e', '#f08a70', true); ptext(g, nm, rx + bw - ptextW(nm) + 1, 15, '#120a0e'); ptext(g, nm, rx + bw - ptextW(nm), 14, '#ff9a7a');
     if (boss && boss.K.poise && def.legend && boss.st !== 'down') { const k = boss.broken > 0 ? 1 : Math.min(1, boss.stg || 0); g.fillStyle = '#1a1410'; g.fillRect(rx, 21, bw, 2); g.fillStyle = boss.broken > 0 ? (Math.floor(this.t * 12) % 2 ? '#fff2c0' : '#ffb040') : '#e8c25a'; g.fillRect(rx + Math.round(bw * (1 - k)), 21, Math.round(bw * k), 2); if (boss.broken > 0) ptext(g, 'STAGGERED', rx + bw - ptextW('STAGGERED'), 25, '#ffe08a'); }
-    { const S = this.sty; if (S.r > 0 && this.phase === 'fight') { const nmS = ['', 'SPARK', 'EMBER', 'BLAZE', 'FURNACE'][S.r], col = ['', '#c8c0b0', '#ffb35a', '#ff7a30', '#ff4a2a'][S.r], sc = S.pop > .3 ? 2 : 1, x = W - 6 - ptextW(nmS, sc), y = 48; ptext(g, nmS, x + 1, y + 1, '#120a0e', sc); ptext(g, nmS, x, y, col, sc); g.fillStyle = '#1a1410'; g.fillRect(W - 46, y + 8 * sc - 1, 40, 2); g.fillStyle = col; g.fillRect(W - 46, y + 8 * sc - 1, Math.round(40 * S.v / 100), 2); } }
+    { const S = this.sty; if (S.r > 0 && this.phase === 'fight' && !this.sup && !this.art) {   /* during ELEVEN and a Memory Art the count words print on this corner */ const nmS = ['', 'SPARK', 'EMBER', 'BLAZE', 'FURNACE'][S.r], col = ['', '#c8c0b0', '#ffb35a', '#ff7a30', '#ff4a2a'][S.r], sc = S.pop > .3 ? 2 : 1, x = W - 6 - ptextW(nmS, sc), y = 48; ptext(g, nmS, x + 1, y + 1, '#120a0e', sc); ptext(g, nmS, x, y, col, sc); g.fillStyle = '#1a1410'; g.fillRect(W - 46, y + 8 * sc - 1, 40, 2); g.fillStyle = col; g.fillRect(W - 46, y + 8 * sc - 1, Math.round(40 * S.v / 100), 2); } }
     if (this.phase === 'fight' && !this.sup && !this.art) { const C = [['HK', p.hcd], ['RM', p.pcd], ['WC', p.lcd], ['BR', p.bcd], [p.boots ? '' : 'DR', p.scd], ['RO', p.rcd]]; let x = 27; for (const [n2, cd] of C) { if (!n2 || cd > 1e8 || cd <= 0) continue; ptext(g, n2, x + 1, 33, '#120a0e'); ptext(g, n2, x, 32, '#b89a70'); g.fillStyle = '#e8c25a'; g.fillRect(x, 38, Math.max(1, Math.round(7 * (1 - Math.min(1, cd / 3)))), 1); x += 12; } }
-    if (this.hitsT > 0 && this.hitsN > 1) { const s = this.hitsN + ' HITS'; ptext(g, s, W - 6 - ptextW(s, 2) + 1, 35, '#120a0e', 2); ptext(g, s, W - 6 - ptextW(s, 2), 34, this.hitsN > 7 ? '#ff7a30' : '#ffe08a', 2); }
+    if (this.hitsT > 0 && this.hitsN > 1 && !this.sup && !this.art) { const s = this.hitsN + ' HITS'; ptext(g, s, W - 6 - ptextW(s, 2) + 1, 35, '#120a0e', 2); ptext(g, s, W - 6 - ptextW(s, 2), 34, this.hitsN > 7 ? '#ff7a30' : '#ffe08a', 2); }
     if (this.vcur && (this.phase === 'fight' || this.phase === 'win') && !(this.sup && this.sup.t < SUPT) && !this.art) { const v = this.vcur, lines = wrapP(v.t, W - 20), a = Math.min(1, (v.max - v.life) * 5, v.life * 3), y0 = H - 6 - lines.length * 9; g.globalAlpha = Math.max(0, a); g.fillStyle = 'rgba(7,5,10,.62)'; g.fillRect(0, y0 - 3, W, lines.length * 9 + 5); g.fillStyle = '#c8a050'; g.fillRect(0, y0 - 3, W, 1); lines.forEach((ln, i) => ptext(g, ln, Math.round(W / 2 - ptextW(ln) / 2), y0 + i * 9, '#fff6dc')); g.globalAlpha = 1; }
-    if (Input.device === 'pad' && this.phase === 'fight' && !this.art && !this.sup && !(this.tipT > 0) && !this.vcur && !this.prompt) { const t = 'X CUT  Y KICK  A JUMP  B DODGE  RB GUARD' + (this.p.hcd > 1e8 ? '' : '  LB HOOK'), tw = ptextW(t); g.globalAlpha = .5; ptext(g, t, W - tw - 4, H - 8, '#e8dcc0'); g.globalAlpha = 1; }
+    if (Input.device === 'pad' && this.phase === 'fight' && !this.art && !this.sup && !(this.tipT > 0) && !this.vcur && !this.prompt) { const t = 'X STRIKE  Y KICK  A JUMP  B DODGE  RB GUARD' + (this.p.hcd > 1e8 ? '' : '  LB HOOK'), tw = ptextW(t); g.globalAlpha = .5; ptext(g, t, W - tw - 4, H - 8, '#e8dcc0'); g.globalAlpha = 1; }
     if (this.tipT > 0 && this.phase === 'fight' && !this.art && !this.sup && !this.vcur && !this.prompt) { const dv = Input.device, bt = this.p.boots, L = dv === 'kb' ? ['E STRIKE  C KICK  F JUMP  X DODGE  V GUARD  Q HOOK', 'TAP KICK x3: ROUNDHOUSE   HOLD KICK: BOOT', 'HOOK UP CLOSE: THE RAM   TAP GUARD AS HE SWINGS: PARRY', bt ? 'BOOTS: HOLD F TO FLY, V SLAM. Q IN THE AIR HAULS A MAN UP: E CUTS HIM DOWN' : 'IN THE AIR: X PLUNGE, C DIVE KICK, F AGAIN: SHAFT DROP', 'GUARD + STRIKE: WIDE CUT   GUARD + KICK: HEADBUTT', 'GUARD + JUMP: BREACH   GUARD + HOOK: ROAR'] : dv === 'pad' ? ['X STRIKE  Y KICK  A JUMP  B DODGE  RB GUARD  LB HOOK', 'TAP Y x3: ROUNDHOUSE   HOLD Y: BOOT', 'LB UP CLOSE: THE RAM   TAP RB AS HE SWINGS: PARRY', bt ? 'BOOTS: HOLD A TO FLY, RB SLAM. LB IN THE AIR HAULS A MAN UP: X CUTS HIM DOWN' : 'IN THE AIR: B PLUNGE, Y DIVE KICK, A AGAIN: SHAFT DROP', 'RB + X: WIDE CUT   RB + Y: HEADBUTT', 'RB + A: BREACH   RB + LB: ROAR'] : ['TAP KICK x3: ROUNDHOUSE. HOLD KICK: BOOT', 'HOOK UP CLOSE: THE RAM', 'TAP GUARD AS HE SWINGS: PARRY', bt ? 'BOOTS: HOLD JUMP TO FLY, B AIR DASH, GUARD SLAM' : 'IN THE AIR: B PLUNGE, JUMP AGAIN: SHAFT DROP', 'GUARD + A: WIDE CUT   GUARD + KICK: HEADBUTT', 'GUARD + JUMP: BREACH   GUARD + HOOK: ROAR'], era = this.era, L2 = L.filter(l => !(era < 1 && /RAM|WIDE CUT|BREACH/.test(l))).map(l => era < 3 ? l.replace(/, [A-Z]+ AGAIN: SHAFT DROP|, JUMP AGAIN: SHAFT DROP/, '') : l).map(l => era < 2 ? l.replace(/GUARD \+ JUMP: BREACH   |RB \+ A: BREACH   /, '') : l), L3 = this.def.newMove ? [this.def.newMove].concat(L2) : L2, tip = L3[Math.floor(this.t / 3.4) % L3.length]; g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11); ptext(g, tip, Math.max(3, Math.round(W / 2 - ptextW(tip) / 2)), H - 8, '#f3e3c3'); }
   },
   renderSuper(g, word, rgbw) {
@@ -3986,7 +3993,7 @@ const Brawl = {
           g.restore(); }
         g.fillStyle = 'rgba(200,40,10,.22)'; g.fillRect(0, y0 + 2, W, bh - 4); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,90,30,${.16 + Math.sin(t * 30) * .06})`; g.fillRect(0, y0 + 2, W, bh - 4); g.globalCompositeOperation = 'source-over';
         for (let i = 0; i < 14; i++) { g.fillStyle = 'rgba(255,220,180,.5)'; g.fillRect((i * 47 + t * 900) % (W + 40) - 20, y0 + 4 + (i * 13) % (bh - 8), 26, 1); }
-        const FN = !word && ((this.sup && this.sup.fn) || this.def.fin); if (FN && FN.rgb) rgbw = FN.rgb; const w = word || (FN && FN.name) || 'ELEVEN', sc = ptextW(w, 4) < W - 10 ? 4 : ptextW(w, 3) < W - 10 ? 3 : 2; ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2) + 2, Math.round(H * .7) + 2, '#120a0e', sc); ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2), Math.round(H * .7), rgbw ? `rgb(${rgbw})` : '#ff7a30', sc); if (word) return; const c3 = (FN && FN.l1) || 'ONE FOR EVERY SECOND', c4 = (FN && FN.l2) || 'THE DOORS STOOD OPEN', s2 = W > 300 ? 2 : 1; if (t > .4) ptext(g, c3, Math.round(W / 2 - ptextW(c3, s2) / 2), Math.round(H * .7) + sc * 6 + 4, '#f3e3c3', s2); if (t > .85) ptext(g, c4, Math.round(W / 2 - ptextW(c4, s2) / 2), Math.round(H * .7) + sc * 6 + 6 + s2 * 7, '#f3e3c3', s2); } }
+        const FN = !word && ((this.sup && this.sup.fn) || this.def.fin); if (FN && FN.rgb) rgbw = FN.rgb; const w = word || (FN && FN.name) || 'ELEVEN', sc = ptextW(w, 4) < W - 10 ? 4 : ptextW(w, 3) < W - 10 ? 3 : 2, s2 = W > 300 ? 2 : 1, yN = word ? Math.round(H * .7) : Math.min(Math.round(H * .7), H - 5 - (sc * 6 + 6 + s2 * 12));   /* the second line used to sit on the bottom edge of the screen */ ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2) + 2, yN + 2, '#120a0e', sc); ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2), yN, rgbw ? `rgb(${rgbw})` : '#ff7a30', sc); if (word) return; const c3 = (FN && FN.l1) || 'ONE FOR EVERY SECOND', c4 = (FN && FN.l2) || 'THE DOORS STOOD OPEN'; if (t > .4) ptext(g, c3, Math.round(W / 2 - ptextW(c3, s2) / 2), yN + sc * 6 + 4, '#f3e3c3', s2); if (t > .85) ptext(g, c4, Math.round(W / 2 - ptextW(c4, s2) / 2), yN + sc * 6 + 6 + s2 * 7, '#f3e3c3', s2); } }
     else if (s.word) { const fin = s.n >= 11, sc = fin ? (W > 300 ? 5 : 4) : 3, a = Math.max(0, 1 - (s.wt || 0) * (fin ? 1.2 : 4)); if (a > 0) { g.globalAlpha = a; const x = fin ? Math.round(W / 2 - ptextW(s.word, sc) / 2) : (s.n % 2 ? 10 : W - 10 - ptextW(s.word, sc)), y = fin ? Math.round(H * .4) : 52 + (s.n % 3) * 16; ptext(g, s.word, x + 2, y + 2, '#120a0e', sc); ptext(g, s.word, x, y, fin ? '#fff0b0' : '#ff7a30', sc); g.globalAlpha = 1; } }
   },
   // Memory Art cut-in, in ELEVEN's language: the memory fills the screen and says its line, then a hard cut to his eyes and the name of the blow.
@@ -4010,7 +4017,7 @@ const Brawl = {
   renderCine(g) {
     const c = this.cine, s = c.shots[c.i], rm = Settings.d.reduce; if (s.black) { g.fillStyle = '#050307'; g.fillRect(0, 0, W, H); }
     const ex = c.acts.map(o => ({ y: o.y, d: () => this.fighter(g, { x: o.x, y: o.y, fx: o.fx || 0, fy: o.fy === undefined ? 1 : o.fy, sheet: o.sheet, anim: o.anim, sc: o.sc, st: o.st || 'idle', t: (o.t || 0) + ((o.st || 'idle') === 'idle' ? c.t : 0), idx: o.k || 0, swing: o.hold ? .18 - (o.ht || .12) + (Settings.d.reduce ? 0 : Math.sin(c.t * 2.6 + (o.k || 0)) * .008) : o.swing ? (c.t % .5 < .18 ? .18 - (c.t % .5) : 0) : 0, guardT: o.guard ? 1 : 0, ax: o.fx || 0, ay: o.fy || 0, combo: o.hold || 1 + (Math.floor(c.t / .5 + (o.k || 0)) % 3) }, { run: !!o.b, key: o, pose: o.pose, swingFx: !!o.swing, id: o.id, blade: o.blade, aura: o.aura || 0, cape: o.cape || (this.def.hero && this.def.hero.cape && o.id === this.def.hero.id ? this.def.hero.cape : 0) || CAST[o.id].look().cape || null }) }));
-    if (!s.black) this.scene(g, ex); else this.g3 = false;
+    if (!s.black) { this.scene(g, ex); for (const d of this._bkd) d(); } else this.g3 = false; this._bkd.length = 0;
     if (s.bolt && !rm) { // rage as weather: red-gold lightning
       const sd = rng(Math.floor(c.t * 14) * 97 + c.i * 13 + 5), on = sd() < .75; if (on) { g.globalCompositeOperation = 'lighter'; for (let b = 0; b < (s.bolt > 1 ? 4 : 2); b++) { let x = sd() * W, y = 12; const pts = [[x, y]]; while (y < H - 14 - sd() * 60) { y += 8 + sd() * 16; x += (sd() - .5) * 44; pts.push([x, y]); if (sd() < .2) { g.strokeStyle = 'rgba(255,150,60,.5)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (sd() - .5) * 60, y + 10 + sd() * 26); g.stroke(); } }
           for (const [wd, col] of [[5, 'rgba(255,70,20,.35)'], [2.5, 'rgba(255,170,80,.7)'], [1, '#fff6dc']]) { g.strokeStyle = col; g.lineWidth = wd; g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.stroke(); } }
@@ -4024,8 +4031,8 @@ const Brawl = {
     if (s.credit) { const a = Math.min(1, c.t * 2.5, (c.dur - c.t) * 2.5), cw = s.credit.split('').join(' '), x = W > 300 ? 14 : Math.max(4, Math.round(W / 2 - ptextW(cw) / 2)); g.globalAlpha = Math.max(0, a) * .55; g.fillStyle = '#07050a'; g.fillRect(x - 4, 17, ptextW(cw) + 8, 14); g.globalAlpha = Math.max(0, a); ptext(g, cw, x + 1, 21, '#120a0e'); ptext(g, cw, x, 20, '#e8c25a'); g.fillStyle = '#e8c25a'; g.fillRect(x, 28, Math.min(W - x * 2, Math.round(ptextW(cw) * Math.min(1, c.t * 1.5))), 1); g.globalAlpha = 1; }
     if (s.big) big(s.big, s.bigC || '#fff6dc', Math.round(H * (s.acts && s.acts.length && !s.black ? .16 : .36)), ptextW(s.big, 3) < W - 8 ? 3 : 2);
     if (s.sub2) { ptext(g, s.sub2, Math.round(W / 2 - ptextW(s.sub2) / 2), Math.round(H * .36) + 24, '#e8c25a'); }
-    if (s.cap) { const lines = wrapP(s.cap, (W - 20) / 2), a = Math.min(1, c.t * 3), bh = lines.length * 13 + 6, y0 = H - 14 - bh; g.globalAlpha = a; g.fillStyle = 'rgba(7,5,10,.72)'; g.fillRect(0, y0, W, bh); g.fillStyle = 'rgba(232,194,90,.5)'; g.fillRect(0, y0, W, 1); lines.forEach((ln, i) => ptext(g, ln, Math.round(W / 2 - ptextW(ln, 2) / 2), y0 + 5 + i * 13, '#fff6dc', 2)); g.globalAlpha = 1; }
-    if (c.i === 0 && c.t < 2.5) { const h = this.def.cineOnly ? (Input.device === 'kb' ? 'ANY KEY: SKIP' : 'TAP: SKIP') : Input.device === 'kb' ? 'E: NEXT   M: SKIP' : 'TAP: NEXT'; ptext(g, h, W - 4 - ptextW(h), H - 10, '#6a6470'); }
+    if (s.cap) { const lines = wrapP(s.cap.replace(/["\u201c\u201d]/g, "'"), (W - 20) / 2),   /* the pixel font has no double quote: it printed as ? */ a = Math.min(1, c.t * 3), bh = lines.length * 13 + 6, y0 = H - 14 - bh; g.globalAlpha = a; g.fillStyle = 'rgba(7,5,10,.72)'; g.fillRect(0, y0, W, bh); g.fillStyle = 'rgba(232,194,90,.5)'; g.fillRect(0, y0, W, 1); lines.forEach((ln, i) => ptext(g, ln, Math.round(W / 2 - ptextW(ln, 2) / 2), y0 + 5 + i * 13, '#fff6dc', 2)); g.globalAlpha = 1; }
+    if (c.i === 0 && c.t < 2.5) { const dv = Input.device, h = this.def.cineOnly ? (dv === 'kb' ? 'ANY KEY: SKIP' : dv === 'pad' ? 'A: SKIP' : 'TAP: SKIP') : dv === 'kb' ? 'E: NEXT   M: SKIP' : dv === 'pad' ? 'A: NEXT   START: SKIP' : 'TAP: NEXT';   /* the pad was told to TAP */ ptext(g, h, W - 4 - ptextW(h), H - 10, '#6a6470'); }
   }
 };
 function wrapP(s, maxW) { const out = []; let cur = ''; for (const w of s.split(' ')) { const t = cur ? cur + ' ' + w : w; if (ptextW(t) > maxW && cur) { out.push(cur); cur = w; } else cur = t; } if (cur) out.push(cur); return out; }
@@ -8490,7 +8497,8 @@ function modal(opts) {
     update() {
       if (G.time - m.born < 0.3) return;
       if (opts.tabs) { if (Input.p('L')) opts.tabs(-1); if (Input.p('R')) opts.tabs(1); }
-      if (Input.rep('up')) m.move(-1); if (Input.rep('down')) m.move(1);
+      if (m.items.length <= 1 && m.panel.scrollHeight > m.panel.clientHeight + 2) { const sc = d => { m.panel.scrollTop += d * Math.round(m.panel.clientHeight * .45); Sound.play('move'); }; if (Input.rep('up')) sc(-1); if (Input.rep('down')) sc(1); }   /* Controls, About, the Codex: one Back button under a long page; up and down jumped straight to the bottom */
+      else { if (Input.rep('up')) m.move(-1); if (Input.rep('down')) m.move(1); }
       const it = m.items[m.sel];
       if (it && it.adj) { if (Input.rep('left')) { it.adj(-1); Sound.play('move'); m.refresh(); } if (Input.rep('right')) { it.adj(1); Sound.play('move'); m.refresh(); } }
       else if (opts.tabs) { if (Input.p('left')) opts.tabs(-1); if (Input.p('right')) opts.tabs(1); }
@@ -8588,9 +8596,9 @@ const Menus = {
     const S = Settings.d, upd = () => { Settings.save(); Settings.apply(); };
     const cyc = (k, n) => d => { S[k] = (S[k] + d + n) % n; upd(); };
     UI.push(modal({ title: 'Settings', build(b) { b.innerHTML = `<p style="opacity:.7">Saves: ${Store.ok ? 'kept in this browser' : 'this session only (storage blocked) — export from Save data'}. Keyboard: WASD/arrows, E/Enter, Esc, M menu, Q/R tabs, H hint. Controller supported.</p>`; }, items: [
-      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 0 : S.diff], act: () => { S.diff = ((S.diff === undefined ? 0 : S.diff) + 1) % 3; upd(); } },
-      { label: 'Graphics (3D fights)', value: () => ['Low', 'Medium', 'High'][S.gfx === undefined ? 2 : S.gfx], act: () => { S.gfx = ((S.gfx === undefined ? 2 : S.gfx) + 1) % 3; upd(); } },
-      { label: 'Show frame time', value: () => S.fps ? 'On' : 'Off', act: () => { S.fps = S.fps ? 0 : 1; upd(); } },
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 0 : S.diff], adj: d => { S.diff = ((S.diff === undefined ? 0 : S.diff) + d + 3) % 3; upd(); } },   /* left and right turn these too, as they do every other row */
+      { label: 'Graphics (3D fights)', value: () => ['Low', 'Medium', 'High'][S.gfx === undefined ? 2 : S.gfx], adj: d => { S.gfx = ((S.gfx === undefined ? 2 : S.gfx) + d + 3) % 3; upd(); } },
+      { label: 'Show frame time', value: () => S.fps ? 'On' : 'Off', adj: () => { S.fps = S.fps ? 0 : 1; upd(); } },
       { label: 'Sound test', value: () => !Sound.ctx ? 'audio off' : Sound.ctx.state === 'running' ? 'tap to hear' : 'blocked: tap again', act: () => { Sound.unlock(); setTimeout(() => { Sound.play('horn'); Sound.play('win'); }, 60); } },
       { label: 'Music', value: () => S.music * 10 + '%', adj: d => { S.music = clamp(S.music + d, 0, 10); upd(); } },
       { label: 'Sound effects', value: () => S.sfx * 10 + '%', adj: d => { S.sfx = clamp(S.sfx + d, 0, 10); upd(); Sound.play('blip'); } },
@@ -8615,7 +8623,7 @@ const Menus = {
           if (s) UI.push(modal({ title: `Overwrite ${nm}?`, build(b) { b.innerHTML = `<p>${esc(Save.describe(s))}</p>`; }, items: [{ label: 'Overwrite', act: () => { UI.pop(); go(); } }, { label: 'Cancel', act: () => UI.pop() }] })); else go(); }
         else if (mode === 'delete') { Save.del(k); Sound.play('deny'); UI.pop(); UI.pop(); Menus.slots('load'); }
         else { UI.clear(); Game.loadSave(s); } } }); }
-    if (mode === 'load') { items.push({ label: 'Delete a save', act: () => Menus.slots('delete') }); items.push({ label: 'Export / import save text', act: () => Menus.saveData() }); }
+    if (mode === 'load') { items.push({ label: 'Delete a save', disabled: () => !Save.SLOTS.some(([k]) => Save.read(k)), act: () => Menus.slots('delete') });   /* with nothing saved the menu opened on this */ items.push({ label: 'Export / import save text', act: () => Menus.saveData() }); }
     items.push({ label: 'Back', act: () => UI.pop() });
     UI.push(modal({ title: mode === 'save' ? 'Save game' : mode === 'delete' ? 'Delete which save?' : 'Load game', build(b) { b.innerHTML = Store.ok ? '<p>The game autosaves at every story beat. Slots are yours.</p>' : '<p>This view cannot keep saves after you close it. Use <b>Export</b> on the Load screen to copy your save text somewhere safe.</p>'; }, items }));
   },
@@ -8648,7 +8656,7 @@ const Menus = {
         ['★ NEW · Part Two · The Count hall (stealth; lose the order)', () => { fresh(); Mission.start('count'); }],
         ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
-      'Levels in 3D (comic)': [
+      'Levels in 3D': [
         ['★ NEW · +7 · The High Docks (third person; Captain Rook)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Issue.start('docks', ok => { if (!ok) HUD.toast('Could not start the 3D level on this device.'); Game.toTitle(); }); }],
         ['★ NEW · +5 · Riser Nine (third person; hold the hatch, in a mask)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'riser', or: [{ brawl: () => FF.riser() }] }], () => Game.toTitle()); }],
         ['★ NEW · +9 · The Stair (third person; three flights to the white door)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'stair', or: [{ brawl: () => FF.stair() }] }], () => Game.toTitle()); }],
@@ -8708,7 +8716,7 @@ const Menus = {
     const onoff = v => v ? 'On' : 'Off';
     UI.push(modal({ title: 'Dev menu', build(b) { b.innerHTML = '<p>Version ' + GAME_VER + '. Jump straight to any fight or story beat. Your save slots are not touched until the game autosaves.</p><p><b>New in ' + GAME_VER + ':</b> ' + DEV_NEW + '</p>'; }, items: [
       { label: 'Training room (all moves, nobody loses)', act: () => { const q = DEV.quick; DEV._tq = q; UI.clear(); DEV.quick = 1; DEV.from = 'main'; $('#devback').classList.remove('hidden'); ffScene('TRAINING', 'A sealed pump room.', () => FF.training(), () => { DEV.quick = q; Game.toTitle(); }); } },
-      { label: 'Fights', act: sub('Fights') }, { label: 'Assay missions (2D) ★', act: sub('Assay missions (2D)') }, { label: 'Levels in 3D (comic) ★', act: sub('Levels in 3D (comic)') }, { label: 'Story beats', act: sub('Story beats') }, { label: 'Cutscenes', act: sub('Cutscenes') },
+      { label: 'Fights', act: sub('Fights') }, { label: 'Assay missions (2D) ★', act: sub('Assay missions (2D)') }, { label: 'Levels in 3D ★', act: sub('Levels in 3D') }, { label: 'Story beats', act: sub('Story beats') }, { label: 'Cutscenes', act: sub('Cutscenes') },
       { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][Settings.d.diff === undefined ? 0 : Settings.d.diff], adj: () => { Settings.d.diff = ((Settings.d.diff === undefined ? 0 : Settings.d.diff) + 1) % 3; Settings.save(); } },
       { label: 'Start fights at full fury', value: () => onoff(DEV.fury), adj: () => { DEV.fury = DEV.fury ? 0 : 1; } },
       { label: 'Skip fight intro films', value: () => onoff(DEV.quick), adj: () => { DEV.quick = DEV.quick ? 0 : 1; } },
@@ -8752,7 +8760,7 @@ const Menus = {
   training(back) { const q = DEV.quick; DEV._tq = q; UI.clear(); DEV.quick = 1; ffScene('TRAINING', 'A sealed pump room. All moves. Nobody loses.', () => FF.training(), () => { DEV.quick = q; if (back && Save.latest()) Game.loadSave(Save.latest()); else Game.toTitle(); }); },
   chapters() { const go = f => () => { UI.clear(); f(); }; UI.push(modal({ title: 'Chapter select', build(b) { b.innerHTML = '<p>Replay any chapter. Your save slots are not touched until the game autosaves.</p>'; }, items: [{ label: 'Part One · from the beginning', act: () => Menus.newGame() }, ...[1, 2, 3, 4, 5].map(n => ({ label: `Part Two · ${n} · ${P2_TITLES[n]}`, act: go(() => playPart2(n)) })), { label: 'Back', act: () => UI.pop() }] })); },
   memories() { let L = []; try { L = JSON.parse(Store.get('sootborn_mem') || '[]'); } catch (e) { } UI.push(modal({ title: 'Memories', build(b) { b.innerHTML = '<p style="opacity:.7">Mara keeps them on the shelf, beside the tins. ' + L.length + ' kept so far.</p>' + (L.map(m => `<div class="card"><b>${esc(m[0])}</b><p>${esc(m[1])}</p><p style="opacity:.55">${esc(m[2] || '')}</p></div>`).join('') || '<p>None yet. They come back to him in fights.</p>'); }, items: [{ label: 'Back', act: () => UI.pop() }] })); },
-  // one card for every kind of play: the same button does the same thing below, in the arena and in the comic-book levels
+  // one card for every kind of play: the same button does the same thing below, in the arena and in the 3D levels
   controls() {
     const rows = [
       ['Move', 'W A S D or arrows', 'Left stick or D-pad', 'The pad'],
@@ -8762,17 +8770,17 @@ const Menus = {
       ['Kick', 'C', 'Y', 'KICK'],
       ['Jump (hold: the boots)', 'F', 'A', 'JUMP'],
       ['Hook line', 'Q', 'LB', 'HOOK'],
-      ['Guard · in the comic-book levels, the lunge', 'V', 'RB', 'GUARD / LUNGE'],
-      ['ELEVEN', 'Hold strike when the fury is full', 'Hold strike', 'Hold A'],
-      ['Look round (comic-book levels)', 'Arrow keys, or drag with the mouse', 'Right stick; click it to lock on', 'Drag the picture'],
+      ['Guard · in the 3D levels, the lunge', 'V', 'RB', 'GUARD / LUNGE'],
+      ['ELEVEN', 'Hold E when the fury is full', 'Hold X', 'Hold A'],
+      ['Look round (3D levels)', 'Arrow keys, or drag with the mouse', 'Right stick; click it to lock on', 'Drag the picture'],
       ['Menu, pause', 'M (or Tab, P)', 'Start', '☰']];
-    UI.push(modal({ title: 'Controls', build(b) { b.innerHTML = `<p>The same button does the same thing everywhere: below, in the arena fights, and in the comic-book levels.</p><table class="ctl"><tr><th></th><th>Keyboard</th><th>Controller</th><th>Touch</th></tr>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table><p><b>In a fight.</b> Three strikes chain; hold strike for a heavy blow. A kick breaks a guard. Dodge through a red swing and he is open. Tap guard as he swings to parry. Walking over a chalked sun in a comic-book level saves and heals.</p><p>Controller letters are an Xbox pad's. On another pad, go by where the button sits.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
+    UI.push(modal({ title: 'Controls', build(b) { b.innerHTML = `<p>The same button does the same thing everywhere: below, in the arena fights, and in the 3D levels.</p><table class="ctl"><tr><th></th><th>Keyboard</th><th>Controller</th><th>Touch</th></tr>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table><p><b>In a fight.</b> Three strikes chain; hold strike for a heavy blow. A kick breaks a guard. Dodge through a red swing and he is open. Tap guard as he swings to parry. Walking over a chalked sun in a 3D level saves and heals.</p><p>Controller letters are an Xbox pad's. On another pad, go by where the button sits.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
   },
   about() {
     UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version ${GAME_VER}. The whole story plays from the animated intro to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (from day thirty-one of the Assay): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
-      <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
-      <p><b>The comic-book levels</b> use the same buttons as the fights (see Controls): tap strike for light cuts; keep it held for three heavy blows; at full fury a held strike is ELEVEN. Kick twice for the Wide Cut. Jump held hovers, and strike in the air dives. The guard button is the lunge. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
+      <p><b>Fights:</b> strike is E on a keyboard, X on a controller, A on touch; dodge is X, B and B (the full list is under Controls). Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
+      <p><b>The 3D levels</b> use the same buttons as the fights (see Controls): tap strike for light cuts; keep it held for three heavy blows; at full fury a held strike is ELEVEN. Kick twice for the Wide Cut. Jump held hovers, and strike in the air dives. The guard button is the lunge. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
   },
   newGame() {
@@ -8913,7 +8921,7 @@ const DayEnd = {
       b.innerHTML = `<p>By first bell the Tallymen have taken the lantern down. It does not matter. Four hundred people saw a sun, and you cannot scrub a thing like that off stone.</p>
         <p>In Row K, a child sleeps with a leaf pressed in a worksheet. In Fuse Room C, one bus hums at nineteen, exactly. And at the gate of Lift Zero, a grey Inspector waits with a ledger, to see who comes to carry it up.</p>
         <p><i>"Be too much for them."</i></p>
-        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers</p>`;
     }, items: [
       { label: 'Wake up: The Ledger, 43 days after the furnace', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => { sv.flags = Object.assign(sv.flags || {}, { day3Done: 1, ledgerUp: G.flags.ledgerUp, toldHer: G.flags.toldHer, toldDace: G.flags.toldDace, fury: G.flags.fury }); afterDay(3, sv); }); } },
       { label: 'Keep exploring instead', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
@@ -8926,7 +8934,7 @@ const DayEnd = {
       b.innerHTML = `<p>Far above Cinderwell — above the rock, above the warnings — a crate of cold greens arrives somewhere that doesn't exist.</p>
         <p>Below, Kael Brennick dreams of ${F('sawRiser') ? 'warm air falling from a pipe with no destination' : 'a lift light, green for eleven seconds'} — and of Seren, laughing at him for being right.</p>
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
-        <h2 style="margin-top:16px">ASHGATE · 41 DAYS AFTER THE FURNACE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">ASHGATE · 41 DAYS AFTER THE FURNACE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers</p>`;
     }, items: [
       { label: 'Wake up: First Fire, 42 days after the furnace', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1().concat([{ card: 'FIRST FIRE', sub: 'Forty-two days after the furnace.', big: 1, tr: 'wake', min: 1.6, max: 5 }]), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
@@ -9145,7 +9153,7 @@ function boot() {
   Store.init(); Settings.load(); Input.init(); Settings.apply(); Layout.update();
   addEventListener('resize', () => Layout.update()); addEventListener('orientationchange', () => setTimeout(() => Layout.update(), 200));
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { if (G.mode === 'world' && !UI.stack.length && !Dialogue.active && !Brawl.active) { if (Puzzle.active) Puzzle.close(); Menus.pause(); } Sound.suspend(); }
+    if (document.hidden) { if (G.mode === 'world' && !UI.stack.length && !Dialogue.active && !Brawl.active) { if (Puzzle.active) Puzzle.close(); Menus.pause(); } else if (Brawl.active && !Brawl.cine && Brawl.phase === 'fight' && !Brawl.def.walk && !UI.stack.length && !Dialogue.active) Brawl.pauseMenu();   /* back from another app mid-fight: the fight waits for you instead of carrying on mid-swing */ Sound.suspend(); }
     else Sound.resume();
   });
   // press-to-start (also unlocks audio as a user gesture)
