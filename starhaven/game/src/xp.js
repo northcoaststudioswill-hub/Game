@@ -13,7 +13,8 @@
   ];
   const prog = () => SH.game.progress;
   X.total = () => (prog() && prog().xp) || 0;
-  X.level = () => { const t = X.total(); let l = 1; while (l < X.AT.length && t >= X.AT[l]) l++; return l; };
+  X.levelAt = t => { let l = 1; while (l < X.AT.length && t >= X.AT[l]) l++; return l; };
+  X.level = () => X.levelAt(X.total());
   X.max = () => X.AT.length;
   X.span = () => { const l = X.level(); return l >= X.max() ? [1, 1] : [X.total() - X.AT[l - 1], X.AT[l] - X.AT[l - 1]]; };
   X.gain = function (n, why) {

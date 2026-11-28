@@ -660,7 +660,7 @@ const path = require('path');
       step({}, null); const shown = document.getElementById('whisper').classList.contains('show'), text = document.getElementById('w-text').textContent;
       check('Finisher band on a dash-strike kill; a whisper slides in (each line once per save)', band === 'RUN THROUGH' && wz.dead && queued === 2 && shown && text.length > 10, { band, queued, shown, text });
       // the Constellation: Starlight buys a heart, and it is in the save
-      SH.saves.erase(0); G.newGame(0); G.hud.cardGo(); G.progress.motes = { woods: 29, prologue: 20 };
+      SH.saves.erase(0); G.newGame(0); G.hud.cardGo(); G.progress.motes = { woods: 29, prologue: 20 }; G.base.progress.motes = { woods: 29, prologue: 20 };
       const S = SH.stars, free0 = S.free(), max0 = P().maxHearts, ok = S.buy('heart'), no = S.buy('edge'), max1 = P().maxHearts;
       const saved = SH.saves.all()[0]; const kept = saved && saved.stars && saved.stars.heart === 1;
       G.loadSlot(0); G.hud.cardGo && G.hud.cardGo(); const afterLoad = P().maxHearts;
@@ -729,8 +729,17 @@ const path = require('path');
       const chip = document.querySelector('#lvl b').textContent, saved = SH.saves.all()[0];
       // aim assist: an attack with no direction held turns to face the enemy behind her
       SH.test.load('ring', { story: false }); const q = P(), e = G.world.things.find(t => t.kind === 'thornSprite'); e.x = q.x - 30; e.y = q.y; q.facing = 1; step({}, ['attack']); step({}, null);
-      check('Experience: 30 XP is level 2 (quicker bow), 90 is level 3 (quicker dash), 150 is level 4 (+1 heart); shown, announced and saved. Aim assist turns an undirected strike to the enemy', l0 === 1 && l2 === 2 && bow < 1 && l3 === 3 && dash < dash0 && l4 === 4 && h4 === h0 + 1 && band === 'LEVEL 4' && chip === 'LV 4' && saved && saved.xp === 150 && q.facing === -1,
+      check('Experience: 30 XP is level 2 (quicker bow), 90 is level 3 (quicker dash), 150 is level 4 (+1 heart); shown and announced, and saved only from the chapter start (no farming by reload). Aim assist turns an undirected strike to the enemy', l0 === 1 && l2 === 2 && bow < 1 && l3 === 3 && dash < dash0 && l4 === 4 && h4 === h0 + 1 && band === 'LEVEL 4' && chip === 'LV 4' && saved && saved.xp === 0 && q.facing === -1,
         { levels: [l0, l2, l3, l4], hearts: [h0, h4], band, chip, savedXp: saved && saved.xp, turnedToEnemy: q.facing === -1 });
+      // No farming: bonds won mid-chapter are undone by Restart chapter and are not in the save; a bad slot loads safely
+      SH.saves.erase(0); G.newGame(0); G.hud.cardGo(); G.bond('nessa', 30, false, 'test');
+      const mid = (SH.saves.all()[0].bonds.nessa || { pts: 0 }).pts; document.getElementById('m-restart').click();
+      const after = (G.progress.bonds.nessa || { pts: 0 }).pts;
+      localStorage.setItem('starhaven.slots.v1', JSON.stringify([{ chapter: 'x', bonds: 5, met: 'no', xp: 600, playFrames: null }, { version: 99, chapter: 2 }, null]));
+      let d0 = null, d1 = null, err = null; try { d0 = SH.saves.describe(SH.saves.all()[0]); d1 = SH.saves.describe(SH.saves.all()[1]); } catch (e) { err = String(e); }
+      check('No farming: Restart chapter undoes bonds won in it, and saves hold the chapter start; a broken or newer save is read safely', mid === 0 && after === 0 && !err && d0 && d0.level === 7 && d1 && d1.future,
+        { savedMid: mid, afterRestart: after, err, level: d0 && d0.level, future: d1 && d1.future });
+      SH.saves.erase(0); SH.saves.erase(1);
       SH.saves.erase(0);
     })();
 

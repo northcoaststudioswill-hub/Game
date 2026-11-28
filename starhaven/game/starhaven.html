@@ -575,8 +575,10 @@ body[data-mode] #effects { display: none !important; }
 html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom: auto !important; }
 
 /* ---- the fae bow's button (Chapter 4 on): above STRIKE, where the right thumb already is */
-#b-bow { display: none; width: 62px; height: 62px; right: calc(max(24px, env(safe-area-inset-right)) + 112px); bottom: 116px; font-size: 12px; letter-spacing: .08em; border-color: rgba(159,232,255,.7) !important; color: #dff6ff; }
-body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px); bottom: calc(12vh + 92px); }
+#b-bow { display: none; width: 62px; height: 62px; right: calc(max(24px, env(safe-area-inset-right)) + 274px); bottom: 118px; font-size: 12px; letter-spacing: .08em; border-color: rgba(159,232,255,.7) !important; color: #dff6ff; }
+body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 126px); bottom: calc(12vh + 266px); }
+#b-talk { right: calc(max(24px, env(safe-area-inset-right)) + 40px); bottom: 214px; }
+body.upright #b-talk { right: calc(max(24px, env(safe-area-inset-right)) + 122px); bottom: calc(12vh + 190px); }
 </style>
 </head>
 <body>
@@ -636,7 +638,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.3.0 &middot; Prologue to Chapter 4</div>
+  <div id="f-ver">v0.3.1 &middot; Prologue to Chapter 4</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -1463,8 +1465,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ] },
       ['caelum', 'The Five will test you tomorrow. Bram will try to break you. Iris will try to read you. Let them.'],
       ['wren', 'And you?'],
-      ['caelum', 'I\'ll be watching from somewhere I can pretend I\'m not.'],
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['caelum', 'I\'ll be watching from somewhere I can pretend I\'m not.'],
     ],
 
     // ======================================================== Chapter 2: The Five
@@ -1595,8 +1597,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         ] },
       ] },
       ['caelum', 'One more thing. The debt. You don\'t owe me anything anymore. You can leave whenever you like.'],
-      ['wren', '...I know. I\'m staying anyway.'],
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['wren', '...I know. I\'m staying anyway.'],
     ],
     // Chapter 2, more to do
     ring_bram_talk: [
@@ -1642,8 +1644,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ] },
       ['bram', 'You fight like someone with people to protect.'],
       ['wren', 'Two sisters. Mortal. Across the sea.'],
-      ['bram', 'Then we keep them safe. That\'s what the Five do.'],
       { do: 'bond', who: 'bram', pts: 20, why: 'An evening together.' },
+      ['bram', 'Then we keep them safe. That\'s what the Five do.'],
     ],
     ev2_iris: [
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
@@ -1662,8 +1664,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         ] },
       ] },
       ['iris', 'Can I tell you a secret? Caelum\'s thread tangled with yours the day you walked into the Umbra. He pretends it didn\'t.'],
-      ['wren', '...Does he.'],
       { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
+      ['wren', '...Does he.'],
     ],
 
     // ---------------- Heart scenes: play when a bond reaches a new heart
@@ -1793,6 +1795,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         { text: '"Ask me again some other night."', bond: { caelum: 10 }, why: 'His own words, handed back to him. He laughed.', then: [['caelum', 'Using my own lines against me. That\'s cruel, Wren. I respect it.']] },
       ] },
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['narr', 'They stay until the lamps below go out one street at a time, and the stars come down to meet them.'],
     ],
     ev3_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
@@ -1803,8 +1806,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         { text: '"Ask your forty-one questions."', bond: { thane: 10 }, why: 'Nobody has ever let him get to forty-one.', then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
         { text: 'Ask about the other six powers', bond: { thane: 5 }, why: 'Curiosity is the way to Thane\'s heart.', then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
       ] },
-      ['thane', 'You know, Caelum hasn\'t smiled like he does now in a long time. Whatever you\'re doing to him, keep doing it.'],
       { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
+      ['thane', 'You know, Caelum hasn\'t smiled like he does now in a long time. Whatever you\'re doing to him, keep doing it.'],
     ],
     heart_thane_2: [
       { do: 'art', id: 'library', title: 'Thane: heart 2' },
@@ -1914,8 +1917,13 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     ev4_caelum: [
       { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
       ['caelum', 'You shot a shadow out of my sky. I have wanted someone to do that for a very long time.'],
-      ['wren', 'Rowan wrote to the Iron King because of me.'],
-      ['caelum', 'Rowan wrote to the Iron King because of Rowan. Don\'t carry that one, Wren. It isn\'t yours.'],
+      { if: 'rowanDoubt', then: [
+        ['wren', 'I keep reading that letter, hoping the seal will change.'],
+        ['caelum', 'So do I. It won\'t. But if he wrote it, he wrote it because of himself, not because of you. Don\'t carry that one, Wren.'],
+      ], else: [
+        ['wren', 'Rowan wrote to the Iron King because of me.'],
+        ['caelum', 'Rowan wrote to the Iron King because of Rowan. Don\'t carry that one, Wren. It isn\'t yours.'],
+      ] },
       { choose: [
         { text: '"Teach me to fall, the way you do."', bond: { caelum: 10 }, why: 'She wants to be able to leave. He wants that for her too.', then: [
           ['caelum', 'When you can feel all of the Tether, and not only the pull. Soon, I think.'],
@@ -1925,6 +1933,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         ] },
       ] },
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['narr', 'The Tether hums, low and steady, all the way home. For once she does not mind it.'],
     ],
     ev4_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
@@ -1940,6 +1949,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         ] },
       ] },
       { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
+      ['narr', 'When she leaves, the hole in the dome is a little smaller, and so is the weight on his shoulders.'],
     ],
     ev4_iris: [
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
@@ -1955,6 +1965,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         ] },
       ] },
       { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
+      ['narr', 'The tower lamp burns late. Below, Starhaven goes to sleep under a sky that has been read and found kind.'],
     ],
     finale: [
       { do: 'art', id: 'city', title: 'Next: Chapter 5, The Cartographer\'s House' },
@@ -2856,13 +2867,13 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
 // A slot holds where you are and what you've built: chapter, bonds, people met, playtime.
 (function (SH) {
   const KEY = 'starhaven.slots.v1', N = 3;
-  const S = SH.saves = { N };
+  const S = SH.saves = { N, VERSION: 2 };
 
   S.blank = () => ({ v: 1, chapter: 0, reached: 0, bonds: {}, met: [], playFrames: 0, pending: null, savedAt: 0 });
 
   S.all = function () {
     const a = SH.store.get(KEY, null);
-    if (Array.isArray(a)) return a.concat([null, null, null]).slice(0, N);
+    if (Array.isArray(a)) return a.concat([null, null, null]).slice(0, N).map(S.clean);
     // carry an older single save into slot 1
     const arr = [null, null, null], old = SH.store.get('starhaven.save.v1', null);
     if (old && (old.reached > 0 || (old.met && old.met.length))) {
@@ -2871,6 +2882,21 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       SH.store.set(KEY, arr);
     }
     return arr;
+  };
+  // Make any stored slot safe to read: wrong types become defaults, unknown chapters are clamped. A slot from a newer
+  // version of the game than this one is kept but shown as unreadable, so it is never loaded half-understood.
+  S.clean = function (s) {
+    if (!s || typeof s !== 'object') return null;
+    const num = (v, d) => (typeof v === 'number' && isFinite(v) ? v : d), obj = v => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+    const N = SH.STORY.CHAPTERS.length;
+    return Object.assign({}, s, {
+      chapter: Math.max(0, Math.min(N, Math.floor(num(s.chapter, 0)))), reached: Math.max(0, Math.floor(num(s.reached, 0))),
+      bonds: obj(s.bonds), met: Array.isArray(s.met) ? s.met.filter(x => typeof x === 'string') : [], playFrames: num(s.playFrames, 0),
+      motes: obj(s.motes), stars: obj(s.stars), mem: obj(s.mem), seen: obj(s.seen), lore: obj(s.lore), said: obj(s.said),
+      xp: num(s.xp, 0), bonus: num(s.bonus, 0), bondMeter: num(s.bondMeter, 0), savedAt: num(s.savedAt, 0),
+      pending: typeof s.pending === 'string' && SH.STORY.SCRIPTS && SH.STORY.SCRIPTS[s.pending] ? s.pending : null,
+      future: num(s.version, 1) > S.VERSION,
+    });
   };
   S.write = function (i, data) {
     const a = S.all();
@@ -2885,13 +2911,14 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   };
   S.describe = function (s) {
     if (!s) return null;
+    if (s.future) return { title: 'Saved by a newer version', time: '-', caelum: 0, when: '', level: 1, stars: 0, choices: 0, future: true };
     const ST = SH.STORY, ch = ST.CHAPTERS[Math.min(s.chapter, ST.CHAPTERS.length - 1)];
     const mins = Math.floor(s.playFrames / 3600), time = `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
     const done = s.chapter >= ST.CHAPTERS.length;
     const c = s.bonds && s.bonds.caelum ? SH.game.heartsFor(s.bonds.caelum.pts) : 0;
     let when = '';
     try { when = new Date(s.savedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch (e) { /* fine */ }
-    const xp = s.xp || 0, lv = 1 + [30, 80, 150, 240, 350].filter(v => xp >= v).length, stars = Object.values(s.motes || {}).reduce((a, b) => a + b, 0) + (s.bonus || 0), choices = Object.keys(s.mem || {}).length;
+    const xp = s.xp || 0, lv = SH.xp.levelAt(xp), stars = Object.values(s.motes || {}).reduce((a, b) => a + b, 0) + (s.bonus || 0), choices = Object.keys(s.mem || {}).length;
     return { title: done ? 'Concept complete' : `${ch.label}: ${ch.name}`, time, caelum: c, when, level: lv, stars, choices };
   };
 })(window.SH = window.SH || {});
@@ -3483,6 +3510,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     this.reset();
   }
   ThornSprite.prototype.reset = function () {
+    if (this.dead && this.counted) return;   // the same rule as spies: what she beat stays beaten after a knockout
     Object.assign(this, {
       x: this.home.x, y: this.home.y, vx: 0, vy: 0,
       hp: this.def.hp, dir: Math.random() < 0.5 ? -1 : 1,
@@ -3565,7 +3593,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : hit.launch ? -hit.launch : -1.8;
     fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#a898e8', '#e0d4ff', '#ffffff'] });
     if (this.hp <= 0) {
-      this.dead = true; this.deadT = 0;
+      this.dead = true; this.deadT = 0; this.counted = true;
       fx.burst(this.x, this.y - this.h / 2, 22, { speed: 3.2, life: 34, size: 3, gravity: 0.08, colors: ['#1c1830', '#a898e8', '#2a2444', '#e0d4ff'] });
       fx.ring(this.x, this.y - this.h / 2, '#e0d4ff', 30, 18, 2);
       world.onKill(this);
@@ -3981,7 +4009,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   const K = SH.ch4 = {};
 
   SH.ENEMY_DEFS.spy = { name: 'Winged spy', hp: 6, damage: 1, sight: 230, diveSpeed: 5.2, mark: 34, down: 120 };
-  SH.ENEMY_DEFS.shadow = { name: 'The Spymaster\'s Shadow', hp: 30, damage: 1, slain: 'SPYBREAKER', falls: 'THE SHADOW IS UNMADE', quiet: 'THE STACKS ARE STILL', after: 'lib4_end' };
+  SH.ENEMY_DEFS.shadow = { name: 'The Spymaster\'s Shadow', hp: 30, damage: 1, slain: 'SPYBREAKER', falls: 'THE SHADOW IS UNMADE', quiet: 'THE STACKS ARE STILL', after: 'lib4_end', whisper: 'bossStart4' };
 
   // ---------------------------------------------------------------- the lectern: an open book the spies come to rob
   function Lectern(x, y) { Object.assign(this, { kind: 'lectern', x, y, pages: 2, max: 2, robbed: 0 }); }
@@ -4187,9 +4215,9 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     fx.burst(this.x, this.y - 18, 9, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.5, speed: 2.6, life: 20, colors: ['#1a1630', '#8a5ad8', '#ff5a8a', '#ffffff'] });
     if (this.hp <= 0) { this.dead = true; this.darts = []; world.onBossDown(); return { landed: true, killed: true }; }
     if (grounded && this.hp <= this.def.hp * 0.5 && !this.halfRose) { this.halfRose = true; this.state = 'rise'; this.t = 0; this.wing = 0; fx.word(this.x, this.y - 50, 'IT TEARS FREE', '#ff5a8a', 80); SH.fx.kick(6); }
-    if (!grounded) {
+    if (!grounded && this.state !== 'rise') {   // hits while it is still rising hurt it, but do not count toward the next fall
       this.wing++;
-      if (this.wing >= this.need() && this.state !== 'rise') { this.state = 'fall'; this.vy = 0; this.t = 0; fx.word(this.x, this.y - 50, 'ITS WINGS FAIL', '#ffd27a', 80); SH.arts.whisper('shadowDown'); }
+      if (this.wing >= this.need()) { this.state = 'fall'; this.vy = 0; this.t = 0; fx.word(this.x, this.y - 50, 'ITS WINGS FAIL', '#ffd27a', 80); SH.arts.whisper('shadowDown'); }
     }
     return { landed: true, killed: false };
   };
@@ -4922,7 +4950,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   ];
   const prog = () => SH.game.progress;
   X.total = () => (prog() && prog().xp) || 0;
-  X.level = () => { const t = X.total(); let l = 1; while (l < X.AT.length && t >= X.AT[l]) l++; return l; };
+  X.levelAt = t => { let l = 1; while (l < X.AT.length && t >= X.AT[l]) l++; return l; };
+  X.level = () => X.levelAt(X.total());
   X.max = () => X.AT.length;
   X.span = () => { const l = X.level(); return l >= X.max() ? [1, 1] : [X.total() - X.AT[l - 1], X.AT[l] - X.AT[l - 1]]; };
   X.gain = function (n, why) {
@@ -4972,6 +5001,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     const d = S.DEFS.find(x => x.id === id);
     if (!d || !S.canBuy(d)) return false;
     const p = prog(); p.stars = p.stars || {}; p.stars[id] = S.level(id) + 1;
+    const base = SH.game.base && SH.game.base.progress;   // spending is not farmable, so it is kept even if the chapter restarts
+    if (base) { base.stars = base.stars || {}; base.stars[id] = p.stars[id]; }
     S.apply(); SH.game.save(true); SH.sfx.play('lantern');
     return true;
   };
@@ -7890,17 +7921,30 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     heartQueue: [],
   };
   // Saves go to the current slot (none in chapter select). `where` overrides the resume point after a chapter ends.
+  // A save always holds progress as it stood at the last checkpoint (chapter start, or chapter end before its evening),
+  // because loading resumes from that point. Otherwise bonds won mid-chapter could be won again after a reload.
+  const clone = o => JSON.parse(JSON.stringify(o == null ? {} : o));
+  G.checkpoint = function () {
+    G.base = { progress: clone(G.progress), said: clone(SH.arts.said), meter: SH.arts.meter || 0 };
+  };
+  G.rewind = function () {        // restart the chapter: undo what was gained in it
+    if (!G.base) return;
+    const frames = G.progress.playFrames || 0;
+    G.progress = clone(G.base.progress); G.progress.playFrames = frames;
+    SH.arts.said = clone(G.base.said); SH.arts.meter = G.base.meter;
+  };
   G.save = function (show) {
     if (G.slot == null) return;
-    const pr = G.progress;
-    SH.saves.write(G.slot, {
+    if (!G.base) G.checkpoint();
+    const pr = Object.assign({}, G.base.progress, { playFrames: G.progress.playFrames || 0 });
+    SH.saves.write(G.slot, { version: SH.saves.VERSION,
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, lore: pr.lore || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, lore: pr.lore || {}, said: G.base.said, bondMeter: Math.round(G.base.meter),
     });
     if (show) G.hud.saved();
   };
   G.newGame = function (slot) {
-    G.slot = slot == null ? null : slot;
+    G.slot = slot == null ? null : slot; G.base = null;
     G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0, motes: {}, stars: {} };
     SH.arts.newGame();
     G.startChapter(0);
@@ -7913,6 +7957,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   G.loadSlot = function (slot) {
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
+    if (s.future) return;
     G.slot = slot;
     G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0, lore: Object.assign({}, s.lore) };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
@@ -7922,7 +7967,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       G.chapter = Math.max(0, Math.min(N - 1, target - 1));
       G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null; fx.reset();
       G.build(ST.CHAPTERS[G.chapter].room);
-      G.resumeAt = target; G.pending2 = s.pending;
+      G.resumeAt = target; G.pending2 = s.pending; G.checkpoint();
       G.afterScript = () => { G.resumeAt = null; G.pending2 = null; goOn(); };
       G.runScript(s.pending);
     } else if (target >= N) { G.chapter = N - 1; G.build(ST.CHAPTERS[N - 1].room); G.state = 'end'; G.hud.end(true); }
@@ -8056,6 +8101,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     G.resumeAt = null; G.pending2 = null;
     G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
     fx.reset();
+    G.checkpoint();
     const ch = G.chapterDef();
     G.build(ch.room);
     G.state = 'card';
@@ -8071,14 +8117,15 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     G.progress.reached = Math.max(G.progress.reached, next);
     SH.xp.gain(20);
     G.resumeAt = next; G.pending2 = ch.after || null;
+    const w = G.world, got = w.motes.filter(m => m.got).length, total = w.motes.length;
+    if (!G.progress.motes) G.progress.motes = {};
+    G.progress.motes[ch.id] = Math.max(G.progress.motes[ch.id] || 0, got);
+    G.checkpoint();
     G.save(true);
     G.state = 'card';
     // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
     const cont = () => { G.pending2 = null; G.save(); if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
     // how the chapter went: time, hearts lost, Starlight gathered (your best is kept)
-    const w = G.world, got = w.motes.filter(m => m.got).length, total = w.motes.length;
-    if (!G.progress.motes) G.progress.motes = {};
-    G.progress.motes[ch.id] = Math.max(G.progress.motes[ch.id] || 0, got);
     const secs = Math.round((w.frames || 0) / 60);
     const stats = [`Time ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`, `Hits taken ${w.player.stats.hurt}`];
     if (total) stats.push(`Starlight ${got} / ${total}${got === total ? ' \u2726 all of it' : ''}`);
@@ -8193,7 +8240,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
       case 'close': case 'open': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, st.do === 'close'); g.lift = st.do === 'open' ? 0 : 0; fx.kick(4); SH.sfx.play('thud'); } break; }
-      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); G.look(b.x, b.y - 30, 1.35, 70); SH.arts.whisper('bossStart'); } break; }
+      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); G.look(b.x, b.y - 30, 1.35, 70); SH.arts.whisper(b.def.whisper || 'bossStart'); } break; }
       case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
@@ -8615,6 +8662,10 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   };
 
   G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.navReset(); G.hud.menu(true); G.hud.nav('menu', 0); };
+  // Leaving the app (switching apps, locking the phone, closing the tab): pause, stop held buttons, keep playtime.
+  const away = () => { input.clear(); if (G.state === 'play') G.pause(); try { G.save(); } catch (e) { /* storage may be gone */ } };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) away(); });
+  window.addEventListener('pagehide', away);
   G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); G.hud.stars(false); };
 
   // ---------------------------------------------------------------- loop
@@ -9138,7 +9189,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     on('hw-back', () => { $('howto').classList.remove('show'); H.menu(true); });
     on('ex-ok', () => SH.game.explainClose());
     on('st-back', () => { H.stars(false); H.menu(true); });
-    on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
+    on('m-restart', () => { H.menu(false); G.rewind(); G.startChapter(G.chapter); });
     on('m-controls', () => $('controls').classList.toggle('show'));
     on('m-title', () => { H.menu(false); SH.front.toTitle(); });
     const fs = $('m-fullscreen');
@@ -9332,7 +9383,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   F.main = function () {
     const S = SH.saves, latest = S.latest(), slots = S.all(), any = slots.some(Boolean);
     const items = [];
-    if (latest >= 0) { const d = S.describe(slots[latest]); items.push({ label: 'Continue', sub: `Slot ${latest + 1} &middot; ${esc(d.title)}`, action: () => F.go(() => SH.game.loadSlot(latest)) }); }
+    if (latest >= 0 && !slots[latest].future) { const d = S.describe(slots[latest]); items.push({ label: 'Continue', sub: `Slot ${latest + 1} &middot; ${esc(d.title)}`, action: () => F.go(() => SH.game.loadSlot(latest)) }); }
     items.push({ label: 'New game', sub: 'Begin Wren\'s story, in the winter woods', action: () => F.slots('new') });
     items.push({ label: 'Load game', sub: 'Three journals are kept on the shelf', disabled: !any, action: () => F.slots('load') });
     items.push({ label: 'Chapter select', sub: 'Any chapter, without saving (concept build)', action: F.chapters });
@@ -9347,7 +9398,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       const d = S.describe(s);
       const sub = d ? `${esc(d.title)} &middot; Level ${d.level} &middot; &#10022; ${d.stars}${d.choices ? ` &middot; ${d.choices} choice${d.choices > 1 ? 's' : ''} remembered` : ''}${d.caelum ? ` &middot; Caelum ${'&#9829;'.repeat(d.caelum)}` : ''} &middot; ${d.time} played${d.when ? `, ${esc(d.when)}` : ''}` : 'An empty journal';
       return {
-        label: `Slot ${i + 1}`, sub, disabled: mode === 'load' && !s,
+        label: `Slot ${i + 1}`, sub: d && d.future ? 'Saved by a newer version of Starhaven. Update the game to load it.' : sub, disabled: mode === 'load' && (!s || s.future),
         action: () => {
           if (mode === 'load') return F.go(() => SH.game.loadSlot(i));
           if (!s) return F.go(() => SH.game.newGame(i));

@@ -20,6 +20,8 @@
     const d = S.DEFS.find(x => x.id === id);
     if (!d || !S.canBuy(d)) return false;
     const p = prog(); p.stars = p.stars || {}; p.stars[id] = S.level(id) + 1;
+    const base = SH.game.base && SH.game.base.progress;   // spending is not farmable, so it is kept even if the chapter restarts
+    if (base) { base.stars = base.stars || {}; base.stars[id] = p.stars[id]; }
     S.apply(); SH.game.save(true); SH.sfx.play('lantern');
     return true;
   };

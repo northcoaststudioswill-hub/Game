@@ -412,7 +412,7 @@
     on('hw-back', () => { $('howto').classList.remove('show'); H.menu(true); });
     on('ex-ok', () => SH.game.explainClose());
     on('st-back', () => { H.stars(false); H.menu(true); });
-    on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
+    on('m-restart', () => { H.menu(false); G.rewind(); G.startChapter(G.chapter); });
     on('m-controls', () => $('controls').classList.toggle('show'));
     on('m-title', () => { H.menu(false); SH.front.toTitle(); });
     const fs = $('m-fullscreen');

@@ -31,9 +31,13 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.3.0 (Nov 28, 2026)
+## Playtest build: v0.3.1 (Nov 28, 2026)
 
-The newest build: [`releases/v0.3.0/`](releases/v0.3.0/RELEASE-NOTES.md), with `starhaven-v0.3.0-share.zip` to send.
+The newest build: [`releases/v0.3.1/`](releases/v0.3.1/RELEASE-NOTES.md), with `starhaven-v0.3.1-share.zip` to send.
+Fixes from the playtest review: touch buttons that no longer overlap, no bond farming by reloading, safe saves, a
+pause when you leave the app, and story continuity fixes.
+
+Before it, v0.3.0 ([notes](releases/v0.3.0/RELEASE-NOTES.md)):
 **The Fallen Sky**: the whole game rewritten into a new world of star Houses (see `WORLD.md`), keeping the plot's
 shape: the low star, the Eclipse and the Umbra, the Weighing, Caelum's light, and the Tether.
 

@@ -7,7 +7,7 @@
   const K = SH.ch4 = {};
 
   SH.ENEMY_DEFS.spy = { name: 'Winged spy', hp: 6, damage: 1, sight: 230, diveSpeed: 5.2, mark: 34, down: 120 };
-  SH.ENEMY_DEFS.shadow = { name: 'The Spymaster\'s Shadow', hp: 30, damage: 1, slain: 'SPYBREAKER', falls: 'THE SHADOW IS UNMADE', quiet: 'THE STACKS ARE STILL', after: 'lib4_end' };
+  SH.ENEMY_DEFS.shadow = { name: 'The Spymaster\'s Shadow', hp: 30, damage: 1, slain: 'SPYBREAKER', falls: 'THE SHADOW IS UNMADE', quiet: 'THE STACKS ARE STILL', after: 'lib4_end', whisper: 'bossStart4' };
 
   // ---------------------------------------------------------------- the lectern: an open book the spies come to rob
   function Lectern(x, y) { Object.assign(this, { kind: 'lectern', x, y, pages: 2, max: 2, robbed: 0 }); }
@@ -213,9 +213,9 @@
     fx.burst(this.x, this.y - 18, 9, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.5, speed: 2.6, life: 20, colors: ['#1a1630', '#8a5ad8', '#ff5a8a', '#ffffff'] });
     if (this.hp <= 0) { this.dead = true; this.darts = []; world.onBossDown(); return { landed: true, killed: true }; }
     if (grounded && this.hp <= this.def.hp * 0.5 && !this.halfRose) { this.halfRose = true; this.state = 'rise'; this.t = 0; this.wing = 0; fx.word(this.x, this.y - 50, 'IT TEARS FREE', '#ff5a8a', 80); SH.fx.kick(6); }
-    if (!grounded) {
+    if (!grounded && this.state !== 'rise') {   // hits while it is still rising hurt it, but do not count toward the next fall
       this.wing++;
-      if (this.wing >= this.need() && this.state !== 'rise') { this.state = 'fall'; this.vy = 0; this.t = 0; fx.word(this.x, this.y - 50, 'ITS WINGS FAIL', '#ffd27a', 80); SH.arts.whisper('shadowDown'); }
+      if (this.wing >= this.need()) { this.state = 'fall'; this.vy = 0; this.t = 0; fx.word(this.x, this.y - 50, 'ITS WINGS FAIL', '#ffd27a', 80); SH.arts.whisper('shadowDown'); }
     }
     return { landed: true, killed: false };
   };

@@ -612,8 +612,8 @@
       ] },
       ['caelum', 'The Five will test you tomorrow. Bram will try to break you. Iris will try to read you. Let them.'],
       ['wren', 'And you?'],
-      ['caelum', 'I\'ll be watching from somewhere I can pretend I\'m not.'],
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['caelum', 'I\'ll be watching from somewhere I can pretend I\'m not.'],
     ],
 
     // ======================================================== Chapter 2: The Five
@@ -744,8 +744,8 @@
         ] },
       ] },
       ['caelum', 'One more thing. The debt. You don\'t owe me anything anymore. You can leave whenever you like.'],
-      ['wren', '...I know. I\'m staying anyway.'],
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['wren', '...I know. I\'m staying anyway.'],
     ],
     // Chapter 2, more to do
     ring_bram_talk: [
@@ -791,8 +791,8 @@
       ] },
       ['bram', 'You fight like someone with people to protect.'],
       ['wren', 'Two sisters. Mortal. Across the sea.'],
-      ['bram', 'Then we keep them safe. That\'s what the Five do.'],
       { do: 'bond', who: 'bram', pts: 20, why: 'An evening together.' },
+      ['bram', 'Then we keep them safe. That\'s what the Five do.'],
     ],
     ev2_iris: [
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
@@ -811,8 +811,8 @@
         ] },
       ] },
       ['iris', 'Can I tell you a secret? Caelum\'s thread tangled with yours the day you walked into the Umbra. He pretends it didn\'t.'],
-      ['wren', '...Does he.'],
       { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
+      ['wren', '...Does he.'],
     ],
 
     // ---------------- Heart scenes: play when a bond reaches a new heart
@@ -942,6 +942,7 @@
         { text: '"Ask me again some other night."', bond: { caelum: 10 }, why: 'His own words, handed back to him. He laughed.', then: [['caelum', 'Using my own lines against me. That\'s cruel, Wren. I respect it.']] },
       ] },
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['narr', 'They stay until the lamps below go out one street at a time, and the stars come down to meet them.'],
     ],
     ev3_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
@@ -952,8 +953,8 @@
         { text: '"Ask your forty-one questions."', bond: { thane: 10 }, why: 'Nobody has ever let him get to forty-one.', then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
         { text: 'Ask about the other six powers', bond: { thane: 5 }, why: 'Curiosity is the way to Thane\'s heart.', then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
       ] },
-      ['thane', 'You know, Caelum hasn\'t smiled like he does now in a long time. Whatever you\'re doing to him, keep doing it.'],
       { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
+      ['thane', 'You know, Caelum hasn\'t smiled like he does now in a long time. Whatever you\'re doing to him, keep doing it.'],
     ],
     heart_thane_2: [
       { do: 'art', id: 'library', title: 'Thane: heart 2' },
@@ -1063,8 +1064,13 @@
     ev4_caelum: [
       { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
       ['caelum', 'You shot a shadow out of my sky. I have wanted someone to do that for a very long time.'],
-      ['wren', 'Rowan wrote to the Iron King because of me.'],
-      ['caelum', 'Rowan wrote to the Iron King because of Rowan. Don\'t carry that one, Wren. It isn\'t yours.'],
+      { if: 'rowanDoubt', then: [
+        ['wren', 'I keep reading that letter, hoping the seal will change.'],
+        ['caelum', 'So do I. It won\'t. But if he wrote it, he wrote it because of himself, not because of you. Don\'t carry that one, Wren.'],
+      ], else: [
+        ['wren', 'Rowan wrote to the Iron King because of me.'],
+        ['caelum', 'Rowan wrote to the Iron King because of Rowan. Don\'t carry that one, Wren. It isn\'t yours.'],
+      ] },
       { choose: [
         { text: '"Teach me to fall, the way you do."', bond: { caelum: 10 }, why: 'She wants to be able to leave. He wants that for her too.', then: [
           ['caelum', 'When you can feel all of the Tether, and not only the pull. Soon, I think.'],
@@ -1074,6 +1080,7 @@
         ] },
       ] },
       { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
+      ['narr', 'The Tether hums, low and steady, all the way home. For once she does not mind it.'],
     ],
     ev4_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
@@ -1089,6 +1096,7 @@
         ] },
       ] },
       { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
+      ['narr', 'When she leaves, the hole in the dome is a little smaller, and so is the weight on his shoulders.'],
     ],
     ev4_iris: [
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
@@ -1104,6 +1112,7 @@
         ] },
       ] },
       { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
+      ['narr', 'The tower lamp burns late. Below, Starhaven goes to sleep under a sky that has been read and found kind.'],
     ],
     finale: [
       { do: 'art', id: 'city', title: 'Next: Chapter 5, The Cartographer\'s House' },

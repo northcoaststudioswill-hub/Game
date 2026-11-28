@@ -17,17 +17,30 @@
     heartQueue: [],
   };
   // Saves go to the current slot (none in chapter select). `where` overrides the resume point after a chapter ends.
+  // A save always holds progress as it stood at the last checkpoint (chapter start, or chapter end before its evening),
+  // because loading resumes from that point. Otherwise bonds won mid-chapter could be won again after a reload.
+  const clone = o => JSON.parse(JSON.stringify(o == null ? {} : o));
+  G.checkpoint = function () {
+    G.base = { progress: clone(G.progress), said: clone(SH.arts.said), meter: SH.arts.meter || 0 };
+  };
+  G.rewind = function () {        // restart the chapter: undo what was gained in it
+    if (!G.base) return;
+    const frames = G.progress.playFrames || 0;
+    G.progress = clone(G.base.progress); G.progress.playFrames = frames;
+    SH.arts.said = clone(G.base.said); SH.arts.meter = G.base.meter;
+  };
   G.save = function (show) {
     if (G.slot == null) return;
-    const pr = G.progress;
-    SH.saves.write(G.slot, {
+    if (!G.base) G.checkpoint();
+    const pr = Object.assign({}, G.base.progress, { playFrames: G.progress.playFrames || 0 });
+    SH.saves.write(G.slot, { version: SH.saves.VERSION,
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, lore: pr.lore || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, lore: pr.lore || {}, said: G.base.said, bondMeter: Math.round(G.base.meter),
     });
     if (show) G.hud.saved();
   };
   G.newGame = function (slot) {
-    G.slot = slot == null ? null : slot;
+    G.slot = slot == null ? null : slot; G.base = null;
     G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0, motes: {}, stars: {} };
     SH.arts.newGame();
     G.startChapter(0);
@@ -40,6 +53,7 @@
   G.loadSlot = function (slot) {
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
+    if (s.future) return;
     G.slot = slot;
     G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0, lore: Object.assign({}, s.lore) };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
@@ -49,7 +63,7 @@
       G.chapter = Math.max(0, Math.min(N - 1, target - 1));
       G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null; fx.reset();
       G.build(ST.CHAPTERS[G.chapter].room);
-      G.resumeAt = target; G.pending2 = s.pending;
+      G.resumeAt = target; G.pending2 = s.pending; G.checkpoint();
       G.afterScript = () => { G.resumeAt = null; G.pending2 = null; goOn(); };
       G.runScript(s.pending);
     } else if (target >= N) { G.chapter = N - 1; G.build(ST.CHAPTERS[N - 1].room); G.state = 'end'; G.hud.end(true); }
@@ -183,6 +197,7 @@
     G.resumeAt = null; G.pending2 = null;
     G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
     fx.reset();
+    G.checkpoint();
     const ch = G.chapterDef();
     G.build(ch.room);
     G.state = 'card';
@@ -198,14 +213,15 @@
     G.progress.reached = Math.max(G.progress.reached, next);
     SH.xp.gain(20);
     G.resumeAt = next; G.pending2 = ch.after || null;
+    const w = G.world, got = w.motes.filter(m => m.got).length, total = w.motes.length;
+    if (!G.progress.motes) G.progress.motes = {};
+    G.progress.motes[ch.id] = Math.max(G.progress.motes[ch.id] || 0, got);
+    G.checkpoint();
     G.save(true);
     G.state = 'card';
     // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
     const cont = () => { G.pending2 = null; G.save(); if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
     // how the chapter went: time, hearts lost, Starlight gathered (your best is kept)
-    const w = G.world, got = w.motes.filter(m => m.got).length, total = w.motes.length;
-    if (!G.progress.motes) G.progress.motes = {};
-    G.progress.motes[ch.id] = Math.max(G.progress.motes[ch.id] || 0, got);
     const secs = Math.round((w.frames || 0) / 60);
     const stats = [`Time ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`, `Hits taken ${w.player.stats.hurt}`];
     if (total) stats.push(`Starlight ${got} / ${total}${got === total ? ' \u2726 all of it' : ''}`);
@@ -320,7 +336,7 @@
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
       case 'close': case 'open': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, st.do === 'close'); g.lift = st.do === 'open' ? 0 : 0; fx.kick(4); SH.sfx.play('thud'); } break; }
-      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); G.look(b.x, b.y - 30, 1.35, 70); SH.arts.whisper('bossStart'); } break; }
+      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); G.look(b.x, b.y - 30, 1.35, 70); SH.arts.whisper(b.def.whisper || 'bossStart'); } break; }
       case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
@@ -742,6 +758,10 @@
   };
 
   G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.navReset(); G.hud.menu(true); G.hud.nav('menu', 0); };
+  // Leaving the app (switching apps, locking the phone, closing the tab): pause, stop held buttons, keep playtime.
+  const away = () => { input.clear(); if (G.state === 'play') G.pause(); try { G.save(); } catch (e) { /* storage may be gone */ } };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) away(); });
+  window.addEventListener('pagehide', away);
   G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); G.hud.stars(false); };
 
   // ---------------------------------------------------------------- loop

@@ -162,7 +162,7 @@
   F.main = function () {
     const S = SH.saves, latest = S.latest(), slots = S.all(), any = slots.some(Boolean);
     const items = [];
-    if (latest >= 0) { const d = S.describe(slots[latest]); items.push({ label: 'Continue', sub: `Slot ${latest + 1} &middot; ${esc(d.title)}`, action: () => F.go(() => SH.game.loadSlot(latest)) }); }
+    if (latest >= 0 && !slots[latest].future) { const d = S.describe(slots[latest]); items.push({ label: 'Continue', sub: `Slot ${latest + 1} &middot; ${esc(d.title)}`, action: () => F.go(() => SH.game.loadSlot(latest)) }); }
     items.push({ label: 'New game', sub: 'Begin Wren\'s story, in the winter woods', action: () => F.slots('new') });
     items.push({ label: 'Load game', sub: 'Three journals are kept on the shelf', disabled: !any, action: () => F.slots('load') });
     items.push({ label: 'Chapter select', sub: 'Any chapter, without saving (concept build)', action: F.chapters });
@@ -177,7 +177,7 @@
       const d = S.describe(s);
       const sub = d ? `${esc(d.title)} &middot; Level ${d.level} &middot; &#10022; ${d.stars}${d.choices ? ` &middot; ${d.choices} choice${d.choices > 1 ? 's' : ''} remembered` : ''}${d.caelum ? ` &middot; Caelum ${'&#9829;'.repeat(d.caelum)}` : ''} &middot; ${d.time} played${d.when ? `, ${esc(d.when)}` : ''}` : 'An empty journal';
       return {
-        label: `Slot ${i + 1}`, sub, disabled: mode === 'load' && !s,
+        label: `Slot ${i + 1}`, sub: d && d.future ? 'Saved by a newer version of Starhaven. Update the game to load it.' : sub, disabled: mode === 'load' && (!s || s.future),
         action: () => {
           if (mode === 'load') return F.go(() => SH.game.loadSlot(i));
           if (!s) return F.go(() => SH.game.newGame(i));

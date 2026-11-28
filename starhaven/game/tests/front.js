@@ -131,6 +131,30 @@ const path = require('path');
   const erased = await page.evaluate(() => SH.saves.all()[0]);
   check('Load game: erase a slot (with a confirm)', eraseIdx >= 0 && erased === null, { loadMenu, erased });
 
+  // Touch buttons: with every button showing, none may overlap, in landscape or upright, on small and large phones.
+  const overlaps = {};
+  for (const vp of [{ width: 844, height: 390 }, { width: 667, height: 375 }, { width: 390, height: 844 }, { width: 360, height: 740 }]) {
+    const pg = await browser.newPage({ viewport: vp, hasTouch: true, isMobile: true });
+    await pg.goto('file://' + path.resolve(file)); await pg.waitForTimeout(200);
+    overlaps[vp.width + 'x' + vp.height] = await pg.evaluate(() => {
+      SH.test.load('library', { story: false });
+      document.body.dataset.input = 'touch'; document.body.dataset.state = 'play'; document.body.classList.toggle('upright', innerHeight > innerWidth);
+      const ids = [...document.querySelectorAll('#touch .tbtn')].map(e => e.id);
+      for (const id of ids) { const e = document.getElementById(id); e.style.display = 'flex'; e.classList.add('show'); }
+      const box = ids.map(id => [id, document.getElementById(id).getBoundingClientRect()]);
+      const bad = [];
+      for (let i = 0; i < box.length; i++) for (let j = i + 1; j < box.length; j++) {
+        const a = box[i][1], c = box[j][1];
+        if (Math.min(a.right, c.right) - Math.max(a.left, c.left) > 0 && Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top) > 0) bad.push(box[i][0] + '/' + box[j][0]);
+        if (!a.width) bad.push(box[i][0] + ' hidden');
+      }
+      for (const [id, r] of box) if (r.left < 0 || r.right > innerWidth || r.bottom > innerHeight) bad.push(id + ' off screen');
+      return bad;
+    });
+    await pg.close();
+  }
+  check('Touch buttons: none overlap or leave the screen at four phone sizes, both orientations', Object.values(overlaps).every(v => !v.length), overlaps);
+
   await browser.close();
   let fails = 0;
   for (const r of out) { if (!r.ok) fails++; console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}  ${JSON.stringify(r.info)}`); }
