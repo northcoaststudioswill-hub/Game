@@ -148,6 +148,7 @@ function hudRun(){const B=BIOMES[RUN.biome];
  if(RUN.relic){const q=project(RUN.relic.x,22,RUN.relic.y),R0=RELICS.find(r=>r.id===RUN.relic.id);if(q&&R0){const quiet=RUN.phase==='doors',near=PL.find(p=>p.relicNear);
   ctext(RUN.relic.read||(RD.relic&&RD.relic[R0.id])?R0.n:(quiet?R0.src:'?'),q.y-8,1,quiet?'#ffe9a0':'rgba(255,233,160,.5)','#120a18',q.x);if(near)ctext(btnName(near.dev,'a')+': READ',q.y+4,1,'#ffd94d','#120a18',q.x)}}
  if(RUN.qitem){const q=project(RUN.qitem.x,18,RUN.qitem.y),Q=KQUESTS[RUN.qitem.char];if(q)ctext(Q.steps[RUN.qitem.step].item,q.y-8,1,Q.col,'#120a18',q.x)}
+ if(RUN.engine&&!RUN.split&&!RUN.engine.used){const E=RUN.engine,q=project(E.x,24,E.y);if(q){const near=PL.find(p=>p.engineNear);ctext(RUN.phase==='doors'?'A STILL ENGINE':'?',q.y-8,1,'#c8d8ff','#120a18',q.x);if(near)ctext(btnName(near.dev,'a')+': TOUCH IT',q.y+4,1,'#ffd94d','#120a18',q.x)}}
  if(RUN.ghostNpc){const g=RUN.ghostNpc,q=project(g.x,30,g.y);if(q&&g.line<0)ctext(GHOSTN,q.y-8,1,'#bfe8ff','#120a18',q.x)}
  if(RUN.echo){const q=project(RUN.echo.x,22,RUN.echo.y);if(q)ctext('AN ECHO',q.y-8,1,'#ffe9a0','#120a18',q.x)}
  /* who is talking down here */
@@ -299,6 +300,7 @@ function hudOver(win){r(win?'rgba(16,24,12,.84)':'rgba(24,8,14,.84)',0,0,VW,VH);
  if(L.co&&L.co.length>1)L.co.forEach((c,i)=>ctext('P'+(c.ix+1)+' '+c.char+'   FELLED '+c.kills+'   WENT DOWN '+c.downs,194+i*12,1,PCOL[c.ix]||'#fff','#120a18'));
  if(L.heat)ctext('HEAT '+L.heat,166,1,'#f8a060',null);
  if(L.spr)ctext('SPROUTS BANKED  +'+L.spr,180,1,'#a8f080',null);
+ if(!win){const id=wrapPx('MARCUS: "Bro. I got an idea. '+marcusIdea(true)+'"',Math.min(420,VW-30),1).slice(0,3);id.forEach((l,i)=>ctext(l,VH-88+i*12,1,'#ffb070',null))}
  ctext('SPEND IT AT THE MIRROR. GO AGAIN.',VH-52,1,'#a8f080',null);
  if(overT>1.3)ctext(btnName(lead0(),'a')+': THE HEARTH',VH-34,2,((time*2)|0)%2?'#ffffff':'#ffd94d')}
 function drawHud(){HIT=[];hx.setTransform(hudS,0,0,hudS,0,0);hx.clearRect(0,0,VW,VH);drawHudInner();hudNet()}

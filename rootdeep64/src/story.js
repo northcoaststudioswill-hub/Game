@@ -154,7 +154,7 @@ const EVENTS=[
  {id:'ghostGone',who:'ERIN',when:()=>RD.flags.ghostGone,lines:[['ERIN',"Staking the beans before the rain. That's what she said? That's the last thing?"],['ERIN',"...That's exactly her. Not goodbye. Chores."],['ERIN',"I'll stake them tonight. And keeper, the Lantern flickered just now, like somebody waving. I waved back. Is that silly?"],['MARCUS',"Yes."],['MARCUS',"...I waved too. Shut up."]],rew:{dew:50}},
  {id:'frost',who:'RANGER',when:()=>RD.relic&&RD.relic['r-b7']&&RD.relic['r-v1']&&RD.relic['r-c1'],lines:[['RANGER',"Three tablets, three stories of the crack. Frost, a clumsy keeper, a Lantern too full."],['RANGER',"I've patrolled long enough to know: when everybody remembers it differently, it was a long time ago and they all loved it."]]},
  {id:'relic12',who:'SCOUT',when:()=>RD.relic&&Object.keys(RD.relic).length>=12,lines:[['SCOUT',"Twelve relics! The Codex has a page for them now. Statues, shrines, cold camps. People LIVED down there, Will. For years."]]},
- {id:'relicall',who:'ERIN',when:()=>RD.relic&&Object.keys(RD.relic).length>=36,lines:[['ERIN',"All thirty-six. You read every one of them out to me."],['ERIN',"Keepers, all the way down. Every one of them kept coming back. I think that's the only rule that ever mattered."]],rew:{dew:60}},
+ {id:'relicall',who:'ERIN',when:()=>RD.relic&&Object.keys(RD.relic).length>=RELICS.length,lines:[['ERIN',"Every last one. You read every one of them out to me."],['ERIN',"Keepers, all the way down. Every one of them kept coming back. I think that's the only rule that ever mattered."]],rew:{dew:60}},
  /* echoes */
  {id:'echo1',who:'SCOUT',when:()=>echoCount()>=1,lines:[['SCOUT',"You found WRITING? Down THERE? Read it to me exactly. No, slower. No, do the voice."],['SCOUT',"I've added a page to the Codex. I'm calling them echoes because 'creepy root notes' didn't fit on the tab."]]},
  {id:'echo12',who:'SCOUT',when:()=>echoCount()>=12,lines:[['SCOUT',"Twelve echoes. I laid them out in order on the table. Then I put them away again, because in order they're a letter, and it's addressed to whoever's reading."]]},
@@ -167,7 +167,7 @@ function storyNext(who){loreInit();
  for(const m of MISSIONS)if(m.who===who&&missionOpen(m)&&!RD.flags['mt_'+m.id])return{id:'mt_'+m.id,lines:m.ask,ask:m};
  for(const e of EVENTS)if(e.who===who&&!RD.flags['ev_'+e.id]&&e.when())return{id:'ev_'+e.id,lines:e.lines,rew:e.rew};
  return null}
-function storyFinish(ev){RD.flags[ev.id]=1;let msg='';
+function storyFinish(ev){if(!ev.idea)RD.flags[ev.id]=1;let msg='';
  if(ev.mission){RD.msn[ev.mission.id]=1;msg='MISSION DONE: '+ev.mission.n}
  if(ev.ask)msg='NEW MISSION: '+ev.ask.n;
  if(ev.kq){const Q=KQUESTS[ev.kq];RD.kq[ev.kq]=(RD.kq[ev.kq]||0)+1;delete RD.kqFound[ev.kq];msg=ev.kqs.done?'QUEST COMPLETE: '+Q.n+' - '+Q.reward:Q.n+' '+RD.kq[ev.kq]+'/'+Q.steps.length;if(ev.kqs.done)RD.kqDone[ev.kq]=1}

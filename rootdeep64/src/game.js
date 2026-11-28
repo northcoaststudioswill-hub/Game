@@ -288,7 +288,9 @@ function hubUpdate(dt){if(pressed('sel')||pressed('start')){rdSave();menuSel=0;s
    if(t.kind==='sprouts'){sprPage=0;uiSel=0;state='sprouts';return}
    if(t.kind==='board'){boardSel=0;state='board';return}
    if(t.kind==='npc'){talkNPC=t.who;uiSel=0;const n0=HUBNPC[t.who];if(n0)n0.yaw=Math.atan2(p.x-n0.x,p.y-n0.y);
-    talkEv=storyNext(t.who);if(talkEv){talkLine=0;talkWho=talkEv.lines[0][0];talkTxt=talkEv.lines[0][1];RD.flags['met_'+t.who]=1;state='talk';return}talkWho=t.who;
+    talkEv=storyNext(t.who);
+    if(!talkEv&&t.who==='MARCUS'){const L=LINES.MARCUS,ix=(RD.lineIx.MARCUS||0)%L.length;RD.lineIx.MARCUS=ix+1;talkEv={id:'idea',idea:true,lines:[['MARCUS','Bro. I got an idea.'],['MARCUS',marcusIdea()],['MARCUS',L[ix]]]}}
+    if(talkEv){talkLine=0;talkWho=talkEv.lines[0][0];talkTxt=talkEv.lines[0][1];RD.flags['met_'+t.who]=1;state='talk';return}talkWho=t.who;
     talkStart=RD.flags['met_'+t.who]?(RD.lineIx[t.who]||1)%LINES[t.who].length:0;
     RD.flags['met_'+t.who]=1;talkLine=0;talkTxt=LINES[t.who][talkStart];RD.lineIx[t.who]=talkStart+1;rdSave();
     const n=HUBNPC[t.who];if(n)n.yaw=Math.atan2(p.x-n.x,p.y-n.y);

@@ -88,7 +88,7 @@ just before they fire. Online friends see all of it (rebuilt on their side from 
 `src/lore.js`, new writing on top of the existing lore (flagged in the file). It adds:
 
 - **Twelve named chambers** (THE ROOT CELLAR ... THE HOLLOW), each with a whisper on your first visit.
-- **36 relics** placed in rooms as 3D objects (tablets, statues, shrines, cold camps, packs, carvings), read when
+- **38 relics** placed in rooms as 3D objects (tablets, statues, shrines, cold camps, packs, carvings), read when
   the room is quiet. Three tablets tell three different stories of how the Lantern cracked; the game doesn't pick one.
   Codex page 5 keeps them.
 - **The keeper before you**: a ghost who turns up after fights across eight visits, remembers a little more each time,
@@ -98,6 +98,16 @@ just before they fire. Online friends see all of it (rebuilt on their side from 
   bring each one home to a particular NPC; finishing gives that keeper +10 max health. Listed on the Board and on
   keeper select.
 - **The story so far** on Codex page 6.
+- **Will's canon, written in** (the facts are Will's; the words are Claude's):
+  - **Marcus always has a new idea.** Every conversation with him opens "Bro. I got an idea." and gives a tip that
+    sounds wrong and is right, picked from 22 to fit what has been going on (what killed you, Moondew you're
+    hoarding, a super you never use...). It never repeats twice in a row. The death screen shows one too.
+  - **Erin keeps seeing a hidden kingdom.** Seven visions, unlocked as you go deeper, told at the Hearth.
+  - **The split, hinted, never named.** After your first escape (or the ghost's fourth visit) a still engine waits in
+    chamber 10, THE CINDER CHOIR. Touch it in a quiet room and its light doubles: two identical lights, one goes
+    down into the deep wide open, the other turns for the stairs and quietly shuts the doors that could hurt someone.
+    Nobody explains it. Afterwards the twin lights sometimes cross the far wall of the Core, two relics in the Core
+    show two jars with one label, and Erin's later visions see two lights at the gate. Online, it plays for everyone.
 - `node test/lore.js` checks it all, including that every line fits its box.
 
 ## Moves

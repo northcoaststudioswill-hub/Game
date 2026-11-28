@@ -247,7 +247,10 @@ function buildProps(){let b;
  b=new MB();b.box(0,2.6,0,7,5.2,4.6,'#6a4428','#8a5a38');b.box(0,5.6,0,7.4,1,5,'#5a3418');b.box(0,3,2.4,3,2.4,.6,'#8a5a38');b.cyl(4.4,0,0,.5,.5,7,4,'#7a4a28');b.sph(-3.6,1.6,2,1.6,1.2,1.4,5,3,'#c8a060');PROP.pack=b.done();
  b=new MB();b.box(0,9,0,18,18,1.6,'#3a2e3e','#5a4e5e');for(let i=0;i<6;i++){const a=i/6*6.28;b.box(Math.cos(a)*4.2,9+Math.sin(a)*4.2,.9,1.6,1.6,.4,TYPES[i].c)}b.box(0,15.6,.9,2,3,.4,'#ffe9a0');PROP.carving=b.done();
  /* a lost thing a keeper is looking for */
- b=new MB();b.sph(0,2,0,2.6,2,2.6,6,4,'#c8a060','#f8e0a0');b.cyl(0,3.4,0,.8,.3,2,4,'#8a5a38');b.sph(0,5.8,0,1.4,1.4,1.4,5,4,'#ffffff');PROP.qitem=b.done()}
+ b=new MB();b.sph(0,2,0,2.6,2,2.6,6,4,'#c8a060','#f8e0a0');b.cyl(0,3.4,0,.8,.3,2,4,'#8a5a38');b.sph(0,5.8,0,1.4,1.4,1.4,5,4,'#ffffff');PROP.qitem=b.done();
+ /* the still engine: a cage of roots around a cold glass heart */
+ b=new MB();b.cyl(0,0,0,9,7,3,8,'#2a1c18','#4a3428');for(let i=0;i<6;i++){const a=i/6*6.28;b.xf(Math.cos(a)*5.5,3,Math.sin(a)*5.5,Math.sin(a)*.3,0,-Math.cos(a)*.3).box(0,7,0,1.4,15,1.4,'#3a2a20','#6a4a30').rst()}b.cyl(0,17,0,6.5,0,4,8,'#3a2a20','#6a4a30');PROP.engine=b.done();
+ b=new MB();b.sph(0,0,0,4.2,4.2,4.2,8,6,'#9aa8c0','#e8f0ff');PROP.engineCore=b.done()}
 
 /* ---------- camera ---------- */
 const CAM={x:W/2,z:H/2,d:1,init:false};
@@ -365,6 +368,13 @@ function sceneRun(dt){const B=RUN.biome,L=BLIGHT[B];setLight(L[0],L[1],L[2]);set
  /* the room's relic: brighter while unread; a lost thing in its keeper's colour; the ghost */
  if(RUN.relic){const R0=RELICS.find(r=>r.id===RUN.relic.id);if(R0){const fresh=!(RD.relic&&RD.relic[R0.id]),rx=RUN.relic.x,rz=RUN.relic.y;shadow(rx,rz,8);prop(PROP[R0.prop],rx,0,rz-(R0.prop==='carving'?2:0),R0.prop==='carving'?0:(rx*.07)%1.2-.6,1.05,fresh?{add:.08+.06*Math.sin(time*3)}:null);
   if(fresh)sprite(rx,10,rz,34+4*Math.sin(time*2),hex('#ffe9a0'),RUN.phase==='doors'?.32:.16,true);if(fresh&&RUN.phase==='doors'){const t=(time*.6)%1;sprite(rx+Math.sin(time*3)*3,8+t*20,rz,2,hex('#fff3c0'),1-t,true)}}}
+ if(RUN.engine){const E=RUN.engine,S=RUN.split,awake=S?clamp(S.t/2.2,0,1):0;shadow(E.x,E.y,10);prop(PROP.engine,E.x,0,E.y,0,1);mPush();mT(E.x,10+(S?Math.sin(time*3)*.6:0),E.y);draw(PROP.engineCore,{unlit:true,add:awake*.5,c:E.used?[.4,.42,.5]:null});mPop();
+  if(!S&&!E.used&&RUN.phase==='doors'){sprite(E.x,10,E.y,30+4*Math.sin(time*1.3),hex('#c8d8ff'),.18,true)}
+  if(S&&S.t>2.4){const u=clamp((S.t-2.4)/20,0,1),sep=Math.min(1,Math.max(0,(S.t-11)/8)),rise=Math.min(1,(S.t-2.4)/3),fa=1-clamp((S.t-22)/4,0,1);
+   for(const sd of[-1,1]){const lx=E.x+sd*sep*58,lz=E.y+sep*(sd<0?18:-34),ly=10+rise*18+Math.sin(time*2+sd)*2;shadow(lx,lz,6*fa);sprite(lx,ly,lz,20,[1,1,1],.95*fa,true);sprite(lx,ly,lz,56+8*Math.sin(time*4+sd),hex(sd<0?'#ffe9a0':'#cfe0ff'),.6*fa,true);
+    if(sd>0&&sep>.3)for(let k=0;k<3;k++){mPush();mT(lx+(k-1)*5,ly-6,lz+2);mS(1.2,6*Math.min(1,(sep-.3)*2),.6);drawT(MESH.cube,{c:hex('#cfe0ff'),a:.5*fa,unlit:true,glow:true});mPop()}}
+   if(S.t<4)sprite(E.x,12,E.y,140*(1-clamp((S.t-2.2)/1.8,0,1)),[1,1,1],.6,true)}}
+ if(RUN.twins){const T=RUN.twins,u=clamp(T.t/7,0,1),fa=Math.sin(u*3.14159);for(const sd of[-1,1]){const lx=W/2+sd*(20+u*90),lz=34;sprite(lx,20,lz,12,[1,1,1],.8*fa,true);sprite(lx,20,lz,36,hex(sd<0?'#ffe9a0':'#cfe0ff'),.35*fa,true)}}
  if(RUN.qitem){const q=RUN.qitem,Q=KQUESTS[q.char],bob=Math.sin(time*3)*1.5;shadow(q.x,q.y,4);prop(PROP.qitem,q.x,6+bob,q.y,time*1.5,1.2,{add:.15});sprite(q.x,9+bob,q.y,30,hex(Q.col),.4,true);const t=(time*.9)%1;sprite(q.x,6+t*24,q.y,2.4,hex(Q.col),1-t,true)}
  if(RUN.ghostNpc){const g=RUN.ghostNpc,fade=clamp(g.t/1.2,0,1)*(1-clamp((g.out||0)/1.4,0,1)),fl=.75+.25*Math.sin(time*7);
   XRAY={c:[.42,.68,1],a:.3*fade*fl,unlit:true,glow:true};drawCast('GHOST',g.x,g.y+Math.sin(time*1.3)*1.5,Math.atan2((lead()||{x:g.x}).x-g.x,((lead()||{y:g.y+1}).y)-g.y),{id:'ghost',npc:'RANGER',talk:g.line>=0&&!g.out});XRAY=null;

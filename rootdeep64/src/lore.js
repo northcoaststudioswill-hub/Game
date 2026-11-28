@@ -72,6 +72,8 @@ const RELICS=[
  {id:'r-c9',th:2,prop:'shrine',src:'AN EMBER SHRINE',n:'RETURNED LIGHT',x:"Little cups of light, set out in rows like seedlings. Each has a keeper's mark on it. One row is empty. The first cup has your mark."},
  {id:'r-c10',th:2,prop:'carving',src:'A CARVING IN THE ASH',n:'THE ANSWER, MAYBE',x:"THE CRACK IS NOT A WOUND. IT IS A ROOT. THE LANTERN PUT DOWN A ROOT, LIKE EVERYTHING ELSE IN THE GARDEN. WE JUST NEVER SAW A LIGHT DO IT."},
  {id:'r-c11',th:2,prop:'pack',src:'A SCORCHED PACK',n:'TWO HANDWRITINGS',x:"A notebook in two hands. The first is a keeper's. The second copies it, letter by letter, worse and then better. The last page is only the second hand: HELLO."},
+ {id:'r-c13',th:2,prop:'shrine',src:'AN EMBER SHRINE',n:'TWO JARS, ONE LABEL',x:"Two jars on one shelf, the same light in each, the same label on both. One jar has a lid. Not tight. Just enough that you could open it if you really needed to."},
+ {id:'r-c14',th:2,prop:'carving',src:'A CARVING IN THE ASH',n:'THE GATE, KEPT',x:"A gate drawn in the glass, slightly open. A small figure stands beside it holding the latch, not to keep anyone out, just to make sure whoever comes through is ready."},
  {id:'r-c12',th:2,prop:'tablet',src:'A SCORCHED TABLET',n:'TO WHOEVER IS NEXT, AGAIN',x:"YOU WILL WANT TO WIN. YOU WILL. BUT EVERY TIME YOU CLIMB OUT, TURN AROUND ON THE LAST STAIR. WAVE. IT HAS NEVER HAD ANYONE WAVE."}];
 const RELICSRC=['ROOT-SCRATCHED','DROWNED','CINDER'];
 
@@ -126,10 +128,10 @@ function freeSpot(){let best=[W/2,H/2];for(let i=0;i<40;i++){const x=30+Math.ran
   if(RUN.obst.some(o=>x>o.x-18&&x<o.x+o.w+18&&y>o.y-18&&y<o.y+o.h+22))continue;if(x>W/2-70&&x<W/2+70&&y<84)continue;
   if(PL.some(p=>Math.hypot(p.x-x,p.y-y)<30))continue;return[x,y]}return best}
 /* a new chamber: its name the first time, maybe a relic, maybe something a keeper has been looking for */
-function chamberLore(ch){loreInit();RUN.relic=null;RUN.qitem=null;RUN.ghostNpc=null;
+function chamberLore(ch){loreInit();RUN.relic=null;RUN.qitem=null;RUN.ghostNpc=null;RUN.engine=null;RUN.split=null;RUN.twins=null;
  const nm=CHNAMES[ch-1];RUN.firstVisit=false;
  if(nm&&!RD.chSeen[ch]){RD.chSeen[ch]=1;RUN.firstVisit=true;subLater(.25,nm.n,nm.w,3.4,'#c8b8e8')}
- const boss=ch===4||ch===8||ch===12;if(boss)return;
+ const boss=ch===4||ch===8||ch===12;if(boss)return;engineRoll(ch);twinsRoll(ch);
  const pool=RELICS.filter(r=>r.th===RUN.biome),fresh=pool.filter(r=>!RD.relic[r.id]);
  if((fresh.length&&Math.random()<.6)||(!fresh.length&&Math.random()<.2)){const r=(fresh.length?fresh:pool)[(Math.random()*(fresh.length||pool.length))|0];const q=freeSpot();RUN.relic={id:r.id,x:q[0],y:q[1]}}
  for(const p of PL){const Q=KQUESTS[p.char];if(!Q)continue;const s=RD.kq[p.char]||0,st=Q.steps[s];
@@ -140,7 +142,7 @@ function ghostRoll(ch){loreInit();if(RD.ghost>=GHOST.length||RUN.ghostMet||ch===
  if((RD.ghost===0&&ch===3)||Math.random()<.26){RUN.ghostMet=true;RUN.ghostNpc={x:W/2,y:H/2+4,t:0,line:-1,lt:0,out:0}}}
 function readRelic(p){const r=RELICS.find(x=>x.id===RUN.relic.id);if(!r)return;menuDev=p.dev;echoRead=Object.assign({relic:true},r);RD.relic[r.id]=1;RUN.relic.read=true;echoT=0;rdSave();snd(660,.2,990,'triangle',.05);state='echo'}
 /* in the room: reading, finding, listening. Returns true when it opened a page (the frame stops there) */
-function loreUpdate(dt){if(!RUN)return false;
+function loreUpdate(dt){if(!RUN)return false;if(splitUpdate(dt))return false;
  if(RUN.relic&&RUN.phase==='doors')for(const p of PL){p.relicNear=!p.down&&Math.hypot(p.x-RUN.relic.x,p.y-RUN.relic.y)<18;if(p.relicNear&&p.dev.pr.a){p.dev.pr.a=false;readRelic(p);return true}}
  else for(const p of PL)p.relicNear=false;
  const q=RUN.qitem;if(q)for(const p of PL){if(p.down||p.char!==q.char||Math.hypot(p.x-q.x,p.y-q.y)>13)continue;const Q=KQUESTS[q.char],st=Q.steps[q.step];
@@ -163,5 +165,74 @@ function storySoFar(){loreInit();const L=[],m=id=>RD.msn&&RD.msn[id];
  L.push((m('e1')?'* ':'- ')+'The Grub Mother, and a story for Erin');L.push((m('e3')?'* ':'- ')+'The thing at the bottom wears your face');
  L.push((m('e4')?'* ':'- ')+'The long way up');L.push((m('e5')?'* ':'- ')+'What the light left behind ('+Object.keys(RD.echo||{}).length+'/18 echoes)');
  L.push((m('e6')?'* ':'- ')+'Roots that bloom');L.push((RD.ghost>=GHOST.length?'* ':'- ')+'The keeper before you ('+RD.ghost+'/'+GHOST.length+' meetings)');
+ L.push((RD.flags.split?'* ':'- ')+(RD.flags.split?'Something woke in the Choir':'Something sleeps in the Ember Core'));
+ L.push('- Erin\'s visions ('+VISIONS.filter(v=>RD.flags['ev_'+v.id]).length+'/'+VISIONS.length+')');
  L.push('- Relics read: '+relicCount()+'/'+RELICS.length);for(const ch in KQUESTS){const Q=KQUESTS[ch];L.push((RD.kqDone[ch]?'* ':'- ')+ch+': '+Q.n+' ('+(RD.kq[ch]||0)+'/'+Q.steps.length+')')}
  return L}
+
+/* =====================================================================
+   Will's canon, added later: Erin keeps having visions of a hidden
+   kingdom; Marcus always has a new idea for the dungeons (wrong-sounding,
+   actually right, very sure of himself, "bro"); and something you switch
+   on in the deep splits one light into two, left unexplained, hinted only.
+   The words of the visions, the ideas and the split scene are Claude's.
+   ===================================================================== */
+/* ---------------- Marcus has an idea ---------------- */
+const IDEAS=[
+ {id:'hollow',w:()=>(RD.diedTo.hollow||0)>0,l:"It copies you, right? So be worse. Do the dumbest thing you'd never do. Stand still. Watch it stand still too, like a moron."},
+ {id:'king',w:()=>(RD.diedTo.king||0)>0,l:"When the King jumps, go stand exactly where he's gonna land. Then leave. Big guys hate that. Trust me, I'm a big guy."},
+ {id:'mother',w:()=>(RD.diedTo.mother||0)>0,l:"Somebody's mom charges in a straight line? Stand right in front of her. Wait. Wait. Now don't be there. Moms can't turn, bro."},
+ {id:'mirror',w:()=>RD.dew>=40,l:"You're sitting on Moondew like it's gonna get you a date. Spend it. All of it. The Mirror doesn't do refunds and neither do I."},
+ {id:'fountain',w:()=>(RD.stats.bosses||0)<1&&(RD.stats.maxCh||0)>=3,l:"Pick the water door before a boss. I know. I hate water. Pick it anyway. Walk in wet, walk out alive. That's the plan."},
+ {id:'dash',w:()=>(RD.stats.deaths||0)>=1,l:"Stop dodging the hits, bro. Run INTO them. Dash right through. You can't get hit if you're busy being somewhere else."},
+ {id:'crab',w:()=>RD.seen.crab,l:"Crabs got shields, right? So hit 'em slower. Way slower. Hold the button down like you're mad about it. Shields hate patience."},
+ {id:'spitter',w:()=>RD.seen.spitter,l:"The plant guys run away from you? So run away from them faster. But at them. Dash, then swing. Two things at once. I do it with eating."},
+ {id:'super',w:()=>(RD.stats.supers||0)<3&&(RD.stats.runs||0)>=2,l:"Your super's full and you're SAVING it? For what, a wedding? Waste it on the first guy you see. It comes back. That's how bars work."},
+ {id:'special',w:()=>(RD.stats.specials||0)<5&&(RD.stats.runs||0)>=2,l:"That special has a cooldown. So the best time to use it is now. Always now. Every second it's not cooling down is a second you lost, bro."},
+ {id:'honey',w:()=>RD.honey>=1,l:"Give your honey away. All of it. Worst investment there is. Pays out every single time. Don't ask me how. Ask Erin, she's got the shelf."},
+ {id:'keep',w:()=>Object.keys(RD.keeps).length>0&&!RD.keepEq,l:"You've got somebody's junk on the shelf and you're not wearing it? Wear the junk. It's free power. You're basically going down there naked."},
+ {id:'buds',w:()=>(RD.stats.budsBanked||0)<6&&(RD.stats.runs||0)>=2,l:"Your sprouts run off when you get hit. So get hit less. Or chase 'em. Chasing's cardio. You need cardio. Everybody can see you need cardio."},
+ {id:'gods',w:()=>Object.keys(RD.boonSeen).length>=6,l:"Take the boon from whoever you liked least last time. Mix 'em. Fire plus lightning? That's a storm, bro. On fire. Being loyal to one vegetable is weird."},
+ {id:'elite',w:()=>(RD.stats.maxCh||0)>=3&&(RD.stats.elites||0)<2,l:"The big guy in chamber three? Ignore him. Kill all his friends first so he's lonely. Lonely guys make mistakes. Source: me, every night."},
+ {id:'quiet',w:()=>relicCount()<4&&(RD.stats.chambers||0)>=4,l:"When a room's empty, slow down and look around. Free stuff everywhere. I never look around. That's why I'm broke and also why I'm right."},
+ {id:'friend',w:()=>(RD.stats.coopRuns||0)<1&&(RD.stats.deaths||0)>=3,l:"Bring a friend down. Worse plan. More people. More revives. A revive is just a death you didn't pay for, bro. That's coupons."},
+ {id:'grace',w:()=>(RD.stats.deaths||0)>=10&&!RD.set.grace,l:"There's an easy-mode thing in Settings. Real keepers use every advantage. I'd never touch it. I would immediately touch it. Touch it."},
+ {id:'pact',w:()=>(RD.stats.escapes||0)>=1&&heatTotal()<1,l:"You got out? Cool. Now make it harder on purpose. The deep pays you more when you make it worse. It's called negotiating, bro."},
+ {id:'heavy',w:()=>true,l:"Hit slower to hit harder. Hold it, let go, boom. Patience is just aggression that's loading."},
+ {id:'cast',w:()=>true,l:"Your cast is your best friend, so stop using it on things that are close. Throw it at the guy across the room. Friends are for distance."},
+ {id:'door',w:()=>true,l:"Don't take the door you want. Take the one you need. ...No, that's backwards. No it isn't. I'm right. Shut up, I'm right."}];
+/* the idea that fits best right now, and not the one he gave last time */
+function marcusIdea(peek){loreInit();RD.ideaSeen=RD.ideaSeen||{};const fit=IDEAS.filter(i=>{try{return i.w()}catch(e){return false}});
+ let pick=fit.find(i=>!RD.ideaSeen[i.id])||fit.find(i=>RD.ideaLast!==i.id)||IDEAS[IDEAS.length-1];
+ if(!peek){RD.ideaSeen[pick.id]=1;RD.ideaLast=pick.id;if(fit.every(i=>RD.ideaSeen[i.id]))RD.ideaSeen={}}return pick.l}
+
+/* ---------------- Erin's visions ---------------- */
+const VISIONS=[
+ {id:'v1',w:()=>(RD.stats.runs||0)>=2,lines:[['ERIN',"I had the strangest dream. A kingdom under the garden. Not the deep. Somewhere else. Somewhere hidden."],['ERIN',"Towers made of light, and nobody in them. Somebody laughing, far off, like they'd just heard good news."],['MARCUS',"That's called being tired, Erin."]]},
+ {id:'v2',w:()=>(RD.stats.maxCh||0)>=5,lines:[['ERIN',"It happened again. Awake this time. I was pulling weeds and I saw a gate, right where the bean poles are."],['ERIN',"Just for a second. It was shut. Somebody on the other side was whistling the sprout bed's song."]]},
+ {id:'v3',w:()=>RD.seen.king,lines:[['ERIN',"The hidden kingdom has a throne. Like the King's, but dry. Nobody has ever sat in it."],['ERIN',"I think it's waiting for somebody. I don't think it's waiting for a king."]]},
+ {id:'v4',w:()=>(RD.stats.escapes||0)>=1,lines:[['ERIN',"When you came up the long way I saw it clearest yet. A whole city, folded up small, like a seed."],['ERIN',"Keeper... what if the Lantern was never only a light? What if it was a door, once?"]]},
+ {id:'v5',w:()=>RD.flags.split,lines:[['ERIN',"What did you do down there? Last night the gate had two lights in front of it."],['ERIN',"Same colour. Same hum. One went in. The other stayed and pulled the gate almost shut. Not all the way. A crack, like you leave for a cat."],['LOUIE',"WOOF. (He dreamed them too. He barked at both. Both wagged.)"]]},
+ {id:'v6',w:()=>RD.flags.split&&(RD.flags.ghostGone||(RD.stats.escapes||0)>=3),lines:[['ERIN',"She was there. The keeper before. In the hidden kingdom, sitting by the gate with her little lantern."],['ERIN',"She pointed at the two lights and put a finger to her lips. Like it's a secret. Like it's a good one."]]},
+ {id:'v7',w:()=>RD.flags.split&&(RD.stats.escapes||0)>=3&&RD.ghost>=GHOST.length,lines:[['ERIN',"The visions stopped. Now I just have one thought and it won't leave."],['ERIN',"The kingdom isn't hidden from us. It's hidden for us. Somebody is keeping it safe until we're ready."],['MARCUS',"Bro. I got an idea. What if we just... knock?"],['ERIN',"...That's the worst idea you've ever had."],['MARCUS',"Exactly. So it's probably right."]]}];
+
+/* the visions are Erin's story events (story.js loads first, so they join here) */
+EVENTS.push(...VISIONS.map(v=>({id:v.id,who:'ERIN',when:v.w,lines:v.lines})));
+/* ---------------- the engine in the Choir ---------------- */
+const SPLITN='???';
+const SPLIT=["(The engine wakes. Every ember in the Choir goes quiet at once.)","(The light inside it doubles. Not brighter. Twice.)",
+ "(Two lights now. The same colour, the same hum. They look at each other the way you look into a mirror.)",
+ "(One drifts down into the deep, wide open, every door in it thrown wide.)",
+ "(The other turns for the stairs, quietly shutting a few of its own doors. Not all. Just the ones that could hurt someone.)",
+ "(Same light. Two names, maybe. You aren't sure what you just did. You're fairly sure it was meant to happen.)"];
+const TWINSAY=["(Two lights at the far wall, the same colour. One of them closes a door behind it.)","(The twin lights again. They pass each other like old friends on a stair.)","(Two glows, far off, humming the same note. Neither one looks back. Both wave.)"];
+function engineRoll(ch){if(ch!==10||RD.flags.split)return;if((RD.stats.escapes||0)>=1||RD.ghost>=4){let q=null;for(let r=0;r<120&&!q;r+=6)for(let k=0;k<12&&!q;k++){const a=k/12*6.283,x=W/2+Math.cos(a)*r,y=H*.55+Math.sin(a)*r*.7;if(!RUN.obst.some(o=>x>o.x-20&&x<o.x+o.w+20&&y>o.y-20&&y<o.y+o.h+24))q=[x,y]}q=q||freeSpot();RUN.engine={x:q[0],y:q[1]}}}
+function twinsRoll(ch){if(!RD.flags.split||ch<9||ch>11||RUN.engine)return;if(Math.random()<.2)RUN.twins={t:0}}
+function splitUpdate(dt){
+ if(RUN.engine&&!RUN.split&&RUN.phase==='doors')for(const p of PL){p.engineNear=!p.down&&Math.hypot(p.x-RUN.engine.x,p.y-RUN.engine.y)<20;
+  if(p.engineNear&&p.dev.pr.a){p.dev.pr.a=false;RUN.split={t:0,x:RUN.engine.x,y:RUN.engine.y,i:-1};RD.flags.split=1;rdSave();snd(110,1.2,55,'sine',.06);return true}}
+ const S=RUN.split;if(S){S.t+=dt;const li=Math.floor(S.t/3.9);if(li!==S.i&&li<SPLIT.length){S.i=li;sub(SPLITN,SPLIT[li],3.9,'#e8e4f5')}
+  if(S.t>2.2&&!S.fl){S.fl=1;RUN.flash=.3;slowMo(.8);CAM.punch=.08;snd(880,.8,1760,'sine',.04);later(()=>snd(1320,.9,660,'sine',.04),300)}
+  if(S.t>26){RUN.split=null;RUN.engine.used=true}}
+ const T=RUN.twins;if(T){T.t+=dt;if(!T.said&&T.t>.5){T.said=1;sub(SPLITN,TWINSAY[(Math.random()*TWINSAY.length)|0],3.6,'#e8e4f5')}if(T.t>7)RUN.twins=null}
+ return false}

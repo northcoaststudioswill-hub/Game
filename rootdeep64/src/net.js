@@ -97,6 +97,7 @@ function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
   if(RUN.echo)c.ec=[r1(RUN.echo.x),r1(RUN.echo.y)];
   if(RUN.relic)c.rl=[r1(RUN.relic.x),r1(RUN.relic.y),RELICS.findIndex(r=>r.id===RUN.relic.id),RUN.relic.read?1:0];
   if(RUN.qitem)c.qi=[r1(RUN.qitem.x),r1(RUN.qitem.y),CHARS.findIndex(x=>x.id===RUN.qitem.char),RUN.qitem.step];
+  if(RUN.engine)c.en=[r1(RUN.engine.x),r1(RUN.engine.y),RUN.engine.used?1:0];if(RUN.split)c.sp=r2(RUN.split.t);if(RUN.twins)c.tw=r2(RUN.twins.t);
   if(RUN.ghostNpc)c.gh=[r1(RUN.ghostNpc.x),r1(RUN.ghostNpc.y),r2(RUN.ghostNpc.t),RUN.ghostNpc.line,r2(RUN.ghostNpc.out||0)]}
  const cc=fit(c,['E']);if(cc)NET.rooms.c.presence({c:cc}).catch(()=>{});
  const f={q,sq:NET.sq.slice()};
@@ -183,6 +184,8 @@ function netApplyCore(){const c=NET.core;if(!c||typeof c!=='object')return;
  RUN.echo=c.ec?{x:c.ec[0],y:c.ec[1]}:null;
  RUN.relic=c.rl&&RELICS[c.rl[2]]?{x:c.rl[0],y:c.rl[1],id:RELICS[c.rl[2]].id,read:!!c.rl[3]}:null;
  RUN.qitem=c.qi&&CHARS[c.qi[2]]?{x:c.qi[0],y:c.qi[1],char:CHARS[c.qi[2]].id,step:c.qi[3]}:null;
+ RUN.engine=c.en?{x:c.en[0],y:c.en[1],used:!!c.en[2]}:null;RUN.split=c.sp!==undefined&&RUN.engine?Object.assign(RUN.split||{},{t:c.sp,x:RUN.engine.x,y:RUN.engine.y}):null;RUN.twins=c.tw!==undefined?{t:c.tw}:null;
+ for(const p of PL)p.engineNear=!!(RUN.engine&&!RUN.split&&RUN.phase==='doors'&&Math.hypot(p.x-RUN.engine.x,p.y-RUN.engine.y)<20);
  RUN.ghostNpc=c.gh?Object.assign(RUN.ghostNpc||{},{x:c.gh[0],y:c.gh[1],t:c.gh[2],line:c.gh[3],out:c.gh[4]}):null;
  for(const p of PL)p.relicNear=!!(RUN.relic&&RUN.phase==='doors'&&!p.down&&Math.hypot(p.x-RUN.relic.x,p.y-RUN.relic.y)<18)}
 const seenId=new Set();
