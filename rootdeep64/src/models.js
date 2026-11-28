@@ -461,6 +461,7 @@ function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),L=BL
 function drawScene(dt){if(HSTOP>0&&state==='run')dt=0;else if(SLOWT>0&&state==='run')dt*=SLOWK;ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||state==='online'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
+ if(state==='ep')return sceneEp(dt);
  if(state==='chars')return sceneChars(dt);
  if(RUN&&(state==='run'||state==='pause'||state==='boon'||state==='shop'||state==='set'||state==='echo'))return sceneRun(dt);
  if(state==='over'||state==='win')return sceneOver(dt);

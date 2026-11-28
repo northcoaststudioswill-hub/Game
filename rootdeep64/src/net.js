@@ -89,7 +89,7 @@ function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
  const c={q,st:state,ow:(PL.find(p=>p.dev===menuDev)||{ix:-1}).ix,sT:r2(stateT),P:PL.map(pRec)};
  if(say2T>0)c.s2=[say2Txt,r2(say2T)];if(joinT>0)c.jm=[joinMsg,r2(joinT)];
  if(state==='hub'||state==='talk')c.N=NPCS.map(w=>{const n=HUBNPC[w];return n?[r1(n.x),r1(n.y),Math.round((n.yaw||0)*57.3),n.mv?1:0,n.act>0?1:0,r1(n.hx)]:[0,0,0,0,0,0]});
- if(state==='cine')c.ci=[rdCineIx,r2(rdCineT)];if(state==='over'||state==='win')c.ov=r2(overT);if(state==='chars')c.dv=r2(diveT);
+ if(state==='cine')c.ci=[rdCineIx,r2(rdCineT)];if(state==='ep'&&EPI)c.ep=[EPI.i,EPI.b,r2(EPI.t),EPI.K];if(state==='over'||state==='win')c.ov=r2(overT);if(state==='chars')c.dv=r2(diveT);
  if(RUN){c.R=[RUN.chamber,RUN.biome,RUN.phase==='doors'?1:RUN.phase==='fight'?0:2,r2(RUN.time),RUN.petals,RUN.dew,RUN.keys,RUN.heat,r2(RUN.zoneT),r2(RUN.flash||0),r2(RUN.freeze||0),RUN.freezeP?RUN.freezeP.ix:-1,RUN.elite?1:0,RUN.wave2?RUN.wave2.length:0,r2(RUN.shake||0)];
   c.E=RUN.enemies.map(eRec);c.O=RUN.obst.map(o=>[r1(o.x),r1(o.y),r1(o.w),r1(o.h),r2(o.s)]);
   c.D=RUN.doors.map(d=>[DKINDS.indexOf(d.kind),GODIDS.indexOf(d.god),r2(d.hold),d.by?d.by.ix:-1,d.boss?1:0,r1(d.x),r1(d.y)]);
@@ -167,7 +167,7 @@ function netApplyCore(){const c=NET.core;if(!c||typeof c!=='object')return;
  menuDev=(PL.find(p=>p.ix===c.ow)||{}).dev||null;
  if(c.s2){say2Txt=c.s2[0];say2T=c.s2[1]}if(c.jm){joinMsg=c.jm[0];joinT=c.jm[1]}
  if(c.N)NPCS.forEach((w,i)=>{const a=c.N[i];if(!a)return;const n=HUBNPC[w]||(HUBNPC[w]={x:a[0],y:a[1],route:[],ri:0});n.tx=a[0];n.ty=a[1];n.yaw=a[2]/57.3;n.mv=a[3];n.act=a[4];n.hx=a[5]});
- if(c.ci){rdCineIx=c.ci[0];rdCineT=c.ci[1]}if(c.ov!==undefined)overT=c.ov;if(c.dv!==undefined)diveT=c.dv;
+ if(c.ci){rdCineIx=c.ci[0];rdCineT=c.ci[1]}if(c.ep){if(!EPI||EPI.i!==c.ep[0])EPI=epBuild(c.ep[0],c.ep[3]);EPI.b=Math.min(c.ep[1],EPI.beats.length-1);EPI.t=c.ep[2]}else if(state!=='ep')EPI=null;if(c.ov!==undefined)overT=c.ov;if(c.dv!==undefined)diveT=c.dv;
  if(!c.R){RUN=null;return}
  const R0=c.R;if(!RUN||RUN.chamber!==R0[0])RUN={enemies:[],projs:[],eprojs:[],pickups:[],pods:[],buds:[],texts:[],parts:[],rings:[],bolts:[],zones:[],hazards:[],acts:[],doors:[],obst:[],boons:{atk:null,cast:null,dash:null,pass:[]},subQ:[]};
  Object.assign(RUN,{chamber:R0[0],biome:R0[1],phase:['fight','doors','idle'][R0[2]],time:R0[3],petals:R0[4],dew:R0[5],keys:R0[6],heat:R0[7],zoneT:R0[8],flash:R0[9],freeze:R0[10],elite:!!R0[12],wave2:R0[13]?{length:R0[13]}:null,shake:R0[14]});
@@ -261,7 +261,7 @@ function hudNet(){if(!NET.host&&!NET.client)return;
  if(NET.host){const n=new Set(PL.filter(p=>p.dev.net).map(p=>p.dev.peer)).size;text('ONLINE · '+NET.code.toUpperCase()+(n?' · '+n+' FRIEND'+(n>1?'S':''):' · WAITING FOR FRIENDS'),8,VH-14,1,'rgba(168,240,128,.85)','#120a18')}
  else{const age=performance.now()-NET.snapAt,mine=PL.some(p=>p.mine);
   text(NET.core?(age>800?'ONLINE · LAGGING...':'ONLINE · '+NET.code.toUpperCase()):'CONNECTING TO THE HOST...',8,VH-14,1,age>800?'#ff9a8a':'rgba(168,240,128,.85)','#120a18');
-  if(NET.core&&!mine&&state!=='cine')banner('PRESS A TO JOIN THE PARTY',VH*.38);
+  if(NET.core&&!mine&&state!=='cine'&&state!=='ep')banner('PRESS A TO JOIN THE PARTY',VH*.38);
   if(NET.leaveT>0)banner('HOLD TO LEAVE THE ONLINE GAME...',VH*.5)}}
 /* a client leaves by holding Select (keyboard Q / Esc) or the touch START for 1.5 s */
 function netClientLeaveCheck(dt){if(!NET.client)return;let held=false;for(const id in DEV){const d=DEV[id];if(d.cur.sel||(id==='touch'&&d.cur.start))held=true}

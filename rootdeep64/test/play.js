@@ -17,6 +17,7 @@ const {chromium}=require('playwright');const path=require('path');
  await tap('Enter');s=await st();ok(s.state==='hub','START skips the intro into the Hearth');
  /* walk to the Root Door and open CHOOSE YOUR KEEPER */
  await hold('KeyS',1600);await tap('KeyZ');s=await st();ok(s.state==='chars','walking onto the Root Door + A opens CHOOSE YOUR KEEPER ('+s.state+')');
+ await pg.evaluate(()=>{RD.starter='WILL';RD.open={WILL:1}}); /* past the first-keeper choice (test/episodes.js covers that) */
  await tap('KeyS');await tap('KeyZ');s=await st();ok(s.state==='chars','locked ERIN refuses to dive');
  await tap('KeyW');await tap('KeyZ');await pg.waitForTimeout(300);s=await st();ok(s.state==='run'&&s.run.chamber===1,'WILL dives: chamber 1');
  ok(s.run.enemies>0,'chamber 1 has foes ('+s.run.enemies+')');
@@ -46,7 +47,7 @@ const {chromium}=require('playwright');const path=require('path');
  await ev(()=>{__rd.RDF.clearRoom()});await waitFor(()=>RUN&&RUN.phase==='doors',6000);s=await st();ok(s.run.phase==='doors'&&(await ev(()=>RUN.keys))===1,'boss down: key + doors');
  const dewBefore=s.meta.dew,runDew=s.run.dew+2*(s.run.chamber-1);await ev(()=>{__rd.RDF.hurt(999,0);__rd.RDF.hurt(999,1)});s=await st();
  ok(s.state==='over'&&s.meta.dew===dewBefore+runDew&&s.meta.keys===2,'party wipe: THE DEEP KEEPS YOU, Moondew + key banked ('+s.meta.dew+' dew)');
- await waitFor(()=>overT>1.4,8000);await tap('KeyZ');await waitFor(()=>state==='hub',3000);s=await st();ok(s.state==='hub','A returns to the Hearth');
+ await waitFor(()=>overT>1.4,8000);await tap('KeyZ');await waitFor(()=>state==='hub'||state==='ep',3000);s=await st();ok(s.state==='ep','A goes home, and the first death plays an episode');await tap('Enter');await waitFor(()=>state==='hub',3000);s=await st();ok(s.state==='hub','START skips it into the Hearth');
  /* escape */
  await ev(()=>{__rd.RDF.depart();__rd.RDF.finale()});await ev(()=>{__rd.RDF.clearRoom()});await pg.waitForTimeout(300);s=await st();ok(s.state==='win'&&s.meta.escapes===1,'chamber 12 cleared: YOU ESCAPED THE DEEP');
  console.log(errs.length?'CONSOLE ERRORS:\n'+[...new Set(errs)].join('\n'):'no console errors');console.log(fails?fails+' FAILED':'ALL GREEN');await br.close();process.exit(fails||errs.length?1:0)})();

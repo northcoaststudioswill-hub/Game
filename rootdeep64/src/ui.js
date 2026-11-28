@@ -175,7 +175,7 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
  if(state==='keep'){screenShell('KEEPSAKE SHELF','ONE AT A TIME  ·  LEVELS BY USE');
   rowsDraw2(KEEPS.map(k=>{const own=M.keeps[k.id];return{a:(M.keepEq===k.id?'* ':'')+k.n,b:own?'Lv'+keepLv(k.who)+'  ·  '+(M.keepXp[k.who]||0)+'/50':'GIFT '+k.who}}),uiSel,KEEPS[uiSel].d);
   footer(A+': EQUIP / REMOVE    '+Bk+': BACK');return}
- if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 6  ·  '+Bk+': BACK');
+ if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 7  ·  '+Bk+': BACK');
   if(codexPage===0)rowsPlain(['RUNS '+M.stats.runs+'   DEATHS '+M.stats.deaths,'ESCAPES '+M.stats.escapes+'   CHAMBERS CLEARED '+M.stats.chambers,'FOES FELLED '+M.stats.kills+'   BOSSES '+M.stats.bosses,'HEAT NOW '+heatTotal(),'WEAPON: '+WEAPONS[M.weapon].n,'KEEPSAKE: '+(M.keepEq?((KEEPS.find(k=>k.id===M.keepEq)||{}).n):'NONE')],60,17);
   else if(codexPage===1){const seen=Object.keys(FOES).filter(k=>M.seen[k]);const boss=Object.keys(BOSSES).filter(i=>M.seen[BOSSES[i].id]);
    rowsPlain(['FOES MET '+seen.length+' / '+Object.keys(FOES).length].concat(seen.map(k=>FOES[k].n)).concat(['BOSSES MET '+boss.length+' / 3']).concat(boss.map(i=>BOSSES[i].n)),60,15)}
@@ -184,6 +184,11 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
    const top=clamp(echoSel-6,0,Math.max(0,found.length-13));found.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
     text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(BIOMES[e.th].n,PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
    if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
+  else if(codexPage===6){const L=EPISODES.filter(e=>RD.ep&&RD.ep[e.id]);text('EPISODES  '+L.length+' / '+EPISODES.length,PX+14,54,1,'#ffd94d',null);
+   if(!L.length)wrapPx('Nothing yet. Things happen at home when you come back from the deep. Keep going down.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
+   const top=clamp(echoSel-6,0,Math.max(0,L.length-13));L.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
+    text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext('EP '+(EPISODES.indexOf(e)+1),PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
+   if(L.length)footer(A+': WATCH AGAIN    < > PAGES    '+Bk+': BACK')}
   else if(codexPage===5){text('THE STORY SO FAR',PX+14,54,1,'#ffd94d',null);storySoFar().forEach((l,i)=>text(l,PX+14,72+i*14,1,l[0]==='*'?'#a8f080':'#c8c0d8',null))}
   else if(codexPage===2)rowsPlain(['DIFFERENT BOONS OFFERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
   else{const found=ECHOES.filter(e=>M.echo[e.id]);text('ECHOES FOUND  '+found.length+' / '+ECHOES.length,PX+14,54,1,'#ffd94d',null);
@@ -261,7 +266,7 @@ function sceneChars(dt){setLight([.3,.9,.6],[.85,.72,.6],[.52,.44,.48]);setFog('
   mPush();mT(q.x,.5,q.y);mS(11);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.ready?1:.55,unlit:true,glow:p.ready});mPop();
   drawCast(c.id,q.x,q.y,p.ready?0:Math.sin(time*1.1+i)*.45,{id:'cs'+i,nosit:p.ready,scale:1.5,c:un?null:[.16,.14,.22],weapon:un&&c.id!=='LOUIE'?RD.weapon:null,cheer:p.ready?((time*.85+i*.3)%1)*.84:-1,npc:un?null:'MARCUS'})});
  frameEnd()}
-function hudChars(){const n=PL.length,d0=lead0();r('rgba(10,6,16,.82)',0,0,VW,26);ctext('CHOOSE YOUR KEEPER',5,3,'#ffd94d','#403010');
+function hudChars(){const n=PL.length,d0=lead0();r('rgba(10,6,16,.82)',0,0,VW,26);ctext(firstPick()?'CHOOSE YOUR FIRST KEEPER':'CHOOSE YOUR KEEPER',5,3,'#ffd94d','#403010');if(firstPick())ctext('ANY OF THEM. THE OTHERS COME HOME LATER, ONE BY ONE.',30,1,'#a8f080','#120a18');
  const colW=Math.min(150,(VW-12)/Math.max(n,1));
  PL.forEach((p,i)=>{const c=CHARS[p.csel],un=charUnlocked(c.id),q=CSLOT(i),top=project(q.x,40,q.y),ft=project(q.x,-3,q.y);if(!top||!ft)return;const x=top.x;
   ctext('P'+(p.ix+1)+'  ·  '+(p.dev.id.slice(0,2)==='gp'?'PAD':p.dev.label),top.y-16,1,PCOL[p.ix],'#120a18',x);
@@ -309,6 +314,7 @@ function drawHudInner(){
  case 'title':case 'menu':hudTitle();return;
  case 'online':hudTitle();drawOnline();return;
  case 'cine':hudCine();return;
+ case 'ep':hudEp();return;
  case 'hub':case 'talk':hudHub();return;
  case 'chars':hudChars();return;
  case 'run':hudRun();return;

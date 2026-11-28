@@ -52,7 +52,9 @@ function rdLoad(){try{let s=JSON.parse(localStorage.getItem(SAVEKEY)||'null');
  RD.mirror=RD.mirror||{};RD.weapons=RD.weapons||['blade'];RD.keeps=RD.keeps||{};RD.keepXp=RD.keepXp||{};RD.bank=RD.bank||{};RD.party=RD.party||[];
  RD.pact=RD.pact||{};RD.bounty=RD.bounty||{};RD.gift=RD.gift||{};RD.seen=RD.seen||{};RD.boonSeen=RD.boonSeen||{};RD.lineIx=RD.lineIx||{};RD.flags=RD.flags||{};
  RD.chars=RD.chars||['WILL','WILL','WILL','WILL'];for(const k of['msn','echo','bossK','killK','diedTo','charEsc','charRun','seenN','godMet'])RD[k]=RD[k]||{};if(!RD.set)RD.set={mus:7,sfx:8,shake:true};
- RD.stats=Object.assign({runs:0,deaths:0,escapes:0,kills:0,bosses:0,chambers:0},RD.stats)}
+ RD.stats=Object.assign({runs:0,deaths:0,escapes:0,kills:0,bosses:0,chambers:0},RD.stats);RD.ep=RD.ep||{};
+ /* saves from before the first-keeper choice started as Will */
+ if(!RD.starter&&RD.stats.runs>0){RD.starter='WILL';RD.open={WILL:1}}if(RD.starter&&!RD.open)RD.open={[RD.starter]:1}}
 rdLoad();
 function rdSave(){if(NET.client)return;try{localStorage.setItem(SAVEKEY,JSON.stringify(RD))}catch(e){}}
 let RUN=null;
@@ -216,21 +218,25 @@ const NPCPOS={ERIN:[88,-100],LOUIE:[120,-46],RANGER:[188,-54],MARCUS:[206,-106],
 const HUBNPC={};
 const NPCSPD={ERIN:32,LOUIE:46,RANGER:36,MARCUS:27,SCOUT:38};
 const BED={x:41*HK,y:H-84},DOOR={x:W/2,y:H-13},BOARD={x:W/2+58,y:H-20};
-function charUnlocked(id){if(id==='WILL')return true;if(id==='ERIN')return(RD.gift.ERIN||0)>=3;
+/* the first time you descend, any keeper can go; the one(s) you pick stay open, the others come home later */
+function charEarned(id){if(id==='WILL')return(RD.stats.maxCh||0)>=4;if(id==='ERIN')return(RD.gift.ERIN||0)>=3;
  if(id==='LOUIE')return(RD.stats.budsBanked||0)>=20;if(id==='MARCUS')return(RD.stats.deaths||0)>=8;return false}
-function charLockTxt(id){if(id==='ERIN')return 'GIVE ERIN HONEY AT THE HEARTH: '+(RD.gift.ERIN||0)+'/3';
+function charUnlocked(id){if(!RD.starter)return CHARS.some(c=>c.id===id);return!!(RD.open&&RD.open[id])||charEarned(id)}
+function keeperDefault(){return RD.starter||'WILL'}
+function firstPick(){return!RD.starter}
+function charLockTxt(id){if(id==='WILL')return 'HE COMES HOME WHEN YOU REACH CHAMBER 4: '+Math.min(4,RD.stats.maxCh||0)+'/4';if(id==='ERIN')return 'GIVE ERIN HONEY AT THE HEARTH: '+(RD.gift.ERIN||0)+'/3';
  if(id==='LOUIE')return 'BANK SPROUTS FROM RUNS: '+(RD.stats.budsBanked||0)+'/20';
  if(id==='MARCUS')return 'HE TAKES OVER AFTER 8 DEATHS: '+(RD.stats.deaths||0)+'/8';return ''}
 /* CHOOSE YOUR KEEPER — every joined keeper picks at once; dive when all are ready */
-function charsEnter(){for(const p of PL){p.csel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.chars[p.ix]||'WILL')));if(!charUnlocked(CHARS[p.csel].id))p.csel=0;p.ready=false}diveT=0;state='chars'}
-function charsUpdate(dt){for(const np of pollJoin()){np.csel=Math.max(0,CHARS.findIndex(c=>c.id===RD.chars[np.ix]));if(!charUnlocked(CHARS[np.csel].id))np.csel=0;np.ready=false;snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
+function charsEnter(){for(const p of PL){p.csel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.chars[p.ix]||'WILL')));if(!charUnlocked(CHARS[p.csel].id))p.csel=Math.max(0,CHARS.findIndex(c=>c.id===keeperDefault()));p.ready=false}diveT=0;state='chars'}
+function charsUpdate(dt){for(const np of pollJoin()){np.csel=Math.max(0,CHARS.findIndex(c=>c.id===RD.chars[np.ix]));if(!charUnlocked(CHARS[np.csel].id))np.csel=Math.max(0,CHARS.findIndex(c=>c.id===keeperDefault()));np.ready=false;snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
  for(const p of PL.slice()){const d=p.dev;
   if(!p.ready){if(d.pr.down||d.pr.right||d.rp==='down'){p.csel=(p.csel+1)%CHARS.length;snd(520,.04)}if(d.pr.up||d.pr.left||d.rp==='up'){p.csel=(p.csel+CHARS.length-1)%CHARS.length;snd(520,.04)}
    if(d.pr.a){const c=CHARS[p.csel];if(charUnlocked(c.id)){p.char=c.id;RD.chars[p.ix]=c.id;p.ready=true;snd(784,.1);later(()=>snd(1175,.2),90)}else snd(140,.09)}
    /* B: the first seat backs out to the Hearth; anyone else leaves the party */
    else if(d.pr.b){if(p===PL[0]){state='hub';return}dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.06)}}
   else if(d.pr.b){p.ready=false;diveT=0;snd(330,.05)}}
- if(PL.length&&PL.every(p=>p.ready)){diveT+=dt;if(diveT>(PL.length>1?.7:.05)){rdSave();rdStartRun();state='run'}}else diveT=0}
+ if(PL.length&&PL.every(p=>p.ready)){diveT+=dt;if(diveT>(PL.length>1?.7:.05)){if(firstPick()){RD.starter=PL[0].char;RD.open={};for(const p of PL)RD.open[p.char]=1}rdSave();rdStartRun();state='run'}}else diveT=0}
 const NPCROUTE={
  ERIN:[[88,-100],[76,-84,1],[24,-112,1],[88,-100]],
  LOUIE:[[120,-46],'P3',[96,-64],[64,-44],'P3'],
@@ -240,7 +246,7 @@ const NPCROUTE={
 function hubNpcReset(){for(const who of NPCS){const hx2=NPCPOS[who][0]*HK,hy=H+NPCPOS[who][1];
  const route=NPCROUTE[who].map(pt=>pt==='P3'?'P3':{x:pt[0]*HK,y:H+pt[1],act:!!pt[2]});
  HUBNPC[who]={x:hx2,y:hy,hx:hx2,hy,route,ri:0,jx:0,jy:0,act:0,wait:.3+Math.random()*.8,yaw:0,mv:0}}}
-function hubEnter(){PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*20;p.y=H/2+16;p.vx=p.vy=0;p.down=false;p.ax=0;p.ay=1;p.dashT=0;p.inv=0;p.swing=0;p.castA=0;p.cheer=0;p.land=0;p.hurt=0;movesReset(p,true);p.char=RD.chars[p.ix]||'WILL';if(!charUnlocked(p.char))p.char='WILL'});hubNpcReset();state='hub';}
+function hubEnter(){PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*20;p.y=H/2+16;p.vx=p.vy=0;p.down=false;p.ax=0;p.ay=1;p.dashT=0;p.inv=0;p.swing=0;p.castA=0;p.cheer=0;p.land=0;p.hurt=0;movesReset(p,true);p.char=RD.chars[p.ix]||keeperDefault();if(!charUnlocked(p.char))p.char=keeperDefault()});hubNpcReset();state='hub';}
 function movePlayer(p,dt,spd){let mx=p.dev.mx,my=p.dev.my;const l=Math.hypot(mx,my);
  const sp=spd*(rdStats(p).speedMul);
  if(l>0){const k=Math.min(1,l)/l;p.vx=mx*k*sp;p.vy=my*k*sp;p.fx=mx!==0?Math.sign(mx):p.fx;p.fy=my;p.anim+=dt*8*Math.min(1,l);p.mv=1}
@@ -261,7 +267,7 @@ function hubTarget(p){let best=null,bs=1e9;const fx=p.ax||0,fy=p.ay===undefined?
  consider({kind:'descend',n:'THE ROOT DOOR — DESCEND',x:DOOR.x,y:DOOR.y},20,-6);
  return best;}
 function hubUpdate(dt){if(pressed('sel')||pressed('start')){rdSave();menuSel=0;state='menu';return}
- for(const np of pollJoin()){const L=PL[0];np.x=clamp(L.x+R(-16,16),20,W-20);np.y=clamp(L.y+14,50,H-20);np.char=RD.chars[np.ix]||'WILL';if(!charUnlocked(np.char))np.char='WILL';snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
+ for(const np of pollJoin()){const L=PL[0];np.x=clamp(L.x+R(-16,16),20,W-20);np.y=clamp(L.y+14,50,H-20);np.char=RD.chars[np.ix]||keeperDefault();if(!charUnlocked(np.char))np.char=keeperDefault();snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
  /* hold B for a second to leave the party (any seat, as long as someone stays) */
  for(const p of PL.slice()){if(p.dev.cur.b&&PL.length>1){p.leaveT=(p.leaveT||0)+dt;if(p.leaveT>1.1){dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.08,160)}}else p.leaveT=0}
  /* a controller that was unplugged leaves the party here */
@@ -325,7 +331,8 @@ function keepUpdate(){uiSel=nav(uiSel,KEEPS.length);
  if(pressed('a')){const k=KEEPS[uiSel];
   if(RD.keeps[k.id]){RD.keepEq=RD.keepEq===k.id?'':k.id;rdSave();snd(660,.08,990)}else snd(140,.08)}
  if(pressed('b')||pressed('start'))state='hub';}
-function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);echoSel=0;snd(520,.04)}if(pressed('right')){codexPage=Math.min(5,codexPage+1);echoSel=0;snd(520,.04)}
+function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);echoSel=0;snd(520,.04)}if(pressed('right')){codexPage=Math.min(6,codexPage+1);echoSel=0;snd(520,.04)}
+ if(codexPage===6){const L=EPISODES.map((e,i)=>i).filter(i=>RD.ep&&RD.ep[EPISODES[i].id]);if(L.length){echoSel=nav(echoSel,L.length);if(pressed('a')){epStart(L[echoSel],'codex');return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(codexPage===4){const found=RELICS.filter(r=>RD.relic&&RD.relic[r.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=Object.assign({relic:true},found[echoSel]);echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(codexPage===3){const found=ECHOES.filter(e=>RD.echo[e.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=found[echoSel];echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(pressed('b')||pressed('a')||pressed('start'))state='hub';}
@@ -569,7 +576,7 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.bo
 function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  for(const p of PL)if(p.dev.pr.start){pauseSel=0;pausePage=0;pauseConfirm=-1;state='pause';menuDev=p.dev;rdSave();return}
  /* drop in mid-run: new keepers land beside the party */
- for(const np of pollJoin()){const L=lead();np.char=RD.chars[np.ix]&&charUnlocked(RD.chars[np.ix])?RD.chars[np.ix]:'WILL';plRunInit(np);movesReset(np,true);
+ for(const np of pollJoin()){const L=lead();np.char=RD.chars[np.ix]&&charUnlocked(RD.chars[np.ix])?RD.chars[np.ix]:keeperDefault();plRunInit(np);movesReset(np,true);
   np.x=clamp(L.x+R(-18,18),20,W-20);np.y=clamp(L.y+R(-10,10),40,H-16);np.land=.62;np.inv=1.5;joinMsg=joinNote(np);joinT=3;say2('P'+(np.ix+1)+' DROPS IN!',1.6);snd(784,.08,1175)}
  if(RUN.shake>0)RUN.shake*=Math.max(0,1-dt*7);if(RUN.flash>0)RUN.flash-=dt;if(RUN.banner){RUN.banner.t-=dt;if(RUN.banner.t<=0)RUN.banner=null}
  if(RUN.sub){RUN.sub.t-=dt;if(RUN.sub.t<=0)RUN.sub=null}for(const q of RUN.subQ)q.d-=dt;{const q=RUN.subQ.find(q=>q.d<=0);if(q){RUN.subQ.splice(RUN.subQ.indexOf(q),1);sub(q.who,q.txt,q.t,q.c)}}
@@ -723,5 +730,6 @@ function gameStep(dt){time+=dt;
  /* hit-stop holds the fight still; slow motion stretches the last kill */
  case 'run':if(!RUN){hubEnter();return}if(HSTOP>0){HSTOP-=dt;return}if(SLOWT>0){SLOWT-=dt;dt*=SLOWK}runUpdate(dt);fxUpdate(dt);return;
  /* a short lock so mashing attack through a death doesn't skip the summary; the prompt appears when it lifts */
- case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start')))hubEnter();return;
+ case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start'))){hubEnter();epCheck()}return;
+ case 'ep':epUpdate(dt);return;
  }}

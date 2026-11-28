@@ -110,6 +110,26 @@ just before they fire. Online friends see all of it (rebuilt on their side from 
     show two jars with one label, and Erin's later visions see two lights at the gate. Online, it plays for everyone.
 - `node test/lore.js` checks it all, including that every line fits its box.
 
+## Episodes, and your first keeper
+
+- **Pick anyone first.** On a new save, CHOOSE YOUR FIRST KEEPER lets you pick Will, Erin, Louie or Marcus. Whoever you
+  dive with first stays open (in co-op, everyone's first pick does). The others come home on their own:
+  Will when you reach chamber 4, Erin after 3 Honey, Louie after 20 sprouts banked, Marcus after 8 deaths.
+  Older saves keep Will as their first keeper.
+- **19 episodes** (`src/episodes.js`): short scenes played in the 3D engine with the real cast, staged with moving
+  actors and cut between wide, close, low, two-shot, pan and sky shots, with a title card ("EPISODE 9 - BACK IN BED").
+  One plays when you come home from a run, if something has crossed a line since:
+  - a keeper comes home (four unlock episodes that end on KEEPER UNLOCKED);
+  - your first death, 25 deaths (Marcus's pie chart of how you die), first escape (sunrise in the garden);
+  - 100 / 500 / 1000 foes felled (the 500 one is the foes talking about you);
+  - each boss beaten for the first time, from their side (the Grub Mother's night, the Drowned King's crown,
+    the Hollow alone);
+  - 8 Honey given, 8 Mirror ranks, 12 relics read, 25 supers, your first co-op run, and the split.
+  Whoever you play stands in the scene as themself; if they're one of the cast, their other lines drop out.
+  A: next line. START: skip. Codex page 7 replays any you've seen. Online, the guest watches the same shot.
+- `node test/episodes.js` checks the first pick, plays every beat of every episode, checks that every line fits a phone
+  screen, and covers when they trigger, unlocking and replay.
+
 ## Moves
 
 On top of the cartridge's attack / cast / dash, every keeper has four more verbs (`src/moves.js`). Every name
@@ -204,6 +224,7 @@ never renumber, you can drop in mid-run and leave from the Hearth or pause menu.
 - `src/models.js` – the cast, foes, bosses, sprouts, rooms, camera, scenes
 - `src/anim.js` – character animation: jointed rigs, spring-driven poses, every action and NPC habit
 - `src/ui.js` – HUD and every menu screen
+- `src/episodes.js` – the episodes: staging, cameras, triggers
 - `src/main.js` – boot, frame loop, `window.__rd` test hooks (same spirit as `__g.RDF()`)
 
 ## Tests
@@ -221,6 +242,7 @@ Need Node + Playwright with Chromium.
   checks they cost, land and clean up; saves a frame of each.
 - `node test/story.js` – missions asked and turned in, conversations firing off real progress, echoes, boss and
   god lines, the ending; also checks every line of text fits its box.
+- `node test/episodes.js` – the first-keeper choice, every episode beat drawn, text fit at phone width, triggers, unlocks, Codex replay.
 - `node test/fixes.js` – one check per playtest fix (menu ownership, seats, doors, spawns, revives, boon text...).
 - `node test/phone.js` – iPhone-sized touch viewports, portrait and landscape.
 

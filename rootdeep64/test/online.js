@@ -46,6 +46,9 @@ const DELAY=+(process.env.NET_DELAY||60);
  /* friend presses A: their keeper appears in the host's party */
  await tap(B,'KeyZ');await B.waitForTimeout(900);
  s=await ev(A,()=>PL.map(p=>p.ix+':'+(p.dev.net?'net':p.dev.id)));ok(s.length===2&&s[1].endsWith('net'),'host: the friend joined the party as P2 ('+s+')');
+ /* an episode at home plays on both screens */
+ await ev(A,()=>{epStart(EPISODES.findIndex(e=>e.id==='coop1'),'hub');EPI.b=2;EPI.t=.5});await B.waitForTimeout(900);s=await ev(B,()=>({st:state,id:EPI&&EPI.E.id,b:EPI&&EPI.b}));ok(s.st==='ep'&&s.id==='coop1'&&s.b>=2,'friend: sees the same episode, same beat ('+JSON.stringify(s)+')');
+ await ev(A,()=>epEnd());await B.waitForTimeout(700);s=await ev(B,()=>state);ok(s==='hub','friend: back at the Hearth when it ends ('+s+')');
  s=await ev(B,()=>PL.map(p=>p.ix+(p.mine?'*':'')));ok(s.includes('1*'),'friend: sees both keepers and knows which one is theirs ('+s+')');
  /* the friend walks: it moves on their screen at once, and the host follows */
  const b0=await ev(B,()=>{const p=PL.find(q=>q.mine);return[p.x,p.y]});await B.keyboard.down('KeyD');await B.waitForTimeout(150);

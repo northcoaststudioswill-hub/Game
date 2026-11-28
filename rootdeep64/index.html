@@ -256,7 +256,7 @@ function touchInit(){const zone=document.getElementById('stickzone'),nub=documen
   const on=e=>{woke();TS.btn[b]=true;TS.latch[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
   el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false})}
  /* taps on menus: a row picks / chooses, and on talk, notes, intro and end screens any tap goes on */
- const TAPANY=new Set(['title','cine','talk','echo','over','win']),TAPMENU=new Set(['menu','online','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
+ const TAPANY=new Set(['title','cine','ep','talk','echo','over','win']),TAPMENU=new Set(['menu','online','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
  document.addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('.tb'))return;const t=e.changedTouches[0];if(!t)return;
   if(TAPANY.has(state)){woke();TS.latch.a=true;e.preventDefault();e.stopPropagation();return}
   if(!TAPMENU.has(state))return;const rc=stage.getBoundingClientRect(),vx=(t.clientX-rc.left)/rc.width*VW,vy=(t.clientY-rc.top)/rc.height*VH;
@@ -497,7 +497,9 @@ function rdLoad(){try{let s=JSON.parse(localStorage.getItem(SAVEKEY)||'null');
  RD.mirror=RD.mirror||{};RD.weapons=RD.weapons||['blade'];RD.keeps=RD.keeps||{};RD.keepXp=RD.keepXp||{};RD.bank=RD.bank||{};RD.party=RD.party||[];
  RD.pact=RD.pact||{};RD.bounty=RD.bounty||{};RD.gift=RD.gift||{};RD.seen=RD.seen||{};RD.boonSeen=RD.boonSeen||{};RD.lineIx=RD.lineIx||{};RD.flags=RD.flags||{};
  RD.chars=RD.chars||['WILL','WILL','WILL','WILL'];for(const k of['msn','echo','bossK','killK','diedTo','charEsc','charRun','seenN','godMet'])RD[k]=RD[k]||{};if(!RD.set)RD.set={mus:7,sfx:8,shake:true};
- RD.stats=Object.assign({runs:0,deaths:0,escapes:0,kills:0,bosses:0,chambers:0},RD.stats)}
+ RD.stats=Object.assign({runs:0,deaths:0,escapes:0,kills:0,bosses:0,chambers:0},RD.stats);RD.ep=RD.ep||{};
+ /* saves from before the first-keeper choice started as Will */
+ if(!RD.starter&&RD.stats.runs>0){RD.starter='WILL';RD.open={WILL:1}}if(RD.starter&&!RD.open)RD.open={[RD.starter]:1}}
 rdLoad();
 function rdSave(){if(NET.client)return;try{localStorage.setItem(SAVEKEY,JSON.stringify(RD))}catch(e){}}
 let RUN=null;
@@ -661,21 +663,25 @@ const NPCPOS={ERIN:[88,-100],LOUIE:[120,-46],RANGER:[188,-54],MARCUS:[206,-106],
 const HUBNPC={};
 const NPCSPD={ERIN:32,LOUIE:46,RANGER:36,MARCUS:27,SCOUT:38};
 const BED={x:41*HK,y:H-84},DOOR={x:W/2,y:H-13},BOARD={x:W/2+58,y:H-20};
-function charUnlocked(id){if(id==='WILL')return true;if(id==='ERIN')return(RD.gift.ERIN||0)>=3;
+/* the first time you descend, any keeper can go; the one(s) you pick stay open, the others come home later */
+function charEarned(id){if(id==='WILL')return(RD.stats.maxCh||0)>=4;if(id==='ERIN')return(RD.gift.ERIN||0)>=3;
  if(id==='LOUIE')return(RD.stats.budsBanked||0)>=20;if(id==='MARCUS')return(RD.stats.deaths||0)>=8;return false}
-function charLockTxt(id){if(id==='ERIN')return 'GIVE ERIN HONEY AT THE HEARTH: '+(RD.gift.ERIN||0)+'/3';
+function charUnlocked(id){if(!RD.starter)return CHARS.some(c=>c.id===id);return!!(RD.open&&RD.open[id])||charEarned(id)}
+function keeperDefault(){return RD.starter||'WILL'}
+function firstPick(){return!RD.starter}
+function charLockTxt(id){if(id==='WILL')return 'HE COMES HOME WHEN YOU REACH CHAMBER 4: '+Math.min(4,RD.stats.maxCh||0)+'/4';if(id==='ERIN')return 'GIVE ERIN HONEY AT THE HEARTH: '+(RD.gift.ERIN||0)+'/3';
  if(id==='LOUIE')return 'BANK SPROUTS FROM RUNS: '+(RD.stats.budsBanked||0)+'/20';
  if(id==='MARCUS')return 'HE TAKES OVER AFTER 8 DEATHS: '+(RD.stats.deaths||0)+'/8';return ''}
 /* CHOOSE YOUR KEEPER — every joined keeper picks at once; dive when all are ready */
-function charsEnter(){for(const p of PL){p.csel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.chars[p.ix]||'WILL')));if(!charUnlocked(CHARS[p.csel].id))p.csel=0;p.ready=false}diveT=0;state='chars'}
-function charsUpdate(dt){for(const np of pollJoin()){np.csel=Math.max(0,CHARS.findIndex(c=>c.id===RD.chars[np.ix]));if(!charUnlocked(CHARS[np.csel].id))np.csel=0;np.ready=false;snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
+function charsEnter(){for(const p of PL){p.csel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.chars[p.ix]||'WILL')));if(!charUnlocked(CHARS[p.csel].id))p.csel=Math.max(0,CHARS.findIndex(c=>c.id===keeperDefault()));p.ready=false}diveT=0;state='chars'}
+function charsUpdate(dt){for(const np of pollJoin()){np.csel=Math.max(0,CHARS.findIndex(c=>c.id===RD.chars[np.ix]));if(!charUnlocked(CHARS[np.csel].id))np.csel=Math.max(0,CHARS.findIndex(c=>c.id===keeperDefault()));np.ready=false;snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
  for(const p of PL.slice()){const d=p.dev;
   if(!p.ready){if(d.pr.down||d.pr.right||d.rp==='down'){p.csel=(p.csel+1)%CHARS.length;snd(520,.04)}if(d.pr.up||d.pr.left||d.rp==='up'){p.csel=(p.csel+CHARS.length-1)%CHARS.length;snd(520,.04)}
    if(d.pr.a){const c=CHARS[p.csel];if(charUnlocked(c.id)){p.char=c.id;RD.chars[p.ix]=c.id;p.ready=true;snd(784,.1);later(()=>snd(1175,.2),90)}else snd(140,.09)}
    /* B: the first seat backs out to the Hearth; anyone else leaves the party */
    else if(d.pr.b){if(p===PL[0]){state='hub';return}dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.06)}}
   else if(d.pr.b){p.ready=false;diveT=0;snd(330,.05)}}
- if(PL.length&&PL.every(p=>p.ready)){diveT+=dt;if(diveT>(PL.length>1?.7:.05)){rdSave();rdStartRun();state='run'}}else diveT=0}
+ if(PL.length&&PL.every(p=>p.ready)){diveT+=dt;if(diveT>(PL.length>1?.7:.05)){if(firstPick()){RD.starter=PL[0].char;RD.open={};for(const p of PL)RD.open[p.char]=1}rdSave();rdStartRun();state='run'}}else diveT=0}
 const NPCROUTE={
  ERIN:[[88,-100],[76,-84,1],[24,-112,1],[88,-100]],
  LOUIE:[[120,-46],'P3',[96,-64],[64,-44],'P3'],
@@ -685,7 +691,7 @@ const NPCROUTE={
 function hubNpcReset(){for(const who of NPCS){const hx2=NPCPOS[who][0]*HK,hy=H+NPCPOS[who][1];
  const route=NPCROUTE[who].map(pt=>pt==='P3'?'P3':{x:pt[0]*HK,y:H+pt[1],act:!!pt[2]});
  HUBNPC[who]={x:hx2,y:hy,hx:hx2,hy,route,ri:0,jx:0,jy:0,act:0,wait:.3+Math.random()*.8,yaw:0,mv:0}}}
-function hubEnter(){PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*20;p.y=H/2+16;p.vx=p.vy=0;p.down=false;p.ax=0;p.ay=1;p.dashT=0;p.inv=0;p.swing=0;p.castA=0;p.cheer=0;p.land=0;p.hurt=0;movesReset(p,true);p.char=RD.chars[p.ix]||'WILL';if(!charUnlocked(p.char))p.char='WILL'});hubNpcReset();state='hub';}
+function hubEnter(){PL.forEach((p,i)=>{p.x=W/2+(i-(PL.length-1)/2)*20;p.y=H/2+16;p.vx=p.vy=0;p.down=false;p.ax=0;p.ay=1;p.dashT=0;p.inv=0;p.swing=0;p.castA=0;p.cheer=0;p.land=0;p.hurt=0;movesReset(p,true);p.char=RD.chars[p.ix]||keeperDefault();if(!charUnlocked(p.char))p.char=keeperDefault()});hubNpcReset();state='hub';}
 function movePlayer(p,dt,spd){let mx=p.dev.mx,my=p.dev.my;const l=Math.hypot(mx,my);
  const sp=spd*(rdStats(p).speedMul);
  if(l>0){const k=Math.min(1,l)/l;p.vx=mx*k*sp;p.vy=my*k*sp;p.fx=mx!==0?Math.sign(mx):p.fx;p.fy=my;p.anim+=dt*8*Math.min(1,l);p.mv=1}
@@ -706,7 +712,7 @@ function hubTarget(p){let best=null,bs=1e9;const fx=p.ax||0,fy=p.ay===undefined?
  consider({kind:'descend',n:'THE ROOT DOOR — DESCEND',x:DOOR.x,y:DOOR.y},20,-6);
  return best;}
 function hubUpdate(dt){if(pressed('sel')||pressed('start')){rdSave();menuSel=0;state='menu';return}
- for(const np of pollJoin()){const L=PL[0];np.x=clamp(L.x+R(-16,16),20,W-20);np.y=clamp(L.y+14,50,H-20);np.char=RD.chars[np.ix]||'WILL';if(!charUnlocked(np.char))np.char='WILL';snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
+ for(const np of pollJoin()){const L=PL[0];np.x=clamp(L.x+R(-16,16),20,W-20);np.y=clamp(L.y+14,50,H-20);np.char=RD.chars[np.ix]||keeperDefault();if(!charUnlocked(np.char))np.char=keeperDefault();snd(784,.08,1175);joinMsg=joinNote(np);joinT=3}
  /* hold B for a second to leave the party (any seat, as long as someone stays) */
  for(const p of PL.slice()){if(p.dev.cur.b&&PL.length>1){p.leaveT=(p.leaveT||0)+dt;if(p.leaveT>1.1){dropPlayer(p);joinMsg='PLAYER '+(p.ix+1)+' LEFT';joinT=2;snd(330,.08,160)}}else p.leaveT=0}
  /* a controller that was unplugged leaves the party here */
@@ -770,7 +776,8 @@ function keepUpdate(){uiSel=nav(uiSel,KEEPS.length);
  if(pressed('a')){const k=KEEPS[uiSel];
   if(RD.keeps[k.id]){RD.keepEq=RD.keepEq===k.id?'':k.id;rdSave();snd(660,.08,990)}else snd(140,.08)}
  if(pressed('b')||pressed('start'))state='hub';}
-function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);echoSel=0;snd(520,.04)}if(pressed('right')){codexPage=Math.min(5,codexPage+1);echoSel=0;snd(520,.04)}
+function codexUpdate(){if(pressed('left')){codexPage=Math.max(0,codexPage-1);echoSel=0;snd(520,.04)}if(pressed('right')){codexPage=Math.min(6,codexPage+1);echoSel=0;snd(520,.04)}
+ if(codexPage===6){const L=EPISODES.map((e,i)=>i).filter(i=>RD.ep&&RD.ep[EPISODES[i].id]);if(L.length){echoSel=nav(echoSel,L.length);if(pressed('a')){epStart(L[echoSel],'codex');return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(codexPage===4){const found=RELICS.filter(r=>RD.relic&&RD.relic[r.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=Object.assign({relic:true},found[echoSel]);echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(codexPage===3){const found=ECHOES.filter(e=>RD.echo[e.id]);if(found.length){echoSel=nav(echoSel,found.length);if(pressed('a')){echoRead=found[echoSel];echoT=0;state='echo';return}}if(pressed('b')||pressed('start'))state='hub';return}
  if(pressed('b')||pressed('a')||pressed('start'))state='hub';}
@@ -1014,7 +1021,7 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.mv=0;if(e.bo
 function runUpdate(dt){RUN.time+=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  for(const p of PL)if(p.dev.pr.start){pauseSel=0;pausePage=0;pauseConfirm=-1;state='pause';menuDev=p.dev;rdSave();return}
  /* drop in mid-run: new keepers land beside the party */
- for(const np of pollJoin()){const L=lead();np.char=RD.chars[np.ix]&&charUnlocked(RD.chars[np.ix])?RD.chars[np.ix]:'WILL';plRunInit(np);movesReset(np,true);
+ for(const np of pollJoin()){const L=lead();np.char=RD.chars[np.ix]&&charUnlocked(RD.chars[np.ix])?RD.chars[np.ix]:keeperDefault();plRunInit(np);movesReset(np,true);
   np.x=clamp(L.x+R(-18,18),20,W-20);np.y=clamp(L.y+R(-10,10),40,H-16);np.land=.62;np.inv=1.5;joinMsg=joinNote(np);joinT=3;say2('P'+(np.ix+1)+' DROPS IN!',1.6);snd(784,.08,1175)}
  if(RUN.shake>0)RUN.shake*=Math.max(0,1-dt*7);if(RUN.flash>0)RUN.flash-=dt;if(RUN.banner){RUN.banner.t-=dt;if(RUN.banner.t<=0)RUN.banner=null}
  if(RUN.sub){RUN.sub.t-=dt;if(RUN.sub.t<=0)RUN.sub=null}for(const q of RUN.subQ)q.d-=dt;{const q=RUN.subQ.find(q=>q.d<=0);if(q){RUN.subQ.splice(RUN.subQ.indexOf(q),1);sub(q.who,q.txt,q.t,q.c)}}
@@ -1168,7 +1175,8 @@ function gameStep(dt){time+=dt;
  /* hit-stop holds the fight still; slow motion stretches the last kill */
  case 'run':if(!RUN){hubEnter();return}if(HSTOP>0){HSTOP-=dt;return}if(SLOWT>0){SLOWT-=dt;dt*=SLOWK}runUpdate(dt);fxUpdate(dt);return;
  /* a short lock so mashing attack through a death doesn't skip the summary; the prompt appears when it lifts */
- case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start')))hubEnter();return;
+ case 'over':case 'win':overT+=dt;if(overT>1.3&&(pressed('a')||pressed('start'))){hubEnter();epCheck()}return;
+ case 'ep':epUpdate(dt);return;
  }}
 /* =====================================================================
    ROOTDEEP 64 — moves
@@ -1425,9 +1433,9 @@ const EVENTS=[
  {id:'esc1s',who:'SCOUT',when:()=>stn('escapes')>=1,lines:[['SCOUT',"You escaped! I measured the Lantern before and after. It's brighter. By a very small number. I've never been happier about a very small number."]]},
  {id:'esc2',who:'ERIN',when:()=>stn('escapes')>=2&&RD.msn.e4,lines:[['ERIN',"Twice now. And both times the thing at the bottom was whole again when you got there?"],['ERIN',"Then you're not killing it. You're carrying a little of it home each time, and it fills back in from all that light. Keeper... I think that's the right way round."]]},
  /* the cast takes the door */
- {id:'un_erin',who:'ERIN',when:()=>charUnlocked('ERIN'),lines:[['ERIN',"Three jars of honey and not one of them was a bribe. I noticed."],['ERIN',"If you ever want a turn up here in the warm, I know the way down. The buds listen to me. Don't tell Marcus I offered."],['MARCUS',"I heard. I hear everything. It's a curse."]]},
- {id:'un_louie',who:'LOUIE',when:()=>charUnlocked('LOUIE'),lines:[['LOUIE',"BOOF! BOOF BOOF! (Twenty home safe! He counted! He can count to twenty now, it is mostly the one number said twenty times!)"],['LOUIE',"WOOF. (The door smells like yes today.)"]]},
- {id:'un_marcus',who:'MARCUS',when:()=>charUnlocked('MARCUS'),lines:[['MARCUS',"Eight times. I've watched you go down that hole and come up through a vegetable EIGHT times."],['MARCUS',"Move. I'll do it. I'm gonna hate every second and I want you to watch."]]},
+ {id:'un_erin',who:'ERIN',when:()=>charEarned('ERIN')&&!!(RD.ep&&RD.ep.un_ERIN),lines:[['ERIN',"Three jars of honey and not one of them was a bribe. I noticed."],['ERIN',"If you ever want a turn up here in the warm, I know the way down. The buds listen to me. Don't tell Marcus I offered."],['MARCUS',"I heard. I hear everything. It's a curse."]]},
+ {id:'un_louie',who:'LOUIE',when:()=>charEarned('LOUIE')&&!!(RD.ep&&RD.ep.un_LOUIE),lines:[['LOUIE',"BOOF! BOOF BOOF! (Twenty home safe! He counted! He can count to twenty now, it is mostly the one number said twenty times!)"],['LOUIE',"WOOF. (The door smells like yes today.)"]]},
+ {id:'un_marcus',who:'MARCUS',when:()=>charEarned('MARCUS')&&!!(RD.ep&&RD.ep.un_MARCUS),lines:[['MARCUS',"Eight times. I've watched you go down that hole and come up through a vegetable EIGHT times."],['MARCUS',"Move. I'll do it. I'm gonna hate every second and I want you to watch."]]},
  {id:'played_marcus',who:'ERIN',when:()=>RD.charRun&&RD.charRun.MARCUS,lines:[['ERIN',"He went down. Marcus. On purpose."],['MARCUS',"I fell."],['ERIN',"You walked to the door, said 'watch this', and jumped."],['MARCUS',"I fell with confidence."]]},
  {id:'played_erin',who:'LOUIE',when:()=>RD.charRun&&RD.charRun.ERIN,lines:[['LOUIE',"WHINE. (She went down the hole. He sat on the door the whole time. The door is warm now. He would like that noted.)"]]},
  /* moves */
@@ -1771,6 +1779,249 @@ function splitUpdate(dt){
  const T=RUN.twins;if(T){T.t+=dt;if(!T.said&&T.t>.5){T.said=1;sub(SPLITN,TWINSAY[(Math.random()*TWINSAY.length)|0],3.6,'#e8e4f5')}if(T.t>7)RUN.twins=null}
  return false}
 /* =====================================================================
+   ROOTDEEP 64 — episodes
+   Short 3D scenes, played in the engine with the real cast, that happen
+   back home after something in your history crosses a line: a keeper
+   unlocked, a hundred foes felled, the first boss beaten, the first time
+   you get out. One plays per trip home, the way a good roguelike lets the
+   house react to you between runs. They are all in Codex page 7 after.
+   The writing is Claude's, on top of Will's characters and canon.
+
+   Staging: every scene is a pure function of (beat, time in beat), so an
+   online guest renders the exact same shot from three numbers.
+   Cast keys: a character name (WILL ERIN LOUIE MARCUS SCOUT RANGER), '@'
+   for whichever keeper P1 plays, 'f:<foe>' foes, 'b:<n>' bosses,
+   'p:<prop>' props and 'bud:<n>' sprouts. When '@' is one of the named
+   cast, that character plays themself and their other lines drop out.
+   ===================================================================== */
+const EPZ={hearth:H-70,garden:H*.5+20,deep0:H*.5,deep1:H*.5,deep2:H*.5};
+const totalOf=o=>{let n=0;for(const k in o||{})n+=o[k]||0;return n};
+const topKiller=()=>{let b=null,n=0;for(const k in RD.diedTo||{})if(RD.diedTo[k]>n){n=RD.diedTo[k];b=k}
+ const nm={deep:'"the deep, generally"',mother:'the Grub Mother',king:'the Drowned King',hollow:'the Hollow Keeper'};return nm[b]||'"tripped"'};
+const KL=(w,e,l,m)=>({WILL:w,ERIN:e,LOUIE:l,MARCUS:m});
+const EPISODES=[
+ /* ---- a keeper comes home: these play first ---- */
+ {id:'un_ERIN',n:"THE GARDENER'S TURN",set:'garden',card:'ERIN',when:()=>epUnlock('ERIN'),
+  cast:{ERIN:[-10,0,.4],LOUIE:[22,14],MARCUS:[40,-8],'p:honey':[-30,-6],'p:honey2':[-24,-10],'p:honey3':[-36,-2]},
+  beats:[{l:['ERIN',"Three jars of honey on my shelf. Not one of them was a bribe. I checked."],cam:'two',with:'MARCUS'},
+   {l:['ERIN',"You keep coming home with dirt in your hair and a story in your mouth. I want my own story."],mv:{ERIN:[4,10]},cam:'close'},
+   {l:['MARCUS',"Erin. You garden. Down there, the garden gardens YOU."],cam:'two',with:'ERIN'},
+   {l:['ERIN',"Then I'll weed it."],act:{ERIN:'atk'},cam:'low',at:'ERIN'},
+   {l:['LOUIE',"ARF! (He has already packed her a stick. It is his second best stick.)"],act:{LOUIE:'cheer'},cam:'wide'}]},
+ {id:'un_LOUIE',n:'TWENTY HOME SAFE',set:'garden',card:'LOUIE',when:()=>epUnlock('LOUIE'),
+  cast:Object.assign({LOUIE:[0,6,0],SCOUT:[-44,-10],ERIN:[40,-14]},...[...Array(10)].map((_,i)=>({['bud:'+(i%6)+':'+i]:[Math.cos(i/10*6.283)*20,6+Math.sin(i/10*6.283)*16]}))),
+  beats:[{l:['SCOUT',"Eighteen... nineteen... twenty. Twenty sprouts home safe, and Louie counted every one."],cam:'wide',ring:1},
+   {l:['LOUIE',"BOOF! (He can count to twenty now. It is mostly the one number, said twenty times.)"],act:{LOUIE:'happy'},cam:'close',ring:1},
+   {l:['SCOUT',"They follow him like he's the Lantern. Maybe to them, he is."],cam:'two',with:'LOUIE',ring:1},
+   {l:['ERIN',"He sits by the door every night you go down. I think he wants a turn."],cam:'two',with:'LOUIE',ring:1},
+   {l:['LOUIE',"AWOO! (He is going. He has decided. He decided a while ago, honestly.)"],act:{LOUIE:'sup'},cam:'low',ring:1}]},
+ {id:'un_MARCUS',n:'THE HATER GOES DOWN',set:'hearth',card:'MARCUS',when:()=>epUnlock('MARCUS'),
+  cast:{MARCUS:[0,40,3.14],ERIN:[-36,10],LOUIE:[30,16]},
+  beats:[{l:['MARCUS',"Eight times. I've watched you go down that hole and come back up through a vegetable EIGHT times."],cam:'wide'},
+   {l:['ERIN',"Marcus. Don't."],cam:'close'},
+   {l:['MARCUS',"No, I'm doing it. Somebody competent has to. Bro, I've had like forty ideas."],face:{MARCUS:'ERIN'},cam:'low',at:'MARCUS'},
+   {l:['LOUIE',"WOOF? (Forty?)"],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"Forty-one. Idea forty-one: me."],act:{MARCUS:'sup'},cam:'low',at:'MARCUS'}]},
+ {id:'un_WILL',n:'THE KEEPER COMES HOME',set:'garden',card:'WILL',when:()=>epUnlock('WILL'),
+  cast:{WILL:[0,-90,0],ERIN:[-26,20,3.14],MARCUS:[24,24,3.14],LOUIE:[0,30,3.14]},
+  beats:[{d:3.4,mv:{WILL:[0,-6]},cam:'wide',mt:3},
+   {l:['ERIN',"Will? You've been gone since the Lantern cracked. We thought the road had you."],act:{LOUIE:'happy'},cam:'two',with:'WILL'},
+   {l:['WILL',"The road was looking for the same thing you are. It led back here. It always does."],cam:'close'},
+   {l:['MARCUS',"Great. Another one. Bro, take a number. The number is behind me."],cam:'two',with:'WILL'},
+   {l:['WILL',"Then I'll go down behind you. Somebody has to carry the light back up."],act:{LOUIE:'cheer'},cam:'low',at:'WILL'}]},
+ /* ---- the deep, from the other side ---- */
+ {id:'mother',n:"THE MOTHER'S NIGHT",set:'deep0',when:()=>bk('mother')>=1,
+  cast:{'b:0':[0,-20,0],'f:grub:1':[-80,40],'f:grub:2':[70,50],'f:grub:3':[-30,70]},
+  beats:[{d:3.2,mv:{'f:grub:1':[-24,4],'f:grub:2':[24,6],'f:grub:3':[0,18]},mt:3,cam:'pan'},
+   {l:['b:0',"(Hush, little ones. It came through. It came through, and it will come again.)"],cam:'low'},
+   {l:['f:grub:3',"(Squeak?)"],cam:'close'},
+   {l:['b:0',"(No. We do not hate it. We are the garden's history. History does not hate. It waits.)"],cam:'wide'}]},
+ {id:'king',n:'A CROWN, RETURNED',set:'deep1',when:()=>bk('king')>=1,
+  cast:{'b:1':[0,-24,0],'f:crab:1':[-70,50],'f:crab:2':[60,60],'p:shard':[-70,46]},
+  beats:[{d:3,mv:{'f:crab:1':[-14,-2],'p:shard':[-14,-6]},mt:2.8,cam:'pan'},
+   {l:['f:crab:1',"(Your Majesty. We found it in the shallows again.)"],cam:'two',with:'b:1'},
+   {l:['b:1',"(Put it on the step. I will wear it when I remember why.)"],cam:'low'},
+   {l:['f:crab:2',"(Was it the keeper again, Majesty?)"],mv:{'f:crab:2':[20,8]},cam:'wide'},
+   {l:['b:1',"(It always is. Some kings get a kingdom. I got a door that keeps opening.)"],cam:'close'}]},
+ {id:'hollow',n:'THE HOLLOW, ALONE',set:'deep2',when:()=>bk('hollow')>=1,
+  cast:{'b:2':[0,10,3.14]},fx:'lamp',
+  beats:[{d:3.4,cam:'pan'},
+   {l:['b:2',"(I was a keeper once. Or I was what a keeper leaves behind. It is hard to tell from in here.)"],cam:'close'},
+   {l:['b:2',"(It wears my steps better than I did. Good. Someone should.)"],cam:'low'}]},
+ {id:'kills500',n:'WHAT THEY SAY ABOUT YOU',set:'deep0',when:()=>stn('kills')>=500,
+  cast:{'f:grub:1':[-24,6,1.2],'f:beetle:1':[24,4,-1.2],'f:spitter:1':[12,-14,-.4],'f:crab:1':[-10,-16,.4]},
+  beats:[{l:['f:grub:1',"(Squelch. Did everyone see it? The one with the light?)"],cam:'wide'},
+   {l:['f:beetle:1',"(Saw it. Felt it. Twice. The second time was worse.)"],cam:'close'},
+   {l:['f:spitter:1',"(I keep my distance. I am very good at distance. It is better at closing it.)"],cam:'close'},
+   {l:['f:crab:1',"(...I think it's kind of cool, honestly.)"],cam:'low'},
+   {l:['f:grub:1',"(Traitor.)"],face:{'f:grub:1':'f:crab:1','f:beetle:1':'f:crab:1','f:spitter:1':'f:crab:1'},cam:'wide'}]},
+ /* ---- home reacts ---- */
+ {id:'home1',n:'BACK IN BED',set:'hearth',when:()=>stn('deaths')>=1,
+  cast:{'@':[-92,-10,.6],ERIN:[-60,8,-1.2],LOUIE:[-74,16],MARCUS:[-30,-8,-1.4]},
+  beats:[{l:['LOUIE',"WOOF! WOOF! (You're back! You were gone a whole forever!)"],act:{'@':'down',LOUIE:'happy'},cam:'wide'},
+   {l:['ERIN',"There you are. The deep spat you back out, same as everyone. Sit up slow."],act:{'@':'down'},cam:'two',with:'@'},
+   {l:['MARCUS',"Eleven minutes. You were gone eleven minutes. I timed it. New record. The bad kind."],act:{'@':'down'},mv:{MARCUS:[-50,-6]},cam:'close'},
+   {l:['@',KL("Something down there knew my name.","It smelled like the bottom of a flowerpot. Every flowerpot.","WHINE. (Something down there bit back. He would like that noted.)","Okay. Okay. That was a warm-up. Bro, that was a WARM-UP.")],mv:{'@':[-80,4]},cam:'close'},
+   {l:['ERIN',"Eat something. Then go again. The Lantern doesn't fix itself."],act:{LOUIE:'cheer'},cam:'wide'}]},
+ {id:'kills100',n:'THE CATALOGUE',set:'hearth',when:()=>stn('kills')>=100,
+  cast:{SCOUT:[30,-20,-.6],RANGER:[60,-8,-1.2],'@':[0,10,2.6],'p:board':[42,-40]},
+  beats:[{l:['SCOUT',"One hundred! You've felled one hundred things that live below. I've drawn every one. Badly."],act:{SCOUT:'happy'},cam:'two',with:'@'},
+   {l:['RANGER',"Count them if you like. They don't stay counted. The deep grows them back like weeds."],cam:'close'},
+   {l:['@',KL("Then I'll keep counting.","Weeds I know. Weeds you pull every morning, forever, and you smile while you do it.","BOOF. (He would like to count to a hundred. He is at twenty.)","Then they keep losing. Bro, that's a them problem.")],cam:'close'},
+   {l:['SCOUT',"Then I'll need more paper."],cam:'wide'}]},
+ {id:'escape1',n:'SUNRISE',set:'garden',sky:'dawn',when:()=>stn('escapes')>=1,
+  cast:{'@':[0,-90,0],ERIN:[-30,26,3.14],LOUIE:[0,34,3.14],MARCUS:[30,28,3.14],RANGER:[-60,10,2.4]},
+  beats:[{d:3.4,mv:{'@':[0,4]},mt:3,cam:'wide'},
+   {l:['LOUIE',"AROOOO! (Out! All the way out! He knew it! He said so, many times, loudly!)"],act:{LOUIE:'cheer'},mv:{LOUIE:[4,16]},cam:'two',with:'@'},
+   {l:['ERIN',"You went all the way down, and walked back up through the front door of the world."],act:{ERIN:'happy'},cam:'two',with:'@'},
+   {l:['MARCUS',"Lucky. Statistically, lucky. ...Okay, that was sick. Don't tell anyone I said sick."],cam:'close'},
+   {l:['@',KL("It's a long way up. It felt shorter with all of you at the top.","The roots let me through. I think they knew I'd be back to weed them.","AWOO! (He would like a snack, and then to do it again.)","Bro. BRO. I told you. Idea number one: win. Nailed it.")],act:{'@':'cheer'},cam:'close'},
+   {l:['RANGER',"Now you know the way. The deep will move it by morning. Go find it again."],cam:'wide'}]},
+ {id:'kills1000',n:'TALLY MARKS',set:'hearth',when:()=>stn('kills')>=1000,
+  cast:{MARCUS:[40,-24,3.14],'p:tablet':[40,-38],ERIN:[0,6,.6],LOUIE:[18,12]},
+  beats:[{l:['MARCUS',"Nine hundred ninety-nine... one thousand. Bro. One THOUSAND."],act:{MARCUS:'atk'},cam:'close'},
+   {l:['ERIN',"Are you keeping score of the keeper's fights on my wall?"],mv:{ERIN:[16,-6]},cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"Somebody has to. Idea: we frame it. We frame the wall."],face:{MARCUS:'ERIN'},cam:'close'},
+   {l:['LOUIE',"WOOF. (He has eaten the chalk. It was blue. So is he, now.)"],act:{LOUIE:'happy'},cam:'low',at:'LOUIE'}]},
+ {id:'deaths25',n:'THE LEADERBOARD',set:'hearth',when:()=>stn('deaths')>=25,
+  cast:{MARCUS:[30,-26,.3],'p:board':[42,-40],ERIN:[-20,0,.8],LOUIE:[0,14],'@':[-46,10,1.2]},
+  beats:[{l:['MARCUS',"Family meeting. I made a chart of how the keeper dies. It's a pie chart. It's mostly pie."],cam:'wide'},
+   {l:['ERIN',"Marcus. That is not funny."],cam:'close'},
+   {l:['MARCUS',()=>"It's a little funny. Biggest slice: "+topKiller()+". Second biggest slice: also that."],cam:'close'},
+   {l:['ERIN',()=>stn('deaths')+" times. And "+stn('deaths')+" times, you came home. That's the chart I'm keeping."],act:{ERIN:'happy'},cam:'two',with:'@'},
+   {l:['LOUIE',"WOOF. (He sits on the chart. Meeting over.)"],mv:{LOUIE:[24,-18]},cam:'low',at:'LOUIE'}]},
+ {id:'honey8',n:'THE SHELF',set:'hearth',when:()=>totalOf(RD.gift)>=8,
+  cast:{ERIN:[-40,-6,1.2],MARCUS:[0,0,-1.2],'p:honey':[-58,-20],'p:honey2':[-52,-22],'p:honey3':[-46,-24],'p:table':[-52,-16]},
+  beats:[{l:['ERIN',"Eight jars now. I never eat them. I just line them up and look at them."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"That's insane. Can I have one?"],cam:'close'},
+   {l:['ERIN',"No. Each one's a day somebody went down there and thought of me on the way back."],cam:'close'},
+   {l:['MARCUS',"...Okay, that's actually nice. Still insane."],cam:'wide'}]},
+ {id:'coop1',n:"WHO'S THE BEST PARTNER",set:'hearth',when:()=>stn('coopRuns')>=1,
+  cast:{MARCUS:[-14,0,1.5],LOUIE:[14,0,-1.5],ERIN:[0,-30,0],SCOUT:[-40,-20,.6]},
+  beats:[{l:['MARCUS',"Obviously I'm the best partner. I bring ideas."],cam:'two',with:'LOUIE'},
+   {l:['LOUIE',"BOOF. (He brings sticks. Sticks are ideas you can hold.)"],act:{LOUIE:'happy'},cam:'low',at:'LOUIE'},
+   {l:['ERIN',"Two of you went down together and both came up arguing. It's working."],cam:'wide'},
+   {l:['SCOUT',"Two keepers, two lights. The deep never knows which one to watch."],cam:'close'}]},
+ {id:'split',n:'TWO LIGHTS OVER THE GARDEN',set:'garden',sky:'night',fx:'twins',when:()=>!!RD.flags.split,
+  cast:{ERIN:[-10,30,3.14],MARCUS:[40,60,3.14]},
+  beats:[{d:3.6,cam:'sky'},
+   {l:['ERIN',"Marcus. Wake up. Look."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"Bro, it's the middle of the... oh."],mv:{MARCUS:[14,30]},cam:'two',with:'ERIN'},
+   {l:['ERIN',"Same light. Two of them. One's going down. The other's closing the gate behind it. Gently."],cam:'sky'},
+   {l:['MARCUS',"I got an idea. We don't say anything about this. To anyone."],cam:'close'},
+   {l:['ERIN',"That's a good idea."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"I know. That's what scares me."],cam:'sky'}]},
+ {id:'mirror',n:'THE MIRROR TALKS BACK',set:'hearth',when:()=>totalOf(RD.mirror)>=8,
+  cast:{MARCUS:[0,-14,3.14],'p:mirror':[0,-40],SCOUT:[34,0,-.8]},
+  beats:[{l:['MARCUS',"Every time you spend Moondew at this thing, it gets a little shinier. Suspicious."],cam:'close'},
+   {l:['SCOUT',"It isn't getting shinier. You're getting stronger. It just shows you."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"So it's a mirror that hypes you up. Bro. I want one. I want six."],act:{MARCUS:'cheer'},cam:'low',at:'MARCUS'}]},
+ {id:'relics12',n:'READING ALOUD',set:'hearth',when:()=>typeof relicCount==='function'&&relicCount()>=12,
+  cast:{SCOUT:[0,-10,0],RANGER:[-34,4,.8],ERIN:[34,6,-.8],LOUIE:[10,20],'p:tablet':[0,-22]},
+  beats:[{l:['SCOUT',"Twelve relics. Three stories about how the Lantern cracked, and not one of them agrees."],cam:'wide'},
+   {l:['RANGER',"Good. Stories that agree are usually lying together."],cam:'close'},
+   {l:['ERIN',"Read the one about the jar again. Louie likes that one."],cam:'two',with:'LOUIE'},
+   {l:['LOUIE',"Zzz. (He does.)"],act:{LOUIE:'down'},cam:'low',at:'LOUIE'}]},
+ {id:'supers',n:'SHOW-OFFS',set:'garden',when:()=>stn('supers')>=25,
+  cast:{MARCUS:[-16,0,.8],ERIN:[20,-4,-.8],LOUIE:[4,16]},
+  beats:[{l:['MARCUS',"Watch. Watch this. Hydro jet. Ffffssssh."],act:{MARCUS:'sup'},cam:'low',at:'MARCUS'},
+   {l:['ERIN',"You're just spitting."],cam:'two',with:'MARCUS'},
+   {l:['MARCUS',"It's a TECHNIQUE."],cam:'close'},
+   {l:['LOUIE',"BOOF! (He does his too. A pigeon falls out of a tree, offended.)"],act:{LOUIE:'sup'},cam:'wide'},
+   {l:['ERIN',"...Okay, that one was good."],act:{ERIN:'happy'},cam:'close'}]}];
+const EPNAMES=EPISODES.map(e=>e.n);
+function epUnlock(id){return!!RD.starter&&!(RD.open&&RD.open[id])&&charEarned(id)}
+
+/* ---------------- playing one ---------------- */
+let EPI=null;
+function epKeeper(){return PL[0]?PL[0].char:keeperDefault()}
+/* resolve an episode into beats with start/end marks for every actor */
+function epBuild(i,keeper){const E=EPISODES[i],z0=EPZ[E.set]||H*.5,K=keeper||epKeeper();const cast={};let drop=null;
+ if(E.cast['@']&&E.cast[K]&&K!=='@')drop=K;
+ for(const k in E.cast){if(k===drop)continue;const c=E.cast[k];cast[k]={x:W/2+c[0],z:z0+c[1],yaw:c[2]};}
+ const beats=[{d:2.4,title:true,cam:E.beats[0].cam==='sky'?'sky':'wide'}];
+ for(const b of E.beats){if(b.l&&b.l[0]===drop)continue;beats.push(Object.assign({},b))}
+ if(E.card)beats.push({d:2.8,card:E.card,cam:'wide'});
+ /* walk each actor's marks through the beats */
+ const pos={};for(const k in cast)pos[k]={x:cast[k].x,z:cast[k].z};
+ for(const b of beats){b.from={};b.to={};for(const k in cast){b.from[k]={...pos[k]};const m=b.mv&&b.mv[k];if(m)pos[k]={x:W/2+m[0],z:z0+m[1]};b.to[k]={...pos[k]}}
+  if(b.l){let t=b.l[1];if(typeof t==='function')t=t();else if(typeof t==='object')t=t[K]||t.WILL;b.txt=t;b.who=b.l[0]==='@'?K:b.l[0];b.d=b.d||clamp(1.6+t.length*.05,3,7.5)}}
+ return{i,E,K,cast,beats,b:0,t:0,z0}}
+function epStart(i,back){EPI=epBuild(i);EPI.back=back||'hub';RD.ep=RD.ep||{};RD.ep[EPISODES[i].id]=1;rdSave();state='ep';snd(392,.25,523,'triangle',.05)}
+/* after a run, back home: the first episode whose moment has come */
+function epCheck(){if(NET.client||!RD.flags.cineSeen)return false;RD.ep=RD.ep||{};
+ for(let i=0;i<EPISODES.length;i++){const E=EPISODES[i];if(RD.ep[E.id])continue;let ok=false;try{ok=E.when()}catch(e){}
+  if(ok){epStart(i,'hub');return true}}return false}
+function epEnd(){const E=EPI&&EPI.E;if(E&&E.card){RD.open=RD.open||{};RD.open[E.card]=1;rdSave()}const back=EPI?EPI.back:'hub';EPI=null;state=back==='codex'?'codex':'hub'}
+function epUpdate(dt){if(!EPI){state='hub';return}const B=EPI.beats[EPI.b];EPI.t+=dt;
+ if(pressed('start')||pressed('sel')){epEnd();return}
+ if((pressed('a')&&EPI.t>.3)||EPI.t>=B.d){EPI.b++;EPI.t=0;if(EPI.b>=EPI.beats.length)epEnd()}}
+/* where everyone is, this frame */
+function epActors(){const B=EPI.beats[EPI.b],u=ss(0,B.mt||1.3,EPI.t),A={};
+ for(const k in EPI.cast){const f=B.from[k],to=B.to[k];A[k]={k,x:lerp(f.x,to.x,u),z:lerp(f.z,to.z,u),moving:(f.x!==to.x||f.z!==to.z)&&u<1,dx:to.x-f.x,dz:to.z-f.z}}
+ const sp=B.who&&A[B.l[0]==='@'?'@':B.l[0]];
+ for(const k in A){const a=A[k],c=EPI.cast[k];
+  if(a.moving)a.yaw=Math.atan2(a.dx,a.dz);
+  else if(B.face&&B.face[k]&&A[B.face[k]])a.yaw=Math.atan2(A[B.face[k]].x-a.x,A[B.face[k]].z-a.z);
+  else if(sp&&sp!==a&&!k.startsWith('p:')&&!k.startsWith('bud'))a.yaw=Math.atan2(sp.x-a.x,sp.z-a.z);
+  else if(sp===a&&B.with&&A[B.with])a.yaw=Math.atan2(A[B.with].x-a.x,A[B.with].z-a.z);
+  else a.yaw=c.yaw!==undefined?c.yaw:0}
+ return{A,sp}}
+/* how tall and how big each kind of actor is, for framing */
+function epSize(k){if(!k)return[14,1];if(k.startsWith('b:'))return[[16,2.3],[22,2.2],[30,2.1]][+k.slice(2)];if(k.startsWith('f:'))return[8,.8];if(k==='LOUIE'||(k==='@'&&EPI.K==='LOUIE'))return[12,1.15];return[24,1.25]}
+function epCam(A,sp){const B=EPI.beats[EPI.b],t=EPI.t,side=EPI.b%2?1:-1;const L=Object.values(A).filter(a=>!a.k.startsWith('p:')&&!a.k.startsWith('bud'));
+ let cx=0,cz=0;for(const a of L){cx+=a.x;cz+=a.z}cx/=L.length||1;cz/=L.length||1;
+ const foc=A[B.at]||sp||L[0]||{x:W/2,z:EPI.z0},[h,s]=epSize(foc.k);
+ /* the dialogue box covers the bottom third, so subjects are framed high */
+ switch(B.cam){
+  case'close':{/* in front of the face, three-quarter on */const y=foc.yaw||0,fx=Math.sin(y),fz=Math.cos(y),d=(40-t*1.2)*s;
+   setCam([foc.x+fx*d+fz*side*d*.45,h*.95+3,foc.z+fz*d-fx*side*d*.45],[foc.x,h*.52,foc.z],.5);break}
+  case'low':setCam([foc.x+side*10*s,3+h*.25,foc.z+(44-t)*s],[foc.x,h*.75,foc.z],.56);break;
+  case'two':{const o=A[B.with]||L.find(a=>a!==foc)||foc,[h2,s2]=epSize(o.k),hm=Math.max(h,h2),sm=Math.max(s,s2),mx=(foc.x+o.x)/2,mz=(foc.z+o.z)/2,d=Math.hypot(foc.x-o.x,foc.z-o.z);
+   /* side-on to the pair, from the open side of the room */let nx=-(o.z-foc.z),nz=o.x-foc.x;const nl=Math.hypot(nx,nz)||1;nx/=nl;nz/=nl;if(nz<0){nx=-nx;nz=-nz}if(nl<2){nx=0;nz=1}
+   const dd=40*sm+d*.75-t*1.2;setCam([mx+nx*dd+side*6,hm*.9+6,mz+nz*dd],[mx,hm*.42,mz],.58);break}
+  case'pan':setCam([cx-50+t*14,64,cz+110],[cx,0,cz],.6);break;
+  case'sky':setCam([cx+side*10,10,cz+80-t*2],[cx,46,cz-60],.7);break;
+  default:setCam([cx+Math.sin(time*.2)*18,62,cz+118-t*2],[cx,2,cz-6],.6)}}
+function epSet(E){const night=E.sky==='night',dawn=E.sky==='dawn',cx=W/2;
+ if(E.set==='hearth'){setLight([.3,.9,.45],[.78,.66,.52],[.5,.42,.44]);setFog('#120a12',430,820);frameBegin();drawRoomMesh('hub');
+  prop(PROP.rug,W/2,0,H-44);for(const s of STATIONS)prop(PROP[s.id],s.x,0,29,0,1.15);lantern(W/2,50,H*.42,1.5);
+  torch(12,40);torch(W-12,40);torch(12,H*.62);torch(W-12,H*.62);prop(PROP.bed,BED.x,0,BED.y-6,0,1.08);
+  prop(PROP.hatch,DOOR.x,0,DOOR.y);prop(PROP.plant,22*HK,0,H-80);prop(PROP.plant,196*HK,0,H-126);prop(PROP.crate,216*HK,0,H-80,.3)}
+ else if(E.set==='garden'){if(night){setLight([.2,.9,.4],[.26,.3,.46],[.3,.32,.46]);setFog('#04060e',220,600)}else if(dawn){setLight([.6,.5,.4],[1,.78,.58],[.56,.5,.52]);setFog('#3a2a30',260,700)}else{setLight([.2,.9,.4],[.62,.64,.6],[.58,.6,.56]);setFog('#0a140c',260,640)}
+  frameBegin();drawRoomMesh('garden');for(let i=0;i<46;i++)prop(PROP.tuft,(i*47)%(W+160)-80,0,(i*31)%(H+80)-10,i,1.2+(i%3)*.4);
+  for(let i=0;i<5;i++)prop(PROP.plant,-30+(i*91)%(W+60),0,20+(i*53)%70,i,1.4);prop(PROP.post,cx,0,H*.5-26);lantern(cx,28,H*.5-26,1.5);
+  if(dawn){sprite(W/2+60,70+EPI.t*2,-160,90,hex('#ffd890'),.8,true);sprite(W/2+60,70,-160,240,hex('#ff9a60'),.25,true)}else sprite(W+40,150,-120,26,[.91,.9,.96],.9,false)}
+ else{const B=+E.set.slice(4),L=BLIGHT[B];setLight(L[0],L[1],L[2]);setFog(L[3],300,700);frameBegin();drawRoomMesh(BKEY[B],[.85,.85,.9]);torch(12,36);torch(W-12,36);torch(12,H*.62);torch(W-12,H*.62)}
+ if(E.fx==='twins'){const T=(EPI.b+EPI.t/6);for(const sd of[-1,1]){const lx=W/2+sd*(10+T*14),ly=70+Math.sin(T*2+sd)*6-(sd>0?T*3:0),lz=-30-T*(sd<0?14:4);
+   sprite(lx,ly,lz,14,[1,1,1],.95,true);sprite(lx,ly,lz,50,hex(sd<0?'#ffe9a0':'#cfe0ff'),.55,true)}}
+ if(E.fx==='lamp'){sprite(W/2,14,EPZ.deep2-30,10,hex('#ffe9a0'),.6+.2*Math.sin(time*2),true);sprite(W/2,14,EPZ.deep2-30,40,hex('#ffd94d'),.2,true);lantern(W/2,10,EPZ.deep2-30,1)}}
+function sceneEp(dt){if(!EPI)return;const E=EPI.E,B=EPI.beats[EPI.b];const {A,sp}=epActors();
+ epCam(A,sp);epSet(E);const t=EPI.t,T=time;
+ for(const k in A){const a=A[k],act=B.act&&B.act[k],talking=sp===a&&!B.title&&!B.card;
+  if(k.startsWith('p:')){const pm=PROP[k.slice(2).replace(/\d+$/,'')];if(pm){prop(pm,a.x,0,a.z,a.yaw||0,1.2);shadow(a.x,a.z,5)}continue}
+  if(k.startsWith('bud:')){const ty=+k.split(':')[1],i=+k.split(':')[2];let x=a.x,z=a.z;if(B.ring){const ang=i/10*6.283+T*.8,c=EPI.cast.LOUIE?A.LOUIE:a;x=c.x+Math.cos(ang)*20;z=c.z+Math.sin(ang)*16}
+   shadow(x,z,3);drawBud(ty,x,z,Math.atan2(-Math.sin(i/10*6.283+T*.8),Math.cos(i/10*6.283+T*.8)),Math.abs(Math.sin(T*6+i))*3,.75);continue}
+  if(k.startsWith('f:')){const kind=k.split(':')[1],f=FOES[kind];shadow(a.x,a.z,f.r);drawFoe({kind,x:a.x,y:a.z,z:talking?Math.abs(Math.sin(T*9))*2:0,yaw:a.yaw,r:f.r,flash:0,born:0,state:0,hp:1,max:1,mv:a.moving?1:0,t:T});continue}
+  if(k.startsWith('b:')){const ix=+k.slice(2),b=BOSSES[ix];drawFoe({kind:'boss',bossIx:ix,x:a.x,y:a.z,yaw:a.yaw,r:b.r,flash:0,born:0,state:0,hp:b.hp,max:b.hp,mv:a.moving?1:0,t:T,tx:a.x,ty:a.z,lx:a.x,ly:a.z});continue}
+  const who=k==='@'?EPI.K:k,cyc=(t*.8)%1;const o={id:'ep'+EPI.i+k,talk:talking,look:sp&&sp!==a?Math.atan2(sp.x-a.x,sp.z-a.z):undefined,nosit:true};
+  if(!PL.some(p=>p.char===who)&&k!=='@')o.npc=who;
+  if(act==='cheer')o.cheer=cyc*.84;else if(act==='happy')o.happy=true;else if(act==='down')o.down=true;else if(act==='atk'){o.atk=(t*1.4)%1;o.weapon=who==='LOUIE'?null:'blade';o.trail=true}
+  else if(act==='sup')o.sup=Math.min(.99,(t*.7)%1.2);if(who==='LOUIE')o.happy=o.happy||act==='happy';
+  shadow(a.x,a.z,6);drawCast(who,a.x,a.z,a.yaw,o)}
+ frameEnd()}
+const EPPLATE={WILL:'#2a4a8a'};
+function epName(k){if(k==='@')return EPI.K;if(k.startsWith('f:'))return FOES[k.split(':')[1]].n;if(k.startsWith('b:'))return BOSSES[+k.slice(2)].n;return k}
+function epPlate(k){if(k.startsWith('b:'))return '#4a2050';if(k.startsWith('f:'))return '#3a3040';const n=k==='@'?EPI.K:k;return RDCPLATE[n]||EPPLATE[n]||'#181020'}
+function hudEp(){if(!EPI)return;const B=EPI.beats[EPI.b],t=EPI.t,E=EPI.E;r('#000000',0,0,VW,22);r('#000000',0,VH-22,VW,22);
+ if(EPI.b===0&&t<.5)r('rgba(0,0,0,'+(1-t/.5)+')',0,0,VW,VH);
+ if(B.title){const a=clamp(Math.min(t/.4,(B.d-t)/.4),0,1);hx.globalAlpha=a;ctext('EPISODE '+(EPI.i+1),VH*.36,1,'#c8c0d8',null);logoText(E.n,VW/2,VH*.36+14,22);hx.globalAlpha=1}
+ if(B.card){const a=clamp(t/.4,0,1);hx.globalAlpha=a;ctext('KEEPER UNLOCKED',VH*.34,1,'#a8f080','#120a18');logoText(B.card,VW/2,VH*.34+14,30);ctext('CHOOSE '+B.card+' WHEN YOU DESCEND',VH*.34+52,1,'#c8c0d8','#120a18');hx.globalAlpha=1}
+ if(B.txt){const bw=Math.min(350,VW-16),bx=(VW-bw)/2,by=VH-84;panel(bx,by,bw,56,'#f4ead2','#281c30');const nm=epName(B.l[0]),pc=epPlate(B.l[0]),nw=tw(nm,2)+14;
+  r('#181020',bx+6,by-10,nw,17);r(pc,bx+7,by-9,nw-2,15);text(nm,bx+13,by-7,2,'#ffffff',null);
+  let left=Math.floor(t*60);wrapPx(B.txt,bw-22,1).slice(0,3).forEach((l,i)=>{if(left<=0)return;text(l.slice(0,left),bx+11,by+12+i*13,1,'#281c30',null);left-=l.length+1})}
+ rtext(btnName(lead0(),'a')+': NEXT   '+btnName(lead0(),'start')+': SKIP',VW-8,VH-15,1,'#8d84a8',null)}
+/* =====================================================================
    ROOTDEEP 64 — online play
    Built on the artifact page's `room` capability: everyone with the page
    open can find each other. No server of ours, no app store.
@@ -1860,7 +2111,7 @@ function netSend(){if(!NET.rooms.c)return;const q=++NET.seq;
  const c={q,st:state,ow:(PL.find(p=>p.dev===menuDev)||{ix:-1}).ix,sT:r2(stateT),P:PL.map(pRec)};
  if(say2T>0)c.s2=[say2Txt,r2(say2T)];if(joinT>0)c.jm=[joinMsg,r2(joinT)];
  if(state==='hub'||state==='talk')c.N=NPCS.map(w=>{const n=HUBNPC[w];return n?[r1(n.x),r1(n.y),Math.round((n.yaw||0)*57.3),n.mv?1:0,n.act>0?1:0,r1(n.hx)]:[0,0,0,0,0,0]});
- if(state==='cine')c.ci=[rdCineIx,r2(rdCineT)];if(state==='over'||state==='win')c.ov=r2(overT);if(state==='chars')c.dv=r2(diveT);
+ if(state==='cine')c.ci=[rdCineIx,r2(rdCineT)];if(state==='ep'&&EPI)c.ep=[EPI.i,EPI.b,r2(EPI.t),EPI.K];if(state==='over'||state==='win')c.ov=r2(overT);if(state==='chars')c.dv=r2(diveT);
  if(RUN){c.R=[RUN.chamber,RUN.biome,RUN.phase==='doors'?1:RUN.phase==='fight'?0:2,r2(RUN.time),RUN.petals,RUN.dew,RUN.keys,RUN.heat,r2(RUN.zoneT),r2(RUN.flash||0),r2(RUN.freeze||0),RUN.freezeP?RUN.freezeP.ix:-1,RUN.elite?1:0,RUN.wave2?RUN.wave2.length:0,r2(RUN.shake||0)];
   c.E=RUN.enemies.map(eRec);c.O=RUN.obst.map(o=>[r1(o.x),r1(o.y),r1(o.w),r1(o.h),r2(o.s)]);
   c.D=RUN.doors.map(d=>[DKINDS.indexOf(d.kind),GODIDS.indexOf(d.god),r2(d.hold),d.by?d.by.ix:-1,d.boss?1:0,r1(d.x),r1(d.y)]);
@@ -1938,7 +2189,7 @@ function netApplyCore(){const c=NET.core;if(!c||typeof c!=='object')return;
  menuDev=(PL.find(p=>p.ix===c.ow)||{}).dev||null;
  if(c.s2){say2Txt=c.s2[0];say2T=c.s2[1]}if(c.jm){joinMsg=c.jm[0];joinT=c.jm[1]}
  if(c.N)NPCS.forEach((w,i)=>{const a=c.N[i];if(!a)return;const n=HUBNPC[w]||(HUBNPC[w]={x:a[0],y:a[1],route:[],ri:0});n.tx=a[0];n.ty=a[1];n.yaw=a[2]/57.3;n.mv=a[3];n.act=a[4];n.hx=a[5]});
- if(c.ci){rdCineIx=c.ci[0];rdCineT=c.ci[1]}if(c.ov!==undefined)overT=c.ov;if(c.dv!==undefined)diveT=c.dv;
+ if(c.ci){rdCineIx=c.ci[0];rdCineT=c.ci[1]}if(c.ep){if(!EPI||EPI.i!==c.ep[0])EPI=epBuild(c.ep[0],c.ep[3]);EPI.b=Math.min(c.ep[1],EPI.beats.length-1);EPI.t=c.ep[2]}else if(state!=='ep')EPI=null;if(c.ov!==undefined)overT=c.ov;if(c.dv!==undefined)diveT=c.dv;
  if(!c.R){RUN=null;return}
  const R0=c.R;if(!RUN||RUN.chamber!==R0[0])RUN={enemies:[],projs:[],eprojs:[],pickups:[],pods:[],buds:[],texts:[],parts:[],rings:[],bolts:[],zones:[],hazards:[],acts:[],doors:[],obst:[],boons:{atk:null,cast:null,dash:null,pass:[]},subQ:[]};
  Object.assign(RUN,{chamber:R0[0],biome:R0[1],phase:['fight','doors','idle'][R0[2]],time:R0[3],petals:R0[4],dew:R0[5],keys:R0[6],heat:R0[7],zoneT:R0[8],flash:R0[9],freeze:R0[10],elite:!!R0[12],wave2:R0[13]?{length:R0[13]}:null,shake:R0[14]});
@@ -2032,7 +2283,7 @@ function hudNet(){if(!NET.host&&!NET.client)return;
  if(NET.host){const n=new Set(PL.filter(p=>p.dev.net).map(p=>p.dev.peer)).size;text('ONLINE · '+NET.code.toUpperCase()+(n?' · '+n+' FRIEND'+(n>1?'S':''):' · WAITING FOR FRIENDS'),8,VH-14,1,'rgba(168,240,128,.85)','#120a18')}
  else{const age=performance.now()-NET.snapAt,mine=PL.some(p=>p.mine);
   text(NET.core?(age>800?'ONLINE · LAGGING...':'ONLINE · '+NET.code.toUpperCase()):'CONNECTING TO THE HOST...',8,VH-14,1,age>800?'#ff9a8a':'rgba(168,240,128,.85)','#120a18');
-  if(NET.core&&!mine&&state!=='cine')banner('PRESS A TO JOIN THE PARTY',VH*.38);
+  if(NET.core&&!mine&&state!=='cine'&&state!=='ep')banner('PRESS A TO JOIN THE PARTY',VH*.38);
   if(NET.leaveT>0)banner('HOLD TO LEAVE THE ONLINE GAME...',VH*.5)}}
 /* a client leaves by holding Select (keyboard Q / Esc) or the touch START for 1.5 s */
 function netClientLeaveCheck(dt){if(!NET.client)return;let held=false;for(const id in DEV){const d=DEV[id];if(d.cur.sel||(id==='touch'&&d.cur.start))held=true}
@@ -2499,6 +2750,7 @@ function sceneOver(dt){const B=clamp((RD.lastRun&&RD.lastRun.biome)||0,0,2),L=BL
 function drawScene(dt){if(HSTOP>0&&state==='run')dt=0;else if(SLOWT>0&&state==='run')dt*=SLOWK;ADT=(state==='pause'||state==='boon'||state==='shop'||state==='echo'||(state==='set'&&setReturn==='pause'))?0:dt;
  if(state==='title'||state==='menu'||state==='online'||(state==='set'&&setReturn!=='pause'))return sceneTitle(dt);
  if(state==='cine')return sceneCine(dt);
+ if(state==='ep')return sceneEp(dt);
  if(state==='chars')return sceneChars(dt);
  if(RUN&&(state==='run'||state==='pause'||state==='boon'||state==='shop'||state==='set'||state==='echo'))return sceneRun(dt);
  if(state==='over'||state==='win')return sceneOver(dt);
@@ -2958,7 +3210,7 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
  if(state==='keep'){screenShell('KEEPSAKE SHELF','ONE AT A TIME  ·  LEVELS BY USE');
   rowsDraw2(KEEPS.map(k=>{const own=M.keeps[k.id];return{a:(M.keepEq===k.id?'* ':'')+k.n,b:own?'Lv'+keepLv(k.who)+'  ·  '+(M.keepXp[k.who]||0)+'/50':'GIFT '+k.who}}),uiSel,KEEPS[uiSel].d);
   footer(A+': EQUIP / REMOVE    '+Bk+': BACK');return}
- if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 6  ·  '+Bk+': BACK');
+ if(state==='codex'){screenShell('CODEX OF THE DEEP','< > PAGES  ·  '+(codexPage+1)+' / 7  ·  '+Bk+': BACK');
   if(codexPage===0)rowsPlain(['RUNS '+M.stats.runs+'   DEATHS '+M.stats.deaths,'ESCAPES '+M.stats.escapes+'   CHAMBERS CLEARED '+M.stats.chambers,'FOES FELLED '+M.stats.kills+'   BOSSES '+M.stats.bosses,'HEAT NOW '+heatTotal(),'WEAPON: '+WEAPONS[M.weapon].n,'KEEPSAKE: '+(M.keepEq?((KEEPS.find(k=>k.id===M.keepEq)||{}).n):'NONE')],60,17);
   else if(codexPage===1){const seen=Object.keys(FOES).filter(k=>M.seen[k]);const boss=Object.keys(BOSSES).filter(i=>M.seen[BOSSES[i].id]);
    rowsPlain(['FOES MET '+seen.length+' / '+Object.keys(FOES).length].concat(seen.map(k=>FOES[k].n)).concat(['BOSSES MET '+boss.length+' / 3']).concat(boss.map(i=>BOSSES[i].n)),60,15)}
@@ -2967,6 +3219,11 @@ function drawUI(){const M=RD,d=lead0(),A=btnName(d,'a'),Bk=btnName(d,'b');
    const top=clamp(echoSel-6,0,Math.max(0,found.length-13));found.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
     text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext(BIOMES[e.th].n,PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
    if(found.length)footer(A+': READ    < > PAGES    '+Bk+': BACK')}
+  else if(codexPage===6){const L=EPISODES.filter(e=>RD.ep&&RD.ep[e.id]);text('EPISODES  '+L.length+' / '+EPISODES.length,PX+14,54,1,'#ffd94d',null);
+   if(!L.length)wrapPx('Nothing yet. Things happen at home when you come back from the deep. Keep going down.',270,1).forEach((l,i)=>text(l,PX+14,76+i*13,1,'#a89ec2',null));
+   const top=clamp(echoSel-6,0,Math.max(0,L.length-13));L.slice(top,top+13).forEach((e,i)=>{const on=top+i===echoSel,yy=70+i*15;hitbox(PX+8,yy-3,284,14,on,()=>echoSel=top+i);if(on){r('#f8e060',PX+8,yy-3,284,14);r('#281c30',PX+9,yy-2,282,12)}
+    text(e.n,PX+14,yy,1,on?'#ffffff':'#c8c0d8',null);rtext('EP '+(EPISODES.indexOf(e)+1),PX+286,yy,1,on?'#ffd94d':'#6a6284',null)});
+   if(L.length)footer(A+': WATCH AGAIN    < > PAGES    '+Bk+': BACK')}
   else if(codexPage===5){text('THE STORY SO FAR',PX+14,54,1,'#ffd94d',null);storySoFar().forEach((l,i)=>text(l,PX+14,72+i*14,1,l[0]==='*'?'#a8f080':'#c8c0d8',null))}
   else if(codexPage===2)rowsPlain(['DIFFERENT BOONS OFFERED: '+Object.keys(M.boonSeen).length,'','THE GODS:'].concat(GODIDS.map(g=>GODS[g].n+' — '+GODS[g].t)),60,16);
   else{const found=ECHOES.filter(e=>M.echo[e.id]);text('ECHOES FOUND  '+found.length+' / '+ECHOES.length,PX+14,54,1,'#ffd94d',null);
@@ -3044,7 +3301,7 @@ function sceneChars(dt){setLight([.3,.9,.6],[.85,.72,.6],[.52,.44,.48]);setFog('
   mPush();mT(q.x,.5,q.y);mS(11);drawT(MESH.ring,{c:hex(PCOL[p.ix]),a:p.ready?1:.55,unlit:true,glow:p.ready});mPop();
   drawCast(c.id,q.x,q.y,p.ready?0:Math.sin(time*1.1+i)*.45,{id:'cs'+i,nosit:p.ready,scale:1.5,c:un?null:[.16,.14,.22],weapon:un&&c.id!=='LOUIE'?RD.weapon:null,cheer:p.ready?((time*.85+i*.3)%1)*.84:-1,npc:un?null:'MARCUS'})});
  frameEnd()}
-function hudChars(){const n=PL.length,d0=lead0();r('rgba(10,6,16,.82)',0,0,VW,26);ctext('CHOOSE YOUR KEEPER',5,3,'#ffd94d','#403010');
+function hudChars(){const n=PL.length,d0=lead0();r('rgba(10,6,16,.82)',0,0,VW,26);ctext(firstPick()?'CHOOSE YOUR FIRST KEEPER':'CHOOSE YOUR KEEPER',5,3,'#ffd94d','#403010');if(firstPick())ctext('ANY OF THEM. THE OTHERS COME HOME LATER, ONE BY ONE.',30,1,'#a8f080','#120a18');
  const colW=Math.min(150,(VW-12)/Math.max(n,1));
  PL.forEach((p,i)=>{const c=CHARS[p.csel],un=charUnlocked(c.id),q=CSLOT(i),top=project(q.x,40,q.y),ft=project(q.x,-3,q.y);if(!top||!ft)return;const x=top.x;
   ctext('P'+(p.ix+1)+'  ·  '+(p.dev.id.slice(0,2)==='gp'?'PAD':p.dev.label),top.y-16,1,PCOL[p.ix],'#120a18',x);
@@ -3092,6 +3349,7 @@ function drawHudInner(){
  case 'title':case 'menu':hudTitle();return;
  case 'online':hudTitle();drawOnline();return;
  case 'cine':hudCine();return;
+ case 'ep':hudEp();return;
  case 'hub':case 'talk':hudHub();return;
  case 'chars':hudChars();return;
  case 'run':hudRun();return;

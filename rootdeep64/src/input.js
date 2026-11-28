@@ -34,7 +34,7 @@ function touchInit(){const zone=document.getElementById('stickzone'),nub=documen
   const on=e=>{woke();TS.btn[b]=true;TS.latch[b]=true;el.classList.add('on');e.preventDefault()},off=e=>{TS.btn[b]=false;el.classList.remove('on');e.preventDefault()};
   el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false})}
  /* taps on menus: a row picks / chooses, and on talk, notes, intro and end screens any tap goes on */
- const TAPANY=new Set(['title','cine','talk','echo','over','win']),TAPMENU=new Set(['menu','online','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
+ const TAPANY=new Set(['title','cine','ep','talk','echo','over','win']),TAPMENU=new Set(['menu','online','set','mirror','arm','keep','codex','heat','board','sprouts','boon','shop','pause']);
  document.addEventListener('touchstart',e=>{if(e.target.closest&&e.target.closest('.tb'))return;const t=e.changedTouches[0];if(!t)return;
   if(TAPANY.has(state)){woke();TS.latch.a=true;e.preventDefault();e.stopPropagation();return}
   if(!TAPMENU.has(state))return;const rc=stage.getBoundingClientRect(),vx=(t.clientX-rc.left)/rc.width*VW,vy=(t.clientY-rc.top)/rc.height*VH;
