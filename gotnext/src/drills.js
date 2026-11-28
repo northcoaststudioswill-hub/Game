@@ -13,7 +13,7 @@ const FT = [0, 4.6];
 const DRILL_DEFS = [
   { id: 'layups', n: 'Layup Lines', cat: 'F', time: 45, medals: [8, 12, 16], pay: [30, 6], unit: 'pts',
     d: 'Start at a cone, attack the rim, finish. Alternate sides for 45 seconds. Layups 1, dunks 2.',
-    tip: 'Push the skill stick up to attack; push sideways as you go up for a euro step.' },
+    tip: 'Drive at the rim with the stick (RT for speed), then push the skill stick up to finish. From out here, up is a jumper.' },
   { id: 'mikan', n: 'Mikan Drill', cat: 'F', time: 30, medals: [9, 13, 17], pay: [25, 6], unit: 'makes',
     d: 'Left side, right side, under the rim. As many finishes as you can in 30 seconds.', tip: 'Flick up the moment the ball is in your hands.' },
   { id: 'ft', n: 'Free Throws', cat: 'S', shots: 10, medals: [6, 8, 10], pay: [20, 8], unit: 'pts',
@@ -29,7 +29,7 @@ const DRILL_DEFS = [
   { id: 'weave', n: 'Cone Weave', cat: 'P', time: 22, medals: [160, 230, 290], pay: [30, 0.6], unit: 'pts',
     d: 'Dribble through four cones (toward the rim side of the first, away side of the next), then score. A dribble move at a cone is style points.',
     tip: 'Hit a crossover or spin as you pass a cone.' },
-  { id: 'slides', n: 'Defensive Slides', cat: 'D', time: 30, medals: [11, 15, 19], pay: [25, 6], unit: 'touches',
+  { id: 'slides', n: 'Defensive Slides', cat: 'D', time: 30, medals: [8, 11, 14], pay: [25, 6], unit: 'touches',
     d: 'No ball. Slide between the lines for 30 seconds. Sprinting does not count: stay in your stance.', tip: 'Move with the stick, keep the sprint button off.' },
 ];
 const DRILL = {}; DRILL_DEFS.forEach(d => DRILL[d.id] = d);
@@ -145,12 +145,12 @@ const DRILL_RUN = {
     noRepOnMiss(D) { return D.data.phase !== 'finish'; },
   },
   slides: {
-    begin(D) { dLine(-3.2, 4.0, -3.2, 7.0); dLine(3.2, 4.0, 3.2, 7.0); MT.off = 1; D.data.side = 1; D.data.warn = 0; },
+    begin(D) { dLine(-3.2, 4.0, -3.2, 7.0); dLine(3.2, 4.0, 3.2, 7.0); MT.off = 1; D.data.side = 0; D.data.warn = 0; },      /* side 0: the first touch counts on either line */
     rep(D) { if (D.rep === 0) { dPlace(0, 5.5, false); MT.me.faceLock = Math.PI; } },
     step(D, dt) {
       const me = MT.me, d = D.data; me.faceLock = 0 + Math.PI; me.forceAn = me.sprinting ? null : 'slide';
       if (me.sprinting) { d.warn -= dt; if (d.warn <= 0) { floatTxt(me, 'SLIDE, DON\'T RUN', '#ff8a3c'); d.warn = 1.2; } d.cheat = true; }
-      if (d.side > 0 ? me.x >= 3.05 : me.x <= -3.05) { if (d.cheat) { d.cheat = false; floatTxt(me, 'NO COUNT', '#ff8a3c'); } else { D.score++; floatTxt(me, '+1', '#3dffa0'); sfx('ui'); } d.side = -d.side; }
+      const hit = me.x >= 3.05 && d.side >= 0 ? 1 : me.x <= -3.05 && d.side <= 0 ? -1 : 0; if (hit) { if (d.cheat) { d.cheat = false; floatTxt(me, 'NO COUNT', '#ff8a3c'); } else { D.score++; floatTxt(me, '+1', '#3dffa0'); sfx('ui'); } d.side = -hit; }
     },
   },
 };
@@ -198,8 +198,9 @@ function drillEnd(res, back) {
   const k = dayKey(); if (rec.day !== k) { rec.day = k; rec.today = 0; } rec.today++; rec.runs++;
   const medal = d.medals.filter(m => score >= m).length, newBest = score > rec.best, notes = [];
   // repeats of the same drill on the same day pay less after the third
-  const rpt = [1, 1, 1, 0.75, 0.5, 0.35][Math.min(5, rec.today - 1)];
-  let vc = Math.round((d.pay[0] + score * d.pay[1]) * rpt * (evOn('grind') ? 1.5 : 1) * (1 + cribFx('vc')));
+  const rpt = [1, 1, 1, 0.6, 0.35, 0.15, 0][Math.min(6, rec.today - 1)];      /* after six runs of one drill in a day it pays nothing */
+  // the base is for a real attempt (half of bronze), and points past gold pay nothing: 21 greens in a row paid 840 HC a minute, games pay ~130
+  let vc = Math.round(((score >= d.medals[0] / 2 ? d.pay[0] : 0) + Math.min(score, d.medals[2]) * d.pay[1]) * rpt * (evOn('grind') ? 1.5 : 1) * (1 + cribFx('vc')));
   let rep = Math.round(score * 0.6 + medal * 6);
   if (rpt < 1) notes.push(`Run ${rec.today} of this drill today: ${Math.round(rpt * 100)}% pay`); if (evOn('grind')) notes.push('GRIND DAY +50%');
   if (medal > rec.medal) { const bonus = [0, 100, 250, 600][medal], rb = [0, 20, 50, 120][medal]; vc += bonus; rep += rb; notes.push(['', 'BRONZE', 'SILVER', 'GOLD'][medal] + ` medal: +${bonus} HC, +${rb} Respect`); lifeAdd('medals', medal - rec.medal); if (medal === 3) lifeAdd('drillGolds'); rec.medal = medal; }
@@ -218,7 +219,7 @@ function uiDrills(back, tab0) {
   if (back === 'hub' && !S.coachMet) { S.coachMet = 1; save(); }      /* you found him: the first-day goal moves on */
   daily(); let tab = tab0 || 'drills';
   openPanel(() => {
-    const ev = todayEvent();
+    const ev = todayEvent(); if (back !== 'crib') { if (tab === 'how' && !S.tutRead) { S.tutRead = 1; save(); } lessonCheck(); }      /* pay out before the header prints the HC (it showed the old number) */
     let h = `<div class="ph"><h2>${back === 'crib' ? 'HOME DRILLS' : 'COACH\'S BOARD'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
     if (back !== 'crib') { h += `<div class="tabs">` + [['drills', 'DRILLS'], ['how', 'HOW IT WORKS'], ['plan', 'LESSON PLAN']].map(([k, n]) => Btn(n, () => { tab = k; rerender(); }, tab === k ? 'sel' : '')).join('') + `</div>`; lessonCheck(); if (tab === 'how') return h + howTab(back) + `</div>`; if (tab === 'plan') return h + lessonTab() + `</div>`; }
     h += `<div class="card sel"><h3 class="ye">TODAY · ${ev.n}</h3><p>${ev.d}</p></div>`;

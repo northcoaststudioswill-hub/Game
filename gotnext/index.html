@@ -2934,7 +2934,7 @@ function scorePts(p, pts, how) {
   if (how !== 'dunk' && M_.B.shooter === p && M_.B.clockAt !== undefined && M_.B.clockAt < 1.6 && !M_.practice && !M_.drill) { highlight('buzzer', p); lateCall(0.9, 'BUZZER BEATER', p.b.name + ' beat the clock', '#ffc531'); M_.B.clockAt = undefined; }
   { const R = M_.runS || (M_.runS = { team: -1, n: 0, pts: 0 });      // unanswered buckets: three in a row is a run
     if (R.team === p.team) { R.n++; R.pts += pts; } else { if (R.n >= 3) lateCall(1.5, 'RUN OVER', p.b.name + ' stops the bleeding', '#7de3ff'); R.team = p.team; R.n = 1; R.pts = pts; }
-    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', (M_.me && p.team === M_.me.team ? 'Your team · ' : 'Them · ') + `${R.pts}–0`, M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, M_.me && p.team === M_.me.team ? 'Your team' : 'Them', M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); }
+    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', (M_.me && p.team === M_.me.team ? 'Your team · ' : 'Them · ') + `${R.pts}–0`, M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && !M_.practice && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, M_.me && p.team === M_.me.team ? 'Your team' : 'Them', M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); }
   for (const o of M_.P) if (o.team !== p.team) { o.hot = 0; if (o.fire) { o.fire = false; } }
   if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { p.pointAt = M_.B.assist; p.pointT = 1.6; M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
   if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfxM('fire'); }
@@ -3058,7 +3058,7 @@ function releaseShot(p) {
   // nearly every time). Off the window it is the plain odds for the look, never better than a fair release.
   const autoT = p.user && s.auto; if (autoT) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');
   // perfect timing beats an open look every time; a hand in the face still costs a good release (smothered, about two in three)
-  if (green) prob = (c < 0.12 ? 1 : Math.max(0.18, 1 - (c - 0.12) * 1.6)) * (d > 7.6 ? Math.max(0.3, 1 - (d - 7.6) * 0.12) : 1); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.82) * (e < w * 2.2 ? 1.12 : 1);
+  if (green) prob = (c < 0.12 ? 1 : Math.max(0.45, 1 - (c - 0.12) * 0.9))      /* a perfect release smothered goes in about half the time (it was 18%: perfect timing read as a miss) */  * (d > 7.6 ? Math.max(0.3, 1 - (d - 7.6) * 0.12) : 1); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.82) * (e < w * 2.2 ? 1.12 : 1);
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
@@ -3067,8 +3067,9 @@ function releaseShot(p) {
   }
   B.foulBy = null;
   if (!MT.arcade && !MT.practice) for (const o of MT.P) {
-    if (o.team === p.team || o.st !== 'jump') continue; const dd = dist(o, p); if (dd > 0.78) continue;
-    const fch = clamp(0.3 + (o.lunge ? 0.22 : 0) + (0.78 - dd) * 0.6 - nAtt(o, 'perd') * 0.25 - 0.05 * bt(o, 'ground') - 0.07 * bt(o, 'hardhat'), 0.04, 0.75);
+    if (o.team === p.team || o.st !== 'jump') continue; const dd = dist(o, p); if (dd > 0.62) continue;
+    const fly = Math.hypot(o.vx || 0, o.vz || 0) > 1.6 ? 0.14 : 0;      /* straight up is legal; flying into him is the foul */
+    const fch = clamp(0.06 + fly + (o.lunge ? 0.2 : 0) + (0.62 - dd) * 0.5 - nAtt(o, 'perd') * 0.25 - 0.05 * bt(o, 'ground') - 0.07 * bt(o, 'hardhat'), 0.02, 0.45);
     if (Math.random() < fch) { B.foulBy = o; break; }
   }
   { const u = MT.me; if (u && u.team !== p.team && !p.user && c >= 0.4 && dist(u, p) < 2.2 && (u.st === 'jump' || u.handsUp)) floatTxt(u, c >= 0.6 ? 'SMOTHERED' : 'GOOD CONTEST', c >= 0.6 ? '#33e0ff' : '#9fe6ff'); }      /* your defense, said out loud */
@@ -5134,7 +5135,7 @@ function buildHub() {
   mural('WHO GOT\nNEXT', 8.5, 4.6, ['#141418', '#ff2d78', '#a78bff', '#ece9e2', '#08080a'], 12, 3.1, 19.05, Math.PI);
   M(box(2.6, 0.04, 3.4), flat(0x050506), -6.4, 0.03, 10.2, scene); for (const [rx, rz, rw, rd] of [[-7.75, 10.2, 0.1, 3.4], [-5.05, 10.2, 0.1, 3.4], [-6.4, 11.9, 2.8, 0.1]]) ink(M(box(rw, 1.0, rd), toon('#3dffa0'), rx, 0.5, rz, scene), 1.06); solid(-7.85, -4.95, 8.45, 12.0);      /* the subway stairwell rail is solid (legs sank into it: the bot called it the green dumpster) */ for (let i = 0; i < 5; i++) M(box(2.5, 0.05, 0.3), toon('#3a3c44'), -6.4, -0.02 - i * 0.02, 9.0 + i * 0.5, scene);
   fadeable(M(cyl(0.06, 0.06, 3.2, 6), toon('#1c1d22'), -7.75, 1.6, 8.5, scene), -7.75, 8.5); const sb = sign('UPTOWN LINE', 2.4, 0.5, '#3dffa0', '#0a0a0e'); sb.position.set(-6.6, 3.0, 8.5); scene.add(sb); for (let i = 0; i < 5; i++) M(box(0.06, 1.4, 0.06), toon('#6a707c'), -7.4 + i * 0.5, 0.7, 8.55, scene); M(box(2.4, 0.06, 0.06), toon('#6a707c'), -6.4, 0.9, 8.55, scene); solid(-8, -4.8, 8.4, 12.2);
-  spot(-6.4, 7.6, 1.8, 'UPTOWN LINE', () => uiDialog('UPTOWN LINE', 'Gate is chained. A sticker on it says: MORE CITY SOON. Somebody wrote "that\'s what they said in 2139" under it.', [['Aight.', null]]));
+  spot(-6.6, 8.0, 1.0, 'UPTOWN LINE', () => uiDialog('UPTOWN LINE', 'Gate is chained. A sticker on it says: MORE CITY SOON. Somebody wrote "that\'s what they said in 2139" under it.', [['Aight.', null]])); W.spots[W.spots.length - 1].low = true;      /* a flavour gate: anything real nearby (Coach) wins the prompt */
   // (the NO REFS and KINGS STAY murals that hung across the two alleys are gone: the alleys are open)
   blockDress();
   for (let i = 0; i < 2; i++) { poster(scene, -15.42, 2.1, -10.9 + i * 1.55, Math.PI / 2, i % 2); poster(scene, 15.42, 2.1, 10.2 + i * 1.55 * -1, -Math.PI / 2, (i + 1) % 2); poster(scene, -15.42, 2.1, 10.9 - i * 1.55, Math.PI / 2, (i + 1) % 2); }
@@ -5669,16 +5670,18 @@ function kaelBuild() {
   return b;
 }
 function uiKael() {
-  const today = dayKey(), worked = S.kaelWork === today, beat = !!S.kaelBeat;
-  uiDialog('BRENNICK · 88 OVR', pick(CAST_LINES.kael), [
-    [beat ? 'RUN ONES (rematch)' : 'RUN ONES', () => runKael()],
+  const today = dayKey(), worked = S.kaelWork === today, beat = !!S.kaelBeat, need = TIERS_COURT[2], locked = !beat && rankOf(S.rep) < need.rank;      /* he runs Ones on THE CAGE court: not before you are rated for it (a rookie walked into an 88 and lost 0-7) */
+  const ones = locked ? ['RUN ONES · reach ' + RANKS[need.rank].n.toUpperCase() + ' first', null, 'alt', true] : [beat ? 'RUN ONES (rematch)' : 'RUN ONES', () => runKael()];
+  uiDialog('BRENNICK · 88 OVR', locked ? '"You\'re ' + RANKS[rankOf(S.rep)].n + '. I run Ones in The Cage. Come back ' + RANKS[need.rank].n + '. Till then: early work."' : pick(CAST_LINES.kael), [
+    ...(locked ? [] : [ones]),
     [worked ? 'EARLY WORK: DONE TODAY' : 'EARLY WORK', () => { const cats = ['F', 'S', 'P', 'D'], c = pick(cats); S.kaelWork = today; S.bxp[c] += 40; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; toast('SMARTS POINT', '+1 ' + CATS[c][0]); } save(); uiClose(); sfx('unlock'); toast('BRENNICK', '"Listen." +40 ' + CATS[c][0] + ' smarts XP'); }, '', worked],
+    ...(locked ? [ones] : []),
     ['Later'],
   ]);
 }
 function runKael() {
   uiClose(); const tier = TIERS_COURT[2], b = kaelBuild(), first = !S.kaelBeat;
-  const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: 77, firstOff: 0 };
+  const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: [], ball: S.worn.ball, seed: 77, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) { setTimeout(() => toast('BRENNICK', '"' + pick(CAST_LINES.kaelLose) + '"'), 1600); return null; }
     if (first) { S.kaelBeat = true; deedDrip('bk_washer', 'Beat Brennick'); const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
     return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 HC' : 'Beat Brennick again +150 HC' }; };
@@ -6249,7 +6252,7 @@ function guideInit() {
 function guideStep(dt) {
   const G = W.guide; if (!G) return; const n = G.n, me = W.me; G.t += dt; let moving = false, wave = false; const dm = Math.hypot(me.x - n.x, me.z - n.z);
   if (G.st === 'greet') { n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.15); wave = true;
-    if (G.t > 1.0 && !UI.cur) { G.st = 'asked'; uiDialog('WALK-ON', 'First day? I\'m Walk-On. I carry the cones. Coach Overtime is right over there and he teaches everything: come on, I\'ll take you.', [['Show me', () => { uiClose(); G.st = 'lead'; G.t = 0; toast('FOLLOW WALK-ON', 'He is taking you to Coach Overtime.'); }], ['I know my way around', () => { uiClose(); S.tut = 1; save(); G.st = 'lead'; G.quiet = true; }, 'alt']]); } }
+    if (G.t > 1.0 && !UI.cur) { G.st = 'asked'; uiDialog('WALK-ON', 'First day? I\'m Walk-On. I carry the cones. Coach Overtime is right over there and he teaches everything: come on, I\'ll take you.', [['Show me', () => { uiClose(); S.tut = 1; save(); G.st = 'lead'; G.t = 0; toast('FOLLOW WALK-ON', 'He is taking you to Coach Overtime.'); }], ['I know my way around', () => { uiClose(); S.tut = 1; save(); G.st = 'lead'; G.quiet = true; }, 'alt']]); } }
   else if (G.st === 'lead') { const tx = -1.7, tz = 5.9, dx = tx - n.x, dz = tz - n.z, l = Math.hypot(dx, dz);
     if (l < 0.35) { G.st = G.quiet ? 'rest' : 'arrive'; G.t = 0; n.face = Math.PI * 0.8; }
     else if (!G.quiet && dm > 5.5) { n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.12); wave = true; }      /* waits for you */
@@ -6996,7 +6999,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
 function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
 function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
-function openPanel(render, cls, onBack) { UI.openN = UI.stepN || 0; UI.openT = performance.now(); UI.lockMs = 450; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
+function openPanel(render, cls, onBack) { UI.openN = UI.stepN || 0; UI.openT = performance.now(); UI.lockMs = 200; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
   // a controller starts on the panel's main action (RESUME, PLAY…), else on the first thing that is not a tab or the close button
   const f = focusables(); let i = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')); if (i < 0) i = f.findIndex(e => e.closest('.pf')); if (i < 0) i = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, i); paintFocus(); }
 function rerender(reset) {
@@ -7007,15 +7010,24 @@ function rerender(reset) {
 function uiClose() { if (UI.cur && UI.cur.onClose) { const f = UI.cur.onClose; UI.cur.onClose = null; f(); } UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
 function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],input[type=text],select,.card[data-k],.sw[data-k],span[data-k]:not([data-k=""])')).filter(e => e.offsetParent !== null); }
-// controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
+// controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list).
+// Things in the same row (or column) always win over things off it: a wide key next to a short one used to lose to a
+// key on the row below (RIGHT from DONE landed on N). The pinned footer button (RUN IT, HIT THE BLOCK) is the end of the
+// page: DOWN reaches it only when nothing else is below, UP leaves it for the page, and nothing wraps round to the top.
 function navDir(f, from, m) {
-  const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2; let best = -1, bs = 1e9;
+  const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2;
+  const curPf = !!cur.closest('.pf'), horiz = m === 'L' || m === 'R'; let bestA = -1, sA = 1e9, bestO = -1, sO = 1e9;
   f.forEach((el, i) => { if (i === from) return; const r = el.getBoundingClientRect(); if (!r.width) return;
-    const dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy, horiz = m === 'L' || m === 'R';
+    if (!!el.closest('.pf') !== curPf) return;      /* the footer and the page are two lists; the fallbacks below join them */
+    const dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy;
     const main = m === 'R' ? dx : m === 'L' ? -dx : m === 'D' ? dy : -dy; if (main <= 6) return;
-    const over = horiz ? Math.max(0, Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top)) : Math.max(0, Math.min(a.right, r.right) - Math.max(a.left, r.left));
-    const cross = horiz ? Math.abs(dy) : Math.abs(dx), s = main + (over > 0 ? 0 : cross * 2.2); if (s < bs) { bs = s; best = i; } });
-  if (best < 0 && (m === 'U' || m === 'D')) best = (from + (m === 'D' ? 1 : -1) + f.length) % f.length;      /* nothing that way: step through the list */
+    const over = horiz ? Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top) : Math.min(a.right, r.right) - Math.max(a.left, r.left);
+    const cross = horiz ? Math.abs(dy) : Math.abs(dx);
+    if (over > Math.min(a.height, r.height, a.width, r.width) * 0.3 || over > 8) { const sc = main + cross * 0.3; if (sc < sA) { sA = sc; bestA = i; } }
+    else { const sc = main + cross * 2.2; if (sc < sO) { sO = sc; bestO = i; } } });
+  let best = bestA >= 0 ? bestA : bestO;
+  if (best < 0 && m === 'D' && !curPf) best = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')), best = best < 0 ? f.findIndex(e => e.closest('.pf')) : best;      /* the bottom of the page: on to the footer */
+  if (best < 0 && m === 'U' && curPf) { let lo = -1, ly = -1e9; f.forEach((el, i) => { if (el.closest('.pf')) return; const r = el.getBoundingClientRect(); if (r.width && r.bottom <= a.top + 2 && r.top > ly) { ly = r.top; lo = i; } }); best = lo; }      /* off the footer: the lowest thing on the page above it */
   return best < 0 ? from : best;
 }
 // LB / RB flip through the tabs at the top of a menu
@@ -7062,10 +7074,11 @@ function uiStep(dt) {
     else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
   if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
-  if (I.aP && UI.cur && performance.now() - (UI.openT || 0) < (UI.lockMs || 450)) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results) */
+  if (I.aP && UI.cur && ((UI.stepN || 0) - (UI.openN || 0)) / 60 < (UI.lockMs || 200) / 1000) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results). Counted in frames, not wall time: on a slow machine a deliberate press was eaten */
   if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') { if (e.dataset.padkb && I_PAD()) e.dispatchEvent(new CustomEvent('padkb', { bubbles: true })); else e.focus(); } else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
   if (I.back && UI.cur) { uiBack(); I.back = false; }
   else if (I.start && UI.cur && $('panel').querySelector('.kbdone')) { $('panel').querySelector('.kbdone').click(); I.start = false; }      /* typing a name: START is done */
+  else if (I.start && UI.cur && $('panel').querySelector('[data-start] .btn:not(.alt)')) { $('panel').querySelector('[data-start] .btn:not(.alt)').click(); I.start = false; }      /* START is the screen's main action (HIT THE BLOCK) */
   else if (I.start && UI.cur && UI.cur.startCloses && (UI.stepN || 0) - (UI.openN || 0) > 6) { uiBack(); I.start = false; }      /* START opened it, START closes it (on a pad only B did) */
 }
 
@@ -7123,12 +7136,12 @@ function keysHint(force) {
   let ctx = 'world', t = '';
   if (MT && MT.me && !MT.replay) { const me = MT.me, B = MT.B; ctx = MT.phase !== 'live' ? 'dead' : B.holder === me ? 'ball' : MT.off === me.team && B.state !== 'loose' ? 'off' : B.state === 'loose' ? 'loose' : 'def'; if (MT.arcade && ctx === 'def') ctx = 'defR'; }
   const key = ctx + (pad ? 'p' : 'k'); if (!force && el._k === key) return; el._k = key;
-  const P = pad ? { mv: 'LEFT STICK', spr: kk('RT'), shoot: KC.X, pass: KC.A, steal: KC.A + KC.X, block: KC.Y, moves: 'RIGHT STICK', lt: kk('LT'), lb: kk('LB'), menu: kk('START'), look: 'RIGHT STICK', act: KC.A }
+  const P = pad ? { mv: 'LEFT STICK', spr: kk('RT'), shoot: KC.X, pass: KC.A, steal: KC.X, block: KC.Y, moves: 'RIGHT STICK', lt: kk('LT'), lb: kk('LB'), menu: kk('START'), look: 'RIGHT STICK', act: KC.A }
     : { mv: kk('WASD'), spr: kk('SHIFT'), shoot: kk('SPACE'), pass: kk('E'), steal: kk('E'), block: kk('SPACE'), moves: kk('IJKL'), lt: kk('Q'), lb: kk('R'), menu: kk('P'), look: kk('J') + kk('L'), act: kk('E') };
   const g = (b, w) => `<span>${b} ${w}</span>`;
   if (ctx === 'world') t = [g(P.mv, 'move'), g(P.spr, 'run'), g(P.act, 'talk / use'), g(P.look, 'look'), g(P.menu, 'my player')].join('');
   else if (ctx === 'ball') t = [g(P.shoot, 'shoot: hold, let go at the top'), MT && MT.cfg.lot ? g(P.pass, 'put it down (back to the Block)') : g(P.pass, pad ? 'pass (aim with the stick)' : 'pass (aim with WASD)'), g(P.spr, 'turbo'), g(P.moves, 'moves · ↙↘ step-back · roll it: spin'), g(P.lt, 'post up'), MT && MT.cfg.lot ? '' : g(P.lb, 'call a screen')].join('');
-  else if (ctx === 'off') t = [g(P.pass, 'call for it'), g(P.shoot, 'jump'), g(P.moves, 'cut'), g(P.lb, 'set a screen'), g(P.lt, 'box out'), g(P.spr, 'sprint')].join('');
+  else if (ctx === 'off') t = [g(P.pass, 'call for it'), g(P.block, 'jump'), g(P.moves, 'cut'), g(P.lb, 'set a screen'), g(P.lt, 'box out'), g(P.spr, 'sprint')].join('');
   else if (ctx === 'def' || ctx === 'defR') t = [g(P.steal, ctx === 'defR' ? 'shove (hold LT: punch)' : 'steal'), g(P.block, 'jump / contest'), pad ? g(P.moves, '↑ both hands · ↖↗ one hand · ↙↘ low') : '', g(P.lt, 'body up'), g(P.lb, 'switch'), g(P.spr, 'sprint')].join('');
   else if (ctx === 'loose') t = [g(P.mv, 'get to it'), g(P.steal, 'dive'), g(P.block, 'jump for it')].join('');
   else t = [g(P.menu, 'pause')].join('');
@@ -7171,17 +7184,20 @@ function uiBuilder(opts) {
     h += `<div class="cat">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}" data-padkb="1">`;
     if (T.kb) {      // a controller has no keys: letters on the screen, picked with the stick and A
       const add = c => () => { if ((T.name || '').length < 12) T.name = (T.name || '') + c; sfx('ui'); rerender(); };
-      h += `<div class="card padkb" style="display:flex;flex-wrap:wrap;gap:4px">` + Btn('DONE ✓ (START)', () => { T.kb = false; rerender(); }, 'sm kbdone') + Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt') + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => Btn(c, add(c), 'sm alt')).join('') + Btn('SPACE', add(' '), 'sm alt') + ((T.name || '').trim() ? '' : Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt')) + `</div>`; }      /* DONE and DELETE first (easy to reach), RANDOM only while the name is empty (it overwrote a typed one) */
+      const cell = (html, span) => `<div style="grid-column:span ${span || 1};display:grid">${html}</div>`;
+      h += `<div class="card padkb" style="display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px">` + cell(Btn('DONE ✓ (START)', () => { T.kb = false; rerender(); }, 'sm kbdone'), 3) + cell(Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt'), 3) + cell(Btn('SPACE', add(' '), 'sm alt'), 2)
+        + cell(Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt', !!(T.name || '').trim()), 2)
+        + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => cell(Btn(c, add(c), 'sm alt'))).join('') + `</div>`; }      /* a fixed 10-wide grid: rows and columns stay put while you type (RANDOM greys out instead of vanishing and shifting the keys), so the d-pad moves like a keyboard */      /* DONE and DELETE first (easy to reach), RANDOM only while the name is empty (it overwrote a typed one) */
     h += `<div class="cat">PLAYSTYLE <span class="mu" style="text-transform:none;letter-spacing:.02em">— sets what you can become</span></div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === T.build.style ? 'sel' : ''}" data-k="${on(() => { T.build.style = s.id; sfx('ui'); rig(); rerender(); })}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">ORIGIN <span class="mu" style="text-transform:none;letter-spacing:.02em">— where 2145 America grew you</span></div><div class="grid">` + ORIGINS.map(o => `<div class="card ${o.id === T.build.origin ? 'sel' : ''}" data-k="${on(() => { T.build.origin = o.id; sfx('ui'); rerender(); })}"><h3>${o.n}</h3><p>${o.d}</p><p class="buff">${o.perk}</p></div>`).join('') + `</div>`;
-    h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. You can wear three; more at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
+    h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. Pick one now; two more slots open at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
     h += `<div class="cat">BODY <span class="mu" style="text-transform:none;letter-spacing:.02em">— every inch moves your caps</span></div><div class="card"><div id="bodyLbl" style="display:none"></div>`;
     h += `<label class="sl">HEIGHT <b id="lh">${fmtH(T.build.body.h)}</b></label><input type="range" min="${H_MIN}" max="${H_MAX}" step="1" value="${T.build.body.h}" data-k="${on(el => { T.build.body.h = +el.value; $('lh').textContent = fmtH(T.build.body.h); upd(); })}">`;
     h += `<label class="sl">WEIGHT <b id="lw">${lbs()} lbs</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.w * 10)}" data-k="${on(el => { T.build.body.w = el.value / 10; upd(); })}">`;
     h += `<label class="sl">WINGSPAN <b id="ls">${fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5))}</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.s * 10)}" data-k="${on(el => { T.build.body.s = el.value / 10; upd(); })}"></div>`;
     h += `<div class="cat">LOOK</div><div class="card">` + SKINS.map((c, i) => `<span class="sw ${i === T.build.skin ? 'sel' : ''}" style="background:${c}" data-k="${on(() => { T.build.skin = i; rig(); rerender(); })}"></span>`).join('') + `<div style="margin-top:8px">` + DRIP.filter(d => d.slot === 'hair' && d.src === 'start').map(d => Btn(d.n, () => { T.hair = d.id; rig(); rerender(); }, 'sm ' + (T.hair === d.id ? '' : 'alt'))).join(' ') + `</div></div>`;
     h += `<div class="cat">ATTRIBUTE CAPS <span class="mu" style="text-transform:none;letter-spacing:.02em">— ${st.n}, max potential</span></div><div class="card" id="capbox">${capBars(T.build)}</div>`;
-    h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
+    h += `</div><div class="pf" data-start="1">${Btn('HIT THE BLOCK <small style="opacity:.7">(START)</small>', () => {
       if (!(($('bname').value || T.name || '').trim()) && !T.warned && I_PAD()) { T.warned = true; T.kb = true; toast('NAME YOUR PLAYER', 'Or press HIT THE BLOCK again to go as ROOKIE.'); rerender(); if (!T.kb) $('bname').focus(); return; }      /* no more accidental "Nobody" */
       const nm = (($('bname').value || T.name || '')).trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();
@@ -7912,7 +7928,7 @@ const FT = [0, 4.6];
 const DRILL_DEFS = [
   { id: 'layups', n: 'Layup Lines', cat: 'F', time: 45, medals: [8, 12, 16], pay: [30, 6], unit: 'pts',
     d: 'Start at a cone, attack the rim, finish. Alternate sides for 45 seconds. Layups 1, dunks 2.',
-    tip: 'Push the skill stick up to attack; push sideways as you go up for a euro step.' },
+    tip: 'Drive at the rim with the stick (RT for speed), then push the skill stick up to finish. From out here, up is a jumper.' },
   { id: 'mikan', n: 'Mikan Drill', cat: 'F', time: 30, medals: [9, 13, 17], pay: [25, 6], unit: 'makes',
     d: 'Left side, right side, under the rim. As many finishes as you can in 30 seconds.', tip: 'Flick up the moment the ball is in your hands.' },
   { id: 'ft', n: 'Free Throws', cat: 'S', shots: 10, medals: [6, 8, 10], pay: [20, 8], unit: 'pts',
@@ -7928,7 +7944,7 @@ const DRILL_DEFS = [
   { id: 'weave', n: 'Cone Weave', cat: 'P', time: 22, medals: [160, 230, 290], pay: [30, 0.6], unit: 'pts',
     d: 'Dribble through four cones (toward the rim side of the first, away side of the next), then score. A dribble move at a cone is style points.',
     tip: 'Hit a crossover or spin as you pass a cone.' },
-  { id: 'slides', n: 'Defensive Slides', cat: 'D', time: 30, medals: [11, 15, 19], pay: [25, 6], unit: 'touches',
+  { id: 'slides', n: 'Defensive Slides', cat: 'D', time: 30, medals: [8, 11, 14], pay: [25, 6], unit: 'touches',
     d: 'No ball. Slide between the lines for 30 seconds. Sprinting does not count: stay in your stance.', tip: 'Move with the stick, keep the sprint button off.' },
 ];
 const DRILL = {}; DRILL_DEFS.forEach(d => DRILL[d.id] = d);
@@ -8044,12 +8060,12 @@ const DRILL_RUN = {
     noRepOnMiss(D) { return D.data.phase !== 'finish'; },
   },
   slides: {
-    begin(D) { dLine(-3.2, 4.0, -3.2, 7.0); dLine(3.2, 4.0, 3.2, 7.0); MT.off = 1; D.data.side = 1; D.data.warn = 0; },
+    begin(D) { dLine(-3.2, 4.0, -3.2, 7.0); dLine(3.2, 4.0, 3.2, 7.0); MT.off = 1; D.data.side = 0; D.data.warn = 0; },      /* side 0: the first touch counts on either line */
     rep(D) { if (D.rep === 0) { dPlace(0, 5.5, false); MT.me.faceLock = Math.PI; } },
     step(D, dt) {
       const me = MT.me, d = D.data; me.faceLock = 0 + Math.PI; me.forceAn = me.sprinting ? null : 'slide';
       if (me.sprinting) { d.warn -= dt; if (d.warn <= 0) { floatTxt(me, 'SLIDE, DON\'T RUN', '#ff8a3c'); d.warn = 1.2; } d.cheat = true; }
-      if (d.side > 0 ? me.x >= 3.05 : me.x <= -3.05) { if (d.cheat) { d.cheat = false; floatTxt(me, 'NO COUNT', '#ff8a3c'); } else { D.score++; floatTxt(me, '+1', '#3dffa0'); sfx('ui'); } d.side = -d.side; }
+      const hit = me.x >= 3.05 && d.side >= 0 ? 1 : me.x <= -3.05 && d.side <= 0 ? -1 : 0; if (hit) { if (d.cheat) { d.cheat = false; floatTxt(me, 'NO COUNT', '#ff8a3c'); } else { D.score++; floatTxt(me, '+1', '#3dffa0'); sfx('ui'); } d.side = -hit; }
     },
   },
 };
@@ -8097,8 +8113,9 @@ function drillEnd(res, back) {
   const k = dayKey(); if (rec.day !== k) { rec.day = k; rec.today = 0; } rec.today++; rec.runs++;
   const medal = d.medals.filter(m => score >= m).length, newBest = score > rec.best, notes = [];
   // repeats of the same drill on the same day pay less after the third
-  const rpt = [1, 1, 1, 0.75, 0.5, 0.35][Math.min(5, rec.today - 1)];
-  let vc = Math.round((d.pay[0] + score * d.pay[1]) * rpt * (evOn('grind') ? 1.5 : 1) * (1 + cribFx('vc')));
+  const rpt = [1, 1, 1, 0.6, 0.35, 0.15, 0][Math.min(6, rec.today - 1)];      /* after six runs of one drill in a day it pays nothing */
+  // the base is for a real attempt (half of bronze), and points past gold pay nothing: 21 greens in a row paid 840 HC a minute, games pay ~130
+  let vc = Math.round(((score >= d.medals[0] / 2 ? d.pay[0] : 0) + Math.min(score, d.medals[2]) * d.pay[1]) * rpt * (evOn('grind') ? 1.5 : 1) * (1 + cribFx('vc')));
   let rep = Math.round(score * 0.6 + medal * 6);
   if (rpt < 1) notes.push(`Run ${rec.today} of this drill today: ${Math.round(rpt * 100)}% pay`); if (evOn('grind')) notes.push('GRIND DAY +50%');
   if (medal > rec.medal) { const bonus = [0, 100, 250, 600][medal], rb = [0, 20, 50, 120][medal]; vc += bonus; rep += rb; notes.push(['', 'BRONZE', 'SILVER', 'GOLD'][medal] + ` medal: +${bonus} HC, +${rb} Respect`); lifeAdd('medals', medal - rec.medal); if (medal === 3) lifeAdd('drillGolds'); rec.medal = medal; }
@@ -8117,7 +8134,7 @@ function uiDrills(back, tab0) {
   if (back === 'hub' && !S.coachMet) { S.coachMet = 1; save(); }      /* you found him: the first-day goal moves on */
   daily(); let tab = tab0 || 'drills';
   openPanel(() => {
-    const ev = todayEvent();
+    const ev = todayEvent(); if (back !== 'crib') { if (tab === 'how' && !S.tutRead) { S.tutRead = 1; save(); } lessonCheck(); }      /* pay out before the header prints the HC (it showed the old number) */
     let h = `<div class="ph"><h2>${back === 'crib' ? 'HOME DRILLS' : 'COACH\'S BOARD'}</h2>${vcLine()}${Btn('✕', uiClose, 'alt sm')}</div><div class="pb">`;
     if (back !== 'crib') { h += `<div class="tabs">` + [['drills', 'DRILLS'], ['how', 'HOW IT WORKS'], ['plan', 'LESSON PLAN']].map(([k, n]) => Btn(n, () => { tab = k; rerender(); }, tab === k ? 'sel' : '')).join('') + `</div>`; lessonCheck(); if (tab === 'how') return h + howTab(back) + `</div>`; if (tab === 'plan') return h + lessonTab() + `</div>`; }
     h += `<div class="card sel"><h3 class="ye">TODAY · ${ev.n}</h3><p>${ev.d}</p></div>`;

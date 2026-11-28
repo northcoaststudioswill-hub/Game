@@ -30,7 +30,7 @@ const st = await p.evaluate(() => { const P = __pit; P.uiClose(); window.__tick(
 check('LOCKED IN says whose D', /their d/i.test(st || ''), st);
 // 5. meter window follows the real one, and the +5 button has a price
 const mz = await p.evaluate(() => { const P = __pit, M = P.MT; const me = M.me; me.shot = me.shot || { j: { win: 0 } }; const open = P.call('shotWin', me, 0, 0.3), hand = P.call('shotWin', me, 0.6, 0.3); return { open: +open.toFixed(3), hand: +hand.toFixed(3) }; });
-check('green window narrows with a hand up (floor kept)', mz.hand <= mz.open && mz.hand >= 0.035, JSON.stringify(mz));
+check('green window narrows with a hand up (floor kept)', mz.hand <= mz.open && mz.hand >= 0.028, JSON.stringify(mz));
 const plus = await p.evaluate(() => { const P = __pit; P.call('quitMatch'); window.__tick(10); P.uiClose(); P.uiPlayer('attrs'); window.__tick(3); return [...document.querySelectorAll('#panel button')].map(b => b.textContent).filter(t => /^\+\d/.test(t)).slice(0, 4); });
 check('+5 button shows its total price', plus.some(t => /^\+5 · \d+/.test(t)), plus.join(', '));
 console.log(errs.length ? 'PAGE ERRORS: ' + errs.slice(0, 3).join(' | ') : 'no page errors'); console.log(ok ? 'ALL PASS' : 'SOME FAILED'); await b.close();

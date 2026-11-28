@@ -5,7 +5,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function on(fn) { UI.handlers.push(fn); return UI.handlers.length - 1; }
 function Btn(label, fn, cls, dis) { return `<button class="btn ${cls || ''}" data-k="${on(fn)}" ${dis ? 'disabled' : ''}>${label}</button>`; }
 function uiBusy() { return !!UI.cur || $('title').style.display === 'flex'; }
-function openPanel(render, cls, onBack) { UI.openN = UI.stepN || 0; UI.openT = performance.now(); UI.lockMs = 450; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
+function openPanel(render, cls, onBack) { UI.openN = UI.stepN || 0; UI.openT = performance.now(); UI.lockMs = 200; UI.cur = { render, cls: cls || '', onBack }; UI.focus = 0; rerender(true); document.body.classList.add('busy');
   // a controller starts on the panel's main action (RESUME, PLAY…), else on the first thing that is not a tab or the close button
   const f = focusables(); let i = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')); if (i < 0) i = f.findIndex(e => e.closest('.pf')); if (i < 0) i = f.findIndex(e => !e.closest('.tabs') && !e.closest('.ph')); UI.focus = Math.max(0, i); paintFocus(); }
 function rerender(reset) {
@@ -16,15 +16,24 @@ function rerender(reset) {
 function uiClose() { if (UI.cur && UI.cur.onClose) { const f = UI.cur.onClose; UI.cur.onClose = null; f(); } UI.cur = null; $('panel').style.display = 'none'; $('panel').innerHTML = ''; document.body.classList.remove('busy'); if (W) { W.look = false; W.talk = null; } if (MT) MT.paused = false; uiHud(); }
 function uiBack() { if (!UI.cur) return; sfx('ui'); if (UI.cur.onBack) UI.cur.onBack(); else uiClose(); }
 function focusables() { const root = UI.cur ? $('panel') : $('title'); return Array.from(root.querySelectorAll('.btn:not([disabled]),input[type=range],input[type=text],select,.card[data-k],.sw[data-k],span[data-k]:not([data-k=""])')).filter(e => e.offsetParent !== null); }
-// controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list)
+// controller menus: the stick / d-pad moves to the nearest thing in that direction on screen (not just next in a list).
+// Things in the same row (or column) always win over things off it: a wide key next to a short one used to lose to a
+// key on the row below (RIGHT from DONE landed on N). The pinned footer button (RUN IT, HIT THE BLOCK) is the end of the
+// page: DOWN reaches it only when nothing else is below, UP leaves it for the page, and nothing wraps round to the top.
 function navDir(f, from, m) {
-  const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2; let best = -1, bs = 1e9;
+  const cur = f[from]; if (!cur) return 0; const a = cur.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2;
+  const curPf = !!cur.closest('.pf'), horiz = m === 'L' || m === 'R'; let bestA = -1, sA = 1e9, bestO = -1, sO = 1e9;
   f.forEach((el, i) => { if (i === from) return; const r = el.getBoundingClientRect(); if (!r.width) return;
-    const dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy, horiz = m === 'L' || m === 'R';
+    if (!!el.closest('.pf') !== curPf) return;      /* the footer and the page are two lists; the fallbacks below join them */
+    const dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy;
     const main = m === 'R' ? dx : m === 'L' ? -dx : m === 'D' ? dy : -dy; if (main <= 6) return;
-    const over = horiz ? Math.max(0, Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top)) : Math.max(0, Math.min(a.right, r.right) - Math.max(a.left, r.left));
-    const cross = horiz ? Math.abs(dy) : Math.abs(dx), s = main + (over > 0 ? 0 : cross * 2.2); if (s < bs) { bs = s; best = i; } });
-  if (best < 0 && (m === 'U' || m === 'D')) best = (from + (m === 'D' ? 1 : -1) + f.length) % f.length;      /* nothing that way: step through the list */
+    const over = horiz ? Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top) : Math.min(a.right, r.right) - Math.max(a.left, r.left);
+    const cross = horiz ? Math.abs(dy) : Math.abs(dx);
+    if (over > Math.min(a.height, r.height, a.width, r.width) * 0.3 || over > 8) { const sc = main + cross * 0.3; if (sc < sA) { sA = sc; bestA = i; } }
+    else { const sc = main + cross * 2.2; if (sc < sO) { sO = sc; bestO = i; } } });
+  let best = bestA >= 0 ? bestA : bestO;
+  if (best < 0 && m === 'D' && !curPf) best = f.findIndex(e => e.closest('.pf') && !e.classList.contains('alt')), best = best < 0 ? f.findIndex(e => e.closest('.pf')) : best;      /* the bottom of the page: on to the footer */
+  if (best < 0 && m === 'U' && curPf) { let lo = -1, ly = -1e9; f.forEach((el, i) => { if (el.closest('.pf')) return; const r = el.getBoundingClientRect(); if (r.width && r.bottom <= a.top + 2 && r.top > ly) { ly = r.top; lo = i; } }); best = lo; }      /* off the footer: the lowest thing on the page above it */
   return best < 0 ? from : best;
 }
 // LB / RB flip through the tabs at the top of a menu
@@ -71,10 +80,11 @@ function uiStep(dt) {
     else { UI.focus = navDir(f, Math.min(UI.focus, f.length - 1), m); paintFocus(); const n = f[UI.focus]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', inline: 'nearest' }); sfx('ui'); }
   }
   if (UI.cur && (I.lbP || I.rbP)) navTab(I.rbP ? 1 : -1);
-  if (I.aP && UI.cur && performance.now() - (UI.openT || 0) < (UI.lockMs || 450)) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results) */
+  if (I.aP && UI.cur && ((UI.stepN || 0) - (UI.openN || 0)) / 60 < (UI.lockMs || 200) / 1000) I.aP = false;      /* a pass or steal still held from the game must not click the screen that just opened (it skipped the results). Counted in frames, not wall time: on a slow machine a deliberate press was eaten */
   if (I.aP && f[UI.focus] && !IS_TOUCH) { const e = f[UI.focus]; if (e.tagName === 'SELECT') { e.selectedIndex = (e.selectedIndex + 1) % e.options.length; e.dispatchEvent(new Event('change', { bubbles: true })); } else if (e.type === 'text') { if (e.dataset.padkb && I_PAD()) e.dispatchEvent(new CustomEvent('padkb', { bubbles: true })); else e.focus(); } else e.click(); I.aP = false; }      /* the press is used up: it must not also act in the world behind the menu */
   if (I.back && UI.cur) { uiBack(); I.back = false; }
   else if (I.start && UI.cur && $('panel').querySelector('.kbdone')) { $('panel').querySelector('.kbdone').click(); I.start = false; }      /* typing a name: START is done */
+  else if (I.start && UI.cur && $('panel').querySelector('[data-start] .btn:not(.alt)')) { $('panel').querySelector('[data-start] .btn:not(.alt)').click(); I.start = false; }      /* START is the screen's main action (HIT THE BLOCK) */
   else if (I.start && UI.cur && UI.cur.startCloses && (UI.stepN || 0) - (UI.openN || 0) > 6) { uiBack(); I.start = false; }      /* START opened it, START closes it (on a pad only B did) */
 }
 
@@ -132,12 +142,12 @@ function keysHint(force) {
   let ctx = 'world', t = '';
   if (MT && MT.me && !MT.replay) { const me = MT.me, B = MT.B; ctx = MT.phase !== 'live' ? 'dead' : B.holder === me ? 'ball' : MT.off === me.team && B.state !== 'loose' ? 'off' : B.state === 'loose' ? 'loose' : 'def'; if (MT.arcade && ctx === 'def') ctx = 'defR'; }
   const key = ctx + (pad ? 'p' : 'k'); if (!force && el._k === key) return; el._k = key;
-  const P = pad ? { mv: 'LEFT STICK', spr: kk('RT'), shoot: KC.X, pass: KC.A, steal: KC.A + KC.X, block: KC.Y, moves: 'RIGHT STICK', lt: kk('LT'), lb: kk('LB'), menu: kk('START'), look: 'RIGHT STICK', act: KC.A }
+  const P = pad ? { mv: 'LEFT STICK', spr: kk('RT'), shoot: KC.X, pass: KC.A, steal: KC.X, block: KC.Y, moves: 'RIGHT STICK', lt: kk('LT'), lb: kk('LB'), menu: kk('START'), look: 'RIGHT STICK', act: KC.A }
     : { mv: kk('WASD'), spr: kk('SHIFT'), shoot: kk('SPACE'), pass: kk('E'), steal: kk('E'), block: kk('SPACE'), moves: kk('IJKL'), lt: kk('Q'), lb: kk('R'), menu: kk('P'), look: kk('J') + kk('L'), act: kk('E') };
   const g = (b, w) => `<span>${b} ${w}</span>`;
   if (ctx === 'world') t = [g(P.mv, 'move'), g(P.spr, 'run'), g(P.act, 'talk / use'), g(P.look, 'look'), g(P.menu, 'my player')].join('');
   else if (ctx === 'ball') t = [g(P.shoot, 'shoot: hold, let go at the top'), MT && MT.cfg.lot ? g(P.pass, 'put it down (back to the Block)') : g(P.pass, pad ? 'pass (aim with the stick)' : 'pass (aim with WASD)'), g(P.spr, 'turbo'), g(P.moves, 'moves · ↙↘ step-back · roll it: spin'), g(P.lt, 'post up'), MT && MT.cfg.lot ? '' : g(P.lb, 'call a screen')].join('');
-  else if (ctx === 'off') t = [g(P.pass, 'call for it'), g(P.shoot, 'jump'), g(P.moves, 'cut'), g(P.lb, 'set a screen'), g(P.lt, 'box out'), g(P.spr, 'sprint')].join('');
+  else if (ctx === 'off') t = [g(P.pass, 'call for it'), g(P.block, 'jump'), g(P.moves, 'cut'), g(P.lb, 'set a screen'), g(P.lt, 'box out'), g(P.spr, 'sprint')].join('');
   else if (ctx === 'def' || ctx === 'defR') t = [g(P.steal, ctx === 'defR' ? 'shove (hold LT: punch)' : 'steal'), g(P.block, 'jump / contest'), pad ? g(P.moves, '↑ both hands · ↖↗ one hand · ↙↘ low') : '', g(P.lt, 'body up'), g(P.lb, 'switch'), g(P.spr, 'sprint')].join('');
   else if (ctx === 'loose') t = [g(P.mv, 'get to it'), g(P.steal, 'dive'), g(P.block, 'jump for it')].join('');
   else t = [g(P.menu, 'pause')].join('');
@@ -180,17 +190,20 @@ function uiBuilder(opts) {
     h += `<div class="cat">NAME ON THE JERSEY</div><input type="text" id="bname" maxlength="12" placeholder="YOUR NAME" value="${esc(T.name)}" data-padkb="1">`;
     if (T.kb) {      // a controller has no keys: letters on the screen, picked with the stick and A
       const add = c => () => { if ((T.name || '').length < 12) T.name = (T.name || '') + c; sfx('ui'); rerender(); };
-      h += `<div class="card padkb" style="display:flex;flex-wrap:wrap;gap:4px">` + Btn('DONE ✓ (START)', () => { T.kb = false; rerender(); }, 'sm kbdone') + Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt') + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => Btn(c, add(c), 'sm alt')).join('') + Btn('SPACE', add(' '), 'sm alt') + ((T.name || '').trim() ? '' : Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt')) + `</div>`; }      /* DONE and DELETE first (easy to reach), RANDOM only while the name is empty (it overwrote a typed one) */
+      const cell = (html, span) => `<div style="grid-column:span ${span || 1};display:grid">${html}</div>`;
+      h += `<div class="card padkb" style="display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px">` + cell(Btn('DONE ✓ (START)', () => { T.kb = false; rerender(); }, 'sm kbdone'), 3) + cell(Btn('⌫ DELETE', () => { T.name = (T.name || '').slice(0, -1); rerender(); }, 'sm alt'), 3) + cell(Btn('SPACE', add(' '), 'sm alt'), 2)
+        + cell(Btn('RANDOM', () => { T.name = pick(['HOOPER', 'BUCKETS', 'SPLASH', 'DIME', 'HANDLES', 'BOARDMAN', 'STREETS', 'MIDRANGE', 'CROSSUP']) + Math.floor(Math.random() * 90 + 10); rerender(); }, 'sm alt', !!(T.name || '').trim()), 2)
+        + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').map(c => cell(Btn(c, add(c), 'sm alt'))).join('') + `</div>`; }      /* a fixed 10-wide grid: rows and columns stay put while you type (RANDOM greys out instead of vanishing and shifting the keys), so the d-pad moves like a keyboard */      /* DONE and DELETE first (easy to reach), RANDOM only while the name is empty (it overwrote a typed one) */
     h += `<div class="cat">PLAYSTYLE <span class="mu" style="text-transform:none;letter-spacing:.02em">— sets what you can become</span></div><div class="grid">` + STYLES.map(s => `<div class="card ${s.id === T.build.style ? 'sel' : ''}" data-k="${on(() => { T.build.style = s.id; sfx('ui'); rig(); rerender(); })}"><h3>${s.n}</h3><p>${s.tag}</p></div>`).join('') + `</div>`;
     h += `<div class="cat">ORIGIN <span class="mu" style="text-transform:none;letter-spacing:.02em">— where 2145 America grew you</span></div><div class="grid">` + ORIGINS.map(o => `<div class="card ${o.id === T.build.origin ? 'sel' : ''}" data-k="${on(() => { T.build.origin = o.id; sfx('ui'); rerender(); })}"><h3>${o.n}</h3><p>${o.d}</p><p class="buff">${o.perk}</p></div>`).join('') + `</div>`;
-    h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. You can wear three; more at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
+    h += `<div class="cat">PERSONALITY <span class="mu" style="text-transform:none;letter-spacing:.02em">— how you talk, and a small edge. Pick one now; two more slots open at Tape Deck</span></div><div class="grid">` + PERS_BASE.map(t => `<div class="card ${t.id === ((T.build.pers || ['quiet'])[0]) ? 'sel' : ''}" data-k="${on(() => { T.build.pers = [t.id, '', '']; sfx('ui'); rerender(); })}"><h3>${t.n}</h3><p style="color:var(--go)">${t.d}</p><p class="mu">“${esc(t.t.w[0])}”</p></div>`).join('') + `</div>`;
     h += `<div class="cat">BODY <span class="mu" style="text-transform:none;letter-spacing:.02em">— every inch moves your caps</span></div><div class="card"><div id="bodyLbl" style="display:none"></div>`;
     h += `<label class="sl">HEIGHT <b id="lh">${fmtH(T.build.body.h)}</b></label><input type="range" min="${H_MIN}" max="${H_MAX}" step="1" value="${T.build.body.h}" data-k="${on(el => { T.build.body.h = +el.value; $('lh').textContent = fmtH(T.build.body.h); upd(); })}">`;
     h += `<label class="sl">WEIGHT <b id="lw">${lbs()} lbs</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.w * 10)}" data-k="${on(el => { T.build.body.w = el.value / 10; upd(); })}">`;
     h += `<label class="sl">WINGSPAN <b id="ls">${fmtH(Math.round(T.build.body.h + 2 + T.build.body.s * 5))}</b></label><input type="range" min="-10" max="10" step="1" value="${Math.round(T.build.body.s * 10)}" data-k="${on(el => { T.build.body.s = el.value / 10; upd(); })}"></div>`;
     h += `<div class="cat">LOOK</div><div class="card">` + SKINS.map((c, i) => `<span class="sw ${i === T.build.skin ? 'sel' : ''}" style="background:${c}" data-k="${on(() => { T.build.skin = i; rig(); rerender(); })}"></span>`).join('') + `<div style="margin-top:8px">` + DRIP.filter(d => d.slot === 'hair' && d.src === 'start').map(d => Btn(d.n, () => { T.hair = d.id; rig(); rerender(); }, 'sm ' + (T.hair === d.id ? '' : 'alt'))).join(' ') + `</div></div>`;
     h += `<div class="cat">ATTRIBUTE CAPS <span class="mu" style="text-transform:none;letter-spacing:.02em">— ${st.n}, max potential</span></div><div class="card" id="capbox">${capBars(T.build)}</div>`;
-    h += `</div><div class="pf">${Btn('HIT THE BLOCK', () => {
+    h += `</div><div class="pf" data-start="1">${Btn('HIT THE BLOCK <small style="opacity:.7">(START)</small>', () => {
       if (!(($('bname').value || T.name || '').trim()) && !T.warned && I_PAD()) { T.warned = true; T.kb = true; toast('NAME YOUR PLAYER', 'Or press HIT THE BLOCK again to go as ROOKIE.'); rerender(); if (!T.kb) $('bname').focus(); return; }      /* no more accidental "Nobody" */
       const nm = (($('bname').value || T.name || '')).trim().toUpperCase().replace(/[<>&"]/g, '').slice(0, 12) || 'ROOKIE';
       S.name = nm; S.build = T.build; S.worn.hair = T.hair; S.attrs = startAttrs(S.build); if (!S.created && ORIGIN[S.build.origin].k === 'vc') S.vc += 400; S.created = true; save();

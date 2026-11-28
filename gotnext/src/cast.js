@@ -157,16 +157,18 @@ function kaelBuild() {
   return b;
 }
 function uiKael() {
-  const today = dayKey(), worked = S.kaelWork === today, beat = !!S.kaelBeat;
-  uiDialog('BRENNICK · 88 OVR', pick(CAST_LINES.kael), [
-    [beat ? 'RUN ONES (rematch)' : 'RUN ONES', () => runKael()],
+  const today = dayKey(), worked = S.kaelWork === today, beat = !!S.kaelBeat, need = TIERS_COURT[2], locked = !beat && rankOf(S.rep) < need.rank;      /* he runs Ones on THE CAGE court: not before you are rated for it (a rookie walked into an 88 and lost 0-7) */
+  const ones = locked ? ['RUN ONES · reach ' + RANKS[need.rank].n.toUpperCase() + ' first', null, 'alt', true] : [beat ? 'RUN ONES (rematch)' : 'RUN ONES', () => runKael()];
+  uiDialog('BRENNICK · 88 OVR', locked ? '"You\'re ' + RANKS[rankOf(S.rep)].n + '. I run Ones in The Cage. Come back ' + RANKS[need.rank].n + '. Till then: early work."' : pick(CAST_LINES.kael), [
+    ...(locked ? [] : [ones]),
     [worked ? 'EARLY WORK: DONE TODAY' : 'EARLY WORK', () => { const cats = ['F', 'S', 'P', 'D'], c = pick(cats); S.kaelWork = today; S.bxp[c] += 40; while (S.bxp[c] >= 100) { S.bxp[c] -= 100; S.bp[c]++; toast('SMARTS POINT', '+1 ' + CATS[c][0]); } save(); uiClose(); sfx('unlock'); toast('BRENNICK', '"Listen." +40 ' + CATS[c][0] + ' smarts XP'); }, '', worked],
+    ...(locked ? [ones] : []),
     ['Later'],
   ]);
 }
 function runKael() {
   uiClose(); const tier = TIERS_COURT[2], b = kaelBuild(), first = !S.kaelBeat;
-  const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: S.boosts.splice(0), ball: S.worn.ball, seed: 77, firstOff: 0 };
+  const cfg = { mode: ONES, tier, teams: [[{ b: myBuild(), ctrl: 0, mine: true }], [{ b, ctrl: -1, ai: 0.85 }]], boosts: [], ball: S.worn.ball, seed: 77, firstOff: 0 };
   cfg.bonus = res => { if (!res.win) { setTimeout(() => toast('BRENNICK', '"' + pick(CAST_LINES.kaelLose) + '"'), 1600); return null; }
     if (first) { S.kaelBeat = true; deedDrip('bk_washer', 'Beat Brennick'); const hb = JSON.parse(JSON.stringify(b)); hb.net = 0; if (!S.homies.some(h => h.name === hb.name)) { if (S.homies.length >= 12) S.homies.shift(); S.homies.push(hb); } setTimeout(() => toast('BRENNICK RUNS WITH YOU NOW', '"Aye. And aye."', 'ach'), 1800); }
     return { vc: first ? 600 : 150, rep: first ? 120 : 15, note: first ? 'Beat Brennick +600 HC' : 'Beat Brennick again +150 HC' }; };

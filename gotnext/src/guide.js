@@ -41,7 +41,7 @@ function guideInit() {
 function guideStep(dt) {
   const G = W.guide; if (!G) return; const n = G.n, me = W.me; G.t += dt; let moving = false, wave = false; const dm = Math.hypot(me.x - n.x, me.z - n.z);
   if (G.st === 'greet') { n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.15); wave = true;
-    if (G.t > 1.0 && !UI.cur) { G.st = 'asked'; uiDialog('WALK-ON', 'First day? I\'m Walk-On. I carry the cones. Coach Overtime is right over there and he teaches everything: come on, I\'ll take you.', [['Show me', () => { uiClose(); G.st = 'lead'; G.t = 0; toast('FOLLOW WALK-ON', 'He is taking you to Coach Overtime.'); }], ['I know my way around', () => { uiClose(); S.tut = 1; save(); G.st = 'lead'; G.quiet = true; }, 'alt']]); } }
+    if (G.t > 1.0 && !UI.cur) { G.st = 'asked'; uiDialog('WALK-ON', 'First day? I\'m Walk-On. I carry the cones. Coach Overtime is right over there and he teaches everything: come on, I\'ll take you.', [['Show me', () => { uiClose(); S.tut = 1; save(); G.st = 'lead'; G.t = 0; toast('FOLLOW WALK-ON', 'He is taking you to Coach Overtime.'); }], ['I know my way around', () => { uiClose(); S.tut = 1; save(); G.st = 'lead'; G.quiet = true; }, 'alt']]); } }
   else if (G.st === 'lead') { const tx = -1.7, tz = 5.9, dx = tx - n.x, dz = tz - n.z, l = Math.hypot(dx, dz);
     if (l < 0.35) { G.st = G.quiet ? 'rest' : 'arrive'; G.t = 0; n.face = Math.PI * 0.8; }
     else if (!G.quiet && dm > 5.5) { n.face = lerpAng(n.face, Math.atan2(me.x - n.x, me.z - n.z), 0.12); wave = true; }      /* waits for you */

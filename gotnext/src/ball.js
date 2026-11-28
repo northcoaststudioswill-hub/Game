@@ -143,7 +143,7 @@ function scorePts(p, pts, how) {
   if (how !== 'dunk' && M_.B.shooter === p && M_.B.clockAt !== undefined && M_.B.clockAt < 1.6 && !M_.practice && !M_.drill) { highlight('buzzer', p); lateCall(0.9, 'BUZZER BEATER', p.b.name + ' beat the clock', '#ffc531'); M_.B.clockAt = undefined; }
   { const R = M_.runS || (M_.runS = { team: -1, n: 0, pts: 0 });      // unanswered buckets: three in a row is a run
     if (R.team === p.team) { R.n++; R.pts += pts; } else { if (R.n >= 3) lateCall(1.5, 'RUN OVER', p.b.name + ' stops the bleeding', '#7de3ff'); R.team = p.team; R.n = 1; R.pts = pts; }
-    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', (M_.me && p.team === M_.me.team ? 'Your team · ' : 'Them · ') + `${R.pts}–0`, M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, M_.me && p.team === M_.me.team ? 'Your team' : 'Them', M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); }
+    if (R.n === 3 && !M_.practice) { lateCall(1.5, 'ON A RUN', (M_.me && p.team === M_.me.team ? 'Your team · ' : 'Them · ') + `${R.pts}–0`, M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); if (typeof crowdHeat === 'function' && M_.crowd) crowdHeat(1); } else if (R.n > 3 && !M_.practice && R.n % 2 === 1) lateCall(1.5, `${R.pts}–0 RUN`, M_.me && p.team === M_.me.team ? 'Your team' : 'Them', M_.me && p.team === M_.me.team ? '#ffc531' : '#ff6a5a'); }
   for (const o of M_.P) if (o.team !== p.team) { o.hot = 0; if (o.fire) { o.fire = false; } }
   if (M_.B.assist && M_.B.assist !== p && M_.time - p.catchT < 5) { p.pointAt = M_.B.assist; p.pointT = 1.6; M_.B.assist.stats.ast++; addBrav(M_.B.assist, 0.10); floatTxt(M_.B.assist, 'ASSIST', '#ffc531'); }
   if (M_.arcade && p.hot >= 3 && !p.fire) { p.fire = true; p.stats.fires++; call(pick(CALLS.fire), '', '#ff7a1f', 1.6); sfxM('fire'); }
@@ -267,7 +267,7 @@ function releaseShot(p) {
   // nearly every time). Off the window it is the plain odds for the look, never better than a fair release.
   const autoT = p.user && s.auto; if (autoT) green = green && Math.random() < 0.08 + 0.17 * nAtt(p, 'iq') + 0.06 * bt(p, 'heatcheck');
   // perfect timing beats an open look every time; a hand in the face still costs a good release (smothered, about two in three)
-  if (green) prob = (c < 0.12 ? 1 : Math.max(0.18, 1 - (c - 0.12) * 1.6)) * (d > 7.6 ? Math.max(0.3, 1 - (d - 7.6) * 0.12) : 1); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.82) * (e < w * 2.2 ? 1.12 : 1);
+  if (green) prob = (c < 0.12 ? 1 : Math.max(0.45, 1 - (c - 0.12) * 0.9))      /* a perfect release smothered goes in about half the time (it was 18%: perfect timing read as a miss) */  * (d > 7.6 ? Math.max(0.3, 1 - (d - 7.6) * 0.12) : 1); else      /* a hand up a metre off a perfect release still costs it (it went in 86% of the time) */ prob = base * Math.max(0.12, 1 - (e - w) / 0.38 * (1.1 - nAtt(p, 'iq') * 0.35)) * (1 - c * 0.82) * (e < w * 2.2 ? 1.12 : 1);
   // blocked?
   for (const o of MT.P) {
     if (o.team === p.team || o.st !== 'jump' || dist(o, p) > 1.45) continue;
@@ -276,8 +276,9 @@ function releaseShot(p) {
   }
   B.foulBy = null;
   if (!MT.arcade && !MT.practice) for (const o of MT.P) {
-    if (o.team === p.team || o.st !== 'jump') continue; const dd = dist(o, p); if (dd > 0.78) continue;
-    const fch = clamp(0.3 + (o.lunge ? 0.22 : 0) + (0.78 - dd) * 0.6 - nAtt(o, 'perd') * 0.25 - 0.05 * bt(o, 'ground') - 0.07 * bt(o, 'hardhat'), 0.04, 0.75);
+    if (o.team === p.team || o.st !== 'jump') continue; const dd = dist(o, p); if (dd > 0.62) continue;
+    const fly = Math.hypot(o.vx || 0, o.vz || 0) > 1.6 ? 0.14 : 0;      /* straight up is legal; flying into him is the foul */
+    const fch = clamp(0.06 + fly + (o.lunge ? 0.2 : 0) + (0.62 - dd) * 0.5 - nAtt(o, 'perd') * 0.25 - 0.05 * bt(o, 'ground') - 0.07 * bt(o, 'hardhat'), 0.02, 0.45);
     if (Math.random() < fch) { B.foulBy = o; break; }
   }
   { const u = MT.me; if (u && u.team !== p.team && !p.user && c >= 0.4 && dist(u, p) < 2.2 && (u.st === 'jump' || u.handsUp)) floatTxt(u, c >= 0.6 ? 'SMOTHERED' : 'GOOD CONTEST', c >= 0.6 ? '#33e0ff' : '#9fe6ff'); }      /* your defense, said out loud */
