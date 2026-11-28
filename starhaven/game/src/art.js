@@ -7,14 +7,14 @@
 
   // ---------------------------------------------------------------- portraits (48 x 48 pixels, shown big)
   const LOOKS = {
-    wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' },
+    wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' , freckles: true },
     wren_m: { bg: ['#3a4a6a', '#121a2a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: false, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#c8a060' },
     caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
-    queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
+    queen: { bg: ['#2a1f4a', '#07050f'], skin: '#e8e4f2', shade: '#c4bcd8', hair: '#0c0a16', hairD: '#05040a', eye: '#e8e0ff', style: 'long', ears: true, cloth: '#1a1630', clothD: '#0e0c1c', crown: true, lips: '#5a3a8a' },
     bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },
     nessa: { bg: ['#4a4a5a', '#16161e'], skin: '#f0d4c0', shade: '#d4b49e', hair: '#2a1a14', hairD: '#140c08', eye: '#5a6a7a', style: 'braid', ears: false, cloth: '#5a5a6a', clothD: '#3a3a48' },
     lissa: { bg: ['#4a6a3a', '#141e10'], skin: '#f6dcc6', shade: '#dcbca8', hair: '#b8864a', hairD: '#8a5a2a', eye: '#6a9a5a', style: 'long', ears: false, cloth: '#4a7a4a', clothD: '#2f5a2f', flower: true },
-    rowan: { bg: ['#6a8a3a', '#1a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
+    rowan: { bg: ['#c8904a', '#3a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
     mirelle: { bg: ['#6a4a34', '#1c120c'], skin: '#e8c8a8', shade: '#c8a484', hair: '#d8d4e0', hairD: '#a8a4b8', eye: '#3a2a1a', style: 'bun', ears: true, cloth: '#8a5a3a', clothD: '#6a4a34', trim: '#f4f0e0' },
     thane: { bg: ['#5a2a3a', '#1a0c12'], skin: '#8a5a3c', shade: '#6e4630', hair: '#2a2a2a', hairD: '#9a9a9a', eye: '#3a2a1a', style: 'shaved', ears: true, cloth: '#6a2a3a', clothD: '#4a1a26', trim: '#e8c070', glasses: true },
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
@@ -41,7 +41,7 @@
       else if (k === 'rowan') { for (let i = 0; i < 12; i++) { g.fillStyle = i % 2 ? 'rgba(255,154,192,0.7)' : 'rgba(255,255,255,0.7)'; g.fillRect(h(i) * 48, h(i + 7) * 36, 2, 2); } }
       else if (k === 'queen') { g.strokeStyle = 'rgba(255,74,90,0.5)'; g.lineWidth = 2; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(i * 14, 48); g.quadraticCurveTo(i * 14 + 10, 20, i * 14 - 4, 0); g.stroke(); } g.lineWidth = 1; }
     }
-    if (L.wings) { R(2, 14, 8, 30, '#0a0818'); R(38, 14, 8, 30, '#0a0818'); R(4, 10, 6, 6, '#0a0818'); R(38, 10, 6, 6, '#0a0818'); R(3, 14, 1, 26, '#6a5aa8'); R(44, 14, 1, 26, '#6a5aa8'); }
+    if (L.wings) { R(4, 34, 10, 14, '#0e0b22'); R(34, 34, 10, 14, '#0e0b22'); for (const [sx2, sy2] of [[6, 38], [10, 43], [37, 40], [41, 36], [8, 46], [39, 45]]) R(sx2, sy2, 1, 1, '#c8b8ff'); }   // his mantle of dusk, with stars in it
     if (L.thread) { g.strokeStyle = '#ffe9a8'; g.globalAlpha = 0.8; g.beginPath(); g.moveTo(0, 40); g.bezierCurveTo(14, 24, 30, 46, 48, 30); g.stroke(); g.globalAlpha = 1; }
     // long hair behind
     if (L.style === 'long') { R(11, 10, 26, 34, L.hair); }
@@ -55,7 +55,8 @@
     R(20, 32, 8, 7, L.shade);
     R(15, 12, 18, 22, L.skin);
     R(15, 30, 18, 4, L.shade);
-    if (L.ears) { R(12, 18, 3, 6, L.skin); R(11, 15, 2, 4, L.skin); R(33, 18, 3, 6, L.skin); R(35, 15, 2, 4, L.skin); }
+    if (L.ears) { R(13, 19, 2, 5, L.skin); R(33, 19, 2, 5, L.skin); }   // plain ears: the Lit are born from stars, not pointed
+    if (L.freckles) { g.globalAlpha = 0.85; for (const [fx2, fy2] of [[17, 25], [19, 26], [18, 27], [29, 26], [31, 25], [30, 27], [22, 24], [26, 24]]) R(fx2, fy2, 1, 1, '#ffe9a8'); g.globalAlpha = 0.25; R(16, 24, 5, 4, '#ffe9a8'); R(28, 24, 5, 4, '#ffe9a8'); g.globalAlpha = 1; }   // her freckles glow: she is Lit
     // hair on top
     if (L.style === 'pony') { R(14, 9, 20, 6, L.hair); R(14, 12, 3, 9, L.hair); R(30, 11, 4, 6, L.hairD); }
     if (L.style === 'swept') { R(14, 8, 20, 6, L.hair); R(14, 12, 4, 10, L.hair); R(26, 12, 7, 3, L.hair); R(30, 12, 4, 8, L.hairD); }
@@ -63,8 +64,7 @@
     if (L.style === 'shaved') { R(15, 10, 18, 3, L.hair); }
     if (L.style === 'braid') { R(14, 9, 20, 5, L.hair); R(14, 12, 3, 9, L.hair); R(31, 12, 3, 9, L.hair); R(33, 18, 4, 4, L.hairD); R(34, 22, 4, 4, L.hair); R(35, 26, 4, 4, L.hairD); R(35, 30, 4, 4, L.hair); }
     if (L.flower) { R(30, 10, 4, 4, '#ff9ac0'); R(31, 11, 2, 2, '#ffe9a8'); }
-    if (L.antlers) { R(14, 12, 20, 1, '#e8c070'); R(17, 10, 2, 3, '#7ac05a'); R(29, 10, 2, 3, '#7ac05a');
-      g.strokeStyle = '#d8c8a0'; g.beginPath(); g.moveTo(15, 9); g.lineTo(10, 1); g.moveTo(12, 5); g.lineTo(7, 4); g.moveTo(33, 9); g.lineTo(38, 1); g.moveTo(36, 5); g.lineTo(41, 4); g.stroke(); }
+    if (L.antlers) { R(14, 12, 20, 1, '#e8c070'); for (let i = 0; i < 9; i++) { const hh = 3 + (4 - Math.abs(i - 4)) * 1.5; R(15 + i * 2, 12 - hh, 1, hh, i % 2 ? '#ffd27a' : '#fff6d8'); } g.globalAlpha = 0.3; R(13, 2, 22, 10, '#ffe9a8'); g.globalAlpha = 1; }   // a crown of morning light
     if (L.glasses) { g.strokeStyle = '#e8c070'; g.strokeRect(17.5, 19.5, 6, 5); g.strokeRect(25.5, 19.5, 6, 5); g.beginPath(); g.moveTo(23.5, 21.5); g.lineTo(25.5, 21.5); g.stroke(); R(15, 10, 18, 2, L.hairD); }
     if (L.style === 'bun') { R(14, 9, 20, 5, L.hair); R(19, 3, 10, 7, L.hair); R(14, 12, 3, 7, L.hair); R(31, 12, 3, 7, L.hair); R(21, 4, 6, 1, L.hairD); }
     // eyes, brows, mouth
@@ -79,8 +79,8 @@
     if (L.scar) { R(27, 16, 1, 9, '#a85a4a'); }
     if (L.circlet) { R(15, 13, 18, 1, '#cfd6ff'); R(23, 11, 2, 3, '#ffffff'); R(22, 12, 4, 1, '#ffffff'); }
     if (L.crown) {
-      for (let i = 0; i < 6; i++) { R(14 + i * 4, 4 + (i % 2) * 2, 2, 7 - (i % 2) * 2, '#4a1a2a'); R(14 + i * 4, 4 + (i % 2) * 2, 2, 1, '#ff4a5a'); }
-      R(14, 10, 20, 2, '#4a1a2a');
+      for (let i = 0; i < 6; i++) { R(14 + i * 4, 3 + (i % 2) * 2, 2, 8 - (i % 2) * 2, '#1a1626'); R(14 + i * 4, 3 + (i % 2) * 2, 1, 2, '#e0d4ff'); }   // black glass
+      R(14, 10, 20, 2, '#2a2444');
     }
     // finer features: a lid line and a catch-light in each eye, a blush, a two-tone mouth, a softer jaw,
     // a shadow under the chin, and a highlight running through the hair

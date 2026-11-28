@@ -828,7 +828,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
 
   SH.ENEMY_DEFS = {
     thornSprite: {
-      name: 'Thorn sprite', hp: 4, w: 24, h: 22,
+      name: 'Glassling', hp: 4, w: 24, h: 22,
       wander: 0.55, sight: 150, sightY: 50, leash: 5,
       windup: 26, lungeSpeed: 5.4, lungeHop: 2.6, lungeFrames: 20, recover: 42,
       respawn: 300, damage: 1, gravity: 0.5,
@@ -2095,7 +2095,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     L('d_pack', 0, 'I was not the first', { seen: 'd_pack' }, 'Something to find under the Umbra\'s road.', 'A mortal hunter\'s pack in the cells, older than my grandmother. A woman\'s, I think, by the knife. She went up the Stair and down into the Umbra and nobody at home ever knew why she did not come back. I took the ribbon off her pack. It is tied round my quiver strap now.'),
     L('c_rowanCame', 4, 'Through the bars', { mem: 'rowanCame' }, 'A choice in the Umbra.', 'I told him I came to get him out, and I watched it land. Nobody comes for a Lord of the sky. I think that one sentence is why he cannot let me go now. I meant it as a kindness. It was one. It was also the first bar of a different cage.'),
     L('c_rowanDebt', 4, 'A debt, paid', { mem: 'rowanDebt' }, 'A choice in the Umbra.', 'I told him it was the law, a light for a light, and nothing more. He said I never owed him anything. It was the most honest thing he ever said to me, and he said it from inside a cage.'),
-    L('c_lamps', 4, 'Four lamps', { mem: 'lamps' }, 'Something to do on the street in Starhaven.', 'Mirelle was a lamplighter for forty years. When the Thorn Queen fell the guild was half gone and the lamps on her street stayed dark, because nobody had the heart to climb. I climbed. I did not know I was doing anything but climbing. She says that is the only way the First Lamp ever stays lit.'),
+    L('c_lamps', 4, 'Four lamps', { mem: 'lamps' }, 'Something to do on the street in Starhaven.', 'Mirelle was a lamplighter for forty years. When the Eclipse fell the guild was half gone and the lamps on her street stayed dark, because nobody had the heart to climb. I climbed. I did not know I was doing anything but climbing. She says that is the only way the First Lamp ever stays lit.'),
     L('c_cat', 4, 'Mirelle\'s cat', { mem: 'cat' }, 'Someone in Starhaven needs help.', 'On an awning, furious, perfectly able to get down. The first thing I did in this city that was not about a war. I think about that more than it deserves.'),
     L('c_page', 4, 'The torn page', { mem: 'page' }, 'Something to find on the mountain.', 'Frozen to the rock on the mountain road, in Thane\'s hand: "wyrms sleep facing the wind". He lost it up there years ago, before the Eclipse, when he still went looking at things himself. He held it by the edges and said nothing for a while, which he never does.'),
     L('c_bram', 4, 'What I told Bram', { mem: 'bramTruth' }, 'A choice at the Training Ring.', 'He asked why I stay. I said: because nobody here has lied to me yet. He said to give it a week. He also said it was a soldier\'s answer, and from Bram that is a medal.'),
@@ -3563,11 +3563,11 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     this.flash = 8;
     const kb = hit.pogo ? 0 : hit.kb;
     this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : hit.launch ? -hit.launch : -1.8;
-    fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#9be07a', '#d8ffb8', '#ffffff'] });
+    fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#a898e8', '#e0d4ff', '#ffffff'] });
     if (this.hp <= 0) {
       this.dead = true; this.deadT = 0;
-      fx.burst(this.x, this.y - this.h / 2, 22, { speed: 3.2, life: 34, size: 3, gravity: 0.08, colors: ['#5f9e4c', '#9be07a', '#3d6b33', '#ffe9a8'] });
-      fx.ring(this.x, this.y - this.h / 2, '#d8ffb8', 30, 18, 2);
+      fx.burst(this.x, this.y - this.h / 2, 22, { speed: 3.2, life: 34, size: 3, gravity: 0.08, colors: ['#1c1830', '#a898e8', '#2a2444', '#e0d4ff'] });
+      fx.ring(this.x, this.y - this.h / 2, '#e0d4ff', 30, 18, 2);
       world.onKill(this);
       return { landed: true, killed: true };
     }
@@ -4320,14 +4320,14 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
 
   // ---------------------------------------------------------------- portraits (48 x 48 pixels, shown big)
   const LOOKS = {
-    wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' },
+    wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' , freckles: true },
     wren_m: { bg: ['#3a4a6a', '#121a2a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: false, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#c8a060' },
     caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
-    queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
+    queen: { bg: ['#2a1f4a', '#07050f'], skin: '#e8e4f2', shade: '#c4bcd8', hair: '#0c0a16', hairD: '#05040a', eye: '#e8e0ff', style: 'long', ears: true, cloth: '#1a1630', clothD: '#0e0c1c', crown: true, lips: '#5a3a8a' },
     bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },
     nessa: { bg: ['#4a4a5a', '#16161e'], skin: '#f0d4c0', shade: '#d4b49e', hair: '#2a1a14', hairD: '#140c08', eye: '#5a6a7a', style: 'braid', ears: false, cloth: '#5a5a6a', clothD: '#3a3a48' },
     lissa: { bg: ['#4a6a3a', '#141e10'], skin: '#f6dcc6', shade: '#dcbca8', hair: '#b8864a', hairD: '#8a5a2a', eye: '#6a9a5a', style: 'long', ears: false, cloth: '#4a7a4a', clothD: '#2f5a2f', flower: true },
-    rowan: { bg: ['#6a8a3a', '#1a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
+    rowan: { bg: ['#c8904a', '#3a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
     mirelle: { bg: ['#6a4a34', '#1c120c'], skin: '#e8c8a8', shade: '#c8a484', hair: '#d8d4e0', hairD: '#a8a4b8', eye: '#3a2a1a', style: 'bun', ears: true, cloth: '#8a5a3a', clothD: '#6a4a34', trim: '#f4f0e0' },
     thane: { bg: ['#5a2a3a', '#1a0c12'], skin: '#8a5a3c', shade: '#6e4630', hair: '#2a2a2a', hairD: '#9a9a9a', eye: '#3a2a1a', style: 'shaved', ears: true, cloth: '#6a2a3a', clothD: '#4a1a26', trim: '#e8c070', glasses: true },
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
@@ -4354,7 +4354,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       else if (k === 'rowan') { for (let i = 0; i < 12; i++) { g.fillStyle = i % 2 ? 'rgba(255,154,192,0.7)' : 'rgba(255,255,255,0.7)'; g.fillRect(h(i) * 48, h(i + 7) * 36, 2, 2); } }
       else if (k === 'queen') { g.strokeStyle = 'rgba(255,74,90,0.5)'; g.lineWidth = 2; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(i * 14, 48); g.quadraticCurveTo(i * 14 + 10, 20, i * 14 - 4, 0); g.stroke(); } g.lineWidth = 1; }
     }
-    if (L.wings) { R(2, 14, 8, 30, '#0a0818'); R(38, 14, 8, 30, '#0a0818'); R(4, 10, 6, 6, '#0a0818'); R(38, 10, 6, 6, '#0a0818'); R(3, 14, 1, 26, '#6a5aa8'); R(44, 14, 1, 26, '#6a5aa8'); }
+    if (L.wings) { R(4, 34, 10, 14, '#0e0b22'); R(34, 34, 10, 14, '#0e0b22'); for (const [sx2, sy2] of [[6, 38], [10, 43], [37, 40], [41, 36], [8, 46], [39, 45]]) R(sx2, sy2, 1, 1, '#c8b8ff'); }   // his mantle of dusk, with stars in it
     if (L.thread) { g.strokeStyle = '#ffe9a8'; g.globalAlpha = 0.8; g.beginPath(); g.moveTo(0, 40); g.bezierCurveTo(14, 24, 30, 46, 48, 30); g.stroke(); g.globalAlpha = 1; }
     // long hair behind
     if (L.style === 'long') { R(11, 10, 26, 34, L.hair); }
@@ -4368,7 +4368,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     R(20, 32, 8, 7, L.shade);
     R(15, 12, 18, 22, L.skin);
     R(15, 30, 18, 4, L.shade);
-    if (L.ears) { R(12, 18, 3, 6, L.skin); R(11, 15, 2, 4, L.skin); R(33, 18, 3, 6, L.skin); R(35, 15, 2, 4, L.skin); }
+    if (L.ears) { R(13, 19, 2, 5, L.skin); R(33, 19, 2, 5, L.skin); }   // plain ears: the Lit are born from stars, not pointed
+    if (L.freckles) { g.globalAlpha = 0.85; for (const [fx2, fy2] of [[17, 25], [19, 26], [18, 27], [29, 26], [31, 25], [30, 27], [22, 24], [26, 24]]) R(fx2, fy2, 1, 1, '#ffe9a8'); g.globalAlpha = 0.25; R(16, 24, 5, 4, '#ffe9a8'); R(28, 24, 5, 4, '#ffe9a8'); g.globalAlpha = 1; }   // her freckles glow: she is Lit
     // hair on top
     if (L.style === 'pony') { R(14, 9, 20, 6, L.hair); R(14, 12, 3, 9, L.hair); R(30, 11, 4, 6, L.hairD); }
     if (L.style === 'swept') { R(14, 8, 20, 6, L.hair); R(14, 12, 4, 10, L.hair); R(26, 12, 7, 3, L.hair); R(30, 12, 4, 8, L.hairD); }
@@ -4376,8 +4377,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     if (L.style === 'shaved') { R(15, 10, 18, 3, L.hair); }
     if (L.style === 'braid') { R(14, 9, 20, 5, L.hair); R(14, 12, 3, 9, L.hair); R(31, 12, 3, 9, L.hair); R(33, 18, 4, 4, L.hairD); R(34, 22, 4, 4, L.hair); R(35, 26, 4, 4, L.hairD); R(35, 30, 4, 4, L.hair); }
     if (L.flower) { R(30, 10, 4, 4, '#ff9ac0'); R(31, 11, 2, 2, '#ffe9a8'); }
-    if (L.antlers) { R(14, 12, 20, 1, '#e8c070'); R(17, 10, 2, 3, '#7ac05a'); R(29, 10, 2, 3, '#7ac05a');
-      g.strokeStyle = '#d8c8a0'; g.beginPath(); g.moveTo(15, 9); g.lineTo(10, 1); g.moveTo(12, 5); g.lineTo(7, 4); g.moveTo(33, 9); g.lineTo(38, 1); g.moveTo(36, 5); g.lineTo(41, 4); g.stroke(); }
+    if (L.antlers) { R(14, 12, 20, 1, '#e8c070'); for (let i = 0; i < 9; i++) { const hh = 3 + (4 - Math.abs(i - 4)) * 1.5; R(15 + i * 2, 12 - hh, 1, hh, i % 2 ? '#ffd27a' : '#fff6d8'); } g.globalAlpha = 0.3; R(13, 2, 22, 10, '#ffe9a8'); g.globalAlpha = 1; }   // a crown of morning light
     if (L.glasses) { g.strokeStyle = '#e8c070'; g.strokeRect(17.5, 19.5, 6, 5); g.strokeRect(25.5, 19.5, 6, 5); g.beginPath(); g.moveTo(23.5, 21.5); g.lineTo(25.5, 21.5); g.stroke(); R(15, 10, 18, 2, L.hairD); }
     if (L.style === 'bun') { R(14, 9, 20, 5, L.hair); R(19, 3, 10, 7, L.hair); R(14, 12, 3, 7, L.hair); R(31, 12, 3, 7, L.hair); R(21, 4, 6, 1, L.hairD); }
     // eyes, brows, mouth
@@ -4392,8 +4392,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     if (L.scar) { R(27, 16, 1, 9, '#a85a4a'); }
     if (L.circlet) { R(15, 13, 18, 1, '#cfd6ff'); R(23, 11, 2, 3, '#ffffff'); R(22, 12, 4, 1, '#ffffff'); }
     if (L.crown) {
-      for (let i = 0; i < 6; i++) { R(14 + i * 4, 4 + (i % 2) * 2, 2, 7 - (i % 2) * 2, '#4a1a2a'); R(14 + i * 4, 4 + (i % 2) * 2, 2, 1, '#ff4a5a'); }
-      R(14, 10, 20, 2, '#4a1a2a');
+      for (let i = 0; i < 6; i++) { R(14 + i * 4, 3 + (i % 2) * 2, 2, 8 - (i % 2) * 2, '#1a1626'); R(14 + i * 4, 3 + (i % 2) * 2, 1, 2, '#e0d4ff'); }   // black glass
+      R(14, 10, 20, 2, '#2a2444');
     }
     // finer features: a lid line and a catch-light in each eye, a blush, a two-tone mouth, a softer jaw,
     // a shadow under the chin, and a highlight running through the hair
@@ -5299,7 +5299,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     nessa: { skin: '#f0d4c0', hair: '#2a1a14', style: 'long', top: '#5a5a6a', trim: '#8a8a9a', robe: '#4a4a5a', eye: '#2a1a14', axe: true },
     lissa: { skin: '#f0d4c0', hair: '#b8864a', style: 'braid', top: '#4a7a4a', trim: '#c8e0a0', robe: '#3f6a3f', eye: '#2a1a14', basket: true, small: 2 },
     rowan: { skin: '#f2d8b8', hair: '#e8c070', style: 'swept', top: '#3a5a2a', trim: '#e8c070', legs: '#2a3a1e', boots: '#3a2a14', eye: '#4ac06a', antlers: true, tall: 1, coat: true },
-    queen: { skin: '#efe4ea', hair: '#2a0a16', style: 'long', top: '#3a0e20', trim: '#ff4a5a', robe: '#2a0a16', eye: '#ff4a5a', crown: true, tall: 2 },
+    queen: { skin: '#e8e4f2', hair: '#0c0a16', style: 'long', top: '#1a1630', trim: '#c8b8ff', robe: '#0e0c1c', eye: '#e8e0ff', crown: true, tall: 2 },
   };
 
   function drawBody(g, L, frame) {
@@ -5309,11 +5309,10 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     const hip = -18 - tall, sh = -34 - tall * 2 + small + breathe, head = sh - 11;   // y of hips, shoulders, top of the head
     const top = L.top, topL = shade(top, 1.28), topD = shade(top, 0.72), skin = L.skin, skinD = shade(skin, 0.8), skinL = shade(skin, 1.08);
     const hair = L.hair, hairL = shade(hair, 1.4), hairD = shade(hair, 0.7);
-    // wings, folded behind (the High Lord of Dusk)
+    // a mantle of dusk behind him, with stars in it (the Lord of Dusk; the Lit have no wings)
     if (L.wings) {
-      R(-13, sh - 14, 4, 6, '#0e0b22'); R(-14, sh - 9, 8, 40, '#0e0b22'); R(-12, sh + 30, 5, 8, '#0e0b22');
-      R(-14, sh - 9, 1, 38, '#6a5aa8'); R(-11, sh - 4, 1, 30, '#1c1838'); R(-9, sh - 2, 1, 26, '#1c1838');
-      R(-13, sh - 15, 2, 2, '#b9a8ff');
+      R(-11, sh - 2, 8, 40, '#0e0b22'); R(-12, sh + 34, 7, 6, '#0e0b22'); R(-11, sh - 2, 1, 38, '#3a2a6a');
+      for (let i = 0; i < 6; i++) R(-10 + (i * 3) % 6, sh + 3 + i * 6, 1, 1, i % 2 ? '#c8b8ff' : '#fff6d8');
     }
     if (L.style === 'long') { R(-6, head + 3, 4, 20, hairD); R(-5, head + 3, 2, 18, hair); }
     // legs or a robe
@@ -5354,8 +5353,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     if (L.style === 'long') { R(-5, head - 2, 10, 4, hair); R(-5, head, 3, 10, hair); R(-3, head - 2, 6, 1, hairL); }
     if (L.style === 'braid') { R(-5, head - 2, 10, 4, hair); R(-5, head, 3, 6, hair); R(-3, head - 2, 6, 1, hairL); for (let i = 0; i < 5; i++) R(-7 + (i % 2), head + 5 + i * 3, 3, 3, i % 2 ? hairD : hair); R(3, head - 1, 2, 2, '#ff9ac0'); }
     if (L.glasses) { R(0, head + 2, 5, 1, '#e8c070'); R(0, head + 5, 5, 1, '#e8c070'); R(0, head + 2, 1, 4, '#e8c070'); R(4, head + 2, 1, 4, '#e8c070'); }
-    if (L.antlers) { R(-2, head - 8, 1, 7, '#d8c8a0'); R(-4, head - 10, 1, 4, '#d8c8a0'); R(-3, head - 7, 2, 1, '#d8c8a0'); R(2, head - 9, 1, 8, '#d8c8a0'); R(3, head - 7, 3, 1, '#d8c8a0'); R(5, head - 10, 1, 4, '#d8c8a0'); R(-4, head - 1, 9, 1, '#e8c070'); }
-    if (L.crown) { for (let i = 0; i < 5; i++) { R(-4 + i * 2, head - 5 + (i % 2) * 2, 1, 4 - (i % 2) * 2, '#4a1a2a'); } R(-4, head - 2, 9, 1, '#ff4a5a'); }
+    if (L.antlers) { for (let i = 0; i < 7; i++) { const hh = 2 + (3 - Math.abs(i - 3)); R(-4 + i * 1.5, head - 1 - hh, 1, hh, i % 2 ? '#ffd27a' : '#fff6d8'); } R(-4, head - 1, 9, 1, '#e8c070'); }   // a crown of morning light
+    if (L.crown) { for (let i = 0; i < 5; i++) { R(-4 + i * 2, head - 6 + (i % 2) * 2, 1, 5 - (i % 2) * 2, '#1a1626'); R(-4 + i * 2, head - 6 + (i % 2) * 2, 1, 1, '#c8b8ff'); } R(-4, head - 2, 9, 1, '#6a5aa8'); }   // a crown of black glass
     if (L.wings) R(-4, head + 1, 9, 1, '#cfd6ff');                                                          // his circlet
     // what they carry
     if (L.book) { R(4, sh + 10, 7, 9, '#3a2a5a'); R(4, sh + 10, 7, 1, '#e8c070'); R(10, sh + 10, 1, 9, '#f4f0e0'); }
@@ -5505,9 +5504,10 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       sky(g, ['#0c0a26', '#2a1c4a', '#6a3a6a']); starfield(g, t, 40, 9, 90); moon(g, 178, 46, 10);
       g.fillStyle = '#2a1c3a'; for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(112 + i * 20, 122, 16 + rnd(i) * 6, 0, 6.3); g.fill(); }
       drift(g, t, 22, ['#ff9ac0', '#ffffff'], false, 2);
-      if (arrive > 0) {   // wings first, then the man, then the eyes
-        const y = 120 - arrive * 22, sp = arrive * 34;
-        g.fillStyle = '#05040f'; for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(160, y - 18); g.lineTo(160 + sd * sp, y - 38 - Math.sin(t * 0.05) * 3); g.lineTo(160 + sd * (sp + 10), y - 8); g.lineTo(160 + sd * sp * 0.6, y - 2); g.lineTo(160 + sd * sp * 0.3, y + 8); g.fill(); }
+      if (arrive > 0) {   // a falling star first, then the man inside it, then the eyes
+        const y = 120 - arrive * 22;
+        for (let q = 0; q < 12; q++) { const kk = q / 12; g.globalAlpha = (1 - kk) * 0.7 * (arrive < 1 ? 1 : 0.4); g.fillStyle = q % 2 ? '#c8b8ff' : '#fff6d8'; g.beginPath(); g.ellipse(160 + kk * 60, y - 20 - kk * 70, 6 * (1 - kk * 0.6), 3, -1.1, 0, 6.3); g.fill(); }
+        g.globalAlpha = 1; g.fillStyle = '#05040f';
         R(g, 154, y - 26, 12, 30, '#05040f'); R(g, 155, y - 36, 10, 11, '#05040f');
         if (arrive >= 1) { const bl = (t % 200) < 5; if (!bl) { R(g, 157, y - 31, 2, 1, '#a58bff'); R(g, 162, y - 31, 2, 1, '#a58bff'); } glow(g, 160, y - 30, 10, 'rgba(165,139,255,0.35)'); }
       }
@@ -5664,24 +5664,18 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       for (let k = 0; k < 4; k++) { const ty = base - h * 0.2 - k * h * 0.2, tw = (h * 0.24) * (1 - k * 0.2); g.fillStyle = col; g.beginPath(); g.moveTo(x, ty - h * 0.3); g.lineTo(x - tw, ty); g.lineTo(x + tw, ty); g.fill(); if (snowCol) { g.fillStyle = snowCol; g.beginPath(); g.moveTo(x, ty - h * 0.3); g.lineTo(x - tw * 0.7, ty - 2); g.lineTo(x - tw * 0.2, ty - h * 0.14); g.fill(); } }
       R(g, x - 1, base - h * 0.2, 3, h * 0.2, col); }
   }
-  // the white stag, drawn for the screen: slender, antlered, lit from inside
+  // the low star, drawn for the screen: a ball of white light trailing a veil. fall 0..1: it drops into the snow and goes out
   function stag(g, x, y, fall, t) {
-    g.save(); g.translate(x, y); g.rotate(-fall * 1.42); g.translate(fall * 6, -fall * 9);
-    const br = Math.sin(t * 0.05) * 0.5;
-    for (const ol of ['#5a6a98', null]) {
-      const e = ol ? 1.2 : 0, wc = ol || '#f6f8ff', sc = ol || '#cfd8f4';
-      g.strokeStyle = ol || '#dfe6fb'; g.lineWidth = 2.4 + e * 2; g.lineCap = 'round';
-      for (const lx of [-13, -8, 8, 13]) { g.beginPath(); g.moveTo(lx, -15); g.lineTo(lx + (lx < 0 ? -1 : 1), -7); g.lineTo(lx, 0); g.stroke(); }
-      g.fillStyle = wc; g.beginPath(); g.moveTo(-18 - e, -23 + br); g.quadraticCurveTo(-4, -30 - e + br, 12, -27 - e + br); g.quadraticCurveTo(18 + e, -22, 15 + e, -16); g.quadraticCurveTo(0, -11 + e, -14, -13 + e); g.quadraticCurveTo(-21 - e, -16, -18 - e, -23 + br); g.fill();
-      if (!ol) { g.fillStyle = sc; g.beginPath(); g.moveTo(-15, -15); g.quadraticCurveTo(0, -11, 14, -16); g.quadraticCurveTo(0, -13.5, -15, -15); g.fill(); }
-      g.strokeStyle = wc; g.lineWidth = 6 + e * 2; g.beginPath(); g.moveTo(11, -24); g.quadraticCurveTo(13, -36, 19, -42 + br); g.stroke();
-      g.fillStyle = wc; g.beginPath(); g.moveTo(15 - e, -47 + br - e); g.lineTo(23, -47 + br - e); g.lineTo(30 + e, -41 + br); g.lineTo(29 + e, -38 + br + e); g.lineTo(17 - e, -38 + br + e); g.closePath(); g.fill();
-      g.strokeStyle = ol || '#eef2ff'; g.lineWidth = 1.6 + e * 2;
-      for (const sd of [0, 1]) { const ax = 18 + sd * 4, ln = sd ? 6 : -6; g.beginPath(); g.moveTo(ax, -46 + br); g.quadraticCurveTo(ax + ln * 0.4, -57, ax + ln, -68); g.moveTo(ax + ln * 0.3, -54); g.lineTo(ax + ln * 0.3 + (sd ? 7 : -7), -60); g.moveTo(ax + ln * 0.65, -61); g.lineTo(ax + ln * 0.65 + (sd ? 7 : -7), -68); g.stroke(); }
-      if (!ol) R(g, 24, -44 + br, 2, 2, '#1a1430');
-    }
-    g.restore();
+    g.save(); g.translate(x, y - 26 + fall * 22);
+    const R0 = 12 * (1 - fall * 0.5);
+    for (let i = 0; i < 8; i++) { const k = i / 8; g.globalAlpha = (1 - k) * 0.45 * (1 - fall * 0.8); g.fillStyle = i % 2 ? '#cfd6ff' : '#fff6d8'; g.beginPath(); g.ellipse(-10 - k * 34, Math.sin(t * 0.06 + i) * 3 * k, R0 * (1 - k * 0.7), R0 * 0.5 * (1 - k * 0.6), 0, 0, 6.3); g.fill(); }
+    g.globalAlpha = 1;
+    glow(g, 0, 0, R0 * 3.4, 'rgba(255,250,235,' + (0.75 - fall * 0.6) + ')');
+    g.fillStyle = fall < 1 ? '#ffffff' : '#c8c8d8'; g.beginPath(); g.arc(0, 0, R0 * 0.55, 0, 6.3); g.fill();
+    for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + t * 0.01; g.globalAlpha = 0.8 - fall * 0.7; R(g, Math.cos(a) * R0 * 1.5 - 1, Math.sin(a) * R0 * 1.5 - 1, 2, 2, '#ffffff'); }
+    g.globalAlpha = 1; g.restore();
   }
+
 
   // ---------------------------------------------------------------- The white stag
   C.hunt = function (g, t, cue) {
@@ -5774,23 +5768,23 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   // ---------------------------------------------------------------- Under the Mountain: his blood, and she wakes fae
   C.rebirth = function (g, t, cue) {
     const c = cam(t), r = cue && cue.name === 'rise' ? cue.t : -1, up = r < 0 ? 0 : ease(r / 90), light = r < 0 ? 0 : Math.min(1, r / 60);
-    sky(g, ['#040608', '#0a1410', '#12201a', '#0c1612']);
-    layer(g, c, 0.3, () => { g.fillStyle = '#0e1a14'; for (let i = -1; i < 12; i++) { const x = i * 32, h = 30 + rnd(i) * 50; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 16, h); g.lineTo(x + 34, 0); g.fill(); } glow(g, 160, 90, 150, 'rgba(255,140,170,' + (0.10 + light * 0.1) + ')'); });
+    sky(g, ['#04030a', '#0a0816', '#120e22', '#0a0816']);
+    layer(g, c, 0.3, () => { g.fillStyle = '#0e0c1c'; for (let i = -1; i < 12; i++) { const x = i * 32, h = 30 + rnd(i) * 50; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 16, h); g.lineTo(x + 34, 0); g.fill(); } glow(g, 160, 90, 150, 'rgba(190,160,255,' + (0.10 + light * 0.1) + ')'); });
     layer(g, c, 0.6, () => {   // the queen's thorns, which burn back from the light
-      for (let i = 0; i < 9; i++) { const x = (i < 5 ? 10 + i * 22 : 190 + (i - 5) * 30) + (i < 5 ? -1 : 1) * light * 26, sw = Math.sin(t * 0.02 + i) * 2; g.strokeStyle = '#2a1024'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(x, 132); g.quadraticCurveTo(x + sw + (i < 5 ? 16 : -16), 90, x + (i < 5 ? 30 : -30) + sw, 56 + rnd(i) * 30); g.stroke(); g.fillStyle = light > 0.3 ? '#ff8a3a' : '#ff5a78'; for (let k = 0; k < 4; k++) R(g, x + (i < 5 ? 1 : -1) * k * 7 + sw, 120 - k * 16, 2, 2, g.fillStyle); }
+      for (let i = 0; i < 9; i++) { const x = (i < 5 ? 10 + i * 22 : 190 + (i - 5) * 30) + (i < 5 ? -1 : 1) * light * 26, sw = Math.sin(t * 0.02 + i) * 2; g.strokeStyle = '#1c1830'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(x, 132); g.quadraticCurveTo(x + sw + (i < 5 ? 16 : -16), 90, x + (i < 5 ? 30 : -30) + sw, 56 + rnd(i) * 30); g.stroke(); g.fillStyle = light > 0.3 ? '#ff8a3a' : '#c8b8ff'; for (let k = 0; k < 4; k++) R(g, x + (i < 5 ? 1 : -1) * k * 7 + sw, 120 - k * 16, 2, 2, g.fillStyle); }
     });
     layer(g, c, 1, () => {
-      R(g, -30, 128, W + 60, 30, '#0a100c'); R(g, -30, 128, W + 60, 1, '#2f4a3c'); R(g, 124, 122, 76, 8, '#1c2a22'); R(g, 124, 122, 76, 1, '#4f7a62');   // the slab
+      R(g, -30, 128, W + 60, 30, '#08070e'); R(g, -30, 128, W + 60, 1, '#3a3266'); R(g, 124, 122, 76, 8, '#1a1626'); R(g, 124, 122, 76, 1, '#6a5aa8');   // the slab
       glow(g, 160, 112 - up * 22, 30 + light * 120, 'rgba(255,246,216,' + (0.18 + light * 0.6) + ')');
       if (light > 0) { g.save(); g.translate(160, 108 - up * 22); g.rotate(t * 0.004); for (let i = 0; i < 16; i++) { g.rotate(Math.PI / 8); g.fillStyle = 'rgba(255,224,150,' + 0.12 * light + ')'; g.beginPath(); g.moveTo(0, 0); g.lineTo(-6, -220 * light); g.lineTo(6, -220 * light); g.fill(); } g.restore(); }
       // Wren: lying on the slab, then lifted upright by the light
       g.save(); g.translate(160, 122 - up * 16); g.rotate(-Math.PI / 2 * (1 - up)); person(g, 'wren', 0, up < 1 ? 0 : 0, 1, up > 0.9 ? t : 0); g.restore();
       person(g, 'caelum', 214, 134, -1, t, r > 30 && r < 140 ? { emote: { e: '!', t: 30 } } : null);
-      if (r < 0) { const k = (t % 90) / 90; R(g, 190 - k * 24, 100 + k * 16, 2, 3, '#ff5a78'); glow(g, 190 - k * 24, 101 + k * 16, 6, 'rgba(255,90,120,0.6)'); }   // his blood, a drop at a time
-      else { const pk = 0.5 + 0.4 * Math.sin(t * 0.08); g.strokeStyle = 'rgba(255,210,122,' + pk * light + ')'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(164, 106 - up * 22); g.quadraticCurveTo(188, 92, 210, 108); g.stroke(); }   // the bond, pulled taut
+      if (r < 0) { glow(g, 196, 104, 14, 'rgba(200,184,255,0.7)'); for (let q = 0; q < 6; q++) { const k = ((t * 0.012 + q / 6) % 1); R(g, 196 - k * 34, 104 + k * 10 - Math.sin(k * 3.14) * 10, 2, 2, q % 2 ? '#c8b8ff' : '#fff6d8'); } }   // his own star, leaving his hands for her
+      else { const pk = 0.5 + 0.4 * Math.sin(t * 0.08); g.strokeStyle = 'rgba(255,210,122,' + pk * light + ')'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(164, 106 - up * 22); g.quadraticCurveTo(188, 92, 210, 108); g.stroke(); }   // the Tether, pulled taut
       if (light > 0) for (let i = 0; i < 40; i++) { const a = rnd(i) * 6.283, k = ((r * 0.012 + rnd(i * 3)) % 1); R(g, 160 + Math.cos(a) * k * 170, 104 - up * 22 + Math.sin(a) * k * 100, 2, 2, i % 2 ? '#ffd27a' : '#fff6d8'); }
     });
-    layer(g, c, 1.8, () => { g.fillStyle = '#030504'; g.beginPath(); g.moveTo(-40, 150); g.lineTo(-40, 70); g.quadraticCurveTo(0, 96, 22, 150); g.fill(); g.beginPath(); g.moveTo(350, 150); g.lineTo(350, 84); g.quadraticCurveTo(310, 100, 292, 150); g.fill(); });
+    layer(g, c, 1.8, () => { g.fillStyle = '#030208'; g.beginPath(); g.moveTo(-40, 150); g.lineTo(-40, 70); g.quadraticCurveTo(0, 96, 22, 150); g.fill(); g.beginPath(); g.moveTo(350, 150); g.lineTo(350, 84); g.quadraticCurveTo(310, 100, 292, 150); g.fill(); });
     if (r >= 0 && r < 12) { g.fillStyle = 'rgba(255,246,216,' + (1 - r / 12) + ')'; g.fillRect(0, 0, W, H); }
     C.post(g, t);
   };
@@ -5841,14 +5835,19 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   };
 
   // a thorn vine: grows from (x0, base) by `len`, swaying; buds glow at its tip and along it
+  // a shard of the Eclipse's black glass, rising from (x0, base) by len: dark, sharp, with a cold lit face (was a thorn vine)
+  const GLASS = { '#4a1226': '#1c1830', '#5a1830': '#241f3a', '#6a1c34': '#2a2444', '#3a1226': '#1a1626', '#05020a': '#05040a', '#3a1024': '#2a2444' };
   function vine(g, x0, base, len, i, t, col, bud) {
-    g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); g.moveTo(x0, base);
-    let x = x0, y = base;
-    for (let k = 0; k < len; k += 5) { x = x0 + Math.sin(k * 0.07 + i * 1.7) * (8 + k * 0.08) + Math.sin(t * 0.02 + i) * k * 0.03; y = base - k; g.lineTo(x, y); }
-    g.stroke(); g.lineWidth = 1;
-    for (let k = 12; k < len; k += 14) { const tx = x0 + Math.sin(k * 0.07 + i * 1.7) * (8 + k * 0.08), sd = k % 28 ? 1 : -1; g.fillStyle = col; g.beginPath(); g.moveTo(tx, base - k); g.lineTo(tx + sd * 6, base - k - 3); g.lineTo(tx, base - k - 4); g.fill(); }
-    if (len > 16 && bud) { glow(g, x, y, 9, 'rgba(255,74,90,0.5)'); R(g, x - 2, y - 2, 4, 4, bud); R(g, x - 1, y - 3, 2, 1, '#ffb0b8'); }
+    if (len <= 3) return;
+    col = GLASS[col] || col;
+    const L = len, lean = Math.sin(i * 1.7) * L * 0.22, w = 3 + (i % 3) * 2 + L * 0.05;
+    g.fillStyle = col; g.beginPath(); g.moveTo(x0 - w, base); g.lineTo(x0 + lean, base - L); g.lineTo(x0 + w, base); g.fill();
+    g.fillStyle = 'rgba(120,100,200,0.35)'; g.beginPath(); g.moveTo(x0 + lean, base - L); g.lineTo(x0 + w, base); g.lineTo(x0 + w * 0.2, base); g.fill();
+    g.strokeStyle = 'rgba(224,212,255,0.55)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x0 + w * 0.4, base); g.lineTo(x0 + lean, base - L); g.stroke();
+    if (L > 30) { const sx = x0 + lean * 0.45, sy = base - L * 0.45, sd = i % 2 ? 1 : -1; g.fillStyle = col; g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + sd * L * 0.3, sy - L * 0.25); g.lineTo(sx, sy - 6); g.fill(); }
+    if (L > 16 && bud) { glow(g, x0 + lean, base - L, 9, 'rgba(190,160,255,0.55)'); R(g, x0 + lean - 1, base - L - 1, 2, 2, '#fff6ff'); }
   }
+
 
   // ---------------------------------------------------------------- The Spring Court garden: she paints again, and he watches from the arch
   C.garden = function (g, t) {
@@ -5898,27 +5897,28 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   // ---------------------------------------------------------------- The Blight: her thorns climb the courts, and she watches from the mountain
   C.thorns = function (g, t) {
     const c = cam(t), grow = ease(t / 300);
-    sky(g, ['#12040c', '#3a0a18', '#7a1a26', '#c2452e']);
-    layer(g, c, 0.05, () => { glow(g, 160, 96, 110, 'rgba(255,90,70,0.35)'); for (let i = 0; i < 30; i++) { g.globalAlpha = 0.3 + 0.4 * Math.abs(Math.sin(t * 0.02 + i)); R(g, rnd(i + 2) * W, rnd(i * 3) * 60, 1, 1, '#ffb0a0'); } g.globalAlpha = 1; });
+    sky(g, ['#04030a', '#0e0b1e', '#1e1838', '#3a2e5e']);
+    layer(g, c, 0.05, () => { glow(g, 248, 36, 46, 'rgba(255,246,216,0.8)'); g.fillStyle = '#000000'; g.beginPath(); g.arc(250, 36, 15, 0, 6.3); g.fill(); g.strokeStyle = 'rgba(255,246,216,0.9)'; g.lineWidth = 1; g.beginPath(); g.arc(250, 36, 15.5, 0, 6.3); g.stroke(); });   // the eclipse itself
+    layer(g, c, 0.05, () => { glow(g, 160, 96, 110, 'rgba(150,120,255,0.35)'); for (let i = 0; i < 30; i++) { g.globalAlpha = 0.3 + 0.4 * Math.abs(Math.sin(t * 0.02 + i)); R(g, rnd(i + 2) * W, rnd(i * 3) * 60, 1, 1, '#d8d0ff'); } g.globalAlpha = 1; });
     layer(g, c, 0.2, () => {   // the mountain, hollow, with one lit window near the top: hers
-      g.fillStyle = '#1a060e'; g.beginPath(); g.moveTo(40, 124); g.lineTo(120, 52); g.lineTo(146, 66); g.lineTo(170, 22); g.lineTo(198, 60); g.lineTo(226, 48); g.lineTo(290, 124); g.fill();
-      g.fillStyle = '#2a0a16'; g.beginPath(); g.moveTo(170, 22); g.lineTo(198, 60); g.lineTo(186, 74); g.lineTo(176, 52); g.fill();
-      const pk = 0.6 + 0.4 * Math.sin(t * 0.05); glow(g, 170, 48, 16 * pk, 'rgba(255,74,90,0.7)'); R(g, 168, 44, 4, 7, '#ff4a5a'); R(g, 169, 45, 2, 3, '#ffd0d0');
+      g.fillStyle = '#0c0a18'; g.beginPath(); g.moveTo(40, 124); g.lineTo(120, 52); g.lineTo(146, 66); g.lineTo(170, 22); g.lineTo(198, 60); g.lineTo(226, 48); g.lineTo(290, 124); g.fill();
+      g.fillStyle = '#16122a'; g.beginPath(); g.moveTo(170, 22); g.lineTo(198, 60); g.lineTo(186, 74); g.lineTo(176, 52); g.fill();
+      const pk = 0.6 + 0.4 * Math.sin(t * 0.05); glow(g, 170, 48, 16 * pk, 'rgba(190,160,255,0.7)'); R(g, 168, 44, 4, 7, '#c8b8ff'); R(g, 169, 45, 2, 3, '#f0eaff');
       g.fillStyle = '#05020a'; g.beginPath(); g.moveTo(150, 124); g.lineTo(150, 104); g.quadraticCurveTo(170, 84, 190, 104); g.lineTo(190, 124); g.fill();   // the gate into the Deep
     });
     layer(g, c, 0.4, () => {   // a court on the plain below, its towers being taken
       const towers = [[36, 30], [58, 44], [78, 26], [232, 38], [256, 50], [280, 30]];
-      for (const [x, h] of towers) { R(g, x, 122 - h, 12, h, '#2a0e1a'); g.fillStyle = '#2a0e1a'; g.beginPath(); g.moveTo(x - 2, 122 - h); g.lineTo(x + 6, 112 - h); g.lineTo(x + 14, 122 - h); g.fill(); const lit = grow < 0.5 + rnd(x) * 0.4; R(g, x + 4, 128 - h, 3, 4, lit ? '#ffd27a' : '#12040a'); }
-      towers.forEach(([x, h], i) => vine(g, x + 6, 124, grow * (h + 14), i + 20, t, '#4a1226', null));
+      for (const [x, h] of towers) { R(g, x, 122 - h, 12, h, '#18142c'); g.fillStyle = '#18142c'; g.beginPath(); g.moveTo(x - 2, 122 - h); g.lineTo(x + 6, 112 - h); g.lineTo(x + 14, 122 - h); g.fill(); const lit = grow < 0.5 + rnd(x) * 0.4; R(g, x + 4, 128 - h, 3, 4, lit ? '#ffd27a' : '#0a0814'); }
+      towers.forEach(([x, h], i) => vine(g, x + 6, 124, grow * (h + 14), i + 20, t, '#1c1830', null));
     });
-    layer(g, c, 0.75, () => { R(g, -30, 120, W + 60, 34, '#14050c'); for (let i = 0; i < 9; i++) vine(g, 10 + i * 38 + rnd(i) * 14, 126, grow * (34 + rnd(i * 2) * 44), i, t, '#5a1830', '#ff4a5a'); });
+    layer(g, c, 0.75, () => { R(g, -30, 120, W + 60, 34, '#0a0814'); for (let i = 0; i < 9; i++) vine(g, 10 + i * 38 + rnd(i) * 14, 126, grow * (34 + rnd(i * 2) * 44), i, t, '#241f3a', '#c8b8ff'); });
     layer(g, c, 1, () => {
-      R(g, -30, 132, W + 60, 20, '#0a0308'); R(g, -30, 132, W + 60, 1, '#4a1226');
+      R(g, -30, 132, W + 60, 20, '#06050c'); R(g, -30, 132, W + 60, 1, '#1c1830');
       for (let i = 0; i < 12; i++) { const x = rnd(i + 31) * W, dead = grow > rnd(i * 7); R(g, x, 126, 1, 6, dead ? '#3a2a22' : '#5a9a4a'); R(g, x - 1, 124, 3, 3, dead ? '#4a3a30' : i % 2 ? '#ff9ac0' : '#fff0f4'); }   // Spring's flowers, dying one by one
       person(g, 'queen', 160, 138, 1, t);
-      for (let i = 0; i < 6; i++) vine(g, 160 + (i - 2.5) * 16, 138, grow * (14 + rnd(i) * 16), i + 50, t, '#6a1c34', i % 2 ? '#ff4a5a' : null);
+      for (let i = 0; i < 6; i++) vine(g, 160 + (i - 2.5) * 16, 138, grow * (14 + rnd(i) * 16), i + 50, t, '#2a2444', i % 2 ? '#c8b8ff' : null);
     });
-    drift(g, t, 22, ['#ff7a5a', '#ffb057', '#5a1830'], true, 33);
+    drift(g, t, 22, ['#a898e8', '#ffb057', '#241f3a'], true, 33);
     layer(g, c, 1.8, () => { for (const [x0, i] of [[-6, 90], [14, 91], [306, 92], [326, 93]]) { g.globalAlpha = 1; vine(g, x0, 154, 60 + grow * 80, i, t, '#05020a', null); } });
   };
 
@@ -5931,8 +5931,8 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       for (let i = 0; i < 10; i++) { const x = rnd(i + 8) * W; g.globalAlpha = 0.25; R(g, x, 0, 1, 40 + rnd(i * 2) * 70, '#3a4a5a'); const dy = (t * 0.6 + i * 37) % 120; g.globalAlpha = 0.7; R(g, x, dy, 1, 2, '#8ab0c8'); } g.globalAlpha = 1;
       R(g, 70, 22, 22, 16, '#03040a'); for (let i = 0; i < 4; i++) R(g, 73 + i * 5, 22, 2, 16, '#1c2028');
       const mg = g.createLinearGradient(80, 30, 130, 126); mg.addColorStop(0, 'rgba(160,190,230,0.22)'); mg.addColorStop(1, 'rgba(160,190,230,0)'); g.fillStyle = mg; g.beginPath(); g.moveTo(70, 38); g.lineTo(92, 38); g.lineTo(158, 128); g.lineTo(92, 128); g.fill();
-      for (let i = 0; i < 4; i++) vine(g, 250 + i * 18, 0, -0, i, t, '#3a1226', null);
-      g.save(); g.translate(0, 0); for (let i = 0; i < 4; i++) { g.strokeStyle = '#3a1226'; g.lineWidth = 2; g.beginPath(); g.moveTo(244 + i * 20, 0); for (let y = 0; y < 50 + rnd(i) * 40; y += 5) g.lineTo(244 + i * 20 + Math.sin(y * 0.1 + i) * 6, y); g.stroke(); } g.lineWidth = 1; g.restore();
+      for (let i = 0; i < 4; i++) vine(g, 250 + i * 18, 0, -0, i, t, '#2a2444', null);
+      g.save(); g.translate(0, 0); for (let i = 0; i < 4; i++) { g.strokeStyle = '#2a2444'; g.lineWidth = 2; g.beginPath(); g.moveTo(244 + i * 20, 0); for (let y = 0; y < 50 + rnd(i) * 40; y += 5) g.lineTo(244 + i * 20 + Math.sin(y * 0.1 + i) * 6, y); g.stroke(); } g.lineWidth = 1; g.restore();
     });
     layer(g, c, 1, () => {
       R(g, -30, 126, W + 60, 26, '#0c0e14'); R(g, -30, 126, W + 60, 1, '#262a36'); for (let i = -1; i < 14; i++) R(g, i * 26 + 8, 127, 1, 24, '#07080c');
@@ -5941,12 +5941,12 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       g.strokeStyle = '#3a3e4a'; g.lineWidth = 1; g.beginPath(); g.moveTo(128, 60); for (let i = 0; i < 8; i++) g.lineTo(128 - i * 3 + (i % 2), 60 + i * 8); g.stroke();   // a chain
       // Wren, lying on her side in the straw, breathing fast; the wound in her arm glows the queen's red
       g.save(); g.translate(104, 124); g.rotate(-Math.PI / 2); person(g, 'wren', 0, 0, 1, 0); g.restore();
-      const fever = 0.5 + 0.5 * Math.sin(t * 0.12); glow(g, 110, 118, 9 + fever * 4, 'rgba(255,74,90,' + (0.35 + fever * 0.3) + ')'); R(g, 109, 117, 3, 2, '#ff4a5a');
-      if (k > 0) {   // he steps out of the dark: night first, then stars, then wings, then the man
+      const fever = 0.5 + 0.5 * Math.sin(t * 0.12); glow(g, 110, 118, 9 + fever * 4, 'rgba(190,160,255,' + (0.35 + fever * 0.3) + ')'); R(g, 109, 117, 3, 2, '#c8b8ff');
+      if (k > 0) {   // he falls into the cell like a star: night first, then stars, then the streak, then the man
         glow(g, 206, 96, 80 * k, 'rgba(120,100,220,0.4)');
         for (let i = 0; i < 46; i++) { const a = i / 46 * 6.3 + t * 0.008, r = 30 + rnd(i) * 40; g.globalAlpha = k * (0.4 + 0.6 * Math.abs(Math.sin(t * 0.08 + i))); R(g, 206 + Math.cos(a) * r, 92 + Math.sin(a) * r * 0.7, 1, 1, i % 3 ? '#fff6d8' : '#b9a8ff'); }
-        g.globalAlpha = k; g.fillStyle = '#05040e';
-        for (const sd of [-1, 1]) { const sp = 30 + Math.sin(t * 0.03) * 2; g.beginPath(); g.moveTo(206, 100); g.quadraticCurveTo(206 + sd * sp, 60, 206 + sd * (sp + 8), 112); g.lineTo(206 + sd * sp * 0.7, 104); g.lineTo(206 + sd * sp * 0.4, 116); g.lineTo(206, 110); g.fill(); }
+        for (let q = 0; q < 10; q++) { const kk = q / 10; g.globalAlpha = k * (1 - kk) * 0.6; g.fillStyle = q % 2 ? '#3a2a6a' : '#1c1838'; g.beginPath(); g.ellipse(206 + kk * 50, 96 - kk * 60, 12 * (1 - kk * 0.6), 6, -0.9, 0, 6.3); g.fill(); }   // the streak he fell along
+        g.globalAlpha = k;
         person(g, 'caelum', 206, 138, -1, t);
         g.globalAlpha = k * (0.5 + 0.3 * Math.sin(t * 0.06)); g.strokeStyle = '#ffd27a'; g.beginPath(); g.moveTo(112, 116); g.bezierCurveTo(140, 100, 176, 124, 200, 112); g.stroke();   // the thread, though she cannot feel it yet
         g.globalAlpha = 1;
@@ -5958,33 +5958,34 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   // ---------------------------------------------------------------- The Queen's throne: three trials won, and the last thorn
   C.trials = function (g, t, cue) {
     const c = cam(t), ct = cue ? cue.t : 0, strike = cue && cue.name === 'end' ? ease((ct - 150) / 40) : 0;
-    sky(g, ['#0a0308', '#200812', '#4a0e1c', '#200812']);
+    sky(g, ['#06050c', '#100c20', '#241a40', '#100c20']);
     layer(g, c, 0.15, () => {   // the hall: pillars of root going up into the dark, braziers burning red
-      for (let i = -1; i < 8; i++) { const x = i * 48 + 10; R(g, x, 0, 14, 126, '#14050c'); R(g, x + 2, 0, 2, 126, '#2a0a16'); for (let k = 0; k < 5; k++) R(g, x + rnd(i * 5 + k) * 12, rnd(k + i) * 120, 2, 8, '#0a0308'); }
-      for (const x of [58, 262]) { const fl = Math.sin(t * 0.25 + x) * 2; glow(g, x, 84, 36 + fl * 2, 'rgba(255,74,60,0.45)'); R(g, x - 5, 90, 10, 3, '#3a2a2a'); R(g, x - 1, 93, 2, 33, '#2a1c1c'); g.fillStyle = '#ff6a4a'; g.beginPath(); g.moveTo(x - 4, 90); g.lineTo(x, 78 + fl); g.lineTo(x + 4, 90); g.fill(); R(g, x - 1, 85, 2, 4, '#ffd27a'); }
+      for (let i = -1; i < 8; i++) { const x = i * 48 + 10; R(g, x, 0, 14, 126, '#0a0814'); R(g, x + 2, 0, 2, 126, '#16122a'); for (let k = 0; k < 5; k++) R(g, x + rnd(i * 5 + k) * 12, rnd(k + i) * 120, 2, 8, '#06050c'); }
+      for (const x of [58, 262]) { const fl = Math.sin(t * 0.25 + x) * 2; glow(g, x, 84, 36 + fl * 2, 'rgba(170,140,255,0.45)'); R(g, x - 5, 90, 10, 3, '#3a2a2a'); R(g, x - 1, 93, 2, 33, '#2a1c1c'); g.fillStyle = '#b8a8ff'; g.beginPath(); g.moveTo(x - 4, 90); g.lineTo(x, 78 + fl); g.lineTo(x + 4, 90); g.fill(); R(g, x - 1, 85, 2, 4, '#ffd27a'); }
     });
     layer(g, c, 0.45, () => {   // the freed High Lords' empty chains, and a crowd of the court as shapes
-      for (let i = 0; i < 16; i++) { const x = 8 + i * 20 + rnd(i) * 6, h = 20 + rnd(i * 3) * 8; if (x > 124 && x < 196) continue; R(g, x, 124 - h, 9, h, '#0e040a'); g.fillStyle = '#0e040a'; g.beginPath(); g.arc(x + 4.5, 122 - h, 4, 0, 6.3); g.fill(); if (i % 3 === 0) { R(g, x + 2, 120 - h, 1, 1, '#ff4a5a'); R(g, x + 6, 120 - h, 1, 1, '#ff4a5a'); } }
+      for (let i = 0; i < 16; i++) { const x = 8 + i * 20 + rnd(i) * 6, h = 20 + rnd(i * 3) * 8; if (x > 124 && x < 196) continue; R(g, x, 124 - h, 9, h, '#0a0814'); g.fillStyle = '#0a0814'; g.beginPath(); g.arc(x + 4.5, 122 - h, 4, 0, 6.3); g.fill(); if (i % 3 === 0) { R(g, x + 2, 120 - h, 1, 1, '#c8b8ff'); R(g, x + 6, 120 - h, 1, 1, '#c8b8ff'); } }
     });
+    layer(g, c, 0.6, () => { glow(g, 160, 70, 130, 'rgba(150,120,255,0.35)'); glow(g, 160, 130, 90, 'rgba(200,184,255,0.2)'); });   // her cold light, so the hall can be seen
     layer(g, c, 0.8, () => {   // the throne: woven thorn, taller than it needs to be
-      R(g, 118, 112, 84, 14, '#1a0810'); R(g, 126, 104, 68, 8, '#220a14'); R(g, 134, 96, 52, 8, '#2a0c18');
-      g.fillStyle = '#12040a'; g.beginPath(); g.moveTo(140, 96); g.lineTo(144, 34); g.lineTo(160, 14); g.lineTo(176, 34); g.lineTo(180, 96); g.fill();
-      for (let i = 0; i < 9; i++) { g.strokeStyle = '#3a1024'; g.lineWidth = 2; g.beginPath(); g.moveTo(142 + i * 4.5, 96); g.quadraticCurveTo(160 + (i - 4) * 9, 50, 160 + (i - 4) * 7 + Math.sin(t * 0.02 + i) * 2, 18 + Math.abs(i - 4) * 6); g.stroke(); } g.lineWidth = 1;
-      for (let i = 0; i < 7; i++) { const x = 146 + rnd(i + 3) * 28, y = 30 + rnd(i * 5) * 56; glow(g, x, y, 5, 'rgba(255,74,90,0.5)'); R(g, x - 1, y - 1, 3, 3, '#ff4a5a'); }
+      R(g, 118, 112, 84, 14, '#0e0c1a'); R(g, 126, 104, 68, 8, '#120e22'); R(g, 134, 96, 52, 8, '#18142c');
+      g.fillStyle = '#0a0814'; g.beginPath(); g.moveTo(140, 96); g.lineTo(144, 34); g.lineTo(160, 14); g.lineTo(176, 34); g.lineTo(180, 96); g.fill();
+      for (let i = 0; i < 9; i++) { g.strokeStyle = '#2a2444'; g.lineWidth = 2; g.beginPath(); g.moveTo(142 + i * 4.5, 96); g.quadraticCurveTo(160 + (i - 4) * 9, 50, 160 + (i - 4) * 7 + Math.sin(t * 0.02 + i) * 2, 18 + Math.abs(i - 4) * 6); g.stroke(); } g.lineWidth = 1;
+      for (let i = 0; i < 7; i++) { const x = 146 + rnd(i + 3) * 28, y = 30 + rnd(i * 5) * 56; glow(g, x, y, 5, 'rgba(190,160,255,0.5)'); R(g, x - 1, y - 1, 3, 3, '#c8b8ff'); }
       person(g, 'queen', 160, 96, 1, t);
     });
     layer(g, c, 1, () => {
-      R(g, -30, 126, W + 60, 26, '#0a0308'); R(g, -30, 126, W + 60, 1, '#4a1226'); R(g, 100, 126, 120, 26, '#3a0a16'); R(g, 100, 126, 2, 26, '#e8c070'); R(g, 218, 126, 2, 26, '#e8c070');   // the carpet to the throne
+      R(g, -30, 126, W + 60, 26, '#06050c'); R(g, -30, 126, W + 60, 1, '#1c1830'); R(g, 100, 126, 120, 26, '#1c1636'); R(g, 100, 126, 2, 26, '#e8c070'); R(g, 218, 126, 2, 26, '#e8c070');   // the carpet to the throne
       const fall = strike;
       g.save(); g.translate(204, 142); g.rotate(fall * 1.45); person(g, 'wren', 0, 0, -1, fall > 0 ? 0 : t); g.restore();
       if (cue && cue.name === 'end' && ct > 120) {   // the last thorn: from the floor, through her
         const k = ease((ct - 120) / 30);
-        g.strokeStyle = '#6a1c34'; g.lineWidth = 3; g.beginPath(); g.moveTo(236, 150); g.quadraticCurveTo(230, 140, 236 - 28 * k, 150 - 30 * k); g.stroke(); g.lineWidth = 1;
-        if (k >= 1 && fall < 0.5) { glow(g, 206, 120, 14, 'rgba(255,74,90,0.7)'); R(g, 204, 118, 4, 4, '#ff4a5a'); }
+        g.strokeStyle = '#2a2444'; g.lineWidth = 3; g.beginPath(); g.moveTo(236, 150); g.quadraticCurveTo(230, 140, 236 - 28 * k, 150 - 30 * k); g.stroke(); g.lineWidth = 1;
+        if (k >= 1 && fall < 0.5) { glow(g, 206, 120, 14, 'rgba(190,160,255,0.7)'); R(g, 204, 118, 4, 4, '#c8b8ff'); }
       }
       person(g, 'rowan', 60, 142, 1, t);   // free, and too late
     });
-    drift(g, t, 18, ['#ff7a5a', '#ff4a5a', '#5a1830'], true, 71);
+    drift(g, t, 18, ['#a898e8', '#c8b8ff', '#241f3a'], true, 71);
     layer(g, c, 1.8, () => { vine(g, -4, 154, 110, 3, t, '#05020a', null); vine(g, 324, 154, 120, 5, t, '#05020a', null); vine(g, 20, 154, 60, 8, t, '#05020a', null); });
     if (strike > 0) { g.fillStyle = 'rgba(0,0,0,' + Math.min(0.85, ease((ct - 230) / 80)) + ')'; g.fillRect(0, 0, W, H); }
   };
@@ -6213,7 +6214,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         else { const r = 7 + sc * 11; ctx.globalAlpha = a * 0.78; ctx.fillStyle = '#2a2452'; ctx.beginPath(); ctx.ellipse(x, y - r * 0.25, r * 1.3, r * 0.8, 0, 0, 6.3); ctx.fill(); ctx.fillStyle = '#14102c'; ctx.beginPath(); ctx.ellipse(x, y, r * 1.5, r, 0, 0, 6.3); ctx.ellipse(x + r, y + r * 0.2, r, r * 0.7, 0, 0, 6.3); ctx.ellipse(x - r, y + r * 0.3, r * 1.1, r * 0.7, 0, 0, 6.3); ctx.fill(); if ((t + (o.x * 100 | 0)) % 50 < 4) { ctx.strokeStyle = '#cfd6ff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y - r * 0.4); ctx.lineTo(x - 5, y + r * 0.2); ctx.lineTo(x + 4, y + r * 0.3); ctx.lineTo(x - 2, y + r); ctx.stroke(); } }
       }
       ctx.globalAlpha = 1;
-      // Caelum from behind, wings spread, Wren in his arms
+      // Caelum from behind, falling upward as a comet, Wren in his arms
       const fxp = cx + s.x * vw * 0.2, fyp = VH * 0.66 + s.y * VH * 0.14, flap = Math.sin(t * 0.14) * 0.26;
       if (wall && !(s.flash > 0 && Math.floor(s.flash / 4) % 2)) {   // Rowan's white mare from behind, the two of them on her back
         const gy = VH * 0.56 + s.y * VH * 0.05, gal = Math.sin(t * 0.32), R2 = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
@@ -6224,20 +6225,22 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
         for (let q = 0; q < 5; q++) R2(-3 + Math.sin(t * 0.2 + q) * (q + 1), 14 + q * 6, 6, 7, q % 2 ? '#dfe6f2' : '#ffffff');                        // her tail
         R2(-11, -40, 22, 36, '#0a0818'); R2(-9, -38, 18, 32, '#3a6a3a'); R2(-9, -38, 4, 32, '#2a5028'); R2(5, -38, 4, 32, '#4c8648'); R2(-9, -12, 18, 3, '#e8c070');   // Rowan's back, his belt
         R2(-7, -54, 14, 16, '#0a0818'); R2(-6, -53, 12, 14, '#e8c070');                                                                                 // his fair head
-        for (const sd of [-1, 1]) { ctx.strokeStyle = '#f2e6c8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sd * 4, -53); ctx.lineTo(sd * 10, -64); ctx.lineTo(sd * 16, -62); ctx.moveTo(sd * 10, -64); ctx.lineTo(sd * 9, -72); ctx.stroke(); }   // antlers
+        for (let q = -3; q <= 3; q++) { const a = -Math.PI / 2 + q * 0.32, l = 8 + (3 - Math.abs(q)) * 3; ctx.strokeStyle = '#ffe9a8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 7, -54 + Math.sin(a) * 5); ctx.lineTo(Math.cos(a) * (7 + l), -54 + Math.sin(a) * (5 + l)); ctx.stroke(); }   // his crown of morning light
         R2(-17, -34, 8, 14, '#0a0818'); R2(-16, -33, 6, 12, '#e0703f'); R2(-19, -26, 5, 12, '#e0703f'); R2(-15, -20, 5, 6, '#7a5a3a');                    // Wren in front of him: her hair, her old coat
         for (let q = 0; q < 4; q++) { ctx.globalAlpha = 0.5; R2(-30 + q * 20 + gal * 4, 40 + (q % 2) * 4, 3, 3, '#ffffff'); } ctx.globalAlpha = 1;       // snow kicked up
         ctx.restore();
       }
       if (!wall && !(s.flash > 0 && Math.floor(s.flash / 4) % 2)) {
         ctx.save(); ctx.translate(fxp, fyp); ctx.rotate(s.tilt * 0.6);
-        for (const sd of [-1, 1]) {
-          ctx.save(); ctx.scale(sd, 1); ctx.rotate(-flap);
-          ctx.fillStyle = '#0a0818'; ctx.beginPath(); ctx.moveTo(4, -16); ctx.lineTo(42, -40); ctx.lineTo(96, -30); ctx.lineTo(84, -6); ctx.lineTo(70, -14); ctx.lineTo(60, 8); ctx.lineTo(44, -4); ctx.lineTo(32, 16); ctx.lineTo(18, 0); ctx.lineTo(6, 14); ctx.closePath(); ctx.fill();
-          ctx.fillStyle = '#1c1838'; ctx.beginPath(); ctx.moveTo(6, -14); ctx.lineTo(42, -36); ctx.lineTo(92, -28); ctx.lineTo(82, -10); ctx.lineTo(44, -8); ctx.lineTo(18, -2); ctx.closePath(); ctx.fill();
-          ctx.strokeStyle = '#6a5aa8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(4, -15); ctx.lineTo(42, -38); ctx.lineTo(96, -30); ctx.moveTo(42, -38); ctx.lineTo(60, 6); ctx.moveTo(42, -38); ctx.lineTo(32, 14); ctx.stroke();
-          ctx.restore();
+        // no wings: the Lit fly as a falling star does. A comet of shadow and starlight streams back from him, toward us.
+        for (let q = 0; q < 16; q++) {
+          const k = q / 16, w = 34 * (1 - k * 0.5) + Math.sin(t * 0.2 + q) * 3, yy = 16 + k * 70, sway = Math.sin(t * 0.1 + q * 0.5) * 6 * k - s.tilt * 30 * k;
+          ctx.globalAlpha = 0.55 * (1 - k); ctx.fillStyle = q % 2 ? '#3a2a6a' : '#1c1838'; ctx.beginPath(); ctx.ellipse(sway, yy, w, 10 + k * 8, 0, 0, 6.3); ctx.fill();
         }
+        ctx.globalAlpha = 1;
+        for (let q = 0; q < 22; q++) { const k = ((t * 0.03 + q * 0.13) % 1), sx = Math.sin(q * 2.7) * 30 * (1 - k * 0.4), sy = 10 + k * 90; ctx.globalAlpha = 1 - k; ctx.fillStyle = q % 3 ? '#c8b8ff' : '#fff6d8'; ctx.fillRect(Math.round(sx), Math.round(sy), 2, 2); }   // starlight shed behind
+        ctx.globalAlpha = 1;
+        { const g2 = ctx.createRadialGradient(0, -10, 4, 0, -10, 46); g2.addColorStop(0, 'rgba(200,184,255,0.45)'); g2.addColorStop(1, 'rgba(200,184,255,0)'); ctx.fillStyle = g2; ctx.fillRect(-46, -56, 92, 92); }
         const R = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); };
         R(-10, -22, 20, 34, '#0a0818'); R(-8, -20, 16, 30, '#241f48'); R(-8, -20, 3, 30, '#16122e'); R(5, -20, 3, 30, '#322c62');     // his back
         R(-7, -36, 14, 16, '#0a0818'); R(-6, -35, 12, 14, '#1a1530'); R(-6, -35, 12, 2, '#cfd6ff');                                       // his head, the circlet
@@ -6591,7 +6594,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     g.fillStyle = COL.skin; g.beginPath(); g.moveTo(-3, hy); g.lineTo(6.5, hy); g.lineTo(6.8, hy + 6); g.lineTo(5, hy + 10.5); g.lineTo(0, hy + 11); g.lineTo(-3.5, hy + 8); g.fill();
     g.fillStyle = '#e2b89c'; g.beginPath(); g.moveTo(-3.5, hy + 7.5); g.lineTo(0, hy + 11); g.lineTo(5, hy + 10.5); g.lineTo(5.6, hy + 9); g.lineTo(0.5, hy + 9.5); g.fill();   // shade under the jaw
     g.fillStyle = COL.skin; g.fillRect(-0.5, hy + 10, 3, 3.5);                                                                                  // neck
-    if (!mortal) { g.fillStyle = COL.skin; g.beginPath(); g.moveTo(-1.5, hy + 5.5); g.lineTo(-4.5, hy + 0.5); g.lineTo(0.5, hy + 3.5); g.fill(); }  // the pointed ear
+    if (!mortal) { g.fillStyle = '#ffe9a8'; g.fillRect(2.4, hy + 7.2, 0.9, 0.9); g.fillRect(4.2, hy + 7.6, 0.9, 0.9); g.fillRect(3.2, hy + 8.4, 0.9, 0.9); g.globalAlpha = 0.25 + 0.15 * Math.sin(t * 0.05); g.fillRect(1.8, hy + 6.6, 4, 3); g.globalAlpha = 1; }  // her freckles glow: she is Lit
     // hair: a full crown swept back, a fringe over the brow, one bright strand
     g.fillStyle = COL.hair; g.beginPath(); g.moveTo(-5.5, hy + 7); g.quadraticCurveTo(-7.5, hy - 2, -2, hy - 4); g.quadraticCurveTo(4, hy - 5, 7.5, hy - 1); g.lineTo(7.2, hy + 2.2); g.lineTo(4.5, hy + 0.6); g.lineTo(1.5, hy + 2.6); g.lineTo(-1.5, hy + 1); g.lineTo(-2.5, hy + 7.5); g.fill();
     g.fillStyle = COL.hairD; g.beginPath(); g.moveTo(-5.5, hy + 7); g.quadraticCurveTo(-6.5, hy + 2, -4, hy - 1); g.lineTo(-3, hy + 7.5); g.fill();
@@ -6736,20 +6739,20 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   const PAL = {
     star: '#ffffff', starDim: '#a9b8ff',
     plank: '#29233f', plankTop: '#cbb8ff',
-    thornDark: '#2a1024', thornMid: '#5a1d3e', thornTip: '#ff5a78',
+    thornDark: '#0c0a16', thornMid: '#2a2244', thornTip: '#e0d4ff',   // the Eclipse's black glass
     gold: '#ffd27a', goldDeep: '#d9973f', warm: '#ffe9a8',
     hair: '#e0703f', hairDark: '#a8452a', skin: '#f6dcc6', tunic: '#2f8f7a', tunicDark: '#1f6656',
     cloak: '#2c3d74', cloakRim: '#9fc2ff', legs: '#3b3150', boots: '#6a4430', blade: '#eef8ff',
-    sprite: '#2f5c2b', spriteRim: '#8fd16b', spriteEye: '#ffb057', spriteAngry: '#ff8a3a',
+    sprite: '#1c1830', spriteRim: '#a898e8', spriteEye: '#e8e0ff', spriteAngry: '#ff8a3a',   // glasslings: black glass, lit edges
   };
   SH.PAL = PAL;
 
   const THEMES = {
     deep: {
-      sky: ['#050807', '#0b1411', '#13201b', '#1b2a22'], stars: false, far: 'cave', mid: 'roots',
-      farA: '#132019', farB: '#0d1712', midC: '#08100c', mist: 'rgba(150,220,180,0.10)', glow: 'rgba(255,140,170,0.20)',
-      ground: '#060908', speck: '#18291f', edgeLight: '#d6f0dc', edgeMid: '#4f7a62', grass: '#8ccaa8', grassDark: '#3f6a58', side: '#16261e',
-      motes: ['#cfeedd', '#ffb8c8'],
+      sky: ['#05040c', '#0c0a1a', '#151228', '#1e1a36'], stars: false, far: 'cave', mid: 'roots',   // the Umbra: the dark between stars, floored with black glass
+      farA: '#16132a', farB: '#0e0c1e', midC: '#090714', mist: 'rgba(170,150,255,0.10)', glow: 'rgba(190,150,255,0.20)',
+      ground: '#07060e', speck: '#1c1a30', edgeLight: '#e0d8ff', edgeMid: '#5a5290', grass: '#a898e8', grassDark: '#4a427a', side: '#18152c',
+      motes: ['#e0d8ff', '#ffd8f0'],
     },
     dusk: {
       sky: ['#0d0c26', '#2a2058', '#5a3270', '#9a5070'], stars: true, far: 'mountains', mid: 'trees',
@@ -6819,7 +6822,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     }
   };
   // How dark each place is away from a light: [colour, strength].
-  const DARK = { library: ['#0a0503', 0.36], deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  const DARK = { library: ['#0a0503', 0.36], deep: ['#03020a', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
@@ -7019,7 +7022,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   // railings and crates in the city. Sparse, so it frames the picture without hiding the ground Wren stands on.
   function makeForeground(name) {
     const w = 900, h = 64, c = canvas(w, h), g = c.getContext('2d'), r = rng(name.length * 7 + 3);
-    const col = { library: '#060302', deep: '#020504', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
+    const col = { library: '#060302', deep: '#030208', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
     g.fillStyle = col;
     for (let x = 0; x < w; x += 2) { const gh = 3 + Math.sin(x * 0.05) * 2 + r() * 5; g.fillRect(x, h - gh, 2, gh); }   // a low uneven edge
     for (let i = 0; i < 7; i++) {
@@ -7174,13 +7177,16 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
           if (snowy && hsh === 1) { g.fillStyle = '#dfe8ff'; g.fillRect(x + 6, y + 9, 2, 6); g.fillRect(x + 7, y + 15, 1, 2); }   // an icicle
         }
       } else if (t === SH.T_THORNS) {
-        const glow = g.createLinearGradient(0, y - 8, 0, y + TS); glow.addColorStop(0, 'rgba(255,60,100,0)'); glow.addColorStop(1, 'rgba(255,60,100,0.22)');
+        // shards of the Eclipse's black glass: dark, sharp, with a cold lit edge
+        const glow = g.createLinearGradient(0, y - 8, 0, y + TS); glow.addColorStop(0, 'rgba(170,140,255,0)'); glow.addColorStop(1, 'rgba(170,140,255,0.22)');
         g.fillStyle = glow; g.fillRect(x, y - 8, TS, TS + 8);
         g.fillStyle = PAL.thornDark; g.fillRect(x, y + TS - 6, TS, 6);
-        for (let i = 0; i < 4; i++) {
-          const bx = x + i * 6 + rand() * 3, h = 9 + rand() * 9;
-          g.fillStyle = PAL.thornMid; g.beginPath(); g.moveTo(bx, y + TS); g.lineTo(bx + 3, y + TS - h); g.lineTo(bx + 6, y + TS); g.fill();
-          g.fillStyle = PAL.thornTip; g.fillRect(bx + 2, y + TS - h, 2, 3);
+        for (let i = 0; i < 3; i++) {
+          const bx = x + i * 8 + rand() * 3, h = 10 + rand() * 9, lean = (rand() - 0.5) * 6;
+          g.fillStyle = '#05040a'; g.beginPath(); g.moveTo(bx - 1, y + TS); g.lineTo(bx + 3 + lean, y + TS - h - 1); g.lineTo(bx + 8, y + TS); g.fill();
+          g.fillStyle = PAL.thornMid; g.beginPath(); g.moveTo(bx, y + TS); g.lineTo(bx + 3 + lean, y + TS - h); g.lineTo(bx + 7, y + TS); g.fill();
+          g.fillStyle = '#4a3e7a'; g.beginPath(); g.moveTo(bx + 3 + lean, y + TS - h); g.lineTo(bx + 7, y + TS); g.lineTo(bx + 5, y + TS); g.fill();   // the lit face
+          g.fillStyle = PAL.thornTip; g.fillRect(Math.round(bx + 2 + lean), Math.round(y + TS - h), 2, 2);
         }
       }
     }
@@ -7514,16 +7520,19 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     ctx.fillStyle = 'rgba(255,252,240,0.9)'; ctx.fillRect(x - 10, 96, 20, 288);
   }
   function drawWyrm(ctx, wy, cy, t) {
-    // the Deep Wyrm: a wall of dark coils with pale eyes, filling everything behind its front edge
+    // the Swallowing Dark: the Eclipse's hunger, a wall of nothing that eats the light as it comes
     const x = wy.x, top = cy - 20, bot = cy + SH.VIEW_H + 20;
-    ctx.fillStyle = '#020403'; ctx.fillRect(x - 2000, top, 2000, bot - top);
+    ctx.fillStyle = '#000000'; ctx.fillRect(x - 2000, top, 2000, bot - top);
     ctx.beginPath(); ctx.moveTo(x, top);
-    for (let y = top; y <= bot; y += 16) ctx.lineTo(x + 18 + Math.sin(y * 0.05 + t * 0.2) * 14, y);
+    for (let y = top; y <= bot; y += 12) ctx.lineTo(x + 16 + Math.sin(y * 0.06 + t * 0.25) * 12 + Math.sin(y * 0.17 - t * 0.4) * 5, y);
     ctx.lineTo(x - 10, bot); ctx.fill();
-    ctx.fillStyle = '#d6f0dc';
-    const ey = cy + 150 + Math.sin(t * 0.07) * 10;
-    ctx.fillRect(x - 6, ey, 10, 4); ctx.fillRect(x - 6, ey + 30, 10, 4);
-    ctx.fillStyle = '#ff7a8a'; ctx.fillRect(x - 2, ey + 1, 3, 2); ctx.fillRect(x - 2, ey + 31, 3, 2);
+    for (let i = 0; i < 26; i++) {   // the light it is eating: specks pulled into its edge
+      const k = ((t * 0.02 + i * 0.137) % 1), yy = top + ((i * 97) % (bot - top)), xx = x + 70 - k * 70;
+      ctx.globalAlpha = 1 - k; ctx.fillStyle = i % 3 ? '#c8b8ff' : '#fff6d8'; ctx.fillRect(Math.round(xx), Math.round(yy), 2, 2);
+    }
+    ctx.globalAlpha = 1;
+    const ey = cy + 150 + Math.sin(t * 0.07) * 10, bl = (t % 160) < 6;
+    if (!bl) { ctx.fillStyle = '#e0d8ff'; ctx.fillRect(x - 8, ey, 12, 3); ctx.fillRect(x - 8, ey + 34, 12, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 3, ey, 3, 3); ctx.fillRect(x - 3, ey + 34, 3, 3); }
   }
 
   function drawParticles(ctx, fx) {
@@ -7590,14 +7599,14 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   function drawBulb(ctx, b, t) {
     const y = b.y + Math.sin(b.t) * 3, x = b.x;
     if (b.closed > 0) {
-      ctx.fillStyle = '#4a1d3a'; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#2a2444'; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
       return;
     }
-    const g = ctx.createRadialGradient(x, y, 2, x, y, 26); g.addColorStop(0, 'rgba(255,143,184,0.45)'); g.addColorStop(1, 'rgba(255,143,184,0)');
+    const g = ctx.createRadialGradient(x, y, 2, x, y, 26); g.addColorStop(0, 'rgba(159,232,255,0.45)'); g.addColorStop(1, 'rgba(159,232,255,0)');
     ctx.fillStyle = g; ctx.fillRect(x - 26, y - 26, 52, 52);
     for (let i = 0; i < 6; i++) {
       const a = i / 6 * Math.PI * 2 + b.t * 0.6;
-      ctx.fillStyle = i % 2 ? '#c2477a' : '#ff8fb8';
+      ctx.fillStyle = i % 2 ? '#4a8ac8' : '#9fe8ff';
       ctx.beginPath(); ctx.ellipse(x + Math.cos(a) * 7, y + Math.sin(a) * 7, 7, 4, a, 0, Math.PI * 2); ctx.fill();
     }
     ctx.fillStyle = PAL.gold; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
@@ -7623,13 +7632,15 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
   }
   function drawThornWall(ctx, tw, t) {
     const TS = SH.TILE, x = tw.x * TS, top = tw.top * TS, bot = 16 * TS, wd = tw.w * TS;
-    ctx.fillStyle = '#2a1024'; ctx.fillRect(x + 4, top, wd - 8, bot - top);
-    for (let y = top; y < bot; y += 10) for (let k = 0; k < 3; k++) {
-      const sx = x + 4 + k * (wd - 8) / 3 + Math.sin(y * 0.3 + k) * 3;
-      ctx.fillStyle = '#5a1d3e'; ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx + (k % 2 ? 9 : -9), y + 4); ctx.lineTo(sx, y + 7); ctx.fill();
-      ctx.fillStyle = '#ff5a78'; ctx.fillRect(sx + (k % 2 ? 7 : -9), y + 3, 2, 2);
+    // a wall of the Eclipse's black glass: facets, cold highlights, a violet sheen
+    ctx.fillStyle = '#0c0a16'; ctx.fillRect(x + 2, top, wd - 4, bot - top);
+    for (let y = top; y < bot; y += 14) for (let k = 0; k < 3; k++) {
+      const sx = x + 2 + k * (wd - 4) / 3, w3 = (wd - 4) / 3, o = ((y / 14 | 0) + k) % 2;
+      ctx.fillStyle = o ? '#1c1830' : '#2a2444'; ctx.beginPath(); ctx.moveTo(sx, y + (o ? 0 : 6)); ctx.lineTo(sx + w3, y + (o ? 6 : 0)); ctx.lineTo(sx + w3, y + 14); ctx.lineTo(sx, y + 14); ctx.fill();
+      ctx.fillStyle = 'rgba(224,212,255,0.55)'; ctx.fillRect(Math.round(sx + 2), Math.round(y + (o ? 1 : 6)), Math.round(w3 * 0.4), 1);
     }
-    const g = ctx.createLinearGradient(x - 20, 0, x + wd + 20, 0); g.addColorStop(0, 'rgba(255,60,100,0)'); g.addColorStop(0.5, 'rgba(255,60,100,0.12)'); g.addColorStop(1, 'rgba(255,60,100,0)');
+    for (let k = 0; k < 4; k++) { const sx = x + 4 + k * (wd - 8) / 3, sh = 12 + (k % 2) * 8; ctx.fillStyle = '#2a2444'; ctx.beginPath(); ctx.moveTo(sx - 4, top); ctx.lineTo(sx, top - sh); ctx.lineTo(sx + 4, top); ctx.fill(); ctx.fillStyle = '#e0d4ff'; ctx.fillRect(sx - 1, top - sh, 1, 3); }
+    const g = ctx.createLinearGradient(x - 20, 0, x + wd + 20, 0); g.addColorStop(0, 'rgba(170,140,255,0)'); g.addColorStop(0.5, 'rgba(170,140,255,0.14)'); g.addColorStop(1, 'rgba(170,140,255,0)');
     ctx.fillStyle = g; ctx.fillRect(x - 20, top, wd + 40, bot - top);
   }
   function drawBrazier(ctx, b, t) {
@@ -7795,8 +7806,19 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(0, 0, 20, 3, 0, 0, Math.PI * 2); ctx.fill();
       if (t % 9 === 0) SH.fx.burst(e.x + (Math.random() - 0.5) * 40, e.y - 10 - Math.random() * 40, 1, { speed: 0.3, life: 40, gravity: -0.02, colors: ['#fff6d8', '#cfd6ff'], glow: true });
     }
-    ctx.rotate(e.fall * 1.4); ctx.scale(e.dir, 1);
-    stagBody(ctx, e, t, '#0a0818'); stagBody(ctx, e, t, null);
+    // a low star: a ball of white light drifting over the snow, trailing light like a veil
+    const out = Math.min(1, e.fall), bob = e.state === 'down' ? 0 : Math.sin(t * 0.05) * 4, cy = -30 + bob + out * 26;
+    const R = 11 * (1 - out * 0.45), tail = e.state === 'flee' ? 46 : 26;
+    for (let i = 0; i < 7; i++) {   // the veil behind it
+      const k = i / 7; ctx.globalAlpha = (1 - k) * 0.45 * (1 - out * 0.8); ctx.fillStyle = i % 2 ? '#cfd6ff' : '#fff6d8';
+      ctx.beginPath(); ctx.ellipse(-e.dir * (8 + k * tail), cy + Math.sin(t * 0.08 + i) * 3 * k, R * (1 - k * 0.7), R * 0.5 * (1 - k * 0.6), 0, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    const gl = ctx.createRadialGradient(0, cy, 1, 0, cy, R * 3.2); gl.addColorStop(0, `rgba(255,250,235,${0.9 - out * 0.7})`); gl.addColorStop(0.35, `rgba(220,228,255,${0.4 - out * 0.3})`); gl.addColorStop(1, 'rgba(200,210,255,0)');
+    ctx.fillStyle = gl; ctx.fillRect(-R * 3.2, cy - R * 3.2, R * 6.4, R * 6.4);
+    ctx.fillStyle = out < 1 ? '#ffffff' : '#c8c8d8'; ctx.beginPath(); ctx.arc(0, cy, R * 0.55, 0, Math.PI * 2); ctx.fill();
+    for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + t * 0.01; ctx.fillStyle = `rgba(255,255,255,${0.7 - out * 0.6})`; ctx.fillRect(Math.round(Math.cos(a) * R * 1.4) - 1, Math.round(cy + Math.sin(a) * R * 1.4) - 1, 2, 2); }   // its points
+    if (e.state === 'down' && out >= 1 && t % 6 === 0) SH.fx.burst(e.x + (Math.random() - 0.5) * 16, e.y - 6, 1, { speed: 0.2, life: 50, gravity: -0.02, colors: ['#fff6d8', '#cfd6ff'], glow: true });   // its light leaving
     ctx.restore();
   }
   function drawSprite(ctx, e, t) {
@@ -7834,7 +7856,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     // health pips once it's been hit
     if (e.hp < d.hp) {
       const n = Math.ceil(d.hp / SH.COMBAT.damage), left = Math.ceil(e.hp / SH.COMBAT.damage);
-      for (let i = 0; i < n; i++) { ctx.fillStyle = i < left ? '#9be07a' : '#2a2a3a'; ctx.fillRect(Math.round(x - n * 4 + i * 8 + 1), Math.round(e.y - d.h - 12), 6, 3); }
+      for (let i = 0; i < n; i++) { ctx.fillStyle = i < left ? '#c8b8ff' : '#2a2a3a'; ctx.fillRect(Math.round(x - n * 4 + i * 8 + 1), Math.round(e.y - d.h - 12), 6, 3); }
     }
   }
   function star(ctx, x, y, R, r, n, rot) {
@@ -7932,7 +7954,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
       wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
       onKill(e) { G.hud.goal(); SH.arts.whisper('kill');
-        if (e && e.kind === 'thornSprite') { fx.burst(e.x, e.y - 12, 26, { speed: 3.2, life: 46, gravity: 0.1, drag: 0.95, size: 3, colors: ['#2f5c2b', '#8fd16b', '#5a1d3e', '#ff5a78'] }); fx.ring(e.x, e.y - 12, '#8fd16b', 34, 16, 2); } SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
+        if (e && e.kind === 'thornSprite') { fx.burst(e.x, e.y - 12, 26, { speed: 3.2, life: 46, gravity: 0.1, drag: 0.95, size: 3, colors: ['#1c1830', '#a898e8', '#0c0a16', '#e0d4ff'] }); fx.ring(e.x, e.y - 12, '#c8b8ff', 34, 16, 2); } SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
       onDash() { },
       onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
@@ -8535,7 +8557,7 @@ body.upright #b-bow { right: calc(max(24px, env(safe-area-inset-right)) + 116px)
     if (w.wyrm && w.wyrm.on) w.wyrm.x = Math.min(w.wyrm.x, p.x - 9 * TS);
     G.snapCamera();
     w.fade = 0.7;
-    fx.word(p.x, p.y - 52, kind === 'thorns' ? 'ouch: thorns' : 'fell', '#ff9aa8', 40);
+    fx.word(p.x, p.y - 52, kind === 'thorns' ? 'ouch: glass' : 'fell', '#ff9aa8', 40);
   };
 
   // The Old Wyrm is down. Hold the moment: its light pours into Wren, her hearts fill, the hollow goes quiet. Then the story moves.

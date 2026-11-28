@@ -89,11 +89,11 @@
     this.flash = 8;
     const kb = hit.pogo ? 0 : hit.kb;
     this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : hit.launch ? -hit.launch : -1.8;
-    fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#9be07a', '#d8ffb8', '#ffffff'] });
+    fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#a898e8', '#e0d4ff', '#ffffff'] });
     if (this.hp <= 0) {
       this.dead = true; this.deadT = 0;
-      fx.burst(this.x, this.y - this.h / 2, 22, { speed: 3.2, life: 34, size: 3, gravity: 0.08, colors: ['#5f9e4c', '#9be07a', '#3d6b33', '#ffe9a8'] });
-      fx.ring(this.x, this.y - this.h / 2, '#d8ffb8', 30, 18, 2);
+      fx.burst(this.x, this.y - this.h / 2, 22, { speed: 3.2, life: 34, size: 3, gravity: 0.08, colors: ['#1c1830', '#a898e8', '#2a2444', '#e0d4ff'] });
+      fx.ring(this.x, this.y - this.h / 2, '#e0d4ff', 30, 18, 2);
       world.onKill(this);
       return { landed: true, killed: true };
     }

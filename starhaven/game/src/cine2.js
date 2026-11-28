@@ -66,9 +66,10 @@
       sky(g, ['#0c0a26', '#2a1c4a', '#6a3a6a']); starfield(g, t, 40, 9, 90); moon(g, 178, 46, 10);
       g.fillStyle = '#2a1c3a'; for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(112 + i * 20, 122, 16 + rnd(i) * 6, 0, 6.3); g.fill(); }
       drift(g, t, 22, ['#ff9ac0', '#ffffff'], false, 2);
-      if (arrive > 0) {   // wings first, then the man, then the eyes
-        const y = 120 - arrive * 22, sp = arrive * 34;
-        g.fillStyle = '#05040f'; for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(160, y - 18); g.lineTo(160 + sd * sp, y - 38 - Math.sin(t * 0.05) * 3); g.lineTo(160 + sd * (sp + 10), y - 8); g.lineTo(160 + sd * sp * 0.6, y - 2); g.lineTo(160 + sd * sp * 0.3, y + 8); g.fill(); }
+      if (arrive > 0) {   // a falling star first, then the man inside it, then the eyes
+        const y = 120 - arrive * 22;
+        for (let q = 0; q < 12; q++) { const kk = q / 12; g.globalAlpha = (1 - kk) * 0.7 * (arrive < 1 ? 1 : 0.4); g.fillStyle = q % 2 ? '#c8b8ff' : '#fff6d8'; g.beginPath(); g.ellipse(160 + kk * 60, y - 20 - kk * 70, 6 * (1 - kk * 0.6), 3, -1.1, 0, 6.3); g.fill(); }
+        g.globalAlpha = 1; g.fillStyle = '#05040f';
         R(g, 154, y - 26, 12, 30, '#05040f'); R(g, 155, y - 36, 10, 11, '#05040f');
         if (arrive >= 1) { const bl = (t % 200) < 5; if (!bl) { R(g, 157, y - 31, 2, 1, '#a58bff'); R(g, 162, y - 31, 2, 1, '#a58bff'); } glow(g, 160, y - 30, 10, 'rgba(165,139,255,0.35)'); }
       }

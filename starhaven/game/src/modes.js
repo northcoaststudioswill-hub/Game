@@ -168,7 +168,7 @@
         else { const r = 7 + sc * 11; ctx.globalAlpha = a * 0.78; ctx.fillStyle = '#2a2452'; ctx.beginPath(); ctx.ellipse(x, y - r * 0.25, r * 1.3, r * 0.8, 0, 0, 6.3); ctx.fill(); ctx.fillStyle = '#14102c'; ctx.beginPath(); ctx.ellipse(x, y, r * 1.5, r, 0, 0, 6.3); ctx.ellipse(x + r, y + r * 0.2, r, r * 0.7, 0, 0, 6.3); ctx.ellipse(x - r, y + r * 0.3, r * 1.1, r * 0.7, 0, 0, 6.3); ctx.fill(); if ((t + (o.x * 100 | 0)) % 50 < 4) { ctx.strokeStyle = '#cfd6ff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y - r * 0.4); ctx.lineTo(x - 5, y + r * 0.2); ctx.lineTo(x + 4, y + r * 0.3); ctx.lineTo(x - 2, y + r); ctx.stroke(); } }
       }
       ctx.globalAlpha = 1;
-      // Caelum from behind, wings spread, Wren in his arms
+      // Caelum from behind, falling upward as a comet, Wren in his arms
       const fxp = cx + s.x * vw * 0.2, fyp = VH * 0.66 + s.y * VH * 0.14, flap = Math.sin(t * 0.14) * 0.26;
       if (wall && !(s.flash > 0 && Math.floor(s.flash / 4) % 2)) {   // Rowan's white mare from behind, the two of them on her back
         const gy = VH * 0.56 + s.y * VH * 0.05, gal = Math.sin(t * 0.32), R2 = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
@@ -179,20 +179,22 @@
         for (let q = 0; q < 5; q++) R2(-3 + Math.sin(t * 0.2 + q) * (q + 1), 14 + q * 6, 6, 7, q % 2 ? '#dfe6f2' : '#ffffff');                        // her tail
         R2(-11, -40, 22, 36, '#0a0818'); R2(-9, -38, 18, 32, '#3a6a3a'); R2(-9, -38, 4, 32, '#2a5028'); R2(5, -38, 4, 32, '#4c8648'); R2(-9, -12, 18, 3, '#e8c070');   // Rowan's back, his belt
         R2(-7, -54, 14, 16, '#0a0818'); R2(-6, -53, 12, 14, '#e8c070');                                                                                 // his fair head
-        for (const sd of [-1, 1]) { ctx.strokeStyle = '#f2e6c8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(sd * 4, -53); ctx.lineTo(sd * 10, -64); ctx.lineTo(sd * 16, -62); ctx.moveTo(sd * 10, -64); ctx.lineTo(sd * 9, -72); ctx.stroke(); }   // antlers
+        for (let q = -3; q <= 3; q++) { const a = -Math.PI / 2 + q * 0.32, l = 8 + (3 - Math.abs(q)) * 3; ctx.strokeStyle = '#ffe9a8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 7, -54 + Math.sin(a) * 5); ctx.lineTo(Math.cos(a) * (7 + l), -54 + Math.sin(a) * (5 + l)); ctx.stroke(); }   // his crown of morning light
         R2(-17, -34, 8, 14, '#0a0818'); R2(-16, -33, 6, 12, '#e0703f'); R2(-19, -26, 5, 12, '#e0703f'); R2(-15, -20, 5, 6, '#7a5a3a');                    // Wren in front of him: her hair, her old coat
         for (let q = 0; q < 4; q++) { ctx.globalAlpha = 0.5; R2(-30 + q * 20 + gal * 4, 40 + (q % 2) * 4, 3, 3, '#ffffff'); } ctx.globalAlpha = 1;       // snow kicked up
         ctx.restore();
       }
       if (!wall && !(s.flash > 0 && Math.floor(s.flash / 4) % 2)) {
         ctx.save(); ctx.translate(fxp, fyp); ctx.rotate(s.tilt * 0.6);
-        for (const sd of [-1, 1]) {
-          ctx.save(); ctx.scale(sd, 1); ctx.rotate(-flap);
-          ctx.fillStyle = '#0a0818'; ctx.beginPath(); ctx.moveTo(4, -16); ctx.lineTo(42, -40); ctx.lineTo(96, -30); ctx.lineTo(84, -6); ctx.lineTo(70, -14); ctx.lineTo(60, 8); ctx.lineTo(44, -4); ctx.lineTo(32, 16); ctx.lineTo(18, 0); ctx.lineTo(6, 14); ctx.closePath(); ctx.fill();
-          ctx.fillStyle = '#1c1838'; ctx.beginPath(); ctx.moveTo(6, -14); ctx.lineTo(42, -36); ctx.lineTo(92, -28); ctx.lineTo(82, -10); ctx.lineTo(44, -8); ctx.lineTo(18, -2); ctx.closePath(); ctx.fill();
-          ctx.strokeStyle = '#6a5aa8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(4, -15); ctx.lineTo(42, -38); ctx.lineTo(96, -30); ctx.moveTo(42, -38); ctx.lineTo(60, 6); ctx.moveTo(42, -38); ctx.lineTo(32, 14); ctx.stroke();
-          ctx.restore();
+        // no wings: the Lit fly as a falling star does. A comet of shadow and starlight streams back from him, toward us.
+        for (let q = 0; q < 16; q++) {
+          const k = q / 16, w = 34 * (1 - k * 0.5) + Math.sin(t * 0.2 + q) * 3, yy = 16 + k * 70, sway = Math.sin(t * 0.1 + q * 0.5) * 6 * k - s.tilt * 30 * k;
+          ctx.globalAlpha = 0.55 * (1 - k); ctx.fillStyle = q % 2 ? '#3a2a6a' : '#1c1838'; ctx.beginPath(); ctx.ellipse(sway, yy, w, 10 + k * 8, 0, 0, 6.3); ctx.fill();
         }
+        ctx.globalAlpha = 1;
+        for (let q = 0; q < 22; q++) { const k = ((t * 0.03 + q * 0.13) % 1), sx = Math.sin(q * 2.7) * 30 * (1 - k * 0.4), sy = 10 + k * 90; ctx.globalAlpha = 1 - k; ctx.fillStyle = q % 3 ? '#c8b8ff' : '#fff6d8'; ctx.fillRect(Math.round(sx), Math.round(sy), 2, 2); }   // starlight shed behind
+        ctx.globalAlpha = 1;
+        { const g2 = ctx.createRadialGradient(0, -10, 4, 0, -10, 46); g2.addColorStop(0, 'rgba(200,184,255,0.45)'); g2.addColorStop(1, 'rgba(200,184,255,0)'); ctx.fillStyle = g2; ctx.fillRect(-46, -56, 92, 92); }
         const R = (x, y, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); };
         R(-10, -22, 20, 34, '#0a0818'); R(-8, -20, 16, 30, '#241f48'); R(-8, -20, 3, 30, '#16122e'); R(5, -20, 3, 30, '#322c62');     // his back
         R(-7, -36, 14, 16, '#0a0818'); R(-6, -35, 12, 14, '#1a1530'); R(-6, -35, 12, 2, '#cfd6ff');                                       // his head, the circlet

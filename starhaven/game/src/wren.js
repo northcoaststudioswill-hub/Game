@@ -137,7 +137,7 @@
     g.fillStyle = COL.skin; g.beginPath(); g.moveTo(-3, hy); g.lineTo(6.5, hy); g.lineTo(6.8, hy + 6); g.lineTo(5, hy + 10.5); g.lineTo(0, hy + 11); g.lineTo(-3.5, hy + 8); g.fill();
     g.fillStyle = '#e2b89c'; g.beginPath(); g.moveTo(-3.5, hy + 7.5); g.lineTo(0, hy + 11); g.lineTo(5, hy + 10.5); g.lineTo(5.6, hy + 9); g.lineTo(0.5, hy + 9.5); g.fill();   // shade under the jaw
     g.fillStyle = COL.skin; g.fillRect(-0.5, hy + 10, 3, 3.5);                                                                                  // neck
-    if (!mortal) { g.fillStyle = COL.skin; g.beginPath(); g.moveTo(-1.5, hy + 5.5); g.lineTo(-4.5, hy + 0.5); g.lineTo(0.5, hy + 3.5); g.fill(); }  // the pointed ear
+    if (!mortal) { g.fillStyle = '#ffe9a8'; g.fillRect(2.4, hy + 7.2, 0.9, 0.9); g.fillRect(4.2, hy + 7.6, 0.9, 0.9); g.fillRect(3.2, hy + 8.4, 0.9, 0.9); g.globalAlpha = 0.25 + 0.15 * Math.sin(t * 0.05); g.fillRect(1.8, hy + 6.6, 4, 3); g.globalAlpha = 1; }  // her freckles glow: she is Lit
     // hair: a full crown swept back, a fringe over the brow, one bright strand
     g.fillStyle = COL.hair; g.beginPath(); g.moveTo(-5.5, hy + 7); g.quadraticCurveTo(-7.5, hy - 2, -2, hy - 4); g.quadraticCurveTo(4, hy - 5, 7.5, hy - 1); g.lineTo(7.2, hy + 2.2); g.lineTo(4.5, hy + 0.6); g.lineTo(1.5, hy + 2.6); g.lineTo(-1.5, hy + 1); g.lineTo(-2.5, hy + 7.5); g.fill();
     g.fillStyle = COL.hairD; g.beginPath(); g.moveTo(-5.5, hy + 7); g.quadraticCurveTo(-6.5, hy + 2, -4, hy - 1); g.lineTo(-3, hy + 7.5); g.fill();

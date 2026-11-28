@@ -28,7 +28,7 @@
     nessa: { skin: '#f0d4c0', hair: '#2a1a14', style: 'long', top: '#5a5a6a', trim: '#8a8a9a', robe: '#4a4a5a', eye: '#2a1a14', axe: true },
     lissa: { skin: '#f0d4c0', hair: '#b8864a', style: 'braid', top: '#4a7a4a', trim: '#c8e0a0', robe: '#3f6a3f', eye: '#2a1a14', basket: true, small: 2 },
     rowan: { skin: '#f2d8b8', hair: '#e8c070', style: 'swept', top: '#3a5a2a', trim: '#e8c070', legs: '#2a3a1e', boots: '#3a2a14', eye: '#4ac06a', antlers: true, tall: 1, coat: true },
-    queen: { skin: '#efe4ea', hair: '#2a0a16', style: 'long', top: '#3a0e20', trim: '#ff4a5a', robe: '#2a0a16', eye: '#ff4a5a', crown: true, tall: 2 },
+    queen: { skin: '#e8e4f2', hair: '#0c0a16', style: 'long', top: '#1a1630', trim: '#c8b8ff', robe: '#0e0c1c', eye: '#e8e0ff', crown: true, tall: 2 },
   };
 
   function drawBody(g, L, frame) {
@@ -38,11 +38,10 @@
     const hip = -18 - tall, sh = -34 - tall * 2 + small + breathe, head = sh - 11;   // y of hips, shoulders, top of the head
     const top = L.top, topL = shade(top, 1.28), topD = shade(top, 0.72), skin = L.skin, skinD = shade(skin, 0.8), skinL = shade(skin, 1.08);
     const hair = L.hair, hairL = shade(hair, 1.4), hairD = shade(hair, 0.7);
-    // wings, folded behind (the High Lord of Dusk)
+    // a mantle of dusk behind him, with stars in it (the Lord of Dusk; the Lit have no wings)
     if (L.wings) {
-      R(-13, sh - 14, 4, 6, '#0e0b22'); R(-14, sh - 9, 8, 40, '#0e0b22'); R(-12, sh + 30, 5, 8, '#0e0b22');
-      R(-14, sh - 9, 1, 38, '#6a5aa8'); R(-11, sh - 4, 1, 30, '#1c1838'); R(-9, sh - 2, 1, 26, '#1c1838');
-      R(-13, sh - 15, 2, 2, '#b9a8ff');
+      R(-11, sh - 2, 8, 40, '#0e0b22'); R(-12, sh + 34, 7, 6, '#0e0b22'); R(-11, sh - 2, 1, 38, '#3a2a6a');
+      for (let i = 0; i < 6; i++) R(-10 + (i * 3) % 6, sh + 3 + i * 6, 1, 1, i % 2 ? '#c8b8ff' : '#fff6d8');
     }
     if (L.style === 'long') { R(-6, head + 3, 4, 20, hairD); R(-5, head + 3, 2, 18, hair); }
     // legs or a robe
@@ -83,8 +82,8 @@
     if (L.style === 'long') { R(-5, head - 2, 10, 4, hair); R(-5, head, 3, 10, hair); R(-3, head - 2, 6, 1, hairL); }
     if (L.style === 'braid') { R(-5, head - 2, 10, 4, hair); R(-5, head, 3, 6, hair); R(-3, head - 2, 6, 1, hairL); for (let i = 0; i < 5; i++) R(-7 + (i % 2), head + 5 + i * 3, 3, 3, i % 2 ? hairD : hair); R(3, head - 1, 2, 2, '#ff9ac0'); }
     if (L.glasses) { R(0, head + 2, 5, 1, '#e8c070'); R(0, head + 5, 5, 1, '#e8c070'); R(0, head + 2, 1, 4, '#e8c070'); R(4, head + 2, 1, 4, '#e8c070'); }
-    if (L.antlers) { R(-2, head - 8, 1, 7, '#d8c8a0'); R(-4, head - 10, 1, 4, '#d8c8a0'); R(-3, head - 7, 2, 1, '#d8c8a0'); R(2, head - 9, 1, 8, '#d8c8a0'); R(3, head - 7, 3, 1, '#d8c8a0'); R(5, head - 10, 1, 4, '#d8c8a0'); R(-4, head - 1, 9, 1, '#e8c070'); }
-    if (L.crown) { for (let i = 0; i < 5; i++) { R(-4 + i * 2, head - 5 + (i % 2) * 2, 1, 4 - (i % 2) * 2, '#4a1a2a'); } R(-4, head - 2, 9, 1, '#ff4a5a'); }
+    if (L.antlers) { for (let i = 0; i < 7; i++) { const hh = 2 + (3 - Math.abs(i - 3)); R(-4 + i * 1.5, head - 1 - hh, 1, hh, i % 2 ? '#ffd27a' : '#fff6d8'); } R(-4, head - 1, 9, 1, '#e8c070'); }   // a crown of morning light
+    if (L.crown) { for (let i = 0; i < 5; i++) { R(-4 + i * 2, head - 6 + (i % 2) * 2, 1, 5 - (i % 2) * 2, '#1a1626'); R(-4 + i * 2, head - 6 + (i % 2) * 2, 1, 1, '#c8b8ff'); } R(-4, head - 2, 9, 1, '#6a5aa8'); }   // a crown of black glass
     if (L.wings) R(-4, head + 1, 9, 1, '#cfd6ff');                                                          // his circlet
     // what they carry
     if (L.book) { R(4, sh + 10, 7, 9, '#3a2a5a'); R(4, sh + 10, 7, 1, '#e8c070'); R(10, sh + 10, 1, 9, '#f4f0e0'); }

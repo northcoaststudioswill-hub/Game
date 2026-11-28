@@ -6,20 +6,20 @@
   const PAL = {
     star: '#ffffff', starDim: '#a9b8ff',
     plank: '#29233f', plankTop: '#cbb8ff',
-    thornDark: '#2a1024', thornMid: '#5a1d3e', thornTip: '#ff5a78',
+    thornDark: '#0c0a16', thornMid: '#2a2244', thornTip: '#e0d4ff',   // the Eclipse's black glass
     gold: '#ffd27a', goldDeep: '#d9973f', warm: '#ffe9a8',
     hair: '#e0703f', hairDark: '#a8452a', skin: '#f6dcc6', tunic: '#2f8f7a', tunicDark: '#1f6656',
     cloak: '#2c3d74', cloakRim: '#9fc2ff', legs: '#3b3150', boots: '#6a4430', blade: '#eef8ff',
-    sprite: '#2f5c2b', spriteRim: '#8fd16b', spriteEye: '#ffb057', spriteAngry: '#ff8a3a',
+    sprite: '#1c1830', spriteRim: '#a898e8', spriteEye: '#e8e0ff', spriteAngry: '#ff8a3a',   // glasslings: black glass, lit edges
   };
   SH.PAL = PAL;
 
   const THEMES = {
     deep: {
-      sky: ['#050807', '#0b1411', '#13201b', '#1b2a22'], stars: false, far: 'cave', mid: 'roots',
-      farA: '#132019', farB: '#0d1712', midC: '#08100c', mist: 'rgba(150,220,180,0.10)', glow: 'rgba(255,140,170,0.20)',
-      ground: '#060908', speck: '#18291f', edgeLight: '#d6f0dc', edgeMid: '#4f7a62', grass: '#8ccaa8', grassDark: '#3f6a58', side: '#16261e',
-      motes: ['#cfeedd', '#ffb8c8'],
+      sky: ['#05040c', '#0c0a1a', '#151228', '#1e1a36'], stars: false, far: 'cave', mid: 'roots',   // the Umbra: the dark between stars, floored with black glass
+      farA: '#16132a', farB: '#0e0c1e', midC: '#090714', mist: 'rgba(170,150,255,0.10)', glow: 'rgba(190,150,255,0.20)',
+      ground: '#07060e', speck: '#1c1a30', edgeLight: '#e0d8ff', edgeMid: '#5a5290', grass: '#a898e8', grassDark: '#4a427a', side: '#18152c',
+      motes: ['#e0d8ff', '#ffd8f0'],
     },
     dusk: {
       sky: ['#0d0c26', '#2a2058', '#5a3270', '#9a5070'], stars: true, far: 'mountains', mid: 'trees',
@@ -89,7 +89,7 @@
     }
   };
   // How dark each place is away from a light: [colour, strength].
-  const DARK = { library: ['#0a0503', 0.36], deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  const DARK = { library: ['#0a0503', 0.36], deep: ['#03020a', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
@@ -289,7 +289,7 @@
   // railings and crates in the city. Sparse, so it frames the picture without hiding the ground Wren stands on.
   function makeForeground(name) {
     const w = 900, h = 64, c = canvas(w, h), g = c.getContext('2d'), r = rng(name.length * 7 + 3);
-    const col = { library: '#060302', deep: '#020504', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
+    const col = { library: '#060302', deep: '#030208', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
     g.fillStyle = col;
     for (let x = 0; x < w; x += 2) { const gh = 3 + Math.sin(x * 0.05) * 2 + r() * 5; g.fillRect(x, h - gh, 2, gh); }   // a low uneven edge
     for (let i = 0; i < 7; i++) {
@@ -444,13 +444,16 @@
           if (snowy && hsh === 1) { g.fillStyle = '#dfe8ff'; g.fillRect(x + 6, y + 9, 2, 6); g.fillRect(x + 7, y + 15, 1, 2); }   // an icicle
         }
       } else if (t === SH.T_THORNS) {
-        const glow = g.createLinearGradient(0, y - 8, 0, y + TS); glow.addColorStop(0, 'rgba(255,60,100,0)'); glow.addColorStop(1, 'rgba(255,60,100,0.22)');
+        // shards of the Eclipse's black glass: dark, sharp, with a cold lit edge
+        const glow = g.createLinearGradient(0, y - 8, 0, y + TS); glow.addColorStop(0, 'rgba(170,140,255,0)'); glow.addColorStop(1, 'rgba(170,140,255,0.22)');
         g.fillStyle = glow; g.fillRect(x, y - 8, TS, TS + 8);
         g.fillStyle = PAL.thornDark; g.fillRect(x, y + TS - 6, TS, 6);
-        for (let i = 0; i < 4; i++) {
-          const bx = x + i * 6 + rand() * 3, h = 9 + rand() * 9;
-          g.fillStyle = PAL.thornMid; g.beginPath(); g.moveTo(bx, y + TS); g.lineTo(bx + 3, y + TS - h); g.lineTo(bx + 6, y + TS); g.fill();
-          g.fillStyle = PAL.thornTip; g.fillRect(bx + 2, y + TS - h, 2, 3);
+        for (let i = 0; i < 3; i++) {
+          const bx = x + i * 8 + rand() * 3, h = 10 + rand() * 9, lean = (rand() - 0.5) * 6;
+          g.fillStyle = '#05040a'; g.beginPath(); g.moveTo(bx - 1, y + TS); g.lineTo(bx + 3 + lean, y + TS - h - 1); g.lineTo(bx + 8, y + TS); g.fill();
+          g.fillStyle = PAL.thornMid; g.beginPath(); g.moveTo(bx, y + TS); g.lineTo(bx + 3 + lean, y + TS - h); g.lineTo(bx + 7, y + TS); g.fill();
+          g.fillStyle = '#4a3e7a'; g.beginPath(); g.moveTo(bx + 3 + lean, y + TS - h); g.lineTo(bx + 7, y + TS); g.lineTo(bx + 5, y + TS); g.fill();   // the lit face
+          g.fillStyle = PAL.thornTip; g.fillRect(Math.round(bx + 2 + lean), Math.round(y + TS - h), 2, 2);
         }
       }
     }
@@ -784,16 +787,19 @@
     ctx.fillStyle = 'rgba(255,252,240,0.9)'; ctx.fillRect(x - 10, 96, 20, 288);
   }
   function drawWyrm(ctx, wy, cy, t) {
-    // the Deep Wyrm: a wall of dark coils with pale eyes, filling everything behind its front edge
+    // the Swallowing Dark: the Eclipse's hunger, a wall of nothing that eats the light as it comes
     const x = wy.x, top = cy - 20, bot = cy + SH.VIEW_H + 20;
-    ctx.fillStyle = '#020403'; ctx.fillRect(x - 2000, top, 2000, bot - top);
+    ctx.fillStyle = '#000000'; ctx.fillRect(x - 2000, top, 2000, bot - top);
     ctx.beginPath(); ctx.moveTo(x, top);
-    for (let y = top; y <= bot; y += 16) ctx.lineTo(x + 18 + Math.sin(y * 0.05 + t * 0.2) * 14, y);
+    for (let y = top; y <= bot; y += 12) ctx.lineTo(x + 16 + Math.sin(y * 0.06 + t * 0.25) * 12 + Math.sin(y * 0.17 - t * 0.4) * 5, y);
     ctx.lineTo(x - 10, bot); ctx.fill();
-    ctx.fillStyle = '#d6f0dc';
-    const ey = cy + 150 + Math.sin(t * 0.07) * 10;
-    ctx.fillRect(x - 6, ey, 10, 4); ctx.fillRect(x - 6, ey + 30, 10, 4);
-    ctx.fillStyle = '#ff7a8a'; ctx.fillRect(x - 2, ey + 1, 3, 2); ctx.fillRect(x - 2, ey + 31, 3, 2);
+    for (let i = 0; i < 26; i++) {   // the light it is eating: specks pulled into its edge
+      const k = ((t * 0.02 + i * 0.137) % 1), yy = top + ((i * 97) % (bot - top)), xx = x + 70 - k * 70;
+      ctx.globalAlpha = 1 - k; ctx.fillStyle = i % 3 ? '#c8b8ff' : '#fff6d8'; ctx.fillRect(Math.round(xx), Math.round(yy), 2, 2);
+    }
+    ctx.globalAlpha = 1;
+    const ey = cy + 150 + Math.sin(t * 0.07) * 10, bl = (t % 160) < 6;
+    if (!bl) { ctx.fillStyle = '#e0d8ff'; ctx.fillRect(x - 8, ey, 12, 3); ctx.fillRect(x - 8, ey + 34, 12, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 3, ey, 3, 3); ctx.fillRect(x - 3, ey + 34, 3, 3); }
   }
 
   function drawParticles(ctx, fx) {
@@ -860,14 +866,14 @@
   function drawBulb(ctx, b, t) {
     const y = b.y + Math.sin(b.t) * 3, x = b.x;
     if (b.closed > 0) {
-      ctx.fillStyle = '#4a1d3a'; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#2a2444'; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
       return;
     }
-    const g = ctx.createRadialGradient(x, y, 2, x, y, 26); g.addColorStop(0, 'rgba(255,143,184,0.45)'); g.addColorStop(1, 'rgba(255,143,184,0)');
+    const g = ctx.createRadialGradient(x, y, 2, x, y, 26); g.addColorStop(0, 'rgba(159,232,255,0.45)'); g.addColorStop(1, 'rgba(159,232,255,0)');
     ctx.fillStyle = g; ctx.fillRect(x - 26, y - 26, 52, 52);
     for (let i = 0; i < 6; i++) {
       const a = i / 6 * Math.PI * 2 + b.t * 0.6;
-      ctx.fillStyle = i % 2 ? '#c2477a' : '#ff8fb8';
+      ctx.fillStyle = i % 2 ? '#4a8ac8' : '#9fe8ff';
       ctx.beginPath(); ctx.ellipse(x + Math.cos(a) * 7, y + Math.sin(a) * 7, 7, 4, a, 0, Math.PI * 2); ctx.fill();
     }
     ctx.fillStyle = PAL.gold; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
@@ -893,13 +899,15 @@
   }
   function drawThornWall(ctx, tw, t) {
     const TS = SH.TILE, x = tw.x * TS, top = tw.top * TS, bot = 16 * TS, wd = tw.w * TS;
-    ctx.fillStyle = '#2a1024'; ctx.fillRect(x + 4, top, wd - 8, bot - top);
-    for (let y = top; y < bot; y += 10) for (let k = 0; k < 3; k++) {
-      const sx = x + 4 + k * (wd - 8) / 3 + Math.sin(y * 0.3 + k) * 3;
-      ctx.fillStyle = '#5a1d3e'; ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx + (k % 2 ? 9 : -9), y + 4); ctx.lineTo(sx, y + 7); ctx.fill();
-      ctx.fillStyle = '#ff5a78'; ctx.fillRect(sx + (k % 2 ? 7 : -9), y + 3, 2, 2);
+    // a wall of the Eclipse's black glass: facets, cold highlights, a violet sheen
+    ctx.fillStyle = '#0c0a16'; ctx.fillRect(x + 2, top, wd - 4, bot - top);
+    for (let y = top; y < bot; y += 14) for (let k = 0; k < 3; k++) {
+      const sx = x + 2 + k * (wd - 4) / 3, w3 = (wd - 4) / 3, o = ((y / 14 | 0) + k) % 2;
+      ctx.fillStyle = o ? '#1c1830' : '#2a2444'; ctx.beginPath(); ctx.moveTo(sx, y + (o ? 0 : 6)); ctx.lineTo(sx + w3, y + (o ? 6 : 0)); ctx.lineTo(sx + w3, y + 14); ctx.lineTo(sx, y + 14); ctx.fill();
+      ctx.fillStyle = 'rgba(224,212,255,0.55)'; ctx.fillRect(Math.round(sx + 2), Math.round(y + (o ? 1 : 6)), Math.round(w3 * 0.4), 1);
     }
-    const g = ctx.createLinearGradient(x - 20, 0, x + wd + 20, 0); g.addColorStop(0, 'rgba(255,60,100,0)'); g.addColorStop(0.5, 'rgba(255,60,100,0.12)'); g.addColorStop(1, 'rgba(255,60,100,0)');
+    for (let k = 0; k < 4; k++) { const sx = x + 4 + k * (wd - 8) / 3, sh = 12 + (k % 2) * 8; ctx.fillStyle = '#2a2444'; ctx.beginPath(); ctx.moveTo(sx - 4, top); ctx.lineTo(sx, top - sh); ctx.lineTo(sx + 4, top); ctx.fill(); ctx.fillStyle = '#e0d4ff'; ctx.fillRect(sx - 1, top - sh, 1, 3); }
+    const g = ctx.createLinearGradient(x - 20, 0, x + wd + 20, 0); g.addColorStop(0, 'rgba(170,140,255,0)'); g.addColorStop(0.5, 'rgba(170,140,255,0.14)'); g.addColorStop(1, 'rgba(170,140,255,0)');
     ctx.fillStyle = g; ctx.fillRect(x - 20, top, wd + 40, bot - top);
   }
   function drawBrazier(ctx, b, t) {
@@ -1065,8 +1073,19 @@
       ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(0, 0, 20, 3, 0, 0, Math.PI * 2); ctx.fill();
       if (t % 9 === 0) SH.fx.burst(e.x + (Math.random() - 0.5) * 40, e.y - 10 - Math.random() * 40, 1, { speed: 0.3, life: 40, gravity: -0.02, colors: ['#fff6d8', '#cfd6ff'], glow: true });
     }
-    ctx.rotate(e.fall * 1.4); ctx.scale(e.dir, 1);
-    stagBody(ctx, e, t, '#0a0818'); stagBody(ctx, e, t, null);
+    // a low star: a ball of white light drifting over the snow, trailing light like a veil
+    const out = Math.min(1, e.fall), bob = e.state === 'down' ? 0 : Math.sin(t * 0.05) * 4, cy = -30 + bob + out * 26;
+    const R = 11 * (1 - out * 0.45), tail = e.state === 'flee' ? 46 : 26;
+    for (let i = 0; i < 7; i++) {   // the veil behind it
+      const k = i / 7; ctx.globalAlpha = (1 - k) * 0.45 * (1 - out * 0.8); ctx.fillStyle = i % 2 ? '#cfd6ff' : '#fff6d8';
+      ctx.beginPath(); ctx.ellipse(-e.dir * (8 + k * tail), cy + Math.sin(t * 0.08 + i) * 3 * k, R * (1 - k * 0.7), R * 0.5 * (1 - k * 0.6), 0, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    const gl = ctx.createRadialGradient(0, cy, 1, 0, cy, R * 3.2); gl.addColorStop(0, `rgba(255,250,235,${0.9 - out * 0.7})`); gl.addColorStop(0.35, `rgba(220,228,255,${0.4 - out * 0.3})`); gl.addColorStop(1, 'rgba(200,210,255,0)');
+    ctx.fillStyle = gl; ctx.fillRect(-R * 3.2, cy - R * 3.2, R * 6.4, R * 6.4);
+    ctx.fillStyle = out < 1 ? '#ffffff' : '#c8c8d8'; ctx.beginPath(); ctx.arc(0, cy, R * 0.55, 0, Math.PI * 2); ctx.fill();
+    for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + t * 0.01; ctx.fillStyle = `rgba(255,255,255,${0.7 - out * 0.6})`; ctx.fillRect(Math.round(Math.cos(a) * R * 1.4) - 1, Math.round(cy + Math.sin(a) * R * 1.4) - 1, 2, 2); }   // its points
+    if (e.state === 'down' && out >= 1 && t % 6 === 0) SH.fx.burst(e.x + (Math.random() - 0.5) * 16, e.y - 6, 1, { speed: 0.2, life: 50, gravity: -0.02, colors: ['#fff6d8', '#cfd6ff'], glow: true });   // its light leaving
     ctx.restore();
   }
   function drawSprite(ctx, e, t) {
@@ -1104,7 +1123,7 @@
     // health pips once it's been hit
     if (e.hp < d.hp) {
       const n = Math.ceil(d.hp / SH.COMBAT.damage), left = Math.ceil(e.hp / SH.COMBAT.damage);
-      for (let i = 0; i < n; i++) { ctx.fillStyle = i < left ? '#9be07a' : '#2a2a3a'; ctx.fillRect(Math.round(x - n * 4 + i * 8 + 1), Math.round(e.y - d.h - 12), 6, 3); }
+      for (let i = 0; i < n; i++) { ctx.fillStyle = i < left ? '#c8b8ff' : '#2a2a3a'; ctx.fillRect(Math.round(x - n * 4 + i * 8 + 1), Math.round(e.y - d.h - 12), 6, 3); }
     }
   }
   function star(ctx, x, y, R, r, n, rot) {
