@@ -323,7 +323,7 @@ function capsFor(build) {
   }
   return out;
 }
-function startAttrs(build) { const c = capsFor(build), o = {}; for (const a of ATTRS) o[a.id] = Math.max(30, Math.round(c[a.id] * 0.60)); return o; }
+function startAttrs(build) { const c = capsFor(build), o = {}; for (const a of ATTRS) o[a.id] = Math.max(30, Math.round(c[a.id] * 0.56)); return o; }
 function attrCost(v) { const b = 6 + Math.pow(Math.max(0, v - 30), 1.55) * 0.16; return Math.round(b * (1 + Math.pow(Math.max(0, v - 55) / 13, 1.6))); }   // HC for +1 from v: cheap early, steep near the top (maxing a build is weeks of play, not one night)
 const OVR_W = { layup: 1, dunk: .7, close: .7, mid: 1, three: 1.2, iq: .8, handle: 1.1, pass: .8, swb: .8, perd: 1, intd: .7, steal: .8, block: .7, reb: .8, speed: 1, accel: 1, str: .6, vert: .7, stam: .6 };
 function ovrOf(attrs) {
@@ -897,8 +897,8 @@ const MODES = [
   { id: 'j3', n: 'RUCKUS 3v3', size: 3, arcade: true, to: 21, d: 'Arcade chaos with six people and no adults.' },
 ];
 const TIERS_COURT = [
-  { n: 'SIDE COURT', rank: 0, ai: 0.30, ovr: 58, mult: 1 },
-  { n: 'MAIN COURT', rank: 2, ai: 0.55, ovr: 70, mult: 1.6 },
+  { n: 'SIDE COURT', rank: 0, ai: 0.42, ovr: 62, mult: 1 },
+  { n: 'MAIN COURT', rank: 2, ai: 0.62, ovr: 72, mult: 1.6 },
   { n: 'THE CAGE', rank: 4, ai: 0.78, ovr: 82, mult: 2.4 },
   { n: 'KINGS COURT', rank: 6, ai: 1.0, ovr: 92, mult: 3.5 },
 ];
@@ -2794,7 +2794,8 @@ function edFromCode(code) { try { const j = JSON.parse(decodeURIComponent(escape
 let MT = null;
 const ARC = 6.75, GRAV = 9.8, HOOP_Y = 3.05;
 const SPOTS = [[-6.9, 0.7], [6.9, 0.7], [-5.6, 5.3], [5.6, 5.3], [0, 7.7], [-2.7, 1.3], [2.7, 1.3], [0, 4.8]];
-const nAtt = (p, id) => clamp((att(p, id) - 25) / 74, 0, 1.15);
+// a rating as 0..1, curved: the low end is worse than a straight line (a 55 plays like a 55, not like most of a 99), the top is the same 1
+const nAtt = (p, id) => Math.pow(clamp((att(p, id) - 25) / 74, 0, 1.08), 1.25);
 function att(p, id) { const v = p.A && p.A[id]; return (typeof v === 'number' && v === v ? v : 60) + (p.bravT > 0 ? 8 : 0) + (p.puA ? (p.puA[id] || 0) : 0); }
 const bt = (p, id) => p.b.badges[id] || 0;
 const dHoop = p => Math.hypot(p.x, p.z);
@@ -3030,7 +3031,7 @@ function shotWin(p, c, n) {
   if (MT.gamePt) w *= 0.78 + nAtt(p, 'iq') * 0.34;
   if (!MT.arcade) { if (p.hot >= 3) w *= 1.08; else if (p.cold >= 3 && bt(p, 'heatcheck') < 2) w *= 0.9; if (MT.runS && MT.runS.n >= 3) w *= MT.runS.team === p.team ? 1.05 : 0.97; }      /* streaks and runs */
   { const lead = MT.score[p.team] - MT.score[1 - p.team]; w *= 1 + px(p, 'green') + (MT.gamePt ? px(p, 'clutch') : 0) + (p.hot >= 2 ? px(p, 'hot') : 0) + (lead <= -3 ? px(p, 'behind') : 0) + (lead >= 3 ? px(p, 'ahead') : 0); }      /* personality */      /* game point: nerves shrink the window, a high Shot IQ widens it */
-  if (p.user && !MT.arcade) w = Math.max(w, 0.035);      /* a floor: a low-rated build still gets about two frames either side */
+  if (p.user && !MT.arcade) w = Math.max(w, 0.028);      /* a floor: a low-rated build still gets about two frames either side */
   return w;
 }
 function releaseShot(p) {
@@ -3218,7 +3219,7 @@ function resolveFinish(p) {
   const pts = MT.arcade ? 2 : 1;
   if (f.type === 'dunk') {
     const ds = DUNK[f.style] || DUNKS[0];
-    const prob = 0.74 + nAtt(p, 'dunk') * 0.24 + ds.bonus + 0.04 * bt(p, 'gravity') + put - c * 0.5 + (MT.arcade ? 0.15 : 0) + (p.fire ? 0.3 : 0);
+    const prob = 0.66 + nAtt(p, 'dunk') * 0.32 + ds.bonus + 0.04 * bt(p, 'gravity') + put - c * 0.5 + (MT.arcade ? 0.15 : 0) + (p.fire ? 0.3 : 0);
     const dk = Math.random() < prob; if (typeof vipFin === 'function') vipFin(p, 'dunk', dk, c);
     if (dk) {
       B.state = 'through'; B.holder = null; B.pos.set(0, HOOP_Y - 0.05, 0); B.vel.set(0, -5, 0); B.t = 0; B.scored = true;
@@ -3233,7 +3234,7 @@ function resolveFinish(p) {
     missed(p); B.state = 'loose'; B.holder = null; B.pos.set(0, HOOP_Y + 0.2, 0.2); B.vel.set(rnd(-2, 2), rnd(3, 5), rnd(1, 4)); B.rebound = true; B.shooter = p; B.t = 0; MT.hoopT = 0.4; sfxM('rim'); if (MT.drill) drillEvent('miss', p, { kind: 'dunk' }); fb(p, 'Rim check failed', '#ff8a1f'); p.hot = 0; p.fire = false; return;
   }
   const kAdj = { under: -0.04, over: -0.03, quick: -0.03, spin: -0.05, finger: -0.03, scoop: -0.03, reverse: -0.02, power: -0.04 + nAtt(p, 'str') * 0.1, euro: 0, lay: 0.02, hang: -0.02, switch: -0.01 }[f.kind] || 0;
-  const prob = 0.52 + nAtt(p, 'layup') * 0.38 + 0.03 * bt(p, 'softmoney') + put + kAdj + px(p, 'fin') + px(p, 'close') + (f.postFin || 0) - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
+  const prob = 0.46 + nAtt(p, 'layup') * 0.44 + 0.03 * bt(p, 'softmoney') + put + kAdj + px(p, 'fin') + px(p, 'close') + (f.postFin || 0) - c * (f.kind === 'power' ? 0.45 : 0.6) + (p.fire ? 0.3 : 0);
   const lk = Math.random() < prob; if (typeof vipFin === 'function') vipFin(p, f.kind || 'lay', lk, c);
   handPos(p.rig, f.bh || 'R', B.pos); launch(p, lk, pts, false, 1, 'close'); if (f.foulBy) B.foulBy = f.foulBy; B.T = 0.32; B.vel.set(-B.pos.x / B.T, (HOOP_Y + 0.06 - B.pos.y + 0.5 * GRAV * B.T * B.T) / B.T, -B.pos.z / B.T);
   if (!B.make) { B.vel.x += rnd(-0.6, 0.6); B.vel.z += rnd(0.2, 0.8); }
@@ -3242,7 +3243,7 @@ function startMove(p, slot, dx, dz) {
   if (p.moveCool > 0 || p.stam < 6) return;
   const mv = packMove(p, slot) || MOVE[p.b.moves[slot]] || MOVES.find(m => m.slot === slot);
   if (mv.keep) { dx *= 0.45; dz = -0.9; }            /* in-and-out: the fake goes sideways, the burst goes forward */ const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
-  const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.3);
+  const burstV = mv.burst * (1 + 0.06 * bt(p, 'getaway')) * (0.85 + nAtt(p, 'accel') * 0.22);
   if (typeof vipMove === 'function') vipMove(p, mv.id);
   p.dblX = null;
   p.moveN = (p.moveN || 0) + 1; p.st = 'move'; p.t = 0; p.mv = { mv, dx, dz, v: burstV, slot, h0: p.hand }; p.moveCool = mv.dur * 0.48; p.stam -= mv.st; p.handSwT = MT.time + 0.8;      /* a hand you chose with a move stays chosen a while */ if (mv.slot === 'side' && !mv.keep) {      // a crossover: the ball goes to the hand on the side you go, as seen looking at the rim (it had them backwards:
@@ -3925,7 +3926,7 @@ function stepPlayer(p, dt) {
   } else p.assist = 0;
   // locomotion
   // a jog is a jog and a sprint is a sprint: jog 2.7-4.3 m/s by Speed, sprint 4.2-7.4 (it used to be 3.3-5.8 against 4.2-7.4, which read the same)
-  const jogV = 2.7 + nAtt(p, 'speed') * 1.6, sprV = 4.2 + nAtt(p, 'speed') * 3.2; let top = jogV * (M_.arcade ? 1.15 : 1);
+  const jogV = 2.7 + nAtt(p, 'speed') * 1.35, sprV = 4.2 + nAtt(p, 'speed') * 2.5;      /* a 99 sprints at 6.7 m/s (it was 7.4: on a half court that was a blur), a new build at about 5 */ let top = jogV * (M_.arcade ? 1.15 : 1);
   if (hasBall) top *= 0.80 + 0.17 * nAtt(p, 'swb');
   if (p.post) top = Math.min(top, 1.2 + 0.45 * nAtt(p, 'str'));
   top *= 1 + px(p, 'speed'); if (p.screen && p.user) top *= 0.2; if (p.bodyUp) { const h = B.holder; top *= h && h.team !== p.team && dist(h, p) < 1.3 ? 1 : 0.86; }      /* bodied up on him, your feet keep up with his; only away from him is the stance slower */ if (p.box) top *= 0.62;
@@ -3949,7 +3950,7 @@ function stepPlayer(p, dt) {
       const onBallD = def && B.holder && B.holder.team !== p.team && dist(B.holder, p) < 3; p.onBallD = onBallD;      /* the man guarding the ball slides: no plant, sharper feet */
       if (!onBallD && !(p.plantT > 0) && p.st === 'free' && p.y < 0.05 && sp0 > 2.6 && tl > 1 && (p.vx * tvx + p.vz * tvz) / (sp0 * tl) < 0.3) { p.plantD = 0.14 + 0.12 * (1 - nAtt(p, 'accel')); p.plantT = p.plantD; p.plantX = p.vx / sp0; p.plantZ = p.vz / sp0; sfx('squeak'); }
       if (p.plantT > 0) { p.plantT -= dt; if (p.plantT > p.plantD * 0.45) { tvx = 0; tvz = 0; } } }
-    const acc = (9 + nAtt(p, 'accel') * 12) * (opp ? 1.9 : 1) * (p.onBallD ? 1 + (0.45 + 0.35 * nAtt(p, 'perd')) * (p.user ? 1 : clamp((p.aiLvl - 0.2) / 0.6, 0, 1)) : 1) * dt;      // braking and reversing bite harder than speeding up
+    const acc = (9 + nAtt(p, 'accel') * 9.5) * (opp ? 1.9 : 1) * (p.onBallD ? 1 + (0.45 + 0.35 * nAtt(p, 'perd')) * (p.user ? 1 : clamp((p.aiLvl - 0.2) / 0.6, 0, 1)) : 1) * dt;      // braking and reversing bite harder than speeding up
     const ddx = tvx - p.vx, ddz = tvz - p.vz, dl = Math.hypot(ddx, ddz); if (dl <= acc || dl === 0) { p.vx = tvx; p.vz = tvz; } else { p.vx += ddx / dl * acc; p.vz += ddz / dl * acc; }
   }
   // guarding a post-up: hold your ground (you do not walk into him); the contact itself decides who gives, by strength
