@@ -875,5 +875,13 @@ rep("    SC.world.build();\n    pl.init(); SC.cam.init();", "    if (G.waMood) G
 
 /* ---- end WORLD-B ---- */
 
+/* ---- v0.91 LOOK team patches (grit: rendering, HUD, pages) go here ---- */
+
+/* ---- end LOOK ---- */
+
+/* ---- v0.91 LORE team patches go here ---- */
+
+/* ---- end LORE ---- */
+
 writeFileSync(dir + 'issue.html', s);
 console.log('issue.html', (s.length / 1024).toFixed(1) + ' KB,', n, 'patches');
